@@ -21,7 +21,8 @@ export type PushNotificationType =
   | 'challenge_accepted'
   | 'challenge_declined'
   | 'gift_received'
-  | 'level_up';
+  | 'level_up'
+  | 'season_start';
 
 /**
  * Map push types to notification_type for user_notifications table (N-7)
@@ -38,6 +39,7 @@ const NOTIFICATION_TYPE_MAP: Record<PushNotificationType, string> = {
   achievement: 'achievement',
   daily_challenge: 'system',
   level_up: 'achievement',
+  season_start: 'system',
 };
 
 /**
@@ -425,6 +427,31 @@ export async function notifyLevelUp(
     data: {
       type: 'level_up',
       deepLink: '/adventure',
+    },
+  }, 'both');
+}
+
+/**
+ * Notify user that a new season has started.
+ * `prevSeasonId` is the season that just ended — when the player has a row
+ * in that archive, they have rewards to claim and the body switches to the
+ * "claim now" copy. When prevSeasonId is omitted, body falls to a generic
+ * "new season has begun" line (e.g. season-1 cold-start, no archive yet).
+ */
+export async function notifySeasonStart(
+  toUserId: string,
+  newSeasonId: number,
+  prevSeasonId?: number
+): Promise<void> {
+  const locale = await getUserLocale(toUserId);
+  const bodyKey = prevSeasonId ? 'seasonStart.body' : 'seasonStart.bodyNoClaim';
+  return triggerPush(toUserId, 'season_start', {
+    title: translatePush(locale, 'seasonStart.title', { n: newSeasonId }),
+    body: translatePush(locale, bodyKey, prevSeasonId ? { prev: prevSeasonId } : {}),
+    imageUrl: mascotImageUrl('celebration'),
+    data: {
+      type: 'season_start',
+      deepLink: '/leaderboard',
     },
   }, 'both');
 }

@@ -398,6 +398,86 @@ export async function triggerAutoPromotion(): Promise<{
 }
 
 /**
+ * Start Season Reset cron
+ *
+ * Runs daily at 00:05 UTC. Idempotent: only seasons whose status='active'
+ * AND end_date <= now() are processed, so daily firings are no-ops 29 of 30
+ * days. Push fan-out (`season_start`) happens inside `processExpiredSeasons`
+ * — every archived player is notified that the new season is live.
+ */
+export function startSeasonResetCron() {
+  const task = cron.schedule('5 0 * * *', async () => {
+    await withCronLock('cron:season-reset', 15 * 60 * 1000, async () => {
+      logger.info('CRON', 'Starting season reset...');
+      const startTime = Date.now();
+
+      try {
+        const { processExpiredSeasons } = await import('../modules/seasonManager');
+        const result = await processExpiredSeasons();
+        const duration = Date.now() - startTime;
+
+        if (result.errors?.length) {
+          logger.error('CRON', 'Season reset reported errors', { errors: result.errors });
+        }
+        logger.info('CRON', `Season reset complete in ${duration}ms`, {
+          processed: result.processed,
+          notified: result.notified ?? 0,
+        });
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+        logger.error('CRON', 'Season reset failed', { error: errorMsg });
+      }
+    });
+  }, {
+    timezone: 'UTC',
+  });
+
+  logger.info('CRON', 'Season reset cron started (runs daily at 00:05 UTC)');
+  return task;
+}
+
+/**
+ * Manual trigger for Season Reset
+ * Used by admin dashboard / staging validation
+ */
+export async function triggerSeasonReset(): Promise<{
+  success: boolean;
+  processed: number;
+  notified: number;
+  duration: number;
+  error?: string;
+}> {
+  logger.info('MANUAL', 'Starting manual season reset...');
+  const startTime = Date.now();
+
+  try {
+    const { processExpiredSeasons } = await import('../modules/seasonManager');
+    const result = await processExpiredSeasons();
+    const duration = Date.now() - startTime;
+
+    logger.info('MANUAL', `Season reset complete in ${duration}ms`, result);
+
+    return {
+      success: !result.errors?.length,
+      processed: result.processed,
+      notified: result.notified ?? 0,
+      duration,
+      error: result.errors?.join('; '),
+    };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('MANUAL', 'Season reset failed', { error: errorMsg });
+    return {
+      success: false,
+      processed: 0,
+      notified: 0,
+      duration: Date.now() - startTime,
+      error: errorMsg,
+    };
+  }
+}
+
+/**
  * Start Re-engagement Email cron
  * Runs every hour to send "first letter hint" emails to inactive daily challenge players.
  * The recipient query filters by local time (7-9 AM), so hourly runs cover all timezones.
@@ -472,6 +552,9 @@ export function startAllCronJobs(): ScheduledTask[] {
 
   // Re-engagement emails (hourly — filters by local time 7-9 AM)
   tasks.push(startReengagementEmailCron());
+
+  // Season reset (daily 00:05 UTC, no-op when no expired seasons)
+  tasks.push(startSeasonResetCron());
 
   logger.info('CRON', `All ${tasks.length} cron jobs started`);
   return tasks;

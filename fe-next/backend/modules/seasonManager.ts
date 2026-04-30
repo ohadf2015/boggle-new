@@ -9,6 +9,8 @@
  */
 
 import { getSupabase } from './supabaseServer';
+import { notifySeasonStart } from './pushNotificationTriggers';
+import logger from '../utils/logger';
 
 export interface SeasonResetResult {
   success: boolean;
@@ -27,12 +29,17 @@ const EMPTY_FAILURE = (msg: string): SeasonResetResult => ({
 export interface ExpiredSeasonsResult {
   processed: number;
   results: SeasonResetResult[];
+  notified?: number;
   errors?: string[];
 }
 
 /**
  * Discovers all `seasons` rows with status='active' AND end_date <= now()
  * and processes a reset for each. Used by the cron route at T+0.
+ *
+ * After each successful reset, fans out a `season_start` push to every
+ * player archived in the just-closed season. Push fan-out is best-effort:
+ * failures are logged but never abort the rotation.
  */
 export async function processExpiredSeasons(): Promise<ExpiredSeasonsResult> {
   const supabase = getSupabase();
@@ -59,14 +66,57 @@ export async function processExpiredSeasons(): Promise<ExpiredSeasonsResult> {
     }
 
     const results: SeasonResetResult[] = [];
+    let notified = 0;
     for (const row of rows) {
-      results.push(await processSeasonReset(row.id));
+      const result = await processSeasonReset(row.id);
+      results.push(result);
+      if (result.success && result.snapshotted > 0) {
+        notified += await notifyPlayersOfSeasonStart(row.id, row.id + 1);
+      }
     }
 
-    return { processed: rows.length, results };
+    return { processed: rows.length, results, notified };
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return { processed: 0, results: [], errors: [msg] };
+  }
+}
+
+/**
+ * Fan out a `season_start` push to every player archived in `prevSeasonId`.
+ * Returns the count of pushes scheduled (allSettled — never throws).
+ */
+export async function notifyPlayersOfSeasonStart(
+  prevSeasonId: number,
+  newSeasonId: number
+): Promise<number> {
+  const supabase = getSupabase();
+  if (!supabase) return 0;
+
+  try {
+    const { data, error } = await supabase
+      .from('season_leaderboards')
+      .select('player_id')
+      .eq('season_id', prevSeasonId);
+
+    if (error) {
+      logger.warn('SEASON', 'notifyPlayersOfSeasonStart query failed', { error: error.message });
+      return 0;
+    }
+
+    const ids = ((data ?? []) as Array<{ player_id: string }>)
+      .map((r) => r.player_id)
+      .filter(Boolean);
+    if (ids.length === 0) return 0;
+
+    await Promise.allSettled(
+      ids.map((id) => notifySeasonStart(id, newSeasonId, prevSeasonId)),
+    );
+    return ids.length;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    logger.error('SEASON', 'notifyPlayersOfSeasonStart threw', { error: msg });
+    return 0;
   }
 }
 

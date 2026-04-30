@@ -16,6 +16,7 @@ import {
   notifyDirectMessage,
   notifyGiftReceived,
   notifyTurnReminder,
+  notifySeasonStart,
 } from '../pushNotificationTriggers';
 
 // Mock fcmService
@@ -276,6 +277,47 @@ describe('pushNotificationTriggers', () => {
           deepLink: '/join/ABC123',
         },
       }));
+    });
+  });
+
+  describe('notifySeasonStart', () => {
+    it('sends push with claim copy when prev season provided', async () => {
+      await notifySeasonStart('uid', 5, 4);
+
+      expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
+        title: '🏆 Season 5 is here!',
+        body: 'Season 4 ended — claim your rewards now!',
+        data: {
+          type: 'season_start',
+          deepLink: '/leaderboard',
+        },
+      }));
+    });
+
+    it('falls back to no-claim copy when prev season missing', async () => {
+      await notifySeasonStart('uid', 1);
+
+      expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
+        title: '🏆 Season 1 is here!',
+        body: 'A new season has begun — climb the ranks!',
+      }));
+    });
+
+    it('saves notification history with system type', async () => {
+      await notifySeasonStart('uid', 5, 4);
+
+      expect(mockInsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          user_id: 'uid',
+          notification_type: 'system',
+          title: '🏆 Season 5 is here!',
+        }),
+      );
+    });
+
+    it('does not throw on FCM failure', async () => {
+      mockSendToUser.mockRejectedValue(new Error('FCM down'));
+      await expect(notifySeasonStart('uid', 5, 4)).resolves.toBeUndefined();
     });
   });
 });

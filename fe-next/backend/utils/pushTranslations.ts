@@ -66,6 +66,10 @@ const STRINGS: Record<PushLocale, Dict> = {
 
     'levelUp.title': 'Level {level}!',
     'levelUp.body': 'Congratulations — you reached level {level}!',
+
+    'seasonStart.title': '🏆 Season {n} is here!',
+    'seasonStart.body': 'Season {prev} ended — claim your rewards now!',
+    'seasonStart.bodyNoClaim': 'A new season has begun — climb the ranks!',
   },
   he: {
     'friendRequest.title': 'בקשת חברות',
@@ -110,6 +114,10 @@ const STRINGS: Record<PushLocale, Dict> = {
 
     'levelUp.title': '!{level} שלב',
     'levelUp.body': '!{level} מזל טוב — הגעת לשלב',
+
+    'seasonStart.title': '!{n} עונה 🏆',
+    'seasonStart.body': '!הסתיימה — מהר/י לאסוף את הפרסים {prev} עונה',
+    'seasonStart.bodyNoClaim': '!עונה חדשה התחילה — בוא/י לטפס בדירוג',
   },
   sv: {
     'friendRequest.title': 'Vänförfrågan',
@@ -154,6 +162,10 @@ const STRINGS: Record<PushLocale, Dict> = {
 
     'levelUp.title': 'Nivå {level}!',
     'levelUp.body': 'Grattis — du nådde nivå {level}!',
+
+    'seasonStart.title': '🏆 Säsong {n} är här!',
+    'seasonStart.body': 'Säsong {prev} avslutades — hämta dina belöningar nu!',
+    'seasonStart.bodyNoClaim': 'En ny säsong har börjat — klättra i rankningen!',
   },
   ja: {
     'friendRequest.title': 'フレンド申請',
@@ -198,6 +210,10 @@ const STRINGS: Record<PushLocale, Dict> = {
 
     'levelUp.title': 'レベル{level}！',
     'levelUp.body': 'おめでとう — レベル{level}に到達！',
+
+    'seasonStart.title': '🏆 シーズン{n}開幕！',
+    'seasonStart.body': 'シーズン{prev}が終了 — 報酬を受け取ろう！',
+    'seasonStart.bodyNoClaim': '新シーズン開幕 — ランキングを駆け上がろう！',
   },
   es: {
     'friendRequest.title': 'Solicitud de amistad',
@@ -242,6 +258,10 @@ const STRINGS: Record<PushLocale, Dict> = {
 
     'levelUp.title': '¡Nivel {level}!',
     'levelUp.body': '¡Felicidades — llegaste al nivel {level}!',
+
+    'seasonStart.title': '🏆 ¡Llegó la Temporada {n}!',
+    'seasonStart.body': '¡La Temporada {prev} terminó — reclama tus recompensas!',
+    'seasonStart.bodyNoClaim': '¡Empezó una nueva temporada — sube en la clasificación!',
   },
 };
 
