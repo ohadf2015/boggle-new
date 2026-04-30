@@ -4623,7 +4623,7 @@ const en = {
       "vaultSubtitle": "Stash coins, unlock rewards"
     },
     "playingNow": "Playing Now",
-    "welcomeTitle": "Words. Rivals. Glory.",
+    "welcomeTitle": "Words. Friends. Wins.",
     "welcomeSubtitle": "Free. No sign-up. No pay-to-win.",
     "playTodayChallenge": "Play Today's Challenge",
     "moreGameModes": "More Game Modes",

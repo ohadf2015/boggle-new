@@ -4521,7 +4521,7 @@ const he = {
       "vaultSubtitle": "אספו מטבעות, פתחו פרסים"
     },
     "playingNow": "משחקים עכשיו",
-    "welcomeTitle": "מילים. יריבים. תהילה.",
+    "welcomeTitle": "מילים. חברים. ניצחון.",
     "welcomeSubtitle": "חינם. בלי הרשמה. בלי תשלום לניצחון.",
     "playTodayChallenge": "שחקו באתגר היומי",
     "moreGameModes": "עוד מצבי משחק",

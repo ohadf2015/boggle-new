@@ -4518,7 +4518,7 @@ const sv = {
       "vaultSubtitle": "Samla mynt, lås upp belöningar"
     },
     "playingNow": "Spelar Nu",
-    "welcomeTitle": "Ord. Rivaler. Ära.",
+    "welcomeTitle": "Ord. Vänner. Seger.",
     "welcomeSubtitle": "Gratis. Ingen registrering. Inget pay-to-win.",
     "playTodayChallenge": "Spela dagens utmaning",
     "moreGameModes": "Fler spellägen",

@@ -4548,7 +4548,7 @@ const es = {
       "vaultSubtitle": "Acumula monedas, desbloquea recompensas"
     },
     "playingNow": "jugando",
-    "welcomeTitle": "Palabras. Rivales. Gloria.",
+    "welcomeTitle": "Palabras. Amigos. Victoria.",
     "welcomeSubtitle": "Gratis. Sin registro. Sin pagar para ganar.",
     "playTodayChallenge": "Jugar el desafío de hoy",
     "moreGameModes": "Más modos de juego",

@@ -18,16 +18,15 @@ import LanguageSelect from './LanguageSelect';
 import TutorialGame from './TutorialGame';
 import QuickProfileSetup from './QuickProfileSetup';
 import ScoreRevealV2 from './ScoreRevealV2';
-import ModeFork from './ModeFork';
 import OnboardingProgress from './OnboardingProgress';
 import ReturningUserStep from './ReturningUserStep';
 import CrazyGamesWelcome, { type CrazyGamesMode } from './CrazyGamesWelcome';
 import AuthModal from '@/components/auth/AuthModal';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
-type FlowStep = 'returningUser' | 'language' | 'tutorial' | 'profile' | 'scoreReveal' | 'fork';
+type FlowStep = 'returningUser' | 'language' | 'tutorial' | 'profile' | 'scoreReveal';
 
-const STEPS: FlowStep[] = ['language', 'returningUser', 'tutorial', 'profile', 'scoreReveal', 'fork'];
+const STEPS: FlowStep[] = ['language', 'returningUser', 'tutorial', 'profile', 'scoreReveal'];
 
 /** Step-specific accent colors for the floating background shapes */
 const STEP_ACCENTS: Record<FlowStep, { color1: string; color2: string }> = {
@@ -36,7 +35,6 @@ const STEP_ACCENTS: Record<FlowStep, { color1: string; color2: string }> = {
   tutorial: { color1: 'rgba(0,255,255,0.06)', color2: 'rgba(191,255,0,0.04)' },
   profile: { color1: 'rgba(255,20,147,0.06)', color2: 'rgba(191,255,0,0.04)' },
   scoreReveal: { color1: 'rgba(191,255,0,0.08)', color2: 'rgba(255,20,147,0.05)' },
-  fork: { color1: 'rgba(139,92,246,0.06)', color2: 'rgba(0,255,255,0.05)' },
 };
 
 interface OnboardingFlowProps {
@@ -45,7 +43,7 @@ interface OnboardingFlowProps {
 
 /**
  * OnboardingFlow - Orchestrates the full FTUE.
- * State machine: language -> tutorial -> profile -> scoreReveal -> fork.
+ * State machine: language -> tutorial -> profile -> scoreReveal -> home.
  * Full-screen with floating geometric background and progress dots.
  */
 const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
@@ -143,47 +141,27 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   );
 
 
-  // Step 3: Continue to fork
+  // Step 3: Score reveal complete — finish onboarding and land on the home page.
+  // The mode-fork screen used to live here; we now skip it so first-timers go
+  // straight to the full landing UX where they can pick any mode themselves.
   const handleContinue = useCallback(() => {
+    if (isNavigating) return;
+    setIsNavigating(true);
     trackOnboardingStep('score_reveal', { action: 'continue' });
-    setStep('fork');
-  }, []);
+    markOnboardingComplete({
+      avatarId: 'custom',
+      displayName: playerName || 'Player',
+      selectedMode: 'home',
+    });
 
-  // Step 4: Mode selected — complete the onboarding
-  const handleModeSelect = useCallback(
-    (mode: 'daily' | 'practice' | 'home' | 'joinRoom') => {
-      // Prevent double-taps from stacking router pushes during navigation
-      if (isNavigating) return;
-      setIsNavigating(true);
-      trackOnboardingStep('mode_select', { mode });
-      markOnboardingComplete({
-        avatarId: 'custom',
-        displayName: playerName || 'Player',
-        selectedMode: mode === 'daily' ? 'daily' : mode === 'joinRoom' ? 'multi' : mode === 'home' ? 'home' : 'single',
-      });
-
-      // Check for a pending room invite (saved before FTUE started)
-      const pendingRoom = consumePendingRoomInvite();
-      if (mode === 'joinRoom' && pendingRoom) {
-        router.push(`/${language}/multiplayer?room=${pendingRoom}`);
-      } else if (pendingRoom) {
-        // Even if they picked daily/practice, still redirect to the room
-        // since that was their original intent
-        router.push(`/${language}/multiplayer?room=${pendingRoom}`);
-      } else if (mode === 'home') {
-        router.push(`/${language}`);
-      } else {
-        const route =
-          mode === 'daily'
-            ? `/${language}/daily`
-            : `/${language}/singleplayer?autoStart=practice`;
-        router.push(route);
-      }
-
-      onComplete();
-    },
-    [language, router, onComplete, playerName, isNavigating]
-  );
+    const pendingRoom = consumePendingRoomInvite();
+    if (pendingRoom) {
+      router.push(`/${language}/multiplayer?room=${pendingRoom}`);
+    } else {
+      router.push(`/${language}`);
+    }
+    onComplete();
+  }, [isNavigating, language, router, onComplete, playerName]);
 
   // Step 0: Language selected — proceed to returningUser prompt
   // On CrazyGames the "have an account" branch is dead (no external auth),
@@ -245,8 +223,6 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
             onSkip={handleSkipOnboarding}
           />
         );
-      case 'fork':
-        return <ModeFork onSelectMode={handleModeSelect} hasPendingInvite={hasPendingRoomInvite()} />;
       default:
         return null;
     }
