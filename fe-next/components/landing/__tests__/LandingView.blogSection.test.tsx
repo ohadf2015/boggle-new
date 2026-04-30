@@ -1,11 +1,16 @@
 /**
- * RED test: LandingView must start ambient music via a single mount-time
- * call to playTrack(BOSSA). It must NOT register window pointerdown/keydown
- * listeners that duplicate MusicContext's own auto-unlock path (which caused
- * double playback of the Bossa track).
+ * Homepage blog section: must surface the 3 NEWEST blog posts (the ones
+ * authored most recently per LandingBlogSection's `recentPosts` array).
+ *
+ * Regression guard: the previous version of the homepage rendered three
+ * stale slugs (science-behind-word-games / why-word-games-are-addictive /
+ * daily-challenge-strategies) hardcoded inside LandingSEOSection's
+ * `blogLinks`. That data path was duplicated and went unmaintained — so
+ * even after `recentPosts` was updated to the new posts, the homepage
+ * kept showing the old ones.
  */
 import React from 'react';
-import { render, act } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import LandingView from '../LandingView';
 import { useAuth } from '@/contexts/AuthContext';
@@ -56,6 +61,9 @@ vi.mock('@/hooks/useEvents', () => ({
 }));
 vi.mock('@/utils/perfVariant', () => ({ getPerfVariant: () => 'low' }));
 vi.mock('@/utils/growthTracking', () => ({ trackModeSelected: vi.fn() }));
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => ({ isOnCrazyGamesPlatform: false, isLoading: false }),
+}));
 vi.mock('next/dynamic', () => ({ default: () => () => <div /> }));
 vi.mock('framer-motion', () => {
   const motionObj: Record<string, React.FC<React.PropsWithChildren<Record<string, unknown>>>> = new Proxy(
@@ -72,11 +80,13 @@ vi.mock('framer-motion', () => {
 vi.mock('next/link', () => ({
   default: ({ children, href }: { children: React.ReactNode; href: string }) => <a href={href}>{children}</a>,
 }));
+vi.mock('next/image', () => ({
+  default: ({ alt, ...rest }: { alt: string }) => <img alt={alt} {...rest} />,
+}));
 vi.mock('@/components/Header', () => ({ default: () => <header /> }));
 vi.mock('../LandingHero', () => ({ LandingHero: () => <div /> }));
 vi.mock('../LandingChallengeCards', () => ({ LandingChallengeCards: () => <div /> }));
 vi.mock('../LandingLeaderboardPreview', () => ({ LandingLeaderboardPreview: () => <div /> }));
-vi.mock('../LandingSEOSection', () => ({ LandingSEOSection: () => <div />, ScrollIndicator: () => <div /> }));
 vi.mock('@/components/ads', () => ({ AdPlaceholder: () => <div />, InlineBannerAd: () => <div /> }));
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -85,47 +95,36 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
   </QueryClientProvider>
 );
 
-describe('LandingView — music init', () => {
-  const playTrack = vi.fn();
-  const unlockAudio = vi.fn();
-
+describe('LandingView — homepage blog section', () => {
   beforeEach(() => {
-    playTrack.mockClear();
-    unlockAudio.mockClear();
     (useAuth as unknown as vi.Mock).mockReturnValue({ isAuthenticated: false, loading: false, profile: null });
     (useLanguage as unknown as vi.Mock).mockReturnValue({ t: (k: string) => k, language: 'en', dir: 'ltr' });
     (useMusic as unknown as vi.Mock).mockReturnValue({
-      playTrack, unlockAudio, fadeToTrack: playTrack, TRACKS: { BOSSA: 'bossa', LOBBY: 'lobby' },
+      playTrack: vi.fn(), unlockAudio: vi.fn(), fadeToTrack: vi.fn(),
+      TRACKS: { BOSSA: 'bossa', LOBBY: 'lobby' },
     });
   });
 
-  it('calls playTrack(BOSSA) exactly once on mount, without requiring a user gesture', () => {
-    render(<LandingView />, { wrapper });
+  it('renders the 3 newest blog post links (not the legacy stale set)', () => {
+    const { container } = render(<LandingView />, { wrapper });
+    const hrefs = Array.from(container.querySelectorAll('a')).map((a) => a.getAttribute('href') || '');
 
-    const bossaCalls = playTrack.mock.calls.filter((c) => c[0] === 'bossa');
-    expect(bossaCalls).toHaveLength(1);
-  });
+    // Newest 3 (per LandingBlogSection.recentPosts) must be present.
+    expect(hrefs).toEqual(expect.arrayContaining([
+      '/en/blog/netflix-word-game-2026-rise',
+      '/en/blog/boggle-vs-wordle',
+      '/en/blog/boggle-vs-scrabble',
+    ]));
 
-  it('does not register window pointerdown/keydown listeners that would trigger duplicate playback', () => {
-    const addSpy = vi.spyOn(window, 'addEventListener');
-    render(<LandingView />, { wrapper });
-
-    const landingListeners = addSpy.mock.calls.filter(
-      ([evt]) => evt === 'pointerdown' || evt === 'keydown'
-    );
-    expect(landingListeners).toHaveLength(0);
-    addSpy.mockRestore();
-  });
-
-  it('does not re-trigger playTrack when the user taps the document', () => {
-    render(<LandingView />, { wrapper });
-    playTrack.mockClear();
-
-    act(() => {
-      window.dispatchEvent(new Event('pointerdown'));
-      document.dispatchEvent(new Event('click'));
-    });
-
-    expect(playTrack).not.toHaveBeenCalled();
+    // The legacy slugs that were hardcoded in LandingSEOSection.blogLinks
+    // must NOT leak through any other path on the homepage.
+    const legacy = [
+      '/en/blog/science-behind-word-games',
+      '/en/blog/why-word-games-are-addictive',
+      '/en/blog/daily-challenge-strategies',
+    ];
+    for (const stale of legacy) {
+      expect(hrefs).not.toContain(stale);
+    }
   });
 });
