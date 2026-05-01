@@ -16,7 +16,11 @@ interface LootChestRevealProps {
   chestTier?: ChestTier;
 }
 
-const STAGGER_MS = 500;
+// F12 audit (2026-05-01): tightened from 500→200ms so 4-drop reveal completes
+// in ~800ms (well under the 1500ms target). Reframes pacing as abundance, not grind.
+const STAGGER_MS = 200;
+
+const GOLD_DROP_TYPES = new Set(['gold', 'bonusGold']);
 
 const RARITY_GLOW: Record<LootRarity, string> = {
   common: 'shadow-hard-sm',
@@ -104,6 +108,11 @@ export default function LootChestReveal({
   const allRevealed = revealedCount >= drops.length;
   const chestAssets = CHEST_IMAGES[chestTier];
 
+  // F12 audit (2026-05-01): bold total reframes loot as abundance.
+  const totalGold = drops
+    .filter(d => GOLD_DROP_TYPES.has(d.type))
+    .reduce((sum, d) => sum + (d.quantity ?? 1), 0);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
       <AdaptiveMotion.div
@@ -169,6 +178,24 @@ export default function LootChestReveal({
             </div>
           )}
         </AdaptiveAnimatePresence>
+
+        {/* F12 — bold total gold sum, only when there's gold to celebrate */}
+        {allRevealed && opened && totalGold > 0 && (
+          <AdaptiveMotion.div
+            data-testid="loot-total-gold"
+            initial={{ opacity: 0, scale: 0.6 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 18 }}
+            className="flex items-baseline gap-2 px-5 py-2 rounded-neo border-3 border-neo-yellow bg-neo-yellow/15 shadow-hard"
+          >
+            <span className="text-xs font-bold uppercase tracking-wide text-neo-yellow/80">
+              {t('adventure.loot.total')}
+            </span>
+            <span className="font-neo-display text-3xl font-black text-neo-yellow tabular-nums">
+              +{totalGold}
+            </span>
+          </AdaptiveMotion.div>
+        )}
 
         {/* Continue */}
         {allRevealed && opened && (

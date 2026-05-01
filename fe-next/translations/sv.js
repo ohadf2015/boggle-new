@@ -5498,7 +5498,10 @@ const sv = {
       "matchSummary": "Matchsammanfattning",
       "survived": "Överlevde",
       "outOrder": "Ut #{order}",
-      "eliminatedOrder": "#{order}"
+      "eliminatedOrder": "#{order}",
+      "stepBadge": "STEG 2 AV 2",
+      "completeDailyTitle": "Avsluta dagens utmaning",
+      "completeDailyDesc": "Spela Ordjakt för att slutföra din dagliga utmaning"
     },
     "score": {
       "title": "Din Poäng",
@@ -7347,7 +7350,8 @@ const sv = {
       "bestWords": "Bästa ord",
       "bestScore": "Bästa poäng",
       "attempts": "Försök",
-      "nearMissTitle": "Så nära!"
+      "nearMissTitle": "Så nära!",
+      "objectiveProgress": "Så här gick det"
     },
     "preview": {
       "title": "Förhandsvisning",
@@ -8109,7 +8113,8 @@ const sv = {
       "ancientRelic": "Forntida relik",
       "cosmicShard": "Kosmisk skärva",
       "fragment": "Fragment",
-      "luckyBonus": "Lyckobonusen!"
+      "luckyBonus": "Lyckobonusen!",
+      "total": "Totalt"
     },
     "ascension": {
       "level1": "Nybörjare", "level2": "Lärling", "level3": "Adept",

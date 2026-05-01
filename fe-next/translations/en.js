@@ -5598,7 +5598,10 @@ const en = {
       "matchSummary": "Match Summary",
       "survived": "Survived",
       "outOrder": "Out #{order}",
-      "eliminatedOrder": "#{order}"
+      "eliminatedOrder": "#{order}",
+      "stepBadge": "STEP 2 OF 2",
+      "completeDailyTitle": "Finish today's challenge",
+      "completeDailyDesc": "Play Word Hunt to complete your Daily Challenge"
     },
     "score": {
       "title": "Your Score",
@@ -7439,7 +7442,8 @@ const en = {
       "bestWords": "Best Words",
       "bestScore": "Best Score",
       "attempts": "Attempts",
-      "nearMissTitle": "So Close!"
+      "nearMissTitle": "So Close!",
+      "objectiveProgress": "How You Did"
     },
     "preview": {
       "title": "Level Preview",
@@ -8201,7 +8205,8 @@ const en = {
       "ancientRelic": "Ancient Relic",
       "cosmicShard": "Cosmic Shard",
       "fragment": "Fragment",
-      "luckyBonus": "Lucky Bonus!"
+      "luckyBonus": "Lucky Bonus!",
+      "total": "Total"
     },
     "ascension": {
       "level1": "Novice",

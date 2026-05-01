@@ -104,6 +104,7 @@ export default function AdventureTailOverlays({
           bestScore={Math.max(score, bestAttempt?.bestScore ?? 0)}
           attemptCount={(bestAttempt?.attemptCount ?? 0) + 1}
           nearMissMessages={getNearMissMessages(objectives)}
+          objectives={objectives}
           onRetry={onRetryFromAssist}
           onRetryWithBonus={onRetryWithBonus}
           onRetryWithHint={onRetryWithHint}

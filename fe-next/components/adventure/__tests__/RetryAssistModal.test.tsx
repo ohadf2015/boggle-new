@@ -23,6 +23,11 @@ const mockTranslations: Record<string, string> = {
   'adventure.retry.bestScore': 'Best Score',
   'adventure.retry.attempts': 'Attempts',
   'adventure.retry.nearMissTitle': 'So Close!',
+  'adventure.retry.objectiveProgress': 'How You Did',
+  'adventure.objectives.wordCount': 'Find words',
+  'adventure.objectives.scoreTarget': 'Reach score',
+  'adventure.objectives.clearIce': 'Clear ice',
+  'adventure.objectives.longWords': 'Long words (5+)',
   'adventure.nearMiss.scoreAway': 'Only {remaining} points away!',
   'adventure.nearMiss.wordsAway': 'Just {remaining} more words!',
   'adventure.nearMiss.countAway': 'Only {remaining} more to go!',
@@ -282,6 +287,86 @@ describe('RetryAssistModal', () => {
     it('should not render near-miss section when prop is undefined', () => {
       render(<RetryAssistModal {...defaultProps} />);
       expect(screen.queryByTestId('near-miss-section')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Objective Progress (F5)', () => {
+    it('renders a progress bar for each incomplete objective', () => {
+      render(
+        <RetryAssistModal
+          {...defaultProps}
+          objectives={[
+            { type: 'wordCount', target: 8, current: 5, isComplete: false },
+            { type: 'clearIce', target: 6, current: 4, isComplete: false },
+          ]}
+        />
+      );
+      const bars = screen.getAllByRole('progressbar');
+      expect(bars).toHaveLength(2);
+      expect(bars[0]).toHaveAttribute('aria-valuenow', '5');
+      expect(bars[0]).toHaveAttribute('aria-valuemax', '8');
+      expect(bars[1]).toHaveAttribute('aria-valuenow', '4');
+      expect(bars[1]).toHaveAttribute('aria-valuemax', '6');
+    });
+
+    it('shows current/target fraction for each incomplete objective', () => {
+      render(
+        <RetryAssistModal
+          {...defaultProps}
+          objectives={[{ type: 'wordCount', target: 8, current: 5, isComplete: false }]}
+        />
+      );
+      expect(screen.getByText('5 / 8')).toBeInTheDocument();
+    });
+
+    it('labels each progress bar with the objective name', () => {
+      render(
+        <RetryAssistModal
+          {...defaultProps}
+          objectives={[{ type: 'wordCount', target: 8, current: 5, isComplete: false }]}
+        />
+      );
+      expect(screen.getByRole('progressbar')).toHaveAccessibleName(/find words/i);
+    });
+
+    it('omits completed objectives so the player sees only the gap', () => {
+      render(
+        <RetryAssistModal
+          {...defaultProps}
+          objectives={[
+            { type: 'wordCount', target: 8, current: 5, isComplete: false },
+            { type: 'scoreTarget', target: 200, current: 200, isComplete: true },
+          ]}
+        />
+      );
+      expect(screen.getAllByRole('progressbar')).toHaveLength(1);
+      expect(screen.queryByText('200 / 200')).not.toBeInTheDocument();
+    });
+
+    it('treats missing current as zero (player did not progress that objective)', () => {
+      render(
+        <RetryAssistModal
+          {...defaultProps}
+          objectives={[{ type: 'wordCount', target: 8 }]}
+        />
+      );
+      expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0');
+      expect(screen.getByText('0 / 8')).toBeInTheDocument();
+    });
+
+    it('does not render the progress section when objectives prop is missing', () => {
+      render(<RetryAssistModal {...defaultProps} />);
+      expect(screen.queryByTestId('objective-progress-section')).not.toBeInTheDocument();
+    });
+
+    it('does not render the progress section when every objective is complete', () => {
+      render(
+        <RetryAssistModal
+          {...defaultProps}
+          objectives={[{ type: 'wordCount', target: 8, current: 8, isComplete: true }]}
+        />
+      );
+      expect(screen.queryByTestId('objective-progress-section')).not.toBeInTheDocument();
     });
   });
 });

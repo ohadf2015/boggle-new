@@ -5485,7 +5485,10 @@ const he = {
       "matchSummary": "סיכום משחק",
       "survived": "שרד",
       "outOrder": "הודח #{order}",
-      "eliminatedOrder": "#{order}"
+      "eliminatedOrder": "#{order}",
+      "stepBadge": "שלב 2 מתוך 2",
+      "completeDailyTitle": "סיים את האתגר היומי",
+      "completeDailyDesc": "שחק בציד מילים כדי להשלים את האתגר היומי"
     },
     "score": {
       "title": "הניקוד שלך",
@@ -7334,7 +7337,8 @@ const he = {
       "bestWords": "מילים הכי טובות",
       "bestScore": "ניקוד הכי טוב",
       "attempts": "ניסיונות",
-      "nearMissTitle": "כמעט!"
+      "nearMissTitle": "כמעט!",
+      "objectiveProgress": "מה השגתם"
     },
     "preview": {
       "title": "תצוגה מקדימה של שלב",
@@ -8092,7 +8096,8 @@ const he = {
       "goldenQuill": "נוצת זהב",
       "worldEssence": "תמצית עולם",
       "ancientRelic": "שריד עתיק",
-      "cosmicShard": "רסיס קוסמי"
+      "cosmicShard": "רסיס קוסמי",
+      "total": "סה״כ"
     },
     "collection": {
       "title": "אוסף",

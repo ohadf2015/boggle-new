@@ -16,6 +16,7 @@ import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { trackRewardedAdOffered } from '@/utils/growthTracking';
 import type { NearMissMessage } from '@/lib/adventure/nearMiss';
+import type { LevelObjective } from '@/types/adventure/level';
 
 // ==============================================
 // TYPES
@@ -42,6 +43,11 @@ interface RetryAssistModalProps {
   onExit: () => void;
   /** Near-miss feedback messages (optional) */
   nearMissMessages?: NearMissMessage[];
+  /**
+   * F5 — failed-attempt objective state. Renders one progress bar per
+   * incomplete objective so the player sees which goal they were short on.
+   */
+  objectives?: LevelObjective[];
 }
 
 // ==============================================
@@ -94,6 +100,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
     onRetryWithHint,
     onExit,
     nearMissMessages,
+    objectives,
   }) => {
     const { t } = useLanguage();
     const dialogRef = useRef<HTMLDivElement>(null);
@@ -118,6 +125,11 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
     // Determine which assists are unlocked
     const showBonusTime = consecutiveFailures >= BONUS_TIME_THRESHOLD;
     const showHintAssist = consecutiveFailures >= HINT_ASSIST_THRESHOLD;
+
+    // F5 — only incomplete objectives are shown; completed ones are the gap-free part.
+    const incompleteObjectives = (objectives ?? []).filter(
+      (o) => !o.isComplete && o.target > 0
+    );
 
     return (
       <AdaptiveAnimatePresence>
@@ -216,6 +228,48 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
                   </div>
                 </div>
               </div>
+
+              {/* F5 — Objective progress bars: shows the player which goals they were short on. */}
+              {incompleteObjectives.length > 0 && (
+                <div
+                  data-testid="objective-progress-section"
+                  className="px-4 py-3 border-b-2 border-neo-black/20"
+                >
+                  <p className="text-xs font-bold text-neo-white/50 uppercase tracking-wide mb-2">
+                    {t('adventure.retry.objectiveProgress')}
+                  </p>
+                  <ul className="space-y-2">
+                    {incompleteObjectives.map((obj) => {
+                      const current = Math.max(0, Math.min(obj.current ?? 0, obj.target));
+                      const pct = Math.round((current / obj.target) * 100);
+                      const label = t(`adventure.objectives.${obj.type}`);
+                      return (
+                        <li key={obj.type}>
+                          <div className="flex items-baseline justify-between mb-1">
+                            <span className="text-sm font-bold text-neo-white/80">{label}</span>
+                            <span className="text-xs font-mono text-neo-white/60">
+                              {current} / {obj.target}
+                            </span>
+                          </div>
+                          <div
+                            role="progressbar"
+                            aria-label={label}
+                            aria-valuenow={current}
+                            aria-valuemin={0}
+                            aria-valuemax={obj.target}
+                            className="h-2 w-full overflow-hidden rounded-full bg-neo-black/40 border border-neo-black/40"
+                          >
+                            <div
+                              className="h-full bg-neo-cyan transition-[width] duration-300"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
 
               {/* Near-Miss Encouragement */}
               {nearMissMessages && nearMissMessages.length > 0 && (

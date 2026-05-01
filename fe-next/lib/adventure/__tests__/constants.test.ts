@@ -102,8 +102,9 @@ describe('Adventure Constants', () => {
 
   describe('Timer Durations', () => {
     it('should scale timer with grid size (bumps at grid transitions)', () => {
-      // World 1 starts generous for tutorial
-      expect(TIMER_DURATIONS[1]).toBe(120);
+      // World 1 starts generous for tutorial — F3 fun audit (2026-05-01):
+      // bumped 120→150 so new players have ≥9s per tile to grok board reading.
+      expect(TIMER_DURATIONS[1]).toBe(150);
 
       // Timer bumps UP when grid size increases (worlds 3, 6, 9)
       // to maintain consistent per-tile search time
@@ -129,6 +130,13 @@ describe('Adventure Constants', () => {
         // And no more than 10 (early worlds are intentionally generous)
         expect(perTile).toBeLessThanOrEqual(10);
       }
+    });
+
+    // F3 (audit 2026-05-01) — tutorial-world generosity contract.
+    // Prevents future regression that re-tightens W1 below the FTUE threshold.
+    it('should give World 1 at least 9 seconds per tile (FTUE generosity)', () => {
+      const W1_TILES = 16; // 4x4
+      expect(TIMER_DURATIONS[1] / W1_TILES).toBeGreaterThanOrEqual(9);
     });
   });
 });

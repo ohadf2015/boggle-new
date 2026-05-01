@@ -5526,7 +5526,10 @@ const ja = {
       "matchSummary": "マッチサマリー",
       "survived": "生存",
       "outOrder": "#{order}番目に脱落",
-      "eliminatedOrder": "#{order}"
+      "eliminatedOrder": "#{order}",
+      "stepBadge": "ステップ 2 / 2",
+      "completeDailyTitle": "今日のチャレンジを完了",
+      "completeDailyDesc": "ワードハントをプレイしてデイリーチャレンジを達成"
     },
     "score": {
       "title": "あなたのスコア",
@@ -7360,7 +7363,8 @@ const ja = {
       "bestWords": "最高の単語数",
       "bestScore": "最高スコア",
       "attempts": "挑戦回数",
-      "nearMissTitle": "あと少し！"
+      "nearMissTitle": "あと少し！",
+      "objectiveProgress": "あなたの結果"
     },
     "preview": {
       "title": "レベル プレビュー",
@@ -8118,7 +8122,8 @@ const ja = {
       "goldenQuill": "黄金の羽ペン",
       "worldEssence": "ワールドエッセンス",
       "ancientRelic": "古代の遺物",
-      "cosmicShard": "宇宙の欠片"
+      "cosmicShard": "宇宙の欠片",
+      "total": "合計"
     },
     "collection": {
       "title": "コレクション",

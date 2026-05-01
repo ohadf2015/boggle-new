@@ -5455,7 +5455,10 @@ const es = {
       "matchSummary": "Resumen del Partido",
       "survived": "Sobrevivió",
       "outOrder": "Fuera #{order}",
-      "eliminatedOrder": "#{order}"
+      "eliminatedOrder": "#{order}",
+      "stepBadge": "PASO 2 DE 2",
+      "completeDailyTitle": "Termina el reto de hoy",
+      "completeDailyDesc": "Juega Caza de Palabras para completar tu Reto Diario"
     },
     "score": {
       "title": "Tu Puntuación",
@@ -7662,7 +7665,8 @@ const es = {
       "bestWords": "Mejores palabras",
       "bestScore": "Mejor puntuación",
       "attempts": "Intentos",
-      "nearMissTitle": "¡Tan cerca!"
+      "nearMissTitle": "¡Tan cerca!",
+      "objectiveProgress": "Cómo te fue"
     },
     "preview": {
       "title": "Vista previa del nivel",
@@ -8138,7 +8142,8 @@ const es = {
       "goldenQuill": "Pluma Dorada",
       "worldEssence": "Esencia del Mundo",
       "ancientRelic": "Reliquia Antigua",
-      "cosmicShard": "Fragmento Cósmico"
+      "cosmicShard": "Fragmento Cósmico",
+      "total": "Total"
     },
     "collection": {
       "title": "Colección",
