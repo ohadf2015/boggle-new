@@ -24,7 +24,7 @@ export const LandingSeasonHero: React.FC = () => {
       className="relative w-full max-w-4xl mx-auto rounded-neo border-neo-thick border-black bg-neo-navy-light overflow-hidden shadow-hard-lg"
       style={{ borderColor: '#000' }}
     >
-      <div className="relative aspect-[16/7] sm:aspect-[21/9] w-full">
+      <div className="relative aspect-[21/7] sm:aspect-[32/9] w-full">
         <Image
           src={currentSeason.imageUrl}
           alt={currentSeason.theme}
@@ -37,7 +37,7 @@ export const LandingSeasonHero: React.FC = () => {
           aria-hidden="true"
         />
 
-        <div className="absolute top-3 end-3">
+        <div className="absolute top-2 end-2">
           <div
             className={`px-2 py-1 rounded-neo border-neo border-black shadow-hard-sm font-neo-display text-sm leading-none ${
               isEndingSoon ? 'bg-neo-pink text-black animate-neo-pop' : 'bg-neo-lime text-black'
@@ -48,14 +48,14 @@ export const LandingSeasonHero: React.FC = () => {
           </div>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 p-3 sm:p-5 flex flex-col gap-2">
-          <div className="flex items-center gap-2">
+        <div className="absolute inset-x-0 bottom-0 p-2 sm:p-3 flex flex-col gap-1">
+          <div className="flex items-center gap-1.5">
             <Trophy
-              className={`w-5 h-5 shrink-0 ${isEndingSoon ? 'text-neo-pink' : 'text-neo-yellow'}`}
+              className={`w-4 h-4 shrink-0 ${isEndingSoon ? 'text-neo-pink' : 'text-neo-yellow'}`}
               aria-hidden="true"
             />
             <span
-              className={`text-xs sm:text-sm font-neo-display ${
+              className={`text-[10px] sm:text-xs font-neo-display ${
                 isEndingSoon ? 'text-neo-pink' : 'text-neo-cream/80'
               }`}
             >
@@ -65,13 +65,13 @@ export const LandingSeasonHero: React.FC = () => {
             </span>
           </div>
 
-          <h2 className="font-neo-display text-xl sm:text-3xl text-neo-cream leading-tight drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">
+          <h2 className="font-neo-display text-base sm:text-2xl text-neo-cream leading-tight drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">
             {t('season.name', { number: currentSeason.id, theme: currentSeason.theme })}
           </h2>
 
           <Link
             href="/leaderboard"
-            className="self-start mt-1 px-3 py-1.5 sm:px-4 sm:py-2 rounded-neo border-neo border-black bg-neo-lime text-black font-neo-display text-xs sm:text-sm shadow-hard-sm hover:shadow-hard-pressed active:translate-y-[1px] transition-shadow"
+            className="self-start px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-neo border-neo border-black bg-neo-lime text-black font-neo-display text-xs shadow-hard-sm hover:shadow-hard-pressed active:translate-y-[1px] transition-shadow"
           >
             {t('season.viewLeaderboard')}
           </Link>
