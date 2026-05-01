@@ -3,10 +3,20 @@ import type { CombatModel, FsmState, Locale, Tile, TileId } from '../types';
 import { drawTiles, refillTiles } from '../engine/tilePool';
 import { hasAnyComposableWord } from '../engine/wordValidator';
 import { transition, type FsmEvent } from '../fsm';
+import {
+  ABILITY_DEFS,
+  consumeAbility,
+  tickAbilityCooldowns,
+  type AbilityId,
+  type AbilityState,
+} from '../abilities';
 
 interface CombatStore extends CombatModel {
   locale: Locale;
-  startNewBattle: (locale?: Locale) => void;
+  abilities: AbilityState[];
+  /** When set, the player is choosing a target tile to trigger this ability. */
+  pendingAbility: AbilityId | null;
+  startNewBattle: (locale?: Locale, abilities?: AbilityId[]) => void;
   dispatch: (event: FsmEvent) => void;
   refillUsedTiles: (usedIds: TileId[]) => void;
   applyHeroDamage: (dmg: number) => void;
@@ -25,6 +35,12 @@ interface CombatStore extends CombatModel {
   finalizeBotClaim: (tileIds: TileId[], turns: number) => void;
   /** Force terminal state. Used when hero HP hits 0 outside a regular FSM transition. */
   setDefeat: () => void;
+  /** Enter "select target" mode for an ability. */
+  setPendingAbility: (id: AbilityId | null) => void;
+  /** Mark the ability as used; reset its cooldown. Clears pending. */
+  consumePendingAbility: () => void;
+  /** Decrement cooldown counters for all abilities (called per player-turn end). */
+  tickAbilityCooldowns: () => void;
 }
 
 const HERO_MAX_HP = 30;
@@ -41,8 +57,15 @@ export const useCombatStore = create<CombatStore>((set) => ({
   tiles: [],
   fsmState: { type: 'idle' } as FsmState,
   locale: 'en' as Locale,
+  abilities: [],
+  pendingAbility: null,
 
-  startNewBattle: (locale: Locale = 'en') => {
+  startNewBattle: (locale: Locale = 'en', equipped: AbilityId[] = ['block']) => {
+    const abilityStates: AbilityState[] = equipped.map((id) => ({
+      id,
+      cooldownRemaining: 0,
+      maxCooldown: ABILITY_DEFS[id].maxCooldown,
+    }));
     set({
       heroHp: HERO_MAX_HP,
       heroMaxHp: HERO_MAX_HP,
@@ -52,6 +75,8 @@ export const useCombatStore = create<CombatStore>((set) => ({
       tiles: drawTiles(16, locale),
       fsmState: { type: 'idle' },
       locale,
+      abilities: abilityStates,
+      pendingAbility: null,
     });
   },
 
@@ -95,6 +120,24 @@ export const useCombatStore = create<CombatStore>((set) => ({
 
   setDefeat: () => {
     set({ fsmState: { type: 'defeat' } });
+  },
+
+  setPendingAbility: (id) => {
+    set({ pendingAbility: id });
+  },
+
+  consumePendingAbility: () => {
+    set((s) => {
+      if (!s.pendingAbility) return s;
+      return {
+        abilities: consumeAbility(s.abilities, s.pendingAbility),
+        pendingAbility: null,
+      };
+    });
+  },
+
+  tickAbilityCooldowns: () => {
+    set((s) => ({ abilities: tickAbilityCooldowns(s.abilities) }));
   },
 
   applyEnemyDamage: (dmg) => {

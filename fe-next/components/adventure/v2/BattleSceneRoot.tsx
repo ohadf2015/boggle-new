@@ -11,6 +11,7 @@ import { playSfx } from '@/lib/adventure/v2/audio/soundBus';
 import { attachKeyboardBridge, findTileByLetter } from './input/RuneSlateInput';
 import { BotLoop } from './BotLoop';
 import type { Locale, TileId, Tile } from '@/lib/adventure/v2/types';
+import type { AbilityId } from '@/lib/adventure/v2/abilities';
 
 interface Props {
   onVictory: () => void;
@@ -52,7 +53,9 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
         (tileId, letter) => handleTileTap(tileId, letter),
         () => handleSubmit(),
         () => handleUndo(),
+        (abilityId) => handleAbilityPressed(abilityId),
       );
+      scene.abilityBar.setLocale(locale);
       app.stage.addChild(scene);
       sceneRef.current = scene;
 
@@ -103,6 +106,7 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
 
     scene.actorLayer.updateHp(s.heroHp, s.heroMaxHp, s.enemyHp, s.enemyMaxHp);
     scene.runeSlate.setTiles(s.tiles);
+    scene.abilityBar.setAbilities(s.abilities, s.pendingAbility);
 
     if (s.fsmState.type === 'player_compose') {
       s.fsmState.tilesUsed.forEach((id) => scene.runeSlate.markUsed(id));
@@ -132,7 +136,22 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
     const s = useCombatStore.getState();
     if (s.fsmState.type !== 'player_compose') return;
     const tile = s.tiles[tileId];
-    if (!tile || tile.claimedBy) return;
+    if (!tile) return;
+
+    // BLOCK ability mode: tap a bot-targeted tile to deny without consuming
+    if (s.pendingAbility === 'block') {
+      if (tile.targetedBy === 'bot') {
+        botLoopRef.current?.invalidate();
+        s.consumePendingAbility();
+        playSfx('word_invalid'); // re-using existing sfx as a deny "thwack"
+        return;
+      }
+      // Tapping a non-targeted tile while pending block → cancel pending mode
+      s.setPendingAbility(null);
+      return;
+    }
+
+    if (tile.claimedBy) return;
 
     // If bot was eyeing this tile, the player just stole it → invalidate bot's plan
     if (tile.targetedBy === 'bot') {
@@ -141,6 +160,19 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
 
     s.dispatch({ type: 'TILE_TAP', tileId, letter });
     playSfx('tile_tap');
+  }
+
+  function handleAbilityPressed(id: AbilityId) {
+    const s = useCombatStore.getState();
+    if (s.fsmState.type !== 'player_compose') return;
+    const ability = s.abilities.find((a) => a.id === id);
+    if (!ability || ability.cooldownRemaining > 0) return;
+    // Toggle: pressing the same ability twice cancels pending mode
+    if (s.pendingAbility === id) {
+      s.setPendingAbility(null);
+      return;
+    }
+    s.setPendingAbility(id);
   }
 
   function handleUndo() {
@@ -201,10 +233,11 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
         return;
       }
 
-      // Refill used tiles + auto-rescue if deadlocked
+      // Refill used tiles + auto-rescue if deadlocked + tick ability cooldowns
       s.refillUsedTiles(usedIds);
       s.tickClaimDecay();
       s.rescueIfStuck();
+      s.tickAbilityCooldowns();
 
       // Reset FSM to next compose phase
       s.dispatch({ type: 'PLAYER_RESOLVED', enemyHpRemaining: post.enemyHp });

@@ -1,10 +1,12 @@
 import { Container, Graphics } from 'pixi.js';
 import type { TileId } from '@/lib/adventure/v2/types';
+import type { AbilityId } from '@/lib/adventure/v2/abilities';
 import { ActorLayer } from '../layers/ActorLayer';
 import { RuneSlateLayer } from '../layers/RuneSlateLayer';
 import { CastingGlyphLayer } from '../layers/CastingGlyphLayer';
 import { HudOverlayLayer } from '../layers/HudOverlayLayer';
 import { BotBannerLayer } from '../layers/BotBannerLayer';
+import { AbilityBarLayer } from '../layers/AbilityBarLayer';
 
 export class BattleScene extends Container {
   readonly backdrop: Graphics;
@@ -13,11 +15,13 @@ export class BattleScene extends Container {
   readonly castingGlyph: CastingGlyphLayer;
   readonly hud: HudOverlayLayer;
   readonly botBanner: BotBannerLayer;
+  readonly abilityBar: AbilityBarLayer;
 
   constructor(
     onTileTap: (tileId: TileId, letter: string) => void,
     onSubmit: () => void,
     onUndo: () => void,
+    onAbilityPressed: (id: AbilityId) => void,
   ) {
     super();
 
@@ -39,5 +43,8 @@ export class BattleScene extends Container {
 
     this.botBanner = new BotBannerLayer();
     this.addChild(this.botBanner);
+
+    this.abilityBar = new AbilityBarLayer(onAbilityPressed);
+    this.addChild(this.abilityBar);
   }
 }
