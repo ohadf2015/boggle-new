@@ -3,7 +3,7 @@
  */
 
 import { vi } from 'vitest';
-import { getDailyChallengePushRecipients } from '../pushReminders';
+import { getDailyChallengePushRecipients, markDailyPushSentBatch } from '../pushReminders';
 
 // Build a chainable query builder mock
 function makeBuilder(result: { data: unknown; error: unknown }) {
@@ -63,25 +63,36 @@ describe('getDailyChallengePushRecipients', () => {
     setup();
   });
 
-  it('returns users with active push token who have not played today', async () => {
+  it('returns users with active push token who have not played today, with locale', async () => {
     tokensResult.data = [{ user_id: 'u1' }, { user_id: 'u2' }, { user_id: 'u3' }];
     profilesResult.data = [
-      { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: null },
-      { id: 'u2', timezone: 'America/New_York', last_daily_push_sent_at: null },
-      { id: 'u3', timezone: 'America/New_York', last_daily_push_sent_at: null },
+      { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: null, language: 'he' },
+      { id: 'u2', timezone: 'America/New_York', last_daily_push_sent_at: null, language: 'en' },
+      { id: 'u3', timezone: 'America/New_York', last_daily_push_sent_at: null, language: 'en' },
     ];
     puzzleAttemptsResult.data = [{ player_id: 'u2' }]; // u2 played daily puzzle
     wordHuntAttemptsResult.data = [{ player_id: 'u3' }]; // u3 played word hunt
 
     const recipients = await getDailyChallengePushRecipients();
 
-    expect(recipients).toEqual(['u1']);
+    expect(recipients).toEqual([{ userId: 'u1', locale: 'he' }]);
+  });
+
+  it('falls back to en when profiles.language is missing/null', async () => {
+    tokensResult.data = [{ user_id: 'u1' }];
+    profilesResult.data = [
+      { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: null, language: null },
+    ];
+
+    const recipients = await getDailyChallengePushRecipients();
+
+    expect(recipients).toEqual([{ userId: 'u1', locale: 'en' }]);
   });
 
   it('excludes users who started but did not complete today (any row = played)', async () => {
     tokensResult.data = [{ user_id: 'u1' }];
     profilesResult.data = [
-      { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: null },
+      { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: null, language: 'en' },
     ];
     // User started word hunt but did not solve — still counts as played
     wordHuntAttemptsResult.data = [{ player_id: 'u1' }];
@@ -94,7 +105,7 @@ describe('getDailyChallengePushRecipients', () => {
   it('does not query the legacy daily_challenges table', async () => {
     tokensResult.data = [{ user_id: 'u1' }];
     profilesResult.data = [
-      { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: null },
+      { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: null, language: 'en' },
     ];
 
     await getDailyChallengePushRecipients();
@@ -109,7 +120,7 @@ describe('getDailyChallengePushRecipients', () => {
     const today = new Date().toISOString();
     tokensResult.data = [{ user_id: 'u1' }];
     profilesResult.data = [
-      { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: today },
+      { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: today, language: 'en' },
     ];
 
     const recipients = await getDailyChallengePushRecipients();
@@ -123,7 +134,7 @@ describe('getDailyChallengePushRecipients', () => {
 
     tokensResult.data = [{ user_id: 'u1' }];
     profilesResult.data = [
-      { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: null },
+      { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: null, language: 'en' },
     ];
 
     const recipients = await getDailyChallengePushRecipients();
@@ -135,5 +146,26 @@ describe('getDailyChallengePushRecipients', () => {
     tokensResult.data = [];
     const recipients = await getDailyChallengePushRecipients();
     expect(recipients).toEqual([]);
+  });
+});
+
+describe('markDailyPushSentBatch', () => {
+  it('issues a single UPDATE with IN(...) for all userIds', async () => {
+    const updateSpy = vi.fn().mockReturnValue({
+      in: vi.fn().mockResolvedValue({ error: null }),
+    });
+    mockFrom.mockReturnValue({ update: updateSpy });
+
+    await markDailyPushSentBatch(['u1', 'u2', 'u3']);
+
+    expect(mockFrom).toHaveBeenCalledWith('profiles');
+    expect(updateSpy).toHaveBeenCalledTimes(1);
+    expect(updateSpy.mock.calls[0][0]).toMatchObject({ last_daily_push_sent_at: expect.any(String) });
+    expect(updateSpy.mock.results[0].value.in).toHaveBeenCalledWith('id', ['u1', 'u2', 'u3']);
+  });
+
+  it('no-ops on empty list', async () => {
+    await markDailyPushSentBatch([]);
+    expect(mockFrom).not.toHaveBeenCalled();
   });
 });

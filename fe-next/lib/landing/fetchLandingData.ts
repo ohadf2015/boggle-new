@@ -60,6 +60,7 @@ export async function fetchLandingData(language: string): Promise<LandingInitial
           'player_id, username, display_name, total_score, avatar_image, avatar_config, profiles!leaderboard_player_id_fkey(prestige_level)'
         )
         .eq('season_id', currentSeasonId)
+        .gt('total_score', 0)
         .order('total_score', { ascending: false })
         .limit(TOP_PLAYERS_LIMIT),
 

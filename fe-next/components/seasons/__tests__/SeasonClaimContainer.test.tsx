@@ -7,10 +7,21 @@ vi.mock('framer-motion', () => {
     React.createElement('div', { className: className as string, ...rest }, children);
   const PassSpan = ({ children, className, ...rest }: React.PropsWithChildren<Record<string, unknown>>) =>
     React.createElement('span', { className: className as string, ...rest }, children);
+  const PassButton = ({ children, className, ...rest }: React.PropsWithChildren<Record<string, unknown>>) =>
+    React.createElement('button', { className: className as string, ...rest }, children);
+  const useMotionValue = (initial: number) => {
+    let v = initial;
+    return { get: () => v, set: (n: number) => { v = n; }, on: () => () => {} };
+  };
+  const useSpring = (mv: { on: () => () => void }) => mv;
+  const animate = () => ({ stop: () => {} });
   return {
-    motion: { div: Pass, h2: Pass, p: Pass, span: PassSpan },
+    motion: { div: Pass, h2: Pass, p: Pass, span: PassSpan, button: PassButton },
     AnimatePresence: ({ children }: React.PropsWithChildren) => React.createElement(React.Fragment, null, children),
     useReducedMotion: () => true,
+    useMotionValue,
+    useSpring,
+    animate,
   };
 });
 

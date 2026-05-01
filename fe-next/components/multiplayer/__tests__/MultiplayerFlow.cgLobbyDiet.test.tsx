@@ -125,7 +125,7 @@ describe('MultiplayerFlow — CG lobby diet', () => {
     expect(screen.getByTestId('cg-lobby-hero')).toBeTruthy();
   });
 
-  it('hides RoomListView and SeasonBanner when hero is collapsed', () => {
+  it('hides RoomListView when hero is collapsed (SeasonBanner moved to homepage)', () => {
     mockIsOnCrazyGamesPlatform = true;
     sessionStorage.setItem('boggle_cg_auto_joined', '1');
     render(<MultiplayerFlow {...baseProps} />);
@@ -133,13 +133,13 @@ describe('MultiplayerFlow — CG lobby diet', () => {
     expect(screen.queryByTestId('season-banner')).toBeNull();
   });
 
-  it('shows RoomListView and SeasonBanner after Browse-rooms tap', () => {
+  it('shows RoomListView after Browse-rooms tap; season presence stays on homepage', () => {
     mockIsOnCrazyGamesPlatform = true;
     sessionStorage.setItem('boggle_cg_auto_joined', '1');
     render(<MultiplayerFlow {...baseProps} />);
     fireEvent.click(screen.getByTestId('cg-lobby-hero-browse'));
     expect(screen.getByTestId('room-list-view')).toBeTruthy();
-    expect(screen.getByTestId('season-banner')).toBeTruthy();
+    expect(screen.queryByTestId('season-banner')).toBeNull();
   });
 
   it('PLAY CTA fires Quick Play (calls handleJoin with quickPlay flag)', () => {

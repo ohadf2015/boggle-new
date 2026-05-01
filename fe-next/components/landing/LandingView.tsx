@@ -30,6 +30,7 @@ const LandingAvatarTeaser = dynamic(() => import('./LandingAvatarTeaser').then(m
 });
 import { LandingChallengeCards } from './LandingChallengeCards';
 import { LandingLeaderboardPreview } from './LandingLeaderboardPreview';
+import { LandingSeasonHero } from './LandingSeasonHero';
 
 // Below-the-fold sections — lazy load to speed up initial render
 // LiveActivityTicker moved out to reduce landing clutter
@@ -182,6 +183,9 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           gameModes={gameModes}
           languages={langCount}
         />
+
+        {/* Season Hero — prominent themed art + countdown + leaderboard CTA */}
+        <LandingSeasonHero />
 
 
         {/* ===== GAME MODES — THE PRIMARY CONTENT ===== */}

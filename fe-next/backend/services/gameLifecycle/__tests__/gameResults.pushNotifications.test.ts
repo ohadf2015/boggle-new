@@ -8,6 +8,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // Hoist mocks so vi.mock factory can reference them
 const mockNotifyLevelUp = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
 const mockNotifyAchievementsBatch = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
+const mockGetUserLocalesBatch = vi.hoisted(() => vi.fn().mockResolvedValue(new Map()));
 const mockProcessGameResults = vi.hoisted(() => vi.fn());
 const mockGetSocketById = vi.hoisted(() => vi.fn());
 const mockSafeEmit = vi.hoisted(() => vi.fn());
@@ -21,6 +22,7 @@ const mockUpdateRankedMmr = vi.hoisted(() => vi.fn().mockResolvedValue(undefined
 vi.mock('../../../modules/pushNotificationTriggers', () => ({
   notifyLevelUp: mockNotifyLevelUp,
   notifyAchievementsBatch: mockNotifyAchievementsBatch,
+  getUserLocalesBatch: mockGetUserLocalesBatch,
 }));
 
 vi.mock('../../../modules/supabaseServer', () => ({
@@ -130,7 +132,10 @@ describe('gameResults push notifications', () => {
       await recordGameResultsToSupabase(makeIo(), 'GAME1', [makePlayerResult()], makeGame());
 
       expect(mockNotifyLevelUp).toHaveBeenCalledOnce();
-      expect(mockNotifyLevelUp).toHaveBeenCalledWith(AUTH_USER_ID, 5);
+      // Locale is pre-fetched once per game-end and forwarded to avoid
+      // per-player getUserLocale round-trips that saturate the Supabase
+      // semaphore (Sentry 136). 'en' here = test default (no profile mock).
+      expect(mockNotifyLevelUp).toHaveBeenCalledWith(AUTH_USER_ID, 5, 'en');
     });
 
     it('does NOT call notifyLevelUp when player did not level up', async () => {
@@ -201,7 +206,11 @@ describe('gameResults push notifications', () => {
       await recordGameResultsToSupabase(makeIo(), 'GAME1', [makePlayerResult()], makeGame());
 
       expect(mockNotifyAchievementsBatch).toHaveBeenCalledTimes(1);
-      expect(mockNotifyAchievementsBatch).toHaveBeenCalledWith(AUTH_USER_ID, ['VETERAN', 'WORD_COLLECTOR']);
+      expect(mockNotifyAchievementsBatch).toHaveBeenCalledWith(
+        AUTH_USER_ID,
+        ['VETERAN', 'WORD_COLLECTOR'],
+        'en'
+      );
     });
 
     it('does NOT call notifyAchievementsBatch when no achievements unlocked', async () => {

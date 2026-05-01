@@ -15,8 +15,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
-import { useSeasonClaim } from '@/hooks/useSeasonClaim';
+import { useSeasonClaim, type UnclaimedSeason } from '@/hooks/useSeasonClaim';
 import { trpc } from '@/lib/trpc';
+import logger from '@/utils/logger';
 import { SeasonClaimModal } from './SeasonClaimModal';
 
 const DISMISS_KEY = (seasonId: number) => `season-claim-dismissed:${seasonId}`;
@@ -30,60 +31,77 @@ export const SeasonClaimContainer: React.FC = () => {
 
   const [dismissed, setDismissed] = useState<Set<number>>(() => new Set());
   const [justClaimed, setJustClaimed] = useState<Set<number>>(() => new Set());
+  // Snapshot the first surfaced season — keeps the modal mounted after a
+  // successful claim invalidates the query and drops `next` to null. Without
+  // this, the modal would unmount the instant the user clicks claim, which
+  // looked like "click does nothing".
+  const [active, setActive] = useState<UnclaimedSeason | null>(null);
+  const [claimError, setClaimError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (next && !active) setActive(next);
+  }, [next, active]);
 
   // Pull season-archive stats (games_played, total_score) for the modal recap.
-  // The query stays disabled until we have a real season to claim; cached 5min.
   const recapQuery = trpc.leaderboard.getSeasonRecap.useQuery(
     {
       playerId: playerId ?? '00000000-0000-0000-0000-000000000000',
-      seasonId: next?.seasonId ?? 0,
+      seasonId: active?.seasonId ?? 0,
     },
     {
-      enabled: !!playerId && !!next,
+      enabled: !!playerId && !!active,
       staleTime: 5 * 60_000,
     },
   );
 
-  // Hydrate session-scoped dismissals on mount
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (!next) return;
-    const isDismissed = sessionStorage.getItem(DISMISS_KEY(next.seasonId)) === '1';
-    const wasClaimed = sessionStorage.getItem(CLAIMED_KEY(next.seasonId)) === '1';
-    if (isDismissed) setDismissed((s) => new Set(s).add(next.seasonId));
-    if (wasClaimed) setJustClaimed((s) => new Set(s).add(next.seasonId));
-  }, [next]);
+    if (!active) return;
+    const isDismissed = sessionStorage.getItem(DISMISS_KEY(active.seasonId)) === '1';
+    const wasClaimed = sessionStorage.getItem(CLAIMED_KEY(active.seasonId)) === '1';
+    if (isDismissed) setDismissed((s) => new Set(s).add(active.seasonId));
+    if (wasClaimed) setJustClaimed((s) => new Set(s).add(active.seasonId));
+  }, [active]);
 
   const onClose = useCallback(() => {
-    if (!next) return;
-    sessionStorage.setItem(DISMISS_KEY(next.seasonId), '1');
-    setDismissed((s) => new Set(s).add(next.seasonId));
-  }, [next]);
+    if (!active) return;
+    sessionStorage.setItem(DISMISS_KEY(active.seasonId), '1');
+    setDismissed((s) => new Set(s).add(active.seasonId));
+    setActive(null);
+  }, [active]);
 
   const onClaim = useCallback(async () => {
-    if (!next) return;
-    const result = await claim(next.seasonId);
-    if (result.success || result.alreadyClaimed) {
-      sessionStorage.setItem(CLAIMED_KEY(next.seasonId), '1');
-      setJustClaimed((s) => new Set(s).add(next.seasonId));
+    if (!active) return;
+    setClaimError(null);
+    try {
+      const result = await claim(active.seasonId);
+      if (result.success || result.alreadyClaimed) {
+        sessionStorage.setItem(CLAIMED_KEY(active.seasonId), '1');
+        setJustClaimed((s) => new Set(s).add(active.seasonId));
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Claim failed';
+      logger.error('SEASON_CLAIM', 'mutation failed', { error: msg, seasonId: active.seasonId });
+      setClaimError(msg);
     }
-  }, [next, claim]);
+  }, [active, claim]);
 
-  if (!playerId || !next) return null;
-  if (dismissed.has(next.seasonId)) return null;
+  if (!playerId || !active) return null;
+  if (dismissed.has(active.seasonId)) return null;
 
-  const isClaimed = justClaimed.has(next.seasonId);
+  const isClaimed = justClaimed.has(active.seasonId);
 
   return (
     <SeasonClaimModal
-      seasonId={next.seasonId}
-      seasonName={`Season ${next.seasonId}`}
-      tier={next.tier}
-      rankPosition={next.rankPosition}
-      rewards={next.rewards}
+      seasonId={active.seasonId}
+      seasonName={`Season ${active.seasonId}`}
+      tier={active.tier}
+      rankPosition={active.rankPosition}
+      rewards={active.rewards}
       isClaiming={isClaiming}
       isClaimed={isClaimed}
       recap={recapQuery.data?.data ?? null}
+      claimError={claimError}
       onClaim={onClaim}
       onClose={onClose}
     />

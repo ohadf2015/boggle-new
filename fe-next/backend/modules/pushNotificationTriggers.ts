@@ -5,7 +5,7 @@
  */
 
 import logger from '../utils/logger';
-import { translatePush, type PushLocale, isPushLocale } from '../utils/pushTranslations';
+import { translatePush, type PushLocale, isPushLocale, countryToLocale } from '../utils/pushTranslations';
 import { sendToUser, type FCMPayload } from './fcmService';
 import { mascotImageUrl } from '../services/pushNotificationService';
 import { getSupabase, isSupabaseConfigured } from './supabase';
@@ -66,8 +66,56 @@ const NOTIFICATION_TYPE_MAP: Record<PushNotificationType, string> = {
 };
 
 /**
- * Look up recipient's preferred locale from profiles.language.
- * Fail-open to 'en' — missing locale must not block delivery.
+ * Batch-fetch locales for many recipients in a single profiles query.
+ * Used by hot fan-out paths (game-end emit*, hourly cron) to avoid the
+ * N+1 round-trip pattern that saturated the Supabase semaphore (Sentry
+ * 136). Mirrors getUserLocale's chain in-process — chosen language
+ * (profiles.language) wins; falls back to country_code heuristic; then
+ * 'en'. Single round-trip cost: same query plus one extra column.
+ */
+export async function getUserLocalesBatch(
+  userIds: readonly string[]
+): Promise<Map<string, PushLocale>> {
+  const map = new Map<string, PushLocale>();
+  if (userIds.length === 0) return map;
+  try {
+    if (!isSupabaseConfigured()) return map;
+    const supabase = getSupabase();
+    if (!supabase) return map;
+
+    const unique = Array.from(new Set(userIds));
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, language, country_code')
+      .in('id', unique);
+
+    if (error || !data) return map;
+    for (const row of data as Array<{ id: string; language: string | null; country_code: string | null }>) {
+      if (isPushLocale(row.language)) {
+        map.set(row.id, row.language);
+        continue;
+      }
+      const fromCountry = countryToLocale(row.country_code);
+      map.set(row.id, fromCountry ?? 'en');
+    }
+  } catch {
+    /* fail-open: callers fall back to per-user getUserLocale */
+  }
+  return map;
+}
+
+/**
+ * Resolve recipient's push locale: chosen language, else heuristic.
+ *
+ *   profiles.language → country_code heuristic → 'en'
+ *
+ * profiles.language is the user's *chosen* UI language (written by
+ * /api/user/language from LanguageContext). game_sessions.language is the
+ * puzzle dictionary the user picked, NOT their UI language — a Hebrew
+ * speaker playing the English daily puzzle would otherwise get an English
+ * push, so it's deliberately excluded from the chain. country_code is a
+ * pure heuristic, used only when no chosen language exists. logger.warn
+ * fires on every fallback so silent drift to 'en' surfaces in prod logs.
  */
 export async function getUserLocale(userId: string): Promise<PushLocale> {
   try {
@@ -75,15 +123,30 @@ export async function getUserLocale(userId: string): Promise<PushLocale> {
     const supabase = getSupabase();
     if (!supabase) return 'en';
 
-    const { data, error } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('language')
+      .select('language, country_code')
       .eq('id', userId)
       .maybeSingle();
 
-    if (error || !data) return 'en';
-    return isPushLocale(data.language) ? data.language : 'en';
-  } catch {
+    if (profileError) {
+      logger.warn('PUSH_TRIGGER', 'profiles lookup failed — defaulting to en', { userId, error: profileError.message });
+      return 'en';
+    }
+
+    if (isPushLocale(profile?.language)) return profile.language as PushLocale;
+
+    // No chosen language — fall back to country_code heuristic.
+    const fromCountry = countryToLocale(profile?.country_code);
+    if (fromCountry) {
+      logger.warn('PUSH_TRIGGER', 'profiles.language NULL — fell back to country_code', { userId, country: profile?.country_code });
+      return fromCountry;
+    }
+
+    logger.warn('PUSH_TRIGGER', 'profiles.language NULL and no country signal — defaulting to en', { userId });
+    return 'en';
+  } catch (err) {
+    logger.error('PUSH_TRIGGER', `getUserLocale threw: ${(err as Error).message}`, { userId });
     return 'en';
   }
 }
@@ -304,9 +367,10 @@ export async function notifyTurnReminder(
  */
 export async function notifyAchievement(
   toUserId: string,
-  achievementKeyOrName: string
+  achievementKeyOrName: string,
+  precomputedLocale?: PushLocale
 ): Promise<void> {
-  const locale = await getUserLocale(toUserId);
+  const locale = precomputedLocale ?? (await getUserLocale(toUserId));
   const name = resolveAchievementName(achievementKeyOrName, locale);
   return triggerPush(toUserId, 'achievement', {
     title: translatePush(locale, 'achievement.title'),
@@ -332,13 +396,14 @@ export async function notifyAchievement(
  */
 export async function notifyAchievementsBatch(
   toUserId: string,
-  achievementKeys: string[]
+  achievementKeys: string[],
+  precomputedLocale?: PushLocale
 ): Promise<void> {
   if (achievementKeys.length === 0) return;
   if (achievementKeys.length === 1) {
-    return notifyAchievement(toUserId, achievementKeys[0]);
+    return notifyAchievement(toUserId, achievementKeys[0], precomputedLocale);
   }
-  const locale = await getUserLocale(toUserId);
+  const locale = precomputedLocale ?? (await getUserLocale(toUserId));
   const names = achievementKeys.map((k) => resolveAchievementName(k, locale));
   const count = names.length;
   const title = translatePush(locale, 'achievement.titleMulti', { count });
@@ -476,9 +541,13 @@ export async function notifyGiftReceived(
  */
 export async function notifyDailyChallengeReminder(
   toUserId: string,
-  override?: { title?: string; body?: string; deepLink?: string; variant?: number }
+  override?: { title?: string; body?: string; deepLink?: string; variant?: number; locale?: PushLocale }
 ): Promise<void> {
-  const locale = await getUserLocale(toUserId);
+  // Hourly reminder cron pre-fetches every recipient's locale in one batch
+  // via getDailyChallengePushRecipients(). When the caller passes it through
+  // we skip the per-user profiles round-trip — that fan-out was a primary
+  // contributor to Supabase queue saturation (Sentry 136).
+  const locale = override?.locale ?? (await getUserLocale(toUserId));
   const title = override?.title ?? translatePush(locale, 'dailyChallenge.title');
   const body = override?.body ?? translatePush(locale, 'dailyChallenge.body');
   const deepLink = override?.deepLink ?? '/daily';
@@ -499,9 +568,10 @@ export async function notifyDailyChallengeReminder(
  */
 export async function notifyLevelUp(
   toUserId: string,
-  newLevel: number
+  newLevel: number,
+  precomputedLocale?: PushLocale
 ): Promise<void> {
-  const locale = await getUserLocale(toUserId);
+  const locale = precomputedLocale ?? (await getUserLocale(toUserId));
   return triggerPush(toUserId, 'level_up', {
     title: translatePush(locale, 'levelUp.title', { level: newLevel }),
     body: translatePush(locale, 'levelUp.body', { level: newLevel }),

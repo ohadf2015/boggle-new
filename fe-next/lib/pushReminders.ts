@@ -6,12 +6,18 @@
  */
 
 import logger from '@/backend/utils/logger';
+import { isPushLocale, type PushLocale } from '@/backend/utils/pushTranslations';
 import { getSupabaseAdmin, getLocalHour, getTodayDate } from './email';
 
 const REMINDER_HOUR_MIN = 17;
 const REMINDER_HOUR_MAX = 19;
 
-export async function getDailyChallengePushRecipients(): Promise<string[]> {
+export interface DailyPushRecipient {
+  userId: string;
+  locale: PushLocale;
+}
+
+export async function getDailyChallengePushRecipients(): Promise<DailyPushRecipient[]> {
   const supabase = getSupabaseAdmin();
   if (!supabase) {
     logger.error?.('PUSH_REMINDER', 'Supabase admin not available');
@@ -33,9 +39,11 @@ export async function getDailyChallengePushRecipients(): Promise<string[]> {
 
   const userIds = Array.from(new Set(tokens.map((t: { user_id: string }) => t.user_id)));
 
+  // Pull `language` alongside scheduling fields so the cron can avoid an
+  // N+1 round-trip to profiles for every getUserLocale() call downstream.
   const { data: profiles, error: profilesErr } = await supabase
     .from('profiles')
-    .select('id, timezone, last_daily_push_sent_at')
+    .select('id, timezone, last_daily_push_sent_at, language')
     .in('id', userIds);
 
   if (profilesErr) {
@@ -100,11 +108,12 @@ export async function getDailyChallengePushRecipients(): Promise<string[]> {
     }
   }
 
-  const recipients: string[] = [];
+  const recipients: DailyPushRecipient[] = [];
   for (const p of profiles as Array<{
     id: string;
     timezone: string | null;
     last_daily_push_sent_at: string | null;
+    language: string | null;
   }>) {
     if (playedIds.has(p.id)) continue;
     if (optedOut.has(p.id)) continue;
@@ -117,12 +126,18 @@ export async function getDailyChallengePushRecipients(): Promise<string[]> {
     const localHour = getLocalHour(p.timezone || 'UTC');
     if (localHour < REMINDER_HOUR_MIN || localHour > REMINDER_HOUR_MAX) continue;
 
-    recipients.push(p.id);
+    const locale: PushLocale = isPushLocale(p.language) ? p.language : 'en';
+    recipients.push({ userId: p.id, locale });
   }
 
   return recipients;
 }
 
+/**
+ * Single-user mark — kept for callers outside the hourly cron. The cron
+ * itself MUST use {@link markDailyPushSentBatch} to avoid an N+1 fan-out
+ * that previously saturated the Supabase semaphore (Sentry 136).
+ */
 export async function markDailyPushSent(userId: string): Promise<void> {
   const supabase = getSupabaseAdmin();
   if (!supabase) return;
@@ -132,5 +147,25 @@ export async function markDailyPushSent(userId: string): Promise<void> {
     .eq('id', userId);
   if (error) {
     logger.error?.('PUSH_REMINDER', `mark sent failed for ${userId}: ${error.message}`);
+  }
+}
+
+/**
+ * Batch mark used by the hourly daily-challenge reminder cron. One UPDATE
+ * with `IN (...)` instead of N parallel UPDATEs — the previous fan-out
+ * (lib/pushReminders.markDailyPushSent per recipient) drove queue depth
+ * past the 25-slot semaphore and produced the recurring [SUPABASE]
+ * Request queue depth Sentry warning.
+ */
+export async function markDailyPushSentBatch(userIds: string[]): Promise<void> {
+  if (userIds.length === 0) return;
+  const supabase = getSupabaseAdmin();
+  if (!supabase) return;
+  const { error } = await supabase
+    .from('profiles')
+    .update({ last_daily_push_sent_at: new Date().toISOString() })
+    .in('id', userIds);
+  if (error) {
+    logger.error?.('PUSH_REMINDER', `batch mark sent failed (${userIds.length} ids): ${error.message}`);
   }
 }

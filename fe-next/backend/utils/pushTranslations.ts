@@ -17,6 +17,24 @@ export function isPushLocale(value: unknown): value is PushLocale {
   return typeof value === 'string' && (SUPPORTED_PUSH_LOCALES as readonly string[]).includes(value);
 }
 
+// Last-resort signal: when both profiles.language and game_sessions.language are
+// missing, derive a best-effort push locale from ISO 3166-1 alpha-2 country code.
+// Returns null for unmapped countries — caller decides final fallback so the
+// "we exhausted every signal" log line stays distinct from "deliberate en."
+const COUNTRY_LOCALE_MAP: Record<string, PushLocale> = {
+  IL: 'he',
+  JP: 'ja',
+  SE: 'sv',
+  ES: 'es', MX: 'es', AR: 'es', CO: 'es', CL: 'es', PE: 'es', VE: 'es',
+  EC: 'es', BO: 'es', CR: 'es', GT: 'es', HN: 'es', NI: 'es', PA: 'es',
+  PY: 'es', SV: 'es', UY: 'es', DO: 'es', PR: 'es',
+};
+
+export function countryToLocale(country: unknown): PushLocale | null {
+  if (typeof country !== 'string' || country.length === 0) return null;
+  return COUNTRY_LOCALE_MAP[country.toUpperCase()] ?? null;
+}
+
 type Dict = Record<string, string>;
 
 // Key format: "<domain>.<subkey>". English copy aligned to trigger call sites

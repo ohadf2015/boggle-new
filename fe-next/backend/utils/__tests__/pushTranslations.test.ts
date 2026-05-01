@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { translatePush, isPushLocale, SUPPORTED_PUSH_LOCALES } from '../pushTranslations';
+import { translatePush, isPushLocale, SUPPORTED_PUSH_LOCALES, countryToLocale } from '../pushTranslations';
 
 describe('pushTranslations', () => {
   describe('isPushLocale', () => {
@@ -90,6 +90,39 @@ describe('pushTranslations', () => {
           expect(out, `${loc}:${key}`).not.toBe(key);
         }
       }
+    });
+  });
+
+  describe('countryToLocale', () => {
+    it('maps IL → he', () => {
+      expect(countryToLocale('IL')).toBe('he');
+    });
+
+    it('maps JP → ja', () => {
+      expect(countryToLocale('JP')).toBe('ja');
+    });
+
+    it('maps SE → sv', () => {
+      expect(countryToLocale('SE')).toBe('sv');
+    });
+
+    it('maps Spanish-speaking countries → es', () => {
+      for (const cc of ['ES', 'MX', 'AR', 'CO', 'CL', 'PE', 'VE', 'EC', 'BO', 'CR', 'GT', 'HN', 'NI', 'PA', 'PY', 'SV', 'UY', 'DO', 'PR']) {
+        expect(countryToLocale(cc), cc).toBe('es');
+      }
+    });
+
+    it('is case-insensitive', () => {
+      expect(countryToLocale('il')).toBe('he');
+      expect(countryToLocale('jp')).toBe('ja');
+    });
+
+    it('returns null for unmapped or invalid input', () => {
+      expect(countryToLocale('US')).toBeNull();
+      expect(countryToLocale('GB')).toBeNull();
+      expect(countryToLocale(null)).toBeNull();
+      expect(countryToLocale(undefined)).toBeNull();
+      expect(countryToLocale('')).toBeNull();
     });
   });
 });

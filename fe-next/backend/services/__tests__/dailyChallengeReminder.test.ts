@@ -3,22 +3,24 @@
  * Verifies service delegates to the HTTP-path recipient gate
  * (getDailyChallengePushRecipients) — excludes users who PLAYED today,
  * not users who STARTED but didn't finish — and sends per-user dynamic copy.
+ *
+ * Recipient shape carries pre-fetched locale and post-send mark is batched
+ * (Sentry 136 / Supabase queue depth fix).
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const mockGetRecipients = vi.hoisted(() => vi.fn());
-const mockMarkSent = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
+const mockMarkBatch = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
 const mockNotify = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
 const mockIsSupabaseConfigured = vi.hoisted(() => vi.fn(() => true));
 
 vi.mock('@/lib/pushReminders', () => ({
   getDailyChallengePushRecipients: mockGetRecipients,
-  markDailyPushSent: mockMarkSent,
+  markDailyPushSentBatch: mockMarkBatch,
 }));
 
 vi.mock('../../modules/pushNotificationTriggers', () => ({
   notifyDailyChallengeReminder: mockNotify,
-  getUserLocale: vi.fn().mockResolvedValue('en'),
 }));
 
 vi.mock('../../modules/supabase', () => ({
@@ -32,6 +34,11 @@ vi.mock('../../utils/logger', () => ({
 
 import { sendDailyChallengeReminders } from '../dailyChallengeReminder';
 
+const recipient = (userId: string, locale: 'en' | 'he' | 'sv' | 'ja' | 'es' = 'en') => ({
+  userId,
+  locale,
+});
+
 beforeEach(() => {
   vi.clearAllMocks();
   mockIsSupabaseConfigured.mockReturnValue(true);
@@ -39,7 +46,7 @@ beforeEach(() => {
 
 describe('sendDailyChallengeReminders', () => {
   it('notifies each recipient returned by the push-recipients gate', async () => {
-    mockGetRecipients.mockResolvedValue(['user-1', 'user-2']);
+    mockGetRecipients.mockResolvedValue([recipient('user-1'), recipient('user-2')]);
 
     await sendDailyChallengeReminders();
 
@@ -50,7 +57,7 @@ describe('sendDailyChallengeReminders', () => {
   });
 
   it('passes dynamic witty copy per user (not hardcoded default)', async () => {
-    mockGetRecipients.mockResolvedValue(['user-1']);
+    mockGetRecipients.mockResolvedValue([recipient('user-1')]);
 
     await sendDailyChallengeReminders();
 
@@ -62,10 +69,17 @@ describe('sendDailyChallengeReminders', () => {
     expect(override.deepLink).not.toContain('/daily-challenge');
     expect(override.deepLink).toContain('src=push');
     expect(typeof override.variant).toBe('number');
+    expect(override.locale).toBe('en');
   });
 
   it('gives different users different copy (deterministic variant)', async () => {
-    mockGetRecipients.mockResolvedValue(['alpha', 'bravo', 'charlie', 'delta', 'echo']);
+    mockGetRecipients.mockResolvedValue([
+      recipient('alpha'),
+      recipient('bravo'),
+      recipient('charlie'),
+      recipient('delta'),
+      recipient('echo'),
+    ]);
 
     await sendDailyChallengeReminders();
 
@@ -74,13 +88,15 @@ describe('sendDailyChallengeReminders', () => {
     expect(unique.size).toBeGreaterThan(1);
   });
 
-  it('marks push as sent for each recipient', async () => {
-    mockGetRecipients.mockResolvedValue(['user-1', 'user-2']);
+  it('batches the post-send mark for all successful recipients', async () => {
+    mockGetRecipients.mockResolvedValue([recipient('user-1'), recipient('user-2')]);
 
     await sendDailyChallengeReminders();
 
-    expect(mockMarkSent).toHaveBeenCalledWith('user-1');
-    expect(mockMarkSent).toHaveBeenCalledWith('user-2');
+    expect(mockMarkBatch).toHaveBeenCalledTimes(1);
+    const sentIds = mockMarkBatch.mock.calls[0][0] as string[];
+    expect(sentIds).toEqual(expect.arrayContaining(['user-1', 'user-2']));
+    expect(sentIds).toHaveLength(2);
   });
 
   it('does nothing when no eligible recipients', async () => {
@@ -89,7 +105,7 @@ describe('sendDailyChallengeReminders', () => {
     await sendDailyChallengeReminders();
 
     expect(mockNotify).not.toHaveBeenCalled();
-    expect(mockMarkSent).not.toHaveBeenCalled();
+    expect(mockMarkBatch).not.toHaveBeenCalled();
   });
 
   it('skips when Supabase not configured', async () => {
@@ -102,11 +118,14 @@ describe('sendDailyChallengeReminders', () => {
   });
 
   it('does not throw when a single user notification fails', async () => {
-    mockGetRecipients.mockResolvedValue(['user-1', 'user-2']);
+    mockGetRecipients.mockResolvedValue([recipient('user-1'), recipient('user-2')]);
     mockNotify.mockRejectedValueOnce(new Error('fcm boom'));
 
     await expect(sendDailyChallengeReminders()).resolves.not.toThrow();
     // still attempts the second user
     expect(mockNotify).toHaveBeenCalledTimes(2);
+    // batched mark contains only the successful user
+    const sentIds = mockMarkBatch.mock.calls[0][0] as string[];
+    expect(sentIds).toEqual(['user-2']);
   });
 });

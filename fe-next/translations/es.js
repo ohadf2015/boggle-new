@@ -4403,7 +4403,8 @@ const es = {
     "pastSeasons": "Temporadas pasadas",
     "noPastSeasons": "Aún no hay temporadas pasadas",
     "rankedAt": "Puesto #{{position}}",
-    "tierLabel": "Nivel"
+    "tierLabel": "Nivel",
+    "viewLeaderboard": "Ver clasificación"
   },
   "seasonBadges": {
     "section": {

@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { SeasonBanner } from '@/components/multiplayer/SeasonBanner';
 import RoomListView from './RoomListView';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMatchmaking } from '@/hooks/useMatchmaking';
@@ -40,10 +39,8 @@ const CgAwareLobbyChrome: React.FC<CgAwareLobbyChromeProps> = ({
 
   return (
     <>
-      {/* SeasonBanner returns null for unranked users — render its wrapper
-          padding only when something will actually appear, so non-admin
-          unranked players don't get a 12px ghost gap above ARENA HUB. */}
-      <SeasonBanner />
+      {/* Season presence moved to homepage — SeasonHero on /. The MP lobby
+          stays focused on rooms + matchmaking. */}
       {isAdmin && (
         <div className="px-4 pt-3">
           <button

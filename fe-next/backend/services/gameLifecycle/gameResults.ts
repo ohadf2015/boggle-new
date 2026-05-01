@@ -8,7 +8,8 @@ import type { Server } from 'socket.io';
 import type { WordDetail } from '@/shared/types';
 import type { GameState } from '../../modules/gameState/types';
 import { processGameResults, isSupabaseConfigured } from '../../modules/supabaseServer';
-import { notifyLevelUp, notifyAchievementsBatch } from '../../modules/pushNotificationTriggers';
+import { notifyLevelUp, notifyAchievementsBatch, getUserLocalesBatch } from '../../modules/pushNotificationTriggers';
+import type { PushLocale } from '../../utils/pushTranslations';
 import type { GameResultsOutput } from '../../modules/supabase/gameProcessing';
 import type { UserAuthInfo } from '../../modules/supabase/client';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
@@ -246,11 +247,18 @@ export async function recordGameResultsToSupabase(
       }
     }
 
+    // Pre-fetch every notify-eligible recipient's locale in ONE query so the
+    // emit* fan-outs below don't trigger N+1 profiles round-trips. Previously
+    // each notifyLevelUp / notifyAchievementsBatch call awaited its own
+    // getUserLocale, saturating the Supabase semaphore (Sentry 136).
+    const notifyAuthIds = collectNotifyAuthIds(results, game);
+    const localeMap = await getUserLocalesBatch(notifyAuthIds);
+
     // Emit XP events to each player
-    emitXpEvents(io, results, game);
+    emitXpEvents(io, results, game, localeMap);
 
     // Emit lifetime achievements to players
-    emitLifetimeAchievements(io, results, game);
+    emitLifetimeAchievements(io, results, game, localeMap);
 
     // Process engagement events for each player
     await processEngagementEvents(io, scoresArray, game, gameCode);
@@ -272,7 +280,29 @@ export async function recordGameResultsToSupabase(
  * Emit XP gained and level up events to players
  */
  
-function emitXpEvents(io: Server, results: any, game: GameState): void {
+function collectNotifyAuthIds(results: any, game: GameState): string[] {
+  const ids = new Set<string>();
+  for (const [username, xp] of Object.entries(results?.xpResults ?? {}) as [string, any][]) {
+    if (xp?.leveledUp) {
+      const authUserId = (game.users?.[username] as UserData | undefined)?.authUserId;
+      if (authUserId) ids.add(authUserId);
+    }
+  }
+  for (const [username, list] of Object.entries(results?.lifetimeAchievements ?? {}) as [string, any[]][]) {
+    if (Array.isArray(list) && list.length > 0) {
+      const authUserId = (game.users?.[username] as UserData | undefined)?.authUserId;
+      if (authUserId) ids.add(authUserId);
+    }
+  }
+  return Array.from(ids);
+}
+
+function emitXpEvents(
+  io: Server,
+  results: any,
+  game: GameState,
+  localeMap: Map<string, PushLocale> = new Map()
+): void {
   if (!results.xpResults) return;
 
    
@@ -303,7 +333,7 @@ function emitXpEvents(io: Server, results: any, game: GameState): void {
           );
           const authUserId = (game.users?.[username] as UserData | undefined)?.authUserId;
           if (authUserId) {
-            notifyLevelUp(authUserId, xpInfo.newLevel);
+            notifyLevelUp(authUserId, xpInfo.newLevel, localeMap.get(authUserId) ?? 'en');
           }
         }
       }
@@ -318,7 +348,8 @@ function emitXpEvents(io: Server, results: any, game: GameState): void {
 function emitLifetimeAchievements(
   io: Server,
   results: any,
-  game: GameState
+  game: GameState,
+  localeMap: Map<string, PushLocale> = new Map()
 ): void {
   if (!results.lifetimeAchievements) return;
 
@@ -344,7 +375,7 @@ function emitLifetimeAchievements(
         // shared achievements translation table; batch coalesces N unlocks
         // into a single push (was N separate banners pre-batch).
         const keys = achievements.map((a) => a.key as string);
-        notifyAchievementsBatch(userData.authUserId, keys);
+        notifyAchievementsBatch(userData.authUserId, keys, localeMap.get(userData.authUserId) ?? 'en');
       }
     }
   }

@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
-import { Sparkles, Trophy, Target, Swords, ArrowRight, Flame, Crown } from 'lucide-react';
+import { Sparkles, Trophy, Target, Swords, ArrowRight, Flame } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,13 +28,14 @@ interface PrevSummary {
 const CONFETTI_COLORS = ['#BFFF00', '#FF1493', '#00FFFF', '#8B5CF6', '#FFE135', '#FF6B35'];
 
 // Deterministic confetti positions so SSR/CSR match.
-const CONFETTI = Array.from({ length: 22 }, (_, i) => ({
+const CONFETTI = Array.from({ length: 56 }, (_, i) => ({
   left: ((i * 47) % 100),
   top: ((i * 73) % 100),
   size: 6 + ((i * 13) % 10),
   delay: ((i * 17) % 100) / 100,
   color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
   rotate: (i * 31) % 360,
+  duration: 3 + (i % 4),
 }));
 
 export const SeasonAnnouncementModal: React.FC = () => {
@@ -106,10 +107,6 @@ export const SeasonAnnouncementModal: React.FC = () => {
   const days = Math.floor(totalHours / 24);
   const hours = totalHours % 24;
   const prevColor = prev ? tierColor(prev.peak_tier) : null;
-  const winRate = useMemo(() => {
-    if (!prev || prev.games_played === 0) return 0;
-    return Math.round((prev.games_won / prev.games_played) * 100);
-  }, [prev]);
 
   // Smart label: rotation evidence wins, else fall back to "ending soon" if short.
   const isFinalStretch = !prevSeasonId && days < FINAL_STRETCH_DAYS;
@@ -124,7 +121,7 @@ export const SeasonAnnouncementModal: React.FC = () => {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 texture-halftone"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 texture-halftone"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -132,6 +129,38 @@ export const SeasonAnnouncementModal: React.FC = () => {
         data-testid="season-announcement-modal"
         data-season-id={season.id}
       >
+        {/* Full-screen confetti rain — celebratory backdrop */}
+        {!reduceMotion && (
+          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+            {CONFETTI.map((c, i) => (
+              <motion.span
+                key={i}
+                className="absolute block"
+                style={{
+                  left: `${c.left}%`,
+                  top: `${c.top}%`,
+                  width: c.size,
+                  height: c.size,
+                  backgroundColor: c.color,
+                  borderRadius: i % 3 === 0 ? '50%' : '2px',
+                  boxShadow: '1px 1px 0 rgba(0,0,0,0.6)',
+                }}
+                initial={{ y: -40, opacity: 0, rotate: 0 }}
+                animate={{
+                  y: ['-10vh', '110vh'],
+                  opacity: [0, 1, 1, 0.6, 0],
+                  rotate: [0, c.rotate, c.rotate * 2],
+                }}
+                transition={{
+                  duration: c.duration,
+                  delay: c.delay,
+                  repeat: Infinity,
+                  ease: 'linear',
+                }}
+              />
+            ))}
+          </div>
+        )}
         <motion.div
           ref={dialogRef}
           tabIndex={-1}
@@ -145,38 +174,6 @@ export const SeasonAnnouncementModal: React.FC = () => {
           aria-modal="true"
           aria-labelledby="season-announcement-title"
         >
-          {/* Confetti dust — only in non-reduced-motion */}
-          {!reduceMotion && (
-            <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-neo" aria-hidden="true">
-              {CONFETTI.map((c, i) => (
-                <motion.span
-                  key={i}
-                  className="absolute block"
-                  style={{
-                    left: `${c.left}%`,
-                    top: `${c.top}%`,
-                    width: c.size,
-                    height: c.size,
-                    backgroundColor: c.color,
-                    borderRadius: i % 3 === 0 ? '50%' : '2px',
-                  }}
-                  initial={{ y: -20, opacity: 0, rotate: 0 }}
-                  animate={{
-                    y: [0, 12, 0],
-                    opacity: [0, 0.9, 0.5, 0.9, 0],
-                    rotate: [0, c.rotate, c.rotate * 2],
-                  }}
-                  transition={{
-                    duration: 4 + (i % 3),
-                    delay: c.delay,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                />
-              ))}
-            </div>
-          )}
-
           <div className="relative text-center flex flex-col items-center gap-3">
             {/* Mascot with animated sparkle ring */}
             <div className="relative">
@@ -281,49 +278,75 @@ export const SeasonAnnouncementModal: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Previous-season recap (authenticated + had a prior season) */}
+          {/*
+            Previous-season recap — only the 3 icon tiles (rank / score / games).
+            Dropped: header bar ("YOUR LAST SEASON" sandwiched in crowns) and the
+            peak-tier + WR chip strip below — both duplicate data already visible.
+            Each tile: snappy spring entrance + idle wobble + hover lift.
+          */}
           {prev && prevColor && (
             <motion.div
-              className="bg-gradient-to-br from-neo-navy-light to-neo-navy border-neo-thick border-black rounded-neo p-4 flex flex-col gap-3 shadow-hard-sm"
+              className="grid grid-cols-3 gap-2 text-center"
               initial={reduceMotion ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={reduceMotion ? { duration: 0 } : { delay: 0.55 }}
               data-testid="season-prev-summary"
             >
-              <div className="flex items-center justify-center gap-2">
-                <Crown className="w-4 h-4 text-neo-yellow" aria-hidden="true" />
-                <p className="text-xs text-neo-cream uppercase tracking-widest font-neo-display font-black">
-                  {t('season.lastSeason')}
-                </p>
-                <Crown className="w-4 h-4 text-neo-yellow" aria-hidden="true" />
-              </div>
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="bg-neo-navy rounded-neo border-neo-thick border-black p-2 shadow-hard-sm">
-                  <Trophy className="w-4 h-4 mx-auto text-neo-yellow" aria-hidden="true" />
-                  <p className="font-neo-display font-black text-lg text-neo-cream leading-none mt-1 tabular-nums">#{prev.rank_position}</p>
-                  <p className="text-[10px] text-neo-cream/70 uppercase tracking-wider mt-0.5 font-bold">{t('leaderboard.rank')}</p>
-                </div>
-                <div className="bg-neo-navy rounded-neo border-neo-thick border-black p-2 shadow-hard-sm">
-                  <Target className="w-4 h-4 mx-auto text-neo-lime" aria-hidden="true" />
-                  <p className="font-neo-display font-black text-lg text-neo-cream leading-none mt-1 tabular-nums">{prev.total_score.toLocaleString()}</p>
-                  <p className="text-[10px] text-neo-cream/70 uppercase tracking-wider mt-0.5 font-bold">{t('leaderboard.score')}</p>
-                </div>
-                <div className="bg-neo-navy rounded-neo border-neo-thick border-black p-2 shadow-hard-sm">
-                  <Swords className="w-4 h-4 mx-auto text-neo-pink" aria-hidden="true" />
-                  <p className="font-neo-display font-black text-lg text-neo-cream leading-none mt-1 tabular-nums">{prev.games_played}</p>
-                  <p className="text-[10px] text-neo-cream/70 uppercase tracking-wider mt-0.5 font-bold">{t('leaderboard.games')}</p>
-                </div>
-              </div>
-              <div className="flex items-center justify-center gap-2 flex-wrap">
-                <span className={`px-3 py-1 text-xs font-neo-display font-black border-neo-thick border-black rounded-neo bg-neo-navy shadow-hard-sm ${prevColor.text}`}>
-                  {t('season.peakTier', { tier: prev.peak_tier })}
-                </span>
-                {prev.games_played > 0 && (
-                  <span className="px-3 py-1 text-xs font-neo-display font-black border-neo-thick border-black rounded-neo bg-neo-lime text-black shadow-hard-sm tabular-nums">
-                    {winRate}% WR
+              {[
+                {
+                  icon: <Trophy className="w-4 h-4 text-black" aria-hidden="true" />,
+                  accent: 'bg-neo-yellow',
+                  value: `#${prev.rank_position}`,
+                  label: t('leaderboard.rank'),
+                },
+                {
+                  icon: <Target className="w-4 h-4 text-black" aria-hidden="true" />,
+                  accent: 'bg-neo-lime',
+                  value: prev.total_score.toLocaleString(),
+                  label: t('leaderboard.score'),
+                },
+                {
+                  icon: <Swords className="w-4 h-4 text-black" aria-hidden="true" />,
+                  accent: 'bg-neo-pink',
+                  value: String(prev.games_played),
+                  label: t('leaderboard.games'),
+                },
+              ].map((tile, i) => (
+                <motion.div
+                  key={tile.label}
+                  className="bg-neo-navy rounded-neo border-neo-thick border-black p-2 shadow-hard-sm"
+                  initial={reduceMotion ? false : { opacity: 0, y: 18, scale: 0.7, rotate: -4 }}
+                  animate={
+                    reduceMotion
+                      ? { opacity: 1 }
+                      : { opacity: 1, y: 0, scale: 1, rotate: i % 2 === 0 ? [-1, 1, -1] : [1, -1, 1] }
+                  }
+                  transition={
+                    reduceMotion
+                      ? { duration: 0 }
+                      : {
+                          type: 'spring',
+                          stiffness: 320,
+                          damping: 18,
+                          delay: 0.6 + i * 0.08,
+                          rotate: { duration: 5 + i, repeat: Infinity, ease: 'easeInOut' },
+                        }
+                  }
+                  whileHover={reduceMotion ? undefined : { scale: 1.05, rotate: 0, y: -2 }}
+                >
+                  <span
+                    className={`inline-flex items-center justify-center w-7 h-7 rounded-neo border-neo border-black shadow-hard-sm ${tile.accent}`}
+                  >
+                    {tile.icon}
                   </span>
-                )}
-              </div>
+                  <p className="font-neo-display font-black text-lg text-neo-cream leading-none mt-1 tabular-nums">
+                    {tile.value}
+                  </p>
+                  <p className="text-[10px] text-neo-cream/70 uppercase tracking-wider mt-0.5 font-bold">
+                    {tile.label}
+                  </p>
+                </motion.div>
+              ))}
             </motion.div>
           )}
 

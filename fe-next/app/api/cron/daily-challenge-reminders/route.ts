@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import logger from '@/utils/logger';
-import { getDailyChallengePushRecipients, markDailyPushSent } from '@/lib/pushReminders';
-import { notifyDailyChallengeReminder, getUserLocale } from '@/backend/modules/pushNotificationTriggers';
+import { getDailyChallengePushRecipients, markDailyPushSentBatch } from '@/lib/pushReminders';
+import { notifyDailyChallengeReminder } from '@/backend/modules/pushNotificationTriggers';
 import { pickDailyReminderCopy } from '@/lib/dailyReminderCopy';
 import { getLocalHour, getTodayDate } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
@@ -14,6 +14,10 @@ import { captureApiError } from '@/utils/sentry';
  * reminded today, and (4) are currently in their 17:00-19:00 local window.
  *
  * Security: CRON_SECRET via x-cron-secret header or Authorization: Bearer.
+ *
+ * NOTE: recipients carry a pre-fetched `locale` and the post-send mark is
+ * batched into one UPDATE — see Sentry 136 (Supabase queue depth). Do NOT
+ * reintroduce per-recipient getUserLocale or markDailyPushSent calls here.
  */
 export async function POST(request: NextRequest) {
   const cronSecret =
@@ -38,29 +42,36 @@ export async function POST(request: NextRequest) {
     }
 
     const date = getTodayDate();
+    const localHour = getLocalHour('UTC');
+    const hoursLeft = Math.max(1, 24 - localHour);
 
     const results = await Promise.allSettled(
-      recipients.map(async (userId) => {
-        const localHour = getLocalHour('UTC');
-        const hoursLeft = Math.max(1, 24 - localHour);
-        const locale = await getUserLocale(userId);
+      recipients.map(async ({ userId, locale }) => {
         const copy = pickDailyReminderCopy({ userId, date, hoursLeft, locale });
         await notifyDailyChallengeReminder(userId, {
           title: copy.title,
           body: copy.body,
           deepLink: copy.deepLink,
           variant: copy.variant,
+          locale,
         });
-        await markDailyPushSent(userId);
       })
     );
 
     let sent = 0;
     let failed = 0;
-    results.forEach((r) => {
-      if (r.status === 'fulfilled') sent++;
-      else failed++;
+    const sentIds: string[] = [];
+    results.forEach((r, i) => {
+      if (r.status === 'fulfilled') {
+        sent++;
+        sentIds.push(recipients[i].userId);
+      } else {
+        failed++;
+      }
     });
+
+    // Single batched UPDATE instead of N parallel UPDATEs.
+    await markDailyPushSentBatch(sentIds);
 
     logger.log(`[Push Cron] Completed: ${sent} sent, ${failed} failed`);
     return NextResponse.json({ success: true, sent, failed });

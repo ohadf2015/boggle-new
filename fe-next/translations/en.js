@@ -4477,7 +4477,8 @@ const en = {
     "pastSeasons": "Past Seasons",
     "noPastSeasons": "No past seasons yet",
     "rankedAt": "Rank #{{position}}",
-    "tierLabel": "Tier"
+    "tierLabel": "Tier",
+    "viewLeaderboard": "View leaderboard"
   },
   "seasonBadges": {
     "section": {

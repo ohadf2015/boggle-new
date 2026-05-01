@@ -4357,7 +4357,8 @@ const ja = {
     "pastSeasons": "過去のシーズン",
     "noPastSeasons": "過去のシーズンはまだありません",
     "rankedAt": "{{position}}位",
-    "tierLabel": "ティア"
+    "tierLabel": "ティア",
+    "viewLeaderboard": "ランキングを見る"
   },
   "seasonBadges": {
     "section": {

@@ -69,6 +69,7 @@ export function useTopPlayers(limit = 5, options: UseTopPlayersOptions = {}) {
         .from('leaderboard')
         .select('player_id, username, display_name, total_score, avatar_image, avatar_config, profiles!leaderboard_player_id_fkey(prestige_level)')
         .eq('season_id', seasonId)
+        .gt('total_score', 0)
         .order('total_score', { ascending: false })
         .limit(limit);
 

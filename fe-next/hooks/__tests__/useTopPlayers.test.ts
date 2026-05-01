@@ -21,10 +21,11 @@ beforeEach(() => {
 function setupChain(data: unknown, error: unknown = null) {
   const limit = vi.fn().mockResolvedValue({ data, error });
   const order = vi.fn().mockReturnValue({ limit });
-  const eq = vi.fn().mockReturnValue({ order });
+  const gt = vi.fn().mockReturnValue({ order });
+  const eq = vi.fn().mockReturnValue({ gt });
   const select = vi.fn().mockReturnValue({ eq });
   mockFrom.mockReturnValue({ select });
-  return { select, eq, order, limit };
+  return { select, eq, gt, order, limit };
 }
 
 describe('useTopPlayers', () => {
@@ -49,6 +50,7 @@ describe('useTopPlayers', () => {
 
     expect(mockRpc).toHaveBeenCalledWith('get_current_season_id');
     expect(chain.eq).toHaveBeenCalledWith('season_id', 2);
+    expect(chain.gt).toHaveBeenCalledWith('total_score', 0);
     expect(result.current.players).toHaveLength(1);
     expect(result.current.players[0]).toMatchObject({
       id: 'p1',

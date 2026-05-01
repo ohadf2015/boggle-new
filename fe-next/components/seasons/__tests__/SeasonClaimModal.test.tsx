@@ -8,10 +8,26 @@ vi.mock('framer-motion', () => {
     React.createElement('div', { className: className as string, ...rest }, children);
   const PassSpan = ({ children, className, ...rest }: React.PropsWithChildren<Record<string, unknown>>) =>
     React.createElement('span', { className: className as string, ...rest }, children);
+  const PassButton = ({ children, className, ...rest }: React.PropsWithChildren<Record<string, unknown>>) =>
+    React.createElement('button', { className: className as string, ...rest }, children);
+  // CounterTicker uses these — stub them so the component mounts in jsdom.
+  const useMotionValue = (initial: number) => {
+    let v = initial;
+    return {
+      get: () => v,
+      set: (n: number) => { v = n; },
+      on: () => () => {},
+    };
+  };
+  const useSpring = (mv: { on: () => () => void }) => mv;
+  const animate = () => ({ stop: () => {} });
   return {
-    motion: { div: Pass, h2: Pass, p: Pass, span: PassSpan },
+    motion: { div: Pass, h2: Pass, p: Pass, span: PassSpan, button: PassButton },
     AnimatePresence: ({ children }: React.PropsWithChildren) => React.createElement(React.Fragment, null, children),
     useReducedMotion: () => false,
+    useMotionValue,
+    useSpring,
+    animate,
   };
 });
 
@@ -96,22 +112,29 @@ describe('SeasonClaimModal', () => {
     expect(badge).toHaveAttribute('data-rank', '1');
   });
 
-  it('shows "Permanent collectible" pill for top-5 placement', () => {
+  it('omits the verbose "Permanent collectible" pill for top-5 placements (trimmed copy)', () => {
     render(<SeasonClaimModal {...baseProps} rankPosition={3} />);
-    expect(screen.getByText('Permanent collectible')).toBeInTheDocument();
+    expect(screen.queryByText('Permanent collectible')).not.toBeInTheDocument();
   });
 
-  it('renders recap stats grid when recap data present', () => {
+  it('renders claim error message when claimError set', () => {
+    render(<SeasonClaimModal {...baseProps} claimError="Database unavailable" />);
+    expect(screen.getByTestId('season-claim-error')).toHaveTextContent('Database unavailable');
+  });
+
+  it('renders recap stats grid (with icons + animated counters) when recap data present', () => {
     render(
       <SeasonClaimModal
         {...baseProps}
         recap={{ totalScore: 12345, gamesPlayed: 42, gamesWon: 18 }}
       />,
     );
+    // Labels are stable; numeric values flow through CounterTicker which drives a
+    // spring animation in real browsers. Asserting labels keeps the test resilient
+    // to the animated count-up (mocks animate() as a no-op so values start at 0).
     expect(screen.getByText('Games Played')).toBeInTheDocument();
-    expect(screen.getByText('42')).toBeInTheDocument();
     expect(screen.getByText('Final Score')).toBeInTheDocument();
-    expect(screen.getByText('12,345')).toBeInTheDocument();
+    expect(screen.getByText('Peak Tier')).toBeInTheDocument();
   });
 
   it('invokes onClaim when claim button pressed', () => {
