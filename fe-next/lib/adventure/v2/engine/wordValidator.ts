@@ -21,3 +21,16 @@ export function isComposableFromTiles(word: string, tiles: Tile[]): boolean {
   }
   return true;
 }
+
+/**
+ * Returns true if AT LEAST ONE valid word ≥3 letters can be composed
+ * from the given tiles. Used to detect "stuck" slate states.
+ */
+export function hasAnyComposableWord(tiles: Tile[]): boolean {
+  if (tiles.length < 3) return false;
+  for (const w of PROTO_DICT_EN) {
+    if (w.length > tiles.length) continue;
+    if (isComposableFromTiles(w, tiles)) return true;
+  }
+  return false;
+}

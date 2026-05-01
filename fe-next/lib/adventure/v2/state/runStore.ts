@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { CombatModel, FsmState, Tile, TileId } from '../types';
 import { drawTiles, refillTiles } from '../engine/tilePool';
+import { hasAnyComposableWord } from '../engine/wordValidator';
 import { transition, type FsmEvent } from '../fsm';
 
 interface CombatStore extends CombatModel {
@@ -13,12 +14,14 @@ interface CombatStore extends CombatModel {
   claimTilesForBot: (tileIds: TileId[], turns: number) => void;
   /** Decrement claim counters; refresh tiles whose counter hits 0. */
   tickClaimDecay: () => void;
+  /** If no valid word can be made from free tiles, refresh ALL free tiles. Returns true if it triggered. */
+  rescueIfStuck: () => boolean;
 }
 
 const HERO_MAX_HP = 30;
 const ENEMY_MAX_HP = 25;
 const ENEMY_ATK = 4;
-const BOT_CLAIM_TURNS = 2;
+const BOT_CLAIM_TURNS = 1;
 
 export const useCombatStore = create<CombatStore>((set) => ({
   heroHp: HERO_MAX_HP,
@@ -81,5 +84,22 @@ export const useCombatStore = create<CombatStore>((set) => ({
       });
       return { tiles: refillTiles(next, expired, 'en') };
     });
+  },
+
+  rescueIfStuck: () => {
+    const s = useCombatStore.getState();
+    const free = s.tiles.filter((t) => !t.claimedBy);
+    if (hasAnyComposableWord(free)) return false;
+    // No valid word possible — refresh all free tiles
+    const freeIds = free.map((t) => t.id);
+    set((curr) => ({ tiles: refillTiles(curr.tiles, freeIds, 'en') }));
+    // Recurse once if STILL stuck (extremely unlikely given dict)
+    const after = useCombatStore.getState();
+    const afterFree = after.tiles.filter((t) => !t.claimedBy);
+    if (!hasAnyComposableWord(afterFree)) {
+      const ids = afterFree.map((t) => t.id);
+      set((curr) => ({ tiles: refillTiles(curr.tiles, ids, 'en') }));
+    }
+    return true;
   },
 }));

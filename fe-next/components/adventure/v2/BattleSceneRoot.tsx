@@ -190,32 +190,37 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
     const scene = sceneRef.current;
     if (!scene) return;
 
-    const pick = pickBotWord(s.tiles);
+    // 65% chance bot picks a word; 35% pass to give breathing room
+    const botActs = Math.random() < 0.65;
+    const pick = botActs ? pickBotWord(s.tiles) : null;
+
+    const finalize = () => {
+      // Decay claims first, THEN refresh tiles, THEN rescue if stuck
+      s.tickClaimDecay();
+      s.rescueIfStuck();
+      if (useCombatStore.getState().fsmState.type === 'tile_refresh') {
+        s.dispatch({ type: 'TILE_REFRESH_DONE' });
+      }
+      s.dispatch({ type: 'START_TURN' });
+    };
 
     if (!pick) {
-      // Bot can't form a word — pass turn, no damage, decay then refresh.
-      scene.botBanner.show('', 0, 700, () => {
+      // Bot passes — short banner, no damage
+      scene.botBanner.show('', 0, 450, () => {
         s.dispatch({ type: 'BOT_RESOLVED', heroHpRemaining: s.heroHp });
-        s.tickClaimDecay();
-        s.dispatch({ type: 'TILE_REFRESH_DONE' });
-        s.dispatch({ type: 'START_TURN' });
+        finalize();
       });
       return;
     }
 
-    // Damage formula reuses player's calc with bot's word's letterValueSum
     const botTiles: Tile[] = pick.tileIds.map((id) => s.tiles[id]).filter(Boolean) as Tile[];
-    const botDamage = calculateDamage(botTiles, { critRoll: 1, runeBonusSum: 0, heroAtk: 1 });
+    const botDamage = calculateDamage(botTiles, { critRoll: 1, runeBonusSum: 0, heroAtk: 0.7 });
 
     s.dispatch({ type: 'BOT_PICKED', word: pick.word, tilesClaimed: pick.tileIds, damage: botDamage });
-    s.claimTilesForBot(pick.tileIds, 2);
-
-    // Visually flash the claimed tiles
+    s.claimTilesForBot(pick.tileIds, 1);
     scene.runeSlate.flashBotClaim(pick.tileIds);
 
-    // Show banner, then apply damage
-    scene.botBanner.show(pick.word, botDamage, 1100, () => {
-      // Move FSM to bot_resolve
+    scene.botBanner.show(pick.word, botDamage, 600, () => {
       useCombatStore.setState({ fsmState: botComposeToResolve(useCombatStore.getState().fsmState) });
 
       s.applyHeroDamage(botDamage);
@@ -225,13 +230,7 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
 
       const after = useCombatStore.getState();
       s.dispatch({ type: 'BOT_RESOLVED', heroHpRemaining: after.heroHp });
-      // Decay claim counters + refresh expired
-      s.tickClaimDecay();
-
-      if (useCombatStore.getState().fsmState.type === 'tile_refresh') {
-        s.dispatch({ type: 'TILE_REFRESH_DONE' });
-        s.dispatch({ type: 'START_TURN' });
-      }
+      finalize();
     });
   }
 
