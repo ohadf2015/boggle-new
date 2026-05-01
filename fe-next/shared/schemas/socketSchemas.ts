@@ -103,7 +103,7 @@ export const GuestTokenHashSchema = z.string()
 export const UsernameSchema = z.string()
   .min(1, 'Username is required')
   .max(30, 'Username must be at most 30 characters')
-  .regex(/^[a-zA-Z0-9_\-\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\s]+$/)
+  .regex(/^[a-zA-Z0-9._\-\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\s]+$/)
   .transform(s => s.trim())
   // SECURITY: Reject control characters, zero-width characters, and BOM
   .refine((val) => !/[\u0000-\u001F\u007F-\u009F\u200B-\u200D\uFEFF]/.test(val), 'Username contains invalid characters');
