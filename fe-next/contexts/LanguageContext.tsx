@@ -317,10 +317,8 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                 if (fallback) {
                     return fallback;
                 }
-                // Demoted from warn → debug so transient post-deploy gaps and
-                // unmerged feature copy don't page Sentry. Real-time gaps surface
-                // in dev console and via the i18n audit script.
-                logger.debug(`Translation missing for key: ${path} in language: ${language}`);
+                // DO NOT demote to debug. User mandate 2026-05-01: missing keys are real bugs and must page Sentry.
+                logger.warn(`Translation missing for key: ${path} in language: ${language}`);
                 return path;
             }
             current = (current as Record<string, unknown>)[key];

@@ -23,15 +23,15 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import { InlineBannerAd } from '@/components/ads';
-import NearRankIndicator from '@/components/leaderboard/NearRankIndicator';
+const NearRankIndicator = dynamic(() => import('@/components/leaderboard/NearRankIndicator'), { ssr: false });
 import { TierBadge, TierProgressBar } from '@/components/ui/TierBadge';
 import { useTierPromotion } from '@/hooks/useTierPromotion';
 import { useTierPosition } from '@/hooks/useTierPosition';
 import { useExperiment } from '@/hooks/useExperiment';
-import TierPositionPanel from '@/components/leaderboard/TierPositionPanel';
+const TierPositionPanel = dynamic(() => import('@/components/leaderboard/TierPositionPanel'), { ssr: false });
 import { SeasonLeaderboardTabs, type SeasonTabKey } from '@/components/seasons/SeasonLeaderboardTabs';
-import { SeasonBanner } from '@/components/multiplayer/SeasonBanner';
-import { PastSeasonsLeaderboard } from '@/components/seasons/PastSeasonsLeaderboard';
+const SeasonBanner = dynamic(() => import('@/components/multiplayer/SeasonBanner').then(m => ({ default: m.SeasonBanner })), { ssr: false });
+const PastSeasonsLeaderboard = dynamic(() => import('@/components/seasons/PastSeasonsLeaderboard').then(m => ({ default: m.PastSeasonsLeaderboard })), { ssr: false });
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import {
   getGlobalLeaderboardTier,
