@@ -74,7 +74,7 @@ vi.mock('framer-motion', () => {
     motion: motionObj, m: motionObj,
     AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     useMotionValue: () => ({ get: () => 0, set: () => {}, on: () => () => {} }),
-    useSpring: (v: unknown) => v, useInView: () => true, animate: () => ({ stop: () => {} }),
+    useSpring: (v: unknown) => v, useInView: () => true, useReducedMotion: () => false, animate: () => ({ stop: () => {} }),
   };
 });
 vi.mock('next/link', () => ({

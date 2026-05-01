@@ -125,6 +125,7 @@ vi.mock('framer-motion', () => {
     useMotionValue: (init: number) => ({ get: () => init, set: () => {}, on: () => () => {} }),
     useSpring: (v: any) => v,
     useInView: () => true,
+    useReducedMotion: () => false,
     animate: () => ({ stop: () => {} }),
   };
 });

@@ -127,13 +127,15 @@ export const PastSeasonsLeaderboard: React.FC = () => {
                   {row.total_score.toLocaleString()}
                 </div>
                 <div className="col-span-3 text-right">
-                  <span className={cn(
-                    'px-2 py-0.5 text-xs font-neo-display rounded-neo border-neo border-black',
-                    color.text, color.bg ?? 'bg-neo-navy'
-                  )}>
-                    <Trophy className="inline w-3 h-3 me-1" aria-hidden="true" />
-                    {row.peak_tier}
-                  </span>
+                  {row.peak_tier ? (
+                    <span className={cn(
+                      'px-2 py-0.5 text-xs font-neo-display rounded-neo border-neo bg-neo-navy',
+                      color.text, color.border
+                    )}>
+                      <Trophy className="inline w-3 h-3 me-1" aria-hidden="true" />
+                      {row.peak_tier}
+                    </span>
+                  ) : null}
                 </div>
               </div>
             );

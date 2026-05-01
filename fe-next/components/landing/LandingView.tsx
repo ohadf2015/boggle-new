@@ -35,10 +35,6 @@ import { LandingSeasonHero } from './LandingSeasonHero';
 // Below-the-fold sections — lazy load to speed up initial render
 // LiveActivityTicker moved out to reduce landing clutter
 // Engagement widgets — only high-value conditional ones on landing
-const AnonymousTeaserWidgets = dynamic(() => import('./AnonymousTeaserWidgets').then(m => m.AnonymousTeaserWidgets), {
-  ssr: false,
-  loading: () => <div className="h-32 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
-});
 const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), {
   ssr: false,
   loading: () => <div className="h-48 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
@@ -93,7 +89,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
 
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { isOnCrazyGamesPlatform, isLoading: cgLoading } = useCrazyGames();
-  // Treat "still resolving" as embedded — prevents AnonymousTeaserWidgets
+  // Treat "still resolving" as embedded — prevents the auth modal
   // signup CTA from flashing on first paint while the CG SDK confirms env.
   const hideExternalAuth = cgLoading || isOnCrazyGamesPlatform;
   const [showShareModal, setShowShareModal] = useState(false);
@@ -207,11 +203,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           <div className="w-full max-w-4xl mx-auto">
             <LandingLeaderboardPreview players={topPlayers} loading={topPlayersLoading} compact />
           </div>
-        )}
-
-        {/* Engagement widgets — anonymous teasers only; authenticated urgency banner removed */}
-        {!isAuthenticated && !hideExternalAuth && (
-          <AnonymousTeaserWidgets onSignUpClick={() => setShowAuthModal(true)} />
         )}
 
         {/* Below-fold sections — rank + avatar only. Community/Share moved off landing. */}

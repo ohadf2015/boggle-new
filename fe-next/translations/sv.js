@@ -4373,7 +4373,7 @@ const sv = {
     "noPastSeasons": "Inga tidigare säsonger ännu",
     "rankedAt": "Plats #{{position}}",
     "tierLabel": "Nivå",
-    "viewLeaderboard": "Se topplistan"
+    "viewLeaderboard": "Topplistan"
   },
   "seasonBadges": {
     "section": {

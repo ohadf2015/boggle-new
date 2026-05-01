@@ -4377,7 +4377,7 @@ const he = {
     "noPastSeasons": "אין עדיין עונות קודמות",
     "rankedAt": "מקום #{{position}}",
     "tierLabel": "דרגה",
-    "viewLeaderboard": "צפו בטבלת המובילים"
+    "viewLeaderboard": "טבלת מובילים"
   },
   "seasonBadges": {
     "section": {
