@@ -98,10 +98,24 @@ describe('LandingSeasonHero', () => {
     expect(screen.getByText('Season ending soon!')).toBeInTheDocument();
   });
 
-  it('links to the leaderboard', () => {
+  it('links the entire banner to the leaderboard', () => {
     render(<LandingSeasonHero />);
-    const cta = screen.getByRole('link', { name: 'View leaderboard' });
+    const cta = screen.getByRole('link', {
+      name: 'Season 5: Phonic Phenoms — View leaderboard',
+    });
     expect(cta).toHaveAttribute('href', '/leaderboard');
+  });
+
+  it('does not render a separate CTA button', () => {
+    render(<LandingSeasonHero />);
+    expect(screen.queryByRole('link', { name: 'View leaderboard' })).not.toBeInTheDocument();
+  });
+
+  it('allows the season title to wrap onto two lines instead of truncating', () => {
+    render(<LandingSeasonHero />);
+    const title = screen.getByText('Season 5: Phonic Phenoms');
+    expect(title.className).toMatch(/line-clamp-2/);
+    expect(title.className).not.toMatch(/\btruncate\b/);
   });
 
   it('returns null on the CrazyGames platform', () => {
