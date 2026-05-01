@@ -29,7 +29,7 @@
 @custom-variant medium-short (@media (max-height: 850px));
 @custom-variant desktop-tall (@media (min-width: 1024px) and (min-height: 700px));
 @custom-variant desktop-short (@media (min-width: 1024px) and (max-height: 699px));
-@custom-variant desktop-medium-short (@media (min-width: 1024px) and (max-height: 900px));
+@custom-variant desktop-medium-short (@media (min-width: 1024px) and (max-height: 1023px));
 
 @utility text-balance {
   text-wrap: balance;

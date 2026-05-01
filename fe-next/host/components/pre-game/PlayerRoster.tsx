@@ -40,7 +40,6 @@ interface PlayerRosterProps {
   headerExtra?: React.ReactNode;
 }
 
-const AVATAR_COLORS = ['bg-neo-cyan', 'bg-neo-pink', 'bg-purple-400', 'bg-neo-lime', 'bg-neo-yellow', 'bg-orange-400', 'bg-teal-400', 'bg-rose-400'];
 const AVATAR_RING_COLORS = ['ring-neo-cyan/40', 'ring-neo-pink/40', 'ring-purple-400/40', 'ring-neo-lime/40', 'ring-neo-yellow/40', 'ring-orange-400/40', 'ring-teal-400/40', 'ring-rose-400/40'];
 
 const DIFFICULTY_CONFIG: Record<BotDifficulty, {
@@ -198,16 +197,15 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                     )}
 
                     {(() => {
-                      const hasAvatar = !!(avatar?.customAvatar || avatar?.avatarImage);
                       const tilePx = compact ? 56 : 64;
+                      // Avatar handles full fallback chain (customAvatar → seeded-from-userId).
+                      // Don't gate on hasAvatar: backend may emit legacy `{emoji,color}` shape
+                      // (userManager.ts:144) which has no customAvatar — Avatar still renders
+                      // a deterministic seeded face from `userId={name}`.
                       const tileInner = (
                         <div className={cn(
                           'rounded-full border-neo-black flex items-center justify-center overflow-hidden shadow-hard aspect-square',
                           compact ? 'w-14 h-14 border-[3px]' : 'w-16 h-16 border-[3px]',
-                          // Solid color background only for letter fallback — when a real avatar
-                          // renders, AvatarRenderer paints its own bgColor and mode frame so
-                          // an outer color disc creates a competing-cyan halo (see screenshot bug).
-                          !hasAvatar && AVATAR_COLORS[index % AVATAR_COLORS.length],
                           compact
                             ? cn('ring-2 ring-offset-1 ring-offset-neo-navy', AVATAR_RING_COLORS[index % AVATAR_RING_COLORS.length])
                             : cn(
@@ -215,19 +213,13 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                                 isHostPlayer && 'ring-2 ring-neo-yellow ring-offset-1 ring-offset-neo-navy',
                               ),
                         )}>
-                          {hasAvatar ? (
-                            <Avatar
-                              customAvatar={avatar?.customAvatar ?? undefined}
-                              userId={name}
-                              pixelSize={tilePx}
-                              mode="multiplayer"
-                              className="w-full h-full"
-                            />
-                          ) : (
-                            <span className={cn('font-black text-neo-black', compact ? 'text-2xl' : 'text-2xl')}>
-                              {name.charAt(0).toUpperCase()}
-                            </span>
-                          )}
+                          <Avatar
+                            customAvatar={avatar?.customAvatar ?? undefined}
+                            userId={name}
+                            pixelSize={tilePx}
+                            mode="multiplayer"
+                            className="w-full h-full"
+                          />
                         </div>
                       );
                       if (isMe && onSelfAvatarClick) {

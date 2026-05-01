@@ -435,10 +435,10 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   animate={{ scale: 1, opacity: 1 }}
                   className="relative z-20 shrink-0"
                 >
-                  <div className="hidden desktop-short:lg:block lg:hidden">
+                  <div className="hidden desktop-short:lg:block desktop-medium-short:lg:block lg:hidden">
                     <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="sm" onTimerState={onTimerState} />
                   </div>
-                  <div className="hidden desktop-tall:lg:block">
+                  <div className="hidden desktop-tall:lg:block desktop-medium-short:lg:hidden">
                     <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" onTimerState={onTimerState} />
                   </div>
                   <div className="hidden md:block lg:hidden short:md:hidden medium-short:md:hidden">
@@ -507,7 +507,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
           {/* Word Forming Area - inside header area for tighter integration */}
           {isPlaying && gameMode !== 'word-hunt' && (
-            <div className="relative flex items-center justify-center shrink-0 -mt-1 mb-0.5 desktop-short:lg:-mt-2 desktop-short:lg:mb-0">
+            <div className="relative flex items-center justify-center shrink-0 -mt-1 mb-0.5 desktop-short:lg:-mt-2 desktop-short:lg:mb-0 desktop-medium-short:lg:-mt-2 desktop-medium-short:lg:mb-0">
               <LeadChangeBanner event={leadChangeEvent ?? null} />
               <WordFormingArea
                 word={isTypingMode ? typedWord : formedWord}
