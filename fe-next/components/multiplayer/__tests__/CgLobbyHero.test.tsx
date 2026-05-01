@@ -72,10 +72,16 @@ describe('CgLobbyHero', () => {
     expect(img.src).toContain('/mascot/play.webp');
   });
 
-  it('uses waving.webp mascot for returning variants', () => {
+  it('uses spectating.webp (observer) mascot for returning variants', () => {
     render(<CgLobbyHero variant="returning-named" displayName="X" onPlay={vi.fn()} onBrowse={vi.fn()} />);
     const img = screen.getByTestId('cg-lobby-hero-mascot') as HTMLImageElement;
-    expect(img.src).toContain('/mascot/waving.webp');
+    expect(img.src).toContain('/mascot/spectating.webp');
+  });
+
+  it('uses spectating.webp for returning-anon variant too', () => {
+    render(<CgLobbyHero variant="returning-anon" displayName={null} onPlay={vi.fn()} onBrowse={vi.fn()} />);
+    const img = screen.getByTestId('cg-lobby-hero-mascot') as HTMLImageElement;
+    expect(img.src).toContain('/mascot/spectating.webp');
   });
 
   it('renders aria-label on section from t()', () => {

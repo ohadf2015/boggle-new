@@ -711,7 +711,14 @@ Drop in this order. Stop dropping when you have a shippable v1.
 2. **Mascot in combat.** Mascot is in the Hub for sure. Should it appear as a sidekick in combat (cute non-interactive companion sprite) or stay Hub-only? Recommendation: Hub-only v1 to preserve combat focus.
 3. **Hero customization.** Currently the hero is a single shared character. Skin variants from runes/achievements? Recommendation: ONE hero v1, cosmetic skins post-launch.
 4. **PvP integration.** Does Adventure unlock anything in multiplayer? (Lexicon shared across modes, e.g. words found in adventure could buff multiplayer dictionary.) Recommendation: Lexicon is shared, runs are isolated.
-5. **Asset budget approval.** ~12 backgrounds (4 per chapter) + 3 boss arenas + ~9 enemy sprites + 3 hero anim sets. Estimated fal-ai cost + curation hours: 30-40h art-direction work spread across a 6-week sprint. Sign-off?
+5. **Asset budget approval.** ~9 backgrounds (3 per chapter, post-cap revision) + 3 boss arenas + ~9 enemy sprites + 3 hero anim sets. Estimated fal-ai cost + curation hours: 30-40h art-direction work spread across a 6-week sprint. Sign-off?
+6. **Hebrew bidi inside the casting glyph.** When a he-locale player composes a word, letters fly from RuneSlate (chrome-mirrored, top-right-anchored) into the casting glyph between hero (left) and enemy (right). Should the spelled word read **RTL inside the glyph** (visually correct for Hebrew readers — right-most letter is the first letter) on a non-mirrored battlefield? Recommendation: **YES, RTL inside the glyph for he**. The glyph is a text element, not a battlefield-geometry element — it follows chrome rules.
+7. **Existing-player data migration policy.** v1 adventure currently grants gold (single shared currency) + per-mode achievements. v2 adds: lexicon (new, blank for everyone), runes (new pool, replaces v1 `runeCatalog.ts`). Decisions to lock:
+   - **Gold:** preserved (single shared currency across all modes — never zeroed).
+   - **v1 runes earned:** zeroed at v2 launch. Compensation: existing players get +500 gold one-time grant + an exclusive "Veteran" cosmetic badge. Lock confirmed?
+   - **v1 adventure achievements:** preserved as historical record; v2 adds new achievement set; both visible in achievements UI under separate tabs.
+   - **v1 progress (level reached, etc.):** snapshotted to backup table, not exposed in v2 UI. Effectively reset.
+8. **Japanese deferral.** Adventure mode in `ja` shows "coming soon" card with link/CTA back to other modes. User comfortable with this scope cut? Or hold v1 for ja? Recommendation: ship without ja; add in v2 with hiragana-tile design.
 
 ---
 
