@@ -3,17 +3,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
-import { Sparkles, Trophy, Target, Swords, ArrowRight, Flame } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { Sparkles, Trophy, Target, Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { supabase } from '@/lib/supabase';
-import { getCurrentSeasonDynamic, getSeasonTimeRemaining } from '@/lib/seasons';
+import { getCurrentSeasonDynamic } from '@/lib/seasons';
 import { tierColor } from '@/lib/tierColors';
 
 const STORAGE_KEY = 'lexiclash:lastSeenSeasonId';
-const FINAL_STRETCH_DAYS = 7;
 
 interface PrevSummary {
   season_id: number;
@@ -39,14 +37,12 @@ const CONFETTI = Array.from({ length: 56 }, (_, i) => ({
 }));
 
 export const SeasonAnnouncementModal: React.FC = () => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const { user } = useAuth();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
-  const router = useRouter();
   const reduceMotion = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [season, setSeason] = useState(() => getCurrentSeasonDynamic());
-  const [remaining, setRemaining] = useState(() => getSeasonTimeRemaining());
   const [prevSeasonId, setPrevSeasonId] = useState<number | null>(null);
   const [prev, setPrev] = useState<PrevSummary | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -55,7 +51,6 @@ export const SeasonAnnouncementModal: React.FC = () => {
     if (typeof window === 'undefined') return;
     const current = getCurrentSeasonDynamic();
     setSeason(current);
-    setRemaining(getSeasonTimeRemaining());
     const lastSeenStr = localStorage.getItem(STORAGE_KEY);
     const lastSeen = Number(lastSeenStr ?? '0');
     if (lastSeen !== current.id) {
@@ -74,22 +69,11 @@ export const SeasonAnnouncementModal: React.FC = () => {
       });
   }, [open, prevSeasonId, user?.id]);
 
-  useEffect(() => {
-    if (!open) return;
-    const interval = setInterval(() => setRemaining(getSeasonTimeRemaining()), 60_000);
-    return () => clearInterval(interval);
-  }, [open]);
-
   const dismiss = () => {
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEY, String(season.id));
     }
     setOpen(false);
-  };
-
-  const viewPast = () => {
-    dismiss();
-    router.push(`/${language}/leaderboard`);
   };
 
   useEffect(() => {
@@ -103,17 +87,7 @@ export const SeasonAnnouncementModal: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const totalHours = Math.max(0, Math.floor(remaining.totalMs / 3_600_000));
-  const days = Math.floor(totalHours / 24);
-  const hours = totalHours % 24;
   const prevColor = prev ? tierColor(prev.peak_tier) : null;
-
-  // Smart label: rotation evidence wins, else fall back to "ending soon" if short.
-  const isFinalStretch = !prevSeasonId && days < FINAL_STRETCH_DAYS;
-  const badgeLabel = isFinalStretch ? t('season.finalDays') : t('season.newSeason');
-  const badgeBg = isFinalStretch ? 'bg-neo-orange' : 'bg-neo-lime';
-  const badgeIcon = isFinalStretch ? Flame : Sparkles;
-  const BadgeIcon = badgeIcon;
 
   if (!open) return null;
   if (isOnCrazyGamesPlatform) return null;
@@ -212,7 +186,7 @@ export const SeasonAnnouncementModal: React.FC = () => {
             </div>
 
             <motion.div
-              className={`flex items-center gap-2 px-4 py-1.5 ${badgeBg} border-neo-thick border-black rounded-neo shadow-hard`}
+              className="flex items-center gap-2 px-4 py-1.5 bg-neo-lime border-neo-thick border-black rounded-neo shadow-hard"
               initial={reduceMotion ? false : { opacity: 0, y: -8, scale: 0.8 }}
               animate={
                 reduceMotion
@@ -221,11 +195,11 @@ export const SeasonAnnouncementModal: React.FC = () => {
               }
               transition={reduceMotion ? { duration: 0 } : { delay: 0.3, duration: 0.5 }}
             >
-              <BadgeIcon className="w-4 h-4 text-black" aria-hidden="true" />
+              <Sparkles className="w-4 h-4 text-black" aria-hidden="true" />
               <span className="font-neo-display font-black text-sm text-black uppercase tracking-wider">
-                {badgeLabel}
+                {t('season.newSeason')}
               </span>
-              <BadgeIcon className="w-4 h-4 text-black" aria-hidden="true" />
+              <Sparkles className="w-4 h-4 text-black" aria-hidden="true" />
             </motion.div>
 
             <motion.h2
@@ -238,45 +212,6 @@ export const SeasonAnnouncementModal: React.FC = () => {
               {t('season.name', { number: season.id, theme: season.theme })}
             </motion.h2>
           </div>
-
-          {/* Big visible countdown — gradient header pill */}
-          <motion.div
-            className="relative bg-neo-navy-light border-neo-thick border-black rounded-neo p-3 shadow-hard-sm overflow-hidden"
-            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={reduceMotion ? { duration: 0 } : { delay: 0.45 }}
-            data-testid="season-countdown"
-          >
-            <p className="text-xs text-neo-cream/80 text-center uppercase tracking-widest font-neo-display font-black">
-              {isFinalStretch ? t('season.finalDays') : t('season.endsIn', { days })}
-            </p>
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              <motion.div
-                className="bg-neo-pink border-neo-thick border-black rounded-neo py-3 text-center shadow-hard"
-                animate={
-                  reduceMotion
-                    ? undefined
-                    : { rotate: [-1, 1, -1] }
-                }
-                transition={reduceMotion ? undefined : { duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <p className="font-neo-display font-black text-4xl text-black leading-none tabular-nums">{days}</p>
-                <p className="text-[11px] font-black text-black uppercase tracking-widest mt-1">days</p>
-              </motion.div>
-              <motion.div
-                className="bg-neo-cyan border-neo-thick border-black rounded-neo py-3 text-center shadow-hard"
-                animate={
-                  reduceMotion
-                    ? undefined
-                    : { rotate: [1, -1, 1] }
-                }
-                transition={reduceMotion ? undefined : { duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <p className="font-neo-display font-black text-4xl text-black leading-none tabular-nums">{hours}</p>
-                <p className="text-[11px] font-black text-black uppercase tracking-widest mt-1">hrs</p>
-              </motion.div>
-            </div>
-          </motion.div>
 
           {/*
             Previous-season recap — only the 3 icon tiles (rank / score / games).
@@ -350,40 +285,22 @@ export const SeasonAnnouncementModal: React.FC = () => {
             </motion.div>
           )}
 
-          <motion.div
-            className="grid grid-cols-2 gap-2"
+          <motion.button
+            onClick={dismiss}
+            className="
+              w-full py-3 bg-neo-lime text-black font-neo-display font-black
+              border-neo-thick border-black rounded-neo shadow-hard
+              hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-0.5
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-pink
+              transition-all uppercase tracking-wider
+            "
             initial={reduceMotion ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={reduceMotion ? { duration: 0 } : { delay: 0.65 }}
+            aria-label={t('season.continue')}
           >
-            <button
-              onClick={viewPast}
-              className="
-                py-3 bg-neo-navy-light text-neo-cream font-neo-display font-black
-                border-neo-thick border-black rounded-neo shadow-hard-sm
-                hover:shadow-hard active:shadow-hard-pressed active:translate-y-0.5
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-pink
-                transition-all text-sm flex items-center justify-center gap-1
-              "
-              aria-label={t('season.pastSeasons')}
-            >
-              {t('season.pastSeasons')}
-              <ArrowRight className="w-3 h-3 rtl:rotate-180" aria-hidden="true" />
-            </button>
-            <button
-              onClick={dismiss}
-              className="
-                py-3 bg-neo-lime text-black font-neo-display font-black
-                border-neo-thick border-black rounded-neo shadow-hard
-                hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-0.5
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-pink
-                transition-all uppercase tracking-wider
-              "
-              aria-label={t('season.continue')}
-            >
-              {t('season.continue')}
-            </button>
-          </motion.div>
+            {t('season.continue')}
+          </motion.button>
         </motion.div>
       </motion.div>
     </AnimatePresence>

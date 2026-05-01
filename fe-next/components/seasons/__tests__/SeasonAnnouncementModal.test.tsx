@@ -9,12 +9,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       if (key === 'season.name' && params)
         return `Season ${params.number}: ${params.theme}`;
-      if (key === 'season.endsIn' && params) return `Ends in ${params.days} days`;
       if (key === 'season.peakTier' && params) return `Peak: ${params.tier}`;
       const map: Record<string, string> = {
         'season.newSeason': 'New Season',
         'season.continue': 'Continue',
-        'season.pastSeasons': 'Past Seasons',
         'season.thisSeason': 'This Season',
         'leaderboard.rank': 'Rank',
         'leaderboard.score': 'Score',
@@ -34,10 +32,6 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => mockUseCrazyGames(),
 }));
 
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn() }),
-}));
-
 vi.mock('@/lib/supabase', () => ({ supabase: null }));
 
 vi.mock('@/lib/seasons', () => ({
@@ -49,7 +43,6 @@ vi.mock('@/lib/seasons', () => ({
     endDate: new Date('2027-12-31T00:00:00Z'),
     rewards: [],
   }),
-  getSeasonTimeRemaining: () => ({ days: 12, hours: 5, totalMs: 12 * 86_400_000 + 5 * 3_600_000 }),
 }));
 
 vi.mock('next/image', () => ({
@@ -83,12 +76,14 @@ describe('SeasonAnnouncementModal', () => {
     expect(screen.queryByTestId('season-announcement-modal')).toBeNull();
   });
 
-  it('shows the visible countdown for current season', () => {
+  it('does not render the time-left countdown', () => {
     render(<SeasonAnnouncementModal />);
-    const countdown = screen.getByTestId('season-countdown');
-    expect(countdown).toBeInTheDocument();
-    expect(countdown).toHaveTextContent('12');
-    expect(countdown).toHaveTextContent('5');
+    expect(screen.queryByTestId('season-countdown')).toBeNull();
+  });
+
+  it('does not render the past-seasons CTA', () => {
+    render(<SeasonAnnouncementModal />);
+    expect(screen.queryByRole('button', { name: /past seasons/i })).toBeNull();
   });
 
   it('persists current season id and closes on CTA click', () => {
