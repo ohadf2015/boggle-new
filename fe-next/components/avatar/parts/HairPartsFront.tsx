@@ -365,6 +365,23 @@ function LocsShortFront({ fill }: HairPartProps) {
   );
 }
 
+function PonytailFront({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Sleek pulled-back forehead cap — sits above eye line (y<34), no face coverage */}
+      <path d="M16 32 C16 14 30 8 50 6 C70 8 84 14 84 32 Q74 33 66 31 Q58 33 50 31 Q42 33 34 31 Q26 33 16 32Z"
+        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Pulled-back texture lines radiating from crown */}
+      <path d="M28 24 C36 16 46 10 50 8 C54 10 64 16 72 24" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.14" />
+      <path d="M32 22 C40 14 50 10 50 8 C50 10 60 14 68 22" fill="none" stroke="#fff" strokeWidth={1} opacity="0.18" />
+      <path d="M22 28 C30 20 42 14 50 12" fill="none" stroke="#fff" strokeWidth={0.7} opacity="0.12" strokeLinecap="round" />
+      <path d="M78 28 C70 20 58 14 50 12" fill="none" stroke="#fff" strokeWidth={0.7} opacity="0.12" strokeLinecap="round" />
+      {/* Crown highlight */}
+      <path d="M34 12 C42 8 58 8 66 12" fill="none" stroke="#fff" strokeWidth={1.4} opacity="0.2" strokeLinecap="round" />
+    </g>
+  );
+}
+
 export const HAIR_FRONT_MAP = {
   bangs: BangsFront, long: LongFront, bob: BobFront, wavy: WavyFront,
   sideshave: SideshaveFront, afro: AfroFront, dreads: DreadsFront, pigtails: PigtailsFront,
@@ -374,4 +391,5 @@ export const HAIR_FRONT_MAP = {
   halfUp: HalfUpFront, himecut: HimecutFront, lob: LobFront, shag: ShagFront,
   curlyBangs: CurlyBangsFront, sideSwept: SideSweptFront,
   frizzle: FrizzleFront, durag: DuragFront, locsShort: LocsShortFront,
+  ponytail: PonytailFront,
 } as const;
