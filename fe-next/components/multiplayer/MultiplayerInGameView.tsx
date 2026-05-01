@@ -296,6 +296,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         leaderboard={leaderboard}
         onQuit={handleQuit}
         t={t}
+        remainingTime={remainingTime}
       />
     );
   }

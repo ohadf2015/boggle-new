@@ -45,6 +45,8 @@ interface Props {
   leaderboard: LeaderboardEntry[];
   onQuit: () => void;
   t: (path: string, params?: Record<string, string | number>) => string;
+  /** Match countdown in seconds, sourced from MP startGame.timerSeconds. Null while server timer not yet known. */
+  remainingTime?: number | null;
 }
 
 const MIN_LEN = WHEEL_RUSH_MIN_WORD_LEN;
@@ -74,7 +76,7 @@ const FogCountdown: React.FC<{ endsAt: number }> = ({ endsAt }) => {
   return <span className="opacity-60 tabular-nums">{secs}s</span>;
 };
 
-export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t }) => {
+export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t, remainingTime }) => {
   const {
     playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
     playButtonClickSound, playBoardShuffleSound,
@@ -101,6 +103,10 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const dragStartIdxRef = useRef<number | null>(null);
   const dragEngagedRef = useRef(false);
   const usedIndicesRef = useRef<Set<number>>(new Set());
+  // Latest-builtLetters ref + submit ref let handlePointerUp finalize the drag without
+  // re-creating the callback on every keystroke (matches WordWheelGame.tsx:165,176).
+  const builtLettersRef = useRef<BuiltLetter[]>([]);
+  const handleSubmitRef = useRef<() => void>(() => {});
 
   // Latest-value ref for socket handlers — prevents listener re-registration
   // when consumer-supplied values (t, sound funcs) change reference across renders.
@@ -125,6 +131,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     return set;
   }, [builtLetters]);
   useEffect(() => { usedIndicesRef.current = usedIndices; }, [usedIndices]);
+  useEffect(() => { builtLettersRef.current = builtLetters; }, [builtLetters]);
 
   const builtWord = useMemo(
     () => builtLetters.map(bl => bl.letter).join(''),
@@ -271,10 +278,15 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     tryDragHit(e.clientX, e.clientY);
   }, [tryDragHit]);
   const handlePointerUp = useCallback(() => {
+    const wasEngaged = dragEngagedRef.current;
     draggingRef.current = false;
     lastDragIdxRef.current = null;
     dragStartIdxRef.current = null;
     dragEngagedRef.current = false;
+    // Auto-submit when drag actually traversed letters and built ≥MIN_LEN — mirrors WordWheelGame.tsx:334.
+    if (wasEngaged && builtLettersRef.current.length >= MIN_LEN) {
+      handleSubmitRef.current();
+    }
   }, []);
 
   const handleRemoveLetter = useCallback((index: number) => {
@@ -321,6 +333,9 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
 
     socket.emit('submitWheelWord', { word });
   }, [socket, puzzle, builtLetters.length, builtWord, flash, t, playWordRejectedSound]);
+
+  // Keep submit ref fresh so handlePointerUp can reach the latest closure without re-binding pointer handlers.
+  useEffect(() => { handleSubmitRef.current = handleSubmit; }, [handleSubmit]);
 
   // Responsive wheel radius — observe the container directly. Browser batches
   // ResizeObserver callbacks per-frame, so rapid window resizes won't thrash.
@@ -390,6 +405,20 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             );
           })}
         </div>
+        {typeof remainingTime === 'number' && (
+          <div
+            data-testid="wheel-rush-timer"
+            aria-label={t('wordWheel.timeLeft') || 'Time Left'}
+            className={cn(
+              'shrink-0 px-2.5 py-1 rounded-neo border-2 border-neo-black font-neo-display font-bold text-xs sm:text-sm shadow-hard tabular-nums',
+              remainingTime <= 10
+                ? 'bg-neo-red text-neo-white animate-pulse'
+                : 'bg-neo-cyan text-neo-black',
+            )}
+          >
+            {Math.floor(Math.max(0, remainingTime) / 60)}:{String(Math.max(0, remainingTime) % 60).padStart(2, '0')}
+          </div>
+        )}
         <Button size="sm" variant="destructive" onClick={onQuit} className="shrink-0">{t('common.quit') || 'Quit'}</Button>
       </div>
 

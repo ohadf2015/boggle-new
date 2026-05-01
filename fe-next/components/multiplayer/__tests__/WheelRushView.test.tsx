@@ -363,7 +363,85 @@ describe('WheelRushView', () => {
     expect(screen.queryByRole('button', { name: /reactions\.label/i })).toBeNull();
   });
 
-it('marks word as stolen-from-me when wheelWordStolen targets self', () => {
+it('renders the round-timer countdown when remainingTime prop is provided', () => {
+    const socket = makeMockSocket();
+    render(
+      <WheelRushView
+        socket={socket}
+        username="alice"
+        leaderboard={[{ username: 'alice', score: 0 }]}
+        onQuit={vi.fn()}
+        t={tStub}
+        remainingTime={75}
+      />,
+    );
+    act(() => {
+      socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
+    });
+    expect(screen.getByText('1:15')).toBeTruthy();
+  });
+
+  it('hides the round-timer when remainingTime prop is null', () => {
+    const socket = makeMockSocket();
+    render(
+      <WheelRushView
+        socket={socket}
+        username="alice"
+        leaderboard={[{ username: 'alice', score: 0 }]}
+        onQuit={vi.fn()}
+        t={tStub}
+        remainingTime={null}
+      />,
+    );
+    act(() => {
+      socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
+    });
+    expect(screen.queryByTestId('wheel-rush-timer')).toBeNull();
+  });
+
+  it('emits submitWheelWord on pointer-up after dragging across ≥3 letters', () => {
+    const socket = makeMockSocket();
+    const { container } = render(
+      <WheelRushView
+        socket={socket}
+        username="alice"
+        leaderboard={[{ username: 'alice', score: 0 }]}
+        onQuit={vi.fn()}
+        t={tStub}
+      />,
+    );
+    act(() => {
+      socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
+    });
+    socket.emit.mockClear();
+
+    const buttons = Array.from(
+      container.querySelectorAll<HTMLButtonElement>('[data-wheel-letter]'),
+    );
+    const byLetter = (l: string) =>
+      buttons.find(b => (b.dataset.wheelLetter || '').toUpperCase() === l)!;
+    const C = byLetter('C');
+    const A = byLetter('A');
+    const R = byLetter('R');
+    expect(C && A && R).toBeTruthy();
+
+    const wheelDiv = container.querySelector<HTMLDivElement>('div.touch-none')!;
+    const queue: HTMLElement[] = [C, A, R];
+    const efp = vi.spyOn(document, 'elementFromPoint').mockImplementation(() => queue.shift() || null);
+
+    try {
+      fireEvent.pointerDown(wheelDiv, { clientX: 0, clientY: 0 });
+      fireEvent.pointerMove(wheelDiv, { clientX: 1, clientY: 1 });
+      fireEvent.pointerMove(wheelDiv, { clientX: 2, clientY: 2 });
+      fireEvent.pointerUp(wheelDiv, { clientX: 2, clientY: 2 });
+    } finally {
+      efp.mockRestore();
+    }
+
+    expect(socket.emit).toHaveBeenCalledWith('submitWheelWord', { word: 'CAR' });
+  });
+
+  it('marks word as stolen-from-me when wheelWordStolen targets self', () => {
     const socket = makeMockSocket();
     render(
       <WheelRushView
