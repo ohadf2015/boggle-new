@@ -7,10 +7,9 @@ import { useCombatStore } from '@/lib/adventure/v2/state/runStore';
 import { BattleScene } from './scenes/BattleScene';
 import { calculateDamage } from '@/lib/adventure/v2/engine/damageCalculator';
 import { isValidWord, isComposableFromTiles } from '@/lib/adventure/v2/engine/wordValidator';
-import { pickBotWord } from '@/lib/adventure/v2/engine/botWordPicker';
 import { playSfx } from '@/lib/adventure/v2/audio/soundBus';
 import { attachKeyboardBridge, findTileByLetter } from './input/RuneSlateInput';
-import { botComposeToResolve } from '@/lib/adventure/v2/fsm';
+import { BotLoop } from './BotLoop';
 import type { TileId, Tile } from '@/lib/adventure/v2/types';
 
 interface Props {
@@ -22,6 +21,7 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<Application | null>(null);
   const sceneRef = useRef<BattleScene | null>(null);
+  const botLoopRef = useRef<BotLoop | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -58,6 +58,14 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
       useCombatStore.getState().startNewBattle();
       useCombatStore.getState().dispatch({ type: 'START_TURN' });
       syncSceneFromStore();
+
+      // Start the bot's continuous reveal loop
+      const loop = new BotLoop(
+        (word, dmg, tileIds) => handleBotWordCompleted(word, dmg, tileIds),
+        (tileId) => handleBotTargetReveal(tileId),
+      );
+      botLoopRef.current = loop;
+      loop.start();
     })();
 
     const unsub = useCombatStore.subscribe(() => syncSceneFromStore());
@@ -77,6 +85,8 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
       mounted = false;
       unsub();
       bridge.destroy();
+      botLoopRef.current?.stop();
+      botLoopRef.current = null;
       sceneRef.current?.destroy({ children: true });
       appRef.current?.destroy(true, { children: true, texture: true });
       sceneRef.current = null;
@@ -106,10 +116,12 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
     }
 
     if (s.fsmState.type === 'victory') {
+      botLoopRef.current?.stop();
       playSfx('victory');
       onVictory();
     }
     if (s.fsmState.type === 'defeat') {
+      botLoopRef.current?.stop();
       playSfx('defeat');
       onDefeat();
     }
@@ -120,6 +132,12 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
     if (s.fsmState.type !== 'player_compose') return;
     const tile = s.tiles[tileId];
     if (!tile || tile.claimedBy) return;
+
+    // If bot was eyeing this tile, the player just stole it → invalidate bot's plan
+    if (tile.targetedBy === 'bot') {
+      botLoopRef.current?.invalidate();
+    }
+
     s.dispatch({ type: 'TILE_TAP', tileId, letter });
     playSfx('tile_tap');
   }
@@ -175,63 +193,52 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
 
       s.applyEnemyDamage(dmg);
       const post = useCombatStore.getState();
-      s.dispatch({ type: 'PLAYER_RESOLVED', enemyHpRemaining: post.enemyHp });
+
+      // Victory check
+      if (post.enemyHp <= 0) {
+        s.dispatch({ type: 'PLAYER_RESOLVED', enemyHpRemaining: 0 });
+        return;
+      }
+
+      // Refill used tiles + auto-rescue if deadlocked
       s.refillUsedTiles(usedIds);
+      s.tickClaimDecay();
+      s.rescueIfStuck();
 
-      if (useCombatStore.getState().fsmState.type !== 'bot_compose') return;
-
-      // BOT TURN
-      runBotTurn();
+      // Reset FSM to next compose phase
+      s.dispatch({ type: 'PLAYER_RESOLVED', enemyHpRemaining: post.enemyHp });
+      // PLAYER_RESOLVED would normally enter bot_compose; we no longer use that —
+      // force back to player_compose for the next turn.
+      useCombatStore.setState({
+        fsmState: { type: 'player_compose', word: '', tilesUsed: [] },
+      });
     });
   }
 
-  function runBotTurn() {
-    const s = useCombatStore.getState();
+  function handleBotTargetReveal(_tileId: TileId) {
+    // Visual feedback handled by RuneSlateLayer.setTiles via store subscribe.
+    // Optional: small SFX cue
+    // playSfx('tile_undo'); // re-using existing sfx as a soft tick
+  }
+
+  function handleBotWordCompleted(word: string, dmg: number, tileIds: TileId[]) {
     const scene = sceneRef.current;
     if (!scene) return;
 
-    // 65% chance bot picks a word; 35% pass to give breathing room
-    const botActs = Math.random() < 0.65;
-    const pick = botActs ? pickBotWord(s.tiles) : null;
+    scene.runeSlate.flashBotClaim(tileIds);
+    scene.botBanner.show(word, dmg, 700, () => {});
 
-    const finalize = () => {
-      // Decay claims first, THEN refresh tiles, THEN rescue if stuck
-      s.tickClaimDecay();
-      s.rescueIfStuck();
-      if (useCombatStore.getState().fsmState.type === 'tile_refresh') {
-        s.dispatch({ type: 'TILE_REFRESH_DONE' });
-      }
-      s.dispatch({ type: 'START_TURN' });
-    };
+    const store = useCombatStore.getState();
+    store.applyHeroDamage(dmg);
+    sceneRef.current?.actorLayer.flashHeroHurt();
+    playSfx('hit_hero');
+    screenShake(10, 6);
 
-    if (!pick) {
-      // Bot passes — short banner, no damage
-      scene.botBanner.show('', 0, 450, () => {
-        s.dispatch({ type: 'BOT_RESOLVED', heroHpRemaining: s.heroHp });
-        finalize();
-      });
-      return;
+    // Defeat check
+    const after = useCombatStore.getState();
+    if (after.heroHp <= 0) {
+      store.setDefeat();
     }
-
-    const botTiles: Tile[] = pick.tileIds.map((id) => s.tiles[id]).filter(Boolean) as Tile[];
-    const botDamage = calculateDamage(botTiles, { critRoll: 1, runeBonusSum: 0, heroAtk: 0.7 });
-
-    s.dispatch({ type: 'BOT_PICKED', word: pick.word, tilesClaimed: pick.tileIds, damage: botDamage });
-    s.claimTilesForBot(pick.tileIds, 1);
-    scene.runeSlate.flashBotClaim(pick.tileIds);
-
-    scene.botBanner.show(pick.word, botDamage, 600, () => {
-      useCombatStore.setState({ fsmState: botComposeToResolve(useCombatStore.getState().fsmState) });
-
-      s.applyHeroDamage(botDamage);
-      sceneRef.current?.actorLayer.flashHeroHurt();
-      playSfx('hit_hero');
-      screenShake(10, 6);
-
-      const after = useCombatStore.getState();
-      s.dispatch({ type: 'BOT_RESOLVED', heroHpRemaining: after.heroHp });
-      finalize();
-    });
   }
 
   return (

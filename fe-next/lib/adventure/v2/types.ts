@@ -9,6 +9,8 @@ export interface Tile {
   claimedBy?: 'bot' | null;
   /** Turns remaining on the claim before tile refreshes back to free. */
   claimTurnsRemaining?: number;
+  /** Bot has it earmarked for a not-yet-completed word. Player can still tap to steal. */
+  targetedBy?: 'bot' | null;
 }
 
 export type FsmState =

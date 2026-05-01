@@ -10,6 +10,7 @@ interface TileSprite {
   rarity: Tile['rarity'];
   used: boolean;
   claimed: boolean;
+  targeted: boolean;
   claimTurns: number;
 }
 
@@ -79,6 +80,7 @@ export class RuneSlateLayer extends Container {
       rarity: 'common',
       used: false,
       claimed: false,
+      targeted: false,
       claimTurns: 0,
     };
 
@@ -86,6 +88,7 @@ export class RuneSlateLayer extends Container {
     c.cursor = 'pointer';
     c.on('pointerdown', () => {
       if (sprite.used || sprite.claimed) return;
+      // Tapping a TARGETED tile is allowed — it steals from bot
       this.onTileTap(id, sprite.letterText.text);
     });
 
@@ -100,6 +103,7 @@ export class RuneSlateLayer extends Container {
       sp.rarity = t.rarity;
       sp.used = false;
       sp.claimed = !!t.claimedBy;
+      sp.targeted = !!t.targetedBy && !t.claimedBy;
       sp.claimTurns = t.claimTurnsRemaining ?? 0;
       sp.letterText.alpha = sp.claimed ? 0.55 : 1;
       sp.claimText.text = sp.claimed && sp.claimTurns > 0 ? `${sp.claimTurns}` : '';
@@ -127,9 +131,18 @@ export class RuneSlateLayer extends Container {
   private paintTile(sp: TileSprite) {
     let fillColor: number;
     let strokeColor: number;
+    let strokeWidth = 2;
+
     if (sp.claimed) {
       fillColor = 0x3a0a1a;
       strokeColor = 0xff00aa;
+      strokeWidth = 4;
+    } else if (sp.targeted) {
+      // Bot is eyeing this tile — pink ghost outline, fill stays normal so the letter is readable
+      fillColor =
+        sp.rarity === 'rare' ? 0x4a1a4a : sp.rarity === 'uncommon' ? 0x1a3a4a : 0x1a1a2e;
+      strokeColor = 0xff77cc;
+      strokeWidth = 5;
     } else {
       fillColor =
         sp.rarity === 'rare' ? 0x4a1a4a : sp.rarity === 'uncommon' ? 0x1a3a4a : 0x1a1a2e;
@@ -140,7 +153,7 @@ export class RuneSlateLayer extends Container {
     sp.bg
       .rect(0, 0, TILE_SIZE, TILE_SIZE)
       .fill(fillColor)
-      .stroke({ color: strokeColor, width: sp.claimed ? 4 : 2 });
+      .stroke({ color: strokeColor, width: strokeWidth });
   }
 
   flashBotClaim(tileIds: TileId[]) {

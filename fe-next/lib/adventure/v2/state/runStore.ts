@@ -10,12 +10,20 @@ interface CombatStore extends CombatModel {
   refillUsedTiles: (usedIds: TileId[]) => void;
   applyHeroDamage: (dmg: number) => void;
   applyEnemyDamage: (dmg: number) => void;
-  /** Mark tiles as bot-claimed for N turns. */
+  /** Mark tiles as bot-claimed for N turns (final, locked). */
   claimTilesForBot: (tileIds: TileId[], turns: number) => void;
   /** Decrement claim counters; refresh tiles whose counter hits 0. */
   tickClaimDecay: () => void;
   /** If no valid word can be made from free tiles, refresh ALL free tiles. Returns true if it triggered. */
   rescueIfStuck: () => boolean;
+  /** Mark a tile as bot-targeted (visible reveal step, not yet locked). */
+  targetTileForBot: (tileId: TileId) => void;
+  /** Clear all bot targets (e.g. plan invalidated). */
+  clearBotTargets: () => void;
+  /** Convert bot-targeted tiles to claimed (final lock); used on plan completion. */
+  finalizeBotClaim: (tileIds: TileId[], turns: number) => void;
+  /** Force terminal state. Used when hero HP hits 0 outside a regular FSM transition. */
+  setDefeat: () => void;
 }
 
 const HERO_MAX_HP = 30;
@@ -54,6 +62,36 @@ export const useCombatStore = create<CombatStore>((set) => ({
 
   applyHeroDamage: (dmg) => {
     set((s) => ({ heroHp: Math.max(0, s.heroHp - dmg) }));
+  },
+
+  targetTileForBot: (tileId) => {
+    set((s) => ({
+      tiles: s.tiles.map((t) =>
+        t.id === tileId ? { ...t, targetedBy: 'bot' as const } : t,
+      ),
+    }));
+  },
+
+  clearBotTargets: () => {
+    set((s) => ({
+      tiles: s.tiles.map((t) =>
+        t.targetedBy ? { ...t, targetedBy: null } : t,
+      ),
+    }));
+  },
+
+  finalizeBotClaim: (tileIds, turns = 1) => {
+    set((s) => ({
+      tiles: s.tiles.map((t) =>
+        tileIds.includes(t.id)
+          ? { ...t, targetedBy: null, claimedBy: 'bot' as const, claimTurnsRemaining: turns }
+          : t,
+      ),
+    }));
+  },
+
+  setDefeat: () => {
+    set({ fsmState: { type: 'defeat' } });
   },
 
   applyEnemyDamage: (dmg) => {
