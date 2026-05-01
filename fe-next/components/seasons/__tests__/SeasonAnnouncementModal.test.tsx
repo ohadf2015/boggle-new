@@ -23,8 +23,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+const mockUseAuth = vi.fn<[], { user: { id: string } | null }>(() => ({ user: null }));
 vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({ user: null }),
+  useAuth: () => mockUseAuth(),
 }));
 
 const mockUseCrazyGames = vi.fn(() => ({ isOnCrazyGamesPlatform: false }));
@@ -33,6 +34,10 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
 }));
 
 vi.mock('@/lib/supabase', () => ({ supabase: null }));
+
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => new URLSearchParams(window.location.search),
+}));
 
 vi.mock('@/lib/seasons', () => ({
   getCurrentSeasonDynamic: () => ({
@@ -56,6 +61,8 @@ describe('SeasonAnnouncementModal', () => {
   beforeEach(() => {
     localStorage.clear();
     mockUseCrazyGames.mockReturnValue({ isOnCrazyGamesPlatform: false });
+    mockUseAuth.mockReturnValue({ user: null });
+    window.history.replaceState({}, '', '/');
   });
 
   it('does not show on CrazyGames embed (no season popups in CG)', () => {
@@ -91,5 +98,50 @@ describe('SeasonAnnouncementModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
     expect(screen.queryByTestId('season-announcement-modal')).toBeNull();
     expect(localStorage.getItem('lexiclash:lastSeenSeasonId')).toBe('7');
+  });
+
+  it('keys storage by user id when authenticated (per-player gate)', () => {
+    mockUseAuth.mockReturnValue({ user: { id: 'user-abc' } });
+    localStorage.setItem('lexiclash:lastSeenSeasonId:user-abc', '7');
+    render(<SeasonAnnouncementModal />);
+    expect(screen.queryByTestId('season-announcement-modal')).toBeNull();
+  });
+
+  it('shows for one user even when another user already dismissed on same device', () => {
+    localStorage.setItem('lexiclash:lastSeenSeasonId:user-other', '7');
+    mockUseAuth.mockReturnValue({ user: { id: 'user-abc' } });
+    render(<SeasonAnnouncementModal />);
+    expect(screen.getByTestId('season-announcement-modal')).toBeInTheDocument();
+  });
+
+  it('persists per-user key on dismiss when authenticated', () => {
+    mockUseAuth.mockReturnValue({ user: { id: 'user-abc' } });
+    render(<SeasonAnnouncementModal />);
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(localStorage.getItem('lexiclash:lastSeenSeasonId:user-abc')).toBe('7');
+  });
+
+  it('force-opens when ?seasonModal=1 is in the URL even if already dismissed', () => {
+    localStorage.setItem('lexiclash:lastSeenSeasonId', '7');
+    window.history.replaceState({}, '', '/leaderboard?seasonModal=1');
+    render(<SeasonAnnouncementModal />);
+    expect(screen.getByTestId('season-announcement-modal')).toBeInTheDocument();
+  });
+
+  it('strips seasonModal query param after force-open', () => {
+    localStorage.setItem('lexiclash:lastSeenSeasonId', '7');
+    window.history.replaceState({}, '', '/leaderboard?seasonModal=1&foo=bar');
+    render(<SeasonAnnouncementModal />);
+    expect(window.location.search).not.toContain('seasonModal');
+    expect(window.location.search).toContain('foo=bar');
+  });
+
+  it('renders mascot clipped in a circle wrapper', () => {
+    render(<SeasonAnnouncementModal />);
+    const mascot = screen.getByTestId('season-announcement-mascot');
+    const circleWrapper = mascot.closest('[data-testid="season-mascot-clip"]');
+    expect(circleWrapper).not.toBeNull();
+    expect(circleWrapper?.className).toMatch(/rounded-full/);
+    expect(circleWrapper?.className).toMatch(/overflow-hidden/);
   });
 });

@@ -300,7 +300,7 @@ describe('pushNotificationTriggers', () => {
         body: 'Season 4 ended — claim your rewards now!',
         data: {
           type: 'season_start',
-          deepLink: '/leaderboard',
+          deepLink: '/leaderboard?seasonModal=1',
         },
       }));
     });

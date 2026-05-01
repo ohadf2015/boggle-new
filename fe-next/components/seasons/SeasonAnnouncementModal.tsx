@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { Sparkles, Trophy, Target, Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,6 +13,10 @@ import { getCurrentSeasonDynamic } from '@/lib/seasons';
 import { tierColor } from '@/lib/tierColors';
 
 const STORAGE_KEY = 'lexiclash:lastSeenSeasonId';
+const FORCE_PARAM = 'seasonModal';
+
+const storageKeyFor = (userId: string | null | undefined) =>
+  userId ? `${STORAGE_KEY}:${userId}` : STORAGE_KEY;
 
 interface PrevSummary {
   season_id: number;
@@ -46,18 +51,32 @@ export const SeasonAnnouncementModal: React.FC = () => {
   const [prevSeasonId, setPrevSeasonId] = useState<number | null>(null);
   const [prev, setPrev] = useState<PrevSummary | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
+  const forceSignal = searchParams?.get(FORCE_PARAM) ?? null;
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const current = getCurrentSeasonDynamic();
     setSeason(current);
-    const lastSeenStr = localStorage.getItem(STORAGE_KEY);
-    const lastSeen = Number(lastSeenStr ?? '0');
-    if (lastSeen !== current.id) {
+
+    const params = new URLSearchParams(window.location.search);
+    const forced = params.get(FORCE_PARAM) === '1';
+
+    const key = storageKeyFor(user?.id);
+    const lastSeen = Number(localStorage.getItem(key) ?? '0');
+
+    if (forced || lastSeen !== current.id) {
       setOpen(true);
       if (lastSeen > 0 && lastSeen < current.id) setPrevSeasonId(lastSeen);
     }
-  }, []);
+
+    if (forced) {
+      params.delete(FORCE_PARAM);
+      const qs = params.toString();
+      const next = window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash;
+      window.history.replaceState({}, '', next);
+    }
+  }, [user?.id, forceSignal]);
 
   useEffect(() => {
     if (!open || prevSeasonId == null || !user?.id || !supabase) return;
@@ -71,7 +90,7 @@ export const SeasonAnnouncementModal: React.FC = () => {
 
   const dismiss = () => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, String(season.id));
+      localStorage.setItem(storageKeyFor(user?.id), String(season.id));
     }
     setOpen(false);
   };
@@ -173,15 +192,20 @@ export const SeasonAnnouncementModal: React.FC = () => {
                 }
                 className="relative drop-shadow-[3px_3px_0px_rgba(0,0,0,1)]"
               >
-                <Image
-                  src="/mascot/celebration.gif"
-                  alt=""
-                  width={140}
-                  height={140}
-                  priority
-                  unoptimized
-                  data-testid="season-announcement-mascot"
-                />
+                <div
+                  data-testid="season-mascot-clip"
+                  className="relative rounded-full overflow-hidden bg-neo-navy w-[140px] h-[140px] border-neo-thick border-black"
+                >
+                  <Image
+                    src="/mascot/celebration.gif"
+                    alt=""
+                    width={140}
+                    height={140}
+                    priority
+                    unoptimized
+                    data-testid="season-announcement-mascot"
+                  />
+                </div>
               </motion.div>
             </div>
 

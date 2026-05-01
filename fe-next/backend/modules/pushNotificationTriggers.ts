@@ -603,7 +603,7 @@ export async function notifySeasonStart(
     imageUrl: mascotImageUrl('celebration'),
     data: {
       type: 'season_start',
-      deepLink: '/leaderboard',
+      deepLink: '/leaderboard?seasonModal=1',
     },
   }, 'both');
 }
