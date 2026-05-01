@@ -120,6 +120,29 @@ export function useAdMob() {
     }
   }, [hasNoAds, getConfig, isDev, whenReady]);
 
+  /**
+   * Pre-load a rewarded ad so the next `showRewarded` resolves instantly
+   * (no network spinner between tap and ad). Fire-and-forget — failures
+   * are silent because the eventual `showRewarded` retries `prepare` and
+   * surfaces errors there.
+   *
+   * Call this when the user enters a context where they're likely to opt
+   * in (e.g. a RewardedAdGoldButton mounting). Skipped on no-ads builds.
+   */
+  const prepareRewarded = useCallback(async (opts?: ShowRewardedOptions) => {
+    if (hasNoAds()) return;
+    const config = getConfig();
+    if (!config) return;
+    const surface: RewardedSurface = opts?.surface ?? 'generic';
+    const adId = config.rewardedUnits?.[surface] ?? config.rewardedAdId;
+    try {
+      await whenReady();
+      await AdMob.prepareRewardVideoAd({ adId });
+    } catch {
+      // Silent: subsequent showRewarded path will retry + report.
+    }
+  }, [hasNoAds, getConfig, whenReady]);
+
   const hideBanner = useCallback(async () => {
     // getConfig returns null when AdMob isn't available — skip entirely.
     if (!getConfig()) return;
@@ -139,7 +162,7 @@ export function useAdMob() {
     }
   }, [getConfig, whenReady]);
 
-  return { showRewarded, showInterstitial, showBanner, hideBanner };
+  return { showRewarded, prepareRewarded, showInterstitial, showBanner, hideBanner };
 }
 
 export default useAdMob;

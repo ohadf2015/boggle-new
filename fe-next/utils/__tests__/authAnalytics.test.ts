@@ -164,14 +164,15 @@ describe('identifyUserForAnalytics', () => {
     expect(args.acquisition_date).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
 
-  it('resetUserAnalytics calls posthog.reset + captures user_logged_out', () => {
+  it('resetUserAnalytics only resets — never auto-emits user_logged_out', () => {
+    // Auto-emit on state transition caused 6.5x logout-per-user spam (PostHog
+    // 30d: 767/117). Logout event must come from explicit signOut() only;
+    // session-refresh blips and cross-tab oscillation should not pollute it.
     const reset = vi.fn();
-    // Re-mock with reset for this test only
-    // (cleanest: just verify the helper's contract by asserting capture call)
     resetUserAnalytics({ reset });
 
     expect(reset).toHaveBeenCalled();
-    expect(capture).toHaveBeenCalledWith('user_logged_out');
+    expect(capture).not.toHaveBeenCalledWith('user_logged_out');
   });
 });
 
@@ -213,7 +214,12 @@ describe('syncAuthAnalyticsTransition (gates user_logged_out / user_identified)'
     expect(next).toBe(true);
   });
 
-  it('logout (true → false) captures user_logged_out exactly once', () => {
+  it('logout (true → false) resets identification but does NOT emit user_logged_out', () => {
+    // The state-transition logout path covers session-refresh failures, cross-
+    // tab signouts, and other system-driven flips. Those should reset the
+    // PostHog identification (so guest events route to a new distinct_id) but
+    // must NOT emit user_logged_out — that event is reserved for explicit,
+    // user-initiated signOut (see lib/supabase.ts).
     const reset = vi.fn();
     const next = syncAuthAnalyticsTransition({
       wasAuthenticated: true,
@@ -221,7 +227,7 @@ describe('syncAuthAnalyticsTransition (gates user_logged_out / user_identified)'
       reset,
     });
     expect(reset).toHaveBeenCalledTimes(1);
-    expect(capture).toHaveBeenCalledWith('user_logged_out');
+    expect(capture).not.toHaveBeenCalledWith('user_logged_out');
     expect(next).toBe(false);
   });
 

@@ -5,7 +5,7 @@
  * to encourage account creation and persist progress.
  */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { getGuestStats } from '@/utils/guestManager';
 import { usePostHogFlag } from '@/hooks/usePostHogFlag';
 import { trackSignupFunnel } from '@/utils/growthTracking';
@@ -23,6 +23,7 @@ interface UseSignupPromptParams {
 interface SignupPromptResult {
   showSignupModal: boolean;
   setShowSignupModal: (show: boolean) => void;
+  dismissSignupModal: () => void;
 }
 
 /**
@@ -36,6 +37,9 @@ export function useSignupPrompt({
   disabled = false,
 }: UseSignupPromptParams): SignupPromptResult {
   const [showSignupModal, setShowSignupModal] = useState(false);
+  // Capture the variant the prompt was shown under so dismissal/completion
+  // events can attribute correctly without re-reading guest stats.
+  const shownVariantRef = useRef<{ isFirstWin: boolean } | null>(null);
 
   // A/B test: 'after-first-win' gates on actual win (with 5-game fallback for non-winners);
   // 'after-third-game' gates purely on games count.
@@ -65,11 +69,21 @@ export function useSignupPrompt({
     const timer = setTimeout(() => {
       setShowSignupModal(true);
       sessionStorage.setItem(SIGNUP_PROMPT_SHOWN_KEY, 'true');
+      shownVariantRef.current = { isFirstWin };
       trackSignupFunnel('prompt_shown', isFirstWin);
     }, 3500);
 
     return () => clearTimeout(timer);
   }, [isAuthenticated, hasUser, authLoading, disabled, signupVariant]);
 
-  return { showSignupModal, setShowSignupModal };
+  const dismissSignupModal = useCallback(() => {
+    setShowSignupModal(false);
+    const shown = shownVariantRef.current;
+    if (shown) {
+      shownVariantRef.current = null;
+      trackSignupFunnel('dismissed', shown.isFirstWin);
+    }
+  }, []);
+
+  return { showSignupModal, setShowSignupModal, dismissSignupModal };
 }

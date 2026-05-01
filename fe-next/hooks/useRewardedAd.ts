@@ -109,6 +109,8 @@ interface UseRewardedAdReturn {
   isPlaceholderCooldown: boolean;
   /** Show a rewarded ad and earn coins on completion */
   showAd: () => void;
+  /** Pre-load the next ad so showAd resolves instantly. No-op on web/CG. */
+  prepareAd: () => void;
   /** Error message if ad failed */
   error: string | null;
   /** Amount of coins that will be rewarded */
@@ -298,11 +300,22 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     }
   }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseSimulation, crazyGames, adMob, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface]);
 
+  // Pre-load AdMob rewarded slot when caller signals likely intent (button
+  // mount). CrazyGames SDK auto-prepares; simulation/placeholder paths
+  // resolve instantly. Reduces tap-to-ad latency on the hot native path —
+  // PostHog 30d showed only 3 users ever completed a watch (96 offers /
+  // 13 users / 20 watches), and tap-latency anecdotally drives drop-off.
+  const prepareAd = useCallback(() => {
+    if (!shouldUseAdMob) return;
+    void adMob.prepareRewarded({ surface });
+  }, [shouldUseAdMob, adMob, surface]);
+
   return {
     status,
     isAdAvailable,
     isPlaceholderCooldown,
     showAd,
+    prepareAd,
     error,
     rewardAmount,
     canShowAd: !isDailyLimitReached() && !(isPlaceholder && !isDev),

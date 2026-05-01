@@ -3,11 +3,10 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, ReactNode } from 'react';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import { syncAuthAnalyticsTransition } from '@/utils/authAnalytics';
+import { consumePendingSignupCompletion } from '@/utils/growthTracking';
 
-// Import types and hooks from auth module
+// Import hooks from auth module (types are re-exported separately below)
 import {
-  type ProfileData,
-  type RankedProgress,
   type AuthContextValue,
   useAuthState,
   useComputedAuthValues,
@@ -104,6 +103,7 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
       const navLang =
         typeof navigator !== 'undefined' ? navigator.language?.split('-')[0] ?? '' : '';
       const locale = docLang || navLang || 'en';
+      const wasGuest = !wasAuthenticatedRef.current;
       wasAuthenticatedRef.current = syncAuthAnalyticsTransition({
         wasAuthenticated: wasAuthenticatedRef.current,
         identify: {
@@ -115,6 +115,11 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
           email: user.email ?? null,
         },
       });
+      // Resolve pending signup-prompt funnel only on guest → authed flips.
+      // Re-identifies of an already-authed user must not re-fire completion.
+      if (wasGuest) {
+        consumePendingSignupCompletion();
+      }
     } else {
       if (wasAuthenticatedRef.current) {
         clearSentryUser();

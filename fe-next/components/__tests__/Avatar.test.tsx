@@ -251,15 +251,27 @@ describe('Avatar', () => {
       expect(avatar1).toBe(avatar2);
     });
 
-    it('prefers avatarImage over userId as seed', () => {
+    it('prefers userId over legacy avatarImage as seed', () => {
       const { unmount } = render(<Avatar avatarImage="pizza-pete" userId="user-123" />);
       const withUserId = screen.getByTestId('custom-avatar').getAttribute('data-base');
       unmount();
 
-      render(<Avatar avatarImage="pizza-pete" />);
-      const withoutUserId = screen.getByTestId('custom-avatar').getAttribute('data-base');
+      render(<Avatar userId="user-123" />);
+      const userIdOnly = screen.getByTestId('custom-avatar').getAttribute('data-base');
 
-      expect(withUserId).toBe(withoutUserId);
+      // userId wins over deprecated avatarImage — seeds match userId-only render
+      expect(withUserId).toBe(userIdOnly);
+    });
+
+    it('falls back to legacy avatarImage when userId is absent', () => {
+      const { unmount } = render(<Avatar avatarImage="pizza-pete" />);
+      const seedA = screen.getByTestId('custom-avatar').getAttribute('data-base');
+      unmount();
+
+      render(<Avatar avatarImage="pizza-pete" />);
+      const seedB = screen.getByTestId('custom-avatar').getAttribute('data-base');
+
+      expect(seedA).toBe(seedB);
     });
   });
 

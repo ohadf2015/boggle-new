@@ -70,12 +70,28 @@ export function identifyUserForAnalytics(args: IdentifyArgs): void {
 }
 
 /**
- * Reset on logout. Caller passes `posthog.reset` so tests can inject
- * a spy without re-mocking the module.
+ * Reset PostHog identification on logout (system-driven OR user-initiated).
+ *
+ * Does NOT emit `user_logged_out` — that event is reserved for explicit
+ * sign-out and is captured directly in `lib/supabase.ts#signOut`. Coupling
+ * the emit to state-transition fires it on session-refresh blips and
+ * cross-tab oscillation (saw 6.5×/user spam in PostHog 30d).
+ *
+ * Caller passes `posthog.reset` so tests can inject a spy without re-
+ * mocking the module.
  */
 export function resetUserAnalytics(opts?: { reset?: () => void }): void {
   const reset = opts?.reset ?? (posthog.reset as () => void);
   safe(() => reset());
+}
+
+/**
+ * Explicit user-initiated sign-out emit. Call from the signOut path only.
+ * Separated from `resetUserAnalytics` so transient state oscillation
+ * (network blip, cross-tab broadcast, session refresh fail) does not
+ * pollute the conversion funnel.
+ */
+export function captureUserLoggedOut(): void {
   safe(() => (posthog.capture as PHFn)('user_logged_out'));
 }
 

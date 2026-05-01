@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
 import type { ProfileData, RankedProgress } from '@/contexts/auth/authTypes';
 import { broadcastSignedOut } from '@/utils/crossTabAuthSync';
+import { captureUserLoggedOut } from '@/utils/authAnalytics';
 import { locales } from './i18n';
 import { isNative } from '@/utils/platform';
 
@@ -173,6 +174,11 @@ export async function verifyOtpCode(email: string, token: string) {
 
 export async function signOut() {
   if (!supabase) return { error: { message: 'Supabase not configured' } };
+
+  // Emit on the user-initiated path only — system-driven token refresh
+  // failures and cross-tab oscillation must not pollute the conversion
+  // funnel (was firing 6.5×/user before this guard).
+  captureUserLoggedOut();
 
   // Broadcast sign out to other tabs before signing out
   // This ensures other tabs clear their state immediately

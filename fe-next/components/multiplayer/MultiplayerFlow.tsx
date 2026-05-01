@@ -131,6 +131,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
 
   // CG lobby diet: hero expansion state and variant
   const [heroExpanded, setHeroExpanded] = useState(false);
+  const [heroDismissed, setHeroDismissed] = useState(false);
   const heroVariant = useCgLobbyHeroVariant(cgUser ?? null);
 
   // UX-014: Room fetch timeout — if rooms haven't loaded after 10s, show retry banner
@@ -403,7 +404,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     !cgAutoJoinHandledRef.current &&
     (typeof window === 'undefined' || !window.sessionStorage.getItem('boggle_cg_auto_joined'));
 
-  const showCgHero = isOnCrazyGamesPlatform && !isClassroomMode && !cgAutoJoinPending;
+  const showCgHero = isOnCrazyGamesPlatform && !isClassroomMode && !cgAutoJoinPending && !heroDismissed;
 
   // Classroom mode: suppress public-lobby chrome. Auto-join effects above still
   // run (handleInvitationAutoJoin fires from prefilledRoom), so the host's room
@@ -434,6 +435,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
           onBrowse={() => {
             heroVariant.markSeen();
             setHeroExpanded(true);
+            setHeroDismissed(true);
           }}
         />
       )}

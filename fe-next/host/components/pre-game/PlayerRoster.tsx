@@ -218,7 +218,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                           {hasAvatar ? (
                             <Avatar
                               customAvatar={avatar?.customAvatar ?? undefined}
-                              avatarImage={avatar?.avatarImage}
+                              userId={name}
                               pixelSize={tilePx}
                               mode="multiplayer"
                               className="w-full h-full"

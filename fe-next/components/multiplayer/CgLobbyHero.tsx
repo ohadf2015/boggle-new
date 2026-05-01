@@ -124,29 +124,48 @@ const CgLobbyHero: React.FC<CgLobbyHeroProps> = ({ variant, displayName, onPlay,
           <button
             data-testid="cg-lobby-hero-browse"
             onClick={handleBrowse}
-            className="mt-1 font-neo-body text-sm text-neo-cream/70 hover:text-neo-cream underline-offset-4 hover:underline transition-colors"
+            className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-neo border-neo-thick border-black bg-neo-navy text-neo-cream font-neo-display text-sm uppercase tracking-tight shadow-hard-sm active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px] transition-transform duration-100 hover:bg-neo-cyan hover:text-black"
           >
-            {t('cg.hero.browseRooms')}
+            <span>{t('cg.hero.browseRooms')}</span>
           </button>
         </div>
 
-        {/* RIGHT — mascot on plinth */}
+        {/* RIGHT — mascot in circle frame with halo */}
         <motion.div
           initial={{ opacity: 0, scale: 0.92 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.1, ease: DECEL }}
-          className="relative w-full max-w-[260px] mx-auto"
+          className="relative w-[160px] sm:w-[180px] mx-auto"
         >
-          <div className="relative aspect-square rounded-neo border-neo-thick border-black bg-neo-navy overflow-hidden">
+          {/* Layered glow — cyan outer, lime inner. Pure additive light, no blobs */}
+          <div
+            aria-hidden
+            className="absolute inset-0 -m-8 rounded-full bg-neo-cyan/35 blur-2xl motion-reduce:hidden"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 -m-3 rounded-full bg-neo-lime/30 blur-xl motion-reduce:hidden"
+          />
+          {/* Circle frame — hard border + offset shadow, neo style */}
+          <div className="relative aspect-square rounded-full border-neo-thick border-black bg-neo-navy overflow-hidden shadow-hard">
             <motion.img
               src={MASCOT[variant]}
               alt=""
               data-testid="cg-lobby-hero-mascot"
-              className="w-full h-full object-contain motion-reduce:!animate-none"
-              animate={{ y: [0, -4, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+              className="w-full h-full object-cover scale-125 motion-reduce:!animate-none"
+              animate={{ y: [0, -3, 0] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
             />
           </div>
+          {/* Sparkle accent — small lime dot for personality */}
+          <div
+            aria-hidden
+            className={`absolute top-1 ${isRTL ? 'left-1' : 'right-1'} w-4 h-4 rounded-full bg-neo-lime border-2 border-black shadow-hard-sm`}
+          />
+          <div
+            aria-hidden
+            className={`absolute bottom-2 ${isRTL ? 'right-0' : 'left-0'} w-3 h-3 rounded-full bg-neo-pink border-2 border-black`}
+          />
         </motion.div>
       </div>
     </section>

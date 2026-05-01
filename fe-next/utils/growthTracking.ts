@@ -61,6 +61,10 @@ export type GrowthEvent =
   | 'share_win_prompt_shown'
   | 'share_win_prompt_clicked'
   | 'share_card_generated'
+  // Unified share funnel — fires alongside surface-specific events with a
+  // `method` prop so PostHog "Share Action (Any Method)" goal can match a
+  // single event regardless of the channel.
+  | 'share_completed'
   | 'friend_added'
   | 'challenge_sent'
   // Engagement
@@ -73,8 +77,10 @@ export type GrowthEvent =
   // Conversion
   | 'signup_prompt_shown'
   | 'signup_completed'
+  | 'signup_dismissed'
   | 'first_win_signup_shown'
   | 'first_win_signup_completed'
+  | 'first_win_signup_dismissed'
   | 'guest_conversion'
   // Monetization
   | 'iap_viewed'
@@ -88,6 +94,8 @@ export type GrowthEvent =
   | 'onboarding_started'
   | 'onboarding_step_completed'
   | 'onboarding_first_word_found'
+  | 'onboarding_completed'
+  | 'onboarding_skipped'
   // Modals / confirmation dialogs
   | 'modal_interaction'
   // Friction / engagement
@@ -394,17 +402,48 @@ export const trackGameCompletion = (
 };
 
 /**
- * Track signup funnel
+ * Track signup funnel.
+ *
+ * `prompt_shown` is fired by useSignupPrompt when the modal opens. It also
+ * stickies the variant in sessionStorage so that a later auth-success can
+ * resolve the funnel to `completed`. `dismissed` fires when the modal is
+ * closed without auth — separates "didn't see" from "saw but bounced".
  */
+const SIGNUP_FUNNEL_PENDING_KEY = 'lexiclash_signup_funnel_pending';
+
 export const trackSignupFunnel = (
-  step: 'prompt_shown' | 'completed',
+  step: 'prompt_shown' | 'completed' | 'dismissed',
   isFirstWin: boolean
 ): void => {
-  if (isFirstWin) {
-    trackGrowthEvent(step === 'prompt_shown' ? 'first_win_signup_shown' : 'first_win_signup_completed');
-  } else {
-    trackGrowthEvent(step === 'prompt_shown' ? 'signup_prompt_shown' : 'signup_completed');
+  const variant = isFirstWin ? 'first_win' : 'multi_game';
+  if (typeof window !== 'undefined') {
+    if (step === 'prompt_shown') {
+      sessionStorage.setItem(SIGNUP_FUNNEL_PENDING_KEY, variant);
+    } else {
+      sessionStorage.removeItem(SIGNUP_FUNNEL_PENDING_KEY);
+    }
   }
+  if (step === 'prompt_shown') {
+    trackGrowthEvent(isFirstWin ? 'first_win_signup_shown' : 'signup_prompt_shown');
+  } else if (step === 'completed') {
+    trackGrowthEvent(isFirstWin ? 'first_win_signup_completed' : 'signup_completed');
+  } else {
+    trackGrowthEvent(isFirstWin ? 'first_win_signup_dismissed' : 'signup_dismissed');
+  }
+};
+
+/**
+ * Resolve a pending signup-prompt funnel to `completed` after the user
+ * authenticates. Called from AuthContext on guest → authed transition.
+ * No-op if no prompt was shown (covers users who signed up via header
+ * button, not via the post-game prompt).
+ */
+export const consumePendingSignupCompletion = (): void => {
+  if (typeof window === 'undefined') return;
+  const pending = sessionStorage.getItem(SIGNUP_FUNNEL_PENDING_KEY);
+  if (!pending) return;
+  sessionStorage.removeItem(SIGNUP_FUNNEL_PENDING_KEY);
+  trackSignupFunnel('completed', pending === 'first_win');
 };
 
 /**
@@ -832,6 +871,30 @@ export const trackOnboardingFirstWord = (
   extras: Record<string, unknown> = {},
 ): void => {
   trackGrowthEvent('onboarding_first_word_found', { word, attemptNumber, ...extras });
+};
+
+/**
+ * Onboarding completed — fires when the user reaches the mode-fork (FTUE
+ * fully done). Caller passes `step_count` (how many steps fired) and
+ * `duration_ms` so PostHog can render a completion-rate funnel + median
+ * time-to-onboard. Pair with `onboarding_started` for the conversion
+ * denominator.
+ */
+export const trackOnboardingCompleted = (
+  extras: { step_count: number; duration_ms: number } & Record<string, unknown>,
+): void => {
+  trackGrowthEvent('onboarding_completed', extras);
+};
+
+/**
+ * Onboarding skipped — fires when the user bails (closes/skips) before
+ * reaching the mode-fork. `at_step` carries the last step they saw so we
+ * can spot drop-off hotspots, `duration_ms` measures patience.
+ */
+export const trackOnboardingSkipped = (
+  extras: { at_step: OnboardingStep | 'unknown'; duration_ms: number } & Record<string, unknown>,
+): void => {
+  trackGrowthEvent('onboarding_skipped', extras);
 };
 
 /** Modal action discriminator for funnel analysis. */

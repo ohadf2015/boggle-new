@@ -44,6 +44,7 @@ describe('RewardedAdGoldButton', () => {
       isAdAvailable: true,
       isPlaceholderCooldown: false,
       showAd: mockShowAd,
+      prepareAd: vi.fn(),
       error: null,
       rewardAmount: 25,
     });
@@ -67,6 +68,7 @@ describe('RewardedAdGoldButton', () => {
       isAdAvailable: true,
       isPlaceholderCooldown: false,
       showAd: mockShowAd,
+      prepareAd: vi.fn(),
       error: null,
       rewardAmount: 25,
     });
@@ -86,6 +88,7 @@ describe('RewardedAdGoldButton', () => {
       isAdAvailable: true,
       isPlaceholderCooldown: true,
       showAd: mockShowAd,
+      prepareAd: vi.fn(),
       error: null,
       rewardAmount: 25,
     });

@@ -18,6 +18,7 @@ vi.mock('@/hooks/useRewardedAd', () => ({
     isAdAvailable: true,
     isPlaceholderCooldown: false,
     showAd: vi.fn(),
+    prepareAd: vi.fn(),
     error: null,
     rewardAmount: 25,
   }),

@@ -2,6 +2,32 @@ import toast from 'react-hot-toast';
 import posthog from 'posthog-js';
 import logger from '@/utils/logger';
 import { trackReferralInviteSent } from '@/utils/viralTracking';
+import { trackGrowthEvent } from '@/utils/growthTracking';
+
+export type ShareMethod =
+  | 'whatsapp'
+  | 'facebook'
+  | 'telegram'
+  | 'twitter'
+  | 'discord'
+  | 'email'
+  | 'sms'
+  | 'clipboard'
+  | 'web_share_api'
+  | 'fallback_clipboard';
+
+/**
+ * Unified share-completion event. Fires alongside surface-specific events
+ * (share_whatsapp_clicked etc.) so the "Share Action (Any Method)" PostHog
+ * goal can match without knowing every channel name. Caller passes the
+ * concrete `method` so we can break down conversion by channel.
+ */
+export function trackShareCompleted(
+  method: ShareMethod,
+  extras?: Record<string, string | number | boolean>,
+): void {
+  trackGrowthEvent('share_completed', { method, ...(extras ?? {}) });
+}
 
 /**
  * Translation function type
@@ -52,6 +78,7 @@ export const copyJoinUrl = async (gameCode: string, t: TranslationFunction | nul
       icon: '✅',
     });
     trackReferralInviteSent();
+    trackShareCompleted('clipboard', { utm_source: utmSource });
     return true;
   } catch (clipboardError) {
     // Fallback 1: execCommand for older browsers
@@ -74,6 +101,7 @@ export const copyJoinUrl = async (gameCode: string, t: TranslationFunction | nul
           icon: '✅',
         });
         trackReferralInviteSent();
+        trackShareCompleted('fallback_clipboard', { utm_source: utmSource });
         return true;
       }
       throw new Error('execCommand copy returned false');
@@ -82,6 +110,7 @@ export const copyJoinUrl = async (gameCode: string, t: TranslationFunction | nul
       if (typeof navigator.share === 'function') {
         try {
           await navigator.share({ url });
+          trackShareCompleted('web_share_api', { utm_source: utmSource });
           return true;
         } catch (shareError) {
           // User cancelled or share failed — only log if not user-cancelled
@@ -125,6 +154,7 @@ export const shareViaWhatsApp = (gameCode: string, roomName: string = '', t: Tra
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(whatsappUrl, '_blank');
   trackReferralInviteSent();
+  trackShareCompleted('whatsapp');
 };
 
 /**
@@ -137,6 +167,7 @@ export const shareViaFacebook = (url: string): void => {
   // Note: Facebook doesn't support pre-filled text in sharer, only URL
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
   window.open(facebookUrl, '_blank', 'width=600,height=400');
+  trackShareCompleted('facebook');
 };
 
 /**
@@ -151,6 +182,7 @@ export const shareViaTelegram = (message: string, url?: string): void => {
     ? `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(message)}`
     : `https://t.me/share/url?text=${encodeURIComponent(message)}`;
   window.open(telegramUrl, '_blank', 'width=600,height=400');
+  trackShareCompleted('telegram');
 };
 
 /**
@@ -164,6 +196,7 @@ export const shareViaTwitter = (message: string, url?: string): void => {
   const text = url ? `${message}\n${url}` : message;
   const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
   window.open(twitterUrl, '_blank', 'width=550,height=420');
+  trackShareCompleted('twitter');
 };
 
 /**
@@ -186,6 +219,7 @@ export const shareViaDiscord = async (message: string, url: string, t: Translati
       duration: 3000,
       icon: '🎮',
     });
+    trackShareCompleted('discord');
     return true;
   } catch (error) {
     logger.error('Failed to copy for Discord:', error);
@@ -207,6 +241,7 @@ export const shareViaEmail = (subject: string, body: string, url: string): void 
   const fullBody = `${body}\n\n${url}`;
   const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(fullBody)}`;
   window.location.href = mailtoUrl;
+  trackShareCompleted('email');
 };
 
 /**
@@ -222,6 +257,7 @@ export const shareViaSms = (message: string, url: string): void => {
   // iOS uses &body=, Android uses ?body= - use ? for broader compatibility
   const smsUrl = `sms:?body=${encodeURIComponent(fullMessage)}`;
   window.location.href = smsUrl;
+  trackShareCompleted('sms');
 };
 
 /**
@@ -414,6 +450,7 @@ export const shareResultsViaWhatsApp = (
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(whatsappUrl, '_blank');
   trackReferralInviteSent();
+  trackShareCompleted('whatsapp', { surface: 'results' });
 };
 
 /**
@@ -640,13 +677,18 @@ export const shareBoard = (
   const message = `${t('ugc.board.shareMessage')}\n${t('ugc.board.createdBy', { name: creatorName })}\n\n${url}`;
 
   if (navigator.share) {
-    navigator.share({ title, text: message, url }).catch(() => {
-      // Fallback to clipboard
-      navigator.clipboard.writeText(message).catch(() => {});
-    });
+    navigator.share({ title, text: message, url })
+      .then(() => trackShareCompleted('web_share_api', { surface: 'board' }))
+      .catch(() => {
+        // Fallback to clipboard
+        navigator.clipboard.writeText(message)
+          .then(() => trackShareCompleted('clipboard', { surface: 'board' }))
+          .catch(() => {});
+      });
   } else {
     navigator.clipboard.writeText(message).then(() => {
       toast.success(t('share.linkCopied') || 'Link copied!', { duration: 2000, icon: '✅' });
+      trackShareCompleted('clipboard', { surface: 'board' });
     }).catch(() => {});
   }
 };
@@ -674,12 +716,17 @@ export const shareWordPack = (
   const message = `${t('ugc.pack.shareMessage')}\n"${name}" ${t('ugc.board.createdBy', { name: creatorName })}\n\n${url}`;
 
   if (navigator.share) {
-    navigator.share({ title: name, text: message, url }).catch(() => {
-      navigator.clipboard.writeText(message).catch(() => {});
-    });
+    navigator.share({ title: name, text: message, url })
+      .then(() => trackShareCompleted('web_share_api', { surface: 'word_pack' }))
+      .catch(() => {
+        navigator.clipboard.writeText(message)
+          .then(() => trackShareCompleted('clipboard', { surface: 'word_pack' }))
+          .catch(() => {});
+      });
   } else {
     navigator.clipboard.writeText(message).then(() => {
       toast.success(t('share.linkCopied') || 'Link copied!', { duration: 2000, icon: '✅' });
+      trackShareCompleted('clipboard', { surface: 'word_pack' });
     }).catch(() => {});
   }
 };

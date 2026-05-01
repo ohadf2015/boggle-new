@@ -26,11 +26,6 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
   surface,
   size = 'sm',
 }) => {
-  useEffect(() => {
-    trackRewardedAdOffered(surface);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const { t } = useLanguage();
@@ -40,12 +35,20 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
   const [glare, setGlare] = useState<{ x: number; y: number } | null>(null);
   const [burstKey, setBurstKey] = useState(0);
 
-  const { showAd, status, isPlaceholderCooldown } = useRewardedAd({
+  const { showAd, prepareAd, status, isPlaceholderCooldown } = useRewardedAd({
     surface: 'doubleGold',
     onRewardEarned: (amount) => {
       onRewardEarned?.(amount);
     },
   });
+
+  // Fire offer + warm the ad slot in one effect so the next tap resolves
+  // without a network spinner. prepareAd is a no-op on web/CG/simulation.
+  useEffect(() => {
+    trackRewardedAdOffered(surface);
+    prepareAd();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const capped = isPlaceholderCooldown;
   const isLoading = status === 'loading' || status === 'showing';

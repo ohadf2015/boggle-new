@@ -31,7 +31,7 @@ export function SignupPromptHost() {
   const pathname = usePathname();
   const { isAuthenticated, user, loading: authLoading } = useAuth();
 
-  const { showSignupModal, setShowSignupModal } = useSignupPrompt({
+  const { showSignupModal, dismissSignupModal } = useSignupPrompt({
     isAuthenticated,
     hasUser: !!user,
     authLoading,
@@ -41,7 +41,7 @@ export function SignupPromptHost() {
   return (
     <FirstWinSignupModal
       isOpen={showSignupModal}
-      onClose={() => setShowSignupModal(false)}
+      onClose={dismissSignupModal}
       variant="multiGames"
     />
   );

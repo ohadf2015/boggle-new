@@ -54,17 +54,20 @@ const SIZE_CONFIG: Record<AvatarSize, SizeConfig> = {
  * Unified Avatar Component
  * Fallback chain: customAvatar (SVG) > deterministic random custom avatar.
  */
-const Avatar = memo<AvatarProps>(({
-  customAvatar,
-  userId,
-  avatarImage,
-  size = 'md',
-  pixelSize,
-  className = '',
-  isLoading,
-  mode,
-  frame,
-}) => {
+const Avatar = memo<AvatarProps>((props) => {
+  const {
+    customAvatar,
+    userId,
+    size = 'md',
+    pixelSize,
+    className = '',
+    isLoading,
+    mode,
+    frame,
+  } = props;
+  // Back-compat: legacy callers still pass `avatarImage`. Read via prop access
+  // so this component does not surface its own deprecation diagnostic.
+  const legacySeed = (props as { avatarImage?: string }).avatarImage;
   const frameClass = frameWrapperClass(frame);
   const frameAttr = frameClass ? { 'data-frame': frame as string } : {};
   const baseConfig = SIZE_CONFIG[size] || SIZE_CONFIG.md;
@@ -77,16 +80,16 @@ const Avatar = memo<AvatarProps>(({
     : undefined;
 
   // Pre-compute fallback avatar (must be before conditionals to satisfy hook rules)
-  const fallbackSeed = avatarImage || userId || 'default-avatar';
+  const fallbackSeed = userId || legacySeed || 'default-avatar';
   const fallbackConfig = useMemo(
     () => getSeededAvatarConfig(hashString(fallbackSeed)),
     [fallbackSeed]
   );
 
   // Show skeleton only when explicitly loading or when no identity is available.
-  // The fallback config is deterministic from userId/avatarImage, so server and
-  // client renders match without a hydration gate.
-  const hasIdentity = !!(customAvatar || userId || avatarImage);
+  // The fallback config is deterministic from userId, so server and client
+  // renders match without a hydration gate.
+  const hasIdentity = !!(customAvatar || userId || legacySeed);
   const shouldLoad = isLoading === true || (isLoading === undefined && !hasIdentity);
 
   // 0. Loading state

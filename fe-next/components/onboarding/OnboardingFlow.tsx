@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,6 +11,8 @@ import { setStoredCustomAvatar } from '@/utils/profileStorage';
 import {
   trackOnboardingStart,
   trackOnboardingStep,
+  trackOnboardingCompleted,
+  trackOnboardingSkipped,
   markFirstGameActivation,
 } from '@/utils/growthTracking';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -64,17 +66,62 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   // sit silently while Next.js fetches the destination page.
   const [isNavigating, setIsNavigating] = useState(false);
 
+  // Funnel timing + step counter — captured at mount so completion/skip
+  // events can carry duration_ms and step_count without prop-drilling.
+  // Init refs to 0 (NOT Date.now) so render stays pure; effect below stamps
+  // the real start time on mount.
+  const startedAtRef = useRef<number>(0);
+  const stepsCompletedRef = useRef<number>(0);
+  const completionEmittedRef = useRef<boolean>(false);
+
   useEffect(() => {
+    startedAtRef.current = Date.now();
     trackOnboardingStart();
   }, []);
 
-  // When user signs in during the returningUser step, skip FTUE entirely
+  const emitCompleted = useCallback((extras: Record<string, unknown> = {}) => {
+    if (completionEmittedRef.current) return;
+    completionEmittedRef.current = true;
+    trackOnboardingCompleted({
+      step_count: stepsCompletedRef.current,
+      duration_ms: Date.now() - startedAtRef.current,
+      ...extras,
+    });
+  }, []);
+
+  const emitSkipped = useCallback((atStep: FlowStep | 'unknown') => {
+    if (completionEmittedRef.current) return;
+    completionEmittedRef.current = true;
+    trackOnboardingSkipped({
+      // FlowStep aligns with OnboardingStep names except 'returningUser'.
+      // Map to a known OnboardingStep / 'unknown' to keep payload shape stable.
+      at_step: (atStep === 'returningUser' ? 'unknown' : atStep) as never,
+      duration_ms: Date.now() - startedAtRef.current,
+    });
+  }, []);
+
+  // Track each step completion through a wrapper so the count stays
+  // truthful regardless of which call site advances the flow. Avoid
+  // passing `undefined` as 2nd arg — keeps test assertions like
+  // `toHaveBeenCalledWith('language')` matching.
+  const recordStep = useCallback((step: Parameters<typeof trackOnboardingStep>[0], extras?: Record<string, unknown>) => {
+    stepsCompletedRef.current += 1;
+    if (extras === undefined) {
+      trackOnboardingStep(step);
+    } else {
+      trackOnboardingStep(step, extras);
+    }
+  }, []);
+
+  // When user signs in during the returningUser step, skip FTUE entirely.
+  // This counts as a completion (auth replaced the FTUE goal).
   useEffect(() => {
     if (isAuthenticated && step === 'returningUser') {
       markOnboardingComplete({ avatarId: 'custom', displayName: '', selectedMode: null });
+      emitCompleted({ via: 'auth_returning_user' });
       onComplete();
     }
-  }, [isAuthenticated, step, onComplete]);
+  }, [isAuthenticated, step, onComplete, emitCompleted]);
 
   const handleHaveAccount = useCallback(() => {
     if (isOnCrazyGamesPlatform) return;
@@ -87,8 +134,9 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
 
   const handleSkipOnboarding = useCallback(() => {
     markOnboardingSkipped();
+    emitSkipped(step);
     onComplete();
-  }, [onComplete]);
+  }, [onComplete, emitSkipped, step]);
 
   const stepIndex = useMemo(() => STEPS.indexOf(step), [step]);
   const accent = STEP_ACCENTS[step];
@@ -99,7 +147,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       setTutorialScore(score);
       setTutorialWords(wordsFound);
       markGuidanceShown('firstPlayTutorialCompleted');
-      trackOnboardingStep('tutorial', { score, wordCount: wordsFound.length });
+      recordStep('tutorial', { score, wordCount: wordsFound.length });
       markFirstGameActivation({
         won: true,
         score,
@@ -108,7 +156,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       });
       setStep('profile');
     },
-    []
+    [recordStep]
   );
 
   // Step 2: Profile complete
@@ -119,7 +167,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       setStoredCustomAvatar(avatar);
 
       const pendingInvite = hasPendingRoomInvite();
-      trackOnboardingStep('profile', { hasPendingInvite: pendingInvite });
+      recordStep('profile', { hasPendingInvite: pendingInvite });
 
       // If player arrived via room invite, skip scoreReveal + fork — go straight to the room
       if (pendingInvite) {
@@ -131,13 +179,14 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         const roomCode = consumePendingRoomInvite();
         setIsNavigating(true);
         router.push(`/${language}/multiplayer?room=${roomCode}`);
+        emitCompleted({ via: 'pending_invite' });
         onComplete();
         return;
       }
 
       setStep('scoreReveal');
     },
-    [language, router, onComplete]
+    [language, router, onComplete, recordStep, emitCompleted]
   );
 
 
@@ -147,7 +196,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const handleContinue = useCallback(() => {
     if (isNavigating) return;
     setIsNavigating(true);
-    trackOnboardingStep('score_reveal', { action: 'continue' });
+    recordStep('score_reveal', { action: 'continue' });
     markOnboardingComplete({
       avatarId: 'custom',
       displayName: playerName || 'Player',
@@ -160,20 +209,21 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     } else {
       router.push(`/${language}`);
     }
+    emitCompleted({ via: 'score_reveal' });
     onComplete();
-  }, [isNavigating, language, router, onComplete, playerName]);
+  }, [isNavigating, language, router, onComplete, playerName, recordStep, emitCompleted]);
 
   // Step 0: Language selected — proceed to returningUser prompt
   // On CrazyGames the "have an account" branch is dead (no external auth),
   // so skip straight to tutorial.
   const handleLanguageSelect = useCallback(() => {
-    trackOnboardingStep('language');
+    recordStep('language');
     if (isOnCrazyGamesPlatform) {
       setStep('tutorial');
       return;
     }
     setStep('returningUser');
-  }, [isOnCrazyGamesPlatform]);
+  }, [isOnCrazyGamesPlatform, recordStep]);
 
   // CrazyGames portal: replace 5-step FTUE with one welcome screen.
   // Players land via thumbnail click; expectation is play in seconds.
@@ -189,9 +239,10 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
             ? `/${language}/multiplayer`
             : `/${language}/singleplayer?autoStart=practice`;
       router.push(route);
+      emitCompleted({ via: 'crazygames_welcome', selected_mode: mode });
       onComplete();
     },
-    [isNavigating, language, router, onComplete],
+    [isNavigating, language, router, onComplete, emitCompleted],
   );
 
   const renderStep = () => {

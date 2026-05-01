@@ -62,7 +62,7 @@ const CrazyGamesFriendsStrip = memo(function CrazyGamesFriendsStrip({ roomId }: 
     >
       <div className="flex items-center gap-2 px-1">
         <Users className="w-3.5 h-3.5 text-neo-cyan" />
-        <h2 className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
+        <h2 className="font-neo-display text-[11px] text-neo-cream/80 uppercase tracking-[0.2em]">
           {t('multiplayerFlow.crazyGamesFriends', 'Friends on CrazyGames')}
         </h2>
       </div>
@@ -72,8 +72,8 @@ const CrazyGamesFriendsStrip = memo(function CrazyGamesFriendsStrip({ roomId }: 
           <div className="flex gap-3">
             {[0, 1, 2].map(i => (
               <div key={`friend-skel-${i}`} className="flex flex-col items-center gap-1.5 w-16 animate-pulse">
-                <div className="w-10 h-10 rounded-full bg-slate-700" />
-                <div className="w-12 h-2.5 rounded bg-slate-700" />
+                <div className="w-10 h-10 rounded-full bg-neo-navy-light border-2 border-black" />
+                <div className="w-12 h-2.5 rounded bg-neo-navy-light" />
               </div>
             ))}
           </div>
@@ -96,21 +96,21 @@ const CrazyGamesFriendsStrip = memo(function CrazyGamesFriendsStrip({ roomId }: 
                     alt={friend.username}
                     width={40}
                     height={40}
-                    className="w-10 h-10 rounded-full object-cover border-2 border-neo-cyan/40"
+                    className="w-10 h-10 rounded-full object-cover border-[2.5px] border-black shadow-hard-sm"
                     unoptimized
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-slate-700 border-2 border-neo-cyan/40 flex items-center justify-center">
-                    <Users className="w-4 h-4 text-neo-white/50" />
+                  <div className="w-10 h-10 rounded-full bg-neo-navy-light border-[2.5px] border-black shadow-hard-sm flex items-center justify-center">
+                    <Users className="w-4 h-4 text-neo-cyan" />
                   </div>
                 )}
                 {roomId && (
-                  <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-neo-lime border border-neo-black flex items-center justify-center">
-                    <UserPlus className="w-2.5 h-2.5 text-neo-black" />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-neo-lime border-2 border-black flex items-center justify-center">
+                    <UserPlus className="w-2.5 h-2.5 text-black" />
                   </div>
                 )}
               </div>
-              <span className="text-[10px] font-bold text-neo-white/60 truncate w-full text-center">
+              <span className="font-neo-body text-[11px] font-bold text-neo-cream/85 truncate w-full text-center">
                 {friend.username}
               </span>
             </button>
