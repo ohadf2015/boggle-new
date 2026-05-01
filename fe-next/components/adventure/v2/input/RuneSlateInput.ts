@@ -43,6 +43,7 @@ export function findTileByLetter(
 ): TileId | null {
   const usedSet = new Set(usedIds);
   for (const t of tiles) {
+    if (t.claimedBy) continue;
     if (!usedSet.has(t.id) && t.letter.toUpperCase() === letter.toUpperCase()) {
       return t.id;
     }
