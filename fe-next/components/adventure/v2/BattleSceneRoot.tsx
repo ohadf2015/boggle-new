@@ -7,8 +7,10 @@ import { useCombatStore } from '@/lib/adventure/v2/state/runStore';
 import { BattleScene } from './scenes/BattleScene';
 import { calculateDamage } from '@/lib/adventure/v2/engine/damageCalculator';
 import { isValidWord, isComposableFromTiles } from '@/lib/adventure/v2/engine/wordValidator';
+import { pickBotWord } from '@/lib/adventure/v2/engine/botWordPicker';
 import { playSfx } from '@/lib/adventure/v2/audio/soundBus';
 import { attachKeyboardBridge, findTileByLetter } from './input/RuneSlateInput';
+import { botComposeToResolve } from '@/lib/adventure/v2/fsm';
 import type { TileId, Tile } from '@/lib/adventure/v2/types';
 
 interface Props {
@@ -20,7 +22,6 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<Application | null>(null);
   const sceneRef = useRef<BattleScene | null>(null);
-  const enemyTurnTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -76,7 +77,6 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
       mounted = false;
       unsub();
       bridge.destroy();
-      if (enemyTurnTimerRef.current) clearTimeout(enemyTurnTimerRef.current);
       sceneRef.current?.destroy({ children: true });
       appRef.current?.destroy(true, { children: true, texture: true });
       sceneRef.current = null;
@@ -95,7 +95,9 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
 
     if (s.fsmState.type === 'player_compose') {
       s.fsmState.tilesUsed.forEach((id) => scene.runeSlate.markUsed(id));
-      const tiles: Tile[] = s.fsmState.tilesUsed.map((id) => s.tiles[id]).filter(Boolean) as Tile[];
+      const tiles: Tile[] = s.fsmState.tilesUsed
+        .map((id) => s.tiles[id])
+        .filter(Boolean) as Tile[];
       const word = s.fsmState.word;
       const valid =
         word.length >= 3 && isValidWord(word) && isComposableFromTiles(word, tiles);
@@ -116,6 +118,8 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
   function handleTileTap(tileId: TileId, letter: string) {
     const s = useCombatStore.getState();
     if (s.fsmState.type !== 'player_compose') return;
+    const tile = s.tiles[tileId];
+    if (!tile || tile.claimedBy) return;
     s.dispatch({ type: 'TILE_TAP', tileId, letter });
     playSfx('tile_tap');
   }
@@ -130,12 +134,25 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
     playSfx('tile_undo');
   }
 
+  function screenShake(amplitude = 8, repeats = 5) {
+    const stage = appRef.current?.stage;
+    if (!stage) return;
+    const ox = stage.position.x;
+    gsap.fromTo(
+      stage.position,
+      { x: ox - amplitude },
+      { x: ox, duration: 0.04, repeat: repeats, yoyo: true, ease: 'power1.inOut' },
+    );
+  }
+
   function handleSubmit() {
     const s = useCombatStore.getState();
     if (s.fsmState.type !== 'player_compose') return;
 
     const word = s.fsmState.word;
-    const tiles: Tile[] = s.fsmState.tilesUsed.map((id) => s.tiles[id]).filter(Boolean) as Tile[];
+    const tiles: Tile[] = s.fsmState.tilesUsed
+      .map((id) => s.tiles[id])
+      .filter(Boolean) as Tile[];
 
     if (word.length < 3 || !isValidWord(word) || !isComposableFromTiles(word, tiles)) {
       playSfx('word_invalid');
@@ -154,45 +171,67 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
     sceneRef.current!.castingGlyph.fireProjectile(impact.x, impact.y, () => {
       sceneRef.current?.actorLayer.flashEnemyHurt();
       playSfx('hit_enemy');
-
-      // Screen shake
-      const stage = appRef.current?.stage;
-      if (stage) {
-        const ox = stage.position.x;
-        gsap.fromTo(
-          stage.position,
-          { x: ox - 8 },
-          { x: ox, duration: 0.04, repeat: 5, yoyo: true, ease: 'power1.inOut' },
-        );
-      }
+      screenShake(8, 5);
 
       s.applyEnemyDamage(dmg);
       const post = useCombatStore.getState();
-      const nextEnemyDamage = post.enemyAtk;
-      s.dispatch({
-        type: 'PLAYER_RESOLVED',
-        enemyHpRemaining: post.enemyHp,
-        nextEnemyDamage,
-      });
+      s.dispatch({ type: 'PLAYER_RESOLVED', enemyHpRemaining: post.enemyHp });
       s.refillUsedTiles(usedIds);
 
-      if (useCombatStore.getState().fsmState.type !== 'enemy_telegraph') return;
+      if (useCombatStore.getState().fsmState.type !== 'bot_compose') return;
 
-      enemyTurnTimerRef.current = setTimeout(() => {
-        if (useCombatStore.getState().fsmState.type !== 'enemy_telegraph') return;
-        s.dispatch({ type: 'ENEMY_TELEGRAPH_DONE' });
-        s.applyHeroDamage(nextEnemyDamage);
-        sceneRef.current?.actorLayer.flashHeroHurt();
-        playSfx('hit_hero');
-        s.dispatch({
-          type: 'ENEMY_RESOLVED',
-          heroHpRemaining: useCombatStore.getState().heroHp,
-        });
-        if (useCombatStore.getState().fsmState.type === 'tile_refresh') {
-          s.dispatch({ type: 'TILE_REFRESH_DONE' });
-          s.dispatch({ type: 'START_TURN' });
-        }
-      }, 800);
+      // BOT TURN
+      runBotTurn();
+    });
+  }
+
+  function runBotTurn() {
+    const s = useCombatStore.getState();
+    const scene = sceneRef.current;
+    if (!scene) return;
+
+    const pick = pickBotWord(s.tiles);
+
+    if (!pick) {
+      // Bot can't form a word — pass turn, no damage, decay then refresh.
+      scene.botBanner.show('', 0, 700, () => {
+        s.dispatch({ type: 'BOT_RESOLVED', heroHpRemaining: s.heroHp });
+        s.tickClaimDecay();
+        s.dispatch({ type: 'TILE_REFRESH_DONE' });
+        s.dispatch({ type: 'START_TURN' });
+      });
+      return;
+    }
+
+    // Damage formula reuses player's calc with bot's word's letterValueSum
+    const botTiles: Tile[] = pick.tileIds.map((id) => s.tiles[id]).filter(Boolean) as Tile[];
+    const botDamage = calculateDamage(botTiles, { critRoll: 1, runeBonusSum: 0, heroAtk: 1 });
+
+    s.dispatch({ type: 'BOT_PICKED', word: pick.word, tilesClaimed: pick.tileIds, damage: botDamage });
+    s.claimTilesForBot(pick.tileIds, 2);
+
+    // Visually flash the claimed tiles
+    scene.runeSlate.flashBotClaim(pick.tileIds);
+
+    // Show banner, then apply damage
+    scene.botBanner.show(pick.word, botDamage, 1100, () => {
+      // Move FSM to bot_resolve
+      useCombatStore.setState({ fsmState: botComposeToResolve(useCombatStore.getState().fsmState) });
+
+      s.applyHeroDamage(botDamage);
+      sceneRef.current?.actorLayer.flashHeroHurt();
+      playSfx('hit_hero');
+      screenShake(10, 6);
+
+      const after = useCombatStore.getState();
+      s.dispatch({ type: 'BOT_RESOLVED', heroHpRemaining: after.heroHp });
+      // Decay claim counters + refresh expired
+      s.tickClaimDecay();
+
+      if (useCombatStore.getState().fsmState.type === 'tile_refresh') {
+        s.dispatch({ type: 'TILE_REFRESH_DONE' });
+        s.dispatch({ type: 'START_TURN' });
+      }
     });
   }
 

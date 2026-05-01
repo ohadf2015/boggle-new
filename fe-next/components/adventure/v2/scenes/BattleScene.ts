@@ -4,6 +4,7 @@ import { ActorLayer } from '../layers/ActorLayer';
 import { RuneSlateLayer } from '../layers/RuneSlateLayer';
 import { CastingGlyphLayer } from '../layers/CastingGlyphLayer';
 import { HudOverlayLayer } from '../layers/HudOverlayLayer';
+import { BotBannerLayer } from '../layers/BotBannerLayer';
 
 export class BattleScene extends Container {
   readonly backdrop: Graphics;
@@ -11,6 +12,7 @@ export class BattleScene extends Container {
   readonly runeSlate: RuneSlateLayer;
   readonly castingGlyph: CastingGlyphLayer;
   readonly hud: HudOverlayLayer;
+  readonly botBanner: BotBannerLayer;
 
   constructor(
     onTileTap: (tileId: TileId, letter: string) => void,
@@ -34,5 +36,8 @@ export class BattleScene extends Container {
 
     this.hud = new HudOverlayLayer(onSubmit, onUndo);
     this.addChild(this.hud);
+
+    this.botBanner = new BotBannerLayer();
+    this.addChild(this.botBanner);
   }
 }

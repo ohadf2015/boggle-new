@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { CombatModel, FsmState, TileId } from '../types';
+import type { CombatModel, FsmState, Tile, TileId } from '../types';
 import { drawTiles, refillTiles } from '../engine/tilePool';
 import { transition, type FsmEvent } from '../fsm';
 
@@ -9,11 +9,16 @@ interface CombatStore extends CombatModel {
   refillUsedTiles: (usedIds: TileId[]) => void;
   applyHeroDamage: (dmg: number) => void;
   applyEnemyDamage: (dmg: number) => void;
+  /** Mark tiles as bot-claimed for N turns. */
+  claimTilesForBot: (tileIds: TileId[], turns: number) => void;
+  /** Decrement claim counters; refresh tiles whose counter hits 0. */
+  tickClaimDecay: () => void;
 }
 
 const HERO_MAX_HP = 30;
 const ENEMY_MAX_HP = 25;
 const ENEMY_ATK = 4;
+const BOT_CLAIM_TURNS = 2;
 
 export const useCombatStore = create<CombatStore>((set) => ({
   heroHp: HERO_MAX_HP,
@@ -50,5 +55,31 @@ export const useCombatStore = create<CombatStore>((set) => ({
 
   applyEnemyDamage: (dmg) => {
     set((s) => ({ enemyHp: Math.max(0, s.enemyHp - dmg) }));
+  },
+
+  claimTilesForBot: (tileIds, turns = BOT_CLAIM_TURNS) => {
+    set((s) => ({
+      tiles: s.tiles.map((t) =>
+        tileIds.includes(t.id)
+          ? { ...t, claimedBy: 'bot' as const, claimTurnsRemaining: turns }
+          : t,
+      ),
+    }));
+  },
+
+  tickClaimDecay: () => {
+    set((s) => {
+      const expired: TileId[] = [];
+      const next: Tile[] = s.tiles.map((t) => {
+        if (!t.claimedBy) return t;
+        const remaining = (t.claimTurnsRemaining ?? 0) - 1;
+        if (remaining <= 0) {
+          expired.push(t.id);
+          return { ...t, claimedBy: null, claimTurnsRemaining: 0 };
+        }
+        return { ...t, claimTurnsRemaining: remaining };
+      });
+      return { tiles: refillTiles(next, expired, 'en') };
+    });
   },
 }));

@@ -6,8 +6,11 @@ interface TileSprite {
   container: Container;
   bg: Graphics;
   letterText: Text;
+  claimText: Text;
   rarity: Tile['rarity'];
   used: boolean;
+  claimed: boolean;
+  claimTurns: number;
 }
 
 const TILE_SIZE = 155;
@@ -59,12 +62,30 @@ export class RuneSlateLayer extends Container {
     txt.position.set(TILE_SIZE / 2, TILE_SIZE / 2);
     c.addChild(txt);
 
-    const sprite: TileSprite = { id, container: c, bg, letterText: txt, rarity: 'common', used: false };
+    const claim = new Text({
+      text: '',
+      style: { fontFamily: 'Fredoka', fontSize: 22, fill: 0xff00aa, fontWeight: 'bold' },
+    });
+    claim.anchor.set(1, 0);
+    claim.position.set(TILE_SIZE - 8, 6);
+    c.addChild(claim);
+
+    const sprite: TileSprite = {
+      id,
+      container: c,
+      bg,
+      letterText: txt,
+      claimText: claim,
+      rarity: 'common',
+      used: false,
+      claimed: false,
+      claimTurns: 0,
+    };
 
     c.eventMode = 'static';
     c.cursor = 'pointer';
     c.on('pointerdown', () => {
-      if (sprite.used) return;
+      if (sprite.used || sprite.claimed) return;
       this.onTileTap(id, sprite.letterText.text);
     });
 
@@ -78,7 +99,10 @@ export class RuneSlateLayer extends Container {
       sp.letterText.text = t.letter;
       sp.rarity = t.rarity;
       sp.used = false;
-      sp.letterText.alpha = 1;
+      sp.claimed = !!t.claimedBy;
+      sp.claimTurns = t.claimTurnsRemaining ?? 0;
+      sp.letterText.alpha = sp.claimed ? 0.55 : 1;
+      sp.claimText.text = sp.claimed && sp.claimTurns > 0 ? `${sp.claimTurns}` : '';
       this.paintTile(sp);
     });
   }
@@ -101,11 +125,31 @@ export class RuneSlateLayer extends Container {
   }
 
   private paintTile(sp: TileSprite) {
-    const fillColor =
-      sp.rarity === 'rare' ? 0x4a1a4a : sp.rarity === 'uncommon' ? 0x1a3a4a : 0x1a1a2e;
-    const strokeColor =
-      sp.rarity === 'rare' ? 0xffe135 : sp.rarity === 'uncommon' ? 0x00ffff : 0xffffff;
+    let fillColor: number;
+    let strokeColor: number;
+    if (sp.claimed) {
+      fillColor = 0x3a0a1a;
+      strokeColor = 0xff00aa;
+    } else {
+      fillColor =
+        sp.rarity === 'rare' ? 0x4a1a4a : sp.rarity === 'uncommon' ? 0x1a3a4a : 0x1a1a2e;
+      strokeColor =
+        sp.rarity === 'rare' ? 0xffe135 : sp.rarity === 'uncommon' ? 0x00ffff : 0xffffff;
+    }
     sp.bg.clear();
-    sp.bg.rect(0, 0, TILE_SIZE, TILE_SIZE).fill(fillColor).stroke({ color: strokeColor, width: 2 });
+    sp.bg
+      .rect(0, 0, TILE_SIZE, TILE_SIZE)
+      .fill(fillColor)
+      .stroke({ color: strokeColor, width: sp.claimed ? 4 : 2 });
+  }
+
+  flashBotClaim(tileIds: TileId[]) {
+    tileIds.forEach((id) => {
+      const sp = this.tileSprites[id];
+      if (!sp) return;
+      const orig = sp.container.scale.x;
+      sp.container.scale.set(orig * 1.15);
+      setTimeout(() => sp.container.scale.set(orig), 180);
+    });
   }
 }

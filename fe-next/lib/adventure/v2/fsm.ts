@@ -6,9 +6,9 @@ export type FsmEvent =
   | { type: 'TILE_UNDO'; tileId: TileId }
   | { type: 'SUBMIT' }
   | { type: 'RESOLVE'; damage: number }
-  | { type: 'PLAYER_RESOLVED'; enemyHpRemaining: number; nextEnemyDamage: number }
-  | { type: 'ENEMY_TELEGRAPH_DONE' }
-  | { type: 'ENEMY_RESOLVED'; heroHpRemaining: number }
+  | { type: 'PLAYER_RESOLVED'; enemyHpRemaining: number }
+  | { type: 'BOT_PICKED'; word: string; tilesClaimed: TileId[]; damage: number }
+  | { type: 'BOT_RESOLVED'; heroHpRemaining: number }
   | { type: 'TILE_REFRESH_DONE' };
 
 export function transition(state: FsmState, event: FsmEvent): FsmState {
@@ -52,18 +52,29 @@ export function transition(state: FsmState, event: FsmEvent): FsmState {
     case 'player_resolve':
       if (event.type === 'PLAYER_RESOLVED') {
         if (event.enemyHpRemaining <= 0) return { type: 'victory' };
-        return { type: 'enemy_telegraph', nextDamage: event.nextEnemyDamage, ms: 800 };
+        // Move into bot's claim phase, awaiting BOT_PICKED with the word.
+        return { type: 'bot_compose', word: '', tilesClaimed: [], damage: 0 };
       }
       return state;
 
-    case 'enemy_telegraph':
-      if (event.type === 'ENEMY_TELEGRAPH_DONE') {
-        return { type: 'enemy_resolve', damage: state.nextDamage };
+    case 'bot_compose':
+      if (event.type === 'BOT_PICKED') {
+        return {
+          type: 'bot_compose',
+          word: event.word,
+          tilesClaimed: event.tilesClaimed,
+          damage: event.damage,
+        };
+      }
+      // After the bot's word is shown, transition to bot_resolve which applies damage.
+      if (event.type === 'BOT_RESOLVED') {
+        // Skipped path: bot found no word — no damage, jump straight to refresh.
+        return { type: 'tile_refresh', replacedTileIds: [] };
       }
       return state;
 
-    case 'enemy_resolve':
-      if (event.type === 'ENEMY_RESOLVED') {
+    case 'bot_resolve':
+      if (event.type === 'BOT_RESOLVED') {
         if (event.heroHpRemaining <= 0) return { type: 'defeat' };
         return { type: 'tile_refresh', replacedTileIds: [] };
       }
@@ -84,4 +95,10 @@ export function transition(state: FsmState, event: FsmEvent): FsmState {
       return _exhaustive;
     }
   }
+}
+
+/** Convenience helper: from `bot_compose` (after BOT_PICKED), advance to `bot_resolve`. */
+export function botComposeToResolve(state: FsmState): FsmState {
+  if (state.type !== 'bot_compose') return state;
+  return { type: 'bot_resolve', damage: state.damage };
 }

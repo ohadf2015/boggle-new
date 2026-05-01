@@ -5,6 +5,10 @@ export interface Tile {
   letter: string;
   rarity: 'common' | 'uncommon' | 'rare';
   letterValue: number;
+  /** If set, this tile is claimed by the bot and unselectable for player. */
+  claimedBy?: 'bot' | null;
+  /** Turns remaining on the claim before tile refreshes back to free. */
+  claimTurnsRemaining?: number;
 }
 
 export type FsmState =
@@ -12,8 +16,8 @@ export type FsmState =
   | { type: 'player_compose'; word: string; tilesUsed: TileId[] }
   | { type: 'player_submit'; word: string; tilesUsed: TileId[] }
   | { type: 'player_resolve'; damage: number; tilesUsed: TileId[] }
-  | { type: 'enemy_telegraph'; nextDamage: number; ms: number }
-  | { type: 'enemy_resolve'; damage: number }
+  | { type: 'bot_compose'; word: string; tilesClaimed: TileId[]; damage: number }
+  | { type: 'bot_resolve'; damage: number }
   | { type: 'tile_refresh'; replacedTileIds: TileId[] }
   | { type: 'victory' }
   | { type: 'defeat' };
