@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { BattleSceneRoot } from '@/components/adventure/v2/BattleSceneRoot';
-import { PostFightModal } from '@/components/adventure/v2/PostFightModal';
+import { BetweenFightsScreen, RunCompleteScreen, type FightOutcome } from '@/components/adventure/v2/RunScreens';
 import { useCombatStore } from '@/lib/adventure/v2/state/runStore';
 import { loadHeDict, isHeDictLoaded } from '@/lib/adventure/v2/engine/__protoDictHe';
 import type { Locale } from '@/lib/adventure/v2/types';
@@ -11,8 +11,24 @@ interface PageClientProps {
   locale: Locale;
 }
 
+const FIGHT_COUNT = 3;
+
+type RunStatus = 'fighting' | 'between' | 'run-victory' | 'run-defeat';
+
+interface RunState {
+  fightIndex: number; // 0..FIGHT_COUNT-1, the current fight
+  outcomes: FightOutcome[];
+  status: RunStatus;
+}
+
+const initialRun: RunState = {
+  fightIndex: 0,
+  outcomes: [],
+  status: 'fighting',
+};
+
 export function PageClient({ locale }: PageClientProps) {
-  const [outcome, setOutcome] = useState<'victory' | 'defeat' | null>(null);
+  const [run, setRun] = useState<RunState>(initialRun);
   const [resetKey, setResetKey] = useState(0);
   const [dictReady, setDictReady] = useState(locale !== 'he' || isHeDictLoaded());
   const [dictError, setDictError] = useState<string | null>(null);
@@ -32,10 +48,38 @@ export function PageClient({ locale }: PageClientProps) {
     };
   }, [locale, dictReady]);
 
-  const onVictory = useCallback(() => setOutcome('victory'), []);
-  const onDefeat = useCallback(() => setOutcome('defeat'), []);
-  const onRetry = useCallback(() => {
-    setOutcome(null);
+  const onVictory = useCallback(() => {
+    setRun((s) => {
+      const isLast = s.fightIndex >= FIGHT_COUNT - 1;
+      return {
+        ...s,
+        outcomes: [...s.outcomes, 'win'],
+        status: isLast ? 'run-victory' : 'between',
+      };
+    });
+  }, []);
+
+  const onDefeat = useCallback(() => {
+    setRun((s) => ({
+      ...s,
+      outcomes: [...s.outcomes, 'loss'],
+      status: 'run-defeat',
+    }));
+  }, []);
+
+  const continueToNextFight = useCallback(() => {
+    setRun((s) => ({
+      fightIndex: s.fightIndex + 1,
+      outcomes: s.outcomes,
+      status: 'fighting',
+    }));
+    setResetKey((k) => k + 1);
+    useCombatStore.getState().startNewBattle(locale);
+    useCombatStore.getState().dispatch({ type: 'START_TURN' });
+  }, [locale]);
+
+  const startNewRun = useCallback(() => {
+    setRun(initialRun);
     setResetKey((k) => k + 1);
     useCombatStore.getState().startNewBattle(locale);
     useCombatStore.getState().dispatch({ type: 'START_TURN' });
@@ -64,7 +108,7 @@ export function PageClient({ locale }: PageClientProps) {
       >
         {isHe ? 'אדוונצ\'ר פרוטוטייפ' : 'Adventure Prototype'}
         <span style={{ marginInlineStart: 12, fontSize: 14, opacity: 0.6 }}>
-          [{locale}]
+          [{locale}] {isHe ? `קרב ${run.fightIndex + 1}/${FIGHT_COUNT}` : `Fight ${run.fightIndex + 1}/${FIGHT_COUNT}`}
         </span>
       </h1>
       <p
@@ -108,7 +152,33 @@ export function PageClient({ locale }: PageClientProps) {
         />
       )}
 
-      {outcome && <PostFightModal outcome={outcome} onRetry={onRetry} onExit={onRetry} />}
+      {run.status === 'between' && (
+        <BetweenFightsScreen
+          fightIndex={run.fightIndex}
+          fightCount={FIGHT_COUNT}
+          outcomes={run.outcomes}
+          isHe={isHe}
+          onContinue={continueToNextFight}
+        />
+      )}
+      {run.status === 'run-victory' && (
+        <RunCompleteScreen
+          outcome="victory"
+          outcomes={run.outcomes}
+          fightCount={FIGHT_COUNT}
+          isHe={isHe}
+          onNewRun={startNewRun}
+        />
+      )}
+      {run.status === 'run-defeat' && (
+        <RunCompleteScreen
+          outcome="defeat"
+          outcomes={run.outcomes}
+          fightCount={FIGHT_COUNT}
+          isHe={isHe}
+          onNewRun={startNewRun}
+        />
+      )}
     </main>
   );
 }
