@@ -180,9 +180,24 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
       }
       setIsLoading(false);
 
-      // Signal loading complete — bootstrap calls sdkGameLoadingStart() early
-      if (window.CrazyGames?.SDK && window.__crazyGamesEnvironment === 'crazygames') {
-        try { window.CrazyGames.SDK.game.sdkGameLoadingStop(); } catch { /* noop */ }
+      // Signal loading complete — bootstrap calls sdkGameLoadingStart() early.
+      // Gate on portal-presence not env: CG QA preview / `?disableAds` flips env to
+      // 'disabled' while the iframe still shows the portal loader. Skipping Stop in
+      // that path leaves the kawaii portal loader hung forever (the original bug).
+      // Wait briefly for `__crazyGamesReady` so we don't race the bootstrap's Start.
+      const cgReadyDeadline = Date.now() + 500;
+      while (!window.__crazyGamesReady && Date.now() < cgReadyDeadline) {
+        await new Promise(resolve => setTimeout(resolve, 25));
+      }
+      const inCgPortal =
+        window.__crazyGamesEnvironment === 'crazygames' || isCrazyGamesIframe();
+      if (window.CrazyGames?.SDK && inCgPortal) {
+        try {
+          window.CrazyGames.SDK.game.sdkGameLoadingStop();
+        } catch (err) {
+          // Surface failures — silent catch was hiding the loader-hang root cause.
+          console.warn('[CG] sdkGameLoadingStop failed', err);
+        }
       }
     };
 

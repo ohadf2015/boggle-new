@@ -10,8 +10,40 @@ import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import type { GuestSessionUpdateData } from '@/backend/modules/guestTracker';
 
-// Cap at 5s — prevents orphaned requests when Supabase is slow
-export const maxDuration = 5;
+// Hard wall-clock cap. Express custom server (Railway) ignores Next's `maxDuration`,
+// so we enforce here — without it, hanging Supabase fetches let the request sit until
+// the 30s Express timeout. See server/middleware.ts ROUTES_WITH_CUSTOM_TIMEOUT.
+const ROUTE_TIMEOUT_MS = 4000;
+
+// Phase tracker — captured by closure in each handler. When the wall-clock cap wins
+// we log which await we were sitting on, so the *real* hang point surfaces on the next
+// production occurrence instead of getting masked by the 504.
+type Phase =
+  | 'init'
+  | 'parse-body'
+  | 'load-trackers'
+  | 'create-or-get'
+  | 'update'
+  | 'auth-get-user'
+  | 'link'
+  | 'fetch-session';
+
+function withRouteTimeout<T extends NextResponse>(
+  phaseRef: { current: Phase; method: string; action?: string },
+  work: Promise<T>
+): Promise<T | NextResponse> {
+  return Promise.race<T | NextResponse>([
+    work,
+    new Promise<NextResponse>((resolve) =>
+      setTimeout(() => {
+        console.warn(
+          `[guest-session] wall-clock timeout method=${phaseRef.method} action=${phaseRef.action ?? '?'} stuck-at=${phaseRef.current}`
+        );
+        resolve(NextResponse.json({ error: 'Timeout' }, { status: 504 }));
+      }, ROUTE_TIMEOUT_MS)
+    ),
+  ]);
+}
 
 type GuestTrackerModule = typeof import('@/backend/modules/guestTracker');
 
@@ -43,10 +75,20 @@ const RATE_LIMIT_CONFIG = {
   blockDurationMs: 300000,
 };
 
+export function GET(request: NextRequest) {
+  const phaseRef: { current: Phase; method: string; action?: string } = { current: 'init', method: 'GET' };
+  return withRouteTimeout(phaseRef, handleGet(request, phaseRef));
+}
+
+export function POST(request: NextRequest) {
+  const phaseRef: { current: Phase; method: string; action?: string } = { current: 'init', method: 'POST' };
+  return withRouteTimeout(phaseRef, handlePost(request, phaseRef));
+}
+
 /**
  * GET - Retrieve guest session by session ID
  */
-export async function GET(request: NextRequest) {
+async function handleGet(request: NextRequest, phaseRef: { current: Phase; action?: string }) {
   // Check rate limit
   const rateLimit = checkApiRateLimit(request, 'guest-session-get', RATE_LIMIT_CONFIG);
   if (!rateLimit.success) {
@@ -72,7 +114,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Get the trackers first to catch any import errors early
+    phaseRef.current = 'load-trackers';
     const trackers = await getTrackers();
+    phaseRef.current = 'fetch-session';
     const session = await trackers.getGuestSession(sessionId);
 
     if (!session) {
@@ -99,7 +143,7 @@ export async function GET(request: NextRequest) {
 /**
  * POST - Create or update guest session
  */
-export async function POST(request: NextRequest) {
+async function handlePost(request: NextRequest, phaseRef: { current: Phase; action?: string }) {
   // Check rate limit
   const rateLimit = checkApiRateLimit(request, 'guest-session-post', RATE_LIMIT_CONFIG);
   if (!rateLimit.success) {
@@ -108,8 +152,10 @@ export async function POST(request: NextRequest) {
 
   try {
     // Get the trackers first to catch any import errors early
+    phaseRef.current = 'load-trackers';
     const trackers = await getTrackers();
 
+    phaseRef.current = 'parse-body';
     const body = await request.json();
     const {
       action, // 'create' or 'update' or 'link'
@@ -138,6 +184,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    phaseRef.action = String(action ?? 'create');
+
     // Create or get existing session
     if (action === 'create' || !action) {
       if (!sessionId) {
@@ -147,6 +195,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      phaseRef.current = 'create-or-get';
       const session = await trackers.getOrCreateGuestSession({
         sessionId,
         deviceType: deviceType || null,
@@ -192,6 +241,7 @@ export async function POST(request: NextRequest) {
       if (country !== undefined) updates.country = country;
       updates.lastVisitAt = new Date();
 
+      phaseRef.current = 'update';
       const success = await trackers.updateGuestSession(sessionId, updates);
 
       if (!success) {
@@ -216,6 +266,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Auth check: only authenticated users can link sessions
+      phaseRef.current = 'auth-get-user';
       const supabase = await createClient();
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (authError || !user) {
@@ -225,6 +276,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      phaseRef.current = 'link';
       const success = await trackers.linkGuestSessionToUser(sessionId, user.id);
 
       if (!success) {

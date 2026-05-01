@@ -32,13 +32,13 @@ const CATEGORY_ICONS: Record<Category, typeof X> = {
 };
 
 const ALL_CATEGORIES: { key: Category; labelKey: string; maleOnly?: boolean }[] = [
-  { key: 'base', labelKey: 'avatar.builder.base' },
-  { key: 'hair', labelKey: 'avatar.builder.hair' },
-  { key: 'eyes', labelKey: 'avatar.builder.eyes' },
-  { key: 'mouth', labelKey: 'avatar.builder.mouth' },
-  { key: 'facialHair', labelKey: 'avatar.builder.facialHair', maleOnly: true },
-  { key: 'accessories', labelKey: 'avatar.builder.accessories' },
-  { key: 'background', labelKey: 'avatar.builder.background' },
+  { key: 'base', labelKey: 'avatarBuilder.base' },
+  { key: 'hair', labelKey: 'avatarBuilder.hair' },
+  { key: 'eyes', labelKey: 'avatarBuilder.eyes' },
+  { key: 'mouth', labelKey: 'avatarBuilder.mouth' },
+  { key: 'facialHair', labelKey: 'avatarBuilder.facialHair', maleOnly: true },
+  { key: 'accessories', labelKey: 'avatarBuilder.accessories' },
+  { key: 'background', labelKey: 'avatarBuilder.background' },
 ];
 
 // Jelly wobble for avatar preview (from animate-ai: playful-wobble-jelly)
@@ -184,7 +184,7 @@ export default function AvatarBuilderModal({
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 sm:p-4 border-b-3 border-black">
           <h2 id="avatar-builder-title" className="font-neo-display text-neo-white text-xl font-bold">
-            {t('avatar.builder.title')}
+            {t('avatarBuilder.title')}
           </h2>
           <div className="flex items-center gap-3">
             {premium && (
@@ -262,7 +262,7 @@ export default function AvatarBuilderModal({
             whileTap={{ scale: 0.92 }}
             transition={BUTTON_SPRING}
             className="flex items-center gap-1.5 px-3 py-2 bg-neo-purple text-neo-white font-bold rounded-neo border-2 border-black shadow-hard-sm transition-shadow"
-            title={t('avatar.builder.randomize')}
+            title={t('avatarBuilder.randomize')}
           >
             <AdaptiveMotion.span
               key={previewKey}
@@ -273,7 +273,7 @@ export default function AvatarBuilderModal({
             >
               <Shuffle size={16} />
             </AdaptiveMotion.span>
-            <span className="hidden xs:inline">{t('avatar.builder.randomize')}</span>
+            <span className="hidden xs:inline">{t('avatarBuilder.randomize')}</span>
           </AdaptiveMotion.button>
           <AdaptiveMotion.button
             onClick={handleUndo}
@@ -281,7 +281,7 @@ export default function AvatarBuilderModal({
             transition={BUTTON_SPRING}
             disabled={historyRef.current.length === 0}
             className="flex items-center gap-1.5 px-3 py-2 bg-neo-navy-light text-neo-white/70 font-bold rounded-neo border-2 border-neo-white/20 hover:border-neo-white/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            title={t('avatar.builder.undo')}
+            title={t('avatarBuilder.undo')}
           >
             <Undo2 size={16} />
           </AdaptiveMotion.button>
@@ -290,7 +290,7 @@ export default function AvatarBuilderModal({
             whileTap={{ scale: 0.88 }}
             transition={BUTTON_SPRING}
             className="flex items-center gap-1.5 px-3 py-2 bg-neo-navy-light text-neo-white/70 font-bold rounded-neo border-2 border-neo-white/20 hover:border-neo-white/50 transition-all"
-            title={t('avatar.builder.download') || 'Download'}
+            title={t('avatarBuilder.download') || 'Download'}
           >
             <Download size={16} />
           </AdaptiveMotion.button>
@@ -299,7 +299,7 @@ export default function AvatarBuilderModal({
             onClick={onClose}
             className="px-4 py-2 text-neo-white/70 font-bold hover:text-neo-white transition-colors"
           >
-            {t('avatar.builder.cancel')}
+            {t('avatarBuilder.cancel')}
           </button>
           <AdaptiveMotion.button
             onClick={handleSave}
@@ -308,7 +308,7 @@ export default function AvatarBuilderModal({
             transition={BUTTON_SPRING}
             className="px-6 py-2 bg-neo-lime text-neo-black font-bold rounded-neo border-2 border-black shadow-hard-sm transition-shadow"
           >
-            {t('avatar.builder.save')}
+            {t('avatarBuilder.save')}
           </AdaptiveMotion.button>
         </div>
 

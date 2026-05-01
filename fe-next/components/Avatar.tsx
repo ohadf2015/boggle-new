@@ -25,6 +25,8 @@ interface AvatarProps {
   /** Unique identifier for deterministic fallback avatar generation (e.g. user ID, username) */
   userId?: string;
   size?: AvatarSize;
+  /** Pixel size override — fills container at exact px (bypasses SIZE_CONFIG). Used when caller already controls outer tile dimensions. */
+  pixelSize?: number;
   className?: string;
   /** Show loading skeleton instead of avatar */
   isLoading?: boolean;
@@ -57,6 +59,7 @@ const Avatar = memo<AvatarProps>(({
   userId,
   avatarImage,
   size = 'md',
+  pixelSize,
   className = '',
   isLoading,
   mode,
@@ -64,7 +67,14 @@ const Avatar = memo<AvatarProps>(({
 }) => {
   const frameClass = frameWrapperClass(frame);
   const frameAttr = frameClass ? { 'data-frame': frame as string } : {};
-  const config = SIZE_CONFIG[size] || SIZE_CONFIG.md;
+  const baseConfig = SIZE_CONFIG[size] || SIZE_CONFIG.md;
+  const config: SizeConfig = pixelSize != null
+    ? { container: '', px: pixelSize }
+    : baseConfig;
+  const containerSizeClass = pixelSize != null ? '' : config.container;
+  const containerStyle = pixelSize != null
+    ? { width: pixelSize, height: pixelSize }
+    : undefined;
 
   // Pre-compute fallback avatar (must be before conditionals to satisfy hook rules)
   const fallbackSeed = avatarImage || userId || 'default-avatar';
@@ -90,7 +100,8 @@ const Avatar = memo<AvatarProps>(({
   if (customAvatar) {
     return (
       <div
-        className={cn('relative rounded-full overflow-hidden shrink-0', config.container, className, frameClass)}
+        className={cn('relative rounded-full overflow-hidden shrink-0', containerSizeClass, className, frameClass)}
+        style={containerStyle}
         data-testid="header-avatar"
         data-avatar-type="custom"
         {...frameAttr}
@@ -103,7 +114,8 @@ const Avatar = memo<AvatarProps>(({
   // 2. Fallback: deterministic random custom avatar
   return (
     <div
-      className={cn('relative rounded-full overflow-hidden shrink-0', config.container, className, frameClass)}
+      className={cn('relative rounded-full overflow-hidden shrink-0', containerSizeClass, className, frameClass)}
+      style={containerStyle}
       data-testid="header-avatar"
       data-avatar-type="generated"
       {...frameAttr}

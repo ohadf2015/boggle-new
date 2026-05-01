@@ -31,7 +31,7 @@ describe('AvatarBuilderModal', () => {
 
   it('renders when isOpen=true', () => {
     render(<AvatarBuilderModal {...defaultProps} />);
-    expect(screen.getByText('avatar.builder.title')).toBeInTheDocument();
+    expect(screen.getByText('avatarBuilder.title')).toBeInTheDocument();
   });
 
   it('does not render when isOpen=false', () => {
@@ -41,13 +41,13 @@ describe('AvatarBuilderModal', () => {
 
   it('calls onClose when cancel clicked', () => {
     render(<AvatarBuilderModal {...defaultProps} />);
-    fireEvent.click(screen.getByText('avatar.builder.cancel'));
+    fireEvent.click(screen.getByText('avatarBuilder.cancel'));
     expect(defaultProps.onClose).toHaveBeenCalled();
   });
 
   it('calls onSave with config when save clicked', () => {
     render(<AvatarBuilderModal {...defaultProps} />);
-    fireEvent.click(screen.getByText('avatar.builder.save'));
+    fireEvent.click(screen.getByText('avatarBuilder.save'));
     expect(defaultProps.onSave).toHaveBeenCalledWith(DEFAULT_AVATAR_CONFIG);
     expect(defaultProps.onClose).toHaveBeenCalled();
   });

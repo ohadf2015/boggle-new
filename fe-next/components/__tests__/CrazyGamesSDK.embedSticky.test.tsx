@@ -57,4 +57,74 @@ describe('CrazyGamesProvider — embed status is sticky', () => {
     await waitFor(() => expect(screen.getByTestId('loading').textContent).toBe('false'));
     expect(screen.getByTestId('platform').textContent).toBe('true');
   });
+
+  it('calls sdkGameLoadingStop when iframe sticky is true even if SDK env=disabled (portal loader fix)', async () => {
+    // Regression: portal loader (kawaii mascot) hangs when SDK init resolves env='disabled'
+    // because the prior gate required env==='crazygames'. Iframe-sticky path must still dismiss
+    // the portal loader.
+    const stopSpy = vi.fn();
+    (window as unknown as { __crazyGamesReady?: boolean }).__crazyGamesReady = true;
+    (window as unknown as { CrazyGames: unknown }).CrazyGames = {
+      SDK: {
+        init: vi.fn().mockResolvedValue(undefined),
+        getEnvironment: vi.fn().mockResolvedValue('disabled'),
+        game: { isInstantMultiplayer: false, sdkGameLoadingStop: stopSpy },
+      },
+    };
+
+    render(
+      <CrazyGamesProvider>
+        <Probe />
+      </CrazyGamesProvider>,
+    );
+
+    await waitFor(() => expect(screen.getByTestId('loading').textContent).toBe('false'));
+    expect(stopSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls sdkGameLoadingStop when env=crazygames (happy path)', async () => {
+    const stopSpy = vi.fn();
+    (window as unknown as { __crazyGamesReady?: boolean }).__crazyGamesReady = true;
+    (window as unknown as { CrazyGames: unknown }).CrazyGames = {
+      SDK: {
+        init: vi.fn().mockResolvedValue(undefined),
+        getEnvironment: vi.fn().mockResolvedValue('crazygames'),
+        game: { isInstantMultiplayer: false, sdkGameLoadingStop: stopSpy },
+        user: { getUser: vi.fn().mockResolvedValue(null) },
+      },
+    };
+
+    render(
+      <CrazyGamesProvider>
+        <Probe />
+      </CrazyGamesProvider>,
+    );
+
+    await waitFor(() => expect(stopSpy).toHaveBeenCalledTimes(1));
+  });
+
+  it('logs a warning when sdkGameLoadingStop throws (was silently swallowed before)', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    (window as unknown as { __crazyGamesReady?: boolean }).__crazyGamesReady = true;
+    (window as unknown as { CrazyGames: unknown }).CrazyGames = {
+      SDK: {
+        init: vi.fn().mockResolvedValue(undefined),
+        getEnvironment: vi.fn().mockResolvedValue('crazygames'),
+        game: {
+          isInstantMultiplayer: false,
+          sdkGameLoadingStop: vi.fn(() => { throw new Error('SDK in bad state'); }),
+        },
+        user: { getUser: vi.fn().mockResolvedValue(null) },
+      },
+    };
+
+    render(
+      <CrazyGamesProvider>
+        <Probe />
+      </CrazyGamesProvider>,
+    );
+
+    await waitFor(() => expect(warnSpy).toHaveBeenCalled());
+    expect(warnSpy.mock.calls[0][0]).toMatch(/sdkGameLoadingStop/i);
+  });
 });

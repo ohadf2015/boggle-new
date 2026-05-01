@@ -198,11 +198,16 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                     )}
 
                     {(() => {
+                      const hasAvatar = !!(avatar?.customAvatar || avatar?.avatarImage);
+                      const tilePx = compact ? 56 : 64;
                       const tileInner = (
                         <div className={cn(
                           'rounded-full border-neo-black flex items-center justify-center overflow-hidden shadow-hard aspect-square',
                           compact ? 'w-14 h-14 border-[3px]' : 'w-16 h-16 border-[3px]',
-                          AVATAR_COLORS[index % AVATAR_COLORS.length],
+                          // Solid color background only for letter fallback — when a real avatar
+                          // renders, AvatarRenderer paints its own bgColor and mode frame so
+                          // an outer color disc creates a competing-cyan halo (see screenshot bug).
+                          !hasAvatar && AVATAR_COLORS[index % AVATAR_COLORS.length],
                           compact
                             ? cn('ring-2 ring-offset-1 ring-offset-neo-navy', AVATAR_RING_COLORS[index % AVATAR_RING_COLORS.length])
                             : cn(
@@ -210,12 +215,13 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                                 isHostPlayer && 'ring-2 ring-neo-yellow ring-offset-1 ring-offset-neo-navy',
                               ),
                         )}>
-                          {avatar?.customAvatar || avatar?.avatarImage ? (
+                          {hasAvatar ? (
                             <Avatar
                               customAvatar={avatar?.customAvatar ?? undefined}
                               avatarImage={avatar?.avatarImage}
-                              size="lg"
+                              pixelSize={tilePx}
                               mode="multiplayer"
+                              className="w-full h-full"
                             />
                           ) : (
                             <span className={cn('font-black text-neo-black', compact ? 'text-2xl' : 'text-2xl')}>

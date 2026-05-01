@@ -170,7 +170,6 @@ function requestTimeout(): RequestHandler {
   const timeout = parseInt(process.env.REQUEST_TIMEOUT_MS || '30000', 10);
 
   // Routes that handle their own timeouts (Next.js maxDuration or long-running Express routes)
-  // guest-session is non-critical analytics — let the client's 5s AbortController handle it
   const ROUTES_WITH_CUSTOM_TIMEOUT = [
     '/api/cron/',
     // Next.js admin email routes — own per-step timeouts + maxDuration=60.
@@ -180,6 +179,9 @@ function requestTimeout(): RequestHandler {
     '/api/admin/send-test-android-beta-launch',
     '/api/admin/send-android-beta-launch-to-player',
     '/api/admin/android-beta-launch-preview',
+    // Non-critical analytics; route owns a 4s wall-clock cap (see route.ts).
+    // Was hanging 30s before its own cap was added — see Railway logs 2026-05-01.
+    '/api/analytics/guest-session',
   ];
 
   const isDev = process.env.NODE_ENV !== 'production';

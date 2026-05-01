@@ -85,7 +85,7 @@ export interface GenderToggleProps {
 export function GenderToggle({ selected, onSelect, t }: GenderToggleProps) {
   return (
     <div>
-      <p className="text-neo-white/60 text-xs font-bold uppercase mb-2">{t('avatar.builder.gender')}</p>
+      <p className="text-neo-white/60 text-xs font-bold uppercase mb-2">{t('avatarBuilder.gender')}</p>
       <div className="flex gap-2">
         {AVATAR_GENDERS.map(gender => (
           <AdaptiveMotion.button
@@ -101,7 +101,7 @@ export function GenderToggle({ selected, onSelect, t }: GenderToggleProps) {
             }`}
           >
             <span className="text-lg">{gender === 'male' ? '\u2642' : '\u2640'}</span>
-            <span className="text-sm">{t(`avatar.builder.${gender}`)}</span>
+            <span className="text-sm">{t(`avatarBuilder.${gender}`)}</span>
           </AdaptiveMotion.button>
         ))}
       </div>

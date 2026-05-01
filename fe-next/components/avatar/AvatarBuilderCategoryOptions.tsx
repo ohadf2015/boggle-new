@@ -87,7 +87,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
             t={t}
           />
           <PartPreviewGrid
-            label={t('avatar.builder.shape')}
+            label={t('avatarBuilder.shape')}
             partType="base"
             premiumCategory="base"
             options={visibleParts('base', AVATAR_BASES)}
@@ -99,7 +99,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
             onCoinSpend={onCoinSpend}
           />
           <ColorStrip
-            label={t('avatar.builder.skinColor')}
+            label={t('avatarBuilder.skinColor')}
             colors={AVATAR_SKIN_COLORS}
             selected={config.skinColor}
             onSelect={v => updateConfig('skinColor', v)}
@@ -111,20 +111,20 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
       return (
         <div className="space-y-3">
           <PartPreviewGrid
-            label={t('avatar.builder.style')}
+            label={t('avatarBuilder.style')}
             partType="hair"
             premiumCategory="hair"
             options={hairOptions}
             selected={config.hair}
             onSelect={v => updateConfig('hair', v)}
             config={config}
-            noneLabel={t('avatar.builder.none')}
+            noneLabel={t('avatarBuilder.none')}
             premium={premium}
             t={t}
             onCoinSpend={onCoinSpend}
           />
           <ColorStrip
-            label={t('avatar.builder.hairColor')}
+            label={t('avatarBuilder.hairColor')}
             colors={AVATAR_HAIR_COLORS}
             selected={config.hairColor}
             onSelect={v => updateConfig('hairColor', v)}
@@ -138,7 +138,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
           {/* Expression Presets — one-click emotion combos */}
           <div>
             <p className="text-neo-white/60 text-xs font-bold uppercase mb-2">
-              {t('avatar.builder.expressions') || 'Expressions'}
+              {t('avatarBuilder.expressions') || 'Expressions'}
             </p>
             <div className="flex flex-wrap gap-1.5">
               {EXPRESSION_PRESETS.map(preset => (
@@ -161,7 +161,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
             </div>
           </div>
           <PartPreviewGrid
-            label={t('avatar.builder.style')}
+            label={t('avatarBuilder.style')}
             partType="eyes"
             premiumCategory="eyes"
             options={visibleParts('eyes', AVATAR_EYE_STYLES)}
@@ -173,33 +173,33 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
             onCoinSpend={onCoinSpend}
           />
           <ColorStrip
-            label={t('avatar.builder.eyeColor') || 'Iris Color'}
+            label={t('avatarBuilder.eyeColor') || 'Iris Color'}
             colors={AVATAR_EYE_COLORS}
             selected={config.eyeColor || '#4A6FA5'}
             onSelect={v => updateConfig('eyeColor', v)}
           />
           <PartPreviewGrid
-            label={t('avatar.builder.nose') || 'Nose'}
+            label={t('avatarBuilder.nose') || 'Nose'}
             partType="nose"
             premiumCategory="nose"
             options={AVATAR_NOSE_STYLES}
             selected={config.noseStyle ?? 'none'}
             onSelect={v => updateConfig('noseStyle', v)}
             config={config}
-            noneLabel={t('avatar.builder.none')}
+            noneLabel={t('avatarBuilder.none')}
             premium={premium}
             t={t}
             onCoinSpend={onCoinSpend}
           />
           <PartPreviewGrid
-            label={t('avatar.builder.eyebrows') || 'Eyebrows'}
+            label={t('avatarBuilder.eyebrows') || 'Eyebrows'}
             partType="eyebrows"
             premiumCategory="eyebrows"
             options={AVATAR_EYEBROW_STYLES}
             selected={config.eyebrows ?? 'none'}
             onSelect={v => updateConfig('eyebrows', v)}
             config={config}
-            noneLabel={t('avatar.builder.none')}
+            noneLabel={t('avatarBuilder.none')}
             premium={premium}
             t={t}
             onCoinSpend={onCoinSpend}
@@ -209,7 +209,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
     case 'mouth':
       return (
         <PartPreviewGrid
-          label={t('avatar.builder.style')}
+          label={t('avatarBuilder.style')}
           partType="mouth"
           premiumCategory="mouth"
           options={visibleParts('mouth', AVATAR_MOUTH_STYLES)}
@@ -224,14 +224,14 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
     case 'facialHair':
       return (
         <PartPreviewGrid
-          label={t('avatar.builder.facialHairStyle') || 'Style'}
+          label={t('avatarBuilder.facialHairStyle') || 'Style'}
           partType="facialHair"
           premiumCategory="facialHair"
           options={AVATAR_FACIAL_HAIR_STYLES}
           selected={config.facialHair ?? 'none'}
           onSelect={v => updateConfig('facialHair', v)}
           config={config}
-          noneLabel={t('avatar.builder.none')}
+          noneLabel={t('avatarBuilder.none')}
           premium={premium}
           t={t}
           onCoinSpend={onCoinSpend}
@@ -241,21 +241,21 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
       return (
         <div className="space-y-3">
           <PartPreviewGrid
-            label={t('avatar.builder.type')}
+            label={t('avatarBuilder.type')}
             partType="accessory"
             premiumCategory="accessory"
             options={visibleParts('accessory', AVATAR_ACCESSORIES)}
             selected={config.accessory}
             onSelect={v => updateConfig('accessory', v)}
             config={config}
-            noneLabel={t('avatar.builder.none')}
+            noneLabel={t('avatarBuilder.none')}
             premium={premium}
             t={t}
             onCoinSpend={onCoinSpend}
           />
           {config.accessory !== 'none' && (
             <ColorStrip
-              label={t('avatar.builder.accessoryColor')}
+              label={t('avatarBuilder.accessoryColor')}
               colors={AVATAR_ACCESSORY_COLORS}
               selected={config.accessoryColor}
               onSelect={v => updateConfig('accessoryColor', v)}
@@ -270,7 +270,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
           {/* Color Theme Presets */}
           <div>
             <p className="text-neo-white/60 text-xs font-bold uppercase mb-2">
-              {t('avatar.builder.colorTheme') || 'Color Theme'}
+              {t('avatarBuilder.colorTheme') || 'Color Theme'}
             </p>
             <div className="flex flex-wrap gap-1.5">
               {COLOR_THEMES.map(theme => (
@@ -302,7 +302,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
             </div>
           </div>
           <ColorStrip
-            label={t('avatar.builder.bgColor')}
+            label={t('avatarBuilder.bgColor')}
             colors={allBgColors}
             selected={config.bgColor}
             onSelect={v => {
@@ -318,7 +318,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
             premium={premium}
           />
           <ColorStrip
-            label={t('avatar.builder.shirtColor') || 'Shirt Color'}
+            label={t('avatarBuilder.shirtColor') || 'Shirt Color'}
             colors={AVATAR_SHIRT_COLORS}
             selected={config.shirtColor || (config.gender === 'female' ? '#E85D9B' : '#4A90D9')}
             onSelect={v => updateConfig('shirtColor', v)}
@@ -326,7 +326,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
           {/* Body/Clothing Style */}
           <div>
             <p className="text-neo-white/60 text-xs font-bold uppercase mb-2">
-              {t('avatar.builder.bodyStyle') || 'Outfit'}
+              {t('avatarBuilder.bodyStyle') || 'Outfit'}
             </p>
             <div className="flex flex-wrap gap-1.5">
               {AVATAR_BODY_STYLES.map(style => (
@@ -339,7 +339,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
                       : 'border-neo-white/15 text-neo-white/60 hover:border-neo-white/40'
                   }`}
                 >
-                  {t(`avatar.builder.bodyStyles.${style}`) || style}
+                  {t(`avatarBuilder.bodyStyles.${style}`) || style}
                 </button>
               ))}
             </div>

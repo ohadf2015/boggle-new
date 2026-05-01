@@ -296,7 +296,7 @@ export default function PartPreviewGrid<T extends string>({
                   onClick={() => setConfirmPurchase(null)}
                   className="flex-1 px-4 py-2.5 text-neo-white/70 font-bold rounded-neo border-2 border-neo-white/15 hover:border-neo-white/30 transition-colors"
                 >
-                  {_t?.('avatar.builder.cancel') || 'Cancel'}
+                  {_t?.('avatarBuilder.cancel') || 'Cancel'}
                 </button>
                 <AdaptiveMotion.button
                   whileHover={{ scale: 1.03 }}

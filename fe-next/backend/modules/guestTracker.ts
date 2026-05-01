@@ -26,17 +26,31 @@ function getSupabaseClient(): SupabaseClient | null {
   return supabase;
 }
 
-/** Wrap a promise/thenable with a timeout to prevent hanging Supabase calls */
-function withTimeout<T>(promise: PromiseLike<T>, ms: number, label: string): Promise<T> {
+const DB_TIMEOUT_MS = 5000;
+
+/**
+ * Run a Supabase query with both an AbortSignal-driven cancel and a JS-level timeout.
+ *
+ * The JS race rejects the awaited promise on schedule, but does not cancel the
+ * underlying fetch — without `.abortSignal()`, the socket stays open until the
+ * Supabase edge closes it. Wiring AbortSignal.timeout into postgrest-js asks the
+ * client to abort the in-flight fetch when our budget elapses; whether it actually
+ * frees the pool slot depends on the postgrest-js version honouring the signal.
+ * The +50ms on the JS timer ensures the AbortSignal fires first when both are armed.
+ */
+function runQuery<T>(
+  buildQuery: (signal: AbortSignal) => PromiseLike<T>,
+  label: string,
+  ms: number = DB_TIMEOUT_MS
+): Promise<T> {
+  const signal = AbortSignal.timeout(ms);
   return Promise.race([
-    Promise.resolve(promise),
+    Promise.resolve(buildQuery(signal)),
     new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms + 50)
     ),
   ]);
 }
-
-const DB_TIMEOUT_MS = 5000;
 
 export interface GuestSessionData {
   sessionId: string;
@@ -74,23 +88,26 @@ export async function getOrCreateGuestSession(
 
   try {
     // Try to get existing session
-    const { data: existingSession, error: fetchError } = await withTimeout(
-      client
+    const { data: existingSession, error: fetchError } = await runQuery(
+      (signal) => client
         .from('guest_sessions')
         .select('id, session_id, first_visit_at, last_visit_at, device_type, browser, language, utm_source, utm_medium, utm_campaign, referrer, country, user_id, linked_at, created_at')
         .eq('session_id', sessionData.sessionId)
+        .abortSignal(signal)
         .single(),
-      DB_TIMEOUT_MS,
       'getOrCreate:fetch'
     );
 
     if (existingSession && !fetchError) {
-      // Update last visit time — fire and forget, don't block response
+      // Update last visit time — fire and forget, don't block response.
+      // 5s AbortSignal so the connection releases even if Supabase stalls.
+      const bgSignal = AbortSignal.timeout(DB_TIMEOUT_MS);
       Promise.resolve(
         client
           .from('guest_sessions')
           .update({ last_visit_at: new Date().toISOString() })
           .eq('session_id', sessionData.sessionId)
+          .abortSignal(bgSignal)
       ).catch((err: unknown) => logger.error('GUEST_TRACKER', `Failed to update last visit: ${err}`));
 
       logger.info('GUEST_TRACKER', `Updated last visit for session ${sessionData.sessionId}`);
@@ -98,8 +115,8 @@ export async function getOrCreateGuestSession(
     }
 
     // Create new session
-    const { data: newSession, error: insertError } = await withTimeout(
-      client
+    const { data: newSession, error: insertError } = await runQuery(
+      (signal) => client
         .from('guest_sessions')
         .insert({
           session_id: sessionData.sessionId,
@@ -115,8 +132,8 @@ export async function getOrCreateGuestSession(
           last_visit_at: new Date().toISOString(),
         })
         .select()
+        .abortSignal(signal)
         .single(),
-      DB_TIMEOUT_MS,
       'getOrCreate:insert'
     );
 
@@ -158,12 +175,12 @@ export async function updateGuestSession(
       updateData.last_visit_at = updates.lastVisitAt.toISOString();
     }
 
-    const { error } = await withTimeout(
-      client
+    const { error } = await runQuery(
+      (signal) => client
         .from('guest_sessions')
         .update(updateData)
-        .eq('session_id', sessionId),
-      DB_TIMEOUT_MS,
+        .eq('session_id', sessionId)
+        .abortSignal(signal),
       'updateGuestSession'
     );
 
@@ -191,15 +208,15 @@ export async function linkGuestSessionToUser(
   if (!client) return false;
 
   try {
-    const { error } = await withTimeout(
-      client
+    const { error } = await runQuery(
+      (signal) => client
         .from('guest_sessions')
         .update({
           user_id: userId,
           linked_at: new Date().toISOString(),
         })
-        .eq('session_id', sessionId),
-      DB_TIMEOUT_MS,
+        .eq('session_id', sessionId)
+        .abortSignal(signal),
       'linkGuestSessionToUser'
     );
 
@@ -224,13 +241,13 @@ export async function getGuestSession(sessionId: string): Promise<any | null> {
   if (!client) return null;
 
   try {
-    const { data, error } = await withTimeout(
-      client
+    const { data, error } = await runQuery(
+      (signal) => client
         .from('guest_sessions')
         .select('id, session_id, first_visit_at, last_visit_at, device_type, browser, language, utm_source, utm_medium, utm_campaign, referrer, country, user_id, linked_at, created_at')
         .eq('session_id', sessionId)
+        .abortSignal(signal)
         .single(),
-      DB_TIMEOUT_MS,
       'getGuestSession'
     );
 
