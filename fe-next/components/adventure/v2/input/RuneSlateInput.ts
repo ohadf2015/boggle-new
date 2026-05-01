@@ -10,9 +10,18 @@ interface Handlers {
   onEnter: () => void;
 }
 
+const HE_FINAL_TO_BASE: Record<string, string> = {
+  'ך': 'כ',
+  'ם': 'מ',
+  'ן': 'נ',
+  'ף': 'פ',
+  'ץ': 'צ',
+};
+
+const HE_LETTER_RE = /^[א-ת]$/; // base + final Hebrew letters
+
 export function attachKeyboardBridge(handlers: Handlers): Bridge {
   function onKeyDown(e: KeyboardEvent) {
-    // Ignore when typing in form inputs (just in case)
     const target = e.target as HTMLElement | null;
     if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
 
@@ -28,6 +37,11 @@ export function attachKeyboardBridge(handlers: Handlers): Bridge {
     }
     if (/^[a-zA-Z]$/.test(e.key)) {
       handlers.onLetterKey(e.key.toUpperCase());
+      return;
+    }
+    if (HE_LETTER_RE.test(e.key)) {
+      const normalized = HE_FINAL_TO_BASE[e.key] ?? e.key;
+      handlers.onLetterKey(normalized);
     }
   }
   window.addEventListener('keydown', onKeyDown);

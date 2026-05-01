@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { BattleSceneRoot } from '@/components/adventure/v2/BattleSceneRoot';
 import { PostFightModal } from '@/components/adventure/v2/PostFightModal';
 import { useCombatStore } from '@/lib/adventure/v2/state/runStore';
+import { loadHeDict, isHeDictLoaded } from '@/lib/adventure/v2/engine/__protoDictHe';
 import type { Locale } from '@/lib/adventure/v2/types';
 
 interface PageClientProps {
@@ -13,6 +14,23 @@ interface PageClientProps {
 export function PageClient({ locale }: PageClientProps) {
   const [outcome, setOutcome] = useState<'victory' | 'defeat' | null>(null);
   const [resetKey, setResetKey] = useState(0);
+  const [dictReady, setDictReady] = useState(locale !== 'he' || isHeDictLoaded());
+  const [dictError, setDictError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (locale !== 'he' || dictReady) return;
+    let alive = true;
+    loadHeDict()
+      .then(() => {
+        if (alive) setDictReady(true);
+      })
+      .catch((err: unknown) => {
+        if (alive) setDictError(err instanceof Error ? err.message : 'failed to load dict');
+      });
+    return () => {
+      alive = false;
+    };
+  }, [locale, dictReady]);
 
   const onVictory = useCallback(() => setOutcome('victory'), []);
   const onDefeat = useCallback(() => setOutcome('defeat'), []);
@@ -62,7 +80,34 @@ export function PageClient({ locale }: PageClientProps) {
           ? 'הקש על אריחים או הקלד אותיות · Enter כדי לכשף · Backspace לבטל'
           : 'Tap tiles or type letters · Enter to cast · Backspace to undo'}
       </p>
-      <BattleSceneRoot key={resetKey} onVictory={onVictory} onDefeat={onDefeat} locale={locale} />
+
+      {dictError && (
+        <p style={{ color: '#ef4444', textAlign: 'center', fontFamily: 'Rubik, sans-serif' }}>
+          Dictionary load error: {dictError}
+        </p>
+      )}
+
+      {!dictReady ? (
+        <p
+          style={{
+            color: '#bfff00',
+            textAlign: 'center',
+            fontSize: 18,
+            padding: 80,
+            fontFamily: 'Rubik, sans-serif',
+          }}
+        >
+          {isHe ? 'טוען מילון…' : 'Loading dictionary…'}
+        </p>
+      ) : (
+        <BattleSceneRoot
+          key={resetKey}
+          onVictory={onVictory}
+          onDefeat={onDefeat}
+          locale={locale}
+        />
+      )}
+
       {outcome && <PostFightModal outcome={outcome} onRetry={onRetry} onExit={onRetry} />}
     </main>
   );
