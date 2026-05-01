@@ -376,6 +376,39 @@ describe('AdventureGrid', () => {
       expect(cells[0]).toHaveAttribute('aria-label', expect.stringContaining('gold'));
     });
 
+    it('A11y Critical-2: aria-label includes "cleared" state for cleared tiles', () => {
+      const tiles = createMockTiles(4);
+      tiles[0] = { ...tiles[0], isCleared: true };
+
+      render(<AdventureGrid tiles={tiles} gridSize={4} />);
+
+      const cells = screen.getAllByRole('gridcell');
+      expect(cells[0]).toHaveAttribute('aria-label', expect.stringContaining('cleared'));
+    });
+
+    it('A11y Critical-2: aria-label includes "frozen" state for frozen tiles', () => {
+      const tiles = createMockTiles(4);
+      // Ice tiles are isFrozen by default in createTileWithType
+      tiles[0] = createTileWithType(0, 'ice');
+
+      render(<AdventureGrid tiles={tiles} gridSize={4} />);
+
+      const cells = screen.getAllByRole('gridcell');
+      expect(cells[0]).toHaveAttribute('aria-label', expect.stringContaining('frozen'));
+    });
+
+    it('A11y Critical-2: aria-label keeps both type and state (gold + cleared)', () => {
+      const tiles = createMockTiles(4);
+      tiles[0] = { ...createTileWithType(0, 'gold'), isCleared: true };
+
+      render(<AdventureGrid tiles={tiles} gridSize={4} />);
+
+      const cells = screen.getAllByRole('gridcell');
+      const label = cells[0].getAttribute('aria-label') ?? '';
+      expect(label).toMatch(/gold/);
+      expect(label).toMatch(/cleared/);
+    });
+
     it('should indicate selected state via aria-selected', () => {
       // GIVEN
       const tiles = createMockTiles(4);

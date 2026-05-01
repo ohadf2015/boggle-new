@@ -35,10 +35,14 @@ export function generateLootChest(
   // Centered at 0.5: Math.random()*5-2.5 produces 0 when mocked to 0.5 (keeps
   // deterministic tests exact). World gap = 6 > max variance 2 → strictly monotonic.
   const baseGold = (10 + worldId * 3) * stars;
+  // F4 audit (2026-05-01): early-world plenty. Boost only baseGold (not perfect/bonus/multiplier)
+  // for W1-W2 so casual players feel rewarded fast and can afford T1 upgrades within 1-2 levels.
+  const earlyWorldBoost = worldId <= 2 ? 1.5 : 1.0;
+  const boostedBaseGold = baseGold * earlyWorldBoost;
   const perfectBonus = stars === 3 ? 50 : 0;
   // Gold multiplier only applies to base gold, not bonus/trophy (prevents runaway inflation)
   const variance = Math.round(Math.random() * 5 - 2.5); // –2 to +2 (0 when Math.random=0.5)
-  const gold = Math.floor((baseGold + perfectBonus) * goldMultiplier) + variance;
+  const gold = Math.floor((boostedBaseGold + perfectBonus) * goldMultiplier) + variance;
   drops.push({ type: 'gold', amount: gold, nameKey: 'adventure.loot.gold', rarity: 'common' });
 
   // XP (always)

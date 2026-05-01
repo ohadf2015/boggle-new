@@ -9,6 +9,7 @@
 
 import React, { memo, useMemo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { SMOOTH } from '@/lib/adventure/springPhysics';
 import {
   Clock,
   Target,
@@ -67,11 +68,7 @@ const cardVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      type: 'spring' as const,
-      stiffness: 300,
-      damping: 25,
-    },
+    transition: SMOOTH, // GF-001 — canonical adventure spring (was 300/25 ad-hoc)
   },
 };
 

@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
+import { SMOOTH } from '@/lib/adventure/springPhysics';
 
 // ==============================================
 // TYPES
@@ -270,7 +271,7 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
                   className="mt-4 px-4 py-2 rounded-neo border-neo bg-neo-navy/80"
                   initial={{ y: 16, opacity: 0, scale: 0.9 }}
                   animate={{ y: 0, opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3, duration: 0.5, type: 'spring', stiffness: 300, damping: 25 }}
+                  transition={{ ...SMOOTH, delay: 0.3 }}
                 >
                   <p className={cn('text-sm font-bold text-center max-w-[260px] leading-snug', theme.textColor)}>
                     {t(`adventure.worlds.mechanicHint${worldNumber}`)}

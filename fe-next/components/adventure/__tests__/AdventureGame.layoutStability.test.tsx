@@ -534,6 +534,7 @@ vi.mock('../ui', () => ({
   GameSidebar: ({ children }: any) => <div data-testid="game-sidebar">{children}</div>,
   GameGridArea: ({ children }: any) => <div data-testid="game-grid-area">{children}</div>,
   PauseOverlay: () => null,
+  GameLiveRegion: () => null,
   GameLayout: ({ header, gridArea, sidebar, overlays }: any) => (
     <div data-testid="game-layout">{header}{gridArea}{sidebar}{overlays}</div>
   ),

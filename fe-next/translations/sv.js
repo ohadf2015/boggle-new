@@ -7264,7 +7264,9 @@ const sv = {
         "chain": "kedjebricka, länkbonus",
         "time": "tidsbricka, plus 5 sekunder",
         "locked": "låst bricka, lås upp med matchande bokstav",
-        "multiplier": "multiplikatorbricka, 2x poäng"
+        "multiplier": "multiplikatorbricka, 2x poäng",
+        "cleared": "rensad",
+        "frozen": "frusen"
       }
     },
     "errors": {
@@ -7277,6 +7279,9 @@ const sv = {
       "validationTimeout": "Valideringen tog för lång tid — försök igen",
       "validationCancelled": "Valideringen avbröts",
       "missingCenterLetter": "Måste inkludera mittenbokstaven!"
+    },
+"live": {
+      "wordFound": "{{word}} hittat, plus {{points}} poäng"
     },
 "game": {
       "title": "Äventyrsläge",

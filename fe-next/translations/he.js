@@ -7255,7 +7255,9 @@ const he = {
         "chain": "אריח שרשרת, בונוס קישור",
         "time": "אריח זמן, פלוס 5 שניות",
         "locked": "אריח נעול, שחרר עם אות תואמת",
-        "multiplier": "אריח מכפיל, ניקוד x2"
+        "multiplier": "אריח מכפיל, ניקוד x2",
+        "cleared": "נוקה",
+        "frozen": "קפוא"
       }
     },
     "errors": {
@@ -7268,6 +7270,9 @@ const he = {
       "validationTimeout": "האימות נכשל — נסו שוב",
       "validationCancelled": "האימות בוטל",
       "missingCenterLetter": "חובה לכלול את האות המרכזית!"
+    },
+"live": {
+      "wordFound": "{{word}}, פלוס {{points}} נקודות"
     },
 "game": {
       "title": "מצב הרפתקה",

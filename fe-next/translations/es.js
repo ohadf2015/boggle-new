@@ -7583,7 +7583,9 @@ const es = {
         "chain": "ficha cadena, combo",
         "time": "ficha de tiempo, más 5 segundos",
         "locked": "ficha bloqueada, desbloquear con letra coincidente",
-        "multiplier": "ficha multiplicadora, 2x puntos"
+        "multiplier": "ficha multiplicadora, 2x puntos",
+        "cleared": "despejada",
+        "frozen": "congelada"
       }
     },
     "errors": {
@@ -7596,6 +7598,9 @@ const es = {
       "validationTimeout": "La validación tardó demasiado — inténtalo de nuevo",
       "validationCancelled": "La validación fue cancelada",
       "missingCenterLetter": "¡Debe incluir la letra central!"
+    },
+    "live": {
+      "wordFound": "{{word}} encontrada, más {{points}} puntos"
     },
     "game": {
       "title": "Modo Aventura",

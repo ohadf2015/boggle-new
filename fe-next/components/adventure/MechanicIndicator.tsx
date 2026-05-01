@@ -2,6 +2,7 @@
 
 import { memo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { SNAPPY } from '@/lib/adventure/springPhysics';
 import { Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -51,7 +52,7 @@ const MechanicIndicator = memo(function MechanicIndicator({
           )}
           initial={{ scale: 1.4 }}
           animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+          transition={SNAPPY}
           key={hitCount}
         >
           ×{hitCount}{hitCount >= 2 && ' STREAK'}

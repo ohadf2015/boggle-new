@@ -12,6 +12,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { calculateAdventureXp } from '@/shared/utils/adventureXpUtils';
 import { generateLevelLoot } from '@/lib/adventure/lootGenerator';
 import { trackGameEnd } from '@/utils/growthTracking';
+import { useHaptics } from '@/hooks/useHaptics';
 import type { LootDrop } from '@/types/adventure';
 import type { LevelUpPayload } from '@/components/education/LevelUpCelebration';
 import type { BossTauntEvent } from '@/types/boss';
@@ -171,12 +172,26 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
   }); // runs every render — ref sync is cheap, no deps needed
 
   // Reset completion flags ONLY on actual level change
+  const completionHapticFiredRef = useRef(false);
   useEffect(() => {
     completionProcessedRef.current = false;
     attemptRecordedRef.current = false;
     completionSavedRef.current = false;
     completionSaveFailedRef.current = false;
+    completionHapticFiredRef.current = false;
   }, [levelConfig.world, levelConfig.level]);
+
+  // GF-003 — fire level-complete haptic once when stars are earned on a non-boss level.
+  // Boss levels emit their own haptic from BossVictory.tsx, so skip here to avoid double-fire.
+  const haptics = useHaptics();
+  useEffect(() => {
+    if (isBossLevel) return;
+    if (!showLevelComplete) return;
+    if (gameState.stars <= 0) return;
+    if (completionHapticFiredRef.current) return;
+    completionHapticFiredRef.current = true;
+    void haptics.levelComplete();
+  }, [showLevelComplete, gameState.stars, isBossLevel, haptics]);
 
   // Calculate estimated XP and gold for UI display on level completion.
   // Actual state updates happen server-side via ProgressionContext.completeLevel().

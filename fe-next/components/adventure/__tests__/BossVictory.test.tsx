@@ -37,6 +37,22 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+const levelCompleteHapticSpy = vi.fn();
+vi.mock('@/hooks/useHaptics', () => ({
+  useHaptics: () => ({
+    levelComplete: levelCompleteHapticSpy,
+    success: vi.fn(),
+    tap: vi.fn(),
+    error: vi.fn(),
+    warning: vi.fn(),
+    selection: vi.fn(),
+    bossHit: vi.fn(),
+    trigger: vi.fn(),
+    triggerCustom: vi.fn(),
+    isSupported: () => false,
+  }),
+}));
+
 vi.mock('framer-motion', () => {
   const React = require('react');
 
@@ -144,6 +160,7 @@ const defaultProps = {
 describe('BossVictory', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    levelCompleteHapticSpy.mockClear();
   });
 
   describe('Victory State', () => {
@@ -153,6 +170,16 @@ describe('BossVictory', () => {
 
       // THEN
       expect(screen.getByText('Boss Defeated!')).toBeInTheDocument();
+    });
+
+    it('GF-003: fires level-complete haptic exactly once on mount when isVictory', () => {
+      render(<BossVictory {...defaultProps} isVictory={true} />);
+      expect(levelCompleteHapticSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('GF-003: does NOT fire haptic on defeat', () => {
+      render(<BossVictory {...defaultProps} isVictory={false} />);
+      expect(levelCompleteHapticSpy).not.toHaveBeenCalled();
     });
 
     it('should show boss victory taunt when player wins', () => {

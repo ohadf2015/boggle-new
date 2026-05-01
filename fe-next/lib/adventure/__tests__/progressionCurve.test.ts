@@ -74,17 +74,23 @@ describe('Gold economy', () => {
     expect(totalGold).toBeGreaterThanOrEqual(90);
   });
 
-  it('base gold (excluding random bonuses) should increase with world number', () => {
+  it('base gold should increase with world from W2 onwards (W1-W2 are early-world boosted per F4)', () => {
+    // F4 audit (2026-05-01): W1-W2 baseGold ×1.5 boost intentionally creates
+    // early-world plenty so casual players can afford a T1 upgrade in 1-2 levels.
+    // This deliberately flattens W1→W2→W3 (may even invert at W2→W3) — the
+    // tradeoff the audit accepted. Strict monotonicity resumes from W3 onward.
     const baseGoldByWorld: number[] = [];
     for (let world = 1; world <= WORLDS_COUNT; world++) {
       const chest = generateLootChest(world, 1, 2, 0, 1);
-      // Only check guaranteed gold drop (not random bonusGold which varies by seed)
       const baseGold = chest.drops.find(d => d.type === 'gold')?.amount ?? 0;
       baseGoldByWorld.push(baseGold);
     }
-    for (let i = 1; i < baseGoldByWorld.length; i++) {
+    // Monotonic from W3 onward (index 2 = world 3).
+    for (let i = 3; i < baseGoldByWorld.length; i++) {
       expect(baseGoldByWorld[i]).toBeGreaterThan(baseGoldByWorld[i - 1]);
     }
+    // W1 should still be lower than the late game so progression isn't trivialized.
+    expect(baseGoldByWorld[baseGoldByWorld.length - 1]).toBeGreaterThan(baseGoldByWorld[0]);
   });
 });
 

@@ -603,6 +603,7 @@ vi.mock('../ui', () => {
     },
     PauseOverlay: (props: any) =>
       props.isVisible ? <div data-testid="pause-overlay" /> : null,
+    GameLiveRegion: () => null,
     GameLayout: ({ header, gridArea, sidebar, overlays }: any) => (
       <div>
         {header}

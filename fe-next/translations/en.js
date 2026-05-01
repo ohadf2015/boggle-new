@@ -7161,7 +7161,9 @@ const en = {
         "chain": "chain tile, link bonus",
         "time": "time tile, plus 5 seconds",
         "locked": "locked tile, unlock with matching letter",
-        "multiplier": "multiplier tile, 2x score"
+        "multiplier": "multiplier tile, 2x score",
+        "cleared": "cleared",
+        "frozen": "frozen"
       }
     },
     "next": "NEXT",
@@ -7369,6 +7371,9 @@ const en = {
       "validationTimeout": "Validation timed out — try again",
       "validationCancelled": "Validation was cancelled",
       "missingCenterLetter": "Must include the center letter!"
+    },
+"live": {
+      "wordFound": "{{word}} found, plus {{points}} points"
     },
 "game": {
       "title": "Adventure Mode",

@@ -223,6 +223,7 @@ const AdventureGame = memo<AdventureGameProps>(
       prevWordsFoundLen, comboCount: gameState.comboCount,
       sfx: {
         setGameActive, playCountdownBeep, playWordAcceptedSound, playComboSound,
+        playCoinCollectSound,
         playLevelUpSound, playBossEntranceSound, playBossHitSound, playBossPhaseChangeSound,
         playBossDefeatSound, playTimerUrgentSound, playBossDefeatLegendarySound, playLegendaryWordSound,
       },

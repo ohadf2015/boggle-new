@@ -13,6 +13,8 @@ interface SFXHandlers {
   playCountdownBeep: (timeRemaining: number) => void;
   playWordAcceptedSound: () => void;
   playComboSound: (comboCount: number) => void;
+  /** GF-002 — pairs with score-popup arc to complete the dopamine loop */
+  playCoinCollectSound: () => void;
   playLevelUpSound: () => void;
   playBossEntranceSound: () => void;
   playBossHitSound: () => void;
@@ -61,10 +63,13 @@ export function useAdventureSFX({
     if (isPlaying && timeRemaining === 5) sfx.playTimerUrgentSound();
   }, [isPlaying, timeRemaining, sfx]);
 
-  // Word accepted sound + combo sound
+  // Word accepted sound + combo sound + score-popup audio (GF-002)
   useEffect(() => {
     if (prevWordsFoundLen !== undefined && wordsFoundLength > prevWordsFoundLen && isPlaying) {
       sfx.playWordAcceptedSound();
+      // GF-002: pair the score-popup arc with a coin-collect SFX so the visual
+      // reward has audio support. Layered immediately — engine handles overlap.
+      sfx.playCoinCollectSound();
       if (comboCount >= 2) sfx.playComboSound(comboCount);
     }
   }, [wordsFoundLength, prevWordsFoundLen, comboCount, isPlaying, sfx]);

@@ -11,22 +11,36 @@ describe('generateLootChest', () => {
     const chest = generateLootChest(1, 1, 2, 300, 1);
     const gold = chest.drops.find(d => d.type === 'gold');
     expect(gold).toBeDefined();
-    // baseGold = (10 + 1*3) * 2 = 26, perfectBonus = 0, multiplier = 1 → 26
-    expect(gold!.amount).toBe(26);
+    // F4: baseGold = (10 + 1*3) * 2 = 26 × 1.5 (W1-W2 early-world boost) = 39
+    expect(gold!.amount).toBe(39);
   });
 
   it('applies goldMultiplier', () => {
     const chest = generateLootChest(1, 1, 2, 300, 2);
     const gold = chest.drops.find(d => d.type === 'gold');
-    // (10 + 3) * 2 * 2 = 52
-    expect(gold!.amount).toBe(52);
+    // F4: 26 × 1.5 = 39 boosted base, × 2 multiplier = 78
+    expect(gold!.amount).toBe(78);
   });
 
   it('gives perfect bonus for 3-star gold', () => {
     const chest = generateLootChest(1, 1, 3, 100, 1);
     const gold = chest.drops.find(d => d.type === 'gold');
-    // baseGold = (10+3)*3 = 39, perfectBonus = 50, multiplier = 1 → 89
-    expect(gold!.amount).toBe(89);
+    // F4: baseGold = 39 × 1.5 = 58.5 boosted, +50 perfect = 108.5, floor = 108
+    expect(gold!.amount).toBe(108);
+  });
+
+  it('boosts W1-W2 baseGold by 50% (F4 audit 2026-05-01) — early-world plenty', () => {
+    // W2 2-star: baseGold = (10 + 6) * 2 = 32 × 1.5 = 48
+    const w2 = generateLootChest(2, 1, 2, 300, 1).drops.find(d => d.type === 'gold')!.amount;
+    expect(w2).toBe(48);
+    // W3 2-star is NOT boosted: (10 + 9) * 2 = 38
+    const w3 = generateLootChest(3, 1, 2, 300, 1).drops.find(d => d.type === 'gold')!.amount;
+    expect(w3).toBe(38);
+    // Boost should not invert the curve — W3 should be higher than pre-boost W3 baseline
+    // and W1 should still be smaller than W10 even with boost.
+    const w1 = generateLootChest(1, 1, 2, 300, 1).drops.find(d => d.type === 'gold')!.amount;
+    const w10 = generateLootChest(10, 1, 2, 300, 1).drops.find(d => d.type === 'gold')!.amount;
+    expect(w10).toBeGreaterThan(w1);
   });
 
   it('gold scales significantly with world number', () => {

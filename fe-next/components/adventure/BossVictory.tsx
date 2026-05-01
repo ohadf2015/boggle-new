@@ -8,12 +8,13 @@
 
 'use client';
 
-import { memo, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Star, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { useHaptics } from '@/hooks/useHaptics';
 import type { BossVictoryProps } from '@/types/boss';
 import { SilentVideo } from '@/components/ui/SilentVideo';
 
@@ -73,8 +74,18 @@ const BossVictory = memo<BossVictoryProps>(
     const bossHpDepleted = bossObjective?.current ?? 0; // percentage depleted (0-100)
     const isNearMiss = !isVictory && bossHpDepleted >= 85; // boss had <15% HP left
     const dialogRef = useRef<HTMLDivElement>(null);
+    const hapticFiredRef = useRef(false);
+    const haptics = useHaptics();
 
     useFocusTrap(dialogRef, true, onContinue);
+
+    // GF-003 — fire victory haptic once on mount when isVictory.
+    // Mobile players expect rumble on big wins; absence felt empty.
+    useEffect(() => {
+      if (!isVictory || hapticFiredRef.current) return;
+      hapticFiredRef.current = true;
+      void haptics.levelComplete();
+    }, [isVictory, haptics]);
 
     const formattedScore = useMemo(
       () => score.toLocaleString(),

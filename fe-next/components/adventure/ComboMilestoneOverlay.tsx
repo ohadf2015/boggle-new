@@ -42,28 +42,29 @@ const overlayVariants = {
   exit: { opacity: 0 },
 };
 
+// GF-010 audit (2026-05-01): scale-burst keyframes turn a single-jump
+// arrival into a bounce-and-settle for celebratory feel. Overshoot to 1.2
+// then settle to 1.0 — milestones now feel earned, not just delivered.
 const textVariants = {
   initial: {
-    scale: 0.5,
+    scale: 0.6,
     opacity: 0,
     rotate: -10,
   },
   animate: {
-    scale: 1,
+    scale: [0.6, 1.2, 1],
     opacity: 1,
     rotate: 0,
     transition: {
-      type: 'spring' as const,
-      stiffness: 300,
-      damping: 15,
+      scale: { duration: 0.55, times: [0, 0.55, 1], ease: 'easeOut' as const },
+      opacity: { duration: 0.18 },
+      rotate: { type: 'spring' as const, stiffness: 300, damping: 15 },
     },
   },
   exit: {
-    scale: 1.5,
+    scale: 1.4,
     opacity: 0,
-    transition: {
-      duration: 0.3,
-    },
+    transition: { duration: 0.3 },
   },
 };
 

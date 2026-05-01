@@ -23,6 +23,7 @@ import dynamic from 'next/dynamic';
 import { useGridGestures } from './useGridGestures';
 import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
 import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
+import { vibrateKeyboardSelect } from '@/components/grid/hapticFeedback';
 import { useBossGridEffect } from '@/hooks/useBossGridEffect';
 import './BossGridEffectStyles.css';
 import type { TileEffectEvent } from './AdventureEffectsCanvas';
@@ -264,7 +265,12 @@ const AdventureGrid = memo(
     }, [onWordSubmit, selectedIndices, tiles]);
 
     const keyboardSelectTile = useCallback((index: number) => {
-      if (onTileSelect && tiles[index]) onTileSelect(index, tiles[index]);
+      if (onTileSelect && tiles[index]) {
+        // GF-015 audit (2026-05-01): mirror the touch/mouse haptic on keyboard
+        // selection so screen-reader and motor-disability users get parity feedback.
+        vibrateKeyboardSelect(false);
+        onTileSelect(index, tiles[index]);
+      }
     }, [onTileSelect, tiles]);
 
     const { focusedIndex } = useGridKeyboardNav({
@@ -346,12 +352,21 @@ const AdventureGrid = memo(
       handleMouseUp();
     }, [handleMouseUp]);
 
-    // Get aria-label for tile (translated)
+    // Get aria-label for tile (translated).
+    // A11y Critical-2 (audit 2026-05-01): include letter, type, and state
+    // (cleared/frozen) so screen-reader users hear the full tile context.
     const getTileAriaLabel = useCallback((tile: GridTileState): string => {
-      const baseLabel = `${t('adventure.tiles.letter')} ${tile.letter}`;
-      if (tile.type === 'standard') return baseLabel;
-      const typeLabel = t(`adventure.tiles.aria.${tile.type}`);
-      return typeLabel ? `${baseLabel}, ${typeLabel}` : baseLabel;
+      const parts = [`${t('adventure.tiles.letter')} ${tile.letter}`];
+      if (tile.type !== 'standard') {
+        const typeLabel = t(`adventure.tiles.aria.${tile.type}`);
+        if (typeLabel) parts.push(typeLabel);
+      }
+      if (tile.isCleared) {
+        parts.push(t('adventure.tiles.aria.cleared'));
+      } else if (tile.isFrozen) {
+        parts.push(t('adventure.tiles.aria.frozen'));
+      }
+      return parts.join(', ');
     }, [t]);
 
     return (

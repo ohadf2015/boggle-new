@@ -23,6 +23,7 @@ vi.mock('../ui', () => ({
   AdventureHuntClueBoxes: (p: { targetLength: number }) => (
     <div data-testid="clue-boxes" data-length={p.targetLength} />
   ),
+  GameLiveRegion: () => <div data-testid="game-live-region" />,
 }));
 vi.mock('../AdventureGameOverlays', () => ({
   default: (p: { handlePauseToggle?: () => void }) => (

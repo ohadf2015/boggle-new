@@ -7281,7 +7281,9 @@ const ja = {
         "chain": "チェーンタイル、リンクボーナス",
         "time": "タイムタイル、プラス5秒",
         "locked": "ロックタイル、一致する文字で解除",
-        "multiplier": "マルチプライヤータイル、2倍スコア"
+        "multiplier": "マルチプライヤータイル、2倍スコア",
+        "cleared": "クリア済み",
+        "frozen": "凍結"
       }
     },
     "errors": {
@@ -7294,6 +7296,9 @@ const ja = {
       "validationTimeout": "検証がタイムアウトしました — もう一度お試しください",
       "validationCancelled": "検証がキャンセルされました",
       "missingCenterLetter": "中心の文字を含める必要があります！"
+    },
+"live": {
+      "wordFound": "{{word}} 発見、{{points}}ポイント獲得"
     },
 "game": {
       "title": "アドベンチャーモード",
