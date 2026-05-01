@@ -54,6 +54,21 @@ export function GamePageSeoContent({
           ))}
         </div>
       )}
+
+      {faq && faq.length > 0 && <FaqJsonLd faq={faq} />}
     </section>
   );
+}
+
+function FaqJsonLd({ faq }: { faq: FaqItem[] }) {
+  const json = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faq.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: { '@type': 'Answer', text: item.answer },
+    })),
+  });
+  return <script type="application/ld+json">{json}</script>;
 }

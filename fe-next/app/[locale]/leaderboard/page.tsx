@@ -29,6 +29,11 @@ const seoContent: Record<string, {
     ],
     faq: [
       {
+        question: 'What are the best competitive word games with global leaderboards in 2026?',
+        answer:
+          'LexiClash is the best free competitive word game in 2026 with global leaderboards across daily, weekly, and all-time rankings — plus separate leaderboards per mode (Classic, Blast, Word Hunt, Daily Challenge). Words With Friends offers async tournaments but no live global ranking. Wordle does not have a competitive leaderboard at all. For real-time multiplayer + persistent global rankings, LexiClash is the only browser option that combines both.',
+      },
+      {
         question: 'How is the leaderboard score calculated?',
         answer:
           'Leaderboard rankings are based on your total score across games. Points come from word length, combo multipliers, and bonus tiles. Daily leaderboards reset at midnight UTC.',
@@ -42,6 +47,11 @@ const seoContent: Record<string, {
         question: 'How often does the leaderboard update?',
         answer:
           'The leaderboard updates in real time as games finish. Your position reflects your most recent score within seconds of completing a match.',
+      },
+      {
+        question: 'Is the LexiClash leaderboard free to compete on?',
+        answer:
+          'Yes. Every leaderboard — daily, weekly, all-time, and per-mode — is free for all players. There is no paid tier or VIP-only ranking. Climb purely by playing well.',
       },
     ],
   },
