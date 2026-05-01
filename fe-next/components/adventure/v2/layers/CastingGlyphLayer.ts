@@ -21,7 +21,7 @@ export class CastingGlyphLayer extends Container {
 
     this.wordText = new Text({
       text: '',
-      style: { fontFamily: 'Fredoka', fontSize: 56, fill: 0xffffff, fontWeight: 'bold' },
+      style: { fontFamily: ['Fredoka', 'Rubik', 'sans-serif'], fontSize: 56, fill: 0xffffff, fontWeight: 'bold' },
     });
     this.wordText.anchor.set(0.5);
     this.wordText.position.set(0, -10);
@@ -29,7 +29,7 @@ export class CastingGlyphLayer extends Container {
 
     this.dmgText = new Text({
       text: '',
-      style: { fontFamily: 'Fredoka', fontSize: 28, fill: 0xbfff00 },
+      style: { fontFamily: ['Fredoka', 'Rubik', 'sans-serif'], fontSize: 28, fill: 0xbfff00 },
     });
     this.dmgText.anchor.set(0.5);
     this.dmgText.position.set(0, 30);

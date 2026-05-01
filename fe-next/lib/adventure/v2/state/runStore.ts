@@ -1,11 +1,12 @@
 import { create } from 'zustand';
-import type { CombatModel, FsmState, Tile, TileId } from '../types';
+import type { CombatModel, FsmState, Locale, Tile, TileId } from '../types';
 import { drawTiles, refillTiles } from '../engine/tilePool';
 import { hasAnyComposableWord } from '../engine/wordValidator';
 import { transition, type FsmEvent } from '../fsm';
 
 interface CombatStore extends CombatModel {
-  startNewBattle: () => void;
+  locale: Locale;
+  startNewBattle: (locale?: Locale) => void;
   dispatch: (event: FsmEvent) => void;
   refillUsedTiles: (usedIds: TileId[]) => void;
   applyHeroDamage: (dmg: number) => void;
@@ -39,16 +40,18 @@ export const useCombatStore = create<CombatStore>((set) => ({
   enemyAtk: ENEMY_ATK,
   tiles: [],
   fsmState: { type: 'idle' } as FsmState,
+  locale: 'en' as Locale,
 
-  startNewBattle: () => {
+  startNewBattle: (locale: Locale = 'en') => {
     set({
       heroHp: HERO_MAX_HP,
       heroMaxHp: HERO_MAX_HP,
       enemyHp: ENEMY_MAX_HP,
       enemyMaxHp: ENEMY_MAX_HP,
       enemyAtk: ENEMY_ATK,
-      tiles: drawTiles(16, 'en'),
+      tiles: drawTiles(16, locale),
       fsmState: { type: 'idle' },
+      locale,
     });
   },
 
@@ -57,7 +60,7 @@ export const useCombatStore = create<CombatStore>((set) => ({
   },
 
   refillUsedTiles: (usedIds) => {
-    set((s) => ({ tiles: refillTiles(s.tiles, usedIds, 'en') }));
+    set((s) => ({ tiles: refillTiles(s.tiles, usedIds, s.locale) }));
   },
 
   applyHeroDamage: (dmg) => {
@@ -120,23 +123,21 @@ export const useCombatStore = create<CombatStore>((set) => ({
         }
         return { ...t, claimTurnsRemaining: remaining };
       });
-      return { tiles: refillTiles(next, expired, 'en') };
+      return { tiles: refillTiles(next, expired, s.locale) };
     });
   },
 
   rescueIfStuck: () => {
     const s = useCombatStore.getState();
     const free = s.tiles.filter((t) => !t.claimedBy);
-    if (hasAnyComposableWord(free)) return false;
-    // No valid word possible — refresh all free tiles
+    if (hasAnyComposableWord(free, s.locale)) return false;
     const freeIds = free.map((t) => t.id);
-    set((curr) => ({ tiles: refillTiles(curr.tiles, freeIds, 'en') }));
-    // Recurse once if STILL stuck (extremely unlikely given dict)
+    set((curr) => ({ tiles: refillTiles(curr.tiles, freeIds, curr.locale) }));
     const after = useCombatStore.getState();
     const afterFree = after.tiles.filter((t) => !t.claimedBy);
-    if (!hasAnyComposableWord(afterFree)) {
+    if (!hasAnyComposableWord(afterFree, after.locale)) {
       const ids = afterFree.map((t) => t.id);
-      set((curr) => ({ tiles: refillTiles(curr.tiles, ids, 'en') }));
+      set((curr) => ({ tiles: refillTiles(curr.tiles, ids, curr.locale) }));
     }
     return true;
   },

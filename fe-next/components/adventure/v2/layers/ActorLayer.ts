@@ -32,14 +32,14 @@ export class ActorLayer extends Container {
 
     this.heroHpText = new Text({
       text: '',
-      style: { fontFamily: 'Fredoka', fontSize: 22, fill: 0xffffff },
+      style: { fontFamily: ['Fredoka', 'Rubik', 'sans-serif'], fontSize: 22, fill: 0xffffff },
     });
     this.heroHpText.position.set(220, 240);
     this.addChild(this.heroHpText);
 
     this.enemyHpText = new Text({
       text: '',
-      style: { fontFamily: 'Fredoka', fontSize: 22, fill: 0xffffff },
+      style: { fontFamily: ['Fredoka', 'Rubik', 'sans-serif'], fontSize: 22, fill: 0xffffff },
     });
     this.enemyHpText.position.set(1580, 220);
     this.addChild(this.enemyHpText);

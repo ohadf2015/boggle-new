@@ -34,4 +34,4 @@ export interface CombatModel {
   fsmState: FsmState;
 }
 
-export type Locale = 'en';
+export type Locale = 'en' | 'he';

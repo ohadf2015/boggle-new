@@ -57,7 +57,7 @@ export class RuneSlateLayer extends Container {
 
     const txt = new Text({
       text: '?',
-      style: { fontFamily: 'Fredoka', fontSize: 64, fill: 0xffffff, fontWeight: 'bold' },
+      style: { fontFamily: ['Fredoka', 'Rubik', 'sans-serif'], fontSize: 64, fill: 0xffffff, fontWeight: 'bold' },
     });
     txt.anchor.set(0.5);
     txt.position.set(TILE_SIZE / 2, TILE_SIZE / 2);
@@ -65,7 +65,7 @@ export class RuneSlateLayer extends Container {
 
     const claim = new Text({
       text: '',
-      style: { fontFamily: 'Fredoka', fontSize: 22, fill: 0xff00aa, fontWeight: 'bold' },
+      style: { fontFamily: ['Fredoka', 'Rubik', 'sans-serif'], fontSize: 22, fill: 0xff00aa, fontWeight: 'bold' },
     });
     claim.anchor.set(1, 0);
     claim.position.set(TILE_SIZE - 8, 6);

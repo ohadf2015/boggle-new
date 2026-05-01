@@ -10,14 +10,15 @@ import { isValidWord, isComposableFromTiles } from '@/lib/adventure/v2/engine/wo
 import { playSfx } from '@/lib/adventure/v2/audio/soundBus';
 import { attachKeyboardBridge, findTileByLetter } from './input/RuneSlateInput';
 import { BotLoop } from './BotLoop';
-import type { TileId, Tile } from '@/lib/adventure/v2/types';
+import type { Locale, TileId, Tile } from '@/lib/adventure/v2/types';
 
 interface Props {
   onVictory: () => void;
   onDefeat: () => void;
+  locale?: Locale;
 }
 
-export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
+export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<Application | null>(null);
   const sceneRef = useRef<BattleScene | null>(null);
@@ -55,7 +56,7 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
       app.stage.addChild(scene);
       sceneRef.current = scene;
 
-      useCombatStore.getState().startNewBattle();
+      useCombatStore.getState().startNewBattle(locale);
       useCombatStore.getState().dispatch({ type: 'START_TURN' });
       syncSceneFromStore();
 
@@ -110,7 +111,7 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
         .filter(Boolean) as Tile[];
       const word = s.fsmState.word;
       const valid =
-        word.length >= 3 && isValidWord(word) && isComposableFromTiles(word, tiles);
+        word.length >= 3 && isValidWord(word, s.locale) && isComposableFromTiles(word, tiles);
       const dmg = valid ? calculateDamage(tiles, { critRoll: 1, runeBonusSum: 0, heroAtk: 1 }) : 0;
       scene.castingGlyph.showWord(word, dmg, word.length < 3 ? true : valid);
     }
@@ -172,7 +173,7 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
       .map((id) => s.tiles[id])
       .filter(Boolean) as Tile[];
 
-    if (word.length < 3 || !isValidWord(word) || !isComposableFromTiles(word, tiles)) {
+    if (word.length < 3 || !isValidWord(word, s.locale) || !isComposableFromTiles(word, tiles)) {
       playSfx('word_invalid');
       sceneRef.current?.castingGlyph.shakeInvalid();
       return;

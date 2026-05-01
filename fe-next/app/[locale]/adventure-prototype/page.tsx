@@ -6,6 +6,13 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function AdventurePrototypePage() {
-  return <PageClient />;
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export default async function AdventurePrototypePage({ params }: PageProps) {
+  const { locale } = await params;
+  // Only en + he supported in prototype
+  const safeLocale = locale === 'he' ? 'he' : 'en';
+  return <PageClient locale={safeLocale} />;
 }

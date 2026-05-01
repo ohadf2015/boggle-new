@@ -14,8 +14,21 @@ export const EN_FREQUENCY: FreqRow[] = [
   ['X', 1, 8, 'rare'], ['Q', 1, 10, 'rare'], ['Z', 1, 10, 'rare'],
 ];
 
+// Hebrew letter frequency (rough, base-form only — finals normalized at dict load).
+export const HE_FREQUENCY: FreqRow[] = [
+  ['י', 11, 1, 'common'], ['ו', 10, 1, 'common'], ['א', 9, 1, 'common'],
+  ['ה', 9, 1, 'common'], ['ר', 8, 1, 'common'], ['מ', 7, 1, 'common'],
+  ['ת', 6, 1, 'common'], ['ל', 6, 1, 'common'], ['נ', 5, 2, 'common'],
+  ['ב', 4, 2, 'common'], ['ש', 4, 2, 'common'], ['ד', 3, 2, 'common'],
+  ['כ', 3, 3, 'uncommon'], ['ע', 3, 3, 'uncommon'], ['ח', 2, 3, 'uncommon'],
+  ['פ', 2, 3, 'uncommon'], ['ק', 2, 4, 'uncommon'], ['ס', 2, 4, 'uncommon'],
+  ['ג', 2, 4, 'uncommon'], ['ז', 1, 6, 'rare'], ['ט', 1, 6, 'rare'],
+  ['צ', 1, 6, 'rare'],
+];
+
 const FREQ_BY_LOCALE: Record<Locale, FreqRow[]> = {
   en: EN_FREQUENCY,
+  he: HE_FREQUENCY,
 };
 
 function pickWeighted(freq: FreqRow[], rng: () => number): FreqRow {

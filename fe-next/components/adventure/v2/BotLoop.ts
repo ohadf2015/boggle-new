@@ -84,7 +84,7 @@ export class BotLoop {
         this.scheduleTick(REVEAL_INTERVAL_MS);
         return;
       }
-      const pick = pickBotWord(store.tiles);
+      const pick = pickBotWord(store.tiles, store.locale);
       if (!pick) {
         this.scheduleTick(NO_PICK_RETRY_MS);
         return;

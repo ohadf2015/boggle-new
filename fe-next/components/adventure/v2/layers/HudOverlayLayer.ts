@@ -34,7 +34,7 @@ export class HudOverlayLayer extends Container {
 
     const txt = new Text({
       text: label,
-      style: { fontFamily: 'Fredoka', fontSize: 36, fill: ink, fontWeight: 'bold' },
+      style: { fontFamily: ['Fredoka', 'Rubik', 'sans-serif'], fontSize: 36, fill: ink, fontWeight: 'bold' },
     });
     txt.anchor.set(0.5);
     txt.position.set(100, 35);

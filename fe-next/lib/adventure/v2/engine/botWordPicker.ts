@@ -1,22 +1,25 @@
-import type { Tile, TileId } from '../types';
+import type { Locale, Tile, TileId } from '../types';
 import { PROTO_DICT_EN } from './__protoDict';
+import { PROTO_DICT_HE } from './__protoDictHe';
 import { isComposableFromTiles } from './wordValidator';
 
 const MIN_BOT_WORD_LEN = 4;
 const MAX_BOT_WORD_LEN = 6;
 
-let cachedDictByLen: Map<number, string[]> | null = null;
+const cachedDictByLen: Partial<Record<Locale, Map<number, string[]>>> = {};
 
-function getDictByLen(): Map<number, string[]> {
-  if (cachedDictByLen) return cachedDictByLen;
+function getDictByLen(locale: Locale): Map<number, string[]> {
+  const cached = cachedDictByLen[locale];
+  if (cached) return cached;
+  const dict = locale === 'he' ? PROTO_DICT_HE : PROTO_DICT_EN;
   const m = new Map<number, string[]>();
-  for (const w of PROTO_DICT_EN) {
+  for (const w of dict) {
     const len = w.length;
     if (len < MIN_BOT_WORD_LEN || len > MAX_BOT_WORD_LEN) continue;
     if (!m.has(len)) m.set(len, []);
     m.get(len)!.push(w);
   }
-  cachedDictByLen = m;
+  cachedDictByLen[locale] = m;
   return m;
 }
 
@@ -30,9 +33,9 @@ export interface BotPick {
  * Pick the longest valid word the bot can compose from currently-unclaimed tiles.
  * Returns null if no valid word ≥4 letters exists.
  */
-export function pickBotWord(tiles: Tile[]): BotPick | null {
+export function pickBotWord(tiles: Tile[], locale: Locale = 'en'): BotPick | null {
   const free = tiles.filter((t) => !t.claimedBy);
-  const byLen = getDictByLen();
+  const byLen = getDictByLen(locale);
 
   for (let len = MAX_BOT_WORD_LEN; len >= MIN_BOT_WORD_LEN; len--) {
     const candidates = byLen.get(len) ?? [];
@@ -66,5 +69,6 @@ function pickTileIdsForWord(word: string, free: Tile[]): TileId[] | null {
 
 /** Reset the cache (test helper). */
 export function __resetBotDictCache() {
-  cachedDictByLen = null;
+  delete cachedDictByLen.en;
+  delete cachedDictByLen.he;
 }

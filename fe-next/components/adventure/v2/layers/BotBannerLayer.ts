@@ -23,7 +23,7 @@ export class BotBannerLayer extends Container {
 
     this.labelText = new Text({
       text: 'BOT GRABS',
-      style: { fontFamily: 'Fredoka', fontSize: 22, fill: 0xff00aa, fontWeight: 'bold', letterSpacing: 4 },
+      style: { fontFamily: ['Fredoka', 'Rubik', 'sans-serif'], fontSize: 22, fill: 0xff00aa, fontWeight: 'bold', letterSpacing: 4 },
     });
     this.labelText.anchor.set(0.5);
     this.labelText.position.set(0, -50);
@@ -31,7 +31,7 @@ export class BotBannerLayer extends Container {
 
     this.wordText = new Text({
       text: '',
-      style: { fontFamily: 'Fredoka', fontSize: 64, fill: 0xffffff, fontWeight: 'bold' },
+      style: { fontFamily: ['Fredoka', 'Rubik', 'sans-serif'], fontSize: 64, fill: 0xffffff, fontWeight: 'bold' },
     });
     this.wordText.anchor.set(0.5);
     this.wordText.position.set(0, -2);
@@ -39,7 +39,7 @@ export class BotBannerLayer extends Container {
 
     this.dmgText = new Text({
       text: '',
-      style: { fontFamily: 'Fredoka', fontSize: 32, fill: 0xff00aa, fontWeight: 'bold' },
+      style: { fontFamily: ['Fredoka', 'Rubik', 'sans-serif'], fontSize: 32, fill: 0xff00aa, fontWeight: 'bold' },
     });
     this.dmgText.anchor.set(0.5);
     this.dmgText.position.set(0, 50);
