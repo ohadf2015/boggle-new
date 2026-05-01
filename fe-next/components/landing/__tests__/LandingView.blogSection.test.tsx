@@ -81,6 +81,7 @@ vi.mock('next/link', () => ({
   default: ({ children, href }: { children: React.ReactNode; href: string }) => <a href={href}>{children}</a>,
 }));
 vi.mock('next/image', () => ({
+  // eslint-disable-next-line @next/next/no-img-element
   default: ({ alt, ...rest }: { alt: string }) => <img alt={alt} {...rest} />,
 }));
 vi.mock('@/components/Header', () => ({ default: () => <header /> }));
