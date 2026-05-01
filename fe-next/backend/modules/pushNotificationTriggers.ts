@@ -593,9 +593,10 @@ export async function notifyLevelUp(
 export async function notifySeasonStart(
   toUserId: string,
   newSeasonId: number,
-  prevSeasonId?: number
+  prevSeasonId?: number,
+  precomputedLocale?: PushLocale
 ): Promise<void> {
-  const locale = await getUserLocale(toUserId);
+  const locale = precomputedLocale ?? (await getUserLocale(toUserId));
   const bodyKey = prevSeasonId ? 'seasonStart.body' : 'seasonStart.bodyNoClaim';
   return triggerPush(toUserId, 'season_start', {
     title: translatePush(locale, 'seasonStart.title', { n: newSeasonId }),

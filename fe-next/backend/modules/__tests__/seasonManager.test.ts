@@ -36,8 +36,11 @@ vi.mock('../supabaseServer', () => ({
   }),
 }));
 
+const mockGetUserLocalesBatch = vi.fn();
+
 vi.mock('../pushNotificationTriggers', () => ({
   notifySeasonStart: (...args: unknown[]) => mockNotifySeasonStart(...args),
+  getUserLocalesBatch: (...args: unknown[]) => mockGetUserLocalesBatch(...args),
 }));
 
 vi.mock('../../utils/logger', () => ({
@@ -117,6 +120,8 @@ describe('processExpiredSeasons', () => {
     mockExpiredSelect.mockReset();
     mockArchiveSelect.mockReset();
     mockNotifySeasonStart.mockReset();
+    mockGetUserLocalesBatch.mockReset();
+    mockGetUserLocalesBatch.mockResolvedValue(new Map());
     mockArchiveSelect.mockReturnValue({ data: [], error: null });
   });
 
@@ -169,9 +174,9 @@ describe('processExpiredSeasons', () => {
     const result = await processExpiredSeasons();
 
     expect(mockNotifySeasonStart).toHaveBeenCalledTimes(3);
-    expect(mockNotifySeasonStart).toHaveBeenNthCalledWith(1, 'p1', 8, 7);
-    expect(mockNotifySeasonStart).toHaveBeenNthCalledWith(2, 'p2', 8, 7);
-    expect(mockNotifySeasonStart).toHaveBeenNthCalledWith(3, 'p3', 8, 7);
+    expect(mockNotifySeasonStart).toHaveBeenNthCalledWith(1, 'p1', 8, 7, undefined);
+    expect(mockNotifySeasonStart).toHaveBeenNthCalledWith(2, 'p2', 8, 7, undefined);
+    expect(mockNotifySeasonStart).toHaveBeenNthCalledWith(3, 'p3', 8, 7, undefined);
     expect(result.notified).toBe(3);
   });
 
@@ -203,6 +208,8 @@ describe('notifyPlayersOfSeasonStart', () => {
   beforeEach(() => {
     mockArchiveSelect.mockReset();
     mockNotifySeasonStart.mockReset();
+    mockGetUserLocalesBatch.mockReset();
+    mockGetUserLocalesBatch.mockResolvedValue(new Map());
   });
 
   it('returns 0 when archive query errors', async () => {
@@ -229,5 +236,56 @@ describe('notifyPlayersOfSeasonStart', () => {
 
     expect(count).toBe(2);
     expect(mockNotifySeasonStart).toHaveBeenCalledTimes(2);
+  });
+
+  // Sentry NEXTJS-136: pool exhaustion at season rotation. Prove fan-out
+  // batches locales (1 query, not N) and forwards precomputed locale to
+  // notifySeasonStart so triggerPush skips per-user getUserLocale.
+  it('batch-fetches locales once and forwards precomputed locale to each push', async () => {
+    mockArchiveSelect.mockReturnValue({
+      data: [{ player_id: 'a' }, { player_id: 'b' }, { player_id: 'c' }],
+      error: null,
+    });
+    mockGetUserLocalesBatch.mockResolvedValue(
+      new Map([
+        ['a', 'he'],
+        ['b', 'ja'],
+        ['c', 'en'],
+      ]),
+    );
+
+    await notifyPlayersOfSeasonStart(3, 4);
+
+    expect(mockGetUserLocalesBatch).toHaveBeenCalledTimes(1);
+    expect(mockGetUserLocalesBatch).toHaveBeenCalledWith(['a', 'b', 'c']);
+    expect(mockNotifySeasonStart).toHaveBeenCalledWith('a', 4, 3, 'he');
+    expect(mockNotifySeasonStart).toHaveBeenCalledWith('b', 4, 3, 'ja');
+    expect(mockNotifySeasonStart).toHaveBeenCalledWith('c', 4, 3, 'en');
+  });
+
+  // Concurrency cap prevents the Promise.all blast that maxed pool 25/25.
+  // With CHUNK_SIZE=10 and 25 ids, never more than 10 in-flight at once.
+  it('chunks fan-out at concurrency 10 to cap parallel supabase inserts', async () => {
+    const ids = Array.from({ length: 25 }, (_, i) => `u${i}`);
+    mockArchiveSelect.mockReturnValue({
+      data: ids.map((id) => ({ player_id: id })),
+      error: null,
+    });
+    mockGetUserLocalesBatch.mockResolvedValue(new Map(ids.map((id) => [id, 'en'])));
+
+    let inFlight = 0;
+    let peak = 0;
+    mockNotifySeasonStart.mockImplementation(async () => {
+      inFlight += 1;
+      peak = Math.max(peak, inFlight);
+      await new Promise((r) => setTimeout(r, 5));
+      inFlight -= 1;
+    });
+
+    const count = await notifyPlayersOfSeasonStart(3, 4);
+
+    expect(count).toBe(25);
+    expect(mockNotifySeasonStart).toHaveBeenCalledTimes(25);
+    expect(peak).toBeLessThanOrEqual(10);
   });
 });

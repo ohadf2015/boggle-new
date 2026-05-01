@@ -9,8 +9,13 @@
  */
 
 import { getSupabase } from './supabaseServer';
-import { notifySeasonStart } from './pushNotificationTriggers';
+import { notifySeasonStart, getUserLocalesBatch } from './pushNotificationTriggers';
 import logger from '../utils/logger';
+
+// Cap parallel fan-out so per-user user_notifications INSERTs don't
+// saturate the Supabase semaphore (Sentry NEXTJS-136 — pool 25/25,
+// queue depth 34 at season-rotation cron).
+const SEASON_PUSH_CHUNK_SIZE = 10;
 
 export interface SeasonResetResult {
   success: boolean;
@@ -109,9 +114,16 @@ export async function notifyPlayersOfSeasonStart(
       .filter(Boolean);
     if (ids.length === 0) return 0;
 
-    await Promise.allSettled(
-      ids.map((id) => notifySeasonStart(id, newSeasonId, prevSeasonId)),
-    );
+    const locales = await getUserLocalesBatch(ids);
+
+    for (let i = 0; i < ids.length; i += SEASON_PUSH_CHUNK_SIZE) {
+      const chunk = ids.slice(i, i + SEASON_PUSH_CHUNK_SIZE);
+      await Promise.allSettled(
+        chunk.map((id) =>
+          notifySeasonStart(id, newSeasonId, prevSeasonId, locales.get(id)),
+        ),
+      );
+    }
     return ids.length;
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
