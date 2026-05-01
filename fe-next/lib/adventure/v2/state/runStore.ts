@@ -66,13 +66,23 @@ export const useCombatStore = create<CombatStore>((set) => ({
       cooldownRemaining: 0,
       maxCooldown: ABILITY_DEFS[id].maxCooldown,
     }));
+    const tiles = drawTiles(16, locale);
+    // Sprinkle 2 random gold tiles at battle start
+    const goldCount = 2;
+    const indices = new Set<number>();
+    while (indices.size < goldCount) {
+      indices.add(Math.floor(Math.random() * tiles.length));
+    }
+    indices.forEach((i) => {
+      tiles[i] = { ...tiles[i], isGold: true };
+    });
     set({
       heroHp: HERO_MAX_HP,
       heroMaxHp: HERO_MAX_HP,
       enemyHp: ENEMY_MAX_HP,
       enemyMaxHp: ENEMY_MAX_HP,
       enemyAtk: ENEMY_ATK,
-      tiles: drawTiles(16, locale),
+      tiles,
       fsmState: { type: 'idle' },
       locale,
       abilities: abilityStates,

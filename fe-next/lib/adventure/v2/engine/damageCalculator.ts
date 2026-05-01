@@ -22,7 +22,10 @@ function getLengthMultiplier(len: number): number {
 
 export function calculateDamage(tiles: Tile[], ctx: DamageContext): number {
   if (tiles.length < 3) return 0;
-  const letterValueSum = tiles.reduce((acc, t) => acc + t.letterValue, 0);
+  const letterValueSum = tiles.reduce(
+    (acc, t) => acc + t.letterValue * (t.isGold ? 2 : 1),
+    0,
+  );
   const base = letterValueSum * getLengthMultiplier(tiles.length);
   const final = base * ctx.critRoll * (1 + ctx.runeBonusSum) * ctx.heroAtk;
   return Math.floor(final);

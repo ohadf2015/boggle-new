@@ -11,6 +11,7 @@ interface TileSprite {
   used: boolean;
   claimed: boolean;
   targeted: boolean;
+  isGold: boolean;
   claimTurns: number;
 }
 
@@ -81,6 +82,7 @@ export class RuneSlateLayer extends Container {
       used: false,
       claimed: false,
       targeted: false,
+      isGold: false,
       claimTurns: 0,
     };
 
@@ -104,6 +106,7 @@ export class RuneSlateLayer extends Container {
       sp.used = false;
       sp.claimed = !!t.claimedBy;
       sp.targeted = !!t.targetedBy && !t.claimedBy;
+      sp.isGold = !!t.isGold;
       sp.claimTurns = t.claimTurnsRemaining ?? 0;
       sp.letterText.alpha = sp.claimed ? 0.55 : 1;
       sp.claimText.text = sp.claimed && sp.claimTurns > 0 ? `${sp.claimTurns}` : '';
@@ -138,10 +141,13 @@ export class RuneSlateLayer extends Container {
       strokeColor = 0xff00aa;
       strokeWidth = 4;
     } else if (sp.targeted) {
-      // Bot is eyeing this tile — pink ghost outline, fill stays normal so the letter is readable
       fillColor =
         sp.rarity === 'rare' ? 0x4a1a4a : sp.rarity === 'uncommon' ? 0x1a3a4a : 0x1a1a2e;
       strokeColor = 0xff77cc;
+      strokeWidth = 5;
+    } else if (sp.isGold) {
+      fillColor = 0x4a3a0a;
+      strokeColor = 0xffe135;
       strokeWidth = 5;
     } else {
       fillColor =
@@ -154,6 +160,11 @@ export class RuneSlateLayer extends Container {
       .rect(0, 0, TILE_SIZE, TILE_SIZE)
       .fill(fillColor)
       .stroke({ color: strokeColor, width: strokeWidth });
+
+    // Gold sparkle overlay — small bright dot upper-left
+    if (sp.isGold && !sp.claimed) {
+      sp.bg.circle(14, 14, 4).fill(0xffe135);
+    }
   }
 
   flashBotClaim(tileIds: TileId[]) {

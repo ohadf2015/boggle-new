@@ -11,6 +11,8 @@ export interface Tile {
   claimTurnsRemaining?: number;
   /** Bot has it earmarked for a not-yet-completed word. Player can still tap to steal. */
   targetedBy?: 'bot' | null;
+  /** Gold tile — letter value × 2 when used in damage calc. Sparkly visual. */
+  isGold?: boolean;
 }
 
 export type FsmState =
