@@ -36,6 +36,42 @@ describe('getWordByDate', () => {
   });
 });
 
+describe('heWords inventory (Phase 1.A: 14 → 30)', () => {
+  const he = wordsByLocale.he;
+
+  it('contains at least 30 entries', () => {
+    expect(he.length).toBeGreaterThanOrEqual(30);
+  });
+
+  it('has unique dateKeys', () => {
+    const keys = he.map((w) => w.dateKey);
+    expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it('has unique words', () => {
+    const words = he.map((w) => w.word);
+    expect(new Set(words).size).toBe(words.length);
+  });
+
+  it('every entry has non-empty required fields', () => {
+    for (const w of he) {
+      expect(w.word.trim().length).toBeGreaterThan(0);
+      expect(w.definition.trim().length).toBeGreaterThan(0);
+      expect(w.etymology.trim().length).toBeGreaterThan(0);
+      expect(w.example.trim().length).toBeGreaterThan(0);
+      expect(w.funFact.trim().length).toBeGreaterThan(0);
+      expect(w.partOfSpeech.trim().length).toBeGreaterThan(0);
+    }
+  });
+
+  it('every dateKey is a valid ISO date in 2026', () => {
+    for (const w of he) {
+      expect(w.dateKey).toMatch(/^2026-\d{2}-\d{2}$/);
+      expect(Number.isFinite(Date.parse(w.dateKey + 'T00:00:00Z'))).toBe(true);
+    }
+  });
+});
+
 describe('getRotatedTodayWord', () => {
   it('returns the exact-match entry when one exists for that date', () => {
     const entry = getRotatedTodayWord('he', '2026-03-08');
