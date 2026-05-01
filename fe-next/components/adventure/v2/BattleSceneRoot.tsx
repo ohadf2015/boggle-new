@@ -8,6 +8,7 @@ import { BattleScene } from './scenes/BattleScene';
 import { calculateDamage } from '@/lib/adventure/v2/engine/damageCalculator';
 import { isValidWord, isComposableFromTiles } from '@/lib/adventure/v2/engine/wordValidator';
 import { playSfx } from '@/lib/adventure/v2/audio/soundBus';
+import { attachKeyboardBridge, findTileByLetter } from './input/RuneSlateInput';
 import type { TileId, Tile } from '@/lib/adventure/v2/types';
 
 interface Props {
@@ -60,9 +61,21 @@ export function BattleSceneRoot({ onVictory, onDefeat }: Props) {
 
     const unsub = useCombatStore.subscribe(() => syncSceneFromStore());
 
+    const bridge = attachKeyboardBridge({
+      onLetterKey: (letter) => {
+        const s = useCombatStore.getState();
+        if (s.fsmState.type !== 'player_compose') return;
+        const tileId = findTileByLetter(s.tiles, s.fsmState.tilesUsed, letter);
+        if (tileId !== null) handleTileTap(tileId, letter);
+      },
+      onBackspace: () => handleUndo(),
+      onEnter: () => handleSubmit(),
+    });
+
     return () => {
       mounted = false;
       unsub();
+      bridge.destroy();
       if (enemyTurnTimerRef.current) clearTimeout(enemyTurnTimerRef.current);
       sceneRef.current?.destroy({ children: true });
       appRef.current?.destroy(true, { children: true, texture: true });
