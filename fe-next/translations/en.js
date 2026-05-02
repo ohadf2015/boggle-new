@@ -4959,6 +4959,16 @@ const en = {
     }
   },
   "practice": {
+    "modifier": {
+      "todayLabel": "Today's twist",
+      "bonus": "{{x}}× bonus",
+      "vowelOnly": "Vowel-only",
+      "vowelOnlyDesc": "Words made only of vowels",
+      "doubleLetter": "Double-letter",
+      "doubleLetterDesc": "Words with adjacent matching letters",
+      "sWords": "S-words",
+      "sWordsDesc": "Words starting with S"
+    },
     "header": "Practice Mode",
     "instructions": "Swipe letters to find words. No rush!",
     "wordsFound": "Words Found",

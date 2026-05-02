@@ -4863,6 +4863,16 @@ const he = {
     }
   },
   "practice": {
+    "modifier": {
+      "todayLabel": "האתגר של היום",
+      "bonus": "בונוס {{x}}×",
+      "vowelOnly": "תנועות בלבד",
+      "vowelOnlyDesc": "מילים מתנועות בלבד",
+      "doubleLetter": "אות כפולה",
+      "doubleLetterDesc": "מילים עם אותיות סמוכות זהות",
+      "sWords": "מילים בש׳",
+      "sWordsDesc": "מילים שמתחילות בש׳"
+    },
     "header": "מצב אימון",
     "instructions": "החליקו על אותיות ליצירת מילים (3+ אותיות)",
     "reset": "איפוס",

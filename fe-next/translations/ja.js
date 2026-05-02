@@ -4838,6 +4838,16 @@ const ja = {
     }
   },
   "practice": {
+    "modifier": {
+      "todayLabel": "今日のお題",
+      "bonus": "{{x}}×ボーナス",
+      "vowelOnly": "母音のみ",
+      "vowelOnlyDesc": "母音だけの単語",
+      "doubleLetter": "ダブルレター",
+      "doubleLetterDesc": "同じ文字が連続する単語",
+      "sWords": "Sの単語",
+      "sWordsDesc": "Sで始まる単語"
+    },
     "header": "練習モード",
     "instructions": "文字をスワイプして単語を作ろう（3文字以上）",
     "found": "ナイス！見つけた！",

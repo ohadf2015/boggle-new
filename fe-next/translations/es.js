@@ -4883,6 +4883,16 @@ const es = {
     }
   },
   "practice": {
+    "modifier": {
+      "todayLabel": "Reto de hoy",
+      "bonus": "Bonificación {{x}}×",
+      "vowelOnly": "Solo vocales",
+      "vowelOnlyDesc": "Palabras solo de vocales",
+      "doubleLetter": "Letra doble",
+      "doubleLetterDesc": "Palabras con letras dobles",
+      "sWords": "Palabras con S",
+      "sWordsDesc": "Palabras que empiezan con S"
+    },
     "header": "Practica",
     "instructions": "Desliza para formar palabras",
     "wordsFound": "Encontradas",

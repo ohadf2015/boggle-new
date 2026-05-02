@@ -4853,6 +4853,16 @@ const sv = {
     }
   },
   "practice": {
+    "modifier": {
+      "todayLabel": "Dagens utmaning",
+      "bonus": "{{x}}× bonus",
+      "vowelOnly": "Endast vokaler",
+      "vowelOnlyDesc": "Ord med bara vokaler",
+      "doubleLetter": "Dubbel bokstav",
+      "doubleLetterDesc": "Ord med dubbla bokstäver",
+      "sWords": "S-ord",
+      "sWordsDesc": "Ord som börjar på S"
+    },
     "header": "Övningsläge",
     "instructions": "Svep över bokstäver för att bilda ord (3+ bokstäver)",
     "found": "Snyggt! Ord hittat!",
