@@ -13,6 +13,7 @@ import { clearSessionPreservingUsername } from '@/utils/session';
 import { hasPlayedWordHuntToday } from '@/utils/dailyChallenge/storage';
 import type { Language } from '@/shared/types/game';
 import useReducedMotion from '@/hooks/useReducedMotion';
+import { usePracticeStreak } from '@/hooks/usePracticeStreak';
 import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
 import {
@@ -219,6 +220,15 @@ const PracticeResults = memo(function PracticeResults({
     reducedMotion ? 0 : 0.3,
   );
 
+  // ─── Practice streak (break-proof) — record once on mount ───
+  const { current: practiceStreak, record: recordPracticeStreak } = usePracticeStreak();
+  const streakRecordedRef = useRef(false);
+  useEffect(() => {
+    if (streakRecordedRef.current) return;
+    streakRecordedRef.current = true;
+    recordPracticeStreak();
+  }, [recordPracticeStreak]);
+
   // ─── Confetti on mount — celebratory for all tiers ───
   const confettiFired = useRef(false);
   useEffect(() => {
@@ -327,6 +337,21 @@ const PracticeResults = memo(function PracticeResults({
             >
               {t('practiceResults.wordsFound', { count: validWordCount })}
             </motion.p>
+
+            {/* Practice streak chip — break-proof, increments per UTC day */}
+            {practiceStreak > 0 && (
+              <motion.div
+                initial={reducedMotion ? false : { scale: 0, rotate: -8 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.55, type: 'spring', stiffness: 380, damping: 18 }}
+                data-testid="practice-streak-chip"
+                className="mt-3 inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-orange px-3 py-1 font-black text-neo-black"
+                aria-label={`Practice streak: ${practiceStreak} days`}
+              >
+                <span aria-hidden>🔥</span>
+                <span className="text-sm">×{practiceStreak}</span>
+              </motion.div>
+            )}
 
             {/* Subtitle */}
             <motion.p
