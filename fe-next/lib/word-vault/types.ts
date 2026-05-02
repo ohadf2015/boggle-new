@@ -31,6 +31,8 @@ export type CipherJar = {
   scrambled: string;
   answer: string;
   isRedHerring?: boolean;
+  /** Category hint shown when player opens the jar (e.g. "מצרך אפייה") */
+  hint?: LocalizedText;
 };
 
 export type CipherRiddle = {

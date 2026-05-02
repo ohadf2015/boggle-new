@@ -88,10 +88,31 @@ export const BOOK_1_HEARTH_ROOMS: RoomConfig[] = [
     riddle: {
       engine: 'cipher',
       jars: [
-        { id: 'jar-sugar', scrambled: 'רכוס', answer: 'סוכר' },
-        { id: 'jar-flour', scrambled: 'חמק', answer: 'קמח' },
-        { id: 'jar-bread', scrambled: 'חמל', answer: 'לחם' },
-        { id: 'jar-red', scrambled: 'חתפ', answer: 'פתח', isRedHerring: true },
+        {
+          id: 'jar-sugar',
+          scrambled: 'רכוס',
+          answer: 'סוכר',
+          hint: { he: 'מתוק, נמס בכוס תה', en: 'Sweet, dissolves in tea' },
+        },
+        {
+          id: 'jar-flour',
+          scrambled: 'חמק',
+          answer: 'קמח',
+          hint: { he: 'אבקה לבנה לאפייה', en: 'White powder for baking' },
+        },
+        {
+          id: 'jar-bread',
+          scrambled: 'חמל',
+          answer: 'לחם',
+          hint: { he: 'יוצא מן התנור, נחתך לפרוסות', en: 'Comes from the oven, sliced' },
+        },
+        {
+          id: 'jar-red',
+          scrambled: 'חתפ',
+          answer: 'פתח',
+          isRedHerring: true,
+          hint: { he: 'פעולה — לא מצרך', en: 'An action — not an ingredient' },
+        },
       ],
     },
     rewards: { coins: 25 },

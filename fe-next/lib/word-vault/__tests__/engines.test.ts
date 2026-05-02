@@ -104,6 +104,17 @@ describe('cipherEngine', () => {
     expect(result.reason).toBe('red-herring');
   });
 
+  it('judgeCipherAttempt distinguishes wrong-word (valid anagram, wrong target) from no-match', () => {
+    // bread jar: scrambled='חמל', answer='לחם'. 'מלח' (salt) is also a valid anagram of those letters.
+    const breadJar = { id: 'j-bread', scrambled: 'חמל', answer: 'לחם' };
+    const valid = judgeCipherAttempt(breadJar, 'מלח');
+    if (valid.ok) throw new Error('expected reject');
+    expect(valid.reason).toBe('wrong-word');
+    const garbage = judgeCipherAttempt(breadJar, 'אבג');
+    if (garbage.ok) throw new Error('expected reject');
+    expect(garbage.reason).toBe('no-match');
+  });
+
   it('isRiddleSolved requires all non-herring jars', () => {
     const set1 = new Set(['j-sugar']);
     expect(isRiddleSolved(cipher, set1)).toBe(false);

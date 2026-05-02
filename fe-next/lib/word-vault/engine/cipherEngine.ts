@@ -11,7 +11,7 @@ export function isAnagramOf(candidate: string, target: string): boolean {
 
 export type CipherJudgement =
   | { ok: true; jarId: string; matched: string }
-  | { ok: false; reason: 'no-match' | 'red-herring' };
+  | { ok: false; reason: 'no-match' | 'red-herring' | 'wrong-word' };
 
 export function judgeCipherAttempt(
   jar: CipherJar,
@@ -24,7 +24,7 @@ export function judgeCipherAttempt(
     return { ok: false, reason: 'red-herring' };
   }
   if (normalizeHebrewFinalForms(candidate) !== normalizeHebrewFinalForms(jar.answer)) {
-    return { ok: false, reason: 'no-match' };
+    return { ok: false, reason: 'wrong-word' };
   }
   return { ok: true, jarId: jar.id, matched: jar.answer };
 }

@@ -43,23 +43,65 @@ export function HubFoyer({ store, onEnterRoom }: HubFoyerProps) {
         </span>
       </header>
 
-      <div className="relative flex flex-1 flex-col items-center justify-center gap-6 px-6 py-10 bg-gradient-to-b from-[#0e1a2b] to-[#0b1220]">
-        <h1 className="font-fredoka text-5xl font-black tracking-tight text-lime-300 sm:text-6xl">
+      <div
+        className="relative flex flex-1 flex-col items-center justify-center gap-4 overflow-hidden px-6 py-8"
+        style={{
+          backgroundImage:
+            "radial-gradient(ellipse at 50% 100%, rgba(255,107,53,0.18) 0%, transparent 55%), linear-gradient(180deg, #0b1220 0%, #11182f 60%, #1a0e0e 100%)",
+        }}
+      >
+        {/* Cinder villain mascot — Book 1 boss preview, lurking */}
+        <img
+          src="/word-vault/villains/cinder.png"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-6 -left-6 h-44 w-44 select-none object-contain opacity-50 sm:h-56 sm:w-56"
+          style={{ filter: 'drop-shadow(0 0 24px rgba(255,107,53,0.5))' }}
+        />
+
+        {/* Librarian — guide, on the right */}
+        <img
+          src="/word-vault/characters/librarian.png"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-2 right-2 h-40 w-40 select-none object-contain sm:h-56 sm:w-56"
+        />
+
+        {/* Melo — hero, between us and the page */}
+        <img
+          src="/word-vault/characters/melo.png"
+          alt="מלו"
+          className="pointer-events-none relative z-10 h-32 w-32 select-none object-contain drop-shadow-[3px_3px_0_rgba(0,0,0,0.6)] sm:h-40 sm:w-40"
+        />
+
+        {/* Ember particles */}
+        <EmberParticles />
+
+        <h1 className="relative z-10 font-fredoka text-5xl font-black tracking-tight text-lime-300 drop-shadow-[3px_3px_0_#000] sm:text-6xl">
           מרתף המילים
         </h1>
-        <p className="font-rubik text-lg text-white/70">ספר 1 — אולמות האח</p>
-        <ul className="flex w-full max-w-sm flex-col gap-3 pt-4">
+        <p className="relative z-10 font-rubik text-base text-white/70">ספר 1 — אולמות האח</p>
+        <ul className="relative z-10 flex w-full max-w-sm flex-col gap-3 pt-2">
           {HUB_BUTTONS.map((b) => (
             <li key={b.id}>
               <button
                 type="button"
                 onClick={() => setActivePanel(b.id)}
-                className="w-full rounded-md border-4 border-white bg-pink-400 px-6 py-3 text-center font-fredoka text-xl font-bold text-[#0b1220] shadow-[4px_4px_0_0_#000] transition hover:bg-lime-300"
+                className="w-full rounded-md border-4 border-white bg-pink-400 px-6 py-3 text-center font-fredoka text-xl font-bold text-[#0b1220] shadow-[4px_4px_0_0_#000] transition hover:bg-lime-300 active:translate-y-[2px] active:shadow-[2px_2px_0_0_#000]"
               >
                 {b.labelHe}
               </button>
             </li>
           ))}
+          <li className="pt-2">
+            <button
+              type="button"
+              onClick={() => onEnterRoom('room-1-6')}
+              className="w-full rounded-md border-4 border-orange-300 bg-[#1a0e0e] px-6 py-3 text-center font-fredoka text-lg font-bold text-orange-300 shadow-[4px_4px_0_0_#000] transition hover:bg-orange-300 hover:text-[#0b1220]"
+            >
+              ▶ קרב סינדר (פלייטסט)
+            </button>
+          </li>
         </ul>
       </div>
 
@@ -150,6 +192,53 @@ const PANEL_TITLES: Record<string, string> = {
   shop: 'חנות',
   settings: 'הגדרות',
 };
+
+function EmberParticles() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden motion-reduce:hidden"
+    >
+      {Array.from({ length: 14 }).map((_, i) => {
+        const left = (i * 7.3) % 100;
+        const delay = (i * 0.7) % 8;
+        const dur = 6 + (i % 5);
+        const size = 3 + (i % 3);
+        return (
+          <span
+            key={i}
+            className="absolute bottom-0 rounded-full bg-orange-400"
+            style={{
+              left: `${left}%`,
+              width: `${size}px`,
+              height: `${size}px`,
+              animation: `wv-ember ${dur}s ${delay}s linear infinite`,
+              filter: 'blur(1px)',
+            }}
+          />
+        );
+      })}
+      <style jsx>{`
+        @keyframes wv-ember {
+          0% {
+            transform: translateY(0) translateX(0) scale(1);
+            opacity: 0;
+          }
+          10% {
+            opacity: 0.85;
+          }
+          80% {
+            opacity: 0.6;
+          }
+          100% {
+            transform: translateY(-100vh) translateX(20px) scale(0.4);
+            opacity: 0;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
 
 function PlaceholderPanel({ panelId, onClose }: PlaceholderPanelProps) {
   return (

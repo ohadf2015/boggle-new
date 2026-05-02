@@ -7,6 +7,8 @@ import type { WordVaultStore } from '@/lib/word-vault/state/gameStore';
 import { WordConstraintRiddle } from './riddles/WordConstraintRiddle';
 import { CipherRiddle } from './riddles/CipherRiddle';
 import { LogicSequenceRiddle } from './riddles/LogicSequenceRiddle';
+import { CinderBossFight } from './scenes/CinderBossFight';
+import { DarkDoorScene } from './scenes/DarkDoorScene';
 
 interface RoomShellProps {
   store: WordVaultStore;
@@ -55,9 +57,110 @@ export function RoomShell({ store, roomId, onExit }: RoomShellProps) {
     );
   }
 
+  // Room 1.1: full-screen escape-room scene (dark door)
+  if (room.id === 'room-1-1') {
+    return (
+      <div className="relative flex min-h-[100dvh] flex-col text-white">
+        <DarkDoorScene
+          onSolved={() => {
+            handleSolve();
+            onExit();
+          }}
+          onExit={onExit}
+        />
+      </div>
+    );
+  }
+
+  // Room 1.6: full-screen boss fight scene replaces the riddle panel
+  if (room.id === 'room-1-6') {
+    return (
+      <div className="relative flex min-h-[100dvh] flex-col text-white">
+        <header className="relative z-20 flex items-center justify-between border-b-4 border-white/10 bg-[#0b1220]/90 px-4 py-3">
+          <button
+            type="button"
+            onClick={onExit}
+            className="rounded border-2 border-white/40 px-3 py-1 text-sm text-white"
+          >
+            ← חזרה
+          </button>
+          <h1 className="font-fredoka text-xl font-bold text-orange-300">{room.title.he}</h1>
+          <span className="w-16" />
+        </header>
+        <CinderBossFight
+          onVictoryMercy={() => {
+            handleSolve();
+            onExit();
+          }}
+          onVictoryDamage={() => {
+            // damage win = bad ending, but still mark solved for prototype
+            handleSolve();
+            onExit();
+          }}
+          onDefeat={() => {
+            // restart fight on defeat (prototype: just exit)
+            onExit();
+          }}
+        />
+      </div>
+    );
+  }
+
+  const isHearthRoom = room.chapter === 1;
+  const isRedemptionRoom = room.id === 'room-1-6';
+
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-gradient-to-b from-[#1a0e0e] via-[#0b1220] to-[#0b1220] text-white">
-      <header className="flex items-center justify-between border-b-4 border-white/10 bg-[#0b1220]/90 px-4 py-3">
+    <div className="relative flex min-h-[100dvh] flex-col overflow-hidden text-white">
+      {/* Hearth atmosphere — only Book 1 */}
+      {isHearthRoom && (
+        <>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-0 opacity-50"
+            style={{
+              backgroundImage: "url('/word-vault/bg/hearth-halls.jpg')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              filter: 'brightness(0.45) saturate(1.15)',
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-0"
+            style={{
+              background:
+                'radial-gradient(ellipse at 50% 100%, rgba(255,107,53,0.28) 0%, transparent 60%), linear-gradient(180deg, rgba(11,18,32,0.55) 0%, rgba(26,14,14,0.7) 100%)',
+            }}
+          />
+          {/* Cinder villain mascot — small lurker most rooms, large confrontation in 1.6 */}
+          <img
+            src="/word-vault/villains/cinder.png"
+            alt=""
+            aria-hidden={!isRedemptionRoom}
+            className={
+              isRedemptionRoom
+                ? 'pointer-events-none absolute right-1/2 top-20 z-0 h-72 w-72 translate-x-1/2 select-none object-contain opacity-90 sm:h-96 sm:w-96'
+                : 'pointer-events-none absolute -top-4 -left-4 z-0 h-32 w-32 select-none object-contain opacity-60 sm:h-40 sm:w-40'
+            }
+            style={{
+              filter: isRedemptionRoom
+                ? 'drop-shadow(0 0 40px rgba(255,107,53,0.95))'
+                : 'drop-shadow(0 0 20px rgba(255,107,53,0.6))',
+              animation: isRedemptionRoom ? 'wv-rage 3.5s ease-in-out infinite' : undefined,
+            }}
+          />
+          {isRedemptionRoom && (
+            <style jsx global>{`
+              @keyframes wv-rage {
+                0%, 100% { transform: translateX(50%) scale(1); }
+                50% { transform: translateX(50%) scale(1.04); }
+              }
+            `}</style>
+          )}
+        </>
+      )}
+
+      <header className="relative z-10 flex items-center justify-between border-b-4 border-white/10 bg-[#0b1220]/90 px-4 py-3 backdrop-blur-sm">
         <button
           type="button"
           onClick={onExit}
@@ -69,11 +172,11 @@ export function RoomShell({ store, roomId, onExit }: RoomShellProps) {
         <span className="w-16" />
       </header>
 
-      <p className="px-6 pt-4 font-rubik text-sm leading-relaxed text-white/80">
+      <p className="relative z-10 px-6 pt-4 font-rubik text-sm leading-relaxed text-white/80">
         {room.storyBeat.he}
       </p>
 
-      <main className="flex flex-1 items-center justify-center p-6">
+      <main className="relative z-10 flex flex-1 items-center justify-center p-6">
         {room.riddle.engine === 'word-constraint' && (
           <WordConstraintRiddle
             riddle={room.riddle}
