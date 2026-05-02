@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable @next/next/no-img-element -- Boss-fight character sprites; next/image not needed. */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -157,7 +158,7 @@ export function CinderBossFight({
 
     // counter-attack on a tick
     setTimeout(cinderCounter, 600);
-  }, [outcome, word, selected, phase, mercy, pushFloat, refillLetters, onVictoryDamage, onVictoryMercy, cinderCounter]);
+  }, [outcome, word, selected, phase, mercy, pushFloat, refillLetters, cinderCounter]);
 
   // Defeat detection
   useEffect(() => {

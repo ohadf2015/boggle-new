@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable @next/next/no-img-element -- Decorative character sprites; next/image not needed. */
 
 import { useMemo } from 'react';
 import { useStore } from 'zustand';

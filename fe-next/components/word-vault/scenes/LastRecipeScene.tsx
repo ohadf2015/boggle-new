@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable @next/next/no-img-element -- Decorative character sprites; next/image not needed. */
 
 import { useCallback, useState } from 'react';
 import { EmberOverlay } from '@/components/word-vault/pixi/EmberOverlay';
@@ -242,7 +243,7 @@ export function LastRecipeScene({ onSolved, onExit }: Props) {
             className="rounded-md border-2 border-orange-300/50 bg-[#1a0808]/95 px-4 py-2 font-rubik text-base"
             style={{ color: 'rgba(255,225,180,0.95)', textShadow: '0 0 12px rgba(255,107,53,0.5)', animation: 'wv-toast 2.4s ease-out forwards' }}
           >
-            "{whisper}"
+            {`"${whisper}"`}
           </p>
         </div>
       )}
@@ -310,7 +311,7 @@ export function LastRecipeScene({ onSolved, onExit }: Props) {
             dir="rtl"
           >
             הלבה התקררה. הסדקים נסגרו. רגע אחד הוא חזר —
-            חיבק את מלו, לחש "תודה",
+            {'חיבק את מלו, לחש "תודה",'}
             ונעלם, השאיר אחריו ספר מתכונים, קמע, ושיר אותיות.
           </p>
           <button

@@ -209,7 +209,7 @@ export function OldKitchenScene({ onSolved, onExit }: Props) {
             style={{ color: 'rgba(255,235,200,0.98)', textShadow: '2px 2px 0 #000, 0 0 18px rgba(255,180,80,0.6)' }}
             dir="rtl"
           >
-            "{FINAL_LINE_HE}"
+            {`"${FINAL_LINE_HE}"`}
           </p>
           <button
             type="button"

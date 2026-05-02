@@ -303,7 +303,7 @@ export function ColdStoveScene({ onSolved, onExit }: Props) {
             style={{ color: 'rgba(255,225,180,0.95)', textShadow: '2px 2px 0 #000, 0 0 18px rgba(255,140,60,0.6)' }}
             dir="rtl"
           >
-            "{SECRET_PHRASE_HE}"
+            {`"${SECRET_PHRASE_HE}"`}
           </p>
           <button
             type="button"

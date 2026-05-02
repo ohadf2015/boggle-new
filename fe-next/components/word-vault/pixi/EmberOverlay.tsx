@@ -38,6 +38,7 @@ export function EmberOverlay({
     if (!active) return;
     if (typeof window === 'undefined') return;
 
+    const state = stateRef.current;
     let cancelled = false;
     let cleanupFn: (() => void) | null = null;
 
@@ -207,10 +208,10 @@ export function EmberOverlay({
 
     return () => {
       cancelled = true;
-      stateRef.current.destroyed = true;
+      state.destroyed = true;
       if (cleanupFn) cleanupFn();
-      if (stateRef.current.cleanup) stateRef.current.cleanup();
-      stateRef.current.addBurst = null;
+      if (state.cleanup) state.cleanup();
+      state.addBurst = null;
     };
   }, [active, density, tint, intensity]);
 

@@ -50,7 +50,10 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
   }
 
   const activeJar = activeJarId ? JARS.find((j) => j.id === activeJarId) : null;
-  const activeArrangement = activeJarId ? arrangements[activeJarId] ?? [] : [];
+  const activeArrangement = useMemo(
+    () => (activeJarId ? arrangements[activeJarId] ?? [] : []),
+    [activeJarId, arrangements],
+  );
 
   const availableForActive = useMemo(() => {
     if (!activeJar) return [];
@@ -180,7 +183,7 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
           dir="rtl"
         >
           <p className="text-center font-rubik text-sm" style={{ color: 'rgba(255,225,180,0.7)' }}>
-            <em>"{activeJar.hintHe}"</em>
+            <em>{`"${activeJar.hintHe}"`}</em>
           </p>
           {/* Built word slots */}
           <div className="mt-3 flex items-center justify-center gap-2">
@@ -303,7 +306,7 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
             style={{ color: 'rgba(220,235,255,0.95)', textShadow: '2px 2px 0 #000, 0 0 18px rgba(120,200,255,0.5)' }}
             dir="rtl"
           >
-            "{SECRET_PHRASE_HE}"
+            {`"${SECRET_PHRASE_HE}"`}
           </p>
           <button
             type="button"

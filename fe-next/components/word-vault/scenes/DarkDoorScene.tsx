@@ -239,7 +239,7 @@ export function DarkDoorScene({ onSolved, onExit }: Props) {
       setTrace([]);
       traceRef.current = [];
     }, 250);
-  }, [tracing, cells, onSolved, pushWhisper]);
+  }, [tracing, cells, pushWhisper]);
 
   const traceSet = useMemo(() => new Set(trace), [trace]);
 
