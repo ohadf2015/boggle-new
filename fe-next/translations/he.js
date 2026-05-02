@@ -1303,6 +1303,12 @@ const he = {
     }
   },
   "multiplayer": {
+    "postRound": {
+      "title": "במהלך הסיבוב שלך",
+      "joined": "{{count}} הצטרפו",
+      "left": "{{count}} עזבו",
+      "achievements": "{{count}} הישגים נפתחו"
+    },
     "mode": "מצב משחק",
     "timer": "טיימר",
     "subtitle": "התחרו עם חברים בזמן אמת",

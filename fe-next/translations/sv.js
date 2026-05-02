@@ -5753,6 +5753,12 @@ const sv = {
     "unblock": "Avblockera"
   },
   "multiplayer": {
+    "postRound": {
+      "title": "Under din runda",
+      "joined": "{{count}} anslöt",
+      "left": "{{count}} lämnade",
+      "achievements": "{{count}} prestationer upplåsta"
+    },
     "mode": "Läge",
     "timer": "Timer",
     "subtitle": "Tävla med vänner i realtid",

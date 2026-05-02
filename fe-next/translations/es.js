@@ -5773,6 +5773,12 @@ const es = {
     "unblock": "Desbloquear"
   },
   "multiplayer": {
+    "postRound": {
+      "title": "Durante tu ronda",
+      "joined": "{{count}} se unieron",
+      "left": "{{count}} salieron",
+      "achievements": "{{count}} logros desbloqueados"
+    },
     "mode": "Modo",
     "timer": "Tiempo",
     "subtitle": "Compite con amigos en tiempo real",

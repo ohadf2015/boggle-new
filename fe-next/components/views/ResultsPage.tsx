@@ -34,6 +34,7 @@ const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr
 import { ResultsModals } from '@/components/results/ResultsModals';
 import { ResultsMainContent, type ResultsMainContentProps } from '@/components/results/ResultsMainContent';
 import { ResultsDetailsContent, type ResultsDetailsContentProps } from '@/components/results/ResultsDetailsContent';
+import { PostRoundSummary } from '@/components/results/PostRoundSummary';
 import type { WordHuntResultsSummaryProps } from '@/components/results/WordHuntResultsSummary';
 const StickyReadyBar = dynamic(() => import('@/components/results/StickyReadyBar'), { ssr: false });
 const PostGameSocialActions = dynamic(() => import('@/components/results/PostGameSocialActions'), { ssr: false });
@@ -541,13 +542,29 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     return wordMap;
   }, [deferredFinalScoresForWords]);
 
-  // Pre-generate next grid during results (Brawl Stars-style: zero delay on start)
-  const preGeneratedGrid = useMemo(() => {
+  // Pre-generate next grid AFTER first paint (Brawl Stars-style: zero delay on
+  // rematch). Running this in a useMemo during render blocked the first frame —
+  // 6 candidate boards × richness solver on the main thread. Defer to idle so
+  // results paint instantly; if host hits rematch before idle fires,
+  // handleStartGame falls back to a single sync generation.
+  type Grid = string[][];
+  const [preGeneratedGrid, setPreGeneratedGrid] = useState<Grid | null>(null);
+  useEffect(() => {
     const difficultyConfig = DIFFICULTIES.MEDIUM;
-    return pickRichestBoardClient(
+    const generate = () => pickRichestBoardClient(
       () => generateRandomTable(difficultyConfig.rows, difficultyConfig.cols, roomLanguage, []),
-      roomLanguage
+      roomLanguage,
     );
+    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback;
+    if (typeof ric === 'function') {
+      const id = ric(() => setPreGeneratedGrid(generate()), { timeout: 1500 });
+      return () => {
+        const cic = (window as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback;
+        if (typeof cic === 'function') cic(id);
+      };
+    }
+    const t = setTimeout(() => setPreGeneratedGrid(generate()), 0);
+    return () => clearTimeout(t);
   }, [roomLanguage]);
 
   const startGameTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -561,13 +578,21 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     if (!socket || !isHost) return;
     logger.log('[RESULTS] Host starting new game from results page');
 
+    // If idle pre-generation hasn't completed yet, fall back to synchronous
+    // generation here (rare — only if host clicks rematch within ~1 frame
+    // of mount).
+    const gridForGame = preGeneratedGrid ?? pickRichestBoardClient(
+      () => generateRandomTable(DIFFICULTIES.MEDIUM.rows, DIFFICULTIES.MEDIUM.cols, roomLanguage, []),
+      roomLanguage,
+    );
+
     // Timeout guard: if resetGame callback never fires (socket issue), recover
     let callbackFired = false;
     startGameTimeoutRef.current = setTimeout(() => {
       if (!callbackFired) {
         logger.debug('[RESULTS] resetGame callback timed out — attempting startGame anyway');
         socket.emit('startGame', {
-          letterGrid: preGeneratedGrid,
+          letterGrid: gridForGame,
           timerSeconds: 120,
           language: roomLanguage,
           hostPlaying: true,
@@ -588,7 +613,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         logger.log('[RESULTS] Game reset confirmed, starting new game');
 
         socket.emit('startGame', {
-          letterGrid: preGeneratedGrid,
+          letterGrid: gridForGame,
           timerSeconds: 120,
           language: roomLanguage,
           hostPlaying: true,
@@ -817,6 +842,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         onDismiss={dismissNudge}
         mpGamesThisSession={mpNudgeStats.mpGamesThisSession}
       />
+
+      {/* What you missed during your round — drains MidRoundEventQueue */}
+      <PostRoundSummary />
 
       <div
         className="flex-1 flex flex-col min-h-0 bg-neo-navy transition-colors duration-300 relative"

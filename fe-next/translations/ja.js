@@ -5686,6 +5686,12 @@ const ja = {
     "multiplayer": "マルチプレイヤー"
   },
   "multiplayer": {
+    "postRound": {
+      "title": "ラウンド中の出来事",
+      "joined": "{{count}}人参加",
+      "left": "{{count}}人退出",
+      "achievements": "実績{{count}}個解除"
+    },
     "mode": "モード",
     "timer": "タイマー",
     "subtitle": "友達とリアルタイムで競争",

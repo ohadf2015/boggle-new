@@ -5820,6 +5820,12 @@ const en = {
     "multiplayer": "Multiplayer"
   },
   "multiplayer": {
+    "postRound": {
+      "title": "During your round",
+      "joined": "{{count}} joined",
+      "left": "{{count}} left",
+      "achievements": "{{count}} achievements unlocked"
+    },
     "mode": "Mode",
     "timer": "Timer",
     "subtitle": "Compete with friends in real-time",
