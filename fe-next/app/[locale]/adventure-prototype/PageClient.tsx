@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { BattleSceneRoot } from '@/components/adventure/v2/BattleSceneRoot';
 import { BetweenFightsScreen, RunCompleteScreen, type FightOutcome } from '@/components/adventure/v2/RunScreens';
 import { UpgradePicker } from '@/components/adventure/v2/UpgradePicker';
+import { TreasureRoom, CampRoom, BossIntroScreen } from '@/components/adventure/v2/RoomScreens';
 import { useCombatStore } from '@/lib/adventure/v2/state/runStore';
 import { loadHeDict, isHeDictLoaded } from '@/lib/adventure/v2/engine/__protoDictHe';
 import { pickRandomUpgradeChoices, type UpgradeId } from '@/lib/adventure/v2/upgrades';
@@ -13,12 +14,23 @@ interface PageClientProps {
   locale: Locale;
 }
 
-const FIGHT_COUNT = 3;
+// Run sequence: combat → treasure → combat → camp → BOSS
+type RoomKind = 'combat' | 'treasure' | 'camp' | 'boss';
+const RUN_SEQUENCE: RoomKind[] = ['combat', 'treasure', 'combat', 'camp', 'boss'];
+const COMBAT_COUNT = RUN_SEQUENCE.filter((r) => r === 'combat' || r === 'boss').length; // 3
 
-type RunStatus = 'pre-fight' | 'fighting' | 'between' | 'run-victory' | 'run-defeat';
+type RunStatus =
+  | 'pre-fight' // upgrade picker before a combat
+  | 'fighting'
+  | 'between' // post-victory summary
+  | 'treasure'
+  | 'camp'
+  | 'boss-intro'
+  | 'run-victory'
+  | 'run-defeat';
 
 interface RunState {
-  fightIndex: number;
+  roomIndex: number; // index into RUN_SEQUENCE
   outcomes: FightOutcome[];
   status: RunStatus;
   equipped: UpgradeId[];
@@ -27,12 +39,23 @@ interface RunState {
 
 function makeInitialRun(): RunState {
   return {
-    fightIndex: 0,
+    roomIndex: 0,
     outcomes: [],
     status: 'pre-fight',
     equipped: [],
     pickerChoices: pickRandomUpgradeChoices([], 3),
   };
+}
+
+function combatNumber(roomIndex: number): number {
+  // Count combats / boss up to and including this room
+  return RUN_SEQUENCE.slice(0, roomIndex + 1).filter(
+    (r) => r === 'combat' || r === 'boss',
+  ).length;
+}
+
+function isBossNext(run: RunState): boolean {
+  return RUN_SEQUENCE[run.roomIndex] === 'boss';
 }
 
 export function PageClient({ locale }: PageClientProps) {
@@ -56,22 +79,53 @@ export function PageClient({ locale }: PageClientProps) {
     };
   }, [locale, dictReady]);
 
-  const onVictory = useCallback(() => {
-    setRun((s) => {
-      const isLast = s.fightIndex >= FIGHT_COUNT - 1;
-      if (isLast) {
-        return {
-          ...s,
-          outcomes: [...s.outcomes, 'win'],
-          status: 'run-victory',
-        };
+  const startFight = useCallback(
+    (equipped: UpgradeId[], isBoss: boolean) => {
+      setResetKey((k) => k + 1);
+      useCombatStore.getState().startNewBattle(locale, equipped);
+      // Boss buff: +60% enemy HP
+      if (isBoss) {
+        const s = useCombatStore.getState();
+        useCombatStore.setState({
+          enemyMaxHp: Math.floor(s.enemyMaxHp * 1.6),
+          enemyHp: Math.floor(s.enemyMaxHp * 1.6),
+        });
       }
-      return {
-        ...s,
-        outcomes: [...s.outcomes, 'win'],
-        status: 'between',
-      };
-    });
+      useCombatStore.getState().dispatch({ type: 'START_TURN' });
+    },
+    [locale],
+  );
+
+  const advanceToNextRoom = useCallback(
+    (newRun: RunState) => {
+      const nextIdx = newRun.roomIndex + 1;
+      if (nextIdx >= RUN_SEQUENCE.length) {
+        setRun({ ...newRun, status: 'run-victory' });
+        return;
+      }
+      const nextKind = RUN_SEQUENCE[nextIdx];
+      const updated: RunState = { ...newRun, roomIndex: nextIdx };
+      if (nextKind === 'combat') {
+        updated.status = 'pre-fight';
+        updated.pickerChoices = pickRandomUpgradeChoices(updated.equipped, 3);
+      } else if (nextKind === 'treasure') {
+        updated.status = 'treasure';
+      } else if (nextKind === 'camp') {
+        updated.status = 'camp';
+      } else if (nextKind === 'boss') {
+        updated.status = 'boss-intro';
+      }
+      setRun(updated);
+    },
+    [],
+  );
+
+  const onVictory = useCallback(() => {
+    setRun((s) => ({
+      ...s,
+      outcomes: [...s.outcomes, 'win'],
+      status: 'between',
+    }));
   }, []);
 
   const onDefeat = useCallback(() => {
@@ -82,35 +136,23 @@ export function PageClient({ locale }: PageClientProps) {
     }));
   }, []);
 
-  const startFight = useCallback(
-    (equipped: UpgradeId[]) => {
-      setResetKey((k) => k + 1);
-      useCombatStore.getState().startNewBattle(locale, equipped);
-      useCombatStore.getState().dispatch({ type: 'START_TURN' });
-    },
-    [locale],
-  );
-
   const continueFromBetween = useCallback(() => {
-    // Transition from victory-summary to upgrade picker
-    setRun((s) => ({
-      ...s,
-      status: 'pre-fight',
-      pickerChoices: pickRandomUpgradeChoices(s.equipped, 3),
-    }));
-  }, []);
+    setRun((s) => {
+      // Advance to next room
+      advanceToNextRoom(s);
+      return s;
+    });
+  }, [advanceToNextRoom]);
 
   const onUpgradePicked = useCallback(
     (id: UpgradeId) => {
       setRun((s) => {
         const nextEquipped = [...s.equipped, id];
-        const nextFightIndex = s.outcomes.length; // 0 before fight 1, 1 between fight 1 & 2, etc.
-        // Start the next fight immediately
-        setTimeout(() => startFight(nextEquipped), 0);
+        const isBoss = RUN_SEQUENCE[s.roomIndex] === 'boss';
+        setTimeout(() => startFight(nextEquipped, isBoss), 0);
         return {
           ...s,
           equipped: nextEquipped,
-          fightIndex: nextFightIndex,
           status: 'fighting',
           pickerChoices: [],
         };
@@ -119,13 +161,52 @@ export function PageClient({ locale }: PageClientProps) {
     [startFight],
   );
 
+  const onTreasurePick = useCallback(
+    (id: 'heal' | 'maxHpUp' | 'randomUpgrade') => {
+      const store = useCombatStore.getState();
+      if (id === 'heal') {
+        store.applyHeroHeal(Math.floor(store.heroMaxHp * 0.5));
+      } else if (id === 'maxHpUp') {
+        store.bumpMaxHp(5, true);
+      } else if (id === 'randomUpgrade') {
+        const choices = pickRandomUpgradeChoices(run.equipped, 1);
+        if (choices.length > 0) {
+          const newId = choices[0];
+          setRun((s) => ({ ...s, equipped: [...s.equipped, newId] }));
+          store.addUpgrade(newId);
+        }
+      }
+      setRun((s) => {
+        advanceToNextRoom(s);
+        return s;
+      });
+    },
+    [advanceToNextRoom, run.equipped],
+  );
+
+  const onCampContinue = useCallback(() => {
+    const store = useCombatStore.getState();
+    store.applyHeroHeal(store.heroMaxHp); // full heal
+    setRun((s) => {
+      advanceToNextRoom(s);
+      return s;
+    });
+  }, [advanceToNextRoom]);
+
+  const onBossIntroContinue = useCallback(() => {
+    setRun((s) => {
+      setTimeout(() => startFight(s.equipped, true), 0);
+      return { ...s, status: 'fighting' };
+    });
+  }, [startFight]);
+
   const startNewRun = useCallback(() => {
     const init = makeInitialRun();
     setRun(init);
-    // Don't start the fight yet; wait for upgrade pick
   }, []);
 
   const isHe = locale === 'he';
+  const currentCombatNum = combatNumber(run.roomIndex);
 
   return (
     <main
@@ -148,7 +229,10 @@ export function PageClient({ locale }: PageClientProps) {
       >
         {isHe ? 'אדוונצ\'ר פרוטוטייפ' : 'Adventure Prototype'}
         <span style={{ marginInlineStart: 12, fontSize: 14, opacity: 0.6 }}>
-          [{locale}] {isHe ? `קרב ${run.fightIndex + 1}/${FIGHT_COUNT}` : `Fight ${run.fightIndex + 1}/${FIGHT_COUNT}`}
+          [{locale}]{' '}
+          {isHe
+            ? `קרב ${currentCombatNum}/${COMBAT_COUNT}`
+            : `Combat ${currentCombatNum}/${COMBAT_COUNT}`}
         </span>
       </h1>
       <p
@@ -161,8 +245,8 @@ export function PageClient({ locale }: PageClientProps) {
         }}
       >
         {isHe
-          ? 'הקש על אריחים או הקלד אותיות · Enter כדי לכשף · Backspace לבטל'
-          : 'Tap tiles or type letters · Enter to cast · Backspace to undo'}
+          ? 'גרור אותיות סמוכות · שחרר כדי לכשף'
+          : 'Drag adjacent tiles · release to cast'}
       </p>
 
       {dictError && (
@@ -196,26 +280,40 @@ export function PageClient({ locale }: PageClientProps) {
         <UpgradePicker
           choices={run.pickerChoices}
           isHe={isHe}
-          fightIndex={run.fightIndex}
-          fightCount={FIGHT_COUNT}
+          fightIndex={currentCombatNum - 1}
+          fightCount={COMBAT_COUNT}
           onPick={onUpgradePicked}
           equippedSoFar={run.equipped}
         />
       )}
       {run.status === 'between' && (
         <BetweenFightsScreen
-          fightIndex={run.fightIndex}
-          fightCount={FIGHT_COUNT}
+          fightIndex={currentCombatNum - 1}
+          fightCount={COMBAT_COUNT}
           outcomes={run.outcomes}
           isHe={isHe}
           onContinue={continueFromBetween}
+        />
+      )}
+      {run.status === 'treasure' && (
+        <TreasureRoom isHe={isHe} onPick={onTreasurePick} onContinue={() => {}} />
+      )}
+      {run.status === 'camp' && <CampRoom isHe={isHe} onContinue={onCampContinue} />}
+      {run.status === 'boss-intro' && (
+        <BossIntroScreen
+          isHe={isHe}
+          onContinue={onBossIntroContinue}
+          bossName="THE PRESSURE"
+          bossNameHe="הלחץ"
+          bossSubtitle="Faster reveals. More HP. Bring your build."
+          bossSubtitleHe="חשיפה מהירה יותר. יותר בריאות. הביא את הבנייה שלך."
         />
       )}
       {run.status === 'run-victory' && (
         <RunCompleteScreen
           outcome="victory"
           outcomes={run.outcomes}
-          fightCount={FIGHT_COUNT}
+          fightCount={COMBAT_COUNT}
           isHe={isHe}
           onNewRun={startNewRun}
         />
@@ -224,7 +322,7 @@ export function PageClient({ locale }: PageClientProps) {
         <RunCompleteScreen
           outcome="defeat"
           outcomes={run.outcomes}
-          fightCount={FIGHT_COUNT}
+          fightCount={COMBAT_COUNT}
           isHe={isHe}
           onNewRun={startNewRun}
         />

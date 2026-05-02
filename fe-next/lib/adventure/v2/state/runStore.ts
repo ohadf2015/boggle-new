@@ -50,6 +50,8 @@ interface CombatStore extends CombatModel {
   addUpgrade: (id: UpgradeId) => void;
   /** Apply hero heal capped at heroMaxHp. */
   applyHeroHeal: (amount: number) => void;
+  /** Permanently bump max HP for the run (treasure reward). */
+  bumpMaxHp: (amount: number, healToo?: boolean) => void;
   /** Reset shield to armed (call at fight start). */
   armWordShield: () => void;
   /** Try to consume the shield. Returns true if blocked. */
@@ -194,6 +196,14 @@ export const useCombatStore = create<CombatStore>((set) => ({
 
   applyHeroHeal: (amount) => {
     set((s) => ({ heroHp: Math.min(s.heroMaxHp, s.heroHp + amount) }));
+  },
+
+  /** Bump max HP and (optionally) heal the same amount. Used by treasure rewards. */
+  bumpMaxHp: (amount: number, healToo: boolean = true) => {
+    set((s) => ({
+      heroMaxHp: s.heroMaxHp + amount,
+      heroHp: healToo ? s.heroHp + amount : s.heroHp,
+    }));
   },
 
   armWordShield: () => {
