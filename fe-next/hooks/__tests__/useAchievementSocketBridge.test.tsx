@@ -1,4 +1,6 @@
 /**
+ * @vitest-environment happy-dom
+ *
  * useAchievementSocketBridge Hook Tests
  *
  * Bridges socket achievement events to the global AchievementQueueProvider.
@@ -10,14 +12,20 @@
  */
 
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { EventEmitter } from 'events';
 import { useAchievementSocketBridge } from '../useAchievementSocketBridge';
+import { midRoundEventQueueStore } from '../useMidRoundEventQueue';
 
 const queueAchievementMock = vi.fn();
+let gameActiveMock = false;
 
 vi.mock('@/components/achievements', () => ({
   useAchievementQueue: () => ({ queueAchievement: queueAchievementMock }),
+}));
+
+vi.mock('@/hooks/gameState', () => ({
+  useGameActive: () => gameActiveMock,
 }));
 
 type FakeSocket = EventEmitter;
@@ -29,6 +37,8 @@ function makeSocket(): FakeSocket {
 describe('useAchievementSocketBridge', () => {
   beforeEach(() => {
     queueAchievementMock.mockClear();
+    gameActiveMock = false;
+    act(() => midRoundEventQueueStore.getState().clear());
   });
 
   it('queues each achievement when liveAchievementUnlocked fires', () => {
@@ -86,6 +96,59 @@ describe('useAchievementSocketBridge', () => {
     });
 
     expect(queueAchievementMock).not.toHaveBeenCalled();
+  });
+
+  describe('mid-round defer (gameActive=true)', () => {
+    it('enqueues to MidRoundEventQueue instead of toast when gameActive', () => {
+      gameActiveMock = true;
+      const socket = makeSocket();
+      renderHook(() => useAchievementSocketBridge(socket as unknown as import('socket.io-client').Socket));
+
+      socket.emit('liveAchievementUnlocked', {
+        achievements: [
+          { key: 'FIRST_BLOOD', icon: '🎯', count: 1 },
+          { key: 'WORD_MASTER', icon: '📚' },
+        ],
+      });
+
+      expect(queueAchievementMock).not.toHaveBeenCalled();
+      const events = midRoundEventQueueStore.getState().events;
+      expect(events.length).toBe(2);
+      expect(events[0]).toEqual({
+        kind: 'achievementUnlocked',
+        payload: { key: 'FIRST_BLOOD', icon: '🎯', count: 1 },
+      });
+      expect(events[1]).toEqual({
+        kind: 'achievementUnlocked',
+        payload: { key: 'WORD_MASTER', icon: '📚' },
+      });
+    });
+
+    it('also enqueues lifetime achievements when gameActive', () => {
+      gameActiveMock = true;
+      const socket = makeSocket();
+      renderHook(() => useAchievementSocketBridge(socket as unknown as import('socket.io-client').Socket));
+
+      socket.emit('lifetimeAchievementsUnlocked', {
+        achievements: [{ key: 'VETERAN', icon: '🎖️' }],
+      });
+
+      expect(queueAchievementMock).not.toHaveBeenCalled();
+      expect(midRoundEventQueueStore.getState().events.length).toBe(1);
+    });
+
+    it('toasts as before when gameActive=false (lobby/results)', () => {
+      gameActiveMock = false;
+      const socket = makeSocket();
+      renderHook(() => useAchievementSocketBridge(socket as unknown as import('socket.io-client').Socket));
+
+      socket.emit('liveAchievementUnlocked', {
+        achievements: [{ key: 'FIRST_BLOOD', icon: '🎯' }],
+      });
+
+      expect(queueAchievementMock).toHaveBeenCalledTimes(1);
+      expect(midRoundEventQueueStore.getState().events).toEqual([]);
+    });
   });
 
   it('re-binds when socket instance changes', () => {
