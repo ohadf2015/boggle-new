@@ -24,7 +24,7 @@ const metaTitles: Record<string, string> = {
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: 'Boggle vs Scrabble in 2026: 7 honest differences in gameplay, strategy, brain benefits, and social play. Which classic word game wins for family night, solo training, or pure fun? Verdict inside.',
+  en: 'Boggle vs Scrabble 2026: 7 key differences — gameplay, strategy & brain benefits. Which word game wins for family night or pure fun? Verdict.',
   he: 'בוגל מול סקראבל — השוואה כנה של משחקיות, אסטרטגיה, גרסאות דיגיטליות, יתרונות מוחיים וחוויה חברתית. גלו איזה משחק מילים קלאסי מתאים לכם ב-2026.',
   sv: 'Boggle vs Scrabble — en arlig jamforelse av spelmekanik, strategi, digitala versioner, hjarnfordelar och social upplevelse. Ta reda pa vilket klassiskt ordspel som passar dig 2026.',
   ja: 'ボグル vs スクラブル — ゲームプレイ、戦略、デジタル版、脳トレ効果、ソーシャル体験の正直な比較。2026年、あなたに合った言葉ゲームを見つけよう。',
