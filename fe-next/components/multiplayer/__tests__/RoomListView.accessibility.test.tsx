@@ -194,5 +194,26 @@ describe('RoomListView accessibility', () => {
       expect(root).toHaveClass('max-w-2xl');
       expect(root).toHaveClass('lg:max-w-5xl');
     });
+
+    it('body uses lg:grid 2-col split for desktop (audit C1 Tier 3)', () => {
+      // Tier 3: at lg+ split into a left rail (actions + welcome) and right
+      // pane (open-arenas list). Mobile keeps the existing single-column flow.
+      const { container } = render(<RoomListView {...defaultProps} />);
+      // The room list is inside the right pane; find it then walk up to the
+      // grid container that hosts both columns.
+      const list = container.querySelector('[role="list"]');
+      expect(list).toBeTruthy();
+      // Walk up to find an ancestor with lg:grid + lg:grid-cols class
+      let el: HTMLElement | null = list as HTMLElement | null;
+      let foundGrid = false;
+      while (el) {
+        if (/\blg:grid\b/.test(el.className) && /lg:grid-cols/.test(el.className)) {
+          foundGrid = true;
+          break;
+        }
+        el = el.parentElement;
+      }
+      expect(foundGrid).toBe(true);
+    });
   });
 });

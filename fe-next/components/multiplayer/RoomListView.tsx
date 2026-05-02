@@ -235,8 +235,15 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           </button>
         </motion.header>
 
-        {/* Scrollable Content */}
-        <div className="flex-1 flex flex-col px-5 lg:px-6 gap-5 overflow-y-auto pb-10 safe-area-bottom pt-5">
+        {/* Scrollable Content. At lg+ split into a 2-column desktop layout
+            (audit C1 Tier 3): left rail = welcome + actions + CG-friends,
+            right pane = live-match status + open-arenas list. Mobile keeps
+            single-column flow. The two wrapper divs share the parent gap-5
+            so vertical rhythm matches the prior single-column layout. */}
+        <div className="flex-1 flex flex-col lg:grid lg:grid-cols-[minmax(280px,360px)_1fr] lg:items-start px-5 lg:px-6 gap-5 lg:gap-6 overflow-y-auto pb-10 safe-area-bottom pt-5">
+
+          {/* Left rail (mobile: in-flow) */}
+          <div className="flex flex-col gap-5">
 
           {/* Welcome Card — inline, non-blocking */}
           <AnimatePresence>
@@ -244,23 +251,6 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               <MultiplayerWelcomeCard onDismiss={() => setShowWelcomeCard(false)} />
             )}
           </AnimatePresence>
-
-          {/* Live Match Status Bar */}
-          {liveMatchCount > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-neo-pink/10 border-2 border-neo-pink rounded-xl p-3 flex items-center justify-between"
-            >
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-neo-pink animate-pulse" />
-                <span className="text-[10px] font-black text-neo-pink uppercase">
-                  {liveMatchCount} {t('multiplayerFlow.roomList.liveMatches')}
-                </span>
-              </div>
-              <Eye className="w-4 h-4 text-neo-pink" />
-            </motion.div>
-          )}
 
           {/* Action Buttons — Quick Start + Create Room side by side */}
           {onQuickPlay && (
@@ -303,6 +293,27 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
           {/* CrazyGames Friends — only shown on platform */}
           <CrazyGamesFriendsStrip />
+
+          </div>
+          {/* Right pane (mobile: in-flow) */}
+          <div className="flex flex-col gap-5">
+
+          {/* Live Match Status Bar */}
+          {liveMatchCount > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-neo-pink/10 border-2 border-neo-pink rounded-xl p-3 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-neo-pink animate-pulse" />
+                <span className="text-[10px] font-black text-neo-pink uppercase">
+                  {liveMatchCount} {t('multiplayerFlow.roomList.liveMatches')}
+                </span>
+              </div>
+              <Eye className="w-4 h-4 text-neo-pink" />
+            </motion.div>
+          )}
 
           {/* Open Arenas Section */}
           <motion.section
@@ -497,6 +508,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               </motion.div>
             )}
           </motion.section>
+          </div>
         </div>
 
         {/* How to Play Dialog */}
