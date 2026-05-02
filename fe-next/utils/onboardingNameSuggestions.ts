@@ -1,19 +1,10 @@
-const ADJECTIVES = [
-  'EPIC', 'ZESTY', 'NEON', 'PIZZA', 'LIME', 'COSMIC',
-  'GLITCH', 'BOLT', 'SUPER', 'TURBO', 'MAGIC', 'SOLID',
-  'WORD', 'MEGA', 'WILD', 'FUNKY', 'ROYAL', 'LUCKY',
-];
+import { BOT_CONFIG } from '@/backend/modules/botConfig';
 
-const NOUNS = [
-  'TIGER', 'CAT', 'WOLF', 'OWL', 'FOX', 'BEAR',
-  'WIZARD', 'NINJA', 'PILOT', 'GHOST', 'COMET', 'KNIGHT',
-  'ROBOT', 'LEGEND', 'CHAMP', 'ROOKIE', 'HERO', 'SCOUT',
-];
+type Language = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
-function pickOne<T>(items: readonly T[]): T {
-  return items[Math.floor(Math.random() * items.length)];
-}
-
-export function suggestPlayerName(): string {
-  return `${pickOne(ADJECTIVES)}-${pickOne(NOUNS)}`;
+export function suggestPlayerName(language: Language | string = 'en'): string {
+  const pool =
+    BOT_CONFIG.PLAYER_NAMES[language as Language] ?? BOT_CONFIG.PLAYER_NAMES.en;
+  const entry = pool[Math.floor(Math.random() * pool.length)];
+  return entry.name;
 }

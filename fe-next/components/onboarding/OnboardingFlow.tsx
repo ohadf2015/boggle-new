@@ -133,10 +133,18 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   }, []);
 
   const handleSkipOnboarding = useCallback(() => {
+    if (isNavigating) return;
+    setIsNavigating(true);
     markOnboardingSkipped();
     emitSkipped(step);
+    const pendingRoom = consumePendingRoomInvite();
+    router.push(
+      pendingRoom
+        ? `/${language}/multiplayer?room=${pendingRoom}`
+        : `/${language}/multiplayer`,
+    );
     onComplete();
-  }, [onComplete, emitSkipped, step]);
+  }, [isNavigating, language, router, onComplete, emitSkipped, step]);
 
   const stepIndex = useMemo(() => STEPS.indexOf(step), [step]);
   const accent = STEP_ACCENTS[step];
@@ -160,14 +168,16 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   );
 
   // Step 2: Profile complete
+  const playerNameEditedRef = useRef(false);
   const handleProfileComplete = useCallback(
-    (name: string, avatar: CustomAvatarConfig) => {
+    (name: string, avatar: CustomAvatarConfig, nameEdited: boolean) => {
       setPlayerName(name);
       setPlayerAvatar(avatar);
       setStoredCustomAvatar(avatar);
+      playerNameEditedRef.current = nameEdited;
 
       const pendingInvite = hasPendingRoomInvite();
-      recordStep('profile', { hasPendingInvite: pendingInvite });
+      recordStep('profile', { hasPendingInvite: pendingInvite, nameEdited });
 
       // If player arrived via room invite, skip scoreReveal + fork — go straight to the room
       if (pendingInvite) {
@@ -175,6 +185,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           avatarId: 'custom',
           displayName: name,
           selectedMode: 'multi',
+          nameEdited,
         });
         const roomCode = consumePendingRoomInvite();
         setIsNavigating(true);
@@ -201,13 +212,14 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       avatarId: 'custom',
       displayName: playerName || 'Player',
       selectedMode: 'home',
+      nameEdited: playerNameEditedRef.current,
     });
 
     const pendingRoom = consumePendingRoomInvite();
     if (pendingRoom) {
       router.push(`/${language}/multiplayer?room=${pendingRoom}`);
     } else {
-      router.push(`/${language}`);
+      router.push(`/${language}/multiplayer`);
     }
     emitCompleted({ via: 'score_reveal' });
     onComplete();

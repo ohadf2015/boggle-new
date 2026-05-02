@@ -67,13 +67,41 @@ export function extractOAuthDisplayName(
   return null;
 }
 
-// Hardcoded fun names for when the random name API fails — never show "Player_xxxx"
-const FALLBACK_NAMES = [
-  'WordNinja', 'LetterWizard', 'VowelViking', 'SyllableStar',
-  'GrammarGhost', 'SpellingBee', 'AlphabetAce', 'LexiconLion',
-  'PuzzlePanda', 'DictionaryDog', 'VocabViper', 'SyntaxSailor',
-  'PhonicsPhoenix', 'BookwormBear', 'RuneRanger', 'QuillQuokka',
-];
+// Locale-aware fallback names for when the random-name API fails.
+// Witty single-or-two-word names with no dashes/underscores. Mirrors the
+// style of BOT_CONFIG.PLAYER_NAMES so a fallback feels native, not jarring.
+const FALLBACK_NAMES_BY_LANG: Record<string, string[]> = {
+  en: [
+    'Sneaky Pickle', 'Disco Potato', 'Cosmic Banana', 'Fluffy Waffle',
+    'Peppy Penguin', 'Loopy Llama', 'Bouncy Bear', 'Sassy Sloth',
+    'Quirky Quokka', 'Funky Flamingo', 'Wacky Walrus', 'Zesty Avocado',
+  ],
+  he: [
+    'מלפפון חמקמק', 'בננה קוסמית', 'וופל פלאפי', 'פינגווין פפי',
+    'למה לופי', 'דרקון מסוחרר', 'דוב קופצני', 'פלמינגו פאנקי',
+    'עצלן חצוף', 'קואלה משונה', 'רקון רועש', 'שועל פיזי',
+  ],
+  sv: [
+    'Smyg Gurka', 'Kosmisk Banan', 'Pigg Pingvin', 'Loopy Lama',
+    'Yr Drake', 'Studsig Björn', 'Funky Flamingo', 'Fräck Sengångare',
+    'Knasig Koala', 'Vild Tvättbjörn', 'Fräsig Räv', 'Glad Flodhäst',
+  ],
+  ja: [
+    'こっそりピクルス', 'コズミックバナナ', 'ペッピーペンギン', 'ルーピーラマ',
+    'くるくるドラゴン', 'ぴょんぴょんクマ', 'ファンキーフラミンゴ', 'おませなナマケモノ',
+    'へんてこコアラ', 'やんちゃアライグマ', 'シュワシュワキツネ', 'ハッピーカバ',
+  ],
+  es: [
+    'Pepino Astuto', 'Banana Cósmica', 'Pingüino Animado', 'Llama Chiflada',
+    'Dragón Mareado', 'Oso Saltarín', 'Flamenco Funky', 'Perezoso Sassy',
+    'Koala Raro', 'Mapache Ruidoso', 'Zorro Chispeante', 'Hippo Feliz',
+  ],
+};
+
+function pickFallbackName(language: string): string {
+  const pool = FALLBACK_NAMES_BY_LANG[language] ?? FALLBACK_NAMES_BY_LANG.en;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
 
 /**
  * Fetch a random player name with suited avatar
@@ -92,9 +120,8 @@ export async function fetchRandomPlayerName(
     return await response.json();
   } catch (error) {
     logger.warn('Failed to fetch random name, using fallback:', error);
-    const name = FALLBACK_NAMES[Math.floor(Math.random() * FALLBACK_NAMES.length)];
     return {
-      name,
+      name: pickFallbackName(language),
       avatar: { emoji: '😀', color: '#8B5CF6' },
     };
   }

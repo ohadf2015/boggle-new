@@ -12,7 +12,7 @@ import { suggestPlayerName } from '@/utils/onboardingNameSuggestions';
 import { cn } from '@/lib/utils';
 
 interface QuickProfileSetupProps {
-  onComplete: (name: string, avatar: CustomAvatarConfig) => void;
+  onComplete: (name: string, avatar: CustomAvatarConfig, nameEdited: boolean) => void;
   onSkip?: () => void;
   hasPendingInvite?: boolean;
 }
@@ -26,8 +26,14 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
   onComplete,
   hasPendingInvite,
 }) => {
-  const { t, dir } = useLanguage();
-  const [name, setName] = useState(suggestPlayerName);
+  const { t, dir, language } = useLanguage();
+  // Initial suggestion is locale-aware. We snapshot it in a ref so we can
+  // tell later whether the user edited the field (force-customize gating).
+  const initialSuggestionRef = useRef<string>('');
+  if (initialSuggestionRef.current === '') {
+    initialSuggestionRef.current = suggestPlayerName(language);
+  }
+  const [name, setName] = useState(initialSuggestionRef.current);
   const [avatar, setAvatar] = useState<CustomAvatarConfig>(getRandomAvatarConfig);
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
   const [avatarKey, setAvatarKey] = useState(0);
@@ -59,11 +65,13 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
   const handleRandomize = useCallback(() => {
     setAvatar(getRandomAvatarConfig());
     setAvatarKey((k) => k + 1);
-    setName(suggestPlayerName());
+    const next = suggestPlayerName(language);
+    initialSuggestionRef.current = next;
+    setName(next);
     previouslyValidRef.current = false;
     // Small burst centred near the avatar (roughly upper-middle of viewport)
     fireOnboardingBurst({ y: 0.4 }, ['#FFE135', '#FF1493', '#BFFF00']);
-  }, []);
+  }, [language]);
 
   const handleBuilderSave = useCallback((config: CustomAvatarConfig) => {
     setAvatar(config);
@@ -91,7 +99,8 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
     }
     // Send-off burst in the brand pink — steps forward into the score reveal
     fireOnboardingBurst({ y: 0.6 }, ['#FF1493', '#BFFF00', '#FFE135']);
-    onComplete(liveTrimmed, avatar);
+    const nameEdited = liveTrimmed !== initialSuggestionRef.current.trim();
+    onComplete(liveTrimmed, avatar, nameEdited);
   }, [name, avatar, onComplete]);
 
   const staggerChild = {

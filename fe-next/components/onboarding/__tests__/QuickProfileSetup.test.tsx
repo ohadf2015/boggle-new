@@ -158,8 +158,18 @@ describe('QuickProfileSetup', () => {
     fireEvent.click(screen.getByText("Let's go!"));
     expect(defaultProps.onComplete).toHaveBeenCalledWith(
       'TestPlayer',
-      expect.any(Object)
+      expect.any(Object),
+      true
     );
+  });
+
+  it('reports nameEdited=false when user submits the auto-suggestion unchanged', () => {
+    render(<QuickProfileSetup {...defaultProps} />);
+    // Don't touch the input — submit straight away
+    fireEvent.click(screen.getByText("Let's go!"));
+    expect(defaultProps.onComplete).toHaveBeenCalledTimes(1);
+    const args = defaultProps.onComplete.mock.calls[0];
+    expect(args[2]).toBe(false);
   });
 
   describe('avatar builder integration', () => {
@@ -202,7 +212,8 @@ describe('QuickProfileSetup', () => {
       fireEvent.click(screen.getByText("Let's go!"));
       expect(defaultProps.onComplete).toHaveBeenCalledWith(
         'Player',
-        expect.objectContaining({ gender: 'female', skinColor: '#8D5524' })
+        expect.objectContaining({ gender: 'female', skinColor: '#8D5524' }),
+        expect.any(Boolean)
       );
     });
   });

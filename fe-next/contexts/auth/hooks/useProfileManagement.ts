@@ -26,6 +26,7 @@ import { getRandomAvatarConfig } from '@/shared/types/customAvatar';
 import { captureBackgroundError } from '@/utils/sentry';
 import logger from '@/utils/logger';
 import { fetchGeolocation, fetchRandomPlayerName, extractOAuthDisplayName } from '../authUtils';
+import { decideDisplayName } from '../profileNamePrecedence';
 import { getOnboardingData } from '@/utils/onboardingStorage';
 import type { ProfileData, AuthStateSetters } from '../authTypes';
 
@@ -157,29 +158,34 @@ async function createNewProfile(
 ): Promise<void> {
   logger.info('Profile not found, creating minimal profile for user:', userId);
 
-  // FTUE-captured data (if user completed onboarding before signing up) wins
-  // over OAuth/random — this preserves the name/avatar they already picked.
+  // FTUE-captured data (if user completed onboarding before signing up).
   const onboardingData = getOnboardingData();
-  const ftueName = onboardingData?.displayName?.trim();
+  const ftueName = onboardingData?.displayName?.trim() ?? null;
   const ftueAvatarId = onboardingData?.avatarId;
+  const ftueNameEdited = onboardingData?.nameEdited === true;
 
   // Extract name from OAuth provider (Google, Discord, Apple)
   const oauthName = extractOAuthDisplayName(userMetadata);
 
-  let displayName: string;
+  // Persist current locale so push notifications + random fallback names
+  // honour the user's choice. Without this, fallback is 'en' for ~80% of users.
+  const storedLanguage = getStoredLanguage();
+  const lang = storedLanguage ?? 'en';
 
   // Prefer FTUE avatar if present, else random character avatar.
   const finalAvatarImage = ftueAvatarId || getRandomAvatar().id;
 
-  if (ftueName) {
-    displayName = ftueName;
-  } else if (oauthName) {
-    displayName = oauthName;
-  } else {
-    // No FTUE/OAuth display name - generate a fun random name
-    const randomData = await fetchRandomPlayerName();
-    displayName = randomData.name;
-  }
+  // Always pre-fetch a localized random fallback so the precedence module
+  // is pure + sync. Cheap (single API call) and only happens at signup.
+  const randomData = await fetchRandomPlayerName(lang);
+
+  const decision = decideDisplayName({
+    ftueName,
+    ftueNameEdited,
+    oauthName,
+    randomFallback: randomData.name,
+  });
+  const displayName = decision.displayName;
 
   // Username slug: human-readable base from displayName + short UUID suffix for uniqueness.
   // UUID suffix guarantees the UNIQUE constraint without a collision-check round-trip.
@@ -190,9 +196,6 @@ async function createNewProfile(
 
   const randomCustomAvatar = getRandomAvatarConfig();
 
-  // Persist current locale so push notifications localize from row creation.
-  const storedLanguage = getStoredLanguage();
-
   const { data: newProfile, error: createError } = await createProfile({
     id: userId,
     username,
@@ -201,7 +204,9 @@ async function createNewProfile(
     avatar_color: avatarColor,
     avatar_image: finalAvatarImage,
     avatar_config: randomCustomAvatar,
-    has_customized_profile: Boolean(ftueName), // FTUE pick counts as customized; else prompt after sign-in
+    // false → ProfileCustomizationModal forces a name change. true only when
+    // the user actively picked a name (edited FTUE input or has OAuth name).
+    has_customized_profile: decision.hasCustomized,
     ...(storedLanguage ? { language: storedLanguage } : {}),
   });
 

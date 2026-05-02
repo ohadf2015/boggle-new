@@ -23,6 +23,9 @@ export interface OnboardingData {
   displayName: string;
   selectedMode: 'single' | 'multi' | 'daily' | 'home' | null;
   completedAt: string; // ISO timestamp
+  // True when the user actually changed the name input from the auto-suggestion.
+  // Used by createNewProfile to decide whether to force the customize modal.
+  nameEdited?: boolean;
 }
 
 /**
