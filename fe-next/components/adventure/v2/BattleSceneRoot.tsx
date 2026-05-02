@@ -12,6 +12,7 @@ import { playSfx } from '@/lib/adventure/v2/audio/soundBus';
 import { attachKeyboardBridge, findTileByLetter } from './input/RuneSlateInput';
 import { BotLoop } from './BotLoop';
 import { areAdjacent } from '@/lib/adventure/v2/engine/adjacency';
+import { ENEMY_DEFS } from '@/lib/adventure/v2/enemies';
 import type { Locale, TileId, Tile } from '@/lib/adventure/v2/types';
 import type { AbilityId } from '@/lib/adventure/v2/abilities';
 
@@ -40,18 +41,14 @@ interface Props {
   onVictory: () => void;
   onDefeat: () => void;
   locale?: Locale;
-  enemyName?: string;
-  enemyNameHe?: string;
-  isBoss?: boolean;
+  enemyId?: string;
 }
 
 export function BattleSceneRoot({
   onVictory,
   onDefeat,
   locale = 'en',
-  enemyName = 'ENEMY',
-  enemyNameHe = 'אויב',
-  isBoss = false,
+  enemyId = 'apprentice',
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<Application | null>(null);
@@ -91,8 +88,18 @@ export function BattleSceneRoot({
       );
       scene.abilityBar.setLocale(locale);
       scene.buildSidebar.setLocale(locale);
-      scene.actorLayer.setEnemyName(locale === 'he' ? enemyNameHe : enemyName, isBoss);
+      const enemy = ENEMY_DEFS[enemyId] ?? ENEMY_DEFS.apprentice;
+      scene.actorLayer.setEnemyName(locale === 'he' ? enemy.nameHe : enemy.name, enemy.isBoss);
+      scene.actorLayer.setEnemyWeakness(
+        locale === 'he' ? enemy.weaknessLabelHe : enemy.weaknessLabel,
+      );
       scene.actorLayer.setHeroName(locale === 'he' ? 'גיבור · רמה 1' : 'HERO · Lv. 1');
+      // Apply enemy stats to store
+      useCombatStore.setState({
+        enemyHp: enemy.hp,
+        enemyMaxHp: enemy.hp,
+        enemyAtk: enemy.atk,
+      });
       // Drag extension: pointer-over a tile while drag is active
       scene.runeSlate.onTileEnter = (tileId, letter) => handleDragEnter(tileId, letter);
       app.stage.addChild(scene);
@@ -335,12 +342,16 @@ export function BattleSceneRoot({
     }
 
     playSfx('word_submit');
-    const { damage: dmg } = calculatePlayerDamage({
+    const enemy = ENEMY_DEFS[enemyId] ?? ENEMY_DEFS.apprentice;
+    const damageResult = calculatePlayerDamage({
       tiles,
       word,
       upgrades: s.equippedUpgrades,
       locale: s.locale,
+      enemyWeakness: enemy.weakness,
     });
+    const dmg = damageResult.damage;
+    const isWeak = damageResult.weak;
     s.dispatch({ type: 'SUBMIT' });
     s.dispatch({ type: 'RESOLVE', damage: dmg });
 
@@ -353,9 +364,8 @@ export function BattleSceneRoot({
     const impact = sceneRef.current!.actorLayer.getEnemyImpactPoint();
 
     sceneRef.current!.castingGlyph.fireProjectile(impact.x, impact.y, () => {
-      // Crit detection: compare actual damage vs the no-crit version. Crude but works.
-      const isCrit = dmg > calculateDamage(tiles, { critRoll: 1, runeBonusSum: 0, heroAtk: 1 }) * 1.5;
-      sceneRef.current?.actorLayer.flashEnemyHurt(dmg, isCrit);
+      const isCrit = damageResult.crit;
+      sceneRef.current?.actorLayer.flashEnemyHurt(dmg, isCrit, isWeak);
       playSfx('hit_enemy');
       screenShake(isCrit ? 14 : 8, isCrit ? 8 : 5);
 

@@ -48,10 +48,18 @@ function makeInitialRun(): RunState {
 }
 
 function combatNumber(roomIndex: number): number {
-  // Count combats / boss up to and including this room
   return RUN_SEQUENCE.slice(0, roomIndex + 1).filter(
     (r) => r === 'combat' || r === 'boss',
   ).length;
+}
+
+const COMBAT_ENEMY_POOL = ['apprentice', 'hoarder', 'predator'];
+
+function enemyForRoom(roomIndex: number): string {
+  if (RUN_SEQUENCE[roomIndex] === 'boss') return 'pressure';
+  // Different enemy for each non-boss combat
+  const num = RUN_SEQUENCE.slice(0, roomIndex + 1).filter((r) => r === 'combat').length;
+  return COMBAT_ENEMY_POOL[(num - 1) % COMBAT_ENEMY_POOL.length];
 }
 
 function isBossNext(run: RunState): boolean {
@@ -273,9 +281,7 @@ export function PageClient({ locale }: PageClientProps) {
           onVictory={onVictory}
           onDefeat={onDefeat}
           locale={locale}
-          isBoss={RUN_SEQUENCE[run.roomIndex] === 'boss'}
-          enemyName={RUN_SEQUENCE[run.roomIndex] === 'boss' ? 'THE PRESSURE' : 'ENEMY'}
-          enemyNameHe={RUN_SEQUENCE[run.roomIndex] === 'boss' ? 'הלחץ' : 'אויב'}
+          enemyId={enemyForRoom(run.roomIndex)}
         />
       )}
 

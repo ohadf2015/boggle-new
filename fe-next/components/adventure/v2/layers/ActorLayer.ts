@@ -17,6 +17,7 @@ export class ActorLayer extends Container {
   private enemyHpText: Text;
   private heroNameText: Text;
   private enemyNameText: Text;
+  private weaknessText: Text;
   private floatingNumbers: Container;
   private isBossMode = false;
 
@@ -101,6 +102,21 @@ export class ActorLayer extends Container {
     this.enemyHpText.position.set(ENEMY_X, ENEMY_Y - 100);
     this.addChild(this.enemyHpText);
 
+    this.weaknessText = new Text({
+      text: '',
+      style: {
+        fontFamily: ['Fredoka', 'Rubik', 'sans-serif'],
+        fontSize: 14,
+        fill: 0xffe135,
+        fontWeight: 'bold',
+        letterSpacing: 2,
+        stroke: { color: 0x000000, width: 3 },
+      },
+    });
+    this.weaknessText.anchor.set(0.5);
+    this.weaknessText.position.set(ENEMY_X, ENEMY_Y - 75);
+    this.addChild(this.weaknessText);
+
     // FLOATING NUMBERS ────────────────────────
     this.floatingNumbers = new Container();
     this.addChild(this.floatingNumbers);
@@ -110,8 +126,11 @@ export class ActorLayer extends Container {
     this.isBossMode = isBoss;
     this.enemyNameText.text = isBoss ? `👑 ${name}` : name;
     this.enemyNameText.style.fill = isBoss ? 0xff1493 : 0xef4444;
-    // Redraw silhouette in boss color
     this.drawEnemySilhouette(this.enemySilhouette, isBoss);
+  }
+
+  setEnemyWeakness(label: string) {
+    this.weaknessText.text = label;
   }
 
   setHeroName(name: string) {
@@ -180,7 +199,7 @@ export class ActorLayer extends Container {
     this.enemyHpText.text = `${enemyHp}/${enemyMaxHp}`;
   }
 
-  flashEnemyHurt(damage: number, isCrit: boolean = false) {
+  flashEnemyHurt(damage: number, isCrit: boolean = false, isWeak: boolean = false) {
     const orig = this.enemySprite.position.x;
     this.enemySilhouette.tint = 0xffffff;
     gsap.to(this.enemySprite.position, {
@@ -195,6 +214,38 @@ export class ActorLayer extends Container {
       },
     });
     this.spawnFloatingNumber(damage, ENEMY_X, ENEMY_Y - 40, isCrit ? 'crit' : 'enemy-hit');
+    if (isWeak) this.spawnWeakCallout();
+  }
+
+  private spawnWeakCallout() {
+    const text = new Text({
+      text: 'WEAK!',
+      style: {
+        fontFamily: ['Fredoka', 'Rubik', 'sans-serif'],
+        fontSize: 38,
+        fill: 0xffe135,
+        fontWeight: 'bold',
+        stroke: { color: 0xff1493, width: 5 },
+        letterSpacing: 4,
+      },
+    });
+    text.anchor.set(0.5);
+    text.position.set(ENEMY_X, ENEMY_Y - 100);
+    this.floatingNumbers.addChild(text);
+    gsap
+      .timeline({
+        onComplete: () => {
+          text.parent?.removeChild(text);
+          text.destroy();
+        },
+      })
+      .fromTo(
+        text.scale,
+        { x: 0.4, y: 0.4 },
+        { x: 1.5, y: 1.5, duration: 0.18, ease: 'back.out(2.2)' },
+      )
+      .to(text.scale, { x: 1, y: 1, duration: 0.12 })
+      .to(text, { alpha: 0, duration: 0.5 }, '+=0.2');
   }
 
   flashHeroHurt(damage: number) {
