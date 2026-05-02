@@ -143,7 +143,7 @@ export async function createHubScene(
     app,
     resize,
     destroy: () => {
-      app.destroy(true, { children: true, texture: false });
+      app.destroy(false, { children: true, texture: false });
     },
   };
 }

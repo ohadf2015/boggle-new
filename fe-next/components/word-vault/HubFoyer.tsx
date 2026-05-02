@@ -1,10 +1,19 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useStore } from 'zustand';
 import { BOOK_1_HEARTH_ROOMS } from '@/lib/word-vault/content/book1-hearth-stub';
 import type { WordVaultStore } from '@/lib/word-vault/state/gameStore';
-import { createHubScene, type HubScene, type HubButtonId } from './pixi/HubScene';
+
+type HubButtonId = 'worldmap' | 'inventory' | 'memory-theatre' | 'shop' | 'settings';
+
+const HUB_BUTTONS: { id: HubButtonId; labelHe: string }[] = [
+  { id: 'worldmap', labelHe: 'מפת העולם' },
+  { id: 'inventory', labelHe: 'מלאי' },
+  { id: 'memory-theatre', labelHe: 'תיאטרון הזיכרון' },
+  { id: 'shop', labelHe: 'חנות' },
+  { id: 'settings', labelHe: 'הגדרות' },
+];
 
 interface HubFoyerProps {
   store: WordVaultStore;
@@ -12,49 +21,11 @@ interface HubFoyerProps {
 }
 
 export function HubFoyer({ store, onEnterRoom }: HubFoyerProps) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const sceneRef = useRef<HubScene | null>(null);
   const [activePanel, setActivePanel] = useState<HubButtonId | null>(null);
 
   const memoryCoins = useStore(store, (s) => s.memoryCoins);
   const hintTokens = useStore(store, (s) => s.hintTokens);
   const solvedRooms = useStore(store, (s) => s.solvedRooms);
-
-  useEffect(() => {
-    let cancelled = false;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    createHubScene(canvas, {
-      onButtonClick: (id) => {
-        if (id === 'worldmap') {
-          setActivePanel('worldmap');
-        } else {
-          setActivePanel(id);
-        }
-      },
-    }).then((scene) => {
-      if (cancelled) {
-        scene.destroy();
-        return;
-      }
-      sceneRef.current = scene;
-    });
-
-    const onResize = () => {
-      const c = canvasRef.current;
-      if (!c || !sceneRef.current) return;
-      sceneRef.current.resize(c.clientWidth, c.clientHeight);
-    };
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      cancelled = true;
-      window.removeEventListener('resize', onResize);
-      sceneRef.current?.destroy();
-      sceneRef.current = null;
-    };
-  }, []);
 
   return (
     <div className="relative flex min-h-[100dvh] flex-col">
@@ -72,8 +43,24 @@ export function HubFoyer({ store, onEnterRoom }: HubFoyerProps) {
         </span>
       </header>
 
-      <div className="relative flex-1">
-        <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
+      <div className="relative flex flex-1 flex-col items-center justify-center gap-6 px-6 py-10 bg-gradient-to-b from-[#0e1a2b] to-[#0b1220]">
+        <h1 className="font-fredoka text-5xl font-black tracking-tight text-lime-300 sm:text-6xl">
+          מרתף המילים
+        </h1>
+        <p className="font-rubik text-lg text-white/70">ספר 1 — אולמות האח</p>
+        <ul className="flex w-full max-w-sm flex-col gap-3 pt-4">
+          {HUB_BUTTONS.map((b) => (
+            <li key={b.id}>
+              <button
+                type="button"
+                onClick={() => setActivePanel(b.id)}
+                className="w-full rounded-md border-4 border-white bg-pink-400 px-6 py-3 text-center font-fredoka text-xl font-bold text-[#0b1220] shadow-[4px_4px_0_0_#000] transition hover:bg-lime-300"
+              >
+                {b.labelHe}
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
 
       {activePanel === 'worldmap' && (

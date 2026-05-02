@@ -18,7 +18,7 @@ export function PageClient({ locale }: PageClientProps) {
   const [screen, setScreen] = useState<Screen>({ kind: 'hub' });
 
   useEffect(() => {
-    setStore(getGameStore());
+    setStore(() => getGameStore());
   }, []);
 
   useEffect(() => {
