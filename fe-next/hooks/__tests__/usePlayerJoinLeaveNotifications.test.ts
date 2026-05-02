@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { usePlayerJoinLeaveNotifications } from '../usePlayerJoinLeaveNotifications';
 import { neoInfoToast, neoWarningToast } from '@/components/NeoToast';
+import { midRoundEventQueueStore } from '../useMidRoundEventQueue';
 
 vi.mock('@/components/NeoToast', async () => {
   const actual = await vi.importActual<typeof import('@/components/NeoToast')>('@/components/NeoToast');
@@ -26,6 +27,7 @@ type Player = { username: string; score?: number; isBot?: boolean };
 describe('usePlayerJoinLeaveNotifications', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    act(() => midRoundEventQueueStore.getState().clear());
   });
 
   it('should not show notifications on initial render', () => {
@@ -162,6 +164,93 @@ describe('usePlayerJoinLeaveNotifications', () => {
       expect.stringContaining('3 bots'),
       expect.objectContaining({ icon: expect.anything() })
     );
+  });
+
+  describe('deferToQueue (mid-round suppression)', () => {
+    it('does not toast when deferToQueue=true and instead enqueues join event', () => {
+      const { rerender } = renderHook(
+        ({ players }: { players: Player[] }) =>
+          usePlayerJoinLeaveNotifications({
+            players,
+            currentUsername: 'Alice',
+            t: mockT,
+            deferToQueue: true,
+          }),
+        { initialProps: { players: [{ username: 'Alice' }] } }
+      );
+
+      rerender({ players: [{ username: 'Alice' }, { username: 'Bob' }] });
+
+      expect(neoInfoToast).not.toHaveBeenCalled();
+      const events = midRoundEventQueueStore.getState().events;
+      expect(events).toEqual([
+        { kind: 'playerJoined', payload: { username: 'Bob', isBot: false } },
+      ]);
+    });
+
+    it('enqueues leaves as well when deferToQueue=true', () => {
+      const { rerender } = renderHook(
+        ({ players }: { players: Player[] }) =>
+          usePlayerJoinLeaveNotifications({
+            players,
+            currentUsername: 'Alice',
+            t: mockT,
+            deferToQueue: true,
+          }),
+        { initialProps: { players: [{ username: 'Alice' }, { username: 'Bob' }] } }
+      );
+
+      rerender({ players: [{ username: 'Alice' }] });
+
+      expect(neoWarningToast).not.toHaveBeenCalled();
+      expect(midRoundEventQueueStore.getState().events).toEqual([
+        { kind: 'playerLeft', payload: { username: 'Bob' } },
+      ]);
+    });
+
+    it('enqueues each bot individually (no consolidation in deferred mode)', () => {
+      const { rerender } = renderHook(
+        ({ players }: { players: Player[] }) =>
+          usePlayerJoinLeaveNotifications({
+            players,
+            currentUsername: 'Alice',
+            t: mockT,
+            deferToQueue: true,
+          }),
+        { initialProps: { players: [{ username: 'Alice' }] as Player[] } }
+      );
+
+      rerender({
+        players: [
+          { username: 'Alice' },
+          { username: 'Bot-1', isBot: true },
+          { username: 'Bot-2', isBot: true },
+        ],
+      });
+
+      expect(neoInfoToast).not.toHaveBeenCalled();
+      const events = midRoundEventQueueStore.getState().events;
+      expect(events.length).toBe(2);
+      expect(events[0]).toEqual({ kind: 'playerJoined', payload: { username: 'Bot-1', isBot: true } });
+      expect(events[1]).toEqual({ kind: 'playerJoined', payload: { username: 'Bot-2', isBot: true } });
+    });
+
+    it('toasts as before when deferToQueue=false (default)', () => {
+      const { rerender } = renderHook(
+        ({ players }: { players: Player[] }) =>
+          usePlayerJoinLeaveNotifications({
+            players,
+            currentUsername: 'Alice',
+            t: mockT,
+          }),
+        { initialProps: { players: [{ username: 'Alice' }] } }
+      );
+
+      rerender({ players: [{ username: 'Alice' }, { username: 'Bob' }] });
+
+      expect(neoInfoToast).toHaveBeenCalledTimes(1);
+      expect(midRoundEventQueueStore.getState().events).toEqual([]);
+    });
   });
 
   it('should show separate toasts for humans and one consolidated toast for bots', () => {

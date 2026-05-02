@@ -31,7 +31,7 @@ import { useMultiplayerEventNotifications } from '@/hooks/useMultiplayerEventNot
 import { useMultiplayerSounds } from '@/hooks/useMultiplayerSounds';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useMultiplayerJoin } from './useMultiplayerJoin';
-import { useGameActions, useGameStore } from '@/hooks/gameState';
+import { useGameActions, useGameStore, useGameActive } from '@/hooks/gameState';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import { neoInfoToast } from '@/components/NeoToast';
 import type { Language, ActiveRoom, Avatar, GameMode } from '@/shared/types/game';
@@ -83,6 +83,10 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   const [hostUsername, setHostUsername] = useState<string>('');
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHost, setIsHost] = useState<boolean>(false);
+  // Quick-play and classroom flows create rooms with `isPrivate=true`. The
+  // server echoes that flag in `joined` — we plumb it through so the lobby
+  // can hide invite/share UI for rooms that are not meant to be discovered.
+  const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [activeRooms, setActiveRooms] = useState<ActiveRoom[]>([]);
   const [roomLanguage, setRoomLanguage] = useState<Language | null>(null);
@@ -155,7 +159,14 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   const seriesTracker = useSeriesTracker();
 
-  usePlayerJoinLeaveNotifications({ players: playersInRoom, currentUsername: username, t, enabled: isActive });
+  const gameActive = useGameActive();
+  usePlayerJoinLeaveNotifications({
+    players: playersInRoom,
+    currentUsername: username,
+    t,
+    enabled: isActive,
+    deferToQueue: gameActive,
+  });
   useMultiplayerEventNotifications({ currentUsername: username, t, enabled: isActive });
   const mpSounds = useMultiplayerSounds();
 
@@ -168,6 +179,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     onJoined: (data) => {
       setIsHost(data.isHost);
       setIsActive(true);
+      setIsPrivate(!!data.isPrivate);
       setError('');
       setAttemptingReconnect(false);
       setShouldAutoJoin(false);
@@ -207,22 +219,14 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     onError: (data) => {
       setIsJoining(false);
       if (data.message?.includes('not found') || data.message?.includes('Game not found') || data.message?.includes('closed')) {
-        if (attemptingReconnect) {
-          setError(t('errors.sessionExpired'));
-          toast.error(t('errors.sessionExpired'), { duration: 5000, icon: '⚠️' });
-        } else {
-          const isClosed = data.message?.includes('closed');
-          const errorKey = isClosed ? 'errors.roomClosed' : 'errors.gameCodeNotExist';
-          setError(t(errorKey) || t('errors.gameCodeNotExist'));
-          // Show a helpful error with longer duration so the user can read it
-          toast.error(
-            t(isClosed ? 'errors.roomClosedJoinAnother' : 'errors.roomNotFoundJoinAnother')
-              || t('errors.roomNoLongerExists')
-              || t('errors.gameCodeNotExist'),
-            { duration: 6000, icon: isClosed ? '🚪' : '❌' }
-          );
-        }
-        setGameCode(''); setPrefilledRoomCode(''); setIsActive(false); setAttemptingReconnect(false); setShouldAutoJoin(false); clearSession();
+        // Silent redirect to lobby — no toast, no inline error. The user
+        // either followed a stale invite link, refreshed into a room that
+        // closed, or hit a race against host-cleanup. Showing them a 6s
+        // error blocked the lobby they were already being sent to. Just
+        // land on the lobby cleanly and let them pick a fresh room.
+        setError('');
+        setGameCode(''); setPrefilledRoomCode(''); setIsActive(false); setIsHost(false); setIsPrivate(false);
+        setAttemptingReconnect(false); setShouldAutoJoin(false); clearSession();
         socket?.emit('getActiveRooms');
         if (typeof window !== 'undefined' && window.location.search.includes('room=')) {
           const url = new URL(window.location.href);
@@ -392,6 +396,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             onShowResults={handleShowResults} pendingGameStart={pendingGameStart}
             onGameStartConsumed={() => setPendingGameStart(null)} lessonData={lessonData}
             onUsernameChange={setUsername} autoStart={quickPlay}
+            isPrivate={isPrivate || quickPlay}
           />
         </FeatureErrorBoundary>
       );
@@ -418,13 +423,26 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           {/* Banners inside h-dvh so they participate in flex layout */}
           {isActive ? <ConnectionBanner showScoreSafe onLeaveGame={() => {
             signalIntentionalLeave();
-            socket?.emit('leaveRoom', { gameCode });
-            setIsActive(false); setIsHost(false); setGameCode('');
+            // Tell the server we're leaving and pass username so the schema
+            // validates (server still derives identity from the socket map).
+            socket?.emit('leaveRoom', { gameCode, username });
+            setIsActive(false); setIsHost(false); setIsPrivate(false); setGameCode('');
             // Clear results so a subsequent rejoin doesn't render the prior
-            // game's results page for a frame before the socket reconnects
-            // (audit UX-MED-17).
+            // game's results page for a frame before the socket reconnects.
             setShowResults(false); setResultsData(null);
-            clearSession();
+            // Preserve username so the next join modal pre-fills it; clearing
+            // the session removes the room mapping so refresh / restore won't
+            // throw the player back into this room.
+            clearSessionPreservingUsername(username);
+            // Mark intentional exit — tightens the auto-rejoin freshness guard
+            // so even a same-second F5 stays on the lobby, not back in-game.
+            try { sessionStorage.setItem('boggle_intentional_exit', '1'); } catch { /* blocked */ }
+            // Clean ?room= so a back/forward nav doesn't auto-rejoin.
+            if (typeof window !== 'undefined' && window.location.search.includes('room=')) {
+              const url = new URL(window.location.href);
+              url.searchParams.delete('room');
+              window.history.replaceState({}, '', url.pathname + (url.search || ''));
+            }
             toast(t('multiplayerFlow.roomList.leftGame'), { icon: '👋' });
           }} /> : <ConnectionDot />}
           <SpectatorBanner isSpectating={isSpectator} onRequestUpgrade={handleUpgradeToPlayer} t={t} spectatorCount={spectators.length} />
