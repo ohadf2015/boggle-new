@@ -5297,6 +5297,9 @@ const es = {
   },
   "wordHunt": {
     "title": "Caza de Palabras",
+    "dangerAlert": "¡Peligro! ¡Pocas vidas!",
+    "eliminatedAlert": "¡Has sido eliminado!",
+    "lastStanding": "¡Último en pie!",
     "welcome": {
       "title": "Caza de Palabras Diaria"
     },

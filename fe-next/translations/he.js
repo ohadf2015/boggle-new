@@ -5272,6 +5272,9 @@ const he = {
   },
   "wordHunt": {
     "title": "ציד מילים",
+    "dangerAlert": "סכנה! נשארו מעט חיים!",
+    "eliminatedAlert": "הודחת!",
+    "lastStanding": "האחרון שנשאר!",
     "welcome": {
       "title": "ציד מילים יומי"
     },

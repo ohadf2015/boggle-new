@@ -8,24 +8,27 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { capture, identify, people_set_once } = vi.hoisted(() => ({
-  capture: vi.fn(),
-  identify: vi.fn(),
-  people_set_once: vi.fn(),
-  register: vi.fn(),
-  register_once: vi.fn(),
-  people_set: vi.fn(),
-}));
+const { capture, identify, people_set_once, reset, posthogMock } = vi.hoisted(() => {
+  const c = vi.fn();
+  const i = vi.fn();
+  const pso = vi.fn();
+  const r = vi.fn();
+  // `__loaded` is mutated per-test to simulate init state.
+  const mock: Record<string, unknown> = {
+    __loaded: true,
+    capture: c,
+    identify: i,
+    reset: r,
+    register: vi.fn(),
+    register_once: vi.fn(),
+    people: { set: vi.fn(), set_once: pso },
+  };
+  return { capture: c, identify: i, people_set_once: pso, reset: r, posthogMock: mock };
+});
 
 vi.mock('posthog-js', () => ({
   __esModule: true,
-  default: {
-    capture,
-    identify,
-    register: vi.fn(),
-    register_once: vi.fn(),
-    people: { set: vi.fn(), set_once: people_set_once },
-  },
+  default: posthogMock,
 }));
 
 const mockUtm = vi.fn();
@@ -34,6 +37,7 @@ vi.mock('@/utils/utmCapture', () => ({
 }));
 
 import {
+  captureUserLoggedOut,
   identifyUserForAnalytics,
   resetUserAnalytics,
   syncAuthAnalyticsTransition,
@@ -241,5 +245,51 @@ describe('syncAuthAnalyticsTransition (gates user_logged_out / user_identified)'
     expect(reset).not.toHaveBeenCalled();
     expect(capture).not.toHaveBeenCalledWith('user_logged_out');
     expect(next).toBe(true);
+  });
+});
+
+describe('posthog-uninitialized guard (no NEXT_PUBLIC_POSTHOG_KEY)', () => {
+  // When posthog.init() has never been called, posthog.reset/identify/capture
+  // throw `Cannot read properties of undefined (reading '__loaded')`. The
+  // safe() wrapper catches the throw but the call still pollutes the dev
+  // console. Guard at the caller so we don't even attempt the call.
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockUtm.mockReturnValue(null);
+    posthogMock.__loaded = false;
+  });
+
+  afterEach(() => {
+    posthogMock.__loaded = true;
+  });
+
+  it('resetUserAnalytics() with no opts skips posthog.reset when __loaded=false', () => {
+    resetUserAnalytics();
+    expect(reset).not.toHaveBeenCalled();
+  });
+
+  it('identifyUserForAnalytics skips posthog.identify when __loaded=false', () => {
+    identifyUserForAnalytics({
+      userId: 'user-1',
+      displayName: 'Alice',
+      isAdmin: false,
+      isTeacher: false,
+      locale: 'en',
+    });
+    expect(identify).not.toHaveBeenCalled();
+    expect(capture).not.toHaveBeenCalled();
+  });
+
+  it('captureUserLoggedOut skips posthog.capture when __loaded=false', () => {
+    captureUserLoggedOut();
+    expect(capture).not.toHaveBeenCalled();
+  });
+
+  it('explicit injected reset still fires (test-injection path bypasses guard)', () => {
+    // Tests/callers that inject their own reset spy expect the call — the
+    // guard only blocks the default posthog.reset path.
+    const injected = vi.fn();
+    resetUserAnalytics({ reset: injected });
+    expect(injected).toHaveBeenCalled();
   });
 });

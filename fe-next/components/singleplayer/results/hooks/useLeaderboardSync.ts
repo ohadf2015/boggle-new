@@ -78,8 +78,15 @@ export function useLeaderboardSync({
         const result = await response.json();
         logger.log('[useLeaderboardSync] Leaderboard synced:', result);
       } catch (error) {
-        // Network errors (e.g., iOS "Load failed") are transient — warn, don't error
-        logger.warn('[useLeaderboardSync] Failed to sync leaderboard:', error);
+        // Transient infra (5xx/Load failed) is non-actionable — keep out of Sentry.
+        const msg = error instanceof Error ? error.message : String(error);
+        const isTransient =
+          /\b5\d\d\b/.test(msg) || /Load failed|Failed to fetch|NetworkError/i.test(msg);
+        if (isTransient) {
+          logger.log('[useLeaderboardSync] Leaderboard sync transient error:', msg);
+        } else {
+          logger.warn('[useLeaderboardSync] Failed to sync leaderboard:', error);
+        }
       }
     }
 

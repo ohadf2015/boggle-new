@@ -33,7 +33,16 @@ function safe<T>(fn: () => T): T | undefined {
   }
 }
 
+// posthog.* throws `Cannot read properties of undefined (reading '__loaded')`
+// when init() has never run (e.g., NEXT_PUBLIC_POSTHOG_KEY missing in dev).
+// Guard at the caller so the error never fires — safe() would catch it but
+// the dev console gets polluted on every auth-state mount.
+function isPostHogLoaded(): boolean {
+  return (posthog as unknown as { __loaded?: boolean }).__loaded === true;
+}
+
 export function identifyUserForAnalytics(args: IdentifyArgs): void {
+  if (!isPostHogLoaded()) return;
   const { userId, displayName, isAdmin, isTeacher, locale, email } = args;
 
   safe(() =>
@@ -81,6 +90,9 @@ export function identifyUserForAnalytics(args: IdentifyArgs): void {
  * mocking the module.
  */
 export function resetUserAnalytics(opts?: { reset?: () => void }): void {
+  // Default-path uses posthog.reset which requires init. Injected resets
+  // (used by tests + the syncAuthAnalyticsTransition path) always fire.
+  if (!opts?.reset && !isPostHogLoaded()) return;
   const reset = opts?.reset ?? (posthog.reset as () => void);
   safe(() => reset());
 }
@@ -92,6 +104,7 @@ export function resetUserAnalytics(opts?: { reset?: () => void }): void {
  * pollute the conversion funnel.
  */
 export function captureUserLoggedOut(): void {
+  if (!isPostHogLoaded()) return;
   safe(() => (posthog.capture as PHFn)('user_logged_out'));
 }
 

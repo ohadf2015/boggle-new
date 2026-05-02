@@ -192,11 +192,17 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
       const inCgPortal =
         window.__crazyGamesEnvironment === 'crazygames' || isCrazyGamesIframe();
       if (window.CrazyGames?.SDK && inCgPortal) {
-        try {
-          window.CrazyGames.SDK.game.sdkGameLoadingStop();
-        } catch (err) {
-          // Surface failures — silent catch was hiding the loader-hang root cause.
-          console.warn('[CG] sdkGameLoadingStop failed', err);
+        const stopFn = window.CrazyGames.SDK.game?.sdkGameLoadingStop;
+        if (typeof stopFn === 'function') {
+          try {
+            stopFn.call(window.CrazyGames.SDK.game);
+          } catch (err) {
+            // Surface real exceptions — silent catch was hiding the loader-hang root cause.
+            console.warn('[CG] sdkGameLoadingStop failed', err);
+          }
+        } else {
+          // Partial SDK shape (seen on some embeds). Loader still resolves via portal-side timeout.
+          console.debug('[CG] sdkGameLoadingStop unavailable on game namespace');
         }
       }
     };

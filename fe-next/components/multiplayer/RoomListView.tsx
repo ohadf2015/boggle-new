@@ -193,7 +193,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
       <div
         dir={dir}
-        className="flex-1 min-h-0 bg-neo-navy relative flex flex-col w-full max-w-2xl mx-auto"
+        className="flex-1 min-h-0 bg-neo-navy relative flex flex-col w-full max-w-2xl lg:max-w-5xl mx-auto"
         {...pullToRefreshHandlers}
       >
         <PullToRefreshIndicator
@@ -520,3 +520,4 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 };
 
 export default RoomListView;
+

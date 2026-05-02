@@ -183,4 +183,16 @@ describe('RoomListView accessibility', () => {
       expect(items).toHaveLength(2);
     });
   });
+
+  describe('responsive desktop width (audit C1)', () => {
+    // Mobile: max-w-2xl (672px). Desktop 1920×1080 was content-stuck-narrow at
+    // 672px in the 2026-05-02 viewport audit. Bump to lg:max-w-5xl (1024px)
+    // so the lobby breathes on desktop without re-architecting the lg layout.
+    it('keeps mobile cap and adds lg:max-w-5xl on desktop', () => {
+      const { container } = render(<RoomListView {...defaultProps} />);
+      const root = container.querySelector('[dir]');
+      expect(root).toHaveClass('max-w-2xl');
+      expect(root).toHaveClass('lg:max-w-5xl');
+    });
+  });
 });

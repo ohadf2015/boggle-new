@@ -5313,6 +5313,9 @@ const ja = {
   },
   "wordHunt": {
     "title": "ワードハント",
+    "dangerAlert": "危険！ライフが残り少ない！",
+    "eliminatedAlert": "脱落しました！",
+    "lastStanding": "最後の生き残り！",
     "welcome": {
       "title": "デイリーワードハント"
     },
