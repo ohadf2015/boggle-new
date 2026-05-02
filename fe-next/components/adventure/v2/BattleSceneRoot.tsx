@@ -40,9 +40,19 @@ interface Props {
   onVictory: () => void;
   onDefeat: () => void;
   locale?: Locale;
+  enemyName?: string;
+  enemyNameHe?: string;
+  isBoss?: boolean;
 }
 
-export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
+export function BattleSceneRoot({
+  onVictory,
+  onDefeat,
+  locale = 'en',
+  enemyName = 'ENEMY',
+  enemyNameHe = 'אויב',
+  isBoss = false,
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<Application | null>(null);
   const sceneRef = useRef<BattleScene | null>(null);
@@ -80,6 +90,9 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
         (abilityId) => handleAbilityPressed(abilityId),
       );
       scene.abilityBar.setLocale(locale);
+      scene.buildSidebar.setLocale(locale);
+      scene.actorLayer.setEnemyName(locale === 'he' ? enemyNameHe : enemyName, isBoss);
+      scene.actorLayer.setHeroName(locale === 'he' ? 'גיבור · רמה 1' : 'HERO · Lv. 1');
       // Drag extension: pointer-over a tile while drag is active
       scene.runeSlate.onTileEnter = (tileId, letter) => handleDragEnter(tileId, letter);
       app.stage.addChild(scene);
@@ -158,6 +171,7 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
     scene.actorLayer.updateHp(s.heroHp, s.heroMaxHp, s.enemyHp, s.enemyMaxHp);
     scene.runeSlate.setTiles(s.tiles);
     scene.abilityBar.setAbilities(s.abilities, s.pendingAbility);
+    scene.buildSidebar.setEquipped(s.equippedUpgrades);
 
     if (s.fsmState.type === 'player_compose') {
       s.fsmState.tilesUsed.forEach((id) => scene.runeSlate.markUsed(id));
@@ -339,9 +353,11 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
     const impact = sceneRef.current!.actorLayer.getEnemyImpactPoint();
 
     sceneRef.current!.castingGlyph.fireProjectile(impact.x, impact.y, () => {
-      sceneRef.current?.actorLayer.flashEnemyHurt();
+      // Crit detection: compare actual damage vs the no-crit version. Crude but works.
+      const isCrit = dmg > calculateDamage(tiles, { critRoll: 1, runeBonusSum: 0, heroAtk: 1 }) * 1.5;
+      sceneRef.current?.actorLayer.flashEnemyHurt(dmg, isCrit);
       playSfx('hit_enemy');
-      screenShake(8, 5);
+      screenShake(isCrit ? 14 : 8, isCrit ? 8 : 5);
 
       s.applyEnemyDamage(dmg);
       const post = useCombatStore.getState();
@@ -386,15 +402,14 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
     // WORD SHIELD passive — first incoming damage post-cast is blocked
     const blocked = store.consumeWordShield();
     if (blocked) {
-      // Show banner-side feedback via subtitle: skip damage entirely
-      sceneRef.current?.actorLayer.flashHeroHurt();
+      sceneRef.current?.actorLayer.flashHeroHurt(0);
       playSfx('word_invalid');
       screenShake(4, 3);
       return;
     }
 
     store.applyHeroDamage(dmg);
-    sceneRef.current?.actorLayer.flashHeroHurt();
+    sceneRef.current?.actorLayer.flashHeroHurt(dmg);
     playSfx('hit_hero');
     screenShake(10, 6);
 

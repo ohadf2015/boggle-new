@@ -273,6 +273,9 @@ export function PageClient({ locale }: PageClientProps) {
           onVictory={onVictory}
           onDefeat={onDefeat}
           locale={locale}
+          isBoss={RUN_SEQUENCE[run.roomIndex] === 'boss'}
+          enemyName={RUN_SEQUENCE[run.roomIndex] === 'boss' ? 'THE PRESSURE' : 'ENEMY'}
+          enemyNameHe={RUN_SEQUENCE[run.roomIndex] === 'boss' ? 'הלחץ' : 'אויב'}
         />
       )}
 

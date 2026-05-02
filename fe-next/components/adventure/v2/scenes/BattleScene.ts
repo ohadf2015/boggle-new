@@ -7,6 +7,7 @@ import { CastingGlyphLayer } from '../layers/CastingGlyphLayer';
 import { HudOverlayLayer } from '../layers/HudOverlayLayer';
 import { BotBannerLayer } from '../layers/BotBannerLayer';
 import { AbilityBarLayer } from '../layers/AbilityBarLayer';
+import { BuildSidebarLayer } from '../layers/BuildSidebarLayer';
 
 export class BattleScene extends Container {
   readonly backdrop: Graphics;
@@ -16,6 +17,7 @@ export class BattleScene extends Container {
   readonly hud: HudOverlayLayer;
   readonly botBanner: BotBannerLayer;
   readonly abilityBar: AbilityBarLayer;
+  readonly buildSidebar: BuildSidebarLayer;
 
   constructor(
     onTileTap: (tileId: TileId, letter: string) => void,
@@ -46,5 +48,8 @@ export class BattleScene extends Container {
 
     this.abilityBar = new AbilityBarLayer(onAbilityPressed);
     this.addChild(this.abilityBar);
+
+    this.buildSidebar = new BuildSidebarLayer();
+    this.addChild(this.buildSidebar);
   }
 }
