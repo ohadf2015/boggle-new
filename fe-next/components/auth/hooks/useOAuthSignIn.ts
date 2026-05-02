@@ -10,6 +10,7 @@ import {
   isNativeOAuthAvailable
 } from '@/utils/nativeOAuth';
 import logger from '@/utils/logger';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface UseOAuthSignInOptions {
   /** Callback before redirect (e.g., to store pending data) */
@@ -55,6 +56,7 @@ interface UseOAuthSignInReturn {
  */
 export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSignInReturn {
   const { onBeforeRedirect, onError, onSuccess, forceBrowserOAuth = false } = options;
+  const { t } = useLanguage();
 
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -118,7 +120,7 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
 
         // Unexpected result shape — log for debugging, show generic error to user
         logger.error(`[useOAuthSignIn] Unexpected native OAuth result: ${JSON.stringify(nativeResult)}`);
-        setError('Sign in failed. Please try again.');
+        setError(t('errors.signInFailedRetry'));
         return;
       }
 
@@ -142,7 +144,7 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
         // Apple on Android - not supported natively, and browser OAuth requires
         // additional configuration. Show appropriate error.
         if (provider === 'apple') {
-          const errorMessage = 'Apple Sign In is only available on iOS devices';
+          const errorMessage = t('errors.appleSignInIosOnly');
           setError(errorMessage);
           onError?.(errorMessage);
           return;
@@ -158,12 +160,14 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
         case 'discord':
           result = await signInWithDiscord();
           break;
-        case 'apple':
+        case 'apple': {
           // Apple OAuth on web requires additional setup
           // For now, only support on iOS via native SDK
-          setError('Apple Sign In is only available on iOS devices');
-          onError?.('Apple Sign In is only available on iOS devices');
+          const appleErr = t('errors.appleSignInIosOnly');
+          setError(appleErr);
+          onError?.(appleErr);
           return;
+        }
       }
 
       if (result?.error) {
@@ -179,7 +183,7 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
     } finally {
       setLoadingProvider(null);
     }
-  }, [onBeforeRedirect, onError, onSuccess, forceBrowserOAuth]);
+  }, [onBeforeRedirect, onError, onSuccess, forceBrowserOAuth, t]);
 
   return {
     signIn,

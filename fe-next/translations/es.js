@@ -994,6 +994,8 @@ const es = {
     "failedToLoadLeaderboard": "Error al cargar la tabla de posiciones",
     "failedToLoadProfile": "Error al cargar el perfil",
     "failedToLoadWordOfTheDay": "Error al cargar la Palabra del día",
+    "signInFailedRetry": "El inicio de sesión falló — ¿intentar de nuevo?",
+    "appleSignInIosOnly": "Inicio con Apple solo en iPhone o iPad",
     "unableToLoadData": "No se pudieron cargar los datos. Intenta de nuevo.",
     "tryAgainButton": "Intentar de nuevo",
     "connectionTimeout": "Tarda mucho en conectar",

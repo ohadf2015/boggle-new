@@ -952,6 +952,8 @@ const sv = {
     "failedToLoadLeaderboard": "Kunde inte ladda topplistan",
     "failedToLoadProfile": "Kunde inte ladda profilen",
     "failedToLoadWordOfTheDay": "Kunde inte ladda Dagens ord",
+    "signInFailedRetry": "Inloggningen misslyckades — försök igen?",
+    "appleSignInIosOnly": "Apple-inloggning kräver iPhone eller iPad",
     "unableToLoadData": "Kunde inte ladda data. Försök igen.",
     "tryAgainButton": "Försök igen",
     "connectionTimeout": "Tar för lång tid att ansluta",

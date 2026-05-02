@@ -945,6 +945,8 @@ const ja = {
     "failedToLoadLeaderboard": "ランキングの読み込みに失敗",
     "failedToLoadProfile": "プロフィールの読み込みに失敗",
     "failedToLoadWordOfTheDay": "今日の単語の読み込みに失敗",
+    "signInFailedRetry": "サインインに失敗 — もう一度試してね",
+    "appleSignInIosOnly": "Appleでのサインインは iPhone / iPad のみ対応",
     "unableToLoadData": "データが読み込めなかった。もう一回試してみて！",
     "tryAgainButton": "もう一度",
     "connectionTimeout": "接続に時間かかりすぎ",

@@ -936,6 +936,8 @@ const en = {
     "failedToLoadLeaderboard": "Leaderboard took a detour — refresh?",
     "failedToLoadProfile": "Profile went AWOL — try again?",
     "failedToLoadWordOfTheDay": "Word of the Day went AWOL — try again?",
+    "signInFailedRetry": "Sign in didn't work — give it another shot?",
+    "appleSignInIosOnly": "Apple Sign In needs an iPhone or iPad",
     "unableToLoadData": "Couldn't grab that — try again!",
     "tryAgainButton": "Try again",
     "connectionTimeout": "Connection's dragging — hang tight!",

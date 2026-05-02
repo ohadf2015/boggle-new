@@ -945,6 +945,8 @@ const he = {
     "failedToLoadLeaderboard": "לא הצלחנו לטעון את הטבלה",
     "failedToLoadProfile": "לא הצלחנו לטעון את הפרופיל",
     "failedToLoadWordOfTheDay": "לא הצלחנו לטעון את מילת היום",
+    "signInFailedRetry": "ההתחברות נכשלה — לנסות שוב?",
+    "appleSignInIosOnly": "כניסה עם Apple זמינה רק במכשירי iPhone ו-iPad",
     "unableToLoadData": "לא ניתן לטעון נתונים. נסה שוב.",
     "tryAgainButton": "נסה שוב",
     "connectionTimeout": "לוקח יותר מדי זמן להתחבר",
