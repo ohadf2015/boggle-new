@@ -1313,6 +1313,7 @@ const he = {
     "timer": "טיימר",
     "subtitle": "התחרו עם חברים בזמן אמת",
     "playersJoined": "שחקנים הצטרפו",
+    "playersJoinedCount": "{{count}} שחקנים הצטרפו!",
     "playerJoined": "הצטרף למשחק!",
     "playerLeft": "עזב את המשחק",
     "playerEliminated": "הודח מהמשחק!",

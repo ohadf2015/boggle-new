@@ -5842,6 +5842,7 @@ const en = {
     "playersJoined": "players joined",
     "playerJoined": "joined the game!",
     "playerLeft": "left the game",
+    "playersJoinedCount": "{{count}} players joined!",
     "playerEliminated": "has been eliminated!",
     "youEliminated": "You're out!",
     "playerLastLife": "is on their last life!",

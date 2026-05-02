@@ -95,23 +95,20 @@ export function usePlayerJoinLeaveNotifications({
         enqueue({ kind: 'playerLeft', payload: { username: name } });
       }
     } else {
-      // Lobby/results: toast as before
-      for (const name of newHumans) {
-        neoInfoToast(`${name} ${t('multiplayer.playerJoined')}`, {
-          icon: '👋',
+      // Lobby/results: ONE consolidated toast per batch (joins, leaves) so
+      // iOS doesn't flash through a rapid sequence of single-name toasts.
+      const joinTotal = newHumans.length + newBots.length;
+      if (joinTotal > 0) {
+        const joinMessage = buildJoinMessage(newHumans, newBots, t);
+        neoInfoToast(joinMessage, {
+          icon: newHumans.length > 0 ? '👋' : TOAST_ICONS.gamepad,
           duration: ROOM_TOAST_DURATION,
           id: ROOM_TOAST_ID,
         });
       }
-      if (newBots.length > 0) {
-        neoInfoToast(t('multiplayer.botsJoined', { count: newBots.length }), {
-          icon: TOAST_ICONS.gamepad,
-          duration: ROOM_TOAST_DURATION,
-          id: ROOM_TOAST_ID,
-        });
-      }
-      for (const name of leavers) {
-        neoWarningToast(`${name} ${t('multiplayer.playerLeft')}`, {
+      if (leavers.length > 0) {
+        const leaveMessage = buildLeaveMessage(leavers, t);
+        neoWarningToast(leaveMessage, {
           icon: '🚪',
           duration: ROOM_TOAST_DURATION,
           id: ROOM_TOAST_ID,
@@ -121,4 +118,40 @@ export function usePlayerJoinLeaveNotifications({
 
     prevUsernamesRef.current = currentUsernames;
   }, [players, currentUsername, t, enabled, deferToQueue]);
+}
+
+type Translate = (key: string, params?: Record<string, string | number>) => string;
+
+function buildJoinMessage(humans: string[], bots: string[], t: Translate): string {
+  // Single human alone → keep classic personal text "Bob joined the game!"
+  if (humans.length === 1 && bots.length === 0) {
+    return `${humans[0]} ${t('multiplayer.playerJoined')}`;
+  }
+  // Bots only → existing botsJoined translation handles the count
+  if (humans.length === 0 && bots.length > 0) {
+    return t('multiplayer.botsJoined', { count: bots.length });
+  }
+  // Mixed batch → list the humans + suffix bot count
+  const total = humans.length + bots.length;
+  if (humans.length === 0) {
+    return t('multiplayer.playersJoinedCount', { count: total });
+  }
+  // 1-3 humans → list names; 4+ → "Bob, Carol +N more"
+  const namesPart = humans.length <= 3
+    ? humans.join(', ')
+    : `${humans.slice(0, 2).join(', ')} +${humans.length - 2}`;
+  if (bots.length === 0) {
+    return `${namesPart} ${t('multiplayer.playerJoined')}`;
+  }
+  return `${namesPart} +${bots.length} 🤖 ${t('multiplayer.playerJoined')}`;
+}
+
+function buildLeaveMessage(leavers: string[], t: Translate): string {
+  if (leavers.length === 1) {
+    return `${leavers[0]} ${t('multiplayer.playerLeft')}`;
+  }
+  const namesPart = leavers.length <= 3
+    ? leavers.join(', ')
+    : `${leavers.slice(0, 2).join(', ')} +${leavers.length - 2}`;
+  return `${namesPart} ${t('multiplayer.playerLeft')}`;
 }

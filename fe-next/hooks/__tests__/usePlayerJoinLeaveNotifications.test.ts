@@ -86,7 +86,7 @@ describe('usePlayerJoinLeaveNotifications', () => {
     expect(neoInfoToast).not.toHaveBeenCalled();
   });
 
-  it('should handle multiple joins at once', () => {
+  it('should handle multiple joins at once with ONE consolidated toast', () => {
     const { rerender } = renderHook(
       ({ players }: { players: Player[] }) =>
         usePlayerJoinLeaveNotifications({ players, currentUsername: 'Alice', t: mockT }),
@@ -95,10 +95,10 @@ describe('usePlayerJoinLeaveNotifications', () => {
 
     rerender({ players: [{ username: 'Alice' }, { username: 'Bob' }, { username: 'Charlie' }] });
 
-    expect(neoInfoToast).toHaveBeenCalledTimes(2);
+    expect(neoInfoToast).toHaveBeenCalledTimes(1);
   });
 
-  it('should handle multiple leaves at once', () => {
+  it('should handle multiple leaves at once with ONE consolidated toast', () => {
     const { rerender } = renderHook(
       ({ players }: { players: Player[] }) =>
         usePlayerJoinLeaveNotifications({ players, currentUsername: 'Alice', t: mockT }),
@@ -107,7 +107,7 @@ describe('usePlayerJoinLeaveNotifications', () => {
 
     rerender({ players: [{ username: 'Alice' }] });
 
-    expect(neoWarningToast).toHaveBeenCalledTimes(2);
+    expect(neoWarningToast).toHaveBeenCalledTimes(1);
   });
 
   it('should not notify when disabled', () => {
@@ -253,6 +253,90 @@ describe('usePlayerJoinLeaveNotifications', () => {
     });
   });
 
+  describe('lobby consolidation (cap to one toast per batch)', () => {
+    it('fires only ONE toast when multiple humans join at once', () => {
+      const { rerender } = renderHook(
+        ({ players }: { players: Player[] }) =>
+          usePlayerJoinLeaveNotifications({ players, currentUsername: 'Alice', t: mockT }),
+        { initialProps: { players: [{ username: 'Alice' }] as Player[] } }
+      );
+
+      rerender({
+        players: [
+          { username: 'Alice' },
+          { username: 'Bob' },
+          { username: 'Carol' },
+          { username: 'Dave' },
+        ],
+      });
+
+      expect(neoInfoToast).toHaveBeenCalledTimes(1);
+    });
+
+    it('fires only ONE toast when humans + bots arrive in same batch', () => {
+      const { rerender } = renderHook(
+        ({ players }: { players: Player[] }) =>
+          usePlayerJoinLeaveNotifications({ players, currentUsername: 'Alice', t: mockT }),
+        { initialProps: { players: [{ username: 'Alice' }] as Player[] } }
+      );
+
+      rerender({
+        players: [
+          { username: 'Alice' },
+          { username: 'Bob' },
+          { username: 'Bot-1', isBot: true },
+          { username: 'Bot-2', isBot: true },
+        ],
+      });
+
+      expect(neoInfoToast).toHaveBeenCalledTimes(1);
+    });
+
+    it('fires only ONE leave toast when many leave at once', () => {
+      const { rerender } = renderHook(
+        ({ players }: { players: Player[] }) =>
+          usePlayerJoinLeaveNotifications({ players, currentUsername: 'Alice', t: mockT }),
+        {
+          initialProps: {
+            players: [
+              { username: 'Alice' },
+              { username: 'Bob' },
+              { username: 'Carol' },
+              { username: 'Dave' },
+            ] as Player[],
+          },
+        }
+      );
+
+      rerender({ players: [{ username: 'Alice' }] });
+
+      expect(neoWarningToast).toHaveBeenCalledTimes(1);
+    });
+
+    it('fires at most TWO total toasts (1 join + 1 leave) when both happen', () => {
+      const { rerender } = renderHook(
+        ({ players }: { players: Player[] }) =>
+          usePlayerJoinLeaveNotifications({ players, currentUsername: 'Alice', t: mockT }),
+        {
+          initialProps: {
+            players: [{ username: 'Alice' }, { username: 'Bob' }] as Player[],
+          },
+        }
+      );
+
+      rerender({
+        players: [
+          { username: 'Alice' },
+          { username: 'Carol' },
+          { username: 'Dave' },
+        ],
+      });
+
+      expect(neoInfoToast).toHaveBeenCalledTimes(1);
+      expect(neoWarningToast).toHaveBeenCalledTimes(1);
+    });
+  });
+
   it('should show separate toasts for humans and one consolidated toast for bots', () => {
     const initialPlayers: Player[] = [{ username: 'Alice' }];
     const { rerender } = renderHook(
@@ -270,15 +354,7 @@ describe('usePlayerJoinLeaveNotifications', () => {
       ],
     });
 
-    // 1 toast for Bob (human) + 1 consolidated toast for 2 bots = 2 total
-    expect(neoInfoToast).toHaveBeenCalledTimes(2);
-    expect(neoInfoToast).toHaveBeenCalledWith(
-      'Bob joined the game!',
-      expect.objectContaining({ icon: '👋' })
-    );
-    expect(neoInfoToast).toHaveBeenCalledWith(
-      expect.stringContaining('2 bots'),
-      expect.objectContaining({ icon: expect.anything() })
-    );
+    // ONE consolidated toast for the whole batch (humans + bots)
+    expect(neoInfoToast).toHaveBeenCalledTimes(1);
   });
 });

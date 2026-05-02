@@ -5773,6 +5773,7 @@ const sv = {
     "timer": "Timer",
     "subtitle": "Tävla med vänner i realtid",
     "playersJoined": "spelare anslöt",
+    "playersJoinedCount": "{{count}} spelare anslöt!",
     "playerJoined": "gick med i spelet!",
     "playerLeft": "lämnade spelet",
     "playerEliminated": "har eliminerats!",

@@ -5706,6 +5706,7 @@ const ja = {
     "timer": "タイマー",
     "subtitle": "友達とリアルタイムで競争",
     "playersJoined": "人参加中",
+    "playersJoinedCount": "{{count}}人が参加しました！",
     "playerJoined": "がゲームに参加しました！",
     "playerLeft": "がゲームを退出しました",
     "playerEliminated": "が脱落しました！",

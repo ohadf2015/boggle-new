@@ -5793,6 +5793,7 @@ const es = {
     "timer": "Tiempo",
     "subtitle": "Compite con amigos en tiempo real",
     "playersJoined": "jugadores unidos",
+    "playersJoinedCount": "¡{{count}} jugadores se unieron!",
     "playerJoined": "se unio al juego!",
     "playerLeft": "salio del juego",
     "playerEliminated": "ha sido eliminado!",
