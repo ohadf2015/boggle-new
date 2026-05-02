@@ -139,6 +139,8 @@ vi.mock('../../../backend/utils/gameStartCoordinator', () => ({
     initializeSequence: vi.fn().mockReturnValue('msg-1'),
     scheduleRetries: vi.fn(),
     setAcknowledgmentTimeout: vi.fn(),
+    setCountdownCompleteTimeout: vi.fn(),
+    recordCountdownComplete: vi.fn(),
     cleanupSequence: vi.fn(),
   },
 }));

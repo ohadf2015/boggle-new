@@ -10,10 +10,10 @@ export const WHEEL_RUSH_DURATION_SEC = 120;
 export const WHEEL_RUSH_LOCK_MS = 3_000;
 
 /** Consolation score for a successful steal (claimant loses nothing — steal rewards speed) */
-export const WHEEL_RUSH_STEAL_BONUS = 3;
+export const WHEEL_RUSH_STEAL_BONUS = 8;
 
 /** First-finder multiplier applied on top of base word score */
-export const WHEEL_RUSH_FIRST_FINDER_MULT = 1.5;
+export const WHEEL_RUSH_FIRST_FINDER_MULT = 1.2;
 
 /** Fog-of-war: opponent words shown as count-only for this many ms after round start */
 export const WHEEL_RUSH_FOG_MS = 10_000;
@@ -21,8 +21,5 @@ export const WHEEL_RUSH_FOG_MS = 10_000;
 /** Min word length accepted (matches daily wheel) */
 export const WHEEL_RUSH_MIN_WORD_LEN = 3;
 
-/** Base points per letter (matches daily wheel rough average) */
-export const WHEEL_RUSH_POINTS_PER_LETTER = 2;
-
 /** Pangram bonus — uses all 7 letters */
-export const WHEEL_RUSH_PANGRAM_BONUS = 10;
+export const WHEEL_RUSH_PANGRAM_BONUS = 50;

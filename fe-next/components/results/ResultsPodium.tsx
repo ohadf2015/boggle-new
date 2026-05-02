@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import type { PlayerScore } from '@/hooks/useResultsData';
 import Avatar from '../Avatar';
 import { REACTIONS } from '@/components/game/QuickReactions';
+import { AddFriendBadge } from '@/components/results/ResultsFriendStatus';
 
 /** Emoji bubble that floats above a targeted podium player */
 interface PodiumBubble {
@@ -361,32 +362,37 @@ export default function ResultsPodium({
                   {scoreDisplay}
                 </motion.p>
 
-                {/* Per-player emoji button — only for other players */}
-                {showEmojiButton && (
-                  <div className="relative mt-1">
-                    <button
-                      onClick={() => setOpenPicker(openPicker === player.username ? null : player.username)}
-                      className={cn(
-                        'w-7 h-7 flex items-center justify-center rounded-neo',
-                        'bg-neo-navy border-2 border-neo-white/20 shadow-hard-sm',
-                        'hover:bg-neo-white/10 hover:border-neo-lime/40',
-                        'active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]',
-                        'transition-all',
-                        openPicker === player.username && 'bg-neo-lime/15 border-neo-lime/50'
-                      )}
-                      aria-label={`Send emoji to ${player.username}`}
-                    >
-                      <SmilePlus className="w-3.5 h-3.5 text-neo-white/70" />
-                    </button>
-                    <AnimatePresence>
-                      {openPicker === player.username && (
-                        <PodiumEmojiPicker
-                          onSelect={(id) => handleEmojiSelect(id, player.username)}
-                          onClose={() => setOpenPicker(null)}
-                          position={layoutIdx === 0 ? 'left' : layoutIdx === 2 ? 'right' : 'center'}
-                        />
-                      )}
-                    </AnimatePresence>
+                {/* Per-player actions — add-friend (always available) + emoji (when reactions wired) */}
+                {!isCurrentUser && (
+                  <div className="relative mt-1 flex items-center justify-center gap-1">
+                    <AddFriendBadge username={player.username} isBot={(player as { isBot?: boolean }).isBot} />
+                    {showEmojiButton && (
+                      <>
+                        <button
+                          onClick={() => setOpenPicker(openPicker === player.username ? null : player.username)}
+                          className={cn(
+                            'w-7 h-7 flex items-center justify-center rounded-neo',
+                            'bg-neo-navy border-2 border-neo-white/20 shadow-hard-sm',
+                            'hover:bg-neo-white/10 hover:border-neo-lime/40',
+                            'active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]',
+                            'transition-all',
+                            openPicker === player.username && 'bg-neo-lime/15 border-neo-lime/50'
+                          )}
+                          aria-label={`Send emoji to ${player.username}`}
+                        >
+                          <SmilePlus className="w-3.5 h-3.5 text-neo-white/70" />
+                        </button>
+                        <AnimatePresence>
+                          {openPicker === player.username && (
+                            <PodiumEmojiPicker
+                              onSelect={(id) => handleEmojiSelect(id, player.username)}
+                              onClose={() => setOpenPicker(null)}
+                              position={layoutIdx === 0 ? 'left' : layoutIdx === 2 ? 'right' : 'center'}
+                            />
+                          )}
+                        </AnimatePresence>
+                      </>
+                    )}
                   </div>
                 )}
               </motion.div>

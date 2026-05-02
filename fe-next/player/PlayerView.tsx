@@ -25,12 +25,18 @@ import PlayerWaitingView from './components/PlayerWaitingView';
 import PlayerInGameView from './components/PlayerInGameView';
 import FirstTimeAchievement, { useFirstTimeAchievement } from '../components/game/FirstTimeAchievement';
 import ModeRevealOverlay from '@/components/game/ModeRevealOverlay';
+import { useModeFirstSeen, type IntroMode } from '@/hooks/useModeFirstSeen';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Loader2 } from 'lucide-react';
 
 // Custom hooks
 import usePlayerSocketEvents from './hooks/usePlayerSocketEvents';
 import { resetComboState } from '@/shared/utils/comboUtils';
+import {
+  sendCountdownComplete,
+  stashStartGameMessageId,
+  consumeStashedMessageId,
+} from '@/shared/utils/gameEventUtils';
 import {
   useFoundWords,
   useBoardTheme,
@@ -116,6 +122,19 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     v ? dispatchReveal({ type: 'endReveal' }) : dispatchReveal({ type: 'reset' });
   const [minWordLength, setMinWordLength] = useState<number>(2);
   const gameMode = useGameMode();
+
+  // Cozy first-time intro key — pause auto-dismiss timer for new players
+  const modeIntroKey: IntroMode =
+    gameMode === 'blast' ? 'blast'
+    : gameMode === 'word-hunt' ? 'wordHunt'
+    : gameMode === 'wheel-rush' ? 'wheelRush'
+    : 'classic';
+  const { hasSeen: hasSeenIntro } = useModeFirstSeen(modeIntroKey);
+
+  // Captures the messageId from the most recent startGame so we can emit
+  // `countdownComplete` once the GoRipplesAnimation finishes. Server gates
+  // round-timer start on this signal, so the timer doesn't tick during 3-2-1.
+  const pendingMessageIdRef = useRef<string | null>(null);
 
   // Multiplayer timer - uses timestamp-based countdown that syncs with server
   // Initial time will be set when game starts via socket event
@@ -299,15 +318,17 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     }
   }, [showModeReveal, showStartAnimation, letterGrid, remainingTime, gameActive, waitingForResults, gameTimer]);
 
-  // Auto-dismiss mode reveal after 2 seconds, then trigger countdown
+  // Auto-dismiss mode reveal after 2 seconds, then trigger countdown.
+  // First-time players see cozy ModeIntroCard instead — no timer, advance on tap.
   useEffect(() => {
     if (!showModeReveal) return;
+    if (!hasSeenIntro) return;
     const timer = setTimeout(() => {
       // dispatch batches showModeReveal=false + showStartAnimation=true in one update
       dispatchReveal({ type: 'endReveal' });
     }, 2000);
     return () => clearTimeout(timer);
-  }, [showModeReveal]);
+  }, [showModeReveal, hasSeenIntro]);
 
   // Clear shuffling grid when game starts
   useEffect(() => {
@@ -428,6 +449,8 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       handleGameStartMusic();
 
       if (pendingGameStart.messageId) {
+        pendingMessageIdRef.current = pendingGameStart.messageId;
+        stashStartGameMessageId('PLAYER', pendingGameStart.messageId);
         socket.emit('startGameAck', { messageId: pendingGameStart.messageId });
         logger.log('[PLAYER] Sent startGameAck for pending game start, messageId:', pendingGameStart.messageId);
       }
@@ -511,6 +534,8 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           modeLabel={modeRevealLabel}
           seriesRoundNumber={seriesRoundNumber}
           t={t}
+          modeKey={modeIntroKey}
+          onIntroDismiss={() => dispatchReveal({ type: 'endReveal' })}
         />
       );
     }
@@ -580,8 +605,25 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
 
   return (
     <>
+      {showModeReveal && (
+        <ModeRevealOverlay
+          modeLabel={modeRevealLabel}
+          seriesRoundNumber={seriesRoundNumber}
+          t={t}
+          modeKey={modeIntroKey}
+          onIntroDismiss={() => dispatchReveal({ type: 'endReveal' })}
+        />
+      )}
       {showStartAnimation && (
-        <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} t={t} />
+        <GoRipplesAnimation
+          onComplete={() => {
+            setShowStartAnimation(false);
+            const id = pendingMessageIdRef.current ?? consumeStashedMessageId('PLAYER');
+            pendingMessageIdRef.current = null;
+            if (socket) sendCountdownComplete(socket, id, 'PLAYER');
+          }}
+          t={t}
+        />
       )}
       {/* First-time achievement celebrations for new players */}
       {isNewPlayerRef.current && (
@@ -601,7 +643,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         letterGrid={letterGrid}
         shufflingGrid={shufflingGrid}
         gameActive={gameActive}
-        showStartAnimation={showStartAnimation}
+        showStartAnimation={showModeReveal || showStartAnimation}
         remainingTime={remainingTime}
         gameLanguage={gameLanguage}
         minWordLength={minWordLength}

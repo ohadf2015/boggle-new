@@ -10,9 +10,9 @@ import {
   WHEEL_RUSH_STEAL_BONUS,
   WHEEL_RUSH_FIRST_FINDER_MULT,
   WHEEL_RUSH_MIN_WORD_LEN,
-  WHEEL_RUSH_POINTS_PER_LETTER,
   WHEEL_RUSH_PANGRAM_BONUS,
 } from '@/shared/constants/wheelRushConstants';
+import { calculateWordScoreByLength } from '@/shared/utils/scoring';
 import { getCachedTrie, getTrieNode, type TrieNode } from './boggleSolver';
 
 // Nine-letter seed sources (mirror of utils/dailyChallenge/wordWheelGeneration —
@@ -149,9 +149,9 @@ export function validateWheelSubmission(
   return { valid: true };
 }
 
-/** Base score for a word (length-based + pangram bonus). */
+/** Base score for a word (canonical length curve + pangram bonus). */
 export function scoreWheelWord(word: string, allLetters: string[]): number {
-  const base = word.length * WHEEL_RUSH_POINTS_PER_LETTER;
+  const base = calculateWordScoreByLength(word.length);
   const usesAll = allLetters.every(l => word.toUpperCase().includes(l.toUpperCase()));
   return usesAll ? base + WHEEL_RUSH_PANGRAM_BONUS : base;
 }

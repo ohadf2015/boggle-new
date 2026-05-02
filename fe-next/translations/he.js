@@ -1783,7 +1783,19 @@ const he = {
       "playMultiplayer": "מולטיפלייר",
       "demoCaption": "איך משחקים",
       "freeBadge": "חינם תמיד",
-      "demoAlt": "לוח אותיות שמראה איך לחבר מילה"
+      "demoAlt": "לוח אותיות שמראה איך לחבר מילה",
+      "tutorial": {
+        "tag": "שלב 1 · איך משחקים",
+        "heading": "החליקו",
+        "headingAccent": "לאיות",
+        "subtitle": "חברו אותיות צמודות. נראה לכם פעם אחת, ואז התור שלכם.",
+        "watchMe": "תראו רגע...",
+        "yourTurn": "תורכם — אייתו",
+        "success": "כל הכבוד!",
+        "skip": "דלגו → בחירת מצב",
+        "caption": "נסו",
+        "tryIt": "החליקו!"
+      }
     },
     "welcome": {
       "title": "ברוכים הבאים ל-LexiClash!",
@@ -9998,28 +10010,36 @@ const he = {
       description: "מצאו כמה שיותר מילים!",
       feature1: "מתוזמן",
       feature2: "ניקוד",
-      feature3: "חופשי"
+      feature3: "חופשי",
+      intro: { greet: "בלי לחץ. רק מילים." }
     },
     blast: {
       name: "בלאסט",
       description: "נקו אריחים עם קומבואים וכוחות מיוחדים!",
       feature1: "קומבו שרשרת",
       feature2: "אריחים מיוחדים",
-      feature3: "מפל"
+      feature3: "מפל",
+      intro: { greet: "טפח, החלק, נשם. אין מירוץ." }
     },
     wordHunt: {
       name: "ציד מילים",
       description: "מצאו את מילת היעד לפני כולם!",
       feature1: "מילות יעד",
       feature2: "מרוץ מהירות",
-      feature3: "רמזים"
+      feature3: "רמזים",
+      intro: { greet: "מילה אחת בכל פעם. אתם תצליחו." }
     },
     wheelRush: {
       name: "ריצת גלגל",
       description: "גלגל אותיות — גנבו מילים כדי לנצח!",
       feature1: "חלון נעילה",
       feature2: "ערפל קרב",
-      feature3: "בונוס פנגרם"
+      feature3: "בונוס פנגרם",
+      intro: { greet: "סובבו בעדינות. המילים יבואו." }
+    },
+    intro: {
+      cta: "בוא נתחיל",
+      skip: "דלג"
     },
     random: "אקראי",
     randomDescription: "הפתיעו אותי! מצב אקראי בכל סיבוב.",
@@ -10033,6 +10053,10 @@ const he = {
     "fast": "מהיר",
     "party": "מסיבה",
     "challenge": "אתגר"
+  },
+  "practiceHub": {
+    "title": "תרגול",
+    "subtitle": "מקום שקט ללמוד כל מצב"
   },
   "shareResult": {
     "singleplayer": "LexiClash סולו",

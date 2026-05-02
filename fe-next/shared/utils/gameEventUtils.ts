@@ -99,6 +99,39 @@ export function sendStartGameAck(
 }
 
 /**
+ * Signal that the client's pre-game countdown animation has finished.
+ * Server starts the round timer once every expected client reports.
+ */
+export function sendCountdownComplete(
+  socket: Socket,
+  messageId: string | null | undefined,
+  context: 'HOST' | 'PLAYER'
+): void {
+  if (!messageId) return;
+  socket.emit('countdownComplete', { messageId });
+  logger.log(`[${context}] Sent countdownComplete for messageId:`, messageId);
+}
+
+/**
+ * Process-local stash for the latest startGame messageId per role.
+ * Both Host and Player can receive startGame via two paths (page-level
+ * `pendingGameStart` for cold mount; socket events for hot mount on
+ * subsequent rounds). The countdown animation lives in a different scope
+ * than either receiver, so we stash the id where the animation can find it.
+ */
+const stashedMessageIds: Record<string, string | null> = {};
+
+export function stashStartGameMessageId(role: 'HOST' | 'PLAYER', messageId: string | null | undefined): void {
+  stashedMessageIds[role] = messageId ?? null;
+}
+
+export function consumeStashedMessageId(role: 'HOST' | 'PLAYER'): string | null {
+  const id = stashedMessageIds[role] ?? null;
+  stashedMessageIds[role] = null;
+  return id;
+}
+
+/**
  * Trigger game over celebration with confetti
  */
 export function triggerGameOverCelebration(): void {

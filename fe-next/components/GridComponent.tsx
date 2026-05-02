@@ -359,6 +359,16 @@ const GridComponent = memo<GridComponentProps>(({
     gap: GRID_GAP_CLASS,
   }), [grid]);
 
+  // Per-cell aria-label is stable for a given (grid, language). Computing it
+  // inside the cell render loop fires 16 t() calls + 3 regex passes per call
+  // every time GridComponent re-renders during a drag. Pre-compute once.
+  const cellAriaLabels = useMemo(
+    () => grid.map((row, i) =>
+      row.map((cell, j) => t('game.grid.cellLabel', { row: i + 1, col: j + 1, letter: cell })),
+    ),
+    [grid, t],
+  );
+
   return (
     <LazyMotion features={domAnimation} strict>
     <div className="relative w-full h-full flex items-center justify-center">
@@ -520,7 +530,7 @@ const GridComponent = memo<GridComponentProps>(({
                   onTouchStart={handleCellTouchStart}
                   onMouseDown={handleCellMouseDown}
                   onDoubleClick={handleCellDoubleClick}
-                  ariaLabel={t('game.grid.cellLabel', { row: i + 1, col: j + 1, letter: cell })}
+                  ariaLabel={cellAriaLabels[i][j]}
                 />
               );
             })

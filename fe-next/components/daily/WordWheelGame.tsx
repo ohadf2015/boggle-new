@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { isValidWordWheelWord, type WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
 import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { WheelLetter, WordTile } from './WordWheelParts';
@@ -75,6 +76,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const wheelContainerRef = useRef<HTMLDivElement>(null);
   const idleSubmitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ── Live leaderboard rivals (snapshot on mount + refresh every 30s) ──
   const [rivals, setRivals] = useState<RivalScore[]>([]);
@@ -178,9 +180,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   useEffect(() => { builtLettersRef.current = builtLetters; }, [builtLetters]);
   useEffect(() => { usedIndicesRef.current = usedIndices; }, [usedIndices]);
 
-  // Auto-submit after 1s idle (or instantly on drag-release; see handlePointerUp)
+  // Auto-submit after 1s idle (or instantly on drag-release; see handlePointerUp).
+  // Any change to builtLetters also cancels a pending post-error auto-reset
+  // (so a new tap during the 2.5s reset window doesn't get wiped mid-typing).
   useEffect(() => {
     if (idleSubmitTimerRef.current) { clearTimeout(idleSubmitTimerRef.current); idleSubmitTimerRef.current = null; }
+    if (autoResetTimerRef.current) { clearTimeout(autoResetTimerRef.current); autoResetTimerRef.current = null; }
     if (builtLetters.length >= 3 && !gameOverRef.current) {
       idleSubmitTimerRef.current = setTimeout(() => {
         idleSubmitTimerRef.current = null;
@@ -190,9 +195,29 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     return () => { if (idleSubmitTimerRef.current) { clearTimeout(idleSubmitTimerRef.current); idleSubmitTimerRef.current = null; } };
   }, [builtLetters]);
 
+  useEffect(() => () => {
+    if (autoResetTimerRef.current) { clearTimeout(autoResetTimerRef.current); autoResetTimerRef.current = null; }
+  }, []);
+
   const builtWord = useMemo(
     () => builtLetters.map(bl => bl.letter).join(''),
     [builtLetters],
+  );
+
+  // Hebrew sofit (final-form) is a presentation concern only: wheel tiles
+  // and internal state always carry regular forms (so dedup, scoring, and
+  // dictionary lookups stay consistent across the cache, which already
+  // accepts both forms). Display layer swaps the LAST glyph to its sofit
+  // equivalent so Hebrew speakers see proper orthography.
+  const displayLetters = useMemo(() => {
+    const raw = builtLetters.map(bl => bl.letter);
+    if (language !== 'he' || raw.length === 0) return raw;
+    const finalized = applyHebrewFinalLetters(raw.join(''));
+    return finalized.split('');
+  }, [builtLetters, language]);
+  const displayWord = useCallback(
+    (word: string) => (language === 'he' ? applyHebrewFinalLetters(word) : word),
+    [language],
   );
 
   // Timer
@@ -237,13 +262,30 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   }, [duration, onComplete, onEffect, playEpicVictorySound, playCountdownBeep, paused]);
 
   // ── Feedback toast ──
+  // Errors hold the toast longer (2500ms) and auto-reset the built word at the
+  // same moment, so the player sees *why* it failed and the wheel clears for a
+  // fresh attempt without needing the manual reset button. New input within
+  // the window cancels the auto-reset (see builtLetters effect above).
   const showFeedback = useCallback((message: string, type: 'success' | 'error') => {
     setFeedback({ message, type });
-    setTimeout(() => setFeedback(null), 1500);
+    const toastDuration = type === 'error' ? 2500 : 1500;
+    setTimeout(() => setFeedback(null), toastDuration);
     if (type === 'error') {
       setWordBuilderShake(true);
       haptic([30, 50, 30]);
       setTimeout(() => setWordBuilderShake(false), 400);
+      // Cancel any pending idle-auto-resubmit so the same bad word doesn't
+      // ping-pong toasts at the player every 1s (builtLetters didn't change,
+      // so the idle effect won't reset the timer for us).
+      if (idleSubmitTimerRef.current) {
+        clearTimeout(idleSubmitTimerRef.current);
+        idleSubmitTimerRef.current = null;
+      }
+      if (autoResetTimerRef.current) clearTimeout(autoResetTimerRef.current);
+      autoResetTimerRef.current = setTimeout(() => {
+        autoResetTimerRef.current = null;
+        setBuiltLetters([]);
+      }, 2500);
     }
   }, []);
 
@@ -577,6 +619,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
       {/* ── Word Builder Area ── */}
       <motion.div
+        data-testid="word-builder"
         className="relative w-full min-h-[52px] sm:min-h-[72px] flex items-center justify-center"
         animate={
           wordBuilderShake
@@ -604,7 +647,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               builtLetters.map((bl, i) => (
                 <WordTile
                   key={`${bl.wheelIndex}-${i}`}
-                  letter={bl.letter}
+                  letter={displayLetters[i] ?? bl.letter}
                   index={i}
                   onRemove={handleRemoveLetter}
                   isCenter={bl.wheelIndex === -1}
@@ -867,42 +910,45 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       </div>
       </div>
 
-      {/* ── Found Words — capped height with internal scroll so a 40+ word
-          run doesn't push the page miles tall on small screens. ── */}
-      <AnimatePresence>
-        {wordsFound.length > 0 && (
-          <motion.div
-            className="w-full mt-2"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-          >
-            <h3 className="text-neo-cream/50 text-xs font-bold uppercase mb-2">
-              {t('wordWheel.foundWords')} ({wordsFound.length})
-            </h3>
-            <div className="flex flex-wrap gap-1.5 max-h-[112px] sm:max-h-[136px] overflow-y-auto pr-1">
-              {wordsFound.map((word) => (
-                <motion.span
-                  key={word}
-                  className={cn(
-                    'px-2.5 py-1 rounded-neo border-2 text-neo-cream text-xs font-semibold shadow-hard-xs',
-                    word === lastFoundWord
-                      ? 'bg-neo-lime/20 border-neo-lime ring-1 ring-neo-lime/40'
-                      : 'bg-neo-navy-light border-neo-black',
-                  )}
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={word === lastFoundWord && !prefersReducedMotion
-                    ? { scale: [0, 1.15, 1], opacity: 1 }
-                    : { scale: 1, opacity: 1 }
-                  }
-                  transition={prefersReducedMotion ? { duration: 0.2 } : { type: 'spring', stiffness: 500 }}
-                >
-                  {word} <span className="text-neo-lime font-black">+{scoreWord(word)}</span>
-                </motion.span>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* ── Found Words — fixed-height reserved slot. Always rendered so the
+          wheel cluster's `flex-1 justify-center` parent never re-centers when
+          the first word lands or new chips wrap to a new row. Chips scroll
+          inside the cap; only the chip animations move, never the slot. ── */}
+      <div
+        data-testid="found-words-slot"
+        className="w-full mt-2 h-[112px] sm:h-[136px] flex flex-col"
+      >
+        <h3
+          className={cn(
+            'text-xs font-bold uppercase mb-1.5 shrink-0 transition-opacity',
+            wordsFound.length > 0 ? 'text-neo-cream/50 opacity-100' : 'opacity-0',
+          )}
+          aria-hidden={wordsFound.length === 0}
+        >
+          {t('wordWheel.foundWords')} ({wordsFound.length})
+        </h3>
+        <div className="flex flex-wrap gap-1.5 overflow-y-auto pr-1 flex-1 min-h-0">
+          {wordsFound.map((word) => (
+            <motion.span
+              key={word}
+              className={cn(
+                'px-2.5 py-1 rounded-neo border-2 text-neo-cream text-xs font-semibold shadow-hard-xs h-fit',
+                word === lastFoundWord
+                  ? 'bg-neo-lime/20 border-neo-lime ring-1 ring-neo-lime/40'
+                  : 'bg-neo-navy-light border-neo-black',
+              )}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={word === lastFoundWord && !prefersReducedMotion
+                ? { scale: [0, 1.15, 1], opacity: 1 }
+                : { scale: 1, opacity: 1 }
+              }
+              transition={prefersReducedMotion ? { duration: 0.2 } : { type: 'spring', stiffness: 500 }}
+            >
+              {displayWord(word)} <span className="text-neo-lime font-black">+{scoreWord(word)}</span>
+            </motion.span>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

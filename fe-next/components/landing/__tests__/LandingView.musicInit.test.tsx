@@ -34,6 +34,7 @@ vi.mock('next/navigation', () => ({
 }));
 vi.mock('@/utils/onboardingStorage', () => ({
   hasCompletedOnboarding: () => true,
+  hasSupabaseSession: () => false,
   markOnboardingComplete: vi.fn(),
   markOnboardingSkipped: vi.fn(),
 }));

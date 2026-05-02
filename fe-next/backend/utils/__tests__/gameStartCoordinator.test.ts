@@ -246,25 +246,25 @@ describe('GameStartCoordinator', () => {
   // ==========================================
 
   describe('handlePlayerDisconnect', () => {
-    it('removes player from expected and triggers timer if remaining all ACKed', () => {
+    it('removes player from expected and triggers timer if remaining all reported countdownComplete', () => {
       const messageId = coordinator.initializeSequence('GAME1', ['alice', 'bob', 'charlie'], 60);
 
-      coordinator.recordAcknowledgment('GAME1', 'alice', messageId);
-      coordinator.recordAcknowledgment('GAME1', 'bob', messageId);
+      coordinator.recordCountdownComplete('GAME1', 'alice', messageId);
+      coordinator.recordCountdownComplete('GAME1', 'bob', messageId);
 
-      // charlie disconnects — alice and bob already ACKed
+      // charlie disconnects — alice and bob already finished countdown
       const result = coordinator.handlePlayerDisconnect('GAME1', 'charlie');
 
       expect(result).toEqual({ startTimer: true });
       expect(coordinator.getSequenceStats('GAME1')!.timerStarted).toBe(true);
     });
 
-    it('does not start timer if remaining players have not all ACKed', () => {
+    it('does not start timer if remaining players have not all reported countdownComplete', () => {
       const messageId = coordinator.initializeSequence('GAME1', ['alice', 'bob', 'charlie'], 60);
 
-      coordinator.recordAcknowledgment('GAME1', 'alice', messageId);
+      coordinator.recordCountdownComplete('GAME1', 'alice', messageId);
 
-      // charlie disconnects — bob still hasn't ACKed
+      // charlie disconnects — bob still hasn't finished countdown
       const result = coordinator.handlePlayerDisconnect('GAME1', 'charlie');
 
       expect(result).toEqual({ startTimer: false });
@@ -300,19 +300,22 @@ describe('GameStartCoordinator', () => {
       expect(result).toEqual({ startTimer: false });
     });
 
-    it('clears ack timeout when disconnect triggers start', () => {
+    it('clears countdown + ack timeouts when disconnect triggers start', () => {
       const messageId = coordinator.initializeSequence('GAME1', ['alice', 'bob'], 60);
-      const onTimeout = vi.fn();
+      const onAckTimeout = vi.fn();
+      const onCountdownTimeout = vi.fn();
 
-      coordinator.setAcknowledgmentTimeout('GAME1', 3000, onTimeout);
-      coordinator.recordAcknowledgment('GAME1', 'alice', messageId);
+      coordinator.setAcknowledgmentTimeout('GAME1', 3000, onAckTimeout);
+      coordinator.setCountdownCompleteTimeout('GAME1', 8000, onCountdownTimeout);
+      coordinator.recordCountdownComplete('GAME1', 'alice', messageId);
 
-      // bob disconnects — alice already ACKed, should start timer
+      // bob disconnects — alice already finished countdown, should start timer
       coordinator.handlePlayerDisconnect('GAME1', 'bob');
 
-      // Timeout should have been cleared
-      vi.advanceTimersByTime(5000);
-      expect(onTimeout).not.toHaveBeenCalled();
+      // Both timeouts should have been cleared
+      vi.advanceTimersByTime(10000);
+      expect(onAckTimeout).not.toHaveBeenCalled();
+      expect(onCountdownTimeout).not.toHaveBeenCalled();
     });
 
     it('does NOT start timer if all players disconnect (0 expected)', () => {
@@ -497,11 +500,11 @@ describe('GameStartCoordinator', () => {
       const messageId = coordinator.initializeSequence('GAME1', ['alice', 'bob', 'charlie'], 60);
       const onTimeout = vi.fn();
 
-      coordinator.setAcknowledgmentTimeout('GAME1', 5000, onTimeout);
+      coordinator.setCountdownCompleteTimeout('GAME1', 5000, onTimeout);
 
-      // alice and bob ACK
-      coordinator.recordAcknowledgment('GAME1', 'alice', messageId);
-      coordinator.recordAcknowledgment('GAME1', 'bob', messageId);
+      // alice and bob finish countdown
+      coordinator.recordCountdownComplete('GAME1', 'alice', messageId);
+      coordinator.recordCountdownComplete('GAME1', 'bob', messageId);
 
       // charlie disconnects at 2000ms
       vi.advanceTimersByTime(2000);

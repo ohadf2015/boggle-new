@@ -43,6 +43,19 @@ vi.mock('@/utils/consts', () => ({
   getDeadzoneThreshold: () => 5,
 }));
 
+// processTouchMove is RAF-batched in production. Stub rAF synchronously so
+// state updates land within the same act() block and assertions stay valid.
+beforeEach(() => {
+  vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+    cb(performance.now());
+    return 0;
+  });
+  vi.stubGlobal('cancelAnimationFrame', () => {});
+});
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
 describe('useGridInteraction - T-Shape Selection Bug', () => {
   /**
    * Grid layout:

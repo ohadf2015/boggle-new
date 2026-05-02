@@ -40,6 +40,7 @@ interface UseMultiplayerSocketOptions {
     username: string;
     language?: Language;
     roomName?: string;
+    isPrivate?: boolean;
   }) => void;
   onUpdateUsers: (users: Array<{ username: string; score?: number; avatar?: Avatar; isHost?: boolean; isBot?: boolean; presenceStatus?: string; isWindowFocused?: boolean }>) => void;
   onActiveRooms: (rooms: ActiveRoom[]) => void;
@@ -182,10 +183,8 @@ export function useMultiplayerSocket(
         const savedSession = getSession();
         if (savedSession && savedSession.gameCode && savedSession.username) {
           logger.log('[SOCKET.IO] Reconnecting to game:', savedSession.gameCode);
-          toast.success(optionsRef.current.t('common.reconnecting') || 'Reconnecting to game...', {
-            id: 'socket-reconnecting-to-game',
-            duration: 2000,
-          });
+          // Silent reconnect — the socket-status indicator already conveys this
+          // and a "Reconnecting..." toast on every wifi blip was noise.
           // Re-emit join with full identity context for proper server-side matching
           // Missing authUserId caused reconnections to lose authenticated player mapping
           const joinPayload: Record<string, unknown> = {
@@ -480,7 +479,19 @@ export function useMultiplayerSocket(
         });
         toast.success(opts.t('hostView.youAreNowHost'), { duration: 5000, icon: '👑' });
       } else {
-        toast(`${data.newHost} ${opts.t('hostView.newHostAssigned')}`, { duration: 3000, icon: '🔄' });
+        // If the previous host was me, clear my stale host session so a later
+        // reload/restore doesn't put me back into the host UI.
+        if (data.previousHost === opts.username) {
+          saveSession({
+            gameCode: opts.gameCode,
+            username: opts.username,
+            isHost: false,
+            roomName: opts.roomName || opts.username,
+            language: opts.roomLanguage || 'en',
+          });
+        }
+        // Suppress "🔄 X is now the host" — the player roster surfaces the
+        // crown badge and the demoted toast was noise on top of the room.
       }
       opts.onHostTransferred(data);
     });

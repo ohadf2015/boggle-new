@@ -52,7 +52,6 @@ interface PlayerWaitingViewProps {
   onAvatarChange?: (config: CustomAvatarConfig) => void;
 }
 
-const AVATAR_COLORS = ['bg-neo-cyan', 'bg-neo-pink', 'bg-purple-400', 'bg-neo-lime', 'bg-neo-yellow', 'bg-orange-400', 'bg-teal-400', 'bg-rose-400'];
 const MAX_PLAYERS = 8;
 
 // ==================== Component ====================
@@ -241,21 +240,21 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                     </motion.div>
                   )}
                   <div className={cn(
-                    'w-16 h-16 rounded-full border-3 border-neo-black flex items-center justify-center overflow-hidden',
+                    'w-16 h-16 rounded-full border-3 border-neo-black flex items-center justify-center overflow-hidden shadow-hard aspect-square',
                     isMe ? 'ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy' : '',
-                    AVATAR_COLORS[index % AVATAR_COLORS.length]
                   )}>
-                    {avatar?.customAvatar || avatar?.avatarImage ? (
-                      <Avatar
-                        customAvatar={avatar?.customAvatar ?? undefined}
-                        avatarImage={avatar?.avatarImage}
-                        size="xl"
-                      />
-                    ) : (
-                      <span className="text-2xl font-black text-neo-black">
-                        {name.charAt(0).toUpperCase()}
-                      </span>
-                    )}
+                    {/* Avatar handles full fallback chain (customAvatar → seeded face from userId).
+                        Don't gate on hasAvatar: backend may emit legacy `{emoji,color}` shape
+                        (userManager.ts) which has no customAvatar — Avatar still renders a
+                        deterministic seeded face from userId={name}. Stacking a colored bg
+                        disc + initial-letter span behind it caused a visible "two avatars" bug. */}
+                    <Avatar
+                      customAvatar={avatar?.customAvatar ?? undefined}
+                      userId={name}
+                      pixelSize={64}
+                      mode="multiplayer"
+                      className="w-full h-full"
+                    />
                   </div>
                   {isBot && (
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-neo-cyan border-2 border-neo-black rounded-full flex items-center justify-center">

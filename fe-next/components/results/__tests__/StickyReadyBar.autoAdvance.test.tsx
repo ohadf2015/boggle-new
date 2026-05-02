@@ -112,9 +112,12 @@ describe('StickyReadyBar auto-advance (host)', () => {
     expect(onStartGame).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onStartGame immediately when countdown button is clicked', () => {
+  it('calls onStartGame when host clicks countdown button after 15s host-hold', () => {
     const onStartGame = vi.fn();
     render(<StickyReadyBar {...baseProps} onStartGame={onStartGame} />);
+
+    // Host CTA is gated for the first 15s (until host-hold expires or all ready)
+    act(() => { vi.advanceTimersByTime(15_000); });
 
     const btn = screen.getByTestId('auto-countdown-cta');
     fireEvent.click(btn);

@@ -518,6 +518,7 @@ export const neoInfoToast = (message: string, options: NeoToastOptions = {}): st
     {
       duration: options.duration || 3000,
       position: 'top-center',
+      id: options.id,
     }
   );
 };
@@ -568,6 +569,7 @@ export const neoWarningToast = (message: string, options: NeoToastOptions = {}):
     {
       duration: options.duration || 4000,
       position: 'top-center',
+      id: options.id,
     }
   );
 };

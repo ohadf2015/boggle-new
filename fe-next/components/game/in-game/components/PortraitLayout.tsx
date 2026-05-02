@@ -10,7 +10,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import GridComponent, { type HighlightedCell } from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
 import RoomChat from '@/components/RoomChat';
-import WordFormingArea, { type WordFeedback } from '../../WordFormingArea';
+import { type WordFeedback } from '../../WordFormingArea';
+import { WordFormingAreaConnected } from './WordFormingAreaConnected';
 import ComboDisplay from '../../ComboDisplay';
 import CompactLeaderboard from '../../CompactLeaderboard';
 import { useBlastComboSync } from '@/hooks/gameState/store';
@@ -83,9 +84,9 @@ interface PortraitLayoutProps {
   deferredLeaderboard: LeaderboardPlayer[];
   foundWords: FoundWord[];
 
-  // Word forming
-  formedWord: string;
-  letterCount: number;
+  // Word forming — formedWord/letterCount read from useSelectionStore inside
+  // WordFormingAreaConnected, not propagated as props (avoids re-rendering this
+  // entire layout on every cell entered during a drag).
   currentFeedback: WordFeedback | null;
 
   // Keyboard input
@@ -184,8 +185,6 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   leaderboard,
   deferredLeaderboard,
   foundWords,
-  formedWord,
-  letterCount,
   currentFeedback,
   isTypingMode,
   typedWord,
@@ -509,11 +508,10 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           {isPlaying && gameMode !== 'word-hunt' && (
             <div className="relative flex items-center justify-center shrink-0 -mt-1 mb-0.5 desktop-short:lg:-mt-2 desktop-short:lg:mb-0 desktop-medium-short:lg:-mt-2 desktop-medium-short:lg:mb-0">
               <LeadChangeBanner event={leadChangeEvent ?? null} />
-              <WordFormingArea
-                word={isTypingMode ? typedWord : formedWord}
-                letterCount={isTypingMode ? typedWord.length : letterCount}
+              <WordFormingAreaConnected
+                isTypingMode={isTypingMode}
+                typedWord={typedWord}
                 feedback={currentFeedback}
-                compact
               />
             </div>
           )}

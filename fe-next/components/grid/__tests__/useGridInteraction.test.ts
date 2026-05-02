@@ -31,6 +31,20 @@ vi.mock('@/utils/consts', () => ({
   getDeadzoneThreshold: () => 5,
 }));
 
+// processTouchMove is RAF-batched to coalesce 60-120Hz touch events into one
+// process per frame. Stub rAF to fire synchronously so existing tests continue
+// to assert state immediately after handleTouchMove inside act().
+beforeEach(() => {
+  vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+    cb(performance.now());
+    return 0;
+  });
+  vi.stubGlobal('cancelAnimationFrame', () => {});
+});
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
 describe('useGridInteraction', () => {
   const mockGrid: LetterGrid = [
     ['A', 'B', 'C', 'D'],
@@ -272,6 +286,135 @@ describe('useGridInteraction', () => {
       expect(onPathSubmit).toHaveBeenCalledWith([
         expect.objectContaining({ row: 0, col: 0, letter: 'A' }),
       ]);
+    });
+  });
+
+  describe('post-submit cooldown — next selection is not wiped', () => {
+    /**
+     * Regression: the non-combo path schedules `setTimeout(setSelectedCells([]), 150)`
+     * after submit. If the player tapped a new tile within that 150ms, the
+     * orphan timer would fire later and erase the new selection — feeling like
+     * an input cooldown. Fix: track the timer + cancel on next touchstart, and
+     * guard the callback with `!isTouchingRef.current`.
+     */
+    it('preserves a new selection started within 150ms of the previous submit', () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+      try {
+        const onWordSubmit = vi.fn();
+        const gridRef = createMockRef();
+
+        const { result } = renderHook(() =>
+          useGridInteraction({
+            grid: mockGrid,
+            interactive: true,
+            comboLevel: 0,
+            onWordSubmit,
+            gridRef,
+            language: 'en',
+          })
+        );
+
+        // Submit a single-tile word via direct submitWord (non-combo path)
+        act(() => {
+          const tapEvent = {
+            touches: [{ clientX: 50, clientY: 50 }],
+          } as unknown as React.TouchEvent<HTMLDivElement>;
+          result.current.handleTouchStart(0, 0, 'A', tapEvent);
+        });
+        act(() => {
+          result.current.submitWord();
+        });
+
+        expect(onWordSubmit).toHaveBeenCalledWith('A');
+
+        // Within the 150ms hold window, start a new word at K (2,2)
+        act(() => {
+          vi.advanceTimersByTime(50);
+        });
+        act(() => {
+          const newTap = {
+            touches: [{ clientX: 250, clientY: 250 }],
+          } as unknown as React.TouchEvent<HTMLDivElement>;
+          result.current.handleTouchStart(2, 2, 'K', newTap);
+        });
+
+        // Let the orphan timer reach its scheduled fire time
+        act(() => {
+          vi.advanceTimersByTime(200);
+        });
+
+        // The new selection MUST NOT be wiped by the prior submit's pending clear
+        expect(result.current.selectedCells).toHaveLength(1);
+        expect(result.current.selectedCells[0]).toMatchObject({ row: 2, col: 2, letter: 'K' });
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('still clears the selection after 150ms when no new touch starts', () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+      try {
+        const onWordSubmit = vi.fn();
+        const onPathSubmit = vi.fn();
+        const gridRef = createMockRef();
+
+        // Need cell measurements for handleTouchMove → hasMovedRef = true so
+        // handleTouchEnd takes the submit path.
+        gridRef.current.getBoundingClientRect = () => ({
+          left: 0, top: 0, width: 400, height: 400, right: 400, bottom: 400,
+          x: 0, y: 0, toJSON: () => ({}),
+        });
+        const mockCell = document.createElement('div');
+        mockCell.getBoundingClientRect = () => ({
+          left: 0, top: 0, width: 100, height: 100, right: 100, bottom: 100,
+          x: 0, y: 0, toJSON: () => ({}),
+        });
+        gridRef.current.appendChild(mockCell);
+        for (let i = 1; i < 16; i++) {
+          gridRef.current.appendChild(mockCell.cloneNode(true));
+        }
+
+        const { result } = renderHook(() =>
+          useGridInteraction({
+            grid: mockGrid,
+            interactive: true,
+            comboLevel: 0,
+            onWordSubmit,
+            onPathSubmit,
+            gridRef,
+            language: 'en',
+          })
+        );
+
+        // Real swipe pattern: start → move → end (submits via handleTouchEnd)
+        act(() => {
+          result.current.handleTouchStart(0, 0, 'A', {
+            touches: [{ clientX: 50, clientY: 50 }],
+          } as unknown as React.TouchEvent<HTMLDivElement>);
+        });
+        act(() => {
+          result.current.handleTouchMove({
+            touches: [{ clientX: 150, clientY: 50 }],
+            cancelable: true,
+            preventDefault: vi.fn(),
+          } as unknown as TouchEvent);
+        });
+        act(() => {
+          result.current.handleTouchEnd();
+        });
+
+        // After release, selection still visible during the 150ms hold
+        expect(result.current.selectedCells.length).toBeGreaterThan(0);
+
+        // After the hold, selection clears (no new touch started)
+        act(() => {
+          vi.advanceTimersByTime(200);
+        });
+
+        expect(result.current.selectedCells).toHaveLength(0);
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 });

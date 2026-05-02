@@ -16,10 +16,11 @@ import { useTopPlayers } from '@/hooks/useTopPlayers';
 import { useLandingStats } from '@/hooks/useLandingStats';
 import { InlineBannerAd } from '@/components/ads';
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
-import { hasCompletedOnboarding, markOnboardingComplete } from '@/utils/onboardingStorage';
+import { hasCompletedOnboarding, hasSupabaseSession, markOnboardingComplete } from '@/utils/onboardingStorage';
 import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
 import { LandingBlogSection } from './LandingBlogSection';
 import { LandingHero } from './LandingHero';
+import { LandingCardsSkeleton } from './LandingCardsSkeleton';
 const LandingSocialProofBar = dynamic(() => import('./LandingSocialProofBar').then(m => m.LandingSocialProofBar), {
   ssr: false,
   loading: () => <div className="h-10 w-full max-w-4xl mx-auto" />,
@@ -65,8 +66,15 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, TRACKS } = useMusic();
-  const { isAuthenticated, isAdmin, profile } = useAuth();
+  const { isAuthenticated, isAdmin, profile, loading: authLoading } = useAuth();
   const isMobilePortrait = useMobilePortrait();
+
+  // Auth-flicker gate: if a Supabase token exists in localStorage we KNOW the user
+  // will resolve to authed. Render skeleton until profile lands instead of paint-
+  // ing the guest-default card set and overwriting it on hydration. Guests with
+  // no token sync straight from localStorage and hit the real cards on paint #1.
+  const [hadSession] = useState(() => typeof window !== 'undefined' && hasSupabaseSession());
+  const cardsReady = !hadSession || (!authLoading && !!profile);
 
   // Below-fold content is already code-split via dynamic() imports,
   // so no need for a separate hydration gate that causes CLS.
@@ -185,25 +193,27 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
 
 
         {/* ===== GAME MODES — THE PRIMARY CONTENT ===== */}
-        <LandingChallengeCards
-          language={language}
-          isAdmin={isAdmin}
-          hasBlastAccess={!!profile?.blast_access}
-          activePlayers={liveRoomStats.activePlayers}
-          openRooms={liveRoomStats.openRooms}
-          totalPlayers={liveRoomStats.totalPlayers}
-          playerAllTimeBest={playerAllTimeBest}
-          t={t}
-          dailyChallengeStats={dailyChallengeStats}
-          cardOrder={initialData?.cardOrder}
-        />
-
-        {/* Leaderboard — mobile only (desktop shows in hero sidebar) */}
-        {isMobilePortrait && (
-          <div className="w-full max-w-4xl mx-auto">
-            <LandingLeaderboardPreview players={topPlayers} loading={topPlayersLoading} compact />
-          </div>
+        {cardsReady ? (
+          <LandingChallengeCards
+            language={language}
+            isAdmin={isAdmin}
+            hasBlastAccess={!!profile?.blast_access}
+            activePlayers={liveRoomStats.activePlayers}
+            openRooms={liveRoomStats.openRooms}
+            totalPlayers={liveRoomStats.totalPlayers}
+            playerAllTimeBest={playerAllTimeBest}
+            t={t}
+            dailyChallengeStats={dailyChallengeStats}
+            cardOrder={initialData?.cardOrder}
+          />
+        ) : (
+          <LandingCardsSkeleton />
         )}
+
+        {/* Leaderboard — mobile only via CSS (no JS-driven mount/unmount → no CLS) */}
+        <div className="md:hidden w-full max-w-4xl mx-auto">
+          <LandingLeaderboardPreview players={topPlayers} loading={topPlayersLoading} compact />
+        </div>
 
         {/* Below-fold sections — rank + avatar only. Community/Share moved off landing. */}
         <div className="flex flex-col gap-6 sm:gap-8">

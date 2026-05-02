@@ -40,6 +40,7 @@ export interface ClientToServerEvents {
   join: (data: JoinGamePayload) => void;
   startGame: (data: StartGamePayload) => void;
   startGameAck: (data: { messageId: string }) => void;
+  countdownComplete: (data: { messageId: string }) => void;
   endGame: () => void;
   resetGame: () => void;
   closeRoom: () => void;
@@ -392,6 +393,9 @@ export interface StartGameBroadcast {
   skipAck?: boolean;
   gameMode?: GameMode;
   goldenLetters?: Array<{ row: number; col: number }>;
+  /** Server's authoritative session id — required for reconnect/lateJoin so
+   *  the client's timeUpdate session-id guard accepts subsequent ticks. */
+  gameSessionId?: number;
 }
 
 export interface WordAcceptedPayload {

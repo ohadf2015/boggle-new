@@ -46,6 +46,9 @@ const AUTO_SECONDS_DEFAULT = 35;
 // fit per session, lifting CG's average-playtime metric. 20s leaves room
 // to read final scores without giving the user a bounce window.
 const AUTO_SECONDS_CG = 20;
+// Minimum time host must wait before starting next round, so other
+// players can read the results screen. Bypassed when everyone is ready.
+const HOST_HOLD_SECONDS = 15;
 
 /**
  * Inline ready bar — renders as flex items inside a parent floating bar.
@@ -111,8 +114,22 @@ export default function StickyReadyBar({
   });
   const [secondsLeft, setSecondsLeft] = useState(AUTO_SECONDS);
   const [tooltipMode, setTooltipMode] = useState<GameModeOption | null>(null);
+  const [hostHoldExpired, setHostHoldExpired] = useState(false);
+  const hostHoldExpiredRef = useRef(false);
   const completedRef = useRef(false);
   const countdownStartedRef = useRef(false);
+
+  const allReady = totalPlayers > 0 && readyCount >= totalPlayers;
+  const hostStartGated = isHost && !hostHoldExpired && !allReady;
+
+  useEffect(() => {
+    if (!isHost) return;
+    const tid = setTimeout(() => {
+      hostHoldExpiredRef.current = true;
+      setHostHoldExpired(true);
+    }, HOST_HOLD_SECONDS * 1000);
+    return () => clearTimeout(tid);
+  }, [isHost]);
 
   // Determine if we should show auto-countdown
   // Host: always (auto-starts game)
@@ -127,6 +144,7 @@ export default function StickyReadyBar({
 
   const handleCountdownComplete = useCallback(() => {
     if (completedRef.current) return;
+    if (isHost && !hostHoldExpiredRef.current && !allReady) return;
     completedRef.current = true;
     clearCancelFlag();
     if (isHost) {
@@ -134,7 +152,7 @@ export default function StickyReadyBar({
     } else {
       onMarkReady();
     }
-  }, [isHost, onStartGame, onMarkReady, clearCancelFlag]);
+  }, [isHost, onStartGame, onMarkReady, clearCancelFlag, allReady]);
 
   useEffect(() => {
     if (!showCountdown) return;
@@ -183,8 +201,15 @@ export default function StickyReadyBar({
           <motion.button
             data-testid="auto-countdown-cta"
             onClick={handleCountdownComplete}
-            className={cn(btnBase, btnColor, 'relative overflow-hidden')}
-            whileTap={{ scale: 0.95 }}
+            aria-disabled={hostStartGated}
+            disabled={hostStartGated}
+            className={cn(
+              btnBase,
+              btnColor,
+              'relative overflow-hidden',
+              hostStartGated && 'opacity-60 cursor-not-allowed'
+            )}
+            whileTap={hostStartGated ? undefined : { scale: 0.95 }}
           >
             {/* CSS-only progress fill — GPU-composited, no JS animation loop */}
             <div
@@ -202,14 +227,22 @@ export default function StickyReadyBar({
             <span className="relative z-10 flex items-center gap-3">
               {isRevenge && winnerUsername ? (
                 <>
-                  <div className="w-7 h-7 rounded-full border-2 border-black overflow-hidden shadow-hard-sm shrink-0 bg-neo-navy">
-                    <Avatar userId={winnerUsername} customAvatar={winnerAvatar?.customAvatar} size="sm" className="w-full h-full" />
-                  </div>
+                  {isHost ? (
+                    <Play className="w-5 h-5 shrink-0" />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full border-2 border-black overflow-hidden shadow-hard-sm shrink-0 bg-neo-navy">
+                      <Avatar userId={winnerUsername} customAvatar={winnerAvatar?.customAvatar} size="sm" className="w-full h-full" />
+                    </div>
+                  )}
                   <span className="truncate">{t('results.revengeRematch', { player: winnerUsername })}</span>
                 </>
               ) : (
                 <>
-                  <Crown className="w-5 h-5 shrink-0" />
+                  {isHost ? (
+                    <Play className="w-5 h-5 shrink-0" />
+                  ) : (
+                    <Crown className="w-5 h-5 shrink-0" />
+                  )}
                   <span className="truncate">{t('results.defendTitle')}</span>
                 </>
               )}
@@ -237,9 +270,19 @@ export default function StickyReadyBar({
     if (isHost) {
       return (
         <motion.button
-          onClick={() => { clearCancelFlag(); onStartGame(); }}
-          whileTap={{ scale: 0.95 }}
-          className={cn(btnBase, isRevenge ? 'bg-neo-pink text-white' : 'bg-neo-lime text-neo-black')}
+          onClick={() => {
+            if (hostStartGated) return;
+            clearCancelFlag();
+            onStartGame();
+          }}
+          aria-disabled={hostStartGated}
+          disabled={hostStartGated}
+          whileTap={hostStartGated ? undefined : { scale: 0.95 }}
+          className={cn(
+            btnBase,
+            isRevenge ? 'bg-neo-pink text-white' : 'bg-neo-lime text-neo-black',
+            hostStartGated && 'opacity-60 cursor-not-allowed'
+          )}
         >
           {isRevenge && winnerUsername ? (
             <>

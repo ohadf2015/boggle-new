@@ -1772,7 +1772,19 @@ const sv = {
       "playMultiplayer": "Flerspelare",
       "demoCaption": "Så spelar du",
       "freeBadge": "Alltid Gratis",
-      "demoAlt": "Bokstavsruta som visar hur man kopplar ihop ett ord"
+      "demoAlt": "Bokstavsruta som visar hur man kopplar ihop ett ord",
+      "tutorial": {
+        "tag": "Steg 1 · Så Spelar Du",
+        "heading": "Svep",
+        "headingAccent": "för att stava",
+        "subtitle": "Koppla ihop angränsande bokstäver. Vi visar en gång — sen är det din tur.",
+        "watchMe": "Titta...",
+        "yourTurn": "Din tur — stava",
+        "success": "Snyggt!",
+        "skip": "Hoppa över → Välj läge",
+        "caption": "Testa",
+        "tryIt": "Svep!"
+      }
     },
     "welcome": {
       "title": "Välkommen till LexiClash!",
@@ -10029,28 +10041,36 @@ const sv = {
       description: "Hitta så många ord du kan!",
       feature1: "Tidsbegränsat",
       feature2: "Poängbaserat",
-      feature3: "Fritt"
+      feature3: "Fritt",
+      intro: { greet: "Ta din tid. Bara ord." }
     },
     blast: {
       name: "Blast",
       description: "Rensa brickor med kombos och specialkrafter!",
       feature1: "Kedjekombos",
       feature2: "Specialbrickor",
-      feature3: "Kaskad"
+      feature3: "Kaskad",
+      intro: { greet: "Tryck, dra, andas. Ingen brådska." }
     },
     wordHunt: {
       name: "Ordjakt",
       description: "Tävla om att hitta målordet!",
       feature1: "Målord",
       feature2: "Snabblopp",
-      feature3: "Ledtrådar"
+      feature3: "Ledtrådar",
+      intro: { greet: "Ett ord i taget. Du fixar det." }
     },
     wheelRush: {
       name: "Hjulrusning",
       description: "Kapplöpning på hjulet — stjäl ord för att vinna!",
       feature1: "Låsfönster",
       feature2: "Stridsdimma",
-      feature3: "Pangrambonus"
+      feature3: "Pangrambonus",
+      intro: { greet: "Snurra lugnt. Orden kommer." }
+    },
+    intro: {
+      cta: "Sätt igång",
+      skip: "Hoppa över"
     },
     random: "Slumpmässigt",
     randomDescription: "Överraska mig! Slumpa läge varje runda.",
@@ -10064,6 +10084,10 @@ const sv = {
     "fast": "Snabb",
     "party": "Fest",
     "challenge": "Utmaning"
+  },
+  "practiceHub": {
+    "title": "Övning",
+    "subtitle": "En lugn plats att lära sig varje läge"
   },
   "shareResult": {
     "singleplayer": "LexiClash Solo",

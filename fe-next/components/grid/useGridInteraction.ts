@@ -1,13 +1,11 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { getDeadzoneThreshold } from '@/utils/consts';
 import type { LetterGrid, GridPosition, Language } from '@/types';
 import type { CellPosition, SelectedCell } from './types';
-import { getPerformanceConfig } from './performanceUtils';
 import {
   type GridMeasurements,
   isAdjacentCell,
   isDiagonalMove,
-  getSelectableAdjacentCells,
   measureGrid,
   getCellAtPosition,
   isWithinSelectionThreshold,
@@ -48,7 +46,6 @@ interface UseGridInteractionReturn {
   selectedCells: SelectedCell[];
   fadingCells: GridPosition[];
   focusedCell: GridPosition | null;
-  adjacentCells: GridPosition[];
   swipeVelocity: number;
   hoveredCell: GridPosition | null;
   isSelecting: boolean;
@@ -88,7 +85,6 @@ export function useGridInteraction({
   const [fadingCells, setFadingCells] = useState<GridPosition[]>([]);
   const [focusedCell, setFocusedCell] = useState<GridPosition | null>(null);
   const [, setIsKeyboardMode] = useState(false);
-  const [adjacentCells, setAdjacentCells] = useState<GridPosition[]>([]);
   const [hoveredCell, setHoveredCell] = useState<GridPosition | null>(null);
   const [isClickSelectMode, setIsClickSelectMode] = useState(false);
   const isTouchingRef = useRef(false);
@@ -107,10 +103,24 @@ export function useGridInteraction({
   const gridMeasurementsRef = useRef<GridMeasurements | null>(null);
   const pendingTouchRef = useRef<{ x: number; y: number } | null>(null);
   const rafIdRef = useRef<number | null>(null);
+  // Track scheduling state separately from id so re-entry detection is
+  // robust against synchronous rAF stubs (used in tests).
+  const rafScheduledRef = useRef(false);
   const velocityTrackerRef = useRef(createVelocityTracker());
-  const performanceConfig = useMemo(() => getPerformanceConfig(), []);
+  // Read combo via ref so handler closures stay stable as combo ticks. Without
+  // this, every server-driven combo update re-creates processTouchMove +
+  // handleTouchEnd + submitWord, which re-runs the useEffect that re-binds the
+  // native touchmove listener mid-game.
+  const comboLevelRef = useRef(comboLevel);
+  useEffect(() => { comboLevelRef.current = comboLevel; }, [comboLevel]);
   const selectedCells = externalSelectedCells || internalSelectedCells;
   const setSelectedCells = externalSelectedCells ? noOp : setInternalSelectedCells;
+  // Mirror selectedCells into a ref so submitWord / startSequentialFadeOut /
+  // undoLastCell can be stable callbacks (no `selectedCells` in their deps).
+  // Without this, selection updates during drag re-create the global mouseup/
+  // touchend listeners attached at line 525, costing one rebind per pointer move.
+  const selectedCellsRef = useRef(selectedCells);
+  useEffect(() => { selectedCellsRef.current = selectedCells; }, [selectedCells]);
 
   const getGridMeasurements = useCallback((): GridMeasurements | null => {
     if (!gridRef.current) return null;
@@ -144,46 +154,33 @@ export function useGridInteraction({
   }, [gridRef]);
 
 
-  useEffect(() => {
-    const lastCell = selectedCells[selectedCells.length - 1];
-    if (lastCell && isTouchingRef.current) {
-      const base = getSelectableAdjacentCells(lastCell, grid, selectedCells);
-      if (isAdjacentOverride) {
-        // Add portal-reachable cells beyond standard 8-direction
-        const selectedSet = new Set(selectedCells.map(c => `${c.row}-${c.col}`));
-        const baseSet = new Set(base.map(c => `${c.row}-${c.col}`));
-        const rows = grid.length;
-        const cols = grid[0]?.length ?? 4;
-        for (let r = 0; r < rows; r++) {
-          for (let c = 0; c < cols; c++) {
-            const key = `${r}-${c}`;
-            if (baseSet.has(key) || selectedSet.has(key)) continue;
-            if (isAdjacentOverride(lastCell, { row: r, col: c })) {
-              base.push({ row: r, col: c });
-            }
-          }
-        }
-      }
-      setAdjacentCells(base);
-    } else {
-      setAdjacentCells([]);
-    }
-  }, [selectedCells, grid, isAdjacentOverride]);
   // Track fade timeouts so they can be cancelled when a new selection starts
   const fadeTimerIdsRef = useRef<NodeJS.Timeout[]>([]);
+  // Tracks the non-combo post-submit "hold visible 150ms then clear" timer.
+  // Cancelled in cancelFadeOut so a quick next-word tap isn't wiped by a
+  // stale clear from the previous submission.
+  const postSubmitClearRef = useRef<NodeJS.Timeout | null>(null);
   const cancelFadeOut = useCallback(() => {
     if (fadeTimeoutRef.current) {
       clearTimeout(fadeTimeoutRef.current);
       fadeTimeoutRef.current = null;
     }
+    if (postSubmitClearRef.current) {
+      clearTimeout(postSubmitClearRef.current);
+      postSubmitClearRef.current = null;
+    }
     fadeTimerIdsRef.current.forEach(id => clearTimeout(id));
     fadeTimerIdsRef.current = [];
     setFadingCells([]);
   }, []);
-  const startSequentialFadeOut = useCallback((isCombo = false) => {
-    if (selectedCells.length === 0) return;
+  // `cellsOverride` lets callers pass an explicit fade source (e.g. handleTouchEnd
+  // passes the just-released dragCells). Without override, reads from the
+  // selectedCellsRef so this callback stays stable across drag steps.
+  const startSequentialFadeOut = useCallback((isCombo = false, cellsOverride?: SelectedCell[]) => {
+    const source = cellsOverride ?? selectedCellsRef.current;
+    if (source.length === 0) return;
     cancelFadeOut();
-    const cellsToFade = [...selectedCells];
+    const cellsToFade = [...source];
     setFadingCells(cellsToFade);
     // Reduced delays for snappier desktop feel
     const cellFadeDelay = isCombo ? 80 : 50;
@@ -203,26 +200,35 @@ export function useGridInteraction({
       fadeTimeoutRef.current = null;
       fadeTimerIdsRef.current = [];
     }, totalDelay);
-  }, [selectedCells, setSelectedCells, cancelFadeOut]);
+  }, [setSelectedCells, cancelFadeOut]);
   const submitWord = useCallback(() => {
-    if (selectedCells.length === 0) return;
-    const formedWord = selectedCells.map(c => c.letter).join('');
-    if (onPathSubmit) onPathSubmit([...selectedCells]);
+    const current = selectedCellsRef.current;
+    if (current.length === 0) return;
+    const combo = comboLevelRef.current;
+    const formedWord = current.map(c => c.letter).join('');
+    if (onPathSubmit) onPathSubmit([...current]);
     if (onWordSubmit) onWordSubmit(formedWord);
-    vibrateWordSubmit(selectedCells.length, comboLevel, fireRoundActive);
-    if (comboLevel > 0) {
-      startSequentialFadeOut(true);
+    vibrateWordSubmit(current.length, combo, fireRoundActive);
+    if (combo > 0) {
+      startSequentialFadeOut(true, current);
     } else {
-      setTimeout(() => setSelectedCells([]), 150);
+      if (postSubmitClearRef.current) clearTimeout(postSubmitClearRef.current);
+      postSubmitClearRef.current = setTimeout(() => {
+        postSubmitClearRef.current = null;
+        // Skip if user already started a new word — clearing would wipe it.
+        if (isTouchingRef.current) return;
+        setSelectedCells([]);
+      }, 150);
     }
     setIsClickSelectMode(false);
-  }, [selectedCells, onWordSubmit, onPathSubmit, comboLevel, fireRoundActive, startSequentialFadeOut, setSelectedCells]);
+  }, [onWordSubmit, onPathSubmit, fireRoundActive, startSequentialFadeOut, setSelectedCells]);
   const undoLastCell = useCallback(() => {
-    if (selectedCells.length > 0) {
-      setSelectedCells(selectedCells.slice(0, -1));
+    const current = selectedCellsRef.current;
+    if (current.length > 0) {
+      setSelectedCells(current.slice(0, -1));
       vibrateUndo(fireRoundActive);
     }
-  }, [selectedCells, setSelectedCells, fireRoundActive]);
+  }, [setSelectedCells, fireRoundActive]);
   useEffect(() => {
     if (!interactive || comboLevel === 0 || selectedCells.length === 0) {
       if (autoSubmitTimeoutRef.current) {
@@ -238,7 +244,7 @@ export function useGridInteraction({
           const formedWord = selectedCells.map(c => c.letter).join('');
           if (onPathSubmit) onPathSubmit([...selectedCells]);
           if (onWordSubmit) onWordSubmit(formedWord);
-          startSequentialFadeOut(true);
+          startSequentialFadeOut(true, selectedCells);
           isTouchingRef.current = false;
         }
       }, 500);
@@ -300,7 +306,11 @@ export function useGridInteraction({
         for (let i = existingIndex + 1; i < dragCells.length; i++) {
           toggleDragClass(dragCells[i].row, dragCells[i].col, false);
         }
-        dragSelectionRef.current = dragCells.slice(0, existingIndex + 1);
+        const trimmed = dragCells.slice(0, existingIndex + 1);
+        dragSelectionRef.current = trimmed;
+        // Sync React state — without this, word preview / combo / escalation
+        // hold the stale longer path until next forward step or release.
+        setSelectedCells(trimmed);
         vibrateBacktrack(fireRoundActive);
       }
       return;
@@ -310,8 +320,9 @@ export function useGridInteraction({
       // Check cell filter — pass current drag length so gem filter uses real-time count
       if (cellFilter && !cellFilter(currentCell.row, currentCell.col, dragCells.length)) return;
       const newCount = dragCells.length + 1;
-      const prevTier = getSelectionEscalation(dragCells.length - 1, dragCells.length, comboLevel).tier;
-      const newTier = getSelectionEscalation(dragCells.length, newCount, comboLevel).tier;
+      const combo = comboLevelRef.current;
+      const prevTier = getSelectionEscalation(dragCells.length - 1, dragCells.length, combo).tier;
+      const newTier = getSelectionEscalation(dragCells.length, newCount, combo).tier;
       const newCell = { row: currentCell.row, col: currentCell.col, letter: currentCell.letter };
       const newDragCells = [...dragCells, newCell];
       dragSelectionRef.current = newDragCells;
@@ -323,7 +334,7 @@ export function useGridInteraction({
         vibrateCellDrag(fireRoundActive, newTier);
       }
     }
-  }, [fireRoundActive, comboLevel, getCellAtPos, toggleDragClass, setSelectedCells, cellFilter, isAdjacentOverride]);
+  }, [fireRoundActive, getCellAtPos, toggleDragClass, setSelectedCells, cellFilter, isAdjacentOverride]);
 
   const handleTouchMove = useCallback((e: TouchEvent | MouseEvent) => {
     if (!interactive || !isTouchingRef.current) return;
@@ -346,20 +357,21 @@ export function useGridInteraction({
     } else {
       if ('cancelable' in e && e.cancelable) e.preventDefault();
     }
-    if (performanceConfig.isLowEnd) {
-      pendingTouchRef.current = { x: touchX, y: touchY };
-      if (rafIdRef.current === null) {
-        rafIdRef.current = requestAnimationFrame(() => {
-          rafIdRef.current = null;
-          const pending = pendingTouchRef.current;
-          if (pending && isTouchingRef.current) processTouchMove(pending.x, pending.y);
-          pendingTouchRef.current = null;
-        });
-      }
-    } else {
-      processTouchMove(touchX, touchY);
+    // Always RAF-batch — native pointer/touch events fire 60-120Hz on iOS;
+    // coalescing to one process per frame caps GridComponent re-renders to
+    // display refresh rate without losing any meaningful selection event.
+    pendingTouchRef.current = { x: touchX, y: touchY };
+    if (!rafScheduledRef.current) {
+      rafScheduledRef.current = true;
+      rafIdRef.current = requestAnimationFrame(() => {
+        rafScheduledRef.current = false;
+        rafIdRef.current = null;
+        const pending = pendingTouchRef.current;
+        if (pending && isTouchingRef.current) processTouchMove(pending.x, pending.y);
+        pendingTouchRef.current = null;
+      });
     }
-  }, [interactive, performanceConfig.isLowEnd, processTouchMove]);
+  }, [interactive, processTouchMove]);
 
   const handleTouchEnd = useCallback(() => {
     if (!interactive || !isTouchingRef.current) return;
@@ -368,7 +380,6 @@ export function useGridInteraction({
       clearTimeout(autoSubmitTimeoutRef.current);
       autoSubmitTimeoutRef.current = null;
     }
-    setAdjacentCells([]);
     velocityTrackerRef.current.reset();
     lastDirectionRef.current = null;
     startCellRef.current = null;
@@ -380,11 +391,18 @@ export function useGridInteraction({
       const formedWord = dragCells.map(c => c.letter).join('');
       if (onPathSubmit) onPathSubmit([...dragCells]);
       if (onWordSubmit) onWordSubmit(formedWord);
-      vibrateWordSubmit(dragCells.length, comboLevel, fireRoundActive);
-      if (comboLevel > 0) {
-        startSequentialFadeOut(true);
+      const combo = comboLevelRef.current;
+      vibrateWordSubmit(dragCells.length, combo, fireRoundActive);
+      if (combo > 0) {
+        startSequentialFadeOut(true, dragCells);
       } else {
-        setTimeout(() => setSelectedCells([]), 150);
+        if (postSubmitClearRef.current) clearTimeout(postSubmitClearRef.current);
+        postSubmitClearRef.current = setTimeout(() => {
+          postSubmitClearRef.current = null;
+          // Skip clear if user already started a new word.
+          if (isTouchingRef.current) return;
+          setSelectedCells([]);
+        }, 150);
       }
     } else {
       if (dragCells.length === 1 && !hasMovedRef.current && onSingleTapDetected) {
@@ -395,7 +413,7 @@ export function useGridInteraction({
     }
     dragSelectionRef.current = [];
     hasMovedRef.current = false;
-  }, [interactive, onWordSubmit, onPathSubmit, fireRoundActive, comboLevel, startSequentialFadeOut, setSelectedCells, onSingleTapDetected, clearAllDragClasses]);
+  }, [interactive, onWordSubmit, onPathSubmit, fireRoundActive, startSequentialFadeOut, setSelectedCells, onSingleTapDetected, clearAllDragClasses]);
 
   // Click-to-select handler for desktop (extracted)
   const handleCellClick = useGridClickHandler({
@@ -543,10 +561,15 @@ export function useGridInteraction({
     return () => window.removeEventListener('touchstart', handleFirstTouch);
   }, []);
 
+  // Track isClickSelectMode in a ref so this effect (binds 2 global listeners)
+  // doesn't re-run on every selection length change during drag.
+  const isClickSelectModeRef = useRef(isClickSelectMode);
+  useEffect(() => { isClickSelectModeRef.current = isClickSelectMode; }, [isClickSelectMode]);
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (gridRef.current && !gridRef.current.contains(e.target as Node)) {
-        if (isClickSelectMode && selectedCells.length > 0) {
+        if (isClickSelectModeRef.current && selectedCellsRef.current.length > 0) {
           submitWord();
         } else {
           setIsClickSelectMode(false);
@@ -555,7 +578,7 @@ export function useGridInteraction({
       }
     };
     const handleEscapeKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isClickSelectMode) {
+      if (e.key === 'Escape' && isClickSelectModeRef.current) {
         setIsClickSelectMode(false);
         setSelectedCells([]);
       }
@@ -566,7 +589,7 @@ export function useGridInteraction({
       window.removeEventListener('mousedown', handleClickOutside);
       window.removeEventListener('keydown', handleEscapeKey);
     };
-  }, [gridRef, isClickSelectMode, selectedCells.length, submitWord, setSelectedCells]);
+  }, [gridRef, submitWord, setSelectedCells]);
 
   useEffect(() => {
     const handlePointerDown = () => setIsKeyboardMode(false);
@@ -585,6 +608,7 @@ export function useGridInteraction({
     return () => {
       if (rafIdRef.current !== null) { cancelAnimationFrame(rafIdRef.current); rafIdRef.current = null; }
       if (mouseRafIdRef.current !== null) { cancelAnimationFrame(mouseRafIdRef.current); mouseRafIdRef.current = null; }
+      if (postSubmitClearRef.current) { clearTimeout(postSubmitClearRef.current); postSubmitClearRef.current = null; }
     };
   }, []);
 
@@ -610,7 +634,6 @@ export function useGridInteraction({
     selectedCells,
     fadingCells,
     focusedCell,
-    adjacentCells,
     swipeVelocity: velocityTrackerRef.current.getVelocity(),
     hoveredCell,
     isSelecting: isClickSelectMode,

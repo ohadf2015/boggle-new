@@ -211,6 +211,21 @@ describe('handleReconnection', () => {
     expect(socket.emit).toHaveBeenCalledWith('updateLeaderboard', expect.objectContaining({ leaderboard: [] }));
   });
 
+  // 7a. Reconnect must include gameSessionId so client accepts subsequent
+  // server timeUpdate ticks (usePlayerGameEvents.ts:398-401 drops stale sessions).
+  it('emits startGame with gameSessionId on reconnect to in-progress game', () => {
+    const game = makeGame({ gameState: 'playing', letterGrid: [['A']], remainingTime: 60, gameSessionId: 11 });
+    mockIsInProgress.mockReturnValue(true);
+    const socket = createMockSocket('socket-new');
+
+    handleReconnection({} as any, socket, game, 'GAME1', 'Player1');
+
+    expect(socket.emit).toHaveBeenCalledWith(
+      'startGame',
+      expect.objectContaining({ gameSessionId: 11 })
+    );
+  });
+
   // 7b. Blast timer guard: remainingTime=0 must NOT fall back to full timerSeconds
   // Regression guard — `||` falsy-fallback would reset an expired blast clock to 90s
   // during the endGame race window, letting a reconnecting player play past t=0.
@@ -336,6 +351,22 @@ describe('handleLateJoin', () => {
     expect(socket.emit).toHaveBeenCalledWith(
       'startGame',
       expect.objectContaining({ lateJoin: true, letterGrid: game.letterGrid })
+    );
+  });
+
+  // Regression guard: late-join must include gameSessionId so client's
+  // handleTimeUpdate session-id check (usePlayerGameEvents.ts:398-401) does
+  // NOT drop every server timeUpdate as "stale" — that left late-joiners
+  // stuck on the one-shot setTime() value while everyone else's timer ticked.
+  it('emits startGame with gameSessionId so client accepts subsequent timeUpdate ticks', () => {
+    const game = makeGame({ gameState: 'playing', letterGrid: [['A']], remainingTime: 45, gameSessionId: 7 });
+    const socket = createMockSocket();
+
+    handleLateJoin(socket, game, 'GAME1', 'NewPlayer');
+
+    expect(socket.emit).toHaveBeenCalledWith(
+      'startGame',
+      expect.objectContaining({ gameSessionId: 7 })
     );
   });
 

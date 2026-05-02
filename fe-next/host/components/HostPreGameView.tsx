@@ -96,6 +96,8 @@ interface HostPreGameViewProps {
   lessonData?: LessonData | null;
   onNameChange?: (newName: string) => void;
   onAvatarChange?: (config: CustomAvatarConfig) => void;
+  /** When true (Quick Play / classroom), hide invite + share affordances. */
+  isPrivate?: boolean;
 }
 
 // ==================== Component ====================
@@ -121,6 +123,7 @@ function HostPreGameView({
   lessonData,
   onNameChange,
   onAvatarChange,
+  isPrivate = false,
 }: HostPreGameViewProps): React.ReactElement {
   const { socket } = useSocket();
   const { isAdmin, isAuthenticated, updateProfile, profile } = useAuth();
@@ -218,13 +221,19 @@ function HostPreGameView({
   });
 
   useEffect(() => {
+    // Private rooms (Quick Play / classroom) intentionally suppress the
+    // CrazyGames invite chip — these flows aren't designed for friend invites.
+    if (isPrivate) {
+      if (isInviteButtonVisible) hideInviteButton();
+      return;
+    }
     if (gameCode && gameState === 'waiting') {
       showInviteButton(gameCode);
     }
     return () => {
       if (isInviteButtonVisible) hideInviteButton();
     };
-  }, [gameCode, gameState, showInviteButton, hideInviteButton, isInviteButtonVisible]);
+  }, [gameCode, gameState, showInviteButton, hideInviteButton, isInviteButtonVisible, isPrivate]);
 
   // Actual player count for start logic
   const actualPlayerCount = hostPlaying
@@ -375,9 +384,11 @@ function HostPreGameView({
             </span>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <div className="lg:hidden">
-              <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />
-            </div>
+            {!isPrivate && (
+              <div className="lg:hidden">
+                <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />
+              </div>
+            )}
             {/* UI-language switcher — distinct from board-language chip on the left;
                 lets every lobby player change app language without leaving the room. */}
             <QuickLanguageSwitcher compact />
@@ -440,9 +451,11 @@ function HostPreGameView({
             }
             rightContent={
               <div data-testid="desktop-chat-area">
-                <div className="animate-fade-in-up" style={{ animationDelay: '60ms' }}>
-                  <InviteCard gameCode={gameCode} t={t} />
-                </div>
+                {!isPrivate && (
+                  <div className="animate-fade-in-up" style={{ animationDelay: '60ms' }}>
+                    <InviteCard gameCode={gameCode} t={t} />
+                  </div>
+                )}
                 <div className="animate-fade-in-up" style={{ animationDelay: '140ms' }}>
                   <GameInstructions selectedGameMode={selectedGameMode} t={t} />
                 </div>
@@ -492,7 +505,7 @@ function HostPreGameView({
                 hasBlastAccess={hasBlastAccess}
               />
               <GameInstructions selectedGameMode={selectedGameMode} t={t} defaultOpen={false} />
-              <InviteCard gameCode={gameCode} t={t} />
+              {!isPrivate && <InviteCard gameCode={gameCode} t={t} />}
             </div>
           </div>
           {/* Sticky bottom start button — mobile */}

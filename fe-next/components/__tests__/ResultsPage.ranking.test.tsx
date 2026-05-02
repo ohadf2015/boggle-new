@@ -209,6 +209,7 @@ vi.mock('@/utils/SocketContext', () => ({
     socket: { emit: vi.fn(), on: vi.fn(), off: vi.fn() },
     isConnected: true,
   }),
+  useSocketOptional: () => null,
 }));
 
 vi.mock('@/components/RoomChat', () => ({

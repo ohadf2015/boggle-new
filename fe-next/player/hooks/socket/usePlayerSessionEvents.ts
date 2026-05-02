@@ -6,7 +6,7 @@
  */
 import { useEffect, useMemo, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
-import { neoSuccessToast, neoInfoToast, wordErrorToast, TOAST_ICONS } from '../../../components/NeoToast';
+import { neoInfoToast, wordErrorToast, TOAST_ICONS } from '../../../components/NeoToast';
 import { clearSessionPreservingUsername } from '../../../utils/session';
 import { socketErrorMessage } from '../../../utils/socketErrorMessage';
 import { processAchievements } from '@/shared/utils/achievementUtils';
@@ -121,10 +121,7 @@ export function usePlayerSessionEvents({
 
     const handleHostTransferred = (data: HostTransferredPayload) => {
       logger.log('[PLAYER] Host transferred to:', data.newHost);
-      neoSuccessToast(data.message || `${data.newHost} ${t('playerView.isNowHost') || 'is now the host'}`, {
-        icon: TOAST_ICONS.crown,
-        duration: 4000
-      });
+      // Silent — the host crown moves on the player roster, no toast needed.
     };
 
     const handleSessionTakenOver = (data: HostMessagePayload) => {

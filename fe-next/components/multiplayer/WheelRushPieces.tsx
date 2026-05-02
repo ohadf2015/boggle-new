@@ -17,9 +17,14 @@ interface MyWordsChipsProps {
 }
 
 export const MyWordsChips: React.FC<MyWordsChipsProps> = ({ words }) => {
-  if (words.length === 0) return null;
+  // Always render a fixed-height slot so the wheel cluster's `flex-1
+  // justify-center` doesn't re-center when the first chip lands. Empty
+  // state is silent — no header/placeholder, just reserved space.
   return (
-    <div className="max-h-16 overflow-y-auto flex flex-wrap gap-1.5 justify-center">
+    <div
+      data-testid="my-words-slot"
+      className="h-16 overflow-y-auto flex flex-wrap gap-1.5 justify-center"
+    >
       {words.slice(0, 20).map((w, i) => (
         <span
           key={`${w.word}-${i}`}

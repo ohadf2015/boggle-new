@@ -41,6 +41,8 @@ const { mockCheckRateLimit, mockValidatePayload, mockEmitError, mockGetGame, moc
     initializeSequence: vi.fn(() => 'msg-id-123'),
     scheduleRetries: vi.fn(),
     setAcknowledgmentTimeout: vi.fn(),
+    setCountdownCompleteTimeout: vi.fn(),
+    recordCountdownComplete: vi.fn(),
   };
   const mockStopAllBots = vi.fn();
   const mockNotifyGameStarted = vi.fn(() => Promise.resolve());

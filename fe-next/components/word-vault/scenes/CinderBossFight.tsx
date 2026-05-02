@@ -157,7 +157,7 @@ export function CinderBossFight({
 
     // counter-attack on a tick
     setTimeout(cinderCounter, 600);
-  }, [outcome, word, selected, phase, pushFloat, refillLetters, onVictoryDamage, onVictoryMercy, cinderCounter]);
+  }, [outcome, word, selected, phase, mercy, pushFloat, refillLetters, onVictoryDamage, onVictoryMercy, cinderCounter]);
 
   // Defeat detection
   useEffect(() => {

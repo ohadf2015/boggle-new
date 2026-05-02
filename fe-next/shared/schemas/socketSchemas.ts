@@ -196,6 +196,14 @@ export const StartGameAckSchema = z.object({
 });
 
 /**
+ * countdownComplete event payload - client signals pre-game countdown finished
+ * (independent of ack: ack = delivery confirmation, this = readiness to play)
+ */
+export const CountdownCompleteSchema = z.object({
+  messageId: z.string().min(1),
+});
+
+/**
  * submitWord event payload
  */
 export const SubmitWordSchema = z.object({
@@ -399,6 +407,7 @@ export const ClientEventSchemas = {
   leaveRoom: LeaveRoomSchema,
   startGame: StartGameSchema,
   startGameAck: StartGameAckSchema,
+  countdownComplete: CountdownCompleteSchema,
   resetGame: ResetGameSchema,
   closeRoom: CloseRoomSchema,
   submitWord: SubmitWordSchema,

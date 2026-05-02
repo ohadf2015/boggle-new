@@ -17,6 +17,10 @@ vi.mock('framer-motion', async () => {
   };
 });
 
+vi.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({ playButtonClickSound: vi.fn() }),
+}));
+
 vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     // eslint-disable-next-line react/display-name
@@ -44,7 +48,45 @@ const mockT = (key: string, params?: Record<string, string | number>) => {
 };
 
 describe('ModeRevealOverlay', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it('renders mode label', () => {
+    render(<ModeRevealOverlay modeLabel="CLASSIC!" t={mockT} />);
+    expect(screen.getByText('CLASSIC!')).toBeInTheDocument();
+  });
+
+  it('renders cozy ModeIntroCard for first-time when modeKey provided', () => {
+    render(
+      <ModeRevealOverlay
+        modeLabel="BLAST!"
+        modeKey="blast"
+        onIntroDismiss={() => {}}
+        t={mockT}
+      />,
+    );
+    // CTA from gameModes.intro.cta key signals intro card was rendered
+    expect(screen.getByRole('button', { name: /gameModes\.intro\.cta|Let's go/i })).toBeInTheDocument();
+    // Splash mode label NOT rendered as the giant lime headline
+    expect(screen.queryByText('BLAST!')).not.toBeInTheDocument();
+  });
+
+  it('renders splash (skips intro) when modeKey already seen', () => {
+    localStorage.setItem('lc_seen_mode_blast', '1');
+    render(
+      <ModeRevealOverlay
+        modeLabel="BLAST!"
+        modeKey="blast"
+        onIntroDismiss={() => {}}
+        t={mockT}
+      />,
+    );
+    expect(screen.getByText('BLAST!')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Let's go/i })).not.toBeInTheDocument();
+  });
+
+  it('renders splash when no modeKey passed (back-compat)', () => {
     render(<ModeRevealOverlay modeLabel="CLASSIC!" t={mockT} />);
     expect(screen.getByText('CLASSIC!')).toBeInTheDocument();
   });

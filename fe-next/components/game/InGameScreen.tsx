@@ -13,6 +13,7 @@ import {
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { useAnnouncer } from '../GameAnnouncer';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
+import { useSelectionStore, resetSelection } from '@/hooks/useSelectionStore';
 import { useTapToDragGuidance } from '@/hooks/useTapToDragGuidance';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
@@ -194,9 +195,9 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     wordsFound: foundWords.length,
   });
 
-  // State
-  const [formedWord, setFormedWord] = useState('');
-  const [letterCount, setLetterCount] = useState(0);
+  // State — formedWord/letterCount live in useSelectionStore (subscribed by
+  // WordFormingAreaConnected only). Keeping them out of InGameScreen state
+  // prevents this whole tree from re-rendering on every cell entered during a drag.
   const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
   const [lastWordFoundTime, setLastWordFoundTime] = useState<number>(() => (gameActive ? Date.now() : 0));
 
@@ -223,8 +224,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   // Clear stale feedback and formed word when grid changes (new round)
   useEffect(() => {
     setCurrentFeedback(null);
-    setFormedWord('');
-    setLetterCount(0);
+    resetSelection();
   }, [letterGrid]);
 
   // Reset lastWordFoundTime when game starts
@@ -494,10 +494,11 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     enableQuickTip: isDesktop,
   });
 
-  // Word change handler
+  // Word change handler — pushes selection into useSelectionStore so only
+  // WordFormingAreaConnected re-renders. InGameScreen + PortraitLayout no longer
+  // re-render per cell entered during a drag.
   const handleWordChange = useCallback((word: string, count: number) => {
-    setFormedWord(word);
-    setLetterCount(count);
+    useSelectionStore.getState().setSelection(word, count);
   }, []);
 
   // Shared props for layout components
@@ -521,8 +522,6 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     playerScore: playerData.score,
     playerRank: playerData.rank,
     leaderboard,
-    formedWord,
-    letterCount,
     currentFeedback,
     isTypingMode: keyboardInput.isTypingMode,
     typedWord: keyboardInput.typedWord,

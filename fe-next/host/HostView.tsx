@@ -17,6 +17,11 @@ import { setStoredUsername, setStoredCustomAvatar } from '@/utils/profileStorage
 import { useGameMode } from '@/hooks/gameState/store';
 import logger from '@/utils/logger';
 import { useBlastWave } from '@/hooks/gameState/selectors';
+import {
+  sendCountdownComplete,
+  stashStartGameMessageId,
+  consumeStashedMessageId,
+} from '@/shared/utils/gameEventUtils';
 
 // Extracted components
 import HostPreGameView from './components/HostPreGameView';
@@ -85,6 +90,8 @@ interface HostViewProps {
   onUsernameChange?: (newName: string) => void;
   /** Quick Play: auto-start solo game immediately after room join */
   autoStart?: boolean;
+  /** Private rooms (Quick Play / classroom) hide invite + share affordances. */
+  isPrivate?: boolean;
 }
 
 // ==========================================
@@ -102,6 +109,7 @@ const HostView: React.FC<HostViewProps> = memo(({
   lessonData,
   onUsernameChange,
   autoStart = false,
+  isPrivate = false,
 }) => {
   const { t, language } = useLanguage();
   const { socket } = useSocket();
@@ -360,6 +368,12 @@ const HostView: React.FC<HostViewProps> = memo(({
       state.setRemainingTime(pendingGameStart.timerSeconds);
     }
 
+    // Stash so the GoRipplesAnimation can emit `countdownComplete` once it
+    // finishes — server gates the round timer on that signal.
+    if (pendingGameStart.messageId) {
+      stashStartGameMessageId('HOST', pendingGameStart.messageId);
+    }
+
     // Reset states for new game and trigger animation
     state.setWaitingForResults(false);
     state.setShowStartAnimation(true);
@@ -483,7 +497,14 @@ const HostView: React.FC<HostViewProps> = memo(({
     <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-neo-navy">
       {/* GO Animation */}
       {runtime.showStartAnimation && (
-        <GoRipplesAnimation onComplete={() => state.setShowStartAnimation(false)} t={t} />
+        <GoRipplesAnimation
+          onComplete={() => {
+            state.setShowStartAnimation(false);
+            const id = consumeStashedMessageId('HOST');
+            if (socket) sendCountdownComplete(socket, id, 'HOST');
+          }}
+          t={t}
+        />
       )}
 
       {/* Dialogs */}
@@ -599,6 +620,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           lessonData={lessonData}
           onNameChange={handleHostNameChange}
           onAvatarChange={handleHostAvatarChange}
+          isPrivate={isPrivate}
         />
       )}
 

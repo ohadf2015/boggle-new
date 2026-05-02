@@ -18,11 +18,6 @@ vi.mock('@/hooks/useReducedMotion', () => ({
 
 vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
 
-vi.mock('../WinStreakDisplay', () => ({
-  __esModule: true,
-  default: () => <div data-testid="win-streak" />,
-}));
-
 const onCrazyGames = { isOnCrazyGamesPlatform: true };
 const offCrazyGames = { isOnCrazyGamesPlatform: false };
 let cgFlag = onCrazyGames;
@@ -44,11 +39,11 @@ describe('RewardsSummary on CrazyGames — guest tease suppression', () => {
     );
     await new Promise((r) => setTimeout(r, 350));
     expect(container.textContent).not.toMatch(/signInToEarn/);
-    expect(screen.queryByText(/rewardsEarned/)).not.toBeInTheDocument();
+    expect(container.firstChild).toBeNull();
   });
 
-  it('still renders the panel when CG guest has a streak reward', async () => {
-    render(
+  it('still renders the streak chip when CG guest has a streak reward', async () => {
+    const { container } = render(
       <RewardsSummary
         coinReward={reward}
         isAuthenticated={false}
@@ -56,10 +51,10 @@ describe('RewardsSummary on CrazyGames — guest tease suppression', () => {
       />
     );
     await waitFor(() => {
-      expect(screen.getByText(/rewardsEarned/)).toBeInTheDocument();
+      expect(container.querySelector('.bg-neo-orange\\/90')).not.toBeNull();
     });
     expect(screen.queryByText(/signInToEarn/)).not.toBeInTheDocument();
-    expect(screen.getByTestId('win-streak')).toBeInTheDocument();
+    expect(screen.getByText('3')).toBeInTheDocument();
   });
 
   it('still shows the guest tease off CG (web)', async () => {

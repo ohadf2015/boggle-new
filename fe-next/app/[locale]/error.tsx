@@ -119,15 +119,17 @@ export default function Error({
   return (
     <div className="flex-1 flex items-center justify-center bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy px-4 py-8">
       <div className="neo-card max-w-lg w-full p-8 text-center animate-neo-pop rotate-[-1deg] bg-neo-cream border-4 border-neo-black shadow-hard-xl">
-        {/* Interactive Mascot - shows different moods based on error type */}
-        <div className="mb-6">
+        {/* Interactive Mascot - transparent variants render cleanly on cream card */}
+        <div className="mb-6 flex justify-center">
           <InteractiveMascot
-            variant={isChunkError ? 'thinking' : 'oops'}
-            size="lg"
+            variant={isChunkError ? 'powerup' : 'cryingNobg'}
+            size="xl"
+            priority
+            fetchPriority="high"
             enableHover
             enableClick
-            hoverVariant="encouraging"
-            clickVariant={isChunkError ? 'excited' : 'happy'}
+            hoverVariant={isChunkError ? 'mindblown' : 'encouraging'}
+            clickVariant={isChunkError ? 'celebration' : 'happy'}
             clickAnimation={isChunkError ? 'spin' : 'shake'}
             tooltip={isChunkError ? t('errors.refreshPage') : t('common.retry')}
           />

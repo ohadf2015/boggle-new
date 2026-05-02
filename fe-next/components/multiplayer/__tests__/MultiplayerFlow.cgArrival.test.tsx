@@ -112,24 +112,24 @@ describe('MultiplayerFlow — CrazyGames lobby arrival telemetry', () => {
     mockIsOnCrazyGamesPlatform = false;
   });
 
-  it('fires cg_lobby_arrival once on CG mount with auto_join_room decision', () => {
+  it('fires cg_lobby_arrival once on CG mount with show_lobby decision (auto-join removed)', () => {
     mockIsOnCrazyGamesPlatform = true;
     render(<MultiplayerFlow {...baseProps} />);
     const arrivalCalls = trackGrowthEventMock.mock.calls.filter(
       ([event]) => event === 'cg_lobby_arrival',
     );
     expect(arrivalCalls).toHaveLength(1);
-    expect(arrivalCalls[0][1]).toMatchObject({ decision: 'auto_join_room' });
+    expect(arrivalCalls[0][1]).toMatchObject({ decision: 'show_lobby' });
   });
 
-  it('fires cg_lobby_arrival with quick_play decision when no joinable rooms', () => {
+  it('still fires cg_lobby_arrival with show_lobby decision when no joinable rooms', () => {
     mockIsOnCrazyGamesPlatform = true;
     render(<MultiplayerFlow {...baseProps} activeRooms={[]} />);
     const arrivalCalls = trackGrowthEventMock.mock.calls.filter(
       ([event]) => event === 'cg_lobby_arrival',
     );
     expect(arrivalCalls).toHaveLength(1);
-    expect(arrivalCalls[0][1]).toMatchObject({ decision: 'quick_play' });
+    expect(arrivalCalls[0][1]).toMatchObject({ decision: 'show_lobby', joinableRoomCount: 0 });
   });
 
   it('does not fire cg_lobby_arrival on non-CrazyGames platforms', () => {

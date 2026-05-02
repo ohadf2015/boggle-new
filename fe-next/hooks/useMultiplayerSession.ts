@@ -190,11 +190,23 @@ export function useMultiplayerSession(
           }
         })();
 
-        if (isPageRefresh) {
+        // Tight freshness window: only silent-rejoin if the saved session
+        // was active in the last 5 minutes. Outside that window we treat
+        // the user as having "moved on" — the session expiry is 2h, but
+        // 2h is way too long to dump someone back into a game they forgot
+        // about. Stale sessions just get cleared; if they want to rejoin
+        // they'll see the room list.
+        const FRESH_REJOIN_WINDOW_MS = 5 * 60 * 1000;
+        const sessionAgeMs = savedSession.timestamp
+          ? Date.now() - savedSession.timestamp
+          : Number.POSITIVE_INFINITY;
+        const isFresh = sessionAgeMs < FRESH_REJOIN_WINDOW_MS;
+
+        if (isPageRefresh && isFresh) {
           onSetGameCode(savedSession.gameCode);
           onSetAttemptingReconnect(true);
         } else {
-          logger.log('[Init] User navigated to main page, clearing session');
+          logger.log('[Init] Skipping auto-rejoin — refresh:', isPageRefresh, 'fresh:', isFresh);
           clearSession();
         }
       } else if (hasSession && intentionalExit) {

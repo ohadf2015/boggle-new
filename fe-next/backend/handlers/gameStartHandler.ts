@@ -614,10 +614,16 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       );
     });
 
-    // Set acknowledgment timeout
-    gameStartCoordinator.setAcknowledgmentTimeout(gameCode, 3000, () => {
+    // Bot-only rooms have no human countdown to wait for — start immediately.
+    // Otherwise, wait for every human client to emit `countdownComplete`
+    // (post-animation), with an 8s fallback in case a client never reports.
+    if (humanUsernames.length === 0) {
       startGameTimer(io, gameCode, validTimer);
-    });
+    } else {
+      gameStartCoordinator.setCountdownCompleteTimeout(gameCode, 8000, () => {
+        startGameTimer(io, gameCode, validTimer);
+      });
+    }
 
     logger.info('SOCKET', `Game ${gameCode} starting with ${playerUsernames.length} players`);
 

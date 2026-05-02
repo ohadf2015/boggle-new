@@ -3817,7 +3817,19 @@ const es = {
       "playMultiplayer": "Multijugador",
       "demoCaption": "Cómo jugar",
       "freeBadge": "Gratis Siempre",
-      "demoAlt": "Cuadrícula de letras mostrando cómo trazar una palabra"
+      "demoAlt": "Cuadrícula de letras mostrando cómo trazar una palabra",
+      "tutorial": {
+        "tag": "Paso 1 · Cómo Jugar",
+        "heading": "Desliza",
+        "headingAccent": "para formar",
+        "subtitle": "Conecta letras adyacentes. Te lo mostramos una vez y luego es tu turno.",
+        "watchMe": "Mira esto...",
+        "yourTurn": "Tu turno — forma",
+        "success": "¡Bien hecho!",
+        "skip": "Saltar → Elegir modo",
+        "caption": "Pruébalo",
+        "tryIt": "¡Trázala!"
+      }
     },
     "welcome": {
       "title": "¡Bienvenido a LexiClash!",
@@ -9851,28 +9863,36 @@ const es = {
       "description": "¡Encuentra todas las palabras que puedas!",
       "feature1": "Cronometrado",
       "feature2": "Puntuación",
-      "feature3": "Libre"
+      "feature3": "Libre",
+      "intro": { "greet": "Tómate tu tiempo. Solo palabras." }
     },
     "blast": {
       "name": "Blast",
       "description": "¡Elimina fichas con combos y poderes especiales!",
       "feature1": "Combos en cadena",
       "feature2": "Fichas especiales",
-      "feature3": "Cascada"
+      "feature3": "Cascada",
+      "intro": { "greet": "Toca, desliza, respira. Sin prisa." }
     },
     "wordHunt": {
       "name": "Caza de Palabras",
       "description": "¡Compite por encontrar la palabra objetivo!",
       "feature1": "Palabras objetivo",
       "feature2": "Carrera de velocidad",
-      "feature3": "Pistas"
+      "feature3": "Pistas",
+      "intro": { "greet": "Una palabra a la vez. Tú puedes." }
     },
     "wheelRush": {
       "name": "Rueda Veloz",
       "description": "¡Corre la rueda — roba palabras para ganar!",
       "feature1": "Ventana de bloqueo",
       "feature2": "Niebla de guerra",
-      "feature3": "Bonus pangrama"
+      "feature3": "Bonus pangrama",
+      "intro": { "greet": "Gira con calma. Las palabras llegan." }
+    },
+    "intro": {
+      "cta": "Vamos",
+      "skip": "Saltar"
     },
     "random": "Aleatorio",
     "randomDescription": "¡Sorpréndeme! Modo aleatorio en cada ronda.",
@@ -9886,6 +9906,10 @@ const es = {
     "fast": "Rápido",
     "party": "Fiesta",
     "challenge": "Desafío"
+  },
+  "practiceHub": {
+    "title": "Práctica",
+    "subtitle": "Un lugar tranquilo para aprender cada modo"
   },
   "accept": "Aceptar",
   "availableOpponents": "Oponentes disponibles",

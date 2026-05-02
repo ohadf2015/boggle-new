@@ -1875,7 +1875,19 @@ const en = {
       "playMultiplayer": "Multiplayer",
       "demoCaption": "How to play",
       "freeBadge": "Free Forever",
-      "demoAlt": "Letter grid showing how to trace a word path"
+      "demoAlt": "Letter grid showing how to trace a word path",
+      "tutorial": {
+        "tag": "Step 1 · How to Play",
+        "heading": "Drag",
+        "headingAccent": "to spell",
+        "subtitle": "Connect touching letters. We'll show you once, then it's your turn.",
+        "watchMe": "Watch this...",
+        "yourTurn": "Your turn — spell",
+        "success": "Got it! Nice trace.",
+        "skip": "Skip → Pick a mode",
+        "caption": "Try it",
+        "tryIt": "Trace this!"
+      }
     },
     "welcome": {
       "title": "Welcome to LexiClash!",
@@ -10218,28 +10230,36 @@ const en = {
       description: "Find as many words as you can!",
       feature1: "Timed",
       feature2: "Score-based",
-      feature3: "Free-form"
+      feature3: "Free-form",
+      intro: { greet: "Take your time. Just words." }
     },
     blast: {
       name: "Blast",
       description: "Clear tiles with combos and special powers!",
       feature1: "Chain combos",
       feature2: "Special tiles",
-      feature3: "Cascade"
+      feature3: "Cascade",
+      intro: { greet: "Tap, swipe, breathe. No rush." }
     },
     wordHunt: {
       name: "Word Hunt",
       description: "Race to find the target word!",
       feature1: "Target words",
       feature2: "Speed race",
-      feature3: "Hints"
+      feature3: "Hints",
+      intro: { greet: "One word at a time. You've got this." }
     },
     wheelRush: {
       name: "Wheel Rush",
       description: "Race the wheel — steal words to win!",
       feature1: "Steal-lock window",
       feature2: "Fog of war",
-      feature3: "Pangram bonus"
+      feature3: "Pangram bonus",
+      intro: { greet: "Spin gently. Words come." }
+    },
+    intro: {
+      cta: "Let's go",
+      skip: "Skip intro"
     },
     random: "Random",
     randomDescription: "Surprise me! Pick a random mode each round.",
@@ -10253,6 +10273,10 @@ const en = {
     "fast": "Quick",
     "party": "Party",
     "challenge": "Challenge"
+  },
+  "practiceHub": {
+    "title": "Practice",
+    "subtitle": "A quiet place to learn each mode"
   },
   "shareResult": {
     "singleplayer": "LexiClash Solo",

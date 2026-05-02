@@ -76,6 +76,10 @@ interface StartGameAckPayload {
   messageId: string;
 }
 
+interface CountdownCompletePayload {
+  messageId: string;
+}
+
 interface GetWordsForBoardPayload {
   language: Language;
   boardSize?: { rows: number; cols: number };
@@ -211,6 +215,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         username: hostUsername || 'Host',
         roomName: roomName || gameCode,
         language: language || 'en',
+        isPrivate: isPrivate || false,
         users: getGameUsers(gameCode)
       });
 
@@ -290,7 +295,10 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
   // Register startGame handler from extracted module
   registerStartGameHandler(io, socket);
 
-  // Handle start game acknowledgment
+  // Handle start game acknowledgment — confirms delivery only.
+  // Timer start is now gated on `countdownComplete` (post-animation),
+  // not on ack (post-receipt), so the round timer doesn't tick down
+  // while players are still watching the 3-2-1-GO countdown.
   socket.on('startGameAck', (data: StartGameAckPayload) => {
     const { messageId } = data;
     const gameCode = getGameBySocketId(socket.id);
@@ -298,12 +306,22 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
     if (!gameCode || !username) return;
 
-    const result = gameStartCoordinator.recordAcknowledgment(gameCode, username, messageId);
+    gameStartCoordinator.recordAcknowledgment(gameCode, username, messageId);
+  });
+
+  // Handle countdown completion — fires after client's pre-game animation
+  // finishes. When all expected players report, start the authoritative timer.
+  socket.on('countdownComplete', (data: CountdownCompletePayload) => {
+    const { messageId } = data;
+    const gameCode = getGameBySocketId(socket.id);
+    const username = getUsernameBySocketId(socket.id);
+
+    if (!gameCode || !username) return;
+
+    const result = gameStartCoordinator.recordCountdownComplete(gameCode, username, messageId);
 
     if (result.valid && result.allReady) {
       const game = getGame(gameCode);
-      // Use game.gameDuration (validated timer set during startGame) rather than
-      // game.timerSeconds which could be stale or fall back to a wrong default
       startGameTimer(io, gameCode, game?.gameDuration || game?.timerSeconds || 180);
     }
   });
@@ -377,6 +395,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         skipAck: true,
         boardTheme: game.boardTheme || null,
         gameMode: recoveryGameMode,
+        gameSessionId: game.gameSessionId,
         ...(recoveryGameMode === 'blast' && game.blastModeState ? {
           blastTileOverlay: game.blastModeState.overlay || [],
           blastSeed: game.blastModeState.seed ?? null,

@@ -57,6 +57,14 @@ function comboAmplification(comboLevel: number): number {
 }
 
 /**
+ * Module-level cache keyed by (depth, tier, comboLevel). The function is pure
+ * w.r.t. these inputs, so caching gives stable object references across drag
+ * steps within the same tier — required for downstream React.memo to hold.
+ * Bounded (~depth 0-15 × tier 0-3 × combo 0-10 ≈ 640 entries), no eviction.
+ */
+const escalationCache = new Map<string, SelectionEscalation>();
+
+/**
  * Get escalation properties for a tile based on its position in the selection chain.
  * Combo level compounds in two ways:
  *   1. Tier shift: each combo level adds 0.5 "virtual letters" → reach higher tiers sooner
@@ -73,19 +81,19 @@ export function getSelectionEscalation(
 ): SelectionEscalation {
   const comboBoost = comboLevel * 0.5;
   const effectiveLength = totalSelected + comboBoost;
+  const tier = effectiveLength <= 2 ? 0 : effectiveLength <= 4 ? 1 : effectiveLength <= 6 ? 2 : 3;
+  const cacheKey = `${selectionIndex}|${tier}|${comboLevel}`;
+  const cached = escalationCache.get(cacheKey);
+  if (cached) return cached;
+
   const depth = selectionIndex;
   const amp = comboAmplification(comboLevel);
-
-  if (effectiveLength <= 2) {
-    return baseTier(depth, amp);
-  }
-  if (effectiveLength <= 4) {
-    return momentumTier(depth, amp);
-  }
-  if (effectiveLength <= 6) {
-    return hotTier(depth, amp);
-  }
-  return fireTier(depth, amp);
+  const result = tier === 0 ? baseTier(depth, amp)
+    : tier === 1 ? momentumTier(depth, amp)
+    : tier === 2 ? hotTier(depth, amp)
+    : fireTier(depth, amp);
+  escalationCache.set(cacheKey, result);
+  return result;
 }
 
 function baseTier(_depth: number, amp: number): SelectionEscalation {

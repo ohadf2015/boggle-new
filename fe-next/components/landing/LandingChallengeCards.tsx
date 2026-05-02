@@ -223,7 +223,7 @@ export function LandingChallengeCards({
             <ModeCard
               title={t('landing.practice')}
               description={t('landing.practiceDesc')}
-              href={`/${language}/singleplayer?autoStart=practice`}
+              href={`/${language}/practice`}
               icon={<BookOpen className="w-6 h-6" />}
               modeImage="/modes/practice.png"
               variant="cyan"

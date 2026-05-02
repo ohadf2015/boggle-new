@@ -9,6 +9,7 @@ import { resetComboState as resetComboStateUtil } from '@/shared/utils/comboUtil
 
 import {
   sendStartGameAck,
+  stashStartGameMessageId,
   createRoomClosedDueToInactivityHandler,
   triggerGameOverCelebration,
   showGameCompleteToast,
@@ -338,6 +339,10 @@ export function useHostGameEvents({
       resetComboState();
       setXpGainedData(null);
       setLevelUpData(null);
+
+      // Stash messageId so the GoRipplesAnimation can emit `countdownComplete`
+      // when it finishes — that's what now starts the server-side round timer.
+      stashStartGameMessageId('HOST', data.messageId);
 
       // Send acknowledgment to server using shared utility
       sendStartGameAck(socket, data, 'HOST');

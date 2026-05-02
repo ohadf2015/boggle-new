@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Coins, Trophy, Star, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import WinStreakDisplay from './WinStreakDisplay';
 import { fireConfetti } from '@/utils/confettiUtils';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import { ScoreCountUp } from '@/components/results/shared';
@@ -57,7 +56,6 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
   const { t } = useLanguage();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const reducedMotion = useReducedMotion();
-  const inf = reducedMotion ? 0 : Infinity;
   const [showRewards, setShowRewards] = useState(false);
   const [celebrationFired, setCelebrationFired] = useState(false);
 
@@ -99,194 +97,86 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
     return null;
   }
 
+  // Compose breakdown into a single tooltip string so the full earning detail
+  // remains discoverable without owning vertical space on the results page.
+  const breakdownTooltip = (() => {
+    if (!hasCoins || !isAuthenticated || !coinReward?.breakdown) return undefined;
+    const b = coinReward.breakdown;
+    const parts: string[] = [];
+    if (b.base > 0) parts.push(`${t('reveal.base')} +${b.base}`);
+    if ((b.scoreBonus ?? 0) > 0) parts.push(`${t('coins.score')} +${b.scoreBonus}`);
+    if ((b.placement ?? 0) > 0) parts.push(`${t('coins.placement')} +${b.placement}`);
+    if ((b.efficiency ?? 0) > 0) parts.push(`${t('coins.efficiency')} +${b.efficiency}`);
+    if ((b.streak ?? 0) > 0) parts.push(`${t('coins.streak')} +${b.streak}`);
+    if ((b.streakBonus ?? 0) > 0) parts.push(`🔥 +${b.streakBonus}`);
+    return parts.length > 0 ? parts.join(' · ') : undefined;
+  })();
+
   return (
     <AnimatePresence>
       {showRewards && (
         <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 24 }}
           className={cn(
-            'relative overflow-hidden rounded-neo-lg border-4 border-neo-black shadow-hard-xl',
-            'bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy',
+            'relative rounded-neo border-2 border-neo-black bg-neo-navy-light/60',
             className
           )}
         >
-          {/* Animated background glow */}
-          <motion.div
-            className="absolute inset-0 opacity-20"
-            animate={{
-              background: [
-                'radial-gradient(circle at 20% 50%, #FFE135 0%, transparent 50%)',
-                'radial-gradient(circle at 80% 50%, #00FFFF 0%, transparent 50%)',
-                'radial-gradient(circle at 50% 80%, #a855f7 0%, transparent 50%)',
-                'radial-gradient(circle at 20% 50%, #FFE135 0%, transparent 50%)',
-              ],
-            }}
-            transition={{ duration: 4, repeat: inf, ease: 'easeInOut' }}
-          />
-
-          {/* Header */}
-          <div className="relative z-10 px-4 py-3 border-b-2 border-neo-cream/10">
-            <div className="flex items-center justify-center gap-2">
-              <motion.div
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 1.5, repeat: inf, repeatDelay: 2 }}
-              >
-                <Sparkles className="w-5 h-5 text-neo-lime" />
-              </motion.div>
-              <h3 className="font-black text-neo-cream uppercase tracking-wider text-sm">
-                {t('results.rewardsEarned')}
-              </h3>
-              <motion.div
-                animate={{ rotate: [0, -10, 10, 0] }}
-                transition={{ duration: 1.5, repeat: inf, repeatDelay: 2 }}
-              >
-                <Sparkles className="w-5 h-5 text-neo-lime" />
-              </motion.div>
-            </div>
-          </div>
-
-          {/* Rewards Grid */}
-          <div className="relative z-10 p-4 space-y-3">
-            {/* Coins Reward */}
+          <div className="flex flex-wrap items-center gap-2 px-3 py-2">
+            {/* Coins chip — compact replacement for prior full-width card */}
             {hasCoins && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
+              <span
+                title={breakdownTooltip}
                 className={cn(
-                  'flex items-center justify-between p-3 rounded-neo border-2',
-                  isAuthenticated
-                    ? 'bg-neo-lime/20 border-neo-lime/50'
-                    : 'bg-neo-navy-light/50 border-neo-cream/20'
+                  'inline-flex items-center gap-1.5 rounded-neo border-2 border-neo-black px-2 py-1 text-sm font-black tabular-nums',
+                  isAuthenticated ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy text-neo-pink/80'
                 )}
               >
-                <div className="flex items-center gap-3">
-                  <div className={cn(
-                    'w-10 h-10 rounded-neo flex items-center justify-center border-2 border-neo-black',
-                    isAuthenticated ? 'bg-neo-lime' : 'bg-neo-navy-light'
-                  )}>
-                    <Coins className={cn(
-                      'w-5 h-5',
-                      isAuthenticated ? 'text-neo-black' : 'text-neo-pink'
-                    )} />
-                  </div>
-                  <div>
-                    <div className={cn(
-                      'font-black text-xl tabular-nums',
-                      isAuthenticated ? 'text-neo-lime' : 'text-neo-pink/70'
-                    )}>
-                      +<ScoreCountUp to={coinReward.awarded} duration={1200} delay={reducedMotion ? 0 : 400} />
-                    </div>
-                    <div className="text-xs text-neo-cream/60 font-bold">
-                      {isAuthenticated
-                        ? (t('reveal.coins'))
-                        : (t('coins.signInToEarn'))}
-                    </div>
-                  </div>
-                </div>
-                {/* Breakdown tooltip hint */}
-                {isAuthenticated && coinReward.breakdown && (
-                  <div className="text-xs text-neo-cream/60 space-y-0.5 text-right">
-                    {coinReward.breakdown.base > 0 && (
-                      <div>{t('reveal.base')}: +{coinReward.breakdown.base}</div>
-                    )}
-                    {(coinReward.breakdown.scoreBonus ?? 0) > 0 && (
-                      <div>{t('coins.score')}: +{coinReward.breakdown.scoreBonus}</div>
-                    )}
-                    {(coinReward.breakdown.placement ?? 0) > 0 && (
-                      <div>{t('coins.placement')}: +{coinReward.breakdown.placement}</div>
-                    )}
-                    {(coinReward.breakdown.efficiency ?? 0) > 0 && (
-                      <div>{t('coins.efficiency')}: +{coinReward.breakdown.efficiency}</div>
-                    )}
-                    {(coinReward.breakdown.streak ?? 0) > 0 && (
-                      <div>{t('coins.streak')}: +{coinReward.breakdown.streak}</div>
-                    )}
-                    {(coinReward.breakdown.streakBonus ?? 0) > 0 && (
-                      <div className="text-neo-pink font-semibold">🔥 +{coinReward.breakdown.streakBonus}</div>
-                    )}
-                  </div>
+                <Coins className="w-3.5 h-3.5" aria-hidden />
+                +<ScoreCountUp to={coinReward.awarded} duration={900} delay={reducedMotion ? 0 : 200} />
+                {!isAuthenticated && (
+                  <span className="ms-1 text-[10px] uppercase tracking-wide opacity-70">
+                    {t('coins.signInToEarn')}
+                  </span>
                 )}
-              </motion.div>
+              </span>
             )}
 
-            {/* Win Streak */}
+            {/* Win Streak chip */}
             {hasStreak && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
-              >
-                <WinStreakDisplay
-                  currentStreak={winStreak.currentStreak}
-                  bestStreak={winStreak.bestStreak}
-                  isNewMilestone={winStreak.isNewMilestone}
-                  previousStreak={winStreak.previousStreak}
-                  compact={false}
-                />
-              </motion.div>
+              <span className="inline-flex items-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-orange/90 px-2 py-1 text-sm font-black text-neo-black tabular-nums">
+                <span aria-hidden>🔥</span>
+                {winStreak.currentStreak}
+                {winStreak.isNewMilestone && <Sparkles className="w-3.5 h-3.5" aria-hidden />}
+              </span>
             )}
 
-            {/* Achievements */}
+            {/* Achievements chip */}
             {hasAchievements && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
+              <button
+                type="button"
                 onClick={onAchievementsClick}
-                role={onAchievementsClick ? 'button' : undefined}
-                tabIndex={onAchievementsClick ? 0 : undefined}
-                onKeyDown={onAchievementsClick ? (e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onAchievementsClick();
-                  }
-                } : undefined}
+                disabled={!onAchievementsClick}
                 className={cn(
-                  "flex items-center justify-between p-3 rounded-neo border-2 bg-neo-pink/20 border-neo-pink/50",
-                  onAchievementsClick && "cursor-pointer hover:bg-neo-pink/30 active:scale-[0.98] transition-all"
+                  'inline-flex items-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-pink px-2 py-1 text-sm font-black text-neo-black tabular-nums',
+                  onAchievementsClick && 'cursor-pointer hover:brightness-110 active:scale-[0.97] transition-transform',
                 )}
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-neo bg-neo-pink flex items-center justify-center border-2 border-neo-black">
-                    <Trophy className="w-5 h-5 text-neo-black" />
-                  </div>
-                  <div>
-                    <div className="font-black text-xl text-neo-pink tabular-nums">
-                      <ScoreCountUp to={achievementsUnlocked} duration={800} delay={reducedMotion ? 0 : 600} />
-                    </div>
-                    <div className="text-xs text-neo-cream/60 font-bold">
-                      {achievementsUnlocked === 1
-                        ? (t('results.achievementUnlocked'))
-                        : (t('results.achievementsUnlocked'))}
-                    </div>
-                  </div>
-                </div>
-                <motion.div
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ type: 'tween', duration: 0.5, repeat: 3 }}
-                  className="text-2xl"
-                >
-                  🏆
-                </motion.div>
-              </motion.div>
+                <Trophy className="w-3.5 h-3.5" aria-hidden />
+                {achievementsUnlocked}
+              </button>
+            )}
+
+            {isWinner && (
+              <span className="ms-auto inline-flex items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-lime px-2 py-1 text-xs font-black text-neo-black uppercase">
+                <Star className="w-3 h-3 fill-neo-black" aria-hidden />
+                {t('results.rewardsEarned')}
+              </span>
             )}
           </div>
-
-          {/* Victory badge for winners */}
-          {isWinner && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5, type: 'spring', stiffness: 400, damping: 22 }}
-              className="absolute -top-2 -right-2 w-12 h-12 bg-neo-lime rounded-full border-3 border-neo-black shadow-hard flex items-center justify-center"
-            >
-              <Star className="w-6 h-6 text-neo-black fill-neo-black" />
-            </motion.div>
-          )}
         </motion.div>
       )}
     </AnimatePresence>

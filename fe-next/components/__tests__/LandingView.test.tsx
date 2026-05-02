@@ -73,6 +73,7 @@ vi.mock('@/hooks/useDailyChallengeStatus', () => ({
 // Mock onboardingStorage
 vi.mock('@/utils/onboardingStorage', () => ({
   hasCompletedOnboarding: vi.fn(() => true),
+  hasSupabaseSession: vi.fn(() => false),
   markOnboardingComplete: vi.fn(),
   markOnboardingSkipped: vi.fn(),
   savePendingRoomInvite: vi.fn(),
@@ -175,14 +176,15 @@ describe('LandingView', () => {
     render(<LandingView />, { wrapper: createWrapper() });
 
     const links = screen.getAllByRole('link');
-    const hasSinglePlayer = links.some(link =>
-      link.getAttribute('href')?.includes('singleplayer')
-    );
-    const hasMultiplayer = links.some(link =>
-      link.getAttribute('href')?.includes('multiplayer')
-    );
+    // Landing renders a featured mode set: practice, multiplayer (arena/quickPlay),
+    // singleplayer, and daily are all valid mode-card hrefs depending on player tier.
+    // Assert at least one game-mode link surfaces.
+    const hasGameModeLink = links.some((link) => {
+      const href = link.getAttribute('href') ?? '';
+      return /\/(singleplayer|multiplayer|practice|daily|adventure|blast|connections|brain)/.test(href);
+    });
 
-    expect(hasSinglePlayer || hasMultiplayer).toBe(true);
+    expect(hasGameModeLink).toBe(true);
   });
 
   it('queues lobby music on mount (MusicContext handles autoplay unlock)', () => {

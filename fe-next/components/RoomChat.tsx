@@ -67,7 +67,6 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
-  const [isComposing, setIsComposing] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [latestAnnouncement, setLatestAnnouncement] = useState('');
   const parentRef = useRef<HTMLDivElement>(null);
@@ -221,11 +220,17 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
     setUnreadCount(0);
   };
 
+  // Read DOM value at send time. Android GBoard with Hebrew/RTL buffers IME
+  // composition and may leave React state empty until commit; the DOM input
+  // already has the typed text, so read from there.
   const sendMessage = () => {
-    if (!inputMessage.trim() || !socket) return;
+    if (!socket) return;
+    const raw = inputRef.current?.value ?? inputMessage;
+    const trimmed = raw.trim();
+    if (!trimmed) return;
 
     socket.emit('chatMessage', {
-      message: inputMessage.trim(),
+      message: trimmed,
       gameCode,
       username,
       isHost
@@ -233,12 +238,18 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
 
     setInputMessage('');
     if (inputRef.current) {
+      inputRef.current.value = '';
       inputRef.current.focus();
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !isComposing && !e.nativeEvent.isComposing) {
+    // Skip only when keydown is an IME composition commit (keyCode 229).
+    // `isComposing` is unreliable on Android GBoard with Hebrew/RTL — it
+    // stays true past the commit, blocking Enter-to-send. keyCode 229 is the
+    // canonical IME-commit signal across the browsers/keyboards we support.
+    // Same pattern as components/friends/messaging/MessageComposer.tsx.
+    if (e.key === 'Enter' && e.nativeEvent.keyCode !== 229) {
       e.preventDefault();
       sendMessage();
     }
@@ -389,16 +400,15 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             ref={inputRef}
             value={inputMessage}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputMessage(e.target.value)}
+            // `onInput` is the reliable signal on Android GBoard with Hebrew/RTL
+            // when `onChange` doesn't fire mid-composition. Mirror DOM → state.
+            onInput={(e: React.FormEvent<HTMLInputElement>) => setInputMessage(e.currentTarget.value)}
             onKeyDown={handleKeyDown}
             onFocus={handleInputFocus}
-            onCompositionStart={() => setIsComposing(true)}
             onCompositionUpdate={(e: React.CompositionEvent<HTMLInputElement>) => {
-              // Sync state during IME composition — some browsers (Safari/iOS)
-              // suppress `onChange` while composing, leaving disable check stale.
               setInputMessage(e.currentTarget.value);
             }}
             onCompositionEnd={(e: React.CompositionEvent<HTMLInputElement>) => {
-              setIsComposing(false);
               setInputMessage(e.currentTarget.value);
             }}
             placeholder={t('chat.placeholder')}
@@ -409,10 +419,17 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
           />
           <Button
             onClick={sendMessage}
-            disabled={inputMessage.length === 0 || !socket}
+            // `aria-disabled` (not real `disabled`) so taps still commit Android
+            // GBoard IME composition (Hebrew/RTL) — sendMessage reads DOM value
+            // and bails on empty trim. jest-dom's `toBeDisabled()` matches both.
+            aria-disabled={inputMessage.length === 0 || !socket}
             size="icon"
             variant="cyan"
-            className="shrink-0 disabled:bg-neo-navy-light disabled:text-neo-cream/40 disabled:grayscale disabled:opacity-50"
+            className={`shrink-0 ${
+              inputMessage.length === 0 || !socket
+                ? 'bg-neo-navy-light text-neo-cream/40 grayscale opacity-50'
+                : ''
+            }`}
             aria-label={t('chat.send')}
           >
             <Send aria-hidden="true" />

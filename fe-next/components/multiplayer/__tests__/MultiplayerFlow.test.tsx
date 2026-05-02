@@ -569,7 +569,10 @@ describe('MultiplayerFlow - Game Code Generation', () => {
 
 });
 
-describe('CrazyGames Smart Auto-Join', () => {
+describe('CrazyGames lobby arrival — never auto-join (policy 2026-05-03)', () => {
+  // The CrazyGames "smart auto-join" was removed. Landing on /multiplayer in
+  // a CG iframe must show the lobby and let the user pick — silent redirects
+  // into stranger rooms or quick-play matches were a primary UX complaint.
   const baseProps = {
     handleJoin: vi.fn(),
     refreshRooms: vi.fn(),
@@ -604,27 +607,21 @@ describe('CrazyGames Smart Auto-Join', () => {
     mockIsOnCrazyGamesPlatform = false;
   });
 
-  it('should auto-join first open room on CrazyGames platform', () => {
+  it('does NOT auto-join an open room on CrazyGames — lobby renders for user choice', () => {
     const handleJoin = vi.fn();
     render(<MultiplayerFlow {...baseProps} handleJoin={handleJoin} />);
 
-    expect(handleJoin).toHaveBeenCalledWith(
-      false, null, 'ROOM01', undefined, 'CGPlayer',
-    );
+    expect(handleJoin).not.toHaveBeenCalled();
   });
 
-  it('should trigger quick-play when no open rooms on CrazyGames', () => {
+  it('does NOT auto-trigger quick-play when no open rooms on CrazyGames', () => {
     const handleJoin = vi.fn();
     render(<MultiplayerFlow {...baseProps} handleJoin={handleJoin} activeRooms={[]} />);
 
-    // Quick play creates a room (host mode = true)
-    expect(handleJoin).toHaveBeenCalledWith(
-      true, expect.any(String), expect.any(String), expect.any(String), 'CGPlayer',
-      expect.objectContaining({ quickPlay: true }),
-    );
+    expect(handleJoin).not.toHaveBeenCalled();
   });
 
-  it('should skip full rooms when auto-joining on CrazyGames', () => {
+  it('does NOT auto-join when only full rooms exist on CrazyGames', () => {
     const handleJoin = vi.fn();
     const fullRooms: ActiveRoom[] = [
       {
@@ -634,14 +631,10 @@ describe('CrazyGames Smart Auto-Join', () => {
     ];
     render(<MultiplayerFlow {...baseProps} handleJoin={handleJoin} activeRooms={fullRooms} />);
 
-    // Should quick-play since the only room is full
-    expect(handleJoin).toHaveBeenCalledWith(
-      true, expect.any(String), expect.any(String), expect.any(String), 'CGPlayer',
-      expect.objectContaining({ quickPlay: true }),
-    );
+    expect(handleJoin).not.toHaveBeenCalled();
   });
 
-  it('should skip in-progress rooms when auto-joining on CrazyGames', () => {
+  it('does NOT auto-join in-progress rooms on CrazyGames', () => {
     const handleJoin = vi.fn();
     const rooms: ActiveRoom[] = [
       {
@@ -651,10 +644,7 @@ describe('CrazyGames Smart Auto-Join', () => {
     ];
     render(<MultiplayerFlow {...baseProps} handleJoin={handleJoin} activeRooms={rooms} />);
 
-    expect(handleJoin).toHaveBeenCalledWith(
-      true, expect.any(String), expect.any(String), expect.any(String), 'CGPlayer',
-      expect.objectContaining({ quickPlay: true }),
-    );
+    expect(handleJoin).not.toHaveBeenCalled();
   });
 
   it('should NOT auto-join on non-CrazyGames platforms', () => {

@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import type { PlayerScore } from '@/hooks/useResultsData';
 import type { ConsolationCrown } from '@/utils/consolationCrowns';
 import Avatar from '@/components/Avatar';
+import { AddFriendBadge } from '@/components/results/ResultsFriendStatus';
 
 interface ConsolationRowsProps {
   /** Players ranked 4th and below */
@@ -132,14 +133,19 @@ export default function ConsolationRows({
                 )}
               </div>
             </div>
-            <span
-              className={cn(
-                'text-xs font-black tabular-nums shrink-0',
-                isCurrent ? 'text-white/60' : 'text-white/40'
+            <div className="flex items-center gap-2 shrink-0">
+              {!isCurrent && (
+                <AddFriendBadge username={player.username} isBot={(player as { isBot?: boolean }).isBot} />
               )}
-            >
-              {formatScore(player.score)}
-            </span>
+              <span
+                className={cn(
+                  'text-xs font-black tabular-nums',
+                  isCurrent ? 'text-white/60' : 'text-white/40'
+                )}
+              >
+                {formatScore(player.score)}
+              </span>
+            </div>
           </motion.div>
         );
       })}

@@ -2,7 +2,7 @@
  * Connection Utilities
  * Shared logic for connection status, disconnect/reconnect events
  */
-import { neoSuccessToast, neoInfoToast } from '../../components/NeoToast';
+import { neoInfoToast } from '../../components/NeoToast';
 import logger from '@/utils/logger';
 
 // ==================== Types ====================
@@ -20,33 +20,21 @@ export interface PlayerEventData {
 
 // ==================== Handlers ====================
 
+// Shared toast slot for all room-presence chatter — matches the join/leave hook
+// so disconnect/leave/host events never stack.
+const ROOM_TOAST_ID = 'mp-room-presence';
+
 /**
- * Handle player connection status change (weak/stable)
+ * Handle player connection status change (weak/stable).
+ * Silent by design — the player roster surfaces a presence dot, and toasting
+ * every wifi blip ("📶 weak", "✅ recovered") is the noise the user hated.
  */
 export function handlePlayerConnectionStatusChanged(
   data: ConnectionStatusData,
-  t: (key: string) => string,
+  _t: (key: string) => string,
   context: 'HOST' | 'PLAYER'
 ): void {
-  logger.log(`[${context}] Player connection status changed:`, data);
-
-  if (data.connectionStatus === 'weak') {
-    neoInfoToast(
-      data.message || `${data.username} ${t('playerView.weakConnection') || 'has weak connection'}`,
-      {
-        icon: '📶',
-        duration: 4000,
-      }
-    );
-  } else if (data.connectionStatus === 'stable') {
-    neoSuccessToast(
-      data.message || `${data.username} ${t('playerView.connectionRecovered') || 'connection recovered'}`,
-      {
-        icon: '✅',
-        duration: 2000,
-      }
-    );
-  }
+  logger.log(`[${context}] Player connection status changed (silent):`, data);
 }
 
 /**
@@ -95,7 +83,8 @@ export function handlePlayerDisconnected(
       data.message || `${data.username} ${t('playerView.disconnected') || 'disconnected. Waiting for reconnection...'}`,
       {
         icon: '📡',
-        duration: 3000,
+        duration: 2500,
+        id: ROOM_TOAST_ID,
       }
     );
   }, OPPONENT_DISCONNECT_DELAY_MS);
@@ -105,30 +94,19 @@ export function handlePlayerDisconnected(
 
 /**
  * Handle player reconnected event.
- * If they reconnected within the delay window, the disconnect toast
- * was never shown — the disconnection was invisible to opponents.
+ * Silent — when reconnect happens inside the 6s grace window the disconnect
+ * toast was never shown anyway, and after a longer absence the roster going
+ * green is enough signal. "✅ X reconnected" was the chatty toast users hated.
  */
 export function handlePlayerReconnected(
   data: PlayerEventData,
-  t: (key: string) => string,
+  _t: (key: string) => string,
   context: 'HOST' | 'PLAYER'
 ): void {
-  logger.log(`[${context}] Player reconnected:`, data.username);
-
-  // If the disconnect notification was still pending, cancel it silently
-  const wasPending = cancelPendingDisconnectNotification(data.username);
-  if (wasPending) {
-    logger.log(`[${context}] Quick reconnect — disconnect was invisible to opponents`);
-    return; // Don't show reconnect toast either — nobody knew they left
-  }
-
-  neoSuccessToast(
-    data.message || `${data.username} ${t('playerView.reconnected') || 'reconnected'}`,
-    {
-      icon: '✅',
-      duration: 2000,
-    }
-  );
+  logger.log(`[${context}] Player reconnected (silent):`, data.username);
+  // Cancel any still-pending disconnect toast — the player is back before
+  // we ever told the room they left, so stay silent.
+  cancelPendingDisconnectNotification(data.username);
 }
 
 /**
@@ -144,7 +122,8 @@ export function handlePlayerLeft(
     data.message || `${data.username} ${t('playerView.leftRoom') || 'left the room'}`,
     {
       icon: '👋',
-      duration: 2000,
+      duration: 2200,
+      id: ROOM_TOAST_ID,
     }
   );
 }

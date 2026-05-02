@@ -278,7 +278,7 @@ const GridCell = memo<GridCellProps>(({
       effectiveRenderMode={effectiveRenderMode}
       reduceMotion={reduceMotion}
       selectionIndex={selectionIdx}
-      totalSelected={selectedCellsLength}
+      escalation={escalation}
     />
 
     <span

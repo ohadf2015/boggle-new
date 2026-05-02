@@ -7,11 +7,21 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUserRank } from '@/lib/supabase';
+import { hasSupabaseSession } from '@/utils/onboardingStorage';
+
+const SKELETON_CLASSES = cn(
+  'w-full max-w-md mx-auto lg:max-w-none',
+  'bg-neo-navy-light/40 border-3 border-neo-black/40 rounded-neo-lg',
+  'h-[80px] sm:h-[88px] animate-pulse'
+);
 
 export function LandingYourRank() {
   const { t } = useLanguage();
-  const { isAuthenticated, profile } = useAuth();
+  const { isAuthenticated, profile, loading } = useAuth();
   const [rank, setRank] = useState<{ rank_position: number; total_score: number } | null>(null);
+  // Sync localStorage peek so SSR + first paint agree on whether to reserve space
+  // for the rank card. Avoids the "null → mount" CLS when auth resolves to authed.
+  const [hadSession] = useState(() => typeof window !== 'undefined' && hasSupabaseSession());
 
   useEffect(() => {
     if (!isAuthenticated || !profile?.id) return;
@@ -29,7 +39,13 @@ export function LandingYourRank() {
     return () => { cancelled = true; };
   }, [isAuthenticated, profile?.id]);
 
-  if (!isAuthenticated || !rank) return null;
+  // Settled guest — render nothing (no token in storage AND auth has resolved unauth).
+  if (!hadSession && !loading && !isAuthenticated) return null;
+
+  // Authed-likely path: reserve space until rank arrives so the row doesn't grow.
+  if (loading || !rank) {
+    return <div className={SKELETON_CLASSES} aria-hidden="true" />;
+  }
 
   return (
     <motion.div

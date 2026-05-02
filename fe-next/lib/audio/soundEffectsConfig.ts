@@ -213,8 +213,12 @@ export const SOUND_PRIORITIES: Record<SoundEffectKey, AUDIO_LOAD_PRIORITY> = {
   buttonClick: AUDIO_LOAD_PRIORITY.HIGH,
   message: AUDIO_LOAD_PRIORITY.NORMAL,
   comboSaved: AUDIO_LOAD_PRIORITY.NORMAL,
-  victoryFanfare: AUDIO_LOAD_PRIORITY.NORMAL,
-  defeatSting: AUDIO_LOAD_PRIORITY.NORMAL,
+  // Bumped NORMAL → HIGH so the progressive idle-time preloader warms these
+  // during gameplay. Without it, the first results-page playback triggers
+  // decodeAudioData on the main thread (50–150ms stall on phones), which is
+  // the dominant source of mount-time jank.
+  victoryFanfare: AUDIO_LOAD_PRIORITY.HIGH,
+  defeatSting: AUDIO_LOAD_PRIORITY.HIGH,
   levelUp: AUDIO_LOAD_PRIORITY.NORMAL,
   powerUp: AUDIO_LOAD_PRIORITY.NORMAL,
   bossHit: AUDIO_LOAD_PRIORITY.NORMAL,

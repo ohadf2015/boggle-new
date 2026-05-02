@@ -23,6 +23,7 @@ import ScoreRevealV2 from './ScoreRevealV2';
 import OnboardingProgress from './OnboardingProgress';
 import ReturningUserStep from './ReturningUserStep';
 import CrazyGamesWelcome, { type CrazyGamesMode } from './CrazyGamesWelcome';
+import CrazyGamesTutorial from './CrazyGamesTutorial';
 import AuthModal from '@/components/auth/AuthModal';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
@@ -56,6 +57,8 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const [step, setStep] = useState<FlowStep>('language');
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { isOnCrazyGamesPlatform } = useCrazyGames();
+  // CG portal substep: tutorial first, then welcome with mode CTAs.
+  const [cgTutorialDone, setCgTutorialDone] = useState(false);
   const [tutorialScore, setTutorialScore] = useState(0);
   const [, setTutorialWords] = useState<string[]>([]);
   const [tutorialAttempt] = useState(1);
@@ -301,7 +304,33 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         className="fixed inset-0 z-[100] bg-neo-navy flex flex-col items-center justify-center overflow-y-auto"
         dir={dir}
       >
-        <CrazyGamesWelcome onPlay={handleCrazyGamesPlay} />
+        <AnimatePresence mode="wait">
+          {!cgTutorialDone ? (
+            <motion.div
+              key="cg-tutorial"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full"
+            >
+              <CrazyGamesTutorial
+                onContinue={() => setCgTutorialDone(true)}
+                onSkip={() => setCgTutorialDone(true)}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="cg-welcome"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full"
+            >
+              <CrazyGamesWelcome onPlay={handleCrazyGamesPlay} />
+            </motion.div>
+          )}
+        </AnimatePresence>
         <AnimatePresence>
           {isNavigating && (
             <motion.div

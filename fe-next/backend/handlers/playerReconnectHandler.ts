@@ -179,6 +179,11 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
     game.users[username].disconnected = false;
     delete game.users[username].disconnectedAt;
 
+    // Enforce host-status truth on rejoin — protects against stale isHost
+    // when transferHost ran during the disconnect window. Without this, an
+    // ex-host who rejoins can momentarily appear as host on the client.
+    game.users[username].isHost = game.hostUsername === username;
+
     broadcastToRoom(io, getGameRoom(gameCode), 'playerReconnected', { username });
   } else {
     // User entry missing (e.g., Redis restore didn't include user data)
@@ -208,6 +213,7 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
     username,
     roomName: game.roomName,
     language: game.language,
+    isPrivate: game.isPrivate || false,
     reconnected: true,
     users: getGameUsers(gameCode)
   });
@@ -224,6 +230,7 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
       skipAck: true,
       boardTheme: game.boardTheme || null,
       gameMode: game.gameMode || 'classic',
+      gameSessionId: game.gameSessionId,
     };
 
     // Include blast mode state for reconnecting players
@@ -287,6 +294,7 @@ function handleLateJoin(socket: Socket, game: GameState, gameCode: string, usern
     skipAck: true,
     boardTheme: game.boardTheme || null,
     gameMode: game.gameMode || 'classic',
+    gameSessionId: game.gameSessionId,
   };
 
   // Include blast mode state for late joiners

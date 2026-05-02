@@ -205,6 +205,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       username,
       roomName: game.roomName,
       language: game.language,
+      isPrivate: game.isPrivate || false,
       users: getGameUsers(gameCode)
     });
 
@@ -252,38 +253,34 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // Check if leaving user is the host
     const isLeavingUserHost = game.hostUsername === username;
 
-    // If game is in progress or finished, mark as disconnected instead of removing
-    // This allows the player to rejoin and continue
+    // Explicit `leaveRoom` (the user pressed Exit) — always fully remove,
+    // regardless of game state. Distinct from a transport disconnect, which
+    // hits `connectionHandler` and marks the user as `disconnected: true`
+    // pending a reconnect grace window. If we kept the in-progress slot open
+    // here, the user would silently auto-resume on next visit — surprising.
     if (isInProgress(game.gameState) || game.gameState === 'finished') {
-      if (game.users[username]) {
-        // Cancel any pending reconnection timeout from a prior disconnect
-        timerManager.clearTimer(`reconnect:${gameCode}:${username}`);
+      // Cancel any pending reconnection timer from a prior network drop.
+      timerManager.clearTimer(`reconnect:${gameCode}:${username}`);
 
-        game.users[username].disconnected = true;
-        game.users[username].disconnectedAt = Date.now();
-
-        // Notify game start coordinator so ack sequence adjusts for the leaving player
-        const leaveCoordResult = gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
-        if (leaveCoordResult && leaveCoordResult.startTimer) {
-          startGameTimer(io, gameCode, game.gameDuration || game.timerSeconds || 180);
-        }
-
-        // Clear socket mappings to prevent stale socket ID issues on rejoin
-        // User data remains in game.users for score preservation
-        clearSocketMappingsForLeave(socket.id, gameCode, username);
-
-        logger.info('SOCKET', `${username} left room ${gameCode} (game in progress - marked as disconnected, can rejoin)`);
-
-        broadcastToRoom(io, getGameRoom(gameCode), 'playerLeft', {
-          username,
-          message: `${username} left the room`
-        });
-
-        // Update spectator list in case slot opened
-        broadcastToRoom(io, getGameRoom(gameCode), 'spectatorList', {
-          spectators: getGameSpectators(gameCode)
-        });
+      // Notify game start coordinator so ack sequence adjusts.
+      const leaveCoordResult = gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+      if (leaveCoordResult && leaveCoordResult.startTimer) {
+        startGameTimer(io, gameCode, game.gameDuration || game.timerSeconds || 180);
       }
+
+      clearSocketMappingsForLeave(socket.id, gameCode, username);
+      removeUserFromGame(gameCode, username);
+
+      logger.info('SOCKET', `${username} left room ${gameCode} (in-progress — fully removed on explicit exit)`);
+
+      broadcastToRoom(io, getGameRoom(gameCode), 'playerLeft', {
+        username,
+        message: `${username} left the room`
+      });
+
+      broadcastToRoom(io, getGameRoom(gameCode), 'spectatorList', {
+        spectators: getGameSpectators(gameCode)
+      });
     } else {
       // Game not started yet - fully remove user
       removeUserFromGame(gameCode, username);

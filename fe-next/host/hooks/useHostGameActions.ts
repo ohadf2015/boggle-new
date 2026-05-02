@@ -303,6 +303,9 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     setGameStarted(false);
 
     clearSessionPreservingUsername(username);
+    // Persist the intentional-exit flag in sessionStorage so the post-reload
+    // boot path skips auto-rejoin. The ref alone is gone after reload.
+    try { sessionStorage.setItem('boggle_intentional_exit', '1'); } catch { /* blocked */ }
     socket?.emit('closeRoom', { gameCode });
     setTimeout(() => {
       socket?.disconnect();

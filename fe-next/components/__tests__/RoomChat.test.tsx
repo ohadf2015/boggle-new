@@ -209,41 +209,107 @@ describe('RoomChat', () => {
   });
 
   describe('send button state', () => {
-    it('disables send button when input is empty', () => {
+    // Send button uses `aria-disabled` (not real `disabled`) so taps still
+    // commit Android GBoard IME composition for Hebrew/RTL. sendMessage
+    // reads the DOM value at click time and bails on empty trim.
+    it('marks send button aria-disabled when input is empty', () => {
       render(<RoomChat {...defaultProps} />);
       const sendButton = screen.getByRole('button', { name: 'Send message' });
-      expect(sendButton).toBeDisabled();
+      expect(sendButton).toHaveAttribute('aria-disabled', 'true');
     });
 
-    it('enables send button when input has text', () => {
+    it('clears aria-disabled when input has text', () => {
       render(<RoomChat {...defaultProps} />);
       const input = screen.getByPlaceholderText('Type a message...');
       const sendButton = screen.getByRole('button', { name: 'Send message' });
 
       fireEvent.change(input, { target: { value: 'Hello' } });
-      expect(sendButton).not.toBeDisabled();
+      expect(sendButton).toHaveAttribute('aria-disabled', 'false');
     });
 
-    it('enables send button for whitespace-only input (trims on send)', () => {
-      // Regression: prior `!inputMessage.trim()` disable hid button while user
-      // had visible (whitespace) content. Disable now keys on raw length.
+    it('clears aria-disabled for whitespace-only input (trims on send)', () => {
       render(<RoomChat {...defaultProps} />);
       const input = screen.getByPlaceholderText('Type a message...');
       const sendButton = screen.getByRole('button', { name: 'Send message' });
 
       fireEvent.change(input, { target: { value: '   ' } });
-      expect(sendButton).not.toBeDisabled();
+      expect(sendButton).toHaveAttribute('aria-disabled', 'false');
+    });
+
+    it('does not emit chatMessage when send is tapped with empty input', () => {
+      render(<RoomChat {...defaultProps} />);
+      const sendButton = screen.getByRole('button', { name: 'Send message' });
+      fireEvent.click(sendButton);
+      expect(mockSocket.emit).not.toHaveBeenCalledWith('chatMessage', expect.anything());
+    });
+  });
+
+  describe('Hebrew / RTL input', () => {
+    it('sends Hebrew message via change event', () => {
+      render(<RoomChat {...defaultProps} />);
+      const input = screen.getByPlaceholderText('Type a message...');
+
+      fireEvent.change(input, { target: { value: 'שלום עולם' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
+
+      expect(mockSocket.emit).toHaveBeenCalledWith('chatMessage', expect.objectContaining({
+        message: 'שלום עולם'
+      }));
+    });
+
+    it('sends Hebrew message via Enter key', () => {
+      render(<RoomChat {...defaultProps} />);
+      const input = screen.getByPlaceholderText('Type a message...');
+
+      fireEvent.change(input, { target: { value: 'בדיקה' } });
+      fireEvent.keyDown(input, { key: 'Enter' });
+
+      expect(mockSocket.emit).toHaveBeenCalledWith('chatMessage', expect.objectContaining({
+        message: 'בדיקה'
+      }));
+    });
+
+    it('sends via DOM value when Android GBoard leaves React state empty (composition buffer)', () => {
+      // Simulates Android GBoard with Hebrew: onChange does not fire, but the
+      // DOM input has the typed text. Tap on Send must still emit.
+      render(<RoomChat {...defaultProps} />);
+      const input = screen.getByPlaceholderText('Type a message...') as HTMLInputElement;
+
+      // Bypass React state — write directly to DOM
+      input.value = 'שלום';
+      fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
+
+      expect(mockSocket.emit).toHaveBeenCalledWith('chatMessage', expect.objectContaining({
+        message: 'שלום'
+      }));
+    });
+
+    it('sends Enter after Hebrew compositionEnd', () => {
+      render(<RoomChat {...defaultProps} />);
+      const input = screen.getByPlaceholderText('Type a message...');
+
+      fireEvent.compositionStart(input);
+      fireEvent.change(input, { target: { value: 'שלום' } });
+      fireEvent.compositionEnd(input, { data: 'שלום' });
+      fireEvent.keyDown(input, { key: 'Enter' });
+
+      expect(mockSocket.emit).toHaveBeenCalledWith('chatMessage', expect.objectContaining({
+        message: 'שלום'
+      }));
     });
   });
 
   describe('IME composition', () => {
-    it('does not send on Enter while composing (e.g. Japanese kana)', () => {
+    // keyCode 229 is the canonical IME-commit signal — used to gate Enter
+    // instead of `isComposing` because GBoard Hebrew/RTL keeps `isComposing`
+    // true past commit. See handleKeyDown in RoomChat.tsx.
+    it('does not send on Enter with keyCode 229 (IME commit, e.g. Japanese kana)', () => {
       render(<RoomChat {...defaultProps} />);
       const input = screen.getByPlaceholderText('Type a message...');
 
       fireEvent.change(input, { target: { value: 'こ' } });
       fireEvent.compositionStart(input);
-      fireEvent.keyDown(input, { key: 'Enter', isComposing: true });
+      fireEvent.keyDown(input, { key: 'Enter', keyCode: 229 });
 
       expect(mockSocket.emit).not.toHaveBeenCalledWith('chatMessage', expect.any(Object));
     });

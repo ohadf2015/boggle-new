@@ -1758,7 +1758,19 @@ const ja = {
       "playMultiplayer": "対戦",
       "demoCaption": "遊び方",
       "freeBadge": "ずっと無料",
-      "demoAlt": "単語の作り方を示す文字盤"
+      "demoAlt": "単語の作り方を示す文字盤",
+      "tutorial": {
+        "tag": "ステップ 1 · 遊び方",
+        "heading": "なぞって",
+        "headingAccent": "綴ろう",
+        "subtitle": "隣り合う文字をつなごう。お手本のあと、あなたの番です。",
+        "watchMe": "見ててね...",
+        "yourTurn": "あなたの番！綴って",
+        "success": "やった！",
+        "skip": "スキップ → モード選択",
+        "caption": "やってみよう",
+        "tryIt": "なぞって！"
+      }
     },
     "welcome": {
       "title": "LexiClashへようこそ！",
@@ -9963,28 +9975,36 @@ const ja = {
       description: "できるだけ多くの単語を見つけよう！",
       feature1: "タイム制",
       feature2: "スコア制",
-      feature3: "自由形式"
+      feature3: "自由形式",
+      intro: { greet: "ゆっくりで大丈夫。言葉だけ。" }
     },
     blast: {
       name: "ブラスト",
       description: "コンボと特殊パワーでタイルをクリア！",
       feature1: "チェーンコンボ",
       feature2: "特殊タイル",
-      feature3: "カスケード"
+      feature3: "カスケード",
+      intro: { greet: "タップ、スワイプ、呼吸。急がなくていい。" }
     },
     wordHunt: {
       name: "ワードハント",
       description: "ターゲットの単語を最速で見つけよう！",
       feature1: "ターゲット単語",
       feature2: "スピードレース",
-      feature3: "ヒント"
+      feature3: "ヒント",
+      intro: { greet: "一語ずつ。きっとできる。" }
     },
     wheelRush: {
       name: "ホイールラッシュ",
       description: "ホイールで競争 — 単語を奪って勝利！",
       feature1: "ロック窓",
       feature2: "戦場の霧",
-      feature3: "パングラムボーナス"
+      feature3: "パングラムボーナス",
+      intro: { greet: "そっと回そう。言葉は来る。" }
+    },
+    intro: {
+      cta: "はじめよう",
+      skip: "スキップ"
     },
     random: "ランダム",
     randomDescription: "お楽しみに！毎ラウンド違うモードを選びます。",
@@ -9998,6 +10018,10 @@ const ja = {
     "fast": "クイック",
     "party": "パーティー",
     "challenge": "チャレンジ"
+  },
+  "practiceHub": {
+    "title": "練習",
+    "subtitle": "それぞれのモードを学ぶ静かな場所"
   },
   "shareResult": {
     "singleplayer": "LexiClash ソロ",

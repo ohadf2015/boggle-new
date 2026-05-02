@@ -41,6 +41,19 @@ vi.mock('@/utils/profileStorage', () => ({
 
 vi.mock('@/components/auth/AuthModal', () => ({ __esModule: true, default: () => null }));
 
+// Tutorial stub — the real component pulls in MiniGrid + framer-motion hooks.
+// Expose onContinue (skip path also routes through it) as buttons so tests
+// can advance the CG flow without driving the real demo.
+vi.mock('../CrazyGamesTutorial', () => ({
+  __esModule: true,
+  default: ({ onContinue, onSkip }: { onContinue: () => void; onSkip: () => void }) => (
+    <div data-testid="crazygames-tutorial">
+      <button data-testid="cg-tutorial-continue" onClick={onContinue}>continue</button>
+      <button data-testid="cg-tutorial-skip" onClick={onSkip}>skip</button>
+    </div>
+  ),
+}));
+
 // Stubs that should NOT mount on CrazyGames
 vi.mock('../LanguageSelect', () => ({
   __esModule: true,
@@ -91,18 +104,32 @@ describe('OnboardingFlow on CrazyGames', () => {
     vi.clearAllMocks();
   });
 
-  it('renders only CrazyGamesWelcome — no language/tutorial/profile/scoreReveal', () => {
+  it('renders CrazyGamesTutorial first — welcome and FTUE steps are gated', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
-    expect(screen.getByTestId('crazygames-welcome')).toBeInTheDocument();
+    expect(screen.getByTestId('crazygames-tutorial')).toBeInTheDocument();
+    expect(screen.queryByTestId('crazygames-welcome')).not.toBeInTheDocument();
     expect(screen.queryByTestId('language-select')).not.toBeInTheDocument();
     expect(screen.queryByTestId('tutorial-game')).not.toBeInTheDocument();
     expect(screen.queryByTestId('quick-profile-setup')).not.toBeInTheDocument();
     expect(screen.queryByTestId('score-reveal')).not.toBeInTheDocument();
   });
 
+  it('reveals CrazyGamesWelcome after tutorial onContinue', () => {
+    render(<OnboardingFlow onComplete={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('cg-tutorial-continue'));
+    expect(screen.getByTestId('crazygames-welcome')).toBeInTheDocument();
+  });
+
+  it('reveals CrazyGamesWelcome after tutorial onSkip (never traps user)', () => {
+    render(<OnboardingFlow onComplete={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('cg-tutorial-skip'));
+    expect(screen.getByTestId('crazygames-welcome')).toBeInTheDocument();
+  });
+
   it('Play Daily routes to /<locale>/daily and marks complete', () => {
     const onComplete = vi.fn();
     render(<OnboardingFlow onComplete={onComplete} />);
+    fireEvent.click(screen.getByTestId('cg-tutorial-continue'));
     fireEvent.click(screen.getByTestId('crazygames-welcome-cta-daily'));
     expect(mockMarkComplete).toHaveBeenCalled();
     expect(mockPush).toHaveBeenCalledWith('/en/daily');
@@ -111,18 +138,21 @@ describe('OnboardingFlow on CrazyGames', () => {
 
   it('Practice CTA routes to singleplayer practice', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('cg-tutorial-continue'));
     fireEvent.click(screen.getByTestId('crazygames-welcome-cta-practice'));
     expect(mockPush).toHaveBeenCalledWith('/en/singleplayer?autoStart=practice');
   });
 
   it('Multiplayer CTA routes to multiplayer hub', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('cg-tutorial-continue'));
     fireEvent.click(screen.getByTestId('crazygames-welcome-cta-multiplayer'));
     expect(mockPush).toHaveBeenCalledWith('/en/multiplayer');
   });
 
-  it('emits cg_welcome_view + cg_welcome_play telemetry', () => {
+  it('emits cg_welcome_view + cg_welcome_play telemetry after tutorial', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('cg-tutorial-continue'));
     expect(mockTrack).toHaveBeenCalledWith('cg_welcome_view', expect.any(Object));
     fireEvent.click(screen.getByTestId('crazygames-welcome-cta-daily'));
     expect(mockTrack).toHaveBeenCalledWith(

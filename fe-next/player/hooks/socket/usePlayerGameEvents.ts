@@ -12,6 +12,7 @@ import { resetComboState as resetComboStateUtil } from '@/shared/utils/comboUtil
 
 import {
   sendStartGameAck,
+  stashStartGameMessageId,
   createHostLeftRoomClosingHandler,
 } from '@/shared/utils/gameEventUtils';
 import { useLetterGrid, useGameLanguage, useShowStartAnimation, useGameActions, useGameStore } from '@/hooks/gameState';
@@ -347,6 +348,7 @@ export function usePlayerGameEvents({
         }
       }
 
+      stashStartGameMessageId('PLAYER', data.messageId);
       sendStartGameAck(socket, data, 'PLAYER');
       onGameStart?.();
 

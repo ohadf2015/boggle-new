@@ -328,14 +328,15 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     setHostUsername(quickPlayUsername);
     setUsername(quickPlayUsername);
 
-    // Create public room immediately with host playing and auto-start the game.
-    // Public so other players (web + CrazyGames) can discover it in the lobby.
-    handleJoin(true, defaultLanguage, gameCode, roomName, quickPlayUsername, { quickPlay: true });
+    // Quick Play creates a PRIVATE room (not discoverable in the public lobby
+    // and no invite/share affordances surfaced). Players who tap Quick Play
+    // want to drop in fast against bots, not host a friends-night session.
+    handleJoin(true, defaultLanguage, gameCode, roomName, quickPlayUsername, { quickPlay: true, isPrivate: true });
 
-    // Show CrazyGames invite button so host can invite friends
-    cgShowInvite(gameCode);
+    // Intentionally NOT calling cgShowInvite — quick games are solo-vs-bots
+    // sessions and the CrazyGames invite chip would mislead.
 
-  }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, cgShowInvite]);
+  }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername]);
 
   // Landing Quick Play auto-fire: when the user arrives via
   // `/multiplayer?quickPlay=true`, kick off `handleQuickPlay` exactly once on
@@ -351,11 +352,15 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     handleQuickPlay();
   }, [quickPlay, autoCreate, handleQuickPlay]);
 
-  // CrazyGames Smart Auto-Join: join an open room or quick-play on first load
+  // CrazyGames lobby arrival — observability only, NEVER auto-join.
+  //
+  // Policy (2026-05-03): the platform must not silently throw the player into
+  // a stranger's room or a quick-play match on landing. Auto-joins were
+  // surprising and stripped users of agency — they'd suddenly be losing a
+  // ranked match they didn't ask for. Lobby renders, user chooses. The CG
+  // hero card + Quick Play button + room list are the entry points.
   useEffect(() => {
     if (!isOnCrazyGamesPlatform) return;
-    // Wait for the CG SDK to finish handshaking so leaderboard/ad calls
-    // emitted as a side-effect of joining a room don't no-op silently.
     if (!isCrazyGamesReady) return;
     if (cgAutoJoinHandledRef.current) return;
     if (cgInviteHandledRef.current) return;
@@ -363,48 +368,35 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     if (autoCreate) return;
     if (roomsLoading) return;
 
-    // Only auto-join on the very first visit this session — not after quitting a room
     try {
-      if (sessionStorage.getItem('boggle_cg_auto_joined')) return;
+      if (sessionStorage.getItem('boggle_cg_lobby_logged')) return;
     } catch { /* storage blocked */ }
 
     cgAutoJoinHandledRef.current = true;
 
     try {
-      sessionStorage.setItem('boggle_cg_auto_joined', '1');
+      sessionStorage.setItem('boggle_cg_lobby_logged', '1');
     } catch { /* storage blocked */ }
 
-    const joinableRoom = activeRooms.find(
+    const joinableRoomCount = activeRooms.filter(
       (r) => r.gameState === 'waiting' && r.playerCount < (r.maxPlayers || 8),
-    );
+    ).length;
 
-    const decision = joinableRoom ? 'auto_join_room' : 'quick_play';
     trackGrowthEvent('cg_lobby_arrival', {
-      decision,
+      decision: 'show_lobby',
       activeRoomCount: activeRooms.length,
-      joinableRoomCount: activeRooms.filter(
-        (r) => r.gameState === 'waiting' && r.playerCount < (r.maxPlayers || 8),
-      ).length,
+      joinableRoomCount,
     });
-
-    if (joinableRoom) {
-      handleRoomClick(joinableRoom);
-    } else {
-      handleQuickPlay();
-    }
-  }, [isOnCrazyGamesPlatform, isCrazyGamesReady, roomsLoading, activeRooms, prefilledRoom, autoCreate, handleRoomClick, handleQuickPlay]);
+  }, [isOnCrazyGamesPlatform, isCrazyGamesReady, roomsLoading, activeRooms, prefilledRoom, autoCreate]);
 
   // CG SDK initializes async — but blocking the lobby on it kills first-paint
   // and tanks gameplay-conversion. Show the lobby immediately; auto-join waits
   // for SDK ready (effect above) so platform calls fire correctly when they fire.
 
-  // CG lobby diet: determine if auto-join is pending or if hero should show
-  const cgAutoJoinPending =
-    isOnCrazyGamesPlatform &&
-    !cgAutoJoinHandledRef.current &&
-    (typeof window === 'undefined' || !window.sessionStorage.getItem('boggle_cg_auto_joined'));
-
-  const showCgHero = isOnCrazyGamesPlatform && !isClassroomMode && !cgAutoJoinPending && !heroDismissed;
+  // CG lobby hero — show immediately. The previous "pending" gate existed to
+  // hide the hero while smart auto-join was deciding; auto-join is gone, so
+  // there's nothing to wait for.
+  const showCgHero = isOnCrazyGamesPlatform && !isClassroomMode && !heroDismissed;
 
   // Classroom mode: suppress public-lobby chrome. Auto-join effects above still
   // run (handleInvitationAutoJoin fires from prefilledRoom), so the host's room

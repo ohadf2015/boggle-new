@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { m } from 'framer-motion';
 import type { ComboColors, PerformanceMode } from './types';
-import { getSelectionEscalation } from './selectionEscalation';
+import type { SelectionEscalation } from './selectionEscalation';
 import VFXTileEffect from './VFXTileEffect';
 
 interface GridCellEffectsProps {
@@ -13,8 +13,9 @@ interface GridCellEffectsProps {
   reduceMotion: boolean;
   /** 0-based index of this tile in the selection order */
   selectionIndex: number;
-  /** Total number of currently selected tiles */
-  totalSelected: number;
+  /** Pre-computed escalation from parent. Stable ref per (depth, tier, combo)
+   *  via getSelectionEscalation cache → memo holds across drag steps within a tier. */
+  escalation: SelectionEscalation | null;
 }
 
 /**
@@ -64,11 +65,9 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
   effectiveRenderMode,
   reduceMotion,
   selectionIndex,
-  totalSelected,
+  escalation,
 }) {
-  if (!isSelected || effectiveRenderMode === 'minimal') return null;
-
-  const escalation = getSelectionEscalation(selectionIndex, totalSelected, comboLevel);
+  if (!isSelected || effectiveRenderMode === 'minimal' || !escalation) return null;
 
   // Compound intensity: max of escalation tier and combo-derived intensity
   const compoundTier = Math.max(

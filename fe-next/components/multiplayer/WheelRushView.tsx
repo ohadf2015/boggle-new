@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Socket } from 'socket.io-client';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import dynamic from 'next/dynamic';
-import { RotateCcw, Shuffle, Sparkles } from 'lucide-react';
+import { ChevronUp, RotateCcw, Shuffle, Sparkles } from 'lucide-react';
 import { WheelLetter, WordTile } from '@/components/daily/WordWheelParts';
 import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -51,6 +51,10 @@ interface Props {
 
 const MIN_LEN = WHEEL_RUSH_MIN_WORD_LEN;
 
+// Mirrors WordWheelGame.tsx — coarse "X words to pass Y" estimator. Same
+// constant on both surfaces so the daily-challenge feel ports cleanly.
+const AVG_POINTS_PER_WORD = 6;
+
 type WheelErrorCode =
   | 'too-short' | 'no-center' | 'bad-letters' | 'not-a-word'
   | 'already-closed' | 'locked-by-other' | 'duplicate';
@@ -95,6 +99,26 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const [wheelRadius, setWheelRadius] = useState(72);
 
   const { floatingReactions, dismissReaction } = useQuickReactions({ socket, username });
+
+  // Next-rival hint — mirrors WordWheelGame.tsx for daily-challenge parity.
+  // Hidden while fog-of-war is active so we don't leak masked opponent
+  // scores. The slot itself stays mounted (reserved height) to prevent
+  // mid-match layout shift when the pill toggles.
+  const nextRival = useMemo(() => {
+    if (fogActive) return null;
+    const me = leaderboard.find(p => p.username === username);
+    const myScore = me?.score ?? 0;
+    return leaderboard
+      .filter(p => p.username !== username && p.score > myScore)
+      .sort((a, b) => a.score - b.score)[0] ?? null;
+  }, [leaderboard, username, fogActive]);
+
+  const wordsToPass = nextRival
+    ? Math.max(1, Math.ceil(
+        (nextRival.score - (leaderboard.find(p => p.username === username)?.score ?? 0)) /
+        AVG_POINTS_PER_WORD,
+      ))
+    : 0;
 
   const fbTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wheelContainerRef = useRef<HTMLDivElement>(null);
@@ -164,7 +188,13 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       const me = latestRef.current.username;
       setPuzzle(data.puzzle);
       setOuterLetters(data.puzzle.outerLetters);
-      setStartedAt(data.startedAt ?? Date.now());
+      const sa = data.startedAt ?? Date.now();
+      setStartedAt(sa);
+      // Flip fog ON synchronously with startedAt so the next-rival memo
+      // never sees fogActive=false on the same render that opponents
+      // first appear (race that leaked masked scores). The off-flip
+      // still belongs to the timeout effect below.
+      if (Date.now() < sa + WHEEL_RUSH_FOG_MS) setFogActive(true);
       // Reconnect-snapshot hydration: rebuild client state from server payload.
       const mine = data.myWords ?? data.foundWords?.[me] ?? [];
       if (mine.length) {
@@ -487,8 +517,33 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         </AnimatePresence>
       </motion.div>
 
-      {/* Wheel cluster — fills remaining vertical space, centered */}
-      <div className="flex-1 flex flex-col items-center justify-center min-h-0 gap-2">
+      {/* Daily-style "X more words to pass Y" hint. Reserved-height slot —
+          ALWAYS rendered so toggling visibility never shifts the wheel.
+          Hidden during fog-of-war (don't reveal opponent scores). */}
+      <div
+        data-testid="mp-next-rival-slot"
+        className="w-full mt-1 min-h-[26px] sm:min-h-[28px] flex items-center justify-center shrink-0"
+      >
+        <AnimatePresence>
+          {nextRival && (
+            <motion.div
+              data-testid="mp-next-rival-pill"
+              className="px-2.5 py-1 rounded-neo border-2 border-neo-cream/20 bg-neo-navy-light/60 text-[11px] sm:text-xs text-neo-cream/80 font-semibold flex items-center gap-1.5"
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+            >
+              <ChevronUp className="w-3 h-3 text-neo-lime" />
+              <span dir="auto">
+                {t('wordWheel.wordsToPass', { count: wordsToPass, name: nextRival.username })}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Wheel + actions cluster — kept tight together, vertically centered. */}
+      <div className="flex-1 flex flex-col items-center justify-center min-h-0 gap-3">
         <div
           ref={wheelContainerRef}
           className="relative w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 flex items-center justify-center touch-none"
@@ -535,10 +590,10 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         <p className="text-neo-cream/40 text-xs text-center px-2">
           {t('wordWheel.centerLetterRule') || 'Must include center letter'} &middot; {(t('wordWheel.minLetters') || 'Min {min} letters').replace('{min}', String(MIN_LEN))}
         </p>
-      </div>
 
-      {/* Actions (Clear / Submit / Shuffle) */}
-      <div className="flex items-center justify-center gap-3 shrink-0">
+        {/* Actions (Clear / Submit / Shuffle) — sit directly under the wheel
+            so the player's thumb stays in the wheel's gravity well. */}
+        <div className="flex items-center justify-center gap-3 shrink-0 mt-1">
         <motion.button
           type="button"
           onClick={handleClear}
@@ -587,6 +642,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         >
           <Shuffle className="w-5 h-5" />
         </motion.button>
+        </div>
       </div>
 
       <MyWordsChips words={myWords} />

@@ -25,9 +25,9 @@ import {
   WHEEL_RUSH_LOCK_MS,
   WHEEL_RUSH_STEAL_BONUS,
   WHEEL_RUSH_FIRST_FINDER_MULT,
-  WHEEL_RUSH_POINTS_PER_LETTER,
   WHEEL_RUSH_PANGRAM_BONUS,
 } from '@/shared/constants/wheelRushConstants';
+import { calculateWordScoreByLength } from '@/shared/utils/scoring';
 
 describe('wheelRushManager', () => {
   describe('generateWheelPuzzle', () => {
@@ -81,11 +81,11 @@ describe('wheelRushManager', () => {
   describe('scoreWheelWord', () => {
     const all = ['C','A','N','E','S','T','X'];
     it('length-based base', () => {
-      expect(scoreWheelWord('CANE', all)).toBe(4 * WHEEL_RUSH_POINTS_PER_LETTER);
+      expect(scoreWheelWord('CANE', all)).toBe(calculateWordScoreByLength(4));
     });
     it('pangram bonus when all letters used', () => {
       // fake word w/ all 7 letters
-      expect(scoreWheelWord('CANESTX', all)).toBe(7 * WHEEL_RUSH_POINTS_PER_LETTER + WHEEL_RUSH_PANGRAM_BONUS);
+      expect(scoreWheelWord('CANESTX', all)).toBe(calculateWordScoreByLength(7) + WHEEL_RUSH_PANGRAM_BONUS);
     });
   });
 
@@ -98,7 +98,7 @@ describe('wheelRushManager', () => {
       expect(r.kind).toBe('locked');
       if (r.kind === 'locked') {
         expect(r.lockUntil).toBe(1000 + WHEEL_RUSH_LOCK_MS);
-        expect(r.score).toBe(Math.round(4 * WHEEL_RUSH_POINTS_PER_LETTER * WHEEL_RUSH_FIRST_FINDER_MULT));
+        expect(r.score).toBe(Math.round(calculateWordScoreByLength(4) * WHEEL_RUSH_FIRST_FINDER_MULT));
       }
       expect(s.locks['CANE'].by).toBe('p1');
     });
@@ -111,7 +111,7 @@ describe('wheelRushManager', () => {
       if (r.kind === 'stolen') {
         expect(r.from).toBe('p1');
         expect(r.stealBonus).toBe(WHEEL_RUSH_STEAL_BONUS);
-        expect(r.score).toBe(4 * WHEEL_RUSH_POINTS_PER_LETTER);
+        expect(r.score).toBe(calculateWordScoreByLength(4));
       }
       expect(s.closed).toContain('CANE');
       expect(s.locks['CANE']).toBeUndefined();

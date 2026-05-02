@@ -13,7 +13,7 @@
  * - Signup prompts (guest user conversion)
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, startTransition } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { useWinStreak } from '@/hooks/useWinStreak';
@@ -255,40 +255,46 @@ export function useResultsSideEffects({
   useEffect(() => {
     if (hasAwardedCoinsRef.current || !currentPlayerData || !gameCode) return;
 
-    const sessionId = `mp_${gameCode}_${Date.now()}`;
+    // Defer one frame past first paint. awardGameCoins fires a 'coinsChanged'
+    // event that re-renders every CoinContext consumer; running it inline with
+    // the other mount effects compounds the results-page setState cascade and
+    // costs visible jank in the first ~100ms.
+    const rafId = requestAnimationFrame(() => {
+      const sessionId = `mp_${gameCode}_${Date.now()}`;
+      const reward = awardGameCoins(
+        sessionId,
+        'multiplayer',
+        currentPlayerData.score || 0,
+        currentPlayerRank,
+        totalPlayers,
+        currentStreak,
+      );
 
-    const reward = awardGameCoins(
-      sessionId,
-      'multiplayer',
-      currentPlayerData.score || 0,
-      currentPlayerRank,
-      totalPlayers,
-      currentStreak
-    );
-
-    if (reward && reward.awarded > 0) {
-      setCoinReward(reward);
-      if (user?.id) {
-        // Authenticated: Sync to DB AND Refresh Profile
-        syncCoinsToDatabase(
-          user.id,
-          reward.awarded,
-          'Multiplayer Game',
-          {
-            gameCode,
-            score: currentPlayerData.score || 0,
-            rank: currentPlayerRank,
-            totalPlayers,
-          }
-        ).then(() => {
-          refreshCoins();
-        }).catch((err: unknown) => {
-          logger.error('[useResultsSideEffects] Coin sync failed:', err);
-        });
+      if (reward && reward.awarded > 0) {
+        startTransition(() => setCoinReward(reward));
+        if (user?.id) {
+          syncCoinsToDatabase(
+            user.id,
+            reward.awarded,
+            'Multiplayer Game',
+            {
+              gameCode,
+              score: currentPlayerData.score || 0,
+              rank: currentPlayerRank,
+              totalPlayers,
+            },
+          ).then(() => {
+            refreshCoins();
+          }).catch((err: unknown) => {
+            logger.error('[useResultsSideEffects] Coin sync failed:', err);
+          });
+        }
       }
-    }
 
-    hasAwardedCoinsRef.current = true;
+      hasAwardedCoinsRef.current = true;
+    });
+
+    return () => cancelAnimationFrame(rafId);
   }, [currentPlayerData, currentPlayerRank, totalPlayers, gameCode, user?.id, refreshCoins, currentStreak]);
 
   // ==============================================
@@ -336,10 +342,10 @@ export function useResultsSideEffects({
     }).then((cognitiveResult) => {
       if (cognitiveResult) {
         logger.log('[useResultsSideEffects] Cognitive scores saved:', cognitiveResult);
-        setBrainPointsReward({
+        startTransition(() => setBrainPointsReward({
           scoreDelta: cognitiveResult.scoreDelta,
           newScore: cognitiveResult.overallScore,
-        });
+        }));
       }
     }).catch((err: unknown) => {
       logger.error('[useResultsSideEffects] Cognitive score save failed:', err);
@@ -374,7 +380,6 @@ export function useResultsSideEffects({
         lastWinDate && new Date(lastWinDate).toDateString() === new Date().toDateString();
 
       const prevStreak = currentStreak;
-      setPreviousStreak(prevStreak);
       recordWin();
 
       const newStreak = alreadyPlayedToday ? currentStreak : prevStreak + 1;
@@ -383,11 +388,16 @@ export function useResultsSideEffects({
       const tierThresholds = [3, 7, 14, 30];
       const isNewMilestone = !alreadyPlayedToday && tierThresholds.some((t) => newStreak === t);
 
-      setWinStreakData({
-        currentStreak: newStreak,
-        bestStreak: Math.max(bestStreak, newStreak),
-        isNewMilestone,
-        previousStreak: prevStreak,
+      // Wrap setStates in startTransition so the first paint of the results
+      // page isn't blocked by the streak/badge cascade.
+      startTransition(() => {
+        setPreviousStreak(prevStreak);
+        setWinStreakData({
+          currentStreak: newStreak,
+          bestStreak: Math.max(bestStreak, newStreak),
+          isNewMilestone,
+          previousStreak: prevStreak,
+        });
       });
     }
 

@@ -16,7 +16,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import logger from '@/utils/logger';
 import type { ResultsPageProps } from '@/types/components';
 import { useResultsSocketEvents } from '@/components/results/useResultsSocketEvents';
-import { useResultsData, type PlayerScore } from '@/hooks/useResultsData';
+import { useResultsData } from '@/hooks/useResultsData';
 import { useResultsSideEffects } from '@/hooks/useResultsSideEffects';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useMultiplayerSignupNudge } from '@/hooks/useMultiplayerSignupNudge';
@@ -37,7 +37,7 @@ import { ResultsDetailsContent, type ResultsDetailsContentProps } from '@/compon
 import { PostRoundSummary } from '@/components/results/PostRoundSummary';
 import type { WordHuntResultsSummaryProps } from '@/components/results/WordHuntResultsSummary';
 const StickyReadyBar = dynamic(() => import('@/components/results/StickyReadyBar'), { ssr: false });
-const PostGameSocialActions = dynamic(() => import('@/components/results/PostGameSocialActions'), { ssr: false });
+import { ResultsFriendStatusProvider } from '@/components/results/ResultsFriendStatus';
 import { generateRandomTable } from '@/utils/utils';
 import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
@@ -77,8 +77,6 @@ interface DesktopResultsLayoutProps {
   wheelRushPlayerStats: Record<string, WheelRushPlayerStats>;
   currentUsername?: string;
   gameCode?: string;
-  sortedScores: PlayerScore[];
-  otherPlayers: PlayerScore[];
   isBotsOnlyGame: boolean;
   postGameWordReview?: React.ReactNode;
   isCurrentUserWinner: boolean;
@@ -100,8 +98,6 @@ function DesktopResultsLayout({
   wheelRushPlayerStats,
   currentUsername,
   gameCode,
-  sortedScores,
-  otherPlayers,
   isBotsOnlyGame,
   postGameWordReview,
   isCurrentUserWinner,
@@ -185,12 +181,7 @@ function DesktopResultsLayout({
                 currentUsername={currentUsername}
               />
             )}
-            {gameCode && sortedScores.length > 1 && (
-              <PostGameSocialActions
-                opponents={otherPlayers}
-                reducedMotion={null}
-              />
-            )}
+            {/* Add-friend affordance now lives inline on each player tile (Podium + ConsolationRows). */}
             {/* D1 retention CTA — outcome-aware Daily Challenge invite. Renders on CG too
                 (PostGameEngagement self-hides on CG; this one stays). */}
             <DailyChallengeInvite isWinner={isCurrentUserWinner} />
@@ -799,13 +790,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           />
         </div>
       )}
-      {/* Social actions: Add Friend for non-friend opponents (E-10, E-14) */}
-      {gameCode && sortedScores.length > 1 && (
-        <PostGameSocialActions
-          opponents={otherPlayers}
-          reducedMotion={null}
-        />
-      )}
+      {/* Add-friend affordance now lives inline on each player tile (Podium + ConsolationRows). */}
     </>
   );
 
@@ -818,8 +803,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     missedWords,
     isHost,
     t,
-    isCurrentPlayerReady,
-    onMarkReady: handleMarkReady,
   };
 
   // Render Details Tab Content using shared component
@@ -950,8 +933,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         wheelRushPlayerStats={wheelRushPlayerStats}
         currentUsername={username}
         gameCode={gameCode}
-        sortedScores={sortedScores}
-        otherPlayers={otherPlayers}
         isBotsOnlyGame={isBotsOnlyGame}
         postGameWordReview={postGameWordReviewNode}
         isCurrentUserWinner={isCurrentUserWinner}
@@ -1005,7 +986,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 function ResultsPageWithErrorBoundary(props: ResultsPageProps) {
   return (
     <FeatureErrorBoundary featureName="Results" showHomeButton={true}>
-      <ResultsPage {...props} />
+      <ResultsFriendStatusProvider>
+        <ResultsPage {...props} />
+      </ResultsFriendStatusProvider>
     </FeatureErrorBoundary>
   );
 }

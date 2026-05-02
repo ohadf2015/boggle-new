@@ -28,8 +28,8 @@ const makeReward = (breakdown: CoinReward['breakdown']): CoinReward => ({
   breakdown,
 });
 
-describe('RewardsSummary breakdown line items', () => {
-  it('renders streakBonus, efficiency, and streak alongside existing line items', async () => {
+describe('RewardsSummary breakdown tooltip', () => {
+  it('exposes streakBonus, efficiency, streak alongside existing fields via the chip title', async () => {
     const reward = makeReward({
       base: 10,
       scoreBonus: 20,
@@ -39,26 +39,26 @@ describe('RewardsSummary breakdown line items', () => {
       streakBonus: 15,
     });
 
-    render(
+    const { container } = render(
       <RewardsSummary coinReward={reward} isAuthenticated={true} />
     );
 
+    let chip: HTMLElement | null = null;
     await waitFor(() => {
-      expect(screen.getByText('+10', { exact: false })).toBeInTheDocument();
+      chip = container.querySelector('[title]');
+      expect(chip).not.toBeNull();
     });
 
-    // Existing fields — now via translation keys
-    expect(screen.getByText(/reveal\.base/)).toBeInTheDocument();
-    expect(screen.getByText(/coins\.score/)).toBeInTheDocument();
-    expect(screen.getByText(/coins\.placement/)).toBeInTheDocument();
-
-    // New fields — the gap this test closes
-    expect(screen.getByText(/coins\.efficiency/)).toBeInTheDocument();
-    expect(screen.getByText(/coins\.streak\b/)).toBeInTheDocument();
-    expect(screen.getByText(/\+15/)).toBeInTheDocument(); // streakBonus value
+    const title = chip!.getAttribute('title') ?? '';
+    expect(title).toMatch(/reveal\.base/);
+    expect(title).toMatch(/coins\.score/);
+    expect(title).toMatch(/coins\.placement/);
+    expect(title).toMatch(/coins\.efficiency/);
+    expect(title).toMatch(/coins\.streak\b/);
+    expect(title).toMatch(/\+15/);
   });
 
-  it('omits zero-value line items', async () => {
+  it('omits zero-value segments from the title tooltip', async () => {
     const reward = makeReward({
       base: 10,
       scoreBonus: 0,
@@ -68,16 +68,20 @@ describe('RewardsSummary breakdown line items', () => {
       streakBonus: 0,
     });
 
-    render(
+    const { container } = render(
       <RewardsSummary coinReward={reward} isAuthenticated={true} />
     );
 
+    let chip: HTMLElement | null = null;
     await waitFor(() => {
-      expect(screen.getByText(/reveal\.base/)).toBeInTheDocument();
+      chip = container.querySelector('[title]');
+      expect(chip).not.toBeNull();
     });
 
-    expect(screen.queryByText(/coins\.score/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/coins\.efficiency/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/coins\.streak\b/)).not.toBeInTheDocument();
+    const title = chip!.getAttribute('title') ?? '';
+    expect(title).toMatch(/reveal\.base/);
+    expect(title).not.toMatch(/coins\.score/);
+    expect(title).not.toMatch(/coins\.efficiency/);
+    expect(title).not.toMatch(/coins\.streak\b/);
   });
 });

@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { useModeFirstSeen, type IntroMode } from '@/hooks/useModeFirstSeen';
+import ModeIntroCard from './ModeIntroCard';
 
 type TFunction = (key: string, params?: Record<string, string | number>) => string;
 
@@ -9,13 +11,39 @@ export interface ModeRevealOverlayProps {
   modeLabel: string;
   seriesRoundNumber?: number;
   t: TFunction;
+  /** When provided + first-time for this mode, renders cozy intro instead of splash. */
+  modeKey?: IntroMode;
+  /** Called when first-time user taps CTA / Skip. Required if modeKey is set. */
+  onIntroDismiss?: () => void;
 }
 
 /**
- * Mode reveal splash shown before countdown.
- * Displays game mode + optional "ROUND N" for series games (round 2+).
+ * Mode reveal — first-time gets cozy ModeIntroCard, returning players get fast splash.
+ * Splash displays game mode + optional "ROUND N" for series games (round 2+).
  */
-const ModeRevealOverlay: React.FC<ModeRevealOverlayProps> = ({ modeLabel, seriesRoundNumber, t }) => {
+const ModeRevealOverlay: React.FC<ModeRevealOverlayProps> = ({
+  modeLabel,
+  seriesRoundNumber,
+  t,
+  modeKey,
+  onIntroDismiss,
+}) => {
+  const { hasSeen, markSeen } = useModeFirstSeen(modeKey ?? 'classic');
+  const showIntro = modeKey != null && !hasSeen;
+
+  if (showIntro) {
+    return (
+      <ModeIntroCard
+        mode={modeKey}
+        t={t}
+        onContinue={() => {
+          markSeen();
+          onIntroDismiss?.();
+        }}
+      />
+    );
+  }
+
   const showRound = seriesRoundNumber != null && seriesRoundNumber >= 1;
   const displayRound = showRound ? seriesRoundNumber + 1 : null;
 

@@ -56,9 +56,12 @@ describe('LandingHero', () => {
     expect(screen.getAllByTestId('leaderboard-preview').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('hides leaderboard sidebar on mobile', () => {
+  it('hides leaderboard sidebar on mobile via CSS', () => {
+    // Layout is CSS-driven for SSR/hydration parity: leaderboard renders in DOM
+    // but its wrapper carries `hidden md:block` so it's invisible on mobile.
     render(<LandingHero {...baseProps} isMobilePortrait={true} />);
-    // On mobile the leaderboard sidebar is not rendered
-    expect(screen.queryByTestId('leaderboard-preview')).not.toBeInTheDocument();
+    const wrapper = screen.getByTestId('leaderboard-preview').parentElement;
+    expect(wrapper?.className).toMatch(/\bhidden\b/);
+    expect(wrapper?.className).toMatch(/md:block/);
   });
 });
