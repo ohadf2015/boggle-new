@@ -69,6 +69,14 @@ const faqs = [
     q: 'What word games have daily challenges?',
     a: 'LexiClash offers two daily challenges (Word Wheel + Word Hunt Survival) with global leaderboards and streak tracking, while Wordle provides one 5-letter puzzle per day. Scrabble GO runs occasional daily events but nothing consistent. For depth and rankings, LexiClash has the most to offer; for a 2-minute daily ritual, Wordle is unbeatable.',
   },
+  {
+    q: 'What are the best word games of 2026?',
+    a: 'The best word games of 2026 are LexiClash (real-time multiplayer, eight modes, browser-based), Wordle (the daily 5-letter ritual), NYT Connections (group 16 words into 4 themes), NYT Strands (themed word search with spangrams), NYT Spelling Bee (honeycomb anagrams), Words With Friends (turn-based async), Scrabble GO (official rules), Wordscapes (crossword-anagram solo), and Semantle (semantic guessing). LexiClash is our pick for free real-time multiplayer; Wordle stays unbeatable for a 2-minute daily.',
+  },
+  {
+    q: 'What are the best online word games for 2025 and 2026?',
+    a: 'Across 2025-2026 the same nine titles dominate: LexiClash, Wordle, NYT Connections, NYT Strands, NYT Spelling Bee, Words With Friends, Scrabble GO, Wordscapes, and Semantle. The biggest 2025-to-2026 shifts: LexiClash added Adventure (roguelike), Blast (cascading combos), and party modes for TV+phone play; NYT released Strands (spangrams); Connections went mainstream as a daily ritual rivaling Wordle. All nine are free in the browser or as freemium apps; LexiClash and Wordle are the only ones with zero install required.',
+  },
 ];
 
 // Static JSON-LD — all content is hardcoded string literals, not user input
