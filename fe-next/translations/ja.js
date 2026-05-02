@@ -5594,7 +5594,8 @@ const ja = {
       "hoursAgo": "{count}時間前",
       "scopeCombined": "総合",
       "scopeWordHunt": "ワードハント",
-      "scopeWordWheel": "ワードホイール"
+      "scopeWordWheel": "ワードホイール",
+      "loadError": "リーダーボードを読み込めませんでした — 再試行してください"
     },
     "shareMessage": {
       "header": "LexiClash ワードハント #{number}",

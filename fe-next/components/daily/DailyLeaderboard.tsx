@@ -114,11 +114,11 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       }
     } catch (err) {
       console.error('Failed to fetch daily leaderboard:', err);
-      setError('Failed to load leaderboard');
+      setError(t('daily.leaderboard.loadError'));
     } finally {
       setLoading(false);
     }
-  }, [puzzleDate, language, onParticipantCountChange, gameType]);
+  }, [puzzleDate, language, onParticipantCountChange, gameType, t]);
 
   // Initial fetch and polling - pause when tab is not visible
   const pollingInterval = useSafeInterval();

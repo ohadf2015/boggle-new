@@ -5523,7 +5523,8 @@ const es = {
       "hoursAgo": "hace {count}h",
       "scopeCombined": "Combinado",
       "scopeWordHunt": "Caza de Palabras",
-      "scopeWordWheel": "Rueda de Palabras"
+      "scopeWordWheel": "Rueda de Palabras",
+      "loadError": "No se pudo cargar la tabla — toca para reintentar"
     },
     "shareMessage": {
       "header": "LexiClash Caza de Palabras #{number}",

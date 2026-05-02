@@ -263,11 +263,11 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       }
     } catch (err) {
       console.error('Failed to fetch today leaderboard:', err);
-      setTodayError('Failed to load leaderboard');
+      setTodayError(t('daily.leaderboard.loadError'));
     } finally {
       setTodayLoading(false);
     }
-  }, [puzzleDate, language, onParticipantCountChange, activeTab, scope]);
+  }, [puzzleDate, language, onParticipantCountChange, activeTab, scope, t]);
 
   // Fetch all-time leaderboard — merges Word Hunt + Word Wheel
   const fetchAllTimeLeaderboard = useCallback(async () => {
@@ -336,11 +336,11 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       }
     } catch (err) {
       console.error('Failed to fetch all-time leaderboard:', err);
-      setAllTimeError('Failed to load leaderboard');
+      setAllTimeError(t('daily.leaderboard.loadError'));
     } finally {
       setAllTimeLoading(false);
     }
-  }, [language, onParticipantCountChange, activeTab, scope]);
+  }, [language, onParticipantCountChange, activeTab, scope, t]);
 
   // Initial fetch and polling
   const pollingInterval = useSafeInterval();

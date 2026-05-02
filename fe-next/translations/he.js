@@ -5553,7 +5553,8 @@ const he = {
       "hoursAgo": "לפני {count} שע'",
       "scopeCombined": "משולב",
       "scopeWordHunt": "ציד מילים",
-      "scopeWordWheel": "גלגל המילים"
+      "scopeWordWheel": "גלגל המילים",
+      "loadError": "טעינת הטבלה נכשלה — לחיצה לניסיון נוסף"
     },
     "shareMessage": {
       "header": "LexiClash ציד מילים #{number}",

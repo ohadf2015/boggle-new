@@ -5663,7 +5663,8 @@ const en = {
       "hoursAgo": "{count}h ago",
       "scopeCombined": "Combined",
       "scopeWordHunt": "Word Hunt",
-      "scopeWordWheel": "Word Wheel"
+      "scopeWordWheel": "Word Wheel",
+      "loadError": "Couldn't load leaderboard — tap retry"
     },
     "shareMessage": {
       "header": "LexiClash Word Hunt #{number}",

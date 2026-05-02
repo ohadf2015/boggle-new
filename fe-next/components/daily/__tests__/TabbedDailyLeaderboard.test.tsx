@@ -373,4 +373,30 @@ describe('TabbedDailyLeaderboard', () => {
       expect(screen.getByText(/77/)).toBeInTheDocument();
     });
   });
+
+  describe('i18n: leaderboard error uses translation key (not hardcoded English)', () => {
+    // 4 sites used to setError('Failed to load leaderboard') in raw English —
+    // breaks Hebrew/Swedish/Japanese/Spanish UX. Audit 2026-05-02 / memory
+    // feedback-hardcoded-leaderboard-error.md.
+    it('renders translation key when fetch fails', async () => {
+      (global.fetch as jest.Mock).mockImplementation(() =>
+        Promise.resolve({ ok: false, status: 500, text: () => Promise.resolve('boom') })
+      );
+
+      const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
+      render(
+        <TabbedDailyLeaderboard
+          puzzleDate="2026-01-09"
+          language="en"
+          t={mockT}
+        />
+      );
+
+      // mockT is identity (returns the key) — so the rendered text proves
+      // the component is calling t() with the canonical key.
+      expect(await screen.findByText('daily.leaderboard.loadError')).toBeInTheDocument();
+      // And the raw English literal MUST NOT appear.
+      expect(screen.queryByText('Failed to load leaderboard')).not.toBeInTheDocument();
+    });
+  });
 });

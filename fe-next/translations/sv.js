@@ -5563,7 +5563,8 @@ const sv = {
       "hoursAgo": "{count}h sedan",
       "scopeCombined": "Kombinerat",
       "scopeWordHunt": "Ordjakt",
-      "scopeWordWheel": "Ordhjul"
+      "scopeWordWheel": "Ordhjul",
+      "loadError": "Kunde inte ladda topplistan — tryck igen"
     },
     "shareMessage": {
       "header": "LexiClash Ordjakt #{number}",
