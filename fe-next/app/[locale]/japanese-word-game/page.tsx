@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import NativePageEnhancements from "@/components/landing/NativePageEnhancements";
 
-export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -202,6 +202,7 @@ export default async function JapaneseWordGamePage({ params }: PageProps) {
             グローバルリーダーボードで競争し、アチーブメントを獲得し、特別なゲームモードをアンロックしてください。当社のボスバトルでは、プレイヤーがAIの敵と協力するユニークなPvEツイストが追加されます。日々の挑戦は毎日新しいパズルを提供し、排他的な報酬があります。
           </p>
         </section>
+        <NativePageEnhancements locale={locale} />
       </div>
     </main>
   );

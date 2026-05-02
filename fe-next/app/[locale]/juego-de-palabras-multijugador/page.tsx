@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import NativePageEnhancements from "@/components/landing/NativePageEnhancements";
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 
-export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -221,6 +221,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
             Compite en clasificaciones globales, obtén logros y desbloquea modos de juego especiales. Nuestras batallas de jefes añaden un giro único de PvE donde los jugadores colaboran contra oponentes de IA. Los desafíos diarios ofrecen nuevos rompecabezas cada día con recompensas exclusivas.
           </p>
         </section>
+        <NativePageEnhancements locale={locale} />
       </div>
     </main>
   );

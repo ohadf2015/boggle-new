@@ -1,9 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-
-export const dynamic = 'force-dynamic';
-
-type Locale = 'he';
+import NativePageEnhancements from '@/components/landing/NativePageEnhancements';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -12,8 +9,7 @@ interface PageProps {
 const BASE_URL = 'https://www.lexiclash.live';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { locale } = await params;
-  const isTargetLocale = locale === 'he';
+  await params;
   const pageUrl = `${BASE_URL}/he/hebrew-multiplayer-word-game`;
 
   return {
@@ -212,6 +208,7 @@ export default async function HebrewMultiplayerWordGamePage({ params }: PageProp
             עם פרסים בלעדיים.
           </p>
         </section>
+        <NativePageEnhancements locale={locale} />
       </div>
     </main>
   );

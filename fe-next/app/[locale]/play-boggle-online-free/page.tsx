@@ -3,8 +3,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Script from 'next/script';
 
-export const dynamic = 'force-dynamic';
-
 interface PageProps {
   params: Promise<{ locale: string }>;
 }
@@ -148,10 +146,10 @@ const modeBgMap = {
 } as const;
 
 const stats = [
-  { value: '50K+', label: 'Games Played', color: 'text-neo-lime' },
-  { value: '4.7★', label: 'Player Rating', color: 'text-neo-yellow' },
-  { value: '20', label: 'Max Players', color: 'text-neo-pink' },
+  { value: '4×4-6×6', label: 'Grid Sizes', color: 'text-neo-lime' },
   { value: '5', label: 'Languages', color: 'text-neo-cyan' },
+  { value: '20', label: 'Max Players', color: 'text-neo-pink' },
+  { value: '8', label: 'Game Modes', color: 'text-neo-yellow' },
 ];
 
 const features = [
@@ -239,8 +237,9 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
 
             <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs uppercase tracking-widest text-neo-gray-200">
               <span className="inline-flex items-center gap-2"><span className="text-neo-lime">●</span> live now</span>
-              <span>50K+ games played</span>
-              <span className="text-neo-yellow">4.7★ rated</span>
+              <span>browser-based</span>
+              <span className="text-neo-yellow">5 languages</span>
+              <span>2-20 players</span>
             </div>
           </div>
 
@@ -259,6 +258,26 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
               <span className="absolute -bottom-3 -right-3 inline-block rotate-[8deg] border-3 border-neo-black bg-neo-pink px-3 py-1 font-neo-display text-sm font-black uppercase text-neo-white shadow-hard">2026</span>
             </div>
           </div>
+        </section>
+
+        {/* WORDS WITH FRIENDS CROSS-LINK BANNER */}
+        <section className="mt-12">
+          <Link
+            href={`/${locale}/words-with-friends-alternative`}
+            className="group relative flex items-center justify-between gap-4 overflow-hidden rounded-neo border-4 border-neo-black bg-neo-pink p-5 shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:p-6"
+          >
+            <div className="absolute inset-0 texture-halftone-comic opacity-20" aria-hidden="true" />
+            <div className="relative">
+              <span className="inline-block rotate-[-3deg] rounded border-2 border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy shadow-hard-sm">★ Looking for Words With Friends? ★</span>
+              <h3 className="mt-3 font-neo-display text-xl font-black uppercase leading-tight text-neo-white sm:text-2xl">
+                The free <span className="bg-neo-navy px-2 text-neo-lime">Words With Friends</span> alternative — but real-time.
+              </h3>
+              <p className="mt-2 max-w-xl text-sm text-neo-white/90">2-20 friends play the same grid simultaneously. Match takes 2-3 min, not 3 days. No download.</p>
+            </div>
+            <span className="relative shrink-0 rounded-neo border-3 border-neo-black bg-neo-navy px-4 py-2 font-neo-display text-sm font-black uppercase tracking-widest text-neo-lime shadow-hard transition-all group-hover:translate-x-1">
+              Compare →
+            </span>
+          </Link>
         </section>
 
         {/* MODE TRIO */}

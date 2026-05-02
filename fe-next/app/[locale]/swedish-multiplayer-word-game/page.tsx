@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import NativePageEnhancements from "@/components/landing/NativePageEnhancements";
 
-export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -211,6 +211,7 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
             varje dag med exklusiva belöningar.
           </p>
         </section>
+        <NativePageEnhancements locale={locale} />
       </div>
     </main>
   );
