@@ -7,8 +7,12 @@ import type { WordVaultStore } from '@/lib/word-vault/state/gameStore';
 import { WordConstraintRiddle } from './riddles/WordConstraintRiddle';
 import { CipherRiddle } from './riddles/CipherRiddle';
 import { LogicSequenceRiddle } from './riddles/LogicSequenceRiddle';
-import { CinderBossFight } from './scenes/CinderBossFight';
+import { CipherPantryScene } from './scenes/CipherPantryScene';
+import { ColdStoveScene } from './scenes/ColdStoveScene';
 import { DarkDoorScene } from './scenes/DarkDoorScene';
+import { LastRecipeScene } from './scenes/LastRecipeScene';
+import { OldKitchenScene } from './scenes/OldKitchenScene';
+import { SootedWallScene } from './scenes/SootedWallScene';
 
 interface RoomShellProps {
   store: WordVaultStore;
@@ -72,35 +76,76 @@ export function RoomShell({ store, roomId, onExit }: RoomShellProps) {
     );
   }
 
-  // Room 1.6: full-screen boss fight scene replaces the riddle panel
+  // Room 1.2: Cipher Pantry — frozen jars with scrambled labels
+  if (room.id === 'room-1-2') {
+    return (
+      <div className="relative flex min-h-[100dvh] flex-col text-white">
+        <CipherPantryScene
+          onSolved={() => {
+            handleSolve();
+            onExit();
+          }}
+          onExit={onExit}
+        />
+      </div>
+    );
+  }
+
+  // Room 1.3: Sooted Wall — wipe-to-reveal multi-layer cipher
+  if (room.id === 'room-1-3') {
+    return (
+      <div className="relative flex min-h-[100dvh] flex-col text-white">
+        <SootedWallScene
+          onSolved={() => {
+            handleSolve();
+            onExit();
+          }}
+          onExit={onExit}
+        />
+      </div>
+    );
+  }
+
+  // Room 1.5: Cael's Old Kitchen — observation memory room
+  if (room.id === 'room-1-5') {
+    return (
+      <div className="relative flex min-h-[100dvh] flex-col text-white">
+        <OldKitchenScene
+          onSolved={() => {
+            handleSolve();
+            onExit();
+          }}
+          onExit={onExit}
+        />
+      </div>
+    );
+  }
+
+  // Room 1.4: Cold Stove — sequential ignition puzzle
+  if (room.id === 'room-1-4') {
+    return (
+      <div className="relative flex min-h-[100dvh] flex-col text-white">
+        <ColdStoveScene
+          onSolved={() => {
+            handleSolve();
+            onExit();
+          }}
+          onExit={onExit}
+        />
+      </div>
+    );
+  }
+
+  // Room 1.6: Last Recipe — confrontation/cook climax
   if (room.id === 'room-1-6') {
     return (
       <div className="relative flex min-h-[100dvh] flex-col text-white">
-        <header className="relative z-20 flex items-center justify-between border-b-4 border-white/10 bg-[#0b1220]/90 px-4 py-3">
-          <button
-            type="button"
-            onClick={onExit}
-            className="rounded border-2 border-white/40 px-3 py-1 text-sm text-white"
-          >
-            ← חזרה
-          </button>
-          <h1 className="font-fredoka text-xl font-bold text-orange-300">{room.title.he}</h1>
-          <span className="w-16" />
-        </header>
-        <CinderBossFight
-          onVictoryMercy={() => {
+        <LastRecipeScene
+          onSolved={() => {
             handleSolve();
             onExit();
           }}
-          onVictoryDamage={() => {
-            // damage win = bad ending, but still mark solved for prototype
-            handleSolve();
-            onExit();
-          }}
-          onDefeat={() => {
-            // restart fight on defeat (prototype: just exit)
-            onExit();
-          }}
+          onExit={onExit}
         />
       </div>
     );

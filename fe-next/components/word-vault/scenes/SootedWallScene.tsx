@@ -1,0 +1,606 @@
+'use client';
+
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { normalizeHebrewFinalForms } from '@/lib/word-vault/engine/wordConstraintEngine';
+
+interface Props {
+  onSolved: () => void;
+  onExit: () => void;
+}
+
+interface Carving {
+  id: string;
+  /** Full word, with one position marked by '_' placeholder */
+  partial: string;
+  /** Correct missing letter */
+  answer: string;
+  /** Hint subtitle that appears once enough soot is wiped */
+  hintHe: string;
+  /** Final answer for the recipe (display once filled) */
+  fullWord: string;
+  /** Position on the wall (0..1 each) */
+  x: number;
+  y: number;
+}
+
+const CARVINGS: Carving[] = [
+  { id: 'water',  partial: 'מי_',  answer: 'ם', fullWord: 'מים',  hintHe: 'שותה הכל. גם זמן.', x: 0.22, y: 0.30 },
+  { id: 'flour',  partial: 'ק_ח',  answer: 'מ', fullWord: 'קמח',  hintHe: 'אבק שלא מת.',          x: 0.62, y: 0.28 },
+  { id: 'bread',  partial: '_חם',  answer: 'ל', fullWord: 'לחם',  hintHe: 'מה שלוקח זמן.',        x: 0.22, y: 0.62 },
+  { id: 'honey',  partial: 'דב_',  answer: 'ש', fullWord: 'דבש',  hintHe: 'הזיכרון של דבורים.',   x: 0.62, y: 0.60 },
+];
+
+const LETTER_POOL = ['ם', 'מ', 'ל', 'ש', 'ת', 'ר', 'ב', 'ה'];
+
+const REVEAL_THRESHOLD = 0.55; // soot must be wiped >55% to reveal hint
+const SECRET_PHRASE_HE = 'אין מתכון בלי האות שחסרה. לחם הוא קודם לכל מים.';
+
+export function SootedWallScene({ onSolved, onExit }: Props) {
+  const [revealed, setRevealed] = useState<Record<string, number>>(() =>
+    Object.fromEntries(CARVINGS.map((c) => [c.id, 0])),
+  );
+  const [filled, setFilled] = useState<Record<string, string | null>>(() =>
+    Object.fromEntries(CARVINGS.map((c) => [c.id, null])),
+  );
+  const [activeCarving, setActiveCarving] = useState<string | null>(null);
+  const [showBrief, setShowBrief] = useState(true);
+  const [showGestureDemo, setShowGestureDemo] = useState(true);
+  const [done, setDone] = useState(false);
+  const [shake, setShake] = useState<string | null>(null);
+  const [whisper, setWhisper] = useState<string | null>(null);
+  const wipingRef = useRef<{ id: string | null; lastX: number; lastY: number } | null>(null);
+
+  const allCorrect = useMemo(
+    () => CARVINGS.every((c) => filled[c.id] === c.answer),
+    [filled],
+  );
+
+  // Trigger solve when all correct
+  if (allCorrect && !done) {
+    setTimeout(() => setDone(true), 600);
+  }
+
+  const carvingsRevealed = CARVINGS.filter((c) => revealed[c.id] >= REVEAL_THRESHOLD).length;
+
+  const handleWipe = useCallback(
+    (id: string, deltaPx: number) => {
+      if (filled[id] || done) return;
+      // First touch dismisses the gesture demo
+      if (showGestureDemo) setShowGestureDemo(false);
+      setRevealed((prev) => {
+        const next = Math.min(1, (prev[id] ?? 0) + deltaPx * 0.0035);
+        return { ...prev, [id]: next };
+      });
+    },
+    [filled, done, showGestureDemo],
+  );
+
+  const handlePanelPointerDown = useCallback(
+    (id: string, e: React.PointerEvent<HTMLDivElement>) => {
+      if (filled[id] || done) return;
+      e.preventDefault();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      wipingRef.current = { id, lastX: e.clientX, lastY: e.clientY };
+    },
+    [filled, done],
+  );
+
+  const handlePanelPointerMove = useCallback(
+    (id: string, e: React.PointerEvent<HTMLDivElement>) => {
+      const w = wipingRef.current;
+      if (!w || w.id !== id) return;
+      const dx = e.clientX - w.lastX;
+      const dy = e.clientY - w.lastY;
+      const dist = Math.hypot(dx, dy);
+      handleWipe(id, dist);
+      w.lastX = e.clientX;
+      w.lastY = e.clientY;
+    },
+    [handleWipe],
+  );
+
+  const handlePanelPointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+    wipingRef.current = null;
+  }, []);
+
+  const handleSelectLetter = useCallback(
+    (letter: string) => {
+      if (!activeCarving || done) return;
+      const c = CARVINGS.find((x) => x.id === activeCarving);
+      if (!c) return;
+      if (revealed[c.id] < REVEAL_THRESHOLD) {
+        setWhisper('עוד לא מספיק נקי. נגב עוד.');
+        setTimeout(() => setWhisper(null), 1800);
+        return;
+      }
+      const norm = normalizeHebrewFinalForms(letter);
+      const ansNorm = normalizeHebrewFinalForms(c.answer);
+      if (norm === ansNorm) {
+        setFilled((prev) => ({ ...prev, [c.id]: c.answer }));
+        setActiveCarving(null);
+      } else {
+        setShake(c.id);
+        setTimeout(() => setShake(null), 350);
+      }
+    },
+    [activeCarving, done, revealed],
+  );
+
+  return (
+    <div
+      className="relative min-h-[100dvh] w-full overflow-hidden"
+      style={{
+        background:
+          "radial-gradient(ellipse at 50% 50%, rgba(60,30,18,0.55) 0%, rgba(15,8,4,0.95) 75%), #0a0604",
+      }}
+    >
+      {/* Dim charred-wall BG image */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage: "url('/word-vault/bg/hearth-halls.jpg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 70%',
+          filter: 'brightness(0.28) saturate(0.6) contrast(1.1)',
+          mixBlendMode: 'multiply',
+        }}
+      />
+
+      {/* Stone-wall texture overlay */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-50"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'%3E%3Cfilter id='s'%3E%3CfeTurbulence baseFrequency='0.03' numOctaves='4'/%3E%3CfeColorMatrix values='0 0 0 0 0.18  0 0 0 0 0.13  0 0 0 0 0.08  0 0 0 0.95 0'/%3E%3C/filter%3E%3Crect width='600' height='600' filter='url(%23s)'/%3E%3C/svg%3E\")",
+          backgroundSize: 'cover',
+        }}
+      />
+
+      {/* Edge vignette */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(0,0,0,0.85) 95%)',
+        }}
+      />
+
+      {/* Header */}
+      <div className="relative z-10 px-6 pt-5 text-center" dir="rtl">
+        <p className="font-fredoka text-[11px] uppercase tracking-[0.4em]" style={{ color: 'rgba(220,200,180,0.4)' }}>
+          הקיר המפויח
+        </p>
+        <h2
+          className="mt-1 font-fredoka text-2xl font-black"
+          style={{ color: 'rgba(255,225,180,0.92)', textShadow: '2px 2px 0 #000' }}
+        >
+          {done ? 'הקיר נסדק.' : 'נגב את הפיח. השלם את האות.'}
+        </h2>
+        <p className="mt-1 font-rubik text-xs" style={{ color: 'rgba(220,200,180,0.5)' }}>
+          חשוף {carvingsRevealed} / 4 · השלם {Object.values(filled).filter(Boolean).length} / 4
+        </p>
+      </div>
+
+      {/* Wall carvings */}
+      <div className="relative z-10 mt-6 mx-auto flex w-full max-w-3xl items-center justify-center" style={{ height: '60vh' }}>
+        {CARVINGS.map((c, idx) => (
+          <CarvingPanel
+            key={c.id}
+            carving={c}
+            revealAmount={revealed[c.id] ?? 0}
+            filledLetter={filled[c.id]}
+            isActive={activeCarving === c.id}
+            isShaking={shake === c.id}
+            showGestureDemo={showGestureDemo && idx === 0 && !showBrief}
+            onPointerDown={(e) => handlePanelPointerDown(c.id, e)}
+            onPointerMove={(e) => handlePanelPointerMove(c.id, e)}
+            onPointerUp={handlePanelPointerUp}
+            onTap={() => {
+              if (!filled[c.id] && revealed[c.id] >= REVEAL_THRESHOLD) {
+                setActiveCarving(c.id);
+              } else if (filled[c.id]) {
+                // already filled — show whisper of hint
+                setWhisper(`"${c.hintHe}"`);
+                setTimeout(() => setWhisper(null), 2500);
+              } else {
+                setWhisper('עוד לא מספיק נקי. נגב עוד.');
+                setTimeout(() => setWhisper(null), 1800);
+              }
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Letter pool */}
+      {!done && (
+        <div className="relative z-10 mx-auto mt-2 flex max-w-md flex-col items-center px-4 pb-6" dir="rtl">
+          <p className="mb-2 font-fredoka text-xs text-amber-200/60">
+            {activeCarving
+              ? 'בחר את האות החסרה:'
+              : 'גרור על קיר לנגב, אז גע בחיריץ לבחור אות.'}
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {LETTER_POOL.map((ltr) => (
+              <button
+                key={ltr}
+                type="button"
+                onClick={() => handleSelectLetter(ltr)}
+                disabled={!activeCarving}
+                className="grid h-12 w-12 place-items-center rounded-md border-2 font-fredoka text-2xl font-black transition-all disabled:opacity-30"
+                style={{
+                  background: activeCarving
+                    ? 'linear-gradient(180deg, #d4ba8a 0%, #8a6c44 100%)'
+                    : 'linear-gradient(180deg, #4a3a2a 0%, #2a1f14 100%)',
+                  borderColor: activeCarving ? '#5a3a18' : 'rgba(120,100,82,0.35)',
+                  color: activeCarving ? '#1a0e08' : 'rgba(180,160,140,0.5)',
+                  boxShadow: activeCarving
+                    ? '0 3px 0 rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,235,180,0.3)'
+                    : 'inset 0 1px 0 rgba(255,235,180,0.05)',
+                }}
+              >
+                {ltr}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Whisper */}
+      {whisper && (
+        <div className="pointer-events-none absolute inset-x-0 top-[15%] z-20 flex justify-center px-6" dir="rtl">
+          <p
+            className="rounded-md border-2 border-amber-300/40 bg-[#1a0e08]/90 px-4 py-2 font-rubik text-base"
+            style={{
+              color: 'rgba(255,225,180,0.95)',
+              textShadow: '0 0 12px rgba(255,140,60,0.4)',
+              animation: 'wv-toast 2.5s ease-out forwards',
+            }}
+          >
+            {whisper}
+          </p>
+        </div>
+      )}
+
+      {/* Pause */}
+      <button
+        type="button"
+        onClick={onExit}
+        aria-label="חזרה"
+        className="absolute left-3 top-3 z-30 rounded border border-white/10 px-2 py-1 text-xs text-white/30 hover:text-white/60"
+      >
+        ←
+      </button>
+
+      {/* Brief overlay */}
+      {showBrief && !done && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/85 px-6">
+          <div
+            className="w-full max-w-md rounded-md border-4 border-amber-300 p-6 text-center shadow-[6px_6px_0_0_#000]"
+            style={{ background: 'linear-gradient(180deg, #2a1f14 0%, #1a1208 100%)' }}
+            dir="rtl"
+          >
+            <p className="font-fredoka text-xs uppercase tracking-[0.4em] text-amber-200/60">הקיר המפויח</p>
+            <h2 className="mt-2 font-fredoka text-3xl font-black text-amber-200" style={{ textShadow: '2px 2px 0 #000' }}>
+              קאל חרת. הפיח כיסה.
+            </h2>
+            <p className="mt-4 font-rubik text-base leading-relaxed text-white/85">
+              ארבע מילים נשרטו בקיר — מצרכי לחם.
+              בכל אחת אות אחת חסרה מתחת לפיח.
+            </p>
+            <p className="mt-3 font-rubik text-sm text-white/65">
+              <strong>גרור</strong> על אזור בקיר כדי לנגב פיח (מספיק כדי לקרוא).
+              <strong> גע</strong> במילה החשופה. <strong>בחר</strong> את האות הנכונה מהאוסף למטה.
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowBrief(false)}
+              className="mt-6 rounded-md border-4 border-amber-300 bg-amber-200 px-6 py-2 font-fredoka text-lg font-black text-[#1a0e08] shadow-[3px_3px_0_0_#000]"
+            >
+              להתחיל
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Solve overlay */}
+      {done && (
+        <div
+          className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-4 px-6 text-center"
+          style={{
+            background:
+              'radial-gradient(ellipse at center, rgba(255,180,80,0.45) 0%, rgba(11,8,4,0.95) 70%)',
+            animation: 'wv-bloom 1.4s ease-out forwards',
+          }}
+        >
+          <p className="font-rubik text-sm tracking-wide text-white/70" dir="rtl">המתכון שלם.</p>
+          <div className="flex flex-wrap justify-center gap-2" dir="rtl">
+            {CARVINGS.map((c) => (
+              <span
+                key={c.id}
+                className="rounded-md border-4 border-amber-300 bg-amber-200 px-4 py-2 font-fredoka text-2xl font-black text-[#1a0e08] shadow-[3px_3px_0_0_#000]"
+              >
+                {c.fullWord}
+              </span>
+            ))}
+          </div>
+          <p
+            className="mt-4 max-w-md font-fredoka text-lg font-bold leading-relaxed"
+            style={{ color: 'rgba(255,225,180,0.95)', textShadow: '2px 2px 0 #000, 0 0 18px rgba(255,140,60,0.6)' }}
+            dir="rtl"
+          >
+            “{SECRET_PHRASE_HE}”
+          </p>
+          <button
+            type="button"
+            onClick={onSolved}
+            className="mt-6 rounded-md border-4 border-amber-300 bg-amber-200 px-8 py-3 font-fredoka text-xl font-black text-[#1a0e08] shadow-[4px_4px_0_0_#000] transition active:translate-y-[2px] active:shadow-[2px_2px_0_0_#000]"
+          >
+            המשך &nbsp;→
+          </button>
+        </div>
+      )}
+
+      <style jsx global>{`
+        @keyframes wv-toast {
+          0% { opacity: 0; transform: translateY(8px); }
+          15%, 80% { opacity: 1; transform: translateY(0); }
+          100% { opacity: 0; transform: translateY(-12px); }
+        }
+        @keyframes wv-bloom {
+          0% { opacity: 0; transform: scale(0.92); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes wv-shakeX {
+          0%,100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
+        }
+        @keyframes wv-emberPulse {
+          0%,100% { box-shadow: 0 0 18px rgba(255,140,60,0.5); }
+          50% { box-shadow: 0 0 28px rgba(255,180,80,0.85); }
+        }
+        @keyframes wv-finger {
+          0%   { left: 24px;  opacity: 0; transform: translate(-50%, -50%) scale(0.85); }
+          15%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+          80%  { left: 196px; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+          100% { left: 196px; opacity: 0; transform: translate(-50%, -50%) scale(0.85); }
+        }
+        @keyframes wv-trail {
+          0%   { opacity: 0; transform: translateY(-50%) scaleX(0); transform-origin: left center; }
+          25%  { opacity: 0.85; }
+          80%  { opacity: 0.85; transform: translateY(-50%) scaleX(1); transform-origin: left center; }
+          100% { opacity: 0; }
+        }
+        @keyframes wv-wipeArc {
+          0%   { opacity: 0; left: 24px; }
+          25%  { opacity: 0.9; }
+          80%  { opacity: 0.9; left: 196px; }
+          100% { opacity: 0; left: 196px; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function FingerCursor() {
+  return (
+    <svg width="36" height="44" viewBox="0 0 36 44" style={{ filter: 'drop-shadow(2px 3px 4px rgba(0,0,0,0.7))' }}>
+      {/* finger silhouette */}
+      <defs>
+        <linearGradient id="fingerGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#f0d4a8"/>
+          <stop offset="100%" stopColor="#a08060"/>
+        </linearGradient>
+      </defs>
+      {/* hand back */}
+      <path d="M14 26 Q12 30 14 36 L26 40 Q28 36 28 32 L26 26 Z" fill="url(#fingerGrad)" stroke="#3a2818" strokeWidth="1.4" strokeLinejoin="round"/>
+      {/* index finger */}
+      <path d="M16 4 Q14 6 14 12 L14 28 Q16 30 22 30 L22 12 Q22 4 19 4 Q17 4 16 4 Z" fill="url(#fingerGrad)" stroke="#3a2818" strokeWidth="1.4" strokeLinejoin="round"/>
+      {/* fingernail highlight */}
+      <ellipse cx="18" cy="8" rx="2.2" ry="2.8" fill="#fff5d8" opacity="0.7"/>
+      {/* knuckle */}
+      <line x1="14" y1="20" x2="22" y2="20" stroke="#3a2818" strokeWidth="0.8" opacity="0.6"/>
+      {/* glow halo around fingertip */}
+      <circle cx="18" cy="6" r="6" fill="none" stroke="rgba(255,210,140,0.6)" strokeWidth="1.5" opacity="0.5"/>
+    </svg>
+  );
+}
+
+function CarvingPanel({
+  carving,
+  revealAmount,
+  filledLetter,
+  isActive,
+  isShaking,
+  showGestureDemo,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
+  onTap,
+}: {
+  carving: Carving;
+  revealAmount: number;
+  filledLetter: string | null;
+  isActive: boolean;
+  isShaking: boolean;
+  showGestureDemo: boolean;
+  onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => void;
+  onPointerMove: (e: React.PointerEvent<HTMLDivElement>) => void;
+  onPointerUp: (e: React.PointerEvent<HTMLDivElement>) => void;
+  onTap: () => void;
+}) {
+  const sootOpacity = Math.max(0, 0.95 - revealAmount * 1.05);
+  const carvingVisible = revealAmount > 0.25;
+  const hintVisible = revealAmount >= REVEAL_THRESHOLD;
+  const isLocked = !!filledLetter;
+
+  // Compose displayed word with placeholder/letter
+  const displayText = isLocked ? carving.fullWord : carving.partial;
+
+  return (
+    <div
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onClick={onTap}
+      style={{
+        position: 'absolute',
+        left: `${carving.x * 100}%`,
+        top: `${carving.y * 100}%`,
+        transform: 'translate(-50%, -50%)',
+        width: 220,
+        height: 130,
+        touchAction: 'none',
+        animation: isShaking
+          ? 'wv-shakeX 0.35s'
+          : isLocked
+          ? 'wv-emberPulse 2.4s ease-in-out infinite'
+          : undefined,
+      }}
+      className="select-none"
+    >
+      {/* Stone slab */}
+      <div
+        className="relative h-full w-full overflow-hidden rounded-lg"
+        style={{
+          background:
+            'linear-gradient(180deg, rgba(80,55,38,0.55) 0%, rgba(40,28,18,0.85) 100%)',
+          border: isLocked
+            ? '3px solid rgba(255,180,80,0.85)'
+            : isActive
+            ? '3px solid rgba(255,200,120,0.65)'
+            : '2px solid rgba(120,90,60,0.55)',
+          boxShadow: 'inset 0 0 24px rgba(0,0,0,0.7)',
+        }}
+      >
+        {/* stone grain */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-50 mix-blend-overlay"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='130'%3E%3Cfilter id='r'%3E%3CfeTurbulence baseFrequency='0.05' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.7 0'/%3E%3C/filter%3E%3Crect width='200' height='130' filter='url(%23r)'/%3E%3C/svg%3E\")",
+          }}
+        />
+
+        {/* Carved word — only visible after wiping */}
+        <div
+          className="absolute inset-0 flex flex-col items-center justify-center"
+          style={{
+            opacity: carvingVisible ? Math.min(1, revealAmount * 1.6) : 0,
+            transition: 'opacity 220ms',
+          }}
+          dir="rtl"
+        >
+          <span
+            className="font-fredoka text-5xl font-black"
+            style={{
+              color: isLocked ? '#ffe4a8' : '#b8a080',
+              textShadow: isLocked
+                ? '0 0 20px rgba(255,180,80,0.95), 1px 1px 0 #000, -1px -1px 0 #000'
+                : 'inset 0 1px 0 #000, 1px 1px 0 #000, -1px -1px 0 #000',
+              letterSpacing: 6,
+            }}
+          >
+            {displayText}
+          </span>
+          {hintVisible && !isLocked && (
+            <span
+              className="mt-1 font-rubik text-xs italic"
+              style={{ color: 'rgba(255,225,180,0.65)' }}
+            >
+              {`"${carving.hintHe}"`}
+            </span>
+          )}
+        </div>
+
+        {/* Soot overlay — fades as wiped */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(circle at 30% 40%, rgba(15,10,6,0.95) 0%, rgba(8,5,3,1) 80%), linear-gradient(135deg, rgba(8,5,3,1) 0%, rgba(20,12,6,0.95) 100%)',
+            opacity: sootOpacity,
+            transition: 'opacity 200ms',
+          }}
+        />
+
+        {/* Animated gesture demo — finger swipe across the slab */}
+        {showGestureDemo && revealAmount < 0.05 && (
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            {/* trail behind finger */}
+            <span
+              className="absolute"
+              style={{
+                top: '50%',
+                left: 24,
+                width: 110,
+                height: 18,
+                transform: 'translateY(-50%)',
+                background:
+                  'linear-gradient(90deg, transparent 0%, rgba(255,210,140,0.35) 30%, rgba(255,180,80,0.55) 70%, transparent 100%)',
+                borderRadius: 12,
+                filter: 'blur(3px)',
+                opacity: 0,
+                animation: 'wv-trail 1.8s ease-in-out infinite',
+              }}
+            />
+            {/* fading wipe arc that "cleans" the soot */}
+            <span
+              className="absolute"
+              style={{
+                top: '50%',
+                left: 24,
+                width: 110,
+                height: 36,
+                transform: 'translateY(-50%)',
+                borderRadius: 18,
+                background:
+                  'radial-gradient(ellipse at 30% 50%, rgba(255,225,180,0.3) 0%, transparent 70%)',
+                opacity: 0,
+                animation: 'wv-wipeArc 1.8s ease-in-out infinite',
+              }}
+            />
+            {/* the finger / hand cursor */}
+            <span
+              className="absolute"
+              style={{
+                top: '50%',
+                left: 24,
+                transform: 'translate(-50%, -50%)',
+                opacity: 0,
+                animation: 'wv-finger 1.8s ease-in-out infinite',
+              }}
+            >
+              <FingerCursor />
+            </span>
+            {/* tiny prompt */}
+            <span
+              className="absolute bottom-1 right-2 font-rubik text-[10px] tracking-wider"
+              style={{ color: 'rgba(255,210,140,0.55)' }}
+              dir="rtl"
+            >
+              ← גרור לנגב
+            </span>
+          </div>
+        )}
+
+        {/* Static fallback "swipe me" hint */}
+        {!showGestureDemo && revealAmount < 0.05 && (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <span className="font-rubik text-xs" style={{ color: 'rgba(255,200,120,0.4)' }}>
+              ↻ נגב
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
