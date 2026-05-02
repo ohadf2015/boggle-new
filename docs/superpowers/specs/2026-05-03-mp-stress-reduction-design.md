@@ -11,6 +11,21 @@
 
 5 mid-round interruption surfaces audited in MP. Most are already gated to lobby/results, but 2 leak mid-round and 1 borderline. Plus: zero protection for new MP players (no bot-pad, no hidden MMR, no loss shield). Proposed fix = 3 small policy changes + 2 new flags. Net: ~3-4 days work, no new content, ships value to existing players this week.
 
+## Implementation Status (2026-05-03 session)
+
+**SHIPPED end-to-end:**
+- ✅ Fix 1: defer mid-round join/leave (`b9be8d964`)
+- ✅ Fix 2: defer mid-round achievement unlocks incl. cinematic-tier (`c6b24f843`)
+- ✅ PostRoundSummary consumer + ResultsPage mount + 5 i18n locales (`8de5bad73`)
+- 31/31 tests across `useMidRoundEventQueue`, `usePlayerJoinLeaveNotifications`, `useAchievementSocketBridge`, `PostRoundSummary`
+
+**Dead code — no work needed:**
+- ⊘ Fix 3 (`RankUpCinematic` gate): component defined, zero non-test consumers — no production leak risk to gate.
+- ⊘ Fix 5 (hide MMR via `NearRankTeaser`): `nearRankData` prop only set in test fixtures — never wired in production. No leak to suppress.
+
+**Deferred:**
+- ⏸ Fix 4 (bot-pad first 3 MP matches): touches matchmaker (`backend/handlers/matchmakingHandler.ts` + `backend/services/matchmakingQueue.ts`). Can reuse existing `player_ratings.games_played` (no DB migration needed). Estimated ~half day. Separate session.
+
 ---
 
 ## Audit: Mid-Round Interruption Surfaces
