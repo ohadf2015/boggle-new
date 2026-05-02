@@ -10,13 +10,18 @@ import {
   type AbilityId,
   type AbilityState,
 } from '../abilities';
+import { isAbilityUpgrade, type UpgradeId } from '../upgrades';
 
 interface CombatStore extends CombatModel {
   locale: Locale;
   abilities: AbilityState[];
   /** When set, the player is choosing a target tile to trigger this ability. */
   pendingAbility: AbilityId | null;
-  startNewBattle: (locale?: Locale, abilities?: AbilityId[]) => void;
+  /** Stacked across the run; survives between fights. */
+  equippedUpgrades: UpgradeId[];
+  /** Word Shield: first word of fight blocks bot's next attack. */
+  wordShieldArmed: boolean;
+  startNewBattle: (locale?: Locale, equippedUpgrades?: UpgradeId[]) => void;
   dispatch: (event: FsmEvent) => void;
   refillUsedTiles: (usedIds: TileId[]) => void;
   applyHeroDamage: (dmg: number) => void;
@@ -41,6 +46,14 @@ interface CombatStore extends CombatModel {
   consumePendingAbility: () => void;
   /** Decrement cooldown counters for all abilities (called per player-turn end). */
   tickAbilityCooldowns: () => void;
+  /** Add an upgrade to the run's equipped set. */
+  addUpgrade: (id: UpgradeId) => void;
+  /** Apply hero heal capped at heroMaxHp. */
+  applyHeroHeal: (amount: number) => void;
+  /** Reset shield to armed (call at fight start). */
+  armWordShield: () => void;
+  /** Try to consume the shield. Returns true if blocked. */
+  consumeWordShield: () => boolean;
 }
 
 const HERO_MAX_HP = 30;
@@ -59,16 +72,23 @@ export const useCombatStore = create<CombatStore>((set) => ({
   locale: 'en' as Locale,
   abilities: [],
   pendingAbility: null,
+  equippedUpgrades: [],
+  wordShieldArmed: false,
 
-  startNewBattle: (locale: Locale = 'en', equipped: AbilityId[] = ['block']) => {
-    const abilityStates: AbilityState[] = equipped.map((id) => ({
-      id,
-      cooldownRemaining: 0,
-      maxCooldown: ABILITY_DEFS[id].maxCooldown,
-    }));
+  startNewBattle: (locale: Locale = 'en', equippedUpgrades: UpgradeId[] = ['block']) => {
+    // Map equipped abilities → state with fresh cooldowns
+    const abilityStates: AbilityState[] = equippedUpgrades
+      .filter(isAbilityUpgrade)
+      .map((id) => ({
+        id,
+        cooldownRemaining: 0,
+        maxCooldown: ABILITY_DEFS[id].maxCooldown,
+      }));
+
     const tiles = drawTiles(16, locale);
-    // Sprinkle 2 random gold tiles at battle start
-    const goldCount = 2;
+    // Base 2 gold tiles + Golden Start adds 2 more
+    const hasGoldenStart = equippedUpgrades.includes('golden_start');
+    const goldCount = Math.min(tiles.length, hasGoldenStart ? 4 : 2);
     const indices = new Set<number>();
     while (indices.size < goldCount) {
       indices.add(Math.floor(Math.random() * tiles.length));
@@ -76,6 +96,7 @@ export const useCombatStore = create<CombatStore>((set) => ({
     indices.forEach((i) => {
       tiles[i] = { ...tiles[i], isGold: true };
     });
+
     set({
       heroHp: HERO_MAX_HP,
       heroMaxHp: HERO_MAX_HP,
@@ -87,6 +108,8 @@ export const useCombatStore = create<CombatStore>((set) => ({
       locale,
       abilities: abilityStates,
       pendingAbility: null,
+      equippedUpgrades,
+      wordShieldArmed: equippedUpgrades.includes('word_shield'),
     });
   },
 
@@ -148,6 +171,45 @@ export const useCombatStore = create<CombatStore>((set) => ({
 
   tickAbilityCooldowns: () => {
     set((s) => ({ abilities: tickAbilityCooldowns(s.abilities) }));
+  },
+
+  addUpgrade: (id) => {
+    set((s) => {
+      if (s.equippedUpgrades.includes(id)) return s;
+      const nextUpgrades = [...s.equippedUpgrades, id];
+      // If a new ability was added, append its state
+      let nextAbilities = s.abilities;
+      if (isAbilityUpgrade(id) && !s.abilities.some((a) => a.id === id)) {
+        nextAbilities = [
+          ...s.abilities,
+          { id, cooldownRemaining: 0, maxCooldown: ABILITY_DEFS[id].maxCooldown },
+        ];
+      }
+      return {
+        equippedUpgrades: nextUpgrades,
+        abilities: nextAbilities,
+      };
+    });
+  },
+
+  applyHeroHeal: (amount) => {
+    set((s) => ({ heroHp: Math.min(s.heroMaxHp, s.heroHp + amount) }));
+  },
+
+  armWordShield: () => {
+    set({ wordShieldArmed: true });
+  },
+
+  consumeWordShield: () => {
+    let consumed = false;
+    set((s) => {
+      if (s.wordShieldArmed) {
+        consumed = true;
+        return { wordShieldArmed: false };
+      }
+      return s;
+    });
+    return consumed;
   },
 
   applyEnemyDamage: (dmg) => {

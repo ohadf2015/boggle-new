@@ -3,8 +3,10 @@
 import { useState, useCallback, useEffect } from 'react';
 import { BattleSceneRoot } from '@/components/adventure/v2/BattleSceneRoot';
 import { BetweenFightsScreen, RunCompleteScreen, type FightOutcome } from '@/components/adventure/v2/RunScreens';
+import { UpgradePicker } from '@/components/adventure/v2/UpgradePicker';
 import { useCombatStore } from '@/lib/adventure/v2/state/runStore';
 import { loadHeDict, isHeDictLoaded } from '@/lib/adventure/v2/engine/__protoDictHe';
+import { pickRandomUpgradeChoices, type UpgradeId } from '@/lib/adventure/v2/upgrades';
 import type { Locale } from '@/lib/adventure/v2/types';
 
 interface PageClientProps {
@@ -13,22 +15,28 @@ interface PageClientProps {
 
 const FIGHT_COUNT = 3;
 
-type RunStatus = 'fighting' | 'between' | 'run-victory' | 'run-defeat';
+type RunStatus = 'pre-fight' | 'fighting' | 'between' | 'run-victory' | 'run-defeat';
 
 interface RunState {
-  fightIndex: number; // 0..FIGHT_COUNT-1, the current fight
+  fightIndex: number;
   outcomes: FightOutcome[];
   status: RunStatus;
+  equipped: UpgradeId[];
+  pickerChoices: UpgradeId[];
 }
 
-const initialRun: RunState = {
-  fightIndex: 0,
-  outcomes: [],
-  status: 'fighting',
-};
+function makeInitialRun(): RunState {
+  return {
+    fightIndex: 0,
+    outcomes: [],
+    status: 'pre-fight',
+    equipped: [],
+    pickerChoices: pickRandomUpgradeChoices([], 3),
+  };
+}
 
 export function PageClient({ locale }: PageClientProps) {
-  const [run, setRun] = useState<RunState>(initialRun);
+  const [run, setRun] = useState<RunState>(makeInitialRun);
   const [resetKey, setResetKey] = useState(0);
   const [dictReady, setDictReady] = useState(locale !== 'he' || isHeDictLoaded());
   const [dictError, setDictError] = useState<string | null>(null);
@@ -51,10 +59,17 @@ export function PageClient({ locale }: PageClientProps) {
   const onVictory = useCallback(() => {
     setRun((s) => {
       const isLast = s.fightIndex >= FIGHT_COUNT - 1;
+      if (isLast) {
+        return {
+          ...s,
+          outcomes: [...s.outcomes, 'win'],
+          status: 'run-victory',
+        };
+      }
       return {
         ...s,
         outcomes: [...s.outcomes, 'win'],
-        status: isLast ? 'run-victory' : 'between',
+        status: 'between',
       };
     });
   }, []);
@@ -67,23 +82,48 @@ export function PageClient({ locale }: PageClientProps) {
     }));
   }, []);
 
-  const continueToNextFight = useCallback(() => {
+  const startFight = useCallback(
+    (equipped: UpgradeId[]) => {
+      setResetKey((k) => k + 1);
+      useCombatStore.getState().startNewBattle(locale, equipped);
+      useCombatStore.getState().dispatch({ type: 'START_TURN' });
+    },
+    [locale],
+  );
+
+  const continueFromBetween = useCallback(() => {
+    // Transition from victory-summary to upgrade picker
     setRun((s) => ({
-      fightIndex: s.fightIndex + 1,
-      outcomes: s.outcomes,
-      status: 'fighting',
+      ...s,
+      status: 'pre-fight',
+      pickerChoices: pickRandomUpgradeChoices(s.equipped, 3),
     }));
-    setResetKey((k) => k + 1);
-    useCombatStore.getState().startNewBattle(locale);
-    useCombatStore.getState().dispatch({ type: 'START_TURN' });
-  }, [locale]);
+  }, []);
+
+  const onUpgradePicked = useCallback(
+    (id: UpgradeId) => {
+      setRun((s) => {
+        const nextEquipped = [...s.equipped, id];
+        const nextFightIndex = s.outcomes.length; // 0 before fight 1, 1 between fight 1 & 2, etc.
+        // Start the next fight immediately
+        setTimeout(() => startFight(nextEquipped), 0);
+        return {
+          ...s,
+          equipped: nextEquipped,
+          fightIndex: nextFightIndex,
+          status: 'fighting',
+          pickerChoices: [],
+        };
+      });
+    },
+    [startFight],
+  );
 
   const startNewRun = useCallback(() => {
-    setRun(initialRun);
-    setResetKey((k) => k + 1);
-    useCombatStore.getState().startNewBattle(locale);
-    useCombatStore.getState().dispatch({ type: 'START_TURN' });
-  }, [locale]);
+    const init = makeInitialRun();
+    setRun(init);
+    // Don't start the fight yet; wait for upgrade pick
+  }, []);
 
   const isHe = locale === 'he';
 
@@ -152,13 +192,23 @@ export function PageClient({ locale }: PageClientProps) {
         />
       )}
 
+      {run.status === 'pre-fight' && dictReady && (
+        <UpgradePicker
+          choices={run.pickerChoices}
+          isHe={isHe}
+          fightIndex={run.fightIndex}
+          fightCount={FIGHT_COUNT}
+          onPick={onUpgradePicked}
+          equippedSoFar={run.equipped}
+        />
+      )}
       {run.status === 'between' && (
         <BetweenFightsScreen
           fightIndex={run.fightIndex}
           fightCount={FIGHT_COUNT}
           outcomes={run.outcomes}
           isHe={isHe}
-          onContinue={continueToNextFight}
+          onContinue={continueFromBetween}
         />
       )}
       {run.status === 'run-victory' && (

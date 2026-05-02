@@ -6,12 +6,32 @@ import { gsap } from 'gsap';
 import { useCombatStore } from '@/lib/adventure/v2/state/runStore';
 import { BattleScene } from './scenes/BattleScene';
 import { calculateDamage } from '@/lib/adventure/v2/engine/damageCalculator';
+import { calculatePlayerDamage } from '@/lib/adventure/v2/engine/applyDamageBonuses';
 import { isValidWord, isComposableFromTiles } from '@/lib/adventure/v2/engine/wordValidator';
 import { playSfx } from '@/lib/adventure/v2/audio/soundBus';
 import { attachKeyboardBridge, findTileByLetter } from './input/RuneSlateInput';
 import { BotLoop } from './BotLoop';
 import type { Locale, TileId, Tile } from '@/lib/adventure/v2/types';
 import type { AbilityId } from '@/lib/adventure/v2/abilities';
+
+const VOWELS_EN = new Set(['A', 'E', 'I', 'O', 'U']);
+const VOWELS_HE = new Set(['א', 'ה', 'ו', 'י']);
+
+function previewBonus(
+  tiles: Tile[],
+  word: string,
+  store: ReturnType<typeof useCombatStore.getState>,
+): number {
+  let bonus = 0;
+  const upgrades = new Set(store.equippedUpgrades);
+  if (upgrades.has('vowel_surge')) {
+    const set = store.locale === 'he' ? VOWELS_HE : VOWELS_EN;
+    const count = tiles.filter((t) => set.has(t.letter.toUpperCase())).length;
+    if (count >= 3) bonus += 0.5;
+  }
+  if (upgrades.has('long_word_rage') && word.length >= 6) bonus += 0.5;
+  return bonus;
+}
 
 interface Props {
   onVictory: () => void;
@@ -116,7 +136,10 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
       const word = s.fsmState.word;
       const valid =
         word.length >= 3 && isValidWord(word, s.locale) && isComposableFromTiles(word, tiles);
-      const dmg = valid ? calculateDamage(tiles, { critRoll: 1, runeBonusSum: 0, heroAtk: 1 }) : 0;
+      // Preview damage WITHOUT critical roll (deterministic preview); critical resolves on submit
+      const dmg = valid
+        ? calculateDamage(tiles, { critRoll: 1, runeBonusSum: previewBonus(tiles, word, s), heroAtk: 1 })
+        : 0;
       scene.castingGlyph.showWord(word, dmg, word.length < 3 ? true : valid);
     }
 
@@ -138,15 +161,33 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
     const tile = s.tiles[tileId];
     if (!tile) return;
 
-    // BLOCK ability mode: tap a bot-targeted tile to deny without consuming
+    // BLOCK ability: tap bot-targeted tile to deny w/o consuming
     if (s.pendingAbility === 'block') {
       if (tile.targetedBy === 'bot') {
         botLoopRef.current?.invalidate();
         s.consumePendingAbility();
-        playSfx('word_invalid'); // re-using existing sfx as a deny "thwack"
+        playSfx('word_invalid');
         return;
       }
-      // Tapping a non-targeted tile while pending block → cancel pending mode
+      s.setPendingAbility(null);
+      return;
+    }
+
+    // STEAL ability: tap bot-CLAIMED tile to free it + add to compose
+    if (s.pendingAbility === 'steal') {
+      if (tile.claimedBy === 'bot') {
+        // Free the tile
+        useCombatStore.setState({
+          tiles: s.tiles.map((t) =>
+            t.id === tileId ? { ...t, claimedBy: null, claimTurnsRemaining: 0 } : t,
+          ),
+        });
+        s.consumePendingAbility();
+        // Add to compose
+        s.dispatch({ type: 'TILE_TAP', tileId, letter: tile.letter });
+        playSfx('tile_tap');
+        return;
+      }
       s.setPendingAbility(null);
       return;
     }
@@ -212,9 +253,19 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
     }
 
     playSfx('word_submit');
-    const dmg = calculateDamage(tiles, { critRoll: 1, runeBonusSum: 0, heroAtk: 1 });
+    const { damage: dmg } = calculatePlayerDamage({
+      tiles,
+      word,
+      upgrades: s.equippedUpgrades,
+      locale: s.locale,
+    });
     s.dispatch({ type: 'SUBMIT' });
     s.dispatch({ type: 'RESOLVE', damage: dmg });
+
+    // HEAL ON WORD passive
+    if (s.equippedUpgrades.includes('heal_on_word')) {
+      s.applyHeroHeal(1);
+    }
 
     const usedIds = tiles.map((t) => t.id);
     const impact = sceneRef.current!.actorLayer.getEnemyImpactPoint();
@@ -263,12 +314,22 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
     scene.botBanner.show(word, dmg, 700, () => {});
 
     const store = useCombatStore.getState();
+
+    // WORD SHIELD passive — first incoming damage post-cast is blocked
+    const blocked = store.consumeWordShield();
+    if (blocked) {
+      // Show banner-side feedback via subtitle: skip damage entirely
+      sceneRef.current?.actorLayer.flashHeroHurt();
+      playSfx('word_invalid');
+      screenShake(4, 3);
+      return;
+    }
+
     store.applyHeroDamage(dmg);
     sceneRef.current?.actorLayer.flashHeroHurt();
     playSfx('hit_hero');
     screenShake(10, 6);
 
-    // Defeat check
     const after = useCombatStore.getState();
     if (after.heroHp <= 0) {
       store.setDefeat();
