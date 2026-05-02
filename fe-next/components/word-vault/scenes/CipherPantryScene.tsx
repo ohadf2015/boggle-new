@@ -25,7 +25,7 @@ interface Jar {
 const JARS: Jar[] = [
   { id: 'sugar', scrambled: ['ר','ק','ו','ס'], answer: 'סוכר', hintHe: 'מתוק. נמס בכוס.', x: 0.20, y: 0.32 },
   { id: 'flour', scrambled: ['ק','ח','מ'],     answer: 'קמח',  hintHe: 'אבק לבן לאפייה.',   x: 0.46, y: 0.32 },
-  { id: 'bread', scrambled: ['ל','ח','ם'],     answer: 'לחם',  hintHe: 'יוצא מהתנור.',       x: 0.72, y: 0.32 },
+  { id: 'bread', scrambled: ['ח','ם','ל'],     answer: 'לחם',  hintHe: 'יוצא מהתנור.',       x: 0.72, y: 0.32 },
   { id: 'honey', scrambled: ['ש','ב','ד'],     answer: 'דבש',  hintHe: 'עבודת דבורים.',      x: 0.46, y: 0.66 },
 ];
 
