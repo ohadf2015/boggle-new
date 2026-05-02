@@ -275,6 +275,14 @@ export default function BrainTrainingPageClient() {
             </button>
           </motion.div>
 
+          {/* Audit H2 — anonymous /brain showed only the sign-in card and 95%
+              empty viewport on desktop. Surface the drill grid below the CTA
+              so guests see what's available. QuickDrillsSection is auth-aware
+              (gamesPlayed=0 for guests → 3 unlocked + 2 locked previews). */}
+          <div className="mt-6">
+            <QuickDrillsSection />
+          </div>
+
           {/* Auth Modal */}
           <AuthModal
             isOpen={showAuthModal}

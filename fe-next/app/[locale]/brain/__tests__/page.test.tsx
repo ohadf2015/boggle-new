@@ -222,5 +222,49 @@ describe('BrainTrainingPage - Loading States', () => {
 
       expect(screen.getByText('common.signIn')).toBeInTheDocument();
     });
+
+    it('shows the drill grid for anonymous users (audit H2 — conversion fix)', async () => {
+      // Audit 2026-05-02 finding H2: anonymous /brain showed only "Sign In to
+      // Track Your Gains" — no drill list, no value-prop, no preview. This
+      // test pins the fix: drill section must render alongside the sign-in
+      // CTA so guests can see what they'd unlock.
+      mockUseAuth.mockReturnValue({
+        user: null,
+        profile: null,
+        rankedProgress: null,
+        loading: false,
+        isSupabaseEnabled: true,
+        isAuthenticated: false,
+        isGuest: true,
+        isAdmin: false,
+      isTeacher: false,
+        canPlayRanked: false,
+        gamesUntilRanked: 10,
+        needsProfileCustomization: false,
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
+      });
+
+      mockUseBrainScore.mockReturnValue({
+        brainScore: null,
+        recentGameScores: [],
+        drillProgress: [],
+        brainScoreHistory: [],
+        isLoading: false,
+        error: null,
+        refresh: vi.fn(),
+        initializeBrainScore: vi.fn(),
+      });
+
+      render(<BrainTrainingPage />, { wrapper: AllTheProviders });
+
+      // QuickDrillsSection's heading uses the t('brain.quickDrills') key.
+      await waitFor(() => {
+        expect(screen.getByText('brain.quickDrills')).toBeInTheDocument();
+      });
+      // Sign-in CTA still present — drill grid is a supplement, not a replacement.
+      expect(screen.getByText('common.signIn')).toBeInTheDocument();
+    });
   });
 });
