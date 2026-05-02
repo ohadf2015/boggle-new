@@ -25,7 +25,7 @@ interface UsePlayerJoinLeaveNotificationsProps {
 // Reusing one id makes react-hot-toast replace any visible toast with the
 // next one — only one is on-screen at a time, behaving like a 1-deep queue.
 const ROOM_TOAST_ID = 'mp-room-presence';
-const ROOM_TOAST_DURATION = 2200;
+const ROOM_TOAST_DURATION = 1500;
 
 /**
  * Shows toast notifications when players join or leave the multiplayer lobby.
