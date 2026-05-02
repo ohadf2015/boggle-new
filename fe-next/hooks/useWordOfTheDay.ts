@@ -9,6 +9,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 /** Curated word lists per language — must match backend wordOfTheDayManager.ts pools */
 const WORD_POOLS: Record<string, string[]> = {
@@ -100,6 +101,7 @@ export interface WotdData {
 
 export function useWordOfTheDay(language: string): WotdData {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [stats, setStats] = useState({ foundCount: 0, totalPlayers: 0, foundPercent: 0 });
   const [playerFound, setPlayerFound] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -150,11 +152,11 @@ export function useWordOfTheDay(language: string): WotdData {
         }
       }
     } catch {
-      setError('Failed to load Word of the Day');
+      setError(t('errors.failedToLoadWordOfTheDay'));
     } finally {
       setLoading(false);
     }
-  }, [today, language, user?.id]);
+  }, [today, language, user?.id, t]);
 
   useEffect(() => {
     fetchData();

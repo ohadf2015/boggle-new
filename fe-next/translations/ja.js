@@ -944,6 +944,7 @@ const ja = {
     "goHome": "ホームへ",
     "failedToLoadLeaderboard": "ランキングの読み込みに失敗",
     "failedToLoadProfile": "プロフィールの読み込みに失敗",
+    "failedToLoadWordOfTheDay": "今日の単語の読み込みに失敗",
     "unableToLoadData": "データが読み込めなかった。もう一回試してみて！",
     "tryAgainButton": "もう一度",
     "connectionTimeout": "接続に時間かかりすぎ",
@@ -2344,6 +2345,12 @@ const ja = {
       "nice": "プレイするたびに上達します",
       "warmup": "練習あるのみ — その調子！"
     }
+  },
+  "practiceContinue": {
+    "title": "いいね — {score}点!",
+    "body": "練習を続けますか、終了しますか?",
+    "continue": "続ける",
+    "skip": "結果を見る"
   },
   "almostFound": {
     "title": "もう少しで見つかった...",

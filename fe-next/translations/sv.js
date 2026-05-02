@@ -951,6 +951,7 @@ const sv = {
     "goHome": "Hem",
     "failedToLoadLeaderboard": "Kunde inte ladda topplistan",
     "failedToLoadProfile": "Kunde inte ladda profilen",
+    "failedToLoadWordOfTheDay": "Kunde inte ladda Dagens ord",
     "unableToLoadData": "Kunde inte ladda data. Försök igen.",
     "tryAgainButton": "Försök igen",
     "connectionTimeout": "Tar för lång tid att ansluta",
@@ -2356,6 +2357,12 @@ const sv = {
       "nice": "Varje spel gör dig vassare",
       "warmup": "Övning ger färdighet — du är på väg!"
     }
+  },
+  "practiceContinue": {
+    "title": "Snyggt — {score} poäng!",
+    "body": "Vill du fortsätta öva eller avsluta?",
+    "continue": "Kör vidare",
+    "skip": "Visa resultat"
   },
   "almostFound": {
     "title": "Du hittade nästan...",

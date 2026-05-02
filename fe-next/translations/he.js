@@ -944,6 +944,7 @@ const he = {
     "goHome": "הביתה",
     "failedToLoadLeaderboard": "לא הצלחנו לטעון את הטבלה",
     "failedToLoadProfile": "לא הצלחנו לטעון את הפרופיל",
+    "failedToLoadWordOfTheDay": "לא הצלחנו לטעון את מילת היום",
     "unableToLoadData": "לא ניתן לטעון נתונים. נסה שוב.",
     "tryAgainButton": "נסה שוב",
     "connectionTimeout": "לוקח יותר מדי זמן להתחבר",
@@ -2362,6 +2363,12 @@ const he = {
       "nice": "כל משחק עושה את שלו",
       "warmup": "מתחממים — בדרך הנכונה"
     }
+  },
+  "practiceContinue": {
+    "title": "כל הכבוד — {score} נקודות!",
+    "body": "להמשיך להתאמן או לסיים?",
+    "continue": "ממשיכים",
+    "skip": "לראות תוצאות"
   },
   "almostFound": {
     "title": "כמעט מצאת...",

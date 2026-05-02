@@ -935,6 +935,7 @@ const en = {
     "goHome": "Go Home",
     "failedToLoadLeaderboard": "Leaderboard took a detour — refresh?",
     "failedToLoadProfile": "Profile went AWOL — try again?",
+    "failedToLoadWordOfTheDay": "Word of the Day went AWOL — try again?",
     "unableToLoadData": "Couldn't grab that — try again!",
     "tryAgainButton": "Try again",
     "connectionTimeout": "Connection's dragging — hang tight!",
@@ -2459,6 +2460,12 @@ const en = {
       "nice": "Every game makes you sharper",
       "warmup": "Practice makes perfect — you're getting there!"
     }
+  },
+  "practiceContinue": {
+    "title": "Nice — {score} points!",
+    "body": "Want to keep practicing or wrap it up?",
+    "continue": "Keep going",
+    "skip": "See results"
   },
   "almostFound": {
     "title": "You Almost Found...",

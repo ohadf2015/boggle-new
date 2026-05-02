@@ -993,6 +993,7 @@ const es = {
     "goHome": "Ir al inicio",
     "failedToLoadLeaderboard": "Error al cargar la tabla de posiciones",
     "failedToLoadProfile": "Error al cargar el perfil",
+    "failedToLoadWordOfTheDay": "Error al cargar la Palabra del día",
     "unableToLoadData": "No se pudieron cargar los datos. Intenta de nuevo.",
     "tryAgainButton": "Intentar de nuevo",
     "connectionTimeout": "Tarda mucho en conectar",
@@ -2308,6 +2309,12 @@ const es = {
       "nice": "Cada juego te hace mejor",
       "warmup": "¡La práctica hace al maestro — vas por buen camino!"
     }
+  },
+  "practiceContinue": {
+    "title": "¡Genial — {score} puntos!",
+    "body": "¿Sigues practicando o terminamos?",
+    "continue": "Seguir",
+    "skip": "Ver resultados"
   },
   "almostFound": {
     "title": "Casi encontraste...",

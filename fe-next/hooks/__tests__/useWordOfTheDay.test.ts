@@ -23,6 +23,16 @@ vi.mock('@/lib/supabase', () => ({
   supabase: { from: (...args: unknown[]) => mockFrom(...args) },
 }));
 
+// Mock LanguageContext — t() returns key (identity) so error assertions
+// can verify the canonical i18n key, not a literal string.
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string) => key,
+    language: 'en',
+    dir: 'ltr',
+  }),
+}));
+
 import { useWordOfTheDay } from '../useWordOfTheDay';
 
 function createChain(data: Record<string, unknown> | null, error: unknown = null) {
@@ -140,6 +150,8 @@ describe('useWordOfTheDay', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(result.current.error).toBe('Failed to load Word of the Day');
+    // Hook now translates via t() — canonical i18n key, no raw English.
+    // Per audit 2026-05-02 + memory feedback-hardcoded-leaderboard-error.
+    expect(result.current.error).toBe('errors.failedToLoadWordOfTheDay');
   });
 });
