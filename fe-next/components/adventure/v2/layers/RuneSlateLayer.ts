@@ -89,13 +89,20 @@ export class RuneSlateLayer extends Container {
     c.eventMode = 'static';
     c.cursor = 'pointer';
     c.on('pointerdown', () => {
-      if (sprite.used || sprite.claimed) return;
-      // Tapping a TARGETED tile is allowed — it steals from bot
+      if (sprite.claimed) return;
       this.onTileTap(id, sprite.letterText.text);
+    });
+    c.on('pointerover', () => {
+      // Drag-extension: only valid when pointer is held down (caller checks)
+      if (sprite.claimed) return;
+      this.onTileEnter?.(id, sprite.letterText.text);
     });
 
     return sprite;
   }
+
+  /** Optional handler for drag-extension (pointer over while held). */
+  public onTileEnter?: (tileId: TileId, letter: string) => void;
 
   setTiles(tiles: Tile[]) {
     tiles.forEach((t, idx) => {

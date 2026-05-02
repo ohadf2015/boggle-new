@@ -2,6 +2,9 @@ import type { Locale, Tile, TileId } from '../types';
 import { PROTO_DICT_EN } from './__protoDict';
 import { PROTO_DICT_HE } from './__protoDictHe';
 import { isComposableFromTiles } from './wordValidator';
+import { findAdjacencyPathForWord } from './adjacency';
+
+const SLATE_COLS = 4;
 
 const MIN_BOT_WORD_LEN = 4;
 const MAX_BOT_WORD_LEN = 6;
@@ -41,7 +44,8 @@ export function pickBotWord(tiles: Tile[], locale: Locale = 'en'): BotPick | nul
     const candidates = byLen.get(len) ?? [];
     for (const word of candidates) {
       if (!isComposableFromTiles(word, free)) continue;
-      const tileIds = pickTileIdsForWord(word, free);
+      // Bot must respect adjacency on the slate (parity with player)
+      const tileIds = findAdjacencyPathForWord(word, tiles, SLATE_COLS);
       if (!tileIds) continue;
       const letterValueSum = tileIds.reduce((acc, id) => {
         const t = tiles.find((tt) => tt.id === id);

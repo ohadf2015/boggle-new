@@ -11,8 +11,11 @@ import { isValidWord, isComposableFromTiles } from '@/lib/adventure/v2/engine/wo
 import { playSfx } from '@/lib/adventure/v2/audio/soundBus';
 import { attachKeyboardBridge, findTileByLetter } from './input/RuneSlateInput';
 import { BotLoop } from './BotLoop';
+import { areAdjacent } from '@/lib/adventure/v2/engine/adjacency';
 import type { Locale, TileId, Tile } from '@/lib/adventure/v2/types';
 import type { AbilityId } from '@/lib/adventure/v2/abilities';
+
+const SLATE_COLS = 4;
 
 const VOWELS_EN = new Set(['A', 'E', 'I', 'O', 'U']);
 const VOWELS_HE = new Set(['א', 'ה', 'ו', 'י']);
@@ -44,6 +47,7 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
   const appRef = useRef<Application | null>(null);
   const sceneRef = useRef<BattleScene | null>(null);
   const botLoopRef = useRef<BotLoop | null>(null);
+  const isDraggingRef = useRef(false);
 
   useEffect(() => {
     let mounted = true;
@@ -70,14 +74,31 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
       appRef.current = app;
 
       const scene = new BattleScene(
-        (tileId, letter) => handleTileTap(tileId, letter),
+        (tileId, letter) => handleDragStart(tileId, letter),
         () => handleSubmit(),
         () => handleUndo(),
         (abilityId) => handleAbilityPressed(abilityId),
       );
       scene.abilityBar.setLocale(locale);
+      // Drag extension: pointer-over a tile while drag is active
+      scene.runeSlate.onTileEnter = (tileId, letter) => handleDragEnter(tileId, letter);
       app.stage.addChild(scene);
       sceneRef.current = scene;
+
+      // Global pointerup → finalize drag (submit if path valid)
+      const onWindowUp = () => {
+        if (isDraggingRef.current) {
+          isDraggingRef.current = false;
+          handleSubmit();
+        }
+      };
+      window.addEventListener('pointerup', onWindowUp);
+      window.addEventListener('pointercancel', onWindowUp);
+      // Stash for cleanup
+      (app as Application & { _cleanup?: () => void })._cleanup = () => {
+        window.removeEventListener('pointerup', onWindowUp);
+        window.removeEventListener('pointercancel', onWindowUp);
+      };
 
       useCombatStore.getState().startNewBattle(locale);
       useCombatStore.getState().dispatch({ type: 'START_TURN' });
@@ -99,7 +120,15 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
         const s = useCombatStore.getState();
         if (s.fsmState.type !== 'player_compose') return;
         const tileId = findTileByLetter(s.tiles, s.fsmState.tilesUsed, letter);
-        if (tileId !== null) handleTileTap(tileId, letter);
+        if (tileId === null) return;
+        // Keyboard input must respect adjacency (parity with drag)
+        const path = s.fsmState.tilesUsed;
+        if (path.length > 0) {
+          const last = path[path.length - 1];
+          if (!areAdjacent(last, tileId, SLATE_COLS)) return;
+        }
+        s.dispatch({ type: 'TILE_TAP', tileId, letter });
+        playSfx('tile_tap');
       },
       onBackspace: () => handleUndo(),
       onEnter: () => handleSubmit(),
@@ -111,6 +140,8 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
       bridge.destroy();
       botLoopRef.current?.stop();
       botLoopRef.current = null;
+      const cleanup = (appRef.current as (Application & { _cleanup?: () => void }) | null)?._cleanup;
+      cleanup?.();
       sceneRef.current?.destroy({ children: true });
       appRef.current?.destroy(true, { children: true, texture: true });
       sceneRef.current = null;
@@ -155,7 +186,7 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
     }
   }
 
-  function handleTileTap(tileId: TileId, letter: string) {
+  function handleDragStart(tileId: TileId, letter: string) {
     const s = useCombatStore.getState();
     if (s.fsmState.type !== 'player_compose') return;
     const tile = s.tiles[tileId];
@@ -176,17 +207,14 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
     // STEAL ability: tap bot-CLAIMED tile to free it + add to compose
     if (s.pendingAbility === 'steal') {
       if (tile.claimedBy === 'bot') {
-        // Free the tile
         useCombatStore.setState({
           tiles: s.tiles.map((t) =>
             t.id === tileId ? { ...t, claimedBy: null, claimTurnsRemaining: 0 } : t,
           ),
         });
         s.consumePendingAbility();
-        // Add to compose
         s.dispatch({ type: 'TILE_TAP', tileId, letter: tile.letter });
         playSfx('tile_tap');
-        return;
       }
       s.setPendingAbility(null);
       return;
@@ -194,11 +222,51 @@ export function BattleSceneRoot({ onVictory, onDefeat, locale = 'en' }: Props) {
 
     if (tile.claimedBy) return;
 
-    // If bot was eyeing this tile, the player just stole it → invalidate bot's plan
+    // Start a fresh drag: clear any prior compose, then add this tile
+    if (s.fsmState.tilesUsed.length > 0) {
+      // Reset prior path by undoing each tile in reverse
+      for (let i = s.fsmState.tilesUsed.length - 1; i >= 0; i--) {
+        s.dispatch({ type: 'TILE_UNDO', tileId: s.fsmState.tilesUsed[i] });
+      }
+    }
+
     if (tile.targetedBy === 'bot') {
       botLoopRef.current?.invalidate();
     }
 
+    isDraggingRef.current = true;
+    s.dispatch({ type: 'TILE_TAP', tileId, letter });
+    playSfx('tile_tap');
+  }
+
+  function handleDragEnter(tileId: TileId, letter: string) {
+    if (!isDraggingRef.current) return;
+    const s = useCombatStore.getState();
+    if (s.fsmState.type !== 'player_compose') return;
+    const tile = s.tiles[tileId];
+    if (!tile || tile.claimedBy) return;
+
+    const path = s.fsmState.tilesUsed;
+    if (path.length === 0) return;
+
+    // Drag-back-undo: hovering over the second-to-last tile = pop the last
+    if (path.length >= 2 && path[path.length - 2] === tileId) {
+      const last = path[path.length - 1];
+      s.dispatch({ type: 'TILE_UNDO', tileId: last });
+      playSfx('tile_undo');
+      return;
+    }
+
+    // Already in path → ignore
+    if (path.includes(tileId)) return;
+
+    // Adjacency check against last tile
+    const last = path[path.length - 1];
+    if (!areAdjacent(last, tileId, SLATE_COLS)) return;
+
+    if (tile.targetedBy === 'bot') {
+      botLoopRef.current?.invalidate();
+    }
     s.dispatch({ type: 'TILE_TAP', tileId, letter });
     playSfx('tile_tap');
   }
