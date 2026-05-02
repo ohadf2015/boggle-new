@@ -19,6 +19,10 @@ import {
 import type { SinglePlayerGameState, SinglePlayerResultsData } from './SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
 import { ScorePopupFly } from '@/components/animations/ScorePopupFly';
+import PracticeContinuePrompt from './PracticeContinuePrompt';
+import { fireVictoryConfetti } from '@/utils/confettiUtils';
+
+const PRACTICE_CONTINUE_THRESHOLD = 100;
 
 interface SinglePlayerGameProps {
   settings: SinglePlayerGameState;
@@ -124,6 +128,42 @@ function SinglePlayerGame({
     }
     prevScoreRef.current = core.score;
   }, [core.score, core.foundWords]);
+
+  // Practice-mode all-words celebration — fires once when player clears the board.
+  // Declared first so the score-threshold prompt can suppress itself when this fires.
+  const allClearedRef = useRef(false);
+  useEffect(() => {
+    if (settings.mode !== 'practice') return;
+    if (allClearedRef.current) return;
+    const total = core.totalBoardWords ?? 0;
+    if (total > 0 && core.foundWords.length >= total) {
+      allClearedRef.current = true;
+      fireVictoryConfetti();
+      // End the run after confetti fires so player lands on the results page.
+      setTimeout(() => core.handleFinishPractice(), 1200);
+    }
+  }, [core.foundWords.length, core.totalBoardWords, settings.mode, core]);
+
+  // Practice-mode continue prompt — fires once when score crosses threshold.
+  // Continue closes modal; Skip ends the game and routes to results.
+  // Suppressed if the all-cleared celebration already fired (which ends the run).
+  const [continuePromptOpen, setContinuePromptOpen] = React.useState(false);
+  const continuePromptShownRef = useRef(false);
+  useEffect(() => {
+    if (settings.mode !== 'practice') return;
+    if (continuePromptShownRef.current) return;
+    if (core.isGameOver) return;
+    if (allClearedRef.current) return;
+    if (core.score >= PRACTICE_CONTINUE_THRESHOLD) {
+      continuePromptShownRef.current = true;
+      setContinuePromptOpen(true);
+    }
+  }, [core.score, core.isGameOver, settings.mode]);
+  const handlePromptContinue = useCallback(() => setContinuePromptOpen(false), []);
+  const handlePromptSkip = useCallback(() => {
+    setContinuePromptOpen(false);
+    core.handleFinishPractice();
+  }, [core]);
 
   // Dead-time growth signal: fire once per round after N seconds of no letter selection
   const sessionKey = core.grid
@@ -283,12 +323,22 @@ function SinglePlayerGame({
     />
   );
 
+  const practicePromptElement = settings.mode === 'practice' ? (
+    <PracticeContinuePrompt
+      open={continuePromptOpen}
+      score={core.score}
+      onContinue={handlePromptContinue}
+      onSkip={handlePromptSkip}
+    />
+  ) : null;
+
   // Landscape layout
   if (core.isLandscape) {
     return (
       <div className="relative h-full">
         {encouragementBanner}
         {scorePopupElement}
+        {practicePromptElement}
         <LandscapeGameLayout
           {...commonProps}
           progressBarExpanded={core.progressBarExpanded}
@@ -306,6 +356,7 @@ function SinglePlayerGame({
       <div className="relative h-full">
         {encouragementBanner}
         {scorePopupElement}
+        {practicePromptElement}
         <DesktopGameLayout
           {...commonProps}
           targetHighScore={core.targetHighScore}
@@ -322,7 +373,8 @@ function SinglePlayerGame({
   return (
     <div className="relative">
       {encouragementBanner}
-        {scorePopupElement}
+      {scorePopupElement}
+      {practicePromptElement}
       <PortraitGameLayout
         {...commonProps}
         targetHighScore={core.targetHighScore}

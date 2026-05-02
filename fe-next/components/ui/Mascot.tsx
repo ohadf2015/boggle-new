@@ -682,7 +682,7 @@ export const Mascot = memo(function Mascot({
 
   return (
     <motion.div
-      className={`relative ${SIZE_CLASSES[size]} ${className}`}
+      className={`relative shrink-0 ${SIZE_CLASSES[size]} ${className}`}
       variants={animationVariants}
       animate={shouldAnimate ? 'animate' : undefined}
     >
@@ -748,7 +748,7 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
 
   return (
     <motion.div
-      className={`relative ${SIZE_CLASSES[size]} ${className}`}
+      className={`relative shrink-0 ${SIZE_CLASSES[size]} ${className}`}
       initial={{ scale: 0, opacity: 0, y: 20 }}
       animate={{ scale: 1, opacity: 1, y: 0 }}
       transition={{

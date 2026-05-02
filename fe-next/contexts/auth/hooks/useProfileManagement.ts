@@ -32,6 +32,20 @@ import type { ProfileData, AuthStateSetters } from '../authTypes';
 const SUPPORTED_LANGUAGES = ['he', 'en', 'sv', 'ja', 'es'] as const;
 type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
+// Build a human-readable username slug from a display name plus a 6-char UUID
+// suffix. The suffix guarantees the profiles.username UNIQUE constraint without
+// a collision-check round-trip. Empty/non-ASCII names fall back to 'player'.
+// Example: "John Smith" + uuid -> "johnsmitha1b2c3"
+function buildUsernameSlug(displayName: string, userId: string): string {
+  const base = displayName
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[^a-z0-9]/g, '')
+    .slice(0, 16) || 'player';
+  const suffix = userId.replace(/-/g, '').slice(0, 6);
+  return `${base}${suffix}`;
+}
+
 // Read stored locale from cookie/localStorage at signup so profiles.language
 // is populated on row creation. Without this, fallback is 'en' for ~80% of
 // users → all push notifications go out in English. See LanguageContext.tsx.
@@ -152,9 +166,6 @@ async function createNewProfile(
   // Extract name from OAuth provider (Google, Discord, Apple)
   const oauthName = extractOAuthDisplayName(userMetadata);
 
-  // Username is a non-user-facing unique slug derived from UUID (guaranteed unique).
-  // display_name is the human-visible name from FTUE, OAuth, or a fun random name.
-  const username = `user_${userId.replace(/-/g, '').slice(0, 12)}`;
   let displayName: string;
 
   // Prefer FTUE avatar if present, else random character avatar.
@@ -169,6 +180,10 @@ async function createNewProfile(
     const randomData = await fetchRandomPlayerName();
     displayName = randomData.name;
   }
+
+  // Username slug: human-readable base from displayName + short UUID suffix for uniqueness.
+  // UUID suffix guarantees the UNIQUE constraint without a collision-check round-trip.
+  const username = buildUsernameSlug(displayName, userId);
 
   // Get legacy emoji/color from the character avatar (for backward compatibility with DB)
   const { emoji: avatarEmoji, color: avatarColor } = getAvatarEmojiAndColor(finalAvatarImage);
@@ -302,7 +317,7 @@ export function useProfileManagement({
 
       const profilePayload: Partial<ProfileData> = {
         id: user.id,
-        username: `user_${user.id.replace(/-/g, '').slice(0, 12)}`,
+        username: buildUsernameSlug(username, user.id),
         display_name: username,
         avatar_emoji: avatarEmoji || '',
         avatar_color: avatarColor || '#4ECDC4',
