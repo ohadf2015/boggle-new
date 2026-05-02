@@ -5,7 +5,7 @@
 
 import { translations } from '@/translations';
 
-type SupportedLanguage = 'en' | 'he' | 'sv' | 'ja';
+type SupportedLanguage = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 // Character avatar image IDs for random assignment when no keyword match
 const AVATAR_IMAGE_IDS: string[] = [
