@@ -4,6 +4,19 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { normalizeHebrewFinalForms } from '@/lib/word-vault/engine/wordConstraintEngine';
 import { getGameStore } from '@/lib/word-vault/state/gameStore';
 
+/**
+ * Room 1.3 — The Sooted Wall
+ *
+ * Verb taxonomy:
+ *   PRIMARY:   REVEAL  (drag-wipe soot to expose carved word fragments)
+ *   SECONDARY: COMPOSE (after wipe past per-carving threshold, fill the
+ *                       missing letter from the shared pool)
+ *
+ * Cross-room item perks: melo-lantern auto-reveals first carving;
+ * defrost-candle lowers wipe threshold globally (0.55→0.40); broom
+ * lowers it deeply on the honey-carving (0.55→0.25) + visual sparkle.
+ */
+
 interface Props {
   onSolved: () => void;
   onExit: () => void;

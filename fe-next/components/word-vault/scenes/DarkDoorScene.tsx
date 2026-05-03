@@ -3,6 +3,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { EmberOverlay } from '@/components/word-vault/pixi/EmberOverlay';
 
+/**
+ * Room 1.1 — The Cracked Door
+ *
+ * Verb taxonomy:
+ *   PRIMARY:   REVEAL  (find lantern hotspot in dark; light reveals door letters)
+ *   SECONDARY: COMPOSE (tap א then ש in order to spell אש)
+ *
+ * Establishes the game's grammar: scene-as-interface, no floating UI,
+ * the lantern is your primary tool — callback paid off in 1.3.
+ */
+
 interface Props {
   onSolved: () => void;
   onExit: () => void;

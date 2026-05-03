@@ -3,6 +3,19 @@
 import { useState } from 'react';
 import { EmberOverlay } from '@/components/word-vault/pixi/EmberOverlay';
 
+/**
+ * Room 1.5 — Uri's Old Kitchen
+ *
+ * Verb taxonomy:
+ *   PRIMARY:   REVEAL  (tap mementos to discover photo fragments)
+ *   SECONDARY: COMPOSE (assemble fragments into the family photo)
+ *
+ * Foreshadows the 1.6 spelling seal by surfacing the brother's name
+ * (אורי) on the back of the center photo fragment.
+ */
+
+type FragmentId = 'corner-tl' | 'corner-tr' | 'corner-bl' | 'corner-br' | 'center';
+
 interface Props {
   onSolved: () => void;
   onExit: () => void;
@@ -12,80 +25,93 @@ interface Memento {
   id: string;
   x: number;
   y: number;
-  glyph: 'apron' | 'ladle' | 'cookbook' | 'hat' | 'photo';
-  labelHe: string;
-  /** Memory line that plays when clicked */
+  glyph: string;
   memoryHe: string;
-  /** A single emphasized HE word/phrase that the player should notice */
-  highlightedHe: string;
+  fragmentId: FragmentId;
 }
 
 const MEMENTOS: Memento[] = [
   {
-    id: 'apron',
+    id: 'kettle',
     x: 0.18,
-    y: 0.42,
-    glyph: 'apron',
-    labelHe: 'הסינר',
-    memoryHe: 'הוא לבש אותו כל בוקר. הריח של בצק בוקע מהבד.',
-    highlightedHe: 'בצק',
+    y: 0.32,
+    glyph: '☕',
+    memoryHe: 'הקומקום שלו. תה בוקר. בכל בוקר.',
+    fragmentId: 'corner-tl',
   },
   {
-    id: 'ladle',
-    x: 0.40,
-    y: 0.58,
-    glyph: 'ladle',
-    labelHe: 'הכף',
-    memoryHe: 'הוא בחש בה לאט. אמר: "מים לא ממהרים. מי שממהר — לא טועם."',
-    highlightedHe: 'מים',
+    id: 'apron',
+    x: 0.78,
+    y: 0.3,
+    glyph: '🍳',
+    memoryHe: 'הסינר. תמיד עם כתם קמח אחד שלא ירד.',
+    fragmentId: 'corner-tr',
   },
   {
-    id: 'cookbook',
-    x: 0.62,
-    y: 0.45,
-    glyph: 'cookbook',
-    labelHe: 'הספר',
-    memoryHe: 'דפיו פתוחים על מתכון לחם. שורה ראשונה: "תחילה מים, אז קמח."',
-    highlightedHe: 'קמח',
+    id: 'spice',
+    x: 0.2,
+    y: 0.68,
+    glyph: '🌿',
+    memoryHe: 'מדף התבלינים. הוא ידע כל אחד בעיניים עצומות.',
+    fragmentId: 'corner-bl',
   },
   {
-    id: 'hat',
+    id: 'recipe',
     x: 0.82,
-    y: 0.30,
-    glyph: 'hat',
-    labelHe: 'הכובע',
-    memoryHe: 'הוא היה גדול עליו. הילדים צחקו. הוא חייך.',
-    highlightedHe: 'דבש',
+    y: 0.66,
+    glyph: '📜',
+    memoryHe: 'מתכון על דף קרוע. בכתב היד שלו.',
+    fragmentId: 'corner-br',
   },
   {
     id: 'photo',
-    x: 0.50,
-    y: 0.22,
-    glyph: 'photo',
-    labelHe: 'התצלום',
-    memoryHe: 'חמישה בני דודים. הוא במרכז. בידו: לחם.',
-    highlightedHe: 'לחם',
+    x: 0.5,
+    y: 0.5,
+    glyph: '🖼️',
+    memoryHe: 'התמונה המשפחתית. מאחור — חתימה.',
+    fragmentId: 'center',
   },
 ];
 
-const FINAL_LINE_HE =
-  'מים. קמח. דבש. הסדר היה תמיד שלו.';
-
 export function OldKitchenScene({ onSolved, onExit }: Props) {
-  const [examined, setExamined] = useState<Set<string>>(new Set());
-  const [activeMemento, setActiveMemento] = useState<Memento | null>(null);
-  const [rememberedWords, setRememberedWords] = useState<string[]>([]);
+  const [revealedFragments, setRevealedFragments] = useState<Set<FragmentId>>(new Set());
+  const [composedFragments, setComposedFragments] = useState<Set<FragmentId>>(new Set());
+  const [activeMemento, setActiveMemento] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [showSignature, setShowSignature] = useState(false);
 
-  const allExamined = examined.size === MEMENTOS.length;
-  const allRemembered = rememberedWords.length === MEMENTOS.length;
+  const allComposed = composedFragments.size === 5;
+
+  const handleMementoTap = (memento: Memento) => {
+    setActiveMemento(memento.id);
+    setRevealedFragments((prev) => new Set(prev).add(memento.fragmentId));
+  };
+
+  const handleFragmentTap = (fragmentId: FragmentId) => {
+    setComposedFragments((prev) => new Set(prev).add(fragmentId));
+    setRevealedFragments((prev) => {
+      const updated = new Set(prev);
+      updated.delete(fragmentId);
+      return updated;
+    });
+
+    // Trigger signature reveal if center fragment just composed
+    if (fragmentId === 'center' && !composedFragments.has('center')) {
+      setTimeout(() => setShowSignature(true), 400);
+    }
+  };
+
+  const handlePhotoComplete = () => {
+    setDone(true);
+    setTimeout(() => onSolved(), 800);
+  };
 
   return (
     <div
       className="relative min-h-[100dvh] w-full overflow-hidden"
       style={{
         background:
-          "radial-gradient(ellipse at 50% 40%, rgba(255,220,160,0.25) 0%, rgba(40,30,20,0.95) 80%), #1a1208",
+          'radial-gradient(ellipse at 50% 40%, rgba(255,220,160,0.25) 0%, rgba(40,30,20,0.95) 80%), #1a1208',
       }}
     >
       {/* BG image */}
@@ -99,7 +125,7 @@ export function OldKitchenScene({ onSolved, onExit }: Props) {
           filter: 'brightness(0.7) saturate(1.1) sepia(0.15)',
         }}
       />
-      {/* Soft golden vignette — bittersweet warmth */}
+      {/* Soft golden vignette */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
@@ -109,22 +135,25 @@ export function OldKitchenScene({ onSolved, onExit }: Props) {
         }}
       />
 
-      {/* Soft golden Pixi mote drift — different tint than other rooms */}
+      {/* Soft golden Pixi mote drift */}
       <EmberOverlay density={28} tint={0xfff5d8} intensity={0.5} />
 
       {/* Header */}
       <div className="relative z-10 px-6 pt-5 text-center" dir="rtl">
-        <p className="font-fredoka text-[11px] uppercase tracking-[0.4em]" style={{ color: 'rgba(255,225,180,0.45)' }}>
+        <p
+          className="font-fredoka text-[11px] uppercase tracking-[0.4em]"
+          style={{ color: 'rgba(255,225,180,0.45)' }}
+        >
           המטבח הישן של אורי
         </p>
         <h2
           className="mt-1 font-fredoka text-2xl font-black"
           style={{ color: 'rgba(255,235,200,0.95)', textShadow: '2px 2px 0 #000' }}
         >
-          {done ? 'אתה זוכר.' : allExamined ? 'הכל נראה. עכשיו תזכור.' : 'גע בכל מה שנותר ממנו'}
+          {done ? 'אתה זוכרת.' : allComposed ? 'התצלום שלם.' : 'אסוף את הדברים שנותרו'}
         </h2>
         <p className="mt-1 font-rubik text-xs" style={{ color: 'rgba(255,225,180,0.5)' }}>
-          {examined.size} / {MEMENTOS.length}
+          {composedFragments.size} / 5
         </p>
       </div>
 
@@ -134,19 +163,16 @@ export function OldKitchenScene({ onSolved, onExit }: Props) {
           <MementoSpot
             key={m.id}
             memento={m}
-            isExamined={examined.has(m.id)}
-            onClick={() => {
-              setActiveMemento(m);
-              setExamined((prev) => new Set(prev).add(m.id));
-            }}
+            isRevealed={revealedFragments.has(m.fragmentId)}
+            onClick={() => handleMementoTap(m)}
           />
         ))}
       </div>
 
-      {/* Memory whisper modal — player must TAP the highlighted word to "remember" it */}
+      {/* Memory whisper modal */}
       {activeMemento && (
         <div
-          className="absolute inset-x-0 bottom-24 z-30 flex justify-center px-6"
+          className="absolute inset-x-0 bottom-32 z-30 flex justify-center px-6"
           dir="rtl"
         >
           <div
@@ -157,52 +183,113 @@ export function OldKitchenScene({ onSolved, onExit }: Props) {
             }}
           >
             <p className="font-fredoka text-xs uppercase tracking-[0.3em] text-amber-200/60">
-              {activeMemento.labelHe}
+              זיכרון
             </p>
             <p className="mt-2 font-rubik text-base leading-relaxed text-white/90">
-              {renderTappableHighlighted(
-                activeMemento.memoryHe,
-                activeMemento.highlightedHe,
-                rememberedWords.includes(activeMemento.highlightedHe),
-                () => {
-                  setRememberedWords((prev) =>
-                    prev.includes(activeMemento.highlightedHe) ? prev : [...prev, activeMemento.highlightedHe],
-                  );
-                  setTimeout(() => setActiveMemento(null), 600);
-                },
-              )}
+              {MEMENTOS.find((m) => m.id === activeMemento)?.memoryHe}
             </p>
             <p className="mt-3 font-rubik text-[11px] italic text-amber-200/50">
-              גע במילה הזורחת כדי לזכור.
+              גע בשום מקום כדי לסגור.
             </p>
           </div>
         </div>
       )}
 
-      {/* Remembered words bank — visible reminder of what player gathered */}
-      {rememberedWords.length > 0 && !activeMemento && !done && (
-        <div className="absolute inset-x-0 bottom-28 z-20 flex justify-center px-4" dir="rtl">
-          <div className="flex flex-wrap items-center justify-center gap-2 rounded-md border-2 border-amber-300/40 bg-[#1a0e08]/85 px-3 py-2">
-            <span className="font-fredoka text-[11px] uppercase tracking-widest text-amber-200/60">זוכר:</span>
-            {rememberedWords.map((w) => (
-              <span
-                key={w}
-                className="rounded bg-amber-300/20 px-2 py-0.5 font-fredoka text-sm font-bold"
-                style={{ color: 'rgba(255,225,160,0.95)' }}
+      {/* Photo frame grid with composed fragments */}
+      {!done && (
+        <div
+          className="absolute inset-x-0 bottom-24 z-20 flex justify-center px-6"
+          dir="rtl"
+        >
+          <div className="max-w-sm space-y-3">
+            {/* Frame container */}
+            <div
+              className="mx-auto grid w-full grid-cols-3 gap-3 rounded-md border-3 border-amber-300/30 bg-[#0a0805]/70 p-4"
+              style={{
+                background: allComposed
+                  ? 'linear-gradient(135deg, rgba(255,235,180,0.15), rgba(255,200,100,0.1))'
+                  : 'rgba(10,8,5,0.7)',
+              }}
+            >
+              {/* Frame slots: TL TR BL BR Center */}
+              <FrameSlot
+                fragmentId="corner-tl"
+                isComposed={composedFragments.has('corner-tl')}
+              />
+              <FrameSlot
+                fragmentId="center"
+                isCenter
+                isComposed={composedFragments.has('center')}
+              />
+              <FrameSlot
+                fragmentId="corner-tr"
+                isComposed={composedFragments.has('corner-tr')}
+              />
+              <FrameSlot
+                fragmentId="corner-bl"
+                isComposed={composedFragments.has('corner-bl')}
+              />
+              <div />
+              <FrameSlot
+                fragmentId="corner-br"
+                isComposed={composedFragments.has('corner-br')}
+              />
+            </div>
+
+            {/* Revealed fragments drawer */}
+            {revealedFragments.size > 0 && (
+              <div className="flex flex-wrap justify-center gap-2 rounded-md border-2 border-amber-300/40 bg-[#1a0e08]/85 px-3 py-2">
+                <span className="font-fredoka text-[10px] uppercase tracking-widest text-amber-200/60 w-full text-center">
+                  גילויים
+                </span>
+                {Array.from(revealedFragments).map((fid) => (
+                  <button
+                    key={fid}
+                    type="button"
+                    onClick={() => handleFragmentTap(fid)}
+                    className="rounded bg-amber-300/25 px-2 py-1 font-fredoka text-xs font-bold text-amber-200 transition-colors hover:bg-amber-300/40 active:scale-95"
+                  >
+                    {getFragmentLabel(fid)}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Signature reveal after center composed */}
+            {showSignature && composedFragments.has('center') && (
+              <div
+                className="text-center"
+                style={{
+                  animation: 'wv-signatureIn 1.2s ease-out forwards',
+                }}
               >
-                {w}
-              </span>
-            ))}
+                <p
+                  className="font-rubik text-sm italic"
+                  style={{ color: 'rgba(255,235,200,0.8)' }}
+                >
+                  בכתב ידו.
+                </p>
+                <p
+                  className="font-fredoka text-lg font-bold"
+                  style={{
+                    color: 'rgba(255,225,160,0.95)',
+                    textShadow: '0 0 8px rgba(255,180,80,0.4)',
+                  }}
+                >
+                  אורי
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* Continue button after all examined AND remembered */}
-      {allExamined && allRemembered && !activeMemento && !done && (
+      {/* Continue button after all composed */}
+      {allComposed && !activeMemento && !done && (
         <div className="absolute inset-x-0 bottom-12 z-30 flex justify-center">
           <button
             type="button"
-            onClick={() => setDone(true)}
+            onClick={handlePhotoComplete}
             className="rounded-md border-4 border-amber-300 bg-amber-200 px-8 py-3 font-fredoka text-xl font-black text-[#1a0e08] shadow-[4px_4px_0_0_#000]"
             style={{ animation: 'wv-continueIn 0.7s ease-out' }}
           >
@@ -226,16 +313,20 @@ export function OldKitchenScene({ onSolved, onExit }: Props) {
         <div
           className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-4 px-6 text-center"
           style={{
-            background: 'radial-gradient(ellipse at center, rgba(255,235,180,0.45) 0%, rgba(20,12,8,0.95) 70%)',
+            background:
+              'radial-gradient(ellipse at center, rgba(255,235,180,0.45) 0%, rgba(20,12,8,0.95) 70%)',
             animation: 'wv-bloom 1.4s ease-out forwards',
           }}
         >
           <p
             className="max-w-md font-fredoka text-xl font-bold leading-relaxed"
-            style={{ color: 'rgba(255,235,200,0.98)', textShadow: '2px 2px 0 #000, 0 0 18px rgba(255,180,80,0.6)' }}
+            style={{
+              color: 'rgba(255,235,200,0.98)',
+              textShadow: '2px 2px 0 #000, 0 0 18px rgba(255,180,80,0.6)',
+            }}
             dir="rtl"
           >
-            {`"${FINAL_LINE_HE}"`}
+            התצלום המשפחתי. שלם.
           </p>
           <button
             type="button"
@@ -249,83 +340,66 @@ export function OldKitchenScene({ onSolved, onExit }: Props) {
 
       <style jsx global>{`
         @keyframes wv-bloom {
-          0% { opacity: 0; transform: scale(0.92); }
-          100% { opacity: 1; transform: scale(1); }
+          0% {
+            opacity: 0;
+            transform: scale(0.92);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
         }
         @keyframes wv-memoryIn {
-          0% { opacity: 0; transform: translateY(20px); }
-          100% { opacity: 1; transform: translateY(0); }
+          0% {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         @keyframes wv-continueIn {
-          0% { opacity: 0; transform: translateY(20px) scale(0.92); }
-          100% { opacity: 1; transform: translateY(0) scale(1); }
+          0% {
+            opacity: 0;
+            transform: translateY(20px) scale(0.92);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
         }
         @keyframes wv-mementoGlow {
-          0%,100% { filter: drop-shadow(0 0 8px rgba(255,200,140,0.4)); }
-          50% { filter: drop-shadow(0 0 18px rgba(255,225,180,0.85)); }
+          0%,
+          100% {
+            filter: drop-shadow(0 0 8px rgba(255, 200, 140, 0.4));
+          }
+          50% {
+            filter: drop-shadow(0 0 18px rgba(255, 225, 180, 0.85));
+          }
         }
-        @keyframes wv-tappableGlow {
-          0%,100% { box-shadow: 0 0 8px rgba(255,180,80,0.4); }
-          50% { box-shadow: 0 0 18px rgba(255,225,180,0.85); }
+        @keyframes wv-signatureIn {
+          0% {
+            opacity: 0;
+            transform: translateY(-12px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
       `}</style>
     </div>
   );
 }
 
-function renderTappableHighlighted(
-  text: string,
-  highlight: string,
-  alreadyRemembered: boolean,
-  onTap: () => void,
-) {
-  if (!text.includes(highlight)) return text;
-  const parts = text.split(highlight);
-  return parts.map((part, i) => (
-    <span key={i}>
-      {part}
-      {i < parts.length - 1 &&
-        (alreadyRemembered ? (
-          <em
-            className="font-fredoka not-italic font-black"
-            style={{
-              color: 'rgba(180,255,180,0.95)',
-              textShadow: '0 0 12px rgba(150,220,150,0.55)',
-              padding: '0 2px',
-            }}
-          >
-            {highlight}
-          </em>
-        ) : (
-          <button
-            type="button"
-            onClick={onTap}
-            className="font-fredoka font-black"
-            style={{
-              color: 'rgba(255,210,140,1)',
-              textShadow: '0 0 14px rgba(255,180,80,0.85)',
-              padding: '2px 4px',
-              borderRadius: 4,
-              background: 'rgba(255,180,80,0.18)',
-              border: '1.5px solid rgba(255,200,120,0.5)',
-              cursor: 'pointer',
-              animation: 'wv-tappableGlow 1.6s ease-in-out infinite',
-            }}
-          >
-            {highlight}
-          </button>
-        ))}
-    </span>
-  ));
-}
-
 function MementoSpot({
   memento,
-  isExamined,
+  isRevealed,
   onClick,
 }: {
   memento: Memento;
-  isExamined: boolean;
+  isRevealed: boolean;
   onClick: () => void;
 }) {
   return (
@@ -338,7 +412,7 @@ function MementoSpot({
         top: `${memento.y * 100}%`,
         transform: 'translate(-50%, -50%)',
       }}
-      aria-label={memento.labelHe}
+      aria-label={`זיכרון: ${memento.memoryHe}`}
     >
       {/* Glowing halo */}
       <span
@@ -346,89 +420,81 @@ function MementoSpot({
         className="absolute"
         style={{
           inset: -16,
-          background: isExamined
+          background: isRevealed
             ? 'radial-gradient(circle, rgba(255,210,140,0.18) 0%, transparent 65%)'
             : 'radial-gradient(circle, rgba(255,225,180,0.5) 0%, transparent 65%)',
-          animation: isExamined ? undefined : 'wv-mementoGlow 2.4s ease-in-out infinite',
+          animation: isRevealed ? undefined : 'wv-mementoGlow 2.4s ease-in-out infinite',
           filter: 'blur(2px)',
         }}
       />
-      <MementoGlyph kind={memento.glyph} faded={isExamined} />
+      <span
+        className="text-4xl transition-opacity"
+        style={{ opacity: isRevealed ? 0.6 : 1 }}
+      >
+        {memento.glyph}
+      </span>
       <span
         className="mt-1 rounded px-1.5 py-0.5 font-rubik text-xs font-bold"
         style={{
-          color: isExamined ? 'rgba(220,200,180,0.5)' : 'rgba(255,235,200,0.95)',
+          color: isRevealed ? 'rgba(220,200,180,0.5)' : 'rgba(255,235,200,0.95)',
           background: 'rgba(0,0,0,0.55)',
           textShadow: '0 1px 1px rgba(0,0,0,0.95)',
         }}
       >
-        {memento.labelHe}
+        זיכרון
       </span>
     </button>
   );
 }
 
-function MementoGlyph({ kind, faded }: { kind: Memento['glyph']; faded: boolean }) {
-  const ink = '#3a2818';
-  const cream = faded ? '#a08868' : '#f5d8a8';
-  const cloth = faded ? '#8a6e4a' : '#e8c688';
-  const wood = faded ? '#5a3e26' : '#9c6e3e';
-  const opacity = faded ? 0.6 : 1;
-  const filter = faded
-    ? 'saturate(0.7) brightness(0.9)'
-    : 'drop-shadow(2px 4px 4px rgba(0,0,0,0.6))';
-  const size = 64;
+function FrameSlot({
+  fragmentId,
+  isCenter = false,
+  isComposed,
+}: {
+  fragmentId: FragmentId;
+  isCenter?: boolean;
+  isComposed: boolean;
+}) {
+  const baseClass = isCenter ? 'col-span-1 row-span-2' : '';
+  return (
+    <div
+      className={`${baseClass} aspect-square rounded border-2 border-amber-300/40 bg-[#0a0805]/40`}
+      style={{
+        background: isComposed
+          ? 'linear-gradient(135deg, rgba(255,235,180,0.25), rgba(255,200,100,0.15))'
+          : 'rgba(10,8,5,0.4)',
+        transition: 'all 0.5s ease-out',
+      }}
+    >
+      {isComposed && (
+        <div
+          className="flex h-full w-full items-center justify-center"
+          style={{
+            animation: 'wv-mementoGlow 1.8s ease-in-out infinite',
+          }}
+        >
+          <div
+            className="rounded bg-amber-300/30 px-2 py-1 font-fredoka text-[10px] font-bold text-amber-200/80"
+            style={{
+              textShadow: '0 0 6px rgba(255,180,80,0.3)',
+            }}
+          >
+            ✓
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
-  switch (kind) {
-    case 'apron':
-      return (
-        <svg width={size} height={size} viewBox="0 0 64 64" style={{ filter, opacity }}>
-          <path d="M22 8 Q22 14 26 16 M42 8 Q42 14 38 16" fill="none" stroke={ink} strokeWidth="2.2" strokeLinecap="round"/>
-          <path d="M22 8 L22 18 L42 18 L42 8 Z" fill={cloth} stroke={ink} strokeWidth="1.8"/>
-          <path d="M18 18 Q14 32 16 56 L48 56 Q50 32 46 18 Z" fill={cloth} stroke={ink} strokeWidth="2" strokeLinejoin="round"/>
-          <rect x="24" y="38" width="16" height="10" rx="1" fill="none" stroke={ink} strokeWidth="1"/>
-        </svg>
-      );
-    case 'ladle':
-      return (
-        <svg width={size} height={size} viewBox="0 0 64 64" style={{ filter, opacity }}>
-          <ellipse cx="44" cy="44" rx="14" ry="11" fill="#9ca0a8" stroke={ink} strokeWidth="2"/>
-          <ellipse cx="44" cy="42" rx="11" ry="8" fill="#5e6068"/>
-          <rect x="6" y="14" width="28" height="6" rx="2" fill={wood} stroke={ink} strokeWidth="2" transform="rotate(-25 20 17)"/>
-          <line x1="34" y1="36" x2="14" y2="14" stroke={ink} strokeWidth="2"/>
-        </svg>
-      );
-    case 'cookbook':
-      return (
-        <svg width={size} height={size} viewBox="0 0 64 64" style={{ filter, opacity }}>
-          <path d="M8 12 L56 8 L52 56 L8 52 Z" fill={wood} stroke={ink} strokeWidth="2"/>
-          <path d="M30 10 L30 54" stroke={ink} strokeWidth="1.5"/>
-          {[18, 26, 34, 42].map((y) => <line key={y} x1="14" y1={y} x2="28" y2={y - 1} stroke={ink} strokeWidth="0.8" opacity="0.5"/>)}
-          {[18, 26, 34, 42].map((y) => <line key={y} x1="34" y1={y - 1} x2="48" y2={y - 2} stroke={ink} strokeWidth="0.8" opacity="0.5"/>)}
-          <text x="42" y="22" fontSize="6" fill={cream} fontWeight="bold" fontFamily="serif">לחם</text>
-        </svg>
-      );
-    case 'hat':
-      return (
-        <svg width={size} height={size} viewBox="0 0 64 64" style={{ filter, opacity }}>
-          <ellipse cx="32" cy="48" rx="22" ry="6" fill={cloth} stroke={ink} strokeWidth="2"/>
-          <path d="M18 48 Q14 32 18 22 Q22 14 32 14 Q42 14 46 22 Q50 32 46 48 Z" fill={cream} stroke={ink} strokeWidth="2" strokeLinejoin="round"/>
-          <ellipse cx="22" cy="22" rx="4" ry="3" fill={cream} stroke={ink} strokeWidth="1.5"/>
-          <ellipse cx="32" cy="18" rx="5" ry="3.5" fill={cream} stroke={ink} strokeWidth="1.5"/>
-          <ellipse cx="42" cy="22" rx="4" ry="3" fill={cream} stroke={ink} strokeWidth="1.5"/>
-        </svg>
-      );
-    case 'photo':
-      return (
-        <svg width={size} height={size} viewBox="0 0 64 64" style={{ filter, opacity }}>
-          <rect x="6" y="8" width="52" height="48" rx="2" fill={cream} stroke={ink} strokeWidth="2"/>
-          <rect x="9" y="11" width="46" height="34" fill="#3a4a5c"/>
-          <rect x="13" y="32" width="9" height="11" rx="1" fill={ink} opacity="0.65"/>
-          <rect x="22" y="28" width="9" height="15" rx="1" fill={ink} opacity="0.85"/>
-          <rect x="30" y="24" width="11" height="19" rx="1" fill={cream} opacity="0.95"/>
-          <rect x="40" y="28" width="9" height="15" rx="1" fill={ink} opacity="0.85"/>
-          <rect x="48" y="32" width="9" height="11" rx="1" fill={ink} opacity="0.65"/>
-        </svg>
-      );
-  }
+function getFragmentLabel(fragmentId: FragmentId): string {
+  const labels: Record<FragmentId, string> = {
+    'corner-tl': 'TL',
+    'corner-tr': 'TR',
+    'corner-bl': 'BL',
+    'corner-br': 'BR',
+    center: 'C',
+  };
+  return labels[fragmentId];
 }

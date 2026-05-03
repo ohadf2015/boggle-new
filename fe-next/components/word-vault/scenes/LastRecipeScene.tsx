@@ -6,6 +6,18 @@ import { EmberOverlay } from '@/components/word-vault/pixi/EmberOverlay';
 import { getGameStore } from '@/lib/word-vault/state/gameStore';
 import type { ItemId } from '@/lib/word-vault/types';
 
+/**
+ * Room 1.6 — The Last Recipe (Book 1 climax)
+ *
+ * Verb taxonomy:
+ *   PRIMARY:   SEQUENCE (place 4 ritual items on the altar — any order accepted)
+ *   SECONDARY: COMPOSE  (spell אורי from a 4-letter pool to summon the brother)
+ *
+ * The two verbs land in two phases (placing → spelling). Decoys (broom,
+ * defrost-candle) are inventory items that shake when wrongly placed.
+ * Canonical placement order (light→key→memory→truth) earns a richer flame burst.
+ */
+
 interface Props {
   onSolved: () => void;
   onExit: () => void;

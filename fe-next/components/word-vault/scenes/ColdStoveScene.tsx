@@ -4,6 +4,17 @@ import { useCallback, useEffect, useState } from 'react';
 import { EmberOverlay } from '@/components/word-vault/pixi/EmberOverlay';
 import { getGameStore } from '@/lib/word-vault/state/gameStore';
 
+/**
+ * Room 1.4 — The Cold Stove
+ *
+ * Verb taxonomy:
+ *   PRIMARY:   SEQUENCE (turn 4 valves in correct ignition order: gas→air→fire)
+ *   SECONDARY: REVEAL   (the broken time-valve is a red herring; brass-key
+ *                        from 1.3 silently auto-snaps the gas valve + golden shimmer)
+ *
+ * Graduated feedback: wrong sequence keeps the correct prefix instead of full reset.
+ */
+
 interface Props {
   onSolved: () => void;
   onExit: () => void;

@@ -5,6 +5,15 @@ import { normalizeHebrewFinalForms } from '@/lib/word-vault/engine/wordConstrain
 import { EmberOverlay } from '@/components/word-vault/pixi/EmberOverlay';
 import { getGameStore } from '@/lib/word-vault/state/gameStore';
 
+/**
+ * Room 1.2 — The Cipher Pantry
+ *
+ * Verb taxonomy:
+ *   PRIMARY:   COMPOSE (drag/tap letters to unscramble each frozen jar)
+ *   SECONDARY: REVEAL  (3 hotspots: cobweb / floorboard / broom — broom-hotspot
+ *                       grants the cross-room broom item used in 1.3)
+ */
+
 interface Props {
   onSolved: () => void;
   onExit: () => void;
