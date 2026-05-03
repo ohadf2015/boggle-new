@@ -31,7 +31,41 @@ const CARVINGS: Carving[] = [
   { id: 'honey',  partial: 'דב_',  answer: 'ש', fullWord: 'דבש',  hintHe: 'הזיכרון של דבורים.',   x: 0.62, y: 0.60 },
 ];
 
-const LETTER_POOL = ['ם', 'מ', 'ל', 'ש', 'ת', 'ר', 'ב', 'ה'];
+// Letter pool: 4 correct (ם,מ,ל,ש) + 4 decoys, shuffled order
+const LETTER_POOL = ['ת', 'מ', 'ר', 'ל', 'ה', 'ש', 'ב', 'ם'];
+
+interface SootHotspot {
+  id: string;
+  x: number;
+  y: number;
+  glyph: string;
+  loreHe: string;
+  shardHe?: string;
+}
+
+const SOOT_HOTSPOTS: SootHotspot[] = [
+  {
+    id: 'sconce',
+    x: 0.08, y: 0.18,
+    glyph: '🔥',
+    loreHe: 'מתחת לפיח של מנורת הקיר — סימן של אש קטנה שלא כבתה לגמרי.',
+    shardHe: 'א',
+  },
+  {
+    id: 'crack',
+    x: 0.92, y: 0.78,
+    glyph: '⌇',
+    loreHe: 'הקיר נסדק. בעמקים זוהרת אות שאי-אפשר לקרוא בלי להישען.',
+    shardHe: 'ל',
+  },
+  {
+    id: 'inscription',
+    x: 0.50, y: 0.92,
+    glyph: '✦',
+    loreHe: 'בקצה הקיר, ליד הרצפה — חתימה. רק שלוש אותיות. "קאל".',
+    shardHe: 'ק',
+  },
+];
 
 const REVEAL_THRESHOLD = 0.55; // soot must be wiped >55% to reveal hint
 const SECRET_PHRASE_HE = 'אין מתכון בלי האות שחסרה. לחם הוא קודם לכל מים.';
@@ -47,6 +81,9 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
   const [showBrief, setShowBrief] = useState(true);
   const [showGestureDemo, setShowGestureDemo] = useState(true);
   const [done, setDone] = useState(false);
+  const [activeHotspot, setActiveHotspot] = useState<SootHotspot | null>(null);
+  const [exploredHotspots, setExploredHotspots] = useState<Set<string>>(new Set());
+  const [foundShards, setFoundShards] = useState<string[]>([]);
   const [shake, setShake] = useState<string | null>(null);
   const [whisper, setWhisper] = useState<string | null>(null);
   const wipingRef = useRef<{ id: string | null; lastX: number; lastY: number } | null>(null);

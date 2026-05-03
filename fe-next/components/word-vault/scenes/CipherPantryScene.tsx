@@ -26,42 +26,39 @@ interface Jar {
 
 /**
  * 4 jars, each holds an abstract concept tied to Cael's worldview.
- * Answers are NOT food names — they're things a brother whispered, kept,
- * lost, or feared. Riddles require lateral interpretation.
- * Pool = answer's letters + 4-5 decoys (~9 letters total).
+ * Pool letters intentionally interleaved (decoys mixed with answer).
  */
 const JARS: Jar[] = [
   {
     id: 'jar-blessing',
-    // Display label on jar (scrambled visual)
     scrambled: ['כ','ה','ב','ר'],
-    pool: ['ב','ר','כ','ה','ע','ש','ח','ל','מ'],
+    pool: ['ע','ב','ש','ר','ח','כ','ל','ה','מ'],
     answer: 'ברכה',
-    hintHe: 'מה שקאל אמר ללחם לפני שאכל ממנו.',
+    hintHe: 'אומרים אותה לפני שטועמים — ושוכחים אחרי.',
     x: 0.20, y: 0.32,
   },
   {
     id: 'jar-life',
     scrambled: ['י','י','ח','ם'],
-    pool: ['ח','י','י','ם','ק','מ','ש','א','ל'],
+    pool: ['ק','י','מ','ח','ש','י','א','ם','ל'],
     answer: 'חיים',
-    hintHe: 'מה שהאבק מבקש ממים.',
+    hintHe: 'אבק לבן + מים + זמן = ?',
     x: 0.46, y: 0.32,
   },
   {
     id: 'jar-sleep',
     scrambled: ['ה','י','ש','נ'],
-    pool: ['ש','י','נ','ה','ק','ר','ם','ל','ב'],
+    pool: ['ק','ש','ר','י','ם','נ','ל','ה','ב'],
     answer: 'שינה',
-    hintHe: 'מה שהמטבח עושה כשאף אחד לא בבית.',
+    hintHe: 'מה שהמטבח עושה אחרי חצות.',
     x: 0.72, y: 0.32,
   },
   {
     id: 'jar-brothers',
     scrambled: ['ם','י','ח','א'],
-    pool: ['א','ח','י','ם','ב','ע','ת','ש','ר'],
+    pool: ['ב','א','ע','ח','ת','י','ש','ם','ר'],
     answer: 'אחים',
-    hintHe: 'מה שסינדר עדיין מתגעגע אליו — ולא יודה.',
+    hintHe: 'התשובה שכולם מחפשים. ובאף בית אין מספיק.',
     x: 0.46, y: 0.66,
   },
 ];
@@ -82,14 +79,14 @@ const HOTSPOTS: PantryHotspot[] = [
     id: 'cobweb',
     x: 0.10, y: 0.12,
     glyph: '🕸️',
-    loreHe: '"לקח לנו זמן לבנות. את הבית. את הקורי-עכביש." — קאל',
+    loreHe: 'קורי-עכביש בפינה. מתחתיהם — חריץ דק.',
     shardHe: 'ב',
   },
   {
     id: 'floorboard',
     x: 0.92, y: 0.85,
     glyph: '☐',
-    loreHe: '"מתחת לרצפה — שם הוא הסתיר את ספר ההזיכרון."',
+    loreHe: 'קרש שעלה מהרצפה. מתחת — חלל קטן.',
     shardHe: 'ח',
   },
   {
