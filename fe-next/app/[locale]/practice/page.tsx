@@ -4,15 +4,14 @@ import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { PracticeHubJsonLd } from '@/components/seo/PracticeJsonLd';
 import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
 
-const LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+// Client tree (LanguageContext + transitive useSearchParams) requires per-request
+// render; SEO content (metadata + JSON-LD) ships in-band on every SSR pass.
+export const dynamic = 'force-dynamic';
+
 const SITE_URL = 'https://www.lexiclash.live';
 
 interface Props {
   params: Promise<{ locale: string }>;
-}
-
-export async function generateStaticParams() {
-  return LOCALES.map((locale) => ({ locale }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

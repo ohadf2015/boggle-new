@@ -6,7 +6,10 @@ import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { PracticeModeJsonLd } from '@/components/seo/PracticeJsonLd';
 import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
 
-const LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+// Client tree (LanguageContext + useSearchParams) requires per-request render;
+// SEO content (metadata + JSON-LD) ships in-band on every SSR pass.
+export const dynamic = 'force-dynamic';
+
 const SITE_URL = 'https://www.lexiclash.live';
 
 const MODE_BREADCRUMB_NAME: Record<(typeof PRACTICE_MODES)[number], string> = {
@@ -17,12 +20,6 @@ const MODE_BREADCRUMB_NAME: Record<(typeof PRACTICE_MODES)[number], string> = {
 
 interface Props {
   params: Promise<{ locale: string; mode: string }>;
-}
-
-export async function generateStaticParams() {
-  return LOCALES.flatMap((locale) =>
-    PRACTICE_MODES.map((mode) => ({ locale, mode }))
-  );
 }
 
 const SEO_KEY_BY_MODE: Record<(typeof PRACTICE_MODES)[number], string> = {
