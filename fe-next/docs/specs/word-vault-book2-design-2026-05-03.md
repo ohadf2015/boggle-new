@@ -14,9 +14,9 @@
 | **כפור** (Kfor) | "frost" | Concrete, sensory; pairs aesthetically with אש (fire) ↔ כפור (frost) as Book 1 ↔ Book 2 mirror | Loses the "muteness" theme entirely |
 | **דוממת** (Domemet) | "the silent one" (feminine) | Carries both silence + identity as a corrupted family member | Made-up word; less natural |
 
-**Recommendation: כפור.** Book 1 = אש vs גחלת (fire vs ember); Book 2 = אש vs כפור (fire vs frost) reads as a clean mirror. The "muteness" theme can come through environmental design (frozen voices, no echoes, glass-like silence) rather than the name.
+**Decision: כפור (Kfor) — locked 2026-05-03.** Book 1 = אש vs גחלת (fire vs ember); Book 2 = אש vs כפור (fire vs frost) reads as a clean mirror. The "muteness" theme will come through environmental design (frozen voices, no echoes, glass-like silence) rather than the name.
 
-Brother memory thread: cousin in Book 2 is a different character from Book 1's אורי. Naming proposal: **רוני** (Roni — common Israeli name + means "my joy" — ironic given the corruption).
+Brother memory thread: cousin in Book 2 is a different character from Book 1's אורי. Naming proposal: **רוני** (Roni — common Israeli name + means "my joy" — ironic given the corruption). **OPEN — not yet locked. User will pick at next-session opening.**
 
 ---
 
@@ -127,14 +127,14 @@ Total word touches: ~20 across the book vs Book 1's ~12. Book 2 leans harder int
 2. **Asset production.** Each room needs 1 BG image + 3-5 hotspot glyphs. Book 1 used `mcp-image` for 4 BGs; Book 2 needs 5-6 new ones. ~$50 / 1 day budget.
 3. **HE quality.** All scene strings will need native-review. Pattern is now established (mark "AI-drafted, native review pending" in commit messages).
 4. **Verb-3 absorption rate.** If Book 2 rooms drift toward COMPOSE-heavy (per critic D's word-moments push), the SEQUENCE verb may feel under-used. Watch ratio across all 6 rooms during prototyping.
-5. **Frost-Mute name.** **OPEN — user must pick before implementation.** `כפור` is the recommendation but not committed.
+5. **Frost-Mute name.** **DECIDED — locked to `כפור` 2026-05-03.** Book 2 implementation can proceed with this name. Brother name (`רוני` proposed) still open.
 
 ---
 
 ## Recommended next-session opening
 
-1. Confirm cousin name (`כפור` vs `דממה`)
-2. Confirm brother name (`רוני` or alternate)
+1. ~~Confirm cousin name~~ — **DONE: locked to `כפור` 2026-05-03.**
+2. Confirm brother name (`רוני` or alternate) — still open
 3. Prototype scene 2.1 (Frozen Door) using the existing `useReveal` hook — proves the abstraction transfers across themes
 4. If 2.1 lands clean → continue with 2.2/2.3 in next session(s)
 5. Cross-book item bloat decision before 2.6
