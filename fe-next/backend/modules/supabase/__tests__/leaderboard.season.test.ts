@@ -15,14 +15,15 @@ vi.mock('@/lib/seasons', () => ({
 import { getSupabase } from '../client';
 import { updateLeaderboardEntry } from '../leaderboard';
 
-interface PriorSnapshot { season_id: number; total_score: number }
+interface PriorSnapshot { season_id: number; total_score: number; games_played?: number; games_won?: number }
 
 function buildClient(opts: {
   lifetime: number;
   priors: PriorSnapshot[];
   capture: { upsertSpy: ReturnType<typeof vi.fn>; upsertOpts?: unknown };
+  profile?: Partial<{ total_games: number; casual_wins: number; ranked_wins: number }>;
 }) {
-  const { lifetime, priors, capture } = opts;
+  const { lifetime, priors, capture, profile: profileOverrides = {} } = opts;
   capture.upsertSpy = vi.fn((row: unknown, optsArg: unknown) => {
     capture.upsertOpts = optsArg;
     return {
@@ -45,9 +46,9 @@ function buildClient(opts: {
                     avatar_emoji: '🌟',
                     avatar_color: '#abc',
                     total_score: lifetime,
-                    total_games: 10,
-                    casual_wins: 4,
-                    ranked_wins: 1,
+                    total_games: profileOverrides.total_games ?? 10,
+                    casual_wins: profileOverrides.casual_wins ?? 4,
+                    ranked_wins: profileOverrides.ranked_wins ?? 1,
                     ranked_mmr: 1234,
                   },
                   error: null,
@@ -140,6 +141,91 @@ describe('updateLeaderboardEntry — season aware', () => {
 
     const row = capture.upsertSpy.mock.calls[0][0];
     expect(row.total_score).toBe(1500);
+  });
+
+  it('derives season-scoped games_played from lifetime − Σ prior snapshots', async () => {
+    // Lifetime total_games = 100. Prior seasons snapshotted 30 + 50 = 80.
+    // Season-scoped games_played in current season = 100 − 80 = 20.
+    const capture: any = {};
+    (getSupabase as any).mockReturnValue(
+      buildClient({
+        lifetime: 9999,
+        priors: [
+          { season_id: 1, total_score: 0, games_played: 30, games_won: 5 },
+          { season_id: 6, total_score: 0, games_played: 50, games_won: 8 },
+        ],
+        profile: { total_games: 100, casual_wins: 11, ranked_wins: 4 },
+        capture,
+      }),
+    );
+    await updateLeaderboardEntry('player-1');
+
+    const row = capture.upsertSpy.mock.calls[0][0];
+    expect(row.games_played).toBe(20);
+  });
+
+  it('derives season-scoped games_won from lifetime (casual+ranked) − Σ prior snapshots', async () => {
+    // Lifetime wins = casual 11 + ranked 4 = 15. Prior wins snapshots = 5 + 8 = 13.
+    // Season-scoped games_won = 15 − 13 = 2.
+    const capture: any = {};
+    (getSupabase as any).mockReturnValue(
+      buildClient({
+        lifetime: 9999,
+        priors: [
+          { season_id: 1, total_score: 0, games_played: 30, games_won: 5 },
+          { season_id: 6, total_score: 0, games_played: 50, games_won: 8 },
+        ],
+        profile: { total_games: 100, casual_wins: 11, ranked_wins: 4 },
+        capture,
+      }),
+    );
+    await updateLeaderboardEntry('player-1');
+
+    const row = capture.upsertSpy.mock.calls[0][0];
+    expect(row.games_won).toBe(2);
+  });
+
+  it('clamps games_won ≤ games_played (defends against missing-casual_wins snapshot gap)', async () => {
+    // Snapshot only captured ranked_wins historically; lifetime_wins includes
+    // casual_wins not in priors → naive derivation produces wins > games.
+    // Clamp must keep wins ≤ games for a sane UI.
+    const capture: any = {};
+    (getSupabase as any).mockReturnValue(
+      buildClient({
+        lifetime: 0,
+        priors: [
+          { season_id: 1, total_score: 0, games_played: 100, games_won: 5 },
+        ],
+        // Lifetime: 110 games (10 in S2), 50 wins (lifetime casual+ranked).
+        // Naive: games=10, wins=50−5=45. Clamped: wins=min(10,45)=10.
+        profile: { total_games: 110, casual_wins: 40, ranked_wins: 10 },
+        capture,
+      }),
+    );
+    await updateLeaderboardEntry('player-1');
+
+    const row = capture.upsertSpy.mock.calls[0][0];
+    expect(row.games_played).toBe(10);
+    expect(row.games_won).toBe(10);
+    expect(row.games_won).toBeLessThanOrEqual(row.games_played);
+  });
+
+  it('clamps games_played and games_won to zero when prior snapshots exceed lifetime', async () => {
+    // Defensive: snapshot drift shouldn't push counters negative.
+    const capture: any = {};
+    (getSupabase as any).mockReturnValue(
+      buildClient({
+        lifetime: 100,
+        priors: [{ season_id: 6, total_score: 0, games_played: 9999, games_won: 9999 }],
+        profile: { total_games: 5, casual_wins: 0, ranked_wins: 1 },
+        capture,
+      }),
+    );
+    await updateLeaderboardEntry('player-1');
+
+    const row = capture.upsertSpy.mock.calls[0][0];
+    expect(row.games_played).toBeGreaterThanOrEqual(0);
+    expect(row.games_won).toBeGreaterThanOrEqual(0);
   });
 
   it('clamps to zero when computation would otherwise go negative', async () => {

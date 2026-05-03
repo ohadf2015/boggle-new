@@ -24,22 +24,35 @@ export async function updateLeaderboardEntry(playerId: string, retries = 1): Pro
 
   const seasonId = getCurrentSeasonDynamic().id;
 
-  // Derive season-scoped score from lifetime + prior-season snapshots so the row
-  // can never regress to lifetime totals across rollovers:
-  //   season_score = lifetime − Σ(prior season finals) + 10% × previous season final
-  // Self-corrects on every write — bypasses any race in process_season_reset.
+  // Derive season-scoped values from lifetime + prior-season snapshots so the
+  // row can never regress to lifetime totals across rollovers:
+  //   season_score        = lifetime_score − Σ(prior finals) + 10% × prev final
+  //   season_games_played = lifetime_games − Σ(prior season games_played)
+  //   season_games_won    = lifetime_wins  − Σ(prior season games_won)
+  // Score gets a 10% soft carry from the previous season; counters do not
+  // (process_season_reset zeroes them at rollover by design). Self-corrects
+  // on every write — bypasses any race in process_season_reset.
   const { data: priorSnapshots } = await client
     .from('season_leaderboards')
-    .select('season_id, total_score')
+    .select('season_id, total_score, games_played, games_won')
     .eq('player_id', playerId)
     .lt('season_id', seasonId);
 
   const priors = priorSnapshots ?? [];
   const sumAllPriorFinals = priors.reduce((sum, row) => sum + (row.total_score ?? 0), 0);
+  const sumPriorGames     = priors.reduce((sum, row) => sum + (row.games_played ?? 0), 0);
+  const sumPriorWins      = priors.reduce((sum, row) => sum + (row.games_won ?? 0), 0);
   const previousSeasonFinal = priors.find(r => r.season_id === seasonId - 1)?.total_score ?? 0;
   const carry = Math.floor(0.10 * previousSeasonFinal);
-  const lifetime = profile.total_score || 0;
-  const seasonScore = Math.max(0, lifetime - sumAllPriorFinals + carry);
+  const lifetime      = profile.total_score || 0;
+  const lifetimeGames = profile.total_games || 0;
+  const lifetimeWins  = (profile.casual_wins || 0) + (profile.ranked_wins || 0);
+  const seasonScore       = Math.max(0, lifetime      - sumAllPriorFinals + carry);
+  const seasonGamesPlayed = Math.max(0, lifetimeGames - sumPriorGames);
+  // Clamp wins ≤ games to neutralise pre-fix snapshot gaps where
+  // games_won captured only ranked_wins (missing casual_wins). Without
+  // this, derivation can produce >100% win-rate rows.
+  const seasonGamesWon    = Math.min(seasonGamesPlayed, Math.max(0, lifetimeWins - sumPriorWins));
 
   // Upsert leaderboard entry — composite PK (player_id, season_id) since
   // 20260426160000_seasons_infrastructure.
@@ -53,8 +66,8 @@ export async function updateLeaderboardEntry(playerId: string, retries = 1): Pro
       avatar_emoji: profile.avatar_emoji,
       avatar_color: profile.avatar_color,
       total_score: seasonScore,
-      games_played: profile.total_games || 0,
-      games_won: (profile.casual_wins || 0) + (profile.ranked_wins || 0),
+      games_played: seasonGamesPlayed,
+      games_won: seasonGamesWon,
       ranked_mmr: profile.ranked_mmr || 1000,
       last_updated: new Date().toISOString()
     }, {
