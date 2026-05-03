@@ -998,6 +998,52 @@ export const trackTierProgressionMilestone = (props: {
   }
 };
 
+/**
+ * Highlight reel start — fires when the user opens the highlights generator.
+ * `topEpicness` is the max epicness score of all clips in the buffer.
+ * `clipCount` is how many clips are available to pick from.
+ */
+export const trackHighlightStart = (payload: {
+  topEpicness: number;
+  clipCount: number;
+}): void => {
+  try {
+    posthog.capture('highlight_started', payload);
+  } catch {
+    // PostHog not initialized — silent
+  }
+};
+
+/**
+ * Highlight reel skip — fires when the user skips a clip during playback.
+ * `clipIndex` is the position in the reel (0-indexed).
+ * `elapsedMs` is how long they watched before skipping.
+ */
+export const trackHighlightSkipped = (payload: {
+  clipIndex: number;
+  elapsedMs: number;
+}): void => {
+  try {
+    posthog.capture('highlight_skipped', payload);
+  } catch {
+    // PostHog not initialized — silent
+  }
+};
+
+/**
+ * Highlight buffer overflow — fires when the clip buffer exceeds max capacity.
+ * `eventsDropped` is how many clips were discarded to make room.
+ */
+export const trackHighlightBufferOverflow = (payload: {
+  eventsDropped: number;
+}): void => {
+  try {
+    posthog.capture('highlight_buffer_overflow', payload);
+  } catch {
+    // PostHog not initialized — silent
+  }
+};
+
 const growthTracking = {
   trackGrowthEvent,
   trackShare,
