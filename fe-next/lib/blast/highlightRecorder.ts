@@ -1,4 +1,5 @@
 import { useHighlightStore } from '@/stores/highlightStore';
+import { trackHighlightBufferOverflow } from '@/utils/growthTracking';
 import type {
   WordSubmitEvent,
   GameEndEvent,
@@ -16,7 +17,11 @@ export function createHighlightRecorder(): HighlightRecorder {
   return {
     start() {
       startTime = Date.now();
-      useHighlightStore.getState().reset();
+      const store = useHighlightStore.getState();
+      store.reset();
+      store.setOverflowHandler((eventsDropped) => {
+        trackHighlightBufferOverflow({ eventsDropped });
+      });
     },
     recordWordSubmit(data) {
       const t = Date.now() - startTime;
