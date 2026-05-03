@@ -74,6 +74,13 @@ describe('word-vault types & stub content', () => {
     expect(CINDER.nameEn).toBe('Gachelet');
   });
 
+  it('broom item description references soot — contract for the 1.2→1.3 cross-room flow', () => {
+    const broom = BOOK_1_ITEMS.find((i) => i.id === 'broom');
+    expect(broom).toBeDefined();
+    // The HE description must mention soot (פיח) so the cross-room narrative arc reads correctly
+    expect(broom?.description.he).toMatch(/פיח/);
+  });
+
   it('every room declares a non-negative coin reward', () => {
     for (const room of BOOK_1_HEARTH_ROOMS) {
       const conf: RoomConfig = room;

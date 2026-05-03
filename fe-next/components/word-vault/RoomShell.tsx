@@ -73,6 +73,7 @@ export function RoomShell({ store, roomId, onExit }: RoomShellProps) {
           }}
           onExit={onExit}
         />
+        <RevisitBanner roomId={room.id} show={isAlreadySolved} />
       </div>
     );
   }
@@ -88,6 +89,7 @@ export function RoomShell({ store, roomId, onExit }: RoomShellProps) {
           }}
           onExit={onExit}
         />
+        <RevisitBanner roomId={room.id} show={isAlreadySolved} />
       </div>
     );
   }
@@ -103,6 +105,7 @@ export function RoomShell({ store, roomId, onExit }: RoomShellProps) {
           }}
           onExit={onExit}
         />
+        <RevisitBanner roomId={room.id} show={isAlreadySolved} />
       </div>
     );
   }
@@ -118,6 +121,7 @@ export function RoomShell({ store, roomId, onExit }: RoomShellProps) {
           }}
           onExit={onExit}
         />
+        <RevisitBanner roomId={room.id} show={isAlreadySolved} />
       </div>
     );
   }
@@ -133,6 +137,7 @@ export function RoomShell({ store, roomId, onExit }: RoomShellProps) {
           }}
           onExit={onExit}
         />
+        <RevisitBanner roomId={room.id} show={isAlreadySolved} />
       </div>
     );
   }
@@ -148,6 +153,7 @@ export function RoomShell({ store, roomId, onExit }: RoomShellProps) {
           }}
           onExit={onExit}
         />
+        <RevisitBanner roomId={room.id} show={isAlreadySolved} />
       </div>
     );
   }
@@ -264,6 +270,44 @@ interface StoryOnlyRoomProps {
   onContinue: () => void;
   onExit: () => void;
   isSolved: boolean;
+}
+
+// Per-room revisit copy (shown only when the player re-enters a solved room from the hub)
+const REVISIT_LINES: Record<string, string> = {
+  'room-1-1': 'הדלת נשארה פתוחה.',
+  'room-1-2': 'הצנצנות עוד שם. הקור פחות.',
+  'room-1-3': 'הסימנים שלו זוהרים פחות עכשיו.',
+  'room-1-4': 'התנור עוד דולק.',
+  'room-1-5': 'המטבח התקרר.',
+  'room-1-6': 'המזבח נשאר ריק. הוא הלך.',
+};
+
+function RevisitBanner({ roomId, show }: { roomId: string; show: boolean }) {
+  if (!show) return null;
+  const line = REVISIT_LINES[roomId];
+  if (!line) return null;
+  return (
+    <div
+      className="pointer-events-none fixed inset-x-0 top-2 z-50 flex justify-center px-4"
+      dir="rtl"
+      aria-live="polite"
+    >
+      <p
+        className="rounded-full border-2 border-amber-300/45 bg-[#1a0e08]/85 px-4 py-1 font-rubik text-xs text-amber-200/90 backdrop-blur"
+        style={{ animation: 'wv-revisitFade 5s ease-out forwards' }}
+      >
+        ↻ {line}
+      </p>
+      <style jsx>{`
+        @keyframes wv-revisitFade {
+          0%   { opacity: 0; transform: translateY(-6px); }
+          15%  { opacity: 1; transform: translateY(0); }
+          80%  { opacity: 1; }
+          100% { opacity: 0; transform: translateY(-3px); }
+        }
+      `}</style>
+    </div>
+  );
 }
 
 function StoryOnlyRoom({ title, beat, onContinue, onExit, isSolved }: StoryOnlyRoomProps) {

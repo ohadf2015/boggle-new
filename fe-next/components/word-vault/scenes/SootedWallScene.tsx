@@ -55,6 +55,7 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
   const [whisper, setWhisper] = useState<string | null>(null);
   const [hasBroom, setHasBroom] = useState(false);
   const [hasDefrost, setHasDefrost] = useState(false);
+  const [broomBarkFired, setBroomBarkFired] = useState(false);
   const wipingRef = useRef<{ id: string | null; lastX: number; lastY: number } | null>(null);
 
   // Item perks on mount: lantern auto-reveals 1 carving; broom = fast-wipe on thickest; defrost candle = uniform speedup
@@ -223,6 +224,7 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
             key={c.id}
             carving={c}
             revealAmount={revealed[c.id] ?? 0}
+            threshold={thresholdFor(c.id)}
             filledLetter={filled[c.id]}
             isActive={activeCarving === c.id}
             isShaking={shake === c.id}
@@ -233,6 +235,12 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
             onTap={() => {
               if (!filled[c.id] && revealed[c.id] >= thresholdFor(c.id)) {
                 setActiveCarving(c.id);
+                // Broom legibility bark: first time honey-carving becomes active for a broom-holder
+                if (hasBroom && c.id === BROOM_TARGET_CARVING && !broomBarkFired) {
+                  setBroomBarkFired(true);
+                  setWhisper('המטאטא שלך מנגב את העובי הזה.');
+                  setTimeout(() => setWhisper(null), 2400);
+                }
               } else if (filled[c.id]) {
                 // already filled — show whisper of hint
                 setWhisper(`"${c.hintHe}"`);
@@ -435,6 +443,7 @@ function FingerCursor() {
 function CarvingPanel({
   carving,
   revealAmount,
+  threshold,
   filledLetter,
   isActive,
   isShaking,
@@ -446,6 +455,7 @@ function CarvingPanel({
 }: {
   carving: Carving;
   revealAmount: number;
+  threshold: number;
   filledLetter: string | null;
   isActive: boolean;
   isShaking: boolean;
@@ -457,8 +467,10 @@ function CarvingPanel({
 }) {
   const sootOpacity = Math.max(0, 0.95 - revealAmount * 1.05);
   const carvingVisible = revealAmount > 0.25;
-  const hintVisible = revealAmount >= REVEAL_THRESHOLD;
+  const hintVisible = revealAmount >= threshold;
   const isLocked = !!filledLetter;
+  // Affordance glow: ready-to-tap once wiped past per-carving threshold + not yet filled + not currently active
+  const readyToTap = hintVisible && !isLocked && !isActive;
 
   // Compose displayed word with placeholder/letter
   const displayText = isLocked ? carving.fullWord : carving.partial;
@@ -495,8 +507,13 @@ function CarvingPanel({
             ? '3px solid rgba(255,180,80,0.85)'
             : isActive
             ? '3px solid rgba(255,200,120,0.65)'
+            : readyToTap
+            ? '2.5px solid rgba(255,200,120,0.85)'
             : '2px solid rgba(120,90,60,0.55)',
-          boxShadow: 'inset 0 0 24px rgba(0,0,0,0.7)',
+          boxShadow: readyToTap
+            ? 'inset 0 0 24px rgba(0,0,0,0.7), 0 0 18px rgba(255,180,80,0.55)'
+            : 'inset 0 0 24px rgba(0,0,0,0.7)',
+          animation: readyToTap ? 'wv-emberPulse 2.4s ease-in-out infinite' : undefined,
         }}
       >
         {/* stone grain */}

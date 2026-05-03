@@ -51,28 +51,32 @@ export function ColdStoveScene({ onSolved, onExit }: Props) {
   const [burst, setBurst] = useState<{ id: number; x: number; y: number } | undefined>();
   const [burstId, setBurstId] = useState(0);
   const [revealed, setRevealed] = useState<Set<ValveId>>(new Set());
-  const [hasBrassKey, setHasBrassKey] = useState(false);
 
-  // Item perks on mount
+  // Brass-key perk: silently auto-snaps the FIRST valve in the order; rest still requires inference
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const items = getGameStore().getState().permanentItems;
-    if (items.includes('brass-key')) setHasBrassKey(true);
+    if (items.includes('brass-key')) {
+      setSequence([CORRECT_ORDER[0]]);
+      setRevealed((prev) => new Set(prev).add(CORRECT_ORDER[0]));
+    }
   }, []);
 
   const handleTurn = useCallback(
     (id: ValveId) => {
       if (done) return;
-      // Time valve = broken UNLESS player has the brass key (which fixes it and reveals the order)
+      // Time valve = broken; cryptic whisper only, never advances
       if (id === BROKEN_VALVE) {
         setRevealed((prev) => new Set(prev).add(id));
-        if (hasBrassKey) {
-          setWhisper('"גז. אוויר. אש. — אורי תיקן את הברז."');
-        } else {
-          setWhisper('"זמן לא אופים. אבל הזמן אופה אותנו."');
-        }
+        setWhisper('"זמן לא אופים. אבל הזמן אופה אותנו."');
         setTimeout(() => setWhisper(null), 2400);
-        // Doesn't advance sequence — silently
+        return;
+      }
+
+      // Re-tapping a valve already in the current attempt is a no-op
+      if (sequence.includes(id)) {
+        setWhisper('"כבר סובב."');
+        setTimeout(() => setWhisper(null), 1400);
         return;
       }
 
@@ -115,7 +119,7 @@ export function ColdStoveScene({ onSolved, onExit }: Props) {
         setTimeout(() => setDone(true), 1200);
       }
     },
-    [sequence, done, burstId, hasBrassKey],
+    [sequence, done, burstId],
   );
 
   return (

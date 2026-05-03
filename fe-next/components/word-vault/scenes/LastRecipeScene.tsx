@@ -1,7 +1,7 @@
 'use client';
 /* eslint-disable @next/next/no-img-element -- Decorative character sprites; next/image not needed. */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { EmberOverlay } from '@/components/word-vault/pixi/EmberOverlay';
 import { getGameStore } from '@/lib/word-vault/state/gameStore';
 import type { ItemId } from '@/lib/word-vault/types';
@@ -12,7 +12,13 @@ interface Props {
 }
 
 const RITUAL_ORDER: ItemId[] = ['melo-lantern', 'brass-key', 'family-photo', 'cael-recipe-book'];
+const RITUAL_SET = new Set<ItemId>(RITUAL_ORDER);
 const RITUAL_LENGTH = 4;
+
+// Spelling seal: after 4 items placed, player spells the brother's name from a small pool
+const SEAL_TARGET = ['א', 'ו', 'ר', 'י']; // אורי
+const SEAL_POOL = ['א', 'ו', 'ר', 'י', 'ת', 'ה'];
+const CANONICAL_BONUS_VO = 'אש זכרה את הסדר של אורי.';
 
 const ITEM_GLYPH: Record<ItemId, string> = {
   'melo-lantern': '🏮',
@@ -37,12 +43,14 @@ const SUCCESS_LINES = [
   '"מים. קמח. דבש. לחם של אורי." — אורי חזר.',
 ];
 
+type Phase = 'placing' | 'spelling' | 'transforming' | 'done';
+
 export function LastRecipeScene({ onSolved, onExit }: Props) {
   const [slotsFilled, setSlotsFilled] = useState<ItemId[]>([]);
+  const [phase, setPhase] = useState<Phase>('placing');
+  const [sealLetters, setSealLetters] = useState<string[]>([]);
   const [showBrief, setShowBrief] = useState(true);
   const [whisper, setWhisper] = useState<string | null>(null);
-  const [transformed, setTransformed] = useState(false);
-  const [done, setDone] = useState(false);
   const [shake, setShake] = useState(false);
   const [burst, setBurst] = useState<{ id: number; x: number; y: number } | undefined>();
   const [burstId, setBurstId] = useState(0);
@@ -53,17 +61,29 @@ export function LastRecipeScene({ onSolved, onExit }: Props) {
     setInventory(getGameStore().getState().permanentItems);
   }, []);
 
+  const transformed = phase === 'transforming' || phase === 'done';
+  const done = phase === 'done';
   const cinderHpPct = Math.max(0.1, 1 - (slotsFilled.length / RITUAL_LENGTH) * 0.9);
+
+  // Canonical = items placed in the narrative order light → key → memory → truth
+  const placedInCanonicalOrder = useMemo(
+    () => slotsFilled.length === RITUAL_LENGTH && slotsFilled.every((id, i) => id === RITUAL_ORDER[i]),
+    [slotsFilled],
+  );
 
   const handlePlaceItem = useCallback(
     (itemId: ItemId) => {
-      if (done || transformed) return;
+      if (phase !== 'placing') return;
 
-      const nextSlotIdx = slotsFilled.length;
-      const expectedItemId = RITUAL_ORDER[nextSlotIdx];
+      // Already placed? Friendly no-op
+      if (slotsFilled.includes(itemId)) {
+        setWhisper('כבר על המזבח.');
+        setTimeout(() => setWhisper(null), 1600);
+        return;
+      }
 
-      // Wrong item or already placed
-      if (itemId !== expectedItemId || slotsFilled.includes(itemId)) {
+      // Decoy item (not in the ritual set) → shake + per-item line
+      if (!RITUAL_SET.has(itemId)) {
         setShake(true);
         setTimeout(() => setShake(false), 400);
         const decoyLine = DECOY_LINES[itemId] ?? 'לא. זה לא נכון.';
@@ -72,7 +92,7 @@ export function LastRecipeScene({ onSolved, onExit }: Props) {
         return;
       }
 
-      // Correct item in correct order
+      // Correct ritual item — accepts in any order
       const next = [...slotsFilled, itemId];
       setSlotsFilled(next);
       setBurstId((b) => b + 1);
@@ -84,14 +104,51 @@ export function LastRecipeScene({ onSolved, onExit }: Props) {
       setWhisper(SUCCESS_LINES[lineIdx]);
       setTimeout(() => setWhisper(null), 2400);
 
+      // 4 items placed — open the spelling seal phase
       if (next.length === RITUAL_LENGTH) {
         setTimeout(() => {
-          setTransformed(true);
-          setTimeout(() => setDone(true), 2200);
+          setPhase('spelling');
+          setWhisper('כתבי את שמו.');
+          setTimeout(() => setWhisper(null), 2400);
         }, 1500);
       }
     },
-    [slotsFilled, done, transformed, burstId],
+    [phase, slotsFilled, burstId],
+  );
+
+  const handleSealLetter = useCallback(
+    (letter: string) => {
+      if (phase !== 'spelling') return;
+
+      const nextIdx = sealLetters.length;
+      const expected = SEAL_TARGET[nextIdx];
+      if (letter !== expected) {
+        setShake(true);
+        setTimeout(() => setShake(false), 400);
+        setWhisper('לא האות הזאת.');
+        setTimeout(() => setWhisper(null), 1600);
+        return;
+      }
+
+      const next = [...sealLetters, letter];
+      setSealLetters(next);
+
+      if (next.length === SEAL_TARGET.length) {
+        // Name fully spelled — trigger transformation, with canonical bonus VO if items were placed in narrative order
+        setTimeout(() => {
+          setPhase('transforming');
+          if (placedInCanonicalOrder) {
+            setWhisper(CANONICAL_BONUS_VO);
+            setTimeout(() => setWhisper(null), 2800);
+          }
+          setTimeout(() => {
+            setPhase('done');
+            setTimeout(() => onSolved(), 800);
+          }, 2200);
+        }, 600);
+      }
+    },
+    [phase, sealLetters, placedInCanonicalOrder, onSolved],
   );
 
   return (
@@ -192,20 +249,63 @@ export function LastRecipeScene({ onSolved, onExit }: Props) {
         <Altar slotsFilled={slotsFilled} active={!done} />
       </div>
 
-      {/* Inventory drawer */}
-      {!done && (
+      {/* Inventory drawer — only during placing phase */}
+      {phase === 'placing' && (
         <div className="relative z-10 mx-auto mt-4 flex max-w-2xl flex-wrap items-center justify-center gap-2 px-4" dir="rtl">
           {inventory.map((itemId) => (
             <button
               key={itemId}
               type="button"
               onClick={() => handlePlaceItem(itemId)}
-              disabled={transformed || slotsFilled.includes(itemId)}
+              disabled={slotsFilled.includes(itemId)}
               className="flex flex-col items-center gap-1 rounded border-2 border-amber-300/30 bg-[#1a0e08]/85 px-3 py-2 transition-all hover:border-amber-300/70 disabled:opacity-50"
             >
               <span className="text-3xl">{ITEM_GLYPH[itemId]}</span>
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Spelling seal — letter pool to spell אורי */}
+      {phase === 'spelling' && (
+        <div className="relative z-10 mx-auto mt-4 flex max-w-md flex-col items-center px-4" dir="rtl">
+          <div className="mb-2 flex gap-2">
+            {SEAL_TARGET.map((target, i) => {
+              const placed = sealLetters[i];
+              return (
+                <span
+                  key={i}
+                  className="grid h-12 w-12 place-items-center rounded-md border-2 font-fredoka text-2xl font-black"
+                  style={{
+                    background: placed ? 'linear-gradient(180deg, #ffd47a 0%, #c98b2a 100%)' : 'rgba(40,20,12,0.6)',
+                    borderColor: placed ? '#5a3a18' : 'rgba(180,140,80,0.4)',
+                    color: placed ? '#1a0e08' : 'rgba(220,180,120,0.4)',
+                    textShadow: placed ? '0 0 6px rgba(255,225,170,0.9)' : 'none',
+                  }}
+                >
+                  {placed ?? target}
+                </span>
+              );
+            })}
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {SEAL_POOL.map((ltr, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => handleSealLetter(ltr)}
+                className="grid h-11 w-11 place-items-center rounded-md border-2 font-fredoka text-xl font-black transition-all"
+                style={{
+                  background: 'linear-gradient(180deg, #d4ba8a 0%, #8a6c44 100%)',
+                  borderColor: '#5a3a18',
+                  color: '#1a0e08',
+                  boxShadow: '0 3px 0 rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,235,180,0.3)',
+                }}
+              >
+                {ltr}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
