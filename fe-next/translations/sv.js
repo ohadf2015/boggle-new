@@ -143,6 +143,30 @@ const sv = {
       "ogTitle": "Sällsynta Ädelstenar - Ovanliga Ord",
       "ogDescription": "Upptäck sällsynta ord andra missar. Utöka ditt ordförråd!"
     },
+    "practice": {
+      "title": "Övningsläge för Ordspel - Lär & Handledning | LexiClash",
+      "description": "Öva ordspel i din egen takt! Ingen timer, inget tryck — lär dig boggle, word hunt och ordhjul med inbyggda coaching-tips. Gratis nybörjarvänlig handledning.",
+      "ogTitle": "Övningsläge - Lär dig Ordspel Stressfritt",
+      "ogDescription": "Behärska 3 ordspelslägen med vår coaching-handledning. Ingen timer, ingen stress!"
+    },
+    "practiceClassic": {
+      "title": "Boggle-övning - Lär dig Klassiskt Ordsök | LexiClash",
+      "description": "Öva klassiskt boggle-ordsök i din egen takt. Coaching-tips i spelet, ingen timer, inget tryck. Gratis handledning för nybörjare.",
+      "ogTitle": "Boggle-övning - Klassisk Ordsökshandledning",
+      "ogDescription": "Lär dig klassiska ordsöksmekanik med coaching-tips. Stressfritt övningsläge!"
+    },
+    "practiceWordHunt": {
+      "title": "Word Hunt-övning - Lär dig Daglig Jakt | LexiClash",
+      "description": "Öva Word Hunt i din egen takt. Lär dig hitta längre ord, kedja bonusplattor och bygga poängcombos med inbyggd handledning. Gratis utan timer.",
+      "ogTitle": "Word Hunt-övning - Handledningsläge",
+      "ogDescription": "Behärska Word Hunt med stressfri handledning. Coaching-tips, ingen timer!"
+    },
+    "practiceWheelRush": {
+      "title": "Ordhjul-övning - Lär dig Anagramläge | LexiClash",
+      "description": "Öva ordhjul-anagramläget i din egen takt. Coach-uppmaningar, dolda bonusord, ingen timer. Perfekt gratis handledning för nybörjare.",
+      "ogTitle": "Ordhjul-övning - Anagramhandledning",
+      "ogDescription": "Lär dig anagramhjulets mekanik med coaching-prompter. Stressfri handledning!"
+    },
     "community": {
       "title": "Ordpussel Från Gemenskapen - Spelarskapade Brädspel | LexiClash",
       "description": "Bläddra och spela gemenskapsskapade ordpussel! Skapa egna brädspel, dela med vänner och tävla.",
@@ -10088,9 +10112,9 @@ const sv = {
       feature3: "Fritt",
       intro: { greet: "Ta din tid. Bara ord." },
       tutorial: {
-        tip1: "Dra intilliggande bokstäver",
-        tip2: "Längre = fler poäng",
-        tip3: "Ingen timer, utforska"
+        tip1: "Tryck på intilliggande rutor för att stava",
+        tip2: "Längre ord visar mer",
+        tip3: "Ingen timer — utforska bara"
       }
     },
     blast: {
@@ -10109,9 +10133,9 @@ const sv = {
       feature3: "Ledtrådar",
       intro: { greet: "Ett ord i taget. Du fixar det." },
       tutorial: {
-        tip1: "Hitta målordet",
-        tip2: "Dra intilliggande bokstäver",
-        tip3: "Flera vägar fungerar"
+        tip1: "Tryck på bokstäver för att stava målordet",
+        tip2: "Grön ruta = rätt plats",
+        tip3: "Gul ruta = fel plats, rätt bokstav"
       }
     },
     wheelRush: {
@@ -10122,9 +10146,9 @@ const sv = {
       feature3: "Pangrambonus",
       intro: { greet: "Snurra lugnt. Orden kommer." },
       tutorial: {
-        tip1: "Använd mittbokstaven",
-        tip2: "Vilken ordning som helst",
-        tip3: "Pluraler förlänger ord"
+        tip1: "Tryck på den limegröna mittbokstaven — den måste finnas i varje ord",
+        tip2: "Tryck på yttre bokstäver i valfri ordning",
+        tip3: "Prova pluralformer för att förlänga"
       }
     },
     intro: {

@@ -141,7 +141,7 @@ export default function PracticeClassicSandbox() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center w-full max-w-md mx-auto px-4 py-4 gap-3">
+    <div className="flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3">
       <PracticeModeNav current="classic" />
       <PracticeCoachTip mode="classic" wordsFound={foundWords.length} />
 

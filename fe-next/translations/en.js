@@ -143,6 +143,30 @@ const en = {
       "ogTitle": "Rare Gems - Uncommon Word Discovery",
       "ogDescription": "Discover rare words others miss. Expand your vocabulary with this unique drill!"
     },
+    "practice": {
+      "title": "Word Game Practice Mode - Learn & Tutorial | LexiClash",
+      "description": "Practice word games at your own pace! No timer, no pressure — learn boggle, word hunt, and word wheel mechanics with built-in coaching tips. Free beginner-friendly tutorial.",
+      "ogTitle": "Practice Mode - Learn Word Games Stress-Free",
+      "ogDescription": "Master 3 word game modes with our coaching tutorial. No timer, no stress — just learn at your pace!"
+    },
+    "practiceClassic": {
+      "title": "Boggle Practice - Learn Classic Word Search | LexiClash",
+      "description": "Practice classic boggle-style word search at your own pace. In-game coaching tips, no timer, no pressure. Free tutorial mode for beginners learning to chain letters into words.",
+      "ogTitle": "Boggle Practice - Classic Word Search Tutorial",
+      "ogDescription": "Learn classic word search mechanics with coaching tips. Stress-free practice mode!"
+    },
+    "practiceWordHunt": {
+      "title": "Word Hunt Practice - Learn Daily Hunt Mode | LexiClash",
+      "description": "Practice Word Hunt at your own pace. Learn to spot longer words, chain bonus tiles, and build score combos with built-in tutorial coaching. Free, no-timer beginner mode.",
+      "ogTitle": "Word Hunt Practice - Tutorial Mode",
+      "ogDescription": "Master Word Hunt mechanics with stress-free tutorial. Coaching tips, no timer!"
+    },
+    "practiceWheelRush": {
+      "title": "Word Wheel Practice - Learn Anagram Wheel Mode | LexiClash",
+      "description": "Practice the Word Wheel anagram mode at your own pace. Coach prompts, hidden bonus words, no timer. Free tutorial for beginners learning rotating-letter puzzles.",
+      "ogTitle": "Word Wheel Practice - Anagram Tutorial",
+      "ogDescription": "Learn anagram wheel mechanics with coaching prompts. Free, stress-free tutorial!"
+    },
     "community": {
       "title": "Community Word Puzzles - Player-Created Boards | LexiClash",
       "description": "Browse and play community-created word puzzles! Create your own custom boards, share with friends, and compete on player-made challenges.",
@@ -10277,9 +10301,9 @@ const en = {
       feature3: "Free-form",
       intro: { greet: "Take your time. Just words." },
       tutorial: {
-        tip1: "Drag adjacent letters",
-        tip2: "Longer = more points",
-        tip3: "No timer, just explore"
+        tip1: "Tap adjacent tiles to spell",
+        tip2: "Longer words show off more",
+        tip3: "No timer — just explore"
       }
     },
     blast: {
@@ -10298,9 +10322,9 @@ const en = {
       feature3: "Hints",
       intro: { greet: "One word at a time. You've got this." },
       tutorial: {
-        tip1: "Find the target word",
-        tip2: "Drag adjacent letters",
-        tip3: "Many paths work"
+        tip1: "Tap letters to spell the target",
+        tip2: "Green tile = right spot",
+        tip3: "Yellow tile = wrong spot, right letter"
       }
     },
     wheelRush: {
@@ -10311,9 +10335,9 @@ const en = {
       feature3: "Pangram bonus",
       intro: { greet: "Spin gently. Words come." },
       tutorial: {
-        tip1: "Use the center letter",
-        tip2: "Any order works",
-        tip3: "Plurals extend words"
+        tip1: "Tap the lime center letter — it must appear in every word",
+        tip2: "Tap outer letters in any order",
+        tip3: "Try plural forms to extend a word"
       }
     },
     intro: {

@@ -143,6 +143,30 @@ const es = {
       "ogTitle": "Gemas Raras - Descubrimiento de Palabras",
       "ogDescription": "Descubre palabras raras que otros pasan por alto. Amplia tu vocabulario!"
     },
+    "practice": {
+      "title": "Modo Práctica de Juegos de Palabras - Tutorial | LexiClash",
+      "description": "¡Practica juegos de palabras a tu propio ritmo! Sin temporizador, sin presión — aprende boggle, word hunt y la rueda de palabras con consejos de coaching integrados. Tutorial gratis para principiantes.",
+      "ogTitle": "Modo Práctica - Aprende Juegos de Palabras Sin Estrés",
+      "ogDescription": "¡Domina 3 modos con nuestro tutorial de coaching. Sin temporizador, a tu propio ritmo!"
+    },
+    "practiceClassic": {
+      "title": "Práctica Boggle - Aprende Búsqueda Clásica | LexiClash",
+      "description": "Practica búsqueda de palabras estilo boggle a tu propio ritmo. Consejos de coaching en el juego, sin temporizador, sin presión. Tutorial gratis para principiantes.",
+      "ogTitle": "Práctica Boggle - Tutorial Búsqueda Clásica",
+      "ogDescription": "Aprende búsqueda clásica con consejos de coaching. ¡Modo práctica sin estrés!"
+    },
+    "practiceWordHunt": {
+      "title": "Práctica Word Hunt - Aprende Modo Caza Diaria | LexiClash",
+      "description": "Practica Word Hunt a tu propio ritmo. Aprende a detectar palabras largas, encadenar fichas bonus y construir combos con coaching integrado. Gratis, sin temporizador.",
+      "ogTitle": "Práctica Word Hunt - Modo Tutorial",
+      "ogDescription": "Domina Word Hunt con tutorial sin estrés. ¡Consejos de coaching, sin temporizador!"
+    },
+    "practiceWheelRush": {
+      "title": "Práctica Rueda de Palabras - Tutorial Anagrama | LexiClash",
+      "description": "Practica la rueda de palabras de anagrama a tu propio ritmo. Indicaciones del coach, palabras bonus ocultas, sin temporizador. Tutorial gratis perfecto para principiantes.",
+      "ogTitle": "Práctica Rueda de Palabras - Tutorial Anagrama",
+      "ogDescription": "Aprende la rueda de anagrama con coaching. ¡Tutorial gratis sin estrés!"
+    },
     "community": {
       "title": "Puzzles de Palabras Comunitarios - Tableros Creados por Jugadores | LexiClash",
       "description": "Explora y juega puzzles de palabras creados por la comunidad! Crea tableros personalizados y comparte con amigos.",
@@ -9910,9 +9934,9 @@ const es = {
       "feature3": "Libre",
       "intro": { "greet": "Tómate tu tiempo. Solo palabras." },
       "tutorial": {
-        "tip1": "Arrastra letras adyacentes",
-        "tip2": "Más largo = más puntos",
-        "tip3": "Sin temporizador, explora"
+        "tip1": "Toca casillas adyacentes para deletrear",
+        "tip2": "Las palabras largas lucen más",
+        "tip3": "Sin temporizador — solo explora"
       }
     },
     "blast": {
@@ -9931,9 +9955,9 @@ const es = {
       "feature3": "Pistas",
       "intro": { "greet": "Una palabra a la vez. Tú puedes." },
       "tutorial": {
-        "tip1": "Encuentra la palabra objetivo",
-        "tip2": "Arrastra letras adyacentes",
-        "tip3": "Varios caminos funcionan"
+        "tip1": "Toca letras para deletrear el objetivo",
+        "tip2": "Casilla verde = lugar correcto",
+        "tip3": "Casilla amarilla = lugar incorrecto"
       }
     },
     "wheelRush": {
@@ -9944,9 +9968,9 @@ const es = {
       "feature3": "Bonus pangrama",
       "intro": { "greet": "Gira con calma. Las palabras llegan." },
       "tutorial": {
-        "tip1": "Usa la letra central",
-        "tip2": "Cualquier orden vale",
-        "tip3": "Plurales alargan palabras"
+        "tip1": "Toca la letra lima del centro — debe estar en cada palabra",
+        "tip2": "Toca las letras exteriores en cualquier orden",
+        "tip3": "Prueba plurales para alargar la palabra"
       }
     },
     "intro": {
