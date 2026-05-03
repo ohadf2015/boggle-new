@@ -3,8 +3,12 @@
 
 import { useMemo } from 'react';
 import { useStore } from 'zustand';
+import posthog from 'posthog-js';
 import { BOOK_1_HEARTH_ROOMS } from '@/lib/word-vault/content/book1-hearth-stub';
 import type { WordVaultStore } from '@/lib/word-vault/state/gameStore';
+import { useFeatureFlag } from '@/hooks/useFeatureFlag';
+import { BeatRunner } from './BeatRunner';
+import { ROOM_R1_1 } from '@/lib/word-vault/beats/r1.1';
 import { WordConstraintRiddle } from './riddles/WordConstraintRiddle';
 import { CipherRiddle } from './riddles/CipherRiddle';
 import { LogicSequenceRiddle } from './riddles/LogicSequenceRiddle';
@@ -22,11 +26,42 @@ interface RoomShellProps {
 }
 
 export function RoomShell({ store, roomId, onExit }: RoomShellProps) {
+  const { enabled: magicGridEnabled } = useFeatureFlag('word-vault.magic-grid');
   const room = useMemo(
     () => BOOK_1_HEARTH_ROOMS.find((r) => r.id === roomId) ?? null,
     [roomId],
   );
   const isAlreadySolved = useStore(store, (s) => s.solvedRooms.includes(roomId));
+
+  // Feature-flagged routing: r1.1 → BeatRunner when enabled, fallback to DarkDoorScene
+  if (magicGridEnabled && roomId === 'room-1-1') {
+    return (
+      <BeatRunner
+        room={ROOM_R1_1}
+        onRoomComplete={() => {
+          posthog.capture('word_vault_beat_solved', { roomId: 'room-1-1', beatId: 'open-door' });
+          store.getState().solveRoom('room-1-1', { coins: 5 });
+          store.getState().markBeatSolved('r1.1', 'open-door');
+          onExit();
+        }}
+        onResult={(r) => {
+          if (r.kind === 'invalid') {
+            posthog.capture('word_vault_invalid_attempt', { roomId: 'room-1-1', reason: r.reason });
+          } else if (r.kind === 'bonus-hit') {
+            posthog.capture('word_vault_bonus_word_found', {
+              roomId: 'room-1-1',
+              word: r.word,
+              rarity: r.rarity,
+              coins: r.coins,
+            });
+            store.getState().earnCoins(r.coins);
+          } else if (r.kind === 'target-hit') {
+            posthog.capture('word_vault_grid_summon_target_hit', { roomId: 'room-1-1' });
+          }
+        }}
+      />
+    );
+  }
 
   if (!room) {
     return (
