@@ -42,6 +42,7 @@ export interface SoundEffectsContextType {
   playBlastBombSound: () => void;
   playBlastLightningSound: () => void;
   playBlastPrismSound: () => void;
+  playBlastHighlightStingerSound: () => void;
   playMatchFoundSound: () => void;
   playStreakMilestoneSound: () => void;
   playTierPromotionSound: () => void;
@@ -128,6 +129,7 @@ export const SOUND_EFFECTS = {
   blastBomb: '/sounds/blast-bomb.mp3',
   blastLightning: '/sounds/blast-lightning.mp3',
   blastPrism: '/sounds/blast-prism.mp3',
+  blastHighlightStinger: '/sounds/blast-highlight-stinger.webm',
   matchFound: '/sounds/match-found.mp3',
   streakMilestone: '/sounds/streak-milestone.mp3',
   tierPromotion: '/sounds/tier-promotion.mp3',
@@ -225,6 +227,7 @@ export const SOUND_PRIORITIES: Record<SoundEffectKey, AUDIO_LOAD_PRIORITY> = {
   blastBomb: AUDIO_LOAD_PRIORITY.NORMAL,
   blastLightning: AUDIO_LOAD_PRIORITY.NORMAL,
   blastPrism: AUDIO_LOAD_PRIORITY.NORMAL,
+  blastHighlightStinger: AUDIO_LOAD_PRIORITY.NORMAL,
   matchFound: AUDIO_LOAD_PRIORITY.NORMAL,
   coinCollect: AUDIO_LOAD_PRIORITY.NORMAL,
   boardShuffle: AUDIO_LOAD_PRIORITY.NORMAL,

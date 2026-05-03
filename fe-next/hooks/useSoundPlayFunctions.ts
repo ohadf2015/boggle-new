@@ -112,6 +112,7 @@ export function useSoundPlayFunctions(playSound: PlaySoundFn, guards: SoundGuard
   const playBlastBombSound = useCallback(() => { playSound('blastBomb', { volume: 0.7 }); haptics.tap(); }, [playSound]);
   const playBlastLightningSound = useCallback(() => { playSound('blastLightning', { volume: 0.7 }); haptics.tap(); }, [playSound]);
   const playBlastPrismSound = useCallback(() => { playSound('blastPrism', { volume: 0.7 }); haptics.tap(); }, [playSound]);
+  const playBlastHighlightStingerSound = useCallback(() => { playSound('blastHighlightStinger', { volume: 0.8, requiresGameActive: false }); }, [playSound]);
 
   // Matchmaking & multiplayer
   const playMatchFoundSound = useCallback(() => { playSound('matchFound', { volume: 0.8, requiresGameActive: false }); haptics.success(); }, [playSound]);
@@ -195,6 +196,7 @@ export function useSoundPlayFunctions(playSound: PlaySoundFn, guards: SoundGuard
     playBlastBombSound,
     playBlastLightningSound,
     playBlastPrismSound,
+    playBlastHighlightStingerSound,
     playMatchFoundSound,
     playStreakMilestoneSound,
     playTierPromotionSound,

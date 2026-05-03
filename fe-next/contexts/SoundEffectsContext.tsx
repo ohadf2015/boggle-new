@@ -522,7 +522,7 @@ const SOUND_EFFECTS_FALLBACK = {
   playLevelUpSound: NOOP, playLevelUpModalSound: NOOP, playPowerUpSound: NOOP,
   playBossHitSound: NOOP, playBossPhaseChangeSound: NOOP,
   playBossEntranceSound: NOOP, playBossDefeatSound: NOOP,
-  playBlastBombSound: NOOP, playBlastLightningSound: NOOP, playBlastPrismSound: NOOP,
+  playBlastBombSound: NOOP, playBlastLightningSound: NOOP, playBlastPrismSound: NOOP, playBlastHighlightStingerSound: NOOP,
   playMatchFoundSound: NOOP, playStreakMilestoneSound: NOOP, playTierPromotionSound: NOOP,
   playTileSelectSound: NOOP, playRoundStartSound: NOOP, playTimesUpSound: NOOP,
   playCoinCollectSound: NOOP, playButtonClickSound: NOOP, playChestOpenSound: NOOP,
