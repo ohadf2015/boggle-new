@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -16,7 +16,6 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-import { vi } from 'vitest';
 import PracticeStreakChip from '../PracticeStreakChip';
 import { recordPracticeSession, resetPracticeStreak } from '@/hooks/usePracticeStreak';
 
