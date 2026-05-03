@@ -36,6 +36,8 @@ interface GameEndDeps {
   objectives: { allObjectivesComplete: boolean };
   onGameEnd: (results: BlastResultsData) => void;
   onWaveComplete?: (score: number, words: string[], clearPct: number) => void;
+  /** Fires when board is cleared and highlight phase should start (SP only). */
+  onHighlightStart?: (finalScore: number) => void;
   /** Fires after Sugar Crush with every non-cleared tile, so the view can trigger a finale debris burst. */
   onDeadEndFinale?: (tiles: DeadEndFinaleTile[]) => void;
   /** When true, a dead-end state will NOT kick off the Sugar Crush finale — caller is showing a continue offer. */
@@ -46,6 +48,8 @@ interface GameEndDeps {
   };
   setExplosionShake: (intensity: number) => void;
   explosionShakeTimerRef: React.RefObject<ReturnType<typeof setTimeout> | null>;
+  /** Highlight recorder for Blast Highlight Reel. Records game-end event before transitioning to highlight phase. */
+  recorder?: import('@/lib/blast/highlightRecorder').HighlightRecorder;
 }
 
 /**
@@ -68,17 +72,26 @@ export function useBlastGameEnd(deps: GameEndDeps) {
   // IMPORTANT: Do NOT include `engine` in deps — Sugar Crush mutates tileStates which would
   // recreate the engine object, cancel the async loop via cleanup, and restart it infinitely.
   useEffect(() => {
-    const { onGameEnd, onWaveComplete, maxCombo, sounds, setExplosionShake, explosionShakeTimerRef } = depsRef.current;
+    const { onGameEnd, onWaveComplete, onHighlightStart, maxCombo, sounds, setExplosionShake, explosionShakeTimerRef, recorder } = depsRef.current;
 
     // Board cleared — all tiles gone (SP only)
     if (!isMultiplayer && engine.gameState.isComplete) {
       const { score, wordsFound, tilesCleared, totalTiles } = engine.gameState;
       const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
 
+      // Record game-end event in highlight recorder before transitioning to highlight phase
+      recorder?.recordEnd('cleared', score);
+
       // Full board clear always advances the wave — secondary objectives
       // (collect_type, word_length, score_target) affect stars, not progression.
       if (onWaveComplete) {
         const timer = setTimeout(() => onWaveComplete(score, wordsFound, clearPct), 2000);
+        return () => clearTimeout(timer);
+      }
+
+      // Route through highlight phase if a callback is provided; otherwise fall back to direct game-end
+      if (onHighlightStart) {
+        const timer = setTimeout(() => onHighlightStart(score), 2000);
         return () => clearTimeout(timer);
       }
 
@@ -93,6 +106,10 @@ export function useBlastGameEnd(deps: GameEndDeps) {
       if (sugarCrushRunningRef.current) return undefined;
       sugarCrushRunningRef.current = true;
       setSugarCrushActive(true);
+
+      // Record dead-end in highlight recorder (no highlight reel for losses)
+      const { recorder } = depsRef.current;
+      recorder?.recordEnd('deadEnd', engine.gameState.score);
 
       let cancelled = false;
 

@@ -56,6 +56,7 @@ interface BlastGameProps {
   cumulativeScore?: number;
   onWaveComplete?: (waveScore: number, waveWords: string[], clearPct: number) => void;
   onGameEnd: (results: BlastResultsData) => void;
+  onHighlightStart?: (finalScore: number) => void;
   onQuit: () => void;
   onComboDetected?: (combos: SpecialCombo[]) => void;
   pendingDiscovery?: BlastComboType | null;
@@ -83,6 +84,7 @@ export function BlastGame({
   cumulativeScore: _cumulativeScore = 0,
   onWaveComplete,
   onGameEnd,
+  onHighlightStart,
   onQuit,
   onComboDetected,
   pendingDiscovery,
@@ -501,10 +503,12 @@ export function BlastGame({
   const { sugarCrushActive } = useBlastGameEnd({
     engine, isMultiplayer, gridSize: config.gridSize,
     waveConfig, objectives, onGameEnd: handleGameEnd, onWaveComplete,
+    onHighlightStart,
     maxCombo: combo.maxCombo, sounds,
     setExplosionShake, explosionShakeTimerRef,
     onDeadEndFinale: handleDeadEndFinale,
     deferDeadEndFinale: continueModalOpen,
+    recorder: highlightRecorderRef.current,
   });
 
   // Loading state — wait for both grid generation AND dictionary cache

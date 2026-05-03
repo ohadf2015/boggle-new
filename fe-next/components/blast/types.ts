@@ -63,7 +63,7 @@ export const DEFAULT_BLAST_CONFIG: BlastGameConfig = {
   boardClearMode: 'shrink',
 };
 
-export type BlastPhase = 'ready' | 'waveIntro' | 'playing' | 'waveTransition' | 'results';
+export type BlastPhase = 'ready' | 'waveIntro' | 'playing' | 'waveTransition' | 'highlight' | 'results';
 
 export interface BlastGameState {
   score: number;

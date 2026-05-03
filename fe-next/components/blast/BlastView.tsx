@@ -12,10 +12,13 @@ import { BlastGame } from './BlastGame';
 import { BlastResultsSummary } from './BlastResultsSummary';
 import { BlastPregameBuffModal, type BlastPregameBuff } from './BlastPregameBuffModal';
 import { BlastRetryWaveModal } from './BlastRetryWaveModal';
+import { HighlightPlayer } from './highlight/HighlightPlayer';
 import { useBlastCheckpoint } from './hooks/useBlastCheckpoint';
 import { getWaveConfig, getWaveDistribution } from './utils/blastWaveConfig';
 import { calculateEarnedStars } from './utils/blastStarCalculator';
 import { resolveBlastConfig, type BlastPhase, type BlastResultsData, type WaveResult } from './types';
+import { useHighlightStore } from '@/stores/highlightStore';
+import { rankMoments } from '@/lib/blast/highlightScoring';
 import type { Language } from '@/shared/types/game';
 import { Button } from '@/components/ui/button';
 import { saveBlastResult } from './utils/saveBlastResult';
@@ -117,6 +120,11 @@ export function BlastView() {
     setPhase('waveTransition');
   }, [currentWave, checkpoint]);
 
+  /** Board cleared — route through highlight phase */
+  const handleHighlightStart = useCallback((_finalScore: number) => {
+    setPhase('highlight');
+  }, []);
+
   /** Game ended */
   const handleGameEnd = useCallback((resultsData: BlastResultsData) => {
     // Save the wave the player reached even on a fail — declining the retry
@@ -214,6 +222,13 @@ export function BlastView() {
     router.push(`/${language}/`);
   }, [router, language]);
 
+  /** Compute top-1 ranked moment for highlight phase playback */
+  const highlightMoments = useMemo(() => {
+    if (phase !== 'highlight') return [];
+    const events = useHighlightStore.getState().events;
+    return rankMoments(events).slice(0, 1);
+  }, [phase]);
+
   return (
     <div className="flex flex-col flex-1 min-h-0 h-full bg-neo-navy relative">
       {phase === 'ready' && (
@@ -300,6 +315,7 @@ export function BlastView() {
           initialBuff={pregameBuff}
           onWaveComplete={handleWaveComplete}
           onGameEnd={handleGameEnd}
+          onHighlightStart={handleHighlightStart}
           onQuit={handleQuit}
         />
       )}
@@ -362,6 +378,14 @@ export function BlastView() {
           </div>
         );
       })()}
+
+      {phase === 'highlight' && highlightMoments.length > 0 && results && (
+        <HighlightPlayer
+          moments={highlightMoments}
+          finalScore={totalScore + (results?.finalScore ?? 0)}
+          onComplete={() => setPhase('results')}
+        />
+      )}
 
       {phase === 'results' && results && (() => {
         // Retry-on-loss eligibility: failed (clearPct < 90), have an ad provider,
