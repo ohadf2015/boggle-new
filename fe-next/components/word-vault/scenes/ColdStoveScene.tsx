@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { EmberOverlay } from '@/components/word-vault/pixi/EmberOverlay';
 import { getGameStore } from '@/lib/word-vault/state/gameStore';
+import { useSequence } from '@/lib/word-vault/hooks/useSequence';
 
 /**
  * Room 1.4 — The Cold Stove
@@ -55,7 +56,6 @@ const SMOKE_LINES_BY_SHAPE: Record<SmokeShape, string> = {
 };
 
 export function ColdStoveScene({ onSolved, onExit, isRevisit = false }: Props) {
-  const [sequence, setSequence] = useState<ValveId[]>([]);
   const [showBrief, setShowBrief] = useState(true);
   const [done, setDone] = useState(false);
   const [smokeShape, setSmokeShape] = useState<SmokeShape | null>(null);
@@ -66,77 +66,81 @@ export function ColdStoveScene({ onSolved, onExit, isRevisit = false }: Props) {
   const [revealed, setRevealed] = useState<Set<ValveId>>(new Set());
   const [brassKeyShimmerId, setBrassKeyShimmerId] = useState(0);
 
-  // Brass-key perk: silently auto-snaps the FIRST valve, plus a one-shot golden shimmer
-  // on the gas valve so the player can SEE that the key did something.
+  // Read brass-key once at construction (singleton store is sync-readable client-side)
+  const initialSequence: ValveId[] =
+    typeof window !== 'undefined' && getGameStore().getState().permanentItems.includes('brass-key')
+      ? [CORRECT_ORDER[0]]
+      : [];
+
+  // useSequence owns: attempt order, dedupe, prefix-keep on wrong, red-herring routing
+  const seq = useSequence<ValveId>({
+    correctOrder: CORRECT_ORDER,
+    initialSequence,
+    redHerringId: BROKEN_VALVE,
+    onRedHerring: () => {
+      setRevealed((prev) => new Set(prev).add(BROKEN_VALVE));
+      setWhisper('"זמן לא אופים. אבל הזמן אופה אותנו."');
+      setTimeout(() => setWhisper(null), 2400);
+    },
+  });
+
+  const sequence = seq.sequence;
+
+  // Brass-key visual side-effects: reveal gas valve + golden shimmer
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const items = getGameStore().getState().permanentItems;
-    if (items.includes('brass-key')) {
-      setSequence([CORRECT_ORDER[0]]);
-      setRevealed((prev) => new Set(prev).add(CORRECT_ORDER[0]));
-      // Defer one paint frame so the shimmer overlays the freshly-revealed valve
-      setTimeout(() => setBrassKeyShimmerId(Date.now()), 200);
-    }
+    if (initialSequence.length === 0) return;
+    setRevealed((prev) => new Set(prev).add(CORRECT_ORDER[0]));
+    setTimeout(() => setBrassKeyShimmerId(Date.now()), 200);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot mount effect; initialSequence stable
   }, []);
 
   const handleTurn = useCallback(
     (id: ValveId) => {
       if (done) return;
-      // Time valve = broken; cryptic whisper only, never advances
-      if (id === BROKEN_VALVE) {
-        setRevealed((prev) => new Set(prev).add(id));
-        setWhisper('"זמן לא אופים. אבל הזמן אופה אותנו."');
-        setTimeout(() => setWhisper(null), 2400);
-        return;
-      }
+      const result = seq.tryStep(id);
 
-      // Re-tapping a valve already in the current attempt is a no-op
-      if (sequence.includes(id)) {
-        setWhisper('"כבר סובב."');
-        setTimeout(() => setWhisper(null), 1400);
-        return;
-      }
-
-      const next = [...sequence, id];
-      setSequence(next);
-      setRevealed((prev) => new Set(prev).add(id));
-
-      // Match against correct order
-      const isCorrectSoFar = next.every((v, i) => v === CORRECT_ORDER[i]);
-      if (!isCorrectSoFar) {
-        // Wrong: emit smoke shape, but KEEP correct prefix (graduated feedback)
-        const correctPrefix: ValveId[] = [];
-        for (let i = 0; i < next.length; i++) {
-          if (next[i] === CORRECT_ORDER[i]) correctPrefix.push(next[i]);
-          else break;
+      switch (result) {
+        case 'redherring':
+          // onRedHerring callback already fired the whisper
+          return;
+        case 'duplicate':
+          setWhisper('"כבר סובב."');
+          setTimeout(() => setWhisper(null), 1400);
+          return;
+        case 'wrong': {
+          // Hook keeps the wrong tail visible briefly then auto-rewinds to correct prefix.
+          // Layer in the smoke + whisper for game-feel.
+          setRevealed((prev) => new Set(prev).add(id));
+          const shapes: SmokeShape[] = ['heart', 'fish', 'star', 'cloud', 'cross'];
+          const shape = shapes[Math.floor(Math.random() * shapes.length)];
+          setSmokeShape(shape);
+          setSmokeKey((k) => k + 1);
+          setWhisper(SMOKE_LINES_BY_SHAPE[shape]);
+          setTimeout(() => {
+            setSmokeShape(null);
+            setWhisper(null);
+          }, 2400);
+          return;
         }
-        const shapes: SmokeShape[] = ['heart', 'fish', 'star', 'cloud', 'cross'];
-        const shape = shapes[Math.floor(Math.random() * shapes.length)];
-        setSmokeShape(shape);
-        setSmokeKey((k) => k + 1);
-        setWhisper(SMOKE_LINES_BY_SHAPE[shape]);
-        setTimeout(() => {
-          setSmokeShape(null);
-          setWhisper(null);
-          setSequence(correctPrefix);
-        }, 2400);
-        return;
-      }
-
-      if (next.length === CORRECT_ORDER.length) {
-        // SOLVED
-        setBurstId((b) => b + 1);
-        if (typeof window !== 'undefined') {
-          setBurst({
-            id: burstId + 1,
-            x: window.innerWidth / 2,
-            y: window.innerHeight * 0.55,
-          });
+        case 'correct':
+        case 'complete': {
+          setRevealed((prev) => new Set(prev).add(id));
+          if (result === 'complete') {
+            setBurstId((b) => b + 1);
+            if (typeof window !== 'undefined') {
+              setBurst({
+                id: burstId + 1,
+                x: window.innerWidth / 2,
+                y: window.innerHeight * 0.55,
+              });
+            }
+            setTimeout(() => setDone(true), 1200);
+          }
+          return;
         }
-        setTimeout(() => setDone(true), 1200);
       }
     },
-    [sequence, done, burstId],
+    [done, seq, burstId],
   );
 
   return (

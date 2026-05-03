@@ -88,15 +88,17 @@ export function OldKitchenScene({ onSolved, onExit }: Props) {
   };
 
   const handleFragmentTap = (fragmentId: FragmentId) => {
-    setComposedFragments((prev) => new Set(prev).add(fragmentId));
+    const nextComposed = new Set(composedFragments).add(fragmentId);
+    setComposedFragments(nextComposed);
     setRevealedFragments((prev) => {
       const updated = new Set(prev);
       updated.delete(fragmentId);
       return updated;
     });
 
-    // Trigger signature reveal if center fragment just composed
-    if (fragmentId === 'center' && !composedFragments.has('center')) {
+    // Round-4 fix: signature reveal fires on PUZZLE COMPLETION (any-order),
+    // not on center placement. Was: only triggered if center was composed last.
+    if (nextComposed.size === 5) {
       setTimeout(() => setShowSignature(true), 400);
     }
   };
@@ -255,8 +257,8 @@ export function OldKitchenScene({ onSolved, onExit }: Props) {
               </div>
             )}
 
-            {/* Signature reveal after center composed */}
-            {showSignature && composedFragments.has('center') && (
+            {/* Signature reveal after all 5 fragments composed (order-agnostic per round-4 fix) */}
+            {showSignature && (
               <div
                 className="text-center"
                 style={{

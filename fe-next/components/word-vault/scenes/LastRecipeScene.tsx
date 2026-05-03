@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { EmberOverlay } from '@/components/word-vault/pixi/EmberOverlay';
 import { getGameStore } from '@/lib/word-vault/state/gameStore';
+import { useCompose } from '@/lib/word-vault/hooks/useCompose';
 import type { ItemId } from '@/lib/word-vault/types';
 
 /**
@@ -63,7 +64,9 @@ type Phase = 'placing' | 'spelling' | 'transforming' | 'done';
 export function LastRecipeScene({ onSolved, onExit, isRevisit = false }: Props) {
   const [slotsFilled, setSlotsFilled] = useState<ItemId[]>([]);
   const [phase, setPhase] = useState<Phase>('placing');
-  const [sealLetters, setSealLetters] = useState<string[]>([]);
+  // useCompose owns the spelling-seal state (player spells אורי letter-by-letter)
+  const seal = useCompose<string>({ target: SEAL_TARGET });
+  const sealLetters = seal.composed;
   const [showBrief, setShowBrief] = useState(true);
   const [whisper, setWhisper] = useState<string | null>(null);
   const [shake, setShake] = useState(false);
@@ -130,21 +133,15 @@ export function LastRecipeScene({ onSolved, onExit, isRevisit = false }: Props) 
   const handleSealLetter = useCallback(
     (letter: string) => {
       if (phase !== 'spelling') return;
-
-      const nextIdx = sealLetters.length;
-      const expected = SEAL_TARGET[nextIdx];
-      if (letter !== expected) {
+      const result = seal.tryItem(letter);
+      if (result === 'wrong') {
         setShake(true);
         setTimeout(() => setShake(false), 400);
         setWhisper('לא האות הזאת.');
         setTimeout(() => setWhisper(null), 1600);
         return;
       }
-
-      const next = [...sealLetters, letter];
-      setSealLetters(next);
-
-      if (next.length === SEAL_TARGET.length) {
+      if (result === 'complete') {
         // Name fully spelled — trigger transformation. Canonical-order players get a richer flame
         // (delivered visually via the EmberOverlay density/tint ramp below — no VO line).
         setTimeout(() => {
@@ -156,7 +153,7 @@ export function LastRecipeScene({ onSolved, onExit, isRevisit = false }: Props) 
         }, 600);
       }
     },
-    [phase, sealLetters, onSolved],
+    [phase, seal, onSolved],
   );
 
   return (
@@ -362,7 +359,15 @@ export function LastRecipeScene({ onSolved, onExit, isRevisit = false }: Props) 
             </p>
             <button
               type="button"
-              onClick={() => setShowBrief(false)}
+              onClick={() => {
+                setShowBrief(false);
+                // Round-4 stitch: echo the brother's name once when ritual room opens.
+                // Bridges 1.5's "אורי" foreshadow to the 1.6 spelling-seal payoff.
+                setTimeout(() => {
+                  setWhisper('אחיך… אורי.');
+                  setTimeout(() => setWhisper(null), 2400);
+                }, 800);
+              }}
               className="mt-6 rounded-md border-4 border-orange-300 bg-orange-300 px-6 py-2 font-fredoka text-lg font-black text-[#1a0e08] shadow-[3px_3px_0_0_#000]"
             >
               להתחיל

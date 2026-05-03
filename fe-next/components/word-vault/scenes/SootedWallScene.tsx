@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { normalizeHebrewFinalForms } from '@/lib/word-vault/engine/wordConstraintEngine';
 import { getGameStore } from '@/lib/word-vault/state/gameStore';
+import { useReveal } from '@/lib/word-vault/hooks/useReveal';
 
 /**
  * Room 1.3 — The Sooted Wall
@@ -53,10 +54,9 @@ const BROOM_THRESHOLD = 0.25;    // broom holder gets a deep speedup on the thic
 const BROOM_TARGET_CARVING = 'honey'; // the thickest-soot carving — broom helps here
 const SECRET_PHRASE_HE = 'אין מתכון בלי האות שחסרה. לחם הוא קודם לכל מים.';
 
+const CARVING_IDS = CARVINGS.map((c) => c.id);
+
 export function SootedWallScene({ onSolved, onExit }: Props) {
-  const [revealed, setRevealed] = useState<Record<string, number>>(() =>
-    Object.fromEntries(CARVINGS.map((c) => [c.id, 0])),
-  );
   const [filled, setFilled] = useState<Record<string, string | null>>(() =>
     Object.fromEntries(CARVINGS.map((c) => [c.id, null])),
   );
@@ -69,20 +69,6 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
   const [hasBroom, setHasBroom] = useState(false);
   const [hasDefrost, setHasDefrost] = useState(false);
   const [broomSparkleId, setBroomSparkleId] = useState(0); // increments to remount sparkle overlay; 0 = never fired
-  const wipingRef = useRef<{ id: string | null; lastX: number; lastY: number } | null>(null);
-
-  // Item perks on mount: lantern auto-reveals 1 carving; broom = fast-wipe on thickest; defrost candle = uniform speedup
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const items = getGameStore().getState().permanentItems;
-    if (items.includes('broom')) setHasBroom(true);
-    if (items.includes('defrost-candle')) setHasDefrost(true);
-    if (items.includes('melo-lantern')) {
-      setRevealed((prev) => ({ ...prev, [CARVINGS[0].id]: 1 }));
-      setTimeout(() => setWhisper('הפנס מאיר חריץ אחד.'), 700);
-      setTimeout(() => setWhisper(null), 3200);
-    }
-  }, []);
 
   const thresholdFor = useCallback(
     (carvingId: string): number => {
@@ -92,6 +78,23 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
     },
     [hasBroom, hasDefrost],
   );
+
+  // useReveal owns: per-carving wipe progress, pointer handlers, threshold check
+  const reveal = useReveal({ targetIds: CARVING_IDS, thresholdFor });
+
+  // Item perks on mount: lantern auto-reveals 1 carving; broom = fast-wipe on thickest; defrost candle = uniform speedup
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const items = getGameStore().getState().permanentItems;
+    if (items.includes('broom')) setHasBroom(true);
+    if (items.includes('defrost-candle')) setHasDefrost(true);
+    if (items.includes('melo-lantern')) {
+      reveal.setProgress(CARVINGS[0].id, 1);
+      setTimeout(() => setWhisper('הפנס מאיר חריץ אחד.'), 700);
+      setTimeout(() => setWhisper(null), 3200);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot mount effect; reveal is stable
+  }, []);
 
   const allCorrect = useMemo(
     () => CARVINGS.every((c) => filled[c.id] === c.answer),
@@ -103,58 +106,21 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
     setTimeout(() => setDone(true), 600);
   }
 
-  const carvingsRevealed = CARVINGS.filter((c) => revealed[c.id] >= thresholdFor(c.id)).length;
+  const carvingsRevealed = CARVINGS.filter((c) => reveal.isRevealed(c.id)).length;
 
-  const handleWipe = useCallback(
-    (id: string, deltaPx: number) => {
-      if (filled[id] || done) return;
-      // First touch dismisses the gesture demo
-      if (showGestureDemo) setShowGestureDemo(false);
-      setRevealed((prev) => {
-        const next = Math.min(1, (prev[id] ?? 0) + deltaPx * 0.0035);
-        return { ...prev, [id]: next };
-      });
-    },
-    [filled, done, showGestureDemo],
-  );
-
-  const handlePanelPointerDown = useCallback(
-    (id: string, e: React.PointerEvent<HTMLDivElement>) => {
-      if (filled[id] || done) return;
-      e.preventDefault();
-      e.currentTarget.setPointerCapture(e.pointerId);
-      wipingRef.current = { id, lastX: e.clientX, lastY: e.clientY };
-    },
-    [filled, done],
-  );
-
-  const handlePanelPointerMove = useCallback(
-    (id: string, e: React.PointerEvent<HTMLDivElement>) => {
-      const w = wipingRef.current;
-      if (!w || w.id !== id) return;
-      const dx = e.clientX - w.lastX;
-      const dy = e.clientY - w.lastY;
-      const dist = Math.hypot(dx, dy);
-      handleWipe(id, dist);
-      w.lastX = e.clientX;
-      w.lastY = e.clientY;
-    },
-    [handleWipe],
-  );
-
-  const handlePanelPointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-      e.currentTarget.releasePointerCapture(e.pointerId);
+  // Dismiss the gesture demo as soon as ANY wipe progress is detected
+  useEffect(() => {
+    if (showGestureDemo && CARVING_IDS.some((id) => (reveal.revealed[id] ?? 0) > 0)) {
+      setShowGestureDemo(false);
     }
-    wipingRef.current = null;
-  }, []);
+  }, [reveal.revealed, showGestureDemo]);
 
   const handleSelectLetter = useCallback(
     (letter: string) => {
       if (!activeCarving || done) return;
       const c = CARVINGS.find((x) => x.id === activeCarving);
       if (!c) return;
-      if (revealed[c.id] < thresholdFor(c.id)) {
+      if (!reveal.isRevealed(c.id)) {
         setWhisper('עוד לא מספיק נקי. נגב עוד.');
         setTimeout(() => setWhisper(null), 1800);
         return;
@@ -169,7 +135,7 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
         setTimeout(() => setShake(null), 350);
       }
     },
-    [activeCarving, done, revealed, thresholdFor],
+    [activeCarving, done, reveal],
   );
 
   return (
@@ -232,21 +198,24 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
 
       {/* Wall carvings */}
       <div className="relative z-10 mt-6 mx-auto flex w-full max-w-3xl items-center justify-center" style={{ height: '60vh' }}>
-        {CARVINGS.map((c, idx) => (
+        {CARVINGS.map((c, idx) => {
+          const handlers = reveal.handlersFor(c.id);
+          const locked = !!filled[c.id] || done;
+          return (
           <CarvingPanel
             key={c.id}
             carving={c}
-            revealAmount={revealed[c.id] ?? 0}
+            revealAmount={reveal.revealed[c.id] ?? 0}
             threshold={thresholdFor(c.id)}
             filledLetter={filled[c.id]}
             isActive={activeCarving === c.id}
             isShaking={shake === c.id}
             showGestureDemo={showGestureDemo && idx === 0 && !showBrief}
-            onPointerDown={(e) => handlePanelPointerDown(c.id, e)}
-            onPointerMove={(e) => handlePanelPointerMove(c.id, e)}
-            onPointerUp={handlePanelPointerUp}
+            onPointerDown={locked ? () => undefined : handlers.onPointerDown}
+            onPointerMove={locked ? () => undefined : handlers.onPointerMove}
+            onPointerUp={handlers.onPointerUp}
             onTap={() => {
-              if (!filled[c.id] && revealed[c.id] >= thresholdFor(c.id)) {
+              if (!filled[c.id] && reveal.isRevealed(c.id)) {
                 setActiveCarving(c.id);
                 // Broom legibility: visual-only sparkle burst on the honey carving the first time
                 // a broom-holder activates it. No whisper — let the player notice their tool worked.
@@ -263,7 +232,8 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
               }
             }}
           />
-        ))}
+          );
+        })}
 
         {/* Broom sparkle burst — visual-only feedback, fires once per playthrough on honey-carving activation */}
         {broomSparkleId > 0 && (() => {
