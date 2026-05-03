@@ -25,7 +25,10 @@ export function classifySubmit(
     if (!gateAccepts(cfg.semanticGate.class, word)) {
       return { kind: 'invalid', reason: 'wrong-class' };
     }
-    const rarity = gateBonusFor(cfg.semanticGate.class, word) as 1 | 2;
+    const rawRarity = gateBonusFor(cfg.semanticGate.class, word);
+    // gateAccepts guarantees rawRarity > 0; defensively re-classify if invariant breaks.
+    if (rawRarity === 0) return { kind: 'invalid', reason: 'wrong-class' };
+    const rarity: 1 | 2 = rawRarity;
     const base = cfg.bonusBucket?.baseCoinsPerWord ?? 1;
     return { kind: 'bonus-hit', word, rarity, coins: base * rarity };
   }

@@ -54,4 +54,11 @@ describe('classifySubmit', () => {
     expect(r.kind).toBe('invalid');
     if (r.kind === 'invalid') expect(r.reason).toBe('used');
   });
+
+  it('returns invalid not-word when no gate set and word not target', () => {
+    const cfg: VaultGridConfig = { ...baseCfg, semanticGate: undefined };
+    const r = classifySubmit('בית', cfg, new Set());
+    expect(r.kind).toBe('invalid');
+    if (r.kind === 'invalid') expect(r.reason).toBe('not-word');
+  });
 });
