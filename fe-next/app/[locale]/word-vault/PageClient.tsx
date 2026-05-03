@@ -17,7 +17,8 @@ interface PageClientProps {
 type Screen =
   | { kind: 'story'; roomId: string }
   | { kind: 'hub' }
-  | { kind: 'transition'; nextRoomId: string | null };
+  | { kind: 'transition'; nextRoomId: string | null }
+  | { kind: 'book-end' };
 
 const ROOM_ORDER = BOOK_1_HEARTH_ROOMS.map((r) => r.id);
 
@@ -113,13 +114,22 @@ function SceneRouter({
     return <SceneTransition nextRoomId={screen.nextRoomId} setScreen={setScreen} />;
   }
 
+  if (screen.kind === 'book-end') {
+    return <BookEndCinematic onContinue={() => setScreen({ kind: 'hub' })} />;
+  }
+
   return (
     <SceneFrame>
       <RoomShell
         store={store}
         roomId={screen.roomId}
         onExit={() => {
-          // After solving (or backing out): smooth transition to next room (or hub if last)
+          // After solving the LAST room: book-end cinematic
+          if (screen.roomId === ROOM_ORDER[ROOM_ORDER.length - 1]) {
+            setScreen({ kind: 'book-end' });
+            return;
+          }
+          // Otherwise: smooth transition to next room
           const next = getNextRoomId(screen.roomId);
           setScreen({ kind: 'transition', nextRoomId: next });
         }}
@@ -201,5 +211,133 @@ function PauseMenuButton({ onPause }: { onPause: () => void }) {
     >
       ☰
     </button>
+  );
+}
+
+function BookEndCinematic({ onContinue }: { onContinue: () => void }) {
+  return (
+    <div
+      className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden px-6 text-center"
+      style={{
+        background:
+          'radial-gradient(ellipse at 50% 40%, rgba(255,210,140,0.4) 0%, rgba(20,12,8,0.98) 70%), #0a0604',
+      }}
+      dir="rtl"
+    >
+      {/* Floating embers */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        {Array.from({ length: 24 }).map((_, i) => (
+          <span
+            key={i}
+            className="absolute"
+            style={{
+              left: `${(i * 7.7) % 100}%`,
+              bottom: 0,
+              width: 3 + (i % 3),
+              height: 3 + (i % 3),
+              background: i % 4 === 0 ? '#fff5d8' : '#ffaa44',
+              borderRadius: '50%',
+              boxShadow: '0 0 10px rgba(255,180,80,0.85)',
+              animation: `wv-bookEmber ${10 + (i % 7)}s ${(i * 0.5) % 8}s linear infinite`,
+              opacity: 0,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Title */}
+      <p
+        className="font-fredoka text-xs uppercase tracking-[0.5em] text-amber-200/55"
+        style={{ animation: 'wv-fadeUp 1.2s ease-out 0s both' }}
+      >
+        ספר 1 — אולמות האח
+      </p>
+      <h1
+        className="mt-3 font-fredoka text-5xl font-black text-amber-200 sm:text-6xl"
+        style={{
+          textShadow: '3px 3px 0 #000, 0 0 40px rgba(255,180,80,0.85)',
+          animation: 'wv-fadeUp 1.4s ease-out 0.4s both',
+        }}
+      >
+        קאל חזר.
+      </h1>
+
+      {/* Cael portrait */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/word-vault/characters/cael.png"
+        alt="קאל"
+        className="mt-6 h-56 w-56 object-contain sm:h-72 sm:w-72"
+        style={{
+          filter: 'drop-shadow(0 0 60px rgba(255,225,170,0.95))',
+          animation: 'wv-fadeUp 1.6s ease-out 0.8s both, wv-caelGlow 4s ease-in-out 2s infinite',
+        }}
+      />
+
+      {/* Story closure */}
+      <p
+        className="mt-6 max-w-md font-rubik text-base leading-relaxed text-white/90 sm:text-lg"
+        style={{ animation: 'wv-fadeUp 1.8s ease-out 1.4s both' }}
+      >
+        הלבה התקררה. הסדקים נסגרו. רגע אחד הוא חזר —
+        <br />
+        חיבק את מלו, לחש "תודה", ונעלם.
+        <br />
+        השאיר אחריו: ספר מתכונים, קמע סינדר, ושיר אותיות אחד.
+      </p>
+
+      {/* Loot earned */}
+      <div
+        className="mt-6 flex flex-wrap items-center justify-center gap-3"
+        style={{ animation: 'wv-fadeUp 2s ease-out 2s both' }}
+      >
+        <BookEndChip emoji="📖" label="ספר המתכונים" />
+        <BookEndChip emoji="🔥" label="קמע סינדר" />
+        <BookEndChip emoji="🎵" label="שיר אותיות 1/4" />
+      </div>
+
+      <p
+        className="mt-6 max-w-md font-fredoka text-sm uppercase tracking-[0.3em] text-amber-200/55"
+        style={{ animation: 'wv-fadeUp 2.4s ease-out 2.8s both' }}
+      >
+        עוד שלושה בני דודים. עוד שלוש אחיות. ספר 2 בקרוב.
+      </p>
+
+      {/* Continue button */}
+      <button
+        type="button"
+        onClick={onContinue}
+        className="mt-8 rounded-md border-4 border-amber-300 bg-amber-200 px-10 py-3 font-fredoka text-xl font-black text-[#1a0e08] shadow-[4px_4px_0_0_#000] transition active:translate-y-[2px] active:shadow-[2px_2px_0_0_#000]"
+        style={{ animation: 'wv-fadeUp 2.6s ease-out 3.4s both' }}
+      >
+        חזרה למרתף &nbsp;→
+      </button>
+
+      <style jsx global>{`
+        @keyframes wv-fadeUp {
+          0% { opacity: 0; transform: translateY(20px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes wv-bookEmber {
+          0% { opacity: 0; transform: translate(0, 0) scale(1); }
+          10% { opacity: 0.95; }
+          90% { opacity: 0.6; }
+          100% { opacity: 0; transform: translate(60px, -120vh) scale(0.4); }
+        }
+        @keyframes wv-caelGlow {
+          0%,100% { filter: drop-shadow(0 0 50px rgba(255,225,170,0.85)); }
+          50% { filter: drop-shadow(0 0 90px rgba(255,235,180,1)); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function BookEndChip({ emoji, label }: { emoji: string; label: string }) {
+  return (
+    <span className="flex items-center gap-2 rounded-md border-4 border-amber-300 bg-[#1a0e08]/90 px-4 py-2 font-fredoka text-base font-black text-amber-200 shadow-[3px_3px_0_0_#000]">
+      <span className="text-2xl">{emoji}</span>
+      <span>{label}</span>
+    </span>
   );
 }
