@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { rankMoments, EPICNESS_WEIGHTS } from '../highlightScoring';
+import { rankMoments } from '../highlightScoring';
 import type { HighlightEvent, WordSubmitEvent } from '../highlightTypes';
 
 function wordEvent(over: Partial<WordSubmitEvent>): WordSubmitEvent {
