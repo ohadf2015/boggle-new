@@ -41,7 +41,7 @@ export default function DevVaultGridPage() {
       <section>
         <h2 className="text-lg mb-2">log</h2>
         <pre className="text-xs bg-stone-900 p-2 rounded overflow-auto">
-          {log.map((r, i) => JSON.stringify(r) + '\n').join('')}
+          {log.map((r) => JSON.stringify(r) + '\n').join('')}
         </pre>
       </section>
     </div>
