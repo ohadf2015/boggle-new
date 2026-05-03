@@ -117,6 +117,15 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     addForAllLocales(routes, `/brain/drills/${drill}`, { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
   });
 
+  // ─── Practice / tutorial ───
+  // Beginner-friendly stress-free mode. Hub + per-mode tutorials. Strong long-tail
+  // ("how to play boggle", "word game tutorial") + AI-crawler discovery via llms.txt.
+  addForAllLocales(routes, '/practice', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.7 });
+  const practiceModes = ['classic', 'wordHunt', 'wheelRush'];
+  practiceModes.forEach((mode) => {
+    addForAllLocales(routes, `/practice/${mode}`, { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.65 });
+  });
+
   // ─── Tools ───
   addForAllLocales(routes, '/tools', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
   addForAllLocales(routes, '/tools/word-solver', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
