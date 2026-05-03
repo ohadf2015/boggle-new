@@ -4996,6 +4996,10 @@ const en = {
       "classic": "Next: Classic practice",
       "wordHunt": "Next: Word Hunt practice",
       "wheelRush": "Next: Wheel Rush practice"
+    },
+    "coach": {
+      "label": "Tip",
+      "dismiss": "Got it"
     }
   },
   "wizard": {

@@ -15,6 +15,7 @@ import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
 import dynamic from 'next/dynamic';
+import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 
 const WordWheelPixiRing = dynamic(() => import('./WordWheelPixiRing'), { ssr: false });
 
@@ -581,6 +582,13 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`,
       )}
     >
+      {/* Practice-mode coach — auto-hides on first found word. */}
+      {practice && (
+        <div className="w-full pb-2">
+          <PracticeCoachTip mode="wheelRush" wordsFound={wordsFound.length} />
+        </div>
+      )}
+
       {/* ── Timer & Score Bar ── */}
       <div className="w-full space-y-1.5">
         <div className="flex items-center justify-between w-full gap-2">

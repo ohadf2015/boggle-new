@@ -4901,6 +4901,10 @@ const he = {
       "classic": "הבא: אימון קלאסי",
       "wordHunt": "הבא: ציד מילים",
       "wheelRush": "הבא: גלגל המילים"
+    },
+    "coach": {
+      "label": "טיפ",
+      "dismiss": "הבנתי"
     }
   },
   "wizard": {

@@ -20,6 +20,7 @@ import type { SinglePlayerGameState, SinglePlayerResultsData } from './SinglePla
 import type { LetterGrid } from '@/shared/types/game';
 import { ScorePopupFly } from '@/components/animations/ScorePopupFly';
 import PracticeContinuePrompt from './PracticeContinuePrompt';
+import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 
 const PRACTICE_CONTINUE_THRESHOLD = 100;
@@ -332,6 +333,13 @@ function SinglePlayerGame({
     />
   ) : null;
 
+  // In-game coaching strip for practice mode — auto-hides after first word found.
+  const practiceCoachElement = settings.mode === 'practice' ? (
+    <div className="absolute top-2 inset-x-0 z-30 px-3 pointer-events-auto">
+      <PracticeCoachTip mode="classic" wordsFound={core.foundWords.length} />
+    </div>
+  ) : null;
+
   // Landscape layout
   if (core.isLandscape) {
     return (
@@ -339,6 +347,7 @@ function SinglePlayerGame({
         {encouragementBanner}
         {scorePopupElement}
         {practicePromptElement}
+        {practiceCoachElement}
         <LandscapeGameLayout
           {...commonProps}
           progressBarExpanded={core.progressBarExpanded}
@@ -357,6 +366,7 @@ function SinglePlayerGame({
         {encouragementBanner}
         {scorePopupElement}
         {practicePromptElement}
+        {practiceCoachElement}
         <DesktopGameLayout
           {...commonProps}
           targetHighScore={core.targetHighScore}

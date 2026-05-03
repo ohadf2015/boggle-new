@@ -4875,6 +4875,10 @@ const ja = {
       "classic": "次へ: クラシック練習",
       "wordHunt": "次へ: ワードハント練習",
       "wheelRush": "次へ: ホイールラッシュ練習"
+    },
+    "coach": {
+      "label": "ヒント",
+      "dismiss": "わかった"
     }
   },
   "wizard": {

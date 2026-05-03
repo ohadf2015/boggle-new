@@ -4920,6 +4920,10 @@ const es = {
       "classic": "Siguiente: Práctica clásica",
       "wordHunt": "Siguiente: Práctica Word Hunt",
       "wheelRush": "Siguiente: Práctica Wheel Rush"
+    },
+    "coach": {
+      "label": "Consejo",
+      "dismiss": "Entendido"
     }
   },
   "wizard": {

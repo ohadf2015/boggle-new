@@ -39,6 +39,7 @@ import {
 } from './survival';
 import { SurvivalDesktopLayout } from './survival/SurvivalDesktopLayout';
 import { SurvivalExtraLifeModal } from './survival/SurvivalExtraLifeModal';
+import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 
 const EXTRA_LIFE_RESTORE_AMOUNT = 50;
 const EXTRA_LIFE_COIN_COST = 50;
@@ -378,6 +379,11 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       <div ref={containerRef} className="relative w-full h-full">
         {pixiOverlay}
         <ScreenFlashOverlay trigger={flashTrigger} colorClass={flashColor} />
+        {practice && (
+          <div className="absolute top-2 inset-x-0 z-30 px-3 pointer-events-auto">
+            <PracticeCoachTip mode="wordHunt" wordsFound={state.discoveredWords.length} />
+          </div>
+        )}
         {/* react-rewards anchor — must exist in DOM for reward confetti to target */}
         <span id={rewardId} className="fixed top-1/2 left-1/2 pointer-events-none" />
         <SurvivalDesktopLayout
@@ -473,6 +479,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {pixiOverlay}
       {/* Subtle screen flash on word discovery */}
       <ScreenFlashOverlay trigger={flashTrigger} colorClass={flashColor} />
+
+      {/* Practice-mode coaching strip — auto-hides on first discovery. */}
+      {practice && (
+        <div className="px-1 pt-1 pb-2">
+          <PracticeCoachTip mode="wordHunt" wordsFound={state.discoveredWords.length} />
+        </div>
+      )}
 
       {/* Top bar */}
       <SurvivalHeader

@@ -4890,6 +4890,10 @@ const sv = {
       "classic": "Nästa: Klassisk övning",
       "wordHunt": "Nästa: Word Hunt-övning",
       "wheelRush": "Nästa: Wheel Rush-övning"
+    },
+    "coach": {
+      "label": "Tips",
+      "dismiss": "Uppfattat"
     }
   },
   "wizard": {
