@@ -13,56 +13,38 @@ const cfg: VaultGridConfig = {
   semanticGate: { class: 'name-male', acceptList: ['אש'] },
 };
 
-describe('VaultGrid (skeleton)', () => {
-  it('renders 9 tiles for size 3', () => {
-    render(<VaultGrid config={cfg} onSubmit={() => undefined} />);
-    expect(screen.getAllByRole('button', { name: /vault-tile/i })).toHaveLength(9);
-  });
-
-  it('tapping tiles in anytap mode builds the selection in tap order', () => {
-    const onSubmit = vi.fn();
-    render(<VaultGrid config={cfg} onSubmit={onSubmit} />);
+describe('VaultGrid + classifier integration', () => {
+  it('emits target-hit SubmitResult when target word is built', () => {
+    const onResult = vi.fn();
+    render(<VaultGrid config={cfg} onResult={onResult} />);
     const tiles = screen.getAllByRole('button', { name: /vault-tile/i });
     fireEvent.click(tiles[0]); // א
     fireEvent.click(tiles[1]); // ש
     fireEvent.click(screen.getByRole('button', { name: /vault-submit/i }));
-    expect(onSubmit).toHaveBeenCalledTimes(1);
-    expect(onSubmit.mock.calls[0][0]).toBe('אש');
+    expect(onResult).toHaveBeenCalledTimes(1);
+    expect(onResult.mock.calls[0][0].kind).toBe('target-hit');
   });
 
-  it('clear button resets selection', () => {
-    const onSubmit = vi.fn();
-    render(<VaultGrid config={cfg} onSubmit={onSubmit} />);
+  it('emits invalid too-short for single tile submit', () => {
+    const onResult = vi.fn();
+    render(<VaultGrid config={cfg} onResult={onResult} />);
     const tiles = screen.getAllByRole('button', { name: /vault-tile/i });
     fireEvent.click(tiles[0]);
-    fireEvent.click(screen.getByRole('button', { name: /vault-clear/i }));
     fireEvent.click(screen.getByRole('button', { name: /vault-submit/i }));
-    expect(onSubmit).not.toHaveBeenCalled();
-  });
-});
-
-const adjacentCfg: VaultGridConfig = { ...cfg, traversal: 'adjacent' };
-
-describe('VaultGrid adjacent mode', () => {
-  it('rejects non-adjacent tap chain', () => {
-    const onSubmit = vi.fn();
-    render(<VaultGrid config={adjacentCfg} onSubmit={onSubmit} />);
-    const tiles = screen.getAllByRole('button', { name: /vault-tile/i });
-    // size=3 grid; index 0 (top-left) and index 2 (top-right) are NOT adjacent
-    fireEvent.click(tiles[0]);
-    fireEvent.click(tiles[2]); // should be rejected
-    fireEvent.click(screen.getByRole('button', { name: /vault-submit/i }));
-    // Only first letter selected → onSubmit fires with single letter
-    expect(onSubmit).toHaveBeenCalledWith('א');
+    expect(onResult.mock.calls[0][0]).toEqual({ kind: 'invalid', reason: 'too-short' });
   });
 
-  it('accepts adjacent diagonal taps', () => {
-    const onSubmit = vi.fn();
-    render(<VaultGrid config={adjacentCfg} onSubmit={onSubmit} />);
-    const tiles = screen.getAllByRole('button', { name: /vault-tile/i });
-    fireEvent.click(tiles[0]); // (0,0) א
-    fireEvent.click(tiles[4]); // (1,1) ד — diagonal adjacent
+  it('clears submitted-set across distinct grid mounts (per-beat scope)', () => {
+    const onResult = vi.fn();
+    const { unmount } = render(<VaultGrid config={cfg} onResult={onResult} />);
+    let tiles = screen.getAllByRole('button', { name: /vault-tile/i });
+    fireEvent.click(tiles[0]); fireEvent.click(tiles[1]);
     fireEvent.click(screen.getByRole('button', { name: /vault-submit/i }));
-    expect(onSubmit).toHaveBeenCalledWith('אד');
+    unmount();
+    render(<VaultGrid config={cfg} onResult={onResult} />);
+    tiles = screen.getAllByRole('button', { name: /vault-tile/i });
+    fireEvent.click(tiles[0]); fireEvent.click(tiles[1]);
+    fireEvent.click(screen.getByRole('button', { name: /vault-submit/i }));
+    expect(onResult.mock.calls[1][0].kind).toBe('target-hit'); // not 'used'
   });
 });

@@ -1,13 +1,14 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { generateLetters } from '@/lib/word-vault/grid/letterSource';
-import { applyFrozen } from '@/lib/word-vault/grid/modifiers/frozen';
-import type { TileState, VaultGridConfig } from '@/lib/word-vault/grid/types';
+import { applyFrozen, thawOnTargetHit } from '@/lib/word-vault/grid/modifiers/frozen';
+import { classifySubmit } from '@/lib/word-vault/grid/submit';
+import type { TileState, VaultGridConfig, SubmitResult } from '@/lib/word-vault/grid/types';
 import { GridTile } from './GridTile';
 
 type Props = {
   config: VaultGridConfig;
-  onSubmit: (word: string) => void;
+  onResult: (result: SubmitResult) => void;
 };
 
 const isAdjacent = (a: number, b: number, size: number): boolean => {
@@ -16,7 +17,7 @@ const isAdjacent = (a: number, b: number, size: number): boolean => {
   return Math.abs(ra - rb) <= 1 && Math.abs(ca - cb) <= 1 && (a !== b);
 };
 
-export function VaultGrid({ config, onSubmit }: Props) {
+export function VaultGrid({ config, onResult }: Props) {
   const initialTiles: TileState[] = useMemo(() => {
     const letters = generateLetters(config);
     let tiles: TileState[] = letters.map((letter, index) => ({
@@ -30,6 +31,7 @@ export function VaultGrid({ config, onSubmit }: Props) {
 
   const [tiles, setTiles] = useState<TileState[]>(initialTiles);
   const [selected, setSelected] = useState<number[]>([]);
+  const [submitted, setSubmitted] = useState<Set<string>>(new Set());
 
   const handleTap = (index: number) => {
     if (tiles[index].frozen) return;
@@ -52,7 +54,14 @@ export function VaultGrid({ config, onSubmit }: Props) {
   const submit = () => {
     if (selected.length === 0) return;
     const word = selected.map((i) => tiles[i].letter).join('');
-    onSubmit(word);
+    const result = classifySubmit(word, config, submitted);
+    if (result.kind !== 'invalid' || result.reason !== 'too-short') {
+      setSubmitted((s) => new Set(s).add(word));
+    }
+    if (result.kind === 'target-hit') {
+      setTiles((t) => thawOnTargetHit(t));
+    }
+    onResult(result);
     clear();
   };
 
