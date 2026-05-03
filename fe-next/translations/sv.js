@@ -4933,7 +4933,17 @@ const sv = {
       "targetLabel": "Målord",
       "submit": "Gissa",
       "backspace": "Ångra",
-      "solved": "Löst! Bra jobbat."
+      "solved": "Löst! Bra jobbat.",
+      "huntGreet": "Jaga det gömda ordet!",
+      "huntInstruction": "Ett {length}-bokstavers ord gömmer sig på brädet. Svep ett {length}-bokstavers ord för ledtrådar.",
+      "triesLeft": "försök",
+      "feedbackCorrect": "rätt plats",
+      "feedbackWrongPlace": "fel plats",
+      "feedbackNotInWord": "inte i ordet",
+      "matchLength": "Skicka för att använda ett försök!",
+      "boardEmpty": "Hittade inget mål — skapar nytt bräde...",
+      "discoveries": "Bonusord",
+      "giveUp": "Avslöja målet"
     },
     "complete": {
       "title": "Läget klart!",
@@ -4971,7 +4981,23 @@ const sv = {
     "huntSlot": "{length} bokstäver",
     "wheelGreet": "Använd lime-bokstaven!",
     "wheelShuffle": "Blanda",
-    "wheelClear": "Rensa"
+    "wheelClear": "Rensa",
+    "playAgain": "Spela detta läge igen",
+    "tryAnother": "Prova ett annat läge",
+    "complete": {
+      "title": "Du klarade det!",
+      "subtitleClassic": "Du är en riktig ordtrollkarl.",
+      "subtitleWordHunt": "Skarpa ögon! Du hittade alla gömda ord.",
+      "subtitleWheelRush": "Smidiga drag på hjulet.",
+      "praise1": "Otroligt!",
+      "praise2": "Ordlegend!",
+      "praise3": "Ren genialitet!",
+      "praise4": "Du får det att se lätt ut.",
+      "statsWords": "Ord",
+      "statsLongest": "Längsta",
+      "statsLetters": "Bokstäver",
+      "noLongest": "—"
+    }
   },
   "practiceWelcome": {
     "greet": "Välkommen till Övning!",
@@ -10203,12 +10229,15 @@ const sv = {
     "subtitle": "En lugn plats att lära sig varje läge",
     "greet": "Välj ett läge och spela!",
     "progress": "{done} av {total} lägen klara",
+    "progressLabel": "Din framsteg",
+    "stepCount": "{done}/{total}",
     "completedBadge": "Klart",
     "completedDesc": "Tryck för att spela igen",
     "navAria": "Övningslägen",
     "backToHub": "← Hubb",
     "playLabel": "Spela",
     "playAgainLabel": "Spela igen",
+    "skipLabel": "Hoppa över övning — ta mig hem",
     "allCompleteTitle": "All övning klar!",
     "allCompleteBody": "Du är redo för de riktiga lägena."
   },

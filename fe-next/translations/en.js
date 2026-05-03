@@ -5039,7 +5039,17 @@ const en = {
       "targetLabel": "Target word",
       "submit": "Guess",
       "backspace": "Undo",
-      "solved": "Solved! Great job."
+      "solved": "Solved! Great job.",
+      "huntGreet": "Hunt the hidden word!",
+      "huntInstruction": "A {length}-letter word is hiding on the board. Swipe any {length}-letter word to get clues.",
+      "triesLeft": "tries",
+      "feedbackCorrect": "right spot",
+      "feedbackWrongPlace": "wrong spot",
+      "feedbackNotInWord": "not in word",
+      "matchLength": "Submit to use a try!",
+      "boardEmpty": "Couldn't find a target on this board — generating a fresh one...",
+      "discoveries": "Bonus words found",
+      "giveUp": "Reveal target"
     },
     "complete": {
       "title": "Mode complete!",
@@ -5066,6 +5076,8 @@ const en = {
     "instructionWordHunt": "Find {goal} hidden words.",
     "done": "Nice — you got them all!",
     "continue": "Back to practice",
+    "playAgain": "Play this mode again",
+    "tryAnother": "Try another mode",
     "newBoard": "New board",
     "progress": "{found} of {goal} words",
     "greet": "Drag across letters!",
@@ -5077,7 +5089,21 @@ const en = {
     "huntSlot": "{length} letters",
     "wheelGreet": "Use the lime letter!",
     "wheelShuffle": "Shuffle",
-    "wheelClear": "Clear"
+    "wheelClear": "Clear",
+    "complete": {
+      "title": "You did it!",
+      "subtitleClassic": "You're a real word wizard.",
+      "subtitleWordHunt": "Sharp eyes! You spotted every hidden word.",
+      "subtitleWheelRush": "Smooth moves on that wheel.",
+      "praise1": "Incredible!",
+      "praise2": "Word legend!",
+      "praise3": "Smooth brain energy!",
+      "praise4": "You make it look easy.",
+      "statsWords": "Words",
+      "statsLongest": "Longest",
+      "statsLetters": "Letters",
+      "noLongest": "—"
+    }
   },
   "practiceWelcome": {
     "greet": "Welcome to Practice!",
@@ -10392,12 +10418,15 @@ const en = {
     "subtitle": "A quiet place to learn each mode",
     "greet": "Pick a mode and play!",
     "progress": "{done} of {total} modes complete",
+    "progressLabel": "Your progress",
+    "stepCount": "{done}/{total}",
     "completedBadge": "Completed",
     "completedDesc": "Tap to play again",
     "navAria": "Practice modes",
     "backToHub": "← Hub",
     "playLabel": "Play",
     "playAgainLabel": "Play again",
+    "skipLabel": "Skip practice — take me home",
     "allCompleteTitle": "All practice complete!",
     "allCompleteBody": "You're ready for the real modes."
   },

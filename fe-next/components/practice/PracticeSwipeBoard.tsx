@@ -14,6 +14,7 @@ import { generateRandomTable } from '@/utils/utils';
 import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { fireOnboardingBurst, fireVictoryConfetti } from '@/utils/confettiUtils';
 import { markPracticeMode } from '@/lib/practice/practiceProgress';
+import PracticeCompleteCard from './PracticeCompleteCard';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 import type { LetterGrid } from '@/types';
 
@@ -332,13 +333,14 @@ export default function PracticeSwipeBoard({ mode, rows, cols, goal }: Props) {
       )}
 
       {isComplete ? (
-        <Link
-          href={`/${language}/practice`}
-          data-testid="practice-continue-cta"
-          className="mt-2 inline-flex items-center justify-center w-full max-w-md bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed"
-        >
-          {t('practiceSwipe.continue')}
-        </Link>
+        <div className="mt-2 w-full flex justify-center">
+          <PracticeCompleteCard
+            mode={mode}
+            words={validWords}
+            locale={language}
+            onPlayAgain={handleNewBoard}
+          />
+        </div>
       ) : (
         <button
           type="button"

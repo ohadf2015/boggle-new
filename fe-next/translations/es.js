@@ -4963,7 +4963,17 @@ const es = {
       "targetLabel": "Palabra objetivo",
       "submit": "Adivinar",
       "backspace": "Deshacer",
-      "solved": "¡Resuelto! Buen trabajo."
+      "solved": "¡Resuelto! Buen trabajo.",
+      "huntGreet": "¡Caza la palabra oculta!",
+      "huntInstruction": "Una palabra de {length} letras se esconde en el tablero. Desliza cualquier palabra de {length} letras para obtener pistas.",
+      "triesLeft": "intentos",
+      "feedbackCorrect": "lugar correcto",
+      "feedbackWrongPlace": "lugar equivocado",
+      "feedbackNotInWord": "no en la palabra",
+      "matchLength": "¡Envía para usar un intento!",
+      "boardEmpty": "No se encontró objetivo — generando nuevo tablero...",
+      "discoveries": "Palabras extra",
+      "giveUp": "Revelar objetivo"
     },
     "complete": {
       "title": "¡Modo completado!",
@@ -5001,7 +5011,23 @@ const es = {
     "huntSlot": "{length} letras",
     "wheelGreet": "¡Usa la letra lima!",
     "wheelShuffle": "Mezclar",
-    "wheelClear": "Limpiar"
+    "wheelClear": "Limpiar",
+    "playAgain": "Jugar este modo de nuevo",
+    "tryAnother": "Probar otro modo",
+    "complete": {
+      "title": "¡Lo lograste!",
+      "subtitleClassic": "Eres un verdadero mago de las palabras.",
+      "subtitleWordHunt": "¡Ojos agudos! Encontraste cada palabra oculta.",
+      "subtitleWheelRush": "Movimientos suaves en la rueda.",
+      "praise1": "¡Increíble!",
+      "praise2": "¡Leyenda de las palabras!",
+      "praise3": "¡Pura genialidad!",
+      "praise4": "Lo haces ver fácil.",
+      "statsWords": "Palabras",
+      "statsLongest": "Más larga",
+      "statsLetters": "Letras",
+      "noLongest": "—"
+    }
   },
   "practiceWelcome": {
     "greet": "¡Bienvenido a Práctica!",
@@ -10025,12 +10051,15 @@ const es = {
     "subtitle": "Un lugar tranquilo para aprender cada modo",
     "greet": "¡Elige un modo y juega!",
     "progress": "{done} de {total} modos completos",
+    "progressLabel": "Tu progreso",
+    "stepCount": "{done}/{total}",
     "completedBadge": "Completado",
     "completedDesc": "Toca para jugar de nuevo",
     "navAria": "Modos de práctica",
     "backToHub": "← Inicio",
     "playLabel": "Jugar",
     "playAgainLabel": "Jugar de nuevo",
+    "skipLabel": "Saltar la práctica — ir al inicio",
     "allCompleteTitle": "¡Toda la práctica completa!",
     "allCompleteBody": "Estás listo para los modos reales."
   },
