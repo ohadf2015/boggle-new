@@ -4404,7 +4404,15 @@ const ja = {
     "noPastSeasons": "過去のシーズンはまだありません",
     "rankedAt": "{{position}}位",
     "tierLabel": "ティア",
-    "viewLeaderboard": "ランキング"
+    "viewLeaderboard": "ランキング",
+    "tagline": {
+      "1": "一語ずつ、伝説を刻め",
+      "2": "王冠は受け継ぐものじゃない、勝ち取るものだ",
+      "3": "知識こそ最も鋭き刃",
+      "4": "リズムを制する者が勝つ",
+      "5": "音こそが新たな戦略",
+      "6": "辞書を支配せよ"
+    }
   },
   "seasonBadges": {
     "section": {

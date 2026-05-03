@@ -8,12 +8,16 @@
 // Dynamically imported (ssr: false) to keep PixiJS out of the SSR bundle.
 
 import { useEffect, useRef, useCallback } from 'react';
+import { Text } from 'pixi.js';
+import { gsap } from 'gsap';
 import { useBlastDebris } from './useBlastDebris';
 import { GameCanvas, useGameEngine } from '@/lib/gameEngine/GameCanvas';
 import { createEnhancedEffects, type EnhancedEffectsManager } from './utils/blastEnhancedEffects';
 import { createBlastJuiceKit, type BlastJuiceKit } from './effects/blastJuiceKit';
+import { buildComboLevelUpTimeline } from './effects/blastGsapTimelines';
 import { useBlastAmbientEffects } from './useBlastAmbientEffects';
 import { useBlastPixiOverlays } from './hooks/useBlastPixiOverlays';
+import { useBlastGsapTimelines } from './hooks/useBlastGsapTimelines';
 import { isReducedMotionPreferred } from '@/utils/accessibility';
 import {
   TILE_EXPLOSION_VARIANTS,
@@ -190,6 +194,12 @@ function EffectsWorker({
   // All teardown + camera.destroyed guards live inside the hook.
   const { fireShockwave, flashCross, spawnPulseRing, spawnStarBurst, spawnAfterglow, spawnLightSweep } = useBlastPixiOverlays({
     camera, width, height, gridSize, cellSize, chainLevel,
+  });
+
+  // ─── GSAP timeline runners — cascade depth 1-4, wave shower, long word ─
+  const { runCascadePunch, runLongWordPunch, runWaveClearShower, trackTimeline } = useBlastGsapTimelines({
+    camera, shake, timeDilation, particles, width, height,
+    fireShockwave, spawnStarBurst, confettiPreset: CONFETTI_BURST,
   });
 
   // ─── Prism cross beam effect ──────────────────────────────────────
@@ -376,7 +386,19 @@ function EffectsWorker({
       else if (count >= 3) shake.medium();
       else shake.light();
     }
-  }, [clearedTiles, particles, shake, cellSize, gridSize, height, spawnDebris, spawnLightningBolt, spawnLightningDebris, firePrismBeams, spawnPrismDebris, flashCross, physics, fireShockwave, spawnPulseRing, spawnStarBurst, spawnAfterglow, moveGhostTo]);
+
+    // J5 — long-word punch (≥6 tiles cleared). Centroid of cleared positions.
+    // Runs after standard per-tile bursts so the layered shockwave/zoom reads
+    // as "this word was special" rather than competing with tile-specific FX.
+    if (clearedTiles.length >= 6) {
+      let cx = 0, cy = 0;
+      for (const t of clearedTiles) {
+        cx += t.col * cellSize + cellSize / 2;
+        cy += t.row * cellSize + cellSize / 2;
+      }
+      runLongWordPunch(clearedTiles.length, cx / clearedTiles.length, cy / clearedTiles.length);
+    }
+  }, [clearedTiles, particles, shake, cellSize, gridSize, height, spawnDebris, spawnLightningBolt, spawnLightningDebris, firePrismBeams, spawnPrismDebris, flashCross, physics, fireShockwave, spawnPulseRing, spawnStarBurst, spawnAfterglow, moveGhostTo, runLongWordPunch]);
 
   // Chain cascade sparkle + mega celebration at chain 5
   useEffect(() => {
@@ -392,14 +414,15 @@ function EffectsWorker({
         spawnPulseRing(width / 2, height / 2, 3);
         juiceRef.current?.megaPunch({ cx: width / 2, cy: height / 2 });
         spawnLightSweep();
-      } else if (chainLevel >= 3) {
-        shake.medium();
       } else {
-        shake.light();
+        // J1 — GSAP-driven escalation timeline for depths 1-4 (≥5 handled above).
+        // Layers shake + zoom + RGB + bloom + freeze with intensity scaling per depth.
+        runCascadePunch(chainLevel);
+        if (chainLevel >= 3) spawnPulseRing(width / 2, height / 2, chainLevel);
       }
     }
     prevChainRef.current = chainLevel;
-  }, [chainLevel, particles, shake, width, height, fireShockwave, spawnStarBurst, spawnPulseRing, spawnLightSweep]);
+  }, [chainLevel, particles, shake, width, height, fireShockwave, spawnStarBurst, spawnPulseRing, spawnLightSweep, runCascadePunch]);
 
   // Combo flash particles + juice pulse (chromatic aberration + saturation bump)
   useEffect(() => {
@@ -407,9 +430,43 @@ function EffectsWorker({
       particles.burst(pickRandom(COMBO_FLASH_VARIANTS), width / 2, height / 2, comboTier * 15);
       juiceRef.current?.comboPulse(comboTier);
       spawnPulseRing(width / 2, height / 2, comboTier);
+
+      // J2 — Pixi tier-badge: "x{N}" pops in, scales, drifts up while fading.
+      // Skipped under reduced motion (handled inside the timeline runner check).
+      if (!isReducedMotionPreferred() && comboTier >= 2 && !camera.destroyed) {
+        const badge = new Text({
+          text: `x${comboTier}`,
+          style: {
+            fontFamily: ['Fredoka', 'Rubik', 'sans-serif'],
+            fontSize: 56,
+            fontWeight: '900',
+            fill: 0xbfff00,
+            stroke: { color: 0x1a1a2e, width: 6 },
+            dropShadow: { color: 0x000000, blur: 4, distance: 2, alpha: 0.7, angle: Math.PI / 2 },
+          },
+        });
+        badge.anchor.set(0.5);
+        badge.position.set(width / 2, height * 0.42);
+        badge.alpha = 1;
+        badge.scale.set(0);
+        camera.addChild(badge);
+
+        const cleanupBadge = () => {
+          try { camera.removeChild(badge); } catch { /* */ }
+          if (!badge.destroyed) badge.destroy();
+        };
+        const tl = buildComboLevelUpTimeline(gsap, {
+          target: badge,
+          tier: comboTier,
+          riseDistance: 70,
+          onComplete: cleanupBadge,
+        });
+        // Tracker chains onComplete + runs cleanupBadge on unmount-kill.
+        trackTimeline(tl, cleanupBadge);
+      }
     }
     prevComboRef.current = comboTier;
-  }, [comboTier, particles, width, height, spawnPulseRing]);
+  }, [comboTier, particles, width, height, spawnPulseRing, camera, trackTimeline]);
 
   // Wave clear celebration — particles + shockwave + juice burst (zoom blur + bloom + hit-stop)
   useEffect(() => {
@@ -421,9 +478,11 @@ function EffectsWorker({
       juiceRef.current?.waveClearBurst({ cx: width / 2, cy: height / 2 });
       spawnLightSweep();
       spawnWaveClearBurst(width / 2, height / 2, Math.min(width, height) * 0.45);
+      // J3 — staggered confetti shower over ~700ms (3 bursts + crescendo tail).
+      runWaveClearShower();
     }
     prevWaveRef.current = waveCleared;
-  }, [waveCleared, particles, width, height, fireShockwave, spawnStarBurst, spawnPulseRing, spawnLightSweep, spawnWaveClearBurst]);
+  }, [waveCleared, particles, width, height, fireShockwave, spawnStarBurst, spawnPulseRing, spawnLightSweep, spawnWaveClearBurst, runWaveClearShower]);
 
   return null;
 }

@@ -227,6 +227,29 @@ export function getLocalHour(timezone: string): number {
 }
 
 /**
+ * Current minute-of-day [0..1439] in a specific timezone. Used by the
+ * smart daily-challenge reminder to match each user's "usual play time"
+ * against now, with circular-clock arithmetic.
+ */
+export function getLocalMinuteOfDay(timezone: string, now: Date = new Date()): number {
+  try {
+    const fmt = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    const parts = fmt.formatToParts(now);
+    const h = parseInt(parts.find((p) => p.type === 'hour')?.value ?? '0', 10);
+    const m = parseInt(parts.find((p) => p.type === 'minute')?.value ?? '0', 10);
+    // Intl can emit "24" for midnight in some locales; fold to 0.
+    return ((h % 24) * 60 + m) % 1440;
+  } catch {
+    return now.getUTCHours() * 60 + now.getUTCMinutes();
+  }
+}
+
+/**
  * Subject line variations for A/B testing
  * Rotate through these to find the best performer
  */

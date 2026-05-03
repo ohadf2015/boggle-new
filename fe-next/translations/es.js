@@ -4450,7 +4450,15 @@ const es = {
     "noPastSeasons": "Aún no hay temporadas pasadas",
     "rankedAt": "Puesto #{{position}}",
     "tierLabel": "Nivel",
-    "viewLeaderboard": "Clasificación"
+    "viewLeaderboard": "Clasificación",
+    "tagline": {
+      "1": "Forja tu leyenda, palabra a palabra",
+      "2": "Las coronas se ganan, no se heredan",
+      "3": "El saber es tu hoja más afilada",
+      "4": "El ritmo gana la ronda",
+      "5": "El sonido es la nueva estrategia",
+      "6": "Reina el diccionario"
+    }
   },
   "seasonBadges": {
     "section": {

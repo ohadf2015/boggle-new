@@ -246,7 +246,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           <p className="mt-2 max-w-2xl text-sm sm:text-base text-neo-gray-200">
             Deep-dive landing pages on specific use cases, with comparison tables, FAQs, and free word lists.
           </p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Link
               href={`/${locale}/education/vocabulary-games-classroom`}
               className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
@@ -270,6 +270,14 @@ function EducationResourceLinks({ locale }: { locale: string }) {
               <span className="inline-block border-2 border-neo-black bg-neo-purple px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white">For Teachers</span>
               <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">Word Games for Teachers</h3>
               <p className="mt-2 text-xs text-neo-gray-200">Sub-day, brain-break, warm-up — zero prep, free forever.</p>
+            </Link>
+            <Link
+              href={`/${locale}/education/spelling-bee-practice`}
+              className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+            >
+              <span className="inline-block border-2 border-neo-black bg-neo-pink px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white">Spelling Bee</span>
+              <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">Spelling Bee Practice Online</h3>
+              <p className="mt-2 text-xs text-neo-gray-200">4-week training plan, custom word lists, 1v1 duels — Scripps prep.</p>
             </Link>
           </div>
         </>

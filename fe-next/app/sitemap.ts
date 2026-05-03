@@ -144,6 +144,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     '/education/vocabulary-games-classroom',
     '/education/esl-word-games',
     '/education/games-for-teachers',
+    '/education/spelling-bee-practice',
   ];
   educationLandings.forEach((path) => {
     routes.push({
@@ -241,6 +242,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/lexiclash-vs-popple', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForAllLocales(routes, '/lexiclash-vs-quizlet', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForAllLocales(routes, '/lexiclash-vs-kahoot', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForAllLocales(routes, '/lexiclash-vs-wordwall', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
 
   // Per-locale competitor landings — locale-specific indexing for native switcher intent
   routes.push({

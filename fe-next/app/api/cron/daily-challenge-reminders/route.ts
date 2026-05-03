@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import logger from '@/utils/logger';
-import { getDailyChallengePushRecipients, markDailyPushSentBatch } from '@/lib/pushReminders';
+import { getSmartDailyChallengePushRecipients, markDailyPushSentBatch } from '@/lib/pushReminders';
 import { notifyDailyChallengeReminder } from '@/backend/modules/pushNotificationTriggers';
 import { pickDailyReminderCopy } from '@/lib/dailyReminderCopy';
 import { getLocalHour, getTodayDate } from '@/lib/email';
@@ -9,9 +9,10 @@ import { captureApiError } from '@/utils/sentry';
 /**
  * POST /api/cron/daily-challenge-reminders
  *
- * Hourly cron: sends push reminder to users who (1) have an active device
- * token, (2) haven't completed today's daily challenge, (3) haven't been
- * reminded today, and (4) are currently in their 17:00-19:00 local window.
+ * Hourly cron: smart per-user scheduler. Picks users whose typical play
+ * time (circular-mean, 30d rolling, sample >= 3) plus 30 min falls in the
+ * current local-time hour-window. Excludes never-played, played-today,
+ * already-pushed-today, and opted-out users.
  *
  * Security: CRON_SECRET via x-cron-secret header or Authorization: Bearer.
  *
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const recipients = await getDailyChallengePushRecipients();
+    const recipients = await getSmartDailyChallengePushRecipients();
     logger.log(`[Push Cron] ${recipients.length} daily-challenge reminder recipients`);
 
     if (recipients.length === 0) {

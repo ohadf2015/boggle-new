@@ -149,7 +149,10 @@ export async function registerAllCronJobs(): Promise<void> {
     await runAutoPromotion();
   });
 
-  await registerCronJob('daily-challenge-reminder', '0 17 * * *', async () => {
+  // Hourly tick: smart per-user scheduler picks recipients whose typical
+  // play-time + 30 min lands inside the current hour window. Each user
+  // sees at most one push per day (last_daily_push_sent_at dedup).
+  await registerCronJob('daily-challenge-reminder', '0 * * * *', async () => {
     const { sendDailyChallengeReminders } = await import('../services/dailyChallengeReminder');
     await sendDailyChallengeReminders();
   });

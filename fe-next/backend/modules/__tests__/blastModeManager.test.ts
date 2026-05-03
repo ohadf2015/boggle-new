@@ -331,15 +331,13 @@ describe('blastModeManager', () => {
       }
     });
 
-    it('wave 5 overlay CAN contain diamond tiles (diamond enabled at wave 5)', () => {
-      const diamondSeen = new Set<string>();
+    it('wave 5 overlay should NOT contain diamond tiles (diamond retired in Sprint 1)', () => {
       for (let i = 0; i < 200; i++) {
         const overlay = generateBlastOverlay(largeGrid, 1.0, 5);
         for (const tile of overlay) {
-          diamondSeen.add(tile.type);
+          expect(tile.type).not.toBe('diamond');
         }
       }
-      expect(diamondSeen.has('diamond')).toBe(true);
     });
 
     it('wave 3 overlay CAN contain prism tiles (prism enabled at wave 3)', () => {

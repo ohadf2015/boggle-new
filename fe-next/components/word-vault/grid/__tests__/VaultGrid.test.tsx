@@ -40,3 +40,29 @@ describe('VaultGrid (skeleton)', () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 });
+
+const adjacentCfg: VaultGridConfig = { ...cfg, traversal: 'adjacent' };
+
+describe('VaultGrid adjacent mode', () => {
+  it('rejects non-adjacent tap chain', () => {
+    const onSubmit = vi.fn();
+    render(<VaultGrid config={adjacentCfg} onSubmit={onSubmit} />);
+    const tiles = screen.getAllByRole('button', { name: /vault-tile/i });
+    // size=3 grid; index 0 (top-left) and index 2 (top-right) are NOT adjacent
+    fireEvent.click(tiles[0]);
+    fireEvent.click(tiles[2]); // should be rejected
+    fireEvent.click(screen.getByRole('button', { name: /vault-submit/i }));
+    // Only first letter selected → onSubmit fires with single letter
+    expect(onSubmit).toHaveBeenCalledWith('א');
+  });
+
+  it('accepts adjacent diagonal taps', () => {
+    const onSubmit = vi.fn();
+    render(<VaultGrid config={adjacentCfg} onSubmit={onSubmit} />);
+    const tiles = screen.getAllByRole('button', { name: /vault-tile/i });
+    fireEvent.click(tiles[0]); // (0,0) א
+    fireEvent.click(tiles[4]); // (1,1) ד — diagonal adjacent
+    fireEvent.click(screen.getByRole('button', { name: /vault-submit/i }));
+    expect(onSubmit).toHaveBeenCalledWith('אד');
+  });
+});

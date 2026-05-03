@@ -4419,7 +4419,15 @@ const sv = {
     "noPastSeasons": "Inga tidigare säsonger ännu",
     "rankedAt": "Plats #{{position}}",
     "tierLabel": "Nivå",
-    "viewLeaderboard": "Topplistan"
+    "viewLeaderboard": "Topplistan",
+    "tagline": {
+      "1": "Smid din legend, ett ord i taget",
+      "2": "Kronor förtjänas, inte ärvs",
+      "3": "Kunskap är ditt vassaste vapen",
+      "4": "Rytm vinner ronder",
+      "5": "Ljud är den nya strategin",
+      "6": "Härska över ordboken"
+    }
   },
   "seasonBadges": {
     "section": {

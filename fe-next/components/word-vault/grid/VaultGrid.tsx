@@ -10,6 +10,12 @@ type Props = {
   onSubmit: (word: string) => void;
 };
 
+const isAdjacent = (a: number, b: number, size: number): boolean => {
+  const ra = Math.floor(a / size); const ca = a % size;
+  const rb = Math.floor(b / size); const cb = b % size;
+  return Math.abs(ra - rb) <= 1 && Math.abs(ca - cb) <= 1 && (a !== b);
+};
+
 export function VaultGrid({ config, onSubmit }: Props) {
   const initialTiles: TileState[] = useMemo(() => {
     const letters = generateLetters(config);
@@ -28,6 +34,10 @@ export function VaultGrid({ config, onSubmit }: Props) {
   const handleTap = (index: number) => {
     if (tiles[index].frozen) return;
     if (selected.includes(index)) return;
+    if (config.traversal === 'adjacent' && selected.length > 0) {
+      const last = selected[selected.length - 1];
+      if (!isAdjacent(last, index, config.size)) return;
+    }
     setSelected((s) => [...s, index]);
     setTiles((t) =>
       t.map((tile) => (tile.index === index ? { ...tile, selected: true } : tile)),

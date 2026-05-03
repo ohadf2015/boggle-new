@@ -1,7 +1,7 @@
 import { isSupabaseConfigured } from '../modules/supabase';
 import { notifyDailyChallengeReminder } from '../modules/pushNotificationTriggers';
 import {
-  getDailyChallengePushRecipients,
+  getSmartDailyChallengePushRecipients,
   markDailyPushSentBatch,
 } from '@/lib/pushReminders';
 import { pickDailyReminderCopy } from '@/lib/dailyReminderCopy';
@@ -22,7 +22,7 @@ export async function sendDailyChallengeReminders(): Promise<void> {
     return;
   }
 
-  const recipients = await getDailyChallengePushRecipients();
+  const recipients = await getSmartDailyChallengePushRecipients();
   if (recipients.length === 0) {
     logger.info('DAILY_REMINDER', 'No eligible recipients');
     return;

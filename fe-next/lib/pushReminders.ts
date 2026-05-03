@@ -7,10 +7,17 @@
 
 import logger from '@/backend/utils/logger';
 import { isPushLocale, type PushLocale } from '@/backend/utils/pushTranslations';
-import { getSupabaseAdmin, getLocalHour, getTodayDate } from './email';
+import { getSupabaseAdmin, getLocalHour, getLocalMinuteOfDay, getTodayDate } from './email';
+import { addMinutesWrap, inWindow } from './smartReminderTime';
 
 const REMINDER_HOUR_MIN = 17;
 const REMINDER_HOUR_MAX = 19;
+
+// Smart-reminder constants. Push fires when current local time falls inside
+// [avg + OFFSET, avg + OFFSET + WINDOW). Hourly cron tick = WINDOW must be >= 60
+// to guarantee every user gets exactly one tick that includes them.
+const SMART_OFFSET_MINUTES = 30;
+const SMART_WINDOW_MINUTES = 60;
 
 export interface DailyPushRecipient {
   userId: string;
@@ -125,6 +132,148 @@ export async function getDailyChallengePushRecipients(): Promise<DailyPushRecipi
 
     const localHour = getLocalHour(p.timezone || 'UTC');
     if (localHour < REMINDER_HOUR_MIN || localHour > REMINDER_HOUR_MAX) continue;
+
+    const locale: PushLocale = isPushLocale(p.language) ? p.language : 'en';
+    recipients.push({ userId: p.id, locale });
+  }
+
+  return recipients;
+}
+
+/**
+ * Smart variant of {@link getDailyChallengePushRecipients}. Instead of a
+ * fixed 17–19 local-hour window, schedules each user's reminder to fire
+ * 30 minutes after their typical play time (circular mean over the last
+ * 30 days, sample size >= 3). Users who have never played, or whose
+ * sample is too small, are excluded — `if he did at all` per design.
+ *
+ * Designed to run on an hourly cron. The view + per-user window logic
+ * picks up only the slice of users whose target time matches the current
+ * tick, so the same ID never gets pushed twice in one day.
+ */
+export async function getSmartDailyChallengePushRecipients(
+  now: Date = new Date()
+): Promise<DailyPushRecipient[]> {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) {
+    logger.error?.('PUSH_REMINDER', 'Supabase admin not available');
+    return [];
+  }
+
+  const today = getTodayDate();
+
+  const { data: tokens, error: tokensErr } = await supabase
+    .from('user_push_tokens')
+    .select('user_id')
+    .eq('is_active', true);
+
+  if (tokensErr) {
+    logger.error?.('PUSH_REMINDER', `tokens query failed: ${tokensErr.message}`);
+    return [];
+  }
+  if (!tokens || tokens.length === 0) return [];
+
+  const userIds = Array.from(new Set(tokens.map((t: { user_id: string }) => t.user_id)));
+
+  const [profilesRes, avgRes, puzzleRes, wordHuntRes, prefRes] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('id, timezone, last_daily_push_sent_at, language')
+      .in('id', userIds),
+    supabase
+      .from('v_user_daily_play_avg')
+      .select('player_id, timezone, sample_size, avg_play_minute_of_day')
+      .in('player_id', userIds),
+    supabase
+      .from('daily_puzzle_attempts')
+      .select('player_id')
+      .eq('puzzle_date', today)
+      .in('player_id', userIds),
+    supabase
+      .from('daily_word_hunt_attempts')
+      .select('player_id')
+      .eq('puzzle_date', today)
+      .in('player_id', userIds),
+    supabase
+      .from('user_notification_preferences')
+      .select('user_id, push_enabled, daily_challenge')
+      .in('user_id', userIds),
+  ]);
+
+  if (profilesRes.error) {
+    logger.error?.('PUSH_REMINDER', `profiles query failed: ${profilesRes.error.message}`);
+    return [];
+  }
+  if (avgRes.error) {
+    logger.error?.('PUSH_REMINDER', `avg view query failed: ${avgRes.error.message}`);
+    return [];
+  }
+  if (puzzleRes.error || wordHuntRes.error || prefRes.error) {
+    const msg =
+      puzzleRes.error?.message || wordHuntRes.error?.message || prefRes.error?.message;
+    logger.error?.('PUSH_REMINDER', `attempts/prefs query failed: ${msg}`);
+    return [];
+  }
+
+  const profiles = (profilesRes.data ?? []) as Array<{
+    id: string;
+    timezone: string | null;
+    last_daily_push_sent_at: string | null;
+    language: string | null;
+  }>;
+  if (profiles.length === 0) return [];
+
+  // user_id → avg row. Skipping never-played users = excluding any user
+  // missing from this map, which is what `if he did at all` requires.
+  const avgByUser = new Map<string, { timezone: string | null; avg_play_minute_of_day: number }>();
+  for (const r of (avgRes.data ?? []) as Array<{
+    player_id: string;
+    timezone: string | null;
+    avg_play_minute_of_day: number;
+  }>) {
+    avgByUser.set(r.player_id, {
+      timezone: r.timezone,
+      avg_play_minute_of_day: r.avg_play_minute_of_day,
+    });
+  }
+
+  const playedIds = new Set<string>();
+  for (const r of (puzzleRes.data ?? []) as Array<{ player_id: string | null }>) {
+    if (r.player_id) playedIds.add(r.player_id);
+  }
+  for (const r of (wordHuntRes.data ?? []) as Array<{ player_id: string | null }>) {
+    if (r.player_id) playedIds.add(r.player_id);
+  }
+
+  const optedOut = new Set<string>();
+  for (const row of (prefRes.data ?? []) as Array<{
+    user_id: string;
+    push_enabled: boolean | null;
+    daily_challenge: boolean | null;
+  }>) {
+    if (row.push_enabled === false || row.daily_challenge === false) {
+      optedOut.add(row.user_id);
+    }
+  }
+
+  const recipients: DailyPushRecipient[] = [];
+  for (const p of profiles) {
+    const avg = avgByUser.get(p.id);
+    if (!avg) continue; // never-played → skip
+    if (playedIds.has(p.id)) continue;
+    if (optedOut.has(p.id)) continue;
+
+    if (p.last_daily_push_sent_at) {
+      const lastDate = new Date(p.last_daily_push_sent_at).toISOString().split('T')[0];
+      if (lastDate === today) continue;
+    }
+
+    // Prefer the timezone that was used to compute the avg, so the
+    // window math stays consistent if the profile TZ has since moved.
+    const tz = avg.timezone || p.timezone || 'UTC';
+    const target = addMinutesWrap(avg.avg_play_minute_of_day, SMART_OFFSET_MINUTES);
+    const currentLocalMin = getLocalMinuteOfDay(tz, now);
+    if (!inWindow(currentLocalMin, target, SMART_WINDOW_MINUTES)) continue;
 
     const locale: PushLocale = isPushLocale(p.language) ? p.language : 'en';
     recipients.push({ userId: p.id, locale });

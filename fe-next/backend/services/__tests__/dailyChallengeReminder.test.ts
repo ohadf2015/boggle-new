@@ -1,8 +1,9 @@
 /**
  * TDD tests: daily challenge push reminder (BullMQ path)
- * Verifies service delegates to the HTTP-path recipient gate
- * (getDailyChallengePushRecipients) — excludes users who PLAYED today,
- * not users who STARTED but didn't finish — and sends per-user dynamic copy.
+ * Verifies service delegates to the smart per-user recipient gate
+ * (getSmartDailyChallengePushRecipients) — excludes users who PLAYED today,
+ * who never played, who already got pushed today, etc. — and sends
+ * per-user dynamic copy.
  *
  * Recipient shape carries pre-fetched locale and post-send mark is batched
  * (Sentry 136 / Supabase queue depth fix).
@@ -15,7 +16,7 @@ const mockNotify = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
 const mockIsSupabaseConfigured = vi.hoisted(() => vi.fn(() => true));
 
 vi.mock('@/lib/pushReminders', () => ({
-  getDailyChallengePushRecipients: mockGetRecipients,
+  getSmartDailyChallengePushRecipients: mockGetRecipients,
   markDailyPushSentBatch: mockMarkBatch,
 }));
 

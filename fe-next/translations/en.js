@@ -4524,7 +4524,15 @@ const en = {
     "noPastSeasons": "No past seasons yet",
     "rankedAt": "Rank #{{position}}",
     "tierLabel": "Tier",
-    "viewLeaderboard": "Leaderboard"
+    "viewLeaderboard": "Leaderboard",
+    "tagline": {
+      "1": "Forge your legacy, one word at a time",
+      "2": "Crowns earned, not inherited",
+      "3": "Knowledge is your sharpest blade",
+      "4": "Rhythm wins rounds",
+      "5": "Sound is the new strategy",
+      "6": "Rule the dictionary"
+    }
   },
   "seasonBadges": {
     "section": {
