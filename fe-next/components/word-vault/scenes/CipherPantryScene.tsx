@@ -11,22 +11,56 @@ interface Props {
 
 interface Jar {
   id: string;
-  /** scrambled letters as ordered array */
+  /** scrambled letters shown on the jar's outside (the "label") */
   scrambled: string[];
+  /** Letter pool below — includes the answer's letters PLUS decoys */
+  pool: string[];
   /** correct unscrambled answer */
   answer: string;
-  /** category hint */
+  /** Riddle hint — poetic, not descriptive */
   hintHe: string;
   /** position on shelf (0..1) */
   x: number;
   y: number;
 }
 
+/**
+ * Pool composition: every jar has its answer's letters PLUS 3-4 decoys.
+ * Decoys chosen to be tempting but spell wrong HE words from same letters.
+ */
 const JARS: Jar[] = [
-  { id: 'sugar', scrambled: ['ר','ק','ו','ס'], answer: 'סוכר', hintHe: 'מתוק. נמס בכוס.', x: 0.20, y: 0.32 },
-  { id: 'flour', scrambled: ['ק','ח','מ'],     answer: 'קמח',  hintHe: 'אבק לבן לאפייה.',   x: 0.46, y: 0.32 },
-  { id: 'bread', scrambled: ['ח','ם','ל'],     answer: 'לחם',  hintHe: 'יוצא מהתנור.',       x: 0.72, y: 0.32 },
-  { id: 'honey', scrambled: ['ש','ב','ד'],     answer: 'דבש',  hintHe: 'עבודת דבורים.',      x: 0.46, y: 0.66 },
+  {
+    id: 'sugar',
+    scrambled: ['ר','כ','ו','ס'],
+    pool: ['ס','ו','כ','ר','א','מ','ת','ב'],
+    answer: 'סוכר',
+    hintHe: 'גביש מתוק שזוכר את השדה.',
+    x: 0.20, y: 0.32,
+  },
+  {
+    id: 'flour',
+    scrambled: ['ק','ח','מ'],
+    pool: ['ק','מ','ח','ל','ש','ע','י'],
+    answer: 'קמח',
+    hintHe: 'אבק שאינו מת. הוסף מים — והוא קם.',
+    x: 0.46, y: 0.32,
+  },
+  {
+    id: 'bread',
+    scrambled: ['ח','ם','ל'],
+    pool: ['ל','ח','ם','מ','ש','א','ב','ד'],
+    answer: 'לחם',
+    hintHe: 'מים, אבק, וזמן. ילד אחד מהשלושה.',
+    x: 0.72, y: 0.32,
+  },
+  {
+    id: 'honey',
+    scrambled: ['ש','ב','ד'],
+    pool: ['ד','ב','ש','כ','ם','ר','ע','ץ'],
+    answer: 'דבש',
+    hintHe: 'זהב נוזלי שלא נכרה.',
+    x: 0.46, y: 0.66,
+  },
 ];
 
 const SECRET_PHRASE_HE = 'ארבעה צנצנות. ארבעה זיכרונות. אחד פתח את הדלת.';
@@ -73,7 +107,7 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
       setArrangements((prev) => ({ ...prev, [activeJarId]: next }));
 
       // Check completion
-      if (next.length === activeJar.scrambled.length) {
+      if (next.length === activeJar.answer.length) {
         const word = next.map((k) => k.split('-')[0]).join('');
         if (normalizeHebrewFinalForms(word) === normalizeHebrewFinalForms(activeJar.answer)) {
           // correct
@@ -185,9 +219,9 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
           <p className="text-center font-rubik text-sm" style={{ color: 'rgba(255,225,180,0.7)' }}>
             <em>{`"${activeJar.hintHe}"`}</em>
           </p>
-          {/* Built word slots */}
-          <div className="mt-3 flex items-center justify-center gap-2">
-            {Array.from({ length: activeJar.scrambled.length }).map((_, slotIdx) => {
+          {/* Built word slots — carved obsidian look */}
+          <div className="mt-3 flex items-center justify-center gap-2" dir="rtl">
+            {Array.from({ length: activeJar.answer.length }).map((_, slotIdx) => {
               const placed = activeArrangement[slotIdx];
               const letter = placed?.split('-')[0] ?? '';
               return (
@@ -195,23 +229,30 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
                   key={slotIdx}
                   type="button"
                   onClick={() => placed && handleRemoveLetter(slotIdx)}
-                  className="grid h-12 w-12 place-items-center rounded-md border-2 font-fredoka text-2xl font-black"
+                  className="grid h-12 w-12 place-items-center rounded font-fredoka text-2xl font-black"
                   style={{
-                    background: placed ? 'linear-gradient(180deg, #d4ba8a, #8a6c44)' : 'rgba(0,0,0,0.4)',
-                    borderColor: placed ? '#5a3a18' : 'rgba(180,160,140,0.3)',
-                    color: placed ? '#1a0e08' : 'rgba(180,160,140,0.5)',
-                    boxShadow: placed ? '0 3px 0 rgba(0,0,0,0.7)' : 'inset 0 1px 0 rgba(255,235,180,0.05)',
+                    background: placed
+                      ? 'linear-gradient(180deg, rgba(80,55,32,0.95), rgba(40,25,14,0.95))'
+                      : 'rgba(8,6,4,0.7)',
+                    border: placed
+                      ? '2px solid rgba(255,180,80,0.85)'
+                      : '1.5px solid rgba(120,100,82,0.35)',
+                    color: placed ? 'rgba(255,210,140,1)' : 'rgba(120,100,82,0.4)',
+                    boxShadow: placed
+                      ? 'inset 0 0 12px rgba(255,140,60,0.35), 0 0 14px rgba(255,140,60,0.3)'
+                      : 'inset 0 0 8px rgba(0,0,0,0.65)',
+                    textShadow: placed ? '0 0 12px rgba(255,180,80,0.85)' : 'none',
                     cursor: placed ? 'pointer' : 'default',
                   }}
                 >
-                  {letter || '_'}
+                  {letter || '·'}
                 </button>
               );
             })}
           </div>
-          {/* Letter pool */}
+          {/* Letter pool — includes decoys; carved-stone tile look */}
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-            {activeJar.scrambled.map((ltr, idx) => {
+            {activeJar.pool.map((ltr, idx) => {
               const key = `${ltr}-${idx}`;
               const used = activeArrangement.includes(key);
               return (
@@ -220,15 +261,20 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
                   type="button"
                   onClick={() => handleAddLetter(ltr, idx)}
                   disabled={used}
-                  className="grid h-12 w-12 place-items-center rounded-md border-2 font-fredoka text-2xl font-black transition-all"
+                  className="grid h-11 w-11 place-items-center rounded font-fredoka text-xl font-black transition-all"
                   style={{
                     background: used
-                      ? 'rgba(60,55,50,0.5)'
-                      : 'linear-gradient(180deg, #6a8aa8, #2e4a64)',
-                    borderColor: used ? 'rgba(120,100,80,0.3)' : '#1a2a3a',
-                    color: used ? 'rgba(180,160,140,0.4)' : 'rgba(220,235,255,0.95)',
-                    boxShadow: used ? 'inset 0 1px 0 rgba(0,0,0,0.4)' : '0 3px 0 rgba(0,0,0,0.7)',
-                    transform: used ? 'translateY(2px)' : 'translateY(0)',
+                      ? 'rgba(20,14,10,0.6)'
+                      : 'linear-gradient(180deg, rgba(60,42,28,0.95), rgba(28,18,12,0.98))',
+                    border: used
+                      ? '1.5px solid rgba(80,65,50,0.4)'
+                      : '1.5px solid rgba(180,140,90,0.45)',
+                    color: used ? 'rgba(120,100,80,0.4)' : 'rgba(225,205,180,0.92)',
+                    boxShadow: used
+                      ? 'inset 0 0 8px rgba(0,0,0,0.65)'
+                      : 'inset 0 1px 0 rgba(255,210,160,0.12), 0 2px 0 rgba(0,0,0,0.7)',
+                    textShadow: '0 1px 2px rgba(0,0,0,0.75)',
+                    transform: used ? 'translateY(1px)' : 'translateY(0)',
                   }}
                 >
                   {ltr}
@@ -261,12 +307,12 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
               המזווה הקפוא
             </p>
             <h2 className="mt-2 font-fredoka text-3xl font-black text-cyan-200" style={{ textShadow: '2px 2px 0 #000' }}>
-              ארבע צנצנות. ארבע תוויות מבולגנות.
+              ארבע צנצנות. תוויותיהן התערבבו.
             </h2>
             <p className="mt-4 font-rubik text-base leading-relaxed text-white/85">
-              קאל ערבב את האותיות לפני שהקפא הגיע.
-              <br />
-              לחץ על צנצנת. סדר את האותיות. גלה מה היה בה.
+              קאל ערבב תוויות לפני שהקור התפשט.
+              חידה אחת על כל צנצנת — וקצת אותיות נוספות שלא שייכות.
+              קרא, חשוב, בחר.
             </p>
             <button
               type="button"
