@@ -1939,7 +1939,7 @@ const en = {
     },
     "training": {
       "title": "Training",
-      "description": "No timer, no stress. Perfect for first-timers!",
+      "description": "No timer. No stress.",
       "ready": "You're ready!",
       "hint": "More modes unlock as you play!"
     },
@@ -1960,7 +1960,7 @@ const en = {
     },
     "ftue": {
       "swipeToConnect": "Swipe to connect letters!",
-      "findMultipleWords": "Find 3 words! Swipe across letters to spell them.",
+      "findMultipleWords": "Find 3 words. Swipe to spell.",
       "wordsFound": "{{count}}/3 words found",
       "amazing": "AMAZING!",
       "keepGoing": "COMBO!",
@@ -1977,9 +1977,9 @@ const en = {
       "continue": "Continue",
       "aboveAverage": "Above average!",
       "dailyChallenge": "Daily Challenge",
-      "dailyChallengeDesc": "Compete on today's board — same puzzle for everyone!",
+      "dailyChallengeDesc": "Same puzzle, every player",
       "practiceMode": "Quick Play",
-      "practiceModeDesc": "Jump in — find words at your own pace!",
+      "practiceModeDesc": "No timer, your pace",
       "joinFriendsGame": "Join Friend's Game",
       "joinFriendsGameDesc": "Jump into a live match with friends!",
       "friendIsWaiting": "Your friend is waiting!",
@@ -10232,7 +10232,12 @@ const en = {
       feature1: "Timed",
       feature2: "Score-based",
       feature3: "Free-form",
-      intro: { greet: "Take your time. Just words." }
+      intro: { greet: "Take your time. Just words." },
+      tutorial: {
+        tip1: "Drag adjacent letters",
+        tip2: "Longer = more points",
+        tip3: "No timer, just explore"
+      }
     },
     blast: {
       name: "Blast",
@@ -10248,7 +10253,12 @@ const en = {
       feature1: "Target words",
       feature2: "Speed race",
       feature3: "Hints",
-      intro: { greet: "One word at a time. You've got this." }
+      intro: { greet: "One word at a time. You've got this." },
+      tutorial: {
+        tip1: "Find the target word",
+        tip2: "Drag adjacent letters",
+        tip3: "Many paths work"
+      }
     },
     wheelRush: {
       name: "Wheel Rush",
@@ -10256,11 +10266,20 @@ const en = {
       feature1: "Steal-lock window",
       feature2: "Fog of war",
       feature3: "Pangram bonus",
-      intro: { greet: "Spin gently. Words come." }
+      intro: { greet: "Spin gently. Words come." },
+      tutorial: {
+        tip1: "Use the center letter",
+        tip2: "Any order works",
+        tip3: "Plurals extend words"
+      }
     },
     intro: {
       cta: "Let's go",
       skip: "Skip intro"
+    },
+    tutorial: {
+      title: "How it works",
+      cta: "Got it, try it"
     },
     random: "Random",
     randomDescription: "Surprise me! Pick a random mode each round.",
@@ -10278,6 +10297,10 @@ const en = {
   "practiceHub": {
     "title": "Practice",
     "subtitle": "A quiet place to learn each mode"
+  },
+  "practiceBadge": {
+    "label": "Practice",
+    "aria": "Practice mode — no XP earned"
   },
   "shareResult": {
     "singleplayer": "LexiClash Solo",

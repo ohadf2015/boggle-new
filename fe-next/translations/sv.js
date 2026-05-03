@@ -1836,7 +1836,7 @@ const sv = {
     },
     "training": {
       "title": "Träningsläge",
-      "description": "Öva i din egen takt utan press. Perfekt för nybörjare!",
+      "description": "Ingen timer. Ingen press.",
       "ready": "Du är redo att spela!",
       "hint": "Fler spellägen låses upp när du spelar!"
     },
@@ -1857,7 +1857,7 @@ const sv = {
     },
     "ftue": {
       "swipeToConnect": "Svep för att koppla bokstäver!",
-      "findMultipleWords": "Hitta 3 ord! Svep över bokstäver för att stava.",
+      "findMultipleWords": "Hitta 3 ord. Svep för att stava.",
       "wordsFound": "{{count}}/3 ord hittade",
       "amazing": "FANTASTISKT!",
       "keepGoing": "KOMBO!",
@@ -1874,9 +1874,9 @@ const sv = {
       "continue": "Fortsätt",
       "aboveAverage": "Över snittet!",
       "dailyChallenge": "Daglig Utmaning",
-      "dailyChallengeDesc": "Tävla på dagens bräde — samma pussel för alla!",
+      "dailyChallengeDesc": "Samma pussel, alla spelare",
       "practiceMode": "Snabbspel",
-      "practiceModeDesc": "Hoppa in — hitta ord i din egen takt!",
+      "practiceModeDesc": "Ingen timer, din takt",
       "joinFriendsGame": "Gå med i väns spel",
       "joinFriendsGameDesc": "Hoppa in i en livematch med vänner!",
       "friendIsWaiting": "Din vän väntar!",
@@ -10043,7 +10043,12 @@ const sv = {
       feature1: "Tidsbegränsat",
       feature2: "Poängbaserat",
       feature3: "Fritt",
-      intro: { greet: "Ta din tid. Bara ord." }
+      intro: { greet: "Ta din tid. Bara ord." },
+      tutorial: {
+        tip1: "Dra intilliggande bokstäver",
+        tip2: "Längre = fler poäng",
+        tip3: "Ingen timer, utforska"
+      }
     },
     blast: {
       name: "Blast",
@@ -10059,7 +10064,12 @@ const sv = {
       feature1: "Målord",
       feature2: "Snabblopp",
       feature3: "Ledtrådar",
-      intro: { greet: "Ett ord i taget. Du fixar det." }
+      intro: { greet: "Ett ord i taget. Du fixar det." },
+      tutorial: {
+        tip1: "Hitta målordet",
+        tip2: "Dra intilliggande bokstäver",
+        tip3: "Flera vägar fungerar"
+      }
     },
     wheelRush: {
       name: "Hjulrusning",
@@ -10067,11 +10077,20 @@ const sv = {
       feature1: "Låsfönster",
       feature2: "Stridsdimma",
       feature3: "Pangrambonus",
-      intro: { greet: "Snurra lugnt. Orden kommer." }
+      intro: { greet: "Snurra lugnt. Orden kommer." },
+      tutorial: {
+        tip1: "Använd mittbokstaven",
+        tip2: "Vilken ordning som helst",
+        tip3: "Pluraler förlänger ord"
+      }
     },
     intro: {
       cta: "Sätt igång",
       skip: "Hoppa över"
+    },
+    tutorial: {
+      title: "Så funkar det",
+      cta: "Jag fattar, kör"
     },
     random: "Slumpmässigt",
     randomDescription: "Överraska mig! Slumpa läge varje runda.",
@@ -10089,6 +10108,10 @@ const sv = {
   "practiceHub": {
     "title": "Övning",
     "subtitle": "En lugn plats att lära sig varje läge"
+  },
+  "practiceBadge": {
+    "label": "Övning",
+    "aria": "Övningsläge — ingen XP tjänas"
   },
   "shareResult": {
     "singleplayer": "LexiClash Solo",

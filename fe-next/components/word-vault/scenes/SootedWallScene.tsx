@@ -34,40 +34,10 @@ const CARVINGS: Carving[] = [
 // Letter pool: 4 correct (ם,מ,ל,ש) + 4 decoys, shuffled order
 const LETTER_POOL = ['ת', 'מ', 'ר', 'ל', 'ה', 'ש', 'ב', 'ם'];
 
-interface SootHotspot {
-  id: string;
-  x: number;
-  y: number;
-  glyph: string;
-  loreHe: string;
-  shardHe?: string;
-}
-
-const SOOT_HOTSPOTS: SootHotspot[] = [
-  {
-    id: 'sconce',
-    x: 0.08, y: 0.18,
-    glyph: '🔥',
-    loreHe: 'מתחת לפיח של מנורת הקיר — סימן של אש קטנה שלא כבתה לגמרי.',
-    shardHe: 'א',
-  },
-  {
-    id: 'crack',
-    x: 0.92, y: 0.78,
-    glyph: '⌇',
-    loreHe: 'הקיר נסדק. בעמקים זוהרת אות שאי-אפשר לקרוא בלי להישען.',
-    shardHe: 'ל',
-  },
-  {
-    id: 'inscription',
-    x: 0.50, y: 0.92,
-    glyph: '✦',
-    loreHe: 'בקצה הקיר, ליד הרצפה — חתימה. רק שלוש אותיות. "קאל".',
-    shardHe: 'ק',
-  },
-];
-
-const REVEAL_THRESHOLD = 0.55; // soot must be wiped >55% to reveal hint
+const REVEAL_THRESHOLD = 0.55;   // baseline: soot must be wiped >55% to reveal hint
+const DEFROST_THRESHOLD = 0.40;  // defrost-candle holder gets a uniform speedup
+const BROOM_THRESHOLD = 0.25;    // broom holder gets a deep speedup on the thickest carving
+const BROOM_TARGET_CARVING = 'honey'; // the thickest-soot carving — broom helps here
 const SECRET_PHRASE_HE = 'אין מתכון בלי האות שחסרה. לחם הוא קודם לכל מים.';
 
 export function SootedWallScene({ onSolved, onExit }: Props) {
@@ -81,23 +51,33 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
   const [showBrief, setShowBrief] = useState(true);
   const [showGestureDemo, setShowGestureDemo] = useState(true);
   const [done, setDone] = useState(false);
-  const [activeHotspot, setActiveHotspot] = useState<SootHotspot | null>(null);
-  const [exploredHotspots, setExploredHotspots] = useState<Set<string>>(new Set());
-  const [foundShards, setFoundShards] = useState<string[]>([]);
   const [shake, setShake] = useState<string | null>(null);
   const [whisper, setWhisper] = useState<string | null>(null);
+  const [hasBroom, setHasBroom] = useState(false);
+  const [hasDefrost, setHasDefrost] = useState(false);
   const wipingRef = useRef<{ id: string | null; lastX: number; lastY: number } | null>(null);
 
-  // Lantern perk: if player has melo-lantern, auto-reveal one carving on mount
+  // Item perks on mount: lantern auto-reveals 1 carving; broom = fast-wipe on thickest; defrost candle = uniform speedup
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const items = getGameStore().getState().permanentItems;
-    if (!items.includes('melo-lantern')) return;
-    // Auto-reveal the first carving fully (so player sees lantern's effect)
-    setRevealed((prev) => ({ ...prev, [CARVINGS[0].id]: 1 }));
-    setTimeout(() => setWhisper('הפנס מאיר חריץ אחד.'), 700);
-    setTimeout(() => setWhisper(null), 3200);
+    if (items.includes('broom')) setHasBroom(true);
+    if (items.includes('defrost-candle')) setHasDefrost(true);
+    if (items.includes('melo-lantern')) {
+      setRevealed((prev) => ({ ...prev, [CARVINGS[0].id]: 1 }));
+      setTimeout(() => setWhisper('הפנס מאיר חריץ אחד.'), 700);
+      setTimeout(() => setWhisper(null), 3200);
+    }
   }, []);
+
+  const thresholdFor = useCallback(
+    (carvingId: string): number => {
+      if (hasBroom && carvingId === BROOM_TARGET_CARVING) return BROOM_THRESHOLD;
+      if (hasDefrost) return DEFROST_THRESHOLD;
+      return REVEAL_THRESHOLD;
+    },
+    [hasBroom, hasDefrost],
+  );
 
   const allCorrect = useMemo(
     () => CARVINGS.every((c) => filled[c.id] === c.answer),
@@ -109,7 +89,7 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
     setTimeout(() => setDone(true), 600);
   }
 
-  const carvingsRevealed = CARVINGS.filter((c) => revealed[c.id] >= REVEAL_THRESHOLD).length;
+  const carvingsRevealed = CARVINGS.filter((c) => revealed[c.id] >= thresholdFor(c.id)).length;
 
   const handleWipe = useCallback(
     (id: string, deltaPx: number) => {
@@ -160,7 +140,7 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
       if (!activeCarving || done) return;
       const c = CARVINGS.find((x) => x.id === activeCarving);
       if (!c) return;
-      if (revealed[c.id] < REVEAL_THRESHOLD) {
+      if (revealed[c.id] < thresholdFor(c.id)) {
         setWhisper('עוד לא מספיק נקי. נגב עוד.');
         setTimeout(() => setWhisper(null), 1800);
         return;
@@ -175,7 +155,7 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
         setTimeout(() => setShake(null), 350);
       }
     },
-    [activeCarving, done, revealed],
+    [activeCarving, done, revealed, thresholdFor],
   );
 
   return (
@@ -251,7 +231,7 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
             onPointerMove={(e) => handlePanelPointerMove(c.id, e)}
             onPointerUp={handlePanelPointerUp}
             onTap={() => {
-              if (!filled[c.id] && revealed[c.id] >= REVEAL_THRESHOLD) {
+              if (!filled[c.id] && revealed[c.id] >= thresholdFor(c.id)) {
                 setActiveCarving(c.id);
               } else if (filled[c.id]) {
                 // already filled — show whisper of hint
@@ -266,31 +246,22 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
         ))}
       </div>
 
-      {/* Letter pool */}
-      {!done && (
+      {/* Letter pool — only renders when player has wiped a carving and tapped it (discovery-first) */}
+      {!done && activeCarving && (
         <div className="relative z-10 mx-auto mt-2 flex max-w-md flex-col items-center px-4 pb-6" dir="rtl">
-          <p className="mb-2 font-fredoka text-xs text-amber-200/60">
-            {activeCarving
-              ? 'בחר את האות החסרה:'
-              : 'גרור על קיר לנגב, אז גע בחיריץ לבחור אות.'}
-          </p>
+          <p className="mb-2 font-fredoka text-xs text-amber-200/60">בחר את האות החסרה:</p>
           <div className="flex flex-wrap items-center justify-center gap-2">
             {LETTER_POOL.map((ltr) => (
               <button
                 key={ltr}
                 type="button"
                 onClick={() => handleSelectLetter(ltr)}
-                disabled={!activeCarving}
-                className="grid h-12 w-12 place-items-center rounded-md border-2 font-fredoka text-2xl font-black transition-all disabled:opacity-30"
+                className="grid h-12 w-12 place-items-center rounded-md border-2 font-fredoka text-2xl font-black transition-all"
                 style={{
-                  background: activeCarving
-                    ? 'linear-gradient(180deg, #d4ba8a 0%, #8a6c44 100%)'
-                    : 'linear-gradient(180deg, #4a3a2a 0%, #2a1f14 100%)',
-                  borderColor: activeCarving ? '#5a3a18' : 'rgba(120,100,82,0.35)',
-                  color: activeCarving ? '#1a0e08' : 'rgba(180,160,140,0.5)',
-                  boxShadow: activeCarving
-                    ? '0 3px 0 rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,235,180,0.3)'
-                    : 'inset 0 1px 0 rgba(255,235,180,0.05)',
+                  background: 'linear-gradient(180deg, #d4ba8a 0%, #8a6c44 100%)',
+                  borderColor: '#5a3a18',
+                  color: '#1a0e08',
+                  boxShadow: '0 3px 0 rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,235,180,0.3)',
                 }}
               >
                 {ltr}
@@ -336,7 +307,7 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
           >
             <p className="font-fredoka text-xs uppercase tracking-[0.4em] text-amber-200/60">הקיר המפויח</p>
             <h2 className="mt-2 font-fredoka text-3xl font-black text-amber-200" style={{ textShadow: '2px 2px 0 #000' }}>
-              קאל חרת. הפיח כיסה.
+              אורי חרת. הפיח כיסה.
             </h2>
             <p className="mt-4 font-rubik text-base leading-relaxed text-white/85">
               ארבע מילים נשרטו בקיר — מצרכי לחם.

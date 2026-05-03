@@ -15,9 +15,5 @@ export async function generateStaticParams() {
 export default async function PracticeModePage({ params }: Props) {
   const { locale, mode } = await params;
   if (!isValidPracticeMode(mode)) notFound();
-  return (
-    <main className="min-h-screen w-full">
-      <PracticePageClient mode={mode} locale={locale} />
-    </main>
-  );
+  return <PracticePageClient mode={mode} locale={locale} />;
 }

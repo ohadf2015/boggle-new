@@ -53,6 +53,29 @@ describe('gameStore — actions', () => {
     expect(store.getState().permanentItems.sort()).toEqual(['cael-recipe-book', 'cinder-charm']);
   });
 
+  it('grantItem appends a hotspot-found item to permanentItems', () => {
+    const store = make();
+    expect(store.getState().permanentItems).toEqual([]);
+    const granted = store.getState().grantItem('broom');
+    expect(granted).toBe(true);
+    expect(store.getState().permanentItems).toEqual(['broom']);
+  });
+
+  it('grantItem returns false and does not duplicate when item already owned', () => {
+    const store = make();
+    store.getState().grantItem('broom');
+    const second = store.getState().grantItem('broom');
+    expect(second).toBe(false);
+    expect(store.getState().permanentItems).toEqual(['broom']);
+  });
+
+  it('grantItem persists through reload (cross-room item flow)', () => {
+    const seed = make();
+    seed.getState().grantItem('broom');
+    const restored = make();
+    expect(restored.getState().permanentItems).toContain('broom');
+  });
+
   it('earnCoins increments the balance', () => {
     const store = make();
     store.getState().earnCoins(15);

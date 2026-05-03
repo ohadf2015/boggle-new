@@ -52,7 +52,7 @@ export function HubFoyer({ store, onEnterRoom }: HubFoyerProps) {
       {/* Melo — hero */}
       <img
         src="/word-vault/characters/melo.png"
-        alt="מלו"
+        alt="אש"
         className="pointer-events-none relative z-10 h-32 w-32 select-none object-contain drop-shadow-[3px_3px_0_rgba(0,0,0,0.6)] sm:h-40 sm:w-40"
       />
 

@@ -1822,7 +1822,7 @@ const ja = {
     },
     "training": {
       "title": "トレーニングモード",
-      "description": "プレッシャーなしで自分のペースで練習。初心者にぴったり！",
+      "description": "時間制限なし。気楽に。",
       "ready": "準備完了！",
       "hint": "プレイするほど新しいモードが解放されるよ！"
     },
@@ -1844,7 +1844,7 @@ const ja = {
     },
     "ftue": {
       "swipeToConnect": "スワイプで文字をつなげよう！",
-      "findMultipleWords": "3つの単語を見つけよう！文字をスワイプしてスペル！",
+      "findMultipleWords": "3単語を見つけよう。スワイプで綴る。",
       "wordsFound": "{{count}}/3 単語発見",
       "amazing": "すごい！",
       "keepGoing": "コンボ！",
@@ -1861,9 +1861,9 @@ const ja = {
       "continue": "続ける",
       "aboveAverage": "平均以上！",
       "dailyChallenge": "デイリーチャレンジ",
-      "dailyChallengeDesc": "今日のボードで勝負 — みんな同じパズル！",
+      "dailyChallengeDesc": "全員、同じパズル",
       "practiceMode": "クイックプレイ",
-      "practiceModeDesc": "すぐ始められる — 自分のペースで単語を見つけよう！",
+      "practiceModeDesc": "時間制限なし、自分のペース",
       "joinFriendsGame": "フレンドのゲームに参加",
       "joinFriendsGameDesc": "フレンドとライブマッチに飛び込もう！",
       "friendIsWaiting": "フレンドが待ってるよ！",
@@ -9977,7 +9977,12 @@ const ja = {
       feature1: "タイム制",
       feature2: "スコア制",
       feature3: "自由形式",
-      intro: { greet: "ゆっくりで大丈夫。言葉だけ。" }
+      intro: { greet: "ゆっくりで大丈夫。言葉だけ。" },
+      tutorial: {
+        tip1: "隣の文字をなぞる",
+        tip2: "長いほど高得点",
+        tip3: "時間制限なし"
+      }
     },
     blast: {
       name: "ブラスト",
@@ -9993,7 +9998,12 @@ const ja = {
       feature1: "ターゲット単語",
       feature2: "スピードレース",
       feature3: "ヒント",
-      intro: { greet: "一語ずつ。きっとできる。" }
+      intro: { greet: "一語ずつ。きっとできる。" },
+      tutorial: {
+        tip1: "ターゲットを見つける",
+        tip2: "隣の文字をなぞる",
+        tip3: "経路は複数ある"
+      }
     },
     wheelRush: {
       name: "ホイールラッシュ",
@@ -10001,11 +10011,20 @@ const ja = {
       feature1: "ロック窓",
       feature2: "戦場の霧",
       feature3: "パングラムボーナス",
-      intro: { greet: "そっと回そう。言葉は来る。" }
+      intro: { greet: "そっと回そう。言葉は来る。" },
+      tutorial: {
+        tip1: "中央の文字を使う",
+        tip2: "順番は自由",
+        tip3: "複数形で伸ばせる"
+      }
     },
     intro: {
       cta: "はじめよう",
       skip: "スキップ"
+    },
+    tutorial: {
+      title: "遊び方",
+      cta: "わかった、やってみる"
     },
     random: "ランダム",
     randomDescription: "お楽しみに！毎ラウンド違うモードを選びます。",
@@ -10023,6 +10042,10 @@ const ja = {
   "practiceHub": {
     "title": "練習",
     "subtitle": "それぞれのモードを学ぶ静かな場所"
+  },
+  "practiceBadge": {
+    "label": "練習",
+    "aria": "練習モード — XPなし"
   },
   "shareResult": {
     "singleplayer": "LexiClash ソロ",

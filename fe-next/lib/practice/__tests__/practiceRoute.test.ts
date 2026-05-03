@@ -2,10 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { practiceTargetUrl, isValidPracticeMode, PRACTICE_MODES } from '../practiceRoute';
 
 describe('practiceTargetUrl', () => {
-  it('maps blast to /blast with practice flag', () => {
-    expect(practiceTargetUrl('blast', 'en')).toBe('/en/blast?practice=1');
-  });
-
   it('maps wordHunt to /daily/word-hunt with practice flag', () => {
     expect(practiceTargetUrl('wordHunt', 'he')).toBe('/he/daily/word-hunt?practice=1');
   });
@@ -18,24 +14,37 @@ describe('practiceTargetUrl', () => {
     expect(practiceTargetUrl('classic', 'ja')).toBe('/ja/singleplayer?practice=1');
   });
 
-  it('preserves locale across all modes', () => {
+  it('preserves locale across all practice modes', () => {
     PRACTICE_MODES.forEach((mode) => {
       expect(practiceTargetUrl(mode, 'sv')).toMatch(/^\/sv\//);
     });
   });
 });
 
+describe('PRACTICE_MODES catalog', () => {
+  it('excludes blast (bespoke tutorial out of scope)', () => {
+    expect(PRACTICE_MODES).not.toContain('blast');
+  });
+
+  it('includes the three teachable modes', () => {
+    expect(PRACTICE_MODES).toEqual(['classic', 'wordHunt', 'wheelRush']);
+  });
+});
+
 describe('isValidPracticeMode', () => {
-  it('accepts canonical mode keys', () => {
-    expect(isValidPracticeMode('blast')).toBe(true);
+  it('accepts modes in the practice catalog', () => {
     expect(isValidPracticeMode('classic')).toBe(true);
     expect(isValidPracticeMode('wordHunt')).toBe(true);
     expect(isValidPracticeMode('wheelRush')).toBe(true);
   });
 
+  it('rejects blast at the route layer (no practice tutorial yet)', () => {
+    expect(isValidPracticeMode('blast')).toBe(false);
+  });
+
   it('rejects unknown strings', () => {
     expect(isValidPracticeMode('blastoff')).toBe(false);
     expect(isValidPracticeMode('')).toBe(false);
-    expect(isValidPracticeMode('word-hunt')).toBe(false); // hyphenated form not supported
+    expect(isValidPracticeMode('word-hunt')).toBe(false);
   });
 });

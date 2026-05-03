@@ -55,17 +55,23 @@ describe('word-vault types & stub content', () => {
     expect(CINDER.was).toMatch(/cook|warm/i);
   });
 
-  it('BOOK_1_ITEMS exposes one item per room (6 total) per RPG-layer spec', () => {
-    expect(BOOK_1_ITEMS).toHaveLength(6);
+  it('BOOK_1_ITEMS exposes 6 room-reward items + 1 hotspot item (broom) per RPG-layer spec', () => {
+    expect(BOOK_1_ITEMS).toHaveLength(7);
     const ids = BOOK_1_ITEMS.map((i) => i.id).sort();
     expect(ids).toEqual([
       'brass-key',
+      'broom',
       'cael-recipe-book',
       'cinder-charm',
       'defrost-candle',
       'family-photo',
       'melo-lantern',
     ]);
+  });
+
+  it('CINDER renamed to native HE (גחלת) per critique pass 2026-05-03', () => {
+    expect(CINDER.nameHe).toBe('גחלת');
+    expect(CINDER.nameEn).toBe('Gachelet');
   });
 
   it('every room declares a non-negative coin reward', () => {

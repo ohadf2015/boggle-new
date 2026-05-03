@@ -30,6 +30,7 @@ export type WordVaultState = GameProgress & {
 export type WordVaultActions = {
   startNewSession: () => void;
   solveRoom: (roomId: RoomId, reward: RoomReward) => void;
+  grantItem: (itemId: ItemId) => boolean;
   earnCoins: (n: number) => void;
   spendHintToken: () => boolean;
   grantHintTokens: (n: number) => void;
@@ -136,6 +137,14 @@ export function createGameStore(options: CreateGameStoreOptions = {}): WordVault
             sync({ type: 'item-earned', itemId }, snapshot(get()));
           }
         }
+      },
+
+      grantItem: (itemId) => {
+        const state = get();
+        if (state.permanentItems.includes(itemId)) return false;
+        set({ permanentItems: [...state.permanentItems, itemId] });
+        persistAndSync({ type: 'item-earned', itemId });
+        return true;
       },
 
       earnCoins: (n) => {

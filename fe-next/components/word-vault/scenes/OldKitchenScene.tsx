@@ -115,7 +115,7 @@ export function OldKitchenScene({ onSolved, onExit }: Props) {
       {/* Header */}
       <div className="relative z-10 px-6 pt-5 text-center" dir="rtl">
         <p className="font-fredoka text-[11px] uppercase tracking-[0.4em]" style={{ color: 'rgba(255,225,180,0.45)' }}>
-          המטבח הישן של קאל
+          המטבח הישן של אורי
         </p>
         <h2
           className="mt-1 font-fredoka text-2xl font-black"

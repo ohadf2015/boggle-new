@@ -222,7 +222,9 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     if (pendingRoom) {
       router.push(`/${language}/multiplayer?room=${pendingRoom}`);
     } else {
-      router.push(`/${language}/multiplayer`);
+      // First-timers with no invite land in cozy practice hub to learn modes
+      // before facing real opponents. Reduces "dropped into MP cold" churn.
+      router.push(`/${language}/practice`);
     }
     emitCompleted({ via: 'score_reveal' });
     onComplete();

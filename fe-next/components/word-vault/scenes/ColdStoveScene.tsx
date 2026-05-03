@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { EmberOverlay } from '@/components/word-vault/pixi/EmberOverlay';
+import { getGameStore } from '@/lib/word-vault/state/gameStore';
 
 interface Props {
   onSolved: () => void;
@@ -50,15 +51,27 @@ export function ColdStoveScene({ onSolved, onExit }: Props) {
   const [burst, setBurst] = useState<{ id: number; x: number; y: number } | undefined>();
   const [burstId, setBurstId] = useState(0);
   const [revealed, setRevealed] = useState<Set<ValveId>>(new Set());
+  const [hasBrassKey, setHasBrassKey] = useState(false);
+
+  // Item perks on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const items = getGameStore().getState().permanentItems;
+    if (items.includes('brass-key')) setHasBrassKey(true);
+  }, []);
 
   const handleTurn = useCallback(
     (id: ValveId) => {
       if (done) return;
-      // Time valve = broken — gives a unique whisper, doesn't add to sequence
+      // Time valve = broken UNLESS player has the brass key (which fixes it and reveals the order)
       if (id === BROKEN_VALVE) {
         setRevealed((prev) => new Set(prev).add(id));
-        setWhisper('"זמן לא אופים. אבל הזמן אופה אותנו."');
-        setTimeout(() => setWhisper(null), 2200);
+        if (hasBrassKey) {
+          setWhisper('"גז. אוויר. אש. — אורי תיקן את הברז."');
+        } else {
+          setWhisper('"זמן לא אופים. אבל הזמן אופה אותנו."');
+        }
+        setTimeout(() => setWhisper(null), 2400);
         // Doesn't advance sequence — silently
         return;
       }
@@ -70,7 +83,12 @@ export function ColdStoveScene({ onSolved, onExit }: Props) {
       // Match against correct order
       const isCorrectSoFar = next.every((v, i) => v === CORRECT_ORDER[i]);
       if (!isCorrectSoFar) {
-        // Wrong: emit smoke shape
+        // Wrong: emit smoke shape, but KEEP correct prefix (graduated feedback)
+        const correctPrefix: ValveId[] = [];
+        for (let i = 0; i < next.length; i++) {
+          if (next[i] === CORRECT_ORDER[i]) correctPrefix.push(next[i]);
+          else break;
+        }
         const shapes: SmokeShape[] = ['heart', 'fish', 'star', 'cloud', 'cross'];
         const shape = shapes[Math.floor(Math.random() * shapes.length)];
         setSmokeShape(shape);
@@ -79,7 +97,7 @@ export function ColdStoveScene({ onSolved, onExit }: Props) {
         setTimeout(() => {
           setSmokeShape(null);
           setWhisper(null);
-          setSequence([]);
+          setSequence(correctPrefix);
         }, 2400);
         return;
       }
@@ -97,7 +115,7 @@ export function ColdStoveScene({ onSolved, onExit }: Props) {
         setTimeout(() => setDone(true), 1200);
       }
     },
-    [sequence, done, burstId],
+    [sequence, done, burstId, hasBrassKey],
   );
 
   return (
@@ -253,7 +271,7 @@ export function ColdStoveScene({ onSolved, onExit }: Props) {
               ארבעה ברזים. אש אחת.
             </h2>
             <p className="mt-4 font-rubik text-base leading-relaxed text-white/85">
-              קאל ידע את הסדר. אתה צריך ללמוד אותו.
+              אורי ידע את הסדר. את צריכה ללמוד אותו.
               סובב ברזים. הקשב למה שהתנור עושה.
             </p>
             <p className="mt-3 font-rubik text-sm text-white/65">

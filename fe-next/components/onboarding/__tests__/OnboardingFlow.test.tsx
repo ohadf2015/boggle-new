@@ -173,13 +173,13 @@ describe('OnboardingFlow', () => {
     expect(screen.getByTestId('score-reveal')).toBeInTheDocument();
   });
 
-  it('navigates to multiplayer after score reveal continue', () => {
+  it('navigates to cozy practice hub after score reveal continue', () => {
     render(<OnboardingFlow {...defaultProps} />);
     selectLanguage();
     fireEvent.click(screen.getByText('Complete Tutorial'));
     fireEvent.click(screen.getByText('Set Profile'));
     fireEvent.click(screen.getByText('Continue'));
-    expect(mockPush).toHaveBeenCalledWith('/en/multiplayer');
+    expect(mockPush).toHaveBeenCalledWith('/en/practice');
   });
 
   it('advances to score reveal after profile setup', () => {
@@ -259,14 +259,14 @@ describe('OnboardingFlow', () => {
       expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=ABC123');
     });
 
-    it('redirects to multiplayer after continue when no pending invite', () => {
+    it('redirects to cozy practice hub after continue when no pending invite', () => {
       mockConsumePendingRoom.mockReturnValue(null);
       render(<OnboardingFlow {...defaultProps} />);
       advanceToProfile();
       fireEvent.click(screen.getByText('Set Profile'));
       expect(screen.getByTestId('score-reveal')).toBeInTheDocument();
       fireEvent.click(screen.getByText('Continue'));
-      expect(mockPush).toHaveBeenCalledWith('/en/multiplayer');
+      expect(mockPush).toHaveBeenCalledWith('/en/practice');
     });
   });
 });

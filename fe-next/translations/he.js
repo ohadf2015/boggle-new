@@ -1847,7 +1847,7 @@ const he = {
     },
     "training": {
       "title": "מצב אימון",
-      "description": "תרגלו בקצב שלכם בלי לחץ. מושלם למתחילים! 💪",
+      "description": "בלי טיימר. בלי לחץ.",
       "ready": "מוכנים לשחק!",
       "hint": "מצבי משחק נוספים ייפתחו ככל שתשחקו יותר! 🎮"
     },
@@ -1868,7 +1868,7 @@ const he = {
     },
     "ftue": {
       "swipeToConnect": "החליקו לחיבור אותיות!",
-      "findMultipleWords": "מצאו 3 מילים! החליקו על אותיות כדי לאיית.",
+      "findMultipleWords": "מצאו 3 מילים. החליקו לאיות.",
       "wordsFound": "{{count}}/3 מילים נמצאו",
       "amazing": "מדהים!",
       "keepGoing": "קומבו!",
@@ -1885,9 +1885,9 @@ const he = {
       "continue": "המשך",
       "aboveAverage": "מעל הממוצע!",
       "dailyChallenge": "אתגר יומי",
-      "dailyChallengeDesc": "התחרו על הלוח של היום — אותו פאזל לכולם!",
+      "dailyChallengeDesc": "אותו פאזל, לכל השחקנים",
       "practiceMode": "משחק מהיר",
-      "practiceModeDesc": "קפצו פנימה — מצאו מילים בקצב שלכם!",
+      "practiceModeDesc": "בלי טיימר, בקצב שלך",
       "joinFriendsGame": "הצטרפו למשחק של חבר",
       "joinFriendsGameDesc": "קפצו למשחק חי עם חברים!",
       "friendIsWaiting": "החבר שלכם מחכה!",
@@ -10012,7 +10012,12 @@ const he = {
       feature1: "מתוזמן",
       feature2: "ניקוד",
       feature3: "חופשי",
-      intro: { greet: "בלי לחץ. רק מילים." }
+      intro: { greet: "בלי לחץ. רק מילים." },
+      tutorial: {
+        tip1: "גררו אותיות סמוכות",
+        tip2: "ארוך יותר = יותר נקודות",
+        tip3: "אין טיימר, רק חקרו"
+      }
     },
     blast: {
       name: "בלאסט",
@@ -10028,7 +10033,12 @@ const he = {
       feature1: "מילות יעד",
       feature2: "מרוץ מהירות",
       feature3: "רמזים",
-      intro: { greet: "מילה אחת בכל פעם. אתם תצליחו." }
+      intro: { greet: "מילה אחת בכל פעם. אתם תצליחו." },
+      tutorial: {
+        tip1: "מצאו את מילת המטרה",
+        tip2: "גררו אותיות סמוכות",
+        tip3: "יש כמה דרכים"
+      }
     },
     wheelRush: {
       name: "ריצת גלגל",
@@ -10036,11 +10046,20 @@ const he = {
       feature1: "חלון נעילה",
       feature2: "ערפל קרב",
       feature3: "בונוס פנגרם",
-      intro: { greet: "סובבו בעדינות. המילים יבואו." }
+      intro: { greet: "סובבו בעדינות. המילים יבואו." },
+      tutorial: {
+        tip1: "השתמשו באות המרכזית",
+        tip2: "כל סדר עובד",
+        tip3: "רבים מאריכים מילים"
+      }
     },
     intro: {
       cta: "בוא נתחיל",
       skip: "דלג"
+    },
+    tutorial: {
+      title: "איך זה עובד",
+      cta: "הבנתי, נסו את זה"
     },
     random: "אקראי",
     randomDescription: "הפתיעו אותי! מצב אקראי בכל סיבוב.",
@@ -10058,6 +10077,10 @@ const he = {
   "practiceHub": {
     "title": "תרגול",
     "subtitle": "מקום שקט ללמוד כל מצב"
+  },
+  "practiceBadge": {
+    "label": "תרגול",
+    "aria": "מצב תרגול — לא צוברים XP"
   },
   "shareResult": {
     "singleplayer": "LexiClash סולו",

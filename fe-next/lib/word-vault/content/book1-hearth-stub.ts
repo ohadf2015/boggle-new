@@ -2,8 +2,8 @@ import type { Cousin, Item, RoomConfig } from '../types';
 
 export const CINDER: Cousin = {
   id: 'cinder',
-  nameHe: 'סינדר',
-  nameEn: 'Cinder',
+  nameHe: 'גחלת',
+  nameEn: 'Gachelet',
   was: 'warm-hearted cook, fed everyone, knew every recipe by heart',
   is: 'charred-black cube wreathed in lava-cracks, hungry, raging',
   domain: 'Hearth Halls — burned-down kitchen, ash-covered counters',
@@ -12,7 +12,7 @@ export const CINDER: Cousin = {
 export const BOOK_1_ITEMS: Item[] = [
   {
     id: 'melo-lantern',
-    name: { he: 'הפנס של מלו', en: "Melo's Lantern" },
+    name: { he: 'הפנס של אש', en: "Esh's Lantern" },
     description: { he: 'חושף אות אחת בכל קיר חרוט', en: 'Reveals one letter on a carved wall' },
   },
   {
@@ -27,10 +27,10 @@ export const BOOK_1_ITEMS: Item[] = [
   },
   {
     id: 'cael-recipe-book',
-    name: { he: 'ספר המתכונים של קאל', en: "Cael's Recipe Book" },
+    name: { he: 'ספר המתכונים של אורי', en: "Uri's Recipe Book" },
     description: {
-      he: 'מציג את סדר המתכון של קאל פעם אחת',
-      en: "Shows Cael's recipe order once",
+      he: 'מציג את סדר המתכון של אורי פעם אחת',
+      en: "Shows Uri's recipe order once",
     },
   },
   {
@@ -40,12 +40,20 @@ export const BOOK_1_ITEMS: Item[] = [
   },
   {
     id: 'cinder-charm',
-    name: { he: 'קמע סינדר', en: 'Cinder Charm' },
+    name: { he: 'קמע גחלת', en: 'Gachelet Charm' },
     description: {
       he: '+1 מטבעות זיכרון מחידות אש',
       en: '+1 Memory Coin from fire-themed riddles',
     },
     passive: 'fire-coin-bonus',
+  },
+  {
+    id: 'broom',
+    name: { he: 'מטאטא קש ישן', en: 'Old Straw Broom' },
+    description: {
+      he: 'מנקה ערמות פיח עבות בקירות הסדוקים',
+      en: 'Sweeps thick soot from cracked walls',
+    },
   },
 ];
 
@@ -55,8 +63,8 @@ export const BOOK_1_HEARTH_ROOMS: RoomConfig[] = [
     chapter: 1,
     title: { he: 'הדלת הסדוקה', en: 'The Cracked Door' },
     storyBeat: {
-      he: 'מלו נכנס. הפנס נדלק. שאון רחוק. סינדר קורא: "חזור, קטנטן!"',
-      en: 'Melo enters. Lantern lights up. Distant roar. Cinder calls: "GO BACK, LITTLE ONE!"',
+      he: 'אש נכנסת. הפנס נדלק. שאון רחוק. גחלת קוראת: "חזרי, קטנטונת!"',
+      en: 'Esh enters. Lantern lights up. Distant roar. Gachelet calls: "GO BACK, LITTLE ONE!"',
     },
     riddle: {
       engine: 'word-constraint',
@@ -74,8 +82,8 @@ export const BOOK_1_HEARTH_ROOMS: RoomConfig[] = [
     chapter: 1,
     title: { he: 'קיר המתכונים', en: 'The Recipe Wall' },
     storyBeat: {
-      he: 'בעת שהקלפים מסתדרים, נשמעת מנגינת זמזום קלה — שירת הבישול הישנה של קאל.',
-      en: "As cards align, faint humming melody plays — Cael's old cooking song.",
+      he: 'בעת שהקלפים מסתדרים, נשמעת מנגינת זמזום קלה — שירת הבישול הישנה של אורי.',
+      en: "As cards align, faint humming melody plays — Uri's old cooking song.",
     },
     riddle: {
       engine: 'logic-sequence',
@@ -137,8 +145,8 @@ export const BOOK_1_HEARTH_ROOMS: RoomConfig[] = [
     chapter: 1,
     title: { he: 'המרתף המעשן', en: 'The Smouldering Vault' },
     storyBeat: {
-      he: 'המרתף נפתח, ומגלה את ספר המתכונים של קאל.',
-      en: "Vault opens, reveals Cael's Recipe Book.",
+      he: 'המרתף נפתח, ומגלה את ספר המתכונים של אורי.',
+      en: "Vault opens, reveals Uri's Recipe Book.",
     },
     riddle: {
       engine: 'logic-sequence',
@@ -166,10 +174,10 @@ export const BOOK_1_HEARTH_ROOMS: RoomConfig[] = [
   {
     id: 'room-1-5',
     chapter: 1,
-    title: { he: 'המטבח הישן של קאל', en: "Cael's Old Kitchen" },
+    title: { he: 'המטבח הישן של אורי', en: "Uri's Old Kitchen" },
     storyBeat: {
-      he: 'מטבח נקי, קפוא בזמן שלפני ההשחתה. תמונה משפחתית של חמשת בני הדודים. מלו מזיל דמעה. סדר המנה החתומה נחשף בסביבה.',
-      en: 'A clean kitchen frozen in time before corruption. Family photo of all 5 cousins. Melo sheds a tear. Signature dish ingredient ORDER revealed environmentally.',
+      he: 'מטבח נקי, קפוא בזמן שלפני ההשחתה. תמונה משפחתית של חמשת בני הדודים. אש מזילה דמעה. סדר המנה החתומה נחשף בסביבה.',
+      en: 'A clean kitchen frozen in time before corruption. Family photo of all 5 cousins. Esh sheds a tear. Signature dish ingredient ORDER revealed environmentally.',
     },
     riddle: null,
     rewards: { coins: 15, items: ['family-photo'], letterFragment: 1 },
@@ -180,8 +188,8 @@ export const BOOK_1_HEARTH_ROOMS: RoomConfig[] = [
     chapter: 1,
     title: { he: 'המתכון האחרון', en: 'The Last Recipe' },
     storyBeat: {
-      he: 'במילה הנכונה השלישית סינדר חוזר לרגע להיות קאל, בוכה, מחבק את מלו ונעלם — ומשאיר אחריו את ספר המתכונים ושירת אותיות.',
-      en: 'On third correct word, Cinder transforms back into Cael for a moment, weeps, hugs Melo, then vanishes — leaving Recipe Book + Letter-Song.',
+      he: 'כשהפריטים נחים יחד על המזבח, גחלת חוזרת לרגע להיות אורי, בוכה, מחבק את אש ונעלם — ומשאיר אחריו את שירת האותיות.',
+      en: 'When the ritual items rest together on the altar, Gachelet transforms back into Uri for a moment, weeps, hugs Esh, then vanishes — leaving the Letter-Song.',
     },
     riddle: {
       engine: 'word-constraint',

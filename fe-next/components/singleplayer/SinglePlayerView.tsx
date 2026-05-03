@@ -24,6 +24,8 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAchievementQueue } from '@/components/achievements';
 import { useSinglePlayerConfig } from './useSinglePlayerConfig';
+import { usePracticeFlag } from '@/hooks/usePracticeFlag';
+import PracticeBadge from '@/components/practice/PracticeBadge';
 
 export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge';
 export type SinglePlayerPhase = 'pre-game' | 'playing' | 'results';
@@ -86,6 +88,7 @@ export interface SinglePlayerResultsData {
 const SinglePlayerView: React.FC = () => {
   const { language: uiLanguage, t } = useLanguage();
   const searchParams = useSearchParams();
+  const isPractice = usePracticeFlag();
 
   const {
     phase, setPhase,
@@ -202,6 +205,13 @@ const SinglePlayerView: React.FC = () => {
     results.previousHighScore = highScoreResult.previousBest;
     results.isNewAllTimeBest = highScoreResult.isNewAllTimeBest;
 
+    // Practice mode: skip all reward writes (XP, leaderboard, creator coins, achievements)
+    if (isPractice) {
+      setResultsData(results);
+      setPhase('results');
+      return;
+    }
+
     // Sync stats + XP to Supabase for authenticated users
     if (isAuthenticated && user?.id) {
       fetch('/api/stats/record-game', {
@@ -250,7 +260,7 @@ const SinglePlayerView: React.FC = () => {
     setResultsData(results);
     setPhase('results');
   // eslint-disable-next-line react-hooks/exhaustive-deps -- t is stable from LanguageContext
-}, [gameState.mode, gameState.difficulty, gameState.timerSeconds, boardCode, setPhase, isAuthenticated, user?.id, queueAchievement]);
+}, [gameState.mode, gameState.difficulty, gameState.timerSeconds, boardCode, setPhase, isAuthenticated, user?.id, queueAchievement, isPractice]);
 
   return (
     <div
@@ -272,6 +282,11 @@ const SinglePlayerView: React.FC = () => {
       )}
 
       <div className={`w-full px-2 sm:px-3 lg:px-4 landscape-content overflow-x-hidden ${phase === 'playing' ? 'flex-1 min-h-0 flex flex-col' : ''}`}>
+        {phase === 'playing' && isPractice && (
+          <div className="absolute top-3 right-3 z-30 pointer-events-none">
+            <PracticeBadge />
+          </div>
+        )}
         {phase === 'playing' && (
           <SinglePlayerGame
             settings={gameState}

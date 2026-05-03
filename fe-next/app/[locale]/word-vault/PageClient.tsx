@@ -15,7 +15,7 @@ interface PageClientProps {
 }
 
 type Screen =
-  | { kind: 'story'; roomId: string }
+  | { kind: 'story'; roomId: string; isRevisit?: boolean }
   | { kind: 'hub' }
   | { kind: 'transition'; nextRoomId: string | null }
   | { kind: 'book-end' };
@@ -105,7 +105,10 @@ function SceneRouter({
     return (
       <HubFoyer
         store={store}
-        onEnterRoom={(roomId) => setScreen({ kind: 'story', roomId })}
+        onEnterRoom={(roomId) => {
+          const isRevisit = solvedRooms.includes(roomId);
+          setScreen({ kind: 'story', roomId, isRevisit });
+        }}
       />
     );
   }
@@ -124,6 +127,11 @@ function SceneRouter({
         store={store}
         roomId={screen.roomId}
         onExit={() => {
+          // Revisit flow: solved-room replays return to hub, never auto-advance
+          if (screen.kind === 'story' && screen.isRevisit) {
+            setScreen({ kind: 'hub' });
+            return;
+          }
           // After solving the LAST room: book-end cinematic
           if (screen.roomId === ROOM_ORDER[ROOM_ORDER.length - 1]) {
             setScreen({ kind: 'book-end' });
@@ -259,14 +267,14 @@ function BookEndCinematic({ onContinue }: { onContinue: () => void }) {
           animation: 'wv-fadeUp 1.4s ease-out 0.4s both',
         }}
       >
-        קאל חזר.
+        אורי חזר.
       </h1>
 
       {/* Cael portrait */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/word-vault/characters/cael.png"
-        alt="קאל"
+        alt="אורי"
         className="mt-6 h-56 w-56 object-contain sm:h-72 sm:w-72"
         style={{
           filter: 'drop-shadow(0 0 60px rgba(255,225,170,0.95))',
@@ -281,9 +289,9 @@ function BookEndCinematic({ onContinue }: { onContinue: () => void }) {
       >
         הלבה התקררה. הסדקים נסגרו. רגע אחד הוא חזר —
         <br />
-        חיבק את מלו, לחש &quot;תודה&quot;, ונעלם.
+        חיבק את אש, לחש &quot;תודה&quot;, ונעלם.
         <br />
-        השאיר אחריו: ספר מתכונים, קמע סינדר, ושיר אותיות אחד.
+        השאיר אחריו: ספר מתכונים, קמע גחלת, ושיר אותיות אחד.
       </p>
 
       {/* Loot earned */}
@@ -292,7 +300,7 @@ function BookEndCinematic({ onContinue }: { onContinue: () => void }) {
         style={{ animation: 'wv-fadeUp 2s ease-out 2s both' }}
       >
         <BookEndChip emoji="📖" label="ספר המתכונים" />
-        <BookEndChip emoji="🔥" label="קמע סינדר" />
+        <BookEndChip emoji="🔥" label="קמע גחלת" />
         <BookEndChip emoji="🎵" label="שיר אותיות 1/4" />
       </div>
 

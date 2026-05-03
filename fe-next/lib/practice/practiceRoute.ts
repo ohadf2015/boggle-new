@@ -3,12 +3,10 @@
  * Shared by the /practice/[mode] entry route and any tests.
  */
 
-import type { IntroMode } from '@/hooks/useModeFirstSeen';
+import type { PracticeMode } from './practiceTutorialSteps';
 
-export function practiceTargetUrl(mode: IntroMode, locale: string): string {
+export function practiceTargetUrl(mode: PracticeMode, locale: string): string {
   switch (mode) {
-    case 'blast':
-      return `/${locale}/blast?practice=1`;
     case 'wordHunt':
       return `/${locale}/daily/word-hunt?practice=1`;
     case 'wheelRush':
@@ -19,8 +17,13 @@ export function practiceTargetUrl(mode: IntroMode, locale: string): string {
   }
 }
 
-export const PRACTICE_MODES: ReadonlyArray<IntroMode> = ['classic', 'blast', 'wordHunt', 'wheelRush'];
+/**
+ * Practice mode catalog — intentionally excludes 'blast'.
+ * Blast mechanics (combos, special tiles, cascade) need a bespoke tutorial
+ * that doesn't fit the simple drag-find-word pattern of the other 3 modes.
+ */
+export const PRACTICE_MODES: ReadonlyArray<PracticeMode> = ['classic', 'wordHunt', 'wheelRush'];
 
-export function isValidPracticeMode(value: string): value is IntroMode {
+export function isValidPracticeMode(value: string): value is PracticeMode {
   return (PRACTICE_MODES as readonly string[]).includes(value);
 }

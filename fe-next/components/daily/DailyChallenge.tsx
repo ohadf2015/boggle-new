@@ -41,6 +41,8 @@ import { shouldAutoShowTutorial } from './tutorial/shouldAutoShowTutorial';
 import { markWordHuntTutorialSeen } from './tutorial/markWordHuntTutorialSeen';
 import { useDailyChallengeUrlParams } from './useDailyChallengeUrlParams';
 import { useRetryChallenge } from './useRetryChallenge';
+import { usePracticeFlag } from '@/hooks/usePracticeFlag';
+import PracticeBadge from '@/components/practice/PracticeBadge';
 import type { LetterGrid, Language } from '@/types';
 
 export type DailyChallengePhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played';
@@ -50,6 +52,7 @@ const DailyChallenge: React.FC = () => {
   const { isAuthenticated, profile } = useAuth();
   const { unlockAudio } = useMusic();
   const { recordWin: recordStreak } = useWinStreak();
+  const isPractice = usePracticeFlag();
 
   // Game language state
   const urlLocale = language as Language;
@@ -148,7 +151,8 @@ const DailyChallenge: React.FC = () => {
       const hasCompletedTutorial = typeof window !== 'undefined' && localStorage.getItem(tutorialKey) === 'true';
       setTutorialCompleted(hasCompletedTutorial);
 
-      if (!wasJustReset) {
+      // Practice mode: bypass already-played gates so the player can replay safely
+      if (!wasJustReset && !isPractice) {
         const localResult = getTodaysWordHuntResult(gameLanguage);
         if (localResult) {
           if (!isMounted) return;
@@ -236,7 +240,8 @@ const DailyChallenge: React.FC = () => {
       return;
     }
 
-    if (hasPlayedWordHuntToday(gameLanguage)) {
+    // Practice mode: bypass already-played gates so the player can replay safely
+    if (!isPractice && hasPlayedWordHuntToday(gameLanguage)) {
       const result = getTodaysWordHuntResult(gameLanguage);
       if (result) {
         setStoredResult(result);
@@ -245,45 +250,54 @@ const DailyChallenge: React.FC = () => {
       }
     }
 
-    try {
-      const date = getDailyChallengeDate();
-      const fp = await getGuestFingerprint();
-      const checkParams = new URLSearchParams();
-      if (isAuthenticated && profile) checkParams.set('playerId', profile.id);
-      else if (fp) checkParams.set('guestFingerprint', fp);
+    if (!isPractice) {
+      try {
+        const date = getDailyChallengeDate();
+        const fp = await getGuestFingerprint();
+        const checkParams = new URLSearchParams();
+        if (isAuthenticated && profile) checkParams.set('playerId', profile.id);
+        else if (fp) checkParams.set('guestFingerprint', fp);
 
-      if (checkParams.toString()) {
-        const checkResponse = await fetch(
-          `/api/daily-challenge/word-hunt/check-played/${date}/${gameLanguage}?${checkParams.toString()}`
-        );
-        if (checkResponse.ok) {
-          const checkData = await checkResponse.json();
-          if (checkData.hasPlayed) {
-            neoErrorToast(t('daily.alreadyPlayed'), { icon: '🔒', duration: 3000 });
-            if (checkData.result) {
-              const number = getPuzzleNumber(date);
-              const serverResult = mapServerResultToStoredResult(
-                checkData.result, date, number, gameLanguage, checkData.streak?.currentStreak || 0
-              );
-              setStoredResult(serverResult);
+        if (checkParams.toString()) {
+          const checkResponse = await fetch(
+            `/api/daily-challenge/word-hunt/check-played/${date}/${gameLanguage}?${checkParams.toString()}`
+          );
+          if (checkResponse.ok) {
+            const checkData = await checkResponse.json();
+            if (checkData.hasPlayed) {
+              neoErrorToast(t('daily.alreadyPlayed'), { icon: '🔒', duration: 3000 });
+              if (checkData.result) {
+                const number = getPuzzleNumber(date);
+                const serverResult = mapServerResultToStoredResult(
+                  checkData.result, date, number, gameLanguage, checkData.streak?.currentStreak || 0
+                );
+                setStoredResult(serverResult);
+              }
+              setPhase('already-played');
+              return;
             }
-            setPhase('already-played');
-            return;
           }
         }
+      } catch (error) {
+        console.warn('Failed to check server before game start:', error);
       }
-    } catch (error) {
-      console.warn('Failed to check server before game start:', error);
     }
 
     trackDailyPuzzle('opened', 'word_hunt');
     trackFeatureFirstUse('daily_word_hunt');
     gameStartedAtRef.current = Date.now();
     setPhase('playing');
-  }, [gameLanguage, isAuthenticated, profile, t, unlockAudio, justResetRef]);
+  }, [gameLanguage, isAuthenticated, profile, t, unlockAudio, justResetRef, isPractice]);
 
   // Handle game completion
   const handleGameComplete = useCallback((result: SurvivalGameResult, rescueMethod?: WordHuntRescueMethod) => {
+    // Practice mode: skip all persistence (no streak, no leaderboard, no analytics).
+    // Show transient results only and let player replay freely.
+    if (isPractice) {
+      setGameResult(result);
+      setPhase('completed');
+      return;
+    }
     const wordHuntResult: WordHuntResult = {
       puzzleNumber,
       puzzleDate,
@@ -362,7 +376,7 @@ const DailyChallenge: React.FC = () => {
         .catch(() => { /* non-critical */ });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- t is stable from LanguageContext
-}, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated, recordStreak]);
+}, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated, recordStreak, isPractice]);
 
   const handleTutorialComplete = useCallback(() => {
     markWordHuntTutorialSeen(gameLanguage);
@@ -411,6 +425,12 @@ const DailyChallenge: React.FC = () => {
             onShowTutorial={handleShowTutorial}
             t={t}
           />
+        )}
+
+        {phase === 'playing' && isPractice && (
+          <div className="absolute top-3 right-3 z-30 pointer-events-none">
+            <PracticeBadge />
+          </div>
         )}
 
         {phase === 'playing' && grid && targetWord && (

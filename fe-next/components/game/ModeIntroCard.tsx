@@ -23,10 +23,10 @@ const MASCOT_FOR_MODE: Record<IntroMode, string> = {
 };
 
 const RING_FOR_MODE: Record<IntroMode, string> = {
-  classic: 'bg-neo-cyan/20 border-neo-cyan/40',
-  blast: 'bg-neo-pink/20 border-neo-pink/40',
-  wordHunt: 'bg-neo-lime/20 border-neo-lime/40',
-  wheelRush: 'bg-neo-purple/20 border-neo-purple/40',
+  classic: 'bg-neo-cyan/35 border-neo-cyan',
+  blast: 'bg-neo-pink/35 border-neo-pink',
+  wordHunt: 'bg-neo-lime/35 border-neo-lime',
+  wheelRush: 'bg-neo-purple/35 border-neo-purple',
 };
 
 /**
@@ -47,7 +47,12 @@ const ModeIntroCard: React.FC<ModeIntroCardProps> = ({ mode, t, onContinue }) =>
   const skip = t('gameModes.intro.skip');
 
   return (
-    <div className="h-full bg-linear-to-b from-neo-navy to-neo-navy-light flex items-center justify-center px-6">
+    <div className="min-h-[100dvh] w-full bg-linear-to-b from-neo-navy to-neo-navy-light flex flex-col items-center justify-center px-6 py-10">
+      <div className="flex items-center justify-center gap-2 mb-6" aria-hidden>
+        <span className="w-6 h-2 rounded-full bg-neo-lime" />
+        <span className="w-2 h-2 rounded-full bg-neo-cream/60" />
+        <span className="w-2 h-2 rounded-full bg-neo-cream/40" />
+      </div>
       <AdaptiveMotion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -57,7 +62,7 @@ const ModeIntroCard: React.FC<ModeIntroCardProps> = ({ mode, t, onContinue }) =>
         <AdaptiveMotion.div
           animate={{ scale: [1, 1.02, 1] }}
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-          className={`w-32 h-32 rounded-full border-2 flex items-center justify-center ${RING_FOR_MODE[mode]}`}
+          className={`relative w-32 h-32 rounded-full border-2 overflow-hidden flex items-center justify-center ${RING_FOR_MODE[mode]}`}
           aria-hidden
         >
           <Image
@@ -65,13 +70,13 @@ const ModeIntroCard: React.FC<ModeIntroCardProps> = ({ mode, t, onContinue }) =>
             alt=""
             width={96}
             height={96}
-            className="object-contain"
+            className="object-contain rounded-full"
             draggable={false}
             priority
           />
         </AdaptiveMotion.div>
 
-        <p className="text-sm font-neo-body text-neo-cream/70 italic">
+        <p className="text-sm font-neo-body text-neo-cream/85 italic">
           {greet}
         </p>
 
@@ -79,7 +84,7 @@ const ModeIntroCard: React.FC<ModeIntroCardProps> = ({ mode, t, onContinue }) =>
           {name}
         </h1>
 
-        <p className="text-base font-neo-body text-neo-cream/80 leading-relaxed">
+        <p className="text-base font-neo-body text-neo-cream leading-relaxed">
           {description}
         </p>
 

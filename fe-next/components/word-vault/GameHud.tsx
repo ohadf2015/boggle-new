@@ -17,6 +17,7 @@ const ITEM_GLYPH: Record<ItemId, string> = {
   'cael-recipe-book': '📖',
   'family-photo':     '🖼️',
   'cinder-charm':     '🔥',
+  'broom':            '🧹',
 };
 
 export function GameHud({ store }: Props) {
@@ -37,7 +38,7 @@ export function GameHud({ store }: Props) {
         }}
       >
         <div className="pointer-events-auto flex items-center gap-2">
-          <HudPill icon="🪙" value={memoryCoins} tone="gold" />
+          <HudPill icon="🪙" value={memoryCoins} tone="gold" glow={items.includes('cinder-charm')} />
           <HudPill icon="💡" value={hintTokens} tone="cyan" />
         </div>
         <button
@@ -69,7 +70,7 @@ export function GameHud({ store }: Props) {
                 className="font-fredoka text-2xl font-black text-amber-200"
                 style={{ textShadow: '2px 2px 0 #000' }}
               >
-                המלאי של מלו
+                המלאי של אש
               </h2>
               <button
                 type="button"
@@ -117,10 +118,12 @@ function HudPill({
   icon,
   value,
   tone,
+  glow = false,
 }: {
   icon: string;
   value: number;
   tone: 'gold' | 'cyan';
+  glow?: boolean;
 }) {
   const palette =
     tone === 'gold'
@@ -129,7 +132,12 @@ function HudPill({
   return (
     <span
       className="flex items-center gap-1 rounded-full border-2 px-3 py-0.5 font-fredoka font-black"
-      style={{ background: palette.bg, borderColor: palette.border, color: palette.ink }}
+      style={{
+        background: palette.bg,
+        borderColor: palette.border,
+        color: palette.ink,
+        boxShadow: glow ? '0 0 14px 2px rgba(255,107,53,0.65), inset 0 0 8px rgba(255,140,60,0.35)' : undefined,
+      }}
     >
       <span>{icon}</span>
       <span>{value}</span>

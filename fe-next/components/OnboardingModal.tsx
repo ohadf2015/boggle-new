@@ -164,8 +164,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
       });
     }
 
-    // Navigate directly to practice mode (no timer, relaxed exploration)
-    router.push(`/${language}/singleplayer?autoStart=practice`);
+    // Land in cozy practice hub — players pick a mode + see a guided tutorial
+    // before being dropped into the real engine. Replaces legacy autoStart flow.
+    router.push(`/${language}/practice`);
 
     onClose();
   };

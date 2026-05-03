@@ -15,7 +15,8 @@ export type ItemId =
   | 'brass-key'
   | 'cael-recipe-book'
   | 'family-photo'
-  | 'cinder-charm';
+  | 'cinder-charm'
+  | 'broom';
 
 export type RoomId = string;
 

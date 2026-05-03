@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { normalizeHebrewFinalForms } from '@/lib/word-vault/engine/wordConstraintEngine';
 import { EmberOverlay } from '@/components/word-vault/pixi/EmberOverlay';
+import { getGameStore } from '@/lib/word-vault/state/gameStore';
 
 interface Props {
   onSolved: () => void;
@@ -261,6 +262,9 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
                   if (h.shardHe) {
                     setFoundShards((prev) => (prev.includes(h.shardHe!) ? prev : [...prev, h.shardHe!]));
                   }
+                  if (h.id === 'old-broom') {
+                    getGameStore().getState().grantItem('broom');
+                  }
                 }
               }}
               aria-label={h.id}
@@ -436,7 +440,7 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
               ארבע צנצנות. תוויותיהן התערבבו.
             </h2>
             <p className="mt-4 font-rubik text-base leading-relaxed text-white/85">
-              קאל ערבב תוויות לפני שהקור התפשט.
+              אורי ערבב תוויות לפני שהקור התפשט.
               חידה אחת על כל צנצנת — וקצת אותיות נוספות שלא שייכות.
               קרא, חשוב, בחר.
             </p>

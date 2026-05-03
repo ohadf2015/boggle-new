@@ -28,6 +28,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { getGuestFingerprint } from '@/utils/guestManager';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
+import { usePracticeFlag } from '@/hooks/usePracticeFlag';
+import PracticeBadge from '@/components/practice/PracticeBadge';
 
 // Lazy-load PixiJS effects canvas (no SSR)
 const WordWheelEffectsCanvas = dynamic(
@@ -49,6 +51,7 @@ const WORD_WHEEL_DURATION = 120; // 2 minutes
 
 const WordWheelChallenge: React.FC = () => {
   const { t, language } = useLanguage();
+  const isPractice = usePracticeFlag();
   const { setGameActive } = useSoundEffects();
   const { profile, isAuthenticated } = useAuth();
   const setIsInGame = useHideNavigation();
@@ -97,6 +100,15 @@ const WordWheelChallenge: React.FC = () => {
     const gameLang = language as Language;
 
     const init = async () => {
+      // Practice mode: bypass already-played gates so the player can replay safely
+      if (isPractice) {
+        const generated = generateWordWheelPuzzle(date, gameLang);
+        if (!isMounted) return;
+        setPuzzle(generated);
+        setPhase('ready');
+        return;
+      }
+
       // Fast-path: localStorage already has today's result.
       if (hasPlayedWordWheelToday(gameLang)) {
         const stored = getTodaysWordWheelResult(gameLang);
@@ -186,7 +198,7 @@ const WordWheelChallenge: React.FC = () => {
     init();
     return () => { isMounted = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [language, isAuthenticated, profile?.id, guestFingerprint]);
+  }, [language, isAuthenticated, profile?.id, guestFingerprint, isPractice]);
 
   const handleValidateWord = useCallback(
     (word: string) => fastValidateWord(word, language as Language),
@@ -201,6 +213,12 @@ const WordWheelChallenge: React.FC = () => {
   const handleComplete = useCallback((result: WordWheelGameResult) => {
     setGameActive(false);
     setGameResult(result);
+
+    // Practice mode: skip all persistence (no streak, no leaderboard, no localStorage)
+    if (isPractice) {
+      setPhase('completed');
+      return;
+    }
 
     const gameLang = language as Language;
     const date = getDailyChallengeDate();
@@ -289,7 +307,7 @@ const WordWheelChallenge: React.FC = () => {
     })();
 
     setPhase('completed');
-  }, [language, puzzle, puzzleNumber, setGameActive, isAuthenticated, profile]);
+  }, [language, puzzle, puzzleNumber, setGameActive, isAuthenticated, profile, isPractice]);
 
   const handleEffect = useCallback((effect: WordWheelEffect) => {
     setEffects(prev => [...prev, effect]);
@@ -422,6 +440,11 @@ const WordWheelChallenge: React.FC = () => {
         )}
 
         {/* Playing */}
+        {phase === 'playing' && isPractice && (
+          <div className="absolute top-3 right-3 z-30 pointer-events-none">
+            <PracticeBadge />
+          </div>
+        )}
         {phase === 'playing' && puzzle && (
           <motion.div
             key="playing"

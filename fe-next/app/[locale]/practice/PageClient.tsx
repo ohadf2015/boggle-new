@@ -3,14 +3,15 @@
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { haptics } from '@/utils/haptics';
 import { PRACTICE_MODES } from '@/lib/practice/practiceRoute';
-import type { IntroMode } from '@/hooks/useModeFirstSeen';
+import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
-const MODE_ACCENT: Record<IntroMode, string> = {
-  classic: 'border-neo-cyan/40 hover:border-neo-cyan/70',
-  blast: 'border-neo-pink/40 hover:border-neo-pink/70',
-  wordHunt: 'border-neo-lime/40 hover:border-neo-lime/70',
-  wheelRush: 'border-neo-purple/40 hover:border-neo-purple/70',
+const MODE_ACCENT: Record<PracticeMode, string> = {
+  classic: 'border-neo-cyan/80 hover:border-neo-cyan',
+  wordHunt: 'border-neo-lime/80 hover:border-neo-lime',
+  wheelRush: 'border-neo-purple/80 hover:border-neo-purple',
 };
 
 interface Props {
@@ -23,9 +24,14 @@ interface Props {
  */
 export default function PracticeHubClient({ locale }: Props) {
   const { t } = useLanguage();
+  const { playButtonClickSound } = useSoundEffects();
+  const handleTileTap = () => {
+    playButtonClickSound();
+    haptics.tap();
+  };
 
   return (
-    <div className="min-h-screen w-full bg-linear-to-b from-neo-navy to-neo-navy-light px-6 py-10">
+    <div className="min-h-[100dvh] w-full bg-linear-to-b from-neo-navy to-neo-navy-light px-6 py-10">
       <div className="max-w-md mx-auto">
         <AdaptiveMotion.div
           initial={{ opacity: 0, y: 8 }}
@@ -36,7 +42,7 @@ export default function PracticeHubClient({ locale }: Props) {
           <h1 className="text-3xl font-neo-display font-bold text-neo-cream mb-2">
             {t('practiceHub.title')}
           </h1>
-          <p className="text-sm font-neo-body text-neo-cream/70 italic">
+          <p className="text-sm font-neo-body text-neo-cream/85 italic">
             {t('practiceHub.subtitle')}
           </p>
         </AdaptiveMotion.div>
@@ -51,12 +57,13 @@ export default function PracticeHubClient({ locale }: Props) {
             >
               <Link
                 href={`/${locale}/practice/${mode}`}
-                className={`block rounded-neo border-2 ${MODE_ACCENT[mode]} bg-neo-navy/60 px-5 py-4 transition-colors`}
+                onClick={handleTileTap}
+                className={`block rounded-neo border-2 ${MODE_ACCENT[mode]} bg-neo-navy-light px-5 py-4 transition-colors active:translate-y-px shadow-hard-sm`}
               >
                 <h2 className="text-lg font-neo-display font-bold text-neo-cream">
                   {t(`gameModes.${mode}.name`)}
                 </h2>
-                <p className="text-sm font-neo-body text-neo-cream/70 mt-1">
+                <p className="text-sm font-neo-body text-neo-cream/90 mt-1">
                   {t(`gameModes.${mode}.description`)}
                 </p>
               </Link>

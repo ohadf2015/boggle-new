@@ -3881,7 +3881,7 @@ const es = {
     },
     "training": {
       "title": "Modo Entrenamiento",
-      "description": "Practica a tu ritmo sin presión. ¡Perfecto para principiantes!",
+      "description": "Sin temporizador. Sin presión.",
       "ready": "¡Listo para jugar!",
       "hint": "¡Más modos se desbloquean mientras juegas!"
     },
@@ -3902,7 +3902,7 @@ const es = {
     },
     "ftue": {
       "swipeToConnect": "¡Desliza para conectar letras!",
-      "findMultipleWords": "¡Encuentra 3 palabras! Desliza sobre las letras para deletrear.",
+      "findMultipleWords": "Encuentra 3 palabras. Desliza para deletrear.",
       "wordsFound": "{{count}}/3 palabras encontradas",
       "amazing": "¡INCREÍBLE!",
       "keepGoing": "¡COMBO!",
@@ -3919,9 +3919,9 @@ const es = {
       "continue": "Continuar",
       "aboveAverage": "¡Por encima del promedio!",
       "dailyChallenge": "Desafío Diario",
-      "dailyChallengeDesc": "Compite en el tablero de hoy — ¡el mismo puzzle para todos!",
+      "dailyChallengeDesc": "Mismo puzzle, todos juegan",
       "practiceMode": "Juego Rápido",
-      "practiceModeDesc": "¡Salta y encuentra palabras a tu ritmo!",
+      "practiceModeDesc": "Sin temporizador, tu ritmo",
       "joinFriendsGame": "Unirse al juego de un amigo",
       "joinFriendsGameDesc": "¡Únete a una partida en vivo con amigos!",
       "friendIsWaiting": "¡Tu amigo te espera!",
@@ -9865,7 +9865,12 @@ const es = {
       "feature1": "Cronometrado",
       "feature2": "Puntuación",
       "feature3": "Libre",
-      "intro": { "greet": "Tómate tu tiempo. Solo palabras." }
+      "intro": { "greet": "Tómate tu tiempo. Solo palabras." },
+      "tutorial": {
+        "tip1": "Arrastra letras adyacentes",
+        "tip2": "Más largo = más puntos",
+        "tip3": "Sin temporizador, explora"
+      }
     },
     "blast": {
       "name": "Blast",
@@ -9881,7 +9886,12 @@ const es = {
       "feature1": "Palabras objetivo",
       "feature2": "Carrera de velocidad",
       "feature3": "Pistas",
-      "intro": { "greet": "Una palabra a la vez. Tú puedes." }
+      "intro": { "greet": "Una palabra a la vez. Tú puedes." },
+      "tutorial": {
+        "tip1": "Encuentra la palabra objetivo",
+        "tip2": "Arrastra letras adyacentes",
+        "tip3": "Varios caminos funcionan"
+      }
     },
     "wheelRush": {
       "name": "Rueda Veloz",
@@ -9889,11 +9899,20 @@ const es = {
       "feature1": "Ventana de bloqueo",
       "feature2": "Niebla de guerra",
       "feature3": "Bonus pangrama",
-      "intro": { "greet": "Gira con calma. Las palabras llegan." }
+      "intro": { "greet": "Gira con calma. Las palabras llegan." },
+      "tutorial": {
+        "tip1": "Usa la letra central",
+        "tip2": "Cualquier orden vale",
+        "tip3": "Plurales alargan palabras"
+      }
     },
     "intro": {
       "cta": "Vamos",
       "skip": "Saltar"
+    },
+    "tutorial": {
+      "title": "Cómo funciona",
+      "cta": "Entendido, probar"
     },
     "random": "Aleatorio",
     "randomDescription": "¡Sorpréndeme! Modo aleatorio en cada ronda.",
@@ -9911,6 +9930,10 @@ const es = {
   "practiceHub": {
     "title": "Práctica",
     "subtitle": "Un lugar tranquilo para aprender cada modo"
+  },
+  "practiceBadge": {
+    "label": "Práctica",
+    "aria": "Modo práctica — sin XP"
   },
   "accept": "Aceptar",
   "availableOpponents": "Oponentes disponibles",
