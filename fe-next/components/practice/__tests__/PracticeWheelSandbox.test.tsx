@@ -16,6 +16,8 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
     playWordAcceptedSound: vi.fn(),
     playWordRejectedSound: vi.fn(),
+    playButtonClickSound: vi.fn(),
+    playBoardShuffleSound: vi.fn(),
     setGameActive: vi.fn(),
   }),
 }));
