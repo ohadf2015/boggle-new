@@ -4947,6 +4947,7 @@ const sv = {
       "submit": "Skicka",
       "reset": "Rensa",
       "needsCenter": "Ordet måste använda mittbokstaven.",
+      "tooShort": "Minst 2 bokstäver.",
       "found": "Bra! Ordet tillagt.",
       "notAWord": "Inte ett ord — prova ett annat.",
       "duplicate": "Redan hittat.",
@@ -4955,11 +4956,27 @@ const sv = {
   },
   "practiceSwipe": {
     "back": "← Övning",
-    "instruction": "Svep över bokstäverna för att stava {goal} ord.",
-    "done": "Bra — du hittade alla.",
+    "instruction": "Svep för att stava {goal} ord.",
+    "instructionWordHunt": "Hitta {goal} dolda ord.",
+    "done": "Bra — du hittade alla!",
     "continue": "Tillbaka till övning",
     "newBoard": "Ny tavla",
-    "progress": "{found} av {goal} ord"
+    "progress": "{found} av {goal} ord",
+    "greet": "Svep över bokstäverna!",
+    "greetWordHunt": "Jaga de dolda orden!",
+    "celebrate1": "Snyggt!",
+    "celebrate2": "Galant!",
+    "celebrate3": "Boom!",
+    "celebrate4": "Eld i baken!",
+    "huntSlot": "{length} bokstäver",
+    "wheelGreet": "Använd lime-bokstaven!",
+    "wheelShuffle": "Blanda",
+    "wheelClear": "Rensa"
+  },
+  "practiceWelcome": {
+    "greet": "Välkommen till Övning!",
+    "tip": "Prova varje läge i din egen takt. Ingen tid, ingen press.",
+    "cta": "Kör!"
   },
   "wizard": {
     "selectMode": "Välj spelläge",
@@ -10184,11 +10201,14 @@ const sv = {
   "practiceHub": {
     "title": "Övning",
     "subtitle": "En lugn plats att lära sig varje läge",
+    "greet": "Välj ett läge och spela!",
     "progress": "{done} av {total} lägen klara",
     "completedBadge": "Klart",
     "completedDesc": "Tryck för att spela igen",
     "navAria": "Övningslägen",
     "backToHub": "← Hubb",
+    "playLabel": "Spela",
+    "playAgainLabel": "Spela igen",
     "allCompleteTitle": "All övning klar!",
     "allCompleteBody": "Du är redo för de riktiga lägena."
   },

@@ -5,14 +5,41 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { haptics } from '@/utils/haptics';
+import { Mascot, type MascotVariant } from '@/components/ui/Mascot';
 import { PRACTICE_MODES } from '@/lib/practice/practiceRoute';
 import { usePracticeProgress } from '@/components/practice/usePracticeProgress';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
-const MODE_ACCENT: Record<PracticeMode, string> = {
-  classic: 'border-neo-cyan/80 hover:border-neo-cyan',
-  wordHunt: 'border-neo-lime/80 hover:border-neo-lime',
-  wheelRush: 'border-neo-purple/80 hover:border-neo-purple',
+interface ModeStyle {
+  mascot: MascotVariant;
+  border: string;
+  badge: string;
+  cta: string;
+  bg: string;
+}
+
+const MODE_STYLE: Record<PracticeMode, ModeStyle> = {
+  classic: {
+    mascot: 'scholar',
+    border: 'border-neo-cyan',
+    badge: 'cyan',
+    cta: 'bg-neo-cyan',
+    bg: 'from-neo-cyan/10 to-transparent',
+  },
+  wordHunt: {
+    mascot: 'explorer',
+    border: 'border-neo-lime',
+    badge: 'lime',
+    cta: 'bg-neo-lime',
+    bg: 'from-neo-lime/10 to-transparent',
+  },
+  wheelRush: {
+    mascot: 'dj',
+    border: 'border-neo-purple',
+    badge: 'purple',
+    cta: 'bg-neo-purple text-neo-white',
+    bg: 'from-neo-purple/10 to-transparent',
+  },
 };
 
 interface Props {
@@ -20,8 +47,8 @@ interface Props {
 }
 
 /**
- * Cozy practice hub. One mode per row, breathing accents, no badges or
- * counters. Tap → /practice/<mode> which shows the intro card.
+ * Practice hub. Hero mascot greeting + bigger, mascot-fronted mode cards so
+ * the screen pops on first landing. Tap → /practice/<mode>.
  */
 export default function PracticeHubClient({ locale }: Props) {
   const { t, language } = useLanguage();
@@ -33,25 +60,28 @@ export default function PracticeHubClient({ locale }: Props) {
   };
 
   return (
-    <div className="min-h-[100dvh] w-full bg-linear-to-b from-neo-navy to-neo-navy-light px-6 py-10">
+    <div className="min-h-[100dvh] w-full bg-linear-to-b from-neo-navy to-neo-navy-light px-5 py-6">
       <div className="max-w-md mx-auto">
         <AdaptiveMotion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="mb-6 text-center"
+          className="mb-5 flex items-center gap-3"
         >
-          <h1 className="text-3xl font-neo-display font-bold text-neo-cream mb-2">
-            {t('practiceHub.title')}
-          </h1>
-          <p className="text-sm font-neo-body text-neo-cream/85 italic">
-            {t('practiceHub.subtitle')}
-          </p>
+          <Mascot variant="waving" size="sm" clipShape="circle" clipBorder="lime" />
+          <div className="flex-1 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo px-3 py-2 shadow-hard-sm">
+            <h1 className="text-lg font-neo-display font-black uppercase tracking-tight leading-none">
+              {t('practiceHub.title')}
+            </h1>
+            <p className="text-xs font-neo-body font-bold leading-tight mt-0.5">
+              {t('practiceHub.greet')}
+            </p>
+          </div>
         </AdaptiveMotion.div>
 
         <div
           data-testid="practice-progress-headline"
-          className="mb-6 flex items-center justify-center gap-2 text-xs uppercase tracking-wider font-neo-display font-black text-neo-lime"
+          className="mb-4 flex items-center justify-center gap-2 text-xs uppercase tracking-wider font-neo-display font-black text-neo-lime"
         >
           <span aria-hidden>★</span>
           <span>
@@ -67,7 +97,7 @@ export default function PracticeHubClient({ locale }: Props) {
             transition={{ duration: 0.5, ease: 'easeOut' }}
             role="status"
             aria-live="polite"
-            className="mb-6 px-4 py-3 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black shadow-hard text-center"
+            className="mb-5 px-4 py-3 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black shadow-hard text-center"
           >
             <p className="font-neo-display font-black text-base mb-0.5">
               {t('practiceHub.allCompleteTitle')}
@@ -81,6 +111,7 @@ export default function PracticeHubClient({ locale }: Props) {
         <div className="flex flex-col gap-3">
           {PRACTICE_MODES.map((mode, idx) => {
             const isDone = completed.has(mode);
+            const style = MODE_STYLE[mode];
             return (
               <AdaptiveMotion.div
                 key={mode}
@@ -98,7 +129,7 @@ export default function PracticeHubClient({ locale }: Props) {
                       ? `${t(`gameModes.${mode}.name`)} — ${t('practiceHub.completedBadge')}`
                       : t(`gameModes.${mode}.name`)
                   }
-                  className={`relative block rounded-neo border-2 ${MODE_ACCENT[mode]} bg-neo-navy-light px-5 py-4 transition-colors active:translate-y-px shadow-hard-sm`}
+                  className={`relative block rounded-neo border-3 ${style.border} bg-linear-to-r ${style.bg} bg-neo-navy-light px-3 py-3 transition-transform active:translate-y-px shadow-hard-sm overflow-hidden`}
                 >
                   {isDone && (
                     <span
@@ -108,17 +139,27 @@ export default function PracticeHubClient({ locale }: Props) {
                       ✓
                     </span>
                   )}
-                  <h2 className="text-lg font-neo-display font-bold text-neo-cream">
-                    {t(`gameModes.${mode}.name`)}
-                  </h2>
-                  <p className="text-sm font-neo-body text-neo-cream/90 mt-1 pe-8">
-                    {t(`gameModes.${mode}.description`)}
-                  </p>
-                  {isDone && (
-                    <p className="text-xs font-neo-body text-neo-lime/90 mt-2 italic">
-                      {t('practiceHub.completedDesc')}
-                    </p>
-                  )}
+                  <div className="flex items-center gap-3">
+                    <Mascot
+                      variant={style.mascot}
+                      size="xs"
+                      clipShape="circle"
+                      clipBorder={style.badge as 'cyan' | 'lime' | 'purple'}
+                    />
+                    <div className="flex-1 min-w-0 pe-8">
+                      <h2 className="text-lg font-neo-display font-black text-neo-cream leading-tight">
+                        {t(`gameModes.${mode}.name`)}
+                      </h2>
+                      <p className="text-xs font-neo-body font-bold text-neo-cream/80 leading-tight mt-0.5">
+                        {t(`gameModes.${mode}.description`)}
+                      </p>
+                    </div>
+                    <span
+                      className={`shrink-0 px-3 py-1.5 rounded-neo border-2 border-neo-black text-neo-black font-neo-display font-black text-xs uppercase tracking-wide shadow-hard-sm ${style.cta}`}
+                    >
+                      {isDone ? t('practiceHub.playAgainLabel') : t('practiceHub.playLabel')}
+                    </span>
+                  </div>
                 </Link>
               </AdaptiveMotion.div>
             );

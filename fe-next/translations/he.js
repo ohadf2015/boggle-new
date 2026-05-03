@@ -4958,6 +4958,7 @@ const he = {
       "submit": "שלח",
       "reset": "אפס",
       "needsCenter": "המילה חייבת להשתמש באות שבמרכז.",
+      "tooShort": "צריך לפחות 2 אותיות.",
       "found": "יפה! המילה נוספה.",
       "notAWord": "זו לא מילה — נסה אחרת.",
       "duplicate": "כבר נמצאה.",
@@ -4966,11 +4967,27 @@ const he = {
   },
   "practiceSwipe": {
     "back": "→ תרגול",
-    "instruction": "החלק על האותיות כדי לאיית {goal} מילים.",
-    "done": "יפה — מצאת את כולן.",
+    "instruction": "החלק כדי לאיית {goal} מילים.",
+    "instructionWordHunt": "מצא {goal} מילים נסתרות.",
+    "done": "יפה — מצאת את כולן!",
     "continue": "חזרה לתרגול",
     "newBoard": "לוח חדש",
-    "progress": "{found} מתוך {goal} מילים"
+    "progress": "{found} מתוך {goal} מילים",
+    "greet": "החלק על האותיות!",
+    "greetWordHunt": "צוד את המילים!",
+    "celebrate1": "יפה!",
+    "celebrate2": "מעולה!",
+    "celebrate3": "סוף הדרך!",
+    "celebrate4": "אש!",
+    "huntSlot": "{length} אותיות",
+    "wheelGreet": "השתמש באות הירוקה!",
+    "wheelShuffle": "ערבב",
+    "wheelClear": "נקה"
+  },
+  "practiceWelcome": {
+    "greet": "ברוך הבא לתרגול!",
+    "tip": "נסה כל מצב בקצב שלך. אין טיימר, אין לחץ.",
+    "cta": "קדימה!"
   },
   "wizard": {
     "selectMode": "בחר מצב משחק",
@@ -10153,11 +10170,14 @@ const he = {
   "practiceHub": {
     "title": "תרגול",
     "subtitle": "מקום שקט ללמוד כל מצב",
+    "greet": "בחר מצב ושחק!",
     "progress": "{done} מתוך {total} מצבים הושלמו",
     "completedBadge": "הושלם",
     "completedDesc": "הקש כדי לשחק שוב",
     "navAria": "מצבי תרגול",
     "backToHub": "→ תפריט",
+    "playLabel": "שחק",
+    "playAgainLabel": "שחק שוב",
     "allCompleteTitle": "כל מצבי התרגול הושלמו!",
     "allCompleteBody": "אתם מוכנים למצבים האמיתיים."
   },

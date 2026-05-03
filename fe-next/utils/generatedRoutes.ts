@@ -6,6 +6,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/accessibility",
   "/account/delete",
   "/adventure",
+  "/adventure-prototype",
   "/adventure/achievements",
   "/adventure/boss-rush",
   "/adventure/endless",
@@ -88,6 +89,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/party",
   "/party/join",
   "/play-boggle-online-free",
+  "/practice",
   "/profile",
   "/quests",
   "/referrals",
@@ -111,6 +113,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/word-forge",
   "/word-games-online-free",
   "/word-of-the-day",
+  "/word-vault",
   "/words",
   "/words-with-friends-alternative"
 ];
