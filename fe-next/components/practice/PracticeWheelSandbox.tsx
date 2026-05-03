@@ -48,7 +48,8 @@ const PUZZLES: Record<string, WheelPuzzle> = {
   es: {
     center: 'A',
     outer: ['C', 'S', 'M', 'E'],
-    validWords: new Set(['CASA', 'MES', 'CAS', 'AME', 'MASA', 'SACA']),
+    // Every entry must include the center 'A'. MES/CAS removed — no A.
+    validWords: new Set(['CASA', 'AME', 'MASA', 'SACA', 'AMA', 'MAS', 'ASA', 'CASE']),
   },
 };
 

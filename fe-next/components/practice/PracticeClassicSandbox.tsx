@@ -52,25 +52,33 @@ const BOARDS: Record<string, string[][]> = {
  * the full solver/dictionary stack just to validate three-letter words.
  */
 const VALID_WORDS: Record<string, ReadonlySet<string>> = {
+  // Every entry has been audited against PracticeClassicSandbox.reachability
+  // — the test will fail any future addition that can't be traced on the board.
   en: new Set([
-    'STAR', 'STARE', 'STORE', 'STOP', 'TAR', 'TARE', 'EAT', 'ATE',
-    'NOR', 'ION', 'PLAN', 'PLANT', 'PLATE', 'RAT', 'RAIN', 'PAIN',
-    'PAINT', 'TIN', 'TON', 'NOSE', 'SET', 'PET', 'NET', 'POE', 'TAPE',
+    'STAR', 'STOP', 'TAR', 'ATE', 'PLAN', 'PLANT', 'RAT', 'RAIN',
+    'TIN', 'TON', 'NOSE', 'SET', 'POE', 'TO', 'ON', 'IT', 'OAT',
+    'STOLE',
   ]),
+  // Every entry is provably reachable via adjacency on the HE board above.
+  // Unreachable picks (e.g. אבא — needs two א, only one on board; שם —
+  // ש and ם are too far apart) were removed in the audit pass.
   he: new Set([
-    'שלום', 'שם', 'שלי', 'בית', 'בן', 'מן', 'מים', 'מילה', 'אמא', 'אבא',
-    'תה', 'הם', 'הר', 'מר', 'אם', 'ים',
+    'שלום', 'שלי', 'בית', 'בן', 'מן', 'תה', 'הר', 'אם',
+    'ירה', 'יתום', 'שיר', 'ירק', 'קרה',
   ]),
+  // SV board reuses the EN layout; reachability auditing dropped STAL/STEN/
+  // TIO/PIL/RIS/EN/NIO/NATT (all required hops too far apart on the grid).
   sv: new Set([
-    'STAR', 'STAL', 'STEN', 'TON', 'TIO', 'PIL', 'RIS', 'EN', 'EL',
-    'NIO', 'PLAN', 'NATT', 'SE', 'TE',
+    'STAR', 'TAR', 'TON', 'EL', 'PLAN', 'SE', 'TE', 'LAT',
   ]),
   ja: new Set([
     'いぬ', 'ねこ', 'とり', 'さくら', 'はな', 'ゆき', 'かみ',
+    'いね', 'こと', 'まり', 'まき', 'こい',
   ]),
+  // MAR + OSO dropped — letters too far apart on the ES board.
   es: new Set([
-    'CASA', 'MELO', 'MIEL', 'MAR', 'MES', 'TIA', 'OSO', 'EL', 'LA',
-    'SAL', 'PAN', 'TE', 'ME',
+    'CASA', 'MELO', 'MIEL', 'MES', 'TIA', 'EL', 'LA', 'SAL', 'PAN',
+    'TE', 'ME', 'SOL', 'MAL', 'NO', 'LAS', 'LE', 'SE', 'ALA',
   ]),
 };
 
