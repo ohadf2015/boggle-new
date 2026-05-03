@@ -4973,6 +4973,7 @@ const es = {
     },
     "wheelRush": {
       "instruction": "Forma palabras usando la letra central (lima). Toca las demás alrededor.",
+      "instructionShort": "Usa la letra lima en cada palabra — encuentra {goal}.",
       "submit": "Enviar",
       "reset": "Reiniciar",
       "needsCenter": "La palabra debe usar la letra central.",
@@ -4981,6 +4982,14 @@ const es = {
       "duplicate": "Ya encontrada.",
       "foundWordsLabel": "Encontradas ({count})"
     }
+  },
+  "practiceSwipe": {
+    "back": "← Práctica",
+    "instruction": "Desliza sobre las letras para formar {goal} palabras.",
+    "done": "¡Bien — las encontraste todas!",
+    "continue": "Volver a práctica",
+    "newBoard": "Tablero nuevo",
+    "progress": "{found} de {goal} palabras"
   },
   "wizard": {
     "selectMode": "Seleccionar Modo de Juego",

@@ -4928,6 +4928,7 @@ const ja = {
     },
     "wheelRush": {
       "instruction": "中央の文字（ライム色）を使って単語を作ります。周りの文字をタップしてください。",
+      "instructionShort": "ライムの文字を毎回使って、{goal}語見つけよう。",
       "submit": "送信",
       "reset": "リセット",
       "needsCenter": "中央の文字を使う必要があります。",
@@ -4936,6 +4937,14 @@ const ja = {
       "duplicate": "すでに見つけました。",
       "foundWordsLabel": "発見 ({count})"
     }
+  },
+  "practiceSwipe": {
+    "back": "← 練習",
+    "instruction": "文字をなぞって{goal}個の単語を作ろう。",
+    "done": "やった — 全部見つけた！",
+    "continue": "練習に戻る",
+    "newBoard": "新しい盤",
+    "progress": "{found}/{goal}語"
   },
   "wizard": {
     "selectMode": "ゲームモードを選択",

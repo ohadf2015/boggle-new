@@ -1,74 +1,61 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import PracticeChainCta from './PracticeChainCta';
-import PracticeCoachTip from './PracticeCoachTip';
-import PracticeCompleteBanner from './PracticeCompleteBanner';
-import PracticeModeNav from './PracticeModeNav';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { haptics } from '@/utils/haptics';
+import { useDictionaryCache } from '@/hooks/useDictionaryCache';
+import { fireOnboardingBurst, fireVictoryConfetti } from '@/utils/confettiUtils';
 import { markPracticeMode, PRACTICE_GOALS } from '@/lib/practice/practiceProgress';
+import { normalizeWord } from '@/shared/utils/wordNormalization';
 
 /**
- * Tiny curated wheel: 1 center + 4 outer letters. Center letter MUST appear
- * in every word — same rule as the real wheel mode but on a much smaller
- * surface so the player can grasp the constraint quickly.
+ * Wheel mode practice. Same constraint as the real wheel: every word must
+ * include the centre letter. Validation hits the real client-side dictionary
+ * cache, so the player can find any real word — no curated allow-list.
  */
-interface WheelPuzzle {
+interface WheelLetters {
   center: string;
   outer: string[];
-  validWords: ReadonlySet<string>;
 }
 
-const PUZZLES: Record<string, WheelPuzzle> = {
-  en: {
-    center: 'A',
-    outer: ['T', 'R', 'C', 'E'],
-    validWords: new Set(['CAR', 'CAT', 'RAT', 'ACE', 'CARE', 'RACE', 'TEAR', 'RATE', 'CRATE', 'REACT', 'ACT', 'ATE', 'EAR', 'EAT', 'ART', 'TAR']),
-  },
-  he: {
-    center: 'א',
-    outer: ['ב', 'ם', 'מ', 'ה'],
-    // All entries must contain the center 'א'. Sandbox allows repeating an
-    // outer letter (player can click it twice) — that's intentional, matches
-    // real wheel mechanic.
-    validWords: new Set(['אם', 'בא', 'אבא', 'אמא', 'אבה', 'מאה', 'אהבה']),
-  },
-  sv: {
-    center: 'A',
-    outer: ['T', 'R', 'K', 'E'],
-    validWords: new Set(['ATT', 'ARK', 'AKTE', 'TAR', 'TEA', 'RAT', 'ART']),
-  },
-  ja: {
-    center: 'い',
-    // Outer chosen so every word in validWords actually contains the center 'い'
-    // (previous outer included ね/こ which let through 'ねこ' violating the rule).
-    outer: ['ぬ', 'と', 'け', 'ま'],
-    validWords: new Set(['いぬ', 'いと', 'いけ', 'いま', 'けい', 'まい']),
-  },
-  es: {
-    center: 'A',
-    outer: ['C', 'S', 'M', 'E'],
-    // Every entry must include the center 'A'. MES/CAS removed — no A.
-    validWords: new Set(['CASA', 'AME', 'MASA', 'SACA', 'AMA', 'MAS', 'ASA', 'CASE']),
-  },
+const LETTERS: Record<string, WheelLetters> = {
+  en: { center: 'A', outer: ['T', 'R', 'C', 'E', 'S'] },
+  he: { center: 'א', outer: ['ב', 'ם', 'מ', 'ה', 'ר'] },
+  sv: { center: 'A', outer: ['T', 'R', 'K', 'E', 'S'] },
+  ja: { center: 'い', outer: ['ぬ', 'と', 'け', 'ま', 'り'] },
+  es: { center: 'A', outer: ['C', 'S', 'M', 'E', 'L'] },
 };
+
+const GOAL = PRACTICE_GOALS.wheelRush;
 
 export default function PracticeWheelSandbox() {
   const { language, t } = useLanguage();
-  const puzzle = PUZZLES[language] ?? PUZZLES.en;
+  const { playWordAcceptedSound, playWordRejectedSound, setGameActive } = useSoundEffects();
+  const { checkWord, isLoaded } = useDictionaryCache(language);
+  const wheel = LETTERS[language] ?? LETTERS.en;
+
+  useEffect(() => {
+    setGameActive(true);
+    return () => setGameActive(false);
+  }, [setGameActive]);
 
   const [built, setBuilt] = useState<string[]>([]);
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<{ kind: 'ok' | 'bad' | 'dup' | 'noCenter'; message: string } | null>(null);
-
-  useEffect(() => {
-    if (foundWords.length >= PRACTICE_GOALS.wheelRush) {
-      markPracticeMode('wheelRush', language);
-    }
-  }, [foundWords.length, language]);
-  const isComplete = foundWords.length >= PRACTICE_GOALS.wheelRush;
+  const celebratedRef = useRef(false);
 
   const currentWord = useMemo(() => built.join(''), [built]);
+  const isComplete = foundWords.length >= GOAL;
+
+  useEffect(() => {
+    if (isComplete && !celebratedRef.current) {
+      celebratedRef.current = true;
+      markPracticeMode('wheelRush', language);
+      fireVictoryConfetti();
+    }
+  }, [isComplete, language]);
 
   const addLetter = useCallback((letter: string) => {
     setFeedback(null);
@@ -81,39 +68,63 @@ export default function PracticeWheelSandbox() {
   }, []);
 
   const submit = useCallback(() => {
-    if (currentWord.length < 2) return;
-    if (!built.includes(puzzle.center)) {
+    if (currentWord.length < 3) return;
+    if (!built.includes(wheel.center)) {
       setFeedback({ kind: 'noCenter', message: t('practice.wheelRush.needsCenter') });
+      playWordRejectedSound();
       return;
     }
-    const upper = currentWord.toUpperCase();
-    if (foundWords.includes(upper)) {
+    const normalized = normalizeWord(currentWord, language).toLowerCase();
+    if (foundWords.includes(normalized)) {
       setFeedback({ kind: 'dup', message: t('practice.wheelRush.duplicate') });
       return;
     }
-    const hit = puzzle.validWords.has(upper) || puzzle.validWords.has(currentWord);
-    if (hit) {
-      setFoundWords((prev) => [...prev, upper]);
+    if (!isLoaded) return;
+    if (checkWord(normalized)) {
+      setFoundWords((prev) => [...prev, normalized]);
       setFeedback({ kind: 'ok', message: t('practice.wheelRush.found') });
       setBuilt([]);
+      playWordAcceptedSound();
+      haptics.success();
+      fireOnboardingBurst({ x: 0.5, y: 0.45 });
     } else {
       setFeedback({ kind: 'bad', message: t('practice.wheelRush.notAWord') });
+      playWordRejectedSound();
     }
-  }, [built, currentWord, foundWords, puzzle, t]);
+  }, [built, currentWord, foundWords, wheel.center, t, language, isLoaded, checkWord, playWordAcceptedSound, playWordRejectedSound]);
 
   return (
-    <div className="flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3">
-      <PracticeModeNav current="wheelRush" />
-      <PracticeCoachTip mode="wheelRush" wordsFound={foundWords.length} />
+    <div className="min-h-[100dvh] w-full bg-linear-to-b from-neo-navy to-neo-navy-light px-4 pt-4 pb-bottom-stack flex flex-col items-center gap-3">
+      <div className="w-full max-w-md flex items-center justify-between">
+        <Link
+          href={`/${language}/practice`}
+          className="text-xs font-neo-display font-black text-neo-cream/60 hover:text-neo-cream"
+        >
+          {t('practiceSwipe.back')}
+        </Link>
+        <div
+          aria-label={t('practiceSwipe.progress', { found: foundWords.length, goal: GOAL })}
+          className="flex items-center gap-1.5"
+        >
+          {Array.from({ length: GOAL }).map((_, i) => (
+            <span
+              key={i}
+              className={
+                'w-3 h-3 rounded-full border-2 border-neo-black ' +
+                (i < foundWords.length ? 'bg-neo-purple' : 'bg-neo-navy')
+              }
+            />
+          ))}
+        </div>
+      </div>
 
-      <p className="text-neo-cream/80 text-sm text-center font-neo-body">
-        {t('practice.wheelRush.instruction')}
-      </p>
+      <h1 className="text-base font-neo-display font-black text-neo-cream text-center max-w-md leading-tight">
+        {isComplete ? t('practiceSwipe.done') : t('practice.wheelRush.instructionShort', { goal: GOAL })}
+      </h1>
 
       <div className="relative w-56 h-56 mx-auto">
-        {/* Outer ring positioned at 4 cardinal points */}
-        {puzzle.outer.map((letter, i) => {
-          const angle = (i * 90 - 90) * (Math.PI / 180);
+        {wheel.outer.map((letter, i) => {
+          const angle = (i * (360 / wheel.outer.length) - 90) * (Math.PI / 180);
           const x = 96 * Math.cos(angle);
           const y = 96 * Math.sin(angle);
           return (
@@ -122,13 +133,14 @@ export default function PracticeWheelSandbox() {
               type="button"
               data-testid={`practice-wheel-outer-${i}`}
               onClick={() => addLetter(letter)}
+              disabled={isComplete}
               style={{
                 position: 'absolute',
                 top: '50%',
                 left: '50%',
                 transform: `translate(${x}px, ${y}px) translate(-50%, -50%)`,
               }}
-              className="w-14 h-14 rounded-full border-2 border-neo-black bg-neo-cream text-neo-black font-neo-display font-black text-xl shadow-hard-sm active:scale-95"
+              className="w-14 h-14 rounded-full border-2 border-neo-black bg-neo-cream text-neo-black font-neo-display font-black text-xl shadow-hard-sm active:scale-95 disabled:opacity-50"
             >
               {letter}
             </button>
@@ -137,10 +149,11 @@ export default function PracticeWheelSandbox() {
         <button
           type="button"
           data-testid="practice-wheel-center"
-          onClick={() => addLetter(puzzle.center)}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border-3 border-neo-black bg-neo-lime text-neo-black font-neo-display font-black text-2xl shadow-hard active:scale-95"
+          onClick={() => addLetter(wheel.center)}
+          disabled={isComplete}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border-3 border-neo-black bg-neo-lime text-neo-black font-neo-display font-black text-2xl shadow-hard active:scale-95 disabled:opacity-50"
         >
-          {puzzle.center}
+          {wheel.center}
         </button>
       </div>
 
@@ -151,11 +164,11 @@ export default function PracticeWheelSandbox() {
         {currentWord}
       </div>
 
-      <div className="flex gap-2 w-full">
+      <div className="flex gap-2 w-full max-w-md">
         <button
           type="button"
           onClick={submit}
-          disabled={currentWord.length < 2}
+          disabled={currentWord.length < 3 || isComplete}
           className="flex-1 bg-neo-cyan text-neo-black border-2 border-neo-black rounded-neo py-2 font-neo-display font-black text-sm shadow-hard active:shadow-hard-pressed disabled:opacity-50"
         >
           {t('practice.wheelRush.submit')}
@@ -163,7 +176,8 @@ export default function PracticeWheelSandbox() {
         <button
           type="button"
           onClick={reset}
-          className="bg-neo-navy-light text-neo-cream border-2 border-neo-cream/30 rounded-neo px-3 py-2 font-neo-display font-black text-sm"
+          disabled={isComplete}
+          className="bg-neo-navy-light text-neo-cream border-2 border-neo-cream/30 rounded-neo px-3 py-2 font-neo-display font-black text-sm disabled:opacity-50"
         >
           {t('practice.wheelRush.reset')}
         </button>
@@ -186,25 +200,28 @@ export default function PracticeWheelSandbox() {
         </div>
       )}
 
-      <div className="w-full">
-        <p className="text-neo-cream/60 text-xs uppercase font-neo-display font-black mb-1">
-          {t('practice.wheelRush.foundWordsLabel', { count: foundWords.length })}
-        </p>
-        <ul className="flex flex-wrap gap-1.5 min-h-[1.5rem]">
+      {foundWords.length > 0 && (
+        <ul className="flex flex-wrap gap-1.5 justify-center max-w-md">
           {foundWords.map((w) => (
             <li
               key={w}
-              className="px-2 py-0.5 bg-neo-lime/20 border border-neo-lime/40 rounded text-neo-lime text-xs font-neo-display font-bold"
+              className="px-2 py-0.5 rounded text-xs font-neo-display font-bold border border-neo-purple/60 text-neo-purple bg-neo-navy-light"
             >
-              {w}
+              {w.toUpperCase()}
             </li>
           ))}
         </ul>
-      </div>
+      )}
 
-      {isComplete && <PracticeCompleteBanner mode="wheelRush" />}
-
-      <PracticeChainCta currentMode="wheelRush" className="mt-2 inline-flex items-center justify-center w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed" />
+      {isComplete && (
+        <Link
+          href={`/${language}/practice`}
+          data-testid="practice-continue-cta"
+          className="mt-2 inline-flex items-center justify-center w-full max-w-md bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed"
+        >
+          {t('practiceSwipe.continue')}
+        </Link>
+      )}
     </div>
   );
 }

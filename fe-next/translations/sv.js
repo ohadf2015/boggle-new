@@ -4943,6 +4943,7 @@ const sv = {
     },
     "wheelRush": {
       "instruction": "Bygg ord med mittbokstaven (lime). Tryck på övriga runt den.",
+      "instructionShort": "Använd lime-bokstaven i varje ord — hitta {goal}.",
       "submit": "Skicka",
       "reset": "Rensa",
       "needsCenter": "Ordet måste använda mittbokstaven.",
@@ -4951,6 +4952,14 @@ const sv = {
       "duplicate": "Redan hittat.",
       "foundWordsLabel": "Hittade ({count})"
     }
+  },
+  "practiceSwipe": {
+    "back": "← Övning",
+    "instruction": "Svep över bokstäverna för att stava {goal} ord.",
+    "done": "Bra — du hittade alla.",
+    "continue": "Tillbaka till övning",
+    "newBoard": "Ny tavla",
+    "progress": "{found} av {goal} ord"
   },
   "wizard": {
     "selectMode": "Välj spelläge",
