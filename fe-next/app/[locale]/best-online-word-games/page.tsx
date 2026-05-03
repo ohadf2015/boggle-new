@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: '9 Best Online Word Games of 2026 (Free, No Download)',
-    description: 'We ranked the 9 best word games of 2026: Wordle, NYT Connections, Strands, Spelling Bee, Scrabble GO, Semantle, LexiClash. Honest pros & cons — pick yours in 2 minutes.',
+    description: 'We ranked the 9 best word games of 2026: Wordle, NYT Connections, Scrabble GO, LexiClash & more. Honest pros & cons — pick yours in 2 min.',
     keywords: 'best online word games 2026, free word games online, nyt connections, nyt strands, spelling bee game, semantle, wordle alternatives, multiplayer word games, word games with friends, word puzzle games online, word games no download, connections game',
     openGraph: {
       title: '9 Best Online Word Games of 2026 — Honestly Ranked',
