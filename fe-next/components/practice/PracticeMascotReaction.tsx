@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import type { MotionProps } from 'framer-motion';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
@@ -23,14 +24,12 @@ const MASCOT_FOR_MODE: Record<PracticeMode, string> = {
  * gameplay surface. Reactions are short bursts that settle back to idle —
  * implemented as keyframe arrays so the bounce/shake/spin returns to the same
  * neutral pose.
+ *
+ * Typed via `MotionProps['animate']` so framer-motion's strict `Easing` literal
+ * union accepts our ease names without `as const` (which would freeze the
+ * keyframe arrays as readonly and break a different motion constraint).
  */
-const REACTION_VARIANTS: Record<PracticeMascotMood, {
-  scale?: number | number[];
-  rotate?: number | number[];
-  y?: number | number[];
-  x?: number | number[];
-  transition: { duration?: number; repeat?: number; ease?: string };
-}> = {
+const REACTION_VARIANTS: Record<PracticeMascotMood, MotionProps['animate']> = {
   idle: {
     scale: [1, 1.04, 1],
     transition: { duration: 3.6, repeat: Infinity, ease: 'easeInOut' },
@@ -71,7 +70,6 @@ export default function PracticeMascotReaction({ mode, reaction }: Props) {
       <AdaptiveMotion.div
         key={reaction}
         animate={variant}
-        transition={variant.transition}
         className="relative w-full h-full rounded-full border-2 border-neo-black overflow-hidden bg-neo-navy/90 shadow-hard-sm"
       >
         <Image
