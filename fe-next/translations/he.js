@@ -4954,6 +4954,7 @@ const he = {
     },
     "wheelRush": {
       "instruction": "בנה מילים תוך שימוש באות במרכז (ליים). הקש על שאר האותיות סביבה.",
+      "instructionShort": "השתמש באות הליים בכל מילה — מצא {goal}.",
       "submit": "שלח",
       "reset": "אפס",
       "needsCenter": "המילה חייבת להשתמש באות שבמרכז.",
@@ -4962,6 +4963,14 @@ const he = {
       "duplicate": "כבר נמצאה.",
       "foundWordsLabel": "נמצאו ({count})"
     }
+  },
+  "practiceSwipe": {
+    "back": "→ תרגול",
+    "instruction": "החלק על האותיות כדי לאיית {goal} מילים.",
+    "done": "יפה — מצאת את כולן.",
+    "continue": "חזרה לתרגול",
+    "newBoard": "לוח חדש",
+    "progress": "{found} מתוך {goal} מילים"
   },
   "wizard": {
     "selectMode": "בחר מצב משחק",

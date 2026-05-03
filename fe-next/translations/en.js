@@ -5049,6 +5049,7 @@ const en = {
     },
     "wheelRush": {
       "instruction": "Build words using the center letter (lime). Tap any other letters around it.",
+      "instructionShort": "Use the lime letter in every word — find {goal}.",
       "submit": "Submit",
       "reset": "Reset",
       "needsCenter": "Word must use the center letter.",
@@ -5057,6 +5058,14 @@ const en = {
       "duplicate": "Already found.",
       "foundWordsLabel": "Found ({count})"
     }
+  },
+  "practiceSwipe": {
+    "back": "← Practice",
+    "instruction": "Swipe over letters to spell {goal} words.",
+    "done": "Nice — you found them all.",
+    "continue": "Back to practice",
+    "newBoard": "New board",
+    "progress": "{found} of {goal} words"
   },
   "wizard": {
     "selectMode": "Select Game Mode",

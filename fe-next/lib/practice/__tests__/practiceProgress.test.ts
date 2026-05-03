@@ -56,7 +56,9 @@ describe('practiceProgress', () => {
 
   it('exposes completion goal counts for the hub progress headline', () => {
     expect(PRACTICE_GOALS.classic).toBeGreaterThan(0);
-    expect(PRACTICE_GOALS.wordHunt).toBe(1); // solving target = 1 success
+    // wordHunt practice now uses the shared swipe board with a 3-word goal
+    // (was 1 — that was for the old Wordle-style guess sandbox).
+    expect(PRACTICE_GOALS.wordHunt).toBeGreaterThan(0);
     expect(PRACTICE_GOALS.wheelRush).toBeGreaterThan(0);
   });
 

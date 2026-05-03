@@ -16,7 +16,7 @@ const PROGRESS_EVENT = 'practice:progress';
 
 export const PRACTICE_GOALS: Record<PracticeMode, number> = {
   classic: 3,
-  wordHunt: 1,
+  wordHunt: 3,
   wheelRush: 3,
 };
 
