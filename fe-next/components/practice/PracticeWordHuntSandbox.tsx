@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeChainCta from './PracticeChainCta';
 import PracticeCoachTip from './PracticeCoachTip';
 import PracticeCompleteBanner from './PracticeCompleteBanner';
+import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
 import PracticeModeNav from './PracticeModeNav';
 import { markPracticeMode } from '@/lib/practice/practiceProgress';
 import {
@@ -109,8 +110,20 @@ export default function PracticeWordHuntSandbox() {
     setGuess('');
   }, [guess, target, targetLength]);
 
+  // Last attempt's feedback array tells us if the player just guessed wrong
+  // (no slot was 'correct'). Used only for mascot mood; doesn't change game.
+  const lastAttempt = attempts[attempts.length - 1];
+  const lastWasWrong =
+    !solved && !!lastAttempt && lastAttempt.feedback.every((f) => f !== 'correct');
+  const mascotReaction: PracticeMascotMood = solved
+    ? 'celebrate'
+    : lastWasWrong
+      ? 'wrong'
+      : 'idle';
+
   return (
-    <div className="flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3">
+    <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3">
+      <PracticeMascotReaction mode="wordHunt" reaction={mascotReaction} />
       <PracticeModeNav current="wordHunt" />
       <PracticeCoachTip mode="wordHunt" wordsFound={solved ? 1 : 0} />
 

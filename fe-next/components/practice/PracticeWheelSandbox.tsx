@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeChainCta from './PracticeChainCta';
 import PracticeCoachTip from './PracticeCoachTip';
 import PracticeCompleteBanner from './PracticeCompleteBanner';
+import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
 import PracticeModeNav from './PracticeModeNav';
 import { markPracticeMode, PRACTICE_GOALS } from '@/lib/practice/practiceProgress';
 import {
@@ -90,6 +91,14 @@ export default function PracticeWheelSandbox() {
   }, [foundWords.length, language]);
   const isComplete = foundWords.length >= PRACTICE_GOALS.wheelRush;
 
+  const mascotReaction: PracticeMascotMood = isComplete
+    ? 'celebrate'
+    : feedback?.kind === 'ok'
+      ? 'cheer'
+      : feedback?.kind === 'bad' || feedback?.kind === 'noCenter'
+        ? 'wrong'
+        : 'idle';
+
   const currentWord = useMemo(() => built.join(''), [built]);
 
   const addLetter = useCallback((letter: string) => {
@@ -133,7 +142,8 @@ export default function PracticeWheelSandbox() {
   }, [built, currentWord, foundWords, puzzle, t, language]);
 
   return (
-    <div className="flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3">
+    <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3">
+      <PracticeMascotReaction mode="wheelRush" reaction={mascotReaction} />
       <PracticeModeNav current="wheelRush" />
       <PracticeCoachTip mode="wheelRush" wordsFound={foundWords.length} />
 

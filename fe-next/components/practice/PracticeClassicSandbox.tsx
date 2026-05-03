@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeChainCta from './PracticeChainCta';
 import PracticeCoachTip from './PracticeCoachTip';
 import PracticeCompleteBanner from './PracticeCompleteBanner';
+import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
 import PracticeModeNav from './PracticeModeNav';
 import { markPracticeMode, PRACTICE_GOALS } from '@/lib/practice/practiceProgress';
 import {
@@ -129,6 +130,14 @@ export default function PracticeClassicSandbox() {
   }, [foundWords.length, language]);
   const isComplete = foundWords.length >= PRACTICE_GOALS.classic;
 
+  const mascotReaction: PracticeMascotMood = isComplete
+    ? 'celebrate'
+    : feedback?.kind === 'ok'
+      ? 'cheer'
+      : feedback?.kind === 'bad'
+        ? 'wrong'
+        : 'idle';
+
   const currentWord = useMemo(() => path.map((c) => c.letter).join(''), [path]);
   const selectedKeys = useMemo(() => new Set(path.map(cellKey)), [path]);
 
@@ -180,7 +189,8 @@ export default function PracticeClassicSandbox() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3">
+    <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3">
+      <PracticeMascotReaction mode="classic" reaction={mascotReaction} />
       <PracticeModeNav current="classic" />
       <PracticeCoachTip mode="classic" wordsFound={foundWords.length} />
 
