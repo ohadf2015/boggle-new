@@ -1240,7 +1240,8 @@ const es = {
       "gameModes": {
         "classic": "Clásico",
         "wordHunt": "Caza de Palabras",
-        "blast": "Blast"
+        "blast": "Blast",
+        "wheelRush": "Carrera de Ruleta"
       }
     },
     "joinModal": {

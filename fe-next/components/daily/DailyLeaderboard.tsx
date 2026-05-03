@@ -114,7 +114,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       }
     } catch (err) {
       console.error('Failed to fetch daily leaderboard:', err);
-      setError(t('daily.leaderboard.loadError'));
+      setError(t('errors.failedToLoadLeaderboard'));
     } finally {
       setLoading(false);
     }

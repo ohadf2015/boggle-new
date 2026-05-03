@@ -1218,7 +1218,8 @@ const en = {
       "gameModes": {
         "classic": "Classic",
         "wordHunt": "Word Hunt",
-        "blast": "Blast"
+        "blast": "Blast",
+        "wheelRush": "Wheel Rush"
       }
     },
     "joinModal": {

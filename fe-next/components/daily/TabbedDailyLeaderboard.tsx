@@ -263,7 +263,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       }
     } catch (err) {
       console.error('Failed to fetch today leaderboard:', err);
-      setTodayError(t('daily.leaderboard.loadError'));
+      setTodayError(t('errors.failedToLoadLeaderboard'));
     } finally {
       setTodayLoading(false);
     }
@@ -336,7 +336,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       }
     } catch (err) {
       console.error('Failed to fetch all-time leaderboard:', err);
-      setAllTimeError(t('daily.leaderboard.loadError'));
+      setAllTimeError(t('errors.failedToLoadLeaderboard'));
     } finally {
       setAllTimeLoading(false);
     }

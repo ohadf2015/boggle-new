@@ -1222,7 +1222,8 @@ const ja = {
       "gameModes": {
         "classic": "クラシック",
         "wordHunt": "ワードハント",
-        "blast": "ブラスト"
+        "blast": "ブラスト",
+        "wheelRush": "ホイールラッシュ"
       }
     },
     "joinModal": {

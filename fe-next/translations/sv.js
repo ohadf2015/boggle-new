@@ -1233,7 +1233,8 @@ const sv = {
       "gameModes": {
         "classic": "Klassiskt",
         "wordHunt": "Ordjakt",
-        "blast": "Blast"
+        "blast": "Blast",
+        "wheelRush": "Hjulrush"
       }
     },
     "joinModal": {

@@ -393,8 +393,9 @@ describe('TabbedDailyLeaderboard', () => {
       );
 
       // mockT is identity (returns the key) — so the rendered text proves
-      // the component is calling t() with the canonical key.
-      expect(await screen.findByText('daily.leaderboard.loadError')).toBeInTheDocument();
+      // the component is calling t() with the canonical key from the shared
+      // errors namespace (Sentry NEXTJS-13F: never used to ship in he locale).
+      expect(await screen.findByText('errors.failedToLoadLeaderboard')).toBeInTheDocument();
       // And the raw English literal MUST NOT appear.
       expect(screen.queryByText('Failed to load leaderboard')).not.toBeInTheDocument();
     });

@@ -1222,7 +1222,8 @@ const he = {
       "gameModes": {
         "classic": "קלאסי",
         "wordHunt": "ציד מילים",
-        "blast": "בלאסט"
+        "blast": "בלאסט",
+        "wheelRush": "מרוץ הגלגל"
       }
     },
     "joinModal": {

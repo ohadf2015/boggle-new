@@ -143,10 +143,41 @@ export const clearBotsGamePlayed = (): void => {
 
 export const hasSupabaseSession = (): boolean => {
   if (typeof window === 'undefined') return false;
+  // @supabase/ssr stores the session in a cookie, while older `@supabase/supabase-js`
+  // browser clients used localStorage. We check both, but only count a *live* session:
+  // Supabase v2 commonly leaves the literal string "null" or an object with no
+  // access_token after signOut, which would false-positive a `!!getItem(key)` check
+  // and cause new visitors to skip the FTUE flow entirely.
+  const looksLive = (raw: string | null | undefined): boolean => {
+    if (!raw) return false;
+    try {
+      const parsed = JSON.parse(raw);
+      return !!(parsed && typeof parsed === 'object' && parsed.access_token);
+    } catch {
+      return false;
+    }
+  };
+
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
     if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
-      return !!localStorage.getItem(key);
+      if (looksLive(localStorage.getItem(key))) return true;
+    }
+  }
+
+  if (typeof document !== 'undefined' && document.cookie) {
+    for (const part of document.cookie.split(';')) {
+      const eq = part.indexOf('=');
+      if (eq < 0) continue;
+      const name = part.slice(0, eq).trim();
+      if (name.startsWith('sb-') && name.endsWith('-auth-token')) {
+        try {
+          const value = decodeURIComponent(part.slice(eq + 1).trim());
+          if (looksLive(value)) return true;
+        } catch {
+          // ignore malformed cookie value
+        }
+      }
     }
   }
   return false;
