@@ -1,9 +1,12 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeChainCta from './PracticeChainCta';
 import PracticeCoachTip from './PracticeCoachTip';
+import PracticeCompleteBanner from './PracticeCompleteBanner';
+import PracticeModeNav from './PracticeModeNav';
+import { markPracticeMode, PRACTICE_GOALS } from '@/lib/practice/practiceProgress';
 
 /**
  * Curated 4x4 practice board per language. Hand-picked to surface common
@@ -87,6 +90,15 @@ export default function PracticeClassicSandbox() {
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<{ kind: 'ok' | 'bad' | 'dup'; message: string } | null>(null);
 
+  // Mark practice complete the moment the player hits the word-count goal —
+  // hub tile gets a check, chain CTA flips to "next mode" tone.
+  useEffect(() => {
+    if (foundWords.length >= PRACTICE_GOALS.classic) {
+      markPracticeMode('classic', language);
+    }
+  }, [foundWords.length, language]);
+  const isComplete = foundWords.length >= PRACTICE_GOALS.classic;
+
   const currentWord = useMemo(() => path.map((c) => c.letter).join(''), [path]);
   const selectedKeys = useMemo(() => new Set(path.map(cellKey)), [path]);
 
@@ -130,6 +142,7 @@ export default function PracticeClassicSandbox() {
 
   return (
     <div className="flex flex-col items-center w-full max-w-md mx-auto px-4 py-4 gap-3">
+      <PracticeModeNav current="classic" />
       <PracticeCoachTip mode="classic" wordsFound={foundWords.length} />
 
       <p className="text-neo-cream/80 text-sm text-center font-neo-body">
@@ -220,6 +233,8 @@ export default function PracticeClassicSandbox() {
           ))}
         </ul>
       </div>
+
+      {isComplete && <PracticeCompleteBanner mode="classic" />}
 
       <PracticeChainCta currentMode="classic" className="mt-2 inline-flex items-center justify-center w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed" />
     </div>

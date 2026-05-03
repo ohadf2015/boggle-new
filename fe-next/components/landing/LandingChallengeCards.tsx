@@ -87,8 +87,6 @@ export function LandingChallengeCards({
   // Practice also disappears as soon as the player has finished any game —
   // a recorded personal best is a durable "I've played" signal that survives
   // localStorage clears for signed-in users.
-  // CrazyGames bypass: portal players see every mode open — practice gate is
-  // hidden chrome that confuses portal traffic and CG forbids walled content.
   const isVeteranRaw = useIsPracticeVeteran();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const hasPlayedAnyGame = !!playerAllTimeBest && playerAllTimeBest.score > 0;
@@ -96,9 +94,9 @@ export function LandingChallengeCards({
 
   // Mode-roster newcomer gate — independent of onboarding-completed and MP-joined
   // flags (both flip too eagerly in production: onboarding completes before the
-  // first real game, and isNewPlayer requires an MP join). Drives both the
-  // "More Game Modes" collapse and the locked-card overlay so a brand-new
-  // player doesn't see eight options on first paint.
+  // first real game, and isNewPlayer requires an MP join). Drives the
+  // "More Game Modes" collapse so a brand-new player doesn't see eight options
+  // on first paint.
   const { userStats } = useUserStats();
   const isNewcomerByGames =
     !isOnCrazyGamesPlatform &&
@@ -154,23 +152,9 @@ export function LandingChallengeCards({
   // high-intent set instead of every available mode.
   const cardOrder: LandingCardKey[] = orderedBeforeFeatured.filter((m) => FEATURED_MODES.has(m));
 
-  // Non-veterans (still in practice state) see non-essential modes as LOCKED — softer
-  // than hiding, preserves discoverability while keeping landing calm + focused on
-  // practice + daily. Practice & daily always stay unlocked.
-  const lockNonEssential = !isVeteran;
-  // Newcomers (< THRESHOLDS.modeRoster games) get a games-count copy that sets a
-  // concrete expectation; longer-tenured non-veterans keep the practice-completion
-  // copy that matches the practice-graduation flow.
-  const lockedMessage = isNewcomerByGames
-    ? t('landing.playGamesToUnlock').replace('{count}', String(THRESHOLDS.modeRoster))
-    : t('landing.practiceFirstToUnlock');
-  const isModeLocked = (mode: LandingCardKey): boolean =>
-    lockNonEssential && mode !== 'practice' && mode !== 'daily';
-
   /** Renders a card by mode key with staggered CSS animation */
   const renderCard = (mode: LandingCardKey, index: number) => {
     const style = { animationDelay: cardDelay(index) } as React.CSSProperties;
-    const locked = isModeLocked(mode);
 
     switch (mode) {
       case 'quickPlay':
@@ -185,8 +169,6 @@ export function LandingChallengeCards({
               variant="cyan"
               highlighted={isVeteran}
               highlightLabel={isVeteran ? t('onboarding.welcome.startHere') : undefined}
-              locked={locked}
-              lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('quickPlay', 'home'); trackLandingCtaClick('mode_card', { mode: 'quickPlay', variant: 'cyan' }); }}
             />
           </div>
@@ -206,8 +188,6 @@ export function LandingChallengeCards({
               playerCount={{ count: activePlayers, label: t('landing.playingNow') }}
               highlighted={isFirstTimer && !isNewbie}
               highlightLabel={isFirstTimer && !isNewbie ? t('onboarding.welcome.startHere') : undefined}
-              locked={locked}
-              lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('arena', 'home'); trackLandingCtaClick('mode_card', { mode: 'arena', variant: 'pink' }); }}
             />
           </div>
@@ -254,8 +234,6 @@ export function LandingChallengeCards({
               modeImage="/modes/blast.png"
               variant="orange"
               badge="NEW"
-              locked={locked}
-              lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('blast', 'home'); trackLandingCtaClick('mode_card', { mode: 'blast', variant: 'orange' }); }}
             />
           </div>
@@ -271,8 +249,6 @@ export function LandingChallengeCards({
               icon={<Map className="w-6 h-6" />}
               modeImage="/modes/adventure.png"
               variant="lime"
-              locked={locked}
-              lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('adventure', 'home'); trackLandingCtaClick('mode_card', { mode: 'adventure', variant: 'lime' }); }}
             />
           </div>
@@ -289,8 +265,6 @@ export function LandingChallengeCards({
               modeImage="/modes/connections.png"
               variant="purple"
               badge="NEW"
-              locked={locked}
-              lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('connections', 'home'); trackLandingCtaClick('mode_card', { mode: 'connections', variant: 'purple' }); }}
             />
           </div>
@@ -306,8 +280,6 @@ export function LandingChallengeCards({
               icon={<Brain className="w-6 h-6" />}
               modeImage="/modes/practice.png"
               variant="purple"
-              locked={locked}
-              lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('brainGym', 'home'); trackLandingCtaClick('mode_card', { mode: 'brainGym', variant: 'purple' }); }}
             />
           </div>

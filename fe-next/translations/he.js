@@ -4917,9 +4917,16 @@ const he = {
     },
     "wordHunt": {
       "instruction": "הקש על אותיות כדי לאיית את מילת המטרה. ירוק = במקום הנכון. צהוב = אות נכונה במקום הלא נכון.",
+      "targetLabel": "מילת המטרה",
       "submit": "נחש",
       "backspace": "בטל",
       "solved": "פתרת! כל הכבוד."
+    },
+    "complete": {
+      "title": "המצב הושלם!",
+      "classic": "3 מילים נמצאו",
+      "wordHunt": "המטרה נפתרה",
+      "wheelRush": "3 מילים נמצאו"
     },
     "wheelRush": {
       "instruction": "בנה מילים תוך שימוש באות במרכז (ליים). הקש על שאר האותיות סביבה.",
@@ -10112,7 +10119,12 @@ const he = {
   },
   "practiceHub": {
     "title": "תרגול",
-    "subtitle": "מקום שקט ללמוד כל מצב"
+    "subtitle": "מקום שקט ללמוד כל מצב",
+    "progress": "{done} מתוך {total} מצבים הושלמו",
+    "completedBadge": "הושלם",
+    "completedDesc": "הקש כדי לשחק שוב",
+    "navAria": "מצבי תרגול",
+    "backToHub": "→ תפריט"
   },
   "practiceBadge": {
     "label": "תרגול",

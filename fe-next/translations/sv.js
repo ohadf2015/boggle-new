@@ -4906,9 +4906,16 @@ const sv = {
     },
     "wordHunt": {
       "instruction": "Tryck på bokstäver för att stava målordet. Grön = rätt plats. Gul = fel plats.",
+      "targetLabel": "Målord",
       "submit": "Gissa",
       "backspace": "Ångra",
       "solved": "Löst! Bra jobbat."
+    },
+    "complete": {
+      "title": "Läget klart!",
+      "classic": "3 ord hittade",
+      "wordHunt": "målet löst",
+      "wheelRush": "3 ord hittade"
     },
     "wheelRush": {
       "instruction": "Bygg ord med mittbokstaven (lime). Tryck på övriga runt den.",
@@ -10143,7 +10150,12 @@ const sv = {
   },
   "practiceHub": {
     "title": "Övning",
-    "subtitle": "En lugn plats att lära sig varje läge"
+    "subtitle": "En lugn plats att lära sig varje läge",
+    "progress": "{done} av {total} lägen klara",
+    "completedBadge": "Klart",
+    "completedDesc": "Tryck för att spela igen",
+    "navAria": "Övningslägen",
+    "backToHub": "← Hubb"
   },
   "practiceBadge": {
     "label": "Övning",

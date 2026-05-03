@@ -1,9 +1,12 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeChainCta from './PracticeChainCta';
 import PracticeCoachTip from './PracticeCoachTip';
+import PracticeCompleteBanner from './PracticeCompleteBanner';
+import PracticeModeNav from './PracticeModeNav';
+import { markPracticeMode } from '@/lib/practice/practiceProgress';
 
 /**
  * Curated target word + tile pool per locale. Pool deliberately includes the
@@ -60,6 +63,10 @@ export default function PracticeWordHuntSandbox() {
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [solved, setSolved] = useState(false);
 
+  useEffect(() => {
+    if (solved) markPracticeMode('wordHunt', language);
+  }, [solved, language]);
+
   const targetLength = useMemo(() => Array.from(target).length, [target]);
 
   const addLetter = useCallback((letter: string) => {
@@ -81,6 +88,7 @@ export default function PracticeWordHuntSandbox() {
 
   return (
     <div className="flex flex-col items-center w-full max-w-md mx-auto px-4 py-4 gap-3">
+      <PracticeModeNav current="wordHunt" />
       <PracticeCoachTip mode="wordHunt" wordsFound={solved ? 1 : 0} />
 
       <p className="text-neo-cream/80 text-sm text-center font-neo-body">
@@ -89,16 +97,26 @@ export default function PracticeWordHuntSandbox() {
 
       <div
         data-testid="practice-target"
-        className="flex gap-1.5 items-center justify-center font-neo-display font-black"
+        className="flex flex-col items-center gap-1"
       >
-        {Array.from({ length: targetLength }).map((_, i) => (
-          <span
-            key={i}
-            className="w-8 h-10 flex items-center justify-center text-2xl text-neo-cream/40 border-b-3 border-neo-cream/40"
-          >
-            {solved ? Array.from(target)[i] : '?'}
-          </span>
-        ))}
+        <span className="text-[10px] uppercase font-neo-display font-black text-neo-cream/60 tracking-wider">
+          {t('practice.wordHunt.targetLabel')}
+        </span>
+        <div className="flex gap-1.5 items-center justify-center font-neo-display font-black">
+          {Array.from(target).map((letter, i) => (
+            <span
+              key={i}
+              className={
+                'w-8 h-10 flex items-center justify-center text-2xl border-b-3 ' +
+                (solved
+                  ? 'text-neo-lime border-neo-lime'
+                  : 'text-neo-cream border-neo-cream/40')
+              }
+            >
+              {letter}
+            </span>
+          ))}
+        </div>
       </div>
 
       <ul className="w-full flex flex-col gap-1 min-h-[2rem]">
@@ -173,6 +191,8 @@ export default function PracticeWordHuntSandbox() {
           {t('practice.wordHunt.solved')}
         </div>
       )}
+
+      {solved && <PracticeCompleteBanner mode="wordHunt" />}
 
       <PracticeChainCta currentMode="wordHunt" className="mt-2 inline-flex items-center justify-center w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed" />
     </div>

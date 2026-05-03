@@ -4936,9 +4936,16 @@ const es = {
     },
     "wordHunt": {
       "instruction": "Toca letras para deletrear la palabra objetivo. Verde = lugar correcto. Amarillo = lugar incorrecto.",
+      "targetLabel": "Palabra objetivo",
       "submit": "Adivinar",
       "backspace": "Deshacer",
       "solved": "¡Resuelto! Buen trabajo."
+    },
+    "complete": {
+      "title": "¡Modo completado!",
+      "classic": "3 palabras encontradas",
+      "wordHunt": "objetivo resuelto",
+      "wheelRush": "3 palabras encontradas"
     },
     "wheelRush": {
       "instruction": "Forma palabras usando la letra central (lima). Toca las demás alrededor.",
@@ -9965,7 +9972,12 @@ const es = {
   },
   "practiceHub": {
     "title": "Práctica",
-    "subtitle": "Un lugar tranquilo para aprender cada modo"
+    "subtitle": "Un lugar tranquilo para aprender cada modo",
+    "progress": "{done} de {total} modos completos",
+    "completedBadge": "Completado",
+    "completedDesc": "Toca para jugar de nuevo",
+    "navAria": "Modos de práctica",
+    "backToHub": "← Inicio"
   },
   "practiceBadge": {
     "label": "Práctica",

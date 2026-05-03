@@ -13,6 +13,12 @@ export interface ModeIntroCardProps {
   mode: IntroMode;
   t: TFunction;
   onContinue: () => void;
+  /**
+   * Optional skip handler — if provided, the "skip" link bypasses the tutorial
+   * and jumps straight to play. If omitted, falls back to onContinue (so the
+   * link is functional but goes to whatever onContinue routes to).
+   */
+  onSkip?: () => void;
 }
 
 const MASCOT_FOR_MODE: Record<IntroMode, string> = {
@@ -33,12 +39,17 @@ const RING_FOR_MODE: Record<IntroMode, string> = {
  * Cozy first-time mode intro. One mascot, one description, one CTA.
  * No timer, no leaderboard, no data clutter. Skippable.
  */
-const ModeIntroCard: React.FC<ModeIntroCardProps> = ({ mode, t, onContinue }) => {
+const ModeIntroCard: React.FC<ModeIntroCardProps> = ({ mode, t, onContinue, onSkip }) => {
   const { playButtonClickSound } = useSoundEffects();
   const handleContinue = () => {
     playButtonClickSound();
     haptics.tap();
     onContinue();
+  };
+  const handleSkip = () => {
+    playButtonClickSound();
+    haptics.tap();
+    (onSkip ?? onContinue)();
   };
   const name = t(`gameModes.${mode}.name`);
   const description = t(`gameModes.${mode}.description`);
@@ -98,7 +109,7 @@ const ModeIntroCard: React.FC<ModeIntroCardProps> = ({ mode, t, onContinue }) =>
 
         <button
           type="button"
-          onClick={handleContinue}
+          onClick={handleSkip}
           className="text-xs text-neo-cream/50 underline-offset-4 hover:underline focus-visible:underline"
         >
           {skip}

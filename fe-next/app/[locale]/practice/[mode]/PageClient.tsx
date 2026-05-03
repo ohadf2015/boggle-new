@@ -36,7 +36,7 @@ export default function PracticePageClient({ mode, locale: _locale }: Props) {
   }, [markSeen]);
 
   if (step === 'intro') {
-    return <ModeIntroCard mode={mode} t={t} onContinue={goToTutorial} />;
+    return <ModeIntroCard mode={mode} t={t} onContinue={goToTutorial} onSkip={goToPlay} />;
   }
   if (step === 'tutorial') {
     return <PracticeTutorialSheet mode={mode} t={t} onContinue={goToPlay} />;

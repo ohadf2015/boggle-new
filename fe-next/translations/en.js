@@ -5012,9 +5012,16 @@ const en = {
     },
     "wordHunt": {
       "instruction": "Tap letters to spell the target word. Green = right spot. Yellow = wrong spot.",
+      "targetLabel": "Target word",
       "submit": "Guess",
       "backspace": "Undo",
       "solved": "Solved! Great job."
+    },
+    "complete": {
+      "title": "Mode complete!",
+      "classic": "3 words found",
+      "wordHunt": "target solved",
+      "wheelRush": "3 words found"
     },
     "wheelRush": {
       "instruction": "Build words using the center letter (lime). Tap any other letters around it.",
@@ -10332,7 +10339,12 @@ const en = {
   },
   "practiceHub": {
     "title": "Practice",
-    "subtitle": "A quiet place to learn each mode"
+    "subtitle": "A quiet place to learn each mode",
+    "progress": "{done} of {total} modes complete",
+    "completedBadge": "Completed",
+    "completedDesc": "Tap to play again",
+    "navAria": "Practice modes",
+    "backToHub": "← Hub"
   },
   "practiceBadge": {
     "label": "Practice",

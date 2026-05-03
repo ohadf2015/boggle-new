@@ -1,9 +1,12 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeChainCta from './PracticeChainCta';
 import PracticeCoachTip from './PracticeCoachTip';
+import PracticeCompleteBanner from './PracticeCompleteBanner';
+import PracticeModeNav from './PracticeModeNav';
+import { markPracticeMode, PRACTICE_GOALS } from '@/lib/practice/practiceProgress';
 
 /**
  * Tiny curated wheel: 1 center + 4 outer letters. Center letter MUST appear
@@ -52,6 +55,13 @@ export default function PracticeWheelSandbox() {
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<{ kind: 'ok' | 'bad' | 'dup' | 'noCenter'; message: string } | null>(null);
 
+  useEffect(() => {
+    if (foundWords.length >= PRACTICE_GOALS.wheelRush) {
+      markPracticeMode('wheelRush', language);
+    }
+  }, [foundWords.length, language]);
+  const isComplete = foundWords.length >= PRACTICE_GOALS.wheelRush;
+
   const currentWord = useMemo(() => built.join(''), [built]);
 
   const addLetter = useCallback((letter: string) => {
@@ -87,6 +97,7 @@ export default function PracticeWheelSandbox() {
 
   return (
     <div className="flex flex-col items-center w-full max-w-md mx-auto px-4 py-4 gap-3">
+      <PracticeModeNav current="wheelRush" />
       <PracticeCoachTip mode="wheelRush" wordsFound={foundWords.length} />
 
       <p className="text-neo-cream/80 text-sm text-center font-neo-body">
@@ -184,6 +195,8 @@ export default function PracticeWheelSandbox() {
           ))}
         </ul>
       </div>
+
+      {isComplete && <PracticeCompleteBanner mode="wheelRush" />}
 
       <PracticeChainCta currentMode="wheelRush" className="mt-2 inline-flex items-center justify-center w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed" />
     </div>

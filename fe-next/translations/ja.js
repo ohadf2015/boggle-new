@@ -4891,9 +4891,16 @@ const ja = {
     },
     "wordHunt": {
       "instruction": "文字をタップしてターゲットの単語を作ります。緑 = 正しい位置。黄色 = 間違った位置。",
+      "targetLabel": "ターゲットの単語",
       "submit": "推測",
       "backspace": "戻す",
       "solved": "解けた！よくできました。"
+    },
+    "complete": {
+      "title": "モード完了！",
+      "classic": "3単語発見",
+      "wordHunt": "ターゲット解決",
+      "wheelRush": "3単語発見"
     },
     "wheelRush": {
       "instruction": "中央の文字（ライム色）を使って単語を作ります。周りの文字をタップしてください。",
@@ -10077,7 +10084,12 @@ const ja = {
   },
   "practiceHub": {
     "title": "練習",
-    "subtitle": "それぞれのモードを学ぶ静かな場所"
+    "subtitle": "それぞれのモードを学ぶ静かな場所",
+    "progress": "{total}つ中{done}つ完了",
+    "completedBadge": "完了",
+    "completedDesc": "もう一度プレイ",
+    "navAria": "練習モード",
+    "backToHub": "← ハブ"
   },
   "practiceBadge": {
     "label": "練習",
