@@ -47,13 +47,17 @@ interface Props {
 }
 
 /**
- * Practice hub. Hero mascot greeting + bigger, mascot-fronted mode cards so
- * the screen pops on first landing. Tap → /practice/<mode>.
+ * Practice hub. Hero greeting + progress bar + mascot-fronted mode cards.
+ * A skip CTA at the bottom lets returning players jump straight home.
  */
 export default function PracticeHubClient({ locale }: Props) {
   const { t, language } = useLanguage();
   const { playButtonClickSound } = useSoundEffects();
   const completed = usePracticeProgress(language);
+  const total = PRACTICE_MODES.length;
+  const done = completed.size;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const allDone = done === total;
   const handleTileTap = () => {
     playButtonClickSound();
     haptics.tap();
@@ -66,7 +70,7 @@ export default function PracticeHubClient({ locale }: Props) {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="mb-5 flex items-center gap-3"
+          className="mb-4 flex items-center gap-3"
         >
           <Mascot variant="waving" size="sm" clipShape="circle" clipBorder="lime" />
           <div className="flex-1 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo px-3 py-2 shadow-hard-sm">
@@ -79,17 +83,50 @@ export default function PracticeHubClient({ locale }: Props) {
           </div>
         </AdaptiveMotion.div>
 
-        <div
-          data-testid="practice-progress-headline"
-          className="mb-4 flex items-center justify-center gap-2 text-xs uppercase tracking-wider font-neo-display font-black text-neo-lime"
+        <AdaptiveMotion.div
+          data-testid="practice-progress-card"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: 'easeOut', delay: 0.05 }}
+          className="mb-5 px-4 py-3 rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard-sm"
         >
-          <span aria-hidden>★</span>
-          <span>
-            {t('practiceHub.progress', { done: completed.size, total: PRACTICE_MODES.length })}
-          </span>
-        </div>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] uppercase tracking-wider font-neo-display font-black text-neo-cream/70">
+              {t('practiceHub.progressLabel')}
+            </span>
+            <span
+              data-testid="practice-progress-count"
+              className="text-sm font-neo-display font-black text-neo-lime"
+            >
+              {t('practiceHub.stepCount', { done, total })}
+            </span>
+          </div>
+          <div
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={total}
+            aria-valuenow={done}
+            aria-label={t('practiceHub.progress', { done, total })}
+            className="relative h-3 w-full rounded-full bg-neo-navy border-2 border-neo-black overflow-hidden"
+          >
+            <AdaptiveMotion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${pct}%` }}
+              transition={{ duration: 0.7, ease: 'easeOut' }}
+              className={
+                'h-full ' + (allDone ? 'bg-neo-lime' : 'bg-linear-to-r from-neo-cyan via-neo-lime to-neo-pink')
+              }
+            />
+          </div>
+          <div
+            data-testid="practice-progress-headline"
+            className="mt-2 text-[11px] font-neo-body font-bold text-neo-cream/70 text-center"
+          >
+            {t('practiceHub.progress', { done, total })}
+          </div>
+        </AdaptiveMotion.div>
 
-        {completed.size === PRACTICE_MODES.length && (
+        {allDone && (
           <AdaptiveMotion.div
             data-testid="practice-all-complete"
             initial={{ opacity: 0, scale: 0.95, y: -8 }}
@@ -164,6 +201,17 @@ export default function PracticeHubClient({ locale }: Props) {
               </AdaptiveMotion.div>
             );
           })}
+        </div>
+
+        <div className="mt-8 flex justify-center">
+          <Link
+            href={`/${locale}`}
+            data-testid="practice-skip-cta"
+            onClick={handleTileTap}
+            className="text-xs font-neo-display font-black text-neo-cream/60 hover:text-neo-cream underline underline-offset-4 decoration-2"
+          >
+            {t('practiceHub.skipLabel')}
+          </Link>
         </div>
       </div>
     </div>

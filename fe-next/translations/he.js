@@ -4944,7 +4944,17 @@ const he = {
       "targetLabel": "מילת המטרה",
       "submit": "נחש",
       "backspace": "בטל",
-      "solved": "פתרת! כל הכבוד."
+      "solved": "פתרת! כל הכבוד.",
+      "huntGreet": "צוד את המילה הנסתרת!",
+      "huntInstruction": "מילה בת {length} אותיות מסתתרת על הלוח. החלק כל מילה באורך {length} כדי לקבל רמזים.",
+      "triesLeft": "ניסיונות",
+      "feedbackCorrect": "מקום נכון",
+      "feedbackWrongPlace": "מקום לא נכון",
+      "feedbackNotInWord": "לא במילה",
+      "matchLength": "שלח כדי לנצל ניסיון!",
+      "boardEmpty": "לא נמצאה מטרה — מייצר לוח חדש...",
+      "discoveries": "מילות בונוס",
+      "giveUp": "חשוף את המטרה"
     },
     "complete": {
       "title": "המצב הושלם!",
@@ -4982,7 +4992,23 @@ const he = {
     "huntSlot": "{length} אותיות",
     "wheelGreet": "השתמש באות הירוקה!",
     "wheelShuffle": "ערבב",
-    "wheelClear": "נקה"
+    "wheelClear": "נקה",
+    "playAgain": "שחק שוב במצב הזה",
+    "tryAnother": "נסה מצב אחר",
+    "complete": {
+      "title": "הצלחת!",
+      "subtitleClassic": "אתה אשף מילים אמיתי.",
+      "subtitleWordHunt": "עיניים חדות! מצאת כל מילה נסתרת.",
+      "subtitleWheelRush": "תנועות חלקות על הגלגל.",
+      "praise1": "מדהים!",
+      "praise2": "אגדת מילים!",
+      "praise3": "מוח חלק!",
+      "praise4": "אתה גורם לזה להיראות קל.",
+      "statsWords": "מילים",
+      "statsLongest": "הארוכה",
+      "statsLetters": "אותיות",
+      "noLongest": "—"
+    }
   },
   "practiceWelcome": {
     "greet": "ברוך הבא לתרגול!",
@@ -10172,12 +10198,15 @@ const he = {
     "subtitle": "מקום שקט ללמוד כל מצב",
     "greet": "בחר מצב ושחק!",
     "progress": "{done} מתוך {total} מצבים הושלמו",
+    "progressLabel": "ההתקדמות שלך",
+    "stepCount": "{done}/{total}",
     "completedBadge": "הושלם",
     "completedDesc": "הקש כדי לשחק שוב",
     "navAria": "מצבי תרגול",
     "backToHub": "→ תפריט",
     "playLabel": "שחק",
     "playAgainLabel": "שחק שוב",
+    "skipLabel": "דלג על התרגול — קח אותי הביתה",
     "allCompleteTitle": "כל מצבי התרגול הושלמו!",
     "allCompleteBody": "אתם מוכנים למצבים האמיתיים."
   },

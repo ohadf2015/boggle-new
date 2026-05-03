@@ -7,7 +7,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { type CustomAvatarConfig, getRandomAvatarConfig } from '@/shared/types/customAvatar';
 import Avatar from '@/components/Avatar';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
-import { fireOnboardingBurst } from '@/utils/confettiUtils';
 import { suggestPlayerName } from '@/utils/onboardingNameSuggestions';
 import { cn } from '@/lib/utils';
 
@@ -69,8 +68,6 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
     initialSuggestionRef.current = next;
     setName(next);
     previouslyValidRef.current = false;
-    // Small burst centred near the avatar (roughly upper-middle of viewport)
-    fireOnboardingBurst({ y: 0.4 }, ['#FFE135', '#FF1493', '#BFFF00']);
   }, [language]);
 
   const handleBuilderSave = useCallback((config: CustomAvatarConfig) => {
@@ -97,8 +94,6 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
       inputRef.current?.focus();
       return;
     }
-    // Send-off burst in the brand pink — steps forward into the score reveal
-    fireOnboardingBurst({ y: 0.6 }, ['#FF1493', '#BFFF00', '#FFE135']);
     const nameEdited = liveTrimmed !== initialSuggestionRef.current.trim();
     onComplete(liveTrimmed, avatar, nameEdited);
   }, [name, avatar, onComplete]);

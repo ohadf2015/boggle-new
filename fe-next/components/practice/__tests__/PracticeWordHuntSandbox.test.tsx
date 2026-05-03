@@ -1,8 +1,7 @@
 /**
- * PracticeWordHuntSandbox is now a thin wrapper around PracticeSwipeBoard —
- * it just picks the wordHunt mode + board size + goal. The shared sandbox
- * covers the real swipe interaction + dictionary validation; here we only
- * assert that the wrapper renders the correct mode surface and key chrome.
+ * PracticeWordHuntSandbox renders a real-game-style hidden-target hunt:
+ * clue boxes, tries counter, Wordle-style feedback. We assert the surface
+ * markers and that the survival HUD chrome doesn't leak in.
  */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
@@ -41,6 +40,15 @@ vi.mock('@/hooks/useWordSubmission', () => ({
   }),
 }));
 
+// The hunt enumerates valid words on the board via checkWord — pretend a small
+// set of common letters always validates so we get a target picked deterministically.
+vi.mock('@/hooks/useDictionaryCache', () => ({
+  useDictionaryCache: () => ({
+    checkWord: (w: string) => w.length >= 3 && w.length <= 5,
+    isLoaded: true,
+  }),
+}));
+
 import PracticeWordHuntSandbox from '../PracticeWordHuntSandbox';
 
 describe('PracticeWordHuntSandbox', () => {
@@ -61,9 +69,14 @@ describe('PracticeWordHuntSandbox', () => {
     expect(screen.getByTestId('practice-instruction')).toBeInTheDocument();
   });
 
-  it('shows progress dots for each word toward the goal', () => {
+  it('shows tries-remaining HUD reused from the real word hunt clue area', () => {
     render(<PracticeWordHuntSandbox />);
-    expect(screen.getByTestId('practice-progress')).toBeInTheDocument();
+    expect(screen.getByTestId('practice-tries-left')).toBeInTheDocument();
+  });
+
+  it('renders the clue boxes that mirror the real game target display', () => {
+    render(<PracticeWordHuntSandbox />);
+    expect(screen.getByTestId('practice-clue-boxes')).toBeInTheDocument();
   });
 
   it('does NOT render any survival HUD chrome (life bar, attempts, clues)', () => {

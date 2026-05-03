@@ -4918,7 +4918,17 @@ const ja = {
       "targetLabel": "ターゲットの単語",
       "submit": "推測",
       "backspace": "戻す",
-      "solved": "解けた！よくできました。"
+      "solved": "解けた！よくできました。",
+      "huntGreet": "隠された言葉を狩ろう！",
+      "huntInstruction": "{length}文字の単語が盤面に隠れています。{length}文字の単語をスワイプしてヒントを得よう。",
+      "triesLeft": "試行",
+      "feedbackCorrect": "正しい位置",
+      "feedbackWrongPlace": "間違った位置",
+      "feedbackNotInWord": "単語にない",
+      "matchLength": "送信して試行を使う！",
+      "boardEmpty": "ターゲットが見つかりません — 新しい盤面を生成中...",
+      "discoveries": "ボーナス単語",
+      "giveUp": "ターゲットを公開"
     },
     "complete": {
       "title": "モード完了！",
@@ -4956,7 +4966,23 @@ const ja = {
     "huntSlot": "{length}文字",
     "wheelGreet": "ライムの文字を使って！",
     "wheelShuffle": "シャッフル",
-    "wheelClear": "クリア"
+    "wheelClear": "クリア",
+    "playAgain": "もう一度プレイ",
+    "tryAnother": "他のモードを試す",
+    "complete": {
+      "title": "やったね！",
+      "subtitleClassic": "本物の言葉の魔法使いだ。",
+      "subtitleWordHunt": "鋭い目！隠れた言葉をすべて見つけた。",
+      "subtitleWheelRush": "ホイール上の滑らかな動き。",
+      "praise1": "信じられない！",
+      "praise2": "言葉の伝説！",
+      "praise3": "天才的！",
+      "praise4": "簡単そうに見せるね。",
+      "statsWords": "言葉",
+      "statsLongest": "最長",
+      "statsLetters": "文字",
+      "noLongest": "—"
+    }
   },
   "practiceWelcome": {
     "greet": "練習へようこそ！",
@@ -10137,12 +10163,15 @@ const ja = {
     "subtitle": "それぞれのモードを学ぶ静かな場所",
     "greet": "モードを選んでプレイ！",
     "progress": "{total}つ中{done}つ完了",
+    "progressLabel": "あなたの進捗",
+    "stepCount": "{done}/{total}",
     "completedBadge": "完了",
     "completedDesc": "もう一度プレイ",
     "navAria": "練習モード",
     "backToHub": "← ハブ",
     "playLabel": "プレイ",
     "playAgainLabel": "もう一度",
+    "skipLabel": "練習をスキップ — ホームへ",
     "allCompleteTitle": "全ての練習が完了！",
     "allCompleteBody": "本番モードに挑戦する準備ができました。"
   },
