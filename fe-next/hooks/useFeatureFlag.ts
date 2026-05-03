@@ -40,6 +40,25 @@ export function useFeatureFlag(
         setLoading(true);
         setError(null);
 
+        // Dev-only: check localStorage override for E2E testing
+        if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
+          const overridesStr = window.localStorage.getItem('feature_flag_overrides');
+          if (overridesStr) {
+            try {
+              const overrides = JSON.parse(overridesStr);
+              if (flagName in overrides) {
+                if (isMounted) {
+                  setEnabled(overrides[flagName] === true);
+                  setLoading(false);
+                }
+                return;
+              }
+            } catch {
+              // Ignore parse errors, fall through to API check
+            }
+          }
+        }
+
         // Call backend API to check feature flag (supports guest users with null userId)
         const response = await fetch(`/api/feature-flags/check`, {
           method: 'POST',
