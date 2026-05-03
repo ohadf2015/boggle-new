@@ -28,7 +28,10 @@ const PUZZLES: Record<string, WheelPuzzle> = {
   he: {
     center: 'א',
     outer: ['ב', 'ם', 'מ', 'ה'],
-    validWords: new Set(['אם', 'אבא', 'אמא', 'אהבה', 'מאה']),
+    // All entries must contain the center 'א'. Sandbox allows repeating an
+    // outer letter (player can click it twice) — that's intentional, matches
+    // real wheel mechanic.
+    validWords: new Set(['אם', 'בא', 'אבא', 'אמא', 'אבה', 'מאה', 'אהבה']),
   },
   sv: {
     center: 'A',
@@ -37,8 +40,10 @@ const PUZZLES: Record<string, WheelPuzzle> = {
   },
   ja: {
     center: 'い',
-    outer: ['ぬ', 'ね', 'こ', 'と'],
-    validWords: new Set(['いぬ', 'ねこ', 'いと']),
+    // Outer chosen so every word in validWords actually contains the center 'い'
+    // (previous outer included ね/こ which let through 'ねこ' violating the rule).
+    outer: ['ぬ', 'と', 'け', 'ま'],
+    validWords: new Set(['いぬ', 'いと', 'いけ', 'いま', 'けい', 'まい']),
   },
   es: {
     center: 'A',
