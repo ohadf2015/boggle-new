@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { createHighlightRecorder, type HighlightRecorder } from '@/lib/blast/highlightRecorder';
 import { useBlastSounds } from './hooks/useBlastSounds';
 import { useComboSystem } from '@/hooks/useComboSystem';
 import { useWordSubmission } from '@/components/singleplayer/game/hooks/useWordSubmission';
@@ -140,6 +141,9 @@ export function BlastGame({
   const comboStreak = useBlastComboStreak(getComboWindowMs(minWordLength));
   const spamDetection = useSpamDetection();
 
+  // Highlight recorder for Blast Highlight Reel feature
+  const highlightRecorderRef = useRef<HighlightRecorder>(createHighlightRecorder());
+
   // MP board sync: apply server-authoritative board state when blastBoardUpdate arrives
   // Queue updates during cascade to prevent ref corruption mid-animation
   const pendingBoardUpdatesRef = useRef<Array<{ grid: LetterGrid; tileStates: BlastTileState[][] }>>([]);
@@ -192,6 +196,13 @@ export function BlastGame({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setGameActive]);
 
+  // Start highlight recorder when game becomes playable
+  useEffect(() => {
+    if (engine.grid && isDictionaryReady) {
+      highlightRecorderRef.current.start();
+    }
+  }, [engine.grid, isDictionaryReady]);
+
   // Effects + UI state
   const [scoreFlyEvents, setScoreFlyEvents] = useState<ScoreFlyEvent[]>([]);
   const [comboFlash, setComboFlash] = useState<{ id: string; tier: 1 | 2 | 3 } | null>(null);
@@ -231,6 +242,7 @@ export function BlastGame({
     onWordWithComboTypeRef, onComboDetected,
     config, t,
     scoreMultiplier: buffScoreMultiplier,
+    recorder: highlightRecorderRef.current,
     effects: {
       setLastWordLength, setWordSubmitCount, setWordFoundParticle,
       setClearedTilesForEffects, setScoreFlyEvents,

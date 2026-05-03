@@ -15,6 +15,7 @@ import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism } from '@/co
 import type { BlastTileType, BlastGameConfig } from '../types';
 import type { ScoreFlyEvent } from '../BlastScoreFly';
 import type { ClearedTileEvent } from '../BlastEffectsCanvas';
+import type { HighlightRecorder } from '@/lib/blast/highlightRecorder';
 import type { useBlastEngine } from './useBlastEngine';
 import type { useBlastSequencer } from './useBlastSequencer';
 import type { useBlastSounds } from './useBlastSounds';
@@ -52,6 +53,8 @@ interface UseBlastWordHandlerParams {
   effects: WordHandlerEffects;
   /** Multiplies baseScore before submission (e.g. combo2x pre-game buff). Defaults to 1. */
   scoreMultiplier?: number;
+  /** Highlight recorder for capturing replay moments. Optional for backward compatibility. */
+  recorder?: HighlightRecorder;
 }
 
 export function useBlastWordHandler({
@@ -69,6 +72,7 @@ export function useBlastWordHandler({
   t,
   effects,
   scoreMultiplier = 1,
+  recorder,
 }: UseBlastWordHandlerParams) {
   const handleWordAccepted = useCallback(async (data: { word: string; score: number }) => {
     if (lastPathRef.current.length === 0) return;
@@ -92,7 +96,10 @@ export function useBlastWordHandler({
 
     effects.setWordFoundParticle(c => c + 1);
 
-    // 1. Animate word clear
+    // 1. Capture pre-grid snapshot before clearing
+    const preGrid = structuredClone(engine.tileStates);
+
+    // 1a. Animate word clear
     const clearedInfo = path.map(p => ({
       row: p.row,
       col: p.col,
@@ -108,6 +115,9 @@ export function useBlastWordHandler({
     // 2. Submit to engine — apply pregame-buff score multiplier (combo2x) before scoring
     const multipliedScore = scoreMultiplier !== 1 ? Math.round(data.score * scoreMultiplier) : data.score;
     const result = engine.submitWord(path, data.word, multipliedScore);
+
+    // 2a. Capture post-grid snapshot after engine processing
+    const postGrid = structuredClone(engine.tileStates);
 
     // 3. Score fly effect
     const avgRow = path.reduce((s, p) => s + p.row, 0) / path.length;
@@ -176,6 +186,23 @@ export function useBlastWordHandler({
 
     // 7. Cascade chain
     await runCascade(path.length);
+
+    // 7a. Record word submission for highlight reel if recorder is available
+    if (recorder) {
+      const specialTilesInPath = clearedInfo
+        .map(c => c.type as BlastTileType)
+        .filter(t => t !== 'standard');
+      recorder.recordWordSubmit({
+        word: data.word,
+        score: result.score,
+        path: path.map(p => ({ row: p.row, col: p.col })),
+        combo: detectedCombos.length,
+        specialTilesHit: specialTilesInPath,
+        preGrid,
+        postGrid,
+        effectsFired: result.explosions.map(e => e.type),
+      });
+    }
 
     sounds.playTileClear(clearedInfo.length);
     sounds.playLongWordBonus(path.length);
