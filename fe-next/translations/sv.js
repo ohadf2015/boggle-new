@@ -4903,6 +4903,22 @@ const sv = {
       "notAWord": "Inte på den här tavlan — prova en annan väg.",
       "duplicate": "Redan hittat.",
       "foundWordsLabel": "Hittade ({count})"
+    },
+    "wordHunt": {
+      "instruction": "Tryck på bokstäver för att stava målordet. Grön = rätt plats. Gul = fel plats.",
+      "submit": "Gissa",
+      "backspace": "Ångra",
+      "solved": "Löst! Bra jobbat."
+    },
+    "wheelRush": {
+      "instruction": "Bygg ord med mittbokstaven (lime). Tryck på övriga runt den.",
+      "submit": "Skicka",
+      "reset": "Rensa",
+      "needsCenter": "Ordet måste använda mittbokstaven.",
+      "found": "Bra! Ordet tillagt.",
+      "notAWord": "Inte ett ord — prova ett annat.",
+      "duplicate": "Redan hittat.",
+      "foundWordsLabel": "Hittade ({count})"
     }
   },
   "wizard": {

@@ -4888,6 +4888,22 @@ const ja = {
       "notAWord": "このボードにはありません — 別の道を試してください。",
       "duplicate": "すでに見つけました。",
       "foundWordsLabel": "発見 ({count})"
+    },
+    "wordHunt": {
+      "instruction": "文字をタップしてターゲットの単語を作ります。緑 = 正しい位置。黄色 = 間違った位置。",
+      "submit": "推測",
+      "backspace": "戻す",
+      "solved": "解けた！よくできました。"
+    },
+    "wheelRush": {
+      "instruction": "中央の文字（ライム色）を使って単語を作ります。周りの文字をタップしてください。",
+      "submit": "送信",
+      "reset": "リセット",
+      "needsCenter": "中央の文字を使う必要があります。",
+      "found": "いいね！単語を追加しました。",
+      "notAWord": "単語ではありません — 別を試してください。",
+      "duplicate": "すでに見つけました。",
+      "foundWordsLabel": "発見 ({count})"
     }
   },
   "wizard": {

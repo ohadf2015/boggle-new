@@ -5009,6 +5009,22 @@ const en = {
       "notAWord": "Not on this board — try another path.",
       "duplicate": "Already found.",
       "foundWordsLabel": "Found ({count})"
+    },
+    "wordHunt": {
+      "instruction": "Tap letters to spell the target word. Green = right spot. Yellow = wrong spot.",
+      "submit": "Guess",
+      "backspace": "Undo",
+      "solved": "Solved! Great job."
+    },
+    "wheelRush": {
+      "instruction": "Build words using the center letter (lime). Tap any other letters around it.",
+      "submit": "Submit",
+      "reset": "Reset",
+      "needsCenter": "Word must use the center letter.",
+      "found": "Nice! Word added.",
+      "notAWord": "Not a word — try another.",
+      "duplicate": "Already found.",
+      "foundWordsLabel": "Found ({count})"
     }
   },
   "wizard": {

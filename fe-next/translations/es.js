@@ -4933,6 +4933,22 @@ const es = {
       "notAWord": "No está en este tablero — prueba otro camino.",
       "duplicate": "Ya encontrada.",
       "foundWordsLabel": "Encontradas ({count})"
+    },
+    "wordHunt": {
+      "instruction": "Toca letras para deletrear la palabra objetivo. Verde = lugar correcto. Amarillo = lugar incorrecto.",
+      "submit": "Adivinar",
+      "backspace": "Deshacer",
+      "solved": "¡Resuelto! Buen trabajo."
+    },
+    "wheelRush": {
+      "instruction": "Forma palabras usando la letra central (lima). Toca las demás alrededor.",
+      "submit": "Enviar",
+      "reset": "Reiniciar",
+      "needsCenter": "La palabra debe usar la letra central.",
+      "found": "¡Bien! Palabra añadida.",
+      "notAWord": "No es una palabra — prueba otra.",
+      "duplicate": "Ya encontrada.",
+      "foundWordsLabel": "Encontradas ({count})"
     }
   },
   "wizard": {
