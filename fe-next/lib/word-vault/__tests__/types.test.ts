@@ -55,10 +55,17 @@ describe('word-vault types & stub content', () => {
     expect(CINDER.was).toMatch(/cook|warm/i);
   });
 
-  it('BOOK_1_ITEMS exposes the three permanent items from spec', () => {
-    expect(BOOK_1_ITEMS).toHaveLength(3);
+  it('BOOK_1_ITEMS exposes one item per room (6 total) per RPG-layer spec', () => {
+    expect(BOOK_1_ITEMS).toHaveLength(6);
     const ids = BOOK_1_ITEMS.map((i) => i.id).sort();
-    expect(ids).toEqual(['cael-recipe-book', 'cinder-charm', 'melo-lantern']);
+    expect(ids).toEqual([
+      'brass-key',
+      'cael-recipe-book',
+      'cinder-charm',
+      'defrost-candle',
+      'family-photo',
+      'melo-lantern',
+    ]);
   });
 
   it('every room declares a non-negative coin reward', () => {
