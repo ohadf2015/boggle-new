@@ -19,12 +19,17 @@ import {
   type SupabaseSync,
   type SupabaseSyncEvent,
 } from './persistence';
+import { createNotebookSlice, type NotebookSnapshot } from './notebookSlice';
+import { createBeatProgressSlice } from './beatProgressSlice';
+import type { ClueFragment, BeatId } from '../beats/types';
 
 export type WordVaultState = GameProgress & {
   locale: Locale;
   reduceMotion: boolean;
   largeText: boolean;
   audioVolume: AudioVolume;
+  notebook: NotebookSnapshot;
+  beatProgress: Record<RoomId, BeatId[]>;
 };
 
 export type WordVaultActions = {
@@ -41,6 +46,10 @@ export type WordVaultActions = {
   setReduceMotion: (v: boolean) => void;
   setLargeText: (v: boolean) => void;
   setAudioVolume: (v: Partial<AudioVolume>) => void;
+  addClue: (roomId: RoomId, fragment: ClueFragment) => void;
+  markBeatSolved: (roomId: RoomId, beatId: BeatId) => void;
+  isBeatSolved: (roomId: RoomId, beatId: BeatId) => boolean;
+  cluesFor: (roomId: RoomId) => ClueFragment[];
 };
 
 export type WordVaultStoreState = WordVaultState & WordVaultActions;
@@ -59,6 +68,8 @@ const DEFAULT_STATE: WordVaultState = {
   reduceMotion: false,
   largeText: false,
   audioVolume: { music: 0.7, sfx: 0.9 },
+  notebook: { byRoom: {}, lastTapAt: 0 } as any,
+  beatProgress: {} as any,
 };
 
 const snapshot = (state: WordVaultState): PersistedShape => ({
@@ -106,6 +117,9 @@ export function createGameStore(options: CreateGameStoreOptions = {}): WordVault
   const baseState = merge(DEFAULT_STATE, persisted ?? {});
   const initial = { ...baseState, ...(options.initialState ?? {}) };
   const sync = options.supabaseSync ?? NOOP_SUPABASE_SYNC;
+
+  const notebookSlice = createNotebookSlice();
+  const beatProgress = createBeatProgressSlice();
 
   const store = create<WordVaultStoreState>((set, get) => {
     const persistAndSync = (event?: SupabaseSyncEvent) => {
@@ -205,6 +219,23 @@ export function createGameStore(options: CreateGameStoreOptions = {}): WordVault
         set({ audioVolume: { ...get().audioVolume, ...v } });
         persistAndSync({ type: 'settings-changed' });
       },
+
+      addClue: (roomId, fragment) => {
+        notebookSlice.addClue(roomId as any, fragment);
+        set((s) => ({ ...s, notebook: notebookSlice.snapshot() }));
+      },
+
+      markBeatSolved: (roomId, beatId) => {
+        beatProgress.markSolved(roomId as any, beatId);
+        set((s) => ({
+          ...s,
+          beatProgress: { ...s.beatProgress, [roomId]: beatProgress.solvedBeats(roomId as any) },
+        }));
+      },
+
+      isBeatSolved: (roomId, beatId) => beatProgress.isSolved(roomId as any, beatId),
+
+      cluesFor: (roomId) => notebookSlice.cluesFor(roomId as any),
     };
   });
 

@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createGameStore, type WordVaultStore } from '../state/gameStore';
+import type { ClueFragment } from '../beats/types';
 
 const STORAGE_KEY = 'word-vault:progress:v1';
 
@@ -143,5 +144,21 @@ describe('gameStore — persistence', () => {
     store.getState().startNewSession();
     expect(store.getState().memoryCoins).toBe(0);
     expect(store.getState().solvedRooms).toEqual([]);
+  });
+});
+
+describe('gameStore notebook + beat progress', () => {
+  it('addClue persists into state.notebook', () => {
+    const store = createGameStore();
+    const fragment: ClueFragment = { id: 'door', roomId: 'r1.1', kind: 'whisper', text: 'x' };
+    store.getState().addClue('r1.1', fragment);
+    expect(store.getState().notebook.byRoom['r1.1']).toHaveLength(1);
+  });
+
+  it('markBeatSolved + isBeatSolved roundtrip', () => {
+    const store = createGameStore();
+    expect(store.getState().isBeatSolved('r1.1', 'open-door')).toBe(false);
+    store.getState().markBeatSolved('r1.1', 'open-door');
+    expect(store.getState().isBeatSolved('r1.1', 'open-door')).toBe(true);
   });
 });
