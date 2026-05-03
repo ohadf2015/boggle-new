@@ -8789,6 +8789,18 @@ const es = {
       "locked": { "name": "Bloqueada", "desc": "Cerrada — elimina su Llave emparejada para desbloquear" },
       "key": { "name": "Llave", "desc": "Desbloquea fichas Bloqueadas adyacentes al usarse (+20 pts cada una)" },
       "anchor": { "name": "Ancla", "desc": "Bonus de palabra larga — +3 pts por cada letra de la palabra al eliminarse" }
+    },
+    "highlight": {
+      "captions": {
+        "biggestWord": "PALABRA MÁS GRANDE",
+        "tripleCombo": "COMBO TRIPLE",
+        "specialChain": "CADENA DE PODER",
+        "finalClear": "LIMPIEZA FINAL"
+      },
+      "boardCleared": "TABLERO LIMPIO",
+      "skipLabel": "Omitir",
+      "reelLabel": "Repetición",
+      "bestWord": "Mejor palabra"
     }
   },
   "student": {

@@ -8753,6 +8753,18 @@ const he = {
       "locked": { "name": "נעולה", "desc": "חסום — נקה את המפתח המשויך כדי לשחרר" },
       "key": { "name": "מפתח", "desc": "משחרר אריחים נעולים סמוכים בניקוי (20+ נק׳ לכל אחד)" },
       "anchor": { "name": "עוגן", "desc": "בונוס מילה ארוכה — 3+ נק׳ לכל אות במילה בניקוי" }
+    },
+    "highlight": {
+      "captions": {
+        "biggestWord": "המילה הכי גדולה",
+        "tripleCombo": "קומבו משולש",
+        "specialChain": "שרשרת עוצמה",
+        "finalClear": "ניקוי סופי"
+      },
+      "boardCleared": "הלוח נוקה",
+      "skipLabel": "דלג",
+      "reelLabel": "סרטון שיא",
+      "bestWord": "המילה הטובה ביותר"
     }
   },
   "student": {

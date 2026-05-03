@@ -8784,6 +8784,18 @@ const sv = {
       "locked": { "name": "Låst", "desc": "Spärrad — rensa parad Nyckel för att låsa upp" },
       "key": { "name": "Nyckel", "desc": "Låser upp intilliggande Låsta brickor när den rensas (+20 p styck)" },
       "anchor": { "name": "Ankare", "desc": "Långordsbonus — +3 p per bokstav i ordet när den rensas" }
+    },
+    "highlight": {
+      "captions": {
+        "biggestWord": "STÖRSTA ORDET",
+        "tripleCombo": "TRIPPELCOMBO",
+        "specialChain": "KRAFTKEDJA",
+        "finalClear": "SLUTSTÄDNING"
+      },
+      "boardCleared": "BRÄDET RENSAT",
+      "skipLabel": "Hoppa över",
+      "reelLabel": "Höjdpunkter",
+      "bestWord": "Bästa ord"
     }
   },
   "student": {

@@ -8960,6 +8960,18 @@ const en = {
       "locked": { "name": "Locked", "desc": "Gated — clear its paired Key to unlock" },
       "key": { "name": "Key", "desc": "Unlocks adjacent Locked tiles when cleared (+20 pts each)" },
       "anchor": { "name": "Anchor", "desc": "Long-word bonus — +3 pts per letter in the word when cleared" }
+    },
+    "highlight": {
+      "captions": {
+        "biggestWord": "BIGGEST WORD",
+        "tripleCombo": "TRIPLE COMBO",
+        "specialChain": "POWER CHAIN",
+        "finalClear": "FINAL CLEAR"
+      },
+      "boardCleared": "BOARD CLEARED",
+      "skipLabel": "Skip",
+      "reelLabel": "Highlight reel",
+      "bestWord": "Best word"
     }
   },
   "student": {

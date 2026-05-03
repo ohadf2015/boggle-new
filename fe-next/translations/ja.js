@@ -8770,6 +8770,18 @@ const ja = {
       "locked": { "name": "ロック", "desc": "封鎖 — ペアのカギを消すと解除" },
       "key": { "name": "カギ", "desc": "単語で消すと隣接ロックを解除（+20点／個）" },
       "anchor": { "name": "アンカー", "desc": "長単語ボーナス — 消去時、単語の文字数×+3点" }
+    },
+    "highlight": {
+      "captions": {
+        "biggestWord": "最大の単語",
+        "tripleCombo": "トリプルコンボ",
+        "specialChain": "パワーチェーン",
+        "finalClear": "ファイナルクリア"
+      },
+      "boardCleared": "ボードクリア",
+      "skipLabel": "スキップ",
+      "reelLabel": "ハイライト",
+      "bestWord": "ベストワード"
     }
   },
   "student": {
