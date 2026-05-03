@@ -25,41 +25,79 @@ interface Jar {
 }
 
 /**
- * Pool composition: every jar has its answer's letters PLUS 3-4 decoys.
- * Decoys chosen to be tempting but spell wrong HE words from same letters.
+ * 4 jars, each holds an abstract concept tied to Cael's worldview.
+ * Answers are NOT food names — they're things a brother whispered, kept,
+ * lost, or feared. Riddles require lateral interpretation.
+ * Pool = answer's letters + 4-5 decoys (~9 letters total).
  */
 const JARS: Jar[] = [
   {
-    id: 'sugar',
-    scrambled: ['ר','כ','ו','ס'],
-    pool: ['ס','ו','כ','ר','א','מ','ת','ב'],
-    answer: 'סוכר',
-    hintHe: 'גביש מתוק שזוכר את השדה.',
+    id: 'jar-blessing',
+    // Display label on jar (scrambled visual)
+    scrambled: ['כ','ה','ב','ר'],
+    pool: ['ב','ר','כ','ה','ע','ש','ח','ל','מ'],
+    answer: 'ברכה',
+    hintHe: 'מה שקאל אמר ללחם לפני שאכל ממנו.',
     x: 0.20, y: 0.32,
   },
   {
-    id: 'flour',
-    scrambled: ['ק','ח','מ'],
-    pool: ['ק','מ','ח','ל','ש','ע','י'],
-    answer: 'קמח',
-    hintHe: 'אבק שאינו מת. הוסף מים — והוא קם.',
+    id: 'jar-life',
+    scrambled: ['י','י','ח','ם'],
+    pool: ['ח','י','י','ם','ק','מ','ש','א','ל'],
+    answer: 'חיים',
+    hintHe: 'מה שהאבק מבקש ממים.',
     x: 0.46, y: 0.32,
   },
   {
-    id: 'bread',
-    scrambled: ['ח','ם','ל'],
-    pool: ['ל','ח','ם','מ','ש','א','ב','ד'],
-    answer: 'לחם',
-    hintHe: 'מים, אבק, וזמן. ילד אחד מהשלושה.',
+    id: 'jar-sleep',
+    scrambled: ['ה','י','ש','נ'],
+    pool: ['ש','י','נ','ה','ק','ר','ם','ל','ב'],
+    answer: 'שינה',
+    hintHe: 'מה שהמטבח עושה כשאף אחד לא בבית.',
     x: 0.72, y: 0.32,
   },
   {
-    id: 'honey',
-    scrambled: ['ש','ב','ד'],
-    pool: ['ד','ב','ש','כ','ם','ר','ע','ץ'],
-    answer: 'דבש',
-    hintHe: 'זהב נוזלי שלא נכרה.',
+    id: 'jar-brothers',
+    scrambled: ['ם','י','ח','א'],
+    pool: ['א','ח','י','ם','ב','ע','ת','ש','ר'],
+    answer: 'אחים',
+    hintHe: 'מה שסינדר עדיין מתגעגע אליו — ולא יודה.',
     x: 0.46, y: 0.66,
+  },
+];
+
+interface PantryHotspot {
+  id: string;
+  x: number;
+  y: number;
+  glyph: string;
+  /** Lore line revealed on first click */
+  loreHe: string;
+  /** Optional: letter shard found here (added to player's discovery log) */
+  shardHe?: string;
+}
+
+const HOTSPOTS: PantryHotspot[] = [
+  {
+    id: 'cobweb',
+    x: 0.10, y: 0.12,
+    glyph: '🕸️',
+    loreHe: '"לקח לנו זמן לבנות. את הבית. את הקורי-עכביש." — קאל',
+    shardHe: 'ב',
+  },
+  {
+    id: 'floorboard',
+    x: 0.92, y: 0.85,
+    glyph: '☐',
+    loreHe: '"מתחת לרצפה — שם הוא הסתיר את ספר ההזיכרון."',
+    shardHe: 'ח',
+  },
+  {
+    id: 'old-broom',
+    x: 0.06, y: 0.85,
+    glyph: '〰',
+    loreHe: 'אבק על הרצפה מצייר אות. כמעט נמחק.',
+    shardHe: 'ה',
   },
 ];
 
@@ -76,6 +114,9 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
   const [done, setDone] = useState(false);
   const [burst, setBurst] = useState<{ id: number; x: number; y: number } | undefined>();
   const [burstId, setBurstId] = useState(0);
+  const [exploredHotspots, setExploredHotspots] = useState<Set<string>>(new Set());
+  const [foundShards, setFoundShards] = useState<string[]>([]);
+  const [activeHotspot, setActiveHotspot] = useState<PantryHotspot | null>(null);
 
   const allSolved = solvedJars.size === JARS.length;
 
@@ -208,7 +249,95 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
             }}
           />
         ))}
+
+        {/* Discovery hotspots — click to explore the scene */}
+        {HOTSPOTS.map((h) => {
+          const isExplored = exploredHotspots.has(h.id);
+          return (
+            <button
+              key={h.id}
+              type="button"
+              onClick={() => {
+                setActiveHotspot(h);
+                if (!isExplored) {
+                  setExploredHotspots((prev) => new Set(prev).add(h.id));
+                  if (h.shardHe) {
+                    setFoundShards((prev) => (prev.includes(h.shardHe!) ? prev : [...prev, h.shardHe!]));
+                  }
+                }
+              }}
+              aria-label={h.id}
+              className="absolute z-20 grid h-10 w-10 place-items-center rounded-full transition-all"
+              style={{
+                left: `${h.x * 100}%`,
+                top: `${h.y * 100}%`,
+                transform: 'translate(-50%, -50%)',
+                background: isExplored ? 'rgba(255,180,80,0.05)' : 'rgba(255,180,80,0.18)',
+                border: isExplored ? '1.5px solid rgba(180,160,140,0.25)' : '2px solid rgba(255,180,80,0.55)',
+                boxShadow: isExplored ? 'none' : '0 0 14px rgba(255,180,80,0.4)',
+                color: isExplored ? 'rgba(180,160,140,0.4)' : 'rgba(255,210,140,0.9)',
+                fontSize: 18,
+                animation: isExplored ? undefined : 'wv-hotspotPulse 2s ease-in-out infinite',
+              }}
+            >
+              {h.glyph}
+            </button>
+          );
+        })}
       </div>
+
+      {/* Found-shards bank — visible reward for exploration */}
+      {foundShards.length > 0 && !done && (
+        <div className="pointer-events-none absolute right-3 top-14 z-10 flex flex-col items-end gap-1" dir="rtl">
+          <span className="font-fredoka text-[10px] uppercase tracking-widest text-amber-200/55">שברי אות</span>
+          <div className="flex gap-1">
+            {foundShards.map((s, i) => (
+              <span
+                key={i}
+                className="grid h-7 w-7 place-items-center rounded border border-amber-300/55 bg-[#1a0e08]/85 font-fredoka text-base font-black"
+                style={{ color: 'rgba(255,210,140,0.95)', textShadow: '0 0 8px rgba(255,180,80,0.6)' }}
+              >
+                {s}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Hotspot lore modal */}
+      {activeHotspot && (
+        <div
+          className="absolute inset-0 z-40 flex items-center justify-center bg-black/70 px-6"
+          onClick={() => setActiveHotspot(null)}
+        >
+          <div
+            className="max-w-md rounded-md border-4 border-amber-300/70 px-5 py-4 text-center shadow-[4px_4px_0_0_#000]"
+            style={{ background: 'linear-gradient(180deg, #1a0e08 0%, #0a0604 100%)' }}
+            onClick={(e) => e.stopPropagation()}
+            dir="rtl"
+          >
+            <p className="font-rubik text-base leading-relaxed text-white/90">{activeHotspot.loreHe}</p>
+            {activeHotspot.shardHe && (
+              <div className="mt-3 flex items-center justify-center gap-2">
+                <span className="font-fredoka text-[10px] uppercase tracking-widest text-amber-200/55">שבר אות</span>
+                <span
+                  className="grid h-9 w-9 place-items-center rounded-md border-2 border-amber-300 font-fredoka text-2xl font-black"
+                  style={{ background: 'linear-gradient(180deg, #5a3a18, #2a160a)', color: 'rgba(255,225,160,1)', textShadow: '0 0 12px rgba(255,180,80,0.85)' }}
+                >
+                  {activeHotspot.shardHe}
+                </span>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => setActiveHotspot(null)}
+              className="mt-4 rounded border-2 border-amber-300 px-4 py-1 font-fredoka text-sm font-bold text-amber-200"
+            >
+              סגור
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Active-jar editing tray */}
       {activeJar && !done && (
@@ -377,6 +506,10 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
         @keyframes wv-jarFrostMelt {
           0% { opacity: 1; }
           100% { opacity: 0; }
+        }
+        @keyframes wv-hotspotPulse {
+          0%,100% { box-shadow: 0 0 12px rgba(255,180,80,0.4); transform: translate(-50%,-50%) scale(1); }
+          50% { box-shadow: 0 0 22px rgba(255,200,120,0.85); transform: translate(-50%,-50%) scale(1.08); }
         }
       `}</style>
     </div>
