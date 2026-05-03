@@ -10179,7 +10179,9 @@ const sv = {
     "completedBadge": "Klart",
     "completedDesc": "Tryck för att spela igen",
     "navAria": "Övningslägen",
-    "backToHub": "← Hubb"
+    "backToHub": "← Hubb",
+    "allCompleteTitle": "All övning klar!",
+    "allCompleteBody": "Du är redo för de riktiga lägena."
   },
   "practiceBadge": {
     "label": "Övning",

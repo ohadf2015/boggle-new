@@ -59,6 +59,25 @@ export default function PracticeHubClient({ locale }: Props) {
           </span>
         </div>
 
+        {completed.size === PRACTICE_MODES.length && (
+          <AdaptiveMotion.div
+            data-testid="practice-all-complete"
+            initial={{ opacity: 0, scale: 0.95, y: -8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            role="status"
+            aria-live="polite"
+            className="mb-6 px-4 py-3 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black shadow-hard text-center"
+          >
+            <p className="font-neo-display font-black text-base mb-0.5">
+              {t('practiceHub.allCompleteTitle')}
+            </p>
+            <p className="font-neo-body text-xs">
+              {t('practiceHub.allCompleteBody')}
+            </p>
+          </AdaptiveMotion.div>
+        )}
+
         <div className="flex flex-col gap-3">
           {PRACTICE_MODES.map((mode, idx) => {
             const isDone = completed.has(mode);

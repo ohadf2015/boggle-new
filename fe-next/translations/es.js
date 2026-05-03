@@ -10001,7 +10001,9 @@ const es = {
     "completedBadge": "Completado",
     "completedDesc": "Toca para jugar de nuevo",
     "navAria": "Modos de práctica",
-    "backToHub": "← Inicio"
+    "backToHub": "← Inicio",
+    "allCompleteTitle": "¡Toda la práctica completa!",
+    "allCompleteBody": "Estás listo para los modos reales."
   },
   "practiceBadge": {
     "label": "Práctica",

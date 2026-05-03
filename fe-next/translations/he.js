@@ -10148,7 +10148,9 @@ const he = {
     "completedBadge": "הושלם",
     "completedDesc": "הקש כדי לשחק שוב",
     "navAria": "מצבי תרגול",
-    "backToHub": "→ תפריט"
+    "backToHub": "→ תפריט",
+    "allCompleteTitle": "כל מצבי התרגול הושלמו!",
+    "allCompleteBody": "אתם מוכנים למצבים האמיתיים."
   },
   "practiceBadge": {
     "label": "תרגול",

@@ -10113,7 +10113,9 @@ const ja = {
     "completedBadge": "完了",
     "completedDesc": "もう一度プレイ",
     "navAria": "練習モード",
-    "backToHub": "← ハブ"
+    "backToHub": "← ハブ",
+    "allCompleteTitle": "全ての練習が完了！",
+    "allCompleteBody": "本番モードに挑戦する準備ができました。"
   },
   "practiceBadge": {
     "label": "練習",

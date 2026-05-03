@@ -10368,7 +10368,9 @@ const en = {
     "completedBadge": "Completed",
     "completedDesc": "Tap to play again",
     "navAria": "Practice modes",
-    "backToHub": "← Hub"
+    "backToHub": "← Hub",
+    "allCompleteTitle": "All practice complete!",
+    "allCompleteBody": "You're ready for the real modes."
   },
   "practiceBadge": {
     "label": "Practice",
