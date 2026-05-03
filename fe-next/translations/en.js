@@ -10371,7 +10371,12 @@ const en = {
     "backToHub": "← Hub",
     "allCompleteTitle": "All practice complete!",
     "allCompleteBody": "You're ready for the real modes.",
-    "streakDays": "Day {count}"
+    "streakDays": "Day {count}",
+    "welcome": {
+      "title": "First time? Welcome.",
+      "body": "Three quiet warmups, no scores, no clock. Tap a tile to start.",
+      "startHere": "Start here"
+    }
   },
   "practiceBadge": {
     "label": "Practice",

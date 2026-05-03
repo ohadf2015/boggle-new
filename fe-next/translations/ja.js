@@ -10116,7 +10116,12 @@ const ja = {
     "backToHub": "← ハブ",
     "allCompleteTitle": "全ての練習が完了！",
     "allCompleteBody": "本番モードに挑戦する準備ができました。",
-    "streakDays": "{count}日連続"
+    "streakDays": "{count}日連続",
+    "welcome": {
+      "title": "はじめて？ようこそ。",
+      "body": "静かなウォームアップ3つ、スコアなし、時計なし。タイルをタップして始めましょう。",
+      "startHere": "ここから始める"
+    }
   },
   "practiceBadge": {
     "label": "練習",

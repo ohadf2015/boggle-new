@@ -10182,7 +10182,12 @@ const sv = {
     "backToHub": "← Hubb",
     "allCompleteTitle": "All övning klar!",
     "allCompleteBody": "Du är redo för de riktiga lägena.",
-    "streakDays": "Dag {count}"
+    "streakDays": "Dag {count}",
+    "welcome": {
+      "title": "Första gången? Välkommen.",
+      "body": "Tre lugna uppvärmningar, inga poäng, ingen klocka. Tryck på en ruta för att börja.",
+      "startHere": "Börja här"
+    }
   },
   "practiceBadge": {
     "label": "Övning",

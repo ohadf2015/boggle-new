@@ -8,6 +8,7 @@ import { haptics } from '@/utils/haptics';
 import { PRACTICE_MODES } from '@/lib/practice/practiceRoute';
 import { usePracticeProgress } from '@/components/practice/usePracticeProgress';
 import PracticeStreakChip from '@/components/practice/PracticeStreakChip';
+import PracticeHubWelcome from '@/components/practice/PracticeHubWelcome';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
 const MODE_ACCENT: Record<PracticeMode, string> = {
@@ -62,6 +63,8 @@ export default function PracticeHubClient({ locale }: Props) {
           </div>
           <PracticeStreakChip />
         </div>
+
+        {completed.size === 0 && <PracticeHubWelcome />}
 
         {completed.size === PRACTICE_MODES.length && (
           <AdaptiveMotion.div

@@ -10004,7 +10004,12 @@ const es = {
     "backToHub": "← Inicio",
     "allCompleteTitle": "¡Toda la práctica completa!",
     "allCompleteBody": "Estás listo para los modos reales.",
-    "streakDays": "Día {count}"
+    "streakDays": "Día {count}",
+    "welcome": {
+      "title": "¿Primera vez? Bienvenido.",
+      "body": "Tres calentamientos tranquilos, sin puntaje, sin reloj. Toca un mosaico para comenzar.",
+      "startHere": "Empieza aquí"
+    }
   },
   "practiceBadge": {
     "label": "Práctica",

@@ -10151,7 +10151,12 @@ const he = {
     "backToHub": "→ תפריט",
     "allCompleteTitle": "כל מצבי התרגול הושלמו!",
     "allCompleteBody": "אתם מוכנים למצבים האמיתיים.",
-    "streakDays": "יום {count}"
+    "streakDays": "יום {count}",
+    "welcome": {
+      "title": "פעם ראשונה? ברוכים הבאים.",
+      "body": "שלושה חימומים שקטים, בלי ניקוד ובלי שעון. הקישו על תיבה כדי להתחיל.",
+      "startHere": "התחילו כאן"
+    }
   },
   "practiceBadge": {
     "label": "תרגול",
