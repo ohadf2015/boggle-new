@@ -4894,6 +4894,15 @@ const sv = {
     "coach": {
       "label": "Tips",
       "dismiss": "Uppfattat"
+    },
+    "classic": {
+      "instruction": "Tryck på intilliggande rutor för att stava ett ord, sen skicka. Ingen tid, ingen poäng.",
+      "submit": "Skicka",
+      "reset": "Rensa",
+      "found": "Bra! Ordet tillagt.",
+      "notAWord": "Inte på den här tavlan — prova en annan väg.",
+      "duplicate": "Redan hittat.",
+      "foundWordsLabel": "Hittade ({count})"
     }
   },
   "wizard": {

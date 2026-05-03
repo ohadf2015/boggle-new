@@ -5000,6 +5000,15 @@ const en = {
     "coach": {
       "label": "Tip",
       "dismiss": "Got it"
+    },
+    "classic": {
+      "instruction": "Tap adjacent tiles to spell a word, then submit. No timer, no score.",
+      "submit": "Submit",
+      "reset": "Reset",
+      "found": "Nice! Word added.",
+      "notAWord": "Not on this board — try another path.",
+      "duplicate": "Already found.",
+      "foundWordsLabel": "Found ({count})"
     }
   },
   "wizard": {

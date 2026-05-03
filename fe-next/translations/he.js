@@ -4905,6 +4905,15 @@ const he = {
     "coach": {
       "label": "טיפ",
       "dismiss": "הבנתי"
+    },
+    "classic": {
+      "instruction": "הקש על משבצות סמוכות כדי לאיית מילה, ואז שלח. בלי טיימר, בלי ניקוד.",
+      "submit": "שלח",
+      "reset": "אפס",
+      "found": "יפה! המילה נוספה.",
+      "notAWord": "לא על הלוח הזה — נסה מסלול אחר.",
+      "duplicate": "כבר נמצאה.",
+      "foundWordsLabel": "נמצאו ({count})"
     }
   },
   "wizard": {

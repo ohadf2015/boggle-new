@@ -4924,6 +4924,15 @@ const es = {
     "coach": {
       "label": "Consejo",
       "dismiss": "Entendido"
+    },
+    "classic": {
+      "instruction": "Toca casillas adyacentes para deletrear una palabra y envía. Sin tiempo, sin puntuación.",
+      "submit": "Enviar",
+      "reset": "Reiniciar",
+      "found": "¡Bien! Palabra añadida.",
+      "notAWord": "No está en este tablero — prueba otro camino.",
+      "duplicate": "Ya encontrada.",
+      "foundWordsLabel": "Encontradas ({count})"
     }
   },
   "wizard": {

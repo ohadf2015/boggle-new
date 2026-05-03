@@ -4879,6 +4879,15 @@ const ja = {
     "coach": {
       "label": "ヒント",
       "dismiss": "わかった"
+    },
+    "classic": {
+      "instruction": "隣り合うタイルをタップして単語を作り、送信。タイマーもスコアもなし。",
+      "submit": "送信",
+      "reset": "リセット",
+      "found": "いいね！単語を追加しました。",
+      "notAWord": "このボードにはありません — 別の道を試してください。",
+      "duplicate": "すでに見つけました。",
+      "foundWordsLabel": "発見 ({count})"
     }
   },
   "wizard": {
