@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import {
     Home, Swords, ScrollText, Users,
-    Map, Brain, CalendarDays, Zap, Hammer, PartyPopper,
+    Brain, CalendarDays, Zap, Hammer, PartyPopper,
     Trophy, User as UserIcon, Settings as SettingsIcon, Users2, Gift, Target,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -61,7 +61,6 @@ const INDICATOR_COLORS: Record<TabId, string> = {
 // Routes already covered by the base tabs (home/play/quests/friends) return null → no extra slot.
 type DynamicSpec = Omit<TabConfig, 'id'>;
 const DYNAMIC_ROUTES: ReadonlyArray<readonly [string, DynamicSpec]> = [
-    ['/adventure',          { labelKey: 'nav.adventure',    icon: Map,            color: 'text-neo-lime',   glowColor: 'bg-neo-lime/15' }],
     ['/brain',              { labelKey: 'nav.brain',        icon: Brain,          color: 'text-neo-purple', glowColor: 'bg-neo-purple/15' }],
     ['/daily-word-wheel',   { labelKey: 'nav.daily',        icon: CalendarDays,   color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
     ['/word-of-the-day',    { labelKey: 'nav.daily',        icon: CalendarDays,   color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],

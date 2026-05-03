@@ -48,7 +48,7 @@ interface LandingChallengeCardsProps {
 type LandingCardKey = LandingGameMode | 'quickPlay' | 'connections' | 'brainGym';
 
 /** Default card order when no server data available */
-const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'quickPlay', 'arena', 'practice', 'blast', 'adventure', 'connections', 'brainGym'];
+const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'quickPlay', 'arena', 'practice', 'blast', 'connections', 'brainGym'];
 
 /**
  * Featured landing modes — surfaces every shippable mode so players can
@@ -57,7 +57,7 @@ const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'quickPlay', 'arena', 'practic
  */
 const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice', 'quickPlay',
-  'adventure', 'connections', 'brainGym',
+  'connections', 'brainGym',
 ]);
 
 /** CSS stagger delay for each card index */

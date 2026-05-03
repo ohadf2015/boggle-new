@@ -60,7 +60,6 @@ describe('LandingChallengeCards reordering (MP/SP split)', () => {
     expect(featuredRow).toHaveTextContent('landing.practice');
     expect(spSection).not.toHaveTextContent('landing.practice');
     expect(spSection).toHaveTextContent('landing.blastMode');
-    expect(spSection).toHaveTextContent('landing.adventureMode');
     expect(spSection).toHaveTextContent('landing.wordChainMode');
     expect(spSection).toHaveTextContent('landing.brainTraining');
   });

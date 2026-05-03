@@ -263,7 +263,6 @@ describe('GlobalBottomNav', () => {
 
     describe('Dynamic Contextual Tab', () => {
         const dynamicRoutes: Array<[string, RegExp]> = [
-            ['/en/adventure', /adventure/i],
             ['/en/brain', /brain/i],
             ['/en/daily', /daily/i],
             ['/en/word-of-the-day', /daily/i],
@@ -303,7 +302,7 @@ describe('GlobalBottomNav', () => {
         });
 
         it('shows 5 tabs total when a dynamic route is active', () => {
-            (usePathname as Mock).mockReturnValue('/en/adventure');
+            (usePathname as Mock).mockReturnValue('/en/brain');
             render(<GlobalBottomNav />);
 
             const buttons = screen.getAllByRole('button');
@@ -311,10 +310,10 @@ describe('GlobalBottomNav', () => {
         });
 
         it('clicking the dynamic tab does not push a new route (already on page)', () => {
-            (usePathname as Mock).mockReturnValue('/en/adventure');
+            (usePathname as Mock).mockReturnValue('/en/brain');
             render(<GlobalBottomNav />);
 
-            const dynamicBtn = screen.getByRole('button', { name: /adventure/i });
+            const dynamicBtn = screen.getByRole('button', { name: /brain/i });
             fireEvent.click(dynamicBtn);
 
             expect(mockPush).not.toHaveBeenCalled();

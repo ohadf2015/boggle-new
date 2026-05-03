@@ -165,7 +165,7 @@ export default function WordGamesEducationPageClient(): React.ReactElement {
           <InlineBannerAd webZone="content-page" className="my-6" />
 
           <div className={cn('mt-12 pt-6 border-t', isDarkMode ? 'border-slate-700' : 'border-gray-200')}>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               <Link href={`/${locale}/daily`}>
                 <Button className="rounded-neo border-3 border-neo-black bg-neo-yellow text-neo-black font-bold shadow-hard hover:shadow-hard-lg">
                   {content.tryDaily}
@@ -178,6 +178,30 @@ export default function WordGamesEducationPageClient(): React.ReactElement {
               </Link>
             </div>
           </div>
+
+          {/* Education-specific CTAs — surface the dedicated teacher/classroom landings.
+              Locale-gated to en because the linked landings are EN-only target. */}
+          {locale === 'en' && (
+            <div className={cn('mt-8 pt-6 border-t', isDarkMode ? 'border-slate-700' : 'border-gray-200')}>
+              <h3 className={cn('mb-4 font-neo-display text-lg font-bold uppercase', isDarkMode ? 'text-neo-cream' : 'text-neo-navy')}>
+                For teachers running classroom vocabulary
+              </h3>
+              <div className="grid gap-3 sm:grid-cols-3">
+                <Link href={`/${locale}/education/vocabulary-games-classroom`} className="group rounded-neo border-3 border-neo-black bg-neo-cyan p-4 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
+                  <span className="block font-neo-display text-sm font-black uppercase tracking-widest text-neo-navy">Vocabulary Games for Classroom</span>
+                  <span className="mt-2 block text-xs text-neo-navy/80">No signup, 5 languages, free forever.</span>
+                </Link>
+                <Link href={`/${locale}/education/esl-word-games`} className="group rounded-neo border-3 border-neo-black bg-neo-pink p-4 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
+                  <span className="block font-neo-display text-sm font-black uppercase tracking-widest text-neo-white">ESL Word Games Online</span>
+                  <span className="mt-2 block text-xs text-neo-white/90">CEFR-scaled, 5 dictionaries, no student accounts.</span>
+                </Link>
+                <Link href={`/${locale}/education/games-for-teachers`} className="group rounded-neo border-3 border-neo-black bg-neo-purple p-4 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
+                  <span className="block font-neo-display text-sm font-black uppercase tracking-widest text-neo-white">Word Games for Teachers</span>
+                  <span className="mt-2 block text-xs text-neo-white/90">Sub-day, brain-break, warm-up — zero prep.</span>
+                </Link>
+              </div>
+            </div>
+          )}
 
           <AuthorBioCard />
 

@@ -81,9 +81,8 @@ describe('LandingChallengeCards', () => {
     expect(screen.getByText('landing.blastMode')).toBeInTheDocument();
   });
 
-  it('surfaces every shippable mode (adventure, connections, brain gym) so players can discover them', () => {
+  it('surfaces every shippable mode (connections, brain gym) so players can discover them', () => {
     render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.getByText('landing.adventureMode')).toBeInTheDocument();
     expect(screen.getByText('landing.wordChainMode')).toBeInTheDocument();
     expect(screen.getByText('landing.brainTraining')).toBeInTheDocument();
   });
@@ -173,12 +172,11 @@ describe('LandingChallengeCards', () => {
       expect(container.querySelector('[data-testid="landing-section-more"]')).not.toBeNull();
     });
 
-    it('player with 0 games does NOT see adventure/connections/brainGym above the fold', () => {
+    it('player with 0 games does NOT see connections/brainGym above the fold', () => {
       mockUserStats.mockReturnValue({ userStats: { totalGamesPlayed: 0 }, isLoading: false });
       const { container } = render(<LandingChallengeCards {...baseProps} />);
       const moreSection = container.querySelector('[data-testid="landing-section-more"]');
       // The extras live INSIDE the expander, not above it
-      expect(moreSection?.textContent).toContain('landing.adventureMode');
       expect(moreSection?.textContent).toContain('landing.wordChainMode');
       expect(moreSection?.textContent).toContain('landing.brainTraining');
     });

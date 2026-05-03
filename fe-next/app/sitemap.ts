@@ -138,6 +138,81 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/education/duels', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.65 });
   addForAllLocales(routes, '/education/classroom-game', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.65 });
 
+  // ─── Education SEO landings (English-only target; non-EN noindexed via robots in metadata) ───
+  // Each targets a high-volume teacher/ESL keyword cluster; non-EN locales hreflang back to /education.
+  const educationLandings = [
+    '/education/vocabulary-games-classroom',
+    '/education/esl-word-games',
+    '/education/games-for-teachers',
+  ];
+  educationLandings.forEach((path) => {
+    routes.push({
+      url: `${BASE_URL}/en${path}`,
+      lastModified: LAST_DEPLOYED,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+      alternates: {
+        languages: {
+          'x-default': `${BASE_URL}/en${path}`,
+          en: `${BASE_URL}/en${path}`,
+          he: `${BASE_URL}/he/hebrew-classroom-vocabulary-games`,
+          sv: `${BASE_URL}/sv/education`,
+          ja: `${BASE_URL}/ja/education`,
+          es: `${BASE_URL}/es/juegos-vocabulario-aula`,
+          'en-US': `${BASE_URL}/en${path}`,
+          'en-GB': `${BASE_URL}/en${path}`,
+          'en-IL': `${BASE_URL}/en${path}`,
+        },
+      },
+      images: [`${BASE_URL}/og-image-en.webp`],
+    });
+  });
+
+  // ─── Hebrew dedicated education landing (HE primary market) ───
+  routes.push({
+    url: `${BASE_URL}/he/hebrew-classroom-vocabulary-games`,
+    lastModified: LAST_DEPLOYED,
+    changeFrequency: 'weekly',
+    priority: 0.9,
+    alternates: {
+      languages: {
+        'x-default': `${BASE_URL}/en/education/vocabulary-games-classroom`,
+        en: `${BASE_URL}/en/education/vocabulary-games-classroom`,
+        he: `${BASE_URL}/he/hebrew-classroom-vocabulary-games`,
+        sv: `${BASE_URL}/sv/education`,
+        ja: `${BASE_URL}/ja/education`,
+        es: `${BASE_URL}/es/juegos-vocabulario-aula`,
+        'he-IL': `${BASE_URL}/he/hebrew-classroom-vocabulary-games`,
+        'en-IL': `${BASE_URL}/en/education/vocabulary-games-classroom`,
+      },
+    },
+    images: [`${BASE_URL}/og-image-he.webp`],
+  });
+
+  // ─── Spanish dedicated education landing ───
+  routes.push({
+    url: `${BASE_URL}/es/juegos-vocabulario-aula`,
+    lastModified: LAST_DEPLOYED,
+    changeFrequency: 'weekly',
+    priority: 0.85,
+    alternates: {
+      languages: {
+        'x-default': `${BASE_URL}/en/education/vocabulary-games-classroom`,
+        en: `${BASE_URL}/en/education/vocabulary-games-classroom`,
+        he: `${BASE_URL}/he/hebrew-classroom-vocabulary-games`,
+        sv: `${BASE_URL}/sv/education`,
+        ja: `${BASE_URL}/ja/education`,
+        es: `${BASE_URL}/es/juegos-vocabulario-aula`,
+        'es-ES': `${BASE_URL}/es/juegos-vocabulario-aula`,
+        'es-MX': `${BASE_URL}/es/juegos-vocabulario-aula`,
+        'es-AR': `${BASE_URL}/es/juegos-vocabulario-aula`,
+        'es-CO': `${BASE_URL}/es/juegos-vocabulario-aula`,
+        'es-US': `${BASE_URL}/es/juegos-vocabulario-aula`,
+      },
+    },
+    images: [`${BASE_URL}/og-image-es.webp`],
+  });
+
   // ─── Content pages ───
   addForAllLocales(routes, '/how-to-play', { lastModified: GUIDES_UPDATED, changeFrequency: 'weekly', priority: 0.9 });
   addForAllLocales(routes, '/rules', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.7 });
@@ -164,6 +239,8 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/lexiclash-vs-cabanagrams', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForAllLocales(routes, '/lexiclash-vs-puzzly-words', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForAllLocales(routes, '/lexiclash-vs-popple', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForAllLocales(routes, '/lexiclash-vs-quizlet', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForAllLocales(routes, '/lexiclash-vs-kahoot', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
 
   // Per-locale competitor landings — locale-specific indexing for native switcher intent
   routes.push({

@@ -2,7 +2,7 @@
 
 import { memo, useMemo } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, Swords, Zap, Calendar, Mountain, Trophy, Users } from 'lucide-react';
+import { Home, Swords, Zap, Calendar, Trophy, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
@@ -23,7 +23,6 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'singleplayer', labelKey: 'nav.singleplayer', icon: Zap, route: '/singleplayer', color: 'text-neo-white/50', activeColor: 'text-neo-cyan border-neo-cyan' },
   { id: 'multiplayer', labelKey: 'nav.play', icon: Swords, route: '/multiplayer', color: 'text-neo-white/50', activeColor: 'text-neo-pink border-neo-pink' },
   { id: 'daily', labelKey: 'nav.daily', icon: Calendar, route: '/daily', color: 'text-neo-white/50', activeColor: 'text-neo-yellow border-neo-yellow' },
-  { id: 'adventure', labelKey: 'nav.adventure', icon: Mountain, route: '/adventure', color: 'text-neo-white/50', activeColor: 'text-neo-lime border-neo-lime' },
   { id: 'leaderboard', labelKey: 'nav.leaderboard', icon: Trophy, route: '/leaderboard', color: 'text-neo-white/50', activeColor: 'text-neo-yellow border-neo-yellow' },
   { id: 'friends', labelKey: 'nav.friends', icon: Users, route: '/friends', color: 'text-neo-white/50', activeColor: 'text-neo-pink border-neo-pink' },
 ];

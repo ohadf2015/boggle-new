@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import {
@@ -33,6 +34,11 @@ const seoContent: Record<string, { title: string; description: string; features:
       { question: 'Is LexiClash an educational word game for students of all ages?', answer: 'Yes. Difficulty and word lists are customizable per assignment, making it suitable for primary, middle, and high school students as well as adult learners.' },
       { question: 'Can I use LexiClash as a vocabulary game for teachers?', answer: 'Absolutely. The teacher hub lets you build custom word lists from your curriculum, schedule game sessions, view class-wide analytics, and export results for grading.' },
       { question: 'How does the vocabulary duel format work?', answer: 'Two or more students compete head-to-head to find words from a shared board as fast as possible. First to hit the target score wins. Teachers can restrict word lists to vocabulary from current lessons.' },
+      { question: 'Do students need an account to play?', answer: 'No. Students join a classroom session with a 4-digit code and play instantly in any browser. Only the teacher needs an account to manage classrooms and word lists.' },
+      { question: 'Is LexiClash Education really free?', answer: 'Yes — fully free, no paywalls, no premium tier. Teachers and students get the same word games, vocabulary duels, classroom multiplayer, and analytics dashboard at zero cost.' },
+      { question: 'How does LexiClash compare to Quizlet, Kahoot, or Wordwall?', answer: 'LexiClash focuses on word-formation gameplay (Boggle-style grids, anagrams, word wheels) rather than flashcards or quizzes. It runs without student accounts, supports 5 languages including Hebrew RTL and Japanese, and adds real-time multiplayer for the whole class — all on a free tier.' },
+      { question: 'What languages does LexiClash Education support?', answer: 'English, Hebrew (with full right-to-left layout), Swedish, Japanese, and Spanish. Each language has its own dictionary, making LexiClash suitable for ESL/EFL classrooms, Hebrew immersion programs, and multilingual schools.' },
+      { question: 'How long is a typical classroom session?', answer: 'A vocabulary duel takes 2–3 minutes. A whole-class word game runs 5–10 minutes. Most teachers use LexiClash as a 5-minute warm-up, mid-lesson brain break, or end-of-class review activity.' },
     ],
   },
   he: {
@@ -49,6 +55,11 @@ const seoContent: Record<string, { title: string; description: string; features:
       { question: 'אילו משחקי מילים זמינים לכיתה?', answer: 'LexiClash Education מציע דואלי אוצר מילים רב-משתתפים, מצודות מילים בזמן מוגבל ואתגרי בניית מילים שיתופיים — כולם ניתנים למשחק ישירות בדפדפן ללא הורדה.' },
       { question: 'כיצד מורים יוצרים כיתה?', answer: 'מורים יוצרים כיתה בלוח המחוונים, מזמינים תלמידים עם קוד הצטרפות ומשיקים כל משחק מילים תוך שניות. ניקוד והתקדמות נעקבים אוטומטית.' },
       { question: 'האם ניתן להשתמש ב-LexiClash כמשחק אוצר מילים לכל הגילאים?', answer: 'כן. הרמה ורשימות המילים ניתנות להתאמה אישית לכל מטלה, מה שהופך אותה למתאימה לתלמידי יסודי, חטיבה ותיכון.' },
+      { question: 'האם תלמידים צריכים חשבון כדי לשחק?', answer: 'לא. תלמידים מצטרפים למפגש כיתתי עם קוד בן 4 ספרות ומשחקים מיידית בכל דפדפן. רק המורה צריך חשבון לניהול כיתות ורשימות מילים.' },
+      { question: 'האם LexiClash Education באמת חינמי?', answer: 'כן — חינם לחלוטין, ללא חומות תשלום, ללא שכבת פרימיום. מורים ותלמידים מקבלים את אותם משחקי מילים, דואלי אוצר מילים, רב-משתתפים כיתתי ולוח אנליטיקה ללא עלות.' },
+      { question: 'איך LexiClash משתווה ל-Quizlet, Kahoot או Wordwall?', answer: 'LexiClash מתמקד במשחקי בניית מילים (לוחות בסגנון Boggle, אנגרמות, גלגלי מילים) במקום כרטיסיות או חידונים. פועל ללא חשבונות תלמיד, תומך ב-5 שפות כולל עברית RTL ויפנית, ומוסיף רב-משתתפים בזמן אמת לכל הכיתה — הכל בשכבה חינמית.' },
+      { question: 'באילו שפות LexiClash Education תומך?', answer: 'אנגלית, עברית (כולל פריסה ימין-לשמאל מלאה), שוודית, יפנית וספרדית. לכל שפה מילון משלה, מה שהופך את LexiClash למתאים לכיתות אנגלית כשפה שנייה, תוכניות עברית כשפה שנייה ובתי ספר רב-לשוניים.' },
+      { question: 'כמה זמן אורך מפגש כיתתי טיפוסי?', answer: 'דואל אוצר מילים אורך 2–3 דקות. משחק מילים לכל הכיתה אורך 5–10 דקות. רוב המורים משתמשים ב-LexiClash כחימום של 5 דקות, הפסקת מוח באמצע השיעור או פעילות סיכום בסוף השיעור.' },
     ],
   },
   ja: {
@@ -67,6 +78,11 @@ const seoContent: Record<string, { title: string; description: string; features:
       { question: 'LexiClashはあらゆる年齢の生徒に適していますか？', answer: 'はい。難易度とワードリストは課題ごとにカスタマイズ可能で、小学生、中学生、高校生、成人学習者に適しています。' },
       { question: '教師向けの語彙ゲームとして使えますか？', answer: 'もちろんです。教師ハブではカリキュラムからカスタムワードリストを作成し、ゲームセッションをスケジュールし、クラス全体の分析を表示し、採点用に結果をエクスポートできます。' },
       { question: '語彙デュエルの形式はどのように機能しますか？', answer: '2人以上の生徒が共有ボードからできるだけ早く単語を見つけて対戦します。目標スコアに最初に達した方が勝ちます。教師は現在のレッスンの語彙にワードリストを制限できます。' },
+      { question: '生徒はプレイにアカウントが必要ですか？', answer: 'いいえ。生徒は4桁のコードでクラスルームセッションに参加し、任意のブラウザで即座にプレイできます。教師のみがクラスルームとワードリストの管理にアカウントが必要です。' },
+      { question: 'LexiClash Educationは本当に無料ですか？', answer: 'はい — 完全無料、ペイウォールなし、プレミアム階層なし。教師と生徒は同じワードゲーム、語彙デュエル、クラスルームマルチプレイヤー、分析ダッシュボードを無料で利用できます。' },
+      { question: 'LexiClashはQuizlet、Kahoot、Wordwallと比べてどうですか？', answer: 'LexiClashはフラッシュカードやクイズではなく、単語形成ゲームプレイ（Boggleスタイルのグリッド、アナグラム、ワードホイール）に焦点を当てています。生徒のアカウントなしで動作し、ヘブライ語RTLと日本語を含む5言語をサポートし、クラス全体のリアルタイムマルチプレイヤーを追加 — すべて無料階層で。' },
+      { question: 'LexiClash Educationはどの言語をサポートしていますか？', answer: '英語、ヘブライ語（完全な右から左のレイアウト付き）、スウェーデン語、日本語、スペイン語。各言語には独自の辞書があり、ESL/EFL教室、ヘブライ語イマージョンプログラム、多言語学校に適しています。' },
+      { question: '典型的なクラスルームセッションの長さは？', answer: '語彙デュエルは2〜3分。クラス全体のワードゲームは5〜10分実行されます。ほとんどの教師はLexiClashを5分間のウォームアップ、レッスン中盤の頭の休憩、または授業終了時の復習活動として使用します。' },
     ],
   },
   sv: {
@@ -85,6 +101,11 @@ const seoContent: Record<string, { title: string; description: string; features:
       { question: 'Är LexiClash lämpligt för elever i alla åldrar?', answer: 'Ja. Svårighetsgrad och ordlistor kan anpassas per uppgift, vilket gör det lämpligt för elever i grundskolan, mellanstadiet och gymnasiet samt vuxna inlärare.' },
       { question: 'Kan jag använda LexiClash som ett ordförrådsspel för lärare?', answer: 'Absolut. Lärarhubben låter dig bygga anpassade ordlistor från din läroplan, schemalägga spelpass, visa klassanalys och exportera resultat för betygsättning.' },
       { question: 'Hur fungerar ordförrådsduellerna?', answer: 'Två eller fler elever tävlar mot varandra för att hitta ord från en gemensam bräda så snabbt som möjligt. Den första som når målpoängen vinner. Lärare kan begränsa ordlistor till aktuell lektionsvokabulär.' },
+      { question: 'Behöver elever ett konto för att spela?', answer: 'Nej. Elever ansluter till en klassrumssession med en 4-siffrig kod och spelar direkt i valfri webbläsare. Endast läraren behöver ett konto för att hantera klassrum och ordlistor.' },
+      { question: 'Är LexiClash Education verkligen gratis?', answer: 'Ja — helt gratis, inga betalspärrar, ingen premiumnivå. Lärare och elever får samma ordspel, ordförrådsdueller, klassrumsmultiplayer och analyspanel utan kostnad.' },
+      { question: 'Hur jämförs LexiClash med Quizlet, Kahoot eller Wordwall?', answer: 'LexiClash fokuserar på ordbildningsspel (Boggle-liknande brädor, anagram, ordhjul) snarare än flashcards eller frågesporter. Det fungerar utan elevkonton, stöder 5 språk inklusive hebreiska RTL och japanska, och lägger till realtidsmultiplayer för hela klassen — allt på en gratisnivå.' },
+      { question: 'Vilka språk stöder LexiClash Education?', answer: 'Engelska, hebreiska (med fullständig höger-till-vänster-layout), svenska, japanska och spanska. Varje språk har sin egen ordbok, vilket gör LexiClash lämpligt för ESL/EFL-klassrum, hebreiska immersionsprogram och flerspråkiga skolor.' },
+      { question: 'Hur lång är en typisk klassrumssession?', answer: 'En ordförrådsduell tar 2–3 minuter. Ett ordspel för hela klassen pågår 5–10 minuter. De flesta lärare använder LexiClash som en 5-minuters uppvärmning, hjärnpaus mitt i lektionen eller granskningsaktivitet vid lektionens slut.' },
     ],
   },
   es: {
@@ -101,6 +122,11 @@ const seoContent: Record<string, { title: string; description: string; features:
       { question: '¿Qué juegos de palabras para el aula están disponibles?', answer: 'LexiClash Education ofrece duelos de vocabulario multijugador, búsquedas de palabras cronometradas y desafíos colaborativos de construcción de palabras, todo jugable en el navegador sin descargas.' },
       { question: '¿Cómo configuran los profesores un juego de palabras en clase?', answer: 'Los profesores crean un aula en el panel del profesor, invitan a los alumnos con un código de acceso y lanzan cualquier juego o tarea en segundos. El progreso y las puntuaciones se registran automáticamente.' },
       { question: '¿Puedo usar LexiClash como juego de vocabulario para profesores?', answer: 'Por supuesto. El panel del profesor te permite crear listas de palabras personalizadas de tu currículo, programar sesiones de juego, ver análisis de toda la clase y exportar resultados.' },
+      { question: '¿Necesitan los estudiantes una cuenta para jugar?', answer: 'No. Los estudiantes se unen a una sesión de aula con un código de 4 dígitos y juegan al instante en cualquier navegador. Solo el profesor necesita una cuenta para gestionar aulas y listas de palabras.' },
+      { question: '¿LexiClash Education es realmente gratis?', answer: 'Sí — totalmente gratis, sin muros de pago, sin nivel premium. Profesores y estudiantes obtienen los mismos juegos de palabras, duelos de vocabulario, multijugador de aula y panel de análisis sin coste alguno.' },
+      { question: '¿Cómo se compara LexiClash con Quizlet, Kahoot o Wordwall?', answer: 'LexiClash se centra en juegos de formación de palabras (cuadrículas estilo Boggle, anagramas, ruedas de palabras) en lugar de tarjetas didácticas o cuestionarios. Funciona sin cuentas de estudiantes, admite 5 idiomas incluyendo hebreo RTL y japonés, y añade multijugador en tiempo real para toda la clase — todo en un nivel gratuito.' },
+      { question: '¿Qué idiomas admite LexiClash Education?', answer: 'Inglés, hebreo (con diseño completo de derecha a izquierda), sueco, japonés y español. Cada idioma tiene su propio diccionario, lo que hace que LexiClash sea adecuado para aulas ESL/EFL, programas de inmersión en hebreo y escuelas multilingües.' },
+      { question: '¿Cuánto dura una sesión de aula típica?', answer: 'Un duelo de vocabulario dura 2–3 minutos. Un juego de palabras para toda la clase dura 5–10 minutos. La mayoría de los profesores usan LexiClash como calentamiento de 5 minutos, descanso mental a mitad de lección o actividad de repaso al final de la clase.' },
     ],
   },
 };
@@ -124,6 +150,7 @@ export default async function EducationPage({ params }: { params: Promise<{ loca
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       )}
       <EducationPageClient />
+      <EducationResourceLinks locale={locale} />
       <GamePageSeoContent
         title={content.title}
         description={content.description}
@@ -131,5 +158,122 @@ export default async function EducationPage({ params }: { params: Promise<{ loca
         faq={content.faq}
       />
     </>
+  );
+}
+
+// Server-rendered crawlable internal-link section. Surfaces sub-routes and
+// English-only SEO landings to Googlebot + signals their priority via the
+// PageRank flow from /education (priority 0.7 in sitemap).
+const RESOURCE_TITLES: Record<string, { heading: string; subhead: string; cards: { duels: { title: string; desc: string }; classroom: { title: string; desc: string } } }> = {
+  en: {
+    heading: 'Explore Education Modes',
+    subhead: 'Pick the right format for your classroom — quick 1v1 duels or live whole-class multiplayer.',
+    cards: {
+      duels: { title: 'Vocabulary Duels (1v1)', desc: 'Pair students for 2-3 minute head-to-head word battles.' },
+      classroom: { title: 'Live Classroom Game', desc: 'Whole-class multiplayer; up to 30 students join with a 4-digit code.' },
+    },
+  },
+  he: {
+    heading: 'גלו מצבי לימוד',
+    subhead: 'בחרו את הפורמט המתאים לכיתה — דואלי 1v1 מהירים או רב-משתתפים חי לכל הכיתה.',
+    cards: {
+      duels: { title: 'דואלי אוצר מילים (1v1)', desc: 'התאימו תלמידים לקרבות מילים של 2-3 דקות פנים מול פנים.' },
+      classroom: { title: 'משחק כיתתי חי', desc: 'רב-משתתפים לכל הכיתה; עד 30 תלמידים מצטרפים עם קוד בן 4 ספרות.' },
+    },
+  },
+  sv: {
+    heading: 'Utforska utbildningslägen',
+    subhead: 'Välj rätt format för ditt klassrum — snabba 1v1-dueller eller live-multiplayer för hela klassen.',
+    cards: {
+      duels: { title: 'Ordförrådsdueller (1v1)', desc: 'Para ihop elever för 2-3 minuters ordstrider mot varandra.' },
+      classroom: { title: 'Live klassrumsspel', desc: 'Multiplayer för hela klassen; upp till 30 elever ansluter med en 4-siffrig kod.' },
+    },
+  },
+  ja: {
+    heading: '教育モードを探索',
+    subhead: 'クラスに最適なフォーマットを選択 — クイック1対1デュエルまたはクラス全体のライブマルチプレイヤー。',
+    cards: {
+      duels: { title: '語彙デュエル (1対1)', desc: '生徒をペアリングして2〜3分の単語バトルを実施。' },
+      classroom: { title: 'ライブクラスルームゲーム', desc: 'クラス全体のマルチプレイヤー; 最大30人の生徒が4桁のコードで参加。' },
+    },
+  },
+  es: {
+    heading: 'Explora los modos educativos',
+    subhead: 'Elige el formato adecuado para tu aula — duelos 1v1 rápidos o multijugador en vivo para toda la clase.',
+    cards: {
+      duels: { title: 'Duelos de vocabulario (1v1)', desc: 'Empareja estudiantes para batallas de palabras cara a cara de 2-3 minutos.' },
+      classroom: { title: 'Juego de aula en vivo', desc: 'Multijugador para toda la clase; hasta 30 estudiantes se unen con un código de 4 dígitos.' },
+    },
+  },
+};
+
+function EducationResourceLinks({ locale }: { locale: string }) {
+  const lang = locale in RESOURCE_TITLES ? locale : 'en';
+  const t = RESOURCE_TITLES[lang];
+  const isEn = lang === 'en';
+
+  return (
+    <section aria-label="Education resources" className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 border-t-3 border-neo-black/30">
+      <h2 className="font-neo-display text-2xl sm:text-3xl font-black uppercase text-neo-white">
+        {t.heading}
+      </h2>
+      <p className="mt-2 max-w-2xl text-sm sm:text-base text-neo-gray-200">{t.subhead}</p>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <Link
+          href={`/${locale}/education/duels`}
+          className="group rounded-neo border-3 border-neo-black bg-neo-pink p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+        >
+          <h3 className="font-neo-display text-lg font-black uppercase text-neo-white">{t.cards.duels.title}</h3>
+          <p className="mt-2 text-sm text-neo-white/90">{t.cards.duels.desc}</p>
+          <span className="mt-3 inline-block font-neo-display text-xs font-black uppercase tracking-widest text-neo-yellow">→</span>
+        </Link>
+        <Link
+          href={`/${locale}/education/classroom-game`}
+          className="group rounded-neo border-3 border-neo-black bg-neo-cyan p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+        >
+          <h3 className="font-neo-display text-lg font-black uppercase text-neo-navy">{t.cards.classroom.title}</h3>
+          <p className="mt-2 text-sm text-neo-navy/90">{t.cards.classroom.desc}</p>
+          <span className="mt-3 inline-block font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy">→</span>
+        </Link>
+      </div>
+
+      {isEn && (
+        <>
+          <h2 className="mt-12 font-neo-display text-2xl sm:text-3xl font-black uppercase text-neo-white">
+            Teacher Guides
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm sm:text-base text-neo-gray-200">
+            Deep-dive landing pages on specific use cases, with comparison tables, FAQs, and free word lists.
+          </p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <Link
+              href={`/${locale}/education/vocabulary-games-classroom`}
+              className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+            >
+              <span className="inline-block border-2 border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">Guide</span>
+              <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">Vocabulary Games for the Classroom</h3>
+              <p className="mt-2 text-xs text-neo-gray-200">No signup, 5 languages, free forever — vs Quizlet/Kahoot/Wordwall.</p>
+            </Link>
+            <Link
+              href={`/${locale}/education/esl-word-games`}
+              className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+            >
+              <span className="inline-block border-2 border-neo-black bg-neo-cyan px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">ESL</span>
+              <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">ESL Word Games Online</h3>
+              <p className="mt-2 text-xs text-neo-gray-200">CEFR-scaled (A1→C2), 5 dictionaries, no student signup.</p>
+            </Link>
+            <Link
+              href={`/${locale}/education/games-for-teachers`}
+              className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+            >
+              <span className="inline-block border-2 border-neo-black bg-neo-purple px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white">For Teachers</span>
+              <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">Word Games for Teachers</h3>
+              <p className="mt-2 text-xs text-neo-gray-200">Sub-day, brain-break, warm-up — zero prep, free forever.</p>
+            </Link>
+          </div>
+        </>
+      )}
+    </section>
   );
 }
