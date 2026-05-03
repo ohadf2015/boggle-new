@@ -248,90 +248,6 @@ export default function PracticeSwipeBoard({ mode, rows, cols, goal }: Props) {
         </div>
       </div>
 
-      {mode === 'wordHunt' && (
-        <div data-testid="practice-hunt-slots" className="w-full max-w-md flex justify-center gap-2">
-          {huntSlots.map((slot, i) => {
-            const length = huntLengths[i];
-            return (
-              <div
-                key={i}
-                data-testid={`practice-hunt-slot-${i}`}
-                data-filled={slot ? 'true' : 'false'}
-                className={
-                  'flex-1 rounded-neo border-2 border-neo-black px-2 py-1 text-center transition-colors ' +
-                  (slot ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-cream/70')
-                }
-              >
-                {slot ? (
-                  <span className="font-neo-display font-black text-base tracking-wider">{slot}</span>
-                ) : (
-                  <span className="font-neo-body font-bold text-xs uppercase tracking-wider">
-                    {t('practiceSwipe.huntSlot', { length })}
-                  </span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      <WordFormingArea
-        word={formingWord}
-        letterCount={letterCount}
-        feedback={currentFeedback}
-        compact
-        className="justify-center"
-      />
-
-      <div className="relative w-full max-w-md flex items-center justify-center">
-        <div className="w-full" style={{ aspectRatio: '1 / 1' }}>
-          <GridComponent
-            grid={grid}
-            interactive={!isComplete}
-            onWordSubmit={submitWord}
-            onWordChange={handleWordChange}
-            hideWordPreview
-            language={language}
-            animateOnMount
-          />
-        </div>
-        <AnimatePresence>
-          {pop && (
-            <motion.div
-              key={pop.id}
-              initial={{ opacity: 0, scale: 0.6, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: -10 }}
-              exit={{ opacity: 0, scale: 0.7, y: -40 }}
-              transition={{ type: 'spring', stiffness: 360, damping: 18 }}
-              className="absolute pointer-events-none z-10 bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard"
-            >
-              <span className="font-neo-display font-black text-lg uppercase tracking-wide">
-                {pop.label}
-              </span>
-              <span className="block text-xs font-neo-body font-bold opacity-90 text-center">
-                +{pop.word.toUpperCase()}
-              </span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {validWords.length > 0 && (
-        <ul
-          data-testid="practice-found-words"
-          className="flex flex-wrap gap-1.5 justify-center max-w-md"
-        >
-          {validWords.map((w) => (
-            <li
-              key={w}
-              className={`px-2 py-0.5 rounded text-xs font-neo-display font-bold border bg-neo-navy-light ${accent.pill}`}
-            >
-              {w}
-            </li>
-          ))}
-        </ul>
-      )}
-
       {isComplete ? (
         <div className="mt-2 w-full flex justify-center">
           <PracticeCompleteCard
@@ -342,14 +258,100 @@ export default function PracticeSwipeBoard({ mode, rows, cols, goal }: Props) {
           />
         </div>
       ) : (
-        <button
-          type="button"
-          onClick={handleNewBoard}
-          data-testid="practice-new-board"
-          className="mt-1 px-3 py-1 text-xs font-neo-display font-black text-neo-cream/60 underline underline-offset-2"
-        >
-          {t('practiceSwipe.newBoard')}
-        </button>
+        <>
+          {mode === 'wordHunt' && (
+            <div data-testid="practice-hunt-slots" className="w-full max-w-md flex justify-center gap-2">
+              {huntSlots.map((slot, i) => {
+                const length = huntLengths[i];
+                return (
+                  <div
+                    key={i}
+                    data-testid={`practice-hunt-slot-${i}`}
+                    data-filled={slot ? 'true' : 'false'}
+                    className={
+                      'flex-1 rounded-neo border-2 border-neo-black px-2 py-1 text-center transition-colors ' +
+                      (slot ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-cream/70')
+                    }
+                  >
+                    {slot ? (
+                      <span className="font-neo-display font-black text-base tracking-wider">{slot}</span>
+                    ) : (
+                      <span className="font-neo-body font-bold text-xs uppercase tracking-wider">
+                        {t('practiceSwipe.huntSlot', { length })}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <WordFormingArea
+            word={formingWord}
+            letterCount={letterCount}
+            feedback={currentFeedback}
+            compact
+            className="justify-center"
+          />
+
+          <div className="relative w-full max-w-md flex items-center justify-center">
+            <div className="w-full" style={{ aspectRatio: '1 / 1' }}>
+              <GridComponent
+                grid={grid}
+                interactive
+                onWordSubmit={submitWord}
+                onWordChange={handleWordChange}
+                hideWordPreview
+                language={language}
+                animateOnMount
+              />
+            </div>
+            <AnimatePresence>
+              {pop && (
+                <motion.div
+                  key={pop.id}
+                  initial={{ opacity: 0, scale: 0.6, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: -10 }}
+                  exit={{ opacity: 0, scale: 0.7, y: -40 }}
+                  transition={{ type: 'spring', stiffness: 360, damping: 18 }}
+                  className="absolute pointer-events-none z-10 bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard"
+                >
+                  <span className="font-neo-display font-black text-lg uppercase tracking-wide">
+                    {pop.label}
+                  </span>
+                  <span className="block text-xs font-neo-body font-bold opacity-90 text-center">
+                    +{pop.word.toUpperCase()}
+                  </span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {validWords.length > 0 && (
+            <ul
+              data-testid="practice-found-words"
+              className="flex flex-wrap gap-1.5 justify-center max-w-md"
+            >
+              {validWords.map((w) => (
+                <li
+                  key={w}
+                  className={`px-2 py-0.5 rounded text-xs font-neo-display font-bold border bg-neo-navy-light ${accent.pill}`}
+                >
+                  {w}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <button
+            type="button"
+            onClick={handleNewBoard}
+            data-testid="practice-new-board"
+            className="mt-1 px-3 py-1 text-xs font-neo-display font-black text-neo-cream/60 underline underline-offset-2"
+          >
+            {t('practiceSwipe.newBoard')}
+          </button>
+        </>
       )}
     </div>
   );

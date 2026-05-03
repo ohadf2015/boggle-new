@@ -5041,7 +5041,7 @@ const en = {
       "backspace": "Undo",
       "solved": "Solved! Great job.",
       "huntGreet": "Hunt the hidden word!",
-      "huntInstruction": "A {length}-letter word is hiding on the board. Swipe any {length}-letter word to get clues.",
+      "huntInstruction": "A {length}-letter word is hiding on the board. Any valid word counts as a discovery — only {length}-letter words count as a guess and reveal color clues about the target.",
       "triesLeft": "tries",
       "feedbackCorrect": "right spot",
       "feedbackWrongPlace": "wrong spot",

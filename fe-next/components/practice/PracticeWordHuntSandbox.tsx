@@ -435,78 +435,6 @@ export default function PracticeWordHuntSandbox() {
         </div>
       )}
 
-      <WordFormingArea
-        word={formingWord}
-        letterCount={letterCount}
-        feedback={currentFeedback}
-        compact
-        className="justify-center"
-      />
-
-      <div className="relative w-full max-w-md flex items-center justify-center">
-        <div className="w-full" style={{ aspectRatio: '1 / 1' }}>
-          {grid && (
-            <GridComponent
-              grid={grid}
-              interactive={!solved}
-              onWordSubmit={submitWord}
-              onWordChange={handleWordChange}
-              hideWordPreview
-              language={language}
-              animateOnMount
-            />
-          )}
-        </div>
-        <AnimatePresence>
-          {pop && (
-            <motion.div
-              key={pop.id}
-              initial={{ opacity: 0, scale: 0.6, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: -10 }}
-              exit={{ opacity: 0, scale: 0.7, y: -40 }}
-              transition={{ type: 'spring', stiffness: 360, damping: 18 }}
-              className="absolute pointer-events-none z-10 bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard"
-            >
-              <span className="font-neo-display font-black text-lg uppercase tracking-wide">
-                {pop.label}
-              </span>
-              <span className="block text-xs font-neo-body font-bold opacity-90 text-center">
-                +{pop.word.toUpperCase()}
-              </span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {validWords.length > 0 && (
-        <div className="w-full max-w-md">
-          <p className="text-[10px] uppercase tracking-wider font-neo-display font-black text-neo-cream/50 text-center mb-1">
-            {t('practice.wordHunt.discoveries')} ({validWordCount})
-          </p>
-          <ul
-            data-testid="practice-found-words"
-            className="flex flex-wrap gap-1.5 justify-center"
-          >
-            {validWords.map((w) => {
-              const isTarget = target && w === target.toUpperCase();
-              return (
-                <li
-                  key={w}
-                  className={cn(
-                    'px-2 py-0.5 rounded text-xs font-neo-display font-bold border bg-neo-navy-light',
-                    isTarget
-                      ? 'border-neo-lime text-neo-lime ring-1 ring-neo-lime/40'
-                      : 'border-neo-lime/40 text-neo-lime/80',
-                  )}
-                >
-                  {language === 'he' ? applyHebrewFinalLetters(w) : w}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
-
       {solved ? (
         <div className="mt-2 w-full flex justify-center">
           <PracticeCompleteCard
@@ -517,26 +445,100 @@ export default function PracticeWordHuntSandbox() {
           />
         </div>
       ) : (
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={handleNewBoard}
-            data-testid="practice-new-board"
-            className="px-3 py-1 text-xs font-neo-display font-black text-neo-cream/60 underline underline-offset-2"
-          >
-            {t('practiceSwipe.newBoard')}
-          </button>
-          {(triesRemaining === 0 || tries > 0) && !revealed && (
+        <>
+          <WordFormingArea
+            word={formingWord}
+            letterCount={letterCount}
+            feedback={currentFeedback}
+            compact
+            className="justify-center"
+          />
+
+          <div className="relative w-full max-w-md flex items-center justify-center">
+            <div className="w-full" style={{ aspectRatio: '1 / 1' }}>
+              {grid && (
+                <GridComponent
+                  grid={grid}
+                  interactive
+                  onWordSubmit={submitWord}
+                  onWordChange={handleWordChange}
+                  hideWordPreview
+                  language={language}
+                  animateOnMount
+                />
+              )}
+            </div>
+            <AnimatePresence>
+              {pop && (
+                <motion.div
+                  key={pop.id}
+                  initial={{ opacity: 0, scale: 0.6, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: -10 }}
+                  exit={{ opacity: 0, scale: 0.7, y: -40 }}
+                  transition={{ type: 'spring', stiffness: 360, damping: 18 }}
+                  className="absolute pointer-events-none z-10 bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard"
+                >
+                  <span className="font-neo-display font-black text-lg uppercase tracking-wide">
+                    {pop.label}
+                  </span>
+                  <span className="block text-xs font-neo-body font-bold opacity-90 text-center">
+                    +{pop.word.toUpperCase()}
+                  </span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {validWords.length > 0 && (
+            <div className="w-full max-w-md">
+              <p className="text-[10px] uppercase tracking-wider font-neo-display font-black text-neo-cream/50 text-center mb-1">
+                {t('practice.wordHunt.discoveries')} ({validWordCount})
+              </p>
+              <ul
+                data-testid="practice-found-words"
+                className="flex flex-wrap gap-1.5 justify-center"
+              >
+                {validWords.map((w) => {
+                  const isTarget = target && w === target.toUpperCase();
+                  return (
+                    <li
+                      key={w}
+                      className={cn(
+                        'px-2 py-0.5 rounded text-xs font-neo-display font-bold border bg-neo-navy-light',
+                        isTarget
+                          ? 'border-neo-lime text-neo-lime ring-1 ring-neo-lime/40'
+                          : 'border-neo-lime/40 text-neo-lime/80',
+                      )}
+                    >
+                      {language === 'he' ? applyHebrewFinalLetters(w) : w}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+
+          <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={handleReveal}
-              data-testid="practice-reveal-target"
+              onClick={handleNewBoard}
+              data-testid="practice-new-board"
               className="px-3 py-1 text-xs font-neo-display font-black text-neo-cream/60 underline underline-offset-2"
             >
-              {t('practice.wordHunt.giveUp')}
+              {t('practiceSwipe.newBoard')}
             </button>
-          )}
-        </div>
+            {(triesRemaining === 0 || tries > 0) && !revealed && (
+              <button
+                type="button"
+                onClick={handleReveal}
+                data-testid="practice-reveal-target"
+                className="px-3 py-1 text-xs font-neo-display font-black text-neo-cream/60 underline underline-offset-2"
+              >
+                {t('practice.wordHunt.giveUp')}
+              </button>
+            )}
+          </div>
+        </>
       )}
     </div>
   );

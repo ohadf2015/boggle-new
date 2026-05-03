@@ -4935,7 +4935,7 @@ const sv = {
       "backspace": "Ångra",
       "solved": "Löst! Bra jobbat.",
       "huntGreet": "Jaga det gömda ordet!",
-      "huntInstruction": "Ett {length}-bokstavers ord gömmer sig på brädet. Svep ett {length}-bokstavers ord för ledtrådar.",
+      "huntInstruction": "Ett {length}-bokstavers ord gömmer sig på brädet. Alla giltiga ord räknas som upptäckter — endast {length}-bokstavers ord räknas som gissning och avslöjar färgledtrådar om målet.",
       "triesLeft": "försök",
       "feedbackCorrect": "rätt plats",
       "feedbackWrongPlace": "fel plats",

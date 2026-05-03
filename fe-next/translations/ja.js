@@ -4920,7 +4920,7 @@ const ja = {
       "backspace": "戻す",
       "solved": "解けた！よくできました。",
       "huntGreet": "隠された言葉を狩ろう！",
-      "huntInstruction": "{length}文字の単語が盤面に隠れています。{length}文字の単語をスワイプしてヒントを得よう。",
+      "huntInstruction": "{length}文字の単語が盤面に隠れています。有効な単語はすべて発見としてカウントされます — {length}文字の単語のみが推測として扱われ、ターゲットの色のヒントを明らかにします。",
       "triesLeft": "試行",
       "feedbackCorrect": "正しい位置",
       "feedbackWrongPlace": "間違った位置",
