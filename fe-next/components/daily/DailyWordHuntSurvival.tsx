@@ -59,6 +59,8 @@ interface DailyWordHuntSurvivalProps {
   currentPlayerId?: string | null;
   /** Guest fingerprint for highlighting in leaderboard */
   currentGuestFingerprint?: string | null;
+  /** Practice mode: suppress life drain + extra-life monetization. */
+  practice?: boolean;
 }
 
 /**
@@ -77,6 +79,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   puzzleDate,
   currentPlayerId,
   currentGuestFingerprint,
+  practice = false,
 }) => {
   const { t } = useLanguage();
   const { isDesktop, isTv } = useDesktopLayout();
@@ -96,7 +99,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const hasRealAdProvider = useHasRealAdProvider();
   const { canAfford, spendCoins } = useCoinsFromContext();
   const canAffordCoinRestore = canAfford(EXTRA_LIFE_COIN_COST);
-  const hasRescueAvailable = hasRealAdProvider || canAffordCoinRestore;
+  // Practice runs never bottom out on life, so the rescue prompt would never fire —
+  // gate it explicitly so we don't surface monetization in a tutorial flow.
+  const hasRescueAvailable = !practice && (hasRealAdProvider || canAffordCoinRestore);
 
   const handleInnerComplete = React.useCallback(
     (result: SurvivalGameResult) => onComplete(result, rescueMethodRef.current),
@@ -113,6 +118,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     t,
     deferGameOver:
       hasRescueAvailable && !hasUsedExtraLifeRef.current && !extraLifeDeclined,
+    disableLifeDrain: practice,
   });
 
   const extraLifeModalOpen =

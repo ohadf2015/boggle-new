@@ -461,6 +461,7 @@ const WordWheelChallenge: React.FC = () => {
               onValidateWord={handleValidateWord}
               onEffect={handleEffect}
               language={language}
+              practice={isPractice}
             />
           </motion.div>
         )}

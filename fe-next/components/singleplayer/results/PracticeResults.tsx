@@ -247,9 +247,11 @@ const PracticeResults = memo(function PracticeResults({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ─── Navigation ───
+  // Route into the practice flow for the next mode rather than the live daily —
+  // keeps the player in no-pressure practice until they exit the chain.
   const handleWordHuntDaily = useCallback(() => {
     clearSessionPreservingUsername();
-    router.push(`/${language}/daily/word-hunt`);
+    router.push(`/${language}/practice/wordHunt`);
   }, [router, language]);
 
   const ctaPulseRepeat = reducedMotion ? 0 : 3;

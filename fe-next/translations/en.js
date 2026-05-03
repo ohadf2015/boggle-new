@@ -4989,7 +4989,14 @@ const en = {
     "invalid": "Not a word",
     "duplicate": "Already found",
     "reset": "Reset",
-    "backToTips": "Back to Tips"
+    "backToTips": "Back to Tips",
+    "endRun": "Done — continue",
+    "allDone": "All practice modes done",
+    "continueTo": {
+      "classic": "Next: Classic practice",
+      "wordHunt": "Next: Word Hunt practice",
+      "wheelRush": "Next: Wheel Rush practice"
+    }
   },
   "wizard": {
     "selectMode": "Select Game Mode",

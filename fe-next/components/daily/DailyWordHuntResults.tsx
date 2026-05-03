@@ -36,6 +36,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { FLEXING_SCORE_THRESHOLD, ENCOURAGING_SCORE_THRESHOLD } from '@/utils/mascotConfig';
 import { WinCinematic } from './WinCinematic';
 import { WordHuntResultsContent } from './WordHuntResultsContent';
+import { usePracticeFlag } from '@/hooks/usePracticeFlag';
+import PracticeChainCta from '@/components/practice/PracticeChainCta';
 
 // Import from results module
 import {
@@ -70,6 +72,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   onGameLanguageChange,
 }) => {
   const { t } = useLanguage();
+  const isPractice = usePracticeFlag();
   const { user, profile, isAuthenticated } = useAuth();
 
   const { showInterstitial } = useInterstitialAd();
@@ -367,6 +370,11 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       {/* Main Content - flex-1 min-h-0 fills remaining space after compact header */}
       {/* Bottom padding accounts for fixed MobileTabBar (--mobile-bottom-safe = 80px + safe-area) */}
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-3 pb-bottom-stack md:pb-6">
+        {isPractice && (
+          <div className="max-w-md mx-auto pt-3">
+            <PracticeChainCta currentMode="wordHunt" />
+          </div>
+        )}
         {/* Mobile: Tab-based content */}
         <div className="max-w-md mx-auto pt-4 md:hidden">
           {activeTab === 'results' && <WordHuntResultsContent {...resultsContentProps} />}

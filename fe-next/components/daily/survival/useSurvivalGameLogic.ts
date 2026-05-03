@@ -36,6 +36,12 @@ export interface UseSurvivalGameLogicProps {
   onComplete: (result: SurvivalGameResult) => void;
   t: (key: string) => string;
   deferGameOver?: boolean;
+  /**
+   * Practice-mode opt-out: when true the life-drain interval is suppressed so the
+   * player never loses life. Score still increments, words still register —
+   * just no time pressure. Pairs with `?practice=1` URL flag.
+   */
+  disableLifeDrain?: boolean;
 }
 
 export interface SurvivalGameState {
@@ -121,6 +127,7 @@ export function useSurvivalGameLogic({
   onComplete,
   t,
   deferGameOver = false,
+  disableLifeDrain = false,
 }: UseSurvivalGameLogicProps): [SurvivalGameState, SurvivalGameActions] {
   const { user } = useAuth();
   const { playWordAcceptedSound, playWordRejectedSound, setGameActive } = useSoundEffects();
@@ -260,9 +267,10 @@ export function useSurvivalGameLogic({
   const baseDrainRate = isNewPlayer.current ? NEW_PLAYER_LIFE_DRAIN_RATE : LIFE_DRAIN_RATE;
   const drainRate = baseDrainRate * getLanguageDrainMultiplier(language);
 
-  // Life drain effect
+  // Life drain effect — suppressed in practice mode (`disableLifeDrain`) so the
+  // player can explore the board without time pressure.
   useEffect(() => {
-    if (state.isGameOver) {
+    if (state.isGameOver || disableLifeDrain) {
       lifeDrainInterval.stop();
       return;
     }
@@ -275,7 +283,7 @@ export function useSurvivalGameLogic({
     return () => {
       lifeDrainInterval.stop();
     };
-  }, [state.isGameOver, drainRate, lifeDrainInterval]);
+  }, [state.isGameOver, disableLifeDrain, drainRate, lifeDrainInterval]);
 
   // Check for life-based game over. While `deferGameOver` is true (e.g. a
   // rewarded-ad extra-life modal is open), suppress the finale so the reducer

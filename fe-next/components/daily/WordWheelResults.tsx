@@ -9,6 +9,8 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { cn } from '@/lib/utils';
 import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { usePracticeFlag } from '@/hooks/usePracticeFlag';
+import PracticeChainCta from '@/components/practice/PracticeChainCta';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import type { Language } from '@/types';
 import type { WordWheelGameResult } from './WordWheelGame';
@@ -106,6 +108,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
 }) => {
   const { t, language } = useLanguage();
   const { submitLeaderboardScore } = useCrazyGames();
+  const isPractice = usePracticeFlag();
   const tier = getResultTier(result.score);
   const [showConfetti, setShowConfetti] = useState(false);
   const [animatedScore, setAnimatedScore] = useState(0);
@@ -240,9 +243,22 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         </div>
       </motion.div>
 
+      {/* Practice mode: replace cross-promos + leaderboard with chain CTA so the
+          player flows from one practice mode to the next without dead-ends. */}
+      {isPractice && (
+        <motion.div
+          className="w-full z-10"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
+        >
+          <PracticeChainCta currentMode="wheelRush" />
+        </motion.div>
+      )}
+
       {/* PRIMARY CROSS-PROMO: Word Hunt CTA — promoted above leaderboard so users
           finish today's daily-pair (mirrors Word Hunt results page treatment). */}
-      {!hasPlayedWordHunt && (
+      {!isPractice && !hasPlayedWordHunt && (
         <motion.div
           className="w-full z-10"
           initial={{ opacity: 0, y: 12 }}
@@ -315,25 +331,27 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         </motion.div>
       )}
 
-      {/* Leaderboard */}
-      <motion.div
-        className="w-full z-10"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
-      >
-        <TabbedDailyLeaderboard
-          puzzleDate={puzzleDate}
-          language={gameLang}
-          currentPlayerId={currentPlayerId}
-          currentGuestFingerprint={currentGuestFingerprint}
-          scope="word-wheel"
-          defaultTab="today"
-          t={t}
-          maxVisible={5}
-          compact
-        />
-      </motion.div>
+      {/* Leaderboard — hidden in practice (no score persisted, would only confuse). */}
+      {!isPractice && (
+        <motion.div
+          className="w-full z-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+        >
+          <TabbedDailyLeaderboard
+            puzzleDate={puzzleDate}
+            language={gameLang}
+            currentPlayerId={currentPlayerId}
+            currentGuestFingerprint={currentGuestFingerprint}
+            scope="word-wheel"
+            defaultTab="today"
+            t={t}
+            maxVisible={5}
+            compact
+          />
+        </motion.div>
+      )}
 
     </motion.div>
   );

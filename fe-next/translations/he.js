@@ -4894,7 +4894,14 @@ const he = {
     "duplicate": "כבר מצאת את זה!",
     "invalid": "לא מילה - נסה שוב!",
     "wordsFound": "מילים שנמצאו:",
-    "backToTips": "חזרה לטיפים"
+    "backToTips": "חזרה לטיפים",
+    "endRun": "סיימתי — הלאה",
+    "allDone": "סיימת את כל מצבי האימון",
+    "continueTo": {
+      "classic": "הבא: אימון קלאסי",
+      "wordHunt": "הבא: ציד מילים",
+      "wheelRush": "הבא: גלגל המילים"
+    }
   },
   "wizard": {
     "selectMode": "בחר מצב משחק",

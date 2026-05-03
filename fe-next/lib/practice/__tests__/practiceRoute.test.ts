@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { practiceTargetUrl, isValidPracticeMode, PRACTICE_MODES } from '../practiceRoute';
+import {
+  practiceTargetUrl,
+  isValidPracticeMode,
+  PRACTICE_MODES,
+  getNextPracticeMode,
+  practiceHubUrl,
+  nextPracticeUrl,
+} from '../practiceRoute';
 
 describe('practiceTargetUrl', () => {
   it('maps wordHunt to /daily/word-hunt with practice flag', () => {
@@ -46,5 +53,37 @@ describe('isValidPracticeMode', () => {
     expect(isValidPracticeMode('blastoff')).toBe(false);
     expect(isValidPracticeMode('')).toBe(false);
     expect(isValidPracticeMode('word-hunt')).toBe(false);
+  });
+});
+
+describe('getNextPracticeMode', () => {
+  it('returns wordHunt after classic', () => {
+    expect(getNextPracticeMode('classic')).toBe('wordHunt');
+  });
+
+  it('returns wheelRush after wordHunt', () => {
+    expect(getNextPracticeMode('wordHunt')).toBe('wheelRush');
+  });
+
+  it('returns null after wheelRush (chain complete)', () => {
+    expect(getNextPracticeMode('wheelRush')).toBeNull();
+  });
+});
+
+describe('practiceHubUrl', () => {
+  it('returns the locale-prefixed practice hub path', () => {
+    expect(practiceHubUrl('he')).toBe('/he/practice');
+    expect(practiceHubUrl('en')).toBe('/en/practice');
+  });
+});
+
+describe('nextPracticeUrl', () => {
+  it('routes to the next mode intro page when one exists', () => {
+    expect(nextPracticeUrl('classic', 'he')).toBe('/he/practice/wordHunt');
+    expect(nextPracticeUrl('wordHunt', 'es')).toBe('/es/practice/wheelRush');
+  });
+
+  it('routes to the practice hub when chain is complete', () => {
+    expect(nextPracticeUrl('wheelRush', 'sv')).toBe('/sv/practice');
   });
 });

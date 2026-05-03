@@ -4868,7 +4868,14 @@ const ja = {
     "invalid": "単語じゃないよ、もう一回！",
     "reset": "リセット",
     "wordsFound": "発見した単語:",
-    "backToTips": "コツに戻る"
+    "backToTips": "コツに戻る",
+    "endRun": "終了 — 次へ",
+    "allDone": "練習モードすべて完了",
+    "continueTo": {
+      "classic": "次へ: クラシック練習",
+      "wordHunt": "次へ: ワードハント練習",
+      "wheelRush": "次へ: ホイールラッシュ練習"
+    }
   },
   "wizard": {
     "selectMode": "ゲームモードを選択",

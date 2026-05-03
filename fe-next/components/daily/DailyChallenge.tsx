@@ -444,6 +444,7 @@ const DailyChallenge: React.FC = () => {
             puzzleDate={puzzleDate}
             currentPlayerId={isAuthenticated && profile ? profile.id : null}
             currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+            practice={isPractice}
           />
         )}
 

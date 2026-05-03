@@ -26,6 +26,10 @@ describe('shouldRedirectBareSingleplayer', () => {
     expect(shouldRedirectBareSingleplayer({ returnTo: 'daily' })).toBe(false);
   });
 
+  it('does NOT redirect when practice flag is present', () => {
+    expect(shouldRedirectBareSingleplayer({ practice: '1' })).toBe(false);
+  });
+
   it('handles array values from Next.js searchParams shape', () => {
     expect(shouldRedirectBareSingleplayer({ autoStart: ['practice'] })).toBe(false);
   });

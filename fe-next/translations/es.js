@@ -4913,7 +4913,14 @@ const es = {
     "duplicate": "¡Ya la tienes!",
     "invalid": "No es válida",
     "reset": "Reiniciar",
-    "backToTips": "Volver a tips"
+    "backToTips": "Volver a tips",
+    "endRun": "Listo — continuar",
+    "allDone": "Todos los modos de práctica completados",
+    "continueTo": {
+      "classic": "Siguiente: Práctica clásica",
+      "wordHunt": "Siguiente: Práctica Word Hunt",
+      "wheelRush": "Siguiente: Práctica Wheel Rush"
+    }
   },
   "wizard": {
     "selectMode": "Seleccionar Modo de Juego",

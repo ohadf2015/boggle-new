@@ -6,14 +6,14 @@
  * (random mode + auto-filled bots), so the route's mode-picker entry is dead.
  *
  * The route itself stays alive to serve:
- *   - Practice mode             (?autoStart=practice)
+ *   - Practice mode             (?autoStart=practice OR ?practice=1)
  *   - Daily challenge replay    (?returnTo=daily)
  *   - UGC community boards      (?boardCode=...)
  *   - Preset auto-launch        (?preset=...)
  *
  * Anything else → redirect to the new Quick Play flow.
  */
-const PRESERVED_PARAMS = ['autoStart', 'preset', 'boardCode', 'returnTo'] as const;
+const PRESERVED_PARAMS = ['autoStart', 'preset', 'boardCode', 'returnTo', 'practice'] as const;
 
 export function shouldRedirectBareSingleplayer(
   searchParams: Record<string, string | string[] | undefined>,

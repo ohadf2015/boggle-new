@@ -4883,7 +4883,14 @@ const sv = {
     "invalid": "Inte ett ord - testa igen!",
     "reset": "Börja om",
     "wordsFound": "Ord hittade:",
-    "backToTips": "Tillbaka till Tips"
+    "backToTips": "Tillbaka till Tips",
+    "endRun": "Klar — fortsätt",
+    "allDone": "Alla övningslägen klara",
+    "continueTo": {
+      "classic": "Nästa: Klassisk övning",
+      "wordHunt": "Nästa: Word Hunt-övning",
+      "wheelRush": "Nästa: Wheel Rush-övning"
+    }
   },
   "wizard": {
     "selectMode": "Välj spelläge",

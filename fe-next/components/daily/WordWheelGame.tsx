@@ -33,6 +33,8 @@ interface WordWheelGameProps {
   onEffect: (effect: WordWheelEffect) => void;
   language: string;
   paused?: boolean;
+  /** Practice mode: suppress countdown timer + show manual "end practice" CTA. */
+  practice?: boolean;
 }
 
 // Rough avg points per word for "X words to pass" estimate
@@ -41,7 +43,7 @@ const AVG_POINTS_PER_WORD = 6;
 interface RivalScore { name: string; score: number }
 
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
-  puzzle, duration, onComplete, onValidateWord, onEffect, language, paused = false,
+  puzzle, duration, onComplete, onValidateWord, onEffect, language, paused = false, practice = false,
 }) => {
   const { t } = useLanguage();
   // `useReducedMotion` returns `true` when the user has set the OS-level
@@ -220,9 +222,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     [language],
   );
 
-  // Timer
+  // Timer — suppressed in practice mode (no countdown, no auto-complete).
+  // Player ends the run via the manual "End practice" CTA below.
   useEffect(() => {
-    if (gameOverRef.current || paused) return;
+    if (gameOverRef.current || paused || practice) return;
     const interval = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
@@ -259,7 +262,20 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [duration, onComplete, onEffect, playEpicVictorySound, playCountdownBeep, paused]);
+  }, [duration, onComplete, onEffect, playEpicVictorySound, playCountdownBeep, paused, practice]);
+
+  // Practice-mode end CTA: player taps to wrap up the run with current state.
+  // Mirrors the natural timer-end onComplete payload so downstream results UI
+  // doesn't need a special practice branch.
+  const handleEndPractice = useCallback(() => {
+    if (gameOverRef.current) return;
+    gameOverRef.current = true;
+    onComplete({
+      wordsFound: wordsFoundRef.current,
+      score: scoreRef.current,
+      timeSeconds: 0,
+    });
+  }, [onComplete]);
 
   // ── Feedback toast ──
   // Errors hold the toast longer (2500ms) and auto-reset the built word at the
@@ -604,17 +620,27 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             </motion.span>
           </div>
         </div>
-        {/* Timer progress bar */}
-        <div className="w-full h-1.5 rounded-full bg-neo-navy-light border border-neo-cream/10 overflow-hidden">
-          <motion.div
-            className={cn(
-              'h-full rounded-full',
-              timeLeft <= 10 ? 'bg-neo-red' : timeLeft <= 30 ? 'bg-neo-orange' : 'bg-linear-to-r from-neo-lime to-neo-cyan',
-            )}
-            style={{ width: `${(timeLeft / duration) * 100}%` }}
-            transition={{ duration: 0.3 }}
-          />
-        </div>
+        {/* Timer progress bar — replaced by manual end-CTA in practice mode. */}
+        {practice ? (
+          <button
+            type="button"
+            onClick={handleEndPractice}
+            className="w-full bg-neo-lime text-neo-black border-2 border-neo-black rounded-neo py-2 px-3 font-neo-display font-black text-sm shadow-hard active:shadow-hard-pressed active:translate-x-px active:translate-y-px"
+          >
+            {t('practice.endRun')}
+          </button>
+        ) : (
+          <div className="w-full h-1.5 rounded-full bg-neo-navy-light border border-neo-cream/10 overflow-hidden">
+            <motion.div
+              className={cn(
+                'h-full rounded-full',
+                timeLeft <= 10 ? 'bg-neo-red' : timeLeft <= 30 ? 'bg-neo-orange' : 'bg-linear-to-r from-neo-lime to-neo-cyan',
+              )}
+              style={{ width: `${(timeLeft / duration) * 100}%` }}
+              transition={{ duration: 0.3 }}
+            />
+          </div>
+        )}
       </div>
 
       {/* ── Word Builder Area ── */}
