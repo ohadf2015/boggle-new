@@ -1,12 +1,18 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeChainCta from './PracticeChainCta';
 import PracticeCoachTip from './PracticeCoachTip';
 import PracticeCompleteBanner from './PracticeCompleteBanner';
 import PracticeModeNav from './PracticeModeNav';
 import { markPracticeMode, PRACTICE_GOALS } from '@/lib/practice/practiceProgress';
+import {
+  trackPracticeStarted,
+  trackPracticeWordFound,
+  trackPracticeCompleted,
+} from '@/lib/practice/telemetry';
+import { getPracticeStreak } from '@/hooks/usePracticeStreak';
 
 /**
  * Tiny curated wheel: 1 center + 4 outer letters. Center letter MUST appear
@@ -61,9 +67,25 @@ export default function PracticeWheelSandbox() {
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<{ kind: 'ok' | 'bad' | 'dup' | 'noCenter'; message: string } | null>(null);
 
+  const startedAtRef = useRef<number>(0);
+  const completedFiredRef = useRef(false);
+
   useEffect(() => {
-    if (foundWords.length >= PRACTICE_GOALS.wheelRush) {
+    startedAtRef.current = Date.now();
+    trackPracticeStarted({ mode: 'wheelRush', locale: language });
+  }, [language]);
+
+  useEffect(() => {
+    if (foundWords.length >= PRACTICE_GOALS.wheelRush && !completedFiredRef.current) {
+      completedFiredRef.current = true;
       markPracticeMode('wheelRush', language);
+      trackPracticeCompleted({
+        mode: 'wheelRush',
+        locale: language,
+        wordsFound: foundWords.length,
+        durationSeconds: Math.round((Date.now() - startedAtRef.current) / 1000),
+        streakDay: getPracticeStreak().current,
+      });
     }
   }, [foundWords.length, language]);
   const isComplete = foundWords.length >= PRACTICE_GOALS.wheelRush;
@@ -93,13 +115,22 @@ export default function PracticeWheelSandbox() {
     }
     const hit = puzzle.validWords.has(upper) || puzzle.validWords.has(currentWord);
     if (hit) {
-      setFoundWords((prev) => [...prev, upper]);
+      setFoundWords((prev) => {
+        const next = [...prev, upper];
+        trackPracticeWordFound({
+          mode: 'wheelRush',
+          locale: language,
+          word: upper,
+          wordsFound: next.length,
+        });
+        return next;
+      });
       setFeedback({ kind: 'ok', message: t('practice.wheelRush.found') });
       setBuilt([]);
     } else {
       setFeedback({ kind: 'bad', message: t('practice.wheelRush.notAWord') });
     }
-  }, [built, currentWord, foundWords, puzzle, t]);
+  }, [built, currentWord, foundWords, puzzle, t, language]);
 
   return (
     <div className="flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3">

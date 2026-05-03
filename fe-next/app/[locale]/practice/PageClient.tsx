@@ -7,6 +7,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { haptics } from '@/utils/haptics';
 import { PRACTICE_MODES } from '@/lib/practice/practiceRoute';
 import { usePracticeProgress } from '@/components/practice/usePracticeProgress';
+import PracticeStreakChip from '@/components/practice/PracticeStreakChip';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
 const MODE_ACCENT: Record<PracticeMode, string> = {
@@ -49,14 +50,17 @@ export default function PracticeHubClient({ locale }: Props) {
           </p>
         </AdaptiveMotion.div>
 
-        <div
-          data-testid="practice-progress-headline"
-          className="mb-6 flex items-center justify-center gap-2 text-xs uppercase tracking-wider font-neo-display font-black text-neo-lime"
-        >
-          <span aria-hidden>★</span>
-          <span>
-            {t('practiceHub.progress', { done: completed.size, total: PRACTICE_MODES.length })}
-          </span>
+        <div className="mb-6 flex flex-col items-center gap-2">
+          <div
+            data-testid="practice-progress-headline"
+            className="flex items-center justify-center gap-2 text-xs uppercase tracking-wider font-neo-display font-black text-neo-lime"
+          >
+            <span aria-hidden>★</span>
+            <span>
+              {t('practiceHub.progress', { done: completed.size, total: PRACTICE_MODES.length })}
+            </span>
+          </div>
+          <PracticeStreakChip />
         </div>
 
         {completed.size === PRACTICE_MODES.length && (

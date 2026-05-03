@@ -36,11 +36,14 @@ const t = (key: string) => {
   const dict: Record<string, string> = {
     'gameModes.tutorial.title': 'How it works',
     'gameModes.tutorial.cta': 'Got it, try it',
+    'gameModes.intro.skip': 'Skip intro',
     'gameModes.classic.name': 'Classic',
+    'gameModes.classic.intro.greet': 'Take your time. Just words.',
     'gameModes.classic.tutorial.tip1': 'Drag adjacent letters',
     'gameModes.classic.tutorial.tip2': 'Longer = more points',
     'gameModes.classic.tutorial.tip3': 'No timer, explore',
     'gameModes.wheelRush.name': 'Wheel Rush',
+    'gameModes.wheelRush.intro.greet': 'Spin gently. Words come.',
     'gameModes.wheelRush.tutorial.tip1': 'Center letter required',
     'gameModes.wheelRush.tutorial.tip2': 'Tap any order',
     'gameModes.wheelRush.tutorial.tip3': 'Try plurals',
@@ -81,5 +84,24 @@ describe('PracticeTutorialSheet', () => {
     render(<PracticeTutorialSheet mode="classic" t={t} onContinue={onContinue} />);
     fireEvent.click(screen.getByRole('button', { name: 'Got it, try it' }));
     expect(onContinue).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders the intro greeting line for charm (merged from former intro card)', () => {
+    render(<PracticeTutorialSheet mode="classic" t={t} onContinue={() => {}} />);
+    expect(screen.getByText('Take your time. Just words.')).toBeInTheDocument();
+  });
+
+  it('renders a skip link that fires onSkip (or onContinue when omitted)', () => {
+    const onContinue = vi.fn();
+    const onSkip = vi.fn();
+    render(<PracticeTutorialSheet mode="classic" t={t} onContinue={onContinue} onSkip={onSkip} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Skip intro' }));
+    expect(onSkip).toHaveBeenCalledTimes(1);
+    expect(onContinue).not.toHaveBeenCalled();
+  });
+
+  it('exposes a stable practice-tutorial-sheet test id for outer-flow gating', () => {
+    render(<PracticeTutorialSheet mode="classic" t={t} onContinue={() => {}} />);
+    expect(screen.getByTestId('practice-tutorial-sheet')).toBeInTheDocument();
   });
 });

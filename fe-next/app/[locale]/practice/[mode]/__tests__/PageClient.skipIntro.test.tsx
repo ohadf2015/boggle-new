@@ -31,10 +31,11 @@ beforeEach(() => {
 });
 
 describe('PracticePageClient fluency: skip intro for completed modes', () => {
-  it('first-time visit: shows the intro card', () => {
+  it('first-time visit: shows the merged tutorial sheet (intro + tips), not sandbox', () => {
     render(<PracticePageClient mode="classic" locale="en" />);
-    // ModeIntroCard renders the "intro" greet line, the sandbox does not.
     expect(screen.queryByTestId('practice-board')).toBeNull();
+    // The merged sheet is the tutorial — exposes the cta button as a skip-target.
+    expect(screen.getByTestId('practice-tutorial-sheet')).toBeInTheDocument();
   });
 
   it('previously-completed mode: drops the player straight into the sandbox', () => {

@@ -1,12 +1,17 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeChainCta from './PracticeChainCta';
 import PracticeCoachTip from './PracticeCoachTip';
 import PracticeCompleteBanner from './PracticeCompleteBanner';
 import PracticeModeNav from './PracticeModeNav';
 import { markPracticeMode } from '@/lib/practice/practiceProgress';
+import {
+  trackPracticeStarted,
+  trackPracticeCompleted,
+} from '@/lib/practice/telemetry';
+import { getPracticeStreak } from '@/hooks/usePracticeStreak';
 
 /**
  * Curated target word + tile pool per locale. Pool deliberately includes the
@@ -63,8 +68,26 @@ export default function PracticeWordHuntSandbox() {
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [solved, setSolved] = useState(false);
 
+  const startedAtRef = useRef<number>(0);
+  const completedFiredRef = useRef(false);
+
   useEffect(() => {
-    if (solved) markPracticeMode('wordHunt', language);
+    startedAtRef.current = Date.now();
+    trackPracticeStarted({ mode: 'wordHunt', locale: language });
+  }, [language]);
+
+  useEffect(() => {
+    if (solved && !completedFiredRef.current) {
+      completedFiredRef.current = true;
+      markPracticeMode('wordHunt', language);
+      trackPracticeCompleted({
+        mode: 'wordHunt',
+        locale: language,
+        wordsFound: 1,
+        durationSeconds: Math.round((Date.now() - startedAtRef.current) / 1000),
+        streakDay: getPracticeStreak().current,
+      });
+    }
   }, [solved, language]);
 
   const targetLength = useMemo(() => Array.from(target).length, [target]);

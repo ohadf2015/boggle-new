@@ -39,13 +39,23 @@ export interface PracticeTutorialSheetProps {
   mode: PracticeMode;
   t: TFunction;
   onContinue: () => void;
+  /**
+   * Optional skip handler — bypasses the tutorial and jumps straight to play.
+   * If omitted, the skip button calls onContinue (so it stays functional but
+   * routes wherever the parent decides).
+   */
+  onSkip?: () => void;
 }
 
 /**
- * Cozy mode tutorial — three short tips + a small mascot.
- * No interactivity, just calm explanation. Tap CTA → real engine.
+ * Merged practice intro + tutorial sheet (was two separate full-screen modals
+ * before 2026-05-03). Combines the warm greeting from the deprecated
+ * `ModeIntroCard` with the 3-tip tutorial layout, dropping a full-screen tap
+ * from every new-mode entry.
+ *
+ * Audit ref: practice/onboarding audit 2026-05-03 §3 ("Double-modal intro").
  */
-const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, onContinue }) => {
+const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, onContinue, onSkip }) => {
   const { playButtonClickSound } = useSoundEffects();
   const tipKeys = tutorialTipKeys(mode);
   const icons = TIP_ICONS[mode];
@@ -55,18 +65,25 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
     haptics.tap();
     onContinue();
   };
+  const handleSkip = () => {
+    playButtonClickSound();
+    haptics.tap();
+    (onSkip ?? onContinue)();
+  };
 
   return (
-    <div className="min-h-[100dvh] w-full bg-linear-to-b from-neo-navy to-neo-navy-light flex items-center justify-center px-6 py-10">
+    <div
+      data-testid="practice-tutorial-sheet"
+      className="min-h-[100dvh] w-full bg-linear-to-b from-neo-navy to-neo-navy-light flex items-center justify-center px-6 py-10"
+    >
       <AdaptiveMotion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="w-full max-w-md flex flex-col gap-6"
+        className="w-full max-w-md flex flex-col gap-5"
       >
-        {/* 3-step progress: intro · tutorial(here) · play */}
+        {/* 2-step progress: intro+tutorial(here) · play */}
         <div className="flex items-center justify-center gap-2" aria-hidden>
-          <span className="w-2 h-2 rounded-full bg-neo-cream/70" />
           <span className="w-6 h-2 rounded-full bg-neo-lime" />
           <span className="w-2 h-2 rounded-full bg-neo-cream/40" />
         </div>
@@ -93,6 +110,11 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
           </div>
         </div>
 
+        {/* Greeting line — the charm-prelude that used to live in ModeIntroCard. */}
+        <p className="text-sm font-neo-body text-neo-cream/85 italic text-center">
+          {t(`gameModes.${mode}.intro.greet`)}
+        </p>
+
         {/* Wordless mechanic demo — show, don't tell */}
         <PracticeMiniDemo mode={mode} />
 
@@ -118,13 +140,22 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
           })}
         </ol>
 
-        <button
-          type="button"
-          onClick={handleContinue}
-          className="self-center mt-2 px-8 py-3 rounded-neo border-2 border-neo-black bg-neo-lime text-neo-black font-neo-display font-bold shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
-        >
-          {t('gameModes.tutorial.cta')}
-        </button>
+        <div className="flex flex-col items-center gap-2 mt-1">
+          <button
+            type="button"
+            onClick={handleContinue}
+            className="px-8 py-3 rounded-neo border-2 border-neo-black bg-neo-lime text-neo-black font-neo-display font-bold shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
+          >
+            {t('gameModes.tutorial.cta')}
+          </button>
+          <button
+            type="button"
+            onClick={handleSkip}
+            className="text-xs text-neo-cream/50 underline-offset-4 hover:underline focus-visible:underline"
+          >
+            {t('gameModes.intro.skip')}
+          </button>
+        </div>
       </AdaptiveMotion.div>
     </div>
   );

@@ -10115,7 +10115,8 @@ const ja = {
     "navAria": "練習モード",
     "backToHub": "← ハブ",
     "allCompleteTitle": "全ての練習が完了！",
-    "allCompleteBody": "本番モードに挑戦する準備ができました。"
+    "allCompleteBody": "本番モードに挑戦する準備ができました。",
+    "streakDays": "{count}日連続"
   },
   "practiceBadge": {
     "label": "練習",

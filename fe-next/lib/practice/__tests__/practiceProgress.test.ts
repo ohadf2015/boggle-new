@@ -12,10 +12,12 @@ import {
   resetPracticeProgress,
   PRACTICE_GOALS,
 } from '../practiceProgress';
+import { getPracticeStreak, resetPracticeStreak } from '@/hooks/usePracticeStreak';
 
 // jsdom test env exposes window.localStorage but reset between tests.
 beforeEach(() => {
   window.localStorage.clear();
+  resetPracticeStreak();
 });
 
 describe('practiceProgress', () => {
@@ -86,5 +88,23 @@ describe('markPracticeMode side effects', () => {
     markPracticeMode('classic', 'en');
     expect(listener).toHaveBeenCalled();
     window.removeEventListener('practice:progress', listener);
+  });
+
+  it('records a practice streak session on first completion of the day', () => {
+    expect(getPracticeStreak().current).toBe(0);
+    markPracticeMode('classic', 'en');
+    expect(getPracticeStreak().current).toBe(1);
+  });
+
+  it('records the streak even when the mode was already marked (replay-on-new-day)', () => {
+    // First mark + reset streak to simulate "yesterday" completion.
+    markPracticeMode('classic', 'en');
+    resetPracticeStreak();
+    expect(getPracticeStreak().current).toBe(0);
+
+    // Re-mark — even though the mode-set short-circuits as already done,
+    // the streak side-effect must still tick.
+    markPracticeMode('classic', 'en');
+    expect(getPracticeStreak().current).toBe(1);
   });
 });

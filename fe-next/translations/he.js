@@ -10150,7 +10150,8 @@ const he = {
     "navAria": "מצבי תרגול",
     "backToHub": "→ תפריט",
     "allCompleteTitle": "כל מצבי התרגול הושלמו!",
-    "allCompleteBody": "אתם מוכנים למצבים האמיתיים."
+    "allCompleteBody": "אתם מוכנים למצבים האמיתיים.",
+    "streakDays": "יום {count}"
   },
   "practiceBadge": {
     "label": "תרגול",

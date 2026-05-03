@@ -10181,7 +10181,8 @@ const sv = {
     "navAria": "Övningslägen",
     "backToHub": "← Hubb",
     "allCompleteTitle": "All övning klar!",
-    "allCompleteBody": "Du är redo för de riktiga lägena."
+    "allCompleteBody": "Du är redo för de riktiga lägena.",
+    "streakDays": "Dag {count}"
   },
   "practiceBadge": {
     "label": "Övning",

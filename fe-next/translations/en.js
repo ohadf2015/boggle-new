@@ -10370,7 +10370,8 @@ const en = {
     "navAria": "Practice modes",
     "backToHub": "← Hub",
     "allCompleteTitle": "All practice complete!",
-    "allCompleteBody": "You're ready for the real modes."
+    "allCompleteBody": "You're ready for the real modes.",
+    "streakDays": "Day {count}"
   },
   "practiceBadge": {
     "label": "Practice",

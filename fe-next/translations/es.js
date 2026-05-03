@@ -10003,7 +10003,8 @@ const es = {
     "navAria": "Modos de práctica",
     "backToHub": "← Inicio",
     "allCompleteTitle": "¡Toda la práctica completa!",
-    "allCompleteBody": "Estás listo para los modos reales."
+    "allCompleteBody": "Estás listo para los modos reales.",
+    "streakDays": "Día {count}"
   },
   "practiceBadge": {
     "label": "Práctica",

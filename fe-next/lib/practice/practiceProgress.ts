@@ -10,6 +10,7 @@
  * the player crosses these — keeps sandbox + tracking decoupled.
  */
 import type { PracticeMode } from './practiceTutorialSteps';
+import { recordPracticeSession } from '@/hooks/usePracticeStreak';
 
 const KEY_PREFIX = 'lc_practice_done_v1';
 const PROGRESS_EVENT = 'practice:progress';
@@ -45,6 +46,11 @@ const safeWrite = (locale: string, set: Set<string>): void => {
 };
 
 export function markPracticeMode(mode: PracticeMode, locale: string): void {
+  // Always tick the streak — even on replay-of-already-complete-mode the next
+  // day, the player put in real work and deserves the streak credit. The hook
+  // self-debounces same-UTC-day calls so multi-completion in one day is safe.
+  recordPracticeSession();
+
   const done = safeRead(locale);
   if (done.has(mode)) return;
   done.add(mode);
