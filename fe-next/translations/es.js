@@ -4980,16 +4980,33 @@ const es = {
       "found": "¡Bien! Palabra añadida.",
       "notAWord": "No es una palabra — prueba otra.",
       "duplicate": "Ya encontrada.",
+      "tooShort": "Mínimo 2 letras.",
       "foundWordsLabel": "Encontradas ({count})"
     }
   },
   "practiceSwipe": {
     "back": "← Práctica",
-    "instruction": "Desliza sobre las letras para formar {goal} palabras.",
+    "instruction": "Desliza para formar {goal} palabras.",
+    "instructionWordHunt": "Encuentra {goal} palabras ocultas.",
     "done": "¡Bien — las encontraste todas!",
     "continue": "Volver a práctica",
     "newBoard": "Tablero nuevo",
-    "progress": "{found} de {goal} palabras"
+    "progress": "{found} de {goal} palabras",
+    "greet": "¡Desliza por las letras!",
+    "greetWordHunt": "¡Caza las palabras!",
+    "celebrate1": "¡Bien!",
+    "celebrate2": "¡Genial!",
+    "celebrate3": "¡Boom!",
+    "celebrate4": "¡En llamas!",
+    "huntSlot": "{length} letras",
+    "wheelGreet": "¡Usa la letra lima!",
+    "wheelShuffle": "Mezclar",
+    "wheelClear": "Limpiar"
+  },
+  "practiceWelcome": {
+    "greet": "¡Bienvenido a Práctica!",
+    "tip": "Prueba cada modo a tu ritmo. Sin tiempo, sin presión.",
+    "cta": "¡Vamos!"
   },
   "wizard": {
     "selectMode": "Seleccionar Modo de Juego",
@@ -10006,11 +10023,14 @@ const es = {
   "practiceHub": {
     "title": "Práctica",
     "subtitle": "Un lugar tranquilo para aprender cada modo",
+    "greet": "¡Elige un modo y juega!",
     "progress": "{done} de {total} modos completos",
     "completedBadge": "Completado",
     "completedDesc": "Toca para jugar de nuevo",
     "navAria": "Modos de práctica",
     "backToHub": "← Inicio",
+    "playLabel": "Jugar",
+    "playAgainLabel": "Jugar de nuevo",
     "allCompleteTitle": "¡Toda la práctica completa!",
     "allCompleteBody": "Estás listo para los modos reales."
   },

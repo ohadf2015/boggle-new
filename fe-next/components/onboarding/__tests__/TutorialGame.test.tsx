@@ -1,140 +1,79 @@
-import { render, screen, fireEvent, act } from '@testing-library/react';
+/**
+ * TutorialGame is now a transition step — friendly mascot greeting + CTA that
+ * hands the player off to /practice. The actual mechanic-teaching lives in the
+ * practice modes. Public surface: data-testids `tutorial-game` + `tutorial-continue`.
+ */
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock framer-motion
 vi.mock('framer-motion', () => {
   const React = require('react');
-  const MotionDiv = React.forwardRef(function MotionDiv(
-    { children, onAnimationComplete, ...props }: any,
-    ref: any
-  ) {
-    return (
-      <div ref={ref} {...props}>
-        {children}
-      </div>
-    );
-  });
-  const MotionSpan = React.forwardRef(function MotionSpan(
-    { children, ...props }: any,
-    ref: any
-  ) {
-    return (
-      <span ref={ref} {...props}>
-        {children}
-      </span>
-    );
+  const Wrap = React.forwardRef(function Wrap({ children, ...p }: any, ref: any) {
+    return <div ref={ref} {...p}>{children}</div>;
   });
   return {
-    motion: { div: MotionDiv, span: MotionSpan, button: MotionDiv },
-    AnimatePresence: function AnimatePresence({ children }: any) {
-      return <>{children}</>;
-    },
+    motion: new Proxy({} as any, { get: () => Wrap }),
+    AnimatePresence: ({ children }: any) => <>{children}</>,
   };
 });
 
-// Mock lucide-react
 vi.mock('lucide-react', () => ({
-  Sparkles: () => <div data-testid="sparkles-icon" />,
-  Trophy: () => <div data-testid="trophy-icon" />,
-  Target: () => <div data-testid="target-icon" />,
+  ArrowRight: () => null,
 }));
 
-// Mock Mascot
 vi.mock('@/components/ui/Mascot', () => ({
   Mascot: ({ variant }: any) => <div data-testid={`mascot-${variant}`} />,
 }));
 
-// Mock MiniGrid
-vi.mock('../MiniGrid', () => {
-  const React = require('react');
-  return {
-    __esModule: true,
-    default: (props: any) => (
-      <div
-        data-testid="mini-grid"
-        data-size={props.size}
-        onClick={() => props.onDemoComplete?.()}
-      />
-    ),
-  };
-});
+vi.mock('@/utils/growthTracking', () => ({
+  trackOnboardingFirstWord: vi.fn(),
+}));
 
-// Mock LanguageContext
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string, fallback?: any) => {
-      const translations: Record<string, string> = {
-        'onboarding.ftue.swipeToConnect': 'Swipe to connect letters!',
-        'onboarding.ftue.findMultipleWords': 'Find 3 words! Swipe across letters to spell them.',
-        'onboarding.ftue.wordsFound': '{{count}}/3 words found',
-        'onboarding.ftue.amazing': 'AMAZING!',
-        'onboarding.ftue.keepGoing': 'Keep going!',
-      };
-      if (typeof fallback === 'string') return fallback;
-      return translations[key] || key;
-    },
+    t: (key: string, fallback?: any) => (typeof fallback === 'string' ? fallback : key),
     language: 'en',
     dir: 'ltr',
   }),
 }));
 
-// Mock tutorialBoardConfig
-vi.mock('../tutorialBoardConfig', () => ({
-  getTutorialBoard: () => ({
-    letters: [
-      ['C', 'A', 'T', 'S'],
-      ['R', 'O', 'P', 'E'],
-      ['S', 'T', 'A', 'R'],
-      ['D', 'O', 'G', 'S'],
-    ],
-    targetWords: [
-      { word: 'CAT', path: [], length: 3 },
-      { word: 'DOG', path: [], length: 3 },
-      { word: 'STARS', path: [], length: 5 },
-    ],
-    validWords: new Set(['CAT', 'DOG', 'STAR', 'STARS', 'ROPE', 'TOP']),
-  }),
-  isValidTutorialWord: (word: string) =>
-    new Set(['CAT', 'DOG', 'STAR', 'STARS', 'ROPE', 'TOP']).has(word.toUpperCase()),
-}));
-
 import TutorialGame from '../TutorialGame';
 
-describe('TutorialGame', () => {
-  const defaultProps = {
-    onComplete: vi.fn(),
-  };
+describe('TutorialGame (practice transition)', () => {
+  const defaultProps = { onComplete: vi.fn() };
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('renders the tutorial grid with 4x4 size', () => {
+  it('renders the transition surface', () => {
     render(<TutorialGame {...defaultProps} />);
-    const grid = screen.getByTestId('mini-grid');
-    expect(grid).toBeInTheDocument();
-    expect(grid).toHaveAttribute('data-size', '4');
+    expect(screen.getByTestId('tutorial-game')).toBeInTheDocument();
   });
 
-  it('shows mascot speech bubble with find-multiple-words instruction', () => {
+  it('renders a celebration-variant mascot', () => {
     render(<TutorialGame {...defaultProps} />);
-    expect(screen.getByText('Find 3 words! Swipe across letters to spell them.')).toBeInTheDocument();
+    expect(screen.getByTestId('mascot-celebration')).toBeInTheDocument();
   });
 
-  it('displays word counter showing 0/3', () => {
+  it('renders the welcome greeting + tip + CTA', () => {
     render(<TutorialGame {...defaultProps} />);
-    // The word counter should show the count
-    expect(screen.getByTestId('word-counter')).toBeInTheDocument();
+    expect(screen.getByText('practiceWelcome.greet')).toBeInTheDocument();
+    expect(screen.getByText('practiceWelcome.tip')).toBeInTheDocument();
+    expect(screen.getByTestId('tutorial-continue')).toBeInTheDocument();
   });
 
-  it('renders in full-screen mode with no chrome', () => {
+  it('does NOT render the old mini-grid mechanic', () => {
     render(<TutorialGame {...defaultProps} />);
-    const container = screen.getByTestId('tutorial-game');
-    expect(container).toBeInTheDocument();
+    expect(screen.queryByTestId('mini-grid')).toBeNull();
+    expect(screen.queryByTestId('word-counter')).toBeNull();
   });
 
-  it('shows mascot with encouraging variant', () => {
-    render(<TutorialGame {...defaultProps} />);
-    expect(screen.getByTestId('mascot-encouraging')).toBeInTheDocument();
+  it('fires onComplete with zero score and no words on CTA tap', () => {
+    const onComplete = vi.fn();
+    render(<TutorialGame onComplete={onComplete} />);
+    fireEvent.click(screen.getByTestId('tutorial-continue'));
+    expect(onComplete).toHaveBeenCalledWith(0, []);
   });
 });

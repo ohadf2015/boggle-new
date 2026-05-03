@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { haptics } from '@/utils/haptics';
+import { Mascot, type MascotVariant } from '@/components/ui/Mascot';
 import GridComponent from '@/components/GridComponent';
 import WordFormingArea from '@/components/game/WordFormingArea';
 import { useWordSubmission } from '@/hooks/useWordSubmission';
@@ -22,16 +24,42 @@ interface Props {
   goal: number;
 }
 
-const ACCENT: Record<Props['mode'], { dot: string; pill: string }> = {
-  classic: { dot: 'bg-neo-cyan', pill: 'border-neo-cyan/60 text-neo-cyan' },
-  wordHunt: { dot: 'bg-neo-lime', pill: 'border-neo-lime/60 text-neo-lime' },
+const ACCENT: Record<Props['mode'], { dot: string; pill: string; bubble: string; ring: string }> = {
+  classic: {
+    dot: 'bg-neo-cyan',
+    pill: 'border-neo-cyan/60 text-neo-cyan',
+    bubble: 'bg-neo-cyan',
+    ring: 'border-neo-cyan',
+  },
+  wordHunt: {
+    dot: 'bg-neo-lime',
+    pill: 'border-neo-lime/60 text-neo-lime',
+    bubble: 'bg-neo-lime',
+    ring: 'border-neo-lime',
+  },
 };
+
+const IDLE_MASCOT: Record<Props['mode'], MascotVariant> = {
+  classic: 'encouraging',
+  wordHunt: 'explorer',
+};
+
+const WIN_MASCOT: Record<Props['mode'], MascotVariant> = {
+  classic: 'celebration',
+  wordHunt: 'flexing',
+};
+
+/** Pick desired hunt slot lengths from board size — small variety. */
+function huntLengthsFor(goal: number): number[] {
+  const lengths = [3, 4, 5];
+  return Array.from({ length: goal }, (_, i) => lengths[i % lengths.length]);
+}
 
 /**
  * Real swipe-over-letters practice. Uses the production GridComponent and
- * dictionary-backed validation — same feel as the real game, minus the timer
- * and HUD chrome. Goal is intentionally tiny (3 words) so beginners reach the
- * win moment fast and get the celebration.
+ * dictionary-backed validation. Adds a friendly mascot, bigger per-word
+ * celebration moments, and a Word Hunt variant where slots represent specific
+ * word lengths to fill (distinct mini-game feel from Classic).
  */
 export default function PracticeSwipeBoard({ mode, rows, cols, goal }: Props) {
   const { language, t } = useLanguage();
@@ -55,7 +83,52 @@ export default function PracticeSwipeBoard({ mode, rows, cols, goal }: Props) {
 
   const [formingWord, setFormingWord] = useState('');
   const [letterCount, setLetterCount] = useState(0);
+  const [pop, setPop] = useState<{ id: number; word: string; label: string } | null>(null);
+  const popIdRef = useRef(0);
   const celebratedRef = useRef(false);
+
+  // Word Hunt slots: each slot wants a word of a specific length. Once a
+  // valid word matches a slot's length, the slot fills with that word.
+  const huntLengths = useMemo(() => huntLengthsFor(goal), [goal]);
+  const [huntSlots, setHuntSlots] = useState<(string | null)[]>(() =>
+    Array.from({ length: goal }, () => null),
+  );
+
+  const handleAccepted = useCallback(
+    (word: string, _score: number) => {
+      playWordAcceptedSound();
+      haptics.success();
+      // Pop a tiny celebration label per word
+      const labels = [
+        t('practiceSwipe.celebrate1'),
+        t('practiceSwipe.celebrate2'),
+        t('practiceSwipe.celebrate3'),
+        t('practiceSwipe.celebrate4'),
+      ];
+      popIdRef.current += 1;
+      setPop({
+        id: popIdRef.current,
+        word,
+        label: labels[Math.min(labels.length - 1, Math.floor(Math.random() * labels.length))],
+      });
+      setTimeout(() => {
+        setPop((cur) => (cur && cur.id === popIdRef.current ? null : cur));
+      }, 900);
+      fireOnboardingBurst({ x: 0.5, y: 0.4 });
+
+      // Word Hunt: try to fill an empty slot whose required length matches
+      if (mode === 'wordHunt') {
+        setHuntSlots((prev) => {
+          const idx = prev.findIndex((s, i) => s === null && huntLengths[i] === word.length);
+          if (idx === -1) return prev;
+          const next = [...prev];
+          next[idx] = word.toUpperCase();
+          return next;
+        });
+      }
+    },
+    [playWordAcceptedSound, t, mode, huntLengths],
+  );
 
   const {
     foundWords,
@@ -66,21 +139,17 @@ export default function PracticeSwipeBoard({ mode, rows, cols, goal }: Props) {
   } = useWordSubmission({
     grid,
     language,
-    minWordLength: 3,
+    minWordLength: 2,
     mode: 'practice',
     t,
-    onWordAccepted: () => {
-      playWordAcceptedSound();
-      haptics.success();
-      // Tiny burst per word — keeps the win loop tight.
-      fireOnboardingBurst({ x: 0.5, y: 0.45 });
-    },
+    onWordAccepted: handleAccepted,
     onWordRejected: () => {
       playWordRejectedSound();
     },
   });
 
-  const isComplete = validWordCount >= goal;
+  const huntFilled = huntSlots.filter(Boolean).length;
+  const isComplete = mode === 'wordHunt' ? huntFilled >= goal : validWordCount >= goal;
 
   useEffect(() => {
     if (isComplete && !celebratedRef.current) {
@@ -101,18 +170,27 @@ export default function PracticeSwipeBoard({ mode, rows, cols, goal }: Props) {
     celebratedRef.current = false;
     setFormingWord('');
     setLetterCount(0);
-  }, [generateBoard, resetSubmission]);
+    setHuntSlots(Array.from({ length: goal }, () => null));
+  }, [generateBoard, resetSubmission, goal]);
 
   const validWords = useMemo(
     () => foundWords.filter((w) => w.isValid === true).map((w) => w.word.toUpperCase()),
     [foundWords],
   );
 
+  const mascotVariant = isComplete ? WIN_MASCOT[mode] : IDLE_MASCOT[mode];
+  const greet = mode === 'wordHunt' ? t('practiceSwipe.greetWordHunt') : t('practiceSwipe.greet');
+  const instruction = isComplete
+    ? t('practiceSwipe.done')
+    : mode === 'wordHunt'
+      ? t('practiceSwipe.instructionWordHunt', { goal })
+      : t('practiceSwipe.instruction', { goal });
+
   return (
     <div
       data-testid="practice-swipe-board"
       data-mode={mode}
-      className="min-h-[100dvh] w-full bg-linear-to-b from-neo-navy to-neo-navy-light px-4 pt-4 pb-bottom-stack flex flex-col items-center gap-3"
+      className="min-h-[100dvh] w-full bg-linear-to-b from-neo-navy to-neo-navy-light px-4 pt-3 pb-bottom-stack flex flex-col items-center gap-3"
     >
       <div className="w-full max-w-md flex items-center justify-between">
         <Link
@@ -121,31 +199,80 @@ export default function PracticeSwipeBoard({ mode, rows, cols, goal }: Props) {
         >
           {t('practiceSwipe.back')}
         </Link>
-        <div
-          data-testid="practice-progress"
-          aria-label={t('practiceSwipe.progress', { found: validWordCount, goal })}
-          className="flex items-center gap-1.5"
-        >
-          {Array.from({ length: goal }).map((_, i) => (
-            <span
-              key={i}
-              className={
-                'w-3 h-3 rounded-full border-2 border-neo-black ' +
-                (i < validWordCount ? accent.dot : 'bg-neo-navy')
-              }
-            />
-          ))}
+        {mode !== 'wordHunt' && (
+          <div
+            data-testid="practice-progress"
+            aria-label={t('practiceSwipe.progress', { found: validWordCount, goal })}
+            className="flex items-center gap-1.5"
+          >
+            {Array.from({ length: goal }).map((_, i) => (
+              <span
+                key={i}
+                className={
+                  'w-3 h-3 rounded-full border-2 border-neo-black ' +
+                  (i < validWordCount ? accent.dot : 'bg-neo-navy')
+                }
+              />
+            ))}
+          </div>
+        )}
+        {mode === 'wordHunt' && (
+          <div
+            data-testid="practice-progress"
+            aria-label={t('practiceSwipe.progress', { found: huntFilled, goal })}
+            className="flex items-center gap-1.5"
+          >
+            {Array.from({ length: goal }).map((_, i) => (
+              <span
+                key={i}
+                className={
+                  'w-3 h-3 rounded-full border-2 border-neo-black ' +
+                  (huntSlots[i] ? accent.dot : 'bg-neo-navy')
+                }
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="w-full max-w-md flex items-center gap-2">
+        <Mascot variant={mascotVariant} size="xs" clipShape="circle" clipBorder={mode === 'classic' ? 'cyan' : 'lime'} />
+        <div className={`relative flex-1 ${accent.bubble} text-neo-black border-2 border-neo-black rounded-neo px-3 py-2 shadow-hard-sm`}>
+          <p className="text-xs font-neo-display font-black uppercase tracking-wide leading-tight">
+            {greet}
+          </p>
+          <p data-testid="practice-instruction" className="text-sm font-neo-body font-bold leading-tight">
+            {instruction}
+          </p>
         </div>
       </div>
 
-      <h1
-        data-testid="practice-instruction"
-        className="text-base font-neo-display font-black text-neo-cream text-center max-w-md leading-tight"
-      >
-        {isComplete
-          ? t('practiceSwipe.done')
-          : t('practiceSwipe.instruction', { goal })}
-      </h1>
+      {mode === 'wordHunt' && (
+        <div data-testid="practice-hunt-slots" className="w-full max-w-md flex justify-center gap-2">
+          {huntSlots.map((slot, i) => {
+            const length = huntLengths[i];
+            return (
+              <div
+                key={i}
+                data-testid={`practice-hunt-slot-${i}`}
+                data-filled={slot ? 'true' : 'false'}
+                className={
+                  'flex-1 rounded-neo border-2 border-neo-black px-2 py-1 text-center transition-colors ' +
+                  (slot ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-cream/70')
+                }
+              >
+                {slot ? (
+                  <span className="font-neo-display font-black text-base tracking-wider">{slot}</span>
+                ) : (
+                  <span className="font-neo-body font-bold text-xs uppercase tracking-wider">
+                    {t('practiceSwipe.huntSlot', { length })}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <WordFormingArea
         word={formingWord}
@@ -155,7 +282,7 @@ export default function PracticeSwipeBoard({ mode, rows, cols, goal }: Props) {
         className="justify-center"
       />
 
-      <div className="w-full max-w-md flex items-center justify-center">
+      <div className="relative w-full max-w-md flex items-center justify-center">
         <div className="w-full" style={{ aspectRatio: '1 / 1' }}>
           <GridComponent
             grid={grid}
@@ -167,6 +294,25 @@ export default function PracticeSwipeBoard({ mode, rows, cols, goal }: Props) {
             animateOnMount
           />
         </div>
+        <AnimatePresence>
+          {pop && (
+            <motion.div
+              key={pop.id}
+              initial={{ opacity: 0, scale: 0.6, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: -10 }}
+              exit={{ opacity: 0, scale: 0.7, y: -40 }}
+              transition={{ type: 'spring', stiffness: 360, damping: 18 }}
+              className="absolute pointer-events-none z-10 bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard"
+            >
+              <span className="font-neo-display font-black text-lg uppercase tracking-wide">
+                {pop.label}
+              </span>
+              <span className="block text-xs font-neo-body font-bold opacity-90 text-center">
+                +{pop.word.toUpperCase()}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {validWords.length > 0 && (

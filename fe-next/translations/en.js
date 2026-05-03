@@ -5053,6 +5053,7 @@ const en = {
       "submit": "Submit",
       "reset": "Reset",
       "needsCenter": "Word must use the center letter.",
+      "tooShort": "Need at least 2 letters.",
       "found": "Nice! Word added.",
       "notAWord": "Not a word — try another.",
       "duplicate": "Already found.",
@@ -5061,11 +5062,27 @@ const en = {
   },
   "practiceSwipe": {
     "back": "← Practice",
-    "instruction": "Swipe over letters to spell {goal} words.",
-    "done": "Nice — you found them all.",
+    "instruction": "Swipe to spell {goal} words.",
+    "instructionWordHunt": "Find {goal} hidden words.",
+    "done": "Nice — you got them all!",
     "continue": "Back to practice",
     "newBoard": "New board",
-    "progress": "{found} of {goal} words"
+    "progress": "{found} of {goal} words",
+    "greet": "Drag across letters!",
+    "greetWordHunt": "Hunt the hidden words!",
+    "celebrate1": "Nice!",
+    "celebrate2": "Sweet!",
+    "celebrate3": "Boom!",
+    "celebrate4": "On fire!",
+    "huntSlot": "{length} letters",
+    "wheelGreet": "Use the lime letter!",
+    "wheelShuffle": "Shuffle",
+    "wheelClear": "Clear"
+  },
+  "practiceWelcome": {
+    "greet": "Welcome to Practice!",
+    "tip": "Try every mode at your own pace. No timer, no pressure.",
+    "cta": "Let's go!"
   },
   "wizard": {
     "selectMode": "Select Game Mode",
@@ -10373,11 +10390,14 @@ const en = {
   "practiceHub": {
     "title": "Practice",
     "subtitle": "A quiet place to learn each mode",
+    "greet": "Pick a mode and play!",
     "progress": "{done} of {total} modes complete",
     "completedBadge": "Completed",
     "completedDesc": "Tap to play again",
     "navAria": "Practice modes",
     "backToHub": "← Hub",
+    "playLabel": "Play",
+    "playAgainLabel": "Play again",
     "allCompleteTitle": "All practice complete!",
     "allCompleteBody": "You're ready for the real modes."
   },

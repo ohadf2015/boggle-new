@@ -4932,6 +4932,7 @@ const ja = {
       "submit": "送信",
       "reset": "リセット",
       "needsCenter": "中央の文字を使う必要があります。",
+      "tooShort": "2文字以上必要。",
       "found": "いいね！単語を追加しました。",
       "notAWord": "単語ではありません — 別を試してください。",
       "duplicate": "すでに見つけました。",
@@ -4940,11 +4941,27 @@ const ja = {
   },
   "practiceSwipe": {
     "back": "← 練習",
-    "instruction": "文字をなぞって{goal}個の単語を作ろう。",
+    "instruction": "なぞって{goal}個の単語を作ろう。",
+    "instructionWordHunt": "隠された{goal}個の単語を見つけよう。",
     "done": "やった — 全部見つけた！",
     "continue": "練習に戻る",
     "newBoard": "新しい盤",
-    "progress": "{found}/{goal}語"
+    "progress": "{found}/{goal}語",
+    "greet": "文字をなぞって！",
+    "greetWordHunt": "隠れた単語を狩ろう！",
+    "celebrate1": "いいね！",
+    "celebrate2": "やるじゃん！",
+    "celebrate3": "ドーン！",
+    "celebrate4": "燃えてる！",
+    "huntSlot": "{length}文字",
+    "wheelGreet": "ライムの文字を使って！",
+    "wheelShuffle": "シャッフル",
+    "wheelClear": "クリア"
+  },
+  "practiceWelcome": {
+    "greet": "練習へようこそ！",
+    "tip": "自分のペースで各モードを試してみよう。タイマーなし、プレッシャーなし。",
+    "cta": "始めよう！"
   },
   "wizard": {
     "selectMode": "ゲームモードを選択",
@@ -10118,11 +10135,14 @@ const ja = {
   "practiceHub": {
     "title": "練習",
     "subtitle": "それぞれのモードを学ぶ静かな場所",
+    "greet": "モードを選んでプレイ！",
     "progress": "{total}つ中{done}つ完了",
     "completedBadge": "完了",
     "completedDesc": "もう一度プレイ",
     "navAria": "練習モード",
     "backToHub": "← ハブ",
+    "playLabel": "プレイ",
+    "playAgainLabel": "もう一度",
     "allCompleteTitle": "全ての練習が完了！",
     "allCompleteBody": "本番モードに挑戦する準備ができました。"
   },
