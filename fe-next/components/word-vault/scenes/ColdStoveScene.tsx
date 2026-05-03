@@ -7,6 +7,8 @@ import { getGameStore } from '@/lib/word-vault/state/gameStore';
 interface Props {
   onSolved: () => void;
   onExit: () => void;
+  /** True when player re-enters a solved room from the hub. Enables persistent post-solve visuals. */
+  isRevisit?: boolean;
 }
 
 type ValveId = 'gas' | 'air' | 'fire' | 'time';
@@ -41,7 +43,7 @@ const SMOKE_LINES_BY_SHAPE: Record<SmokeShape, string> = {
   cross: 'התנור אמר לא.',
 };
 
-export function ColdStoveScene({ onSolved, onExit }: Props) {
+export function ColdStoveScene({ onSolved, onExit, isRevisit = false }: Props) {
   const [sequence, setSequence] = useState<ValveId[]>([]);
   const [showBrief, setShowBrief] = useState(true);
   const [done, setDone] = useState(false);
@@ -51,14 +53,18 @@ export function ColdStoveScene({ onSolved, onExit }: Props) {
   const [burst, setBurst] = useState<{ id: number; x: number; y: number } | undefined>();
   const [burstId, setBurstId] = useState(0);
   const [revealed, setRevealed] = useState<Set<ValveId>>(new Set());
+  const [brassKeyShimmerId, setBrassKeyShimmerId] = useState(0);
 
-  // Brass-key perk: silently auto-snaps the FIRST valve in the order; rest still requires inference
+  // Brass-key perk: silently auto-snaps the FIRST valve, plus a one-shot golden shimmer
+  // on the gas valve so the player can SEE that the key did something.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const items = getGameStore().getState().permanentItems;
     if (items.includes('brass-key')) {
       setSequence([CORRECT_ORDER[0]]);
       setRevealed((prev) => new Set(prev).add(CORRECT_ORDER[0]));
+      // Defer one paint frame so the shimmer overlays the freshly-revealed valve
+      setTimeout(() => setBrassKeyShimmerId(Date.now()), 200);
     }
   }, []);
 
@@ -138,7 +144,11 @@ export function ColdStoveScene({ onSolved, onExit }: Props) {
           backgroundImage: "url('/word-vault/bg/stove.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          filter: done ? 'brightness(0.85) saturate(1.4)' : 'brightness(0.4) saturate(0.85)',
+          filter: done
+            ? 'brightness(0.85) saturate(1.4)'
+            : isRevisit
+            ? 'brightness(0.6) saturate(1.1)'  // post-solve warmth persists on revisit
+            : 'brightness(0.4) saturate(0.85)',
           transition: 'filter 1.4s ease-out',
         }}
       />
@@ -157,9 +167,9 @@ export function ColdStoveScene({ onSolved, onExit }: Props) {
 
       {/* Pixi ember/spark overlay */}
       <EmberOverlay
-        density={done ? 100 : 12}
-        tint={done ? 0xff8a3c : 0x4a5060}
-        intensity={done ? 1 : 0.4}
+        density={done ? 100 : isRevisit ? 35 : 12}
+        tint={done || isRevisit ? 0xff8a3c : 0x4a5060}
+        intensity={done ? 1 : isRevisit ? 0.6 : 0.4}
         burst={burst}
       />
 
@@ -217,6 +227,30 @@ export function ColdStoveScene({ onSolved, onExit }: Props) {
             disabled={done}
           />
         ))}
+
+        {/* Brass-key shimmer — visual-only "the key did this" cue on the gas valve */}
+        {brassKeyShimmerId > 0 && (() => {
+          const gas = VALVES.find((v) => v.id === CORRECT_ORDER[0]);
+          if (!gas) return null;
+          return (
+            <div
+              key={brassKeyShimmerId}
+              aria-hidden="true"
+              className="pointer-events-none absolute"
+              style={{
+                left: `${gas.x * 100}%`,
+                top: `${gas.y * 100}%`,
+                transform: 'translate(-50%, -50%)',
+                width: 110,
+                height: 110,
+                background:
+                  'radial-gradient(circle at center, rgba(255,225,160,0.95) 0%, rgba(255,180,80,0.45) 45%, transparent 75%)',
+                animation: 'wv-keyShimmer 1.2s ease-out forwards',
+                mixBlendMode: 'screen',
+              }}
+            />
+          );
+        })()}
 
         {/* Smoke shape from chimney */}
         {smokeShape && (
@@ -356,6 +390,12 @@ export function ColdStoveScene({ onSolved, onExit }: Props) {
         @keyframes wv-valveTurn {
           0% { transform: translate(-50%,-50%) rotate(0); }
           100% { transform: translate(-50%,-50%) rotate(180deg); }
+        }
+        @keyframes wv-keyShimmer {
+          0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+          25%  { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+          70%  { opacity: 0.7; transform: translate(-50%, -50%) scale(1.15); }
+          100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); }
         }
       `}</style>
     </div>

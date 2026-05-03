@@ -136,6 +136,7 @@ export function RoomShell({ store, roomId, onExit }: RoomShellProps) {
             onExit();
           }}
           onExit={onExit}
+          isRevisit={isAlreadySolved}
         />
         <RevisitBanner roomId={room.id} show={isAlreadySolved} />
       </div>
@@ -152,6 +153,7 @@ export function RoomShell({ store, roomId, onExit }: RoomShellProps) {
             onExit();
           }}
           onExit={onExit}
+          isRevisit={isAlreadySolved}
         />
         <RevisitBanner roomId={room.id} show={isAlreadySolved} />
       </div>

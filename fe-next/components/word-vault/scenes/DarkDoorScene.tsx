@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { EmberOverlay } from '@/components/word-vault/pixi/EmberOverlay';
 
 interface Props {
@@ -77,6 +77,7 @@ export function DarkDoorScene({ onSolved, onExit }: Props) {
   const [done, setDone] = useState(false);
   const [shakeId, setShakeId] = useState<string | null>(null);
   const [bossRoared, setBossRoared] = useState(false);
+  const [idleHint, setIdleHint] = useState(false);
   const [whispers, setWhispers] = useState<Whisper[]>([]);
   const [parallax, setParallax] = useState({ x: 0, y: 0 });
   const [examined, setExamined] = useState<Set<string>>(new Set());
@@ -84,6 +85,17 @@ export function DarkDoorScene({ onSolved, onExit }: Props) {
   const burstId = useRef(0);
   const whisperId = useRef(0);
   const sceneRef = useRef<HTMLDivElement>(null);
+
+  // Soft safety net: if the player hasn't lit the lantern after 8s, surface an ultra-subtle ember
+  // particle near the lantern hotspot. Clears the moment the lantern is lit OR on unmount.
+  useEffect(() => {
+    if (lanternLit) {
+      setIdleHint(false);
+      return;
+    }
+    const t = setTimeout(() => setIdleHint(true), 8000);
+    return () => clearTimeout(t);
+  }, [lanternLit]);
 
   const onMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -235,6 +247,29 @@ export function DarkDoorScene({ onSolved, onExit }: Props) {
           examined={examined.has(h.id)}
         />
       ))}
+
+      {/* Idle safety: soft ember pulses near the lantern after 8s of no progress */}
+      {idleHint && !lanternLit && (() => {
+        const lanternHotspot = HOTSPOTS.find((h) => h.isLantern);
+        if (!lanternHotspot) return null;
+        return (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute"
+            style={{
+              left: `${lanternHotspot.x * 100}%`,
+              top: `${lanternHotspot.y * 100}%`,
+              transform: 'translate(-50%, -50%)',
+              width: 80,
+              height: 80,
+              background:
+                'radial-gradient(circle at center, rgba(255,180,80,0.45) 0%, transparent 65%)',
+              animation: 'wv-idleHint 2.4s ease-in-out infinite',
+              mixBlendMode: 'screen',
+            }}
+          />
+        );
+      })()}
 
       {/* Atmospheric line */}
       <div className="relative z-10 px-6 pt-6 text-center" dir="rtl">
@@ -407,6 +442,10 @@ export function DarkDoorScene({ onSolved, onExit }: Props) {
           0% { opacity: 0; transform: translateY(8px); }
           15%, 80% { opacity: 1; transform: translateY(0); }
           100% { opacity: 0; transform: translateY(-12px); }
+        }
+        @keyframes wv-idleHint {
+          0%,100% { opacity: 0.15; transform: translate(-50%, -50%) scale(0.85); }
+          50%     { opacity: 0.55; transform: translate(-50%, -50%) scale(1.15); }
         }
         @keyframes wv-popBurst {
           0% { opacity: 0.95; transform: scale(0.6); }

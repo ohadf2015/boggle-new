@@ -9,16 +9,19 @@ import type { ItemId } from '@/lib/word-vault/types';
 interface Props {
   onSolved: () => void;
   onExit: () => void;
+  /** True when player re-enters a solved room from the hub. Enables persistent post-solve visuals. */
+  isRevisit?: boolean;
 }
 
 const RITUAL_ORDER: ItemId[] = ['melo-lantern', 'brass-key', 'family-photo', 'cael-recipe-book'];
 const RITUAL_SET = new Set<ItemId>(RITUAL_ORDER);
 const RITUAL_LENGTH = 4;
 
-// Spelling seal: after 4 items placed, player spells the brother's name from a small pool
+// Spelling seal: after 4 items placed, player spells the brother's name.
+// Pool collapsed to the exact 4 letters per round-3 critique — 6 letters made the
+// finale feel like 8 micro-puzzles. Now: pick the next correct letter, advance.
 const SEAL_TARGET = ['א', 'ו', 'ר', 'י']; // אורי
-const SEAL_POOL = ['א', 'ו', 'ר', 'י', 'ת', 'ה'];
-const CANONICAL_BONUS_VO = 'אש זכרה את הסדר של אורי.';
+const SEAL_POOL = ['א', 'ו', 'ר', 'י'];
 
 const ITEM_GLYPH: Record<ItemId, string> = {
   'melo-lantern': '🏮',
@@ -45,7 +48,7 @@ const SUCCESS_LINES = [
 
 type Phase = 'placing' | 'spelling' | 'transforming' | 'done';
 
-export function LastRecipeScene({ onSolved, onExit }: Props) {
+export function LastRecipeScene({ onSolved, onExit, isRevisit = false }: Props) {
   const [slotsFilled, setSlotsFilled] = useState<ItemId[]>([]);
   const [phase, setPhase] = useState<Phase>('placing');
   const [sealLetters, setSealLetters] = useState<string[]>([]);
@@ -104,13 +107,9 @@ export function LastRecipeScene({ onSolved, onExit }: Props) {
       setWhisper(SUCCESS_LINES[lineIdx]);
       setTimeout(() => setWhisper(null), 2400);
 
-      // 4 items placed — open the spelling seal phase
+      // 4 items placed — open the spelling seal phase silently (the empty letter slots ARE the prompt)
       if (next.length === RITUAL_LENGTH) {
-        setTimeout(() => {
-          setPhase('spelling');
-          setWhisper('כתבי את שמו.');
-          setTimeout(() => setWhisper(null), 2400);
-        }, 1500);
+        setTimeout(() => setPhase('spelling'), 1500);
       }
     },
     [phase, slotsFilled, burstId],
@@ -134,13 +133,10 @@ export function LastRecipeScene({ onSolved, onExit }: Props) {
       setSealLetters(next);
 
       if (next.length === SEAL_TARGET.length) {
-        // Name fully spelled — trigger transformation, with canonical bonus VO if items were placed in narrative order
+        // Name fully spelled — trigger transformation. Canonical-order players get a richer flame
+        // (delivered visually via the EmberOverlay density/tint ramp below — no VO line).
         setTimeout(() => {
           setPhase('transforming');
-          if (placedInCanonicalOrder) {
-            setWhisper(CANONICAL_BONUS_VO);
-            setTimeout(() => setWhisper(null), 2800);
-          }
           setTimeout(() => {
             setPhase('done');
             setTimeout(() => onSolved(), 800);
@@ -148,7 +144,7 @@ export function LastRecipeScene({ onSolved, onExit }: Props) {
         }, 600);
       }
     },
-    [phase, sealLetters, placedInCanonicalOrder, onSolved],
+    [phase, sealLetters, onSolved],
   );
 
   return (
@@ -186,10 +182,11 @@ export function LastRecipeScene({ onSolved, onExit }: Props) {
       />
 
       {/* Pixi ember/spark overlay */}
+      {/* Canonical-order players get a richer flame; revisit retains a soft ember whisper. */}
       <EmberOverlay
-        density={transformed ? 80 : 50}
-        tint={transformed ? 0xffd47a : 0xff5018}
-        intensity={transformed ? 1 : 0.85}
+        density={transformed ? (placedInCanonicalOrder ? 120 : 80) : isRevisit ? 25 : 50}
+        tint={transformed ? (placedInCanonicalOrder ? 0xfff4c8 : 0xffd47a) : isRevisit ? 0xffb878 : 0xff5018}
+        intensity={transformed ? 1 : isRevisit ? 0.5 : 0.85}
         burst={burst}
       />
 

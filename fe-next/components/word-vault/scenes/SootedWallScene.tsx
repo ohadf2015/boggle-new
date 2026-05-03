@@ -55,7 +55,7 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
   const [whisper, setWhisper] = useState<string | null>(null);
   const [hasBroom, setHasBroom] = useState(false);
   const [hasDefrost, setHasDefrost] = useState(false);
-  const [broomBarkFired, setBroomBarkFired] = useState(false);
+  const [broomSparkleId, setBroomSparkleId] = useState(0); // increments to remount sparkle overlay; 0 = never fired
   const wipingRef = useRef<{ id: string | null; lastX: number; lastY: number } | null>(null);
 
   // Item perks on mount: lantern auto-reveals 1 carving; broom = fast-wipe on thickest; defrost candle = uniform speedup
@@ -235,11 +235,10 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
             onTap={() => {
               if (!filled[c.id] && revealed[c.id] >= thresholdFor(c.id)) {
                 setActiveCarving(c.id);
-                // Broom legibility bark: first time honey-carving becomes active for a broom-holder
-                if (hasBroom && c.id === BROOM_TARGET_CARVING && !broomBarkFired) {
-                  setBroomBarkFired(true);
-                  setWhisper('המטאטא שלך מנגב את העובי הזה.');
-                  setTimeout(() => setWhisper(null), 2400);
+                // Broom legibility: visual-only sparkle burst on the honey carving the first time
+                // a broom-holder activates it. No whisper — let the player notice their tool worked.
+                if (hasBroom && c.id === BROOM_TARGET_CARVING && broomSparkleId === 0) {
+                  setBroomSparkleId(Date.now());
                 }
               } else if (filled[c.id]) {
                 // already filled — show whisper of hint
@@ -252,6 +251,30 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
             }}
           />
         ))}
+
+        {/* Broom sparkle burst — visual-only feedback, fires once per playthrough on honey-carving activation */}
+        {broomSparkleId > 0 && (() => {
+          const honey = CARVINGS.find((c) => c.id === BROOM_TARGET_CARVING);
+          if (!honey) return null;
+          return (
+            <div
+              key={broomSparkleId}
+              aria-hidden="true"
+              className="pointer-events-none absolute"
+              style={{
+                left: `${honey.x * 100}%`,
+                top: `${honey.y * 100}%`,
+                transform: 'translate(-50%, -50%)',
+                width: 240,
+                height: 150,
+                background:
+                  'radial-gradient(circle at center, rgba(255,225,160,0.85) 0%, rgba(255,180,80,0.4) 40%, transparent 70%)',
+                animation: 'wv-broomSparkle 1.5s ease-out forwards',
+                mixBlendMode: 'screen',
+              }}
+            />
+          );
+        })()}
       </div>
 
       {/* Letter pool — only renders when player has wiped a carving and tapped it (discovery-first) */}
@@ -411,6 +434,12 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
           80%  { opacity: 0.9; left: 196px; }
           100% { opacity: 0; left: 196px; }
         }
+        @keyframes wv-broomSparkle {
+          0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+          25%  { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+          70%  { opacity: 0.8; transform: translate(-50%, -50%) scale(1.2); }
+          100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4); }
+        }
       `}</style>
     </div>
   );
@@ -489,11 +518,7 @@ function CarvingPanel({
         width: 220,
         height: 130,
         touchAction: 'none',
-        animation: isShaking
-          ? 'wv-shakeX 0.35s'
-          : isLocked
-          ? 'wv-emberPulse 2.4s ease-in-out infinite'
-          : undefined,
+        animation: isShaking ? 'wv-shakeX 0.35s' : undefined,
       }}
       className="select-none"
     >
@@ -504,16 +529,19 @@ function CarvingPanel({
           background:
             'linear-gradient(180deg, rgba(80,55,38,0.55) 0%, rgba(40,28,18,0.85) 100%)',
           border: isLocked
-            ? '3px solid rgba(255,180,80,0.85)'
+            ? '3px solid rgba(220,200,160,0.85)'  // solved = cool steady gold
             : isActive
             ? '3px solid rgba(255,200,120,0.65)'
             : readyToTap
             ? '2.5px solid rgba(255,200,120,0.85)'
             : '2px solid rgba(120,90,60,0.55)',
-          boxShadow: readyToTap
+          boxShadow: isLocked
+            ? 'inset 0 0 24px rgba(0,0,0,0.7), 0 0 10px rgba(220,200,160,0.35)'  // solved = subtle steady glow
+            : readyToTap
             ? 'inset 0 0 24px rgba(0,0,0,0.7), 0 0 18px rgba(255,180,80,0.55)'
             : 'inset 0 0 24px rgba(0,0,0,0.7)',
-          animation: readyToTap ? 'wv-emberPulse 2.4s ease-in-out infinite' : undefined,
+          // Animation reserved for "ready" state ONLY — solved is steady, not pulsing
+          animation: readyToTap ? 'wv-emberPulse 1.8s ease-in-out infinite' : undefined,
         }}
       >
         {/* stone grain */}
