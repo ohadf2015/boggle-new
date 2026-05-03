@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { normalizeHebrewFinalForms } from '@/lib/word-vault/engine/wordConstraintEngine';
+import { getGameStore } from '@/lib/word-vault/state/gameStore';
 
 interface Props {
   onSolved: () => void;
@@ -49,6 +50,17 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
   const [shake, setShake] = useState<string | null>(null);
   const [whisper, setWhisper] = useState<string | null>(null);
   const wipingRef = useRef<{ id: string | null; lastX: number; lastY: number } | null>(null);
+
+  // Lantern perk: if player has melo-lantern, auto-reveal one carving on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const items = getGameStore().getState().permanentItems;
+    if (!items.includes('melo-lantern')) return;
+    // Auto-reveal the first carving fully (so player sees lantern's effect)
+    setRevealed((prev) => ({ ...prev, [CARVINGS[0].id]: 1 }));
+    setTimeout(() => setWhisper('הפנס מאיר חריץ אחד.'), 700);
+    setTimeout(() => setWhisper(null), 3200);
+  }, []);
 
   const allCorrect = useMemo(
     () => CARVINGS.every((c) => filled[c.id] === c.answer),

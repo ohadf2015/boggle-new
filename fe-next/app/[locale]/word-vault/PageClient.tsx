@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useStore } from 'zustand';
 import type { Locale } from '@/lib/word-vault/types';
+import { GameHud } from '@/components/word-vault/GameHud';
 import { HubFoyer } from '@/components/word-vault/HubFoyer';
 import { RoomShell } from '@/components/word-vault/RoomShell';
 import { BOOK_1_HEARTH_ROOMS } from '@/lib/word-vault/content/book1-hearth-stub';
@@ -123,6 +124,7 @@ function SceneRouter({
           setScreen({ kind: 'transition', nextRoomId: next });
         }}
       />
+      <GameHud store={store} />
       <PauseMenuButton onPause={() => setScreen({ kind: 'hub' })} />
     </SceneFrame>
   );

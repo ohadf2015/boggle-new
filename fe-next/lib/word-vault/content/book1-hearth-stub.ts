@@ -13,15 +13,30 @@ export const BOOK_1_ITEMS: Item[] = [
   {
     id: 'melo-lantern',
     name: { he: 'הפנס של מלו', en: "Melo's Lantern" },
-    description: { he: 'מאיר את כל המילים', en: 'Lights all words' },
+    description: { he: 'חושף אות אחת בכל קיר חרוט', en: 'Reveals one letter on a carved wall' },
+  },
+  {
+    id: 'defrost-candle',
+    name: { he: 'נר להמסה', en: 'Defrost Candle' },
+    description: { he: 'מנגב פיח מהר יותר', en: 'Wipes soot faster' },
+  },
+  {
+    id: 'brass-key',
+    name: { he: 'מפתח ברונזה', en: 'Brass Key' },
+    description: { he: 'מתקן את ברז הזמן', en: 'Fixes the broken time-valve' },
   },
   {
     id: 'cael-recipe-book',
     name: { he: 'ספר המתכונים של קאל', en: "Cael's Recipe Book" },
     description: {
-      he: 'משלים אוטומטית רצפי מצרכים',
-      en: 'Auto-completes ingredient sequences',
+      he: 'מציג את סדר המתכון של קאל פעם אחת',
+      en: "Shows Cael's recipe order once",
     },
+  },
+  {
+    id: 'family-photo',
+    name: { he: 'תצלום משפחתי', en: 'Family Photo' },
+    description: { he: 'חושף את האות הראשונה של המצרך הבא', en: 'Reveals first letter of next ingredient' },
   },
   {
     id: 'cinder-charm',
@@ -52,7 +67,7 @@ export const BOOK_1_HEARTH_ROOMS: RoomConfig[] = [
       minLength: 2,
       targetWords: ['אש'],
     },
-    rewards: { coins: 10 },
+    rewards: { coins: 10, items: ['melo-lantern'] },
   },
   {
     id: 'room-1-2',
@@ -75,7 +90,7 @@ export const BOOK_1_HEARTH_ROOMS: RoomConfig[] = [
         en: 'First boil, then knead, finally bake.',
       },
     },
-    rewards: { coins: 20 },
+    rewards: { coins: 20, items: ['defrost-candle'] },
   },
   {
     id: 'room-1-3',
@@ -115,7 +130,7 @@ export const BOOK_1_HEARTH_ROOMS: RoomConfig[] = [
         },
       ],
     },
-    rewards: { coins: 25 },
+    rewards: { coins: 25, items: ['brass-key'] },
   },
   {
     id: 'room-1-4',
@@ -157,7 +172,7 @@ export const BOOK_1_HEARTH_ROOMS: RoomConfig[] = [
       en: 'A clean kitchen frozen in time before corruption. Family photo of all 5 cousins. Melo sheds a tear. Signature dish ingredient ORDER revealed environmentally.',
     },
     riddle: null,
-    rewards: { coins: 15, letterFragment: 1 },
+    rewards: { coins: 15, items: ['family-photo'], letterFragment: 1 },
     isStoryOnly: true,
   },
   {

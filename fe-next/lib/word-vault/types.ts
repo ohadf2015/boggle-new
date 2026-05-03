@@ -9,7 +9,13 @@ export type RiddleEngineId = 'word-constraint' | 'cipher' | 'logic-sequence';
 
 export type CousinId = 'cinder' | 'frost-mute' | 'forgotten' | 'ciphermaster';
 
-export type ItemId = 'melo-lantern' | 'cael-recipe-book' | 'cinder-charm';
+export type ItemId =
+  | 'melo-lantern'
+  | 'defrost-candle'
+  | 'brass-key'
+  | 'cael-recipe-book'
+  | 'family-photo'
+  | 'cinder-charm';
 
 export type RoomId = string;
 

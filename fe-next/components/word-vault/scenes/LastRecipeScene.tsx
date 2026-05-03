@@ -1,9 +1,10 @@
 'use client';
 /* eslint-disable @next/next/no-img-element -- Decorative character sprites; next/image not needed. */
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { EmberOverlay } from '@/components/word-vault/pixi/EmberOverlay';
 import { normalizeHebrewFinalForms } from '@/lib/word-vault/engine/wordConstraintEngine';
+import { getGameStore } from '@/lib/word-vault/state/gameStore';
 
 interface Props {
   onSolved: () => void;
@@ -74,6 +75,17 @@ export function LastRecipeScene({ onSolved, onExit }: Props) {
   const [burst, setBurst] = useState<{ id: number; x: number; y: number } | undefined>();
   const [burstId, setBurstId] = useState(0);
   const [spellLetters, setSpellLetters] = useState<string[]>([]);
+  const [hasRecipeBook, setHasRecipeBook] = useState(false);
+  const [hasFamilyPhoto, setHasFamilyPhoto] = useState(false);
+  const [recipeBookUsed, setRecipeBookUsed] = useState(false);
+  const [photoUsed, setPhotoUsed] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const items = getGameStore().getState().permanentItems;
+    setHasRecipeBook(items.includes('cael-recipe-book'));
+    setHasFamilyPhoto(items.includes('family-photo'));
+  }, []);
 
   const cinderProgress = potSequence.filter((id) => CORRECT_SEQUENCE.includes(id)).length;
   const cinderHpPct = Math.max(0.1, 1 - cinderProgress * 0.3);
@@ -337,7 +349,7 @@ export function LastRecipeScene({ onSolved, onExit }: Props) {
             ))}
           </div>
           {/* Actions */}
-          <div className="mt-3 flex gap-3">
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
             <button
               type="button"
               onClick={handleClearSpell}
@@ -355,6 +367,48 @@ export function LastRecipeScene({ onSolved, onExit }: Props) {
               איית
             </button>
           </div>
+
+          {/* Item perks — only shown if collected */}
+          {(hasRecipeBook || hasFamilyPhoto) && (
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+              {hasRecipeBook && !recipeBookUsed && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRecipeBookUsed(true);
+                    const remaining = CORRECT_SEQUENCE.filter((id) => !potSequence.includes(id))
+                      .map((id) => SPELL_TARGET[id])
+                      .join(' · ');
+                    setWhisper(`📖 ${remaining}`);
+                    setTimeout(() => setWhisper(null), 4500);
+                  }}
+                  className="flex items-center gap-1 rounded-full border-2 border-amber-300/60 bg-[#1a0e08]/85 px-3 py-1 font-fredoka text-xs font-bold text-amber-200"
+                  title="ספר המתכונים של קאל"
+                >
+                  📖 קרא מתכון
+                </button>
+              )}
+              {hasFamilyPhoto && !photoUsed && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPhotoUsed(true);
+                    const nextIngId = CORRECT_SEQUENCE[potSequence.length];
+                    if (!nextIngId) return;
+                    const word = SPELL_TARGET[nextIngId];
+                    if (!word) return;
+                    setSpellLetters([word[0]]);
+                    setWhisper(`🖼️ "${word[0]}..."`);
+                    setTimeout(() => setWhisper(null), 2400);
+                  }}
+                  className="flex items-center gap-1 rounded-full border-2 border-amber-300/60 bg-[#1a0e08]/85 px-3 py-1 font-fredoka text-xs font-bold text-amber-200"
+                  title="תצלום משפחתי — אות ראשונה"
+                >
+                  🖼️ אות ראשונה
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
 
