@@ -74,9 +74,11 @@ const FINAL_LINE_HE =
 export function OldKitchenScene({ onSolved, onExit }: Props) {
   const [examined, setExamined] = useState<Set<string>>(new Set());
   const [activeMemento, setActiveMemento] = useState<Memento | null>(null);
+  const [rememberedWords, setRememberedWords] = useState<string[]>([]);
   const [done, setDone] = useState(false);
 
   const allExamined = examined.size === MEMENTOS.length;
+  const allRemembered = rememberedWords.length === MEMENTOS.length;
 
   return (
     <div
@@ -141,7 +143,7 @@ export function OldKitchenScene({ onSolved, onExit }: Props) {
         ))}
       </div>
 
-      {/* Memory whisper modal */}
+      {/* Memory whisper modal — player must TAP the highlighted word to "remember" it */}
       {activeMemento && (
         <div
           className="absolute inset-x-0 bottom-24 z-30 flex justify-center px-6"
@@ -158,21 +160,45 @@ export function OldKitchenScene({ onSolved, onExit }: Props) {
               {activeMemento.labelHe}
             </p>
             <p className="mt-2 font-rubik text-base leading-relaxed text-white/90">
-              {renderHighlighted(activeMemento.memoryHe, activeMemento.highlightedHe)}
+              {renderTappableHighlighted(
+                activeMemento.memoryHe,
+                activeMemento.highlightedHe,
+                rememberedWords.includes(activeMemento.highlightedHe),
+                () => {
+                  setRememberedWords((prev) =>
+                    prev.includes(activeMemento.highlightedHe) ? prev : [...prev, activeMemento.highlightedHe],
+                  );
+                  setTimeout(() => setActiveMemento(null), 600);
+                },
+              )}
             </p>
-            <button
-              type="button"
-              onClick={() => setActiveMemento(null)}
-              className="mt-4 rounded border-2 border-amber-300 px-4 py-1 font-fredoka text-sm font-bold text-amber-200"
-            >
-              סגור
-            </button>
+            <p className="mt-3 font-rubik text-[11px] italic text-amber-200/50">
+              גע במילה הזורחת כדי לזכור.
+            </p>
           </div>
         </div>
       )}
 
-      {/* Continue button after all examined */}
-      {allExamined && !activeMemento && !done && (
+      {/* Remembered words bank — visible reminder of what player gathered */}
+      {rememberedWords.length > 0 && !activeMemento && !done && (
+        <div className="absolute inset-x-0 bottom-28 z-20 flex justify-center px-4" dir="rtl">
+          <div className="flex flex-wrap items-center justify-center gap-2 rounded-md border-2 border-amber-300/40 bg-[#1a0e08]/85 px-3 py-2">
+            <span className="font-fredoka text-[11px] uppercase tracking-widest text-amber-200/60">זוכר:</span>
+            {rememberedWords.map((w) => (
+              <span
+                key={w}
+                className="rounded bg-amber-300/20 px-2 py-0.5 font-fredoka text-sm font-bold"
+                style={{ color: 'rgba(255,225,160,0.95)' }}
+              >
+                {w}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Continue button after all examined AND remembered */}
+      {allExamined && allRemembered && !activeMemento && !done && (
         <div className="absolute inset-x-0 bottom-12 z-30 flex justify-center">
           <button
             type="button"
@@ -238,29 +264,57 @@ export function OldKitchenScene({ onSolved, onExit }: Props) {
           0%,100% { filter: drop-shadow(0 0 8px rgba(255,200,140,0.4)); }
           50% { filter: drop-shadow(0 0 18px rgba(255,225,180,0.85)); }
         }
+        @keyframes wv-tappableGlow {
+          0%,100% { box-shadow: 0 0 8px rgba(255,180,80,0.4); }
+          50% { box-shadow: 0 0 18px rgba(255,225,180,0.85); }
+        }
       `}</style>
     </div>
   );
 }
 
-function renderHighlighted(text: string, highlight: string) {
+function renderTappableHighlighted(
+  text: string,
+  highlight: string,
+  alreadyRemembered: boolean,
+  onTap: () => void,
+) {
   if (!text.includes(highlight)) return text;
   const parts = text.split(highlight);
   return parts.map((part, i) => (
     <span key={i}>
       {part}
-      {i < parts.length - 1 && (
-        <em
-          className="font-fredoka not-italic font-black"
-          style={{
-            color: 'rgba(255,210,140,1)',
-            textShadow: '0 0 14px rgba(255,180,80,0.85)',
-            padding: '0 2px',
-          }}
-        >
-          {highlight}
-        </em>
-      )}
+      {i < parts.length - 1 &&
+        (alreadyRemembered ? (
+          <em
+            className="font-fredoka not-italic font-black"
+            style={{
+              color: 'rgba(180,255,180,0.95)',
+              textShadow: '0 0 12px rgba(150,220,150,0.55)',
+              padding: '0 2px',
+            }}
+          >
+            {highlight}
+          </em>
+        ) : (
+          <button
+            type="button"
+            onClick={onTap}
+            className="font-fredoka font-black"
+            style={{
+              color: 'rgba(255,210,140,1)',
+              textShadow: '0 0 14px rgba(255,180,80,0.85)',
+              padding: '2px 4px',
+              borderRadius: 4,
+              background: 'rgba(255,180,80,0.18)',
+              border: '1.5px solid rgba(255,200,120,0.5)',
+              cursor: 'pointer',
+              animation: 'wv-tappableGlow 1.6s ease-in-out infinite',
+            }}
+          >
+            {highlight}
+          </button>
+        ))}
     </span>
   ));
 }

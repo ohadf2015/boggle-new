@@ -1,8 +1,9 @@
 'use client';
 /* eslint-disable @next/next/no-img-element -- Decorative character sprites; next/image not needed. */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { EmberOverlay } from '@/components/word-vault/pixi/EmberOverlay';
+import { normalizeHebrewFinalForms } from '@/lib/word-vault/engine/wordConstraintEngine';
 
 interface Props {
   onSolved: () => void;
@@ -34,11 +35,28 @@ const INGREDIENTS: Ingredient[] = [
 
 const CORRECT_SEQUENCE = ['water', 'flour', 'honey'];
 
-const CINDER_LINES = [
-  'אני רעב. תאכיל אותי.',
-  'מהר. אני שורף.',
-  'אם תטעה — אני אטעם אותך.',
-];
+/** Letter pool for spelling — includes all letters needed plus distractors. */
+const LETTER_POOL = ['מ','י','ם','ק','ח','ד','ב','ש','ל','א','פ','ר'];
+
+/** Map ingredient id → expected HE word the player must spell */
+const SPELL_TARGET: Record<string, string> = {
+  water: 'מים',
+  flour: 'קמח',
+  honey: 'דבש',
+  // Decoys also have spellable HE words (player CAN spell them as wrong attempts)
+  salt:  'מלח',
+  ash:   'אפר',
+  blood: 'דם',
+};
+
+const ALL_TARGETS = Object.values(SPELL_TARGET).map((w) => normalizeHebrewFinalForms(w));
+
+// Reserved for future random-Cinder-taunts feature
+// const CINDER_LINES = [
+//   'אני רעב. תאכיל אותי.',
+//   'מהר. אני שורף.',
+//   'אם תטעה — אני אטעם אותך.',
+// ];
 
 const SUCCESS_LINES = [
   '...זה? זה מוכר.',
@@ -55,64 +73,111 @@ export function LastRecipeScene({ onSolved, onExit }: Props) {
   const [shake, setShake] = useState(false);
   const [burst, setBurst] = useState<{ id: number; x: number; y: number } | undefined>();
   const [burstId, setBurstId] = useState(0);
+  const [spellLetters, setSpellLetters] = useState<string[]>([]);
 
   const cinderProgress = potSequence.filter((id) => CORRECT_SEQUENCE.includes(id)).length;
   const cinderHpPct = Math.max(0.1, 1 - cinderProgress * 0.3);
 
-  const handleDrop = useCallback(
+  const currentSpell = useMemo(() => spellLetters.join(''), [spellLetters]);
+  const currentSpellNorm = useMemo(() => normalizeHebrewFinalForms(currentSpell), [currentSpell]);
+
+  /** Submit currentSpell — check against expected ingredient */
+  const handleSubmit = useCallback(() => {
+    if (done || spellLetters.length === 0) return;
+
+    // Find which ingredient was spelled (if any)
+    const spelledId = Object.entries(SPELL_TARGET).find(
+      ([, word]) => normalizeHebrewFinalForms(word) === currentSpellNorm,
+    )?.[0];
+
+    if (!spelledId) {
+      // not a recognized HE ingredient word at all
+      setShake(true);
+      setTimeout(() => setShake(false), 400);
+      setWhisper('זה לא מצרך. תכוון יותר טוב.');
+      setTimeout(() => setWhisper(null), 2200);
+      setTimeout(() => setSpellLetters([]), 600);
+      return;
+    }
+
+    const ing = INGREDIENTS.find((i) => i.id === spelledId);
+    if (!ing) return;
+
+    // Decoy ingredient? (valid HE word but not part of recipe)
+    if (!ing.isCorrect) {
+      setShake(true);
+      setTimeout(() => setShake(false), 400);
+      setWhisper(ing.decoyLine ?? 'לא.');
+      setTimeout(() => setWhisper(null), 2200);
+      setTimeout(() => setSpellLetters([]), 600);
+      return;
+    }
+
+    // Already in pot
+    if (potSequence.includes(spelledId)) {
+      setWhisper('כבר שמת את זה.');
+      setTimeout(() => setWhisper(null), 1800);
+      setTimeout(() => setSpellLetters([]), 600);
+      return;
+    }
+
+    // Wrong sequence position
+    const expectedAt = CORRECT_SEQUENCE[potSequence.length];
+    if (spelledId !== expectedAt) {
+      setShake(true);
+      setTimeout(() => setShake(false), 400);
+      setWhisper('לא בסדר הזה. אני זוכר אחרת.');
+      setTimeout(() => {
+        setWhisper(null);
+        setPotSequence([]);
+        setSpellLetters([]);
+      }, 2200);
+      return;
+    }
+
+    // Correct + in order
+    const next = [...potSequence, spelledId];
+    setPotSequence(next);
+    setSpellLetters([]);
+    setBurstId((b) => b + 1);
+    if (typeof window !== 'undefined') {
+      setBurst({ id: burstId + 1, x: window.innerWidth / 2, y: window.innerHeight * 0.7 });
+    }
+    const lineIdx = Math.min(next.length - 1, SUCCESS_LINES.length - 1);
+    setWhisper(SUCCESS_LINES[lineIdx]);
+    setTimeout(() => setWhisper(null), 2400);
+
+    if (next.length === CORRECT_SEQUENCE.length) {
+      setTimeout(() => {
+        setTransformed(true);
+        setTimeout(() => setDone(true), 2200);
+      }, 1500);
+    }
+  }, [done, spellLetters, currentSpellNorm, potSequence, burstId]);
+
+  const handleAddLetter = useCallback((letter: string) => {
+    if (done) return;
+    setSpellLetters((prev) => (prev.length >= 6 ? prev : [...prev, letter]));
+  }, [done]);
+
+  const handleClearSpell = useCallback(() => setSpellLetters([]), []);
+
+  // Auto-submit when spell matches any valid ingredient HE word
+  useMemo(() => {
+    if (currentSpell.length >= 2 && ALL_TARGETS.includes(currentSpellNorm)) {
+      // small debounce so player sees the completed word
+      setTimeout(handleSubmit, 280);
+    }
+  }, [currentSpell, currentSpellNorm, handleSubmit]);
+
+  // Legacy bottle-tap handler — now just hint at the ingredient
+  const handleBottleTap = useCallback(
     (ing: Ingredient) => {
       if (done) return;
-
-      // Decoy
-      if (!ing.isCorrect) {
-        setShake(true);
-        setTimeout(() => setShake(false), 400);
-        setWhisper(ing.decoyLine ?? 'לא.');
-        setTimeout(() => setWhisper(null), 2200);
-        return;
-      }
-
-      // Already in pot? skip
-      if (potSequence.includes(ing.id)) {
-        setWhisper('כבר שמת. תראה מה קורה.');
-        setTimeout(() => setWhisper(null), 1800);
-        return;
-      }
-
-      // Check sequence position
-      const expectedAt = CORRECT_SEQUENCE[potSequence.length];
-      if (ing.id !== expectedAt) {
-        // wrong order — clear pot, comic recoil
-        setShake(true);
-        setTimeout(() => setShake(false), 400);
-        setWhisper('לא בסדר הזה. אני זוכר אחרת.');
-        setTimeout(() => {
-          setWhisper(null);
-          setPotSequence([]);
-        }, 2200);
-        return;
-      }
-
-      // Correct & in order
-      const next = [...potSequence, ing.id];
-      setPotSequence(next);
-      setBurstId((b) => b + 1);
-      if (typeof window !== 'undefined') {
-        setBurst({ id: burstId + 1, x: window.innerWidth / 2, y: window.innerHeight * 0.7 });
-      }
-      const lineIdx = Math.min(next.length - 1, SUCCESS_LINES.length - 1);
-      setWhisper(SUCCESS_LINES[lineIdx]);
+      setWhisper(`"${SPELL_TARGET[ing.id] ?? ing.labelHe}" — אבל אתה צריך לאיית. לא לזרוק.`);
       setTimeout(() => setWhisper(null), 2400);
-
-      if (next.length === CORRECT_SEQUENCE.length) {
-        // FULL TRANSFORMATION
-        setTimeout(() => {
-          setTransformed(true);
-          setTimeout(() => setDone(true), 2200);
-        }, 1500);
-      }
     },
-    [potSequence, done, burstId],
+    [done],
   );
 
   return (
@@ -213,14 +278,14 @@ export function LastRecipeScene({ onSolved, onExit }: Props) {
         <Pot sequence={potSequence} active={!done} />
       </div>
 
-      {/* Ingredients shelf */}
+      {/* Ingredients shelf — peek the names, tap to read hint, but you must SPELL */}
       {!done && (
-        <div className="relative z-10 mx-auto mt-4 grid max-w-2xl grid-cols-3 gap-3 px-4 pb-6 sm:grid-cols-6" dir="rtl">
+        <div className="relative z-10 mx-auto mt-3 grid max-w-2xl grid-cols-3 gap-2 px-4 sm:grid-cols-6" dir="rtl">
           {INGREDIENTS.map((ing) => (
             <button
               key={ing.id}
               type="button"
-              onClick={() => handleDrop(ing)}
+              onClick={() => handleBottleTap(ing)}
               disabled={transformed}
               className="flex flex-col items-center gap-1 rounded border-2 border-amber-300/30 bg-[#1a0e08]/85 px-2 py-3 transition-all hover:border-amber-300/70 disabled:opacity-50"
               style={{
@@ -233,6 +298,63 @@ export function LastRecipeScene({ onSolved, onExit }: Props) {
               </span>
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Spell-pad — the actual word puzzle */}
+      {!done && (
+        <div className="relative z-10 mx-auto mt-3 flex max-w-md flex-col items-center px-4 pb-6" dir="rtl">
+          {/* Hint about which ingredient is needed next */}
+          <p className="font-fredoka text-xs uppercase tracking-[0.3em] text-amber-200/55">
+            איית את המצרך הבא
+          </p>
+          {/* Spell display */}
+          <div
+            className="mt-2 flex min-h-[60px] w-full items-center justify-center rounded-md border-4 border-amber-300 bg-[#1a0808]/90 px-3 py-2"
+            style={{ animation: shake ? 'wv-cinderShake 0.4s' : undefined }}
+          >
+            <span
+              className="font-fredoka text-3xl font-black tracking-widest"
+              style={{
+                color: 'rgba(255,225,180,1)',
+                textShadow: '0 0 18px rgba(255,140,60,0.7)',
+              }}
+            >
+              {currentSpell || ' '}
+            </span>
+          </div>
+          {/* Letter pool */}
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+            {LETTER_POOL.map((ltr, i) => (
+              <button
+                key={`${ltr}-${i}`}
+                type="button"
+                onClick={() => handleAddLetter(ltr)}
+                className="grid h-11 w-11 place-items-center rounded-md border-2 border-amber-300/60 bg-gradient-to-b from-[#3a2010] to-[#1a0808] font-fredoka text-2xl font-black text-amber-200 shadow-[0_3px_0_0_#000] transition active:translate-y-[2px] active:shadow-[0_1px_0_0_#000]"
+              >
+                {ltr}
+              </button>
+            ))}
+          </div>
+          {/* Actions */}
+          <div className="mt-3 flex gap-3">
+            <button
+              type="button"
+              onClick={handleClearSpell}
+              disabled={spellLetters.length === 0}
+              className="rounded border-2 border-white/30 px-4 py-1 font-rubik text-sm text-white/70 disabled:opacity-30"
+            >
+              נקה
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={spellLetters.length < 2}
+              className="rounded-md border-4 border-amber-300 bg-amber-200 px-6 py-1 font-fredoka text-base font-black text-[#1a0e08] shadow-[3px_3px_0_0_#000] disabled:opacity-30"
+            >
+              איית
+            </button>
+          </div>
         </div>
       )}
 
