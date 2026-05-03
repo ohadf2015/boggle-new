@@ -4965,7 +4965,7 @@ const es = {
       "backspace": "Deshacer",
       "solved": "¡Resuelto! Buen trabajo.",
       "huntGreet": "¡Caza la palabra oculta!",
-      "huntInstruction": "Una palabra de {length} letras se esconde en el tablero. Desliza cualquier palabra de {length} letras para obtener pistas.",
+      "huntInstruction": "Una palabra de {length} letras se esconde en el tablero. Cualquier palabra válida cuenta como descubrimiento — solo las palabras de {length} letras cuentan como intento y revelan pistas de color sobre el objetivo.",
       "triesLeft": "intentos",
       "feedbackCorrect": "lugar correcto",
       "feedbackWrongPlace": "lugar equivocado",

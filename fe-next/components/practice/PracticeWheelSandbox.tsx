@@ -235,6 +235,30 @@ export default function PracticeWheelSandbox() {
         </div>
       </div>
 
+      {isComplete ? (
+        <div className="mt-2 w-full flex justify-center">
+          <PracticeCompleteCard
+            mode="wheelRush"
+            words={foundWords}
+            locale={language}
+            onPlayAgain={() => {
+              setFoundWords([]);
+              setBuilt([]);
+              setFeedback(null);
+              celebratedRef.current = false;
+              setOuter((prev) => {
+                const arr = [...prev];
+                for (let i = arr.length - 1; i > 0; i--) {
+                  const j = Math.floor(Math.random() * (i + 1));
+                  [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+              });
+            }}
+          />
+        </div>
+      ) : (
+        <>
       <div
         data-testid="practice-current-word"
         className="min-h-[2.25rem] font-neo-display font-black text-2xl text-neo-cream tracking-widest"
@@ -373,29 +397,7 @@ export default function PracticeWheelSandbox() {
           ))}
         </ul>
       )}
-
-      {isComplete && (
-        <div className="mt-2 w-full flex justify-center">
-          <PracticeCompleteCard
-            mode="wheelRush"
-            words={foundWords}
-            locale={language}
-            onPlayAgain={() => {
-              setFoundWords([]);
-              setBuilt([]);
-              setFeedback(null);
-              celebratedRef.current = false;
-              setOuter((prev) => {
-                const arr = [...prev];
-                for (let i = arr.length - 1; i > 0; i--) {
-                  const j = Math.floor(Math.random() * (i + 1));
-                  [arr[i], arr[j]] = [arr[j], arr[i]];
-                }
-                return arr;
-              });
-            }}
-          />
-        </div>
+        </>
       )}
     </div>
   );
