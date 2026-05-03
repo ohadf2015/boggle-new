@@ -27,8 +27,9 @@ export function useHighlightClock(): ClockApi {
   const rafRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number | null>(null);
   const runningRef = useRef(false);
+  const tickRef = useRef<(time: number) => void>(() => {});
 
-  const tick = useCallback((time: number) => {
+  tickRef.current = (time: number) => {
     if (!runningRef.current) return;
     if (lastTimeRef.current == null) lastTimeRef.current = time;
     const delta = time - lastTimeRef.current;
@@ -38,14 +39,14 @@ export function useHighlightClock(): ClockApi {
       elapsed: stateRef.current.elapsed + delta * stateRef.current.rate,
     };
     setState(next);
-    rafRef.current = requestAnimationFrame(tick);
-  }, []);
+    rafRef.current = requestAnimationFrame((t) => tickRef.current(t));
+  };
 
   const start = useCallback(() => {
     runningRef.current = true;
     lastTimeRef.current = null;
-    rafRef.current = requestAnimationFrame(tick);
-  }, [tick]);
+    rafRef.current = requestAnimationFrame((t) => tickRef.current(t));
+  }, []);
 
   const stop = useCallback(() => {
     runningRef.current = false;
