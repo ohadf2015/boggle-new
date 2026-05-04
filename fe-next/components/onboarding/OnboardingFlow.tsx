@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { markOnboardingComplete, markOnboardingSkipped, consumePendingRoomInvite, hasPendingRoomInvite, getPendingRoomInvite } from '@/utils/onboardingStorage';
+import { markOnboardingComplete, markOnboardingSkipped, consumePendingRoomInvite, hasPendingRoomInvite } from '@/utils/onboardingStorage';
 import { markGuidanceShown } from '@/utils/contextualGuidanceStorage';
 import { setStoredCustomAvatar } from '@/utils/profileStorage';
 import {
@@ -16,6 +16,7 @@ import {
   markFirstGameActivation,
 } from '@/utils/growthTracking';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { useInviteOnboardingMode, type FlowStep, STEPS, INVITE_STEPS } from '@/hooks/useInviteOnboardingMode';
 import LanguageSelect from './LanguageSelect';
 import TutorialGame from './TutorialGame';
 import QuickProfileSetup from './QuickProfileSetup';
@@ -27,11 +28,6 @@ import CrazyGamesWelcome, { type CrazyGamesMode } from './CrazyGamesWelcome';
 import CrazyGamesTutorial from './CrazyGamesTutorial';
 import AuthModal from '@/components/auth/AuthModal';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
-
-type FlowStep = 'returningUser' | 'language' | 'tutorial' | 'profile' | 'scoreReveal' | 'inviteTutorial';
-
-const STEPS: FlowStep[] = ['language', 'returningUser', 'tutorial', 'profile', 'scoreReveal'];
-const INVITE_STEPS: FlowStep[] = ['language', 'profile', 'inviteTutorial'];
 
 /** Step-specific accent colors for the floating background shapes */
 const STEP_ACCENTS: Record<FlowStep, { color1: string; color2: string }> = {
@@ -71,16 +67,6 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   // Route transitions are outside React's lifecycle, so the modal would otherwise
   // sit silently while Next.js fetches the destination page.
   const [isNavigating, setIsNavigating] = useState(false);
-
-  // Snapshot the pending invite at mount. The user can dismiss/consume it mid-flow,
-  // but we want UI continuity (banner with hostName) until the step itself completes.
-  const inviteAtMountRef = useRef<{ code: string; hostName?: string } | null>(null);
-  const [isInviteMode] = useState(() => {
-    const inv = getPendingRoomInvite();
-    if (inv) inviteAtMountRef.current = { code: inv.code, hostName: inv.hostName };
-    return !!inv;
-  });
-  const activeSteps = isInviteMode ? INVITE_STEPS : STEPS;
 
   // Funnel timing + step counter — captured at mount so completion/skip
   // events can carry duration_ms and step_count without prop-drilling.
@@ -162,6 +148,20 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     onComplete();
   }, [isNavigating, language, router, onComplete, emitSkipped, step]);
 
+  // Step 2: Profile complete setup
+  const playerNameEditedRef = useRef(false);
+
+  const { isInviteMode, inviteAtMount, activeSteps, handleInviteTeaserComplete } = useInviteOnboardingMode({
+    language,
+    router,
+    onComplete,
+    isNavigating,
+    setIsNavigating,
+    getPlayerName: () => playerName,
+    getNameEdited: () => playerNameEditedRef.current,
+    emitCompleted,
+  });
+
   const stepIndex = useMemo(() => activeSteps.indexOf(step), [step, activeSteps]);
   const accent = STEP_ACCENTS[step];
 
@@ -183,8 +183,6 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     [recordStep]
   );
 
-  // Step 2: Profile complete
-  const playerNameEditedRef = useRef(false);
   const handleProfileComplete = useCallback(
     (name: string, avatar: CustomAvatarConfig, nameEdited: boolean) => {
       setPlayerName(name);
@@ -196,31 +194,14 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       recordStep('profile', { hasPendingInvite: pendingInvite, nameEdited });
 
       // Invite-mode: profile saved → user plays the one-moment teaser before joining the room.
-      // Navigation happens after teaser complete OR skip.
       if (isInviteMode && pendingInvite) {
         setStep('inviteTutorial');
         return;
       }
 
-      // Legacy fallthrough: pre-isInviteMode callers that still expect direct jump
-      if (pendingInvite) {
-        markOnboardingComplete({
-          avatarId: 'custom',
-          displayName: name,
-          selectedMode: 'multi',
-          nameEdited,
-        });
-        const roomCode = consumePendingRoomInvite();
-        setIsNavigating(true);
-        router.push(`/${language}/multiplayer?room=${roomCode}`);
-        emitCompleted({ via: 'pending_invite' });
-        onComplete();
-        return;
-      }
-
       setStep('scoreReveal');
     },
-    [language, router, onComplete, recordStep, emitCompleted, isInviteMode]
+    [recordStep, isInviteMode]
   );
 
 
@@ -249,22 +230,6 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     emitCompleted({ via: 'score_reveal' });
     onComplete();
   }, [isNavigating, language, router, onComplete, playerName, recordStep, emitCompleted]);
-
-  // Invite mode teaser complete — navigate to the room
-  const handleInviteTeaserComplete = useCallback(() => {
-    if (isNavigating) return;
-    setIsNavigating(true);
-    markOnboardingComplete({
-      avatarId: 'custom',
-      displayName: playerName || 'Player',
-      selectedMode: 'multi',
-      nameEdited: playerNameEditedRef.current,
-    });
-    const roomCode = consumePendingRoomInvite();
-    router.push(`/${language}/multiplayer?room=${roomCode}`);
-    emitCompleted({ via: 'invite_tutorial' });
-    onComplete();
-  }, [isNavigating, language, router, onComplete, playerName, emitCompleted]);
 
   // Step 0: Language selected — proceed to returningUser prompt
   // On CrazyGames the "have an account" branch is dead (no external auth),
@@ -322,8 +287,8 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           <QuickProfileSetup
             onComplete={handleProfileComplete}
             hasPendingInvite={hasPendingRoomInvite()}
-            inviteContext={isInviteMode && inviteAtMountRef.current
-              ? { roomCode: inviteAtMountRef.current.code, hostName: inviteAtMountRef.current.hostName }
+            inviteContext={isInviteMode && inviteAtMount
+              ? { roomCode: inviteAtMount.code, hostName: inviteAtMount.hostName }
               : undefined}
             onSkipInvite={isInviteMode ? handleSkipOnboarding : undefined}
           />
@@ -337,15 +302,14 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           />
         );
       case 'inviteTutorial': {
-        const ctx = inviteAtMountRef.current;
-        if (!ctx) {
+        if (!inviteAtMount) {
           handleSkipOnboarding();
           return null;
         }
         return (
           <InviteTutorialTeaser
-            roomCode={ctx.code}
-            hostName={ctx.hostName}
+            roomCode={inviteAtMount.code}
+            hostName={inviteAtMount.hostName}
             onComplete={handleInviteTeaserComplete}
             onSkip={handleSkipOnboarding}
           />
