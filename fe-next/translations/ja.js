@@ -11071,6 +11071,38 @@ const ja = {
     "socialProof": "今日{{count}}人が参加",
     "aboveYourNorm": "平均より+{{delta}}%",
     "belowYourNorm": "平均より{{delta}}%"
+  },
+  "wordcraft": {
+    "title": "WordCraft",
+    "adminBadge": "管理者サンドボックス · 単語グリッド",
+    "you": "あなた",
+    "bot": "WordBot",
+    "tied": "引き分け",
+    "yourTurn": "あなたの番",
+    "botTurn": "WordBotが考え中…",
+    "gameOver": "ゲーム終了",
+    "winnerLabel": "{{name}}の勝ち!",
+    "bagRemaining": "袋",
+    "yourRack": "あなたのラック",
+    "submit": "決定",
+    "recall": "戻す",
+    "pass": "パス",
+    "swap": "交換",
+    "history": "最近の手",
+    "passed": "パスしました",
+    "loadingDict": "辞書を読み込み中…",
+    "error": {
+      "dictLoading": "辞書を読み込んでいます。",
+      "invalidWord": "{{word}}は辞書にありません。",
+      "mustCoverCenter": "最初の単語は中央の星をカバーする必要があります。",
+      "tooShort": "単語は2文字以上必要です。",
+      "notLinear": "タイルは1行または1列に配置してください。",
+      "notContiguous": "タイルは連続している必要があります。",
+      "disconnected": "単語は既存のタイルとつながっている必要があります。",
+      "outOfBounds": "タイルがボードの外に置かれています。",
+      "noTiles": "プレイするには少なくとも1つのタイルを置いてください。",
+      "bagTooSmallToSwap": "袋に交換するための十分なタイルがありません。"
+    }
   }
 };
 

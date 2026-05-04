@@ -11244,6 +11244,38 @@ const en = {
     "socialProof": "Joined {{count}} players today",
     "aboveYourNorm": "+{{delta}}% above your average",
     "belowYourNorm": "{{delta}}% below your average"
+  },
+  "wordcraft": {
+    "title": "WordCraft",
+    "adminBadge": "Admin sandbox · Tournament word grid",
+    "you": "You",
+    "bot": "WordBot",
+    "tied": "Tied",
+    "yourTurn": "Your turn",
+    "botTurn": "WordBot is thinking…",
+    "gameOver": "Game over",
+    "winnerLabel": "{{name}} wins!",
+    "bagRemaining": "Bag",
+    "yourRack": "Your rack",
+    "submit": "Submit",
+    "recall": "Recall",
+    "pass": "Pass",
+    "swap": "Swap",
+    "history": "Recent moves",
+    "passed": "passed",
+    "loadingDict": "Loading dictionary…",
+    "error": {
+      "dictLoading": "Dictionary still loading.",
+      "invalidWord": "{{word}} is not in the dictionary.",
+      "mustCoverCenter": "First word must cover the center star.",
+      "tooShort": "Words need at least 2 letters.",
+      "notLinear": "Place tiles in a single row or column.",
+      "notContiguous": "Tiles must be contiguous.",
+      "disconnected": "Word must connect to an existing tile.",
+      "outOfBounds": "Tile placed off the board.",
+      "noTiles": "Place at least one tile to play.",
+      "bagTooSmallToSwap": "Not enough tiles in the bag to swap."
+    }
   }
 };
 

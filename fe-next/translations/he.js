@@ -11144,6 +11144,38 @@ const he = {
     "socialProof": "{{count}} שחקנים שיחקו היום",
     "aboveYourNorm": "+{{delta}}% מעל הממוצע שלך",
     "belowYourNorm": "{{delta}}% מתחת לממוצע שלך"
+  },
+  "wordcraft": {
+    "title": "WordCraft",
+    "adminBadge": "ארגז חול למנהלים · לוח מילים תחרותי",
+    "you": "אתה",
+    "bot": "WordBot",
+    "tied": "תיקו",
+    "yourTurn": "התור שלך",
+    "botTurn": "WordBot חושב…",
+    "gameOver": "המשחק נגמר",
+    "winnerLabel": "{{name}} ניצח!",
+    "bagRemaining": "שק",
+    "yourRack": "האותיות שלך",
+    "submit": "שלח",
+    "recall": "החזר",
+    "pass": "דלג",
+    "swap": "החלף",
+    "history": "מהלכים אחרונים",
+    "passed": "דילג",
+    "loadingDict": "טוען מילון…",
+    "error": {
+      "dictLoading": "המילון עדיין נטען.",
+      "invalidWord": "{{word}} לא נמצא במילון.",
+      "mustCoverCenter": "המילה הראשונה חייבת לכסות את הכוכב המרכזי.",
+      "tooShort": "מילים חייבות לפחות 2 אותיות.",
+      "notLinear": "יש להניח את האותיות בשורה או בעמודה אחת.",
+      "notContiguous": "האותיות חייבות להיות רצופות.",
+      "disconnected": "המילה חייבת להתחבר לאות קיימת.",
+      "outOfBounds": "האות הונחה מחוץ ללוח.",
+      "noTiles": "הנח לפחות אות אחת.",
+      "bagTooSmallToSwap": "אין מספיק אותיות בשק כדי להחליף."
+    }
   }
 };
 

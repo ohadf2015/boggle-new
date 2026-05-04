@@ -11174,6 +11174,38 @@ const es = {
     "socialProof": "Hoy se unieron {{count}} jugadores",
     "aboveYourNorm": "+{{delta}}% sobre tu promedio",
     "belowYourNorm": "{{delta}}% bajo tu promedio"
+  },
+  "wordcraft": {
+    "title": "WordCraft",
+    "adminBadge": "Sandbox de admin · Tablero de palabras",
+    "you": "Tú",
+    "bot": "WordBot",
+    "tied": "Empate",
+    "yourTurn": "Tu turno",
+    "botTurn": "WordBot está pensando…",
+    "gameOver": "Fin del juego",
+    "winnerLabel": "¡{{name}} gana!",
+    "bagRemaining": "Bolsa",
+    "yourRack": "Tu atril",
+    "submit": "Jugar",
+    "recall": "Devolver",
+    "pass": "Pasar",
+    "swap": "Cambiar",
+    "history": "Jugadas recientes",
+    "passed": "pasó",
+    "loadingDict": "Cargando diccionario…",
+    "error": {
+      "dictLoading": "El diccionario aún se está cargando.",
+      "invalidWord": "{{word}} no está en el diccionario.",
+      "mustCoverCenter": "La primera palabra debe cubrir la estrella central.",
+      "tooShort": "Las palabras deben tener al menos 2 letras.",
+      "notLinear": "Coloca las fichas en una sola fila o columna.",
+      "notContiguous": "Las fichas deben ser contiguas.",
+      "disconnected": "La palabra debe conectar con una ficha existente.",
+      "outOfBounds": "Ficha colocada fuera del tablero.",
+      "noTiles": "Coloca al menos una ficha para jugar.",
+      "bagTooSmallToSwap": "No hay suficientes fichas en la bolsa para cambiar."
+    }
   }
 };
 

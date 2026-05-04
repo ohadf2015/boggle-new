@@ -11139,6 +11139,38 @@ const sv = {
     "socialProof": "Gick med {{count}} spelare idag",
     "aboveYourNorm": "+{{delta}}% över ditt snitt",
     "belowYourNorm": "{{delta}}% under ditt snitt"
+  },
+  "wordcraft": {
+    "title": "WordCraft",
+    "adminBadge": "Admin-sandlåda · Tävlings-ordbräde",
+    "you": "Du",
+    "bot": "WordBot",
+    "tied": "Oavgjort",
+    "yourTurn": "Din tur",
+    "botTurn": "WordBot tänker…",
+    "gameOver": "Spelet är slut",
+    "winnerLabel": "{{name}} vinner!",
+    "bagRemaining": "Påse",
+    "yourRack": "Ditt ställ",
+    "submit": "Skicka",
+    "recall": "Ångra",
+    "pass": "Passa",
+    "swap": "Byt",
+    "history": "Senaste drag",
+    "passed": "passade",
+    "loadingDict": "Läser in ordlista…",
+    "error": {
+      "dictLoading": "Ordlistan laddas fortfarande.",
+      "invalidWord": "{{word}} finns inte i ordlistan.",
+      "mustCoverCenter": "Första ordet måste täcka mittstjärnan.",
+      "tooShort": "Ord behöver minst 2 bokstäver.",
+      "notLinear": "Lägg brickorna i en rad eller kolumn.",
+      "notContiguous": "Brickorna måste vara sammanhängande.",
+      "disconnected": "Ordet måste ansluta till en befintlig bricka.",
+      "outOfBounds": "Brickan placerad utanför brädet.",
+      "noTiles": "Lägg minst en bricka för att spela.",
+      "bagTooSmallToSwap": "Inte tillräckligt med brickor i påsen för att byta."
+    }
   }
 };
 
