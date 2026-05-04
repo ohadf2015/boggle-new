@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useInviteContext } from '@/hooks/useInviteContext';
 import { consumePendingRoomInvite } from '@/utils/onboardingStorage';
+import { trackPracticePendingBannerClicked } from '@/utils/growthTracking';
 
 const DISMISS_KEY = 'lexiclash_invite_banner_dismissed';
 
@@ -24,10 +25,21 @@ const PendingRoomBanner: React.FC<Props> = ({ locale }) => {
   const [dismissed, setDismissed] = useState(() =>
     typeof window !== 'undefined' && sessionStorage.getItem(DISMISS_KEY) === '1',
   );
+  const mountedAtRef = useRef<number>(0);
+
+  useEffect(() => {
+    mountedAtRef.current = Date.now();
+  }, []);
 
   const handleClick = useCallback(() => {
     const code = consumePendingRoomInvite();
-    if (code) router.push(`/${locale}/multiplayer?room=${code}`);
+    if (code) {
+      trackPracticePendingBannerClicked({
+        roomCode: code,
+        secondsOnPracticeHub: Math.round((Date.now() - mountedAtRef.current) / 1000),
+      });
+      router.push(`/${locale}/multiplayer?room=${code}`);
+    }
   }, [locale, router]);
 
   const handleDismiss = useCallback(() => {

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { trackInviteTutorialStarted, trackInviteTutorialWordFound } from '@/utils/growthTracking';
 import InviteContextBanner from './InviteContextBanner';
 
 interface Props {
@@ -30,6 +31,7 @@ const InviteTutorialTeaser: React.FC<Props> = ({ roomCode, hostName, onComplete,
   const { t, dir } = useLanguage();
   const [selected, setSelected] = useState<number[]>([]);
   const [state, setState] = useState<TeaserState>('idle');
+  const startedAtRef = useRef<number>(0);
 
   const word = selected.map((i) => TEASER_LETTERS[i]).join('');
 
@@ -56,8 +58,19 @@ const InviteTutorialTeaser: React.FC<Props> = ({ roomCode, hostName, onComplete,
       setState('invalid');
       return;
     }
+    trackInviteTutorialWordFound({
+      roomCode,
+      word: word.toUpperCase(),
+      secondsSinceStart: startedAtRef.current ? Math.round((Date.now() - startedAtRef.current) / 1000) : 0,
+    });
     setState('celebrating');
-  }, [word]);
+  }, [word, roomCode]);
+
+  // Initialize tracking timer on mount
+  useEffect(() => {
+    startedAtRef.current = Date.now();
+    trackInviteTutorialStarted({ roomCode });
+  }, [roomCode]);
 
   // Auto-advance once celebrating
   useEffect(() => {

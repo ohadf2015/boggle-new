@@ -14,13 +14,14 @@ import {
   trackOnboardingCompleted,
   trackOnboardingSkipped,
   markFirstGameActivation,
+  trackInviteTutorialSkipped,
+  trackInviteConsumed,
 } from '@/utils/growthTracking';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
-import { useInviteOnboardingMode, type FlowStep, STEPS, INVITE_STEPS } from '@/hooks/useInviteOnboardingMode';
+import { useInviteOnboardingMode, type FlowStep } from '@/hooks/useInviteOnboardingMode';
 import LanguageSelect from './LanguageSelect';
 import TutorialGame from './TutorialGame';
 import QuickProfileSetup from './QuickProfileSetup';
-import ScoreRevealV2 from './ScoreRevealV2';
 import OnboardingProgress from './OnboardingProgress';
 import ReturningUserStep from './ReturningUserStep';
 import InviteTutorialTeaser from './InviteTutorialTeaser';
@@ -35,7 +36,6 @@ const STEP_ACCENTS: Record<FlowStep, { color1: string; color2: string }> = {
   language: { color1: 'rgba(191,255,0,0.07)', color2: 'rgba(0,255,255,0.05)' },
   tutorial: { color1: 'rgba(0,255,255,0.06)', color2: 'rgba(191,255,0,0.04)' },
   profile: { color1: 'rgba(255,20,147,0.06)', color2: 'rgba(191,255,0,0.04)' },
-  scoreReveal: { color1: 'rgba(191,255,0,0.08)', color2: 'rgba(255,20,147,0.05)' },
   inviteTutorial: { color1: 'rgba(255,20,147,0.10)', color2: 'rgba(0,255,255,0.05)' },
 };
 
@@ -45,7 +45,7 @@ interface OnboardingFlowProps {
 
 /**
  * OnboardingFlow - Orchestrates the full FTUE.
- * State machine: language -> tutorial -> profile -> scoreReveal -> home.
+ * State machine: language -> tutorial -> profile -> home.
  * Full-screen with floating geometric background and progress dots.
  */
 const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
@@ -58,8 +58,6 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   // CG portal substep: tutorial first, then welcome with mode CTAs.
   const [cgTutorialDone, setCgTutorialDone] = useState(false);
-  const [tutorialScore, setTutorialScore] = useState(0);
-  const [, setTutorialWords] = useState<string[]>([]);
   const [tutorialAttempt] = useState(1);
   const [playerName, setPlayerName] = useState('');
   const [, setPlayerAvatar] = useState<CustomAvatarConfig | null>(null);
@@ -75,6 +73,11 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const startedAtRef = useRef<number>(0);
   const stepsCompletedRef = useRef<number>(0);
   const completionEmittedRef = useRef<boolean>(false);
+  // Store invite context for use in callbacks (updated after hook call)
+  const inviteContextRef = useRef<{ isInviteMode: boolean; inviteAtMount: { code: string; hostName?: string } | null }>({
+    isInviteMode: false,
+    inviteAtMount: null,
+  });
 
   useEffect(() => {
     startedAtRef.current = Date.now();
@@ -139,6 +142,23 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     setIsNavigating(true);
     markOnboardingSkipped();
     emitSkipped(step);
+    // Track invite-specific skip event if applicable
+    const { isInviteMode, inviteAtMount } = inviteContextRef.current;
+    if (isInviteMode && inviteAtMount) {
+      const landedTs = Number(sessionStorage.getItem('invite_landed_ts') || '0');
+      const secondsSinceLanded = landedTs ? Math.round((Date.now() - landedTs) / 1000) : 0;
+      trackInviteTutorialSkipped({
+        roomCode: inviteAtMount.code,
+        step: step === 'inviteTutorial' ? 'tutorial' : 'profile',
+        secondsSinceLanded,
+      });
+      const totalSeconds = landedTs ? Math.round((Date.now() - landedTs) / 1000) : 0;
+      trackInviteConsumed({
+        roomCode: inviteAtMount.code,
+        path: 'skip',
+        totalSeconds,
+      });
+    }
     const pendingRoom = consumePendingRoomInvite();
     router.push(
       pendingRoom
@@ -162,14 +182,17 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     emitCompleted,
   });
 
+  // Update invite context ref for use in callback handlers
+  useEffect(() => {
+    inviteContextRef.current = { isInviteMode, inviteAtMount };
+  }, [isInviteMode, inviteAtMount]);
+
   const stepIndex = useMemo(() => activeSteps.indexOf(step), [step, activeSteps]);
   const accent = STEP_ACCENTS[step];
 
   // Step 1: Tutorial complete
   const handleTutorialComplete = useCallback(
     (score: number, wordsFound: string[]) => {
-      setTutorialScore(score);
-      setTutorialWords(wordsFound);
       markGuidanceShown('firstPlayTutorialCompleted');
       recordStep('tutorial', { score, wordCount: wordsFound.length });
       markFirstGameActivation({
@@ -183,8 +206,13 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     [recordStep]
   );
 
+  // Step 3: Profile complete → finish onboarding and route to practice/invite.
+  // The score-reveal interstitial used to live between this step and navigation,
+  // but it duplicated info already shown on the practice hub (gold/streak/title)
+  // and added a needless tap before the user could play.
   const handleProfileComplete = useCallback(
     (name: string, avatar: CustomAvatarConfig, nameEdited: boolean) => {
+      if (isNavigating) return;
       setPlayerName(name);
       setPlayerAvatar(avatar);
       setStoredCustomAvatar(avatar);
@@ -193,42 +221,30 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       const pendingInvite = hasPendingRoomInvite();
       recordStep('profile', { hasPendingInvite: pendingInvite, nameEdited });
 
-      // Invite-mode: profile saved → user plays the one-moment teaser before joining the room.
       if (isInviteMode && pendingInvite) {
         setStep('inviteTutorial');
         return;
       }
 
-      setStep('scoreReveal');
+      setIsNavigating(true);
+      markOnboardingComplete({
+        avatarId: 'custom',
+        displayName: name || 'Player',
+        selectedMode: 'home',
+        nameEdited,
+      });
+
+      const pendingRoom = consumePendingRoomInvite();
+      if (pendingRoom) {
+        router.push(`/${language}/multiplayer?room=${pendingRoom}`);
+      } else {
+        router.push(`/${language}/practice`);
+      }
+      emitCompleted({ via: 'profile' });
+      onComplete();
     },
-    [recordStep, isInviteMode]
+    [recordStep, isInviteMode, isNavigating, language, router, onComplete, emitCompleted]
   );
-
-  // Step 3: Score reveal complete — finish onboarding and land on the home page.
-  // The mode-fork screen used to live here; we now skip it so first-timers go
-  // straight to the full landing UX where they can pick any mode themselves.
-  const handleContinue = useCallback(() => {
-    if (isNavigating) return;
-    setIsNavigating(true);
-    recordStep('score_reveal', { action: 'continue' });
-    markOnboardingComplete({
-      avatarId: 'custom',
-      displayName: playerName || 'Player',
-      selectedMode: 'home',
-      nameEdited: playerNameEditedRef.current,
-    });
-
-    const pendingRoom = consumePendingRoomInvite();
-    if (pendingRoom) {
-      router.push(`/${language}/multiplayer?room=${pendingRoom}`);
-    } else {
-      // First-timers with no invite land in cozy practice hub to learn modes
-      // before facing real opponents. Reduces "dropped into MP cold" churn.
-      router.push(`/${language}/practice`);
-    }
-    emitCompleted({ via: 'score_reveal' });
-    onComplete();
-  }, [isNavigating, language, router, onComplete, playerName, recordStep, emitCompleted]);
 
   // Step 0: Language selected — proceed to returningUser prompt
   // On CrazyGames the "have an account" branch is dead (no external auth),
@@ -290,14 +306,6 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
               ? { roomCode: inviteAtMount.code, hostName: inviteAtMount.hostName }
               : undefined}
             onSkipInvite={isInviteMode ? handleSkipOnboarding : undefined}
-          />
-        );
-      case 'scoreReveal':
-        return (
-          <ScoreRevealV2
-            score={tutorialScore}
-            onContinue={handleContinue}
-            onSkip={handleSkipOnboarding}
           />
         );
       case 'inviteTutorial': {

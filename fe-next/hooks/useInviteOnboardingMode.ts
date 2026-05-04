@@ -7,16 +7,16 @@ import {
   consumePendingRoomInvite,
   markOnboardingComplete,
 } from '@/utils/onboardingStorage';
+import { trackInviteConsumed } from '@/utils/growthTracking';
 
 export type FlowStep =
   | 'returningUser'
   | 'language'
   | 'tutorial'
   | 'profile'
-  | 'scoreReveal'
   | 'inviteTutorial';
 
-export const STEPS: FlowStep[] = ['language', 'returningUser', 'tutorial', 'profile', 'scoreReveal'];
+export const STEPS: FlowStep[] = ['language', 'returningUser', 'tutorial', 'profile'];
 export const INVITE_STEPS: FlowStep[] = ['language', 'profile', 'inviteTutorial'];
 
 interface InviteContext {
@@ -71,6 +71,14 @@ export function useInviteOnboardingMode(
       nameEdited: getNameEdited(),
     });
     const roomCode = consumePendingRoomInvite();
+    // Track invite completion event
+    const landedTs = Number(sessionStorage.getItem('invite_landed_ts') || '0');
+    const totalSeconds = landedTs ? Math.round((Date.now() - landedTs) / 1000) : 0;
+    trackInviteConsumed({
+      roomCode: roomCode || '',
+      path: 'tutorial',
+      totalSeconds,
+    });
     router.push(`/${language}/multiplayer?room=${roomCode}`);
     emitCompleted({ via: 'invite_tutorial' });
     onComplete();
