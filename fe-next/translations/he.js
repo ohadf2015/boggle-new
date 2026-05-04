@@ -5476,6 +5476,9 @@ const he = {
       "watchOthers": "צפו בשחקנים שנותרו",
       "viewBoard": "צפייה בלוח",
       "boardReview": "סקירת לוח",
+      "ladder": {
+        "empty": "אין מילים עדיין — מצאו את הראשונה!",
+      },
     },
     "shareResult": "שתפו תוצאה",
     "quitConfirmTitle": "לעזוב את הציד?",

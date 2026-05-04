@@ -5745,6 +5745,9 @@ const es = {
       "watchOthers": "Observa a los jugadores restantes",
       "viewBoard": "Ver tablero",
       "boardReview": "Revisión del tablero",
+      "ladder": {
+        "empty": "¡Aún no hay palabras! Encuentra la primera.",
+      },
     },
     "facts": {
       "title": "Datos Curiosos",

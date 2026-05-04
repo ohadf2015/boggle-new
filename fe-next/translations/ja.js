@@ -5510,6 +5510,9 @@ const ja = {
       "watchOthers": "残りのプレイヤーを見る",
       "viewBoard": "ボード表示",
       "boardReview": "ボードレビュー",
+      "ladder": {
+        "empty": "まだ単語がありません — 最初の一つを見つけよう！",
+      },
     },
     "shareResult": "結果をシェア",
     "quitConfirmTitle": "ハントを終了する？",

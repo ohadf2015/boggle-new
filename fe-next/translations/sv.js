@@ -5479,6 +5479,9 @@ const sv = {
       "watchOthers": "Titta på de kvarvarande spelarna",
       "viewBoard": "Visa bräde",
       "boardReview": "Brädesöversikt",
+      "ladder": {
+        "empty": "Inga ord ännu — hitta det första!",
+      },
     },
     "shareResult": "Dela resultat",
     "quitConfirmTitle": "Lämna jakten?",

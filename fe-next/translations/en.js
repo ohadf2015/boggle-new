@@ -5579,6 +5579,9 @@ const en = {
       "watchOthers": "Watch the remaining players",
       "viewBoard": "View Board",
       "boardReview": "Board Review",
+      "ladder": {
+        "empty": "No words yet — find the first one!",
+      },
     },
     "shareResult": "Share",
     "quitConfirmTitle": "Leave the Hunt?",

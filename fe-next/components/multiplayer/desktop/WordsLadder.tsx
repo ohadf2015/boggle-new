@@ -1,3 +1,5 @@
+import { useLanguage } from '@/contexts/LanguageContext';
+
 export interface LadderWord {
   word: string;
   score: number;
@@ -7,15 +9,55 @@ export interface LadderWord {
   inputMethod?: 'kb' | 'drag';
 }
 
-/** Placeholder — real implementation in Task P2.T8. */
-export function WordsLadder({ words }: { words: LadderWord[]; meId?: string }) {
+interface WordsLadderProps {
+  words: LadderWord[];
+  meId?: string;
+}
+
+/**
+ * Live-updating found-words ladder for the desktop shell's right rail.
+ * - Newest first (sorted by ts desc)
+ * - Mine vs opponent tinted (own words full opacity, opponent dimmed)
+ * - Stolen words shown with strike-through
+ * - Top entry pulses (`animate-ladder-bump`) on insert; reduced-motion no-ops it
+ * - aria-live="polite" so screen readers announce new words
+ */
+export function WordsLadder({ words, meId }: WordsLadderProps) {
+  const { t } = useLanguage();
+  const sorted = [...words].sort((a, b) => b.ts - a.ts);
+
+  if (sorted.length === 0) {
+    return (
+      <div data-testid="ladder-empty" className="p-4 text-center opacity-50 text-sm">
+        {t('mp.ladder.empty')}
+      </div>
+    );
+  }
+
   return (
-    <ul className="flex flex-col gap-1 p-2" data-component="words-ladder">
-      {words.map((w, i) => (
-        <li key={`${w.word}-${w.ts}-${i}`} className="flex justify-between text-sm">
-          <span className="font-mono">{w.word}</span><span className="opacity-60">{w.score}</span>
-        </li>
-      ))}
+    <ul
+      className="flex flex-col gap-1 p-2 overflow-y-auto"
+      data-component="words-ladder"
+      aria-live="polite"
+    >
+      {sorted.map((w, idx) => {
+        const mine = !!meId && w.userId === meId;
+        const stolen = !!w.stolenFrom;
+        return (
+          <li
+            key={`${w.word}-${w.ts}`}
+            data-testid={`ladder-row-${w.word}`}
+            data-row="true"
+            data-mine={String(mine)}
+            data-stolen={String(stolen)}
+            data-bump={idx === 0 ? 'true' : 'false'}
+            className={`flex justify-between items-center text-sm px-2 py-1 rounded ${mine ? 'text-foreground' : 'text-foreground/60'} ${stolen ? 'line-through decoration-red-500' : ''} ${idx === 0 ? 'animate-ladder-bump font-bold' : ''}`}
+          >
+            <span className="font-mono">{w.word}</span>
+            <span className="tabular-nums">{w.score}</span>
+          </li>
+        );
+      })}
     </ul>
   );
 }
