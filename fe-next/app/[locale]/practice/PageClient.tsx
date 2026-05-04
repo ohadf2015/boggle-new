@@ -9,6 +9,7 @@ import { PRACTICE_MODES } from '@/lib/practice/practiceRoute';
 import { usePracticeProgress } from '@/components/practice/usePracticeProgress';
 import PracticeStreakChip from '@/components/practice/PracticeStreakChip';
 import PracticeHubWelcome from '@/components/practice/PracticeHubWelcome';
+import PendingRoomBanner from '@/components/practice/PendingRoomBanner';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
 const MODE_ACCENT: Record<PracticeMode, string> = {
@@ -37,6 +38,7 @@ export default function PracticeHubClient({ locale }: Props) {
   return (
     <div className="min-h-[100dvh] w-full bg-linear-to-b from-neo-navy to-neo-navy-light px-6 py-10">
       <div className="max-w-md mx-auto">
+        <PendingRoomBanner locale={locale} />
         <AdaptiveMotion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
