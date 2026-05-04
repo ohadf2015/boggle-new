@@ -83,8 +83,27 @@ describe('useRewardedAd analytics', () => {
     expect(trackRewardedAdDeclined).toHaveBeenCalledWith(
       'daily_limit_reached',
       expect.any(String),
-      undefined,
+      'generic',
     );
     expect(trackRewardedAdWatched).not.toHaveBeenCalled();
+  });
+
+  it('threads explicit surface into the declined event', () => {
+    const today = new Date().toISOString().slice(0, 10);
+    localStorage.setItem(
+      'lexiclash_daily_ad_views',
+      JSON.stringify({ date: today, count: 10 }),
+    );
+
+    const { result } = renderHook(() => useRewardedAd({ analyticsSurface: 'blast_wave_continue' }));
+    act(() => {
+      result.current.showAd();
+    });
+
+    expect(trackRewardedAdDeclined).toHaveBeenCalledWith(
+      'daily_limit_reached',
+      expect.any(String),
+      'blast_wave_continue',
+    );
   });
 });

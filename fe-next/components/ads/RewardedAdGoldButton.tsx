@@ -37,6 +37,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
 
   const { showAd, prepareAd, status, isPlaceholderCooldown } = useRewardedAd({
     surface: 'doubleGold',
+    analyticsSurface: surface,
     onRewardEarned: (amount) => {
       onRewardEarned?.(amount);
     },
