@@ -23,8 +23,8 @@ const r1_4_thaw: VaultGridConfig = {
 };
 
 export default function DevVaultGridPage() {
-  if (process.env.NODE_ENV === 'production') return null;
   const [log, setLog] = useState<SubmitResult[]>([]);
+  if (process.env.NODE_ENV === 'production') return null;
   const handle = (r: SubmitResult) => setLog((l) => [r, ...l].slice(0, 20));
 
   return (
