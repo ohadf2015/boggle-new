@@ -231,6 +231,60 @@ describe('useGameTimer - Multiplayer Synchronization', () => {
     expect(result.current.isRunning).toBe(true);
   });
 
+  it('fires onTimeUp when setTime(0) is called from a non-zero state', () => {
+    const onTimeUp = vi.fn();
+
+    const { result } = renderHook(() =>
+      useGameTimer({
+        initialTime: 60,
+        autoStart: true,
+        onTimeUp,
+      })
+    );
+
+    expect(onTimeUp).not.toHaveBeenCalled();
+
+    act(() => {
+      result.current.setTime(0);
+    });
+
+    expect(onTimeUp).toHaveBeenCalledTimes(1);
+  });
+
+  it('does NOT re-fire onTimeUp on subsequent setTime(0) calls (idempotent)', () => {
+    const onTimeUp = vi.fn();
+
+    const { result } = renderHook(() =>
+      useGameTimer({
+        initialTime: 60,
+        autoStart: true,
+        onTimeUp,
+      })
+    );
+
+    act(() => { result.current.setTime(0); });
+    act(() => { result.current.setTime(0); });
+    act(() => { result.current.setTime(0); });
+
+    expect(onTimeUp).toHaveBeenCalledTimes(1);
+  });
+
+  it('does NOT fire onTimeUp when setTime is called with a non-zero value', () => {
+    const onTimeUp = vi.fn();
+
+    const { result } = renderHook(() =>
+      useGameTimer({
+        initialTime: 60,
+        autoStart: true,
+        onTimeUp,
+      })
+    );
+
+    act(() => { result.current.setTime(30); });
+
+    expect(onTimeUp).not.toHaveBeenCalled();
+  });
+
   it('should handle rapid pause/unpause cycles with server syncs', async () => {
     /**
      * Tests network jitter scenario where game state flickers rapidly

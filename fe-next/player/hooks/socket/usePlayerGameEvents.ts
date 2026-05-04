@@ -420,6 +420,20 @@ export function usePlayerGameEvents({
         setGameLanguage(data.language);
       }
 
+      // Game-end signal must run regardless of countdown-animation state — if
+      // the server says 0 remaining, the round IS over and the player needs the
+      // waiting-for-results UI plus the fallback timeout. Previously this branch
+      // sat below the showStartAnimation early-return, so a `timeUpdate(0)` that
+      // arrived while the 3-2-1 ripple was still on screen was silently dropped.
+      if (data.remainingTime <= 0) {
+        setGameActive(false);
+        gameActiveRef.current = false;
+        setShowStartAnimation(false);
+        setWaitingForResults(true);
+        startResultsTimeout();
+        return;
+      }
+
       // During countdown animation, sync the timer (above) but don't activate the game
       if (showStartAnimationRef.current) {
         return;
@@ -432,14 +446,6 @@ export function usePlayerGameEvents({
         setGameActive(true);
         gameActiveRef.current = true;
         setShowStartAnimation(false);
-      }
-
-      if (data.remainingTime <= 0) {
-        setGameActive(false);
-        gameActiveRef.current = false;
-        setShowStartAnimation(false);
-        setWaitingForResults(true);
-        startResultsTimeout();
       }
     };
 

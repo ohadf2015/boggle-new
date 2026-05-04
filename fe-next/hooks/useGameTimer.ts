@@ -298,6 +298,15 @@ export function useGameTimer(options: UseGameTimerOptions): GameTimerReturn {
     if (startTimestampRef.current !== null) {
       startTimestampRef.current = performance.now();
     }
+
+    // Honor the onTimeUp contract when a server sync drives the timer to 0.
+    // computeAndApplyTime would only fire onTimeUp via local ticking, so a
+    // direct setTime(0) (e.g. server `timeUpdate` carrying remainingTime=0)
+    // would otherwise silently swallow the callback.
+    if (clampedTime <= 0 && !timeUpCalledRef.current) {
+      timeUpCalledRef.current = true;
+      onTimeUpRef.current?.();
+    }
   }, [initialTime]);
 
   // Cleanup on unmount

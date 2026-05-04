@@ -34,7 +34,7 @@ export function startGameTimer(
   // Reset AI validation count for this game (hybrid cost-saving)
   resetGameAIValidationCount(gameCode);
 
-  const intervalMs = parseInt(process.env.TIME_UPDATE_INTERVAL_MS || '1000');
+  const intervalMs = parseInt(process.env.TIME_UPDATE_INTERVAL_MS || '1000', 10);
 
   // TIMESTAMP-BASED TIMING: Use actual elapsed time to prevent drift
   const startTimestamp = Date.now();
@@ -69,9 +69,15 @@ export function startGameTimer(
     // Broadcast every second for accurate client timer display
     // Previous "smart broadcasting" (every 10s) caused player timers to stutter
     if (secondChanged) {
+      // Read gameSessionId fresh — `game` was captured at startGameTimer call
+      // and `updateGame` mutates in place so the closure is currently safe, but
+      // reading via getGame() defends against any future immutable-update
+      // refactor that would silently start broadcasting stale session ids and
+      // make clients filter all `timeUpdate`s as stale.
+      const liveGame = getGame(gameCode);
       broadcastToRoom(io, getGameRoom(gameCode), 'timeUpdate', {
         remainingTime,
-        gameSessionId: game.gameSessionId,
+        gameSessionId: liveGame?.gameSessionId ?? game.gameSessionId,
       });
     }
     lastBroadcastSecond = remainingTime;
