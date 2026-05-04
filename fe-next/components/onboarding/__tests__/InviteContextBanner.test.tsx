@@ -38,7 +38,7 @@ describe('InviteContextBanner', () => {
   it('has accessible skip button with min height for touch targets', () => {
     wrap(<InviteContextBanner roomCode="ABC123" hostName="Alice" onSkip={() => {}} />);
     const skipBtn = screen.getByTestId('invite-banner-skip');
-    expect(skipBtn).toHaveClass('min-h-[40px]');
+    expect(skipBtn).toHaveClass('min-h-[44px]');
     expect(skipBtn).toHaveAttribute('type', 'button');
   });
 

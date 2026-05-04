@@ -26,7 +26,7 @@ const InviteContextBanner: React.FC<Props> = ({ roomCode, hostName, onSkip }) =>
       role="status"
       aria-live="polite"
     >
-      <p className="font-neo-display font-black text-sm uppercase tracking-wide truncate">
+      <p className="font-neo-display font-black text-sm uppercase tracking-wide truncate min-w-0">
         <span aria-hidden>👋 </span>
         {t('invite.banner.host', { hostName: displayName })}{' '}
         <span className="font-mono bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo">
@@ -37,7 +37,7 @@ const InviteContextBanner: React.FC<Props> = ({ roomCode, hostName, onSkip }) =>
         data-testid="invite-banner-skip"
         type="button"
         onClick={onSkip}
-        className="shrink-0 min-h-[40px] px-3 py-2 rounded-neo bg-neo-black text-neo-pink border-2 border-neo-black font-neo-display font-black text-xs uppercase tracking-wide active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+        className="shrink-0 min-h-[44px] px-3 py-2 rounded-neo bg-neo-black text-neo-pink border-2 border-neo-black font-neo-display font-black text-xs uppercase tracking-wide active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
       >
         {t('invite.banner.skipCTA')}
       </button>
