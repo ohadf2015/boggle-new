@@ -85,7 +85,7 @@ const InviteTutorialTeaser: React.FC<Props> = ({ roomCode, hostName, onComplete,
             const isSelected = selected.includes(idx);
             return (
               <button
-                key={idx}
+                key={letter}
                 data-testid={`teaser-tile-${letter}`}
                 type="button"
                 onClick={() => handleTap(idx)}
@@ -113,7 +113,7 @@ const InviteTutorialTeaser: React.FC<Props> = ({ roomCode, hostName, onComplete,
             data-testid="teaser-clear"
             type="button"
             onClick={handleClear}
-            className="min-h-[44px] px-4 py-2 rounded-neo border-2 border-neo-cream/30 text-neo-cream/80 font-neo-display text-sm uppercase tracking-wide active:translate-y-px"
+            className="min-h-[44px] px-4 py-2 rounded-neo border-2 border-neo-cream/60 text-neo-cream font-neo-display text-sm uppercase tracking-wide active:translate-y-px"
           >
             {t('invite.tutorial.clear')}
           </button>
