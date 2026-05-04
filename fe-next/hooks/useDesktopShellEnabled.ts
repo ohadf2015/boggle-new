@@ -1,5 +1,5 @@
 import { useIsDesktop } from './useMediaQuery';
-import { useExperiment } from '../lib/experiments';
+import { useExperiment } from './useExperiment';
 
 /**
  * Gates `MultiplayerDesktopShell` mounting.
@@ -15,7 +15,7 @@ import { useExperiment } from '../lib/experiments';
  */
 export function useDesktopShellEnabled(): boolean {
   const isDesktop = useIsDesktop();
-  const variant = useExperiment('mp.desktop-shell.v1');
+  const { variant } = useExperiment('mp.desktop-shell.v1');
   const flagOn = variant !== 'off';
   return isDesktop && flagOn;
 }
