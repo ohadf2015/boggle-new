@@ -246,3 +246,33 @@ describe('useBlastGsapTimelines.trackTimeline', () => {
     expect(teardown).not.toHaveBeenCalled();
   });
 });
+
+// ─── playPhaseTransition ────────────────────────────────────────────────
+describe('useBlastGsapTimelines.playPhaseTransition', () => {
+  it('exposes playPhaseTransition on the hook return', () => {
+    const { result } = renderHook(() => useBlastGsapTimelines(makeDeps().deps));
+    expect(typeof result.current.playPhaseTransition).toBe('function');
+  });
+
+  it('selected phase builds a timeline (tracked for unmount kill)', () => {
+    const { deps } = makeDeps();
+    const { result, unmount } = renderHook(() => useBlastGsapTimelines(deps));
+    const el = { style: {} } as unknown as HTMLElement;
+    result.current.playPhaseTransition(el, 'selected');
+    unmount();
+    expect(killedTimelines.size).toBeGreaterThanOrEqual(1);
+  });
+
+  it('reduced-motion sets static end-state on element without tween', () => {
+    reducedMotionMock.mockReturnValue(true);
+    const { result } = renderHook(() => useBlastGsapTimelines(makeDeps().deps));
+    const el = document.createElement('div');
+    result.current.playPhaseTransition(el, 'clearing');
+    expect(el.style.opacity).toBe('0');
+    // Falling phase resets translateY to 0 statically
+    const el2 = document.createElement('div');
+    result.current.playPhaseTransition(el2, 'falling', { fallOffset: 80 });
+    expect(el2.style.transform).toContain('translateY(0)');
+  });
+});
+
