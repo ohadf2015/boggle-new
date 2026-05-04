@@ -124,7 +124,17 @@ vi.mock('../ScoreRevealV2', () => {
   };
 });
 
+vi.mock('../InviteTutorialTeaser', () => ({
+  __esModule: true,
+  default: () => <div data-testid="invite-tutorial-teaser" />,
+}));
+
+vi.mock('@/hooks/useInviteOnboardingMode');
+
 import OnboardingFlow from '../OnboardingFlow';
+import * as useInviteModule from '@/hooks/useInviteOnboardingMode';
+
+const mockUseInviteOnboardingMode = vi.mocked(useInviteModule.useInviteOnboardingMode);
 
 describe('OnboardingFlow', () => {
   const defaultProps = {
@@ -135,6 +145,12 @@ describe('OnboardingFlow', () => {
     vi.clearAllMocks();
     mockHasPendingRoom.mockReturnValue(false);
     mockConsumePendingRoom.mockReturnValue(null);
+    mockUseInviteOnboardingMode.mockReturnValue({
+      isInviteMode: false,
+      inviteAtMount: null,
+      activeSteps: ['language', 'returningUser', 'tutorial', 'profile', 'scoreReveal', 'inviteTutorial'],
+      handleInviteTeaserComplete: vi.fn(),
+    });
   });
 
   const pickLanguage = () => fireEvent.click(screen.getByText('Select Language'));
@@ -253,13 +269,20 @@ describe('OnboardingFlow', () => {
       fireEvent.click(screen.getByText('Complete Tutorial'));
     };
 
-    it('redirects to multiplayer room directly from profile when pending invite exists', () => {
+    it('advances to InviteTutorialTeaser step when pending invite exists', () => {
+      mockGetPendingRoom.mockReturnValue({ code: 'ABC123', hostName: 'Alice', ts: Date.now() });
       mockHasPendingRoom.mockReturnValue(true);
-      mockConsumePendingRoom.mockReturnValue('ABC123');
+      mockUseInviteOnboardingMode.mockReturnValue({
+        isInviteMode: true,
+        inviteAtMount: { code: 'ABC123', hostName: 'Alice' },
+        activeSteps: ['language', 'profile', 'inviteTutorial'],
+        handleInviteTeaserComplete: vi.fn(),
+      });
       render(<OnboardingFlow {...defaultProps} />);
-      advanceToProfile();
+      fireEvent.click(screen.getByText('Select Language'));
       fireEvent.click(screen.getByText('Set Profile'));
-      expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=ABC123');
+      expect(screen.getByTestId('invite-tutorial-teaser')).toBeInTheDocument();
+      expect(mockPush).not.toHaveBeenCalledWith(expect.stringContaining('/multiplayer?room='));
     });
 
     it('redirects to cozy practice hub after continue when no pending invite', () => {

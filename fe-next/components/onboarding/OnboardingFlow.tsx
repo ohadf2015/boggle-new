@@ -204,7 +204,6 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     [recordStep, isInviteMode]
   );
 
-
   // Step 3: Score reveal complete — finish onboarding and land on the home page.
   // The mode-fork screen used to live here; we now skip it so first-timers go
   // straight to the full landing UX where they can pick any mode themselves.
@@ -390,8 +389,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       className="fixed inset-0 z-[100] bg-neo-navy flex flex-col items-center justify-center overflow-y-auto"
       dir={dir}
     >
-      {/* Floating geometric background shapes — shift color per step.
-          Sizes scale up at lg: so the navy doesn't feel empty on desktop. */}
+      {/* Floating background shapes shift color per step; sizes scale up on lg. */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
         <motion.div
           className="absolute w-[300px] h-[300px] lg:w-[560px] lg:h-[560px] rounded-full blur-[120px] lg:blur-[160px]"
@@ -405,7 +403,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
           style={{ bottom: '5%', right: '-3%' }}
         />
-        {/* Subtle diagonal grid lines */}
+        {/* Subtle diagonal grid pattern */}
         <div
           className="absolute inset-0 opacity-[0.02]"
           style={{
