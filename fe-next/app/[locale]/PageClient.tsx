@@ -6,6 +6,14 @@ import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite } fro
 import { LandingView } from '@/components/landing';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
 
+// Denylist: allow only Latin/accented/Hebrew/Hiragana/Katakana + space/apostrophe/hyphen
+const HOST_NAME_ALLOWED = /[^A-Za-z0-9 '\-À-ɏ֐-׿぀-ヿ]/g;
+
+const sanitizeHostName = (raw: string): string => {
+  if (!raw) return '';
+  return raw.replace(HOST_NAME_ALLOWED, '').trim().slice(0, 24);
+};
+
 const OnboardingFlow = dynamic(
   () => import('@/components/onboarding/OnboardingFlow'),
   {
@@ -33,9 +41,14 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   const [showFTUE, setShowFTUE] = useState(() => {
     if (typeof window === 'undefined') return false;
     if (hasCompletedOnboarding() || hasSupabaseSession()) return false;
-    // Save room invite before onboarding replaces the view
-    const roomCode = new URLSearchParams(window.location.search).get('room');
-    if (roomCode) savePendingRoomInvite(roomCode);
+    // Save room invite (and optional host name) before onboarding replaces the view
+    const params = new URLSearchParams(window.location.search);
+    const roomCode = params.get('room');
+    if (roomCode) {
+      const rawHost = params.get('host') ?? '';
+      const hostName = sanitizeHostName(rawHost) || undefined;
+      savePendingRoomInvite(roomCode, hostName);
+    }
     return true;
   });
 
