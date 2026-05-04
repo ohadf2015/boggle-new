@@ -6,7 +6,9 @@ import type { BlastTileType } from './types';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTileTooltip } from './utils/blastTileTooltips';
-import { TILE_VISUALS, CLEARING_COLORS, CLEARING_ANIMS } from './blastTileVisuals';
+import { TILE_VISUALS, CLEARING_COLORS, CLEARING_ANIMS, TILE_ACCENTS } from './blastTileVisuals';
+import { useExperiment } from '@/hooks/useExperiment';
+import styles from './BlastTile.module.css';
 
 const TILE_TEXT_SHADOW_STYLE = { textShadow: '0 1px 0 rgba(255,255,255,0.4), 0 2px 3px rgba(0,0,0,0.2)' } as const;
 const TILE_TEXT_SHADOW_LIGHT_STYLE = { textShadow: '0 1px 2px rgba(0,0,0,0.4)' } as const;
@@ -221,6 +223,9 @@ export const BlastTile = memo(function BlastTile({
   }
 
   const visual = TILE_VISUALS[type] ?? TILE_VISUALS.standard;
+  const { variant: candyVariant } = useExperiment('blast.candy-shell.enabled');
+  const candyOn = candyVariant === 'candy';
+  const accent = TILE_ACCENTS[type] ?? TILE_ACCENTS.standard;
   // Skip tooltip lookup entirely for standard tiles (the vast majority) — keeps render fast
   const tooltip = type !== 'standard' ? getTileTooltip(type, t) : null;
   const effectivePhase = reducedMotion && ANIMATED_PHASES.has(phase) ? 'idle' : phase;
@@ -281,11 +286,29 @@ export const BlastTile = memo(function BlastTile({
         ...selectionStyle,
         ...(willChangeValue && { willChange: willChangeValue }),
         containerType: 'inline-size',
+        ...(candyOn && {
+          '--bt-gloss': accent.glossTop,
+          '--bt-rim-light': accent.rimLight,
+          '--bt-rim-dark': accent.rimDark,
+          '--bt-cast': accent.castShadow,
+        } as React.CSSProperties),
       }}
       aria-label={`${letter}${type !== 'standard' ? ` ${type} tile` : ''}`}
       title={tooltip ? `${tooltip.name}: ${tooltip.desc}` : undefined}
     >
-      <span className="relative z-10" style={visual.text === 'text-white' ? TILE_TEXT_SHADOW_LIGHT_STYLE : TILE_TEXT_SHADOW_STYLE}>{letter}</span>
+      {candyOn && (
+        <>
+          <span data-bt-layer="cast" aria-hidden="true" className={styles.candyShell} />
+          <span data-bt-layer="gloss" aria-hidden="true" className={styles.gloss} />
+          <span data-bt-layer="rim" aria-hidden="true" className={styles.rim} />
+        </>
+      )}
+      <span
+        className={`relative z-10 ${candyOn ? (visual.text === 'text-white' ? styles.letterLight : styles.letter) : ''}`}
+        style={candyOn ? undefined : (visual.text === 'text-white' ? TILE_TEXT_SHADOW_LIGHT_STYLE : TILE_TEXT_SHADOW_STYLE)}
+      >
+        {letter}
+      </span>
       {visual.indicator && (
         <span className={`absolute top-0.5 inset-e-0.5 leading-none pointer-events-none ${visual.text ?? ''}`} aria-hidden="true">
           <visual.indicator className="w-[clamp(9px,2.4cqw,15px)] h-[clamp(9px,2.4cqw,15px)]" strokeWidth={2.5} />
