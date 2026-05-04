@@ -14,6 +14,7 @@ import { useAchievementQueue } from '../components/achievements';
 import { usePresence } from '../hooks/usePresence';
 import { useHints } from '../hooks/useHints';
 import { useGameTimer } from '../hooks/useGameTimer';
+import { useTimerZeroWatchdog } from '../hooks/useTimerZeroWatchdog';
 import logger from '@/utils/logger';
 import type { TournamentStanding } from '@/types';
 import type {
@@ -97,7 +98,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const leaderboard = useLeaderboard();
 
   // Get setters from Zustand store (actions never trigger re-renders)
-  const { setFoundWords, setLetterGrid, setShufflingGrid } = useGameActions();
+  const { setFoundWords, setLetterGrid, setShufflingGrid, setWaitingForResults } = useGameActions();
 
   // Game state
   const [gameActive, setGameActive] = useState<boolean>(false);
@@ -152,6 +153,22 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Note: Always use the actual timer value, not conditioned on gameActive
   // The timer is set during pendingGameStart processing before gameActive is true
   const remainingTime = gameTimer.remainingTime;
+
+  // Recovery watchdog: server-side game-end events (`endGame`, `timeUpdate(0)`,
+  // `validatedScores`) can be missed on flaky connections, leaving the player
+  // staring at a frozen 0:00 board. When the timer hits 0 after a previously-
+  // active game and no result transition happens, force `waitingForResults`
+  // and re-request results from the server's cached payload.
+  useTimerZeroWatchdog({
+    remainingTime,
+    gameActive,
+    waitingForResults,
+    onTrigger: () => {
+      logger.log('[PLAYER] Timer-zero watchdog: bootstrapping waiting state + requesting results');
+      setWaitingForResults(true);
+      socket?.emit('requestResults');
+    },
+  });
 
   // Player state
   const [playersReady, setPlayersReady] = useState<Player[]>(initialPlayers);
