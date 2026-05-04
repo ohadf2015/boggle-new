@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { markOnboardingComplete, markOnboardingSkipped, consumePendingRoomInvite, hasPendingRoomInvite } from '@/utils/onboardingStorage';
+import { markOnboardingComplete, markOnboardingSkipped, consumePendingRoomInvite, hasPendingRoomInvite, getPendingRoomInvite } from '@/utils/onboardingStorage';
 import { markGuidanceShown } from '@/utils/contextualGuidanceStorage';
 import { setStoredCustomAvatar } from '@/utils/profileStorage';
 import {
@@ -22,14 +22,16 @@ import QuickProfileSetup from './QuickProfileSetup';
 import ScoreRevealV2 from './ScoreRevealV2';
 import OnboardingProgress from './OnboardingProgress';
 import ReturningUserStep from './ReturningUserStep';
+import InviteTutorialTeaser from './InviteTutorialTeaser';
 import CrazyGamesWelcome, { type CrazyGamesMode } from './CrazyGamesWelcome';
 import CrazyGamesTutorial from './CrazyGamesTutorial';
 import AuthModal from '@/components/auth/AuthModal';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
-type FlowStep = 'returningUser' | 'language' | 'tutorial' | 'profile' | 'scoreReveal';
+type FlowStep = 'returningUser' | 'language' | 'tutorial' | 'profile' | 'scoreReveal' | 'inviteTutorial';
 
 const STEPS: FlowStep[] = ['language', 'returningUser', 'tutorial', 'profile', 'scoreReveal'];
+const INVITE_STEPS: FlowStep[] = ['language', 'profile', 'inviteTutorial'];
 
 /** Step-specific accent colors for the floating background shapes */
 const STEP_ACCENTS: Record<FlowStep, { color1: string; color2: string }> = {
@@ -38,6 +40,7 @@ const STEP_ACCENTS: Record<FlowStep, { color1: string; color2: string }> = {
   tutorial: { color1: 'rgba(0,255,255,0.06)', color2: 'rgba(191,255,0,0.04)' },
   profile: { color1: 'rgba(255,20,147,0.06)', color2: 'rgba(191,255,0,0.04)' },
   scoreReveal: { color1: 'rgba(191,255,0,0.08)', color2: 'rgba(255,20,147,0.05)' },
+  inviteTutorial: { color1: 'rgba(255,20,147,0.10)', color2: 'rgba(0,255,255,0.05)' },
 };
 
 interface OnboardingFlowProps {
@@ -68,6 +71,16 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   // Route transitions are outside React's lifecycle, so the modal would otherwise
   // sit silently while Next.js fetches the destination page.
   const [isNavigating, setIsNavigating] = useState(false);
+
+  // Snapshot the pending invite at mount. The user can dismiss/consume it mid-flow,
+  // but we want UI continuity (banner with hostName) until the step itself completes.
+  const inviteAtMountRef = useRef<{ code: string; hostName?: string } | null>(null);
+  const [isInviteMode] = useState(() => {
+    const inv = getPendingRoomInvite();
+    if (inv) inviteAtMountRef.current = { code: inv.code, hostName: inv.hostName };
+    return !!inv;
+  });
+  const activeSteps = isInviteMode ? INVITE_STEPS : STEPS;
 
   // Funnel timing + step counter — captured at mount so completion/skip
   // events can carry duration_ms and step_count without prop-drilling.
@@ -149,7 +162,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     onComplete();
   }, [isNavigating, language, router, onComplete, emitSkipped, step]);
 
-  const stepIndex = useMemo(() => STEPS.indexOf(step), [step]);
+  const stepIndex = useMemo(() => activeSteps.indexOf(step), [step, activeSteps]);
   const accent = STEP_ACCENTS[step];
 
   // Step 1: Tutorial complete
@@ -182,7 +195,14 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       const pendingInvite = hasPendingRoomInvite();
       recordStep('profile', { hasPendingInvite: pendingInvite, nameEdited });
 
-      // If player arrived via room invite, skip scoreReveal + fork — go straight to the room
+      // Invite-mode: profile saved → user plays the one-moment teaser before joining the room.
+      // Navigation happens after teaser complete OR skip.
+      if (isInviteMode && pendingInvite) {
+        setStep('inviteTutorial');
+        return;
+      }
+
+      // Legacy fallthrough: pre-isInviteMode callers that still expect direct jump
       if (pendingInvite) {
         markOnboardingComplete({
           avatarId: 'custom',
@@ -200,7 +220,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
 
       setStep('scoreReveal');
     },
-    [language, router, onComplete, recordStep, emitCompleted]
+    [language, router, onComplete, recordStep, emitCompleted, isInviteMode]
   );
 
 
@@ -230,17 +250,38 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     onComplete();
   }, [isNavigating, language, router, onComplete, playerName, recordStep, emitCompleted]);
 
+  // Invite mode teaser complete — navigate to the room
+  const handleInviteTeaserComplete = useCallback(() => {
+    if (isNavigating) return;
+    setIsNavigating(true);
+    markOnboardingComplete({
+      avatarId: 'custom',
+      displayName: playerName || 'Player',
+      selectedMode: 'multi',
+      nameEdited: playerNameEditedRef.current,
+    });
+    const roomCode = consumePendingRoomInvite();
+    router.push(`/${language}/multiplayer?room=${roomCode}`);
+    emitCompleted({ via: 'invite_tutorial' });
+    onComplete();
+  }, [isNavigating, language, router, onComplete, playerName, emitCompleted]);
+
   // Step 0: Language selected — proceed to returningUser prompt
   // On CrazyGames the "have an account" branch is dead (no external auth),
   // so skip straight to tutorial.
+  // In invite mode, skip returnUser and go straight to profile.
   const handleLanguageSelect = useCallback(() => {
     recordStep('language');
     if (isOnCrazyGamesPlatform) {
       setStep('tutorial');
       return;
     }
+    if (isInviteMode) {
+      setStep('profile');
+      return;
+    }
     setStep('returningUser');
-  }, [isOnCrazyGamesPlatform, recordStep]);
+  }, [isOnCrazyGamesPlatform, isInviteMode, recordStep]);
 
   // CrazyGames portal: replace 5-step FTUE with one welcome screen.
   // Players land via thumbnail click; expectation is play in seconds.
@@ -281,6 +322,10 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           <QuickProfileSetup
             onComplete={handleProfileComplete}
             hasPendingInvite={hasPendingRoomInvite()}
+            inviteContext={isInviteMode && inviteAtMountRef.current
+              ? { roomCode: inviteAtMountRef.current.code, hostName: inviteAtMountRef.current.hostName }
+              : undefined}
+            onSkipInvite={isInviteMode ? handleSkipOnboarding : undefined}
           />
         );
       case 'scoreReveal':
@@ -291,6 +336,21 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
             onSkip={handleSkipOnboarding}
           />
         );
+      case 'inviteTutorial': {
+        const ctx = inviteAtMountRef.current;
+        if (!ctx) {
+          handleSkipOnboarding();
+          return null;
+        }
+        return (
+          <InviteTutorialTeaser
+            roomCode={ctx.code}
+            hostName={ctx.hostName}
+            onComplete={handleInviteTeaserComplete}
+            onSkip={handleSkipOnboarding}
+          />
+        );
+      }
       default:
         return null;
     }
@@ -401,7 +461,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
             transition={{ duration: 0.25 }}
             className="absolute top-6 z-10"
           >
-            <OnboardingProgress currentStep={stepIndex} totalSteps={STEPS.length} />
+            <OnboardingProgress currentStep={stepIndex} totalSteps={activeSteps.length} />
           </motion.div>
         )}
       </AnimatePresence>

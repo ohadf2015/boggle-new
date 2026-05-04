@@ -27,18 +27,21 @@ const mockMarkComplete = vi.fn();
 const mockMarkSkipped = vi.fn();
 const mockConsumePendingRoom = vi.fn((): string | null => null);
 const mockHasPendingRoom = vi.fn(() => false);
+const mockGetPendingRoom = vi.fn(() => null);
 vi.mock('@/utils/onboardingStorage', () => ({
   markOnboardingComplete: (...args: any[]) => mockMarkComplete(...args),
   markOnboardingSkipped: (...args: any[]) => mockMarkSkipped(...args),
   hasCompletedOnboarding: () => false,
   consumePendingRoomInvite: () => mockConsumePendingRoom(),
   hasPendingRoomInvite: () => mockHasPendingRoom(),
+  getPendingRoomInvite: () => mockGetPendingRoom(),
 }));
 
 // Mock next/navigation
 const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
+  usePathname: () => '/en',
 }));
 
 // Mock LanguageContext

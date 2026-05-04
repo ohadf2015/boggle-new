@@ -32,12 +32,14 @@ vi.mock('framer-motion', () => {
 
 const mockHasPendingRoom = vi.fn(() => false);
 const mockConsumePendingRoom = vi.fn((): string | null => null);
+const mockGetPendingRoom = vi.fn(() => null);
 vi.mock('@/utils/onboardingStorage', () => ({
   markOnboardingComplete: vi.fn(),
   markOnboardingSkipped: vi.fn(),
   hasCompletedOnboarding: () => false,
   consumePendingRoomInvite: () => mockConsumePendingRoom(),
   hasPendingRoomInvite: () => mockHasPendingRoom(),
+  getPendingRoomInvite: () => mockGetPendingRoom(),
 }));
 
 vi.mock('@/utils/contextualGuidanceStorage', () => ({
@@ -51,6 +53,7 @@ vi.mock('@/utils/profileStorage', () => ({
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => '/en',
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({

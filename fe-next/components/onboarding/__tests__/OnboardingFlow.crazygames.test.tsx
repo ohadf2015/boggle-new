@@ -21,10 +21,14 @@ vi.mock('@/utils/onboardingStorage', () => ({
   hasCompletedOnboarding: () => false,
   consumePendingRoomInvite: () => null,
   hasPendingRoomInvite: () => false,
+  getPendingRoomInvite: () => null,
 }));
 
 const mockPush = vi.fn();
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }) }));
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockPush }),
+  usePathname: () => '/en',
+}));
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr', setLanguage: vi.fn() }),
