@@ -20,6 +20,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLeaderboard, useUserRank } from '@/hooks/useSupabaseRealtime';
 import { cn } from '@/lib/utils';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import { InlineBannerAd } from '@/components/ads';
@@ -292,7 +293,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                         {t('leaderboard.yourRank')} · #{userRank.rank_position || '—'} {t('leaderboard.global')}
                       </p>
                       <p className={cn('text-sm font-semibold', isDarkMode ? 'text-white' : 'text-gray-900')}>
-                        {userRank.total_score?.toLocaleString() || 0} {t('leaderboard.score')}
+                        {safeToLocaleString(userRank.total_score ?? 0, language)} {t('leaderboard.score')}
                       </p>
                     </div>
                   </div>
@@ -327,7 +328,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                         {t('leaderboard.score')}
                       </p>
                       <p className={cn('text-2xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
-                        {userRank.total_score?.toLocaleString() || 0}
+                        {safeToLocaleString(userRank.total_score ?? 0, language)}
                       </p>
                     </div>
                     {currentUserTier && (
@@ -470,7 +471,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                         'sm:hidden font-semibold text-sm',
                         isDarkMode ? 'text-white' : 'text-gray-900'
                       )}>
-                        {entry.total_score?.toLocaleString() || 0}
+                        {safeToLocaleString(entry.total_score ?? 0, language)}
                       </div>
                     </div>
                     <div
@@ -479,7 +480,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                         isDarkMode ? 'text-white' : 'text-gray-900'
                       )}
                     >
-                      {entry.total_score?.toLocaleString() || 0}
+                      {safeToLocaleString(entry.total_score ?? 0, language)}
                     </div>
                     <div className={cn('hidden sm:block sm:col-span-2 text-right text-sm', 'text-gray-600')}>
                       {entry.games_played || 0}

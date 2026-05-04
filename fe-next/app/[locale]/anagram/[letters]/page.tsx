@@ -34,13 +34,14 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const title = `Anagrams of ${upper} — Anagram Solver | LexiClash`;
   const description = `Find all words you can make from the letters ${upper}. Free anagram solver for Scrabble, Boggle, and word games.`;
   const url = `${BASE_URL}/${locale}/anagram/${letters}`;
+  const enUrl = `${BASE_URL}/en/anagram/${letters}`;
 
   return {
     title,
     description,
     openGraph: { type: 'website', url, title, description, siteName: 'LexiClash' },
     alternates: {
-      canonical: `${BASE_URL}/en/anagram/${letters}`,
+      canonical: locale === 'en' ? url : enUrl,
       languages: Object.fromEntries([
         ['x-default', `${BASE_URL}/en/anagram/${letters}`],
         ...LOCALES.map(l => [l, `${BASE_URL}/${l}/anagram/${letters}`]),

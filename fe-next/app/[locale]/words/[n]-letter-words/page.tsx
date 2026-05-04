@@ -75,13 +75,14 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const title = `All ${n}-Letter Words | LexiClash Word Game`;
   const description = `Browse all ${n}-letter words in the LexiClash dictionary. See every valid ${n}-letter word with its score and play it in a real-time word game.`;
   const url = `${BASE_URL}/${locale}/words/${n}-letter-words`;
+  const enUrl = `${BASE_URL}/en/words/${n}-letter-words`;
 
   return {
     title,
     description,
     openGraph: { type: 'website', url, title, description, siteName: 'LexiClash' },
     alternates: {
-      canonical: url,
+      canonical: locale === 'en' ? url : enUrl,
       languages: Object.fromEntries([
         ['x-default', `${BASE_URL}/en/words/${n}-letter-words`],
         ...LOCALES.map(l => [l, `${BASE_URL}/${l}/words/${n}-letter-words`]),

@@ -8,13 +8,13 @@ const es = {
     "clash": "Clash"
   },
   "seo": {
-    "title": "Juego de Palabras Multijugador Gratis - Online",
-    "description": "¡Compite contra amigos en emocionantes batallas de palabras en tiempo real! LexiClash es un juego de palabras multijugador rápido donde cada segundo cuenta. Encuentra palabras, supera a tus oponentes y sube en la clasificación. Perfecto para fiestas, noches de juegos y competiciones amistosas. ¡Juega gratis en 5 idiomas - sin descargas!",
-    "keywords": "juego de palabras multijugador, juego de palabras en tiempo real, batalla de palabras online, juego de palabras para fiestas, juego de palabras competitivo, boggle online, juego de vocabulario, juego de aprendizaje de idiomas, juego online gratis, juego de letras gratis, wordle en español, boggle en español gratis, juego de palabras sin descargar, juego de palabras para grupos, juego de vocabulario online, juego de palabras con amigos, juego de palabras educativo, scrabble alternativa online, juego de palabras en navegador, reto de palabras diario, juego de palabras rápido, juego cerebral de palabras",
-    "ogTitle": "LexiClash - Juego de Palabras Multijugador Rápido | Compite en Tiempo Real",
-    "ogDescription": "🎮 ¡Compite contra amigos en emocionantes batallas de palabras en tiempo real! ⚡ Encuentra palabras rápido, supera a tus oponentes, sube en la clasificación 🔥 ¡Juega gratis ahora!",
-    "twitterTitle": "LexiClash - Juego de Palabras Multijugador Rápido",
-    "twitterDescription": "🎮 ¡Batallas de palabras en tiempo real! Encuentra palabras, supera oponentes ⚡ Perfecto para fiestas 🔥 ¡Juega gratis!",
+    "title": "Juego de Palabras Multijugador Online Gratis - Alternativa a Scrabble en Tiempo Real",
+    "description": "¿Buscas un juego de palabras online multijugador como Scrabble pero más rápido? LexiClash es la alternativa gratis al estilo Scrabble: batallas de palabras en tiempo real contra amigos, sin descargas, sin esperas por turnos. Encuentra palabras, supera a tus oponentes y sube en la clasificación. ¡Juega gratis en 5 idiomas en el navegador!",
+    "keywords": "juego de palabras multijugador, alternativa a scrabble en línea, alternativa multijugador a scrabble, juego como scrabble online, juego al estilo scrabble, jugar scrabble alternativa gratis, juegos de palabras online multijugador, scrabble alternativa multijugador español, alternativa gratis a scrabble go, jugar scrabble alternativa en español, juego de palabras en tiempo real, batalla de palabras online, juego de palabras para fiestas, juego de palabras competitivo, boggle online, juego de vocabulario, juego de aprendizaje de idiomas, juego online gratis, juego de letras gratis, wordle en español, boggle en español gratis, juego de palabras sin descargar, juego de palabras para grupos, juego de vocabulario online, juego de palabras con amigos, juego de palabras educativo, juego de palabras en navegador, reto de palabras diario, juego de palabras rápido, juego cerebral de palabras",
+    "ogTitle": "LexiClash - Alternativa Multijugador a Scrabble | Juego de Palabras Online Gratis",
+    "ogDescription": "🎮 La alternativa al estilo Scrabble pero en tiempo real ⚡ Batallas de palabras multijugador online gratis 🔥 Sin descargas — ¡juega en el navegador ya!",
+    "twitterTitle": "LexiClash - Alternativa a Scrabble Multijugador Online",
+    "twitterDescription": "🎮 Alternativa al estilo Scrabble en tiempo real ⚡ Multijugador online gratis 🔥 Sin descargas, sin turnos lentos.",
     "locale": "es_ES",
     "language": "Spanish",
     "leaderboard": {
@@ -420,6 +420,12 @@ const es = {
     "shareViaWhatsApp": "Compartir por WhatsApp",
     "shareViaTelegram": "Compartir por Telegram",
     "close": "Cerrar",
+    "search": "Buscar",
+    "searchPlaceholder": "Buscar...",
+    "noResults": "Sin resultados",
+    "navigation": "Navegación",
+    "copiedToClipboard": "¡Copiado al portapapeles!",
+    "toClose": "para cerrar",
     "ordinal1": "1°",
     "ordinal2": "2°",
     "ordinal3": "3°",
@@ -1103,6 +1109,9 @@ const es = {
       "hair": "Pelo",
       "eyes": "Ojos",
       "mouth": "Boca",
+      "expressions": "Expresiones",
+      "nose": "Nariz",
+      "eyeColor": "Color de ojos",
       "accessories": "Accesorios",
       "background": "Vibra",
       "shape": "Forma",
@@ -3091,7 +3100,9 @@ const es = {
       "codeSentTo": "Código enviado a",
       "verify": "Verificar código",
       "changeEmail": "Cambiar email",
-      "resend": "Reenviar código"
+      "resend": "Reenviar código",
+      "codeSent": "¡Código enviado!",
+      "enterCode": "Ingresa tu código"
     },
     "trustBadge": "Seguro y privado"
   },
@@ -7311,6 +7322,8 @@ const es = {
       "readyToFight": "¡Vamos!",
       "enraged": "¡ENFURECIDO!",
       "enragedBanner": "¡ENFURECIDO!",
+      "tutorialGotIt": "¡Entendido!",
+      "newMechanic": "¡Nueva mecánica desbloqueada!",
       "phases": {
         "phase1": "FASE 1",
         "phase2": "FASE 2",
@@ -7779,6 +7792,10 @@ const es = {
       "objectives": "Objetivos",
       "combo": "Combo",
       "wordsFound": "Palabras encontradas",
+      "wordsYouMissed": "Palabras que te perdiste",
+      "missedWordsSummary": "{{count}} palabras que podrías haber encontrado",
+      "showMore": "Mostrar más",
+      "showLess": "Mostrar menos",
       "paused": "Pausado",
       "tryAgain": "¡Inténtalo de nuevo!",
       "perfect": "¡Perfecto!",
@@ -8318,7 +8335,9 @@ const es = {
       "worldEssence": "Esencia del Mundo",
       "ancientRelic": "Reliquia Antigua",
       "cosmicShard": "Fragmento Cósmico",
-      "total": "Total"
+      "total": "Total",
+      "fragment": "Fragmento",
+      "luckyBonus": "¡Bonus de la suerte!"
     },
     "collection": {
       "title": "Colección",

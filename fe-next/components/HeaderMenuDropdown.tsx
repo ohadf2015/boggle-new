@@ -253,7 +253,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                                                 {profile.display_name || profile.username}
                                             </span>
                                             <div className="flex items-center gap-2 mt-1">
-                                                <CoinBalance coins={profile.total_coins || 0} size="sm" showAnimation={false} />
+                                                <CoinBalance coins={profile.total_coins || 0} size="sm" showAnimation={false} language={language} />
                                             </div>
                                             {engagementStatus.streak > 0 && (
                                                 <div className="flex items-center gap-1.5 mt-1">

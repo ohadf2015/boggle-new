@@ -10,6 +10,7 @@ import {
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
 import { Loader } from '@/components/ui/Loader';
@@ -252,17 +253,17 @@ export default function PlayerProfilePageClient() {
         />
         <StatCard
           icon={<TrendingUp className="w-4 h-4 text-neo-cyan" />}
-          value={profile.totalGames.toLocaleString()}
+          value={safeToLocaleString(profile.totalGames, language)}
           label={t('profile.gamesPlayed')}
         />
         <StatCard
           icon={<Star className="w-4 h-4 text-neo-orange" />}
-          value={profile.totalScore.toLocaleString()}
+          value={safeToLocaleString(profile.totalScore, language)}
           label={t('profile.totalScore')}
         />
         <StatCard
           icon={<Hash className="w-4 h-4 text-neo-lime" />}
-          value={profile.totalWords.toLocaleString()}
+          value={safeToLocaleString(profile.totalWords, language)}
           label={t('profile.totalWords')}
         />
         <StatCard

@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Coins, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 
 interface CoinBalanceProps {
   coins?: number;
@@ -11,6 +12,8 @@ interface CoinBalanceProps {
   showAnimation?: boolean;
   showSparkle?: boolean;
   className?: string;
+  /** Locale code for number formatting (e.g. 'es', 'he'). Default 'en'. Pass from useLanguage(). */
+  language?: string;
 }
 
 export function CoinBalance({
@@ -18,7 +21,8 @@ export function CoinBalance({
   size = 'md',
   showAnimation = false,
   showSparkle = false,
-  className
+  className,
+  language = 'en',
 }: CoinBalanceProps) {
 
   // Inject shimmer keyframes once on mount (SSR-safe)
@@ -61,7 +65,7 @@ export function CoinBalance({
   const content = (
     <div
       role="status"
-      aria-label={`Coin balance: ${coins.toLocaleString()}`}
+      aria-label={`Coin balance: ${safeToLocaleString(coins, language)}`}
       data-coin-counter="true"
       className={cn(
         // Base layout
@@ -116,7 +120,7 @@ export function CoinBalance({
         "relative z-10 font-black tracking-tight",
         "text-amber-900 drop-shadow-[0_1px_0_rgba(255,255,255,0.5)]"
       )}>
-        {coins.toLocaleString()}
+        {safeToLocaleString(coins, language)}
       </span>
 
       {/* Optional sparkle indicator */}

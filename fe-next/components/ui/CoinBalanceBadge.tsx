@@ -18,6 +18,7 @@
 import { memo } from 'react';
 import { Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 
 interface CoinBalanceBadgeProps {
   /** Current coin balance */
@@ -28,6 +29,8 @@ interface CoinBalanceBadgeProps {
   canAfford?: boolean;
   /** Additional className for positioning */
   className?: string;
+  /** Locale code for number formatting. Default 'en'. Pass from useLanguage(). */
+  language?: string;
 }
 
 const sizeConfig = {
@@ -53,8 +56,10 @@ export const CoinBalanceBadge = memo<CoinBalanceBadgeProps>(function CoinBalance
   size = 'sm',
   canAfford = true,
   className,
+  language = 'en',
 }) {
   const config = sizeConfig[size];
+  const formatted = safeToLocaleString(balance, language);
 
   return (
     <div
@@ -68,11 +73,11 @@ export const CoinBalanceBadge = memo<CoinBalanceBadgeProps>(function CoinBalance
         className
       )}
       role="status"
-      aria-label={`Coin balance: ${balance.toLocaleString()}`}
+      aria-label={`Coin balance: ${formatted}`}
       data-coin-counter="true"
     >
       <Coins className={cn(config.icon, canAfford ? 'text-neo-black' : 'text-white')} />
-      <span>{balance.toLocaleString()}</span>
+      <span>{formatted}</span>
     </div>
   );
 });
