@@ -42,7 +42,7 @@ export function StandardDesktopAdapter(props: StandardDesktopAdapterProps) {
       wordsLadder: <WordsLadder words={props.foundWords} meId={props.meId} />,
       activityStream: <KeyboardHintStrip />,
     },
-    meta: { mode: 'standard', roomId: props.roomId },
+    meta: { mode: 'classic', roomId: props.roomId },
   };
   return <MultiplayerDesktopShell slots={slots} />;
 }

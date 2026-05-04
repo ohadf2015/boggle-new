@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-export type MpDesktopMode = 'standard' | 'wheel-rush' | 'blast' | 'word-hunt';
+export type MpDesktopMode = 'classic' | 'wheel-rush' | 'blast' | 'word-hunt';
 
 export interface ShellSlots {
   left: {
