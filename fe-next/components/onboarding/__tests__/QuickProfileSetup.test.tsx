@@ -101,6 +101,18 @@ vi.mock('@/shared/types/customAvatar', () => ({
   }),
 }));
 
+// Mock InviteContextBanner
+vi.mock('@/components/onboarding/InviteContextBanner', () => ({
+  __esModule: true,
+  default: ({ roomCode, hostName, onSkip }: any) => (
+    <div data-testid="invite-banner">
+      {hostName && <span>{hostName}</span>}
+      <span>{roomCode}</span>
+      <button onClick={onSkip}>Skip</button>
+    </div>
+  ),
+}));
+
 import QuickProfileSetup from '../QuickProfileSetup';
 
 describe('QuickProfileSetup', () => {
@@ -215,6 +227,26 @@ describe('QuickProfileSetup', () => {
         expect.objectContaining({ gender: 'female', skinColor: '#8D5524' }),
         expect.any(Boolean)
       );
+    });
+  });
+
+  describe('QuickProfileSetup invite mode', () => {
+    it('renders InviteContextBanner when inviteContext is provided', () => {
+      render(
+        <QuickProfileSetup
+          onComplete={() => {}}
+          hasPendingInvite
+          inviteContext={{ roomCode: 'ABC123', hostName: 'Alice' }}
+          onSkipInvite={() => {}}
+        />
+      );
+      expect(screen.getByTestId('invite-banner')).toBeInTheDocument();
+      expect(screen.getByText(/ABC123/)).toBeInTheDocument();
+    });
+
+    it('does NOT render banner when inviteContext absent', () => {
+      render(<QuickProfileSetup onComplete={() => {}} />);
+      expect(screen.queryByTestId('invite-banner')).not.toBeInTheDocument();
     });
   });
 });

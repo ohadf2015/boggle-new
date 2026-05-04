@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { type CustomAvatarConfig, getRandomAvatarConfig } from '@/shared/types/customAvatar';
 import Avatar from '@/components/Avatar';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
+import InviteContextBanner from './InviteContextBanner';
 import { suggestPlayerName } from '@/utils/onboardingNameSuggestions';
 import { cn } from '@/lib/utils';
 
@@ -14,6 +15,8 @@ interface QuickProfileSetupProps {
   onComplete: (name: string, avatar: CustomAvatarConfig, nameEdited: boolean) => void;
   onSkip?: () => void;
   hasPendingInvite?: boolean;
+  inviteContext?: { roomCode: string; hostName?: string };
+  onSkipInvite?: () => void;
 }
 
 /**
@@ -24,6 +27,8 @@ interface QuickProfileSetupProps {
 const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
   onComplete,
   hasPendingInvite,
+  inviteContext,
+  onSkipInvite,
 }) => {
   const { t, dir, language } = useLanguage();
   // Initial suggestion is locale-aware. We snapshot it in a ref so we can
@@ -117,6 +122,13 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
       dir={dir}
     >
       <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-5 shadow-hard-md">
+        {inviteContext && onSkipInvite && (
+          <InviteContextBanner
+            roomCode={inviteContext.roomCode}
+            hostName={inviteContext.hostName}
+            onSkip={onSkipInvite}
+          />
+        )}
         {/* Header */}
         <motion.h2
           custom={0}
