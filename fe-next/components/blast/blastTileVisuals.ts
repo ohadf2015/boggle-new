@@ -114,3 +114,38 @@ export const CLEARING_ANIMS: Partial<Record<BlastTileType, { transform: string; 
   crystal:   { transform: 'scale(1.7) rotate(180deg)', transition: 'all 260ms cubic-bezier(0.34, 1.56, 0.64, 1)', filter: 'brightness(2.2) saturate(2.5) hue-rotate(20deg)' },
   fuse:      { transform: 'scale(2.3) rotate(-20deg)', transition: 'all 220ms cubic-bezier(0.17, 0.67, 0.83, 0.67)', filter: 'brightness(2.8) saturate(2.5)' },
 };
+
+/** Per-type accent quad consumed by BlastTile.module.scss via CSS custom properties.
+ *  glossTop  = top specular highlight base colour (RGBA)
+ *  rimLight  = inner top-left rim stroke
+ *  rimDark   = inner bottom-right rim stroke
+ *  castShadow = colour of the soft cast shadow under the tile
+ */
+export const TILE_ACCENTS: Record<BlastTileType, {
+  glossTop: string;
+  rimLight: string;
+  rimDark: string;
+  castShadow: string;
+}> = {
+  standard:  { glossTop: 'rgba(255,255,255,0.55)', rimLight: 'rgba(255,255,255,0.85)', rimDark: 'rgba(0,0,0,0.20)',     castShadow: 'rgba(0,0,0,0.35)'    },
+  gold:      { glossTop: 'rgba(255,250,210,0.65)', rimLight: 'rgba(255,246,192,0.95)', rimDark: 'rgba(94,50,0,0.45)',   castShadow: 'rgba(94,50,0,0.55)'  },
+  bomb:      { glossTop: 'rgba(255,210,210,0.55)', rimLight: 'rgba(255,200,210,0.85)', rimDark: 'rgba(60,8,24,0.55)',   castShadow: 'rgba(60,8,24,0.55)'  },
+  lightning: { glossTop: 'rgba(255,242,180,0.65)', rimLight: 'rgba(255,240,168,0.95)', rimDark: 'rgba(76,22,0,0.50)',   castShadow: 'rgba(76,22,0,0.55)'  },
+  prism:     { glossTop: 'rgba(255,255,255,0.55)', rimLight: 'rgba(255,255,255,0.95)', rimDark: 'rgba(40,8,78,0.55)',   castShadow: 'rgba(40,8,78,0.55)'  },
+  rainbow:   { glossTop: 'rgba(255,255,255,0.55)', rimLight: 'rgba(255,255,255,0.95)', rimDark: 'rgba(8,54,66,0.55)',   castShadow: 'rgba(8,54,66,0.55)'  },
+  ice:       { glossTop: 'rgba(245,253,255,0.70)', rimLight: 'rgba(232,246,255,0.95)', rimDark: 'rgba(28,74,114,0.45)', castShadow: 'rgba(28,74,114,0.55)' },
+  gem:       { glossTop: 'rgba(255,225,234,0.60)', rimLight: 'rgba(255,210,228,0.85)', rimDark: 'rgba(138,21,69,0.55)', castShadow: 'rgba(138,21,69,0.55)' },
+  frozen:    { glossTop: 'rgba(245,253,255,0.70)', rimLight: 'rgba(232,246,255,0.95)', rimDark: 'rgba(28,74,114,0.45)', castShadow: 'rgba(28,74,114,0.55)' },
+  magnet:    { glossTop: 'rgba(244,220,252,0.60)', rimLight: 'rgba(232,200,250,0.85)', rimDark: 'rgba(40,8,78,0.55)',   castShadow: 'rgba(40,8,78,0.55)'  },
+  diamond:   { glossTop: 'rgba(244,253,255,0.70)', rimLight: 'rgba(228,247,250,0.95)', rimDark: 'rgba(8,54,66,0.45)',   castShadow: 'rgba(8,54,66,0.55)'  },
+  countdown: { glossTop: 'rgba(255,242,180,0.65)', rimLight: 'rgba(255,240,168,0.95)', rimDark: 'rgba(76,22,0,0.50)',   castShadow: 'rgba(76,22,0,0.55)'  },
+  shuffle:   { glossTop: 'rgba(252,224,248,0.60)', rimLight: 'rgba(248,212,240,0.85)', rimDark: 'rgba(54,8,86,0.55)',   castShadow: 'rgba(54,8,86,0.55)'  },
+  magma:     { glossTop: 'rgba(255,210,210,0.55)', rimLight: 'rgba(255,200,210,0.85)', rimDark: 'rgba(60,8,24,0.55)',   castShadow: 'rgba(60,8,24,0.55)'  },
+  portal:    { glossTop: 'rgba(248,232,252,0.55)', rimLight: 'rgba(244,220,252,0.85)', rimDark: 'rgba(26,5,64,0.55)',   castShadow: 'rgba(26,5,64,0.55)'  },
+  catalyst:  { glossTop: 'rgba(232,250,238,0.60)', rimLight: 'rgba(212,244,224,0.85)', rimDark: 'rgba(8,56,38,0.45)',   castShadow: 'rgba(8,56,38,0.55)'  },
+  crystal:   { glossTop: 'rgba(244,220,252,0.60)', rimLight: 'rgba(232,200,250,0.85)', rimDark: 'rgba(40,8,78,0.55)',   castShadow: 'rgba(40,8,78,0.55)'  },
+  fuse:      { glossTop: 'rgba(255,242,180,0.65)', rimLight: 'rgba(255,240,168,0.95)', rimDark: 'rgba(76,22,0,0.50)',   castShadow: 'rgba(76,22,0,0.55)'  },
+  locked:    { glossTop: 'rgba(232,228,212,0.45)', rimLight: 'rgba(216,208,194,0.80)', rimDark: 'rgba(86,78,66,0.55)',  castShadow: 'rgba(86,78,66,0.55)' },
+  key:       { glossTop: 'rgba(255,250,210,0.65)', rimLight: 'rgba(255,246,192,0.95)', rimDark: 'rgba(94,50,0,0.45)',   castShadow: 'rgba(94,50,0,0.55)'  },
+  anchor:    { glossTop: 'rgba(232,250,238,0.60)', rimLight: 'rgba(212,244,224,0.85)', rimDark: 'rgba(8,56,38,0.45)',   castShadow: 'rgba(8,56,38,0.55)'  },
+};
