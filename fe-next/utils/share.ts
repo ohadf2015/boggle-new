@@ -41,9 +41,11 @@ type TranslationFunction = (
  * Get the join URL for a game room
  * @param gameCode - The game code
  * @param utmSource - Optional UTM source to track where link came from
+ * @param hostName - Optional host display name (truncated to 24 chars). When set,
+ *   appended as `host=<encoded>` so the recipient's onboarding can name them.
  * @returns The full URL to join the game
  */
-export const getJoinUrl = (gameCode: string, utmSource?: string): string => {
+export const getJoinUrl = (gameCode: string, utmSource?: string, hostName?: string): string => {
   if (typeof window === 'undefined') return '';
   if (!gameCode) return '';
   const origin = window.location.origin;
@@ -56,6 +58,9 @@ export const getJoinUrl = (gameCode: string, utmSource?: string): string => {
     params.set('utm_source', utmSource);
     params.set('utm_medium', 'referral');
     params.set('utm_campaign', 'player_invite');
+  }
+  if (hostName && hostName.trim()) {
+    params.set('host', hostName.trim().slice(0, 24));
   }
   return `${origin}/${locale}?${params.toString()}`;
 };

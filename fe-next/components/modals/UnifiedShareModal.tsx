@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
 import { getJoinUrl, copyJoinUrl, shareViaWhatsApp, shareViaTwitter, shareViaDiscord, shareViaEmail, shareViaSms, canShareViaSms, generatePersonalizedShareMessage, type GameResultForShare } from '@/utils/share';
 import { trackShare } from '@/utils/growthTracking';
+import { getStoredUsername } from '@/utils/profileStorage';
 import { useNativeShare } from '@/hooks/useNativeShare';
 import { addCoins } from '@/utils/coinManager';
 import { createChallenge, getChallengeUrl, generateChallengeShareMessage, type ChallengeCreatorData, type ChallengeGameConfig, type ChallengePerformance } from '@/utils/challenges';
@@ -78,7 +79,11 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
       toast.success(t('share.shareBonusAwarded'), { icon: '🎉', duration: 3000 });
     }
   }, [t]);
-  const joinUrl = getJoinUrl(gameCode, isPostGame ? 'share-win' : 'modal-share');
+  const joinUrl = getJoinUrl(
+    gameCode,
+    isPostGame ? 'share-win' : 'modal-share',
+    getStoredUsername() ?? undefined,
+  );
   const [copied, setCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatingChallenge, setIsCreatingChallenge] = useState(false);
