@@ -5748,6 +5748,11 @@ const es = {
       "ladder": {
         "empty": "¡Aún no hay palabras! Encuentra la primera.",
       },
+      "kbHint": {
+        "submit": "enviar",
+        "pop": "borrar última",
+        "clear": "limpiar",
+      },
     },
     "facts": {
       "title": "Datos Curiosos",

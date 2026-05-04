@@ -5482,6 +5482,11 @@ const sv = {
       "ladder": {
         "empty": "Inga ord ännu — hitta det första!",
       },
+      "kbHint": {
+        "submit": "skicka",
+        "pop": "ta bort sista",
+        "clear": "rensa",
+      },
     },
     "shareResult": "Dela resultat",
     "quitConfirmTitle": "Lämna jakten?",

@@ -5479,6 +5479,11 @@ const he = {
       "ladder": {
         "empty": "אין מילים עדיין — מצאו את הראשונה!",
       },
+      "kbHint": {
+        "submit": "שלח",
+        "pop": "מחק אות",
+        "clear": "נקה",
+      },
     },
     "shareResult": "שתפו תוצאה",
     "quitConfirmTitle": "לעזוב את הציד?",

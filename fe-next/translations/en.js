@@ -5582,6 +5582,11 @@ const en = {
       "ladder": {
         "empty": "No words yet — find the first one!",
       },
+      "kbHint": {
+        "submit": "submit",
+        "pop": "remove last",
+        "clear": "clear",
+      },
     },
     "shareResult": "Share",
     "quitConfirmTitle": "Leave the Hunt?",

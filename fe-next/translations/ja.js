@@ -5513,6 +5513,11 @@ const ja = {
       "ladder": {
         "empty": "まだ単語がありません — 最初の一つを見つけよう！",
       },
+      "kbHint": {
+        "submit": "送信",
+        "pop": "最後を削除",
+        "clear": "クリア",
+      },
     },
     "shareResult": "結果をシェア",
     "quitConfirmTitle": "ハントを終了する？",
