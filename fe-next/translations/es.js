@@ -1030,6 +1030,7 @@ const es = {
     "tryAgainButton": "Intentar de nuevo",
     "connectionTimeout": "Tarda mucho en conectar",
     "rateLimited": "¡Más lento, campeón!",
+    "sessionMigrated": "Cambiado a tu otra pestaña.",
     "connectionLost": "Conexión perdida - reconectando",
     "notConnected": "No llegamos al servidor",
     "generic": "Algo salió mal. ¡Intenta de nuevo!",
@@ -1233,6 +1234,11 @@ const es = {
   "multiplayerFlow": {
     "host": "Anfitrión",
     "roomClosed": "Sala cerrada",
+    "hostLeftModal": {
+      "title": "El anfitrión se fue",
+      "body": "La sala se está cerrando. Volviendo al lobby en unos segundos — o toca abajo para salir ahora.",
+      "exitNow": "Volver al lobby ahora"
+    },
     "rateLimited": "¡Más lento, campeón!",
     "roomList": {
       "activeRooms": "¡Métete!",
@@ -1297,6 +1303,7 @@ const es = {
       "creating": "Preparando arena...",
       "languageLabel": "Idioma del juego",
       "gameModeLabel": "Modo de juego",
+      "modeRandom": "Aleatorio",
       "wordDifficultyLabel": "Dificultad de palabras"
     },
     "profileSetup": {
@@ -1444,6 +1451,7 @@ const es = {
     "gameOverCheckScores": "¡Fin! Revisa puntuaciones",
     "progressAnnouncement": "Encontraste {found} palabras — {missed} más estaban escondidas!",
     "youAreNowHost": "¡Eres el anfitrión!",
+    "hostTransferredToOther": "Un nuevo anfitrión tomó el control.",
     "newHostAssigned": "ahora es el anfitrión",
     "tournamentMode": "Modo Torneo",
     "rounds": "Rondas",
@@ -3995,6 +4003,31 @@ const es = {
           "wordLegend": "¡Debut legendario!"
         }
       }
+    }
+  },
+  "invite": {
+    "banner": {
+      "host": "{hostName} te espera en",
+      "yourFriend": "Tu amigo",
+      "skipCTA": "Saltar y unirme"
+    },
+    "profile": {
+      "header": "Uniéndote a la sala de {hostName}"
+    },
+    "tutorial": {
+      "prompt": "Arrastra letras para formar una palabra",
+      "submit": "Enviar",
+      "clear": "Borrar",
+      "invalid": "Prueba otra palabra",
+      "celebrate": "¡Bien! Uniéndote a {hostName}…"
+    },
+    "practice": {
+      "banner": "{hostName} te espera en {code}",
+      "dismissAria": "Descartar invitación"
+    },
+    "toast": {
+      "expired": "Esta invitación ha caducado",
+      "notFound": "La sala {code} ya no está disponible"
     }
   },
   "preGameTutorial": {

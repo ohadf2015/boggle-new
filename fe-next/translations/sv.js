@@ -982,6 +982,7 @@ const sv = {
     "tryAgainButton": "Försök igen",
     "connectionTimeout": "Tar för lång tid att ansluta",
     "rateLimited": "Lugna ner dig, sprinter!",
+    "sessionMigrated": "Bytte till din andra flik.",
     "connectionLost": "Förlorade anslutningen - återansluter",
     "notConnected": "Kan inte nå servern",
     "generic": "Något gick fel. Försök igen!",
@@ -1217,6 +1218,11 @@ const sv = {
     "inviteFriend": "Bjud in en vän",
     "host": "Värd",
     "roomClosed": "Rummet stängt",
+    "hostLeftModal": {
+      "title": "Värden lämnade",
+      "body": "Rummet stängs. Du återgår till lobbyn om några sekunder — eller tryck nedan för att lämna nu.",
+      "exitNow": "Tillbaka till lobbyn nu"
+    },
     "rateLimited": "Lugna ner dig!",
     "roomList": {
       "activeRooms": "Hoppa in!",
@@ -1281,6 +1287,7 @@ const sv = {
       "creating": "Förbereder arenan...",
       "languageLabel": "Spelspråk",
       "gameModeLabel": "Spelläge",
+      "modeRandom": "Slumpmässigt",
       "wordDifficultyLabel": "Ordsvårighet"
     },
     "profileSetup": {
@@ -1428,6 +1435,7 @@ const sv = {
     "gameOverCheckScores": "Spelet slut! Kolla slutresultaten",
     "progressAnnouncement": "Hittade {found} ord — {missed} till gömde sig!",
     "youAreNowHost": "Du är nu värden!",
+    "hostTransferredToOther": "En ny värd har tagit över.",
     "newHostAssigned": "är nu värden",
     "tournamentMode": "Turneringsläge",
     "rounds": "Omgångar",
@@ -1939,6 +1947,31 @@ const sv = {
           "wordLegend": "Legendarisk debut!"
         }
       }
+    }
+  },
+  "invite": {
+    "banner": {
+      "host": "{hostName} väntar i",
+      "yourFriend": "Din kompis",
+      "skipCTA": "Hoppa över och gå med"
+    },
+    "profile": {
+      "header": "Går med i {hostName}s rum"
+    },
+    "tutorial": {
+      "prompt": "Dra bokstäver för att skapa ett ord",
+      "submit": "Skicka",
+      "clear": "Rensa",
+      "invalid": "Prova ett annat ord",
+      "celebrate": "Snyggt! Går med {hostName}…"
+    },
+    "practice": {
+      "banner": "{hostName} väntar i {code}",
+      "dismissAria": "Avvisa inbjudan"
+    },
+    "toast": {
+      "expired": "Inbjudan har gått ut",
+      "notFound": "Rummet {code} finns inte längre"
     }
   },
   "preGameTutorial": {

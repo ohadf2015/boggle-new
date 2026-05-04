@@ -975,6 +975,7 @@ const he = {
     "tryAgainButton": "נסה שוב",
     "connectionTimeout": "לוקח יותר מדי זמן להתחבר",
     "rateLimited": "לאט, ספרינטר!",
+    "sessionMigrated": "עברנו ללשונית השנייה שלך.",
     "connectionLost": "איבדנו את החיבור - מתחברים מחדש",
     "notConnected": "לא מצליחים להגיע לשרת",
     "generic": "משהו השתבש. נסה שוב!",
@@ -1206,6 +1207,11 @@ const he = {
   "multiplayerFlow": {
     "host": "מארח",
     "roomClosed": "החדר נסגר",
+    "hostLeftModal": {
+      "title": "המארח עזב",
+      "body": "החדר נסגר. חוזרים ללובי תוך כמה שניות — או הקש כאן כדי לצאת עכשיו.",
+      "exitNow": "חזרה ללובי עכשיו"
+    },
     "rateLimited": "לאט לאט!",
     "roomList": {
       "activeRooms": "קפוץ פנימה!",
@@ -1270,6 +1276,7 @@ const he = {
       "creating": "מכין זירה...",
       "languageLabel": "שפת המשחק",
       "gameModeLabel": "מצב משחק",
+      "modeRandom": "מקרי",
       "wordDifficultyLabel": "רמת קושי מילים"
     },
     "profileSetup": {
@@ -1440,6 +1447,7 @@ const he = {
     "gameOverCheckScores": "המשחק נגמר! בדוק את התוצאות הסופיות",
     "progressAnnouncement": "מצאת {found} מילים — עוד {missed} הסתתרו!",
     "youAreNowHost": "אתה המארח החדש!",
+    "hostTransferredToOther": "מארח חדש קיבל את ההגה.",
     "newHostAssigned": "הוא המארח החדש",
     "tournamentMode": "מצב טורניר",
     "rounds": "סבבים",
@@ -1950,6 +1958,31 @@ const he = {
           "wordLegend": "הופעת בכורה אגדית!"
         }
       }
+    }
+  },
+  "invite": {
+    "banner": {
+      "host": "{hostName} מחכה ב",
+      "yourFriend": "החבר שלך",
+      "skipCTA": "דלג והצטרף"
+    },
+    "profile": {
+      "header": "מצטרף לחדר של {hostName}"
+    },
+    "tutorial": {
+      "prompt": "גרור אותיות כדי ליצור מילה",
+      "submit": "שלח",
+      "clear": "נקה",
+      "invalid": "נסה מילה אחרת",
+      "celebrate": "יופי! מצטרף ל-{hostName}…"
+    },
+    "practice": {
+      "banner": "{hostName} מחכה ב-{code}",
+      "dismissAria": "סגור הזמנה"
+    },
+    "toast": {
+      "expired": "ההזמנה פגה",
+      "notFound": "החדר {code} כבר לא זמין"
     }
   },
 

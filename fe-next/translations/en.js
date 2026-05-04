@@ -966,6 +966,7 @@ const en = {
     "tryAgainButton": "Try again",
     "connectionTimeout": "Connection's dragging — hang tight!",
     "rateLimited": "Slow down, speedster!",
+    "sessionMigrated": "Switched to your other tab.",
     "connectionLost": "Lost connection - reconnecting",
     "notConnected": "Can't reach the server",
     "generic": "Something went wrong. Try again!",
@@ -1200,6 +1201,11 @@ const en = {
   "multiplayerFlow": {
     "host": "Host",
     "roomClosed": "Room closed",
+    "hostLeftModal": {
+      "title": "Host Left",
+      "body": "The room is closing. Returning to the lobby in a few seconds — or tap below to leave now.",
+      "exitNow": "Back to lobby now"
+    },
     "rateLimited": "Slow down, speedster!",
     "crazyGamesFriends": "Play with Friends on CrazyGames",
     "inviteFriend": "Invite a Friend",
@@ -1266,6 +1272,7 @@ const en = {
       "creating": "Setting up arena...",
       "languageLabel": "Game Language",
       "gameModeLabel": "Game Mode",
+      "modeRandom": "Random",
       "wordDifficultyLabel": "Word Difficulty"
     },
     "profileSetup": {
@@ -1414,6 +1421,7 @@ const en = {
     "roomClosedInactivity": "Room timed out — everyone went quiet!",
     "gameOverCheckScores": "Game Over! Check final scores",
     "youAreNowHost": "You are now the host!",
+    "hostTransferredToOther": "A new host has taken over.",
     "newHostAssigned": "is now the host",
     "tournamentMode": "Tournament Mode",
     "rounds": "Rounds",
@@ -2042,6 +2050,31 @@ const en = {
           "wordLegend": "Legendary debut!"
         }
       }
+    }
+  },
+  "invite": {
+    "banner": {
+      "host": "{hostName} is waiting in",
+      "yourFriend": "Your friend",
+      "skipCTA": "Skip & Join now"
+    },
+    "profile": {
+      "header": "Joining {hostName}'s room"
+    },
+    "tutorial": {
+      "prompt": "Drag letters to make a word",
+      "submit": "Submit",
+      "clear": "Clear",
+      "invalid": "Try a different word",
+      "celebrate": "Nice! Joining {hostName}…"
+    },
+    "practice": {
+      "banner": "{hostName} is waiting in {code}",
+      "dismissAria": "Dismiss invite"
+    },
+    "toast": {
+      "expired": "This invite has expired",
+      "notFound": "Room {code} is no longer available"
     }
   },
   "preGameTutorial": {

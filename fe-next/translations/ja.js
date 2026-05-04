@@ -975,6 +975,7 @@ const ja = {
     "tryAgainButton": "もう一度",
     "connectionTimeout": "接続に時間かかりすぎ",
     "rateLimited": "落ち着いて、スプリンター！",
+    "sessionMigrated": "別のタブに切り替えました。",
     "connectionLost": "接続切れ - 再接続中",
     "notConnected": "サーバーに届かない",
     "generic": "問題が発生しました。もう一度やってね！",
@@ -1206,6 +1207,11 @@ const ja = {
   "multiplayerFlow": {
     "host": "ホスト",
     "roomClosed": "ルームが閉鎖されました",
+    "hostLeftModal": {
+      "title": "ホストが退出しました",
+      "body": "ルームを閉じています。数秒後にロビーへ戻ります — すぐ戻るには下をタップ。",
+      "exitNow": "すぐにロビーへ戻る"
+    },
     "rateLimited": "落ち着いて！",
     "roomList": {
       "activeRooms": "飛び込め！",
@@ -1270,6 +1276,7 @@ const ja = {
       "creating": "アリーナ準備中...",
       "languageLabel": "ゲーム言語",
       "gameModeLabel": "ゲームモード",
+      "modeRandom": "ランダム",
       "wordDifficultyLabel": "単語の難易度"
     },
     "profileSetup": {
@@ -1417,6 +1424,7 @@ const ja = {
     "gameOverCheckScores": "ゲームオーバー！最終スコアを確認してください",
     "progressAnnouncement": "{found}個の単語を発見 — あと{missed}個が隠れていた!",
     "youAreNowHost": "あなたが新しいホストになりました！",
+    "hostTransferredToOther": "新しいホストに交代しました。",
     "newHostAssigned": "が新しいホストになりました",
     "tournamentMode": "トーナメントモード",
     "rounds": "ラウンド",
@@ -1926,6 +1934,31 @@ const ja = {
           "wordLegend": "伝説のデビュー！"
         }
       }
+    }
+  },
+  "invite": {
+    "banner": {
+      "host": "{hostName}さんが待っています:",
+      "yourFriend": "お友達",
+      "skipCTA": "スキップして参加"
+    },
+    "profile": {
+      "header": "{hostName}さんのルームに参加中"
+    },
+    "tutorial": {
+      "prompt": "文字をドラッグして単語を作ろう",
+      "submit": "送信",
+      "clear": "クリア",
+      "invalid": "別の単語を試して",
+      "celebrate": "やった！{hostName}さんに参加中…"
+    },
+    "practice": {
+      "banner": "{hostName}さんが {code} で待っています",
+      "dismissAria": "招待を閉じる"
+    },
+    "toast": {
+      "expired": "この招待は期限切れです",
+      "notFound": "ルーム {code} はもう利用できません"
     }
   },
   "preGameTutorial": {
