@@ -94,29 +94,66 @@ export const isFirstTimeUser = (): boolean => {
 };
 
 // ── Pending Room Invite ──────────────────────────────────────────────
-// Preserves a multiplayer room code across the onboarding flow so users
-// who click an invite link before completing FTUE can join after.
+// Preserves a multiplayer room code (and optional host name) across the
+// onboarding flow so users who click an invite link before completing FTUE
+// can join after. Stored as JSON with a 24h TTL.
 
 const PENDING_ROOM_KEY = 'lexiclash_pending_room_invite';
+const INVITE_TTL_MS = 24 * 60 * 60 * 1000;
+const INVITE_EVENT = 'invite-changed';
 
-/** Save a room code so post-onboarding redirect can pick it up. */
-export const savePendingRoomInvite = (roomCode: string): void => {
+export interface PendingRoomInvite {
+  code: string;
+  hostName?: string;
+  ts: number;
+}
+
+const emitInviteChanged = (): void => {
   if (typeof window === 'undefined') return;
-  sessionStorage.setItem(PENDING_ROOM_KEY, roomCode);
+  window.dispatchEvent(new CustomEvent(INVITE_EVENT));
 };
 
-/** Retrieve (and clear) a pending room invite code. */
-export const consumePendingRoomInvite = (): string | null => {
+/** Save a room code (and optional host display name) so post-onboarding redirect can pick it up. */
+export const savePendingRoomInvite = (roomCode: string, hostName?: string): void => {
+  if (typeof window === 'undefined') return;
+  const payload: PendingRoomInvite = { code: roomCode, hostName, ts: Date.now() };
+  sessionStorage.setItem(PENDING_ROOM_KEY, JSON.stringify(payload));
+  emitInviteChanged();
+};
+
+/** Read pending invite without consuming it. Returns null if expired or absent. */
+export const getPendingRoomInvite = (): PendingRoomInvite | null => {
   if (typeof window === 'undefined') return null;
-  const code = sessionStorage.getItem(PENDING_ROOM_KEY);
-  if (code) sessionStorage.removeItem(PENDING_ROOM_KEY);
-  return code;
+  const raw = sessionStorage.getItem(PENDING_ROOM_KEY);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as PendingRoomInvite;
+    if (parsed && typeof parsed === 'object' && parsed.code) {
+      if (typeof parsed.ts === 'number' && Date.now() - parsed.ts > INVITE_TTL_MS) {
+        sessionStorage.removeItem(PENDING_ROOM_KEY);
+        return null;
+      }
+      return parsed;
+    }
+  } catch {
+    // Legacy plain-string payload — wrap and return.
+    return { code: raw, ts: Date.now() };
+  }
+  return null;
 };
 
-/** Check if a pending room invite exists without consuming it. */
+/** Retrieve (and clear) the pending invite room code. */
+export const consumePendingRoomInvite = (): string | null => {
+  const invite = getPendingRoomInvite();
+  if (!invite) return null;
+  sessionStorage.removeItem(PENDING_ROOM_KEY);
+  emitInviteChanged();
+  return invite.code;
+};
+
+/** Check if a (non-expired) pending room invite exists. */
 export const hasPendingRoomInvite = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  return !!sessionStorage.getItem(PENDING_ROOM_KEY);
+  return getPendingRoomInvite() !== null;
 };
 
 /**
