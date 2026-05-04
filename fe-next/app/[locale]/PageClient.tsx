@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite } from '@/utils/onboardingStorage';
+import { trackInviteLanded } from '@/utils/growthTracking';
 import { LandingView } from '@/components/landing';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
 
@@ -48,6 +49,13 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
       const rawHost = params.get('host') ?? '';
       const hostName = sanitizeHostName(rawHost) || undefined;
       savePendingRoomInvite(roomCode, hostName);
+      // Stamp landing time so downstream events can measure secondsSinceLanded
+      sessionStorage.setItem('invite_landed_ts', String(Date.now()));
+      trackInviteLanded({
+        roomCode,
+        hasHostName: !!hostName,
+        isFirstTimeUser: true, // gated by hasCompletedOnboarding check above
+      });
     }
     return true;
   });

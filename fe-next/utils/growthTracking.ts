@@ -120,7 +120,6 @@ export type OnboardingStep =
   | 'language'
   | 'tutorial'
   | 'profile'
-  | 'score_reveal'
   | 'mode_select';
 
 export interface GrowthEventData {
@@ -852,11 +851,7 @@ export const trackOnboardingStart = (extras: Record<string, unknown> = {}): void
   trackGrowthEvent('onboarding_started', extras);
 };
 
-/**
- * Onboarding step completion — fires as the user advances through the FTUE.
- * For `score_reveal`, `action: 'retry' | 'continue'` discriminates friction
- * (retries hit the tutorial loop; continues progress to mode fork).
- */
+/** Onboarding step completion — fires as the user advances through the FTUE. */
 export const trackOnboardingStep = (
   step: OnboardingStep,
   extras: Record<string, unknown> = {},
@@ -1076,6 +1071,74 @@ const growthTracking = {
   trackRewardedAdOffered,
   trackRewardedAdWatched,
   trackRewardedAdDeclined,
+};
+
+// ── Invite onboarding events ──────────────────────────────────────────
+// Funnel for first-time users who land via an MP-room invite link.
+
+interface InviteLandedProps {
+  roomCode: string;
+  hasHostName: boolean;
+  isFirstTimeUser: boolean;
+}
+
+export const trackInviteLanded = (props: InviteLandedProps): void => {
+  try {
+    posthog.capture('invite_landed', props);
+  } catch { /* silent — posthog not initialised */ }
+};
+
+export const trackInviteTutorialStarted = (props: { roomCode: string }): void => {
+  try {
+    posthog.capture('invite_tutorial_started', props);
+  } catch { /* silent */ }
+};
+
+interface InviteTutorialWordFoundProps {
+  roomCode: string;
+  word: string;
+  secondsSinceStart: number;
+}
+
+export const trackInviteTutorialWordFound = (props: InviteTutorialWordFoundProps): void => {
+  try {
+    posthog.capture('invite_tutorial_word_found', props);
+  } catch { /* silent */ }
+};
+
+interface InviteTutorialSkippedProps {
+  roomCode: string;
+  step: 'profile' | 'tutorial';
+  secondsSinceLanded: number;
+}
+
+export const trackInviteTutorialSkipped = (props: InviteTutorialSkippedProps): void => {
+  try {
+    posthog.capture('invite_tutorial_skipped', props);
+  } catch { /* silent */ }
+};
+
+interface InviteConsumedProps {
+  roomCode: string;
+  path: 'tutorial' | 'skip';
+  totalSeconds: number;
+}
+
+export const trackInviteConsumed = (props: InviteConsumedProps): void => {
+  try {
+    posthog.capture('invite_consumed', props);
+  } catch { /* silent */ }
+};
+
+interface PracticePendingBannerProps {
+  roomCode: string;
+  secondsOnPracticeHub: number;
+}
+
+export const trackPracticePendingBannerClicked = (props: PracticePendingBannerProps): void => {
+  try {
+    posthog.capture('practice_pending_banner_clicked', props);
+  } catch { /* silent */ }
 };
 
 export default growthTracking;
