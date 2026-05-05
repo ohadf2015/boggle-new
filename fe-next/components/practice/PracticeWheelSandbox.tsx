@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Check } from 'lucide-react';
+import { Check, RotateCcw, Shuffle } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import PracticeChainCta from './PracticeChainCta';
-import PracticeCompleteBanner from './PracticeCompleteBanner';
+import PracticeCompletePopup from './PracticeCompletePopup';
+import PracticePostCompleteChip from './PracticePostCompleteChip';
 import PracticeInstructions from './PracticeInstructions';
 import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
 import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
@@ -70,7 +70,11 @@ const RADIUS_PX = 84; // matches real WheelRush mid-breakpoint orbit
 export default function PracticeWheelSandbox() {
   const { language, t } = useLanguage();
   const puzzle = PUZZLES[language] ?? PUZZLES.en;
-  const allLetters = useMemo(() => [puzzle.center, ...puzzle.outer], [puzzle]);
+  // Outer letters live in state so Shuffle can rearrange them. Reset on
+  // language change so locale switches still pull from PUZZLES correctly.
+  const [outerLetters, setOuterLetters] = useState<string[]>(puzzle.outer);
+  useEffect(() => { setOuterLetters(puzzle.outer); }, [puzzle]);
+  const allLetters = useMemo(() => [puzzle.center, ...outerLetters], [puzzle.center, outerLetters]);
 
   const validator = usePracticeValidator(language);
   const juice = usePracticeJuice();
@@ -87,10 +91,27 @@ export default function PracticeWheelSandbox() {
   const [confettiKey, setConfettiKey] = useState(0);
   const [scorePopup, setScorePopup] = useState<{ key: number; points: number } | null>(null);
   const [toast, setToast] = useState<{ type: FeedbackType; message: string } | null>(null);
+  const [popupDismissed, setPopupDismissed] = useState(false);
+  // Bad-feedback shake on the built-word builder — matches real WordWheelGame
+  // (lines 290-293). Visual confirmation the word was rejected without a
+  // textual error in the player's reading path.
+  const [builderShake, setBuilderShake] = useState(false);
 
   const startedAtRef = useRef(0);
   const completedFiredRef = useRef(false);
   const isComplete = foundWords.length >= PRACTICE_GOALS.wheelRush;
+
+  // ── Drag-to-spell + idle auto-submit refs (parity with real WordWheelGame
+  // lines 162-397). Drag engages only after pointer moves to a DIFFERENT
+  // letter than the start so single taps stay single taps. ──
+  const draggingRef = useRef(false);
+  const lastDragIdxRef = useRef<number | null>(null);
+  const dragStartIdxRef = useRef<number | null>(null);
+  const dragEngagedRef = useRef(false);
+  const idleSubmitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const builtRef = useRef(built);
+  const usedIndicesRef = useRef<Set<number>>(new Set());
+  useEffect(() => { builtRef.current = built; }, [built]);
   // Friendly mid-game coaching — fires once per session per mistake kind.
   const coach = usePracticeMistakeCoach();
   const badCountRef = useRef(0);
@@ -117,6 +138,7 @@ export default function PracticeWheelSandbox() {
   }, [isComplete, foundWords.length, language, advanceBeat]);
 
   const usedIndices = useMemo(() => new Set(built.map((b) => b.originIndex)), [built]);
+  useEffect(() => { usedIndicesRef.current = usedIndices; }, [usedIndices]);
   const word = useMemo(() => built.map((b) => b.letter).join(''), [built]);
 
   const onLetterPress = useCallback((_letter: string, idx: number, _el: HTMLButtonElement) => {
@@ -188,10 +210,133 @@ export default function PracticeWheelSandbox() {
     return () => window.removeEventListener('keydown', onKey);
   }, [onSubmit]);
 
+  // ── Idle 1s auto-submit (parity with real WordWheelGame.tsx:189-199) ──
+  // After the player stops adding letters for 1s with ≥3 letters built, auto
+  // submit. Bad-feedback cancels (player is reading the rejection message).
+  useEffect(() => {
+    if (idleSubmitTimerRef.current) {
+      clearTimeout(idleSubmitTimerRef.current);
+      idleSubmitTimerRef.current = null;
+    }
+    if (built.length >= 3 && !isComplete && feedback !== 'bad' && feedback !== 'noCenter') {
+      idleSubmitTimerRef.current = setTimeout(() => {
+        idleSubmitTimerRef.current = null;
+        onSubmit();
+      }, 1000);
+    }
+    return () => {
+      if (idleSubmitTimerRef.current) {
+        clearTimeout(idleSubmitTimerRef.current);
+        idleSubmitTimerRef.current = null;
+      }
+    };
+  }, [built, isComplete, feedback, onSubmit]);
+
+  // ── Drag-to-spell (parity with real WordWheelGame.tsx:353-397) ──
+  // Drag only engages once pointer moves to a different letter than the start
+  // — so single taps stay single taps and onClick still fires.
+  const tryDragHit = useCallback((clientX: number, clientY: number) => {
+    const el = document.elementFromPoint(clientX, clientY) as HTMLElement | null;
+    const btn = el?.closest<HTMLButtonElement>('[data-wheel-letter]');
+    if (!btn) return;
+    const idx = Number(btn.dataset.wheelIndex);
+    if (idx === lastDragIdxRef.current) return;
+    if (!dragEngagedRef.current) {
+      const startIdx = dragStartIdxRef.current;
+      if (startIdx === null || idx === startIdx) return;
+      dragEngagedRef.current = true;
+      lastDragIdxRef.current = startIdx;
+      const startBtn = document.querySelector<HTMLButtonElement>(
+        `[data-wheel-index="${startIdx}"]`,
+      );
+      if (startBtn && !usedIndicesRef.current.has(startIdx)) {
+        const startLetter = startBtn.dataset.wheelLetter || '';
+        setBuilt((prev) => [...prev, { letter: startLetter, originIndex: startIdx }]);
+      }
+    }
+    if (usedIndicesRef.current.has(idx)) return;
+    lastDragIdxRef.current = idx;
+    const letter = btn.dataset.wheelLetter || '';
+    setBuilt((prev) => [...prev, { letter, originIndex: idx }]);
+  }, []);
+
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    draggingRef.current = true;
+    dragEngagedRef.current = false;
+    lastDragIdxRef.current = null;
+    const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+    const btn = el?.closest<HTMLButtonElement>('[data-wheel-letter]');
+    dragStartIdxRef.current = btn ? Number(btn.dataset.wheelIndex) : null;
+  }, []);
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!draggingRef.current) return;
+    tryDragHit(e.clientX, e.clientY);
+  }, [tryDragHit]);
+  const handlePointerUp = useCallback(() => {
+    const wasEngaged = dragEngagedRef.current;
+    draggingRef.current = false;
+    lastDragIdxRef.current = null;
+    dragStartIdxRef.current = null;
+    dragEngagedRef.current = false;
+    if (wasEngaged && builtRef.current.length >= 3) {
+      if (idleSubmitTimerRef.current) {
+        clearTimeout(idleSubmitTimerRef.current);
+        idleSubmitTimerRef.current = null;
+      }
+      onSubmit();
+    }
+  }, [onSubmit]);
+
+  // ── Reset (clear built word) ──
+  const handleReset = useCallback(() => {
+    setBuilt([]);
+    setFeedback(null);
+    sound.playButtonClickSound?.();
+  }, [sound]);
+
+  // ── Shuffle outer letters (parity with real WordWheelGame.tsx:417-441) ──
+  // Built letters carry positional wheelIndex; after shuffle the same index
+  // would point to a different letter. Remap each built tile to its new
+  // position by letter (preferring unused positions for duplicates); drop any
+  // that can't be relocated. Center letter (originIndex 0) is unaffected.
+  const handleShuffle = useCallback(() => {
+    setOuterLetters((prev) => {
+      const arr = [...prev];
+      for (let i = arr.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      setBuilt((prevBuilt) => {
+        const claimed = new Set<number>();
+        const remapped: typeof prevBuilt = [];
+        for (const b of prevBuilt) {
+          if (b.originIndex === 0) { remapped.push(b); continue; }
+          const newIdx = arr.findIndex((l, idx) => l === b.letter && !claimed.has(idx + 1));
+          if (newIdx !== -1) {
+            claimed.add(newIdx + 1);
+            remapped.push({ letter: b.letter, originIndex: newIdx + 1 });
+          }
+        }
+        return remapped;
+      });
+      return arr;
+    });
+    sound.playBoardShuffleSound?.();
+  }, [sound]);
+
   // Auto-clear feedback toast after 1.4s (matches real WheelRush UX).
   useEffect(() => {
     if (!feedback) return;
     const id = setTimeout(() => setFeedback(null), 1400);
+    return () => clearTimeout(id);
+  }, [feedback]);
+
+  // Trigger builder shake when feedback flips to bad/noCenter — auto-clears
+  // after 400ms (one shake cycle).
+  useEffect(() => {
+    if (feedback !== 'bad' && feedback !== 'noCenter') return;
+    setBuilderShake(true);
+    const id = setTimeout(() => setBuilderShake(false), 400);
     return () => clearTimeout(id);
   }, [feedback]);
 
@@ -249,8 +394,19 @@ export default function PracticeWheelSandbox() {
       />
 
       {/* Wheel — uses real WheelLetter for visual parity, with the real
-          decorative PixiJS orbital ring overlay (pointer-events-none, lazy). */}
-      <div data-testid="practice-wheel" className="relative w-56 h-56 sm:w-64 sm:h-64">
+          decorative PixiJS orbital ring overlay (pointer-events-none, lazy).
+          Pointer handlers wire drag-to-spell so practice feels exactly like
+          live WheelRush. Single taps still pass through via WheelLetter's
+          onClick because dragEngagedRef gates the additive logic. */}
+      <div
+        data-testid="practice-wheel"
+        className="relative w-56 h-56 sm:w-64 sm:h-64 touch-none"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onPointerLeave={handlePointerUp}
+      >
         <div className="absolute inset-0 pointer-events-none">
           <WordWheelPixiRing
             selectedIndices={Array.from(usedIndices)}
@@ -265,7 +421,7 @@ export default function PracticeWheelSandbox() {
           isUsed={usedIndices.has(0)}
           onPress={onLetterPress}
         />
-        {puzzle.outer.map((letter, i) => {
+        {outerLetters.map((letter, i) => {
           const idx = i + 1;
           return (
             <WheelLetter
@@ -273,7 +429,7 @@ export default function PracticeWheelSandbox() {
               letter={letter}
               isCenter={false}
               index={idx}
-              angle={i * (360 / puzzle.outer.length)}
+              angle={i * (360 / outerLetters.length)}
               radius={RADIUS_PX}
               isUsed={usedIndices.has(idx)}
               onPress={onLetterPress}
@@ -314,8 +470,21 @@ export default function PracticeWheelSandbox() {
         )}
       </AnimatePresence>
 
-      {/* Built-word builder — uses real WordTile (tap to remove). */}
-      <div className="flex items-end gap-1 min-h-[3rem]" data-testid="practice-built-word">
+      {/* Built-word builder — uses real WordTile (tap to remove). Shakes
+          horizontally on bad / missing-center feedback (real-game parity).
+          Empty state shows a tap-or-drag hint so first-timers don't stare
+          at a blank rectangle. */}
+      <motion.div
+        className="flex items-end gap-1 min-h-[3rem]"
+        data-testid="practice-built-word"
+        animate={builderShake ? { x: [0, -8, 8, -6, 6, 0] } : { x: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        {built.length === 0 && (
+          <span className="text-neo-cream/55 font-neo-body text-xs italic">
+            {t('practice.wheelRush.builderHint')}
+          </span>
+        )}
         <AnimatePresence mode="popLayout">
           {built.map((b, i) => (
             <WordTile
@@ -338,6 +507,40 @@ export default function PracticeWheelSandbox() {
             <Check className="w-5 h-5" aria-hidden />
           </button>
         )}
+      </motion.div>
+
+      {/* Reset + Shuffle row — mirrors live WordWheelGame controls
+          (RotateCcw + Shuffle icons, same neo-brutalist chrome). Visible
+          always, sized for thumb reach without crowding the wheel. Stagger
+          entrance keeps the controls feeling crafted on first paint. */}
+      <div className="flex items-center justify-center gap-3" aria-label="wheel-controls">
+        <motion.button
+          type="button"
+          data-testid="practice-wheel-reset"
+          onClick={handleReset}
+          aria-label={t('practice.wheelRush.reset')}
+          className="inline-flex items-center justify-center w-10 h-10 rounded-full border-3 border-neo-black bg-neo-cream text-neo-navy shadow-hard active:translate-y-px active:shadow-hard-pressed disabled:opacity-50"
+          disabled={built.length === 0}
+          initial={{ opacity: 0, y: 8, scale: 0.85 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 360, damping: 22 }}
+          whileTap={{ scale: 0.92 }}
+        >
+          <RotateCcw className="w-5 h-5" aria-hidden />
+        </motion.button>
+        <motion.button
+          type="button"
+          data-testid="practice-wheel-shuffle"
+          onClick={handleShuffle}
+          aria-label={t('practice.wheelRush.shuffle')}
+          className="inline-flex items-center justify-center w-10 h-10 rounded-full border-3 border-neo-black bg-neo-purple text-neo-cream shadow-hard active:translate-y-px active:shadow-hard-pressed"
+          initial={{ opacity: 0, y: 8, scale: 0.85 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.18, type: 'spring', stiffness: 360, damping: 22 }}
+          whileTap={{ scale: 0.92, rotate: 90 }}
+        >
+          <Shuffle className="w-5 h-5" aria-hidden />
+        </motion.button>
       </div>
 
       {/* Found words — last-found highlight matches real
@@ -390,13 +593,12 @@ export default function PracticeWheelSandbox() {
         )}
       </AnimatePresence>
 
-      {isComplete && <PracticeCompleteBanner mode="wheelRush" />}
-      {isComplete && (
-        <PracticeChainCta
-          currentMode="wheelRush"
-          className="mt-2 inline-flex items-center justify-center w-full bg-neo-purple text-neo-cream border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed"
-        />
-      )}
+      <PracticeCompletePopup
+        open={isComplete && !popupDismissed}
+        mode="wheelRush"
+        onDismiss={() => setPopupDismissed(true)}
+      />
+      <PracticePostCompleteChip open={isComplete && popupDismissed} mode="wheelRush" />
     </div>
   );
 }

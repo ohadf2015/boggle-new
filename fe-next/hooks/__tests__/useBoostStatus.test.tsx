@@ -2,6 +2,10 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useBoostStatus } from '../useBoostStatus';
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ isAuthenticated: true }),
+}));
+
 describe('useBoostStatus', () => {
   beforeEach(() => {
     global.fetch = vi.fn();

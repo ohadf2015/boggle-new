@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { Flame } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
-import HeaderMenuDropdown from '../HeaderMenuDropdown';
 import AuthButton from '../auth/AuthButton';
 import { QuickLanguageSwitcher } from '../QuickLanguageSwitcher';
 import MusicControls from '../MusicControls';
@@ -17,7 +16,12 @@ interface HeaderDesktopControlsProps {
     onSignUp: () => void;
 }
 
-const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount, onOpenGiftModal, onSignIn, onSignUp }) => {
+// Desktop inline strip — streak / music / lang / auth.
+// The unified menu trigger now lives in HeaderMobileMenu (visible at all
+// breakpoints), so this component no longer renders a dropdown.
+// `unclaimedCount` + `onOpenGiftModal` props are retained for API parity
+// with HeaderMobileMenu — gift surfacing happens inside the side drawer.
+const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ onSignIn, onSignUp }) => {
     const { t, language } = useLanguage();
     const { isAuthenticated, loading } = useAuth();
     const { isOnCrazyGamesPlatform, isLoading: cgLoading } = useCrazyGames();
@@ -51,17 +55,6 @@ const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount
                 <AuthButton
                     onSignInClick={onSignIn}
                     onSignUpClick={onSignUp}
-                />
-            )}
-
-            {/* Unified menu — all actions live here.
-                Hidden on CrazyGames (mirrors HeaderMobileMenu): menu items lead
-                to profile/settings/leaderboard/cookie banner/Ko-fi/Instagram —
-                all of which navigate the player off-mode (CG is multiplayer-only). */}
-            {!isOnCrazyGamesPlatform && (
-                <HeaderMenuDropdown
-                    unclaimedCount={unclaimedCount}
-                    onOpenGiftModal={onOpenGiftModal}
                 />
             )}
         </div>

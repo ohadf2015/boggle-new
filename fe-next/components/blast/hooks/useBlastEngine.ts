@@ -89,6 +89,12 @@ export interface UseBlastEngineReturn {
   getLatestState: () => { grid: LetterGrid | null; tileStates: BlastTileState[][] };
   /** Apply server-authoritative board state (MP sync) */
   applyServerBoard: (newGrid: LetterGrid, newTileStates: BlastTileState[][]) => void;
+  /** Goal Gallery — ratchet peakCascadeDepth from cascade hook. */
+  recordCascadeDepth: (depth: number) => void;
+  /** Goal Gallery — flip routeCompleted flag (path_route satisfied). */
+  setRouteCompleted: () => void;
+  /** Goal Gallery — flip sniperHit flag (tile_sniper satisfied). */
+  setSniperHit: () => void;
   /** Sprint 1: visible "Lucky Boost" chip flips on after 2+ consecutive failed
    *  words. Singleplayer only — hidden state surfaced so players see when the
    *  game is helping them. Mirrors the boost gate in the spawn-modifier path. */
@@ -377,6 +383,9 @@ export function useBlastEngine(
       for (const [tType, count] of Object.entries(clearedTypeCounts)) {
         mergedTypeClears[tType as BlastTileType] = (mergedTypeClears[tType as BlastTileType] || 0) + (count as number);
       }
+      // Goal Gallery — peak word length per wave.
+      // peakCascadeDepth is bumped elsewhere where cascadeChainLevel advances.
+      const newPeakWordLength = Math.max(prev.peakWordLength ?? 0, word.length);
       return {
         ...prev,
         score: prev.score + totalScore - betweenTurn.penalty,
@@ -390,6 +399,8 @@ export function useBlastEngine(
           prev.diamondRevealTurns > 0 ? prev.diamondRevealTurns - 1 : 0,
         ),
         lastWordColorCounts: colorCounts,
+        peakWordLength: newPeakWordLength,
+        lastWordCells: path.map(c => ({ row: c.row, col: c.col })),
       };
     });
 
@@ -562,6 +573,25 @@ export function useBlastEngine(
     setTileStates(() => newTileStates);
   }, []);
 
+  // Goal Gallery — ratchet peakCascadeDepth from cascade hook.
+  // Called after a cascade resolves with the achieved chain depth.
+  const recordCascadeDepth = useCallback((depth: number) => {
+    if (depth <= 0) return;
+    setGameState(prev => ({
+      ...prev,
+      peakCascadeDepth: Math.max(prev.peakCascadeDepth ?? 0, depth),
+    }));
+  }, []);
+
+  // Goal Gallery — flip routeCompleted (path_route) and sniperHit (tile_sniper)
+  // from BlastGame's evaluator effect. Idempotent: already-flipped flags stay set.
+  const setRouteCompleted = useCallback(() => {
+    setGameState(prev => prev.routeCompleted ? prev : { ...prev, routeCompleted: true });
+  }, []);
+  const setSniperHit = useCallback(() => {
+    setGameState(prev => prev.sniperHit ? prev : { ...prev, sniperHit: true });
+  }, []);
+
   // Stable actions object — functions never change identity, so use empty deps
   const actions = useMemo(() => ({
     submitWord,
@@ -579,6 +609,9 @@ export function useBlastEngine(
     addBonusScore,
     getLatestState,
     applyServerBoard,
+    recordCascadeDepth,
+    setRouteCompleted,
+    setSniperHit,
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }), []);
 

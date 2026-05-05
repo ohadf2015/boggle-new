@@ -10,6 +10,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
+// ── ResultsBannerSlot mock (added in 2026-05-05; pulls in useAdMob) ──────────
+vi.mock('@/components/ads/ResultsBannerSlot', () => ({ default: () => null }));
+
 // ── Mascot mock ──────────────────────────────────────────────────────────────
 vi.mock('@/components/ui/Mascot', () => ({
   MascotWithEntrance: ({ variant }: { variant: string }) => (

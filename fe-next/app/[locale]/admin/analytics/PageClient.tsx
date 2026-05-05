@@ -13,6 +13,10 @@ import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
 import { RetentionHeatmap } from '@/components/admin/analytics/RetentionHeatmap';
 import { EngagementFunnel } from '@/components/admin/analytics/EngagementFunnel';
 import { ChurnRiskPanel } from '@/components/admin/analytics/ChurnRiskPanel';
+import { CountryBreakdown } from '@/components/admin/analytics/CountryBreakdown';
+import { AcquisitionSources } from '@/components/admin/analytics/AcquisitionSources';
+import { GuestActivityPanel } from '@/components/admin/analytics/GuestActivityPanel';
+import { AuthSessionsPanel } from '@/components/admin/analytics/AuthSessionsPanel';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
@@ -117,6 +121,16 @@ export default function AnalyticsPageClient() {
 
           <EngagementFunnel funnel={funnel} />
           <RetentionHeatmap cohorts={cohorts} />
+          {authToken && (
+            <>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <CountryBreakdown authToken={authToken} />
+                <AcquisitionSources authToken={authToken} />
+              </div>
+              <AuthSessionsPanel authToken={authToken} />
+              <GuestActivityPanel authToken={authToken} />
+            </>
+          )}
           <ChurnRiskPanel players={churnPlayers} total={churnTotal} />
         </main>
       </div>

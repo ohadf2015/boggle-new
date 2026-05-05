@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Heart } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import PracticeChainCta from './PracticeChainCta';
-import PracticeCompleteBanner from './PracticeCompleteBanner';
+import PracticeCompletePopup from './PracticeCompletePopup';
+import PracticePostCompleteChip from './PracticePostCompleteChip';
 import PracticeInstructions from './PracticeInstructions';
 import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
 import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
@@ -99,6 +99,7 @@ export default function PracticeWordHuntSandbox() {
   >([]);
   const [shortTip, setShortTip] = useState<string | null>(null);
   const [confettiKey, setConfettiKey] = useState(0);
+  const [popupDismissed, setPopupDismissed] = useState(false);
 
   const overlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shortTipTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -399,7 +400,10 @@ export default function PracticeWordHuntSandbox() {
         </div>
 
         {discoveries.length > 0 && (
-          <div className="w-full" data-testid="practice-discoveries">
+          <div
+            className="w-full max-h-[14vh] overflow-y-auto"
+            data-testid="practice-discoveries"
+          >
             <DiscoveredWordsList words={discoveries} t={t} />
           </div>
         )}
@@ -411,15 +415,11 @@ export default function PracticeWordHuntSandbox() {
         )}
       </div>
 
-      {/* Bail-out CTA — pinned bottom. */}
-      <div className="mt-auto flex flex-col gap-2 w-full">
-        {solved && <PracticeCompleteBanner mode="wordHunt" />}
-        {solved ? (
-          <PracticeChainCta
-            currentMode="wordHunt"
-            className="inline-flex items-center justify-center w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed"
-          />
-        ) : (
+      {/* Bail-out CTA — pinned bottom (only when unsolved; solved state
+          uses the celebration popup instead so the chain CTA is overlaid
+          and never below the fold). */}
+      {!solved && (
+        <div className="mt-auto w-full">
           <Link
             href={liveHref}
             data-testid="practice-bailout-cta"
@@ -427,8 +427,15 @@ export default function PracticeWordHuntSandbox() {
           >
             {t('practice.wordHunt.bailoutCta')}
           </Link>
-        )}
-      </div>
+        </div>
+      )}
+
+      <PracticeCompletePopup
+        open={solved && !popupDismissed}
+        mode="wordHunt"
+        onDismiss={() => setPopupDismissed(true)}
+      />
+      <PracticePostCompleteChip open={solved && popupDismissed} mode="wordHunt" />
     </div>
   );
 }

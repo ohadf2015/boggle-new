@@ -73,6 +73,42 @@ function getProgress(
       }
       break;
     }
+
+    // ===== Goal Gallery (mechanic-rich rotating goals) =====
+
+    case 'cascade_chain': {
+      // Player must trigger ≥N cascade depth from a single word's chain reaction.
+      // Reads peakCascadeDepth which the engine ratchets whenever
+      // cascadeChainLevel advances during a cascade. Goal stays satisfied
+      // once hit even if later moves never re-cascade.
+      current = gameState.peakCascadeDepth ?? 0;
+      break;
+    }
+
+    case 'path_route': {
+      // Reducer flips `routeCompleted` when any submitted word's selection
+      // path includes both startCell + endCell (and any mustPassCells). Hook
+      // just reads the flag so progress is binary 0/1.
+      current = gameState.routeCompleted ? 1 : 0;
+      break;
+    }
+
+    case 'tile_sniper': {
+      // Reducer flips `sniperHit` when any submitted word's path includes
+      // the marked targetCell. Binary 0/1.
+      current = gameState.sniperHit ? 1 : 0;
+      break;
+    }
+
+    case 'long_word_lockup': {
+      // Single masterstroke: any word ≥ minWordLength counts. Track peak
+      // so goal stays earned across wave even if shorter words follow.
+      const minLen = objective.minWordLength ?? 8;
+      const peak = gameState.peakWordLength ?? 0;
+      // current=1 once peak crosses threshold, else 0
+      current = peak >= minLen ? 1 : 0;
+      break;
+    }
   }
 
   return {

@@ -24,6 +24,7 @@ import { useAdminDashboard } from '@/hooks/useAdminDashboard';
 import { KPICards } from '@/components/admin/overview/KPICards';
 import { SystemHealth } from '@/components/admin/overview/SystemHealth';
 import { GameModePopularity } from '@/components/admin/overview/GameModePopularity';
+import { DailyActivityChart } from '@/components/admin/overview/DailyActivityChart';
 
 export default function AdminPageClient() {
   const router = useRouter();
@@ -126,6 +127,7 @@ export default function AdminPageClient() {
           {/* Dashboard content */}
           {authToken ? (
             <>
+              <DailyActivityChart authToken={authToken} />
               <LiveMonitor authToken={authToken} onTokenExpired={refreshToken} />
               <TodayGamesHistory authToken={authToken} />
 

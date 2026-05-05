@@ -10,7 +10,8 @@ import { Button } from '@/components/ui/button';
 import { MobileTooltip } from '@/components/ui/MobileTooltip';
 import { cn } from '@/lib/utils';
 import { useBlastBadgeUnlocks } from './hooks/useBlastBadgeUnlocks';
-import { BlastBragCard } from './BlastBragCard';
+import { BlastInsightRibbon } from './BlastInsightRibbon';
+import { BlastCountUp } from './BlastCountUp';
 import { getMascotForResults, MASCOT_IMAGES } from './utils/blastMascot';
 import { computeFailReason } from './utils/computeFailReason';
 import type { BlastResultsData } from './types';
@@ -74,12 +75,13 @@ export function BlastResultsSummary({
       data-fail={didFail ? 'true' : 'false'}
     >
       <div className="flex-1 overflow-y-auto px-4 pt-6 pb-4 flex flex-col items-center gap-4">
-      {/* Mascot */}
+      {/* Mascot — tabloid tilt: -3deg LTR, +3deg RTL via Tailwind logical
+          rotation. Slight overshoot on entrance reads as "stuck on the page". */}
       <AdaptiveMotion.div
-        initial={{ scale: 0, rotate: -10, opacity: 0 }}
-        animate={{ scale: 1, rotate: 0, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 380, damping: 18 }}
-        className="relative w-24 h-24 rounded-neo border-3 border-neo-black shadow-hard-lg overflow-hidden bg-neo-navy-light"
+        initial={{ scale: 0, rotate: -16, opacity: 0 }}
+        animate={{ scale: 1, rotate: -3, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 380, damping: 14 }}
+        className="relative w-28 h-28 rounded-neo border-3 border-neo-black shadow-hard-lg overflow-hidden bg-neo-navy-light rtl:rotate-3"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -182,6 +184,9 @@ export function BlastResultsSummary({
         </AdaptiveMotion.div>
       )}
 
+      {/* Insight ribbon — single hero headline picked from results */}
+      {!didFail && <BlastInsightRibbon results={results} t={t} />}
+
       {/* Score card */}
       <AdaptiveMotion.div
         initial={{ scale: 0.8, opacity: 0 }}
@@ -210,7 +215,11 @@ export function BlastResultsSummary({
           </AdaptiveMotion.div>
         )}
         <p className="text-6xl font-black text-white tabular-nums font-neo-display drop-shadow-[2px_2px_0_#000]">
-          {results.finalScore.toLocaleString()}
+          <BlastCountUp
+            value={results.finalScore}
+            data-testid="blast-results-final-score"
+            className="inline-block"
+          />
         </p>
         <p className="text-xs uppercase tracking-widest text-white/50 mt-1 font-bold">
           {results.wordsFound.length} {t('blast.wordsFound')} &middot;{' '}
@@ -246,9 +255,6 @@ export function BlastResultsSummary({
           </div>
         </div>
       </AdaptiveMotion.div>
-
-      {/* Brag card */}
-      <BlastBragCard results={results} t={t} />
 
       {/* Best-moment grid */}
       <AdaptiveMotion.div
@@ -287,7 +293,9 @@ export function BlastResultsSummary({
         )}
       </AdaptiveMotion.div>
 
-      {/* Wave breakdown */}
+      {/* Wave breakdown — horizontal scroll-snap row. Each wave is its own
+          mini card; best wave gets the lime-ring sticker. Beats the vertical
+          bar list at being scannable when the player ran 5+ waves. */}
       {results.waveResults.length > 0 && (
         <AdaptiveMotion.div
           initial={{ y: 10, opacity: 0 }}
@@ -299,7 +307,11 @@ export function BlastResultsSummary({
           <p className="text-[10px] uppercase tracking-widest font-bold text-white/60 mb-2 px-1">
             {t('blast.waveBreakdown')}
           </p>
-          <div className="flex flex-col gap-1.5">
+          <div
+            className="flex gap-2 overflow-x-auto -mx-1 px-1 pb-1 snap-x snap-mandatory
+                       scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10"
+            data-testid="blast-results-wave-strip"
+          >
             {results.waveResults.map((wave) => {
               const isBest = bestWave?.waveNumber === wave.waveNumber;
               const pct = wave.clearPercentage;
@@ -307,28 +319,39 @@ export function BlastResultsSummary({
                 <div
                   key={wave.waveNumber}
                   className={cn(
-                    'flex items-center gap-2 px-3 py-2 rounded-neo border-2',
+                    'shrink-0 snap-start flex flex-col items-center justify-between gap-1 w-20 px-2 py-2 rounded-neo border-3',
                     isBest
-                      ? 'border-neo-lime bg-neo-lime/10'
-                      : 'border-white/10 bg-neo-navy',
+                      ? 'border-neo-lime bg-linear-to-b from-neo-lime/15 to-neo-lime/5 shadow-hard'
+                      : 'border-neo-black/40 bg-neo-navy shadow-hard-sm',
                   )}
                 >
                   <span className={cn(
-                    'font-neo-display font-black text-xs min-w-[48px]',
-                    isBest ? 'text-neo-lime' : 'text-white/60',
+                    'font-neo-display font-black text-[10px] uppercase tracking-wider',
+                    isBest ? 'text-neo-lime' : 'text-white/55',
                   )}>
                     {t('blast.results.wave', { n: String(wave.waveNumber) })}
                   </span>
-                  <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                    <div
-                      className={cn('h-full rounded-full', isBest ? 'bg-neo-lime' : 'bg-neo-cyan/60')}
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                  <span className="font-black text-xs text-white tabular-nums min-w-[44px] text-right">
+                  <span className={cn(
+                    'font-neo-display font-black text-base leading-none tabular-nums',
+                    isBest ? 'text-neo-lime' : 'text-white',
+                  )}>
                     {wave.score.toLocaleString()}
                   </span>
-                  <span className="text-[10px] text-white/40 tabular-nums min-w-[30px] text-right">
+                  {/* Mini circular % indicator — stack of 8 dots filled by tens */}
+                  <div className="flex gap-[2px] mt-0.5">
+                    {[...Array(8)].map((_, i) => (
+                      <span
+                        key={i}
+                        className={cn(
+                          'w-[5px] h-[5px] rounded-full',
+                          (i + 1) * 12.5 <= pct
+                            ? (isBest ? 'bg-neo-lime' : 'bg-neo-cyan')
+                            : 'bg-white/15',
+                        )}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-[9px] text-white/40 tabular-nums">
                     {pct}%
                   </span>
                 </div>

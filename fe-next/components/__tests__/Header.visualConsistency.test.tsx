@@ -152,7 +152,7 @@ describe('Header Visual Consistency - Desktop Mode', () => {
 
             // Desktop controls now have: Coin Balance link, Gift button, Language Switcher, Menu
             // Note: Profile link with coin balance doesn't have bg-neo-cream class
-            // Settings has been moved to HeaderMenuDropdown
+            // Settings has been moved to the unified side drawer
 
             // Test that desktop controls exist and contain expected elements
             expect(desktopControls).toBeInTheDocument();
@@ -171,7 +171,7 @@ describe('Header Visual Consistency - Desktop Mode', () => {
             const desktopControls = container.querySelector('.hidden.sm\\:flex');
 
             // Gift button should NOT have gradients (uses solid bg-amber-400)
-            // Note: Settings has been moved to HeaderMenuDropdown
+            // Note: Settings has been moved to the unified side drawer
             const giftButton = desktopControls?.querySelector('button[aria-label*="gift"]');
 
             if (giftButton) {

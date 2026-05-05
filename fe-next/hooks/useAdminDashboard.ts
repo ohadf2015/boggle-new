@@ -1,11 +1,16 @@
 /**
  * Hook for fetching admin dashboard KPI stats and system health.
+ *
+ * Polls every 30s while the admin tab is visible. Pauses the poll when the
+ * tab is hidden (`document.hidden === true`) and refetches immediately when
+ * it becomes visible again — keeps server load + bandwidth scoped to admins
+ * who are actually looking.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 const ADMIN_API_BASE = '/api/admin';
-const REFRESH_INTERVAL = 30_000; // 30 seconds
+const REFRESH_INTERVAL = 30_000;
 
 interface StatsData {
   overview: { totalPlayers: number; totalGames: number; totalWords: number; totalGameTimeHours: number };
@@ -32,8 +37,11 @@ async function fetchJson<T>(url: string, token: string): Promise<T> {
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const json = await res.json();
-  // Handle both old format (direct) and new format (envelope with .data)
   return json.data ?? json;
+}
+
+function isHidden(): boolean {
+  return typeof document !== 'undefined' && document.visibilityState === 'hidden';
 }
 
 export function useAdminDashboard(authToken: string | null): AdminDashboardData {
@@ -61,11 +69,28 @@ export function useAdminDashboard(authToken: string | null): AdminDashboardData 
     }
   }, [authToken]);
 
+  // Stable ref so the visibility listener never goes stale.
+  const fetchRef = useRef(fetchData);
+  useEffect(() => { fetchRef.current = fetchData; }, [fetchData]);
+
   useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, REFRESH_INTERVAL);
-    return () => clearInterval(interval);
-  }, [fetchData]);
+    fetchRef.current();
+
+    const interval = setInterval(() => {
+      if (isHidden()) return;
+      fetchRef.current();
+    }, REFRESH_INTERVAL);
+
+    const onVisibility = () => {
+      if (!isHidden()) fetchRef.current();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [authToken]);
 
   return { stats, health, loading, error };
 }

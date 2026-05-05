@@ -40,9 +40,38 @@ describe('PracticeWheelSandbox redesigned', () => {
     expect(document.querySelector('[data-wheel-index="7"]')).toBeNull();
   });
 
-  it('does NOT render a reset button (tap built-tile to remove instead)', () => {
+  it('renders reset + shuffle buttons (real-game parity)', () => {
     render(<PracticeWheelSandbox />);
-    expect(screen.queryByRole('button', { name: 'practice.wheelRush.reset' })).toBeNull();
+    expect(screen.getByTestId('practice-wheel-reset')).toBeInTheDocument();
+    expect(screen.getByTestId('practice-wheel-shuffle')).toBeInTheDocument();
+  });
+
+  it('reset clears any built letters', () => {
+    render(<PracticeWheelSandbox />);
+    const center = document.querySelector('[data-wheel-index="0"]') as HTMLElement;
+    const o1 = document.querySelector('[data-wheel-index="1"]') as HTMLElement;
+    fireEvent.click(center);
+    fireEvent.click(o1);
+    fireEvent.click(screen.getByTestId('practice-wheel-reset'));
+    // After reset all wheel letters should be unused (no aria-pressed=true).
+    const used = Array.from(document.querySelectorAll('[data-wheel-used="true"]'));
+    expect(used.length).toBe(0);
+  });
+
+  it('shuffle keeps 7 wheel letters and rerenders the outer ring', () => {
+    render(<PracticeWheelSandbox />);
+    const before = Array.from(
+      document.querySelectorAll('[data-wheel-letter]'),
+    ).map((el) => (el as HTMLElement).dataset.wheelLetter);
+    expect(before.length).toBe(7);
+    fireEvent.click(screen.getByTestId('practice-wheel-shuffle'));
+    const after = Array.from(
+      document.querySelectorAll('[data-wheel-letter]'),
+    ).map((el) => (el as HTMLElement).dataset.wheelLetter);
+    expect(after.length).toBe(7);
+    // Center never moves; outer 6 are the same set, possibly reordered.
+    expect(after[0]).toBe(before[0]);
+    expect(new Set(after.slice(1))).toEqual(new Set(before.slice(1)));
   });
 
   it('does NOT render the rotating PracticeCoachTip', () => {

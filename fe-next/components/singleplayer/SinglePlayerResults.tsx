@@ -14,6 +14,7 @@ import BonusBadgesRow from '@/components/results/BonusBadgesRow';
 import CoinRewardDisplay from '@/components/results/CoinRewardDisplay';
 import SinglePlayerGoldTopUp from './results/components/SinglePlayerGoldTopUp';
 import DoubleGoldAdButton from '@/components/ads/DoubleGoldAdButton';
+import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 
 import NextStepPrompt, { type NextStepMode } from '@/components/results/NextStepPrompt';
 import AutoPlayCountdown from '@/components/results/AutoPlayCountdown';
@@ -399,6 +400,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>{heroBlock}</motion.div>
             {showShareImmediate && <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>{shareBlock}</motion.div>}
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>{leaderboardBlock}</motion.div>
+            <ResultsBannerSlot placement="singleplayer-complete" className="my-3" />
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>{statsBlock}</motion.div>
             {isAuthenticated && coinReward?.awarded ? (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.32 }}>

@@ -41,6 +41,7 @@ function createChain(data: Record<string, unknown> | null, error: unknown = null
       eq: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
           single: vi.fn().mockResolvedValue({ data, error }),
+          maybeSingle: vi.fn().mockResolvedValue({ data, error }),
         }),
       }),
     }),

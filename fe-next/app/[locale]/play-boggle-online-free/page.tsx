@@ -300,7 +300,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
                   {m.label}
                 </span>
                 <div className="relative h-24 w-24">
-                  <Image src={m.mascot} alt="" fill sizes="96px" className="object-contain" />
+                  <Image src={m.mascot} alt="" fill sizes="96px" className="object-contain" unoptimized />
                 </div>
                 <h3 className="font-neo-display text-2xl font-black leading-tight">{m.title}</h3>
                 <p className="text-sm text-neo-gray-200">{m.desc}</p>
@@ -343,7 +343,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
                 </span>
                 <div className="mt-3 flex items-start gap-4">
                   <div className="relative h-16 w-16 shrink-0">
-                    <Image src={s.mascot} alt="" fill sizes="64px" className="object-contain" />
+                    <Image src={s.mascot} alt="" fill sizes="64px" className="object-contain" unoptimized />
                   </div>
                   <div>
                     <h3 className="font-neo-display text-xl font-black">{s.title}</h3>
@@ -506,7 +506,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
               </div>
             </div>
             <div className="relative hidden h-44 w-44 lg:block">
-              <Image src="/mascot/winner.webp" alt="" fill sizes="176px" className="object-contain" />
+              <Image src="/mascot/winner.webp" alt="" fill sizes="176px" className="object-contain" unoptimized />
             </div>
           </div>
         </section>

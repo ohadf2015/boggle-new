@@ -99,19 +99,24 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     <div className="hidden sm:block"><LeaguePositionBadge /></div>
                 </div>
 
-                <HeaderDesktopControls
-                    unclaimedCount={unclaimedCount}
-                    onOpenGiftModal={handleOpenGiftModal}
-                    onSignIn={openSignIn}
-                    onSignUp={openSignUp}
-                />
+                {/* Right cluster: desktop strip (sm+) + side-menu trigger.
+                    Wrapped so justify-between treats them as a single end-aligned
+                    block, keeping the burger adjacent to the desktop controls. */}
+                <div className="flex items-center gap-2 shrink-0">
+                    <HeaderDesktopControls
+                        unclaimedCount={unclaimedCount}
+                        onOpenGiftModal={handleOpenGiftModal}
+                        onSignIn={openSignIn}
+                        onSignUp={openSignUp}
+                    />
 
-                <HeaderMobileMenu
-                    unclaimedCount={unclaimedCount}
-                    onOpenGiftModal={handleOpenGiftModal}
-                    onSignIn={openSignIn}
-                    onSignUp={openSignUp}
-                />
+                    <HeaderMobileMenu
+                        unclaimedCount={unclaimedCount}
+                        onOpenGiftModal={handleOpenGiftModal}
+                        onSignIn={openSignIn}
+                        onSignUp={openSignUp}
+                    />
+                </div>
             </div>
 
             {/* Desktop game-mode tabs share the fixed header band so they aren't

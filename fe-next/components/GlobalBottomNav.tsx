@@ -7,6 +7,7 @@ import {
     Home, Swords, ScrollText, Users,
     Brain, CalendarDays, Zap, Hammer, PartyPopper,
     Trophy, User as UserIcon, Settings as SettingsIcon, Users2, Gift, Target,
+    BookOpen,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
@@ -28,7 +29,7 @@ const QUEST_TOTAL = QUEST_MISSION_TYPES.length;
 // Lazy load AuthModal - only shown when unauthenticated users tap Profile
 const AuthModal = dynamic(() => import('./auth/AuthModal'), { ssr: false });
 
-type TabId = 'home' | 'play' | 'quests' | 'friends' | 'dynamic';
+type TabId = 'home' | 'quests' | 'friends' | 'dynamic';
 
 interface TabConfig {
     id: TabId;
@@ -41,8 +42,11 @@ interface TabConfig {
 // Order: home is LAST so it renders rightmost (with dir="ltr" on the nav row,
 // this holds in both LTR and RTL locales so users always reach home on the right).
 // The dynamic slot (when present) is inserted just before home — see computed `tabs` below.
+//
+// Multiplayer is intentionally NOT a base tab: it surfaces only via the dynamic
+// slot when the user is already on a /multiplayer route, so non-MP surfaces stay
+// uncluttered. See DYNAMIC_ROUTES below.
 const TABS_BASE: TabConfig[] = [
-    { id: 'play',    labelKey: 'nav.play',    icon: Swords,     color: 'text-neo-pink', glowColor: 'bg-neo-pink/15' },
     { id: 'quests',  labelKey: 'nav.quests',  icon: ScrollText, color: 'text-neo-lime', glowColor: 'bg-neo-lime/15' },
     { id: 'friends', labelKey: 'nav.friends', icon: Users,      color: 'text-neo-pink', glowColor: 'bg-neo-pink/15' },
     { id: 'home',    labelKey: 'nav.home',    icon: Home,       color: 'text-neo-cyan', glowColor: 'bg-neo-cyan/15' },
@@ -51,16 +55,23 @@ const TABS_BASE: TabConfig[] = [
 // Color map for the sliding indicator pill
 const INDICATOR_COLORS: Record<TabId, string> = {
     home: 'bg-neo-cyan',
-    play: 'bg-neo-pink',
     quests: 'bg-neo-lime',
     friends: 'bg-neo-pink',
     dynamic: 'bg-neo-cyan',
 };
 
-// Route → contextual tab mapping. First matching prefix wins.
-// Routes already covered by the base tabs (home/play/quests/friends) return null → no extra slot.
 type DynamicSpec = Omit<TabConfig, 'id'>;
+
+// Reusable specs for routes that share a contextual tab.
+const PLAY_SPEC: DynamicSpec = { labelKey: 'nav.play', icon: Swords,   color: 'text-neo-pink', glowColor: 'bg-neo-pink/15' };
+const BLOG_SPEC: DynamicSpec = { labelKey: 'nav.blog', icon: BookOpen, color: 'text-neo-cyan', glowColor: 'bg-neo-cyan/15' };
+
+// Route → contextual tab mapping. Matched as exact OR `prefix + '/'` so unrelated
+// slugs like '/multiplayer-word-game-online' don't collide with '/multiplayer'.
+// Routes already covered by the base tabs (home/quests/friends) return null → no extra slot.
 const DYNAMIC_ROUTES: ReadonlyArray<readonly [string, DynamicSpec]> = [
+    ['/multiplayer',        PLAY_SPEC],
+    ['/blog',               BLOG_SPEC],
     ['/brain',              { labelKey: 'nav.brain',        icon: Brain,          color: 'text-neo-purple', glowColor: 'bg-neo-purple/15' }],
     ['/daily-word-wheel',   { labelKey: 'nav.daily',        icon: CalendarDays,   color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
     ['/word-of-the-day',    { labelKey: 'nav.daily',        icon: CalendarDays,   color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
@@ -77,10 +88,35 @@ const DYNAMIC_ROUTES: ReadonlyArray<readonly [string, DynamicSpec]> = [
     ['/singleplayer',       { labelKey: 'nav.singleplayer', icon: Target,         color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
 ];
 
+// Content / SEO landing prefixes that all route into the Blog dynamic tab.
+// Editorial / static-content surfaces and slug-y SEO doorways live here. Game
+// surfaces (multiplayer, daily, brain…) belong in DYNAMIC_ROUTES instead.
+const LANDING_PREFIXES: ReadonlyArray<string> = [
+    '/about', '/faq', '/how-to-play', '/rules', '/glossary', '/guides',
+    '/words', '/anagram', '/editorial-policy', '/legal', '/contact', '/accessibility',
+    // English SEO landings
+    '/best-online-word-games', '/boggle-word-shake-free', '/multiplayer-word-game-online',
+    '/online-word-games-with-friends', '/play-boggle-online-free', '/word-games-online-free',
+    '/words-with-friends-alternative',
+    // Locale-specific landings
+    '/hebrew-classroom-vocabulary-games', '/hebrew-multiplayer-word-game',
+    '/japanese-word-game', '/swedish-multiplayer-word-game',
+    '/juego-de-palabras-multijugador', '/juegos-vocabulario-aula',
+    // Competitor comparison landings
+    '/lexiclash-vs-apalabrados', '/lexiclash-vs-cabanagrams', '/lexiclash-vs-kahoot',
+    '/lexiclash-vs-popple', '/lexiclash-vs-puzzly-words', '/lexiclash-vs-quizlet',
+    '/lexiclash-contra-wordle', '/lexiclash-neged-wordle',
+];
+
+function matchesPrefix(cleanPath: string, prefix: string): boolean {
+    return cleanPath === prefix || cleanPath.startsWith(prefix + '/');
+}
+
 function resolveDynamic(cleanPath: string): DynamicSpec | null {
     for (const [prefix, spec] of DYNAMIC_ROUTES) {
-        if (cleanPath.startsWith(prefix)) return spec;
+        if (matchesPrefix(cleanPath, prefix)) return spec;
     }
+    if (LANDING_PREFIXES.some((p) => matchesPrefix(cleanPath, p))) return BLOG_SPEC;
     return null;
 }
 
@@ -177,9 +213,8 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
 
     const activeTab = useMemo((): TabId | null => {
         if (cleanPath === '' || cleanPath === '/') return 'home';
-        if (cleanPath.startsWith('/multiplayer')) return 'play';
-        if (cleanPath.startsWith('/quests')) return 'quests';
-        if (cleanPath.startsWith('/friends')) return 'friends';
+        if (matchesPrefix(cleanPath, '/quests')) return 'quests';
+        if (matchesPrefix(cleanPath, '/friends')) return 'friends';
         if (dynamicSpec) return 'dynamic';
         return null; // Unmapped route → no tab highlighted (avoids misleading home selection)
     }, [cleanPath, dynamicSpec]);
@@ -204,7 +239,6 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
         }
         const routes: Record<Exclude<TabId, 'dynamic'>, string> = {
             home: `/${language}`,
-            play: `/${language}/multiplayer`,
             quests: `/${language}/quests`,
             friends: `/${language}/friends`,
         };

@@ -6,6 +6,7 @@
 import express, { Response, Router } from 'express';
 import type { AdminRequest, NameCountData, ProfileRow, EventRow, CountMaps } from './types';
 import logger from '../../utils/logger';
+import { applyPlayerListFilters, type PlayerListFilters } from './playerListFilters';
 
 import { getSupabase } from '../../modules/supabaseServer';
 
@@ -308,6 +309,14 @@ router.get('/players', async (req: AdminRequest, res: Response): Promise<void> =
     const sortBy = (req.query.sortBy as string) || 'created_at';
     const sortOrder = (req.query.sortOrder as string) === 'asc' ? true : false;
 
+    const country = (req.query.country as string) || null;
+    const roleParam = (req.query.role as string) || null;
+    const role: PlayerListFilters['role'] = roleParam === 'admin' || roleParam === 'teacher' || roleParam === 'player' ? roleParam : null;
+    const hasBlast = req.query.hasBlast === 'true';
+    const mmrMin = req.query.mmrMin ? parseInt(req.query.mmrMin as string) : null;
+    const mmrMax = req.query.mmrMax ? parseInt(req.query.mmrMax as string) : null;
+    const daysSinceActive = req.query.daysSinceActive ? parseInt(req.query.daysSinceActive as string) : null;
+
     let query = supabase
       .from('profiles')
       .select(`
@@ -317,14 +326,19 @@ router.get('/players', async (req: AdminRequest, res: Response): Promise<void> =
         ranked_mmr, peak_mmr, longest_word, longest_word_length,
         total_coins, lifetime_coins_earned, total_hints_used,
         prestige_level, prestige_multiplier,
-        country_code, referral_count, user_role, is_admin,
+        country_code, referral_count, user_role, is_admin, blast_access,
         daily_email_subscribed, last_seen_at, last_game_at, created_at
       `, { count: 'exact' });
 
-    if (search) {
-      // Search by username or display_name
-      query = query.or(`username.ilike.%${search}%,display_name.ilike.%${search}%`);
-    }
+    query = applyPlayerListFilters(query as never, {
+      search,
+      country,
+      role,
+      hasBlast: hasBlast ? true : null,
+      mmrMin: Number.isFinite(mmrMin) ? mmrMin : null,
+      mmrMax: Number.isFinite(mmrMax) ? mmrMax : null,
+      daysSinceActive: Number.isFinite(daysSinceActive) ? daysSinceActive : null,
+    }) as never;
 
     const validSortFields = ['created_at', 'last_game_at', 'total_games', 'total_score', 'username', 'ranked_mmr'];
     const sortField = validSortFields.includes(sortBy) ? sortBy : 'created_at';

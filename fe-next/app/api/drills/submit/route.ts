@@ -87,6 +87,38 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
+    // Idempotency: client supplies a submissionId per submission. If we see the same
+    // ID for this user within ~5 min, return the prior session without re-crediting.
+    // No DB migration required — uses existing extra_data JSONB column.
+    const submissionId =
+      (extraData && typeof extraData === 'object' && 'submissionId' in extraData
+        ? String((extraData as Record<string, unknown>).submissionId ?? '')
+        : '') ||
+      request.headers.get('idempotency-key') ||
+      '';
+
+    if (submissionId) {
+      const fiveMinAgoIso = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      const { data: existing } = await supabase
+        .from('drill_sessions')
+        .select('id, score, level, duration_seconds, words_found, domain_score_earned, created_at')
+        .eq('user_id', user.id)
+        .eq('drill_type', drillType)
+        .gte('created_at', fiveMinAgoIso)
+        .filter('extra_data->>submissionId', 'eq', submissionId)
+        .maybeSingle();
+
+      if (existing) {
+        return NextResponse.json({
+          success: true,
+          idempotent: true,
+          data: existing,
+          xpAwarded: 0,
+          levelPromoted: false,
+        });
+      }
+    }
+
     const { data: sessionData, error: sessionError } = await supabase
       .from('drill_sessions')
       .insert({
@@ -374,11 +406,17 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    const previousLevel = priorSnapshot?.level ?? 1;
+    const levelPromoted = nextProgress.level > previousLevel;
+
     return NextResponse.json({
       success: true,
       data: sessionData,
       brainScore: updatedBrainScore,
       xpAwarded,
+      levelPromoted,
+      newLevel: nextProgress.level,
+      previousLevel,
     });
   } catch (error) {
     const err = error as Error;

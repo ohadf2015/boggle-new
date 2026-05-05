@@ -6,12 +6,15 @@ import { BannerAdPosition } from '@capacitor-community/admob';
 import { useAdMob } from '@/hooks/useAdMob';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { AdPlaceholder } from './AdPlaceholder';
+import type { BannerVariant } from '@/lib/admob-config';
 
 interface InlineBannerAdProps {
   /** Zone label used for the dev-only web placeholder. */
   webZone?: 'lobby' | 'between-rounds' | 'content-page' | 'post-game' | 'menu';
   /** Reserved height (px) for the native overlay slot. Matches adaptive banner height. */
   reservedHeight?: number;
+  /** Banner unit variant — 'game' (in-flow) or 'content' (results/hub/non-game). */
+  variant?: BannerVariant;
   className?: string;
 }
 
@@ -24,6 +27,7 @@ interface InlineBannerAdProps {
 export default function InlineBannerAd({
   webZone = 'content-page',
   reservedHeight = 60,
+  variant = 'game',
   className,
 }: InlineBannerAdProps) {
   const slotRef = useRef<HTMLDivElement>(null);
@@ -57,7 +61,7 @@ export default function InlineBannerAd({
       currentMargin = margin;
       await hideBanner();
       if (cancelled) return;
-      await showBanner(BannerAdPosition.BOTTOM_CENTER, margin);
+      await showBanner(BannerAdPosition.BOTTOM_CENTER, margin, { variant });
       // Final reconcile: if cleanup ran during showBanner (route change mid-
       // flight), explicitly hide. Otherwise the plugin paints the banner on
       // the destination — visible on game routes that disallow banners.
@@ -74,7 +78,7 @@ export default function InlineBannerAd({
       window.removeEventListener('scroll', show);
       void hideBanner();
     };
-  }, [showBanner, hideBanner, safeArea.bottom]);
+  }, [showBanner, hideBanner, safeArea.bottom, variant]);
 
   // Native: reserved slot (banner overlays this div's footprint).
   if (Capacitor.isNativePlatform()) {

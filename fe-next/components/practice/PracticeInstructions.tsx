@@ -129,7 +129,7 @@ export default function PracticeInstructions({ mode }: Props) {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 12 }}
         transition={{ duration: 0.22, ease: 'easeOut' }}
-        className={`relative w-full max-w-sm rounded-neo border-3 border-neo-black ${ACCENT_BORDER[mode]} bg-neo-navy-light shadow-hard-lg max-h-[calc(100dvh-2rem)] overflow-y-auto`}
+        className={`relative w-full max-w-sm rounded-neo border-3 border-neo-black ${ACCENT_BORDER[mode]} bg-neo-navy-light shadow-hard-lg max-h-[calc(100dvh-2rem)] overflow-hidden flex flex-col`}
       >
         {/* Mode-color bar at the top — same chunky brand language as the live HUD. */}
         <div className={`h-1.5 ${ACCENT_BG[mode]}`} aria-hidden />
@@ -144,9 +144,10 @@ export default function PracticeInstructions({ mode }: Props) {
           <X className="w-4 h-4" aria-hidden />
         </button>
 
-        <div className="p-4 sm:p-5 flex flex-col gap-4">
-          {/* Hero illustration. Square, 1:1, generated per-mode. */}
-          <div className="relative w-full aspect-square rounded-neo overflow-hidden border-2 border-neo-black">
+        <div className="p-4 sm:p-5 flex flex-col gap-3 min-h-0 overflow-y-auto">
+          {/* Hero illustration. Capped height so 3 tips + CTA always fit on
+              short phones (iPhone SE, fold-front) without forcing scroll. */}
+          <div className="relative w-full aspect-[4/3] max-h-[28vh] sm:max-h-[32vh] rounded-neo overflow-hidden border-2 border-neo-black flex-shrink-0">
             <Image
               src={HERO_SRC[mode]}
               alt=""

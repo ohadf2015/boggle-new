@@ -89,12 +89,26 @@ export default function PersonalizedDrillRecommendation({
   const { t, language } = useLanguage();
   const isDarkMode = theme === 'dark';
 
-  // Find the recommended domain based on priority
+  // Find the recommended domain based on priority. Critically: skip domains
+  // whose drill is still locked (gamesPlayed < unlockRequirement) so a brand-new
+  // player whose weakest domain happens to be vocabulary (rare-gems, locked till
+  // 10 games) doesn't get told "play 10 more games" as their primary CTA — they
+  // get sent to the next-weakest *unlocked* drill instead.
   const getRecommendedDomain = (): CognitiveDomain => {
     const domainEntries = Object.entries(domains) as [CognitiveDomain, DomainScore][];
 
+    const isDomainUnlocked = (domain: CognitiveDomain) => {
+      const drill = DOMAIN_TO_DRILL[domain];
+      return gamesPlayed >= DRILL_CONFIG[drill].unlockRequirement;
+    };
+
+    const unlockedEntries = domainEntries.filter(([d]) => isDomainUnlocked(d));
+    // Defensive: if every drill is locked (shouldn't happen since 3 are always unlocked),
+    // fall back to the full list so the user still sees something useful.
+    const candidatePool = unlockedEntries.length > 0 ? unlockedEntries : domainEntries;
+
     // Priority 1: Declining domains (sorted by lowest score)
-    const decliningDomains = domainEntries
+    const decliningDomains = candidatePool
       .filter(([, data]) => data.trend === 'declining')
       .sort((a, b) => a[1].score - b[1].score);
 
@@ -103,7 +117,7 @@ export default function PersonalizedDrillRecommendation({
     }
 
     // Priority 2: Lowest scoring domain
-    const sortedByScore = [...domainEntries].sort((a, b) => a[1].score - b[1].score);
+    const sortedByScore = [...candidatePool].sort((a, b) => a[1].score - b[1].score);
     return sortedByScore[0][0];
   };
 

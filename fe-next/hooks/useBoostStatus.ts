@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface BoostStatus {
   remaining: number;
@@ -15,11 +16,17 @@ interface UseBoostStatusReturn {
 }
 
 export function useBoostStatus(): UseBoostStatusReturn {
+  const { isAuthenticated } = useAuth();
   const [status, setStatus] = useState<BoostStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
+    if (!isAuthenticated) {
+      setStatus(null);
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
     setError(null);
     try {
@@ -34,7 +41,7 @@ export function useBoostStatus(): UseBoostStatusReturn {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     void refresh();

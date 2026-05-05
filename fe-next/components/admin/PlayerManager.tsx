@@ -3,8 +3,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Search, Calendar,
-  ChevronLeft, ChevronRight, Gift, Bomb
+  ChevronLeft, ChevronRight, Gift, Bomb, ExternalLink
 } from 'lucide-react';
+import Link from 'next/link';
+import { postHogPersonUrl } from '@/lib/admin/postHogLinks';
 import { Loader } from '@/components/ui/Loader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,7 +43,7 @@ interface Player {
 }
 
 export function PlayerManager({ authToken }: { authToken: string }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
@@ -52,6 +54,10 @@ export function PlayerManager({ authToken }: { authToken: string }) {
   const [sortOrder, setSortOrder] = useState<'asc'|'desc'>('desc');
   const [limit, setLimit] = useState(20);
   const [offset, setOffset] = useState(0);
+  const [country, setCountry] = useState<string>('');
+  const [role, setRole] = useState<'all' | 'admin' | 'teacher' | 'player'>('all');
+  const [hasBlast, setHasBlast] = useState(false);
+  const [daysSinceActive, setDaysSinceActive] = useState<string>('');
 
   // Gift dialog state
   const [giftDialogOpen, setGiftDialogOpen] = useState(false);
@@ -95,13 +101,19 @@ export function PlayerManager({ authToken }: { authToken: string }) {
       params.append('sortOrder', sortOrder);
       params.append('limit', limit.toString());
       params.append('offset', offset.toString());
+      if (country.trim()) params.append('country', country.trim().toUpperCase());
+      if (role !== 'all') params.append('role', role);
+      if (hasBlast) params.append('hasBlast', 'true');
+      if (daysSinceActive.trim() && Number.isFinite(Number(daysSinceActive))) {
+        params.append('daysSinceActive', daysSinceActive.trim());
+      }
 
       const response = await fetch(`/api/admin/players?${params.toString()}`, {
         headers: { Authorization: `Bearer ${authToken}` }
       });
-      
+
       if (!response.ok) throw new Error('Failed to fetch players');
-      
+
       const data = await response.json();
       setPlayers(data.players);
       setTotal(data.total);
@@ -111,7 +123,7 @@ export function PlayerManager({ authToken }: { authToken: string }) {
     } finally {
       setLoading(false);
     }
-  }, [authToken, searchQuery, sortBy, sortOrder, limit, offset]);
+  }, [authToken, searchQuery, sortBy, sortOrder, limit, offset, country, role, hasBlast, daysSinceActive]);
 
   // Debounce search
   useEffect(() => {
@@ -157,14 +169,62 @@ export function PlayerManager({ authToken }: { authToken: string }) {
             </SelectContent>
           </Select>
 
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="icon"
             onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
             title={sortOrder === 'asc' ? "Ascending" : "Descending"}
           >
             {sortOrder === 'asc' ? "↑" : "↓"}
           </Button>
+        </div>
+      </div>
+
+      {/* Advanced filters */}
+      <div data-testid="player-filter-bar" className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-white dark:bg-slate-800 text-black dark:text-white p-3 rounded-lg shadow-xs">
+        <div>
+          <label className="text-xs text-slate-500 block mb-1">Country (ISO)</label>
+          <Input
+            placeholder="IL, US, …"
+            value={country}
+            maxLength={3}
+            onChange={(e) => { setCountry(e.target.value); setOffset(0); }}
+          />
+        </div>
+        <div>
+          <label className="text-xs text-slate-500 block mb-1">Role</label>
+          <Select value={role} onValueChange={(v) => { setRole(v as typeof role); setOffset(0); }}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="teacher">Teacher</SelectItem>
+              <SelectItem value="player">Player</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <label className="text-xs text-slate-500 block mb-1">Inactive ≥ N days</label>
+          <Input
+            placeholder="e.g. 14"
+            type="number"
+            min={1}
+            value={daysSinceActive}
+            onChange={(e) => { setDaysSinceActive(e.target.value); setOffset(0); }}
+          />
+        </div>
+        <div className="flex items-end">
+          <label className="inline-flex items-center gap-2 text-sm cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={hasBlast}
+              onChange={(e) => { setHasBlast(e.target.checked); setOffset(0); }}
+              className="w-4 h-4"
+            />
+            Has Blast access
+          </label>
         </div>
       </div>
 
@@ -187,12 +247,15 @@ export function PlayerManager({ authToken }: { authToken: string }) {
                   <div className="flex items-center gap-3">
                     <Avatar customAvatar={player.avatar_config} userId={player.id} size="lg" />
                     <div>
-                      <h3 className="font-bold text-lg flex items-center gap-2">
+                      <Link
+                        href={`/${language}/admin/players/${player.id}`}
+                        className="font-bold text-lg flex items-center gap-2 hover:text-neo-cyan transition-colors"
+                      >
                         {player.display_name || player.username}
                         {player.display_name && player.username && (
                           <span className="text-xs font-normal text-slate-500">@{player.username}</span>
                         )}
-                      </h3>
+                      </Link>
                       <div className="text-xs text-slate-500 flex items-center gap-3 mt-1">
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
@@ -224,6 +287,22 @@ export function PlayerManager({ authToken }: { authToken: string }) {
                       <span className="font-mono font-bold text-amber-500">{player.ranked_mmr}</span>
                     </div>
                     <div className="flex flex-col items-center sm:items-end gap-1">
+                      {(() => {
+                        const phUrl = postHogPersonUrl(player.id);
+                        if (!phUrl) return null;
+                        return (
+                          <a
+                            href={phUrl}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            title="Open in PostHog"
+                            className="inline-flex items-center gap-1 text-xs text-purple-600 hover:text-purple-700 hover:underline"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                            PostHog
+                          </a>
+                        );
+                      })()}
                       <Button
                         variant="outline"
                         size="sm"

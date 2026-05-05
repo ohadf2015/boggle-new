@@ -126,7 +126,7 @@ export function useWordOfTheDay(language: string): WotdData {
         .select('found_count, total_players')
         .eq('date', today)
         .eq('language', language)
-        .single();
+        .maybeSingle();
 
       if (wotdRow) {
         const fc = wotdRow.found_count ?? 0;
@@ -145,7 +145,7 @@ export function useWordOfTheDay(language: string): WotdData {
           .select('found')
           .eq('player_id', user.id)
           .eq('date', today)
-          .single();
+          .maybeSingle();
 
         if (playerRow) {
           setPlayerFound(!!playerRow.found);

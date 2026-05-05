@@ -3,6 +3,9 @@ import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import ChallengeResults from '../ChallengeResults';
 
+// --- Mock ResultsBannerSlot (added in 2026-05-05; pulls in useAdMob) ---
+vi.mock('@/components/ads/ResultsBannerSlot', () => ({ default: () => null }));
+
 // --- Mock LanguageContext ---
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({

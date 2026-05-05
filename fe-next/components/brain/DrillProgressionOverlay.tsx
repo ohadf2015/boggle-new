@@ -29,6 +29,8 @@ interface DrillProgressionOverlayProps {
   xpAwarded?: number;
   /** Gold awarded for this drill */
   goldAwarded?: number;
+  /** Level promotion info if drill bumped player to a new level */
+  levelUp?: { newLevel: number; previousLevel: number };
 }
 
 const DOMAIN_CONFIG: Record<CognitiveDomain, {
@@ -130,6 +132,7 @@ export default function DrillProgressionOverlay({
   tier,
   xpAwarded,
   goldAwarded,
+  levelUp,
 }: DrillProgressionOverlayProps) {
   const { theme } = useTheme();
   const { t } = useLanguage();
@@ -216,6 +219,24 @@ export default function DrillProgressionOverlay({
             >
               <X className="w-4 h-4" />
             </button>
+
+            {/* Level-up celebration banner — shows above header when drill promoted player to new level */}
+            {levelUp && levelUp.newLevel > levelUp.previousLevel && (
+              <motion.div
+                initial={{ opacity: 0, y: -12, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: 'spring', damping: 14, stiffness: 220, delay: 0.4 }}
+                className="mb-4 flex items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-2 shadow-hard-sm"
+                role="status"
+                aria-label={`Level up to ${levelUp.newLevel}`}
+              >
+                <Star className="h-4 w-4 text-neo-black" fill="currentColor" />
+                <span className="font-neo-display text-xs font-black uppercase tracking-widest text-neo-black">
+                  {t('brain.drills.levelUp', { level: levelUp.newLevel })}
+                </span>
+                <Star className="h-4 w-4 text-neo-black" fill="currentColor" />
+              </motion.div>
+            )}
 
             {/* Header */}
             <div className="text-center mb-6">

@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { locales, defaultLocale } from '../lib/i18n';
 import { loadTranslation, getCachedTranslation, seedTranslationCache, type TranslationData } from '../translations/loadTranslation';
 import logger from '@/utils/logger';
+import { hasSupabaseSession } from '@/utils/onboardingStorage';
 import type { Language } from '@/types';
 
 interface LanguageContextValue {
@@ -220,6 +221,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
             // sessionStorage unavailable (private mode etc.) — fall through and POST
         }
         if (alreadySynced) return;
+        if (!hasSupabaseSession()) return;
         fetch('/api/user/language', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -253,7 +255,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
             // notifications can be localized server-side. `explicit:true` lets the
             // API overwrite any prior auto-synced value — switcher click is the
             // user's deliberate intent and must win over URL/cookie heuristics.
-            if (typeof fetch !== 'undefined') {
+            if (typeof fetch !== 'undefined' && hasSupabaseSession()) {
                 // Reset session dedup so the auto-sync effect won't bail on the next
                 // mount, and so subsequent re-mounts re-confirm the explicit choice.
                 try { sessionStorage.removeItem(`boggle_language_synced:${newLang}`); } catch { /* ignore */ }

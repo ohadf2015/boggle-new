@@ -5,6 +5,7 @@ import { markModePlayedLogic } from '@/hooks/useDailyModeQuest';
 import { motion, AnimatePresence } from 'framer-motion';
 import WatchAdButton from './WatchAdButton';
 import DoubleGoldAdButton from '@/components/ads/DoubleGoldAdButton';
+import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
 import { Share2, Flame, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { useDailyConfetti } from './results/useDailyConfetti';
@@ -424,6 +425,9 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           </motion.div>
         )}
       </div>{/* end left column */}
+
+      {/* Native-banner slot (mobile column on stack; web shows nothing — CrazyGamesBanner covers web) */}
+      <ResultsBannerSlot placement="daily-complete" className="lg:hidden my-3" />
 
       {/* RIGHT COLUMN on desktop: leaderboard (on mobile rendered below via normal flow) */}
       <div>

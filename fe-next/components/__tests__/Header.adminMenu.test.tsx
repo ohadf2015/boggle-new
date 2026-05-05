@@ -1,8 +1,8 @@
 /**
  * Test: Header Admin Menu Visibility
  *
- * Bug: Admin users cannot see admin link in desktop menu dropdown (HeaderMenuDropdown)
- * The admin link exists in mobile menu but is missing from desktop HeaderMenuDropdown
+ * Mobile + desktop now share the same side-drawer menu (HeaderMobileMenu),
+ * so the admin link only needs to be tested once via the unified Header.
  */
 
 import React from 'react';
@@ -10,7 +10,6 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import Header from '../Header';
-import HeaderMenuDropdown from '../HeaderMenuDropdown';
 
 // Mock next/navigation
 vi.mock('next/navigation', () => ({
@@ -124,67 +123,34 @@ describe('Header Admin Menu', () => {
     mockAuthContext.isAdmin = true;
   });
 
-  describe('Mobile Menu (works correctly)', () => {
-    it('should show admin link for admin users in mobile menu', async () => {
+  describe('Unified side-drawer menu (mobile + desktop)', () => {
+    it('shows admin link for admin users when the drawer opens', async () => {
       const user = userEvent.setup();
-      const { container } = render(<Header />);
+      render(<Header />);
 
-      // Find and click mobile hamburger menu (in sm:hidden section)
-      const mobileSection = container.querySelector('.sm\\:hidden');
-      expect(mobileSection).toBeInTheDocument();
+      // Open the unified menu via the hamburger trigger.
+      const hamburgerButton = screen.getByRole('button', { name: /common.openMenu/i });
+      await user.click(hamburgerButton);
 
-      const hamburgerButton = mobileSection?.querySelector('button');
-      expect(hamburgerButton).toBeInTheDocument();
-
-      // Click to open mobile menu
-      if (hamburgerButton) {
-        await user.click(hamburgerButton);
-      }
-
-      // Wait for mobile menu to open and check for admin section
-      // The admin section should be visible in mobile menu
-      const adminText = await screen.findByText('common.admin');
-      expect(adminText).toBeInTheDocument();
-
-      // Verify admin link exists (it's a button in mobile, not a link)
+      // Admin section + link should be visible.
+      expect(await screen.findByText('common.admin')).toBeInTheDocument();
       const adminLinks = screen.getAllByRole('link');
       const adminLink = adminLinks.find(link => link.getAttribute('href')?.includes('/admin'));
       expect(adminLink).toBeInTheDocument();
       expect(adminLink).toHaveAttribute('href', '/en/admin');
     });
-  });
 
-  describe('Desktop Menu Dropdown (BROKEN)', () => {
-    it('should show admin link for admin users in desktop menu dropdown', async () => {
-      const user = userEvent.setup();
-      render(<HeaderMenuDropdown />);
-
-      // Find and click the menu dropdown button
-      const menuButton = screen.getByRole('button', { name: /menu/i });
-      await user.click(menuButton);
-
-      // This should find the admin link but WILL FAIL because it's missing
-      // Expected: Admin link should be visible for admin users
-      // Actual: Admin link is missing from HeaderMenuDropdown
-      const adminLink = await screen.findByRole('link', { name: /admin/i });
-      expect(adminLink).toBeInTheDocument();
-      expect(adminLink).toHaveAttribute('href', '/en/admin');
-    });
-
-    it('should not show admin link for non-admin users', async () => {
-      // Override AuthContext to non-admin
+    it('hides admin link for non-admin users', async () => {
       mockAuthContext.isAdmin = false;
 
       const user = userEvent.setup();
-      render(<HeaderMenuDropdown />);
+      render(<Header />);
 
-      // Open menu
-      const menuButton = screen.getByRole('button', { name: /menu/i });
-      await user.click(menuButton);
+      const hamburgerButton = screen.getByRole('button', { name: /common.openMenu/i });
+      await user.click(hamburgerButton);
 
-      // Admin link should NOT be present
-      const adminLink = screen.queryByRole('link', { name: /admin/i });
-      expect(adminLink).not.toBeInTheDocument();
+      // Admin section should not appear.
+      expect(screen.queryByText('common.admin')).not.toBeInTheDocument();
     });
   });
 });

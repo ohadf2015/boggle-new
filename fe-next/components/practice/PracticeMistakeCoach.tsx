@@ -101,7 +101,7 @@ export default function PracticeMistakeCoach({ kind, mode, onClose }: Props) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 320, damping: 22 }}
-            className={`relative w-full max-w-sm rounded-neo border-3 border-neo-black ${ACCENT_BORDER[mode]} bg-neo-navy-light shadow-hard-lg max-h-[calc(100dvh-2rem)] overflow-y-auto`}
+            className={`relative w-full max-w-sm rounded-neo border-3 border-neo-black ${ACCENT_BORDER[mode]} bg-neo-navy-light shadow-hard-lg max-h-[calc(100dvh-2rem)] overflow-hidden flex flex-col`}
           >
             {/* Mode-color accent bar at top — matches help modal language. */}
             <div className={`h-1.5 ${ACCENT_BG[mode]}`} aria-hidden />
@@ -116,9 +116,11 @@ export default function PracticeMistakeCoach({ kind, mode, onClose }: Props) {
               <X className="w-4 h-4" aria-hidden />
             </button>
 
-            <div className="p-4 sm:p-5 flex flex-col gap-4">
-              {/* Hero illustration — the visual story carries the lesson. */}
-              <div className="relative w-full aspect-square rounded-neo overflow-hidden border-2 border-neo-black">
+            <div className="p-4 sm:p-5 flex flex-col gap-3 min-h-0 overflow-y-auto">
+              {/* Hero illustration — the visual story carries the lesson.
+                  Capped height (4:3 + max-vh) so body text + CTA always fit
+                  on short phones without forcing modal scroll. */}
+              <div className="relative w-full aspect-[4/3] max-h-[28vh] sm:max-h-[32vh] rounded-neo overflow-hidden border-2 border-neo-black flex-shrink-0">
                 <Image
                   src={IMAGE_FOR_KIND[kind]}
                   alt=""

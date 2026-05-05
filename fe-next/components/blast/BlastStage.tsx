@@ -15,6 +15,8 @@ import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormin
 import { BlastHUD } from './BlastHUD';
 import { BlastMPLeaderboard } from './BlastMPLeaderboard';
 import { BlastBoard } from './BlastBoard';
+import { BlastRouteOverlay } from './BlastRouteOverlay';
+import { BlastSniperMarker } from './BlastSniperMarker';
 import BlastChainText from './BlastChainText';
 import BlastWaveClearText from './BlastWaveClearText';
 import BlastWordPraise from './BlastWordPraise';
@@ -98,6 +100,28 @@ interface BlastStageProps {
   hintSlot?: React.ReactNode;
   // Optional hint toast overlaid above the grid for HINT_HIGHLIGHT_MS
   hintToast?: React.ReactNode;
+  // Goal Gallery — path_route endpoints, rendered as SVG rings + bezier wire
+  // overlaying the board grid. Set by BlastGame when a path_route objective
+  // has been resolved against the current grid; null otherwise.
+  pathRoute?: {
+    startCell: { row: number; col: number };
+    endCell: { row: number; col: number };
+    completed: boolean;
+  } | null;
+  // Goal Gallery — tile_sniper target cell, rendered as crosshair marker.
+  tileSniper?: {
+    targetCell: { row: number; col: number };
+    hit: boolean;
+  } | null;
+  // Goal Gallery — set when a route/sniper goal *transitions* to satisfied so
+  // the Pixi canvas fires a shockwave + starburst at the cell. Nonce changes
+  // on each new hit so re-trigger works.
+  goalHit?: {
+    row: number;
+    col: number;
+    kind: 'route' | 'sniper';
+    nonce: number;
+  } | null;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -148,6 +172,9 @@ export const BlastStage = memo(function BlastStage({
   ddaBoostActive = false,
   hintSlot,
   hintToast,
+  pathRoute,
+  tileSniper,
+  goalHit,
   t,
 }: BlastStageProps) {
   const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete, isDeadEnd } = gameState;
@@ -342,6 +369,32 @@ export const BlastStage = memo(function BlastStage({
                 diamondRevealTurns={gameState.diamondRevealTurns}
               />
             </div>
+            {/* Goal Gallery — path_route SVG overlay (rings + bezier wire). Sits between the
+                tile DOM and the Pixi effects so particles/shatters draw above. pointer-events
+                stay none so taps reach BlastBoard. */}
+            {pathRoute && boardSize.width > 0 && (
+              <div className="absolute inset-0 z-15 pointer-events-none">
+                <BlastRouteOverlay
+                  startCell={pathRoute.startCell}
+                  endCell={pathRoute.endCell}
+                  cellSize={boardSize.width / gridSize}
+                  gap={0}
+                  completed={pathRoute.completed}
+                />
+              </div>
+            )}
+            {/* Goal Gallery — tile_sniper crosshair marker. Same z-band as the
+                route overlay, mutually exclusive in seeder so they won't co-exist. */}
+            {tileSniper && boardSize.width > 0 && (
+              <div className="absolute inset-0 z-15 pointer-events-none">
+                <BlastSniperMarker
+                  targetCell={tileSniper.targetCell}
+                  cellSize={boardSize.width / gridSize}
+                  gap={0}
+                  hit={tileSniper.hit}
+                />
+              </div>
+            )}
             {/* PixiJS effects layer — overlays DOM board so particles/shockwaves/shatters are visible above tile art. pointer-events-none so taps still reach BlastBoard. */}
             {boardSize.width > 0 && (
               <div className="absolute inset-0 z-20 pointer-events-none rounded-[6px]">
@@ -353,6 +406,7 @@ export const BlastStage = memo(function BlastStage({
                   chainLevel={sequencerState?.chainLevel ?? 0}
                   comboTier={comboFlashTier}
                   waveCleared={waveCleared}
+                  goalHit={goalHit}
                 />
               </div>
             )}

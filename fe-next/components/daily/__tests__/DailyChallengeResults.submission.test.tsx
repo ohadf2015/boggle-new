@@ -15,6 +15,9 @@ import { render, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { server } from '@/test/msw/server';
 
+// Mock ResultsBannerSlot (added in 2026-05-05; pulls in useAdMob)
+vi.mock('@/components/ads/ResultsBannerSlot', () => ({ default: () => null }));
+
 // Mock useDevicePerformance
 vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({

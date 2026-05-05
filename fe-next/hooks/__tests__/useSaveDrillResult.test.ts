@@ -173,7 +173,7 @@ describe('useSaveDrillResult', () => {
       expect(saveResult!.brainScore).toBeUndefined();
     });
 
-    it('should send correct request body to API', async () => {
+    it('should send correct request body to API with idempotency key', async () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => mockBrainScoreResponse,
@@ -185,13 +185,38 @@ describe('useSaveDrillResult', () => {
         await result.current.saveDrillResult(mockDrillResult);
       });
 
-      expect(global.fetch).toHaveBeenCalledWith('/api/drills/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(mockDrillResult),
+      // Idempotency: hook must inject a per-submission UUID into extraData
+      // and mirror it as the Idempotency-Key header so the server can dedupe
+      // retries (network blip, double-click) without double-crediting.
+      const call = (global.fetch as any).mock.calls[0];
+      expect(call[0]).toBe('/api/drills/submit');
+      expect(call[1].method).toBe('POST');
+      expect(call[1].headers['Content-Type']).toBe('application/json');
+      const submissionId = call[1].headers['Idempotency-Key'];
+      expect(typeof submissionId).toBe('string');
+      expect(submissionId.length).toBeGreaterThan(0);
+      const body = JSON.parse(call[1].body);
+      expect(body.drillType).toBe(mockDrillResult.drillType);
+      expect(body.score).toBe(mockDrillResult.score);
+      expect(body.extraData.submissionId).toBe(submissionId);
+      expect(body.extraData.maxCombo).toBe(mockDrillResult.extraData?.maxCombo);
+    });
+
+    it('should generate a unique submissionId per call', async () => {
+      (global.fetch as any).mockResolvedValue({
+        ok: true,
+        json: async () => mockBrainScoreResponse,
       });
+      const { result } = renderHook(() => useSaveDrillResult());
+
+      await act(async () => {
+        await result.current.saveDrillResult(mockDrillResult);
+        await result.current.saveDrillResult(mockDrillResult);
+      });
+
+      const id1 = (global.fetch as any).mock.calls[0][1].headers['Idempotency-Key'];
+      const id2 = (global.fetch as any).mock.calls[1][1].headers['Idempotency-Key'];
+      expect(id1).not.toBe(id2);
     });
   });
 });

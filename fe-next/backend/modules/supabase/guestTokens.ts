@@ -18,7 +18,7 @@ export async function getOrCreateGuestToken(tokenHash: string): Promise<{ data: 
     .select('id, token_hash, stats, claimed_by, created_at, updated_at')
     .eq('token_hash', tokenHash)
     .is('claimed_by', null)
-    .single();
+    .maybeSingle();
 
   if (existing) return { data: existing, error: null };
 
@@ -57,9 +57,9 @@ export async function updateGuestStats(tokenHash: string, gameStats: GameStats):
     .select('stats')
     .eq('token_hash', tokenHash)
     .is('claimed_by', null)
-    .single();
+    .maybeSingle();
 
-  if (fetchError) {
+  if (fetchError || !token) {
     // Token doesn't exist, create it
     return getOrCreateGuestToken(tokenHash);
   }

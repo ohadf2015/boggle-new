@@ -104,16 +104,18 @@ describe('Header - Music Controls Placement', () => {
                 </AllProviders>
             );
 
-            // Music controls are inside menus (not always visible in header bar)
-            // Both mobile (sm:hidden) and desktop (hidden sm:flex) sections exist in DOM
+            // Both viewports share a single side-drawer trigger now.
+            // The mobile-only inline strip (sm:hidden) still hosts MusicControls
+            // and QuickLanguageSwitcher; the desktop strip (hidden sm:flex) hosts
+            // the same widgets for desktop.
             const mobileControls = document.querySelector('.sm\\:hidden');
             const desktopControls = document.querySelector('.hidden.sm\\:flex');
             expect(mobileControls).toBeInTheDocument();
             expect(desktopControls).toBeInTheDocument();
 
-            // Mobile section should have a hamburger menu button to access music controls
-            const mobileMenuButton = mobileControls?.querySelector('button[aria-haspopup]');
-            expect(mobileMenuButton).toBeDefined();
+            // The unified hamburger button lives outside both strips.
+            const hamburgerButton = container.querySelector('button[aria-haspopup="true"]');
+            expect(hamburgerButton).toBeInTheDocument();
         });
 
         it('should NOT render music controls in the mobile menu dropdown', () => {
@@ -126,16 +128,12 @@ describe('Header - Music Controls Placement', () => {
                 </AllProviders>
             );
 
-            // Find the mobile menu buttons (there may be multiple due to hamburger + menu dropdown)
-            const menuButtons = screen.getAllByRole('button', { name: /open menu|menu/i });
-
-            // Find the hamburger menu button (in sm:hidden section)
-            const mobileMenuSection = container.querySelector('.sm\\:hidden');
-            const hamburgerButton = menuButtons.find(btn =>
-                mobileMenuSection?.contains(btn)
+            // The unified hamburger trigger is rendered once for both viewports.
+            const hamburgerButton = container.querySelector<HTMLButtonElement>(
+                'button[aria-haspopup="true"]'
             );
 
-            expect(hamburgerButton).toBeDefined();
+            expect(hamburgerButton).toBeInTheDocument();
             hamburgerButton?.click();
 
             // Wait for menu to open - look for the slide-out pane
@@ -152,8 +150,8 @@ describe('Header - Music Controls Placement', () => {
         });
     });
 
-    describe('HeaderMenuDropdown', () => {
-        it('should have a menu button that can open the dropdown with music controls', () => {
+    describe('Unified side-drawer trigger', () => {
+        it('renders the hamburger trigger at desktop breakpoints with the neo-brutalist styling', () => {
             // Render with desktop viewport
             global.innerWidth = 1024;
 
@@ -163,15 +161,15 @@ describe('Header - Music Controls Placement', () => {
                 </AllProviders>
             );
 
-            // Find the menu dropdown button in the desktop section (hidden sm:flex)
-            const desktopControls = container.querySelector('.hidden.sm\\:flex');
-            const desktopMenuButton = desktopControls?.querySelector('button[aria-haspopup]');
-            expect(desktopMenuButton).toBeInTheDocument();
-            expect(desktopMenuButton).toHaveAttribute('aria-expanded', 'false');
+            // Mobile + desktop now share the same hamburger trigger; it sits
+            // outside the two viewport-gated strips.
+            const triggerButton = container.querySelector('button[aria-haspopup="true"]');
+            expect(triggerButton).toBeInTheDocument();
+            expect(triggerButton).toHaveAttribute('aria-expanded', 'false');
 
-            // The dropdown trigger is present and accessible
-            expect(desktopMenuButton).toHaveClass('border-3');
-            expect(desktopMenuButton).toHaveClass('rounded-neo');
+            // Trigger keeps the neo-brutalist chrome.
+            expect(triggerButton).toHaveClass('border-3');
+            expect(triggerButton).toHaveClass('rounded-neo');
         });
     });
 });

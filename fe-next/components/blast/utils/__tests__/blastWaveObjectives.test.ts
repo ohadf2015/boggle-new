@@ -54,13 +54,14 @@ describe('getWaveObjectives', () => {
 
   it('returns collect_type lightning + word_length for wave 4', () => {
     const objectives = getWaveObjectives(4);
-    expect(objectives).toHaveLength(3);
-    expect(objectives[1]).toEqual({
+    // Goal Gallery may seed cascade_chain on wave 4+ (35% deterministic gate)
+    expect(objectives.length).toBeGreaterThanOrEqual(3);
+    expect(objectives.find(o => o.type === 'collect_type')).toEqual({
       type: 'collect_type',
       tileType: 'lightning',
       target: 3,
     });
-    expect(objectives[2]).toEqual({
+    expect(objectives.find(o => o.type === 'word_length')).toEqual({
       type: 'word_length',
       target: 2,
       minWordLength: 5,

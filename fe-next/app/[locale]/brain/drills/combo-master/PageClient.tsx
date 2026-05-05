@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import ComboMaster from '@/components/drills/ComboMaster';
 import DrillProgressionOverlay from '@/components/brain/DrillProgressionOverlay';
+import DrillResearchIntro from '@/components/brain/DrillResearchIntro';
 import { useDrillGrid } from '@/hooks/useDrillGrid';
 import { useSaveDrillResult, DrillBrainScoreUpdate } from '@/hooks/useSaveDrillResult';
 import { useDrillRewards } from '@/hooks/useDrillRewards';
@@ -37,6 +38,7 @@ export default function ComboMasterPageClient() {
   const [showProgressionOverlay, setShowProgressionOverlay] = useState(false);
   const [brainScoreUpdate, setBrainScoreUpdate] = useState<DrillBrainScoreUpdate | null>(null);
   const [drillRewards, setDrillRewards] = useState<{ xpAwarded: number; goldAwarded: number } | null>(null);
+  const [levelUp, setLevelUp] = useState<{ newLevel: number; previousLevel: number } | null>(null);
   const [sessionId] = useState(() => `drill_combo-master_${crypto.randomUUID()}`);
 
   // Generate drill grid
@@ -77,7 +79,13 @@ export default function ComboMasterPageClient() {
 
     // Show progression overlay if we got brainScore data back
     if (saveResult.success && saveResult.brainScore) {
+      try { sessionStorage.setItem('lex_brain_dirty', '1'); } catch { /* ignore */ }
       setBrainScoreUpdate(saveResult.brainScore);
+      if (saveResult.levelPromoted && saveResult.newLevel != null && saveResult.previousLevel != null) {
+        setLevelUp({ newLevel: saveResult.newLevel, previousLevel: saveResult.previousLevel });
+      } else {
+        setLevelUp(null);
+      }
       setShowProgressionOverlay(true);
       const rewards = await awardDrillRewards({ level: result.level, score: result.score, xpAwarded: saveResult.xpAwarded ?? 0 });
       setDrillRewards(rewards);
@@ -143,6 +151,8 @@ export default function ComboMasterPageClient() {
         <BoostButton mode="drill" sessionId={sessionId} />
       </header>
 
+      <DrillResearchIntro drillType="combo-master" />
+
       {/* Drill Content */}
       <div className="flex-1">
         <FeatureErrorBoundary featureName="drill-combo-master">
@@ -170,6 +180,7 @@ export default function ComboMasterPageClient() {
           tier={brainScoreUpdate.tier}
           xpAwarded={drillRewards?.xpAwarded}
           goldAwarded={drillRewards?.goldAwarded}
+          levelUp={levelUp ?? undefined}
         />
       )}
     </div>

@@ -11,6 +11,9 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 
+// ── ResultsBannerSlot mock (added in 2026-05-05; pulls in useAdMob) ──────────
+vi.mock('@/components/ads/ResultsBannerSlot', () => ({ default: () => null }));
+
 // ── WinCinematic mock — captures onComplete for use in tests ──────────────────
 let capturedOnComplete: (() => void) | null = null;
 

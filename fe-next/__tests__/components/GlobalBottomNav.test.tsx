@@ -73,6 +73,7 @@ describe('GlobalBottomNav', () => {
             'nav.leaderboard': 'Leaderboard',
             'nav.profile': 'Profile',
             'nav.friends': 'Friends',
+            'nav.blog': 'Blog',
             'quests.progress': `${params?.completed ?? 0}/${params?.total ?? 0}`,
         };
         return translations[key] || key;
@@ -131,12 +132,14 @@ describe('GlobalBottomNav', () => {
     });
 
     describe('Rendering', () => {
-        it('should render all three navigation tabs', () => {
+        it('should render the three base navigation tabs (quests, friends, home) on root path', () => {
             render(<GlobalBottomNav />);
 
             expect(screen.getByRole('button', { name: /home/i })).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /play/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /quests/i })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /friends/i })).toBeInTheDocument();
+            // Multiplayer is no longer a base tab — only surfaces on /multiplayer routes
+            expect(screen.queryByRole('button', { name: /^play$/i })).not.toBeInTheDocument();
         });
 
         it('should render with proper ARIA labels', () => {
@@ -263,6 +266,7 @@ describe('GlobalBottomNav', () => {
 
     describe('Dynamic Contextual Tab', () => {
         const dynamicRoutes: Array<[string, RegExp]> = [
+            ['/en/multiplayer', /play/i],
             ['/en/brain', /brain/i],
             ['/en/daily', /daily/i],
             ['/en/word-of-the-day', /daily/i],
@@ -284,13 +288,13 @@ describe('GlobalBottomNav', () => {
             expect(tab).toHaveAttribute('aria-current', 'page');
         });
 
-        it('does not render a dynamic tab on unmapped routes (base 4 tabs only)', () => {
+        it('does not render a dynamic tab on unmapped routes (base 3 tabs only)', () => {
             (usePathname as Mock).mockReturnValue('/en/some-other-page');
             render(<GlobalBottomNav />);
 
-            // Only the 4 base tabs: home, play (multiplayer), quests, friends
+            // Only the 3 base tabs: quests, friends, home
             const buttons = screen.getAllByRole('button');
-            expect(buttons).toHaveLength(4);
+            expect(buttons).toHaveLength(3);
         });
 
         it('does not render a dynamic tab when already on a base tab route', () => {
@@ -298,15 +302,15 @@ describe('GlobalBottomNav', () => {
             render(<GlobalBottomNav />);
 
             const buttons = screen.getAllByRole('button');
-            expect(buttons).toHaveLength(4);
+            expect(buttons).toHaveLength(3);
         });
 
-        it('shows 5 tabs total when a dynamic route is active', () => {
+        it('shows 4 tabs total when a dynamic route is active', () => {
             (usePathname as Mock).mockReturnValue('/en/brain');
             render(<GlobalBottomNav />);
 
             const buttons = screen.getAllByRole('button');
-            expect(buttons).toHaveLength(5);
+            expect(buttons).toHaveLength(4);
         });
 
         it('clicking the dynamic tab does not push a new route (already on page)', () => {
@@ -317,6 +321,76 @@ describe('GlobalBottomNav', () => {
             fireEvent.click(dynamicBtn);
 
             expect(mockPush).not.toHaveBeenCalled();
+        });
+
+        it('does not match /multiplayer dynamic on look-alike SEO slug /multiplayer-word-game-online', () => {
+            (usePathname as Mock).mockReturnValue('/en/multiplayer-word-game-online');
+            render(<GlobalBottomNav />);
+
+            // Should NOT show a Play tab; /multiplayer-word-game-online is a landing page → Blog tab
+            expect(screen.queryByRole('button', { name: /^play$/i })).not.toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /blog/i })).toHaveAttribute('aria-current', 'page');
+        });
+    });
+
+    describe('Multiplayer Tab Surfacing', () => {
+        it('surfaces a Play tab and marks it active on /multiplayer', () => {
+            (usePathname as Mock).mockReturnValue('/en/multiplayer');
+            render(<GlobalBottomNav />);
+
+            const play = screen.getByRole('button', { name: /play/i });
+            expect(play).toBeInTheDocument();
+            expect(play).toHaveAttribute('aria-current', 'page');
+        });
+
+        it('surfaces Play tab on /multiplayer sub-routes (e.g. /multiplayer/lobby)', () => {
+            (usePathname as Mock).mockReturnValue('/en/multiplayer/lobby');
+            render(<GlobalBottomNav />);
+
+            expect(screen.getByRole('button', { name: /play/i })).toBeInTheDocument();
+        });
+
+        it('hides the Play tab on non-multiplayer routes', () => {
+            (usePathname as Mock).mockReturnValue('/en/friends');
+            render(<GlobalBottomNav />);
+
+            expect(screen.queryByRole('button', { name: /^play$/i })).not.toBeInTheDocument();
+        });
+    });
+
+    describe('Blog Tab on Editorial / Landing Surfaces', () => {
+        const blogActiveRoutes = [
+            '/en/blog',
+            '/en/blog/boggle-vs-wordle',
+            '/en/about',
+            '/en/faq',
+            '/en/glossary',
+            '/en/guides',
+            '/en/words',
+            '/en/anagram',
+            '/en/words-with-friends-alternative',
+            '/en/best-online-word-games',
+            '/en/multiplayer-word-game-online',
+            '/he/hebrew-multiplayer-word-game',
+            '/es/juego-de-palabras-multijugador',
+            '/en/lexiclash-vs-popple',
+        ];
+
+        it.each(blogActiveRoutes)('renders Blog tab as active on %s', (path) => {
+            const lang = path.split('/')[1];
+            (useLanguage as Mock).mockReturnValue({ t: mockT, language: lang });
+            (usePathname as Mock).mockReturnValue(path);
+            render(<GlobalBottomNav />);
+
+            const blog = screen.getByRole('button', { name: /blog/i });
+            expect(blog).toHaveAttribute('aria-current', 'page');
+        });
+
+        it('does not surface Blog tab on game routes', () => {
+            (usePathname as Mock).mockReturnValue('/en/multiplayer');
+            render(<GlobalBottomNav />);
+
+            expect(screen.queryByRole('button', { name: /blog/i })).not.toBeInTheDocument();
         });
     });
 
@@ -461,6 +535,7 @@ describe('GlobalBottomNav', () => {
                 const translations: Record<string, string> = {
                     'nav.home': 'בית',
                     'nav.play': 'שחק',
+                    'nav.quests': 'משימות',
                     'nav.leaderboard': 'טבלת מובילים',
                     'nav.friends': 'חברים',
                 };
@@ -476,7 +551,7 @@ describe('GlobalBottomNav', () => {
             render(<GlobalBottomNav />);
 
             expect(screen.getByText('בית')).toBeInTheDocument();
-            expect(screen.getByText('שחק')).toBeInTheDocument();
+            expect(screen.getByText('משימות')).toBeInTheDocument();
             expect(screen.getByText('חברים')).toBeInTheDocument();
         });
 
@@ -522,7 +597,7 @@ describe('GlobalBottomNav', () => {
             render(<GlobalBottomNav />);
 
             expect(screen.getByRole('button', { name: /home/i })).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /play/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /quests/i })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /friends/i })).toBeInTheDocument();
         });
     });

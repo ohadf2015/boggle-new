@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { Gem, Star, Trophy, RotateCcw, Clock, Target } from 'lucide-react';
+import { Gem, Star, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
@@ -11,6 +11,7 @@ import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
 import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
+import RareGemsCompletePhase from './RareGemsCompletePhase';
 import type { LetterGrid, Language } from '@/types';
 
 // Level configurations
@@ -432,120 +433,14 @@ export default function RareGems({
         )}
 
         {phase === 'complete' && (
-          <AdaptiveMotion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center space-y-6"
-          >
-            <AdaptiveMotion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', damping: 12, delay: 0.2 }}
-            >
-              <Trophy className={cn(
-                'w-14 h-14 sm:w-20 sm:h-20 mx-auto',
-                rareWordsFound >= levelConfig.targetRare ? 'text-neo-lime' : 'text-gray-400'
-              )} />
-            </AdaptiveMotion.div>
-            <AdaptiveMotion.h2
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className={cn(
-                'text-2xl font-black',
-                'text-neo-white'
-              )}
-            >
-              {rareWordsFound >= levelConfig.targetRare ? t('brain.drills.complete') : t('brain.drills.gameOver')}
-            </AdaptiveMotion.h2>
-            <AdaptiveMotion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className={cn(
-                'p-4 rounded-neo border-3 border-neo-black space-y-3',
-                'bg-slate-800'
-              )}
-            >
-              {/* Animated Score */}
-              <AdaptiveMotion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.7, type: 'spring' }}
-                className="text-3xl font-black text-neo-green"
-              >
-                <AdaptiveMotion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8 }}
-                >
-                  {score}
-                </AdaptiveMotion.span> {t('brain.drills.points')}
-              </AdaptiveMotion.div>
-              
-              {/* Animated Stats Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-                <AdaptiveMotion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.9 }}
-                  className={cn(
-                    'p-3 rounded-neo border-2 border-neo-black',
-                    'bg-slate-700'
-                  )}
-                >
-                  <Gem className="w-6 h-6 mx-auto text-neo-purple mb-1" />
-                  <p className={cn('text-2xl font-black', 'text-neo-white')}>
-                    {rareWordsFound}
-                  </p>
-                  <p className={cn('text-xs', 'text-neo-white/70')}>
-                    {t('brain.drills.rareWords')}
-                  </p>
-                </AdaptiveMotion.div>
-                <AdaptiveMotion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 1 }}
-                  className={cn(
-                    'p-3 rounded-neo border-2 border-neo-black',
-                    'bg-slate-700'
-                  )}
-                >
-                  <Target className="w-6 h-6 mx-auto text-neo-green mb-1" />
-                  <p className={cn('text-2xl font-black', 'text-neo-white')}>
-                    {wordsFound.length}
-                  </p>
-                  <p className={cn('text-xs', 'text-neo-white/70')}>
-                    {t('brain.drills.wordsFound')}
-                  </p>
-                </AdaptiveMotion.div>
-              </div>
-            </AdaptiveMotion.div>
-            <AdaptiveMotion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 }}
-              className="flex gap-3 justify-center"
-            >
-              <AdaptiveMotion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => { setPhase('ready'); onPlayAgain?.(); }}
-                className="flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-neo-purple text-white"
-              >
-                <RotateCcw className="w-5 h-5" />
-                {t('brain.drills.playAgain')}
-              </AdaptiveMotion.button>
-              {onExit && (
-                <AdaptiveMotion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={onExit}
-                  className="px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-neo-lime text-neo-black"
-                >
-                  {t('brain.drills.exit')}
-                </AdaptiveMotion.button>
-              )}
-            </AdaptiveMotion.div>
-          </AdaptiveMotion.div>
+          <RareGemsCompletePhase
+            score={score}
+            rareWordsFound={rareWordsFound}
+            wordsFoundCount={wordsFound.length}
+            targetRare={levelConfig.targetRare}
+            onPlayAgain={() => { setPhase('ready'); onPlayAgain?.(); }}
+            onExit={onExit}
+          />
         )}
       </div>
     </div>

@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import LightningRound from '@/components/drills/LightningRound';
 import DrillProgressionOverlay from '@/components/brain/DrillProgressionOverlay';
+import DrillResearchIntro from '@/components/brain/DrillResearchIntro';
 import { useDrillGrid } from '@/hooks/useDrillGrid';
 import { useSaveDrillResult, DrillBrainScoreUpdate } from '@/hooks/useSaveDrillResult';
 import { useDrillRewards } from '@/hooks/useDrillRewards';
@@ -37,6 +38,7 @@ export default function LightningRoundPageClient() {
   const [showProgressionOverlay, setShowProgressionOverlay] = useState(false);
   const [brainScoreUpdate, setBrainScoreUpdate] = useState<DrillBrainScoreUpdate | null>(null);
   const [drillRewards, setDrillRewards] = useState<{ xpAwarded: number; goldAwarded: number } | null>(null);
+  const [levelUp, setLevelUp] = useState<{ newLevel: number; previousLevel: number } | null>(null);
   const [sessionId] = useState(() => `drill_lightning-round_${crypto.randomUUID()}`);
 
   // Generate drill grid
@@ -75,7 +77,14 @@ export default function LightningRoundPageClient() {
 
     // Show progression overlay if we got brainScore data back
     if (saveResult.success && saveResult.brainScore) {
+      // Mark hub as dirty so it refetches on next mount (live brain-score refresh)
+      try { sessionStorage.setItem('lex_brain_dirty', '1'); } catch { /* ignore */ }
       setBrainScoreUpdate(saveResult.brainScore);
+      if (saveResult.levelPromoted && saveResult.newLevel != null && saveResult.previousLevel != null) {
+        setLevelUp({ newLevel: saveResult.newLevel, previousLevel: saveResult.previousLevel });
+      } else {
+        setLevelUp(null);
+      }
       setShowProgressionOverlay(true);
       const rewards = await awardDrillRewards({ level: result.level, score: result.score, xpAwarded: saveResult.xpAwarded ?? 0 });
       setDrillRewards(rewards);
@@ -141,6 +150,8 @@ export default function LightningRoundPageClient() {
         <BoostButton mode="drill" sessionId={sessionId} />
       </header>
 
+      <DrillResearchIntro drillType="lightning-round" />
+
       {/* Drill Content */}
       <div className="flex-1">
         <FeatureErrorBoundary featureName="drill-lightning-round">
@@ -168,6 +179,7 @@ export default function LightningRoundPageClient() {
           tier={brainScoreUpdate.tier}
           xpAwarded={drillRewards?.xpAwarded}
           goldAwarded={drillRewards?.goldAwarded}
+          levelUp={levelUp ?? undefined}
         />
       )}
     </div>

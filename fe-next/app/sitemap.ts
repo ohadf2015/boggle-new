@@ -340,6 +340,9 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     { locale: 'en', path: '/play-boggle-online-free', img: 'en' },
     { locale: 'en', path: '/word-games-online-free', img: 'en' },
   ] as const;
+
+  // Brain Training Word Games — native content in all 5 locales, register each
+  addForAllLocales(routes, '/brain-training-word-games', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
   seoLandings.forEach(({ locale, path, img }) => {
     routes.push({
       url: `${BASE_URL}/${locale}${path}`,

@@ -30,6 +30,10 @@ describe('LanguageContext — server-side language sync', () => {
         document.cookie = 'boggle_language_explicit=; path=/; max-age=0';
         mockPathname = '/en';
 
+        // Seed a live Supabase session so the auto-sync POST is allowed to fire.
+        // hasSupabaseSession() reads sb-<id>-auth-token with looksLive() requiring access_token.
+        localStorage.setItem('sb-test-auth-token', JSON.stringify({ access_token: 'test-token' }));
+
         fetchMock = vi.fn(async () => new Response(JSON.stringify({ success: true }), { status: 200 }));
         vi.stubGlobal('fetch', fetchMock);
     });
@@ -143,6 +147,22 @@ describe('LanguageContext — server-side language sync', () => {
             expect(call).toBeDefined();
             expect(JSON.parse(call![1].body)).toEqual({ language: 'en', explicit: false });
         });
+    });
+
+    it('skips POST entirely when no live Supabase session (guest / pre-login)', async () => {
+        mockPathname = '/en';
+        // Wipe seeded session — guest path
+        localStorage.clear();
+
+        render(
+            <LanguageProvider initialLanguage="en">
+                <span />
+            </LanguageProvider>
+        );
+
+        await new Promise((r) => setTimeout(r, 30));
+        const calls = fetchMock.mock.calls.filter((c) => c[0] === '/api/user/language');
+        expect(calls).toHaveLength(0);
     });
 
     it('re-POSTs when language changes (different lang invalidates dedup)', async () => {

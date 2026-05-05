@@ -30,6 +30,8 @@ import express, { Router } from 'express';
 import { adminRateLimit, adminAuth } from './middleware';
 import statsRoutes from './statsRoutes';
 import playerRoutes from './playerRoutes';
+import playerDetailRoutes from './playerDetailRoutes';
+import authSessionsRoutes from './authSessionsService';
 import gameRoutes from './gameRoutes';
 import wordModerationRoutes from './wordModerationRoutes';
 import utilityRoutes from './utilityRoutes';
@@ -53,6 +55,12 @@ router.use('/', statsRoutes);
 
 // Player routes (/api/admin/players/*)
 router.use('/', playerRoutes);
+
+// Player drill-down detail (/api/admin/players/:id/detail)
+router.use('/', playerDetailRoutes);
+
+// Auth game-sessions analytics (/api/admin/analytics/auth-games)
+router.use('/', authSessionsRoutes);
 
 // Game routes (/api/admin/games/*, /api/admin/activity/*, /api/admin/realtime, etc.)
 router.use('/', gameRoutes);

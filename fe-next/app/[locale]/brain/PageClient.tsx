@@ -102,6 +102,19 @@ export default function BrainTrainingPageClient() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const { brainScore, recentGameScores, drillProgress, brainScoreHistory, isLoading, error, refresh } = useBrainScore();
 
+  // Drill submission sets `lex_brain_dirty=1` in sessionStorage when the player
+  // completes a drill and returns to the hub. We refresh once after initial load
+  // so the radar chart and history reflect the freshly submitted scores rather
+  // than stale data from the prior fetch.
+  const BRAIN_DIRTY_KEY = 'lex_brain_dirty';
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (sessionStorage.getItem(BRAIN_DIRTY_KEY) === '1') {
+      sessionStorage.removeItem(BRAIN_DIRTY_KEY);
+      void refresh();
+    }
+  }, [refresh]);
+
   // State for first game celebration - persisted to localStorage for show-once behavior
   const FIRST_GAME_CELEBRATION_KEY = 'lexiclash_brain_first_game_celebration_shown';
   const [showCelebration, setShowCelebration] = useState(false);

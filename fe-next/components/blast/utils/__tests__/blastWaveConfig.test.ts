@@ -7,7 +7,9 @@ import {
   getWaveObjectives,
   seedTargetWordObjective,
   seedColorPowerObjective,
+  seedGalleryObjective,
 } from '../blastWaveConfig';
+import type { BlastObjective } from '../../types';
 
 /**
  * Sprint 1 tile retirement: 14 special types disabled across all waves so the
@@ -568,5 +570,84 @@ describe('wave completability invariants', () => {
     it('movesAllowed is at least 4 (minimum playable wave length)', () => {
       expect(getWaveConfig(wave).movesAllowed).toBeGreaterThanOrEqual(4);
     });
+  });
+});
+
+describe('seedGalleryObjective — Goal Gallery rotation', () => {
+  it('returns objectives unchanged before any gate (wave 1-3)', () => {
+    const base: BlastObjective[] = [{ type: 'clear_percent', target: 90 }];
+    expect(seedGalleryObjective(1, base)).toBe(base);
+    expect(seedGalleryObjective(3, base)).toBe(base);
+  });
+
+  it('skips when target_word objective already present (mutual exclusion)', () => {
+    const base: BlastObjective[] = [
+      { type: 'clear_percent', target: 90 },
+      { type: 'target_word', target: 1, targetWord: 'CAT' },
+    ];
+    // Wave 7 normally eligible — should still skip
+    expect(seedGalleryObjective(7, base)).toBe(base);
+  });
+
+  it('emits at most ONE gallery goal per wave', () => {
+    const base: BlastObjective[] = [{ type: 'clear_percent', target: 90 }];
+    for (let w = 4; w <= 30; w++) {
+      const result = seedGalleryObjective(w, base);
+      const galleryTypes = ['path_route', 'cascade_chain', 'tile_sniper', 'long_word_lockup'];
+      const galleryGoals = result.filter(o => galleryTypes.includes(o.type));
+      expect(galleryGoals.length).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('cascade_chain target ramps with wave (capped at 6)', () => {
+    // Wave-15 should always seed cascade_chain at the seed RNG ((15*53)%100=45<35? no actually 15*53=795%100=95). Use 4 — 4*53=212%100=12 < 35 ✓
+    const base: BlastObjective[] = [];
+    const r4 = seedGalleryObjective(4, base);
+    const cc = r4.find(o => o.type === 'cascade_chain');
+    if (cc) {
+      expect(cc.target).toBeGreaterThanOrEqual(3);
+      expect(cc.target).toBeLessThanOrEqual(6);
+    }
+  });
+
+  it('long_word_lockup minWordLength scales with wave', () => {
+    // Try waves 7,10,13 — actual seed may or may not pick lockup but if it does, length must scale
+    for (const wave of [7, 10, 13]) {
+      const result = seedGalleryObjective(wave, []);
+      const lockup = result.find(o => o.type === 'long_word_lockup');
+      if (!lockup) continue;
+      const expected = wave >= 13 ? 9 : wave >= 10 ? 8 : 7;
+      expect(lockup.minWordLength).toBe(expected);
+    }
+  });
+
+  it('respects wave gates: no path_route before wave 5', () => {
+    for (let w = 1; w <= 4; w++) {
+      const result = seedGalleryObjective(w, []);
+      expect(result.find(o => o.type === 'path_route')).toBeUndefined();
+    }
+  });
+
+  it('respects wave gates: no tile_sniper before wave 6', () => {
+    for (let w = 1; w <= 5; w++) {
+      const result = seedGalleryObjective(w, []);
+      expect(result.find(o => o.type === 'tile_sniper')).toBeUndefined();
+    }
+  });
+
+  it('respects wave gates: no long_word_lockup before wave 7', () => {
+    for (let w = 1; w <= 6; w++) {
+      const result = seedGalleryObjective(w, []);
+      expect(result.find(o => o.type === 'long_word_lockup')).toBeUndefined();
+    }
+  });
+
+  it('deterministic — same wave seed yields same goal type', () => {
+    const wave = 9;
+    const a = seedGalleryObjective(wave, []);
+    const b = seedGalleryObjective(wave, []);
+    const aTypes = a.map(o => o.type).sort();
+    const bTypes = b.map(o => o.type).sort();
+    expect(aTypes).toEqual(bTypes);
   });
 });

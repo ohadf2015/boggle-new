@@ -8,6 +8,7 @@ import { render, screen } from '@testing-library/react';
 import DailyChallengeResults from '../DailyChallengeResults';
 import type { DailyChallengeResult, DailyStreak } from '@/utils/dailyChallenge';
 
+vi.mock('@/components/ads/ResultsBannerSlot', () => ({ default: () => null }));
 vi.mock('@/hooks/useInterstitialAd', () => ({
   useInterstitialAd: () => ({ showInterstitial: vi.fn() }),
 }));

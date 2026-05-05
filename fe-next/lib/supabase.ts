@@ -285,7 +285,7 @@ export async function getGuestToken(tokenHash: string) {
     .select('id, token_hash, stats, claimed_by, created_at, updated_at')
     .eq('token_hash', tokenHash)
     .is('claimed_by', null)
-    .single();
+    .maybeSingle();
 }
 
 // Used by backend and components/views/ResultsPage.tsx

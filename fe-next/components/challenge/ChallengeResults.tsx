@@ -15,6 +15,7 @@ import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import type { SinglePlayerResultsData } from '@/components/singleplayer/SinglePlayerView';
 
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
+import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 
 interface ChallengeResultsProps {
   results: SinglePlayerResultsData;
@@ -237,13 +238,14 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
             {t('common.backToHome')}
           </Button>
 
-          {/* Banner Ads — CrazyGames (web iframe) / AdMob (native) */}
+          {/* Banner Ads — CrazyGamesBanner covers web iframe; ResultsBannerSlot covers native AdMob. */}
           <div className="hidden md:block">
             <CrazyGamesBanner size="728x90" />
           </div>
           <div className="md:hidden">
             <CrazyGamesBanner size="320x50" />
           </div>
+          <ResultsBannerSlot placement="challenge-complete" className="my-3" />
         </motion.div>
       </motion.div>
     </div>

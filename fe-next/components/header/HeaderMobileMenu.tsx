@@ -256,7 +256,9 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
 
     return (
         <>
-            {/* Mobile: Volume + Lang + Auth + Hamburger */}
+            {/* Mobile-only inline strip: Volume + Lang + Auth.
+                Desktop already renders these via HeaderDesktopControls,
+                so we keep the trio gated `sm:hidden` to avoid duplicates. */}
             <div className="sm:hidden flex items-center gap-2 min-w-0 shrink-0">
                 <MusicControls />
 
@@ -291,54 +293,57 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                         <span>{t('auth.signIn')}</span>
                     </button>
                 )}
-
-                {/*
-                  Animated Hamburger Button.
-                  Hidden on CrazyGames: the menu exposes profile / settings /
-                  leaderboard / cookie banner / Ko-fi / Instagram links that
-                  would all navigate the player off-mode (CG is multiplayer-only).
-                  `mounted` gate: SSR cannot resolve `isCrazyGames` (SDK loads
-                  client-only); deferring keeps SSR ↔ first-client render
-                  identical, preventing Radix Select aria-controls drift on
-                  the sibling QuickLanguageSwitcher.
-                */}
-                {mounted && !isCrazyGames && (
-                    <button
-                        onClick={() => {
-                            if (!showMobileMenu) {
-                                markBadgeSeen(badgeCount);
-                                if (notificationCount > 0) {
-                                    markAllAsRead();
-                                }
-                            }
-                            setShowMobileMenu(!showMobileMenu);
-                        }}
-                        className={cn(
-                            "relative flex items-center justify-center shrink-0",
-                            "w-11 h-11 min-w-[44px] min-h-[44px]",
-                            "bg-neo-cream text-neo-black",
-                            "border-3 border-neo-black",
-                            "rounded-neo shadow-hard-sm",
-                            "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard",
-                            "active:translate-x-px active:translate-y-px active:shadow-none",
-                            "transition-all duration-100"
-                        )}
-                        aria-label={showMobileMenu ? t('common.closeMenu') : t('common.openMenu')}
-                        aria-expanded={showMobileMenu}
-                    >
-                        <m.div
-                            animate={{ rotate: showMobileMenu ? 90 : 0 }}
-                            transition={{ type: 'spring', damping: 15, stiffness: 200 }}
-                        >
-                            {showMobileMenu ? <X size={18} /> : <Menu size={18} />}
-                        </m.div>
-                        {/* Aggregated badge */}
-                        {badgeCount > 0 && !showMobileMenu && !badgeSeen && (
-                            <div className="absolute -top-1.5 -inset-e-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-neo-red rounded-full border-2 border-neo-cream text-[10px] font-black text-white leading-none">{badgeCount}</div>
-                        )}
-                    </button>
-                )}
             </div>
+
+            {/*
+              Hamburger Button — visible at ALL breakpoints (mobile + desktop).
+              Replaces the legacy desktop dropdown so both viewports share the
+              same side-drawer menu.
+              Hidden on CrazyGames: the menu exposes profile / settings /
+              leaderboard / cookie banner / Ko-fi / Instagram links that
+              would all navigate the player off-mode (CG is multiplayer-only).
+              `mounted` gate: SSR cannot resolve `isCrazyGames` (SDK loads
+              client-only); deferring keeps SSR ↔ first-client render
+              identical, preventing Radix Select aria-controls drift on
+              the sibling QuickLanguageSwitcher.
+            */}
+            {mounted && !isCrazyGames && (
+                <button
+                    onClick={() => {
+                        if (!showMobileMenu) {
+                            markBadgeSeen(badgeCount);
+                            if (notificationCount > 0) {
+                                markAllAsRead();
+                            }
+                        }
+                        setShowMobileMenu(!showMobileMenu);
+                    }}
+                    className={cn(
+                        "relative flex items-center justify-center shrink-0",
+                        "w-11 h-11 min-w-[44px] min-h-[44px]",
+                        "bg-neo-cream text-neo-black",
+                        "border-3 border-neo-black",
+                        "rounded-neo shadow-hard-sm",
+                        "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard",
+                        "active:translate-x-px active:translate-y-px active:shadow-none",
+                        "transition-all duration-100"
+                    )}
+                    aria-label={showMobileMenu ? t('common.closeMenu') : t('common.openMenu')}
+                    aria-expanded={showMobileMenu}
+                    aria-haspopup="true"
+                >
+                    <m.div
+                        animate={{ rotate: showMobileMenu ? 90 : 0 }}
+                        transition={{ type: 'spring', damping: 15, stiffness: 200 }}
+                    >
+                        {showMobileMenu ? <X size={18} /> : <Menu size={18} />}
+                    </m.div>
+                    {/* Aggregated badge */}
+                    {badgeCount > 0 && !showMobileMenu && !badgeSeen && (
+                        <div className="absolute -top-1.5 -inset-e-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-neo-red rounded-full border-2 border-neo-cream text-[10px] font-black text-white leading-none">{badgeCount}</div>
+                    )}
+                </button>
+            )}
 
             {/* Mobile Menu Slide-out Pane (also hidden on CrazyGames) */}
             {!isCrazyGames && mounted && createPortal(
@@ -353,7 +358,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                 animate="visible"
                                 exit="exit"
                                 transition={{ duration: 0.2 }}
-                                className="fixed inset-0 bg-neo-black/60 backdrop-blur-[2px] z-70 sm:hidden"
+                                className="fixed inset-0 bg-neo-black/60 backdrop-blur-[2px] z-70"
                                 onClick={closeMenu}
                             />
 
@@ -369,7 +374,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                 dragElastic={0.15}
                                 onDragEnd={handleDragEnd}
                                 className={cn(
-                                    "fixed top-0 bottom-0 w-[300px] max-w-[88vw] z-80 sm:hidden",
+                                    "fixed top-0 bottom-0 w-[320px] sm:w-[360px] max-w-[88vw] z-80",
                                     "bg-neo-navy border-neo-black",
                                     "shadow-hard-xl overflow-y-auto overflow-x-hidden",
                                     "pb-[max(env(safe-area-inset-bottom),1rem)]",
@@ -928,7 +933,9 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     );
 });
 
-HeaderMobileMenu.displayName = 'HeaderMobileMenu';
+// Despite the legacy filename, this component now renders the unified
+// side drawer for both mobile and desktop viewports.
+HeaderMobileMenu.displayName = 'HeaderSideMenu';
 
 export default HeaderMobileMenu;
 

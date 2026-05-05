@@ -184,8 +184,11 @@ export function useBlastWordHandler({
       nearMissTimerRef.current = setTimeout(() => effects.setNearMissCells([]), 1200);
     }
 
-    // 7. Cascade chain
-    await runCascade(path.length);
+    // 7. Cascade chain — capture depth for Goal Gallery cascade_chain goal.
+    const chainDepth = await runCascade(path.length);
+    if (chainDepth > 0) {
+      engine.recordCascadeDepth(chainDepth);
+    }
 
     // 7a. Record word submission for highlight reel if recorder is available
     if (recorder) {

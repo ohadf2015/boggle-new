@@ -75,4 +75,30 @@ describe('InlineBannerAd', () => {
     await Promise.resolve();
     expect(showBannerMock).toHaveBeenCalled();
   });
+
+  it('defaults to game banner variant when none specified', async () => {
+    isNativeMock.mockReturnValue(true);
+    getPlatformMock.mockReturnValue('android');
+    showBannerMock.mockResolvedValue(undefined);
+    hideBannerMock.mockResolvedValue(undefined);
+
+    render(<InlineBannerAd />);
+    await Promise.resolve();
+    await Promise.resolve();
+    const lastCall = showBannerMock.mock.calls.at(-1);
+    expect(lastCall?.[2]).toEqual({ variant: 'game' });
+  });
+
+  it('passes variant=content to showBanner when prop set', async () => {
+    isNativeMock.mockReturnValue(true);
+    getPlatformMock.mockReturnValue('android');
+    showBannerMock.mockResolvedValue(undefined);
+    hideBannerMock.mockResolvedValue(undefined);
+
+    render(<InlineBannerAd variant="content" />);
+    await Promise.resolve();
+    await Promise.resolve();
+    const lastCall = showBannerMock.mock.calls.at(-1);
+    expect(lastCall?.[2]).toEqual({ variant: 'content' });
+  });
 });

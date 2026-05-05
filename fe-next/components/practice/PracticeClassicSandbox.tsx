@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import PracticeChainCta from './PracticeChainCta';
-import PracticeCompleteBanner from './PracticeCompleteBanner';
+import PracticeCompletePopup from './PracticeCompletePopup';
+import PracticePostCompleteChip from './PracticePostCompleteChip';
 import PracticeInstructions from './PracticeInstructions';
 import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
 import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
@@ -69,6 +69,7 @@ export default function PracticeClassicSandbox() {
   const [confettiKey, setConfettiKey] = useState(0);
   const [toast, setToast] = useState<{ type: FeedbackType; message: string } | null>(null);
   const [scorePopup, setScorePopup] = useState<{ key: number; word: string } | null>(null);
+  const [popupDismissed, setPopupDismissed] = useState(false);
   const startedAtRef = useRef(0);
   const completedFiredRef = useRef(false);
   const isComplete = foundWords.length >= PRACTICE_GOALS.classic;
@@ -238,13 +239,12 @@ export default function PracticeClassicSandbox() {
         )}
       </AnimatePresence>
 
-      {isComplete && <PracticeCompleteBanner mode="classic" />}
-      {isComplete && (
-        <PracticeChainCta
-          currentMode="classic"
-          className="mt-auto inline-flex items-center justify-center w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed"
-        />
-      )}
+      <PracticeCompletePopup
+        open={isComplete && !popupDismissed}
+        mode="classic"
+        onDismiss={() => setPopupDismissed(true)}
+      />
+      <PracticePostCompleteChip open={isComplete && popupDismissed} mode="classic" />
     </div>
   );
 }
