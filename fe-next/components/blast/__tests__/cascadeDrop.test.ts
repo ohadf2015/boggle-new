@@ -2,8 +2,13 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { createCascadeDropTween } from '../effects/blastGsapTimelines';
 
+const ORIG_MATCHMEDIA = typeof window !== 'undefined' ? window.matchMedia : undefined;
+
 describe('createCascadeDropTween', () => {
-  afterEach(() => vi.restoreAllMocks());
+  afterEach(() => {
+    vi.restoreAllMocks();
+    if (ORIG_MATCHMEDIA) window.matchMedia = ORIG_MATCHMEDIA;
+  });
 
   it('staggers via columnIndex (delay = columnIndex * 0.04)', () => {
     const el = document.createElement('div');

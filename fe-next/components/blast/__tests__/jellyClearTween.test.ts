@@ -3,6 +3,10 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import type { BlastTileType } from '../types';
 import { createJellyClearTween, JELLY_CLEAR_DURATION_MS } from '../effects/blastGsapTimelines';
 
+// Save the real matchMedia at module-load so per-test mutations restore cleanly
+// and don't leak into subsequent test files (happy-dom shares globals across files).
+const ORIG_MATCHMEDIA = typeof window !== 'undefined' ? window.matchMedia : undefined;
+
 const ALL_TYPES: BlastTileType[] = [
   'standard', 'gold', 'bomb', 'lightning', 'prism', 'rainbow', 'ice',
   'gem', 'frozen', 'magnet', 'diamond', 'countdown', 'shuffle', 'magma',
@@ -10,7 +14,10 @@ const ALL_TYPES: BlastTileType[] = [
 ];
 
 describe('createJellyClearTween', () => {
-  afterEach(() => vi.restoreAllMocks());
+  afterEach(() => {
+    vi.restoreAllMocks();
+    if (ORIG_MATCHMEDIA) window.matchMedia = ORIG_MATCHMEDIA;
+  });
 
   it.each(ALL_TYPES)('returns a non-null timeline for %s with positive duration', (type) => {
     const el = document.createElement('div');

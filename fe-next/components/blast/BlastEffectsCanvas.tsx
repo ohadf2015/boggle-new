@@ -13,7 +13,7 @@ import { gsap } from 'gsap';
 import { useBlastDebris } from './useBlastDebris';
 import { GameCanvas, useGameEngine } from '@/lib/gameEngine/GameCanvas';
 import { createEnhancedEffects, type EnhancedEffectsManager } from './utils/blastEnhancedEffects';
-import { createBlastJuiceKit, type BlastJuiceKit } from './effects/blastJuiceKit';
+import { createBlastJuiceKit, spawnTypedBurst, type BlastJuiceKit } from './effects/blastJuiceKit';
 import { buildComboLevelUpTimeline } from './effects/blastGsapTimelines';
 import { useBlastAmbientEffects } from './useBlastAmbientEffects';
 import { useBlastPixiOverlays } from './hooks/useBlastPixiOverlays';
@@ -254,11 +254,7 @@ function EffectsWorker({
     // Sniper hit gets an extra screen punch for the kill-shot feel; route
     // completion already cinematic enough via the wire-flash + shockwave.
     if (goalHit.kind === 'sniper') {
-      try {
-        shake?.start?.({ intensity: 8, duration: 220 });
-      } catch {
-        // shake API may differ; swallow defensively rather than crash.
-      }
+      shake.shake({ intensity: 7, duration: 0.25, decay: 'exponential' });
     }
   }, [goalHit, cellSize, fireShockwave, spawnStarBurst, shake]);
 
@@ -390,12 +386,17 @@ function EffectsWorker({
     }
 
     // Lingering sparkle dust at each clear position — floats upward for ambient magic
+    const comboSize = clearedTiles.length;
     for (const tile of clearedTiles) {
       const x = tile.col * cellSize + cellSize / 2;
       const y = tile.row * cellSize + cellSize / 2;
       particles.burst(LINGER_SPARKLE, x, y, 3);
       // Afterglow residue — warm halo that lingers where tiles were cleared
       spawnAfterglow(x, y, tile.type === 'bomb' ? 0xff3366 : tile.type === 'lightning' ? 0x00ffff : 0xbfff00);
+      // Phase 4 jelly: tile-tinted typed burst. Adds a shockwave ring on
+      // combo >= 3 plus particles in the tile's accent colour. Cap-bounded
+      // (FIFO eviction at 64 concurrent) so high-combo clears can't runaway.
+      if (camera) spawnTypedBurst(camera, tile.type, x, y, comboSize);
     }
 
     // Move ghost sprite to centroid of cleared tiles (for chain ghost trail)
@@ -442,7 +443,7 @@ function EffectsWorker({
       }
       runLongWordPunch(clearedTiles.length, cx / clearedTiles.length, cy / clearedTiles.length);
     }
-  }, [clearedTiles, particles, shake, cellSize, gridSize, height, spawnDebris, spawnLightningBolt, spawnLightningDebris, firePrismBeams, spawnPrismDebris, flashCross, physics, fireShockwave, spawnPulseRing, spawnStarBurst, spawnAfterglow, moveGhostTo, runLongWordPunch]);
+  }, [clearedTiles, particles, shake, cellSize, gridSize, height, spawnDebris, spawnLightningBolt, spawnLightningDebris, firePrismBeams, spawnPrismDebris, flashCross, physics, fireShockwave, spawnPulseRing, spawnStarBurst, spawnAfterglow, moveGhostTo, runLongWordPunch, camera]);
 
   // Chain cascade sparkle + mega celebration at chain 5
   useEffect(() => {
