@@ -5,7 +5,8 @@
  *
  * Architectural differences from v1:
  *  • No single bordered "card" — flat stacked sections on navy
- *  • Asymmetric hero: circular marshmallow badge + heading as a pair
+ *  • Single bold hero illustration replaces split OG card + mascot circle
+ *    (mascot + flying letter tiles + sparkles, locale-agnostic, ~115KB JPEG)
  *  • Letter reveal moved into the CTA zone (the hint IS the invitation)
  *  • Typographic hierarchy: 32px heading, 14px everything else
  *  • Humanized copy: contractions, concrete imagery, no AI hedging
@@ -177,17 +178,10 @@ interface ReengagementEmailV2Props {
 
 /* ───────────────────────── Assets ───────────────────────── */
 
-// Use www. domain — lexiclash.live 301s to www, and email clients don't follow redirects
-const MASCOT_SRC = 'https://www.lexiclash.live/mascot/waving.gif';
-
-/** Localized OG card — branded LexiClash header (replaces text wordmark) */
-const OG_IMAGE_BY_LANG: Record<string, string> = {
-  en: 'https://www.lexiclash.live/og-image-en.jpg',
-  he: 'https://www.lexiclash.live/og-image-he.jpg',
-  sv: 'https://www.lexiclash.live/og-image-sv.jpg',
-  ja: 'https://www.lexiclash.live/og-image-ja.jpg',
-  es: 'https://www.lexiclash.live/og-image-es.jpg',
-};
+// Use www. domain — lexiclash.live 301s to www, and email clients don't follow redirects.
+// Locale-agnostic celebration scene: mascot + flying letter tiles + sparkles.
+// Replaces the v2-original split (localized OG card + small mascot GIF circle).
+const HERO_SRC = 'https://www.lexiclash.live/email/reengagement-hero-v2.jpg';
 
 /* ─── Palette (solid hex only — dark-mode safe) ─── */
 
@@ -222,7 +216,6 @@ export default function ReengagementEmailV2({
   const sh = rtl ? '-' : '';
   const locale = ['he', 'sv', 'ja', 'es'].includes(language) ? language : 'en';
   const privacyUrl = `https://lexiclash.live/${locale}/privacy`;
-  const ogImageSrc = OG_IMAGE_BY_LANG[locale] || OG_IMAGE_BY_LANG.en;
   const year = new Date().getFullYear();
 
   return (
@@ -264,10 +257,11 @@ export default function ReengagementEmailV2({
             /* Google dark mode specificity boost */
             u + .body-v2 .cta-btn-v2 { background-color: ${C.lime} !important; color: ${C.black} !important; }
             u + .body-v2 .cta-td-v2 { background-color: ${C.lime} !important; }
+            /* Hero banner scales fluidly: width:100% with max-width 560 in inline style */
+            .hero-banner { box-shadow: ${sh}6px 6px 0px ${C.black} !important; }
             @media (max-width: 480px) {
               .h1-v2 { font-size: 26px !important; line-height: 1.25 !important; }
-              .mascot-ring { width: 132px !important; height: 132px !important; }
-              .mascot-img { width: 124px !important; height: 124px !important; }
+              .hero-banner { box-shadow: ${sh}4px 4px 0px ${C.black} !important; border-radius: 14px !important; }
               .letter-big { font-size: 56px !important; }
               .pitch-v2 { font-size: 14px !important; }
             }
@@ -290,22 +284,31 @@ export default function ReengagementEmailV2({
                 <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
                   style={{ maxWidth: '560px' }} dir={dir}>
 
-                  {/* ── 1. Branded OG header (localized — visual proof this is LexiClash) ── */}
+                  {/* ── 1. HERO BANNER — locale-agnostic celebration scene
+                          (mascot + flying letter tiles + sparkles).
+                          Single visual that does the brand AND emotional work
+                          previously split between OG card + mascot circle. ── */}
                   <tr>
-                    <td align="center" style={{ paddingBottom: '24px' }}>
-                      <Link href={playUrl} target="_blank" style={{ textDecoration: 'none', display: 'inline-block', lineHeight: 0 }}>
+                    <td align="center" style={{ paddingBottom: '28px' }}>
+                      <Link
+                        href={playUrl}
+                        target="_blank"
+                        style={{ textDecoration: 'none', display: 'inline-block', lineHeight: 0 }}
+                      >
                         <Img
-                          src={ogImageSrc}
-                          alt="LexiClash"
-                          width="280"
-                          height="147"
+                          src={HERO_SRC}
+                          alt="LexiClash — letter tiles bursting around Lexi the marshmallow mascot"
+                          width="560"
+                          height="312"
+                          className="hero-banner"
                           style={{
                             display: 'block',
-                            width: '280px',
-                            height: '147px',
-                            border: `3px solid ${C.black}`,
-                            borderRadius: '12px',
-                            boxShadow: `${sh}4px 4px 0px ${C.black}`,
+                            width: '100%',
+                            maxWidth: '560px',
+                            height: 'auto',
+                            border: `4px solid ${C.black}`,
+                            borderRadius: '18px',
+                            boxShadow: `${sh}6px 6px 0px ${C.black}`,
                             outline: 'none',
                           }}
                         />
@@ -313,51 +316,7 @@ export default function ReengagementEmailV2({
                     </td>
                   </tr>
 
-                  {/* ── 2. HERO — circular marshmallow badge (clipped) ── */}
-                  <tr>
-                    <td align="center" style={{ paddingBottom: '20px' }}>
-                      <table role="presentation" cellPadding={0} cellSpacing={0}>
-                        <tr>
-                          <td
-                            className="mascot-ring"
-                            align="center"
-                            valign="middle"
-                            width={160}
-                            height={160}
-                            style={{
-                              width: '160px',
-                              height: '160px',
-                              backgroundColor: C.badge,
-                              borderRadius: '9999px',
-                              border: `4px solid ${C.black}`,
-                              boxShadow: `${sh}6px 6px 0px ${C.black}`,
-                              overflow: 'hidden',
-                              lineHeight: 0,
-                              fontSize: 0,
-                            }}
-                          >
-                            <Img
-                              src={MASCOT_SRC}
-                              alt="Lexi waving hello"
-                              width="148"
-                              height="148"
-                              className="mascot-img"
-                              style={{
-                                display: 'block',
-                                width: '148px',
-                                height: '148px',
-                                borderRadius: '9999px',
-                                border: 0,
-                                outline: 'none',
-                              }}
-                            />
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-
-                  {/* ── 3. Heading ── */}
+                  {/* ── 2. Heading ── */}
                   <tr>
                     <td align="center" style={{ padding: '0 12px' }}>
                       <Heading as="h1" className="h1-v2" style={{
@@ -390,7 +349,7 @@ export default function ReengagementEmailV2({
                     </td>
                   </tr>
 
-                  {/* ── 4. LETTER REVEAL — the hint IS the invitation ── */}
+                  {/* ── 3. LETTER REVEAL — the hint IS the invitation ── */}
                   <tr>
                     <td align="center" style={{ paddingBottom: '14px' }}>
                       <Text className="hint-label" style={{
@@ -460,7 +419,7 @@ export default function ReengagementEmailV2({
                     </td>
                   </tr>
 
-                  {/* ── 5. Pitch line ── */}
+                  {/* ── 4. Pitch line ── */}
                   <tr>
                     <td align="center" style={{ padding: '0 20px 20px' }}>
                       <Text className="pitch-v2" style={{
@@ -480,7 +439,7 @@ export default function ReengagementEmailV2({
                     </td>
                   </tr>
 
-                  {/* ── 6. CTA — single primary action ── */}
+                  {/* ── 5. CTA — single primary action ── */}
                   <tr>
                     <td align="center" style={{ paddingBottom: '24px' }}>
                       <table role="presentation" cellPadding={0} cellSpacing={0}
@@ -520,7 +479,7 @@ export default function ReengagementEmailV2({
                   {/* spacer above footer */}
                   <tr><td style={{ height: '12px', lineHeight: 0, fontSize: 0 }}>&nbsp;</td></tr>
 
-                  {/* ── 7. Footer ── */}
+                  {/* ── 6. Footer ── */}
                   <tr>
                     <td style={{ borderTop: `1px solid ${C.divider}`, paddingTop: '24px' }}>
                       <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">

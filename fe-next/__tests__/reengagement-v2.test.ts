@@ -32,24 +32,35 @@ describe('ReengagementEmailV2 — component render', () => {
     expect(html).toMatch(/you\s*good/);
     // Apostrophes get HTML-encoded → match "Let" + "s go" loosely
     expect(html).toMatch(/Let.{1,10}s go/);
-    // Branding now lives in the OG image alt text (text wordmark removed)
-    expect(html).toContain('alt="LexiClash"');
+    // Branding now lives in the hero illustration alt text (text wordmark removed)
+    expect(html).toMatch(/alt="LexiClash[^"]*Lexi[^"]*"/);
   });
 
-  it('includes the circular marshmallow mascot with alt text', async () => {
+  it('includes the new celebration hero illustration with descriptive alt text', async () => {
     const html = await renderHtml();
-    expect(html).toContain('https://www.lexiclash.live/mascot/waving.gif');
-    expect(html).toContain('Lexi waving hello');
-    // Circular clipping — border-radius 9999px applied to the ring cell
-    expect(html).toContain('border-radius:9999px');
+    // Single locale-agnostic hero illustration — replaces v2-original mascot GIF circle + OG card
+    expect(html).toContain('https://www.lexiclash.live/email/reengagement-hero-v2.jpg');
+    // Alt mentions both brand and mascot (a11y + brand recall in image-blocked clients)
+    expect(html).toMatch(/alt="LexiClash[^"]*Lexi[^"]*marshmallow[^"]*"/);
+    // Hero is hard-shadowed neo-brutalist — 6px offset shadow, no blur
+    expect(html).toMatch(/box-shadow:[^"';]*6px 6px 0px/);
+    // Hero scales fluidly across email clients (max-width 560 + width 100%)
+    expect(html).toMatch(/max-width:560px/);
   });
 
-  it('uses the localized OG image as branded header (proves it is LexiClash)', async () => {
+  it('hero illustration is locale-agnostic — same asset across all 5 languages', async () => {
+    // Old v2 used per-locale OG cards; v3 hero is one shared illustration since the
+    // visuals (mascot, blank tiles, sparkles) carry no language-specific text.
+    const heroUrls = new Set<string>();
     for (const lang of ['en', 'he', 'sv', 'ja', 'es']) {
       const html = await renderHtml({ language: lang });
-      expect(html).toContain(`https://www.lexiclash.live/og-image-${lang}.jpg`);
-      expect(html).toContain('alt="LexiClash"');
+      const match = html.match(/src="(https:\/\/www\.lexiclash\.live\/email\/reengagement-hero[^"]+)"/);
+      expect(match).not.toBeNull();
+      heroUrls.add(match![1]);
+      // Old per-locale OG cards must NOT leak back in
+      expect(html).not.toContain(`og-image-${lang}.jpg`);
     }
+    expect(heroUrls.size).toBe(1);
   });
 
   it('renders tightened copy — drops the kettle/PS/urgency cruft', async () => {
