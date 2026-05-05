@@ -86,6 +86,7 @@ interface FoundWord {
   timestamp?: number;
   comboBonus?: number;
   fireRoundBonus?: number;
+  inputMethod?: 'kb' | 'drag';
 }
 
 interface LeaderboardEntry {
@@ -348,7 +349,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       score: fw.score ?? 0,
       ts: fw.timestamp ?? 0,
       userId: username,
-      inputMethod: ('drag' as const),
+      inputMethod: fw.inputMethod ?? 'drag',
     }));
 
     // Build InGameScreen props object
@@ -433,7 +434,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       score: fw.score ?? 0,
       ts: fw.timestamp ?? 0,
       userId: username,
-      inputMethod: ('drag' as const),
+      inputMethod: fw.inputMethod ?? 'drag',
     }));
 
     const wheelRushProps = {
@@ -476,7 +477,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       score: fw.score ?? 0,
       ts: fw.timestamp ?? 0,
       userId: username,
-      inputMethod: ('drag' as const),
+      inputMethod: fw.inputMethod ?? 'drag',
     }));
 
     const blastGameProps = {
@@ -525,7 +526,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       score: fw.score ?? 0,
       ts: fw.timestamp ?? 0,
       userId: username,
-      inputMethod: ('drag' as const),
+      inputMethod: fw.inputMethod ?? 'drag',
     }));
 
     const wordHuntGameProps = {

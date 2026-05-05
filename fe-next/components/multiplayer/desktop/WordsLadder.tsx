@@ -54,6 +54,16 @@ export function WordsLadder({ words, meId }: WordsLadderProps) {
             className={`flex justify-between items-center text-sm px-2 py-1 rounded ${mine ? 'text-foreground' : 'text-foreground/60'} ${stolen ? 'line-through decoration-red-500' : ''} ${idx === 0 ? 'animate-ladder-bump font-bold' : ''}`}
           >
             <span className="font-mono">{w.word}</span>
+            {w.inputMethod === 'kb' && (
+              <span
+                data-testid={`ladder-kb-chip-${w.word}`}
+                className="text-xs px-1 rounded bg-neo-cyan text-foreground"
+                aria-label="keyboard bonus"
+                title="+10% keyboard bonus"
+              >
+                ⌨️ +10%
+              </span>
+            )}
             <span className="tabular-nums">{w.score}</span>
           </li>
         );

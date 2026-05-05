@@ -61,4 +61,22 @@ describe('WordsLadder', () => {
     expect(container1.querySelectorAll('[data-row="true"]')).toHaveLength(1);
     expect(container2.querySelectorAll('[data-row="true"]')).toHaveLength(1);
   });
+
+  it('shows ⌨️ chip on kb-input rows', () => {
+    const words: LadderWord[] = [{ word: 'TYPED', score: 11, ts: 1, userId: 'me', inputMethod: 'kb' as const }];
+    render(<WordsLadder words={words} meId="me" />);
+    expect(screen.getByTestId('ladder-kb-chip-TYPED')).toBeInTheDocument();
+  });
+
+  it('does not show chip on drag rows', () => {
+    const words: LadderWord[] = [{ word: 'DRAGGED', score: 10, ts: 1, userId: 'me', inputMethod: 'drag' as const }];
+    render(<WordsLadder words={words} meId="me" />);
+    expect(screen.queryByTestId('ladder-kb-chip-DRAGGED')).not.toBeInTheDocument();
+  });
+
+  it('does not show chip when inputMethod is undefined (legacy)', () => {
+    const words: LadderWord[] = [{ word: 'LEGACY', score: 10, ts: 1, userId: 'me' }];
+    render(<WordsLadder words={words} meId="me" />);
+    expect(screen.queryByTestId('ladder-kb-chip-LEGACY')).not.toBeInTheDocument();
+  });
 });
