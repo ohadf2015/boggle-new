@@ -173,7 +173,15 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           className="flex-1 min-h-0 px-1 relative overflow-hidden flex items-center justify-center"
           style={{ containerType: 'size' }}
         >
-          <div className="relative aspect-square mx-auto" style={{ width: 'min(100cqw, 100cqh)', maxWidth: '440px' }}>
+          <div
+            className="relative mx-auto"
+            style={{
+              ['--wh-grid-size' as string]: 'min(100cqw, 100cqh, 440px)',
+              width: 'var(--wh-grid-size)',
+              height: 'var(--wh-grid-size)',
+              aspectRatio: '1 / 1',
+            }}
+          >
             <SurvivalGridSection
               grid={grid}
               isGameOver={isGameOver}
