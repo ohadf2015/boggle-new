@@ -5002,7 +5002,10 @@ const ja = {
       "categoryHint": "{length}文字の{category}",
       "realGameLabel": "本番では",
       "livesNote": "本番のWord Huntでは間違い1回でライフ1減（最大{max}）。練習モードは無制限です。",
-      "bailoutCta": "わかった — 本番へ！"
+      "bailoutCta": "わかった — 本番へ！",
+      "shortWordTip": "{word} は短すぎます。本番では{min}文字以上必要、足りないとライフを失います。",
+      "discoveryHint": "ボーナスワード発見！ヒント文字が表示されました。",
+      "discoveryTipNoClue": "有効な単語ですが、ターゲットの文字は出ませんでした。もっと長い単語を試して！"
     },
     "complete": {
       "title": "モード完了！",

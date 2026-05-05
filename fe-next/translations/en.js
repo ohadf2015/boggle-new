@@ -5129,7 +5129,10 @@ const en = {
       "categoryHint": "{length}-letter {category}",
       "realGameLabel": "in real game",
       "livesNote": "Real Word Hunt costs 1 life per wrong guess (max {max}). Practice gives you infinite tries.",
-      "bailoutCta": "I got it — let's play!"
+      "bailoutCta": "I got it — let's play!",
+      "shortWordTip": "{word} is too short. In real Word Hunt you need {min}+ letters or you lose a life.",
+      "discoveryHint": "Bonus word found — clue letters revealed!",
+      "discoveryTipNoClue": "Valid word, but no target letters revealed. Try longer guesses!"
     },
     "complete": {
       "title": "Mode complete!",

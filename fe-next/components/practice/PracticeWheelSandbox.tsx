@@ -9,6 +9,7 @@ import PracticeChainCta from './PracticeChainCta';
 import PracticeCompleteBanner from './PracticeCompleteBanner';
 import PracticeInstructions from './PracticeInstructions';
 import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
+import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
 import PracticeModeNav from './PracticeModeNav';
 import PracticeMicroTip from './PracticeMicroTip';
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
@@ -26,6 +27,10 @@ import { getPracticeStreak } from '@/hooks/usePracticeStreak';
 // share visuals + animations. Future style updates to WheelLetter / WordTile
 // auto-propagate to practice.
 import { WheelLetter, WordTile } from '@/components/daily/WordWheelParts';
+// Real-game celebration primitives — sound + confetti on word found.
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import InlineConfetti from '@/components/effects/InlineConfetti';
+import { WordFeedbackToast, type FeedbackType } from '@/components/daily/WordFeedbackToast';
 // Decorative orbital rings — same Pixi overlay the real wheel uses.
 const WordWheelPixiRing = dynamic(() => import('@/components/daily/WordWheelPixiRing'), { ssr: false });
 
@@ -69,6 +74,7 @@ export default function PracticeWheelSandbox() {
 
   const validator = usePracticeValidator(language);
   const juice = usePracticeJuice();
+  const sound = useSoundEffects();
   const fxRef = useRef<PracticePixiFxHandle | null>(null);
   const tutorialRef = useRef(createMicroTutorial({ mode: 'wheelRush' }));
   const [beat, setBeat] = useState<MicroTutorialBeat>(tutorialRef.current.currentBeat());
@@ -78,10 +84,16 @@ export default function PracticeWheelSandbox() {
   const [built, setBuilt] = useState<Array<{ letter: string; originIndex: number }>>([]);
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<'ok' | 'bad' | 'dup' | 'noCenter' | null>(null);
+  const [confettiKey, setConfettiKey] = useState(0);
+  const [scorePopup, setScorePopup] = useState<{ key: number; points: number } | null>(null);
+  const [toast, setToast] = useState<{ type: FeedbackType; message: string } | null>(null);
 
   const startedAtRef = useRef(0);
   const completedFiredRef = useRef(false);
   const isComplete = foundWords.length >= PRACTICE_GOALS.wheelRush;
+  // Friendly mid-game coaching — fires once per session per mistake kind.
+  const coach = usePracticeMistakeCoach();
+  const badCountRef = useRef(0);
 
   useEffect(() => {
     startedAtRef.current = Date.now();
@@ -123,6 +135,8 @@ export default function PracticeWheelSandbox() {
     if (word.length < 3) return; // mirrors real (WordWheelGame.tsx:455)
     if (!word.includes(puzzle.center)) {
       setFeedback('noCenter');
+      // Coach the rule the first time — this IS the rule of wheel rush.
+      coach.trigger('needsCenter');
       return;
     }
     if (foundWords.includes(word)) {
@@ -143,15 +157,27 @@ export default function PracticeWheelSandbox() {
         return { x: rect?.left ?? 0, y: rect?.top ?? 0, el: el ?? document.createElement('div') };
       });
       juice.triggerWordFound(tilePositions);
+      sound.playWordAcceptedSound?.();
+      setConfettiKey((k) => k + 1);
+      // Score popup + word-length sound — mirrors live wheel
+      // (WordWheelGame.tsx:490-512).
+      const points = word.length;
+      setScorePopup({ key: Date.now(), points });
+      sound.playWordLengthSound?.(word.length);
+      setToast({ type: 'valid-word', message: `+${points} ${word}` });
       tutorialRef.current.dispatch({ type: 'word-found' });
       advanceBeat();
       setBuilt([]);
     } else {
       setFeedback('bad');
+      sound.playWordRejectedSound?.();
       const el = document.querySelector(`[data-wheel-index="${built[0]?.originIndex}"]`);
       if (el) juice.triggerInvalid(el);
+      // 1st invalid attempt → friendly "real words only" coach.
+      badCountRef.current += 1;
+      if (badCountRef.current === 1) coach.trigger('notAWord');
     }
-  }, [word, puzzle.center, foundWords, validator, juice, language, built, advanceBeat]);
+  }, [word, puzzle.center, foundWords, validator, juice, sound, language, built, advanceBeat, coach]);
 
   // Submit-on-Enter for keyboard players (parity with real WheelRush).
   useEffect(() => {
@@ -212,6 +238,7 @@ export default function PracticeWheelSandbox() {
       </div>
 
       <PracticeInstructions mode="wheelRush" />
+      <PracticeMistakeCoach kind={coach.active} mode="wheelRush" onClose={coach.close} />
 
       <PracticeMicroTip
         beat={beat}
@@ -333,6 +360,35 @@ export default function PracticeWheelSandbox() {
           );
         })}
       </ul>
+
+      {confettiKey > 0 && (
+        <div data-testid="practice-confetti" className="absolute left-1/2 top-32 -translate-x-1/2 pointer-events-none">
+          <InlineConfetti key={confettiKey} size="md" />
+        </div>
+      )}
+
+      <WordFeedbackToast
+        type={toast?.type ?? null}
+        message={toast?.message ?? ''}
+        onClose={() => setToast(null)}
+      />
+
+      <AnimatePresence>
+        {scorePopup && (
+          <motion.div
+            key={scorePopup.key}
+            data-testid="practice-score-popup"
+            initial={{ opacity: 0, y: 0, scale: 0.8 }}
+            animate={{ opacity: 1, y: -40, scale: 1 }}
+            exit={{ opacity: 0, y: -60 }}
+            transition={{ duration: 0.9, ease: 'easeOut' }}
+            onAnimationComplete={() => setScorePopup(null)}
+            className="absolute left-1/2 top-1/3 -translate-x-1/2 pointer-events-none px-3 py-1.5 rounded-neo border-2 border-neo-black bg-neo-purple text-neo-cream font-neo-display font-black text-base shadow-hard"
+          >
+            +{scorePopup.points} pts
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {isComplete && <PracticeCompleteBanner mode="wheelRush" />}
       {isComplete && (

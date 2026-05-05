@@ -5058,7 +5058,10 @@ const es = {
       "categoryHint": "{category} de {length} letras",
       "realGameLabel": "en el juego real",
       "livesNote": "El Word Hunt real cuesta 1 vida por cada intento fallado (máx. {max}). Aquí tienes intentos ilimitados.",
-      "bailoutCta": "¡Ya lo tengo — vamos a jugar!"
+      "bailoutCta": "¡Ya lo tengo — vamos a jugar!",
+      "shortWordTip": "{word} es muy corto. En el Word Hunt real necesitas {min}+ letras o pierdes una vida.",
+      "discoveryHint": "¡Palabra bonus encontrada — letras pista reveladas!",
+      "discoveryTipNoClue": "Palabra válida, pero no se revelaron letras del objetivo. ¡Prueba con palabras más largas!"
     },
     "complete": {
       "title": "¡Modo completado!",

@@ -1,13 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Heart } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeChainCta from './PracticeChainCta';
 import PracticeCompleteBanner from './PracticeCompleteBanner';
 import PracticeInstructions from './PracticeInstructions';
 import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
+import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
 import PracticeModeNav from './PracticeModeNav';
 import PracticeMicroTip from './PracticeMicroTip';
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
@@ -23,8 +24,19 @@ import {
 import { getPracticeStreak } from '@/hooks/usePracticeStreak';
 import GridComponent from '@/components/GridComponent';
 import { DiscoveredWordsList } from '@/components/daily/DiscoveredWordsList';
-import PracticeTargetBoxes from './PracticeTargetBoxes';
-import PracticeGuessHistory, { type GuessRow, computeFeedback } from './PracticeGuessHistory';
+// REUSE the real Word Hunt clue UI + clue accumulation hook so practice
+// shows the exact same progressive letter reveals the live game does.
+import { SurvivalClueBoxes, useSurvivalClues, FEEDBACK_OVERLAY_DURATION } from '@/components/daily/survival';
+import type { TargetAttempt } from '@/components/daily/survival/types';
+import {
+  getLetterFeedback,
+  isTargetWordFound,
+  type LetterFeedback,
+} from '@/utils/wordHuntFeedback';
+import type { HintLevel } from '@/utils/aiHintGenerator';
+import { MIN_DISCOVERY_WORD_LENGTH } from '@/shared/constants/gameConstants';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import InlineConfetti from '@/components/effects/InlineConfetti';
 
 const BOARDS: Record<string, string[][]> = {
   en: [['S', 'T', 'A', 'R'], ['E', 'O', 'N', 'I'], ['P', 'L', 'A', 'T'], ['E', 'R', 'I', 'N']],
@@ -34,10 +46,6 @@ const BOARDS: Record<string, string[][]> = {
   es: [['C', 'A', 'S', 'A'], ['M', 'E', 'L', 'O'], ['T', 'I', 'A', 'R'], ['E', 'O', 'N', 'P']],
 };
 
-// 4-letter targets for visual + difficulty parity with live Word Hunt
-// (live target window is 5–6 letters, but practice trims to 4 to keep the
-// first-encounter beat scannable). ja stays at 3 — there is no clean 4-kana
-// trace on the existing board, and ja learners prefer a familiar word.
 const TARGETS: Record<string, string> = {
   en: 'STAR',
   he: 'ארנב',
@@ -46,19 +54,23 @@ const TARGETS: Record<string, string> = {
   es: 'CASA',
 };
 
-// Real Word Hunt MAX_ATTEMPTS — surfaced in the educational tries pill so
-// learners see what they'd be racing in live mode.
+// Mirrors live `MAX_ATTEMPTS` shown in the educational tries pill.
 const REAL_GAME_MAX_TRIES = 7;
+
+const SHORT_TIP_DURATION_MS = 3200;
 
 /**
  * Word-hunt practice sandbox — visual + behavioral parity with the live
- * Word Hunt mode:
- *  - Target hidden behind solid black `?` boxes (matches real `HintBoxes`).
- *  - A tries pill shows real-game life cost (∞ here · 7 in real game) so
- *    learners see the stakes without paying them.
- *  - Wrong-length guesses give Wordle-style green/yellow/grey feedback.
- *  - A bail-out CTA is always reachable so confident learners can leave
- *    practice and start the live mode mid-flow.
+ * Word Hunt mode by REUSING the real `<SurvivalClueBoxes>` plus
+ * `useSurvivalClues` hook. Submitted target-length guesses populate the
+ * clue boxes via `getLetterFeedback`, and bonus discoveries reveal green
+ * letters via `updateCluesFromDiscovery` — identical to the live game.
+ *
+ * Practice differences (intentional):
+ *  - Infinite tries (no life drain, no game-over).
+ *  - Sub-MIN_DISCOVERY guesses surface an educational "would cost a life"
+ *    tip instead of being silently dropped.
+ *  - Celebration: real `playWordAcceptedSound` + `<InlineConfetti>` burst.
  */
 export default function PracticeWordHuntSandbox() {
   const { language, t } = useLanguage();
@@ -66,25 +78,58 @@ export default function PracticeWordHuntSandbox() {
   const target = TARGETS[language] ?? TARGETS.en;
   const validator = usePracticeValidator(language);
   const juice = usePracticeJuice();
+  const sound = useSoundEffects();
   const fxRef = useRef<PracticePixiFxHandle | null>(null);
   const tutorialRef = useRef(createMicroTutorial({ mode: 'wordHunt' }));
   const [beat, setBeat] = useState<MicroTutorialBeat>(tutorialRef.current.currentBeat());
   const advanceBeat = useCallback(() => setBeat(tutorialRef.current.currentBeat()), []);
 
+  const clueContainerRef = useRef<HTMLDivElement | null>(null);
+  const [clueState, clueActions] = useSurvivalClues({
+    targetWord: target,
+    clueContainerRef,
+  });
+
   const [solved, setSolved] = useState(false);
+  const [attempts, setAttempts] = useState<TargetAttempt[]>([]);
+  const [latestFeedback, setLatestFeedback] = useState<LetterFeedback[] | null>(null);
+  const [showFeedbackOverlay, setShowFeedbackOverlay] = useState(false);
   const [discoveries, setDiscoveries] = useState<
     Array<{ word: string; timestamp: number; lifeGained: number; tokensGained: number }>
   >([]);
-  const [feedback, setFeedback] = useState<'ok' | 'bad' | null>(null);
-  const [guessHistory, setGuessHistory] = useState<GuessRow[]>([]);
+  const [shortTip, setShortTip] = useState<string | null>(null);
+  const [confettiKey, setConfettiKey] = useState(0);
 
+  const overlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const shortTipTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startedAtRef = useRef(0);
   const completedFiredRef = useRef(false);
+  // Friendly mid-game coaching — fires once per session per mistake kind.
+  const coach = usePracticeMistakeCoach();
+  const badCountRef = useRef(0);
+
+  // Build a level-1 hint shape so SurvivalClueBoxes renders the all-? row.
+  // Letters reveal via accumulatedClues as the player guesses/discovers.
+  const currentHint = useMemo<HintLevel>(
+    () => ({
+      level: 1,
+      hint: target.split('').map(() => '_').join(' '),
+      unlockCost: 0,
+    }),
+    [target],
+  );
+
+  const dir: 'ltr' | 'rtl' = language === 'he' ? 'rtl' : 'ltr';
 
   useEffect(() => {
     startedAtRef.current = Date.now();
     trackPracticeStarted({ mode: 'wordHunt', locale: language });
   }, [language]);
+
+  useEffect(() => () => {
+    if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
+    if (shortTipTimeoutRef.current) clearTimeout(shortTipTimeoutRef.current);
+  }, []);
 
   useEffect(() => {
     if (solved && !completedFiredRef.current) {
@@ -102,19 +147,61 @@ export default function PracticeWordHuntSandbox() {
     }
   }, [solved, language, advanceBeat]);
 
-  const handleWordSubmit = useCallback(async (rawWord: string) => {
-    if (rawWord.length < 2) return;
+  const flashShortTip = useCallback((message: string) => {
+    setShortTip(message);
+    if (shortTipTimeoutRef.current) clearTimeout(shortTipTimeoutRef.current);
+    shortTipTimeoutRef.current = setTimeout(() => setShortTip(null), SHORT_TIP_DURATION_MS);
+  }, []);
 
-    // Target win — full reveal + lime fill.
-    if (rawWord === target) {
+  const triggerOverlay = useCallback((feedback: LetterFeedback[]) => {
+    setLatestFeedback(feedback);
+    setShowFeedbackOverlay(true);
+    if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
+    overlayTimeoutRef.current = setTimeout(() => {
+      setShowFeedbackOverlay(false);
+    }, FEEDBACK_OVERLAY_DURATION);
+  }, []);
+
+  const handleWordSubmit = useCallback(async (rawWord: string) => {
+    if (!rawWord || rawWord.length === 0) return;
+
+    const displayWord = rawWord.toUpperCase();
+    const targetUpper = target.toUpperCase();
+
+    // Sub-MIN_DISCOVERY: educate, do NOT silently drop.
+    if (rawWord.length < MIN_DISCOVERY_WORD_LENGTH) {
+      flashShortTip(
+        t('practice.wordHunt.shortWordTip', {
+          word: displayWord,
+          min: MIN_DISCOVERY_WORD_LENGTH,
+        }),
+      );
+      const tile = document.querySelector('[data-row][data-col]');
+      if (tile) juice.triggerInvalid(tile);
+      return;
+    }
+
+    // Target match — full clue reveal + celebration.
+    if (displayWord === targetUpper) {
+      const winFeedback = targetUpper.split('').map((ch, idx) => ({
+        letter: ch,
+        feedback: 'green' as const,
+        position: idx,
+      }));
+      const winAttempt: TargetAttempt = {
+        word: displayWord,
+        feedback: winFeedback,
+        timestamp: Date.now(),
+      };
+      const nextAttempts = [...attempts, winAttempt];
+      setAttempts(nextAttempts);
+      clueActions.updateCluesFromFeedback(winFeedback, nextAttempts);
+      triggerOverlay(winFeedback);
       setSolved(true);
-      setFeedback('ok');
-      setGuessHistory((rows) => [
-        ...rows,
-        { word: rawWord, feedback: new Array(rawWord.length).fill('correct' as const) },
-      ]);
+      sound.playWordAcceptedSound?.();
+      setConfettiKey((k) => k + 1);
       const cells = Array.from(document.querySelectorAll('[data-row][data-col]')) as HTMLElement[];
-      const positions = cells.slice(0, rawWord.length).map((el) => {
+      const positions = cells.slice(0, displayWord.length).map((el) => {
         const r = el.getBoundingClientRect();
         return { x: r.left, y: r.top, el };
       });
@@ -124,33 +211,95 @@ export default function PracticeWordHuntSandbox() {
       return;
     }
 
-    // Same-length wrong guesses produce Wordle feedback in history.
-    if (rawWord.length === target.length) {
-      setGuessHistory((rows) => [
-        ...rows,
-        { word: rawWord, feedback: computeFeedback(rawWord, target) },
-      ]);
+    // Same length as target — counts as a target attempt with feedback.
+    if (displayWord.length === targetUpper.length) {
+      if (attempts.some((a) => a.word === displayWord)) {
+        return; // duplicate
+      }
+      const feedback = getLetterFeedback(displayWord, targetUpper, language);
+      const attempt: TargetAttempt = {
+        word: displayWord,
+        feedback,
+        timestamp: Date.now(),
+      };
+      const nextAttempts = [...attempts, attempt];
+      setAttempts(nextAttempts);
+      clueActions.updateCluesFromFeedback(feedback, nextAttempts);
+      triggerOverlay(feedback);
+
+      if (isTargetWordFound(feedback)) {
+        setSolved(true);
+        sound.playWordAcceptedSound?.();
+        setConfettiKey((k) => k + 1);
+      } else {
+        // Wrong target attempt: still validate vs board for "bonus discovery"
+        // path — keep parity with real game's same-length-and-on-board flow.
+        const result = await validator.check(displayWord);
+        if (result.isValid && !discoveries.some((d) => d.word === displayWord)) {
+          setDiscoveries((d) => [
+            ...d,
+            { word: displayWord, timestamp: Date.now(), lifeGained: 0, tokensGained: 0 },
+          ]);
+          const cluesRevealed = clueActions.updateCluesFromDiscovery(displayWord);
+          if (cluesRevealed > 0) clueActions.triggerClueGainAnimation(cluesRevealed);
+          sound.playWordAcceptedSound?.();
+          trackPracticeWordFound({
+            mode: 'wordHunt',
+            locale: language,
+            word: displayWord,
+            wordsFound: discoveries.length + 1,
+          });
+        }
+      }
+      return;
     }
 
-    const result = await validator.check(rawWord);
-    if (result.isValid) {
-      const already = discoveries.some((d) => d.word === rawWord);
-      if (!already) {
-        setDiscoveries((d) => [
-          ...d,
-          { word: rawWord, timestamp: Date.now(), lifeGained: 0, tokensGained: 0 },
-        ]);
-        trackPracticeWordFound({
-          mode: 'wordHunt', locale: language, word: rawWord, wordsFound: discoveries.length + 1,
-        });
-      }
-      setFeedback('ok');
-    } else {
-      setFeedback('bad');
+    // Discovery word (shorter than target): validate + reveal clues.
+    const result = await validator.check(displayWord);
+    if (!result.isValid) {
       const tile = document.querySelector('[data-row][data-col]');
       if (tile) juice.triggerInvalid(tile);
+      sound.playWordRejectedSound?.();
+      // 1st invalid bonus-word attempt → coach the "real words only" rule.
+      badCountRef.current += 1;
+      if (badCountRef.current === 1) coach.trigger('notAWord');
+      return;
     }
-  }, [target, validator, juice, language, discoveries, advanceBeat]);
+    if (discoveries.some((d) => d.word === displayWord)) return;
+    setDiscoveries((d) => [
+      ...d,
+      { word: displayWord, timestamp: Date.now(), lifeGained: 0, tokensGained: 0 },
+    ]);
+    trackPracticeWordFound({
+      mode: 'wordHunt',
+      locale: language,
+      word: displayWord,
+      wordsFound: discoveries.length + 1,
+    });
+    const cluesRevealed = clueActions.updateCluesFromDiscovery(displayWord);
+    if (cluesRevealed > 0) {
+      clueActions.triggerClueGainAnimation(cluesRevealed);
+      flashShortTip(t('practice.wordHunt.discoveryHint'));
+    } else {
+      flashShortTip(t('practice.wordHunt.discoveryTipNoClue'));
+    }
+    sound.playWordAcceptedSound?.();
+    setConfettiKey((k) => k + 1);
+  }, [
+    target,
+    attempts,
+    language,
+    validator,
+    juice,
+    sound,
+    discoveries,
+    clueActions,
+    triggerOverlay,
+    flashShortTip,
+    t,
+    advanceBeat,
+    coach,
+  ]);
 
   const onSelectionChange = useCallback(() => {
     tutorialRef.current.dispatch({ type: 'drag-started' });
@@ -159,13 +308,12 @@ export default function PracticeWordHuntSandbox() {
 
   const mascotReaction: PracticeMascotMood = solved
     ? 'celebrate'
-    : feedback === 'ok'
+    : showFeedbackOverlay
       ? 'cheer'
-      : feedback === 'bad'
+      : shortTip
         ? 'wrong'
         : 'idle';
 
-  const dir: 'ltr' | 'rtl' = language === 'he' ? 'rtl' : 'ltr';
   const liveHref = `/${language}/daily/word-hunt`;
 
   return (
@@ -173,8 +321,7 @@ export default function PracticeWordHuntSandbox() {
       <PracticePixiFx ref={fxRef} />
       <PracticeMascotReaction mode="wordHunt" reaction={mascotReaction} />
 
-      {/* HUD strip — mode nav + educational tries pill mimicking the real
-          game's `X/MAX_ATTEMPTS tries left` so learners see the stakes. */}
+      {/* HUD strip — mode nav + educational tries pill. */}
       <div className="w-full flex items-center justify-between gap-2">
         <PracticeModeNav current="wordHunt" />
         <div
@@ -188,25 +335,49 @@ export default function PracticeWordHuntSandbox() {
       </div>
 
       <PracticeInstructions mode="wordHunt" />
+      <PracticeMistakeCoach kind={coach.active} mode="wordHunt" onClose={coach.close} />
 
-      {/* Top stack ends here — board + history + CTA stretch below */}
       <div className="flex flex-col items-center gap-3 flex-1 w-full">
+        {/* REAL clue boxes — letters reveal as discoveries / target attempts
+            land their feedback. data-testid wrapper allows tests to assert
+            presence without depending on internal SurvivalClueBoxes markup. */}
         <div data-testid="practice-target" className="flex flex-col items-center gap-1.5 w-full">
           <span className="text-xs uppercase font-neo-display font-black text-neo-cream/70 tracking-wider">
             {t('practice.wordHunt.targetLabel')}
           </span>
-          <PracticeTargetBoxes
-            word={target}
-            solved={solved}
-            dir={dir}
-            hidden
-          />
+          <div data-testid="practice-clue-boxes" className="w-full">
+            <SurvivalClueBoxes
+              ref={clueContainerRef}
+              currentHint={currentHint}
+              targetWord={target}
+              attempts={attempts}
+              accumulatedClues={clueState.accumulatedClues}
+              revealedLetters={new Set()}
+              knownLetters={clueState.knownLetters}
+              latestAttemptFeedback={latestFeedback}
+              showFeedbackOverlay={showFeedbackOverlay}
+              isClueGaining={clueState.isClueGaining}
+              skipAnimations={false}
+              gameDir={dir}
+              t={t as (key: string) => string}
+              matchesTargetLength={false}
+            />
+          </div>
           <p className="text-[10px] sm:text-xs text-neo-cream/60 text-center max-w-xs px-2 mt-1">
             {t('practice.wordHunt.livesNote', { max: REAL_GAME_MAX_TRIES })}
           </p>
         </div>
 
-        <PracticeGuessHistory rows={guessHistory} dir={dir} />
+        {shortTip && (
+          <div
+            data-testid="practice-short-tip"
+            role="status"
+            aria-live="polite"
+            className="px-3 py-1.5 rounded-neo border-2 border-neo-pink bg-neo-pink/15 text-neo-cream font-neo-display font-bold text-xs text-center max-w-xs"
+          >
+            {shortTip}
+          </div>
+        )}
 
         <PracticeMicroTip
           beat={beat}
@@ -232,10 +403,15 @@ export default function PracticeWordHuntSandbox() {
             <DiscoveredWordsList words={discoveries} t={t} />
           </div>
         )}
+
+        {confettiKey > 0 && (
+          <div data-testid="practice-confetti" className="absolute left-1/2 top-32 -translate-x-1/2 pointer-events-none">
+            <InlineConfetti key={confettiKey} size="md" />
+          </div>
+        )}
       </div>
 
-      {/* Bail-out CTA — pinned to bottom via mt-auto. Visible whether solved
-          or not so confident learners can drop into live mode at any time. */}
+      {/* Bail-out CTA — pinned bottom. */}
       <div className="mt-auto flex flex-col gap-2 w-full">
         {solved && <PracticeCompleteBanner mode="wordHunt" />}
         {solved ? (

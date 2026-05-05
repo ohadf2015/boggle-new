@@ -6,6 +6,7 @@ import PracticeChainCta from './PracticeChainCta';
 import PracticeCompleteBanner from './PracticeCompleteBanner';
 import PracticeInstructions from './PracticeInstructions';
 import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
+import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
 import PracticeModeNav from './PracticeModeNav';
 import PracticeMicroTip from './PracticeMicroTip';
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
@@ -23,6 +24,12 @@ import { getPracticeStreak } from '@/hooks/usePracticeStreak';
 // these primitives auto-propagate to practice.
 import GridComponent from '@/components/GridComponent';
 import { DiscoveredWordsList } from '@/components/daily/DiscoveredWordsList';
+// Real-game celebration primitives — keeps practice feeling identical
+// to live Classic when a word is found.
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import InlineConfetti from '@/components/effects/InlineConfetti';
+import { WordFeedbackToast, type FeedbackType } from '@/components/daily/WordFeedbackToast';
+import { AnimatePresence, motion } from 'framer-motion';
 
 // Curated practice boards — Hebrew is finals-free (matches real letter
 // pool in lib/adventure/gridConstants.ts). Each board is hand-picked to
@@ -49,6 +56,7 @@ export default function PracticeClassicSandbox() {
   const board = BOARDS[language] ?? BOARDS.en;
   const validator = usePracticeValidator(language);
   const juice = usePracticeJuice();
+  const sound = useSoundEffects();
   const fxRef = useRef<PracticePixiFxHandle | null>(null);
   const tutorialRef = useRef(createMicroTutorial({ mode: 'classic' }));
   const [beat, setBeat] = useState<MicroTutorialBeat>(tutorialRef.current.currentBeat());
@@ -58,9 +66,15 @@ export default function PracticeClassicSandbox() {
     Array<{ word: string; timestamp: number; lifeGained: number; tokensGained: number }>
   >([]);
   const [feedback, setFeedback] = useState<'ok' | 'bad' | 'dup' | null>(null);
+  const [confettiKey, setConfettiKey] = useState(0);
+  const [toast, setToast] = useState<{ type: FeedbackType; message: string } | null>(null);
+  const [scorePopup, setScorePopup] = useState<{ key: number; word: string } | null>(null);
   const startedAtRef = useRef(0);
   const completedFiredRef = useRef(false);
   const isComplete = foundWords.length >= PRACTICE_GOALS.classic;
+  // Friendly mid-game coaching — fires once per session per mistake kind.
+  const coach = usePracticeMistakeCoach();
+  const badCountRef = useRef(0);
 
   useEffect(() => {
     startedAtRef.current = Date.now();
@@ -111,14 +125,28 @@ export default function PracticeClassicSandbox() {
         return { x: r.left, y: r.top, el };
       });
       juice.triggerWordFound(positions);
+      sound.playWordAcceptedSound?.();
+      setConfettiKey((k) => k + 1);
+      // Real-game-style "+points" popup over the board.
+      setScorePopup({ key: Date.now(), word: upper });
+      // Real WordFeedbackToast — same component DailyChallengeGame uses.
+      setToast({ type: 'valid-word', message: `+${upper.length} ${upper}` });
       tutorialRef.current.dispatch({ type: 'word-found' });
       advanceBeat();
     } else {
       setFeedback('bad');
+      sound.playWordRejectedSound?.();
+      setToast({ type: 'invalid-word', message: t('practice.classic.notAWord') || upper });
       const tile = document.querySelector('[data-row][data-col]');
       if (tile) juice.triggerInvalid(tile);
+      // Mistake coach: 1st invalid → "real words only" buddy popup;
+      // 2nd → "diagonals work too!" hint (player may be stuck on rows).
+      // Each kind fires once per session — never nags.
+      badCountRef.current += 1;
+      if (badCountRef.current === 1) coach.trigger('notAWord');
+      else if (badCountRef.current === 2) coach.trigger('diagonalsOk');
     }
-  }, [foundWords, validator, juice, language, advanceBeat]);
+  }, [foundWords, validator, juice, sound, language, advanceBeat, t, coach]);
 
   // Detect first-drag for tutorial beat advance.
   const onSelectionChange = useCallback(() => {
@@ -153,6 +181,7 @@ export default function PracticeClassicSandbox() {
       </div>
 
       <PracticeInstructions mode="classic" />
+      <PracticeMistakeCoach kind={coach.active} mode="classic" onClose={coach.close} />
 
       <PracticeMicroTip
         beat={beat}
@@ -176,6 +205,38 @@ export default function PracticeClassicSandbox() {
       <div className="w-full" data-testid="practice-discoveries">
         <DiscoveredWordsList words={foundWords} t={t} />
       </div>
+
+      {confettiKey > 0 && (
+        <div data-testid="practice-confetti" className="absolute left-1/2 top-32 -translate-x-1/2 pointer-events-none">
+          <InlineConfetti key={confettiKey} size="md" />
+        </div>
+      )}
+
+      {/* Real WordFeedbackToast (same as DailyChallengeGame) — full
+          word-validation feedback parity. */}
+      <WordFeedbackToast
+        type={toast?.type ?? null}
+        message={toast?.message ?? ''}
+        onClose={() => setToast(null)}
+      />
+
+      {/* Floating "+N pts" popup — mirrors live wheel game (lastWordScore). */}
+      <AnimatePresence>
+        {scorePopup && (
+          <motion.div
+            key={scorePopup.key}
+            data-testid="practice-score-popup"
+            initial={{ opacity: 0, y: 0, scale: 0.8 }}
+            animate={{ opacity: 1, y: -40, scale: 1 }}
+            exit={{ opacity: 0, y: -60 }}
+            transition={{ duration: 0.9, ease: 'easeOut' }}
+            onAnimationComplete={() => setScorePopup(null)}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 pointer-events-none px-3 py-1.5 rounded-neo border-2 border-neo-black bg-neo-lime text-neo-black font-neo-display font-black text-base shadow-hard"
+          >
+            +{scorePopup.word.length} pts
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {isComplete && <PracticeCompleteBanner mode="classic" />}
       {isComplete && (

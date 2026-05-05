@@ -5017,7 +5017,10 @@ const sv = {
       "categoryHint": "{category}, {length} bokstäver",
       "realGameLabel": "i riktiga spelet",
       "livesNote": "I riktiga Word Hunt kostar varje fel gissning ett liv (max {max}). Här har du oändliga försök.",
-      "bailoutCta": "Jag fattar — kör igång!"
+      "bailoutCta": "Jag fattar — kör igång!",
+      "shortWordTip": "{word} är för kort. I riktiga Word Hunt behövs {min}+ bokstäver, annars förlorar du ett liv.",
+      "discoveryHint": "Bonusord! Ledtrådsbokstäver avslöjade.",
+      "discoveryTipNoClue": "Giltigt ord — men inga målbokstäver avslöjade. Prova längre gissningar!"
     },
     "complete": {
       "title": "Läget klart!",
