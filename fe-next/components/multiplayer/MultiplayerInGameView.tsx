@@ -29,6 +29,7 @@ import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
 import { StandardDesktopAdapter } from './desktop/StandardDesktopAdapter';
 import { WheelRushDesktopAdapter } from './desktop/WheelRushDesktopAdapter';
 import { BlastDesktopAdapter } from './desktop/BlastDesktopAdapter';
+import { WordHuntDesktopAdapter } from './desktop/WordHuntDesktopAdapter';
 
 // Mode-specific game views are split into per-route chunks. Only the active
 // mode's bundle is downloaded — non-blast rooms don't pay for BlastGame's
@@ -503,6 +504,55 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         comboCount={comboLevel ?? 0}
         meId={username}
         canvas={<BlastGame {...blastGameProps} />}
+      />
+    );
+  }
+
+  // Desktop shell for word-hunt mode
+  if ((gameMode as string) === 'word-hunt' && shellEnabled) {
+    // Map leaderboard from MultiplayerInGameView shape to RosterPlayer shape
+    const rosterPlayers = leaderboard.map(entry => ({
+      userId: entry.username ?? '',
+      username: entry.username,
+      score: entry.score,
+      status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
+      isYou: entry.username === username,
+    }));
+
+    // Map foundWords from FoundWord shape to LadderWord shape
+    const ladderWords = foundWords.map((fw, idx) => ({
+      word: fw.word,
+      score: fw.score ?? 0,
+      ts: fw.timestamp ?? 0,
+      userId: username,
+      inputMethod: ('drag' as const),
+    }));
+
+    const wordHuntGameProps = {
+      grid: effectiveGrid,
+      gameLanguage,
+      leaderboard,
+      username,
+      score: leaderboard.find(p => p.username === username)?.score ?? 0,
+      onQuit: handleQuit,
+      onWordSubmit,
+      onWordHuntGuess: handleWordHuntGuess,
+      gameActive,
+      minWordLength,
+      socket,
+      foundWords,
+    };
+
+    return (
+      <WordHuntDesktopAdapter
+        roomId={gameCode}
+        leaderboard={rosterPlayers}
+        foundWords={ladderWords}
+        remainingTime={remainingTime ?? 0}
+        totalTime={totalTime ?? 180}
+        targetCategory=""
+        meId={username}
+        canvas={<WordHuntGame {...wordHuntGameProps} />}
       />
     );
   }
