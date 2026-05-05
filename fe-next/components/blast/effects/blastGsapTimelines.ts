@@ -120,6 +120,44 @@ export function createJellyClearTween(
   return tl;
 }
 
+export interface CascadeDropOptions {
+  /** Starting Y offset in px (negative = above grid). */
+  fromY: number;
+  /** 0-based column for stagger calculation. */
+  columnIndex: number;
+}
+
+/**
+ * Cascade drop with bounce + parallel squash-stretch settle. Reduced-motion
+ * snaps to final position. Manual two-tween recipe (no Club CustomBounce).
+ */
+export function createCascadeDropTween(
+  el: HTMLElement,
+  opts: CascadeDropOptions,
+): gsap.core.Timeline {
+  const tl = gsap.timeline({ delay: opts.columnIndex * 0.04 });
+  if (reducedMotionActive()) {
+    tl.set(el, { y: 0, scaleX: 1, scaleY: 1 });
+    return tl;
+  }
+  tl.from(el, { y: opts.fromY, duration: 0.55, ease: 'bounce.out' }, 0);
+  tl.fromTo(
+    el,
+    { scaleY: 1.15, scaleX: 0.85 },
+    {
+      scaleY: 0.7,
+      scaleX: 1.15,
+      duration: 0.18,
+      ease: 'power2.out',
+      yoyo: true,
+      repeat: 1,
+      transformOrigin: 'center bottom',
+    },
+    0.4,
+  );
+  return tl;
+}
+
 /**
  * Per-tile idle "breathing" tween — subtle infinite yoyo rotateX/Y with a
  * randomised phase so a grid of tiles never pulses in unison.
