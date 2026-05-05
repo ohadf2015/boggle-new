@@ -1,7 +1,8 @@
 'use client';
 
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { Lock } from 'lucide-react';
+import { gsap } from 'gsap';
 import type { BlastTileType } from './types';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -229,10 +230,42 @@ export const BlastTile = memo(function BlastTile({
   // Skip tooltip lookup entirely for standard tiles (the vast majority) — keeps render fast
   const tooltip = type !== 'standard' ? getTileTooltip(type, t) : null;
   const effectivePhase = reducedMotion && ANIMATED_PHASES.has(phase) ? 'idle' : phase;
-  const phaseStyle = effectivePhase !== 'idle' && effectivePhase !== 'selected'
+
+  // Candy variant: GSAP timelines drive selected/anticipation/clearing phase tweens
+  // for squash-stretch + elastic settle. Falling/appearing/landing keep their existing
+  // CSS keyframes — they already feel right and don't need re-routing.
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const phaseTlRef = useRef<gsap.core.Timeline | null>(null);
+  const gsapPhases: TilePhase[] = ['selected', 'anticipation', 'clearing'];
+  const useGsapForPhase = candyOn && !reducedMotion && (gsapPhases.includes(effectivePhase) || (effectivePhase === 'idle' && isSelected));
+
+  useEffect(() => {
+    if (!useGsapForPhase) return;
+    const el = buttonRef.current;
+    if (!el) return;
+    phaseTlRef.current?.kill();
+    const tl = gsap.timeline();
+    if (effectivePhase === 'selected' || (effectivePhase === 'idle' && isSelected)) {
+      tl.to(el, { scale: 1.06, duration: 0.18, ease: 'back.out(2)' });
+    } else if (effectivePhase === 'anticipation') {
+      tl
+        .to(el, { scaleX: 1.18, scaleY: 0.82, duration: 0.08, ease: 'power2.out' })
+        .to(el, { scaleX: 1, scaleY: 1, duration: 0.10, ease: 'elastic.out(1, 0.4)' });
+    } else if (effectivePhase === 'clearing') {
+      tl
+        .to(el, { scaleX: 0.92, scaleY: 1.08, duration: 0.04 })
+        .to(el, { scale: 1.4, duration: 0.10, ease: 'back.out(3.5)' })
+        .to(el, { rotate: clearRotate ?? 0, opacity: 0, duration: 0.18 }, '<');
+    }
+    phaseTlRef.current = tl;
+    return () => { phaseTlRef.current?.kill(); phaseTlRef.current = null; };
+  }, [useGsapForPhase, effectivePhase, isSelected, clearRotate]);
+
+  // When GSAP owns the phase, suppress legacy inline styles that would fight the tween.
+  const phaseStyle = effectivePhase !== 'idle' && effectivePhase !== 'selected' && !(candyOn && effectivePhase === 'anticipation') && !(candyOn && effectivePhase === 'clearing')
     ? getPhaseStyles(effectivePhase, type, fallOffset, clearRotate, spawnOffset)
     : {};
-  const selectionStyle = getSelectionStyles(isSelected, selectionIndex, selectionTotal);
+  const selectionStyle = candyOn ? {} : getSelectionStyles(isSelected, selectionIndex, selectionTotal);
   // Narrow willChange to the property the current phase actually animates — avoid forcing
   // unnecessary compositor layers for idle tiles.
   let willChangeValue: string | undefined;
@@ -244,6 +277,7 @@ export const BlastTile = memo(function BlastTile({
 
   return (
     <button
+      ref={buttonRef}
       type="button"
       onClick={onClick}
       onAnimationEnd={(e) => {
