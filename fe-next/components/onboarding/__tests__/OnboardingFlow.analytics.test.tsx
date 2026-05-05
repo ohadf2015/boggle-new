@@ -181,18 +181,6 @@ describe('OnboardingFlow analytics', () => {
     });
   });
 
-  it('fires step=score_reveal action=continue on Continue', () => {
-    render(<OnboardingFlow onComplete={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('lang-btn'));
-    goNew();
-    fireEvent.click(screen.getByTestId('tut-btn'));
-    fireEvent.click(screen.getByTestId('profile-btn'));
-    fireEvent.click(screen.getByTestId('continue-btn'));
-    expect(trackOnboardingStep).toHaveBeenCalledWith('score_reveal', {
-      action: 'continue',
-    });
-  });
-
   // Regression: PostHog funnel showed tutorial step fires ~2x start count
   // because handleNewUser emitted 'tutorial' on entry AND handleTutorialComplete
   // emitted 'tutorial' on exit. Step events must fire once per step, on completion only.

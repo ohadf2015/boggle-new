@@ -112,18 +112,6 @@ vi.mock('../QuickProfileSetup', () => {
   };
 });
 
-vi.mock('../ScoreRevealV2', () => {
-  return {
-    __esModule: true,
-    default: ({ onContinue, onSkip }: any) => (
-      <div data-testid="score-reveal">
-        <button onClick={onContinue}>Continue</button>
-        {onSkip && <button onClick={onSkip}>Skip</button>}
-      </div>
-    ),
-  };
-});
-
 vi.mock('../InviteTutorialTeaser', () => ({
   __esModule: true,
   default: () => <div data-testid="invite-tutorial-teaser" />,
@@ -148,7 +136,7 @@ describe('OnboardingFlow', () => {
     mockUseInviteOnboardingMode.mockReturnValue({
       isInviteMode: false,
       inviteAtMount: null,
-      activeSteps: ['language', 'returningUser', 'tutorial', 'profile', 'scoreReveal', 'inviteTutorial'],
+      activeSteps: ['language', 'returningUser', 'tutorial', 'profile', 'inviteTutorial'],
       handleInviteTeaserComplete: vi.fn(),
     });
   });
@@ -184,37 +172,19 @@ describe('OnboardingFlow', () => {
     expect(screen.getByTestId('quick-profile-setup')).toBeInTheDocument();
   });
 
-  it('transitions to score reveal after profile setup', () => {
+  it('navigates to practice hub directly after profile setup (no score-reveal interstitial)', () => {
     render(<OnboardingFlow {...defaultProps} />);
     selectLanguage();
     fireEvent.click(screen.getByText('Complete Tutorial'));
     fireEvent.click(screen.getByText('Set Profile'));
-    expect(screen.getByTestId('score-reveal')).toBeInTheDocument();
-  });
-
-  it('navigates to cozy practice hub after score reveal continue', () => {
-    render(<OnboardingFlow {...defaultProps} />);
-    selectLanguage();
-    fireEvent.click(screen.getByText('Complete Tutorial'));
-    fireEvent.click(screen.getByText('Set Profile'));
-    fireEvent.click(screen.getByText('Continue'));
     expect(mockPush).toHaveBeenCalledWith('/en/practice');
   });
 
-  it('advances to score reveal after profile setup', () => {
+  it('calls onComplete after profile setup', () => {
     render(<OnboardingFlow {...defaultProps} />);
     selectLanguage();
     fireEvent.click(screen.getByText('Complete Tutorial'));
     fireEvent.click(screen.getByText('Set Profile'));
-    expect(screen.getByTestId('score-reveal')).toBeInTheDocument();
-  });
-
-  it('calls onComplete after score reveal continue', () => {
-    render(<OnboardingFlow {...defaultProps} />);
-    selectLanguage();
-    fireEvent.click(screen.getByText('Complete Tutorial'));
-    fireEvent.click(screen.getByText('Set Profile'));
-    fireEvent.click(screen.getByText('Continue'));
     expect(defaultProps.onComplete).toHaveBeenCalled();
   });
 
@@ -223,7 +193,6 @@ describe('OnboardingFlow', () => {
     selectLanguage();
     fireEvent.click(screen.getByText('Complete Tutorial'));
     fireEvent.click(screen.getByText('Set Profile'));
-    fireEvent.click(screen.getByText('Continue'));
     expect(mockMarkComplete).toHaveBeenCalled();
   });
 
@@ -235,30 +204,27 @@ describe('OnboardingFlow', () => {
   });
 
   describe('navigation loading state', () => {
-    it('shows a loading overlay after score reveal continue', () => {
+    it('shows a loading overlay after profile setup triggers navigation', () => {
       render(<OnboardingFlow {...defaultProps} />);
       selectLanguage();
       fireEvent.click(screen.getByText('Complete Tutorial'));
       fireEvent.click(screen.getByText('Set Profile'));
-      fireEvent.click(screen.getByText('Continue'));
       expect(screen.getByTestId('onboarding-loading')).toBeInTheDocument();
     });
 
-    it('does not show a loading overlay before continue is clicked', () => {
+    it('does not show a loading overlay before profile is submitted', () => {
       render(<OnboardingFlow {...defaultProps} />);
       selectLanguage();
       fireEvent.click(screen.getByText('Complete Tutorial'));
-      fireEvent.click(screen.getByText('Set Profile'));
       expect(screen.queryByTestId('onboarding-loading')).not.toBeInTheDocument();
     });
 
-    it('ignores duplicate continue clicks while navigating', () => {
+    it('ignores duplicate profile submissions while navigating', () => {
       render(<OnboardingFlow {...defaultProps} />);
       selectLanguage();
       fireEvent.click(screen.getByText('Complete Tutorial'));
       fireEvent.click(screen.getByText('Set Profile'));
-      fireEvent.click(screen.getByText('Continue'));
-      fireEvent.click(screen.getByText('Continue'));
+      fireEvent.click(screen.getByText('Set Profile'));
       expect(mockPush).toHaveBeenCalledTimes(1);
     });
   });
@@ -285,13 +251,11 @@ describe('OnboardingFlow', () => {
       expect(mockPush).not.toHaveBeenCalledWith(expect.stringContaining('/multiplayer?room='));
     });
 
-    it('redirects to cozy practice hub after continue when no pending invite', () => {
+    it('redirects to cozy practice hub on profile setup when no pending invite', () => {
       mockConsumePendingRoom.mockReturnValue(null);
       render(<OnboardingFlow {...defaultProps} />);
       advanceToProfile();
       fireEvent.click(screen.getByText('Set Profile'));
-      expect(screen.getByTestId('score-reveal')).toBeInTheDocument();
-      fireEvent.click(screen.getByText('Continue'));
       expect(mockPush).toHaveBeenCalledWith('/en/practice');
     });
   });

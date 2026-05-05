@@ -83,6 +83,25 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
   const { isConnected, isReconnecting, connectionError } = useSocket();
   const { t } = useLanguage();
   const statusConfig = useStatusConfig(t);
+  // 3-second success window after rising edge into 'connected' (UX audit 2026-05-04 #7).
+  // Confirms recovery to user, then dot hides so it doesn't clutter the HUD.
+  const [showSuccess, setShowSuccess] = useState(false);
+  const prevConnectedRef = useRef(false);
+
+  useEffect(() => {
+    const prev = prevConnectedRef.current;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    if (isConnected && !prev) {
+      setShowSuccess(true);
+      timer = setTimeout(() => setShowSuccess(false), 3000);
+    } else if (!isConnected && prev) {
+      setShowSuccess(false);
+    }
+    prevConnectedRef.current = isConnected;
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [isConnected]);
 
   const getStatus = (): ConnectionStatus => {
     if (isConnected) return 'connected';
@@ -93,8 +112,8 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
 
   const status = getStatus();
 
-  // Only show indicator when there's a problem - don't show green dot for normal operation
-  if (status === 'connected') {
+  // 'connected' renders only during the success window; otherwise hide for clean HUD.
+  if (status === 'connected' && !showSuccess) {
     return null;
   }
 
@@ -112,6 +131,7 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
           'flex items-center gap-2',
           'px-3 py-1.5 rounded-full',
           'border-2 border-neo-black shadow-hard-sm',
+          status === 'connected' && 'bg-neo-lime',
           status === 'connecting' && 'bg-neo-cream',
           status === 'reconnecting' && 'bg-neo-cream',
           status === 'disconnected' && 'bg-neo-red',

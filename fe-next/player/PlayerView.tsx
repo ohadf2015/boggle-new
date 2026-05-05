@@ -26,7 +26,6 @@ import PlayerWaitingView from './components/PlayerWaitingView';
 import PlayerInGameView from './components/PlayerInGameView';
 import FirstTimeAchievement, { useFirstTimeAchievement } from '../components/game/FirstTimeAchievement';
 import ModeRevealOverlay from '@/components/game/ModeRevealOverlay';
-import { useModeFirstSeen, type IntroMode } from '@/hooks/useModeFirstSeen';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Loader2 } from 'lucide-react';
 
@@ -123,14 +122,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     v ? dispatchReveal({ type: 'endReveal' }) : dispatchReveal({ type: 'reset' });
   const [minWordLength, setMinWordLength] = useState<number>(2);
   const gameMode = useGameMode();
-
-  // Cozy first-time intro key — pause auto-dismiss timer for new players
-  const modeIntroKey: IntroMode =
-    gameMode === 'blast' ? 'blast'
-    : gameMode === 'word-hunt' ? 'wordHunt'
-    : gameMode === 'wheel-rush' ? 'wheelRush'
-    : 'classic';
-  const { hasSeen: hasSeenIntro } = useModeFirstSeen(modeIntroKey);
 
   // Captures the messageId from the most recent startGame so we can emit
   // `countdownComplete` once the GoRipplesAnimation finishes. Server gates
@@ -336,16 +327,14 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   }, [showModeReveal, showStartAnimation, letterGrid, remainingTime, gameActive, waitingForResults, gameTimer]);
 
   // Auto-dismiss mode reveal after 2 seconds, then trigger countdown.
-  // First-time players see cozy ModeIntroCard instead — no timer, advance on tap.
+  // MP enters round same for first-time + returning players (no cozy fork).
   useEffect(() => {
     if (!showModeReveal) return;
-    if (!hasSeenIntro) return;
     const timer = setTimeout(() => {
-      // dispatch batches showModeReveal=false + showStartAnimation=true in one update
       dispatchReveal({ type: 'endReveal' });
     }, 2000);
     return () => clearTimeout(timer);
-  }, [showModeReveal, hasSeenIntro]);
+  }, [showModeReveal]);
 
   // Clear shuffling grid when game starts
   useEffect(() => {
@@ -553,7 +542,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           modeLabel={modeRevealLabel}
           seriesRoundNumber={seriesRoundNumber}
           t={t}
-          modeKey={modeIntroKey}
           onIntroDismiss={() => dispatchReveal({ type: 'endReveal' })}
         />
       );
@@ -629,7 +617,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           modeLabel={modeRevealLabel}
           seriesRoundNumber={seriesRoundNumber}
           t={t}
-          modeKey={modeIntroKey}
           onIntroDismiss={() => dispatchReveal({ type: 'endReveal' })}
         />
       )}

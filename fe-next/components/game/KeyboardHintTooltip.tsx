@@ -13,6 +13,8 @@ interface KeyboardHintTooltipProps {
   delaySeconds?: number;
   /** Only show on desktop/tablet */
   desktopOnly?: boolean;
+  /** Suppress entirely (e.g. during round-start countdown) */
+  suppressed?: boolean;
   /** Translation function */
   t: (key: string) => string;
 }
@@ -26,12 +28,14 @@ interface KeyboardHintTooltipProps {
 export function KeyboardHintTooltip({
   delaySeconds = 10,
   desktopOnly = true,
+  suppressed = false,
   t,
 }: KeyboardHintTooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
+    if (suppressed) return;
     // Check if user has already dismissed this hint
     const hasSeenHint = typeof window !== 'undefined'
       ? localStorage.getItem('keyboardHintDismissed') === 'true'
@@ -69,7 +73,7 @@ export function KeyboardHintTooltip({
       clearTimeout(showTimer);
       if (closeTimer) clearTimeout(closeTimer);
     };
-  }, [delaySeconds, desktopOnly]);
+  }, [delaySeconds, desktopOnly, suppressed]);
 
   const handleDismiss = () => {
     setIsDismissed(true);
@@ -81,8 +85,8 @@ export function KeyboardHintTooltip({
     }
   };
 
-  // Don't render if dismissed
-  if (isDismissed) {
+  // Don't render if dismissed or suppressed
+  if (isDismissed || suppressed) {
     return null;
   }
 
@@ -95,8 +99,8 @@ export function KeyboardHintTooltip({
           exit={{ opacity: 0, x: -20, scale: 0.9 }}
           transition={{ type: 'spring', stiffness: 350, damping: 28 }}
           className={cn(
-            'fixed top-28 left-4 z-40',
-            'max-w-[220px]',
+            'fixed bottom-28 left-3 z-40',
+            'w-[240px]',
             'bg-neo-pink/95 backdrop-blur-xs text-white',
             'border-3 border-neo-black',
             'rounded-neo-lg shadow-hard-lg',

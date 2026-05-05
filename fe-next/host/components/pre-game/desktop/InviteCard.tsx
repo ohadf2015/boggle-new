@@ -22,6 +22,8 @@ export interface InviteCardProps {
   compact?: boolean;
   /** Desktop-optimized layout with better horizontal space usage */
   desktop?: boolean;
+  /** Wobble + waiting hint when room is empty (UX audit 2026-05-04 #4) */
+  showHint?: boolean;
 }
 
 // ==================== Component ====================
@@ -30,6 +32,7 @@ export function InviteCard({
   gameCode,
   t,
   className,
+  showHint = false,
 }: InviteCardProps): React.ReactElement {
   const [linkCopied, setLinkCopied] = useState(false);
   const [qrExpanded, setQrExpanded] = useState(false);
@@ -142,6 +145,7 @@ export function InviteCard({
         data-testid="invite-card"
         className={cn(
           'rounded-neo-lg border-3 border-neo-lime/60 bg-slate-800/90 shadow-hard-lg overflow-hidden ring-2 ring-neo-lime/20',
+          showHint && 'animate-neo-wobble',
           className
         )}
       >
@@ -193,11 +197,12 @@ export function InviteCard({
             </div>
           </button>
 
-          {/* COPY LINK button — primary CTA, lime to match hero accent and
-              read as the next action, not a tertiary control. */}
+          {/* SHARE button — single primary lobby CTA (lime). Uses Web Share API
+              when available, falls back to clipboard copy otherwise. Replaces
+              the prior copy-link + share split per UX audit 2026-05-04. */}
           <motion.button
-            data-testid="copy-link-button"
-            onClick={handleCopyLink}
+            data-testid="native-share-button"
+            onClick={handleNativeShare}
             whileTap={{ scale: 0.95 }}
             className={cn(
               'flex-1 h-11 flex items-center justify-center gap-2 rounded-lg border-2 border-neo-black text-xs font-black uppercase tracking-widest transition-all shadow-hard',
@@ -205,25 +210,22 @@ export function InviteCard({
                 ? 'bg-neo-lime text-neo-black'
                 : 'bg-neo-lime text-neo-black hover:-translate-y-0.5 active:shadow-hard-pressed active:translate-y-0.5'
             )}
-            aria-label={t('roomCode.copyLink')}
+            aria-label={t('share.button')}
           >
-            {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-            <span>{linkCopied ? t('roomCode.copied') : t('roomCode.copyLink')}</span>
+            {linkCopied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+            <span>{linkCopied ? t('roomCode.copied') : t('share.button')}</span>
           </motion.button>
-
-          {/* Share button */}
-          {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
-            <motion.button
-              data-testid="native-share-button"
-              onClick={handleNativeShare}
-              whileTap={{ scale: 0.95 }}
-              className="w-11 h-11 flex items-center justify-center rounded-lg border-2 border-neo-black bg-neo-cyan text-neo-black shadow-hard hover:translate-y-0.5 active:shadow-none transition-all shrink-0"
-              aria-label={t('share.button')}
-            >
-              <Share2 className="w-4 h-4" />
-            </motion.button>
-          )}
         </div>
+
+        {showHint && (
+          <div
+            data-testid="invite-empty-hint"
+            aria-live="polite"
+            className="px-4 pb-3 text-xs font-bold uppercase tracking-widest text-neo-lime/80"
+          >
+            {t('hostView.waitingForPlayers')}
+          </div>
+        )}
       </div>
 
       {mounted ? createPortal(qrModal, document.body) : null}

@@ -57,10 +57,10 @@ describe('OnboardingFlow — invite mode', () => {
     expect(progress.getAttribute('data-total')).toBe('3');
   });
 
-  it('uses 5-step path when no invite at mount (regression guard)', () => {
+  it('uses 4-step path when no invite at mount (regression guard)', () => {
     wrap(<OnboardingFlow onComplete={() => {}} />);
     const progress = screen.getByTestId('onboarding-progress');
-    expect(progress.getAttribute('data-total')).toBe('5');
+    expect(progress.getAttribute('data-total')).toBe('4');
   });
 
   it('renders LanguageSelect first in invite mode', () => {
