@@ -5081,6 +5081,26 @@ const es = {
       "tooShort": "Mínimo 2 letras.",
       "foundWordsLabel": "Encontradas ({count})",
       "scoreChip": "{score} pts"
+    },
+    "mistakeCoach": {
+      "ariaLabel": "Consejo de práctica",
+      "cta": "¡Entendido!",
+      "notAWord": {
+        "title": "¡Hmm — esa no es una palabra!",
+        "body": "Prueba palabras reales como ESTRELLA, GATO o PLATO. Las combinaciones inventadas no cuentan, ¡pero la práctica es gratis — sigue explorando!"
+      },
+      "notAdjacent": {
+        "title": "¡Las fichas deben tocarse!",
+        "body": "Cada letra tiene que estar justo al lado de la anterior — los lados Y las esquinas cuentan. ¡Conéctalas como una cadena!"
+      },
+      "diagonalsOk": {
+        "title": "¡Las diagonales también funcionan!",
+        "body": "Las letras pueden conectarse en cualquiera de las 8 direcciones — incluyendo diagonalmente. ¡Prueba el zigzag para hallazgos sorpresa!"
+      },
+      "needsCenter": {
+        "title": "¡Usa la letra lima!",
+        "body": "Cada palabra de la rueda debe incluir la letra brillante del centro. Es el corazón del rompecabezas — ¡empieza con ella!"
+      }
     }
   },
   "practiceSwipe": {

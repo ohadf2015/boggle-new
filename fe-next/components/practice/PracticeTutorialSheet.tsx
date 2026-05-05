@@ -11,10 +11,12 @@ import { tutorialTipKeys, type PracticeMode } from '@/lib/practice/practiceTutor
 
 type TFunction = (key: string, params?: Record<string, string | number>) => string;
 
-const MASCOT_FOR_MODE: Record<PracticeMode, string> = {
-  classic: '/mascot/scholar.webp',
-  wordHunt: '/mascot/explorer.webp',
-  wheelRush: '/mascot/dj.webp',
+// Hero illustrations — same as the practice hub tile thumbnails AND the
+// in-game help modal. One image, three places, consistent visual story.
+const HERO_FOR_MODE: Record<PracticeMode, string> = {
+  classic: '/practice/help/practice-help-classic.png',
+  wordHunt: '/practice/help/practice-help-wordhunt.png',
+  wheelRush: '/practice/help/practice-help-wheelrush.png',
 };
 
 const ACCENT_FOR_MODE: Record<PracticeMode, string> = {
@@ -88,26 +90,34 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
           <span className="w-2 h-2 rounded-full bg-neo-cream/40" />
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="relative w-16 h-16 rounded-full border-2 border-neo-cream/70 overflow-hidden bg-neo-navy shrink-0">
-            <Image
-              src={MASCOT_FOR_MODE[mode]}
-              alt=""
-              fill
-              sizes="64px"
-              className="object-contain"
-              draggable={false}
-              priority
-            />
-          </div>
-          <div>
-            <p className="text-xs font-neo-body text-neo-cream/80 uppercase tracking-wider font-bold">
-              {t('gameModes.tutorial.title')}
-            </p>
-            <h2 className="text-xl font-neo-display font-bold text-neo-cream">
-              {t(`gameModes.${mode}.name`)}
-            </h2>
-          </div>
+        {/* Hero illustration — big, friendly, mascot included. Replaces
+            the previous tiny 64px mascot circle. The image carries the full
+            mechanic story (drag/wheel/wordle-feedback) so tip cards become
+            reinforcement, not the primary teaching surface. */}
+        <AdaptiveMotion.div
+          initial={{ scale: 0.92, rotate: -2 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 280, damping: 18 }}
+          className="relative w-full aspect-square max-w-xs mx-auto rounded-neo border-3 border-neo-black overflow-hidden shadow-hard"
+        >
+          <Image
+            src={HERO_FOR_MODE[mode]}
+            alt=""
+            fill
+            sizes="(max-width: 640px) 90vw, 384px"
+            className="object-cover"
+            draggable={false}
+            priority
+          />
+        </AdaptiveMotion.div>
+
+        <div className="text-center">
+          <p className="text-xs font-neo-body text-neo-cream/80 uppercase tracking-wider font-bold">
+            {t('gameModes.tutorial.title')}
+          </p>
+          <h2 className="text-2xl font-neo-display font-bold text-neo-cream mt-1">
+            {t(`gameModes.${mode}.name`)}
+          </h2>
         </div>
 
         {/* Greeting line — the charm-prelude that used to live in ModeIntroCard. */}
@@ -115,7 +125,8 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
           {t(`gameModes.${mode}.intro.greet`)}
         </p>
 
-        {/* Wordless mechanic demo — show, don't tell */}
+        {/* Wordless animated mechanic demo — supplementary motion below the
+            static hero. Plays a short loop showing the input gesture. */}
         <PracticeMiniDemo mode={mode} />
 
         <ol className="flex flex-col gap-3">

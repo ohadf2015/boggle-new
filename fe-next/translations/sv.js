@@ -5040,6 +5040,26 @@ const sv = {
       "duplicate": "Redan hittat.",
       "foundWordsLabel": "Hittade ({count})",
       "scoreChip": "{score} p"
+    },
+    "mistakeCoach": {
+      "ariaLabel": "Övningstips",
+      "cta": "Förstått!",
+      "notAWord": {
+        "title": "Hmm — det är inget ord!",
+        "body": "Prova riktiga ordboksord som STJÄRNA, KATT eller TALLRIK. Påhittade bokstavsmix räknas inte, men i övning är det gratis — utforska vidare!"
+      },
+      "notAdjacent": {
+        "title": "Brickorna måste röra varandra!",
+        "body": "Varje bokstav måste sitta direkt bredvid den förra — sidor OCH hörn räknas. Koppla dem som en kedja!"
+      },
+      "diagonalsOk": {
+        "title": "Diagonaler funkar också!",
+        "body": "Bokstäver kan kopplas i alla 8 riktningar — inklusive diagonalt. Testa att zickzacka för överraskande fynd!"
+      },
+      "needsCenter": {
+        "title": "Använd den limegröna bokstaven!",
+        "body": "Varje ord på hjulet måste innehålla den ljusa mittbokstaven. Det är pusslets hjärta — börja med den!"
+      }
     }
   },
   "practiceSwipe": {

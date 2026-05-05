@@ -23,7 +23,11 @@ export default function PracticeHubWelcome() {
       transition={{ type: 'spring', stiffness: 280, damping: 20 }}
       className="mb-5 flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black bg-neo-cyan/15 shadow-hard"
     >
-      <div className="relative w-14 h-14 rounded-full border-2 border-neo-black overflow-hidden bg-neo-navy shrink-0">
+      <AdaptiveMotion.div
+        animate={{ rotate: [0, -6, 6, 0], y: [0, -2, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        className="relative w-14 h-14 rounded-full border-2 border-neo-black overflow-hidden bg-neo-navy shrink-0"
+      >
         <Image
           src="/mascot/scholar.webp"
           alt=""
@@ -32,7 +36,7 @@ export default function PracticeHubWelcome() {
           className="object-contain"
           draggable={false}
         />
-      </div>
+      </AdaptiveMotion.div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-neo-display font-black text-neo-cream leading-tight">
           {t('practiceHub.welcome.title')}

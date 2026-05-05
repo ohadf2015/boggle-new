@@ -5152,6 +5152,26 @@ const en = {
       "duplicate": "Already found.",
       "foundWordsLabel": "Found ({count})",
       "scoreChip": "{score} pts"
+    },
+    "mistakeCoach": {
+      "ariaLabel": "Practice tip",
+      "cta": "Got it!",
+      "notAWord": {
+        "title": "Hmm — that's not a word!",
+        "body": "Try real dictionary words like STAR, CAT, or PLATE. Made-up letter combos won't count, but practice is free — keep exploring!"
+      },
+      "notAdjacent": {
+        "title": "Tiles need to touch!",
+        "body": "Each letter has to sit right next to the one before it — sides AND corners both count. Connect them like a chain!"
+      },
+      "diagonalsOk": {
+        "title": "Diagonals work too!",
+        "body": "Letters can connect in any of 8 directions — including diagonal jumps. Try going zig-zag for surprising finds!"
+      },
+      "needsCenter": {
+        "title": "Use the lime letter!",
+        "body": "Every word on the wheel must include the bright center letter. It's the puzzle's heartbeat — start with it!"
+      }
     }
   },
   "practiceSwipe": {
