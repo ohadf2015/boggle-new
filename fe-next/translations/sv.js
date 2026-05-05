@@ -4933,20 +4933,22 @@ const sv = {
   "practice": {
     "instructions": {
       "title": "Så spelar du",
+      "scoringLabel": "Poäng",
+      "cta": "Kör igång!",
       "classic": {
-        "line1": "Dra anslutna bokstäver för att stava ett ord.",
-        "line2": "Diagonaler fungerar — hörn räknas som anslutna.",
-        "line3": "Hitta 3 riktiga ord för att avsluta."
+        "line1": "Dra fingret över bokstäverna — de behöver inte vara på rad.",
+        "line2": "Diagonaler räknas också. Vilket håll som helst funkar!",
+        "line3": "Hitta 3 riktiga ord för att vinna. Ingen tid, ingen press."
       },
       "wordHunt": {
-        "line1": "Hitta målordet som visas ovanför rutnätet.",
-        "line2": "Dra anslutna bokstäver i rätt ordning.",
-        "line3": "Bonusord räknas också — samla så många du vill."
+        "line1": "Ett hemligt ord gömmer sig på brädet. Kategorin ovan är din ledtråd!",
+        "line2": "Prova vilken gissning som helst — färgerna visar vilka bokstäver som är nära svaret.",
+        "line3": "Knäck det hemliga ordet för att vinna. Ta all tid du behöver."
       },
       "wheelRush": {
-        "line1": "Varje ord måste använda mittenbokstaven.",
-        "line2": "Dra genom valfria bokstäver runt hjulet.",
-        "line3": "Hitta 3 riktiga ord för att avsluta."
+        "line1": "Tryck på bokstäverna runt hjulet för att bygga ett ord.",
+        "line2": "Den lysande mittbokstaven måste finnas i varje ord.",
+        "line3": "Hitta 3 riktiga ord för att avsluta — ta det lugnt!"
       }
     },
     "modifier": {
@@ -5010,7 +5012,9 @@ const sv = {
       "matchLength": "Skicka för att använda ett försök!",
       "boardEmpty": "Hittade inget mål — skapar nytt bräde...",
       "discoveries": "Bonusord",
-      "giveUp": "Avslöja målet"
+      "giveUp": "Avslöja målet",
+      "chillChip": "Stressfri 🌱",
+      "categoryHint": "{category}, {length} bokstäver"
     },
     "complete": {
       "title": "Läget klart!",
@@ -5028,7 +5032,8 @@ const sv = {
       "found": "Bra! Ordet tillagt.",
       "notAWord": "Inte ett ord — prova ett annat.",
       "duplicate": "Redan hittat.",
-      "foundWordsLabel": "Hittade ({count})"
+      "foundWordsLabel": "Hittade ({count})",
+      "scoreChip": "{score} p"
     }
   },
   "practiceSwipe": {

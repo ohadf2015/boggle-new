@@ -5039,20 +5039,28 @@ const en = {
   "practice": {
     "instructions": {
       "title": "How to play",
+      "scoringLabel": "Scoring",
+      "cta": "Let's go!",
       "classic": {
-        "line1": "Drag connected letters to spell a word.",
-        "line2": "Diagonals work — corners count as connected.",
-        "line3": "Find 3 real words to finish."
+        "line1": "Drag your finger across letters — they don't need to be in a row.",
+        "line2": "Diagonals count too. Any direction works!",
+        "line3": "Find 3 real words to win. No timer, no stress.",
+        "scoring1": "+2 points per letter.",
+        "scoring2": "Combo streaks add bonus points."
       },
       "wordHunt": {
-        "line1": "Find the target word shown above the grid.",
-        "line2": "Drag connected letters in the right order.",
-        "line3": "Bonus words count too — collect as many as you like."
+        "line1": "A secret word is hiding on the board. The category up top is your clue!",
+        "line2": "Try any guess — colours show which letters are close to the answer.",
+        "line3": "Crack the secret word to win. Take all the time you need.",
+        "scoring1": "+20 points for the target word.",
+        "scoring2": "+2 per letter for any other valid word."
       },
       "wheelRush": {
-        "line1": "Every word must use the center letter.",
-        "line2": "Drag through any letters around the wheel.",
-        "line3": "Find 3 real words to finish."
+        "line1": "Tap letters around the wheel to build a word.",
+        "line2": "The bright middle letter must appear in every word.",
+        "line3": "Find 3 real words to finish — easy does it!",
+        "scoring1": "+1 point per letter.",
+        "scoring2": "+5 bonus for using all 7 letters."
       }
     },
     "modifier": {
@@ -5116,7 +5124,9 @@ const en = {
       "matchLength": "Submit to use a try!",
       "boardEmpty": "Couldn't find a target on this board — generating a fresh one...",
       "discoveries": "Bonus words found",
-      "giveUp": "Reveal target"
+      "giveUp": "Reveal target",
+      "chillChip": "No stress 🌱",
+      "categoryHint": "{length}-letter {category}"
     },
     "complete": {
       "title": "Mode complete!",
@@ -5134,7 +5144,8 @@ const en = {
       "found": "Nice! Word added.",
       "notAWord": "Not a word — try another.",
       "duplicate": "Already found.",
-      "foundWordsLabel": "Found ({count})"
+      "foundWordsLabel": "Found ({count})",
+      "scoreChip": "{score} pts"
     }
   },
   "practiceSwipe": {

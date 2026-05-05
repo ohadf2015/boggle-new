@@ -177,17 +177,38 @@ export default function PracticeWheelSandbox() {
         ? 'wrong'
         : 'idle';
 
+  // Decorative practice score — sums letter counts × 1pt to mirror the
+  // live wheel's score chip. Practice never persists this number; it's
+  // purely so the HUD shape matches the real game.
+  const previewScore = useMemo(
+    () => foundWords.reduce((sum, w) => sum + w.length, 0),
+    [foundWords],
+  );
+
   return (
-    <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3">
+    <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3 min-h-[calc(100dvh-var(--bottom-stack-height,5rem))]">
       <PracticePixiFx ref={fxRef} />
       <PracticeMascotReaction mode="wheelRush" reaction={mascotReaction} />
-      <PracticeModeNav current="wheelRush" />
 
-      <div
-        data-testid="practice-goal-indicator"
-        className="absolute top-2 right-2 px-2.5 py-1 rounded-full bg-neo-purple/20 border border-neo-purple text-neo-cream text-xs font-neo-display font-black"
-      >
-        {foundWords.length}/{PRACTICE_GOALS.wheelRush}
+      {/* HUD strip — mode nav + score + decorative no-timer chip. Same
+          three-segment shape as the live WheelRush HUD so the practice
+          page is visually indistinguishable from the real thing. */}
+      <div className="w-full flex items-center justify-between gap-2">
+        <PracticeModeNav current="wheelRush" />
+        <div className="flex items-center gap-2">
+          <div
+            data-testid="practice-wheel-score"
+            className="px-2.5 py-1 rounded-full bg-neo-purple/20 border border-neo-purple text-neo-cream text-xs font-neo-display font-black whitespace-nowrap"
+          >
+            {t('practice.wheelRush.scoreChip', { score: previewScore })}
+          </div>
+          <div
+            data-testid="practice-goal-indicator"
+            className="px-2.5 py-1 rounded-full bg-neo-cream/10 border border-neo-cream/30 text-neo-cream text-xs font-neo-display font-black whitespace-nowrap"
+          >
+            {foundWords.length}/{PRACTICE_GOALS.wheelRush}
+          </div>
+        </div>
       </div>
 
       <PracticeInstructions mode="wheelRush" />

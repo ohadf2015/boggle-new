@@ -17,6 +17,8 @@ interface Props {
   solved?: boolean;
   /** ltr / rtl direction. */
   dir?: 'ltr' | 'rtl';
+  /** When true, render `?` instead of the actual letters (hidden target). */
+  hidden?: boolean;
 }
 
 const sizeFor = (len: number) =>
@@ -28,7 +30,7 @@ const sizeFor = (len: number) =>
         ? 'w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base'
         : 'w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm';
 
-export default function PracticeTargetBoxes({ word, solved = false, dir = 'ltr' }: Props) {
+export default function PracticeTargetBoxes({ word, solved = false, dir = 'ltr', hidden = false }: Props) {
   const letters = word.split('');
   const cls = sizeFor(letters.length);
 
@@ -38,24 +40,30 @@ export default function PracticeTargetBoxes({ word, solved = false, dir = 'ltr' 
       dir={dir}
       className="flex justify-center flex-wrap gap-1.5 sm:gap-2 px-2"
     >
-      {letters.map((letter, idx) => (
-        <AdaptiveMotion.div
-          key={`${idx}-${letter}`}
-          initial={{ opacity: 0, y: -6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: idx * 0.05, type: 'spring', stiffness: 300, damping: 22 }}
-          data-testid={`practice-target-box-${idx}`}
-          className={
-            'flex items-center justify-center rounded-neo border-2 border-neo-black font-neo-display font-black shadow-hard-sm transition-colors ' +
-            cls + ' ' +
-            (solved
-              ? 'bg-neo-lime text-neo-black'
-              : 'bg-neo-cream text-neo-black')
-          }
-        >
-          {letter}
-        </AdaptiveMotion.div>
-      ))}
+      {letters.map((letter, idx) => {
+        const showHidden = hidden && !solved;
+        return (
+          <AdaptiveMotion.div
+            key={`${idx}-${letter}`}
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.05, type: 'spring', stiffness: 300, damping: 22 }}
+            data-testid={`practice-target-box-${idx}`}
+            data-hidden={showHidden ? 'true' : undefined}
+            className={
+              'flex items-center justify-center rounded-neo border-2 border-neo-black font-neo-display font-black shadow-hard-sm transition-colors ' +
+              cls + ' ' +
+              (solved
+                ? 'bg-neo-lime text-neo-black'
+                : showHidden
+                  ? 'bg-neo-navy-light text-neo-cream/60'
+                  : 'bg-neo-cream text-neo-black')
+            }
+          >
+            {showHidden ? '?' : letter}
+          </AdaptiveMotion.div>
+        );
+      })}
     </div>
   );
 }

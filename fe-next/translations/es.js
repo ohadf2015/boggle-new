@@ -4974,20 +4974,22 @@ const es = {
   "practice": {
     "instructions": {
       "title": "Cómo jugar",
+      "scoringLabel": "Puntuación",
+      "cta": "¡A jugar!",
       "classic": {
-        "line1": "Arrastra letras conectadas para formar una palabra.",
-        "line2": "Las diagonales valen — las esquinas cuentan como conectadas.",
-        "line3": "Encuentra 3 palabras reales para terminar."
+        "line1": "Arrastra el dedo por las letras — no necesitan estar en fila.",
+        "line2": "Las diagonales valen. ¡Cualquier dirección funciona!",
+        "line3": "Encuentra 3 palabras reales para ganar. Sin reloj, sin estrés."
       },
       "wordHunt": {
-        "line1": "Encuentra la palabra objetivo que aparece sobre el tablero.",
-        "line2": "Arrastra letras conectadas en el orden correcto.",
-        "line3": "Las palabras extra también cuentan — junta cuantas quieras."
+        "line1": "Hay una palabra secreta escondida en el tablero. ¡La categoría arriba es tu pista!",
+        "line2": "Prueba cualquier palabra — los colores muestran qué letras están cerca de la respuesta.",
+        "line3": "Descubre la palabra secreta para ganar. Tómate todo el tiempo que quieras."
       },
       "wheelRush": {
-        "line1": "Cada palabra debe usar la letra del centro.",
-        "line2": "Arrastra por cualquier letra alrededor de la rueda.",
-        "line3": "Encuentra 3 palabras reales para terminar."
+        "line1": "Toca las letras alrededor de la rueda para formar una palabra.",
+        "line2": "La letra brillante del centro debe aparecer en cada palabra.",
+        "line3": "Encuentra 3 palabras reales para terminar — ¡tranqui!"
       }
     },
     "modifier": {
@@ -5051,7 +5053,9 @@ const es = {
       "matchLength": "¡Envía para usar un intento!",
       "boardEmpty": "No se encontró objetivo — generando nuevo tablero...",
       "discoveries": "Palabras extra",
-      "giveUp": "Revelar objetivo"
+      "giveUp": "Revelar objetivo",
+      "chillChip": "Modo relax 🌱",
+      "categoryHint": "{category} de {length} letras"
     },
     "complete": {
       "title": "¡Modo completado!",
@@ -5069,7 +5073,8 @@ const es = {
       "notAWord": "No es una palabra — prueba otra.",
       "duplicate": "Ya encontrada.",
       "tooShort": "Mínimo 2 letras.",
-      "foundWordsLabel": "Encontradas ({count})"
+      "foundWordsLabel": "Encontradas ({count})",
+      "scoreChip": "{score} pts"
     }
   },
   "practiceSwipe": {

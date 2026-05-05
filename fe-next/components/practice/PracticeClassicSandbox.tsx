@@ -135,16 +135,21 @@ export default function PracticeClassicSandbox() {
         : 'idle';
 
   return (
-    <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3">
+    <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3 min-h-[calc(100dvh-var(--bottom-stack-height,5rem))]">
       <PracticePixiFx ref={fxRef} />
       <PracticeMascotReaction mode="classic" reaction={mascotReaction} />
-      <PracticeModeNav current="classic" />
 
-      <div
-        data-testid="practice-goal-indicator"
-        className="absolute top-2 right-2 px-2.5 py-1 rounded-full bg-neo-cyan/20 border border-neo-cyan text-neo-cream text-xs font-neo-display font-black"
-      >
-        {foundWords.length}/{PRACTICE_GOALS.classic}
+      {/* HUD strip — mode nav left, goal pill right. Same vertical real-estate
+          as the live game's score/timer row, so the practice screen feels
+          like the real thing. */}
+      <div className="w-full flex items-center justify-between gap-2">
+        <PracticeModeNav current="classic" />
+        <div
+          data-testid="practice-goal-indicator"
+          className="px-2.5 py-1 rounded-full bg-neo-cyan/20 border border-neo-cyan text-neo-cream text-xs font-neo-display font-black whitespace-nowrap"
+        >
+          {foundWords.length}/{PRACTICE_GOALS.classic}
+        </div>
       </div>
 
       <PracticeInstructions mode="classic" />
@@ -176,7 +181,7 @@ export default function PracticeClassicSandbox() {
       {isComplete && (
         <PracticeChainCta
           currentMode="classic"
-          className="mt-2 inline-flex items-center justify-center w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed"
+          className="mt-auto inline-flex items-center justify-center w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed"
         />
       )}
     </div>
