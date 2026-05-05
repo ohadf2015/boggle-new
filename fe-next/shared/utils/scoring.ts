@@ -8,12 +8,20 @@
  * - Combo bonuses (flat bonuses that scale with word length)
  * - Combo multipliers (currently unused, but available for future)
  * - Fire round multipliers (2x during earthquake fire rounds)
+ * - Keyboard bonus multiplier (+10% for keyboard input in multiplayer)
  *
  * IMPORTANT: All other scoring implementations should import from this file.
  * Do not duplicate scoring logic elsewhere.
  *
  * @module shared/utils/scoring
  */
+
+/**
+ * Keyboard input bonus multiplier.
+ * Desktop players using keyboard get +10% score reward to balance
+ * the effort of keyboard input vs tap/drag on mobile.
+ */
+export const KB_BONUS_MULT = 1.1;
 
 /**
  * Combo tier names for UI display and logic branching.
@@ -140,29 +148,42 @@ function getBaseScore(wordLength: number): number {
 }
 
 /**
+ * Metadata for score calculation (input method, etc.)
+ */
+export interface ScoringMeta {
+  inputMethod?: 'kb' | 'drag';
+}
+
+/**
  * Calculate score for a single word
  *
  * Exponential base scoring rewards longer words dramatically.
  * Combo bonus is added based on word length (longer words benefit more).
  * Fire round multiplier (2x) is applied to the final score.
+ * Keyboard bonus (1.1x) is applied last as the final multiplier.
  *
- * Final formula: (baseScore + comboBonus) * fireRoundMultiplier * rarityMultiplier
+ * Final formula: floor((baseScore + comboBonus) * fireRoundMultiplier * rarityMultiplier * kbBonus)
+ * Where kbBonus = 1.1 if inputMethod='kb', else 1.0
  *
  * @param word - The word being scored (string)
  * @param comboLevel - Current combo level (default: 0)
  * @param fireRoundMultiplier - Fire round multiplier (default: 1, or 2 during fire rounds)
+ * @param rarityMultiplier - Rarity multiplier (default: 1, or 1.15-1.5 for rare words)
+ * @param meta - Metadata including inputMethod (default: { inputMethod: 'drag' })
  * @returns Total score for the word
  *
  * @example
  * calculateWordScore('CAT') // => 10 (3 letters = 10 pts)
  * calculateWordScore('HOUSE') // => 50 (5 letters = 50 pts)
  * calculateWordScore('TESTING', 5, 2) // => 420 ((200 + 10) * 2)
+ * calculateWordScore('CAT', 0, 1, 1, { inputMethod: 'kb' }) // => 11 (10 * 1.1)
  */
 export function calculateWordScore(
   word: string,
   comboLevel: number = 0,
   fireRoundMultiplier: number = 1,
-  rarityMultiplier: number = 1
+  rarityMultiplier: number = 1,
+  meta: ScoringMeta = {}
 ): number {
   const length = word.length;
   if (length < 2) return 0;
@@ -170,7 +191,14 @@ export function calculateWordScore(
   const baseScore = getBaseScore(length);
   const bonus = getComboBonus(comboLevel, length);
 
-  return Math.floor((baseScore + bonus) * fireRoundMultiplier * rarityMultiplier);
+  let score = Math.floor((baseScore + bonus) * fireRoundMultiplier * rarityMultiplier);
+
+  // Apply keyboard bonus as final multiplier (after all other multipliers)
+  if (meta.inputMethod === 'kb') {
+    score = Math.round(score * KB_BONUS_MULT);
+  }
+
+  return score;
 }
 
 /** Base score lookup — derived from BASE_SCORES for backward compat */
@@ -186,11 +214,13 @@ export const WORD_SCORES: Record<number, number> = {
 export function calculateWordScoreByLength(
   wordLength: number,
   comboLevel: number = 0,
-  fireRoundMultiplier: number = 1
+  fireRoundMultiplier: number = 1,
+  rarityMultiplier: number = 1,
+  meta: ScoringMeta = {}
 ): number {
   if (wordLength < 2) return 0;
   const dummyWord = 'A'.repeat(wordLength);
-  return calculateWordScore(dummyWord, comboLevel, fireRoundMultiplier);
+  return calculateWordScore(dummyWord, comboLevel, fireRoundMultiplier, rarityMultiplier, meta);
 }
 
 // ==============================================
