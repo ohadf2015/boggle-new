@@ -1,6 +1,8 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Play, FastForward } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -10,6 +12,7 @@ import { usePracticeProgress } from '@/components/practice/usePracticeProgress';
 import PracticeStreakChip from '@/components/practice/PracticeStreakChip';
 import PracticeHubWelcome from '@/components/practice/PracticeHubWelcome';
 import PendingRoomBanner from '@/components/practice/PendingRoomBanner';
+import { markAllPracticeModesSkipped } from '@/lib/practice/practiceProgress';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
 const MODE_ACCENT: Record<PracticeMode, string> = {
@@ -29,10 +32,26 @@ interface Props {
 export default function PracticeHubClient({ locale }: Props) {
   const { t, language } = useLanguage();
   const { playButtonClickSound } = useSoundEffects();
+  const router = useRouter();
   const completed = usePracticeProgress(language);
   const handleTileTap = () => {
     playButtonClickSound();
     haptics.tap();
+  };
+  // First-non-completed mode (Quick Start jumps here, skipping the per-mode
+  // tutorial via ?play=1). Falls back to first mode if everything's done.
+  const nextMode: PracticeMode =
+    PRACTICE_MODES.find((m) => !completed.has(m)) ?? PRACTICE_MODES[0];
+  const handleQuickStart = () => {
+    playButtonClickSound();
+    haptics.tap();
+    router.push(`/${locale}/practice/${nextMode}?play=1`);
+  };
+  const handleSkipAll = () => {
+    playButtonClickSound();
+    haptics.tap();
+    markAllPracticeModesSkipped(language);
+    router.push(`/${locale}`);
   };
 
   return (
@@ -64,6 +83,33 @@ export default function PracticeHubClient({ locale }: Props) {
             </span>
           </div>
           <PracticeStreakChip />
+        </div>
+
+        {/* Hub CTAs: Quick Start (jump straight into next mode play) +
+            Skip All (mark all complete + go home). Visible always so the user
+            can opt out of the tutorial flow at any time. */}
+        <div
+          data-testid="practice-hub-ctas"
+          className="mb-5 flex flex-col gap-2"
+        >
+          <button
+            type="button"
+            data-testid="practice-hub-quick-start"
+            onClick={handleQuickStart}
+            className="flex items-center justify-center gap-2 w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:translate-y-px active:shadow-hard-pressed"
+          >
+            <Play className="w-5 h-5" aria-hidden />
+            <span>{t('practiceHub.quickStartCta')}</span>
+          </button>
+          <button
+            type="button"
+            data-testid="practice-hub-skip-all"
+            onClick={handleSkipAll}
+            className="flex items-center justify-center gap-2 w-full bg-transparent text-neo-cream/80 border-2 border-neo-cream/40 rounded-neo py-2 px-4 font-neo-display font-bold text-sm hover:border-neo-cream/70 active:translate-y-px"
+          >
+            <FastForward className="w-4 h-4" aria-hidden />
+            <span>{t('practiceHub.skipAllCta')}</span>
+          </button>
         </div>
 
         {completed.size === 0 && <PracticeHubWelcome />}

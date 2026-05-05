@@ -1,7 +1,7 @@
 /**
- * Redesigned PracticeWheelSandbox — drag-spell on a 5-letter wheel (1 center
- * + 4 outer). Center-letter rule enforced. Real dictionary validation. No
- * submit/reset buttons, no curated word list. Goal: 3 valid words.
+ * Redesigned PracticeWheelSandbox — TAP-BASED to mirror real WheelRush.
+ * 7 letters (1 center + 6 outer). Real `<WheelLetter>` component reused.
+ * Center-letter rule + 3-letter min match real (WordWheelGame.tsx:455–467).
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -31,18 +31,17 @@ beforeEach(() => {
 });
 
 describe('PracticeWheelSandbox redesigned', () => {
-  it('renders one center letter and four outer letters (5 total)', () => {
+  it('renders one center letter and six outer letters (7 total — real WheelRush parity)', () => {
     render(<PracticeWheelSandbox />);
-    expect(screen.getByTestId('practice-letter-0')).toBeInTheDocument();
-    expect(screen.getByTestId('practice-letter-1')).toBeInTheDocument();
-    expect(screen.getByTestId('practice-letter-2')).toBeInTheDocument();
-    expect(screen.getByTestId('practice-letter-3')).toBeInTheDocument();
-    expect(screen.getByTestId('practice-letter-4')).toBeInTheDocument();
+    // WheelLetter buttons expose data-wheel-index 0..6
+    for (let i = 0; i <= 6; i += 1) {
+      expect(document.querySelector(`[data-wheel-index="${i}"]`)).not.toBeNull();
+    }
+    expect(document.querySelector('[data-wheel-index="7"]')).toBeNull();
   });
 
-  it('does NOT render submit, reset, or backspace buttons', () => {
+  it('does NOT render a reset button (tap built-tile to remove instead)', () => {
     render(<PracticeWheelSandbox />);
-    expect(screen.queryByRole('button', { name: 'practice.wheelRush.submit' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'practice.wheelRush.reset' })).toBeNull();
   });
 
@@ -70,22 +69,38 @@ describe('PracticeWheelSandbox redesigned', () => {
     expect(screen.queryByTestId('practice-chain-cta')).toBeNull();
   });
 
-  it('drag of center+outer invokes the validator', async () => {
+  it('submit button hidden until built word reaches 3 letters (real min)', () => {
     render(<PracticeWheelSandbox />);
-    fireEvent.pointerDown(screen.getByTestId('practice-letter-0'));
-    fireEvent.pointerEnter(screen.getByTestId('practice-letter-1'));
-    fireEvent.pointerEnter(screen.getByTestId('practice-letter-2'));
-    fireEvent.pointerUp(screen.getByTestId('practice-letter-2'));
+    // Tap two letters → still hidden
+    const center = document.querySelector('[data-wheel-index="0"]') as HTMLElement;
+    const outer = document.querySelector('[data-wheel-index="1"]') as HTMLElement;
+    fireEvent.click(center);
+    fireEvent.click(outer);
+    expect(screen.queryByTestId('practice-wheel-submit')).toBeNull();
+  });
+
+  it('shows submit button at 3 letters then validates on tap', async () => {
+    render(<PracticeWheelSandbox />);
+    const center = document.querySelector('[data-wheel-index="0"]') as HTMLElement;
+    const o1 = document.querySelector('[data-wheel-index="1"]') as HTMLElement;
+    const o2 = document.querySelector('[data-wheel-index="2"]') as HTMLElement;
+    fireEvent.click(center);
+    fireEvent.click(o1);
+    fireEvent.click(o2);
+    const submit = screen.getByTestId('practice-wheel-submit');
+    fireEvent.click(submit);
     await waitFor(() => expect(validatorCheck).toHaveBeenCalled());
   });
 
   it('does NOT call validator if center letter not used', async () => {
     render(<PracticeWheelSandbox />);
-    // Drag two outer letters only (no center)
-    fireEvent.pointerDown(screen.getByTestId('practice-letter-1'));
-    fireEvent.pointerEnter(screen.getByTestId('practice-letter-2'));
-    fireEvent.pointerUp(screen.getByTestId('practice-letter-2'));
-    // Validator should NOT be called — center-letter rule rejects early
+    const o1 = document.querySelector('[data-wheel-index="1"]') as HTMLElement;
+    const o2 = document.querySelector('[data-wheel-index="2"]') as HTMLElement;
+    const o3 = document.querySelector('[data-wheel-index="3"]') as HTMLElement;
+    fireEvent.click(o1);
+    fireEvent.click(o2);
+    fireEvent.click(o3);
+    fireEvent.click(screen.getByTestId('practice-wheel-submit'));
     await new Promise((r) => setTimeout(r, 50));
     expect(validatorCheck).not.toHaveBeenCalled();
   });

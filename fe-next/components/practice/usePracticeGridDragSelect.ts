@@ -1,15 +1,11 @@
 import { useCallback, useState } from 'react';
+import { isAdjacent } from '@/lib/grid/adjacencyRules';
 
 export interface GridCell {
   row: number;
   col: number;
   letter: string;
 }
-
-const isAdjacent = (a: GridCell, b: GridCell) =>
-  Math.abs(a.row - b.row) <= 1 &&
-  Math.abs(a.col - b.col) <= 1 &&
-  !(a.row === b.row && a.col === b.col);
 
 /**
  * Practice-mode grid drag-select. Adjacency includes diagonals. Re-entering an

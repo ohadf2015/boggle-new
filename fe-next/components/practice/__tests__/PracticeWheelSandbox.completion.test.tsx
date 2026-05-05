@@ -1,7 +1,9 @@
 /**
- * Integration test (redesigned): drag-spelling 3 valid wheel words containing
+ * Integration test (redesigned): tap-spell 3 valid wheel words containing
  * the center letter writes progress + reveals chain CTA. Also asserts the
  * center-letter rule short-circuits validation (no API call).
+ *
+ * Wheel switched from drag→tap on 2026-05-05 to mirror real WheelRush input.
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -25,11 +27,15 @@ vi.mock('pixi.js', () => ({
 import PracticeWheelSandbox from '../PracticeWheelSandbox';
 import { isPracticeModeComplete } from '@/lib/practice/practiceProgress';
 
-const dragWord = (indices: number[]) => {
-  const tiles = indices.map((i) => screen.getByTestId(`practice-letter-${i}`));
-  fireEvent.pointerDown(tiles[0]);
-  for (let k = 1; k < tiles.length; k++) fireEvent.pointerEnter(tiles[k]);
-  fireEvent.pointerUp(tiles[tiles.length - 1]);
+/** Tap letters by index (0=center, 1..N=outer), then tap submit. */
+const tapWord = (indices: number[]) => {
+  for (const i of indices) {
+    const el = document.querySelector(`[data-wheel-index="${i}"]`) as HTMLElement | null;
+    if (!el) throw new Error(`wheel letter ${i} not found`);
+    fireEvent.click(el);
+  }
+  const submit = screen.queryByTestId('practice-wheel-submit');
+  if (submit) fireEvent.click(submit);
 };
 
 beforeEach(() => {
@@ -38,16 +44,16 @@ beforeEach(() => {
   window.localStorage.clear();
 });
 
-describe('PracticeWheelSandbox completion integration (redesign)', () => {
+describe('PracticeWheelSandbox completion integration (redesign — tap mode)', () => {
   it('writes progress + reveals chain CTA after 3 valid words with center letter', async () => {
-    // EN puzzle — letters[0]=A (center), letters[1..4]=T R C E
+    // EN puzzle: center=A (idx 0), outer T R C E S N (idx 1..6)
     render(<PracticeWheelSandbox />);
 
-    dragWord([2, 0, 1]);  // CAR  (C=idx 3, A=0, R=2 — but we use indices 2,0,1 → letters[2]=R letters[0]=A letters[1]=T → "RAT")
+    tapWord([0, 1, 2]); // ATR
     await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(1));
-    dragWord([3, 0, 2]);  // letters[3]=C letters[0]=A letters[2]=R → "CAR"
+    tapWord([0, 3, 2]); // ACR
     await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(2));
-    dragWord([4, 0, 2]);  // letters[4]=E letters[0]=A letters[2]=R → "EAR"
+    tapWord([0, 4, 2]); // AER
     await waitFor(() => {
       expect(screen.getByTestId('practice-chain-cta')).toBeInTheDocument();
     });
@@ -56,8 +62,7 @@ describe('PracticeWheelSandbox completion integration (redesign)', () => {
 
   it('rejects a word without the center letter (validator NOT called)', async () => {
     render(<PracticeWheelSandbox />);
-    // letters[1]=T letters[3]=C letters[2]=R → "TCR" no center A
-    dragWord([1, 3, 2]);
+    tapWord([1, 3, 2]); // TCR — no center A
     await new Promise((r) => setTimeout(r, 50));
     expect(validatorCheck).not.toHaveBeenCalled();
     expect(isPracticeModeComplete('wheelRush', 'en')).toBe(false);

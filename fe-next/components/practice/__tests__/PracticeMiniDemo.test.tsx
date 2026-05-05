@@ -17,9 +17,19 @@ describe('PracticeMiniDemo locale-aware letters', () => {
     expect(screen.getByText('ש')).toBeInTheDocument();
     expect(screen.getByText('ל')).toBeInTheDocument();
     expect(screen.getByText('ו')).toBeInTheDocument();
-    expect(screen.getByText('ם')).toBeInTheDocument();
+    // Demo uses non-final mem (matches main letter pool, gridConstants.ts)
+    expect(screen.getByText('מ')).toBeInTheDocument();
+    expect(screen.queryByText('ם')).toBeNull();
     expect(screen.queryByText('E')).toBeNull();
     expect(screen.queryByText('C')).toBeNull();
+  });
+
+  it('does NOT include Hebrew final letters anywhere (classic)', () => {
+    mockLanguage.mockReturnValue('he');
+    render(<PracticeMiniDemo mode="classic" />);
+    ['ם', 'ץ', 'ך', 'ן', 'ף'].forEach((sofit) => {
+      expect(screen.queryByText(sofit)).toBeNull();
+    });
   });
 
   it('renders Japanese hiragana in JA locale (wheelRush)', () => {

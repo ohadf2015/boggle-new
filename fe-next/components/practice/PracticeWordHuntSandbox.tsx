@@ -4,12 +4,16 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeChainCta from './PracticeChainCta';
 import PracticeCompleteBanner from './PracticeCompleteBanner';
+import PracticeInstructions from './PracticeInstructions';
 import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
 import PracticeModeNav from './PracticeModeNav';
 import PracticeMicroTip from './PracticeMicroTip';
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
 import { usePracticeGridDragSelect } from './usePracticeGridDragSelect';
 import { usePracticeJuice } from './usePracticeJuice';
+// Reuse real-game discovered-words list so chip styling, animations, and the
+// length-based color cascade (cream/cyan/pink) stay in sync with production.
+import { DiscoveredWordsList } from '@/components/daily/DiscoveredWordsList';
 import { usePracticeValidator } from '@/lib/practice/usePracticeValidator';
 import { createMicroTutorial, type MicroTutorialBeat } from '@/lib/practice/microTutorial';
 import { markPracticeMode } from '@/lib/practice/practiceProgress';
@@ -20,58 +24,38 @@ import {
 } from '@/lib/practice/telemetry';
 import { getPracticeStreak } from '@/hooks/usePracticeStreak';
 
+// Curated practice boards — Hebrew is finals-free (matches real letter pool
+// in lib/adventure/gridConstants.ts). Each board is hand-checked to ensure
+// the target word can be traced via 4-or-8-neighbour adjacency.
 const BOARDS: Record<string, string[][]> = {
   en: [['S', 'T', 'A', 'R'], ['E', 'O', 'N', 'I'], ['P', 'L', 'A', 'T'], ['E', 'R', 'I', 'N']],
-  he: [['ש', 'ל', 'ו', 'ם'], ['ב', 'י', 'ת', 'א'], ['מ', 'ן', 'ר', 'ה'], ['ע', 'ק', 'ו', 'ל']],
+  he: [['ש', 'ל', 'ו', 'מ'], ['ב', 'י', 'ת', 'א'], ['ה', 'נ', 'ר', 'ע'], ['ק', 'ד', 'ח', 'ג']],
   sv: [['S', 'T', 'A', 'R'], ['E', 'O', 'N', 'I'], ['P', 'L', 'A', 'T'], ['E', 'R', 'I', 'N']],
   ja: [['い', 'ぬ', 'か', 'み'], ['ね', 'こ', 'と', 'り'], ['さ', 'く', 'ら', 'ま'], ['は', 'な', 'ゆ', 'き']],
   es: [['C', 'A', 'S', 'A'], ['M', 'E', 'L', 'O'], ['T', 'I', 'A', 'R'], ['E', 'O', 'N', 'P']],
 };
 
+// Targets are short, common, and traceable on the board above. HE target
+// 'בית' (house) is a 3-letter, finals-free word; path 1,0→1,1→1,2.
 const TARGETS: Record<string, string> = {
   en: 'STAR',
-  he: 'שלום',
+  he: 'בית',
   sv: 'STAR',
   ja: 'ねこ',
   es: 'CASA',
 };
 
-type LetterFeedback = 'correct' | 'present' | 'absent';
-
-const scoreGuess = (guess: string, target: string): LetterFeedback[] => {
-  const result: LetterFeedback[] = guess.split('').map(() => 'absent' as const);
-  const targetChars = target.split('');
-  const used = new Set<number>();
-  for (let i = 0; i < guess.length; i += 1) {
-    if (guess[i] === targetChars[i]) {
-      result[i] = 'correct';
-      used.add(i);
-    }
-  }
-  for (let i = 0; i < guess.length; i += 1) {
-    if (result[i] === 'correct') continue;
-    const idx = targetChars.findIndex((c, j) => c === guess[i] && !used.has(j));
-    if (idx !== -1) {
-      result[i] = 'present';
-      used.add(idx);
-    }
-  }
-  return result;
-};
-
-const FEEDBACK_BG: Record<LetterFeedback, string> = {
-  correct: 'bg-neo-lime border-neo-lime text-neo-black',
-  present: 'bg-neo-yellow border-neo-yellow text-neo-black',
-  absent: 'bg-neo-navy-light border-neo-cream/30 text-neo-cream/60',
-};
-
 /**
- * Word-hunt practice sandbox (redesigned 2026-05-05).
+ * Word-hunt practice sandbox (rewritten 2026-05-05).
  *
- * Mirrors real word-hunt: 4×4 grid drag-to-spell + target word panel above.
- * Wordle-style position feedback when guess length matches target length.
- * Real dictionary validation for any-length words (counts as "discovery").
- * Goal: spell the target word once. No submit/reset buttons. No life bar.
+ * Mirrors real word-hunt-survival WITHOUT life drain or timer:
+ *   - 4×4 grid + plain target word displayed at top
+ *   - drag-to-spell, drag-release auto-submits
+ *   - target match → solved (mode complete)
+ *   - any other valid word → bonus discovery (juice + chip)
+ *
+ * Wordle-style position feedback was removed 2026-05-05 — real WordHunt has
+ * no per-letter hints, and the dotted "·" target panel was confusing players.
  */
 export default function PracticeWordHuntSandbox() {
   const { language, t } = useLanguage();
@@ -86,8 +70,11 @@ export default function PracticeWordHuntSandbox() {
 
   const grid = usePracticeGridDragSelect({ rows: 4, cols: 4 });
   const [solved, setSolved] = useState(false);
-  const [lastFeedback, setLastFeedback] = useState<LetterFeedback[] | null>(null);
-  const [discoveries, setDiscoveries] = useState<string[]>([]);
+  // Shape matches real WordDiscovery so we can hand the list straight to
+  // <DiscoveredWordsList> without an adapter.
+  const [discoveries, setDiscoveries] = useState<
+    Array<{ word: string; timestamp: number; lifeGained: number; tokensGained: number }>
+  >([]);
   const [feedback, setFeedback] = useState<'ok' | 'bad' | null>(null);
 
   const startedAtRef = useRef(0);
@@ -143,7 +130,6 @@ export default function PracticeWordHuntSandbox() {
 
     if (word === target) {
       setSolved(true);
-      setLastFeedback(scoreGuess(word, target));
       setFeedback('ok');
       const tilePositions = grid.path.map((c) => {
         const el = document.querySelector(`[data-testid="practice-tile-${c.row}-${c.col}"]`) as Element | null;
@@ -157,16 +143,14 @@ export default function PracticeWordHuntSandbox() {
       return;
     }
 
-    if (word.length === target.length) {
-      setLastFeedback(scoreGuess(word, target));
-    } else {
-      setLastFeedback(null);
-    }
-
     const result = await validator.check(word);
     if (result.isValid) {
-      if (!discoveries.includes(word)) {
-        setDiscoveries((d) => [...d, word]);
+      const already = discoveries.some((d) => d.word === word);
+      if (!already) {
+        setDiscoveries((d) => [
+          ...d,
+          { word, timestamp: Date.now(), lifeGained: 0, tokensGained: 0 },
+        ]);
         trackPracticeWordFound({ mode: 'wordHunt', locale: language, word, wordsFound: discoveries.length + 1 });
       }
       setFeedback('ok');
@@ -195,8 +179,6 @@ export default function PracticeWordHuntSandbox() {
         ? 'wrong'
         : 'idle';
 
-  const targetSlots = target.split('');
-
   return (
     <div
       className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3"
@@ -207,24 +189,22 @@ export default function PracticeWordHuntSandbox() {
       <PracticeMascotReaction mode="wordHunt" reaction={mascotReaction} />
       <PracticeModeNav current="wordHunt" />
 
+      <PracticeInstructions mode="wordHunt" />
+
       <div data-testid="practice-target" className="flex flex-col items-center gap-1 w-full">
         <span className="text-xs uppercase font-neo-display font-black text-neo-cream/70 tracking-wider">
           {t('practice.wordHunt.targetLabel')}
         </span>
-        <div className="flex gap-1.5">
-          {targetSlots.map((letter, i) => {
-            const fb = lastFeedback?.[i];
-            const cls = fb ? FEEDBACK_BG[fb] : 'bg-neo-cream border-neo-black text-neo-black';
-            const display = solved ? letter : fb === 'correct' ? letter : '·';
-            return (
-              <div
-                key={i}
-                className={`w-9 h-9 rounded-neo border-2 flex items-center justify-center font-neo-display font-black text-lg shadow-hard-sm ${cls}`}
-              >
-                {display}
-              </div>
-            );
-          })}
+        <div
+          data-testid="practice-target-word"
+          className={
+            'px-4 py-2 rounded-neo border-3 font-neo-display font-black text-2xl tracking-widest shadow-hard ' +
+            (solved
+              ? 'bg-neo-lime border-neo-black text-neo-black'
+              : 'bg-neo-navy-light border-neo-lime text-neo-cream')
+          }
+        >
+          {target}
         </div>
       </div>
 
@@ -264,13 +244,9 @@ export default function PracticeWordHuntSandbox() {
       </div>
 
       {discoveries.length > 0 && (
-        <ul className="flex flex-wrap gap-1.5 w-full">
-          {discoveries.map((w) => (
-            <li key={w} className="px-2 py-0.5 bg-neo-lime/20 border border-neo-lime/40 rounded text-neo-lime text-xs font-neo-display font-bold">
-              {w}
-            </li>
-          ))}
-        </ul>
+        <div className="w-full" data-testid="practice-discoveries">
+          <DiscoveredWordsList words={discoveries} t={t} />
+        </div>
       )}
 
       {solved && <PracticeCompleteBanner mode="wordHunt" />}

@@ -4931,6 +4931,24 @@ const sv = {
     }
   },
   "practice": {
+    "instructions": {
+      "title": "Så spelar du",
+      "classic": {
+        "line1": "Dra anslutna bokstäver för att stava ett ord.",
+        "line2": "Diagonaler fungerar — hörn räknas som anslutna.",
+        "line3": "Hitta 3 riktiga ord för att avsluta."
+      },
+      "wordHunt": {
+        "line1": "Hitta målordet som visas ovanför rutnätet.",
+        "line2": "Dra anslutna bokstäver i rätt ordning.",
+        "line3": "Bonusord räknas också — samla så många du vill."
+      },
+      "wheelRush": {
+        "line1": "Varje ord måste använda mittenbokstaven.",
+        "line2": "Dra genom valfria bokstäver runt hjulet.",
+        "line3": "Hitta 3 riktiga ord för att avsluta."
+      }
+    },
     "modifier": {
       "todayLabel": "Dagens utmaning",
       "bonus": "{{x}}× bonus",
@@ -10255,9 +10273,9 @@ const sv = {
       feature3: "Ledtrådar",
       intro: { greet: "Ett ord i taget. Du fixar det." },
       tutorial: {
-        tip1: "Tryck på bokstäver för att stava målordet",
-        tip2: "Grön ruta = rätt plats",
-        tip3: "Gul ruta = fel plats, rätt bokstav"
+        tip1: "Dra anslutna bokstäver för att stava målordet",
+        tip2: "Bonusord räknas också — hitta så många du vill",
+        tip3: "Ingen timer, ingen livmätare — utforska fritt"
       }
     },
     wheelRush: {
@@ -10275,11 +10293,11 @@ const sv = {
     },
     intro: {
       cta: "Sätt igång",
-      skip: "Hoppa över"
+      skip: "Hoppa över guiden"
     },
     tutorial: {
       title: "Så funkar det",
-      cta: "Jag fattar, kör"
+      cta: "Nu kör vi!"
     },
     random: "Slumpmässigt",
     randomDescription: "Överraska mig! Slumpa läge varje runda.",
@@ -10298,6 +10316,8 @@ const sv = {
     "title": "Övning",
     "subtitle": "En lugn plats att lära sig varje läge",
     "greet": "Välj ett läge och spela!",
+    "quickStartCta": "Snabbstart",
+    "skipAllCta": "Hoppa över — jag vet hur man spelar",
     "progress": "{done} av {total} lägen klara",
     "progressLabel": "Din framsteg",
     "stepCount": "{done}/{total}",

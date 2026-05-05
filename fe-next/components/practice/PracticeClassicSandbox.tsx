@@ -4,12 +4,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeChainCta from './PracticeChainCta';
 import PracticeCompleteBanner from './PracticeCompleteBanner';
+import PracticeInstructions from './PracticeInstructions';
 import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
 import PracticeModeNav from './PracticeModeNav';
 import PracticeMicroTip from './PracticeMicroTip';
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
 import { usePracticeGridDragSelect } from './usePracticeGridDragSelect';
 import { usePracticeJuice } from './usePracticeJuice';
+import { DiscoveredWordsList } from '@/components/daily/DiscoveredWordsList';
 import { usePracticeValidator } from '@/lib/practice/usePracticeValidator';
 import { createMicroTutorial, type MicroTutorialBeat } from '@/lib/practice/microTutorial';
 import { markPracticeMode, PRACTICE_GOALS } from '@/lib/practice/practiceProgress';
@@ -20,9 +22,12 @@ import {
 } from '@/lib/practice/telemetry';
 import { getPracticeStreak } from '@/hooks/usePracticeStreak';
 
+// Curated practice boards — guaranteed to contain ≥3 simple findable words per
+// locale, intentionally finals-free for Hebrew (sofits ם ץ ך ן ף are stripped
+// to mirror real game's letter pool, see lib/adventure/gridConstants.ts).
 const BOARDS: Record<string, string[][]> = {
   en: [['S', 'T', 'A', 'R'], ['E', 'O', 'N', 'I'], ['P', 'L', 'A', 'T'], ['E', 'R', 'I', 'N']],
-  he: [['ש', 'ל', 'ו', 'ם'], ['ב', 'י', 'ת', 'א'], ['מ', 'ן', 'ר', 'ה'], ['ע', 'ק', 'ו', 'ל']],
+  he: [['ש', 'ל', 'ו', 'מ'], ['ב', 'י', 'ת', 'א'], ['ה', 'נ', 'ר', 'ע'], ['ק', 'ד', 'ח', 'ג']],
   sv: [['S', 'T', 'A', 'R'], ['E', 'O', 'N', 'I'], ['P', 'L', 'A', 'T'], ['E', 'R', 'I', 'N']],
   ja: [['い', 'ぬ', 'か', 'み'], ['ね', 'こ', 'と', 'り'], ['さ', 'く', 'ら', 'ま'], ['は', 'な', 'ゆ', 'き']],
   es: [['C', 'A', 'S', 'A'], ['M', 'E', 'L', 'O'], ['T', 'I', 'A', 'R'], ['E', 'O', 'N', 'P']],
@@ -37,7 +42,7 @@ const BOARDS: Record<string, string[][]> = {
  * provides the Pixi+GSAP juice and the just-in-time tutorial state machine.
  */
 export default function PracticeClassicSandbox() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const board = BOARDS[language] ?? BOARDS.en;
   const validator = usePracticeValidator(language);
   const juice = usePracticeJuice();
@@ -47,7 +52,11 @@ export default function PracticeClassicSandbox() {
   const advanceBeat = useCallback(() => setBeat(tutorialRef.current.currentBeat()), []);
 
   const grid = usePracticeGridDragSelect({ rows: 4, cols: 4 });
-  const [foundWords, setFoundWords] = useState<string[]>([]);
+  // WordDiscovery-shaped so we can hand the list to <DiscoveredWordsList>
+  // unchanged. lifeGained/tokensGained stay 0 in practice.
+  const [foundWords, setFoundWords] = useState<
+    Array<{ word: string; timestamp: number; lifeGained: number; tokensGained: number }>
+  >([]);
   const [feedback, setFeedback] = useState<'ok' | 'bad' | 'dup' | null>(null);
   const startedAtRef = useRef(0);
   const completedFiredRef = useRef(false);
@@ -104,7 +113,7 @@ export default function PracticeClassicSandbox() {
       return;
     }
     const upper = word.toUpperCase();
-    if (foundWords.includes(upper)) {
+    if (foundWords.some((w) => w.word === upper)) {
       setFeedback('dup');
       const tile = document.querySelector(
         `[data-testid="practice-tile-${grid.path[0].row}-${grid.path[0].col}"]`,
@@ -116,7 +125,10 @@ export default function PracticeClassicSandbox() {
     const result = await validator.check(upper);
     if (result.isValid) {
       setFoundWords((prev) => {
-        const next = [...prev, upper];
+        const next = [
+          ...prev,
+          { word: upper, timestamp: Date.now(), lifeGained: 0, tokensGained: 0 },
+        ];
         trackPracticeWordFound({
           mode: 'classic',
           locale: language,
@@ -177,6 +189,8 @@ export default function PracticeClassicSandbox() {
         {foundWords.length}/{PRACTICE_GOALS.classic}
       </div>
 
+      <PracticeInstructions mode="classic" />
+
       <PracticeMicroTip
         beat={beat}
         onDismiss={() => {
@@ -220,16 +234,9 @@ export default function PracticeClassicSandbox() {
         {currentWord}
       </div>
 
-      <ul className="flex flex-wrap gap-1.5 min-h-[1.5rem] w-full">
-        {foundWords.map((w) => (
-          <li
-            key={w}
-            className="px-2 py-0.5 bg-neo-lime/20 border border-neo-lime/40 rounded text-neo-lime text-xs font-neo-display font-bold"
-          >
-            {w}
-          </li>
-        ))}
-      </ul>
+      <div className="w-full" data-testid="practice-discoveries">
+        <DiscoveredWordsList words={foundWords} t={t} />
+      </div>
 
       {isComplete && <PracticeCompleteBanner mode="classic" />}
       {isComplete && (

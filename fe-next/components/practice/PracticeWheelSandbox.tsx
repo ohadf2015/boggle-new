@@ -1,14 +1,16 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Check } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeChainCta from './PracticeChainCta';
 import PracticeCompleteBanner from './PracticeCompleteBanner';
+import PracticeInstructions from './PracticeInstructions';
 import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
 import PracticeModeNav from './PracticeModeNav';
 import PracticeMicroTip from './PracticeMicroTip';
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
-import { usePracticeWheelDragSelect } from './usePracticeWheelDragSelect';
 import { usePracticeJuice } from './usePracticeJuice';
 import { usePracticeValidator } from '@/lib/practice/usePracticeValidator';
 import { createMicroTutorial, type MicroTutorialBeat } from '@/lib/practice/microTutorial';
@@ -19,31 +21,43 @@ import {
   trackPracticeCompleted,
 } from '@/lib/practice/telemetry';
 import { getPracticeStreak } from '@/hooks/usePracticeStreak';
+// Reuse REAL game-mode wheel primitives so practice and live wheel rush
+// share visuals + animations. Future style updates to WheelLetter / WordTile
+// auto-propagate to practice.
+import { WheelLetter, WordTile } from '@/components/daily/WordWheelParts';
 
 interface WheelPuzzle {
   /** Letter at the center — must appear in every accepted word. */
   center: string;
-  /** Outer ring letters, top → right → bottom → left. */
+  /** Outer ring letters arranged clockwise from top (60° spacing). */
   outer: string[];
 }
 
+// 1 center + 6 outer = 7 letters total, matching real WheelRush
+// (utils/dailyChallenge/wordWheelGeneration.ts:5).
+// Hebrew is finals-free (no ם ץ ך ן ף).
 const PUZZLES: Record<string, WheelPuzzle> = {
-  en: { center: 'A', outer: ['T', 'R', 'C', 'E'] },
-  he: { center: 'א', outer: ['ב', 'ם', 'מ', 'ה'] },
-  sv: { center: 'A', outer: ['T', 'R', 'K', 'E'] },
-  ja: { center: 'い', outer: ['ぬ', 'と', 'け', 'ま'] },
-  es: { center: 'A', outer: ['C', 'S', 'M', 'E'] },
+  en: { center: 'A', outer: ['T', 'R', 'C', 'E', 'S', 'N'] },
+  he: { center: 'א', outer: ['ב', 'ה', 'ל', 'מ', 'ר', 'ת'] },
+  sv: { center: 'A', outer: ['T', 'R', 'K', 'E', 'S', 'N'] },
+  ja: { center: 'い', outer: ['ぬ', 'と', 'け', 'ま', 'ね', 'こ'] },
+  es: { center: 'A', outer: ['C', 'S', 'M', 'E', 'L', 'R'] },
 };
 
+const RADIUS_PX = 84; // matches real WheelRush mid-breakpoint orbit
+
 /**
- * Wheel-rush practice sandbox (redesigned 2026-05-05).
+ * Wheel-rush practice sandbox — TAP-BASED to mirror real WheelRush
+ * (`components/daily/WordWheelGame.tsx`). Tap letters to build a word,
+ * tap built tiles to remove, tap submit (or Enter) to validate.
  *
- * Mirrors real wheel-rush mechanic: drag-spell using a center-letter-required
- * constraint. Real dictionary validation via /api/validate-word. No submit/
- * reset buttons (drag-release auto-submits, pointer-down auto-clears). Goal:
- * find 3 valid words.
- *
- * Letter index 0 = center, indices 1..N = outer (top→right→bottom→left).
+ * Reuses real components:
+ *  - `<WheelLetter>` for center + outer rendering (animations, hover)
+ *  - `<WordTile>` for the built-word builder
+ * Validation is local (offline-friendly) but rules match real:
+ *  - center letter must appear (real: WordWheelGame.tsx:462)
+ *  - min 3 letters (real: WordWheelGame.tsx:455)
+ *  - duplicate detection
  */
 export default function PracticeWheelSandbox() {
   const { language } = useLanguage();
@@ -57,7 +71,8 @@ export default function PracticeWheelSandbox() {
   const [beat, setBeat] = useState<MicroTutorialBeat>(tutorialRef.current.currentBeat());
   const advanceBeat = useCallback(() => setBeat(tutorialRef.current.currentBeat()), []);
 
-  const wheel = usePracticeWheelDragSelect({ letters: allLetters });
+  // Built word as ordered list of (letter, originalIndex) — index 0 = center.
+  const [built, setBuilt] = useState<Array<{ letter: string; originIndex: number }>>([]);
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<'ok' | 'bad' | 'dup' | 'noCenter' | null>(null);
 
@@ -86,40 +101,29 @@ export default function PracticeWheelSandbox() {
     }
   }, [isComplete, foundWords.length, language, advanceBeat]);
 
-  const onLetterPointerDown = useCallback(
-    (e: React.PointerEvent<HTMLButtonElement>, idx: number) => {
-      e.preventDefault();
-      try { (e.target as Element).releasePointerCapture?.(e.pointerId); } catch { /* ignore */ }
-      wheel.clear();
-      setFeedback(null);
-      wheel.onLetterEnter(idx);
-      tutorialRef.current.dispatch({ type: 'drag-started' });
-      advanceBeat();
-    },
-    [wheel, advanceBeat],
-  );
+  const usedIndices = useMemo(() => new Set(built.map((b) => b.originIndex)), [built]);
+  const word = useMemo(() => built.map((b) => b.letter).join(''), [built]);
 
-  const onLetterPointerEnter = useCallback(
-    (idx: number) => {
-      wheel.onLetterEnter(idx);
-    },
-    [wheel],
-  );
+  const onLetterPress = useCallback((_letter: string, idx: number, _el: HTMLButtonElement) => {
+    if (usedIndices.has(idx)) return; // tap-to-remove handled on WordTile
+    setBuilt((prev) => [...prev, { letter: allLetters[idx], originIndex: idx }]);
+    setFeedback(null);
+    tutorialRef.current.dispatch({ type: 'drag-started' });
+    advanceBeat();
+  }, [usedIndices, allLetters, advanceBeat]);
 
-  const onContainerPointerUp = useCallback(async () => {
-    const word = wheel.word();
-    if (word.length < 2) {
-      wheel.clear();
-      return;
-    }
+  const onTileRemove = useCallback((tileIndex: number) => {
+    setBuilt((prev) => prev.filter((_, i) => i !== tileIndex));
+  }, []);
+
+  const onSubmit = useCallback(async () => {
+    if (word.length < 3) return; // mirrors real (WordWheelGame.tsx:455)
     if (!word.includes(puzzle.center)) {
       setFeedback('noCenter');
-      wheel.clear();
       return;
     }
     if (foundWords.includes(word)) {
       setFeedback('dup');
-      wheel.clear();
       return;
     }
     const result = await validator.check(word);
@@ -130,24 +134,30 @@ export default function PracticeWheelSandbox() {
         return next;
       });
       setFeedback('ok');
-      const tilePositions = wheel.path.map((i) => {
-        const el = document.querySelector(`[data-testid="practice-letter-${i}"]`) as Element | null;
+      const tilePositions = built.map((b) => {
+        const el = document.querySelector(`[data-wheel-index="${b.originIndex}"]`) as Element | null;
         const rect = el?.getBoundingClientRect();
         return { x: rect?.left ?? 0, y: rect?.top ?? 0, el: el ?? document.createElement('div') };
       });
       juice.triggerWordFound(tilePositions);
       tutorialRef.current.dispatch({ type: 'word-found' });
       advanceBeat();
+      setBuilt([]);
     } else {
       setFeedback('bad');
-      const tile = document.querySelector(`[data-testid="practice-letter-${wheel.path[0]}"]`);
-      if (tile) juice.triggerInvalid(tile);
+      const el = document.querySelector(`[data-wheel-index="${built[0]?.originIndex}"]`);
+      if (el) juice.triggerInvalid(el);
     }
-    wheel.clear();
-  }, [wheel, puzzle.center, foundWords, validator, juice, language, advanceBeat]);
+  }, [word, puzzle.center, foundWords, validator, juice, language, built, advanceBeat]);
 
-  const currentWord = useMemo(() => wheel.word(), [wheel]);
-  const selectedSet = useMemo(() => new Set(wheel.path), [wheel.path]);
+  // Submit-on-Enter for keyboard players (parity with real WheelRush).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') onSubmit();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onSubmit]);
 
   const mascotReaction: PracticeMascotMood = isComplete
     ? 'celebrate'
@@ -157,14 +167,8 @@ export default function PracticeWheelSandbox() {
         ? 'wrong'
         : 'idle';
 
-  const RADIUS = 70;
-
   return (
-    <div
-      className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3"
-      onPointerUp={onContainerPointerUp}
-      onPointerLeave={onContainerPointerUp}
-    >
+    <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3">
       <PracticePixiFx ref={fxRef} />
       <PracticeMascotReaction mode="wheelRush" reaction={mascotReaction} />
       <PracticeModeNav current="wheelRush" />
@@ -176,6 +180,8 @@ export default function PracticeWheelSandbox() {
         {foundWords.length}/{PRACTICE_GOALS.wheelRush}
       </div>
 
+      <PracticeInstructions mode="wheelRush" />
+
       <PracticeMicroTip
         beat={beat}
         onDismiss={() => {
@@ -184,62 +190,77 @@ export default function PracticeWheelSandbox() {
         }}
       />
 
-      <div data-testid="practice-wheel" className="relative w-48 h-48 touch-none">
-        {/* Center letter (index 0) */}
-        <button
-          type="button"
-          data-testid="practice-letter-0"
-          onPointerDown={(e) => onLetterPointerDown(e, 0)}
-          onPointerEnter={() => onLetterPointerEnter(0)}
-          className={
-            'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full border-2 border-neo-black font-neo-display font-black text-2xl shadow-hard-sm transition-transform ' +
-            (selectedSet.has(0)
-              ? 'bg-neo-lime text-neo-black scale-95'
-              : 'bg-neo-cyan text-neo-black')
-          }
-        >
-          {puzzle.center}
-        </button>
-        {/* Outer letters (indices 1..N) */}
+      {/* Wheel — uses real WheelLetter for visual parity. */}
+      <div data-testid="practice-wheel" className="relative w-56 h-56 sm:w-64 sm:h-64">
+        <WheelLetter
+          letter={puzzle.center}
+          isCenter
+          index={0}
+          isUsed={usedIndices.has(0)}
+          onPress={onLetterPress}
+        />
         {puzzle.outer.map((letter, i) => {
           const idx = i + 1;
-          const angle = i * 90;
           return (
-            <button
+            <WheelLetter
               key={`${letter}-${i}`}
-              type="button"
-              data-testid={`practice-letter-${idx}`}
-              onPointerDown={(e) => onLetterPointerDown(e, idx)}
-              onPointerEnter={() => onLetterPointerEnter(idx)}
-              style={{
-                transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-${RADIUS}px) rotate(${-angle}deg)`,
-              }}
-              className={
-                'absolute top-1/2 left-1/2 w-12 h-12 rounded-neo border-2 border-neo-black font-neo-display font-black text-xl shadow-hard-sm transition-transform ' +
-                (selectedSet.has(idx)
-                  ? 'bg-neo-lime text-neo-black scale-95'
-                  : 'bg-neo-cream text-neo-black')
-              }
-            >
-              {letter}
-            </button>
+              letter={letter}
+              isCenter={false}
+              index={idx}
+              angle={i * (360 / puzzle.outer.length)}
+              radius={RADIUS_PX}
+              isUsed={usedIndices.has(idx)}
+              onPress={onLetterPress}
+            />
           );
         })}
       </div>
 
-      <div
-        data-testid="practice-current-word"
-        className="min-h-[2rem] font-neo-display font-black text-xl text-neo-cream tracking-wider"
-      >
-        {currentWord}
+      {/* Built-word builder — uses real WordTile (tap to remove). */}
+      <div className="flex items-end gap-1 min-h-[3rem]" data-testid="practice-built-word">
+        <AnimatePresence mode="popLayout">
+          {built.map((b, i) => (
+            <WordTile
+              key={`${b.originIndex}-${i}`}
+              letter={b.letter}
+              index={i}
+              isCenter={b.originIndex === 0}
+              onRemove={onTileRemove}
+            />
+          ))}
+        </AnimatePresence>
+        {word.length >= 3 && (
+          <button
+            type="button"
+            data-testid="practice-wheel-submit"
+            onClick={onSubmit}
+            aria-label="submit"
+            className="ms-1 inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full border-3 border-neo-black bg-neo-lime text-neo-black shadow-hard active:translate-y-px active:shadow-hard-pressed"
+          >
+            <Check className="w-5 h-5" aria-hidden />
+          </button>
+        )}
       </div>
 
+      {/* Found words — last-found highlight matches real
+          (WordWheelGame.tsx:951–985). */}
       <ul className="flex flex-wrap gap-1.5 min-h-[1.5rem] w-full">
-        {foundWords.map((w) => (
-          <li key={w} className="px-2 py-0.5 bg-neo-purple/20 border border-neo-purple/40 rounded text-neo-purple text-xs font-neo-display font-bold">
-            {w}
-          </li>
-        ))}
+        {foundWords.map((w, i) => {
+          const isLast = i === foundWords.length - 1;
+          return (
+            <li
+              key={w}
+              className={
+                'px-2 py-0.5 rounded border text-xs font-neo-display font-bold transition-colors ' +
+                (isLast
+                  ? 'bg-neo-lime/20 border-neo-lime text-neo-lime'
+                  : 'bg-neo-navy-light border-neo-black/40 text-neo-cream')
+              }
+            >
+              {w}
+            </li>
+          );
+        })}
       </ul>
 
       {isComplete && <PracticeCompleteBanner mode="wheelRush" />}

@@ -38,3 +38,30 @@ describe('PracticeHubClient invite banner', () => {
     expect(screen.queryByTestId('pending-room-banner')).not.toBeInTheDocument();
   });
 });
+
+describe('PracticeHubClient quick-start + skip CTAs', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+    localStorage.clear();
+  });
+
+  it('renders Quick Start + Skip All buttons above the tile grid', () => {
+    wrap(<PracticeHubClient locale="en" />);
+    expect(screen.getByTestId('practice-hub-ctas')).toBeInTheDocument();
+    expect(screen.getByTestId('practice-hub-quick-start')).toBeInTheDocument();
+    expect(screen.getByTestId('practice-hub-skip-all')).toBeInTheDocument();
+  });
+
+  it('Quick Start button is the primary CTA (lime background, neo border)', () => {
+    wrap(<PracticeHubClient locale="en" />);
+    const quick = screen.getByTestId('practice-hub-quick-start');
+    expect(quick.className).toMatch(/bg-neo-lime/);
+    expect(quick.className).toMatch(/border-3/);
+  });
+
+  it('Skip All button is the secondary CTA (transparent, dimmed text)', () => {
+    wrap(<PracticeHubClient locale="en" />);
+    const skip = screen.getByTestId('practice-hub-skip-all');
+    expect(skip.className).toMatch(/bg-transparent/);
+  });
+});

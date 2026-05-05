@@ -4972,6 +4972,24 @@ const es = {
     }
   },
   "practice": {
+    "instructions": {
+      "title": "Cómo jugar",
+      "classic": {
+        "line1": "Arrastra letras conectadas para formar una palabra.",
+        "line2": "Las diagonales valen — las esquinas cuentan como conectadas.",
+        "line3": "Encuentra 3 palabras reales para terminar."
+      },
+      "wordHunt": {
+        "line1": "Encuentra la palabra objetivo que aparece sobre el tablero.",
+        "line2": "Arrastra letras conectadas en el orden correcto.",
+        "line3": "Las palabras extra también cuentan — junta cuantas quieras."
+      },
+      "wheelRush": {
+        "line1": "Cada palabra debe usar la letra del centro.",
+        "line2": "Arrastra por cualquier letra alrededor de la rueda.",
+        "line3": "Encuentra 3 palabras reales para terminar."
+      }
+    },
     "modifier": {
       "todayLabel": "Reto de hoy",
       "bonus": "Bonificación {{x}}×",
@@ -10096,9 +10114,9 @@ const es = {
       "feature3": "Pistas",
       "intro": { "greet": "Una palabra a la vez. Tú puedes." },
       "tutorial": {
-        "tip1": "Toca letras para deletrear el objetivo",
-        "tip2": "Casilla verde = lugar correcto",
-        "tip3": "Casilla amarilla = lugar incorrecto"
+        "tip1": "Arrastra letras conectadas para formar la palabra objetivo",
+        "tip2": "Las palabras extra también cuentan — junta cuantas quieras",
+        "tip3": "Sin temporizador ni barra de vida — explora con calma"
       }
     },
     "wheelRush": {
@@ -10116,11 +10134,11 @@ const es = {
     },
     "intro": {
       "cta": "Vamos",
-      "skip": "Saltar"
+      "skip": "Saltar tutorial"
     },
     "tutorial": {
       "title": "Cómo funciona",
-      "cta": "Entendido, probar"
+      "cta": "¡A jugar!"
     },
     "random": "Aleatorio",
     "randomDescription": "¡Sorpréndeme! Modo aleatorio en cada ronda.",
@@ -10139,6 +10157,8 @@ const es = {
     "title": "Práctica",
     "subtitle": "Un lugar tranquilo para aprender cada modo",
     "greet": "¡Elige un modo y juega!",
+    "quickStartCta": "Inicio rápido",
+    "skipAllCta": "Saltar — ya sé cómo jugar",
     "progress": "{done} de {total} modos completos",
     "progressLabel": "Tu progreso",
     "stepCount": "{done}/{total}",

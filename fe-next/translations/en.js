@@ -5037,6 +5037,24 @@ const en = {
     }
   },
   "practice": {
+    "instructions": {
+      "title": "How to play",
+      "classic": {
+        "line1": "Drag connected letters to spell a word.",
+        "line2": "Diagonals work — corners count as connected.",
+        "line3": "Find 3 real words to finish."
+      },
+      "wordHunt": {
+        "line1": "Find the target word shown above the grid.",
+        "line2": "Drag connected letters in the right order.",
+        "line3": "Bonus words count too — collect as many as you like."
+      },
+      "wheelRush": {
+        "line1": "Every word must use the center letter.",
+        "line2": "Drag through any letters around the wheel.",
+        "line3": "Find 3 real words to finish."
+      }
+    },
     "modifier": {
       "todayLabel": "Today's twist",
       "bonus": "{{x}}× bonus",
@@ -10444,9 +10462,9 @@ const en = {
       feature3: "Hints",
       intro: { greet: "One word at a time. You've got this." },
       tutorial: {
-        tip1: "Tap letters to spell the target",
-        tip2: "Green tile = right spot",
-        tip3: "Yellow tile = wrong spot, right letter"
+        tip1: "Drag connected letters to spell the target word",
+        tip2: "Bonus words count too — find as many as you like",
+        tip3: "No timer, no life bar — explore freely"
       }
     },
     wheelRush: {
@@ -10464,11 +10482,11 @@ const en = {
     },
     intro: {
       cta: "Let's go",
-      skip: "Skip intro"
+      skip: "Skip tutorial"
     },
     tutorial: {
       title: "How it works",
-      cta: "Got it, try it"
+      cta: "Let's play!"
     },
     random: "Random",
     randomDescription: "Surprise me! Pick a random mode each round.",
@@ -10487,6 +10505,8 @@ const en = {
     "title": "Practice",
     "subtitle": "A quiet place to learn each mode",
     "greet": "Pick a mode and play!",
+    "quickStartCta": "Quick start",
+    "skipAllCta": "Skip — I know how to play",
     "progress": "{done} of {total} modes complete",
     "progressLabel": "Your progress",
     "stepCount": "{done}/{total}",

@@ -65,6 +65,16 @@ export function getCompletedPracticeModes(locale: string): Set<PracticeMode> {
   return safeRead(locale) as Set<PracticeMode>;
 }
 
+/**
+ * Mark every practice mode as complete without ticking the daily streak.
+ * Used by the hub "Skip All" CTA — bypasses tutorials on revisit while
+ * being honest about what the user actually played (no fake streak credit).
+ */
+export function markAllPracticeModesSkipped(locale: string): void {
+  const set = new Set<string>(['classic', 'wordHunt', 'wheelRush']);
+  safeWrite(locale, set);
+}
+
 export function resetPracticeProgress(locale: string): void {
   try {
     if (typeof window === 'undefined') return;

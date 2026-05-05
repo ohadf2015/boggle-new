@@ -46,11 +46,15 @@ const dragGrid = (cells: Array<[number, number]>) => {
   fireEvent.pointerUp(tiles[tiles.length - 1]);
 };
 
-const dragWheel = (indices: number[]) => {
-  const tiles = indices.map((i) => screen.getByTestId(`practice-letter-${i}`));
-  fireEvent.pointerDown(tiles[0]);
-  for (let k = 1; k < tiles.length; k++) fireEvent.pointerEnter(tiles[k]);
-  fireEvent.pointerUp(tiles[tiles.length - 1]);
+// Wheel switched from drag→tap on 2026-05-05 to mirror real WheelRush.
+const tapWheel = (indices: number[]) => {
+  for (const i of indices) {
+    const el = document.querySelector(`[data-wheel-index="${i}"]`) as HTMLElement | null;
+    if (!el) throw new Error(`wheel letter ${i} not found`);
+    fireEvent.click(el);
+  }
+  const submit = screen.queryByTestId('practice-wheel-submit');
+  if (submit) fireEvent.click(submit);
 };
 
 beforeEach(() => {
@@ -114,13 +118,13 @@ describe('practice sandbox telemetry', () => {
       expect.objectContaining({ mode: 'wheelRush' }),
     );
 
-    // EN wheel: letters[0]=A (center), [1]=T [2]=R [3]=C [4]=E
-    // Build 3 valid words containing center A:
-    dragWheel([3, 0, 1]); // C-A-T → CAT
+    // EN wheel (7 letters): center=A (idx 0), outer T R C E S N (idx 1..6).
+    // Tap 3 valid words containing center A:
+    tapWheel([3, 0, 1]); // C-A-T → CAT
     await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(1));
-    dragWheel([2, 0, 1]); // R-A-T → RAT
+    tapWheel([2, 0, 1]); // R-A-T → RAT
     await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(2));
-    dragWheel([0, 3, 4]); // A-C-E → ACE
+    tapWheel([0, 3, 4]); // A-C-E → ACE
     await waitFor(() => {
       expect(eventNames()).toContain('practice_completed');
     });
