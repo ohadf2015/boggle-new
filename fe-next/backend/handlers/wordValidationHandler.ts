@@ -303,6 +303,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     autoValidated: true,
     isFirstFinder,
     fromLesson: fromLesson,
+    inputMethod,
     ...(goldenBonus > 0 ? { goldenBonus } : {}),
     ...(isSpecialWord ? { isSpecialWord: true } : {}),
     // Merged blast data (Fix 2): includes tile bonus, moves, combo info in single emit
@@ -373,6 +374,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     score: totalScore,
     comboLevel: safeComboLevel,
     isFirstFinder,
+    inputMethod,
     // Merged combo sync (Fix 2): combo type embedded in playerFoundWord instead of separate event
     ...(comboType ? { comboSync: { comboType, username } } : {}),
   });
