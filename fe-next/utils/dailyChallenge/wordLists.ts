@@ -74,77 +74,54 @@ export const BONUS_WORD_LISTS: Record<Language, string[]> = {
  */
 export const TARGET_WORD_LISTS: Record<Language, string[]> = {
   en: [
-    // ── Animals & Creatures (30) ──
-    'BIRD', 'FISH', 'WOLF', 'BEAR', 'FROG', 'DEER', 'DUCK', 'HAWK',
-    'LYNX', 'SWAN', 'CROW', 'MOTH', 'WASP', 'CRAB', 'SEAL', 'TOAD',
-    'DOVE', 'MOLE', 'NEWT', 'WREN', 'OTTER', 'RAVEN', 'CRANE', 'BISON',
-    'SHARK', 'WHALE', 'EAGLE', 'TIGER', 'HORSE', 'SNAKE',
-    // ── Nature & Landscape (28) ──
-    'MOON', 'STAR', 'RAIN', 'WIND', 'SNOW', 'TREE', 'ROCK', 'SAND',
-    'HILL', 'LAKE', 'WAVE', 'CAVE', 'PATH', 'PEAK', 'POND', 'REEF',
-    'LEAF', 'FERN', 'VINE', 'MOSS', 'DUNE', 'GLEN', 'TIDE', 'MIST',
+    // Window: 5-6 letters only (MIN_ANSWER_LENGTH=5, MAX_TARGET_WORD_LENGTH=6).
+    // ── Animals & Creatures ──
+    'OTTER', 'RAVEN', 'CRANE', 'BISON', 'SHARK', 'WHALE', 'EAGLE',
+    'TIGER', 'HORSE', 'SNAKE',
+    // ── Nature & Landscape ──
     'CLOUD', 'RIVER', 'OCEAN', 'BEACH',
-    // ── Food & Flavor (20) ──
-    'CAKE', 'MILK', 'SOUP', 'RICE', 'BEAN', 'CORN', 'PLUM', 'PEAR',
-    'LIME', 'MINT', 'PEACH', 'GRAPE', 'LEMON', 'BREAD', 'OLIVE', 'CREAM',
+    // ── Food & Flavor ──
+    'PEACH', 'GRAPE', 'LEMON', 'BREAD', 'OLIVE', 'CREAM',
     'FEAST', 'SPICE', 'MANGO', 'COCOA',
-    // ── Magic & Fantasy (20) ──
-    'WAND', 'RUNE', 'GLOW', 'FIRE', 'BOLT', 'FLAME', 'SPARK', 'CHARM',
-    'SPELL', 'GHOST', 'FAIRY', 'QUEST', 'REALM', 'CURSE', 'FORGE',
-    'DRAGON', 'KNIGHT', 'WIZARD', 'PIRATE', 'CASTLE',
-    // ── Colors & Materials (16) ──
-    'GOLD', 'IRON', 'JADE', 'RUBY', 'SILK', 'WOOL', 'CLAY', 'COAL',
-    'TEAL', 'OPAL', 'PEARL', 'CORAL', 'AMBER', 'IVORY', 'SILVER', 'BRONZE',
-    // ── Actions & Movement (16) ──
-    'DASH', 'LEAP', 'SPIN', 'DIVE', 'SOAR', 'ROAM', 'BREW', 'BAKE',
+    // ── Magic & Fantasy ──
+    'FLAME', 'SPARK', 'CHARM', 'SPELL', 'GHOST', 'FAIRY', 'QUEST',
+    'REALM', 'CURSE', 'FORGE', 'DRAGON', 'KNIGHT', 'WIZARD', 'PIRATE',
+    'CASTLE',
+    // ── Colors & Materials ──
+    'PEARL', 'CORAL', 'AMBER', 'IVORY', 'SILVER', 'BRONZE',
+    // ── Actions & Movement ──
     'DANCE', 'BLOOM', 'BLAZE', 'SURGE', 'SWOOP', 'GLIDE', 'SWIFT', 'BRAVE',
-    // ── Emotions & Character (14) ──
-    'HOPE', 'WISH', 'CALM', 'GRIT', 'SOUL', 'BOLD', 'KIND',
+    // ── Emotions & Character ──
     'DREAM', 'PRIDE', 'HEART', 'PEACE', 'NOBLE', 'GRACE', 'GRAND',
-    // ── Objects & Tools (16) ──
-    'DRUM', 'BELL', 'HORN', 'SONG', 'COIN', 'MASK', 'RING', 'KITE',
-    'SHIP', 'ARCH', 'DOME', 'HELM', 'CROWN', 'SWORD', 'TORCH', 'SHELL',
-    // ── Places & Structures (18) ──
-    'NEST', 'FORT', 'BARN', 'MILL', 'PIER', 'TENT', 'LAIR', 'HIVE',
+    // ── Objects & Tools ──
+    'CROWN', 'SWORD', 'TORCH', 'SHELL',
+    // ── Places & Structures ──
     'TOWER', 'GROVE', 'TRAIL', 'SHORE', 'CLIFF', 'ARENA', 'GARDEN',
     'FOREST', 'ISLAND', 'VALLEY',
-    // ── Weather & Sky (12) ──
-    'DAWN', 'DUSK', 'GUST', 'FOAM', 'DUST', 'FROST', 'STORM', 'SHADE',
-    'SUNSET', 'BREEZE', 'MEADOW', 'STREAM',
-    // ── Extra vivid words (10) ──
-    'MAZE', 'ECHO', 'HERO', 'SAGE', 'CHEF', 'KING', 'TALE', 'MYTH',
+    // ── Weather & Sky ──
+    'FROST', 'STORM', 'SHADE', 'SUNSET', 'BREEZE', 'MEADOW', 'STREAM',
+    // ── Extra vivid words ──
     'SCOUT', 'MEDAL',
   ],
   he: [
-    // ── Hebrew 4-letter targets (min 4 chars for adequate challenge) ──
-    // 3-letter words (בית, מים, etc.) are in SAME_LENGTH_HELPER_WORDS
-    'עולם', 'חלון', 'כוכב', 'ציפור', 'דגים', 'ארנב', 'אריה', 'עוגה',
-    'ברזל', 'גבעה', 'מכתב', 'סיפור', 'חלום', 'גיבור', 'אדמה', 'שמים',
-    'לילה', 'בוקר', 'שולחן', 'מנורה', 'חתול', 'מורה', 'כיסא', 'תפוח',
-    'מטבע', 'טירה', 'משחק', 'סירה',
-    'מגדל', 'ילדים', 'גלידה', 'תפוז',
-    // ── Hebrew 5-letter ──
-    'נחושת', 'מחשב', 'טלפון', 'חיוך', 'משפחה', 'חברים', 'אהבה', 'שמחה',
-    'בריאות', 'תלמיד', 'ארמון', 'אביב', 'חורף', 'אומץ', 'שלום',
-    'חופש', 'שוקולד', 'פסנתר', 'מוזיקה', 'כדורגל',
-    'הרפתקה', 'מדבר', 'סתיו', 'מלכה',
+    // Window: 5-6 letters only. NOTE: pool is small (~19 words) — needs native
+    // expansion to add ~30 more vivid 5-6-letter Hebrew nouns.
+    'ציפור', 'סיפור', 'גיבור', 'שולחן', 'מנורה', 'ילדים', 'גלידה',
+    'נחושת', 'טלפון', 'משפחה', 'חברים',
+    'בריאות', 'תלמיד', 'ארמון',
+    'שוקולד', 'פסנתר', 'מוזיקה', 'כדורגל',
+    'הרפתקה',
   ],
   sv: [
-    // ── Swedish 4-letter (concrete nouns) ──
-    'HUND', 'KATT', 'STEN', 'BERG', 'REGN', 'VIND', 'NATT', 'LJUS',
-    'DÖRR', 'BORD', 'STOL', 'GLAS', 'BOLL', 'FISK', 'BLAD', 'SNÖN',
-    'MÖRK', 'TÄLT', 'KUNG', 'BORG', 'TORN', 'SÅNG', 'DANS', 'GULL',
-    'HJUL', 'MASK', 'BÅGE', 'VÄGG', 'GOLV', 'SÄNG',
+    // Window: 5-6 letters only.
     // ── Swedish 5-letter ──
     'FÅGEL', 'SOLEN', 'KRAFT', 'PLATS', 'DRAKE', 'SVÄRD', 'SLOTT',
-    'NATUR', 'BJÖRN', 'MOLN', 'FLOD', 'FRUKT', 'BRÖD', 'FROST',
-    'DRÖM', 'LJUD', 'HÄST', 'BLOM', 'HIMMEL', 'STRAND',
-    'BÄVER', 'HJÄLM', 'STRID', 'GULD', 'MÅNEN',
-    'KLAR', 'RUNDA', 'VATTEN', 'VÄRLD', 'VALEN',
+    'NATUR', 'BJÖRN', 'FRUKT', 'FROST', 'HIMMEL', 'STRAND',
+    'BÄVER', 'HJÄLM', 'STRID', 'MÅNEN', 'RUNDA', 'VATTEN', 'VÄRLD',
+    'VALEN',
     // ── Swedish 6-letter ──
     'MORGON', 'KVÄLL', 'VINTER', 'SOMMAR', 'SKOGEN', 'FJÄRIL',
-    'KANIN', 'GNISTA', 'HONUNG',
-    'SILVER', 'BLOMMA', 'SJÖMAN',
+    'KANIN', 'GNISTA', 'HONUNG', 'SILVER', 'BLOMMA', 'SJÖMAN',
   ],
   ja: [
     // ── Japanese 2-character (common compounds) ──
@@ -163,18 +140,14 @@ export const TARGET_WORD_LISTS: Record<Language, string[]> = {
     '味噌汁', 'お弁当', '花吹雪', '満開桜', '修学旅行',
   ],
   es: [
-    // ── Spanish 4-letter (vivid nouns) ──
-    'CASA', 'AGUA', 'VIDA', 'AMOR', 'MESA', 'LUNA', 'FLOR', 'ROSA',
-    'GATO', 'PATO', 'PERA', 'MANO', 'CARA', 'BOCA', 'LAGO', 'RANA',
-    'LOBO', 'NIDO', 'VELA', 'RAYO', 'ARCO', 'MAPA', 'NUBE', 'MIEL',
-    'PIEL', 'NAVE', 'COPO', 'HILO', 'DADO', 'VINO',
+    // Window: 5-6 letters only.
     // ── Spanish 5-letter ──
     'LIBRO', 'MUNDO', 'NOCHE', 'PLAYA', 'CAMPO', 'MONTE', 'LECHE', 'AMIGO',
     'CIELO', 'ARBOL', 'TIGRE', 'PERRO', 'FUEGO', 'HIELO', 'NIEVE',
     'BARCO', 'TORRE', 'REINA', 'BRUJA', 'MAGIA', 'PIEDRA', 'ARENA',
     'SELVA', 'BOSQUE', 'CUEVA', 'GLOBO', 'DANZA', 'CANTO', 'FRESA',
-    'LIMON', 'MANGO', 'ABEJA', 'BUHO', 'CORAL', 'CONCHA', 'ESPADA',
-    'ISLA', 'VIENTO', 'CABRA', 'TIERRA',
+    'LIMON', 'MANGO', 'ABEJA', 'CORAL', 'CONCHA', 'ESPADA',
+    'VIENTO', 'CABRA', 'TIERRA',
     // ── Spanish 6-letter ──
     'FIESTA', 'COCINA', 'JARDIN', 'TIEMPO', 'PLANTA',
     'DRAGON', 'PIRATA', 'TESORO', 'CORONA', 'ESCUDO', 'CAMINO',

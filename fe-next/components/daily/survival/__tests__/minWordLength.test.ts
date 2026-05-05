@@ -2,12 +2,12 @@
  * Tests for Word Hunt minimum/maximum word length enforcement
  *
  * Two distinct minimums:
- * 1. Target word: 4+ letters (except Japanese 2+) - enforced during puzzle generation
- * 2. Discovery words: 3-8 letters - filters trivial 2-letter entries and absurdly long paths
+ * 1. Target word: 5-6 letters (except Japanese 2+) - enforced during puzzle generation
+ * 2. Discovery words: 2-8 letters - filters trivial 1-letter entries and absurdly long paths
  *
  * Expected Behavior:
- * - For all languages: Accept 3-8 letter discovered words
- * - Target word generation enforces 4+ (except Japanese) separately
+ * - For all languages: Accept 2-8 letter discovered words
+ * - Target word generation enforces 5+ (except Japanese) separately
  */
 
 import { renderHook, act, waitFor } from '@testing-library/react';
@@ -88,11 +88,11 @@ describe('Word Hunt Minimum Word Length', () => {
   });
 
   describe('Constants', () => {
-    it('should have target word minimum of 4 for non-Japanese', () => {
-      expect(MIN_ANSWER_LENGTH.en).toBeGreaterThanOrEqual(4);
-      expect(MIN_ANSWER_LENGTH.he).toBeGreaterThanOrEqual(4);
-      expect(MIN_ANSWER_LENGTH.sv).toBeGreaterThanOrEqual(4);
-      expect(MIN_ANSWER_LENGTH.es).toBeGreaterThanOrEqual(4);
+    it('should have target word minimum of 5 for non-Japanese', () => {
+      expect(MIN_ANSWER_LENGTH.en).toBeGreaterThanOrEqual(5);
+      expect(MIN_ANSWER_LENGTH.he).toBeGreaterThanOrEqual(5);
+      expect(MIN_ANSWER_LENGTH.sv).toBeGreaterThanOrEqual(5);
+      expect(MIN_ANSWER_LENGTH.es).toBeGreaterThanOrEqual(5);
     });
 
     it('should have target word minimum of 2 for Japanese', () => {

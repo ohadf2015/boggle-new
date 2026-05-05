@@ -76,24 +76,25 @@ export const MAX_WORD_LENGTH = 50;
 
 /**
  * Minimum TARGET word length by language for Daily Challenge word hunt
- * Most languages: 4 letters minimum for adequate challenge difficulty
+ * Most languages: 5 letters minimum — keeps targets vivid + dodges jargon-heavy 4-letter
+ * dictionary fallbacks. Combined with MAX_TARGET_WORD_LENGTH=6 the window is [5,6].
  * Japanese kanji compounds: 2 characters minimum (kanji are complex)
  */
 export const MIN_ANSWER_LENGTH: Record<string, number> = {
-  en: 4,
-  he: 4,
-  sv: 4,
+  en: 5,
+  he: 5,
+  sv: 5,
   ja: 2,
-  es: 4,
+  es: 5,
 };
 
 /**
  * Get minimum TARGET word length for a language in Daily Word Hunt
  * @param language - Language code (en, he, sv, ja, es)
- * @returns Minimum target word length (4 for most languages, 2 for Japanese)
+ * @returns Minimum target word length (5 for most languages, 2 for Japanese)
  */
 export function getMinAnswerLength(language: string): number {
-  return MIN_ANSWER_LENGTH[language] ?? 4;
+  return MIN_ANSWER_LENGTH[language] ?? 5;
 }
 
 /**

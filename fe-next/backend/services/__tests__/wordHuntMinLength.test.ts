@@ -2,7 +2,7 @@
  * Test: Daily Challenge Word Hunt minimum length validation
  *
  * Two distinct minimums:
- * 1. Target word: 4+ letters for non-Japanese, 2+ for Japanese
+ * 1. Target word: 5+ letters for non-Japanese, 2+ for Japanese
  * 2. Discovery words: 2+ letters for ALL languages
  *
  * TARGET_WORD_LISTS should not contain words shorter than the target minimum.
@@ -13,20 +13,20 @@ import { TARGET_WORD_LISTS } from '@/utils/dailyChallenge/wordLists';
 
 describe('Word Hunt Minimum Length Requirements', () => {
   describe('Target word minimums (MIN_ANSWER_LENGTH)', () => {
-    it('should require 4+ letters for English target words', () => {
-      expect(MIN_ANSWER_LENGTH.en).toBeGreaterThanOrEqual(4);
+    it('should require 5+ letters for English target words', () => {
+      expect(MIN_ANSWER_LENGTH.en).toBeGreaterThanOrEqual(5);
     });
 
-    it('should require 4+ letters for Hebrew target words', () => {
-      expect(MIN_ANSWER_LENGTH.he).toBeGreaterThanOrEqual(4);
+    it('should require 5+ letters for Hebrew target words', () => {
+      expect(MIN_ANSWER_LENGTH.he).toBeGreaterThanOrEqual(5);
     });
 
-    it('should require 4+ letters for Swedish target words', () => {
-      expect(MIN_ANSWER_LENGTH.sv).toBeGreaterThanOrEqual(4);
+    it('should require 5+ letters for Swedish target words', () => {
+      expect(MIN_ANSWER_LENGTH.sv).toBeGreaterThanOrEqual(5);
     });
 
-    it('should require 4+ letters for Spanish target words', () => {
-      expect(MIN_ANSWER_LENGTH.es).toBeGreaterThanOrEqual(4);
+    it('should require 5+ letters for Spanish target words', () => {
+      expect(MIN_ANSWER_LENGTH.es).toBeGreaterThanOrEqual(5);
     });
 
     it('should allow 2+ letters for Japanese target words (kanji exception)', () => {
@@ -50,10 +50,10 @@ describe('Word Hunt Minimum Length Requirements', () => {
     const nonJapaneseLanguages = ['en', 'sv', 'es', 'he'] as const;
 
     it.each(nonJapaneseLanguages)(
-      'should not contain words shorter than 4 letters for %s',
+      'should not contain words shorter than 5 letters for %s',
       (lang) => {
         const words = TARGET_WORD_LISTS[lang] || [];
-        const tooShort = words.filter(w => w.length < 4);
+        const tooShort = words.filter(w => w.length < 5);
         expect(tooShort).toEqual([]);
       }
     );
