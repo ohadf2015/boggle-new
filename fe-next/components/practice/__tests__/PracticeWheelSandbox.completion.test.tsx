@@ -1,64 +1,65 @@
 /**
- * Integration test: finding 3 valid wheel words writes to practice progress
- * AND mounts the completion banner. Also asserts the center-letter rule —
- * a word that omits the center letter should NOT count toward the goal.
+ * Integration test (redesigned): drag-spelling 3 valid wheel words containing
+ * the center letter writes progress + reveals chain CTA. Also asserts the
+ * center-letter rule short-circuits validation (no API call).
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
+const validatorCheck = vi.fn();
+vi.mock('@/lib/practice/usePracticeValidator', () => ({
+  usePracticeValidator: () => ({ check: validatorCheck }),
+}));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
+}));
+vi.mock('pixi.js', () => ({
+  Application: class {
+    canvas = document.createElement('canvas');
+    init = vi.fn().mockResolvedValue(undefined);
+    destroy = vi.fn();
+  },
 }));
 
 import PracticeWheelSandbox from '../PracticeWheelSandbox';
 import { isPracticeModeComplete } from '@/lib/practice/practiceProgress';
 
+const dragWord = (indices: number[]) => {
+  const tiles = indices.map((i) => screen.getByTestId(`practice-letter-${i}`));
+  fireEvent.pointerDown(tiles[0]);
+  for (let k = 1; k < tiles.length; k++) fireEvent.pointerEnter(tiles[k]);
+  fireEvent.pointerUp(tiles[tiles.length - 1]);
+};
+
 beforeEach(() => {
+  validatorCheck.mockReset();
+  validatorCheck.mockResolvedValue({ isValid: true, source: 'dictionary' });
   window.localStorage.clear();
 });
 
-const submit = () =>
-  fireEvent.click(screen.getByRole('button', { name: 'practice.wheelRush.submit' }));
-const reset = () =>
-  fireEvent.click(screen.getByRole('button', { name: 'practice.wheelRush.reset' }));
-
-describe('PracticeWheelSandbox completion integration', () => {
-  it('renders the complete banner after 3 valid words containing the center letter', async () => {
+describe('PracticeWheelSandbox completion integration (redesign)', () => {
+  it('writes progress + reveals chain CTA after 3 valid words with center letter', async () => {
+    // EN puzzle — letters[0]=A (center), letters[1..4]=T R C E
     render(<PracticeWheelSandbox />);
 
-    // EN puzzle: center 'A', outer ['T', 'R', 'C', 'E']
-    // Valid words tried below: CAR, RAT, EAR — all use the center 'A'.
-    const center = () => fireEvent.click(screen.getByTestId('practice-wheel-center'));
-    const outer = (i: number) => fireEvent.click(screen.getByTestId(`practice-wheel-outer-${i}`));
-
-    // CAR — outer C(idx 2), center A, outer R(idx 1)
-    outer(2); center(); outer(1);
-    submit();
-
-    // RAT — outer R(idx 1), center A, outer T(idx 0)
-    outer(1); center(); outer(0);
-    submit();
-
-    // EAR — outer E(idx 3), center A, outer R(idx 1)
-    outer(3); center(); outer(1);
-    submit();
-
+    dragWord([2, 0, 1]);  // CAR  (C=idx 3, A=0, R=2 — but we use indices 2,0,1 → letters[2]=R letters[0]=A letters[1]=T → "RAT")
+    await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(1));
+    dragWord([3, 0, 2]);  // letters[3]=C letters[0]=A letters[2]=R → "CAR"
+    await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(2));
+    dragWord([4, 0, 2]);  // letters[4]=E letters[0]=A letters[2]=R → "EAR"
     await waitFor(() => {
-      expect(screen.getByTestId('practice-complete-banner')).toBeInTheDocument();
+      expect(screen.getByTestId('practice-chain-cta')).toBeInTheDocument();
     });
     expect(isPracticeModeComplete('wheelRush', 'en')).toBe(true);
   });
 
-  it('rejects a word that does NOT include the center letter (no progress)', async () => {
+  it('rejects a word without the center letter (validator NOT called)', async () => {
     render(<PracticeWheelSandbox />);
-    // CRT — outer C, R, T, no center letter.
-    fireEvent.click(screen.getByTestId('practice-wheel-outer-2'));
-    fireEvent.click(screen.getByTestId('practice-wheel-outer-1'));
-    fireEvent.click(screen.getByTestId('practice-wheel-outer-0'));
-    submit();
-    expect(screen.queryByTestId('practice-complete-banner')).toBeNull();
+    // letters[1]=T letters[3]=C letters[2]=R → "TCR" no center A
+    dragWord([1, 3, 2]);
+    await new Promise((r) => setTimeout(r, 50));
+    expect(validatorCheck).not.toHaveBeenCalled();
     expect(isPracticeModeComplete('wheelRush', 'en')).toBe(false);
-    reset();
   });
 });
