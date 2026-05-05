@@ -7,14 +7,26 @@ import type { BlastTileType } from './types';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTileTooltip } from './utils/blastTileTooltips';
-import { TILE_VISUALS, CLEARING_COLORS, CLEARING_ANIMS, TILE_ACCENTS } from './blastTileVisuals';
+import { TILE_VISUALS, TILE_ACCENTS } from './blastTileVisuals';
 import { useExperiment } from '@/hooks/useExperiment';
 import styles from './BlastTile.module.css';
 
-const TILE_TEXT_SHADOW_STYLE = { textShadow: '0 1px 0 rgba(255,255,255,0.4), 0 2px 3px rgba(0,0,0,0.2)' } as const;
-const TILE_TEXT_SHADOW_LIGHT_STYLE = { textShadow: '0 1px 2px rgba(0,0,0,0.4)' } as const;
-
 export type TilePhase = 'idle' | 'selected' | 'anticipation' | 'clearing' | 'falling' | 'appearing' | 'landing';
+
+import {
+  TILE_TEXT_SHADOW_STYLE,
+  TILE_TEXT_SHADOW_LIGHT_STYLE,
+  MULTIPLIER_BADGES,
+  PORTAL_PAIR_COLORS,
+  ANIMATED_PHASES,
+  RARE_LETTERS,
+  getCrackClass,
+  getSpecialEffectClasses,
+  getPhaseStyles,
+  getPhaseClasses,
+  getColorTagGlow,
+  getSelectionStyles,
+} from './blastTileHelpers';
 
 export interface BlastTileProps {
   letter: string;
@@ -61,141 +73,6 @@ export interface BlastTileProps {
   colorTag?: 'pink' | 'cyan' | 'lime';
   onClick?: () => void;
 }
-
-/** Multiplier badges for score-multiplier tiles */
-const MULTIPLIER_BADGES: Partial<Record<BlastTileType, string>> = {
-  gold: '×3',
-  diamond: '×5',
-};
-
-/** Portal pair colors — each pair gets a distinct dot color */
-const PORTAL_PAIR_COLORS = ['#FF6B9D', '#00E5FF', '#FFD700', '#B388FF', '#69F0AE'];
-
-/** Multi-hit tiles: initial hit counts for crack state calculation */
-const MULTI_HIT_MAX: Partial<Record<BlastTileType, number>> = {
-  ice: 2,
-  prism: 2,
-  gem: 3,
-  frozen: 2,
-};
-
-/**
- * Returns crack-state CSS class based on damage progression.
- * - "cracked": tile has taken damage but isn't about to break
- * - "critical": tile is one hit from breaking (gem only, since gem has 3 max hits)
- */
-function getCrackClass(type: BlastTileType, hitsRemaining?: number): string {
-  const maxHits = MULTI_HIT_MAX[type];
-  if (!maxHits || hitsRemaining == null || hitsRemaining >= maxHits) return '';
-  if (hitsRemaining <= 1 && maxHits >= 3) return 'blast-tile-critical';
-  if (hitsRemaining < maxHits) return 'blast-tile-cracked';
-  return '';
-}
-
-/** Type-specific visual effect classes for gem/frozen/ice tiles */
-function getSpecialEffectClasses(type: BlastTileType, phase: TilePhase, hitsRemaining?: number): string {
-  const classes: string[] = [];
-
-  if (type === 'gem') {
-    if (hitsRemaining != null && hitsRemaining > 0) classes.push(`blast-tile-gem-glow-${hitsRemaining}`);
-    if (phase === 'clearing') classes.push('blast-tile-gem-golden-flash');
-  } else if (type === 'frozen') {
-    if (hitsRemaining != null && hitsRemaining < (MULTI_HIT_MAX.frozen ?? 2)) classes.push('blast-tile-frozen-cracked');
-    if (phase === 'clearing') classes.push('blast-tile-frozen-emerge');
-  } else if (type === 'ice') {
-    classes.push('blast-tile-ice-shimmer');
-  }
-
-  return classes.join(' ');
-}
-
-/** Letters that get a rare glow effect — high Scrabble-value letters */
-const RARE_LETTERS = new Set(['Q', 'Z', 'X', 'J']);
-
-const ANIMATED_PHASES = new Set<TilePhase>(['anticipation', 'clearing', 'falling', 'appearing', 'landing']);
-
-function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: number, clearRotate?: number, spawnOffset?: number): React.CSSProperties {
-  const clearing = CLEARING_COLORS[type];
-  switch (phase) {
-    case 'anticipation':
-      return { filter: 'brightness(1.4)', transform: 'scale(1.1)', transition: 'all 120ms ease-out' };
-    case 'clearing': {
-      const clearingAnim = CLEARING_ANIMS[type];
-      const isLightning = type === 'lightning';
-      return {
-        transform: clearingAnim?.transform ?? `scale(1.3) rotate(${clearRotate ?? 0}deg)`,
-        opacity: 0,
-        filter: clearingAnim?.filter,
-        transition: clearingAnim?.transition ?? 'all 180ms ease-in',
-        ...(clearing && { background: clearing.background, border: clearing.border }),
-        ...(isLightning && {
-          background: 'white',
-          boxShadow: '0 0 24px 8px rgba(0,255,255,0.7), 0 0 48px 16px rgba(255,255,255,0.4)',
-          animation: 'blastLightningFlash 160ms ease-in forwards',
-        }),
-      };
-    }
-    case 'falling': {
-      // Tile is at its destination row; CSS keyframe animates FROM --fall-from TO 0
-      // Duration scales with distance for realistic gravity feel
-      const dist = fallOffset ?? 0;
-      const fallDuration = Math.max(250, 180 + dist * 0.8);
-      return {
-        animation: `blastTileFall ${fallDuration}ms cubic-bezier(0.4, 0, 0.6, 1) forwards`,
-        '--fall-from': `-${dist}px`,
-      } as React.CSSProperties;
-    }
-    case 'appearing':
-      return {
-        '--spawn-from': `${-(spawnOffset ?? 60)}px`,
-        opacity: 0,
-        animation: 'blastTileAppear 400ms cubic-bezier(0.22, 1, 0.36, 1) forwards',
-      } as React.CSSProperties;
-    case 'landing':
-      return {
-        transform: 'scaleY(1.08) scaleX(0.94)',
-        transition: 'transform 100ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-      };
-    default:
-      return {};
-  }
-}
-
-/**
- * Compute progressive selection scale: first tile 1.05x, last tile 1.12x.
- */
-function getSelectionScale(selectionIndex?: number, selectionTotal?: number): number {
-  if (selectionIndex == null || !selectionTotal || selectionTotal <= 1) return 1.05;
-  const t = selectionIndex / (selectionTotal - 1);
-  // Round to 3 decimals to avoid floating point noise
-  return Math.round((1.05 + t * 0.07) * 1000) / 1000;
-}
-
-function getPhaseClasses(phase: TilePhase, isSelected: boolean): string {
-  if (phase === 'selected' || (phase === 'idle' && isSelected)) {
-    return `ring-3 ring-neo-lime ring-offset-2 ring-offset-neo-navy shadow-hard-lime blast-tile-select-pop`;
-  }
-  return '';
-}
-
-/** Color tag glow class for color_power objectives */
-function getColorTagGlow(colorTag?: 'pink' | 'cyan' | 'lime'): string {
-  if (!colorTag) return '';
-  const colorMap: Record<string, string> = {
-    pink: 'ring-2 ring-neo-pink animate-pulse',
-    cyan: 'ring-2 ring-neo-cyan animate-pulse',
-    lime: 'ring-2 ring-neo-lime animate-pulse',
-  };
-  return colorMap[colorTag] || '';
-}
-
-/** Inline styles for selected tiles: progressive scale */
-function getSelectionStyles(isSelected: boolean, selectionIndex?: number, selectionTotal?: number): React.CSSProperties {
-  if (!isSelected) return {};
-  const scale = getSelectionScale(selectionIndex, selectionTotal);
-  return { transform: `scale(${scale})` };
-}
-
 
 export const BlastTile = memo(function BlastTile({
   letter, type, phase, isSelected, isCleared, hitsRemaining,
@@ -329,6 +206,8 @@ export const BlastTile = memo(function BlastTile({
           '--bt-rim-light': accent.rimLight,
           '--bt-rim-dark': accent.rimDark,
           '--bt-cast': accent.castShadow,
+          '--bt-jelly-mirror': accent.jellyMirror,
+          '--bt-jelly-edge': accent.jellyEdge,
         } as React.CSSProperties),
       }}
       aria-label={`${letter}${type !== 'standard' ? ` ${type} tile` : ''}`}
@@ -338,6 +217,8 @@ export const BlastTile = memo(function BlastTile({
         <>
           <span data-bt-layer="cast" aria-hidden="true" className={styles.candyShell} />
           <span data-bt-layer="gloss" aria-hidden="true" className={styles.gloss} />
+          <span data-bt-layer="jelly-mirror" aria-hidden="true" className={styles.jellyMirror} />
+          <span data-bt-layer="jelly-edge" aria-hidden="true" className={styles.jellyEdge} />
           <span data-bt-layer="rim" aria-hidden="true" className={styles.rim} />
         </>
       )}
