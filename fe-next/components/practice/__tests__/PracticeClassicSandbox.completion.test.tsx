@@ -1,55 +1,57 @@
 /**
- * Integration test: tapping a 3rd valid word in the classic sandbox writes
- * to practice progress storage AND mounts the completion banner. This is the
- * seam where the sandbox, the practiceProgress lib, and the banner have to
- * agree — easy to break independently of any unit test.
+ * Integration test for the redesigned classic sandbox: drag-spell three valid
+ * words → progress is written + chain CTA reveals. Uses pointer events (not
+ * the legacy submit button — that was removed in the redesign).
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+const validatorCheck = vi.fn();
+vi.mock('@/lib/practice/usePracticeValidator', () => ({
+  usePracticeValidator: () => ({ check: validatorCheck }),
+}));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
+}));
+vi.mock('pixi.js', () => ({
+  Application: class {
+    canvas = document.createElement('canvas');
+    init = vi.fn().mockResolvedValue(undefined);
+    destroy = vi.fn();
+  },
 }));
 
 import PracticeClassicSandbox from '../PracticeClassicSandbox';
 import { isPracticeModeComplete } from '@/lib/practice/practiceProgress';
 
-const tapPath = (cells: Array<[number, number]>) => {
-  for (const [r, c] of cells) {
-    fireEvent.click(screen.getByTestId(`practice-tile-${r}-${c}`));
-  }
-};
-
-const submit = () => {
-  fireEvent.click(screen.getByRole('button', { name: 'practice.classic.submit' }));
+const dragPath = (cells: Array<[number, number]>) => {
+  const tiles = cells.map(([r, c]) => screen.getByTestId(`practice-tile-${r}-${c}`));
+  fireEvent.pointerDown(tiles[0]);
+  for (let i = 1; i < tiles.length; i++) fireEvent.pointerEnter(tiles[i]);
+  fireEvent.pointerUp(tiles[tiles.length - 1]);
 };
 
 beforeEach(() => {
+  validatorCheck.mockReset();
+  validatorCheck.mockResolvedValue({ isValid: true, source: 'dictionary' });
   window.localStorage.clear();
 });
 
-describe('PracticeClassicSandbox completion integration', () => {
-  it('renders the complete banner + writes progress after the 3rd valid word', async () => {
+describe('PracticeClassicSandbox completion integration (redesign)', () => {
+  it('writes progress + reveals chain CTA after the 3rd valid word', async () => {
     render(<PracticeClassicSandbox />);
-    expect(screen.queryByTestId('practice-complete-banner')).toBeNull();
     expect(isPracticeModeComplete('classic', 'en')).toBe(false);
+    expect(screen.queryByTestId('practice-chain-cta')).toBeNull();
 
     // Curated EN board:  S T A R / E O N I / P L A T / E R I N
-    // STAR row 0: (0,0)(0,1)(0,2)(0,3)
-    tapPath([[0, 0], [0, 1], [0, 2], [0, 3]]);
-    submit();
-
-    // PLAN: P(2,0)-L(2,1)-A(2,2)-N(1,2) — last hop is a diagonal
-    tapPath([[2, 0], [2, 1], [2, 2], [1, 2]]);
-    submit();
-
-    // TIN: T(2,3)-I(3,2)-N(3,3) — both hops include a diagonal
-    tapPath([[2, 3], [3, 2], [3, 3]]);
-    submit();
-
+    dragPath([[0, 0], [0, 1], [0, 2], [0, 3]]); // STAR
+    await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(1));
+    dragPath([[2, 0], [2, 1], [2, 2], [1, 2]]); // PLAN
+    await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(2));
+    dragPath([[2, 3], [3, 2], [3, 3]]);         // TIN
     await waitFor(() => {
-      expect(screen.getByTestId('practice-complete-banner')).toBeInTheDocument();
+      expect(screen.getByTestId('practice-chain-cta')).toBeInTheDocument();
     });
     expect(isPracticeModeComplete('classic', 'en')).toBe(true);
   });
