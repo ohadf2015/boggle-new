@@ -196,6 +196,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
         leaderboard={leaderboard}
         onQuit={onStopGame}
         t={t}
+        remainingTime={remainingTime}
       />
     );
   }

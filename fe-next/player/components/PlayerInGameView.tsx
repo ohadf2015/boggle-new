@@ -243,6 +243,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
         leaderboard={leaderboard}
         onQuit={onExitRoom}
         t={t}
+        remainingTime={remainingTime}
       />
     );
   }
