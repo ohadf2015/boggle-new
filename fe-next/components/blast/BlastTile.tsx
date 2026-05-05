@@ -215,6 +215,43 @@ export const BlastTile = memo(function BlastTile({
     if (activationEffect) setLiveActivationEffect(activationEffect);
   }, [activationEffect]);
 
+  // ─── Hooks must run unconditionally (React rules-of-hooks) ──────────────
+  // Compute candy-flag + GSAP wiring state BEFORE the early return below.
+  const { variant: candyVariant } = useExperiment('blast.candy-shell.enabled');
+  const candyOn = candyVariant === 'candy';
+  const accent = TILE_ACCENTS[type] ?? TILE_ACCENTS.standard;
+  // effectivePhase computed early so the GSAP useEffect can list it as a dep
+  // without crossing the early-return boundary.
+  const _effPhaseEarly: TilePhase = reducedMotion && ANIMATED_PHASES.has(phase) ? 'idle' : phase;
+  const _gsapPhases: TilePhase[] = ['selected', 'anticipation', 'clearing'];
+  const _useGsap = candyOn && !reducedMotion && (_gsapPhases.includes(_effPhaseEarly) || (_effPhaseEarly === 'idle' && isSelected));
+
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const phaseTlRef = useRef<gsap.core.Timeline | null>(null);
+
+  useEffect(() => {
+    if (!_useGsap) return;
+    const el = buttonRef.current;
+    if (!el) return;
+    phaseTlRef.current?.kill();
+    const tl = gsap.timeline();
+    if (_effPhaseEarly === 'selected' || (_effPhaseEarly === 'idle' && isSelected)) {
+      tl.to(el, { scale: 1.06, duration: 0.18, ease: 'back.out(2)' });
+    } else if (_effPhaseEarly === 'anticipation') {
+      tl
+        .to(el, { scaleX: 1.18, scaleY: 0.82, duration: 0.08, ease: 'power2.out' })
+        .to(el, { scaleX: 1, scaleY: 1, duration: 0.10, ease: 'elastic.out(1, 0.4)' });
+    } else if (_effPhaseEarly === 'clearing') {
+      tl
+        .to(el, { scaleX: 0.92, scaleY: 1.08, duration: 0.04 })
+        .to(el, { scale: 1.4, duration: 0.10, ease: 'back.out(3.5)' })
+        .to(el, { rotate: clearRotate ?? 0, opacity: 0, duration: 0.18 }, '<');
+    }
+    phaseTlRef.current = tl;
+    return () => { phaseTlRef.current?.kill(); phaseTlRef.current = null; };
+  }, [_useGsap, _effPhaseEarly, isSelected, clearRotate]);
+
+  // ─── Early return (post-hooks) ──────────────────────────────────────────
   // Allow clearing/anticipation phases to render even when isCleared is true —
   // during cascade chains, submitWord marks tiles cleared BEFORE the animation runs.
   // Without this, cascade clearing animations never play (tile goes invisible instantly).
@@ -224,42 +261,9 @@ export const BlastTile = memo(function BlastTile({
   }
 
   const visual = TILE_VISUALS[type] ?? TILE_VISUALS.standard;
-  const { variant: candyVariant } = useExperiment('blast.candy-shell.enabled');
-  const candyOn = candyVariant === 'candy';
-  const accent = TILE_ACCENTS[type] ?? TILE_ACCENTS.standard;
   // Skip tooltip lookup entirely for standard tiles (the vast majority) — keeps render fast
   const tooltip = type !== 'standard' ? getTileTooltip(type, t) : null;
-  const effectivePhase = reducedMotion && ANIMATED_PHASES.has(phase) ? 'idle' : phase;
-
-  // Candy variant: GSAP timelines drive selected/anticipation/clearing phase tweens
-  // for squash-stretch + elastic settle. Falling/appearing/landing keep their existing
-  // CSS keyframes — they already feel right and don't need re-routing.
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const phaseTlRef = useRef<gsap.core.Timeline | null>(null);
-  const gsapPhases: TilePhase[] = ['selected', 'anticipation', 'clearing'];
-  const useGsapForPhase = candyOn && !reducedMotion && (gsapPhases.includes(effectivePhase) || (effectivePhase === 'idle' && isSelected));
-
-  useEffect(() => {
-    if (!useGsapForPhase) return;
-    const el = buttonRef.current;
-    if (!el) return;
-    phaseTlRef.current?.kill();
-    const tl = gsap.timeline();
-    if (effectivePhase === 'selected' || (effectivePhase === 'idle' && isSelected)) {
-      tl.to(el, { scale: 1.06, duration: 0.18, ease: 'back.out(2)' });
-    } else if (effectivePhase === 'anticipation') {
-      tl
-        .to(el, { scaleX: 1.18, scaleY: 0.82, duration: 0.08, ease: 'power2.out' })
-        .to(el, { scaleX: 1, scaleY: 1, duration: 0.10, ease: 'elastic.out(1, 0.4)' });
-    } else if (effectivePhase === 'clearing') {
-      tl
-        .to(el, { scaleX: 0.92, scaleY: 1.08, duration: 0.04 })
-        .to(el, { scale: 1.4, duration: 0.10, ease: 'back.out(3.5)' })
-        .to(el, { rotate: clearRotate ?? 0, opacity: 0, duration: 0.18 }, '<');
-    }
-    phaseTlRef.current = tl;
-    return () => { phaseTlRef.current?.kill(); phaseTlRef.current = null; };
-  }, [useGsapForPhase, effectivePhase, isSelected, clearRotate]);
+  const effectivePhase = _effPhaseEarly;
 
   // When GSAP owns the phase, suppress legacy inline styles that would fight the tween.
   const phaseStyle = effectivePhase !== 'idle' && effectivePhase !== 'selected' && !(candyOn && effectivePhase === 'anticipation') && !(candyOn && effectivePhase === 'clearing')
