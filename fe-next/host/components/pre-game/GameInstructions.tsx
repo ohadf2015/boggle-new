@@ -1,15 +1,37 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Grid3X3, Zap, Crosshair, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Grid3X3, Zap, Crosshair, Disc3, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import type { GameModeOption } from '@/components/GameModeSelector';
+import type { Language } from '@/shared/types/game';
 
 interface GameInstructionsProps {
   selectedGameMode: GameModeOption;
   t: (path: string, params?: Record<string, string | number>) => string;
   defaultOpen?: boolean;
+  lang?: Language;
+}
+
+const STEP_IMAGE_KEYS: Record<string, string> = {
+  'help.swipeLetters': 'swipe-letters',
+  'help.diagonalWorks': 'diagonal-works',
+  'help.comboExplanation': 'combo-bonus',
+  'howToPlay.steps.scoring.description': 'scoring',
+  'gameModes.blast.description': 'blast-mode',
+  'gameModes.wordHunt.description': 'word-hunt-targets',
+  'gameModes.wheelRush.description': 'wheel-spell',
+};
+
+const SUPPORTED_IMAGE_LANGS = new Set<Language>(['en', 'he', 'sv', 'ja', 'es']);
+
+function stepImageSrc(lang: Language, descKey: string): string | null {
+  const concept = STEP_IMAGE_KEYS[descKey];
+  if (!concept) return null;
+  const safeLang = SUPPORTED_IMAGE_LANGS.has(lang) ? lang : 'en';
+  return `/multiplayer/how-to-play/${safeLang}/${concept}.jpg`;
 }
 
 const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: string; iconBgClass: string; dotClass: string; steps: { titleKey: string; descKey: string }[] }> = {
@@ -49,9 +71,18 @@ const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: strin
       { titleKey: 'howToPlay.steps.grid.title', descKey: 'help.diagonalWorks' },
     ],
   },
+  'wheel-rush': {
+    icon: <Disc3 className="w-4 h-4" />,
+    barClass: 'bg-neo-lime', iconBgClass: 'bg-neo-lime', dotClass: 'bg-neo-lime',
+    steps: [
+      { titleKey: 'gameModes.wheelRush.name', descKey: 'gameModes.wheelRush.description' },
+      { titleKey: 'howToPlay.steps.scoring.title', descKey: 'howToPlay.steps.scoring.description' },
+      { titleKey: 'howToPlay.comboBonus', descKey: 'help.comboExplanation' },
+    ],
+  },
 };
 
-export function GameInstructions({ selectedGameMode, t, defaultOpen = true }: GameInstructionsProps): React.ReactElement | null {
+export function GameInstructions({ selectedGameMode, t, defaultOpen = true, lang = 'en' }: GameInstructionsProps): React.ReactElement | null {
   const [instructionStep, setInstructionStep] = useState(0);
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -101,12 +132,28 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen = true }: Ga
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.2 }}
-                  className="min-h-[48px] flex items-start gap-2 text-sm text-slate-300"
+                  className="text-sm text-slate-300"
                 >
-                  <span className={cn('mt-1.5 w-1.5 h-1.5 rounded-full shrink-0', dotClass)} />
-                  <div>
-                    <p className="font-bold text-neo-cream text-xs uppercase mb-0.5">{t(step.titleKey)}</p>
-                    <p>{t(step.descKey)}</p>
+                  {(() => {
+                    const src = stepImageSrc(lang, step.descKey);
+                    return src ? (
+                      <div className="relative mb-2.5 rounded-neo border-2 border-neo-black overflow-hidden shadow-hard-sm aspect-[4/3] bg-neo-navy">
+                        <Image
+                          src={src}
+                          alt={t(step.titleKey)}
+                          fill
+                          sizes="(max-width: 768px) 90vw, 400px"
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : null;
+                  })()}
+                  <div className="min-h-[48px] flex items-start gap-2">
+                    <span className={cn('mt-1.5 w-1.5 h-1.5 rounded-full shrink-0', dotClass)} />
+                    <div>
+                      <p className="font-bold text-neo-cream text-xs uppercase mb-0.5">{t(step.titleKey)}</p>
+                      <p>{t(step.descKey)}</p>
+                    </div>
                   </div>
                 </motion.div>
               </AnimatePresence>

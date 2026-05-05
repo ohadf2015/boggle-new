@@ -457,7 +457,7 @@ function HostPreGameView({
                   </div>
                 )}
                 <div className="animate-fade-in-up" style={{ animationDelay: '140ms' }}>
-                  <GameInstructions selectedGameMode={selectedGameMode} t={t} />
+                  <GameInstructions selectedGameMode={selectedGameMode} t={t} lang={roomLanguage} />
                 </div>
               </div>
             }
@@ -504,7 +504,7 @@ function HostPreGameView({
                 isAdmin={isAdmin}
                 hasBlastAccess={hasBlastAccess}
               />
-              <GameInstructions selectedGameMode={selectedGameMode} t={t} defaultOpen={false} />
+              <GameInstructions selectedGameMode={selectedGameMode} t={t} defaultOpen={false} lang={roomLanguage} />
               {!isPrivate && <InviteCard gameCode={gameCode} t={t} />}
             </div>
           </div>

@@ -1,0 +1,91 @@
+import React from 'react';
+import { render, screen, act } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { HostLeftGraceModal } from '../HostLeftGraceModal';
+
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
+}));
+
+vi.mock('@/components/ui/dialog', () => ({
+  Dialog: ({ children, open }: { children: React.ReactNode; open?: boolean }) =>
+    open ? <div data-testid="dialog">{children}</div> : null,
+  DialogContent: ({ children, className }: { children: React.ReactNode; className?: string; noDescription?: boolean }) =>
+    <div className={className} data-testid="dialog-content">{children}</div>,
+  DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
+}));
+
+describe('HostLeftGraceModal (UX audit 2026-05-04 #2)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('does not render when isOpen=false', () => {
+    render(<HostLeftGraceModal isOpen={false} onExit={vi.fn()} />);
+    expect(screen.queryByTestId('dialog')).toBeNull();
+  });
+
+  it('renders dialog with countdown when isOpen=true', () => {
+    render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} />);
+    expect(screen.getByTestId('dialog')).toBeInTheDocument();
+    expect(screen.getByTestId('host-left-countdown').textContent).toContain('10');
+  });
+
+  it('decrements the countdown every second', () => {
+    render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} />);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(screen.getByTestId('host-left-countdown').textContent).toContain('9');
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(screen.getByTestId('host-left-countdown').textContent).toContain('6');
+  });
+
+  it('calls onExit exactly once after seconds elapse', () => {
+    const onExit = vi.fn();
+    render(<HostLeftGraceModal isOpen={true} onExit={onExit} seconds={3} />);
+    act(() => {
+      vi.advanceTimersByTime(3500);
+    });
+    expect(onExit).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls onExit when the manual exit button is clicked', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const onExit = vi.fn();
+    render(<HostLeftGraceModal isOpen={true} onExit={onExit} seconds={10} />);
+    await user.click(screen.getByTestId('host-left-exit-now'));
+    expect(onExit).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not auto-exit after onExit was triggered manually (no double fire)', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const onExit = vi.fn();
+    render(<HostLeftGraceModal isOpen={true} onExit={onExit} seconds={3} />);
+    await user.click(screen.getByTestId('host-left-exit-now'));
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+    expect(onExit).toHaveBeenCalledTimes(1);
+  });
+
+  it('resets the countdown when isOpen flips false→true', () => {
+    const { rerender } = render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} />);
+    act(() => {
+      vi.advanceTimersByTime(4000);
+    });
+    expect(screen.getByTestId('host-left-countdown').textContent).toContain('6');
+    rerender(<HostLeftGraceModal isOpen={false} onExit={vi.fn()} seconds={10} />);
+    rerender(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} />);
+    expect(screen.getByTestId('host-left-countdown').textContent).toContain('10');
+  });
+});
