@@ -1,37 +1,52 @@
 /**
- * Integration test: solving the wordHunt target writes to practice progress
- * AND mounts the completion banner. Verifies the seam between sandbox state,
- * progress storage, and banner visibility.
+ * Integration test: drag-spelling the target word in the redesigned word-hunt
+ * sandbox writes to practice progress + mounts the completion banner. Pointer
+ * events drive the new drag-on-grid UX.
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
+const validatorCheck = vi.fn();
+vi.mock('@/lib/practice/usePracticeValidator', () => ({
+  usePracticeValidator: () => ({ check: validatorCheck }),
+}));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
+}));
+vi.mock('pixi.js', () => ({
+  Application: class {
+    canvas = document.createElement('canvas');
+    init = vi.fn().mockResolvedValue(undefined);
+    destroy = vi.fn();
+  },
 }));
 
 import PracticeWordHuntSandbox from '../PracticeWordHuntSandbox';
 import { isPracticeModeComplete } from '@/lib/practice/practiceProgress';
 
+const dragPath = (cells: Array<[number, number]>) => {
+  const tiles = cells.map(([r, c]) => screen.getByTestId(`practice-tile-${r}-${c}`));
+  fireEvent.pointerDown(tiles[0]);
+  for (let i = 1; i < tiles.length; i++) fireEvent.pointerEnter(tiles[i]);
+  fireEvent.pointerUp(tiles[tiles.length - 1]);
+};
+
 beforeEach(() => {
+  validatorCheck.mockReset();
+  validatorCheck.mockResolvedValue({ isValid: true, source: 'dictionary' });
   window.localStorage.clear();
 });
 
-describe('PracticeWordHuntSandbox completion integration', () => {
-  it('renders the complete banner + writes progress when target is solved', async () => {
+describe('PracticeWordHuntSandbox completion integration (redesign)', () => {
+  it('writes progress + reveals chain CTA after spelling the target', async () => {
     render(<PracticeWordHuntSandbox />);
 
     expect(screen.queryByTestId('practice-complete-banner')).toBeNull();
     expect(isPracticeModeComplete('wordHunt', 'en')).toBe(false);
 
-    // Curated EN target = "STAR", pool = ['S','T','A','R','O','E'] in that order.
-    const tap = (testId: string) => fireEvent.click(screen.getByTestId(testId));
-    tap('practice-letter-0'); // S
-    tap('practice-letter-1'); // T
-    tap('practice-letter-2'); // A
-    tap('practice-letter-3'); // R
-    fireEvent.click(screen.getByRole('button', { name: 'practice.wordHunt.submit' }));
+    // EN board row 0: S T A R — target = "STAR" — drag (0,0)→(0,1)→(0,2)→(0,3)
+    dragPath([[0, 0], [0, 1], [0, 2], [0, 3]]);
 
     await waitFor(() => {
       expect(screen.getByTestId('practice-complete-banner')).toBeInTheDocument();
