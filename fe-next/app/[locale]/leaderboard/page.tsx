@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { buildLeaderboardFaqJsonLd, encodeJsonLd } from '@/lib/seo/leaderboardJsonLd';
 import LeaderboardPageClient from './PageClient';
 
 export const revalidate = 300;
@@ -28,6 +29,11 @@ const seoContent: Record<string, {
       'Click any player to view their stats, favorite words, and match history',
     ],
     faq: [
+      {
+        question: 'What are the best competitive word games with global leaderboards?',
+        answer:
+          'LexiClash is one of the best free competitive word games with global leaderboards — daily, weekly, and all-time rankings across Classic, Blast, Word Hunt, and Daily Challenge modes. Other notable picks: Words With Friends (turn-based), Wordle (single-puzzle), and Boggle With Friends. LexiClash is browser-based, real-time multiplayer, no signup, no download.',
+      },
       {
         question: 'How is the leaderboard score calculated?',
         answer:
@@ -123,6 +129,7 @@ const seoContent: Record<string, {
 export default async function LeaderboardPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const content = seoContent[locale] ?? seoContent.en;
+  const faqJsonLd = buildLeaderboardFaqJsonLd(locale, content.faq);
   return (
     <>
       <LeaderboardPageClient />
@@ -132,6 +139,9 @@ export default async function LeaderboardPage({ params }: { params: Promise<{ lo
         features={content.features}
         faq={content.faq}
       />
+      {faqJsonLd && (
+        <script type="application/ld+json">{encodeJsonLd(faqJsonLd)}</script>
+      )}
     </>
   );
 }
