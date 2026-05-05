@@ -16,6 +16,7 @@ import {
   buildCascadePunchTimeline,
   buildLongWordPunchTimeline,
   buildWaveClearShowerTimeline,
+  createIdleBreatheTween,
 } from '../effects/blastGsapTimelines';
 import {
   createRGBSplitFilter,
@@ -293,4 +294,53 @@ export function useBlastGsapTimelines({
   );
 
   return { runCascadePunch, runLongWordPunch, runWaveClearShower, trackTimeline, playPhaseTransition };
+}
+
+/**
+ * Mount idle breathing tweens on a set of tile elements with a single
+ * IntersectionObserver gating play/pause based on visibility.
+ * Returns a cleanup that disconnects the observer + kills tweens.
+ *
+ * Off-screen pause is critical — 30+ tiles tweening rotateX/Y at 60fps
+ * is a real CPU cost on mid Android.
+ */
+export function mountIdleBreatheForTiles(tiles: HTMLElement[]): () => void {
+  if (typeof window === 'undefined' || !('IntersectionObserver' in window) || tiles.length === 0) {
+    return () => {};
+  }
+
+  const tweens = new Map<HTMLElement, gsap.core.Tween>();
+  tiles.forEach((el) => {
+    el.style.willChange = 'transform';
+    const t = createIdleBreatheTween(el);
+    if (t) tweens.set(el, t);
+  });
+
+  if (tweens.size === 0) {
+    tiles.forEach((el) => { el.style.willChange = ''; });
+    return () => {};
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const tween = tweens.get(entry.target as HTMLElement);
+        if (!tween) return;
+        if (entry.isIntersecting) tween.play();
+        else tween.pause();
+      });
+    },
+    { threshold: 0.05 },
+  );
+
+  tiles.forEach((el) => observer.observe(el));
+
+  return () => {
+    observer.disconnect();
+    tweens.forEach((t, el) => {
+      t.kill();
+      el.style.willChange = '';
+    });
+    tweens.clear();
+  };
 }

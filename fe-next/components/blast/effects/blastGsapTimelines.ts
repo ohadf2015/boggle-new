@@ -14,10 +14,42 @@
  * All timelines are returned for caller-side .kill() during teardown.
  */
 
-import type { gsap as GsapModule } from 'gsap';
+import { gsap, type gsap as GsapModule } from 'gsap';
 
 type Gsap = typeof GsapModule;
 type Timeline = ReturnType<Gsap['timeline']>;
+
+const reducedMotionActive = (): boolean =>
+  typeof window !== 'undefined' &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+export interface IdleBreatheOptions {
+  /** Injectable for tests so we can pin the random delay deterministically. */
+  random?: () => number;
+}
+
+/**
+ * Per-tile idle "breathing" tween — subtle infinite yoyo rotateX/Y with a
+ * randomised phase so a grid of tiles never pulses in unison.
+ * Returns null under prefers-reduced-motion (caller should skip).
+ */
+export function createIdleBreatheTween(
+  el: HTMLElement,
+  opts: IdleBreatheOptions = {},
+): gsap.core.Tween | null {
+  if (reducedMotionActive()) return null;
+  const random = opts.random ?? Math.random;
+  return gsap.to(el, {
+    rotateX: '+=2',
+    rotateY: '+=2',
+    duration: 4,
+    repeat: -1,
+    yoyo: true,
+    ease: 'sine.inOut',
+    delay: random() * 4,
+  });
+}
 
 // ─── J1 — cascadePunch ────────────────────────────────────────────────────
 
