@@ -384,6 +384,9 @@ export function awardFinalAchievements(game: Game, users: string[]): void {
   if (!game.playerAchievements) {
     game.playerAchievements = {};
   }
+  if (!game.playerWordDetails) {
+    game.playerWordDetails = {};
+  }
 
   users.forEach(username => {
     if (!game.playerWordDetails[username]) {

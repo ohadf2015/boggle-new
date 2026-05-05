@@ -367,6 +367,29 @@ describe('awardFinalAchievements — COMEBACK_CHAMPION', () => {
   });
 });
 
+describe('awardFinalAchievements — defensive guards', () => {
+  it('does not throw when game.playerWordDetails is undefined (Sentry NEXTJS-13X)', () => {
+    const game = buildGame({
+      gameDuration: 180,
+      users: { Player739: { isBot: false } as Game['users'][string] },
+    });
+    delete (game as Partial<Game>).playerWordDetails;
+
+    expect(() => awardFinalAchievements(game, ['Player739'])).not.toThrow();
+    expect(game.playerWordDetails).toEqual({});
+  });
+
+  it('does not throw when game.users is undefined', () => {
+    const game = buildGame({
+      gameDuration: 180,
+      playerWordDetails: { Player1: [] },
+    });
+    delete (game as Partial<Game>).users;
+
+    expect(() => awardFinalAchievements(game, ['Player1'])).not.toThrow();
+  });
+});
+
 describe('checkLifetimeAchievements — FIRST_GAME_WIN', () => {
   it('awards FIRST_GAME_WIN on first win', () => {
     const stats: UserStats = { gamesWon: 1, gamesPlayed: 1 };
