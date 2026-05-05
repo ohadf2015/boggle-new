@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { getTileTooltip } from './utils/blastTileTooltips';
 import { TILE_VISUALS, TILE_ACCENTS } from './blastTileVisuals';
 import { useExperiment } from '@/hooks/useExperiment';
+import { createJellyClearTween } from './effects/blastGsapTimelines';
 import styles from './BlastTile.module.css';
 
 export type TilePhase = 'idle' | 'selected' | 'anticipation' | 'clearing' | 'falling' | 'appearing' | 'landing';
@@ -119,14 +120,21 @@ export const BlastTile = memo(function BlastTile({
         .to(el, { scaleX: 1.18, scaleY: 0.82, duration: 0.08, ease: 'power2.out' })
         .to(el, { scaleX: 1, scaleY: 1, duration: 0.10, ease: 'elastic.out(1, 0.4)' });
     } else if (_effPhaseEarly === 'clearing') {
-      tl
-        .to(el, { scaleX: 0.92, scaleY: 1.08, duration: 0.04 })
-        .to(el, { scale: 1.4, duration: 0.10, ease: 'back.out(3.5)' })
-        .to(el, { rotate: clearRotate ?? 0, opacity: 0, duration: 0.18 }, '<');
+      // Jelly clear (Phase 4) — per-type GSAP signature + opacity fade.
+      // Falls back to the legacy 3-step squash if no signature exists.
+      const jellyTl = createJellyClearTween(el, type);
+      if (jellyTl) {
+        tl.add(jellyTl);
+      } else {
+        tl
+          .to(el, { scaleX: 0.92, scaleY: 1.08, duration: 0.04 })
+          .to(el, { scale: 1.4, duration: 0.10, ease: 'back.out(3.5)' })
+          .to(el, { rotate: clearRotate ?? 0, opacity: 0, duration: 0.18 }, '<');
+      }
     }
     phaseTlRef.current = tl;
     return () => { phaseTlRef.current?.kill(); phaseTlRef.current = null; };
-  }, [_useGsap, _effPhaseEarly, isSelected, clearRotate]);
+  }, [_useGsap, _effPhaseEarly, isSelected, clearRotate, type]);
 
   // ─── Early return (post-hooks) ──────────────────────────────────────────
   // Allow clearing/anticipation phases to render even when isCleared is true —

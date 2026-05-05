@@ -79,6 +79,18 @@ export interface ClearedTileEvent {
   hitsRemaining?: number;
 }
 
+/**
+ * Goal Gallery hit pulse — BlastGame sets this when route/sniper transitions
+ * from incomplete → complete; effects layer fires a shockwave + starburst at
+ * the target cell. Nonce changes to retrigger even if same cell hits twice.
+ */
+export interface BlastGoalHitEvent {
+  row: number;
+  col: number;
+  kind: 'route' | 'sniper';
+  nonce: number;
+}
+
 interface BlastEffectsCanvasProps {
   width: number;
   height: number;
@@ -87,6 +99,8 @@ interface BlastEffectsCanvasProps {
   chainLevel: number;
   comboTier: number;
   waveCleared: boolean;
+  /** Pulse fired when a Goal Gallery objective is satisfied. */
+  goalHit?: BlastGoalHitEvent | null;
 }
 
 // ─── Tile-type → particle preset map ────────────────────────────────────
@@ -128,6 +142,7 @@ function EffectsWorker({
   chainLevel,
   comboTier,
   waveCleared,
+  goalHit,
 }: BlastEffectsCanvasProps) {
   const { app, particles, shake, physics, camera, timeDilation } = useGameEngine();
   const enhancedRef = useRef<EnhancedEffectsManager | null>(null);
@@ -221,6 +236,31 @@ function EffectsWorker({
     emitter.emit(width / 2, height / 2);
     return () => { emitter.destroy(); };
   }, [particles, width, height]);
+
+  // ─── Goal Gallery hit pulse ─────────────────────────────────────────
+  // Fires a Pixi shockwave + starburst when route/sniper transitions to
+  // satisfied. Re-keyed by `goalHit.nonce` so consecutive hits at the same
+  // cell still pulse. Drops silently if goalHit is null or coords are off-board.
+  const lastGoalNonceRef = useRef<number>(-1);
+  useEffect(() => {
+    if (!goalHit) return;
+    if (goalHit.nonce === lastGoalNonceRef.current) return;
+    lastGoalNonceRef.current = goalHit.nonce;
+    if (goalHit.row < 0 || goalHit.col < 0) return;
+    const cx = goalHit.col * cellSize + cellSize / 2;
+    const cy = goalHit.row * cellSize + cellSize / 2;
+    fireShockwave(cx, cy);
+    spawnStarBurst(cx, cy);
+    // Sniper hit gets an extra screen punch for the kill-shot feel; route
+    // completion already cinematic enough via the wire-flash + shockwave.
+    if (goalHit.kind === 'sniper') {
+      try {
+        shake?.start?.({ intensity: 8, duration: 220 });
+      } catch {
+        // shake API may differ; swallow defensively rather than crash.
+      }
+    }
+  }, [goalHit, cellSize, fireShockwave, spawnStarBurst, shake]);
 
   // Ambient effects: ghost trails (chain >= 2) + metaball goo (chain >= 3)
   const { moveGhostTo } = useBlastAmbientEffects({
