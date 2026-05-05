@@ -5055,7 +5055,10 @@ const es = {
       "discoveries": "Palabras extra",
       "giveUp": "Revelar objetivo",
       "chillChip": "Modo relax 🌱",
-      "categoryHint": "{category} de {length} letras"
+      "categoryHint": "{category} de {length} letras",
+      "realGameLabel": "en el juego real",
+      "livesNote": "El Word Hunt real cuesta 1 vida por cada intento fallado (máx. {max}). Aquí tienes intentos ilimitados.",
+      "bailoutCta": "¡Ya lo tengo — vamos a jugar!"
     },
     "complete": {
       "title": "¡Modo completado!",

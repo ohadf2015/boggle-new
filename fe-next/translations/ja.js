@@ -4999,7 +4999,10 @@ const ja = {
       "discoveries": "ボーナス単語",
       "giveUp": "ターゲットを公開",
       "chillChip": "リラックス 🌱",
-      "categoryHint": "{length}文字の{category}"
+      "categoryHint": "{length}文字の{category}",
+      "realGameLabel": "本番では",
+      "livesNote": "本番のWord Huntでは間違い1回でライフ1減（最大{max}）。練習モードは無制限です。",
+      "bailoutCta": "わかった — 本番へ！"
     },
     "complete": {
       "title": "モード完了！",

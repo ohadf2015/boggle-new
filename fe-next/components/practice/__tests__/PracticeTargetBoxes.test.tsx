@@ -22,10 +22,13 @@ describe('PracticeTargetBoxes', () => {
     expect(screen.getByTestId('practice-target-box-3')).toHaveTextContent('R');
   });
 
-  it('flips boxes to the lime-success state when solved', () => {
+  it('flips boxes to real-game green clue style when solved', () => {
+    // Mirrors live `HintBoxes` (SurvivalClueBoxes:298) — solved tiles paint
+    // green-500 to match the real Word Hunt clue palette, not neo-lime.
     render(<PracticeTargetBoxes word="STAR" solved />);
     const box = screen.getByTestId('practice-target-box-0');
-    expect(box.className).toMatch(/bg-neo-lime/);
+    expect(box.className).toMatch(/bg-green-500/);
+    expect(box.className).toMatch(/border-green-700/);
   });
 
   it('uses cream background when unsolved', () => {

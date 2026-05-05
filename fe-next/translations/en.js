@@ -5126,7 +5126,10 @@ const en = {
       "discoveries": "Bonus words found",
       "giveUp": "Reveal target",
       "chillChip": "No stress 🌱",
-      "categoryHint": "{length}-letter {category}"
+      "categoryHint": "{length}-letter {category}",
+      "realGameLabel": "in real game",
+      "livesNote": "Real Word Hunt costs 1 life per wrong guess (max {max}). Practice gives you infinite tries.",
+      "bailoutCta": "I got it — let's play!"
     },
     "complete": {
       "title": "Mode complete!",

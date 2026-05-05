@@ -51,13 +51,13 @@ export default function PracticeTargetBoxes({ word, solved = false, dir = 'ltr',
             data-testid={`practice-target-box-${idx}`}
             data-hidden={showHidden ? 'true' : undefined}
             className={
-              'flex items-center justify-center rounded-neo border-2 border-neo-black font-neo-display font-black shadow-hard-sm transition-colors ' +
+              'flex items-center justify-center rounded-neo border-2 font-bold shadow-hard transition-colors ' +
               cls + ' ' +
               (solved
-                ? 'bg-neo-lime text-neo-black'
+                ? 'bg-green-500 border-green-700 text-neo-black ring-1 ring-green-300/50'
                 : showHidden
-                  ? 'bg-neo-navy-light text-neo-cream/60'
-                  : 'bg-neo-cream text-neo-black')
+                  ? 'bg-neo-black border-neo-black text-white'
+                  : 'bg-neo-cream border-neo-black text-neo-black')
             }
           >
             {showHidden ? '?' : letter}

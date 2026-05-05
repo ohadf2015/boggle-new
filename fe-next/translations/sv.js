@@ -5014,7 +5014,10 @@ const sv = {
       "discoveries": "Bonusord",
       "giveUp": "Avslöja målet",
       "chillChip": "Stressfri 🌱",
-      "categoryHint": "{category}, {length} bokstäver"
+      "categoryHint": "{category}, {length} bokstäver",
+      "realGameLabel": "i riktiga spelet",
+      "livesNote": "I riktiga Word Hunt kostar varje fel gissning ett liv (max {max}). Här har du oändliga försök.",
+      "bailoutCta": "Jag fattar — kör igång!"
     },
     "complete": {
       "title": "Läget klart!",

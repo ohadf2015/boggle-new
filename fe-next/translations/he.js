@@ -5027,7 +5027,10 @@ const he = {
       "discoveries": "מילות בונוס",
       "giveUp": "חשוף את המטרה",
       "chillChip": "מצב רגוע 🌱",
-      "categoryHint": "{category} בת-{length} אותיות"
+      "categoryHint": "{category} בת-{length} אותיות",
+      "realGameLabel": "במשחק האמיתי",
+      "livesNote": "במשחק האמיתי כל ניחוש שגוי עולה חיים אחד (מקס׳ {max}). באימון יש לך ניסיונות אינסופיים.",
+      "bailoutCta": "הבנתי — קדימה למשחק!"
     },
     "complete": {
       "title": "המצב הושלם!",

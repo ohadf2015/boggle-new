@@ -1,6 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Heart } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeChainCta from './PracticeChainCta';
 import PracticeCompleteBanner from './PracticeCompleteBanner';
@@ -23,7 +25,6 @@ import GridComponent from '@/components/GridComponent';
 import { DiscoveredWordsList } from '@/components/daily/DiscoveredWordsList';
 import PracticeTargetBoxes from './PracticeTargetBoxes';
 import PracticeGuessHistory, { type GuessRow, computeFeedback } from './PracticeGuessHistory';
-import { CATEGORY_EMOJIS, getCategoryLabel } from '@/shared/data/wordCategories';
 
 const BOARDS: Record<string, string[][]> = {
   en: [['S', 'T', 'A', 'R'], ['E', 'O', 'N', 'I'], ['P', 'L', 'A', 'T'], ['E', 'R', 'I', 'N']],
@@ -33,48 +34,36 @@ const BOARDS: Record<string, string[][]> = {
   es: [['C', 'A', 'S', 'A'], ['M', 'E', 'L', 'O'], ['T', 'I', 'A', 'R'], ['E', 'O', 'N', 'P']],
 };
 
+// 4-letter targets for visual + difficulty parity with live Word Hunt
+// (live target window is 5–6 letters, but practice trims to 4 to keep the
+// first-encounter beat scannable). ja stays at 3 — there is no clean 4-kana
+// trace on the existing board, and ja learners prefer a familiar word.
 const TARGETS: Record<string, string> = {
   en: 'STAR',
-  he: 'בית',
+  he: 'ארנב',
   sv: 'STAR',
-  ja: 'ねこ',
+  ja: 'さくら',
   es: 'CASA',
 };
 
-// Per-locale category for the target — drives the emoji hint that mirrors
-// real WordHunt's `WordHuntCategoryHint`. Practice picks a fixed category
-// per locale (live mode picks dynamically from the category index).
-const TARGET_CATEGORY: Record<string, string> = {
-  en: 'nature',  // STAR
-  he: 'home',    // בית = house
-  sv: 'nature',  // STAR
-  ja: 'animals', // ねこ = cat
-  es: 'home',    // CASA = house
-};
-
-const HINT_COLLAPSE_MS = 10_000;
+// Real Word Hunt MAX_ATTEMPTS — surfaced in the educational tries pill so
+// learners see what they'd be racing in live mode.
+const REAL_GAME_MAX_TRIES = 7;
 
 /**
- * Word-hunt practice sandbox — full visual + behavioral parity with the
- * live Word Hunt mode:
- *  - Target word is HIDDEN behind `?` blanks until solved (real-mode parity).
- *  - A category emoji + label appears above the blanks for 10 s, then
- *    collapses to emoji-only, mirroring `WordHuntCategoryHint`.
- *  - Wrong-length guesses give Wordle-style green/yellow/grey feedback for
- *    free (educational signal — no life cost in practice).
- *  - Correct-length wrong guesses reveal feedback rows in history (live
- *    mode would deduct life; practice does not, to stay stress-free).
- *  - A scoring footnote spells out the live-mode scoring rules so players
- *    know what to expect when they leave practice.
- *
- * Validation goes through the practice validator (offline-friendly,
- * session-cached). Practice carries no timer + no death.
+ * Word-hunt practice sandbox — visual + behavioral parity with the live
+ * Word Hunt mode:
+ *  - Target hidden behind solid black `?` boxes (matches real `HintBoxes`).
+ *  - A tries pill shows real-game life cost (∞ here · 7 in real game) so
+ *    learners see the stakes without paying them.
+ *  - Wrong-length guesses give Wordle-style green/yellow/grey feedback.
+ *  - A bail-out CTA is always reachable so confident learners can leave
+ *    practice and start the live mode mid-flow.
  */
 export default function PracticeWordHuntSandbox() {
   const { language, t } = useLanguage();
   const board = BOARDS[language] ?? BOARDS.en;
   const target = TARGETS[language] ?? TARGETS.en;
-  const category = TARGET_CATEGORY[language] ?? TARGET_CATEGORY.en;
   const validator = usePracticeValidator(language);
   const juice = usePracticeJuice();
   const fxRef = useRef<PracticePixiFxHandle | null>(null);
@@ -88,16 +77,9 @@ export default function PracticeWordHuntSandbox() {
   >([]);
   const [feedback, setFeedback] = useState<'ok' | 'bad' | null>(null);
   const [guessHistory, setGuessHistory] = useState<GuessRow[]>([]);
-  const [hintExpanded, setHintExpanded] = useState(true);
 
   const startedAtRef = useRef(0);
   const completedFiredRef = useRef(false);
-
-  // Auto-collapse the category hint after 10s — same UX as live mode.
-  useEffect(() => {
-    const timer = setTimeout(() => setHintExpanded(false), HINT_COLLAPSE_MS);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     startedAtRef.current = Date.now();
@@ -184,113 +166,93 @@ export default function PracticeWordHuntSandbox() {
         : 'idle';
 
   const dir: 'ltr' | 'rtl' = language === 'he' ? 'rtl' : 'ltr';
-  const emoji = CATEGORY_EMOJIS[category] ?? '';
-  const categoryLabel = useMemo(
-    () => t('practice.wordHunt.categoryHint', {
-      length: target.length,
-      category: getCategoryLabel(category, language),
-    }),
-    [t, target.length, category, language],
-  );
+  const liveHref = `/${language}/daily/word-hunt`;
 
   return (
-    <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3 min-h-[calc(100dvh-var(--bottom-stack-height,5rem))]">
+    <div className="relative flex flex-col items-stretch w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3 min-h-[calc(100dvh-var(--bottom-stack-height,5rem))]">
       <PracticePixiFx ref={fxRef} />
       <PracticeMascotReaction mode="wordHunt" reaction={mascotReaction} />
 
-      {/* HUD strip — mode nav + a chill "no stress" badge so first-time
-          players see at a glance that this is a sandbox, not the live
-          survival mode. */}
+      {/* HUD strip — mode nav + educational tries pill mimicking the real
+          game's `X/MAX_ATTEMPTS tries left` so learners see the stakes. */}
       <div className="w-full flex items-center justify-between gap-2">
         <PracticeModeNav current="wordHunt" />
         <div
           data-testid="practice-tries-chip"
-          className="px-2.5 py-1 rounded-full bg-neo-lime/20 border border-neo-lime text-neo-cream text-xs font-neo-display font-black whitespace-nowrap"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neo-navy/60 border-2 border-neo-cream/15 text-neo-cream text-[10px] sm:text-xs font-neo-display font-black whitespace-nowrap"
+          title={t('practice.wordHunt.livesNote', { max: REAL_GAME_MAX_TRIES })}
         >
-          {t('practice.wordHunt.chillChip')}
+          <Heart className="w-3 h-3 text-neo-pink fill-neo-pink" aria-hidden />
+          <span>∞ · {REAL_GAME_MAX_TRIES} {t('practice.wordHunt.realGameLabel')}</span>
         </div>
       </div>
 
       <PracticeInstructions mode="wordHunt" />
 
-      {/* Category hint — shows full label for 10s, then collapses to emoji.
-          Click the emoji to re-expand. */}
-      <div
-        data-testid="practice-category-hint"
-        className="flex items-center justify-center min-h-[1.75rem]"
-      >
-        {hintExpanded ? (
-          <button
-            type="button"
-            data-testid="practice-category-hint-expanded"
-            onClick={() => setHintExpanded(false)}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-neo-lime bg-neo-lime/15 text-neo-cream text-xs font-neo-display font-black animate-fade-in"
-          >
-            <span>{categoryLabel}</span>
-            {emoji && <span aria-hidden className="text-base">{emoji}</span>}
-          </button>
-        ) : (
-          emoji && (
-            <button
-              type="button"
-              data-testid="practice-category-hint-collapsed"
-              onClick={() => setHintExpanded(true)}
-              aria-label={categoryLabel}
-              title={categoryLabel}
-              className="text-xl cursor-pointer hover:scale-110 transition-transform animate-fade-in"
-            >
-              {emoji}
-            </button>
-          )
+      {/* Top stack ends here — board + history + CTA stretch below */}
+      <div className="flex flex-col items-center gap-3 flex-1 w-full">
+        <div data-testid="practice-target" className="flex flex-col items-center gap-1.5 w-full">
+          <span className="text-xs uppercase font-neo-display font-black text-neo-cream/70 tracking-wider">
+            {t('practice.wordHunt.targetLabel')}
+          </span>
+          <PracticeTargetBoxes
+            word={target}
+            solved={solved}
+            dir={dir}
+            hidden
+          />
+          <p className="text-[10px] sm:text-xs text-neo-cream/60 text-center max-w-xs px-2 mt-1">
+            {t('practice.wordHunt.livesNote', { max: REAL_GAME_MAX_TRIES })}
+          </p>
+        </div>
+
+        <PracticeGuessHistory rows={guessHistory} dir={dir} />
+
+        <PracticeMicroTip
+          beat={beat}
+          onDismiss={() => {
+            tutorialRef.current.dispatch({ type: 'beat-completed' });
+            advanceBeat();
+          }}
+        />
+
+        <div data-testid="practice-board" className="w-full max-w-xs aspect-square mx-auto">
+          <GridComponent
+            grid={board}
+            interactive
+            onWordSubmit={handleWordSubmit}
+            onSelectionChange={onSelectionChange}
+            hideComboIndicator
+            language={language}
+          />
+        </div>
+
+        {discoveries.length > 0 && (
+          <div className="w-full" data-testid="practice-discoveries">
+            <DiscoveredWordsList words={discoveries} t={t} />
+          </div>
         )}
       </div>
 
-      <div data-testid="practice-target" className="flex flex-col items-center gap-1.5 w-full">
-        <span className="text-xs uppercase font-neo-display font-black text-neo-cream/70 tracking-wider">
-          {t('practice.wordHunt.targetLabel')}
-        </span>
-        <PracticeTargetBoxes
-          word={target}
-          solved={solved}
-          dir={dir}
-          hidden
-        />
+      {/* Bail-out CTA — pinned to bottom via mt-auto. Visible whether solved
+          or not so confident learners can drop into live mode at any time. */}
+      <div className="mt-auto flex flex-col gap-2 w-full">
+        {solved && <PracticeCompleteBanner mode="wordHunt" />}
+        {solved ? (
+          <PracticeChainCta
+            currentMode="wordHunt"
+            className="inline-flex items-center justify-center w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed"
+          />
+        ) : (
+          <Link
+            href={liveHref}
+            data-testid="practice-bailout-cta"
+            className="inline-flex items-center justify-center w-full bg-neo-pink text-neo-cream border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px]"
+          >
+            {t('practice.wordHunt.bailoutCta')}
+          </Link>
+        )}
       </div>
-
-      <PracticeGuessHistory rows={guessHistory} dir={dir} />
-
-      <PracticeMicroTip
-        beat={beat}
-        onDismiss={() => {
-          tutorialRef.current.dispatch({ type: 'beat-completed' });
-          advanceBeat();
-        }}
-      />
-
-      <div data-testid="practice-board" className="w-full max-w-xs aspect-square">
-        <GridComponent
-          grid={board}
-          interactive
-          onWordSubmit={handleWordSubmit}
-          onSelectionChange={onSelectionChange}
-          hideComboIndicator
-          language={language}
-        />
-      </div>
-
-      {discoveries.length > 0 && (
-        <div className="w-full" data-testid="practice-discoveries">
-          <DiscoveredWordsList words={discoveries} t={t} />
-        </div>
-      )}
-
-      {solved && <PracticeCompleteBanner mode="wordHunt" />}
-      {solved && (
-        <PracticeChainCta
-          currentMode="wordHunt"
-          className="mt-auto inline-flex items-center justify-center w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed"
-        />
-      )}
     </div>
   );
 }
