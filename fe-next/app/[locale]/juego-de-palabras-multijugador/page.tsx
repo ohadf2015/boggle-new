@@ -1,8 +1,14 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import NativePageEnhancements from "@/components/landing/NativePageEnhancements";
+import NativePageEnhancements from '@/components/landing/NativePageEnhancements';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
+import { HeroAnimated } from './components/HeroAnimated';
+import { FeatureGrid } from './components/FeatureGrid';
+import { StepsSection } from './components/StepsSection';
+import { ModesShowcase } from './components/ModesShowcase';
+import { FaqAccordion } from './components/FaqAccordion';
+import { BottomCTA } from './components/BottomCTA';
+import { FAQS } from './data';
 
 
 interface PageProps {
@@ -77,31 +83,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function SpanishWordGamePage({ params }: PageProps) {
   const { locale } = await params;
 
-  const faqs = [
-    {
-      q: '¿Cómo juego una alternativa a Scrabble online en español multijugador gratis?',
-      a: 'En LexiClash haces clic en "Crear sala" en la página multijugador, compartes el enlace con tus amigos y todos compiten en tiempo real al estilo Scrabble. LexiClash es una alternativa independiente al Scrabble — sin registro, sin descargas, 100% gratis. Funciona en móvil y ordenador.',
-    },
-    {
-      q: '¿LexiClash es como Scrabble o Apalabrados pero online?',
-      a: 'Sí. LexiClash combina la profundidad estratégica de Scrabble, la velocidad de Boggle y el formato social de Apalabrados, todo en tiempo real con más de 10,000 palabras en español.',
-    },
-    {
-      q: '¿Puedo jugar Scrabble online con amigos sin registrarme?',
-      a: '¡Sí! Crea una sala, envía el enlace por WhatsApp, Discord o cualquier app, y tus amigos se unen al instante. Sin cuenta, sin email, sin descargas.',
-    },
-    {
-      q: '¿Cuántas palabras en español tiene el diccionario?',
-      a: 'Más de 10,000 palabras en español validadas, actualizadas continuamente. Reconoce variantes de España y Latinoamérica.',
-    },
-    {
-      q: '¿Qué modos de juego multijugador hay?',
-      a: 'Salas multijugador en tiempo real, desafíos diarios, cazadores de palabras, modo explosión, batallas de jefes y más. Cada modo tiene reglas y puntuación únicas.',
-    },
-  ];
-
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <main className="relative min-h-screen overflow-hidden bg-neo-navy text-neo-white">
       <BreadcrumbJsonLd
         items={[
           { name: 'Inicio', url: `${BASE_URL}/${locale}` },
@@ -123,104 +106,50 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'FAQPage',
-            mainEntity: faqs.map((faq) => ({
+            mainEntity: FAQS.map((faq) => ({
               '@type': 'Question',
               name: faq.q,
-              acceptedAnswer: {
-                '@type': 'Answer',
-                text: faq.a,
-              },
+              acceptedAnswer: { '@type': 'Answer', text: faq.a },
             })),
           }),
         }}
       />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Alternativa a Scrabble Online en Español Multijugador - Gratis y en Tiempo Real
-        </h1>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-32 top-32 -z-10 h-72 w-72 rotate-12 bg-neo-cyan/10 blur-3xl sm:h-[28rem] sm:w-[28rem]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-40 top-[60%] -z-10 h-72 w-72 -rotate-12 bg-neo-lime/10 blur-3xl sm:h-[28rem] sm:w-[28rem]"
+      />
 
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          ¿Buscas Scrabble online en español multijugador? LexiClash es la mejor alternativa gratuita al estilo Scrabble: un juego de palabras en tiempo real que combina lo mejor de Scrabble, Boggle y Apalabrados. Crea una sala, comparte el enlace con tus amigos y compite al instante en español. Más de 10,000 palabras en el diccionario, sin descargas, sin registro y 100% gratis. Juega esta alternativa multijugador online desde tu móvil u ordenador, en cualquier momento.
-        </p>
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <HeroAnimated locale={locale} />
+        <FeatureGrid />
+        <StepsSection />
+        <ModesShowcase />
+        <FaqAccordion />
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
-            ¿Por qué jugar LexiClash Multijugador?
+        <section className="mb-12 max-w-3xl">
+          <h2 className="mb-3 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
+            Sobre la alternativa a Scrabble online
           </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              'Batallas multijugador en tiempo real con retroalimentación de puntos instantánea',
-              'Crea salas e invita amigos a través de enlace compartido',
-              '10,000+ palabras en español',
-              'Múltiples modos de juego (Boggle, Cazador, Explosión)',
-              'Desafíos diarios con clasificaciones',
-              'Batallas de jefes con giros únicos',
-              'Completamente gratis, sin descargas necesarias',
-              'Juega en 5 idiomas (EN, HE, SV, JA, ES)',
-            ].map((feature) => (
-              <div
-                key={feature}
-                className="flex gap-3 rounded-neo border-3 border-neo-yellow bg-neo-navy/50 p-4 shadow-hard"
-              >
-                <span className="text-neo-yellow">✓</span>
-                <p className="text-sm sm:text-base">{feature}</p>
-              </div>
-            ))}
+          <div className="space-y-3 font-neo-body text-sm leading-relaxed text-neo-white/70 sm:text-base">
+            <p>
+              LexiClash es la alternativa moderna al Scrabble online en español: combina la profundidad estratégica de Scrabble, la velocidad en tiempo real de Boggle y el formato social de Apalabrados. Diseñada para amantes de las palabras, jugadores casuales y competitivos por igual.
+            </p>
+            <p>
+              Juega con amigos, familia o rivales de todo el mundo hispanohablante. Una partida rápida de 15 minutos o una sesión competitiva más larga, LexiClash se adapta a tu ritmo. La interfaz funciona en escritorio y móvil, así que puedes jugar en cualquier lugar.
+            </p>
+            <p>
+              Compite en clasificaciones globales, obtén logros y desbloquea modos especiales. Las batallas de jefes añaden un giro PvE donde colaboras contra oponentes de IA. Los desafíos diarios traen rompecabezas nuevos cada día con recompensas exclusivas.
+            </p>
           </div>
         </section>
 
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link
-            href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-yellow bg-neo-yellow px-6 py-3 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4"
-          >
-            Comenzar a Jugar Multijugador
-          </Link>
-          <Link
-            href={`/${locale}/singleplayer`}
-            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
-          >
-            Jugar Solo
-          </Link>
-          <Link
-            href={`/${locale}/daily`}
-            className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 font-bold text-neo-pink shadow-hard transition-all hover:bg-neo-pink/10 sm:px-8 sm:py-4"
-          >
-            Desafío Diario
-          </Link>
-        </section>
+        <BottomCTA locale={locale} />
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Preguntas Frecuentes</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details
-                key={`faq-${idx}-${faq.q}`}
-                className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard"
-              >
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-yellow transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12 max-w-none">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Sobre la Alternativa a Scrabble Online en Español Multijugador</h2>
-          <p className="mt-4 text-neo-gray-200">
-            LexiClash es la alternativa moderna al Scrabble online en español: combina la profundidad estratégica de Scrabble, la velocidad en tiempo real de Boggle y el formato social de Apalabrados. Nuestra plataforma está diseñada para amantes de las palabras, jugadores casuales y competitivos por igual.
-          </p>
-          <p className="mt-4 text-neo-gray-200">
-            Juega esta alternativa multijugador online con amigos, familia o rivales de todo el mundo hispanohablante. Ya sea una partida rápida de 15 minutos o una sesión competitiva más larga, LexiClash se adapta a tu ritmo. La interfaz intuitiva funciona en escritorio y móvil, así que puedes jugar al estilo Scrabble en español en cualquier lugar y momento.
-          </p>
-          <p className="mt-4 text-neo-gray-200">
-            Compite en clasificaciones globales, obtén logros y desbloquea modos de juego especiales. Nuestras batallas de jefes añaden un giro único de PvE donde los jugadores colaboran contra oponentes de IA. Los desafíos diarios ofrecen nuevos rompecabezas cada día con recompensas exclusivas.
-          </p>
-        </section>
         <NativePageEnhancements locale={locale} />
       </div>
     </main>
