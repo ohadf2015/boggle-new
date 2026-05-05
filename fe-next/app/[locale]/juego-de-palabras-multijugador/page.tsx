@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import NativePageEnhancements from '@/components/landing/NativePageEnhancements';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
@@ -145,6 +146,42 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
             <p>
               Compite en clasificaciones globales, obtén logros y desbloquea modos especiales. Las batallas de jefes añaden un giro PvE donde colaboras contra oponentes de IA. Los desafíos diarios traen rompecabezas nuevos cada día con recompensas exclusivas.
             </p>
+          </div>
+        </section>
+
+        <section className="mb-12 max-w-3xl">
+          <h2 className="mb-3 font-neo-display text-xl font-black uppercase leading-tight text-neo-white sm:text-2xl">
+            Más herramientas en español
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Link
+              href={`/${locale}/words`}
+              className="rounded-neo border-3 border-neo-cyan/60 bg-neo-navy-light p-4 shadow-hard transition-all hover:border-neo-cyan"
+            >
+              <h3 className="font-neo-display font-bold text-neo-cyan">Diccionario de palabras</h3>
+              <p className="mt-1 text-xs text-slate-300">Explora todas las palabras válidas — busca por longitud (3 a 8 letras) o letra inicial.</p>
+            </Link>
+            <Link
+              href={`/${locale}/anagram`}
+              className="rounded-neo border-3 border-neo-pink/60 bg-neo-navy-light p-4 shadow-hard transition-all hover:border-neo-pink"
+            >
+              <h3 className="font-neo-display font-bold text-neo-pink">Resolvedor de anagramas</h3>
+              <p className="mt-1 text-xs text-slate-300">Introduce letras y descubre todas las palabras que puedes formar al instante.</p>
+            </Link>
+            <Link
+              href={`/${locale}/daily`}
+              className="rounded-neo border-3 border-neo-lime/60 bg-neo-navy-light p-4 shadow-hard transition-all hover:border-neo-lime"
+            >
+              <h3 className="font-neo-display font-bold text-neo-lime">Desafío diario</h3>
+              <p className="mt-1 text-xs text-slate-300">Rueda de palabras y caza de palabras — un nuevo puzzle cada día con tablas de clasificación globales.</p>
+            </Link>
+            <Link
+              href={`/${locale}/leaderboard`}
+              className="rounded-neo border-3 border-neo-yellow/60 bg-neo-navy-light p-4 shadow-hard transition-all hover:border-neo-yellow"
+            >
+              <h3 className="font-neo-display font-bold text-neo-yellow">Tabla de clasificación</h3>
+              <p className="mt-1 text-xs text-slate-300">Sube en los rankings globales: diarios, semanales y de todos los tiempos.</p>
+            </Link>
           </div>
         </section>
 
