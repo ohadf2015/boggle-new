@@ -30,6 +30,7 @@ import posthog from 'posthog-js';
 import { usePostHogFlag } from '@/hooks/usePostHogFlag';
 import {
   experimentDefault,
+  experimentEmailOverride,
   isValidVariant,
   type ExperimentKey,
   type ExperimentVariant,
@@ -49,9 +50,23 @@ export function useExperiment<K extends ExperimentKey>(
 
   // Defensive: if PostHog returns a variant we don't know about,
   // collapse to the default rather than ship undefined behaviour.
-  const variant: ExperimentVariant<K> = isValidVariant(key, raw)
+  const liveVariant: ExperimentVariant<K> = isValidVariant(key, raw)
     ? raw
     : fallback;
+
+  // Per-email forced override (registry allowlist). Reads identified email
+  // from PostHog `$set` props (populated by identifyUserForAnalytics on auth).
+  // Wins over the remote variant so single-user pilots don't need a cohort.
+  let identifiedEmail: string | null = null;
+  try {
+    const getProp = (posthog as unknown as { get_property?: (k: string) => unknown }).get_property;
+    const value = typeof getProp === 'function' ? getProp.call(posthog, 'email') : undefined;
+    identifiedEmail = typeof value === 'string' ? value : null;
+  } catch {
+    identifiedEmail = null;
+  }
+  const override = experimentEmailOverride(key, identifiedEmail);
+  const variant: ExperimentVariant<K> = override ?? liveVariant;
 
   const fired = useRef(false);
   const trackExposure = useCallback(() => {

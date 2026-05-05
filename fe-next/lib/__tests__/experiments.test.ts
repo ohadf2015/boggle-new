@@ -11,6 +11,7 @@ import { describe, it, expect } from 'vitest';
 import {
   EXPERIMENTS,
   experimentDefault,
+  experimentEmailOverride,
   isValidVariant,
   type ExperimentKey,
 } from '../experiments';
@@ -68,6 +69,45 @@ describe('experiments registry', () => {
       const key = Object.keys(EXPERIMENTS)[0] as ExperimentKey;
       expect(isValidVariant(key, null)).toBe(false);
       expect(isValidVariant(key, undefined)).toBe(false);
+    });
+  });
+
+  describe('experimentEmailOverride', () => {
+    it('returns null when no override map is configured', () => {
+      // signup-prompt-cta-copy has no forceVariantByEmail
+      expect(experimentEmailOverride('signup-prompt-cta-copy', 'someone@x.com')).toBeNull();
+    });
+
+    it('returns null for an email not present in the override map', () => {
+      expect(experimentEmailOverride('blast.candy-shell.enabled', 'random@x.com')).toBeNull();
+    });
+
+    it('returns null when the email is null/undefined', () => {
+      expect(experimentEmailOverride('blast.candy-shell.enabled', null)).toBeNull();
+      expect(experimentEmailOverride('blast.candy-shell.enabled', undefined)).toBeNull();
+    });
+
+    it('matches email case-insensitively', () => {
+      expect(experimentEmailOverride('blast.candy-shell.enabled', 'OHADF2015@GMAIL.COM')).toBe('candy');
+    });
+
+    it('forces blast.candy-shell.enabled = candy for ohadf2015@gmail.com', () => {
+      expect(experimentEmailOverride('blast.candy-shell.enabled', 'ohadf2015@gmail.com')).toBe('candy');
+    });
+  });
+
+  describe('blast.candy-shell.enabled flag', () => {
+    it('is registered with control + candy variants', () => {
+      expect(EXPERIMENTS['blast.candy-shell.enabled'].variants).toEqual(['control', 'candy']);
+    });
+
+    it('defaults to control (gated rollout)', () => {
+      expect(EXPERIMENTS['blast.candy-shell.enabled'].default).toBe('control');
+    });
+
+    it('lists ohadf2015@gmail.com on the email override allowlist', () => {
+      const cfg = EXPERIMENTS['blast.candy-shell.enabled'];
+      expect(cfg.forceVariantByEmail?.['ohadf2015@gmail.com']).toBe('candy');
     });
   });
 

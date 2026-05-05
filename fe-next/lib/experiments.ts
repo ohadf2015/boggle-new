@@ -15,6 +15,13 @@ export interface ExperimentConfig<V extends readonly string[]> {
   readonly variants: V;
   readonly default: V[number];
   readonly description: string;
+  /**
+   * Optional per-email override. When the currently identified PostHog
+   * user matches a key here, that variant is forced regardless of the
+   * remote flag value. Lowercase the keys — lookup is case-insensitive.
+   * Use sparingly: dev/QA pilots, single-user previews, internal demos.
+   */
+  readonly forceVariantByEmail?: Readonly<Record<string, V[number]>>;
 }
 
 function defineExperiment<V extends readonly string[]>(
@@ -168,6 +175,9 @@ export const EXPERIMENTS = {
     default: 'control',
     description:
       'Blast tile candy-crush presentation + popup redesign. control = current flat DOM, candy = 5-layer composite + GSAP phase timelines + BlastModalShell.',
+    forceVariantByEmail: {
+      'ohadf2015@gmail.com': 'candy',
+    },
   }),
 
   /**
@@ -199,6 +209,27 @@ export function experimentVariants<K extends ExperimentKey>(
   key: K,
 ): readonly ExperimentVariant<K>[] {
   return EXPERIMENTS[key].variants as readonly ExperimentVariant<K>[];
+}
+
+/**
+ * Per-email forced override (case-insensitive). Returns the override
+ * variant when the identified email is allowlisted in the registry,
+ * else `null` so the caller falls back to the live PostHog variant.
+ */
+export function experimentEmailOverride<K extends ExperimentKey>(
+  key: K,
+  email: string | null | undefined,
+): ExperimentVariant<K> | null {
+  if (!email) return null;
+  const map = EXPERIMENTS[key].forceVariantByEmail;
+  if (!map) return null;
+  const lower = email.toLowerCase();
+  for (const [allowedEmail, variant] of Object.entries(map)) {
+    if (allowedEmail.toLowerCase() === lower) {
+      return variant as ExperimentVariant<K>;
+    }
+  }
+  return null;
 }
 
 export function isValidVariant<K extends ExperimentKey>(
