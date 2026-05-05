@@ -4960,6 +4960,15 @@ const sv = {
       "label": "Tips",
       "dismiss": "Uppfattat"
     },
+    "tutorial": {
+      "drag": "Dra.",
+      "spin": "Snurra för att stava.",
+      "target": "Hitta ordet.",
+      "diagonal": "Diagonalt går också.",
+      "nice": "Najs!",
+      "goalComplete": "{count} ord! ✨",
+      "idleNudge": "Prova korta ord."
+    },
     "classic": {
       "instruction": "Tryck på intilliggande rutor för att stava ett ord, sen skicka. Ingen tid, ingen poäng.",
       "submit": "Skicka",

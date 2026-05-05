@@ -5066,6 +5066,15 @@ const en = {
       "label": "Tip",
       "dismiss": "Got it"
     },
+    "tutorial": {
+      "drag": "Drag.",
+      "spin": "Spin to spell.",
+      "target": "Find the target.",
+      "diagonal": "Diagonals work too.",
+      "nice": "Nice!",
+      "goalComplete": "{count} words! ✨",
+      "idleNudge": "Try short words."
+    },
     "classic": {
       "instruction": "Tap adjacent tiles to spell a word, then submit. No timer, no score.",
       "submit": "Submit",

@@ -4971,6 +4971,15 @@ const he = {
       "label": "טיפ",
       "dismiss": "הבנתי"
     },
+    "tutorial": {
+      "drag": "החליקו.",
+      "spin": "סובבו לאיית.",
+      "target": "מצאו את המילה.",
+      "diagonal": "גם באלכסון.",
+      "nice": "יפה!",
+      "goalComplete": "{count} מילים! ✨",
+      "idleNudge": "התחילו מקצרות."
+    },
     "classic": {
       "instruction": "הקש על משבצות סמוכות כדי לאיית מילה, ואז שלח. בלי טיימר, בלי ניקוד.",
       "submit": "שלח",
