@@ -5001,6 +5001,15 @@ const es = {
       "label": "Consejo",
       "dismiss": "Entendido"
     },
+    "tutorial": {
+      "drag": "Arrastra.",
+      "spin": "Gira para deletrear.",
+      "target": "Busca la palabra.",
+      "diagonal": "Diagonales también.",
+      "nice": "¡Bien!",
+      "goalComplete": "¡{count} palabras! ✨",
+      "idleNudge": "Prueba palabras cortas."
+    },
     "classic": {
       "instruction": "Toca casillas adyacentes para deletrear una palabra y envía. Sin tiempo, sin puntuación.",
       "submit": "Enviar",

@@ -4945,6 +4945,15 @@ const ja = {
       "label": "ヒント",
       "dismiss": "わかった"
     },
+    "tutorial": {
+      "drag": "なぞって！",
+      "spin": "回して綴る。",
+      "target": "ターゲットを見つけて。",
+      "diagonal": "斜めもOK。",
+      "nice": "いいね！",
+      "goalComplete": "{count}個！✨",
+      "idleNudge": "短い言葉から。"
+    },
     "classic": {
       "instruction": "隣り合うタイルをタップして単語を作り、送信。タイマーもスコアもなし。",
       "submit": "送信",
