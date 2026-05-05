@@ -11,7 +11,7 @@
 // instances must still be `.destroy()`'d to release GPU buffers.
 
 import { useCallback, useEffect, useRef } from 'react';
-import { Graphics, type Container } from 'pixi.js';
+import { Graphics, MeshRope, Point, Texture, type Container } from 'pixi.js';
 import { BloomFilter, ShockwaveFilter } from 'pixi-filters';
 import { createGlowFilter } from '../effects/pixiFilterPresets';
 import { computePulseRingFrame, pulseRingTierColor } from '../effects/pulseRingCurve';
@@ -364,4 +364,63 @@ export function useBlastPixiOverlays({
   }, [camera, width, height]);
 
   return { fireShockwave, flashCross, spawnPulseRing, spawnStarBurst, spawnAfterglow, spawnLightSweep };
+}
+
+// ─── Chain ribbon (Phase 3 — jelly redesign) ──────────────────────────────
+
+let cachedRibbonTexture: Texture | null = null;
+
+function getRibbonTexture(): Texture {
+  if (cachedRibbonTexture) return cachedRibbonTexture;
+  const c = document.createElement('canvas');
+  c.width = 256; c.height = 8;
+  const ctx = c.getContext('2d');
+  if (ctx) {
+    const g = ctx.createLinearGradient(0, 0, 256, 0);
+    g.addColorStop(0,   'rgba(255, 20, 147, 0.95)');
+    g.addColorStop(0.5, 'rgba(255, 80, 180, 1.00)');
+    g.addColorStop(1,   'rgba(255, 20, 147, 0.30)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 256, 8);
+  }
+  cachedRibbonTexture = Texture.from(c);
+  return cachedRibbonTexture;
+}
+
+export interface ChainRibbonController {
+  rope: MeshRope;
+  points: Point[];
+  update: (pts: ReadonlyArray<{ x: number; y: number }>) => void;
+  dispose: () => void;
+}
+
+/**
+ * Creates a PIXI v8 MeshRope ribbon attached to `stage`. Hot-pink gradient
+ * texture, hidden until selection has 2+ points. Updates points in place
+ * (no allocation churn).
+ */
+export function createChainRibbonController(stage: Container): ChainRibbonController {
+  const points: Point[] = [new Point(0, 0), new Point(0, 0)];
+  const rope = new MeshRope({ texture: getRibbonTexture(), points });
+  rope.visible = false;
+  stage.addChild(rope);
+
+  return {
+    rope,
+    points,
+    update(pts) {
+      if (pts.length < 2) {
+        rope.visible = false;
+        return;
+      }
+      while (points.length < pts.length) points.push(new Point(0, 0));
+      while (points.length > pts.length) points.pop();
+      pts.forEach((p, i) => { points[i].set(p.x, p.y); });
+      rope.visible = true;
+    },
+    dispose() {
+      try { stage.removeChild(rope); } catch { /* */ }
+      rope.destroy();
+    },
+  };
 }

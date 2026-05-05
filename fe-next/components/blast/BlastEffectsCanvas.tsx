@@ -17,6 +17,7 @@ import { createBlastJuiceKit, type BlastJuiceKit } from './effects/blastJuiceKit
 import { buildComboLevelUpTimeline } from './effects/blastGsapTimelines';
 import { useBlastAmbientEffects } from './useBlastAmbientEffects';
 import { useBlastPixiOverlays } from './hooks/useBlastPixiOverlays';
+import { useChainRibbonOverlay } from './hooks/useChainRibbonOverlay';
 import { useBlastGsapTimelines } from './hooks/useBlastGsapTimelines';
 import { isReducedMotionPreferred } from '@/utils/accessibility';
 import {
@@ -195,6 +196,9 @@ function EffectsWorker({
   const { fireShockwave, flashCross, spawnPulseRing, spawnStarBurst, spawnAfterglow, spawnLightSweep } = useBlastPixiOverlays({
     camera, width, height, gridSize, cellSize, chainLevel,
   });
+
+  // ─── Chain ribbon (Phase 3 jelly) ────────────────────────────────────
+  useChainRibbonOverlay({ camera, app: app as { canvas?: HTMLCanvasElement } | null });
 
   // ─── GSAP timeline runners — cascade depth 1-4, wave shower, long word ─
   const { runCascadePunch, runLongWordPunch, runWaveClearShower, trackTimeline } = useBlastGsapTimelines({

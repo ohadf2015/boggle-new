@@ -213,6 +213,7 @@ export const BlastTile = memo(function BlastTile({
       aria-label={`${letter}${type !== 'standard' ? ` ${type} tile` : ''}`}
       title={tooltip ? `${tooltip.name}: ${tooltip.desc}` : undefined}
       data-blast-tile=""
+      data-blast-selected={isSelected ? '' : undefined}
     >
       {candyOn && (
         <>
