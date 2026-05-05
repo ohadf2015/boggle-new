@@ -527,6 +527,7 @@ export function useBlastEngine(
       stars: calculateEarnedStars(gs.tilesCleared, gs.totalTiles, allObjectivesComplete),
       wavesCompleted,
       waveResults,
+      tileTypeClears: gs.tileTypeClears,
     };
   }, []);
 

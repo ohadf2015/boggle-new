@@ -8722,6 +8722,7 @@ const he = {
     "totalScore": "סה\"כ",
     "waveBreakdown": "פירוט גלים",
     "wavesCompleted": "גלים",
+    "tileBreakdown": "פירוט אריחים",
     "skillBreakdown": "ניתוח מיומנות",
     "skillAvgLength": "אורך מילה ממוצע",
     "skillLongWords": "מילים ארוכות (6+)",

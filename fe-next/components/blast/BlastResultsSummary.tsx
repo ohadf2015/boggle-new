@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useBlastBadgeUnlocks } from './hooks/useBlastBadgeUnlocks';
 import { BlastInsightRibbon } from './BlastInsightRibbon';
 import { BlastCountUp } from './BlastCountUp';
+import { BlastTileTypeBreakdown } from './BlastTileTypeBreakdown';
 import { getMascotForResults, MASCOT_IMAGES } from './utils/blastMascot';
 import { computeFailReason } from './utils/computeFailReason';
 import type { BlastResultsData } from './types';
@@ -382,6 +383,17 @@ export function BlastResultsSummary({
           </div>
         </AdaptiveMotion.div>
       )}
+
+      {/* Tile-type breakdown — pill row of how many of each special tile the
+          player cleared this run, leader pill highlighted. */}
+      <AdaptiveMotion.div
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.22 }}
+        className="w-full"
+      >
+        <BlastTileTypeBreakdown tileTypeClears={results.tileTypeClears} t={t} />
+      </AdaptiveMotion.div>
 
       {/* Skill stats */}
       <AdaptiveMotion.div

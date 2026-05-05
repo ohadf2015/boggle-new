@@ -8933,6 +8933,7 @@ const en = {
     "totalScore": "Total",
     "waveBreakdown": "Wave Breakdown",
     "wavesCompleted": "Waves",
+    "tileBreakdown": "Tile Breakdown",
     "skillBreakdown": "Skill Breakdown",
     "skillAvgLength": "Avg Word Length",
     "skillLongWords": "Long Words (6+)",

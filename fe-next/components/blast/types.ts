@@ -138,6 +138,10 @@ export interface BlastResultsData {
   bestWave?: { waveNumber: number; score: number };
   /** Badges unlocked this run (for achievement ribbon) */
   badges?: Array<{ id: string; icon: string; label: string; isNew?: boolean }>;
+  /** Per-tile-type clear counts for the run, summed across waves. Drives
+   *  the tile-type breakdown row on the results screen. Sparse: types with
+   *  0 clears may be omitted by the producer. */
+  tileTypeClears?: Partial<Record<BlastTileType, number>>;
   /** Sprint 3 polish: target_word goal context surfaced on the results card so
    *  the player sees acknowledgement either way ("Target was: CRYSTAL" on miss,
    *  "FOUND IT!" on hit). Optional — only set when the wave actually had a

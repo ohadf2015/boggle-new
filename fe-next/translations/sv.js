@@ -8751,6 +8751,7 @@ const sv = {
     "totalScore": "Totalt",
     "waveBreakdown": "Vågöversikt",
     "wavesCompleted": "Vågor",
+    "tileBreakdown": "Plattanalys",
     "skillBreakdown": "Färdighetsanalys",
     "skillAvgLength": "Snittordlängd",
     "skillLongWords": "Långa ord (6+)",

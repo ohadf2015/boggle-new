@@ -8765,6 +8765,7 @@ const es = {
     "totalScore": "Total",
     "waveBreakdown": "Desglose de oleadas",
     "wavesCompleted": "Oleadas",
+    "tileBreakdown": "Análisis de fichas",
     "skillBreakdown": "Análisis de habilidad",
     "skillAvgLength": "Longitud promedio",
     "skillLongWords": "Palabras largas (6+)",

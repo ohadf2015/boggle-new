@@ -8737,6 +8737,7 @@ const ja = {
     "totalScore": "合計",
     "waveBreakdown": "ウェーブ詳細",
     "wavesCompleted": "ウェーブ",
+    "tileBreakdown": "タイル分析",
     "skillBreakdown": "スキル分析",
     "skillAvgLength": "平均単語長",
     "skillLongWords": "長い単語（6文字以上）",
