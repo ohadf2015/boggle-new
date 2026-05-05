@@ -27,7 +27,7 @@ interface UseGridInteractionProps {
   grid: LetterGrid;
   interactive: boolean;
   comboLevel: number;
-  onWordSubmit?: (word: string) => void;
+  onWordSubmit?: (word: string, meta?: { inputMethod: 'kb' | 'drag' }) => void;
   onPathSubmit?: (cells: SelectedCell[]) => void;
   externalSelectedCells?: SelectedCell[];
   gridRef: React.RefObject<HTMLDivElement | null>;
@@ -207,7 +207,7 @@ export function useGridInteraction({
     const combo = comboLevelRef.current;
     const formedWord = current.map(c => c.letter).join('');
     if (onPathSubmit) onPathSubmit([...current]);
-    if (onWordSubmit) onWordSubmit(formedWord);
+    if (onWordSubmit) onWordSubmit(formedWord, { inputMethod: 'drag' });
     vibrateWordSubmit(current.length, combo, fireRoundActive);
     if (combo > 0) {
       startSequentialFadeOut(true, current);
@@ -243,7 +243,7 @@ export function useGridInteraction({
         if (selectedCells.length >= 3 && isTouchingRef.current) {
           const formedWord = selectedCells.map(c => c.letter).join('');
           if (onPathSubmit) onPathSubmit([...selectedCells]);
-          if (onWordSubmit) onWordSubmit(formedWord);
+          if (onWordSubmit) onWordSubmit(formedWord, { inputMethod: 'drag' });
           startSequentialFadeOut(true, selectedCells);
           isTouchingRef.current = false;
         }
@@ -390,7 +390,7 @@ export function useGridInteraction({
       setSelectedCells([...dragCells]);
       const formedWord = dragCells.map(c => c.letter).join('');
       if (onPathSubmit) onPathSubmit([...dragCells]);
-      if (onWordSubmit) onWordSubmit(formedWord);
+      if (onWordSubmit) onWordSubmit(formedWord, { inputMethod: 'drag' });
       const combo = comboLevelRef.current;
       vibrateWordSubmit(dragCells.length, combo, fireRoundActive);
       if (combo > 0) {

@@ -217,6 +217,8 @@ export const SubmitWordSchema = z.object({
   // is client-supplied — but the surface is enum-restricted to canonical types
   // to prevent arbitrary string injection (BLT-VAL-1, blast MP audit 2026-04-28).
   comboType: z.enum(BLAST_COMBO_TYPES).optional().nullable(),
+  // inputMethod: tracks whether word was submitted via keyboard ('kb') or drag/tap ('drag')
+  inputMethod: z.enum(['kb', 'drag']).optional().default('drag'),
 });
 
 /**
