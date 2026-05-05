@@ -27,29 +27,45 @@ export function useAdMob() {
     // Per-surface unit ID lets AdMob waterfall optimize each placement separately.
     const adId = config.rewardedUnits?.[surface] ?? config.rewardedAdId;
 
-    // Reward must come from the SDK's Rewarded event — Dismissed alone is ambiguous
-    // (fires on both early-close and post-reward per plugin docs).
+    // Reward must come from the SDK's Rewarded event. @capacitor-community/admob v8 does
+    // not guarantee `Rewarded → Dismissed` order on Android — some builds fire Dismissed
+    // first and the Rewarded payload lands ~tens-to-hundreds of ms later. Treat Rewarded
+    // as the direct success trigger; on Dismissed without a prior Rewarded, hold a short
+    // grace window for a late event before declaring skip.
     let rewarded = false;
     let settled = false;
+    let dismissGraceTimer: ReturnType<typeof setTimeout> | null = null;
+    const REWARD_GRACE_MS = 750;
     const handles: Array<{ remove: () => void | Promise<void> }> = [];
 
     const cleanup = () => {
+      if (dismissGraceTimer) { clearTimeout(dismissGraceTimer); dismissGraceTimer = null; }
       handles.forEach((h) => { try { h.remove(); } catch {} });
       handles.length = 0;
     };
 
     let finishRef: (ok: boolean, errMsg?: string) => void = () => {};
 
-    // Register listeners SYNCHRONOUSLY before any await — plugin's addListener
-    // pushes to its internal registry on call (Promise wraps the handle, not registration).
-    // Awaiting first would let the test/event loop race ahead of registration.
     const pendingHandles = [
-      AdMob.addListener(RewardAdPluginEvents.Rewarded, () => { rewarded = true; }),
-      AdMob.addListener(RewardAdPluginEvents.Dismissed, () => finishRef(rewarded)),
+      AdMob.addListener(RewardAdPluginEvents.Rewarded, () => {
+        rewarded = true;
+        finishRef(true);
+      }),
+      AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
+        if (rewarded || settled) return;
+        dismissGraceTimer = setTimeout(() => {
+          if (!rewarded) finishRef(false);
+        }, REWARD_GRACE_MS);
+      }),
       AdMob.addListener(RewardAdPluginEvents.FailedToShow, (e: { message?: string } | undefined) => finishRef(false, e?.message || 'Ad failed to show')),
       AdMob.addListener(RewardAdPluginEvents.FailedToLoad, (e: { message?: string } | undefined) => finishRef(false, e?.message || 'Ad failed to load')),
     ];
-    Promise.all(pendingHandles).then((hs) => handles.push(...hs)).catch(() => {});
+    // Await registration before we fire `prepareRewardVideoAd`, otherwise a fast plugin
+    // could emit Rewarded before our listener is attached on the native side.
+    try {
+      const resolved = await Promise.all(pendingHandles);
+      handles.push(...resolved);
+    } catch { /* listener registration is best-effort; ad path still drives outcome */ }
 
     try {
       await new Promise<void>((resolve) => {

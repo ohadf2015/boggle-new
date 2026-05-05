@@ -87,20 +87,57 @@ describe('useAdMob', () => {
     expect(onReward).toHaveBeenCalledTimes(1);
   });
 
-  it('showRewarded calls onError when dismissed without reward', async () => {
-    const wrapper = makeWrapper(true);
-    const { result } = renderHook(() => useAdMob(), { wrapper });
-    const onReward = vi.fn();
-    const onError = vi.fn();
-    await act(async () => {
-      const p = result.current.showRewarded(onReward, onError);
-      await Promise.resolve();
-      await Promise.resolve();
-      fireEvent('onRewardedVideoAdDismissed');
-      await p;
-    });
-    expect(onReward).not.toHaveBeenCalled();
-    expect(onError).toHaveBeenCalled();
+  it('showRewarded calls onError when dismissed without reward (after grace window)', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    try {
+      const wrapper = makeWrapper(true);
+      const { result } = renderHook(() => useAdMob(), { wrapper });
+      const onReward = vi.fn();
+      const onError = vi.fn();
+      await act(async () => {
+        const p = result.current.showRewarded(onReward, onError);
+        await Promise.resolve();
+        await Promise.resolve();
+        fireEvent('onRewardedVideoAdDismissed');
+        // Grace window allows late Rewarded events; advance past it
+        await vi.advanceTimersByTimeAsync(800);
+        await p;
+      });
+      expect(onReward).not.toHaveBeenCalled();
+      expect(onError).toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  // Regression: @capacitor-community/admob v8 on certain Android builds fires
+  // Dismissed BEFORE Rewarded. The previous implementation read `rewarded`
+  // at Dismissed time and silently dropped the payout — players reported
+  // "watched ad, didn't get life" on /daily/word-hunt.
+  it('showRewarded fires onReward when Rewarded arrives AFTER Dismissed (Android race)', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    try {
+      const wrapper = makeWrapper(true);
+      const { result } = renderHook(() => useAdMob(), { wrapper });
+      const onReward = vi.fn();
+      const onError = vi.fn();
+      await act(async () => {
+        const p = result.current.showRewarded(onReward, onError);
+        await Promise.resolve();
+        await Promise.resolve();
+        // Inverted ordering: Dismissed lands first
+        fireEvent('onRewardedVideoAdDismissed');
+        // Late Rewarded within grace window
+        await vi.advanceTimersByTimeAsync(100);
+        fireEvent('onRewardedVideoAdReward', { type: 'coins', amount: 10 });
+        await vi.advanceTimersByTimeAsync(800);
+        await p;
+      });
+      expect(onReward).toHaveBeenCalledTimes(1);
+      expect(onError).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('showRewarded calls onError on FailedToShow', async () => {
