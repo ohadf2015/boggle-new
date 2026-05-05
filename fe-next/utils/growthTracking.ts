@@ -164,6 +164,8 @@ const CANONICAL_DUAL_EMIT: ReadonlySet<GrowthEvent> = new Set<GrowthEvent>([
   'first_game_won',
   'first_word_found',
   'session_start',
+  'signup_completed',
+  'first_win_signup_completed',
 ]);
 
 /**
@@ -446,6 +448,19 @@ export const consumePendingSignupCompletion = (): void => {
   if (!pending) return;
   sessionStorage.removeItem(SIGNUP_FUNNEL_PENDING_KEY);
   trackSignupFunnel('completed', pending === 'first_win');
+};
+
+/**
+ * Unconditional signup-completion emit for the PostHog "Signup Completed"
+ * goal. The existing `trackSignupFunnel('completed')` only fires when the
+ * post-game prompt was shown first, so users signing up via header / menu /
+ * onboarding never produced a completion event (PostHog 30d 2026-05-05:
+ * 22 prompt_shown × 6 users → 0 completed; meanwhile 15 unique authed users
+ * the same window). Fire this on every guest → authed transition with a
+ * `source` prop so the funnel can attribute by signup origin.
+ */
+export const trackSignupCompleted = (source: string = 'unknown'): void => {
+  trackGrowthEvent('signup_completed', { source });
 };
 
 /**

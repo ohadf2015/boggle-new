@@ -141,6 +141,38 @@ describe('useMultiplayerSignupNudge', () => {
     );
   });
 
+  it('propagates MP submode (word-hunt/classic/wheel-rush) into game_completed `mode`', () => {
+    // PostHog data 30d showed 130 `game_completed` rows with mode='multiplayer'
+    // and 0 with mode='word-hunt'/'classic'/'wheel-rush' even though
+    // `useGameStartTelemetry` correctly tagged 44/31/7 starts under those
+    // submodes. Cause: recordMpGame hardcoded mode='multiplayer'. Fix: accept
+    // submode arg and forward it as `mode` so MP submode funnels become
+    // computable.
+    const { result } = renderHook(() =>
+      useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+    );
+
+    act(() => { result.current.recordMpGame('word-hunt'); });
+
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
+      'game_completed',
+      expect.objectContaining({ mode: 'word-hunt', gameMode: 'word-hunt' })
+    );
+  });
+
+  it('falls back to mode=multiplayer when no submode supplied (back-compat)', () => {
+    const { result } = renderHook(() =>
+      useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+    );
+
+    act(() => { result.current.recordMpGame(); });
+
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
+      'game_completed',
+      expect.objectContaining({ mode: 'multiplayer', gameMode: 'multiplayer' })
+    );
+  });
+
   it('recordMpGame increments session counter', () => {
     const { result } = renderHook(() =>
       useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })

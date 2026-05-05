@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, ReactNode } from 'react';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import { syncAuthAnalyticsTransition } from '@/utils/authAnalytics';
-import { consumePendingSignupCompletion } from '@/utils/growthTracking';
+import { consumePendingSignupCompletion, trackSignupCompleted } from '@/utils/growthTracking';
 
 // Import hooks from auth module (types are re-exported separately below)
 import {
@@ -118,6 +118,21 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
       // Resolve pending signup-prompt funnel only on guest → authed flips.
       // Re-identifies of an already-authed user must not re-fire completion.
       if (wasGuest) {
+        // Unconditional canonical emit so PostHog "Signup Completed" goal
+        // can attribute *any* signup source (header / menu / onboarding /
+        // post-game prompt). Source disambiguator is read from the pending
+        // sessionStorage key so the prompt path keeps its attribution.
+        const pending =
+          typeof window !== 'undefined'
+            ? sessionStorage.getItem('lexiclash_signup_funnel_pending')
+            : null;
+        const source =
+          pending === 'first_win'
+            ? 'first_win_prompt'
+            : pending === 'multi_game'
+            ? 'multi_game_prompt'
+            : 'header_or_menu';
+        trackSignupCompleted(source);
         consumePendingSignupCompletion();
       }
     } else {

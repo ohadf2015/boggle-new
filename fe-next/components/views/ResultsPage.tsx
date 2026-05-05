@@ -435,9 +435,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     isResultsVisible: true,
   });
 
-  // Record MP game completion on mount (recordMpGame is stable via useCallback)
+  // Record MP game completion on mount (recordMpGame is stable via useCallback).
+  // Pass resolvedGameMode so PostHog `game_completed` keeps the submode
+  // (word-hunt / classic / wheel-rush) instead of collapsing to 'multiplayer'.
   useEffect(() => {
-    if (gameCode) recordMpGame();
+    if (gameCode) recordMpGame(resolvedGameMode);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

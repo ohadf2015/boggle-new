@@ -44,7 +44,7 @@ interface UseMultiplayerSignupNudgeReturn {
   /** Dismiss the current nudge */
   dismissNudge: () => void;
   /** Record an MP game completion (call from results page) */
-  recordMpGame: () => void;
+  recordMpGame: (submode?: string) => void;
   /** Whether the coin counter should pulse */
   shouldPulseCoins: boolean;
 }
@@ -96,13 +96,14 @@ export function useMultiplayerSignupNudge({
     };
   }, [mpGames]);
 
-  const recordMpGame = useCallback(() => {
+  const recordMpGame = useCallback((submode?: string) => {
     setMpGames((prev) => {
       const newCount = prev + 1;
       setMpSessionGames(newCount);
+      const mode = submode || 'multiplayer';
       trackGrowthEvent('game_completed', {
-        mode: 'multiplayer',
-        gameMode: 'multiplayer',
+        mode,
+        gameMode: mode,
         gameCode: undefined,
         isGuest: true,
         mpSessionGame: newCount,

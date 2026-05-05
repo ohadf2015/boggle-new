@@ -72,4 +72,28 @@ describe('trackGrowthEvent — canonical dual-emit', () => {
     expect(names).toContain('growth:page_view');
     expect(names).not.toContain('page_view');
   });
+
+  // Hole #5 — PostHog Goal "Signup Completed" was wired to a non-existent
+  // event name. Existing `trackSignupFunnel('completed')` only fires when the
+  // post-game prompt was shown first; users signing up via header/menu never
+  // emit a completion. New `trackSignupCompleted(source)` is unconditional —
+  // every guest→authed flip emits canonical `signup_completed` so the funnel
+  // can attribute by source.
+  it('trackSignupCompleted emits canonical signup_completed with source attribution', async () => {
+    const { trackSignupCompleted } = await import('../growthTracking');
+    trackSignupCompleted('multi_game_prompt');
+
+    const names = capture.mock.calls.map(c => c[0]);
+    expect(names).toContain('signup_completed');
+    const canonical = capture.mock.calls.find(c => c[0] === 'signup_completed');
+    expect(canonical?.[1]).toMatchObject({ source: 'multi_game_prompt' });
+  });
+
+  it('trackSignupCompleted defaults source to "unknown" when omitted', async () => {
+    const { trackSignupCompleted } = await import('../growthTracking');
+    trackSignupCompleted();
+
+    const canonical = capture.mock.calls.find(c => c[0] === 'signup_completed');
+    expect(canonical?.[1]).toMatchObject({ source: 'unknown' });
+  });
 });

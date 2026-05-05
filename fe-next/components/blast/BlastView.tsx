@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Star, Gift, Shield, Bomb, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
-import { trackGameStart } from '@/utils/growthTracking';
+import { trackGameStart, trackGameEnd } from '@/utils/growthTracking';
 import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { BlastGame } from './BlastGame';
@@ -46,9 +46,12 @@ export function BlastView() {
   // first transitions out of `ready`. Was missing entirely → PostHog showed
   // 27 blast mode_selected events with 0 game_starts (2026-04-27 sweep).
   const gameStartedRef = useRef(false);
+  const gameStartTimeRef = useRef<number>(0);
+  const gameEndedRef = useRef(false);
   useEffect(() => {
     if (phase === 'playing' && !gameStartedRef.current) {
       gameStartedRef.current = true;
+      gameStartTimeRef.current = Date.now();
       trackGameStart('blast', { language });
     }
   }, [phase, language]);
@@ -149,6 +152,28 @@ export function BlastView() {
     };
     setResults(mergedResults);
     setPhase('results');
+
+    // Funnel parity: emit growth:game_completed once per blast run. Was missing
+    // entirely → PostHog 30d showed 21 blast game_started with 0 game_completed
+    // (2026-05-05). Fire-once via gameEndedRef to survive any results re-mount.
+    if (!gameEndedRef.current) {
+      gameEndedRef.current = true;
+      const durationSec = gameStartTimeRef.current
+        ? Math.floor((Date.now() - gameStartTimeRef.current) / 1000)
+        : undefined;
+      trackGameEnd(
+        'blast',
+        mergedResults.finalScore,
+        mergedResults.wordsFound.length,
+        true,
+        durationSec,
+        {
+          isWinner: true,
+          wavesCompleted: mergedResults.wavesCompleted,
+          difficulty: config.difficulty ?? 'medium',
+        },
+      );
+    }
 
     // Persist to DB and merge the server's enrichment (percentile, previousBest)
     // back into results state so the rank card and PB delta render.

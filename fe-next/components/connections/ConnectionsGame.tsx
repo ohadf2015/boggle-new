@@ -24,7 +24,7 @@ import { getCurrentLives, setCurrentLives, MAX_LIVES } from '@/lib/connections/l
 import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
 import { submitConnectionsFeedback } from '@/lib/connections/feedback';
 import { fetchBannedPuzzleIds, getCachedBannedIds } from '@/lib/connections/bannedPuzzles';
-import { trackGameStart } from '@/utils/growthTracking';
+import { trackGameStart, trackGameEnd } from '@/utils/growthTracking';
 import PuzzleCard from './PuzzleCard';
 import OutOfLivesModal from './OutOfLivesModal';
 
@@ -103,10 +103,32 @@ export default function ConnectionsGame() {
   // PostHog showed 18 connections mode_selected with 0 game_starts
   // (2026-04-27 sweep). One emit per session is enough; subsequent puzzles
   // within the same session are tracked via puzzle-level events.
+  const gameStartTimeRef = useRef<number>(Date.now());
+  const endFiredRef = useRef<boolean>(false);
   useEffect(() => {
+    gameStartTimeRef.current = Date.now();
     trackGameStart('connections', { language });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Funnel parity: emit growth:game_completed when the player reaches a
+  // terminal puzzle state (correct / outOfLives / gaveUp). Without this,
+  // PostHog 30d showed 10 connections starts → 0 completes (2026-05-05).
+  // Fire-once per mount; subsequent puzzles within the same mount don't
+  // re-emit.
+  useEffect(() => {
+    if (endFiredRef.current) return;
+    const status = state.status;
+    if (status !== 'correct' && status !== 'outOfLives' && status !== 'gaveUp') return;
+    endFiredRef.current = true;
+    const totalScore = sessionScore + (state.score ?? 0);
+    const durationSec = Math.floor((Date.now() - gameStartTimeRef.current) / 1000);
+    trackGameEnd('connections', totalScore, level, status === 'correct', durationSec, {
+      isWinner: status === 'correct',
+      terminalStatus: status,
+      level,
+    });
+  }, [state.status, state.score, sessionScore, level]);
 
   // Refresh ban list in background. If a puzzle just crossed the 3-distinct-
   // disliker threshold while the player was on it, the next level resolution
