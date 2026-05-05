@@ -55,6 +55,12 @@ vi.mock('@/utils/pushNotifications/tokenRegistration', () => ({
   registerPushToken: vi.fn().mockResolvedValue(true),
 }));
 
+// Mock growthTracking — telemetry contract for the push-prompt funnel
+const mockTrackGrowthEvent = vi.fn();
+vi.mock('@/utils/growthTracking', () => ({
+  trackGrowthEvent: (...args: unknown[]) => mockTrackGrowthEvent(...args),
+}));
+
 describe('PushNotificationPrompt', () => {
   let originalNotification: typeof Notification;
 
@@ -141,6 +147,61 @@ describe('PushNotificationPrompt', () => {
       // THEN
       await waitFor(() => {
         expect(registerPushToken).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('telemetry', () => {
+    // PostHog 30d 2026-05-05 had zero observability on push-prompt funnel —
+    // unable to measure show rate, dismiss rate, or grant rate. Without
+    // instrumentation, the MIN_GAMES_BEFORE_PROMPT=3 threshold cannot be
+    // tuned against actual conversion data. Three events form the funnel:
+    // shown → (dismissed | granted | failed).
+    it('emits push_prompt_shown when prompt becomes visible', () => {
+      mockShouldShow.mockReturnValue(true);
+
+      render(<PushNotificationPrompt />);
+
+      expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
+        'push_prompt_shown',
+        expect.any(Object),
+      );
+    });
+
+    it('does NOT emit push_prompt_shown when prompt is hidden', () => {
+      mockShouldShow.mockReturnValue(false);
+
+      render(<PushNotificationPrompt />);
+
+      expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith(
+        'push_prompt_shown',
+        expect.anything(),
+      );
+    });
+
+    it('emits push_prompt_dismissed when Not Now is clicked', () => {
+      mockShouldShow.mockReturnValue(true);
+
+      render(<PushNotificationPrompt />);
+      fireEvent.click(screen.getByText('Not Now'));
+
+      expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
+        'push_prompt_dismissed',
+        expect.any(Object),
+      );
+    });
+
+    it('emits push_prompt_granted when Enable resolves successfully', async () => {
+      mockShouldShow.mockReturnValue(true);
+
+      render(<PushNotificationPrompt />);
+      fireEvent.click(screen.getByText('Enable Notifications'));
+
+      await waitFor(() => {
+        expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
+          'push_prompt_granted',
+          expect.any(Object),
+        );
       });
     });
   });

@@ -82,6 +82,11 @@ export type GrowthEvent =
   | 'first_win_signup_completed'
   | 'first_win_signup_dismissed'
   | 'guest_conversion'
+  // Push notification permission funnel
+  | 'push_prompt_shown'
+  | 'push_prompt_dismissed'
+  | 'push_prompt_granted'
+  | 'push_prompt_failed'
   // Monetization
   | 'iap_viewed'
   | 'iap_purchased'

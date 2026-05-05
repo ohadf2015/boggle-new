@@ -14,15 +14,28 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { shouldShowPushPrompt, dismissPushPrompt } from '@/utils/pushNotifications';
 import { registerPushToken } from '@/utils/pushNotifications/tokenRegistration';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 export function PushNotificationPrompt() {
   const { t } = useLanguage();
   const [visible, setVisible] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
-  useFocusTrap(dialogRef, visible, () => { dismissPushPrompt(); setVisible(false); });
+  useFocusTrap(dialogRef, visible, () => {
+    dismissPushPrompt();
+    trackGrowthEvent('push_prompt_dismissed', { trigger: 'focus_trap_escape' });
+    setVisible(false);
+  });
 
+  // Funnel parity: emit `push_prompt_shown` exactly once per mount when the
+  // prompt becomes visible. Pairs with `push_prompt_dismissed` /
+  // `push_prompt_granted` so the show → grant funnel is computable. Without
+  // this, MIN_GAMES_BEFORE_PROMPT=3 tuning is blind.
   useEffect(() => {
-    setVisible(shouldShowPushPrompt());
+    const should = shouldShowPushPrompt();
+    setVisible(should);
+    if (should) {
+      trackGrowthEvent('push_prompt_shown', {});
+    }
   }, []);
 
   if (!visible) {
@@ -35,14 +48,17 @@ export function PushNotificationPrompt() {
       // Do NOT gate on window.Notification.requestPermission — native WebView
       // exposes that API but it does not trigger the native push-perm dialog.
       await registerPushToken();
+      trackGrowthEvent('push_prompt_granted', {});
     } catch {
       // Permission request failed — close prompt silently
+      trackGrowthEvent('push_prompt_failed', {});
     }
     setVisible(false);
   }
 
   function handleDismiss() {
     dismissPushPrompt();
+    trackGrowthEvent('push_prompt_dismissed', { trigger: 'not_now_button' });
     setVisible(false);
   }
 
