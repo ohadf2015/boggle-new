@@ -3531,3 +3531,32 @@ body.crazygames-embed .game-view-container,
   50% { background-position: 0 -100%; }
   100% { background-position: 0 0; }
 }
+
+/* Words Ladder bump animation on new entry */
+@keyframes ladder-bump {
+  0% { transform: translateX(-4px); }
+  40% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+
+.animate-ladder-bump {
+  animation: ladder-bump 400ms ease-out;
+}
+
+/* RTL mirror for Hebrew/Arabic */
+[dir="rtl"] .animate-ladder-bump {
+  animation: ladder-bump-rtl 400ms ease-out;
+}
+
+@keyframes ladder-bump-rtl {
+  0% { transform: translateX(4px); }
+  40% { transform: translateX(-2px); }
+  100% { transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ladder-bump,
+  [dir="rtl"] .animate-ladder-bump {
+    animation: none;
+  }
+}

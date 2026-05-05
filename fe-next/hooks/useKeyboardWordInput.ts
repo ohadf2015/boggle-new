@@ -34,7 +34,7 @@ export interface UseKeyboardWordInputOptions {
   /** Whether keyboard input is enabled */
   enabled: boolean;
   /** Callback when word is submitted */
-  onWordSubmit?: (word: string) => void;
+  onWordSubmit?: (word: string, meta?: { inputMethod: 'kb' | 'drag' }) => void;
   /** Callback when typed word changes (for external display) */
   onTypedWordChange?: (word: string) => void;
   /** Minimum word length for submission */
@@ -277,7 +277,7 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
   const submitTypedWord = useCallback(() => {
     const word = typedWordRef.current;
     if (word.length >= minWordLength && isValidOnGrid) {
-      onWordSubmit?.(word);
+      onWordSubmit?.(word, { inputMethod: 'kb' });
       setTypedWord('');
       setIsTypingMode(false);
     }

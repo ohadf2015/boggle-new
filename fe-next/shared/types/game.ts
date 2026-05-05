@@ -156,6 +156,11 @@ export interface WordDetail {
    * Optional so existing surfaces that don't need it stay backwards-compatible.
    */
   timestamp?: number;
+  /**
+   * How the word was submitted: keyboard or by dragging tiles.
+   * Used for UI indicators (e.g., ⌨️ chip on desktop WordsLadder).
+   */
+  inputMethod?: 'kb' | 'drag';
 }
 
 /** Entry tracking who found a word first */

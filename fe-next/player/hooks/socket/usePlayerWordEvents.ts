@@ -151,6 +151,7 @@ export function usePlayerWordEvents({
               comboBonus: data.comboBonus ?? 0,
               fireRoundBonus: data.fireRoundBonus ?? 0,
               fireRoundMultiplier: data.fireRoundMultiplier ?? 1,
+              inputMethod: data.inputMethod ?? fw.inputMethod,
             }
           : fw
       ));

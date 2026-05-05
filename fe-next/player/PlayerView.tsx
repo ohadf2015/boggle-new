@@ -489,12 +489,13 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
 
   // Word submission handler - adds word with pending validation state
   // Uses WordDetail type from GameStateContext
-  const handleWordSubmit = useCallback((formedWord: string) => {
+  const handleWordSubmit = useCallback((formedWord: string, meta?: { inputMethod?: 'kb' | 'drag' }) => {
     setFoundWords(prev => [...prev, {
       word: formedWord,
       score: 0, // Will be updated when validated
       validated: false, // Pending validation - will be updated by usePlayerWordEvents
       isDuplicate: false,
+      inputMethod: meta?.inputMethod ?? 'drag',
     }]);
   }, [setFoundWords]);
 
@@ -508,6 +509,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       duplicate: w.isDuplicate,
       comboBonus: w.comboBonus,
       fireRoundBonus: w.fireRoundBonus,
+      inputMethod: w.inputMethod,
     })),
     [foundWords]
   );

@@ -169,6 +169,20 @@ export const EXPERIMENTS = {
     description:
       'Blast tile candy-crush presentation + popup redesign. control = current flat DOM, candy = 5-layer composite + GSAP phase timelines + BlastModalShell.',
   }),
+
+  /**
+   * Multiplayer desktop chassis kill-switch. When enabled (on), desktop
+   * users see the MultiplayerDesktopShell (responsive layout for wide
+   * screens). When disabled (off), all users see legacy mobile-stacked
+   * layout. Not used for A/B traffic split — flip to off via PostHog if
+   * Sentry warnings spike post-deploy.
+   */
+  'mp.desktop-shell.v1': defineExperiment({
+    variants: ['on', 'off'] as const,
+    default: 'on',
+    description:
+      'Multiplayer desktop chassis kill-switch. on = MultiplayerDesktopShell mounts on desktop (default). off = legacy mobile-stacked layout. Flip to off via PostHog if Sentry warnings spike post-deploy. Not used for A/B traffic split.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

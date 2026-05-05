@@ -410,6 +410,7 @@ export interface WordAcceptedPayload {
   fireRoundBonus?: number;
   goldenBonus?: number;
   isSpecialWord?: boolean;
+  inputMethod?: 'kb' | 'drag';
   /** Merged blast data (Fix 2) — present when gameMode is blast */
   blast?: {
     tileBonus: number;

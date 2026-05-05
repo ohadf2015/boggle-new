@@ -25,6 +25,11 @@ import {
 import TournamentStandings from '../TournamentStandings';
 import InGameScreen from '../game/InGameScreen';
 import { useBlastMultiplayerBridge } from '@/components/blast/hooks/useBlastMultiplayerBridge';
+import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
+import { StandardDesktopAdapter } from './desktop/StandardDesktopAdapter';
+import { WheelRushDesktopAdapter } from './desktop/WheelRushDesktopAdapter';
+import { BlastDesktopAdapter } from './desktop/BlastDesktopAdapter';
+import { WordHuntDesktopAdapter } from './desktop/WordHuntDesktopAdapter';
 
 // Mode-specific game views are split into per-route chunks. Only the active
 // mode's bundle is downloaded — non-blast rooms don't pay for BlastGame's
@@ -81,6 +86,7 @@ interface FoundWord {
   timestamp?: number;
   comboBonus?: number;
   fireRoundBonus?: number;
+  inputMethod?: 'kb' | 'drag';
 }
 
 interface LeaderboardEntry {
@@ -245,6 +251,9 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   // word-hunt/blast store updates.
   const gameMode = useGameMode();
 
+  // Desktop shell routing (standard mode only)
+  const shellEnabled = useDesktopShellEnabled();
+
   // Opponent word feed for classic mode
   const { feedItems: opponentFeedItems } = useOpponentWordFeed({ socket, currentPlayerName: username });
 
@@ -320,6 +329,234 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           ))}
         </div>
       </div>
+    );
+  }
+
+  // Desktop shell for classic mode
+  if (shellEnabled && gameMode === 'classic') {
+    // Map leaderboard from MultiplayerInGameView shape to RosterPlayer shape
+    const rosterPlayers = leaderboard.map(entry => ({
+      userId: entry.username ?? '',
+      username: entry.username,
+      score: entry.score,
+      status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
+      isYou: entry.username === username,
+    }));
+
+    // Map foundWords from FoundWord shape to LadderWord shape
+    const ladderWords = foundWords.map((fw, idx) => ({
+      word: fw.word,
+      score: fw.score ?? 0,
+      ts: fw.timestamp ?? 0,
+      userId: username,
+      inputMethod: fw.inputMethod ?? 'drag',
+    }));
+
+    // Build InGameScreen props object
+    const inGameScreenProps = {
+      // Core identity
+      username,
+      gameCode,
+      isHost,
+      isPlaying: true,
+      gameplayFocusMode: true,
+      t,
+      dir,
+      socket,
+      // Game state
+      letterGrid: effectiveGrid,
+      remainingTime,
+      timerValue: timerValue ?? 2,
+      gameActive,
+      showStartAnimation,
+      gameLanguage,
+      minWordLength,
+      comboLevel,
+      comboLevelRef,
+      comboTimeRemaining,
+      comboDanger,
+      // Player data
+      foundWords,
+      leaderboard,
+      totalBoardWords,
+      // Callbacks
+      onExitRoom,
+      onWordSubmit,
+      onResetCombo,
+      // Tournament
+      tournamentData,
+      // Hints
+      hints,
+      // Earthquake/Fire Round
+      earthquakeState,
+      fireRoundActive,
+      fireRoundRemaining,
+      // Board theme
+      boardTheme,
+      // Game mode overlays
+      gameMode: gameMode ?? undefined,
+      onWordHuntGuess: handleWordHuntGuess,
+      // Player experience
+      totalGamesPlayed: profile?.total_games,
+      // Tutorial
+      onShowTutorial,
+      // Desktop shell integration
+      inDesktopShell: true,
+    };
+
+    return (
+      <StandardDesktopAdapter
+        roomId={gameCode}
+        leaderboard={rosterPlayers}
+        foundWords={ladderWords}
+        remainingTime={remainingTime ?? 0}
+        totalTime={totalTime ?? 180}
+        meId={username}
+        canvas={<InGameScreen {...inGameScreenProps} />}
+      />
+    );
+  }
+
+  // Desktop shell for wheel-rush mode
+  // TypeScript doesn't narrow properly on 'wheel-rush' variant in some builds,
+  // but the runtime value is correct (validated in backend/modules/gameModeSelector.ts)
+  if ((gameMode as string) === 'wheel-rush' && shellEnabled) {
+    // Map leaderboard from MultiplayerInGameView shape to RosterPlayer shape
+    const rosterPlayers = leaderboard.map(entry => ({
+      userId: entry.username ?? '',
+      username: entry.username,
+      score: entry.score,
+      status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
+      isYou: entry.username === username,
+    }));
+
+    // Map foundWords from FoundWord shape to LadderWord shape
+    const ladderWords = foundWords.map((fw, idx) => ({
+      word: fw.word,
+      score: fw.score ?? 0,
+      ts: fw.timestamp ?? 0,
+      userId: username,
+      inputMethod: fw.inputMethod ?? 'drag',
+    }));
+
+    const wheelRushProps = {
+      socket,
+      username,
+      leaderboard,
+      onQuit: handleQuit,
+      t,
+      remainingTime,
+    };
+
+    return (
+      <WheelRushDesktopAdapter
+        roomId={gameCode}
+        leaderboard={rosterPlayers}
+        foundWords={ladderWords}
+        remainingTime={remainingTime ?? 0}
+        totalTime={totalTime ?? 60}
+        fogProgress={0} // TODO: Thread fogProgress from WheelRushView's internal state
+        meId={username}
+        canvas={<WheelRushView {...wheelRushProps} />}
+      />
+    );
+  }
+
+  // Desktop shell for blast mode
+  if ((gameMode as string) === 'blast' && shellEnabled) {
+    // Map leaderboard from MultiplayerInGameView shape to RosterPlayer shape
+    const rosterPlayers = leaderboard.map(entry => ({
+      userId: entry.username ?? '',
+      username: entry.username,
+      score: entry.score,
+      status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
+      isYou: entry.username === username,
+    }));
+
+    // Map foundWords from FoundWord shape to LadderWord shape
+    const ladderWords = foundWords.map((fw, idx) => ({
+      word: fw.word,
+      score: fw.score ?? 0,
+      ts: fw.timestamp ?? 0,
+      userId: username,
+      inputMethod: fw.inputMethod ?? 'drag',
+    }));
+
+    const blastGameProps = {
+      config: blastBridge.config,
+      mode: 'multiplayer' as const,
+      remainingTime,
+      totalTime,
+      leaderboard,
+      username,
+      onGameEnd: noop,
+      onQuit: handleQuit,
+      onWordWithComboType: handleBlastWordWithCombo,
+      initialTileStates: blastBridge.initialTileStates,
+      blastSeed: blastBridge.blastSeed,
+      waveNumber: blastBridge.waveNumber,
+    };
+
+    return (
+      <BlastDesktopAdapter
+        roomId={gameCode}
+        leaderboard={rosterPlayers}
+        foundWords={ladderWords}
+        remainingTime={remainingTime ?? 0}
+        totalTime={totalTime ?? 180}
+        comboCount={comboLevel ?? 0}
+        meId={username}
+        canvas={<BlastGame {...blastGameProps} />}
+      />
+    );
+  }
+
+  // Desktop shell for word-hunt mode
+  if ((gameMode as string) === 'word-hunt' && shellEnabled) {
+    // Map leaderboard from MultiplayerInGameView shape to RosterPlayer shape
+    const rosterPlayers = leaderboard.map(entry => ({
+      userId: entry.username ?? '',
+      username: entry.username,
+      score: entry.score,
+      status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
+      isYou: entry.username === username,
+    }));
+
+    // Map foundWords from FoundWord shape to LadderWord shape
+    const ladderWords = foundWords.map((fw, idx) => ({
+      word: fw.word,
+      score: fw.score ?? 0,
+      ts: fw.timestamp ?? 0,
+      userId: username,
+      inputMethod: fw.inputMethod ?? 'drag',
+    }));
+
+    const wordHuntGameProps = {
+      grid: effectiveGrid,
+      gameLanguage,
+      leaderboard,
+      username,
+      score: leaderboard.find(p => p.username === username)?.score ?? 0,
+      onQuit: handleQuit,
+      onWordSubmit,
+      onWordHuntGuess: handleWordHuntGuess,
+      gameActive,
+      minWordLength,
+      socket,
+      foundWords,
+    };
+
+    return (
+      <WordHuntDesktopAdapter
+        roomId={gameCode}
+        leaderboard={rosterPlayers}
+        foundWords={ladderWords}
+        remainingTime={remainingTime ?? 0}
+        totalTime={totalTime ?? 180}
+        targetCategory=""
+        meId={username}
+        canvas={<WordHuntGame {...wordHuntGameProps} />}
+      />
     );
   }
 

@@ -48,6 +48,7 @@ const SUBMIT_WORD_WEIGHT = parseInt(process.env.RATE_WEIGHT_SUBMITWORD || '3');
 interface SubmitWordPayload {
   word: string;
   comboType?: string | null;
+  inputMethod?: 'kb' | 'drag';
 }
 
 interface SubmitWordVotePayload {
@@ -316,7 +317,8 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       if (firstFinder) {
         // Catch-up mechanic: give 50% partial credit for confirmation finds
         // This rewards word knowledge without devaluing first-find
-        const baseScore = calculateWordScore(normalizedWord, 0);
+        const inputMethod = (validation.data as SubmitWordPayload).inputMethod ?? 'drag';
+        const baseScore = calculateWordScore(normalizedWord, 0, 1, 1, { inputMethod });
         const confirmationScore = Math.floor(baseScore * 0.5);
 
         if (confirmationScore > 0) {
@@ -355,9 +357,10 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       const shouldAutoValidate = isInDictionary || isCommunityValidated || hasPositiveScore;
 
       const comboType = (validation.data as SubmitWordPayload).comboType ?? null;
+      const inputMethod = (validation.data as SubmitWordPayload).inputMethod ?? 'drag';
 
       if (shouldAutoValidate) {
-        handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, isInDictionary === true, comboType);
+        handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, isInDictionary === true, comboType, inputMethod);
       } else {
         // Word not in dictionary - reject immediately (no pending/AI validation)
         inc('wordNeedsValidation');

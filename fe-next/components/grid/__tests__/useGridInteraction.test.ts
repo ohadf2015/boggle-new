@@ -282,7 +282,7 @@ describe('useGridInteraction', () => {
         result.current.submitWord();
       });
 
-      expect(onWordSubmit).toHaveBeenCalledWith('A');
+      expect(onWordSubmit).toHaveBeenCalledWith('A', { inputMethod: 'drag' });
       expect(onPathSubmit).toHaveBeenCalledWith([
         expect.objectContaining({ row: 0, col: 0, letter: 'A' }),
       ]);
@@ -325,7 +325,7 @@ describe('useGridInteraction', () => {
           result.current.submitWord();
         });
 
-        expect(onWordSubmit).toHaveBeenCalledWith('A');
+        expect(onWordSubmit).toHaveBeenCalledWith('A', { inputMethod: 'drag' });
 
         // Within the 150ms hold window, start a new word at K (2,2)
         act(() => {

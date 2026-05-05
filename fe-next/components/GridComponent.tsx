@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, memo, useMemo, useCallback } from 'react';
 import { m, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion';
 import { cn } from '../lib/utils';
 import type { LetterGrid, Language } from '@/types';
+import { useGridAriaLabels } from '@/hooks/useGridAriaLabels';
 
 // Import extracted utilities
 import {
@@ -359,15 +360,16 @@ const GridComponent = memo<GridComponentProps>(({
     gap: GRID_GAP_CLASS,
   }), [grid]);
 
-  // Per-cell aria-label is stable for a given (grid, language). Computing it
-  // inside the cell render loop fires 16 t() calls + 3 regex passes per call
-  // every time GridComponent re-renders during a drag. Pre-compute once.
-  const cellAriaLabels = useMemo(
-    () => grid.map((row, i) =>
-      row.map((cell, j) => t('game.grid.cellLabel', { row: i + 1, col: j + 1, letter: cell })),
-    ),
-    [grid, t],
+  // Stable board seed for memoization — changes only when actual letters change
+  const boardSeed = useMemo(
+    () => grid.map(r => r.join('')).join('|'),
+    [grid],
   );
+
+  // Per-cell aria-label memoized by board seed. Closes mp-perf H3:
+  // Previously fired 16 t() calls per render during drag selection.
+  // Now fires 16 t() calls per round (when boardSeed changes).
+  const cellAriaLabels = useGridAriaLabels(grid, boardSeed);
 
   return (
     <LazyMotion features={domAnimation} strict>
@@ -530,7 +532,7 @@ const GridComponent = memo<GridComponentProps>(({
                   onTouchStart={handleCellTouchStart}
                   onMouseDown={handleCellMouseDown}
                   onDoubleClick={handleCellDoubleClick}
-                  ariaLabel={cellAriaLabels[i][j]}
+                  ariaLabel={cellAriaLabels[`${i},${j}`]}
                 />
               );
             })

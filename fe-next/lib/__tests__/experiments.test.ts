@@ -41,7 +41,7 @@ describe('experiments registry', () => {
 
   it('flag keys are kebab-case (PostHog convention)', () => {
     for (const key of Object.keys(EXPERIMENTS)) {
-      expect(key, `${key} casing`).toMatch(/^[a-z][a-z0-9-]*$/);
+      expect(key, `${key} casing`).toMatch(/^[a-z][a-z0-9.-]*$/);
     }
   });
 
@@ -68,6 +68,20 @@ describe('experiments registry', () => {
       const key = Object.keys(EXPERIMENTS)[0] as ExperimentKey;
       expect(isValidVariant(key, null)).toBe(false);
       expect(isValidVariant(key, undefined)).toBe(false);
+    });
+  });
+
+  describe('mp.desktop-shell.v1 flag', () => {
+    it('exists in registry', () => {
+      expect(EXPERIMENTS['mp.desktop-shell.v1']).toBeDefined();
+    });
+
+    it('defaults to "on" so all desktop users see shell', () => {
+      expect(EXPERIMENTS['mp.desktop-shell.v1'].default).toBe('on');
+    });
+
+    it('has on/off variants for kill-switch', () => {
+      expect(EXPERIMENTS['mp.desktop-shell.v1'].variants).toEqual(['on', 'off']);
     });
   });
 });

@@ -54,15 +54,15 @@ interface PeerValidationResult {
   isBot?: boolean;
 }
 
-function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCode: string, username: string, normalizedWord: string, isInDictionary: boolean, comboType?: string | null): void {
+function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCode: string, username: string, normalizedWord: string, isInDictionary: boolean, comboType?: string | null, inputMethod: 'kb' | 'drag' = 'drag'): void {
   // Derive combo and fire round from server state (never trust client)
   const safeComboLevel = game.playerCombos?.[username] || 0;
   const fireRoundActive = game.fireRoundActive === true;
   const fireRoundMultiplier = fireRoundActive ? 2 : 1;
   const baseScore = normalizedWord.length - 1;
-  const wordScore = calculateWordScore(normalizedWord, safeComboLevel, fireRoundMultiplier);
+  const wordScore = calculateWordScore(normalizedWord, safeComboLevel, fireRoundMultiplier, 1, { inputMethod });
   // Calculate combo bonus without fire round multiplier for display purposes
-  const scoreWithoutMultiplier = calculateWordScore(normalizedWord, safeComboLevel, 1);
+  const scoreWithoutMultiplier = calculateWordScore(normalizedWord, safeComboLevel, 1, 1, { inputMethod });
   const comboBonus = scoreWithoutMultiplier - baseScore;
   // Fire round bonus is the additional points from the 2x multiplier
   const fireRoundBonus = fireRoundActive ? scoreWithoutMultiplier : 0;
@@ -303,6 +303,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     autoValidated: true,
     isFirstFinder,
     fromLesson: fromLesson,
+    inputMethod,
     ...(goldenBonus > 0 ? { goldenBonus } : {}),
     ...(isSpecialWord ? { isSpecialWord: true } : {}),
     // Merged blast data (Fix 2): includes tile bonus, moves, combo info in single emit
@@ -373,6 +374,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     score: totalScore,
     comboLevel: safeComboLevel,
     isFirstFinder,
+    inputMethod,
     // Merged combo sync (Fix 2): combo type embedded in playerFoundWord instead of separate event
     ...(comboType ? { comboSync: { comboType, username } } : {}),
   });

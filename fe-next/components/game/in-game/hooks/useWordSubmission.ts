@@ -22,7 +22,7 @@ interface UseWordSubmissionOptions {
   /** Plays on client-side rejection (too short, duplicate, not on board). Server-truth accept sound lives in useSocketFeedback. */
   playWordRejectedSound: () => void;
   announceWordResult: (word: string, isAccepted: boolean, score?: number, message?: string) => void;
-  onWordSubmit?: (word: string) => void;
+  onWordSubmit?: (word: string, meta?: { inputMethod: 'kb' | 'drag' }) => void;
   onResetCombo?: () => void;
   setCurrentFeedback: (feedback: WordFeedback | null) => void;
   setLastWordFoundTime: (time: number) => void;
@@ -31,7 +31,7 @@ interface UseWordSubmissionOptions {
 }
 
 interface UseWordSubmissionReturn {
-  handleGridWordSubmit: (formedWord: string) => void;
+  handleGridWordSubmit: (formedWord: string, meta?: { inputMethod: 'kb' | 'drag' }) => void;
   fireRoundActiveRef: MutableRefObject<boolean>;
 }
 
@@ -64,7 +64,7 @@ export function useWordSubmission(
   // This ensures the socket emit uses the latest value without waiting for re-render
   const fireRoundActiveRef = useRef(false);
 
-  const handleGridWordSubmit = useCallback((formedWord: string): void => {
+  const handleGridWordSubmit = useCallback((formedWord: string, meta?: { inputMethod: 'kb' | 'drag' }): void => {
     if (!isPlaying) return;
 
     const currentLang = gameLanguage || 'en';
@@ -145,10 +145,11 @@ export function useWordSubmission(
       comboLevel: comboLevelRef.current,
       fireRoundActive: fireRoundActiveRef.current,
       comboType: comboTypeRef?.current ?? null,
+      inputMethod: meta?.inputMethod ?? 'drag',
     });
 
     // Add to local found words
-    onWordSubmit?.(formedWord);
+    onWordSubmit?.(formedWord, meta);
   }, [
     isPlaying,
     gameLanguage,

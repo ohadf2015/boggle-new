@@ -113,6 +113,9 @@ export interface InGameScreenProps {
   // Timer urgency state — drives screen border glow
   timerUrgencyState?: 'normal' | 'low' | 'veryLow' | 'critical';
   onTimerState?: (state: 'normal' | 'low' | 'veryLow' | 'critical') => void;
+
+  // Desktop shell integration: when true, desktop shell owns the timer UI (suppress 4× CircularTimer mounts)
+  inDesktopShell?: boolean;
 }
 
 /**
