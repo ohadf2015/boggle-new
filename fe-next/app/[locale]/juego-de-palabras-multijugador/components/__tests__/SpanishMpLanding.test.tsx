@@ -33,7 +33,11 @@ vi.mock('next/link', () => ({
 }));
 
 vi.mock('next/image', () => ({
-  default: ({ alt, src, ...rest }: any) => <img alt={alt} src={typeof src === 'string' ? src : ''} {...rest} />,
+  default: ({ alt, src, fill: _fill, ...rest }: any) => {
+    void _fill;
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img alt={alt} src={typeof src === 'string' ? src : ''} {...rest} />;
+  },
 }));
 
 describe('Spanish MP landing — composition', () => {
