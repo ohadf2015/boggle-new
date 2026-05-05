@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { LazyMotion, domAnimation, m, AnimatePresence, type PanInfo } from 'framer-motion';
 import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, UserPlus, ChevronRight, Sparkles, User, Flame, Bell, Check, Pencil } from 'lucide-react';
@@ -197,7 +197,8 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     }, [pathname, friendsActivityCount, markFriendsSeen]);
     const friendsBadgeCount = Math.max(0, friendsActivityCount - lastSeenFriendsCount);
 
-    const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
     const isRtl = language === 'he';
 

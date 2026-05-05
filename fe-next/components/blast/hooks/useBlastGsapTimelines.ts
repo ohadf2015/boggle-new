@@ -215,5 +215,82 @@ export function useBlastGsapTimelines({
     [trackTl],
   );
 
-  return { runCascadePunch, runLongWordPunch, runWaveClearShower, trackTimeline };
+  /**
+   * Per-tile candy phase tween. Replaces the inline `transition: all ...`
+   * strings in BlastTile with GSAP timelines that compose squash/stretch +
+   * elastic settle. Reduced-motion path sets terminal state without animation.
+   */
+  type PhaseTransitionPhase =
+    | 'selected'
+    | 'anticipation'
+    | 'clearing'
+    | 'falling'
+    | 'appearing'
+    | 'landing';
+
+  const playPhaseTransition = useCallback(
+    (
+      el: HTMLElement,
+      phase: PhaseTransitionPhase,
+      opts?: { fallOffset?: number; spawnOffset?: number; clearRotate?: number },
+    ) => {
+      if (isReducedMotionPreferred()) {
+        switch (phase) {
+          case 'clearing':
+            el.style.opacity = '0';
+            el.style.transform = 'scale(0.9)';
+            return;
+          case 'appearing':
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0) scale(1)';
+            return;
+          case 'falling':
+            el.style.transform = 'translateY(0)';
+            return;
+          default:
+            return;
+        }
+      }
+      const tl = gsap.timeline();
+      switch (phase) {
+        case 'selected':
+          tl.to(el, { scale: 1.06, duration: 0.18, ease: 'back.out(2)' });
+          break;
+        case 'anticipation':
+          tl
+            .to(el, { scaleX: 1.18, scaleY: 0.82, duration: 0.08, ease: 'power2.out' })
+            .to(el, { scaleX: 1, scaleY: 1, duration: 0.10, ease: 'elastic.out(1, 0.4)' });
+          break;
+        case 'clearing':
+          tl
+            .to(el, { scaleX: 0.92, scaleY: 1.08, duration: 0.04 })
+            .to(el, { scale: 1.4, duration: 0.10, ease: 'back.out(3.5)' })
+            .to(el, { rotate: opts?.clearRotate ?? 0, opacity: 0, duration: 0.18 }, '<');
+          break;
+        case 'falling': {
+          const offset = opts?.fallOffset ?? 0;
+          tl.fromTo(el, { y: -offset }, { y: 0, duration: 0.55, ease: 'bounce.out' });
+          break;
+        }
+        case 'appearing': {
+          const off = opts?.spawnOffset ?? 60;
+          tl.fromTo(
+            el,
+            { y: -off, scale: 0.6, opacity: 0 },
+            { y: 0, scale: 1, opacity: 1, duration: 0.32, ease: 'back.out(1.7)' },
+          );
+          break;
+        }
+        case 'landing':
+          tl
+            .to(el, { scaleY: 0.88, duration: 0.06 })
+            .to(el, { scaleY: 1, duration: 0.08, ease: 'elastic.out(1.5, 0.5)' });
+          break;
+      }
+      trackTl(tl);
+    },
+    [trackTl],
+  );
+
+  return { runCascadePunch, runLongWordPunch, runWaveClearShower, trackTimeline, playPhaseTransition };
 }

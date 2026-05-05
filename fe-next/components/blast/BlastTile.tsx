@@ -1,12 +1,15 @@
 'use client';
 
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { Lock } from 'lucide-react';
+import { gsap } from 'gsap';
 import type { BlastTileType } from './types';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTileTooltip } from './utils/blastTileTooltips';
-import { TILE_VISUALS, CLEARING_COLORS, CLEARING_ANIMS } from './blastTileVisuals';
+import { TILE_VISUALS, CLEARING_COLORS, CLEARING_ANIMS, TILE_ACCENTS } from './blastTileVisuals';
+import { useExperiment } from '@/hooks/useExperiment';
+import styles from './BlastTile.module.css';
 
 const TILE_TEXT_SHADOW_STYLE = { textShadow: '0 1px 0 rgba(255,255,255,0.4), 0 2px 3px rgba(0,0,0,0.2)' } as const;
 const TILE_TEXT_SHADOW_LIGHT_STYLE = { textShadow: '0 1px 2px rgba(0,0,0,0.4)' } as const;
@@ -212,6 +215,43 @@ export const BlastTile = memo(function BlastTile({
     if (activationEffect) setLiveActivationEffect(activationEffect);
   }, [activationEffect]);
 
+  // ─── Hooks must run unconditionally (React rules-of-hooks) ──────────────
+  // Compute candy-flag + GSAP wiring state BEFORE the early return below.
+  const { variant: candyVariant } = useExperiment('blast.candy-shell.enabled');
+  const candyOn = candyVariant === 'candy';
+  const accent = TILE_ACCENTS[type] ?? TILE_ACCENTS.standard;
+  // effectivePhase computed early so the GSAP useEffect can list it as a dep
+  // without crossing the early-return boundary.
+  const _effPhaseEarly: TilePhase = reducedMotion && ANIMATED_PHASES.has(phase) ? 'idle' : phase;
+  const _gsapPhases: TilePhase[] = ['selected', 'anticipation', 'clearing'];
+  const _useGsap = candyOn && !reducedMotion && (_gsapPhases.includes(_effPhaseEarly) || (_effPhaseEarly === 'idle' && isSelected));
+
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const phaseTlRef = useRef<gsap.core.Timeline | null>(null);
+
+  useEffect(() => {
+    if (!_useGsap) return;
+    const el = buttonRef.current;
+    if (!el) return;
+    phaseTlRef.current?.kill();
+    const tl = gsap.timeline();
+    if (_effPhaseEarly === 'selected' || (_effPhaseEarly === 'idle' && isSelected)) {
+      tl.to(el, { scale: 1.06, duration: 0.18, ease: 'back.out(2)' });
+    } else if (_effPhaseEarly === 'anticipation') {
+      tl
+        .to(el, { scaleX: 1.18, scaleY: 0.82, duration: 0.08, ease: 'power2.out' })
+        .to(el, { scaleX: 1, scaleY: 1, duration: 0.10, ease: 'elastic.out(1, 0.4)' });
+    } else if (_effPhaseEarly === 'clearing') {
+      tl
+        .to(el, { scaleX: 0.92, scaleY: 1.08, duration: 0.04 })
+        .to(el, { scale: 1.4, duration: 0.10, ease: 'back.out(3.5)' })
+        .to(el, { rotate: clearRotate ?? 0, opacity: 0, duration: 0.18 }, '<');
+    }
+    phaseTlRef.current = tl;
+    return () => { phaseTlRef.current?.kill(); phaseTlRef.current = null; };
+  }, [_useGsap, _effPhaseEarly, isSelected, clearRotate]);
+
+  // ─── Early return (post-hooks) ──────────────────────────────────────────
   // Allow clearing/anticipation phases to render even when isCleared is true —
   // during cascade chains, submitWord marks tiles cleared BEFORE the animation runs.
   // Without this, cascade clearing animations never play (tile goes invisible instantly).
@@ -223,11 +263,13 @@ export const BlastTile = memo(function BlastTile({
   const visual = TILE_VISUALS[type] ?? TILE_VISUALS.standard;
   // Skip tooltip lookup entirely for standard tiles (the vast majority) — keeps render fast
   const tooltip = type !== 'standard' ? getTileTooltip(type, t) : null;
-  const effectivePhase = reducedMotion && ANIMATED_PHASES.has(phase) ? 'idle' : phase;
-  const phaseStyle = effectivePhase !== 'idle' && effectivePhase !== 'selected'
+  const effectivePhase = _effPhaseEarly;
+
+  // When GSAP owns the phase, suppress legacy inline styles that would fight the tween.
+  const phaseStyle = effectivePhase !== 'idle' && effectivePhase !== 'selected' && !(candyOn && effectivePhase === 'anticipation') && !(candyOn && effectivePhase === 'clearing')
     ? getPhaseStyles(effectivePhase, type, fallOffset, clearRotate, spawnOffset)
     : {};
-  const selectionStyle = getSelectionStyles(isSelected, selectionIndex, selectionTotal);
+  const selectionStyle = candyOn ? {} : getSelectionStyles(isSelected, selectionIndex, selectionTotal);
   // Narrow willChange to the property the current phase actually animates — avoid forcing
   // unnecessary compositor layers for idle tiles.
   let willChangeValue: string | undefined;
@@ -239,6 +281,7 @@ export const BlastTile = memo(function BlastTile({
 
   return (
     <button
+      ref={buttonRef}
       type="button"
       onClick={onClick}
       onAnimationEnd={(e) => {
@@ -281,11 +324,29 @@ export const BlastTile = memo(function BlastTile({
         ...selectionStyle,
         ...(willChangeValue && { willChange: willChangeValue }),
         containerType: 'inline-size',
+        ...(candyOn && {
+          '--bt-gloss': accent.glossTop,
+          '--bt-rim-light': accent.rimLight,
+          '--bt-rim-dark': accent.rimDark,
+          '--bt-cast': accent.castShadow,
+        } as React.CSSProperties),
       }}
       aria-label={`${letter}${type !== 'standard' ? ` ${type} tile` : ''}`}
       title={tooltip ? `${tooltip.name}: ${tooltip.desc}` : undefined}
     >
-      <span className="relative z-10" style={visual.text === 'text-white' ? TILE_TEXT_SHADOW_LIGHT_STYLE : TILE_TEXT_SHADOW_STYLE}>{letter}</span>
+      {candyOn && (
+        <>
+          <span data-bt-layer="cast" aria-hidden="true" className={styles.candyShell} />
+          <span data-bt-layer="gloss" aria-hidden="true" className={styles.gloss} />
+          <span data-bt-layer="rim" aria-hidden="true" className={styles.rim} />
+        </>
+      )}
+      <span
+        className={`relative z-10 ${candyOn ? (visual.text === 'text-white' ? styles.letterLight : styles.letter) : ''}`}
+        style={candyOn ? undefined : (visual.text === 'text-white' ? TILE_TEXT_SHADOW_LIGHT_STYLE : TILE_TEXT_SHADOW_STYLE)}
+      >
+        {letter}
+      </span>
       {visual.indicator && (
         <span className={`absolute top-0.5 inset-e-0.5 leading-none pointer-events-none ${visual.text ?? ''}`} aria-hidden="true">
           <visual.indicator className="w-[clamp(9px,2.4cqw,15px)] h-[clamp(9px,2.4cqw,15px)]" strokeWidth={2.5} />

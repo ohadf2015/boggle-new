@@ -70,3 +70,63 @@ describe('useBlastCheckpoint', () => {
     expect(result.current.checkpoint).toBeNull();
   });
 });
+
+describe('useBlastCheckpoint — requiresAd mode', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    vi.restoreAllMocks();
+  });
+
+  it('recordWaveReached does NOT touch localStorage when requiresAd', () => {
+    const { result } = renderHook(() => useBlastCheckpoint({ requiresAd: true }));
+    act(() => result.current.recordWaveReached(4));
+    expect(localStorage.getItem(BLAST_CHECKPOINT_KEY)).toBeNull();
+  });
+
+  it('hasUnpersistedProgress flips true after recordWaveReached when requiresAd', () => {
+    const { result } = renderHook(() => useBlastCheckpoint({ requiresAd: true }));
+    expect(result.current.hasUnpersistedProgress).toBe(false);
+    act(() => result.current.recordWaveReached(4));
+    expect(result.current.hasUnpersistedProgress).toBe(true);
+  });
+
+  it('persistCheckpoint writes the in-memory wave to localStorage', () => {
+    const { result } = renderHook(() => useBlastCheckpoint({ requiresAd: true }));
+    act(() => result.current.recordWaveReached(7));
+    let persisted: number | null = -1;
+    act(() => { persisted = result.current.persistCheckpoint(); });
+    expect(persisted).toBe(7);
+    const stored = JSON.parse(localStorage.getItem(BLAST_CHECKPOINT_KEY)!);
+    expect(stored.highestWave).toBe(7);
+    expect(result.current.hasUnpersistedProgress).toBe(false);
+  });
+
+  it('persistCheckpoint returns null when nothing in memory', () => {
+    const { result } = renderHook(() => useBlastCheckpoint({ requiresAd: true }));
+    let persisted: number | null = -1;
+    act(() => { persisted = result.current.persistCheckpoint(); });
+    expect(persisted).toBeNull();
+    expect(localStorage.getItem(BLAST_CHECKPOINT_KEY)).toBeNull();
+  });
+
+  it('declining the ad evaporates progress next session', () => {
+    const { result, unmount } = renderHook(() => useBlastCheckpoint({ requiresAd: true }));
+    act(() => result.current.recordWaveReached(8));
+    // No persistCheckpoint call — user "declined the ad" by quitting
+    unmount();
+    // Fresh session: nothing in storage, resumeFromWave should be 1
+    const { result: result2 } = renderHook(() => useBlastCheckpoint({ requiresAd: true }));
+    expect(result2.current.resumeFromWave).toBe(1);
+  });
+
+  it('clear() resets in-memory state too', () => {
+    const { result } = renderHook(() => useBlastCheckpoint({ requiresAd: true }));
+    act(() => result.current.recordWaveReached(5));
+    expect(result.current.hasUnpersistedProgress).toBe(true);
+    act(() => result.current.clear());
+    expect(result.current.hasUnpersistedProgress).toBe(false);
+    let persisted: number | null = -1;
+    act(() => { persisted = result.current.persistCheckpoint(); });
+    expect(persisted).toBeNull();
+  });
+});

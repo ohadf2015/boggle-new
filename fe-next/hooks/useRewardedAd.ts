@@ -98,6 +98,12 @@ interface UseRewardedAdOptions {
    * so the waterfall can be optimized per placement. Defaults to 'generic'.
    */
   surface?: RewardedSurface;
+  /**
+   * Free-form analytics tag for the offered→watched funnel. Mirrors the value
+   * passed to `trackRewardedAdOffered` so PostHog can join offer and outcome
+   * by surface. Defaults to the routing `surface` when omitted.
+   */
+  analyticsSurface?: string;
 }
 
 interface UseRewardedAdReturn {
@@ -148,7 +154,8 @@ interface UseRewardedAdReturn {
  * ```
  */
 export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAdReturn {
-  const { onRewardEarned, onAdError, onAdStarted, rewardKind = 'coins', surface = 'generic' } = options;
+  const { onRewardEarned, onAdError, onAdStarted, rewardKind = 'coins', surface = 'generic', analyticsSurface } = options;
+  const telemetrySurface = analyticsSurface ?? surface;
   const [status, setStatus] = useState<AdStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [placeholderCooldownFlag, setPlaceholderCooldownFlag] = useState(() => isPlaceholderCapped());
@@ -186,7 +193,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
 
     // Enforce daily limit across all platforms
     if (isDailyLimitReached()) {
-      trackRewardedAdDeclined('daily_limit_reached', platformForDecline, undefined);
+      trackRewardedAdDeclined('daily_limit_reached', platformForDecline, telemetrySurface);
       onAdError?.('Daily ad limit reached');
       return;
     }
@@ -197,7 +204,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     // locked. canShowAd already returns false here so well-behaved callsites
     // hide the button; this block stops rogue callers from bypassing it.
     if (isPlaceholder && !isDev) {
-      trackRewardedAdDeclined('no_ad_provider', platformForDecline, undefined);
+      trackRewardedAdDeclined('no_ad_provider', platformForDecline, telemetrySurface);
       onAdError?.('No ad provider available');
       return;
     }
@@ -205,7 +212,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     // Enforce placeholder cooldown (development only — production blocked above)
     if (isPlaceholder && isPlaceholderCapped()) {
       setPlaceholderCooldownFlag(true);
-      trackRewardedAdDeclined('placeholder_cooldown', platformForDecline, undefined);
+      trackRewardedAdDeclined('placeholder_cooldown', platformForDecline, telemetrySurface);
       onAdError?.('Cooldown active — try again later');
       return;
     }
@@ -231,7 +238,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
         const result = await awardWatchedAd(platform);
         awarded = result?.awarded ?? rewardAmount;
       }
-      trackRewardedAdWatched(platform, awarded);
+      trackRewardedAdWatched(platform, awarded, telemetrySurface);
       setStatus('completed');
       await onRewardEarned?.(awarded);
 
@@ -243,7 +250,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     const handleAdError = (errorMsg: string) => {
       setStatus('error');
       setError(errorMsg);
-      trackRewardedAdDeclined(errorMsg, platform, undefined);
+      trackRewardedAdDeclined(errorMsg, platform, telemetrySurface);
       onAdError?.(errorMsg);
 
       // Reset to idle after showing error
@@ -298,7 +305,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       onAdStarted?.();
       awardCoinsAndNotify();
     }
-  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseSimulation, crazyGames, adMob, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface]);
+  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseSimulation, crazyGames, adMob, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
 
   // Pre-load AdMob rewarded slot when caller signals likely intent (button
   // mount). CrazyGames SDK auto-prepares; simulation/placeholder paths

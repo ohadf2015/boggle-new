@@ -155,6 +155,20 @@ export const EXPERIMENTS = {
     description:
       "Leaderboard user-rank card. control = current (global rank primary), enabled = TierPositionPanel mounted (tier-rank primary, peer list, percentile).",
   }),
+
+  /**
+   * Blast candy-shell visual upgrade. Wraps tile DOM in 3 presentation
+   * layers (cast shadow / top gloss / inner rim) + GSAP-driven phase
+   * tweens, and re-skins Continue/Retry modals via BlastModalShell.
+   * Default control in prod; flip to candy after manual playtest passes
+   * perf budget on mid-tier Android.
+   */
+  'blast.candy-shell.enabled': defineExperiment({
+    variants: ['control', 'candy'] as const,
+    default: 'control',
+    description:
+      'Blast tile candy-crush presentation + popup redesign. control = current flat DOM, candy = 5-layer composite + GSAP phase timelines + BlastModalShell.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;
