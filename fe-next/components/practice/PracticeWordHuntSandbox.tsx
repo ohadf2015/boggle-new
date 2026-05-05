@@ -23,6 +23,7 @@ import { getPracticeStreak } from '@/hooks/usePracticeStreak';
 // keyboard, accessibility — all match production.
 import GridComponent from '@/components/GridComponent';
 import { DiscoveredWordsList } from '@/components/daily/DiscoveredWordsList';
+import PracticeTargetBoxes from './PracticeTargetBoxes';
 
 const BOARDS: Record<string, string[][]> = {
   en: [['S', 'T', 'A', 'R'], ['E', 'O', 'N', 'I'], ['P', 'L', 'A', 'T'], ['E', 'R', 'I', 'N']],
@@ -147,21 +148,17 @@ export default function PracticeWordHuntSandbox() {
 
       <PracticeInstructions mode="wordHunt" />
 
-      <div data-testid="practice-target" className="flex flex-col items-center gap-1 w-full">
+      <div data-testid="practice-target" className="flex flex-col items-center gap-1.5 w-full">
         <span className="text-xs uppercase font-neo-display font-black text-neo-cream/70 tracking-wider">
           {t('practice.wordHunt.targetLabel')}
         </span>
-        <div
-          data-testid="practice-target-word"
-          className={
-            'px-4 py-2 rounded-neo border-3 font-neo-display font-black text-2xl tracking-widest shadow-hard ' +
-            (solved
-              ? 'bg-neo-lime border-neo-black text-neo-black'
-              : 'bg-neo-navy-light border-neo-lime text-neo-cream')
-          }
-        >
-          {target}
-        </div>
+        {/* Visual parity with real SurvivalClueBoxes (one box per letter)
+            but no progressive reveal — practice already knows the target. */}
+        <PracticeTargetBoxes
+          word={target}
+          solved={solved}
+          dir={language === 'he' ? 'rtl' : 'ltr'}
+        />
       </div>
 
       <PracticeMicroTip

@@ -1,8 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Check } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeChainCta from './PracticeChainCta';
 import PracticeCompleteBanner from './PracticeCompleteBanner';
@@ -25,6 +26,8 @@ import { getPracticeStreak } from '@/hooks/usePracticeStreak';
 // share visuals + animations. Future style updates to WheelLetter / WordTile
 // auto-propagate to practice.
 import { WheelLetter, WordTile } from '@/components/daily/WordWheelParts';
+// Decorative orbital rings — same Pixi overlay the real wheel uses.
+const WordWheelPixiRing = dynamic(() => import('@/components/daily/WordWheelPixiRing'), { ssr: false });
 
 interface WheelPuzzle {
   /** Letter at the center — must appear in every accepted word. */
@@ -60,7 +63,7 @@ const RADIUS_PX = 84; // matches real WheelRush mid-breakpoint orbit
  *  - duplicate detection
  */
 export default function PracticeWheelSandbox() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const puzzle = PUZZLES[language] ?? PUZZLES.en;
   const allLetters = useMemo(() => [puzzle.center, ...puzzle.outer], [puzzle]);
 
@@ -159,6 +162,13 @@ export default function PracticeWheelSandbox() {
     return () => window.removeEventListener('keydown', onKey);
   }, [onSubmit]);
 
+  // Auto-clear feedback toast after 1.4s (matches real WheelRush UX).
+  useEffect(() => {
+    if (!feedback) return;
+    const id = setTimeout(() => setFeedback(null), 1400);
+    return () => clearTimeout(id);
+  }, [feedback]);
+
   const mascotReaction: PracticeMascotMood = isComplete
     ? 'celebrate'
     : feedback === 'ok'
@@ -190,8 +200,16 @@ export default function PracticeWheelSandbox() {
         }}
       />
 
-      {/* Wheel — uses real WheelLetter for visual parity. */}
+      {/* Wheel — uses real WheelLetter for visual parity, with the real
+          decorative PixiJS orbital ring overlay (pointer-events-none, lazy). */}
       <div data-testid="practice-wheel" className="relative w-56 h-56 sm:w-64 sm:h-64">
+        <div className="absolute inset-0 pointer-events-none">
+          <WordWheelPixiRing
+            selectedIndices={Array.from(usedIndices)}
+            radius={RADIUS_PX}
+            combo={0}
+          />
+        </div>
         <WheelLetter
           letter={puzzle.center}
           isCenter
@@ -215,6 +233,38 @@ export default function PracticeWheelSandbox() {
           );
         })}
       </div>
+
+      {/* Feedback toast — mirrors real WheelRush feedback chrome. */}
+      <AnimatePresence>
+        {feedback && (
+          <motion.div
+            key={feedback}
+            data-testid="practice-wheel-feedback"
+            initial={{ opacity: 0, y: -4, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className={
+              'px-3 py-1 rounded-neo border-2 text-xs font-neo-display font-black uppercase tracking-wider ' +
+              (feedback === 'ok'
+                ? 'bg-neo-lime/20 border-neo-lime text-neo-lime'
+                : feedback === 'noCenter'
+                  ? 'bg-neo-pink/20 border-neo-pink text-neo-pink'
+                  : feedback === 'dup'
+                    ? 'bg-neo-cream/15 border-neo-cream/50 text-neo-cream/85'
+                    : 'bg-neo-red/20 border-neo-red text-neo-red')
+            }
+          >
+            {feedback === 'ok'
+              ? t('practice.wheelRush.found')
+              : feedback === 'noCenter'
+                ? t('practice.wheelRush.needsCenter')
+                : feedback === 'dup'
+                  ? t('practice.wheelRush.duplicate')
+                  : t('practice.wheelRush.notAWord')}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Built-word builder — uses real WordTile (tap to remove). */}
       <div className="flex items-end gap-1 min-h-[3rem]" data-testid="practice-built-word">
