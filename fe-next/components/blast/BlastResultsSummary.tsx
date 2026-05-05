@@ -75,41 +75,63 @@ export function BlastResultsSummary({
       data-fail={didFail ? 'true' : 'false'}
     >
       <div className="flex-1 overflow-y-auto px-4 pt-6 pb-4 flex flex-col items-center gap-4">
-      {/* Mascot — tabloid tilt: -3deg LTR, +3deg RTL via Tailwind logical
-          rotation. Slight overshoot on entrance reads as "stuck on the page". */}
+      {/* Tabloid hero band — full-bleed colored ribbon wrapping mascot +
+          headline + stars as one hero unit. Tilted -1° LTR / +1° RTL so the
+          page feels "pasted together" rather than ruler-grid clean. Mascot
+          sits ABSOLUTELY positioned, half-bursting above the band's top edge.
+          Body color flips lime (success) / red (fail) so the band carries
+          the win-state on its own. */}
       <AdaptiveMotion.div
-        initial={{ scale: 0, rotate: -16, opacity: 0 }}
-        animate={{ scale: 1, rotate: -3, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 380, damping: 14 }}
-        className="relative w-28 h-28 rounded-neo border-3 border-neo-black shadow-hard-lg overflow-hidden bg-neo-navy-light rtl:rotate-3"
+        initial={{ scale: 0.92, opacity: 0, y: -20, rotate: -3 }}
+        animate={{ scale: 1, opacity: 1, y: 0, rotate: -1 }}
+        transition={{ type: 'spring', stiffness: 380, damping: 18 }}
+        className={cn(
+          'relative w-full mt-8 mb-2 px-4 pt-12 pb-3',
+          'rounded-neo border-3 border-neo-black shadow-hard-lg',
+          'rtl:rotate-1',
+          didFail ? 'bg-neo-red/90' : 'bg-neo-pink',
+        )}
+        data-testid="blast-results-hero-band"
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={mascotSrc}
-          alt={t(`blast.mascot.${mascotKey}`)}
-          data-testid="blast-results-mascot"
-          data-mascot-key={mascotKey}
-          className="w-full h-full object-cover"
-        />
-      </AdaptiveMotion.div>
-
-      {/* Header + star rating */}
-      <div className="flex flex-col items-center gap-1.5">
-        <AdaptiveMotion.h2
-          initial={{ scale: 0.6, opacity: 0, y: -10 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+        {/* Mascot — sticker bursting up out of the band */}
+        <AdaptiveMotion.div
+          initial={{ scale: 0, rotate: -22, opacity: 0 }}
+          animate={{ scale: 1, rotate: -6, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 380, damping: 14, delay: 0.05 }}
           className={cn(
-            'text-3xl font-black uppercase font-neo-display tracking-wider drop-shadow-[3px_3px_0_#000]',
-            didFail ? 'text-neo-red' : 'text-neo-pink',
+            'absolute -top-10 left-1/2 -translate-x-1/2',
+            'w-24 h-24 rounded-neo border-3 border-neo-black shadow-hard-lg',
+            'overflow-hidden bg-neo-navy-light rtl:rotate-6',
           )}
         >
-          {didFail ? t('blast.results.waveFailed') : t('blast.gameOver')}
-        </AdaptiveMotion.h2>
-        {!didFail && (
-          <StarRating stars={results.stars} label={t(`blast.stars${results.stars}`)} />
-        )}
-      </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={mascotSrc}
+            alt={t(`blast.mascot.${mascotKey}`)}
+            data-testid="blast-results-mascot"
+            data-mascot-key={mascotKey}
+            className="w-full h-full object-cover"
+          />
+        </AdaptiveMotion.div>
+
+        {/* Headline + stars centered inside band */}
+        <div className="flex flex-col items-center gap-1.5">
+          <AdaptiveMotion.h2
+            initial={{ scale: 0.6, opacity: 0, y: -10 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.12 }}
+            className={cn(
+              'text-3xl font-black uppercase font-neo-display tracking-wider',
+              'drop-shadow-[3px_3px_0_#000] text-neo-black',
+            )}
+          >
+            {didFail ? t('blast.results.waveFailed') : t('blast.gameOver')}
+          </AdaptiveMotion.h2>
+          {!didFail && (
+            <StarRating stars={results.stars} label={t(`blast.stars${results.stars}`)} />
+          )}
+        </div>
+      </AdaptiveMotion.div>
 
       {/* Fail banner — shown when player didn't hit the 90% advance threshold */}
       {didFail && (
