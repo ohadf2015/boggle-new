@@ -1,10 +1,10 @@
 /**
- * PracticeInstructions — collapsible "How to play" card on each sandbox.
- * Open by default so new players see the rules without an extra tap.
+ * PracticeInstructions — floating overlay shown by default; dismiss persists
+ * to localStorage; reopens via the floating "?" pill.
  */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
@@ -12,14 +12,18 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 import PracticeInstructions from '../PracticeInstructions';
 
-describe('PracticeInstructions', () => {
-  it('renders the panel + title for the given mode', () => {
+beforeEach(() => {
+  window.localStorage.clear();
+});
+
+describe('PracticeInstructions overlay', () => {
+  it('renders the dialog + title for the given mode by default', () => {
     render(<PracticeInstructions mode="classic" />);
     expect(screen.getByTestId('practice-instructions')).toBeInTheDocument();
     expect(screen.getByText('practice.instructions.title')).toBeInTheDocument();
   });
 
-  it('renders three rule lines per mode by default', () => {
+  it('renders three rule lines per mode', () => {
     render(<PracticeInstructions mode="wordHunt" />);
     const list = screen.getByTestId('practice-instructions-list');
     expect(list.querySelectorAll('li')).toHaveLength(3);
@@ -32,18 +36,35 @@ describe('PracticeInstructions', () => {
     expect(screen.getByText('practice.instructions.wheelRush.line3')).toBeInTheDocument();
   });
 
-  it('toggles closed when the toggle button is clicked', () => {
+  it('dismiss × button hides the overlay and shows the floating "?" pill', () => {
     render(<PracticeInstructions mode="classic" />);
-    expect(screen.getByTestId('practice-instructions-list')).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId('practice-instructions-toggle'));
-    expect(screen.queryByTestId('practice-instructions-list')).toBeNull();
+    fireEvent.click(screen.getByTestId('practice-instructions-dismiss'));
+    expect(screen.queryByTestId('practice-instructions')).toBeNull();
+    expect(screen.getByTestId('practice-instructions-toggle')).toBeInTheDocument();
   });
 
-  it('reopens after a second toggle click', () => {
+  it('persists dismissal to localStorage so re-mount keeps it closed', () => {
+    const { unmount } = render(<PracticeInstructions mode="classic" />);
+    fireEvent.click(screen.getByTestId('practice-instructions-dismiss'));
+    unmount();
     render(<PracticeInstructions mode="classic" />);
-    const toggle = screen.getByTestId('practice-instructions-toggle');
-    fireEvent.click(toggle);
-    fireEvent.click(toggle);
-    expect(screen.getByTestId('practice-instructions-list')).toBeInTheDocument();
+    expect(screen.queryByTestId('practice-instructions')).toBeNull();
+    expect(screen.getByTestId('practice-instructions-toggle')).toBeInTheDocument();
+  });
+
+  it('? pill reopens the overlay', () => {
+    render(<PracticeInstructions mode="classic" />);
+    fireEvent.click(screen.getByTestId('practice-instructions-dismiss'));
+    fireEvent.click(screen.getByTestId('practice-instructions-toggle'));
+    expect(screen.getByTestId('practice-instructions')).toBeInTheDocument();
+  });
+
+  it('dismiss state is per-mode (different modes track separately)', () => {
+    const { unmount } = render(<PracticeInstructions mode="classic" />);
+    fireEvent.click(screen.getByTestId('practice-instructions-dismiss'));
+    unmount();
+    render(<PracticeInstructions mode="wordHunt" />);
+    // wordHunt was never dismissed — overlay should be visible
+    expect(screen.getByTestId('practice-instructions')).toBeInTheDocument();
   });
 });
