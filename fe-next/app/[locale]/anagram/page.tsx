@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
+import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 
 export const dynamic = 'force-dynamic';
 
@@ -108,6 +109,8 @@ export default async function AnagramHubPage({ params }: PageParams) {
             <li>Tap any word to see its score and definition page.</li>
           </ol>
         </section>
+
+        <EsScrabbleCrossLink locale={locale} anchorVariant="anagram" />
 
         <section className="mb-10">
           <h2 className="text-xl font-neo-display font-bold text-neo-cyan uppercase tracking-wider mb-4">
