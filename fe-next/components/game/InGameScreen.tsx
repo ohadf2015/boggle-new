@@ -108,6 +108,9 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   // Game mode overlays
   gameMode,
   onWordHuntGuess,
+
+  // Desktop shell integration
+  inDesktopShell = false,
 }) {
   // Mode-overlay state read directly from store — keeps parents from
   // re-rendering on irrelevant store updates (was previously prop-passed
@@ -574,6 +577,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
       tournamentData={tournamentData}
       totalBoardWords={totalBoardWords}
       gameStatsRef={gameStatsRef}
+      inDesktopShell={inDesktopShell}
     >
       {children}
     </PortraitLayout>

@@ -154,6 +154,9 @@ interface PortraitLayoutProps {
   // Timer urgency state (for screen border glow)
   timerUrgencyState?: 'normal' | 'low' | 'veryLow' | 'critical';
   onTimerState?: (state: 'normal' | 'low' | 'veryLow' | 'critical') => void;
+
+  // Desktop shell integration: when true, desktop shell owns the timer UI (suppress 4× CircularTimer mounts)
+  inDesktopShell?: boolean;
 }
 
 /**
@@ -222,6 +225,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   specialWordEvent,
   timerUrgencyState = 'normal',
   onTimerState,
+  inDesktopShell = false,
 }) {
   // Combo event for leaderboard badges (from Zustand blastComboSync)
   const blastComboSync = useBlastComboSync();
@@ -427,26 +431,28 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 />
 
                 {/* Timer (center) */}
-                <AdaptiveMotion.div
-                  data-tutorial="timer"
-                  data-testid="timer-container"
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="relative z-20 shrink-0"
-                >
-                  <div className="hidden desktop-short:lg:block desktop-medium-short:lg:block lg:hidden">
-                    <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="sm" onTimerState={onTimerState} />
-                  </div>
-                  <div className="hidden desktop-tall:lg:block desktop-medium-short:lg:hidden">
-                    <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" onTimerState={onTimerState} />
-                  </div>
-                  <div className="hidden md:block lg:hidden short:md:hidden medium-short:md:hidden">
-                    <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
-                  </div>
-                  <div className="md:hidden short:md:block short:lg:hidden medium-short:md:block medium-short:lg:hidden">
-                    <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="sm" />
-                  </div>
-                </AdaptiveMotion.div>
+                {!inDesktopShell && (
+                  <AdaptiveMotion.div
+                    data-tutorial="timer"
+                    data-testid="timer-container"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="relative z-20 shrink-0"
+                  >
+                    <div className="hidden desktop-short:lg:block desktop-medium-short:lg:block lg:hidden">
+                      <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="sm" onTimerState={onTimerState} />
+                    </div>
+                    <div className="hidden desktop-tall:lg:block desktop-medium-short:lg:hidden">
+                      <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" onTimerState={onTimerState} />
+                    </div>
+                    <div className="hidden md:block lg:hidden short:md:hidden medium-short:md:hidden">
+                      <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
+                    </div>
+                    <div className="md:hidden short:md:block short:lg:hidden medium-short:md:block medium-short:lg:hidden">
+                      <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="sm" />
+                    </div>
+                  </AdaptiveMotion.div>
+                )}
 
                 {/* Right Side: Score (mobile) - positioned absolutely to not affect timer centering */}
                 {isPlaying && (

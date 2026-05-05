@@ -77,6 +77,7 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
 
   return (
     <motion.div
+      role="timer"
       initial={reduceMotion ? { opacity: 1 } : { scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={reduceMotion ? { duration: 0 } : { duration: 0.3, ease: 'easeOut' }}

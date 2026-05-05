@@ -400,6 +400,8 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       totalGamesPlayed: profile?.total_games,
       // Tutorial
       onShowTutorial,
+      // Desktop shell integration
+      inDesktopShell: true,
     };
 
     return (
