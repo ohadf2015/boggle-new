@@ -1,7 +1,6 @@
 /**
- * Integration test for the redesigned classic sandbox: drag-spell three valid
- * words → progress is written + chain CTA reveals. Uses pointer events (not
- * the legacy submit button — that was removed in the redesign).
+ * Integration test: 3 valid words submitted via the real <GridComponent>
+ * (mocked here for test-isolation) → progress is written + chain CTA reveals.
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -21,15 +20,26 @@ vi.mock('pixi.js', () => ({
     destroy = vi.fn();
   },
 }));
+vi.mock('@/components/GridComponent', () => ({
+  default: ({ onWordSubmit }: { onWordSubmit?: (word: string) => void }) => (
+    <div data-testid="grid-component-stub">
+      <button
+        type="button"
+        data-testid="stub-submit-word"
+        onClick={(e) => onWordSubmit?.((e.currentTarget as HTMLButtonElement).dataset.word ?? '')}
+      />
+      <div data-row="0" data-col="0" />
+    </div>
+  ),
+}));
 
 import PracticeClassicSandbox from '../PracticeClassicSandbox';
 import { isPracticeModeComplete } from '@/lib/practice/practiceProgress';
 
-const dragPath = (cells: Array<[number, number]>) => {
-  const tiles = cells.map(([r, c]) => screen.getByTestId(`practice-tile-${r}-${c}`));
-  fireEvent.pointerDown(tiles[0]);
-  for (let i = 1; i < tiles.length; i++) fireEvent.pointerEnter(tiles[i]);
-  fireEvent.pointerUp(tiles[tiles.length - 1]);
+const submitWord = (word: string) => {
+  const btn = screen.getByTestId('stub-submit-word');
+  btn.setAttribute('data-word', word);
+  fireEvent.click(btn);
 };
 
 beforeEach(() => {
@@ -38,18 +48,17 @@ beforeEach(() => {
   window.localStorage.clear();
 });
 
-describe('PracticeClassicSandbox completion integration (redesign)', () => {
+describe('PracticeClassicSandbox completion integration', () => {
   it('writes progress + reveals chain CTA after the 3rd valid word', async () => {
     render(<PracticeClassicSandbox />);
     expect(isPracticeModeComplete('classic', 'en')).toBe(false);
     expect(screen.queryByTestId('practice-chain-cta')).toBeNull();
 
-    // Curated EN board:  S T A R / E O N I / P L A T / E R I N
-    dragPath([[0, 0], [0, 1], [0, 2], [0, 3]]); // STAR
+    submitWord('STAR');
     await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(1));
-    dragPath([[2, 0], [2, 1], [2, 2], [1, 2]]); // PLAN
+    submitWord('PLAN');
     await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(2));
-    dragPath([[2, 3], [3, 2], [3, 3]]);         // TIN
+    submitWord('TIN');
     await waitFor(() => {
       expect(screen.getByTestId('practice-chain-cta')).toBeInTheDocument();
     });

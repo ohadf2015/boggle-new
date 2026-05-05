@@ -4945,7 +4945,6 @@ const ja = {
       "sWordsDesc": "Sで始まる単語"
     },
     "header": "練習モード",
-    "instructions": "文字をスワイプして単語を作ろう（3文字以上）",
     "found": "ナイス！見つけた！",
     "duplicate": "もう見つけたよ！",
     "invalid": "単語じゃないよ、もう一回！",

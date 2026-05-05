@@ -5001,7 +5001,6 @@ const es = {
       "sWordsDesc": "Palabras que empiezan con S"
     },
     "header": "Practica",
-    "instructions": "Desliza para formar palabras",
     "wordsFound": "Encontradas",
     "found": "¡Encontrada!",
     "duplicate": "¡Ya la tienes!",

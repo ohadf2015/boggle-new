@@ -1,7 +1,6 @@
 /**
- * Integration test: drag-spelling the target word in the redesigned word-hunt
- * sandbox writes to practice progress + mounts the completion banner. Pointer
- * events drive the new drag-on-grid UX.
+ * Integration test: target-word submission via the real <GridComponent>
+ * (mocked here for test-isolation) → progress + completion banner.
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -21,15 +20,26 @@ vi.mock('pixi.js', () => ({
     destroy = vi.fn();
   },
 }));
+vi.mock('@/components/GridComponent', () => ({
+  default: ({ onWordSubmit }: { onWordSubmit?: (word: string) => void }) => (
+    <div data-testid="grid-component-stub">
+      <button
+        type="button"
+        data-testid="stub-submit-word"
+        onClick={(e) => onWordSubmit?.((e.currentTarget as HTMLButtonElement).dataset.word ?? '')}
+      />
+      <div data-row="0" data-col="0" />
+    </div>
+  ),
+}));
 
 import PracticeWordHuntSandbox from '../PracticeWordHuntSandbox';
 import { isPracticeModeComplete } from '@/lib/practice/practiceProgress';
 
-const dragPath = (cells: Array<[number, number]>) => {
-  const tiles = cells.map(([r, c]) => screen.getByTestId(`practice-tile-${r}-${c}`));
-  fireEvent.pointerDown(tiles[0]);
-  for (let i = 1; i < tiles.length; i++) fireEvent.pointerEnter(tiles[i]);
-  fireEvent.pointerUp(tiles[tiles.length - 1]);
+const submitWord = (word: string) => {
+  const btn = screen.getByTestId('stub-submit-word');
+  btn.setAttribute('data-word', word);
+  fireEvent.click(btn);
 };
 
 beforeEach(() => {
@@ -38,16 +48,14 @@ beforeEach(() => {
   window.localStorage.clear();
 });
 
-describe('PracticeWordHuntSandbox completion integration (redesign)', () => {
+describe('PracticeWordHuntSandbox completion integration', () => {
   it('writes progress + reveals chain CTA after spelling the target', async () => {
     render(<PracticeWordHuntSandbox />);
 
     expect(screen.queryByTestId('practice-complete-banner')).toBeNull();
     expect(isPracticeModeComplete('wordHunt', 'en')).toBe(false);
 
-    // EN board row 0: S T A R — target = "STAR" — drag (0,0)→(0,1)→(0,2)→(0,3)
-    dragPath([[0, 0], [0, 1], [0, 2], [0, 3]]);
-
+    submitWord('STAR'); // EN target
     await waitFor(() => {
       expect(screen.getByTestId('practice-complete-banner')).toBeInTheDocument();
     });

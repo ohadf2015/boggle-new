@@ -4,7 +4,8 @@
  *  - practice_word_found per accepted word
  *  - practice_completed at goal-hit
  *
- * Rewritten 2026-05-05 for the redesigned drag-pointer UX (no submit button).
+ * Classic + WordHunt now use the real <GridComponent> (mocked); Wheel
+ * uses real <WheelLetter> (rendered live).
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -32,6 +33,18 @@ vi.mock('pixi.js', () => ({
     destroy = vi.fn();
   },
 }));
+vi.mock('@/components/GridComponent', () => ({
+  default: ({ onWordSubmit }: { onWordSubmit?: (word: string) => void }) => (
+    <div data-testid="grid-component-stub">
+      <button
+        type="button"
+        data-testid="stub-submit-word"
+        onClick={(e) => onWordSubmit?.((e.currentTarget as HTMLButtonElement).dataset.word ?? '')}
+      />
+      <div data-row="0" data-col="0" />
+    </div>
+  ),
+}));
 
 import PracticeClassicSandbox from '../PracticeClassicSandbox';
 import PracticeWordHuntSandbox from '../PracticeWordHuntSandbox';
@@ -39,14 +52,12 @@ import PracticeWheelSandbox from '../PracticeWheelSandbox';
 
 const eventNames = () => captureMock.mock.calls.map((c) => c[0] as string);
 
-const dragGrid = (cells: Array<[number, number]>) => {
-  const tiles = cells.map(([r, c]) => screen.getByTestId(`practice-tile-${r}-${c}`));
-  fireEvent.pointerDown(tiles[0]);
-  for (let i = 1; i < tiles.length; i++) fireEvent.pointerEnter(tiles[i]);
-  fireEvent.pointerUp(tiles[tiles.length - 1]);
+const submitGridWord = (word: string) => {
+  const btn = screen.getByTestId('stub-submit-word');
+  btn.setAttribute('data-word', word);
+  fireEvent.click(btn);
 };
 
-// Wheel switched from drag→tap on 2026-05-05 to mirror real WheelRush.
 const tapWheel = (indices: number[]) => {
   for (const i of indices) {
     const el = document.querySelector(`[data-wheel-index="${i}"]`) as HTMLElement | null;
@@ -76,11 +87,11 @@ describe('practice sandbox telemetry', () => {
       expect.objectContaining({ mode: 'classic', locale: 'en' }),
     );
 
-    dragGrid([[0, 0], [0, 1], [0, 2], [0, 3]]); // STAR
+    submitGridWord('STAR');
     await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(1));
-    dragGrid([[2, 0], [2, 1], [2, 2], [1, 2]]); // PLAN
+    submitGridWord('PLAN');
     await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(2));
-    dragGrid([[2, 3], [3, 2], [3, 3]]);          // TIN
+    submitGridWord('TIN');
     await waitFor(() => {
       expect(eventNames()).toContain('practice_completed');
     });
@@ -103,9 +114,7 @@ describe('practice sandbox telemetry', () => {
       expect.objectContaining({ mode: 'wordHunt' }),
     );
 
-    // EN target = "STAR"; row 0 of board
-    dragGrid([[0, 0], [0, 1], [0, 2], [0, 3]]);
-
+    submitGridWord('STAR'); // EN target
     await waitFor(() => {
       expect(eventNames()).toContain('practice_completed');
     });
@@ -118,8 +127,7 @@ describe('practice sandbox telemetry', () => {
       expect.objectContaining({ mode: 'wheelRush' }),
     );
 
-    // EN wheel (7 letters): center=A (idx 0), outer T R C E S N (idx 1..6).
-    // Tap 3 valid words containing center A:
+    // EN wheel: center=A (idx 0), outer T R C E S N (idx 1..6).
     tapWheel([3, 0, 1]); // C-A-T → CAT
     await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(1));
     tapWheel([2, 0, 1]); // R-A-T → RAT

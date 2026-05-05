@@ -9,6 +9,24 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
+  useLanguageSafe: () => ({ language: 'en', t: (k: string) => k }),
+  LanguageProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+// Sandboxes mount the real <GridComponent>; stub it so this fluency test
+// doesn't pull in framer-motion / cosmetic / earthquake context chains.
+vi.mock('@/components/GridComponent', () => ({
+  default: () => <div data-testid="grid-component-stub" />,
+}));
+vi.mock('pixi.js', () => ({
+  Application: class {
+    canvas = document.createElement('canvas');
+    init = vi.fn().mockResolvedValue(undefined);
+    destroy = vi.fn();
+  },
+}));
+vi.mock('@/lib/practice/usePracticeValidator', () => ({
+  usePracticeValidator: () => ({ check: vi.fn().mockResolvedValue({ isValid: false }) }),
 }));
 
 const searchParamsValue = new URLSearchParams();

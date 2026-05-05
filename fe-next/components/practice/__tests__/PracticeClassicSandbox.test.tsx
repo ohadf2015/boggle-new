@@ -17,6 +17,23 @@ vi.mock('pixi.js', () => ({
   },
 }));
 
+// Stub GridComponent so practice tests can trigger onWordSubmit without
+// dragging through framer-motion / earthquake / cosmetic providers.
+// Real GridComponent is exercised by daily-mode tests; here we only
+// verify practice's wiring around it.
+vi.mock('@/components/GridComponent', () => ({
+  default: ({ onWordSubmit }: { onWordSubmit?: (word: string) => void }) => (
+    <div data-testid="grid-component-stub">
+      <button
+        type="button"
+        data-testid="stub-submit-word"
+        onClick={(e) => onWordSubmit?.((e.currentTarget as HTMLButtonElement).dataset.word ?? '')}
+      />
+      <div data-row="0" data-col="0" />
+    </div>
+  ),
+}));
+
 import PracticeClassicSandbox from '../PracticeClassicSandbox';
 
 beforeEach(() => {
@@ -26,9 +43,9 @@ beforeEach(() => {
 });
 
 describe('PracticeClassicSandbox redesigned', () => {
-  it('renders 16 tiles', () => {
+  it('renders the real GridComponent (via stub)', () => {
     render(<PracticeClassicSandbox />);
-    expect(screen.getAllByTestId(/^practice-tile-/)).toHaveLength(16);
+    expect(screen.getByTestId('grid-component-stub')).toBeInTheDocument();
   });
 
   it('does NOT render a submit button (drag-release auto-submits)', () => {
@@ -46,11 +63,6 @@ describe('PracticeClassicSandbox redesigned', () => {
     expect(screen.queryByTestId('practice-coach-tip')).toBeNull();
   });
 
-  it('does NOT render the long instruction paragraph', () => {
-    render(<PracticeClassicSandbox />);
-    expect(screen.queryByText('practice.classic.instruction')).toBeNull();
-  });
-
   it('renders a goal indicator pill (0/3)', () => {
     render(<PracticeClassicSandbox />);
     const pill = screen.getByTestId('practice-goal-indicator');
@@ -58,14 +70,12 @@ describe('PracticeClassicSandbox redesigned', () => {
     expect(pill).toHaveTextContent('3');
   });
 
-  it('drag-then-pointerup auto-submits via the validator', async () => {
+  it('routes onWordSubmit through the practice validator', async () => {
     render(<PracticeClassicSandbox />);
-    const tiles = screen.getAllByTestId(/^practice-tile-/);
-    fireEvent.pointerDown(tiles[0]);
-    fireEvent.pointerEnter(tiles[1]);
-    fireEvent.pointerEnter(tiles[2]);
-    fireEvent.pointerUp(tiles[2]);
-    await waitFor(() => expect(validatorCheck).toHaveBeenCalled());
+    const btn = screen.getByTestId('stub-submit-word');
+    btn.setAttribute('data-word', 'STAR');
+    fireEvent.click(btn);
+    await waitFor(() => expect(validatorCheck).toHaveBeenCalledWith('STAR'));
   });
 
   it('chain CTA hidden until goal reached', () => {

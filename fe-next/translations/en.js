@@ -5066,7 +5066,6 @@ const en = {
       "sWordsDesc": "Words starting with S"
     },
     "header": "Practice Mode",
-    "instructions": "Swipe letters to find words. No rush!",
     "wordsFound": "Words Found",
     "found": "Found!",
     "invalid": "Not a word",

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeChainCta from './PracticeChainCta';
 import PracticeCompleteBanner from './PracticeCompleteBanner';
@@ -9,9 +9,7 @@ import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMasco
 import PracticeModeNav from './PracticeModeNav';
 import PracticeMicroTip from './PracticeMicroTip';
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
-import { usePracticeGridDragSelect } from './usePracticeGridDragSelect';
 import { usePracticeJuice } from './usePracticeJuice';
-import { DiscoveredWordsList } from '@/components/daily/DiscoveredWordsList';
 import { usePracticeValidator } from '@/lib/practice/usePracticeValidator';
 import { createMicroTutorial, type MicroTutorialBeat } from '@/lib/practice/microTutorial';
 import { markPracticeMode, PRACTICE_GOALS } from '@/lib/practice/practiceProgress';
@@ -21,10 +19,14 @@ import {
   trackPracticeCompleted,
 } from '@/lib/practice/telemetry';
 import { getPracticeStreak } from '@/hooks/usePracticeStreak';
+// Reuse the REAL game grid + discoveries list. Future visual updates to
+// these primitives auto-propagate to practice.
+import GridComponent from '@/components/GridComponent';
+import { DiscoveredWordsList } from '@/components/daily/DiscoveredWordsList';
 
-// Curated practice boards — guaranteed to contain ≥3 simple findable words per
-// locale, intentionally finals-free for Hebrew (sofits ם ץ ך ן ף are stripped
-// to mirror real game's letter pool, see lib/adventure/gridConstants.ts).
+// Curated practice boards — Hebrew is finals-free (matches real letter
+// pool in lib/adventure/gridConstants.ts). Each board is hand-picked to
+// ensure ≥3 simple findable words per locale.
 const BOARDS: Record<string, string[][]> = {
   en: [['S', 'T', 'A', 'R'], ['E', 'O', 'N', 'I'], ['P', 'L', 'A', 'T'], ['E', 'R', 'I', 'N']],
   he: [['ש', 'ל', 'ו', 'מ'], ['ב', 'י', 'ת', 'א'], ['ה', 'נ', 'ר', 'ע'], ['ק', 'ד', 'ח', 'ג']],
@@ -34,12 +36,13 @@ const BOARDS: Record<string, string[][]> = {
 };
 
 /**
- * Classic practice sandbox (redesigned 2026-05-05).
+ * Classic practice sandbox — uses the REAL <GridComponent> so visuals,
+ * animations, drag/keyboard input, accessibility, and combo escalation
+ * all match production. Practice-only chrome (mascot, instructions,
+ * goal pill, chain CTA) wraps the shared grid.
  *
- * Mirrors the real classic engine — drag-to-spell on a 4×4 grid (diagonals
- * allowed), real dictionary validation via /api/validate-word, no submit/reset
- * buttons (drag-release auto-submits, pointer-down auto-clears). Shared infra
- * provides the Pixi+GSAP juice and the just-in-time tutorial state machine.
+ * Validation goes through the practice validator (offline-friendly,
+ * session-cached) — the only thing different from real classic mode.
  */
 export default function PracticeClassicSandbox() {
   const { language, t } = useLanguage();
@@ -51,9 +54,6 @@ export default function PracticeClassicSandbox() {
   const [beat, setBeat] = useState<MicroTutorialBeat>(tutorialRef.current.currentBeat());
   const advanceBeat = useCallback(() => setBeat(tutorialRef.current.currentBeat()), []);
 
-  const grid = usePracticeGridDragSelect({ rows: 4, cols: 4 });
-  // WordDiscovery-shaped so we can hand the list to <DiscoveredWordsList>
-  // unchanged. lifeGained/tokensGained stay 0 in practice.
   const [foundWords, setFoundWords] = useState<
     Array<{ word: string; timestamp: number; lifeGained: number; tokensGained: number }>
   >([]);
@@ -83,43 +83,11 @@ export default function PracticeClassicSandbox() {
     }
   }, [isComplete, foundWords.length, language, advanceBeat]);
 
-  const onTilePointerDown = useCallback(
-    (e: React.PointerEvent<HTMLButtonElement>, row: number, col: number) => {
-      e.preventDefault();
-      // Release implicit pointer capture so subsequent tiles receive
-      // pointerenter during touch drags. Without this, touch drags fire
-      // pointerenter only on the originally-touched tile.
-      try { (e.target as Element).releasePointerCapture?.(e.pointerId); } catch { /* ignore */ }
-      grid.clear();
-      setFeedback(null);
-      grid.onCellEnter(row, col, board[row][col]);
-      tutorialRef.current.dispatch({ type: 'drag-started' });
-      advanceBeat();
-    },
-    [grid, board, advanceBeat],
-  );
-
-  const onTilePointerEnter = useCallback(
-    (row: number, col: number) => {
-      grid.onCellEnter(row, col, board[row][col]);
-    },
-    [grid, board],
-  );
-
-  const onContainerPointerUp = useCallback(async () => {
-    const word = grid.path.map((c) => c.letter).join('');
-    if (word.length < 2) {
-      grid.clear();
-      return;
-    }
-    const upper = word.toUpperCase();
+  const handleWordSubmit = useCallback(async (rawWord: string) => {
+    if (rawWord.length < 2) return;
+    const upper = rawWord.toUpperCase();
     if (foundWords.some((w) => w.word === upper)) {
       setFeedback('dup');
-      const tile = document.querySelector(
-        `[data-testid="practice-tile-${grid.path[0].row}-${grid.path[0].col}"]`,
-      );
-      if (tile) juice.triggerDuplicate(tile);
-      grid.clear();
       return;
     }
     const result = await validator.check(upper);
@@ -130,39 +98,33 @@ export default function PracticeClassicSandbox() {
           { word: upper, timestamp: Date.now(), lifeGained: 0, tokensGained: 0 },
         ];
         trackPracticeWordFound({
-          mode: 'classic',
-          locale: language,
-          word: upper,
-          wordsFound: next.length,
+          mode: 'classic', locale: language, word: upper, wordsFound: next.length,
         });
         return next;
       });
       setFeedback('ok');
-      const tilePositions = grid.path.map((c) => {
-        const el = document.querySelector(
-          `[data-testid="practice-tile-${c.row}-${c.col}"]`,
-        ) as Element | null;
-        const rect = el?.getBoundingClientRect();
-        return { x: rect?.left ?? 0, y: rect?.top ?? 0, el: el ?? document.createElement('div') };
+      // Use the GridComponent's data-row/data-col attrs to find tile centers
+      // for the particle juice. Falls back gracefully if cells aren't in DOM.
+      const cells = Array.from(document.querySelectorAll('[data-row][data-col]')) as HTMLElement[];
+      const positions = cells.slice(0, upper.length).map((el) => {
+        const r = el.getBoundingClientRect();
+        return { x: r.left, y: r.top, el };
       });
-      juice.triggerWordFound(tilePositions);
+      juice.triggerWordFound(positions);
       tutorialRef.current.dispatch({ type: 'word-found' });
       advanceBeat();
     } else {
       setFeedback('bad');
-      const tile = document.querySelector(
-        `[data-testid="practice-tile-${grid.path[0].row}-${grid.path[0].col}"]`,
-      );
+      const tile = document.querySelector('[data-row][data-col]');
       if (tile) juice.triggerInvalid(tile);
     }
-    grid.clear();
-  }, [grid, foundWords, validator, juice, language, advanceBeat]);
+  }, [foundWords, validator, juice, language, advanceBeat]);
 
-  const currentWord = useMemo(() => grid.path.map((c) => c.letter).join(''), [grid.path]);
-  const selectedKeys = useMemo(
-    () => new Set(grid.path.map((c) => `${c.row}-${c.col}`)),
-    [grid.path],
-  );
+  // Detect first-drag for tutorial beat advance.
+  const onSelectionChange = useCallback(() => {
+    tutorialRef.current.dispatch({ type: 'drag-started' });
+    advanceBeat();
+  }, [advanceBeat]);
 
   const mascotReaction: PracticeMascotMood = isComplete
     ? 'celebrate'
@@ -173,11 +135,7 @@ export default function PracticeClassicSandbox() {
         : 'idle';
 
   return (
-    <div
-      className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3"
-      onPointerUp={onContainerPointerUp}
-      onPointerLeave={onContainerPointerUp}
-    >
+    <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3">
       <PracticePixiFx ref={fxRef} />
       <PracticeMascotReaction mode="classic" reaction={mascotReaction} />
       <PracticeModeNav current="classic" />
@@ -199,39 +157,15 @@ export default function PracticeClassicSandbox() {
         }}
       />
 
-      <div
-        data-testid="practice-board"
-        className="grid grid-cols-4 gap-2 w-full max-w-xs touch-none"
-      >
-        {board.map((row, r) =>
-          row.map((letter, c) => {
-            const selected = selectedKeys.has(`${r}-${c}`);
-            return (
-              <button
-                key={`${r}-${c}`}
-                type="button"
-                data-testid={`practice-tile-${r}-${c}`}
-                onPointerDown={(e) => onTilePointerDown(e, r, c)}
-                onPointerEnter={() => onTilePointerEnter(r, c)}
-                className={
-                  'aspect-square rounded-neo border-2 border-neo-black font-neo-display font-black text-2xl shadow-hard-sm transition-transform ' +
-                  (selected
-                    ? 'bg-neo-lime text-neo-black scale-95'
-                    : 'bg-neo-cream text-neo-black')
-                }
-              >
-                {letter}
-              </button>
-            );
-          }),
-        )}
-      </div>
-
-      <div
-        data-testid="practice-current-word"
-        className="min-h-[2rem] font-neo-display font-black text-xl text-neo-cream tracking-wider"
-      >
-        {currentWord}
+      <div data-testid="practice-board" className="w-full max-w-xs aspect-square">
+        <GridComponent
+          grid={board}
+          interactive
+          onWordSubmit={handleWordSubmit}
+          onSelectionChange={onSelectionChange}
+          hideComboIndicator
+          language={language}
+        />
       </div>
 
       <div className="w-full" data-testid="practice-discoveries">

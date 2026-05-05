@@ -1,8 +1,6 @@
 /**
- * Redesigned PracticeWordHuntSandbox — mirrors real word-hunt: 4×4 grid +
- * drag-to-spell + target word panel above. Wordle-style position feedback
- * lights up when the spelled word matches the target length. No survival HUD,
- * no submit/reset buttons (drag-release auto-submits, pointer-down auto-clears).
+ * PracticeWordHuntSandbox — uses real <GridComponent> for the 4×4 board.
+ * Practice-only chrome adds the target panel + bonus discoveries list.
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -22,6 +20,18 @@ vi.mock('pixi.js', () => ({
     destroy = vi.fn();
   },
 }));
+vi.mock('@/components/GridComponent', () => ({
+  default: ({ onWordSubmit }: { onWordSubmit?: (word: string) => void }) => (
+    <div data-testid="grid-component-stub">
+      <button
+        type="button"
+        data-testid="stub-submit-word"
+        onClick={(e) => onWordSubmit?.((e.currentTarget as HTMLButtonElement).dataset.word ?? '')}
+      />
+      <div data-row="0" data-col="0" />
+    </div>
+  ),
+}));
 
 import PracticeWordHuntSandbox from '../PracticeWordHuntSandbox';
 
@@ -37,9 +47,9 @@ describe('PracticeWordHuntSandbox redesigned', () => {
     expect(screen.getByTestId('practice-target')).toBeInTheDocument();
   });
 
-  it('renders a 4×4 grid (16 tiles)', () => {
+  it('renders the real GridComponent (via stub)', () => {
     render(<PracticeWordHuntSandbox />);
-    expect(screen.getAllByTestId(/^practice-tile-/)).toHaveLength(16);
+    expect(screen.getByTestId('grid-component-stub')).toBeInTheDocument();
   });
 
   it('does NOT render submit or reset buttons', () => {
@@ -64,13 +74,11 @@ describe('PracticeWordHuntSandbox redesigned', () => {
     expect(screen.queryByTestId('practice-chain-cta')).toBeNull();
   });
 
-  it('drag of a non-target word invokes the validator', async () => {
-    // Spell "STA" (3 letters) — NOT the EN target "STAR", so validator runs
+  it('non-target word goes through validator', async () => {
     render(<PracticeWordHuntSandbox />);
-    fireEvent.pointerDown(screen.getByTestId('practice-tile-0-0'));
-    fireEvent.pointerEnter(screen.getByTestId('practice-tile-0-1'));
-    fireEvent.pointerEnter(screen.getByTestId('practice-tile-0-2'));
-    fireEvent.pointerUp(screen.getByTestId('practice-tile-0-2'));
-    await waitFor(() => expect(validatorCheck).toHaveBeenCalled());
+    const btn = screen.getByTestId('stub-submit-word');
+    btn.setAttribute('data-word', 'NIT');
+    fireEvent.click(btn);
+    await waitFor(() => expect(validatorCheck).toHaveBeenCalledWith('NIT'));
   });
 });

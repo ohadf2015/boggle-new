@@ -4960,7 +4960,6 @@ const sv = {
       "sWordsDesc": "Ord som börjar på S"
     },
     "header": "Övningsläge",
-    "instructions": "Svep över bokstäver för att bilda ord (3+ bokstäver)",
     "found": "Snyggt! Ord hittat!",
     "duplicate": "Det där hittade du redan!",
     "invalid": "Inte ett ord - testa igen!",
