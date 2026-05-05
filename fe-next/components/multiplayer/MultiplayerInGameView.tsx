@@ -27,6 +27,7 @@ import InGameScreen from '../game/InGameScreen';
 import { useBlastMultiplayerBridge } from '@/components/blast/hooks/useBlastMultiplayerBridge';
 import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
 import { StandardDesktopAdapter } from './desktop/StandardDesktopAdapter';
+import { WheelRushDesktopAdapter } from './desktop/WheelRushDesktopAdapter';
 
 // Mode-specific game views are split into per-route chunks. Only the active
 // mode's bundle is downloaded — non-blast rooms don't pay for BlastGame's
@@ -407,6 +408,51 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         totalTime={totalTime ?? 180}
         meId={username}
         canvas={<InGameScreen {...inGameScreenProps} />}
+      />
+    );
+  }
+
+  // Desktop shell for wheel-rush mode
+  // TypeScript doesn't narrow properly on 'wheel-rush' variant in some builds,
+  // but the runtime value is correct (validated in backend/modules/gameModeSelector.ts)
+  if ((gameMode as string) === 'wheel-rush' && shellEnabled) {
+    // Map leaderboard from MultiplayerInGameView shape to RosterPlayer shape
+    const rosterPlayers = leaderboard.map(entry => ({
+      userId: entry.username ?? '',
+      username: entry.username,
+      score: entry.score,
+      status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
+      isYou: entry.username === username,
+    }));
+
+    // Map foundWords from FoundWord shape to LadderWord shape
+    const ladderWords = foundWords.map((fw, idx) => ({
+      word: fw.word,
+      score: fw.score ?? 0,
+      ts: fw.timestamp ?? 0,
+      userId: username,
+      inputMethod: ('drag' as const),
+    }));
+
+    const wheelRushProps = {
+      socket,
+      username,
+      leaderboard,
+      onQuit: handleQuit,
+      t,
+      remainingTime,
+    };
+
+    return (
+      <WheelRushDesktopAdapter
+        roomId={gameCode}
+        leaderboard={rosterPlayers}
+        foundWords={ladderWords}
+        remainingTime={remainingTime ?? 0}
+        totalTime={totalTime ?? 60}
+        fogProgress={0} // TODO: Thread fogProgress from WheelRushView's internal state
+        meId={username}
+        canvas={<WheelRushView {...wheelRushProps} />}
       />
     );
   }
