@@ -13,6 +13,16 @@ import { addMinutesWrap, inWindow } from './smartReminderTime';
 const REMINDER_HOUR_MIN = 17;
 const REMINDER_HOUR_MAX = 19;
 
+/**
+ * Cold-start fallback default window. Used by the smart cron when the user
+ * has no avg-row yet (brand-new install, sample_size < 3). Active push token
+ * = user already consented, so reaching them at this default range is using
+ * existing permission. Mirrors the legacy non-smart cron's window so behavior
+ * is consistent if a user crosses the 3-sample threshold mid-rollout.
+ */
+const COLD_START_HOUR_MIN = REMINDER_HOUR_MIN;
+const COLD_START_HOUR_MAX = REMINDER_HOUR_MAX;
+
 // Smart-reminder constants. Push fires when current local time falls inside
 // [avg + OFFSET, avg + OFFSET + WINDOW). Hourly cron tick = WINDOW must be >= 60
 // to guarantee every user gets exactly one tick that includes them.
@@ -258,8 +268,6 @@ export async function getSmartDailyChallengePushRecipients(
 
   const recipients: DailyPushRecipient[] = [];
   for (const p of profiles) {
-    const avg = avgByUser.get(p.id);
-    if (!avg) continue; // never-played → skip
     if (playedIds.has(p.id)) continue;
     if (optedOut.has(p.id)) continue;
 
@@ -268,12 +276,26 @@ export async function getSmartDailyChallengePushRecipients(
       if (lastDate === today) continue;
     }
 
-    // Prefer the timezone that was used to compute the avg, so the
-    // window math stays consistent if the profile TZ has since moved.
-    const tz = avg.timezone || p.timezone || 'UTC';
-    const target = addMinutesWrap(avg.avg_play_minute_of_day, SMART_OFFSET_MINUTES);
-    const currentLocalMin = getLocalMinuteOfDay(tz, now);
-    if (!inWindow(currentLocalMin, target, SMART_WINDOW_MINUTES)) continue;
+    const avg = avgByUser.get(p.id);
+
+    if (avg) {
+      // Established cohort: smart per-user window (avg play time + 30min).
+      // Prefer the timezone that was used to compute the avg, so the
+      // window math stays consistent if the profile TZ has since moved.
+      const tz = avg.timezone || p.timezone || 'UTC';
+      const target = addMinutesWrap(avg.avg_play_minute_of_day, SMART_OFFSET_MINUTES);
+      const currentLocalMin = getLocalMinuteOfDay(tz, now);
+      if (!inWindow(currentLocalMin, target, SMART_WINDOW_MINUTES)) continue;
+    } else {
+      // Cold-start fallback: no avg-row yet (brand-new install or
+      // sample_size < 3). Default 17–19 local-hour window is the legacy
+      // non-smart contract; reaching users here uses their existing push
+      // consent without the 3-day gap before v_user_daily_play_avg
+      // populates. Closes the D1-retention reach hole flagged 2026-05-05.
+      const tz = p.timezone || 'UTC';
+      const localHour = getLocalHour(tz);
+      if (localHour < COLD_START_HOUR_MIN || localHour > COLD_START_HOUR_MAX) continue;
+    }
 
     const locale: PushLocale = isPushLocale(p.language) ? p.language : 'en';
     recipients.push({ userId: p.id, locale });

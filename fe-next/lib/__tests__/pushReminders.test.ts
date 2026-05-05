@@ -203,12 +203,34 @@ describe('getSmartDailyChallengePushRecipients', () => {
     expect(recipients).toEqual([]);
   });
 
-  it('excludes never-played users (no row in v_user_daily_play_avg)', async () => {
+  it('cold-start fallback: never-played users in default 17–19 local window are included', async () => {
+    // 2026-05-05 D1-retention sprint: brand-new installs with active push token
+    // were excluded for ~3 days until v_user_daily_play_avg populated. Active
+    // push token = user-granted permission, so reaching them at default
+    // 17–19 local window is using existing consent, not spamming. The 3-day
+    // cold-start gap was the dominant blocker on D1 retention reach.
+    const { getLocalHour } = await import('../email');
+    (getLocalHour as unknown as ReturnType<typeof vi.fn>).mockReturnValue(18);
+
     tokensResult.data = [{ user_id: 'u1' }];
     profilesResult.data = [
       { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: null, language: 'en' },
     ];
-    avgViewResult.data = []; // no history → no row → skip
+    avgViewResult.data = []; // no history → cold-start branch
+
+    const recipients = await getSmartDailyChallengePushRecipients();
+    expect(recipients).toEqual([{ userId: 'u1', locale: 'en' }]);
+  });
+
+  it('cold-start fallback: never-played users OUTSIDE default 17–19 local window are excluded', async () => {
+    const { getLocalHour } = await import('../email');
+    (getLocalHour as unknown as ReturnType<typeof vi.fn>).mockReturnValue(10); // 10am — outside
+
+    tokensResult.data = [{ user_id: 'u1' }];
+    profilesResult.data = [
+      { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: null, language: 'en' },
+    ];
+    avgViewResult.data = [];
 
     const recipients = await getSmartDailyChallengePushRecipients();
     expect(recipients).toEqual([]);
