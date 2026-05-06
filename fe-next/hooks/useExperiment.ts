@@ -28,6 +28,7 @@
 import { useCallback, useRef } from 'react';
 import posthog from 'posthog-js';
 import { usePostHogFlag } from '@/hooks/usePostHogFlag';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   experimentDefault,
   experimentEmailOverride,
@@ -54,18 +55,12 @@ export function useExperiment<K extends ExperimentKey>(
     ? raw
     : fallback;
 
-  // Per-email forced override (registry allowlist). Reads identified email
-  // from PostHog `$set` props (populated by identifyUserForAnalytics on auth).
+  // Per-email forced override (registry allowlist). Reads email straight
+  // from AuthContext — synchronous and provider-safe (useAuth returns a
+  // default value outside the provider, so this is SSR/test friendly).
   // Wins over the remote variant so single-user pilots don't need a cohort.
-  let identifiedEmail: string | null = null;
-  try {
-    const getProp = (posthog as unknown as { get_property?: (k: string) => unknown }).get_property;
-    const value = typeof getProp === 'function' ? getProp.call(posthog, 'email') : undefined;
-    identifiedEmail = typeof value === 'string' ? value : null;
-  } catch {
-    identifiedEmail = null;
-  }
-  const override = experimentEmailOverride(key, identifiedEmail);
+  const { user } = useAuth();
+  const override = experimentEmailOverride(key, user?.email ?? null);
   const variant: ExperimentVariant<K> = override ?? liveVariant;
 
   const fired = useRef(false);

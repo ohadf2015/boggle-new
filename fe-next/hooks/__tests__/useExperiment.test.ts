@@ -17,12 +17,15 @@ vi.mock('@/hooks/usePostHogFlag', () => ({
 }));
 
 const mockCapture = vi.fn();
-const mockGetProperty = vi.fn<(key: string) => unknown>();
 vi.mock('posthog-js', () => ({
   default: {
     capture: (...args: unknown[]) => mockCapture(...args),
-    get_property: (key: string) => mockGetProperty(key),
   },
+}));
+
+const mockUseAuth = vi.fn<() => { user: { email?: string | null } | null }>();
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => mockUseAuth(),
 }));
 
 import { useExperiment } from '../useExperiment';
@@ -31,7 +34,7 @@ import { EXPERIMENTS } from '@/lib/experiments';
 describe('useExperiment', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockGetProperty.mockReturnValue(undefined);
+    mockUseAuth.mockReturnValue({ user: null });
   });
 
   it('returns the registry default when the flag returns the fallback', () => {
@@ -76,30 +79,30 @@ describe('useExperiment', () => {
   });
 
   describe('email overrides', () => {
-    it('forces the override variant when identified email matches the registry allowlist', () => {
+    it('forces the override variant when authed email matches the registry allowlist', () => {
       mockFlagValue.mockImplementation((_key, fallback) => fallback); // posthog returns control
-      mockGetProperty.mockImplementation((k) => (k === 'email' ? 'ohadf2015@gmail.com' : undefined));
+      mockUseAuth.mockReturnValue({ user: { email: 'ohadf2015@gmail.com' } });
       const { result } = renderHook(() => useExperiment('blast.candy-shell.enabled'));
       expect(result.current.variant).toBe('candy');
     });
 
-    it('still uses the live posthog variant when identified email is not on the allowlist', () => {
+    it('still uses the live posthog variant when authed email is not on the allowlist', () => {
       mockFlagValue.mockReturnValue('candy'); // hypothetical PostHog rollout
-      mockGetProperty.mockImplementation((k) => (k === 'email' ? 'random@x.com' : undefined));
+      mockUseAuth.mockReturnValue({ user: { email: 'random@x.com' } });
       const { result } = renderHook(() => useExperiment('blast.candy-shell.enabled'));
       expect(result.current.variant).toBe('candy');
     });
 
-    it('falls back to default when no email is identified and posthog has not assigned', () => {
+    it('falls back to default when no email is authed and posthog has not assigned', () => {
       mockFlagValue.mockImplementation((_key, fallback) => fallback);
-      mockGetProperty.mockReturnValue(undefined);
+      mockUseAuth.mockReturnValue({ user: null });
       const { result } = renderHook(() => useExperiment('blast.candy-shell.enabled'));
       expect(result.current.variant).toBe('control');
     });
 
     it('fires experiment_exposed for the override variant (since it differs from default)', () => {
       mockFlagValue.mockImplementation((_key, fallback) => fallback);
-      mockGetProperty.mockImplementation((k) => (k === 'email' ? 'ohadf2015@gmail.com' : undefined));
+      mockUseAuth.mockReturnValue({ user: { email: 'ohadf2015@gmail.com' } });
       const { result } = renderHook(() => useExperiment('blast.candy-shell.enabled'));
       result.current.trackExposure();
       expect(mockCapture).toHaveBeenCalledWith('experiment_exposed', {
