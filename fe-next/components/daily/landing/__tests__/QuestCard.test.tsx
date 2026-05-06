@@ -142,4 +142,18 @@ describe('QuestCard', () => {
 
     expect(screen.getByText('NEW')).toBeInTheDocument();
   });
+
+  test('renders image overlay when previewImageUrl provided', () => {
+    renderWithProviders(
+      <QuestCard {...defaultProps} previewImageUrl="/daily/word-hunt-hero.jpg" />
+    );
+    expect(screen.getByTestId('quest-card-image-overlay')).toBeInTheDocument();
+  });
+
+  test('does not render details text even when details prop provided', () => {
+    renderWithProviders(
+      <QuestCard {...defaultProps} details="Some long description text" />
+    );
+    expect(screen.queryByText('Some long description text')).not.toBeInTheDocument();
+  });
 });

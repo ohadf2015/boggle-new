@@ -4987,6 +4987,7 @@ const ja = {
     "wordHunt": {
       "instruction": "文字をタップしてターゲットの単語を作ります。緑 = 正しい位置。黄色 = 間違った位置。",
       "targetLabel": "ターゲットの単語",
+      "goalChip": "探せ: {{word}}",
       "submit": "推測",
       "backspace": "戻す",
       "solved": "解けた！よくできました。",
@@ -5430,7 +5431,7 @@ const ja = {
     "wordHunt": {
       "title": "ワードハント",
       "subtitle": "サバイバルモード",
-      "desc": "色ヒントで謎の単語を解き明かせ！",
+      "desc": "単語を当てろ。10回のチャンス。",
       "feature1": "90秒",
       "feature2": "コンボシステム",
       "feature3": "グローバルランキング",
@@ -5556,7 +5557,7 @@ const ja = {
     },
     "hub": {
       "wordWheelQuest": "ワードホイール",
-      "wordWheelDesc": "ホイールで単語を見つけよう — 中央の文字必須！",
+      "wordWheelDesc": "単語を作ろう。中央の文字必須。",
       "wordWheelDetails": "90秒でできるだけ多くの単語を。すべての単語は中央の文字を含む必要があります。",
       "wordHuntQuest": "ワードハント",
       "wordHuntDesc": "10回以内に隠れた単語を当てよう"

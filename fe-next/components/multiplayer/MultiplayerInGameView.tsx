@@ -341,6 +341,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       score: entry.score,
       status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
       isYou: entry.username === username,
+      customAvatar: entry.avatar?.customAvatar ?? null,
     }));
 
     // Map foundWords from FoundWord shape to LadderWord shape
@@ -428,6 +429,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       score: entry.score,
       status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
       isYou: entry.username === username,
+      customAvatar: entry.avatar?.customAvatar ?? null,
     }));
 
     // Map foundWords from FoundWord shape to LadderWord shape
@@ -471,6 +473,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       score: entry.score,
       status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
       isYou: entry.username === username,
+      customAvatar: entry.avatar?.customAvatar ?? null,
     }));
 
     // Map foundWords from FoundWord shape to LadderWord shape
@@ -520,6 +523,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       score: entry.score,
       status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
       isYou: entry.username === username,
+      customAvatar: entry.avatar?.customAvatar ?? null,
     }));
 
     // Map foundWords from FoundWord shape to LadderWord shape

@@ -1,6 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import { RosterRail } from '../RosterRail';
 
+vi.mock('@/components/Avatar', () => ({
+  default: ({ userId, customAvatar }: { userId?: string; customAvatar?: unknown }) => (
+    <span data-testid="avatar" data-uid={userId} data-has-custom={customAvatar ? 'true' : 'false'} />
+  ),
+}));
+
 describe('RosterRail', () => {
   const players = [
     { userId: 'u1', username: 'Alpha', score: 250, status: 'connected' as const, isYou: true },
@@ -44,5 +50,20 @@ describe('RosterRail', () => {
   it('renders rank number', () => {
     render(<RosterRail players={players} />);
     expect(screen.getByTestId('roster-row-u1').textContent).toMatch(/^1/);
+  });
+
+  it('renders an avatar per player using userId as seed', () => {
+    render(<RosterRail players={players} />);
+    const avatars = screen.getAllByTestId('avatar');
+    expect(avatars).toHaveLength(3);
+    expect(avatars.some(a => a.getAttribute('data-uid') === 'u1')).toBe(true);
+  });
+
+  it('passes customAvatar to Avatar when provided', () => {
+    const withAvatar = [
+      { userId: 'u1', username: 'Alpha', score: 100, status: 'connected' as const, customAvatar: { parts: [] } as never },
+    ];
+    render(<RosterRail players={withAvatar} />);
+    expect(screen.getByTestId('avatar').getAttribute('data-has-custom')).toBe('true');
   });
 });

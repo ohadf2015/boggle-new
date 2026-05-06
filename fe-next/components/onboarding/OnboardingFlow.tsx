@@ -30,14 +30,6 @@ import CrazyGamesTutorial from './CrazyGamesTutorial';
 import AuthModal from '@/components/auth/AuthModal';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
-/** Step-specific accent colors for the floating background shapes */
-const STEP_ACCENTS: Record<FlowStep, { color1: string; color2: string }> = {
-  returningUser: { color1: 'rgba(191,255,0,0.18)', color2: 'rgba(255,20,147,0.14)' },
-  language: { color1: 'rgba(191,255,0,0.07)', color2: 'rgba(0,255,255,0.05)' },
-  tutorial: { color1: 'rgba(0,255,255,0.06)', color2: 'rgba(191,255,0,0.04)' },
-  profile: { color1: 'rgba(255,20,147,0.06)', color2: 'rgba(191,255,0,0.04)' },
-  inviteTutorial: { color1: 'rgba(255,20,147,0.10)', color2: 'rgba(0,255,255,0.05)' },
-};
 
 interface OnboardingFlowProps {
   onComplete: () => void;
@@ -188,8 +180,6 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   }, [isInviteMode, inviteAtMount]);
 
   const stepIndex = useMemo(() => activeSteps.indexOf(step), [step, activeSteps]);
-  const accent = STEP_ACCENTS[step];
-
   // Step 1: Tutorial complete
   const handleTutorialComplete = useCallback(
     (score: number, wordsFound: string[]) => {
@@ -397,21 +387,8 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       className="fixed inset-0 z-[100] bg-neo-navy flex flex-col items-center justify-center overflow-y-auto"
       dir={dir}
     >
-      {/* Floating background shapes shift color per step; sizes scale up on lg. */}
+      {/* Subtle diagonal grid pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
-        <motion.div
-          className="absolute w-[300px] h-[300px] lg:w-[560px] lg:h-[560px] rounded-full blur-[120px] lg:blur-[160px]"
-          animate={{ background: accent.color1, x: ['-10%', '5%', '-10%'], y: ['-5%', '10%', '-5%'] }}
-          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ top: '-8%', left: '-5%' }}
-        />
-        <motion.div
-          className="absolute w-[250px] h-[250px] lg:w-[480px] lg:h-[480px] rounded-full blur-[100px] lg:blur-[140px]"
-          animate={{ background: accent.color2, x: ['5%', '-8%', '5%'], y: ['5%', '-5%', '5%'] }}
-          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ bottom: '5%', right: '-3%' }}
-        />
-        {/* Subtle diagonal grid pattern */}
         <div
           className="absolute inset-0 opacity-[0.02]"
           style={{

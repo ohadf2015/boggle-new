@@ -5043,6 +5043,7 @@ const es = {
     "wordHunt": {
       "instruction": "Toca letras para deletrear la palabra objetivo. Verde = lugar correcto. Amarillo = lugar incorrecto.",
       "targetLabel": "Palabra objetivo",
+      "goalChip": "Encuentra: {{word}}",
       "submit": "Adivinar",
       "backspace": "Deshacer",
       "solved": "¡Resuelto! Buen trabajo.",
@@ -5420,7 +5421,7 @@ const es = {
     "wordHunt": {
       "title": "Caza Palabras",
       "subtitle": "Modo Supervivencia",
-      "desc": "¡Descubre la palabra misteriosa con pistas de colores!",
+      "desc": "Descubre la palabra. 10 intentos.",
       "feature1": "90 segundos",
       "feature2": "Sistema de combos",
       "feature3": "Tabla global",
@@ -5551,7 +5552,7 @@ const es = {
     },
     "hub": {
       "wordWheelQuest": "Rueda de palabras",
-      "wordWheelDesc": "Encuentra palabras con la rueda — ¡la letra central es obligatoria!",
+      "wordWheelDesc": "Forma palabras. La letra central es clave.",
       "wordWheelDetails": "Forma tantas palabras como puedas en 90s. Cada palabra debe usar la letra central.",
       "wordHuntQuest": "Caza de palabras",
       "wordHuntDesc": "Descifra la palabra oculta en 10 intentos"

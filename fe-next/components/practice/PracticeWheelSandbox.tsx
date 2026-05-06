@@ -12,11 +12,10 @@ import PracticeInstructions from './PracticeInstructions';
 import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
 import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
 import PracticeModeNav from './PracticeModeNav';
-import PracticeMicroTip from './PracticeMicroTip';
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
 import { usePracticeJuice } from './usePracticeJuice';
 import { usePracticeValidator } from '@/lib/practice/usePracticeValidator';
-import { createMicroTutorial, type MicroTutorialBeat } from '@/lib/practice/microTutorial';
+import { createMicroTutorial } from '@/lib/practice/microTutorial';
 import { markPracticeMode, PRACTICE_GOALS } from '@/lib/practice/practiceProgress';
 import {
   trackPracticeStarted,
@@ -82,8 +81,7 @@ export default function PracticeWheelSandbox() {
   const sound = useSoundEffects();
   const fxRef = useRef<PracticePixiFxHandle | null>(null);
   const tutorialRef = useRef(createMicroTutorial({ mode: 'wheelRush' }));
-  const [beat, setBeat] = useState<MicroTutorialBeat>(tutorialRef.current.currentBeat());
-  const advanceBeat = useCallback(() => setBeat(tutorialRef.current.currentBeat()), []);
+  const advanceBeat = useCallback(() => { tutorialRef.current.currentBeat(); }, []);
 
   // Built word as ordered list of (letter, originalIndex) — index 0 = center.
   const [built, setBuilt] = useState<Array<{ letter: string; originIndex: number }>>([]);
@@ -109,6 +107,7 @@ export default function PracticeWheelSandbox() {
   const lastDragIdxRef = useRef<number | null>(null);
   const dragStartIdxRef = useRef<number | null>(null);
   const dragEngagedRef = useRef(false);
+  const pointerPosRef = useRef<{ x: number; y: number } | null>(null);
   const idleSubmitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const builtRef = useRef(built);
   const usedIndicesRef = useRef<Set<number>>(new Set());
@@ -270,10 +269,12 @@ export default function PracticeWheelSandbox() {
     dragStartIdxRef.current = btn ? Number(btn.dataset.wheelIndex) : null;
   }, []);
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    pointerPosRef.current = { x: e.clientX, y: e.clientY };
     if (!draggingRef.current) return;
     tryDragHit(e.clientX, e.clientY);
   }, [tryDragHit]);
   const handlePointerUp = useCallback(() => {
+    pointerPosRef.current = null;
     const wasEngaged = dragEngagedRef.current;
     draggingRef.current = false;
     lastDragIdxRef.current = null;
@@ -358,7 +359,7 @@ export default function PracticeWheelSandbox() {
   );
 
   return (
-    <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3 min-h-[calc(100dvh-var(--bottom-stack-height,5rem))]">
+    <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-3 pb-2 gap-2 h-[calc(100dvh-var(--bottom-stack-height,0rem))] overflow-hidden">
       <PracticePixiFx ref={fxRef} />
       <PracticeMascotReaction mode="wheelRush" reaction={mascotReaction} />
 
@@ -386,14 +387,6 @@ export default function PracticeWheelSandbox() {
       <PracticeInstructions mode="wheelRush" />
       <PracticeMistakeCoach kind={coach.active} mode="wheelRush" onClose={coach.close} />
 
-      <PracticeMicroTip
-        beat={beat}
-        onDismiss={() => {
-          tutorialRef.current.dispatch({ type: 'beat-completed' });
-          advanceBeat();
-        }}
-      />
-
       {/* Wheel — uses real WheelLetter for visual parity, with the real
           decorative PixiJS orbital ring overlay (pointer-events-none, lazy).
           Pointer handlers wire drag-to-spell so practice feels exactly like
@@ -413,6 +406,8 @@ export default function PracticeWheelSandbox() {
             selectedIndices={Array.from(usedIndices)}
             radius={RADIUS_PX}
             combo={0}
+            pointerPosRef={pointerPosRef}
+            isDraggingRef={draggingRef}
           />
         </div>
         <WheelLetter
@@ -546,7 +541,7 @@ export default function PracticeWheelSandbox() {
 
       {/* Found words — last-found highlight matches real
           (WordWheelGame.tsx:951–985). */}
-      <ul className="flex flex-wrap gap-1.5 min-h-[1.5rem] w-full">
+      <ul className="flex-shrink-0 flex flex-wrap gap-1.5 w-full max-h-[2.5rem] overflow-hidden">
         {foundWords.map((w, i) => {
           const isLast = i === foundWords.length - 1;
           return (

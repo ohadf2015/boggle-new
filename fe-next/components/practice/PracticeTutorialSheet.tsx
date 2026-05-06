@@ -14,9 +14,9 @@ type TFunction = (key: string, params?: Record<string, string | number>) => stri
 // Hero illustrations — same as the practice hub tile thumbnails AND the
 // in-game help modal. One image, three places, consistent visual story.
 const HERO_FOR_MODE: Record<PracticeMode, string> = {
-  classic: '/practice/help/practice-help-classic.png',
-  wordHunt: '/practice/help/practice-help-wordhunt.png',
-  wheelRush: '/practice/help/practice-help-wheelrush.png',
+  classic: '/practice/help/practice-help-classic.jpg',
+  wordHunt: '/practice/help/practice-help-wordhunt.jpg',
+  wheelRush: '/practice/help/practice-help-wheelrush.jpg',
 };
 
 const ACCENT_FOR_MODE: Record<PracticeMode, string> = {

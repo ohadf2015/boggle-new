@@ -17,6 +17,7 @@ import { GRID_PADDING, GRID_GAP_CLASS } from './grid/gridLayoutConstants';
 import EarthquakeEffects from './grid/EarthquakeEffects';
 import { getSelectionEscalation } from './grid/selectionEscalation';
 import DragReleaseHint from './grid/DragReleaseHint';
+import GridConnectorOverlay from './grid/GridConnectorOverlay';
 import { useDisableEarthquakeEffects, useLargeLetters } from '@/contexts/AccessibilityContext';
 import { useDevicePerformance } from '../hooks/useDevicePerformance';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -562,6 +563,8 @@ const GridComponent = memo<GridComponentProps>(({
           particles={earthquakeParticles}
           dust={earthquakeDust}
         />
+
+        <GridConnectorOverlay selectedCells={selectedCells} gridEl={gridRef.current} />
 
         {interactive && (
           <>

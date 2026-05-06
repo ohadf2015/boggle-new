@@ -134,11 +134,6 @@ describe('QuickProfileSetup', () => {
     expect(screen.getByText('Nice work!')).toBeInTheDocument();
   });
 
-  it('shows name prompt', () => {
-    render(<QuickProfileSetup {...defaultProps} />);
-    expect(screen.getByText('What should we call you?')).toBeInTheDocument();
-  });
-
   it('renders name input field', () => {
     render(<QuickProfileSetup {...defaultProps} />);
     expect(screen.getByRole('textbox')).toBeInTheDocument();

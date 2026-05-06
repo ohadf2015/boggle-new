@@ -9,11 +9,10 @@ import PracticeInstructions from './PracticeInstructions';
 import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
 import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
 import PracticeModeNav from './PracticeModeNav';
-import PracticeMicroTip from './PracticeMicroTip';
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
 import { usePracticeJuice } from './usePracticeJuice';
 import { usePracticeValidator } from '@/lib/practice/usePracticeValidator';
-import { createMicroTutorial, type MicroTutorialBeat } from '@/lib/practice/microTutorial';
+import { createMicroTutorial } from '@/lib/practice/microTutorial';
 import { markPracticeMode, PRACTICE_GOALS } from '@/lib/practice/practiceProgress';
 import {
   trackPracticeStarted,
@@ -60,8 +59,7 @@ export default function PracticeClassicSandbox() {
   const sound = useSoundEffects();
   const fxRef = useRef<PracticePixiFxHandle | null>(null);
   const tutorialRef = useRef(createMicroTutorial({ mode: 'classic' }));
-  const [beat, setBeat] = useState<MicroTutorialBeat>(tutorialRef.current.currentBeat());
-  const advanceBeat = useCallback(() => setBeat(tutorialRef.current.currentBeat()), []);
+  const advanceBeat = useCallback(() => { tutorialRef.current.currentBeat(); }, []);
 
   const [foundWords, setFoundWords] = useState<
     Array<{ word: string; timestamp: number; lifeGained: number; tokensGained: number }>
@@ -165,7 +163,7 @@ export default function PracticeClassicSandbox() {
         : 'idle';
 
   return (
-    <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3 min-h-[calc(100dvh-var(--bottom-stack-height,5rem))]">
+    <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-3 pb-2 gap-2 h-[calc(100dvh-var(--bottom-stack-height,0rem))] overflow-hidden">
       <PracticePixiFx ref={fxRef} />
       <PracticeMascotReaction mode="classic" reaction={mascotReaction} />
 
@@ -185,26 +183,20 @@ export default function PracticeClassicSandbox() {
       <PracticeInstructions mode="classic" />
       <PracticeMistakeCoach kind={coach.active} mode="classic" onClose={coach.close} />
 
-      <PracticeMicroTip
-        beat={beat}
-        onDismiss={() => {
-          tutorialRef.current.dispatch({ type: 'beat-completed' });
-          advanceBeat();
-        }}
-      />
-
-      <div data-testid="practice-board" className="w-full max-w-xs aspect-square">
-        <GridComponent
-          grid={board}
-          interactive
-          onWordSubmit={handleWordSubmit}
-          onSelectionChange={onSelectionChange}
-          hideComboIndicator
-          language={language}
-        />
+      <div className="flex-1 min-h-0 flex items-center justify-center w-full">
+        <div data-testid="practice-board" className="w-full max-w-xs aspect-square">
+          <GridComponent
+            grid={board}
+            interactive
+            onWordSubmit={handleWordSubmit}
+            onSelectionChange={onSelectionChange}
+            hideComboIndicator
+            language={language}
+          />
+        </div>
       </div>
 
-      <div className="w-full" data-testid="practice-discoveries">
+      <div className="flex-shrink-0 w-full max-h-[2.5rem] overflow-hidden" data-testid="practice-discoveries">
         <DiscoveredWordsList words={foundWords} t={t} />
       </div>
 

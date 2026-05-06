@@ -5002,6 +5002,7 @@ const sv = {
     "wordHunt": {
       "instruction": "Tryck på bokstäver för att stava målordet. Grön = rätt plats. Gul = fel plats.",
       "targetLabel": "Målord",
+      "goalChip": "Hitta: {{word}}",
       "submit": "Gissa",
       "backspace": "Ångra",
       "solved": "Löst! Bra jobbat.",
@@ -5393,7 +5394,7 @@ const sv = {
     "wordHunt": {
       "title": "Word Hunt",
       "subtitle": "Överlevnadsläge",
-      "desc": "Knäck det mystiska ordet med färgledtrådar!",
+      "desc": "Knäck ordet. 10 försök.",
       "feature1": "90 sekunder",
       "feature2": "Kombosystem",
       "feature3": "Global topplista",
@@ -5523,7 +5524,7 @@ const sv = {
     },
     "hub": {
       "wordWheelQuest": "Ordhjul",
-      "wordWheelDesc": "Hitta ord med hjulet — mittenbokstaven krävs!",
+      "wordWheelDesc": "Bilda ord. Mittenbokstaven krävs.",
       "wordWheelDetails": "Bilda så många ord du kan på 90s. Varje ord måste innehålla mittenbokstaven.",
       "wordHuntQuest": "Ordjakt",
       "wordHuntDesc": "Knäck det dolda ordet på 10 försök"

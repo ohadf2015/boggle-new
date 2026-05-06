@@ -5,11 +5,14 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useBlastOpponentActivity } from '@/hooks/gameState/selectors';
+import Avatar from '@/components/Avatar';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface LeaderboardEntry {
   username: string;
   score: number;
   wordCount?: number;
+  avatar?: { customAvatar?: CustomAvatarConfig | null; avatarImage?: string };
 }
 
 interface BlastMPLeaderboardProps {
@@ -84,8 +87,13 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
               )}
               aria-label={`#${i + 1} ${entry.username} ${entry.score}`}
             >
+              <Avatar
+                pixelSize={16}
+                customAvatar={entry.avatar?.customAvatar ?? undefined}
+                userId={entry.username}
+              />
               <span className="opacity-60 w-3 text-center">{i + 1}</span>
-              <span className="truncate max-w-[72px]">{entry.username}</span>
+              <span className="truncate max-w-[60px]">{entry.username}</span>
               <span className="ms-auto">{entry.score}</span>
             </motion.div>
           );

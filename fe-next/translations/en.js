@@ -5114,6 +5114,7 @@ const en = {
     "wordHunt": {
       "instruction": "Tap letters to spell the target word. Green = right spot. Yellow = wrong spot.",
       "targetLabel": "Target word",
+      "goalChip": "Find: {{word}}",
       "submit": "Guess",
       "backspace": "Undo",
       "solved": "Solved! Great job.",
@@ -5497,7 +5498,7 @@ const en = {
 "wordHunt": {
       "title": "Word Hunt",
       "subtitle": "Survival Mode",
-      "desc": "Crack the mystery word with letter clues!",
+      "desc": "Crack the word. 10 tries.",
       "feature1": "90 seconds",
       "feature2": "Combo system",
       "feature3": "Global leaderboard",
@@ -5629,7 +5630,7 @@ const en = {
     },
     "hub": {
       "wordWheelQuest": "Word Wheel",
-      "wordWheelDesc": "Find words using the wheel — center letter required!",
+      "wordWheelDesc": "Spell words. Center letter required.",
       "wordWheelDetails": "Spell as many words as you can in 90s. Every word must use the center letter.",
       "wordHuntQuest": "Word Hunt",
       "wordHuntDesc": "Crack the hidden word in 10 tries"

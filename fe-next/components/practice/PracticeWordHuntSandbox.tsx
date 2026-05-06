@@ -10,11 +10,10 @@ import PracticeInstructions from './PracticeInstructions';
 import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
 import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
 import PracticeModeNav from './PracticeModeNav';
-import PracticeMicroTip from './PracticeMicroTip';
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
 import { usePracticeJuice } from './usePracticeJuice';
 import { usePracticeValidator } from '@/lib/practice/usePracticeValidator';
-import { createMicroTutorial, type MicroTutorialBeat } from '@/lib/practice/microTutorial';
+import { createMicroTutorial } from '@/lib/practice/microTutorial';
 import { markPracticeMode } from '@/lib/practice/practiceProgress';
 import {
   trackPracticeStarted,
@@ -81,8 +80,7 @@ export default function PracticeWordHuntSandbox() {
   const sound = useSoundEffects();
   const fxRef = useRef<PracticePixiFxHandle | null>(null);
   const tutorialRef = useRef(createMicroTutorial({ mode: 'wordHunt' }));
-  const [beat, setBeat] = useState<MicroTutorialBeat>(tutorialRef.current.currentBeat());
-  const advanceBeat = useCallback(() => setBeat(tutorialRef.current.currentBeat()), []);
+  const advanceBeat = useCallback(() => { tutorialRef.current.currentBeat(); }, []);
 
   const clueContainerRef = useRef<HTMLDivElement | null>(null);
   const [clueState, clueActions] = useSurvivalClues({
@@ -318,7 +316,7 @@ export default function PracticeWordHuntSandbox() {
   const liveHref = `/${language}/daily/word-hunt`;
 
   return (
-    <div className="relative flex flex-col items-stretch w-full max-w-md mx-auto px-4 pt-4 pb-bottom-stack gap-3 min-h-[calc(100dvh-var(--bottom-stack-height,5rem))]">
+    <div className="relative flex flex-col items-stretch w-full max-w-md mx-auto px-4 pt-3 pb-2 gap-2 h-[calc(100dvh-var(--bottom-stack-height,0rem))] overflow-hidden">
       <PracticePixiFx ref={fxRef} />
       <PracticeMascotReaction mode="wordHunt" reaction={mascotReaction} />
 
@@ -338,14 +336,15 @@ export default function PracticeWordHuntSandbox() {
       <PracticeInstructions mode="wordHunt" />
       <PracticeMistakeCoach kind={coach.active} mode="wordHunt" onClose={coach.close} />
 
-      <div className="flex flex-col items-center gap-3 flex-1 w-full">
+      <div className="flex flex-col items-center gap-2 flex-1 min-h-0 w-full overflow-hidden">
         {/* REAL clue boxes — letters reveal as discoveries / target attempts
             land their feedback. data-testid wrapper allows tests to assert
             presence without depending on internal SurvivalClueBoxes markup. */}
         <div data-testid="practice-target" className="flex flex-col items-center gap-1.5 w-full">
-          <span className="text-xs uppercase font-neo-display font-black text-neo-cream/70 tracking-wider">
-            {t('practice.wordHunt.targetLabel')}
-          </span>
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-neo-lime/20 border border-neo-lime text-neo-lime font-neo-display font-black text-sm">
+            <span aria-hidden>🔍</span>
+            <span>{t('practice.wordHunt.goalChip', { word: target.toUpperCase() })}</span>
+          </div>
           <div data-testid="practice-clue-boxes" className="w-full">
             <SurvivalClueBoxes
               ref={clueContainerRef}
@@ -380,14 +379,7 @@ export default function PracticeWordHuntSandbox() {
           </div>
         )}
 
-        <PracticeMicroTip
-          beat={beat}
-          onDismiss={() => {
-            tutorialRef.current.dispatch({ type: 'beat-completed' });
-            advanceBeat();
-          }}
-        />
-
+        <div className="flex-1 min-h-0 flex items-center justify-center w-full">
         <div data-testid="practice-board" className="w-full max-w-xs aspect-square mx-auto">
           <GridComponent
             grid={board}
@@ -398,10 +390,11 @@ export default function PracticeWordHuntSandbox() {
             language={language}
           />
         </div>
+        </div>
 
         {discoveries.length > 0 && (
           <div
-            className="w-full max-h-[14vh] overflow-y-auto"
+            className="flex-shrink-0 w-full max-h-[2.5rem] overflow-hidden"
             data-testid="practice-discoveries"
           >
             <DiscoveredWordsList words={discoveries} t={t} />

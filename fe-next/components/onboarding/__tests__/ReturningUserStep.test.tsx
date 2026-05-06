@@ -34,10 +34,9 @@ describe('ReturningUserStep', () => {
       />
     );
 
-  it('renders title and subtitle', () => {
+  it('renders title', () => {
     renderStep();
     expect(screen.getByText('onboarding.returningUser.title')).toBeTruthy();
-    expect(screen.getByText('onboarding.returningUser.subtitle')).toBeTruthy();
   });
 
   it('renders three action buttons', () => {

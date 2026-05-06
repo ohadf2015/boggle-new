@@ -26,9 +26,9 @@ const ACCENT_BG: Record<PracticeMode, string> = {
 };
 
 const HERO_SRC: Record<PracticeMode, string> = {
-  classic: '/practice/help/practice-help-classic.png',
-  wordHunt: '/practice/help/practice-help-wordhunt.png',
-  wheelRush: '/practice/help/practice-help-wheelrush.png',
+  classic: '/practice/help/practice-help-classic.jpg',
+  wordHunt: '/practice/help/practice-help-wordhunt.jpg',
+  wheelRush: '/practice/help/practice-help-wheelrush.jpg',
 };
 
 const TIPS_KEYS: Record<PracticeMode, [string, string, string]> = {

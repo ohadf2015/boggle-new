@@ -40,7 +40,6 @@ export function QuestCard({
   icon,
   title,
   tagline,
-  details,
   color,
   status,
   isLoadingStatus = false,
@@ -53,6 +52,7 @@ export function QuestCard({
   onRequestChallenge,
   requestState = 'idle',
   variant = 'primary',
+  previewImageUrl,
 }: QuestCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
@@ -142,13 +142,21 @@ export function QuestCard({
           isSecondary
             ? 'flex flex-row items-center gap-3 p-3'
             : 'flex flex-col gap-3 p-4 md:flex-row md:items-center md:gap-4',
+          !isSecondary && previewImageUrl && 'min-h-[170px] md:min-h-[130px]',
           'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
           'transition-shadow duration-200 group',
           requestState === 'loading' && 'opacity-50 cursor-not-allowed',
           isCompleted && 'opacity-85',
           isUnavailable && 'opacity-60'
         )}
-        style={tiltStyle}
+        style={{
+          ...tiltStyle,
+          ...(previewImageUrl ? {
+            backgroundImage: `url(${previewImageUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 30%',
+          } : {}),
+        }}
       >
         {/* Accent strip */}
         {!isSecondary && (
@@ -156,11 +164,17 @@ export function QuestCard({
         )}
 
         {/* Gradient overlay */}
-        {!isSecondary && (
+        {!isSecondary && !previewImageUrl && (
           <div className={cn(
             'absolute inset-x-0 top-0 h-16 bg-linear-to-b to-transparent pointer-events-none',
             colorConfig.gradient
           )} />
+        )}
+        {!isSecondary && previewImageUrl && (
+          <div
+            data-testid="quest-card-image-overlay"
+            className="absolute inset-0 bg-gradient-to-t from-slate-900/98 via-slate-900/70 to-slate-900/30 pointer-events-none"
+          />
         )}
 
         {/* Holographic shimmer on hover */}
@@ -272,11 +286,6 @@ export function QuestCard({
           {!isSecondary && (
             <p className="text-[13px] text-slate-400 line-clamp-2">
               {tagline}
-            </p>
-          )}
-          {!isSecondary && details && (
-            <p className="text-[11px] text-slate-500 font-semibold mt-1 line-clamp-2">
-              {details}
             </p>
           )}
         </div>

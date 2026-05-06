@@ -139,19 +139,9 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
         >
           {hasPendingInvite ? t('onboarding.ftue.friendIsWaiting') : t('onboarding.ftue.niceWork')}
         </motion.h2>
-        <motion.p
-          custom={1}
-          variants={staggerChild}
-          initial="hidden"
-          animate="visible"
-          className="text-sm text-neo-black/70 text-center mb-4"
-        >
-          {hasPendingInvite ? t('onboarding.ftue.pickNameAndJoin') : t('onboarding.ftue.whatsYourName')}
-        </motion.p>
-
         {/* Avatar (clickable to open builder) + randomize */}
         <motion.div
-          custom={2}
+          custom={1}
           variants={staggerChild}
           initial="hidden"
           animate="visible"
@@ -224,7 +214,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
 
         {/* Name input */}
         <motion.div
-          custom={3}
+          custom={2}
           variants={staggerChild}
           initial="hidden"
           animate="visible"
@@ -288,7 +278,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
 
         {/* Submit button */}
         <motion.button
-          custom={4}
+          custom={3}
           variants={staggerChild}
           initial="hidden"
           animate="visible"

@@ -263,14 +263,14 @@ export function DailyChallengeLanding({
           icon={<Timer className="w-8 h-8" />}
           title={t('daily.wordHunt.title')}
           tagline={t('daily.wordHunt.desc')}
-          details={t('daily.wordHunt.details')}
           color="orange"
           status={wordHuntStatus}
           isLoadingStatus={dailyStatus.loading}
           onPlay={onSelectWordHunt}
           timeMode="timed"
           timeModeLabel={t('daily.timedQuest')}
-          customPreview="word-hunt-grid"
+          previewImageUrl="/daily/word-hunt-hero.jpg"
+          previewImageAlt={t('daily.wordHunt.title')}
           currentLanguage={currentLanguage}
           buttonText={t('daily.startQuest')}
           delay={0.15}
@@ -349,12 +349,13 @@ export function DailyChallengeLanding({
           icon={<CircleDot className="w-8 h-8" />}
           title={t('wordWheel.hub.wordWheelQuest')}
           tagline={t('wordWheel.hub.wordWheelDesc')}
-          details={t('wordWheel.hub.wordWheelDetails')}
           color="yellow"
           status="new"
           onPlay={onSelectWordWheel}
           timeMode="timed"
           timeModeLabel={t('daily.timedQuest')}
+          previewImageUrl="/daily/word-wheel-hero.jpg"
+          previewImageAlt={t('wordWheel.hub.wordWheelQuest')}
           buttonText={t('daily.startQuest')}
           delay={0.25}
         />

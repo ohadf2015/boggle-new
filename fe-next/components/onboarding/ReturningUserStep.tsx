@@ -99,12 +99,6 @@ const ReturningUserStep: React.FC<ReturningUserStepProps> = ({
           {t('onboarding.returningUser.title')}
         </motion.h1>
 
-        <motion.p
-          variants={itemVariants}
-          className="font-neo-body font-medium text-neo-cream text-base sm:text-lg max-w-[22rem] leading-relaxed"
-        >
-          {t('onboarding.returningUser.subtitle')}
-        </motion.p>
       </motion.div>
 
       {/* Actions */}
