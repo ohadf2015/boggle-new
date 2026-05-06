@@ -43,8 +43,8 @@ import {
 
 interface Copy {
   greeting: (name: string) => string;
-  missed: string;
-  hint: string;          // small label above the letter reveal
+  caption: string;       // lime banner caption inside hero card (uppercase, MP-style)
+  hint: string;          // small label above the letter reveal (kept for preview text)
   pitch: string;         // line between letter reveal and CTA
   cta: string;
   footerReason: string;
@@ -55,7 +55,7 @@ interface Copy {
 const COPY: Record<string, Copy> = {
   en: {
     greeting: (n) => `${n}, you good?`,
-    missed: "Been a minute. Today's word is waiting.",
+    caption: "Today's word is waiting",
     hint: 'Your hint for today',
     pitch: "30 seconds. One word. That's it.",
     cta: "Let's go",
@@ -65,7 +65,7 @@ const COPY: Record<string, Copy> = {
   },
   he: {
     greeting: (n) => `${n}, הכל טוב?`,
-    missed: 'עבר קצת זמן. המילה של היום מחכה.',
+    caption: 'מילה אחת מחכה לך',
     hint: 'הרמז שלך להיום',
     pitch: '30 שניות. מילה אחת. זהו.',
     cta: 'יאללה',
@@ -75,7 +75,7 @@ const COPY: Record<string, Copy> = {
   },
   sv: {
     greeting: (n) => `${n}, allt bra?`,
-    missed: 'Det var ett tag sen. Dagens ord väntar.',
+    caption: 'Dagens ord väntar',
     hint: 'Din ledtråd för idag',
     pitch: '30 sekunder. Ett ord. Klart.',
     cta: 'Nu kör vi',
@@ -85,7 +85,7 @@ const COPY: Record<string, Copy> = {
   },
   ja: {
     greeting: (n) => `${n}さん、元気？`,
-    missed: 'お久しぶり。今日の単語、待ってるよ。',
+    caption: '今日の単語、待機中',
     hint: '今日のヒント',
     pitch: '30秒、一単語、それだけ。',
     cta: 'いこう',
@@ -95,7 +95,7 @@ const COPY: Record<string, Copy> = {
   },
   es: {
     greeting: (n) => `${n}, ¿todo bien?`,
-    missed: 'Ha pasado un rato. La palabra de hoy te espera.',
+    caption: 'La palabra de hoy te espera',
     hint: 'Tu pista de hoy',
     pitch: '30 segundos. Una palabra. Listo.',
     cta: 'Vamos',
@@ -179,9 +179,9 @@ interface ReengagementEmailV2Props {
 /* ───────────────────────── Assets ───────────────────────── */
 
 // Use www. domain — lexiclash.live 301s to www, and email clients don't follow redirects.
-// Locale-agnostic celebration scene: mascot + flying letter tiles + sparkles.
-// Replaces the v2-original split (localized OG card + small mascot GIF circle).
-const HERO_SRC = 'https://www.lexiclash.live/email/reengagement-hero-v2.jpg';
+// MP "BringYourSquad" letterbox banner (3:1 crop of public/images/invite-hero.jpg).
+// Same kawaii squad illustration MP uses to drive invite-action — now driving re-engagement.
+const HERO_SRC = 'https://www.lexiclash.live/email/mp-invite-hero.jpg';
 
 /* ─── Palette (solid hex only — dark-mode safe) ─── */
 
@@ -239,11 +239,11 @@ export default function ReengagementEmailV2({
             [data-ogsc] h1 { color: ${C.text} !important; }
             [data-ogsc] .cta-btn-v2 { background-color: ${C.lime} !important; color: ${C.black} !important; }
             [data-ogsc] .cta-td-v2 { background-color: ${C.lime} !important; }
-            [data-ogsc] .missed-v2 { color: ${C.pink} !important; }
-            [data-ogsc] .hint-label { color: ${C.hint} !important; }
+            [data-ogsc] .caption-strip { background-color: ${C.bg} !important; }
             [data-ogsb] .body-v2 { background-color: ${C.bg} !important; }
             [data-ogsb] .cta-btn-v2 { background-color: ${C.lime} !important; }
             [data-ogsb] .cta-td-v2 { background-color: ${C.lime} !important; }
+            [data-ogsb] .caption-strip { background-color: ${C.bg} !important; }
             /* Gmail dark mode — prevent color inversion */
             :root { color-scheme: dark !important; }
             @media (prefers-color-scheme: dark) {
@@ -251,18 +251,18 @@ export default function ReengagementEmailV2({
               h1 { color: ${C.text} !important; }
               .cta-btn-v2 { background-color: ${C.lime} !important; color: ${C.black} !important; }
               .cta-td-v2 { background-color: ${C.lime} !important; }
-              .missed-v2 { color: ${C.pink} !important; }
-              .hint-label { color: ${C.hint} !important; }
+              .caption-strip { background-color: ${C.bg} !important; }
             }
             /* Google dark mode specificity boost */
             u + .body-v2 .cta-btn-v2 { background-color: ${C.lime} !important; color: ${C.black} !important; }
             u + .body-v2 .cta-td-v2 { background-color: ${C.lime} !important; }
-            /* Hero banner scales fluidly: width:100% with max-width 560 in inline style */
-            .hero-banner { box-shadow: ${sh}6px 6px 0px ${C.black} !important; }
+            /* Hero card scales fluidly: width:100% with max-width 560 in inline style */
             @media (max-width: 480px) {
               .h1-v2 { font-size: 26px !important; line-height: 1.25 !important; }
-              .hero-banner { box-shadow: ${sh}4px 4px 0px ${C.black} !important; border-radius: 14px !important; }
-              .letter-big { font-size: 56px !important; }
+              .hero-card { box-shadow: ${sh}4px 4px 0px ${C.black} !important; border-radius: 14px !important; }
+              .letter-big { font-size: 44px !important; line-height: 76px !important; }
+              .letter-big-cell { width: 76px !important; height: 76px !important; }
+              .reveal-slots span { font-size: 28px !important; letter-spacing: 8px !important; }
               .pitch-v2 { font-size: 14px !important; }
             }
           `}</style>
@@ -284,45 +284,89 @@ export default function ReengagementEmailV2({
                 <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
                   style={{ maxWidth: '560px' }} dir={dir}>
 
-                  {/* ── 1. HERO BANNER — locale-agnostic celebration scene
-                          (mascot + flying letter tiles + sparkles).
-                          Single visual that does the brand AND emotional work
-                          previously split between OG card + mascot circle. ── */}
+                  {/* ── 1. HERO CARD — MP-style letterbox banner with lime caption
+                          strip, all wrapped in a single neo-brutalist bordered
+                          container. Same visual treatment as the InviteCard
+                          ("Bring Your Squad") so the brand language stays coherent
+                          across re-engagement and in-app invite surfaces. ── */}
                   <tr>
                     <td align="center" style={{ paddingBottom: '28px' }}>
-                      <Link
-                        href={playUrl}
-                        target="_blank"
-                        style={{ textDecoration: 'none', display: 'inline-block', lineHeight: 0 }}
-                      >
-                        <Img
-                          src={HERO_SRC}
-                          alt="LexiClash — letter tiles bursting around Lexi the marshmallow mascot"
-                          width="560"
-                          height="312"
-                          className="hero-banner"
-                          style={{
-                            display: 'block',
-                            width: '100%',
-                            maxWidth: '560px',
-                            height: 'auto',
-                            border: `4px solid ${C.black}`,
-                            borderRadius: '18px',
-                            boxShadow: `${sh}6px 6px 0px ${C.black}`,
-                            outline: 'none',
-                          }}
-                        />
-                      </Link>
+                      <table
+                        role="presentation"
+                        cellPadding={0}
+                        cellSpacing={0}
+                        width="100%"
+                        className="hero-card"
+                        style={{
+                          maxWidth: '560px',
+                          borderCollapse: 'separate',
+                          border: `4px solid ${C.black}`,
+                          borderRadius: '18px',
+                          boxShadow: `${sh}6px 6px 0px ${C.black}`,
+                          backgroundColor: C.bgAlt,
+                          overflow: 'hidden',
+                        }}>
+                        <tr>
+                          <td style={{ padding: 0, lineHeight: 0, fontSize: 0 }}>
+                            <Link
+                              href={playUrl}
+                              target="_blank"
+                              style={{ textDecoration: 'none', display: 'block', lineHeight: 0 }}
+                            >
+                              <Img
+                                src={HERO_SRC}
+                                alt="LexiClash — kawaii squad bursting with letter tiles"
+                                width="552"
+                                height="184"
+                                className="hero-banner"
+                                style={{
+                                  display: 'block',
+                                  width: '100%',
+                                  maxWidth: '552px',
+                                  height: 'auto',
+                                  border: 0,
+                                  outline: 'none',
+                                }}
+                              />
+                            </Link>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="caption-strip" style={{
+                            backgroundColor: C.bg,
+                            padding: '14px 20px',
+                            borderTop: `3px solid ${C.black}`,
+                            textAlign: 'center',
+                          }}>
+                            <Text style={{
+                              color: C.lime,
+                              fontSize: '13px',
+                              fontWeight: 700,
+                              letterSpacing: '2px',
+                              textTransform: 'uppercase' as const,
+                              margin: 0,
+                              textAlign: 'center',
+                              direction: dir,
+                              fontFamily: "'Fredoka', Arial, sans-serif",
+                              lineHeight: '1.3',
+                            }}>
+                              {t.caption}
+                            </Text>
+                          </td>
+                        </tr>
+                      </table>
                     </td>
                   </tr>
 
-                  {/* ── 2. Heading ── */}
+                  {/* ── 2. Heading — single line, no pink sub-copy.
+                          (The "missed you" sentiment now lives in the subject line
+                          + the hero caption strip, so we kill the redundancy here.) ── */}
                   <tr>
-                    <td align="center" style={{ padding: '0 12px' }}>
+                    <td align="center" style={{ padding: '0 12px 26px' }}>
                       <Heading as="h1" className="h1-v2" style={{
                         color: C.text,
                         fontSize: '32px',
-                        margin: '0 0 14px',
+                        margin: 0,
                         fontWeight: 700,
                         textAlign: 'center',
                         lineHeight: '1.2',
@@ -331,91 +375,64 @@ export default function ReengagementEmailV2({
                       }}>
                         {t.greeting(recipientName)}
                       </Heading>
-
-                      <Text className="missed-v2" style={{
-                        color: C.pink,
-                        fontSize: '15px',
-                        margin: '0 0 24px',
-                        fontWeight: 500,
-                        textAlign: 'center',
-                        lineHeight: '1.55',
-                        maxWidth: '420px',
-                        marginLeft: 'auto',
-                        marginRight: 'auto',
-                        direction: dir,
-                      }}>
-                        {t.missed}
-                      </Text>
                     </td>
                   </tr>
 
-                  {/* ── 3. LETTER REVEAL — the hint IS the invitation ── */}
+                  {/* ── 3. INLINE LETTER REVEAL — first-letter tile + underscores
+                          on the SAME row. Reads as a real partial word
+                          (S _ _ _ _) instead of two stacked decorative blocks. ── */}
                   <tr>
-                    <td align="center" style={{ paddingBottom: '14px' }}>
-                      <Text className="hint-label" style={{
-                        color: C.hint,
-                        fontSize: '11px',
-                        fontWeight: 700,
-                        letterSpacing: '2.5px',
-                        textTransform: 'uppercase' as const,
-                        margin: '0 0 14px',
-                        textAlign: 'center',
-                        direction: dir,
-                      }}>
-                        ◆&nbsp;&nbsp;{t.hint}&nbsp;&nbsp;◆
-                      </Text>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td align="center" style={{ paddingBottom: '20px' }}>
-                      {/* Giant single letter tile — the visual hook */}
-                      <table role="presentation" cellPadding={0} cellSpacing={0}>
+                    <td align="center" style={{ paddingBottom: '24px' }}>
+                      <table role="presentation" cellPadding={0} cellSpacing={0} dir={dir}>
                         <tr>
                           <td
-                            width={120}
-                            height={120}
+                            width={92}
+                            height={92}
                             align="center"
                             valign="middle"
                             className="letter-big-cell"
                             style={{
-                              width: '120px',
-                              height: '120px',
+                              width: '92px',
+                              height: '92px',
                               backgroundColor: C.letterFill,
                               border: `4px solid ${C.black}`,
-                              borderRadius: '18px',
-                              boxShadow: `${sh}6px 6px 0px ${C.black}`,
+                              borderRadius: '14px',
+                              boxShadow: `${sh}5px 5px 0px ${C.black}`,
                               textAlign: 'center',
                             }}
                           >
                             <span className="letter-big" style={{
                               color: C.black,
-                              fontSize: '72px',
+                              fontSize: '54px',
                               fontWeight: 700,
-                              lineHeight: '120px',
+                              lineHeight: '92px',
                               fontFamily: "'Fredoka', Arial, sans-serif",
                               display: 'inline-block',
                             }}>
                               {firstLetter}
                             </span>
                           </td>
+                          <td
+                            valign="middle"
+                            className="reveal-slots"
+                            style={{
+                              paddingLeft: rtl ? 0 : '22px',
+                              paddingRight: rtl ? '22px' : 0,
+                            }}
+                          >
+                            <span style={{
+                              color: C.muted,
+                              fontSize: '34px',
+                              fontWeight: 700,
+                              letterSpacing: '10px',
+                              fontFamily: "'Fredoka', Arial, sans-serif",
+                              whiteSpace: 'nowrap',
+                            }}>
+                              _ _ _ _
+                            </span>
+                          </td>
                         </tr>
                       </table>
-                    </td>
-                  </tr>
-
-                  {/* Trailing underscores to tease the remaining word */}
-                  <tr>
-                    <td align="center" style={{ paddingBottom: '20px' }}>
-                      <span style={{
-                        color: C.muted,
-                        fontSize: '28px',
-                        fontWeight: 700,
-                        letterSpacing: '8px',
-                        fontFamily: "'Fredoka', Arial, sans-serif",
-                      }}>
-                        _ _ _ _
-                      </span>
                     </td>
                   </tr>
 

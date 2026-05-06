@@ -33,34 +33,56 @@ describe('ReengagementEmailV2 — component render', () => {
     // Apostrophes get HTML-encoded → match "Let" + "s go" loosely
     expect(html).toMatch(/Let.{1,10}s go/);
     // Branding now lives in the hero illustration alt text (text wordmark removed)
-    expect(html).toMatch(/alt="LexiClash[^"]*Lexi[^"]*"/);
+    expect(html).toMatch(/alt="LexiClash[^"]*"/);
   });
 
-  it('includes the new celebration hero illustration with descriptive alt text', async () => {
+  it('uses the MP-invite letterbox banner as hero with descriptive alt text', async () => {
     const html = await renderHtml();
-    // Single locale-agnostic hero illustration — replaces v2-original mascot GIF circle + OG card
-    expect(html).toContain('https://www.lexiclash.live/email/reengagement-hero-v2.jpg');
-    // Alt mentions both brand and mascot (a11y + brand recall in image-blocked clients)
-    expect(html).toMatch(/alt="LexiClash[^"]*Lexi[^"]*marshmallow[^"]*"/);
-    // Hero is hard-shadowed neo-brutalist — 6px offset shadow, no blur
+    // Hero now mirrors the in-app MP invite card — same kawaii squad illustration
+    // cropped to 3:1 letterbox, hosted under /email/ for absolute-URL fetch.
+    expect(html).toContain('https://www.lexiclash.live/email/mp-invite-hero.jpg');
+    // Alt mentions brand + the visual subject (a11y + brand recall when images blocked)
+    expect(html).toMatch(/alt="LexiClash[^"]*squad[^"]*"/);
+    // Hero card is hard-shadowed neo-brutalist — 6px offset shadow, no blur
     expect(html).toMatch(/box-shadow:[^"';]*6px 6px 0px/);
-    // Hero scales fluidly across email clients (max-width 560 + width 100%)
+    // Hero card scales fluidly across email clients (max-width 560 + width 100%)
     expect(html).toMatch(/max-width:560px/);
   });
 
   it('hero illustration is locale-agnostic — same asset across all 5 languages', async () => {
-    // Old v2 used per-locale OG cards; v3 hero is one shared illustration since the
-    // visuals (mascot, blank tiles, sparkles) carry no language-specific text.
+    // Single shared illustration (kawaii squad) carries no language-specific text,
+    // so the hero asset is identical across every locale.
     const heroUrls = new Set<string>();
     for (const lang of ['en', 'he', 'sv', 'ja', 'es']) {
       const html = await renderHtml({ language: lang });
-      const match = html.match(/src="(https:\/\/www\.lexiclash\.live\/email\/reengagement-hero[^"]+)"/);
+      const match = html.match(/src="(https:\/\/www\.lexiclash\.live\/email\/mp-invite-hero[^"]+)"/);
       expect(match).not.toBeNull();
       heroUrls.add(match![1]);
       // Old per-locale OG cards must NOT leak back in
       expect(html).not.toContain(`og-image-${lang}.jpg`);
     }
     expect(heroUrls.size).toBe(1);
+  });
+
+  it('renders the lime caption strip inside the hero card per locale', async () => {
+    // The MP-style caption strip lives INSIDE the hero card and replaces the v2
+    // pink "missed you" sub-line. Each locale ships its own caption.
+    const expected: Record<string, string> = {
+      en: "Today's word is waiting",
+      he: 'מילה אחת מחכה לך',
+      sv: 'Dagens ord väntar',
+      ja: '今日の単語、待機中',
+      es: 'La palabra de hoy te espera',
+    };
+    for (const [lang, caption] of Object.entries(expected)) {
+      const html = await renderHtml({ language: lang });
+      // Apostrophes get HTML-encoded — match loosely for English only
+      if (lang === 'en') {
+        expect(html).toMatch(/Today.{1,10}s word is waiting/);
+      } else {
+        expect(html).toContain(caption);
+      }
+    }
   });
 
   it('renders tightened copy — drops the kettle/PS/urgency cruft', async () => {
