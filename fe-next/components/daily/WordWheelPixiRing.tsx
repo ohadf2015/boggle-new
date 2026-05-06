@@ -5,7 +5,7 @@
 // Renders: orbital particle rings, letter connection lines, center pulse.
 // Purely decorative — pointer-events: none, transparent background.
 
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Application, Graphics } from 'pixi.js';
 
 interface WordWheelPixiRingProps {
@@ -15,12 +15,18 @@ interface WordWheelPixiRingProps {
   radius: number;
   /** Current combo level (0 = none) */
   combo: number;
+  /** Current pointer screen position during drag — read each frame, no re-renders */
+  pointerPosRef?: React.RefObject<{ x: number; y: number } | null>;
+  /** Whether a drag gesture is currently active */
+  isDraggingRef?: React.RefObject<boolean>;
 }
 
-export default function WordWheelPixiRing({ selectedIndices, radius, combo }: WordWheelPixiRingProps) {
+export default function WordWheelPixiRing({
+  selectedIndices, radius, combo, pointerPosRef, isDraggingRef,
+}: WordWheelPixiRingProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const stateRef = useRef({ selectedIndices, radius, combo });
-  stateRef.current = { selectedIndices, radius, combo };
+  const stateRef = useRef({ selectedIndices, radius, combo, pointerPosRef, isDraggingRef });
+  stateRef.current = { selectedIndices, radius, combo, pointerPosRef, isDraggingRef };
 
   useEffect(() => {
     const el = containerRef.current;
@@ -58,7 +64,7 @@ export default function WordWheelPixiRing({ selectedIndices, radius, combo }: Wo
 
       app.ticker.add((ticker) => {
         const dt = ticker.deltaMS / 1000;
-        const { selectedIndices: sel, radius: r, combo: c } = stateRef.current;
+        const { selectedIndices: sel, radius: r, combo: c, pointerPosRef: ppRef, isDraggingRef: dragRef } = stateRef.current;
         angle += dt * 0.5;
 
         // ── Orbital ring 1: lime dots ──
@@ -68,7 +74,7 @@ export default function WordWheelPixiRing({ selectedIndices, radius, combo }: Wo
           const a = angle + (i / 20) * Math.PI * 2;
           const px = cx + Math.cos(a) * orbit1;
           const py = cy + Math.sin(a) * orbit1;
-          const al = 0.12 + 0.08 * Math.sin(angle * 3 + i * 0.8);
+          const al = 0.25 + 0.12 * Math.sin(angle * 3 + i * 0.8);
           const sz = 1.5 + 0.5 * Math.sin(angle * 2 + i);
           orbitGfx.circle(px, py, sz);
           orbitGfx.fill({ color: 0xbfff00, alpha: al });
@@ -80,7 +86,7 @@ export default function WordWheelPixiRing({ selectedIndices, radius, combo }: Wo
           const a = -angle * 0.7 + (i / 12) * Math.PI * 2;
           const px = cx + Math.cos(a) * orbit2;
           const py = cy + Math.sin(a) * orbit2;
-          const al = 0.06 + 0.04 * Math.sin(angle * 2 + i);
+          const al = 0.15 + 0.08 * Math.sin(angle * 2 + i);
           orbitGfx.circle(px, py, 1.2);
           orbitGfx.fill({ color: 0x00ffff, alpha: al });
         }
@@ -98,18 +104,32 @@ export default function WordWheelPixiRing({ selectedIndices, radius, combo }: Wo
             // Glow line (wider, translucent)
             lineGfx.moveTo(pts[0].x, pts[0].y);
             for (let i = 1; i < pts.length; i++) lineGfx.lineTo(pts[i].x, pts[i].y);
-            lineGfx.stroke({ color: 0xbfff00, width: 6, alpha: 0.12, cap: 'round', join: 'round' });
+            lineGfx.stroke({ color: 0xbfff00, width: 10, alpha: 0.35, cap: 'round', join: 'round' });
 
             // Core line
             lineGfx.moveTo(pts[0].x, pts[0].y);
             for (let i = 1; i < pts.length; i++) lineGfx.lineTo(pts[i].x, pts[i].y);
-            lineGfx.stroke({ color: 0xbfff00, width: 2, alpha: 0.45, cap: 'round', join: 'round' });
+            lineGfx.stroke({ color: 0xbfff00, width: 4, alpha: 0.85, cap: 'round', join: 'round' });
           }
 
           // Vertex dots
           for (const p of pts) {
             lineGfx.circle(p.x, p.y, 3.5);
-            lineGfx.fill({ color: 0xbfff00, alpha: 0.4 });
+            lineGfx.fill({ color: 0xbfff00, alpha: 0.8 });
+          }
+
+          // ── Live drag line: last committed letter → current pointer ──
+          const pp = ppRef?.current ?? null;
+          const isDrag = dragRef?.current ?? false;
+          if (isDrag && pp) {
+            const canvasEl = app.canvas as HTMLCanvasElement;
+            const cr = canvasEl.getBoundingClientRect();
+            const lx = pp.x - cr.left;
+            const ly = pp.y - cr.top;
+            const last = pts[pts.length - 1];
+            lineGfx.moveTo(last.x, last.y);
+            lineGfx.lineTo(lx, ly);
+            lineGfx.stroke({ color: 0xbfff00, width: 3, alpha: 0.5, cap: 'round', join: 'round' });
           }
         }
 

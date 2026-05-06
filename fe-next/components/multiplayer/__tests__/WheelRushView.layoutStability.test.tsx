@@ -139,11 +139,10 @@ describe('WheelRushView — daily-style rival hint', () => {
         vi.advanceTimersByTime(WHEEL_RUSH_FOG_MS + 500);
       });
 
-      // tStub renders `wordWheel.wordsToPass:{count, name}` — assert
-      // the name made it through. The exact count is computed from
-      // (40-10)/AVG_POINTS_PER_WORD so we don't pin it; just verify
-      // the i18n key + name made it through.
-      const pill = screen.getByText(/wordWheel\.wordsToPass/);
+      // tStub renders `wordWheel.pointsToPass:{count, name}` — assert
+      // the name made it through. The exact count is the raw point delta
+      // (40-10 = 30); just verify the i18n key + name made it through.
+      const pill = screen.getByText(/wordWheel\.pointsToPass/);
       expect(pill.textContent).toContain('bob');
     } finally {
       vi.useRealTimers();

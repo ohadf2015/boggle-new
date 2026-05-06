@@ -5517,7 +5517,7 @@ const es = {
     "tapLetters": "Toca o arrastra letras para formar una palabra",
     "tapToRemove": "Toca otra vez una letra añadida para quitarla",
     "doubleTapToSubmit": "Doble toque a una letra para enviar",
-    "wordsToPass": "{count} palabras más para pasar a {name}",
+    "pointsToPass": "+{count}pts para superar a {name}",
     "passedPlayer": "¡Pasaste a {name}!",
     "tapDescription": "Toca las letras de la rueda para deletrear palabras. ¡Cada palabra debe incluir la letra central y tener al menos 3 letras!",
     "timeLimit": "Límite de tiempo: 2 minutos",

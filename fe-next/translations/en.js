@@ -5595,7 +5595,7 @@ const en = {
     "tapLetters": "Tap or drag letters to build a word",
     "tapToRemove": "Tap an added letter again to remove it",
     "doubleTapToSubmit": "Double-tap a letter to submit",
-    "wordsToPass": "{count} more words to pass {name}",
+    "pointsToPass": "+{count} pts to beat {name}",
     "passedPlayer": "You passed {name}!",
     "tapDescription": "Tap letters on the wheel to spell words. Every word must include the center letter and be at least 3 letters long!",
     "timeLimit": "2 minute time limit",

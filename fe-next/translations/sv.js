@@ -5489,7 +5489,7 @@ const sv = {
     "tapLetters": "Tryck eller dra bokstäver för att bygga ett ord",
     "tapToRemove": "Tryck igen på en tillagd bokstav för att ta bort",
     "doubleTapToSubmit": "Dubbeltryck på en bokstav för att skicka",
-    "wordsToPass": "{count} ord till för att passera {name}",
+    "pointsToPass": "+{count}p för att slå {name}",
     "passedPlayer": "Du passerade {name}!",
     "tapDescription": "Tryck på bokstäver på hjulet för att stava ord. Varje ord måste innehålla mittenbokstaven och vara minst 3 bokstäver långt!",
     "timeLimit": "2 minuters tidsgräns",

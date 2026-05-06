@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { WHEEL_RUSH_FOG_MS, WHEEL_RUSH_MIN_WORD_LEN } from '@/shared/constants/wheelRushConstants';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
+import Avatar from '@/components/Avatar';
 import { MyWordsChips, type WordEntry } from './WheelRushPieces';
 import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
@@ -51,9 +52,6 @@ interface Props {
 
 const MIN_LEN = WHEEL_RUSH_MIN_WORD_LEN;
 
-// Mirrors WordWheelGame.tsx — coarse "X words to pass Y" estimator. Same
-// constant on both surfaces so the daily-challenge feel ports cleanly.
-const AVG_POINTS_PER_WORD = 6;
 
 type WheelErrorCode =
   | 'too-short' | 'no-center' | 'bad-letters' | 'not-a-word'
@@ -113,11 +111,8 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       .sort((a, b) => a.score - b.score)[0] ?? null;
   }, [leaderboard, username, fogActive]);
 
-  const wordsToPass = nextRival
-    ? Math.max(1, Math.ceil(
-        (nextRival.score - (leaderboard.find(p => p.username === username)?.score ?? 0)) /
-        AVG_POINTS_PER_WORD,
-      ))
+  const pointsToPass = nextRival
+    ? nextRival.score - (leaderboard.find(p => p.username === username)?.score ?? 0)
     : 0;
 
   const fbTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -517,12 +512,12 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         </AnimatePresence>
       </motion.div>
 
-      {/* Daily-style "X more words to pass Y" hint. Reserved-height slot —
+      {/* Points-to-pass next-rival hint. Reserved-height slot —
           ALWAYS rendered so toggling visibility never shifts the wheel.
           Hidden during fog-of-war (don't reveal opponent scores). */}
       <div
         data-testid="mp-next-rival-slot"
-        className="w-full mt-1 min-h-[26px] sm:min-h-[28px] flex items-center justify-center shrink-0"
+        className="w-full mt-1 min-h-[30px] sm:min-h-[32px] flex items-center justify-center shrink-0"
       >
         <AnimatePresence>
           {nextRival && (
@@ -534,8 +529,14 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
               exit={{ opacity: 0 }}
             >
               <ChevronUp className="w-3 h-3 text-neo-lime" />
+              <Avatar
+                pixelSize={20}
+                customAvatar={nextRival.avatar?.customAvatar}
+                userId={nextRival.username}
+                className="shrink-0 rounded-full"
+              />
               <span dir="auto">
-                {t('wordWheel.wordsToPass', { count: wordsToPass, name: nextRival.username })}
+                {t('wordWheel.pointsToPass', { count: pointsToPass, name: nextRival.username })}
               </span>
             </motion.div>
           )}

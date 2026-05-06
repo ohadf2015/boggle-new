@@ -16,6 +16,7 @@ import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
 import dynamic from 'next/dynamic';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
+import Avatar from '@/components/Avatar';
 
 const WordWheelPixiRing = dynamic(() => import('./WordWheelPixiRing'), { ssr: false });
 
@@ -38,10 +39,8 @@ interface WordWheelGameProps {
   practice?: boolean;
 }
 
-// Rough avg points per word for "X words to pass" estimate
-const AVG_POINTS_PER_WORD = 6;
 
-interface RivalScore { name: string; score: number }
+interface RivalScore { name: string; score: number; avatarImage: string | null; playerId: string | null }
 
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
   puzzle, duration, onComplete, onValidateWord, onEffect, language, paused = false, practice = false,
@@ -98,7 +97,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         if (cancelled) return;
         const list: RivalScore[] = (json.data || [])
           .filter((r: { score?: number; display_name?: string }) => typeof r.score === 'number' && r.display_name)
-          .map((r: { score: number; display_name: string }) => ({ name: r.display_name, score: r.score }))
+          .map((r: { score: number; display_name: string; avatar_image?: string | null; player_id?: string | null }) => ({
+            name: r.display_name,
+            score: r.score,
+            avatarImage: r.avatar_image ?? null,
+            playerId: r.player_id ?? null,
+          }))
           .sort((a: RivalScore, b: RivalScore) => a.score - b.score);
         setRivals(list);
       } catch { /* leaderboard is best-effort */ }
@@ -115,9 +119,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     () => rivals.find(r => r.score > score) || null,
     [rivals, score],
   );
-  const wordsToPass = nextRival
-    ? Math.max(1, Math.ceil((nextRival.score - score) / AVG_POINTS_PER_WORD))
-    : 0;
+  const pointsToPass = nextRival ? nextRival.score - score : 0;
 
   useEffect(() => { wordsFoundRef.current = wordsFound; }, [wordsFound]);
   useEffect(() => { scoreRef.current = score; }, [score]);
@@ -164,6 +166,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const lastDragIdxRef = useRef<number | null>(null);
   const dragStartIdxRef = useRef<number | null>(null);
   const dragEngagedRef = useRef(false);
+  const pointerPosRef = useRef<{ x: number; y: number } | null>(null);
 
   // ── Double-tap-to-submit support ──
   const lastTapRef = useRef<{ idx: number; time: number } | null>(null);
@@ -381,10 +384,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     dragStartIdxRef.current = btn ? Number(btn.dataset.wheelIndex) : null;
   }, []);
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    pointerPosRef.current = { x: e.clientX, y: e.clientY };
     if (!draggingRef.current) return;
     tryDragHit(e.clientX, e.clientY);
   }, [tryDragHit]);
   const handlePointerUp = useCallback(() => {
+    pointerPosRef.current = null;
     const wasEngaged = dragEngagedRef.current;
     draggingRef.current = false;
     lastDragIdxRef.current = null;
@@ -759,14 +764,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         </AnimatePresence>
       </motion.div>
 
-      {/* Words-to-pass next-rival hint — fixed-height reserved slot.
+      {/* Points-to-pass next-rival hint — fixed-height reserved slot.
           h-* (not min-h-*) + whitespace-nowrap + truncate keeps the pill
-          locked to one line. wordsToPass derives from score → mutates every
+          locked to one line. pointsToPass derives from score → mutates every
           submit; long HE/JA strings or long player names would otherwise
           wrap the pill and grow the slot, recentering the wheel cluster. */}
       <div
         data-testid="next-rival-slot"
-        className="w-full mt-1.5 h-[26px] sm:h-[28px] flex items-center justify-center px-2"
+        className="w-full mt-1.5 h-[30px] sm:h-[32px] flex items-center justify-center px-2"
       >
         <AnimatePresence>
           {nextRival && (
@@ -777,8 +782,13 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               exit={{ opacity: 0 }}
             >
               <ChevronUp className="w-3 h-3 text-neo-lime shrink-0" />
+              <Avatar
+                pixelSize={20}
+                userId={nextRival.playerId ?? nextRival.name}
+                className="shrink-0 rounded-full"
+              />
               <span className="truncate">
-                {t('wordWheel.wordsToPass', { count: wordsToPass, name: nextRival.name })}
+                {t('wordWheel.pointsToPass', { count: pointsToPass, name: nextRival.name })}
               </span>
             </motion.div>
           )}
@@ -848,6 +858,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           selectedIndices={builtLetters.map(bl => bl.wheelIndex)}
           radius={wheelRadius}
           combo={combo}
+          pointerPosRef={pointerPosRef}
+          isDraggingRef={draggingRef}
         />
         {/* Outer glow ring — breathing loop disabled under reduced-motion */}
         <motion.div

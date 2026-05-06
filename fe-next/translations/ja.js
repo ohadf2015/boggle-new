@@ -5522,7 +5522,7 @@ const ja = {
     "tapLetters": "文字をタップまたはドラッグして単語を作ろう",
     "tapToRemove": "追加した文字をもう一度タップで削除",
     "doubleTapToSubmit": "文字をダブルタップで送信",
-    "wordsToPass": "{name}を抜くにはあと{count}単語",
+    "pointsToPass": "{name}を抜くにはあと{count}pt",
     "passedPlayer": "{name}を抜きました！",
     "tapDescription": "ホイールの文字をタップして単語を綴ります。すべての単語に中央の文字を含め、3文字以上である必要があります！",
     "timeLimit": "2分の制限時間",

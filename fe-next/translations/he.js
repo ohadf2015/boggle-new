@@ -5490,7 +5490,7 @@ const he = {
     "tapLetters": "הקש או גרור אותיות כדי לבנות מילה",
     "tapToRemove": "הקש שוב על אות שהוספת כדי להסיר",
     "doubleTapToSubmit": "הקש פעמיים על אות כדי לשלוח",
-    "wordsToPass": "עוד {count} מילים כדי לעקוף את {name}",
+    "pointsToPass": "+{count} נק' לעקוף את {name}",
     "passedPlayer": "עקפת את {name}!",
     "tapDescription": "הקש על אותיות בגלגל כדי לאיית מילים. כל מילה חייבת לכלול את האות המרכזית ולהיות באורך של 3 אותיות לפחות!",
     "timeLimit": "מגבלת זמן: 2 דקות",
