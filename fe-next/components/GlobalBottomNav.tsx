@@ -270,17 +270,22 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     // Publish real nav height (h-16 + safe-area) into --bottom-nav-height. This is the
     // single source of truth consumed by content padding (globals.css) and by the
     // AdMob banner's margin calc — replaces brittle DOM measurement from sibling components.
+    // Cached in localStorage so the layout's <head> priming script can set the var
+    // synchronously before paint on next session — prevents CLS from ResizeObserver lag.
     useEffect(() => {
         if (typeof document === 'undefined') return;
         const root = document.documentElement;
         if (isHidden) {
             root.style.setProperty('--bottom-nav-height', '0px');
+            try { localStorage.setItem('lc_bottom_nav_h', '0'); } catch {}
             return;
         }
         const el = navRef.current;
         if (!el) return;
         const update = () => {
-            root.style.setProperty('--bottom-nav-height', `${el.offsetHeight}px`);
+            const h = el.offsetHeight;
+            root.style.setProperty('--bottom-nav-height', `${h}px`);
+            try { localStorage.setItem('lc_bottom_nav_h', String(h)); } catch {}
         };
         update();
         if (typeof ResizeObserver === 'undefined') return;

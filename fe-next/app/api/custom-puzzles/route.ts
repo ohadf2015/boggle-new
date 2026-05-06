@@ -48,6 +48,8 @@ export async function GET(request: NextRequest) {
         totalPlays: p.total_plays || 0,
         createdAt: p.created_at,
       })),
+    }, {
+      headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=120' },
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

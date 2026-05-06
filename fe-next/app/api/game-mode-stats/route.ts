@@ -30,11 +30,15 @@ export async function GET(request: NextRequest) {
   const now = Date.now();
   const cached = statsCache.get(days);
   if (cached && now - cached.timestamp < CACHE_TTL_MS) {
-    return NextResponse.json({ stats: cached.stats });
+    return NextResponse.json({ stats: cached.stats }, {
+      headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=120' },
+    });
   }
 
   const stats = await fetchGameModeStats(days);
   statsCache.set(days, { stats, timestamp: now });
 
-  return NextResponse.json({ stats });
+  return NextResponse.json({ stats }, {
+    headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=120' },
+  });
 }

@@ -36,6 +36,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/blog/word-games-for-kids-education",
   "/boggle-word-shake-free",
   "/brain",
+  "/brain-training-word-games",
   "/brain/drills/combo-master",
   "/brain/drills/lightning-round",
   "/brain/drills/memory-hunt",

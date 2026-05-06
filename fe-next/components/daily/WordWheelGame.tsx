@@ -651,10 +651,13 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         )}
       </div>
 
-      {/* ── Word Builder Area ── */}
+      {/* ── Word Builder Area ──
+          Fixed height (not min-h) so popLayout tile-exit animations on submit
+          don't briefly collapse/expand the box and cause the wheel cluster
+          (flex-1 + justify-center sibling below) to re-center. */}
       <motion.div
         data-testid="word-builder"
-        className="relative w-full min-h-[52px] sm:min-h-[72px] flex items-center justify-center"
+        className="relative w-full h-[52px] sm:h-[72px] flex items-center justify-center"
         animate={
           wordBuilderShake
             ? { x: [-4, 4, -3, 3, -1, 0] }
@@ -756,22 +759,25 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         </AnimatePresence>
       </motion.div>
 
-      {/* Words-to-pass next-rival hint — reserved slot prevents wheel from
-          shifting down when the rival pill mounts/unmounts. */}
+      {/* Words-to-pass next-rival hint — fixed-height reserved slot.
+          h-* (not min-h-*) + whitespace-nowrap + truncate keeps the pill
+          locked to one line. wordsToPass derives from score → mutates every
+          submit; long HE/JA strings or long player names would otherwise
+          wrap the pill and grow the slot, recentering the wheel cluster. */}
       <div
         data-testid="next-rival-slot"
-        className="w-full mt-1.5 min-h-[26px] sm:min-h-[28px] flex items-center justify-center"
+        className="w-full mt-1.5 h-[26px] sm:h-[28px] flex items-center justify-center px-2"
       >
         <AnimatePresence>
           {nextRival && (
             <motion.div
-              className="px-2.5 py-1 rounded-neo border-2 border-neo-cream/20 bg-neo-navy-light/60 text-[11px] sm:text-xs text-neo-cream/80 font-semibold flex items-center gap-1.5"
+              className="max-w-full px-2.5 py-1 rounded-neo border-2 border-neo-cream/20 bg-neo-navy-light/60 text-[11px] sm:text-xs text-neo-cream/80 font-semibold flex items-center gap-1.5 whitespace-nowrap"
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
             >
-              <ChevronUp className="w-3 h-3 text-neo-lime" />
-              <span>
+              <ChevronUp className="w-3 h-3 text-neo-lime shrink-0" />
+              <span className="truncate">
                 {t('wordWheel.wordsToPass', { count: wordsToPass, name: nextRival.name })}
               </span>
             </motion.div>
@@ -813,11 +819,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           chip near the word-builder still serves as the primary CTA when the
           found-words list grows past viewport. */}
       <div className="flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1" data-testid="wheel-cluster">
-      {/* Tap-to-remove + double-tap-to-submit hint — reserved slot so the
-          wheel does not shift down on first tap. */}
+      {/* Tap-to-remove + double-tap-to-submit hint — fixed-height reserved
+          slot (h-*, not min-h-*) so even font/locale ascender variance can't
+          grow the slot when builtLetters mounts/unmounts the hint text. */}
       <div
         data-testid="tap-hint-slot"
-        className="min-h-[14px] sm:min-h-[16px] flex items-center justify-center"
+        className="h-[14px] sm:h-[16px] flex items-center justify-center"
       >
         {builtLetters.length > 0 && (
           <p className="text-neo-cream/40 text-[10px] sm:text-xs text-center">

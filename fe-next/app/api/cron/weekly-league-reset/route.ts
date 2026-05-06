@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { timingSafeEqual } from 'crypto';
 import logger from '@/utils/logger';
 import { captureApiError } from '@/utils/sentry';
+import { withCronLock } from '@/backend/redis/locking';
 
 // Weekly reset may take a while for many leagues
 export const maxDuration = 120;
@@ -29,11 +30,16 @@ export async function GET(request: NextRequest) {
     }
 
     logger.log('[Cron] Starting weekly league reset...');
-    const { processWeeklyReset } = await import('@/backend/modules/leagueManager');
-    const result = await processWeeklyReset();
-    logger.log('[Cron] Weekly league reset complete:', result);
-
-    return NextResponse.json({ success: true, ...result });
+    const locked = await withCronLock('weekly-league-reset', 150_000, async () => {
+      const { processWeeklyReset } = await import('@/backend/modules/leagueManager');
+      return await processWeeklyReset();
+    });
+    if (locked.status === 'skipped') {
+      logger.log('[Cron] weekly-league-reset: skipped (already running)');
+      return NextResponse.json({ success: true, skipped: true, reason: 'already-running' });
+    }
+    logger.log('[Cron] Weekly league reset complete:', locked.result);
+    return NextResponse.json({ success: true, ...locked.result });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     logger.error('[Cron] Weekly league reset failed:', message);

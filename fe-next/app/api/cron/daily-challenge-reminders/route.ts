@@ -5,6 +5,7 @@ import { notifyDailyChallengeReminder } from '@/backend/modules/pushNotification
 import { pickDailyReminderCopy } from '@/lib/dailyReminderCopy';
 import { getLocalHour, getTodayDate } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
+import { withCronLock } from '@/backend/redis/locking';
 
 /**
  * POST /api/cron/daily-challenge-reminders
@@ -35,47 +36,55 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const recipients = await getSmartDailyChallengePushRecipients();
-    logger.log(`[Push Cron] ${recipients.length} daily-challenge reminder recipients`);
+    const locked = await withCronLock('daily-challenge-reminders', 90_000, async () => {
+      const recipients = await getSmartDailyChallengePushRecipients();
+      logger.log(`[Push Cron] ${recipients.length} daily-challenge reminder recipients`);
 
-    if (recipients.length === 0) {
-      return NextResponse.json({ success: true, sent: 0, failed: 0 });
-    }
-
-    const date = getTodayDate();
-    const localHour = getLocalHour('UTC');
-    const hoursLeft = Math.max(1, 24 - localHour);
-
-    const results = await Promise.allSettled(
-      recipients.map(async ({ userId, locale }) => {
-        const copy = pickDailyReminderCopy({ userId, date, hoursLeft, locale });
-        await notifyDailyChallengeReminder(userId, {
-          title: copy.title,
-          body: copy.body,
-          deepLink: copy.deepLink,
-          variant: copy.variant,
-          locale,
-        });
-      })
-    );
-
-    let sent = 0;
-    let failed = 0;
-    const sentIds: string[] = [];
-    results.forEach((r, i) => {
-      if (r.status === 'fulfilled') {
-        sent++;
-        sentIds.push(recipients[i].userId);
-      } else {
-        failed++;
+      if (recipients.length === 0) {
+        return { sent: 0, failed: 0 };
       }
+
+      const date = getTodayDate();
+      const localHour = getLocalHour('UTC');
+      const hoursLeft = Math.max(1, 24 - localHour);
+
+      const results = await Promise.allSettled(
+        recipients.map(async ({ userId, locale }) => {
+          const copy = pickDailyReminderCopy({ userId, date, hoursLeft, locale });
+          await notifyDailyChallengeReminder(userId, {
+            title: copy.title,
+            body: copy.body,
+            deepLink: copy.deepLink,
+            variant: copy.variant,
+            locale,
+          });
+        })
+      );
+
+      let sent = 0;
+      let failed = 0;
+      const sentIds: string[] = [];
+      results.forEach((r, i) => {
+        if (r.status === 'fulfilled') {
+          sent++;
+          sentIds.push(recipients[i].userId);
+        } else {
+          failed++;
+        }
+      });
+
+      // Single batched UPDATE instead of N parallel UPDATEs.
+      await markDailyPushSentBatch(sentIds);
+
+      logger.log(`[Push Cron] Completed: ${sent} sent, ${failed} failed`);
+      return { sent, failed };
     });
 
-    // Single batched UPDATE instead of N parallel UPDATEs.
-    await markDailyPushSentBatch(sentIds);
-
-    logger.log(`[Push Cron] Completed: ${sent} sent, ${failed} failed`);
-    return NextResponse.json({ success: true, sent, failed });
+    if (locked.status === 'skipped') {
+      logger.log('[Push Cron] daily-challenge-reminders: skipped (already running)');
+      return NextResponse.json({ success: true, skipped: true, reason: 'already-running' });
+    }
+    return NextResponse.json({ success: true, ...locked.result });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error('[Push Cron] Error:', errorMessage);

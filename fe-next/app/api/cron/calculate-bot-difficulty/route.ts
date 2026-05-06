@@ -3,6 +3,7 @@ import { timingSafeEqual } from 'crypto';
 import logger from '@/utils/logger';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { captureApiError } from '@/utils/sentry';
+import { withCronLock } from '@/backend/redis/locking';
 
 // Edge Function takes ~10-20s to analyze player stats across all languages
 export const maxDuration = 60;
@@ -43,45 +44,44 @@ export async function GET(request: NextRequest) {
 
     logger.log('[Cron] Starting bot difficulty calculation...');
 
-    // Call the Supabase Edge Function
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const locked = await withCronLock('calculate-bot-difficulty', 90_000, async () => {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!supabaseUrl || !supabaseServiceKey) {
-      logger.error('[Cron] Missing Supabase configuration');
-      return NextResponse.json(
-        { error: 'Missing Supabase configuration' },
-        { status: 500 }
-      );
-    }
+      if (!supabaseUrl || !supabaseServiceKey) {
+        logger.error('[Cron] Missing Supabase configuration');
+        return { ok: false as const, status: 500, body: { error: 'Missing Supabase configuration' } };
+      }
 
-    const edgeFunctionUrl = `${supabaseUrl}/functions/v1/bot-difficulty-calculator`;
+      const edgeFunctionUrl = `${supabaseUrl}/functions/v1/bot-difficulty-calculator`;
 
-    const response = await fetch(edgeFunctionUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${supabaseServiceKey}`,
-      },
+      const response = await fetch(edgeFunctionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseServiceKey}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        logger.error('[Cron] Edge Function error:', errorText);
+        return { ok: false as const, status: response.status, body: { error: 'Edge Function failed', details: errorText } };
+      }
+
+      const result = await response.json();
+      logger.log('[Cron] Bot difficulty calculation complete:', result.summary);
+      return { ok: true as const, body: { success: true, message: 'Bot difficulty calculation complete', ...result } };
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      logger.error('[Cron] Edge Function error:', errorText);
-      return NextResponse.json(
-        { error: 'Edge Function failed', details: errorText },
-        { status: response.status }
-      );
+    if (locked.status === 'skipped') {
+      logger.log('[Cron] calculate-bot-difficulty: skipped (already running)');
+      return NextResponse.json({ success: true, skipped: true, reason: 'already-running' });
     }
-
-    const result = await response.json();
-    logger.log('[Cron] Bot difficulty calculation complete:', result.summary);
-
-    return NextResponse.json({
-      success: true,
-      message: 'Bot difficulty calculation complete',
-      ...result,
-    });
+    if (!locked.result.ok) {
+      return NextResponse.json(locked.result.body, { status: locked.result.status });
+    }
+    return NextResponse.json(locked.result.body);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error('[Cron] Fatal error during bot difficulty calculation:', errorMessage);

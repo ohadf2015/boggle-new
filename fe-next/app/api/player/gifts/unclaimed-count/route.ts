@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
-import { createClient, getSessionUser } from '@/utils/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { captureApiError } from '@/utils/sentry';
 
 /**
@@ -11,15 +12,15 @@ import { captureApiError } from '@/utils/sentry';
  * 2. Were created AFTER the user's gift_modal_dismissed_at timestamp (if set)
  *    This ensures dismissed gifts don't show in the badge count
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const user = await getAuthedUser(request);
 
-    const { user, error: authError } = await getSessionUser(supabase);
-
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     // Fetch profile + gift count in parallel (was sequential — 2 round-trips)
     const [profileResult, giftCountResult] = await Promise.all([

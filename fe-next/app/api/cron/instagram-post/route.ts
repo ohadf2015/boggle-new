@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { timingSafeEqual } from 'crypto';
 import logger from '@/utils/logger';
+import { withCronLock } from '@/backend/redis/locking';
 
 export const maxDuration = 60;
 
@@ -176,52 +177,64 @@ export async function GET(request: NextRequest) {
     }
 
     const lang = request.nextUrl.searchParams.get('lang');
-    const siteUrl = process.env.SITE_URL || 'https://lexiclash.live';
-    const results: { lang: string; status: string; mediaId?: string; error?: string }[] = [];
+    // Per-lang lock — EN and HE legitimately run on different cron schedules.
+    const lockKey = `instagram-post-${lang || 'all'}`;
+    const lockTtl = lang ? 90_000 : 180_000;
 
-    // Post EN
-    if (!lang || lang === 'en') {
-      const post = EN_POSTS[dayOfWeek];
-      const token = process.env.INSTAGRAM_ACCESS_TOKEN_EN;
-      const accountId = process.env.INSTAGRAM_ACCOUNT_ID_EN;
+    const locked = await withCronLock(lockKey, lockTtl, async () => {
+      const siteUrl = process.env.SITE_URL || 'https://lexiclash.live';
+      const results: { lang: string; status: string; mediaId?: string; error?: string }[] = [];
 
-      if (post && token && accountId) {
-        try {
-          const imageUrl = `${siteUrl}/images/promo/${post.image}`;
-          const { mediaId } = await createAndPublish(accountId, token, imageUrl, post.caption, post.hashtags, 'EN');
-          results.push({ lang: 'en', status: 'published', mediaId });
-        } catch (e) {
-          const msg = e instanceof Error ? e.message : String(e);
-          logger.error('[IG:EN] Failed:', msg);
-          results.push({ lang: 'en', status: 'failed', error: msg });
+      // Post EN
+      if (!lang || lang === 'en') {
+        const post = EN_POSTS[dayOfWeek];
+        const token = process.env.INSTAGRAM_ACCESS_TOKEN_EN;
+        const accountId = process.env.INSTAGRAM_ACCOUNT_ID_EN;
+
+        if (post && token && accountId) {
+          try {
+            const imageUrl = `${siteUrl}/images/promo/${post.image}`;
+            const { mediaId } = await createAndPublish(accountId, token, imageUrl, post.caption, post.hashtags, 'EN');
+            results.push({ lang: 'en', status: 'published', mediaId });
+          } catch (e) {
+            const msg = e instanceof Error ? e.message : String(e);
+            logger.error('[IG:EN] Failed:', msg);
+            results.push({ lang: 'en', status: 'failed', error: msg });
+          }
+        } else {
+          results.push({ lang: 'en', status: 'skipped', error: post ? 'Missing credentials' : 'No post for today' });
         }
-      } else {
-        results.push({ lang: 'en', status: 'skipped', error: post ? 'Missing credentials' : 'No post for today' });
       }
-    }
 
-    // Post HE
-    if (!lang || lang === 'he') {
-      const post = HE_POSTS[dayOfWeek];
-      const token = process.env.INSTAGRAM_ACCESS_TOKEN_HE;
-      const accountId = process.env.INSTAGRAM_ACCOUNT_ID_HE;
+      // Post HE
+      if (!lang || lang === 'he') {
+        const post = HE_POSTS[dayOfWeek];
+        const token = process.env.INSTAGRAM_ACCESS_TOKEN_HE;
+        const accountId = process.env.INSTAGRAM_ACCOUNT_ID_HE;
 
-      if (post && token && accountId) {
-        try {
-          const imageUrl = `${siteUrl}/images/promo/${post.image}`;
-          const { mediaId } = await createAndPublish(accountId, token, imageUrl, post.caption, post.hashtags, 'HE');
-          results.push({ lang: 'he', status: 'published', mediaId });
-        } catch (e) {
-          const msg = e instanceof Error ? e.message : String(e);
-          logger.error('[IG:HE] Failed:', msg);
-          results.push({ lang: 'he', status: 'failed', error: msg });
+        if (post && token && accountId) {
+          try {
+            const imageUrl = `${siteUrl}/images/promo/${post.image}`;
+            const { mediaId } = await createAndPublish(accountId, token, imageUrl, post.caption, post.hashtags, 'HE');
+            results.push({ lang: 'he', status: 'published', mediaId });
+          } catch (e) {
+            const msg = e instanceof Error ? e.message : String(e);
+            logger.error('[IG:HE] Failed:', msg);
+            results.push({ lang: 'he', status: 'failed', error: msg });
+          }
+        } else {
+          results.push({ lang: 'he', status: 'skipped', error: post ? 'Missing credentials' : 'No post for today' });
         }
-      } else {
-        results.push({ lang: 'he', status: 'skipped', error: post ? 'Missing credentials' : 'No post for today' });
       }
-    }
 
-    return NextResponse.json({ day: dayOfWeek, results });
+      return results;
+    });
+
+    if (locked.status === 'skipped') {
+      logger.log(`[IG Cron] ${lockKey}: skipped (already running)`);
+      return NextResponse.json({ success: true, skipped: true, reason: 'already-running' });
+    }
+    return NextResponse.json({ day: dayOfWeek, results: locked.result });
   } catch (error) {
     logger.error('[IG Cron] Unexpected error:', error);
     return NextResponse.json(

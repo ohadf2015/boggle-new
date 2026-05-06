@@ -197,7 +197,7 @@ export const SeasonAnnouncementModal: React.FC = () => {
                   className="relative rounded-full overflow-hidden bg-neo-navy w-[140px] h-[140px] border-neo-thick border-black"
                 >
                   <Image
-                    src="/mascot/celebration.gif"
+                    src="/mascot/celebration.webp"
                     alt=""
                     width={140}
                     height={140}

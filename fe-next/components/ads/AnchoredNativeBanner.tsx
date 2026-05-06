@@ -21,6 +21,7 @@ export default function AnchoredNativeBanner() {
     const isAndroid = Capacitor.getPlatform() === 'android';
     const resetVar = () => {
       document.documentElement.style.setProperty('--admob-banner-height', '0px');
+      try { localStorage.setItem('lc_admob_h', '0'); } catch {}
     };
 
     AdMob.addListener(BannerAdPluginEvents.SizeChanged, (info: { height: number }) => {
@@ -31,6 +32,8 @@ export default function AnchoredNativeBanner() {
       // pages with the nav use `has-global-bottom-nav` for their own clearance.
       const total = h > 0 ? h + (isAndroid ? (safeArea.bottom || 0) : 0) : 0;
       document.documentElement.style.setProperty('--admob-banner-height', `${total}px`);
+      // Cache for next session's CLS-priming script in <head>.
+      try { localStorage.setItem('lc_admob_h', String(total)); } catch {}
     })
       .then((handle) => { removers.push(() => handle.remove()); })
       .catch(() => {});

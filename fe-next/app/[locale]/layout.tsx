@@ -42,6 +42,11 @@ const PushNotificationPrompt = nextDynamic(
 const CookieConsent = nextDynamic(() => import('@/components/CookieConsent'));
 
 
+// Synchronously primes CSS vars from localStorage before paint to prevent CLS
+// from AdMob SizeChanged async event and GlobalBottomNav ResizeObserver.
+// Static literal — no user input.
+const PRIME_CLS_VARS_SCRIPT = `(function(){try{var d=document.documentElement;var b=localStorage.getItem('lc_admob_h');var n=localStorage.getItem('lc_bottom_nav_h');if(b&&!isNaN(parseFloat(b)))d.style.setProperty('--admob-banner-height',parseFloat(b)+'px');if(n&&!isNaN(parseFloat(n)))d.style.setProperty('--bottom-nav-height',parseFloat(n)+'px');}catch(e){}})();`;
+
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 interface LocaleLayoutProps {
@@ -501,6 +506,13 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* CrazyGames SDK must load in <head> with beforeInteractive
                     so it's detected by their QA tool before hydration */}
                 <CrazyGamesScriptServer />
+                {/* CLS guard: prime --admob-banner-height and --bottom-nav-height from
+                    localStorage cache BEFORE first paint. Static string literal, no user input. */}
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: PRIME_CLS_VARS_SCRIPT,
+                    }}
+                />
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
                 {/* Dark-only theme — static string literal, no user input, safe from XSS */}

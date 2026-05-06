@@ -67,6 +67,8 @@ export async function GET(request: Request, { params }: RouteParams) {
         createdAt: puzzle.created_at,
         expiresAt: puzzle.expires_at,
       },
+    }, {
+      headers: { 'Cache-Control': 's-maxage=30, stale-while-revalidate=60' },
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

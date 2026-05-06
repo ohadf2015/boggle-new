@@ -9,7 +9,9 @@ import { discoverPublicRoutes } from '@/utils/discoverRoutes';
 export async function GET() {
   try {
     const routes = await discoverPublicRoutes();
-    return NextResponse.json({ routes, count: routes.length });
+    return NextResponse.json({ routes, count: routes.length }, {
+      headers: { 'Cache-Control': 's-maxage=3600, stale-while-revalidate=7200' },
+    });
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Failed to discover routes' },

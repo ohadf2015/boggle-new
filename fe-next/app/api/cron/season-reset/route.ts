@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { timingSafeEqual } from 'crypto';
 import logger from '@/utils/logger';
 import { captureApiError } from '@/utils/sentry';
+import { withCronLock } from '@/backend/redis/locking';
 
 // Snapshot + reset can take a while when many players are in the season.
 export const maxDuration = 600;
@@ -34,11 +35,16 @@ export async function GET(request: NextRequest) {
     }
 
     logger.log('[Cron] Starting season reset...');
-    const { processExpiredSeasons } = await import('@/backend/modules/seasonManager');
-    const result = await processExpiredSeasons();
-    logger.log('[Cron] Season reset complete:', result);
-
-    return NextResponse.json({ success: true, ...result });
+    const locked = await withCronLock('season-reset', 700_000, async () => {
+      const { processExpiredSeasons } = await import('@/backend/modules/seasonManager');
+      return await processExpiredSeasons();
+    });
+    if (locked.status === 'skipped') {
+      logger.log('[Cron] season-reset: skipped (already running)');
+      return NextResponse.json({ success: true, skipped: true, reason: 'already-running' });
+    }
+    logger.log('[Cron] Season reset complete:', locked.result);
+    return NextResponse.json({ success: true, ...locked.result });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     logger.error('[Cron] Season reset failed:', message);

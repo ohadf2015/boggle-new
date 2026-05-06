@@ -37,8 +37,10 @@ export function HubFoyer({ store, onEnterRoom }: HubFoyerProps) {
         src="/word-vault/villains/cinder.png"
         alt=""
         aria-hidden="true"
+        width={224}
+        height={224}
         className="pointer-events-none absolute -bottom-6 -left-6 h-44 w-44 select-none object-contain opacity-50 sm:h-56 sm:w-56"
-        style={{ filter: 'drop-shadow(0 0 24px rgba(255,107,53,0.5))' }}
+        style={{ filter: 'drop-shadow(0 0 24px rgba(255,107,53,0.5))', aspectRatio: '1 / 1' }}
       />
 
       {/* Librarian — guide */}
@@ -46,14 +48,20 @@ export function HubFoyer({ store, onEnterRoom }: HubFoyerProps) {
         src="/word-vault/characters/librarian.png"
         alt=""
         aria-hidden="true"
+        width={224}
+        height={224}
         className="pointer-events-none absolute bottom-2 right-2 h-40 w-40 select-none object-contain sm:h-56 sm:w-56"
+        style={{ aspectRatio: '1 / 1' }}
       />
 
       {/* Melo — hero */}
       <img
         src="/word-vault/characters/melo.png"
         alt="אש"
+        width={160}
+        height={160}
         className="pointer-events-none relative z-10 h-32 w-32 select-none object-contain drop-shadow-[3px_3px_0_rgba(0,0,0,0.6)] sm:h-40 sm:w-40"
+        style={{ aspectRatio: '1 / 1' }}
       />
 
       {/* Ember particles */}
