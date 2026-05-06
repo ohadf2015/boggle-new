@@ -36,11 +36,11 @@ describe('ReengagementEmailV2 — component render', () => {
     expect(html).toMatch(/alt="LexiClash[^"]*"/);
   });
 
-  it('uses the MP-invite letterbox banner as hero with descriptive alt text', async () => {
+  it('uses the bespoke kawaii-squad hero with descriptive alt text', async () => {
     const html = await renderHtml();
-    // Hero now mirrors the in-app MP invite card — same kawaii squad illustration
-    // cropped to 3:1 letterbox, hosted under /email/ for absolute-URL fetch.
-    expect(html).toContain('https://www.lexiclash.live/email/mp-invite-hero.jpg');
+    // Hero is a custom-generated kawaii squad illustration (lime/pink ring, floating
+    // letter tiles), rendered specifically for the email letterbox under /email/.
+    expect(html).toContain('https://www.lexiclash.live/email/reengagement-hero-v3.jpg');
     // Alt mentions brand + the visual subject (a11y + brand recall when images blocked)
     expect(html).toMatch(/alt="LexiClash[^"]*squad[^"]*"/);
     // Hero card is hard-shadowed neo-brutalist — 6px offset shadow, no blur
@@ -55,7 +55,7 @@ describe('ReengagementEmailV2 — component render', () => {
     const heroUrls = new Set<string>();
     for (const lang of ['en', 'he', 'sv', 'ja', 'es']) {
       const html = await renderHtml({ language: lang });
-      const match = html.match(/src="(https:\/\/www\.lexiclash\.live\/email\/mp-invite-hero[^"]+)"/);
+      const match = html.match(/src="(https:\/\/www\.lexiclash\.live\/email\/reengagement-hero-v3[^"]+)"/);
       expect(match).not.toBeNull();
       heroUrls.add(match![1]);
       // Old per-locale OG cards must NOT leak back in

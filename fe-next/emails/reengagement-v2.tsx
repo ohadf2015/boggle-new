@@ -179,9 +179,11 @@ interface ReengagementEmailV2Props {
 /* ───────────────────────── Assets ───────────────────────── */
 
 // Use www. domain — lexiclash.live 301s to www, and email clients don't follow redirects.
-// MP "BringYourSquad" letterbox banner (3:1 crop of public/images/invite-hero.jpg).
-// Same kawaii squad illustration MP uses to drive invite-action — now driving re-engagement.
-const HERO_SRC = 'https://www.lexiclash.live/email/mp-invite-hero.jpg';
+// Bespoke re-engagement hero: kawaii squad around a glowing word board, neon lime/pink
+// dual-ring backdrop, floating ABC tiles. Same "your squad is waiting" emotional beat as
+// the MP InviteCard but rendered specifically for email letterbox (no Scrabble grid, brighter
+// character palette, looser composition that survives 3:1 crop in dark-mode clients).
+const HERO_SRC = 'https://www.lexiclash.live/email/reengagement-hero-v3.jpg';
 
 /* ─── Palette (solid hex only — dark-mode safe) ─── */
 
