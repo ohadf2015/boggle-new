@@ -13,11 +13,11 @@ import { gsap } from 'gsap';
 import { useBlastDebris } from './useBlastDebris';
 import { GameCanvas, useGameEngine } from '@/lib/gameEngine/GameCanvas';
 import { createEnhancedEffects, type EnhancedEffectsManager } from './utils/blastEnhancedEffects';
-import { createBlastJuiceKit, spawnTypedBurst, type BlastJuiceKit } from './effects/blastJuiceKit';
+import { createBlastJuiceKit, type BlastJuiceKit } from './effects/blastJuiceKit';
 import { buildComboLevelUpTimeline } from './effects/blastGsapTimelines';
 import { useBlastAmbientEffects } from './useBlastAmbientEffects';
 import { useBlastPixiOverlays } from './hooks/useBlastPixiOverlays';
-import { useChainRibbonOverlay } from './hooks/useChainRibbonOverlay';
+
 import { useBlastGsapTimelines } from './hooks/useBlastGsapTimelines';
 import { isReducedMotionPreferred } from '@/utils/accessibility';
 import {
@@ -218,10 +218,7 @@ function EffectsWorker({
     camera, width, height, gridSize, cellSize, chainLevel,
   });
 
-  // ─── Chain ribbon (Phase 3 jelly) ────────────────────────────────────
-  useChainRibbonOverlay({ camera, app: app as { canvas?: HTMLCanvasElement } | null });
-
-  // ─── GSAP timeline runners — cascade depth 1-4, wave shower, long word ─
+// ─── GSAP timeline runners — cascade depth 1-4, wave shower, long word ─
   const { runCascadePunch, runLongWordPunch, runWaveClearShower, trackTimeline } = useBlastGsapTimelines({
     camera, shake, timeDilation, particles, width, height,
     fireShockwave, spawnStarBurst, confettiPreset: CONFETTI_BURST,
@@ -427,17 +424,12 @@ function EffectsWorker({
     }
 
     // Lingering sparkle dust at each clear position — floats upward for ambient magic
-    const comboSize = clearedTiles.length;
     for (const tile of clearedTiles) {
       const x = tile.col * cellSize + cellSize / 2;
       const y = tile.row * cellSize + cellSize / 2;
       particles.burst(LINGER_SPARKLE, x, y, 3);
       // Afterglow residue — warm halo that lingers where tiles were cleared
       spawnAfterglow(x, y, tile.type === 'bomb' ? 0xff3366 : tile.type === 'lightning' ? 0x00ffff : 0xbfff00);
-      // Phase 4 jelly: tile-tinted typed burst. Adds a shockwave ring on
-      // combo >= 3 plus particles in the tile's accent colour. Cap-bounded
-      // (FIFO eviction at 64 concurrent) so high-combo clears can't runaway.
-      if (camera) spawnTypedBurst(camera, tile.type, x, y, comboSize);
     }
 
     // Move ghost sprite to centroid of cleared tiles (for chain ghost trail)

@@ -175,9 +175,7 @@ export const EXPERIMENTS = {
     default: 'control',
     description:
       'Blast tile candy-crush presentation + popup redesign. control = current flat DOM, candy = 5-layer composite + GSAP phase timelines + BlastModalShell.',
-    forceVariantByEmail: {
-      'ohadf2015@gmail.com': 'candy',
-    },
+    forceVariantByEmail: {},
   }),
 
   /**

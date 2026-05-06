@@ -14,7 +14,6 @@ import { COMBO_ELIGIBLE_TILES } from './utils/blastCombos';
 import { computeCellFilter, createPortalAdjacency } from './hooks/blastCellFilterLogic';
 import { scanOffensiveSpecial, OFFENSIVE_RANK } from './utils/blastTileEffects';
 import { getTileTooltip } from './utils/blastTileTooltips';
-import { mountIdleBreatheForTiles } from './hooks/useBlastGsapTimelines';
 
 const ZONE_PREVIEW_TILES: Partial<Record<BlastTileType, 'bomb' | 'lightning' | 'prism' | 'magnet'>> = {
   bomb: 'bomb',
@@ -101,7 +100,7 @@ export const BlastBoard = memo(function BlastBoard({
     gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,
   }), [gridSize]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const cleanupRef = useRef<(() => void) | null>(null);
+
   // Initialize to 1 (not 0) so the overlay grid renders immediately.
   // Fall animation pixel math degrades gracefully until ResizeObserver fires.
   const [containerWidth, setContainerWidth] = useState(1);
@@ -222,26 +221,6 @@ export const BlastBoard = memo(function BlastBoard({
   // Only render overlay once we have tile states
   const hasTileStates = tileStates.length > 0 && tileStates[0]?.length > 0;
 
-  // Idle breathing tilt — mounted once per layout change so re-spawned tiles
-  // don't accumulate stale tweens. Off-screen pause via IntersectionObserver
-  // (see mountIdleBreatheForTiles).
-  const tileLayoutKey = `${tileStates.length}x${tileStates[0]?.length ?? 0}`;
-  useEffect(() => {
-    if (!hasTileStates) return;
-    const root = containerRef.current;
-    if (!root) return;
-    // Defer one frame so the BlastTile DOM nodes are in the tree.
-    const id = requestAnimationFrame(() => {
-      const tiles = Array.from(root.querySelectorAll<HTMLElement>('[data-blast-tile]'));
-      if (tiles.length === 0) return;
-      cleanupRef.current = mountIdleBreatheForTiles(tiles);
-    });
-    return () => {
-      cancelAnimationFrame(id);
-      cleanupRef.current?.();
-      cleanupRef.current = null;
-    };
-  }, [hasTileStates, tileLayoutKey]);
 
   return (
     <div
