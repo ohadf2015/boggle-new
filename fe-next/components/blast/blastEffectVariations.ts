@@ -91,7 +91,46 @@ const ZIGZAG_PATH: () => ScoreFlyPath = () => {
   };
 };
 
-export const SCORE_FLY_PATHS = [ARC_PATH, ARC_PATH, SPIRAL_PATH, BOUNCE_PATH, ROCKET_PATH, ZIGZAG_PATH] as const;
+/** Drift — slow lazy upward float with a sideways drift, soft fade */
+const DRIFT_PATH: () => ScoreFlyPath = () => {
+  const drift = rand(-60, 60);
+  return {
+    x: (sx, tx) => [sx, sx + drift * 0.3, sx + drift * 0.6, tx],
+    y: (sy, ty) => [sy, sy - 35, sy - 80, ty],
+    scale: [1.1, 1.05, 0.95, 0.55],
+    rotate: [rand(-8, 8), rand(-12, 12), rand(-6, 6), 0],
+    duration: 0.85,
+    times: [0, 0.3, 0.65, 1],
+  };
+};
+
+/** Whirl — playful tumble with overshoot at midpoint */
+const WHIRL_PATH: () => ScoreFlyPath = () => {
+  const dir = Math.random() > 0.5 ? 1 : -1;
+  return {
+    x: (sx, tx) => [sx, sx + 25 * dir, sx + 60 * dir, sx + 10 * dir, tx],
+    y: (sy, ty) => [sy, sy - 70, sy - 110, sy - 80, ty],
+    scale: [1.2, 1.4, 1.0, 0.85, 0.5],
+    rotate: [0, 90 * dir, 270 * dir, 360 * dir, 360 * dir],
+    duration: 0.78,
+    times: [0, 0.25, 0.5, 0.75, 1],
+  };
+};
+
+/** Comet — fast straight dash with overshoot, lands hot */
+const COMET_PATH: () => ScoreFlyPath = () => ({
+  x: (sx, tx) => [sx, sx + (tx - sx) * 0.3, sx + (tx - sx) * 1.1, tx],
+  y: (sy, ty) => [sy, sy - 40, ty - 6, ty],
+  scale: [1.6, 1.2, 0.9, 0.6],
+  rotate: [rand(-15, 15), 0, 0, 0],
+  duration: 0.5,
+  times: [0, 0.4, 0.85, 1],
+});
+
+export const SCORE_FLY_PATHS = [
+  ARC_PATH, ARC_PATH, SPIRAL_PATH, BOUNCE_PATH, ROCKET_PATH, ZIGZAG_PATH,
+  DRIFT_PATH, WHIRL_PATH, COMET_PATH,
+] as const;
 
 export function getRandomScoreFlyPath(): ScoreFlyPath {
   const factory = pickRandom(SCORE_FLY_PATHS);

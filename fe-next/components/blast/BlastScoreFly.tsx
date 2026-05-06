@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { getRandomScoreFlyPath, type ScoreFlyPath } from './blastEffectVariations';
+import { pickHypePrefix } from './scoreFlyHype';
 
 export interface ScoreFlyEvent {
   id: string;
@@ -71,9 +72,19 @@ const TARGET_X = typeof window !== 'undefined' ? Math.min(120, window.innerWidth
 const TARGET_Y = 8;
 const MAX_FLIES = 3;
 
+function hashId(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return h;
+}
+
 function ScoreFlyItem({ fly, onComplete }: { fly: ScoreFlyEvent; onComplete: (id: string) => void }) {
-  // Pick a random path variation once per fly event
-  const path = useMemo<ScoreFlyPath>(() => getRandomScoreFlyPath(), []);
+  // Deterministic tilt seeded by fly.id keeps render pure (react-hooks/purity).
+  const { path, hype, initialTilt } = useMemo(() => ({
+    path: getRandomScoreFlyPath(),
+    hype: pickHypePrefix(fly.tier),
+    initialTilt: ((Math.abs(hashId(fly.id)) % 2400) / 100) - 12,
+  }), [fly.tier, fly.id]);
 
   // Path functions expect pixel coords; use 0 as origin and TARGET as dest,
   // then apply deltas from the percentage-positioned element.
@@ -99,7 +110,7 @@ function ScoreFlyItem({ fly, onComplete }: { fly: ScoreFlyEvent; onComplete: (id
         y: yKeys[0],
         scale: path.scale[0],
         opacity: 1,
-        rotate: path.rotate?.[0] ?? 0,
+        rotate: (path.rotate?.[0] ?? 0) + initialTilt,
       }}
       animate={{
         x: xKeys,
@@ -123,7 +134,7 @@ function ScoreFlyItem({ fly, onComplete }: { fly: ScoreFlyEvent; onComplete: (id
           aria-hidden="true"
         />
       )}
-      +{fly.score}
+      {hype && <span className="opacity-90 mr-1 text-[0.85em]">{hype}</span>}+{fly.score}
     </AdaptiveMotion.div>
   );
 }

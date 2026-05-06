@@ -7,6 +7,7 @@ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTileTooltip } from './utils/blastTileTooltips';
 import { TILE_VISUALS, CLEARING_COLORS, CLEARING_ANIMS } from './blastTileVisuals';
+import { getCascadeFallStyle } from './blastCascadeStyle';
 
 const TILE_TEXT_SHADOW_STYLE = { textShadow: '0 1px 0 rgba(255,255,255,0.4), 0 2px 3px rgba(0,0,0,0.2)' } as const;
 const TILE_TEXT_SHADOW_LIGHT_STYLE = { textShadow: '0 1px 2px rgba(0,0,0,0.4)' } as const;
@@ -22,6 +23,8 @@ export interface BlastTileProps {
   hitsRemaining?: number;
   /** Fall distance in pixels (set by sequencer for falling phase) */
   fallOffset?: number;
+  /** Tile column (0-based) — drives per-column cascade stagger so columns ripple */
+  col?: number;
   /** Random rotation for clearing phase (-12 to 12 degrees) */
   clearRotate?: number;
   /** Spawn offset in pixels for appearing phase */
@@ -111,7 +114,7 @@ const RARE_LETTERS = new Set(['Q', 'Z', 'X', 'J']);
 
 const ANIMATED_PHASES = new Set<TilePhase>(['anticipation', 'clearing', 'falling', 'appearing', 'landing']);
 
-function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: number, clearRotate?: number, spawnOffset?: number): React.CSSProperties {
+function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: number, clearRotate?: number, spawnOffset?: number, col?: number): React.CSSProperties {
   const clearing = CLEARING_COLORS[type];
   switch (phase) {
     case 'anticipation':
@@ -133,14 +136,8 @@ function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: numb
       };
     }
     case 'falling': {
-      // Tile is at its destination row; CSS keyframe animates FROM --fall-from TO 0
-      // Duration scales with distance for realistic gravity feel
       const dist = fallOffset ?? 0;
-      const fallDuration = Math.max(250, 180 + dist * 0.8);
-      return {
-        animation: `blastTileFall ${fallDuration}ms cubic-bezier(0.4, 0, 0.6, 1) forwards`,
-        '--fall-from': `-${dist}px`,
-      } as React.CSSProperties;
+      return getCascadeFallStyle(dist, col ?? 0);
     }
     case 'appearing':
       return {
@@ -198,7 +195,7 @@ export const BlastTile = memo(function BlastTile({
   letter, type, phase, isSelected, isCleared, hitsRemaining,
   fallOffset, clearRotate, spawnOffset, isNearMiss, activationEffect, isComboPreview,
   selectionIndex, selectionTotal, isLocked, countdown, fuseTimer, zonePreview,
-  isDiamondRevealed, innerType, isCascadeHighlight, portalPairIndex, isScanTarget, colorTag, onClick,
+  isDiamondRevealed, innerType, isCascadeHighlight, portalPairIndex, isScanTarget, colorTag, onClick, col,
 }: BlastTileProps) {
   const reducedMotion = usePrefersReducedMotion();
   const { t } = useLanguage();
@@ -225,7 +222,7 @@ export const BlastTile = memo(function BlastTile({
   const tooltip = type !== 'standard' ? getTileTooltip(type, t) : null;
   const effectivePhase = reducedMotion && ANIMATED_PHASES.has(phase) ? 'idle' : phase;
   const phaseStyle = effectivePhase !== 'idle' && effectivePhase !== 'selected'
-    ? getPhaseStyles(effectivePhase, type, fallOffset, clearRotate, spawnOffset)
+    ? getPhaseStyles(effectivePhase, type, fallOffset, clearRotate, spawnOffset, col)
     : {};
   const selectionStyle = getSelectionStyles(isSelected, selectionIndex, selectionTotal);
   // Narrow willChange to the property the current phase actually animates — avoid forcing
@@ -426,6 +423,7 @@ export const BlastTile = memo(function BlastTile({
   prev.countdown === next.countdown &&
   prev.fuseTimer === next.fuseTimer &&
   prev.fallOffset === next.fallOffset &&
+  prev.col === next.col &&
   prev.clearRotate === next.clearRotate &&
   prev.spawnOffset === next.spawnOffset &&
   prev.isNearMiss === next.isNearMiss &&

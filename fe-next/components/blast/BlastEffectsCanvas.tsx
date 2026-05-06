@@ -17,6 +17,8 @@ import { createBlastJuiceKit, type BlastJuiceKit } from './effects/blastJuiceKit
 import { buildComboLevelUpTimeline } from './effects/blastGsapTimelines';
 import { useBlastAmbientEffects } from './useBlastAmbientEffects';
 import { useBlastPixiOverlays } from './hooks/useBlastPixiOverlays';
+import { useComboStreakMilestone } from './hooks/useComboStreakMilestone';
+import { getComboAmbientTier } from './comboAmbientThreshold';
 import { useBlastGsapTimelines } from './hooks/useBlastGsapTimelines';
 import { isReducedMotionPreferred } from '@/utils/accessibility';
 import {
@@ -85,6 +87,8 @@ interface BlastEffectsCanvasProps {
   clearedTiles: ClearedTileEvent[];
   chainLevel: number;
   comboTier: number;
+  /** Combo streak level (0–10). Crossing 5 / 10 fires a milestone flourish. */
+  comboStreakLevel?: number;
   waveCleared: boolean;
 }
 
@@ -126,6 +130,7 @@ function EffectsWorker({
   clearedTiles,
   chainLevel,
   comboTier,
+  comboStreakLevel = 0,
   waveCleared,
 }: BlastEffectsCanvasProps) {
   const { app, particles, shake, physics, camera, timeDilation } = useGameEngine();
@@ -398,7 +403,20 @@ function EffectsWorker({
       }
       runLongWordPunch(clearedTiles.length, cx / clearedTiles.length, cy / clearedTiles.length);
     }
-  }, [clearedTiles, particles, shake, cellSize, gridSize, height, spawnDebris, spawnLightningBolt, spawnLightningDebris, firePrismBeams, spawnPrismDebris, flashCross, physics, fireShockwave, spawnPulseRing, spawnStarBurst, spawnAfterglow, moveGhostTo, runLongWordPunch]);
+
+    // D — combo-streak ambient afterglow. One Pixi Graphics per word at the
+    // centroid when the streak is hot (≥4). spawnAfterglow already self-cleans,
+    // so this stays bounded — never accrues more than the cleared-tiles cadence.
+    const ambientTier = getComboAmbientTier(comboStreakLevel);
+    if (ambientTier !== null && clearedTiles.length > 0) {
+      let cx = 0, cy = 0;
+      for (const t of clearedTiles) {
+        cx += t.col * cellSize + cellSize / 2;
+        cy += t.row * cellSize + cellSize / 2;
+      }
+      spawnAfterglow(cx / clearedTiles.length, cy / clearedTiles.length, ambientTier);
+    }
+  }, [clearedTiles, particles, shake, cellSize, gridSize, height, spawnDebris, spawnLightningBolt, spawnLightningDebris, firePrismBeams, spawnPrismDebris, flashCross, physics, fireShockwave, spawnPulseRing, spawnStarBurst, spawnAfterglow, moveGhostTo, runLongWordPunch, comboStreakLevel]);
 
   // Chain cascade sparkle + mega celebration at chain 5
   useEffect(() => {
@@ -467,6 +485,21 @@ function EffectsWorker({
     }
     prevComboRef.current = comboTier;
   }, [comboTier, particles, width, height, spawnPulseRing, camera, trackTimeline]);
+
+  // Combo streak milestone — fires once when level crosses 5 (tier 1) or 10 (tier 2).
+  // Distinct from per-word comboTier above; this is a streak-life event, much rarer.
+  const streakMilestone = useComboStreakMilestone(comboStreakLevel);
+  const lastMilestoneIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!streakMilestone || streakMilestone.id === lastMilestoneIdRef.current) return;
+    lastMilestoneIdRef.current = streakMilestone.id;
+    const tier = streakMilestone.tier;
+    spawnStarBurst(width / 2, height / 2, tier === 2 ? 0xbfff00 : 0x00ffff, tier === 2 ? 16 : 10);
+    spawnPulseRing(width / 2, height / 2, tier === 2 ? 3 : 2);
+    if (tier === 2) {
+      fireShockwave(width / 2, height / 2, 22);
+    }
+  }, [streakMilestone, width, height, spawnStarBurst, spawnPulseRing, fireShockwave]);
 
   // Wave clear celebration — particles + shockwave + juice burst (zoom blur + bloom + hit-stop)
   useEffect(() => {

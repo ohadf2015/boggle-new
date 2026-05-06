@@ -387,16 +387,20 @@ export function useHostGameEvents({
         return;
       }
 
-      // Skip timer sync while 3-2-1-GO countdown is playing.
-      // gameStarted becomes true only after the countdown animation completes.
-      // Uses ref to avoid stale closure — prevents useEffect re-registration on every gameStarted change.
-      if (!gameStartedRef.current) {
-        return;
-      }
-
+      // Always update the visual timer so hasActiveGameData stays accurate.
+      // Moving this before the gameStartedRef guard ensures the timer counts
+      // down and reaches 0 even when the countdown animation hasn't formally
+      // completed yet (gameStartedRef.current still false). Without this, a
+      // delayed countdown-complete leaves hasActiveGameData=true forever and
+      // the game view never unmounts.
       setRemainingTime(data.remainingTime);
 
-      if (data.remainingTime === 0 && gameStartedRef.current) {
+      // End the game unconditionally when the server timer reaches 0.
+      // The session-ID guard above is the correct gating layer; we must not
+      // also require gameStartedRef here because a delayed countdown-complete
+      // (gameStartedRef still false) would block this block and leave the
+      // host frozen on the game screen after the timer expires.
+      if (data.remainingTime === 0) {
         setGameStarted(false);
         setShowStartAnimation(false);
         setWaitingForResults(true);
@@ -406,6 +410,13 @@ export function useHostGameEvents({
           icon: TOAST_ICONS.flag,
           duration: 5000,
         });
+        return;
+      }
+
+      // Skip non-zero timer syncs while the 3-2-1-GO countdown is still playing
+      // to avoid triggering game-state effects before the game UI is ready.
+      if (!gameStartedRef.current) {
+        return;
       }
     };
 

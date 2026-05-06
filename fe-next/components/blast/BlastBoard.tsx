@@ -302,6 +302,7 @@ export const BlastBoard = memo(function BlastBoard({
                 portalPairIndex={tile.type === 'portal' && tile.portalPairId ? portalPairMap.get(tile.portalPairId) : undefined}
                 isScanTarget={scanTargetKey?.key === key ? scanTargetKey.source : undefined}
                 clearRotate={animState?.clearRotate}
+                col={tile.col}
                 fallOffset={animState?.fallDistance ? animState.fallDistance * cellHeight : undefined}
                 spawnOffset={animState?.spawnOffset ? animState.spawnOffset * cellHeight : undefined}
               />

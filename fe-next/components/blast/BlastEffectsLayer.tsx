@@ -3,7 +3,13 @@
 import { useMemo } from 'react';
 import { BlastScoreFly, type ScoreFlyEvent } from './BlastScoreFly';
 import { BlastComboFlash } from './BlastComboFlash';
+import { BlastPopBurst, type PopBurstEvent } from './BlastPopBurst';
 import { CHAIN_GLOW_COLORS } from './blastColorTokens';
+
+const POP_BURST_TIER_COLORS: Record<2 | 3, string> = {
+  2: '#00FFFF',
+  3: '#BFFF00',
+};
 
 interface BlastEffectsLayerProps {
   scoreFlyEvents: ScoreFlyEvent[];
@@ -38,6 +44,18 @@ export function BlastEffectsLayer({
 }: BlastEffectsLayerProps) {
   const glowStyle = useMemo(() => getGlowStyle(intensity), [intensity]);
   const pulseClass = intensity >= 5 ? 'animate-pulse' : '';
+  const popBursts: PopBurstEvent[] = useMemo(
+    () =>
+      scoreFlyEvents
+        .filter(e => e.tier >= 2)
+        .map(e => ({
+          id: `pop-${e.id}`,
+          startX: e.startX,
+          startY: e.startY,
+          color: POP_BURST_TIER_COLORS[e.tier as 2 | 3] ?? POP_BURST_TIER_COLORS[2],
+        })),
+    [scoreFlyEvents],
+  );
 
   return (
     <div
@@ -46,6 +64,7 @@ export function BlastEffectsLayer({
       style={glowStyle}
     >
       <BlastComboFlash flash={comboFlash} onComplete={onComboFlashComplete} comboTypeName={comboTypeName} />
+      <BlastPopBurst bursts={popBursts} onComplete={() => {}} />
       <BlastScoreFly flies={scoreFlyEvents} onComplete={onScoreFlyComplete} />
     </div>
   );

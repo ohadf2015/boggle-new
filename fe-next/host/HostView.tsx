@@ -48,6 +48,7 @@ import {
 import { useNavigationGuard } from '../hooks/useNavigationGuard';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useGameStartTelemetry } from '@/hooks/useGameStartTelemetry';
+import { useTimerZeroWatchdog } from '../hooks/useTimerZeroWatchdog';
 
 // ==========================================
 // Props
@@ -239,6 +240,23 @@ const HostView: React.FC<HostViewProps> = memo(({
     earthquakeMusicActiveRef,
     intentionalExitRef: state.refs.intentionalExitRef,
     initialPlayers,
+  });
+
+  // Defense-in-depth: if timeUpdate(0) or endGame are missed on the host (e.g.
+  // brief network blip), this watchdog forces waitingForResults and pulls the
+  // server's cached scoring payload 2s after the timer visually reaches 0.
+  // The root fix (setRemainingTime before guard in useHostGameEvents) handles the
+  // primary case; this catches the residual scenario where the event is lost entirely.
+  useTimerZeroWatchdog({
+    remainingTime: state.runtime.remainingTime,
+    gameActive: state.runtime.gameStarted || (!!state.runtime.tableData && !!state.runtime.remainingTime && state.runtime.remainingTime > 0),
+    waitingForResults: state.runtime.waitingForResults,
+    onTrigger: () => {
+      if (state.tournament.finalScores) return;
+      logger.log('[HOST] Timer-zero watchdog: forcing waiting state + requesting results');
+      state.setWaitingForResults(true);
+      socket?.emit('requestResults');
+    },
   });
 
   // Game actions

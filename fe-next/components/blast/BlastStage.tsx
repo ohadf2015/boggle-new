@@ -352,6 +352,7 @@ export const BlastStage = memo(function BlastStage({
                   clearedTiles={clearedTilesForEffects}
                   chainLevel={sequencerState?.chainLevel ?? 0}
                   comboTier={comboFlashTier}
+                  comboStreakLevel={comboStreak?.level ?? 0}
                   waveCleared={waveCleared}
                 />
               </div>
