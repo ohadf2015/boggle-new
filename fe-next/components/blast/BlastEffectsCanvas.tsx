@@ -52,20 +52,23 @@ import type { ParticleConfig } from '@/lib/gameEngine/types';
 import type { BlastTileType } from './types';
 
 // ─── Lingering sparkle dust — slow-rising ambient particles after clears ─
+// Brand-colored to match the candy-shell reference: lime/pink/gold/cyan starlight,
+// not generic pastel. Adds visible juice on every clear.
 const LINGER_SPARKLE: ParticleConfig = {
-  maxParticles: 18,
-  frequency: 0.04,
-  emitterLifetime: 0.8,
-  particlesPerWave: 3,
-  lifetime: { min: 0.8, max: 1.6 },
-  speed: { min: 20, max: 55 },
-  gravity: { x: 0, y: -40 },
-  scale: { start: 0.7, end: 0 },
-  alpha: { start: 0.85, end: 0 },
-  rotationSpeed: { min: -60, max: 60 },
-  colors: ['ffffff', 'ffffcc', 'ccffff', 'ffccff', 'ccffcc'],
+  maxParticles: 22,
+  frequency: 0.035,
+  emitterLifetime: 0.9,
+  particlesPerWave: 4,
+  lifetime: { min: 0.9, max: 1.8 },
+  speed: { min: 25, max: 70 },
+  gravity: { x: 0, y: -45 },
+  scale: { start: 0.85, end: 0 },
+  alpha: { start: 1, end: 0 },
+  rotationSpeed: { min: -90, max: 90 },
+  // Neo-brutalist brand palette: lime, pink, gold, cyan + white sparkle
+  colors: ['ffffff', 'bfff00', 'ff1493', 'ffd700', '00ffff'],
   spawnShape: 'rect',
-  spawnConfig: { width: 28, height: 28 },
+  spawnConfig: { width: 32, height: 32 },
   blendMode: 'add',
 };
 
@@ -147,6 +150,9 @@ function EffectsWorker({
   const { app, particles, shake, physics, camera, timeDilation } = useGameEngine();
   const enhancedRef = useRef<EnhancedEffectsManager | null>(null);
   const juiceRef = useRef<BlastJuiceKit | null>(null);
+  // Pooled combo-tier "xN" Text — created once per mount, reused on every combo
+  // pulse to avoid `new Text()` allocation per word (Pixi atlas churn).
+  const comboBadgeRef = useRef<Text | null>(null);
 
   const prevClearedKeyRef = useRef('');
   const clearedSeqRef = useRef(0);
@@ -230,12 +236,47 @@ function EffectsWorker({
     particles.burst(PRISM_BEAM_RIGHT, cx + beamOffsets / 2, cy);
   }, [particles, gridSize, cellSize]);
 
-  // Start ambient bokeh on mount
+  // Start ambient bokeh on mount — gated for low-end devices.
+  // 4-or-fewer-core CPUs and ≤4GB RAM see a meaningful FPS hit from a
+  // continuously-emitting bokeh layer (~18 max particles, low frequency).
   useEffect(() => {
+    const nav = typeof navigator !== 'undefined' ? navigator : null;
+    const cores = nav?.hardwareConcurrency ?? 8;
+    const memGb = (nav as (Navigator & { deviceMemory?: number }) | null)?.deviceMemory ?? 8;
+    if (cores <= 4 || memGb <= 4) return;
     const emitter = particles.create(AMBIENT_BOKEH);
     emitter.emit(width / 2, height / 2);
     return () => { emitter.destroy(); };
   }, [particles, width, height]);
+
+  // Mount-time combo badge pool. Single Pixi Text reused for all comboTier pulses.
+  useEffect(() => {
+    if (camera.destroyed) return;
+    const badge = new Text({
+      text: 'x',
+      style: {
+        fontFamily: ['Fredoka', 'Rubik', 'sans-serif'],
+        fontSize: 64,
+        fontWeight: '900',
+        fill: 0xbfff00,
+        stroke: { color: 0x1a1a2e, width: 7 },
+        dropShadow: { color: 0x000000, blur: 4, distance: 3, alpha: 0.8, angle: Math.PI / 2 },
+      },
+    });
+    badge.anchor.set(0.5);
+    badge.alpha = 0;
+    badge.scale.set(0);
+    badge.visible = false;
+    camera.addChild(badge);
+    comboBadgeRef.current = badge;
+    return () => {
+      if (!badge.destroyed) {
+        try { if (!camera.destroyed) camera.removeChild(badge); } catch { /* */ }
+        badge.destroy();
+      }
+      comboBadgeRef.current = null;
+    };
+  }, [camera]);
 
   // ─── Goal Gallery hit pulse ─────────────────────────────────────────
   // Fires a Pixi shockwave + starburst when route/sniper transitions to
@@ -279,10 +320,15 @@ function EffectsWorker({
       const y = tile.row * cellSize + cellSize / 2;
       const isFinalHit = !tile.hitsRemaining || tile.hitsRemaining <= 0;
 
+      // PERF: shader calls split into "redundant" (shatter/dissolve) — dropped
+      // because particle bursts already painted the same xy with similar imagery
+      // — vs "signature" (mercury / slitScan / melt / erode / assemble /
+      // crystallize / refract / pixelSort) — KEPT because they're unique distortions
+      // no particle can replicate (these ARE the juice).
       if (tile.type === 'bomb') {
         fireShockwave(x, y, 12);
         particles.burst(pickRandom(BOMB_EXPLOSION_VARIANTS), x, y);
-        enhancedRef.current?.shatterTile(x, y, 'bomb');
+        // Shatter shader dropped — explosion preset covers it.
       }
 
       if (tile.type === 'gem') {
@@ -291,21 +337,21 @@ function EffectsWorker({
           particles.burst(GEM_SHATTER, x, y);
           fireShockwave(x, y, 8);
           spawnStarBurst(x, y, 0x34d399, 6);
-          enhancedRef.current?.shatterTile(x, y, 'gem');
+          // Shatter shader dropped — GEM_SHATTER particle covers it.
         } else {
           particles.burst(GEM_SHARD_BURST, x, y);
         }
       } else if (tile.type === 'frozen') {
         if (isFinalHit) {
           particles.burst(ICE_SHATTER, x, y);
-          enhancedRef.current?.dissolveTile(x, y, 'frozen');
+          // Dissolve shader dropped — ICE_SHATTER particle covers it.
         } else {
           particles.burst(FROST_CRACK, x, y);
         }
       } else if (tile.type === 'ice') {
         if (isFinalHit) {
           particles.burst(ICE_SHATTER, x, y);
-          enhancedRef.current?.dissolveTile(x, y, 'ice');
+          // Dissolve shader dropped — ICE_SHATTER particle covers it.
         }
         particles.burst(FROST_MIST, x, y);
       } else if (tile.type === 'prism') {
@@ -315,7 +361,7 @@ function EffectsWorker({
         flashCross(x, y);
         spawnPulseRing(x, y, 2);
         spawnStarBurst(x, y, 0xff1493, 12);
-        enhancedRef.current?.prismRefractTile(x, y, 'prism');
+        enhancedRef.current?.prismRefractTile(x, y, 'prism'); // SIGNATURE: chromatic distortion
       } else if (tile.type === 'magnet') {
         particles.burst(VORTEX_PULL, x, y);
         const tid = setTimeout(() => {
@@ -323,65 +369,60 @@ function EffectsWorker({
           particles.burst(VORTEX_EXPLOSION, x, y);
           fireShockwave(x, y, 13);
           physics.applyExplosion({ x, y }, 0.005, cellSize * 3.5);
-          enhancedRef.current?.shatterTile(x, y, 'magnet');
+          // Shatter shader dropped — explosion preset covers it.
         }, 280);
         magnetTimersRef.current.add(tid);
-      // Diamond: crystalline shards + shockwave + shatter + crystallize
       } else if (tile.type === 'diamond') {
         particles.burst(DIAMOND_SHARDS, x, y);
         fireShockwave(x, y, 7);
-        enhancedRef.current?.shatterTile(x, y, 'diamond');
-        enhancedRef.current?.crystallizeTile(x, y, 'diamond');
-      // Gold: golden star burst + liquid melt
+        enhancedRef.current?.crystallizeTile(x, y, 'diamond'); // SIGNATURE: frosty crystal facet
       } else if (tile.type === 'gold') {
         particles.burst(GOLD_STARS, x, y);
         spawnStarBurst(x, y, 0xffd700, 10);
-        enhancedRef.current?.meltTile(x, y, 'gold');
-      // Rainbow: confetti + magnetic assembly (vortex materialization)
+        enhancedRef.current?.meltTile(x, y, 'gold'); // SIGNATURE: liquid metal drip
       } else if (tile.type === 'rainbow') {
         particles.burst(CONFETTI_BURST, x, y);
         spawnPulseRing(x, y, 3);
         spawnStarBurst(x, y, 0x00ffff, 14);
-        enhancedRef.current?.assembleTile(x, y, 'rainbow');
-      // Countdown: fire embers explosion + granular erosion on final
+        enhancedRef.current?.assembleTile(x, y, 'rainbow'); // SIGNATURE: vortex materialize
       } else if (tile.type === 'countdown') {
         particles.burst(FIRE_EMBERS, x, y);
         if (isFinalHit) {
           fireShockwave(x, y, 9);
-          enhancedRef.current?.erodeTile(x, y, 'countdown');
+          enhancedRef.current?.erodeTile(x, y, 'countdown'); // SIGNATURE: granular erosion
         }
-      // Shuffle: swirling rearrangement burst
       } else if (tile.type === 'shuffle') {
         particles.burst(VORTEX_PULL, x, y);
-        enhancedRef.current?.shatterTile(x, y, 'shuffle');
-      // Magma: volcanic eruption — explosive radial burst
+        // Shatter shader dropped — vortex preset covers it.
       } else if (tile.type === 'magma') {
         particles.burst(FIRE_EMBERS, x, y);
         fireShockwave(x, y, 11);
-        enhancedRef.current?.shatterTile(x, y, 'magma');
-      // Portal: vortex pull + electric rings + slit-scan warp
+        // Shatter shader dropped — embers + shockwave cover it.
       } else if (tile.type === 'portal') {
         particles.burst(VORTEX_PULL, x, y);
         particles.burst(ELECTRIC_RINGS, x, y);
         fireShockwave(x, y, 6);
         spawnPulseRing(x, y, 1);
-        enhancedRef.current?.slitScanTile(x, y, 'portal');
-      // Catalyst: liquid mercury transformation
+        enhancedRef.current?.slitScanTile(x, y, 'portal'); // SIGNATURE: warp distortion
       } else if (tile.type === 'catalyst') {
         particles.burst(GOLD_STARS, x, y);
         particles.burst(FIRE_EMBERS, x, y);
         fireShockwave(x, y, 7);
         spawnStarBurst(x, y, 0xffd700, 8);
-        enhancedRef.current?.mercuryTile(x, y, 'catalyst');
+        enhancedRef.current?.mercuryTile(x, y, 'catalyst'); // SIGNATURE: liquid mercury
       } else {
         const preset = CLEAR_PRESET_MAP[tile.type] ?? pickRandom(TILE_EXPLOSION_VARIANTS);
         particles.burst(preset, x, y);
+        // Brand-color sparkle on every standard clear: alternates lime/pink by
+        // tile parity so combos visually mix the two anchor brand hues.
+        const brandColor = (tile.row + tile.col) % 2 === 0 ? 0xbfff00 : 0xff1493;
+        spawnStarBurst(x, y, brandColor, 5);
       }
 
       if (tile.type === 'lightning') {
         lightningTiles.push(tile);
         lightningCols.add(tile.col);
-        enhancedRef.current?.pixelSortTile(x, y, 'lightning');
+        enhancedRef.current?.pixelSortTile(x, y, 'lightning'); // SIGNATURE: glitch slice
       }
     }
 
@@ -476,38 +517,28 @@ function EffectsWorker({
       juiceRef.current?.comboPulse(comboTier);
       spawnPulseRing(width / 2, height / 2, comboTier);
 
-      // J2 — Pixi tier-badge: "x{N}" pops in, scales, drifts up while fading.
-      // Skipped under reduced motion (handled inside the timeline runner check).
+      // J2 — Pixi tier-badge: pooled "x{N}" reused per combo. Allocation-free
+      // path — text/position/scale reset rather than `new Text()` per word.
       if (!isReducedMotionPreferred() && comboTier >= 2 && !camera.destroyed) {
-        const badge = new Text({
-          text: `x${comboTier}`,
-          style: {
-            fontFamily: ['Fredoka', 'Rubik', 'sans-serif'],
-            fontSize: 56,
-            fontWeight: '900',
-            fill: 0xbfff00,
-            stroke: { color: 0x1a1a2e, width: 6 },
-            dropShadow: { color: 0x000000, blur: 4, distance: 2, alpha: 0.7, angle: Math.PI / 2 },
-          },
-        });
-        badge.anchor.set(0.5);
-        badge.position.set(width / 2, height * 0.42);
-        badge.alpha = 1;
-        badge.scale.set(0);
-        camera.addChild(badge);
+        const badge = comboBadgeRef.current;
+        if (badge && !badge.destroyed) {
+          badge.text = `x${comboTier}`;
+          badge.position.set(width / 2, height * 0.42);
+          badge.scale.set(0);
+          badge.alpha = 1;
+          badge.visible = true;
 
-        const cleanupBadge = () => {
-          try { camera.removeChild(badge); } catch { /* */ }
-          if (!badge.destroyed) badge.destroy();
-        };
-        const tl = buildComboLevelUpTimeline(gsap, {
-          target: badge,
-          tier: comboTier,
-          riseDistance: 70,
-          onComplete: cleanupBadge,
-        });
-        // Tracker chains onComplete + runs cleanupBadge on unmount-kill.
-        trackTimeline(tl, cleanupBadge);
+          const hideBadge = () => {
+            if (!badge.destroyed) badge.visible = false;
+          };
+          const tl = buildComboLevelUpTimeline(gsap, {
+            target: badge,
+            tier: comboTier,
+            riseDistance: 70,
+            onComplete: hideBadge,
+          });
+          trackTimeline(tl, hideBadge);
+        }
       }
     }
     prevComboRef.current = comboTier;

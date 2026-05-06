@@ -15,6 +15,7 @@
 - **ALWAYS RUN LINT (`npm run lint`) after writing new code**
 - **MANDATORY TESTING**: Every new component and logic MUST have tests
 - **TEST FAILURE PROTOCOL**: If a test fails, first analyze whether it discovered a bug — if so, fix the bug, never the test. Tests are source of truth.
+- **Supabase Realtime publication**: NEVER add a table to `supabase_realtime` publication without a matching `supabase.channel(...).on('postgres_changes', ...)` consumer in code. WAL→JSON parsing fires per-write even with zero subscribers (caused 95% DB CPU regression on 2026-05-06). Audit: `SELECT * FROM public.v_suspicious_realtime_publications;` — must return 0 rows.
 
 ## Tech Stack
 Next.js 16.0.7 App Router · TypeScript 5.9.3 (mixed JS/TS) · Node 18+ · Express 5.1 · Tailwind 3.4 + SCSS · Radix + Framer Motion · Socket.IO 4.8 · Supabase + Redis (ioredis) · Zod

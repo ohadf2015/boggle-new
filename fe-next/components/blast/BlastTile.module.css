@@ -1,16 +1,25 @@
 /* BlastTile — candy-crush presentation layers.
  * The button itself stays the "base" layer (gradient comes from TILE_VISUALS.style).
  * Layers below stack on top via absolute positioning + pointer-events: none.
+ *
+ * PERF NOTES:
+ * - mix-blend-mode removed from gloss/jelly — kicked layers off GPU compositor fast path
+ *   on 64-tile boards. Brightened gradient alphas to compensate visually.
+ * - SVG fractalNoise filter removed from .gloss::before — feTurbulence runs CPU-side
+ *   in Chrome/WebView and was paying 64× on every paint.
+ * - .candyShell box-shadow replaces filter: blur(2px) — same visual, GPU-fast.
+ * - Static translate3d on host promotes tiles to compositor layers once (vs willChange flip).
  */
 
 .candyShell {
-  /* Drop shadow under the tile, suggests floating mass. */
+  /* Drop shadow under the tile — bigger + harder for neo-brutalist "floating mass" read.
+   * Hard pixel offset (3px) + soft fall-off shadow for jackbox-party-pack feel. */
   position: absolute;
-  inset: 2px -2px -3px 2px;
+  inset: 3px -3px -4px 3px;
   border-radius: inherit;
-  background: var(--bt-cast, rgba(0, 0, 0, 0.35));
-  filter: blur(2px);
-  opacity: 0.55;
+  background: var(--bt-cast, rgba(0, 0, 0, 0.55));
+  box-shadow: 0 3px 6px var(--bt-cast, rgba(0, 0, 0, 0.40));
+  opacity: 0.85;
   z-index: 0;
   transition: transform 120ms ease-out, opacity 120ms ease-out;
   pointer-events: none;
@@ -23,30 +32,20 @@
   opacity: 0.25;
 }
 
+/* Bumped gloss/jelly alpha to compensate for mix-blend-mode: screen removal.
+ * Now reads as a denser white wet-look highlight without paying compositor cost. */
 .gloss {
   position: absolute;
   inset: 0;
   border-radius: inherit;
   background: radial-gradient(
     ellipse at 50% 0%,
-    var(--bt-gloss, rgba(255, 255, 255, 0.55)) 0%,
-    transparent 65%
+    var(--bt-gloss, rgba(255, 255, 255, 0.78)) 0%,
+    rgba(255, 255, 255, 0.20) 40%,
+    transparent 70%
   );
   pointer-events: none;
   z-index: 2;
-  mix-blend-mode: screen;
-}
-
-.gloss::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  /* Anti-banding noise overlay — fractalNoise keeps gradient edges from posterising on Android low-end */
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' /></filter><rect width='40' height='40' filter='url(%23n)' opacity='0.04'/></svg>");
-  background-size: 40px 40px;
-  mix-blend-mode: overlay;
-  pointer-events: none;
 }
 
 .rim {
@@ -55,14 +54,15 @@
   border-radius: inherit;
   pointer-events: none;
   z-index: 3;
-  /* 1px inset stroke gradient: top-left bright, bottom-right dim */
+  /* 2px inset stroke gradient — beefier rim for crisper neo-brutalist read */
   box-shadow:
-    inset 1px 1px 0 var(--bt-rim-light, rgba(255, 255, 255, 0.85)),
-    inset -1px -1px 0 var(--bt-rim-dark, rgba(0, 0, 0, 0.20));
+    inset 2px 2px 0 var(--bt-rim-light, rgba(255, 255, 255, 0.95)),
+    inset -2px -2px 0 var(--bt-rim-dark, rgba(0, 0, 0, 0.30));
 }
 
 /* Jelly mirror — wet-look curved highlight covering top ~55% of dome.
- * Two stacked radial gradients: cream toplight + narrower mirror sheen. */
+ * Stacked radial gradients: cream toplight + bright narrower mirror sheen.
+ * Heavier alpha so the highlight reads on saturated tile backgrounds. */
 .jellyMirror {
   position: absolute;
   inset: 0;
@@ -71,12 +71,11 @@
   z-index: 2;
   background:
     radial-gradient(ellipse 120% 65% at 50% 0%,
-      var(--bt-jelly-mirror, rgba(255, 255, 255, 0.65)) 0%,
+      var(--bt-jelly-mirror, rgba(255, 255, 255, 0.85)) 0%,
       transparent 55%),
     radial-gradient(ellipse 60% 25% at 50% 8%,
-      rgba(255, 255, 255, 0.85) 0%,
-      transparent 55%);
-  mix-blend-mode: screen;
+      rgba(255, 255, 255, 0.98) 0%,
+      transparent 60%);
 }
 
 /* Jelly edge translucency — stacked inset shadows reading as light through the rim. */
@@ -106,6 +105,13 @@
     1px 1px 0 rgba(0, 0, 0, 0.55),
     0 2px 3px rgba(0, 0, 0, 0.55),
     0 -1px 0 rgba(255, 255, 255, 0.20);
+}
+
+/* Static compositor-layer promotion. translate3d once at rest is cheaper than
+ * toggling will-change per phase — that thrashed layer create/destroy cycles. */
+.tileHost {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 /* Reduced-motion: kill every transition the layers introduce. */

@@ -155,14 +155,9 @@ export const BlastTile = memo(function BlastTile({
     ? getPhaseStyles(effectivePhase, type, fallOffset, clearRotate, spawnOffset)
     : {};
   const selectionStyle = candyOn ? {} : getSelectionStyles(isSelected, selectionIndex, selectionTotal);
-  // Narrow willChange to the property the current phase actually animates — avoid forcing
-  // unnecessary compositor layers for idle tiles.
-  let willChangeValue: string | undefined;
-  if (effectivePhase === 'clearing' || effectivePhase === 'appearing') {
-    willChangeValue = 'transform, opacity';
-  } else if (effectivePhase === 'falling' || effectivePhase === 'landing' || isSelected) {
-    willChangeValue = 'transform';
-  }
+  // Compositor promotion: static translate3d via styles.tileHost (applied below) +
+  // mountIdleBreatheForTiles which sets willChange: transform on visible tiles.
+  // Per-phase willChange flipping was thrashing layer create/destroy cycles.
 
   return (
     <button
@@ -182,6 +177,7 @@ export const BlastTile = memo(function BlastTile({
         'rounded-neo',
         'font-neo-display text-[clamp(1.1rem,4.5cqw,1.85rem)] font-black uppercase',
         'select-none',
+        candyOn ? styles.tileHost : '',
         // Only apply CSS transition + active press when idle/selected — animated phases use keyframes
         ...(effectivePhase === 'idle' || effectivePhase === 'selected'
           ? ['transition-transform duration-100', 'active:scale-95 active:translate-y-[2px] active:brightness-110']
@@ -207,7 +203,6 @@ export const BlastTile = memo(function BlastTile({
         ...(visual.style ?? {}),
         ...phaseStyle,
         ...selectionStyle,
-        ...(willChangeValue && { willChange: willChangeValue }),
         containerType: 'inline-size',
         ...(candyOn && {
           '--bt-gloss': accent.glossTop,
