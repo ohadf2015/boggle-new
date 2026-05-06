@@ -413,28 +413,124 @@ const FREE_MOUTH_STYLES = AVATAR_MOUTH_STYLES.filter(v => v !== 'none' && !PREMI
 const FREE_ACCESSORIES = AVATAR_ACCESSORIES.filter(v => !PREMIUM_MAP.accessory.includes(v) && !isHidden('accessory', v));
 const FREE_FACIAL_HAIR_STYLES = AVATAR_FACIAL_HAIR_STYLES.filter(v => !PREMIUM_MAP.facialHair.includes(v));
 const FREE_EYEBROW_STYLES = AVATAR_EYEBROW_STYLES.filter(v => !PREMIUM_MAP.eyebrows.includes(v));
-const FREE_HAIR_STYLES = AVATAR_HAIR_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.hair.includes(v) && !isHidden('hair', v));
+// Gender-specific free hair lists prevent cross-gender style mismatch in random generation
+const FREE_FEMALE_HAIR_STYLES = FEMALE_HAIR_STYLES.filter(v => v !== 'none' && !isPremiumPart('hair', v) && !isHidden('hair', v));
+const FREE_MALE_HAIR_STYLES = MALE_HAIR_STYLES.filter(v => v !== 'none' && !isPremiumPart('hair', v) && !isHidden('hair', v));
 
-export function getRandomAvatarConfig(): CustomAvatarConfig {
-  const pick = <T>(arr: readonly T[]): T => arr[Math.floor(Math.random() * arr.length)];
-  const gender = pick(AVATAR_GENDERS);
+// Curated color vibes for random generation — pick a vibe first, then draw all colors from it.
+// This prevents jarring clashes (dark bg + near-black hair, warm skin + icy blue eyes, etc.).
+type AvatarVibe = {
+  skin: readonly string[];
+  hair: readonly string[];
+  eyes: readonly string[];
+  bg: readonly string[];
+  shirt: readonly string[];
+  accessory: readonly string[];
+};
+
+const AVATAR_VIBES: readonly AvatarVibe[] = [
+  // Warm & Earthy — warm skin, natural brown/honey hair, amber/brown eyes
+  {
+    skin: ['#FFDBB4', '#F8D5C2', '#EDB98A', '#D08B5B', '#FFE0BD', '#C68642'],
+    hair: ['#2C1B18', '#4A3728', '#8B6E4E', '#D4A574', '#E8C07A'],
+    eyes: ['#92400E', '#78350F', '#6B4423', '#B45309', '#D97706'],
+    bg: ['#1a1a2e', '#FF6B35'],
+    shirt: ['#FF6B35', '#C62828', '#4A90D9', '#2C1B18'],
+    accessory: ['#FFD700', '#000000', '#FF6B35'],
+  },
+  // Cool & Nordic — light skin, silver/blonde/black hair, blue/grey eyes
+  {
+    skin: ['#FFDBB4', '#F8D5C2', '#FFE0BD'],
+    hair: ['#FFFFFF', '#C0C0C0', '#808080', '#2C1B18', '#E8C07A'],
+    eyes: ['#4A6FA5', '#3B82F6', '#2563EB', '#1D4ED8', '#6B7280', '#9CA3AF'],
+    bg: ['#1a1a2e', '#00FFFF'],
+    shirt: ['#4A90D9', '#8B5CF6', '#2C1B18'],
+    accessory: ['#00FFFF', '#FFFFFF', '#000000'],
+  },
+  // Fiery Passion — any warm skin, red/orange hair, amber eyes
+  {
+    skin: ['#FFDBB4', '#EDB98A', '#D08B5B', '#AE5D29', '#C68642', '#8D5524'],
+    hair: ['#C62828', '#F57F17'],
+    eyes: ['#B45309', '#D97706', '#92400E', '#78350F'],
+    bg: ['#1a1a2e', '#FF6B35', '#FF1493'],
+    shirt: ['#C62828', '#FF6B35', '#FFD700'],
+    accessory: ['#FF6B35', '#FFD700', '#FF1493'],
+  },
+  // Dark & Moody — deep skin, dark/purple hair, violet eyes
+  {
+    skin: ['#AE5D29', '#694D3D', '#8D5524', '#4A2912'],
+    hair: ['#2C1B18', '#4A3728', '#6A1B9A'],
+    eyes: ['#7C3AED', '#A855F7', '#4A6FA5'],
+    bg: ['#1a1a2e', '#8B5CF6'],
+    shirt: ['#8B5CF6', '#4A90D9', '#2C1B18', '#C62828'],
+    accessory: ['#8B5CF6', '#BFFF00', '#000000'],
+  },
+  // Candy Pop — light/pastel skin, vivid pink/purple/teal hair, bright eyes
+  {
+    skin: ['#FFDBB4', '#F8D5C2', '#FFE0BD', '#FFB6C1', '#E6E6FA'],
+    hair: ['#FF1493', '#6A1B9A', '#00897B', '#C62828'],
+    eyes: ['#3B82F6', '#7C3AED', '#059669', '#10B981'],
+    bg: ['#FF1493', '#BFFF00', '#8B5CF6', '#FFE135'],
+    shirt: ['#E85D9B', '#8B5CF6', '#FFD700', '#FF6B35'],
+    accessory: ['#FF1493', '#BFFF00', '#8B5CF6', '#FFFFFF'],
+  },
+  // Fantasy & Otherworldly — fantastical skin (blue/green/lavender/grey), mystical hair
+  {
+    skin: ['#87CEEB', '#98FB98', '#FFB6C1', '#E6E6FA', '#FFFACD', '#808080', '#A9A9A9'],
+    hair: ['#FFFFFF', '#C0C0C0', '#6A1B9A', '#00897B', '#FF1493', '#4A3728'],
+    eyes: ['#7C3AED', '#A855F7', '#059669', '#10B981', '#4A6FA5'],
+    bg: ['#8B5CF6', '#1a1a2e', '#00897B'],
+    shirt: ['#8B5CF6', '#00897B', '#E85D9B', '#4A90D9'],
+    accessory: ['#BFFF00', '#8B5CF6', '#FFFFFF', '#00FFFF'],
+  },
+  // Nature & Earthy — medium-to-dark skin, earthy/teal hair, green eyes
+  {
+    skin: ['#EDB98A', '#D08B5B', '#AE5D29', '#C68642', '#8D5524', '#694D3D'],
+    hair: ['#00897B', '#4A3728', '#2C1B18', '#8B6E4E'],
+    eyes: ['#059669', '#10B981', '#047857', '#92400E'],
+    bg: ['#00897B', '#1a1a2e'],
+    shirt: ['#00897B', '#4A90D9', '#C62828', '#FF6B35'],
+    accessory: ['#00FFFF', '#BFFF00', '#FFD700'],
+  },
+  // Neon Cyber — light/medium skin, high-contrast hair (white or black), vivid eyes + neon accents
+  {
+    skin: ['#FFDBB4', '#F8D5C2', '#EDB98A', '#D08B5B'],
+    hair: ['#FFFFFF', '#2C1B18', '#808080', '#C0C0C0'],
+    eyes: ['#059669', '#10B981', '#3B82F6', '#7C3AED'],
+    bg: ['#1a1a2e', '#BFFF00', '#FF1493', '#00FFFF'],
+    shirt: ['#2C1B18', '#8B5CF6', '#4A90D9', '#00897B'],
+    accessory: ['#BFFF00', '#00FFFF', '#FF1493', '#8B5CF6'],
+  },
+] as const;
+
+function buildConfig(
+  gender: (typeof AVATAR_GENDERS)[number],
+  vibe: AvatarVibe,
+  pick: <T>(arr: readonly T[]) => T,
+): CustomAvatarConfig {
+  const hairList = gender === 'female' ? FREE_FEMALE_HAIR_STYLES : FREE_MALE_HAIR_STYLES;
   return {
     gender,
     base: pick(FREE_BASES),
-    skinColor: pick(AVATAR_SKIN_COLORS),
-    hair: pick(FREE_HAIR_STYLES),
-    hairColor: pick(AVATAR_HAIR_COLORS),
+    skinColor: pick(vibe.skin),
+    hair: pick(hairList),
+    hairColor: pick(vibe.hair),
     eyes: pick(FREE_EYE_STYLES),
-    eyeColor: pick(AVATAR_EYE_COLORS),
+    eyeColor: pick(vibe.eyes),
     noseStyle: pick(AVATAR_NOSE_STYLES),
     eyebrows: pick(FREE_EYEBROW_STYLES),
     facialHair: gender === 'male' ? pick(FREE_FACIAL_HAIR_STYLES) : 'none',
     mouth: pick(FREE_MOUTH_STYLES),
     accessory: pick(FREE_ACCESSORIES),
-    accessoryColor: pick(AVATAR_ACCESSORY_COLORS),
-    bgColor: pick(AVATAR_BG_COLORS),
-    shirtColor: pick(AVATAR_SHIRT_COLORS),
+    accessoryColor: pick(vibe.accessory),
+    bgColor: pick(vibe.bg),
+    shirtColor: pick(vibe.shirt),
   };
+}
+
+export function getRandomAvatarConfig(): CustomAvatarConfig {
+  const pick = <T>(arr: readonly T[]): T => arr[Math.floor(Math.random() * arr.length)];
+  return buildConfig(pick(AVATAR_GENDERS), pick(AVATAR_VIBES), pick);
 }
 
 /**
@@ -451,24 +547,7 @@ export function getSeededAvatarConfig(seed: number): CustomAvatarConfig {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
   const pick = <T>(arr: readonly T[]): T => arr[Math.floor(rand() * arr.length)];
-  const gender = pick(AVATAR_GENDERS);
-  return {
-    gender,
-    base: pick(FREE_BASES),
-    skinColor: pick(AVATAR_SKIN_COLORS),
-    hair: pick(FREE_HAIR_STYLES),
-    hairColor: pick(AVATAR_HAIR_COLORS),
-    eyes: pick(FREE_EYE_STYLES),
-    eyeColor: pick(AVATAR_EYE_COLORS),
-    noseStyle: pick(AVATAR_NOSE_STYLES),
-    eyebrows: pick(FREE_EYEBROW_STYLES),
-    facialHair: gender === 'male' ? pick(FREE_FACIAL_HAIR_STYLES) : 'none',
-    mouth: pick(FREE_MOUTH_STYLES),
-    accessory: pick(FREE_ACCESSORIES),
-    accessoryColor: pick(AVATAR_ACCESSORY_COLORS),
-    bgColor: pick(AVATAR_BG_COLORS),
-    shirtColor: pick(AVATAR_SHIRT_COLORS),
-  };
+  return buildConfig(pick(AVATAR_GENDERS), pick(AVATAR_VIBES), pick);
 }
 
 /**

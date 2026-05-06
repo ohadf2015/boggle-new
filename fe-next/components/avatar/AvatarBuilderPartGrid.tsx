@@ -127,7 +127,7 @@ export default function PartPreviewGrid<T extends string>({
         variants={gridContainerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-3 sm:grid-cols-4 gap-2"
+        className="grid grid-cols-3 @[24rem]:grid-cols-4 @[36rem]:grid-cols-5 gap-2"
       >
         {sortedOptions.map(option => {
           const isPremium = isPremiumPart(cat, option);

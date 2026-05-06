@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Zap, Ghost, RefreshCw, HelpCircle, Sword, Bomb, Search, CircleDot, ChevronRight, Eye, Users } from 'lucide-react';
+import { ArrowLeft, RefreshCw, HelpCircle, Sword, Bomb, Search, CircleDot, ChevronRight, Eye, Users } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -21,6 +22,8 @@ const MultiplayerWelcomeCard = dynamic(() => import('@/components/multiplayer/Mu
 import { Loader } from '@/components/ui/Loader';
 import AvatarStack from '@/components/multiplayer/AvatarStack';
 import CrazyGamesFriendsStrip from '@/components/multiplayer/CrazyGamesFriendsStrip';
+import ArenaEmptyState from '@/components/multiplayer/ArenaEmptyState';
+import ArenaCTAStrip from '@/components/multiplayer/ArenaCTAStrip';
 import { shouldShowGuidance, markGuidanceShown } from '@/utils/contextualGuidanceStorage';
 
 // ==================== Animation Variants ====================
@@ -28,16 +31,6 @@ import { shouldShowGuidance, markGuidanceShown } from '@/utils/contextualGuidanc
 const headerVariants = {
   hidden: { opacity: 0, y: -20 },
   visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } },
-};
-
-const quickPlayVariants = {
-  hidden: { y: -15, opacity: 0, scale: 0.95 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    scale: 1,
-    transition: { type: 'spring' as const, stiffness: 300, damping: 22, delay: 0.1 },
-  },
 };
 
 const roomListVariants = {
@@ -61,15 +54,6 @@ const roomCardVariants = {
     scale: 0.95,
     x: -20,
     transition: { duration: 0.2 },
-  },
-};
-
-const emptyStateVariants = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { type: 'spring' as const, stiffness: 250, damping: 20, delay: 0.2 },
   },
 };
 
@@ -235,6 +219,33 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           </button>
         </motion.header>
 
+        {/* Hero banner — kawaii rivals + neon arena. Decorative; h1 in header
+            owns the localized title. Aspect-locked for layout stability (no CLS),
+            object-cover keeps focal point centered across viewports. */}
+        <motion.div
+          initial={hasMountedRef.current ? false : { opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: 'easeOut', delay: 0.05 }}
+          className="px-5 lg:px-6 pt-4 lg:pt-5"
+        >
+          <div className="relative w-full overflow-hidden rounded-2xl border-3 border-neo-black shadow-hard">
+            <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[64/15]">
+              <Image
+                src="/images/arena-hub-hero.jpg"
+                alt={t('multiplayerFlow.roomList.heroAlt')}
+                fill
+                priority
+                sizes="(min-width: 1024px) 1024px, 100vw"
+                className="object-cover object-[center_60%]"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-neo-navy via-neo-navy/40 to-transparent pointer-events-none"
+              />
+            </div>
+          </div>
+        </motion.div>
+
         {/* Scrollable Content. At lg+ split into a 2-column desktop layout
             (audit C1 Tier 3): left rail = welcome + actions + CG-friends,
             right pane = live-match status + open-arenas list. Mobile keeps
@@ -254,41 +265,12 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
           {/* Action Buttons — Quick Start + Create Room side by side */}
           {onQuickPlay && (
-            <motion.section
-              variants={quickPlayVariants}
-              initial={hasMountedRef.current ? false : "hidden"}
-              animate="visible"
-              className="flex flex-col sm:flex-row gap-2.5"
-            >
-              <motion.button
-                onClick={onQuickPlay}
-                disabled={isQuickPlayLoading}
-                className="flex-2 min-h-[52px] py-3 px-4 flex items-center justify-center gap-2.5 bg-neo-lime border-3 border-neo-black rounded-xl shadow-hard active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-70 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
-                whileHover={{ scale: 1.02, transition: { type: 'spring' as const, stiffness: 400, damping: 20 } }}
-                whileTap={{ scale: 0.97 }}
-              >
-                {isQuickPlayLoading ? (
-                  <Loader size="sm" />
-                ) : (
-                  <Zap className="w-5 h-5 text-neo-black shrink-0" />
-                )}
-                <span className="text-neo-black font-black text-base sm:text-lg uppercase tracking-tight">
-                  {t('multiplayerFlow.roomList.quickStart')}
-                </span>
-              </motion.button>
-
-              <motion.button
-                onClick={onCreateRoom}
-                whileHover={{ scale: 1.02, transition: { type: 'spring' as const, stiffness: 400, damping: 20 } }}
-                whileTap={{ scale: 0.97 }}
-                className="flex-1 min-h-[48px] py-3 px-4 flex items-center justify-center gap-2 bg-neo-navy-light border-3 border-neo-pink/60 rounded-xl shadow-hard-sm hover:border-neo-pink active:translate-y-0.5 active:shadow-hard-pressed transition-all focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
-              >
-                <Users className="w-4 h-4 text-neo-pink shrink-0" />
-                <span className="text-neo-pink font-black text-sm uppercase tracking-wide whitespace-nowrap">
-                  {t('multiplayerFlow.roomList.createPrivateBattle')}
-                </span>
-              </motion.button>
-            </motion.section>
+            <ArenaCTAStrip
+              onQuickPlay={onQuickPlay}
+              onCreateRoom={onCreateRoom}
+              isQuickPlayLoading={isQuickPlayLoading}
+              skipEnterAnimation={hasMountedRef.current}
+            />
           )}
 
           {/* CrazyGames Friends — only shown on platform */}
@@ -486,26 +468,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 </AnimatePresence>
               </motion.div>
             ) : (
-              /* Empty State */
-              <motion.div
-                variants={emptyStateVariants}
-                initial="hidden"
-                animate="visible"
-                className="bg-neo-navy-light/30 border-2 border-dashed border-white/10 rounded-2xl p-8 flex flex-col items-center text-center"
-              >
-                <motion.div
-                  animate={{ y: [0, -6, 0] }}
-                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' as const }}
-                >
-                  <Ghost className="w-12 h-12 text-white/30 mb-2" />
-                </motion.div>
-                <h3 className="text-white/50 font-black text-sm uppercase tracking-widest">
-                  {t('multiplayerFlow.roomList.noRoomsYet')}
-                </h3>
-                <p className="text-white/30 text-xs mt-1.5 font-bold max-w-[240px]">
-                  {t('multiplayerFlow.roomList.beTheLegend')}
-                </p>
-              </motion.div>
+              <ArenaEmptyState onQuickPlay={onQuickPlay} isQuickPlayLoading={isQuickPlayLoading} />
             )}
           </motion.section>
           </div>

@@ -178,7 +178,7 @@ export default function AvatarBuilderModal({
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="bg-neo-navy border-3 border-black shadow-hard-lg rounded-neo-lg w-full max-w-[95vw] sm:max-w-lg max-h-full flex flex-col min-h-0"
+        className="bg-neo-navy border-3 border-black shadow-hard-lg rounded-neo-lg w-full max-w-[95vw] sm:max-w-xl md:max-w-2xl max-h-full flex flex-col min-h-0 [container-type:inline-size]"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
       >
         {/* Header */}
@@ -206,30 +206,40 @@ export default function AvatarBuilderModal({
             initial={{ scaleX: 1.06, scaleY: 0.94, rotate: -1.5 }}
             animate={{ scaleX: 1, scaleY: 1, rotate: 0 }}
             transition={JELLY_SPRING}
-            className="border-3 border-black shadow-hard rounded-neo-lg overflow-hidden cursor-pointer w-[88px] h-[88px] sm:w-[120px] sm:h-[120px] desktop-tall:sm:w-[160px] desktop-tall:sm:h-[160px]"
+            className="border-3 border-black shadow-hard rounded-neo-lg overflow-hidden cursor-pointer w-[88px] h-[88px] @[24rem]:w-[112px] @[24rem]:h-[112px] @[32rem]:w-[140px] @[32rem]:h-[140px] desktop-tall:@[32rem]:w-[160px] desktop-tall:@[32rem]:h-[160px]"
           >
             <AvatarRenderer config={config} size={160} className="w-full h-full" />
           </AdaptiveMotion.div>
         </div>
 
-        {/* Category Tabs with icons + spring bounce */}
-        <div className="flex px-3 sm:px-4 gap-0.5">
-          {ALL_CATEGORIES.filter(c => !c.maleOnly || config.gender === 'male').map(cat => (
-            <AdaptiveMotion.button
-              key={cat.key}
-              onClick={() => setActiveCategory(cat.key)}
-              whileTap={{ scale: 0.92 }}
-              transition={BUTTON_SPRING}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs sm:text-sm font-bold rounded-neo whitespace-nowrap border-2 transition-colors ${
-                activeCategory === cat.key
-                  ? 'bg-neo-lime text-neo-black border-black shadow-hard-sm'
-                  : 'bg-neo-navy-light text-neo-white/70 border-transparent hover:border-neo-white/30 hover:bg-neo-navy-light/80'
-              }`}
-            >
-              <CategoryIcon category={cat.key} />
-              <span className="hidden sm:inline">{t(cat.labelKey)}</span>
-            </AdaptiveMotion.button>
-          ))}
+        {/* Category Tabs — scroll-snap row, icon-only on narrow, icon+label when room */}
+        <div
+          className="flex gap-1 overflow-x-auto px-3 sm:px-4 py-1 scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          role="tablist"
+          aria-label={t('avatarBuilder.title')}
+        >
+          {ALL_CATEGORIES.filter(c => !c.maleOnly || config.gender === 'male').map(cat => {
+            const isActive = activeCategory === cat.key;
+            return (
+              <AdaptiveMotion.button
+                key={cat.key}
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setActiveCategory(cat.key)}
+                whileTap={{ scale: 0.92 }}
+                transition={BUTTON_SPRING}
+                className={`shrink-0 snap-start min-h-[40px] flex items-center justify-center gap-1.5 px-2.5 @[24rem]:px-3 py-2 text-xs @[28rem]:text-sm font-bold rounded-neo whitespace-nowrap border-2 transition-colors ${
+                  isActive
+                    ? 'bg-neo-lime text-neo-black border-black shadow-hard-sm'
+                    : 'bg-neo-navy-light text-neo-white/70 border-transparent hover:border-neo-white/30 hover:bg-neo-navy-light/80'
+                }`}
+                title={t(cat.labelKey)}
+              >
+                <CategoryIcon category={cat.key} />
+                <span className="hidden @[28rem]:inline">{t(cat.labelKey)}</span>
+              </AdaptiveMotion.button>
+            );
+          })}
         </div>
 
         {/* Options Grid — animated category transition */}
@@ -254,15 +264,16 @@ export default function AvatarBuilderModal({
           </AdaptiveAnimatePresence>
         </div>
 
-        {/* Actions — spring bounce buttons */}
-        <div className="flex flex-wrap gap-2 p-3 sm:p-4 border-t-3 border-black shrink-0 bg-neo-navy">
+        {/* Actions — single row, secondary icon-only on narrow */}
+        <div className="flex items-center gap-1.5 sm:gap-2 p-3 sm:p-4 border-t-3 border-black shrink-0 bg-neo-navy">
           <AdaptiveMotion.button
             onClick={handleRandomize}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.92 }}
             transition={BUTTON_SPRING}
-            className="flex items-center gap-1.5 px-3 py-2 bg-neo-purple text-neo-white font-bold rounded-neo border-2 border-black shadow-hard-sm transition-shadow"
+            className="inline-flex items-center gap-1.5 px-2.5 @[24rem]:px-3 py-2 bg-neo-purple text-neo-white font-bold rounded-neo border-2 border-black shadow-hard-sm transition-shadow shrink-0"
             title={t('avatarBuilder.randomize')}
+            aria-label={t('avatarBuilder.randomize')}
           >
             <AdaptiveMotion.span
               key={previewKey}
@@ -273,15 +284,16 @@ export default function AvatarBuilderModal({
             >
               <Shuffle size={16} />
             </AdaptiveMotion.span>
-            <span className="hidden xs:inline">{t('avatarBuilder.randomize')}</span>
+            <span className="hidden @[26rem]:inline text-sm">{t('avatarBuilder.randomize')}</span>
           </AdaptiveMotion.button>
           <AdaptiveMotion.button
             onClick={handleUndo}
             whileTap={{ scale: 0.88, rotate: -20 }}
             transition={BUTTON_SPRING}
             disabled={historyRef.current.length === 0}
-            className="flex items-center gap-1.5 px-3 py-2 bg-neo-navy-light text-neo-white/70 font-bold rounded-neo border-2 border-neo-white/20 hover:border-neo-white/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            className="inline-flex items-center justify-center w-9 h-9 bg-neo-navy-light text-neo-white/70 rounded-neo border-2 border-neo-white/20 hover:border-neo-white/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all shrink-0"
             title={t('avatarBuilder.undo')}
+            aria-label={t('avatarBuilder.undo')}
           >
             <Undo2 size={16} />
           </AdaptiveMotion.button>
@@ -289,15 +301,16 @@ export default function AvatarBuilderModal({
             onClick={handleDownload}
             whileTap={{ scale: 0.88 }}
             transition={BUTTON_SPRING}
-            className="flex items-center gap-1.5 px-3 py-2 bg-neo-navy-light text-neo-white/70 font-bold rounded-neo border-2 border-neo-white/20 hover:border-neo-white/50 transition-all"
+            className="inline-flex items-center justify-center w-9 h-9 bg-neo-navy-light text-neo-white/70 rounded-neo border-2 border-neo-white/20 hover:border-neo-white/50 transition-all shrink-0"
             title={t('avatarBuilder.download') || 'Download'}
+            aria-label={t('avatarBuilder.download') || 'Download'}
           >
             <Download size={16} />
           </AdaptiveMotion.button>
-          <div className="flex-1" />
+          <div className="flex-1 min-w-0" />
           <button
             onClick={onClose}
-            className="px-4 py-2 text-neo-white/70 font-bold hover:text-neo-white transition-colors"
+            className="px-3 @[24rem]:px-4 py-2 text-sm text-neo-white/70 font-bold hover:text-neo-white transition-colors shrink-0"
           >
             {t('avatarBuilder.cancel')}
           </button>
@@ -306,7 +319,7 @@ export default function AvatarBuilderModal({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.92 }}
             transition={BUTTON_SPRING}
-            className="px-6 py-2 bg-neo-lime text-neo-black font-bold rounded-neo border-2 border-black shadow-hard-sm transition-shadow"
+            className="px-4 @[24rem]:px-6 py-2 bg-neo-lime text-neo-black font-bold rounded-neo border-2 border-black shadow-hard-sm transition-shadow shrink-0"
           >
             {t('avatarBuilder.save')}
           </AdaptiveMotion.button>

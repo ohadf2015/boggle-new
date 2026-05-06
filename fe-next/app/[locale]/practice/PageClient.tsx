@@ -117,9 +117,10 @@ export default function PracticeHubClient({ locale }: Props) {
           <PracticeStreakChip />
         </div>
 
-        {/* Hub CTAs: Quick Start (jump straight into next mode play) +
-            Skip All (mark all complete + go home). Visible always so the user
-            can opt out of the tutorial flow at any time. */}
+        {/* Hub CTAs: Start Practice (jump straight into next mode play) +
+            Skip Practice (mark all complete + go home / real game). Both are
+            visually prominent so the user can opt out of the tutorial flow
+            at any time without hunting for an exit. */}
         <div
           data-testid="practice-hub-ctas"
           className="mb-5 flex flex-col gap-2"
@@ -137,9 +138,9 @@ export default function PracticeHubClient({ locale }: Props) {
             type="button"
             data-testid="practice-hub-skip-all"
             onClick={handleSkipAll}
-            className="flex items-center justify-center gap-2 w-full bg-transparent text-neo-cream/80 border-2 border-neo-cream/40 rounded-neo py-2 px-4 font-neo-display font-bold text-sm hover:border-neo-cream/70 active:translate-y-px"
+            className="flex items-center justify-center gap-2 w-full bg-neo-pink text-neo-cream border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:translate-y-px active:shadow-hard-pressed"
           >
-            <FastForward className="w-4 h-4" aria-hidden />
+            <FastForward className="w-5 h-5" aria-hidden />
             <span>{t('practiceHub.skipAllCta')}</span>
           </button>
         </div>

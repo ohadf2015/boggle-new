@@ -81,4 +81,24 @@ describe('PracticeWordHuntSandbox redesigned', () => {
     fireEvent.click(btn);
     await waitFor(() => expect(validatorCheck).toHaveBeenCalledWith('NIT'));
   });
+
+  it('renders an always-visible bailout CTA pointing at the live mode (regression: was previously hidden after solve)', async () => {
+    render(<PracticeWordHuntSandbox />);
+
+    // Pre-solve: bailout visible.
+    const cta = screen.getByTestId('practice-bailout-cta');
+    expect(cta).toBeInTheDocument();
+    expect(cta.getAttribute('href')).toBe('/en/daily/word-hunt');
+
+    // Solve the target — STAR is the EN sandbox target.
+    const btn = screen.getByTestId('stub-submit-word');
+    btn.setAttribute('data-word', 'STAR');
+    fireEvent.click(btn);
+
+    // Post-solve: bailout STILL visible (the bug was that this disappeared,
+    // leaving the player without an obvious way to leave practice).
+    await waitFor(() => {
+      expect(screen.getByTestId('practice-bailout-cta')).toBeInTheDocument();
+    });
+  });
 });

@@ -59,9 +59,10 @@ describe('PracticeHubClient quick-start + skip CTAs', () => {
     expect(quick.className).toMatch(/border-3/);
   });
 
-  it('Skip All button is the secondary CTA (transparent, dimmed text)', () => {
+  it('Skip All button is a prominent CTA (pink fill, neo border) so users always have a clear exit', () => {
     wrap(<PracticeHubClient locale="en" />);
     const skip = screen.getByTestId('practice-hub-skip-all');
-    expect(skip.className).toMatch(/bg-transparent/);
+    expect(skip.className).toMatch(/bg-neo-pink/);
+    expect(skip.className).toMatch(/border-3/);
   });
 });

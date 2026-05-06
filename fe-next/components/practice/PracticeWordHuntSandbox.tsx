@@ -415,20 +415,18 @@ export default function PracticeWordHuntSandbox() {
         )}
       </div>
 
-      {/* Bail-out CTA — pinned bottom (only when unsolved; solved state
-          uses the celebration popup instead so the chain CTA is overlaid
-          and never below the fold). */}
-      {!solved && (
-        <div className="mt-auto w-full">
-          <Link
-            href={liveHref}
-            data-testid="practice-bailout-cta"
-            className="inline-flex items-center justify-center w-full bg-neo-pink text-neo-cream border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px]"
-          >
-            {t('practice.wordHunt.bailoutCta')}
-          </Link>
-        </div>
-      )}
+      {/* Bail-out CTA — pinned bottom, ALWAYS visible. Players must always
+          have a one-tap escape to the real game, even after solving (the
+          celebration popup is a chain CTA, not the only forward path). */}
+      <div className="mt-auto w-full">
+        <Link
+          href={liveHref}
+          data-testid="practice-bailout-cta"
+          className="inline-flex items-center justify-center w-full bg-neo-pink text-neo-cream border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px]"
+        >
+          {t(solved ? 'practice.wordHunt.playRealCta' : 'practice.wordHunt.bailoutCta')}
+        </Link>
+      </div>
 
       <PracticeCompletePopup
         open={solved && !popupDismissed}

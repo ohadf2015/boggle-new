@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { Check, RotateCcw, Shuffle } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -592,6 +593,18 @@ export default function PracticeWheelSandbox() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Always-visible bailout — players must always have a one-tap escape
+          to the real game, regardless of practice progress. */}
+      <div className="mt-auto w-full">
+        <Link
+          href={`/${language}/daily/word-wheel`}
+          data-testid="practice-bailout-cta"
+          className="inline-flex items-center justify-center w-full bg-neo-pink text-neo-cream border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px]"
+        >
+          {t(isComplete ? 'practice.wordHunt.playRealCta' : 'practice.wordHunt.bailoutCta')}
+        </Link>
+      </div>
 
       <PracticeCompletePopup
         open={isComplete && !popupDismissed}

@@ -81,4 +81,21 @@ describe('PracticeCompletePopup', () => {
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveAttribute('aria-modal', 'true');
   });
+
+  it('exposes a "play real now" link to the matching live mode per practice mode', () => {
+    const { rerender } = render(<PracticeCompletePopup open mode="classic" />);
+    const classicLink = screen.getByTestId('practice-complete-popup-play-real');
+    expect(classicLink).toBeInTheDocument();
+    expect(classicLink.getAttribute('href')).toBe('/en/singleplayer');
+
+    rerender(<PracticeCompletePopup open mode="wordHunt" />);
+    expect(screen.getByTestId('practice-complete-popup-play-real').getAttribute('href')).toBe(
+      '/en/daily/word-hunt',
+    );
+
+    rerender(<PracticeCompletePopup open mode="wheelRush" />);
+    expect(screen.getByTestId('practice-complete-popup-play-real').getAttribute('href')).toBe(
+      '/en/daily/word-wheel',
+    );
+  });
 });

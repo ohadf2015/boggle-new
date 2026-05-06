@@ -84,24 +84,24 @@ export interface GenderToggleProps {
 
 export function GenderToggle({ selected, onSelect, t }: GenderToggleProps) {
   return (
-    <div>
-      <p className="text-neo-white/60 text-xs font-bold uppercase mb-2">{t('avatarBuilder.gender')}</p>
-      <div className="flex gap-2">
+    <div className="flex items-center gap-2 flex-wrap">
+      <p className="text-neo-white/60 text-[11px] font-bold uppercase tracking-wide shrink-0">{t('avatarBuilder.gender')}</p>
+      <div className="inline-flex gap-1 p-1 rounded-neo bg-neo-navy-light/60 border border-neo-white/10">
         {AVATAR_GENDERS.map(gender => (
           <AdaptiveMotion.button
             key={gender}
             onClick={() => onSelect(gender)}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.92 }}
             transition={BUTTON_SPRING}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 font-bold rounded-neo border-2 transition-colors ${
+            className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-[6px] transition-colors ${
               selected === gender
-                ? 'bg-neo-lime/15 border-neo-lime shadow-hard-sm text-neo-lime'
-                : 'bg-neo-navy-light border-neo-white/15 hover:border-neo-white/40 text-neo-white/70'
+                ? 'bg-neo-lime text-neo-black shadow-hard-sm'
+                : 'text-neo-white/70 hover:text-neo-white'
             }`}
           >
-            <span className="text-lg">{gender === 'male' ? '\u2642' : '\u2640'}</span>
-            <span className="text-sm">{t(`avatarBuilder.${gender}`)}</span>
+            <span className="text-base leading-none">{gender === 'male' ? '\u2642' : '\u2640'}</span>
+            <span>{t(`avatarBuilder.${gender}`)}</span>
           </AdaptiveMotion.button>
         ))}
       </div>

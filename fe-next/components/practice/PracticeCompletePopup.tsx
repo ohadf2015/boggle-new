@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect } from 'react';
+import Link from 'next/link';
 import { X } from 'lucide-react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -58,8 +59,16 @@ interface Props {
  * same spring entrance, same neo-brutalist mode-accent color) for coherent
  * popup chrome across the practice surface.
  */
+// Per-mode real-game destination — the "play real now" escape hatch routes
+// the player to the live mode that mirrors what they just practiced.
+const REAL_GAME_HREF: Record<PracticeMode, (locale: string) => string> = {
+  classic: (l) => `/${l}/singleplayer`,
+  wordHunt: (l) => `/${l}/daily/word-hunt`,
+  wheelRush: (l) => `/${l}/daily/word-wheel`,
+};
+
 export default function PracticeCompletePopup({ open, mode, onDismiss }: Props) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { playButtonClickSound } = useSoundEffects();
 
   // Light haptic on first open — celebration handshake.
@@ -164,6 +173,25 @@ export default function PracticeCompletePopup({ open, mode, onDismiss }: Props) 
                   currentMode={mode}
                   className={`relative inline-flex items-center justify-center w-full ${CTA_BG[mode]} ${CTA_TEXT[mode]} border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:translate-y-px active:shadow-hard-pressed`}
                 />
+              </AdaptiveMotion.div>
+              {/* "Play real now" — secondary escape hatch so the player who
+                  just nailed a practice mode can jump straight into the real
+                  thing instead of being chained through more practice. */}
+              <AdaptiveMotion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.26, duration: 0.22, ease: 'easeOut' }}
+              >
+                <Link
+                  href={REAL_GAME_HREF[mode](language)}
+                  data-testid="practice-complete-popup-play-real"
+                  onClick={() => {
+                    haptics.tap();
+                  }}
+                  className="inline-flex items-center justify-center w-full bg-neo-pink text-neo-cream border-3 border-neo-black rounded-neo py-2.5 px-4 font-neo-display font-black text-sm shadow-hard active:translate-y-px active:shadow-hard-pressed"
+                >
+                  {t('practice.wordHunt.playRealCta')}
+                </Link>
               </AdaptiveMotion.div>
               {onDismiss && (
                 <AdaptiveMotion.button

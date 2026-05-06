@@ -12,6 +12,8 @@ import {
   getPartPrice,
   PREMIUM_PART_PRICES,
   EPIC_PART_PRICES,
+  FEMALE_HAIR_STYLES,
+  MALE_HAIR_STYLES,
 } from '../customAvatar';
 
 describe('customAvatarSchema', () => {
@@ -397,6 +399,24 @@ describe('Premium Parts', () => {
         expect(isPremiumPart('mouth', config.mouth)).toBe(false);
         expect(isPremiumPart('accessory', config.accessory)).toBe(false);
         expect(isPremiumPart('hair', config.hair)).toBe(false);
+      }
+    });
+  });
+
+  describe('random avatars use gender-appropriate hair', () => {
+    test('getRandomAvatarConfig returns hair valid for the generated gender', () => {
+      for (let i = 0; i < 500; i++) {
+        const config = getRandomAvatarConfig();
+        const validList: readonly string[] = config.gender === 'female' ? FEMALE_HAIR_STYLES : MALE_HAIR_STYLES;
+        expect(validList).toContain(config.hair);
+      }
+    });
+
+    test('getSeededAvatarConfig returns hair valid for the generated gender', () => {
+      for (let seed = 0; seed < 500; seed++) {
+        const config = getSeededAvatarConfig(seed);
+        const validList: readonly string[] = config.gender === 'female' ? FEMALE_HAIR_STYLES : MALE_HAIR_STYLES;
+        expect(validList).toContain(config.hair);
       }
     });
   });

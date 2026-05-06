@@ -4,7 +4,7 @@
  */
 import { Socket } from 'socket.io-client';
 import { fireGameOverConfetti, fireConfetti, DEFAULT_COLORS } from '../../utils/confettiUtils';
-import { neoSuccessToast, neoErrorToast } from '../../components/NeoToast';
+import { neoErrorToast } from '../../components/NeoToast';
 import { clearSessionPreservingUsername } from '../../utils/session';
 import logger from '@/utils/logger';
 
@@ -153,10 +153,6 @@ export function triggerTournamentCompleteCelebration(): void {
 /**
  * Show game complete toast with confetti
  */
-export function showGameCompleteToast(t: (key: string) => string): void {
+export function showGameCompleteToast(_t: (key: string) => string): void {
   triggerGameOverCelebration();
-  neoSuccessToast(t('hostView.gameComplete') || 'Game complete!', {
-    icon: '🎉',
-    duration: 3000,
-  });
 }
