@@ -79,13 +79,6 @@ describe('useExperiment', () => {
   });
 
   describe('email overrides', () => {
-    it('forces the override variant when authed email matches the registry allowlist', () => {
-      mockFlagValue.mockImplementation((_key, fallback) => fallback); // posthog returns control
-      mockUseAuth.mockReturnValue({ user: { email: 'ohadf2015@gmail.com' } });
-      const { result } = renderHook(() => useExperiment('blast.candy-shell.enabled'));
-      expect(result.current.variant).toBe('candy');
-    });
-
     it('still uses the live posthog variant when authed email is not on the allowlist', () => {
       mockFlagValue.mockReturnValue('candy'); // hypothetical PostHog rollout
       mockUseAuth.mockReturnValue({ user: { email: 'random@x.com' } });
@@ -98,17 +91,6 @@ describe('useExperiment', () => {
       mockUseAuth.mockReturnValue({ user: null });
       const { result } = renderHook(() => useExperiment('blast.candy-shell.enabled'));
       expect(result.current.variant).toBe('control');
-    });
-
-    it('fires experiment_exposed for the override variant (since it differs from default)', () => {
-      mockFlagValue.mockImplementation((_key, fallback) => fallback);
-      mockUseAuth.mockReturnValue({ user: { email: 'ohadf2015@gmail.com' } });
-      const { result } = renderHook(() => useExperiment('blast.candy-shell.enabled'));
-      result.current.trackExposure();
-      expect(mockCapture).toHaveBeenCalledWith('experiment_exposed', {
-        experiment: 'blast.candy-shell.enabled',
-        variant: 'candy',
-      });
     });
   });
 

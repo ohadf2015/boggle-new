@@ -87,12 +87,8 @@ describe('experiments registry', () => {
       expect(experimentEmailOverride('blast.candy-shell.enabled', undefined)).toBeNull();
     });
 
-    it('matches email case-insensitively', () => {
-      expect(experimentEmailOverride('blast.candy-shell.enabled', 'OHADF2015@GMAIL.COM')).toBe('candy');
-    });
-
-    it('forces blast.candy-shell.enabled = candy for ohadf2015@gmail.com', () => {
-      expect(experimentEmailOverride('blast.candy-shell.enabled', 'ohadf2015@gmail.com')).toBe('candy');
+    it('returns null when allowlist is empty (post-revert)', () => {
+      expect(experimentEmailOverride('blast.candy-shell.enabled', 'ohadf2015@gmail.com')).toBeNull();
     });
   });
 
@@ -105,9 +101,9 @@ describe('experiments registry', () => {
       expect(EXPERIMENTS['blast.candy-shell.enabled'].default).toBe('control');
     });
 
-    it('lists ohadf2015@gmail.com on the email override allowlist', () => {
+    it('has an empty email override allowlist (post-revert)', () => {
       const cfg = EXPERIMENTS['blast.candy-shell.enabled'];
-      expect(cfg.forceVariantByEmail?.['ohadf2015@gmail.com']).toBe('candy');
+      expect(cfg.forceVariantByEmail).toEqual({});
     });
   });
 
