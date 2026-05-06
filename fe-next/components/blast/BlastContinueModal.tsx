@@ -3,8 +3,6 @@
 import { Play, X, Heart } from 'lucide-react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
-import { useExperiment } from '@/hooks/useExperiment';
-import { BlastModalShell } from './BlastModalShell';
 
 interface BlastContinueModalProps {
   isOpen: boolean;
@@ -17,8 +15,6 @@ interface BlastContinueModalProps {
 export function BlastContinueModal({
   isOpen, bonusMoves, onContinue, onDecline, t,
 }: BlastContinueModalProps) {
-  const { variant } = useExperiment('blast.candy-shell.enabled');
-  const candyOn = variant === 'candy';
   const { offer, canShowAd } = useRewardedFeatureUnlock({
     placement: 'blast_wave_continue',
     surface: 'retry',
@@ -29,31 +25,6 @@ export function BlastContinueModal({
 
   if (!isOpen) return null;
 
-  if (candyOn) {
-    return (
-      <BlastModalShell
-        isOpen={isOpen}
-        accent="lime"
-        Icon={Heart}
-        title={t('blast.continueModal.title')}
-        body={t('blast.continueModal.body')}
-        cta={canShowAd ? (
-          <button data-testid="blast-continue-cta" onClick={offer}>
-            <Play className="h-5 w-5 inline mr-2" strokeWidth={3} />
-            {t('blast.continueModal.cta', { moves: bonusMoves })}
-          </button>
-        ) : null}
-        decline={
-          <button data-testid="blast-continue-decline" onClick={onDecline}>
-            {t('blast.continueModal.decline')}
-          </button>
-        }
-        testId="blast-continue-modal"
-      />
-    );
-  }
-
-  // Legacy control variant — preserved verbatim.
   return (
     <AdaptiveAnimatePresence>
       <AdaptiveMotion.div

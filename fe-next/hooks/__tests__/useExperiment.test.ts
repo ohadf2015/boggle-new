@@ -80,16 +80,16 @@ describe('useExperiment', () => {
 
   describe('email overrides', () => {
     it('still uses the live posthog variant when authed email is not on the allowlist', () => {
-      mockFlagValue.mockReturnValue('candy'); // hypothetical PostHog rollout
+      mockFlagValue.mockReturnValue('value-prop');
       mockUseAuth.mockReturnValue({ user: { email: 'random@x.com' } });
-      const { result } = renderHook(() => useExperiment('blast.candy-shell.enabled'));
-      expect(result.current.variant).toBe('candy');
+      const { result } = renderHook(() => useExperiment('signup-prompt-cta-copy'));
+      expect(result.current.variant).toBe('value-prop');
     });
 
     it('falls back to default when no email is authed and posthog has not assigned', () => {
       mockFlagValue.mockImplementation((_key, fallback) => fallback);
       mockUseAuth.mockReturnValue({ user: null });
-      const { result } = renderHook(() => useExperiment('blast.candy-shell.enabled'));
+      const { result } = renderHook(() => useExperiment('signup-prompt-cta-copy'));
       expect(result.current.variant).toBe('control');
     });
   });

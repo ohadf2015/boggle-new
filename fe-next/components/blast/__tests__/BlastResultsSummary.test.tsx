@@ -84,20 +84,29 @@ describe('BlastResultsSummary', () => {
     expect(screen.getByTestId('blast-results-score-card').textContent).toContain('2');
   });
 
-  it('renders the insight ribbon (replaces the legacy brag card)', () => {
-    // BlastBragCard was removed in favor of BlastInsightRibbon — single
-    // hero headline picked from results data. Still hides on fail; this
-    // assertion uses a passing run so the ribbon is mounted.
-    render(
+  it('hides the brag card until backend percentile resolves', () => {
+    const { rerender } = render(
       <BlastResultsSummary
-        results={makeResults({ percentile: 88, clearPercentage: 95 })}
+        results={makeResults({ percentile: undefined })}
         t={t}
         onPlayAgain={noop}
         onQuit={noop}
       />,
     );
+    // Card is now the BragCard — keyed off percentile availability.
     expect(screen.queryByTestId('blast-brag-card')).toBeNull();
-    expect(screen.getByTestId('blast-insight-ribbon')).toBeInTheDocument();
+
+    rerender(
+      <BlastResultsSummary
+        results={makeResults({ percentile: 88 })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    const card = screen.getByTestId('blast-brag-card');
+    // Interpolated "beats {pct}" line carries the raw percentile value.
+    expect(card.textContent).toContain('88');
   });
 
   it('shows PB delta + new-record ribbon only when previous best beaten', () => {

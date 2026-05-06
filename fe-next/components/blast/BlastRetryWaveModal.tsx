@@ -3,8 +3,6 @@
 import { Play, RotateCcw, Trophy } from 'lucide-react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
-import { useExperiment } from '@/hooks/useExperiment';
-import { BlastModalShell } from './BlastModalShell';
 
 interface BlastRetryWaveModalProps {
   isOpen: boolean;
@@ -26,8 +24,6 @@ interface BlastRetryWaveModalProps {
 export function BlastRetryWaveModal({
   isOpen, waveNumber, clearPct, onRetry, onDecline, t,
 }: BlastRetryWaveModalProps) {
-  const { variant } = useExperiment('blast.candy-shell.enabled');
-  const candyOn = variant === 'candy';
   const { offer, canShowAd } = useRewardedFeatureUnlock({
     placement: 'blast_wave_retry',
     surface: 'retry',
@@ -38,31 +34,6 @@ export function BlastRetryWaveModal({
 
   if (!isOpen) return null;
 
-  if (candyOn) {
-    return (
-      <BlastModalShell
-        isOpen={isOpen}
-        accent="cyan"
-        Icon={Trophy}
-        title={t('blast.retryWaveModal.title', { wave: waveNumber })}
-        body={t('blast.retryWaveModal.body', { wave: waveNumber, percent: Math.round(clearPct) })}
-        cta={canShowAd ? (
-          <button data-testid="blast-retry-wave-cta" onClick={offer}>
-            <Play className="h-5 w-5 inline mr-2" strokeWidth={3} />
-            {t('blast.retryWaveModal.cta', { wave: waveNumber })}
-          </button>
-        ) : null}
-        decline={
-          <button data-testid="blast-retry-wave-decline" onClick={onDecline}>
-            {t('blast.retryWaveModal.decline')}
-          </button>
-        }
-        testId="blast-retry-wave-modal"
-      />
-    );
-  }
-
-  // Legacy control variant — preserved verbatim.
   return (
     <AdaptiveAnimatePresence>
       <AdaptiveMotion.div

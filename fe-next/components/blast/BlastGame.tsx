@@ -12,7 +12,6 @@ import { useWordSubmission } from '@/components/singleplayer/game/hooks/useWordS
 import { useSpamDetection } from '@/components/singleplayer/game/hooks/useSpamDetection';
 import { useBlastEngine } from './hooks/useBlastEngine';
 import { useBlastObjectives } from './hooks/useBlastObjectives';
-import { useBlastPathRoute } from './hooks/useBlastPathRoute';
 import { useBlastHint } from './hooks/useBlastHint';
 import { pickHintTarget } from './utils/blastHintPicker';
 import { BlastHintButton } from './BlastHintButton';
@@ -383,50 +382,6 @@ export function BlastGame({
     }
   }, [waveNumber, waveObjectives]);
 
-  // Goal Gallery: materialize path_route start/end against the actual grid
-  // (seeder is grid-agnostic) + watch every word submission for route hits.
-  // SP-only — multiplayer uses server-authoritative objectives.
-  const { resolvedObjectives } = useBlastPathRoute({
-    objectives: validatedObjectives,
-    grid: engine.grid,
-    checkWord,
-    gameState: engine.gameState,
-    setRouteCompleted: engine.setRouteCompleted,
-    setSniperHit: engine.setSniperHit,
-    waveNumber,
-    enabled: !isMultiplayer && isDictionaryReady,
-  });
-
-  // Goal Gallery — fire a Pixi shockwave at the satisfying cell whenever
-  // routeCompleted or sniperHit *transitions* false→true. Nonce keys each
-  // emission so the effects canvas re-triggers reliably.
-  const [goalHit, setGoalHit] = useState<
-    { row: number; col: number; kind: 'route' | 'sniper'; nonce: number } | null
-  >(null);
-  const prevRouteRef = useRef(false);
-  const prevSniperRef = useRef(false);
-  const goalNonceRef = useRef(0);
-  useEffect(() => {
-    const r = !!engine.gameState.routeCompleted;
-    if (r && !prevRouteRef.current) {
-      const obj = resolvedObjectives.find(o => o.type === 'path_route');
-      if (obj?.endCell) {
-        goalNonceRef.current += 1;
-        setGoalHit({ row: obj.endCell.row, col: obj.endCell.col, kind: 'route', nonce: goalNonceRef.current });
-      }
-    }
-    prevRouteRef.current = r;
-    const s = !!engine.gameState.sniperHit;
-    if (s && !prevSniperRef.current) {
-      const obj = resolvedObjectives.find(o => o.type === 'tile_sniper');
-      if (obj?.targetCell) {
-        goalNonceRef.current += 1;
-        setGoalHit({ row: obj.targetCell.row, col: obj.targetCell.col, kind: 'sniper', nonce: goalNonceRef.current });
-      }
-    }
-    prevSniperRef.current = s;
-  }, [engine.gameState.routeCompleted, engine.gameState.sniperHit, resolvedObjectives]);
-
   // Objective tracking — pass the (validated, language-aware) objectives so
   // the banner reads the same target_word/color_power that the engine baked
   // into the board. Recomputing from waveNumber would default the language
@@ -434,7 +389,7 @@ export function BlastGame({
   const objectives = useBlastObjectives({
     gameState: engine.gameState,
     tileTypeClears: engine.gameState.tileTypeClears,
-    objectives: resolvedObjectives,
+    objectives: validatedObjectives,
     wordsFound: engine.gameState.wordsFound,
     initialTileTypeCounts,
   });
@@ -663,24 +618,6 @@ export function BlastGame({
         buffConsumed={initialBuff === 'shield' ? shieldConsumed : false}
         objectiveProgress={objectives.objectiveProgress}
         ddaBoostActive={!isMultiplayer && engine.ddaBoostActive}
-        pathRoute={(() => {
-          const r = resolvedObjectives.find(o => o.type === 'path_route' && o.startCell && o.endCell);
-          if (!r || !r.startCell || !r.endCell) return null;
-          return {
-            startCell: r.startCell,
-            endCell: r.endCell,
-            completed: !!engine.gameState.routeCompleted,
-          };
-        })()}
-        tileSniper={(() => {
-          const s = resolvedObjectives.find(o => o.type === 'tile_sniper' && o.targetCell);
-          if (!s || !s.targetCell) return null;
-          return {
-            targetCell: s.targetCell,
-            hit: !!engine.gameState.sniperHit,
-          };
-        })()}
-        goalHit={goalHit}
         hintSlot={!isMultiplayer ? (
           <BlastHintButton
             waveNumber={waveNumber}

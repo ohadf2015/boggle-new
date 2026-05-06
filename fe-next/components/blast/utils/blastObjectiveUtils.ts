@@ -51,18 +51,6 @@ export function formatObjectiveLabel(
     case 'color_power':
       template = t('blast.objective.colorPower') || 'Use {count}+ {color} tiles in one word';
       break;
-    case 'path_route':
-      template = t('blast.objective.pathRoute') || 'Connect the lime tile to the pink tile in one word';
-      break;
-    case 'cascade_chain':
-      template = t('blast.objective.cascadeChain') || 'Chain {target} words back-to-back without missing';
-      break;
-    case 'tile_sniper':
-      template = t('blast.objective.tileSniper') || 'Use the marked tile in one word';
-      break;
-    case 'long_word_lockup':
-      template = t('blast.objective.longWordLockup') || 'Submit one word with {minWordLength}+ letters';
-      break;
     default:
       template = '';
   }

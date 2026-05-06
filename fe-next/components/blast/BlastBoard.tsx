@@ -100,7 +100,6 @@ export const BlastBoard = memo(function BlastBoard({
     gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,
   }), [gridSize]);
   const containerRef = useRef<HTMLDivElement>(null);
-
   // Initialize to 1 (not 0) so the overlay grid renders immediately.
   // Fall animation pixel math degrades gracefully until ResizeObserver fires.
   const [containerWidth, setContainerWidth] = useState(1);
@@ -220,7 +219,6 @@ export const BlastBoard = memo(function BlastBoard({
 
   // Only render overlay once we have tile states
   const hasTileStates = tileStates.length > 0 && tileStates[0]?.length > 0;
-
 
   return (
     <div

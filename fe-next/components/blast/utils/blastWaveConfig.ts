@@ -280,7 +280,7 @@ export function getWaveConfig(wave: number): WaveConfig {
 
 // ==================== Wave Objectives ====================
 
-import type { BlastObjective, BlastObjectiveType } from '../types';
+import type { BlastObjective } from '../types';
 import { getTargetWordPool, pickRandomTargetWord } from './blastTargetWordPool';
 
 /**
@@ -343,80 +343,7 @@ export function getWaveObjectives(wave: number, language?: string): BlastObjecti
   let withTargetWord = seedTargetWordObjective(clamped, lang, baseObjectives);
   let withAllSeeds = seedColorPowerObjective(clamped, withTargetWord);
 
-  // Goal Gallery — at most ONE mechanic-rich goal per wave so each level has
-  // a single distinct flavor. Mutually exclusive with target_word so a wave
-  // never carries two "find one specific thing" goals at once.
-  withAllSeeds = seedGalleryObjective(clamped, withAllSeeds);
-
   return withAllSeeds;
-}
-
-/**
- * Goal Gallery seeder — rotates among mechanic-rich goals at wave gates.
- * Skips when the wave already carries a target_word goal (avoid double-flag).
- *
- * Wave gates (when each mechanic unlocks):
- *   path_route       — wave 5+
- *   cascade_chain    — wave 4+
- *   tile_sniper      — wave 6+
- *   long_word_lockup — wave 7+
- *
- * Probability: 35% per eligible wave, deterministic via wave seed.
- * Pick: rotates by (wave % N_eligible) for variety across runs.
- *
- * Mechanic targets scale modestly with wave so late-game pushes harder
- * without becoming unfeasible.
- */
-export function seedGalleryObjective(
-  wave: number,
-  objectives: BlastObjective[],
-): BlastObjective[] {
-  // Don't double-stack with target_word
-  if (objectives.some(o => o.type === 'target_word')) return objectives;
-
-  // Eligibility per wave gate.
-  // cascade_chain reads gameState.peakCascadeDepth which the engine ratchets
-  // via recordCascadeDepth after every cascade resolves — no board-aware
-  // setup needed. path_route + tile_sniper need cell selection materialized
-  // at wave init against the actual grid + dictionary.
-  const eligible: BlastObjectiveType[] = [];
-  if (wave >= 4) eligible.push('cascade_chain');
-  if (wave >= 5) eligible.push('path_route');
-  if (wave >= 6) eligible.push('tile_sniper');
-  if (wave >= 7) eligible.push('long_word_lockup');
-  if (eligible.length === 0) return objectives;
-
-  // 35% gate, deterministic per wave
-  const shouldAdd = ((wave * 53) % 100) < 35;
-  if (!shouldAdd) return objectives;
-
-  // Rotate pick deterministically
-  const pickIndex = (wave * 7) % eligible.length;
-  const type = eligible[pickIndex];
-
-  // Build the goal — each mechanic has its own target shape.
-  // startCell/endCell/targetCell get FILLED at wave-init time once the board
-  // is generated (current pure-function layer can't see the grid). Reducer
-  // skips activation if endpoints unset — i.e. the seed is a "request" the
-  // game layer must materialize against the actual board. Safe default: skip.
-  switch (type) {
-    case 'cascade_chain': {
-      // Ramp: 3 at wave 4, +1 every 3 waves, cap at 6
-      const target = Math.min(6, 3 + Math.floor((wave - 4) / 3));
-      return [...objectives, { type: 'cascade_chain', target }];
-    }
-    case 'path_route':
-      return [...objectives, { type: 'path_route', target: 1 }];
-    case 'tile_sniper':
-      return [...objectives, { type: 'tile_sniper', target: 1 }];
-    case 'long_word_lockup': {
-      // Threshold ramps with wave: 7 at wave 7-9, 8 at 10-12, 9 at 13+
-      const minWordLength = wave >= 13 ? 9 : wave >= 10 ? 8 : 7;
-      return [...objectives, { type: 'long_word_lockup', target: 1, minWordLength }];
-    }
-    default:
-      return objectives;
-  }
 }
 
 /**

@@ -90,18 +90,6 @@ export interface BlastGameState {
   diamondRevealTurns: number;
   /** Color counts in the last submitted word: { pink, cyan, lime } (for color_power tracking) */
   lastWordColorCounts?: { pink: number; cyan: number; lime: number };
-  /** Goal Gallery — peak cascade depth reached in a single chain this wave
-   *  (for cascade_chain goal). Tracks the deepest single-word chain reaction. */
-  peakCascadeDepth?: number;
-  /** Goal Gallery — peak word length reached this wave (for long_word_lockup). */
-  peakWordLength?: number;
-  /** Goal Gallery — cells of the most recently submitted valid word.
-   *  Read by the path_route + tile_sniper evaluator effect to flip flags. */
-  lastWordCells?: Array<{ row: number; col: number }>;
-  /** Goal Gallery — set once when path_route objective satisfied. */
-  routeCompleted?: boolean;
-  /** Goal Gallery — set once when tile_sniper objective satisfied. */
-  sniperHit?: boolean;
 }
 
 /** Per-wave summary for results breakdown */
@@ -138,10 +126,6 @@ export interface BlastResultsData {
   bestWave?: { waveNumber: number; score: number };
   /** Badges unlocked this run (for achievement ribbon) */
   badges?: Array<{ id: string; icon: string; label: string; isNew?: boolean }>;
-  /** Per-tile-type clear counts for the run, summed across waves. Drives
-   *  the tile-type breakdown row on the results screen. Sparse: types with
-   *  0 clears may be omitted by the producer. */
-  tileTypeClears?: Partial<Record<BlastTileType, number>>;
   /** Sprint 3 polish: target_word goal context surfaced on the results card so
    *  the player sees acknowledgement either way ("Target was: CRYSTAL" on miss,
    *  "FOUND IT!" on hit). Optional — only set when the wave actually had a
@@ -364,22 +348,7 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
 
 // ==================== Objectives ====================
 
-export type BlastObjectiveType =
-  | 'collect_type'
-  | 'clear_all_type'
-  | 'score_target'
-  | 'word_length'
-  | 'clear_percent'
-  | 'target_word'
-  | 'color_power'
-  /** Goal Gallery: spell a single word whose path includes both startCell + endCell. */
-  | 'path_route'
-  /** Goal Gallery: sustain N consecutive valid submits without breaking the streak. */
-  | 'cascade_chain'
-  /** Goal Gallery: submit any word that uses the marked targetCell. */
-  | 'tile_sniper'
-  /** Goal Gallery: submit one word ≥ minWordLength characters (single masterstroke). */
-  | 'long_word_lockup';
+export type BlastObjectiveType = 'collect_type' | 'clear_all_type' | 'score_target' | 'word_length' | 'clear_percent' | 'target_word' | 'color_power';
 
 export type ColorTag = 'pink' | 'cyan' | 'lime';
 
@@ -397,14 +366,6 @@ export interface BlastObjective {
   colorTag?: ColorTag;
   /** Minimum count of colored tiles required (for color_power type) */
   minColorCount?: number;
-  /** path_route — start cell of the route */
-  startCell?: { row: number; col: number };
-  /** path_route — end cell of the route */
-  endCell?: { row: number; col: number };
-  /** path_route — optional checkpoint cells the path must pass through */
-  mustPassCells?: Array<{ row: number; col: number }>;
-  /** tile_sniper — the marked cell the player must include in any word */
-  targetCell?: { row: number; col: number };
 }
 
 /** 2D grid of letters for Blast board representation */

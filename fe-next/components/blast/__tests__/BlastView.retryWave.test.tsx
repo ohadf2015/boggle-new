@@ -63,7 +63,6 @@ vi.mock('@/hooks/useHasRealAdProvider', () => ({
 
 vi.mock('@/utils/growthTracking', () => ({
   trackGameStart: vi.fn(),
-  trackGameEnd: vi.fn(),
 }));
 
 const unlockOnUnlock: { current: (() => void) | null } = { current: null };

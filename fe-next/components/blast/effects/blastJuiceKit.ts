@@ -14,16 +14,13 @@
  * return to baseline quickly, never let residual state linger.
  */
 
-import { Container, Graphics, type Application, type Filter } from 'pixi.js';
-import { gsap } from 'gsap';
+import type { Application, Filter } from 'pixi.js';
 import {
   createRGBSplitFilter,
   createZoomBlurFilter,
   createAdvancedBloomFilter,
   createAdjustmentFilter,
 } from './pixiFilterPresets';
-import { TILE_ACCENTS } from '../blastTileVisuals';
-import type { BlastTileType } from '../types';
 
 type RGBSplit = ReturnType<typeof createRGBSplitFilter>;
 type ZoomBlur = ReturnType<typeof createZoomBlurFilter>;
@@ -197,88 +194,4 @@ export function createBlastJuiceKit(eng: JuiceEngine): BlastJuiceKit {
   };
 
   return { megaPunch, comboPulse, waveClearBurst, destroy };
-}
-
-// ─── Typed clear bursts (Phase 4 jelly) ────────────────────────────────
-
-const MAX_CONCURRENT_PARTICLES = 64;
-let liveParticles: Graphics[] = [];
-
-function reducedMotionLocal(): boolean {
-  return typeof window !== 'undefined'
-    && typeof window.matchMedia === 'function'
-    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
-function parseRgbaToHex(rgba: string): number {
-  const m = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-  if (!m) return 0xffffff;
-  return (parseInt(m[1], 10) << 16) | (parseInt(m[2], 10) << 8) | parseInt(m[3], 10);
-}
-
-function evictParticles(): void {
-  while (liveParticles.length > MAX_CONCURRENT_PARTICLES) {
-    const oldest = liveParticles.shift();
-    try { oldest?.destroy(); } catch { /* */ }
-  }
-}
-
-export interface BurstHandle {
-  particleCount: number;
-  hasShockwave: boolean;
-}
-
-/**
- * Spawn a per-type particle burst at (x, y). Combo >= 3 doubles particle
- * count and adds a shockwave ring. Reduced-motion → no-op.
- * Particles are FIFO-evicted at MAX_CONCURRENT_PARTICLES to bound memory.
- */
-export function spawnTypedBurst(
-  stage: Container,
-  type: BlastTileType,
-  x: number,
-  y: number,
-  combo: number,
-): BurstHandle {
-  if (reducedMotionLocal()) return { particleCount: 0, hasShockwave: false };
-  const accents = TILE_ACCENTS[type] ?? TILE_ACCENTS.standard;
-  const colourHex = parseRgbaToHex(accents.rimDark);
-  const count = combo >= 3 ? 16 : 8;
-
-  for (let i = 0; i < count; i++) {
-    const p = new Graphics().circle(0, 0, 3 + Math.random() * 2).fill({ color: colourHex });
-    p.x = x; p.y = y;
-    try { stage.addChild(p); } catch { /* stage destroyed */ continue; }
-    liveParticles.push(p);
-    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.3;
-    const speed = 60 + Math.random() * 60;
-    gsap.to(p, {
-      x: x + Math.cos(angle) * speed,
-      y: y + Math.sin(angle) * speed,
-      alpha: 0,
-      duration: 0.6,
-      ease: 'power2.out',
-      onComplete: () => {
-        try { p.destroy(); } catch { /* */ }
-        liveParticles = liveParticles.filter((q) => q !== p);
-      },
-    });
-  }
-  evictParticles();
-
-  const hasShockwave = combo >= 3;
-  if (hasShockwave) {
-    const ring = new Graphics().circle(0, 0, 8).stroke({ width: 3, color: colourHex, alpha: 0.7 });
-    ring.x = x; ring.y = y;
-    try { stage.addChild(ring); } catch { return { particleCount: count, hasShockwave: true }; }
-    gsap.to(ring.scale, { x: 6, y: 6, duration: 0.4, ease: 'power2.out' });
-    gsap.to(ring, {
-      alpha: 0,
-      duration: 0.4,
-      ease: 'power2.out',
-      onComplete: () => { try { ring.destroy(); } catch { /* */ } },
-    });
-  }
-
-  return { particleCount: count, hasShockwave };
 }

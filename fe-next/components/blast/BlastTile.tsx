@@ -1,33 +1,17 @@
 'use client';
 
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Lock } from 'lucide-react';
-import { gsap } from 'gsap';
 import type { BlastTileType } from './types';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTileTooltip } from './utils/blastTileTooltips';
-import { TILE_VISUALS, TILE_ACCENTS } from './blastTileVisuals';
-import { useExperiment } from '@/hooks/useExperiment';
-import { createJellyClearTween } from './effects/blastGsapTimelines';
-import styles from './BlastTile.module.css';
+import { TILE_VISUALS, CLEARING_COLORS, CLEARING_ANIMS } from './blastTileVisuals';
+
+const TILE_TEXT_SHADOW_STYLE = { textShadow: '0 1px 0 rgba(255,255,255,0.4), 0 2px 3px rgba(0,0,0,0.2)' } as const;
+const TILE_TEXT_SHADOW_LIGHT_STYLE = { textShadow: '0 1px 2px rgba(0,0,0,0.4)' } as const;
 
 export type TilePhase = 'idle' | 'selected' | 'anticipation' | 'clearing' | 'falling' | 'appearing' | 'landing';
-
-import {
-  TILE_TEXT_SHADOW_STYLE,
-  TILE_TEXT_SHADOW_LIGHT_STYLE,
-  MULTIPLIER_BADGES,
-  PORTAL_PAIR_COLORS,
-  ANIMATED_PHASES,
-  RARE_LETTERS,
-  getCrackClass,
-  getSpecialEffectClasses,
-  getPhaseStyles,
-  getPhaseClasses,
-  getColorTagGlow,
-  getSelectionStyles,
-} from './blastTileHelpers';
 
 export interface BlastTileProps {
   letter: string;
@@ -75,6 +59,141 @@ export interface BlastTileProps {
   onClick?: () => void;
 }
 
+/** Multiplier badges for score-multiplier tiles */
+const MULTIPLIER_BADGES: Partial<Record<BlastTileType, string>> = {
+  gold: '×3',
+  diamond: '×5',
+};
+
+/** Portal pair colors — each pair gets a distinct dot color */
+const PORTAL_PAIR_COLORS = ['#FF6B9D', '#00E5FF', '#FFD700', '#B388FF', '#69F0AE'];
+
+/** Multi-hit tiles: initial hit counts for crack state calculation */
+const MULTI_HIT_MAX: Partial<Record<BlastTileType, number>> = {
+  ice: 2,
+  prism: 2,
+  gem: 3,
+  frozen: 2,
+};
+
+/**
+ * Returns crack-state CSS class based on damage progression.
+ * - "cracked": tile has taken damage but isn't about to break
+ * - "critical": tile is one hit from breaking (gem only, since gem has 3 max hits)
+ */
+function getCrackClass(type: BlastTileType, hitsRemaining?: number): string {
+  const maxHits = MULTI_HIT_MAX[type];
+  if (!maxHits || hitsRemaining == null || hitsRemaining >= maxHits) return '';
+  if (hitsRemaining <= 1 && maxHits >= 3) return 'blast-tile-critical';
+  if (hitsRemaining < maxHits) return 'blast-tile-cracked';
+  return '';
+}
+
+/** Type-specific visual effect classes for gem/frozen/ice tiles */
+function getSpecialEffectClasses(type: BlastTileType, phase: TilePhase, hitsRemaining?: number): string {
+  const classes: string[] = [];
+
+  if (type === 'gem') {
+    if (hitsRemaining != null && hitsRemaining > 0) classes.push(`blast-tile-gem-glow-${hitsRemaining}`);
+    if (phase === 'clearing') classes.push('blast-tile-gem-golden-flash');
+  } else if (type === 'frozen') {
+    if (hitsRemaining != null && hitsRemaining < (MULTI_HIT_MAX.frozen ?? 2)) classes.push('blast-tile-frozen-cracked');
+    if (phase === 'clearing') classes.push('blast-tile-frozen-emerge');
+  } else if (type === 'ice') {
+    classes.push('blast-tile-ice-shimmer');
+  }
+
+  return classes.join(' ');
+}
+
+/** Letters that get a rare glow effect — high Scrabble-value letters */
+const RARE_LETTERS = new Set(['Q', 'Z', 'X', 'J']);
+
+const ANIMATED_PHASES = new Set<TilePhase>(['anticipation', 'clearing', 'falling', 'appearing', 'landing']);
+
+function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: number, clearRotate?: number, spawnOffset?: number): React.CSSProperties {
+  const clearing = CLEARING_COLORS[type];
+  switch (phase) {
+    case 'anticipation':
+      return { filter: 'brightness(1.4)', transform: 'scale(1.1)', transition: 'all 120ms ease-out' };
+    case 'clearing': {
+      const clearingAnim = CLEARING_ANIMS[type];
+      const isLightning = type === 'lightning';
+      return {
+        transform: clearingAnim?.transform ?? `scale(1.3) rotate(${clearRotate ?? 0}deg)`,
+        opacity: 0,
+        filter: clearingAnim?.filter,
+        transition: clearingAnim?.transition ?? 'all 180ms ease-in',
+        ...(clearing && { background: clearing.background, border: clearing.border }),
+        ...(isLightning && {
+          background: 'white',
+          boxShadow: '0 0 24px 8px rgba(0,255,255,0.7), 0 0 48px 16px rgba(255,255,255,0.4)',
+          animation: 'blastLightningFlash 160ms ease-in forwards',
+        }),
+      };
+    }
+    case 'falling': {
+      // Tile is at its destination row; CSS keyframe animates FROM --fall-from TO 0
+      // Duration scales with distance for realistic gravity feel
+      const dist = fallOffset ?? 0;
+      const fallDuration = Math.max(250, 180 + dist * 0.8);
+      return {
+        animation: `blastTileFall ${fallDuration}ms cubic-bezier(0.4, 0, 0.6, 1) forwards`,
+        '--fall-from': `-${dist}px`,
+      } as React.CSSProperties;
+    }
+    case 'appearing':
+      return {
+        '--spawn-from': `${-(spawnOffset ?? 60)}px`,
+        opacity: 0,
+        animation: 'blastTileAppear 400ms cubic-bezier(0.22, 1, 0.36, 1) forwards',
+      } as React.CSSProperties;
+    case 'landing':
+      return {
+        transform: 'scaleY(1.08) scaleX(0.94)',
+        transition: 'transform 100ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+      };
+    default:
+      return {};
+  }
+}
+
+/**
+ * Compute progressive selection scale: first tile 1.05x, last tile 1.12x.
+ */
+function getSelectionScale(selectionIndex?: number, selectionTotal?: number): number {
+  if (selectionIndex == null || !selectionTotal || selectionTotal <= 1) return 1.05;
+  const t = selectionIndex / (selectionTotal - 1);
+  // Round to 3 decimals to avoid floating point noise
+  return Math.round((1.05 + t * 0.07) * 1000) / 1000;
+}
+
+function getPhaseClasses(phase: TilePhase, isSelected: boolean): string {
+  if (phase === 'selected' || (phase === 'idle' && isSelected)) {
+    return `ring-3 ring-neo-lime ring-offset-2 ring-offset-neo-navy shadow-hard-lime blast-tile-select-pop`;
+  }
+  return '';
+}
+
+/** Color tag glow class for color_power objectives */
+function getColorTagGlow(colorTag?: 'pink' | 'cyan' | 'lime'): string {
+  if (!colorTag) return '';
+  const colorMap: Record<string, string> = {
+    pink: 'ring-2 ring-neo-pink animate-pulse',
+    cyan: 'ring-2 ring-neo-cyan animate-pulse',
+    lime: 'ring-2 ring-neo-lime animate-pulse',
+  };
+  return colorMap[colorTag] || '';
+}
+
+/** Inline styles for selected tiles: progressive scale */
+function getSelectionStyles(isSelected: boolean, selectionIndex?: number, selectionTotal?: number): React.CSSProperties {
+  if (!isSelected) return {};
+  const scale = getSelectionScale(selectionIndex, selectionTotal);
+  return { transform: `scale(${scale})` };
+}
+
+
 export const BlastTile = memo(function BlastTile({
   letter, type, phase, isSelected, isCleared, hitsRemaining,
   fallOffset, clearRotate, spawnOffset, isNearMiss, activationEffect, isComboPreview,
@@ -93,50 +212,6 @@ export const BlastTile = memo(function BlastTile({
     if (activationEffect) setLiveActivationEffect(activationEffect);
   }, [activationEffect]);
 
-  // ─── Hooks must run unconditionally (React rules-of-hooks) ──────────────
-  // Compute candy-flag + GSAP wiring state BEFORE the early return below.
-  const { variant: candyVariant } = useExperiment('blast.candy-shell.enabled');
-  const candyOn = candyVariant === 'candy';
-  const accent = TILE_ACCENTS[type] ?? TILE_ACCENTS.standard;
-  // effectivePhase computed early so the GSAP useEffect can list it as a dep
-  // without crossing the early-return boundary.
-  const _effPhaseEarly: TilePhase = reducedMotion && ANIMATED_PHASES.has(phase) ? 'idle' : phase;
-  const _gsapPhases: TilePhase[] = ['selected', 'anticipation', 'clearing'];
-  const _useGsap = candyOn && !reducedMotion && (_gsapPhases.includes(_effPhaseEarly) || (_effPhaseEarly === 'idle' && isSelected));
-
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const phaseTlRef = useRef<gsap.core.Timeline | null>(null);
-
-  useEffect(() => {
-    if (!_useGsap) return;
-    const el = buttonRef.current;
-    if (!el) return;
-    phaseTlRef.current?.kill();
-    const tl = gsap.timeline();
-    if (_effPhaseEarly === 'selected' || (_effPhaseEarly === 'idle' && isSelected)) {
-      tl.to(el, { scale: 1.06, duration: 0.18, ease: 'back.out(2)' });
-    } else if (_effPhaseEarly === 'anticipation') {
-      tl
-        .to(el, { scaleX: 1.18, scaleY: 0.82, duration: 0.08, ease: 'power2.out' })
-        .to(el, { scaleX: 1, scaleY: 1, duration: 0.10, ease: 'elastic.out(1, 0.4)' });
-    } else if (_effPhaseEarly === 'clearing') {
-      // Jelly clear (Phase 4) — per-type GSAP signature + opacity fade.
-      // Falls back to the legacy 3-step squash if no signature exists.
-      const jellyTl = createJellyClearTween(el, type);
-      if (jellyTl) {
-        tl.add(jellyTl);
-      } else {
-        tl
-          .to(el, { scaleX: 0.92, scaleY: 1.08, duration: 0.04 })
-          .to(el, { scale: 1.4, duration: 0.10, ease: 'back.out(3.5)' })
-          .to(el, { rotate: clearRotate ?? 0, opacity: 0, duration: 0.18 }, '<');
-      }
-    }
-    phaseTlRef.current = tl;
-    return () => { phaseTlRef.current?.kill(); phaseTlRef.current = null; };
-  }, [_useGsap, _effPhaseEarly, isSelected, clearRotate, type]);
-
-  // ─── Early return (post-hooks) ──────────────────────────────────────────
   // Allow clearing/anticipation phases to render even when isCleared is true —
   // during cascade chains, submitWord marks tiles cleared BEFORE the animation runs.
   // Without this, cascade clearing animations never play (tile goes invisible instantly).
@@ -148,20 +223,22 @@ export const BlastTile = memo(function BlastTile({
   const visual = TILE_VISUALS[type] ?? TILE_VISUALS.standard;
   // Skip tooltip lookup entirely for standard tiles (the vast majority) — keeps render fast
   const tooltip = type !== 'standard' ? getTileTooltip(type, t) : null;
-  const effectivePhase = _effPhaseEarly;
-
-  // When GSAP owns the phase, suppress legacy inline styles that would fight the tween.
-  const phaseStyle = effectivePhase !== 'idle' && effectivePhase !== 'selected' && !(candyOn && effectivePhase === 'anticipation') && !(candyOn && effectivePhase === 'clearing')
+  const effectivePhase = reducedMotion && ANIMATED_PHASES.has(phase) ? 'idle' : phase;
+  const phaseStyle = effectivePhase !== 'idle' && effectivePhase !== 'selected'
     ? getPhaseStyles(effectivePhase, type, fallOffset, clearRotate, spawnOffset)
     : {};
-  const selectionStyle = candyOn ? {} : getSelectionStyles(isSelected, selectionIndex, selectionTotal);
-  // Compositor promotion: static translate3d via styles.tileHost (applied below) +
-  // mountIdleBreatheForTiles which sets willChange: transform on visible tiles.
-  // Per-phase willChange flipping was thrashing layer create/destroy cycles.
+  const selectionStyle = getSelectionStyles(isSelected, selectionIndex, selectionTotal);
+  // Narrow willChange to the property the current phase actually animates — avoid forcing
+  // unnecessary compositor layers for idle tiles.
+  let willChangeValue: string | undefined;
+  if (effectivePhase === 'clearing' || effectivePhase === 'appearing') {
+    willChangeValue = 'transform, opacity';
+  } else if (effectivePhase === 'falling' || effectivePhase === 'landing' || isSelected) {
+    willChangeValue = 'transform';
+  }
 
   return (
     <button
-      ref={buttonRef}
       type="button"
       onClick={onClick}
       onAnimationEnd={(e) => {
@@ -177,7 +254,6 @@ export const BlastTile = memo(function BlastTile({
         'rounded-neo',
         'font-neo-display text-[clamp(1.1rem,4.5cqw,1.85rem)] font-black uppercase',
         'select-none',
-        candyOn ? styles.tileHost : '',
         // Only apply CSS transition + active press when idle/selected — animated phases use keyframes
         ...(effectivePhase === 'idle' || effectivePhase === 'selected'
           ? ['transition-transform duration-100', 'active:scale-95 active:translate-y-[2px] active:brightness-110']
@@ -203,36 +279,13 @@ export const BlastTile = memo(function BlastTile({
         ...(visual.style ?? {}),
         ...phaseStyle,
         ...selectionStyle,
+        ...(willChangeValue && { willChange: willChangeValue }),
         containerType: 'inline-size',
-        ...(candyOn && {
-          '--bt-gloss': accent.glossTop,
-          '--bt-rim-light': accent.rimLight,
-          '--bt-rim-dark': accent.rimDark,
-          '--bt-cast': accent.castShadow,
-          '--bt-jelly-mirror': accent.jellyMirror,
-          '--bt-jelly-edge': accent.jellyEdge,
-        } as React.CSSProperties),
       }}
       aria-label={`${letter}${type !== 'standard' ? ` ${type} tile` : ''}`}
       title={tooltip ? `${tooltip.name}: ${tooltip.desc}` : undefined}
-      data-blast-tile=""
-      data-blast-selected={isSelected ? '' : undefined}
     >
-      {candyOn && (
-        <>
-          <span data-bt-layer="cast" aria-hidden="true" className={styles.candyShell} />
-          <span data-bt-layer="gloss" aria-hidden="true" className={styles.gloss} />
-          <span data-bt-layer="jelly-mirror" aria-hidden="true" className={styles.jellyMirror} />
-          <span data-bt-layer="jelly-edge" aria-hidden="true" className={styles.jellyEdge} />
-          <span data-bt-layer="rim" aria-hidden="true" className={styles.rim} />
-        </>
-      )}
-      <span
-        className={`relative z-10 ${candyOn ? (visual.text === 'text-white' ? styles.letterLight : styles.letter) : ''}`}
-        style={candyOn ? undefined : (visual.text === 'text-white' ? TILE_TEXT_SHADOW_LIGHT_STYLE : TILE_TEXT_SHADOW_STYLE)}
-      >
-        {letter}
-      </span>
+      <span className="relative z-10" style={visual.text === 'text-white' ? TILE_TEXT_SHADOW_LIGHT_STYLE : TILE_TEXT_SHADOW_STYLE}>{letter}</span>
       {visual.indicator && (
         <span className={`absolute top-0.5 inset-e-0.5 leading-none pointer-events-none ${visual.text ?? ''}`} aria-hidden="true">
           <visual.indicator className="w-[clamp(9px,2.4cqw,15px)] h-[clamp(9px,2.4cqw,15px)]" strokeWidth={2.5} />

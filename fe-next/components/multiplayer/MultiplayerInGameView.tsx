@@ -28,7 +28,6 @@ import { useBlastMultiplayerBridge } from '@/components/blast/hooks/useBlastMult
 import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
 import { StandardDesktopAdapter } from './desktop/StandardDesktopAdapter';
 import { WheelRushDesktopAdapter } from './desktop/WheelRushDesktopAdapter';
-import { BlastDesktopAdapter } from './desktop/BlastDesktopAdapter';
 import { WordHuntDesktopAdapter } from './desktop/WordHuntDesktopAdapter';
 
 // Mode-specific game views are split into per-route chunks. Only the active
@@ -460,56 +459,6 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         fogProgress={0} // TODO: Thread fogProgress from WheelRushView's internal state
         meId={username}
         canvas={<WheelRushView {...wheelRushProps} />}
-      />
-    );
-  }
-
-  // Desktop shell for blast mode
-  if ((gameMode as string) === 'blast' && shellEnabled) {
-    // Map leaderboard from MultiplayerInGameView shape to RosterPlayer shape
-    const rosterPlayers = leaderboard.map(entry => ({
-      userId: entry.username ?? '',
-      username: entry.username,
-      score: entry.score,
-      status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
-      isYou: entry.username === username,
-      customAvatar: entry.avatar?.customAvatar ?? null,
-    }));
-
-    // Map foundWords from FoundWord shape to LadderWord shape
-    const ladderWords = foundWords.map((fw, idx) => ({
-      word: fw.word,
-      score: fw.score ?? 0,
-      ts: fw.timestamp ?? 0,
-      userId: username,
-      inputMethod: fw.inputMethod ?? 'drag',
-    }));
-
-    const blastGameProps = {
-      config: blastBridge.config,
-      mode: 'multiplayer' as const,
-      remainingTime,
-      totalTime,
-      leaderboard,
-      username,
-      onGameEnd: noop,
-      onQuit: handleQuit,
-      onWordWithComboType: handleBlastWordWithCombo,
-      initialTileStates: blastBridge.initialTileStates,
-      blastSeed: blastBridge.blastSeed,
-      waveNumber: blastBridge.waveNumber,
-    };
-
-    return (
-      <BlastDesktopAdapter
-        roomId={gameCode}
-        leaderboard={rosterPlayers}
-        foundWords={ladderWords}
-        remainingTime={remainingTime ?? 0}
-        totalTime={totalTime ?? 180}
-        comboCount={comboLevel ?? 0}
-        meId={username}
-        canvas={<BlastGame {...blastGameProps} />}
       />
     );
   }

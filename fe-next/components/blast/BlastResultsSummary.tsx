@@ -10,9 +10,7 @@ import { Button } from '@/components/ui/button';
 import { MobileTooltip } from '@/components/ui/MobileTooltip';
 import { cn } from '@/lib/utils';
 import { useBlastBadgeUnlocks } from './hooks/useBlastBadgeUnlocks';
-import { BlastInsightRibbon } from './BlastInsightRibbon';
-import { BlastCountUp } from './BlastCountUp';
-import { BlastTileTypeBreakdown } from './BlastTileTypeBreakdown';
+import { BlastBragCard } from './BlastBragCard';
 import { getMascotForResults, MASCOT_IMAGES } from './utils/blastMascot';
 import { computeFailReason } from './utils/computeFailReason';
 import type { BlastResultsData } from './types';
@@ -76,63 +74,40 @@ export function BlastResultsSummary({
       data-fail={didFail ? 'true' : 'false'}
     >
       <div className="flex-1 overflow-y-auto px-4 pt-6 pb-4 flex flex-col items-center gap-4">
-      {/* Tabloid hero band — full-bleed colored ribbon wrapping mascot +
-          headline + stars as one hero unit. Tilted -1° LTR / +1° RTL so the
-          page feels "pasted together" rather than ruler-grid clean. Mascot
-          sits ABSOLUTELY positioned, half-bursting above the band's top edge.
-          Body color flips lime (success) / red (fail) so the band carries
-          the win-state on its own. */}
+      {/* Mascot */}
       <AdaptiveMotion.div
-        initial={{ scale: 0.92, opacity: 0, y: -20, rotate: -3 }}
-        animate={{ scale: 1, opacity: 1, y: 0, rotate: -1 }}
+        initial={{ scale: 0, rotate: -10, opacity: 0 }}
+        animate={{ scale: 1, rotate: 0, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 380, damping: 18 }}
-        className={cn(
-          'relative w-full mt-8 mb-2 px-4 pt-12 pb-3',
-          'rounded-neo border-3 border-neo-black shadow-hard-lg',
-          'rtl:rotate-1',
-          didFail ? 'bg-neo-red/90' : 'bg-neo-pink',
-        )}
-        data-testid="blast-results-hero-band"
+        className="relative w-24 h-24 rounded-neo border-3 border-neo-black shadow-hard-lg overflow-hidden bg-neo-navy-light"
       >
-        {/* Mascot — sticker bursting up out of the band */}
-        <AdaptiveMotion.div
-          initial={{ scale: 0, rotate: -22, opacity: 0 }}
-          animate={{ scale: 1, rotate: -6, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 380, damping: 14, delay: 0.05 }}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={mascotSrc}
+          alt={t(`blast.mascot.${mascotKey}`)}
+          data-testid="blast-results-mascot"
+          data-mascot-key={mascotKey}
+          className="w-full h-full object-cover"
+        />
+      </AdaptiveMotion.div>
+
+      {/* Header + star rating */}
+      <div className="flex flex-col items-center gap-1.5">
+        <AdaptiveMotion.h2
+          initial={{ scale: 0.6, opacity: 0, y: -10 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 380, damping: 22 }}
           className={cn(
-            'absolute -top-10 left-1/2 -translate-x-1/2',
-            'w-24 h-24 rounded-neo border-3 border-neo-black shadow-hard-lg',
-            'overflow-hidden bg-neo-navy-light rtl:rotate-6',
+            'text-3xl font-black uppercase font-neo-display tracking-wider drop-shadow-[3px_3px_0_#000]',
+            didFail ? 'text-neo-red' : 'text-neo-pink',
           )}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={mascotSrc}
-            alt={t(`blast.mascot.${mascotKey}`)}
-            data-testid="blast-results-mascot"
-            data-mascot-key={mascotKey}
-            className="w-full h-full object-cover"
-          />
-        </AdaptiveMotion.div>
-
-        {/* Headline + stars centered inside band */}
-        <div className="flex flex-col items-center gap-1.5">
-          <AdaptiveMotion.h2
-            initial={{ scale: 0.6, opacity: 0, y: -10 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.12 }}
-            className={cn(
-              'text-3xl font-black uppercase font-neo-display tracking-wider',
-              'drop-shadow-[3px_3px_0_#000] text-neo-black',
-            )}
-          >
-            {didFail ? t('blast.results.waveFailed') : t('blast.gameOver')}
-          </AdaptiveMotion.h2>
-          {!didFail && (
-            <StarRating stars={results.stars} label={t(`blast.stars${results.stars}`)} />
-          )}
-        </div>
-      </AdaptiveMotion.div>
+          {didFail ? t('blast.results.waveFailed') : t('blast.gameOver')}
+        </AdaptiveMotion.h2>
+        {!didFail && (
+          <StarRating stars={results.stars} label={t(`blast.stars${results.stars}`)} />
+        )}
+      </div>
 
       {/* Fail banner — shown when player didn't hit the 90% advance threshold */}
       {didFail && (
@@ -207,9 +182,6 @@ export function BlastResultsSummary({
         </AdaptiveMotion.div>
       )}
 
-      {/* Insight ribbon — single hero headline picked from results */}
-      {!didFail && <BlastInsightRibbon results={results} t={t} />}
-
       {/* Score card */}
       <AdaptiveMotion.div
         initial={{ scale: 0.8, opacity: 0 }}
@@ -238,11 +210,7 @@ export function BlastResultsSummary({
           </AdaptiveMotion.div>
         )}
         <p className="text-6xl font-black text-white tabular-nums font-neo-display drop-shadow-[2px_2px_0_#000]">
-          <BlastCountUp
-            value={results.finalScore}
-            data-testid="blast-results-final-score"
-            className="inline-block"
-          />
+          {results.finalScore.toLocaleString()}
         </p>
         <p className="text-xs uppercase tracking-widest text-white/50 mt-1 font-bold">
           {results.wordsFound.length} {t('blast.wordsFound')} &middot;{' '}
@@ -278,6 +246,9 @@ export function BlastResultsSummary({
           </div>
         </div>
       </AdaptiveMotion.div>
+
+      {/* Brag card */}
+      <BlastBragCard results={results} t={t} />
 
       {/* Best-moment grid */}
       <AdaptiveMotion.div
@@ -316,9 +287,7 @@ export function BlastResultsSummary({
         )}
       </AdaptiveMotion.div>
 
-      {/* Wave breakdown — horizontal scroll-snap row. Each wave is its own
-          mini card; best wave gets the lime-ring sticker. Beats the vertical
-          bar list at being scannable when the player ran 5+ waves. */}
+      {/* Wave breakdown */}
       {results.waveResults.length > 0 && (
         <AdaptiveMotion.div
           initial={{ y: 10, opacity: 0 }}
@@ -330,11 +299,7 @@ export function BlastResultsSummary({
           <p className="text-[10px] uppercase tracking-widest font-bold text-white/60 mb-2 px-1">
             {t('blast.waveBreakdown')}
           </p>
-          <div
-            className="flex gap-2 overflow-x-auto -mx-1 px-1 pb-1 snap-x snap-mandatory
-                       scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10"
-            data-testid="blast-results-wave-strip"
-          >
+          <div className="flex flex-col gap-1.5">
             {results.waveResults.map((wave) => {
               const isBest = bestWave?.waveNumber === wave.waveNumber;
               const pct = wave.clearPercentage;
@@ -342,39 +307,28 @@ export function BlastResultsSummary({
                 <div
                   key={wave.waveNumber}
                   className={cn(
-                    'shrink-0 snap-start flex flex-col items-center justify-between gap-1 w-20 px-2 py-2 rounded-neo border-3',
+                    'flex items-center gap-2 px-3 py-2 rounded-neo border-2',
                     isBest
-                      ? 'border-neo-lime bg-linear-to-b from-neo-lime/15 to-neo-lime/5 shadow-hard'
-                      : 'border-neo-black/40 bg-neo-navy shadow-hard-sm',
+                      ? 'border-neo-lime bg-neo-lime/10'
+                      : 'border-white/10 bg-neo-navy',
                   )}
                 >
                   <span className={cn(
-                    'font-neo-display font-black text-[10px] uppercase tracking-wider',
-                    isBest ? 'text-neo-lime' : 'text-white/55',
+                    'font-neo-display font-black text-xs min-w-[48px]',
+                    isBest ? 'text-neo-lime' : 'text-white/60',
                   )}>
                     {t('blast.results.wave', { n: String(wave.waveNumber) })}
                   </span>
-                  <span className={cn(
-                    'font-neo-display font-black text-base leading-none tabular-nums',
-                    isBest ? 'text-neo-lime' : 'text-white',
-                  )}>
+                  <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div
+                      className={cn('h-full rounded-full', isBest ? 'bg-neo-lime' : 'bg-neo-cyan/60')}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <span className="font-black text-xs text-white tabular-nums min-w-[44px] text-right">
                     {wave.score.toLocaleString()}
                   </span>
-                  {/* Mini circular % indicator — stack of 8 dots filled by tens */}
-                  <div className="flex gap-[2px] mt-0.5">
-                    {[...Array(8)].map((_, i) => (
-                      <span
-                        key={i}
-                        className={cn(
-                          'w-[5px] h-[5px] rounded-full',
-                          (i + 1) * 12.5 <= pct
-                            ? (isBest ? 'bg-neo-lime' : 'bg-neo-cyan')
-                            : 'bg-white/15',
-                        )}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-[9px] text-white/40 tabular-nums">
+                  <span className="text-[10px] text-white/40 tabular-nums min-w-[30px] text-right">
                     {pct}%
                   </span>
                 </div>
@@ -383,17 +337,6 @@ export function BlastResultsSummary({
           </div>
         </AdaptiveMotion.div>
       )}
-
-      {/* Tile-type breakdown — pill row of how many of each special tile the
-          player cleared this run, leader pill highlighted. */}
-      <AdaptiveMotion.div
-        initial={{ y: 10, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.22 }}
-        className="w-full"
-      >
-        <BlastTileTypeBreakdown tileTypeClears={results.tileTypeClears} t={t} />
-      </AdaptiveMotion.div>
 
       {/* Skill stats */}
       <AdaptiveMotion.div

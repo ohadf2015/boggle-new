@@ -78,32 +78,9 @@ describe('experiments registry', () => {
       expect(experimentEmailOverride('signup-prompt-cta-copy', 'someone@x.com')).toBeNull();
     });
 
-    it('returns null for an email not present in the override map', () => {
-      expect(experimentEmailOverride('blast.candy-shell.enabled', 'random@x.com')).toBeNull();
-    });
-
     it('returns null when the email is null/undefined', () => {
-      expect(experimentEmailOverride('blast.candy-shell.enabled', null)).toBeNull();
-      expect(experimentEmailOverride('blast.candy-shell.enabled', undefined)).toBeNull();
-    });
-
-    it('returns null when allowlist is empty (post-revert)', () => {
-      expect(experimentEmailOverride('blast.candy-shell.enabled', 'ohadf2015@gmail.com')).toBeNull();
-    });
-  });
-
-  describe('blast.candy-shell.enabled flag', () => {
-    it('is registered with control + candy variants', () => {
-      expect(EXPERIMENTS['blast.candy-shell.enabled'].variants).toEqual(['control', 'candy']);
-    });
-
-    it('defaults to control (gated rollout)', () => {
-      expect(EXPERIMENTS['blast.candy-shell.enabled'].default).toBe('control');
-    });
-
-    it('has an empty email override allowlist (post-revert)', () => {
-      const cfg = EXPERIMENTS['blast.candy-shell.enabled'];
-      expect(cfg.forceVariantByEmail).toEqual({});
+      expect(experimentEmailOverride('signup-prompt-cta-copy', null)).toBeNull();
+      expect(experimentEmailOverride('signup-prompt-cta-copy', undefined)).toBeNull();
     });
   });
 
