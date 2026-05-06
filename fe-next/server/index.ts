@@ -83,6 +83,14 @@ async function start(): Promise<void> {
   const io = createSocketServer(httpServer, CORS_ORIGIN);
   app.set('io', io);
 
+  // Liveness probe — must be ahead of helmet/compression/CORS so a future
+  // middleware regression can never make Railway probes flaky. Stays trivial
+  // (sync JSON, no deps); /health/ready in healthRoutes.ts owns the full
+  // dependency check.
+  app.get('/health/live', (_req: Request, res: Response): void => {
+    res.json({ status: 'alive', timestamp: new Date().toISOString() });
+  });
+
   // Configure middleware
   configureMiddleware(app, { corsOrigin: CORS_ORIGIN, isDev: dev });
 

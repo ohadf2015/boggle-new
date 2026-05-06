@@ -39,18 +39,23 @@ let cronTasks: ScheduledTask[] = [];
 export async function initializeServer(io: Server): Promise<void> {
   // Set up Redis adapter for horizontal scaling — timeout to prevent blocking startup
   const REDIS_INIT_TIMEOUT_MS = 15000;
+  let redisInitTimer: NodeJS.Timeout | undefined;
   try {
     await Promise.race([
       setupRedisAdapter(io as ExtendedSocketServer),
-      new Promise<boolean>((resolve) =>
-        setTimeout(() => {
+      new Promise<boolean>((resolve) => {
+        redisInitTimer = setTimeout(() => {
           lifecycleLogger.warn('Redis adapter setup timed out — continuing without Redis adapter');
           resolve(false);
-        }, REDIS_INIT_TIMEOUT_MS)
-      ),
+        }, REDIS_INIT_TIMEOUT_MS);
+      }),
     ]);
   } catch (error) {
     lifecycleLogger.error({ err: error }, 'Redis adapter setup failed — running in degraded mode');
+  } finally {
+    // Whoever loses the race must be cancelled — otherwise the loser fires its
+    // log line minutes later, polluting prod logs and confusing post-mortems.
+    if (redisInitTimer) clearTimeout(redisInitTimer);
   }
 
   // Restore active games from Redis (persisted during previous graceful shutdown)
