@@ -236,7 +236,12 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       let awarded = 0;
       if (rewardKind === 'coins') {
         const result = await awardWatchedAd(platform);
-        awarded = result?.awarded ?? rewardAmount;
+        if (!result) {
+          // DB write failed — don't report false success to analytics or caller
+          handleAdError('Failed to grant coins — please try again');
+          return;
+        }
+        awarded = result.awarded;
       }
       trackRewardedAdWatched(platform, awarded, telemetrySurface);
       setStatus('completed');
@@ -305,7 +310,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       onAdStarted?.();
       awardCoinsAndNotify();
     }
-  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseSimulation, crazyGames, adMob, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
+  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseSimulation, crazyGames, adMob, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
 
   // Pre-load AdMob rewarded slot when caller signals likely intent (button
   // mount). CrazyGames SDK auto-prepares; simulation/placeholder paths

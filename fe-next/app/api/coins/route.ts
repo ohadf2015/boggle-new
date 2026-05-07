@@ -72,7 +72,11 @@ export async function POST(request: NextRequest) {
         )
       : {};
 
-    const { data, error } = await supabase.rpc('sync_coins', {
+    // Rewarded-ad grants use the capped RPC — enforces 10 watches/day server-side,
+    // atomically, preventing localStorage bypass or direct-POST farming.
+    const isAdReward = reason === 'Watched Ad' && amount > 0;
+    const rpcName = isAdReward ? 'award_ad_coins' : 'sync_coins';
+    const { data, error } = await supabase.rpc(rpcName, {
       p_user_id: user.id,
       p_amount: amount,
       p_reason: reason,

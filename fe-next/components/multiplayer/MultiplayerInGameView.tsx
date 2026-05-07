@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { Socket } from 'socket.io-client';
 import { Button } from '../ui/button';
@@ -260,6 +260,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   const effectiveGrid = letterGrid || shufflingGrid || null;
 
   const noop = useCallback(() => {}, []);
+  const [fogProgress, setFogProgress] = useState(0);
 
   // Blast multiplayer bridge
   const blastBridge = useBlastMultiplayerBridge({
@@ -447,6 +448,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       onQuit: handleQuit,
       t,
       remainingTime,
+      onFogProgressChange: setFogProgress,
     };
 
     return (
@@ -456,7 +458,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         foundWords={ladderWords}
         remainingTime={remainingTime ?? 0}
         totalTime={totalTime ?? 60}
-        fogProgress={0} // TODO: Thread fogProgress from WheelRushView's internal state
+        fogProgress={fogProgress}
         meId={username}
         canvas={<WheelRushView {...wheelRushProps} />}
       />

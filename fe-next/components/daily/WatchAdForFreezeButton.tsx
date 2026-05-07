@@ -18,7 +18,7 @@ interface WatchAdForFreezeButtonProps {
  */
 const WatchAdForFreezeButton: React.FC<WatchAdForFreezeButtonProps> = ({ t, className = '', surface }) => {
   const { freezeCount, earnFreeze } = useStreakFreeze();
-  const { showAd, status, isDailyLimitReached } = useRewardedAd({
+  const { showAd, status, isDailyLimitReached, canShowAd } = useRewardedAd({
     rewardKind: 'feature',
     surface: 'freeze',
     onRewardEarned: () => earnFreeze(),
@@ -26,7 +26,7 @@ const WatchAdForFreezeButton: React.FC<WatchAdForFreezeButtonProps> = ({ t, clas
 
   const offered = freezeCount < MAX_FREEZES;
   useEffect(() => {
-    if (offered) trackRewardedAdOffered(surface);
+    if (offered && canShowAd) trackRewardedAdOffered(surface);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

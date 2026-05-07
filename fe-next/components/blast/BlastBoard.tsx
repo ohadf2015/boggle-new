@@ -3,11 +3,12 @@
 import { useRef, useState, useEffect, useCallback, useMemo, memo } from 'react';
 import GridComponent from '@/components/GridComponent';
 import { BlastTile } from './BlastTile';
+import { BlastDragTrail } from './BlastDragTrail';
 import type { SelectedCell } from '@/components/grid';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState, BlastTileType } from './types';
 import type { SequencerState, TileAnimState } from './hooks/useBlastSequencer';
-import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
+import { GRID_PADDING, GRID_PADDING_PX, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { COMBO_ELIGIBLE_TILES } from './utils/blastCombos';
@@ -243,6 +244,16 @@ export const BlastBoard = memo(function BlastBoard({
         language={language}
         ghostCells
       />
+
+      {/* Layer 1.5: Drag trail — SVG polyline through selected tile centers */}
+      {selectedCells.length >= 2 && containerWidth > 0 && (
+        <BlastDragTrail
+          selectedCells={selectedCells}
+          gridSize={gridSize}
+          containerWidth={containerWidth}
+          padding={GRID_PADDING_PX}
+        />
+      )}
 
       {/* Layer 2: Blast tile type overlay — indicators, special backgrounds, selection glow */}
       {hasTileStates && containerWidth > 0 && (

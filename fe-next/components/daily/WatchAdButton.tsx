@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Coins, CheckCircle, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { Button } from '@/components/ui/button';
-import { useRewardedAd, AdStatus } from '@/hooks/useRewardedAd';
+import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { trackRewardedAdOffered } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
@@ -48,11 +48,12 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
   const [showSuccess, setShowSuccess] = useState(false);
   const [earnedAmount, setEarnedAmount] = useState(0);
 
-  const { coins: currentCoins, refreshCoins } = useCoinContext();
+  const { refreshCoins } = useCoinContext();
 
   // Update effect to refresh coins when ad succeeds
   const { showAd, isAdAvailable, isPlaceholderCooldown, status, error, rewardAmount } = useRewardedAd({
-    surface: 'doubleGold',
+    surface: 'generic',
+    analyticsSurface: surface,
     onRewardEarned: async (earned) => {
       setEarnedAmount(earned);
       setShowSuccess(true);

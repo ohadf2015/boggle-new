@@ -51,6 +51,7 @@ const mockBlastMovesUsed = { value: 7 };
 
 vi.mock('@/hooks/gameState/store', () => ({
   useGameMode: () => mockGameMode.value,
+  useGameModeConfirmed: () => true,
   useBlastTileOverlay: () => mockBlastTileOverlay.value,
   useBlastMovesUsed: () => mockBlastMovesUsed.value,
   useWordHuntTargetLength: () => mockWordHuntTargetLength.value,

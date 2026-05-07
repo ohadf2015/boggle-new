@@ -29,6 +29,7 @@ export function StandardDesktopAdapter(props: StandardDesktopAdapterProps) {
         <div className="flex items-center gap-3 p-3 rounded-xl border-2 border-foreground bg-card">
           <CircularTimer
             duration={props.totalTime}
+            initialRemainingTime={props.remainingTime}
             isPlaying={true}
             size={80}
             colorFamily="cyan"

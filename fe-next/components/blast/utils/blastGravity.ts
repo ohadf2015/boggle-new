@@ -126,18 +126,26 @@ export function computeGravityResult(
 
   for (let col = 0; col < gridSize; col++) {
     // Collect surviving tiles from bottom to top
-    const survivors: Array<{ uid: string; letter: string; type: BlastTileType; originalRow: number; hitsRemaining: number; innerType?: BlastTileType; isThawed?: boolean; countdown?: number }> = [];
+    type Survivor = { uid: string; letter: string; type: BlastTileType; originalRow: number; hitsRemaining: number } & Pick<BlastTileState, 'innerType' | 'isThawed' | 'countdown' | 'portalPairId' | 'crystalMultiplier' | 'fuseGroupId' | 'fuseTimer' | 'isUnlocked' | 'colorTag'>;
+    const survivors: Survivor[] = [];
     for (let row = gridSize - 1; row >= 0; row--) {
-      if (!tileStates[row][col].isCleared) {
+      const t = tileStates[row][col];
+      if (!t.isCleared) {
         survivors.push({
-          uid: tileStates[row][col].uid,
+          uid: t.uid,
           letter: grid[row][col],
-          type: tileStates[row][col].type,
+          type: t.type,
           originalRow: row,
-          hitsRemaining: tileStates[row][col].hitsRemaining,
-          ...(tileStates[row][col].innerType ? { innerType: tileStates[row][col].innerType } : {}),
-          ...(tileStates[row][col].isThawed ? { isThawed: true } : {}),
-          ...(tileStates[row][col].countdown != null ? { countdown: tileStates[row][col].countdown } : {}),
+          hitsRemaining: t.hitsRemaining,
+          ...(t.innerType != null ? { innerType: t.innerType } : {}),
+          ...(t.isThawed ? { isThawed: true } : {}),
+          ...(t.countdown != null ? { countdown: t.countdown } : {}),
+          ...(t.portalPairId != null ? { portalPairId: t.portalPairId } : {}),
+          ...(t.crystalMultiplier != null ? { crystalMultiplier: t.crystalMultiplier } : {}),
+          ...(t.fuseGroupId != null ? { fuseGroupId: t.fuseGroupId } : {}),
+          ...(t.fuseTimer != null ? { fuseTimer: t.fuseTimer } : {}),
+          ...(t.isUnlocked ? { isUnlocked: true } : {}),
+          ...(t.colorTag != null ? { colorTag: t.colorTag } : {}),
         });
       }
     }
@@ -154,9 +162,15 @@ export function computeGravityResult(
         isCleared: false,
         activationEffect: null,
         hitsRemaining: survivor.hitsRemaining,
-        ...(survivor.innerType ? { innerType: survivor.innerType } : {}),
+        ...(survivor.innerType != null ? { innerType: survivor.innerType } : {}),
         ...(survivor.isThawed ? { isThawed: true } : {}),
         ...(survivor.countdown != null ? { countdown: survivor.countdown } : {}),
+        ...(survivor.portalPairId != null ? { portalPairId: survivor.portalPairId } : {}),
+        ...(survivor.crystalMultiplier != null ? { crystalMultiplier: survivor.crystalMultiplier } : {}),
+        ...(survivor.fuseGroupId != null ? { fuseGroupId: survivor.fuseGroupId } : {}),
+        ...(survivor.fuseTimer != null ? { fuseTimer: survivor.fuseTimer } : {}),
+        ...(survivor.isUnlocked ? { isUnlocked: true } : {}),
+        ...(survivor.colorTag != null ? { colorTag: survivor.colorTag } : {}),
       };
 
       const fallDist = bottomRow - survivor.originalRow;

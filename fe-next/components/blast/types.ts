@@ -285,16 +285,19 @@ export const CASCADE_CHAIN_BONUS_MULTIPLIER = 0.75;
 // ==================== Cascade Momentum System ====================
 
 /** Momentum points required for each cascade tier (cumulative thresholds).
- * Players build momentum by finding words; higher tiers unlock deeper cascades. */
-export const CASCADE_MOMENTUM_THRESHOLDS = [0, 2, 4, 7, 11] as const;
+ * Players build momentum by finding words; higher tiers unlock deeper cascades.
+ * Raised from [0,2,4,7,11] → deeper chains now require sustained play, not
+ * just 2-4 words. Prevents near-full-board wipes from short sessions. */
+export const CASCADE_MOMENTUM_THRESHOLDS = [0, 3, 6, 10, 15] as const;
 /** Momentum points earned per word found (before cascade detection) */
 export const CASCADE_MOMENTUM_PER_WORD = 1;
 /** Bonus momentum for words of 5+ letters */
 export const CASCADE_MOMENTUM_LONG_WORD_BONUS = 1;
 /** Momentum decay per turn when no cascade triggers (cool-down) */
 export const CASCADE_MOMENTUM_DECAY = 1;
-/** Maximum cascade chain allowed at each momentum tier (index = tier) */
-export const CASCADE_TIER_MAX_CHAIN = [1, 2, 3, 4, 5] as const;
+/** Maximum cascade chain allowed at each momentum tier (index = tier).
+ * Capped tiers 2-3 at 2 to reduce mid-game avalanche cascades. */
+export const CASCADE_TIER_MAX_CHAIN = [1, 2, 2, 3, 4] as const;
 
 // ==================== Cascade Highlight Constants ====================
 

@@ -12,7 +12,12 @@ import { BlastGame } from './BlastGame';
 import { BlastResultsSummary } from './BlastResultsSummary';
 import { BlastPregameBuffModal, type BlastPregameBuff } from './BlastPregameBuffModal';
 import { BlastRetryWaveModal } from './BlastRetryWaveModal';
+import { BlastMascotHud } from './BlastMascotHud';
 import { HighlightPlayer } from './highlight/HighlightPlayer';
+import { useBlastMascot } from '@/lib/blast/useBlastMascot';
+import { useMascotEnabled } from '@/lib/blast/useMascotEnabled';
+import { emitMascotEvent } from '@/lib/blast/mascotBus';
+import { playWaveFailArpeggio } from '@/lib/blast/waveFailArpeggio';
 import { useBlastCheckpoint } from './hooks/useBlastCheckpoint';
 import { getWaveConfig, getWaveDistribution } from './utils/blastWaveConfig';
 import { calculateEarnedStars } from './utils/blastStarCalculator';
@@ -35,6 +40,10 @@ export function BlastView() {
   const [phase, setPhase] = useState<BlastPhase>('ready');
   const [results, setResults] = useState<BlastResultsData | null>(null);
   const gameKeyRef = useRef(0);
+
+  // HUD mascot — reacts to gameplay events via the mascot bus.
+  const mascot = useBlastMascot();
+  const mascotPref = useMascotEnabled();
 
   const setIsInGame = useHideNavigation();
   useEffect(() => {
@@ -117,6 +126,7 @@ export function BlastView() {
     setWaveHistory(prev => [...prev, waveResult]);
     setLastWaveStats({ score: waveScore, words: waveWords.length, clearPct });
     checkpoint.recordWaveReached(currentWave);
+    emitMascotEvent({ kind: 'wave-clear' });
     setPhase('waveTransition');
   }, [currentWave, checkpoint]);
 
@@ -149,6 +159,13 @@ export function BlastView() {
     };
     setResults(mergedResults);
     setPhase('results');
+
+    // Empathy cue on wave-fail (clearPct < 90 = wave didn't pass): mascot pose +
+    // gentle descending arpeggio. Both decorative — never block save flow.
+    if ((resultsData.clearPercentage ?? 100) < 90) {
+      emitMascotEvent({ kind: 'wave-fail' });
+      playWaveFailArpeggio();
+    }
 
     // Persist to DB and merge the server's enrichment (percentile, previousBest)
     // back into results state so the rank card and PB delta render.
@@ -306,18 +323,27 @@ export function BlastView() {
       />
 
       {phase === 'playing' && (
-        <BlastGame
-          key={`game-${gameKeyRef.current}`}
-          config={config}
-          waveNumber={currentWave}
-          waveConfig={waveConfig}
-          cumulativeScore={totalScore}
-          initialBuff={pregameBuff}
-          onWaveComplete={handleWaveComplete}
-          onGameEnd={handleGameEnd}
-          onHighlightStart={handleHighlightStart}
-          onQuit={handleQuit}
-        />
+        <>
+          <BlastGame
+            key={`game-${gameKeyRef.current}`}
+            config={config}
+            waveNumber={currentWave}
+            waveConfig={waveConfig}
+            cumulativeScore={totalScore}
+            initialBuff={pregameBuff}
+            onWaveComplete={handleWaveComplete}
+            onGameEnd={handleGameEnd}
+            onHighlightStart={handleHighlightStart}
+            onQuit={handleQuit}
+          />
+          <div className="absolute top-3 right-3 z-50">
+            <BlastMascotHud
+              state={mascot.state}
+              enabled={mascotPref.enabled}
+              onToggle={mascotPref.toggle}
+            />
+          </div>
+        </>
       )}
 
       {phase === 'waveTransition' && (() => {

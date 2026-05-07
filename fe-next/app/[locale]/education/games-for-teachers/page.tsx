@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import { getGamesForTeachersContent, EDUCATION_LOCALES, type EducationLocale } from './content';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -11,51 +12,43 @@ const PAGE_PATH = '/education/games-for-teachers';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  const isTargetLocale = locale === 'en';
-  const pageUrl = `${BASE_URL}/en${PAGE_PATH}`;
+  const isTargetLocale = EDUCATION_LOCALES.includes(locale as EducationLocale);
+  const pageUrl = `${BASE_URL}/${locale}${PAGE_PATH}`;
+  const c = getGamesForTeachersContent(locale);
+  const ogLocale = locale === 'he' ? 'he_IL' : locale === 'es' ? 'es_ES' : locale === 'sv' ? 'sv_SE' : locale === 'ja' ? 'ja_JP' : 'en_US';
   return {
-    title: 'Word Games for Teachers — Ready-to-Play, No Prep | LexiClash',
-    description: 'Word games designed for teachers. Zero prep, no student signup, custom curriculum word lists, class analytics, free forever. Use as warm-up, brain break, or sub-day activity.',
+    title: c.metaTitle,
+    description: c.metaDescription,
     keywords: 'word games for teachers, vocabulary games for teachers, classroom games for teachers, teacher word games, free games for teachers, classroom activities for teachers, no-prep classroom games, sub day word games, brain break word games, teacher vocabulary tools',
     openGraph: {
-      title: 'Word Games for Teachers — No Prep | LexiClash',
-      description: 'Free, browser-based, no student signup. Pick a list, share a code, play.',
-      locale: 'en_US',
+      title: c.ogTitle,
+      description: c.ogDescription,
+      locale: ogLocale,
       type: 'website',
       url: pageUrl,
       images: [{ url: `${BASE_URL}/og-image-en.webp`, width: 1200, height: 630, alt: 'LexiClash word games for teachers' }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Word Games for Teachers | LexiClash',
-      description: 'Free, no prep, no student signup. Built for real classrooms.',
+      title: c.ogTitle,
+      description: c.twitterDescription,
       images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
       canonical: pageUrl,
       languages: {
-        'x-default': pageUrl,
-        en: pageUrl,
-        he: `${BASE_URL}/he/education`,
-        sv: `${BASE_URL}/sv/education`,
-        ja: `${BASE_URL}/ja/education`,
-        es: `${BASE_URL}/es/education`,
+        'x-default': `${BASE_URL}/en${PAGE_PATH}`,
+        en: `${BASE_URL}/en${PAGE_PATH}`,
+        he: `${BASE_URL}/he${PAGE_PATH}`,
+        sv: `${BASE_URL}/sv${PAGE_PATH}`,
+        ja: `${BASE_URL}/ja${PAGE_PATH}`,
+        es: `${BASE_URL}/es${PAGE_PATH}`,
       },
     },
     robots: isTargetLocale ? { index: true, follow: true } : { index: false, follow: true },
   };
 }
 
-const faqs = [
-  { q: 'What word games can teachers use in the classroom?', a: 'Teachers can run a Boggle-style word search (whole-class race), Word Hunt (find a hidden target word), Word Wheel (form words from a letter set), or 1v1 vocabulary duels between paired students. All run in the browser, all use teacher-uploaded word lists, all free.' },
-  { q: 'How much prep does it take?', a: 'Under 60 seconds. Pick a word list (yours or one of ours), set time limit, share the 4-digit join code on the projector. Students play. Done.' },
-  { q: 'Does it work without internet?', a: 'It needs internet (real-time multiplayer requires it), but bandwidth is minimal — works on shaky school WiFi.' },
-  { q: 'Can I use my own word lists?', a: 'Yes. Teachers can upload custom lists from any unit, textbook, or curriculum standard. Lists save to the teacher dashboard for reuse.' },
-  { q: 'How do I track student progress?', a: 'Every session logs per-student accuracy, missed words, and class-wide patterns. Use it for formative assessment or to flag students who need extra practice.' },
-  { q: 'What if I have a substitute teacher?', a: 'LexiClash is sub-friendly. Subs can launch a saved word list with no permissions setup — just need the projected join code.' },
-  { q: 'Can I run it on a Chromebook cart?', a: 'Yes. Browser-only, works on any Chromebook, iPad, laptop, or phone. Bandwidth is light enough for 30 students on shared WiFi.' },
-  { q: 'Is there a teacher community or support?', a: 'Yes — see /education for the teacher hub, plus the contact form for direct support.' },
-];
 
 const useCases = [
   { tag: '5-MIN', title: 'Lesson warm-up', desc: 'Open class with a quick Word Wheel from yesterday\'s vocab — wakes the room up.' },
@@ -68,7 +61,7 @@ const useCases = [
 
 const features = [
   { icon: '⏱️', text: 'Setup in under 60 seconds — pick list, share code, play' },
-  { icon: '🚫', text: 'No student accounts — they join with a 4-digit code' },
+  { icon: '✅', text: 'Free student accounts — one-time setup, tracks XP and progress across sessions' },
   { icon: '📚', text: 'Upload custom curriculum word lists — any subject, any grade' },
   { icon: '📊', text: 'Per-student accuracy + class-wide missed-word patterns' },
   { icon: '👥', text: 'Live multiplayer up to 30 students; 1v1 duels for paired practice' },
@@ -79,20 +72,21 @@ const features = [
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
+  const c = getGamesForTeachersContent(locale);
 
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    '@id': `${BASE_URL}/en${PAGE_PATH}#faq`,
-    mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+    '@id': `${BASE_URL}/${locale}${PAGE_PATH}#faq`,
+    mainEntity: c.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
   };
 
   const learningResourceJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'LearningResource',
-    '@id': `${BASE_URL}/en${PAGE_PATH}#resource`,
-    name: 'Word Games for Teachers — Free, Ready-to-Play',
-    url: `${BASE_URL}/en${PAGE_PATH}`,
+    '@id': `${BASE_URL}/${locale}${PAGE_PATH}#resource`,
+    name: c.metaTitle,
+    url: `${BASE_URL}/${locale}${PAGE_PATH}`,
     inLanguage: 'en',
     learningResourceType: 'Activity',
     educationalUse: ['Classroom Activity', 'Formative Assessment', 'Vocabulary Building', 'Brain Break', 'Substitute Teacher Activity'],
@@ -130,19 +124,19 @@ export default async function Page({ params }: PageProps) {
         <section className="grid items-center gap-10 lg:grid-cols-12">
           <div className="lg:col-span-8">
             <span className="inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-purple px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-white shadow-hard">
-              ★ For Teachers ★ Zero Prep ★
+              {c.heroTag}
             </span>
             <h1 className="mt-5 font-neo-display text-5xl font-black leading-[0.92] tracking-tight sm:text-6xl lg:text-7xl">
-              Word Games. <span className="inline-block rotate-[-2deg] bg-neo-purple px-3 text-neo-white shadow-hard">For Teachers.</span>
-              <br /><span className="text-neo-lime">No</span> prep.
+              {c.heroH1.part1} <span className="inline-block rotate-[-2deg] bg-neo-purple px-3 text-neo-white shadow-hard">{c.heroH1.highlight}</span>
+              <br /><span className="text-neo-lime">{c.heroH1.part2}</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">
-              Built for the teacher who has 5 minutes left in class and 30 students who need to move. Pick a list, share a code, play. The dashboard does the rest.
+              {c.heroSubtitle}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-purple px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
                 <span className="block text-base sm:text-lg">▶ Start a Class Game</span>
-                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">Free · No student signup</span>
+                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">{c.ctaSubLabel}</span>
               </Link>
               <Link href={`/${locale}/education`} className="rounded-neo border-4 border-neo-black bg-neo-cyan px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:px-7">
                 <span className="block text-base sm:text-lg">⚙ Teacher Hub</span>
@@ -184,10 +178,10 @@ export default async function Page({ params }: PageProps) {
 
         <section className="mt-20">
           <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            Teacher <span className="text-neo-purple">questions</span>.
+            {c.faqTitle}
           </h2>
           <div className="space-y-3">
-            {faqs.map((faq, idx) => (
+            {c.faqs.map((faq, idx) => (
               <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard transition-all open:shadow-hard-lg">
                 <summary className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 font-neo-display font-black uppercase tracking-wide sm:px-6">
                   <span>{faq.q}</span>
@@ -199,12 +193,18 @@ export default async function Page({ params }: PageProps) {
           </div>
         </section>
 
-        <section className="mt-20 mb-12 rounded-neo border-4 border-neo-black bg-neo-purple p-8 text-neo-white shadow-hard-xl sm:p-12">
+        <nav className="mt-16 flex flex-wrap gap-3 text-sm font-bold" aria-label="Related education resources">
+          <Link href={`/${locale}/education/vocabulary-games-classroom`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-lime transition-all hover:bg-neo-navy">→ Classroom Vocabulary Games</Link>
+          <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-cyan transition-all hover:bg-neo-navy">→ ESL Word Games</Link>
+          <Link href={`/${locale}/education`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-white transition-all hover:bg-neo-navy">→ Education Hub</Link>
+        </nav>
+
+        <section className="mt-12 mb-12 rounded-neo border-4 border-neo-black bg-neo-purple p-8 text-neo-white shadow-hard-xl sm:p-12">
           <h2 className="font-neo-display text-4xl font-black leading-[0.95] sm:text-5xl">
             Stop searching.
             <br /><span className="bg-neo-navy px-3 text-neo-purple">Start playing.</span>
           </h2>
-          <p className="mt-4 max-w-xl text-base font-bold sm:text-lg">Free forever. No student accounts. Pick a list, share a code, watch them play.</p>
+          <p className="mt-4 max-w-xl text-base font-bold sm:text-lg">Free forever. Free student accounts. Pick a list, students log in, watch them play.</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-purple shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg">
               ▶ Start a Game

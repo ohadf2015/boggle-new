@@ -89,4 +89,30 @@ describe('useRewardedAd — rewardKind', () => {
     expect(awardWatchedAdMock).not.toHaveBeenCalled();
     expect(onRewardEarned).toHaveBeenCalledTimes(1);
   });
+
+  it('when awardWatchedAd returns null (DB failure), fires onAdError and suppresses onRewardEarned + analytics', async () => {
+    // Simulate a server-side rejection (e.g. daily cap reached, DB error)
+    awardWatchedAdMock.mockResolvedValueOnce(null);
+
+    const onRewardEarned = vi.fn();
+    const onAdError = vi.fn();
+    const { trackRewardedAdWatched } = await import('@/utils/growthTracking');
+    const trackMock = vi.mocked(trackRewardedAdWatched);
+    trackMock.mockClear();
+
+    const { result } = renderHook(() =>
+      useRewardedAd({ onRewardEarned, onAdError }),
+    );
+
+    await act(async () => {
+      result.current.showAd();
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    // Reward must NOT be reported as successful
+    expect(onRewardEarned).not.toHaveBeenCalled();
+    expect(trackMock).not.toHaveBeenCalled();
+    // Caller must be notified of the failure
+    expect(onAdError).toHaveBeenCalledTimes(1);
+  });
 });

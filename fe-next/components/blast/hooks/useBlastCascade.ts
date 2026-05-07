@@ -23,6 +23,7 @@ import {
 import type { WaveConfig } from '../utils/blastWaveConfig';
 import type { ScoreFlyEvent } from '../BlastScoreFly';
 import type { UseBlastComboStreakReturn } from './useBlastComboStreak';
+import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { detectVerticalWords, detectHorizontalWords } from '../utils/blastVerticalScanner';
 import { detectMatch3Clusters } from '../utils/blastMatch3Detector';
 import { vibrateBlastCascade } from '@/components/grid/hapticFeedback';
@@ -130,6 +131,9 @@ export function useBlastCascade(deps: CascadeDeps) {
         }
 
         if (cascadeFinds.length === 0) break;
+        // Cap total finds per level to 2 (match-3 + one word) — prevents 3
+        // simultaneous detectors from wiping half the board in a single chain step.
+        cascadeFinds.splice(2);
 
         chainLevel++;
 
@@ -183,6 +187,16 @@ export function useBlastCascade(deps: CascadeDeps) {
     // Resume combo timer after cascades complete
     comboStreak.resumeTimer();
     comboStreak.onWordSubmitted();
+
+    // Decorative mascot reaction — fire after cascade settles, only on
+    // chains worth celebrating (>=3). Never block on this.
+    if (chainLevel >= 3) {
+      try {
+        emitMascotEvent({ kind: 'cascade-detected', chainDepth: chainLevel });
+      } catch {
+        /* decorative — swallow */
+      }
+    }
 
     return chainLevel;
    

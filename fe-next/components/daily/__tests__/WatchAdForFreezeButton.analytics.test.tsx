@@ -18,6 +18,7 @@ vi.mock('@/hooks/useRewardedAd', () => ({
     isAdAvailable: true,
     isPlaceholderCooldown: false,
     isDailyLimitReached: false,
+    canShowAd: true,
     showAd: vi.fn(),
   }),
   AdStatus: {},

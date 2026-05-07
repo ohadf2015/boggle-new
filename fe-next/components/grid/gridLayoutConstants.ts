@@ -3,8 +3,11 @@
  * Used by GridComponent and BlastTileOverlay to ensure pixel-perfect alignment.
  */
 
-/** Inner padding of the grid container */
+/** Inner padding of the grid container (CSS value) */
 export const GRID_PADDING = '0.4rem';
+
+/** Inner padding of the grid container (numeric pixels for calculations) */
+export const GRID_PADDING_PX = 6.4;
 
 /**
  * Responsive gap strategy — viewport breakpoints map to tile-gap sizes:

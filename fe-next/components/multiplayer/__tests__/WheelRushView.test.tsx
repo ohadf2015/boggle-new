@@ -473,4 +473,68 @@ it('renders the round-timer countdown when remainingTime prop is provided', () =
     const chip = screen.getByText(/CRANE/);
     expect(chip.className).toMatch(/neo-red|bg-neo-red/);
   });
+
+  it('calls onFogProgressChange with progress in (0,1) while fog is active', () => {
+    vi.useFakeTimers();
+    try {
+      const start = 1_700_000_000_000;
+      vi.setSystemTime(start);
+      const socket = makeMockSocket();
+      const onFogProgressChange = vi.fn();
+      render(
+        <WheelRushView
+          socket={socket}
+          username="alice"
+          leaderboard={[{ username: 'alice', score: 0 }]}
+          onQuit={vi.fn()}
+          t={tStub}
+          onFogProgressChange={onFogProgressChange}
+        />,
+      );
+      act(() => {
+        socket.fire('wheelRushInit', { puzzle, startedAt: start });
+      });
+      act(() => {
+        vi.setSystemTime(start + 250);
+        vi.advanceTimersByTime(250);
+      });
+      expect(onFogProgressChange).toHaveBeenCalled();
+      const progress = onFogProgressChange.mock.calls.at(-1)![0] as number;
+      expect(progress).toBeGreaterThan(0);
+      expect(progress).toBeLessThan(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('calls onFogProgressChange(0) once fog expires', () => {
+    vi.useFakeTimers();
+    try {
+      const start = 1_700_000_000_000;
+      vi.setSystemTime(start);
+      const socket = makeMockSocket();
+      const onFogProgressChange = vi.fn();
+      render(
+        <WheelRushView
+          socket={socket}
+          username="alice"
+          leaderboard={[{ username: 'alice', score: 0 }]}
+          onQuit={vi.fn()}
+          t={tStub}
+          onFogProgressChange={onFogProgressChange}
+        />,
+      );
+      act(() => {
+        socket.fire('wheelRushInit', { puzzle, startedAt: start });
+      });
+      act(() => {
+        vi.setSystemTime(start + WHEEL_RUSH_FOG_MS + 500);
+        vi.advanceTimersByTime(WHEEL_RUSH_FOG_MS + 500);
+      });
+      const lastProgress = onFogProgressChange.mock.calls.at(-1)![0] as number;
+      expect(lastProgress).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

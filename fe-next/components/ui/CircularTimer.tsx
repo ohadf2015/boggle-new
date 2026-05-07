@@ -25,6 +25,8 @@ interface CircularTimerProps {
   className?: string;
   /** Unique key to reset the timer (change to restart) */
   timerKey?: number | string;
+  /** Starting point in seconds (for mid-game reconnects). Defaults to duration. */
+  initialRemainingTime?: number;
 }
 
 const COLOR_FAMILIES = {
@@ -52,6 +54,7 @@ const CircularTimer = memo<CircularTimerProps>(({
   onComplete,
   className,
   timerKey = 0,
+  initialRemainingTime,
 }) => {
   const family = COLOR_FAMILIES[colorFamily];
 
@@ -75,6 +78,7 @@ const CircularTimer = memo<CircularTimerProps>(({
         key={timerKey}
         isPlaying={isPlaying}
         duration={duration}
+        initialRemainingTime={initialRemainingTime}
         colors={colors}
         colorsTime={colorsTime}
         size={size}

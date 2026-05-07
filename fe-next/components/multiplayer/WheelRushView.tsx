@@ -48,6 +48,8 @@ interface Props {
   t: (path: string, params?: Record<string, string | number>) => string;
   /** Match countdown in seconds, sourced from MP startGame.timerSeconds. Null while server timer not yet known. */
   remainingTime?: number | null;
+  /** Called every ~250ms with 0..1 fog progress while fog is active, then 0 when fog clears. */
+  onFogProgressChange?: (progress: number) => void;
 }
 
 const MIN_LEN = WHEEL_RUSH_MIN_WORD_LEN;
@@ -78,7 +80,7 @@ const FogCountdown: React.FC<{ endsAt: number }> = ({ endsAt }) => {
   return <span className="opacity-60 tabular-nums">{secs}s</span>;
 };
 
-export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t, remainingTime }) => {
+export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t, remainingTime, onFogProgressChange }) => {
   const {
     playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
     playButtonClickSound, playBoardShuffleSound,
@@ -132,15 +134,34 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const latestRef = useRef({ t, puzzle, username, playWordAcceptedSound, playWordRejectedSound });
   latestRef.current = { t, puzzle, username, playWordAcceptedSound, playWordRejectedSound };
 
-  // Fog flips off once at expiry — no per-frame ticker on the parent.
-  // FogCountdown leaf owns its own 100ms tick for the seconds display.
+  const onFogProgressRef = useRef(onFogProgressChange);
+  onFogProgressRef.current = onFogProgressChange;
+
+  // Fog flips off once at expiry. Drives onFogProgressChange every 250ms
+  // so the desktop adapter's fog-progress meter stays live.
   useEffect(() => {
     if (startedAt == null) { setFogActive(false); return; }
     const remaining = startedAt + WHEEL_RUSH_FOG_MS - Date.now();
     if (remaining <= 0) { setFogActive(false); return; }
     setFogActive(true);
-    const id = setTimeout(() => setFogActive(false), remaining);
-    return () => clearTimeout(id);
+
+    const tick = () => {
+      const progress = Math.min(1, (Date.now() - startedAt) / WHEEL_RUSH_FOG_MS);
+      onFogProgressRef.current?.(progress);
+    };
+    tick();
+    const tickId = setInterval(tick, 250);
+
+    const expireId = setTimeout(() => {
+      clearInterval(tickId);
+      setFogActive(false);
+      onFogProgressRef.current?.(0);
+    }, remaining);
+
+    return () => {
+      clearTimeout(expireId);
+      clearInterval(tickId);
+    };
   }, [startedAt]);
 
   // Track which wheel indices are used (-1 for center)

@@ -29,7 +29,7 @@ export function WheelRushDesktopAdapter(props: WheelRushDesktopAdapterProps) {
       roster: <RosterRail players={props.leaderboard} />,
       modeBadge: (
         <div className="flex items-center gap-3 p-3 rounded-xl border-2 border-foreground bg-card">
-          <CircularTimer duration={props.totalTime} isPlaying size={80} colorFamily="pink" />
+          <CircularTimer duration={props.totalTime} initialRemainingTime={props.remainingTime} isPlaying size={80} colorFamily="pink" />
           <span className="font-bold uppercase">Wheel Rush</span>
         </div>
       ),

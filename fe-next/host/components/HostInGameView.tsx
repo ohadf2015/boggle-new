@@ -25,6 +25,7 @@ import type { BoardTheme } from '@/shared/types/socket';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   useGameMode,
+  useGameModeConfirmed,
 } from '@/hooks/gameState/store';
 
 // ==================== Types ====================
@@ -128,12 +129,13 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
 
   // Blast multiplayer
   totalTime,
-}): React.ReactElement => {
+}): React.ReactElement | null => {
   // Get player's game history for trail display logic
   const { profile } = useAuth();
 
   // Only gameMode at root — mode-overlay state subscribed by InGameScreen.
   const gameMode = useGameMode();
+  const gameModeConfirmed = useGameModeConfirmed();
 
   // Blast multiplayer bridge — converts Zustand state to BlastGame props
   const blastBridge = useBlastMultiplayerBridge({
@@ -186,6 +188,9 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       timestamp: index,
     }));
   }, [hostFoundWords]);
+
+  // Wait for server to confirm mode before rendering — prevents one-frame classic flash
+  if (!gameModeConfirmed) return null;
 
   // Wheel-rush: dedicated view (no TV variant yet, host always renders it)
   if (gameMode === 'wheel-rush') {

@@ -49,6 +49,7 @@ export const useBoardTheme = () => useGameStore((state) => state.boardTheme);
 
 // Game mode selector
 export const useGameMode = () => useGameStore((state) => state.gameMode);
+export const useGameModeConfirmed = (): boolean => useGameStore((state) => state.gameModeConfirmed);
 export const useHostSelectedGameMode = () => useGameStore((state) => state.hostSelectedGameMode);
 
 // Blast multiplayer selectors

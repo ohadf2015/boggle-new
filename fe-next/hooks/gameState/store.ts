@@ -52,6 +52,7 @@ const initialState: GameState = {
   levelUpData: null,
   boardTheme: null,
   gameMode: 'classic',
+  gameModeConfirmed: false,
   hostSelectedGameMode: 'random',
   blastTileOverlay: [],
   blastMovesUsed: 0,
@@ -303,7 +304,8 @@ export const useGameStore = create<GameStore>()(
     // ==========================================
 
     setGameMode: (value) => set((state) => ({
-      gameMode: applySetState(value, state.gameMode)
+      gameMode: applySetState(value, state.gameMode),
+      gameModeConfirmed: true,
     })),
 
     setHostSelectedGameMode: (value) => set((state) => ({
@@ -423,6 +425,7 @@ export const useGameStore = create<GameStore>()(
         ...initialState,
         combo: DEFAULT_COMBO_STATE,
         hostSelectedGameMode: preservedHostSelectedGameMode,
+        gameModeConfirmed: true,
         ...(data.letterGrid !== undefined && { letterGrid: data.letterGrid }),
         ...(data.remainingTime !== undefined && { remainingTime: data.remainingTime, gameDuration: data.remainingTime }),
         ...(data.gameLanguage !== undefined && { gameLanguage: data.gameLanguage }),
@@ -537,6 +540,7 @@ export {
   useBlastComboSync,
   useBlastOpponentActivity,
   useBlastPlayerStats,
+  useGameModeConfirmed,
   useWheelRushPlayerStats,
   useWordHuntTargetLength,
   useWordHuntTargetCategory,

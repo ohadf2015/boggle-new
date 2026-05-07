@@ -497,27 +497,45 @@ export function CoinProvider({ children }: { children: ReactNode }) {
   }, [addCoins]);
 
   /**
-   * Award coins for watching a rewarded ad
+   * Award coins for watching a rewarded ad.
+   *
+   * Bypasses the generic addCoins() wrapper so we get a typed success/failure
+   * signal — addCoins() swallows errors (returns current balance on failure)
+   * which makes it impossible to detect server-side daily-cap rejections.
+   * Uses syncCoinsToDatabase directly for auth users (routes to award_ad_coins
+   * RPC with server-enforced 10-watch/day limit) and addLocalCoins for guests.
    */
   const awardWatchedAd = useCallback(async (platform: string): Promise<CoinRewardResult | null> => {
     const amount = COIN_REWARDS.WATCH_AD;
+    const metadata = { platform, timestamp: new Date().toISOString() };
 
-    try {
-      const newBalance = await addCoins(amount, 'Watched Ad', {
-        platform,
-        timestamp: new Date().toISOString(),
-      });
-
-      return {
-        awarded: amount,
-        breakdown: { base: amount },
-        newBalance,
-      };
-    } catch (error) {
-      console.error('[CoinContext] Failed to award ad coins:', error);
-      return null;
+    if (isAuthenticated && user) {
+      const result = await syncCoinsToDatabase(user.id, amount, 'Watched Ad', metadata);
+      if (!result.success) {
+        console.error('[CoinContext] Failed to award ad coins:', result.error);
+        toast.error(result.error === 'Daily ad limit reached'
+          ? 'Daily ad limit reached'
+          : 'Failed to grant ad reward');
+        return null;
+      }
+      await refreshProfile();
+      const { data: freshProfile } = await getProfile(user.id);
+      const newBalance = freshProfile?.total_coins ?? result.newBalance ?? (coins + amount);
+      coinEarnToast(amount, 'Watched Ad');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('lexiclash:coin-earned', { detail: { amount } }));
+      }
+      return { awarded: amount, breakdown: { base: amount }, newBalance };
+    } else {
+      const newBalance = addLocalCoins(amount, 'Watched Ad', metadata);
+      setLocalCoins(newBalance);
+      coinEarnToast(amount, 'Watched Ad');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('lexiclash:coin-earned', { detail: { amount } }));
+      }
+      return { awarded: amount, breakdown: { base: amount }, newBalance };
     }
-  }, [addCoins]);
+  }, [isAuthenticated, user, coins, refreshProfile, setLocalCoins]);
 
   // Memoize context value to prevent unnecessary re-renders in consumers
   const value = useMemo<CoinContextValue>(() => ({

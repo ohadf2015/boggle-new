@@ -138,12 +138,18 @@ function EffectsWorker({
   const juiceRef = useRef<BlastJuiceKit | null>(null);
 
   const prevClearedKeyRef = useRef('');
-  const clearedSeqRef = useRef(0);
+  const comboStreakLevelRef = useRef(comboStreakLevel);
   const prevChainRef = useRef(0);
   const prevComboRef = useRef(0);
   const prevWaveRef = useRef(false);
   const magnetTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
   const bloomTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Keep comboStreakLevel ref in sync so the tile-clear effect can read it
+  // without needing it as a dep (prevents re-firing on every streak change).
+  useEffect(() => {
+    comboStreakLevelRef.current = comboStreakLevel;
+  }, [comboStreakLevel]);
 
   // Clean up magnet timers on unmount. Pixi overlay cleanup (cross flash,
   // pulse rings, bloom/shockwave filters) lives inside useBlastPixiOverlays.
@@ -231,8 +237,7 @@ function EffectsWorker({
   // Tile clear → per-type particle bursts + screen shake
   useEffect(() => {
     if (clearedTiles.length === 0) return;
-    clearedSeqRef.current++;
-    const key = `${clearedSeqRef.current}:${clearedTiles.map(t => `${t.row},${t.col},${t.type}`).join(';')}`;
+    const key = clearedTiles.map(t => `${t.row},${t.col},${t.type}`).join(';');
     if (key === prevClearedKeyRef.current) return;
     prevClearedKeyRef.current = key;
 
@@ -407,16 +412,17 @@ function EffectsWorker({
     // D — combo-streak ambient afterglow. One Pixi Graphics per word at the
     // centroid when the streak is hot (≥4). spawnAfterglow already self-cleans,
     // so this stays bounded — never accrues more than the cleared-tiles cadence.
-    const ambientTier = getComboAmbientTier(comboStreakLevel);
+    const ambientTier = getComboAmbientTier(comboStreakLevelRef.current);
     if (ambientTier !== null && clearedTiles.length > 0) {
       let cx = 0, cy = 0;
       for (const t of clearedTiles) {
         cx += t.col * cellSize + cellSize / 2;
         cy += t.row * cellSize + cellSize / 2;
       }
-      spawnAfterglow(cx / clearedTiles.length, cy / clearedTiles.length, ambientTier);
+      const ambientColor = ambientTier === 3 ? 0xff1493 : ambientTier === 2 ? 0xbfff00 : 0x00ffff;
+      spawnAfterglow(cx / clearedTiles.length, cy / clearedTiles.length, ambientColor);
     }
-  }, [clearedTiles, particles, shake, cellSize, gridSize, height, spawnDebris, spawnLightningBolt, spawnLightningDebris, firePrismBeams, spawnPrismDebris, flashCross, physics, fireShockwave, spawnPulseRing, spawnStarBurst, spawnAfterglow, moveGhostTo, runLongWordPunch, comboStreakLevel]);
+  }, [clearedTiles, particles, shake, cellSize, gridSize, height, spawnDebris, spawnLightningBolt, spawnLightningDebris, firePrismBeams, spawnPrismDebris, flashCross, physics, fireShockwave, spawnPulseRing, spawnStarBurst, spawnAfterglow, moveGhostTo, runLongWordPunch]);
 
   // Chain cascade sparkle + mega celebration at chain 5
   useEffect(() => {

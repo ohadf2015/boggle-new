@@ -28,7 +28,7 @@ export function WordHuntDesktopAdapter(props: WordHuntDesktopAdapterProps) {
       roster: <RosterRail players={props.leaderboard} />,
       modeBadge: (
         <div className="flex items-center gap-3 p-3 rounded-xl border-2 border-foreground bg-card">
-          <CircularTimer duration={props.totalTime} isPlaying size={80} colorFamily="purple" />
+          <CircularTimer duration={props.totalTime} initialRemainingTime={props.remainingTime} isPlaying size={80} colorFamily="purple" />
           <span className="font-bold uppercase">Word Hunt</span>
         </div>
       ),

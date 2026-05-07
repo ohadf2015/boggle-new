@@ -12,6 +12,9 @@ import { useCallback, type Dispatch, type SetStateAction, type MutableRefObject 
 import { detectSpecialCombos, type SpecialCombo } from '../utils/blastCombos';
 import { detectNearMiss } from '../utils/blastNearMiss';
 import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism } from '@/components/grid/hapticFeedback';
+import { emitMascotEvent } from '@/lib/blast/mascotBus';
+
+const GEM_LETTERS = /[QZXJ]/i;
 import type { BlastTileType, BlastGameConfig } from '../types';
 import type { ScoreFlyEvent } from '../BlastScoreFly';
 import type { ClearedTileEvent } from '../BlastEffectsCanvas';
@@ -206,6 +209,19 @@ export function useBlastWordHandler({
 
     sounds.playTileClear(clearedInfo.length);
     sounds.playLongWordBonus(path.length);
+
+    // 8. Mascot reaction — fire after the cascade settles so HUD timing matches
+    // the visual finale, not the initial pop. Decorative-only; failure here
+    // must never break gameplay.
+    try {
+      emitMascotEvent({
+        kind: 'word-submitted',
+        wordLength: path.length,
+        gemLetterUsed: GEM_LETTERS.test(data.word),
+      });
+    } catch {
+      /* mascot is decorative — swallow */
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engine, runCascade, onComboDetected, sounds, sequencer, config.gridSize, t, scoreMultiplier]);
 

@@ -29,6 +29,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   useGameMode,
+  useGameModeConfirmed,
   useGameStore,
 } from '@/hooks/gameState/store';
 
@@ -200,12 +201,13 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
   // Blast multiplayer
   totalTime,
-}): React.ReactElement => {
+}): React.ReactElement | null => {
   // Get player's game history for trail display logic
   const { profile } = useAuth();
 
   // Game mode state from Zustand
   const gameMode = useGameMode();
+  const gameModeConfirmed = useGameModeConfirmed();
   const gameDuration = useGameStore((s) => s.gameDuration);
 
   // Mode-overlay state subscribed inside InGameScreen — keeps this view
@@ -233,6 +235,11 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   const handleCloseTournamentStandings = useCallback(() => {
     setShowTournamentStandings(false);
   }, [setShowTournamentStandings]);
+
+  // Wait for server to confirm mode before rendering — prevents one-frame classic flash
+  // caused by the host handler setting tableData (React state) and gameMode (Zustand)
+  // in separate calls, producing two render cycles.
+  if (!gameModeConfirmed) return null;
 
   // Wheel-rush has no letter grid — render dedicated view before grid guard
   if (gameMode === 'wheel-rush') {

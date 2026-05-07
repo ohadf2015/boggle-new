@@ -66,10 +66,10 @@ const es = {
       "ogDescription": "Palabra del Día: Caza + Rueda de Palabras. Mismo puzzle mundial, comparte resultados, construye una racha diaria. Gratis, sin registro."
     },
     "multiplayer": {
-      "title": "Juego de Palabras Multijugador Online · Gratis con Amigos | LexiClash",
-      "description": "Batallas de palabras en tiempo real con amigos — sin registro, sin descarga. Crea sala, comparte enlace, compite en vivo. 6 modos, 5 idiomas, ranking diario. ¡Juega gratis ya! →",
-      "ogTitle": "Batallas de palabras en vivo con amigos — gratis",
-      "ogDescription": "Crea sala, comparte enlace, compite por palabras en vivo. 6 modos, 5 idiomas. Gratis en tu navegador."
+      "title": "Juego como Scrabble en Español — Multijugador Gratis Online | LexiClash",
+      "description": "¿Buscas jugar Scrabble en línea en español? LexiClash es la alternativa gratis: forma palabras en tiempo real contra amigos, sin turnos lentos, sin descarga. Crea sala, comparte enlace. 6 modos, 5 idiomas, ranking diario. ¡Juega ya!",
+      "ogTitle": "Alternativa a Scrabble Online — Multijugador Gratis en Español",
+      "ogDescription": "La alternativa al estilo Scrabble en tiempo real ⚡ Sin turnos lentos, sin descarga. Crea sala, comparte enlace. ¡Juega gratis!"
     },
     "about": {
       "title": "Sobre LexiClash - Nuestra Historia, Mision y Equipo",

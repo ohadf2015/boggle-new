@@ -23,6 +23,7 @@ import { getXpProgress } from '@/backend/modules/xpManager';
 import { getDuelStats, getDuelHistory, type DuelHistoryEntry, type DuelStatsResult } from '@/lib/supabase/education/duels';
 import { Swords, Trophy, X, Minus, Flame } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { transformAchievementRow } from './achievementTransform';
 import { motion } from 'framer-motion';
 import { ClassmatesList } from '@/components/education/duels/ClassmatesList';
 import { getStudentClassroom, getClassroomStudents, getLessons as getStudentLessons, type Classroom, type ClassroomStudent, type VocabularyLesson } from '@/lib/supabase/education';
@@ -76,7 +77,7 @@ export default function StudentProfilePageClient() {
       }
 
       try {
-        // Join with achievement_definitions to get key, category, icon, is_secret
+        // Join with achievement_definitions + tiers to compute nextThreshold client-side
         const { data, error } = await supabase
           .from('student_achievements')
           .select(`
@@ -90,7 +91,12 @@ export default function StudentProfilePageClient() {
               key,
               category,
               icon,
-              is_secret
+              is_secret,
+              achievement_tiers (
+                tier,
+                threshold,
+                tier_order
+              )
             )
           `)
           .eq('student_id', user.id);
@@ -101,28 +107,14 @@ export default function StudentProfilePageClient() {
           return;
         }
 
-        // Transform database rows to StudentAchievement format
-        // Note: next_threshold and percent_complete are computed client-side or set to defaults
-        const formattedAchievements: StudentAchievement[] = (data || []).map((row) => {
-          // Supabase inner join returns a single object, not an array
-          const def = row.achievement_definitions as unknown as {
-            key: string;
-            category: string;
-            icon: string;
-            is_secret: boolean;
-          };
-          return {
-            achievementKey: def.key,
-            currentTier: row.current_tier,
-            progressValue: row.progress_value || 0,
-            nextThreshold: null, // TODO: Calculate from achievement_tiers if needed
-            percentComplete: 100, // Earned achievements are 100% for their current tier
-            isPinned: row.is_pinned || false,
-            isSecret: def.is_secret,
-            category: def.category as 'progress' | 'skill' | 'consistency' | 'exploration',
-            icon: def.icon,
-          };
-        });
+        const formattedAchievements: StudentAchievement[] = (data || []).map((row) =>
+          transformAchievementRow({
+            current_tier: row.current_tier,
+            progress_value: row.progress_value || 0,
+            is_pinned: row.is_pinned || false,
+            achievement_definitions: row.achievement_definitions as unknown as Parameters<typeof transformAchievementRow>[0]['achievement_definitions'],
+          })
+        );
 
         setAchievements(formattedAchievements);
         setIsLoadingAchievements(false);

@@ -32,6 +32,7 @@ vi.mock('@/contexts/AuthContext', () => ({
 
 vi.mock('@/hooks/gameState/store', () => ({
   useGameMode: () => 'blast',
+  useGameModeConfirmed: () => true,
   useBlastTileOverlay: () => [],
   useBlastMovesUsed: () => 0,
   useWordHuntTargetLength: () => 0,

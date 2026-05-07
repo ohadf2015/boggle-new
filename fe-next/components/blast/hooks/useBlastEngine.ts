@@ -11,6 +11,7 @@ import { computeThawedCells } from './blastCellFilterLogic';
 import { computeGravityResult, type GravityResult } from '../utils/blastGravity';
 import type { SpecialCombo } from '../utils/blastCombos';
 import { hasValidWords } from '../utils/blastDeadEndDetector';
+import { buildDeadEndGrid } from '../utils/blastDeadEndGrid';
 import { calculateEarnedStars } from '../utils/blastStarCalculator';
 import { calculateLeftoverMoveBonus, applyRevive } from '../utils/blastMoveUtils';
 import { createDDAState, updateDDA, getDDASpawnModifier, isDDABoostActive } from '../utils/blastDDA';
@@ -217,21 +218,6 @@ export function useBlastEngine(
 
   // ── Dead-end detection ──
   const wordsFoundCount = gameState.wordsFound.length;
-
-  // Locked tile types that can't be used for word formation until thawed
-  const LOCKED_TYPES = new Set(['ice', 'frozen']);
-
-  /** Build grid masking cleared AND locked (ice/frozen unthawed) tiles as empty */
-  const buildDeadEndGrid = (grid: LetterGrid, tiles: BlastTileState[][]) =>
-    grid.map((row, ri) =>
-      row.map((cell, ci) => {
-        const t = tiles[ri]?.[ci];
-        if (!t || t.isCleared) return '';
-        // Ice/frozen tiles that haven't been thawed can't be selected
-        if (LOCKED_TYPES.has(t.type) && !t.isThawed) return '';
-        return cell;
-      }),
-    );
 
   useEffect(() => {
     if (!isDictLoaded || !effectiveGrid) return;

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import { getEslWordGamesContent, EDUCATION_LOCALES, type EducationLocale } from './content';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -11,54 +12,47 @@ const PAGE_PATH = '/education/esl-word-games';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  const isTargetLocale = locale === 'en';
-  const pageUrl = `${BASE_URL}/en${PAGE_PATH}`;
+  const isTargetLocale = EDUCATION_LOCALES.includes(locale as EducationLocale);
+  const pageUrl = `${BASE_URL}/${locale}${PAGE_PATH}`;
+  const c = getEslWordGamesContent(locale);
+  const ogLocale = locale === 'he' ? 'he_IL' : locale === 'es' ? 'es_ES' : locale === 'sv' ? 'sv_SE' : locale === 'ja' ? 'ja_JP' : 'en_US';
   return {
-    title: 'ESL Word Games Online — Free, No Signup, 5 Languages | LexiClash',
-    description: 'Free ESL word games online. Multiplayer + 1v1 vocabulary duels for English language learners. No student signup, runs in any browser, supports English, Spanish, Hebrew, Swedish, and Japanese dictionaries.',
-    keywords: 'esl word games online, esl word games free, free esl games online, esl vocabulary games, english word games for esl students, esl games online no signup, free word games for english learners, efl word games, esl spelling games, vocabulary games for english learners',
+    title: c.metaTitle,
+    description: c.metaDescription,
+    keywords: 'esl word games online, esl word games free, free esl games online, esl vocabulary games, english word games for esl students, free esl games for english learners, efl word games, esl spelling games, vocabulary games for english learners',
     openGraph: {
-      title: 'ESL Word Games Online — Free | LexiClash',
-      description: 'Multiplayer + 1v1 word games for ESL classes. No student signup. 5 languages.',
-      locale: 'en_US',
+      title: c.ogTitle,
+      description: c.ogDescription,
+      locale: ogLocale,
       type: 'website',
       url: pageUrl,
       images: [{ url: `${BASE_URL}/og-image-en.webp`, width: 1200, height: 630, alt: 'LexiClash ESL word games' }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Free ESL Word Games Online | LexiClash',
-      description: 'Multiplayer + 1v1 word games for ESL classes. No signup.',
+      title: c.ogTitle,
+      description: c.twitterDescription,
       images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
       canonical: pageUrl,
       languages: {
-        'x-default': pageUrl,
-        en: pageUrl,
-        he: `${BASE_URL}/he/education`,
-        sv: `${BASE_URL}/sv/education`,
-        ja: `${BASE_URL}/ja/education`,
-        es: `${BASE_URL}/es/education`,
+        'x-default': `${BASE_URL}/en${PAGE_PATH}`,
+        en: `${BASE_URL}/en${PAGE_PATH}`,
+        he: `${BASE_URL}/he${PAGE_PATH}`,
+        sv: `${BASE_URL}/sv${PAGE_PATH}`,
+        ja: `${BASE_URL}/ja${PAGE_PATH}`,
+        es: `${BASE_URL}/es${PAGE_PATH}`,
       },
     },
     robots: isTargetLocale ? { index: true, follow: true } : { index: false, follow: true },
   };
 }
 
-const faqs = [
-  { q: 'What are the best free ESL word games online?', a: 'For ESL classrooms, the best free word games are ones that combine spelling practice with social play. LexiClash runs Boggle-style word search, scrambled-letter wheels, and 1v1 vocabulary duels — all free, no student signup, and with full English dictionaries (plus Spanish, Hebrew, Swedish, Japanese for bilingual programs).' },
-  { q: 'Do ESL students need an account?', a: 'No. Students join with a 4-digit code on any phone or laptop browser. Reduces ESL-classroom friction (account confusion, password resets, parental email requirements).' },
-  { q: 'How do these games help English learners?', a: 'Word-formation games practice spelling, letter patterns, sight-word recognition, and vocabulary recall — the four bottlenecks for early ESL/EFL learners. Real-time multiplayer keeps engagement high without high-stakes pressure.' },
-  { q: 'Can I scaffold for different proficiency levels?', a: 'Yes. Set difficulty per session: shorter words and longer time for beginners; longer words and tight timers for advanced learners. You can also load custom vocabulary lists from your unit.' },
-  { q: 'Does it work for adult ESL/EFL classes?', a: 'Yes. Adult learners get the same browser-based access (no app store), no childish UI, and competitive multiplayer that adults find more engaging than flashcards.' },
-  { q: 'What about bilingual or dual-language programs?', a: 'LexiClash has full dictionaries in 5 languages (English, Spanish, Hebrew with RTL, Swedish, Japanese). Switch languages between rounds to practice each side of a bilingual program.' },
-  { q: 'Is it free for non-profit ESL programs?', a: 'Yes — fully free for any classroom use. No premium tier, no per-student fee, no district license required.' },
-];
 
 const features = [
   { icon: '🌍', text: 'Five built-in dictionaries: English, Spanish, Hebrew (RTL), Swedish, Japanese' },
-  { icon: '⚡', text: 'No student accounts — drops a major ESL-class onboarding bottleneck' },
+  { icon: '⚡', text: 'Free student accounts — quick one-time setup, then tracks progress forever' },
   { icon: '👥', text: 'Live multiplayer up to 30 students; pair-up duels for 2-by-2 practice' },
   { icon: '📈', text: 'Per-student accuracy + class-wide missed-word patterns' },
   { icon: '🎯', text: 'Three game modes: Boggle grid, Word Hunt, Word Wheel' },
@@ -75,20 +69,21 @@ const proficiencyLevels = [
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
+  const c = getEslWordGamesContent(locale);
 
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    '@id': `${BASE_URL}/en${PAGE_PATH}#faq`,
-    mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+    '@id': `${BASE_URL}/${locale}${PAGE_PATH}#faq`,
+    mainEntity: c.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
   };
 
   const learningResourceJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'LearningResource',
-    '@id': `${BASE_URL}/en${PAGE_PATH}#resource`,
-    name: 'ESL Word Games Online — Free',
-    url: `${BASE_URL}/en${PAGE_PATH}`,
+    '@id': `${BASE_URL}/${locale}${PAGE_PATH}#resource`,
+    name: c.metaTitle,
+    url: `${BASE_URL}/${locale}${PAGE_PATH}`,
     inLanguage: 'en',
     learningResourceType: 'Game',
     educationalUse: ['ESL Practice', 'EFL Practice', 'Vocabulary Building', 'Spelling Practice', 'Bilingual Programs'],
@@ -126,14 +121,14 @@ export default async function Page({ params }: PageProps) {
         <section className="grid items-center gap-10 lg:grid-cols-12">
           <div className="lg:col-span-8">
             <span className="inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-cyan px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">
-              ★ ESL / EFL ★ Free Forever ★
+              {c.heroTag}
             </span>
             <h1 className="mt-5 font-neo-display text-5xl font-black leading-[0.92] tracking-tight sm:text-6xl lg:text-7xl">
-              <span className="inline-block rotate-[-2deg] bg-neo-cyan px-3 text-neo-navy shadow-hard">ESL</span> Word Games.
-              <br /><span className="text-neo-lime">Online.</span> <span className="text-neo-pink">Free.</span>
+              <span className="inline-block rotate-[-2deg] bg-neo-cyan px-3 text-neo-navy shadow-hard">{c.heroH1.highlight}</span> {c.heroH1.rest1}
+              <br /><span className="text-neo-lime">{c.heroH1.rest2}</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">
-              Word-formation games designed for English language learners. No student signup, five dictionaries, and a teacher dashboard that surfaces which words tripped which students.
+              {c.heroSubtitle}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-cyan px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
@@ -180,10 +175,10 @@ export default async function Page({ params }: PageProps) {
 
         <section className="mt-20">
           <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            ESL teacher <span className="text-neo-cyan">FAQ</span>.
+            {c.faqTitle}
           </h2>
           <div className="space-y-3">
-            {faqs.map((faq, idx) => (
+            {c.faqs.map((faq, idx) => (
               <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard transition-all open:shadow-hard-lg">
                 <summary className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 font-neo-display font-black uppercase tracking-wide sm:px-6">
                   <span>{faq.q}</span>
@@ -195,12 +190,18 @@ export default async function Page({ params }: PageProps) {
           </div>
         </section>
 
-        <section className="mt-20 mb-12 rounded-neo border-4 border-neo-black bg-neo-cyan p-8 text-neo-navy shadow-hard-xl sm:p-12">
+        <nav className="mt-16 flex flex-wrap gap-3 text-sm font-bold" aria-label="Related education resources">
+          <Link href={`/${locale}/education/vocabulary-games-classroom`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-lime transition-all hover:bg-neo-navy">→ Classroom Vocabulary Games</Link>
+          <Link href={`/${locale}/education/games-for-teachers`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-cyan transition-all hover:bg-neo-navy">→ Games for Teachers</Link>
+          <Link href={`/${locale}/education`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-white transition-all hover:bg-neo-navy">→ Education Hub</Link>
+        </nav>
+
+        <section className="mt-12 mb-12 rounded-neo border-4 border-neo-black bg-neo-cyan p-8 text-neo-navy shadow-hard-xl sm:p-12">
           <h2 className="font-neo-display text-4xl font-black leading-[0.95] sm:text-5xl">
             Five minutes left?
             <br /><span className="bg-neo-navy px-3 text-neo-cyan">Run a vocab round.</span>
           </h2>
-          <p className="mt-4 max-w-xl text-base font-bold sm:text-lg">No student accounts, no app downloads, no prep. Pick a list, share the code, play.</p>
+          <p className="mt-4 max-w-xl text-base font-bold sm:text-lg">{c.heroSubtitle}</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-cyan shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg">
               ▶ Start ESL Game

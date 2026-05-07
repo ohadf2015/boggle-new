@@ -53,6 +53,10 @@ export interface GameState {
 
   // Game mode
   gameMode: GameModeSelection;
+  /** True once the server has confirmed the concrete mode for the current game.
+   * Stays false until setGameMode or batchStartGame fires, preventing a one-frame
+   * flash of classic mode before the server's mode update arrives. */
+  gameModeConfirmed: boolean;
   /**
    * Host's intended game mode for the next round (can be 'random').
    * Persists across rounds — distinct from `gameMode` which holds the
