@@ -10104,6 +10104,11 @@ const es = {
       "syncSuccess": "¡Progreso sincronizado!",
       "syncError": "Falló la sincronización — lo intentaremos de nuevo",
       "conflictResolved": "Progreso actualizado desde la nube"
+    },
+    "retention": {
+      "streakDay": "¡Día {{n}} de racha!",
+      "keepStreak": "¡Vuelve mañana para mantener tu racha!",
+      "firstDay": "¡Gran juego! Vuelve mañana para comenzar una racha."
     }
   },
   "notifications": {

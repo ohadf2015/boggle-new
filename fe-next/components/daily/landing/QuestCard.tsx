@@ -154,7 +154,7 @@ export function QuestCard({
           ...(previewImageUrl ? {
             backgroundImage: `url(${previewImageUrl})`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center 30%',
+            backgroundPosition: 'center center',
           } : {}),
         }}
       >
@@ -295,7 +295,7 @@ export function QuestCard({
           <UnavailableButton requestState={requestState} />
         ) : (
           <div className={cn(
-            'font-black uppercase rounded-lg text-center',
+            'relative z-10 font-black uppercase rounded-lg text-center',
             colorConfig.bg,
             'text-neo-black border-2 border-neo-black shadow-hard-sm',
             'active:translate-y-0.5 active:shadow-none transition-all',

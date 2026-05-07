@@ -269,7 +269,7 @@ export function DailyChallengeLanding({
           onPlay={onSelectWordHunt}
           timeMode="timed"
           timeModeLabel={t('daily.timedQuest')}
-          previewImageUrl="/daily/word-hunt-hero.jpg"
+          previewImageUrl="/daily/word-hunt-mascot.jpg"
           previewImageAlt={t('daily.wordHunt.title')}
           currentLanguage={currentLanguage}
           buttonText={t('daily.startQuest')}
@@ -354,7 +354,7 @@ export function DailyChallengeLanding({
           onPlay={onSelectWordWheel}
           timeMode="timed"
           timeModeLabel={t('daily.timedQuest')}
-          previewImageUrl="/daily/word-wheel-hero.jpg"
+          previewImageUrl="/daily/word-wheel-mascot.jpg"
           previewImageAlt={t('wordWheel.hub.wordWheelQuest')}
           buttonText={t('daily.startQuest')}
           delay={0.25}

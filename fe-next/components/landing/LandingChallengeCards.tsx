@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Swords, BookOpen, Map, Bomb, Zap, Link2, Brain } from 'lucide-react';
+import { Swords, BookOpen, Map, Bomb, Zap, Link2, Brain, Sparkles, ChevronDown } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
@@ -314,7 +314,8 @@ export function LandingChallengeCards({
   const mpCardsExtra = collapseExtras ? mpCardsAll.filter((m) => !ESSENTIAL_FOR_NEWBIES.has(m)) : [];
   const spCards = collapseExtras ? spCardsAll.filter((m) => ESSENTIAL_FOR_NEWBIES.has(m)) : spCardsAll;
   const spCardsExtra = collapseExtras ? spCardsAll.filter((m) => !ESSENTIAL_FOR_NEWBIES.has(m)) : [];
-  const hasExtras = mpCardsExtra.length + spCardsExtra.length > 0;
+  const hiddenCount = mpCardsExtra.length + spCardsExtra.length;
+  const hasExtras = hiddenCount > 0;
 
   let runningIndex = 0;
   const nextIndex = () => runningIndex++;
@@ -371,20 +372,41 @@ export function LandingChallengeCards({
         // first-timers opt into the longer mode list when they're ready.
         <details
           data-testid="landing-section-more"
-          className="group rounded-neo border-2 border-neo-white/20 bg-neo-navy-light/40 px-4 py-3"
+          className="group relative rounded-neo border-3 border-black bg-gradient-to-br from-neo-navy-light to-neo-navy shadow-hard hover:shadow-hard-lime hover:-translate-x-0.5 hover:-translate-y-0.5 open:shadow-hard-lg transition-all overflow-hidden"
         >
-          <summary className="cursor-pointer list-none flex items-center justify-between gap-2 select-none">
-            <span className="font-neo-display font-bold text-sm sm:text-base uppercase tracking-wide text-neo-white/80">
-              {t('landing.moreGameModes') || 'More Game Modes'}
+          <summary className="cursor-pointer list-none flex items-center justify-between gap-3 select-none px-4 py-3 sm:py-4">
+            <span className="flex items-center gap-3 min-w-0">
+              <span
+                aria-hidden="true"
+                className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-neo bg-neo-lime border-2 border-black shadow-hard-sm shrink-0 group-hover:animate-neo-wobble"
+              >
+                <Sparkles className="w-5 h-5 text-neo-navy" strokeWidth={2.5} />
+              </span>
+              <span className="flex flex-col min-w-0">
+                <span className="font-neo-display font-black text-base sm:text-lg uppercase tracking-wide text-neo-white truncate">
+                  {t('landing.moreGameModes') || 'More Game Modes'}
+                </span>
+                <span className="font-neo-body text-xs sm:text-sm text-neo-white/70 group-open:hidden flex items-center gap-2">
+                  {hiddenCount > 0 && (
+                    <span className="inline-flex items-center justify-center min-w-[1.4rem] h-5 px-1.5 rounded-full bg-neo-lime text-neo-navy font-neo-display font-black text-[0.65rem] leading-none border border-black">
+                      +{hiddenCount}
+                    </span>
+                  )}
+                  {t('landing.moreGameModesHint') || 'Tap to explore'}
+                </span>
+                <span className="font-neo-body text-xs sm:text-sm text-neo-white/70 hidden group-open:inline">
+                  {t('common.collapse') || 'Hide'}
+                </span>
+              </span>
             </span>
-            <span className="font-neo-body text-xs sm:text-sm text-neo-white/50 group-open:hidden">
-              {t('landing.moreGameModesHint') || 'Tap to explore'}
-            </span>
-            <span className="font-neo-body text-xs sm:text-sm text-neo-white/50 hidden group-open:inline">
-              {t('common.collapse') || 'Hide'}
+            <span
+              aria-hidden="true"
+              className="flex items-center justify-center w-9 h-9 rounded-full bg-neo-white/10 border-2 border-neo-white/30 shrink-0 transition-transform duration-300 group-open:rotate-180 group-hover:bg-neo-lime/20 group-hover:border-neo-lime"
+            >
+              <ChevronDown className="w-5 h-5 text-neo-white" strokeWidth={2.5} />
             </span>
           </summary>
-          <div className="mt-4 space-y-5">
+          <div className="mt-2 px-4 pb-4 space-y-5">
             {mpCardsExtra.length > 0 && (
               <div className={`grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 items-stretch ${mpCardsExtra.length >= 2 ? 'sm:grid-cols-2' : 'max-w-md mx-auto'}`}>
                 {mpCardsExtra.map((mode) => renderCard(mode, nextIndex()))}

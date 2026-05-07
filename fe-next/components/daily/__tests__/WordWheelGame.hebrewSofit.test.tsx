@@ -2,11 +2,9 @@
  * Hebrew sofit (final-form) display in word wheel.
  *
  * Wheel tiles must NEVER show sofit forms (verified by
- * `wordWheelGeneration.test.ts`). When letters land in the formed-word
- * area or in the found-words list, the LAST letter must render as its
- * sofit equivalent (מ→ם, נ→ן, פ→ף, צ→ץ, כ→ך) so Hebrew speakers see
- * proper orthography. Internal state stays in regular form so dictionary
- * lookups (which the cache normalizes both ways) keep working.
+ * `wordWheelGeneration.test.ts`). The built-word bar and found-words list
+ * also use regular (non-sofit) forms — the wheel is finals-free throughout
+ * so players only ever see the same letter shapes as the tiles.
  */
 import React from 'react';
 import { render, screen, fireEvent, act, cleanup } from '@testing-library/react';
@@ -119,21 +117,21 @@ describe('WordWheelGame Hebrew sofit display', () => {
       .map((b) => (b.firstChild?.textContent || '').trim());
   };
 
-  it('built word renders sofit on the LAST letter only (מ→ם at end)', () => {
+  it('built word never shows sofit — last letter stays in regular form (מ stays מ)', () => {
     const { container } = mountGame();
     tap(container, '[data-wheel-letter="י"]');
     tap(container, '[data-wheel-letter="מ"]');
-    expect(builderTileText(container)).toEqual(['י', 'ם']);
+    expect(builderTileText(container)).toEqual(['י', 'מ']);
   });
 
-  it('built word does NOT render sofit on a non-terminal letter (מ stays מ when not last)', () => {
+  it('built word non-terminal letter stays regular form (מ stays מ when not last)', () => {
     const { container } = mountGame();
     tap(container, '[data-wheel-letter="מ"]');
     tap(container, '[data-wheel-letter="י"]');
     expect(builderTileText(container)).toEqual(['מ', 'י']);
   });
 
-  it('found-word chip shows sofit at the end', async () => {
+  it('found-word chip shows regular form (no sofit)', async () => {
     const { container, onValidateWord } = mountGame();
     // Each wheel letter usable once; need 3 letters with center 'י' present.
     tap(container, '[data-wheel-letter="ה"]');
@@ -145,7 +143,7 @@ describe('WordWheelGame Hebrew sofit display', () => {
     });
     expect(onValidateWord).toHaveBeenCalled();
     const chipText = container.textContent || '';
-    expect(chipText).toContain('הים');
-    expect(chipText).not.toContain('הימ');
+    expect(chipText).toContain('הימ');
+    expect(chipText).not.toContain('הים');
   });
 });

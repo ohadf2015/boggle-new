@@ -10278,6 +10278,11 @@ const en = {
       "syncSuccess": "Progress synced!",
       "syncError": "Sync failed - will retry",
       "conflictResolved": "Progress updated from cloud"
+    },
+    "retention": {
+      "streakDay": "Day {{n}} Streak!",
+      "keepStreak": "Come back tomorrow to keep your streak going!",
+      "firstDay": "Great game! Come back tomorrow to start a streak."
     }
   },
   "notifications": {

@@ -226,10 +226,10 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           initial={hasMountedRef.current ? false : { opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut', delay: 0.05 }}
-          className="px-5 lg:px-6 pt-4 lg:pt-5"
+          className="px-5 lg:px-6 pt-3 lg:pt-5 shrink-0"
         >
           <div className="relative w-full overflow-hidden rounded-2xl border-3 border-neo-black shadow-hard">
-            <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[64/15]">
+            <div className="relative w-full h-[140px] sm:h-auto sm:aspect-[21/9] lg:aspect-[64/15]">
               <Image
                 src="/images/arena-hub-hero.jpg"
                 alt={t('multiplayerFlow.roomList.heroAlt')}

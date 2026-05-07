@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { QrCode, Trophy } from 'lucide-react';
+import { QrCode, Trophy, Share2 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
@@ -8,7 +8,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import ResultsPlayerCard from '../../components/results/ResultsPlayerCard';
 import WordHuntResultsSummary from '../../components/results/WordHuntResultsSummary';
 import TournamentStandings from '../../components/TournamentStandings';
-import { getJoinUrl } from '../../utils/share';
+import { getJoinUrl, copyJoinUrl } from '../../utils/share';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { cn } from '../../lib/utils';
 import type { Socket } from 'socket.io-client';
@@ -486,14 +486,32 @@ interface SoloStartConfirmDialogProps {
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   t: (path: string, params?: Record<string, string | number>) => string;
+  gameCode: string;
 }
 
 export const SoloStartConfirmDialog: React.FC<SoloStartConfirmDialogProps> = memo(function SoloStartConfirmDialog({
   open,
   onOpenChange,
   onConfirm,
-  t
-}) { return (
+  t,
+  gameCode,
+}) {
+  const handleInvite = useCallback(async () => {
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      const url = getJoinUrl(gameCode, 'solo-confirm');
+      try {
+        await navigator.share({
+          title: t('share.inviteTitle'),
+          text: t('share.inviteMessage'),
+          url,
+        });
+      } catch { /* user cancelled */ }
+    } else {
+      await copyJoinUrl(gameCode, t, 'solo-confirm');
+    }
+  }, [gameCode, t]);
+
+  return (
   <AlertDialog open={open} onOpenChange={onOpenChange}>
     <AlertDialogContent className="bg-white text-neo-black dark:bg-neo-navy dark:text-white border-neo-cyan/30">
       <AlertDialogHeader>
@@ -504,16 +522,31 @@ export const SoloStartConfirmDialog: React.FC<SoloStartConfirmDialogProps> = mem
           {t('hostView.soloStartDescription')}
         </AlertDialogDescription>
       </AlertDialogHeader>
-      <AlertDialogFooter>
-        <AlertDialogCancel className="bg-neo-navy/30 dark:bg-neo-navy text-slate-900 dark:text-white border-neo-white/30 dark:border-neo-black/50">
-          {t('hostView.soloStartCancel')}
-        </AlertDialogCancel>
+      <AlertDialogFooter className="flex-col gap-2 sm:flex-col">
+        {/* Invite Friends — PRIMARY */}
         <AlertDialogAction
+          data-testid="solo-dialog-invite"
+          onClick={handleInvite}
+          className="w-full bg-neo-lime text-neo-black font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed flex items-center justify-center gap-2"
+        >
+          <Share2 className="w-4 h-4" />
+          {t('hostView.inviteFriends')}
+        </AlertDialogAction>
+        {/* Play with bots — SECONDARY */}
+        <AlertDialogAction
+          data-testid="solo-dialog-bots"
           onClick={onConfirm}
-          className="bg-neo-lime text-neo-black font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
+          className="w-full bg-neo-navy-light dark:bg-neo-navy/60 text-neo-cream border-2 border-neo-black/40 hover:border-neo-black/70"
         >
           {t('hostView.soloStartConfirm')}
         </AlertDialogAction>
+        {/* Wait for players — CANCEL */}
+        <AlertDialogCancel
+          data-testid="solo-dialog-wait"
+          className="w-full bg-transparent border-transparent text-slate-400 hover:bg-white/5 mt-0"
+        >
+          {t('hostView.soloStartCancel')}
+        </AlertDialogCancel>
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>

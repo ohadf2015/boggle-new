@@ -36,6 +36,8 @@ import { AddFriendDialog } from './AddFriendDialog';
 import { FriendDetailDialog } from './FriendDetailDialog';
 import GiftModal from '@/components/social/GiftModal';
 import { PactFriendSelector } from '@/components/engagement/PactFriendSelector';
+import dynamic from 'next/dynamic';
+const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 import { useSocketOptional } from '@/utils/SocketContext';
 import type { Friend } from '@/utils/friends';
 import type { MessageThread as MessageThreadType } from '@/shared/types/friends';
@@ -93,6 +95,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
   const [challengeFriend, setChallengeFriend] = useState<Friend | null>(null);
   const [giftFriend, setGiftFriend] = useState<Friend | null>(null);
   const [showPactSelector, setShowPactSelector] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const setIsInGame = useHideNavigation();
 
   const socketContext = useSocketOptional();
@@ -349,16 +352,32 @@ const FriendsList: React.FC<FriendsListProps> = ({
   // Not authenticated
   if (!isAuthenticated) {
     return (
-      <div className={cn(
-        'p-4 rounded-neo border-2 text-center',
-        isDark ? 'bg-slate-800 border-white/10' : 'bg-gray-50 border-gray-200',
-        className
-      )}>
-        <Users className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-        <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-500')}>
-          {t('friends.signInRequired')}
-        </p>
-      </div>
+      <>
+        <div className={cn(
+          'p-4 rounded-neo border-2 text-center space-y-3',
+          isDark ? 'bg-slate-800 border-white/10' : 'bg-gray-50 border-gray-200',
+          className
+        )}>
+          <Users className="w-8 h-8 mx-auto text-gray-400" />
+          <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-500')}>
+            {t('friends.signInRequired')}
+          </p>
+          <EnhancedButton
+            onClick={() => setShowAuthModal(true)}
+            size="sm"
+            haptic
+            animation="pop"
+            className="bg-neo-pink text-white mx-auto"
+          >
+            {t('auth.signIn')}
+          </EnhancedButton>
+        </div>
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          initialMode="signin"
+        />
+      </>
     );
   }
 

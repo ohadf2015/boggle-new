@@ -1,5 +1,5 @@
 /** Current schema version — increment when SaveData shape changes */
-const CURRENT_VERSION = 1;
+const CURRENT_VERSION = 2;
 
 /**
  * Cloud save data structure for CrazyGames data module.
@@ -27,6 +27,11 @@ export interface SaveData {
     musicVolume: number;
     soundVolume: number;
     language: string;
+  };
+  /** Added v2: daily return streak tracking for D1 retention */
+  retentionData?: {
+    lastPlayedDate: string;  // ISO date YYYY-MM-DD, empty string when unset
+    cgStreak: number;
   };
 }
 
@@ -61,8 +66,13 @@ function migrateSaveData(data: Record<string, unknown>): SaveData | null {
       // v0 → v1: Add version field (original schema had no version)
       data.version = 1;
     }
-    // Future migrations go here:
-    // if (version < 2) { /* v1 → v2 migration */ }
+    if (version < 2) {
+      // v1 → v2: Add retentionData for D1 streak tracking
+      if (!data.retentionData) {
+        (data as Record<string, unknown>).retentionData = { lastPlayedDate: '', cgStreak: 0 };
+      }
+      data.version = 2;
+    }
   }
 
   return data as unknown as SaveData;

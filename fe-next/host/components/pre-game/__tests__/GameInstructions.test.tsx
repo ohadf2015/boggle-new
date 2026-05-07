@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { GameInstructions } from '../GameInstructions';
 
 vi.mock('framer-motion', () => {
@@ -19,25 +19,48 @@ vi.mock('framer-motion', () => {
 const t = (key: string) => key;
 
 describe('GameInstructions', () => {
-  it('expanded by default (no prop)', () => {
+  it('always shows content — no collapse/expand', () => {
     render(<GameInstructions selectedGameMode="classic" t={t} />);
     expect(screen.getByText('howToPlay.steps.basics.title')).toBeTruthy();
   });
 
-  it('collapsed when defaultOpen=false', () => {
+  it('always shows content even when defaultOpen=false', () => {
     render(<GameInstructions selectedGameMode="classic" t={t} defaultOpen={false} />);
-    expect(screen.queryByText('howToPlay.steps.basics.title')).toBeNull();
+    expect(screen.getByText('howToPlay.steps.basics.title')).toBeTruthy();
   });
 
-  it('expanded when defaultOpen=true', () => {
+  it('always shows content when defaultOpen=true', () => {
     render(<GameInstructions selectedGameMode="classic" t={t} defaultOpen={true} />);
     expect(screen.getByText('howToPlay.steps.basics.title')).toBeTruthy();
+  });
+
+  it('does not render a collapse toggle button', () => {
+    render(<GameInstructions selectedGameMode="classic" t={t} />);
+    expect(document.querySelector('[data-testid="how-to-play-toggle"]')).toBeNull();
   });
 
   it('renders an infographic image for the active step', () => {
     render(<GameInstructions selectedGameMode="classic" t={t} />);
     const img = screen.getByRole('img', { name: 'howToPlay.steps.basics.title' });
     expect(img).toBeTruthy();
+    expect(img.getAttribute('src')).toContain('swipe-letters');
+  });
+
+  it('navigates to next step via next button', () => {
+    render(<GameInstructions selectedGameMode="classic" t={t} />);
+    const nextBtn = screen.getByRole('button', { name: 'common.next' });
+    fireEvent.click(nextBtn);
+    const img = screen.getByRole('img', { name: 'howToPlay.steps.grid.title' });
+    expect(img.getAttribute('src')).toContain('diagonal-works');
+  });
+
+  it('navigates back via prev button', () => {
+    render(<GameInstructions selectedGameMode="classic" t={t} />);
+    const nextBtn = screen.getByRole('button', { name: 'common.next' });
+    fireEvent.click(nextBtn);
+    const prevBtn = screen.getByRole('button', { name: 'common.previous' });
+    fireEvent.click(prevBtn);
+    const img = screen.getByRole('img', { name: 'howToPlay.steps.basics.title' });
     expect(img.getAttribute('src')).toContain('swipe-letters');
   });
 

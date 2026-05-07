@@ -50,6 +50,9 @@ interface Props {
   remainingTime?: number | null;
   /** Called every ~250ms with 0..1 fog progress while fog is active, then 0 when fog clears. */
   onFogProgressChange?: (progress: number) => void;
+  /** When true, hides the internal top-bar (leaderboard chips + timer + quit) and word chips —
+   *  the MultiplayerDesktopShell handles those via the side rails. */
+  isDesktopCanvas?: boolean;
 }
 
 const MIN_LEN = WHEEL_RUSH_MIN_WORD_LEN;
@@ -80,7 +83,7 @@ const FogCountdown: React.FC<{ endsAt: number }> = ({ endsAt }) => {
   return <span className="opacity-60 tabular-nums">{secs}s</span>;
 };
 
-export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t, remainingTime, onFogProgressChange }) => {
+export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t, remainingTime, onFogProgressChange, isDesktopCanvas = false }) => {
   const {
     playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
     playButtonClickSound, playBoardShuffleSound,
@@ -390,13 +393,14 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     if (!el) return;
     const update = () => {
       const w = el.getBoundingClientRect().width;
-      setWheelRadius(Math.max(56, Math.min(96, (w - 56) / 2)));
+      const maxR = isDesktopCanvas ? 140 : 96;
+      setWheelRadius(Math.max(56, Math.min(maxR, (w - 56) / 2)));
     };
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [puzzle]);
+  }, [puzzle, isDesktopCanvas]);
 
   // Keyboard input (shared hook)
   useWordWheelKeyboard({
@@ -422,51 +426,53 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
 
   return (
     <div className="relative flex-1 flex flex-col min-h-0 bg-neo-navy p-3 md:p-4 gap-2 overflow-hidden">
-      {/* Top bar: leaderboard (fog-of-war) + quit */}
-      <div className="flex items-center justify-between gap-2 shrink-0 pt-[env(safe-area-inset-top)]">
-        <div className="flex items-center gap-1.5 overflow-x-auto flex-1 min-w-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {leaderboard.map(p => {
-            const isSelf = p.username === username;
-            const fogged = !isSelf && fogActive;
-            const wc = p.wordCount ?? 0;
-            return (
-              <div
-                key={p.username}
-                className={cn(
-                  'shrink-0 px-2.5 py-1 rounded-neo border-2 border-neo-black font-neo-display font-bold text-xs sm:text-sm shadow-hard whitespace-nowrap',
-                  isSelf ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-cream',
-                )}
-              >
-                <span className="opacity-80">{p.username}</span>
-                <span className="mx-1 opacity-40">·</span>
-                {fogged ? (
-                  <span className="tracking-wider">???</span>
-                ) : (
-                  <span className="tabular-nums">{p.score}</span>
-                )}
-                {wc > 0 && (
-                  <span className="ms-1 text-[10px] sm:text-xs opacity-60 tabular-nums">{wc}w</span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-        {typeof remainingTime === 'number' && (
-          <div
-            data-testid="wheel-rush-timer"
-            aria-label={t('wordWheel.timeLeft') || 'Time Left'}
-            className={cn(
-              'shrink-0 px-2.5 py-1 rounded-neo border-2 border-neo-black font-neo-display font-bold text-xs sm:text-sm shadow-hard tabular-nums',
-              remainingTime <= 10
-                ? 'bg-neo-red text-neo-white animate-pulse'
-                : 'bg-neo-cyan text-neo-black',
-            )}
-          >
-            {Math.floor(Math.max(0, remainingTime) / 60)}:{String(Math.max(0, remainingTime) % 60).padStart(2, '0')}
+      {/* Top bar: leaderboard (fog-of-war) + quit — hidden in desktop shell (handled by side rails) */}
+      {!isDesktopCanvas && (
+        <div className="flex items-center justify-between gap-2 shrink-0 pt-[env(safe-area-inset-top)]">
+          <div className="flex items-center gap-1.5 overflow-x-auto flex-1 min-w-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {leaderboard.map(p => {
+              const isSelf = p.username === username;
+              const fogged = !isSelf && fogActive;
+              const wc = p.wordCount ?? 0;
+              return (
+                <div
+                  key={p.username}
+                  className={cn(
+                    'shrink-0 px-2.5 py-1 rounded-neo border-2 border-neo-black font-neo-display font-bold text-xs sm:text-sm shadow-hard whitespace-nowrap',
+                    isSelf ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-cream',
+                  )}
+                >
+                  <span className="opacity-80">{p.username}</span>
+                  <span className="mx-1 opacity-40">·</span>
+                  {fogged ? (
+                    <span className="tracking-wider">???</span>
+                  ) : (
+                    <span className="tabular-nums">{p.score}</span>
+                  )}
+                  {wc > 0 && (
+                    <span className="ms-1 text-[10px] sm:text-xs opacity-60 tabular-nums">{wc}w</span>
+                  )}
+                </div>
+              );
+            })}
           </div>
-        )}
-        <Button size="sm" variant="destructive" onClick={onQuit} className="shrink-0">{t('common.quit') || 'Quit'}</Button>
-      </div>
+          {typeof remainingTime === 'number' && (
+            <div
+              data-testid="wheel-rush-timer"
+              aria-label={t('wordWheel.timeLeft') || 'Time Left'}
+              className={cn(
+                'shrink-0 px-2.5 py-1 rounded-neo border-2 border-neo-black font-neo-display font-bold text-xs sm:text-sm shadow-hard tabular-nums',
+                remainingTime <= 10
+                  ? 'bg-neo-red text-neo-white animate-pulse'
+                  : 'bg-neo-cyan text-neo-black',
+              )}
+            >
+              {Math.floor(Math.max(0, remainingTime) / 60)}:{String(Math.max(0, remainingTime) % 60).padStart(2, '0')}
+            </div>
+          )}
+          <Button size="sm" variant="destructive" onClick={onQuit} className="shrink-0">{t('common.quit') || 'Quit'}</Button>
+        </div>
+      )}
 
       {fogActive && (
         <div className="text-center text-xs sm:text-sm text-neo-cyan font-neo-display font-bold tracking-wide flex items-center justify-center gap-2 shrink-0">
@@ -568,7 +574,12 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       <div className="flex-1 flex flex-col items-center justify-center min-h-0 gap-3">
         <div
           ref={wheelContainerRef}
-          className="relative w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 flex items-center justify-center touch-none"
+          className={cn(
+            "relative flex items-center justify-center touch-none",
+            isDesktopCanvas
+              ? "w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96"
+              : "w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72",
+          )}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -667,7 +678,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         </div>
       </div>
 
-      <MyWordsChips words={myWords} />
+      {!isDesktopCanvas && <MyWordsChips words={myWords} />}
 
       <div className="pointer-events-none absolute inset-0 z-40">
         {floatingReactions.map(r => (

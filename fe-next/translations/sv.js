@@ -10084,6 +10084,11 @@ const sv = {
       "syncSuccess": "Framsteg synkade!",
       "syncError": "Synkning misslyckades - försöker igen",
       "conflictResolved": "Framsteg uppdaterade från molnet"
+    },
+    "retention": {
+      "streakDay": "Dag {{n}} i rad!",
+      "keepStreak": "Kom tillbaka imorgon och håll din streak igång!",
+      "firstDay": "Bra spel! Kom tillbaka imorgon för att starta en streak."
     }
   },
   "notifications": {

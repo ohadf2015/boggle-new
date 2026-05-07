@@ -10070,6 +10070,11 @@ const ja = {
       "syncSuccess": "Progress synced!",
       "syncError": "Sync failed - will retry",
       "conflictResolved": "Progress updated from cloud"
+    },
+    "retention": {
+      "streakDay": "{{n}}日連続プレイ中！",
+      "keepStreak": "明日も続けてストリークを維持しよう！",
+      "firstDay": "素晴らしいゲームでした！明日も来てストリークを始めよう。"
     }
   },
   "notifications": {

@@ -45,7 +45,7 @@ function convertAttempt(
   attempt: { guess: string; feedback: MPLetterFeedback[]; isDiscovery?: boolean }
 ): TargetAttempt {
   const feedback: SPLetterFeedback[] = attempt.feedback.map((fb, i) => ({
-    letter: attempt.guess[i] || '?',
+    letter: (attempt.guess[i] || '?').toUpperCase(),
     feedback: convertFeedback(fb),
     position: i,
   }));
@@ -102,7 +102,7 @@ export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult 
 
     // Discovery clues from board words (server-computed, mirrors SP logic)
     for (const dc of discoveryClues) {
-      clues.set(dc.position, { letter: dc.letter, type: 'green' });
+      clues.set(dc.position, { letter: dc.letter.toUpperCase(), type: 'green' });
     }
 
     // Target guess feedback: only GREEN (exact position matches) go into accumulatedClues.
@@ -124,7 +124,7 @@ export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult 
     const { knownLetters: computed } = computeYellowState(attempts, letterCounts, accumulatedClues);
     // Add server-computed known letters from word discoveries
     for (const letter of discoveryKnownLetters) {
-      computed.add(letter);
+      computed.add(letter.toUpperCase());
     }
     return computed;
   }, [attempts, discoveryKnownLetters, accumulatedClues]);

@@ -7,7 +7,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { isValidWordWheelWord, type WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
 import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
-import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { WheelLetter, WordTile } from './WordWheelParts';
@@ -210,21 +209,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     [builtLetters],
   );
 
-  // Hebrew sofit (final-form) is a presentation concern only: wheel tiles
-  // and internal state always carry regular forms (so dedup, scoring, and
-  // dictionary lookups stay consistent across the cache, which already
-  // accepts both forms). Display layer swaps the LAST glyph to its sofit
-  // equivalent so Hebrew speakers see proper orthography.
-  const displayLetters = useMemo(() => {
-    const raw = builtLetters.map(bl => bl.letter);
-    if (language !== 'he' || raw.length === 0) return raw;
-    const finalized = applyHebrewFinalLetters(raw.join(''));
-    return finalized.split('');
-  }, [builtLetters, language]);
-  const displayWord = useCallback(
-    (word: string) => (language === 'he' ? applyHebrewFinalLetters(word) : word),
-    [language],
-  );
+  // Wheel tiles always carry regular (non-sofit) forms, so the built-word
+  // bar and found-words list show the same glyphs as the tiles.
+  const displayLetters = useMemo(() => builtLetters.map(bl => bl.letter), [builtLetters]);
+  const displayWord = useCallback((word: string) => word, []);
 
   // Timer — suppressed in practice mode (no countdown, no auto-complete).
   // Player ends the run via the manual "End practice" CTA below.

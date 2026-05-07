@@ -13,8 +13,7 @@ import { detectSpecialCombos, type SpecialCombo } from '../utils/blastCombos';
 import { detectNearMiss } from '../utils/blastNearMiss';
 import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism } from '@/components/grid/hapticFeedback';
 import { emitMascotEvent } from '@/lib/blast/mascotBus';
-
-const GEM_LETTERS = /[QZXJ]/i;
+import { hasGemLetter } from '@/lib/blast/gemLetters';
 import type { BlastTileType, BlastGameConfig } from '../types';
 import type { ScoreFlyEvent } from '../BlastScoreFly';
 import type { ClearedTileEvent } from '../BlastEffectsCanvas';
@@ -217,7 +216,7 @@ export function useBlastWordHandler({
       emitMascotEvent({
         kind: 'word-submitted',
         wordLength: path.length,
-        gemLetterUsed: GEM_LETTERS.test(data.word),
+        gemLetterUsed: hasGemLetter(data.word, config.language),
       });
     } catch {
       /* mascot is decorative — swallow */

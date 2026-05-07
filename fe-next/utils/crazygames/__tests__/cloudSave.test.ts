@@ -6,7 +6,7 @@ describe('cloudSave', () => {
   let mockRemoveItem: jest.Mock;
 
   const mockSaveDataValue: SaveData = {
-    version: 1,
+    version: 2,
     adventureProgress: {
       worldId: 2,
       levelId: 5,
@@ -23,6 +23,10 @@ describe('cloudSave', () => {
       musicVolume: 0.7,
       soundVolume: 0.9,
       language: 'en',
+    },
+    retentionData: {
+      lastPlayedDate: '2026-05-07',
+      cgStreak: 3,
     },
   };
 
@@ -110,7 +114,7 @@ describe('cloudSave', () => {
 
     it('should save minimal data correctly', async () => {
       const minimalData: SaveData = {
-        version: 1,
+        version: 2,
         adventureProgress: {
           worldId: 1,
           levelId: 1,
@@ -141,7 +145,7 @@ describe('cloudSave', () => {
 
     it('should save maximum data correctly', async () => {
       const maxData: SaveData = {
-        version: 1,
+        version: 2,
         adventureProgress: {
           worldId: 10,
           levelId: 50,
@@ -287,6 +291,50 @@ describe('cloudSave', () => {
       );
 
       consoleSpy.mockRestore();
+    });
+  });
+
+  describe('v1 → v2 migration (retentionData)', () => {
+    it('migrates v1 data by adding retentionData with defaults', async () => {
+      const v1Data = {
+        version: 1,
+        adventureProgress: { worldId: 1, levelId: 2, stars: 3, completedLevels: [] },
+        educationProgress: { totalXp: 100, level: 2, streak: 5, achievements: [] },
+        preferences: { musicVolume: 0.5, soundVolume: 0.5, language: 'he' },
+      };
+      mockGetItem.mockResolvedValue(JSON.stringify(v1Data));
+
+      const result = await loadFromCloud();
+
+      expect(result).not.toBeNull();
+      expect(result!.retentionData).toBeDefined();
+      expect(result!.retentionData!.cgStreak).toBe(0);
+      expect(result!.retentionData!.lastPlayedDate).toBe('');
+    });
+
+    it('loads v2 retentionData intact', async () => {
+      const v2Data = {
+        ...mockSaveDataValue,
+        retentionData: { lastPlayedDate: '2026-05-06', cgStreak: 4 },
+      };
+      mockGetItem.mockResolvedValue(JSON.stringify(v2Data));
+
+      const result = await loadFromCloud();
+
+      expect(result!.retentionData).toEqual({ lastPlayedDate: '2026-05-06', cgStreak: 4 });
+    });
+
+    it('saves retentionData in serialized output', async () => {
+      const dataWithRetention: SaveData = {
+        ...mockSaveDataValue,
+        retentionData: { lastPlayedDate: '2026-05-07', cgStreak: 3 },
+      };
+
+      await saveToCloud(dataWithRetention);
+
+      const savedJson = mockSetItem.mock.calls[0][1] as string;
+      const parsed = JSON.parse(savedJson);
+      expect(parsed.retentionData).toEqual({ lastPlayedDate: '2026-05-07', cgStreak: 3 });
     });
   });
 

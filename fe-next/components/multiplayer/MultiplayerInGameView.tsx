@@ -296,8 +296,9 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     (onStopGame ?? onExitRoom)?.();
   }, [onStopGame, onExitRoom]);
 
-  // Wheel Rush mode — no letter grid; render before grid placeholder guard
-  if (gameMode === 'wheel-rush') {
+  // Wheel Rush mode — no letter grid; render before grid placeholder guard.
+  // Mobile-only fallback: desktop path is handled by WheelRushDesktopAdapter below.
+  if (gameMode === 'wheel-rush' && !shellEnabled) {
     return (
       <WheelRushView
         socket={socket}
@@ -345,7 +346,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     }));
 
     // Map foundWords from FoundWord shape to LadderWord shape
-    const ladderWords = foundWords.map((fw, idx) => ({
+    const ladderWords = foundWords.map((fw) => ({
       word: fw.word,
       score: fw.score ?? 0,
       ts: fw.timestamp ?? 0,
@@ -427,13 +428,14 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       userId: entry.username ?? '',
       username: entry.username,
       score: entry.score,
+      wordCount: entry.wordCount,
       status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
       isYou: entry.username === username,
       customAvatar: entry.avatar?.customAvatar ?? null,
     }));
 
     // Map foundWords from FoundWord shape to LadderWord shape
-    const ladderWords = foundWords.map((fw, idx) => ({
+    const ladderWords = foundWords.map((fw) => ({
       word: fw.word,
       score: fw.score ?? 0,
       ts: fw.timestamp ?? 0,
@@ -460,7 +462,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         totalTime={totalTime ?? 60}
         fogProgress={fogProgress}
         meId={username}
-        canvas={<WheelRushView {...wheelRushProps} />}
+        canvas={<WheelRushView {...wheelRushProps} isDesktopCanvas />}
       />
     );
   }
@@ -478,7 +480,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     }));
 
     // Map foundWords from FoundWord shape to LadderWord shape
-    const ladderWords = foundWords.map((fw, idx) => ({
+    const ladderWords = foundWords.map((fw) => ({
       word: fw.word,
       score: fw.score ?? 0,
       ts: fw.timestamp ?? 0,

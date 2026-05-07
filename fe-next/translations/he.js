@@ -10055,6 +10055,11 @@ const he = {
       "syncSuccess": "Progress synced!",
       "syncError": "Sync failed - will retry",
       "conflictResolved": "Progress updated from cloud"
+    },
+    "retention": {
+      "streakDay": "יום {{n}} ברצף!",
+      "keepStreak": "חזור מחר כדי לשמור על הרצף שלך!",
+      "firstDay": "משחק מצוין! חזור מחר כדי להתחיל רצף."
     }
   },
   "notifications": {

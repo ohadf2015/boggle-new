@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Gift, Zap, Sparkles, Shield, Crown, Flame } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { CalendarRewardCard, CalendarReward } from './CalendarRewardCard';
@@ -12,6 +13,8 @@ import { toast } from 'react-hot-toast';
 import { Loader } from '@/components/ui/Loader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { fetchWithAuth, postWithAuth } from '@/utils/authFetch';
+
+const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
 interface CalendarStatus {
   month: number;
@@ -40,6 +43,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
   const [isClaiming, setIsClaiming] = useState(false);
   const [claimedReward, setClaimedReward] = useState<CalendarReward | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const fetchCalendarStatus = useCallback(async () => {
     if (!user?.id) return;
@@ -174,22 +178,35 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
 
           {/* Not logged in state */}
           {!isLoading && !user?.id && (
-            <div className="text-center py-8">
-              <Gift className="w-12 h-12 mx-auto mb-3 text-neo-pink/50" />
-              <h3 className="text-lg font-bold text-neo-black mb-2">
+            <div className="text-center py-8 space-y-3">
+              <Gift className="w-12 h-12 mx-auto text-neo-pink/50" />
+              <h3 className="text-lg font-bold text-neo-black">
                 {t('calendar.loginRequired')}
               </h3>
-              <p className="text-sm text-neo-black/70 mb-4">
+              <p className="text-sm text-neo-black/70">
                 {t('calendar.loginToClaimRewards')}
               </p>
-              <Button
-                onClick={onClose}
-                className="bg-neo-cyan text-neo-black font-bold uppercase text-sm py-2 px-4 border-2 border-neo-black shadow-hard hover:shadow-hard-lg"
-              >
-                {t('common.close')}
-              </Button>
+              <div className="flex flex-col gap-2 items-center pt-1">
+                <Button
+                  onClick={() => setShowAuthModal(true)}
+                  className="bg-neo-pink text-white font-bold uppercase text-sm py-2 px-6 border-2 border-neo-black shadow-hard hover:shadow-hard-lg"
+                >
+                  {t('auth.signIn')}
+                </Button>
+                <button
+                  onClick={onClose}
+                  className="text-xs text-neo-black/50 hover:text-neo-black/80 underline underline-offset-2"
+                >
+                  {t('common.close')}
+                </button>
+              </div>
             </div>
           )}
+          <AuthModal
+            isOpen={showAuthModal}
+            onClose={() => setShowAuthModal(false)}
+            initialMode="signin"
+          />
 
           {/* Error state */}
           {!isLoading && user?.id && fetchError && (

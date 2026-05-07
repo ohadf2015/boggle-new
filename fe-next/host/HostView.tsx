@@ -598,6 +598,7 @@ const HostView: React.FC<HostViewProps> = memo(({
         onOpenChange={state.setShowSoloConfirm}
         onConfirm={actions.confirmSoloStart}
         t={t}
+        gameCode={gameCode}
       />
 
 

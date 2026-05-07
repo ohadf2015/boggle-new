@@ -35,6 +35,9 @@ vi.mock('@/components/landing/WotdTeaser', () => ({
 vi.mock('@/components/vocabulary/WordCollectionCard', () => ({
   WordCollectionCard: () => <div data-testid="word-collection-card" />,
 }));
+vi.mock('@/components/growth/CrazyGamesRetentionCard', () => ({
+  CrazyGamesRetentionCard: () => <div data-testid="cg-retention-card" />,
+}));
 
 const mockUseCrazyGames = useCrazyGames as MockedFunction<typeof useCrazyGames>;
 const mockUseAuth = useAuth as unknown as MockedFunction<() => any>;
@@ -140,10 +143,10 @@ describe('CrazyGames multiplayer-only gating', () => {
   });
 
   describe('PostGameEngagement', () => {
-    it('renders nothing on CrazyGames (WotdTeaser links to /daily)', () => {
+    it('shows CG retention card instead of WotdTeaser on CrazyGames', () => {
       mockUseCrazyGames.mockReturnValue(cgContext(true));
-      const { container } = render(<PostGameEngagement />);
-      expect(container).toBeEmptyDOMElement();
+      render(<PostGameEngagement />);
+      expect(screen.getByTestId('cg-retention-card')).toBeInTheDocument();
       expect(screen.queryByTestId('wotd-teaser')).not.toBeInTheDocument();
     });
 

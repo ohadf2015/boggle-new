@@ -5,6 +5,7 @@ export interface RosterPlayer {
   userId: string;
   username: string;
   score: number;
+  wordCount?: number;
   status: 'connected' | 'disconnected';
   isYou?: boolean;
   customAvatar?: CustomAvatarConfig | null;
@@ -12,35 +13,53 @@ export interface RosterPlayer {
 
 export function RosterRail({ players }: { players: RosterPlayer[] }) {
   const sorted = [...players].sort((a, b) => b.score - a.score);
+  const maxScore = Math.max(...sorted.map(p => p.score), 1);
 
   return (
     <ul className="flex flex-col gap-2" data-component="roster-rail" aria-label="Players">
-      {sorted.map((p, idx) => (
-        <li
-          key={p.userId}
-          data-testid={`roster-row-${p.userId}`}
-          data-row="true"
-          data-you={p.isYou ? 'true' : 'false'}
-          className={`flex items-center gap-2 p-2 border-2 border-foreground rounded-lg bg-card ${p.isYou ? 'ring-2 ring-neo-cyan' : ''}`}
-        >
-          <span className="font-mono text-xs opacity-60 w-5 text-center">{idx + 1}</span>
-          <div className="relative shrink-0">
-            <Avatar
-              size="sm"
-              customAvatar={p.customAvatar ?? undefined}
-              userId={p.userId}
-            />
-            <span
-              data-testid={`status-dot-${p.userId}`}
-              data-status={p.status}
-              className={`absolute bottom-0 end-0 w-2 h-2 rounded-full border border-background ${p.status === 'connected' ? 'bg-green-500' : 'bg-gray-400'}`}
-              aria-label={p.status}
-            />
-          </div>
-          <span className="flex-1 min-w-0 truncate">{p.username}</span>
-          <span className="font-bold tabular-nums">{p.score}</span>
-        </li>
-      ))}
+      {sorted.map((p, idx) => {
+        const pct = Math.min(100, (p.score / maxScore) * 100);
+        return (
+          <li
+            key={p.userId}
+            data-testid={`roster-row-${p.userId}`}
+            data-row="true"
+            data-you={p.isYou ? 'true' : 'false'}
+            className={`flex flex-col gap-1.5 p-2.5 border-2 border-foreground rounded-lg bg-card ${p.isYou ? 'ring-2 ring-neo-cyan' : ''}`}
+          >
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-xs opacity-50 w-5 text-center shrink-0">{idx + 1}</span>
+              <div className="relative shrink-0">
+                <Avatar
+                  size="sm"
+                  customAvatar={p.customAvatar ?? undefined}
+                  userId={p.userId}
+                />
+                <span
+                  data-testid={`status-dot-${p.userId}`}
+                  data-status={p.status}
+                  className={`absolute bottom-0 end-0 w-2 h-2 rounded-full border border-background ${p.status === 'connected' ? 'bg-green-500' : 'bg-gray-400'}`}
+                  aria-label={p.status}
+                />
+              </div>
+              <span className="flex-1 min-w-0 truncate text-sm font-medium">{p.username}</span>
+              <div className="flex flex-col items-end shrink-0">
+                <span className="font-bold tabular-nums text-sm">{p.score}</span>
+                {p.wordCount != null && p.wordCount > 0 && (
+                  <span className="text-[10px] opacity-50 tabular-nums">{p.wordCount}w</span>
+                )}
+              </div>
+            </div>
+            <div className="ms-7 h-1.5 bg-foreground/10 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${p.isYou ? 'bg-neo-cyan' : 'bg-neo-lime/60'}`}
+                style={{ width: `${pct}%` }}
+                aria-hidden="true"
+              />
+            </div>
+          </li>
+        );
+      })}
     </ul>
   );
 }
