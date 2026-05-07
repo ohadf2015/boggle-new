@@ -233,7 +233,19 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     }
 
     if (!botToRemove) {
-      emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, { message: 'Bot not found' });
+      // Idempotent: bot is already gone from both botManager and game.users.
+      // The client UI is stale (race, double-click, reconnect) — confirm success
+      // and resync user list so the client clears the ghost entry. Erroring here
+      // surfaces as a thrown "Bot not found" exception in the browser.
+      logger.info('BOT', `removeBot: bot "${botId || botUsernameToFind || 'unknown'}" already absent from game ${gameCode} — treating as success`);
+      broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+        users: getGameUsers(gameCode) as GameUser[]
+      });
+      socket.emit('botRemoved', {
+        success: true,
+        botId,
+        username: botUsernameToFind
+      });
       return;
     }
 
