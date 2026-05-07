@@ -49,6 +49,26 @@ describe('ReengagementEmailV2 — component render', () => {
     expect(html).toMatch(/max-width:560px/);
   });
 
+  it('wraps the action block (greeting → CTA) in a neo-brutalist card matching the hero', async () => {
+    const html = await renderHtml();
+    // The action card uses the same hard-shadow + thick border treatment as the
+    // hero card — both cards must appear so the email reads as two cohesive units
+    // rather than "card + loose stack".
+    const heroShadows = html.match(/6px 6px 0px/g) || [];
+    // ≥ 2 occurrences: hero card + action card (CTA + tile shadows are also there
+    // but this lower-bound proves the action wrapper exists).
+    expect(heroShadows.length).toBeGreaterThanOrEqual(3);
+    // Action card declares the action-card class so client CSS can target it.
+    expect(html).toContain('action-card');
+  });
+
+  it('flips the action-card hard-shadow X offset for Hebrew (RTL)', async () => {
+    const html = await renderHtml({ language: 'he' });
+    // RTL shadows use negative X offset across BOTH cards (hero + action).
+    const rtlShadows = html.match(/-6px 6px 0px/g) || [];
+    expect(rtlShadows.length).toBeGreaterThanOrEqual(2);
+  });
+
   it('hero illustration is locale-agnostic — same asset across all 5 languages', async () => {
     // Single shared illustration (kawaii squad) carries no language-specific text,
     // so the hero asset is identical across every locale.
@@ -93,7 +113,8 @@ describe('ReengagementEmailV2 — component render', () => {
     expect(html).not.toMatch(/Today.{1,10}s hint is ready when you are/);
     // New punchier replacements (apostrophes get HTML-encoded → tolerate)
     expect(html).toMatch(/Today.{1,10}s word is waiting/);
-    expect(html).toMatch(/That.{1,10}s it/);
+    // Witty pitch reframes the task as a quick achievement, not a chore.
+    expect(html).toContain('Easy win');
   });
 
   it('renders the giant letter tile with firstLetter', async () => {

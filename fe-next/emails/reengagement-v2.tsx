@@ -57,7 +57,7 @@ const COPY: Record<string, Copy> = {
     greeting: (n) => `${n}, you good?`,
     caption: "Today's word is waiting",
     hint: 'Your hint for today',
-    pitch: "30 seconds. One word. That's it.",
+    pitch: 'One word. 30 seconds. Easy win.',
     cta: "Let's go",
     footerReason: 'You signed up for daily word reminders.',
     unsubscribe: 'Unsubscribe',
@@ -67,7 +67,7 @@ const COPY: Record<string, Copy> = {
     greeting: (n) => `${n}, הכל טוב?`,
     caption: 'מילה אחת מחכה לך',
     hint: 'הרמז שלך להיום',
-    pitch: '30 שניות. מילה אחת. זהו.',
+    pitch: 'מילה אחת. 30 שניות. ניצחון קל.',
     cta: 'יאללה',
     footerReason: 'נרשמת לתזכורות מילה יומית.',
     unsubscribe: 'ביטול הרשמה',
@@ -77,7 +77,7 @@ const COPY: Record<string, Copy> = {
     greeting: (n) => `${n}, allt bra?`,
     caption: 'Dagens ord väntar',
     hint: 'Din ledtråd för idag',
-    pitch: '30 sekunder. Ett ord. Klart.',
+    pitch: 'Ett ord. 30 sekunder. Enkel vinst.',
     cta: 'Nu kör vi',
     footerReason: 'Du anmälde dig till dagliga ordpåminnelser.',
     unsubscribe: 'Avprenumerera',
@@ -87,7 +87,7 @@ const COPY: Record<string, Copy> = {
     greeting: (n) => `${n}さん、元気？`,
     caption: '今日の単語、待機中',
     hint: '今日のヒント',
-    pitch: '30秒、一単語、それだけ。',
+    pitch: '一単語、30秒、楽勝。',
     cta: 'いこう',
     footerReason: '毎日の単語リマインダーに登録してくれたよね。',
     unsubscribe: '配信停止',
@@ -97,7 +97,7 @@ const COPY: Record<string, Copy> = {
     greeting: (n) => `${n}, ¿todo bien?`,
     caption: 'La palabra de hoy te espera',
     hint: 'Tu pista de hoy',
-    pitch: '30 segundos. Una palabra. Listo.',
+    pitch: 'Una palabra. 30 segundos. Pan comido.',
     cta: 'Vamos',
     footerReason: 'Te suscribiste a recordatorios diarios.',
     unsubscribe: 'Cancelar suscripción',
@@ -360,145 +360,167 @@ export default function ReengagementEmailV2({
                     </td>
                   </tr>
 
-                  {/* ── 2. Heading — single line, no pink sub-copy.
-                          (The "missed you" sentiment now lives in the subject line
-                          + the hero caption strip, so we kill the redundancy here.) ── */}
+                  {/* ── 2. ACTION CARD — wraps greeting, letter reveal, pitch, and
+                          CTA in a single neo-brutalist container that mirrors the hero
+                          card above. Two matching cards (hero + action) read as a
+                          coherent unit instead of "card + loose stack on navy". ── */}
                   <tr>
-                    <td align="center" style={{ padding: '0 12px 26px' }}>
-                      <Heading as="h1" className="h1-v2" style={{
-                        color: C.text,
-                        fontSize: '32px',
-                        margin: 0,
-                        fontWeight: 700,
-                        textAlign: 'center',
-                        lineHeight: '1.2',
-                        letterSpacing: '-0.5px',
-                        direction: dir,
-                      }}>
-                        {t.greeting(recipientName)}
-                      </Heading>
-                    </td>
-                  </tr>
+                    <td align="center">
+                      <table
+                        role="presentation"
+                        cellPadding={0}
+                        cellSpacing={0}
+                        width="100%"
+                        className="action-card"
+                        style={{
+                          maxWidth: '560px',
+                          borderCollapse: 'separate',
+                          border: `4px solid ${C.black}`,
+                          borderRadius: '18px',
+                          boxShadow: `${sh}6px 6px 0px ${C.black}`,
+                          backgroundColor: C.bgAlt,
+                        }}>
 
-                  {/* ── 3. INLINE LETTER REVEAL — first-letter tile + underscores
-                          on the SAME row. Reads as a real partial word
-                          (S _ _ _ _) instead of two stacked decorative blocks. ── */}
-                  <tr>
-                    <td align="center" style={{ paddingBottom: '24px' }}>
-                      <table role="presentation" cellPadding={0} cellSpacing={0} dir={dir}>
+                        {/* greeting */}
                         <tr>
-                          <td
-                            width={92}
-                            height={92}
-                            align="center"
-                            valign="middle"
-                            className="letter-big-cell"
-                            style={{
-                              width: '92px',
-                              height: '92px',
-                              backgroundColor: C.letterFill,
-                              border: `4px solid ${C.black}`,
-                              borderRadius: '14px',
-                              boxShadow: `${sh}5px 5px 0px ${C.black}`,
+                          <td align="center" style={{ padding: '32px 20px 22px' }}>
+                            <Heading as="h1" className="h1-v2" style={{
+                              color: C.text,
+                              fontSize: '32px',
+                              margin: 0,
+                              fontWeight: 700,
                               textAlign: 'center',
-                            }}
-                          >
-                            <span className="letter-big" style={{
-                              color: C.black,
-                              fontSize: '54px',
-                              fontWeight: 700,
-                              lineHeight: '92px',
-                              fontFamily: "'Fredoka', Arial, sans-serif",
-                              display: 'inline-block',
+                              lineHeight: '1.2',
+                              letterSpacing: '-0.5px',
+                              direction: dir,
                             }}>
-                              {firstLetter}
-                            </span>
-                          </td>
-                          <td
-                            valign="middle"
-                            className="reveal-slots"
-                            style={{
-                              paddingLeft: rtl ? 0 : '22px',
-                              paddingRight: rtl ? '22px' : 0,
-                            }}
-                          >
-                            <span style={{
-                              color: C.muted,
-                              fontSize: '34px',
-                              fontWeight: 700,
-                              letterSpacing: '10px',
-                              fontFamily: "'Fredoka', Arial, sans-serif",
-                              whiteSpace: 'nowrap',
-                            }}>
-                              _ _ _ _
-                            </span>
+                              {t.greeting(recipientName)}
+                            </Heading>
                           </td>
                         </tr>
-                      </table>
-                    </td>
-                  </tr>
 
-                  {/* ── 4. Pitch line ── */}
-                  <tr>
-                    <td align="center" style={{ padding: '0 20px 20px' }}>
-                      <Text className="pitch-v2" style={{
-                        color: C.text,
-                        fontSize: '16px',
-                        fontWeight: 500,
-                        lineHeight: '1.55',
-                        textAlign: 'center',
-                        margin: 0,
-                        maxWidth: '440px',
-                        marginLeft: 'auto',
-                        marginRight: 'auto',
-                        direction: dir,
-                      }}>
-                        {t.pitch}
-                      </Text>
-                    </td>
-                  </tr>
-
-                  {/* ── 5. CTA — single primary action ── */}
-                  <tr>
-                    <td align="center" style={{ paddingBottom: '24px' }}>
-                      <table role="presentation" cellPadding={0} cellSpacing={0}
-                        style={{ margin: '0 auto' }}>
+                        {/* INLINE LETTER REVEAL — first-letter tile + underscores
+                            on the SAME row. Reads as a real partial word
+                            (S _ _ _ _) instead of two stacked decorative blocks. */}
                         <tr>
-                          <td align="center" className="cta-td-v2" style={{
-                            backgroundColor: C.lime,
-                            borderRadius: '16px',
-                            border: `3px solid ${C.black}`,
-                            boxShadow: `${sh}6px 6px 0px ${C.black}`,
-                          }}>
-                            <Button
-                              href={playUrl}
-                              className="cta-btn-v2"
-                              style={{
-                                display: 'inline-block',
-                                backgroundColor: C.lime,
-                                color: C.black,
-                                fontSize: '19px',
-                                fontWeight: 700,
-                                textDecoration: 'none',
-                                padding: '20px 56px',
-                                borderRadius: '16px',
-                                fontFamily: "'Fredoka', Arial, sans-serif",
-                                letterSpacing: '1.5px',
-                                textAlign: 'center',
-                                textTransform: 'uppercase' as const,
-                              }}>
-                              {t.cta} &rarr;
-                            </Button>
+                          <td align="center" style={{ paddingBottom: '20px' }}>
+                            <table role="presentation" cellPadding={0} cellSpacing={0} dir={dir}>
+                              <tr>
+                                <td
+                                  width={92}
+                                  height={92}
+                                  align="center"
+                                  valign="middle"
+                                  className="letter-big-cell"
+                                  style={{
+                                    width: '92px',
+                                    height: '92px',
+                                    backgroundColor: C.letterFill,
+                                    border: `4px solid ${C.black}`,
+                                    borderRadius: '14px',
+                                    boxShadow: `${sh}5px 5px 0px ${C.black}`,
+                                    textAlign: 'center',
+                                  }}
+                                >
+                                  <span className="letter-big" style={{
+                                    color: C.black,
+                                    fontSize: '54px',
+                                    fontWeight: 700,
+                                    lineHeight: '92px',
+                                    fontFamily: "'Fredoka', Arial, sans-serif",
+                                    display: 'inline-block',
+                                  }}>
+                                    {firstLetter}
+                                  </span>
+                                </td>
+                                <td
+                                  valign="middle"
+                                  className="reveal-slots"
+                                  style={{
+                                    paddingLeft: rtl ? 0 : '22px',
+                                    paddingRight: rtl ? '22px' : 0,
+                                  }}
+                                >
+                                  <span style={{
+                                    color: C.muted,
+                                    fontSize: '34px',
+                                    fontWeight: 700,
+                                    letterSpacing: '10px',
+                                    fontFamily: "'Fredoka', Arial, sans-serif",
+                                    whiteSpace: 'nowrap',
+                                  }}>
+                                    _ _ _ _
+                                  </span>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+
+                        {/* pitch line */}
+                        <tr>
+                          <td align="center" style={{ padding: '0 20px 22px' }}>
+                            <Text className="pitch-v2" style={{
+                              color: C.text,
+                              fontSize: '16px',
+                              fontWeight: 500,
+                              lineHeight: '1.55',
+                              textAlign: 'center',
+                              margin: 0,
+                              maxWidth: '440px',
+                              marginLeft: 'auto',
+                              marginRight: 'auto',
+                              direction: dir,
+                            }}>
+                              {t.pitch}
+                            </Text>
+                          </td>
+                        </tr>
+
+                        {/* CTA — single primary action */}
+                        <tr>
+                          <td align="center" style={{ padding: '0 20px 32px' }}>
+                            <table role="presentation" cellPadding={0} cellSpacing={0}
+                              style={{ margin: '0 auto' }}>
+                              <tr>
+                                <td align="center" className="cta-td-v2" style={{
+                                  backgroundColor: C.lime,
+                                  borderRadius: '16px',
+                                  border: `3px solid ${C.black}`,
+                                  boxShadow: `${sh}6px 6px 0px ${C.black}`,
+                                }}>
+                                  <Button
+                                    href={playUrl}
+                                    className="cta-btn-v2"
+                                    style={{
+                                      display: 'inline-block',
+                                      backgroundColor: C.lime,
+                                      color: C.black,
+                                      fontSize: '19px',
+                                      fontWeight: 700,
+                                      textDecoration: 'none',
+                                      padding: '20px 56px',
+                                      borderRadius: '16px',
+                                      fontFamily: "'Fredoka', Arial, sans-serif",
+                                      letterSpacing: '1.5px',
+                                      textAlign: 'center',
+                                      textTransform: 'uppercase' as const,
+                                    }}>
+                                    {t.cta} &rarr;
+                                  </Button>
+                                </td>
+                              </tr>
+                            </table>
                           </td>
                         </tr>
                       </table>
                     </td>
                   </tr>
 
-                  {/* spacer above footer */}
-                  <tr><td style={{ height: '12px', lineHeight: 0, fontSize: 0 }}>&nbsp;</td></tr>
+                  {/* spacer between action card and footer */}
+                  <tr><td style={{ height: '28px', lineHeight: 0, fontSize: 0 }}>&nbsp;</td></tr>
 
-                  {/* ── 6. Footer ── */}
+                  {/* ── 3. Footer ── */}
                   <tr>
                     <td style={{ borderTop: `1px solid ${C.divider}`, paddingTop: '24px' }}>
                       <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
