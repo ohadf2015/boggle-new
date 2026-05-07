@@ -154,4 +154,18 @@ describe('GameGridArea', () => {
     render(<GameGridArea {...defaultProps} />);
     expect(screen.getByTestId('adventure-grid')).toBeInTheDocument();
   });
+
+  // Regression: mobile-landscape CSS rules in animations.css set explicit
+  // width AND height on .game-board-frame. Inside the aspect-square flex
+  // wrapper, flex-shrink shrinks width but not height, breaking the square
+  // grid. The wrapper must carry the `adventure-grid-container` class so the
+  // CSS override (.adventure-grid-container .game-board-frame { width:100%;
+  // height:100% !important }) forces .game-board-frame to fill the square
+  // parent. Mirrors .desktop-grid-container / .tv-grid-container pattern.
+  it('should mark grid wrapper with adventure-grid-container class so .game-board-frame fills the square parent', () => {
+    const { container } = render(<GameGridArea {...defaultProps} />);
+    const wrapper = container.querySelector('.adventure-grid-container');
+    expect(wrapper).not.toBeNull();
+    expect(wrapper?.className).toContain('aspect-square');
+  });
 });
