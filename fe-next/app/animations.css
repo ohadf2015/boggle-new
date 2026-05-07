@@ -2273,6 +2273,21 @@ html.reduce-motion *::after {
   margin: 0 auto;
 }
 
+/* ==================== Adventure Grid Container ==================== */
+/* The adventure layout (GameGridArea) wraps the grid in an aspect-square
+   flex container that sizes itself to the available space. The inner
+   GridComponent's .game-board-frame element must fill that wrapper rather
+   than honoring the legacy mobile-landscape width/height rules above —
+   otherwise flex-shrink squashes width-only, leaving height at the CSS
+   value and producing rectangular cells. */
+.adventure-grid-container .game-board-frame {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: 0 auto;
+}
+
 /* ====================================
    CLUE BOX ATTENTION ANIMATIONS
    For Daily Challenge Target Word Hints

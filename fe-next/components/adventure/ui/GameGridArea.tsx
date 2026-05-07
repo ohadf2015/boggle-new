@@ -222,7 +222,14 @@ export const GameGridArea = memo(function GameGridArea({
         <div className="flex-1 flex items-center justify-center min-h-0 w-full" style={{ maxWidth: 'min(100%, 88cqh, 760px)' }}>
           <AdaptiveMotion.div
             className={cn(
-              'w-full aspect-square max-h-full rounded-neo-lg',
+              // `adventure-grid-container` opts the inner GridComponent out of the
+              // legacy mobile-landscape `.game-board-frame` width/height rules in
+              // animations.css. Without it, those rules force explicit width AND
+              // height on .game-board-frame; flex-shrink then squashes width to
+              // fit this aspect-square parent while height stays at the CSS
+              // value, producing rectangular cells. Mirrors the existing
+              // .desktop-grid-container / .tv-grid-container pattern.
+              'adventure-grid-container w-full aspect-square max-h-full rounded-neo-lg',
               // Stronger glow when a word is accepted — ring + outer shadow pulse
               wasWordSubmitted && lastAccepted
                 ? 'ring-4 ring-neo-lime ring-offset-2 ring-offset-neo-navy/80 shadow-[0_0_24px_4px_rgba(163,230,53,0.45)]'
