@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Shield } from 'lucide-react';
 import Header from '@/components/Header';
@@ -13,6 +13,8 @@ import { WordCraftBoard } from '@/components/word-craft/WordCraftBoard';
 import { WordCraftRack } from '@/components/word-craft/WordCraftRack';
 import { WordCraftScoreboard } from '@/components/word-craft/WordCraftScoreboard';
 import { WordCraftControls } from '@/components/word-craft/WordCraftControls';
+import { WordCraftCelebration, type CelebrationKind } from '@/components/word-craft/WordCraftCelebration';
+import { useWordCraftJuice } from '@/components/word-craft/useWordCraftJuice';
 import { cn } from '@/lib/utils';
 
 export default function WordCraftPageClient() {
@@ -44,6 +46,85 @@ export default function WordCraftPageClient() {
   }, [isAdmin]);
 
   const game = useWordCraftGame({ seed, dict });
+  const juice = useWordCraftJuice();
+
+  const [celebration, setCelebration] = useState<{ kind: CelebrationKind; burstId: number; origin?: { x: number; y: number } }>({
+    kind: null,
+    burstId: 0,
+  });
+
+  const prevPendingIdsRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const next = new Set(game.state.pendingPlacements.map((p) => p.rackTileId));
+    for (const p of game.state.pendingPlacements) {
+      if (!prevPendingIdsRef.current.has(p.rackTileId)) {
+        const el = document.querySelector(`[data-tile-id="${p.rackTileId}"]`);
+        juice.tilePlace(el);
+      }
+    }
+    prevPendingIdsRef.current = next;
+  }, [game.state.pendingPlacements, juice]);
+
+  const prevSelectedRef = useRef<string | null>(null);
+  useEffect(() => {
+    const id = game.state.selectedRackTileId;
+    if (id && id !== prevSelectedRef.current) {
+      const el = document.querySelector(`[data-rack-tile-id="${id}"]`);
+      juice.rackSelect(el);
+    }
+    prevSelectedRef.current = id;
+  }, [game.state.selectedRackTileId, juice]);
+
+  const prevHistoryLenRef = useRef(0);
+  useEffect(() => {
+    const len = game.state.history.length;
+    if (len === prevHistoryLenRef.current) return;
+    const newest = game.state.history[len - 1];
+    prevHistoryLenRef.current = len;
+    if (!newest || newest.score === 0) return;
+
+    const popEl = document.querySelector(`[data-score-value="${newest.who}"]`);
+    juice.scorePop(popEl, newest.score);
+
+    const placedEls = newest.placedTileIds
+      .map((id) => document.querySelector(`[data-tile-id="${id}"]`))
+      .filter((n): n is Element => Boolean(n));
+
+    if (newest.who === 'bot' && placedEls.length > 0) {
+      juice.botReveal(placedEls);
+    }
+
+    const isBingo = newest.placedTileIds.length >= 7;
+    if (isBingo || newest.score >= 50) {
+      const target = (placedEls[Math.floor(placedEls.length / 2)] as HTMLElement | undefined) ?? null;
+      const rect = target?.getBoundingClientRect();
+      setCelebration((prev) => ({
+        kind: 'bingo',
+        burstId: prev.burstId + 1,
+        origin: rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : undefined,
+      }));
+    }
+  }, [game.state.history, juice]);
+
+  useEffect(() => {
+    if (game.state.turn === 'over') {
+      setCelebration((prev) => ({ kind: 'gameOver', burstId: prev.burstId + 1 }));
+    }
+  }, [game.state.turn]);
+
+  const lastErrorRef = useRef<string | null>(null);
+  useEffect(() => {
+    const e = game.state.lastError;
+    if (!e || e === lastErrorRef.current) {
+      lastErrorRef.current = e;
+      return;
+    }
+    lastErrorRef.current = e;
+    const cellEls = game.state.pendingPlacements
+      .map((p) => document.querySelector(`[data-tile-id="${p.rackTileId}"]`))
+      .filter((n): n is Element => Boolean(n));
+    juice.invalidShake(cellEls);
+  }, [game.state.lastError, game.state.pendingPlacements, juice]);
 
   const isProfileLoading = !authLoading && user && !profile;
 
@@ -100,6 +181,7 @@ export default function WordCraftPageClient() {
   return (
     <div className={cn('flex-1 flex flex-col w-full overflow-x-hidden min-h-screen bg-neo-navy', isRTL && 'rtl')}>
       <Header />
+      <WordCraftCelebration kind={celebration.kind} burstId={celebration.burstId} origin={celebration.origin} />
 
       <main className="flex-1 px-3 sm:px-6 py-4 sm:py-6 pb-24 max-w-[820px] mx-auto w-full space-y-4">
         <div className="flex items-center gap-3">

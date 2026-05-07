@@ -13,6 +13,7 @@ interface MoveHistoryEntry {
   who: 'player' | 'bot';
   words: string[];
   score: number;
+  placedTileIds: string[];
 }
 
 export interface WordCraftState {
@@ -85,7 +86,7 @@ function commitMove(
     bot: who === 'bot' ? updatedOwner : state.bot,
     pendingPlacements: [],
     selectedRackTileId: null,
-    history: [...state.history, { who, words, score }],
+    history: [...state.history, { who, words, score, placedTileIds: placements.map((p) => p.rackTileId) }],
     lastError: null,
     consecutivePasses: 0,
     turn: who === 'player' ? 'bot' : 'player',
@@ -131,7 +132,7 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
         selectedRackTileId: null,
         consecutivePasses: passes,
         turn,
-        history: [...state.history, { who: state.turn === 'player' ? 'player' : 'bot', words: [], score: 0 }],
+        history: [...state.history, { who: state.turn === 'player' ? 'player' : 'bot', words: [], score: 0, placedTileIds: [] }],
       };
     }
     case 'SWAP': {
