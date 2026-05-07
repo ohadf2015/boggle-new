@@ -74,26 +74,36 @@ export function useBlastDebris(
     // Static collision walls — floor + left + right so debris bounces
     // and never escapes the play area. Walls extend past the board so
     // high-velocity fragments don't tunnel around corners.
+    //
+    // Floor sits a full cell below the canvas (top edge at y = boardPx +
+    // cellSize) so settled fragments rest off-screen instead of perched on
+    // the bottom-row tiles — the floor used to sit flush with boardPx,
+    // which left red bomb shards visibly stuck on bottom-row letters after
+    // explosions. Side walls extend equally far so a fragment can't bounce
+    // out the corner before the floor catches it.
     const boardPx = gridSize * cellSize;
     const thickness = 40;
     const overshoot = 200;
+    const floorOffset = cellSize;
     const floorId = physics.createWall(
       boardPx / 2,
-      boardPx + thickness / 2,
+      boardPx + thickness / 2 + floorOffset,
       boardPx + overshoot,
       thickness,
     );
+    const sideHeight = boardPx + overshoot + floorOffset;
+    const sideCenterY = boardPx / 2 + floorOffset / 2;
     const leftId = physics.createWall(
       -thickness / 2,
-      boardPx / 2,
+      sideCenterY,
       thickness,
-      boardPx + overshoot,
+      sideHeight,
     );
     const rightId = physics.createWall(
       boardPx + thickness / 2,
-      boardPx / 2,
+      sideCenterY,
       thickness,
-      boardPx + overshoot,
+      sideHeight,
     );
     wallBodyIdsRef.current = [floorId, leftId, rightId];
 

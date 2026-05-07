@@ -232,4 +232,36 @@ describe('useBlastDebris — static walls', () => {
 
     physics.destroy();
   });
+
+  it('debris settles below the visible canvas so fragments do not rest on bottom-row tiles', () => {
+    // Given — 8x8 grid, 40px cells. Canvas spans y=0..boardPx (320). Floor was
+    // positioned with its top edge at boardPx, so settled fragments rested at
+    // y ≈ boardPx (just inside the bottom of the bottom-row tiles), creating
+    // a "leftover red shards stuck on a tile after explosion" visual in blast
+    // mode after bomb clears.
+    const physics = new PhysicsWorld({ gravity: { x: 0, y: 1 } });
+    const camera = new Container();
+    const cellSize = 40;
+    const gridSize = 8;
+    const boardPx = cellSize * gridSize;
+
+    const { result, unmount } = renderHook(() =>
+      useBlastDebris(cellSize, gridSize, camera, physics),
+    );
+
+    result.current.spawnDebris([{ row: 4, col: 4, type: 'bomb' }]);
+
+    // Run physics long enough for fragments to settle on the floor.
+    for (let i = 0; i < 600; i++) physics.update(16.67);
+
+    const dynamic = physics
+      .getAllBodyStates()
+      .filter(b => b.label !== 'wall');
+    expect(dynamic.length).toBeGreaterThan(0);
+    for (const body of dynamic) {
+      expect(body.position.y).toBeGreaterThan(boardPx);
+    }
+
+    unmount();
+  });
 });
