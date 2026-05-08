@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, LogIn, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import FriendsList from '@/components/friends/FriendsList';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
@@ -13,6 +15,8 @@ import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import { useFriends } from '@/hooks/useFriends';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { cn } from '@/lib/utils';
+
+const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
 /**
  * Friends Page - Manage friends and direct challenges
@@ -25,6 +29,9 @@ export default function FriendsPageClient(): React.JSX.Element {
   const { refresh: refreshFriends } = useFriends();
   const router = useRouter();
   const isDark = theme === 'dark';
+
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signup');
 
   // Pull-to-refresh for friends list
   const { pullToRefreshHandlers, pullState } = usePullToRefresh({
@@ -113,9 +120,27 @@ export default function FriendsPageClient(): React.JSX.Element {
                   <p className={cn('text-lg font-bold mb-2', isDark ? 'text-white' : 'text-gray-900')}>
                     {t('friends.signInTitle')}
                   </p>
-                  <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-500')}>
+                  <p className={cn('text-sm mb-6', isDark ? 'text-gray-400' : 'text-gray-500')}>
                     {t('friends.signInDescription')}
                   </p>
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => { setAuthModalMode('signup'); setShowAuthModal(true); }}
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-neo border-2 border-neo-black shadow-hard bg-neo-lime text-neo-black font-bold uppercase tracking-wide hover:shadow-hard-pressed hover:translate-y-px transition-all"
+                    >
+                      <User size={16} aria-hidden="true" />
+                      {t('auth.signUp')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setAuthModalMode('signin'); setShowAuthModal(true); }}
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-neo border-2 border-neo-black shadow-hard bg-neo-pink text-white font-bold uppercase tracking-wide hover:shadow-hard-pressed hover:translate-y-px transition-all"
+                    >
+                      <LogIn size={16} aria-hidden="true" />
+                      {t('auth.signIn')}
+                    </button>
+                  </div>
                 </>
               )}
             </div>
@@ -124,6 +149,12 @@ export default function FriendsPageClient(): React.JSX.Element {
           )}
         </motion.div>
       </div>
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        showGuestStats={true}
+        initialMode={authModalMode}
+      />
     </div>
   );
 }

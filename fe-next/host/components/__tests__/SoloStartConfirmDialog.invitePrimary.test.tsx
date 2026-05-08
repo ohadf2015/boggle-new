@@ -2,13 +2,12 @@
 /**
  * SoloStartConfirmDialog — Invite Friends as primary action
  *
- * RED: Tests written before implementation.
- * Requirements:
+ * Requirements (2-CTA layout):
  * 1. "Invite Friends" button is present and is the primary CTA (lime)
- * 2. "Play with bots" button is present as secondary
- * 3. "Wait for players" cancel still present
+ * 2. "Skip & Play with Bots" button is present as secondary
+ * 3. "Wait for players" cancel is REMOVED
  * 4. Clicking "Invite Friends" triggers share/copy (native share or clipboard)
- * 5. "Play with bots" still calls onConfirm
+ * 5. "Skip & Play with Bots" calls onConfirm
  */
 
 import React from 'react';
@@ -31,7 +30,7 @@ const t = (key: string) => {
     'hostView.soloStartTitle': 'No other players yet!',
     'hostView.soloStartDescription': 'Invite friends, or play with bots.',
     'hostView.soloStartCancel': 'Wait for players',
-    'hostView.soloStartConfirm': 'Play with bots',
+    'hostView.soloStartConfirm': 'Skip & Play with Bots',
     'hostView.inviteFriends': 'Rally your squad!',
     'share.copyLink': 'Copy Link',
     'share.linkCopied': 'Link copied! 🔗',
@@ -69,14 +68,19 @@ describe('SoloStartConfirmDialog — invite primary', () => {
     expect(inviteBtn.className).toMatch(/neo-lime/);
   });
 
-  it('renders play with bots as secondary button', () => {
+  it('renders skip & play with bots as secondary button', () => {
     render(<SoloStartConfirmDialog {...defaultProps} />);
     expect(screen.getByTestId('solo-dialog-bots')).toBeTruthy();
   });
 
-  it('renders wait for players cancel', () => {
+  it('does NOT render the wait-for-players cancel', () => {
     render(<SoloStartConfirmDialog {...defaultProps} />);
-    expect(screen.getByTestId('solo-dialog-wait')).toBeTruthy();
+    expect(screen.queryByTestId('solo-dialog-wait')).toBeNull();
+  });
+
+  it('renders only two action buttons (invite + bots)', () => {
+    render(<SoloStartConfirmDialog {...defaultProps} />);
+    expect(screen.getAllByRole('button')).toHaveLength(2);
   });
 
   it('clicking play with bots calls onConfirm', async () => {

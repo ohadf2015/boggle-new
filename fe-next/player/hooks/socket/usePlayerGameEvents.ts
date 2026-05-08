@@ -278,6 +278,14 @@ export function usePlayerGameEvents({
       wasInActiveGameRef.current = true;
       comboShieldsUsedRef.current = 0;
 
+      // Detect retry of same session: server re-fires startGame to clients that
+      // didn't ack. We must NOT clobber in-flight game state (life, attempts) on
+      // retry — surfaced as "life didn't drain" for guests whose ack path lags.
+      const prevSessionId = gameSessionIdRef.current;
+      const isSameSessionRetry = prevSessionId !== null
+        && ext.gameSessionId !== undefined
+        && prevSessionId === ext.gameSessionId;
+
       if (ext.gameSessionId !== undefined) {
         gameSessionIdRef.current = ext.gameSessionId;
       }
@@ -316,10 +324,11 @@ export function usePlayerGameEvents({
           };
         }
       }
-      if (ext.wordHuntTargetLength != null && ext.wordHuntTargetLength > 0) {
+      if (ext.wordHuntTargetLength != null && ext.wordHuntTargetLength > 0 && !isSameSessionRetry) {
         storeUpdates.wordHuntTargetLength = ext.wordHuntTargetLength;
         storeUpdates.wordHuntTargetCategory = ext.wordHuntTargetCategory ?? null;
-        storeUpdates.wordHuntMyLife = 100;
+        const serverLife = ext.wordHuntPlayerLives?.[username];
+        storeUpdates.wordHuntMyLife = typeof serverLife === 'number' ? serverLife : 100;
         storeUpdates.wordHuntPlayerLives = ext.wordHuntPlayerLives || {};
         storeUpdates.wordHuntTargetAttempts = [];
         storeUpdates.wordHuntTargetFound = false;

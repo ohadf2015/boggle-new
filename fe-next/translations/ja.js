@@ -1391,7 +1391,7 @@ const ja = {
     "soloStartTitle": "まだ他のプレイヤーがいないよ！",
     "soloStartDescription": "友達を招待する？それともボットと対戦？",
     "soloStartCancel": "プレイヤーを待つ",
-    "soloStartConfirm": "ボットと対戦",
+    "soloStartConfirm": "スキップしてボットと対戦",
     "exitRoom": "ルームを退出",
     "startNewGame": "新しいゲームを開始",
     "startNextRound": "次のラウンドを開始",
@@ -8597,6 +8597,7 @@ const ja = {
     "description": "文字を素早くロック。相手の単語を奪え。",
     "results": {
       "matchRecap": "ホイールラッシュ要約",
+      "sceneTitle": "ホイール停止",
       "totalLocks": "ロックされた単語",
       "stealRate": "奪取率",
       "locks": "ロック",
@@ -11361,6 +11362,23 @@ const ja = {
       "5": "壮大！",
       "6": "見事！",
       "7": "その調子！"
+    },
+    "tutor": {
+      "title": "遊び方",
+      "step1": "ラックから文字をタップ",
+      "step2": "空きマスをタップして置く",
+      "step3": "終わったら送信をタップ",
+      "tipFirst": "最初の語は中央の★を通します",
+      "tipScore": "色付きマスはボーナス点",
+      "dismiss": "わかった！",
+      "show": "遊び方"
+    },
+    "steps": {
+      "pick": "文字を選ぶ",
+      "place": "盤に置く",
+      "submit": "送信をタップ",
+      "bot": "WordBot 考え中…",
+      "over": "ゲーム終了"
     }
   },
   mp: {

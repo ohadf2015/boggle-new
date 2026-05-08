@@ -190,8 +190,11 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
                 {isDamaged && !isEliminated && (
                   <span data-wrong-guess="true" className="sr-only" aria-hidden="true" />
                 )}
-                {/* Name + Score */}
+                {/* Avatar + Name + Score */}
                 <div className="flex items-center justify-between gap-2">
+                  <div className={cn("shrink-0", isEliminated && "grayscale")}>
+                    <Avatar userId={player.username} size="sm" />
+                  </div>
                   <PlayerProfileTooltip
                     player={{ username: player.username, score: player.score }}
                     isCurrentUser={isCurrent}

@@ -140,7 +140,8 @@ describe('BrainTrainingPage - Loading States', () => {
 
       // Should NOT show "Sign in to see your progress" message
       expect(screen.queryByText('brain.guestView.title')).not.toBeInTheDocument();
-      expect(screen.queryByText('common.signIn')).not.toBeInTheDocument();
+      expect(screen.queryByText('auth.signIn')).not.toBeInTheDocument();
+      expect(screen.queryByText('auth.signUp')).not.toBeInTheDocument();
     });
 
     it('should show PageLoader while brain score is loading', () => {
@@ -220,7 +221,8 @@ describe('BrainTrainingPage - Loading States', () => {
         expect(screen.getByText('brain.guestView.title')).toBeInTheDocument();
       });
 
-      expect(screen.getByText('common.signIn')).toBeInTheDocument();
+      expect(screen.getByText('auth.signIn')).toBeInTheDocument();
+      expect(screen.getByText('auth.signUp')).toBeInTheDocument();
     });
 
     it('shows the drill grid for anonymous users (audit H2 — conversion fix)', async () => {
@@ -264,7 +266,7 @@ describe('BrainTrainingPage - Loading States', () => {
         expect(screen.getByText('brain.quickDrills')).toBeInTheDocument();
       });
       // Sign-in CTA still present — drill grid is a supplement, not a replacement.
-      expect(screen.getByText('common.signIn')).toBeInTheDocument();
+      expect(screen.getByText('auth.signIn')).toBeInTheDocument();
     });
   });
 });

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Layers } from 'lucide-react';
 import Header from '@/components/Header';
@@ -19,7 +19,10 @@ import { WordCraftControls } from '@/components/word-craft/WordCraftControls';
 import { WordCraftCelebration, type CelebrationKind } from '@/components/word-craft/WordCraftCelebration';
 import { HeatMeter } from '@/components/word-craft/HeatMeter';
 import { ScoreFloat } from '@/components/word-craft/ScoreFloat';
+import { WordCraftTutor } from '@/components/word-craft/WordCraftTutor';
+import { WordCraftDragGhost } from '@/components/word-craft/WordCraftDragGhost';
 import { useWordCraftJuice } from '@/components/word-craft/useWordCraftJuice';
+import { useWordCraftDrag } from '@/components/word-craft/useWordCraftDrag';
 import { useAchievementQueue } from '@/components/achievements';
 import { cn } from '@/lib/utils';
 
@@ -101,6 +104,12 @@ export default function WordCraftPageClient() {
   const juice = useWordCraftJuice();
   const { queueAchievement } = useAchievementQueue();
 
+  // Drag-to-place: pointer-down on rack tile begins a drag; pointer-up over a
+  // valid empty cell drops it via the placeTileOnBoard bypass action.
+  const { drag, begin: beginTileDrag, consumeDropFlag } = useWordCraftDrag({
+    onDrop: (tileId, r, c) => game.placeTileOnBoard(tileId, r, c),
+  });
+
   // Celebrations
   const [celebration, setCelebration] = useState<{ kind: CelebrationKind; burstId: number; origin?: { x: number; y: number } }>({
     kind: null,
@@ -155,6 +164,9 @@ export default function WordCraftPageClient() {
 
     if (newest.who === 'bot' && placedEls.length > 0) {
       juice.botReveal(placedEls);
+    }
+    if (newest.who === 'player' && placedEls.length > 0) {
+      juice.playerCommitReveal(placedEls);
     }
 
     if (newest.who === 'player') {
@@ -264,6 +276,17 @@ export default function WordCraftPageClient() {
   }
 
   const pendingIds = new Set(game.state.pendingPlacements.map((p) => p.rackTileId));
+
+  // First-move flag drives center-star ping + rack glow.
+  const isFirstMove = game.state.history.length === 0 && game.state.pendingPlacements.length === 0;
+  // True when player should pick a tile (no selection, no pending, dict ready, not burned out, their turn).
+  const wantsPick =
+    game.state.turn === 'player' &&
+    !!dict &&
+    !game.state.burnout &&
+    !game.state.selectedRackTileId &&
+    game.state.pendingPlacements.length === 0;
+
   const winner =
     game.state.player.score > game.state.bot.score
       ? t('wordcraft.you')
@@ -288,31 +311,61 @@ export default function WordCraftPageClient() {
   })();
 
   return (
-    <div className={cn('flex-1 flex flex-col w-full overflow-x-hidden min-h-screen bg-neo-navy', isRTL && 'rtl')}>
+    <div
+      className={cn(
+        // No-scroll viewport contract: fill exactly the small viewport height,
+        // hide overflow, lay everything out as flex column. Game must FIT.
+        'flex flex-col w-full h-svh overflow-hidden relative',
+        'bg-neo-navy texture-halftone',
+        isRTL && 'rtl',
+      )}
+    >
+      {/* Backdrop spotlight echoes the brand purple from the mode tile */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[220px] bg-gradient-to-b from-neo-purple/20 via-neo-pink/8 to-transparent"
+      />
       <Header />
       <WordCraftCelebration kind={celebration.kind} burstId={celebration.burstId} origin={celebration.origin} />
 
-      <main className="flex-1 px-3 sm:px-6 py-4 sm:py-6 pb-24 max-w-[820px] mx-auto w-full space-y-3">
-        <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" onClick={() => router.push(`/${language}`)}>
-            <ArrowLeft className="w-4 h-4 me-1" />
-            {t('common.backToHome')}
+      <main className="flex-1 min-h-0 px-3 py-2 max-w-[820px] mx-auto w-full flex flex-col gap-2 relative">
+        {/* Topbar: back · title · BETA · How to play · loading */}
+        <div className="flex items-center gap-2 shrink-0">
+          <Button variant="outline" size="sm" onClick={() => router.push(`/${language}`)} className="shrink-0 h-8 px-2">
+            <ArrowLeft className="w-4 h-4" />
           </Button>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <Layers className="w-5 h-5 text-neo-purple" />
-              <h1 className="text-2xl font-neo-display text-neo-white">{t('wordcraft.title')}</h1>
-              <span className="px-1.5 py-0.5 text-[10px] font-neo-display font-black uppercase tracking-widest bg-neo-purple text-white rounded border border-neo-purple-dark">
-                BETA
-              </span>
-            </div>
-          </div>
+          <span
+            aria-hidden
+            className="inline-flex items-center justify-center w-7 h-7 rounded-neo bg-neo-purple text-white border-2 border-black shadow-hard-sm rotate-[-4deg]"
+          >
+            <Layers className="w-4 h-4" />
+          </span>
+          <h1 className="text-lg font-neo-display font-black text-neo-white tracking-tight">
+            {t('wordcraft.title')}
+          </h1>
+          <span className="px-1.5 py-0.5 text-[9px] font-neo-display font-black uppercase tracking-widest bg-neo-yellow text-neo-navy rounded border-2 border-black shadow-hard-sm rotate-[3deg]">
+            BETA
+          </span>
+          <div className="flex-1" />
+          <WordCraftTutor
+            isRTL={isRTL}
+            labels={{
+              title: t('wordcraft.tutor.title'),
+              step1: t('wordcraft.tutor.step1'),
+              step2: t('wordcraft.tutor.step2'),
+              step3: t('wordcraft.tutor.step3'),
+              tipFirst: t('wordcraft.tutor.tipFirst'),
+              tipScore: t('wordcraft.tutor.tipScore'),
+              dismiss: t('wordcraft.tutor.dismiss'),
+              show: t('wordcraft.tutor.show'),
+            }}
+          />
         </div>
 
         {!dict ? (
-          <div className="flex items-center gap-3 p-3 bg-neo-navy-light border-neo border-black rounded-neo">
+          <div className="flex items-center gap-2 px-2 py-1 bg-neo-navy-light border-2 border-black rounded-neo shrink-0">
             <PageLoader size="sm" />
-            <span className="text-sm text-neo-cream">{t('wordcraft.loadingDict')}</span>
+            <span className="text-xs text-neo-cream">{t('wordcraft.loadingDict')}</span>
           </div>
         ) : null}
 
@@ -331,24 +384,6 @@ export default function WordCraftPageClient() {
           }}
         />
 
-        <div className="relative">
-          <WordCraftBoard
-            board={game.state.board}
-            pendingPlacements={game.state.pendingPlacements}
-            onCellClick={game.placeOnBoard}
-            disabled={game.state.turn !== 'player'}
-          />
-          {scoreFloat ? (
-            <ScoreFloat
-              key={scoreFloat.key}
-              score={scoreFloat.score}
-              overdrive={scoreFloat.overdrive}
-              isBingo={scoreFloat.isBingo}
-              encouragement={scoreFloat.encouragement}
-            />
-          ) : null}
-        </div>
-
         <HeatMeter
           heat={game.state.heat}
           overdrive={game.state.overdrive}
@@ -356,8 +391,34 @@ export default function WordCraftPageClient() {
           label={t('wordcraft.heatLabel')}
         />
 
+        {/* Board fills remaining vertical space; aspect-square keeps it readable */}
+        <div className="flex-1 min-h-0 flex items-center justify-center">
+          <div className="relative aspect-square max-h-full max-w-full">
+            <WordCraftBoard
+              board={game.state.board}
+              pendingPlacements={game.state.pendingPlacements}
+              onCellClick={game.placeOnBoard}
+              onRecallPending={game.recallTile}
+              disabled={game.state.turn !== 'player'}
+              hasSelectedTile={!!game.state.selectedRackTileId}
+              isFirstMove={isFirstMove}
+              dragHoverCell={drag?.active ? drag.hoverCell : null}
+              dragHoverLetter={drag?.active ? drag.letter : null}
+            />
+            {scoreFloat ? (
+              <ScoreFloat
+                key={scoreFloat.key}
+                score={scoreFloat.score}
+                overdrive={scoreFloat.overdrive}
+                isBingo={scoreFloat.isBingo}
+                encouragement={scoreFloat.encouragement}
+              />
+            ) : null}
+          </div>
+        </div>
+
         {game.state.burnout ? (
-          <div className="px-3 py-2 bg-neo-red/20 border-neo border-neo-red text-neo-red text-sm rounded-neo text-center font-neo-display">
+          <div className="px-3 py-1 bg-neo-red/20 border-2 border-neo-red text-neo-red text-xs rounded-neo text-center font-neo-display shrink-0">
             {t('wordcraft.burnout')}
           </div>
         ) : null}
@@ -367,8 +428,13 @@ export default function WordCraftPageClient() {
           selectedId={game.state.selectedRackTileId}
           pendingIds={pendingIds}
           onSelect={game.selectRackTile}
+          onTileDragStart={(tile, e) => beginTileDrag(tile.id, tile.letter, tile.value, e)}
+          consumeDropFlag={consumeDropFlag}
+          draggingTileId={drag?.active ? drag.tileId : null}
           disabled={game.state.turn !== 'player' || !dict || game.state.burnout}
           ariaLabel={t('wordcraft.yourRack')}
+          hintPick={wantsPick && isFirstMove}
+          locale={locale}
         />
 
         <WordCraftControls
@@ -391,36 +457,30 @@ export default function WordCraftPageClient() {
           }}
         />
 
-        {errorMessage ? (
-          <div role="alert" className="px-3 py-2 bg-neo-red/20 border-neo border-neo-red text-neo-red text-sm rounded-neo">
-            {errorMessage}
-          </div>
-        ) : null}
-
-        {game.state.turn === 'over' ? (
-          <div className="text-center py-4 bg-neo-navy-light border-neo border-black rounded-neo">
-            <p className="text-lg font-neo-display text-neo-white">
-              {t('wordcraft.winnerLabel', { name: winner })}
-            </p>
-          </div>
-        ) : null}
-
-        {game.state.history.length > 0 ? (
-          <div className="text-xs text-neo-cream/70 space-y-1">
-            <h2 className="font-neo-display uppercase tracking-wide text-neo-white">{t('wordcraft.history')}</h2>
-            <ul className="space-y-1">
-              {game.state.history.slice(-5).reverse().map((h, i) => (
-                <li key={i} className="flex justify-between">
-                  <span>
-                    {h.who === 'player' ? t('wordcraft.you') : t('wordcraft.bot')}: {h.words.join(', ') || t('wordcraft.passed')}
-                  </span>
-                  <span className="text-neo-lime">+{h.score}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
       </main>
+
+      {/* Drag ghost — follows pointer over the whole viewport */}
+      <WordCraftDragGhost drag={drag} locale={locale} />
+
+      {/* Floating toast — error doesn't reflow the layout, just overlays. */}
+      {errorMessage ? (
+        <div
+          role="alert"
+          className="absolute left-1/2 -translate-x-1/2 top-[calc(72px+8px)] z-40 max-w-[90%] px-3 py-2 bg-neo-red/95 border-2 border-black text-white text-sm rounded-neo shadow-hard-lg font-neo-body"
+        >
+          {errorMessage}
+        </div>
+      ) : null}
+
+      {/* Game-over banner: also floating, doesn't push layout */}
+      {game.state.turn === 'over' ? (
+        <div
+          role="status"
+          className="absolute left-1/2 -translate-x-1/2 bottom-[140px] z-40 px-4 py-3 bg-neo-yellow border-neo-thick border-black text-neo-navy rounded-neo shadow-hard-lg font-neo-display font-black uppercase tracking-wider"
+        >
+          {t('wordcraft.winnerLabel', { name: winner })}
+        </div>
+      ) : null}
     </div>
   );
 }

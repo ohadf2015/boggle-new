@@ -249,6 +249,7 @@ export default function ReferralDashboardClient() {
   const router = useRouter();
   const { data, isLoading, error, copied, handleCopy } = useReferralDashboard();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signup');
   const isDarkMode = theme === 'dark';
 
   const handleShare = useCallback(
@@ -286,13 +287,21 @@ export default function ReferralDashboardClient() {
         <p className="text-neo-white font-bold text-center mb-4">
           {t('referralDashboard.loginRequired')}
         </p>
-        <button
-          onClick={() => setShowAuthModal(true)}
-          className="px-6 py-3 bg-neo-pink text-white font-bold rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-none transition-shadow"
-        >
-          {t('common.signIn')}
-        </button>
-        {showAuthModal && <AuthModal isOpen onClose={() => setShowAuthModal(false)} />}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <button
+            onClick={() => { setAuthModalMode('signup'); setShowAuthModal(true); }}
+            className="px-6 py-3 bg-neo-lime text-neo-black font-bold rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-none transition-shadow"
+          >
+            {t('auth.signUp')}
+          </button>
+          <button
+            onClick={() => { setAuthModalMode('signin'); setShowAuthModal(true); }}
+            className="px-6 py-3 bg-neo-pink text-white font-bold rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-none transition-shadow"
+          >
+            {t('auth.signIn')}
+          </button>
+        </div>
+        {showAuthModal && <AuthModal isOpen onClose={() => setShowAuthModal(false)} initialMode={authModalMode} showGuestStats />}
       </div>
     );
   }

@@ -265,6 +265,14 @@ export function useHostGameEvents({
       const isReconnect = !!extData.reconnect;
       logger.log('[HOST] Received startGame event from server', isReconnect ? '(reconnect)' : '(new game)');
 
+      // Detect retry of same session: server re-fires startGame to clients that
+      // didn't ack. We must NOT clobber in-flight game state (life, attempts) on
+      // retry — surfaced as "life didn't drain" for guests whose ack path lags.
+      const prevSessionId = gameSessionIdRef.current;
+      const isSameSessionRetry = prevSessionId !== null
+        && extData.gameSessionId !== undefined
+        && prevSessionId === extData.gameSessionId;
+
       // Track game session ID
       if (extData.gameSessionId !== undefined) {
         gameSessionIdRef.current = extData.gameSessionId;
@@ -304,11 +312,13 @@ export function useHostGameEvents({
       }
 
       // Set word hunt target length if present (mirrors player handler)
-      if (extData.wordHuntTargetLength != null && extData.wordHuntTargetLength > 0) {
+      // Skip on same-session retry to avoid clobbering in-flight life/attempts.
+      if (extData.wordHuntTargetLength != null && extData.wordHuntTargetLength > 0 && !isSameSessionRetry) {
         const store = useGameStore.getState();
         store.setWordHuntTargetLength(extData.wordHuntTargetLength);
         store.setWordHuntTargetCategory(extData.wordHuntTargetCategory ?? null);
-        store.setWordHuntMyLife(100);
+        const serverLife = extData.wordHuntPlayerLives?.[username];
+        store.setWordHuntMyLife(typeof serverLife === 'number' ? serverLife : 100);
         store.setWordHuntPlayerLives(extData.wordHuntPlayerLives || {});
         store.setWordHuntTargetAttempts([]);
         store.setWordHuntTargetFound(false);
@@ -486,9 +496,15 @@ export function useHostGameEvents({
         wordHuntSummary: data.wordHuntSummary,
       });
 
-      // Only call onShowResults if host is playing (not in broadcast mode)
-      // Use ref to avoid stale closure — hostPlaying is not in useEffect deps
-      if (hostPlayingRef.current && currentOnShowResults) {
+      // Only call onShowResults if host is playing (not in broadcast mode).
+      // Wheel-rush has no dedicated TV broadcast results view, so a desktop
+      // host whose `hostPlaying` was previously toggled off (persisted via
+      // `host_broadcast_mode_enabled` localStorage) would otherwise sit on the
+      // game screen forever after the round ends. Bypass the gate for that
+      // mode so the host always lands on the standard results page.
+      const isWheelRush = data.gameMode === 'wheel-rush';
+      const shouldShowResults = hostPlayingRef.current || isWheelRush;
+      if (shouldShowResults && currentOnShowResults) {
         currentOnShowResults({
           scores: data.scores,
           letterGrid: currentTableData,

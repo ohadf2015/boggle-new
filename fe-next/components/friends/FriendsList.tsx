@@ -96,6 +96,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
   const [giftFriend, setGiftFriend] = useState<Friend | null>(null);
   const [showPactSelector, setShowPactSelector] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signup');
   const setIsInGame = useHideNavigation();
 
   const socketContext = useSocketOptional();
@@ -362,20 +363,31 @@ const FriendsList: React.FC<FriendsListProps> = ({
           <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-500')}>
             {t('friends.signInRequired')}
           </p>
-          <EnhancedButton
-            onClick={() => setShowAuthModal(true)}
-            size="sm"
-            haptic
-            animation="pop"
-            className="bg-neo-pink text-white mx-auto"
-          >
-            {t('auth.signIn')}
-          </EnhancedButton>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2">
+            <EnhancedButton
+              onClick={() => { setAuthModalMode('signup'); setShowAuthModal(true); }}
+              size="sm"
+              haptic
+              animation="pop"
+              className="bg-neo-lime text-neo-black mx-auto"
+            >
+              {t('auth.signUp')}
+            </EnhancedButton>
+            <EnhancedButton
+              onClick={() => { setAuthModalMode('signin'); setShowAuthModal(true); }}
+              size="sm"
+              haptic
+              animation="pop"
+              className="bg-neo-pink text-white mx-auto"
+            >
+              {t('auth.signIn')}
+            </EnhancedButton>
+          </div>
         </div>
         <AuthModal
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
-          initialMode="signin"
+          initialMode={authModalMode}
         />
       </>
     );

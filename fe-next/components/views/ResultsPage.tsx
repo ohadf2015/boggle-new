@@ -48,10 +48,11 @@ import { useGameKeyboardShortcuts } from '@/hooks/useGameKeyboardShortcuts';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { useGameMode, useHostSelectedGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed, useBlastTotalTileBonus, useBlastTotalTilesCleared, useBlastPlayerStats, useWheelRushPlayerStats, useGameActions } from '@/hooks/gameState/store';
 import type { BlastPlayerStats, WheelRushPlayerStats } from '@/shared/types/game';
+import { resolveWheelRushStats } from '@/lib/results/wheelRushStatsFallback';
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
 const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
 const BlastBoardDomination = dynamic(() => import('@/components/results/BlastBoardDomination'), { ssr: false });
-const WheelRushDomination = dynamic(() => import('@/components/results/WheelRushDomination'), { ssr: false });
+const WheelRushResultsScene = dynamic(() => import('@/components/results/WheelRushResultsScene'), { ssr: false });
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const PostGameWordReview = dynamic(() => import('@/components/education/PostGameWordReview'), { ssr: false });
 
@@ -139,6 +140,17 @@ function DesktopResultsLayout({
           <ExitRoomButton onClick={handleExitRoom} label={exitLabel || ''} />
         </div>
 
+        {/* Wheel-rush hero scene takes the top slot for that mode; the
+            standard cinematic block follows beneath for podium + ranks. */}
+        {resolvedGameMode === 'wheel-rush' && Object.keys(wheelRushPlayerStats).length > 0 && (
+          <div className="w-full max-w-3xl mx-auto mb-6">
+            <WheelRushResultsScene
+              playerStats={wheelRushPlayerStats}
+              currentUsername={currentUsername}
+            />
+          </div>
+        )}
+
         {/* Full-width cinematic area: Hero + Podium + Consolation */}
         <div className="w-full max-w-5xl mx-auto">
           <ResultsMainContent
@@ -175,12 +187,8 @@ function DesktopResultsLayout({
                 />
               )
             )}
-            {resolvedGameMode === 'wheel-rush' && Object.keys(wheelRushPlayerStats).length >= 2 && (
-              <WheelRushDomination
-                playerStats={wheelRushPlayerStats}
-                currentUsername={currentUsername}
-              />
-            )}
+            {/* Wheel-rush summary already rendered as the hero scene above
+                this layout's two-column grid. No secondary card needed. */}
             {/* Add-friend affordance now lives inline on each player tile (Podium + ConsolationRows). */}
             {/* D1 retention CTA — outcome-aware Daily Challenge invite. Renders on CG too
                 (PostGameEngagement self-hides on CG; this one stays). */}
@@ -348,6 +356,18 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     gameMode: resolvedGameMode,
     wordHuntTargetFoundBy: wordHuntSummary?.targetFoundBy,
   });
+
+  // Wheel-rush hero is the page's centerpiece for that mode. The dedicated
+  // server payload (wheelRushSummary.playerStats) can be missing when scoring
+  // hits the fallback path, when stats sync races a late-arriving validatedScores
+  // event, or when a player joined late. Backfilling from the standard scores
+  // payload guarantees the hero always has something to render.
+  const effectiveWheelRushStats = useMemo(
+    () => resolveWheelRushStats(wheelRushPlayerStats, sortedScores),
+    [wheelRushPlayerStats, sortedScores],
+  );
+  const isWheelRush = resolvedGameMode === 'wheel-rush';
+  const hasWheelRushStats = Object.keys(effectiveWheelRushStats).length > 0;
 
   // Victory / defeat sounds on results mount
   const { playVictorySound, playDefeatSound, playEpicVictorySound } = useSoundEffects();
@@ -754,9 +774,21 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     currentUsername: username,
   }, [resolvedGameMode, wordHuntSummary, sortedScores, wordHuntEliminatedPlayers, wordHuntPlayerLives, username]);
 
-  // Render Results Tab Content using shared component
+  // Render Results Tab Content using shared component.
+  // Wheel-rush gets a radial wheel-themed hero scene rendered ABOVE the
+  // standard cinematic content — it owns the visual identity for that mode
+  // instead of sitting below the generic podium.
   const renderResultsTab = () => (
     <>
+      {isWheelRush && hasWheelRushStats && (
+        <div className="mb-4">
+          <WheelRushResultsScene
+            playerStats={effectiveWheelRushStats}
+            scores={sortedScores}
+            currentUsername={username}
+          />
+        </div>
+      )}
       <ResultsMainContent
         {...mainContentProps}
         hideInlineCta={!isBotsOnlyGame}
@@ -784,14 +816,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           )}
         </div>
       )}
-      {resolvedGameMode === 'wheel-rush' && Object.keys(wheelRushPlayerStats).length >= 2 && (
-        <div className="mb-3">
-          <WheelRushDomination
-            playerStats={wheelRushPlayerStats}
-            currentUsername={username}
-          />
-        </div>
-      )}
+      {/* Wheel-rush summary already rendered as the hero scene above; no
+          secondary domination card needed below the podium. */}
       {/* Add-friend affordance now lives inline on each player tile (Podium + ConsolationRows). */}
     </>
   );
@@ -932,7 +958,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         blastTotalTilesCleared={blastTotalTilesCleared}
         blastTotalTileBonus={blastTotalTileBonus}
         blastPlayerStats={blastPlayerStats}
-        wheelRushPlayerStats={wheelRushPlayerStats}
+        wheelRushPlayerStats={effectiveWheelRushStats}
         currentUsername={username}
         gameCode={gameCode}
         isBotsOnlyGame={isBotsOnlyGame}

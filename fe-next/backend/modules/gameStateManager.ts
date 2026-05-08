@@ -334,8 +334,17 @@ function resetGameForNewRound(gameCode: string): boolean {
 }
 
 // Cleanup
+// Mirror connectionHandler.HOST_RECONNECTION_GRACE_PERIOD so the periodic
+// empty-room sweep does not race-delete a room while its host is briefly
+// backgrounded (Chrome tab away, phone locked) and the host-disconnect grace
+// timer is still pending.
+const EMPTY_ROOM_GRACE_MS = parseInt(process.env.HOST_RECONNECTION_GRACE_PERIOD || '300000');
+
 function cleanupEmptyRooms(): number {
-  const emptyRooms = gameQueryManager.getEmptyRooms(games as unknown as Record<string, QueryGameBase>);
+  const emptyRooms = gameQueryManager.getEmptyRooms(
+    games as unknown as Record<string, QueryGameBase>,
+    { gracePeriodMs: EMPTY_ROOM_GRACE_MS }
+  );
   for (const code of emptyRooms) {
     logger.info('CLEANUP', `Removing empty room: ${code}`);
     deleteGame(code);

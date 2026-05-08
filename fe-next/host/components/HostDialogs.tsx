@@ -532,7 +532,7 @@ export const SoloStartConfirmDialog: React.FC<SoloStartConfirmDialogProps> = mem
           <Share2 className="w-4 h-4" />
           {t('hostView.inviteFriends')}
         </AlertDialogAction>
-        {/* Play with bots — SECONDARY */}
+        {/* Skip & Play with bots — SECONDARY */}
         <AlertDialogAction
           data-testid="solo-dialog-bots"
           onClick={onConfirm}
@@ -540,13 +540,6 @@ export const SoloStartConfirmDialog: React.FC<SoloStartConfirmDialogProps> = mem
         >
           {t('hostView.soloStartConfirm')}
         </AlertDialogAction>
-        {/* Wait for players — CANCEL */}
-        <AlertDialogCancel
-          data-testid="solo-dialog-wait"
-          className="w-full bg-transparent border-transparent text-slate-400 hover:bg-white/5 mt-0"
-        >
-          {t('hostView.soloStartCancel')}
-        </AlertDialogCancel>
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>

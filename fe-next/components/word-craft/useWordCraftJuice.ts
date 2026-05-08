@@ -12,6 +12,8 @@ export interface UseWordCraftJuice {
   scorePop: (target: JuiceTarget, score: number) => void;
   botReveal: (targets: JuiceTarget[]) => void;
   rackSelect: (target: JuiceTarget) => void;
+  /** Player committed a word — staggered "thump" reveal across the placed tiles */
+  playerCommitReveal: (targets: JuiceTarget[]) => void;
 }
 
 export function useWordCraftJuice(): UseWordCraftJuice {
@@ -81,5 +83,22 @@ export function useWordCraftJuice(): UseWordCraftJuice {
       .to(target, { y: -3, scale: 1.04, duration: 0.16, ease: 'power2.out' });
   }, []);
 
-  return { tilePlace, invalidShake, scorePop, botReveal, rackSelect };
+  const playerCommitReveal = useCallback((targets: JuiceTarget[]) => {
+    const list = targets.filter(Boolean) as Element[];
+    if (list.length === 0) return;
+    if (isReducedMotionPreferred()) return;
+    // Hard "thump" — tiles drop in with a scale spike + downward overshoot,
+    // staggered left-to-right. Compositor-only (transform) so it stays 60fps.
+    const tl = gsap.timeline();
+    list.forEach((el, i) => {
+      tl.fromTo(
+        el,
+        { scale: 1.35, y: -10 },
+        { scale: 1, y: 0, duration: 0.28, ease: 'back.out(2.2)' },
+        i * 0.06,
+      );
+    });
+  }, []);
+
+  return { tilePlace, invalidShake, scorePop, botReveal, rackSelect, playerCommitReveal };
 }

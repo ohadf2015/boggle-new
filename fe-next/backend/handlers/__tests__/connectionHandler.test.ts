@@ -314,7 +314,9 @@ describe('connectionHandler', () => {
       );
     });
 
-    it('closes room immediately when empty after host disconnect', () => {
+    it('does NOT close room immediately when solo host disconnects (backgrounding-friendly)', () => {
+      // User scenario: host creates a room, backgrounds Chrome / locks phone — must NOT
+      // tear down the room. We schedule a grace timer instead and only delete on expiry.
       const game = makeGame({ users: { Host: { socketId: 'socket-host', isHost: true, disconnected: false, isBot: false } } });
       const { socket, handlers } = createMockSocket('socket-host');
       registerConnectionHandlers(mockIo, socket);
@@ -323,11 +325,62 @@ describe('connectionHandler', () => {
       mockGetUsernameBySocketId.mockReturnValue('Host');
       mockGetGame.mockReturnValue(game);
       mockIsRoomEmpty.mockReturnValue(true);
+      mockGetNextEligibleHost.mockReturnValue(null);
 
       handlers['disconnect']('transport close');
 
+      // Room must survive the immediate disconnect tick.
+      expect(mockDeleteGame).not.toHaveBeenCalled();
+      // A grace timer must be scheduled so we can clean up later if host never comes back.
+      expect(mockTimerManager.setTimeout).toHaveBeenCalledWith(
+        'hostReconnect:GAME1',
+        expect.any(Function),
+        expect.any(Number)
+      );
+      expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+        mockIo, 'game:GAME1', 'hostDisconnected', expect.objectContaining({ gracePeriodMs: expect.any(Number) })
+      );
+    });
+
+    it('deletes solo-host room only after grace period expires without reconnect', () => {
+      const game = makeGame({ users: { Host: { socketId: 'socket-host', isHost: true, disconnected: false, isBot: false } } });
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Host');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(true);
+      mockGetNextEligibleHost.mockReturnValue(null);
+
+      handlers['disconnect']('transport close');
+
+      // Advance well past any reasonable grace window (5 minutes default).
+      vi.advanceTimersByTime(10 * 60 * 1000);
+
       expect(mockDeleteGame).toHaveBeenCalledWith('GAME1');
       expect(mockClearGameTimer).toHaveBeenCalledWith('GAME1');
+    });
+
+    it('preserves solo-host room when host reconnects within grace window', () => {
+      const game = makeGame({ users: { Host: { socketId: 'socket-host', isHost: true, disconnected: false, isBot: false } } });
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Host');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(true);
+      mockGetNextEligibleHost.mockReturnValue(null);
+
+      handlers['disconnect']('transport close');
+
+      // Simulate reconnect: hostSocketId rotates to new socket before timer fires.
+      game.hostSocketId = 'new-socket-host';
+
+      vi.advanceTimersByTime(10 * 60 * 1000);
+
+      expect(mockDeleteGame).not.toHaveBeenCalled();
     });
 
     it('starts grace period when no eligible host and room not empty', () => {
@@ -345,7 +398,7 @@ describe('connectionHandler', () => {
 
       expect(mockBroadcastToRoom).toHaveBeenCalledWith(
         mockIo, 'game:GAME1', 'hostDisconnected',
-        expect.objectContaining({ gracePeriodMs: 30000 })
+        expect.objectContaining({ gracePeriodMs: expect.any(Number) })
       );
       expect(mockTimerManager.setTimeout).toHaveBeenCalledWith(
         'hostReconnect:GAME1',
@@ -368,7 +421,7 @@ describe('connectionHandler', () => {
       handlers['disconnect']('transport close');
 
       // After grace period, getGame still returns the game and hostSocketId unchanged
-      vi.advanceTimersByTime(30000);
+      vi.advanceTimersByTime(300000);
 
       expect(mockBroadcastToRoom).toHaveBeenCalledWith(
         mockIo, 'game:GAME1', 'hostLeftRoomClosing',
@@ -395,7 +448,7 @@ describe('connectionHandler', () => {
       mockGetNextEligibleHost.mockReturnValue('Player1');
       mockTransferHost.mockReturnValue({ success: true });
 
-      vi.advanceTimersByTime(30000);
+      vi.advanceTimersByTime(300000);
 
       expect(mockTransferHost).toHaveBeenCalledWith('GAME1', 'Player1');
       expect(mockDeleteGame).not.toHaveBeenCalled();
@@ -433,7 +486,7 @@ describe('connectionHandler', () => {
       // Simulate host reconnect: hostSocketId changes
       game.hostSocketId = 'new-socket-host';
 
-      vi.advanceTimersByTime(30000);
+      vi.advanceTimersByTime(300000);
 
       // Should not close because hostSocketId changed
       expect(mockDeleteGame).not.toHaveBeenCalled();
@@ -492,7 +545,7 @@ describe('connectionHandler', () => {
       // Should fall through to grace period
       expect(mockBroadcastToRoom).toHaveBeenCalledWith(
         mockIo, 'game:GAME1', 'hostDisconnected',
-        expect.objectContaining({ gracePeriodMs: 30000 })
+        expect.objectContaining({ gracePeriodMs: expect.any(Number) })
       );
     });
   });
@@ -556,7 +609,7 @@ describe('connectionHandler', () => {
 
       mockGetGame.mockReturnValue(null);
 
-      vi.advanceTimersByTime(30000);
+      vi.advanceTimersByTime(300000);
 
       expect(mockDeleteGame).not.toHaveBeenCalled();
     });

@@ -126,6 +126,7 @@ export default function BrainTrainingPageClient() {
 
   // State for auth modal
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signup');
 
   // State for share modal
   const [showShareCard, setShowShareCard] = useState(false);
@@ -275,17 +276,30 @@ export default function BrainTrainingPageClient() {
             )}>
               {t('brain.guestView.description')}
             </p>
-            <button
-              onClick={() => setShowAuthModal(true)}
-              className={cn(
-                'px-6 py-3 rounded-neo font-bold',
-                'border-3 border-neo-black shadow-hard',
-                'transition-all hover:translate-y-[-2px] hover:shadow-hard-lg',
-                'bg-neo-cyan text-neo-black'
-              )}
-            >
-              {t('common.signIn')}
-            </button>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
+              <button
+                onClick={() => { setAuthModalMode('signup'); setShowAuthModal(true); }}
+                className={cn(
+                  'px-6 py-3 rounded-neo font-bold',
+                  'border-3 border-neo-black shadow-hard',
+                  'transition-all hover:translate-y-[-2px] hover:shadow-hard-lg',
+                  'bg-neo-lime text-neo-black'
+                )}
+              >
+                {t('auth.signUp')}
+              </button>
+              <button
+                onClick={() => { setAuthModalMode('signin'); setShowAuthModal(true); }}
+                className={cn(
+                  'px-6 py-3 rounded-neo font-bold',
+                  'border-3 border-neo-black shadow-hard',
+                  'transition-all hover:translate-y-[-2px] hover:shadow-hard-lg',
+                  'bg-neo-cyan text-neo-black'
+                )}
+              >
+                {t('auth.signIn')}
+              </button>
+            </div>
           </motion.div>
 
           {/* Audit H2 — anonymous /brain showed only the sign-in card and 95%
@@ -301,6 +315,7 @@ export default function BrainTrainingPageClient() {
             isOpen={showAuthModal}
             onClose={() => setShowAuthModal(false)}
             showGuestStats={true}
+            initialMode={authModalMode}
           />
         </div>
       </div>

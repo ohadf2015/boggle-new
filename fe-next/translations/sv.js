@@ -1402,7 +1402,7 @@ const sv = {
     "soloStartTitle": "Inga andra spelare ännu!",
     "soloStartDescription": "Bjud in vänner, eller spela mot bottar.",
     "soloStartCancel": "Vänta på spelare",
-    "soloStartConfirm": "Spela med bottar",
+    "soloStartConfirm": "Hoppa över & spela mot bottar",
     "exitRoom": "Lämna rum",
     "startNewGame": "Starta nytt spel",
     "startNextRound": "Starta nästa runda",
@@ -8611,6 +8611,7 @@ const sv = {
     "description": "Lås bokstäver snabbt. Stjäl motståndarnas ord.",
     "results": {
       "matchRecap": "Hjulrush Sammanfattning",
+      "sceneTitle": "Hjulet Stannar",
       "totalLocks": "Låsta Ord",
       "stealRate": "Stöldfrekvens",
       "locks": "Lås",
@@ -11429,6 +11430,23 @@ const sv = {
       "5": "Magnifikt!",
       "6": "Lysande!",
       "7": "Fortsätt så!"
+    },
+    "tutor": {
+      "title": "Så spelar du",
+      "step1": "Tryck på en bokstav i ditt ställ",
+      "step2": "Tryck på en tom ruta för att placera",
+      "step3": "Tryck Skicka när du är klar",
+      "tipFirst": "Första ordet måste täcka ★ i mitten",
+      "tipScore": "Färgade rutor ger bonuspoäng",
+      "dismiss": "Uppfattat!",
+      "show": "Så spelar du"
+    },
+    "steps": {
+      "pick": "Välj en bricka",
+      "place": "Placera på brädet",
+      "submit": "Tryck Skicka",
+      "bot": "WordBot tänker…",
+      "over": "Spelet slut"
     }
   },
   mp: {

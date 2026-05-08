@@ -1383,7 +1383,7 @@ const en = {
     "soloStartTitle": "No other players yet!",
     "soloStartDescription": "Invite friends, or play with bots.",
     "soloStartCancel": "Wait for players",
-    "soloStartConfirm": "Play with bots",
+    "soloStartConfirm": "Skip & Play with Bots",
     "exitRoom": "Exit",
     "addFriend": "Add {name}",
     "requestSent": "Request Sent",
@@ -8793,6 +8793,7 @@ const en = {
     "description": "Lock letters fast. Steal opponents' words.",
     "results": {
       "matchRecap": "Wheel Rush Recap",
+      "sceneTitle": "Wheel Settles",
       "totalLocks": "Words Locked",
       "stealRate": "Steal Rate",
       "locks": "Locks",
@@ -11621,6 +11622,23 @@ const en = {
       "5": "Magnificent!",
       "6": "Brilliant!",
       "7": "Keep it up!"
+    },
+    "tutor": {
+      "title": "How to play",
+      "step1": "Tap a letter from your rack",
+      "step2": "Tap an empty square to place it",
+      "step3": "When done, tap Submit",
+      "tipFirst": "First word must cover the center ★",
+      "tipScore": "Colored squares give bonus points",
+      "dismiss": "Got it!",
+      "show": "How to play"
+    },
+    "steps": {
+      "pick": "Pick a tile",
+      "place": "Place it on the board",
+      "submit": "Tap Submit",
+      "bot": "WordBot is thinking…",
+      "over": "Game over"
     }
   },
   mp: {

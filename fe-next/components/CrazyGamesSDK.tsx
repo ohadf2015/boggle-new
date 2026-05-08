@@ -3,7 +3,8 @@
 import { createContext, useContext, useCallback, useState, useEffect, ReactNode } from 'react';
 import { useCrazyGamesViewport } from '@/hooks/useCrazyGamesViewport';
 import { useCrazyGamesScrollPrevention } from '@/hooks/useCrazyGamesScrollPrevention';
-import { trackAdLifecycle, type AdType } from '@/utils/posthogEngagement';
+import { trackAdLifecycle, setPostHogSuperProps, type AdType } from '@/utils/posthogEngagement';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import {
   CRAZYGAMES_NOOP_CONTEXT,
   type CrazyGamesEnvironment,
@@ -115,6 +116,14 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
 
   const { deviceType, isLandscape, viewportSize } = useCrazyGamesViewport();
   useCrazyGamesScrollPrevention(environment === 'crazygames');
+
+  // Tag every PostHog event with `is_cg` so funnel queries don't have to chain
+  // referrer/url filters that drop on cross-domain bounce. Re-fire on every
+  // sticky transition so the prop survives async SDK init that lands later
+  // than PostHogProvider's 2s platform recheck.
+  useEffect(() => {
+    if (isInCrazyGamesIframe) setPostHogSuperProps({ is_cg: true });
+  }, [isInCrazyGamesIframe]);
 
   // Initialize SDK
   useEffect(() => {
@@ -339,13 +348,20 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     const sdkUser = window.CrazyGames.SDK.user;
     try {
       const existing = await sdkUser.getUser();
-      if (existing) return existing;
-      return await sdkUser.showAuthPrompt();
+      if (existing) {
+        trackGrowthEvent('cg_auth_prompt_outcome', { result: 'success', via: 'existing_session' });
+        return existing;
+      }
+      const result = await sdkUser.showAuthPrompt();
+      trackGrowthEvent('cg_auth_prompt_outcome', { result: result ? 'success' : 'dismiss' });
+      return result;
     } catch (err) {
       const code = (err as { code?: string } | null)?.code;
       if (code === 'userAlreadySignedIn') {
+        trackGrowthEvent('cg_auth_prompt_outcome', { result: 'already_signed_in' });
         try { return await sdkUser.getUser(); } catch { return null; }
       }
+      trackGrowthEvent('cg_auth_prompt_outcome', { result: 'error', errorCode: code ?? 'unknown' });
       return null;
     }
   }, [isAvailable]);

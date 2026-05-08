@@ -1420,7 +1420,7 @@ const es = {
     "soloStartTitle": "¡Aún no hay otros jugadores!",
     "soloStartDescription": "Invita amigos o juega contra bots.",
     "soloStartCancel": "Esperar jugadores",
-    "soloStartConfirm": "Jugar con bots",
+    "soloStartConfirm": "Saltar y jugar con bots",
     "exitRoom": "Salir",
     "startNewGame": "Nuevo Juego",
     "startNextRound": "Siguiente Ronda",
@@ -8693,6 +8693,7 @@ const es = {
     "description": "Bloquea letras rápido. Roba palabras a tus rivales.",
     "results": {
       "matchRecap": "Resumen de Rueda Veloz",
+      "sceneTitle": "La Rueda se Detiene",
       "totalLocks": "Palabras Bloqueadas",
       "stealRate": "Tasa de Robo",
       "locks": "Bloqueos",
@@ -11524,6 +11525,23 @@ const es = {
       "5": "¡Magnífico!",
       "6": "¡Brillante!",
       "7": "¡Sigue así!"
+    },
+    "tutor": {
+      "title": "Cómo jugar",
+      "step1": "Toca una letra de tu atril",
+      "step2": "Toca una casilla vacía para colocarla",
+      "step3": "Cuando termines, toca Enviar",
+      "tipFirst": "La primera palabra debe cubrir la ★ central",
+      "tipScore": "Las casillas de color dan puntos extra",
+      "dismiss": "¡Entendido!",
+      "show": "Cómo jugar"
+    },
+    "steps": {
+      "pick": "Elige una ficha",
+      "place": "Colócala en el tablero",
+      "submit": "Toca Enviar",
+      "bot": "WordBot está pensando…",
+      "over": "Fin de la partida"
     }
   },
   "connections": {

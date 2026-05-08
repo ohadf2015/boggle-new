@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import { createBoard, getCell, isFirstMove, type Board } from './board';
-import { createBag, draw, RACK_SIZE, remaining, swap as swapBag, type TileBag } from './tileBag';
+import { createBag, draw, RACK_SIZE, remaining, swap as swapBag, type SupportedLocale, type TileBag } from './tileBag';
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 import { findBestBotMove } from './botMove';
 import type { PlacedTile, PlayerState, RackTile } from './types';
@@ -48,10 +48,11 @@ type Action =
 
 const BOT_NAME = 'WordBot';
 
-function buildInitial(init: number | { seed: number; boardSize?: 13 | 15 }): WordCraftState {
+function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale }): WordCraftState {
   const seed = typeof init === 'number' ? init : init.seed;
   const boardSize = typeof init === 'number' ? 15 : (init.boardSize ?? 15);
-  const bag = createBag({ seed });
+  const locale = typeof init === 'number' ? 'en' : (init.locale ?? 'en');
+  const bag = createBag({ seed, locale });
   const playerRack = draw(bag, RACK_SIZE);
   const botRack = draw(bag, RACK_SIZE);
   return {
@@ -210,14 +211,14 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
 export interface UseWordCraftGameOptions {
   seed?: number;
   dict: Set<string> | null;
-  locale?: string;
+  locale?: SupportedLocale;
   boardSize?: 13 | 15;
 }
 
 export { reducer as wordCraftReducer, buildInitial as buildInitialState }
 
-export function useWordCraftGame({ seed = 1, dict, boardSize = 15 }: UseWordCraftGameOptions) {
-  const initArg = useMemo(() => ({ seed, boardSize }), [seed, boardSize]);
+export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15 }: UseWordCraftGameOptions) {
+  const initArg = useMemo(() => ({ seed, boardSize, locale }), [seed, boardSize, locale]);
   const [state, dispatch] = useReducer(reducer, initArg, buildInitial);
   const isWordValid: DictionaryCheck = useCallback(
     (w: string) => (dict ? dict.has(w.toLowerCase()) || dict.has(w.toUpperCase()) : false),
@@ -248,6 +249,30 @@ export function useWordCraftGame({ seed = 1, dict, boardSize = 15 }: UseWordCraf
       dispatch({ type: 'PLACE_PENDING', placement });
     },
     [state.turn, state.selectedRackTileId, state.board, state.pendingPlacements, state.player.rack],
+  );
+
+  // Drag-to-place bypass: caller provides the tile id directly so we don't depend
+  // on the async-updating selectedRackTileId. Used by the pointer-drag flow.
+  const placeTileOnBoard = useCallback(
+    (rackTileId: string, row: number, col: number) => {
+      if (state.turn !== 'player') return;
+      if (getCell(state.board, row, col).tile) return;
+      if (state.pendingPlacements.some((p) => p.row === row && p.col === col)) return;
+      if (state.pendingPlacements.some((p) => p.rackTileId === rackTileId)) return;
+      const tile = state.player.rack.find((t) => t.id === rackTileId);
+      if (!tile) return;
+      const placement: PlacedTile = {
+        row,
+        col,
+        letter: tile.letter,
+        value: tile.value,
+        isBlank: tile.isBlank,
+        rackTileId: tile.id,
+      };
+      dispatch({ type: 'PLACE_PENDING', placement });
+      dispatch({ type: 'SELECT_RACK_TILE', id: null });
+    },
+    [state.turn, state.board, state.pendingPlacements, state.player.rack],
   );
 
   const recallTile = useCallback(
@@ -334,6 +359,7 @@ export function useWordCraftGame({ seed = 1, dict, boardSize = 15 }: UseWordCraf
     state,
     selectRackTile,
     placeOnBoard,
+    placeTileOnBoard,
     recallTile,
     recallAll,
     submitMove,

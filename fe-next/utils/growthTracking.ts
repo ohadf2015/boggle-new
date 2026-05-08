@@ -123,7 +123,12 @@ export type GrowthEvent =
   | 'cg_lobby_arrival'
   | 'cg_lobby_hero_view'
   | 'cg_lobby_hero_play'
-  | 'cg_lobby_hero_browse';
+  | 'cg_lobby_hero_browse'
+  // CG SDK auth outcome — fired by CrazyGamesProvider.showAuthPrompt for every
+  // invocation. Closes the 0-signups blind spot for CG cohort: pre-fix the
+  // result was discarded, so PostHog couldn't tell dismiss from never-prompted.
+  // Properties: { result: 'success' | 'dismiss' | 'already_signed_in' | 'error', errorCode? }.
+  | 'cg_auth_prompt_outcome';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =

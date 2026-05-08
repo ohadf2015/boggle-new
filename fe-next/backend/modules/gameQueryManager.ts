@@ -187,26 +187,40 @@ export function getActiveRooms(games: Record<string, QueryGameBase>): GameSummar
   return result;
 }
 
+export interface RoomEmptyOptions {
+  // When set, a recently-disconnected human user (disconnectedAt within
+  // `gracePeriodMs` of now) still counts as "present" — keeps backgrounded
+  // hosts' rooms alive across the periodic empty-room sweep.
+  gracePeriodMs?: number;
+}
+
 /**
  * Check if a specific room is empty (no active human players)
  */
-export function isRoomEmpty(game: QueryGameBase | null): boolean {
+export function isRoomEmpty(game: QueryGameBase | null, opts: RoomEmptyOptions = {}): boolean {
   if (!game) return true;
 
   const users = Object.values(game.users);
-  // Room is empty if no users at all
   if (users.length === 0) return true;
-  // Room is empty if no active human players (bots don't count as real players)
-  const activeHumanUsers = users.filter(user => !user.disconnected && !user.isBot);
+
+  const graceMs = opts.gracePeriodMs;
+  const now = Date.now();
+
+  const activeHumanUsers = users.filter(u => {
+    if (u.isBot) return false;
+    if (!u.disconnected) return true;
+    if (graceMs && u.disconnectedAt && now - u.disconnectedAt < graceMs) return true;
+    return false;
+  });
   return activeHumanUsers.length === 0;
 }
 
 /**
  * Get empty rooms (rooms with no active human players)
  */
-export function getEmptyRooms(games: Record<string, QueryGameBase>): string[] {
+export function getEmptyRooms(games: Record<string, QueryGameBase>, opts: RoomEmptyOptions = {}): string[] {
   return Object.values(games)
-    .filter(game => isRoomEmpty(game))
+    .filter(game => isRoomEmpty(game, opts))
     .map(game => game.gameCode);
 }
 

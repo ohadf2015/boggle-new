@@ -34,7 +34,10 @@ import { startGameTimer } from '../services/gameLifecycle/gameTimer.js';
 import logger from '../utils/logger.js';
 
 // Configuration
-const HOST_RECONNECTION_GRACE_PERIOD = parseInt(process.env.HOST_RECONNECTION_GRACE_PERIOD || '30000');
+// Host grace defaults to 5 minutes so a backgrounded Chrome tab / locked phone
+// does not tear down the host's room. Periodic empty-room sweep
+// (gameStateManager.cleanupEmptyRooms) reads the same env var to stay in sync.
+const HOST_RECONNECTION_GRACE_PERIOD = parseInt(process.env.HOST_RECONNECTION_GRACE_PERIOD || '300000');
 const PLAYER_RECONNECTION_GRACE_PERIOD = parseInt(process.env.PLAYER_RECONNECTION_GRACE_PERIOD || '120000');
 
 // Extended GameUser type with reconnection timeout
@@ -115,15 +118,13 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
     game.users[username].disconnectedAt = Date.now();
   }
 
-  // Check if room is now empty (no other active players)
-  if (isRoomEmpty(gameCode)) {
-    logger.info('SOCKET', `Room ${gameCode} is empty after host ${username} disconnected - closing immediately`);
-    clearGameTimer(gameCode);
-    cleanupGameBots(gameCode);
-    deleteGame(gameCode);
-    broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
-    return;
-  }
+  // NOTE: previously we deleted the room immediately when the host was the
+  // last active user (`isRoomEmpty(gameCode)`). That made backgrounding Chrome
+  // / locking the phone instantly destroy the room — even though the user
+  // never explicitly closed it. Now we always fall through to the grace-period
+  // path: getNextEligibleHost will return null for solo rooms, so the existing
+  // grace-timer block schedules a delayed close, giving the host a chance to
+  // reconnect within HOST_RECONNECTION_GRACE_PERIOD.
 
   // Try to find a new host from remaining connected players
   // Retry up to 3 times in case candidates disconnect between selection and transfer

@@ -9,24 +9,49 @@ export interface WordCraftBoardProps {
   board: Board;
   pendingPlacements: PlacedTile[];
   onCellClick: (row: number, col: number) => void;
+  /** Tap a pending tile on the board to send it back to the rack */
+  onRecallPending?: (rackTileId: string) => void;
   disabled?: boolean;
+  hasSelectedTile?: boolean;
+  isFirstMove?: boolean;
+  /** During an active drag: cell key 'r,c' that the dragged tile is hovering over */
+  dragHoverCell?: string | null;
+  /** Letter to render as a ghost in the hovered cell during drag */
+  dragHoverLetter?: string | null;
 }
 
-const PREMIUM_LABEL: Record<string, string> = {
-  DL: '2L',
-  TL: '3L',
-  DW: '2W',
-  TW: '3W',
+const PREMIUM_MULT: Record<string, { mult: '×2' | '×3'; kind: 'L' | 'W' }> = {
+  DL: { mult: '×2', kind: 'L' },
+  TL: { mult: '×3', kind: 'L' },
+  DW: { mult: '×2', kind: 'W' },
+  TW: { mult: '×3', kind: 'W' },
 };
 
-const PREMIUM_BG: Record<string, string> = {
-  DL: 'bg-neo-cyan-muted/40',
-  TL: 'bg-neo-cyan-muted/70',
-  DW: 'bg-neo-pink-muted/40',
-  TW: 'bg-neo-pink-muted/70',
+const PREMIUM_WASH: Record<string, string> = {
+  DL: 'bg-neo-cyan/10',
+  TL: 'bg-neo-cyan/22',
+  DW: 'bg-neo-pink/10',
+  TW: 'bg-neo-pink/22',
 };
 
-function WordCraftBoardImpl({ board, pendingPlacements, onCellClick, disabled }: WordCraftBoardProps) {
+const PREMIUM_INK: Record<string, string> = {
+  DL: 'text-neo-cyan/90',
+  TL: 'text-neo-cyan',
+  DW: 'text-neo-pink/90',
+  TW: 'text-neo-pink',
+};
+
+function WordCraftBoardImpl({
+  board,
+  pendingPlacements,
+  onCellClick,
+  onRecallPending,
+  disabled,
+  hasSelectedTile,
+  isFirstMove,
+  dragHoverCell,
+  dragHoverLetter,
+}: WordCraftBoardProps) {
   const pendingByCoord = new Map<string, PlacedTile>();
   for (const p of pendingPlacements) pendingByCoord.set(`${p.row},${p.col}`, p);
 
@@ -34,11 +59,12 @@ function WordCraftBoardImpl({ board, pendingPlacements, onCellClick, disabled }:
     <div
       role="grid"
       aria-label="WordCraft board"
-      className="mx-auto inline-grid bg-neo-navy-light border-neo-thick border-black rounded-neo p-2 shadow-hard-lg"
+      data-tile-selected={hasSelectedTile ? 'true' : undefined}
+      className="grid bg-black border-neo-thick border-black rounded-neo p-1.5 shadow-hard-lg w-full h-full"
       style={{
         gridTemplateColumns: `repeat(${BOARD_SIZE}, minmax(0, 1fr))`,
+        gridTemplateRows: `repeat(${BOARD_SIZE}, minmax(0, 1fr))`,
         gap: 2,
-        maxWidth: 'min(100%, 720px)',
       }}
     >
       {board.cells.map((row, r) =>
@@ -48,7 +74,15 @@ function WordCraftBoardImpl({ board, pendingPlacements, onCellClick, disabled }:
           const placedTile = cell.tile;
           const isCenter = r === CENTER && c === CENTER;
           const premiumKey = cell.premium ?? '';
+          // Empty cells are interactive when player can place.
+          // Pending cells are interactive (tap to recall) regardless of selection.
+          // Permanently-placed cells are never interactive.
           const isInteractive = !disabled && !placedTile;
+          const isEmpty = !placedTile && !pending;
+          const inviteEmpty = isEmpty && hasSelectedTile && !disabled;
+          const inviteCenter = isCenter && isEmpty && isFirstMove && !disabled;
+          const isDragTarget = dragHoverCell === key && isEmpty;
+          const premium = cell.premium ? PREMIUM_MULT[cell.premium] : null;
 
           return (
             <button
@@ -58,35 +92,68 @@ function WordCraftBoardImpl({ board, pendingPlacements, onCellClick, disabled }:
               data-board-cell={key}
               data-tile-id={pending?.rackTileId ?? placedTile?.rackTileId ?? undefined}
               data-tile-state={pending ? 'pending' : placedTile ? 'placed' : 'empty'}
+              data-cell-invite={inviteEmpty ? 'true' : undefined}
+              data-cell-center-ping={inviteCenter ? 'true' : undefined}
+              data-drag-target={isDragTarget ? 'true' : undefined}
               aria-label={`row ${r + 1} column ${c + 1}${cell.premium ? ` ${cell.premium}` : ''}`}
               disabled={!isInteractive}
-              onClick={() => isInteractive && onCellClick(r, c)}
+              onClick={() => {
+                if (!isInteractive) return;
+                if (pending && onRecallPending) {
+                  onRecallPending(pending.rackTileId);
+                  return;
+                }
+                onCellClick(r, c);
+              }}
               className={cn(
-                'aspect-square flex items-center justify-center select-none',
-                'text-[10px] sm:text-xs font-neo-display border border-black/40',
-                placedTile || pending
-                  ? 'bg-neo-cream text-neo-navy font-bold shadow-hard-sm'
-                  : isCenter
-                    ? 'bg-neo-pink/30 text-neo-white'
-                    : (cell.premium && PREMIUM_BG[cell.premium]) || 'bg-neo-navy-light',
-                pending && 'ring-2 ring-neo-lime',
-                !isInteractive && 'cursor-not-allowed',
-                isInteractive && 'hover:ring-2 hover:ring-neo-cyan',
+                'relative aspect-square flex items-center justify-center select-none touch-manipulation',
+                'transition-all duration-150',
+                placedTile
+                  ? 'bg-neo-cream text-neo-navy shadow-[0_2px_0_0_rgba(0,0,0,0.85)]'
+                  : pending
+                    ? // Pending tile: lime tint + dashed outline so player can tell it's still movable
+                      'bg-neo-lime text-neo-navy shadow-[0_3px_0_0_rgba(0,0,0,0.9)] ring-2 ring-neo-lime-light hover:ring-neo-pink hover:rotate-1'
+                    : isCenter
+                      ? 'bg-neo-pink/35 text-neo-cream'
+                      : (cell.premium && PREMIUM_WASH[cell.premium]) || 'bg-neo-navy-light/40',
+                isDragTarget && 'bg-neo-cyan/30 ring-2 ring-neo-cyan scale-105 z-10',
+                !isInteractive && !pending && 'cursor-not-allowed',
+                isInteractive && !pending && 'hover:bg-neo-cyan/15 active:scale-95',
+                inviteEmpty && 'wc-cell-invite',
+                inviteCenter && 'wc-cell-center-ping',
               )}
               style={{ minWidth: 0 }}
             >
               {placedTile ? (
-                <span className="text-xs sm:text-sm font-bold">
+                <span className="wc-tile-glyph text-sm sm:text-base">
                   {placedTile.letter === '_' ? '·' : placedTile.letter}
                 </span>
               ) : pending ? (
-                <span className="text-xs sm:text-sm font-bold">
+                <span className="wc-tile-glyph text-sm sm:text-base">
                   {pending.letter === '_' ? '·' : pending.letter}
                 </span>
+              ) : isDragTarget && dragHoverLetter ? (
+                // Ghost letter previewing the drop result — half-opacity
+                <span className="wc-tile-glyph text-sm sm:text-base text-neo-cyan/80">
+                  {dragHoverLetter === '_' ? '·' : dragHoverLetter}
+                </span>
               ) : isCenter ? (
-                <span className="text-base">★</span>
-              ) : cell.premium ? (
-                <span className="text-[8px] sm:text-[10px] opacity-80">{PREMIUM_LABEL[premiumKey]}</span>
+                <span aria-hidden className="text-base sm:text-lg drop-shadow">★</span>
+              ) : premium ? (
+                <>
+                  <span className={cn('wc-mult text-[10px] sm:text-[12px]', PREMIUM_INK[premiumKey])}>
+                    {premium.mult}
+                  </span>
+                  <span
+                    aria-hidden
+                    className={cn(
+                      'absolute bottom-0.5 end-0.5 text-[7px] sm:text-[8px] font-black opacity-50',
+                      PREMIUM_INK[premiumKey],
+                    )}
+                  >
+                    {premium.kind}
+                  </span>
+                </>
               ) : null}
             </button>
           );

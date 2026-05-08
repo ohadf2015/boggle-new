@@ -56,6 +56,7 @@ describe('detectCrazyGamesSync', () => {
     expect(detectCrazyGamesSync()).toBe(false);
   });
 
+
   it('does NOT force-on when NEXT_PUBLIC_CRAZYGAMES_ENABLED=true (env governs SDK script load only)', () => {
     // Regression: a previous version returned true unconditionally when this
     // env var was 'true'. Because Next inlines NEXT_PUBLIC_* at build time,

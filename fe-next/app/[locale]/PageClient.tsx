@@ -7,6 +7,7 @@ import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite } fro
 import { trackInviteLanded } from '@/utils/growthTracking';
 import { isOnboardingAllowedRoute } from '@/lib/onboarding/allowedRoutes';
 import { LandingView } from '@/components/landing';
+import { detectCrazyGamesSync } from '@/components/CrazyGamesSDK';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
 
 // Denylist: allow only Latin/accented/Hebrew/Hiragana/Katakana + space/apostrophe/hyphen
@@ -62,7 +63,15 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     return !returning;
   });
 
-  const [showFTUE, setShowFTUE] = useState(false);
+  // CG users on homepage skip the LandingView marketing surface and drop
+  // straight into the CG short-flow (tutorial→welcome). PostHog 90d data showed
+  // most CG visitors ignored the "Start Playing" CTA → only 2/20 saw welcome.
+  // CG portal traffic = high intent to play; respect that.
+  const [showFTUE, setShowFTUE] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    if (hasCompletedOnboarding() || hasSupabaseSession()) return false;
+    return detectCrazyGamesSync();
+  });
   // Defensive route allowlist: FTUE may only render on locale homepage.
   // PageClient is mounted only at /[locale]/page.tsx today, so this is dormant
   // for current users — but guards against a future hoist that would leak the
