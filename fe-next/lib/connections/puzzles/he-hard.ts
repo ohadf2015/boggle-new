@@ -16,7 +16,6 @@ export const HE_HARD: ConnectionPuzzle[] = [
   { id: 'he-h-042', word1: 'עוגיית', word2: 'חלב', bridge: 'שוקולד', difficulty: 'hard' },
   { id: 'he-h-044', word1: 'מלח', word2: 'המלח', bridge: 'ים', difficulty: 'hard' },
   { id: 'he-h-048', word1: 'מחבת', word2: 'כבד', bridge: 'ברזל', difficulty: 'hard' },
-  { id: 'he-h-052', word1: 'כף', word2: 'ימין', bridge: 'יד', difficulty: 'hard' },
   { id: 'he-h-056', word1: 'קערת', word2: 'ירקות', bridge: 'סלט', difficulty: 'hard' },
   { id: 'he-h-061', word1: 'פנס', word2: 'ראשי', bridge: 'רחוב', difficulty: 'hard' },
   { id: 'he-h-081', word1: 'טיפת', word2: 'חזק', bridge: 'גשם', difficulty: 'hard' },

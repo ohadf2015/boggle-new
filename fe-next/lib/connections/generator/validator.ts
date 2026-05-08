@@ -27,6 +27,11 @@ export interface ValidationResult {
 
 const norm = (s: string): string => s.trim().replace(/\s+/g, ' ');
 
+// NOTE: bigram frequency is not a naturalness check. Hebrew speakers reject
+// reversed-smichut compounds ("חשמל מתח" instead of "מתח חשמלי") and English
+// calques ("כוכב סרט" for "movie star") even though both bigrams have wiki
+// hits. See `docs/audits/connections-feedback-2026-05-08.md` — generated HE
+// triples should get a native-review pass before merging into source.
 export function validateTriple(
   triple: Triple,
   freq: FreqLookup,
