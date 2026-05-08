@@ -333,7 +333,7 @@ export async function notifyGameInvite(
     imageUrl: mascotImageUrl('play'),
     data: {
       type: 'game_invite',
-      deepLink: `/join/${roomCode}`,
+      deepLink: `/multiplayer?room=${roomCode}`,
     },
   }, 'both', inviterUserId);
 }
@@ -353,7 +353,7 @@ export async function notifyTurnReminder(
     imageUrl: mascotImageUrl('encouraging'),
     data: {
       type: 'turn_reminder',
-      deepLink: `/join/${roomCode}`,
+      deepLink: `/multiplayer?room=${roomCode}`,
     },
   });
 }
@@ -484,7 +484,7 @@ export async function notifyChallengeAccepted(
     imageUrl: mascotImageUrl('play'),
     data: {
       type: 'challenge_accepted',
-      deepLink: `/join/${roomCode}`,
+      deepLink: `/multiplayer?room=${roomCode}`,
     },
   }, 'both', acceptorUserId);
 }
