@@ -95,6 +95,30 @@ export const EXPERIMENTS = {
   }),
 
   /**
+   * MP signup nudge copy + toast suppression. Driven by 28d PostHog data
+   * showing the post-sheet toast (`trigger: mp_toast`) fired 58 times and
+   * converted 0 — pure dismissal training. Sheet (`mp_sheet`) also 0/19,
+   * but kept as the controlled experiment surface.
+   *
+   * Variants:
+   * - `control` — current behavior: sheet at game 2 + toast at game 3+.
+   * - `toast-disabled` — sheet only, no follow-up toast. Hypothesis: less
+   *   dismissal training without losing signup signal.
+   * - `value-prop` — sheet copy emphasizes "save your stats + climb
+   *   leaderboard". Wired in MultiplayerSignupSheet (P2 spec).
+   * - `social-proof` — sheet copy emphasizes "X players signed up this week".
+   *   Wired in MultiplayerSignupSheet (P2 spec).
+   *
+   * Conversion = signup_completed within 30min of sheet impression.
+   */
+  'mp-signup-nudge-copy-v1': defineExperiment({
+    variants: ['control', 'toast-disabled', 'value-prop', 'social-proof'] as const,
+    default: 'control',
+    description:
+      'MP signup nudge copy + toast gate. control = sheet+toast (status quo, 0/77 converts in 28d). toast-disabled = sheet only. value-prop / social-proof = alternate sheet copy. Conversion = signup_completed within 30min of sheet impression.',
+  }),
+
+  /**
    * CrazyGames onboarding flow. Hypothesis: CG players bounce when
    * forced to pick a mode before seeing gameplay (CG ranks games on
    * 60s-survival rate). `autostart` deep-links straight into Word Hunt

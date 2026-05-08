@@ -82,6 +82,12 @@ export function useMultiplayerSignupNudge({
   const thresholdVariant = usePostHogFlag<string>('mp-signup-nudge-threshold', 'after-2nd-game');
   const sheetThreshold = thresholdVariant === 'after-3rd-game' ? 3 : 2;
 
+  // A/B test: copy + post-sheet toast gating. `toast-disabled` kills the
+  // game-3+ toast trigger that converted 0/58 in 28d — see
+  // `mp-signup-nudge-copy-v1` in lib/experiments.ts.
+  const copyVariant = usePostHogFlag<string>('mp-signup-nudge-copy-v1', 'control');
+  const toastEnabled = copyVariant !== 'toast-disabled';
+
   // Toast threshold is always sheet + 1
   const toastThreshold = sheetThreshold + 1;
   const pulseThreshold = 5;
@@ -143,8 +149,9 @@ export function useMultiplayerSignupNudge({
       return () => clearTimeout(timer);
     }
 
-    // Toast: show on game 3+ (after sheet was already shown/dismissed)
-    if (mpGames >= toastThreshold && wasSheetShown()) {
+    // Toast: show on game 3+ (after sheet was already shown/dismissed).
+    // Suppressed under `toast-disabled` variant — see copyVariant above.
+    if (toastEnabled && mpGames >= toastThreshold && wasSheetShown()) {
       const timer = setTimeout(() => {
         setActiveNudge('toast');
         trackGrowthEvent('signup_prompt_shown', {
@@ -156,7 +163,7 @@ export function useMultiplayerSignupNudge({
     }
 
     return undefined;
-  }, [isAuthenticated, isOnCrazyGamesPlatform, isResultsVisible, mpGames, sheetThreshold, toastThreshold]);
+  }, [isAuthenticated, isOnCrazyGamesPlatform, isResultsVisible, mpGames, sheetThreshold, toastThreshold, toastEnabled]);
 
   const shouldPulseCoins = !isAuthenticated && !isOnCrazyGamesPlatform && mpGames >= pulseThreshold;
 

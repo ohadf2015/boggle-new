@@ -21,8 +21,13 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
 }));
 
 let mockFlagValue = 'after-2nd-game';
+let mockCopyVariant = 'control';
 vi.mock('@/hooks/usePostHogFlag', () => ({
-  usePostHogFlag: () => mockFlagValue,
+  usePostHogFlag: (key: string, fallback?: unknown) => {
+    if (key === 'mp-signup-nudge-threshold') return mockFlagValue;
+    if (key === 'mp-signup-nudge-copy-v1') return mockCopyVariant;
+    return fallback;
+  },
 }));
 
 vi.mock('@/utils/guestManager', () => ({
@@ -43,6 +48,7 @@ describe('useMultiplayerSignupNudge', () => {
     vi.useFakeTimers();
     mockIsOnCrazyGamesPlatform = false;
     mockFlagValue = 'after-2nd-game';
+    mockCopyVariant = 'control';
     // Clear mock storage
     for (const key in mockSessionStore) delete mockSessionStore[key];
   });
@@ -207,5 +213,74 @@ describe('useMultiplayerSignupNudge', () => {
 
     expect(result.current.stats.totalWords).toBe(100);
     expect(result.current.stats.totalScore).toBe(500);
+  });
+
+  describe('mp-signup-nudge-copy-v1 — toast gating', () => {
+    // 28d PostHog: mp_toast trigger fired 58 times, converted 0. Killing it
+    // via experiment flag is the cheapest A/B win — variant `toast-disabled`
+    // skips the post-sheet toast entirely so guests aren't trained to dismiss
+    // a CTA that never converts.
+
+    it('shows toast at game 3 under control variant', () => {
+      mockCopyVariant = 'control';
+      const { result } = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+
+      // Reach + dismiss sheet at game 2
+      act(() => { result.current.recordMpGame(); });
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2500); });
+      expect(result.current.activeNudge).toBe('sheet');
+      act(() => { result.current.dismissNudge(); });
+
+      // Game 3 → toast appears
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2000); });
+      expect(result.current.activeNudge).toBe('toast');
+    });
+
+    it('suppresses toast under toast-disabled variant', () => {
+      mockCopyVariant = 'toast-disabled';
+      const { result } = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+
+      // Sheet still fires (we want to keep collecting some signal)
+      act(() => { result.current.recordMpGame(); });
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2500); });
+      expect(result.current.activeNudge).toBe('sheet');
+      act(() => { result.current.dismissNudge(); });
+
+      // Game 3 onwards: toast NEVER appears under toast-disabled
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2000); });
+      expect(result.current.activeNudge).toBeNull();
+
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2000); });
+      expect(result.current.activeNudge).toBeNull();
+    });
+
+    it('does not emit signup_prompt_shown for mp_toast under toast-disabled', () => {
+      mockCopyVariant = 'toast-disabled';
+      const { result } = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+
+      act(() => { result.current.recordMpGame(); });
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2500); });
+      act(() => { result.current.dismissNudge(); });
+      mockTrackGrowthEvent.mockClear();
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2000); });
+
+      const promptCalls = mockTrackGrowthEvent.mock.calls.filter(
+        ([name, props]) => name === 'signup_prompt_shown' && (props as { trigger?: string })?.trigger === 'mp_toast',
+      );
+      expect(promptCalls).toHaveLength(0);
+    });
   });
 });
