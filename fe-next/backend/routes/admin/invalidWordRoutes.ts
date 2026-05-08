@@ -200,6 +200,7 @@ router.post('/auto-promote', async (req: AdminRequest, res: Response): Promise<v
       submissionBased: result.words.submissionBased.length,
       milogBased: result.words.milogBased.length,
       wiktionaryBased: result.words.wiktionaryBased.length,
+      wiktionaryEsBased: result.words.wiktionaryEsBased.length,
     });
 
     if (!success) {

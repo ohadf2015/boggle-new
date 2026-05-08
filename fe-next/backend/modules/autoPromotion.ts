@@ -11,6 +11,7 @@ import logger from '../utils/logger';
 import { addToCommunityCache } from './communityWordManager';
 import { getVerifiedWordsForPromotion } from '../services/milogWordVerifier';
 import { getVerifiedEnglishWordsForPromotion } from '../services/wiktionaryEnVerifier';
+import { getVerifiedSpanishWordsForPromotion } from '../services/wiktionaryEsVerifier';
 import { getSupabase } from './supabaseServer';
 import { promoteWordToScores } from './wordPromotion';
 
@@ -28,6 +29,7 @@ export interface AutoPromotionResult {
     submissionBased: string[];
     milogBased: string[];
     wiktionaryBased: string[];
+    wiktionaryEsBased: string[];
   };
 }
 
@@ -47,14 +49,14 @@ export function _resetLockForTesting(): void {
 export async function runAutoPromotion(): Promise<AutoPromotionResult> {
   if (isRunning) {
     logger.warn('AUTO_PROMOTE', 'Skipped: another run is in progress');
-    return { promoted: 0, failed: 0, skipped: true, words: { submissionBased: [], milogBased: [], wiktionaryBased: [] } };
+    return { promoted: 0, failed: 0, skipped: true, words: { submissionBased: [], milogBased: [], wiktionaryBased: [], wiktionaryEsBased: [] } };
   }
 
   isRunning = true;
   const result: AutoPromotionResult = {
     promoted: 0,
     failed: 0,
-    words: { submissionBased: [], milogBased: [], wiktionaryBased: [] },
+    words: { submissionBased: [], milogBased: [], wiktionaryBased: [], wiktionaryEsBased: [] },
   };
 
   try {
@@ -72,6 +74,9 @@ export async function runAutoPromotion(): Promise<AutoPromotionResult> {
 
     // --- Path 3: Wiktionary-verified English words ---
     await promoteByWiktionaryEnVerification(supabase, result);
+
+    // --- Path 4: Wiktionary-verified Spanish words ---
+    await promoteByWiktionaryEsVerification(supabase, result);
 
     logger.info('AUTO_PROMOTE', `Complete: ${result.promoted} promoted, ${result.failed} failed`);
     return result;
@@ -198,6 +203,44 @@ async function promoteByWiktionaryEnVerification(
       result.failed++;
       const msg = err instanceof Error ? err.message : String(err);
       logger.error('AUTO_PROMOTE', `Failed to promote wiktionary word "${wordRecord.word}": ${msg}`);
+    }
+  }
+}
+
+async function promoteByWiktionaryEsVerification(
+  supabase: NonNullable<ReturnType<typeof getSupabase>>,
+  result: AutoPromotionResult
+): Promise<void> {
+  const esWords = await getVerifiedSpanishWordsForPromotion();
+
+  if (!esWords || esWords.length === 0) {
+    logger.info('AUTO_PROMOTE', 'No wiktionary-es-verified candidates');
+    return;
+  }
+
+  logger.info('AUTO_PROMOTE', `Processing ${esWords.length} wiktionary-es-verified candidates`);
+
+  for (const wordRecord of esWords) {
+    try {
+      await addToCommunityCache(wordRecord.word, 'es');
+
+      await promoteWordToScores(supabase, wordRecord.word, 'es', {
+        votes: AUTO_PROMOTION_CONFIG.VOTES_TO_ADD,
+        submitter: 'auto_promoted',
+      });
+
+      await supabase.rpc('mark_word_auto_promoted', {
+        p_word_id: wordRecord.id,
+        p_source: 'wiktionary_es_verified',
+      });
+
+      result.promoted++;
+      result.words.wiktionaryEsBased.push(wordRecord.word);
+      logger.info('AUTO_PROMOTE', `Promoted (wiktionary-es): ${wordRecord.word}`);
+    } catch (err) {
+      result.failed++;
+      const msg = err instanceof Error ? err.message : String(err);
+      logger.error('AUTO_PROMOTE', `Failed to promote wiktionary-es word "${wordRecord.word}": ${msg}`);
     }
   }
 }

@@ -153,6 +153,7 @@ export async function runDictionaryEnrichment(): Promise<{
 }> {
   const { processMilogVerificationQueue } = await import('../services/milogWordVerifier');
   const { processWiktionaryEnVerificationQueue } = await import('../services/wiktionaryEnVerifier');
+  const { processWiktionaryEsVerificationQueue } = await import('../services/wiktionaryEsVerifier');
 
   logger.info('DICT_ENRICH', '=== Starting Dictionary Enrichment ===');
 
@@ -164,16 +165,21 @@ export async function runDictionaryEnrichment(): Promise<{
   logger.info('DICT_ENRICH', 'Step 1b: Processing wiktionary (en) verification queue...');
   const wiktionaryResult = await processWiktionaryEnVerificationQueue();
 
-  // Step 2: Promote verified Hebrew words (Wiktionary-verified English handled by auto-promotion cron)
+  // Step 1c: Spanish via Wiktionary (en.wiktionary.org, body.es)
+  logger.info('DICT_ENRICH', 'Step 1c: Processing wiktionary (es) verification queue...');
+  const wiktionaryEsResult = await processWiktionaryEsVerificationQueue();
+
+  // Step 2: Promote verified Hebrew words (Wiktionary-verified EN+ES handled by auto-promotion cron)
   logger.info('DICT_ENRICH', 'Step 2: Promoting verified Hebrew words to dictionary...');
   const promotionResult = await promoteVerifiedWordsToDictionary();
 
-  const totalProcessed = milogResult.processed + wiktionaryResult.processed;
-  const totalVerified = milogResult.verified + wiktionaryResult.verified;
+  const totalProcessed = milogResult.processed + wiktionaryResult.processed + wiktionaryEsResult.processed;
+  const totalVerified = milogResult.verified + wiktionaryResult.verified + wiktionaryEsResult.verified;
 
   logger.info('DICT_ENRICH', '=== Dictionary Enrichment Complete ===');
   logger.info('DICT_ENRICH', `Milog: ${milogResult.verified} verified / ${milogResult.processed} processed`);
-  logger.info('DICT_ENRICH', `Wiktionary: ${wiktionaryResult.verified} verified / ${wiktionaryResult.processed} processed`);
+  logger.info('DICT_ENRICH', `Wiktionary EN: ${wiktionaryResult.verified} verified / ${wiktionaryResult.processed} processed`);
+  logger.info('DICT_ENRICH', `Wiktionary ES: ${wiktionaryEsResult.verified} verified / ${wiktionaryEsResult.processed} processed`);
   logger.info('DICT_ENRICH', `Promotion: ${promotionResult.promoted} promoted, ${promotionResult.failed} failed`);
 
   return {

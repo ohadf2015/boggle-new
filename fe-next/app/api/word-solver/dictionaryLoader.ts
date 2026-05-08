@@ -32,7 +32,17 @@ export async function loadDictionaryWords(language: string): Promise<string[]> {
 
     case 'es': {
       const spanishWords = require('an-array-of-spanish-words') as string[];
-      result = spanishWords.map(w => w.toLowerCase());
+      const wordSet = new Set<string>(spanishWords.map(w => w.toLowerCase()));
+      const approvedFile = path.join(process.cwd(), 'backend', 'spanish_words_approved.txt');
+      const approvedContent = await readFileIfExists(approvedFile);
+      if (approvedContent) {
+        approvedContent
+          .split('\n')
+          .map(w => w.trim().toLowerCase())
+          .filter(w => w.length > 0 && !w.startsWith('#'))
+          .forEach(w => wordSet.add(w));
+      }
+      result = Array.from(wordSet);
       cache[language] = result;
       return result;
     }
