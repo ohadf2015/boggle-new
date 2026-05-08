@@ -8,6 +8,30 @@ describe('locale tile bags', () => {
     expect(total).toBe(100);
   });
 
+  it('sv bag total = 100', () => {
+    const { distribution } = getTileBag('sv');
+    const total = Object.values(distribution).reduce((s, n) => s + n, 0);
+    expect(total).toBe(100);
+  });
+
+  it('he bag total = 100', () => {
+    const { distribution } = getTileBag('he');
+    const total = Object.values(distribution).reduce((s, n) => s + n, 0);
+    expect(total).toBe(100);
+  });
+
+  it('es bag total = 100', () => {
+    const { distribution } = getTileBag('es');
+    const total = Object.values(distribution).reduce((s, n) => s + n, 0);
+    expect(total).toBe(100);
+  });
+
+  it('ja bag total = 100', () => {
+    const { distribution } = getTileBag('ja');
+    const total = Object.values(distribution).reduce((s, n) => s + n, 0);
+    expect(total).toBe(100);
+  });
+
   it('sv bag contains å (Å)', () => {
     const { distribution } = getTileBag('sv');
     expect(distribution['Å']).toBeGreaterThan(0);
