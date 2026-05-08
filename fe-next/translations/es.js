@@ -8,8 +8,8 @@ const es = {
     "clash": "Clash"
   },
   "seo": {
-    "title": "Juego de Palabras Multijugador Online Gratis - Alternativa a Scrabble en Tiempo Real",
-    "description": "¿Buscas un juego de palabras online multijugador como Scrabble pero más rápido? LexiClash es la alternativa gratis al estilo Scrabble: batallas de palabras en tiempo real contra amigos, sin descargas, sin esperas por turnos. Encuentra palabras, supera a tus oponentes y sube en la clasificación. ¡Juega gratis en 5 idiomas en el navegador!",
+    "title": "LexiClash — Scrabble en Español Online Gratis, 2-20 Jugadores, Sin Descarga",
+    "description": "Alternativa a Scrabble online en español: 2-20 jugadores en tiempo real, 8 modos de juego, 10.000+ palabras. Sin turnos lentos, sin descarga, sin registro. ¡Juega gratis en el navegador ya!",
     "keywords": "juego de palabras multijugador, alternativa a scrabble en línea, alternativa multijugador a scrabble, juego como scrabble online, juego al estilo scrabble, jugar scrabble alternativa gratis, juegos de palabras online multijugador, scrabble alternativa multijugador español, alternativa gratis a scrabble go, jugar scrabble alternativa en español, juego de palabras en tiempo real, batalla de palabras online, juego de palabras para fiestas, juego de palabras competitivo, boggle online, juego de vocabulario, juego de aprendizaje de idiomas, juego online gratis, juego de letras gratis, wordle en español, boggle en español gratis, juego de palabras sin descargar, juego de palabras para grupos, juego de vocabulario online, juego de palabras con amigos, juego de palabras educativo, juego de palabras en navegador, reto de palabras diario, juego de palabras rápido, juego cerebral de palabras",
     "ogTitle": "LexiClash - Alternativa Multijugador a Scrabble | Juego de Palabras Online Gratis",
     "ogDescription": "🎮 La alternativa al estilo Scrabble pero en tiempo real ⚡ Batallas de palabras multijugador online gratis 🔥 Sin descargas — ¡juega en el navegador ya!",
@@ -18,10 +18,10 @@ const es = {
     "locale": "es_ES",
     "language": "Spanish",
     "leaderboard": {
-      "title": "Clasificacion Global - Mejores Jugadores de Palabras del Mundo",
-      "description": "Ve a los jugadores mejor clasificados en la tabla de LexiClash. Compite con entusiastas de juegos de palabras de todo el mundo.",
-      "ogTitle": "Clasificación Global - Mejores Jugadores de Palabras",
-      "ogDescription": "¡Mira dónde te clasificas entre los mejores jugadores de palabras!"
+      "title": "Ranking en Vivo de Juegos de Palabras — Top Diario, Semanal e Histórico | LexiClash",
+      "description": "Mira quién gana ahora mismo. Ranking en vivo de los mejores jugadores en 8 modos: diario, semanal e histórico. Filtra por idioma, país y modo. Actualizado en tiempo real.",
+      "ogTitle": "Ranking en Vivo — Top Diario, Semanal e Histórico",
+      "ogDescription": "Ranking en vivo de los mejores jugadores de palabras del mundo. Actualizado en tiempo real. ¡Únete y compite!"
     },
     "profile": {
       "title": "Tu Perfil de Jugador, Estadisticas & Logros del Juego",
@@ -66,10 +66,10 @@ const es = {
       "ogDescription": "Palabra del Día: Caza + Rueda de Palabras. Mismo puzzle mundial, comparte resultados, construye una racha diaria. Gratis, sin registro."
     },
     "multiplayer": {
-      "title": "Juego como Scrabble en Español — Multijugador Gratis Online | LexiClash",
-      "description": "¿Buscas jugar Scrabble en línea en español? LexiClash es la alternativa gratis: forma palabras en tiempo real contra amigos, sin turnos lentos, sin descarga. Crea sala, comparte enlace. 6 modos, 5 idiomas, ranking diario. ¡Juega ya!",
-      "ogTitle": "Alternativa a Scrabble Online — Multijugador Gratis en Español",
-      "ogDescription": "La alternativa al estilo Scrabble en tiempo real ⚡ Sin turnos lentos, sin descarga. Crea sala, comparte enlace. ¡Juega gratis!"
+      "title": "Scrabble en Español Online — 2-20 Jugadores, 8 Modos, Gratis Sin Registro | LexiClash",
+      "description": "Alternativa a Scrabble en línea en español: 2-20 jugadores en tiempo real, 8 modos de juego, 10.000+ palabras, sin turnos lentos, sin descarga. Crea sala, comparte enlace. ¡Juega gratis ya!",
+      "ogTitle": "Alternativa a Scrabble — 2-20 Jugadores, 8 Modos, Gratis",
+      "ogDescription": "Alternativa al estilo Scrabble en tiempo real ⚡ 2-20 jugadores, 8 modos. Sin turnos, sin descarga. ¡Crea sala y juega gratis!"
     },
     "about": {
       "title": "Sobre LexiClash - Nuestra Historia, Mision y Equipo",
@@ -398,6 +398,7 @@ const es = {
     }
   },
   "common": {
+    "used": "Usado",
     "free": "Gratis",
     "loading": "Mezclando letras...",
     "error": "¡Ups!",
@@ -3488,6 +3489,11 @@ const es = {
   },
   "profile": {
     "title": "Tu Cuartel",
+    "notFound": "Jugador no encontrado",
+    "stats": {
+      "games": "partidas",
+      "winRate": "% victorias"
+    },
     "coins": "Monedas",
     "viewProfile": "Ver Perfil",
     "viewCoins": "Ver tus monedas",
@@ -3498,7 +3504,6 @@ const es = {
       "collection": "Colección"
     },
     "overview": "General",
-    "stats": "Stats de Batalla",
     "memberSince": "En batalla desde",
     "totalGames": "Batallas",
     "wins": "Victorias",
@@ -10296,6 +10301,17 @@ const es = {
       "earning": "Viendo...",
       "earned": "+{amount} oro ganado!",
       "cooldown": "Disponible pronto"
+    },
+    "doubleGold": {
+      "cta": "Recompensas dobles +{amount}",
+      "earning": "Doblando..."
+    },
+    "reveal": {
+      "freeViaAd": "Revelar gratis (anuncio)"
+    },
+    "timeLow": {
+      "cta": "Añadir +{seconds}s",
+      "earning": "Añadiendo tiempo..."
     }
   },
   "gameModes": {
@@ -11531,6 +11547,16 @@ const es = {
     "revealHintAd": "Ver anuncio por pista",
     "revealAnswerAd": "Ver anuncio para revelar respuesta",
     "adminGiveUp": "Saltar puzzle (admin)"
+  },
+  "mp": {
+    "kbHint": {
+      "submit": "enviar",
+      "pop": "borrar última",
+      "clear": "limpiar"
+    },
+    "ladder": {
+      "empty": "Aún no hay palabras — ¡encuentra la primera!"
+    }
   }
 };
 

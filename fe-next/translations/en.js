@@ -8,8 +8,8 @@ const en = {
     "clash": "Clash"
   },
   "seo": {
-    "title": "Free Word Game Online - Multiplayer Boggle & Word Battle",
-    "description": "Play free boggle online — no download required! LexiClash is a word game where you type in words like Boggle, competing in real-time. Race friends, build combos, and climb leaderboards. Best free alternative to Boggle, Wordle & Scrabble for groups. Play instantly in 5 languages. Great for parties, team building, and family game nights!",
+    "title": "LexiClash — Free Multiplayer Word Game, 2-20 Players, 8 Modes (No Download)",
+    "description": "Free multiplayer word game — 2-20 players, 8 modes, 5 languages. Real-time word battles like Boggle meets Wordle, no download, no signup. Daily Word Wheel + Word Hunt + Adventure mode. Play instantly →",
     "keywords": "free word game online, multiplayer word game, boggle online free, wordle multiplayer, scrabble alternative online, word game with friends, real-time word battle, party word game, ruzzle alternative, word hunt game, competitive word game, best word game app, online boggle with friends, word puzzle multiplayer, family word game, team building word game, kahoot alternative word game, ESL word game, vocabulary builder game, brain training word game, word race game online, free browser game no download, free boggle online no download, word game you type in words, games like boggle online free, word making games, boggle game free no download, word game like boggle free, word game no download needed, word battle game online, daily word puzzle free, word game for groups, word game for parties online, games like wordle multiplayer, word RPG game, adventure word game, word game on phone free, competitive word puzzle",
     "ogTitle": "LexiClash - Free Multiplayer Word Game | Better Than Boggle & Wordle",
     "ogDescription": "🎮 The best free word game for groups! Race friends in real-time word battles ⚡ Like Boggle meets Wordle - but multiplayer 🔥 No download, play instantly. Perfect for parties!",
@@ -18,9 +18,9 @@ const en = {
     "locale": "en_US",
     "language": "English",
     "leaderboard": {
-      "title": "Global Leaderboard - Top Word Game Players Worldwide",
-      "description": "View the top-ranked players on LexiClash global leaderboard. Compete with word game enthusiasts worldwide and track your progress to become the ultimate word master.",
-      "ogTitle": "Global Leaderboard - Top Word Game Players",
+      "title": "Live Word Game Leaderboard — Daily, Weekly & All-Time Top Players | LexiClash",
+      "description": "See who's winning right now. Live leaderboard tracks daily, weekly, and all-time top scorers across 8 game modes. Filter by language, country, or mode. Updated in real time.",
+      "ogTitle": "Live Leaderboard — Daily, Weekly & All-Time Top Players",
       "ogDescription": "See where you rank among the best word game players. Join LexiClash and compete for the top spot!"
     },
     "profile": {
@@ -60,16 +60,16 @@ const en = {
       "ogDescription": "Play free boggle online — no download needed. Practice word finding solo, challenge AI bots, and beat your high scores."
     },
     "daily": {
-      "title": "Word of the Day — Free Daily Word Puzzle (Word Hunt & Wheel) | LexiClash",
-      "description": "Play today's Word of the Day — free daily word puzzle. Two modes: Word Hunt Survival (10 attempts, Wordle-style) and Daily Word Wheel. Same board worldwide, share emoji results, climb the global leaderboard. New puzzle every day, no signup.",
-      "ogTitle": "Word of the Day — Today's Free Word Puzzle",
-      "ogDescription": "Daily Word Hunt + Word Wheel. Same puzzle worldwide, share emoji results, build a streak. Free, no signup."
+      "title": "Daily Word Wheel & Word Hunt — Free Daily Puzzles, Same Board Worldwide | LexiClash",
+      "description": "Daily Word Wheel + Word Hunt Survival — free, no signup. Same board worldwide, 10 attempts (Wordle-style), share emoji results, climb the global leaderboard. New puzzle every 24h.",
+      "ogTitle": "Daily Word Wheel — Today's Free Word Puzzle",
+      "ogDescription": "Daily Word Wheel + Word Hunt. Same puzzle worldwide, share emoji results, build a streak. Free, no signup."
     },
     "multiplayer": {
-      "title": "Multiplayer Word Game Online — Free Battles With Friends | LexiClash",
-      "description": "Real-time multiplayer word battles with friends — no signup. Host a room, share the link, compete live. 6 modes, 5 languages, daily leaderboard. Play free now →",
-      "ogTitle": "Real-Time Word Battles With Friends — Play Free",
-      "ogDescription": "Host a room, share the link, race for words live. 6 modes, 5 languages. Free in your browser."
+      "title": "Free Multiplayer Word Game — 2-20 Players, 8 Modes, No Signup | LexiClash",
+      "description": "Real-time multiplayer word battles, 2-20 players, no signup. Host a room, share the link, compete live in 8 game modes across 5 languages. Daily leaderboard. Play free now →",
+      "ogTitle": "Real-Time Word Battles, 2-20 Players — Play Free",
+      "ogDescription": "Host a room, share the link, race for words with up to 20 friends. 8 modes, 5 languages. Free in your browser."
     },
     "about": {
       "title": "About LexiClash - Our Story, Mission & Team",
@@ -398,6 +398,7 @@ const en = {
     }
   },
   "common": {
+    "used": "Used",
     "email": "Email",
     "free": "Free",
     "loading": "Shuffling letters...",
@@ -3908,6 +3909,11 @@ const en = {
   },
   "profile": {
     "title": "Your HQ",
+    "notFound": "Player not found",
+    "stats": {
+      "games": "games",
+      "winRate": "win rate"
+    },
     "coins": "Coins",
     "viewProfile": "Your Profile",
     "viewCoins": "Check your stash",
@@ -3918,7 +3924,6 @@ const en = {
       "collection": "Collection"
     },
     "overview": "At a Glance",
-    "stats": "Battle Stats",
     "memberSince": "Clashing since",
     "totalGames": "Battles",
     "wins": "Victories",
@@ -10522,6 +10527,17 @@ const en = {
       earning: "Watching...",
       earned: "+{amount} gold earned!",
       cooldown: "Available soon"
+    },
+    doubleGold: {
+      cta: "Double rewards +{amount}",
+      earning: "Doubling..."
+    },
+    reveal: {
+      freeViaAd: "Free reveal (ad)"
+    },
+    timeLow: {
+      cta: "Add +{seconds}s",
+      earning: "Adding time..."
     }
   },
   "features": {
@@ -11406,7 +11422,88 @@ const en = {
     "revealHint": "Reveal hint",
     "revealHintAd": "Watch ad for hint",
     "revealAnswerAd": "Watch ad to reveal answer",
-    "adminGiveUp": "Skip puzzle (admin)"
+    "adminGiveUp": "Skip puzzle (admin)",
+    "landing": {
+      "metaTitle": "Word Bridge — Find the Connecting Word | LexiClash",
+      "metaDescription": "Free online word puzzle. Two words, one bridge — find the word that links them. Also known as rosh-zanav, the classic Israeli word game. No signup, no downloads.",
+      "metaKeywords": "word bridge puzzle, word association game, bridge word game, rosh zanav, word link puzzle, free word games online, brain word puzzle",
+      "ogTitle": "Word Bridge — Find the Connecting Word",
+      "ogDescription": "Two words, one bridge. The classic word-association puzzle, free online.",
+      "twitterTitle": "Word Bridge — Free Online Puzzle",
+      "twitterDescription": "Two words, one bridge. Find what links them.",
+      "badge": "FREE • NO SIGNUP",
+      "h1Pre": "Two words. One bridge.",
+      "h1Highlight": "Find what links them.",
+      "h1Sub": "Word Bridge — also known as rosh-zanav, the classic Israeli word game",
+      "introP1": "Word Bridge gives you two words. Your job: find the single word that connects them. FIRE + ENGINE? TRUCK. SUN + SHINE? LIGHT. Easy to learn, hard to master.",
+      "introP2": "It's the kind of game your brain wakes up for — fast rounds, vivid \"aha\" moments, and a vocabulary-stretching workout disguised as fun. Free, browser-based, no downloads.",
+      "ctaPrimary": "Play Free Now",
+      "ctaSecondary": "How it works ↓",
+      "demoLabel": "Try one — tap the middle slot",
+      "demoReveal": "Reveal bridge",
+      "demoSuccess": "That's a bridge word!",
+      "samplesHeading": "Three to try",
+      "samplesSub": "Tap any card to reveal the bridge",
+      "samplesEasy": "Easy",
+      "samplesMedium": "Medium",
+      "samplesHard": "Hard",
+      "samplesReveal": "Tap to reveal",
+      "whyHeading": "Why it's good for your brain",
+      "whyVocab": {
+        "title": "Builds vocabulary fast",
+        "body": "Every puzzle pulls from a different semantic neighborhood. You absorb word relationships without trying."
+      },
+      "whyLateral": {
+        "title": "Trains lateral thinking",
+        "body": "There's rarely one path. Your brain learns to scan synonyms, compounds, and idioms at speed."
+      },
+      "whyMemory": {
+        "title": "Strengthens semantic memory",
+        "body": "Bridge-finding is recall + association together — the same skill behind quick wit and tip-of-the-tongue rescue."
+      },
+      "compareHeading": "How does it compare?",
+      "compareSub": "We built Word Bridge to be different on purpose",
+      "compareCol1": "Game",
+      "compareCol2": "What you do",
+      "compareCol3": "Length",
+      "compareCol4": "Skill tested",
+      "compareRow1Name": "Word Bridge (this game)",
+      "compareRow1Do": "Find the word linking two given words",
+      "compareRow1Len": "30 sec / puzzle",
+      "compareRow1Skill": "Association + vocab",
+      "compareRow2Name": "NYT Connections",
+      "compareRow2Do": "Sort 16 words into 4 themed groups",
+      "compareRow2Len": "5–15 min",
+      "compareRow2Skill": "Categorization",
+      "compareRow3Name": "Wordle",
+      "compareRow3Do": "Guess one 5-letter word in 6 tries",
+      "compareRow3Len": "3–5 min",
+      "compareRow3Skill": "Letter logic",
+      "compareRow4Name": "Crossword",
+      "compareRow4Do": "Fill a grid from clues",
+      "compareRow4Len": "10–60 min",
+      "compareRow4Skill": "Trivia + spelling",
+      "faqHeading": "Frequently asked",
+      "faq1Q": "What is Word Bridge?",
+      "faq1A": "A word-association puzzle. You see two words and find the single word that bridges them. Example: TRAFFIC + STORM → JAM (traffic jam, jam storm). Both directions have to make sense.",
+      "faq2Q": "Is this NYT Connections?",
+      "faq2A": "No. NYT Connections asks you to sort 16 words into 4 themed groups. Word Bridge gives you two words and asks for the linking word. Different mechanic, both fun.",
+      "faq3Q": "Is it really free?",
+      "faq3A": "Yes. No signup required, no paywall. Optional rewarded ads buy you hints if you get stuck.",
+      "faq4Q": "What does 'rosh-zanav' mean?",
+      "faq4A": "Hebrew for \"head-tail\" (ראש זנב). It's a classic Israeli car-trip word game where one player says a word and the next has to chain a related word. Word Bridge is its puzzle cousin.",
+      "faq5Q": "Can I play in Hebrew?",
+      "faq5A": "Yes. Switch the locale and you'll get a full Hebrew puzzle bank with native phrasing.",
+      "faq6Q": "How do hints work?",
+      "faq6A": "One free hint per puzzle. Watch a quick rewarded ad or spend coins to reveal it. The hint never gives away the answer outright — just nudges you in the right direction.",
+      "stickyCta": "Play Word Bridge",
+      "footerCtaHeading": "Ready to find some bridges?",
+      "footerCtaBody": "Free. Browser-based. No downloads.",
+      "footerCtaButton": "Start Playing",
+      "crossPromoTitle": "Try Word Bridge",
+      "crossPromoBody": "Two words. One bridge. Free.",
+      "crossPromoCta": "Play"
+    }
   },
   "boosts": {
     "title": "Pick a boost",
@@ -11508,6 +11605,16 @@ const en = {
       "outOfBounds": "Tile placed off the board.",
       "noTiles": "Place at least one tile to play.",
       "bagTooSmallToSwap": "Not enough tiles in the bag to swap."
+    }
+  },
+  mp: {
+    kbHint: {
+      submit: "submit",
+      pop: "remove last",
+      clear: "clear"
+    },
+    ladder: {
+      empty: "No words yet — find the first one!"
     }
   }
 };

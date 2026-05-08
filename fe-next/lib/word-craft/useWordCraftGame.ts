@@ -126,21 +126,56 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
       };
     case 'CLEAR_PENDING':
       return { ...state, pendingPlacements: [], selectedRackTileId: null };
-    case 'COMMIT_PLAYER':
-      return commitMove(state, 'player', action.placements, action.score, action.words);
-    case 'COMMIT_BOT':
-      return commitMove(state, 'bot', action.placements, action.score, action.words);
+    case 'COMMIT_PLAYER': {
+      const base = commitMove(state, 'player', action.placements, action.score, action.words);
+      const wasOverdrive = state.overdrive;
+      if (wasOverdrive) {
+        // Cashing overdrive: reset heat to 60, clear overdrive state
+        return {
+          ...base,
+          heat: 60,
+          overdrive: false,
+          overdriveWarns: 0,
+          burnout: false,
+        };
+      }
+      const heatGain = Math.min(Math.floor(action.score / 5), 25);
+      const newHeat = Math.min(state.heat + heatGain, 100);
+      const newOverdrive = newHeat >= 100;
+      return {
+        ...base,
+        heat: newHeat,
+        overdrive: newOverdrive,
+        overdriveWarns: 0,
+        burnout: false,
+      };
+    }
+    case 'COMMIT_BOT': {
+      const base = commitMove(state, 'bot', action.placements, action.score, action.words);
+      // Bot moves do not affect heat state
+      return {
+        ...base,
+        heat: state.heat,
+        overdrive: state.overdrive,
+        overdriveWarns: state.overdriveWarns,
+        burnout: state.burnout,
+      };
+    }
     case 'SET_ERROR':
       return { ...state, lastError: action.message };
     case 'PASS': {
       const passes = state.consecutivePasses + 1;
       const turn: Turn = passes >= 2 ? 'over' : state.turn === 'player' ? 'bot' : 'player';
+      const newWarns = state.overdrive ? state.overdriveWarns + 1 : state.overdriveWarns;
+      const burnout = state.overdrive && newWarns >= 2;
       return {
         ...state,
         pendingPlacements: [],
         selectedRackTileId: null,
         consecutivePasses: passes,
         turn,
+        overdriveWarns: newWarns,
+        burnout,
         history: [...state.history, { who: state.turn === 'player' ? 'player' : 'bot', words: [], score: 0, placedTileIds: [] }],
       };
     }

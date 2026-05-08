@@ -125,8 +125,20 @@ export default async function WordOfTheDayPage({ params }: PageProps) {
           he: {
             title: 'המילה היומית — למדו מילה חדשה כל יום',
             description: 'גלו מילה חדשה כל יום ב-LexiClash. כל מילה יומית כוללת הגדרה, אטימולוגיה ודוגמאות שימוש.',
-            features: ['מילה חדשה כל יום עם הגדרה ואטימולוגיה', 'עובדות מעניינות ומקורות מילים', 'עברו על מילים קודמות לבניית אוצר מילים'],
-            faq: [{ question: 'מתי המילה היומית מתעדכנת?', answer: 'מילה חדשה נבחרת כל יום בחצות UTC. המילה זהה לכל השחקנים בעולם.' }],
+            features: [
+              'מילה חדשה כל יום עם הגדרה ואטימולוגיה',
+              'עובדות מעניינות ומקורות מילים',
+              'עברו על מילים קודמות לבניית אוצר מילים',
+              'זהה לכל השחקנים בעולם — שתפו עם חברים',
+              'חינם, בלי הרשמה ובלי הורדה',
+            ],
+            faq: [
+              { question: 'מתי המילה היומית מתעדכנת?', answer: 'מילה חדשה נבחרת כל יום בחצות UTC. המילה זהה לכל השחקנים בעולם, כך שאפשר לדבר עליה עם חברים.' },
+              { question: 'מה זה המילה היומית של LexiClash?', answer: 'המילה היומית היא מילה אחת חדשה שנבחרת מדי יום מהמילון הקיים, עם הגדרה מלאה, אטימולוגיה (מקור המילה) ודוגמאות שימוש. אפשר להשתמש בה אחר כך במשחק LexiClash.' },
+              { question: 'איך אפשר לראות את המילים היומיות הקודמות?', answer: 'בעמוד המילה היומית יש ארכיון של מילים מהשבועות והחודשים האחרונים. גוללו מטה כדי לעבור על המילים הקודמות עם ההגדרות המלאות שלהן.' },
+              { question: 'האם המילה היומית זהה לכל השחקנים?', answer: 'כן — אותה מילה לכל מי שנכנס ב-24 השעות שלה, בכל העולם. זה הופך את המילה למשהו לדבר עליו: לשתף בקבוצות, להשוות איך הבנתם את ההגדרה ולהשתמש בה במשחק.' },
+              { question: 'איך משחקים עם המילה היומית?', answer: 'אחרי שלמדתם את ההגדרה ואת מקור המילה, אפשר ללחוץ על "תרגול" כדי להיכנס לסבב משחק רגיל ב-LexiClash ולנסות למצוא את המילה היומית בלוח. זוכים בנקודות בונוס אם מוצאים אותה.' },
+            ],
           },
           sv: {
             title: 'Dagens Ord — Lär Dig Ett Nytt Ord Varje Dag',
@@ -151,14 +163,32 @@ export default async function WordOfTheDayPage({ params }: PageProps) {
           },
         };
         const seoData = wotdSeoContent[locale] ?? wotdSeoContent.en;
+        // Safe: faqJsonLd built entirely from typed object, JSON.stringified — no user input.
+        const faqJsonLd = {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          '@id': `https://www.lexiclash.live/${locale}/word-of-the-day#faq`,
+          inLanguage: locale,
+          mainEntity: seoData.faq.map((qa) => ({
+            '@type': 'Question',
+            name: qa.question,
+            acceptedAnswer: { '@type': 'Answer', text: qa.answer },
+          })),
+        };
         return (
-          <GamePageSeoContent
-            asH1
-            title={seoData.title}
-            description={seoData.description}
-            features={seoData.features}
-            faq={seoData.faq}
-          />
+          <>
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+            />
+            <GamePageSeoContent
+              asH1
+              title={seoData.title}
+              description={seoData.description}
+              features={seoData.features}
+              faq={seoData.faq}
+            />
+          </>
         );
       })()}
     </>

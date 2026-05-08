@@ -47,6 +47,10 @@ interface BlogPostingJsonLdProps {
     citations?: CitationRef[];
     /** Optional FAQ Q/A — when present, an FAQPage schema is co-emitted alongside BlogPosting. */
     faqItems?: FaqQa[];
+    /** Optional keywords (comma-separated) — helps AI categorization (e.g., "boggle vs scrabble, word game comparison"). */
+    keywords?: string;
+    /** Optional articleSection — content category (e.g., "Comparison", "Tutorial", "Trends"). */
+    articleSection?: string;
 }
 
 export function BlogPostingJsonLd({
@@ -59,6 +63,8 @@ export function BlogPostingJsonLd({
     wordCount,
     citations,
     faqItems,
+    keywords,
+    articleSection,
 }: BlogPostingJsonLdProps): ReactNode {
     const articleUrl = `${SITE_URL}/${locale}/blog/${slug}`;
     const imageUrl = getBlogImage(slug);
@@ -73,6 +79,8 @@ export function BlogPostingJsonLd({
         datePublished,
         dateModified: dateModified || datePublished,
         ...(wordCount && { wordCount }),
+        ...(keywords && { keywords }),
+        ...(articleSection && { articleSection }),
         inLanguage: locale,
         image: {
             '@type': 'ImageObject',
@@ -142,6 +150,7 @@ export function BlogPostingJsonLd({
         '@context': 'https://schema.org',
         '@type': 'FAQPage',
         '@id': `${articleUrl}#faq`,
+        inLanguage: locale,
         mainEntity: faqItems.map((qa) => ({
             '@type': 'Question',
             name: qa.question,

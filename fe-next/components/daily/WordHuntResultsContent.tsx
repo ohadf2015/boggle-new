@@ -396,6 +396,44 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       </motion.div>
     )}
 
+    {/* Word Bridge (Connections) cross-promo — EN/HE only, after daily complete */}
+    {wordWheelPlayed && (language === 'en' || language === 'he') && (
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.34, type: 'spring', stiffness: 300, damping: 26 }}
+      >
+        <Link
+          href={`/${language}/connections`}
+          data-testid="daily-connections-cross-promo"
+          onClick={() =>
+            trackGrowthEvent('cross_promo_click', {
+              target: 'connections',
+              source: 'word_hunt_results',
+              placement: 'post_daily_complete',
+              language,
+            })
+          }
+          className="flex items-center justify-between gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-pink shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0 font-neo-display font-black text-neo-white text-lg">
+              ↔
+            </div>
+            <div>
+              <span className="block font-neo-display font-black text-neo-white text-base leading-tight">
+                {t('connections.landing.crossPromoTitle', language === 'he' ? 'נסה ראש זנב' : 'Try Word Bridge')}
+              </span>
+              <p className="text-neo-cream/90 text-xs mt-0.5">
+                {t('connections.landing.crossPromoBody', language === 'he' ? 'שתי מילים, גשר אחד. חינם.' : 'Two words. One bridge. Free.')}
+              </p>
+            </div>
+          </div>
+          <ArrowRight className="w-6 h-6 text-neo-white shrink-0" />
+        </Link>
+      </motion.div>
+    )}
+
     {/* Multiplayer next-step — only after Daily Challenge is complete */}
     {onBackToLobby && wordWheelPlayed && (
       <motion.div

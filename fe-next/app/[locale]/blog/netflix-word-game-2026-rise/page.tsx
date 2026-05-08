@@ -74,6 +74,8 @@ export default async function NetflixWordGameRisePage({ params }: PageProps) {
         datePublished={DATE_PUBLISHED}
         dateModified={DATE_MODIFIED}
         wordCount={wordCount}
+        keywords="netflix word game, juego de palabras netflix, netflix wordle, daily word game 2026, streaming word game, netflix games word puzzle, word game trends 2026"
+        articleSection="Trends"
       />
       <NetflixWordGameRisePageClient />
     </>

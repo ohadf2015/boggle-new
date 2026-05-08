@@ -375,28 +375,46 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 cssSelector: ['[data-speakable="true"]', 'h1', 'h2', 'main p:first-of-type'],
             },
         },
-        // SiteNavigationElement schema for main navigation
+        // SiteNavigationElement schema — ordered by user value for sitelinks signal
+        // (Google picks ~6-8 sitelinks; lead with highest-CTR/most-distinctive pages)
         {
             '@context': 'https://schema.org',
             '@type': 'SiteNavigationElement',
             '@id': 'https://www.lexiclash.live/#site-navigation',
             name: 'Main Navigation',
             hasPart: [
-                { '@type': 'SiteNavigationElement', name: 'Home', url: `https://www.lexiclash.live${localePath}` },
-                { '@type': 'SiteNavigationElement', name: 'Play Classic', url: `https://www.lexiclash.live${localePath}/singleplayer` },
-                { '@type': 'SiteNavigationElement', name: 'Daily Challenge', url: `https://www.lexiclash.live${localePath}/daily` },
+                { '@type': 'SiteNavigationElement', name: 'Multiplayer Word Battle', url: `https://www.lexiclash.live${localePath}/multiplayer` },
                 { '@type': 'SiteNavigationElement', name: 'Daily Word Wheel', url: `https://www.lexiclash.live${localePath}/daily/word-wheel` },
-                { '@type': 'SiteNavigationElement', name: 'Word Hunt', url: `https://www.lexiclash.live${localePath}/daily` },
-                { '@type': 'SiteNavigationElement', name: 'Multiplayer', url: `https://www.lexiclash.live${localePath}/multiplayer` },
+                { '@type': 'SiteNavigationElement', name: 'Daily Word Hunt', url: `https://www.lexiclash.live${localePath}/daily` },
+                { '@type': 'SiteNavigationElement', name: 'Word of the Day', url: `https://www.lexiclash.live${localePath}/word-of-the-day` },
+                { '@type': 'SiteNavigationElement', name: 'Adventure Mode', url: `https://www.lexiclash.live${localePath}/adventure` },
+                { '@type': 'SiteNavigationElement', name: 'Leaderboard', url: `https://www.lexiclash.live${localePath}/leaderboard` },
+                { '@type': 'SiteNavigationElement', name: 'Play Classic Solo', url: `https://www.lexiclash.live${localePath}/singleplayer` },
+                { '@type': 'SiteNavigationElement', name: 'Word Solver', url: `https://www.lexiclash.live${localePath}/tools/word-solver` },
                 { '@type': 'SiteNavigationElement', name: 'How to Play', url: `https://www.lexiclash.live${localePath}/how-to-play` },
                 { '@type': 'SiteNavigationElement', name: 'Blog', url: `https://www.lexiclash.live${localePath}/blog` },
                 { '@type': 'SiteNavigationElement', name: 'FAQ', url: `https://www.lexiclash.live${localePath}/faq` },
-                { '@type': 'SiteNavigationElement', name: 'Leaderboard', url: `https://www.lexiclash.live${localePath}/leaderboard` },
                 { '@type': 'SiteNavigationElement', name: 'About', url: `https://www.lexiclash.live${localePath}/about` },
-                { '@type': 'SiteNavigationElement', name: 'Contact', url: `https://www.lexiclash.live${localePath}/contact` },
-                { '@type': 'SiteNavigationElement', name: 'Word Solver', url: `https://www.lexiclash.live${localePath}/tools/word-solver` },
-                { '@type': 'SiteNavigationElement', name: 'Word of the Day', url: `https://www.lexiclash.live${localePath}/word-of-the-day` },
-                { '@type': 'SiteNavigationElement', name: 'Adventure Mode', url: `https://www.lexiclash.live${localePath}/adventure` },
+            ],
+        },
+        // Game modes ItemList — exposes the 8 distinct game modes as sub-entities
+        // for richer brand SERP / sitelinks consideration (rising "lexiclash" brand query +320% w/w).
+        {
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            '@id': 'https://www.lexiclash.live/#game-modes',
+            name: 'LexiClash Game Modes',
+            description: '8 distinct word game modes — multiplayer, daily, solo, adventure, blast, word hunt, word wheel, brain training.',
+            numberOfItems: 8,
+            itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Multiplayer Word Battle', url: `https://www.lexiclash.live${localePath}/multiplayer`, description: 'Real-time grid battles with 2-20 friends, free, no download.' },
+                { '@type': 'ListItem', position: 2, name: 'Daily Word Wheel', url: `https://www.lexiclash.live${localePath}/daily/word-wheel`, description: 'Spin the daily letter wheel, find every word, beat the timer.' },
+                { '@type': 'ListItem', position: 3, name: 'Daily Word Hunt', url: `https://www.lexiclash.live${localePath}/daily`, description: 'Wordle-style 10-attempt survival mode with global leaderboard.' },
+                { '@type': 'ListItem', position: 4, name: 'Adventure Mode', url: `https://www.lexiclash.live${localePath}/adventure`, description: 'Roguelike word-game adventure with bosses and loot.' },
+                { '@type': 'ListItem', position: 5, name: 'Blast', url: `https://www.lexiclash.live${localePath}/singleplayer`, description: 'Cascading combos and tile-clearing word puzzles.' },
+                { '@type': 'ListItem', position: 6, name: 'Single Player vs AI', url: `https://www.lexiclash.live${localePath}/singleplayer`, description: 'Solo practice against AI bots with adjustable difficulty.' },
+                { '@type': 'ListItem', position: 7, name: 'Brain Training Drills', url: `https://www.lexiclash.live${localePath}/brain-training`, description: 'Quick vocab and pattern drills, daily progression.' },
+                { '@type': 'ListItem', position: 8, name: 'Word of the Day', url: `https://www.lexiclash.live${localePath}/word-of-the-day`, description: 'Daily featured word with definition, etymology and example use.' },
             ],
         },
         // BreadcrumbList schema for better SERP navigation

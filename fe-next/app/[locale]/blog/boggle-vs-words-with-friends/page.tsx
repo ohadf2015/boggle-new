@@ -60,6 +60,8 @@ export default async function BoggleVsWwfPage({ params }: PageProps) {
         datePublished={DATE_PUBLISHED}
         dateModified={DATE_MODIFIED}
         faqItems={faqItems}
+        keywords="boggle vs words with friends, boggle vs wwf, words with friends alternative, boggle words with friends comparison, real-time word games"
+        articleSection="Comparison"
       />
       <BoggleVsWwfPageClient />
     </>

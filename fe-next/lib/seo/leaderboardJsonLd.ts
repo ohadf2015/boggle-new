@@ -17,6 +17,7 @@ export function buildLeaderboardFaqJsonLd(locale: string, faq: FaqItem[]) {
     '@context': 'https://schema.org',
     '@type': 'FAQPage' as const,
     '@id': `${BASE_URL}/${lang}/leaderboard#faq`,
+    inLanguage: lang,
     mainEntity: faq.map((item) => ({
       '@type': 'Question' as const,
       name: item.question,

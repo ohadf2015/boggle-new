@@ -8,8 +8,8 @@ const sv = {
     "clash": "Clash"
   },
   "seo": {
-    "title": "Gratis Multiplayer Ordspel - Spela Online",
-    "description": "Tävla mot vänner i spännande ordstrider i realtid! LexiClash är ett snabbt multiplayer-ordspel där varje sekund räknas. Hitta ord, överträffa motståndarna och klättra på topplistan. Perfekt för fester, spelkvällar och vänskaplig tävling. Också bra för att bygga ordförråd medan du har kul! Spela gratis på 5 språk - ingen nedladdning krävs.",
+    "title": "LexiClash — Scrabble-Alternativ på Svenska, 2-20 Spelare, Gratis Online",
+    "description": "Scrabble-alternativ på svenska: 2-20 spelare i realtid, 8 spellägen, 10 000+ svenska ord, ingen nedladdning. Skapa rum, dela länken med vänner, tävla direkt i webbläsaren. Gratis!",
     "keywords": "multiplayer ordspel, realtids ordspel, online ordstrid, festspel, tävlings ordspel, snabbt ordspel, ordpussel multiplayer, alias spel, kahoot alternativ, familjespelkväll, festspel, teambuilding, ordtävling, live ordspel, ordrace, ordförrådsspel, gratis onlinespel, alfapet online gratis, ordspel utan nedladdning, ordspel för fester, dagligt ordpussel, ordlek med vänner, ordäventyr spel",
     "ogTitle": "LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid",
     "ogDescription": "🎮 Tävla mot vänner i spännande ordstrider i realtid! ⚡ Hitta ord snabbt, överträffa motståndarna, klättra på topplistan 🔥 Perfekt för fester och spelkvällar. Spela gratis!",
@@ -18,10 +18,10 @@ const sv = {
     "locale": "sv_SE",
     "language": "Swedish",
     "leaderboard": {
-      "title": "Global Topplista - Bästa Ordspelarna i Världen & Rankningar",
-      "description": "Visa de högst rankade spelarna på LexiClash globala topplista. Tävla med ordspelsentusiaster över hela världen och följ dina framsteg.",
-      "ogTitle": "Global topplista - Topp ordspelspelare",
-      "ogDescription": "Se var du rankas bland de bästa ordspelsspelarna. Gå med i LexiClash och tävla om toppplatsen!"
+      "title": "Live Topplista — Bästa Ordspelarna (Dagligt, Veckovis & Genom Tiderna) | LexiClash",
+      "description": "Live topplista — bästa ordspelarna i 8 spellägen: dagligt, veckovis och genom tiderna. Filtrera på språk, land och läge. Uppdateras i realtid.",
+      "ogTitle": "Live Topplista — Dagligt, Veckovis & Genom Tiderna",
+      "ogDescription": "Live topplista över världens bästa ordspelare. Uppdateras i realtid. Gå med och tävla!"
     },
     "profile": {
       "title": "Din Spelarprofil, Statistik & Spelframsteg",
@@ -60,16 +60,16 @@ const sv = {
       "ogDescription": "Öva ordhittning solo, utmana AI-bottar och slå dina highscores i LexiClash enspelarläge."
     },
     "daily": {
-      "title": "Dagens Ord — Gratis Dagligt Ordpussel (Ordjakt & Ordhjul) | LexiClash",
-      "description": "Spela Dagens Ord gratis — dagligt ordpussel. Två lägen: Ordjakt (10 försök, Wordle-stil) och Dagligt Ordhjul. Samma bräde världen över. Hitta ord, dela emoji-resultat och klättra på topplistan. Nytt pussel varje dag, ingen registrering.",
-      "ogTitle": "Dagens Ord — Dagligt Ordpussel Gratis",
-      "ogDescription": "Dagens Ord: Ordjakt + Ordhjul. Samma pussel världen över, dela resultat, bygg en strak. Gratis utan registrering."
+      "title": "Dagligt Ordhjul & Ordjakt — Gratis Dagliga Ordpussel, Samma Bräde Över Hela Världen | LexiClash",
+      "description": "Dagligt Ordhjul + Ordjakt — gratis, ingen registrering. Samma bräde över hela världen, 10 försök (Wordle-stil), dela emoji-resultat och klättra på topplistan. Nytt pussel var 24:e timme.",
+      "ogTitle": "Dagligt Ordhjul — Dagens Gratis Ordpussel",
+      "ogDescription": "Dagligt Ordhjul + Ordjakt. Samma pussel över hela världen, dela resultat, bygg en strak. Gratis utan registrering."
     },
     "multiplayer": {
-      "title": "Multiplayer Ordspel Online — Spela Gratis Med Vänner | LexiClash",
-      "description": "Realtids ordstrider med vänner — ingen nedladdning, ingen registrering. Skapa rum, dela länk, tävla live. 6 spellägen, 5 språk, daglig topplista. Spela gratis nu →",
-      "ogTitle": "Ordstrider i realtid med vänner — gratis",
-      "ogDescription": "Skapa rum, dela länk, tävla om ord live. 6 lägen, 5 språk. Gratis i din webbläsare."
+      "title": "Scrabble Online på Svenska — 2-20 Spelare, 8 Spellägen, Gratis | LexiClash",
+      "description": "Scrabble-alternativ på svenska: 2-20 spelare i realtid, 8 spellägen, 10 000+ svenska ord, ingen nedladdning. Skapa rum, dela länken, tävla direkt i webbläsaren. Gratis!",
+      "ogTitle": "Scrabble Online på Svenska — 2-20 Spelare, Gratis",
+      "ogDescription": "Scrabble-alternativ i realtid ⚡ 2-20 spelare, 8 lägen. Skapa rum, dela länken, tävla. Gratis i webbläsaren!"
     },
     "about": {
       "title": "Om LexiClash - Vårt Uppdrag, Berättelse & Team",
@@ -398,6 +398,7 @@ const sv = {
     }
   },
   "common": {
+    "used": "Används",
     "email": "E-post",
     "free": "Gratis",
     "loading": "Blandar bokstäver...",
@@ -3360,6 +3361,11 @@ const sv = {
   },
   "profile": {
     "title": "Ditt HK",
+    "notFound": "Spelaren hittades inte",
+    "stats": {
+      "games": "matcher",
+      "winRate": "vinstprocent"
+    },
     "coins": "Mynt",
     "viewProfile": "Visa Profil",
     "viewCoins": "Se dina mynt",
@@ -3370,7 +3376,6 @@ const sv = {
       "collection": "Samling"
     },
     "overview": "Översikt",
-    "stats": "Statistik",
     "memberSince": "Spelar sedan",
     "totalGames": "Spelade spel",
     "wins": "Vinster",
@@ -10327,6 +10332,17 @@ const sv = {
       earning: "Tittar...",
       earned: "+{amount} guld tjänat!",
       cooldown: "Tillgänglig snart"
+    },
+    doubleGold: {
+      cta: "Dubbla belöningar +{amount}",
+      earning: "Dubblar..."
+    },
+    reveal: {
+      freeViaAd: "Gratis avslöjande (annons)"
+    },
+    timeLow: {
+      cta: "Lägg till +{seconds}s",
+      earning: "Lägger till tid..."
     }
   },
   "features": {
@@ -11397,6 +11413,16 @@ const sv = {
       "outOfBounds": "Brickan placerad utanför brädet.",
       "noTiles": "Lägg minst en bricka för att spela.",
       "bagTooSmallToSwap": "Inte tillräckligt med brickor i påsen för att byta."
+    }
+  },
+  mp: {
+    kbHint: {
+      submit: "skicka",
+      pop: "ta bort sista",
+      clear: "rensa"
+    },
+    ladder: {
+      empty: "Inga ord än — hitta det första!"
     }
   }
 };
