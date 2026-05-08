@@ -11649,6 +11649,43 @@ const en = {
     },
     ladder: {
       empty: "No words yet — find the first one!"
+    },
+    modeName: {
+      classic: "Standard",
+      wheelRush: "Wheel Rush",
+      wordHunt: "Word Hunt",
+      blast: "Blast"
+    },
+    insights: {
+      rosterHeader: "Players",
+      foundHeader: "Found",
+      fogHeader: "Fog",
+      fogLabel: "Fog of War",
+      myStatsHeader: "Your stats",
+      bestWord: "Best",
+      wordsPerMin: "Pace",
+      kbBonusUses: "Keys",
+      opponentInsightHeader: "Rivals",
+      opponentInsightEmpty: "Quiet so far…",
+      paceDeltaPositive: "Leading",
+      paceDeltaNegative: "Trailing",
+      paceDeltaTied: "Tied",
+      categoryHeader: "Target",
+      huntProgressHeader: "Progress",
+      goalTypeTargetWord: "Target word",
+      goalTypeColorPower: "Color power",
+      goalTypeClassic: "Goal",
+      comboCounterHeader: "Combo",
+      comboMultiplierSuffix: "boost",
+      retiredTiles: "Retired",
+      luckyBoost: "Lucky boost",
+      spinCounterAria: "Spin {current} of {total}",
+      rarity: {
+        common: "Common",
+        uncommon: "Uncommon",
+        rare: "Rare",
+        legendary: "Legendary"
+      }
     }
   }
 };

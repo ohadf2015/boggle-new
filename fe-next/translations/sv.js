@@ -11457,6 +11457,43 @@ const sv = {
     },
     ladder: {
       empty: "Inga ord än — hitta det första!"
+    },
+    modeName: {
+      classic: "Standard",
+      wheelRush: "Hjulet",
+      wordHunt: "Ordjakt",
+      blast: "Blast"
+    },
+    insights: {
+      rosterHeader: "Spelare",
+      foundHeader: "Hittade",
+      fogHeader: "Dimma",
+      fogLabel: "Krigsdimma",
+      myStatsHeader: "Din statistik",
+      bestWord: "Bäst",
+      wordsPerMin: "Tempo",
+      kbBonusUses: "Tangenter",
+      opponentInsightHeader: "Rivaler",
+      opponentInsightEmpty: "Tyst än så länge…",
+      paceDeltaPositive: "Leder",
+      paceDeltaNegative: "Efter",
+      paceDeltaTied: "Lika",
+      categoryHeader: "Mål",
+      huntProgressHeader: "Framsteg",
+      goalTypeTargetWord: "Målord",
+      goalTypeColorPower: "Färgkraft",
+      goalTypeClassic: "Mål",
+      comboCounterHeader: "Kombo",
+      comboMultiplierSuffix: "bonus",
+      retiredTiles: "Borta",
+      luckyBoost: "Lyckobonus",
+      spinCounterAria: "Snurr {current} av {total}",
+      rarity: {
+        common: "Vanlig",
+        uncommon: "Ovanlig",
+        rare: "Sällsynt",
+        legendary: "Legendarisk"
+      }
     }
   }
 };

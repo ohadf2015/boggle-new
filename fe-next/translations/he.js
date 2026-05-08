@@ -11545,6 +11545,43 @@ const he = {
     },
     ladder: {
       empty: "עדיין אין מילים — מצא את הראשונה!"
+    },
+    modeName: {
+      classic: "רגיל",
+      wheelRush: "גלגל הזמן",
+      wordHunt: "ציד מילים",
+      blast: "פיצוץ"
+    },
+    insights: {
+      rosterHeader: "שחקנים",
+      foundHeader: "נמצאו",
+      fogHeader: "ערפל",
+      fogLabel: "ערפל מלחמה",
+      myStatsHeader: "הסטטיסטיקה שלך",
+      bestWord: "הכי טוב",
+      wordsPerMin: "קצב",
+      kbBonusUses: "מקלדת",
+      opponentInsightHeader: "יריבים",
+      opponentInsightEmpty: "שקט בינתיים…",
+      paceDeltaPositive: "מוביל",
+      paceDeltaNegative: "מאחור",
+      paceDeltaTied: "שווה",
+      categoryHeader: "יעד",
+      huntProgressHeader: "התקדמות",
+      goalTypeTargetWord: "מילת יעד",
+      goalTypeColorPower: "כוח צבע",
+      goalTypeClassic: "מטרה",
+      comboCounterHeader: "קומבו",
+      comboMultiplierSuffix: "בונוס",
+      retiredTiles: "פרשו",
+      luckyBoost: "בונוס מזל",
+      spinCounterAria: "סיבוב {current} מתוך {total}",
+      rarity: {
+        common: "רגיל",
+        uncommon: "לא שכיח",
+        rare: "נדיר",
+        legendary: "אגדי"
+      }
     }
   }
 };

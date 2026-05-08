@@ -23,8 +23,8 @@ describe('WordHuntDesktopAdapter', () => {
         canvas={<div data-testid="hunt-canvas" />}
       />,
     );
-    expect(screen.getByText(/Word Hunt/i)).toBeInTheDocument();
-    expect(screen.getByTestId('hunt-target')).toHaveTextContent(/animals/i);
+    expect(screen.getByTestId('hunt-mode-badge')).toBeInTheDocument();
+    expect(screen.getByTestId('category-banner-value')).toHaveTextContent(/animals/i);
     expect(screen.getByTestId('hunt-canvas')).toBeInTheDocument();
   });
 
@@ -40,6 +40,7 @@ describe('WordHuntDesktopAdapter', () => {
         canvas={<div />}
       />,
     );
-    expect(screen.getByTestId('hunt-target')).toBeInTheDocument();
+    expect(screen.getByTestId('category-banner')).toBeInTheDocument();
+    expect(screen.getByTestId('category-banner-value').textContent).toBe('—');
   });
 });

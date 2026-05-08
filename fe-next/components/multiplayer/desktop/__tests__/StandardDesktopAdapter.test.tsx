@@ -18,7 +18,8 @@ describe('StandardDesktopAdapter', () => {
     render(<StandardDesktopAdapter {...mkProps()} />);
     expect(screen.getByTestId('canvas')).toBeInTheDocument();
     expect(screen.getByText('Alpha')).toBeInTheDocument();
-    expect(screen.getByText('CAT')).toBeInTheDocument();
+    // 'CAT' appears in WordsLadder and as MyStatsCard's best word
+    expect(screen.getAllByText('CAT').length).toBeGreaterThanOrEqual(1);
   });
 
   it('mounts inside MultiplayerDesktopShell', () => {

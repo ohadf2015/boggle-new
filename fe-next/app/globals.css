@@ -3561,6 +3561,57 @@ body.crazygames-embed .game-view-container,
   }
 }
 
+/* === MP desktop polish — score tick float === */
+@keyframes score-tick-float {
+  0% { opacity: 0; transform: translateY(0) scale(0.8); }
+  20% { opacity: 1; transform: translateY(-4px) scale(1.05); }
+  100% { opacity: 0; transform: translateY(-22px) scale(0.95); }
+}
+.animate-score-tick-float {
+  animation: score-tick-float 600ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* === MP desktop polish — combo pulse on increment === */
+@keyframes combo-pulse {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+.animate-combo-pulse { animation: combo-pulse 320ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+/* === MP desktop polish — shell entrance fade-in stagger === */
+@keyframes mp-shell-fade-in {
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-mp-shell-fade {
+  animation: mp-shell-fade-in 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* === MP desktop polish — opponent word incoming flash === */
+@keyframes opponent-word-flash {
+  0% { background-color: rgba(255, 20, 147, 0.18); }
+  100% { background-color: transparent; }
+}
+.animate-opponent-flash { animation: opponent-word-flash 600ms ease-out; }
+
+/* === MP desktop polish — mascot ambient breath === */
+@keyframes mascot-breath {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+.animate-mascot-breath { animation: mascot-breath 4200ms ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-score-tick-float,
+  .animate-combo-pulse,
+  .animate-mp-shell-fade,
+  .animate-opponent-flash,
+  .animate-mascot-breath {
+    animation: none;
+  }
+}
+
 /* === WordCraft cell hints === */
 @keyframes wc-cell-invite-kf {
   0%, 100% {

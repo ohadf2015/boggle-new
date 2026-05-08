@@ -11389,6 +11389,43 @@ const ja = {
     },
     ladder: {
       empty: "まだ単語なし — 最初の一つを見つけよう！"
+    },
+    modeName: {
+      classic: "スタンダード",
+      wheelRush: "ホイールラッシュ",
+      wordHunt: "ワードハント",
+      blast: "ブラスト"
+    },
+    insights: {
+      rosterHeader: "プレイヤー",
+      foundHeader: "発見",
+      fogHeader: "霧",
+      fogLabel: "戦場の霧",
+      myStatsHeader: "あなたの統計",
+      bestWord: "ベスト",
+      wordsPerMin: "ペース",
+      kbBonusUses: "キー",
+      opponentInsightHeader: "ライバル",
+      opponentInsightEmpty: "まだ静か…",
+      paceDeltaPositive: "リード",
+      paceDeltaNegative: "遅れ",
+      paceDeltaTied: "同点",
+      categoryHeader: "ターゲット",
+      huntProgressHeader: "進捗",
+      goalTypeTargetWord: "ターゲット語",
+      goalTypeColorPower: "カラーパワー",
+      goalTypeClassic: "目標",
+      comboCounterHeader: "コンボ",
+      comboMultiplierSuffix: "ブースト",
+      retiredTiles: "撤退",
+      luckyBoost: "ラッキーブースト",
+      spinCounterAria: "スピン {current} / {total}",
+      rarity: {
+        common: "ふつう",
+        uncommon: "あまりない",
+        rare: "レア",
+        legendary: "伝説"
+      }
     }
   }
 };

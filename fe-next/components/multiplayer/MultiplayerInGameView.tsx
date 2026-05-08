@@ -29,6 +29,7 @@ import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
 import { StandardDesktopAdapter } from './desktop/StandardDesktopAdapter';
 import { WheelRushDesktopAdapter } from './desktop/WheelRushDesktopAdapter';
 import { WordHuntDesktopAdapter } from './desktop/WordHuntDesktopAdapter';
+import { BlastDesktopAdapter } from './desktop/BlastDesktopAdapter';
 
 // Mode-specific game views are split into per-route chunks. Only the active
 // mode's bundle is downloaded — non-blast rooms don't pay for BlastGame's
@@ -253,8 +254,16 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   // Desktop shell routing (standard mode only)
   const shellEnabled = useDesktopShellEnabled();
 
-  // Opponent word feed for classic mode
+  // Opponent word feed
   const { feedItems: opponentFeedItems } = useOpponentWordFeed({ socket, currentPlayerName: username });
+  const opponentInsightWords = opponentFeedItems.map(item => ({
+    wordLength: item.wordLength,
+    firstLetter: item.firstLetter,
+    lastLetter: item.lastLetter,
+    score: item.score,
+    ts: item.timestamp,
+    byUsername: item.playerName,
+  }));
 
   // Effective grid (player may have shufflingGrid fallback)
   const effectiveGrid = letterGrid || shufflingGrid || null;
@@ -414,6 +423,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         remainingTime={remainingTime ?? 0}
         totalTime={totalTime ?? 180}
         meId={username}
+        opponentWords={opponentInsightWords}
         canvas={<InGameScreen {...inGameScreenProps} />}
       />
     );
@@ -462,6 +472,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         totalTime={totalTime ?? 60}
         fogProgress={fogProgress}
         meId={username}
+        opponentWords={opponentInsightWords}
         canvas={<WheelRushView {...wheelRushProps} isDesktopCanvas />}
       />
     );
@@ -512,14 +523,15 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         totalTime={totalTime ?? 180}
         targetCategory=""
         meId={username}
+        opponentWords={opponentInsightWords}
         canvas={<WordHuntGame {...wordHuntGameProps} />}
       />
     );
   }
 
-  // Blast mode
+  // Blast mode — desktop shell + mobile fallback
   if (gameMode === 'blast') {
-    return (
+    const blastCanvas = (
       <BlastGame
         config={blastBridge.config}
         mode="multiplayer"
@@ -535,6 +547,39 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         waveNumber={blastBridge.waveNumber}
       />
     );
+    if (shellEnabled) {
+      const rosterPlayers = leaderboard.map(entry => ({
+        userId: entry.username ?? '',
+        username: entry.username,
+        score: entry.score,
+        wordCount: entry.wordCount,
+        status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
+        isYou: entry.username === username,
+        customAvatar: entry.avatar?.customAvatar ?? null,
+      }));
+      const ladderWords = foundWords.map(fw => ({
+        word: fw.word,
+        score: fw.score ?? 0,
+        ts: fw.timestamp ?? 0,
+        userId: username,
+        inputMethod: fw.inputMethod ?? 'drag',
+      }));
+      return (
+        <BlastDesktopAdapter
+          roomId={gameCode}
+          leaderboard={rosterPlayers}
+          foundWords={ladderWords}
+          remainingTime={remainingTime ?? 0}
+          totalTime={totalTime ?? 60}
+          meId={username}
+          opponentWords={opponentInsightWords}
+          comboCount={comboLevel}
+          comboMultiplier={1 + comboLevel * 0.1}
+          canvas={blastCanvas}
+        />
+      );
+    }
+    return blastCanvas;
   }
 
   // Word Hunt mode

@@ -17,7 +17,7 @@ describe('WheelRushDesktopAdapter', () => {
 
   it('renders shell with mode=wheel-rush badge', () => {
     render(<WheelRushDesktopAdapter {...mkProps()} />);
-    expect(screen.getByText(/Wheel Rush/i)).toBeInTheDocument();
+    expect(screen.getByTestId('wr-mode-badge')).toBeInTheDocument();
   });
 
   it('renders fog meter in left.secondary slot', () => {
@@ -42,7 +42,8 @@ describe('WheelRushDesktopAdapter', () => {
   it('renders roster and words ladder', () => {
     render(<WheelRushDesktopAdapter {...mkProps()} />);
     expect(screen.getByText('Alpha')).toBeInTheDocument();
-    expect(screen.getByText('WHEEL')).toBeInTheDocument();
+    // 'WHEEL' appears in WordsLadder and as MyStatsCard's best word
+    expect(screen.getAllByText('WHEEL').length).toBeGreaterThanOrEqual(1);
   });
 
   it('mounts inside MultiplayerDesktopShell', () => {

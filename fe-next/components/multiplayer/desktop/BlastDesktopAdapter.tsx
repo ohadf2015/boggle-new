@@ -9,67 +9,73 @@ import { MyStatsCard } from './insights/MyStatsCard';
 import { OpponentInsightFeed, type OpponentWord } from './insights/OpponentInsightFeed';
 import { PaceDeltaChip } from './insights/PaceDeltaChip';
 import { LatestScoreTickBanner } from './insights/LatestScoreTickBanner';
-import { CategoryBanner } from './insights/CategoryBanner';
-import { HuntProgressMeter } from './insights/HuntProgressMeter';
+import { GoalBanner, type BlastGoal } from './insights/GoalBanner';
+import { ComboCounter } from './insights/ComboCounter';
+import { RetiredTilesChip } from './insights/RetiredTilesChip';
+import { LuckyBoostChip } from './insights/LuckyBoostChip';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ShellSlots } from './types';
 
-export interface WordHuntDesktopAdapterProps {
+export interface BlastDesktopAdapterProps {
   roomId: string;
   leaderboard: RosterPlayer[];
   foundWords: LadderWord[];
   remainingTime: number;
   totalTime: number;
-  targetCategory: string;
   canvas: ReactNode;
   meId?: string;
   opponentWords?: OpponentWord[];
   startTimeMs?: number;
-  huntFound?: number;
-  huntTarget?: number;
+  goal?: BlastGoal;
+  comboCount?: number;
+  comboMultiplier?: number;
+  retiredTileCount?: number;
+  luckyBoostActive?: boolean;
 }
 
-export function WordHuntDesktopAdapter(props: WordHuntDesktopAdapterProps) {
+export function BlastDesktopAdapter(props: BlastDesktopAdapterProps) {
   const { t } = useLanguage();
+  const goal: BlastGoal = props.goal ?? { type: 'classic' };
   const slots: ShellSlots = {
     left: {
       roster: (
         <ThemedPanel
-          mode="word-hunt"
+          mode="blast"
           variant="rail"
           header={t('mp.insights.rosterHeader')}
           headerRight={`${props.leaderboard.length}`}
-          testId="hunt-roster"
+          testId="blast-roster"
         >
           <RosterRail players={props.leaderboard} />
         </ThemedPanel>
       ),
       modeBadge: (
-        <ThemedPanel mode="word-hunt" variant="badge" testId="hunt-mode-badge">
+        <ThemedPanel mode="blast" variant="badge" testId="blast-mode-badge">
           <div className="flex items-center gap-3 animate-mp-shell-fade">
             <CircularTimer
               duration={props.totalTime}
               initialRemainingTime={props.remainingTime}
               isPlaying
-              size={80}
-              colorFamily="purple"
+              size={88}
+              colorFamily="lime"
             />
-            <div className="flex flex-col">
+            <div className="flex flex-col flex-1 min-w-0">
               <span className="text-[10px] font-mono opacity-50">MP</span>
-              <span className="font-neo-display font-bold uppercase text-xl tracking-wide">
-                {t('mp.modeName.wordHunt')}
+              <span className="font-neo-display font-bold uppercase text-xl tracking-wide truncate">
+                {t('mp.modeName.blast')}
               </span>
+              <div className="flex gap-1 flex-wrap mt-1">
+                <RetiredTilesChip count={props.retiredTileCount ?? 0} />
+                <LuckyBoostChip active={props.luckyBoostActive ?? false} />
+              </div>
             </div>
           </div>
         </ThemedPanel>
       ),
       secondary: (
         <div className="flex flex-col gap-3">
-          <CategoryBanner mode="word-hunt" category={props.targetCategory} />
-          {props.huntFound != null && props.huntTarget != null && (
-            <HuntProgressMeter mode="word-hunt" found={props.huntFound} target={props.huntTarget} />
-          )}
-          <MyStatsCard mode="word-hunt" meId={props.meId} foundWords={props.foundWords} startTimeMs={props.startTimeMs} />
+          {goal.type !== 'classic' && <GoalBanner mode="blast" goal={goal} />}
+          <MyStatsCard mode="blast" meId={props.meId} foundWords={props.foundWords} startTimeMs={props.startTimeMs} />
         </div>
       ),
     },
@@ -77,27 +83,28 @@ export function WordHuntDesktopAdapter(props: WordHuntDesktopAdapterProps) {
     right: {
       wordsLadder: (
         <ThemedPanel
-          mode="word-hunt"
+          mode="blast"
           variant="rail"
           header={t('mp.insights.foundHeader')}
           headerRight={`${props.foundWords.length}`}
-          testId="hunt-ladder"
+          testId="blast-ladder"
         >
-          <LatestScoreTickBanner mode="word-hunt" meId={props.meId} leaderboard={props.leaderboard} />
+          <LatestScoreTickBanner mode="blast" meId={props.meId} leaderboard={props.leaderboard} />
           <WordsLadder words={props.foundWords} meId={props.meId} />
         </ThemedPanel>
       ),
       activityStream: (
         <div className="flex flex-col gap-2">
-          <PaceDeltaChip mode="word-hunt" leaderboard={props.leaderboard} meId={props.meId} />
+          <ComboCounter mode="blast" count={props.comboCount ?? 0} multiplier={props.comboMultiplier ?? 1} />
+          <PaceDeltaChip mode="blast" leaderboard={props.leaderboard} meId={props.meId} />
           {props.opponentWords && props.opponentWords.length > 0 && (
-            <OpponentInsightFeed mode="word-hunt" opponentWords={props.opponentWords} />
+            <OpponentInsightFeed mode="blast" opponentWords={props.opponentWords} />
           )}
           <KeyboardHintStrip />
         </div>
       ),
     },
-    meta: { mode: 'word-hunt', roomId: props.roomId },
+    meta: { mode: 'blast', roomId: props.roomId },
   };
   return <MultiplayerDesktopShell slots={slots} />;
 }

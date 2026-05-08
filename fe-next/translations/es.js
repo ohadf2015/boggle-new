@@ -11590,6 +11590,43 @@ const es = {
     },
     "ladder": {
       "empty": "Aún no hay palabras — ¡encuentra la primera!"
+    },
+    "modeName": {
+      "classic": "Estándar",
+      "wheelRush": "Rueda Loca",
+      "wordHunt": "Caza de Palabras",
+      "blast": "Estallido"
+    },
+    "insights": {
+      "rosterHeader": "Jugadores",
+      "foundHeader": "Encontradas",
+      "fogHeader": "Niebla",
+      "fogLabel": "Niebla de guerra",
+      "myStatsHeader": "Tus estadísticas",
+      "bestWord": "Mejor",
+      "wordsPerMin": "Ritmo",
+      "kbBonusUses": "Teclas",
+      "opponentInsightHeader": "Rivales",
+      "opponentInsightEmpty": "Silencio hasta ahora…",
+      "paceDeltaPositive": "Liderando",
+      "paceDeltaNegative": "Atrás",
+      "paceDeltaTied": "Empate",
+      "categoryHeader": "Objetivo",
+      "huntProgressHeader": "Progreso",
+      "goalTypeTargetWord": "Palabra objetivo",
+      "goalTypeColorPower": "Poder de color",
+      "goalTypeClassic": "Objetivo",
+      "comboCounterHeader": "Combo",
+      "comboMultiplierSuffix": "bonus",
+      "retiredTiles": "Retiradas",
+      "luckyBoost": "Bonus suerte",
+      "spinCounterAria": "Giro {current} de {total}",
+      "rarity": {
+        "common": "Común",
+        "uncommon": "Poco común",
+        "rare": "Raro",
+        "legendary": "Legendario"
+      }
     }
   }
 };
