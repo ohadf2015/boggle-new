@@ -3,6 +3,10 @@ import { render } from '@testing-library/react';
 import HomePageClient from '@/app/[locale]/PageClient';
 import { getPendingRoomInvite } from '@/utils/onboardingStorage';
 
+vi.mock('@/components/landing', () => ({
+  LandingView: () => <div data-testid="landing-view" />,
+}));
+
 vi.mock('next/dynamic', () => ({ default: () => () => <div data-testid="onboarding-flow" /> }));
 
 describe('HomePageClient invite parsing', () => {
