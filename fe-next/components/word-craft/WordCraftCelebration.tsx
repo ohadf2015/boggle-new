@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-export type CelebrationKind = 'bingo' | 'gameOver' | null;
+export type CelebrationKind = 'bingo' | 'gameOver' | 'overdrive' | 'burnout' | null;
 
 export interface WordCraftCelebrationProps {
   kind: CelebrationKind;
@@ -17,10 +17,11 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
   const apiRef = useRef<{
     spawnBurst: ((x: number, y: number, count: number) => void) | null;
     spawnRain: ((duration: number) => void) | null;
+    spawnOverdriveBurst: ((x: number, y: number) => void) | null;
     cleanup: (() => void) | null;
     width: () => number;
     height: () => number;
-  }>({ spawnBurst: null, spawnRain: null, cleanup: null, width: () => 0, height: () => 0 });
+  }>({ spawnBurst: null, spawnRain: null, spawnOverdriveBurst: null, cleanup: null, width: () => 0, height: () => 0 });
 
   const [reducedMotion] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
@@ -161,6 +162,32 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
         app.ticker.add(rainTicker);
       };
 
+      apiRef.current.spawnOverdriveBurst = (x: number, y: number) => {
+        for (let i = 0; i < 120; i++) {
+          const angle = Math.random() * Math.PI * 2
+          const speed = 4 + Math.random() * 8
+          const particle = new PIXI.Particle({
+            texture: tileTexture,
+            x,
+            y,
+            tint: 0xbfff00,
+            scaleX: 0.7 + Math.random() * 0.5,
+            scaleY: 0.7 + Math.random() * 0.5,
+            rotation: Math.random() * Math.PI * 2,
+            alpha: 1,
+          })
+          particles.addParticle(particle)
+          tiles.push({
+            particle,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 3,
+            vr: (Math.random() - 0.5) * 0.2,
+            life: 1,
+            maxLife: 1.2 + Math.random() * 0.5,
+          })
+        }
+      };
+
       app.ticker.add((ticker) => {
         const dt = ticker.deltaTime;
         for (let i = tiles.length - 1; i >= 0; i -= 1) {
@@ -196,6 +223,7 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
       if (apiSnapshot.cleanup) apiSnapshot.cleanup();
       apiSnapshot.spawnBurst = null;
       apiSnapshot.spawnRain = null;
+      apiSnapshot.spawnOverdriveBurst = null;
       apiSnapshot.cleanup = null;
     };
   }, [reducedMotion]);
@@ -222,6 +250,12 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
       } else if (kind === 'gameOver') {
         api.spawnBurst(api.width() / 2, api.height() / 3, 60);
         api.spawnRain(2800);
+      } else if (kind === 'overdrive') {
+        const x = origin?.x ?? api.width() / 2
+        const y = origin?.y ?? api.height() * 0.85
+        api.spawnOverdriveBurst?.(x, y)
+      } else if (kind === 'burnout') {
+        api.spawnBurst?.(api.width() / 2, api.height() / 2, 30)
       }
     };
     tryFire(0);
