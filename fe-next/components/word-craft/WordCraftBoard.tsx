@@ -55,6 +55,9 @@ function WordCraftBoardImpl({ board, pendingPlacements, onCellClick, disabled }:
               key={key}
               type="button"
               role="gridcell"
+              data-board-cell={key}
+              data-tile-id={pending?.rackTileId ?? placedTile?.rackTileId ?? undefined}
+              data-tile-state={pending ? 'pending' : placedTile ? 'placed' : 'empty'}
               aria-label={`row ${r + 1} column ${c + 1}${cell.premium ? ` ${cell.premium}` : ''}`}
               disabled={!isInteractive}
               onClick={() => isInteractive && onCellClick(r, c)}

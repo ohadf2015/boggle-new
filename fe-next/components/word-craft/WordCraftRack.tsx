@@ -30,6 +30,7 @@ function WordCraftRackImpl({
           <button
             key={tile.id}
             type="button"
+            data-rack-tile-id={tile.id}
             disabled={disabled || isPending}
             aria-pressed={isSelected}
             onClick={() => onSelect(isSelected ? null : tile.id)}
