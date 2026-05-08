@@ -12,4 +12,7 @@ describe('isWordCraftBetaUser', () => {
   it('returns false for undefined', () => {
     expect(isWordCraftBetaUser(undefined)).toBe(false)
   })
+  it('is case-insensitive', () => {
+    expect(isWordCraftBetaUser('OHADF2015@GMAIL.COM')).toBe(true)
+  })
 })

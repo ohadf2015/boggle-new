@@ -162,6 +162,7 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
     }
     case 'END_GAME':
       return { ...state, turn: 'over' };
+    // Player skips turn during burnout — heat resets to 40, turn passes to bot.
     case 'BURNOUT_SKIP':
       return { ...state, burnout: false, heat: 40, overdrive: false, overdriveWarns: 0, turn: 'bot' };
     default:
