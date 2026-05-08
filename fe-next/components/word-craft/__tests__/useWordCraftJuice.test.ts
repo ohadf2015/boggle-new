@@ -47,9 +47,6 @@ function makeMockTl(): TimelineSpy & Record<string, unknown> {
 }
 
 vi.mock('gsap', () => ({
-  default: {
-    timeline: () => makeMockTl(),
-  },
   gsap: {
     timeline: () => makeMockTl(),
   },

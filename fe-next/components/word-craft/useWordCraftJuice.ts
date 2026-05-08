@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import gsap from 'gsap';
+import { gsap } from 'gsap';
 import { isReducedMotionPreferred } from '@/utils/accessibility';
 
 export type JuiceTarget = Element | null | undefined;
