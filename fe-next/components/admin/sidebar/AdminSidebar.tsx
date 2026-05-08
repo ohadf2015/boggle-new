@@ -10,6 +10,7 @@ import {
   BookOpen,
   Users,
   Settings,
+  Gamepad2,
 } from 'lucide-react';
 
 interface NavItem {
@@ -36,6 +37,7 @@ export function AdminSidebar({ moderationCount = 0 }: AdminSidebarProps) {
     { key: 'content', labelKey: 'admin.sidebar.content', icon: BookOpen, path: '/content' },
     { key: 'players', labelKey: 'admin.sidebar.players', icon: Users, path: '/players' },
     { key: 'system', labelKey: 'admin.sidebar.system', icon: Settings, path: '/system' },
+    { key: 'word-craft', labelKey: 'admin.sidebar.wordCraft', icon: Gamepad2, path: '/word-craft' },
   ];
 
   const basePath = `/${language}/admin`;

@@ -6537,7 +6537,8 @@ const he = {
       "moderation": "מודרציה",
       "content": "תוכן",
       "players": "שחקנים",
-      "system": "מערכת"
+      "system": "מערכת",
+      "wordCraft": "וורדקראפט"
     },
     "kpi": {
       "dau": "משתמשים פעילים יומיים",

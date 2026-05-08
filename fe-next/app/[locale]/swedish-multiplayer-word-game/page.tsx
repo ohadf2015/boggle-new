@@ -15,12 +15,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/sv/swedish-multiplayer-word-game`;
 
   return {
-    title: 'Multiplayer Ordspel Online - Spela Boggle, Scrabble & Ordspel Gratis | LexiClash',
-    description: 'Gillar du Wordfeud, Boggle eller Scrabble? LexiClash är ett multiplayer ordspel online på svenska! Skapa ett rum, skicka en länk till vänner och tävla i realtid. 10 000+ svenska ord, ingen registrering, helt gratis.',
+    title: 'Scrabble Online Svenska — Ordspel Alternativ Gratis Multiplayer | LexiClash',
+    description: 'Scrabble-alternativ online på svenska, gratis och utan registrering. Skapa rum, bjud in med länk och tävla i realtid. 10 000+ svenska ord. Börja nu!',
     keywords: 'ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid',
     openGraph: {
-      title: 'Multiplayer Ordspel - Boggle & Scrabble Online på Svenska | LexiClash',
-      description: 'Gillar du Wordfeud eller Boggle? Testa LexiClash - multiplayer ordspel på svenska! Skapa rum, bjud in vänner, tävla i realtid. Gratis!',
+      title: 'Scrabble Online Svenska — Gratis Ordspel Alternativ | LexiClash',
+      description: 'Scrabble-alternativ online på svenska: tävla med vänner i realtid. Skapa rum, bjud in med länk. Gratis, ingen registrering.',
       locale: 'sv_SE',
       type: 'website',
       url: pageUrl,
@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Multiplayer Ordspel Online på Svenska - LexiClash',
-      description: 'Gillar du Wordfeud eller Boggle? Testa LexiClash - multiplayer ordspel på svenska! Skapa rum, bjud in vänner och tävla i realtid. Gratis!',
+      title: 'Scrabble Online Svenska — Ordspel Alternativ | LexiClash',
+      description: 'Scrabble-alternativ online på svenska: skapa rum, bjud in med länk, tävla i realtid. Gratis, ingen registrering.',
       images: [`${BASE_URL}/og-image-sv.webp`],
     },
     alternates: {

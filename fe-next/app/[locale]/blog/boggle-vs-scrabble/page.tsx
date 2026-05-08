@@ -13,7 +13,7 @@ interface PageProps {
 
 const SLUG = 'boggle-vs-scrabble';
 const DATE_PUBLISHED = '2026-03-28';
-const DATE_MODIFIED = '2026-03-28';
+const DATE_MODIFIED = '2026-05-08';
 
 const metaTitles: Record<string, string> = {
   en: 'Boggle vs Scrabble: Which Is Better? 7 Differences (2026)',

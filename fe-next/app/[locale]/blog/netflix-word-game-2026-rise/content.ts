@@ -18,6 +18,7 @@ export type LocaleContent = {
   backToBlog: string;
   tryDaily: string;
   practice: string;
+  playMultiplayer: string;
 };
 
 const HERO = '/images/blog/netflix-word-games.jpg';
@@ -131,8 +132,9 @@ The Netflix word game launch is the headline. The actual story is that an entire
       },
     ],
     backToBlog: 'Back to Blog',
-    tryDaily: 'Try Today’s Puzzle',
-    practice: 'Practice Solo',
+    tryDaily: "Try Today's Puzzle",
+    practice: "Practice Solo",
+    playMultiplayer: "Play Multiplayer",
   },
 
   he: {
@@ -236,6 +238,7 @@ The Netflix word game launch is the headline. The actual story is that an entire
     backToBlog: 'חזרה לבלוג',
     tryDaily: 'נסו את הפאזל היומי',
     practice: 'תרגול לבד',
+    playMultiplayer: 'שחק מרובה שחקנים',
   },
 
   sv: {
@@ -338,6 +341,7 @@ Rubriken är "Netflix lanserar ordspel". Den verkliga storyn är att ett helt un
     backToBlog: 'Tillbaka till Bloggen',
     tryDaily: 'Prova Dagens Pussel',
     practice: 'Träna Solo',
+    playMultiplayer: 'Spela Multiplayer',
   },
 
   ja: {
@@ -440,6 +444,7 @@ LexiClashのリアルタイム対戦やWords With Friendsの非同期型のよ�
     backToBlog: 'ブログに戻る',
     tryDaily: '今日のパズルを解く',
     practice: 'ソロ練習',
+    playMultiplayer: 'マルチプレイヤーで遊ぶ',
   },
 
   es: {
@@ -543,5 +548,6 @@ El titular es "Netflix lanza un juego de palabras". La verdadera historia es que
     backToBlog: 'Volver al Blog',
     tryDaily: 'Probar el Puzzle de Hoy',
     practice: 'Practicar Solo',
+    playMultiplayer: 'Jugar Scrabble Online en Español',
   },
 };

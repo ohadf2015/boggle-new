@@ -6574,7 +6574,8 @@ const sv = {
       "moderation": "Moderering",
       "content": "Innehåll",
       "players": "Spelare",
-      "system": "System"
+      "system": "System",
+      "wordCraft": "WordCraft"
     },
     "invalidWords": {
       "title": "Granskning av Ogiltiga Ord",

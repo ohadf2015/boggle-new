@@ -6616,7 +6616,8 @@ const es = {
       "moderation": "Moderación",
       "content": "Contenido",
       "players": "Jugadores",
-      "system": "Sistema"
+      "system": "Sistema",
+      "wordCraft": "WordCraft"
     },
     "invalidWords": {
       "title": "Revisión de Palabras Inválidas",

@@ -161,7 +161,7 @@ export default function NetflixWordGameRisePageClient(): React.ReactElement {
           <InlineBannerAd webZone="content-page" className="my-6" />
 
           <div className={cn('mt-12 pt-6 border-t', isDarkMode ? 'border-slate-700' : 'border-gray-200')}>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               <Link href={`/${locale}/daily`}>
                 <Button className="rounded-neo border-3 border-neo-black bg-neo-yellow text-neo-black font-bold shadow-hard hover:shadow-hard-lg">
                   {content.tryDaily}
@@ -170,6 +170,23 @@ export default function NetflixWordGameRisePageClient(): React.ReactElement {
               <Link href={`/${locale}/singleplayer`}>
                 <Button className="rounded-neo border-3 border-neo-black bg-neo-orange text-neo-black font-bold shadow-hard hover:shadow-hard-lg">
                   {content.practice}
+                </Button>
+              </Link>
+              <Link
+                href={
+                  locale === 'es'
+                    ? '/es/juego-de-palabras-multijugador'
+                    : locale === 'sv'
+                      ? '/sv/swedish-multiplayer-word-game'
+                      : locale === 'he'
+                        ? '/he/hebrew-multiplayer-word-game'
+                        : locale === 'ja'
+                          ? '/ja/japanese-word-game'
+                          : '/en/multiplayer-word-game-online'
+                }
+              >
+                <Button className="rounded-neo border-3 border-neo-black bg-neo-pink text-neo-black font-bold shadow-hard hover:shadow-hard-lg">
+                  {content.playMultiplayer}
                 </Button>
               </Link>
             </div>

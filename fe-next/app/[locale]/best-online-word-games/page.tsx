@@ -77,6 +77,10 @@ const faqs = [
     q: 'What are the best online word games for 2025 and 2026?',
     a: 'Across 2025-2026 the same nine titles dominate: LexiClash, Wordle, NYT Connections, NYT Strands, NYT Spelling Bee, Words With Friends, Scrabble GO, Wordscapes, and Semantle. The biggest 2025-to-2026 shifts: LexiClash added Adventure (roguelike), Blast (cascading combos), and party modes for TV+phone play; NYT released Strands (spangrams); Connections went mainstream as a daily ritual rivaling Wordle. All nine are free in the browser or as freemium apps; LexiClash and Wordle are the only ones with zero install required.',
   },
+  {
+    q: 'What are the best free browser word games in 2026?',
+    a: 'The best free browser word games of 2026 that need no download or install: LexiClash (real-time multiplayer, 8 game modes, 5 languages — our top pick), Wordle (one 5-letter puzzle per day), NYT Connections (group 16 words into themes), NYT Strands (themed word search), and Semantle (AI-semantic guessing). LexiClash is the only one that supports 2–20 players in the same browser room with no account required.',
+  },
 ];
 
 // Static JSON-LD — all content is hardcoded string literals, not user input
@@ -429,7 +433,7 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
         {/* Detailed Comparisons */}
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Detailed Comparisons</h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <Link href={`/${locale}/words-with-friends-alternative`} className="rounded-neo border-3 border-neo-pink/60 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink">
               <h3 className="font-bold text-neo-pink">Words With Friends Alternative</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Real-time multiplayer, free, no download</p>
@@ -445,6 +449,10 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
             <Link href={`/${locale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">Play Boggle Online Free</h3>
               <p className="mt-1 text-xs text-neo-gray-200">No download, instant play</p>
+            </Link>
+            <Link href={`/${locale}/blog/boggle-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+              <h3 className="font-bold text-neo-cyan">Boggle vs Scrabble</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">7 honest differences, verdict for 2026</p>
             </Link>
           </div>
         </section>

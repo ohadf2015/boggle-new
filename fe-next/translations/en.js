@@ -6680,7 +6680,8 @@ const en = {
       "moderation": "Moderation",
       "content": "Content",
       "players": "Players",
-      "system": "System"
+      "system": "System",
+      "wordCraft": "WordCraft"
     },
     "kpi": {
       "dau": "Daily Active Users",

@@ -6663,7 +6663,8 @@ const ja = {
       "moderation": "モデレーション",
       "content": "コンテンツ",
       "players": "プレイヤー",
-      "system": "システム"
+      "system": "システム",
+      "wordCraft": "ワードクラフト"
     },
     "invalidWords": {
       "title": "無効な単語の確認",
