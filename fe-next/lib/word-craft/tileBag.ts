@@ -1,4 +1,9 @@
 import type { RackTile } from './types';
+import * as en from './tileBags/en';
+import * as sv from './tileBags/sv';
+import * as he from './tileBags/he';
+import * as es from './tileBags/es';
+import * as ja from './tileBags/ja';
 
 export const RACK_SIZE = 7;
 export const TOTAL_TILES = 100;
@@ -18,6 +23,15 @@ export const ENGLISH_TILE_DISTRIBUTION: Record<string, number> = {
   [BLANK_LETTER]: 2,
 };
 
+export type SupportedLocale = 'en' | 'sv' | 'he' | 'es' | 'ja';
+
+type BagData = { values: Record<string, number>; distribution: Record<string, number> };
+const BAGS: Record<SupportedLocale, BagData> = { en, sv, he, es, ja };
+
+export function getTileBag(locale: SupportedLocale): BagData {
+  return BAGS[locale] ?? BAGS['en'];
+}
+
 export interface TileBag {
   tiles: RackTile[];
   rng: () => number;
@@ -26,6 +40,7 @@ export interface TileBag {
 
 export interface CreateBagOptions {
   seed: number;
+  locale?: SupportedLocale;
 }
 
 function mulberry32(seed: number): () => number {
@@ -48,15 +63,16 @@ function shuffleInPlace<T>(arr: T[], rng: () => number): void {
 }
 
 export function createBag(options: CreateBagOptions): TileBag {
+  const { values: tileValues, distribution } = getTileBag(options.locale ?? 'en');
   const rng = mulberry32(options.seed);
   const tiles: RackTile[] = [];
   let nextId = 0;
-  for (const [letter, count] of Object.entries(ENGLISH_TILE_DISTRIBUTION)) {
+  for (const [letter, count] of Object.entries(distribution)) {
     for (let i = 0; i < count; i++) {
       tiles.push({
         id: `t-${nextId++}`,
         letter,
-        value: ENGLISH_TILE_VALUES[letter] ?? 0,
+        value: tileValues[letter] ?? 0,
         isBlank: letter === BLANK_LETTER,
       });
     }
