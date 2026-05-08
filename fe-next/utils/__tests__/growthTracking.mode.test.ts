@@ -86,6 +86,31 @@ describe('trackGameEnd — mode property contract', () => {
   });
 });
 
+describe('trackGameCompletion — first_game_played mode propagation', () => {
+  beforeEach(() => captureMock.mockClear());
+
+  it('emits first_game_played with gameMode when isFirstGame=true', () => {
+    trackGameCompletion(false, 80, 4, true, 'multiplayer');
+    const payload = findCapture('first_game_played');
+    expect(payload).toBeDefined();
+    expect(payload!.gameMode).toBe('multiplayer');
+    expect(payload!.mode).toBe('multiplayer');
+  });
+
+  it('emits first_game_played with mode=unknown when caller forgets gameMode', () => {
+    trackGameCompletion(false, 80, 4, true);
+    const payload = findCapture('first_game_played');
+    expect(payload).toBeDefined();
+    expect(payload!.gameMode).toBe('unknown');
+    expect(payload!.mode).toBe('unknown');
+  });
+
+  it('does not emit first_game_played when isFirstGame=false', () => {
+    trackGameCompletion(false, 80, 4, false, 'singleplayer');
+    expect(findCapture('first_game_played')).toBeUndefined();
+  });
+});
+
 describe('trackGameCompletion — first_game_won mode propagation', () => {
   beforeEach(() => captureMock.mockClear());
 

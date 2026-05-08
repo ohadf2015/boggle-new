@@ -15,6 +15,11 @@ vi.mock('../../platform', () => ({
   isNative: vi.fn(() => true),
 }));
 
+const trackGrowthEvent = vi.fn();
+vi.mock('@/utils/growthTracking', () => ({
+  trackGrowthEvent: (...a: unknown[]) => trackGrowthEvent(...a),
+}));
+
 type PushListener = (payload: unknown) => void;
 
 const pushListeners: Record<string, PushListener> = {};
@@ -27,6 +32,7 @@ const mockSchedule = vi.fn(async () => ({ notifications: [] }));
 describe('setupPushListeners — foreground display bridge', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    trackGrowthEvent.mockClear();
     for (const k of Object.keys(pushListeners)) delete pushListeners[k];
 
     (globalThis as any).Capacitor = {
@@ -87,5 +93,32 @@ describe('setupPushListeners — foreground display bridge', () => {
     await Promise.resolve();
 
     expect(mockSchedule).not.toHaveBeenCalled();
+  });
+
+  it('emits notification_delivered with type when push is received', async () => {
+    await setupPushListeners();
+    pushListeners['pushNotificationReceived']({
+      title: 't', body: 'b',
+      data: { type: 'daily_reminder', campaign: 'smart_reminder_v1' },
+    });
+    await Promise.resolve();
+
+    expect(trackGrowthEvent).toHaveBeenCalledWith(
+      'notification_delivered',
+      expect.objectContaining({ type: 'daily_reminder', campaign: 'smart_reminder_v1' }),
+    );
+  });
+
+  it('emits notification_clicked when user taps notification', async () => {
+    await setupPushListeners();
+    pushListeners['pushNotificationActionPerformed']({
+      notification: { data: { type: 'gift', campaign: 'gift_received' } },
+    });
+    await Promise.resolve();
+
+    expect(trackGrowthEvent).toHaveBeenCalledWith(
+      'notification_clicked',
+      expect.objectContaining({ type: 'gift', campaign: 'gift_received' }),
+    );
   });
 });

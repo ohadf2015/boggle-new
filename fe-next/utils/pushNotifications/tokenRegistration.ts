@@ -4,6 +4,7 @@
  */
 
 import { isNative } from '@/utils/platform';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 // Types for Capacitor Push Notifications (dynamic import)
 interface PushNotificationToken {
@@ -238,6 +239,16 @@ export async function setupPushListeners(
     const receivedListener = await PushNotifications.addListener(
       'pushNotificationReceived',
       async (notification: { title?: string; body?: string; data?: Record<string, string> }) => {
+        try {
+          trackGrowthEvent('notification_delivered', {
+            type: notification.data?.type ?? 'unknown',
+            campaign: notification.data?.campaign,
+            actionUrl: notification.data?.actionUrl,
+          });
+        } catch {
+          // analytics never blocks delivery
+        }
+
         if (onNotificationReceived && notification.data) {
           onNotificationReceived(notification.data as Record<string, string>);
         }
@@ -265,6 +276,16 @@ export async function setupPushListeners(
     const actionListener = await PushNotifications.addListener(
       'pushNotificationActionPerformed',
       (action: ActionPerformed) => {
+        try {
+          trackGrowthEvent('notification_clicked', {
+            type: action.notification.data?.type ?? 'unknown',
+            campaign: action.notification.data?.campaign,
+            actionUrl: action.notification.data?.actionUrl,
+          });
+        } catch {
+          // analytics never blocks tap handling
+        }
+
         if (onNotificationTapped && action.notification.data) {
           onNotificationTapped(action.notification.data);
         }

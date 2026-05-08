@@ -87,6 +87,11 @@ export type GrowthEvent =
   | 'push_prompt_dismissed'
   | 'push_prompt_granted'
   | 'push_prompt_failed'
+  // Push notification delivery funnel (instrumented to verify smart-reminder
+  // push actually reaches devices — D1 = 0% suggested cron fires but FCM
+  // delivery may not land. Properties: type, campaign, gameMode if relevant.)
+  | 'notification_delivered'
+  | 'notification_clicked'
   // Monetization
   | 'iap_viewed'
   | 'iap_purchased'
@@ -393,14 +398,13 @@ export const trackGameCompletion = (
   isFirstGame: boolean,
   gameMode?: string
 ): void => {
+  const mode = gameMode || 'unknown';
   if (isFirstGame) {
-    trackGrowthEvent('first_game_played', { score, wordCount });
-    // Funnel event for first game
-    trackGA4Event('funnel_first_game', { mode: gameMode || 'unknown' });
+    trackGrowthEvent('first_game_played', { score, wordCount, mode, gameMode: mode });
+    trackGA4Event('funnel_first_game', { mode });
   }
 
   if (isWinner) {
-    const mode = gameMode || 'unknown';
     trackGrowthEvent(isFirstGame ? 'first_game_won' : 'streak_continued', {
       score,
       wordCount,
