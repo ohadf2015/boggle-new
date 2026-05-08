@@ -27,6 +27,10 @@ export interface WordCraftState {
   history: MoveHistoryEntry[];
   lastError: string | null;
   consecutivePasses: number;
+  heat: number;
+  overdrive: boolean;
+  overdriveWarns: number;
+  burnout: boolean;
 }
 
 type Action =
@@ -39,7 +43,8 @@ type Action =
   | { type: 'SET_ERROR'; message: string | null }
   | { type: 'PASS' }
   | { type: 'SWAP'; tilesToReturn: RackTile[]; replacements: RackTile[] }
-  | { type: 'END_GAME' };
+  | { type: 'END_GAME' }
+  | { type: 'BURNOUT_SKIP' };
 
 const BOT_NAME = 'WordBot';
 
@@ -58,6 +63,10 @@ function buildInitial(seed: number): WordCraftState {
     history: [],
     lastError: null,
     consecutivePasses: 0,
+    heat: 0,
+    overdrive: false,
+    overdriveWarns: 0,
+    burnout: false,
   };
 }
 
@@ -153,6 +162,8 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
     }
     case 'END_GAME':
       return { ...state, turn: 'over' };
+    case 'BURNOUT_SKIP':
+      return { ...state, burnout: false, heat: 40, overdrive: false, overdriveWarns: 0, turn: 'bot' };
     default:
       return state;
   }
@@ -161,7 +172,11 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
 export interface UseWordCraftGameOptions {
   seed?: number;
   dict: Set<string> | null;
+  locale?: string;
+  boardSize?: 13 | 15;
 }
+
+export { reducer as wordCraftReducer, buildInitial as buildInitialState }
 
 export function useWordCraftGame({ seed = 1, dict }: UseWordCraftGameOptions) {
   const [state, dispatch] = useReducer(reducer, seed, buildInitial);
@@ -227,6 +242,8 @@ export function useWordCraftGame({ seed = 1, dict }: UseWordCraftGameOptions) {
 
   const pass = useCallback(() => dispatch({ type: 'PASS' }), []);
 
+  const burnoutSkip = useCallback(() => dispatch({ type: 'BURNOUT_SKIP' }), []);
+
   const swap = useCallback(
     (tilesToReturn: RackTile[]) => {
       if (state.turn !== 'player' && state.turn !== 'bot') return;
@@ -282,6 +299,7 @@ export function useWordCraftGame({ seed = 1, dict }: UseWordCraftGameOptions) {
     recallAll,
     submitMove,
     pass,
+    burnoutSkip,
     swap,
     isFirstMoveOfGame,
     tilesRemaining,
