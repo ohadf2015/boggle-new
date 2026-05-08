@@ -285,7 +285,7 @@ describe('pushNotificationTriggers', () => {
         body: 'Ohad invited you to play!',
         data: {
           type: 'game_invite',
-          deepLink: '/join/ABC123',
+          deepLink: '/multiplayer?room=ABC123',
         },
       }));
     });
