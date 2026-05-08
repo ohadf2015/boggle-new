@@ -48,12 +48,14 @@ type Action =
 
 const BOT_NAME = 'WordBot';
 
-function buildInitial(seed: number): WordCraftState {
+function buildInitial(init: number | { seed: number; boardSize?: 13 | 15 }): WordCraftState {
+  const seed = typeof init === 'number' ? init : init.seed;
+  const boardSize = typeof init === 'number' ? 15 : (init.boardSize ?? 15);
   const bag = createBag({ seed });
   const playerRack = draw(bag, RACK_SIZE);
   const botRack = draw(bag, RACK_SIZE);
   return {
-    board: createBoard(),
+    board: createBoard(boardSize),
     bag,
     player: { id: 'player', name: 'You', score: 0, rack: playerRack, isBot: false },
     bot: { id: 'bot', name: BOT_NAME, score: 0, rack: botRack, isBot: true },
@@ -214,8 +216,9 @@ export interface UseWordCraftGameOptions {
 
 export { reducer as wordCraftReducer, buildInitial as buildInitialState }
 
-export function useWordCraftGame({ seed = 1, dict }: UseWordCraftGameOptions) {
-  const [state, dispatch] = useReducer(reducer, seed, buildInitial);
+export function useWordCraftGame({ seed = 1, dict, boardSize = 15 }: UseWordCraftGameOptions) {
+  const initArg = useMemo(() => ({ seed, boardSize }), [seed, boardSize]);
+  const [state, dispatch] = useReducer(reducer, initArg, buildInitial);
   const isWordValid: DictionaryCheck = useCallback(
     (w: string) => (dict ? dict.has(w.toLowerCase()) || dict.has(w.toUpperCase()) : false),
     [dict],

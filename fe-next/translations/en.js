@@ -11605,6 +11605,22 @@ const en = {
       "outOfBounds": "Tile placed off the board.",
       "noTiles": "Place at least one tile to play.",
       "bagTooSmallToSwap": "Not enough tiles in the bag to swap."
+    },
+    "modeTitle": "WordCraft",
+    "modeDesc": "A crafty word grid battle — score big, trigger Overdrive, and outwit the bot!",
+    "betaLocked": "Beta access required",
+    "heatLabel": "Heat",
+    "overdrive": "OVERDRIVE!",
+    "burnout": "BURNED OUT — skipping turn…",
+    "encouragement": {
+      "0": "Nice word!",
+      "1": "Beautiful!",
+      "2": "Unstoppable!",
+      "3": "Sizzling!",
+      "4": "On fire!",
+      "5": "Magnificent!",
+      "6": "Brilliant!",
+      "7": "Keep it up!"
     }
   },
   mp: {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Swords, BookOpen, Map, Bomb, Zap, Link2, Brain, Sparkles, ChevronDown } from 'lucide-react';
+import { Swords, BookOpen, Map, Bomb, Zap, Link2, Brain, Sparkles, ChevronDown, Layers } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
@@ -12,6 +12,8 @@ import { useIsPracticeVeteran } from '@/hooks/useIsPracticeVeteran';
 import { useUserStats } from '@/hooks/useUserStats';
 import { THRESHOLDS } from '@/utils/featureGates';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useAuth } from '@/contexts/AuthContext';
+import { isWordCraftBetaUser } from '@/lib/word-craft/betaAccess';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 
 interface DailyChallengePreloadedStats {
@@ -45,7 +47,7 @@ interface LandingChallengeCardsProps {
  * `'connections'` and `'brainGym'` are landing-only synthetic modes routing
  * to `/connections` and `/brain` respectively.
  */
-type LandingCardKey = LandingGameMode | 'quickPlay' | 'connections' | 'brainGym';
+type LandingCardKey = LandingGameMode | 'quickPlay' | 'connections' | 'brainGym' | 'wordCraft';
 
 /** Default card order when no server data available */
 const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'quickPlay', 'arena', 'practice', 'blast', 'connections', 'brainGym'];
@@ -57,7 +59,7 @@ const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'quickPlay', 'arena', 'practic
  */
 const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice', 'quickPlay',
-  'connections', 'brainGym',
+  'connections', 'brainGym', 'wordCraft',
 ]);
 
 /** CSS stagger delay for each card index */
@@ -98,6 +100,7 @@ export function LandingChallengeCards({
   // "More Game Modes" collapse so a brand-new player doesn't see eight options
   // on first paint.
   const { userStats } = useUserStats();
+  const { user } = useAuth();
   const isNewcomerByGames =
     !isOnCrazyGamesPlatform &&
     !!userStats &&
@@ -118,6 +121,7 @@ export function LandingChallengeCards({
     const next = [...baseOrder];
     if (!next.includes('connections')) next.push('connections');
     if (!next.includes('brainGym')) next.push('brainGym');
+    if (!next.includes('wordCraft')) next.push('wordCraft');
     return next;
   })();
   // Guarantee blast always appears before adventure (regardless of popularity ranking)
@@ -285,13 +289,33 @@ export function LandingChallengeCards({
           </div>
         );
 
+      case 'wordCraft': {
+        const hasBetaAccess = isWordCraftBetaUser(user?.email);
+        return (
+          <div key="wordCraft" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+            <ModeCard
+              title={t('wordcraft.modeTitle')}
+              description={t('wordcraft.modeDesc')}
+              href={`/${language}/word-craft`}
+              icon={<Layers className="w-6 h-6" />}
+              modeImage="/modes/word-craft.png"
+              variant="purple"
+              badge="BETA"
+              locked={!hasBetaAccess}
+              lockedMessage={t('wordcraft.betaLocked')}
+              onClick={() => { trackModeSelected('wordCraft' as never, 'home'); trackLandingCtaClick('mode_card', { mode: 'wordCraft', variant: 'purple' }); }}
+            />
+          </div>
+        );
+      }
+
       default:
         return null;
     }
   };
 
   const MP_MODES = new Set<LandingCardKey>(['arena', 'quickPlay']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft']);
   // Newcomer-essential modes — always visible above the fold. Everything else
   // collapses into a "More Game Modes" expander to reduce choice paralysis
   // without removing the cards from the DOM (preserves SEO + AI-crawler links).

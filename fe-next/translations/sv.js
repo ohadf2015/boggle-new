@@ -11413,6 +11413,22 @@ const sv = {
       "outOfBounds": "Brickan placerad utanför brädet.",
       "noTiles": "Lägg minst en bricka för att spela.",
       "bagTooSmallToSwap": "Inte tillräckligt med brickor i påsen för att byta."
+    },
+    "modeTitle": "WordCraft",
+    "modeDesc": "Strategisk ordstrid — bygg poäng, aktivera Överdrift och slå boten!",
+    "betaLocked": "Kräver betatillgång",
+    "heatLabel": "Värme",
+    "overdrive": "ÖVERDRIFT!",
+    "burnout": "UTBRÄND — hoppar tur…",
+    "encouragement": {
+      "0": "Snyggt ord!",
+      "1": "Vackert!",
+      "2": "Oemotståndlig!",
+      "3": "Glödande!",
+      "4": "I brand!",
+      "5": "Magnifikt!",
+      "6": "Lysande!",
+      "7": "Fortsätt så!"
     }
   },
   mp: {

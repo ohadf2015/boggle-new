@@ -49,9 +49,15 @@ export function HeatMeter({ heat, overdrive, burnout, label }: HeatMeterProps) {
   useEffect(() => {
     if (!burnout || !containerRef.current) return
     gsap.to(containerRef.current, {
-      x: [-5, 5, -5, 5, 0],
-      duration: 0.3,
+      x: -5,
+      duration: 0.05,
       ease: 'power2.out',
+      onComplete: () => {
+        gsap.to(containerRef.current, { x: 5, duration: 0.05 })
+        gsap.to(containerRef.current, { x: -5, duration: 0.05, delay: 0.1 })
+        gsap.to(containerRef.current, { x: 5, duration: 0.05, delay: 0.15 })
+        gsap.to(containerRef.current, { x: 0, duration: 0.05, delay: 0.2 })
+      },
     })
   }, [burnout])
 

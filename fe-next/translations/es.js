@@ -11508,6 +11508,22 @@ const es = {
       "outOfBounds": "Ficha colocada fuera del tablero.",
       "noTiles": "Coloca al menos una ficha para jugar.",
       "bagTooSmallToSwap": "No hay suficientes fichas en la bolsa para cambiar."
+    },
+    "modeTitle": "WordCraft",
+    "modeDesc": "Batalla de palabras estratégica — acumula puntos, activa el Sobremarcha y vence al bot.",
+    "betaLocked": "Requiere acceso beta",
+    "heatLabel": "Calor",
+    "overdrive": "¡SOBREMARCHA!",
+    "burnout": "¡AGOTADO — saltando turno…",
+    "encouragement": {
+      "0": "¡Buena palabra!",
+      "1": "¡Hermoso!",
+      "2": "¡Imparable!",
+      "3": "¡Ardiente!",
+      "4": "¡En llamas!",
+      "5": "¡Magnífico!",
+      "6": "¡Brillante!",
+      "7": "¡Sigue así!"
     }
   },
   "connections": {
