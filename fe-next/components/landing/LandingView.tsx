@@ -32,6 +32,7 @@ const LandingAvatarTeaser = dynamic(() => import('./LandingAvatarTeaser').then(m
 import { LandingChallengeCards } from './LandingChallengeCards';
 import { LandingLeaderboardPreview } from './LandingLeaderboardPreview';
 import { LandingSeasonHero } from './LandingSeasonHero';
+import { LandingBottomCTA } from './LandingBottomCTA';
 
 // Below-the-fold sections — lazy load to speed up initial render
 // LiveActivityTicker moved out to reduce landing clutter
@@ -60,9 +61,11 @@ const PlayfulBackground = dynamic(
 interface LandingViewProps {
   /** Pre-fetched server data — eliminates client-side waterfall fetches */
   initialData?: LandingInitialData;
+  /** New users: callback to launch OnboardingFlow when they click play */
+  onStartOnboarding?: () => void;
 }
 
-const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
+const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboarding }) => {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, TRACKS } = useMusic();
@@ -145,7 +148,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
     loading: dailyChallengeStatus.loading,
   };
 
-  // FTUE is now handled by PageClient — LandingView only renders for returning users
+  // FTUE is triggered by LandingView via onStartOnboarding prop for new users
 
 
   return (
@@ -235,6 +238,12 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           <InlineBannerAd webZone="menu" className="my-4" />
           {/* B2 — CrazyGames home banner */}
           <CrazyGamesBanner size="728x90" className="my-4" />
+        </div>
+      )}
+
+      {onStartOnboarding && (
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+          <LandingBottomCTA onPlayClick={onStartOnboarding} />
         </div>
       )}
 

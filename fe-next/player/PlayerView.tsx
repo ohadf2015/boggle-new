@@ -140,6 +140,10 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     },
   });
 
+  // Destructure stable useCallback methods so effects can depend on them individually
+  // without re-firing on every render (gameTimer object is new each render).
+  const { reset: timerReset, setTime: timerSetTime, resume: timerResume } = gameTimer;
+
   // Use timer's remaining time for display
   // Note: Always use the actual timer value, not conditioned on gameActive
   // The timer is set during pendingGameStart processing before gameActive is true
@@ -322,9 +326,9 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       setGameActive(true);
       // Resume internal timer so local countdown ticks between server syncs.
       // reset() sets internalPaused=true (autoStart=false), and nothing else clears it.
-      gameTimer.resume();
+      timerResume();
     }
-  }, [showModeReveal, showStartAnimation, letterGrid, remainingTime, gameActive, waitingForResults, gameTimer]);
+  }, [showModeReveal, showStartAnimation, letterGrid, remainingTime, gameActive, waitingForResults, timerResume]);
 
   // Auto-dismiss mode reveal after 2 seconds, then trigger countdown.
   // MP enters round same for first-time + returning players (no cozy fork).
@@ -379,7 +383,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       if (pendingGameStart.letterGrid) setLetterGrid(pendingGameStart.letterGrid);
       if (pendingGameStart.timerSeconds) {
         totalGameTimeRef.current = pendingGameStart.timerSeconds;
-        gameTimer.setTime(pendingGameStart.timerSeconds);
+        timerSetTime(pendingGameStart.timerSeconds);
       }
       setMinWordLength(pendingGameStart.minWordLength ?? 2);
       if (pendingGameStart.language) setGameLanguage(pendingGameStart.language);
@@ -444,8 +448,8 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       if (pendingGameStart.timerSeconds) {
         totalGameTimeRef.current = pendingGameStart.timerSeconds;
         // Sync timer with pending game start
-        gameTimer.reset();
-        gameTimer.setTime(pendingGameStart.timerSeconds);
+        timerReset();
+        timerSetTime(pendingGameStart.timerSeconds);
       }
       setMinWordLength(pendingGameStart.minWordLength ?? 2);
       // Show mode reveal first, which will trigger countdown animation after 2s
@@ -460,9 +464,11 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         socket.emit('startGameAck', { messageId: pendingGameStart.messageId });
         logger.log('[PLAYER] Sent startGameAck for pending game start, messageId:', pendingGameStart.messageId);
       }
-    };
 
-    onGameStartConsumed();
+      // Consume AFTER setup so dep change doesn't trigger cleanup that cancels
+      // the delayed-start timeout (late-join path).
+      onGameStartConsumed();
+    };
 
     if (delay > 0) {
       // Late join - delay to show waiting screen briefly
@@ -473,7 +479,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       startGame();
       return;
     }
-  }, [pendingGameStart, socket, onGameStartConsumed, handleGameStartMusic, gameTimer, setFoundWords, setLetterGrid, setGameLanguage]);
+  }, [pendingGameStart, socket, onGameStartConsumed, handleGameStartMusic, timerReset, timerSetTime, setFoundWords, setLetterGrid, setGameLanguage]);
 
 
   // Word submission handler - adds word with pending validation state

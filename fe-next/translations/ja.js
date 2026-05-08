@@ -11277,6 +11277,7 @@ const ja = {
       "playCta": "プレイ",
       "playMicrocopy": "GO!",
       "browseRooms": "ルームを見る ↓",
+      "liveBadge": "ライブ",
       "aria": { "section": "CrazyGamesウェルカム" }
     }
   },

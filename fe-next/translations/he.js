@@ -11352,6 +11352,7 @@ const he = {
       "playCta": "שחק עכשיו",
       "playMicrocopy": "קדימה!",
       "browseRooms": "או דפדף בחדרים ↓",
+      "liveBadge": "פעיל",
       "aria": { "section": "ברוכים הבאים ל־CrazyGames" }
     }
   },

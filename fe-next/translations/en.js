@@ -11456,6 +11456,7 @@ const en = {
       "playCta": "PLAY NOW",
       "playMicrocopy": "GO!",
       "browseRooms": "Or browse rooms ↓",
+      "liveBadge": "LIVE",
       "aria": { "section": "CrazyGames welcome" }
     }
   },

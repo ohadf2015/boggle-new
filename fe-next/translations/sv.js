@@ -11345,6 +11345,7 @@ const sv = {
       "playCta": "SPELA NU",
       "playMicrocopy": "KÖR!",
       "browseRooms": "Eller bläddra i rum ↓",
+      "liveBadge": "LIVE",
       "aria": { "section": "CrazyGames-välkomst" }
     }
   },

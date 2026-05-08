@@ -167,7 +167,7 @@ describe('WiktionaryEsVerifier', () => {
 
     it('returns not_found on 404', async () => {
       const { HTTPError } = await import('ky');
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       mockGet.mockImplementationOnce(() => { throw new (HTTPError as any)(404); });
 
       const result = await verifyWordOnWiktionaryEs('xyznonexistent');

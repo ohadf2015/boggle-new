@@ -11440,6 +11440,7 @@ const es = {
       "playCta": "JUGAR YA",
       "playMicrocopy": "¡VAMOS!",
       "browseRooms": "O explora salas ↓",
+      "liveBadge": "EN VIVO",
       "aria": { "section": "Bienvenida de CrazyGames" }
     }
   },

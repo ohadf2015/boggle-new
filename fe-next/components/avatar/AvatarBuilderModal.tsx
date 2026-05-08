@@ -213,33 +213,37 @@ export default function AvatarBuilderModal({
         </div>
 
         {/* Category Tabs — scroll-snap row, icon-only on narrow, icon+label when room */}
-        <div
-          className="flex gap-1 overflow-x-auto px-3 sm:px-4 py-1 scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-          role="tablist"
-          aria-label={t('avatarBuilder.title')}
-        >
-          {ALL_CATEGORIES.filter(c => !c.maleOnly || config.gender === 'male').map(cat => {
-            const isActive = activeCategory === cat.key;
-            return (
-              <AdaptiveMotion.button
-                key={cat.key}
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => setActiveCategory(cat.key)}
-                whileTap={{ scale: 0.92 }}
-                transition={BUTTON_SPRING}
-                className={`shrink-0 snap-start min-h-[40px] flex items-center justify-center gap-1.5 px-2.5 @[24rem]:px-3 py-2 text-xs @[28rem]:text-sm font-bold rounded-neo whitespace-nowrap border-2 transition-colors ${
-                  isActive
-                    ? 'bg-neo-lime text-neo-black border-black shadow-hard-sm'
-                    : 'bg-neo-navy-light text-neo-white/70 border-transparent hover:border-neo-white/30 hover:bg-neo-navy-light/80'
-                }`}
-                title={t(cat.labelKey)}
-              >
-                <CategoryIcon category={cat.key} />
-                <span className="hidden @[28rem]:inline">{t(cat.labelKey)}</span>
-              </AdaptiveMotion.button>
-            );
-          })}
+        <div className="relative shrink-0">
+          <div
+            className="flex gap-1 overflow-x-auto px-3 sm:px-4 py-1 scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            role="tablist"
+            aria-label={t('avatarBuilder.title')}
+          >
+            {ALL_CATEGORIES.filter(c => !c.maleOnly || config.gender === 'male').map(cat => {
+              const isActive = activeCategory === cat.key;
+              return (
+                <AdaptiveMotion.button
+                  key={cat.key}
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setActiveCategory(cat.key)}
+                  whileTap={{ scale: 0.92 }}
+                  transition={BUTTON_SPRING}
+                  className={`shrink-0 snap-start min-h-[40px] flex items-center justify-center gap-1.5 px-2.5 py-2 text-xs @[38rem]:text-sm font-bold rounded-neo whitespace-nowrap border-2 transition-colors ${
+                    isActive
+                      ? 'bg-neo-lime text-neo-black border-black shadow-hard-sm'
+                      : 'bg-neo-navy-light text-neo-white/70 border-transparent hover:border-neo-white/30 hover:bg-neo-navy-light/80'
+                  }`}
+                  title={t(cat.labelKey)}
+                >
+                  <CategoryIcon category={cat.key} />
+                  <span className="hidden @[38rem]:inline">{t(cat.labelKey)}</span>
+                </AdaptiveMotion.button>
+              );
+            })}
+          </div>
+          {/* Right fade to signal scrollable tabs */}
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-neo-navy to-transparent @[38rem]:hidden" aria-hidden="true" />
         </div>
 
         {/* Options Grid — animated category transition */}

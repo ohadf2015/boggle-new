@@ -28,21 +28,21 @@ interface HomePageClientProps {
 }
 
 /**
- * Gate: new users (mobile AND desktop) → OnboardingFlow. Returning users → LandingView.
+ * Gate: returning users → LandingView (no CTA). New users → LandingView with
+ * onStartOnboarding CTA; OnboardingFlow mounts only after they click play.
  *
  * Detection is purely localStorage-based (`hasCompletedOnboarding`) — there is
- * no viewport branching, both form factors run the same FTUE. The check is
- * synchronous so there's no flash of LandingView before the onboarding renders.
- * Auth-based returning-player detection is handled inside LandingView for the
- * edge case of cleared localStorage.
+ * no viewport branching, both form factors run the same FTUE. New users see the
+ * landing page first so they can browse before committing to signup.
  */
 export default function HomePageClient({ initialData }: HomePageClientProps): React.JSX.Element {
-  // Synchronous check — runs during first render, not in an effect.
-  // hasSupabaseSession() is Layer 1: skip FTUE for auth users whose localStorage was cleared.
-  const [showFTUE, setShowFTUE] = useState(() => {
+  // Synchronous check: determine if user is new and parse URL invite params.
+  // Kept synchronous (in useState initializer) so invite is saved before any
+  // child effects that might redirect to /multiplayer read it.
+  const [isNewUser] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
-    if (hasCompletedOnboarding() || hasSupabaseSession()) return false;
-    // Save room invite (and optional host name) before onboarding replaces the view
+    const returning = hasCompletedOnboarding() || hasSupabaseSession();
+    // Save room invite (and optional host name) regardless of FTUE state
     const params = new URLSearchParams(window.location.search);
     const roomCode = params.get('room');
     if (roomCode) {
@@ -54,20 +54,25 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
       trackInviteLanded({
         roomCode,
         hasHostName: !!hostName,
-        isFirstTimeUser: true, // gated by hasCompletedOnboarding check above
+        isFirstTimeUser: !returning,
       });
     }
-    return true;
+    return !returning;
   });
 
-  const handleFTUEComplete = useCallback(() => {
-    setShowFTUE(false);
-  }, []);
+  const [showFTUE, setShowFTUE] = useState(false);
 
-  // New users go straight to onboarding — LandingView never mounts
+  const handleStartOnboarding = useCallback(() => setShowFTUE(true), []);
+  const handleFTUEComplete = useCallback(() => setShowFTUE(false), []);
+
   if (showFTUE) {
     return <OnboardingFlow onComplete={handleFTUEComplete} />;
   }
 
-  return <LandingView initialData={initialData} />;
+  return (
+    <LandingView
+      initialData={initialData}
+      onStartOnboarding={isNewUser ? handleStartOnboarding : undefined}
+    />
+  );
 }
