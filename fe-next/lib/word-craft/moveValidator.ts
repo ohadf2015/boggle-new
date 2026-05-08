@@ -1,5 +1,5 @@
 import type { PlacedTile, ScoringTile, Direction } from './types';
-import { BOARD_SIZE, CENTER, getCell, isFirstMove, isInBounds, type Board } from './board';
+import { CENTER, getCell, isFirstMove, isInBounds, type Board } from './board';
 import { scoreWord, scoreTurn, BINGO_THRESHOLD } from './scoring';
 
 export type MoveError =
@@ -116,7 +116,8 @@ function findMainWordSpan(
     if (!isInBounds(r, c) || !getCell(board, r, c).tile) break;
     minPos--;
   }
-  while (maxPos < BOARD_SIZE - 1) {
+  const maxBound = board.cells.length - 1;
+  while (maxPos < maxBound) {
     const r = direction === 'across' ? axisIndex : maxPos + 1;
     const c = direction === 'across' ? maxPos + 1 : axisIndex;
     if (!isInBounds(r, c) || !getCell(board, r, c).tile) break;
@@ -146,7 +147,8 @@ function findCrossWordSpan(
     if (!hasTileAt(r, c)) break;
     minPos--;
   }
-  while (maxPos < BOARD_SIZE - 1) {
+  const maxBound = board.cells.length - 1;
+  while (maxPos < maxBound) {
     const r = crossDirection === 'across' ? axisIndex : maxPos + 1;
     const c = crossDirection === 'across' ? maxPos + 1 : axisIndex;
     if (!hasTileAt(r, c)) break;

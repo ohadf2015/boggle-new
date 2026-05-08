@@ -1,5 +1,5 @@
 import type { PlacedTile, RackTile, Direction } from './types';
-import { BOARD_SIZE, CENTER, getCell, isFirstMove, isInBounds, type Board } from './board';
+import { CENTER, getCell, isFirstMove, isInBounds, type Board } from './board';
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 
 export interface BotMove {
@@ -97,11 +97,12 @@ export function findBestBotMove(
 
   let best: BotMove | null = null;
   const empty = isFirstMove(board);
+  const size = board.cells.length;
 
   for (const { word, tiles } of candidateWords) {
     for (const direction of ['across', 'down'] as Direction[]) {
-      for (let r = 0; r < BOARD_SIZE; r++) {
-        for (let c = 0; c < BOARD_SIZE; c++) {
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
           if (!candidateFitsInBounds(r, c, tiles.length, direction)) continue;
           if (candidateOverlapsExistingTile(board, r, c, tiles.length, direction)) continue;
           if (empty) {

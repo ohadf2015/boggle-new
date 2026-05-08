@@ -103,8 +103,9 @@ export function placeTiles(board: Board, tiles: PlacedTile[]): void {
 }
 
 export function isFirstMove(board: Board): boolean {
-  for (let r = 0; r < BOARD_SIZE; r++) {
-    for (let c = 0; c < BOARD_SIZE; c++) {
+  const size = board.cells.length;
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < board.cells[r].length; c++) {
       if (board.cells[r][c].tile) return false;
     }
   }
