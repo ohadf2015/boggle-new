@@ -1233,6 +1233,8 @@ const es = {
   },
   "multiplayerFlow": {
     "host": "Anfitrión",
+    "crazyGamesFriends": "Jugar con Amigos en CrazyGames",
+    "inviteFriend": "Invitar a un Amigo",
     "roomClosed": "Sala cerrada",
     "hostLeftModal": {
       "title": "El anfitrión se fue",
@@ -1537,6 +1539,8 @@ const es = {
     "enterFullscreen": "Pantalla completa",
     "exitFullscreen": "Salir de pantalla completa",
     "host": "ANFITRIÓN",
+    "timesUp": "¡SE ACABÓ EL TIEMPO!",
+    "timesUpSub": "¡Lápices al aire!",
     "hostBadge": "Este jugador es el anfitrión",
     "rankUp": "Subió",
     "rankDown": "Bajó",
@@ -4980,17 +4984,23 @@ const es = {
       "classic": {
         "line1": "Arrastra el dedo por las letras — no necesitan estar en fila.",
         "line2": "Las diagonales valen. ¡Cualquier dirección funciona!",
-        "line3": "Encuentra 3 palabras reales para ganar. Sin reloj, sin estrés."
+        "line3": "Encuentra 3 palabras reales para ganar. Sin reloj, sin estrés.",
+        "scoring1": "+2 puntos por letra.",
+        "scoring2": "Las rachas de combos añaden puntos extra."
       },
       "wordHunt": {
         "line1": "Hay una palabra secreta escondida en el tablero. ¡La categoría arriba es tu pista!",
         "line2": "Prueba cualquier palabra — los colores muestran qué letras están cerca de la respuesta.",
-        "line3": "Descubre la palabra secreta para ganar. Tómate todo el tiempo que quieras."
+        "line3": "Descubre la palabra secreta para ganar. Tómate todo el tiempo que quieras.",
+        "scoring1": "+20 puntos por la palabra objetivo.",
+        "scoring2": "+2 por letra para cualquier otra palabra válida."
       },
       "wheelRush": {
         "line1": "Toca las letras alrededor de la rueda para formar una palabra.",
         "line2": "La letra brillante del centro debe aparecer en cada palabra.",
-        "line3": "Encuentra 3 palabras reales para terminar — ¡tranqui!"
+        "line3": "Encuentra 3 palabras reales para terminar — ¡tranqui!",
+        "scoring1": "+1 punto por letra.",
+        "scoring2": "+5 de bonus por usar las 7 letras."
       }
     },
     "modifier": {
@@ -5309,6 +5319,10 @@ const es = {
       "socialProof": "Hay un montón de tableros en construcción ahora mismo."
     },
     "playingAs": "Jugando como",
+    "comeBackTomorrow": "¡Vuelve mañana!",
+    "milestoneReached": "¡Hito alcanzado!",
+    "rewardClaimed": "¡Recompensa reclamada!",
+    "streakFreezeEarned": "¡Congelación de racha obtenida!",
     "keepPlaying": "¡Vuelve mañana para un nuevo rompecabezas!",
     "guestPlayer": "Jugador invitado",
     "enterName": "Ingresa tu nombre",
@@ -5563,6 +5577,8 @@ const es = {
   },
   "wordHunt": {
     "title": "Caza de Palabras",
+    "play": "Jugar a Caza de Palabras",
+    "categoryHint": "Categoría: {{category}}",
     "dangerAlert": "¡Peligro! ¡Pocas vidas!",
     "eliminatedAlert": "¡Has sido eliminado!",
     "lastStanding": "¡Último en pie!",
@@ -5993,7 +6009,14 @@ const es = {
         "blitz": "Blitz",
         "survival": "Supervivencia"
       },
-      "sent": "¡Desafío enviado!"
+      "sent": "¡Desafío enviado!",
+      "accept": "Aceptar",
+      "accepted": "¡Desafío aceptado!",
+      "acceptFailed": "Error al aceptar el desafío",
+      "decline": "Rechazar",
+      "declined": "Desafío rechazado",
+      "friendAccepted": "¡{{name}} aceptó tu desafío!",
+      "received": "¡Desafío recibido!"
     },
     "copyInviteLink": "Copiar enlace de invitación",
     "linkCopied": "¡Enlace copiado!",
@@ -6055,7 +6078,12 @@ const es = {
     "youEliminated": "Has sido eliminado!",
     "playerLastLife": "esta en su ultima vida!",
     "yourLastLife": "ULTIMA VIDA!",
-    "botsJoined": "{{count}} oponentes se unieron — no hay humanos, ¡así que te tocan bots!"
+    "botsJoined": "{{count}} oponentes se unieron — no hay humanos, ¡así que te tocan bots!",
+    "nearRank": "¡Tan cerca de subir de rango!",
+    "oneMoreWin": "¡Una victoria más!",
+    "rankUp": "¡Subida de rango!",
+    "welcomeToTier": "¡Bienvenido a {{tier}}!",
+    "winStreak": "¡Racha de {{count}} victorias!"
   },
   "stats": {
     "games": "partidas",
@@ -7179,11 +7207,6 @@ const es = {
       "allQuestsComplete": "¡Todas las misiones diarias completas! ¡Bonus!",
       "dailyQuestBonusComplete": "¡Todas las misiones completas! +50 oro de bonificación"
     },
-    "share": {
-      "perfectClear": "¡Perfecto!",
-      "bestWord": "Mejor palabra",
-      "wordsFound": "palabras encontradas"
-    },
     "streak": {
       "days": "días de racha",
       "milestone3": "¡Racha de 3 días!",
@@ -7314,7 +7337,10 @@ const es = {
     "share": {
       "bossDefeated": "¡Derroté a {{boss}} en {{world}}!",
       "shareCard": "Compartir victoria",
-      "killingWord": "Palabra letal"
+      "killingWord": "Palabra letal",
+      "perfectClear": "Limpieza perfecta",
+      "bestWord": "Mejor palabra",
+      "wordsFound": "palabras encontradas"
     },
     "weeklyChallenge": {
       "title": "Desafío semanal",
@@ -8622,6 +8648,38 @@ const es = {
       "huntSuccess": "¡Objetivo encontrado en {{attempts}} intentos!",
       "huntFailed": "Palabra objetivo no encontrada",
       "wheelWords": "{{center}}/{{total}} palabras con letra central"
+    },
+    "ascension": {
+      "level1": "Novato",
+      "level2": "Aprendiz",
+      "level3": "Adepto",
+      "level4": "Hábil",
+      "level5": "Experto",
+      "level6": "Maestro",
+      "level7": "Gran Maestro",
+      "level8": "Leyenda",
+      "level9": "Mítico",
+      "level10": "Trascendente"
+    },
+    "consumables": {
+      "bossRevive": { "name": "Revivir al Jefe" },
+      "bossShield": { "name": "Escudo del Jefe" },
+      "doubleGold": { "name": "Oro Doble" },
+      "extraHint": { "name": "Pista Extra" },
+      "gridReroll": { "name": "Regenerar Cuadrícula" },
+      "objectiveSkip": { "name": "Saltar Objetivo" },
+      "perfectStar": { "name": "Estrella Perfecta" },
+      "timerExtension": { "name": "Extensión de Tiempo" }
+    },
+    "mutators": {
+      "blindMode": { "name": "Modo Ciego" },
+      "chaosGrid": { "name": "Cuadrícula del Caos" },
+      "fragile": { "name": "Frágil" },
+      "ironMan": { "name": "Hombre de Hierro" },
+      "minimalist": { "name": "Minimalista" },
+      "noHints": { "name": "Sin Pistas" },
+      "speedRun": { "name": "Velocidad" },
+      "wordMaster": { "name": "Maestro de Palabras" }
     }
   },
   "wheelRush": {
@@ -10834,6 +10892,7 @@ const es = {
     }
   },
   "wotd": {
+    "title": "Palabra del Día",
     "teaser": "Palabra del Día",
     "found": "La encontraste!",
     "foundPercent": "Solo el {{percent}}% de los jugadores la encontraron!",
@@ -11263,6 +11322,7 @@ const es = {
   "wordForge": {
     "title": "Forja de Palabras",
     "subtitle": "Deletrea palabras. Reúne runas. Rompe el récord.",
+    "go": "¡Adelante!",
     "startRun": "Iniciar partida",
     "round": "Ronda",
     "roundOf": "Ronda {{round}} de {{max}}",
@@ -11431,6 +11491,44 @@ const es = {
       "noTiles": "Coloca al menos una ficha para jugar.",
       "bagTooSmallToSwap": "No hay suficientes fichas en la bolsa para cambiar."
     }
+  },
+  "connections": {
+    "title": "Cadena de Palabras",
+    "subtitle": "¡Encuentra la palabra que conecta ambas!",
+    "placeholder": "Escribe la palabra puente...",
+    "submit": "Enviar",
+    "correct": "¡Correcto!",
+    "wrong": "Respuesta incorrecta",
+    "lives": "Vidas",
+    "score": "Puntuación",
+    "streak": "Racha",
+    "finished": "¡Terminaste!",
+    "finalScore": "Puntuación Final",
+    "playAgain": "Jugar de nuevo",
+    "loading": "Cargando...",
+    "noAccess": "Este modo de juego no está disponible.",
+    "hintLabel": "Pista",
+    "bonusPoints": "¡Bonus de racha!",
+    "wordChain": "PALABRA1 + ? + PALABRA2",
+    "giveUp": "Rendirse",
+    "solutionIs": "Solución",
+    "like": "Me gusta",
+    "dislike": "No me gusta",
+    "next": "Siguiente",
+    "rateThis": "Valora este puzzle",
+    "thanks": "Gracias por tu opinión",
+    "xpEarned": "XP Ganado",
+    "level": "Nivel",
+    "outOfLives": "¡Sin vidas!",
+    "reviveDescription": "Mira un breve anuncio para recargar tus vidas y continuar este nivel.",
+    "reviveAd": "Ver anuncio por 3 vidas",
+    "adminRefill": "Recargar vidas (admin)",
+    "quitToMenu": "Volver al menú",
+    "noAdAvailable": "No hay anuncio disponible ahora. Inténtalo más tarde.",
+    "revealHint": "Revelar pista",
+    "revealHintAd": "Ver anuncio por pista",
+    "revealAnswerAd": "Ver anuncio para revelar respuesta",
+    "adminGiveUp": "Saltar puzzle (admin)"
   }
 };
 
