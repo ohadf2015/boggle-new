@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite } from '@/utils/onboardingStorage';
 import { trackInviteLanded } from '@/utils/growthTracking';
+import { isOnboardingAllowedRoute } from '@/lib/onboarding/allowedRoutes';
 import { LandingView } from '@/components/landing';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
 
@@ -61,18 +63,27 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   });
 
   const [showFTUE, setShowFTUE] = useState(false);
+  // Defensive route allowlist: FTUE may only render on locale homepage.
+  // PageClient is mounted only at /[locale]/page.tsx today, so this is dormant
+  // for current users — but guards against a future hoist that would leak the
+  // FTUE onto blog/SEO/legal routes (and tank their CWV / SEO).
+  const pathname = usePathname();
+  const routeAllowsOnboarding = isOnboardingAllowedRoute(pathname);
 
-  const handleStartOnboarding = useCallback(() => setShowFTUE(true), []);
+  const handleStartOnboarding = useCallback(() => {
+    if (!routeAllowsOnboarding) return;
+    setShowFTUE(true);
+  }, [routeAllowsOnboarding]);
   const handleFTUEComplete = useCallback(() => setShowFTUE(false), []);
 
-  if (showFTUE) {
+  if (showFTUE && routeAllowsOnboarding) {
     return <OnboardingFlow onComplete={handleFTUEComplete} />;
   }
 
   return (
     <LandingView
       initialData={initialData}
-      onStartOnboarding={isNewUser ? handleStartOnboarding : undefined}
+      onStartOnboarding={isNewUser && routeAllowsOnboarding ? handleStartOnboarding : undefined}
     />
   );
 }

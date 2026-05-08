@@ -50,7 +50,7 @@ export const values: Record<string, number> = {
 
 export const distribution: Record<string, number> = {
   あ: 5,
-  い: 7,
+  い: 9,
   う: 3,
   え: 3,
   お: 3,
@@ -73,7 +73,7 @@ export const distribution: Record<string, number> = {
   に: 3,
   ぬ: 1,
   ね: 1,
-  の: 4,
+  の: 5,
   は: 2,
   ひ: 1,
   ふ: 1,
@@ -94,6 +94,6 @@ export const distribution: Record<string, number> = {
   ろ: 1,
   わ: 1,
   を: 1,
-  ん: 4,
-  _: 3,
+  ん: 2,
+  _: 2,
 };
