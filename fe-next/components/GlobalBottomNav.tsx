@@ -60,10 +60,16 @@ const INDICATOR_COLORS: Record<TabId, string> = {
     dynamic: 'bg-neo-cyan',
 };
 
-type DynamicSpec = Omit<TabConfig, 'id'>;
+// Optional `targetPath` lets a contextual tab navigate elsewhere instead of
+// being a no-op indicator. SEO landings use this to surface a Play CTA that
+// actually routes to `/multiplayer` — visitors arriving on `/online-word-games-
+// with-friends` were tapping the Friends tab (because no Play button existed)
+// and landing on the friends-management page, which is unrelated to playing.
+type DynamicSpec = Omit<TabConfig, 'id'> & { targetPath?: string };
 
 // Reusable specs for routes that share a contextual tab.
 const PLAY_SPEC: DynamicSpec = { labelKey: 'nav.play', icon: Swords,   color: 'text-neo-pink', glowColor: 'bg-neo-pink/15' };
+const PLAY_SPEC_LANDING: DynamicSpec = { ...PLAY_SPEC, targetPath: '/multiplayer' };
 const BLOG_SPEC: DynamicSpec = { labelKey: 'nav.blog', icon: BookOpen, color: 'text-neo-cyan', glowColor: 'bg-neo-cyan/15' };
 
 // Route → contextual tab mapping. Matched as exact OR `prefix + '/'` so unrelated
@@ -88,20 +94,34 @@ const DYNAMIC_ROUTES: ReadonlyArray<readonly [string, DynamicSpec]> = [
     ['/singleplayer',       { labelKey: 'nav.singleplayer', icon: Target,         color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
 ];
 
+// SEO landings whose primary intent is "play multiplayer / play with friends".
+// These get the Play contextual tab (with `targetPath: '/multiplayer'`) so a
+// visitor who arrived from search has a one-tap route into the lobby. Without
+// this, the Friends tab next door becomes the visually-obvious CTA — and
+// dumps players into the friends-management page instead.
+const MP_LANDING_PREFIXES: ReadonlyArray<string> = [
+    '/multiplayer-word-game-online',
+    '/online-word-games-with-friends',
+    '/words-with-friends-alternative',
+    '/hebrew-multiplayer-word-game',
+    '/swedish-multiplayer-word-game',
+    '/juego-de-palabras-multijugador',
+];
+
 // Content / SEO landing prefixes that all route into the Blog dynamic tab.
 // Editorial / static-content surfaces and slug-y SEO doorways live here. Game
 // surfaces (multiplayer, daily, brain…) belong in DYNAMIC_ROUTES instead.
+// MP-themed landings live in MP_LANDING_PREFIXES above and get Play, not Blog.
 const LANDING_PREFIXES: ReadonlyArray<string> = [
     '/about', '/faq', '/how-to-play', '/rules', '/glossary', '/guides',
     '/words', '/anagram', '/editorial-policy', '/legal', '/contact', '/accessibility',
     // English SEO landings
-    '/best-online-word-games', '/boggle-word-shake-free', '/multiplayer-word-game-online',
-    '/online-word-games-with-friends', '/play-boggle-online-free', '/word-games-online-free',
-    '/words-with-friends-alternative',
+    '/best-online-word-games', '/boggle-word-shake-free',
+    '/play-boggle-online-free', '/word-games-online-free',
     // Locale-specific landings
-    '/hebrew-classroom-vocabulary-games', '/hebrew-multiplayer-word-game',
-    '/japanese-word-game', '/swedish-multiplayer-word-game',
-    '/juego-de-palabras-multijugador', '/juegos-vocabulario-aula',
+    '/hebrew-classroom-vocabulary-games',
+    '/japanese-word-game',
+    '/juegos-vocabulario-aula',
     // Competitor comparison landings
     '/lexiclash-vs-apalabrados', '/lexiclash-vs-cabanagrams', '/lexiclash-vs-kahoot',
     '/lexiclash-vs-popple', '/lexiclash-vs-puzzly-words', '/lexiclash-vs-quizlet',
@@ -116,6 +136,7 @@ function resolveDynamic(cleanPath: string): DynamicSpec | null {
     for (const [prefix, spec] of DYNAMIC_ROUTES) {
         if (matchesPrefix(cleanPath, prefix)) return spec;
     }
+    if (MP_LANDING_PREFIXES.some((p) => matchesPrefix(cleanPath, p))) return PLAY_SPEC_LANDING;
     if (LANDING_PREFIXES.some((p) => matchesPrefix(cleanPath, p))) return BLOG_SPEC;
     return null;
 }
@@ -232,7 +253,16 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     }, [dynamicSpec]);
 
     const navigate = useCallback((tab: TabId) => {
-        if (tab === 'dynamic') return; // Already on this page — indicator only
+        if (tab === 'dynamic') {
+            // Most dynamic tabs are indicators for the current page (no-op on
+            // tap). SEO landings opt-in via `targetPath` so the Play tab on
+            // `/online-word-games-with-friends` actually lands users in the
+            // multiplayer lobby instead of doing nothing.
+            if (dynamicSpec?.targetPath) {
+                router.push(`/${language}${dynamicSpec.targetPath}`);
+            }
+            return;
+        }
         if (tab === 'friends' && !isAuthenticated) {
             setShowAuthModal(true);
             return;
@@ -243,7 +273,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
             friends: `/${language}/friends`,
         };
         router.push(routes[tab as Exclude<TabId, 'dynamic'>]);
-    }, [router, language, isAuthenticated]);
+    }, [router, language, isAuthenticated, dynamicSpec]);
 
     // pathsWithOwnNav — dedicated surfaces (admin/educator) that ship their own nav.
     // Game entrypoints (multiplayer, adventure, daily, brain, …) show the global nav on

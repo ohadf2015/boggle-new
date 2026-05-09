@@ -60,16 +60,19 @@ export default function PracticeHubClient({ locale }: Props) {
   };
 
   return (
-    <div className="min-h-[100dvh] w-full bg-linear-to-b from-neo-navy to-neo-navy-light px-6 py-10">
+    <div className="min-h-[100dvh] w-full bg-linear-to-b from-neo-navy to-neo-navy-light px-5 py-5 sm:py-8">
       <div className="max-w-md mx-auto">
         <PendingRoomBanner locale={locale} />
+        {/* Compact header: title row + progress chips inline. Was two stacked
+            blocks (~140px) consuming a quarter of the small-viewport budget;
+            now ~64px, leaving room for the three mode tiles without scroll. */}
         <AdaptiveMotion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="mb-6 text-center"
+          className="mb-4 flex items-center justify-between gap-3"
         >
-          <h1 className="text-3xl font-neo-display font-bold text-neo-cream mb-2 flex items-center justify-center gap-2">
+          <h1 className="text-2xl sm:text-3xl font-neo-display font-bold text-neo-cream flex items-center gap-2">
             <AdaptiveMotion.span
               aria-hidden
               animate={{ rotate: [0, 12, -8, 0] }}
@@ -79,18 +82,16 @@ export default function PracticeHubClient({ locale }: Props) {
             </AdaptiveMotion.span>
             <span>{t('practiceHub.title')}</span>
           </h1>
-        </AdaptiveMotion.div>
-
-        <div className="mb-6 flex flex-col items-center gap-2">
           <div
             data-testid="practice-progress-headline"
-            className="flex items-center justify-center gap-2 text-xs uppercase tracking-wider font-neo-display font-black text-neo-lime"
+            className="shrink-0 flex items-center gap-1.5 px-2 py-1 rounded-full bg-neo-navy/60 border border-neo-lime/40 text-[0.65rem] uppercase tracking-wider font-neo-display font-black text-neo-lime"
           >
             <span aria-hidden>★</span>
-            <span>
-              {t('practiceHub.progress', { done: completed.size, total: PRACTICE_MODES.length })}
-            </span>
+            <span>{t('practiceHub.progress', { done: completed.size, total: PRACTICE_MODES.length })}</span>
           </div>
+        </AdaptiveMotion.div>
+
+        <div className="mb-4 flex justify-center">
           <PracticeStreakChip />
         </div>
 
@@ -113,7 +114,7 @@ export default function PracticeHubClient({ locale }: Props) {
           </AdaptiveMotion.div>
         )}
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2.5">
           {PRACTICE_MODES.map((mode, idx) => {
             const isDone = completed.has(mode);
             return (
@@ -135,33 +136,26 @@ export default function PracticeHubClient({ locale }: Props) {
                       ? `${t(`gameModes.${mode}.name`)} — ${t('practiceHub.completedBadge')}`
                       : t(`gameModes.${mode}.name`)
                   }
-                  className={`relative flex items-center gap-3 rounded-neo border-2 ${MODE_ACCENT[mode]} ${MODE_TINT[mode]} px-3 py-3 transition-colors active:translate-y-px shadow-hard-sm overflow-hidden`}
+                  className={`relative flex items-center gap-3 rounded-neo border-2 ${MODE_ACCENT[mode]} ${MODE_TINT[mode]} px-3 py-2.5 transition-colors active:translate-y-px shadow-hard-sm overflow-hidden`}
                 >
-                  {/* Hero thumbnail — same image as the tutorial help modal,
-                      establishing visual continuity across the practice flow. */}
-                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-neo border-2 border-neo-black overflow-hidden bg-neo-navy">
+                  <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-neo border-2 border-neo-black overflow-hidden bg-neo-navy">
                     <Image
                       src={MODE_HERO[mode]}
                       alt=""
                       fill
-                      sizes="96px"
+                      sizes="80px"
                       className="object-cover"
                     />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h2 className="text-lg font-neo-display font-bold text-neo-cream flex items-center gap-1.5">
-                      <span aria-hidden className="text-base shrink-0">{MODE_EMOJI[mode]}</span>
+                    <h2 className="text-base sm:text-lg font-neo-display font-bold text-neo-cream flex items-center gap-1.5">
+                      <span aria-hidden className="text-sm shrink-0">{MODE_EMOJI[mode]}</span>
                       <span className="truncate">{t(`gameModes.${mode}.name`)}</span>
                     </h2>
-                    <p className="text-xs sm:text-sm font-neo-body text-neo-cream/90 mt-0.5 leading-snug pe-6">
+                    <p className="text-xs font-neo-body text-neo-cream/85 mt-0.5 leading-snug line-clamp-2 pe-6">
                       {t(`gameModes.${mode}.description`)}
                     </p>
-                    {isDone && (
-                      <p className="text-[10px] sm:text-xs font-neo-body text-neo-lime/90 mt-1 italic">
-                        {t('practiceHub.completedDesc')}
-                      </p>
-                    )}
                   </div>
 
                   {isDone && (
@@ -169,7 +163,7 @@ export default function PracticeHubClient({ locale }: Props) {
                       aria-hidden
                       animate={{ rotate: [0, -8, 8, 0] }}
                       transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 2.4, ease: 'easeInOut' }}
-                      className="absolute top-2 end-2 inline-flex items-center justify-center w-7 h-7 rounded-full bg-neo-lime text-neo-black border-2 border-neo-black font-neo-display font-black text-sm shadow-hard-sm"
+                      className="absolute top-1.5 end-1.5 inline-flex items-center justify-center w-6 h-6 rounded-full bg-neo-lime text-neo-black border-2 border-neo-black font-neo-display font-black text-xs shadow-hard-sm"
                     >
                       ✓
                     </AdaptiveMotion.span>

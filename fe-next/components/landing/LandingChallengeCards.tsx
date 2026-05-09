@@ -162,12 +162,16 @@ export function LandingChallengeCards({
 
     switch (mode) {
       case 'quickPlay':
+        // Lands on the multiplayer lobby (room list + create button). Was
+        // auto-creating a private bot room which surprised players — they
+        // expected to pick a room or invite friends. Bare /multiplayer gives
+        // them the full lobby surface with no forced auto-start.
         return (
           <div key="quickPlay" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
             <ModeCard
               title={t('landing.quickPlay')}
               description={t('landing.quickPlayDesc')}
-              href={`/${language}/multiplayer?quickPlay=true`}
+              href={`/${language}/multiplayer`}
               icon={<Zap className="w-6 h-6" />}
               modeImage="/modes/quick-play.png"
               variant="cyan"
@@ -319,7 +323,9 @@ export function LandingChallengeCards({
   // Newcomer-essential modes — always visible above the fold. Everything else
   // collapses into a "More Game Modes" expander to reduce choice paralysis
   // without removing the cards from the DOM (preserves SEO + AI-crawler links).
-  const ESSENTIAL_FOR_NEWBIES = new Set<LandingCardKey>(['daily', 'practice', 'quickPlay']);
+  // Arena (multiplayer) stays surfaced for newbies so the live-rooms entry
+  // point isn't buried — players consistently asked for it on landing.
+  const ESSENTIAL_FOR_NEWBIES = new Set<LandingCardKey>(['daily', 'practice', 'quickPlay', 'arena']);
 
   const heroCards = cardOrder.filter((m) => m === 'daily');
   const mpCardsAll = cardOrder.filter((m) => MP_MODES.has(m));

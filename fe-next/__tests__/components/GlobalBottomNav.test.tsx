@@ -327,9 +327,13 @@ describe('GlobalBottomNav', () => {
             (usePathname as Mock).mockReturnValue('/en/multiplayer-word-game-online');
             render(<GlobalBottomNav />);
 
-            // Should NOT show a Play tab; /multiplayer-word-game-online is a landing page → Blog tab
-            expect(screen.queryByRole('button', { name: /^play$/i })).not.toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /blog/i })).toHaveAttribute('aria-current', 'page');
+            // Multiplayer-themed SEO landing → Play tab (with targetPath
+            // pointing back to the real /multiplayer route). Previously rendered
+            // Blog, which led players into the friends-management page when they
+            // tapped Friends looking for a way to "play with friends".
+            const play = screen.getByRole('button', { name: /play/i });
+            expect(play).toHaveAttribute('aria-current', 'page');
+            expect(screen.queryByRole('button', { name: /blog/i })).not.toBeInTheDocument();
         });
     });
 
@@ -368,11 +372,7 @@ describe('GlobalBottomNav', () => {
             '/en/guides',
             '/en/words',
             '/en/anagram',
-            '/en/words-with-friends-alternative',
             '/en/best-online-word-games',
-            '/en/multiplayer-word-game-online',
-            '/he/hebrew-multiplayer-word-game',
-            '/es/juego-de-palabras-multijugador',
             '/en/lexiclash-vs-popple',
         ];
 
@@ -391,6 +391,39 @@ describe('GlobalBottomNav', () => {
             render(<GlobalBottomNav />);
 
             expect(screen.queryByRole('button', { name: /blog/i })).not.toBeInTheDocument();
+        });
+    });
+
+    describe('Play Tab on Multiplayer-Themed SEO Landings', () => {
+        // SEO landings whose user intent is clearly "play multiplayer" surface a
+        // Play tab in the bottom nav (with `targetPath: /multiplayer`) so visitors
+        // get a clear MP entry point. Without this, they tapped Friends and
+        // landed on the friends-management page — the original bug this fixes.
+        const mpLandingRoutes: Array<[string, string]> = [
+            ['/en/multiplayer-word-game-online', 'en'],
+            ['/en/online-word-games-with-friends', 'en'],
+            ['/en/words-with-friends-alternative', 'en'],
+            ['/he/hebrew-multiplayer-word-game', 'he'],
+            ['/sv/swedish-multiplayer-word-game', 'sv'],
+            ['/es/juego-de-palabras-multijugador', 'es'],
+        ];
+
+        it.each(mpLandingRoutes)('renders Play tab as active on %s', (path, lang) => {
+            (useLanguage as Mock).mockReturnValue({ t: mockT, language: lang });
+            (usePathname as Mock).mockReturnValue(path);
+            render(<GlobalBottomNav />);
+
+            const play = screen.getByRole('button', { name: /play/i });
+            expect(play).toHaveAttribute('aria-current', 'page');
+            expect(screen.queryByRole('button', { name: /blog/i })).not.toBeInTheDocument();
+        });
+
+        it('clicking Play tab on a MP landing routes to /multiplayer (not a no-op)', () => {
+            (usePathname as Mock).mockReturnValue('/en/online-word-games-with-friends');
+            render(<GlobalBottomNav />);
+
+            fireEvent.click(screen.getByRole('button', { name: /play/i }));
+            expect(mockPush).toHaveBeenCalledWith('/en/multiplayer');
         });
     });
 
