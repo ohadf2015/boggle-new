@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 import type { BlastGameState, BlastTileType, BlastObjective, BlastObjectiveProgress } from '../types';
+import type { BlastTileState } from '@/shared/types/blast';
+import { countJelly } from '../utils/blastJellyEngine';
 
 export interface UseBlastObjectivesParams {
   gameState: BlastGameState;
@@ -15,6 +17,10 @@ export interface UseBlastObjectivesParams {
   wordsFound: string[];
   /** Initial count of each tile type on the board (needed for clear_all_type) */
   initialTileTypeCounts?: Record<BlastTileType, number>;
+  /** Current per-cell tile state; needed for cc-mechanic objectives (clear_jelly etc.) */
+  tileStates?: BlastTileState[][];
+  /** Initial jelly cell count at wave start (denominator for clear_jelly progress). */
+  initialJellyCount?: number;
 }
 
 function getProgress(
@@ -23,6 +29,8 @@ function getProgress(
   tileTypeClears: Record<BlastTileType, number>,
   wordsFound: string[],
   initialTileTypeCounts?: Record<BlastTileType, number>,
+  tileStates?: BlastTileState[][],
+  initialJellyCount?: number,
 ): BlastObjectiveProgress {
   let current = 0;
   let target = objective.target;
@@ -73,6 +81,14 @@ function getProgress(
       }
       break;
     }
+
+    case 'clear_jelly': {
+      const initial = initialJellyCount ?? objective.target;
+      const remaining = tileStates ? countJelly(tileStates) : initial;
+      current = Math.max(0, initial - remaining);
+      target = initial;
+      break;
+    }
   }
 
   return {
@@ -88,12 +104,14 @@ export function useBlastObjectives({
   objectives,
   wordsFound,
   initialTileTypeCounts,
+  tileStates,
+  initialJellyCount,
 }: UseBlastObjectivesParams) {
   const objectiveProgress = useMemo(() =>
     objectives.map(obj =>
-      getProgress(obj, gameState, tileTypeClears, wordsFound, initialTileTypeCounts),
+      getProgress(obj, gameState, tileTypeClears, wordsFound, initialTileTypeCounts, tileStates, initialJellyCount),
     ),
-    [objectives, gameState, tileTypeClears, wordsFound, initialTileTypeCounts],
+    [objectives, gameState, tileTypeClears, wordsFound, initialTileTypeCounts, tileStates, initialJellyCount],
   );
 
   const allObjectivesComplete = useMemo(

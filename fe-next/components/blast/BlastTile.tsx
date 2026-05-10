@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { getTileTooltip } from './utils/blastTileTooltips';
 import { TILE_VISUALS, CLEARING_COLORS, CLEARING_ANIMS } from './blastTileVisuals';
 import { getCascadeFallStyle } from './blastCascadeStyle';
+import { BlastJellyOverlay } from './BlastJellyOverlay';
 
 const TILE_TEXT_SHADOW_STYLE = { textShadow: '0 1px 0 rgba(255,255,255,0.4), 0 2px 3px rgba(0,0,0,0.2)' } as const;
 const TILE_TEXT_SHADOW_LIGHT_STYLE = { textShadow: '0 1px 2px rgba(0,0,0,0.4)' } as const;
@@ -59,6 +60,8 @@ export interface BlastTileProps {
   isScanTarget?: 'rainbow';
   /** Color tag for color_power objectives (pink/cyan/lime) — applies pulsing glow */
   colorTag?: 'pink' | 'cyan' | 'lime';
+  /** Jelly layers beneath this cell for clear_jelly objective. Undefined/0 = no jelly. */
+  jellyLayers?: number;
   onClick?: () => void;
 }
 
@@ -195,7 +198,7 @@ export const BlastTile = memo(function BlastTile({
   letter, type, phase, isSelected, isCleared, hitsRemaining,
   fallOffset, clearRotate, spawnOffset, isNearMiss, activationEffect, isComboPreview,
   selectionIndex, selectionTotal, isLocked, countdown, fuseTimer, zonePreview,
-  isDiamondRevealed, innerType, isCascadeHighlight, portalPairIndex, isScanTarget, colorTag, onClick, col,
+  isDiamondRevealed, innerType, isCascadeHighlight, portalPairIndex, isScanTarget, colorTag, jellyLayers, onClick, col,
 }: BlastTileProps) {
   const reducedMotion = usePrefersReducedMotion();
   const { t } = useLanguage();
@@ -282,6 +285,7 @@ export const BlastTile = memo(function BlastTile({
       aria-label={`${letter}${type !== 'standard' ? ` ${type} tile` : ''}`}
       title={tooltip ? `${tooltip.name}: ${tooltip.desc}` : undefined}
     >
+      <BlastJellyOverlay layers={jellyLayers ?? 0} />
       <span className="relative z-10" style={visual.text === 'text-white' ? TILE_TEXT_SHADOW_LIGHT_STYLE : TILE_TEXT_SHADOW_STYLE}>{letter}</span>
       {visual.indicator && (
         <span className={`absolute top-0.5 inset-e-0.5 leading-none pointer-events-none ${visual.text ?? ''}`} aria-hidden="true">
