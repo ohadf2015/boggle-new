@@ -163,14 +163,20 @@ export function BlastView() {
       playWaveFailArpeggio();
     }
 
-    // Persist to DB and merge the server's enrichment (percentile, previousBest)
-    // back into results state so the rank card and PB delta render.
-    saveBlastResult(mergedResults, config.difficulty ?? 'medium', language).then(
-      (patch) => {
-        if (!patch) return;
-        setResults((prev) => (prev ? { ...prev, ...patch } : prev));
-      },
-    );
+    // Save gate: only persist progress when player either passed the wave (>=90% clear)
+    // or accepted the rewarded-ad continue offer. Wave-loss + ad declined = no DB write,
+    // no PB upsert, no XP, no leaderboard. The PostHog telemetry below still fires for
+    // funnel parity — that's analytics, not progress.
+    const passedWave = (mergedResults.clearPercentage ?? 0) >= 90;
+    const adWatched = mergedResults.adContinueUsed === true;
+    if (passedWave || adWatched) {
+      saveBlastResult(mergedResults, config.difficulty ?? 'medium', language).then(
+        (patch) => {
+          if (!patch) return;
+          setResults((prev) => (prev ? { ...prev, ...patch } : prev));
+        },
+      );
+    }
 
     // Canonical cross-mode funnel event. Without this PostHog only sees
     // game_started for blast (server-side blast_completed isn't on the unified

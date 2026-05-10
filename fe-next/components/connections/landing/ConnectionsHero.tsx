@@ -88,7 +88,7 @@ export default function ConnectionsHero({ locale, copy }: Props): React.JSX.Elem
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <Link
-          href={`/${locale}/connections#connections-game`}
+          href={`/${locale}/connections/play`}
           onClick={handlePrimary}
           data-testid="hero-cta-primary"
           className="inline-block rounded-neo border-4 border-neo-pink bg-neo-pink px-8 py-4 text-center font-neo-display font-black uppercase tracking-wide text-neo-white shadow-hard transition-all hover:shadow-hard-lg"

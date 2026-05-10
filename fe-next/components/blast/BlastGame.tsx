@@ -463,6 +463,9 @@ export function BlastGame({
   // Rewarded-ad "continue" offer — SP only, single-use per game.
   // While the modal is open we defer Sugar Crush so the player can revive cleanly.
   const hasUsedContinueRef = useRef(false);
+  // Distinct from hasUsedContinueRef: this only flips on accept, NOT decline.
+  // Plumbed into results so BlastView can gate save on "ad watched OR wave passed".
+  const adContinueAcceptedRef = useRef(false);
   const [continueDeclined, setContinueDeclined] = useState(false);
   // Suppress the offer once the wave goal is already met — the player has
   // effectively won the wave, so prompting for extra moves is noise. The
@@ -481,6 +484,7 @@ export function BlastGame({
 
   const handleContinueAccept = useCallback(() => {
     hasUsedContinueRef.current = true;
+    adContinueAcceptedRef.current = true;
     engine.revive(BLAST_CONTINUE_BONUS_MOVES);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- engine.revive method ref
   }, [engine.revive]);
@@ -496,15 +500,14 @@ export function BlastGame({
     const targetObj = objectives.objectiveProgress.find(
       p => p.objective.type === 'target_word',
     );
-    if (targetObj?.objective.targetWord) {
-      onGameEnd({
-        ...results,
-        targetWord: targetObj.objective.targetWord,
-        targetWordFound: targetObj.isComplete,
-      });
-    } else {
-      onGameEnd(results);
-    }
+    const enriched: BlastResultsData = {
+      ...results,
+      adContinueUsed: adContinueAcceptedRef.current,
+      ...(targetObj?.objective.targetWord
+        ? { targetWord: targetObj.objective.targetWord, targetWordFound: targetObj.isComplete }
+        : {}),
+    };
+    onGameEnd(enriched);
   }, [objectives.objectiveProgress, onGameEnd]);
 
   // Game end detection + Sugar Crush (extracted to useBlastGameEnd)

@@ -23,7 +23,7 @@ export default function ConnectionsFooterCTA({ locale, copy }: Props): React.JSX
         </h2>
         <p className="mb-6 text-base text-neo-cream">{copy.body}</p>
         <Link
-          href={`/${locale}/connections#connections-game`}
+          href={`/${locale}/connections/play`}
           onClick={handleClick}
           data-testid="footer-cta-button"
           className="inline-block rounded-neo border-4 border-neo-black bg-neo-navy px-8 py-4 font-neo-display text-base font-black uppercase tracking-widest text-neo-white shadow-hard transition-all hover:translate-y-[-2px] hover:shadow-hard-lg"

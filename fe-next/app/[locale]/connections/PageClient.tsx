@@ -38,7 +38,7 @@ export default function ConnectionsPageClient({ locale, copy, renderLanding }: P
   }, [locale, renderLanding]);
 
   if (!renderLanding) {
-    // Locale not supported for landing — render game only (no regression for direct visitors).
+    // Locale not supported for landing — render game directly so direct visitors aren't stranded.
     return (
       <div className="flex-1 flex flex-col min-h-0">
         <Suspense fallback={<LoadingFallback />}>
@@ -63,12 +63,6 @@ export default function ConnectionsPageClient({ locale, copy, renderLanding }: P
         label={copy.footerCta.button}
         copy={copy}
       />
-
-      <div id="connections-game" className="scroll-mt-16 border-t-3 border-neo-black bg-neo-navy">
-        <Suspense fallback={<LoadingFallback />}>
-          <ConnectionsGame />
-        </Suspense>
-      </div>
     </main>
   );
 }

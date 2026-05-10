@@ -132,6 +132,10 @@ export interface BlastResultsData {
    *  target_word objective. */
   targetWord?: string;
   targetWordFound?: boolean;
+  /** True when the player accepted the rewarded-ad continue offer at any point in this run.
+   *  Gates progress persistence: a wave-loss with no ad watched (and < 90% clear) must NOT
+   *  save score/PB/leaderboard/XP — see BlastView.handleGameEnd save gate. */
+  adContinueUsed?: boolean;
 }
 
 // ==================== Special Tile Effects ====================
