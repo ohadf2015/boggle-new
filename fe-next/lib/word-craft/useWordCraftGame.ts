@@ -5,6 +5,7 @@ import { createBoard, getCell, isFirstMove, type Board } from './board';
 import { createBag, draw, RACK_SIZE, remaining, swap as swapBag, type SupportedLocale, type TileBag } from './tileBag';
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 import { findBestBotMove } from './botMove';
+import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
 import type { PlacedTile, PlayerState, RackTile } from './types';
 
 export type Turn = 'player' | 'bot' | 'over';
@@ -44,7 +45,8 @@ type Action =
   | { type: 'PASS' }
   | { type: 'SWAP'; tilesToReturn: RackTile[]; replacements: RackTile[] }
   | { type: 'END_GAME' }
-  | { type: 'BURNOUT_SKIP' };
+  | { type: 'BURNOUT_SKIP' }
+  | { type: 'RESET'; seed: number; boardSize: 13 | 15; locale: SupportedLocale };
 
 const BOT_NAME = 'WordBot';
 
@@ -203,6 +205,10 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
     // Player skips turn during burnout — heat resets to 40, turn passes to bot.
     case 'BURNOUT_SKIP':
       return { ...state, burnout: false, heat: 40, overdrive: false, overdriveWarns: 0, turn: 'bot' };
+    // Used when locale or board size changes mid-session — wipes the game so a
+    // Hebrew player who switched from /en doesn't keep the English bag.
+    case 'RESET':
+      return buildInitial({ seed: action.seed, boardSize: action.boardSize, locale: action.locale });
     default:
       return state;
   }
@@ -220,10 +226,49 @@ export { reducer as wordCraftReducer, buildInitial as buildInitialState }
 export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15 }: UseWordCraftGameOptions) {
   const initArg = useMemo(() => ({ seed, boardSize, locale }), [seed, boardSize, locale]);
   const [state, dispatch] = useReducer(reducer, initArg, buildInitial);
+
+  // Locale-aware dict lookup. Hebrew dict is loaded with sofit→regular
+  // normalization (see /api/word-craft/wordlist) but player tiles still carry
+  // sofit forms (ך ם ן ף ץ), so we must normalize the player's word too. Same
+  // story for Spanish accents (ESTÁ vs ESTA).
   const isWordValid: DictionaryCheck = useCallback(
-    (w: string) => (dict ? dict.has(w.toLowerCase()) || dict.has(w.toUpperCase()) : false),
-    [dict],
+    (w: string) => {
+      if (!dict) return false;
+      const candidates = new Set<string>();
+      const lower = w.toLowerCase();
+      const upper = w.toUpperCase();
+      candidates.add(lower);
+      candidates.add(upper);
+      if (locale === 'he') {
+        const norm = normalizeHebrewWord(w);
+        candidates.add(norm);
+        candidates.add(norm.toLowerCase());
+        candidates.add(norm.toUpperCase());
+      }
+      if (locale === 'es') {
+        const norm = normalizeSpanishWord(w);
+        candidates.add(norm);
+        candidates.add(norm.toLowerCase());
+        candidates.add(norm.toUpperCase());
+      }
+      for (const c of candidates) {
+        if (dict.has(c)) return true;
+      }
+      return false;
+    },
+    [dict, locale],
   );
+
+  // Locale or board-size flipping mid-session must restart the game so the
+  // bag matches the active alphabet. (useReducer init is a one-shot so the
+  // useMemo above isn't enough.)
+  const previousResetKeyRef = useRef(`${locale}|${boardSize}`);
+  useEffect(() => {
+    const key = `${locale}|${boardSize}`;
+    if (previousResetKeyRef.current === key) return;
+    previousResetKeyRef.current = key;
+    dispatch({ type: 'RESET', seed, boardSize, locale });
+  }, [locale, boardSize, seed]);
 
   const selectRackTile = useCallback(
     (id: string | null) => dispatch({ type: 'SELECT_RACK_TILE', id }),

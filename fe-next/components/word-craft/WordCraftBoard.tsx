@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useMemo } from 'react';
-import { BOARD_SIZE, CENTER, type Board } from '@/lib/word-craft/board';
+import { CENTER, type Board } from '@/lib/word-craft/board';
 import type { PlacedTile } from '@/lib/word-craft/types';
 import { cn } from '@/lib/utils';
 
@@ -61,23 +61,29 @@ function WordCraftBoardImpl({
   isFirstMove,
   dragHoverCell,
 }: WordCraftBoardProps) {
+  const size = board.cells.length;
   const pendingByCoord = new Map<string, PlacedTile>();
   for (const p of pendingPlacements) pendingByCoord.set(`${p.row},${p.col}`, p);
 
   const axisHintCells = useMemo(
-    () => computeAxisHintCells(pendingPlacements, board.cells.length),
-    [pendingPlacements, board.cells.length],
+    () => computeAxisHintCells(pendingPlacements, size),
+    [pendingPlacements, size],
   );
+
+  // Fewer cells → larger fonts. 11/13/15 boards each get a tuned glyph size.
+  const tileFontClass = size <= 11 ? 'text-lg sm:text-xl' : size === 13 ? 'text-base sm:text-lg' : 'text-sm sm:text-base';
+  const multFontClass = size <= 11 ? 'text-[12px] sm:text-[14px]' : size === 13 ? 'text-[11px] sm:text-[13px]' : 'text-[10px] sm:text-[12px]';
 
   return (
     <div
       role="grid"
       aria-label="WordCraft board"
       data-tile-selected={hasSelectedTile ? 'true' : undefined}
+      data-board-size={size}
       className="grid bg-black border-neo-thick border-black rounded-neo p-1.5 shadow-hard-lg w-full h-full"
       style={{
-        gridTemplateColumns: `repeat(${BOARD_SIZE}, minmax(0, 1fr))`,
-        gridTemplateRows: `repeat(${BOARD_SIZE}, minmax(0, 1fr))`,
+        gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`,
+        gridTemplateRows: `repeat(${size}, minmax(0, 1fr))`,
         gap: 2,
       }}
     >
@@ -138,27 +144,27 @@ function WordCraftBoardImpl({
               style={{ minWidth: 0 }}
             >
               {placedTile ? (
-                <span className="wc-tile-glyph text-sm sm:text-base">
+                <span className={cn('wc-tile-glyph', tileFontClass)}>
                   {placedTile.letter === '_' ? '·' : placedTile.letter}
                 </span>
               ) : pending ? (
-                <span className="wc-tile-glyph text-sm sm:text-base">
+                <span className={cn('wc-tile-glyph', tileFontClass)}>
                   {pending.letter === '_' ? '·' : pending.letter}
                 </span>
               ) : isAxisHint ? (
                 // tiny dot hints player at where next tile in a line could go
                 <span aria-hidden className="block w-1.5 h-1.5 rounded-full bg-neo-cyan/60" />
               ) : isCenter ? (
-                <span aria-hidden className="text-base sm:text-lg drop-shadow">★</span>
+                <span aria-hidden className={cn('drop-shadow', size <= 11 ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg')}>★</span>
               ) : premium ? (
                 <>
-                  <span className={cn('wc-mult text-[10px] sm:text-[12px]', PREMIUM_INK[premiumKey])}>
+                  <span className={cn('wc-mult', multFontClass, PREMIUM_INK[premiumKey])}>
                     {premium.mult}
                   </span>
                   <span
                     aria-hidden
                     className={cn(
-                      'absolute bottom-0.5 end-0.5 text-[7px] sm:text-[8px] font-black opacity-50',
+                      'absolute bottom-0.5 end-0.5 text-[7px] sm:text-[9px] font-black opacity-50',
                       PREMIUM_INK[premiumKey],
                     )}
                   >

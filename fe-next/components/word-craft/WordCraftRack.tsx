@@ -53,11 +53,13 @@ function WordCraftRackImpl({
       data-axis-locked={axisLocked ? 'true' : undefined}
       lang={locale}
       className={cn(
-        // Horizontal scroll-snap rail: tiles never wrap. On wide phones (≥390px)
-        // 7 tiles fit naturally; on narrower viewports the rail scrolls with snap.
-        'flex gap-2 sm:gap-3 items-center justify-center p-3 pt-5 shrink-0',
-        'overflow-x-auto overflow-y-hidden flex-nowrap',
-        'snap-x snap-mandatory scroll-px-4 scrollbar-none',
+        // Horizontal scroll-snap rail: tiles never wrap. We do NOT use
+        // justify-center because that traps overflowed tiles outside the
+        // visible area on narrow phones. Instead a wrapper inside centers
+        // when content fits, and the outer scroller is justify-start so
+        // the first tile is always reachable from the scroll-start edge.
+        'shrink-0 overflow-x-auto overflow-y-hidden',
+        'snap-x snap-mandatory scrollbar-none',
         'bg-black/20 rounded-neo transition-shadow',
         hintPick && 'wc-rack-glow',
       )}
@@ -65,8 +67,17 @@ function WordCraftRackImpl({
         // Keep contents readable: maintain at least one tile-height so layout
         // doesn't collapse if rack briefly empties.
         minHeight: '5.5rem',
+        // End-of-content padding ensures the last tile can scroll fully into
+        // view without being clipped by the scroll viewport edge.
+        scrollPaddingInline: '1rem',
       }}
     >
+      <div
+        className={cn(
+          'flex gap-2 sm:gap-3 items-center justify-start p-3 pt-5',
+          'mx-auto w-fit max-w-full flex-nowrap',
+        )}
+      >
       {tiles.map((tile, idx) => {
         const isPending = pendingIds.has(tile.id);
         const isSelected = selectedId === tile.id;
@@ -127,6 +138,7 @@ function WordCraftRackImpl({
           </button>
         );
       })}
+      </div>
     </div>
   );
 }
