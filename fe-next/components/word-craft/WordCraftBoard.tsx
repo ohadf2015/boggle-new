@@ -19,6 +19,8 @@ export interface WordCraftBoardProps {
   dragHoverCell?: string | null;
   /** Active locale — drives Hebrew sofit auto-display */
   locale?: string;
+  /** Keyboard reticle position — renders a focus ring on this cell */
+  reticle?: { row: number; col: number } | null;
 }
 
 const PREMIUM_MULT: Record<string, { mult: '×2' | '×3'; kind: 'L' | 'W' }> = {
@@ -64,6 +66,7 @@ function WordCraftBoardImpl({
   isFirstMove,
   dragHoverCell,
   locale = 'en',
+  reticle,
 }: WordCraftBoardProps) {
   const size = board.cells.length;
   const pendingByCoord = new Map<string, PlacedTile>();
@@ -104,6 +107,7 @@ function WordCraftBoardImpl({
           const inviteCenter = isCenter && isEmpty && isFirstMove && !disabled;
           const isDragTarget = dragHoverCell === key && isEmpty;
           const isAxisHint = axisHintCells.has(key) && isEmpty && !disabled;
+          const isReticle = reticle?.row === r && reticle?.col === c;
           const premium = cell.premium ? PREMIUM_MULT[cell.premium] : null;
 
           return (
@@ -118,6 +122,7 @@ function WordCraftBoardImpl({
               data-cell-center-ping={inviteCenter ? 'true' : undefined}
               data-drag-target={isDragTarget ? 'true' : undefined}
               data-axis-hint={isAxisHint ? 'true' : undefined}
+              data-reticle={isReticle ? 'true' : undefined}
               aria-label={`row ${r + 1} column ${c + 1}${cell.premium ? ` ${cell.premium}` : ''}`}
               disabled={!isInteractive}
               onClick={() => {
@@ -140,6 +145,7 @@ function WordCraftBoardImpl({
                       : (cell.premium && PREMIUM_WASH[cell.premium]) || 'bg-neo-navy-light/40',
                 isDragTarget && 'bg-neo-cyan/30 ring-4 ring-neo-cyan scale-110 z-10',
                 isAxisHint && !isDragTarget && 'wc-axis-hint',
+                isReticle && !isDragTarget && 'ring-4 ring-neo-yellow ring-offset-1 ring-offset-black z-10',
                 !isInteractive && !pending && 'cursor-not-allowed',
                 isInteractive && !pending && 'hover:bg-neo-cyan/15 active:scale-95',
                 inviteEmpty && 'wc-cell-invite',

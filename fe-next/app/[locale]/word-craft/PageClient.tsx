@@ -489,6 +489,65 @@ export default function WordCraftPageClient() {
     pendingIdsSetRef.current = new Set(game.state.pendingPlacements.map((p) => p.rackTileId));
   }, [game.state.pendingPlacements]);
 
+  // --- Arrow-key reticle ---
+  // Activated by first arrow press (or Tab into the board). The reticle is a
+  // golden focus ring on a board cell; Space drops the currently selected
+  // rack tile there. We wrap-around at edges (friendlier than clamp on a
+  // 13/15 grid) and only preventDefault on arrow keys when the reticle is
+  // engaged so we don't hijack page scroll on routes the player isn't on.
+  const [reticle, setReticle] = useState<{ row: number; col: number } | null>(null);
+  useEffect(() => {
+    if (game.state.turn !== 'player') return;
+    const onKey = (ev: KeyboardEvent) => {
+      const target = ev.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+      const isArrow = ev.key === 'ArrowUp' || ev.key === 'ArrowDown' || ev.key === 'ArrowLeft' || ev.key === 'ArrowRight';
+      if (!isArrow && ev.key !== ' ') return;
+
+      const size = game.state.board.cells.length;
+      const wrap = (n: number) => (n + size) % size;
+
+      if (isArrow) {
+        ev.preventDefault();
+        setReticle((prev) => {
+          // First arrow tap with no reticle → land on center.
+          if (!prev) {
+            const center = Math.floor(size / 2);
+            return { row: center, col: center };
+          }
+          if (ev.key === 'ArrowUp') return { row: wrap(prev.row - 1), col: prev.col };
+          if (ev.key === 'ArrowDown') return { row: wrap(prev.row + 1), col: prev.col };
+          if (ev.key === 'ArrowLeft') return { row: prev.row, col: wrap(prev.col - 1) };
+          if (ev.key === 'ArrowRight') return { row: prev.row, col: wrap(prev.col + 1) };
+          return prev;
+        });
+        return;
+      }
+
+      // Space → drop selected tile at reticle, or fast-tap if axis locked.
+      if (ev.key === ' ' && reticle) {
+        ev.preventDefault();
+        const sel = game.state.selectedRackTileId
+          ? game.state.player.rack.find((t) => t.id === game.state.selectedRackTileId)
+          : null;
+        if (sel) {
+          inputCountsRef.current.tap += 1;
+          game.placeOnBoard(reticle.row, reticle.col);
+        }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [game.state.turn, game.state.board.cells.length, game, reticle]);
+
+  // Drop the reticle when the turn ends so the gold ring doesn't linger
+  // through the bot's turn.
+  useEffect(() => {
+    if (game.state.turn !== 'player') setReticle(null);
+  }, [game.state.turn]);
+
   if (authLoading || !isBetaUser) {
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
@@ -651,6 +710,7 @@ export default function WordCraftPageClient() {
               isFirstMove={isFirstMove}
               dragHoverCell={drag?.active ? drag.hoverCell : null}
               locale={locale}
+              reticle={reticle}
             />
             </WordCraftZoomShell>
             {scoreFloat ? (
