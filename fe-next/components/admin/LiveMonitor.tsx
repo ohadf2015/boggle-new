@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, Users, Gamepad2, Wifi, Clock, Crown, Bot, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,20 @@ interface LivePlayer {
   presence: 'active' | 'idle' | 'afk' | 'disconnected';
   score: number;
   isAuthenticated: boolean;
+  /** Auth user id for linking to admin player profile (null for guests/bots) */
+  playerId?: string | null;
+}
+
+interface LiveSinglePlayerSession {
+  sessionId: string;
+  username: string;
+  avatar: { emoji?: string; color?: string; avatarImage?: string; customAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig } | null;
+  language: string;
+  mode: string;
+  score: number;
+  isAuthenticated: boolean;
+  playerId: string | null;
+  startedAt: number;
 }
 
 interface LiveGame {
@@ -34,6 +49,7 @@ interface LiveGame {
 
 interface LiveGamesResponse {
   games: LiveGame[];
+  singlePlayers?: LiveSinglePlayerSession[];
   stats: {
     activeGames: number;
     playersInGames: number;
@@ -179,7 +195,12 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
     );
   }
 
-  const { games = [], stats } = data || { games: [], stats: { activeGames: 0, playersInGames: 0, socketConnections: 0, singlePlayerCount: 0 } };
+  const { games = [], singlePlayers = [], stats } = data || {
+    games: [],
+    singlePlayers: [] as LiveSinglePlayerSession[],
+    stats: { activeGames: 0, playersInGames: 0, socketConnections: 0, singlePlayerCount: 0 },
+  };
+  const hasAnyLive = games.length > 0 || singlePlayers.length > 0;
 
   return (
     <div className="space-y-6">
@@ -254,7 +275,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
       </div>
 
       {/* Games Grid or Empty State */}
-      {games.length === 0 ? (
+      {!hasAnyLive ? (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -271,61 +292,102 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
       ) : (
         <>
           {/* Active Games Section */}
-          <div>
-            <h2 className="text-lg font-neo-display text-neo-white mb-4">
-              {t('admin.live.activeGames')}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <AnimatePresence mode="popLayout">
-                {games.map((game) => (
-                  <GameCard key={game.gameCode} game={game} t={t} />
-                ))}
-              </AnimatePresence>
+          {games.length > 0 && (
+            <div>
+              <h2 className="text-lg font-neo-display text-neo-white mb-4">
+                {t('admin.live.activeGames')}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <AnimatePresence mode="popLayout">
+                  {games.map((game) => (
+                    <GameCard key={game.gameCode} game={game} t={t} />
+                  ))}
+                </AnimatePresence>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Single Player Live Sessions */}
+          {singlePlayers.length > 0 && (
+            <div>
+              <h2 className="text-lg font-neo-display text-neo-white mb-4">
+                {t('admin.live.singlePlayerLive')}
+              </h2>
+              <div className="bg-slate-800/50 rounded-neo border-neo border-black overflow-hidden overflow-x-auto">
+                <table className="w-full min-w-[600px]">
+                  <thead className="bg-slate-700/50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
+                        {t('admin.live.player')}
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
+                        {t('admin.live.mode')}
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
+                        {t('admin.live.score')}
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
+                        {t('admin.live.started')}
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
+                        {t('admin.live.type')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-700">
+                    {singlePlayers.map((sp) => (
+                      <SinglePlayerRow key={sp.sessionId} session={sp} t={t} />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           {/* All Connected Players Table */}
-          <div>
-            <h2 className="text-lg font-neo-display text-neo-white mb-4">
-              {t('admin.live.connectedPlayers')}
-            </h2>
-            <div className="bg-slate-800/50 rounded-neo border-neo border-black overflow-hidden overflow-x-auto">
-              <table className="w-full min-w-[600px]">
-                <thead className="bg-slate-700/50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
-                      {t('admin.live.player')}
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
-                      {t('admin.live.game')}
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
-                      {t('admin.live.status')}
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
-                      {t('admin.live.score')}
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
-                      {t('admin.live.type')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-700">
-                  {games.flatMap((game) =>
-                    game.players.map((player) => (
-                      <PlayerRow
-                        key={`${game.gameCode}-${player.username}`}
-                        player={player}
-                        gameCode={game.gameCode}
-                        language={game.language}
-                        t={t}
-                      />
-                    ))
-                  )}
-                </tbody>
-              </table>
+          {games.length > 0 && (
+            <div>
+              <h2 className="text-lg font-neo-display text-neo-white mb-4">
+                {t('admin.live.connectedPlayers')}
+              </h2>
+              <div className="bg-slate-800/50 rounded-neo border-neo border-black overflow-hidden overflow-x-auto">
+                <table className="w-full min-w-[600px]">
+                  <thead className="bg-slate-700/50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
+                        {t('admin.live.player')}
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
+                        {t('admin.live.game')}
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
+                        {t('admin.live.status')}
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
+                        {t('admin.live.score')}
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
+                        {t('admin.live.type')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-700">
+                    {games.flatMap((game) =>
+                      game.players.map((player) => (
+                        <PlayerRow
+                          key={`${game.gameCode}-${player.username}`}
+                          player={player}
+                          gameCode={game.gameCode}
+                          language={game.language}
+                          t={t}
+                        />
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
         </>
       )}
 
@@ -377,8 +439,14 @@ function GameCard({ game, t }: { game: LiveGame; t: (key: string) => string }) {
               {player.isHost && <Crown className="w-4 h-4 text-neo-lime" />}
               {player.isBot && <Bot className="w-4 h-4 text-blue-400" />}
               {!player.isHost && !player.isBot && <User className="w-4 h-4 text-slate-400" />}
-              <PlayerAvatar avatar={player.avatar} size="sm" />
-              <span className="text-sm text-neo-white truncate max-w-[100px]">{player.username}</span>
+              <PlayerIdentityLink
+                playerId={player.playerId}
+                isAuthenticated={player.isAuthenticated}
+                avatar={player.avatar}
+                username={player.username}
+                avatarSeed={player.username}
+                truncate
+              />
             </div>
             <div className="flex items-center gap-2">
               <span className={cn('w-2 h-2 rounded-full', PRESENCE_COLORS[player.presence])} />
@@ -424,8 +492,13 @@ function PlayerRow({
         <div className="flex items-center gap-2">
           {player.isHost && <Crown className="w-4 h-4 text-neo-lime" />}
           {player.isBot && <Bot className="w-4 h-4 text-blue-400" />}
-          <PlayerAvatar avatar={player.avatar} size="sm" />
-          <span className="text-sm text-neo-white">{player.username}</span>
+          <PlayerIdentityLink
+            playerId={player.playerId}
+            isAuthenticated={player.isAuthenticated}
+            avatar={player.avatar}
+            username={player.username}
+            avatarSeed={player.username}
+          />
         </div>
       </td>
       <td className="px-4 py-3">
@@ -455,21 +528,97 @@ function PlayerRow({
   );
 }
 
-// Avatar Component
-function PlayerAvatar({
-  avatar,
-  size = 'sm',
+// Single Player Live Session Row
+function SinglePlayerRow({
+  session,
+  t,
 }: {
-  avatar: LivePlayer['avatar'];
-  size?: 'sm' | 'md';
+  session: LiveSinglePlayerSession;
+  t: (key: string) => string;
 }) {
+  const flag = LANGUAGE_FLAGS[session.language] || '🌐';
+
   return (
-    <Avatar
-      customAvatar={avatar?.customAvatar}
-      userId={avatar?.avatarImage}
-      size={size}
-    />
+    <tr className="hover:bg-slate-700/30 transition-colors">
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-2">
+          <PlayerIdentityLink
+            playerId={session.playerId}
+            isAuthenticated={session.isAuthenticated}
+            avatar={session.avatar}
+            username={session.username}
+            avatarSeed={session.playerId || session.sessionId}
+          />
+        </div>
+      </td>
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-2 text-sm text-slate-300">
+          <span>{flag}</span>
+          <span className="capitalize">{session.mode.replace(/[-_]/g, ' ')}</span>
+        </div>
+      </td>
+      <td className="px-4 py-3">
+        <span className="font-mono text-sm text-slate-300">{session.score}</span>
+      </td>
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-1 text-xs text-slate-400">
+          <Clock className="w-3 h-3" />
+          <span>{formatTimeAgo(session.startedAt)}</span>
+        </div>
+      </td>
+      <td className="px-4 py-3">
+        <span className={cn(
+          'px-2 py-0.5 text-xs rounded',
+          session.isAuthenticated ? 'bg-green-500/20 text-green-400' : 'bg-slate-600 text-slate-300'
+        )}>
+          {session.isAuthenticated ? t('admin.live.auth') : t('admin.live.guest')}
+        </span>
+      </td>
+    </tr>
   );
+}
+
+// Linked player identity (avatar + name) — links to admin profile when authed.
+function PlayerIdentityLink({
+  playerId,
+  isAuthenticated,
+  avatar,
+  username,
+  avatarSeed,
+  truncate,
+}: {
+  playerId?: string | null;
+  isAuthenticated: boolean;
+  avatar: LivePlayer['avatar'];
+  username: string;
+  avatarSeed: string;
+  truncate?: boolean;
+}) {
+  const content = (
+    <>
+      <Avatar
+        customAvatar={avatar?.customAvatar}
+        userId={avatar?.avatarImage || avatarSeed}
+        size="sm"
+      />
+      <span className={cn('text-sm text-neo-white', truncate && 'truncate max-w-[100px]')}>
+        {username}
+      </span>
+    </>
+  );
+
+  if (isAuthenticated && playerId) {
+    return (
+      <Link
+        href={`/admin/players/${playerId}`}
+        className="flex items-center gap-2 hover:underline focus:outline-none focus:ring-2 focus:ring-neo-lime rounded"
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return <div className="flex items-center gap-2">{content}</div>;
 }
 
 export default LiveMonitor;

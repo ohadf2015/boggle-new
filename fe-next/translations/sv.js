@@ -5479,6 +5479,7 @@ const sv = {
     }
   },
   "wordWheel": {
+    "youFoundEverything": "Du hittade varje ord de hittade. Snyggt.",
     "title": "Ordhjul",
     "loading": "Laddar Ordhjul...",
     "badge": "ORDHJUL",
@@ -5978,7 +5979,13 @@ const sv = {
         "blitz": "Blixt",
         "survival": "Överlevnad"
       },
-      "sent": "Utmaning skickad!"
+      "sent": "Utmaning skickad!",
+      "errors": {
+        "notFriends": "Ni måste vara vänner för att skicka utmaningar.",
+        "rateLimited": "Sakta ner — vänta lite innan du försöker igen.",
+        "timeout": "Utmaningen tog för lång tid. Försök skicka igen.",
+        "validation": "Kunde inte skicka utmaningen. Kolla detaljerna och försök igen."
+      }
     },
     "copyInviteLink": "Kopiera inbjudningslänk",
     "linkCopied": "Länk kopierad!",
@@ -6644,7 +6651,9 @@ const sv = {
       "ranked": "Rankad",
       "left": "kvar",
       "started": "Startad",
-      "lastUpdated": "Senast uppdaterad"
+      "lastUpdated": "Senast uppdaterad",
+      "singlePlayerLive": "Live Solo",
+      "mode": "Läge"
     },
     "email": {
       "title": "E-posttestning",

@@ -6,7 +6,7 @@
 import express, { Response, Router } from 'express';
 import type { AdminRequest, SocketIO, GameInfo, DailyDataEntry, GuestSession, GuestPlayerStat, EventRow } from './types';
 import logger from '../../utils/logger';
-import { getActiveSinglePlayerCount } from '../singlePlayer';
+import { getActiveSinglePlayerCount, getActiveSinglePlayerSessions } from '../singlePlayer';
 
 const { getSupabase } = require('../../modules/supabaseServer');
 const { getAllGames, getDetailedGames } = require('../../modules/gameStateManager');
@@ -190,6 +190,7 @@ router.get('/live-games', async (req: AdminRequest, res: Response): Promise<void
     const io = req.app.get('io') as SocketIO | undefined;
     const detailedGames = getDetailedGames();
     const singlePlayerCount = getActiveSinglePlayerCount();
+    const singlePlayers = getActiveSinglePlayerSessions();
 
     // Calculate stats
     const activeGames = detailedGames.length;
@@ -198,6 +199,7 @@ router.get('/live-games', async (req: AdminRequest, res: Response): Promise<void
 
     res.json({
       games: detailedGames,
+      singlePlayers,
       stats: {
         activeGames,
         playersInGames,

@@ -5521,6 +5521,7 @@ const es = {
     }
   },
   "wordWheel": {
+    "youFoundEverything": "Encontraste todas las palabras que ellos encontraron. Bien hecho.",
     "title": "Rueda de palabras",
     "loading": "Cargando Rueda de Palabras...",
     "badge": "RUEDA DE PALABRAS",
@@ -6032,7 +6033,13 @@ const es = {
       "decline": "Rechazar",
       "declined": "Desafío rechazado",
       "friendAccepted": "¡{{name}} aceptó tu desafío!",
-      "received": "¡Desafío recibido!"
+      "received": "¡Desafío recibido!",
+      "errors": {
+        "notFriends": "Tienen que ser amigos para enviar un desafío.",
+        "rateLimited": "Más despacio — espera un momento antes de volver a intentarlo.",
+        "timeout": "El desafío caducó. Vuelve a enviarlo.",
+        "validation": "No pudimos enviar el desafío. Revisa los detalles e inténtalo de nuevo."
+      }
     },
     "copyInviteLink": "Copiar enlace de invitación",
     "linkCopied": "¡Enlace copiado!",
@@ -6686,7 +6693,9 @@ const es = {
       "ranked": "Clasificado",
       "left": "restante",
       "started": "Iniciado",
-      "lastUpdated": "Última actualización"
+      "lastUpdated": "Última actualización",
+      "singlePlayerLive": "Solo en vivo",
+      "mode": "Modo"
     },
     "email": {
       "title": "Prueba de Email",

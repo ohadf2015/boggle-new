@@ -283,7 +283,7 @@ export function LandingChallengeCards({
             <ModeCard
               title={t('landing.wordChainMode')}
               description={t('landing.wordChainModeDesc')}
-              href={`/${language}/connections`}
+              href={`/${language}/connections/play`}
               icon={<Link2 className="w-6 h-6" />}
               modeImage="/modes/connections.png"
               variant="purple"
