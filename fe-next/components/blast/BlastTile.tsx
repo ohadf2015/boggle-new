@@ -10,6 +10,7 @@ import { TILE_VISUALS, CLEARING_COLORS, CLEARING_ANIMS } from './blastTileVisual
 import { getCascadeFallStyle } from './blastCascadeStyle';
 import { BlastJellyOverlay } from './BlastJellyOverlay';
 import { BlastCakeOverlay } from './BlastCakeOverlay';
+import { BlastChocolateOverlay } from './BlastChocolateOverlay';
 
 const TILE_TEXT_SHADOW_STYLE = { textShadow: '0 1px 0 rgba(255,255,255,0.4), 0 2px 3px rgba(0,0,0,0.2)' } as const;
 const TILE_TEXT_SHADOW_LIGHT_STYLE = { textShadow: '0 1px 2px rgba(0,0,0,0.4)' } as const;
@@ -300,6 +301,7 @@ export const BlastTile = memo(function BlastTile({
           isAnchor={typeof cakeHp === 'number'}
         />
       )}
+      <BlastChocolateOverlay active={type === 'chocolate'} />
       <span className="relative z-10" style={visual.text === 'text-white' ? TILE_TEXT_SHADOW_LIGHT_STYLE : TILE_TEXT_SHADOW_STYLE}>{letter}</span>
       {visual.indicator && (
         <span className={`absolute top-0.5 inset-e-0.5 leading-none pointer-events-none ${visual.text ?? ''}`} aria-hidden="true">

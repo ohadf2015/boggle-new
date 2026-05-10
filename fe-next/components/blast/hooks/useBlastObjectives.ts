@@ -3,6 +3,7 @@ import type { BlastGameState, BlastTileType, BlastObjective, BlastObjectiveProgr
 import type { BlastTileState } from '@/shared/types/blast';
 import { countJelly } from '../utils/blastJellyEngine';
 import { getCakeHp } from '../utils/blastCakeEngine';
+import { countChocolate } from '../utils/blastChocolateEngine';
 
 export interface UseBlastObjectivesParams {
   gameState: BlastGameState;
@@ -88,6 +89,16 @@ function getProgress(
       const remaining = tileStates ? countJelly(tileStates) : initial;
       current = Math.max(0, initial - remaining);
       target = initial;
+      break;
+    }
+
+    case 'stop_chocolate': {
+      // Survival objective: target=0 chocolate cells at wave end. Until cleared,
+      // current=0/target=0 reads weird, so we expose chocolate-count as progress
+      // (lower is better) and isComplete only when zero remain.
+      const remaining = tileStates ? countChocolate(tileStates) : 1;
+      current = remaining === 0 ? 1 : 0;
+      target = 1;
       break;
     }
 
