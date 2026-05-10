@@ -240,6 +240,9 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
   // Handle leave room
   // Derive username from server-side mapping to prevent impersonation
   socket.on('leaveRoom', ({ gameCode }: LeaveRoomPayload) => {
+    // Light RL: each leave does state mutation + broadcast. Spam → repeated
+    // updateUsers fanouts to all lobby clients.
+    if (!checkRateLimit(socket.id)) return;
     const username = getUsernameBySocketId(socket.id);
     if (!gameCode || !username) return;
 

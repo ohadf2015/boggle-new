@@ -258,6 +258,23 @@ export function useGridInteraction({
     event: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>
   ) => {
     if (!interactive) return;
+    // Tap-last-tile-to-submit on touch (mirrors desktop useGridClickHandler).
+    // Without this, mobile players who tap the final tile expecting submit
+    // wipe their word — rage-click signal in /en + /es multiplayer
+    // (PostHog 14d: 18 rage clicks across 8 sessions).
+    {
+      const dragCells = dragSelectionRef.current;
+      const lastCell = dragCells[dragCells.length - 1];
+      if (
+        lastCell &&
+        lastCell.row === rowIndex &&
+        lastCell.col === colIndex &&
+        dragCells.length >= 2
+      ) {
+        submitWord();
+        return;
+      }
+    }
     isTouchingRef.current = true;
     hasMovedRef.current = false;
     isScrollGestureRef.current = false;
@@ -279,7 +296,7 @@ export function useGridInteraction({
     clearAllDragClasses();
     toggleDragClass(rowIndex, colIndex, true);
     vibrateCellTap(fireRoundActive);
-  }, [interactive, fireRoundActive, cancelFadeOut, clearAllDragClasses, toggleDragClass, setSelectedCells, cellFilter]);
+  }, [interactive, fireRoundActive, cancelFadeOut, clearAllDragClasses, toggleDragClass, setSelectedCells, cellFilter, submitWord]);
 
   const processTouchMove = useCallback((touchX: number, touchY: number) => {
     velocityTrackerRef.current.recordPosition(touchX, touchY);

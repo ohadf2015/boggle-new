@@ -55,9 +55,9 @@ export default function PracticeClassicSandbox() {
   const { language, t } = useLanguage();
   const board = BOARDS[language] ?? BOARDS.en;
   const validator = usePracticeValidator(language);
-  const juice = usePracticeJuice();
-  const sound = useSoundEffects();
   const fxRef = useRef<PracticePixiFxHandle | null>(null);
+  const juice = usePracticeJuice({ fxRef, burstColor: 0x00ffff });
+  const sound = useSoundEffects();
   const tutorialRef = useRef(createMicroTutorial({ mode: 'classic' }));
   const advanceBeat = useCallback(() => { tutorialRef.current.currentBeat(); }, []);
 

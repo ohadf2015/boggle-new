@@ -15,6 +15,7 @@ export type LocaleContent = {
   backToBlog: string;
   tryDaily: string;
   practice: string;
+  scrabbleAlternativeCta: string;
 };
 
 export const contentByLocale: Record<string, LocaleContent> = {
@@ -131,6 +132,7 @@ The seven-letter word hits different when the whole room hears it.`,
     backToBlog: 'Back to Blog',
     tryDaily: 'Try Daily Challenge',
     practice: 'Play Multiplayer',
+    scrabbleAlternativeCta: 'Free Multiplayer Word Game',
   },
   he: {
     title: 'למה משחקי מילים עם חברים זה סיפור אחר לגמרי (המדע של גיימינג חברתי)',
@@ -243,6 +245,7 @@ The seven-letter word hits different when the whole room hears it.`,
     backToBlog: 'חזרה לבלוג',
     tryDaily: 'נסו את האתגר היומי',
     practice: 'שחקו מולטיפלייר',
+    scrabbleAlternativeCta: 'משחק מילים בעברית רב-משתתפים',
   },
   sv: {
     title: 'Ordspel är bättre med folk. Forskningen förklarar varför det känns så.',
@@ -357,6 +360,7 @@ Sjubokstavsordet träffar annorlunda när hela rummet hör det.`,
     backToBlog: 'Tillbaka till bloggen',
     tryDaily: 'Prova daglig utmaning',
     practice: 'Spela multiplayer',
+    scrabbleAlternativeCta: 'Spela Scrabble Online på Svenska',
   },
   ja: {
     title: '一人で解いてる場合じゃない：誰かと遊ぶとワードゲームの脳が変わる話',
@@ -475,6 +479,7 @@ Coyl-ShepherdとNewlandが2013年にJournal of Family Issuesに出した縦断�
     backToBlog: 'ブログに戻る',
     tryDaily: 'デイリーチャレンジを試す',
     practice: 'マルチプレイヤーで遊ぶ',
+    scrabbleAlternativeCta: '日本語ワードゲームをプレイ',
   },
   es: {
     title: 'Juegos de palabras con amigos: por que tu cerebro los necesita mas de lo que crees',
@@ -587,5 +592,6 @@ La palabra de siete letras pega distinto cuando la oye toda la sala.`,
     backToBlog: 'Volver al blog',
     tryDaily: 'Prueba el desafio diario',
     practice: 'Jugar multijugador',
+    scrabbleAlternativeCta: 'Jugar Scrabble Online en Español',
   },
 };

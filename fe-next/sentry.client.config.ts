@@ -246,6 +246,11 @@ Sentry.init({
     /\[HintGenerator\].*timed out/i,
     // Supabase auth lock — React Strict Mode double mount, auto-recovers
     /Lock.*was not released within/i,
+    // Supabase auth lock stolen — concurrent getSession/getUser race, auto-recovers (JAVASCRIPT-NEXTJS-147)
+    /Lock was stolen by another request/i,
+    /\[AuthButton\] Error checking reward/i,
+    // Multiplayer add-bots-during-game guard — legit server reject when game in progress (JAVASCRIPT-NEXTJS-141, 149)
+    /Cannot add bots during a game/i,
     // NativeOAuth Google sign-in — device-specific config issues
     /\[NativeOAuth\].*Google sign-in error/i,
     /\[useOAuthSignIn\].*Native OAuth failed/i,

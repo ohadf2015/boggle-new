@@ -18,6 +18,7 @@ interface LeaderboardEntry {
   guestFingerprint?: string;
 
   avatar_image?: string | null;
+  custom_avatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
 }
 
 export interface SurvivalLiveRanksProps {
@@ -65,6 +66,7 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
         guestFingerprint: row.guest_fingerprint as string | undefined,
 
         avatar_image: row.avatar_image as string | null,
+        custom_avatar: (row.custom_avatar as import('@/shared/types/customAvatar').CustomAvatarConfig | null) ?? null,
       }));
       setEntries(mapped);
       setTotalPlayers(data.totalPlayers || data.totalParticipants || 0);
@@ -136,8 +138,9 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
               {/* Avatar */}
               <div className="shrink-0">
                 <Avatar
-
+                  customAvatar={entry.custom_avatar ?? undefined}
                   avatarImage={entry.avatar_image ?? undefined}
+                  userId={entry.playerId ?? entry.displayName}
                   size="sm"
                 />
               </div>
@@ -149,6 +152,7 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
                   username: entry.displayName,
 
                   avatarImage: entry.avatar_image ?? undefined,
+                  customAvatar: entry.custom_avatar ?? undefined,
                   score: entry.score,
                 }}
                 isCurrentUser={isCurrentPlayer(entry)}

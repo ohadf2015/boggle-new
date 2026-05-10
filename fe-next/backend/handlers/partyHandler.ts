@@ -7,6 +7,7 @@
 import type { Server, Socket } from 'socket.io';
 import { z } from 'zod';
 import { canAccessFeature } from '../utils/featureFlags.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
 import logger from '../utils/logger.js';
 import {
   initCaptionClash,
@@ -149,7 +150,7 @@ function getPublicRoomState(room: PartyRoom): Record<string, unknown> {
 
 // ==================== Room Lifecycle ====================
 
-function cleanupRoom(roomCode: string): void {
+function cleanupRoom(roomCode: string, io?: Server): void {
   const room = partyRooms.get(roomCode);
   if (room?.gameId === 'caption-clash') {
     cleanupCaptionClash(roomCode);
@@ -158,25 +159,49 @@ function cleanupRoom(roomCode: string): void {
   } else if (room?.gameId === 'shadow-clash') {
     cleanupShadowClash(roomCode);
   }
+  // Evict any still-attached sockets from the socket.io room so the adapter
+  // doesn't retain dead subscriptions. handlePlayerLeave normally handles this
+  // per-player, but the 30-min stale-room sweep below can fire while sockets
+  // are still attached.
+  if (io) {
+    io.in(`party:${roomCode}`).socketsLeave(`party:${roomCode}`);
+  }
   partyRooms.delete(roomCode);
   logger.info('PARTY', `Room ${roomCode} cleaned up`);
 }
 
-// Auto-cleanup stale rooms (no activity for 30 min)
-setInterval(() => {
-  const now = Date.now();
-  for (const [code, room] of partyRooms.entries()) {
-    if (now - room.lastActivity > 30 * 60 * 1000) {
-      cleanupRoom(code);
+// Auto-cleanup stale rooms (no activity for 30 min). Interval starts on first
+// handler registration so we have an io reference for socket eviction.
+let staleSweepInterval: NodeJS.Timeout | null = null;
+function startStaleSweep(io: Server): void {
+  if (staleSweepInterval) return;
+  staleSweepInterval = setInterval(() => {
+    const now = Date.now();
+    for (const [code, room] of partyRooms.entries()) {
+      if (now - room.lastActivity > 30 * 60 * 1000) {
+        cleanupRoom(code, io);
+      }
     }
+  }, 5 * 60 * 1000);
+  // Don't keep the event loop alive in test runners
+  if (typeof staleSweepInterval.unref === 'function') {
+    staleSweepInterval.unref();
   }
-}, 5 * 60 * 1000);
+}
 
 // ==================== Handler Registration ====================
 
 export function registerPartyHandlers(io: Server, socket: Socket): void {
+  // Start the stale-room sweep on first registration (idempotent guard inside).
+  startStaleSweep(io);
+
   // ---- Create Room ----
   socket.on('party:create', async (data: unknown) => {
+    // Heavy weight: room creation allocates state + scheduled cleanup
+    if (!checkRateLimit(socket.id, 5)) {
+      socket.emit('party:error', { error: 'RATE_LIMITED', message: 'Slow down' });
+      return;
+    }
     try {
       const parsed = createSchema.parse(data);
       const gameDef = PARTY_GAME_CONFIG[parsed.gameId];
@@ -244,6 +269,10 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
 
   // ---- Join Room ----
   socket.on('party:join', async (data: unknown) => {
+    if (!checkRateLimit(socket.id, 3)) {
+      socket.emit('party:error', { error: 'RATE_LIMITED', message: 'Slow down' });
+      return;
+    }
     try {
       const parsed = joinSchema.parse(data);
       const room = getRoom(parsed.roomCode);
@@ -303,6 +332,10 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
 
   // ---- Start Game ----
   socket.on('party:startGame', () => {
+    if (!checkRateLimit(socket.id, 3)) {
+      socket.emit('party:error', { error: 'RATE_LIMITED', message: 'Slow down' });
+      return;
+    }
     const room = getPlayerRoom(socket.id);
     if (!room) return;
     if (room.hostSocketId !== socket.id) {
@@ -364,6 +397,12 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
 
   // ---- Player Input ----
   socket.on('party:input', (data: unknown) => {
+    // Light weight (1) — pixel-clash live-stroke is high-frequency by design.
+    // Default budget (50/10s) absorbs ~5 strokes/sec which matches drawing UX.
+    if (!checkRateLimit(socket.id)) {
+      // No error emit — silent drop avoids spamming clients during draw bursts
+      return;
+    }
     try {
       const parsed = inputSchema.parse(data);
       const room = getPlayerRoom(socket.id);
@@ -454,12 +493,12 @@ function handlePlayerLeave(io: Server, socket: Socket): void {
       broadcastToRoom(io, room.roomCode, 'party:gameUpdate', getPublicRoomState(room));
       logger.info('PARTY', `Host transferred to ${newHost.username} in ${room.roomCode}`);
     } else {
-      cleanupRoom(room.roomCode);
+      cleanupRoom(room.roomCode, io);
     }
   }
 
   if (Object.keys(room.players).length === 0 && Object.keys(room.spectators).length === 0) {
-    cleanupRoom(room.roomCode);
+    cleanupRoom(room.roomCode, io);
   }
 
   logger.info('PARTY', `${username} left ${room.roomCode}`);

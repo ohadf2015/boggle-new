@@ -73,6 +73,10 @@ interface TabbedDailyLeaderboardProps {
   t: (key: string) => string;
   defaultTab?: LeaderboardTab;
   scope?: LeaderboardScope;
+  /** Words the current player found in today's Word Wheel. When provided,
+   *  rows become clickable for any participant with a wheel score and the
+   *  modal shows only the words the opponent found that the player missed. */
+  myWheelWordsFound?: string[];
 }
 
 // ==========================================
@@ -125,6 +129,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   t,
   defaultTab = 'today',
   scope = 'combined',
+  myWheelWordsFound,
 }) => {
   const [activeTab, setActiveTab] = useState<LeaderboardTab>(defaultTab);
 
@@ -554,6 +559,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
                 compact={compact}
                 t={t}
                 onViewWheelWords={openWheelWords}
+                scope={scope}
               />
             ))
           ) : (
@@ -670,6 +676,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       language={language}
       playerId={wordsModalPlayer?.player_id ?? null}
       playerName={wordsModalPlayer?.display_name ?? ''}
+      myWordsFound={myWheelWordsFound}
       t={t}
     />
     </>

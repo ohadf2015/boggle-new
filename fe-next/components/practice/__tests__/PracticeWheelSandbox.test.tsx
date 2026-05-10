@@ -17,7 +17,20 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('pixi.js', () => ({
   Application: class {
     canvas = document.createElement('canvas');
+    screen = { width: 320, height: 240 };
+    stage = { addChild: vi.fn(), removeChild: vi.fn(), removeChildren: vi.fn() };
+    ticker = { add: vi.fn(), remove: vi.fn() };
     init = vi.fn().mockResolvedValue(undefined);
+    destroy = vi.fn();
+  },
+  Graphics: class {
+    x = 0;
+    y = 0;
+    alpha = 1;
+    scale = { set: vi.fn() };
+    circle = vi.fn().mockReturnThis();
+    fill = vi.fn().mockReturnThis();
+    clear = vi.fn().mockReturnThis();
     destroy = vi.fn();
   },
 }));

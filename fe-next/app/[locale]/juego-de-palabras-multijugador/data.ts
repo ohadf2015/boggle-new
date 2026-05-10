@@ -115,4 +115,12 @@ export const FAQS = [
     q: '¿Qué modos de juego multijugador hay?',
     a: 'Salas multijugador en tiempo real, desafíos diarios, cazadores de palabras, modo explosión, batallas de jefes y más. Cada modo tiene reglas y puntuación únicas.',
   },
+  {
+    q: '¿Dónde puedo jugar Scrabble en línea gratis en español?',
+    a: 'En LexiClash. Es una alternativa a Scrabble en línea, gratis y en español, jugable directamente en el navegador sin descargas ni registro. Más de 10,000 palabras en español validadas, salas multijugador en tiempo real (2-20 jugadores) y desafíos diarios con clasificación global. Para jugar Scrabble gratis en línea con amigos, simplemente comparte el enlace de tu sala.',
+  },
+  {
+    q: '¿Cuál es la mejor alternativa a Scrabble online en español?',
+    a: 'LexiClash es la alternativa a Scrabble online en español más completa de 2026: gratis, sin descargas, multijugador en tiempo real, 8 modos de juego y diccionario español de 10,000+ palabras. A diferencia de las apps oficiales, no hay anuncios entre rondas, no hay bots disfrazados de jugadores reales y nunca se paga por ganar.',
+  },
 ];

@@ -77,9 +77,9 @@ export default function PracticeWheelSandbox() {
   const allLetters = useMemo(() => [puzzle.center, ...outerLetters], [puzzle.center, outerLetters]);
 
   const validator = usePracticeValidator(language);
-  const juice = usePracticeJuice();
-  const sound = useSoundEffects();
   const fxRef = useRef<PracticePixiFxHandle | null>(null);
+  const juice = usePracticeJuice({ fxRef, burstColor: 0x8b5cf6 });
+  const sound = useSoundEffects();
   const tutorialRef = useRef(createMicroTutorial({ mode: 'wheelRush' }));
   const advanceBeat = useCallback(() => { tutorialRef.current.currentBeat(); }, []);
 

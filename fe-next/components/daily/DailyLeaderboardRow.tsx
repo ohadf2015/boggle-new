@@ -23,7 +23,10 @@ export const TodayParticipantRow = memo<{
   compact: boolean;
   t: (key: string) => string;
   onViewWheelWords?: (participant: DailyParticipant) => void;
-}>(({ participant, index, isCurrentUser, compact, t, onViewWheelWords }) => {
+  /** When 'word-wheel', the row exposes the view-words click for any participant
+   *  with a non-zero wheel score (not just those who also played Word Hunt). */
+  scope?: 'combined' | 'word-hunt' | 'word-wheel';
+}>(({ participant, index, isCurrentUser, compact, t, onViewWheelWords, scope = 'combined' }) => {
   const rank = participant.rank_position;
   const countryFlag = getCountryFlag(participant.country_code);
 
@@ -118,9 +121,22 @@ export const TodayParticipantRow = memo<{
               {participant.solved !== undefined && (
                 <span className="text-slate-400 dark:text-slate-500">•</span>
               )}
-              <span className="text-purple-600 dark:text-purple-400 font-bold">
-                {participant.score} {t('wordHunt.leaderboard.pts')}
-              </span>
+              {scope === 'word-wheel' && onViewWheelWords && participant.player_id && !isCurrentUser ? (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); onViewWheelWords(participant); }}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-neo border border-neo-black/30 bg-neo-purple/15 hover:bg-neo-purple/30 text-neo-purple dark:text-neo-purple-light font-bold transition-colors cursor-pointer"
+                  aria-label={t('wordWheel.viewWordsYouMissed') || t('wordWheel.viewSubmittedWords')}
+                  title={t('wordWheel.viewWordsYouMissed') || t('wordWheel.viewSubmittedWords')}
+                >
+                  {participant.score} {t('wordHunt.leaderboard.pts')}
+                  <span aria-hidden className="text-[10px] opacity-70">👁</span>
+                </button>
+              ) : (
+                <span className="text-purple-600 dark:text-purple-400 font-bold">
+                  {participant.score} {t('wordHunt.leaderboard.pts')}
+                </span>
+              )}
             </>
           )}
           {(participant.word_hunt_score ?? 0) > 0 && (participant.word_wheel_score ?? 0) > 0 && (

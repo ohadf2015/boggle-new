@@ -39,7 +39,13 @@ interface WordWheelGameProps {
 }
 
 
-interface RivalScore { name: string; score: number; avatarImage: string | null; playerId: string | null }
+interface RivalScore {
+  name: string;
+  score: number;
+  avatarImage: string | null;
+  customAvatar: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
+  playerId: string | null;
+}
 
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
   puzzle, duration, onComplete, onValidateWord, onEffect, language, paused = false, practice = false,
@@ -78,6 +84,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const wheelContainerRef = useRef<HTMLDivElement>(null);
   const idleSubmitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // True when handleSubmit was triggered by a drag-release (vs tap/idle/double-tap).
+  // Drag-mode users already lifted, so a wrong word should clear immediately
+  // instead of waiting through the read-toast window.
+  const lastSubmitWasDragRef = useRef(false);
 
   // ── Live leaderboard rivals (snapshot on mount + refresh every 30s) ──
   const [rivals, setRivals] = useState<RivalScore[]>([]);
@@ -96,10 +106,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         if (cancelled) return;
         const list: RivalScore[] = (json.data || [])
           .filter((r: { score?: number; display_name?: string }) => typeof r.score === 'number' && r.display_name)
-          .map((r: { score: number; display_name: string; avatar_image?: string | null; player_id?: string | null }) => ({
+          .map((r: { score: number; display_name: string; avatar_image?: string | null; custom_avatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null; player_id?: string | null }) => ({
             name: r.display_name,
             score: r.score,
             avatarImage: r.avatar_image ?? null,
+            customAvatar: r.custom_avatar ?? null,
             playerId: r.player_id ?? null,
           }))
           .sort((a: RivalScore, b: RivalScore) => a.score - b.score);
@@ -276,24 +287,29 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // the window cancels the auto-reset (see builtLetters effect above).
   const showFeedback = useCallback((message: string, type: 'success' | 'error') => {
     setFeedback({ message, type });
-    const toastDuration = type === 'error' ? 2500 : 1500;
+    const toastDuration = type === 'error' ? 1500 : 1500;
     setTimeout(() => setFeedback(null), toastDuration);
     if (type === 'error') {
       setWordBuilderShake(true);
       haptic([30, 50, 30]);
       setTimeout(() => setWordBuilderShake(false), 400);
-      // Cancel any pending idle-auto-resubmit so the same bad word doesn't
-      // ping-pong toasts at the player every 1s (builtLetters didn't change,
-      // so the idle effect won't reset the timer for us).
       if (idleSubmitTimerRef.current) {
         clearTimeout(idleSubmitTimerRef.current);
         idleSubmitTimerRef.current = null;
       }
       if (autoResetTimerRef.current) clearTimeout(autoResetTimerRef.current);
-      autoResetTimerRef.current = setTimeout(() => {
-        autoResetTimerRef.current = null;
+      // Drag-mode submits clear instantly so the next stroke isn't blocked;
+      // tap/idle submits wait 1.5s so the player can see what was wrong.
+      const wasDrag = lastSubmitWasDragRef.current;
+      lastSubmitWasDragRef.current = false;
+      if (wasDrag) {
         setBuiltLetters([]);
-      }, 2500);
+      } else {
+        autoResetTimerRef.current = setTimeout(() => {
+          autoResetTimerRef.current = null;
+          setBuiltLetters([]);
+        }, 1500);
+      }
     }
   }, []);
 
@@ -385,6 +401,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     dragEngagedRef.current = false;
     if (wasEngaged && builtLettersRef.current.length >= 3) {
       if (idleSubmitTimerRef.current) { clearTimeout(idleSubmitTimerRef.current); idleSubmitTimerRef.current = null; }
+      lastSubmitWasDragRef.current = true;
       handleSubmitRef.current();
     }
   }, []);
@@ -773,6 +790,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               <Avatar
                 pixelSize={20}
                 userId={nextRival.playerId ?? nextRival.name}
+                customAvatar={nextRival.customAvatar ?? undefined}
+                avatarImage={nextRival.avatarImage ?? undefined}
                 className="shrink-0 rounded-full"
               />
               <span className="truncate">

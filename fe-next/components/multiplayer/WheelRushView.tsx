@@ -121,6 +121,9 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     : 0;
 
   const fbTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Drag-release submits clear instantly on rejection; tap submits wait 1.5s.
+  const lastSubmitWasDragRef = useRef(false);
   const wheelContainerRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const lastDragIdxRef = useRef<number | null>(null);
@@ -174,7 +177,18 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     return set;
   }, [builtLetters]);
   useEffect(() => { usedIndicesRef.current = usedIndices; }, [usedIndices]);
-  useEffect(() => { builtLettersRef.current = builtLetters; }, [builtLetters]);
+  useEffect(() => {
+    builtLettersRef.current = builtLetters;
+    // Any user input during the 1.5s post-error window cancels the reset
+    // so a fresh attempt isn't wiped mid-typing.
+    if (builtLetters.length > 0 && autoResetTimerRef.current) {
+      clearTimeout(autoResetTimerRef.current);
+      autoResetTimerRef.current = null;
+    }
+  }, [builtLetters]);
+  useEffect(() => () => {
+    if (autoResetTimerRef.current) { clearTimeout(autoResetTimerRef.current); autoResetTimerRef.current = null; }
+  }, []);
 
   const builtWord = useMemo(
     () => builtLetters.map(bl => bl.letter).join(''),
@@ -187,6 +201,22 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       setWordBuilderShake(true);
       haptic([30, 50, 30]);
       setTimeout(() => setWordBuilderShake(false), 400);
+      // Auto-clear the rejected built word so the next attempt isn't blocked.
+      // Drag-release errors clear instantly; tap errors get a 1.5s read window.
+      if (autoResetTimerRef.current) clearTimeout(autoResetTimerRef.current);
+      const wasDrag = lastSubmitWasDragRef.current;
+      lastSubmitWasDragRef.current = false;
+      if (wasDrag) {
+        setBuiltLetters([]);
+      } else {
+        autoResetTimerRef.current = setTimeout(() => {
+          autoResetTimerRef.current = null;
+          setBuiltLetters([]);
+        }, 1500);
+      }
+    } else {
+      if (autoResetTimerRef.current) { clearTimeout(autoResetTimerRef.current); autoResetTimerRef.current = null; }
+      lastSubmitWasDragRef.current = false;
     }
     if (fbTimer.current) clearTimeout(fbTimer.current);
     fbTimer.current = setTimeout(() => setFeedback(null), 1200);
@@ -334,6 +364,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     dragEngagedRef.current = false;
     // Auto-submit when drag actually traversed letters and built ≥MIN_LEN — mirrors WordWheelGame.tsx:334.
     if (wasEngaged && builtLettersRef.current.length >= MIN_LEN) {
+      lastSubmitWasDragRef.current = true;
       handleSubmitRef.current();
     }
   }, []);

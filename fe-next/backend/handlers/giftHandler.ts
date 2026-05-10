@@ -226,6 +226,8 @@ async function handleGiftSendInner(
 export function registerGiftHandlers(io: Server, socket: Socket): void {
   // Return how many gifts the user has sent today
   socket.on('gift:getDailyCount', async () => {
+    // Light weight: read-only Supabase count query, but spammable → DB hammer.
+    if (!checkRateLimit(socket.id)) return;
     const senderId = getAuthUserId(socket);
     if (!senderId) return;
     try {

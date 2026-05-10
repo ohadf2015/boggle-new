@@ -6,6 +6,7 @@ import { Star, Gift, Shield, Bomb, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { trackGameStart } from '@/utils/growthTracking';
+import { trackBlastRunEnded } from '@/components/blast/utils/blastTelemetry';
 import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { BlastGame } from './BlastGame';
@@ -175,6 +176,22 @@ export function BlastView() {
         setResults((prev) => (prev ? { ...prev, ...patch } : prev));
       },
     );
+
+    // Canonical cross-mode funnel event. Without this PostHog only sees
+    // game_started for blast (server-side blast_completed isn't on the unified
+    // funnel), so blast appears to abandon at ~94%.
+    const bestWord = mergedResults.wordsFound
+      .slice()
+      .sort((a, b) => b.length - a.length)[0] ?? '';
+    trackBlastRunEnded({
+      finalScore: mergedResults.finalScore,
+      wavesCompleted: mergedResults.wavesCompleted,
+      maxCombo: mergedResults.maxCombo ?? 0,
+      clearPct: Math.round(mergedResults.clearPercentage ?? 0),
+      wordCount: mergedResults.wordsFound.length,
+      bestWordLength: bestWord.length,
+      difficulty: config.difficulty ?? 'medium',
+    });
   }, [totalScore, allWordsFound, waveHistory, currentWave, config.difficulty, language, checkpoint]);
 
   /** Advance to next wave */

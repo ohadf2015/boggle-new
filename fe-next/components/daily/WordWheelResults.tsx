@@ -349,6 +349,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
             t={t}
             maxVisible={5}
             compact
+            myWheelWordsFound={result.wordsFound}
           />
         </motion.div>
       )}

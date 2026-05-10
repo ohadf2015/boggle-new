@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
@@ -14,6 +14,10 @@ interface WordWheelWordsModalProps {
   language: Language;
   playerId: string | null;
   playerName: string;
+  /** Current player's found words. When provided, modal shows only the diff
+   *  (words the opponent found that the current player did NOT) so the
+   *  player gets actionable "look what I missed" intel instead of a flood. */
+  myWordsFound?: string[];
   t: (key: string) => string;
 }
 
@@ -26,7 +30,7 @@ interface WordsPayload {
 }
 
 export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
-  isOpen, onClose, puzzleDate, language, playerId, playerName, t,
+  isOpen, onClose, puzzleDate, language, playerId, playerName, myWordsFound, t,
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +74,18 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
     };
   }, [isOpen, puzzleDate, language, playerId, playerName, t]);
 
-  const words = payload?.wordsFound ?? [];
+  const allWords = payload?.wordsFound ?? [];
+  // Diff mode: only show words the opponent found that the current player missed.
+  // Falls back to full list if myWordsFound wasn't supplied (e.g. player hasn't
+  // played the wheel yet, in which case the full set is the right view anyway).
+  const diffMode = Array.isArray(myWordsFound);
+  const mySet = useMemo(() => {
+    if (!diffMode) return null;
+    return new Set((myWordsFound ?? []).map(w => w.toUpperCase()));
+  }, [diffMode, myWordsFound]);
+  const words = diffMode && mySet
+    ? allWords.filter(w => !mySet.has(w.toUpperCase()))
+    : allWords;
   const sortedWords = [...words].sort((a, b) => b.length - a.length || a.localeCompare(b));
 
   return (
@@ -86,7 +101,9 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
             🎡 {playerName}
           </h2>
           <p className="text-sm font-bold opacity-80 mt-0.5">
-            {t('wordWheel.submittedWordsTitle')}
+            {diffMode
+              ? (t('wordWheel.youMissedTitle') || 'Words you missed')
+              : t('wordWheel.submittedWordsTitle')}
           </p>
           <button
             type="button"
@@ -128,7 +145,9 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
               {/* Word list */}
               {sortedWords.length === 0 ? (
                 <p className="py-6 text-center text-neo-cream/60 text-sm font-medium">
-                  {t('wordWheel.noWordsSubmitted')}
+                  {diffMode && allWords.length > 0
+                    ? (t('wordWheel.youFoundEverything') || 'You found every word they did. Nice.')
+                    : t('wordWheel.noWordsSubmitted')}
                 </p>
               ) : (
                 <AnimatePresence mode="popLayout">

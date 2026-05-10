@@ -10,6 +10,7 @@ import { PRACTICE_MODES } from '@/lib/practice/practiceRoute';
 import { usePracticeProgress } from '@/components/practice/usePracticeProgress';
 import PracticeStreakChip from '@/components/practice/PracticeStreakChip';
 import PendingRoomBanner from '@/components/practice/PendingRoomBanner';
+import PracticeHubAtmosphere from '@/components/practice/PracticeHubAtmosphere';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
 const MODE_ACCENT: Record<PracticeMode, string> = {
@@ -60,27 +61,46 @@ export default function PracticeHubClient({ locale }: Props) {
   };
 
   return (
-    <div className="min-h-[100dvh] w-full bg-linear-to-b from-neo-navy to-neo-navy-light px-5 py-5 sm:py-8">
-      <div className="max-w-md mx-auto">
+    <div className="relative min-h-[100dvh] w-full overflow-hidden bg-linear-to-b from-neo-navy to-neo-navy-light px-6 py-10">
+      <PracticeHubAtmosphere />
+      <div className="relative z-10 max-w-md mx-auto">
         <PendingRoomBanner locale={locale} />
         {/* Compact header: title row + progress chips inline. Was two stacked
             blocks (~140px) consuming a quarter of the small-viewport budget;
             now ~64px, leaving room for the three mode tiles without scroll. */}
         <AdaptiveMotion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="mb-4 flex items-center justify-between gap-3"
+          initial={{ opacity: 0, y: 14, scale: 0.94 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 220, damping: 18 }}
+          className="relative mb-6 text-center"
         >
-          <h1 className="text-2xl sm:text-3xl font-neo-display font-bold text-neo-cream flex items-center gap-2">
+          {/* Iridescent halo behind the title — pulses softly. Adds heroic
+              first-impression glow without competing with the brutal pixel
+              shadows on tiles below. */}
+          <AdaptiveMotion.div
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-1/2 h-32 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-linear-to-r from-neo-lime/30 via-neo-cyan/30 to-neo-pink/30 blur-2xl"
+            animate={{ opacity: [0.55, 0.9, 0.55], scale: [1, 1.08, 1] }}
+            transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <h1 className="relative text-4xl font-neo-display font-black text-neo-cream mb-2 flex items-center justify-center gap-2 drop-shadow-[2px_2px_0_rgba(0,0,0,0.85)]">
             <AdaptiveMotion.span
               aria-hidden
-              animate={{ rotate: [0, 12, -8, 0] }}
-              transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 1.8, ease: 'easeInOut' }}
+              animate={{ rotate: [0, 14, -10, 0], scale: [1, 1.18, 1] }}
+              transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 1.6, ease: 'easeInOut' }}
+              className="inline-block"
             >
               ✨
             </AdaptiveMotion.span>
             <span>{t('practiceHub.title')}</span>
+            <AdaptiveMotion.span
+              aria-hidden
+              animate={{ rotate: [0, -14, 10, 0], scale: [1, 1.18, 1] }}
+              transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 1.6, delay: 1.2, ease: 'easeInOut' }}
+              className="inline-block"
+            >
+              ✨
+            </AdaptiveMotion.span>
           </h1>
           <div
             data-testid="practice-progress-headline"
@@ -120,12 +140,27 @@ export default function PracticeHubClient({ locale }: Props) {
             return (
               <AdaptiveMotion.div
                 key={mode}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease: 'easeOut', delay: 0.08 + idx * 0.06 }}
-                whileHover={{ y: -2, scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, y: 18, scale: 0.94 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 18, delay: 0.12 + idx * 0.08 }}
+                whileHover={{ y: -3, scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                className="relative"
               >
+                {!isDone && (
+                  <AdaptiveMotion.span
+                    aria-hidden
+                    className={`pointer-events-none absolute -inset-1 rounded-neo blur-lg ${
+                      mode === 'classic'
+                        ? 'bg-neo-cyan/30'
+                        : mode === 'wordHunt'
+                          ? 'bg-neo-lime/30'
+                          : 'bg-neo-purple/35'
+                    }`}
+                    animate={{ opacity: [0.18, 0.55, 0.18] }}
+                    transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut', delay: idx * 0.4 }}
+                  />
+                )}
                 <Link
                   href={`/${locale}/practice/${mode}`}
                   onClick={handleTileTap}

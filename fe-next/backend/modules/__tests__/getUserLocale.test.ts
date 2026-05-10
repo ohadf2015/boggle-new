@@ -57,21 +57,23 @@ describe('getUserLocale fallback chain (chosen language → country heuristic)',
   it('falls back to country_code heuristic when profiles.language is NULL', async () => {
     profilesMaybeSingle.mockResolvedValue({ data: { language: null, country_code: 'JP' }, error: null });
     expect(await getUserLocale('u3')).toBe('ja');
-    expect(mockLogger.warn).toHaveBeenCalledWith(
+    expect(mockLogger.debug).toHaveBeenCalledWith(
       'PUSH_TRIGGER',
       expect.stringContaining('country_code'),
       expect.objectContaining({ userId: 'u3', country: 'JP' })
     );
+    expect(mockLogger.warn).not.toHaveBeenCalled();
   });
 
-  it('defaults to en and warns when no chosen language and unmapped country', async () => {
+  it('defaults to en when no chosen language and unmapped country (debug-only)', async () => {
     profilesMaybeSingle.mockResolvedValue({ data: { language: null, country_code: 'US' }, error: null });
     expect(await getUserLocale('u4')).toBe('en');
-    expect(mockLogger.warn).toHaveBeenCalledWith(
+    expect(mockLogger.debug).toHaveBeenCalledWith(
       'PUSH_TRIGGER',
       expect.stringContaining('default'),
       expect.objectContaining({ userId: 'u4' })
     );
+    expect(mockLogger.warn).not.toHaveBeenCalled();
   });
 
   it('defaults to en when country_code is NULL', async () => {

@@ -35,6 +35,16 @@ const seoContent: Record<string, {
           'LexiClash is one of the best free competitive word games with global leaderboards — daily, weekly, and all-time rankings across Classic, Blast, Word Hunt, and Daily Challenge modes. Other notable picks: Words With Friends (turn-based), Wordle (single-puzzle), and Boggle With Friends. LexiClash is browser-based, real-time multiplayer, no signup, no download.',
       },
       {
+        question: 'What are the best word games of 2026?',
+        answer:
+          'The best word games in 2026 combine real-time multiplayer, daily challenges, and global leaderboards. LexiClash leads the free browser category — 8 game modes, 5 languages, no download, instant play. Wordle remains the daily-puzzle benchmark. Words With Friends owns turn-based async play. For competitive ranked play with global leaderboards, LexiClash is the strongest pick because of its unified daily/weekly/all-time scoring across every mode.',
+      },
+      {
+        question: 'What are the best free browser word games in 2025 and 2026?',
+        answer:
+          'LexiClash, Wordle, Squardle, Spelltower (browser), and Quordle are the top free browser word games in 2025 and 2026 — all playable instantly, no signup, no install. LexiClash is the only one combining a global leaderboard, real-time multiplayer (2-20 players), and 5-language support in one browser package.',
+      },
+      {
         question: 'How is the leaderboard score calculated?',
         answer:
           'Leaderboard rankings are based on your total score across games. Points come from word length, combo multipliers, and bonus tiles. Daily leaderboards reset at midnight UTC.',

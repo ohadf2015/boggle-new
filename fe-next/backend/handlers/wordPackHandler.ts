@@ -8,10 +8,16 @@ import { getGame, getGameBySocketId } from '../modules/gameStateManager.js';
 import { getPackById } from '../modules/supabase/ugcPacks.js';
 import { broadcastToRoom } from '../utils/socketHelpers.js';
 import { ApplyWordPackSchema } from '../../shared/schemas/socketSchemas.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
 import logger from '../utils/logger.js';
 
 export function registerWordPackHandler(io: Server, socket: Socket): void {
   socket.on('apply-word-pack', async (payload: unknown) => {
+    // Heavy weight: each call hits Supabase. Cap at ~10/10s effective.
+    if (!checkRateLimit(socket.id, 5)) {
+      socket.emit('error', { code: 'RATE_LIMITED', message: 'Slow down.' });
+      return;
+    }
     try {
       // Validate payload
       const parsed = ApplyWordPackSchema.safeParse(payload);

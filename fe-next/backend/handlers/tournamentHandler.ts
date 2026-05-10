@@ -240,6 +240,8 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
 
   // Handle get tournament standings
   socket.on('getTournamentStandings', () => {
+    // Light weight: read-only but allocates standings + tournament objects each call
+    if (!checkRateLimit(socket.id)) return;
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {

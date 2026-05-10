@@ -13,6 +13,7 @@ import {
   reactivateHost
 } from '../modules/gameStateManager.js';
 
+import { checkRateLimit } from '../utils/rateLimiter.js';
 import logger from '../utils/logger.js';
 
 const ALLOWED_LANGUAGES: readonly Language[] = ['en', 'he', 'sv', 'ja', 'es'];
@@ -58,6 +59,9 @@ function registerHostHandlers(io: Server, socket: Socket): void {
 
   // Handle host changing the room dictionary language pre-game
   socket.on('changeRoomLanguage', (data: { gameCode?: string; language?: string } | undefined) => {
+    // Weight 3: each accepted change broadcasts to all lobby clients. Rapid
+    // spam would create a re-render storm; pre-game UI doesn't need >1/sec.
+    if (!checkRateLimit(socket.id, 3)) return;
     if (!data || typeof data.gameCode !== 'string' || typeof data.language !== 'string') return;
     if (!ALLOWED_LANGUAGES.includes(data.language as Language)) return;
 

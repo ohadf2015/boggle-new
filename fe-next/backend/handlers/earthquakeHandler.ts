@@ -27,6 +27,7 @@ import { generateRandomTable } from '../utils/gameUtils.js';
 import { generateRichBoard } from '../utils/boardSelection.js';
 import { DIFFICULTIES } from '../utils/consts.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
 import logger from '../utils/logger.js';
 import timerManager from '../utils/timerManager';
 import { gameCleanupEmitter } from '../events/gameCleanup';
@@ -79,6 +80,9 @@ function registerEarthquakeHandlers(io: Server, socket: Socket): void {
    * Payload: { gameSessionId, triggerTime }
    */
   socket.on('triggerEarthquake', (data: TriggerEarthquakePayload) => {
+    // Heavy weight: each trigger spawns a new grid + broadcasts to all players.
+    // Earthquakes naturally fire ~1/round so weight 5 is permissive but caps spam.
+    if (!checkRateLimit(socket.id, 5)) return;
     const { gameSessionId, triggerTime } = data || {};
 
     // Get game by socket ID

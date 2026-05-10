@@ -231,6 +231,9 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
       boardTheme: game.boardTheme || null,
       gameMode: game.gameMode || 'classic',
       gameSessionId: game.gameSessionId,
+      // Replay player's own found words so the in-game word panel isn't blank
+      // after reconnect. Score totals come via updateLeaderboard below.
+      myFoundWords: game.playerWords?.[username] || [],
     };
 
     // Include blast mode state for reconnecting players

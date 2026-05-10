@@ -1,10 +1,18 @@
-import { useCallback } from 'react';
+import { useCallback, type RefObject } from 'react';
 import gsap from 'gsap';
+import type { PracticePixiFxHandle } from './PracticePixiFx';
 
 export interface JuiceTilePos {
   x: number;
   y: number;
   el: Element;
+}
+
+export interface PracticeJuiceOptions {
+  /** Optional Pixi FX ref for particle bursts on word-found + goal-celebrate. */
+  fxRef?: RefObject<PracticePixiFxHandle | null>;
+  /** Mode-flavored particle color (0xRRGGBB). Defaults to neo-cyan. */
+  burstColor?: number;
 }
 
 const reduced = () =>
@@ -16,8 +24,13 @@ const reduced = () =>
  * GSAP-powered juice timelines for practice mode. Every trigger no-ops under
  * prefers-reduced-motion. Tile-pop, shake, duplicate-bounce, and goal-celebrate
  * are short (≤300ms) so they don't block subsequent input.
+ *
+ * When an `fxRef` is provided, word-found also fires a Pixi particle burst
+ * per tile (mode-colored) and goal-complete fires a fullscreen celebration.
  */
-export function usePracticeJuice() {
+export function usePracticeJuice(opts: PracticeJuiceOptions = {}) {
+  const { fxRef, burstColor = 0x00ffff } = opts;
+
   const triggerWordFound = useCallback((tiles: JuiceTilePos[]) => {
     if (reduced()) return;
     const tl = gsap.timeline();
@@ -28,8 +41,18 @@ export function usePracticeJuice() {
         { scale: 1.18, duration: 0.16, ease: 'back.out(2)', yoyo: true, repeat: 1 },
         i * 0.04,
       );
+      const fx = fxRef?.current;
+      if (fx) {
+        // tile.x/y are viewport-relative (getBoundingClientRect); FX translates
+        // to canvas-local internally. Center the burst on the tile.
+        const el = t.el as HTMLElement;
+        const r = el.getBoundingClientRect?.();
+        const cx = r ? r.left + r.width / 2 : t.x;
+        const cy = r ? r.top + r.height / 2 : t.y;
+        fx.burst(cx, cy, burstColor);
+      }
     });
-  }, []);
+  }, [fxRef, burstColor]);
 
   const triggerInvalid = useCallback((el: Element) => {
     if (reduced()) return;
@@ -43,8 +66,9 @@ export function usePracticeJuice() {
 
   const triggerGoalComplete = useCallback(() => {
     if (reduced()) return gsap.timeline();
+    fxRef?.current?.goalCelebrate();
     return gsap.timeline().to(document.body, { duration: 0.001 });
-  }, []);
+  }, [fxRef]);
 
   return { triggerWordFound, triggerInvalid, triggerDuplicate, triggerGoalComplete };
 }

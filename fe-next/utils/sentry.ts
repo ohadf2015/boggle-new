@@ -172,10 +172,12 @@ const EXPECTED_ERROR_PATTERNS = [
   /Game is already starting/i,
   /Invalid start game request/i,
   /duplicate startGame/i,
+  /Cannot add bots during a game/i,
 
   // Supabase auth token lock contention (expected under concurrent requests)
   /Lock .* was released because another request stole it/i,
   /Lock broken by another request with the 'steal' option/i,
+  /Lock was stolen by another request/i,
 
   // Auth loading timeout (safety guard, not a bug)
   /Auth loading timeout/i,

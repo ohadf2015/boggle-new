@@ -38,6 +38,8 @@ interface StartGameBroadcastExt extends StartGameBroadcast {
   wordHuntTargetCategory?: string | null;
   wordHuntPlayerLives?: Record<string, number>;
   wordHuntEliminatedPlayers?: string[];
+  /** Reconnect-only: player's own found-word list, for UI replay */
+  myFoundWords?: string[];
 }
 
 interface ValidatedScoresPayload {
@@ -292,10 +294,23 @@ export function usePlayerGameEvents({
 
       // Batch all Zustand store updates into a single setState call
       // This prevents cascading re-renders (was 15+ individual updates)
-      const storeUpdates: Record<string, unknown> = {
-        foundWords: [],
-        achievements: [],
-      };
+      const isReconnect = data.reconnect === true;
+      const storeUpdates: Record<string, unknown> = {};
+      if (!isReconnect) {
+        // Fresh game: clear words + achievements
+        storeUpdates.foundWords = [];
+        storeUpdates.achievements = [];
+      } else if (ext.myFoundWords && ext.myFoundWords.length > 0) {
+        // Reconnect snapshot: replay player's own words. Per-word score is not
+        // persisted server-side (only the string list); total score is restored
+        // separately via updateLeaderboard. score:0 is a UX placeholder.
+        storeUpdates.foundWords = ext.myFoundWords.map((word) => ({
+          word,
+          score: 0,
+          validated: true,
+          isDuplicate: false,
+        }));
+      }
       if (data.letterGrid) storeUpdates.letterGrid = data.letterGrid;
       if (data.timerSeconds) {
         storeUpdates.remainingTime = data.timerSeconds;
@@ -406,7 +421,10 @@ export function usePlayerGameEvents({
     };
 
     const handleTimeUpdate = (data: TimeUpdatePayload) => {
-      if (data.gameSessionId !== undefined && data.gameSessionId !== gameSessionIdRef.current) {
+      // Only reject OLDER sessions. Strict !== drops legitimate timeUpdates
+      // from a NEW session that arrive before the corresponding startGame
+      // updates the ref (rare reorder; happens on reconnect snapshots).
+      if (data.gameSessionId !== undefined && data.gameSessionId < gameSessionIdRef.current) {
         logger.log('[PLAYER] Ignoring stale timeUpdate from old session:', data.gameSessionId);
         return;
       }

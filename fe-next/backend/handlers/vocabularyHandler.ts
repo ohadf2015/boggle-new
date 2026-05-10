@@ -9,6 +9,7 @@ import type { Socket } from 'socket.io';
 import type { GameState } from '../modules/gameState/types';
 import { checkWordIntegration } from '@/hooks/wordIntegrationLogic';
 
+import { checkRateLimit } from '../utils/rateLimiter.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -92,6 +93,11 @@ export function registerVocabularyHandlers(
   getGame: (code: string) => GameState | null | undefined
 ): void {
   socket.on('selectVocabularyWord', async (payload: SelectWordPayload) => {
+    // Weight 2: per-word toggle is moderate-frequency in classroom UI
+    if (!checkRateLimit(socket.id, 2)) {
+      socket.emit('error', { message: 'Slow down' });
+      return;
+    }
     try {
       const { getGameBySocketId } = await import('../modules/gameStateManager.js');
       const gameCode = getGameBySocketId(socket.id);

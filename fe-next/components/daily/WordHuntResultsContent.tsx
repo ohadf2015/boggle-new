@@ -131,7 +131,15 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
 }) => {
   const [wordWheelPlayed, setWordWheelPlayed] = useState(false);
   useEffect(() => {
-    setWordWheelPlayed(hasPlayedWordWheelToday(language));
+    const refresh = () => setWordWheelPlayed(hasPlayedWordWheelToday(language));
+    refresh();
+    const onVis = () => { if (!document.hidden) refresh(); };
+    document.addEventListener('visibilitychange', onVis);
+    window.addEventListener('focus', refresh);
+    return () => {
+      document.removeEventListener('visibilitychange', onVis);
+      window.removeEventListener('focus', refresh);
+    };
   }, [language]);
 
   // A/B: cross-promo wheel-CTA placement vs leaderboard order.

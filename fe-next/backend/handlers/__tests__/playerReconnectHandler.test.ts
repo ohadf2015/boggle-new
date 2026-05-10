@@ -226,6 +226,41 @@ describe('handleReconnection', () => {
     );
   });
 
+  // 7a-2. Reconnect must replay player's own found words so the in-game word
+  // panel isn't blank after reconnect (server is source of truth).
+  it('emits startGame with myFoundWords replayed from server playerWords', () => {
+    const game = makeGame({
+      gameState: 'playing',
+      letterGrid: [['A']],
+      remainingTime: 60,
+      playerWords: { Player1: ['HELLO', 'WORLD'], Other: ['SOLO'] },
+    });
+    mockIsInProgress.mockReturnValue(true);
+    const socket = createMockSocket('socket-new');
+
+    handleReconnection(mockIo, socket, game, 'GAME1', 'Player1');
+
+    expect(socket.emit).toHaveBeenCalledWith(
+      'startGame',
+      expect.objectContaining({ myFoundWords: ['HELLO', 'WORLD'] })
+    );
+  });
+
+  // 7a-3. Reconnect with no prior words: empty array (not undefined) so the
+  // client's destructure is safe and the array can be checked with .length.
+  it('emits empty myFoundWords when player has no prior words', () => {
+    const game = makeGame({ gameState: 'playing', letterGrid: [['A']], remainingTime: 60 });
+    mockIsInProgress.mockReturnValue(true);
+    const socket = createMockSocket('socket-new');
+
+    handleReconnection(mockIo, socket, game, 'GAME1', 'Player1');
+
+    expect(socket.emit).toHaveBeenCalledWith(
+      'startGame',
+      expect.objectContaining({ myFoundWords: [] })
+    );
+  });
+
   // 7b. Blast timer guard: remainingTime=0 must NOT fall back to full timerSeconds
   // Regression guard — `||` falsy-fallback would reset an expired blast clock to 90s
   // during the endGame race window, letting a reconnecting player play past t=0.

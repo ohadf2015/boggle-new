@@ -3,6 +3,8 @@ import logger from '@/utils/logger';
 import { getSmartDailyChallengePushRecipients, markDailyPushSentBatch } from '@/lib/pushReminders';
 import { notifyDailyChallengeReminder } from '@/backend/modules/pushNotificationTriggers';
 import { pickDailyReminderCopy } from '@/lib/dailyReminderCopy';
+import { findDailyChallengeRivals } from '@/lib/dailyChallengeRivals';
+import { pickRivalReminderCopy } from '@/lib/rivalReminderCopy';
 import { getLocalHour, getTodayDate } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
 import { withCronLock } from '@/backend/redis/locking';
@@ -48,8 +50,39 @@ export async function POST(request: NextRequest) {
       const localHour = getLocalHour('UTC');
       const hoursLeft = Math.max(1, 24 - localHour);
 
+      // Batch-find leaderboard rivals who already cleared today's daily.
+      // Map<userId, RivalCandidate|null>. One set of 3 queries for all
+      // recipients — keeps cron O(1) DB cost regardless of cohort size.
+      const rivalsByUser = await findDailyChallengeRivals(
+        recipients.map((r) => r.userId)
+      );
+
+      let rivalSent = 0;
       const results = await Promise.allSettled(
         recipients.map(async ({ userId, locale }) => {
+          const rival = rivalsByUser.get(userId) ?? null;
+          if (rival) {
+            const copy = pickRivalReminderCopy({
+              userId,
+              date,
+              hoursLeft,
+              locale,
+              rivalUsername: rival.username,
+              direction: rival.direction,
+              scoreGap: rival.scoreGap,
+            });
+            rivalSent++;
+            await notifyDailyChallengeReminder(userId, {
+              title: copy.title,
+              body: copy.body,
+              deepLink: copy.deepLink,
+              variant: copy.variant,
+              locale,
+              imageUrl: rival.avatarImage,
+              kind: 'rival',
+            });
+            return;
+          }
           const copy = pickDailyReminderCopy({ userId, date, hoursLeft, locale });
           await notifyDailyChallengeReminder(userId, {
             title: copy.title,
@@ -76,8 +109,10 @@ export async function POST(request: NextRequest) {
       // Single batched UPDATE instead of N parallel UPDATEs.
       await markDailyPushSentBatch(sentIds);
 
-      logger.log(`[Push Cron] Completed: ${sent} sent, ${failed} failed`);
-      return { sent, failed };
+      logger.log(
+        `[Push Cron] Completed: ${sent} sent (${rivalSent} rival-themed), ${failed} failed`
+      );
+      return { sent, failed, rivalSent };
     });
 
     if (locked.status === 'skipped') {

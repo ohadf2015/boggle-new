@@ -17,8 +17,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/en/lexiclash-vs-wordle`;
 
   return {
-    title: 'LexiClash vs Wordle — Which Word Game Is Better in 2026? | LexiClash',
-    description: 'LexiClash vs Wordle compared: multiplayer battles, unlimited plays, adventure mode, and 5 languages vs one puzzle per day. See which word game fits your style.',
+    title: 'Wordle vs LexiClash 2026 — I Played Both Daily, Here\'s My Verdict',
+    description: 'I played Wordle and LexiClash side-by-side for 30 days. Wordle: 1 puzzle, 6 guesses, done in 90 seconds. LexiClash: unlimited rounds, multiplayer, 5 languages, adventure mode. Honest comparison from someone who used to be a Wordle purist.',
     keywords: 'lexiclash vs wordle, wordle alternative, wordle multiplayer, word games like wordle, wordle with friends, unlimited wordle, best word games 2026, wordle vs boggle, word game comparison',
     openGraph: {
       title: 'LexiClash vs Wordle — Full Comparison 2026',

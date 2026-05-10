@@ -455,13 +455,19 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     isResultsVisible: true,
   });
 
-  // Record MP game completion on mount (recordMpGame is stable via useCallback).
-  // Pass resolvedGameMode so PostHog `game_completed` keeps the submode
-  // (word-hunt / classic / wheel-rush) instead of collapsing to 'multiplayer'.
+  // Record MP game completion when both gameCode AND resolvedGameMode are
+  // available. Empty-deps mount-only fired before resolvedGameMode hydrated
+  // from the store, so PostHog received 111/170 (~65%) MP `game_completed`
+  // events with mode='multiplayer' fallback instead of the actual submode
+  // ('word-hunt' / 'classic' / 'wheel-rush'). Ref guard keeps it once-only.
+  const mpGameRecordedRef = useRef(false);
   useEffect(() => {
-    if (gameCode) recordMpGame(resolvedGameMode);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (mpGameRecordedRef.current) return;
+    if (!gameCode) return;
+    if (!resolvedGameMode) return;
+    mpGameRecordedRef.current = true;
+    recordMpGame(resolvedGameMode);
+  }, [gameCode, resolvedGameMode, recordMpGame]);
 
   // Get games played for first win detection
   const guestStats = useMemo(() => getGuestStatsSummary(), []);

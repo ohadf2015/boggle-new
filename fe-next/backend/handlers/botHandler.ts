@@ -297,6 +297,8 @@ function registerBotHandlers(io: Server, socket: Socket): void {
 
   // Handle get bots list
   socket.on('getBots', () => {
+    // Light RL: read-only but maps over bot list per call
+    if (!checkRateLimit(socket.id)) return;
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {

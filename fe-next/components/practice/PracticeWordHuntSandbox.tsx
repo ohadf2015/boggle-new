@@ -76,9 +76,9 @@ export default function PracticeWordHuntSandbox() {
   const board = BOARDS[language] ?? BOARDS.en;
   const target = TARGETS[language] ?? TARGETS.en;
   const validator = usePracticeValidator(language);
-  const juice = usePracticeJuice();
-  const sound = useSoundEffects();
   const fxRef = useRef<PracticePixiFxHandle | null>(null);
+  const juice = usePracticeJuice({ fxRef, burstColor: 0xbfff00 });
+  const sound = useSoundEffects();
   const tutorialRef = useRef(createMicroTutorial({ mode: 'wordHunt' }));
   const advanceBeat = useCallback(() => { tutorialRef.current.currentBeat(); }, []);
 

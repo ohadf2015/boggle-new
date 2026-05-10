@@ -114,8 +114,9 @@ export async function getUserLocalesBatch(
  * puzzle dictionary the user picked, NOT their UI language — a Hebrew
  * speaker playing the English daily puzzle would otherwise get an English
  * push, so it's deliberately excluded from the chain. country_code is a
- * pure heuristic, used only when no chosen language exists. logger.warn
- * fires on every fallback so silent drift to 'en' surfaces in prod logs.
+ * pure heuristic, used only when no chosen language exists. Fallback paths
+ * log at debug-level only — they're benign defaults, not errors, and were
+ * adding noise to Sentry (JAVASCRIPT-NEXTJS-148).
  */
 export async function getUserLocale(userId: string): Promise<PushLocale> {
   try {
@@ -139,11 +140,11 @@ export async function getUserLocale(userId: string): Promise<PushLocale> {
     // No chosen language — fall back to country_code heuristic.
     const fromCountry = countryToLocale(profile?.country_code);
     if (fromCountry) {
-      logger.warn('PUSH_TRIGGER', 'profiles.language NULL — fell back to country_code', { userId, country: profile?.country_code });
+      logger.debug('PUSH_TRIGGER', 'profiles.language NULL — fell back to country_code', { userId, country: profile?.country_code });
       return fromCountry;
     }
 
-    logger.warn('PUSH_TRIGGER', 'profiles.language NULL and no country signal — defaulting to en', { userId });
+    logger.debug('PUSH_TRIGGER', 'profiles.language NULL and no country signal — defaulting to en', { userId });
     return 'en';
   } catch (err) {
     logger.error('PUSH_TRIGGER', `getUserLocale threw: ${(err as Error).message}`, { userId });
@@ -541,7 +542,15 @@ export async function notifyGiftReceived(
  */
 export async function notifyDailyChallengeReminder(
   toUserId: string,
-  override?: { title?: string; body?: string; deepLink?: string; variant?: number; locale?: PushLocale }
+  override?: {
+    title?: string;
+    body?: string;
+    deepLink?: string;
+    variant?: number;
+    locale?: PushLocale;
+    imageUrl?: string;
+    kind?: string;
+  }
 ): Promise<void> {
   // Hourly reminder cron pre-fetches every recipient's locale in one batch
   // via getDailyChallengePushRecipients(). When the caller passes it through
@@ -551,14 +560,16 @@ export async function notifyDailyChallengeReminder(
   const title = override?.title ?? translatePush(locale, 'dailyChallenge.title');
   const body = override?.body ?? translatePush(locale, 'dailyChallenge.body');
   const deepLink = override?.deepLink ?? '/daily';
+  const imageUrl = override?.imageUrl ?? mascotImageUrl('encouraging');
   return triggerPush(toUserId, 'daily_challenge', {
     title,
     body,
-    imageUrl: mascotImageUrl('encouraging'),
+    imageUrl,
     data: {
       type: 'daily_challenge',
       deepLink,
       ...(override?.variant !== undefined ? { variant: String(override.variant) } : {}),
+      ...(override?.kind ? { kind: override.kind } : {}),
     },
   }, 'push_only');
 }

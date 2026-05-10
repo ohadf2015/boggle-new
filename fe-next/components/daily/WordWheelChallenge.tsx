@@ -90,6 +90,20 @@ const WordWheelChallenge: React.FC = () => {
   }, []);
 
   // Initialize puzzle
+  // Refresh hasPlayedWH whenever this tab regains focus so a wordhunt
+  // completion in another tab/route is reflected without remount.
+  useEffect(() => {
+    const refresh = () => setHasPlayedWH(hasPlayedWordHuntToday(language as Language));
+    refresh();
+    const onVis = () => { if (!document.hidden) refresh(); };
+    document.addEventListener('visibilitychange', onVis);
+    window.addEventListener('focus', refresh);
+    return () => {
+      document.removeEventListener('visibilitychange', onVis);
+      window.removeEventListener('focus', refresh);
+    };
+  }, [language, phase]);
+
   useEffect(() => {
     let isMounted = true;
     const date = getDailyChallengeDate();

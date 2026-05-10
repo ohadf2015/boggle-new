@@ -119,7 +119,10 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('[AuthButton] Error checking reward:', errorMessage);
+      // Supabase auth-lock contention is a benign retry signal, not a bug. Skip console.error
+      // to keep it out of Sentry's captureConsole funnel (JAVASCRIPT-NEXTJS-147).
+      if (/Lock (was stolen|.*was not released|broken)/i.test(errorMessage)) return;
+      console.warn('[AuthButton] Error checking reward:', errorMessage);
     }
   }, [user?.id]);
 
