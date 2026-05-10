@@ -26,6 +26,7 @@ import { BlastMoveWarningMascot } from './BlastMoveWarningMascot';
 import { BlastFxBridge } from './BlastFxBridge';
 import { type BlastComboType, type SpecialCombo } from './utils/blastCombos';
 import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
+import { useJellyEnabled, useCakeEnabled, useChocolateEnabled } from '@/lib/blast/ccMechanicFlags';
 import { validateWaveObjectives } from './utils/blastObjectiveValidator';
 import { getComboMultiplier } from '@/shared/utils/scoring';
 import { type BlastGameConfig, type BlastResultsData, type BlastTileState, type BlastTileType } from './types';
@@ -108,10 +109,17 @@ export function BlastGame({
 
   const minWordLength = waveConfig?.minWordLength ?? 2;
 
+  // CC-mechanic flags (SP only — MP boards are server-authoritative)
+  const jellyEnabled = useJellyEnabled();
+  const cakeEnabled = useCakeEnabled();
+  const chocolateEnabled = useChocolateEnabled();
+
   // Wave objectives (SP only)
   const waveObjectives = useMemo(
-    () => (isMultiplayer ? [] : getWaveObjectives(waveNumber, config.language)),
-    [waveNumber, isMultiplayer, config.language],
+    () => (isMultiplayer ? [] : getWaveObjectives(waveNumber, config.language, {
+      jelly: jellyEnabled, cake: cakeEnabled, chocolate: chocolateEnabled,
+    })),
+    [waveNumber, isMultiplayer, config.language, jellyEnabled, cakeEnabled, chocolateEnabled],
   );
 
   // Core engine
