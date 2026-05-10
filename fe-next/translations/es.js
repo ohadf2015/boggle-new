@@ -6636,6 +6636,7 @@ const es = {
       "moderation": "Moderación",
       "content": "Contenido",
       "players": "Jugadores",
+      "guests": "Invitados",
       "system": "Sistema",
       "wordCraft": "WordCraft"
     },
@@ -6726,6 +6727,8 @@ const es = {
       "ranked": "Clasificado",
       "casual": "Casual",
       "guest": "Invitado",
+      "first": "Primero",
+      "firstGame": "Primer juego de este invitado",
       "noGames": "Aún no hay juegos hoy",
       "noGamesHint": "Los juegos aparecerán aquí cuando los jugadores empiecen a jugar",
       "showing": "Mostrando",

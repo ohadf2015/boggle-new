@@ -23,9 +23,27 @@ export interface UnifiedGame {
   language: string;
   time_played: number;
   created_at: string;
+  completed_at?: string | null;
   profiles: GameProfile | null;
   drill_type?: string;
   drill_level?: number;
+  // Guest / acquisition metadata (only populated for guests)
+  difficulty?: string | null;
+  device_type?: string | null;
+  browser?: string | null;
+  country?: string | null;
+  referrer_source?: string | null;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  is_first_game?: boolean;
+  player_count?: number | null;
+  tokens_earned?: number;
+  tokens_spent?: number;
+  clues_used?: number;
+  life_gained?: number;
+  guest_first_visit_at?: string | null;
+  guest_last_visit_at?: string | null;
 }
 
 // API response structure

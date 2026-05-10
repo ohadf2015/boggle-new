@@ -6594,6 +6594,7 @@ const sv = {
       "moderation": "Moderering",
       "content": "Innehåll",
       "players": "Spelare",
+      "guests": "Gäster",
       "system": "System",
       "wordCraft": "WordCraft"
     },
@@ -6684,6 +6685,8 @@ const sv = {
       "ranked": "Rankad",
       "casual": "Casual",
       "guest": "Gäst",
+      "first": "Första",
+      "firstGame": "Första spelet från denna gäst",
       "noGames": "Inga spel idag ännu",
       "noGamesHint": "Spel visas här när spelare börjar spela",
       "showing": "Visar",

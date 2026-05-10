@@ -6683,6 +6683,7 @@ const ja = {
       "moderation": "モデレーション",
       "content": "コンテンツ",
       "players": "プレイヤー",
+      "guests": "ゲスト",
       "system": "システム",
       "wordCraft": "ワードクラフト"
     },
@@ -6773,6 +6774,8 @@ const ja = {
       "ranked": "ランクマッチ",
       "casual": "カジュアル",
       "guest": "ゲスト",
+      "first": "初回",
+      "firstGame": "このゲストの初回プレイ",
       "noGames": "今日はまだゲームがありません",
       "noGamesHint": "プレイヤーがゲームを開始するとここに表示されます",
       "showing": "表示中",
