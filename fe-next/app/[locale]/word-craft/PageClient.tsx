@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Layers } from 'lucide-react';
 import Header from '@/components/Header';
@@ -21,8 +21,10 @@ import { HeatMeter } from '@/components/word-craft/HeatMeter';
 import { ScoreFloat } from '@/components/word-craft/ScoreFloat';
 import { WordCraftTutor } from '@/components/word-craft/WordCraftTutor';
 import { WordCraftDragGhost } from '@/components/word-craft/WordCraftDragGhost';
+import { WordCraftPendingStrip } from '@/components/word-craft/WordCraftPendingStrip';
 import { useWordCraftJuice } from '@/components/word-craft/useWordCraftJuice';
 import { useWordCraftDrag } from '@/components/word-craft/useWordCraftDrag';
+import { inferAxis, resolveTap } from '@/lib/word-craft/placement';
 import { useAchievementQueue } from '@/components/achievements';
 import { cn } from '@/lib/utils';
 
@@ -109,6 +111,23 @@ export default function WordCraftPageClient() {
   const { drag, begin: beginTileDrag, consumeDropFlag } = useWordCraftDrag({
     onDrop: (tileId, r, c) => game.placeTileOnBoard(tileId, r, c),
   });
+
+  const axis = useMemo(() => inferAxis(game.state.pendingPlacements), [game.state.pendingPlacements]);
+
+  // Fast-tap: when the player has placed >=2 tiles in a line, a tap on a rack
+  // tile auto-drops at the next empty cell along that axis. Eliminates per-tile
+  // targeting for placements 3..7 of a turn.
+  const handleFastTap = useCallback(
+    (tile: { id: string }) => {
+      const rackTile = game.state.player.rack.find((t) => t.id === tile.id);
+      if (!rackTile) return;
+      const result = resolveTap(rackTile, game.state.pendingPlacements, game.state.board);
+      if ('placement' in result) {
+        game.placeTileOnBoard(rackTile.id, result.placement.row, result.placement.col);
+      }
+    },
+    [game],
+  );
 
   // Celebrations
   const [celebration, setCelebration] = useState<{ kind: CelebrationKind; burstId: number; origin?: { x: number; y: number } }>({
@@ -403,7 +422,6 @@ export default function WordCraftPageClient() {
               hasSelectedTile={!!game.state.selectedRackTileId}
               isFirstMove={isFirstMove}
               dragHoverCell={drag?.active ? drag.hoverCell : null}
-              dragHoverLetter={drag?.active ? drag.letter : null}
             />
             {scoreFloat ? (
               <ScoreFloat
@@ -423,6 +441,22 @@ export default function WordCraftPageClient() {
           </div>
         ) : null}
 
+        <WordCraftPendingStrip
+          pending={game.state.pendingPlacements}
+          axis={axis}
+          onRecallOne={game.recallTile}
+          onRecallAll={game.recallAll}
+          locale={locale}
+          labels={{
+            headerEmpty: t('wordcraft.pending.empty'),
+            recallAll: t('wordcraft.pending.recallAll'),
+            recallOne: t('wordcraft.pending.recallOne'),
+            axisHorizontal: t('wordcraft.axis.horizontal'),
+            axisVertical: t('wordcraft.axis.vertical'),
+            axisFlipAria: t('wordcraft.axis.flipAria'),
+          }}
+        />
+
         <WordCraftRack
           tiles={game.state.player.rack}
           selectedId={game.state.selectedRackTileId}
@@ -430,6 +464,8 @@ export default function WordCraftPageClient() {
           onSelect={game.selectRackTile}
           onTileDragStart={(tile, e) => beginTileDrag(tile.id, tile.letter, tile.value, e)}
           consumeDropFlag={consumeDropFlag}
+          onFastTap={handleFastTap}
+          axisLocked={axis !== null}
           draggingTileId={drag?.active ? drag.tileId : null}
           disabled={game.state.turn !== 'player' || !dict || game.state.burnout}
           ariaLabel={t('wordcraft.yourRack')}

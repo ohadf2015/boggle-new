@@ -11447,6 +11447,16 @@ const sv = {
       "submit": "Tryck Skicka",
       "bot": "WordBot tänker…",
       "over": "Spelet slut"
+    },
+    "pending": {
+      "empty": "lägg en bricka för att börja ordet",
+      "recallAll": "skicka tillbaka alla brickor",
+      "recallOne": "skicka tillbaka brickan"
+    },
+    "axis": {
+      "horizontal": "Vågrätt",
+      "vertical": "Lodrätt",
+      "flipAria": "byt ordriktning"
     }
   },
   mp: {

@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { BOARD_SIZE, CENTER, type Board } from '@/lib/word-craft/board';
 import type { PlacedTile } from '@/lib/word-craft/types';
 import { cn } from '@/lib/utils';
@@ -16,8 +16,6 @@ export interface WordCraftBoardProps {
   isFirstMove?: boolean;
   /** During an active drag: cell key 'r,c' that the dragged tile is hovering over */
   dragHoverCell?: string | null;
-  /** Letter to render as a ghost in the hovered cell during drag */
-  dragHoverLetter?: string | null;
 }
 
 const PREMIUM_MULT: Record<string, { mult: '×2' | '×3'; kind: 'L' | 'W' }> = {
@@ -41,6 +39,18 @@ const PREMIUM_INK: Record<string, string> = {
   TW: 'text-neo-pink',
 };
 
+/** Build the set of axis-hint cells (N/E/S/W neighbors) for a single anchor. */
+function computeAxisHintCells(pending: PlacedTile[], boardSize: number): Set<string> {
+  if (pending.length !== 1) return new Set();
+  const { row, col } = pending[0];
+  const out = new Set<string>();
+  if (row - 1 >= 0) out.add(`${row - 1},${col}`);
+  if (row + 1 < boardSize) out.add(`${row + 1},${col}`);
+  if (col - 1 >= 0) out.add(`${row},${col - 1}`);
+  if (col + 1 < boardSize) out.add(`${row},${col + 1}`);
+  return out;
+}
+
 function WordCraftBoardImpl({
   board,
   pendingPlacements,
@@ -50,10 +60,14 @@ function WordCraftBoardImpl({
   hasSelectedTile,
   isFirstMove,
   dragHoverCell,
-  dragHoverLetter,
 }: WordCraftBoardProps) {
   const pendingByCoord = new Map<string, PlacedTile>();
   for (const p of pendingPlacements) pendingByCoord.set(`${p.row},${p.col}`, p);
+
+  const axisHintCells = useMemo(
+    () => computeAxisHintCells(pendingPlacements, board.cells.length),
+    [pendingPlacements, board.cells.length],
+  );
 
   return (
     <div
@@ -74,14 +88,12 @@ function WordCraftBoardImpl({
           const placedTile = cell.tile;
           const isCenter = r === CENTER && c === CENTER;
           const premiumKey = cell.premium ?? '';
-          // Empty cells are interactive when player can place.
-          // Pending cells are interactive (tap to recall) regardless of selection.
-          // Permanently-placed cells are never interactive.
           const isInteractive = !disabled && !placedTile;
           const isEmpty = !placedTile && !pending;
           const inviteEmpty = isEmpty && hasSelectedTile && !disabled;
           const inviteCenter = isCenter && isEmpty && isFirstMove && !disabled;
           const isDragTarget = dragHoverCell === key && isEmpty;
+          const isAxisHint = axisHintCells.has(key) && isEmpty && !disabled;
           const premium = cell.premium ? PREMIUM_MULT[cell.premium] : null;
 
           return (
@@ -95,6 +107,7 @@ function WordCraftBoardImpl({
               data-cell-invite={inviteEmpty ? 'true' : undefined}
               data-cell-center-ping={inviteCenter ? 'true' : undefined}
               data-drag-target={isDragTarget ? 'true' : undefined}
+              data-axis-hint={isAxisHint ? 'true' : undefined}
               aria-label={`row ${r + 1} column ${c + 1}${cell.premium ? ` ${cell.premium}` : ''}`}
               disabled={!isInteractive}
               onClick={() => {
@@ -111,12 +124,12 @@ function WordCraftBoardImpl({
                 placedTile
                   ? 'bg-neo-cream text-neo-navy shadow-[0_2px_0_0_rgba(0,0,0,0.85)]'
                   : pending
-                    ? // Pending tile: lime tint + dashed outline so player can tell it's still movable
-                      'bg-neo-lime text-neo-navy shadow-[0_3px_0_0_rgba(0,0,0,0.9)] ring-2 ring-neo-lime-light hover:ring-neo-pink hover:rotate-1'
+                    ? 'bg-neo-lime text-neo-navy shadow-[0_3px_0_0_rgba(0,0,0,0.9)] ring-2 ring-neo-lime-light hover:ring-neo-pink hover:rotate-1'
                     : isCenter
                       ? 'bg-neo-pink/35 text-neo-cream'
                       : (cell.premium && PREMIUM_WASH[cell.premium]) || 'bg-neo-navy-light/40',
-                isDragTarget && 'bg-neo-cyan/30 ring-2 ring-neo-cyan scale-105 z-10',
+                isDragTarget && 'bg-neo-cyan/30 ring-4 ring-neo-cyan scale-110 z-10',
+                isAxisHint && !isDragTarget && 'wc-axis-hint',
                 !isInteractive && !pending && 'cursor-not-allowed',
                 isInteractive && !pending && 'hover:bg-neo-cyan/15 active:scale-95',
                 inviteEmpty && 'wc-cell-invite',
@@ -132,11 +145,9 @@ function WordCraftBoardImpl({
                 <span className="wc-tile-glyph text-sm sm:text-base">
                   {pending.letter === '_' ? '·' : pending.letter}
                 </span>
-              ) : isDragTarget && dragHoverLetter ? (
-                // Ghost letter previewing the drop result — half-opacity
-                <span className="wc-tile-glyph text-sm sm:text-base text-neo-cyan/80">
-                  {dragHoverLetter === '_' ? '·' : dragHoverLetter}
-                </span>
+              ) : isAxisHint ? (
+                // tiny dot hints player at where next tile in a line could go
+                <span aria-hidden className="block w-1.5 h-1.5 rounded-full bg-neo-cyan/60" />
               ) : isCenter ? (
                 <span aria-hidden className="text-base sm:text-lg drop-shadow">★</span>
               ) : premium ? (

@@ -3664,11 +3664,21 @@ body.crazygames-embed .game-view-container,
   animation: wc-submit-pulse-kf 1.2s ease-in-out infinite;
 }
 
+@keyframes wc-axis-hint-kf {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.18); }
+}
+
+.wc-axis-hint > span {
+  animation: wc-axis-hint-kf 1.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .wc-cell-invite,
   .wc-cell-center-ping,
   .wc-rack-glow,
-  .wc-submit-pulse {
+  .wc-submit-pulse,
+  .wc-axis-hint > span {
     animation: none;
   }
 }

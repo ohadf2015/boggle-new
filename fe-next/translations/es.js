@@ -11542,6 +11542,16 @@ const es = {
       "submit": "Toca Enviar",
       "bot": "WordBot está pensando…",
       "over": "Fin de la partida"
+    },
+    "pending": {
+      "empty": "coloca una ficha para empezar la palabra",
+      "recallAll": "devolver todas las fichas al atril",
+      "recallOne": "devolver la ficha al atril"
+    },
+    "axis": {
+      "horizontal": "Horizontal",
+      "vertical": "Vertical",
+      "flipAria": "cambiar dirección de la palabra"
     }
   },
   "connections": {

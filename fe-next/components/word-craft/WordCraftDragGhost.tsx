@@ -10,22 +10,37 @@ export interface WordCraftDragGhostProps {
 }
 
 /**
+ * Lift offsets keep the dragged tile clear of the thumb on touch devices
+ * (~23 mm above contact) and a smaller bump on mouse/pen so cursor reads
+ * naturally near the artwork.
+ */
+const LIFT_OFFSET_PX: Record<DragState['pointerType'], number> = {
+  touch: 88,
+  pen: 56,
+  mouse: 40,
+};
+
+/**
  * Floating tile that follows the user's pointer during a drag-to-place.
  * Rendered into a viewport-fixed layer; pointer-events: none so the underlying
  * board cells still receive hover/move detection.
  */
 function WordCraftDragGhostImpl({ drag, locale = 'en' }: WordCraftDragGhostProps) {
   if (!drag || !drag.active) return null;
+  const lift = LIFT_OFFSET_PX[drag.pointerType] ?? LIFT_OFFSET_PX.mouse;
+  const locked = drag.hoverCell !== null;
   return (
     <div
       aria-hidden
       lang={locale}
+      data-drag-locked={locked ? 'true' : undefined}
       style={{
         position: 'fixed',
         left: drag.x,
-        top: drag.y,
-        transform: 'translate(-50%, -50%) rotate(-4deg) scale(1.15)',
+        top: drag.y - lift,
+        transform: `translate(-50%, -50%) rotate(-4deg) scale(${locked ? 1.22 : 1.15})`,
         pointerEvents: 'none',
+        transition: 'transform 120ms ease-out',
       }}
       className="z-50 w-14 h-16 sm:w-16 sm:h-[72px] rounded-neo border-neo-thick border-black bg-neo-lime text-neo-navy flex items-center justify-center shadow-hard-lg"
     >

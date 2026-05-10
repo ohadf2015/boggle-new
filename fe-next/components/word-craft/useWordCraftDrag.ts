@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+export type PointerKind = 'mouse' | 'touch' | 'pen';
+
 export interface DragState {
   tileId: string;
   letter: string;
@@ -13,13 +15,32 @@ export interface DragState {
   hoverCell: string | null;
   /** True once movement exceeds threshold; we don't show the ghost until then. */
   active: boolean;
+  /** Pointer kind so the ghost renderer knows how high to lift the preview. */
+  pointerType: PointerKind;
 }
 
 export interface UseWordCraftDragArgs {
   onDrop: (tileId: string, row: number, col: number) => void;
+  /** Optional handler for off-axis drops when an axis is locked. */
+  onOffAxisDrop?: (tileId: string, row: number, col: number) => void;
 }
 
 const DRAG_THRESHOLD_PX = 6;
+
+function vibrate(ms: number) {
+  if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+    try {
+      navigator.vibrate(ms);
+    } catch {
+      // some browsers throw on user-gesture-required policy; ignore
+    }
+  }
+}
+
+function normalizePointerType(t: string | undefined): PointerKind {
+  if (t === 'touch' || t === 'pen') return t;
+  return 'mouse';
+}
 
 /**
  * Pointer-driven drag from rack → board cell.
@@ -32,11 +53,16 @@ const DRAG_THRESHOLD_PX = 6;
  * The drag is "active" only after the user moves past DRAG_THRESHOLD — below
  * that we leave it dormant, so a quick tap still falls through to the rack
  * button's onClick (which toggles selection, the existing tap-to-place flow).
+ *
+ * Haptic: we vibrate(8) once each time the hovered cell *changes* to a valid
+ * drop target. That gives the player a physical-feeling "lock" cue without
+ * spamming the motor.
  */
 export function useWordCraftDrag({ onDrop }: UseWordCraftDragArgs) {
   const [drag, setDrag] = useState<DragState | null>(null);
   const startRef = useRef<{ x: number; y: number } | null>(null);
   const droppedRef = useRef(false);
+  const lastHoverRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!drag) return;
@@ -54,6 +80,11 @@ export function useWordCraftDrag({ onDrop }: UseWordCraftDragArgs) {
         cellEl instanceof HTMLElement && cellEl.dataset.tileState === 'empty'
           ? cellEl.dataset.boardCell ?? null
           : null;
+
+      if (hoverCell && hoverCell !== lastHoverRef.current) {
+        vibrate(8);
+      }
+      lastHoverRef.current = hoverCell;
 
       setDrag((prev) =>
         prev ? { ...prev, x: e.clientX, y: e.clientY, hoverCell, active: prev.active || passedThreshold } : null,
@@ -75,11 +106,13 @@ export function useWordCraftDrag({ onDrop }: UseWordCraftDragArgs) {
       }
       setDrag(null);
       startRef.current = null;
+      lastHoverRef.current = null;
     };
 
     const cancel = () => {
       setDrag(null);
       startRef.current = null;
+      lastHoverRef.current = null;
     };
 
     window.addEventListener('pointermove', move, { passive: true });
@@ -99,6 +132,7 @@ export function useWordCraftDrag({ onDrop }: UseWordCraftDragArgs) {
       // so cells can detect hover. Just record the start position.
       startRef.current = { x: e.clientX, y: e.clientY };
       droppedRef.current = false;
+      lastHoverRef.current = null;
       setDrag({
         tileId,
         letter,
@@ -107,6 +141,7 @@ export function useWordCraftDrag({ onDrop }: UseWordCraftDragArgs) {
         y: e.clientY,
         hoverCell: null,
         active: false,
+        pointerType: normalizePointerType(e.pointerType),
       });
     },
     [],

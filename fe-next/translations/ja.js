@@ -11379,6 +11379,16 @@ const ja = {
       "submit": "送信をタップ",
       "bot": "WordBot 考え中…",
       "over": "ゲーム終了"
+    },
+    "pending": {
+      "empty": "タイルを置いて単語を始めよう",
+      "recallAll": "すべてのタイルをラックに戻す",
+      "recallOne": "タイルをラックに戻す"
+    },
+    "axis": {
+      "horizontal": "横",
+      "vertical": "縦",
+      "flipAria": "単語の向きを切り替える"
     }
   },
   mp: {

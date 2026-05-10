@@ -11639,6 +11639,16 @@ const en = {
       "submit": "Tap Submit",
       "bot": "WordBot is thinking…",
       "over": "Game over"
+    },
+    "pending": {
+      "empty": "place a tile to start your word",
+      "recallAll": "send all tiles back to rack",
+      "recallOne": "send tile back to rack"
+    },
+    "axis": {
+      "horizontal": "Across",
+      "vertical": "Down",
+      "flipAria": "flip word direction"
     }
   },
   mp: {

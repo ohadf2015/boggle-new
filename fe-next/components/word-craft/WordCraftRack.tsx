@@ -13,6 +13,13 @@ export interface WordCraftRackProps {
   onTileDragStart?: (tile: RackTile, e: React.PointerEvent) => void;
   /** True if the previous gesture ended in a drop — suppress click-toggle */
   consumeDropFlag?: () => boolean;
+  /**
+   * If provided + axisLocked is true, a single tap on a non-pending rack tile
+   * fires this instead of toggling selection — auto-places along the locked axis.
+   */
+  onFastTap?: (tile: RackTile) => void;
+  /** True when an axis is inferred from the current pending placements. */
+  axisLocked?: boolean;
   disabled?: boolean;
   ariaLabel: string;
   hintPick?: boolean;
@@ -30,6 +37,8 @@ function WordCraftRackImpl({
   onSelect,
   onTileDragStart,
   consumeDropFlag,
+  onFastTap,
+  axisLocked,
   disabled,
   ariaLabel,
   hintPick,
@@ -41,12 +50,22 @@ function WordCraftRackImpl({
       role="toolbar"
       aria-label={ariaLabel}
       data-rack-hint-pick={hintPick ? 'true' : undefined}
+      data-axis-locked={axisLocked ? 'true' : undefined}
       lang={locale}
       className={cn(
-        'flex gap-2 sm:gap-3 justify-center flex-wrap p-3 pt-5 shrink-0',
+        // Horizontal scroll-snap rail: tiles never wrap. On wide phones (≥390px)
+        // 7 tiles fit naturally; on narrower viewports the rail scrolls with snap.
+        'flex gap-2 sm:gap-3 items-center justify-center p-3 pt-5 shrink-0',
+        'overflow-x-auto overflow-y-hidden flex-nowrap',
+        'snap-x snap-mandatory scroll-px-4 scrollbar-none',
         'bg-black/20 rounded-neo transition-shadow',
         hintPick && 'wc-rack-glow',
       )}
+      style={{
+        // Keep contents readable: maintain at least one tile-height so layout
+        // doesn't collapse if rack briefly empties.
+        minHeight: '5.5rem',
+      }}
     >
       {tiles.map((tile, idx) => {
         const isPending = pendingIds.has(tile.id);
@@ -58,6 +77,7 @@ function WordCraftRackImpl({
             key={tile.id}
             type="button"
             data-rack-tile-id={tile.id}
+            data-fast-tap={axisLocked && !isPending ? 'true' : undefined}
             disabled={disabled || isPending}
             aria-pressed={isSelected}
             onPointerDown={(e) => {
@@ -68,10 +88,14 @@ function WordCraftRackImpl({
             onClick={() => {
               // If the gesture ended as a drop, the tile is now pending — skip toggle.
               if (consumeDropFlag?.()) return;
+              if (axisLocked && onFastTap) {
+                onFastTap(tile);
+                return;
+              }
               onSelect(isSelected ? null : tile.id);
             }}
             className={cn(
-              'relative w-14 h-16 sm:w-16 sm:h-[72px] flex items-center justify-center touch-manipulation',
+              'relative w-14 h-16 sm:w-16 sm:h-[72px] flex items-center justify-center touch-manipulation shrink-0 snap-center',
               'rounded-neo border-neo-thick border-black',
               'transition-all duration-200 ease-out',
               tilt,

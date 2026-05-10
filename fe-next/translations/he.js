@@ -11535,6 +11535,16 @@ const he = {
       "submit": "הקש על שלח",
       "bot": "WordBot חושב…",
       "over": "סוף המשחק"
+    },
+    "pending": {
+      "empty": "הנח אות כדי להתחיל מילה",
+      "recallAll": "החזר את כל האותיות לרק",
+      "recallOne": "החזר אות לרק"
+    },
+    "axis": {
+      "horizontal": "אופקי",
+      "vertical": "אנכי",
+      "flipAria": "הפוך את כיוון המילה"
     }
   },
   mp: {
