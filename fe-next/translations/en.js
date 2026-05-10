@@ -5585,6 +5585,7 @@ const en = {
     }
   },
   "wordWheel": {
+    "youFoundEverything": "You found every word they did. Nice.",
     "title": "Word Wheel",
     "loading": "Loading Word Wheel...",
     "badge": "WORD WHEEL",
@@ -6178,7 +6179,13 @@ const en = {
       "decline": "Decline",
       "declined": "Challenge declined",
       "friendAccepted": "{{name}} accepted your challenge!",
-      "received": "Challenge received!"
+      "received": "Challenge received!",
+      "errors": {
+        "notFriends": "You need to be friends to challenge each other.",
+        "rateLimited": "Slow down — give it a moment before trying again.",
+        "timeout": "Challenge timed out. Try sending it again.",
+        "validation": "Couldn't send the challenge. Check the details and retry."
+      }
     },
     "copyInviteLink": "Copy invite link",
     "linkCopied": "Link copied!",
