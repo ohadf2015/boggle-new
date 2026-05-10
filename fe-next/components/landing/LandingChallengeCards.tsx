@@ -6,7 +6,7 @@ import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
-import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
+import { getGamesCompleted, isNewPlayer } from '@/utils/multiplayerProgressStorage';
 import { trackModeSelected, trackLandingCtaClick } from '@/utils/growthTracking';
 import { useIsPracticeVeteran } from '@/hooks/useIsPracticeVeteran';
 import { useUserStats } from '@/hooks/useUserStats';
@@ -110,6 +110,16 @@ export function LandingChallengeCards({
     !isOnCrazyGamesPlatform &&
     !!userStats &&
     userStats.totalGamesPlayed < THRESHOLDS.modeRoster;
+  // Once a player has finished even one multiplayer round they're past the
+  // choice-paralysis window — surface every mode unconditionally instead of
+  // hiding half behind a "More Game Modes" expander.
+  const [hasPlayedMp] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return getGamesCompleted() > 0;
+  });
+  // Word Craft is gated behind a closed beta. Non-allowlisted players never
+  // see the card — not even a locked one — so the surface stays uncluttered.
+  const wordCraftAllowed = isWordCraftBetaUser(user?.email);
 
   // Layered ordering, applied to a `LandingCardKey[]` working set:
   //   1. Start from the server-provided order (or `DEFAULT_ORDER`).
@@ -126,7 +136,7 @@ export function LandingChallengeCards({
     const next = [...baseOrder];
     if (!next.includes('connections')) next.push('connections');
     if (!next.includes('brainGym')) next.push('brainGym');
-    if (!next.includes('wordCraft')) next.push('wordCraft');
+    if (wordCraftAllowed && !next.includes('wordCraft')) next.push('wordCraft');
     return next;
   })();
   // Guarantee blast always appears before adventure (regardless of popularity ranking)
@@ -344,7 +354,7 @@ export function LandingChallengeCards({
   // Split visible vs. collapsed for first-timers / newbies / newcomers (< 3 games).
   // The newcomer-by-games signal is the durable gate — onboarding-flag and MP-join
   // signals expire too quickly. Veterans + CG players still see everything.
-  const collapseExtras = isFirstTimer || isNewbie || isNewcomerByGames;
+  const collapseExtras = !hasPlayedMp && (isFirstTimer || isNewbie || isNewcomerByGames);
   const mpCards = collapseExtras ? mpCardsAll.filter((m) => ESSENTIAL_FOR_NEWBIES.has(m)) : mpCardsAll;
   const mpCardsExtra = collapseExtras ? mpCardsAll.filter((m) => !ESSENTIAL_FOR_NEWBIES.has(m)) : [];
   const spCards = collapseExtras ? spCardsAll.filter((m) => ESSENTIAL_FOR_NEWBIES.has(m)) : spCardsAll;

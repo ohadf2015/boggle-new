@@ -42,7 +42,7 @@ vi.mock('../ModeCard', () => {
 });
 vi.mock('@/utils/contextualGuidanceStorage', () => ({ shouldShowGuidance: () => false }));
 vi.mock('@/utils/onboardingStorage', () => ({ hasCompletedOnboarding: () => true }));
-vi.mock('@/utils/multiplayerProgressStorage', () => ({ isNewPlayer: () => false }));
+vi.mock('@/utils/multiplayerProgressStorage', () => ({ isNewPlayer: () => false, getGamesCompleted: () => 0 }));
 vi.mock('@/components/daily/DailyChallengeBanner', () => {
   const DailyChallengeBanner = () => <div data-testid="daily-banner" />;
   DailyChallengeBanner.displayName = 'DailyChallengeBanner';
