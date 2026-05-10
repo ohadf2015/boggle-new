@@ -51,6 +51,15 @@ export function formatObjectiveLabel(
     case 'color_power':
       template = t('blast.objective.colorPower') || 'Use {count}+ {color} tiles in one word';
       break;
+    case 'clear_jelly':
+      template = t('blast.objective.clearJelly') || 'Clear all jelly';
+      break;
+    case 'kill_cake':
+      template = t('blast.objective.killCake') || 'Destroy the cake';
+      break;
+    case 'stop_chocolate':
+      template = t('blast.objective.stopChocolate') || 'Stop the chocolate';
+      break;
     default:
       template = '';
   }

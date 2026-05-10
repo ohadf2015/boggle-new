@@ -311,7 +311,17 @@ const WAVE_OBJECTIVES: Record<number, BlastObjective[]> = {
  * @param language optional game language (for target_word pool lookup)
  * @returns base objectives for the wave
  */
-export function getWaveObjectives(wave: number, language?: string): BlastObjective[] {
+export interface CcMechanicFlags {
+  jelly: boolean;
+  cake: boolean;
+  chocolate: boolean;
+}
+
+export function getWaveObjectives(
+  wave: number,
+  language?: string,
+  ccFlags?: CcMechanicFlags,
+): BlastObjective[] {
   const clamped = Math.max(wave, 1);
 
   let baseObjectives: BlastObjective[];
@@ -342,8 +352,42 @@ export function getWaveObjectives(wave: number, language?: string): BlastObjecti
   const lang = language ?? 'en';
   let withTargetWord = seedTargetWordObjective(clamped, lang, baseObjectives);
   let withAllSeeds = seedColorPowerObjective(clamped, withTargetWord);
+  if (ccFlags) withAllSeeds = seedCcMechanicObjective(clamped, withAllSeeds, ccFlags);
 
   return withAllSeeds;
+}
+
+/**
+ * Optionally seed a single cc-mechanic objective (jelly / cake / chocolate)
+ * into wave objectives, behind PostHog flags. Wave 1-2 protected (FTUE).
+ *
+ * Mechanic rotates by wave so a treatment cohort sees variety:
+ *   wave % 3 == 0 → jelly, == 1 → cake, == 2 → chocolate.
+ * Skipped if the rotation lands on a flag the cohort hasn't unlocked.
+ */
+export function seedCcMechanicObjective(
+  wave: number,
+  objectives: BlastObjective[],
+  flags: CcMechanicFlags,
+): BlastObjective[] {
+  if (wave < 3) return objectives;
+
+  const order = [
+    flags.jelly ? 'clear_jelly' as const : null,
+    flags.cake ? 'kill_cake' as const : null,
+    flags.chocolate ? 'stop_chocolate' as const : null,
+  ];
+  const enabled = order.filter((x): x is 'clear_jelly' | 'kill_cake' | 'stop_chocolate' => x !== null);
+  if (enabled.length === 0) return objectives;
+
+  const pick = enabled[wave % enabled.length];
+  if (pick === 'clear_jelly') {
+    return [...objectives, { type: 'clear_jelly', target: 4 + Math.min(wave, 6) }];
+  }
+  if (pick === 'kill_cake') {
+    return [...objectives, { type: 'kill_cake', target: 5 }];
+  }
+  return [...objectives, { type: 'stop_chocolate', target: 0 }];
 }
 
 /**
