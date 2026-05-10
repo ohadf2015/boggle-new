@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import type { LetterGrid } from '@/shared/types/game';
 import type { FoundWord } from '../types';
 import { trackGameStart } from '@/utils/growthTracking';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface UseSinglePlayerEffectsOptions {
   grid: LetterGrid | null;
@@ -78,6 +79,13 @@ export function useSinglePlayerEffects({
   const lastWordFoundTimeRef = useRef<number>(0);
   const gameStartTimeRef = useRef<number>(0);
 
+  const { user, profile } = useAuth();
+
+  // Latest score in a ref so heartbeat can include it without re-running the
+  // effect every score change.
+  const heartbeatScoreRef = useRef(score);
+  heartbeatScoreRef.current = score;
+
   // Game start time + analytics
   useEffect(() => {
     gameStartTimeRef.current = Date.now();
@@ -92,7 +100,9 @@ export function useSinglePlayerEffects({
     return () => setGameActive(false);
   }, [setGameActive]);
 
-  // Heartbeat
+  // Heartbeat — includes identity so admins can see who is playing live.
+  // Guests are tracked anonymously by sessionId; authed users include playerId
+  // so the admin live view can deep-link to their profile.
   useEffect(() => {
     const sessionId =
       typeof crypto !== 'undefined' && crypto.randomUUID
@@ -100,10 +110,28 @@ export function useSinglePlayerEffects({
         : Math.random().toString(36).substring(2) + Date.now().toString(36);
     const sendHeartbeat = async () => {
       try {
+        const username = profile?.display_name || profile?.username || (typeof window !== 'undefined' ? window.localStorage?.getItem('guestUsername') ?? undefined : undefined);
+        const avatar = profile
+          ? {
+              avatarImage: profile.avatar_image,
+              customAvatar: profile.avatar_config ?? undefined,
+              emoji: profile.avatar_emoji,
+              color: profile.avatar_color,
+            }
+          : null;
         await fetch('/api/single-player/heartbeat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId, language, mode }),
+          body: JSON.stringify({
+            sessionId,
+            language,
+            mode,
+            username: username || 'Guest',
+            avatar,
+            playerId: user?.id ?? null,
+            isAuthenticated: !!user,
+            score: heartbeatScoreRef.current,
+          }),
         });
       } catch {
         /* ignore */
@@ -119,7 +147,7 @@ export function useSinglePlayerEffects({
         body: JSON.stringify({ sessionId }),
       }).catch(() => {});
     };
-  }, [language, mode]);
+  }, [language, mode, user, profile]);
 
   // Landscape tutorial
   useEffect(() => {

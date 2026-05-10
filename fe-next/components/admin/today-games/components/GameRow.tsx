@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Clock, User, Crown, Gamepad2, Smartphone, Monitor, Sparkles } from 'lucide-react';
 import type { UnifiedGame } from '../types';
@@ -92,18 +93,13 @@ export function GameRow({ game, t }: GameRowProps) {
       </td>
       <td className="px-2 sm:px-4 py-3">
         <div className="flex flex-col gap-0.5">
-          <div className="flex items-center gap-2">
-            {game.is_guest ? (
-              <User className="w-4 h-4 text-slate-400" />
-            ) : game.placement === 1 ? (
-              <Crown className="w-4 h-4 text-neo-lime" />
-            ) : (
-              <PlayerAvatar
-                customAvatar={game.profiles?.avatar_config}
-                userId={game.player_id || undefined}
-              />
-            )}
-            <span className="text-sm text-neo-white truncate max-w-[120px]">{playerName}</span>
+          <PlayerCell
+            isGuest={!!game.is_guest}
+            playerId={game.player_id}
+            customAvatar={game.profiles?.avatar_config}
+            placement={game.placement}
+            playerName={playerName}
+          >
             {game.is_guest && (
               <span className="text-xs bg-slate-600 text-slate-300 px-1.5 py-0.5 rounded">
                 {t('admin.todayGames.guest')}
@@ -118,7 +114,7 @@ export function GameRow({ game, t }: GameRowProps) {
                 {t('admin.todayGames.first')}
               </span>
             )}
-          </div>
+          </PlayerCell>
           {game.is_guest && (
             <div className="flex items-center gap-2 ms-6 text-[11px] text-slate-500">
               {guestSessionShort && (
@@ -174,4 +170,52 @@ export function GameRow({ game, t }: GameRowProps) {
       </td>
     </motion.tr>
   );
+}
+
+interface PlayerCellProps {
+  isGuest: boolean;
+  playerId: string | null;
+  customAvatar: import('@/shared/types/customAvatar').CustomAvatarConfig | null | undefined;
+  placement: number | null;
+  playerName: string;
+  children: React.ReactNode;
+}
+
+function PlayerCell({
+  isGuest,
+  playerId,
+  customAvatar,
+  placement,
+  playerName,
+  children,
+}: PlayerCellProps) {
+  const inner = (
+    <>
+      {isGuest ? (
+        <User className="w-4 h-4 text-slate-400" />
+      ) : placement === 1 ? (
+        <Crown className="w-4 h-4 text-neo-lime" />
+      ) : (
+        <PlayerAvatar
+          customAvatar={customAvatar}
+          userId={playerId || undefined}
+        />
+      )}
+      <span className="text-sm text-neo-white truncate max-w-[120px]">{playerName}</span>
+      {children}
+    </>
+  );
+
+  if (!isGuest && playerId) {
+    return (
+      <Link
+        href={`/admin/players/${playerId}`}
+        className="flex items-center gap-2 hover:underline focus:outline-none focus:ring-2 focus:ring-neo-lime rounded"
+      >
+        {inner}
+      </Link>
+    );
+  }
+
+  return <div className="flex items-center gap-2">{inner}</div>;
 }

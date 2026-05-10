@@ -6891,7 +6891,9 @@ const en = {
       "ranked": "Ranked",
       "left": "left",
       "started": "Started",
-      "lastUpdated": "Last updated"
+      "lastUpdated": "Last updated",
+      "singlePlayerLive": "Live Single Player",
+      "mode": "Mode"
     },
     "email": {
       "title": "Email Testing",

@@ -6657,7 +6657,9 @@ const he = {
       "ranked": "מדורג",
       "left": "נותר",
       "started": "התחיל",
-      "lastUpdated": "עודכן לאחרונה"
+      "lastUpdated": "עודכן לאחרונה",
+      "singlePlayerLive": "סולו חי",
+      "mode": "מצב"
     },
     "email": {
       "title": "בדיקת אימייל",

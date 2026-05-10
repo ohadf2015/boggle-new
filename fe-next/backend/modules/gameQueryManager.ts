@@ -53,12 +53,19 @@ export interface GameSummary {
 // Detailed player info for admin dashboard
 export interface DetailedGamePlayer {
   username: string;
-  avatar: { emoji?: string; color?: string; avatarImage?: string } | null;
+  avatar: {
+    emoji?: string;
+    color?: string;
+    avatarImage?: string;
+    customAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig;
+  } | null;
   isHost: boolean;
   isBot: boolean;
   presence: 'active' | 'idle' | 'afk' | 'disconnected';
   score: number;
   isAuthenticated: boolean;
+  /** Auth user id for linking to admin player profile (null for guests/bots). */
+  playerId: string | null;
 }
 
 // Detailed game info for admin dashboard
@@ -120,6 +127,7 @@ export function getDetailedGames(games: Record<string, QueryGameBase>): Detailed
         presence,
         score: game.playerScores[username] || 0,
         isAuthenticated: !!user.authUserId,
+        playerId: user.authUserId ?? user.playerId ?? null,
       };
     });
 

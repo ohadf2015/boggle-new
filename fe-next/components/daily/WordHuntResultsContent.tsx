@@ -412,7 +412,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         transition={{ delay: 0.34, type: 'spring', stiffness: 300, damping: 26 }}
       >
         <Link
-          href={`/${language}/connections`}
+          href={`/${language}/connections/play`}
           data-testid="daily-connections-cross-promo"
           onClick={() =>
             trackGrowthEvent('cross_promo_click', {

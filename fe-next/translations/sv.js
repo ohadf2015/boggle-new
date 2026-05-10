@@ -6644,7 +6644,9 @@ const sv = {
       "ranked": "Rankad",
       "left": "kvar",
       "started": "Startad",
-      "lastUpdated": "Senast uppdaterad"
+      "lastUpdated": "Senast uppdaterad",
+      "singlePlayerLive": "Live Solo",
+      "mode": "Läge"
     },
     "email": {
       "title": "E-posttestning",

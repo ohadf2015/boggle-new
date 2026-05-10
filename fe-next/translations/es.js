@@ -6686,7 +6686,9 @@ const es = {
       "ranked": "Clasificado",
       "left": "restante",
       "started": "Iniciado",
-      "lastUpdated": "Última actualización"
+      "lastUpdated": "Última actualización",
+      "singlePlayerLive": "Solo en vivo",
+      "mode": "Modo"
     },
     "email": {
       "title": "Prueba de Email",

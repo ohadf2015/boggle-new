@@ -6733,7 +6733,9 @@ const ja = {
       "ranked": "ランクマッチ",
       "left": "残り",
       "started": "開始",
-      "lastUpdated": "最終更新"
+      "lastUpdated": "最終更新",
+      "singlePlayerLive": "ライブソロ",
+      "mode": "モード"
     },
     "email": {
       "title": "メールテスト",

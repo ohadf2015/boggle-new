@@ -79,7 +79,7 @@ export interface WordHuntMultiplayerBridgeResult {
 }
 
 export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult {
-  const targetLength = useWordHuntTargetLength();
+  const storedTargetLength = useWordHuntTargetLength();
   const targetCategory = useWordHuntTargetCategory();
   const myLife = useWordHuntMyLife();
   const targetAttempts = useWordHuntTargetAttempts();
@@ -95,6 +95,22 @@ export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult 
     () => targetAttempts.map(convertAttempt),
     [targetAttempts]
   );
+
+  // Effective target length: when the store hasn't received a length yet
+  // (late-join, reconnect race, missed startGame), derive it from existing
+  // server-validated signals so HintBoxes still render the target row.
+  const targetLength = useMemo(() => {
+    if (storedTargetLength > 0) return storedTargetLength;
+    // Non-discovery attempts have feedback that matches the target length.
+    for (const a of attempts) {
+      if (!a.isDiscovery && a.feedback.length > 0) return a.feedback.length;
+    }
+    // Last resort: at minimum cover positions we've already revealed.
+    if (discoveryClues.length > 0) {
+      return Math.max(...discoveryClues.map(c => c.position)) + 1;
+    }
+    return 0;
+  }, [storedTargetLength, attempts, discoveryClues]);
 
   // Compute accumulated clues: merge target guess feedback + discovery clues from found words
   const accumulatedClues = useMemo(() => {
