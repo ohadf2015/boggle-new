@@ -347,11 +347,13 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   locked: 0,
   key: 0,
   anchor: 0,
+  chocolate: 0,
+  cake: 0,
 };
 
 // ==================== Objectives ====================
 
-export type BlastObjectiveType = 'collect_type' | 'clear_all_type' | 'score_target' | 'word_length' | 'clear_percent' | 'target_word' | 'color_power';
+export type BlastObjectiveType = 'collect_type' | 'clear_all_type' | 'score_target' | 'word_length' | 'clear_percent' | 'target_word' | 'color_power' | 'clear_jelly' | 'kill_cake' | 'stop_chocolate';
 
 export type ColorTag = 'pink' | 'cyan' | 'lime';
 

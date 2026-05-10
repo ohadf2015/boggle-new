@@ -28,7 +28,9 @@ export type BlastTileType =
   | 'fuse'
   | 'locked'
   | 'key'
-  | 'anchor';
+  | 'anchor'
+  | 'chocolate'
+  | 'cake';
 
 /** Runtime-iterable list of all blast tile types (mirrors BlastTileType union) */
 export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
@@ -53,6 +55,8 @@ export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
   'locked',
   'key',
   'anchor',
+  'chocolate',
+  'cake',
 ] as const;
 
 // ==================== Combo Type ====================
@@ -122,4 +126,10 @@ export interface BlastTileState {
   isUnlocked?: boolean;
   /** Color tag for color_power objectives (pink/cyan/lime). Applies pulsing glow on board. */
   colorTag?: 'pink' | 'cyan' | 'lime';
+  /** Jelly clears: layers remaining beneath this cell. 0 or undefined = no jelly. */
+  jellyLayers?: number;
+  /** Cake-bomb: HP remaining (anchor cell only; satellites omit this field). */
+  cakeHp?: number;
+  /** Cake-bomb: anchor uid that this cell is part of (all 9 cells share). */
+  cakeAnchorUid?: string;
 }

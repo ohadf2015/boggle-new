@@ -200,6 +200,30 @@ export const EXPERIMENTS = {
     description:
       'Multiplayer desktop chassis kill-switch. on = MultiplayerDesktopShell mounts on desktop (default). off = legacy mobile-stacked layout. Flip to off via PostHog if Sentry warnings spike post-deploy. Not used for A/B traffic split.',
   }),
+
+  /**
+   * Blast Candy-Crush mechanics — per-mechanic kill switch + A/B gate. Each
+   * mechanic ships independently so the data team can isolate impact.
+   * Conversion = blast wave-completion rate (treatment vs control).
+   */
+  'blast.jelly': defineExperiment({
+    variants: ['control', 'treatment'] as const,
+    default: 'control',
+    description:
+      'Blast jelly clears mechanic. treatment = waves may pull `clear_jelly` objective + jelly-coated cells. control = legacy waves only.',
+  }),
+  'blast.cake': defineExperiment({
+    variants: ['control', 'treatment'] as const,
+    default: 'control',
+    description:
+      'Blast cake-bomb boss mechanic. treatment = waves may spawn 3x3 cake cluster + `kill_cake` objective. control = legacy waves only.',
+  }),
+  'blast.chocolate': defineExperiment({
+    variants: ['control', 'treatment'] as const,
+    default: 'control',
+    description:
+      'Blast chocolate spreader mechanic. treatment = waves may spawn chocolate cells that grow each turn unless touched + `stop_chocolate` objective. control = legacy waves only.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;
