@@ -27,6 +27,11 @@ vi.mock('next/dynamic', () => ({
     () => <div data-testid="onboarding-flow" />,
 }));
 
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/en',
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+}));
+
 describe('HomePageClient — landing-first for new users', () => {
   beforeEach(() => {
     localStorage.clear();

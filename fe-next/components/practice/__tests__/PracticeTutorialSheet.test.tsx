@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({ playButtonClickSound: vi.fn() }),
@@ -103,5 +104,62 @@ describe('PracticeTutorialSheet', () => {
   it('exposes a stable practice-tutorial-sheet test id for outer-flow gating', () => {
     render(<PracticeTutorialSheet mode="classic" t={t} onContinue={() => {}} />);
     expect(screen.getByTestId('practice-tutorial-sheet')).toBeInTheDocument();
+  });
+
+  it('renders a per-slide illustration component (one per slide) instead of a single hero image', () => {
+    render(<PracticeTutorialSheet mode="classic" t={t} onContinue={() => {}} />);
+    expect(screen.getByTestId('practice-tutorial-art-classic-0')).toBeInTheDocument();
+    expect(screen.getByTestId('practice-tutorial-art-classic-1')).toBeInTheDocument();
+    expect(screen.getByTestId('practice-tutorial-art-classic-2')).toBeInTheDocument();
+  });
+
+  describe('autoplay', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+    afterEach(() => {
+      vi.runOnlyPendingTimers();
+      vi.useRealTimers();
+    });
+
+    it('advances slide automatically when reduced-motion is not requested', () => {
+      // Default jsdom: matchMedia('reduce') === false
+      render(<PracticeTutorialSheet mode="classic" t={t} onContinue={() => {}} />);
+      const ribbonAt = () => screen.getByTestId('practice-tutorial-carousel').textContent ?? '';
+      expect(ribbonAt()).toContain('1 / 3');
+      act(() => { vi.advanceTimersByTime(4600); });
+      expect(ribbonAt()).toContain('2 / 3');
+    });
+
+    it('stops auto-advancing after the user interacts (dot tap)', () => {
+      render(<PracticeTutorialSheet mode="classic" t={t} onContinue={() => {}} />);
+      // Tap dot 0 → user-controlled
+      const dots = screen.getAllByRole('button', { name: /\d+ \/ 3/ });
+      fireEvent.click(dots[0]);
+      const ribbonAt = () => screen.getByTestId('practice-tutorial-carousel').textContent ?? '';
+      expect(ribbonAt()).toContain('1 / 3');
+      act(() => { vi.advanceTimersByTime(15000); });
+      // Still on slide 1 — autoplay paused after interaction
+      expect(ribbonAt()).toContain('1 / 3');
+    });
+
+    it('respects prefers-reduced-motion: reduce by NOT auto-advancing', () => {
+      const matchMediaSpy = vi.spyOn(window, 'matchMedia').mockImplementation((q: string) => ({
+        matches: q.includes('reduce'),
+        media: q,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        onchange: null,
+        dispatchEvent: vi.fn(),
+      } as unknown as MediaQueryList));
+      render(<PracticeTutorialSheet mode="classic" t={t} onContinue={() => {}} />);
+      const ribbonAt = () => screen.getByTestId('practice-tutorial-carousel').textContent ?? '';
+      expect(ribbonAt()).toContain('1 / 3');
+      act(() => { vi.advanceTimersByTime(15000); });
+      expect(ribbonAt()).toContain('1 / 3');
+      matchMediaSpy.mockRestore();
+    });
   });
 });

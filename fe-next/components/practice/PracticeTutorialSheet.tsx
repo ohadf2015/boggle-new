@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
-import Image from 'next/image';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Move, TrendingUp, Compass, Target, Route, Disc, Hand, Plus, type LucideIcon } from 'lucide-react';
 import { motion, type PanInfo } from 'framer-motion';
@@ -9,16 +8,14 @@ import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { haptics } from '@/utils/haptics';
 import { tutorialTipKeys, type PracticeMode } from '@/lib/practice/practiceTutorialSteps';
+import PracticeTutorialArt from './PracticeTutorialArt';
 
 type TFunction = (key: string, params?: Record<string, string | number>) => string;
 
-// Hero illustrations — same as the practice hub tile thumbnails AND the
-// in-game help modal. One image, three places, consistent visual story.
-const HERO_FOR_MODE: Record<PracticeMode, string> = {
-  classic: '/practice/help/practice-help-classic.jpg',
-  wordHunt: '/practice/help/practice-help-wordhunt.jpg',
-  wheelRush: '/practice/help/practice-help-wheelrush.jpg',
-};
+// Auto-advance pacing. WCAG 2.2.2 requires either a pause control or auto-stop
+// within 5s — we honor by stopping on first user interaction. Reduced-motion
+// disables autoplay entirely.
+const AUTOPLAY_INTERVAL_MS = 4500;
 
 const ACCENT_RGB: Record<PracticeMode, string> = {
   classic: '0, 255, 255',
@@ -77,6 +74,9 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
   const tipKeys = tutorialTipKeys(mode);
   const icons = TIP_ICONS[mode];
   const [activeSlide, setActiveSlide] = useState(0);
+  // Stops autoplay forever once the user has touched the carousel. Single-shot
+  // ref (not state) — we never want to re-render purely to mark this.
+  const interactedRef = useRef(false);
 
   const handleContinue = () => {
     playButtonClickSound();
@@ -88,9 +88,12 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
     haptics.tap();
     (onSkip ?? onContinue)();
   };
-  const goToSlide = useCallback((idx: number) => {
-    playButtonClickSound();
-    haptics.tap();
+  const goToSlide = useCallback((idx: number, opts: { user?: boolean } = {}) => {
+    if (opts.user) {
+      interactedRef.current = true;
+      playButtonClickSound();
+      haptics.tap();
+    }
     setActiveSlide(Math.max(0, Math.min(tipKeys.length - 1, idx)));
   }, [playButtonClickSound, tipKeys.length]);
 
@@ -100,9 +103,22 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
     const v = info.velocity.x;
     const next = isRTL ? (offset > threshold || v > 500) : (offset < -threshold || v < -500);
     const prev = isRTL ? (offset < -threshold || v < -500) : (offset > threshold || v > 500);
-    if (next && activeSlide < tipKeys.length - 1) goToSlide(activeSlide + 1);
-    else if (prev && activeSlide > 0) goToSlide(activeSlide - 1);
+    if (next && activeSlide < tipKeys.length - 1) goToSlide(activeSlide + 1, { user: true });
+    else if (prev && activeSlide > 0) goToSlide(activeSlide - 1, { user: true });
   }, [activeSlide, goToSlide, isRTL, tipKeys.length]);
+
+  // Auto-advance until user interacts (or reduced-motion). Loops once through
+  // all slides and stops — meets WCAG 2.2.2 without a pause control.
+  useEffect(() => {
+    if (interactedRef.current) return;
+    if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    if (activeSlide >= tipKeys.length - 1) return; // stop at last slide
+    const id = window.setTimeout(() => {
+      if (interactedRef.current) return;
+      setActiveSlide((prev) => Math.min(prev + 1, tipKeys.length - 1));
+    }, AUTOPLAY_INTERVAL_MS);
+    return () => window.clearTimeout(id);
+  }, [activeSlide, tipKeys.length]);
 
   const backHref = locale ? `/${locale}/practice` : '/practice';
 
@@ -180,18 +196,10 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
                     aria-label={`${idx + 1} / ${tipKeys.length}`}
                     className={`absolute inset-0 transition-opacity duration-300 ${isActive ? 'opacity-100 z-10' : 'opacity-0 pointer-events-none'}`}
                   >
-                    <Image
-                      src={HERO_FOR_MODE[mode]}
-                      alt=""
-                      fill
-                      sizes="(min-width: 768px) 640px, 100vw"
-                      className="object-cover"
-                      draggable={false}
-                      priority={isActive}
-                    />
+                    <PracticeTutorialArt mode={mode} idx={idx} />
                     <div
                       aria-hidden
-                      className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-neo-navy via-neo-navy/80 to-transparent"
+                      className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-neo-navy via-neo-navy/85 to-transparent"
                     />
                     <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 flex items-end gap-3">
                       <span
@@ -216,7 +224,7 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
             {/* Prev / next chevrons (desktop affordance) */}
             <button
               type="button"
-              onClick={() => goToSlide(activeSlide - 1)}
+              onClick={() => goToSlide(activeSlide - 1, { user: true })}
               disabled={activeSlide === 0}
               aria-label={t('howToPlay.back')}
               className="hidden md:flex absolute start-2 top-1/2 -translate-y-1/2 w-9 h-9 items-center justify-center rounded-full bg-neo-navy/80 border-2 border-neo-black text-neo-cream disabled:opacity-30 disabled:cursor-not-allowed hover:bg-neo-navy"
@@ -225,7 +233,7 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
             </button>
             <button
               type="button"
-              onClick={() => goToSlide(activeSlide + 1)}
+              onClick={() => goToSlide(activeSlide + 1, { user: true })}
               disabled={activeSlide === tipKeys.length - 1}
               aria-label={t('howToPlay.nextStep')}
               className="hidden md:flex absolute end-2 top-1/2 -translate-y-1/2 w-9 h-9 items-center justify-center rounded-full bg-neo-navy/80 border-2 border-neo-black text-neo-cream disabled:opacity-30 disabled:cursor-not-allowed hover:bg-neo-navy"
@@ -242,7 +250,7 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
                 <button
                   key={tipKey}
                   type="button"
-                  onClick={() => goToSlide(idx)}
+                  onClick={() => goToSlide(idx, { user: true })}
                   aria-label={`${idx + 1} / ${tipKeys.length}`}
                   aria-current={isActive ? 'step' : undefined}
                   className={`h-2.5 rounded-full transition-all duration-300 ${isActive ? `w-8 ${ACCENT_BG[mode]}` : 'w-2.5 bg-neo-cream/25 hover:bg-neo-cream/45'}`}

@@ -3,15 +3,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { Check, RotateCcw, Shuffle } from 'lucide-react';
+import { ArrowLeft, Check, RotateCcw, Shuffle } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeCompletePopup from './PracticeCompletePopup';
 import PracticePostCompleteChip from './PracticePostCompleteChip';
 import PracticeInstructions from './PracticeInstructions';
-import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
 import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
-import PracticeModeNav from './PracticeModeNav';
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
 import { usePracticeJuice } from './usePracticeJuice';
 import { usePracticeValidator } from '@/lib/practice/usePracticeValidator';
@@ -342,13 +340,6 @@ export default function PracticeWheelSandbox() {
     return () => clearTimeout(id);
   }, [feedback]);
 
-  const mascotReaction: PracticeMascotMood = isComplete
-    ? 'celebrate'
-    : feedback === 'ok'
-      ? 'cheer'
-      : feedback === 'bad' || feedback === 'noCenter'
-        ? 'wrong'
-        : 'idle';
 
   // Decorative practice score — sums letter counts × 1pt to mirror the
   // live wheel's score chip. Practice never persists this number; it's
@@ -361,13 +352,20 @@ export default function PracticeWheelSandbox() {
   return (
     <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-3 pb-2 gap-2 h-[calc(100dvh-var(--bottom-stack-height,0rem))] overflow-hidden">
       <PracticePixiFx ref={fxRef} />
-      <PracticeMascotReaction mode="wheelRush" reaction={mascotReaction} />
 
-      {/* HUD strip — mode nav + score + decorative no-timer chip. Same
+      {/* HUD strip — back-to-hub + score + decorative no-timer chip. Same
           three-segment shape as the live WheelRush HUD so the practice
           page is visually indistinguishable from the real thing. */}
       <div className="w-full flex items-center justify-between gap-2">
-        <PracticeModeNav current="wheelRush" />
+        <Link
+          href={`/${language}/practice`}
+          data-testid="practice-back-to-hub"
+          aria-label={t('practiceHub.backToHub')}
+          className="inline-flex items-center gap-1 px-2 py-1 rounded-full border-2 border-neo-cream/30 text-xs font-neo-display font-black text-neo-cream/80 hover:text-neo-cream hover:border-neo-cream/60 shrink-0 transition-colors opacity-70 hover:opacity-100"
+        >
+          <ArrowLeft className="w-3 h-3 rtl:rotate-180" aria-hidden />
+          <span>{t('practiceHub.backToHub')}</span>
+        </Link>
         <div className="flex items-center gap-2">
           <div
             data-testid="practice-wheel-score"

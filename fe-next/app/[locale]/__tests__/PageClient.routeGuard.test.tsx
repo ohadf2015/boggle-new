@@ -17,6 +17,7 @@ vi.mock('next/dynamic', () => ({ default: () => () => <div data-testid="onboardi
 const mockPathname = vi.fn(() => '/en');
 vi.mock('next/navigation', () => ({
   usePathname: () => mockPathname(),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
 
 describe('HomePageClient route allowlist guard', () => {

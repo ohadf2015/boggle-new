@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite } from '@/utils/onboardingStorage';
 import { trackInviteLanded } from '@/utils/growthTracking';
@@ -63,13 +63,26 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     return !returning;
   });
 
+  // Same-origin relative path captured from `?next=` so a play surface
+  // (e.g. /practice) can redirect first-timers here, finish FTUE, then route
+  // back. Validated client-side: starts with `/`, no protocol-relative `//`.
+  const [pendingNext] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const next = new URLSearchParams(window.location.search).get('next');
+    if (!next || !next.startsWith('/') || next.startsWith('//')) return null;
+    return next;
+  });
+
   // CG users on homepage skip the LandingView marketing surface and drop
   // straight into the CG short-flow (tutorial→welcome). PostHog 90d data showed
   // most CG visitors ignored the "Start Playing" CTA → only 2/20 saw welcome.
   // CG portal traffic = high intent to play; respect that.
+  // ?next= present + FTUE not done = user was redirected from a gated play
+  // surface. Auto-open FTUE so they don't have to click "Start Playing" again.
   const [showFTUE, setShowFTUE] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     if (hasCompletedOnboarding() || hasSupabaseSession()) return false;
+    if (pendingNext) return true;
     return detectCrazyGamesSync();
   });
   // Defensive route allowlist: FTUE may only render on locale homepage.
@@ -77,13 +90,17 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   // for current users — but guards against a future hoist that would leak the
   // FTUE onto blog/SEO/legal routes (and tank their CWV / SEO).
   const pathname = usePathname();
+  const router = useRouter();
   const routeAllowsOnboarding = isOnboardingAllowedRoute(pathname);
 
   const handleStartOnboarding = useCallback(() => {
     if (!routeAllowsOnboarding) return;
     setShowFTUE(true);
   }, [routeAllowsOnboarding]);
-  const handleFTUEComplete = useCallback(() => setShowFTUE(false), []);
+  const handleFTUEComplete = useCallback(() => {
+    setShowFTUE(false);
+    if (pendingNext) router.push(pendingNext);
+  }, [pendingNext, router]);
 
   if (showFTUE && routeAllowsOnboarding) {
     return <OnboardingFlow onComplete={handleFTUEComplete} />;

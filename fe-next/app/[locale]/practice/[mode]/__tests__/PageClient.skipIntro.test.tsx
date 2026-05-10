@@ -44,6 +44,9 @@ import { markPracticeMode } from '@/lib/practice/practiceProgress';
 
 beforeEach(() => {
   window.localStorage.clear();
+  // FTUE gate: pretend onboarding is complete so the gate lets the page render.
+  // Tests that target first-time-user redirect behavior live separately.
+  window.localStorage.setItem('lexiclash_onboarding_completed', 'true');
   // Reset query params between tests.
   for (const k of Array.from(searchParamsValue.keys())) searchParamsValue.delete(k);
   // Default viewport: mobile. Individual tests override for desktop.

@@ -2,13 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeCompletePopup from './PracticeCompletePopup';
 import PracticePostCompleteChip from './PracticePostCompleteChip';
 import PracticeInstructions from './PracticeInstructions';
-import PracticeMascotReaction, { type PracticeMascotMood } from './PracticeMascotReaction';
 import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
-import PracticeModeNav from './PracticeModeNav';
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
 import { usePracticeJuice } from './usePracticeJuice';
 import { usePracticeValidator } from '@/lib/practice/usePracticeValidator';
@@ -154,24 +153,21 @@ export default function PracticeClassicSandbox() {
     advanceBeat();
   }, [advanceBeat]);
 
-  const mascotReaction: PracticeMascotMood = isComplete
-    ? 'celebrate'
-    : feedback === 'ok'
-      ? 'cheer'
-      : feedback === 'bad'
-        ? 'wrong'
-        : 'idle';
-
   return (
     <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-3 pb-2 gap-2 h-[calc(100dvh-var(--bottom-stack-height,0rem))] overflow-hidden">
       <PracticePixiFx ref={fxRef} />
-      <PracticeMascotReaction mode="classic" reaction={mascotReaction} />
 
-      {/* HUD strip — mode nav left, goal pill right. Same vertical real-estate
-          as the live game's score/timer row, so the practice screen feels
-          like the real thing. */}
+      {/* HUD strip — back-to-hub left, goal pill right. */}
       <div className="w-full flex items-center justify-between gap-2">
-        <PracticeModeNav current="classic" />
+        <Link
+          href={`/${language}/practice`}
+          data-testid="practice-back-to-hub"
+          aria-label={t('practiceHub.backToHub')}
+          className="inline-flex items-center gap-1 px-2 py-1 rounded-full border-2 border-neo-cream/30 text-xs font-neo-display font-black text-neo-cream/80 hover:text-neo-cream hover:border-neo-cream/60 shrink-0 transition-colors opacity-70 hover:opacity-100"
+        >
+          <ArrowLeft className="w-3 h-3 rtl:rotate-180" aria-hidden />
+          <span>{t('practiceHub.backToHub')}</span>
+        </Link>
         <div
           data-testid="practice-goal-indicator"
           className="px-2.5 py-1 rounded-full bg-neo-cyan/20 border border-neo-cyan text-neo-cream text-xs font-neo-display font-black whitespace-nowrap"

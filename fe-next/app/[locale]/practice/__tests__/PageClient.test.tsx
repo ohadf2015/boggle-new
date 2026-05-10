@@ -5,9 +5,14 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { savePendingRoomInvite } from '@/utils/onboardingStorage';
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
   usePathname: () => '/',
 }));
+
+beforeEach(() => {
+  // Mark FTUE complete so the gate lets the hub render in tests.
+  window.localStorage.setItem('lexiclash_onboarding_completed', 'true');
+});
 vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({ playButtonClickSound: () => {} }),
 }));

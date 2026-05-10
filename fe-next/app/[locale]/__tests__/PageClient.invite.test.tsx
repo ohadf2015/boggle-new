@@ -9,6 +9,11 @@ vi.mock('@/components/landing', () => ({
 
 vi.mock('next/dynamic', () => ({ default: () => () => <div data-testid="onboarding-flow" /> }));
 
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/en',
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+}));
+
 describe('HomePageClient invite parsing', () => {
   beforeEach(() => {
     sessionStorage.clear();

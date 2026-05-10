@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -12,6 +12,7 @@ import { usePracticeProgress } from '@/components/practice/usePracticeProgress';
 import PracticeStreakChip from '@/components/practice/PracticeStreakChip';
 import PendingRoomBanner from '@/components/practice/PendingRoomBanner';
 import PracticeHubAtmosphere from '@/components/practice/PracticeHubAtmosphere';
+import { useFTUEGate } from '@/lib/onboarding/useFTUEGate';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
 const MODE_ACCENT: Record<PracticeMode, string> = {
@@ -56,6 +57,7 @@ export default function PracticeHubClient({ locale }: Props) {
   const { t, language } = useLanguage();
   const { playButtonClickSound } = useSoundEffects();
   const completed = usePracticeProgress(language);
+  useFTUEGate(locale, `/${locale}/practice`);
   const handleTileTap = () => {
     playButtonClickSound();
     haptics.tap();
@@ -186,34 +188,60 @@ export default function PracticeHubClient({ locale }: Props) {
                       ? `${t(`gameModes.${mode}.name`)} — ${t('practiceHub.completedBadge')}`
                       : t(`gameModes.${mode}.name`)
                   }
-                  className={`relative flex items-center gap-3 rounded-neo border-2 ${MODE_ACCENT[mode]} ${MODE_TINT[mode]} px-3 py-2.5 transition-colors active:translate-y-px shadow-hard-sm overflow-hidden`}
+                  className={`group relative flex items-stretch gap-3 rounded-neo border-2 ${MODE_ACCENT[mode]} ${MODE_TINT[mode]} p-3 transition-all active:translate-y-px shadow-hard md:hover:shadow-hard-lg overflow-hidden md:hover:-translate-y-0.5`}
                 >
-                  <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-neo border-2 border-neo-black overflow-hidden bg-neo-navy">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-neo border-2 border-neo-black overflow-hidden bg-neo-navy">
                     <Image
                       src={MODE_HERO[mode]}
                       alt=""
                       fill
-                      sizes="80px"
-                      className="object-cover"
+                      sizes="(min-width: 768px) 96px, 80px"
+                      className="object-cover transition-transform duration-500 md:group-hover:scale-110"
                     />
+                    <span
+                      aria-hidden
+                      className="absolute inset-0 bg-linear-to-t from-neo-black/45 via-transparent to-transparent"
+                    />
+                    <span
+                      aria-hidden
+                      className="absolute bottom-1 start-1 text-base leading-none drop-shadow-[1px_1px_0_rgba(0,0,0,0.9)]"
+                    >
+                      {MODE_EMOJI[mode]}
+                    </span>
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-base sm:text-lg font-neo-display font-bold text-neo-cream flex items-center gap-1.5">
-                      <span aria-hidden className="text-sm shrink-0">{MODE_EMOJI[mode]}</span>
-                      <span className="truncate">{t(`gameModes.${mode}.name`)}</span>
+                  <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+                    <h2 className="text-base sm:text-lg font-neo-display font-black text-neo-cream truncate">
+                      {t(`gameModes.${mode}.name`)}
                     </h2>
-                    <p className="text-xs font-neo-body text-neo-cream/85 mt-0.5 leading-snug line-clamp-2 pe-6">
+                    <p className="text-[0.72rem] sm:text-xs font-neo-body text-neo-cream/80 leading-snug line-clamp-2 pe-8">
                       {t(`gameModes.${mode}.description`)}
                     </p>
+                    <div className="flex flex-wrap gap-1 mt-0.5">
+                      {(['feature1', 'feature2'] as const).map((fk) => (
+                        <span
+                          key={fk}
+                          className="inline-flex items-center px-1.5 py-px rounded-full border border-neo-cream/25 bg-neo-navy/60 text-[0.6rem] font-neo-display font-bold text-neo-cream/85 uppercase tracking-wide"
+                        >
+                          {t(`gameModes.${mode}.${fk}`)}
+                        </span>
+                      ))}
+                    </div>
                   </div>
+
+                  <span
+                    aria-hidden
+                    className={`absolute top-1/2 end-2 -translate-y-1/2 inline-flex items-center justify-center w-7 h-7 rounded-full border-2 border-neo-black bg-neo-cream/95 text-neo-navy shadow-hard-sm transition-transform duration-300 md:opacity-0 md:translate-x-2 md:group-hover:opacity-100 md:group-hover:translate-x-0`}
+                  >
+                    <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" strokeWidth={3} />
+                  </span>
 
                   {isDone && (
                     <AdaptiveMotion.span
                       aria-hidden
                       animate={{ rotate: [0, -8, 8, 0] }}
                       transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 2.4, ease: 'easeInOut' }}
-                      className="absolute top-1.5 end-1.5 inline-flex items-center justify-center w-6 h-6 rounded-full bg-neo-cream/70 text-neo-navy border-2 border-neo-black font-neo-display font-black text-xs shadow-hard-sm"
+                      className="absolute top-1.5 end-1.5 inline-flex items-center justify-center w-6 h-6 rounded-full bg-neo-yellow text-neo-navy border-2 border-neo-black font-neo-display font-black text-xs shadow-hard-sm"
                     >
                       ★
                     </AdaptiveMotion.span>

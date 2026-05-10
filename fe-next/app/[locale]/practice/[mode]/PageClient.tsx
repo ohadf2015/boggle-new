@@ -9,6 +9,7 @@ import PracticeWordHuntSandbox from '@/components/practice/PracticeWordHuntSandb
 import PracticeWheelSandbox from '@/components/practice/PracticeWheelSandbox';
 import { useModeFirstSeen } from '@/hooks/useModeFirstSeen';
 import { isPracticeModeComplete } from '@/lib/practice/practiceProgress';
+import { useFTUEGate } from '@/lib/onboarding/useFTUEGate';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
 interface Props {
@@ -41,6 +42,7 @@ export default function PracticePageClient({ mode, locale }: Props) {
   const { t, language, dir } = useLanguage();
   const { markSeen } = useModeFirstSeen(mode);
   const searchParams = useSearchParams();
+  useFTUEGate(locale, `/${locale}/practice/${mode}`);
 
   const initialStep: Step =
     searchParams.get('play') === '1' || isPracticeModeComplete(mode, language)
