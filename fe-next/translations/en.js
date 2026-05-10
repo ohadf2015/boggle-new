@@ -1207,6 +1207,11 @@ const en = {
       "body": "The room is closing. Returning to the lobby in a few seconds — or tap below to leave now.",
       "exitNow": "Back to lobby now"
     },
+    "hostLeftReason": {
+      "explicitNoSuccessor": "Host left and no one else is here. Room is closing.",
+      "graceExpired": "Host didn't return in time. Room is closing.",
+      "hostSwitchedRoom": "Host moved to a different room. Room is closing."
+    },
     "rateLimited": "Slow down, speedster!",
     "crazyGamesFriends": "Play with Friends on CrazyGames",
     "inviteFriend": "Invite a Friend",
@@ -5080,6 +5085,7 @@ const en = {
       "sWordsDesc": "Words starting with S"
     },
     "header": "Practice Mode",
+    "again": "Again",
     "wordsFound": "Words Found",
     "found": "Found!",
     "invalid": "Not a word",
@@ -6173,6 +6179,10 @@ const en = {
     },
     "copyInviteLink": "Copy invite link",
     "linkCopied": "Link copied!",
+    "invitedByTitle": "{name} invited you!",
+    "invitedBySubtitle": "Sign up and we'll auto-send a friend request — no searching needed.",
+    "invitedAutoSentToast": "✨ Friend request auto-sent to {name}",
+    "invitedNotFoundToast": "We couldn't find {name} — they may have changed their username.",
     "seeAll": "See all",
     "cancelRequest": "Cancel",
     "signInTitle": "Sign in to add friends",
@@ -11653,7 +11663,14 @@ const en = {
       "flipAria": "flip word direction"
     },
     "zoomLabel": "Pinch to zoom into the board",
-    "zoomReset": "Reset zoom"
+    "zoomReset": "Reset zoom",
+    "live": {
+      "placed": "{{letter}} placed at row {{row}} column {{col}}",
+      "recalled": "{{letter}} returned to rack",
+      "axisAcrossLocked": "Across direction locked",
+      "axisDownLocked": "Down direction locked",
+      "axisUnlocked": "Word direction unlocked"
+    }
   },
   mp: {
     kbHint: {

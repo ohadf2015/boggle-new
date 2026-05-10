@@ -1208,6 +1208,11 @@ const ja = {
   "multiplayerFlow": {
     "host": "ホスト",
     "roomClosed": "ルームが閉鎖されました",
+    "hostLeftReason": {
+      "explicitNoSuccessor": "ホストが退出し、他のプレイヤーもいません。ルームを閉じます。",
+      "graceExpired": "ホストが時間内に戻りませんでした。ルームを閉じます。",
+      "hostSwitchedRoom": "ホストが別のルームへ移動しました。ルームを閉じます。"
+    },
     "hostLeftModal": {
       "title": "ホストが退出しました",
       "body": "ルームを閉じています。数秒後にロビーへ戻ります — すぐ戻るには下をタップ。",
@@ -4953,6 +4958,7 @@ const ja = {
       "sWordsDesc": "Sで始まる単語"
     },
     "header": "練習モード",
+    "again": "もう一度",
     "found": "ナイス！見つけた！",
     "duplicate": "もう見つけたよ！",
     "invalid": "単語じゃないよ、もう一回！",
@@ -6021,6 +6027,10 @@ const ja = {
     },
     "copyInviteLink": "招待リンクをコピー",
     "linkCopied": "リンクをコピーしました！",
+    "invitedByTitle": "{name} さんがあなたを招待しました！",
+    "invitedBySubtitle": "登録すると自動でフレンド申請を送ります — 検索は不要です。",
+    "invitedAutoSentToast": "✨ {name} さんへフレンド申請を自動送信しました",
+    "invitedNotFoundToast": "{name} さんが見つかりませんでした — ユーザー名が変更された可能性があります。",
     "seeAll": "すべて表示",
     "cancelRequest": "キャンセル",
     "signInTitle": "フレンドを追加するにはサインインしてください",
@@ -11393,7 +11403,14 @@ const ja = {
       "flipAria": "単語の向きを切り替える"
     },
     "zoomLabel": "ピンチで盤を拡大",
-    "zoomReset": "拡大をリセット"
+    "zoomReset": "拡大をリセット",
+    "live": {
+      "placed": "{{letter}} を {{row}} 行 {{col}} 列に配置",
+      "recalled": "{{letter}} をラックに戻しました",
+      "axisAcrossLocked": "横方向にロック",
+      "axisDownLocked": "縦方向にロック",
+      "axisUnlocked": "単語の向きを解除"
+    }
   },
   mp: {
     kbHint: {

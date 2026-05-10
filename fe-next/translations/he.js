@@ -1208,6 +1208,11 @@ const he = {
   "multiplayerFlow": {
     "host": "מארח",
     "roomClosed": "החדר נסגר",
+    "hostLeftReason": {
+      "explicitNoSuccessor": "המארח עזב ואין שחקנים נוספים. החדר נסגר.",
+      "graceExpired": "המארח לא חזר בזמן. החדר נסגר.",
+      "hostSwitchedRoom": "המארח עבר לחדר אחר. החדר נסגר."
+    },
     "hostLeftModal": {
       "title": "המארח עזב",
       "body": "החדר נסגר. חוזרים ללובי תוך כמה שניות — או הקש כאן כדי לצאת עכשיו.",
@@ -4981,6 +4986,7 @@ const he = {
       "sWordsDesc": "מילים שמתחילות בש׳"
     },
     "header": "מצב אימון",
+    "again": "שוב",
     "reset": "איפוס",
     "found": "יפה! מצאת מילה! ✨",
     "duplicate": "כבר מצאת את זה!",
@@ -5965,6 +5971,10 @@ const he = {
     },
     "copyInviteLink": "העתק קישור הזמנה",
     "linkCopied": "הקישור הועתק!",
+    "invitedByTitle": "‏{name} הזמינו אותך!",
+    "invitedBySubtitle": "הירשמו ונשלח בקשת חברות אוטומטית — בלי חיפוש.",
+    "invitedAutoSentToast": "✨ בקשת חברות נשלחה אוטומטית אל {name}",
+    "invitedNotFoundToast": "לא מצאנו את {name} — ייתכן ששינו את שם המשתמש.",
     "seeAll": "ראה הכל",
     "cancelRequest": "ביטול",
     "signInTitle": "התחבר כדי להוסיף חברים",
@@ -11549,7 +11559,14 @@ const he = {
       "flipAria": "הפוך את כיוון המילה"
     },
     "zoomLabel": "צבוט כדי להגדיל את הלוח",
-    "zoomReset": "אפס זום"
+    "zoomReset": "אפס זום",
+    "live": {
+      "placed": "{{letter}} הונחה בשורה {{row}} עמודה {{col}}",
+      "recalled": "{{letter}} חזרה לרק",
+      "axisAcrossLocked": "כיוון אופקי ננעל",
+      "axisDownLocked": "כיוון אנכי ננעל",
+      "axisUnlocked": "כיוון המילה שוחרר"
+    }
   },
   mp: {
     kbHint: {

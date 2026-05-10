@@ -1219,6 +1219,11 @@ const sv = {
     "inviteFriend": "Bjud in en vän",
     "host": "Värd",
     "roomClosed": "Rummet stängt",
+    "hostLeftReason": {
+      "explicitNoSuccessor": "Värden lämnade och ingen annan är kvar. Rummet stängs.",
+      "graceExpired": "Värden kom inte tillbaka i tid. Rummet stängs.",
+      "hostSwitchedRoom": "Värden bytte till ett annat rum. Rummet stängs."
+    },
     "hostLeftModal": {
       "title": "Värden lämnade",
       "body": "Rummet stängs. Du återgår till lobbyn om några sekunder — eller tryck nedan för att lämna nu.",
@@ -4968,6 +4973,7 @@ const sv = {
       "sWordsDesc": "Ord som börjar på S"
     },
     "header": "Övningsläge",
+    "again": "Igen",
     "found": "Snyggt! Ord hittat!",
     "duplicate": "Det där hittade du redan!",
     "invalid": "Inte ett ord - testa igen!",
@@ -5973,6 +5979,10 @@ const sv = {
     },
     "copyInviteLink": "Kopiera inbjudningslänk",
     "linkCopied": "Länk kopierad!",
+    "invitedByTitle": "{name} bjöd in dig!",
+    "invitedBySubtitle": "Registrera dig så skickar vi en vänförfrågan automatiskt — ingen sökning behövs.",
+    "invitedAutoSentToast": "✨ Vänförfrågan automatiskt skickad till {name}",
+    "invitedNotFoundToast": "Vi hittade inte {name} — användarnamnet kan ha ändrats.",
     "seeAll": "Visa alla",
     "cancelRequest": "Avbryt",
     "signInTitle": "Logga in för att lägga till vänner",
@@ -11461,7 +11471,14 @@ const sv = {
       "flipAria": "byt ordriktning"
     },
     "zoomLabel": "Nyp för att zooma in på brädet",
-    "zoomReset": "Återställ zoom"
+    "zoomReset": "Återställ zoom",
+    "live": {
+      "placed": "{{letter}} placerad rad {{row}} kolumn {{col}}",
+      "recalled": "{{letter}} tillbaka till stället",
+      "axisAcrossLocked": "Vågrätt riktning låst",
+      "axisDownLocked": "Lodrätt riktning låst",
+      "axisUnlocked": "Ordriktning olåst"
+    }
   },
   mp: {
     kbHint: {

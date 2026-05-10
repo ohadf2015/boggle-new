@@ -1237,6 +1237,11 @@ const es = {
     "crazyGamesFriends": "Jugar con Amigos en CrazyGames",
     "inviteFriend": "Invitar a un Amigo",
     "roomClosed": "Sala cerrada",
+    "hostLeftReason": {
+      "explicitNoSuccessor": "El anfitrión se fue y no queda nadie más. Cerrando la sala.",
+      "graceExpired": "El anfitrión no volvió a tiempo. Cerrando la sala.",
+      "hostSwitchedRoom": "El anfitrión se cambió a otra sala. Cerrando."
+    },
     "hostLeftModal": {
       "title": "El anfitrión se fue",
       "body": "La sala se está cerrando. Volviendo al lobby en unos segundos — o toca abajo para salir ahora.",
@@ -5019,6 +5024,7 @@ const es = {
       "sWordsDesc": "Palabras que empiezan con S"
     },
     "header": "Practica",
+    "again": "De nuevo",
     "wordsFound": "Encontradas",
     "found": "¡Encontrada!",
     "duplicate": "¡Ya la tienes!",
@@ -6027,6 +6033,10 @@ const es = {
     },
     "copyInviteLink": "Copiar enlace de invitación",
     "linkCopied": "¡Enlace copiado!",
+    "invitedByTitle": "¡{name} te invitó!",
+    "invitedBySubtitle": "Regístrate y enviaremos automáticamente una solicitud de amistad — sin buscar.",
+    "invitedAutoSentToast": "✨ Solicitud de amistad enviada a {name}",
+    "invitedNotFoundToast": "No encontramos a {name} — quizá cambió su nombre de usuario.",
     "seeAll": "Ver todos",
     "cancelRequest": "Cancelar",
     "signInTitle": "Inicia sesión para añadir amigos",
@@ -11556,7 +11566,14 @@ const es = {
       "flipAria": "cambiar dirección de la palabra"
     },
     "zoomLabel": "Pellizca para ampliar el tablero",
-    "zoomReset": "Restablecer zoom"
+    "zoomReset": "Restablecer zoom",
+    "live": {
+      "placed": "{{letter}} colocada en fila {{row}} columna {{col}}",
+      "recalled": "{{letter}} devuelta al atril",
+      "axisAcrossLocked": "Dirección horizontal bloqueada",
+      "axisDownLocked": "Dirección vertical bloqueada",
+      "axisUnlocked": "Dirección de la palabra desbloqueada"
+    }
   },
   "connections": {
     "title": "Cadena de Palabras",

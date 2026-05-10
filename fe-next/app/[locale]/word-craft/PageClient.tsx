@@ -23,6 +23,7 @@ import { WordCraftTutor } from '@/components/word-craft/WordCraftTutor';
 import { WordCraftDragGhost } from '@/components/word-craft/WordCraftDragGhost';
 import { WordCraftPendingStrip } from '@/components/word-craft/WordCraftPendingStrip';
 import { WordCraftZoomShell } from '@/components/word-craft/WordCraftZoomShell';
+import { WordCraftLiveRegion } from '@/components/word-craft/WordCraftLiveRegion';
 import { useWordCraftJuice } from '@/components/word-craft/useWordCraftJuice';
 import { useWordCraftDrag } from '@/components/word-craft/useWordCraftDrag';
 import { inferAxis, resolveTap } from '@/lib/word-craft/placement';
@@ -407,6 +408,87 @@ export default function WordCraftPageClient() {
     juice.invalidShake(cellEls);
   }, [game.state.lastError, game.state.pendingPlacements, juice]);
 
+  // --- Desktop keyboard shortcuts ---
+  // Esc       → recall all pending tiles
+  // Enter     → submit move (if eligible)
+  // Backspace → recall last pending tile
+  // Letters   → if a rack tile matches the typed glyph and axis is locked,
+  //             trigger fast-tap; otherwise select the matching tile.
+  // We deliberately skip Arrow keys + Space placement (deferred per spec
+  // §11) to keep the surface small. These four cover 90% of desktop play.
+  useEffect(() => {
+    if (game.state.turn !== 'player') return;
+    const onKey = (ev: KeyboardEvent) => {
+      // Don't fight the user when they're typing into an input/textarea
+      // (search bar, achievements, dev console UIs).
+      const target = ev.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+      if (ev.key === 'Escape') {
+        if (game.state.pendingPlacements.length > 0) {
+          ev.preventDefault();
+          recallAllPending();
+        }
+        return;
+      }
+      if (ev.key === 'Enter') {
+        if (game.state.pendingPlacements.length > 0 && dict && !game.state.burnout) {
+          ev.preventDefault();
+          submitMoveWithTelemetry();
+        }
+        return;
+      }
+      if (ev.key === 'Backspace') {
+        if (game.state.pendingPlacements.length > 0) {
+          ev.preventDefault();
+          const last = game.state.pendingPlacements[game.state.pendingPlacements.length - 1];
+          recallFromBoard(last.rackTileId);
+        }
+        return;
+      }
+      // Letter shortcut — single character key, ignore modifiers + spacebar
+      if (ev.key.length === 1 && !ev.ctrlKey && !ev.metaKey && !ev.altKey && ev.key !== ' ') {
+        const upper = ev.key.toUpperCase();
+        const candidate = game.state.player.rack.find(
+          (t) => !pendingIdsSetRef.current.has(t.id) && t.letter.toUpperCase() === upper,
+        );
+        if (!candidate) return;
+        ev.preventDefault();
+        if (axis !== null) {
+          handleFastTap({ id: candidate.id });
+        } else {
+          game.selectRackTile(candidate.id);
+        }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+    // recallAllPending / submitMoveWithTelemetry / handleFastTap already
+    // close over `game` via useCallback, so changes to game state surface
+    // through their identity changes.
+  }, [
+    game.state.turn,
+    game.state.pendingPlacements,
+    game.state.burnout,
+    game.state.player.rack,
+    dict,
+    axis,
+    handleFastTap,
+    recallAllPending,
+    recallFromBoard,
+    submitMoveWithTelemetry,
+    game,
+  ]);
+
+  // Mirror pendingIds into a ref so the keyboard handler — which closes over
+  // a snapshot of state — can see the current pending set without re-binding
+  // on every keystroke.
+  const pendingIdsSetRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    pendingIdsSetRef.current = new Set(game.state.pendingPlacements.map((p) => p.rackTileId));
+  }, [game.state.pendingPlacements]);
+
   if (authLoading || !isBetaUser) {
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
@@ -467,6 +549,16 @@ export default function WordCraftPageClient() {
       />
       <Header />
       <WordCraftCelebration kind={celebration.kind} burstId={celebration.burstId} origin={celebration.origin} />
+      <WordCraftLiveRegion
+        pending={game.state.pendingPlacements}
+        axis={axis}
+        labels={{
+          placed: (l, r, c) => t('wordcraft.live.placed', { letter: l, row: r, col: c }),
+          recalled: (l) => t('wordcraft.live.recalled', { letter: l }),
+          axisLocked: (a) => (a === 'h' ? t('wordcraft.live.axisAcrossLocked') : t('wordcraft.live.axisDownLocked')),
+          axisUnlocked: t('wordcraft.live.axisUnlocked'),
+        }}
+      />
 
       <main className="flex-1 min-h-0 px-3 py-2 max-w-[820px] mx-auto w-full flex flex-col gap-1.5 relative">
         {/* Topbar: back · title · BETA · How to play · loading */}
