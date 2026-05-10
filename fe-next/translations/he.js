@@ -6557,6 +6557,7 @@ const he = {
       "moderation": "מודרציה",
       "content": "תוכן",
       "players": "שחקנים",
+      "guests": "אורחים",
       "system": "מערכת",
       "wordCraft": "וורדקראפט"
     },
@@ -6697,6 +6698,8 @@ const he = {
       "ranked": "מדורג",
       "casual": "רגיל",
       "guest": "אורח",
+      "first": "ראשון",
+      "firstGame": "המשחק הראשון של אורח זה",
       "noGames": "אין עדיין משחקים היום",
       "noGamesHint": "משחקים יופיעו כאן כשהשחקנים יתחילו לשחק",
       "showing": "מציג",

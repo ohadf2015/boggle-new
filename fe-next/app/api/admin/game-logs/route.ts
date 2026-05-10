@@ -42,7 +42,34 @@ interface GameSessionRow {
   final_rank: number | null;
   duration_seconds: number | null;
   started_at: string;
+  completed_at: string | null;
   completed: boolean | null;
+  difficulty: string | null;
+  device_type: string | null;
+  browser: string | null;
+  country: string | null;
+  referrer_source: string | null;
+  is_first_game: boolean | null;
+  player_count: number | null;
+  tokens_earned: number | null;
+  tokens_spent: number | null;
+  clues_used: number | null;
+  life_gained: number | null;
+}
+
+interface GuestSessionRow {
+  session_id: string;
+  device_type: string | null;
+  browser: string | null;
+  country: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  referrer: string | null;
+  first_visit_at: string;
+  last_visit_at: string;
+  user_id: string | null;
+  linked_at: string | null;
 }
 
 interface WordHuntAttemptRow {
@@ -198,7 +225,19 @@ export async function GET(request: NextRequest) {
           final_rank,
           duration_seconds,
           started_at,
-          completed
+          completed_at,
+          completed,
+          difficulty,
+          device_type,
+          browser,
+          country,
+          referrer_source,
+          is_first_game,
+          player_count,
+          tokens_earned,
+          tokens_spent,
+          clues_used,
+          life_gained
         `, { count: 'exact' })
         .is('user_id', null)
         .not('guest_session_id', 'is', null)
@@ -232,28 +271,65 @@ export async function GET(request: NextRequest) {
           // Don't fail the whole request if guest query fails
         } else {
           guestCount = gCount || 0;
+          const guestSessionRows = ((guestData as unknown as GameSessionRow[]) || []);
+
+          // Pull acquisition metadata (utm + referrer) for these guest sessions in one query
+          const sessionIds = guestSessionRows
+            .map((g) => g.guest_session_id)
+            .filter((id): id is string => Boolean(id));
+          const guestMetaBySessionId: Record<string, GuestSessionRow> = {};
+          if (sessionIds.length > 0) {
+            const { data: guestMetaData } = await supabase
+              .from('guest_sessions')
+              .select('session_id, device_type, browser, country, utm_source, utm_medium, utm_campaign, referrer, first_visit_at, last_visit_at, user_id, linked_at')
+              .in('session_id', sessionIds);
+            ((guestMetaData as unknown as GuestSessionRow[]) || []).forEach((row) => {
+              guestMetaBySessionId[row.session_id] = row;
+            });
+          }
+
           // Transform guest games to match the expected format
-          guestGames = ((guestData as unknown as GameSessionRow[]) || []).map((session) => ({
-            id: session.id,
-            player_id: null,
-            guest_session_id: session.guest_session_id,
-            game_code: session.room_code || 'solo',
-            score: session.score || 0,
-            word_count: Array.isArray(session.words_found) ? session.words_found.length : 0,
-            longest_word: Array.isArray(session.words_found) && session.words_found.length > 0
-              ? session.words_found.reduce<string>((longest, w) =>
-                  (w.word?.length || 0) > (longest.length || 0) ? (w.word ?? longest) : longest, ''
-                )
-              : null,
-            placement: session.final_rank,
-            is_ranked: false,
-            is_guest: true,
-            mode: session.mode,
-            language: session.language,
-            time_played: session.duration_seconds || 0,
-            created_at: session.started_at,
-            profiles: null,
-          }));
+          guestGames = guestSessionRows.map((session) => {
+            const meta = session.guest_session_id ? guestMetaBySessionId[session.guest_session_id] : undefined;
+            return {
+              id: session.id,
+              player_id: null,
+              guest_session_id: session.guest_session_id,
+              game_code: session.room_code || 'solo',
+              score: session.score || 0,
+              word_count: Array.isArray(session.words_found) ? session.words_found.length : 0,
+              longest_word: Array.isArray(session.words_found) && session.words_found.length > 0
+                ? session.words_found.reduce<string>((longest, w) =>
+                    (w.word?.length || 0) > (longest.length || 0) ? (w.word ?? longest) : longest, ''
+                  )
+                : null,
+              placement: session.final_rank,
+              is_ranked: false,
+              is_guest: true,
+              mode: session.mode,
+              language: session.language,
+              time_played: session.duration_seconds || 0,
+              created_at: session.started_at,
+              completed_at: session.completed_at,
+              profiles: null,
+              difficulty: session.difficulty,
+              device_type: session.device_type ?? meta?.device_type ?? null,
+              browser: session.browser ?? meta?.browser ?? null,
+              country: session.country ?? meta?.country ?? null,
+              referrer_source: session.referrer_source ?? meta?.referrer ?? null,
+              utm_source: meta?.utm_source ?? null,
+              utm_medium: meta?.utm_medium ?? null,
+              utm_campaign: meta?.utm_campaign ?? null,
+              is_first_game: session.is_first_game ?? false,
+              player_count: session.player_count ?? null,
+              tokens_earned: session.tokens_earned ?? 0,
+              tokens_spent: session.tokens_spent ?? 0,
+              clues_used: session.clues_used ?? 0,
+              life_gained: session.life_gained ?? 0,
+              guest_first_visit_at: meta?.first_visit_at ?? null,
+              guest_last_visit_at: meta?.last_visit_at ?? null,
+            };
+          });
         }
       }
     }

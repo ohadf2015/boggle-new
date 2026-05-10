@@ -6700,6 +6700,7 @@ const en = {
       "moderation": "Moderation",
       "content": "Content",
       "players": "Players",
+      "guests": "Guests",
       "system": "System",
       "wordCraft": "WordCraft"
     },
@@ -6931,6 +6932,8 @@ const en = {
       "ranked": "Ranked",
       "casual": "Casual",
       "guest": "Guest",
+      "first": "First",
+      "firstGame": "First game from this guest",
       "noGames": "No games today yet",
       "noGamesHint": "Games will appear here as players start playing",
       "showing": "Showing",
