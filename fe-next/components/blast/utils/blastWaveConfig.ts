@@ -197,64 +197,64 @@ const WAVE_TABLE: WaveConfig[] = [
     lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
     movesAllowed: 6,
   },
-  // Wave 8 — catalyst unlock (6 moves)
+  // Wave 8 — revival staircase 1/4: diamond + anchor + gem + magma unlock
   {
     archetype: 'scoreRush',
     minWordLength: 2, specialTileChance: 0.26, iceDistribution: 0.30, goldDistribution: 0.11,
     vowelModifier: 0.80, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 500,
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
-    gemEnabled: false, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
-    diamondEnabled: false,
-    countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
-    lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
+    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    diamondEnabled: true,
+    countdownEnabled: false, shuffleEnabled: false, magmaEnabled: true, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
+    lockedEnabled: false, keyEnabled: false, anchorEnabled: true,
     movesAllowed: 6,
   },
-  // Wave 9 — countdown + fuse unlock (5 moves — tension mechanic, defuse or suffer)
+  // Wave 9 — revival staircase 2/4: + vortex + catalyst + portal + shuffle
   {
     archetype: 'survival',
     minWordLength: 2, specialTileChance: 0.27, iceDistribution: 0.30, goldDistribution: 0.10,
     vowelModifier: 0.78, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 550,
-    lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
-    gemEnabled: false, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
-    diamondEnabled: false,
-    countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
-    lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
+    lightningEnabled: true, vortexEnabled: true, magnetEnabled: false,
+    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    diamondEnabled: true,
+    countdownEnabled: false, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: false, fuseEnabled: false,
+    lockedEnabled: false, keyEnabled: false, anchorEnabled: true,
     movesAllowed: 5,
   },
-  // Wave 10 — shuffle + locked/key unlock (5 moves — rearranges board on clear)
+  // Wave 10 — revival staircase 3/4: + countdown + fuse + crystal
   {
     archetype: 'normal',
     minWordLength: 2, specialTileChance: 0.28, iceDistribution: 0.30, goldDistribution: 0.10,
     vowelModifier: 0.76, maxCascadeChain: 5, cascadeChainBonus: 1.0, scoreThreshold: 600,
-    lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
-    gemEnabled: false, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
-    diamondEnabled: false,
-    countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
-    lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
+    lightningEnabled: true, vortexEnabled: true, magnetEnabled: false,
+    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    diamondEnabled: true,
+    countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: true, fuseEnabled: true,
+    lockedEnabled: false, keyEnabled: false, anchorEnabled: true,
     movesAllowed: 5,
   },
-  // Wave 11 — magma + portal unlock (6 moves — diagonal eruption + teleport paths)
+  // Wave 11 — revival staircase 4/4: + locked + key (paired gate)
   {
     archetype: 'scoreRush',
     minWordLength: 2, specialTileChance: 0.28, iceDistribution: 0.30, goldDistribution: 0.10,
     vowelModifier: 0.75, maxCascadeChain: 5, cascadeChainBonus: 1.0, scoreThreshold: 650,
-    lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
-    gemEnabled: false, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
-    diamondEnabled: false,
-    countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
-    lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
+    lightningEnabled: true, vortexEnabled: true, magnetEnabled: false,
+    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    diamondEnabled: true,
+    countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: true, fuseEnabled: true,
+    lockedEnabled: true, keyEnabled: true, anchorEnabled: true,
     movesAllowed: 6,
   },
-  // Wave 12+ — crystal unlock, everything available (master tier)
+  // Wave 12+ — master tier (full revival inheritance)
   {
     archetype: 'survival',
     minWordLength: 2, specialTileChance: 0.30, iceDistribution: 0.30, goldDistribution: 0.10,
     vowelModifier: 0.75, maxCascadeChain: 5, cascadeChainBonus: 1.0, scoreThreshold: 700,
-    lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
-    gemEnabled: false, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
-    diamondEnabled: false,
-    countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
-    lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
+    lightningEnabled: true, vortexEnabled: true, magnetEnabled: false,
+    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    diamondEnabled: true,
+    countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: true, fuseEnabled: true,
+    lockedEnabled: true, keyEnabled: true, anchorEnabled: true,
     movesAllowed: 6,
   },
 ];
@@ -466,37 +466,37 @@ export function seedColorPowerObjective(
 }
 
 /** Lightning share when enabled (taken from gold + rainbow) */
-const LIGHTNING_SHARE = 0.08;
+export const LIGHTNING_SHARE = 0.08;
 /** Vortex share when enabled (renamed from MAGNET_SHARE; taken from gold + rainbow) */
-const VORTEX_SHARE = 0.06;
+export const VORTEX_SHARE = 0.06;
 /** Treasure gem share when enabled */
-const TREASURE_GEM_SHARE = 0.06;
+export const TREASURE_GEM_SHARE = 0.06;
 /** Prism share when enabled */
-const PRISM_SHARE = 0.06;
+export const PRISM_SHARE = 0.06;
 /** Frost share when enabled (renamed from FROZEN_SHARE) */
-const FROST_SHARE = 0.05;
-/** Diamond share when enabled (taken from gold + rainbow) */
-const DIAMOND_SHARE = 0.04;
-/** Countdown share when enabled */
-const COUNTDOWN_SHARE = 0.04;
-/** Shuffle share when enabled */
-const SHUFFLE_SHARE = 0.04;
-/** Magma share when enabled */
-const MAGMA_SHARE = 0.04;
-/** Portal share when enabled (spawns in pairs) */
-const PORTAL_SHARE = 0.04;
-/** Catalyst share when enabled */
-const CATALYST_SHARE = 0.04;
-/** Crystal share when enabled — smaller than others because growth multiplier scales exponentially */
-const CRYSTAL_SHARE = 0.03;
-/** Fuse share when enabled — spawns in linked pairs */
-const FUSE_SHARE = 0.04;
-/** Locked share when enabled — always 1:1 paired with key */
-const LOCKED_SHARE = 0.04;
-/** Key share when enabled — always 1:1 paired with locked */
-const KEY_SHARE = 0.04;
-/** Anchor share when enabled — long-word reward, modest share */
-const ANCHOR_SHARE = 0.04;
+export const FROST_SHARE = 0.05;
+/** Diamond share when enabled (revival 2× boost — was 0.04). */
+export const DIAMOND_SHARE = 0.08;
+/** Countdown share when enabled (revival 2× boost — was 0.04). */
+export const COUNTDOWN_SHARE = 0.08;
+/** Shuffle share when enabled (revival 2× boost — was 0.04). */
+export const SHUFFLE_SHARE = 0.08;
+/** Magma share when enabled (revival 2× boost — was 0.04). */
+export const MAGMA_SHARE = 0.08;
+/** Portal share when enabled (revival 2× boost — was 0.04; spawns in pairs). */
+export const PORTAL_SHARE = 0.08;
+/** Catalyst share when enabled (revival 2× boost — was 0.04). */
+export const CATALYST_SHARE = 0.08;
+/** Crystal share when enabled (revival 2× boost — was 0.03; growth multiplier scales exponentially). */
+export const CRYSTAL_SHARE = 0.06;
+/** Fuse share when enabled (revival 2× boost — was 0.04; spawns in linked pairs). */
+export const FUSE_SHARE = 0.08;
+/** Locked share when enabled (revival 2× boost — was 0.04; always 1:1 paired with key). */
+export const LOCKED_SHARE = 0.08;
+/** Key share when enabled (revival 2× boost — was 0.04; always 1:1 paired with locked). */
+export const KEY_SHARE = 0.08;
+/** Anchor share when enabled (revival 2× boost — was 0.04; long-word reward). */
+export const ANCHOR_SHARE = 0.08;
 
 /**
  * Build tile distribution for a wave, gating special tiles by unlock progression.
@@ -547,13 +547,21 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
   let key = 0;
   let anchor = 0;
 
-  // Helper: take a share proportionally from gold + rainbow
+  // Helper: take a share proportionally from gold + rainbow.
+  // Floor of 0.10 combined preserves the workhorse score economy
+  // (gold ×3 multiplier + rainbow cascade trigger) — Sprint 1+2 audit's
+  // spawn-dilution concern in reverse: don't dilute the *base* specials
+  // by feeding too many exotic shares.
+  const GOLD_RAINBOW_FLOOR = 0.10;
   const takeShare = (share: number) => {
     const total = gold + rainbow;
-    if (total <= 0) return;
+    if (total <= GOLD_RAINBOW_FLOOR) return;
+    const headroom = total - GOLD_RAINBOW_FLOOR;
+    const taken = Math.min(share, headroom);
+    if (taken <= 0) return;
     const ratio = gold / total;
-    gold -= share * ratio;
-    rainbow -= share * (1 - ratio);
+    gold -= taken * ratio;
+    rainbow -= taken * (1 - ratio);
   };
 
   if (lightningEnabled) {
