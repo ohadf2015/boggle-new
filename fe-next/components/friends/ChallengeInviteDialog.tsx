@@ -1,12 +1,17 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Target } from 'lucide-react';
+import { Target, Send, Zap, Skull, Swords, MessageCircle, Timer } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface ChallengeInviteDialogProps {
   isOpen: boolean;
@@ -28,29 +33,34 @@ interface GameSettings {
   message?: string;
 }
 
-const LANGUAGE_OPTIONS = [
-  { value: 'en', label: 'English' },
-  { value: 'he', label: 'עברית' },
-  { value: 'es', label: 'Español' },
-  { value: 'sv', label: 'Svenska' },
-  { value: 'ja', label: '日本語' },
+const TIMER_PRESETS: ReadonlyArray<{ seconds: number; label: string }> = [
+  { seconds: 60, label: '1:00' },
+  { seconds: 90, label: '1:30' },
+  { seconds: 120, label: '2:00' },
+  { seconds: 180, label: '3:00' },
 ];
 
-const TIMER_OPTIONS = [
-  { value: 60, label: '1:00' },
-  { value: 90, label: '1:30' },
-  { value: 120, label: '2:00' },
-  { value: 180, label: '3:00' },
+type ModeId = 'classic' | 'blitz' | 'survival';
+
+interface ModeMeta {
+  id: ModeId;
+  Icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
+  /** active background. Each mode has its own electric color for instant recognition. */
+  activeBg: string;
+  activeText: string;
+}
+
+const MODES: ReadonlyArray<ModeMeta> = [
+  { id: 'classic', Icon: Swords, activeBg: 'bg-neo-cyan', activeText: 'text-neo-black' },
+  { id: 'blitz', Icon: Zap, activeBg: 'bg-neo-yellow', activeText: 'text-neo-black' },
+  { id: 'survival', Icon: Skull, activeBg: 'bg-neo-pink', activeText: 'text-neo-white' },
 ];
 
 /**
- * ChallengeInviteDialog - Modal for sending game challenges to friends
- *
- * Features:
- * - Game settings picker (language, timer, mode)
- * - Optional custom message
- * - Create new game or share existing room code
- * - Loading state during challenge creation
+ * ChallengeInviteDialog — neo-brutalist challenge sender. Chip pickers replace
+ * dropdowns to cut decision load and add tap delight. Language is inherited
+ * from the user's locale (rare to change). Custom message is hidden behind a
+ * disclosure to avoid blank-field guilt.
  */
 export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
   isOpen,
@@ -61,268 +71,215 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
   className,
 }) => {
   const { t, language } = useLanguage();
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
 
-  const modeOptions = [
-    { value: 'classic', label: t('friends.challenges.modes.classic') },
-    { value: 'blitz', label: t('friends.challenges.modes.blitz') },
-    { value: 'survival', label: t('friends.challenges.modes.survival') },
-  ];
-
-  const [settings, setSettings] = useState<GameSettings>({
-    language: language || 'en',
-    timerSeconds: 120,
-    mode: 'classic',
-    message: '',
-  });
+  const [mode, setMode] = useState<ModeId>('classic');
+  const [timerSeconds, setTimerSeconds] = useState<number>(120);
+  const [message, setMessage] = useState<string>('');
+  const [showMessage, setShowMessage] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /**
-   * Handle setting change
-   */
-  const handleSettingChange = useCallback(<K extends keyof GameSettings>(
-    key: K,
-    value: GameSettings[K]
-  ) => {
-    setSettings((prev) => ({ ...prev, [key]: value }));
+  const reset = useCallback(() => {
+    setMode('classic');
+    setTimerSeconds(120);
+    setMessage('');
+    setShowMessage(false);
+    setError(null);
   }, []);
 
-  /**
-   * Handle send challenge
-   */
   const handleSend = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-
     try {
-      await onSendChallenge(friendId, 'new_game', settings);
+      await onSendChallenge(friendId, 'new_game', {
+        language: language || 'en',
+        timerSeconds,
+        mode,
+        message: message.trim() || undefined,
+      });
+      reset();
       onClose();
-    } catch (err) {
+    } catch {
       setError(t('friends.errors.sendFailed'));
     } finally {
       setIsLoading(false);
     }
-  }, [friendId, settings, onSendChallenge, onClose, t]);
+  }, [friendId, language, timerSeconds, mode, message, onSendChallenge, onClose, reset, t]);
 
-  /**
-   * Reset form when dialog closes
-   */
-  const handleClose = useCallback(() => {
-    if (!isLoading) {
-      setSettings({
-        language: language || 'en',
-        timerSeconds: 120,
-        mode: 'classic',
-        message: '',
-      });
-      setError(null);
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (open || isLoading) return;
+      reset();
       onClose();
-    }
-  }, [isLoading, language, onClose]);
+    },
+    [isLoading, onClose, reset]
+  );
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={handleClose}
-            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs"
-          />
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent
+        noDescription
+        closeButtonLabel={t('common.close')}
+        className={cn('max-w-md', className)}
+      >
+        <DialogHeader variant="pink">
+          <DialogTitle className="flex items-center justify-center gap-2">
+            <Target className="w-6 h-6 stroke-3" aria-hidden="true" />
+            {t('friends.challenges.send')}
+          </DialogTitle>
+        </DialogHeader>
 
-          {/* Dialog */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        <DialogBody className="space-y-5">
+          {/* Recipient — friendly headline, big & playful */}
+          <p
+            dir="auto"
+            className="text-center font-black text-lg leading-tight text-neo-black dark:text-neo-white"
+          >
+            {t('friends.challenges.inviteMessage', { name: friendUsername })}
+          </p>
+
+          {/* MODE — chip row */}
+          <div>
+            <p className="text-xs font-black uppercase tracking-widest text-current/60 mb-2 text-center">
+              {t('multiplayer.mode')}
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {MODES.map(({ id, Icon, activeBg, activeText }) => {
+                const isActive = mode === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setMode(id)}
+                    disabled={isLoading}
+                    aria-pressed={isActive}
+                    className={cn(
+                      'relative flex flex-col items-center gap-1.5 px-2 py-3 rounded-neo border-3 border-neo-black',
+                      'font-black uppercase tracking-tight text-xs transition-all duration-100',
+                      isActive
+                        ? cn(activeBg, activeText, 'shadow-hard-pressed translate-x-px translate-y-px')
+                        : 'bg-neo-cream dark:bg-neo-navy-light text-neo-black dark:text-neo-white shadow-hard hover:-translate-y-0.5 hover:shadow-hard-lg',
+                      isLoading && 'opacity-60 cursor-not-allowed'
+                    )}
+                  >
+                    <Icon className="w-6 h-6 stroke-3" aria-hidden={true} />
+                    <span>{t(`friends.challenges.modes.${id}`)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* TIMER — chip pills */}
+          <div>
+            <p className="text-xs font-black uppercase tracking-widest text-current/60 mb-2 text-center flex items-center justify-center gap-1.5">
+              <Timer className="w-3.5 h-3.5 stroke-3" aria-hidden="true" />
+              {t('multiplayer.timer')}
+            </p>
+            <div className="grid grid-cols-4 gap-2">
+              {TIMER_PRESETS.map(({ seconds, label }) => {
+                const isActive = timerSeconds === seconds;
+                return (
+                  <button
+                    key={seconds}
+                    type="button"
+                    onClick={() => setTimerSeconds(seconds)}
+                    disabled={isLoading}
+                    aria-pressed={isActive}
+                    className={cn(
+                      'py-2.5 rounded-neo border-3 border-neo-black font-black text-base tracking-tight',
+                      'transition-all duration-100',
+                      isActive
+                        ? 'bg-neo-lime text-neo-black shadow-hard-pressed translate-x-px translate-y-px'
+                        : 'bg-neo-cream dark:bg-neo-navy-light text-neo-black dark:text-neo-white shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard',
+                      isLoading && 'opacity-60 cursor-not-allowed'
+                    )}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* MESSAGE — collapsed by default */}
+          <div>
+            {!showMessage ? (
+              <button
+                type="button"
+                onClick={() => setShowMessage(true)}
+                disabled={isLoading}
+                className={cn(
+                  'w-full flex items-center justify-center gap-2 py-2 rounded-neo border-2 border-dashed border-neo-black/40 dark:border-neo-white/30',
+                  'font-black uppercase tracking-wide text-xs text-current/70',
+                  'hover:bg-neo-cream/60 dark:hover:bg-neo-navy-light/40 transition-colors',
+                  isLoading && 'opacity-60 cursor-not-allowed'
+                )}
+              >
+                <MessageCircle className="w-4 h-4 stroke-3" aria-hidden="true" />
+                {t('friends.challenges.customMessage')}
+              </button>
+            ) : (
+              <div>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  disabled={isLoading}
+                  placeholder={t('friends.challenges.customMessage')}
+                  maxLength={200}
+                  rows={2}
+                  autoFocus
+                  className={cn(
+                    'w-full px-3 py-2.5 rounded-neo border-3 border-neo-black resize-none',
+                    'font-bold text-sm',
+                    'bg-neo-cream dark:bg-neo-navy-light text-neo-black dark:text-neo-white',
+                    'shadow-hard-sm focus:shadow-hard focus:outline-none',
+                    'placeholder:text-current/50',
+                    isLoading && 'opacity-50 cursor-not-allowed'
+                  )}
+                />
+                <p className="text-xs mt-1 font-bold text-current/50 text-end">
+                  {message.length}/200
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div className="rounded-neo border-3 border-neo-red bg-neo-red/15 p-3">
+              <p className="text-sm font-black uppercase tracking-tight text-neo-red">{error}</p>
+            </div>
+          )}
+
+          {/* SEND — single big button. Cancel is the X in the corner. */}
+          <button
+            onClick={handleSend}
+            disabled={isLoading}
             className={cn(
-              'fixed inset-x-0 inset-y-0 z-50 flex items-center justify-center p-4',
-              className
+              'w-full flex items-center justify-center gap-2 py-4 rounded-neo border-3 border-neo-black',
+              'font-black text-base uppercase tracking-wider',
+              'bg-neo-lime text-neo-black shadow-hard',
+              'hover:shadow-hard-lg hover:-translate-y-0.5 active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
+              'transition-all duration-100',
+              isLoading && 'opacity-60 cursor-not-allowed'
             )}
           >
-            <div className={cn(
-              'w-full max-w-md rounded-neo border-2 border-neo-black shadow-hard-lg p-6',
-              'max-h-[calc(100dvh-2rem)] overflow-y-auto',
-              isDark ? 'bg-slate-800' : 'bg-white'
-            )}>
-              {/* Header */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                  <Target className="w-6 h-6 text-neo-cyan" />
-                  <h2 className={cn('font-black text-lg', isDark ? 'text-white' : 'text-gray-900')}>
-                    {t('friends.challenges.send')}
-                  </h2>
-                </div>
-                <button
-                  onClick={handleClose}
-                  disabled={isLoading}
-                  aria-label={t('common.close')}
-                  className={cn(
-                    'p-2 rounded-neo border-2 border-neo-black shadow-hard-sm',
-                    'hover:shadow-hard hover:-translate-y-0.5 transition-all',
-                    isDark ? 'bg-slate-700' : 'bg-gray-100',
-                    isLoading && 'opacity-50 cursor-not-allowed'
-                  )}
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Recipient */}
-              <p className={cn('text-sm mb-4', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                {t('friends.challenges.inviteMessage', { name: friendUsername })}
-              </p>
-
-              {/* Settings */}
-              <div className="space-y-4 mb-6">
-                {/* Language */}
-                <div>
-                  <label className={cn('block text-sm font-bold mb-2', isDark ? 'text-white' : 'text-gray-900')}>
-                    {t('settings.language')}
-                  </label>
-                  <select
-                    value={settings.language}
-                    onChange={(e) => handleSettingChange('language', e.target.value)}
-                    disabled={isLoading}
-                    className={cn(
-                      'w-full px-3 py-2 rounded-neo border-2 border-neo-black',
-                      'font-medium text-sm',
-                      isDark ? 'bg-slate-700 text-white' : 'bg-white text-gray-900',
-                      isLoading && 'opacity-50 cursor-not-allowed'
-                    )}
-                  >
-                    {LANGUAGE_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Timer */}
-                <div>
-                  <label className={cn('block text-sm font-bold mb-2', isDark ? 'text-white' : 'text-gray-900')}>
-                    {t('multiplayer.timer')}
-                  </label>
-                  <select
-                    value={settings.timerSeconds}
-                    onChange={(e) => handleSettingChange('timerSeconds', Number(e.target.value))}
-                    disabled={isLoading}
-                    className={cn(
-                      'w-full px-3 py-2 rounded-neo border-2 border-neo-black',
-                      'font-medium text-sm',
-                      isDark ? 'bg-slate-700 text-white' : 'bg-white text-gray-900',
-                      isLoading && 'opacity-50 cursor-not-allowed'
-                    )}
-                  >
-                    {TIMER_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Mode */}
-                <div>
-                  <label className={cn('block text-sm font-bold mb-2', isDark ? 'text-white' : 'text-gray-900')}>
-                    {t('multiplayer.mode')}
-                  </label>
-                  <select
-                    value={settings.mode}
-                    onChange={(e) => handleSettingChange('mode', e.target.value)}
-                    disabled={isLoading}
-                    className={cn(
-                      'w-full px-3 py-2 rounded-neo border-2 border-neo-black',
-                      'font-medium text-sm',
-                      isDark ? 'bg-slate-700 text-white' : 'bg-white text-gray-900',
-                      isLoading && 'opacity-50 cursor-not-allowed'
-                    )}
-                  >
-                    {modeOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Custom message */}
-                <div>
-                  <label className={cn('block text-sm font-bold mb-2', isDark ? 'text-white' : 'text-gray-900')}>
-                    {t('friends.challenges.customMessage')}
-                  </label>
-                  <textarea
-                    value={settings.message}
-                    onChange={(e) => handleSettingChange('message', e.target.value)}
-                    disabled={isLoading}
-                    placeholder={t('friends.challenges.customMessage')}
-                    maxLength={200}
-                    rows={2}
-                    className={cn(
-                      'w-full px-3 py-2 rounded-neo border-2 border-neo-black resize-none',
-                      'font-medium text-sm',
-                      isDark ? 'bg-slate-700 text-white placeholder-gray-500' : 'bg-white text-gray-900 placeholder-gray-400',
-                      isLoading && 'opacity-50 cursor-not-allowed'
-                    )}
-                  />
-                  <p className={cn('text-xs mt-1', isDark ? 'text-gray-500' : 'text-gray-400')}>
-                    {settings.message?.length || 0}/200
-                  </p>
-                </div>
-              </div>
-
-              {/* Error */}
-              {error && (
-                <div className="mb-4 p-3 rounded-neo border-2 border-red-500 bg-red-500/10">
-                  <p className="text-sm font-medium text-red-500">{error}</p>
-                </div>
-              )}
-
-              {/* Actions */}
-              <div className="flex gap-3">
-                <button
-                  onClick={handleClose}
-                  disabled={isLoading}
-                  className={cn(
-                    'flex-1 px-4 py-2 rounded-neo border-2 border-neo-black',
-                    'font-bold text-sm shadow-hard',
-                    'hover:shadow-hard-lg hover:-translate-y-0.5 transition-all',
-                    isDark ? 'bg-slate-700 text-white' : 'bg-gray-200 text-gray-900',
-                    isLoading && 'opacity-50 cursor-not-allowed'
-                  )}
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  onClick={handleSend}
-                  disabled={isLoading}
-                  className={cn(
-                    'flex-1 px-4 py-2 rounded-neo border-2 border-neo-black',
-                    'font-bold text-sm shadow-hard',
-                    'hover:shadow-hard-lg hover:-translate-y-0.5 transition-all',
-                    'bg-neo-lime text-neo-black',
-                    isLoading && 'opacity-50 cursor-not-allowed',
-                    'flex items-center justify-center gap-2'
-                  )}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader size="sm" />
-                      {t('common.sending')}
-                    </>
-                  ) : (
-                    <>
-                      <Target className="w-4 h-4" />
-                      {t('friends.challenges.send')}
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+            {isLoading ? (
+              <>
+                <Loader size="sm" />
+                {t('common.sending')}
+              </>
+            ) : (
+              <>
+                <Send className="w-5 h-5 stroke-3" aria-hidden="true" />
+                {t('friends.challenges.send')}
+              </>
+            )}
+          </button>
+        </DialogBody>
+      </DialogContent>
+    </Dialog>
   );
 };
 

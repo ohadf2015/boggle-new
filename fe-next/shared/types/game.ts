@@ -222,6 +222,8 @@ export interface Game {
   hostReconnectionTimeout?: ReturnType<typeof setTimeout> | null;
   validationTimeout?: ReturnType<typeof setTimeout> | null;
   isRanked: boolean;
+  /** Classroom-mode rooms skip auto-host-transfer (audit T4, 2026-05-10). */
+  isClassroom?: boolean;
   allowLateJoin: boolean;
   createdAt: number;
   lastActivity: number;

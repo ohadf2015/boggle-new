@@ -12,6 +12,8 @@ import {
   isRoomEmpty,
   getNextEligibleHost,
   transferHost,
+  upgradeSpectatorToPlayer,
+  getGameSpectators,
 } from '../../modules/gameStateManager';
 import {
   broadcastToRoom,
@@ -73,6 +75,8 @@ const mockDeleteGame = deleteGame as Mock;
 const mockIsRoomEmpty = isRoomEmpty as Mock;
 const mockGetNextEligibleHost = getNextEligibleHost as Mock;
 const mockTransferHost = transferHost as Mock;
+const mockUpgradeSpectatorToPlayer = upgradeSpectatorToPlayer as Mock;
+const mockGetGameSpectators = getGameSpectators as Mock;
 const mockBroadcastToRoom = broadcastToRoom as Mock;
 
 const mockGetGameRoom = getGameRoom as Mock;
@@ -118,6 +122,7 @@ describe('connectionHandler', () => {
     mockGetGameRoom.mockReturnValue('game:GAME1');
     mockGetActiveRooms.mockReturnValue([]);
     mockGetGameUsers.mockReturnValue([]);
+    mockGetGameSpectators.mockReturnValue([]);
   });
 
   afterEach(() => {
@@ -398,7 +403,11 @@ describe('connectionHandler', () => {
 
       expect(mockBroadcastToRoom).toHaveBeenCalledWith(
         mockIo, 'game:GAME1', 'hostDisconnected',
-        expect.objectContaining({ gracePeriodMs: expect.any(Number) })
+        expect.objectContaining({
+          gracePeriodMs: expect.any(Number),
+          i18nKey: 'playerView.hostDisconnected',
+          i18nParams: expect.objectContaining({ host: 'Host' }),
+        })
       );
       expect(mockTimerManager.setTimeout).toHaveBeenCalledWith(
         'hostReconnect:GAME1',
@@ -425,7 +434,12 @@ describe('connectionHandler', () => {
 
       expect(mockBroadcastToRoom).toHaveBeenCalledWith(
         mockIo, 'game:GAME1', 'hostLeftRoomClosing',
-        expect.objectContaining({ message: expect.any(String) })
+        expect.objectContaining({
+          message: expect.any(String),
+          reason: 'grace_expired',
+          i18nKey: 'multiplayerFlow.hostLeftReason.graceExpired',
+          i18nParams: expect.objectContaining({ host: 'Host' }),
+        })
       );
       expect(mockDeleteGame).toHaveBeenCalledWith('GAME1');
     });
@@ -547,6 +561,224 @@ describe('connectionHandler', () => {
         mockIo, 'game:GAME1', 'hostDisconnected',
         expect.objectContaining({ gracePeriodMs: expect.any(Number) })
       );
+    });
+
+    // T1 (audit 2026-05-10): retry budget should explore up to 3 DIFFERENT
+    // candidates when transfers fail. Pre-fix the loop short-circuited because
+    // getNextEligibleHost lacked an exclude-list, so attempts 2/3 selected the
+    // same already-tried username and the duplicate-check broke the loop.
+    it('tries up to 3 distinct candidates when transferHost keeps failing', () => {
+      const game = makeGame();
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Host');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(false);
+
+      // Simulate the BUG scenario: getNextEligibleHost is called multiple
+      // times. Pre-fix, the wrapper only knows to exclude the leaving host —
+      // so absent a separate per-attempt exclude list, callers that don't
+      // mutate state between attempts get the SAME candidate back. Mirror
+      // that here with `.mockReturnValue('Player1')` (no `.Once`). Post-fix,
+      // the connectionHandler passes a growing exclude-list, so the mock
+      // SHOULD be invoked with progressively larger arrays — and the
+      // duplicate-check should NOT short-circuit (it's the exclude-list,
+      // not the duplicate-check, that drives correctness now).
+      mockGetNextEligibleHost.mockImplementation(
+        (_gameCode: string, exclude: string[] = []) => {
+          // Simulate a real impl: skip excluded users, return Player1/2/3 in order.
+          const candidates = ['Player1', 'Player2', 'Player3'];
+          return candidates.find((c) => !exclude.includes(c)) || null;
+        }
+      );
+      mockTransferHost.mockReturnValue({ success: false, error: 'race' });
+
+      handlers['disconnect']('transport close');
+
+      const calledWith = mockTransferHost.mock.calls.map((c) => c[1]);
+      expect(calledWith).toEqual(['Player1', 'Player2', 'Player3']);
+    });
+
+    // T2 (audit 2026-05-10): when no eligible user remains but a spectator
+    // is present, promote the spectator to host (non-ranked/non-classroom/
+    // non-tournament rooms only). Closes the bug where invite-link rooms
+    // strand willing spectators because join hit MAX_PLAYERS_PER_ROOM.
+    it('promotes a spectator to host when no eligible user exists (T2)', () => {
+      const game = makeGame({
+        users: { Host: { socketId: 'socket-host', isHost: true, disconnected: false, isBot: false } },
+        spectators: { Specta: { socketId: 'socket-specta', avatar: {}, joinedAt: Date.now() } },
+      });
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Host');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(false);
+      mockGetNextEligibleHost.mockReturnValue(null); // no eligible user
+      mockGetGameSpectators.mockReturnValue([{ username: 'Specta', socketId: 'socket-specta', avatar: {}, joinedAt: Date.now() }]);
+      mockUpgradeSpectatorToPlayer.mockReturnValue(true);
+      mockTransferHost.mockReturnValue({ success: true });
+
+      handlers['disconnect']('transport close');
+
+      expect(mockUpgradeSpectatorToPlayer).toHaveBeenCalledWith('GAME1', 'Specta');
+      expect(mockTransferHost).toHaveBeenCalledWith('GAME1', 'Specta');
+      expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+        mockIo, 'game:GAME1', 'hostTransferred',
+        expect.objectContaining({ newHost: 'Specta' })
+      );
+    });
+
+    it('does NOT promote spectator in ranked/classroom/tournament rooms (T2 guard)', () => {
+      const game = makeGame({
+        isRanked: true,
+        users: { Host: { socketId: 'socket-host', isHost: true, disconnected: false, isBot: false } },
+        spectators: { Specta: { socketId: 'socket-specta', avatar: {}, joinedAt: Date.now() } },
+      });
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Host');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(false);
+      mockGetNextEligibleHost.mockReturnValue(null);
+
+      handlers['disconnect']('transport close');
+
+      expect(mockUpgradeSpectatorToPlayer).not.toHaveBeenCalled();
+      // Goes straight to grace period.
+      expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+        mockIo, 'game:GAME1', 'hostDisconnected', expect.anything()
+      );
+    });
+
+    // T3 (audit 2026-05-10): hostTransferred event must carry i18nKey +
+    // params so non-EN locales don't leak the English template literal.
+    // Mirrors the envelope shipped for hostLeftRoomClosing / hostDisconnected.
+    it('hostTransferred broadcast carries i18nKey + i18nParams (T3)', () => {
+      const game = makeGame();
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Host');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(false);
+      mockGetNextEligibleHost.mockReturnValue('Player1');
+      mockTransferHost.mockReturnValue({ success: true });
+
+      handlers['disconnect']('transport close');
+
+      expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+        mockIo, 'game:GAME1', 'hostTransferred',
+        expect.objectContaining({
+          previousHost: 'Host',
+          newHost: 'Player1',
+          i18nKey: 'multiplayerFlow.hostTransferredAnnouncement',
+          i18nParams: expect.objectContaining({ previousHost: 'Host', newHost: 'Player1' }),
+        })
+      );
+    });
+
+    // T5 (audit 2026-05-10): tournament rooms have host-bound state in
+    // tournamentManager that doesn't reconcile after a silent transfer.
+    // Preserve match integrity by NOT transferring.
+    it('does NOT auto-transfer host when game has tournamentId (T5)', () => {
+      const game = makeGame({ tournamentId: 'tourn-abc' });
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Host');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(false);
+      mockGetNextEligibleHost.mockReturnValue('Player1');
+
+      handlers['disconnect']('transport close');
+
+      expect(mockTransferHost).not.toHaveBeenCalled();
+      expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+        mockIo, 'game:GAME1', 'hostDisconnected',
+        expect.objectContaining({ gracePeriodMs: expect.any(Number) })
+      );
+    });
+
+    // T6 (audit 2026-05-10): ranked rooms tie MMR / match outcome to the
+    // original host's session. A silent transfer attributes results to the
+    // wrong player. Skip auto-transfer; close-on-grace preserves rating math.
+    it('does NOT auto-transfer host when game.isRanked=true (T6)', () => {
+      const game = makeGame({ isRanked: true });
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Host');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(false);
+      mockGetNextEligibleHost.mockReturnValue('Player1');
+
+      handlers['disconnect']('transport close');
+
+      expect(mockTransferHost).not.toHaveBeenCalled();
+      expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+        mockIo, 'game:GAME1', 'hostDisconnected',
+        expect.objectContaining({ gracePeriodMs: expect.any(Number) })
+      );
+    });
+
+    // T4 (audit 2026-05-10): classroom rooms must never auto-promote a student
+    // to teacher. Skip the transfer loop entirely and fall straight to the
+    // grace period, giving the teacher 5 minutes to reconnect.
+    it('does NOT auto-transfer host when game.isClassroom=true (teacher protection)', () => {
+      const game = makeGame({ isClassroom: true });
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Host');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(false);
+      // Eligible candidate exists — but classroom guard must prevent its use.
+      mockGetNextEligibleHost.mockReturnValue('Player1');
+
+      handlers['disconnect']('transport close');
+
+      expect(mockTransferHost).not.toHaveBeenCalled();
+      expect(mockBroadcastToRoom).not.toHaveBeenCalledWith(
+        mockIo, 'game:GAME1', 'hostTransferred', expect.anything()
+      );
+      // Should skip straight to grace-period notification.
+      expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+        mockIo, 'game:GAME1', 'hostDisconnected',
+        expect.objectContaining({ gracePeriodMs: expect.any(Number) })
+      );
+    });
+
+    it('passes growing exclude-list to getNextEligibleHost across retries', () => {
+      const game = makeGame();
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Host');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(false);
+      mockGetNextEligibleHost
+        .mockReturnValueOnce('Player1')
+        .mockReturnValueOnce('Player2')
+        .mockReturnValueOnce(null);
+      mockTransferHost.mockReturnValueOnce({ success: false, error: 'race' });
+
+      handlers['disconnect']('transport close');
+
+      // First call excludes only the leaving host.
+      expect(mockGetNextEligibleHost.mock.calls[0]).toEqual(['GAME1', ['Host']]);
+      // Second call must also exclude Player1 (the failed candidate).
+      expect(mockGetNextEligibleHost.mock.calls[1]).toEqual(['GAME1', ['Host', 'Player1']]);
     });
   });
 

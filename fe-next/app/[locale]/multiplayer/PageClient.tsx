@@ -34,6 +34,8 @@ import { useMultiplayerJoin } from './useMultiplayerJoin';
 import { useGameActions, useGameStore, useGameActive } from '@/hooks/gameState';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import { neoInfoToast } from '@/components/NeoToast';
+import { HostLeftGraceModal } from '@/components/multiplayer/HostLeftGraceModal';
+import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
 import type { Language, ActiveRoom, Avatar, GameMode } from '@/shared/types/game';
 import type { Socket } from 'socket.io-client';
 
@@ -92,6 +94,13 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   const [roomLanguage, setRoomLanguage] = useState<Language | null>(null);
   const [playersInRoom, setPlayersInRoom] = useState<Array<{ username: string; score?: number; avatar?: Avatar; isHost?: boolean; isBot?: boolean; presenceStatus?: string; isWindowFocused?: boolean }>>([]);
   const [isJoining, setIsJoining] = useState<boolean>(false);
+  // Soft-cushion modal state for `hostLeftRoomClosing` socket event.
+  // Replaces the prior 2s `window.location` reload (audit 2026-05-10 #1) so
+  // the player gets a 10-second readable explanation + manual exit button.
+  const [hostLeftState, setHostLeftState] = useState<{
+    reason?: 'explicit_no_successor' | 'grace_expired' | 'host_switched_room';
+    message: string;
+  } | null>(null);
 
   const setIsInGame = useHideNavigation();
 
@@ -219,11 +228,13 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     onError: (data) => {
       setIsJoining(false);
       if (data.message?.includes('not found') || data.message?.includes('Game not found') || data.message?.includes('closed')) {
-        // Silent redirect to lobby — no toast, no inline error. The user
-        // either followed a stale invite link, refreshed into a room that
-        // closed, or hit a race against host-cleanup. Showing them a 6s
-        // error blocked the lobby they were already being sent to. Just
-        // land on the lobby cleanly and let them pick a fresh room.
+        // Audit MED #8 (2026-05-10): only show "your room timed out" nudge
+        // when the user was ACTIVELY in this room — not on cold invite-link
+        // follows where the silent redirect to lobby is the right UX.
+        // `isActive` discriminates: true = was playing this room, false = stale link.
+        if (isActive) {
+          toast(t('multiplayerFlow.roomTimedOut'), { duration: 4000, icon: '⏱️' });
+        }
         setError('');
         setGameCode(''); setPrefilledRoomCode(''); setIsActive(false); setIsHost(false); setIsPrivate(false);
         setAttemptingReconnect(false); setShouldAutoJoin(false); clearSession();
@@ -263,10 +274,14 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       setResultsData(null);
       setPendingGameStart(null);
     },
-    onHostLeftRoomClosing: () => {
-      clearSessionPreservingUsername(username);
-      setIsActive(false); setIsHost(false); setGameCode('');
-      toast.error(t('multiplayerFlow.roomClosed'), { duration: 4000, icon: '🚪' });
+    onHostLeftRoomClosing: (data) => {
+      // Show grace modal — actual session/state cleanup happens in onExit.
+      // The modal countdown gives the player time to read what happened
+      // before being yanked back to the lobby.
+      setHostLeftState({
+        reason: data.reason,
+        message: data.resolvedMessage || t('multiplayerFlow.roomClosed'),
+      });
     },
     onSessionMigrated: () => {
       clearSessionPreservingUsername(username);
@@ -395,7 +410,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             initialPlayers={playersInRoom} username={username}
             onShowResults={handleShowResults} pendingGameStart={pendingGameStart}
             onGameStartConsumed={() => setPendingGameStart(null)} lessonData={lessonData}
-            onUsernameChange={setUsername} autoStart={quickPlay}
+            onUsernameChange={setUsername} autoStart={false}
             isPrivate={isPrivate || quickPlay}
           />
         </FeatureErrorBoundary>
@@ -463,6 +478,27 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             <AutoHideHeader />
           )}
           {renderView()}
+          <HostLeftGraceModal
+            isOpen={!!hostLeftState}
+            seconds={10}
+            reason={hostLeftState?.reason}
+            onExit={() => {
+              // Mirrors the cleanup the prior 2s `window.location` reload was
+              // doing implicitly: reset multiplayer state, drop URL traps, mark
+              // intentional exit so auto-rejoin doesn't yank the player back.
+              clearSessionPreservingUsername(username);
+              setIsActive(false); setIsHost(false); setIsPrivate(false); setGameCode('');
+              setShowResults(false); setResultsData(null);
+              try { sessionStorage.setItem('boggle_intentional_exit', '1'); } catch { /* blocked */ }
+              if (typeof window !== 'undefined') {
+                const stripped = stripMultiplayerExitParams(window.location.href);
+                if (stripped !== window.location.href) {
+                  window.history.replaceState({}, '', stripped);
+                }
+              }
+              setHostLeftState(null);
+            }}
+          />
         </div>
       </ErrorBoundary>
     </SocketContext.Provider>

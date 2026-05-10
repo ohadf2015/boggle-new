@@ -1208,11 +1208,14 @@ const he = {
   "multiplayerFlow": {
     "host": "מארח",
     "roomClosed": "החדר נסגר",
+    "roomTimedOut": "החדר שלך פג זמן — חוזרים ללובי.",
     "hostLeftReason": {
       "explicitNoSuccessor": "המארח עזב ואין שחקנים נוספים. החדר נסגר.",
       "graceExpired": "המארח לא חזר בזמן. החדר נסגר.",
       "hostSwitchedRoom": "המארח עבר לחדר אחר. החדר נסגר."
     },
+    "hostTransferredAnnouncement": "{previousHost} עזב. {newHost} הוא המארח החדש.",
+    "hostTransferredAfterGrace": "{previousHost} לא חזר. {newHost} הוא המארח החדש.",
     "hostLeftModal": {
       "title": "המארח עזב",
       "body": "החדר נסגר. חוזרים ללובי תוך כמה שניות — או הקש כאן כדי לצאת עכשיו.",

@@ -141,6 +141,10 @@ export const CreateGameSchema = z.object({
   guestTokenHash: GuestTokenHashSchema,
   isRanked: z.boolean().optional().default(false),
   isPrivate: z.boolean().optional().default(false),
+  // Audit T4 (2026-05-10): when true, host disconnect must NOT auto-promote a
+  // student/player. Goes straight to grace period so the teacher can reclaim
+  // host. Set by the multiplayer client when ?classroom=true URL param is on.
+  isClassroom: z.boolean().optional().default(false),
 });
 
 /**

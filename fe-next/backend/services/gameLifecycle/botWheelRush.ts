@@ -119,7 +119,10 @@ function submitOneWord(
   if (!bot.isActive) return;
 
   const validation = validateWheelSubmission(state, word, language);
-  if (!validation.valid) return;
+  if (!validation.valid) {
+    logger.debug('BOT_WHEEL', `[${bot.username}] reject "${word}" — ${validation.error}`);
+    return;
+  }
 
   const now = Date.now();
   const outcome = applyWheelWord(state, bot.username, word, now);
@@ -218,6 +221,8 @@ export function startBotsForWheelRush(
   }
 
   const gameEndTime = Date.now() + timerSeconds * 1000;
+
+  logger.info('BOT_WHEEL', `Game ${gameCode} (${language}): ${allCandidates.length} candidate wheel words for ${bots.length} bots`);
 
   for (const bot of bots) {
     bot.isActive = true;

@@ -1237,11 +1237,14 @@ const es = {
     "crazyGamesFriends": "Jugar con Amigos en CrazyGames",
     "inviteFriend": "Invitar a un Amigo",
     "roomClosed": "Sala cerrada",
+    "roomTimedOut": "Tu sala expiró — volviendo al lobby.",
     "hostLeftReason": {
       "explicitNoSuccessor": "El anfitrión se fue y no queda nadie más. Cerrando la sala.",
       "graceExpired": "El anfitrión no volvió a tiempo. Cerrando la sala.",
       "hostSwitchedRoom": "El anfitrión se cambió a otra sala. Cerrando."
     },
+    "hostTransferredAnnouncement": "{previousHost} se fue. {newHost} es ahora el anfitrión.",
+    "hostTransferredAfterGrace": "{previousHost} no volvió. {newHost} es ahora el anfitrión.",
     "hostLeftModal": {
       "title": "El anfitrión se fue",
       "body": "La sala se está cerrando. Volviendo al lobby en unos segundos — o toca abajo para salir ahora.",

@@ -95,7 +95,7 @@ type HandleJoinFn = (
   overrideGameCode?: string,
   overrideRoomName?: string,
   overrideUsername?: string,
-  options?: { isPrivate?: boolean },
+  options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean },
 ) => Promise<void>;
 
 export function useMultiplayerJoin({
@@ -124,7 +124,7 @@ export function useMultiplayerJoin({
       overrideGameCode?: string,
       overrideRoomName?: string,
       overrideUsername?: string,
-      options?: { isPrivate?: boolean; quickPlay?: boolean },
+      options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean },
     ) => {
       if (process.env.NODE_ENV === 'development') {
         console.log(`[JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socket?.connected}`);
@@ -238,6 +238,9 @@ export function useMultiplayerJoin({
           guestSessionId,
           avatar: hostAvatar,
           ...(options?.isPrivate && { isPrivate: true }),
+          // Audit T4 (2026-05-10): server-side flag protects against
+          // student-promotion if teacher disconnects mid-session.
+          ...(options?.isClassroom && { isClassroom: true }),
         });
 
         if (options?.quickPlay) {

@@ -1,8 +1,8 @@
 /**
- * BlastView — checkpoint persistence on fail.
- * When a player fails a wave (with or without watching the retry ad), the
- * wave they reached must be persisted so a return visit offers Resume from
- * that wave instead of forcing them back to wave 1.
+ * BlastView — checkpoint persistence semantics.
+ * Resume must reflect the highest wave the player has *cleared*, not
+ * merely attempted. Failing a wave (with or without the retry ad) must
+ * NOT advance the checkpoint — only successful wave completions do.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
@@ -94,22 +94,22 @@ const lossResults = (waveNumber: number, clearPct: number) => ({
   language: 'en' as const,
 });
 
-describe('BlastView — checkpoint persistence on fail', () => {
+describe('BlastView — checkpoint reflects cleared waves only', () => {
   beforeEach(() => {
     blastGameProps.current = null;
     recordWaveReached.mockClear();
   });
 
-  it('persists wave 1 when player fails wave 1 without watching ad', () => {
+  it('does NOT persist progress when player fails wave 1 without watching ad', () => {
     render(<BlastView />);
     fireEvent.click(screen.getByTestId('play-button'));
     act(() => {
       blastGameProps.current.onGameEnd(lossResults(1, 40));
     });
-    expect(recordWaveReached).toHaveBeenCalledWith(1);
+    expect(recordWaveReached).not.toHaveBeenCalled();
   });
 
-  it('persists the failed wave (not wave-1) when player fails wave 3', () => {
+  it('persists wave 2 (last cleared) when player fails wave 3 without ad retry', () => {
     render(<BlastView />);
     fireEvent.click(screen.getByTestId('play-button'));
     act(() => { blastGameProps.current.onWaveComplete(100, ['CAT'], 95); });
@@ -118,10 +118,13 @@ describe('BlastView — checkpoint persistence on fail', () => {
     fireEvent.click(screen.getByTestId('next-wave-button'));
     expect(screen.getByTestId('mock-blast-game').getAttribute('data-wave')).toBe('3');
 
+    // Calls so far: clear-1 + clear-2 — wave 2 is the highest cleared.
+    expect(recordWaveReached).toHaveBeenLastCalledWith(2);
+
     recordWaveReached.mockClear();
     act(() => {
       blastGameProps.current.onGameEnd(lossResults(3, 40));
     });
-    expect(recordWaveReached).toHaveBeenCalledWith(3);
+    expect(recordWaveReached).not.toHaveBeenCalled();
   });
 });

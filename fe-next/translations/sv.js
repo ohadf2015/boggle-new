@@ -1219,11 +1219,14 @@ const sv = {
     "inviteFriend": "Bjud in en vän",
     "host": "Värd",
     "roomClosed": "Rummet stängt",
+    "roomTimedOut": "Ditt rum gick ut — tillbaka till lobbyn.",
     "hostLeftReason": {
       "explicitNoSuccessor": "Värden lämnade och ingen annan är kvar. Rummet stängs.",
       "graceExpired": "Värden kom inte tillbaka i tid. Rummet stängs.",
       "hostSwitchedRoom": "Värden bytte till ett annat rum. Rummet stängs."
     },
+    "hostTransferredAnnouncement": "{previousHost} lämnade. {newHost} är nu värd.",
+    "hostTransferredAfterGrace": "{previousHost} kom inte tillbaka. {newHost} är nu värd.",
     "hostLeftModal": {
       "title": "Värden lämnade",
       "body": "Rummet stängs. Du återgår till lobbyn om några sekunder — eller tryck nedan för att lämna nu.",

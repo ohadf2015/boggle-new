@@ -138,11 +138,6 @@ export function BlastView() {
 
   /** Game ended */
   const handleGameEnd = useCallback((resultsData: BlastResultsData) => {
-    // Save the wave the player reached even on a fail — declining the retry
-    // ad and quitting must still leave a Resume entry on the home screen,
-    // not silently drop them back to wave 1.
-    checkpoint.recordWaveReached(currentWave);
-
     const mergedResults: BlastResultsData = {
       ...resultsData,
       finalScore: totalScore + resultsData.finalScore,
@@ -192,7 +187,7 @@ export function BlastView() {
       bestWordLength: bestWord.length,
       difficulty: config.difficulty ?? 'medium',
     });
-  }, [totalScore, allWordsFound, waveHistory, currentWave, config.difficulty, language, checkpoint]);
+  }, [totalScore, allWordsFound, waveHistory, currentWave, config.difficulty, language]);
 
   /** Advance to next wave */
   const handleWaveAdvance = useCallback(() => {
@@ -431,11 +426,14 @@ export function BlastView() {
       )}
 
       {phase === 'results' && results && (() => {
-        // Retry-on-loss eligibility: failed (clearPct < 90), have an ad provider,
-        // haven't already retried this run, and player hasn't declined yet.
+        // Retry-on-loss eligibility: failed (clearPct < 90), past wave 1
+        // (wave-1 retry has zero progress to preserve and is identical to
+        // Play Again), have an ad provider, haven't already retried, and
+        // player hasn't declined yet.
         const failedClearPct = results.clearPercentage ?? 0;
         const eligibleForRetry =
           failedClearPct < 90
+          && currentWave > 1
           && hasRealAdProvider
           && !retryUsedRef.current
           && !retryDeclined

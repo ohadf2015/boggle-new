@@ -27,26 +27,34 @@ export interface TransferHostResult {
 }
 
 /**
- * Find the next eligible player to become host
- * Prioritizes connected, non-bot players
+ * Find the next eligible player to become host.
+ * Prioritizes connected, non-bot players, returning candidates in insertion
+ * order (earliest joiner first).
+ *
+ * The exclude argument accepts either a single username (legacy callers) or an
+ * array of usernames. Audit T1 (2026-05-10): the retry loop in
+ * connectionHandler needs to pass a *growing* list of already-tried candidates
+ * so attempt 2 doesn't keep returning the same failed candidate as attempt 1.
  */
 export function getNextEligibleHost(
   game: HostGameBase | null,
-  excludeUsername?: string
+  exclude?: string | string[]
 ): string | null {
   if (!game) return null;
 
-  // Find connected, non-bot players (excluding the specified user)
+  const excludeSet = new Set(
+    Array.isArray(exclude) ? exclude : exclude ? [exclude] : []
+  );
+
   const eligiblePlayers = Object.entries(game.users)
     .filter(([username, user]) => {
-      if (excludeUsername && username === excludeUsername) return false;
+      if (excludeSet.has(username)) return false;
       if (user.isBot) return false;
       if (user.disconnected) return false;
       return true;
     })
     .map(([username]) => username);
 
-  // Return the first eligible player (they joined earliest)
   return eligiblePlayers.length > 0 ? eligiblePlayers[0] : null;
 }
 

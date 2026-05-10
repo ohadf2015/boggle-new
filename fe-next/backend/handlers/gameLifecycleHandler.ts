@@ -70,6 +70,7 @@ interface CreateGamePayload {
   guestSessionId?: string;
   isRanked?: boolean;
   isPrivate?: boolean;
+  isClassroom?: boolean;
 }
 
 interface StartGameAckPayload {
@@ -129,7 +130,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked, isPrivate } = validation.data as CreateGamePayload;
+      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked, isPrivate, isClassroom } = validation.data as CreateGamePayload;
 
       // Ranked rooms must be hosted by an authenticated user — guests can't
       // submit results that update the ranked MMR leaderboard, so allowing
@@ -183,6 +184,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         language: language || 'en',
         isRanked: isRanked || false,
         isPrivate: isPrivate || false,
+        isClassroom: isClassroom || false,
         allowLateJoin: isRanked ? false : true
       });
 
@@ -675,7 +677,10 @@ async function handleExistingAuthConnection(io: Server, socket: Socket, authUser
         oldGame.reconnectionTimeout = null;
       }
       broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'hostLeftRoomClosing', {
-        message: 'Host started a new game. Room is closing.'
+        message: 'Host started a new game. Room is closing.',
+        i18nKey: 'multiplayerFlow.hostLeftReason.hostSwitchedRoom',
+        i18nParams: { host: existingConnection.username },
+        reason: 'host_switched_room'
       });
       clearGameTimer(existingConnection.gameCode);
       deleteGame(existingConnection.gameCode);

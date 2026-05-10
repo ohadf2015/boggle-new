@@ -39,7 +39,7 @@ interface MultiplayerFlowProps {
     gameCode?: string,
     roomName?: string,
     overrideUsername?: string,
-    options?: { isPrivate?: boolean; quickPlay?: boolean },
+    options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean },
   ) => void;
   refreshRooms: () => void;
 
@@ -197,7 +197,10 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
         if (host) {
           setRoomName(`${profile.username} Room`);
           setHostUsername(profile.username);
-          handleJoin(true, defaultLanguage, roomCode, `${profile.username} Room`, profile.username, { isPrivate: true });
+          // Audit T4 (2026-05-10): mark room as classroom so server skips
+          // auto-host-transfer if teacher disconnects. Prevents student
+          // silent-promotion to teacher authority.
+          handleJoin(true, defaultLanguage, roomCode, `${profile.username} Room`, profile.username, { isPrivate: true, isClassroom: true });
           return;
         }
         // Pass username as override to avoid stale closure in handleJoin

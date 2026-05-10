@@ -32,6 +32,28 @@ describe('HostLeftGraceModal (UX audit 2026-05-04 #2)', () => {
     expect(screen.queryByTestId('dialog')).toBeNull();
   });
 
+  it('renders generic body copy when no reason is supplied', () => {
+    render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} />);
+    // Mock t() returns the key — assert the generic key landed in the DOM.
+    expect(screen.getByTestId('dialog-content').textContent).toContain('multiplayerFlow.hostLeftModal.body');
+  });
+
+  it('renders reason-specific body when reason="grace_expired"', () => {
+    render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} reason="grace_expired" />);
+    expect(screen.getByTestId('dialog-content').textContent).toContain('multiplayerFlow.hostLeftReason.graceExpired');
+    expect(screen.getByTestId('dialog-content').textContent).not.toContain('multiplayerFlow.hostLeftModal.body');
+  });
+
+  it('renders reason-specific body when reason="host_switched_room"', () => {
+    render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} reason="host_switched_room" />);
+    expect(screen.getByTestId('dialog-content').textContent).toContain('multiplayerFlow.hostLeftReason.hostSwitchedRoom');
+  });
+
+  it('renders reason-specific body when reason="explicit_no_successor"', () => {
+    render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} reason="explicit_no_successor" />);
+    expect(screen.getByTestId('dialog-content').textContent).toContain('multiplayerFlow.hostLeftReason.explicitNoSuccessor');
+  });
+
   it('renders dialog with countdown when isOpen=true', () => {
     render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} />);
     expect(screen.getByTestId('dialog')).toBeInTheDocument();

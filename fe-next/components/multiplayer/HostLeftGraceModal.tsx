@@ -16,6 +16,13 @@ interface HostLeftGraceModalProps {
   onExit: () => void;
   /** Countdown duration. Defaults to 10s — long enough to read what happened, short enough to not feel stuck. */
   seconds?: number;
+  /**
+   * Discriminator from server-side `hostLeftRoomClosing` payload (audit 2026-05-10).
+   * When provided, the modal body uses the reason-specific i18n key so players see
+   * "Host didn't return in time" vs "Host moved to a different room" vs the
+   * generic fallback. Without it, falls through to the generic body.
+   */
+  reason?: 'explicit_no_successor' | 'grace_expired' | 'host_switched_room';
 }
 
 /**
@@ -24,10 +31,17 @@ interface HostLeftGraceModalProps {
  * closed" toast which gave players no time to read or to choose timing.
  * See multiplayer-ux-2026-05-04 #2.
  */
+const REASON_TO_KEY: Record<NonNullable<HostLeftGraceModalProps['reason']>, string> = {
+  explicit_no_successor: 'multiplayerFlow.hostLeftReason.explicitNoSuccessor',
+  grace_expired: 'multiplayerFlow.hostLeftReason.graceExpired',
+  host_switched_room: 'multiplayerFlow.hostLeftReason.hostSwitchedRoom',
+};
+
 export const HostLeftGraceModal: React.FC<HostLeftGraceModalProps> = ({
   isOpen,
   onExit,
   seconds = 10,
+  reason,
 }) => {
   const { t, dir } = useLanguage();
   const [remaining, setRemaining] = useState<number>(seconds);
@@ -74,7 +88,9 @@ export const HostLeftGraceModal: React.FC<HostLeftGraceModalProps> = ({
         </DialogHeader>
         <div className="px-5 py-4 space-y-3">
           <p className="text-sm text-neo-cream/85">
-            {t('multiplayerFlow.hostLeftModal.body')}
+            {reason && REASON_TO_KEY[reason]
+              ? t(REASON_TO_KEY[reason])
+              : t('multiplayerFlow.hostLeftModal.body')}
           </p>
           <p
             data-testid="host-left-countdown"

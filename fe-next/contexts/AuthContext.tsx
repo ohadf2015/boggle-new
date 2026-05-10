@@ -134,6 +134,31 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
             : 'header_or_menu';
         trackSignupCompleted(source);
         consumePendingSignupCompletion();
+        // Auto-friend the inviter if a `?ref=<username>` was captured from an
+        // invite link before this signup. Dynamic import avoids a hard cycle
+        // between AuthContext and friends utilities. Result is dispatched as a
+        // DOM event so any mounted page (friends/PageClient) can show an
+        // i18n-aware toast.
+        void (async () => {
+          try {
+            const [{ consumePendingInviteRef }, friendsApi] = await Promise.all([
+              import('@/utils/inviteRef'),
+              import('@/utils/friends'),
+            ]);
+            const result = await consumePendingInviteRef({
+              searchUsers: friendsApi.searchUsers,
+              sendFriendRequest: friendsApi.sendFriendRequest,
+            });
+            if (!result) return;
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(
+                new CustomEvent('lc:invite-replay', { detail: result })
+              );
+            }
+          } catch {
+            // best-effort — never block auth flow
+          }
+        })();
       }
     } else {
       if (wasAuthenticatedRef.current) {

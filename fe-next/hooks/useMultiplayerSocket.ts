@@ -13,6 +13,7 @@ import {
   getSocketURL,
 } from '@/utils/SocketContext';
 import { saveSession, clearSessionPreservingUsername, getSession } from '@/utils/session';
+import { resolveHostLeftMessage } from '@/lib/multiplayer/resolveHostLeftMessage';
 import logger from '@/utils/logger';
 import { captureSocketError, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
 import type { ActiveRoom, Language, Avatar } from '@/shared/types/game';
@@ -60,7 +61,13 @@ interface UseMultiplayerSocketOptions {
   onError: (error: { message?: string; code?: string }) => void;
   onGameStart: (data: { letterGrid: string[][]; timerSeconds: number; language: Language; minWordLength?: number; messageId?: string }) => void;
   onGameReset: () => void;
-  onHostLeftRoomClosing: (data: { message?: string }) => void;
+  onHostLeftRoomClosing: (data: {
+    message?: string;
+    i18nKey?: string;
+    i18nParams?: Record<string, string | number>;
+    reason?: 'explicit_no_successor' | 'grace_expired' | 'host_switched_room';
+    resolvedMessage?: string;
+  }) => void;
   onSessionMigrated: (data: { message?: string }) => void;
   onWarning: (data: { type?: string; message?: string }) => void;
   onRateLimited: () => void;
@@ -101,7 +108,6 @@ export function useMultiplayerSocket(
   const intentionalLeaveRef = useRef<boolean>(false);
   const hostKeepAliveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const attemptingReconnectRef = useRef<boolean>(attemptingReconnect);
-  const hostLeftReloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectFallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const kickedReloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const heartbeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -380,16 +386,20 @@ export function useMultiplayerSocket(
     socketInstance.on('hostLeftRoomClosing', (data) => {
       intentionalLeaveRef.current = true;
       const opts = optionsRef.current;
-      toast.error(data.message || opts.t('playerView.roomClosed'), {
+      const resolvedMessage = resolveHostLeftMessage(data, opts.t, 'playerView.roomClosed');
+      // Toast is fast feedback the moment the event arrives; the modal in
+      // PageClient (HostLeftGraceModal) is the 10s soft cushion + manual exit.
+      // PageClient's onExit handler does the URL strip + state reset that the
+      // prior 2s `window.location.pathname` reload was doing.
+      toast.error(resolvedMessage, {
         icon: '🚪',
         duration: 5000,
       });
+      // Clear session immediately so a tab-close / navigation during the modal
+      // grace doesn't leave stale rejoin state pointing at a closed room.
+      // Modal onExit does its own cleanup — both paths are idempotent.
       clearSessionPreservingUsername(opts.username);
-      opts.onHostLeftRoomClosing(data);
-      // Store timeout so it can be cancelled on unmount
-      // Hard-navigate to bare pathname (drop ?room=&classroom=&host= so we don't
-      // re-enter the classroom lobby from stale query params).
-      hostLeftReloadTimerRef.current = setTimeout(() => { window.location.href = window.location.pathname; }, 2000);
+      opts.onHostLeftRoomClosing({ ...data, resolvedMessage });
     });
 
     socketInstance.on('kicked', (data: { reason: 'host' | 'inactive' }) => {
@@ -537,10 +547,6 @@ export function useMultiplayerSocket(
       if (heartbeatIntervalRef.current) {
         clearInterval(heartbeatIntervalRef.current);
         heartbeatIntervalRef.current = null;
-      }
-      if (hostLeftReloadTimerRef.current) {
-        clearTimeout(hostLeftReloadTimerRef.current);
-        hostLeftReloadTimerRef.current = null;
       }
       if (reconnectFallbackTimerRef.current) {
         clearTimeout(reconnectFallbackTimerRef.current);

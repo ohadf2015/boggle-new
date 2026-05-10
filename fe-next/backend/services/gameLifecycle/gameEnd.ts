@@ -24,6 +24,7 @@ import { recordGameResultsToSupabase } from './gameResults';
 import { isSupabaseConfigured } from '../../modules/supabaseServer';
 import { handlePeerValidation } from './peerValidation';
 import { handleTournamentCompletion } from './tournamentEnd';
+import { processFriendChallengeCompletion } from '../../modules/friendsChallenges';
 import logger from '../../utils/logger';
 
 const FEEDBACK_TIMEOUT_SECONDS = 15;
@@ -192,6 +193,13 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
 
   // Handle tournament completion
   handleTournamentCompletion(io, gameCode, game);
+
+  // Friend-challenge completion: if this game was started from an accepted
+  // friend_challenges row, broadcast a result event + push to both parties so
+  // the recipient sees the outcome outside the live MP screen.
+  processFriendChallengeCompletion(io, gameCode, game).catch((err: unknown) => {
+    logger.warn('CHALLENGE', `processFriendChallengeCompletion failed: ${(err as Error).message}`);
+  });
 
   logger.info('SOCKET', `Game ${gameCode} ended`);
 }

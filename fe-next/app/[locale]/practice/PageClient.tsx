@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -61,9 +62,23 @@ export default function PracticeHubClient({ locale }: Props) {
   };
 
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-hidden bg-linear-to-b from-neo-navy to-neo-navy-light px-6 py-10">
+    <div className="relative min-h-[100dvh] w-full overflow-hidden bg-linear-to-b from-neo-navy to-neo-navy-light px-4 sm:px-6 py-6 sm:py-10">
       <PracticeHubAtmosphere />
-      <div className="relative z-10 max-w-md mx-auto">
+      <div className="relative z-10 max-w-md md:max-w-3xl xl:max-w-5xl mx-auto">
+        {/* Always-visible back to landing — restores hardware-back parity on
+            desktop where there's no native gesture. */}
+        <div className="mb-3 flex items-center justify-start">
+          <Link
+            href={`/${locale}`}
+            data-testid="practice-hub-back"
+            onClick={handleTileTap}
+            aria-label={t('common.back')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border-2 border-neo-cream/30 text-neo-cream/80 hover:text-neo-cream hover:border-neo-cream/60 text-xs font-neo-display font-bold uppercase tracking-wide transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 rtl:rotate-180" aria-hidden />
+            <span>{t('common.back')}</span>
+          </Link>
+        </div>
         <PendingRoomBanner locale={locale} />
         {/* Compact header: title row + progress chips inline. Was two stacked
             blocks (~140px) consuming a quarter of the small-viewport budget;
@@ -134,7 +149,7 @@ export default function PracticeHubClient({ locale }: Props) {
           </AdaptiveMotion.div>
         )}
 
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-2.5 md:grid md:grid-cols-3 md:gap-4">
           {PRACTICE_MODES.map((mode, idx) => {
             const isDone = completed.has(mode);
             return (
@@ -198,9 +213,9 @@ export default function PracticeHubClient({ locale }: Props) {
                       aria-hidden
                       animate={{ rotate: [0, -8, 8, 0] }}
                       transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 2.4, ease: 'easeInOut' }}
-                      className="absolute top-1.5 end-1.5 inline-flex items-center justify-center w-6 h-6 rounded-full bg-neo-lime text-neo-black border-2 border-neo-black font-neo-display font-black text-xs shadow-hard-sm"
+                      className="absolute top-1.5 end-1.5 inline-flex items-center justify-center w-6 h-6 rounded-full bg-neo-cream/70 text-neo-navy border-2 border-neo-black font-neo-display font-black text-xs shadow-hard-sm"
                     >
-                      ✓
+                      ★
                     </AdaptiveMotion.span>
                   )}
                 </Link>

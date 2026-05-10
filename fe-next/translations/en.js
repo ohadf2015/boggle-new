@@ -1202,6 +1202,7 @@ const en = {
   "multiplayerFlow": {
     "host": "Host",
     "roomClosed": "Room closed",
+    "roomTimedOut": "Your room timed out — back to the lobby.",
     "hostLeftModal": {
       "title": "Host Left",
       "body": "The room is closing. Returning to the lobby in a few seconds — or tap below to leave now.",
@@ -1212,6 +1213,8 @@ const en = {
       "graceExpired": "Host didn't return in time. Room is closing.",
       "hostSwitchedRoom": "Host moved to a different room. Room is closing."
     },
+    "hostTransferredAnnouncement": "{previousHost} left. {newHost} is now the host.",
+    "hostTransferredAfterGrace": "{previousHost} didn't return. {newHost} is now the host.",
     "rateLimited": "Slow down, speedster!",
     "crazyGamesFriends": "Play with Friends on CrazyGames",
     "inviteFriend": "Invite a Friend",

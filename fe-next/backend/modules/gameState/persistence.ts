@@ -132,6 +132,7 @@ export async function restoreGameFromRedis(
       reconnectionTimeout: null,
       isRanked: persisted.isRanked ?? false,
       isPrivate: persisted.isPrivate ?? false,
+      isClassroom: persisted.isClassroom ?? false,
       allowLateJoin: persisted.allowLateJoin ?? true,
       aiApprovedWords: persisted.aiApprovedWords || [],
       peerValidationWord: null,

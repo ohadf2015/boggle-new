@@ -299,6 +299,13 @@ export function useFriends(): UseFriendsReturn {
     socket.on('friends:requestDeclined', onRefresh);
     socket.on('friends:requestSent', onRefresh);
     socket.on('friends:friendRemoved', onRefresh);
+    // Challenge events — without these, the rendered pendingChallenges list
+    // stays stale until the next 30s poll.
+    socket.on('friends:challengeReceived', onRefresh);
+    socket.on('friends:challengeAccepted', onRefresh);
+    socket.on('friends:challengeDeclined', onRefresh);
+    socket.on('friends:challengeExpired', onRefresh);
+    socket.on('friends:challengeResult', onRefresh);
 
     return () => {
       socket.off('friends:requestReceived', onRefresh);
@@ -306,6 +313,11 @@ export function useFriends(): UseFriendsReturn {
       socket.off('friends:requestDeclined', onRefresh);
       socket.off('friends:requestSent', onRefresh);
       socket.off('friends:friendRemoved', onRefresh);
+      socket.off('friends:challengeReceived', onRefresh);
+      socket.off('friends:challengeAccepted', onRefresh);
+      socket.off('friends:challengeDeclined', onRefresh);
+      socket.off('friends:challengeExpired', onRefresh);
+      socket.off('friends:challengeResult', onRefresh);
     };
   }, [isAuthenticated, socket, isSocketConnected, fetchAll]);
 

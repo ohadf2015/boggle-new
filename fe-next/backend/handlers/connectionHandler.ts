@@ -16,7 +16,9 @@ import {
   deleteGame,
   isRoomEmpty,
   getNextEligibleHost,
-  transferHost
+  transferHost,
+  upgradeSpectatorToPlayer,
+  getGameSpectators,
 } from '../modules/gameStateManager.js';
 
 import {
@@ -102,7 +104,11 @@ function registerConnectionHandlers(io: Server, socket: Socket): void {
 function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: string, username: string, _reason: string): void {
   logger.info('SOCKET', `Host (${username}) disconnected from game ${gameCode}`);
 
-  // Clear any existing host reconnection timeout to prevent double-fire
+  // Clear any existing host reconnection timeout to prevent double-fire.
+  // Note: hostManager.transferHost() also clears this timer on successful
+  // transfer mid-grace — both calls are intentional, covering different
+  // lifecycle points (this one kills a prior-flap timer; that one cancels
+  // the timer this handler is about to schedule).
   timerManager.clearTimer(`hostReconnect:${gameCode}`);
 
   // Notify game start coordinator so ack sequence adjusts for the missing player
@@ -126,14 +132,27 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
   // grace-timer block schedules a delayed close, giving the host a chance to
   // reconnect within HOST_RECONNECTION_GRACE_PERIOD.
 
-  // Try to find a new host from remaining connected players
-  // Retry up to 3 times in case candidates disconnect between selection and transfer
+  // Audit T4/T5/T6 (2026-05-10): three modes must NOT auto-transfer host —
+  //   - classroom: prevents student silent-promotion to teacher authority
+  //   - tournament: tournamentManager state is host-bound, won't reconcile
+  //   - ranked: MMR / match outcome is tied to the original host's session
+  // For all three, skip the transfer loop and let the grace-period path run.
+  // The original host can still reclaim host on reconnect.
+  const allowAutoTransfer = !game.isClassroom && !game.isRanked && !game.tournamentId;
+
+  // Try to find a new host from remaining connected players.
+  // Retry up to 3 distinct candidates in case any of them disconnect between
+  // selection and transfer (or transferHost fails for race-condition reasons).
+  // Audit T1 (2026-05-10): pass a growing exclude-list so attempts 2/3 select
+  // a DIFFERENT candidate; previously the duplicate-check would short-circuit
+  // the loop because getNextEligibleHost only knew to exclude the leaving host.
   let hostTransferred = false;
-  const triedCandidates = new Set<string>();
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const nextHost = getNextEligibleHost(gameCode, username);
-    if (!nextHost || triedCandidates.has(nextHost)) break;
-    triedCandidates.add(nextHost);
+  const triedCandidates: string[] = [];
+  const MAX_HOST_TRANSFER_ATTEMPTS = allowAutoTransfer ? 3 : 0;
+  for (let attempt = 0; attempt < MAX_HOST_TRANSFER_ATTEMPTS; attempt++) {
+    const nextHost = getNextEligibleHost(gameCode, [username, ...triedCandidates]);
+    if (!nextHost) break;
+    triedCandidates.push(nextHost);
 
     const transferResult = transferHost(gameCode, nextHost);
     if (transferResult.success) {
@@ -142,7 +161,9 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
       broadcastToRoom(io, getGameRoom(gameCode), 'hostTransferred', {
         previousHost: username,
         newHost: nextHost,
-        message: `${username} left. ${nextHost} is now the host.`
+        message: `${username} left. ${nextHost} is now the host.`,
+        i18nKey: 'multiplayerFlow.hostTransferredAnnouncement',
+        i18nParams: { previousHost: username, newHost: nextHost }
       });
 
       broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
@@ -159,13 +180,48 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
 
   if (hostTransferred) return;
 
+  // Audit T2 (2026-05-10): no eligible USER, but a spectator might be willing.
+  // Promote first available spectator (subject to same mode guards as the user
+  // transfer). Common in invite-link rooms where late joiners hit
+  // MAX_PLAYERS_PER_ROOM and silently land in the spectator slot.
+  if (allowAutoTransfer) {
+    const spectators = getGameSpectators(gameCode) || [];
+    for (const spectator of spectators) {
+      const specName = spectator.username;
+      if (!specName) continue;
+      const upgraded = upgradeSpectatorToPlayer(gameCode, specName);
+      if (!upgraded) continue;
+      const transferResult = transferHost(gameCode, specName);
+      if (transferResult.success) {
+        logger.info('SOCKET', `Spectator ${specName} promoted to host in game ${gameCode}`);
+        broadcastToRoom(io, getGameRoom(gameCode), 'hostTransferred', {
+          previousHost: username,
+          newHost: specName,
+          message: `${username} left. ${specName} is now the host.`,
+          i18nKey: 'multiplayerFlow.hostTransferredAnnouncement',
+          i18nParams: { previousHost: username, newHost: specName }
+        });
+        broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+          users: getGameUsers(gameCode) as GameUser[]
+        });
+        broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
+        return;
+      }
+      // upgrade succeeded but transfer didn't — leave them as a regular user
+      // (better than rolling back) and continue trying next spectator.
+      logger.warn('SOCKET', `Spectator ${specName} upgraded but transferHost failed: ${transferResult.error}`);
+    }
+  }
+
   // No eligible player found for host transfer - use grace period before closing
   logger.info('SOCKET', `No eligible host found for game ${gameCode}, starting grace period`);
 
   // Notify players that host disconnected
   broadcastToRoom(io, getGameRoom(gameCode), 'hostDisconnected', {
     message: 'Host disconnected. Waiting for reconnection...',
-    gracePeriodMs: HOST_RECONNECTION_GRACE_PERIOD
+    gracePeriodMs: HOST_RECONNECTION_GRACE_PERIOD,
+    i18nKey: 'playerView.hostDisconnected',
+    i18nParams: { host: username }
   });
 
   // Start grace period for host reconnection
@@ -176,8 +232,11 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
 
       // Check if host is still disconnected (socket hasn't changed)
       if (currentGame.hostSocketId === socket.id) {
-        // Try one more time to find an eligible host
-        const finalNextHost = getNextEligibleHost(gameCode, username);
+        // Audit T4/T5/T6 (2026-05-10): skip the final transfer attempt for
+        // classroom / ranked / tournament rooms — close the room instead of
+        // promoting a different player into a host-bound role.
+        const skipTransfer = currentGame.isClassroom || currentGame.isRanked || !!currentGame.tournamentId;
+        const finalNextHost = skipTransfer ? null : getNextEligibleHost(gameCode, username);
 
         if (finalNextHost) {
           const finalTransferResult = transferHost(gameCode, finalNextHost);
@@ -185,7 +244,9 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
             broadcastToRoom(io, getGameRoom(gameCode), 'hostTransferred', {
               previousHost: username,
               newHost: finalNextHost,
-              message: `${username} did not reconnect. ${finalNextHost} is now the host.`
+              message: `${username} did not reconnect. ${finalNextHost} is now the host.`,
+              i18nKey: 'multiplayerFlow.hostTransferredAfterGrace',
+              i18nParams: { previousHost: username, newHost: finalNextHost }
             });
             broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
               users: getGameUsers(gameCode) as GameUser[]
@@ -203,7 +264,10 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
 
         // Notify all players
         broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
-          message: 'Host did not reconnect. Room is closing.'
+          message: 'Host did not reconnect. Room is closing.',
+          i18nKey: 'multiplayerFlow.hostLeftReason.graceExpired',
+          i18nParams: { host: username },
+          reason: 'grace_expired'
         });
 
         // Clean up game

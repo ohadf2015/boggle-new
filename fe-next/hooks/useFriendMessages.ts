@@ -287,15 +287,27 @@ export function useFriendMessages(
     try {
       if (socket && isConnected) {
         return new Promise((resolve) => {
+          let settled = false;
+          const settle = (val: string | null) => {
+            if (settled) return;
+            settled = true;
+            socket.off('friends:challengeAccepted', onAccepted);
+            socket.off('friends:error', onError);
+            resolve(val);
+          };
+          // Filter by challengeId — without this, an unrelated accept event
+          // for a different challenge could resolve us with the wrong roomCode.
+          const onAccepted = (data: { challengeId?: string; roomCode: string }) => {
+            if (data?.challengeId !== challengeId) return;
+            settle(data.roomCode);
+          };
+          const onError = () => settle(null);
+
+          socket.on('friends:challengeAccepted', onAccepted);
+          socket.on('friends:error', onError);
           socket.emit('friends:acceptChallenge', { challengeId });
 
-          // Wait for confirmation with room code
-          socket.once('friends:challengeAccepted', (data: { roomCode: string }) => {
-            resolve(data.roomCode);
-          });
-
-          // Timeout after 5 seconds
-          setTimeout(() => resolve(null), 5000);
+          setTimeout(() => settle(null), 5000);
         });
       } else {
         const { success, roomCode } = await friendMessages.acceptChallenge(challengeId);

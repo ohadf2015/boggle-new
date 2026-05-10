@@ -3,10 +3,14 @@
  * Handles challenge sending, accepting, declining, and expiration
  */
 
+import type { Server } from 'socket.io';
+
 import { getSupabase } from './supabaseServer';
 import logger from '../utils/logger';
 import type { Challenge } from '@/shared/types/friends';
 import { areFriends } from './friendsManager';
+import { broadcastToUser } from '../utils/socialHelpers';
+import { notifyChallengeResult } from './pushNotificationTriggers';
 
 /**
  * Helper to map a challenge DB row to Challenge type
@@ -214,6 +218,104 @@ export async function getPendingChallenges(
   } catch (error) {
     logger.error('FRIENDS_MANAGER', `Exception getting pending challenges: ${(error as Error).message}`);
     return { sent: [], received: [] };
+  }
+}
+
+/**
+ * After a multiplayer game ends, detect whether the room was an accepted
+ * friend challenge and, if so, broadcast a `friends:challengeResult` event to
+ * both players plus a push notification. Without this, recipients only ever
+ * saw the live MP results screen — they had no surface in /friends or via
+ * push to know the match was complete.
+ *
+ * Safe to call for every game end: returns silently when no row matches.
+ */
+interface CompletionGameLike {
+  users?: Record<string, { authUserId?: string | null; username?: string; isBot?: boolean }>;
+  playerScores?: Record<string, number>;
+}
+
+export async function processFriendChallengeCompletion(
+  io: Server,
+  gameCode: string,
+  game: CompletionGameLike,
+): Promise<void> {
+  try {
+    const supabase = getSupabase();
+    if (!supabase) return;
+
+    const { data: row } = await supabase
+      .from('friend_challenges')
+      .select('id, challenger_id, challenged_id, status')
+      .eq('challenge_id', gameCode)
+      .eq('status', 'accepted')
+      .single();
+
+    if (!row) return;
+
+    // Build authUserId-keyed scores, skipping bots and unauthenticated guests.
+    const scores: Record<string, number> = {};
+    const usernameByUserId: Record<string, string> = {};
+    for (const [username, user] of Object.entries(game.users ?? {})) {
+      if (user?.isBot) continue;
+      const authUserId = user?.authUserId;
+      if (!authUserId) continue;
+      scores[authUserId] = game.playerScores?.[username] ?? 0;
+      usernameByUserId[authUserId] = user?.username ?? username;
+    }
+
+    // Determine winner: highest score; tie ⇒ null.
+    let winnerUserId: string | null = null;
+    const entries = Object.entries(scores);
+    if (entries.length > 0) {
+      entries.sort((a, b) => b[1] - a[1]);
+      const [topId, topScore] = entries[0];
+      const second = entries[1];
+      winnerUserId = second && second[1] === topScore ? null : topId;
+    }
+
+    await supabase
+      .from('friend_challenges')
+      .update({
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+      })
+      .eq('id', row.id);
+
+    const payload = {
+      challengeId: row.id as string,
+      gameCode,
+      winnerUserId,
+      scores,
+      timestamp: Date.now(),
+    };
+
+    const recipients = [row.challenger_id as string, row.challenged_id as string];
+    for (const userId of recipients) {
+      try {
+        broadcastToUser(io, userId, 'friends:challengeResult', payload);
+      } catch (err) {
+        logger.warn('CHALLENGE', `Failed to broadcast result to ${userId}: ${(err as Error).message}`);
+      }
+      const opponentUserId = userId === row.challenger_id ? row.challenged_id : row.challenger_id;
+      const opponentUsername = usernameByUserId[opponentUserId as string] ?? 'a friend';
+      const didWin = winnerUserId === userId;
+      const isTie = winnerUserId === null;
+      try {
+        await notifyChallengeResult(
+          userId,
+          opponentUsername,
+          didWin ? 'win' : isTie ? 'tie' : 'loss',
+          row.id as string,
+        );
+      } catch (err) {
+        logger.warn('CHALLENGE', `Failed to send result push to ${userId}: ${(err as Error).message}`);
+      }
+    }
+
+    logger.info('CHALLENGE', `Challenge ${row.id} completed (game ${gameCode}); winner=${winnerUserId ?? 'tie'}`);
+  } catch (error) {
+    logger.error('CHALLENGE', `processFriendChallengeCompletion failed for ${gameCode}: ${(error as Error).message}`);
   }
 }
 

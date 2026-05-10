@@ -9,6 +9,7 @@ import { Socket } from 'socket.io-client';
 import { neoInfoToast, wordErrorToast, TOAST_ICONS } from '../../../components/NeoToast';
 import { clearSessionPreservingUsername } from '../../../utils/session';
 import { socketErrorMessage } from '../../../utils/socketErrorMessage';
+import { resolveHostLeftMessage } from '../../../lib/multiplayer/resolveHostLeftMessage';
 import { processAchievements } from '@/shared/utils/achievementUtils';
 import { createXpGainedHandler, createLevelUpHandler } from '@/shared/utils/xpUtils';
 import { createConnectionHandlers } from '@/shared/utils/connectionUtils';
@@ -34,8 +35,19 @@ interface ShufflingGridPayload {
 }
 interface LeaderboardUpdatePayload { leaderboard: LeaderboardEntry[] }
 interface LiveAchievementPayload { achievements?: unknown[] }
-interface HostMessagePayload { message?: string }
-interface HostTransferredPayload { message?: string; newHost?: string }
+interface HostMessagePayload {
+  message?: string;
+  i18nKey?: string;
+  i18nParams?: Record<string, string | number>;
+  gracePeriodMs?: number;
+}
+interface HostTransferredPayload {
+  message?: string;
+  newHost?: string;
+  previousHost?: string;
+  i18nKey?: string;
+  i18nParams?: Record<string, string | number>;
+}
 interface SocketErrorEventPayload { code?: string; message?: string }
 
 /**
@@ -113,10 +125,10 @@ export function usePlayerSessionEvents({
 
     const handleHostDisconnected = (data: HostMessagePayload) => {
       logger.log('[PLAYER] Host disconnected, waiting for reconnection');
-      neoInfoToast(data.message || t('playerView.hostDisconnected') || 'Host disconnected. Waiting for reconnection...', {
-        icon: TOAST_ICONS.hourglass,
-        duration: 5000
-      });
+      neoInfoToast(
+        resolveHostLeftMessage(data, t, 'playerView.hostDisconnected'),
+        { icon: TOAST_ICONS.hourglass, duration: 5000 }
+      );
     };
 
     const handleHostTransferred = (data: HostTransferredPayload) => {

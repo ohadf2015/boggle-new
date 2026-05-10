@@ -93,6 +93,11 @@ export function LandingChallengeCards({
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const hasPlayedAnyGame = !!playerAllTimeBest && playerAllTimeBest.score > 0;
   const isVeteran = isVeteranRaw || isOnCrazyGamesPlatform || hasPlayedAnyGame;
+  // One "Start Here" pill at a time. Practice wins for non-veterans (it's the
+  // pressure-free onramp); MP cards only get the pill once the player has
+  // graduated past practice. Prevents the dual-highlight bug where both
+  // Multiplayer + Practice lit up for brand-new players.
+  const practiceWinsHighlight = !isVeteran;
 
   // Mode-roster newcomer gate — independent of onboarding-completed and MP-joined
   // flags (both flip too eagerly in production: onboarding completes before the
@@ -176,7 +181,7 @@ export function LandingChallengeCards({
               modeImage="/modes/quick-play.png"
               variant="cyan"
               highlighted={isVeteran}
-              highlightLabel={isVeteran ? t('onboarding.welcome.startHere') : undefined}
+              highlightLabel={isVeteran && !practiceWinsHighlight ? t('onboarding.welcome.startHere') : undefined}
               onClick={() => { trackModeSelected('quickPlay', 'home'); trackLandingCtaClick('mode_card', { mode: 'quickPlay', variant: 'cyan' }); }}
             />
           </div>
@@ -194,8 +199,8 @@ export function LandingChallengeCards({
               variant="pink"
               liveBadge={{ openRooms, totalPlayers, roomsLabel: t('landing.openRooms'), playersLabel: t('landing.playersLive') }}
               playerCount={{ count: activePlayers, label: t('landing.playingNow') }}
-              highlighted={isFirstTimer && !isNewbie}
-              highlightLabel={isFirstTimer && !isNewbie ? t('onboarding.welcome.startHere') : undefined}
+              highlighted={isFirstTimer && !isNewbie && !practiceWinsHighlight}
+              highlightLabel={isFirstTimer && !isNewbie && !practiceWinsHighlight ? t('onboarding.welcome.startHere') : undefined}
               onClick={() => { trackModeSelected('arena', 'home'); trackLandingCtaClick('mode_card', { mode: 'arena', variant: 'pink' }); }}
             />
           </div>

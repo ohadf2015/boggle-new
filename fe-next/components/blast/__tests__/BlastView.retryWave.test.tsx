@@ -110,15 +110,22 @@ describe('BlastView — retry-on-loss flow', () => {
     useHasRealAdProviderMock.mockReturnValue(true);
   });
 
-  it('shows the retry-wave modal after a loss when ad provider is available', () => {
+  const advanceToWave = (target: number) => {
+    for (let w = 1; w < target; w++) {
+      act(() => { blastGameProps.current.onWaveComplete(100, ['CAT'], 95); });
+      fireEvent.click(screen.getByTestId('next-wave-button'));
+    }
+  };
+
+  it('shows the retry-wave modal after a wave-2+ loss when ad provider is available', () => {
     render(<BlastView />);
     startGame();
-    triggerLoss(1, 60);
+    advanceToWave(2);
+    triggerLoss(2, 60);
     expect(screen.getByTestId('blast-retry-wave-modal')).toBeDefined();
   });
 
-  it('does NOT show the retry modal when no real ad provider', () => {
-    useHasRealAdProviderMock.mockReturnValue(false);
+  it('does NOT show the retry modal on a wave-1 loss (no progress to preserve)', () => {
     render(<BlastView />);
     startGame();
     triggerLoss(1, 60);
@@ -126,9 +133,20 @@ describe('BlastView — retry-on-loss flow', () => {
     expect(screen.getByTestId('mock-blast-results')).toBeDefined();
   });
 
+  it('does NOT show the retry modal when no real ad provider', () => {
+    useHasRealAdProviderMock.mockReturnValue(false);
+    render(<BlastView />);
+    startGame();
+    advanceToWave(2);
+    triggerLoss(2, 60);
+    expect(screen.queryByTestId('blast-retry-wave-modal')).toBeNull();
+    expect(screen.getByTestId('mock-blast-results')).toBeDefined();
+  });
+
   it('declining the modal falls through to the standard results summary', () => {
     render(<BlastView />);
     startGame();
+    advanceToWave(2);
     triggerLoss(2, 50);
     fireEvent.click(screen.getByTestId('blast-retry-wave-decline'));
     expect(screen.queryByTestId('blast-retry-wave-modal')).toBeNull();
@@ -156,9 +174,10 @@ describe('BlastView — retry-on-loss flow', () => {
   it('is one-shot per run — a second loss after a retry shows the standard summary, no modal', () => {
     render(<BlastView />);
     startGame();
-    triggerLoss(1, 60);
+    advanceToWave(2);
+    triggerLoss(2, 60);
     act(() => { unlockOnUnlock.current?.(); }); // accept retry
-    triggerLoss(1, 55);                         // lose again
+    triggerLoss(2, 55);                         // lose again
     expect(screen.queryByTestId('blast-retry-wave-modal')).toBeNull();
     expect(screen.getByTestId('mock-blast-results')).toBeDefined();
   });

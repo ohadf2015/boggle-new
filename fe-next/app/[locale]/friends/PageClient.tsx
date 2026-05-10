@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { ArrowLeft, LogIn, User } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { ArrowLeft, LogIn, Sparkles, User } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import FriendsList from '@/components/friends/FriendsList';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -15,6 +15,7 @@ import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import { useFriends } from '@/hooks/useFriends';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { cn } from '@/lib/utils';
+import { captureInviteRef, peekInviteRef } from '@/utils/inviteRef';
 
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
@@ -24,14 +25,53 @@ const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: fa
 export default function FriendsPageClient(): React.JSX.Element {
   const { language, t } = useLanguage();
   const { theme } = useTheme();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, profile } = useAuth();
   const { isCrazyGames, isLoggedIn: isCrazyGamesLoggedIn, login: loginCrazyGames, isLoggingIn: isCrazyGamesLoggingIn } = useCrazyGamesAuth();
   const { refresh: refreshFriends } = useFriends();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const isDark = theme === 'dark';
 
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signup');
+  const [inviterUsername, setInviterUsername] = useState<string | null>(null);
+
+  // Capture `?ref=<username>` so it survives sign-up; AuthContext will replay
+  // it after authentication completes (auto-sends a friend request).
+  useEffect(() => {
+    const ref = searchParams?.get('ref');
+    if (ref) {
+      captureInviteRef(ref, profile?.username ?? null);
+    }
+    setInviterUsername(peekInviteRef());
+  }, [searchParams, profile?.username, isAuthenticated]);
+
+  // Listen for AuthContext's invite-replay event so we can show an i18n-aware
+  // confirmation toast right after auto-friend fires post-signup.
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{
+        username: string;
+        success: boolean;
+        reason?: 'not_found' | 'send_failed';
+      }>).detail;
+      if (!detail) return;
+      if (detail.success) {
+        toast.success(
+          t('friends.invitedAutoSentToast').replace('{name}', `@${detail.username}`),
+          { duration: 4500 }
+        );
+        void refreshFriends();
+      } else if (detail.reason === 'not_found') {
+        toast.error(
+          t('friends.invitedNotFoundToast').replace('{name}', `@${detail.username}`)
+        );
+      }
+      setInviterUsername(null);
+    };
+    window.addEventListener('lc:invite-replay', handler);
+    return () => window.removeEventListener('lc:invite-replay', handler);
+  }, [t, refreshFriends]);
 
   // Pull-to-refresh for friends list
   const { pullToRefreshHandlers, pullState } = usePullToRefresh({
@@ -97,10 +137,32 @@ export default function FriendsPageClient(): React.JSX.Element {
           transition={{ duration: 0.3 }}
         >
           {!isAuthenticated && !(isCrazyGames && isCrazyGamesLoggedIn) ? (
-            <div className={cn(
-              'text-center py-12 px-4 rounded-neo border-3 border-neo-black',
-              isDark ? 'bg-slate-800' : 'bg-white'
-            )}>
+            <div className="space-y-4">
+              {inviterUsername && !isCrazyGames && (
+                <div
+                  className={cn(
+                    'relative rounded-neo border-3 border-neo-black shadow-hard',
+                    'bg-neo-yellow text-neo-black',
+                    'px-4 py-4 flex items-start gap-3 overflow-hidden'
+                  )}
+                  style={{ backgroundImage: 'var(--halftone-pattern)' }}
+                  role="status"
+                >
+                  <Sparkles className="w-6 h-6 shrink-0 -mt-0.5" aria-hidden="true" />
+                  <div className="text-start">
+                    <p className="font-black uppercase tracking-tight text-base leading-tight">
+                      {t('friends.invitedByTitle').replace('{name}', `@${inviterUsername}`)}
+                    </p>
+                    <p className="text-sm font-bold mt-1 opacity-80">
+                      {t('friends.invitedBySubtitle')}
+                    </p>
+                  </div>
+                </div>
+              )}
+              <div className={cn(
+                'text-center py-12 px-4 rounded-neo border-3 border-neo-black',
+                isDark ? 'bg-slate-800' : 'bg-white'
+              )}>
               {isCrazyGames ? (
                 <>
                   <p className={cn('text-lg font-bold mb-4', isDark ? 'text-white' : 'text-gray-900')}>
@@ -143,6 +205,7 @@ export default function FriendsPageClient(): React.JSX.Element {
                   </div>
                 </>
               )}
+              </div>
             </div>
           ) : (
             <FriendsList />

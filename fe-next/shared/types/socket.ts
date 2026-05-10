@@ -201,9 +201,29 @@ export interface ServerToClientEvents {
   playerDisconnected: (data: { username: string; message: string }) => void;
   playerReconnected: (data: { username: string }) => void;
   playerLeft: (data: { username: string; message: string }) => void;
-  hostDisconnected: (data: { message: string; gracePeriodMs: number }) => void;
-  hostLeftRoomClosing: (data: { message: string }) => void;
+  hostDisconnected: (data: {
+    message: string;
+    gracePeriodMs: number;
+    i18nKey?: string;
+    i18nParams?: Record<string, string | number>;
+  }) => void;
+  hostLeftRoomClosing: (data: {
+    message: string;
+    i18nKey?: string;
+    i18nParams?: Record<string, string | number>;
+    reason?: 'explicit_no_successor' | 'grace_expired' | 'host_switched_room';
+  }) => void;
   hostReactivated: (data: { success: boolean }) => void;
+  // Audit T3 (2026-05-10): typed payload + i18n envelope. Server-side
+  // `message` was English-only; clients now prefer `i18nKey`+`i18nParams`
+  // via `resolveHostLeftMessage`, falling back to `message` for back-compat.
+  hostTransferred: (data: {
+    previousHost: string;
+    newHost: string;
+    message?: string;
+    i18nKey?: string;
+    i18nParams?: Record<string, string | number>;
+  }) => void;
 
   // Hint events (single-player mode)
   hintResponse: (data: HintPayload) => void;
@@ -342,6 +362,8 @@ export interface CreateGamePayload {
   authUserId?: string;
   guestTokenHash?: string;
   isRanked?: boolean;
+  isPrivate?: boolean;
+  isClassroom?: boolean;
 }
 
 export interface JoinGamePayload {

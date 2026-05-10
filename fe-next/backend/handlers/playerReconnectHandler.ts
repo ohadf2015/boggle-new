@@ -131,7 +131,10 @@ async function handleExistingAuthConnectionJoin(io: Server, socket: Socket, auth
         oldGame.reconnectionTimeout = null;
       }
       broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'hostLeftRoomClosing', {
-        message: 'Host joined a different game. Room is closing.'
+        message: 'Host joined a different game. Room is closing.',
+        i18nKey: 'multiplayerFlow.hostLeftReason.hostSwitchedRoom',
+        i18nParams: { host: existingConnection.username },
+        reason: 'host_switched_room'
       });
       clearGameTimer(existingConnection.gameCode);
       deleteGame(existingConnection.gameCode);

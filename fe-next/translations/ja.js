@@ -1208,11 +1208,14 @@ const ja = {
   "multiplayerFlow": {
     "host": "ホスト",
     "roomClosed": "ルームが閉鎖されました",
+    "roomTimedOut": "ルームの時間切れです — ロビーに戻ります。",
     "hostLeftReason": {
       "explicitNoSuccessor": "ホストが退出し、他のプレイヤーもいません。ルームを閉じます。",
       "graceExpired": "ホストが時間内に戻りませんでした。ルームを閉じます。",
       "hostSwitchedRoom": "ホストが別のルームへ移動しました。ルームを閉じます。"
     },
+    "hostTransferredAnnouncement": "{previousHost}が退出しました。{newHost}が新しいホストです。",
+    "hostTransferredAfterGrace": "{previousHost}が戻りませんでした。{newHost}が新しいホストです。",
     "hostLeftModal": {
       "title": "ホストが退出しました",
       "body": "ルームを閉じています。数秒後にロビーへ戻ります — すぐ戻るには下をタップ。",

@@ -141,6 +141,7 @@ function createGame(gameCode: string, data: GameCreationData): GameState {
     reconnectionTimeout: null,
     isRanked: data.isRanked || false,
     isPrivate: data.isPrivate || false,
+    isClassroom: data.isClassroom || false,
     allowLateJoin: data.allowLateJoin !== false,
     aiApprovedWords: [],
     peerValidationWord: null,
@@ -448,12 +449,21 @@ function clearSocketMappings(socketId: string): { gameCode: string | null; usern
 const clearSocketMappingsForLeave = userManager.clearSocketMappingsForLeave;
 
 // Host Management Delegation
-const getNextEligibleHost = (gameCode: string, excludeUsername?: string): string | null =>
-  hostManager.getNextEligibleHost(asBase<HostGameBase>(games[gameCode]), excludeUsername);
+const getNextEligibleHost = (gameCode: string, exclude?: string | string[]): string | null =>
+  hostManager.getNextEligibleHost(asBase<HostGameBase>(games[gameCode]), exclude);
 
 function transferHost(gameCode: string, newHostUsername: string): TransferHostResult {
   const result = hostManager.transferHost(asBase<HostGameBase>(games[gameCode]), newHostUsername);
-  if (result.success) persistGameState(gameCode);
+  // Audit T10 (2026-05-10): use immediate-persist (not debounced 1s) so a
+  // crash within the window doesn't leave Redis pointing at the old host.
+  // Fire-and-forget — caller flow is sync; persistence error is logged
+  // inside doPersistNow without blocking the broadcast.
+  if (result.success) {
+    persistGameStateNow(gameCode).catch(() => {
+      // Already logged inside persistGameStateNow; swallow to avoid
+      // unhandled-rejection on the sync caller path.
+    });
+  }
   return result;
 }
 

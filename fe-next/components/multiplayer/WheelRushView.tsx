@@ -528,30 +528,26 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             : { type: 'spring', stiffness: 300, damping: 20 }
         }
       >
-        <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap max-w-full">
-          <AnimatePresence mode="popLayout">
-            {builtLetters.length === 0 ? (
-              <motion.span
-                key="placeholder"
-                className="text-neo-cream/30 font-neo-display text-base sm:text-lg"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                {t('wordWheel.tapLetters') || 'Tap letters to build a word'}
-              </motion.span>
-            ) : (
-              builtLetters.map((bl, i) => (
-                <WordTile
-                  key={`${bl.wheelIndex}-${i}`}
-                  letter={bl.letter}
-                  index={i}
-                  onRemove={handleRemoveLetter}
-                  isCenter={bl.wheelIndex === -1}
-                />
-              ))
-            )}
-          </AnimatePresence>
+        <div className="relative flex items-center justify-center gap-1 sm:gap-2 flex-wrap max-w-full w-full">
+          {/* Placeholder is absolute-centered so layout never reflows when letters clear/repopulate
+              (prevents post-reset horizontal shift). */}
+          <motion.span
+            aria-hidden={builtLetters.length > 0}
+            className="absolute inset-0 flex items-center justify-center text-neo-cream/30 font-neo-display text-base sm:text-lg pointer-events-none"
+            animate={{ opacity: builtLetters.length === 0 ? 1 : 0 }}
+            transition={{ duration: 0.18 }}
+          >
+            {t('wordWheel.tapLetters') || 'Tap letters to build a word'}
+          </motion.span>
+          {builtLetters.map((bl, i) => (
+            <WordTile
+              key={`${bl.wheelIndex}-${i}`}
+              letter={bl.letter}
+              index={i}
+              onRemove={handleRemoveLetter}
+              isCenter={bl.wheelIndex === -1}
+            />
+          ))}
         </div>
         <AnimatePresence>
           {feedback && (

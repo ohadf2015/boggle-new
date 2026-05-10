@@ -32,6 +32,7 @@ import { ChallengeRow } from './ChallengeRow';
 import { MessageThreadList } from './messaging/MessageThreadList';
 import { MessageThread } from './messaging/MessageThread';
 import { ChallengeInviteDialog } from './ChallengeInviteDialog';
+import { sendChallengeWithAck } from '@/lib/friends/sendChallengeWithAck';
 import { AddFriendDialog } from './AddFriendDialog';
 import { FriendDetailDialog } from './FriendDetailDialog';
 import GiftModal from '@/components/social/GiftModal';
@@ -132,6 +133,27 @@ const FriendsList: React.FC<FriendsListProps> = ({
     };
     giftSocket.on('friends:challengeDeclined', handleChallengeDeclined);
 
+    // Toast when a challenge we participated in completes (post-game result)
+    const handleChallengeResult = (data: { winnerUserId: string | null; scores?: Record<string, number> }) => {
+      const me = profile?.id;
+      if (!me) return;
+      const myScore = data.scores?.[me] ?? null;
+      const opponentEntry = Object.entries(data.scores ?? {}).find(([uid]) => uid !== me);
+      const opponentScore = opponentEntry?.[1] ?? null;
+      const isTie = data.winnerUserId === null;
+      const didWin = data.winnerUserId === me;
+      const key = isTie ? 'friends.challenges.resultTie' : didWin ? 'friends.challenges.resultWin' : 'friends.challenges.resultLoss';
+      const fallback = isTie ? "It's a tie!" : didWin ? 'You won the challenge!' : 'You lost the challenge.';
+      toast(
+        t(key, fallback, {
+          mine: String(myScore ?? '?'),
+          theirs: String(opponentScore ?? '?'),
+        }),
+        { icon: isTie ? '🤝' : didWin ? '🏆' : '💔' },
+      );
+    };
+    giftSocket.on('friends:challengeResult', handleChallengeResult);
+
     // Toast when a new friend request arrives
     const handleRequestReceived = (data: { fromUsername?: string; fromDisplayName?: string }) => {
       const name = data.fromDisplayName || data.fromUsername || '';
@@ -144,9 +166,10 @@ const FriendsList: React.FC<FriendsListProps> = ({
       giftSocket.off('friends:challengeAccepted', handleChallengeAccepted);
       giftSocket.off('friends:challengeReceived', handleChallengeReceived);
       giftSocket.off('friends:challengeDeclined', handleChallengeDeclined);
+      giftSocket.off('friends:challengeResult', handleChallengeResult);
       giftSocket.off('friends:requestReceived', handleRequestReceived);
     };
-  }, [giftSocket, isGiftSocketConnected, t, router, language]);
+  }, [giftSocket, isGiftSocketConnected, t, router, language, profile?.id]);
 
   const {
     threads,
@@ -292,10 +315,9 @@ const FriendsList: React.FC<FriendsListProps> = ({
   ) => {
     if (!giftSocket || !isGiftSocketConnected) {
       toast.error(t('friends.errors.sendFailed'));
-      return;
+      throw new Error('NOT_CONNECTED');
     }
-    // Emit async challenge with settings (no live room join)
-    giftSocket.emit('friends:sendChallenge', {
+    const result = await sendChallengeWithAck(giftSocket, {
       friendUserId: friendId,
       challengeType,
       gameSettings: settings ? {
@@ -305,9 +327,26 @@ const FriendsList: React.FC<FriendsListProps> = ({
       } : undefined,
       message: settings?.message,
     });
+    if (!result.ok) {
+      const fallback = t('friends.errors.sendFailed');
+      const msg =
+        result.code === 'NOT_FRIENDS' ? t('friends.challenges.errors.notFriends', fallback) :
+        result.code === 'RATE_LIMITED' ? t('friends.challenges.errors.rateLimited', fallback) :
+        result.code === 'TIMEOUT' ? t('friends.challenges.errors.timeout', fallback) :
+        result.code === 'VALIDATION_FAILED' ? t('friends.challenges.errors.validation', fallback) :
+        fallback;
+      toast.error(msg);
+      throw new Error(result.code);
+    }
     toast.success(t('friends.challenges.sent'));
     setChallengeFriend(null);
-  }, [giftSocket, isGiftSocketConnected, t]);
+    // Sender joins the room immediately and waits for the friend. Without
+    // this they sit on /friends and the recipient enters an empty room with
+    // no opponent — meaning no scores to compare when the game ends.
+    if (result.data.roomCode) {
+      router.push(`/${language}/multiplayer?room=${result.data.roomCode}`);
+    }
+  }, [giftSocket, isGiftSocketConnected, t, router, language]);
 
   // Gift sending via Socket.IO
   const handleSendGift = useCallback((gift: GiftPayload) => {

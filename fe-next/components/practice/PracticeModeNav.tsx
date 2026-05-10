@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PRACTICE_MODES } from '@/lib/practice/practiceRoute';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
@@ -8,6 +9,7 @@ import { usePracticeProgress } from './usePracticeProgress';
 
 interface Props {
   current: PracticeMode;
+  step?: 'intro' | 'active' | 'complete';
 }
 
 const ACCENT: Record<PracticeMode, string> = {
@@ -29,7 +31,7 @@ const ACCENT_DIM: Record<PracticeMode, string> = {
  *
  * Always-visible escape hatch — answers "easily move to other modes".
  */
-export default function PracticeModeNav({ current }: Props) {
+export default function PracticeModeNav({ current, step }: Props) {
   const { t, language } = useLanguage();
   const completed = usePracticeProgress(language);
 
@@ -41,9 +43,14 @@ export default function PracticeModeNav({ current }: Props) {
     >
       <Link
         href={`/${language}/practice`}
-        className="text-xs font-neo-display font-black text-neo-cream/60 underline-offset-2 hover:underline shrink-0"
+        data-testid="practice-back-to-hub"
+        aria-label={t('practiceHub.backToHub')}
+        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border-2 border-neo-cream/30 text-xs font-neo-display font-black text-neo-cream/80 hover:text-neo-cream hover:border-neo-cream/60 shrink-0 transition-colors ${
+          step === 'active' ? 'opacity-60 hover:opacity-100' : ''
+        }`}
       >
-        {t('practiceHub.backToHub')}
+        <ArrowLeft className="w-3 h-3 rtl:rotate-180" aria-hidden />
+        <span>{t('practiceHub.backToHub')}</span>
       </Link>
       <div className="flex items-center gap-1.5 flex-1 justify-end">
         {PRACTICE_MODES.map((mode) => {

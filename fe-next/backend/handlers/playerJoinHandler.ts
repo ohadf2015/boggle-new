@@ -126,6 +126,21 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
         logger.info('SOCKET', `Using existing username "${authResult.existingUsername}" instead of "${username}" for auth user reconnection`);
         username = authResult.existingUsername;
       }
+    } else if (guestTokenHash) {
+      // Audit HIGH #4 (2026-05-10): guest reconnect path. If a guest host
+      // returns to their game (sessionStorage cleared, new tab, etc.) and
+      // picks a different display name, the username-based reconnect lookup
+      // would miss them — they'd land as a brand-new player without host
+      // status. Match on guestTokenHash instead so they reclaim their slot.
+      for (const [existingName, user] of Object.entries(game.users)) {
+        if (user.guestTokenHash && user.guestTokenHash === guestTokenHash) {
+          if (existingName !== username) {
+            logger.info('SOCKET', `Guest reconnect by tokenHash: "${username}" → existing slot "${existingName}" in game ${gameCode}`);
+            username = existingName;
+          }
+          break;
+        }
+      }
     }
 
     // Block kicked players from re-joining
@@ -286,6 +301,15 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       });
     } else {
       // Game not started yet - fully remove user
+      // Audit MED #6 (2026-05-10): also clear any stale reconnect timers from
+      // a prior network flap, mirroring the in-progress branch above. Without
+      // this, a player who flapped + then explicitly leaves leaves a phantom
+      // timer in the manager that never fires (game already cleaned up) but
+      // wastes a slot in the timer map.
+      timerManager.clearTimer(`reconnect:${gameCode}:${username}`);
+      if (isLeavingUserHost) {
+        timerManager.clearTimer(`hostReconnect:${gameCode}`);
+      }
       removeUserFromGame(gameCode, username);
       logger.info('SOCKET', `${username} left room ${gameCode} (waiting state - fully removed)`);
     }
@@ -317,7 +341,9 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
           broadcastToRoom(io, getGameRoom(gameCode), 'hostTransferred', {
             previousHost: username,
             newHost: nextHost,
-            message: `${username} left. ${nextHost} is now the host.`
+            message: `${username} left. ${nextHost} is now the host.`,
+            i18nKey: 'multiplayerFlow.hostTransferredAnnouncement',
+            i18nParams: { previousHost: username, newHost: nextHost }
           });
         }
       } else {
@@ -328,7 +354,10 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
         gameStartCoordinator.cleanupSequence(gameCode);
 
         broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
-          message: 'Host left and no other players available. Room is closing.'
+          message: 'Host left and no other players available. Room is closing.',
+          i18nKey: 'multiplayerFlow.hostLeftReason.explicitNoSuccessor',
+          i18nParams: { host: username },
+          reason: 'explicit_no_successor'
         });
 
         deleteGame(gameCode);

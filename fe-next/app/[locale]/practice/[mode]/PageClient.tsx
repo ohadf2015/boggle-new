@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useLayoutEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeTutorialSheet from '@/components/practice/PracticeTutorialSheet';
@@ -18,6 +18,10 @@ interface Props {
 
 type Step = 'tutorial' | 'play';
 
+// SSR-safe alias: useLayoutEffect on the client (paints synchronously, no
+// tutorial flash before swap), no-op useEffect on the server.
+const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
 /**
  * Cozy practice flow:
  *   merged-tutorial-sheet → bespoke practice sandbox.
@@ -33,8 +37,8 @@ type Step = 'tutorial' | 'play';
  *   - Explicit ?play=1 query param: skip tutorial regardless of state.
  *     Mode-nav uses this to jump directly to a sandbox.
  */
-export default function PracticePageClient({ mode, locale: _locale }: Props) {
-  const { t, language } = useLanguage();
+export default function PracticePageClient({ mode, locale }: Props) {
+  const { t, language, dir } = useLanguage();
   const { markSeen } = useModeFirstSeen(mode);
   const searchParams = useSearchParams();
 
@@ -56,8 +60,29 @@ export default function PracticePageClient({ mode, locale: _locale }: Props) {
     setStep('play');
   }, [markSeen]);
 
+  // Desktop players (≥768px) skip the tutorial entirely — the bigger viewport
+  // and pointer affordances make the sandbox self-evident, and the full-screen
+  // sheet otherwise feels like a roadblock between the hub click and play.
+  // useLayoutEffect runs before paint so desktop never sees a tutorial flash.
+  useIsoLayoutEffect(() => {
+    if (step !== 'tutorial') return;
+    if (typeof window === 'undefined') return;
+    if (!window.matchMedia('(min-width: 768px)').matches) return;
+    markSeen();
+    setStep('play');
+  }, [step, markSeen]);
+
   if (step === 'tutorial') {
-    return <PracticeTutorialSheet mode={mode} t={t} onContinue={goToPlay} onSkip={goToPlay} />;
+    return (
+      <PracticeTutorialSheet
+        mode={mode}
+        t={t}
+        locale={locale}
+        isRTL={dir === 'rtl'}
+        onContinue={goToPlay}
+        onSkip={goToPlay}
+      />
+    );
   }
   if (mode === 'wordHunt') return <PracticeWordHuntSandbox />;
   if (mode === 'wheelRush') return <PracticeWheelSandbox />;

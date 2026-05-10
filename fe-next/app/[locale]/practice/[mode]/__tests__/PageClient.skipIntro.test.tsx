@@ -46,6 +46,17 @@ beforeEach(() => {
   window.localStorage.clear();
   // Reset query params between tests.
   for (const k of Array.from(searchParamsValue.keys())) searchParamsValue.delete(k);
+  // Default viewport: mobile. Individual tests override for desktop.
+  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+    matches: false,
+    media: query,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+    onchange: null,
+  })) as unknown as typeof window.matchMedia;
 });
 
 describe('PracticePageClient fluency: skip intro for completed modes', () => {
@@ -66,5 +77,25 @@ describe('PracticePageClient fluency: skip intro for completed modes', () => {
     searchParamsValue.set('play', '1');
     render(<PracticePageClient mode="wordHunt" locale="en" />);
     expect(screen.getByTestId('practice-target')).toBeInTheDocument();
+  });
+
+  it('desktop viewport: skips tutorial and drops the player straight into the sandbox', () => {
+    // Desktop players don't need the tap-by-tap walkthrough — the larger
+    // viewport and pointer affordances make the sandbox self-evident, and the
+    // tutorial sheet otherwise feels like a roadblock between the hub click
+    // and actually playing. Mobile keeps the tutorial.
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: query.includes('768'),
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+      onchange: null,
+    })) as unknown as typeof window.matchMedia;
+    render(<PracticePageClient mode="classic" locale="en" />);
+    expect(screen.queryByTestId('practice-tutorial-sheet')).toBeNull();
+    expect(screen.getByTestId('practice-board')).toBeInTheDocument();
   });
 });

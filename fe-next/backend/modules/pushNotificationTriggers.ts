@@ -43,6 +43,7 @@ export type PushNotificationType =
   | 'direct_message'
   | 'challenge_accepted'
   | 'challenge_declined'
+  | 'challenge_result'
   | 'gift_received'
   | 'level_up'
   | 'season_start';
@@ -57,6 +58,7 @@ const NOTIFICATION_TYPE_MAP: Record<PushNotificationType, string> = {
   direct_message: 'social',
   challenge_accepted: 'social',
   challenge_declined: 'social',
+  challenge_result: 'social',
   gift_received: 'social',
   turn_reminder: 'social',
   achievement: 'achievement',
@@ -508,6 +510,38 @@ export async function notifyChallengeDeclined(
       deepLink: '/friends',
     },
   }, 'in_app_only', declinerUserId);
+}
+
+/**
+ * Notify both parties that a friend challenge match is complete (win/loss/tie).
+ * Closes the loop so the recipient sees the result outside the live MP screen.
+ */
+export async function notifyChallengeResult(
+  toUserId: string,
+  opponentUsername: string,
+  outcome: 'win' | 'loss' | 'tie',
+  challengeId: string,
+): Promise<void> {
+  const locale = await getUserLocale(toUserId);
+  const titleKey =
+    outcome === 'win' ? 'challengeResult.titleWin' :
+    outcome === 'loss' ? 'challengeResult.titleLoss' :
+    'challengeResult.titleTie';
+  const bodyKey =
+    outcome === 'win' ? 'challengeResult.bodyWin' :
+    outcome === 'loss' ? 'challengeResult.bodyLoss' :
+    'challengeResult.bodyTie';
+  return triggerPush(toUserId, 'challenge_result', {
+    title: translatePush(locale, titleKey, { opponent: opponentUsername }),
+    body: translatePush(locale, bodyKey, { opponent: opponentUsername }),
+    imageUrl: mascotImageUrl(outcome === 'win' ? 'celebration' : outcome === 'loss' ? 'crying' : 'play'),
+    data: {
+      type: 'challenge_result',
+      deepLink: '/friends',
+      challengeId,
+      outcome,
+    },
+  }, 'both');
 }
 
 /**

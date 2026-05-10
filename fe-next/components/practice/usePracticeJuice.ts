@@ -70,5 +70,18 @@ export function usePracticeJuice(opts: PracticeJuiceOptions = {}) {
     return gsap.timeline().to(document.body, { duration: 0.001 });
   }, [fxRef]);
 
-  return { triggerWordFound, triggerInvalid, triggerDuplicate, triggerGoalComplete };
+  const triggerCompletionBurst = useCallback(() => {
+    if (reduced()) return;
+    // Fire 2-3x more intense burst than word-found for fullscreen celebration
+    const fx = fxRef?.current;
+    if (fx && typeof window !== 'undefined') {
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      for (let i = 0; i < 3; i++) {
+        fx.burst(cx, cy, burstColor);
+      }
+    }
+  }, [fxRef, burstColor]);
+
+  return { triggerWordFound, triggerInvalid, triggerDuplicate, triggerGoalComplete, triggerCompletionBurst };
 }

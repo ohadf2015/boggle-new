@@ -94,6 +94,8 @@ export interface GameState {
   validationTimeout?: ReturnType<typeof setTimeout> | null;
   isRanked: boolean;
   isPrivate: boolean;
+  /** Classroom-mode rooms skip auto-host-transfer. See audit T4 (2026-05-10). */
+  isClassroom: boolean;
   allowLateJoin: boolean;
   aiApprovedWords: AiApprovedWord[];
   peerValidationWord: AiApprovedWord | null;
@@ -152,6 +154,7 @@ export interface GameCreationData {
   language?: Language;
   isRanked?: boolean;
   isPrivate?: boolean;
+  isClassroom?: boolean;
   allowLateJoin?: boolean;
 }
 
