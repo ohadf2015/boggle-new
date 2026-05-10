@@ -34,7 +34,9 @@ describe('blastWaveConfig — Sprint 1 retired tiles never spawn', () => {
     'anchorEnabled',
   ] as const;
 
-  it.each([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])('wave %i has all retired flags off', (wave) => {
+  // Revival sprint 2026-05-10: the retirement guard scopes to waves 1-7.
+  // Waves 8+ progressively re-enable retired tiles (see blast-tile-revival plan).
+  it.each([1, 2, 3, 4, 5, 6, 7])('wave %i (FTUE cohort) keeps all retired flags off', (wave) => {
     const cfg = getWaveConfig(wave) as unknown as Record<string, unknown>;
     for (const flag of RETIRED_FLAGS) {
       expect(cfg[flag]).toBe(false);
@@ -313,25 +315,23 @@ describe('getWaveDistribution — new tile unlock progression', () => {
     expect(typeof config.diamondEnabled).toBe('boolean');
   });
 
-  it('diamondEnabled stays false at every wave (retired)', () => {
-    for (let wave = 1; wave <= 12; wave++) {
+  it('diamondEnabled stays false through FTUE cohort (waves 1-7)', () => {
+    for (let wave = 1; wave <= 7; wave++) {
       expect(getWaveConfig(wave).diamondEnabled).toBe(false);
     }
   });
 
-  it('crystalEnabled stays false at every wave (retired)', () => {
-    for (let wave = 1; wave <= 15; wave++) {
+  it('crystalEnabled stays false through FTUE cohort (waves 1-7)', () => {
+    for (let wave = 1; wave <= 7; wave++) {
       expect(getWaveConfig(wave).crystalEnabled).toBe(false);
     }
   });
 
-  it('crystal absent from distribution at every wave (retired)', () => {
-    for (let wave = 1; wave <= 15; wave++) {
+  it('crystal absent from distribution through FTUE cohort (waves 1-7)', () => {
+    for (let wave = 1; wave <= 7; wave++) {
       const dist = getWaveDistribution(getWaveConfig(wave));
       expect(dist.crystal ?? 0).toBe(0);
     }
-    const dist12 = getWaveDistribution(getWaveConfig(12));
-    expect(dist12.crystal ?? 0).toBe(0);
   });
 
   it('wave 12 distribution still sums to ~1.0 with crystal included', () => {
