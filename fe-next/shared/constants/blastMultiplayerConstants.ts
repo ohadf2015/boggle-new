@@ -49,6 +49,8 @@ export const BLAST_TILE_BONUSES: Record<BlastTileType, number> = {
   locked: 1,       // gated tile — no bonus, reward is through key unlock
   key: 1.5,        // reward for clearing key (unlocks adjacent locked tiles)
   anchor: 1.5,     // base bonus — length-based bonus applied separately in clearTilesProcessor
+  chocolate: 0,    // cc-mechanic: no per-tile bonus; spread is the threat, not the score
+  cake: 0,         // cc-mechanic: HP damage is event-driven; destruction bonus paid by engine on kill_cake completion
 };
 
 export const BLAST_RAINBOW_FLAT_BONUS = 3;

@@ -9,6 +9,7 @@ import { getTileTooltip } from './utils/blastTileTooltips';
 import { TILE_VISUALS, CLEARING_COLORS, CLEARING_ANIMS } from './blastTileVisuals';
 import { getCascadeFallStyle } from './blastCascadeStyle';
 import { BlastJellyOverlay } from './BlastJellyOverlay';
+import { BlastCakeOverlay } from './BlastCakeOverlay';
 
 const TILE_TEXT_SHADOW_STYLE = { textShadow: '0 1px 0 rgba(255,255,255,0.4), 0 2px 3px rgba(0,0,0,0.2)' } as const;
 const TILE_TEXT_SHADOW_LIGHT_STYLE = { textShadow: '0 1px 2px rgba(0,0,0,0.4)' } as const;
@@ -62,6 +63,12 @@ export interface BlastTileProps {
   colorTag?: 'pink' | 'cyan' | 'lime';
   /** Jelly layers beneath this cell for clear_jelly objective. Undefined/0 = no jelly. */
   jellyLayers?: number;
+  /** Cake-bomb HP for the kill_cake objective. Set on the anchor cell only. */
+  cakeHp?: number;
+  /** Cake-bomb max HP — drives the pip-ring length. */
+  cakeMaxHp?: number;
+  /** True if this tile is part of any cake-bomb cluster (renders the pink wash). */
+  isCakeCell?: boolean;
   onClick?: () => void;
 }
 
@@ -198,7 +205,7 @@ export const BlastTile = memo(function BlastTile({
   letter, type, phase, isSelected, isCleared, hitsRemaining,
   fallOffset, clearRotate, spawnOffset, isNearMiss, activationEffect, isComboPreview,
   selectionIndex, selectionTotal, isLocked, countdown, fuseTimer, zonePreview,
-  isDiamondRevealed, innerType, isCascadeHighlight, portalPairIndex, isScanTarget, colorTag, jellyLayers, onClick, col,
+  isDiamondRevealed, innerType, isCascadeHighlight, portalPairIndex, isScanTarget, colorTag, jellyLayers, cakeHp, cakeMaxHp, isCakeCell, onClick, col,
 }: BlastTileProps) {
   const reducedMotion = usePrefersReducedMotion();
   const { t } = useLanguage();
@@ -286,6 +293,13 @@ export const BlastTile = memo(function BlastTile({
       title={tooltip ? `${tooltip.name}: ${tooltip.desc}` : undefined}
     >
       <BlastJellyOverlay layers={jellyLayers ?? 0} />
+      {isCakeCell && (
+        <BlastCakeOverlay
+          hp={cakeHp ?? cakeMaxHp ?? 5}
+          maxHp={cakeMaxHp ?? 5}
+          isAnchor={typeof cakeHp === 'number'}
+        />
+      )}
       <span className="relative z-10" style={visual.text === 'text-white' ? TILE_TEXT_SHADOW_LIGHT_STYLE : TILE_TEXT_SHADOW_STYLE}>{letter}</span>
       {visual.indicator && (
         <span className={`absolute top-0.5 inset-e-0.5 leading-none pointer-events-none ${visual.text ?? ''}`} aria-hidden="true">

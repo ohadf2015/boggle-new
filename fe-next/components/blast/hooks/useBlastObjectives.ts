@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { BlastGameState, BlastTileType, BlastObjective, BlastObjectiveProgress } from '../types';
 import type { BlastTileState } from '@/shared/types/blast';
 import { countJelly } from '../utils/blastJellyEngine';
+import { getCakeHp } from '../utils/blastCakeEngine';
 
 export interface UseBlastObjectivesParams {
   gameState: BlastGameState;
@@ -87,6 +88,26 @@ function getProgress(
       const remaining = tileStates ? countJelly(tileStates) : initial;
       current = Math.max(0, initial - remaining);
       target = initial;
+      break;
+    }
+
+    case 'kill_cake': {
+      // target carries max-HP; current = damage dealt = maxHp - currentHp.
+      // First cake anchor in tileStates wins (single boss per wave).
+      const maxHp = objective.target;
+      let currentHp: number | null = null;
+      if (tileStates) {
+        for (const row of tileStates) {
+          for (const cell of row) {
+            if (cell.cakeAnchorUid && typeof cell.cakeHp === 'number') {
+              currentHp = getCakeHp(tileStates, cell.cakeAnchorUid);
+              break;
+            }
+          }
+          if (currentHp !== null) break;
+        }
+      }
+      current = currentHp === null ? 0 : Math.max(0, maxHp - currentHp);
       break;
     }
   }
