@@ -15,12 +15,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/sv/swedish-multiplayer-word-game`;
 
   return {
-    title: 'Scrabble Online Svenska — Ordspel Alternativ Gratis Multiplayer | LexiClash',
-    description: 'Scrabble-alternativ online på svenska, gratis och utan registrering. Skapa rum, bjud in med länk och tävla i realtid. 10 000+ svenska ord. Börja nu!',
+    title: 'Scrabble Online Svenska Gratis — Spela med Vänner | LexiClash',
+    description: 'Spela Scrabble online på svenska gratis och utan registrering. Skapa rum, bjud in med länk och tävla i realtid med vänner. 10 000+ ord. Börja nu!',
     keywords: 'ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid',
     openGraph: {
-      title: 'Scrabble Online Svenska — Gratis Ordspel Alternativ | LexiClash',
-      description: 'Scrabble-alternativ online på svenska: tävla med vänner i realtid. Skapa rum, bjud in med länk. Gratis, ingen registrering.',
+      title: 'Scrabble Online Svenska Gratis — Spela med Vänner | LexiClash',
+      description: 'Spela Scrabble online på svenska gratis och utan registrering. Skapa rum, bjud in med länk och tävla i realtid med vänner. 10 000+ ord. Börja nu!',
       locale: 'sv_SE',
       type: 'website',
       url: pageUrl,
@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Scrabble Online Svenska — Ordspel Alternativ | LexiClash',
-      description: 'Scrabble-alternativ online på svenska: skapa rum, bjud in med länk, tävla i realtid. Gratis, ingen registrering.',
+      title: 'Scrabble Online Svenska Gratis — Spela med Vänner | LexiClash',
+      description: 'Spela Scrabble online på svenska gratis och utan registrering. Skapa rum, bjud in med länk och tävla i realtid med vänner. 10 000+ ord. Börja nu!',
       images: [`${BASE_URL}/og-image-sv.webp`],
     },
     alternates: {
