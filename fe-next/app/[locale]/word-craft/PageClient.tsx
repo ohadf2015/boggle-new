@@ -650,6 +650,7 @@ export default function WordCraftPageClient() {
               hasSelectedTile={!!game.state.selectedRackTileId}
               isFirstMove={isFirstMove}
               dragHoverCell={drag?.active ? drag.hoverCell : null}
+              locale={locale}
             />
             </WordCraftZoomShell>
             {scoreFloat ? (

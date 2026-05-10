@@ -3,6 +3,7 @@
 import { memo, useMemo } from 'react';
 import { CENTER, type Board } from '@/lib/word-craft/board';
 import type { PlacedTile } from '@/lib/word-craft/types';
+import { hebrewDisplayLetter } from '@/lib/word-craft/hebrewDisplay';
 import { cn } from '@/lib/utils';
 
 export interface WordCraftBoardProps {
@@ -16,6 +17,8 @@ export interface WordCraftBoardProps {
   isFirstMove?: boolean;
   /** During an active drag: cell key 'r,c' that the dragged tile is hovering over */
   dragHoverCell?: string | null;
+  /** Active locale — drives Hebrew sofit auto-display */
+  locale?: string;
 }
 
 const PREMIUM_MULT: Record<string, { mult: '×2' | '×3'; kind: 'L' | 'W' }> = {
@@ -60,6 +63,7 @@ function WordCraftBoardImpl({
   hasSelectedTile,
   isFirstMove,
   dragHoverCell,
+  locale = 'en',
 }: WordCraftBoardProps) {
   const size = board.cells.length;
   const pendingByCoord = new Map<string, PlacedTile>();
@@ -145,11 +149,29 @@ function WordCraftBoardImpl({
             >
               {placedTile ? (
                 <span className={cn('wc-tile-glyph', tileFontClass)}>
-                  {placedTile.letter === '_' ? '·' : placedTile.letter}
+                  {placedTile.letter === '_'
+                    ? '·'
+                    : hebrewDisplayLetter({
+                        board,
+                        pending: pendingPlacements,
+                        row: r,
+                        col: c,
+                        letter: placedTile.letter,
+                        locale,
+                      })}
                 </span>
               ) : pending ? (
                 <span className={cn('wc-tile-glyph', tileFontClass)}>
-                  {pending.letter === '_' ? '·' : pending.letter}
+                  {pending.letter === '_'
+                    ? '·'
+                    : hebrewDisplayLetter({
+                        board,
+                        pending: pendingPlacements,
+                        row: r,
+                        col: c,
+                        letter: pending.letter,
+                        locale,
+                      })}
                 </span>
               ) : isAxisHint ? (
                 // tiny dot hints player at where next tile in a line could go
