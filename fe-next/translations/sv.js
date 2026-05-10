@@ -5510,7 +5510,9 @@ const sv = {
     "tryAgain": "Fortsätt öva!",
     "longest": "Längsta",
     "viewSubmittedWords": "Visa inskickade ord",
+    "viewWordsYouMissed": "Visa ord du missade",
     "submittedWordsTitle": "Inskickade ord",
+    "youMissedTitle": "Ord du missade",
     "noWordsSubmitted": "Inga ord inskickade ännu",
     "results": {
       "title": "Ordhjulsresultat",
@@ -11457,7 +11459,9 @@ const sv = {
       "horizontal": "Vågrätt",
       "vertical": "Lodrätt",
       "flipAria": "byt ordriktning"
-    }
+    },
+    "zoomLabel": "Nyp för att zooma in på brädet",
+    "zoomReset": "Återställ zoom"
   },
   mp: {
     kbHint: {

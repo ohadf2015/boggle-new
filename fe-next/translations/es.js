@@ -5552,7 +5552,9 @@ const es = {
     "tryAgain": "¡Sigue practicando!",
     "longest": "Más larga",
     "viewSubmittedWords": "Ver palabras enviadas",
+    "viewWordsYouMissed": "Ver palabras que se te escaparon",
     "submittedWordsTitle": "Palabras enviadas",
+    "youMissedTitle": "Palabras que se te escaparon",
     "noWordsSubmitted": "Aún no se han enviado palabras",
     "results": {
       "title": "Resultados de la rueda de palabras",
@@ -11552,7 +11554,9 @@ const es = {
       "horizontal": "Horizontal",
       "vertical": "Vertical",
       "flipAria": "cambiar dirección de la palabra"
-    }
+    },
+    "zoomLabel": "Pellizca para ampliar el tablero",
+    "zoomReset": "Restablecer zoom"
   },
   "connections": {
     "title": "Cadena de Palabras",

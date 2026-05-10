@@ -62,23 +62,15 @@ export function HeatMeter({ heat, overdrive, burnout, label }: HeatMeterProps) {
   }, [burnout])
 
   return (
-    <div ref={containerRef} className="w-full" aria-label={`${label}: ${heat}%`}>
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-[10px] font-neo-display uppercase tracking-widest text-neo-white/60">
-          {label}
-        </span>
-        {overdrive && (
-          <span className="text-[10px] font-neo-display font-black text-neo-yellow animate-pulse uppercase tracking-widest">
-            OVERDRIVE!
-          </span>
-        )}
-        {burnout && !overdrive && (
-          <span className="text-[10px] font-neo-display font-black text-red-400 uppercase tracking-widest">
-            BURNED OUT
-          </span>
-        )}
-      </div>
-      <div className="relative h-3 bg-neo-navy-light border-2 border-black rounded-sm overflow-hidden">
+    <div
+      ref={containerRef}
+      className="w-full flex items-center gap-2 shrink-0"
+      aria-label={`${label}: ${heat}%`}
+    >
+      <span className="text-[10px] font-neo-display uppercase tracking-widest text-neo-white/60 shrink-0 min-w-12">
+        {label}
+      </span>
+      <div className="relative flex-1 h-2.5 bg-neo-navy-light border-2 border-black rounded-sm overflow-hidden">
         <div
           ref={fillRef}
           className={cn(
@@ -88,6 +80,16 @@ export function HeatMeter({ heat, overdrive, burnout, label }: HeatMeterProps) {
           style={{ width: `${heat}%`, backgroundColor: '#BFFF00' }}
         />
       </div>
+      {overdrive && (
+        <span className="text-[10px] font-neo-display font-black text-neo-yellow animate-pulse uppercase tracking-widest shrink-0">
+          OVERDRIVE!
+        </span>
+      )}
+      {burnout && !overdrive && (
+        <span className="text-[10px] font-neo-display font-black text-red-400 uppercase tracking-widest shrink-0">
+          BURNED OUT
+        </span>
+      )}
     </div>
   )
 }

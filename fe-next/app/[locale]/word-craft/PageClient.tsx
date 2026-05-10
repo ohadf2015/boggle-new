@@ -22,6 +22,7 @@ import { ScoreFloat } from '@/components/word-craft/ScoreFloat';
 import { WordCraftTutor } from '@/components/word-craft/WordCraftTutor';
 import { WordCraftDragGhost } from '@/components/word-craft/WordCraftDragGhost';
 import { WordCraftPendingStrip } from '@/components/word-craft/WordCraftPendingStrip';
+import { WordCraftZoomShell } from '@/components/word-craft/WordCraftZoomShell';
 import { useWordCraftJuice } from '@/components/word-craft/useWordCraftJuice';
 import { useWordCraftDrag } from '@/components/word-craft/useWordCraftDrag';
 import { inferAxis, resolveTap } from '@/lib/word-craft/placement';
@@ -467,7 +468,7 @@ export default function WordCraftPageClient() {
       <Header />
       <WordCraftCelebration kind={celebration.kind} burstId={celebration.burstId} origin={celebration.origin} />
 
-      <main className="flex-1 min-h-0 px-3 py-2 max-w-[820px] mx-auto w-full flex flex-col gap-2 relative">
+      <main className="flex-1 min-h-0 px-3 py-2 max-w-[820px] mx-auto w-full flex flex-col gap-1.5 relative">
         {/* Topbar: back · title · BETA · How to play · loading */}
         <div className="flex items-center gap-2 shrink-0">
           <Button variant="outline" size="sm" onClick={() => router.push(`/${language}`)} className="shrink-0 h-8 px-2">
@@ -530,9 +531,12 @@ export default function WordCraftPageClient() {
           label={t('wordcraft.heatLabel')}
         />
 
-        {/* Board fills remaining vertical space; aspect-square keeps it readable */}
+        {/* Board fills remaining vertical space; aspect-square keeps it readable.
+            ZoomShell wraps the grid so the player can pinch-zoom into a corner
+            on small phones — premium-cell labels are otherwise unreadable. */}
         <div className="flex-1 min-h-0 flex items-center justify-center">
           <div className="relative aspect-square max-h-full max-w-full">
+            <WordCraftZoomShell ariaLabel={t('wordcraft.zoomLabel')} resetLabel={t('wordcraft.zoomReset')}>
             <WordCraftBoard
               board={game.state.board}
               pendingPlacements={game.state.pendingPlacements}
@@ -555,6 +559,7 @@ export default function WordCraftPageClient() {
               isFirstMove={isFirstMove}
               dragHoverCell={drag?.active ? drag.hoverCell : null}
             />
+            </WordCraftZoomShell>
             {scoreFloat ? (
               <ScoreFloat
                 key={scoreFloat.key}

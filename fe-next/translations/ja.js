@@ -5543,7 +5543,9 @@ const ja = {
     "tryAgain": "練習を続けましょう！",
     "longest": "最長",
     "viewSubmittedWords": "提出した単語を見る",
+    "viewWordsYouMissed": "見逃した単語を見る",
     "submittedWordsTitle": "提出した単語",
+    "youMissedTitle": "見逃した単語",
     "noWordsSubmitted": "まだ単語が提出されていません",
     "results": {
       "title": "ワードホイール結果",
@@ -11389,7 +11391,9 @@ const ja = {
       "horizontal": "横",
       "vertical": "縦",
       "flipAria": "単語の向きを切り替える"
-    }
+    },
+    "zoomLabel": "ピンチで盤を拡大",
+    "zoomReset": "拡大をリセット"
   },
   mp: {
     kbHint: {

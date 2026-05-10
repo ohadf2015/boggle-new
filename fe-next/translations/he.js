@@ -5511,7 +5511,9 @@ const he = {
     "tryAgain": "המשך להתאמן!",
     "longest": "הארוכה ביותר",
     "viewSubmittedWords": "צפה במילים שהוגשו",
+    "viewWordsYouMissed": "צפה במילים שפספסת",
     "submittedWordsTitle": "מילים שהוגשו",
+    "youMissedTitle": "מילים שפספסת",
     "noWordsSubmitted": "עדיין לא הוגשו מילים",
     "results": {
       "title": "תוצאות גלגל מילים",
@@ -11545,7 +11547,9 @@ const he = {
       "horizontal": "אופקי",
       "vertical": "אנכי",
       "flipAria": "הפוך את כיוון המילה"
-    }
+    },
+    "zoomLabel": "צבוט כדי להגדיל את הלוח",
+    "zoomReset": "אפס זום"
   },
   mp: {
     kbHint: {

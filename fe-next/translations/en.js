@@ -5616,7 +5616,9 @@ const en = {
     "tryAgain": "Keep practicing!",
     "longest": "Longest",
     "viewSubmittedWords": "View submitted words",
+    "viewWordsYouMissed": "View words you missed",
     "submittedWordsTitle": "Submitted Words",
+    "youMissedTitle": "Words you missed",
     "noWordsSubmitted": "No words submitted yet",
     "results": {
       "title": "Word Wheel Results",
@@ -11649,7 +11651,9 @@ const en = {
       "horizontal": "Across",
       "vertical": "Down",
       "flipAria": "flip word direction"
-    }
+    },
+    "zoomLabel": "Pinch to zoom into the board",
+    "zoomReset": "Reset zoom"
   },
   mp: {
     kbHint: {
