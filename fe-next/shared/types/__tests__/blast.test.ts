@@ -5,8 +5,13 @@
 import { BLAST_TILE_TYPE_LIST, type BlastTileType } from '../blast';
 
 describe('BlastTileType canonical definition', () => {
-  it('should contain exactly 21 tile types', () => {
-    expect(BLAST_TILE_TYPE_LIST).toHaveLength(21);
+  it('should contain exactly 23 tile types', () => {
+    expect(BLAST_TILE_TYPE_LIST).toHaveLength(23);
+  });
+
+  it('should contain chocolate and cake (cc-mechanics 2026-05-10)', () => {
+    expect(BLAST_TILE_TYPE_LIST).toContain('chocolate');
+    expect(BLAST_TILE_TYPE_LIST).toContain('cake');
   });
 
   it('should contain fuse (linked pair detonation tile)', () => {
@@ -65,11 +70,13 @@ describe('BlastTileType canonical definition', () => {
       'locked',
       'key',
       'anchor',
+      'chocolate',
+      'cake',
     ];
     for (const type of expected) {
       expect(BLAST_TILE_TYPE_LIST).toContain(type);
     }
-    expect(expected).toHaveLength(21);
+    expect(expected).toHaveLength(23);
   });
 
   it('should have no duplicate entries', () => {
