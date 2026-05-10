@@ -226,7 +226,7 @@ export default function GuestDetailPageClient() {
               <Card>
                 <CardContent className="p-6 space-y-4">
                   <div className="flex flex-wrap items-center gap-3">
-                    {guest.converted_at || guest.user_id ? (
+                    {guest.linked_at || guest.user_id ? (
                       <span className="inline-flex items-center gap-1 text-sm bg-neo-lime/20 text-neo-lime px-2 py-1 rounded">
                         <CheckCircle2 className="w-4 h-4" /> Converted
                         {guest.user_id && (
