@@ -25,6 +25,15 @@ import { WordCraftPendingStrip } from '@/components/word-craft/WordCraftPendingS
 import { useWordCraftJuice } from '@/components/word-craft/useWordCraftJuice';
 import { useWordCraftDrag } from '@/components/word-craft/useWordCraftDrag';
 import { inferAxis, resolveTap } from '@/lib/word-craft/placement';
+import {
+  trackWordCraftAxisLocked,
+  trackWordCraftFastTapUsed,
+  trackWordCraftOffAxisDrop,
+  trackWordCraftPendingRecall,
+  trackWordCraftRecallAll,
+  trackWordCraftTurnSubmitted,
+  type WordCraftInputMethod,
+} from '@/components/word-craft/wordCraftTelemetry';
 import { useAchievementQueue } from '@/components/achievements';
 import { cn } from '@/lib/utils';
 
@@ -106,13 +115,57 @@ export default function WordCraftPageClient() {
   const juice = useWordCraftJuice();
   const { queueAchievement } = useAchievementQueue();
 
+  // --- Telemetry plumbing ---
+  // turnIdRef persists for the whole turn so every event tied to one turn
+  // lands with the same key. Bumps on each successful commit / pass.
+  const turnIdRef = useRef(`t-${Date.now()}-0`);
+  const turnIndexRef = useRef(0);
+  // Per-turn count of dispatch sites — fed into `inputMethod` heuristic on
+  // turn_submitted so we know which gesture dominated the turn.
+  const inputCountsRef = useRef<{ tap: number; drag: number; fastTap: number }>({ tap: 0, drag: 0, fastTap: 0 });
+  const resetTurnTelemetry = useCallback(() => {
+    turnIndexRef.current += 1;
+    turnIdRef.current = `t-${Date.now()}-${turnIndexRef.current}`;
+    inputCountsRef.current = { tap: 0, drag: 0, fastTap: 0 };
+  }, []);
+
   // Drag-to-place: pointer-down on rack tile begins a drag; pointer-up over a
   // valid empty cell drops it via the placeTileOnBoard bypass action.
   const { drag, begin: beginTileDrag, consumeDropFlag } = useWordCraftDrag({
-    onDrop: (tileId, r, c) => game.placeTileOnBoard(tileId, r, c),
+    onDrop: (tileId, r, c) => {
+      // Off-axis detection: if axis is locked and this drop breaks the line,
+      // emit telemetry so we can measure how often the heuristic mis-reads
+      // intent. The actual placement still goes through (current reducer
+      // doesn't enforce axis-line at drop time — validation runs on submit).
+      const pending = game.state.pendingPlacements;
+      const axisAtDrop = inferAxis(pending);
+      if (axisAtDrop === 'h' && pending[0] && pending[0].row !== r) {
+        trackWordCraftOffAxisDrop({ turnId: turnIdRef.current });
+      } else if (axisAtDrop === 'v' && pending[0] && pending[0].col !== c) {
+        trackWordCraftOffAxisDrop({ turnId: turnIdRef.current });
+      }
+      inputCountsRef.current.drag += 1;
+      game.placeTileOnBoard(tileId, r, c);
+    },
   });
 
   const axis = useMemo(() => inferAxis(game.state.pendingPlacements), [game.state.pendingPlacements]);
+
+  // Fire axis_locked exactly once when pending tiles transition from 1→2
+  // and form a valid line. Resets when pending shrinks back to <2.
+  const axisLockEmittedRef = useRef(false);
+  useEffect(() => {
+    if (axis !== null && !axisLockEmittedRef.current) {
+      axisLockEmittedRef.current = true;
+      trackWordCraftAxisLocked({
+        axis,
+        turnNumber: turnIndexRef.current + 1,
+        turnId: turnIdRef.current,
+      });
+    } else if (axis === null && axisLockEmittedRef.current) {
+      axisLockEmittedRef.current = false;
+    }
+  }, [axis]);
 
   // Fast-tap: when the player has placed >=2 tiles in a line, a tap on a rack
   // tile auto-drops at the next empty cell along that axis. Eliminates per-tile
@@ -123,11 +176,78 @@ export default function WordCraftPageClient() {
       if (!rackTile) return;
       const result = resolveTap(rackTile, game.state.pendingPlacements, game.state.board);
       if ('placement' in result) {
+        inputCountsRef.current.fastTap += 1;
+        trackWordCraftFastTapUsed({
+          turnId: turnIdRef.current,
+          tilesPlaced: game.state.pendingPlacements.length + 1,
+        });
+        // Same arc juice as tap-place — flying tile keeps the gesture
+        // physical even when the player isn't aiming.
+        const fromEl = document.querySelector(`[data-rack-tile-id="${rackTile.id}"]`);
+        const toEl = document.querySelector(`[data-board-cell="${result.placement.row},${result.placement.col}"]`);
+        juice.arcTilePlace(fromEl, toEl, rackTile.letter, rackTile.value);
         game.placeTileOnBoard(rackTile.id, result.placement.row, result.placement.col);
       }
     },
+    [game, juice],
+  );
+
+  // Wrap raw recall handlers so the strip / board cells share the same
+  // telemetry surface but the analytics can disambiguate the source.
+  const recallFromStrip = useCallback(
+    (rackTileId: string) => {
+      trackWordCraftPendingRecall({ turnId: turnIdRef.current, source: 'strip' });
+      game.recallTile(rackTileId);
+    },
     [game],
   );
+  const recallFromBoard = useCallback(
+    (rackTileId: string) => {
+      trackWordCraftPendingRecall({ turnId: turnIdRef.current, source: 'board' });
+      game.recallTile(rackTileId);
+    },
+    [game],
+  );
+  const recallAllPending = useCallback(() => {
+    const count = game.state.pendingPlacements.length;
+    if (count > 0) {
+      trackWordCraftRecallAll({ turnId: turnIdRef.current, tilesRecalled: count });
+    }
+    game.recallAll();
+  }, [game]);
+
+  // Wrap submitMove so we emit turn_submitted with a derived inputMethod
+  // before the reducer commits + clears pending state.
+  const submitMoveWithTelemetry = useCallback(() => {
+    const counts = inputCountsRef.current;
+    const total = counts.tap + counts.drag + counts.fastTap;
+    let inputMethod: WordCraftInputMethod = 'tap';
+    if (total > 0) {
+      const max = Math.max(counts.tap, counts.drag, counts.fastTap);
+      const distinctNonZero = Number(counts.tap > 0) + Number(counts.drag > 0) + Number(counts.fastTap > 0);
+      if (distinctNonZero > 1) inputMethod = 'mixed';
+      else if (counts.fastTap === max) inputMethod = 'fast-tap';
+      else if (counts.drag === max) inputMethod = 'drag';
+      else inputMethod = 'tap';
+    }
+    const tilesPlaced = game.state.pendingPlacements.length;
+    const previousHistoryLen = game.state.history.length;
+    game.submitMove();
+    // Fire telemetry only when the commit actually advanced history. We
+    // schedule a microtask so we read post-dispatch state.
+    queueMicrotask(() => {
+      const newest = game.state.history[previousHistoryLen];
+      if (newest && newest.score > 0) {
+        trackWordCraftTurnSubmitted({
+          turnId: turnIdRef.current,
+          inputMethod,
+          tilesPlaced,
+          score: newest.score,
+        });
+        resetTurnTelemetry();
+      }
+    });
+  }, [game, resetTurnTelemetry]);
 
   // Celebrations
   const [celebration, setCelebration] = useState<{ kind: CelebrationKind; burstId: number; origin?: { x: number; y: number } }>({
@@ -416,8 +536,20 @@ export default function WordCraftPageClient() {
             <WordCraftBoard
               board={game.state.board}
               pendingPlacements={game.state.pendingPlacements}
-              onCellClick={game.placeOnBoard}
-              onRecallPending={game.recallTile}
+              onCellClick={(r, c) => {
+                // Visualize tap-to-place: ghost tile flies from rack to cell.
+                // Cures the "two-tap feels indirect" pain by showing motion.
+                const selId = game.state.selectedRackTileId;
+                const sel = selId ? game.state.player.rack.find((t) => t.id === selId) : null;
+                if (sel) {
+                  const fromEl = document.querySelector(`[data-rack-tile-id="${selId}"]`);
+                  const toEl = document.querySelector(`[data-board-cell="${r},${c}"]`);
+                  juice.arcTilePlace(fromEl, toEl, sel.letter, sel.value);
+                }
+                inputCountsRef.current.tap += 1;
+                game.placeOnBoard(r, c);
+              }}
+              onRecallPending={recallFromBoard}
               disabled={game.state.turn !== 'player'}
               hasSelectedTile={!!game.state.selectedRackTileId}
               isFirstMove={isFirstMove}
@@ -444,8 +576,8 @@ export default function WordCraftPageClient() {
         <WordCraftPendingStrip
           pending={game.state.pendingPlacements}
           axis={axis}
-          onRecallOne={game.recallTile}
-          onRecallAll={game.recallAll}
+          onRecallOne={recallFromStrip}
+          onRecallAll={recallAllPending}
           locale={locale}
           labels={{
             headerEmpty: t('wordcraft.pending.empty'),
@@ -478,8 +610,8 @@ export default function WordCraftPageClient() {
           canRecall={game.state.pendingPlacements.length > 0}
           canSwap={game.state.player.rack.length > 0 && game.state.turn === 'player' && !game.state.burnout}
           disabled={game.state.turn !== 'player' || !dict || game.state.burnout}
-          onSubmit={game.submitMove}
-          onRecall={game.recallAll}
+          onSubmit={submitMoveWithTelemetry}
+          onRecall={recallAllPending}
           onPass={game.pass}
           onSwap={() => {
             const toReturn = game.state.player.rack.filter((tile) => !pendingIds.has(tile.id));
