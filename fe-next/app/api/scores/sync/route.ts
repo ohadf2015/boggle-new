@@ -16,8 +16,31 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { captureApiError } from '@/utils/sentry';
-import { revalidateSubmission, type RevalidateResult } from '@/lib/offline/serverRevalidate';
+import { createClient } from '@/utils/supabase/server';
+import {
+  revalidateSubmission,
+  type RevalidateResult,
+  type ServerSubmission,
+} from '@/lib/offline/serverRevalidate';
 import { validateWordOnServer } from '@/lib/wordValidation/serverDicts';
+
+// Per-mode award dispatch map. Each handler is responsible for granting
+// coins/streak/badges/XP for an accepted submission. Returns the awards
+// object surfaced to the client in the sync response. See plan:
+// docs/plans/2026-05-11-offline-mode-phase-1b-award-dispatch.md
+type AwardHandler = (
+  sub: ServerSubmission,
+  userId: string,
+) => Promise<Record<string, number>>;
+
+const awardHandlers: Partial<Record<ServerSubmission['mode'], AwardHandler>> = {
+  // sp:    pending (no live handler — only stats aggregate)
+  // wotd:  pending Phase 1b extract from dailyChallengeRouter
+  // daily-survival:  pending
+  // daily-wordhunt:  pending
+  // brain: pending extract from /api/drills/submit
+  // adventure: pending extract from /api/adventure/complete
+};
 
 const SubmissionSchema = z.object({
   id: z.string().uuid(),
@@ -35,7 +58,10 @@ const RequestSchema = z.object({
   submissions: z.array(SubmissionSchema).min(1).max(50),
 });
 
-type SyncResult = RevalidateResult;
+interface SyncResult extends RevalidateResult {
+  awards?: Record<string, number> | null;
+  awardError?: string;
+}
 
 const dedupeCache = new Map<string, SyncResult>();
 const DEDUPE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -56,6 +82,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const limit = checkApiRateLimit(req, 'scores-sync', { windowMs: 60_000, maxRequests: 20 });
     if (!limit.success) return rateLimitResponse(limit);
 
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+    }
+
     const raw = await req.json();
     const parsed = RequestSchema.safeParse(raw);
     if (!parsed.success) {
@@ -71,7 +105,27 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         results.push(prior);
         continue;
       }
-      const result = await revalidateSubmission(sub, validateWordOnServer);
+      const revalidated = await revalidateSubmission(sub, validateWordOnServer);
+      const result: SyncResult = { ...revalidated };
+
+      if (revalidated.accepted) {
+        const handler = awardHandlers[sub.mode];
+        if (handler) {
+          try {
+            result.awards = await handler(sub, user.id);
+          } catch (err) {
+            result.awardError = err instanceof Error ? err.message : 'unknown_award_error';
+            captureApiError(
+              err instanceof Error ? err : new Error(String(err)),
+              'scores-sync.award',
+              { userId: user.id, body: { mode: sub.mode } },
+            );
+          }
+        } else {
+          result.awards = null;
+        }
+      }
+
       dedupeCache.set(sub.id, result);
       dedupeTimes.set(sub.id, Date.now());
       results.push(result);
