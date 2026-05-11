@@ -9,7 +9,6 @@ import {
   ShieldAlert,
   BookOpen,
   Users,
-  UserX,
   Settings,
   Gamepad2,
 } from 'lucide-react';
@@ -37,7 +36,6 @@ export function AdminSidebar({ moderationCount = 0 }: AdminSidebarProps) {
     { key: 'moderation', labelKey: 'admin.sidebar.moderation', icon: ShieldAlert, path: '/moderation', badge: moderationCount },
     { key: 'content', labelKey: 'admin.sidebar.content', icon: BookOpen, path: '/content' },
     { key: 'players', labelKey: 'admin.sidebar.players', icon: Users, path: '/players' },
-    { key: 'guests', labelKey: 'admin.sidebar.guests', icon: UserX, path: '/guests' },
     { key: 'system', labelKey: 'admin.sidebar.system', icon: Settings, path: '/system' },
     { key: 'word-craft', labelKey: 'admin.sidebar.wordCraft', icon: Gamepad2, path: '/word-craft' },
   ];
