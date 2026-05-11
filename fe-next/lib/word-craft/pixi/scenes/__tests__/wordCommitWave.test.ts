@@ -18,7 +18,7 @@ vi.mock('pixi.js', () => ({
   },
 }));
 vi.mock('gsap', () => ({
-  default: { to: vi.fn((target, opts) => { setTimeout(() => opts.onComplete?.(), 0); return { kill: vi.fn() }; }) },
+  default: { to: vi.fn((_target, opts) => { setTimeout(() => opts.onComplete?.(), 0); return { kill: vi.fn() }; }) },
 }));
 
 const fakeCtx = (rm = false) => ({
