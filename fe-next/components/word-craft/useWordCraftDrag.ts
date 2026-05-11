@@ -72,7 +72,12 @@ export function useWordCraftDrag({ onDrop }: UseWordCraftDragArgs) {
       if (!start) return;
       const dx = e.clientX - start.x;
       const dy = e.clientY - start.y;
-      const passedThreshold = dx * dx + dy * dy >= DRAG_THRESHOLD_PX * DRAG_THRESHOLD_PX;
+      const distanceSquared = dx * dx + dy * dy;
+      const passedThreshold = distanceSquared >= DRAG_THRESHOLD_PX * DRAG_THRESHOLD_PX;
+
+      // Touch pointers only activate drag after exceeding threshold.
+      // Mouse/pen activate immediately on any movement.
+      const shouldActivate = drag.pointerType === 'touch' ? passedThreshold : distanceSquared > 0;
 
       const target = document.elementFromPoint(e.clientX, e.clientY);
       const cellEl = target instanceof Element ? target.closest('[data-board-cell]') : null;
@@ -87,7 +92,7 @@ export function useWordCraftDrag({ onDrop }: UseWordCraftDragArgs) {
       lastHoverRef.current = hoverCell;
 
       setDrag((prev) =>
-        prev ? { ...prev, x: e.clientX, y: e.clientY, hoverCell, active: prev.active || passedThreshold } : null,
+        prev ? { ...prev, x: e.clientX, y: e.clientY, hoverCell, active: prev.active || shouldActivate } : null,
       );
     };
 
