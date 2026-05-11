@@ -397,6 +397,20 @@ const es = {
       "advertisingDesc": "Mostrar anuncios relevantes a través de Google AdMob"
     }
   },
+  "offline": {
+    "banner": {
+      "title": "Estás sin conexión",
+      "subtitle": "El modo de un jugador y los retos diarios siguen funcionando. Las puntuaciones se sincronizarán cuando vuelvas a conectarte.",
+      "dismiss": "Entendido"
+    },
+    "sync": {
+      "adjusted": "{count} palabra{count, plural, one {} other {s}} ajustada{count, plural, one {} other {s}} al sincronizar. Puntuación final: {to}.",
+      "rejected": "{count} palabra{count, plural, one {} other {s}} rechazada{count, plural, one {} other {s}}."
+    },
+    "pending": {
+      "badge": "{count} pendiente{count, plural, one {} other {s}}"
+    }
+  },
   "common": {
     "used": "Usado",
     "free": "Gratis",

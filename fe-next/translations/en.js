@@ -397,6 +397,20 @@ const en = {
       "advertisingDesc": "Show relevant ads via Google AdMob"
     }
   },
+  "offline": {
+    "banner": {
+      "title": "You're offline",
+      "subtitle": "Single-player and daily challenges keep working. Scores sync when you're back.",
+      "dismiss": "Got it"
+    },
+    "sync": {
+      "adjusted": "{count} word{count, plural, one {} other {s}} adjusted on sync. Final score: {to}.",
+      "rejected": "{count} word{count, plural, one {} other {s}} rejected."
+    },
+    "pending": {
+      "badge": "{count} pending"
+    }
+  },
   "common": {
     "used": "Used",
     "email": "Email",

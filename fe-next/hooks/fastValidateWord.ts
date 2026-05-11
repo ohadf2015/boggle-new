@@ -12,9 +12,22 @@
 
 import type { Language } from '@/shared/types/game';
 import { hasWordInMemoryCache } from './useDictionaryCache';
+import { getOfflineStore } from '@/lib/offline';
+import { validateOffline } from '@/lib/offline/dict';
+
+async function tryOfflineDict(word: string, language: Language): Promise<boolean> {
+  try {
+    const store = await getOfflineStore();
+    return await validateOffline(store, word, language);
+  } catch {
+    return false;
+  }
+}
 
 export async function fastValidateWord(word: string, language: Language): Promise<boolean> {
   if (hasWordInMemoryCache(word, language) === true) return true;
+
+  if (await tryOfflineDict(word, language)) return true;
 
   try {
     const res = await fetch('/api/validate-word', {

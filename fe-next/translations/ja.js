@@ -397,6 +397,20 @@ const ja = {
       "advertisingDesc": "Google AdMobを通じて関連広告を表示"
     }
   },
+  "offline": {
+    "banner": {
+      "title": "オフラインです",
+      "subtitle": "シングルプレイとデイリーチャレンジは引き続き遊べます。スコアは復帰時に同期されます。",
+      "dismiss": "OK"
+    },
+    "sync": {
+      "adjusted": "{count}個の単語が同期時に調整されました。最終スコア：{to}",
+      "rejected": "{count}個の単語が却下されました"
+    },
+    "pending": {
+      "badge": "{count}件保留中"
+    }
+  },
   "common": {
     "used": "使用済み",
     "email": "メール",

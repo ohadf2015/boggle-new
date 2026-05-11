@@ -397,6 +397,20 @@ const he = {
       "advertisingDesc": "הצגת פרסומות רלוונטיות דרך Google AdMob"
     }
   },
+  "offline": {
+    "banner": {
+      "title": "את/ה לא מקוון/ת",
+      "subtitle": "משחק יחיד ואתגרים יומיים ממשיכים לעבוד. תוצאות יסונכרנו כשתחזרו לרשת.",
+      "dismiss": "הבנתי"
+    },
+    "sync": {
+      "adjusted": "{count} מילה/מילים עודכנו בסנכרון. ניקוד סופי: {to}.",
+      "rejected": "{count} מילה/מילים נדחו."
+    },
+    "pending": {
+      "badge": "{count} ממתינות"
+    }
+  },
   "common": {
     "used": "בשימוש",
     "email": "אימייל",

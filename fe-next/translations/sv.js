@@ -397,6 +397,20 @@ const sv = {
       "advertisingDesc": "Visa relevanta annonser via Google AdMob"
     }
   },
+  "offline": {
+    "banner": {
+      "title": "Du är offline",
+      "subtitle": "Enspelarläge och dagliga utmaningar fungerar fortfarande. Resultat synkas när du är tillbaka.",
+      "dismiss": "Okej"
+    },
+    "sync": {
+      "adjusted": "{count} ord justerade vid synk. Slutpoäng: {to}.",
+      "rejected": "{count} ord avvisade."
+    },
+    "pending": {
+      "badge": "{count} väntar"
+    }
+  },
   "common": {
     "used": "Används",
     "email": "E-post",
