@@ -1,18 +1,27 @@
 'use client';
 
 import { useCallback, useRef } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAdMob } from '@/hooks/useAdMob';
+import { useH5GamesAds } from '@/hooks/useH5GamesAds';
 
 /**
- * Unified interstitial ad hook — fires on all available platforms.
+ * Unified interstitial ad hook — fires on the surface-appropriate platform.
  *
- * Priority: CrazyGames midgame > AdMob interstitial (native)
- * Each platform is independent — if one fails, the others still fire.
+ * Routing (exactly one fires per `name`, idempotent via firedRef):
+ *   CrazyGames iframe → CG midgame ad
+ *   Android/iOS Capacitor → AdMob interstitial
+ *   Production web (not CG, not native) → H5 Games Ads adBreak({type:'next'})
+ *
+ * Calls are fire-and-forget; failures are swallowed by the underlying hooks.
  */
 export function useInterstitialAd() {
   const { requestMidgameAd } = useCrazyGamesAds();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const adMob = useAdMob();
+  const h5Ads = useH5GamesAds();
   const firedRef = useRef<Set<string>>(new Set());
 
   const showInterstitial = useCallback(
@@ -20,10 +29,26 @@ export function useInterstitialAd() {
       if (firedRef.current.has(name)) return;
       firedRef.current.add(name);
 
-      requestMidgameAd();
-      adMob.showInterstitial();
+      const isProd = process.env.NODE_ENV === 'production';
+      const h5EnvEnabled = process.env.NEXT_PUBLIC_H5_ADS_ENABLED === 'true';
+      const hasH5TestFlag = typeof window !== 'undefined' && (
+        (window as unknown as { __h5AdsTest?: boolean }).__h5AdsTest === true ||
+        (typeof location !== 'undefined' && /[?&]h5ads_test=1/.test(location.search))
+      );
+
+      if (isOnCrazyGamesPlatform) {
+        requestMidgameAd();
+        return;
+      }
+      if (Capacitor.isNativePlatform()) {
+        adMob.showInterstitial();
+        return;
+      }
+      if (h5EnvEnabled && (isProd || hasH5TestFlag)) {
+        h5Ads.showInterstitial(name);
+      }
     },
-    [requestMidgameAd, adMob],
+    [requestMidgameAd, isOnCrazyGamesPlatform, adMob, h5Ads],
   );
 
   return { showInterstitial };

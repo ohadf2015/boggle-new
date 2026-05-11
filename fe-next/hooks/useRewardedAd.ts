@@ -5,6 +5,7 @@ import { Capacitor } from '@capacitor/core';
 import { Howler } from 'howler';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAdMob } from '@/hooks/useAdMob';
+import { useH5GamesAds } from '@/hooks/useH5GamesAds';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
 import type { RewardedSurface } from '@/lib/admob-config';
@@ -167,15 +168,28 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   // Ad platform hooks
   const crazyGames = useCrazyGames();
   const adMob = useAdMob();
+  const h5Ads = useH5GamesAds();
 
   // Determine which ad platform to use (priority order)
   const shouldUseCrazyGames = crazyGames.isAvailable && crazyGames.isOnCrazyGamesPlatform;
   const shouldUseAdMob = !shouldUseCrazyGames && Capacitor.isNativePlatform();
-  // Simulation only in development — never award free gold in production
+  // Production web (not CG, not native) → Google H5 Games Ads via `adBreak()`.
+  // Triple-gated: explicit `NEXT_PUBLIC_H5_ADS_ENABLED=true` env (off until
+  // AdSense domain approval lands, since H5 Games Ads serves no fill without
+  // it), production runtime OR `?h5ads_test=1`, and browser env. Keeping all
+  // three lets us ship the code dormant and flip the env when approval lands.
+  const isProd = process.env.NODE_ENV === 'production';
   const isDev = process.env.NODE_ENV === 'development';
-  const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdMob;
+  const h5EnvEnabled = process.env.NEXT_PUBLIC_H5_ADS_ENABLED === 'true';
+  const hasH5TestFlag = typeof window !== 'undefined' && (
+    (window as unknown as { __h5AdsTest?: boolean }).__h5AdsTest === true ||
+    (typeof location !== 'undefined' && /[?&]h5ads_test=1/.test(location.search))
+  );
+  const shouldUseH5 = !shouldUseCrazyGames && !shouldUseAdMob && h5Ads.isAvailable && h5EnvEnabled && (isProd || hasH5TestFlag);
+  // Simulation only in development — never award free gold in production
+  const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseH5;
   // Placeholder: no ad platform available — still grant coins, log for admin
-  const isPlaceholder = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseSimulation;
+  const isPlaceholder = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseH5 && !shouldUseSimulation;
 
   // Always available — placeholder grants coins when no real ads exist
   const isAdAvailable = true;
@@ -189,7 +203,11 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     }
 
     // Determine platform early for declined-event tagging
-    const platformForDecline = shouldUseCrazyGames ? 'crazygames' : shouldUseAdMob ? 'admob' : shouldUseSimulation ? 'simulation' : 'no-ad-placeholder';
+    const platformForDecline = shouldUseCrazyGames ? 'crazygames'
+      : shouldUseAdMob ? 'admob'
+      : shouldUseH5 ? 'h5-games'
+      : shouldUseSimulation ? 'simulation'
+      : 'no-ad-placeholder';
 
     // Enforce daily limit across all platforms
     if (isDailyLimitReached()) {
@@ -221,7 +239,11 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     setError(null);
 
     // Determine platform for logging
-    const platform = shouldUseCrazyGames ? 'crazygames' : shouldUseAdMob ? 'admob' : shouldUseSimulation ? 'simulation' : 'no-ad-placeholder';
+    const platform = shouldUseCrazyGames ? 'crazygames'
+      : shouldUseAdMob ? 'admob'
+      : shouldUseH5 ? 'h5-games'
+      : shouldUseSimulation ? 'simulation'
+      : 'no-ad-placeholder';
 
     // Award coins helper - uses unified CoinContext for auth/guest sync.
     // For rewardKind='feature' we skip awardWatchedAd so feature unlocks
@@ -295,6 +317,16 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
         (errMsg) => { handleAdError(errMsg || 'Ad dismissed without reward'); },
         { surface },
       );
+    } else if (shouldUseH5) {
+      // Priority 1.75: H5 Games Ads for production web (no SSV — relies on
+      // server-side daily cap in /api/coins for replay protection).
+      setStatus('showing');
+      onAdStarted?.();
+      h5Ads.showRewarded(
+        () => { awardCoinsAndNotify(); },
+        (reason) => { handleAdError(reason || 'Ad dismissed without reward'); },
+        { name: surface },
+      );
     } else if (shouldUseSimulation) {
       // Priority 2: Simulation fallback for development/testing
       setStatus('showing');
@@ -310,7 +342,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       onAdStarted?.();
       awardCoinsAndNotify();
     }
-  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseSimulation, crazyGames, adMob, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
+  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseH5, shouldUseSimulation, crazyGames, adMob, h5Ads, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
 
   // Pre-load AdMob rewarded slot when caller signals likely intent (button
   // mount). CrazyGames SDK auto-prepares; simulation/placeholder paths
