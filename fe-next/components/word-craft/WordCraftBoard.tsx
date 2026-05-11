@@ -1,9 +1,10 @@
 'use client';
 
 import { memo, useMemo } from 'react';
-import { CENTER, type Board } from '@/lib/word-craft/board';
-import type { PlacedTile } from '@/lib/word-craft/types';
+import type { Board } from '@/lib/word-craft/board';
+import type { PlacedTile, PremiumKind } from '@/lib/word-craft/types';
 import { hebrewDisplayLetter } from '@/lib/word-craft/hebrewDisplay';
+import { scoreDotTier, TIER_COLOR_CLASS } from '@/lib/word-craft/scoreDotTier';
 import { cn } from '@/lib/utils';
 
 export interface WordCraftBoardProps {
@@ -23,25 +24,12 @@ export interface WordCraftBoardProps {
   reticle?: { row: number; col: number } | null;
 }
 
-const PREMIUM_MULT: Record<string, { mult: '×2' | '×3'; kind: 'L' | 'W' }> = {
-  DL: { mult: '×2', kind: 'L' },
-  TL: { mult: '×3', kind: 'L' },
-  DW: { mult: '×2', kind: 'W' },
-  TW: { mult: '×3', kind: 'W' },
-};
-
-const PREMIUM_WASH: Record<string, string> = {
-  DL: 'bg-neo-cyan/10',
-  TL: 'bg-neo-cyan/22',
-  DW: 'bg-neo-pink/10',
-  TW: 'bg-neo-pink/22',
-};
-
-const PREMIUM_INK: Record<string, string> = {
-  DL: 'text-neo-cyan/90',
-  TL: 'text-neo-cyan',
-  DW: 'text-neo-pink/90',
-  TW: 'text-neo-pink',
+// Brand-tinted premium squares (no text labels). Each premium kind gets a distinct neo-color.
+const PREMIUM_TINT: Record<PremiumKind, string> = {
+  TW: 'bg-neo-pink/15',  // Triple word
+  DW: 'bg-neo-pink/10',  // Double word (lighter than TW)
+  TL: 'bg-neo-cyan/15',  // Triple letter
+  DL: 'bg-neo-cyan/10',  // Double letter (lighter than TL)
 };
 
 /** Build the set of axis-hint cells (N/E/S/W neighbors) for a single anchor. */
@@ -68,7 +56,8 @@ function WordCraftBoardImpl({
   locale = 'en',
   reticle,
 }: WordCraftBoardProps) {
-  const size = board.cells.length;
+  const size = board.size;
+  const centerIndex = Math.floor(size / 2);
   const pendingByCoord = new Map<string, PlacedTile>();
   for (const p of pendingPlacements) pendingByCoord.set(`${p.row},${p.col}`, p);
 
@@ -79,7 +68,6 @@ function WordCraftBoardImpl({
 
   // Fewer cells → larger fonts. 11/13/15 boards each get a tuned glyph size.
   const tileFontClass = size <= 11 ? 'text-lg sm:text-xl' : size === 13 ? 'text-base sm:text-lg' : 'text-sm sm:text-base';
-  const multFontClass = size <= 11 ? 'text-[12px] sm:text-[14px]' : size === 13 ? 'text-[11px] sm:text-[13px]' : 'text-[10px] sm:text-[12px]';
 
   return (
     <div
@@ -87,7 +75,7 @@ function WordCraftBoardImpl({
       aria-label="WordCraft board"
       data-tile-selected={hasSelectedTile ? 'true' : undefined}
       data-board-size={size}
-      className="grid bg-black border-neo-thick border-black rounded-neo p-1.5 shadow-hard-lg w-full h-full"
+      className="grid bg-black border-neo-thick border-black rounded-neo p-1.5 shadow-hard-lg w-full h-full @container"
       style={{
         gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`,
         gridTemplateRows: `repeat(${size}, minmax(0, 1fr))`,
@@ -99,7 +87,7 @@ function WordCraftBoardImpl({
           const key = `${r},${c}`;
           const pending = pendingByCoord.get(key);
           const placedTile = cell.tile;
-          const isCenter = r === CENTER && c === CENTER;
+          const isCenter = r === centerIndex && c === centerIndex;
           const premiumKey = cell.premium ?? '';
           const isInteractive = !disabled && !placedTile;
           const isEmpty = !placedTile && !pending;
@@ -108,7 +96,6 @@ function WordCraftBoardImpl({
           const isDragTarget = dragHoverCell === key && isEmpty;
           const isAxisHint = axisHintCells.has(key) && isEmpty && !disabled;
           const isReticle = reticle?.row === r && reticle?.col === c;
-          const premium = cell.premium ? PREMIUM_MULT[cell.premium] : null;
 
           return (
             <button
@@ -116,6 +103,7 @@ function WordCraftBoardImpl({
               type="button"
               role="gridcell"
               data-board-cell={key}
+              data-premium={cell.premium ?? ''}
               data-tile-id={pending?.rackTileId ?? placedTile?.rackTileId ?? undefined}
               data-tile-state={pending ? 'pending' : placedTile ? 'placed' : 'empty'}
               data-cell-invite={inviteEmpty ? 'true' : undefined}
@@ -142,7 +130,7 @@ function WordCraftBoardImpl({
                     ? 'bg-neo-lime text-neo-navy shadow-[0_3px_0_0_rgba(0,0,0,0.9)] ring-2 ring-neo-lime-light hover:ring-neo-pink hover:rotate-1'
                     : isCenter
                       ? 'bg-neo-pink/35 text-neo-cream'
-                      : (cell.premium && PREMIUM_WASH[cell.premium]) || 'bg-neo-navy-light/40',
+                      : (cell.premium && PREMIUM_TINT[cell.premium]) || 'bg-neo-navy-light/40',
                 isDragTarget && 'bg-neo-cyan/30 ring-4 ring-neo-cyan scale-110 z-10',
                 isAxisHint && !isDragTarget && 'wc-axis-hint',
                 isReticle && !isDragTarget && 'ring-4 ring-neo-yellow ring-offset-1 ring-offset-black z-10',
@@ -154,18 +142,28 @@ function WordCraftBoardImpl({
               style={{ minWidth: 0 }}
             >
               {placedTile ? (
-                <span className={cn('wc-tile-glyph', tileFontClass)}>
-                  {placedTile.letter === '_'
-                    ? '·'
-                    : hebrewDisplayLetter({
-                        board,
-                        pending: pendingPlacements,
-                        row: r,
-                        col: c,
-                        letter: placedTile.letter,
-                        locale,
-                      })}
-                </span>
+                <>
+                  <span className={cn('wc-tile-glyph font-bold', 'text-[clamp(14px,5cqi,32px)]')}>
+                    {placedTile.letter === '_'
+                      ? '·'
+                      : hebrewDisplayLetter({
+                          board,
+                          pending: pendingPlacements,
+                          row: r,
+                          col: c,
+                          letter: placedTile.letter,
+                          locale,
+                        })}
+                  </span>
+                  <span
+                    data-score-dot
+                    className={cn(
+                      'absolute bottom-[6%] end-[6%] w-[14%] h-[14%] rounded-full',
+                      TIER_COLOR_CLASS[scoreDotTier(placedTile.value)],
+                    )}
+                    aria-hidden="true"
+                  />
+                </>
               ) : pending ? (
                 <span className={cn('wc-tile-glyph', tileFontClass)}>
                   {pending.letter === '_'
@@ -184,21 +182,6 @@ function WordCraftBoardImpl({
                 <span aria-hidden className="block w-1.5 h-1.5 rounded-full bg-neo-cyan/60" />
               ) : isCenter ? (
                 <span aria-hidden className={cn('drop-shadow', size <= 11 ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg')}>★</span>
-              ) : premium ? (
-                <>
-                  <span className={cn('wc-mult', multFontClass, PREMIUM_INK[premiumKey])}>
-                    {premium.mult}
-                  </span>
-                  <span
-                    aria-hidden
-                    className={cn(
-                      'absolute bottom-0.5 end-0.5 text-[7px] sm:text-[9px] font-black opacity-50',
-                      PREMIUM_INK[premiumKey],
-                    )}
-                  >
-                    {premium.kind}
-                  </span>
-                </>
               ) : null}
             </button>
           );
