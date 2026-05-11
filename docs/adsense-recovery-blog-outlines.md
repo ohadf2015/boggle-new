@@ -4,6 +4,32 @@
 
 **Data-driven targets**: Based on current GSC performance, locale CTR, and mobile-first user base (21.8% mobile CTR, 5.87% HE CTR, minimal desktop traffic).
 
+## Status (2026-05-11)
+
+| # | Slug | Status |
+|---|------|--------|
+| 1 | `best-boggle-alternatives-2026` | ✅ Shipped (5 locales, 653-line content.ts) — outline doc had old slug `boggle-alternatives` |
+| 2 | `boggle-vs-scrabble` | ✅ Shipped (5 locales, 628-line content.ts) |
+| 3 | `free-word-games-online` | ✅ Shipped 2026-05-11 EN-only, ~1,900 words; non-EN locales fall back to EN + `robots: noindex` via `hasTranslation: locale === 'en'`. Hero image: ✅ generated. |
+| 4 | `milat-hayom-habit` (HE) | ✅ Shipped 2026-05-11 HE-only, ~1,300 words native Hebrew; non-HE locales fall back + noindex via `hasTranslation: locale === 'he'`. **TODO**: HE native review of voice/idioms |
+| 5 | `mishachke-milim-chinuch` (HE) | ✅ Shipped 2026-05-11 HE-only, ~1,400 words native Hebrew, classroom angle (3 models + research synthesis). Non-HE locales noindex. **TODO**: HE native review |
+| 6 | `alternativas-a-scrabble` (ES) | ✅ Shipped 2026-05-11 ES-only, ~1,600 words native Spanish, TM-safe ("el juego clásico de letras"). Non-ES locales noindex. **TODO**: ES native review |
+| 7 | `juegos-palabras-gratis` (ES) | ✅ Shipped 2026-05-11 ES-only, ~1,800 words, 5-flag red-flag checklist + acentos/eñe/RAE section specific to hispanohablantes. **TODO**: ES native review |
+| 8 | `ordspel-familjer` (SV) | ✅ Shipped 2026-05-11 SV-only, ~1,500 words native Swedish, mysigt/lugn tone, multigeneration FaceTime anecdote, SAOL/Å-Ä-Ö section. **TODO**: SV native review |
+
+**Pattern**: each post = `app/[locale]/blog/<slug>/{page.tsx, content.ts, PageClient.tsx}`. JSON-LD via `BlogPostingJsonLd`. Locale gate via `hasTranslation: locale in metaTitles` (or strict `locale === 'en'` for EN-only).
+
+### Integration registries (also updated 2026-05-11)
+
+1. **`app/sitemap.ts`** — 6 new slugs appended to `blogArticles[]`. Sitemap test 9/9 passing.
+2. **`app/[locale]/blog/PageClient.tsx`** — 6 entries added to `blogPosts[]` slug array + per-authored-locale `posts[slug]` translation. Non-authored locales: post hidden by existing `if (!postContent) return null;` filter (line 799).
+3. **`public/llms.txt`** — 6 entries (authored-locale URLs) added under "Content & Blog".
+4. **`public/images/blog/<slug>.jpg`** — 6 hero images generated via mcp-image (Gemini), 730–935 KB each, 16:9. Sizes match existing posts (range 0.5–2.5 MB). Next/Image will auto-optimize at request time.
+
+### Indexing logic
+
+Each post is indexable in only its authored locale: `hasTranslation: locale === '<authored>'` → `robots: index, follow`. Other locales fall back to authored content but emit `robots: noindex, follow`. Sitemap still lists all locale URLs (per project convention) but search engines respect the per-page noindex.
+
 ---
 
 ## Post 1: English — Boggle Alternatives

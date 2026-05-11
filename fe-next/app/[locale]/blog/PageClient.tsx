@@ -129,6 +129,36 @@ const blogPosts: BlogPost[] = [
     image: '/images/blog/netflix-word-games.jpg',
     date: '2026-04-29',
   },
+  {
+    slug: 'free-word-games-online',
+    image: '/images/blog/free-word-games-online.jpg',
+    date: '2026-05-11',
+  },
+  {
+    slug: 'milat-hayom-habit',
+    image: '/images/blog/milat-hayom-habit.jpg',
+    date: '2026-05-11',
+  },
+  {
+    slug: 'mishachke-milim-chinuch',
+    image: '/images/blog/mishachke-milim-chinuch.jpg',
+    date: '2026-05-11',
+  },
+  {
+    slug: 'alternativas-a-scrabble',
+    image: '/images/blog/alternativas-a-scrabble.jpg',
+    date: '2026-05-11',
+  },
+  {
+    slug: 'juegos-palabras-gratis',
+    image: '/images/blog/juegos-palabras-gratis.jpg',
+    date: '2026-05-11',
+  },
+  {
+    slug: 'ordspel-familjer',
+    image: '/images/blog/ordspel-familjer.jpg',
+    date: '2026-05-11',
+  },
 ];
 
 // Localized content for all languages
@@ -252,6 +282,12 @@ const contentByLocale: Record<string, PageContent> = {
         readTime: '9 min read',
         category: 'Trends',
       },
+      'free-word-games-online': {
+        title: 'Free Word Games Online: The Honest Guide (No Pay-to-Win)',
+        excerpt: 'A field guide to free word games that respect your time and wallet. Five-question red-flag checklist + the daily puzzle and PWA patterns that actually work in 2026.',
+        readTime: '11 min read',
+        category: 'Guide',
+      },
     },
   },
   he: {
@@ -373,6 +409,18 @@ const contentByLocale: Record<string, PageContent> = {
         readTime: '9 דקות קריאה',
         category: 'טרנדים',
       },
+      'milat-hayom-habit': {
+        title: 'מילת היום: איך משחק קטן של שלוש דקות הופך להרגל של שנה שלמה',
+        excerpt: 'מה קורה במוח כשמשחקים מילה אחת ביום, ולמה דווקא בעברית זה עבד רק החל מ-2024. מדריך מלא להרגל היומי.',
+        readTime: '9 דקות קריאה',
+        category: 'הרגלים',
+      },
+      'mishachke-milim-chinuch': {
+        title: 'משחקי מילים בכיתה: מה קורה כשמורה לעברית מחליפה דף עבודה במשחק',
+        excerpt: 'שלושה מודלים של משחקי מילים בכיתת עברית - דואלים, תחרות כיתה, וגשר בין הבית לבית הספר. מה שעבד ומה שלא.',
+        readTime: '10 דקות קריאה',
+        category: 'חינוך',
+      },
     },
   },
   sv: {
@@ -493,6 +541,12 @@ const contentByLocale: Record<string, PageContent> = {
         excerpt: 'Streamingjättar, daglig pusselbesatthet, hjärnträningsboom och en TikTok-driven social loop. Varför varenda skärm plötsligt vill att du stavar.',
         readTime: '9 min läsning',
         category: 'Trender',
+      },
+      'ordspel-familjer': {
+        title: 'Ordspel för Familjer: Hur Vi Hittade Något Att Göra Tillsammans Som Faktiskt Funkar',
+        excerpt: 'En ärlig redogörelse om hur ordspel blev söndagens familjetradition: från sexåring till mormor på FaceTime. Vad fungerar och vad du bör undvika.',
+        readTime: '9 minuters läsning',
+        category: 'Familj',
       },
     },
   },
@@ -735,6 +789,18 @@ const contentByLocale: Record<string, PageContent> = {
         excerpt: 'Gigantes del streaming, obsesión por el puzzle diario, boom del entrenamiento cerebral y un bucle social al estilo TikTok. Por qué cada pantalla quiere que deletrees.',
         readTime: '9 min de lectura',
         category: 'Tendencias',
+      },
+      'alternativas-a-scrabble': {
+        title: 'Alternativas a Scrabble: 4 Juegos de Palabras que Realmente Valen la Pena (2026)',
+        excerpt: 'Cuatro alternativas modernas al clásico juego de letras en tablero: velocidad pura, caza objetivo, duelos online y agrupación tipo Connections.',
+        readTime: '11 min de lectura',
+        category: 'Comparativa',
+      },
+      'juegos-palabras-gratis': {
+        title: 'Juegos de Palabras Gratis 2026: Cómo Detectar las Trampas en 30 Segundos',
+        excerpt: 'Cinco señales de alerta para identificar juegos "gratis" que en realidad son trampas de pago. Guía honesta para hispanohablantes con acentos, eñe y RAE.',
+        readTime: '10 min de lectura',
+        category: 'Guía',
       },
     },
   },

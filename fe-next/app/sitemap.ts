@@ -306,6 +306,12 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     'boggle-vs-scrabble',
     'boggle-vs-words-with-friends',
     'netflix-word-game-2026-rise',
+    'free-word-games-online',
+    'milat-hayom-habit',
+    'mishachke-milim-chinuch',
+    'alternativas-a-scrabble',
+    'juegos-palabras-gratis',
+    'ordspel-familjer',
   ];
   blogArticles.forEach((slug) => {
     addForAllLocales(routes, `/blog/${slug}`, { lastModified: BLOG_UPDATED, changeFrequency: 'monthly', priority: 0.85 });
