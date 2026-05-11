@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { WordCraftGameOverScene } from '../WordCraftGameOverScene';
 
 const t = (k: string) => {
-  if (k === 'wordcraft.winnerLabel') return 'Winner: {name}';
+  if (k === 'wordcraft.winnerLabel') return 'Winner: {{name}}';
   return `[${k}]`;
 };
 

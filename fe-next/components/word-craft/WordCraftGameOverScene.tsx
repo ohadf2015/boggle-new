@@ -11,7 +11,7 @@ export function WordCraftGameOverScene({ t, playerScore, botScore }: Props) {
   const winnerName = playerScore > botScore ? t('wordcraft.you') : t('wordcraft.bot');
   const label = isTie
     ? t('wordcraft.tied')
-    : t('wordcraft.winnerLabel').replace('{name}', winnerName);
+    : t('wordcraft.winnerLabel').replace('{{name}}', winnerName);
 
   return (
     <div
