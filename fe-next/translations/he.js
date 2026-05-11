@@ -11598,6 +11598,21 @@ const he = {
       "axisAcrossLocked": "כיוון אופקי ננעל",
       "axisDownLocked": "כיוון אנכי ננעל",
       "axisUnlocked": "כיוון המילה שוחרר"
+    },
+    // FLAG_FOR_NATIVE_REVIEW: 2026-05-11 wordcraft-mobile-fun (legend + scoreDot + tilesLeft)
+    "tilesLeft": "אריחים שנשארו",
+    "legend": {
+      "title": "בונוסים",
+      "tw": "TW · מילה ×3",
+      "dw": "DW · מילה ×2",
+      "tl": "TL · אות ×3",
+      "dl": "DL · אות ×2"
+    },
+    "scoreDot": {
+      "common": "נקודה אחת",
+      "mid": "2-3 נקודות",
+      "rare": "4-5 נקודות",
+      "legendary": "8+ נקודות"
     }
   },
   mp: {

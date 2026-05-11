@@ -11442,6 +11442,21 @@ const ja = {
       "axisAcrossLocked": "横方向にロック",
       "axisDownLocked": "縦方向にロック",
       "axisUnlocked": "単語の向きを解除"
+    },
+    // FLAG_FOR_NATIVE_REVIEW: 2026-05-11 wordcraft-mobile-fun (legend + scoreDot + tilesLeft)
+    "tilesLeft": "残りタイル",
+    "legend": {
+      "title": "ボーナス",
+      "tw": "TW · ×3 ワード",
+      "dw": "DW · ×2 ワード",
+      "tl": "TL · ×3 レター",
+      "dl": "DL · ×2 レター"
+    },
+    "scoreDot": {
+      "common": "1点",
+      "mid": "2〜3点",
+      "rare": "4〜5点",
+      "legendary": "8点以上"
     }
   },
   mp: {
