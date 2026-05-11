@@ -11,7 +11,6 @@ import {
   Users,
   UserX,
   Settings,
-  Gamepad2,
 } from 'lucide-react';
 
 interface NavItem {
@@ -39,7 +38,6 @@ export function AdminSidebar({ moderationCount = 0 }: AdminSidebarProps) {
     { key: 'players', labelKey: 'admin.sidebar.players', icon: Users, path: '/players' },
     { key: 'guests', labelKey: 'admin.sidebar.guests', icon: UserX, path: '/guests' },
     { key: 'system', labelKey: 'admin.sidebar.system', icon: Settings, path: '/system' },
-    { key: 'word-craft', labelKey: 'admin.sidebar.wordCraft', icon: Gamepad2, path: '/word-craft' },
   ];
 
   const basePath = `/${language}/admin`;

@@ -12,7 +12,6 @@ import {
   Users,
   UserX,
   Settings,
-  Gamepad2,
 } from 'lucide-react';
 
 interface AdminBottomNavProps {
@@ -46,7 +45,6 @@ export function AdminBottomNav({ moderationCount = 0 }: AdminBottomNavProps) {
     { key: 'players', icon: Users, label: t('admin.sidebar.players'), path: '/players' },
     { key: 'guests', icon: UserX, label: t('admin.sidebar.guests'), path: '/guests' },
     { key: 'system', icon: Settings, label: t('admin.sidebar.system'), path: '/system' },
-    { key: 'word-craft', icon: Gamepad2, label: t('admin.sidebar.wordCraft'), path: '/word-craft' },
   ];
 
   function isActive(tab: { path: string; isHome?: boolean }): boolean {
