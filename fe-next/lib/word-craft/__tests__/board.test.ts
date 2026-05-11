@@ -30,12 +30,13 @@ describe('board geometry', () => {
   });
 
   it('isInBounds true within grid, false outside', () => {
-    expect(isInBounds(0, 0)).toBe(true);
-    expect(isInBounds(14, 14)).toBe(true);
-    expect(isInBounds(7, 7)).toBe(true);
-    expect(isInBounds(-1, 0)).toBe(false);
-    expect(isInBounds(0, 15)).toBe(false);
-    expect(isInBounds(15, 7)).toBe(false);
+    const board = createBoard();
+    expect(isInBounds(0, 0, board)).toBe(true);
+    expect(isInBounds(14, 14, board)).toBe(true);
+    expect(isInBounds(7, 7, board)).toBe(true);
+    expect(isInBounds(-1, 0, board)).toBe(false);
+    expect(isInBounds(0, 15, board)).toBe(false);
+    expect(isInBounds(15, 7, board)).toBe(false);
   });
 });
 
@@ -58,58 +59,66 @@ describe('createBoard', () => {
 
 describe('premium square layout (canonical Scrabble)', () => {
   it('center (7,7) is DW', () => {
-    expect(getPremium(CENTER, CENTER)).toBe('DW');
+    const board = createBoard();
+    expect(getPremium(CENTER, CENTER, board)).toBe('DW');
   });
 
   it('all four corners are TW', () => {
-    expect(getPremium(0, 0)).toBe('TW');
-    expect(getPremium(0, 14)).toBe('TW');
-    expect(getPremium(14, 0)).toBe('TW');
-    expect(getPremium(14, 14)).toBe('TW');
+    const board = createBoard();
+    expect(getPremium(0, 0, board)).toBe('TW');
+    expect(getPremium(0, 14, board)).toBe('TW');
+    expect(getPremium(14, 0, board)).toBe('TW');
+    expect(getPremium(14, 14, board)).toBe('TW');
   });
 
   it('edge midpoints (0,7), (7,0), (7,14), (14,7) are TW', () => {
-    expect(getPremium(0, 7)).toBe('TW');
-    expect(getPremium(7, 0)).toBe('TW');
-    expect(getPremium(7, 14)).toBe('TW');
-    expect(getPremium(14, 7)).toBe('TW');
+    const board = createBoard();
+    expect(getPremium(0, 7, board)).toBe('TW');
+    expect(getPremium(7, 0, board)).toBe('TW');
+    expect(getPremium(7, 14, board)).toBe('TW');
+    expect(getPremium(14, 7, board)).toBe('TW');
   });
 
   it('inner DW diagonal: (1,1), (2,2), (3,3), (4,4) all DW', () => {
-    expect(getPremium(1, 1)).toBe('DW');
-    expect(getPremium(2, 2)).toBe('DW');
-    expect(getPremium(3, 3)).toBe('DW');
-    expect(getPremium(4, 4)).toBe('DW');
+    const board = createBoard();
+    expect(getPremium(1, 1, board)).toBe('DW');
+    expect(getPremium(2, 2, board)).toBe('DW');
+    expect(getPremium(3, 3, board)).toBe('DW');
+    expect(getPremium(4, 4, board)).toBe('DW');
   });
 
   it('TL squares at (1,5), (1,9), (5,1), (5,5), (5,9), (5,13)', () => {
-    expect(getPremium(1, 5)).toBe('TL');
-    expect(getPremium(1, 9)).toBe('TL');
-    expect(getPremium(5, 1)).toBe('TL');
-    expect(getPremium(5, 5)).toBe('TL');
-    expect(getPremium(5, 9)).toBe('TL');
-    expect(getPremium(5, 13)).toBe('TL');
+    const board = createBoard();
+    expect(getPremium(1, 5, board)).toBe('TL');
+    expect(getPremium(1, 9, board)).toBe('TL');
+    expect(getPremium(5, 1, board)).toBe('TL');
+    expect(getPremium(5, 5, board)).toBe('TL');
+    expect(getPremium(5, 9, board)).toBe('TL');
+    expect(getPremium(5, 13, board)).toBe('TL');
   });
 
   it('DL squares include (0,3), (0,11), (3,0), (3,7), (3,14)', () => {
-    expect(getPremium(0, 3)).toBe('DL');
-    expect(getPremium(0, 11)).toBe('DL');
-    expect(getPremium(3, 0)).toBe('DL');
-    expect(getPremium(3, 7)).toBe('DL');
-    expect(getPremium(3, 14)).toBe('DL');
+    const board = createBoard();
+    expect(getPremium(0, 3, board)).toBe('DL');
+    expect(getPremium(0, 11, board)).toBe('DL');
+    expect(getPremium(3, 0, board)).toBe('DL');
+    expect(getPremium(3, 7, board)).toBe('DL');
+    expect(getPremium(3, 14, board)).toBe('DL');
   });
 
   it('layout is rotationally symmetric: premium(r,c) === premium(14-r, 14-c)', () => {
+    const board = createBoard();
     for (let r = 0; r < 15; r++) {
       for (let c = 0; c < 15; c++) {
-        expect(getPremium(r, c)).toBe(getPremium(14 - r, 14 - c));
+        expect(getPremium(r, c, board)).toBe(getPremium(14 - r, 14 - c, board));
       }
     }
   });
 
   it('plain squares (no premium) return null — e.g. (0,1), (1,0)', () => {
-    expect(getPremium(0, 1)).toBeNull();
-    expect(getPremium(1, 0)).toBeNull();
+    const board = createBoard();
+    expect(getPremium(0, 1, board)).toBeNull();
+    expect(getPremium(1, 0, board)).toBeNull();
   });
 });
 

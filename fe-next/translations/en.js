@@ -11702,6 +11702,20 @@ const en = {
       "axisAcrossLocked": "Across direction locked",
       "axisDownLocked": "Down direction locked",
       "axisUnlocked": "Word direction unlocked"
+    },
+    "tilesLeft": "Tiles left",
+    "legend": {
+      "title": "Bonuses",
+      "tw": "TW · ×3 word",
+      "dw": "DW · ×2 word",
+      "tl": "TL · ×3 letter",
+      "dl": "DL · ×2 letter"
+    },
+    "scoreDot": {
+      "common": "1 point",
+      "mid": "2–3 points",
+      "rare": "4–5 points",
+      "legendary": "8+ points"
     }
   },
   mp: {

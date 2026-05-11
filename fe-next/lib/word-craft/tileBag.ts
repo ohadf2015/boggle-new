@@ -4,6 +4,7 @@ import * as sv from './tileBags/sv';
 import * as he from './tileBags/he';
 import * as es from './tileBags/es';
 import * as ja from './tileBags/ja';
+import { scaleDistribution } from './tileBag.scaler';
 
 export const RACK_SIZE = 7;
 export const TOTAL_TILES = 100;
@@ -41,6 +42,7 @@ export interface TileBag {
 export interface CreateBagOptions {
   seed: number;
   locale?: SupportedLocale;
+  bagSize?: number;  // when set and < full, scales distribution proportionally
 }
 
 function mulberry32(seed: number): () => number {
@@ -63,7 +65,13 @@ function shuffleInPlace<T>(arr: T[], rng: () => number): void {
 }
 
 export function createBag(options: CreateBagOptions): TileBag {
-  const { values: tileValues, distribution } = getTileBag(options.locale ?? 'en');
+  const { values: tileValues, distribution: fullDist } = getTileBag(options.locale ?? 'en');
+  const fullTotal = Object.values(fullDist).reduce((a, b) => a + b, 0);
+  const distribution =
+    options.bagSize !== undefined && options.bagSize < fullTotal
+      ? scaleDistribution(fullDist, options.bagSize)
+      : fullDist;
+
   const rng = mulberry32(options.seed);
   const tiles: RackTile[] = [];
   let nextId = 0;

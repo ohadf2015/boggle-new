@@ -12,7 +12,6 @@ import { useWordCraftGame } from '@/lib/word-craft/useWordCraftGame';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import { isWordCraftBetaUser } from '@/lib/word-craft/betaAccess';
 import type { SupportedLocale } from '@/lib/word-craft/tileBag';
-import { WordCraftBoard } from '@/components/word-craft/WordCraftBoard';
 import { WordCraftRack } from '@/components/word-craft/WordCraftRack';
 import { WordCraftScoreboard } from '@/components/word-craft/WordCraftScoreboard';
 import { WordCraftControls } from '@/components/word-craft/WordCraftControls';
@@ -22,10 +21,19 @@ import { ScoreFloat } from '@/components/word-craft/ScoreFloat';
 import { WordCraftTutor } from '@/components/word-craft/WordCraftTutor';
 import { WordCraftDragGhost } from '@/components/word-craft/WordCraftDragGhost';
 import { WordCraftPendingStrip } from '@/components/word-craft/WordCraftPendingStrip';
-import { WordCraftZoomShell } from '@/components/word-craft/WordCraftZoomShell';
 import { WordCraftLiveRegion } from '@/components/word-craft/WordCraftLiveRegion';
+import { WordCraftBoardSection } from '@/components/word-craft/WordCraftBoardSection';
+import { WordCraftGameOverScene } from '@/components/word-craft/WordCraftGameOverScene';
 import { useWordCraftJuice } from '@/components/word-craft/useWordCraftJuice';
 import { useWordCraftDrag } from '@/components/word-craft/useWordCraftDrag';
+import { useWordCraftKeyboardShortcuts } from '@/components/word-craft/hooks/useWordCraftKeyboardShortcuts';
+import type { SceneCtx } from '@/lib/word-craft/pixi/sceneCtx';
+import { mountAmbientSparkles, type PremiumCellRef } from '@/lib/word-craft/pixi/ambientSparkles';
+import { playTilePlaceRipple } from '@/lib/word-craft/pixi/scenes/tilePlaceRipple';
+import { playWordCommitWave } from '@/lib/word-craft/pixi/scenes/wordCommitWave';
+import { playScoreConfetti } from '@/lib/word-craft/pixi/scenes/scoreConfetti';
+import { playBotMoveReveal } from '@/lib/word-craft/pixi/scenes/botMoveReveal';
+import { playGameOverBurst } from '@/lib/word-craft/pixi/scenes/gameOverBurst';
 import { inferAxis, resolveTap } from '@/lib/word-craft/placement';
 import {
   trackWordCraftAxisLocked,
@@ -71,14 +79,6 @@ export default function WordCraftPageClient() {
   const locale = (language ?? 'en') as SupportedLocale;
 
   const [dict, setDict] = useState<Set<string> | null>(null);
-  const [boardSize, setBoardSize] = useState<13 | 15>(15);
-
-  // Board size from viewport — computed once on mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setBoardSize(window.innerWidth < 768 ? 13 : 15);
-    }
-  }, []);
 
   const isBetaUser = !authLoading && isWordCraftBetaUser(email);
 
@@ -113,9 +113,11 @@ export default function WordCraftPageClient() {
     return fromUrl ? Number(fromUrl) : Math.floor(Math.random() * 1_000_000);
   }, []);
 
-  const game = useWordCraftGame({ seed, dict, locale, boardSize });
+  const game = useWordCraftGame({ seed, dict, locale });
   const juice = useWordCraftJuice();
   const { queueAchievement } = useAchievementQueue();
+  const [sceneCtx, setSceneCtx] = useState<SceneCtx | null>(null);
+  const ambientSparklesRef = useRef<ReturnType<typeof mountAmbientSparkles> | null>(null);
 
   // --- Telemetry plumbing ---
   // turnIdRef persists for the whole turn so every event tied to one turn
@@ -251,6 +253,26 @@ export default function WordCraftPageClient() {
     });
   }, [game, resetTurnTelemetry]);
 
+  // Keyboard shortcuts and arrow-key reticle (declared AFTER the callbacks it consumes)
+  const { reticle } = useWordCraftKeyboardShortcuts({
+    turn: game.state.turn,
+    pendingPlacements: game.state.pendingPlacements,
+    burnout: game.state.burnout,
+    playerRack: game.state.player.rack,
+    dict,
+    axis,
+    boardSize: game.state.board.size,
+    onRecallAll: recallAllPending,
+    onSubmit: submitMoveWithTelemetry,
+    onRecallOne: recallFromBoard,
+    onFastTap: handleFastTap,
+    onSelectTile: game.selectRackTile,
+    onPlaceOnBoard: (r, c) => {
+      inputCountsRef.current.tap += 1;
+      game.placeOnBoard(r, c);
+    },
+  });
+
   // Celebrations
   const [celebration, setCelebration] = useState<{ kind: CelebrationKind; burstId: number; origin?: { x: number; y: number } }>({
     kind: null,
@@ -268,10 +290,16 @@ export default function WordCraftPageClient() {
       if (!prevPendingIdsRef.current.has(p.rackTileId)) {
         const el = document.querySelector(`[data-tile-id="${p.rackTileId}"]`);
         juice.tilePlace(el);
+        // Fire Pixi ripple at the cell where the tile was placed
+        if (sceneCtx) {
+          playTilePlaceRipple(sceneCtx, { row: p.row, col: p.col }).catch(() => {
+            // Pixi animations can fail on low-end devices; silently continue
+          });
+        }
       }
     }
     prevPendingIdsRef.current = next;
-  }, [game.state.pendingPlacements, juice]);
+  }, [game.state.pendingPlacements, juice, sceneCtx]);
 
   // --- Juice: rack select ---
   const prevSelectedRef = useRef<string | null>(null);
@@ -305,6 +333,21 @@ export default function WordCraftPageClient() {
 
     if (newest.who === 'bot' && placedEls.length > 0) {
       juice.botReveal(placedEls);
+      // Fire Pixi bot move reveal animation. Placed tiles are on the board
+      // post-commit; scan by rackTileId rather than looking in history.
+      if (sceneCtx) {
+        const placements: { row: number; col: number }[] = [];
+        const ids = new Set(newest.placedTileIds);
+        for (let r = 0; r < game.state.board.size; r++) {
+          for (let c = 0; c < game.state.board.size; c++) {
+            const tile = game.state.board.cells[r][c].tile;
+            if (tile && ids.has(tile.rackTileId)) placements.push({ row: r, col: c });
+          }
+        }
+        playBotMoveReveal(sceneCtx, placements).catch(() => {
+          // Pixi animations can fail on low-end devices; silently continue
+        });
+      }
     }
     if (newest.who === 'player' && placedEls.length > 0) {
       juice.playerCommitReveal(placedEls);
@@ -317,6 +360,28 @@ export default function WordCraftPageClient() {
       const encouragement = t(`wordcraft.encouragement.${encIdx}`);
 
       setScoreFloat({ score: newest.score, overdrive: false, isBingo, encouragement, key: len });
+
+      // Fire Pixi word commit wave (scan board by rackTileId rather than history).
+      if (sceneCtx) {
+        const placements: { row: number; col: number; letter: string; value: number }[] = [];
+        const ids = new Set(newest.placedTileIds);
+        for (let r = 0; r < game.state.board.size; r++) {
+          for (let c = 0; c < game.state.board.size; c++) {
+            const tile = game.state.board.cells[r][c].tile;
+            if (tile && ids.has(tile.rackTileId)) {
+              placements.push({ row: r, col: c, letter: tile.letter, value: tile.value });
+            }
+          }
+        }
+        playWordCommitWave(sceneCtx, { placements, totalScore: newest.score }).catch(() => {
+          // Pixi animations can fail on low-end devices; silently continue
+        });
+        if (newest.score >= 30) {
+          playScoreConfetti(sceneCtx).catch(() => {
+            // Pixi animations can fail on low-end devices; silently continue
+          });
+        }
+      }
 
       // Achievement: first word
       if (!firstWordAchievedRef.current) {
@@ -342,7 +407,7 @@ export default function WordCraftPageClient() {
         setScoreFloat((prev) => prev ? { ...prev, overdrive: true } : prev);
       }
     }
-  }, [game.state.history, game.state.overdrive, juice, t, queueAchievement]);
+  }, [game.state.history, game.state.overdrive, juice, t, queueAchievement, sceneCtx, game]);
 
   // --- Overdrive enter ---
   const prevOverdriveRef = useRef(false);
@@ -376,6 +441,21 @@ export default function WordCraftPageClient() {
     return () => clearTimeout(timer);
   }, [game, game.state.burnout, game.burnoutSkip]);
 
+  // --- Pixi: Mount ambient sparkles on premium cells ---
+  useEffect(() => {
+    if (!sceneCtx) return;
+    const cells: PremiumCellRef[] = [];
+    for (let r = 0; r < game.state.board.size; r++) {
+      for (let c = 0; c < game.state.board.size; c++) {
+        const p = game.state.board.cells[r]?.[c]?.premium;
+        if (p) cells.push({ row: r, col: c, kind: p });
+      }
+    }
+    const handle = mountAmbientSparkles(sceneCtx, cells);
+    ambientSparklesRef.current = handle;
+    return () => handle.destroy();
+  }, [sceneCtx, game.state.board]);
+
   // --- Linguist achievement ---
   useEffect(() => {
     if (!isBetaUser) return;
@@ -390,8 +470,14 @@ export default function WordCraftPageClient() {
   useEffect(() => {
     if (game.state.turn === 'over') {
       setCelebration((prev) => ({ kind: 'gameOver', burstId: prev.burstId + 1 }));
+      // Fire Pixi game over burst
+      if (sceneCtx) {
+        playGameOverBurst(sceneCtx).catch(() => {
+          // Pixi animations can fail on low-end devices; silently continue
+        });
+      }
     }
-  }, [game.state.turn]);
+  }, [game.state.turn, sceneCtx]);
 
   // --- Error shake ---
   const lastErrorRef = useRef<string | null>(null);
@@ -408,145 +494,6 @@ export default function WordCraftPageClient() {
     juice.invalidShake(cellEls);
   }, [game.state.lastError, game.state.pendingPlacements, juice]);
 
-  // --- Desktop keyboard shortcuts ---
-  // Esc       → recall all pending tiles
-  // Enter     → submit move (if eligible)
-  // Backspace → recall last pending tile
-  // Letters   → if a rack tile matches the typed glyph and axis is locked,
-  //             trigger fast-tap; otherwise select the matching tile.
-  // We deliberately skip Arrow keys + Space placement (deferred per spec
-  // §11) to keep the surface small. These four cover 90% of desktop play.
-  useEffect(() => {
-    if (game.state.turn !== 'player') return;
-    const onKey = (ev: KeyboardEvent) => {
-      // Don't fight the user when they're typing into an input/textarea
-      // (search bar, achievements, dev console UIs).
-      const target = ev.target as HTMLElement | null;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
-        return;
-      }
-      if (ev.key === 'Escape') {
-        if (game.state.pendingPlacements.length > 0) {
-          ev.preventDefault();
-          recallAllPending();
-        }
-        return;
-      }
-      if (ev.key === 'Enter') {
-        if (game.state.pendingPlacements.length > 0 && dict && !game.state.burnout) {
-          ev.preventDefault();
-          submitMoveWithTelemetry();
-        }
-        return;
-      }
-      if (ev.key === 'Backspace') {
-        if (game.state.pendingPlacements.length > 0) {
-          ev.preventDefault();
-          const last = game.state.pendingPlacements[game.state.pendingPlacements.length - 1];
-          recallFromBoard(last.rackTileId);
-        }
-        return;
-      }
-      // Letter shortcut — single character key, ignore modifiers + spacebar
-      if (ev.key.length === 1 && !ev.ctrlKey && !ev.metaKey && !ev.altKey && ev.key !== ' ') {
-        const upper = ev.key.toUpperCase();
-        const candidate = game.state.player.rack.find(
-          (t) => !pendingIdsSetRef.current.has(t.id) && t.letter.toUpperCase() === upper,
-        );
-        if (!candidate) return;
-        ev.preventDefault();
-        if (axis !== null) {
-          handleFastTap({ id: candidate.id });
-        } else {
-          game.selectRackTile(candidate.id);
-        }
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-    // recallAllPending / submitMoveWithTelemetry / handleFastTap already
-    // close over `game` via useCallback, so changes to game state surface
-    // through their identity changes.
-  }, [
-    game.state.turn,
-    game.state.pendingPlacements,
-    game.state.burnout,
-    game.state.player.rack,
-    dict,
-    axis,
-    handleFastTap,
-    recallAllPending,
-    recallFromBoard,
-    submitMoveWithTelemetry,
-    game,
-  ]);
-
-  // Mirror pendingIds into a ref so the keyboard handler — which closes over
-  // a snapshot of state — can see the current pending set without re-binding
-  // on every keystroke.
-  const pendingIdsSetRef = useRef<Set<string>>(new Set());
-  useEffect(() => {
-    pendingIdsSetRef.current = new Set(game.state.pendingPlacements.map((p) => p.rackTileId));
-  }, [game.state.pendingPlacements]);
-
-  // --- Arrow-key reticle ---
-  // Activated by first arrow press (or Tab into the board). The reticle is a
-  // golden focus ring on a board cell; Space drops the currently selected
-  // rack tile there. We wrap-around at edges (friendlier than clamp on a
-  // 13/15 grid) and only preventDefault on arrow keys when the reticle is
-  // engaged so we don't hijack page scroll on routes the player isn't on.
-  const [reticle, setReticle] = useState<{ row: number; col: number } | null>(null);
-  useEffect(() => {
-    if (game.state.turn !== 'player') return;
-    const onKey = (ev: KeyboardEvent) => {
-      const target = ev.target as HTMLElement | null;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
-        return;
-      }
-      const isArrow = ev.key === 'ArrowUp' || ev.key === 'ArrowDown' || ev.key === 'ArrowLeft' || ev.key === 'ArrowRight';
-      if (!isArrow && ev.key !== ' ') return;
-
-      const size = game.state.board.cells.length;
-      const wrap = (n: number) => (n + size) % size;
-
-      if (isArrow) {
-        ev.preventDefault();
-        setReticle((prev) => {
-          // First arrow tap with no reticle → land on center.
-          if (!prev) {
-            const center = Math.floor(size / 2);
-            return { row: center, col: center };
-          }
-          if (ev.key === 'ArrowUp') return { row: wrap(prev.row - 1), col: prev.col };
-          if (ev.key === 'ArrowDown') return { row: wrap(prev.row + 1), col: prev.col };
-          if (ev.key === 'ArrowLeft') return { row: prev.row, col: wrap(prev.col - 1) };
-          if (ev.key === 'ArrowRight') return { row: prev.row, col: wrap(prev.col + 1) };
-          return prev;
-        });
-        return;
-      }
-
-      // Space → drop selected tile at reticle, or fast-tap if axis locked.
-      if (ev.key === ' ' && reticle) {
-        ev.preventDefault();
-        const sel = game.state.selectedRackTileId
-          ? game.state.player.rack.find((t) => t.id === game.state.selectedRackTileId)
-          : null;
-        if (sel) {
-          inputCountsRef.current.tap += 1;
-          game.placeOnBoard(reticle.row, reticle.col);
-        }
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [game.state.turn, game.state.board.cells.length, game, reticle]);
-
-  // Drop the reticle when the turn ends so the gold ring doesn't linger
-  // through the bot's turn.
-  useEffect(() => {
-    if (game.state.turn !== 'player') setReticle(null);
-  }, [game.state.turn]);
 
   if (authLoading || !isBetaUser) {
     return (
@@ -567,13 +514,6 @@ export default function WordCraftPageClient() {
     !game.state.burnout &&
     !game.state.selectedRackTileId &&
     game.state.pendingPlacements.length === 0;
-
-  const winner =
-    game.state.player.score > game.state.bot.score
-      ? t('wordcraft.you')
-      : game.state.bot.score > game.state.player.score
-        ? t('wordcraft.bot')
-        : t('wordcraft.tied');
 
   const errorMessage = (() => {
     const e = game.state.lastError;
@@ -683,36 +623,42 @@ export default function WordCraftPageClient() {
         />
 
         {/* Board fills remaining vertical space; aspect-square keeps it readable.
-            ZoomShell wraps the grid so the player can pinch-zoom into a corner
-            on small phones — premium-cell labels are otherwise unreadable. */}
+            WordCraftBoardSection wraps the grid + Pixi stage so the player can pinch-zoom
+            and see animations on premium cells / score events. */}
         <div className="flex-1 min-h-0 flex items-center justify-center">
           <div className="relative aspect-square max-h-full max-w-full">
-            <WordCraftZoomShell ariaLabel={t('wordcraft.zoomLabel')} resetLabel={t('wordcraft.zoomReset')}>
-            <WordCraftBoard
+            <WordCraftBoardSection
               board={game.state.board}
-              pendingPlacements={game.state.pendingPlacements}
-              onCellClick={(r, c) => {
+              pending={game.state.pendingPlacements}
+              selectedRackTile={game.state.selectedRackTileId ? game.state.player.rack.find((t) => t.id === game.state.selectedRackTileId) ?? null : null}
+              onCellTap={(cell) => {
                 // Visualize tap-to-place: ghost tile flies from rack to cell.
                 // Cures the "two-tap feels indirect" pain by showing motion.
                 const selId = game.state.selectedRackTileId;
                 const sel = selId ? game.state.player.rack.find((t) => t.id === selId) : null;
                 if (sel) {
                   const fromEl = document.querySelector(`[data-rack-tile-id="${selId}"]`);
-                  const toEl = document.querySelector(`[data-board-cell="${r},${c}"]`);
+                  const toEl = document.querySelector(`[data-board-cell="${cell.row},${cell.col}"]`);
                   juice.arcTilePlace(fromEl, toEl, sel.letter, sel.value);
                 }
                 inputCountsRef.current.tap += 1;
-                game.placeOnBoard(r, c);
+                game.placeOnBoard(cell.row, cell.col);
               }}
-              onRecallPending={recallFromBoard}
-              disabled={game.state.turn !== 'player'}
-              hasSelectedTile={!!game.state.selectedRackTileId}
+              onCellDragOver={(cell) => {
+                // Not used in this component
+              }}
+              onCellDrop={(cell) => {
+                // Not used in this component
+              }}
+              onSceneCtx={setSceneCtx}
+              isDisabled={game.state.turn !== 'player'}
               isFirstMove={isFirstMove}
               dragHoverCell={drag?.active ? drag.hoverCell : null}
               locale={locale}
               reticle={reticle}
+              zoomLabel={t('wordcraft.zoomLabel')}
+              zoomResetLabel={t('wordcraft.zoomReset')}
             />
-            </WordCraftZoomShell>
             {scoreFloat ? (
               <ScoreFloat
                 key={scoreFloat.key}
@@ -800,12 +746,11 @@ export default function WordCraftPageClient() {
 
       {/* Game-over banner: also floating, doesn't push layout */}
       {game.state.turn === 'over' ? (
-        <div
-          role="status"
-          className="absolute left-1/2 -translate-x-1/2 bottom-[140px] z-40 px-4 py-3 bg-neo-yellow border-neo-thick border-black text-neo-navy rounded-neo shadow-hard-lg font-neo-display font-black uppercase tracking-wider"
-        >
-          {t('wordcraft.winnerLabel', { name: winner })}
-        </div>
+        <WordCraftGameOverScene
+          t={t}
+          playerScore={game.state.player.score}
+          botScore={game.state.bot.score}
+        />
       ) : null}
     </div>
   );

@@ -77,7 +77,7 @@ function buildWordTiles(
   for (let i = span.start; i <= span.end; i++) {
     const row = span.direction === 'across' ? span.axisIndex : i;
     const col = span.direction === 'across' ? i : span.axisIndex;
-    if (!isInBounds(row, col)) return null;
+    if (!isInBounds(row, col, board)) return null;
     const cell = getCell(board, row, col);
     const key = `${row},${col}`;
     let letter: string;
@@ -113,14 +113,14 @@ function findMainWordSpan(
   while (minPos > 0) {
     const r = direction === 'across' ? axisIndex : minPos - 1;
     const c = direction === 'across' ? minPos - 1 : axisIndex;
-    if (!isInBounds(r, c) || !getCell(board, r, c).tile) break;
+    if (!isInBounds(r, c, board) || !getCell(board, r, c).tile) break;
     minPos--;
   }
   const maxBound = board.cells.length - 1;
   while (maxPos < maxBound) {
     const r = direction === 'across' ? axisIndex : maxPos + 1;
     const c = direction === 'across' ? maxPos + 1 : axisIndex;
-    if (!isInBounds(r, c) || !getCell(board, r, c).tile) break;
+    if (!isInBounds(r, c, board) || !getCell(board, r, c).tile) break;
     maxPos++;
   }
   return { start: minPos, end: maxPos, axisIndex, direction };
@@ -138,7 +138,7 @@ function findCrossWordSpan(
   let maxPos = minPos;
   const newCoords = newTilesIndex(placements);
   const hasTileAt = (r: number, c: number) => {
-    if (!isInBounds(r, c)) return false;
+    if (!isInBounds(r, c, board)) return false;
     return getCell(board, r, c).tile !== null || newCoords.has(`${r},${c}`);
   };
   while (minPos > 0) {
@@ -167,7 +167,7 @@ function touchesExistingTile(board: Board, placements: PlacedTile[]): boolean {
       [p.row, p.col + 1],
     ];
     for (const [r, c] of neighbors) {
-      if (isInBounds(r, c) && getCell(board, r, c).tile) return true;
+      if (isInBounds(r, c, board) && getCell(board, r, c).tile) return true;
     }
   }
   return false;
@@ -180,7 +180,7 @@ export function validateAndScoreMove(
 ): MoveResult {
   if (placements.length === 0) return fail('NO_TILES');
   for (const p of placements) {
-    if (!isInBounds(p.row, p.col)) return fail('OUT_OF_BOUNDS');
+    if (!isInBounds(p.row, p.col, board)) return fail('OUT_OF_BOUNDS');
     if (getCell(board, p.row, p.col).tile) return fail('CELL_OCCUPIED');
   }
   const seen = new Set<string>();
@@ -253,7 +253,7 @@ export function validateAndScoreMove(
 }
 
 function touchesExistingTileHorizontally(board: Board, p: PlacedTile): boolean {
-  if (isInBounds(p.row, p.col - 1) && getCell(board, p.row, p.col - 1).tile) return true;
-  if (isInBounds(p.row, p.col + 1) && getCell(board, p.row, p.col + 1).tile) return true;
+  if (isInBounds(p.row, p.col - 1, board) && getCell(board, p.row, p.col - 1).tile) return true;
+  if (isInBounds(p.row, p.col + 1, board) && getCell(board, p.row, p.col + 1).tile) return true;
   return false;
 }

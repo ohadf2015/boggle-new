@@ -11605,6 +11605,21 @@ const es = {
       "axisAcrossLocked": "Dirección horizontal bloqueada",
       "axisDownLocked": "Dirección vertical bloqueada",
       "axisUnlocked": "Dirección de la palabra desbloqueada"
+    },
+    // FLAG_FOR_NATIVE_REVIEW: 2026-05-11 wordcraft-mobile-fun (legend + scoreDot + tilesLeft)
+    "tilesLeft": "Fichas restantes",
+    "legend": {
+      "title": "Bonificaciones",
+      "tw": "TW · ×3 palabra",
+      "dw": "DW · ×2 palabra",
+      "tl": "TL · ×3 letra",
+      "dl": "DL · ×2 letra"
+    },
+    "scoreDot": {
+      "common": "1 punto",
+      "mid": "2–3 puntos",
+      "rare": "4–5 puntos",
+      "legendary": "8+ puntos"
     }
   },
   "connections": {

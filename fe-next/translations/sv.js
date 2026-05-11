@@ -11510,6 +11510,21 @@ const sv = {
       "axisAcrossLocked": "Vågrätt riktning låst",
       "axisDownLocked": "Lodrätt riktning låst",
       "axisUnlocked": "Ordriktning olåst"
+    },
+    // FLAG_FOR_NATIVE_REVIEW: 2026-05-11 wordcraft-mobile-fun (legend + scoreDot + tilesLeft)
+    "tilesLeft": "Brickor kvar",
+    "legend": {
+      "title": "Bonusar",
+      "tw": "TW · ×3 ord",
+      "dw": "DW · ×2 ord",
+      "tl": "TL · ×3 bokstav",
+      "dl": "DL · ×2 bokstav"
+    },
+    "scoreDot": {
+      "common": "1 poäng",
+      "mid": "2–3 poäng",
+      "rare": "4–5 poäng",
+      "legendary": "8+ poäng"
     }
   },
   mp: {

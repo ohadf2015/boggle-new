@@ -97,7 +97,7 @@ describe('WordCraftZoomShell', () => {
     pointerDown(region, 20, 100, 200, 'touch');
     pointerDown(region, 21, 200, 200, 'touch');
     act(() => {
-      // Wildly large spread — should clamp at MAX_SCALE = 2.4
+      // Wildly large spread — should clamp at MAX_SCALE = 2.0
       pointerMove(region, 20, -2000, 200, 'touch');
       pointerMove(region, 21, 2000, 200, 'touch');
     });
@@ -106,7 +106,7 @@ describe('WordCraftZoomShell', () => {
     const text = reset?.textContent ?? '';
     const match = text.match(/(\d+(?:\.\d+)?)/);
     const num = match ? parseFloat(match[1]) : 0;
-    expect(num).toBeLessThanOrEqual(2.4);
+    expect(num).toBeLessThanOrEqual(2.0);
     expect(num).toBeGreaterThanOrEqual(2);
   });
 });

@@ -1,7 +1,20 @@
 import type { PlacedTile, PremiumKind } from './types';
 
-export const BOARD_SIZE = 15;
-export const CENTER = 7;
+// 11x11 board with 4-way mirror symmetry across both axes.
+// 4 corner TW, 4 DW (one per quadrant), 4 TL. Total ~12 premiums.
+const PREMIUM_LAYOUT_11: readonly string[] = [
+  'T.........T',  // row 0
+  '...........',  // row 1
+  '..D.....D..',  // row 2
+  '...........',  // row 3
+  '.t.d...d.t.',  // row 4
+  '.....*.....', // row 5: center at (5,5) = '*'
+  '.t.d...d.t.',  // row 6
+  '...........',  // row 7
+  '..D.....D..',  // row 8
+  '...........',  // row 9
+  'T.........T',  // row 10
+] as const;
 
 const PREMIUM_LAYOUT_15: readonly string[] = [
   'T..d...T...d..T',
@@ -49,6 +62,14 @@ const CHAR_TO_PREMIUM: Record<string, PremiumKind | null> = {
   '*': null, // CENTER - no premium
 };
 
+export type BoardSize = 11 | 13 | 15;
+
+const LAYOUTS: Record<BoardSize, readonly string[]> = {
+  11: PREMIUM_LAYOUT_11,
+  13: PREMIUM_LAYOUT_13,
+  15: PREMIUM_LAYOUT_15,
+};
+
 export interface BoardCell {
   premium: PremiumKind | null;
   tile: PlacedTile | null;
@@ -56,31 +77,27 @@ export interface BoardCell {
 
 export interface Board {
   cells: BoardCell[][];
+  size: BoardSize;
 }
 
-function getPremiumForSize(row: number, col: number, size: 13 | 15): PremiumKind | null {
-  if (size === 13) {
-    if (row < 0 || row >= 13 || col < 0 || col >= 13) return null;
-    return CHAR_TO_PREMIUM[PREMIUM_LAYOUT_13[row][col]] ?? null;
+function getPremiumForSize(row: number, col: number, size: BoardSize): PremiumKind | null {
+  if (row < 0 || row >= size || col < 0 || col >= size) return null;
+  return CHAR_TO_PREMIUM[LAYOUTS[size][row][col]] ?? null;
+}
+
+export function isInBounds(row: number, col: number, board: Board): boolean {
+  return row >= 0 && row < board.size && col >= 0 && col < board.size;
+}
+
+export function getPremium(row: number, col: number, board: Board): PremiumKind | null {
+  if (!isInBounds(row, col, board)) return null;
+  return CHAR_TO_PREMIUM[LAYOUTS[board.size][row][col]] ?? null;
+}
+
+export function createBoard(size: BoardSize = 15): Board {
+  if (size !== 11 && size !== 13 && size !== 15) {
+    throw new Error(`Board size must be 11, 13, or 15, got ${size}`);
   }
-  if (row < 0 || row >= 15 || col < 0 || col >= 15) return null;
-  return CHAR_TO_PREMIUM[PREMIUM_LAYOUT_15[row][col]] ?? null;
-}
-
-export function isInBounds(row: number, col: number): boolean {
-  return row >= 0 && row < BOARD_SIZE && col >= 0 && col < BOARD_SIZE;
-}
-
-export function getPremium(row: number, col: number): PremiumKind | null {
-  if (!isInBounds(row, col)) return null;
-  return CHAR_TO_PREMIUM[PREMIUM_LAYOUT_15[row][col]] ?? null;
-}
-
-export function createBoard(size: 13 | 15 = 15): Board {
-  if (size !== 13 && size !== 15) {
-    throw new Error(`Board size must be 13 or 15, got ${size}`);
-  }
-
   const cells: BoardCell[][] = [];
   for (let r = 0; r < size; r++) {
     const row: BoardCell[] = [];
@@ -89,7 +106,7 @@ export function createBoard(size: 13 | 15 = 15): Board {
     }
     cells.push(row);
   }
-  return { cells };
+  return { cells, size };
 }
 
 export function getCell(board: Board, row: number, col: number): BoardCell {
@@ -103,11 +120,14 @@ export function placeTiles(board: Board, tiles: PlacedTile[]): void {
 }
 
 export function isFirstMove(board: Board): boolean {
-  const size = board.cells.length;
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < board.cells[r].length; c++) {
+  for (let r = 0; r < board.size; r++) {
+    for (let c = 0; c < board.size; c++) {
       if (board.cells[r][c].tile) return false;
     }
   }
   return true;
 }
+
+// Backward compat: kept for legacy callers. New code should read `board.size`.
+export const BOARD_SIZE = 15;
+export const CENTER = 7;
