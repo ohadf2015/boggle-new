@@ -11,14 +11,13 @@ interface PageProps {
 const BASE_URL = 'https://www.lexiclash.live';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { locale } = await params;
-  const isTargetLocale = locale === 'en';
+  await params;
   const pageUrl = `${BASE_URL}/en/multiplayer-word-game-online`;
 
   return {
-    title: 'Multiplayer Word Game Online — Free, 2-20 Players | LexiClash',
-    description: 'Free multiplayer word game — everyone plays the same grid at once, not turn-based. Create a room, share a link, compete with 2-20+ friends. No download, no signup.',
-    keywords: 'multiplayer word game, word games multiplayer, word game online free, multiplayer word game online, online multiplayer word games like hanging with friends, word game with friends, free word games, online word battles, word games multiplayer online free, word battle game, word game for groups, word games for parties, competitive word game, word race online, real-time word battle, word games live with people, online multiplayer word find, word multiplayer',
+    title: 'Multiplayer Word Game Online — Free Scrabble-Alternative, 2-20 Players | LexiClash',
+    description: 'Free Scrabble-alternative multiplayer word game online — everyone plays the same grid at once, not turn-based. Create a room, share a link, compete with 2-20+ friends. No download, no signup.',
+    keywords: 'multiplayer word game, word games multiplayer, word game online free, multiplayer word game online, scrabble alternative online, scrabble online multiplayer, online scrabble alternative free, online multiplayer word games like hanging with friends, word game with friends, free word games, online word battles, word games multiplayer online free, word battle game, word game for groups, word games for parties, competitive word game, word race online, real-time word battle, word games live with people, online multiplayer word find, word multiplayer',
     openGraph: {
       title: 'Free Multiplayer Word Game Online With Friends | LexiClash',
       description: 'Words With Friends alternative — everyone plays at once! Create a room, invite 2-20+ friends, compete in real-time word battles. Free, no download.',
@@ -174,6 +173,15 @@ export default async function MultiplayerWordGameOnlinePage({ params }: PageProp
             className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 font-bold text-neo-pink shadow-hard transition-all hover:bg-neo-pink/10 sm:px-8 sm:py-4"
           >
             Daily Challenge
+          </Link>
+        </section>
+
+        <section className="mb-12 rounded-neo border-3 border-neo-lime/60 bg-neo-navy-light p-5 shadow-hard">
+          <Link href={`/${validLocale}/scrabble-alternative-online`} className="block group">
+            <h3 className="font-neo-display text-lg font-black text-neo-lime underline decoration-2 underline-offset-4 group-hover:text-neo-white transition-colors">
+              Looking for a free Scrabble alternative online?
+            </h3>
+            <p className="mt-2 text-sm text-slate-300">Real-time multiplayer, 2-20 players in one browser room, no download — see LexiClash vs Scrabble GO →</p>
           </Link>
         </section>
 

@@ -18,10 +18,10 @@ const en = {
     "locale": "en_US",
     "language": "English",
     "leaderboard": {
-      "title": "Live Word Game Leaderboard — Daily, Weekly & All-Time Top Players | LexiClash",
-      "description": "See who's winning right now. Live leaderboard tracks daily, weekly, and all-time top scorers across 8 game modes. Filter by language, country, or mode. Updated in real time.",
-      "ogTitle": "Live Leaderboard — Daily, Weekly & All-Time Top Players",
-      "ogDescription": "See where you rank among the best word game players. Join LexiClash and compete for the top spot!"
+      "title": "Best Competitive Word Game Leaderboard — Global Daily, Weekly & All-Time Rankings | LexiClash",
+      "description": "The best competitive word game with global leaderboards. Live daily, weekly, and all-time rankings across 8 modes. Filter by language, country, or mode. Updated in real time.",
+      "ogTitle": "Competitive Word Game Leaderboard — Global Rankings, Daily / Weekly / All-Time",
+      "ogDescription": "Climb the global word game leaderboard. Daily, weekly, and all-time rankings across 8 modes. Free, no signup."
     },
     "profile": {
       "title": "Your Player Profile, Stats & Game Achievements",

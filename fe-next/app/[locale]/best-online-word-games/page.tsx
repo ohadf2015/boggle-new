@@ -15,12 +15,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const canonicalUrl = `${BASE_URL}/en/best-online-word-games`;
 
   return {
-    title: '9 Best Online Word Games 2026 — Honestly Ranked (Free, No Download)',
-    description: 'Honest 2026 ranking of the 9 best word games — Wordle, NYT Connections, Strands, Spelling Bee, Scrabble GO, Semantle, LexiClash. Pros, cons & which to pick in 2 minutes.',
-    keywords: 'best online word games 2026, free word games online, nyt connections, nyt strands, spelling bee game, semantle, wordle alternatives, multiplayer word games, word games with friends, word puzzle games online, word games no download, connections game',
+    title: 'Best Free Browser Word Games 2026 — 9 Honest Picks (No Download)',
+    description: 'Best free browser word games of 2026 — honestly ranked. Wordle, NYT Connections, Strands, Spelling Bee, Scrabble GO, Semantle, LexiClash. Pros, cons & which to pick in 2 minutes.',
+    keywords: 'best free browser word games 2026, best word games 2026, best online word games 2025 2026, most popular online word games 2025 2026, free word games online, nyt connections, nyt strands, spelling bee game, semantle, wordle alternatives, multiplayer word games, word games with friends, word puzzle games online, word games no download, connections game',
     openGraph: {
-      title: '9 Best Online Word Games of 2026 — Honestly Ranked',
-      description: 'Compare the 9 top word games: Wordle, Scrabble GO, Words With Friends, LexiClash & more. Free, no download.',
+      title: 'Best Free Browser Word Games 2026 — 9 Honest Picks',
+      description: 'Best free browser word games of 2026, honestly ranked. Wordle, NYT Connections, LexiClash & more — no download required.',
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
@@ -28,8 +28,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: '9 Best Online Word Games of 2026',
-      description: 'Honest ranking of the 9 best word games — free, no download.',
+      title: 'Best Free Browser Word Games 2026 — 9 Honest Picks',
+      description: 'Best free browser word games of 2026, honestly ranked. No download required.',
       images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
@@ -80,6 +80,10 @@ const faqs = [
   {
     q: 'What are the best free browser word games in 2026?',
     a: 'The best free browser word games of 2026 that need no download or install: LexiClash (real-time multiplayer, 8 game modes, 5 languages — our top pick), Wordle (one 5-letter puzzle per day), NYT Connections (group 16 words into themes), NYT Strands (themed word search), and Semantle (AI-semantic guessing). LexiClash is the only one that supports 2–20 players in the same browser room with no account required.',
+  },
+  {
+    q: 'Which word games have global leaderboards and competitive play?',
+    a: 'LexiClash is the most competitive free word game of 2026 with global daily, weekly, and all-time leaderboards across every mode — Word Wheel, Word Hunt Survival, Multiplayer Grid Battle, Adventure, and Blast. Real-time 2-20 player rooms with ELO-style rankings, plus per-language leaderboards (English, Hebrew, Swedish, Japanese, Spanish). Wordle and NYT Connections track personal stats only, no global rankings. Scrabble GO has ranked play but gates it behind an account and an app install.',
   },
 ];
 
@@ -437,6 +441,10 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
             <Link href={`/${locale}/words-with-friends-alternative`} className="rounded-neo border-3 border-neo-pink/60 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink">
               <h3 className="font-bold text-neo-pink">Words With Friends Alternative</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Real-time multiplayer, free, no download</p>
+            </Link>
+            <Link href={`/${locale}/scrabble-alternative-online`} className="rounded-neo border-3 border-neo-lime/60 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime">
+              <h3 className="font-bold text-neo-lime">Scrabble Alternative Online</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">Real-time, 2-20 players, browser-based</p>
             </Link>
             <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">LexiClash vs Wordle</h3>
