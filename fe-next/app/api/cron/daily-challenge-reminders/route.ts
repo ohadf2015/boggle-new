@@ -70,6 +70,10 @@ export async function POST(request: NextRequest) {
               rivalUsername: rival.username,
               direction: rival.direction,
               scoreGap: rival.scoreGap,
+              mode: rival.mode,
+              rivalScore: rival.rivalScore,
+              rankDelta: rival.rankDelta,
+              additionalCount: rival.additionalCount,
             });
             rivalSent++;
             await notifyDailyChallengeReminder(userId, {
