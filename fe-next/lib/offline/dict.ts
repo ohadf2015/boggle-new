@@ -19,13 +19,12 @@ export async function loadDictWords(
   words: string[],
 ): Promise<void> {
   if (words.length === 0) return;
-  for (const raw of words) {
-    const word = normalize(raw);
-    await store.sql.run('INSERT OR IGNORE INTO dict_words(locale, word) VALUES (?, ?)', [
-      locale,
-      word,
-    ]);
-  }
+  const paramsArray: unknown[][] = words
+    .map((raw) => normalize(raw))
+    .filter((w) => w.length > 0)
+    .map((w) => [locale, w]);
+  if (paramsArray.length === 0) return;
+  await store.sql.runBulk('INSERT OR IGNORE INTO dict_words(locale, word) VALUES (?, ?)', paramsArray);
 }
 
 export async function validateOffline(

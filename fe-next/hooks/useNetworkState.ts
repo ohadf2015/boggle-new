@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
+import { classifySlowFromRtt, probeReachability } from '@/lib/offline/networkProbe';
 
 export type NetworkType = 'wifi' | 'cellular' | 'none' | 'unknown';
 
@@ -56,6 +57,25 @@ export function useNetworkState(): NetworkState {
       const conn = getNavigatorConnection() as (NavigatorConnection & EventTarget) | undefined;
       conn?.addEventListener?.('change', refresh);
 
+      const runProbe = () => {
+        if (typeof navigator !== 'undefined' && !navigator.onLine) return;
+        void probeReachability().then((probe) => {
+          if (!probe.reachable) {
+            setState((prev) => ({ ...prev, online: false, type: 'none' }));
+            return;
+          }
+          setState((prev) => ({
+            ...prev,
+            online: true,
+            rttMs: probe.rttMs,
+            slow: classifySlowFromRtt(probe.rttMs) || prev.slow,
+          }));
+        });
+      };
+      runProbe();
+      window.addEventListener('online', runProbe);
+      window.addEventListener('focus', runProbe);
+
       let nativeRemove: (() => void) | undefined;
       if (Capacitor.isNativePlatform()) {
         void (async () => {
@@ -80,6 +100,8 @@ export function useNetworkState(): NetworkState {
       return () => {
         window.removeEventListener('online', refresh);
         window.removeEventListener('offline', refresh);
+        window.removeEventListener('online', runProbe);
+        window.removeEventListener('focus', runProbe);
         conn?.removeEventListener?.('change', refresh);
         nativeRemove?.();
       };

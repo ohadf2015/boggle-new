@@ -11,6 +11,7 @@ export interface OfflineKV {
 
 export interface OfflineSQL {
   run(stmt: string, params?: unknown[]): Promise<{ rows: Record<string, unknown>[] }>;
+  runBulk(stmt: string, paramsArray: unknown[][]): Promise<void>;
 }
 
 export interface OfflineStore {
@@ -111,6 +112,23 @@ export async function createWebStore({ dbName }: WebStoreOptions): Promise<Offli
         if (isMutation) await snapshot();
         return { rows };
       },
+      async runBulk(stmt, paramsArray) {
+        if (paramsArray.length === 0) return;
+        const handle = await ensureSqlDb();
+        const prepared = handle.prepare(stmt);
+        try {
+          for (const params of paramsArray) {
+            prepared.bind(params as never[]);
+            while (prepared.step()) {
+              // drain any RETURNING rows
+            }
+            prepared.reset();
+          }
+        } finally {
+          prepared.free();
+        }
+        await snapshot();
+      },
     },
     async close() {
       await pendingSnapshot;
@@ -171,6 +189,20 @@ export async function createNativeStore(): Promise<OfflineStore> {
         }
         await handle.run(stmt, params);
         return { rows: [] };
+      },
+      async runBulk(stmt, paramsArray) {
+        if (paramsArray.length === 0) return;
+        const handle = await ensureDb();
+        await handle.run('BEGIN', [], false);
+        try {
+          for (const params of paramsArray) {
+            await handle.run(stmt, params);
+          }
+          await handle.run('COMMIT', [], false);
+        } catch (err) {
+          await handle.run('ROLLBACK', [], false).catch(() => undefined);
+          throw err;
+        }
       },
     },
     async close() {
