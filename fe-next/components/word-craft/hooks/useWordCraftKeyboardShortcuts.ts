@@ -1,7 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import type { Board } from '@/lib/word-craft/board';
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
   turn: string;
@@ -75,19 +74,8 @@ export function useWordCraftKeyboardShortcuts(props: Props) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [
-    props.turn,
-    props.pendingPlacements,
-    props.burnout,
-    props.playerRack,
-    props.dict,
-    props.axis,
-    props.onRecallAll,
-    props.onSubmit,
-    props.onRecallOne,
-    props.onFastTap,
-    props.onSelectTile,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.turn, props.pendingPlacements, props.burnout, props.playerRack, props.dict, props.axis, props.onRecallAll, props.onSubmit, props.onRecallOne, props.onFastTap, props.onSelectTile]);
 
   // Arrow-key reticle
   useEffect(() => {
@@ -127,6 +115,7 @@ export function useWordCraftKeyboardShortcuts(props: Props) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.turn, props.boardSize, reticle, props.onPlaceOnBoard]);
 
   // Drop reticle when turn ends
