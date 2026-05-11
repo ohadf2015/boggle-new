@@ -345,6 +345,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     { locale: 'en', path: '/multiplayer-word-game-online', img: 'en' },
     { locale: 'en', path: '/play-boggle-online-free', img: 'en' },
     { locale: 'en', path: '/word-games-online-free', img: 'en' },
+    { locale: 'en', path: '/scrabble-alternative-online', img: 'en' },
   ] as const;
 
   // Brain Training Word Games — native content in all 5 locales, register each
