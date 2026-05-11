@@ -97,4 +97,148 @@ describe('pickRivalReminderCopy', () => {
     });
     expect(c.deepLink).toContain('h=1');
   });
+
+  describe('urgency tier routing', () => {
+    it('picks an urgent-tier variant (index 4 or 5) when hoursLeft ≤ 3', () => {
+      // Try many user IDs to cover hash space — every one must land in urgent set.
+      for (let i = 0; i < 20; i++) {
+        const c = pickRivalReminderCopy({
+          userId: `u${i}`, date: '2026-05-10', hoursLeft: 2, locale: 'en',
+          rivalUsername: 'Maya', direction: 'above', scoreGap: 100,
+        });
+        expect([4, 5]).toContain(c.variant);
+      }
+    });
+
+    it('picks a midday-tier variant (index 2 or 3) when 3 < hoursLeft ≤ 12', () => {
+      for (let i = 0; i < 20; i++) {
+        const c = pickRivalReminderCopy({
+          userId: `u${i}`, date: '2026-05-10', hoursLeft: 8, locale: 'en',
+          rivalUsername: 'Maya', direction: 'above', scoreGap: 100,
+        });
+        expect([2, 3]).toContain(c.variant);
+      }
+    });
+
+    it('picks a morning-tier variant (index 0 or 1) when hoursLeft > 12', () => {
+      for (let i = 0; i < 20; i++) {
+        const c = pickRivalReminderCopy({
+          userId: `u${i}`, date: '2026-05-10', hoursLeft: 20, locale: 'en',
+          rivalUsername: 'Maya', direction: 'above', scoreGap: 100,
+        });
+        expect([0, 1]).toContain(c.variant);
+      }
+    });
+
+    it('encodes tier in the deep link as t=morning|midday|urgent', () => {
+      const urgent = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 1, locale: 'en',
+        rivalUsername: 'Maya', direction: 'above', scoreGap: 100,
+      });
+      expect(urgent.deepLink).toContain('t=urgent');
+
+      const midday = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: 'en',
+        rivalUsername: 'Maya', direction: 'above', scoreGap: 100,
+      });
+      expect(midday.deepLink).toContain('t=midday');
+
+      const morning = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 20, locale: 'en',
+        rivalUsername: 'Maya', direction: 'above', scoreGap: 100,
+      });
+      expect(morning.deepLink).toContain('t=morning');
+    });
+  });
+
+  describe('multi-rival framing', () => {
+    it('appends " and {N} more" tail when additionalCount > 0 (en)', () => {
+      const c = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: 'en',
+        rivalUsername: 'Maya', direction: 'above', scoreGap: 100,
+        additionalCount: 3,
+      });
+      expect(c.body.toLowerCase()).toContain('3 more');
+    });
+
+    it('omits the tail when additionalCount = 0', () => {
+      const c = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: 'en',
+        rivalUsername: 'Maya', direction: 'above', scoreGap: 100,
+        additionalCount: 0,
+      });
+      expect(c.body).not.toMatch(/\d+ more/);
+    });
+
+    it.each(['he', 'sv', 'ja', 'es'] as const)(
+      'localized multi-rival tail renders for %s',
+      (loc) => {
+        const c = pickRivalReminderCopy({
+          userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: loc,
+          rivalUsername: 'Maya', direction: 'above', scoreGap: 100,
+          additionalCount: 2,
+        });
+        // Each locale should mention the count "2" in the suffix
+        expect(c.body).toContain('2');
+      }
+    );
+
+    it('encodes additionalCount in the deep link as n=N', () => {
+      const c = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: 'en',
+        rivalUsername: 'Maya', direction: 'above', scoreGap: 100,
+        additionalCount: 4,
+      });
+      expect(c.deepLink).toContain('n=4');
+    });
+  });
+
+  describe('sharper placeholders (mode / rivalScore / rankDelta)', () => {
+    it('exposes mode in deep link as m=puzzle|wordHunt|both', () => {
+      const c = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: 'en',
+        rivalUsername: 'Maya', direction: 'above', scoreGap: 100,
+        mode: 'wordHunt',
+      });
+      expect(c.deepLink).toContain('m=wordHunt');
+    });
+
+    it('exposes rivalScore in deep link as rs=N', () => {
+      const c = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: 'en',
+        rivalUsername: 'Maya', direction: 'above', scoreGap: 100,
+        rivalScore: 1234,
+      });
+      expect(c.deepLink).toContain('rs=1234');
+    });
+
+    it('exposes rankDelta in deep link as rd=N (preserves sign)', () => {
+      const ahead = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: 'en',
+        rivalUsername: 'Maya', direction: 'above', scoreGap: 100,
+        rankDelta: 7,
+      });
+      expect(ahead.deepLink).toContain('rd=7');
+
+      const behind = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: 'en',
+        rivalUsername: 'Maya', direction: 'below', scoreGap: 100,
+        rankDelta: -3,
+      });
+      expect(behind.deepLink).toContain('rd=-3');
+    });
+
+    it('does not leave {mode}, {rivalScore}, {rankDelta}, or {others} unfilled in body', () => {
+      const c = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 4, locale: 'en',
+        rivalUsername: 'Maya', direction: 'above', scoreGap: 100,
+        mode: 'puzzle', rivalScore: 999, rankDelta: 5, additionalCount: 2,
+      });
+      expect(c.body).not.toContain('{mode}');
+      expect(c.body).not.toContain('{rivalScore}');
+      expect(c.body).not.toContain('{rankDelta}');
+      expect(c.body).not.toContain('{others}');
+      expect(c.body).not.toContain('{hoursLeft}');
+    });
+  });
 });
