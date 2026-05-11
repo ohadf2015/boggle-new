@@ -32,7 +32,7 @@ import { cn } from '@/lib/utils';
  */
 
 const MIN_SCALE = 1;
-const MAX_SCALE = 2.4;
+const MAX_SCALE = 2.0;
 const DOUBLE_TAP_MS = 280;
 
 export interface WordCraftZoomShellProps {
