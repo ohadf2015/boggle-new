@@ -88,7 +88,6 @@ function WordCraftBoardImpl({
           const pending = pendingByCoord.get(key);
           const placedTile = cell.tile;
           const isCenter = r === centerIndex && c === centerIndex;
-          const premiumKey = cell.premium ?? '';
           const isInteractive = !disabled && !placedTile;
           const isEmpty = !placedTile && !pending;
           const inviteEmpty = isEmpty && hasSelectedTile && !disabled;
