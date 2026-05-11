@@ -17,18 +17,55 @@ const contactSeoContent: Record<string, {
   faq: { question: string; answer: string }[];
 }> = {
   en: {
-    title: 'Contact LexiClash — Get in Touch',
+    title: 'Contact LexiClash — Support, Feedback & Partnership',
     description:
-      'Reach the LexiClash team for feedback, bug reports, partnership inquiries, or questions. We read every message and respond as quickly as we can.',
+      'Reach the LexiClash team for support, feedback, bug reports, partnership inquiries, press requests, or general questions. LexiClash is built and maintained by a small independent studio, which means every message reaches a real person on the team — not a queue of outsourced agents reading from a script. We read every email, prioritize bug reports affecting active gameplay, and respond personally to feature suggestions that match our roadmap. Whether you found a dictionary edge case, want to translate LexiClash into a new language, run a school program looking for vocabulary tools, or you just hit something weird and want to flag it — we want to hear from you.',
     features: [
-      'Submit feedback about game modes, features, or the overall experience',
-      'Report bugs or technical issues with detailed descriptions',
-      'Partnership and collaboration inquiries welcome',
-      'Available in English, Hebrew, Swedish, Japanese, and Spanish',
+      'Direct line to the development team — no outsourced support agents, no canned replies',
+      'Bug reports get priority routing — include device, browser, and reproduction steps for fastest fix',
+      'Feature suggestions reviewed weekly — popular requests make it onto the public roadmap',
+      'Partnership inquiries welcome — game portals, education platforms, language-learning apps, content creators',
+      'Press and media contact for interviews, reviews, screenshots, and brand assets',
+      'School and classroom inquiries — we offer free educator accounts and bulk word-list customization',
+      'Available in English, Hebrew, Swedish, Japanese, and Spanish — write in any language we support',
+      'Privacy and data deletion requests handled within 30 days per GDPR and CCPA requirements',
     ],
     faq: [
-      { question: 'How long does it take to get a response?', answer: 'We aim to respond within 48 hours. Bug reports and urgent issues are prioritized.' },
-      { question: 'Can I suggest new features?', answer: 'Absolutely — we love hearing player ideas. Use the contact form to describe your feature suggestion and we will review it.' },
+      {
+        question: 'How long does it take to get a response from LexiClash support?',
+        answer:
+          'We aim to respond to every message within 48 hours during weekdays. Bug reports affecting active gameplay get priority routing and usually receive a response within 12 hours. Complex partnership or technical questions may take 3-5 business days while we coordinate internally. If you have not heard back after 5 business days, the message likely got caught in our spam filter — please resend with a different subject line.',
+      },
+      {
+        question: 'Can I suggest new features or game modes?',
+        answer:
+          'Absolutely — player suggestions drive a large portion of the LexiClash roadmap. The Adventure, Blast, and Word Hunt modes all started as player requests. Use the contact form to describe the feature, why you want it, and what existing game (if any) does it well. We review every suggestion in our weekly planning meeting and respond personally to ones we are considering.',
+      },
+      {
+        question: 'I found a bug — what is the fastest way to get it fixed?',
+        answer:
+          'Email us with: (1) what you were doing when it happened, (2) what device, browser, and operating system you are on, (3) any error message or screenshot, and (4) whether you can reproduce it consistently. Bug reports with reproduction steps usually ship a fix within one release cycle (3-7 days). Critical gameplay bugs are patched within hours.',
+      },
+      {
+        question: 'Do you accept translation contributions or community localizations?',
+        answer:
+          'Yes — LexiClash currently supports English, Hebrew, Swedish, Japanese, and Spanish, all maintained in collaboration with native speakers. If you are fluent in a language not yet supported and want to help bring LexiClash to your community, email us with your background and the language you want to add. We share the translation files, review a sample, and credit contributors in the About page.',
+      },
+      {
+        question: 'Can teachers, schools, or libraries use LexiClash for classroom programs?',
+        answer:
+          'Yes. LexiClash is used in classrooms for vocabulary expansion, ESL practice, and friendly competitive learning. We offer free educator accounts with custom word lists, no ads, and a quiet leaderboard for student groups. Contact us with your school or program name and we will set you up — there is no paid tier required.',
+      },
+      {
+        question: 'How do I delete my LexiClash account and all associated data?',
+        answer:
+          'You can delete your account directly from the Account Settings page (Settings → Account → Delete Account). All personal data is erased within 30 days as required by GDPR and CCPA. If you cannot access the in-app option for any reason, email us at lexiclash.game@gmail.com from the email tied to the account and we will process the deletion manually.',
+      },
+      {
+        question: 'Is there a Discord, subreddit, or community forum for LexiClash?',
+        answer:
+          'We have an active Discord community where players share strategy, request features, report bugs, and run informal tournaments. Join via the link in the footer. For longer-form discussion, the r/LexiClash subreddit is a slower but more searchable place to find past threads and answers.',
+      },
     ],
   },
   he: {

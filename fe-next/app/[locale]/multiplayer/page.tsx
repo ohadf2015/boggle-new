@@ -21,34 +21,59 @@ const seoContent: Record<string, {
   en: {
     title: 'Multiplayer Word Game — Real-Time Word Battles With Friends',
     description:
-      'LexiClash Multiplayer is a real-time competitive word game where you race against friends and rivals to find words on a shared grid. Host private rooms for game nights, join public lobbies to test your skills against the world, or challenge the AI bot when nobody is online. Every match is live, timed, and scored — no waiting for turns.',
+      'LexiClash Multiplayer is a real-time competitive word game where you race against friends and rivals to find words on a shared grid. Host private rooms for game nights, join public lobbies to test your skills against the world, or challenge the AI bot when nobody is online. Every match is live, timed, and scored — no waiting for turns. Four distinct multiplayer modes mean every match feels different: Classic Boggle-style word racing, Wheel Rush rotating-tile sprints, Word Hunt directed-search puzzles, and Blast Mode tile-clearing combo chains. Match-making works across devices: someone on a phone in Tel Aviv can play head-to-head with a friend on a laptop in Stockholm with sub-100ms latency on the same shared grid. No download. No signup unless you want a persistent profile. Open the link, pick a mode, and you are in.',
     features: [
       'Host private rooms with custom settings — invite friends via link or room code',
       'Public matchmaking lobbies — get matched with opponents of similar skill in seconds',
       'Real-time scoring with live opponent word feeds — see what they find as they find it',
       'Adjustable round timers, grid sizes, and scoring rules for casual or competitive play',
       'Spectator mode — watch top players compete and learn advanced word-finding strategies',
+      'Four multiplayer modes: Classic, Wheel Rush, Word Hunt, Blast — each with distinct scoring and pacing',
+      'Cross-device matchmaking — phones, tablets, laptops, and TV screens all join the same match',
+      'Sub-100ms latency on Socket.IO infrastructure — opponent moves appear before you finish typing yours',
+      'Anti-cheat dictionary validation — every submitted word checked against the same competitive list',
+      'Optional rematch system — replay the same opponents on a fresh grid in one tap',
     ],
     faq: [
       {
         question: 'How do I start a multiplayer word game with friends?',
         answer:
-          'Tap "Create Room" on the multiplayer page, customize your settings (timer, grid size, rounds), then share the room link or code with friends. They join instantly — no account required. You can also set a room password for private matches.',
+          'Tap "Create Room" on the multiplayer page, customize your settings (timer, grid size, rounds, mode), then share the room link or code with friends. They join instantly — no account required. You can also set a room password for private matches. Rooms stay open for 24 hours so you can come back to the same lobby after a break.',
       },
       {
         question: 'Is LexiClash multiplayer free to play?',
         answer:
-          'Yes — LexiClash multiplayer is completely free with no download required. Play directly in your browser on any device. There are no paywalls, ads-to-unlock, or premium-only features.',
+          'Yes — LexiClash multiplayer is completely free with no download required. Play directly in your browser on any device. There are no paywalls, ads-to-unlock, or premium-only features. Optional rewarded ads exist for cosmetic boosts but never gate competitive play.',
       },
       {
         question: 'How many players can join a multiplayer room?',
         answer:
-          'Multiplayer rooms support up to 8 players competing simultaneously on the same grid. For larger groups, try Party Mode which supports even more players on a shared TV screen.',
+          'Multiplayer rooms support up to 8 players competing simultaneously on the same grid. For larger groups, try Party Mode which supports even more players on a shared TV screen with phones as controllers. Classroom mode supports up to 32 players for educator use.',
       },
       {
-        question: 'What makes LexiClash different from other online word games?',
+        question: 'What makes LexiClash different from Scrabble, Wordle, or Words With Friends?',
         answer:
-          'Unlike turn-based games like Scrabble or solo puzzles like Wordle, LexiClash is fully real-time — everyone plays the same board simultaneously under time pressure. Combo chains, live score feeds, and head-to-head competition create an intensity that traditional word games cannot match.',
+          'Unlike turn-based games like Scrabble or Words With Friends — where you wait minutes or hours between moves — LexiClash is fully real-time. Everyone plays the same board simultaneously under time pressure. Unlike solo puzzles like Wordle, you compete directly against other players with live score feeds and combo chains. The result is the strategic depth of a tile-letter game combined with the intensity of a fighting game.',
+      },
+      {
+        question: 'What are the four multiplayer modes and which is most popular?',
+        answer:
+          'Classic is a Boggle-style 4x4 or 5x5 grid where you race to find words within a 2-minute timer — most popular for new players. Wheel Rush rotates the letter pool every 15 seconds, rewarding fast pattern recognition. Word Hunt gives a target word count to find within a constrained letter set — best for puzzle lovers. Blast Mode clears tiles as you spell, building combo multipliers for longer chains — most popular for competitive players chasing high scores.',
+      },
+      {
+        question: 'How does matchmaking work? Will I always be matched against strong players?',
+        answer:
+          'Public lobbies use ELO-style skill rating to match you against opponents of similar level. New players start in the rookie pool against other newcomers and the AI bot. As you win matches, your rating climbs and you face progressively stronger opponents. Private rooms have no matchmaking — you choose your opponents directly.',
+      },
+      {
+        question: 'Can I play multiplayer when nobody else is online?',
+        answer:
+          'Yes. LexiClash includes an AI bot opponent with three difficulty levels — Easy, Medium, and Hard. The bot plays at human-realistic speeds (not instant-perfect) and is a useful warm-up before facing humans. It is also the default opponent when public lobbies are empty.',
+      },
+      {
+        question: 'Are LexiClash multiplayer matches fair? How do you prevent cheating?',
+        answer:
+          'Every submitted word is validated server-side against the same competitive dictionary used in Scrabble tournaments. Anagram solvers and external dictionaries do not give an edge because all valid words are equally scored — the only differentiator is how fast you find them. We also detect and block coordinated boost-rings via behavioral analysis.',
       },
     ],
   },
