@@ -6,6 +6,7 @@
  */
 
 import type { Language } from '@/shared/types';
+import { tryValidateOffline } from '@/hooks/fastValidateWord';
 
 /**
  * Result of word integration check
@@ -79,6 +80,11 @@ export async function checkWordIntegrationAsync(
   const lengthResult = checkWordLengthSync(word);
   if (lengthResult) {
     return lengthResult;
+  }
+
+  // Offline dictionary fallback before consulting network
+  if (await tryValidateOffline(normalized, language)) {
+    return { word: normalized, canIntegrate: true };
   }
 
   // Dictionary check via API

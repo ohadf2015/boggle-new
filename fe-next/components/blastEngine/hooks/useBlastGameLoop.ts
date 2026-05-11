@@ -10,6 +10,7 @@ import type { BlastGameConfig } from '@/components/blast/types';
 import { generateTileStates, nextTileUid } from '@/components/blast/utils/blastTileGeneration';
 import { generateSeededLetterGrid } from '@/components/blastEngine/utils/blastWordSeeder';
 import { hasWordInMemoryCache } from '@/hooks/useDictionaryCache';
+import { tryValidateOffline } from '@/hooks/fastValidateWord';
 import type { Language } from '@/shared/types/game';
 
 // ─── Types ────────────────────────────────────────────────────────────
@@ -78,6 +79,12 @@ async function isValidWord(word: string, lang: Language): Promise<boolean> {
   // community-validated words still resolve correctly.
   const memoryHit = hasWordInMemoryCache(word, lang);
   if (memoryHit === true) {
+    dictionaryCache.set(key, true);
+    return true;
+  }
+
+  // Offline dict fallback before consulting network
+  if (await tryValidateOffline(word, lang)) {
     dictionaryCache.set(key, true);
     return true;
   }

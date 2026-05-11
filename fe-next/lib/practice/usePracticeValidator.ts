@@ -1,4 +1,6 @@
 import { useCallback, useRef } from 'react';
+import { tryValidateOffline } from '@/hooks/fastValidateWord';
+import type { Language } from '@/shared/types/game';
 
 export interface PracticeValidationResult {
   isValid: boolean;
@@ -22,6 +24,12 @@ export function usePracticeValidator(language: string) {
       const key = `${language}:${word}`;
       const cached = cacheRef.current.get(key);
       if (cached) return cached;
+
+      if (await tryValidateOffline(word, language as Language)) {
+        const result: PracticeValidationResult = { isValid: true, source: 'dictionary' };
+        cacheRef.current.set(key, result);
+        return result;
+      }
 
       const callOnce = () =>
         fetch('/api/validate-word', {
