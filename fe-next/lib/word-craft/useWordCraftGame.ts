@@ -6,6 +6,7 @@ import { createBag, draw, RACK_SIZE, remaining, swap as swapBag, type SupportedL
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 import { findBestBotMove } from './botMove';
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
+import { getBoardDims } from './boardDimensions';
 import type { PlacedTile, PlayerState, RackTile } from './types';
 
 export type Turn = 'player' | 'bot' | 'over';
@@ -50,15 +51,18 @@ type Action =
 
 const BOT_NAME = 'WordBot';
 
-function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale }): WordCraftState {
+function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale; viewportDims?: { size: 11 | 13 | 15; bagSize: number } }): WordCraftState {
   const seed = typeof init === 'number' ? init : init.seed;
   const boardSize = typeof init === 'number' ? 15 : (init.boardSize ?? 15);
   const locale = typeof init === 'number' ? 'en' : (init.locale ?? 'en');
-  const bag = createBag({ seed, locale });
+  const viewportDims = typeof init === 'number' ? undefined : init.viewportDims;
+
+  const finalBoardSize = viewportDims?.size ?? boardSize;
+  const bag = createBag({ seed, locale, bagSize: viewportDims?.bagSize });
   const playerRack = draw(bag, RACK_SIZE);
   const botRack = draw(bag, RACK_SIZE);
   return {
-    board: createBoard(boardSize),
+    board: createBoard(finalBoardSize),
     bag,
     player: { id: 'player', name: 'You', score: 0, rack: playerRack, isBot: false },
     bot: { id: 'bot', name: BOT_NAME, score: 0, rack: botRack, isBot: true },
@@ -92,7 +96,7 @@ function commitMove(
   for (const p of placements) {
     newBoardCells[p.row][p.col].tile = p;
   }
-  const newBoard: Board = { cells: newBoardCells };
+  const newBoard: Board = { cells: newBoardCells, size: state.board.size };
   const next: WordCraftState = {
     ...state,
     board: newBoard,
@@ -224,7 +228,13 @@ export interface UseWordCraftGameOptions {
 export { reducer as wordCraftReducer, buildInitial as buildInitialState }
 
 export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15 }: UseWordCraftGameOptions) {
-  const initArg = useMemo(() => ({ seed, boardSize, locale }), [seed, boardSize, locale]);
+  // Capture viewport dims at initialization and lock them for the game lifetime
+  const initialDimsRef = useRef(
+    getBoardDims(typeof window === 'undefined' ? 1024 : window.innerWidth)
+  );
+  const initialDims = initialDimsRef.current;
+
+  const initArg = useMemo(() => ({ seed, boardSize, locale, viewportDims: initialDims }), [seed, boardSize, locale, initialDims]);
   const [state, dispatch] = useReducer(reducer, initArg, buildInitial);
 
   // Locale-aware dict lookup. Hebrew dict is loaded with sofit→regular
