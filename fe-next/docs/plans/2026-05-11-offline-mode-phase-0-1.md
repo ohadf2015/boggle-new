@@ -94,9 +94,10 @@
 
 #### 1.2 Dict loader
 - New: `fe-next/lib/offline/dict.ts`.
-- `ensureDictLoaded(locale)` — checks `kv['dict_loaded_{locale}']`, if missing: fetch blob from `/dicts/{locale}.dict.gz`, gunzip, bulk-insert into `dict_words` FTS5 with `(word, locale)` columns.
+- `ensureDictLoaded(locale)` — checks `kv['dict_loaded_{locale}']`, if missing: fetch blob from `/dicts/{locale}.dict.gz`, gunzip, bulk-insert into `dict_words(word TEXT, locale TEXT)` with index `(locale, word)`.
 - Idempotent. ~50ms on Android mid-range to insert 30k words via single transaction.
-- `validateOffline(word, locale): Promise<boolean>` — single FTS5 lookup.
+- `validateOffline(word, locale): Promise<boolean>` — single indexed equality lookup.
+- **FTS5 not used**: sql.js npm bundle lacks `SQLITE_ENABLE_FTS5` compile flag (verified Phase 0 cycle 3). For prefix lookups we use range queries `WHERE locale = ? AND word >= ? AND word < ?` which are O(log n) on the btree index — functionally equivalent for our access patterns. Native Capacitor SQLite ships FTS5, but we'd rather have web/native parity than locale-specific behavior.
 
 #### 1.3 Validator router
 - Edit `fe-next/lib/wordValidation/validate.ts` (or current entry).

@@ -1,5 +1,6 @@
 import { openDB, type IDBPDatabase } from 'idb';
 import { Preferences } from '@capacitor/preferences';
+import initSqlJs, { type Database, type SqlJsStatic } from 'sql.js';
 
 export interface OfflineKV {
   get(key: string): Promise<string | null>;
@@ -7,8 +8,13 @@ export interface OfflineKV {
   del(key: string): Promise<void>;
 }
 
+export interface OfflineSQL {
+  run(stmt: string, params?: unknown[]): Promise<{ rows: Record<string, unknown>[] }>;
+}
+
 export interface OfflineStore {
   kv: OfflineKV;
+  sql: OfflineSQL;
   close?(): Promise<void>;
 }
 
@@ -17,8 +23,43 @@ interface WebStoreOptions {
 }
 
 const KV_STORE = 'kv';
+const BLOB_STORE = 'blobs';
+const SQL_BLOB_KEY = 'sqlite-snapshot';
 const SCHEMA_VERSION = 1;
 const NATIVE_KEY_PREFIX = 'offline.';
+
+let sqlJsModule: SqlJsStatic | null = null;
+async function getSqlJs(): Promise<SqlJsStatic> {
+  if (sqlJsModule) return sqlJsModule;
+  const isNode = typeof process !== 'undefined' && !!process.versions?.node;
+  if (isNode) {
+    const { readFileSync } = await import('node:fs');
+    const { fileURLToPath } = await import('node:url');
+    const pathMod = await import('node:path');
+    const here = pathMod.dirname(fileURLToPath(import.meta.url));
+    const wasmPath = pathMod.resolve(here, '../../node_modules/sql.js/dist/sql-wasm.wasm');
+    const fileBuffer = readFileSync(wasmPath);
+    const wasmBinary = new Uint8Array(fileBuffer).buffer;
+    sqlJsModule = await initSqlJs({ wasmBinary });
+  } else {
+    sqlJsModule = await initSqlJs({ locateFile: (file: string) => `/sql/${file}` });
+  }
+  return sqlJsModule;
+}
+
+function runStatement(db: Database, stmt: string, params: unknown[]): Record<string, unknown>[] {
+  const prepared = db.prepare(stmt);
+  try {
+    prepared.bind(params as never[]);
+    const rows: Record<string, unknown>[] = [];
+    while (prepared.step()) {
+      rows.push(prepared.getAsObject() as Record<string, unknown>);
+    }
+    return rows;
+  } finally {
+    prepared.free();
+  }
+}
 
 export async function createWebStore({ dbName }: WebStoreOptions): Promise<OfflineStore> {
   const db: IDBPDatabase = await openDB(dbName, SCHEMA_VERSION, {
@@ -26,8 +67,27 @@ export async function createWebStore({ dbName }: WebStoreOptions): Promise<Offli
       if (!database.objectStoreNames.contains(KV_STORE)) {
         database.createObjectStore(KV_STORE);
       }
+      if (!database.objectStoreNames.contains(BLOB_STORE)) {
+        database.createObjectStore(BLOB_STORE);
+      }
     },
   });
+
+  let sqlDb: Database | null = null;
+  let pendingSnapshot: Promise<void> = Promise.resolve();
+  async function ensureSqlDb(): Promise<Database> {
+    if (sqlDb) return sqlDb;
+    const SqlJs = await getSqlJs();
+    const priorSnapshot = (await db.get(BLOB_STORE, SQL_BLOB_KEY)) as Uint8Array | undefined;
+    sqlDb = priorSnapshot ? new SqlJs.Database(priorSnapshot) : new SqlJs.Database();
+    return sqlDb;
+  }
+  const snapshot = () => {
+    if (!sqlDb) return Promise.resolve();
+    const bytes = sqlDb.export();
+    pendingSnapshot = pendingSnapshot.then(() => db.put(BLOB_STORE, bytes, SQL_BLOB_KEY).then(() => undefined));
+    return pendingSnapshot;
+  };
 
   return {
     kv: {
@@ -42,7 +102,18 @@ export async function createWebStore({ dbName }: WebStoreOptions): Promise<Offli
         await db.delete(KV_STORE, key);
       },
     },
+    sql: {
+      async run(stmt, params = []) {
+        const handle = await ensureSqlDb();
+        const rows = runStatement(handle, stmt, params);
+        const isMutation = /^\s*(INSERT|UPDATE|DELETE|CREATE|DROP|ALTER)\b/i.test(stmt);
+        if (isMutation) await snapshot();
+        return { rows };
+      },
+    },
     async close() {
+      await pendingSnapshot;
+      sqlDb?.close();
       db.close();
     },
   };
@@ -60,6 +131,11 @@ export async function createNativeStore(): Promise<OfflineStore> {
       },
       async del(key) {
         await Preferences.remove({ key: NATIVE_KEY_PREFIX + key });
+      },
+    },
+    sql: {
+      async run() {
+        throw new Error('NativeStore.sql not yet implemented — Phase 0 cycle 4');
       },
     },
   };
