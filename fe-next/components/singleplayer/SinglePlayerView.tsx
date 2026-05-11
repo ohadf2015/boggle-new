@@ -22,6 +22,10 @@ import { awardCreatorCoins } from '@/utils/creatorRewards';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNetworkState } from '@/hooks/useNetworkState';
+import { useOfflineModeFlag } from '@/hooks/useOfflineModeFlag';
+import { getOfflineStore } from '@/lib/offline';
+import { enqueueScore } from '@/lib/offline/scoreQueue';
 import { useAchievementQueue } from '@/components/achievements';
 import { useSinglePlayerConfig } from './useSinglePlayerConfig';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
@@ -102,6 +106,8 @@ const SinglePlayerView: React.FC = () => {
 
   const setIsInGame = useHideNavigation();
   const { user, isAuthenticated } = useAuth();
+  const { online } = useNetworkState();
+  const offlineFlag = useOfflineModeFlag();
   const { queueAchievement } = useAchievementQueue();
   const [resultsData, setResultsData] = useState<SinglePlayerResultsData | null>(null);
   const [sessionId] = useState(() => `sp_${crypto.randomUUID()}`);
@@ -212,40 +218,56 @@ const SinglePlayerView: React.FC = () => {
       return;
     }
 
-    // Sync stats + XP to Supabase for authenticated users
+    // Sync stats + XP to Supabase for authenticated users.
+    // Offline + flag on: enqueue for /api/scores/sync. Achievement/quest
+    // toasts won't fire offline; the sync.adjusted toast reconciles on
+    // reconnect. localStorage stats (recordGameResult above) already saved.
     if (isAuthenticated && user?.id) {
-      fetch('/api/stats/record-game', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          score: results.playerScore,
-          wordCount: (results.playerWords || []).length,
-          longestWord,
-          timePlayed: results.gameDuration,
-          achievementCount: results.achievements?.length || 0,
-          mode: gameState.mode,
-          maxCombo: results.maxCombo ?? 0,
-          longWordsFound: (results.playerWords || []).filter(w => w.length >= 6).length,
-        }),
-      })
-        .then(r => r.json())
-        .then(data => {
-          if (Array.isArray(data.lifetimeAchievements)) {
-            for (const achievement of data.lifetimeAchievements) {
-              if (achievement?.key) queueAchievement(achievement);
-            }
-          }
-          if (data.questUpdate?.completed) {
-            import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
-              showQuestCompletionToast({
-                questName: t(data.questUpdate.description),
-                xpReward: data.questUpdate.xpReward,
-                t,
-              });
-            });
-          }
+      const recordPayload = {
+        score: results.playerScore,
+        wordCount: (results.playerWords || []).length,
+        words: (results.playerWords || []).map((w: { word?: string } | string) =>
+          typeof w === 'string' ? w : (w.word ?? '')
+        ).filter((w: string) => w),
+        language: gameState.language,
+        longestWord,
+        timePlayed: results.gameDuration,
+        achievementCount: results.achievements?.length || 0,
+        mode: gameState.mode,
+        maxCombo: results.maxCombo ?? 0,
+        longWordsFound: (results.playerWords || []).filter(w => w.length >= 6).length,
+      };
+
+      if (offlineFlag && !online) {
+        void (async () => {
+          const store = await getOfflineStore();
+          await enqueueScore(store, 'sp', recordPayload);
+        })().catch(err => console.warn('[SP] offline enqueue failed', err));
+      } else {
+        fetch('/api/stats/record-game', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(recordPayload),
         })
-        .catch(() => { /* non-critical — localStorage is the fallback */ });
+          .then(r => r.json())
+          .then(data => {
+            if (Array.isArray(data.lifetimeAchievements)) {
+              for (const achievement of data.lifetimeAchievements) {
+                if (achievement?.key) queueAchievement(achievement);
+              }
+            }
+            if (data.questUpdate?.completed) {
+              import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
+                showQuestCompletionToast({
+                  questName: t(data.questUpdate.description),
+                  xpReward: data.questUpdate.xpReward,
+                  t,
+                });
+              });
+            }
+          })
+          .catch(() => { /* non-critical — localStorage is the fallback */ });
+      }
     }
 
     if (boardCode) {
@@ -259,8 +281,7 @@ const SinglePlayerView: React.FC = () => {
 
     setResultsData(results);
     setPhase('results');
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- t is stable from LanguageContext
-}, [gameState.mode, gameState.difficulty, gameState.timerSeconds, boardCode, setPhase, isAuthenticated, user?.id, queueAchievement, isPractice]);
+}, [gameState.mode, gameState.difficulty, gameState.timerSeconds, gameState.language, boardCode, setPhase, isAuthenticated, user?.id, queueAchievement, isPractice, online, offlineFlag, t]);
 
   return (
     <div

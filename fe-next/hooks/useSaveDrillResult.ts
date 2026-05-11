@@ -1,5 +1,9 @@
 import { useState, useCallback } from 'react';
 import type { DrillType, CognitiveDomain, BrainTier } from '@/shared/types/cognitive';
+import { useNetworkState } from '@/hooks/useNetworkState';
+import { useOfflineModeFlag } from '@/hooks/useOfflineModeFlag';
+import { getOfflineStore } from '@/lib/offline';
+import { enqueueScore } from '@/lib/offline/scoreQueue';
 
 interface DrillResult {
   drillType: DrillType;
@@ -30,6 +34,8 @@ interface SaveDrillResultResponse {
   previousLevel?: number;
   /** True when server detected a duplicate submissionId and returned the prior session without re-crediting */
   idempotent?: boolean;
+  /** True when the result was enqueued for offline sync rather than submitted live. Rewards arrive on reconnect via /api/scores/sync. */
+  queued?: boolean;
 }
 
 interface UseSaveDrillResultReturn {
@@ -39,6 +45,8 @@ interface UseSaveDrillResultReturn {
 
 export function useSaveDrillResult(): UseSaveDrillResultReturn {
   const [isSaving, setIsSaving] = useState(false);
+  const { online } = useNetworkState();
+  const offlineFlag = useOfflineModeFlag();
 
   const saveDrillResult = useCallback(async (result: DrillResult): Promise<SaveDrillResultResponse> => {
     setIsSaving(true);
@@ -52,6 +60,21 @@ export function useSaveDrillResult(): UseSaveDrillResultReturn {
         ...result,
         extraData: { ...(result.extraData ?? {}), submissionId },
       };
+
+      // Offline-mode branch: queue for sync, return optimistic success with no
+      // rewards. /api/scores/sync will dispatch through processBrainDrillCompletion
+      // on reconnect and the user sees rewards via the offline.sync.* toast.
+      if (offlineFlag && !online) {
+        const store = await getOfflineStore();
+        await enqueueScore(store, 'brain', body);
+        return {
+          success: true,
+          queued: true,
+          xpAwarded: 0,
+          levelPromoted: false,
+        };
+      }
+
       const response = await fetch('/api/drills/submit', {
         method: 'POST',
         headers: {
@@ -91,7 +114,7 @@ export function useSaveDrillResult(): UseSaveDrillResultReturn {
     } finally {
       setIsSaving(false);
     }
-  }, []);
+  }, [online, offlineFlag]);
 
   return { saveDrillResult, isSaving };
 }
