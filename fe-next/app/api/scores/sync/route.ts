@@ -1,15 +1,23 @@
 // POST /api/scores/sync — batch sync endpoint for offline score queue.
 //
-// Phase 1 status: shape-only stub. Accepts batched submissions, dedupes on
-// the client-issued submissionId UUID via the in-memory map below, and
-// echoes the claimed score back. Server-wins word re-validation against
-// the canonical dict + per-mode award dispatching is deferred to Phase 1
-// follow-up — see plan doc 2026-05-11-offline-mode-phase-0-1.md task 1.7.
+// Server-wins: client-claimed score is IGNORED. For each submission, we
+// re-validate every word against the canonical server dictionary and
+// recompute finalScore from the accepted words via the shared
+// calculateWordScoreByLength helper. Combos/multipliers are not
+// re-applied (server has no game-state context for a queued
+// submission), so finalScore is intentionally a conservative floor —
+// clients render the adjustment via the offline.sync.adjusted toast.
+//
+// Per-mode award dispatch (coins/streaks/badges via existing handlers)
+// is still TODO — current implementation accepts/rejects but does not
+// yet persist to per-mode score tables. Tracked as Phase 1 follow-up.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { captureApiError } from '@/utils/sentry';
+import { revalidateSubmission, type RevalidateResult } from '@/lib/offline/serverRevalidate';
+import { validateWordOnServer } from '@/lib/wordValidation/serverDicts';
 
 const SubmissionSchema = z.object({
   id: z.string().uuid(),
@@ -27,13 +35,7 @@ const RequestSchema = z.object({
   submissions: z.array(SubmissionSchema).min(1).max(50),
 });
 
-interface SyncResult {
-  id: string;
-  accepted: boolean;
-  finalScore: number;
-  rejectedWords: string[];
-  reason?: string;
-}
+type SyncResult = RevalidateResult;
 
 const dedupeCache = new Map<string, SyncResult>();
 const DEDUPE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -62,25 +64,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     purgeStaleDedupe();
 
-    const results: SyncResult[] = parsed.data.submissions.map((sub) => {
+    const results: SyncResult[] = [];
+    for (const sub of parsed.data.submissions) {
       const prior = dedupeCache.get(sub.id);
-      if (prior) return prior;
-
-      // TODO Phase 1 follow-up: server-wins re-validation.
-      // 1. Load canonical dict for sub.payload.language
-      // 2. Filter sub.payload.words → rejectedWords = words not in dict
-      // 3. Recompute finalScore from accepted words using server-side scoring rules
-      // 4. Persist via existing per-mode score-save handler
-      const result: SyncResult = {
-        id: sub.id,
-        accepted: true,
-        finalScore: sub.payload.score,
-        rejectedWords: [],
-      };
+      if (prior) {
+        results.push(prior);
+        continue;
+      }
+      const result = await revalidateSubmission(sub, validateWordOnServer);
       dedupeCache.set(sub.id, result);
       dedupeTimes.set(sub.id, Date.now());
-      return result;
-    });
+      results.push(result);
+    }
 
     return NextResponse.json({ results });
   } catch (err) {
