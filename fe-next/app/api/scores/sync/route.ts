@@ -8,14 +8,15 @@
 // submission), so finalScore is intentionally a conservative floor —
 // clients render the adjustment via the offline.sync.adjusted toast.
 //
-// Per-mode award dispatch (coins/streaks/badges via existing handlers)
-// is still TODO — current implementation accepts/rejects but does not
-// yet persist to per-mode score tables. Tracked as Phase 1 follow-up.
+// Phase 1b: per-mode award dispatch wired in for `adventure` and `brain`.
+// Each handler calls its own pure processCompletion(...) and writes to
+// public.offline_award_log for persistent double-credit protection.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { captureApiError } from '@/utils/sentry';
+import { getPostHogServer } from '@/lib/posthog';
 import { createClient } from '@/utils/supabase/server';
 import {
   revalidateSubmission,
@@ -23,34 +24,90 @@ import {
   type ServerSubmission,
 } from '@/lib/offline/serverRevalidate';
 import { validateWordOnServer } from '@/lib/wordValidation/serverDicts';
+import {
+  processAdventureCompletion,
+  type ProcessAdventureContext,
+} from '@/app/api/adventure/complete/processCompletion';
+import { validateRequestBody as validateAdventureBody } from '@/app/api/adventure/complete/validation';
+import {
+  processBrainDrillCompletion,
+  type ProcessDrillContext,
+  type DrillSubmitBody,
+} from '@/app/api/drills/submit/processCompletion';
 
-// Per-mode award dispatch map. Each handler is responsible for granting
-// coins/streak/badges/XP for an accepted submission. Returns the awards
-// object surfaced to the client in the sync response. See plan:
-// docs/plans/2026-05-11-offline-mode-phase-1b-award-dispatch.md
-type AwardHandler = (
-  sub: ServerSubmission,
-  userId: string,
-) => Promise<Record<string, number>>;
+type SupabaseLike = any;
+
+interface AwardHandlerArgs {
+  sub: ServerSubmission;
+  userId: string;
+  supabase: SupabaseLike;
+}
+
+type AwardHandler = (args: AwardHandlerArgs) => Promise<Record<string, unknown>>;
+
+// Modes where the sync revalidation loop (per-word dictionary check) is
+// the security gate. Other modes (adventure, brain) carry their own
+// validation in their processCompletion pipeline and short-circuit
+// revalidation here.
+const WORD_VALIDATED_MODES = new Set<ServerSubmission['mode']>([
+  'sp', 'wotd', 'daily-survival', 'daily-wordhunt',
+]);
+
+async function dispatchAdventure({ sub, userId, supabase }: AwardHandlerArgs): Promise<Record<string, unknown>> {
+  const validation = validateAdventureBody(sub.payload as Record<string, unknown>);
+  if (!validation.valid || !validation.data) {
+    throw new Error(`adventure payload invalid: ${validation.error}`);
+  }
+  const ctx: ProcessAdventureContext = { supabase, source: 'offline-sync' };
+  const result = await processAdventureCompletion(validation.data, userId, ctx);
+  if (!result.ok) {
+    throw new Error(`adventure handler ${result.status}: ${result.error}`);
+  }
+  return {
+    xpEarned: result.body.xpEarned,
+    goldEarned: result.body.goldEarned,
+    starsGained: result.body.starsGained,
+    isReplay: result.body.isReplay,
+    leveledUp: result.body.leveledUp,
+  };
+}
+
+async function dispatchBrain({ sub, userId, supabase }: AwardHandlerArgs): Promise<Record<string, unknown>> {
+  // Use the queue submission id as the idempotency key — it is already a
+  // UUID and gives processBrainDrillCompletion its 5-min same-submission
+  // guard for free.
+  const body = sub.payload as unknown as DrillSubmitBody;
+  const ctx: ProcessDrillContext = { supabase, source: 'offline-sync' };
+  const result = await processBrainDrillCompletion(body, userId, sub.id, ctx);
+  if (!result.ok) {
+    throw new Error(`brain handler ${result.status}: ${result.error}`);
+  }
+  return {
+    xpAwarded: result.body.xpAwarded,
+    brainScore: result.body.brainScore?.overallScore,
+    levelPromoted: result.body.levelPromoted,
+    idempotent: result.body.idempotent === true,
+  };
+}
 
 const awardHandlers: Partial<Record<ServerSubmission['mode'], AwardHandler>> = {
-  // sp:    pending (no live handler — only stats aggregate)
-  // wotd:  pending Phase 1b extract from dailyChallengeRouter
-  // daily-survival:  pending
-  // daily-wordhunt:  pending
-  // brain: pending extract from /api/drills/submit
-  // adventure: pending extract from /api/adventure/complete
+  adventure: dispatchAdventure,
+  brain: dispatchBrain,
+  // sp / wotd / daily-survival / daily-wordhunt: pending Phase 1c (no
+  // canonical server completion path exists yet for those modes).
 };
 
 const SubmissionSchema = z.object({
   id: z.string().uuid(),
   mode: z.enum(['sp', 'wotd', 'daily-survival', 'daily-wordhunt', 'brain', 'adventure']),
+  // Base payload is intentionally loose. Each mode interprets `words`
+  // differently — word-validated modes need `string[]` (revalidate.ts),
+  // adventure stores `number` (count). Per-mode handlers narrow + validate.
   payload: z.object({
     score: z.number().int().nonnegative(),
-    words: z.array(z.string()).optional(),
     language: z.string().optional(),
     puzzleDate: z.string().optional(),
-  }),
+  }).passthrough(),
   clientCompletedAt: z.number().int().positive(),
 });
 
@@ -59,7 +116,7 @@ const RequestSchema = z.object({
 });
 
 interface SyncResult extends RevalidateResult {
-  awards?: Record<string, number> | null;
+  awards?: Record<string, unknown> | null;
   awardError?: string;
 }
 
@@ -74,6 +131,43 @@ function purgeStaleDedupe(): void {
       dedupeCache.delete(id);
       dedupeTimes.delete(id);
     }
+  }
+}
+
+/**
+ * Persistent idempotency check. Survives server restart and out-of-process
+ * deploys (unlike the in-memory dedupeCache). Returns the previously
+ * awarded payload if found, null otherwise.
+ */
+async function readPriorAwardLog(
+  supabase: SupabaseLike,
+  submissionId: string,
+): Promise<Record<string, unknown> | null> {
+  const { data } = await supabase
+    .from('offline_award_log')
+    .select('awards')
+    .eq('submission_id', submissionId)
+    .maybeSingle();
+  return (data?.awards as Record<string, unknown> | undefined) ?? null;
+}
+
+async function writeAwardLog(
+  supabase: SupabaseLike,
+  submissionId: string,
+  userId: string,
+  mode: string,
+  awards: Record<string, unknown>,
+): Promise<void> {
+  const { error } = await supabase.from('offline_award_log').insert({
+    submission_id: submissionId,
+    user_id: userId,
+    mode,
+    awards,
+  });
+  // 23505 = unique-violation on submission_id — means a concurrent sync
+  // wrote the row first. Safe to swallow; awards already persisted.
+  if (error && error.code !== '23505') {
+    throw new Error(`offline_award_log insert failed: ${error.message}`);
   }
 }
 
@@ -105,20 +199,53 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         results.push(prior);
         continue;
       }
-      const revalidated = await revalidateSubmission(sub, validateWordOnServer);
+
+      // Word-based modes still run through revalidation. Adventure/brain
+      // skip it; their handlers carry the security gate.
+      let revalidated: RevalidateResult;
+      if (WORD_VALIDATED_MODES.has(sub.mode)) {
+        revalidated = await revalidateSubmission(sub as ServerSubmission, validateWordOnServer);
+      } else {
+        revalidated = {
+          id: sub.id,
+          accepted: true,
+          finalScore: sub.payload.score,
+          rejectedWords: [],
+        };
+      }
+
       const result: SyncResult = { ...revalidated };
 
       if (revalidated.accepted) {
         const handler = awardHandlers[sub.mode];
         if (handler) {
           try {
-            result.awards = await handler(sub, user.id);
+            // Persistent idempotency: if this submission already awarded
+            // (e.g. cache evicted and replayed), return cached awards
+            // without re-crediting.
+            const prior = await readPriorAwardLog(supabase, sub.id);
+            if (prior) {
+              result.awards = prior;
+            } else {
+              const awarded = await handler({
+                sub: sub as ServerSubmission,
+                userId: user.id,
+                supabase,
+              });
+              await writeAwardLog(supabase, sub.id, user.id, sub.mode, awarded);
+              result.awards = awarded;
+              getPostHogServer()?.capture({
+                distinctId: user.id,
+                event: 'offline_sync_award_granted',
+                properties: { mode: sub.mode, submissionId: sub.id, ...awarded },
+              });
+            }
           } catch (err) {
             result.awardError = err instanceof Error ? err.message : 'unknown_award_error';
             captureApiError(
               err instanceof Error ? err : new Error(String(err)),
               'scores-sync.award',
-              { userId: user.id, body: { mode: sub.mode } },
+              { userId: user.id, body: { mode: sub.mode, submissionId: sub.id } },
             );
           }
         } else {
