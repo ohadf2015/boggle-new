@@ -1,5 +1,6 @@
 import { openDB, type IDBPDatabase } from 'idb';
 import { Preferences } from '@capacitor/preferences';
+import { CapacitorSQLite, SQLiteConnection } from '@capacitor-community/sqlite';
 import initSqlJs, { type Database, type SqlJsStatic } from 'sql.js';
 
 export interface OfflineKV {
@@ -119,7 +120,34 @@ export async function createWebStore({ dbName }: WebStoreOptions): Promise<Offli
   };
 }
 
+const NATIVE_DB_NAME = 'lexiclash-offline';
+const NATIVE_DB_VERSION = 1;
+
+interface NativeDbHandle {
+  open(): Promise<void>;
+  close(): Promise<void>;
+  run(statement: string, values?: unknown[], transaction?: boolean): Promise<{ changes?: { changes?: number } }>;
+  query(statement: string, values?: unknown[]): Promise<{ values?: Record<string, unknown>[] }>;
+}
+
 export async function createNativeStore(): Promise<OfflineStore> {
+  const sqlite = new SQLiteConnection(CapacitorSQLite);
+  let dbHandle: NativeDbHandle | null = null;
+
+  async function ensureDb(): Promise<NativeDbHandle> {
+    if (dbHandle) return dbHandle;
+    const handle = (await sqlite.createConnection(
+      NATIVE_DB_NAME,
+      false,
+      'no-encryption',
+      NATIVE_DB_VERSION,
+      false,
+    )) as unknown as NativeDbHandle;
+    await handle.open();
+    dbHandle = handle;
+    return handle;
+  }
+
   return {
     kv: {
       async get(key) {
@@ -134,9 +162,22 @@ export async function createNativeStore(): Promise<OfflineStore> {
       },
     },
     sql: {
-      async run() {
-        throw new Error('NativeStore.sql not yet implemented — Phase 0 cycle 4');
+      async run(stmt, params = []) {
+        const handle = await ensureDb();
+        const isSelect = /^\s*SELECT\b/i.test(stmt);
+        if (isSelect) {
+          const result = await handle.query(stmt, params);
+          return { rows: result.values ?? [] };
+        }
+        await handle.run(stmt, params);
+        return { rows: [] };
       },
+    },
+    async close() {
+      if (dbHandle) {
+        await dbHandle.close();
+        dbHandle = null;
+      }
     },
   };
 }
