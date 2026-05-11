@@ -52,6 +52,7 @@ function placementsFromCandidate(
 }
 
 function candidateFitsInBounds(
+  board: Board,
   startRow: number,
   startCol: number,
   length: number,
@@ -59,7 +60,7 @@ function candidateFitsInBounds(
 ): boolean {
   const endRow = direction === 'across' ? startRow : startRow + length - 1;
   const endCol = direction === 'across' ? startCol + length - 1 : startCol;
-  return isInBounds(startRow, startCol) && isInBounds(endRow, endCol);
+  return isInBounds(startRow, startCol, board) && isInBounds(endRow, endCol, board);
 }
 
 function candidateOverlapsExistingTile(
@@ -103,7 +104,7 @@ export function findBestBotMove(
     for (const direction of ['across', 'down'] as Direction[]) {
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
-          if (!candidateFitsInBounds(r, c, tiles.length, direction)) continue;
+          if (!candidateFitsInBounds(board, r, c, tiles.length, direction)) continue;
           if (candidateOverlapsExistingTile(board, r, c, tiles.length, direction)) continue;
           if (empty) {
             const coversCenter =
