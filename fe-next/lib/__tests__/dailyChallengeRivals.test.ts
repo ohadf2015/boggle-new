@@ -206,4 +206,120 @@ describe('findDailyChallengeRivals', () => {
     expect(result.get('user-1')).toBeNull();
     leaderboardResult.error = null;
   });
+
+  describe('extended context (mode/score/rank/additionalCount)', () => {
+    it('exposes rival.rivalScore from leaderboard total_score', async () => {
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 1000, rank_position: 50 },
+        { player_id: 'r1', username: 'R1', avatar_image: 'https://x/r.png', total_score: 1080, rank_position: 40 },
+      ];
+      wordHuntAttemptsResult.data = [{ player_id: 'r1', solved: true }];
+
+      const r = await findDailyChallengeRivals(['u1']);
+      expect(r.get('u1')!.rivalScore).toBe(1080);
+    });
+
+    it('exposes rankDelta = my.rank - rival.rank (positive when rival ahead)', async () => {
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 1000, rank_position: 50 },
+        { player_id: 'r1', username: 'R1', avatar_image: 'https://x/r.png', total_score: 1080, rank_position: 40 },
+      ];
+      wordHuntAttemptsResult.data = [{ player_id: 'r1', solved: true }];
+
+      const r = await findDailyChallengeRivals(['u1']);
+      expect(r.get('u1')!.rankDelta).toBe(10);
+    });
+
+    it("rankDelta is negative when rival is below me in rank", async () => {
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 1000, rank_position: 50 },
+        { player_id: 'r1', username: 'R1', avatar_image: 'https://x/r.png', total_score: 950, rank_position: 60 },
+      ];
+      wordHuntAttemptsResult.data = [{ player_id: 'r1', solved: true }];
+
+      const r = await findDailyChallengeRivals(['u1']);
+      expect(r.get('u1')!.rankDelta).toBe(-10);
+    });
+
+    it('mode = "wordHunt" when rival only cleared word-hunt', async () => {
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 1000, rank_position: 50 },
+        { player_id: 'r1', username: 'R1', avatar_image: 'https://x/r.png', total_score: 1080, rank_position: 40 },
+      ];
+      wordHuntAttemptsResult.data = [{ player_id: 'r1', solved: true }];
+      puzzleAttemptsResult.data = [];
+
+      const r = await findDailyChallengeRivals(['u1']);
+      expect(r.get('u1')!.mode).toBe('wordHunt');
+    });
+
+    it('mode = "puzzle" when rival only cleared puzzle', async () => {
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 1000, rank_position: 50 },
+        { player_id: 'r1', username: 'R1', avatar_image: 'https://x/r.png', total_score: 1080, rank_position: 40 },
+      ];
+      puzzleAttemptsResult.data = [{ player_id: 'r1', score: 500 }];
+      wordHuntAttemptsResult.data = [];
+
+      const r = await findDailyChallengeRivals(['u1']);
+      expect(r.get('u1')!.mode).toBe('puzzle');
+    });
+
+    it('mode = "both" when rival cleared puzzle AND word-hunt', async () => {
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 1000, rank_position: 50 },
+        { player_id: 'r1', username: 'R1', avatar_image: 'https://x/r.png', total_score: 1080, rank_position: 40 },
+      ];
+      puzzleAttemptsResult.data = [{ player_id: 'r1', score: 500 }];
+      wordHuntAttemptsResult.data = [{ player_id: 'r1', solved: true }];
+
+      const r = await findDailyChallengeRivals(['u1']);
+      expect(r.get('u1')!.mode).toBe('both');
+    });
+
+    it('additionalCount counts other in-cap rivals beyond the primary', async () => {
+      // 3 rivals all within score cap, pick closest + 2 others.
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 1000, rank_position: 50 },
+        { player_id: 'r1', username: 'R1', avatar_image: 'https://x/r.png', total_score: 1050, rank_position: 45 },
+        { player_id: 'r2', username: 'R2', avatar_image: 'https://x/r2.png', total_score: 1100, rank_position: 40 },
+        { player_id: 'r3', username: 'R3', avatar_image: 'https://x/r3.png', total_score: 1200, rank_position: 35 },
+      ];
+      wordHuntAttemptsResult.data = [
+        { player_id: 'r1', solved: true },
+        { player_id: 'r2', solved: true },
+        { player_id: 'r3', solved: true },
+      ];
+
+      const c = (await findDailyChallengeRivals(['u1'])).get('u1')!;
+      expect(c.username).toBe('R1');
+      expect(c.additionalCount).toBe(2);
+    });
+
+    it('additionalCount is 0 when only the primary rival exists', async () => {
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 1000, rank_position: 50 },
+        { player_id: 'r1', username: 'R1', avatar_image: 'https://x/r.png', total_score: 1050, rank_position: 45 },
+      ];
+      wordHuntAttemptsResult.data = [{ player_id: 'r1', solved: true }];
+
+      const c = (await findDailyChallengeRivals(['u1'])).get('u1')!;
+      expect(c.additionalCount).toBe(0);
+    });
+
+    it('additionalCount ignores out-of-cap rivals (far veterans not counted)', async () => {
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 200, rank_position: 9000 },
+        { player_id: 'near', username: 'Near', avatar_image: 'https://x/n.png', total_score: 400, rank_position: 8000 },
+        { player_id: 'vet', username: 'Vet', avatar_image: 'https://x/v.png', total_score: 50000, rank_position: 10 },
+      ];
+      wordHuntAttemptsResult.data = [
+        { player_id: 'near', solved: true },
+        { player_id: 'vet', solved: true },
+      ];
+      const c = (await findDailyChallengeRivals(['u1'])).get('u1')!;
+      expect(c.username).toBe('Near');
+      expect(c.additionalCount).toBe(0);
+    });
+  });
 });
