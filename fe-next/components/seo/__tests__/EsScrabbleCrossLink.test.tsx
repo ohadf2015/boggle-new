@@ -39,4 +39,26 @@ describe('EsScrabbleCrossLink', () => {
     const d = render(<EsScrabbleCrossLink locale="es" anchorVariant="daily" />).container.querySelector('a')!.textContent;
     expect(new Set([w, a, d]).size).toBe(3);
   });
+
+  it('renders leaderboard variant with ranking-themed anchor', () => {
+    const { container } = render(<EsScrabbleCrossLink locale="es" anchorVariant="leaderboard" />);
+    const link = container.querySelector('a')!;
+    expect(link.getAttribute('href')).toBe('/es/juego-de-palabras-multijugador');
+    expect(link.textContent).toMatch(/Scrabble|ranking|clasificación/i);
+  });
+
+  it('renders blog variant with contextual anchor for Netflix-style cross-link', () => {
+    const { container } = render(<EsScrabbleCrossLink locale="es" anchorVariant="blog" />);
+    const link = container.querySelector('a')!;
+    expect(link.getAttribute('href')).toBe('/es/juego-de-palabras-multijugador');
+    expect(link.textContent).toMatch(/Scrabble|alternativa/i);
+  });
+
+  it('all five variants produce five distinct anchor texts', () => {
+    const variants = ['words', 'anagram', 'daily', 'leaderboard', 'blog'] as const;
+    const texts = variants.map(v =>
+      render(<EsScrabbleCrossLink locale="es" anchorVariant={v} />).container.querySelector('a')!.textContent
+    );
+    expect(new Set(texts).size).toBe(5);
+  });
 });

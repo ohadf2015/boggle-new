@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
+import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import NetflixWordGameRisePageClient from './PageClient';
 import { contentByLocale } from './content';
 
@@ -78,6 +79,7 @@ export default async function NetflixWordGameRisePage({ params }: PageProps) {
         articleSection="Trends"
       />
       <NetflixWordGameRisePageClient />
+      <EsScrabbleCrossLink locale={locale} anchorVariant="blog" />
     </>
   );
 }

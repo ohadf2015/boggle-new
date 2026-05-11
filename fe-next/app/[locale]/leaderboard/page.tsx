@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { buildLeaderboardFaqJsonLd, encodeJsonLd } from '@/lib/seo/leaderboardJsonLd';
+import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
+import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
+import { HeScrabbleCrossLink } from '@/components/seo/HeScrabbleCrossLink';
 import LeaderboardPageClient from './PageClient';
 
 export const revalidate = 300;
@@ -149,6 +152,9 @@ export default async function LeaderboardPage({ params }: { params: Promise<{ lo
         features={content.features}
         faq={content.faq}
       />
+      <EsScrabbleCrossLink locale={locale} anchorVariant="leaderboard" />
+      <SvScrabbleCrossLink locale={locale} anchorVariant="leaderboard" />
+      <HeScrabbleCrossLink locale={locale} anchorVariant="leaderboard" />
       {faqJsonLd && (
         <script type="application/ld+json">{encodeJsonLd(faqJsonLd)}</script>
       )}

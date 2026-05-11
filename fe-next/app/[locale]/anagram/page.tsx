@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
+import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
+import { HeScrabbleCrossLink } from '@/components/seo/HeScrabbleCrossLink';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
 const anagramSeoContent: Record<string, {
@@ -274,6 +276,8 @@ export default async function AnagramHubPage({ params }: PageParams) {
         </section>
 
         <EsScrabbleCrossLink locale={locale} anchorVariant="anagram" />
+        <SvScrabbleCrossLink locale={locale} anchorVariant="anagram" />
+        <HeScrabbleCrossLink locale={locale} anchorVariant="anagram" />
 
         <section className="mb-10">
           <h2 className="text-xl font-neo-display font-bold text-neo-cyan uppercase tracking-wider mb-4">
