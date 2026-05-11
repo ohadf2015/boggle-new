@@ -25,8 +25,10 @@ import { WordCraftPendingStrip } from '@/components/word-craft/WordCraftPendingS
 import { WordCraftZoomShell } from '@/components/word-craft/WordCraftZoomShell';
 import { WordCraftLiveRegion } from '@/components/word-craft/WordCraftLiveRegion';
 import { WordCraftBoardSection } from '@/components/word-craft/WordCraftBoardSection';
+import { WordCraftGameOverScene } from '@/components/word-craft/WordCraftGameOverScene';
 import { useWordCraftJuice } from '@/components/word-craft/useWordCraftJuice';
 import { useWordCraftDrag } from '@/components/word-craft/useWordCraftDrag';
+import { useWordCraftKeyboardShortcuts } from '@/components/word-craft/hooks/useWordCraftKeyboardShortcuts';
 import type { SceneCtx } from '@/lib/word-craft/pixi/sceneCtx';
 import { mountAmbientSparkles, type PremiumCellRef } from '@/lib/word-craft/pixi/ambientSparkles';
 import { playTilePlaceRipple } from '@/lib/word-craft/pixi/scenes/tilePlaceRipple';
@@ -162,6 +164,26 @@ export default function WordCraftPageClient() {
   });
 
   const axis = useMemo(() => inferAxis(game.state.pendingPlacements), [game.state.pendingPlacements]);
+
+  // Keyboard shortcuts and arrow-key reticle
+  const { reticle } = useWordCraftKeyboardShortcuts({
+    turn: game.state.turn,
+    pendingPlacements: game.state.pendingPlacements,
+    burnout: game.state.burnout,
+    playerRack: game.state.player.rack,
+    dict,
+    axis,
+    boardSize: game.state.board.size,
+    onRecallAll: recallAllPending,
+    onSubmit: submitMoveWithTelemetry,
+    onRecallOne: recallFromBoard,
+    onFastTap: handleFastTap,
+    onSelectTile: game.selectRackTile,
+    onPlaceOnBoard: (r, c) => {
+      inputCountsRef.current.tap += 1;
+      game.placeOnBoard(r, c);
+    },
+  });
 
   // Fire axis_locked exactly once when pending tiles transition from 1→2
   // and form a valid line. Resets when pending shrinks back to <2.
@@ -471,145 +493,6 @@ export default function WordCraftPageClient() {
     juice.invalidShake(cellEls);
   }, [game.state.lastError, game.state.pendingPlacements, juice]);
 
-  // --- Desktop keyboard shortcuts ---
-  // Esc       → recall all pending tiles
-  // Enter     → submit move (if eligible)
-  // Backspace → recall last pending tile
-  // Letters   → if a rack tile matches the typed glyph and axis is locked,
-  //             trigger fast-tap; otherwise select the matching tile.
-  // We deliberately skip Arrow keys + Space placement (deferred per spec
-  // §11) to keep the surface small. These four cover 90% of desktop play.
-  useEffect(() => {
-    if (game.state.turn !== 'player') return;
-    const onKey = (ev: KeyboardEvent) => {
-      // Don't fight the user when they're typing into an input/textarea
-      // (search bar, achievements, dev console UIs).
-      const target = ev.target as HTMLElement | null;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
-        return;
-      }
-      if (ev.key === 'Escape') {
-        if (game.state.pendingPlacements.length > 0) {
-          ev.preventDefault();
-          recallAllPending();
-        }
-        return;
-      }
-      if (ev.key === 'Enter') {
-        if (game.state.pendingPlacements.length > 0 && dict && !game.state.burnout) {
-          ev.preventDefault();
-          submitMoveWithTelemetry();
-        }
-        return;
-      }
-      if (ev.key === 'Backspace') {
-        if (game.state.pendingPlacements.length > 0) {
-          ev.preventDefault();
-          const last = game.state.pendingPlacements[game.state.pendingPlacements.length - 1];
-          recallFromBoard(last.rackTileId);
-        }
-        return;
-      }
-      // Letter shortcut — single character key, ignore modifiers + spacebar
-      if (ev.key.length === 1 && !ev.ctrlKey && !ev.metaKey && !ev.altKey && ev.key !== ' ') {
-        const upper = ev.key.toUpperCase();
-        const candidate = game.state.player.rack.find(
-          (t) => !pendingIdsSetRef.current.has(t.id) && t.letter.toUpperCase() === upper,
-        );
-        if (!candidate) return;
-        ev.preventDefault();
-        if (axis !== null) {
-          handleFastTap({ id: candidate.id });
-        } else {
-          game.selectRackTile(candidate.id);
-        }
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-    // recallAllPending / submitMoveWithTelemetry / handleFastTap already
-    // close over `game` via useCallback, so changes to game state surface
-    // through their identity changes.
-  }, [
-    game.state.turn,
-    game.state.pendingPlacements,
-    game.state.burnout,
-    game.state.player.rack,
-    dict,
-    axis,
-    handleFastTap,
-    recallAllPending,
-    recallFromBoard,
-    submitMoveWithTelemetry,
-    game,
-  ]);
-
-  // Mirror pendingIds into a ref so the keyboard handler — which closes over
-  // a snapshot of state — can see the current pending set without re-binding
-  // on every keystroke.
-  const pendingIdsSetRef = useRef<Set<string>>(new Set());
-  useEffect(() => {
-    pendingIdsSetRef.current = new Set(game.state.pendingPlacements.map((p) => p.rackTileId));
-  }, [game.state.pendingPlacements]);
-
-  // --- Arrow-key reticle ---
-  // Activated by first arrow press (or Tab into the board). The reticle is a
-  // golden focus ring on a board cell; Space drops the currently selected
-  // rack tile there. We wrap-around at edges (friendlier than clamp on a
-  // 13/15 grid) and only preventDefault on arrow keys when the reticle is
-  // engaged so we don't hijack page scroll on routes the player isn't on.
-  const [reticle, setReticle] = useState<{ row: number; col: number } | null>(null);
-  useEffect(() => {
-    if (game.state.turn !== 'player') return;
-    const onKey = (ev: KeyboardEvent) => {
-      const target = ev.target as HTMLElement | null;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
-        return;
-      }
-      const isArrow = ev.key === 'ArrowUp' || ev.key === 'ArrowDown' || ev.key === 'ArrowLeft' || ev.key === 'ArrowRight';
-      if (!isArrow && ev.key !== ' ') return;
-
-      const size = game.state.board.cells.length;
-      const wrap = (n: number) => (n + size) % size;
-
-      if (isArrow) {
-        ev.preventDefault();
-        setReticle((prev) => {
-          // First arrow tap with no reticle → land on center.
-          if (!prev) {
-            const center = Math.floor(size / 2);
-            return { row: center, col: center };
-          }
-          if (ev.key === 'ArrowUp') return { row: wrap(prev.row - 1), col: prev.col };
-          if (ev.key === 'ArrowDown') return { row: wrap(prev.row + 1), col: prev.col };
-          if (ev.key === 'ArrowLeft') return { row: prev.row, col: wrap(prev.col - 1) };
-          if (ev.key === 'ArrowRight') return { row: prev.row, col: wrap(prev.col + 1) };
-          return prev;
-        });
-        return;
-      }
-
-      // Space → drop selected tile at reticle, or fast-tap if axis locked.
-      if (ev.key === ' ' && reticle) {
-        ev.preventDefault();
-        const sel = game.state.selectedRackTileId
-          ? game.state.player.rack.find((t) => t.id === game.state.selectedRackTileId)
-          : null;
-        if (sel) {
-          inputCountsRef.current.tap += 1;
-          game.placeOnBoard(reticle.row, reticle.col);
-        }
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [game.state.turn, game.state.board.cells.length, game, reticle]);
-
-  // Drop the reticle when the turn ends so the gold ring doesn't linger
-  // through the bot's turn.
-  useEffect(() => {
-    if (game.state.turn !== 'player') setReticle(null);
-  }, [game.state.turn]);
 
   if (authLoading || !isBetaUser) {
     return (
@@ -630,13 +513,6 @@ export default function WordCraftPageClient() {
     !game.state.burnout &&
     !game.state.selectedRackTileId &&
     game.state.pendingPlacements.length === 0;
-
-  const winner =
-    game.state.player.score > game.state.bot.score
-      ? t('wordcraft.you')
-      : game.state.bot.score > game.state.player.score
-        ? t('wordcraft.bot')
-        : t('wordcraft.tied');
 
   const errorMessage = (() => {
     const e = game.state.lastError;
@@ -869,12 +745,11 @@ export default function WordCraftPageClient() {
 
       {/* Game-over banner: also floating, doesn't push layout */}
       {game.state.turn === 'over' ? (
-        <div
-          role="status"
-          className="absolute left-1/2 -translate-x-1/2 bottom-[140px] z-40 px-4 py-3 bg-neo-yellow border-neo-thick border-black text-neo-navy rounded-neo shadow-hard-lg font-neo-display font-black uppercase tracking-wider"
-        >
-          {t('wordcraft.winnerLabel', { name: winner })}
-        </div>
+        <WordCraftGameOverScene
+          t={t}
+          playerScore={game.state.player.score}
+          botScore={game.state.bot.score}
+        />
       ) : null}
     </div>
   );
