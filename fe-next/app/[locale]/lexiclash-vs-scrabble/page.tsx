@@ -202,7 +202,11 @@ export default async function LexiClashVsScrabblePage({ params }: PageProps) {
 
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More Comparisons</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <Link href={`/${locale}/scrabble-alternative-online`} className="rounded-neo border-3 border-neo-lime/60 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime">
+              <h3 className="font-bold text-neo-lime">Scrabble Alternative Online</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">Real-time, browser-based, 2-20 players</p>
+            </Link>
             <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">LexiClash vs Wordle</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Unlimited play vs 1 puzzle/day</p>

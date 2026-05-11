@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { extractFaqFromSections } from '@/utils/seo/parseFaqProse';
+import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
+import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
+import { HeScrabbleCrossLink } from '@/components/seo/HeScrabbleCrossLink';
 import BoggleVsScrabblePageClient from './PageClient';
 import { contentByLocale } from './content';
 
@@ -64,6 +68,21 @@ export default async function BoggleVsScrabblePage({ params }: PageProps) {
         articleSection="Comparison"
       />
       <BoggleVsScrabblePageClient />
+      {locale === 'en' && (
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <aside className="my-8 rounded-neo border-3 border-neo-lime/60 bg-neo-navy-light p-5 shadow-hard">
+            <Link href="/en/scrabble-alternative-online" className="block group">
+              <h3 className="font-neo-display text-lg font-black text-neo-lime underline decoration-2 underline-offset-4 group-hover:text-neo-white transition-colors">
+                Looking for a free real-time Scrabble alternative online?
+              </h3>
+              <p className="mt-2 text-sm text-slate-300">LexiClash is the browser-based, real-time Scrabble alternative: 2-20 players, no download, no signup. See the full comparison →</p>
+            </Link>
+          </aside>
+        </div>
+      )}
+      <EsScrabbleCrossLink locale={locale} anchorVariant="blog" />
+      <SvScrabbleCrossLink locale={locale} anchorVariant="anagram" />
+      <HeScrabbleCrossLink locale={locale} anchorVariant="anagram" />
     </>
   );
 }

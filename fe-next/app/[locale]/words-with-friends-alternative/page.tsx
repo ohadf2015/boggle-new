@@ -494,6 +494,7 @@ export default async function WordsWithFriendsAlternativePage({ params }: PagePr
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { href: 'best-online-word-games', tag: 'GUIDE', title: 'Best Word Games 2026', desc: '9 games ranked, honest pros & cons', accent: 'border-neo-yellow text-neo-yellow' },
+              { href: 'scrabble-alternative-online', tag: 'ALT', title: 'Scrabble Alternative Online', desc: 'Real-time, browser, 2-20 players', accent: 'border-neo-lime text-neo-lime' },
               { href: 'lexiclash-vs-wordle', tag: 'VS', title: 'LexiClash vs Wordle', desc: 'Unlimited play vs 1 puzzle/day', accent: 'border-neo-cyan text-neo-cyan' },
               { href: 'lexiclash-vs-scrabble', tag: 'VS', title: 'LexiClash vs Scrabble', desc: 'Real-time vs turn-based', accent: 'border-neo-pink text-neo-pink' },
               { href: 'play-boggle-online-free', tag: 'PLAY', title: 'Free Boggle Online', desc: 'No download, instant play', accent: 'border-neo-lime text-neo-lime' },
