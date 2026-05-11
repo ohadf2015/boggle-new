@@ -15,6 +15,8 @@ import { usePresence } from '../hooks/usePresence';
 import { useHints } from '../hooks/useHints';
 import { useGameTimer } from '../hooks/useGameTimer';
 import { useTimerZeroWatchdog } from '../hooks/useTimerZeroWatchdog';
+import { useTimerStallWatchdog } from '../hooks/useTimerStallWatchdog';
+import { addGameBreadcrumb } from '../utils/sentry';
 import logger from '@/utils/logger';
 import type { TournamentStanding } from '@/types';
 import type {
@@ -162,6 +164,27 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       logger.log('[PLAYER] Timer-zero watchdog: bootstrapping waiting state + requesting results');
       setWaitingForResults(true);
       socket?.emit('requestResults');
+    },
+  });
+
+  // Stall watchdog: catches the "timer frozen mid-game" case where the
+  // displayed value sticks (e.g. 2:00) while the server keeps ticking.
+  // Root causes are varied (gameSessionId drift, buffered transport, server
+  // clock never started) but the recovery is the same: ask the server to
+  // re-emit `startGame` with the fresh `remainingTime` via `requestGameState`.
+  useTimerStallWatchdog({
+    remainingTime,
+    gameActive,
+    waitingForResults,
+    onStall: () => {
+      logger.log('[PLAYER] Timer-stall watchdog: remainingTime frozen — requesting fresh game state');
+      addGameBreadcrumb('mp_timer_stall', {
+        role: 'player',
+        gameCode,
+        remainingTime,
+        gameMode,
+      });
+      socket?.emit('requestGameState');
     },
   });
 

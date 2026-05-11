@@ -49,6 +49,8 @@ import { useNavigationGuard } from '../hooks/useNavigationGuard';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useGameStartTelemetry } from '@/hooks/useGameStartTelemetry';
 import { useTimerZeroWatchdog } from '../hooks/useTimerZeroWatchdog';
+import { useTimerStallWatchdog } from '../hooks/useTimerStallWatchdog';
+import { addGameBreadcrumb } from '../utils/sentry';
 
 // ==========================================
 // Props
@@ -93,6 +95,8 @@ interface HostViewProps {
   autoStart?: boolean;
   /** Private rooms (Quick Play / classroom) hide invite + share affordances. */
   isPrivate?: boolean;
+  /** Quick Play: auto-fill bots + start the moment the lobby mounts. */
+  isQuickPlay?: boolean;
 }
 
 // ==========================================
@@ -111,6 +115,7 @@ const HostView: React.FC<HostViewProps> = memo(({
   onUsernameChange,
   autoStart = false,
   isPrivate = false,
+  isQuickPlay = false,
 }) => {
   const { t, language } = useLanguage();
   const { socket } = useSocket();
@@ -256,6 +261,25 @@ const HostView: React.FC<HostViewProps> = memo(({
       logger.log('[HOST] Timer-zero watchdog: forcing waiting state + requesting results');
       state.setWaitingForResults(true);
       socket?.emit('requestResults');
+    },
+  });
+
+  // Stall watchdog — see PlayerView for rationale. Host display can desync the
+  // same way (server clock unstarted, gameSessionId drift); recovery emits
+  // `requestGameState` to force a fresh `startGame` with current remainingTime.
+  useTimerStallWatchdog({
+    remainingTime: state.runtime.remainingTime,
+    gameActive: state.runtime.gameStarted || (!!state.runtime.tableData && !!state.runtime.remainingTime && state.runtime.remainingTime > 0),
+    waitingForResults: state.runtime.waitingForResults,
+    onStall: () => {
+      if (state.tournament.finalScores) return;
+      logger.log('[HOST] Timer-stall watchdog: remainingTime frozen — requesting fresh game state');
+      addGameBreadcrumb('mp_timer_stall', {
+        role: 'host',
+        gameCode,
+        remainingTime: state.runtime.remainingTime,
+      });
+      socket?.emit('requestGameState');
     },
   });
 
@@ -640,6 +664,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           onNameChange={handleHostNameChange}
           onAvatarChange={handleHostAvatarChange}
           isPrivate={isPrivate}
+          isQuickPlay={isQuickPlay}
         />
       )}
 

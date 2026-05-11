@@ -103,7 +103,9 @@ export const GuestTokenHashSchema = z.string()
 export const UsernameSchema = z.string()
   .min(1, 'Username is required')
   .max(30, 'Username must be at most 30 characters')
-  .regex(/^[a-zA-Z0-9._\-\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\s]+$/)
+  // Latin: a-zA-Z + Latin-1 Supplement/Extended (\u00C0-\u024F) covers Spanish/Swedish/French/German/Nordic accents.
+  // Sentry 139/142/138/143: non-ASCII names like "Andr\u00E9s", "Bj\u00F6rn", "Fran\u00E7ois" were rejected.
+  .regex(/^[a-zA-Z0-9._\-\u00C0-\u024F\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\s]+$/)
   .transform(s => s.trim())
   // SECURITY: Reject control characters, zero-width characters, and BOM
   .refine((val) => !/[\u0000-\u001F\u007F-\u009F\u200B-\u200D\uFEFF]/.test(val), 'Username contains invalid characters');

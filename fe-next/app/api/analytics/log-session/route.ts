@@ -91,12 +91,8 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if (!userId && !guestSessionId) {
-        return NextResponse.json(
-          { error: 'Either userId or guestSessionId must be provided' },
-          { status: 400 }
-        );
-      }
+      // Fully anonymous sessions (no userId AND no guestSessionId) are now allowed —
+      // they persist with both ids NULL so admin dashboard sees every game.
 
       // Validate mode
       if (!['singleplayer', 'multiplayer', 'daily_challenge'].includes(mode)) {

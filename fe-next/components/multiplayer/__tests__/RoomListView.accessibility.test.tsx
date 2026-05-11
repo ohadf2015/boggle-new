@@ -21,6 +21,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+const cgState = { isOnCrazyGamesPlatform: true };
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => cgState,
+}));
+
 vi.mock('framer-motion', () => {
   const proxy = new Proxy({}, {
     get: (_target, prop) => {
@@ -130,10 +135,18 @@ describe('RoomListView accessibility', () => {
   });
 
   describe('icon-only buttons have aria-labels', () => {
-    it('should have aria-label on the back link', () => {
+    it('should have aria-label on the back link when on CrazyGames', () => {
+      cgState.isOnCrazyGamesPlatform = true;
       render(<RoomListView {...defaultProps} />);
-      const backLink = screen.getByRole('link');
+      const backLink = screen.getByRole('link', { name: 'common.back' });
       expect(backLink).toHaveAttribute('aria-label');
+    });
+
+    it('should not render an in-lobby back link off CrazyGames (global Header provides one)', () => {
+      cgState.isOnCrazyGamesPlatform = false;
+      render(<RoomListView {...defaultProps} />);
+      expect(screen.queryByRole('link', { name: 'common.back' })).toBeNull();
+      cgState.isOnCrazyGamesPlatform = true;
     });
 
     it('should have aria-label on the refresh button', () => {

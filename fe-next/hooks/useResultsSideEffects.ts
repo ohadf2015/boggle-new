@@ -13,17 +13,16 @@
  * - Signup prompts (guest user conversion)
  */
 
-import { useEffect, useRef, useState, startTransition } from 'react';
+import { useCallback, useEffect, useRef, useState, startTransition } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { useWinStreak } from '@/hooks/useWinStreak';
 import { useSaveCognitiveScore } from '@/hooks/useSaveCognitiveScore';
+import { useSignupPrompt } from '@/components/singleplayer/results/hooks/useSignupPrompt';
 import logger from '@/utils/logger';
 import {
   getGuestStatsSummary,
   updateGuestStatsAfterGame,
-  shouldShowUpgradePrompt,
-  isFirstWin,
 } from '@/utils/guestManager';
 import { awardGameCoins } from '@/utils/coinManager';
 import { syncCoinsToDatabase } from '@/lib/supabase';
@@ -202,7 +201,7 @@ export function useResultsSideEffects({
   const [previousStreak, setPreviousStreak] = useState<number>(0);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [showFirstWinModal, setShowFirstWinModal] = useState<boolean>(false);
-  const [hasShownUpgradePrompt, setHasShownUpgradePrompt] = useState<boolean>(false);
+  const hasRoutedSignupPromptRef = useRef<boolean>(false);
 
   // ==============================================
   // REFS (Prevent duplicate execution)
@@ -470,60 +469,52 @@ export function useResultsSideEffects({
   }, [user?.id, currentPlayerData]);
 
   // ==============================================
-  // EFFECT 6: Signup Prompt (Scroll-Based)
+  // EFFECT 6: Signup Prompt (hook-driven, timer-based)
+  //
+  // Prior scroll-gated logic fired ~5% of the time (PostHog `first_win_signup`
+  // modalId had 0 events in 7d) because most mobile results screens fit in one
+  // viewport — users never scrolled past 80%. `useSignupPrompt` uses a 3.5s
+  // post-results timer + sessionStorage guard. Route its decision to one of
+  // the two existing modal slots based on winner status.
   // ==============================================
 
-  useEffect(() => {
-    if (
-      isAuthenticated ||
-      user ||
-      authLoading ||
-      hasShownUpgradePrompt ||
-      !hasUpdatedStatsRef.current ||
+  const signupPrompt = useSignupPrompt({
+    isAuthenticated,
+    hasUser: !!user,
+    authLoading,
+    disabled:
+      !!gameCode ||
+      isOnCrazyGamesPlatform ||
       showWordFeedback ||
-      gameCode ||
-      isOnCrazyGamesPlatform
-    ) {
-      return;
+      !hasUpdatedStatsRef.current,
+  });
+
+  useEffect(() => {
+    if (!signupPrompt.showSignupModal) return;
+    if (hasRoutedSignupPromptRef.current) return;
+    hasRoutedSignupPromptRef.current = true;
+    if (isCurrentUserWinner && signupPrompt.isFirstWin) {
+      setShowFirstWinModal(true);
+    } else {
+      setShowAuthModal(true);
     }
+  }, [signupPrompt.showSignupModal, signupPrompt.isFirstWin, isCurrentUserWinner]);
 
-    const shouldShowModal = shouldShowUpgradePrompt();
-    const isFirstWinUser = isFirstWin();
-
-    if (!shouldShowModal && !(isCurrentUserWinner && isFirstWinUser)) {
-      return;
-    }
-
-    const handleScroll = () => {
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      const scrollHeight = document.documentElement.scrollHeight;
-      const clientHeight = document.documentElement.clientHeight;
-      const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
-
-      if (scrollPercentage >= 0.8 && !showWordFeedback) {
-        if (isCurrentUserWinner && (isFirstWinUser || shouldShowModal)) {
-          setShowFirstWinModal(true);
-        } else if (shouldShowModal) {
-          setShowAuthModal(true);
-        }
-        setHasShownUpgradePrompt(true);
-        window.removeEventListener('scroll', handleScroll);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    const initialCheckTimeout = setTimeout(() => {
-      if (!showWordFeedback) {
-        handleScroll();
-      }
-    }, 2000);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      clearTimeout(initialCheckTimeout);
-    };
-  }, [isAuthenticated, user, authLoading, hasShownUpgradePrompt, isCurrentUserWinner, showWordFeedback, gameCode, isOnCrazyGamesPlatform]);
+  const dismissSignupModal = signupPrompt.dismissSignupModal;
+  const wrappedSetShowAuthModal = useCallback(
+    (show: boolean) => {
+      setShowAuthModal(show);
+      if (!show) dismissSignupModal();
+    },
+    [dismissSignupModal],
+  );
+  const wrappedSetShowFirstWinModal = useCallback(
+    (show: boolean) => {
+      setShowFirstWinModal(show);
+      if (!show) dismissSignupModal();
+    },
+    [dismissSignupModal],
+  );
 
   // ==============================================
   // RETURN ALL DATA
@@ -533,9 +524,9 @@ export function useResultsSideEffects({
     brainPointsReward,
     winStreakData,
     showAuthModal,
-    setShowAuthModal,
+    setShowAuthModal: wrappedSetShowAuthModal,
     showFirstWinModal,
-    setShowFirstWinModal,
+    setShowFirstWinModal: wrappedSetShowFirstWinModal,
     coinReward,
   };
 }

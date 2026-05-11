@@ -98,6 +98,8 @@ interface HostPreGameViewProps {
   onAvatarChange?: (config: CustomAvatarConfig) => void;
   /** When true (Quick Play / classroom), hide invite + share affordances. */
   isPrivate?: boolean;
+  /** Quick Play: skip 30s alone-timer, auto-fill bots + start immediately. */
+  isQuickPlay?: boolean;
 }
 
 // ==================== Component ====================
@@ -124,6 +126,7 @@ function HostPreGameView({
   onNameChange,
   onAvatarChange,
   isPrivate = false,
+  isQuickPlay = false,
 }: HostPreGameViewProps): React.ReactElement {
   const { socket } = useSocket();
   const { isAdmin, isAuthenticated, updateProfile, profile } = useAuth();
@@ -252,9 +255,14 @@ function HostPreGameView({
 
   useEffect(() => {
     if (actualPlayerCount === 0) {
-      aloneTimerRef.current = setTimeout(() => {
-        setBotCountdown(10);
-      }, 30_000);
+      if (isQuickPlay) {
+        // Quick Play: skip alone-timer, kick off short "filling bots…" countdown.
+        setBotCountdown(3);
+      } else {
+        aloneTimerRef.current = setTimeout(() => {
+          setBotCountdown(10);
+        }, 30_000);
+      }
     } else {
       if (aloneTimerRef.current) clearTimeout(aloneTimerRef.current);
       if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
@@ -263,12 +271,14 @@ function HostPreGameView({
     return () => {
       if (aloneTimerRef.current) clearTimeout(aloneTimerRef.current);
     };
-  }, [actualPlayerCount]);
+  }, [actualPlayerCount, isQuickPlay]);
 
   useEffect(() => {
     if (botCountdown === null) return;
     if (botCountdown <= 0) {
-      socket?.emit('addBots', { gameCode, count: 2 });
+      // setAutoFill is the backend's bot-fill primitive; the prior 'addBots'
+      // event had no server handler so silently dropped (bots never spawned).
+      socket?.emit('setAutoFill', { enabled: true, targetCount: 3 });
       onStartGame();
       setBotCountdown(null);
       return;
@@ -366,7 +376,7 @@ function HostPreGameView({
       )}
 
       {/* Header */}
-      <header className="shrink-0 px-2 sm:px-3 py-1 sm:py-1.5 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
+      <header className="shrink-0 px-2 sm:px-3 py-1 sm:py-1.5 short:py-0.5 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
         <div className="flex items-center justify-between gap-2">
           {/* Game language chip — prominent so hosts see the board language before starting */}
           <div
@@ -463,7 +473,7 @@ function HostPreGameView({
             }
           />
           {/* Sticky bottom start button — desktop */}
-          <div className="shrink-0 px-6 py-3 border-t-3 border-neo-black bg-neo-navy/95">
+          <div className="shrink-0 px-6 py-3 short:py-1.5 desktop-short:lg:py-1 desktop-medium-short:lg:py-2 border-t-3 border-neo-black bg-neo-navy/95">
             <div className="flex items-center gap-3">
               <BoostButton mode="mp" sessionId={gameCode} open={isBoostPickerOpen} onOpenChange={setIsBoostPickerOpen} />
               <div className="flex-1">

@@ -36,7 +36,23 @@ let cronTasks: ScheduledTask[] = [];
  * Initialize all server components
  * @param io - Socket.IO server instance
  */
+/**
+ * Validate required env vars at boot. Logs loudly + Sentry-flags any missing
+ * secrets so misconfiguration is caught in deploy logs, not on the first user
+ * who hits the feature in prod (Sentry 12K — boost claim threw mid-request).
+ */
+function validateRequiredEnv(): void {
+  const required = ['BOOST_TOKEN_SECRET'];
+  const missing = required.filter(k => !process.env[k]);
+  if (missing.length > 0) {
+    const msg = `Missing required env vars: ${missing.join(', ')}`;
+    lifecycleLogger.error(msg);
+    Sentry.captureMessage(msg, 'error');
+  }
+}
+
 export async function initializeServer(io: Server): Promise<void> {
+  validateRequiredEnv();
   // Set up Redis adapter for horizontal scaling — timeout to prevent blocking startup
   const REDIS_INIT_TIMEOUT_MS = 15000;
   let redisInitTimer: NodeJS.Timeout | undefined;

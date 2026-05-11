@@ -114,10 +114,17 @@ export function getGuestStats(): GuestStats {
 }
 
 /**
- * Save guest stats to storage (both localStorage and sessionStorage)
+ * Save guest stats to storage (both localStorage and sessionStorage).
+ *
+ * Dispatches `guestStatsChanged` so provider-level subscribers (signup prompt,
+ * header chips) re-evaluate after a game updates stats. Without this, hooks
+ * that read stats once on mount never see post-game wins.
  */
 export function saveGuestStats(stats: GuestStats): void {
   saveJsonToStorage(GUEST_STATS_KEY, stats);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('guestStatsChanged'));
+  }
 }
 
 /**

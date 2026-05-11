@@ -415,9 +415,11 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 </div>
               )}
 
-              {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
+              {/* Stats row - Timer centered on mobile, Timer + controls on desktop.
+                  lg uses grid [1fr_auto_1fr] so timer (middle, auto-sized) sits at viewport
+                  center regardless of asymmetric flank widths (GameHeader vs Combo+Score). */}
               <div
-                className="flex w-full items-center justify-center lg:justify-start relative min-h-[56px] md:min-h-[70px] medium-short:min-h-[44px] medium-short:md:min-h-[48px] lg:min-h-[clamp(40px,7dvh,64px)] desktop-short:lg:min-h-[40px] desktop-medium-short:lg:min-h-[44px] short:min-h-[40px] short:md:min-h-[44px] gap-2"
+                className="flex w-full items-center justify-center lg:grid lg:grid-cols-[1fr_auto_1fr] relative min-h-[56px] md:min-h-[70px] medium-short:min-h-[44px] medium-short:md:min-h-[48px] lg:min-h-[clamp(40px,7dvh,64px)] desktop-short:lg:min-h-[40px] desktop-medium-short:lg:min-h-[44px] short:min-h-[40px] short:md:min-h-[44px] gap-2"
                 data-testid="stats-row"
               >
                 {/* Desktop header */}
@@ -696,7 +698,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 username={isHost ? 'Host' : username}
                 isHost={isHost}
                 gameCode={gameCode}
-                className="max-h-[200px] min-h-[80px] desktop-tall:min-h-[120px]"
+                className="max-h-[200px] min-h-[80px] desktop-tall:min-h-[120px] desktop-short:max-h-[100px] desktop-short:min-h-[56px] desktop-medium-short:max-h-[140px] desktop-medium-short:min-h-[72px]"
               />
             </AdaptiveMotion.div>
           </div>

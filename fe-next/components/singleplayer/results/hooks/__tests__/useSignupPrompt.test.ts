@@ -108,6 +108,86 @@ describe('useSignupPrompt — after-third-game variant', () => {
   });
 });
 
+describe('useSignupPrompt — guestStatsChanged re-evaluation', () => {
+  it('does not show on mount with empty stats, then shows after stats-change event grants a win', async () => {
+    mockFlag.mockReturnValue('after-first-win');
+    mockStats.mockReturnValue({ games: 0, wins: 0 });
+    const { result } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(false);
+    expect(mockTrackSignupFunnel).not.toHaveBeenCalled();
+
+    mockStats.mockReturnValue({ games: 1, wins: 1 });
+    await act(async () => {
+      window.dispatchEvent(new Event('guestStatsChanged'));
+    });
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(true);
+    expect(result.current.isFirstWin).toBe(true);
+    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', true);
+  });
+
+  it('ignores stats-change event when authenticated', async () => {
+    mockStats.mockReturnValue({ games: 0, wins: 0 });
+    const { result } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: true, hasUser: true, authLoading: false })
+    );
+    await flushTimer();
+
+    mockStats.mockReturnValue({ games: 5, wins: 3 });
+    await act(async () => {
+      window.dispatchEvent(new Event('guestStatsChanged'));
+    });
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(false);
+  });
+});
+
+describe('useSignupPrompt — isFirstWin exposure', () => {
+  it('exposes isFirstWin=true when shown via actual win', async () => {
+    mockFlag.mockReturnValue('after-first-win');
+    mockStats.mockReturnValue({ games: 1, wins: 1 });
+    const { result } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(true);
+    expect(result.current.isFirstWin).toBe(true);
+  });
+
+  it('exposes isFirstWin=false when shown via 5-game fallback', async () => {
+    mockFlag.mockReturnValue('after-first-win');
+    mockStats.mockReturnValue({ games: 5, wins: 0 });
+    const { result } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(true);
+    expect(result.current.isFirstWin).toBe(false);
+  });
+
+  it('exposes isFirstWin=false for after-third-game variant', async () => {
+    mockFlag.mockReturnValue('after-third-game');
+    mockStats.mockReturnValue({ games: 3, wins: 2 });
+    const { result } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(true);
+    expect(result.current.isFirstWin).toBe(false);
+  });
+
+  it('isFirstWin defaults to false before modal shows', () => {
+    mockStats.mockReturnValue({ games: 0, wins: 0 });
+    const { result } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    expect(result.current.isFirstWin).toBe(false);
+  });
+});
+
 describe('useSignupPrompt — impression telemetry', () => {
   it('emits first_win_signup_shown when first-win qualifies via actual win', async () => {
     mockFlag.mockReturnValue('after-first-win');

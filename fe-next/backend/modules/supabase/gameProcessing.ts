@@ -187,31 +187,29 @@ async function processPlayerResult(
       await updateGuestStats(authInfo.guestTokenHash, gameStats);
     }
 
-    // Log game session for ALL players (authenticated and guests) for admin analytics
-    if (authInfo.authUserId || authInfo.guestSessionId) {
-      try {
-        const logGameSession = getGameSessionLogger();
-        if (logGameSession) {
-          await logGameSession({
-            userId: authInfo.authUserId || null,
-            guestSessionId: authInfo.guestSessionId || null,
-            mode: 'multiplayer',
-            language: gameInfo.language || 'en',
-            score: gameStats.score || 0,
-            wordsFound: [],
-            durationSeconds: gameStats.timePlayed || 0,
-            completed: true,
-            roomCode: gameCode,
-            playerCount: totalPlayers,
-            finalRank: gameStats.placement || null,
-            startedAt: new Date(),
-            completedAt: new Date(),
-          });
-          logger.debug('SUPABASE', `Logged game session for ${playerScore.username}`);
-        }
-      } catch (sessionError) {
-        logger.error('SUPABASE', `Failed to log game session for ${playerScore.username}`, sessionError);
+    // Log game session for ALL players (authenticated, guest, fully anonymous) for admin analytics
+    try {
+      const logGameSession = getGameSessionLogger();
+      if (logGameSession) {
+        await logGameSession({
+          userId: authInfo.authUserId || null,
+          guestSessionId: authInfo.guestSessionId || null,
+          mode: 'multiplayer',
+          language: gameInfo.language || 'en',
+          score: gameStats.score || 0,
+          wordsFound: [],
+          durationSeconds: gameStats.timePlayed || 0,
+          completed: true,
+          roomCode: gameCode,
+          playerCount: totalPlayers,
+          finalRank: gameStats.placement || null,
+          startedAt: new Date(),
+          completedAt: new Date(),
+        });
+        logger.debug('SUPABASE', `Logged game session for ${playerScore.username}`);
       }
+    } catch (sessionError) {
+      logger.error('SUPABASE', `Failed to log game session for ${playerScore.username}`, sessionError);
     }
   } catch (error) {
     logger.error('SUPABASE', `Error processing result for ${playerScore.username}`, error);

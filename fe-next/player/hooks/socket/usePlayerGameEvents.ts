@@ -23,6 +23,7 @@ import type { LetterGrid, Language } from '@/types';
 import type { WordToVote } from '@/player/types';
 import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
 import logger from '@/utils/logger';
+import { addGameBreadcrumb } from '@/utils/sentry';
 import type { GameTimerReturn } from '@/hooks/useGameTimer';
 
 interface StartGameBroadcastExt extends StartGameBroadcast {
@@ -426,6 +427,15 @@ export function usePlayerGameEvents({
       // updates the ref (rare reorder; happens on reconnect snapshots).
       if (data.gameSessionId !== undefined && data.gameSessionId < gameSessionIdRef.current) {
         logger.log('[PLAYER] Ignoring stale timeUpdate from old session:', data.gameSessionId);
+        // Telemetry: pairs with `mp_timer_stall` breadcrumb. If the stall
+        // watchdog fires, this trail explains why timeUpdate emits never
+        // moved the display.
+        addGameBreadcrumb('mp_timer_update_filtered', {
+          role: 'player',
+          incomingSessionId: data.gameSessionId,
+          currentSessionId: gameSessionIdRef.current,
+          remainingTime: data.remainingTime,
+        });
         return;
       }
 

@@ -24,6 +24,8 @@ interface SignupPromptResult {
   showSignupModal: boolean;
   setShowSignupModal: (show: boolean) => void;
   dismissSignupModal: () => void;
+  /** True when the prompt qualifies as a first-win celebration (winner emotional peak). */
+  isFirstWin: boolean;
 }
 
 /**
@@ -37,9 +39,21 @@ export function useSignupPrompt({
   disabled = false,
 }: UseSignupPromptParams): SignupPromptResult {
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [isFirstWin, setIsFirstWin] = useState(false);
+  // Bump on `guestStatsChanged` window event so the gate re-evaluates when a
+  // game updates localStorage. SignupPromptHost mounts once at the provider;
+  // without this, stats read at 0/0 on app boot and never re-check.
+  const [statsVersion, setStatsVersion] = useState(0);
   // Capture the variant the prompt was shown under so dismissal/completion
   // events can attribute correctly without re-reading guest stats.
   const shownVariantRef = useRef<{ isFirstWin: boolean } | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const onChange = () => setStatsVersion((v) => v + 1);
+    window.addEventListener('guestStatsChanged', onChange);
+    return () => window.removeEventListener('guestStatsChanged', onChange);
+  }, []);
 
   // A/B test: 'after-first-win' gates on actual win (with 5-game fallback for non-winners);
   // 'after-third-game' gates purely on games count.
@@ -64,17 +78,18 @@ export function useSignupPrompt({
 
     if (!qualifies) return;
 
-    const isFirstWin = signupVariant !== 'after-third-game' && wins >= 1;
+    const qualifiesAsFirstWin = signupVariant !== 'after-third-game' && wins >= 1;
 
     const timer = setTimeout(() => {
+      setIsFirstWin(qualifiesAsFirstWin);
       setShowSignupModal(true);
       sessionStorage.setItem(SIGNUP_PROMPT_SHOWN_KEY, 'true');
-      shownVariantRef.current = { isFirstWin };
-      trackSignupFunnel('prompt_shown', isFirstWin);
+      shownVariantRef.current = { isFirstWin: qualifiesAsFirstWin };
+      trackSignupFunnel('prompt_shown', qualifiesAsFirstWin);
     }, 3500);
 
     return () => clearTimeout(timer);
-  }, [isAuthenticated, hasUser, authLoading, disabled, signupVariant]);
+  }, [isAuthenticated, hasUser, authLoading, disabled, signupVariant, statsVersion]);
 
   const dismissSignupModal = useCallback(() => {
     setShowSignupModal(false);
@@ -85,5 +100,5 @@ export function useSignupPrompt({
     }
   }, []);
 
-  return { showSignupModal, setShowSignupModal, dismissSignupModal };
+  return { showSignupModal, setShowSignupModal, dismissSignupModal, isFirstWin };
 }

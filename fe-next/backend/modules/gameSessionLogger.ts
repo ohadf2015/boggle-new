@@ -134,12 +134,6 @@ export async function logGameSession(sessionData: GameSessionData): Promise<stri
   if (!client) return null;
 
   try {
-    // Validate that either userId or guestSessionId is set
-    if (!sessionData.userId && !sessionData.guestSessionId) {
-      logger.error('GAME_SESSION_LOGGER', 'Either userId or guestSessionId must be provided');
-      return null;
-    }
-
     const { data, error } = await client
       .from('game_sessions')
       .insert({
@@ -185,7 +179,8 @@ export async function logGameSession(sessionData: GameSessionData): Promise<stri
       return null;
     }
 
-    logger.info('GAME_SESSION_LOGGER', `Logged ${sessionData.mode} session for ${sessionData.userId ? 'user' : 'guest'}`);
+    const actorKind = sessionData.userId ? 'user' : sessionData.guestSessionId ? 'guest' : 'anonymous';
+    logger.info('GAME_SESSION_LOGGER', `Logged ${sessionData.mode} session for ${actorKind}`);
     return data.id;
   } catch (err) {
     logger.error('GAME_SESSION_LOGGER', `Exception logging game session: ${err}`);

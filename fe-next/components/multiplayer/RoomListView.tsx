@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import type { ActiveRoom } from '@/shared/types/game';
 import { cn } from '@/lib/utils';
@@ -140,6 +141,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
   isQuickPlayLoading = false,
 }) => {
   const { t, dir, language } = useLanguage();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showWelcomeCard, setShowWelcomeCard] = useState(false);
   const hasMountedRef = useRef(false);
@@ -191,15 +193,19 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           variants={headerVariants}
           initial={hasMountedRef.current ? false : "hidden"}
           animate="visible"
-          className="flex items-center justify-between py-3 px-4 lg:px-6 shrink-0 border-b-2 border-white/10"
+          className="flex items-center justify-between py-3 short:py-1 medium-short:py-1.5 px-4 lg:px-6 shrink-0 border-b-2 border-white/10"
         >
-          <Link
-            href={`/${language}`}
-            aria-label={t('common.back')}
-            className="flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-2 border-neo-black bg-neo-navy shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
-          >
-            <ArrowLeft className="w-5 h-5 text-neo-white rtl:rotate-180" />
-          </Link>
+          {isOnCrazyGamesPlatform ? (
+            <Link
+              href={`/${language}`}
+              aria-label={t('common.back')}
+              className="flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-2 border-neo-black bg-neo-navy shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
+            >
+              <ArrowLeft className="w-5 h-5 text-neo-white rtl:rotate-180" />
+            </Link>
+          ) : (
+            <span aria-hidden="true" className="w-10 h-10 min-w-[44px] min-h-[44px]" />
+          )}
 
           <div className="text-center">
             <h1
@@ -226,10 +232,10 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           initial={hasMountedRef.current ? false : { opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut', delay: 0.05 }}
-          className="px-5 lg:px-6 pt-3 lg:pt-5 shrink-0"
+          className="px-5 lg:px-6 pt-3 lg:pt-5 short:pt-1.5 medium-short:pt-2 shrink-0"
         >
           <div className="relative w-full overflow-hidden rounded-2xl border-3 border-neo-black shadow-hard">
-            <div className="relative w-full h-[140px] sm:h-auto sm:aspect-[21/9] lg:aspect-[64/15]">
+            <div className="relative w-full h-[140px] short:h-[70px] medium-short:h-[100px] sm:h-auto sm:aspect-[21/9] sm:short:h-[80px] sm:short:aspect-auto sm:medium-short:h-[110px] sm:medium-short:aspect-auto lg:aspect-[64/15] desktop-short:lg:h-[90px] desktop-short:lg:aspect-auto desktop-medium-short:lg:h-[140px] desktop-medium-short:lg:aspect-auto">
               <Image
                 src="/images/arena-hub-hero.jpg"
                 alt={t('multiplayerFlow.roomList.heroAlt')}
@@ -251,7 +257,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             right pane = live-match status + open-arenas list. Mobile keeps
             single-column flow. The two wrapper divs share the parent gap-5
             so vertical rhythm matches the prior single-column layout. */}
-        <div className="flex-1 flex flex-col lg:grid lg:grid-cols-[minmax(280px,360px)_1fr] lg:items-start px-5 lg:px-6 gap-5 lg:gap-6 overflow-y-auto pb-10 safe-area-bottom pt-5">
+        <div className="flex-1 flex flex-col lg:grid lg:grid-cols-[minmax(280px,360px)_1fr] lg:items-start px-5 lg:px-6 gap-5 lg:gap-6 short:gap-2 medium-short:gap-3 overflow-y-auto pb-10 short:pb-4 medium-short:pb-6 safe-area-bottom pt-5 short:pt-2 medium-short:pt-3">
 
           {/* Left rail (mobile: in-flow) */}
           <div className="flex flex-col gap-5">

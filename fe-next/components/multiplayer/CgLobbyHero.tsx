@@ -87,7 +87,7 @@ const CgLobbyHero: React.FC<CgLobbyHeroProps> = ({ variant, displayName, onPlay,
       aria-label={t('cg.hero.aria.section')}
       dir={dir}
       data-testid="cg-lobby-hero"
-      className="@container relative mx-3 sm:mx-4 mt-3 mb-4 rounded-neo border-neo-thick border-black bg-neo-navy-light shadow-hard-lg overflow-hidden texture-halftone [container-type:inline-size]"
+      className="@container relative mx-3 sm:mx-4 mt-3 mb-4 short:mt-1 short:mb-2 medium-short:mt-2 medium-short:mb-2 rounded-neo border-neo-thick border-black bg-neo-navy-light shadow-hard-lg overflow-hidden texture-halftone [container-type:inline-size]"
     >
       {/* Animated diagonal stripe wash */}
       <motion.span
@@ -141,7 +141,7 @@ const CgLobbyHero: React.FC<CgLobbyHeroProps> = ({ variant, displayName, onPlay,
         </motion.span>
       ))}
 
-      <div className="relative grid grid-cols-1 sm:grid-cols-[1.1fr_1fr] gap-4 sm:gap-6 p-5 sm:p-6 items-center">
+      <div className="relative grid grid-cols-1 sm:grid-cols-[1.1fr_1fr] gap-4 sm:gap-6 short:gap-2 medium-short:gap-3 p-5 sm:p-6 short:p-2 medium-short:p-3 items-center">
         {/* LEFT — speech bubble + sub + live badge + CTA */}
         <div className={`flex flex-col gap-3 ${isRTL ? 'sm:items-end sm:text-right' : 'sm:items-start sm:text-left'} items-center text-center`}>
           <motion.div
@@ -155,7 +155,7 @@ const CgLobbyHero: React.FC<CgLobbyHeroProps> = ({ variant, displayName, onPlay,
               transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut' }}
               className="relative px-4 py-3 bg-neo-cream text-black border-neo-thick border-black rounded-neo shadow-hard motion-reduce:!animate-none motion-reduce:!transform-none"
             >
-              <p className="font-neo-display uppercase leading-tight tracking-tight text-2xl sm:text-3xl">
+              <p className="font-neo-display uppercase leading-tight tracking-tight text-2xl sm:text-3xl short:text-lg medium-short:text-xl">
                 {greeting}
               </p>
               <span aria-hidden className="absolute inset-x-2 top-1.5 h-0.5 bg-black/10 rounded-full" />
@@ -223,7 +223,7 @@ const CgLobbyHero: React.FC<CgLobbyHeroProps> = ({ variant, displayName, onPlay,
               animate={{ scale: [1, 1.022, 1] }}
               transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
               whileTap={{ scale: 0.97 }}
-              className="relative z-[1] w-full py-4 px-5 rounded-neo border-neo-thick border-black bg-neo-lime text-black font-neo-display uppercase text-2xl tracking-tight shadow-hard-lg active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-shadow duration-100 flex items-center justify-center gap-2 overflow-hidden motion-reduce:!animate-none motion-reduce:!transform-none"
+              className="relative z-[1] w-full py-4 px-5 short:py-2 short:px-3 medium-short:py-3 rounded-neo border-neo-thick border-black bg-neo-lime text-black font-neo-display uppercase text-2xl short:text-lg medium-short:text-xl tracking-tight shadow-hard-lg active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-shadow duration-100 flex items-center justify-center gap-2 overflow-hidden motion-reduce:!animate-none motion-reduce:!transform-none"
             >
               <motion.span
                 aria-hidden
@@ -271,7 +271,7 @@ const CgLobbyHero: React.FC<CgLobbyHeroProps> = ({ variant, displayName, onPlay,
           initial={{ opacity: 0, scale: 0.82, rotate: isRTL ? 8 : -8 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
           transition={{ duration: 0.55, delay: 0.1, ease: DECEL }}
-          className="relative w-[clamp(120px,28cqi,220px)] mx-auto"
+          className="relative w-[clamp(120px,28cqi,220px)] short:w-[clamp(70px,18cqi,110px)] medium-short:w-[clamp(90px,22cqi,150px)] mx-auto"
         >
           <motion.div
             aria-hidden

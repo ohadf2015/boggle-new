@@ -55,10 +55,10 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
             <div
                 aria-hidden="true"
                 className={cn(
-                    "h-header pb-1 lg:pb-2",
+                    "h-header pb-1 lg:pb-2 short:pb-0 medium-short:pb-0.5",
                     // md+ adds DesktopGameNav (~44px) into the same fixed band, so
                     // the spacer must clear bar + nav. min-height wins over h-header.
-                    "min-h-[60px] sm:min-h-[70px] md:min-h-[114px] lg:min-h-[124px]"
+                    "min-h-[60px] sm:min-h-[70px] md:min-h-[114px] lg:min-h-[124px] short:min-h-[44px] medium-short:min-h-[52px] md:short:min-h-[48px] lg:short:min-h-[52px] desktop-short:lg:min-h-[56px] desktop-medium-short:lg:min-h-[80px]"
                 )}
                 style={{
                     paddingTop: safeArea.top > 0 ? `${safeArea.top}px` : undefined,
@@ -66,13 +66,13 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
             />
             <header
                 className={cn(
-                    "pb-1 lg:pb-2",
+                    "pb-1 lg:pb-2 short:pb-0 medium-short:pb-0.5",
                     // Always fixed so it cannot silently lose its flow slot when an
                     // ancestor has overflow/flex-centering (which breaks `sticky`).
                     // Flow space is reserved by the sibling spacer div above.
                     "fixed top-0 left-0 right-0",
                     "z-[60] bg-slate-50 dark:bg-slate-900",
-                    "min-h-[60px] sm:min-h-[70px] md:min-h-[114px] lg:min-h-[124px]",
+                    "min-h-[60px] sm:min-h-[70px] md:min-h-[114px] lg:min-h-[124px] short:min-h-[44px] medium-short:min-h-[52px] md:short:min-h-[48px] lg:short:min-h-[52px] desktop-short:lg:min-h-[56px] desktop-medium-short:lg:min-h-[80px]",
                     className
                 )}
                 style={{
@@ -84,7 +84,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 className={cn(
                     "w-full mx-auto",
                     "flex items-center justify-between",
-                    "px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-2.5",
+                    "px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-2.5 short:py-1 medium-short:py-1.5 desktop-short:lg:py-1.5",
                     "bg-neo-white/90 dark:bg-neo-navy",
                     "backdrop-blur-xs",
                     "border-b-4 border-neo-black",

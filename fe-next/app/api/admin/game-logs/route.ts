@@ -143,7 +143,8 @@ export async function GET(request: NextRequest) {
     const ALLOWED_SORT_COLUMNS = ['created_at', 'score', 'word_count', 'placement', 'game_mode', 'language'];
     const sortBy = ALLOWED_SORT_COLUMNS.includes(searchParams.get('sortBy') ?? '') ? searchParams.get('sortBy')! : 'created_at';
     const sortOrder = searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc';
-    const includeGuests = searchParams.get('includeGuests') !== 'false'; // Include guests by default
+    // includeGuests=false also hides fully-anonymous games (user_id NULL). Default: include everyone.
+    const includeGuests = searchParams.get('includeGuests') !== 'false';
 
     // Calculate offset
     const offset = (page - 1) * pageSize;
@@ -240,7 +241,6 @@ export async function GET(request: NextRequest) {
           life_gained
         `, { count: 'exact' })
         .is('user_id', null)
-        .not('guest_session_id', 'is', null)
         .eq('completed', true);
 
       // Apply filters to guest query

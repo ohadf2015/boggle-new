@@ -132,7 +132,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const isCrazyGamesIframe = detectCrazyGamesSync;
+    const isCrazyGamesIframe = detectCrazyGamesSync();
 
     const checkSDK = async () => {
       let attempts = 0;
@@ -145,7 +145,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
         await new Promise(resolve => setTimeout(resolve, 100));
         attempts++;
         // Early exit: if not in a CG iframe and SDK hasn't appeared after 500ms, stop waiting
-        if (attempts === quickBailAttempts && !window.CrazyGames?.SDK && !isCrazyGamesIframe()) {
+        if (attempts === quickBailAttempts && !window.CrazyGames?.SDK && !isCrazyGamesIframe) {
           break;
         }
       }
@@ -162,7 +162,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
           const env = window.__crazyGamesEnvironment!;
           setEnvironment(env);
           setIsAvailable(env !== 'disabled');
-          if (env === 'crazygames' || isCrazyGamesIframe()) {
+          if (env === 'crazygames' || isCrazyGamesIframe) {
             setIsInCrazyGamesIframe(true);
           }
           try {
@@ -181,7 +181,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
         } catch {
           setIsAvailable(false);
         }
-      } else if (isCrazyGamesIframe()) {
+      } else if (isCrazyGamesIframe) {
         // SDK failed to load but we're definitely on CrazyGames — hide external auth
         setEnvironment('crazygames');
         setIsAvailable(false);
@@ -199,14 +199,14 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
         await new Promise(resolve => setTimeout(resolve, 25));
       }
       const inCgPortal =
-        window.__crazyGamesEnvironment === 'crazygames' || isCrazyGamesIframe();
+        window.__crazyGamesEnvironment === 'crazygames' || isCrazyGamesIframe;
       if (window.CrazyGames?.SDK && inCgPortal) {
         const stopFn = window.CrazyGames.SDK.game?.sdkGameLoadingStop;
         if (typeof stopFn === 'function') {
           try {
             stopFn.call(window.CrazyGames.SDK.game);
           } catch (err) {
-            // Surface real exceptions — silent catch was hiding the loader-hang root cause.
+            // CG SDK internal — non-actionable, warn-level so we surface SDK issues.
             console.warn('[CG] sdkGameLoadingStop failed', err);
           }
         } else {

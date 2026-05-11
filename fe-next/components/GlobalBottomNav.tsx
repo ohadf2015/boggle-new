@@ -346,7 +346,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
             aria-label={t('nav.bottomNavigation')}
         >
             {/* dir="ltr" locks source-order → visual-order so Home stays rightmost in RTL too */}
-            <div dir="ltr" className="flex items-center justify-around h-16 relative">
+            <div dir="ltr" className="flex items-center justify-around h-16 short:h-12 medium-short:h-14 relative">
                 {tabs.map((tab) => {
                     const isActive = activeTab === tab.id;
                     const Icon = tab.icon;
@@ -357,8 +357,8 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                             onClick={() => navigate(tab.id)}
                             className={cn(
                                 "flex flex-col items-center justify-center relative",
-                                "min-w-[64px] min-h-[48px]",
-                                "px-3 py-2",
+                                "min-w-[64px] min-h-[48px] short:min-h-[40px] medium-short:min-h-[44px]",
+                                "px-3 py-2 short:py-1 medium-short:py-1.5",
                                 "transition-all duration-150",
                                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy rounded",
                                 isActive ? tab.color : "text-neo-white/40"
@@ -404,7 +404,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                                 transition={{ type: 'spring' as const, damping: 12, stiffness: 300 }}
                                 className="relative z-10"
                             >
-                                <Icon className="w-6 h-6 mb-0.5" aria-hidden="true" />
+                                <Icon className="w-6 h-6 short:w-5 short:h-5 mb-0.5 short:mb-0" aria-hidden="true" />
 
                                 {/* Quest progress badge — circular ring on Quests tab */}
                                 {tab.id === 'quests' && questsCompleted > 0 && (
@@ -458,7 +458,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                             {/* Label */}
                             <motion.span
                                 className={cn(
-                                    "text-[10px] font-bold uppercase tracking-wide relative z-10",
+                                    "text-[10px] short:text-[9px] font-bold uppercase tracking-wide relative z-10 short:hidden medium-short:text-[9px]",
                                     isActive ? tab.color : "text-neo-white/40"
                                 )}
                                 animate={{

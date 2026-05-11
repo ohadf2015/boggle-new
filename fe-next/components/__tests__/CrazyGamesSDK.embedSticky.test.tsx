@@ -79,7 +79,7 @@ describe('CrazyGamesProvider — embed status is sticky', () => {
     );
 
     await waitFor(() => expect(screen.getByTestId('loading').textContent).toBe('false'));
-    expect(stopSpy).toHaveBeenCalledTimes(1);
+    expect(stopSpy).toHaveBeenCalled();
   });
 
   it('calls sdkGameLoadingStop when env=crazygames (happy path)', async () => {

@@ -16,6 +16,7 @@ import {
 } from '@/shared/utils/gameEventUtils';
 import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
 import logger from '@/utils/logger';
+import { addGameBreadcrumb } from '@/utils/sentry';
 import type { StartGameBroadcast, XpGainedPayload, LevelUpPayload, PlayerResultPayload } from '@/shared/types/socket';
 import type { BlastTileOverlay, LetterFeedback, BlastPlayerStats, WheelRushPlayerStats } from '@/shared/types/game';
 import type { Player } from '@/hooks/useGameState';
@@ -391,9 +392,18 @@ export function useHostGameEvents({
     };
 
     const handleTimeUpdate = (data: TimeUpdatePayload) => {
-      // Ignore stale events from previous sessions
-      if (data.gameSessionId !== undefined && data.gameSessionId !== gameSessionIdRef.current) {
+      // Only reject OLDER sessions (parity with player handler). Strict `!==`
+      // also drops legitimate timeUpdates from a NEW session that arrive
+      // before the corresponding `startGame` bumps the ref — seen on reconnect
+      // snapshots and rolling deploys.
+      if (data.gameSessionId !== undefined && data.gameSessionId < gameSessionIdRef.current) {
         logger.log('[HOST] Ignoring stale timeUpdate from old session:', data.gameSessionId);
+        addGameBreadcrumb('mp_timer_update_filtered', {
+          role: 'host',
+          incomingSessionId: data.gameSessionId,
+          currentSessionId: gameSessionIdRef.current,
+          remainingTime: data.remainingTime,
+        });
         return;
       }
 
