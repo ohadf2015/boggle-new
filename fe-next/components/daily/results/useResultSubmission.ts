@@ -11,6 +11,10 @@ import {
   type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
 import { neoErrorToast } from '@/components/NeoToast';
+import { useNetworkState } from '@/hooks/useNetworkState';
+import { useOfflineModeFlag } from '@/hooks/useOfflineModeFlag';
+import { getOfflineStore } from '@/lib/offline';
+import { enqueueScore } from '@/lib/offline/scoreQueue';
 import type { Language } from '@/types';
 
 interface UseResultSubmissionProps {
@@ -54,6 +58,8 @@ export function useResultSubmission({
   t,
 }: UseResultSubmissionProps) {
   const hasSubmittedRef = useRef(false);
+  const { online } = useNetworkState();
+  const offlineFlag = useOfflineModeFlag();
 
   // Submit result to backend when completing a new challenge
   useEffect(() => {
@@ -191,6 +197,24 @@ export function useResultSubmission({
           if (result.efficiencyScore !== undefined)
             bodyData.efficiencyScore = result.efficiencyScore;
 
+          // Offline-mode branch: queue for sync via /api/scores/sync.
+          // Survival mode is detected by presence of lifeRemaining field.
+          // Guests skip the queue — sync route requires authenticated user
+          // for awards; their localStorage fallback (markWordHuntResultSubmitted)
+          // is the canonical local record.
+          if (offlineFlag && !online && isAuthenticated && profile?.id) {
+            const mode = bodyData.lifeRemaining !== undefined ? 'daily-survival' : 'daily-wordhunt';
+            try {
+              const store = await getOfflineStore();
+              await enqueueScore(store, mode, bodyData);
+              markWordHuntResultSubmitted(language);
+              onSubmitSuccess();
+            } catch (err) {
+              console.warn('[WordHunt] offline enqueue failed', err);
+            }
+            return;
+          }
+
           const response = await fetch('/api/daily-challenge/word-hunt/submit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -253,6 +277,8 @@ export function useResultSubmission({
     onSubmitSuccess,
     extraTries,
     t,
+    online,
+    offlineFlag,
   ]);
 
   return { hasSubmittedRef };

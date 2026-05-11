@@ -23,6 +23,27 @@ vi.mock('@/utils/dailyChallenge', () => ({
   markWordHuntResultSubmitted: vi.fn(),
 }));
 
+// Default: online + flag off (existing tests unaffected).
+const mockUseNetworkState = vi.fn(() => ({ online: true, slow: false, type: 'wifi', rttMs: 0 }));
+vi.mock('@/hooks/useNetworkState', () => ({
+  useNetworkState: () => mockUseNetworkState(),
+}));
+
+const mockUseOfflineModeFlag = vi.fn(() => false);
+vi.mock('@/hooks/useOfflineModeFlag', () => ({
+  useOfflineModeFlag: () => mockUseOfflineModeFlag(),
+}));
+
+const mockEnqueueScore = vi.fn();
+vi.mock('@/lib/offline/scoreQueue', () => ({
+  enqueueScore: (...args: unknown[]) => mockEnqueueScore(...args),
+}));
+
+const mockGetOfflineStore = vi.fn();
+vi.mock('@/lib/offline', () => ({
+  getOfflineStore: () => mockGetOfflineStore(),
+}));
+
 describe('useResultSubmission', () => {
   const mockResult: WordHuntResult = {
     puzzleNumber: 100,
@@ -329,6 +350,106 @@ describe('useResultSubmission', () => {
           expect.anything()
         );
       }, { timeout: 3000 });
+    });
+  });
+
+  describe('offline queueing (phase 1.5)', () => {
+    beforeEach(() => {
+      mockEnqueueScore.mockReset().mockResolvedValue('queued-uuid');
+      mockGetOfflineStore.mockReset().mockResolvedValue({});
+      mockUseNetworkState.mockReset().mockReturnValue({ online: true, slow: false, type: 'wifi', rttMs: 0 });
+      mockUseOfflineModeFlag.mockReset().mockReturnValue(false);
+    });
+
+    it('when flag ON + offline + authed: enqueues to daily-wordhunt, skips submit fetch', async () => {
+      mockUseOfflineModeFlag.mockReturnValue(true);
+      mockUseNetworkState.mockReturnValue({ online: false, slow: false, type: 'none', rttMs: 0 });
+
+      const props = {
+        result: { ...mockResult, lifeRemaining: undefined } as unknown as WordHuntResult,
+        puzzleNumber: 100,
+        puzzleDate: '2025-01-19',
+        language: 'en' as const,
+        isNewCompletion: true,
+        guestFingerprint: null,
+        isAuthenticated: true,
+        profile: mockProfile,
+        guestPlayer: null,
+        countryCodeReady: true,
+        onSubmitSuccess: mockOnSubmitSuccess,
+      };
+
+      renderHook(() => useResultSubmission(props));
+
+      await waitFor(() => {
+        expect(mockEnqueueScore).toHaveBeenCalledTimes(1);
+      }, { timeout: 3000 });
+
+      const submitFetchCall = mockFetch.mock.calls.find(
+        (c) => c[0] === '/api/daily-challenge/word-hunt/submit',
+      );
+      expect(submitFetchCall).toBeUndefined();
+
+      const [, mode] = mockEnqueueScore.mock.calls[0];
+      expect(mode).toBe('daily-wordhunt');
+      expect(mockOnSubmitSuccess).toHaveBeenCalled();
+    });
+
+    it('when flag ON + offline + authed + survival fields: enqueues to daily-survival', async () => {
+      mockUseOfflineModeFlag.mockReturnValue(true);
+      mockUseNetworkState.mockReturnValue({ online: false, slow: false, type: 'none', rttMs: 0 });
+
+      const props = {
+        result: mockResult, // mockResult.lifeRemaining = 50 → survival
+        puzzleNumber: 100,
+        puzzleDate: '2025-01-19',
+        language: 'en' as const,
+        isNewCompletion: true,
+        guestFingerprint: null,
+        isAuthenticated: true,
+        profile: mockProfile,
+        guestPlayer: null,
+        countryCodeReady: true,
+        onSubmitSuccess: mockOnSubmitSuccess,
+      };
+
+      renderHook(() => useResultSubmission(props));
+
+      await waitFor(() => {
+        expect(mockEnqueueScore).toHaveBeenCalledTimes(1);
+      }, { timeout: 3000 });
+
+      const [, mode] = mockEnqueueScore.mock.calls[0];
+      expect(mode).toBe('daily-survival');
+    });
+
+    it('when flag ON + offline + GUEST: does NOT enqueue (sync needs auth)', async () => {
+      mockUseOfflineModeFlag.mockReturnValue(true);
+      mockUseNetworkState.mockReturnValue({ online: false, slow: false, type: 'none', rttMs: 0 });
+
+      const props = {
+        result: mockResult,
+        puzzleNumber: 100,
+        puzzleDate: '2025-01-19',
+        language: 'en' as const,
+        isNewCompletion: true,
+        guestFingerprint: 'fp-1',
+        isAuthenticated: false,
+        profile: null,
+        guestPlayer: mockGuestPlayer,
+        countryCodeReady: true,
+        onSubmitSuccess: mockOnSubmitSuccess,
+      };
+
+      renderHook(() => useResultSubmission(props));
+
+      // Wait long enough for the effect to settle either way.
+      await new Promise((r) => setTimeout(r, 100));
+      expect(mockEnqueueScore).not.toHaveBeenCalled();
+      // Guests fall through to live fetch path which mockFetch will service.
+      expect(
+        mockFetch.mock.calls.some((c) => c[0] === '/api/daily-challenge/word-hunt/submit'),
+      ).toBe(true);
     });
   });
 });
