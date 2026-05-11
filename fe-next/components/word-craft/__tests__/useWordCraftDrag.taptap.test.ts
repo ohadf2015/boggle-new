@@ -19,7 +19,7 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
     pointerType: 'mouse' | 'touch' | 'pen',
     x: number,
     y: number,
-    target?: EventTarget,
+    _target?: EventTarget,
   ): PointerEvent {
     return new PointerEvent(type, {
       bubbles: true,
@@ -190,7 +190,6 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
       // Point pointerup over the cell while drag is still inactive
       const evt = createPointerEvent('pointerup', 'touch', 52, 52);
       // Override elementFromPoint to return our test cell
-      const origEFP = document.elementFromPoint;
       vi.spyOn(document, 'elementFromPoint').mockReturnValue(cell);
       window.dispatchEvent(evt);
       vi.spyOn(document, 'elementFromPoint').mockRestore();
@@ -227,7 +226,6 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
     act(() => {
       // End drag over a valid empty cell
       const evt = createPointerEvent('pointerup', 'mouse', 5, 5);
-      const origEFP = document.elementFromPoint;
       vi.spyOn(document, 'elementFromPoint').mockReturnValue(cell);
       window.dispatchEvent(evt);
       vi.spyOn(document, 'elementFromPoint').mockRestore();
