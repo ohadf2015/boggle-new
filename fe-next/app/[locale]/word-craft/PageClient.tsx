@@ -12,7 +12,6 @@ import { useWordCraftGame } from '@/lib/word-craft/useWordCraftGame';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import { isWordCraftBetaUser } from '@/lib/word-craft/betaAccess';
 import type { SupportedLocale } from '@/lib/word-craft/tileBag';
-import { WordCraftBoard } from '@/components/word-craft/WordCraftBoard';
 import { WordCraftRack } from '@/components/word-craft/WordCraftRack';
 import { WordCraftScoreboard } from '@/components/word-craft/WordCraftScoreboard';
 import { WordCraftControls } from '@/components/word-craft/WordCraftControls';
@@ -22,7 +21,6 @@ import { ScoreFloat } from '@/components/word-craft/ScoreFloat';
 import { WordCraftTutor } from '@/components/word-craft/WordCraftTutor';
 import { WordCraftDragGhost } from '@/components/word-craft/WordCraftDragGhost';
 import { WordCraftPendingStrip } from '@/components/word-craft/WordCraftPendingStrip';
-import { WordCraftZoomShell } from '@/components/word-craft/WordCraftZoomShell';
 import { WordCraftLiveRegion } from '@/components/word-craft/WordCraftLiveRegion';
 import { WordCraftBoardSection } from '@/components/word-craft/WordCraftBoardSection';
 import { WordCraftGameOverScene } from '@/components/word-craft/WordCraftGameOverScene';
@@ -81,14 +79,6 @@ export default function WordCraftPageClient() {
   const locale = (language ?? 'en') as SupportedLocale;
 
   const [dict, setDict] = useState<Set<string> | null>(null);
-  const [boardSize, setBoardSize] = useState<13 | 15>(15);
-
-  // Board size from viewport — computed once on mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setBoardSize(window.innerWidth < 768 ? 13 : 15);
-    }
-  }, []);
 
   const isBetaUser = !authLoading && isWordCraftBetaUser(email);
 
@@ -123,7 +113,7 @@ export default function WordCraftPageClient() {
     return fromUrl ? Number(fromUrl) : Math.floor(Math.random() * 1_000_000);
   }, []);
 
-  const game = useWordCraftGame({ seed, dict, locale, boardSize });
+  const game = useWordCraftGame({ seed, dict, locale });
   const juice = useWordCraftJuice();
   const { queueAchievement } = useAchievementQueue();
   const [sceneCtx, setSceneCtx] = useState<SceneCtx | null>(null);
@@ -164,26 +154,6 @@ export default function WordCraftPageClient() {
   });
 
   const axis = useMemo(() => inferAxis(game.state.pendingPlacements), [game.state.pendingPlacements]);
-
-  // Keyboard shortcuts and arrow-key reticle
-  const { reticle } = useWordCraftKeyboardShortcuts({
-    turn: game.state.turn,
-    pendingPlacements: game.state.pendingPlacements,
-    burnout: game.state.burnout,
-    playerRack: game.state.player.rack,
-    dict,
-    axis,
-    boardSize: game.state.board.size,
-    onRecallAll: recallAllPending,
-    onSubmit: submitMoveWithTelemetry,
-    onRecallOne: recallFromBoard,
-    onFastTap: handleFastTap,
-    onSelectTile: game.selectRackTile,
-    onPlaceOnBoard: (r, c) => {
-      inputCountsRef.current.tap += 1;
-      game.placeOnBoard(r, c);
-    },
-  });
 
   // Fire axis_locked exactly once when pending tiles transition from 1→2
   // and form a valid line. Resets when pending shrinks back to <2.
@@ -283,6 +253,26 @@ export default function WordCraftPageClient() {
     });
   }, [game, resetTurnTelemetry]);
 
+  // Keyboard shortcuts and arrow-key reticle (declared AFTER the callbacks it consumes)
+  const { reticle } = useWordCraftKeyboardShortcuts({
+    turn: game.state.turn,
+    pendingPlacements: game.state.pendingPlacements,
+    burnout: game.state.burnout,
+    playerRack: game.state.player.rack,
+    dict,
+    axis,
+    boardSize: game.state.board.size,
+    onRecallAll: recallAllPending,
+    onSubmit: submitMoveWithTelemetry,
+    onRecallOne: recallFromBoard,
+    onFastTap: handleFastTap,
+    onSelectTile: game.selectRackTile,
+    onPlaceOnBoard: (r, c) => {
+      inputCountsRef.current.tap += 1;
+      game.placeOnBoard(r, c);
+    },
+  });
+
   // Celebrations
   const [celebration, setCelebration] = useState<{ kind: CelebrationKind; burstId: number; origin?: { x: number; y: number } }>({
     kind: null,
@@ -343,12 +333,17 @@ export default function WordCraftPageClient() {
 
     if (newest.who === 'bot' && placedEls.length > 0) {
       juice.botReveal(placedEls);
-      // Fire Pixi bot move reveal animation
+      // Fire Pixi bot move reveal animation. Placed tiles are on the board
+      // post-commit; scan by rackTileId rather than looking in history.
       if (sceneCtx) {
-        const placements = newest.placedTileIds.map((id) => {
-          const p = game.state.history[len - 1]?.placements.find((pl) => pl.rackTileId === id);
-          return p ? { row: p.row, col: p.col } : null;
-        }).filter((p): p is { row: number; col: number } => Boolean(p));
+        const placements: { row: number; col: number }[] = [];
+        const ids = new Set(newest.placedTileIds);
+        for (let r = 0; r < game.state.board.size; r++) {
+          for (let c = 0; c < game.state.board.size; c++) {
+            const tile = game.state.board.cells[r][c].tile;
+            if (tile && ids.has(tile.rackTileId)) placements.push({ row: r, col: c });
+          }
+        }
         playBotMoveReveal(sceneCtx, placements).catch(() => {
           // Pixi animations can fail on low-end devices; silently continue
         });
@@ -366,12 +361,18 @@ export default function WordCraftPageClient() {
 
       setScoreFloat({ score: newest.score, overdrive: false, isBingo, encouragement, key: len });
 
-      // Fire Pixi word commit wave
+      // Fire Pixi word commit wave (scan board by rackTileId rather than history).
       if (sceneCtx) {
-        const placements = newest.placedTileIds.map((id) => {
-          const p = game.state.history[len - 1]?.placements.find((pl) => pl.rackTileId === id);
-          return p ? { row: p.row, col: p.col, letter: p.letter, value: p.value } : null;
-        }).filter((p): p is { row: number; col: number; letter: string; value: number } => Boolean(p));
+        const placements: { row: number; col: number; letter: string; value: number }[] = [];
+        const ids = new Set(newest.placedTileIds);
+        for (let r = 0; r < game.state.board.size; r++) {
+          for (let c = 0; c < game.state.board.size; c++) {
+            const tile = game.state.board.cells[r][c].tile;
+            if (tile && ids.has(tile.rackTileId)) {
+              placements.push({ row: r, col: c, letter: tile.letter, value: tile.value });
+            }
+          }
+        }
         playWordCommitWave(sceneCtx, { placements, totalScore: newest.score }).catch(() => {
           // Pixi animations can fail on low-end devices; silently continue
         });
