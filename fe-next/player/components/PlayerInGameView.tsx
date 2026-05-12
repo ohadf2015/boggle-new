@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useEffect } from 'react';
 import type { Socket } from 'socket.io-client';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
@@ -32,6 +32,12 @@ import {
   useGameModeConfirmed,
   useGameStore,
 } from '@/hooks/gameState/store';
+import { usePendingWords } from '@/lib/multiplayer/usePendingWords';
+import { useReconnectFlow } from '@/lib/multiplayer/useReconnectFlow';
+import { PendingWordChip } from '@/components/multiplayer/PendingWordChip';
+import { ReconnectingOverlay } from '@/components/multiplayer/ReconnectingOverlay';
+import { MPGameAbortedModal } from '@/components/multiplayer/MPGameAbortedModal';
+import { useRouter, useParams } from 'next/navigation';
 
 // ==================== Hint Types ====================
 
@@ -219,11 +225,48 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
     gridSize: (letterGrid || shufflingGrid)?.[0]?.length ?? 4,
   });
 
+  const { pendingWords, enqueuePending, confirmPending, rejectPending, dismissPending, clearAll } = usePendingWords();
+
+  const router = useRouter();
+  const params = useParams();
+  const { isReconnecting, reconnectAttempt, maxReconnectAttempts, showAbortModal, triggerAbort } =
+    useReconnectFlow({ gameCode, username, gameActive, letterGrid });
+
+  const handleContinueSolo = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('mp_solo_handoff', JSON.stringify({ grid: letterGrid, gameCode }));
+    }
+    const locale = (params?.locale as string) || 'en';
+    router.push(`/${locale}/singleplayer?mpHandoff=1`);
+  }, [router, params, letterGrid, gameCode]);
+
+  // Listen for per-word server feedback to drive pending-word chip transitions
+  useEffect(() => {
+    if (!socket) return;
+    const handlePlayerFound = (data: { username: string; word: string }) => {
+      if (data.username === username) confirmPending(data.word);
+    };
+    const handleWordRejected = (data: { word: string }) => rejectPending(data.word);
+    socket.on('playerFoundWord', handlePlayerFound);
+    socket.on('wordRejected', handleWordRejected);
+    socket.on('wordAlreadyFound', handleWordRejected);
+    socket.on('wordNotOnBoard', handleWordRejected);
+    socket.on('endGame', clearAll);
+    return () => {
+      socket.off('playerFoundWord', handlePlayerFound);
+      socket.off('wordRejected', handleWordRejected);
+      socket.off('wordAlreadyFound', handleWordRejected);
+      socket.off('wordNotOnBoard', handleWordRejected);
+      socket.off('endGame', clearAll);
+    };
+  }, [socket, username, confirmPending, rejectPending, clearAll]);
+
   // Blast multiplayer: emit word + comboType to server via socket
   const handleBlastWordWithCombo = useCallback((word: string, comboType: string | null) => {
     if (!socket) return;
+    enqueuePending(word);
     socket.emit('submitWord', { word, comboType });
-  }, [socket]);
+  }, [socket, enqueuePending]);
 
   // Word hunt guess handler — emits to server
   const handleWordHuntGuess = useCallback((guess: string) => {
@@ -375,6 +418,15 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
         />
       )}
 
+      {/* Pending word chips — optimistic submit feedback */}
+      {pendingWords.size > 0 && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 flex flex-wrap gap-1 justify-center pointer-events-none">
+          {Array.from(pendingWords.entries()).map(([word, status]) => (
+            <PendingWordChip key={word} word={word} status={status} onDismiss={dismissPending} />
+          ))}
+        </div>
+      )}
+
       {/* Tournament Standings Modal */}
       <Dialog open={showTournamentStandings} onOpenChange={setShowTournamentStandings}>
         <DialogContent noDescription className="max-w-4xl max-h-[90vh] overflow-y-auto overscroll-contain scrollable-area bg-white text-neo-black dark:bg-slate-800 dark:text-white border-purple-500/30">
@@ -401,6 +453,13 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {isReconnecting && gameActive && (
+        <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} />
+      )}
+      {showAbortModal && (
+        <MPGameAbortedModal wordCount={foundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onExitRoom} />
+      )}
 
       {/* Exit Confirmation Dialog */}
       <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>

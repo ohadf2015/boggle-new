@@ -286,7 +286,10 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   const specialBonus = isSpecialWord ? specialWordBonus : 0;
 
   // Single atomic score update: word score + blast tile bonus + word-hunt board bonus + bonuses
-  updatePlayerScore(gameCode, username, wordScore + blastTileBonus + wordHuntBoardBonus + goldenBonus + specialBonus, true);
+  const preScore = game.playerScores?.[username] ?? 0;
+  const totalDelta = wordScore + blastTileBonus + wordHuntBoardBonus + goldenBonus + specialBonus;
+  updatePlayerScore(gameCode, username, totalDelta, true);
+  game.serverSeq = (game.serverSeq ?? 0) + 1;
 
   inc('wordAccepted');
   incPerGame(gameCode, 'wordAccepted');
@@ -365,18 +368,28 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
 
   // Broadcast playerFoundWord to room for TV broadcast mode
   // Includes combo level and word for exciting notifications
-  const totalScore = (game.playerScores?.[username] || 0) + wordScore;
+  const totalScore = preScore + totalDelta;
   const playerWordCount = (game.playerWords?.[username]?.length || 0) + 1;
   broadcastToRoom(io, getGameRoom(gameCode), 'playerFoundWord', {
     username: username,
     word: normalizedWord,
     wordCount: playerWordCount,
     score: totalScore,
+    serverSeq: game.serverSeq,
     comboLevel: safeComboLevel,
     isFirstFinder,
     inputMethod,
     // Merged combo sync (Fix 2): combo type embedded in playerFoundWord instead of separate event
     ...(comboType ? { comboSync: { comboType, username } } : {}),
+  });
+
+  broadcastToRoom(io, getGameRoom(gameCode), 'scoreUpdate', {
+    serverSeq: game.serverSeq,
+    username,
+    deltaScore: totalDelta,
+    totalScore,
+    lastWord: normalizedWord,
+    lastWordScore: wordScore,
   });
 
   // Broadcast opponent word feed to all OTHER players (not the word finder)

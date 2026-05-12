@@ -53,6 +53,28 @@ const WORD_VALIDATED_MODES = new Set<ServerSubmission['mode']>([
   'sp', 'wotd', 'daily-survival', 'daily-wordhunt',
 ]);
 
+// Daily modes have a per-date puzzle. Stale submissions (puzzleDate older
+// than yesterday, or missing entirely) are rejected with puzzle_expired —
+// prevents replay-from-cache abuse on the offline sync path.
+const DATE_GUARDED_MODES = new Set<ServerSubmission['mode']>([
+  'wotd', 'daily-survival', 'daily-wordhunt',
+]);
+
+function todayUtcDateString(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
+function yesterdayUtcDateString(): string {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().split('T')[0];
+}
+
+function isPuzzleDateFresh(puzzleDate: string | undefined): boolean {
+  if (!puzzleDate) return false;
+  return puzzleDate === todayUtcDateString() || puzzleDate === yesterdayUtcDateString();
+}
+
 async function dispatchAdventure({ sub, userId, supabase }: AwardHandlerArgs): Promise<Record<string, unknown>> {
   const validation = validateAdventureBody(sub.payload as Record<string, unknown>);
   if (!validation.valid || !validation.data) {
@@ -197,6 +219,22 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       const prior = dedupeCache.get(sub.id);
       if (prior) {
         results.push(prior);
+        continue;
+      }
+
+      // Date guard: daily-mode submissions older than yesterday (or missing
+      // puzzleDate) are stale. Reject before any award / revalidation work.
+      if (DATE_GUARDED_MODES.has(sub.mode) && !isPuzzleDateFresh(sub.payload.puzzleDate)) {
+        const stale: SyncResult = {
+          id: sub.id,
+          accepted: false,
+          finalScore: 0,
+          rejectedWords: [],
+          reason: 'puzzle_expired',
+        };
+        dedupeCache.set(sub.id, stale);
+        dedupeTimes.set(sub.id, Date.now());
+        results.push(stale);
         continue;
       }
 

@@ -79,21 +79,26 @@ export function useNetworkState(): NetworkState {
       let nativeRemove: (() => void) | undefined;
       if (Capacitor.isNativePlatform()) {
         void (async () => {
-          const { Network } = await import('@capacitor/network');
-          const status = await Network.getStatus();
-          setState((prev) => ({
-            ...prev,
-            online: status.connected,
-            type: (status.connectionType as NetworkType) ?? prev.type,
-          }));
-          const listener = await Network.addListener('networkStatusChange', (s) => {
+          try {
+            const { Network } = await import('@capacitor/network');
+            const status = await Network.getStatus();
             setState((prev) => ({
               ...prev,
-              online: s.connected,
-              type: (s.connectionType as NetworkType) ?? prev.type,
+              online: status.connected,
+              type: (status.connectionType as NetworkType) ?? prev.type,
             }));
-          });
-          nativeRemove = () => listener.remove();
+            const listener = await Network.addListener('networkStatusChange', (s) => {
+              setState((prev) => ({
+                ...prev,
+                online: s.connected,
+                type: (s.connectionType as NetworkType) ?? prev.type,
+              }));
+            });
+            nativeRemove = () => listener.remove();
+          } catch {
+            // Plugin not registered in native shell (sync skipped / iOS missing / boot race).
+            // Web detection via navigator.onLine + probeReachability is sufficient.
+          }
         })();
       }
 

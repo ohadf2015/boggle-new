@@ -89,3 +89,48 @@ describe('useNetworkState', () => {
     expect(result.current.type).toBe('unknown');
   });
 });
+
+describe('useNetworkState — native plugin missing fallback', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: true });
+    Object.defineProperty(navigator, 'connection', {
+      configurable: true,
+      value: { effectiveType: '4g', rtt: 100 },
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('does not throw when Capacitor Network plugin is missing on native', async () => {
+    const unhandled = vi.fn();
+    process.on?.('unhandledRejection', unhandled);
+
+    vi.doMock('@capacitor/core', () => ({
+      Capacitor: { isNativePlatform: () => true },
+    }));
+    vi.doMock('@capacitor/network', () => ({
+      Network: {
+        getStatus: vi.fn(async () => {
+          throw new Error('"Network" plugin is not implemented on android');
+        }),
+        addListener: vi.fn(async () => {
+          throw new Error('"Network" plugin is not implemented on android');
+        }),
+      },
+    }));
+
+    const { useNetworkState: useNetworkStateNative } = await import('../useNetworkState');
+    const { result } = renderHook(() => useNetworkStateNative());
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    expect(result.current.online).toBe(true);
+    expect(unhandled).not.toHaveBeenCalled();
+    process.off?.('unhandledRejection', unhandled);
+  });
+});

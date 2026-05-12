@@ -6,6 +6,7 @@
 
 import { getSupabase } from './supabase/client';
 import { awardCoinsServer } from '../services/economy/awardCoins';
+import { getDailyQuestModes, type DailyQuestMode } from '../../shared/dailyQuestPool';
 // Dynamic import may produce nested { default: { default: ... } } due to CJS/ESM interop.
 // Unwrap until we find the actual Logger instance with .info().
 import _loggerImport from '../utils/logger';
@@ -277,4 +278,18 @@ export async function markCelebrated(
   }
 
   return { newlyCelebrated: Array.isArray(data) && data.length > 0 };
+}
+
+const SLOT_MISSION_TYPES: MissionType[] = ['word_hunt', 'adventure', 'community'];
+
+export async function completeMissionForMode(
+  playerId: string,
+  mode: DailyQuestMode,
+  date?: string,
+): Promise<void> {
+  const today = getTodayDate(date);
+  const modes = getDailyQuestModes(today);
+  const slotIndex = modes.indexOf(mode);
+  if (slotIndex === -1) return;
+  await completeMission(playerId, SLOT_MISSION_TYPES[slotIndex], today);
 }

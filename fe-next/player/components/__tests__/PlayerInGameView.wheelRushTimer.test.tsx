@@ -103,6 +103,16 @@ vi.mock('@/components/multiplayer/WheelRushView', () => ({
     />
   ),
 }));
+vi.mock('@/lib/multiplayer/usePendingWords', () => ({
+  usePendingWords: () => ({ pendingWords: new Map(), enqueuePending: vi.fn(), confirmPending: vi.fn(), rejectPending: vi.fn(), dismissPending: vi.fn(), clearAll: vi.fn(), isPending: vi.fn().mockReturnValue(false) }),
+}));
+vi.mock('@/lib/multiplayer/useReconnectFlow', () => ({
+  useReconnectFlow: () => ({ isReconnecting: false, reconnectAttempt: 0, maxReconnectAttempts: 30, showAbortModal: false, lastServerSeq: 0, triggerAbort: vi.fn(), dismissAbortModal: vi.fn() }),
+}));
+vi.mock('@/components/multiplayer/PendingWordChip', () => ({ PendingWordChip: () => null }));
+vi.mock('@/components/multiplayer/ReconnectingOverlay', () => ({ ReconnectingOverlay: () => null }));
+vi.mock('@/components/multiplayer/MPGameAbortedModal', () => ({ MPGameAbortedModal: () => null }));
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }), useParams: () => ({ locale: 'en' }) }));
 
 import PlayerInGameView from '../PlayerInGameView';
 

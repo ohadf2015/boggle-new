@@ -9,7 +9,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('framer-motion', () => ({
   motion: new Proxy({}, {
     get: (_t: unknown, prop: string) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       return ({ children, ...rest }: any) => {
         const React = require('react')
         return React.createElement(prop, rest, children)

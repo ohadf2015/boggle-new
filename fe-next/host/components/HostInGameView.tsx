@@ -1,11 +1,15 @@
 'use client';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { useRouter, useParams } from 'next/navigation';
 import type { Socket } from 'socket.io-client';
 import InGameScreen from '../../components/game/InGameScreen';
 import { useBlastMultiplayerBridge } from '@/components/blast/legacy/hooks/useBlastMultiplayerBridge';
 import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
+import { useReconnectFlow } from '@/lib/multiplayer/useReconnectFlow';
+import { ReconnectingOverlay } from '@/components/multiplayer/ReconnectingOverlay';
+import { MPGameAbortedModal } from '@/components/multiplayer/MPGameAbortedModal';
 
 const BlastGame = dynamic(
   () => import('@/components/blast/legacy/BlastGame').then(m => ({ default: m.BlastGame })),
@@ -27,6 +31,8 @@ import {
   useGameMode,
   useGameModeConfirmed,
 } from '@/hooks/gameState/store';
+import { usePendingWords } from '@/lib/multiplayer/usePendingWords';
+import { PendingWordChip } from '@/components/multiplayer/PendingWordChip';
 
 // ==================== Types ====================
 
@@ -132,12 +138,49 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
 }): React.ReactElement | null => {
   const [showStopConfirm, setShowStopConfirm] = useState(false);
 
+  const router = useRouter();
+  const params = useParams();
+
   // Get player's game history for trail display logic
   const { profile } = useAuth();
 
   // Only gameMode at root — mode-overlay state subscribed by InGameScreen.
   const gameMode = useGameMode();
   const gameModeConfirmed = useGameModeConfirmed();
+
+  const { pendingWords, enqueuePending, confirmPending, rejectPending, dismissPending, clearAll } = usePendingWords();
+
+  const { isReconnecting, reconnectAttempt, maxReconnectAttempts, showAbortModal, triggerAbort } =
+    useReconnectFlow({ gameCode, username, gameActive: true });
+
+  const handleContinueSolo = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('mp_solo_handoff', JSON.stringify({ grid: tableData, gameCode }));
+    }
+    const locale = (params?.locale as string) || 'en';
+    router.push(`/${locale}/singleplayer?mpHandoff=1`);
+  }, [router, params, tableData, gameCode]);
+
+  // Listen for per-word server feedback to drive pending-word chip transitions
+  useEffect(() => {
+    if (!socket) return;
+    const handlePlayerFound = (data: { username: string; word: string }) => {
+      if (data.username === username) confirmPending(data.word);
+    };
+    const handleWordRejected = (data: { word: string }) => rejectPending(data.word);
+    socket.on('playerFoundWord', handlePlayerFound);
+    socket.on('wordRejected', handleWordRejected);
+    socket.on('wordAlreadyFound', handleWordRejected);
+    socket.on('wordNotOnBoard', handleWordRejected);
+    socket.on('endGame', clearAll);
+    return () => {
+      socket.off('playerFoundWord', handlePlayerFound);
+      socket.off('wordRejected', handleWordRejected);
+      socket.off('wordAlreadyFound', handleWordRejected);
+      socket.off('wordNotOnBoard', handleWordRejected);
+      socket.off('endGame', clearAll);
+    };
+  }, [socket, username, confirmPending, rejectPending, clearAll]);
 
   // Blast multiplayer bridge — converts Zustand state to BlastGame props
   const blastBridge = useBlastMultiplayerBridge({
@@ -148,8 +191,9 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   // Blast multiplayer: emit word + comboType to server via socket
   const handleBlastWordWithCombo = useCallback((word: string, comboType: string | null) => {
     if (!socket) return;
+    enqueuePending(word);
     socket.emit('submitWord', { word, comboType });
-  }, [socket]);
+  }, [socket, enqueuePending]);
 
   // Word hunt guess handler — emits to server
   const handleWordHuntGuess = useCallback((guess: string) => {
@@ -216,6 +260,8 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           t={t}
           remainingTime={remainingTime}
         />
+        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} />}
+        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
         {showStopConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
             <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
@@ -254,6 +300,8 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           blastSeed={blastBridge.blastSeed}
           waveNumber={blastBridge.waveNumber}
         />
+        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} />}
+        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
         {showStopConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
             <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
@@ -291,6 +339,8 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           socket={socket}
           foundWords={foundWords}
         />
+        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} />}
+        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
         {showStopConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
             <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
@@ -358,6 +408,16 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       totalGamesPlayed={profile?.total_games}
     />
     </div>
+    {/* Pending word chips — optimistic submit feedback */}
+    {pendingWords.size > 0 && (
+      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 flex flex-wrap gap-1 justify-center pointer-events-none">
+        {Array.from(pendingWords.entries()).map(([word, status]) => (
+          <PendingWordChip key={word} word={word} status={status} onDismiss={dismissPending} />
+        ))}
+      </div>
+    )}
+    {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} />}
+    {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
     {showStopConfirm && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
         <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">

@@ -143,6 +143,8 @@ export interface GameState {
   activeRoundEvent?: string | null;
   /** Player boost claims: sessionId + signed token for firstWordBonus / scoreMultiplier */
   playerBoosts?: Record<string, { sessionId: string; token: string }>;
+  /** Monotonic per-game event counter. Incremented on each scored word submission. Used for resume dedup and delta replay (Phase 3). */
+  serverSeq?: number;
 }
 
 // Game creation data interface

@@ -89,6 +89,7 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
   const autoStart = searchParams?.get('autoStart') || null;
   const presetParam = searchParams?.get('preset') || null;
   const boardCode = searchParams?.get('boardCode') || null;
+  const mpHandoff = searchParams?.get('mpHandoff') === '1';
 
   const [phase, setPhase] = useState<SinglePlayerPhase>(() => {
     const hasAutoStart = searchParams?.get('autoStart');
@@ -239,6 +240,24 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
       setPhase('playing');
     }
   }, [presetParam, autoStart, phase, uiLanguage]);
+
+  // Auto-load MP handoff board (Phase 3.7) — same grid used in MP game
+  useEffect(() => {
+    if (!mpHandoff || hasAutoStartedRef.current) return;
+    if (typeof window === 'undefined') return;
+    const raw = sessionStorage.getItem('mp_solo_handoff');
+    if (!raw) return;
+    hasAutoStartedRef.current = true;
+    try {
+      const { grid } = JSON.parse(raw) as { grid: LetterGrid; gameCode: string };
+      sessionStorage.removeItem('mp_solo_handoff');
+      if (!grid) return;
+      setGameState(prev => ({ ...prev, mode: 'solo-bots', bots: [], grid, language: uiLanguage as Language }));
+      setPhase('playing');
+    } catch {
+      sessionStorage.removeItem('mp_solo_handoff');
+    }
+  }, [mpHandoff, uiLanguage]);
 
   // Auto-load community board
   useEffect(() => {
