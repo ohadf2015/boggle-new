@@ -9,14 +9,49 @@ import { BlastHud } from './BlastHud';
 import { BlastLevelIntroCard } from './BlastLevelIntroCard';
 import { BlastLevelCompleteCard } from './BlastLevelCompleteCard';
 import { BlastChestOpenModal } from './BlastChestOpenModal';
+import { BlastFxOverlay } from './BlastFxOverlay';
+import { BlastAtmosphereOverlay } from './BlastAtmosphereOverlay';
 
 type Props = { level: BlastLevel; onAdvance: () => void };
+
+// Mode color map
+const MODE_COLORS: Record<string, string> = {
+  fruits: '#BFFF00', // lime
+  animals: '#00FFFF', // cyan
+  food: '#FF1493', // pink
+  ocean: '#00FFFF', // cyan
+  space: '#8B5CF6', // purple
+  nature: '#BFFF00', // lime
+  sports: '#FF1493', // pink
+  colors: '#BFFF00', // lime
+  transport: '#00FFFF', // cyan
+  body: '#FF1493', // pink
+  home: '#BFFF00', // lime
+  school: '#00FFFF', // cyan
+  tools: '#FF1493', // pink
+  weather: '#00FFFF', // cyan
+  music: '#BFFF00', // lime
+  jobs: '#FF1493', // pink
+  family: '#BFFF00', // lime
+  numbers: '#00FFFF', // cyan
+  feelings: '#FF1493', // pink
+  mythology: '#8B5CF6', // purple
+  science: '#BFFF00', // lime
+  travel: '#00FFFF', // cyan
+  art: '#FF1493', // pink
+  time: '#BFFF00', // lime
+  onboarding: '#BFFF00', // lime
+};
 
 export function BlastGame({ level, onAdvance }: Props) {
   const [introDismissed, setIntroDismissed] = useState(false);
   const { state, handlers } = useBlastV2(level);
   const { state: progressState, clearLevel, openChest, openMutation } = useBlastProgress();
   const [showChestModal, setShowChestModal] = useState(false);
+
+  const modeColor = MODE_COLORS[level.theme] || '#BFFF00';
+  // FX integration point: BlastFxOverlay mounts useBlastFx internally
+  // Board ref is obtained internally by BlastBoard via useRef
 
   // On level complete, submit to API
   if (state.status === 'levelComplete' && !introDismissed) {
@@ -81,14 +116,19 @@ export function BlastGame({ level, onAdvance }: Props) {
           /* Plan 5 wires hints */
         }}
       />
-      <BlastBoard
-        level={state.level}
-        selection={state.selection}
-        invalidShakeKey={state.invalidShakeKey}
-        onPointerDown={handlers.onPointerDown}
-        onPointerEnter={handlers.onPointerMove}
-        onPointerUp={handlers.onPointerUp}
-      />
+      <div className="relative">
+        <BlastAtmosphereOverlay modeColor={modeColor} />
+        <BlastFxOverlay />
+        <BlastBoard
+          level={state.level}
+          selection={state.selection}
+          invalidShakeKey={state.invalidShakeKey}
+          onPointerDown={handlers.onPointerDown}
+          onPointerEnter={handlers.onPointerMove}
+          onPointerUp={handlers.onPointerUp}
+          modeColor={modeColor}
+        />
+      </div>
     </div>
   );
 }
