@@ -5076,7 +5076,8 @@ const es = {
       "found": "¡Bien! Palabra añadida.",
       "notAWord": "No está en este tablero — prueba otro camino.",
       "duplicate": "Ya encontrada.",
-      "foundWordsLabel": "Encontradas ({count})"
+      "foundWordsLabel": "Encontradas ({count})",
+      "playRealCta": "Jugar clásico ahora →"
     },
     "wordHunt": {
       "instruction": "Toca letras para deletrear la palabra objetivo. Verde = lugar correcto. Amarillo = lugar incorrecto.",
@@ -5103,7 +5104,8 @@ const es = {
       "playRealCta": "Jugar al juego real →",
       "shortWordTip": "{word} es muy corto. En el Word Hunt real necesitas {min}+ letras o pierdes una vida.",
       "discoveryHint": "¡Palabra bonus encontrada — letras pista reveladas!",
-      "discoveryTipNoClue": "Palabra válida, pero no se revelaron letras del objetivo. ¡Prueba con palabras más largas!"
+      "discoveryTipNoClue": "Palabra válida, pero no se revelaron letras del objetivo. ¡Prueba con palabras más largas!",
+      "discoveryTip": "Consejo: ¡Cualquier palabra válida revela pistas! Palabras cortas desbloquean consejos más rápido."
     },
     "complete": {
       "title": "¡Modo completado!",
@@ -5124,7 +5126,8 @@ const es = {
       "duplicate": "Ya encontrada.",
       "tooShort": "Mínimo 2 letras.",
       "foundWordsLabel": "Encontradas ({count})",
-      "scoreChip": "{score} pts"
+      "scoreChip": "{score} pts",
+      "playRealCta": "Jugar Wheel Rush ahora →"
     },
     "mistakeCoach": {
       "ariaLabel": "Consejo de práctica",
@@ -5896,6 +5899,8 @@ const es = {
         "pop": "borrar última",
         "clear": "limpiar",
       },
+      "stopGameConfirm": "¿Terminar el juego para todos?",
+      "stopGameYes": "Terminar Juego",
     },
     "facts": {
       "title": "Datos Curiosos",
@@ -11592,6 +11597,8 @@ const es = {
       "recallAll": "devolver todas las fichas al atril",
       "recallOne": "devolver la ficha al atril"
     },
+    "undo": "Deshacer",
+    "undoLastTile": "Deshacer última ficha",
     "axis": {
       "horizontal": "Horizontal",
       "vertical": "Vertical",

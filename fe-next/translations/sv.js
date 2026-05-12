@@ -5025,7 +5025,8 @@ const sv = {
       "found": "Bra! Ordet tillagt.",
       "notAWord": "Inte på den här tavlan — prova en annan väg.",
       "duplicate": "Redan hittat.",
-      "foundWordsLabel": "Hittade ({count})"
+      "foundWordsLabel": "Hittade ({count})",
+      "playRealCta": "Spela klassiskt nu →"
     },
     "wordHunt": {
       "instruction": "Tryck på bokstäver för att stava målordet. Grön = rätt plats. Gul = fel plats.",
@@ -5073,7 +5074,8 @@ const sv = {
       "notAWord": "Inte ett ord — prova ett annat.",
       "duplicate": "Redan hittat.",
       "foundWordsLabel": "Hittade ({count})",
-      "scoreChip": "{score} p"
+      "scoreChip": "{score} p",
+      "playRealCta": "Spela Wheel Rush nu →"
     },
     "mistakeCoach": {
       "ariaLabel": "Övningstips",
@@ -5614,6 +5616,8 @@ const sv = {
         "pop": "ta bort sista",
         "clear": "rensa",
       },
+      "stopGameConfirm": "Avsluta spelet för alla?",
+      "stopGameYes": "Avsluta spelet",
     },
     "shareResult": "Dela resultat",
     "quitConfirmTitle": "Lämna jakten?",
@@ -11497,6 +11501,8 @@ const sv = {
       "recallAll": "skicka tillbaka alla brickor",
       "recallOne": "skicka tillbaka brickan"
     },
+    "undo": "Ångra",
+    "undoLastTile": "Ångra senaste bricka",
     "axis": {
       "horizontal": "Vågrätt",
       "vertical": "Lodrätt",

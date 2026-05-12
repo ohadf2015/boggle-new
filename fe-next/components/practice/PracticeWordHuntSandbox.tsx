@@ -20,6 +20,7 @@ import {
 } from '@/lib/practice/telemetry';
 import { getPracticeStreak } from '@/hooks/usePracticeStreak';
 import GridComponent from '@/components/GridComponent';
+import type { SelectedCell } from '@/components/grid';
 import { DiscoveredWordsList } from '@/components/daily/DiscoveredWordsList';
 // REUSE the real Word Hunt clue UI + clue accumulation hook so practice
 // shows the exact same progressive letter reveals the live game does.
@@ -96,6 +97,12 @@ export default function PracticeWordHuntSandbox() {
   const [shortTip, setShortTip] = useState<string | null>(null);
   const [confettiKey, setConfettiKey] = useState(0);
   const [popupDismissed, setPopupDismissed] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [currentSelectionLength, setCurrentSelectionLength] = useState(0);
+  const [showDiscoveryTip, setShowDiscoveryTip] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return !localStorage.getItem('practice-wh-discovery-seen');
+  });
 
   const overlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shortTipTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -162,6 +169,7 @@ export default function PracticeWordHuntSandbox() {
   const handleWordSubmit = useCallback(async (rawWord: string) => {
     if (!rawWord || rawWord.length === 0) return;
 
+    setIsVerifying(true);
     const displayWord = rawWord.toUpperCase();
     const targetUpper = target.toUpperCase();
 
@@ -175,6 +183,7 @@ export default function PracticeWordHuntSandbox() {
       );
       const tile = document.querySelector('[data-row][data-col]');
       if (tile) juice.triggerInvalid(tile);
+      setIsVerifying(false);
       return;
     }
 
@@ -205,12 +214,14 @@ export default function PracticeWordHuntSandbox() {
       juice.triggerWordFound(positions);
       tutorialRef.current.dispatch({ type: 'word-found' });
       advanceBeat();
+      setIsVerifying(false);
       return;
     }
 
     // Same length as target — counts as a target attempt with feedback.
     if (displayWord.length === targetUpper.length) {
       if (attempts.some((a) => a.word === displayWord)) {
+        setIsVerifying(false);
         return; // duplicate
       }
       const feedback = getLetterFeedback(displayWord, targetUpper, language);
@@ -248,6 +259,7 @@ export default function PracticeWordHuntSandbox() {
           });
         }
       }
+      setIsVerifying(false);
       return;
     }
 
@@ -260,9 +272,13 @@ export default function PracticeWordHuntSandbox() {
       // 1st invalid bonus-word attempt → coach the "real words only" rule.
       badCountRef.current += 1;
       if (badCountRef.current === 1) coach.trigger('notAWord');
+      setIsVerifying(false);
       return;
     }
-    if (discoveries.some((d) => d.word === displayWord)) return;
+    if (discoveries.some((d) => d.word === displayWord)) {
+      setIsVerifying(false);
+      return;
+    }
     setDiscoveries((d) => [
       ...d,
       { word: displayWord, timestamp: Date.now(), lifeGained: 0, tokensGained: 0 },
@@ -282,6 +298,7 @@ export default function PracticeWordHuntSandbox() {
     }
     sound.playWordAcceptedSound?.();
     setConfettiKey((k) => k + 1);
+    setIsVerifying(false);
   }, [
     target,
     attempts,
@@ -298,7 +315,8 @@ export default function PracticeWordHuntSandbox() {
     coach,
   ]);
 
-  const onSelectionChange = useCallback(() => {
+  const onSelectionChange = useCallback((cells: SelectedCell[]) => {
+    setCurrentSelectionLength(cells.length);
     tutorialRef.current.dispatch({ type: 'drag-started' });
     advanceBeat();
   }, [advanceBeat]);
@@ -308,6 +326,25 @@ export default function PracticeWordHuntSandbox() {
   return (
     <div className="relative flex flex-col items-stretch w-full max-w-md mx-auto px-4 pt-3 pb-2 gap-2 h-[calc(100dvh-var(--bottom-stack-height,0rem))] overflow-hidden">
       <PracticePixiFx ref={fxRef} />
+
+      {/* Discovery mechanic onboarding tip */}
+      {showDiscoveryTip && (
+        <div className="flex items-start gap-2 bg-neo-navy/60 border-2 border-neo-lime text-neo-cream text-sm p-3 mb-2 rounded-neo">
+          <span className="shrink-0">💡</span>
+          <div className="flex-1">
+            <span className="font-bold">{t('practice.wordHunt.discoveryTip')}</span>
+            <button
+              onClick={() => {
+                localStorage.setItem('practice-wh-discovery-seen', '1');
+                setShowDiscoveryTip(false);
+              }}
+              className="ml-2 underline text-neo-lime text-xs hover:text-neo-cream transition-colors"
+            >
+              {t('common.understood')}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* HUD strip — back-to-hub + educational tries pill. */}
       <div className="w-full flex items-center justify-between gap-2">
@@ -357,7 +394,7 @@ export default function PracticeWordHuntSandbox() {
               skipAnimations={false}
               gameDir={dir}
               t={t as (key: string) => string}
-              matchesTargetLength={false}
+              matchesTargetLength={!solved && currentSelectionLength === target.length}
             />
           </div>
           <p className="text-[10px] sm:text-xs text-neo-cream/60 text-center max-w-xs px-2 mt-1">
@@ -365,18 +402,20 @@ export default function PracticeWordHuntSandbox() {
           </p>
         </div>
 
-        {shortTip && (
-          <div
-            data-testid="practice-short-tip"
-            role="status"
-            aria-live="polite"
-            className="px-3 py-1.5 rounded-neo border-2 border-neo-pink bg-neo-pink/15 text-neo-cream font-neo-display font-bold text-xs text-center max-w-xs"
-          >
-            {shortTip}
-          </div>
-        )}
+        <div className="min-h-[2rem] flex items-center justify-center w-full">
+          {shortTip && (
+            <div
+              data-testid="practice-short-tip"
+              role="status"
+              aria-live="polite"
+              className="px-3 py-1.5 rounded-neo border-2 border-neo-pink bg-neo-pink/15 text-neo-cream font-neo-display font-bold text-xs text-center max-w-xs"
+            >
+              {shortTip}
+            </div>
+          )}
+        </div>
 
-        <div className="flex-1 min-h-0 flex items-center justify-center w-full">
+        <div className={`flex-1 min-h-0 flex items-center justify-center w-full relative transition-opacity duration-200 ${isVerifying ? 'opacity-50 pointer-events-none' : ''}`}>
         <div data-testid="practice-board" className="w-full max-w-xs aspect-square mx-auto">
           <GridComponent
             grid={board}
@@ -387,6 +426,11 @@ export default function PracticeWordHuntSandbox() {
             language={language}
           />
         </div>
+        {isVerifying && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-8 h-8 border-2 border-neo-lime border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
         </div>
 
         {discoveries.length > 0 && (

@@ -95,8 +95,8 @@ describe('SurvivalClueBoxes - Yellow Letter Removal When Found Green', () => {
 
     // Find all boxes and check position 0 specifically
     const allBoxes = screen.getAllByRole('generic').filter(el =>
-      el.classList.contains('bg-yellow-500') ||
-      el.classList.contains('bg-green-500') ||
+      el.classList.contains('bg-neo-yellow') ||
+      el.classList.contains('bg-neo-lime') ||
       el.classList.contains('bg-neo-black')
     );
 
@@ -113,8 +113,8 @@ describe('SurvivalClueBoxes - Yellow Letter Removal When Found Green', () => {
     pElements.forEach(pEl => {
       const box = pEl.closest('div');
       // All P's should be green (in correct positions), not yellow
-      expect(box).toHaveClass('bg-green-500');
-      expect(box).not.toHaveClass('bg-yellow-500');
+      expect(box).toHaveClass('bg-neo-lime');
+      expect(box).not.toHaveClass('bg-neo-yellow');
     });
   });
 
@@ -176,11 +176,11 @@ describe('SurvivalClueBoxes - Yellow Letter Removal When Found Green', () => {
     expect(clueBoxes).toHaveLength(2); // Yellow P at 0, green P at 1
 
     // Find the yellow P (should be at position 0)
-    const yellowP = clueBoxes.find(el => el.closest('div')?.classList.contains('bg-yellow-500'));
+    const yellowP = clueBoxes.find(el => el.closest('div')?.classList.contains('bg-neo-yellow'));
     expect(yellowP).toBeDefined();
 
     // Find the green P (should be at position 1)
-    const greenP = clueBoxes.find(el => el.closest('div')?.classList.contains('bg-green-500'));
+    const greenP = clueBoxes.find(el => el.closest('div')?.classList.contains('bg-neo-lime'));
     expect(greenP).toBeDefined();
   });
 
@@ -236,8 +236,8 @@ describe('SurvivalClueBoxes - Yellow Letter Removal When Found Green', () => {
 
     // The A should be green
     const aBox = aElements[0].closest('div');
-    expect(aBox).toHaveClass('bg-green-500');
-    expect(aBox).not.toHaveClass('bg-yellow-500');
+    expect(aBox).toHaveClass('bg-neo-lime');
+    expect(aBox).not.toHaveClass('bg-neo-yellow');
 
     // Position 1 should show "?" (yellow A removed)
     const questionMarks = screen.getAllByText('?');

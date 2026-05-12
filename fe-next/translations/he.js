@@ -5038,7 +5038,8 @@ const he = {
       "found": "יפה! המילה נוספה.",
       "notAWord": "לא על הלוח הזה — נסה מסלול אחר.",
       "duplicate": "כבר נמצאה.",
-      "foundWordsLabel": "נמצאו ({count})"
+      "foundWordsLabel": "נמצאו ({count})",
+      "playRealCta": "שחק קלאסי עכשיו ←"
     },
     "wordHunt": {
       "instruction": "הקש על אותיות כדי לאיית את מילת המטרה. ירוק = במקום הנכון. צהוב = אות נכונה במקום הלא נכון.",
@@ -5086,7 +5087,8 @@ const he = {
       "notAWord": "זו לא מילה — נסה אחרת.",
       "duplicate": "כבר נמצאה.",
       "foundWordsLabel": "נמצאו ({count})",
-      "scoreChip": "{score} נק׳"
+      "scoreChip": "{score} נק׳",
+      "playRealCta": "שחק גלגל מילים עכשיו ←"
     },
     "mistakeCoach": {
       "ariaLabel": "טיפ אימון",
@@ -5613,6 +5615,8 @@ const he = {
         "pop": "מחק אות",
         "clear": "נקה",
       },
+      "stopGameConfirm": "לסיים את המשחק לכול?",
+      "stopGameYes": "סיים משחק",
     },
     "shareResult": "שתפו תוצאה",
     "quitConfirmTitle": "לעזוב את הציד?",
@@ -11585,6 +11589,8 @@ const he = {
       "recallAll": "החזר את כל האותיות לרק",
       "recallOne": "החזר אות לרק"
     },
+    "undo": "בטל",
+    "undoLastTile": "בטל אות אחרונה",
     "axis": {
       "horizontal": "אופקי",
       "vertical": "אנכי",

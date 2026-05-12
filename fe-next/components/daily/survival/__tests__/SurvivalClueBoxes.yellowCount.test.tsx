@@ -62,7 +62,7 @@ describe('SurvivalClueBoxes - Yellow Letter Count Limiting', () => {
 
     // The green A should be at position 1 with green styling
     const greenBox = allAs[0].closest('div');
-    expect(greenBox).toHaveClass('bg-green-500');
+    expect(greenBox).toHaveClass('bg-neo-lime');
   });
 
   it('should show yellows only up to remaining occurrences after greens', () => {
@@ -98,7 +98,7 @@ describe('SurvivalClueBoxes - Yellow Letter Count Limiting', () => {
     expect(allPs.length).toBeLessThanOrEqual(2);
 
     // Count yellow boxes - should be 0 since both Ps are green
-    const yellowBoxes = allPs.filter(el => el.closest('div')?.classList.contains('bg-yellow-500'));
+    const yellowBoxes = allPs.filter(el => el.closest('div')?.classList.contains('bg-neo-yellow'));
     expect(yellowBoxes.length).toBe(0);
   });
 
@@ -139,8 +139,8 @@ describe('SurvivalClueBoxes - Yellow Letter Count Limiting', () => {
     expect(allPs.length).toBe(2);
 
     // Count by color
-    const greenPs = allPs.filter(el => el.closest('div')?.classList.contains('bg-green-500'));
-    const yellowPs = allPs.filter(el => el.closest('div')?.classList.contains('bg-yellow-500'));
+    const greenPs = allPs.filter(el => el.closest('div')?.classList.contains('bg-neo-lime'));
+    const yellowPs = allPs.filter(el => el.closest('div')?.classList.contains('bg-neo-yellow'));
 
     expect(greenPs.length).toBe(1);
     expect(yellowPs.length).toBe(1);
@@ -183,12 +183,12 @@ describe('SurvivalClueBoxes - Yellow Letter Count Limiting', () => {
     const greenA = screen.getByText('A').closest('div');
     const greenE = screen.getByText('E').closest('div');
 
-    expect(greenA).toHaveClass('bg-green-500');
-    expect(greenE).toHaveClass('bg-green-500');
+    expect(greenA).toHaveClass('bg-neo-lime');
+    expect(greenE).toHaveClass('bg-neo-lime');
 
     // No yellow boxes should exist for A or E
     const allBoxes = screen.getAllByText(/[AE]/).map(el => el.closest('div'));
-    const yellowBoxes = allBoxes.filter(box => box?.classList.contains('bg-yellow-500'));
+    const yellowBoxes = allBoxes.filter(box => box?.classList.contains('bg-neo-yellow'));
     expect(yellowBoxes.length).toBe(0);
   });
 
@@ -225,11 +225,11 @@ describe('SurvivalClueBoxes - Yellow Letter Count Limiting', () => {
     expect(allAs.length).toBe(3);
 
     // All 3 should be green (they're at the correct positions)
-    const greenAs = allAs.filter(el => el.closest('div')?.classList.contains('bg-green-500'));
+    const greenAs = allAs.filter(el => el.closest('div')?.classList.contains('bg-neo-lime'));
     expect(greenAs.length).toBe(3);
 
     // No yellow As (all 3 target As are found as green)
-    const yellowAs = allAs.filter(el => el.closest('div')?.classList.contains('bg-yellow-500'));
+    const yellowAs = allAs.filter(el => el.closest('div')?.classList.contains('bg-neo-yellow'));
     expect(yellowAs.length).toBe(0);
   });
 

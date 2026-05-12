@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Check, X, AlertTriangle, RefreshCw, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -32,65 +32,65 @@ const FEEDBACK_STYLES: Record<FeedbackType, {
   animation: string;
 }> = {
   'valid-word': {
-    bg: 'bg-green-500',
-    text: 'text-white',
-    border: 'border-green-700',
+    bg: 'bg-neo-lime',
+    text: 'text-neo-black',
+    border: 'border-neo-black',
     icon: <Check className="w-4 h-4" />,
     animation: 'animate-neo-pop',
   },
   'invalid-word': {
-    bg: 'bg-red-500',
-    text: 'text-white',
-    border: 'border-red-700',
+    bg: 'bg-neo-red',
+    text: 'text-neo-cream',
+    border: 'border-neo-black',
     icon: <X className="w-4 h-4" />,
     animation: 'animate-neo-shake',
   },
   'not-on-board': {
-    bg: 'bg-orange-500',
-    text: 'text-white',
-    border: 'border-orange-700',
+    bg: 'bg-neo-orange',
+    text: 'text-neo-cream',
+    border: 'border-neo-black',
     icon: <AlertTriangle className="w-4 h-4" />,
     animation: 'animate-neo-wiggle',
   },
   'not-in-dictionary': {
-    bg: 'bg-red-500',
-    text: 'text-white',
-    border: 'border-red-700',
+    bg: 'bg-neo-red',
+    text: 'text-neo-cream',
+    border: 'border-neo-black',
     icon: <X className="w-4 h-4" />,
     animation: 'animate-neo-shake',
   },
   'too-short': {
-    bg: 'bg-orange-500',
-    text: 'text-white',
-    border: 'border-orange-700',
+    bg: 'bg-neo-orange',
+    text: 'text-neo-cream',
+    border: 'border-neo-black',
     icon: <AlertTriangle className="w-4 h-4" />,
     animation: 'animate-bounce',
   },
   'too-long': {
-    bg: 'bg-orange-500',
-    text: 'text-white',
-    border: 'border-orange-700',
+    bg: 'bg-neo-orange',
+    text: 'text-neo-cream',
+    border: 'border-neo-black',
     icon: <AlertTriangle className="w-4 h-4" />,
     animation: 'animate-bounce',
   },
   'duplicate': {
-    bg: 'bg-yellow-500',
-    text: 'text-black',
-    border: 'border-yellow-700',
+    bg: 'bg-neo-yellow',
+    text: 'text-neo-black',
+    border: 'border-neo-black',
     icon: <RefreshCw className="w-4 h-4" />,
     animation: 'animate-pulse',
   },
   'target-attempt': {
-    bg: 'bg-blue-500',
-    text: 'text-white',
-    border: 'border-blue-700',
+    bg: 'bg-neo-cyan',
+    text: 'text-neo-black',
+    border: 'border-neo-black',
     icon: <div className="text-base">🎯</div>,
     animation: 'animate-neo-pop',
   },
   'target-found': {
-    bg: 'bg-linear-to-r from-purple-500 via-pink-500 to-yellow-500',
-    text: 'text-white',
-    border: 'border-purple-700',
+    bg: 'bg-linear-to-r from-neo-purple via-neo-pink to-neo-yellow',
+    text: 'text-neo-cream',
+    border: 'border-neo-black',
     icon: <div className="text-base">🎉</div>,
     animation: 'animate-neo-explosion',
   },
@@ -128,8 +128,8 @@ export const WordFeedbackToast: React.FC<WordFeedbackToastProps> = ({
 
   if (isSubtle) {
     return (
-      <AnimatePresence>
-        <motion.div
+      <AdaptiveAnimatePresence>
+        <AdaptiveMotion.div
           key="clue-unlocked"
           initial={{ opacity: 0, y: 8, scale: 0.85 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -138,7 +138,7 @@ export const WordFeedbackToast: React.FC<WordFeedbackToastProps> = ({
           className={cn(
             'fixed top-3 left-1/2 -translate-x-1/2 z-40 pointer-events-none',
             'flex items-center gap-1.5 px-2.5 py-1 rounded-neo',
-            'border-2 shadow-hard text-xs font-bold',
+            'border-2 shadow-hard text-xs font-bold font-neo-display',
             style.bg,
             style.text,
             style.border,
@@ -146,23 +146,24 @@ export const WordFeedbackToast: React.FC<WordFeedbackToastProps> = ({
         >
           <div className="shrink-0">{style.icon}</div>
           <div>{message}</div>
-        </motion.div>
-      </AnimatePresence>
+        </AdaptiveMotion.div>
+      </AdaptiveAnimatePresence>
     );
   }
 
   return (
-    <AnimatePresence>
+    <AdaptiveAnimatePresence>
       {type && (
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ opacity: 0, y: -20, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.9 }}
           transition={{ duration: 0.2 }}
           className={cn(
-            'fixed top-[35%] left-1/2 -translate-x-1/2 z-50',
-            'flex items-center gap-2 px-3 py-2 rounded-lg',
-            'border-2 shadow-neo-brutalist',
+            'fixed top-20 left-1/2 -translate-x-1/2 z-50',
+            'max-h-[640px]:top-12',
+            'flex items-center gap-2 px-3 py-2 rounded-neo',
+            'border-2 shadow-hard',
             style.bg,
             style.text,
             style.border,
@@ -172,11 +173,11 @@ export const WordFeedbackToast: React.FC<WordFeedbackToastProps> = ({
           <div className="shrink-0">
             {style.icon}
           </div>
-          <div className="font-bold text-sm">
+          <div className="font-bold text-sm font-neo-display">
             {message}
           </div>
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 };

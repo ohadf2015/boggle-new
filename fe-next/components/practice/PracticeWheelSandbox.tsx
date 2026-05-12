@@ -202,6 +202,7 @@ export default function PracticeWheelSandbox() {
   // Submit-on-Enter for keyboard players (parity with real WheelRush).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (e.isComposing || e.keyCode === 229) return;
       if (e.key === 'Enter') onSubmit();
     };
     window.addEventListener('keydown', onKey);

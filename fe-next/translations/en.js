@@ -5137,7 +5137,8 @@ const en = {
       "found": "Nice! Word added.",
       "notAWord": "Not on this board — try another path.",
       "duplicate": "Already found.",
-      "foundWordsLabel": "Found ({count})"
+      "foundWordsLabel": "Found ({count})",
+      "playRealCta": "Play Classic now →"
     },
     "wordHunt": {
       "instruction": "Tap letters to spell the target word. Green = right spot. Yellow = wrong spot.",
@@ -5164,7 +5165,8 @@ const en = {
       "playRealCta": "Play the real game →",
       "shortWordTip": "{word} is too short. In real Word Hunt you need {min}+ letters or you lose a life.",
       "discoveryHint": "Bonus word found — clue letters revealed!",
-      "discoveryTipNoClue": "Valid word, but no target letters revealed. Try longer guesses!"
+      "discoveryTipNoClue": "Valid word, but no target letters revealed. Try longer guesses!",
+      "discoveryTip": "Tip: Any valid word reveals clues! Short words unlock hints faster."
     },
     "complete": {
       "title": "Mode complete!",
@@ -5185,7 +5187,8 @@ const en = {
       "notAWord": "Not a word — try another.",
       "duplicate": "Already found.",
       "foundWordsLabel": "Found ({count})",
-      "scoreChip": "{score} pts"
+      "scoreChip": "{score} pts",
+      "playRealCta": "Play Wheel Rush now →"
     },
     "mistakeCoach": {
       "ariaLabel": "Practice tip",
@@ -5720,6 +5723,8 @@ const en = {
         "pop": "remove last",
         "clear": "clear",
       },
+      "stopGameConfirm": "End the game for everyone?",
+      "stopGameYes": "End Game",
     },
     "shareResult": "Share",
     "quitConfirmTitle": "Leave the Hunt?",
@@ -11689,6 +11694,8 @@ const en = {
       "recallAll": "send all tiles back to rack",
       "recallOne": "send tile back to rack"
     },
+    "undo": "Undo",
+    "undoLastTile": "Undo last tile",
     "axis": {
       "horizontal": "Across",
       "vertical": "Down",

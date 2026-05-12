@@ -5010,7 +5010,8 @@ const ja = {
       "found": "いいね！単語を追加しました。",
       "notAWord": "このボードにはありません — 別の道を試してください。",
       "duplicate": "すでに見つけました。",
-      "foundWordsLabel": "発見 ({count})"
+      "foundWordsLabel": "発見 ({count})",
+      "playRealCta": "クラシックを今すぐプレイ →"
     },
     "wordHunt": {
       "instruction": "文字をタップしてターゲットの単語を作ります。緑 = 正しい位置。黄色 = 間違った位置。",
@@ -5058,7 +5059,8 @@ const ja = {
       "notAWord": "単語ではありません — 別を試してください。",
       "duplicate": "すでに見つけました。",
       "foundWordsLabel": "発見 ({count})",
-      "scoreChip": "{score}点"
+      "scoreChip": "{score}点",
+      "playRealCta": "ウィールラッシュを今すぐプレイ →"
     },
     "mistakeCoach": {
       "ariaLabel": "練習ヒント",
@@ -5645,6 +5647,8 @@ const ja = {
         "pop": "最後を削除",
         "clear": "クリア",
       },
+      "stopGameConfirm": "全員のゲームを終了しますか？",
+      "stopGameYes": "ゲーム終了",
     },
     "shareResult": "結果をシェア",
     "quitConfirmTitle": "ハントを終了する？",
@@ -8631,6 +8635,38 @@ const ja = {
       "huntSuccess": "{{attempts}}回の試行でターゲット発見！",
       "huntFailed": "ターゲットワード未発見",
       "wheelWords": "{{center}}/{{total}}語が中心文字を含む"
+    },
+    "ascension": {
+      "level1": "見習い",
+      "level2": "修行者",
+      "level3": "熟練者",
+      "level4": "上級者",
+      "level5": "エキスパート",
+      "level6": "マスター",
+      "level7": "グランドマスター",
+      "level8": "レジェンド",
+      "level9": "ミシック",
+      "level10": "超越者"
+    },
+    "consumables": {
+      "bossRevive": { "name": "ボス復活" },
+      "bossShield": { "name": "ボスシールド" },
+      "doubleGold": { "name": "ゴールド2倍" },
+      "extraHint": { "name": "追加ヒント" },
+      "gridReroll": { "name": "グリッド再生成" },
+      "objectiveSkip": { "name": "目標スキップ" },
+      "perfectStar": { "name": "パーフェクトスター" },
+      "timerExtension": { "name": "時間延長" }
+    },
+    "mutators": {
+      "blindMode": { "name": "ブラインドモード" },
+      "chaosGrid": { "name": "カオスグリッド" },
+      "fragile": { "name": "フラジャイル" },
+      "ironMan": { "name": "アイアンマン" },
+      "minimalist": { "name": "ミニマリスト" },
+      "noHints": { "name": "ヒントなし" },
+      "speedRun": { "name": "スピードラン" },
+      "wordMaster": { "name": "ワードマスター" }
     }
   },
   "wheelRush": {
@@ -10793,6 +10829,7 @@ const ja = {
     }
   },
   "wotd": {
+    "title": "今日の単語",
     "teaser": "今日の単語",
     "found": "見つけた！",
     "foundPercent": "{{percent}}%のプレイヤーだけが見つけました！",
@@ -11222,6 +11259,7 @@ const ja = {
   "wordForge": {
     "title": "ワードフォージ",
     "subtitle": "単語を綴れ。ルーンを集めろ。スコアを打ち破れ。",
+    "go": "GO！",
     "startRun": "ラン開始",
     "round": "ラウンド",
     "roundOf": "ラウンド {{round}} / {{max}}",
@@ -11429,6 +11467,8 @@ const ja = {
       "recallAll": "すべてのタイルをラックに戻す",
       "recallOne": "タイルをラックに戻す"
     },
+    "undo": "元に戻す",
+    "undoLastTile": "最後のタイルを元に戻す",
     "axis": {
       "horizontal": "横",
       "vertical": "縦",

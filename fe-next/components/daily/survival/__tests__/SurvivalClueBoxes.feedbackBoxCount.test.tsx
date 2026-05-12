@@ -130,17 +130,17 @@ describe('SurvivalClueBoxes - Feedback Box Count', () => {
 
     render(<SurvivalClueBoxes {...createProps(targetWord, feedback, true)} />);
 
-    // Green letter shown with green styling
+    // Green letter shown with neo-lime styling
     const wBox = screen.getByText('W').closest('div');
-    expect(wBox).toHaveClass('bg-green-500');
+    expect(wBox).toHaveClass('bg-neo-lime');
 
-    // Gray letter initially flashes with gray styling (before fade timer)
+    // Gray letter initially flashes with navy styling (before fade timer)
     const aBox = screen.getByText('A').closest('div');
-    expect(aBox).toHaveClass('bg-gray-400');
+    expect(aBox).toHaveClass('bg-neo-navy-light');
 
-    // Yellow letter shown with yellow styling
+    // Yellow letter shown with neo-yellow styling
     const rBox = screen.getByText('R').closest('div');
-    expect(rBox).toHaveClass('bg-yellow-500');
+    expect(rBox).toHaveClass('bg-neo-yellow');
   });
 
   it('should fade gray letters to "?" after delay while keeping green/yellow visible', () => {

@@ -85,10 +85,10 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
             <span className={cn(
               "text-xl sm:text-2xl font-black [@media(max-height:560px)]:text-sm",
               triesRemaining <= 2
-                ? "text-red-600 dark:text-red-400"
+                ? "text-neo-red"
                 : triesRemaining <= 4
-                  ? "text-yellow-600 dark:text-yellow-400"
-                  : "text-gray-700 dark:text-gray-300"
+                  ? "text-neo-yellow"
+                  : "text-neo-cream/80"
             )}>
               {triesRemaining}/{MAX_ATTEMPTS} {t('wordHunt.survival.triesLeft')}
             </span>
@@ -221,10 +221,10 @@ const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordL
             className={cn(
               "flex items-center justify-center border-2 rounded-neo font-bold shadow-hard transition-colors duration-500",
               sizeClass,
-              letterFb.feedback === 'green' && "bg-green-500 border-green-700 text-white ring-1 ring-green-300/50",
-              letterFb.feedback === 'yellow' && "bg-yellow-500 border-yellow-600 text-neo-black ring-1 ring-yellow-300/50",
-              isGray && showGrayLetter && "bg-gray-400 border-gray-500 text-white",
-              isGray && !showGrayLetter && "bg-neo-black border-neo-black text-white"
+              letterFb.feedback === 'green' && "bg-neo-lime border-neo-black text-neo-black ring-1 ring-neo-lime/50",
+              letterFb.feedback === 'yellow' && "bg-neo-yellow border-neo-black text-neo-black ring-1 ring-neo-yellow/50",
+              isGray && showGrayLetter && "bg-neo-navy-light border-neo-cream/30 text-neo-cream/70",
+              isGray && !showGrayLetter && "bg-neo-black border-neo-black text-neo-cream"
             )}
           >
             {isClue ? letterFb.letter : (showGrayLetter ? letterFb.letter : '?')}
@@ -295,26 +295,25 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
           displayChar = accumulatedClue.letter;
           clueType = accumulatedClue.type;
           bgClass = accumulatedClue.type === 'green'
-            ? "bg-green-500 border-green-700 text-neo-black"
-            : "bg-yellow-500 border-yellow-600 text-neo-black";
+            ? "bg-neo-lime border-neo-black text-neo-black"
+            : "bg-neo-yellow border-neo-black text-neo-black";
         } else if (isShopRevealed) {
           displayChar = targetWord[idx]?.toUpperCase() || '?';
           clueType = 'green';
-          bgClass = "bg-green-500 border-green-700 text-neo-black";
+          bgClass = "bg-neo-lime border-neo-black text-neo-black";
         } else if (isHintRevealed) {
           displayChar = char;
           clueType = 'green';
-          bgClass = "bg-green-500 border-green-700 text-neo-black";
+          bgClass = "bg-neo-lime border-neo-black text-neo-black";
         } else if (persistedLetter) {
-          // Show persisted yellow letter from previous guesses
           displayChar = persistedLetter.letter;
           clueType = persistedLetter.type;
           bgClass = persistedLetter.type === 'green'
-            ? "bg-green-500 border-green-700 text-neo-black"
-            : "bg-yellow-500 border-yellow-600 text-neo-black";
+            ? "bg-neo-lime border-neo-black text-neo-black"
+            : "bg-neo-yellow border-neo-black text-neo-black";
         } else {
           displayChar = '?';
-          bgClass = "bg-neo-black border-neo-black text-white";
+          bgClass = "bg-neo-black border-neo-black text-neo-cream";
         }
 
         const isRevealed = !!accumulatedClue || isHintRevealed || isShopRevealed || !!persistedLetter;
@@ -329,8 +328,8 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
               "flex items-center justify-center border-2 rounded-neo font-bold shadow-hard",
               sizeClass,
               bgClass,
-              isRevealed && clueType === 'green' && "ring-1 ring-green-300/50",
-              isRevealed && clueType === 'yellow' && "ring-1 ring-yellow-300/50"
+              isRevealed && clueType === 'green' && "ring-1 ring-neo-lime/50",
+              isRevealed && clueType === 'yellow' && "ring-1 ring-neo-yellow/50"
             )}
           >
             {displayChar}
@@ -355,16 +354,16 @@ const FeedbackLegend: React.FC<FeedbackLegendProps> = ({ t }) => (
     className="flex items-center justify-center gap-2 mt-1 text-[10px] sm:text-xs"
   >
     <span className="flex items-center gap-1">
-      <span className="w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded border border-green-700"></span>
-      <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.correct')}</span>
+      <span className="w-3 h-3 sm:w-4 sm:h-4 bg-neo-lime rounded border border-neo-black"></span>
+      <span className="text-neo-cream/70">{t('wordHunt.feedback.correct')}</span>
     </span>
     <span className="flex items-center gap-1">
-      <span className="w-3 h-3 sm:w-4 sm:h-4 bg-yellow-500 rounded border border-yellow-600"></span>
-      <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.wrongPlace')}</span>
+      <span className="w-3 h-3 sm:w-4 sm:h-4 bg-neo-yellow rounded border border-neo-black"></span>
+      <span className="text-neo-cream/70">{t('wordHunt.feedback.wrongPlace')}</span>
     </span>
     <span className="flex items-center gap-1">
-      <span className="w-3 h-3 sm:w-4 sm:h-4 bg-gray-400 rounded border border-gray-500"></span>
-      <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.notInWord')}</span>
+      <span className="w-3 h-3 sm:w-4 sm:h-4 bg-neo-navy-light rounded border border-neo-cream/30"></span>
+      <span className="text-neo-cream/70">{t('wordHunt.feedback.notInWord')}</span>
     </span>
   </AdaptiveMotion.div>
 );
@@ -389,14 +388,14 @@ const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownLetters,
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center gap-1 text-[10px] sm:text-xs"
       >
-        <span className="text-yellow-600 dark:text-yellow-400 font-medium">
+        <span className="text-neo-yellow font-medium">
           {t('wordHunt.survival.knownLetters')}
         </span>
         <div className="flex gap-0.5">
           {Array.from(knownLetters).map((letter) => (
             <span
               key={letter}
-              className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center bg-yellow-500 border border-yellow-600 rounded text-neo-black font-bold text-xs"
+              className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center bg-neo-yellow border border-neo-black rounded text-neo-black font-bold text-xs"
             >
               {letter}
             </span>

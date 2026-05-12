@@ -119,12 +119,14 @@ export default function PracticeHubClient({ locale }: Props) {
               ✨
             </AdaptiveMotion.span>
           </h1>
+          <div className="flex justify-center">
           <div
             data-testid="practice-progress-headline"
-            className="shrink-0 flex items-center gap-1.5 px-2 py-1 rounded-full bg-neo-navy/60 border border-neo-lime/40 text-[0.65rem] uppercase tracking-wider font-neo-display font-black text-neo-lime"
+            className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-neo-navy/60 border border-neo-lime/40 text-[0.65rem] uppercase tracking-wider font-neo-display font-black text-neo-lime"
           >
             <span aria-hidden>★</span>
             <span>{t('practiceHub.progress', { done: completed.size, total: PRACTICE_MODES.length })}</span>
+          </div>
           </div>
         </AdaptiveMotion.div>
 

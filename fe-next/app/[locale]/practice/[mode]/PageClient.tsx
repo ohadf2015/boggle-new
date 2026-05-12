@@ -7,6 +7,7 @@ import PracticeTutorialSheet from '@/components/practice/PracticeTutorialSheet';
 import PracticeClassicSandbox from '@/components/practice/PracticeClassicSandbox';
 import PracticeWordHuntSandbox from '@/components/practice/PracticeWordHuntSandbox';
 import PracticeWheelSandbox from '@/components/practice/PracticeWheelSandbox';
+import PracticeDesktopWelcome from '@/components/practice/PracticeDesktopWelcome';
 import { useModeFirstSeen } from '@/hooks/useModeFirstSeen';
 import { isPracticeModeComplete } from '@/lib/practice/practiceProgress';
 import { useFTUEGate } from '@/lib/onboarding/useFTUEGate';
@@ -57,24 +58,38 @@ export default function PracticePageClient({ mode, locale }: Props) {
     if (initialStep === 'play' && step === 'tutorial') setStep('play');
   }, [initialStep, step]);
 
+  const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
+
+  useIsoLayoutEffect(() => {
+    if (typeof window === 'undefined') return;
+    setIsDesktop(window.matchMedia('(min-width: 768px)').matches);
+  }, []);
+
   const goToPlay = useCallback(() => {
     markSeen();
     setStep('play');
   }, [markSeen]);
 
-  // Desktop players (≥768px) skip the tutorial entirely — the bigger viewport
-  // and pointer affordances make the sandbox self-evident, and the full-screen
-  // sheet otherwise feels like a roadblock between the hub click and play.
-  // useLayoutEffect runs before paint so desktop never sees a tutorial flash.
-  useIsoLayoutEffect(() => {
-    if (step !== 'tutorial') return;
-    if (typeof window === 'undefined') return;
-    if (!window.matchMedia('(min-width: 768px)').matches) return;
-    markSeen();
-    setStep('play');
-  }, [step, markSeen]);
+  const sandbox =
+    mode === 'wordHunt' ? <PracticeWordHuntSandbox /> :
+    mode === 'wheelRush' ? <PracticeWheelSandbox /> :
+    <PracticeClassicSandbox />;
+
+  // Defer render until desktop detection resolves to avoid a one-frame flash
+  // of the wrong tutorial surface.
+  if (step === 'tutorial' && isDesktop === null) return null;
 
   if (step === 'tutorial') {
+    if (isDesktop) {
+      // Desktop: show compact tip card inline above the sandbox so new players
+      // get context without a full-screen gate blocking immediate play.
+      return (
+        <div className="flex flex-col">
+          <PracticeDesktopWelcome mode={mode} onDismiss={goToPlay} />
+          {sandbox}
+        </div>
+      );
+    }
     return (
       <PracticeTutorialSheet
         mode={mode}
@@ -86,7 +101,5 @@ export default function PracticePageClient({ mode, locale }: Props) {
       />
     );
   }
-  if (mode === 'wordHunt') return <PracticeWordHuntSandbox />;
-  if (mode === 'wheelRush') return <PracticeWheelSandbox />;
-  return <PracticeClassicSandbox />;
+  return sandbox;
 }
