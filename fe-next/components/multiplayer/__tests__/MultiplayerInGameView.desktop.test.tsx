@@ -10,7 +10,7 @@ vi.mock('../../../hooks/gameState/store', () => ({
   useGameMode: vi.fn(() => 'classic'),
 }));
 
-vi.mock('../../../components/blast/hooks/useBlastMultiplayerBridge', () => ({
+vi.mock('../../../components/blast/legacy/hooks/useBlastMultiplayerBridge', () => ({
   useBlastMultiplayerBridge: vi.fn(() => ({
     config: {},
     initialTileStates: [],
