@@ -3,6 +3,8 @@ import HomePageClient from './PageClient';
 import { fetchLandingData } from '@/lib/landing/fetchLandingData';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { buildHomepageFaqJsonLd } from '@/lib/seo/homepageFaqJsonLd';
+import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
+import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
 
 export const dynamic = 'force-dynamic';
 
@@ -243,6 +245,8 @@ export default async function HomePage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: faqJsonLd }}
       />
       <HomePageClient initialData={initialData} />
+      <EsScrabbleCrossLink locale={locale} anchorVariant="home" />
+      <SvScrabbleCrossLink locale={locale} anchorVariant="home" />
       <GamePageSeoContent
         title={content.title}
         description={content.description}

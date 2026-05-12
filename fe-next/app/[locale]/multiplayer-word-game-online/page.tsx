@@ -221,6 +221,20 @@ export default async function MultiplayerWordGameOnlinePage({ params }: PageProp
           </div>
         </section>
 
+        <section className="mb-12">
+          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Play in Your Language</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Link href="/es/juego-de-palabras-multijugador" className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+              <h3 className="font-bold text-neo-lime">Jugar Scrabble Online en Español</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">Multijugador en tiempo real, gratis, sin registro</p>
+            </Link>
+            <Link href="/sv/swedish-multiplayer-word-game" className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-cyan/40">
+              <h3 className="font-bold text-neo-cyan">Spela Scrabble Online Svenska</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">Multiplayer ordspel på svenska, gratis</p>
+            </Link>
+          </div>
+        </section>
+
         <section className="mb-12 max-w-none">
           <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">About LexiClash Multiplayer</h2>
           <p className="mt-4 text-neo-gray-200">

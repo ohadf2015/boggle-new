@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-type AnchorVariant = 'words' | 'anagram' | 'leaderboard';
+type AnchorVariant = 'words' | 'anagram' | 'leaderboard' | 'home';
 
 interface Props {
   locale: string;
@@ -19,6 +19,10 @@ const ANCHORS: Record<AnchorVariant, { text: string; tagline: string }> = {
   leaderboard: {
     text: 'Tävla i Scrabble online på svenska — globala topplistor',
     tagline: 'Dagliga, veckovisa och alltime-rankningar. Gratis multiplayer för 2-20 spelare.',
+  },
+  home: {
+    text: 'Spela Scrabble Online Svenska Gratis',
+    tagline: 'Multiplayer ordspel med vänner i realtid — utan registrering, utan nedladdning.',
   },
 };
 

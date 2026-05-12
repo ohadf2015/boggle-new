@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-type AnchorVariant = 'words' | 'anagram' | 'daily' | 'leaderboard' | 'blog';
+type AnchorVariant = 'words' | 'anagram' | 'daily' | 'leaderboard' | 'blog' | 'home';
 
 interface Props {
   locale: string;
@@ -27,6 +27,10 @@ const ANCHORS: Record<AnchorVariant, { text: string; tagline: string }> = {
   blog: {
     text: 'Prueba la alternativa a Scrabble multijugador en español',
     tagline: 'Crea sala, invita por enlace y juega gratis en tiempo real — sin descarga ni registro.',
+  },
+  home: {
+    text: 'Jugar Scrabble Online Gratis en Español',
+    tagline: 'Multijugador con amigos en tiempo real — sin registro, sin descarga. ¡Empieza ya!',
   },
 };
 
