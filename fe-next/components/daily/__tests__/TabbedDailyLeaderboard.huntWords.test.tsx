@@ -47,8 +47,7 @@ global.fetch = vi.fn().mockResolvedValue({
   json: async () => ({ participants: [], totalCount: 0, totalSolved: 0, huntSolved: 0, wheelSolved: 0, guestCount: 0 }),
 });
 
-import TabbedDailyLeaderboard from '../TabbedDailyLeaderboard';
-import type { DailyParticipant } from '../TabbedDailyLeaderboard';
+import TabbedDailyLeaderboard, { type DailyParticipant } from '../TabbedDailyLeaderboard';
 
 const t = (k: string) => k;
 

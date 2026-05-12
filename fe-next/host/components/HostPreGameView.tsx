@@ -130,7 +130,7 @@ function HostPreGameView({
 }: HostPreGameViewProps): React.ReactElement {
   const { socket } = useSocket();
   const { isAdmin, isAuthenticated, updateProfile, profile } = useAuth();
-  const hasBlastAccess = !!profile?.blast_access;
+  const hasBlastAccess = !!(profile?.blast_access || isAdmin);
   const { isOnCrazyGamesPlatform: _isOnCrazyGamesPlatform } = useCrazyGames();
 
 
