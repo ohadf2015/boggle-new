@@ -12,6 +12,7 @@ vi.mock('framer-motion', () => ({
   }),
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
+// eslint-disable-next-line @next/next/no-img-element
 vi.mock('next/image', () => ({ __esModule: true, default: ({ alt }: { alt: string }) => <img alt={alt} /> }));
 vi.mock('@/components/Avatar', () => ({ __esModule: true, default: () => <div data-testid="avatar" /> }));
 vi.mock('@/components/ui/PlayerProfileTooltip', () => ({
@@ -23,7 +24,7 @@ vi.mock('@/components/CrazyGamesSDK', () => ({ useCrazyGames: () => ({ submitLea
 vi.mock('@/components/ui/toggle-group', () => ({
   ToggleGroup: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   ToggleGroupItem: ({ children, value }: { children: React.ReactNode; value: string }) => (
-    <button role="radio" data-value={value}>{children}</button>
+    <button role="radio" aria-checked={false} data-value={value}>{children}</button>
   ),
 }));
 vi.mock('@/utils/avatarConfig', () => ({ AVATARS: [], getAvatarById: () => null }));
