@@ -5519,6 +5519,24 @@ const es = {
       "fortnightFighter": "Luchador Quincenal",
       "monthlyMaster": "Maestro Mensual",
       "centurion": "Centurión"
+    },
+    "weeklyChest": {
+      "title": "Cofre semanal",
+      "dayProgress": "Día {day} de 7",
+      "daysRemaining": "¡{n} días más para tu cofre {tier}!",
+      "claimReady": "¡Tu cofre {tier} está listo!",
+      "claimButton": "Abrir cofre",
+      "tierBronze": "Bronce",
+      "tierSilver": "Plata",
+      "tierGold": "Oro"
+    },
+    "insights": {
+      "personalBest": { "headline": "¡Nuevo récord personal!", "sub": "+{n} pts sobre tu récord" },
+      "percentile": { "headline": "¡Élite hoy!", "sub": "Top {n}% de todos" },
+      "speed": { "headline": "¡Velocidad récord!", "sub": "{n}% más rápido que tu promedio" },
+      "firstTry": { "headline": "¡Al primer intento!", "sub": "Solo el {n}% lo resolvió en 1" },
+      "streakComplete": { "headline": "¡Semana completa!", "sub": "Tu cofre está listo para abrir" },
+      "improved": { "headline": "¡Cada vez mejor!", "sub": "Mejor que ayer" }
     }
   },
   "dailyWordWheelLanding": {

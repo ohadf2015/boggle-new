@@ -5581,7 +5581,25 @@ const en = {
     "comeBackTomorrow": "Come back tomorrow!",
     "milestoneReached": "Milestone reached!",
     "rewardClaimed": "Reward claimed!",
-    "streakFreezeEarned": "Streak freeze earned!"
+    "streakFreezeEarned": "Streak freeze earned!",
+    "weeklyChest": {
+      "title": "Weekly Chest",
+      "dayProgress": "Day {day} of 7",
+      "daysRemaining": "{n} more days for your {tier} Chest!",
+      "claimReady": "Your {tier} Chest is ready!",
+      "claimButton": "Claim Chest",
+      "tierBronze": "Bronze",
+      "tierSilver": "Silver",
+      "tierGold": "Gold"
+    },
+    "insights": {
+      "personalBest": { "headline": "New personal best!", "sub": "+{n} pts vs your record" },
+      "percentile": { "headline": "Elite today!", "sub": "Top {n}% of all players" },
+      "speed": { "headline": "Speed demon!", "sub": "{n}% faster than your avg" },
+      "firstTry": { "headline": "First try!", "sub": "Only {n}% solved it in 1" },
+      "streakComplete": { "headline": "Week complete!", "sub": "Your chest is ready to claim" },
+      "improved": { "headline": "Getting sharper!", "sub": "Better than yesterday" }
+    }
   },
   "dailyWordWheelLanding": {
     "hero": {

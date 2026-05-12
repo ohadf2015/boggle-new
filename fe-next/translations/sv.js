@@ -5476,7 +5476,25 @@ const sv = {
     "comeBackTomorrow": "Kom tillbaka imorgon!",
     "milestoneReached": "Milstolpe nådd!",
     "rewardClaimed": "Belöning hämtad!",
-    "streakFreezeEarned": "Svitfrysning tjänad!"
+    "streakFreezeEarned": "Svitfrysning tjänad!",
+    "weeklyChest": {
+      "title": "Veckokista",
+      "dayProgress": "Dag {day} av 7",
+      "daysRemaining": "{n} dagar kvar för din {tier}-kista!",
+      "claimReady": "Din {tier}-kista är klar!",
+      "claimButton": "Öppna kista",
+      "tierBronze": "Brons",
+      "tierSilver": "Silver",
+      "tierGold": "Guld"
+    },
+    "insights": {
+      "personalBest": { "headline": "Nytt personbästa!", "sub": "+{n} poäng över ditt rekord" },
+      "percentile": { "headline": "Elit idag!", "sub": "Topp {n}% av alla spelare" },
+      "speed": { "headline": "Snabbast!", "sub": "{n}% snabbare än ditt snitt" },
+      "firstTry": { "headline": "Första försöket!", "sub": "Bara {n}% löste det på ett försök" },
+      "streakComplete": { "headline": "Veckan klar!", "sub": "Din kista är klar att öppna" },
+      "improved": { "headline": "Blir skarpare!", "sub": "Bättre än igår" }
+    }
   },
   "dailyWordWheelLanding": {
     "hero": {

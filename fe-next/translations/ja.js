@@ -5509,6 +5509,24 @@ const ja = {
       "fortnightFighter": "フォートナイトファイター",
       "monthlyMaster": "マンスリーマスター",
       "centurion": "センチュリオン"
+    },
+    "weeklyChest": {
+      "title": "週間チェスト",
+      "dayProgress": "7日中{day}日目",
+      "daysRemaining": "{tier}チェストまであと{n}日！",
+      "claimReady": "{tier}チェストの準備ができました！",
+      "claimButton": "チェストを開ける",
+      "tierBronze": "ブロンズ",
+      "tierSilver": "シルバー",
+      "tierGold": "ゴールド"
+    },
+    "insights": {
+      "personalBest": { "headline": "自己ベスト更新！", "sub": "記録より+{n}ポイント" },
+      "percentile": { "headline": "今日はエリート！", "sub": "全プレイヤーのトップ{n}%" },
+      "speed": { "headline": "スピードスター！", "sub": "平均より{n}%速い" },
+      "firstTry": { "headline": "一発正解！", "sub": "{n}%のみが1回で解けた" },
+      "streakComplete": { "headline": "1週間達成！", "sub": "チェストを開ける準備ができました" },
+      "improved": { "headline": "成長中！", "sub": "昨日より上達" }
     }
   },
   "dailyWordWheelLanding": {

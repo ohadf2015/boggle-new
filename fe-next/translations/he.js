@@ -5477,6 +5477,24 @@ const he = {
       "fortnightFighter": "לוחם שבועיים",
       "monthlyMaster": "אלוף חודשי",
       "centurion": "קנטוריון"
+    },
+    "weeklyChest": {
+      "title": "תיבת שבועית",
+      "dayProgress": "יום {day} מתוך 7",
+      "daysRemaining": "עוד {n} ימים לתיבת {tier}!",
+      "claimReady": "תיבת ה{tier} שלך מוכנה!",
+      "claimButton": "פתח תיבה",
+      "tierBronze": "ברונזה",
+      "tierSilver": "כסף",
+      "tierGold": "זהב"
+    },
+    "insights": {
+      "personalBest": { "headline": "שיא אישי חדש!", "sub": "+{n} נקודות מעל שיאך" },
+      "percentile": { "headline": "אליטה היום!", "sub": "טופ {n}% מכל השחקנים" },
+      "speed": { "headline": "מהיר כרוח!", "sub": "{n}% מהיר מהממוצע שלך" },
+      "firstTry": { "headline": "ניחשת בניסיון ראשון!", "sub": "רק {n}% הצליחו בניסיון אחד" },
+      "streakComplete": { "headline": "שבוע מושלם!", "sub": "התיבה שלך מוכנה לפתיחה" },
+      "improved": { "headline": "הולך ומשתפר!", "sub": "טוב יותר מאתמול" }
     }
   },
   "dailyWordWheelLanding": {
