@@ -13,29 +13,31 @@ export default async function BlastPage({
   params,
   searchParams,
 }: {
-  params: { locale: string };
-  searchParams?: { v2?: string };
+  params: Promise<{ locale: string }>;
+  searchParams?: Promise<{ v2?: string }>;
 }) {
-  if (!VALID_LOCALES.includes(params.locale as Locale)) {
+  const { locale: rawLocale } = await params;
+  const resolvedSearch = await searchParams;
+  if (!VALID_LOCALES.includes(rawLocale as Locale)) {
     notFound();
   }
-  const locale = params.locale as Locale;
+  const locale = rawLocale as Locale;
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const email = user?.email?.toLowerCase() ?? null;
   const isTester = email != null && BLAST_V2_TESTERS.has(email);
-  const explicitOptOut = searchParams?.v2 === 'off';
+  const explicitOptOut = resolvedSearch?.v2 === 'off';
   const useV2 = isTester && !explicitOptOut;
 
   if (useV2) {
     const registry = buildRegistry();
     const level = await registry.curated.resolve(1, locale).catch((error: unknown) => {
-      console.error('Failed to load level:', error);
+      console.error('Failed to load blast v2 level:', error);
       return null;
     });
-    if (!level) notFound();
-    return <BlastV2PageClient level={level} />;
+    if (level) return <BlastV2PageClient level={level} />;
+    // fall through to legacy if curated pack missing for this locale
   }
 
   return <BlastLegacyPageClient />;
