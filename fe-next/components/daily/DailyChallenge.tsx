@@ -43,9 +43,14 @@ import { useDailyChallengeUrlParams } from './useDailyChallengeUrlParams';
 import { useRetryChallenge } from './useRetryChallenge';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeBadge from '@/components/practice/PracticeBadge';
+import { useNetworkState } from '@/hooks/useNetworkState';
+import { useOfflineModeFlag } from '@/hooks/useOfflineModeFlag';
+import { getOfflineStore } from '@/lib/offline';
+import { getCachedDailyPuzzle } from '@/lib/offline/prefetchDaily';
+import DailyOfflineFallback from '@/components/offline/DailyOfflineFallback';
 import type { LetterGrid, Language } from '@/types';
 
-export type DailyChallengePhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played';
+export type DailyChallengePhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played' | 'offline-miss';
 
 const DailyChallenge: React.FC = () => {
   const { t, language } = useLanguage();
@@ -53,6 +58,8 @@ const DailyChallenge: React.FC = () => {
   const { unlockAudio } = useMusic();
   const { recordWin: recordStreak } = useWinStreak();
   const isPractice = usePracticeFlag();
+  const offlineFlag = useOfflineModeFlag();
+  const { online } = useNetworkState();
 
   // Game language state
   const urlLocale = language as Language;
@@ -191,6 +198,21 @@ const DailyChallenge: React.FC = () => {
         } catch (checkError) {
           console.warn('Failed to check server for existing attempt:', checkError);
         }
+      }
+
+      if (offlineFlag && !online) {
+        const store = await getOfflineStore();
+        const cached = await getCachedDailyPuzzle<{ grid: LetterGrid; targetWord: string }>(
+          store, date, gameLanguage, 'wordhunt',
+        );
+        if (cached && isMounted) {
+          setGrid(cached.grid);
+          setTargetWord(cached.targetWord);
+          setPhase('ready');
+          return;
+        }
+        if (isMounted) setPhase('offline-miss');
+        return;
       }
 
       try {
@@ -446,6 +468,12 @@ const DailyChallenge: React.FC = () => {
             currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
             practice={isPractice}
           />
+        )}
+
+        {phase === 'offline-miss' && (
+          <motion.div key="offline-miss" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex flex-col">
+            <DailyOfflineFallback onRetry={() => setPhase('loading')} />
+          </motion.div>
         )}
 
         {(phase === 'completed' || phase === 'already-played') && storedResult && puzzleDate && (

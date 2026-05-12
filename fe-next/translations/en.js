@@ -409,6 +409,11 @@ const en = {
     },
     "pending": {
       "badge": "{count} pending"
+    },
+    "daily": {
+      "title": "No Internet Connection",
+      "body": "Connect to play today's daily challenge.",
+      "reconnect": "Try Again"
     }
   },
   "common": {

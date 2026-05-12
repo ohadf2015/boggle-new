@@ -409,6 +409,11 @@ const sv = {
     },
     "pending": {
       "badge": "{count} väntar"
+    },
+    "daily": {
+      "title": "Ingen internetanslutning",
+      "body": "Anslut för att spela dagens dagliga utmaning.",
+      "reconnect": "Försök igen"
     }
   },
   "common": {

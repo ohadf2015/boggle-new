@@ -409,6 +409,11 @@ const es = {
     },
     "pending": {
       "badge": "{count} pendiente{count, plural, one {} other {s}}"
+    },
+    "daily": {
+      "title": "Sin conexión a internet",
+      "body": "Conéctate para jugar el desafío diario de hoy.",
+      "reconnect": "Intentar de nuevo"
     }
   },
   "common": {

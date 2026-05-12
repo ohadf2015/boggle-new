@@ -409,6 +409,11 @@ const ja = {
     },
     "pending": {
       "badge": "{count}件保留中"
+    },
+    "daily": {
+      "title": "インターネット未接続",
+      "body": "今日のデイリーチャレンジをプレイするには接続してください。",
+      "reconnect": "再試行"
     }
   },
   "common": {
