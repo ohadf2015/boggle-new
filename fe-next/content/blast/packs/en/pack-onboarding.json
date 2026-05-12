@@ -1,0 +1,53 @@
+{
+  "theme": "onboarding",
+  "locale": "en",
+  "levels": [
+    {
+      "id": "onboarding-1",
+      "levelNumber": 1,
+      "theme": "onboarding",
+      "locale": "en",
+      "words": ["CAT", "SUN", "EGG"],
+      "columns": [
+        { "index": 0, "tiles": ["C", "S", "E"] },
+        { "index": 1, "tiles": ["A", "U", "G"] },
+        { "index": 2, "tiles": ["T", "N", "G"] }
+      ],
+      "resolvableOrder": ["CAT", "SUN", "EGG"],
+      "tileFlags": {},
+      "difficulty": 1
+    },
+    {
+      "id": "onboarding-2",
+      "levelNumber": 2,
+      "theme": "onboarding",
+      "locale": "en",
+      "words": ["DOG", "MOON", "BIRD"],
+      "columns": [
+        { "index": 0, "tiles": ["D", "M", "B"] },
+        { "index": 1, "tiles": ["O", "O", "I"] },
+        { "index": 2, "tiles": ["G", "N", "R"] },
+        { "index": 3, "tiles": ["", "", "D"] }
+      ],
+      "resolvableOrder": ["DOG", "MOON", "BIRD"],
+      "tileFlags": {},
+      "difficulty": 2
+    },
+    {
+      "id": "onboarding-3",
+      "levelNumber": 3,
+      "theme": "onboarding",
+      "locale": "en",
+      "words": ["TREE", "LEAF", "ROCK"],
+      "columns": [
+        { "index": 0, "tiles": ["T", "L", "R"] },
+        { "index": 1, "tiles": ["R", "E", "O"] },
+        { "index": 2, "tiles": ["E", "A", "C"] },
+        { "index": 3, "tiles": ["E", "F", "K"] }
+      ],
+      "resolvableOrder": ["TREE", "LEAF", "ROCK"],
+      "tileFlags": { "c0r0": ["coin"] },
+      "difficulty": 3
+    }
+  ]
+}
