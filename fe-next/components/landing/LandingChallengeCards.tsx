@@ -12,8 +12,6 @@ import { useIsPracticeVeteran } from '@/hooks/useIsPracticeVeteran';
 import { useUserStats } from '@/hooks/useUserStats';
 import { THRESHOLDS } from '@/utils/featureGates';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
-import { useAuth } from '@/contexts/AuthContext';
-import { isWordCraftBetaUser } from '@/lib/word-craft/betaAccess';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 
 interface DailyChallengePreloadedStats {
@@ -108,7 +106,6 @@ export function LandingChallengeCards({
   // "More Game Modes" collapse so a brand-new player doesn't see eight options
   // on first paint.
   const { userStats } = useUserStats();
-  const { user } = useAuth();
   const isNewcomerByGames =
     !isOnCrazyGamesPlatform &&
     !!userStats &&
@@ -120,10 +117,6 @@ export function LandingChallengeCards({
     if (typeof window === 'undefined') return false;
     return getGamesCompleted() > 0;
   });
-  // Word Craft is gated behind a closed beta. Non-allowlisted players never
-  // see the card — not even a locked one — so the surface stays uncluttered.
-  const wordCraftAllowed = isWordCraftBetaUser(user?.email);
-
   // Layered ordering, applied to a `LandingCardKey[]` working set:
   //   1. Start from the server-provided order (or `DEFAULT_ORDER`).
   //   2. Inject the synthetic `'quickPlay'` card just after `'daily'` so the
@@ -139,7 +132,7 @@ export function LandingChallengeCards({
     const next = [...baseOrder];
     if (!next.includes('connections')) next.push('connections');
     if (!next.includes('brainGym')) next.push('brainGym');
-    if (wordCraftAllowed && !next.includes('wordCraft')) next.push('wordCraft');
+    if (!next.includes('wordCraft')) next.push('wordCraft');
     if (language === 'ja') return next.filter((m) => !JA_HIDDEN_MODES.has(m));
     return next;
   })();
@@ -313,7 +306,6 @@ export function LandingChallengeCards({
         );
 
       case 'wordCraft': {
-        const hasBetaAccess = isWordCraftBetaUser(user?.email);
         return (
           <div key="wordCraft" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
             <ModeCard
@@ -324,8 +316,6 @@ export function LandingChallengeCards({
               modeImage="/modes/word-craft.png"
               variant="purple"
               badge="BETA"
-              locked={!hasBetaAccess}
-              lockedMessage={t('wordcraft.betaLocked')}
               onClick={() => { trackModeSelected('wordCraft' as never, 'home'); trackLandingCtaClick('mode_card', { mode: 'wordCraft', variant: 'purple' }); }}
             />
           </div>

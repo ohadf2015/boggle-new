@@ -105,5 +105,28 @@ describe('WordWheelResults — cross-promo CTA translation + gating', () => {
       expect(screen.queryByRole('link', { name: /finish today/i })).toBeNull();
       expect(screen.queryByRole('link', { name: /\/daily\/word-hunt/i })).toBeNull();
     });
+
+    it('shows back-to-daily link when both challenges are done', async () => {
+      vi.doMock('@/contexts/LanguageContext', () => ({
+        useLanguage: () => ({
+          t: (k: string, fb?: string) => fb || k,
+          language: 'en',
+          dir: 'ltr',
+        }),
+      }));
+      const { default: Component } = await import('../WordWheelResults');
+      render(
+        <Component
+          result={baseResult}
+          puzzleNumber={1}
+          puzzleDate="2026-04-21"
+          language="en"
+          hasPlayedWordHunt={true}
+        />
+      );
+      const link = screen.getByTestId('back-to-daily-link');
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute('href', '/en/daily');
+    });
   });
 });

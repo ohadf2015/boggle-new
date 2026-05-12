@@ -5659,7 +5659,10 @@ const en = {
       "completeDailyTitle": "Finish today's challenge",
       "completeDailyDesc": "Play Word Wheel to complete your Daily Challenge",
       "dailyComplete": "Daily Challenge complete!",
-      "dailyCompleteDesc": "Both games done. Come back tomorrow!"
+      "dailyCompleteDesc": "Both games done. Come back tomorrow!",
+      "backToDaily": "Back to Daily Hub",
+      "backToDailyDesc": "See today's full results",
+      "tapPlayerHint": "Tap a player to see what you missed"
     },
     "hub": {
       "wordWheelQuest": "Word Wheel",
@@ -5905,7 +5908,12 @@ const en = {
       "eliminatedOrder": "#{order}",
       "stepBadge": "STEP 2 OF 2",
       "completeDailyTitle": "Finish today's challenge",
-      "completeDailyDesc": "Play Word Hunt to complete your Daily Challenge"
+      "completeDailyDesc": "Play Word Hunt to complete your Daily Challenge",
+      "backToDaily": "Back to Daily Hub",
+      "backToDailyDesc": "See today's full results",
+      "playerWordsTitle": "{{name}}'s path",
+      "youMissedWords": "Words you missed",
+      "tapPlayerHint": "Tap a player to see their path"
     },
     "score": {
       "title": "Your Score",

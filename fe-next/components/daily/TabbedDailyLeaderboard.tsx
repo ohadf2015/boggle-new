@@ -9,6 +9,7 @@ import { useFriends } from '@/hooks/useFriends';
 import type { Language } from '@/types';
 import { TodayParticipantRow, AllTimeParticipantRow, SkeletonRow } from './DailyLeaderboardRow';
 import { WordWheelWordsModal } from './WordWheelWordsModal';
+import { WordHuntWordsModal } from './WordHuntWordsModal';
 
 // ==========================================
 // Types
@@ -33,6 +34,7 @@ export interface DailyParticipant {
   solved?: boolean;
   attempts_used?: number;
   efficiency_score?: number;
+  words_discovered?: Array<{ word: string; timestamp: number; lifeGained: number; tokensGained: number }>;
   // Per-challenge breakdown for combined view
   word_hunt_score?: number;
   word_wheel_score?: number;
@@ -77,6 +79,9 @@ interface TabbedDailyLeaderboardProps {
    *  rows become clickable for any participant with a wheel score and the
    *  modal shows only the words the opponent found that the player missed. */
   myWheelWordsFound?: string[];
+  /** Words the current player discovered in today's Word Hunt (stepping-stone words).
+   *  When provided, Word Hunt rows become clickable and open diff-mode modal. */
+  myHuntWordsDiscovered?: string[];
 }
 
 // ==========================================
@@ -130,6 +135,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   defaultTab = 'today',
   scope = 'combined',
   myWheelWordsFound,
+  myHuntWordsDiscovered,
 }) => {
   const [activeTab, setActiveTab] = useState<LeaderboardTab>(defaultTab);
 
@@ -137,6 +143,11 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   const [wordsModalPlayer, setWordsModalPlayer] = useState<DailyParticipant | null>(null);
   const openWheelWords = useCallback((p: DailyParticipant) => setWordsModalPlayer(p), []);
   const closeWheelWords = useCallback(() => setWordsModalPlayer(null), []);
+
+  // Word Hunt words modal (uses data already in leaderboard row — no fetch)
+  const [huntWordsModalPlayer, setHuntWordsModalPlayer] = useState<DailyParticipant | null>(null);
+  const openHuntWords = useCallback((p: DailyParticipant) => setHuntWordsModalPlayer(p), []);
+  const closeHuntWords = useCallback(() => setHuntWordsModalPlayer(null), []);
 
   // Friends data for filtering
   const { friends } = useFriends();
@@ -559,6 +570,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
                 compact={compact}
                 t={t}
                 onViewWheelWords={openWheelWords}
+                onViewHuntWords={myHuntWordsDiscovered !== undefined ? openHuntWords : undefined}
                 scope={scope}
               />
             ))
@@ -677,6 +689,15 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       playerId={wordsModalPlayer?.player_id ?? null}
       playerName={wordsModalPlayer?.display_name ?? ''}
       myWordsFound={myWheelWordsFound}
+      t={t}
+    />
+
+    <WordHuntWordsModal
+      isOpen={!!huntWordsModalPlayer}
+      onClose={closeHuntWords}
+      playerName={huntWordsModalPlayer?.display_name ?? ''}
+      wordsDiscovered={huntWordsModalPlayer?.words_discovered ?? []}
+      myWordsDiscovered={myHuntWordsDiscovered}
       t={t}
     />
     </>

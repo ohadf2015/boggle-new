@@ -5,6 +5,8 @@ import {
   markDailyPushSentBatch,
 } from '@/lib/pushReminders';
 import { pickDailyReminderCopy } from '@/lib/dailyReminderCopy';
+import { findDailyChallengeRivals } from '@/lib/dailyChallengeRivals';
+import { pickRivalReminderCopy } from '@/lib/rivalReminderCopy';
 import { getLocalHour, getTodayDate } from '@/lib/email';
 import logger from '../utils/logger';
 
@@ -32,8 +34,40 @@ export async function sendDailyChallengeReminders(): Promise<void> {
   const localHour = getLocalHour('UTC');
   const hoursLeft = Math.max(1, 24 - localHour);
 
+  const rivalsByUser = await findDailyChallengeRivals(
+    recipients.map((r) => r.userId)
+  );
+
+  let rivalSent = 0;
   const results = await Promise.allSettled(
     recipients.map(async ({ userId, locale }) => {
+      const rival = rivalsByUser.get(userId) ?? null;
+      if (rival) {
+        const copy = pickRivalReminderCopy({
+          userId,
+          date,
+          hoursLeft,
+          locale,
+          rivalUsername: rival.username,
+          direction: rival.direction,
+          scoreGap: rival.scoreGap,
+          mode: rival.mode,
+          rivalScore: rival.rivalScore,
+          rankDelta: rival.rankDelta,
+          additionalCount: rival.additionalCount,
+        });
+        rivalSent++;
+        await notifyDailyChallengeReminder(userId, {
+          title: copy.title,
+          body: copy.body,
+          deepLink: copy.deepLink,
+          variant: copy.variant,
+          locale,
+          imageUrl: rival.avatarImage,
+          kind: 'rival',
+        });
+        return;
+      }
       const copy = pickDailyReminderCopy({ userId, date, hoursLeft, locale });
       await notifyDailyChallengeReminder(userId, {
         title: copy.title,
@@ -63,5 +97,5 @@ export async function sendDailyChallengeReminders(): Promise<void> {
 
   await markDailyPushSentBatch(sentIds);
 
-  logger.info('DAILY_REMINDER', `Sent ${sent}, failed ${failed}`);
+  logger.info('DAILY_REMINDER', `Sent ${sent} (${rivalSent} rival-themed), failed ${failed}`);
 }

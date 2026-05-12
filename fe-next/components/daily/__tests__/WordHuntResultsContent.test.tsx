@@ -102,6 +102,13 @@ const baseProps: WordHuntResultsContentProps = {
   t: ((k: string) => k) as WordHuntResultsContentProps['t'],
 };
 
+// Mock storage utility so we can control wordWheelPlayed state
+vi.mock('@/utils/dailyChallenge/storage', () => ({
+  hasPlayedWordWheelToday: vi.fn(() => false),
+}));
+
+import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
+
 describe('WordHuntResultsContent', () => {
   it('renders core sections for a solved puzzle', () => {
     render(<WordHuntResultsContent {...baseProps} />);
@@ -119,5 +126,21 @@ describe('WordHuntResultsContent', () => {
   it('renders inline signup for guests when not dismissed', () => {
     render(<WordHuntResultsContent {...baseProps} isAuthenticated={false} inlineSignupDismissed={false} />);
     expect(screen.getByTestId('inline-signup')).toBeInTheDocument();
+  });
+
+  describe('back-to-daily CTA (both challenges complete)', () => {
+    it('shows back-to-daily link when word wheel already played', () => {
+      (hasPlayedWordWheelToday as ReturnType<typeof vi.fn>).mockReturnValue(true);
+      render(<WordHuntResultsContent {...baseProps} onBackToLobby={vi.fn()} />);
+      const link = screen.getByTestId('back-to-daily-link');
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute('href', '/en/daily');
+    });
+
+    it('does not show back-to-daily link when word wheel not yet played', () => {
+      (hasPlayedWordWheelToday as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      render(<WordHuntResultsContent {...baseProps} onBackToLobby={vi.fn()} />);
+      expect(screen.queryByTestId('back-to-daily-link')).toBeNull();
+    });
   });
 });

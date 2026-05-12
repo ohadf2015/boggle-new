@@ -5595,7 +5595,10 @@ const es = {
       "completeDailyTitle": "Termina el reto de hoy",
       "completeDailyDesc": "Juega Rueda de palabras para completar tu Reto Diario",
       "dailyComplete": "¡Reto Diario completado!",
-      "dailyCompleteDesc": "Ambos juegos hechos. ¡Vuelve mañana!"
+      "dailyCompleteDesc": "Ambos juegos hechos. ¡Vuelve mañana!",
+      "backToDaily": "Volver al Reto Diario",
+      "backToDailyDesc": "Ver los resultados completos de hoy",
+      "tapPlayerHint": "Toca un jugador para ver lo que te perdiste"
     },
     "hub": {
       "wordWheelQuest": "Rueda de palabras",
@@ -5776,7 +5779,12 @@ const es = {
       "eliminatedOrder": "#{order}",
       "stepBadge": "PASO 2 DE 2",
       "completeDailyTitle": "Termina el reto de hoy",
-      "completeDailyDesc": "Juega Caza de Palabras para completar tu Reto Diario"
+      "completeDailyDesc": "Juega Caza de Palabras para completar tu Reto Diario",
+      "backToDaily": "Volver al Reto Diario",
+      "backToDailyDesc": "Ver los resultados completos de hoy",
+      "playerWordsTitle": "El camino de {{name}}",
+      "youMissedWords": "Palabras que te perdiste",
+      "tapPlayerHint": "Toca un jugador para ver su camino"
     },
     "score": {
       "title": "Tu Puntuación",

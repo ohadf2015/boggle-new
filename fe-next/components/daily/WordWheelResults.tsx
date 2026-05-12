@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, animate as fmAnimate } from 'framer-motion';
-import { Star, ArrowRight, ArrowLeft, Flame, Crown, Zap, Type } from 'lucide-react';
+import { Star, ArrowRight, ArrowLeft, Flame, Crown, Zap, Type, Home } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -304,6 +304,37 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         </motion.div>
       )}
 
+      {/* Back to Daily Hub — both challenges complete */}
+      {!isPractice && hasPlayedWordHunt && (
+        <motion.div
+          className="w-full z-10"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
+        >
+          <Link
+            href={`/${language}/daily`}
+            data-testid="back-to-daily-link"
+            className="flex items-center justify-between gap-3 w-full p-5 rounded-neo border-3 border-neo-black bg-neo-cyan shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
+                <Home className="w-7 h-7 text-neo-cyan" />
+              </div>
+              <div>
+                <span className="block font-neo-display font-black text-neo-black text-base leading-tight">
+                  {t('wordWheel.results.backToDaily', 'Back to Daily Hub')}
+                </span>
+                <p className="text-neo-black/70 text-xs mt-0.5">
+                  {t('wordWheel.results.backToDailyDesc', "See today's full results")}
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="w-6 h-6 text-neo-black shrink-0" />
+          </Link>
+        </motion.div>
+      )}
+
       {/* Words found list */}
       {result.wordsFound.length > 0 && (
         <motion.div
@@ -329,6 +360,13 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
             ))}
           </div>
         </motion.div>
+      )}
+
+      {/* Hint: tap a player row to see diff */}
+      {!isPractice && result.wordsFound.length > 0 && (
+        <p className="text-xs text-neo-cream/60 text-center font-medium -mb-1">
+          {t('wordWheel.results.tapPlayerHint', 'Tap a player to see what you missed')}
+        </p>
       )}
 
       {/* Leaderboard — hidden in practice (no score persisted, would only confuse). */}

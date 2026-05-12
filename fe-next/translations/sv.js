@@ -5552,7 +5552,10 @@ const sv = {
       "completeDailyTitle": "Avsluta dagens utmaning",
       "completeDailyDesc": "Spela Ordhjul för att slutföra din dagliga utmaning",
       "dailyComplete": "Daglig utmaning klar!",
-      "dailyCompleteDesc": "Båda spelen klara. Kom tillbaka imorgon!"
+      "dailyCompleteDesc": "Båda spelen klara. Kom tillbaka imorgon!",
+      "backToDaily": "Tillbaka till dagliga utmaningar",
+      "backToDailyDesc": "Se dagens fullständiga resultat",
+      "tapPlayerHint": "Tryck på en spelare för att se vad du missade"
     },
     "hub": {
       "wordWheelQuest": "Ordhjul",
@@ -5798,7 +5801,12 @@ const sv = {
       "eliminatedOrder": "#{order}",
       "stepBadge": "STEG 2 AV 2",
       "completeDailyTitle": "Avsluta dagens utmaning",
-      "completeDailyDesc": "Spela Ordjakt för att slutföra din dagliga utmaning"
+      "completeDailyDesc": "Spela Ordjakt för att slutföra din dagliga utmaning",
+      "backToDaily": "Tillbaka till dagliga utmaningar",
+      "backToDailyDesc": "Se dagens fullständiga resultat",
+      "playerWordsTitle": "{{name}}s väg",
+      "youMissedWords": "Ord du missade",
+      "tapPlayerHint": "Tryck på en spelare för att se deras väg"
     },
     "score": {
       "title": "Din Poäng",

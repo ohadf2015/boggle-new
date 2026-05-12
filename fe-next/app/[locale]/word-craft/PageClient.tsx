@@ -10,7 +10,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useWordCraftGame } from '@/lib/word-craft/useWordCraftGame';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
-import { isWordCraftBetaUser } from '@/lib/word-craft/betaAccess';
 import type { SupportedLocale } from '@/lib/word-craft/tileBag';
 import { WordCraftRack } from '@/components/word-craft/WordCraftRack';
 import { WordCraftScoreboard } from '@/components/word-craft/WordCraftScoreboard';
@@ -73,26 +72,14 @@ function recordLocale(locale: string) {
 export default function WordCraftPageClient() {
   const router = useRouter();
   const { t, language } = useLanguage();
-  const { user, loading: authLoading } = useAuth();
-  const email = user?.email;
+  const { loading: authLoading } = useAuth();
   const isRTL = language === 'he';
   const locale = (language ?? 'en') as SupportedLocale;
 
   const [dict, setDict] = useState<Set<string> | null>(null);
 
-  const isBetaUser = !authLoading && isWordCraftBetaUser(email);
-
-  // Redirect non-beta users once auth resolves
-  useEffect(() => {
-    if (authLoading) return;
-    if (!isBetaUser) {
-      router.replace(`/${language}`);
-    }
-  }, [authLoading, isBetaUser, language, router]);
-
   // Load locale dictionary
   useEffect(() => {
-    if (!isBetaUser) return;
     let cancelled = false;
     loadWordCraftDictionary(locale).then((d) => {
       if (!cancelled) setDict(d);
@@ -100,12 +87,12 @@ export default function WordCraftPageClient() {
       if (!cancelled) setDict(new Set());
     });
     return () => { cancelled = true; };
-  }, [isBetaUser, locale]);
+  }, [locale]);
 
   // Record locale for linguist achievement
   useEffect(() => {
-    if (isBetaUser) recordLocale(locale);
-  }, [isBetaUser, locale]);
+    recordLocale(locale);
+  }, [locale]);
 
   const seed = useMemo(() => {
     if (typeof window === 'undefined') return 1;
@@ -458,7 +445,6 @@ export default function WordCraftPageClient() {
 
   // --- Linguist achievement ---
   useEffect(() => {
-    if (!isBetaUser) return;
     const count = recordLocale(locale);
     if (count >= 3) {
       queueAchievement({ key: 'wordcraft_linguist', icon: '🌍' });
@@ -495,7 +481,7 @@ export default function WordCraftPageClient() {
   }, [game.state.lastError, game.state.pendingPlacements, juice]);
 
 
-  if (authLoading || !isBetaUser) {
+  if (authLoading) {
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
         <PageLoader size="lg" text={t('common.loading')} />

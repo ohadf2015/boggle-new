@@ -3,7 +3,7 @@
  * Verifies service delegates to the smart per-user recipient gate
  * (getSmartDailyChallengePushRecipients) — excludes users who PLAYED today,
  * who never played, who already got pushed today, etc. — and sends
- * per-user dynamic copy.
+ * per-user dynamic copy including rival-aware messages when rivals exist.
  *
  * Recipient shape carries pre-fetched locale and post-send mark is batched
  * (Sentry 136 / Supabase queue depth fix).
@@ -14,6 +14,8 @@ const mockGetRecipients = vi.hoisted(() => vi.fn());
 const mockMarkBatch = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
 const mockNotify = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
 const mockIsSupabaseConfigured = vi.hoisted(() => vi.fn(() => true));
+const mockFindRivals = vi.hoisted(() => vi.fn());
+const mockPickRivalCopy = vi.hoisted(() => vi.fn());
 
 vi.mock('@/lib/pushReminders', () => ({
   getSmartDailyChallengePushRecipients: mockGetRecipients,
@@ -33,6 +35,14 @@ vi.mock('../../utils/logger', () => ({
   default: { info: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
+vi.mock('@/lib/dailyChallengeRivals', () => ({
+  findDailyChallengeRivals: mockFindRivals,
+}));
+
+vi.mock('@/lib/rivalReminderCopy', () => ({
+  pickRivalReminderCopy: mockPickRivalCopy,
+}));
+
 import { sendDailyChallengeReminders } from '../dailyChallengeReminder';
 
 const recipient = (userId: string, locale: 'en' | 'he' | 'sv' | 'ja' | 'es' = 'en') => ({
@@ -40,9 +50,32 @@ const recipient = (userId: string, locale: 'en' | 'he' | 'sv' | 'ja' | 'es' = 'e
   locale,
 });
 
+const mockRival = (overrides = {}) => ({
+  username: 'Maya',
+  direction: 'above' as const,
+  scoreGap: 120,
+  mode: 'classic',
+  rivalScore: 980,
+  rankDelta: 2,
+  additionalCount: 0,
+  avatarImage: 'https://example.com/avatar.png',
+  ...overrides,
+});
+
+const mockRivalCopy = (overrides = {}) => ({
+  title: 'Maya is ahead!',
+  body: 'Close the gap',
+  deepLink: '/daily?src=push&rival=1',
+  variant: 3,
+  ...overrides,
+});
+
 beforeEach(() => {
   vi.clearAllMocks();
   mockIsSupabaseConfigured.mockReturnValue(true);
+  // Default: no rivals
+  mockFindRivals.mockResolvedValue(new Map());
+  mockPickRivalCopy.mockReturnValue(mockRivalCopy());
 });
 
 describe('sendDailyChallengeReminders', () => {
@@ -128,5 +161,81 @@ describe('sendDailyChallengeReminders', () => {
     // batched mark contains only the successful user
     const sentIds = mockMarkBatch.mock.calls[0][0] as string[];
     expect(sentIds).toEqual(['user-2']);
+  });
+
+  describe('rival-aware push', () => {
+    it('uses rival copy when rival found for user', async () => {
+      mockGetRecipients.mockResolvedValue([recipient('user-1', 'en')]);
+      const rival = mockRival();
+      mockFindRivals.mockResolvedValue(new Map([['user-1', rival]]));
+
+      await sendDailyChallengeReminders();
+
+      expect(mockPickRivalCopy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: 'user-1',
+          locale: 'en',
+          rivalUsername: rival.username,
+          direction: rival.direction,
+          scoreGap: rival.scoreGap,
+          mode: rival.mode,
+          rivalScore: rival.rivalScore,
+          rankDelta: rival.rankDelta,
+          additionalCount: rival.additionalCount,
+        })
+      );
+      const override = mockNotify.mock.calls[0][1];
+      expect(override.kind).toBe('rival');
+      expect(override.imageUrl).toBe(rival.avatarImage);
+    });
+
+    it('sends generic copy when no rival found for user', async () => {
+      mockGetRecipients.mockResolvedValue([recipient('user-no-rival', 'sv')]);
+      mockFindRivals.mockResolvedValue(new Map());
+
+      await sendDailyChallengeReminders();
+
+      expect(mockPickRivalCopy).not.toHaveBeenCalled();
+      const override = mockNotify.mock.calls[0][1];
+      expect(override.kind).toBeUndefined();
+      expect(override.imageUrl).toBeUndefined();
+    });
+
+    it('handles mixed batch: rival copy for some, generic for others', async () => {
+      mockGetRecipients.mockResolvedValue([
+        recipient('has-rival', 'en'),
+        recipient('no-rival', 'he'),
+      ]);
+      mockFindRivals.mockResolvedValue(new Map([['has-rival', mockRival()]]));
+
+      await sendDailyChallengeReminders();
+
+      expect(mockNotify).toHaveBeenCalledTimes(2);
+      const rivalCall = mockNotify.mock.calls.find((c) => c[0] === 'has-rival')![1];
+      const genericCall = mockNotify.mock.calls.find((c) => c[0] === 'no-rival')![1];
+      expect(rivalCall.kind).toBe('rival');
+      expect(genericCall.kind).toBeUndefined();
+    });
+
+    it('calls findDailyChallengeRivals once with all recipient user IDs', async () => {
+      mockGetRecipients.mockResolvedValue([
+        recipient('u1'),
+        recipient('u2'),
+        recipient('u3'),
+      ]);
+
+      await sendDailyChallengeReminders();
+
+      expect(mockFindRivals).toHaveBeenCalledTimes(1);
+      expect(mockFindRivals).toHaveBeenCalledWith(['u1', 'u2', 'u3']);
+    });
+
+    it('skips rival lookup when no recipients', async () => {
+      mockGetRecipients.mockResolvedValue([]);
+
+      await sendDailyChallengeReminders();
+
+      expect(mockFindRivals).not.toHaveBeenCalled();
+    });
   });
 });

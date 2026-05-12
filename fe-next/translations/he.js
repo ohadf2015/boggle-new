@@ -5553,7 +5553,10 @@ const he = {
       "completeDailyTitle": "סיים את האתגר היומי",
       "completeDailyDesc": "שחק בגלגל מילים כדי להשלים את האתגר היומי",
       "dailyComplete": "האתגר היומי הושלם!",
-      "dailyCompleteDesc": "שני המשחקים הושלמו. חזור מחר!"
+      "dailyCompleteDesc": "שני המשחקים הושלמו. חזור מחר!",
+      "backToDaily": "חזרה לאתגר היומי",
+      "backToDailyDesc": "ראה את התוצאות המלאות של היום",
+      "tapPlayerHint": "לחץ על שחקן כדי לראות מה פספסת"
     },
     "hub": {
       "wordWheelQuest": "גלגל מילים",
@@ -5797,7 +5800,12 @@ const he = {
       "eliminatedOrder": "#{order}",
       "stepBadge": "שלב 2 מתוך 2",
       "completeDailyTitle": "סיים את האתגר היומי",
-      "completeDailyDesc": "שחק בציד מילים כדי להשלים את האתגר היומי"
+      "completeDailyDesc": "שחק בציד מילים כדי להשלים את האתגר היומי",
+      "backToDaily": "חזרה לאתגר היומי",
+      "backToDailyDesc": "ראה את התוצאות המלאות של היום",
+      "playerWordsTitle": "הנתיב של {{name}}",
+      "youMissedWords": "מילים שהחמצת",
+      "tapPlayerHint": "לחץ על שחקן כדי לראות את נתיבו"
     },
     "score": {
       "title": "הניקוד שלך",

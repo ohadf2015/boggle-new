@@ -11,9 +11,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, CircleDot, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Eye, CircleDot, ArrowRight, CheckCircle2, Home } from 'lucide-react';
 import Link from 'next/link';
-import NextStepPrompt from '@/components/results/NextStepPrompt';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import WatchAdButton from './WatchAdButton';
@@ -124,7 +123,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   onGameLanguageChange,
   onShowCreatePuzzle,
   onSpendStart,
-  onBackToLobby,
+  onBackToLobby: _onBackToLobby,
   freezesAvailable = 0,
   isStreakProtected = false,
   t,
@@ -331,6 +330,8 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       </div>
     )}
 
+    {(result.wordsDiscovered?.length ?? 0) > 0 && <p className="text-xs text-neo-cream/60 text-center font-medium -mb-1">{t('wordHunt.results.tapPlayerHint', 'Tap a player to see their path')}</p>}
+
     {/* Leaderboard — in place of the removed emoji share section */}
     <TabbedDailyLeaderboard
       key={leaderboardKey}
@@ -343,6 +344,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       t={t}
       defaultTab="today"
       scope="word-hunt"
+      myHuntWordsDiscovered={result.wordsDiscovered?.map(w => w.word)}
     />
 
     {/* SECONDARY CROSS-PROMO (variant): Word Wheel CTA below leaderboard. */}
@@ -442,24 +444,37 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       </motion.div>
     )}
 
-    {/* Multiplayer next-step — only after Daily Challenge is complete */}
-    {onBackToLobby && wordWheelPlayed && (
+    {/* Back to Daily Hub — shown when both challenges complete */}
+    {wordWheelPlayed && (
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.36, type: 'spring', stiffness: 300, damping: 26 }}
       >
-        <NextStepPrompt
-          currentMode="word-hunt"
-          onBackToLobby={onBackToLobby}
-          variant="mobile"
-          hideBackButton
-        />
+        <Link
+          href={`/${language}/daily`}
+          data-testid="back-to-daily-link"
+          className="flex items-center justify-between gap-3 w-full p-5 rounded-neo border-3 border-neo-black bg-neo-cyan shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
+              <Home className="w-7 h-7 text-neo-cyan" />
+            </div>
+            <div>
+              <span className="block font-neo-display font-black text-neo-black text-base leading-tight">
+                {t('wordHunt.results.backToDaily', 'Back to Daily Hub')}
+              </span>
+              <p className="text-neo-black/70 text-xs mt-0.5">
+                {t('wordHunt.results.backToDailyDesc', 'See today\'s full results')}
+              </p>
+            </div>
+          </div>
+          <ArrowRight className="w-6 h-6 text-neo-black shrink-0" />
+        </Link>
       </motion.div>
     )}
 
-    {/* Witty facts — supplementary, demoted below the fold so the page is
-        more to the point. Stats blurb above already gives the headline number. */}
+    {/* Witty facts — supplementary, below the fold */}
     {stats && (
       <motion.div
         initial={{ opacity: 0, y: 12 }}

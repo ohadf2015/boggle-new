@@ -5585,7 +5585,10 @@ const ja = {
       "completeDailyTitle": "今日のチャレンジを完了",
       "completeDailyDesc": "ワードホイールをプレイしてデイリーチャレンジを達成",
       "dailyComplete": "デイリーチャレンジ達成！",
-      "dailyCompleteDesc": "両方のゲーム完了。また明日！"
+      "dailyCompleteDesc": "両方のゲーム完了。また明日！",
+      "backToDaily": "デイリーハブに戻る",
+      "backToDailyDesc": "今日の全結果を見る",
+      "tapPlayerHint": "プレイヤーをタップして見逃した単語を確認"
     },
     "hub": {
       "wordWheelQuest": "ワードホイール",
@@ -5829,7 +5832,12 @@ const ja = {
       "eliminatedOrder": "#{order}",
       "stepBadge": "ステップ 2 / 2",
       "completeDailyTitle": "今日のチャレンジを完了",
-      "completeDailyDesc": "ワードハントをプレイしてデイリーチャレンジを達成"
+      "completeDailyDesc": "ワードハントをプレイしてデイリーチャレンジを達成",
+      "backToDaily": "デイリーハブに戻る",
+      "backToDailyDesc": "今日の全結果を見る",
+      "playerWordsTitle": "{{name}}のルート",
+      "youMissedWords": "見逃した単語",
+      "tapPlayerHint": "プレイヤーをタップしてルートを確認"
     },
     "score": {
       "title": "あなたのスコア",
