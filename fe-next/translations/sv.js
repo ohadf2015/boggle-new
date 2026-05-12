@@ -410,6 +410,14 @@ const sv = {
     "pending": {
       "badge": "{count} väntar"
     },
+    "queue": {
+      "title": "Väntar på synk",
+      "close": "Stäng",
+      "status": {
+        "queued": "köad",
+        "rejected": "avvisad"
+      }
+    },
     "daily": {
       "title": "Ingen internetanslutning",
       "body": "Anslut för att spela dagens dagliga utmaning.",
@@ -5316,6 +5324,7 @@ const sv = {
     "guestsPlural": "gaster",
     "tookChallenge": "tog utmaningen",
     "signUpToAppear": "Registrera dig för att synas på topplistan!",
+    "youreOnTheBoard": "Du finns på topplistan! 🎉",
     "totalAttempts": "försök",
     "yourPosition": "Din position",
     "showMore": "Visa mer",

@@ -7,6 +7,8 @@
  */
 
 import { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import {
   getPendingDailyResult,
   clearPendingDailyResult,
@@ -20,6 +22,7 @@ import {
 } from '@/utils/profileStorage';
 import { updateProfile } from '@/lib/supabase';
 import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
+import { useLanguage } from '@/contexts/LanguageContext';
 import logger from '@/utils/logger';
 import type { ProfileData } from '../authTypes';
 
@@ -31,6 +34,9 @@ interface PendingDailyResultSubmission {
  * Hook to handle pending daily challenge result submission after user signup
  */
 export function usePendingDailyResult(): PendingDailyResultSubmission {
+  const router = useRouter();
+  const { t } = useLanguage();
+
   const submitPendingDailyResult = useCallback(
     async (userId: string, userProfile: ProfileData) => {
       try {
@@ -130,6 +136,8 @@ export function usePendingDailyResult(): PendingDailyResultSubmission {
 
         if (response.ok) {
           logger.info('Successfully submitted pending daily result for new user');
+          toast.success(t('daily.youreOnTheBoard'), { duration: 4000 });
+          router.push(`/${pending.language}/daily?showLeaderboard=true`);
         } else {
           const errorText = await response.text();
           logger.warn('Failed to submit pending daily result:', errorText);
@@ -141,7 +149,7 @@ export function usePendingDailyResult(): PendingDailyResultSubmission {
         clearPendingDailyResult();
       }
     },
-    []
+    [router, t]
   );
 
   return { submitPendingDailyResult };

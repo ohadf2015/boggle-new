@@ -410,6 +410,14 @@ const en = {
     "pending": {
       "badge": "{count} pending"
     },
+    "queue": {
+      "title": "Pending Sync",
+      "close": "Close",
+      "status": {
+        "queued": "queued",
+        "rejected": "rejected"
+      }
+    },
     "daily": {
       "title": "No Internet Connection",
       "body": "Connect to play today's daily challenge.",
@@ -5421,6 +5429,7 @@ const en = {
     "guestsPlural": "guests",
     "tookChallenge": "took the challenge",
     "signUpToAppear": "Sign up to appear on the leaderboard!",
+    "youreOnTheBoard": "You're on the leaderboard! 🎉",
     "totalAttempts": "attempts",
     "yourPosition": "Your Rank",
     "showMore": "More",

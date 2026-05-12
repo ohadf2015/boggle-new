@@ -410,6 +410,14 @@ const es = {
     "pending": {
       "badge": "{count} pendiente{count, plural, one {} other {s}}"
     },
+    "queue": {
+      "title": "Sincronización pendiente",
+      "close": "Cerrar",
+      "status": {
+        "queued": "en cola",
+        "rejected": "rechazado"
+      }
+    },
     "daily": {
       "title": "Sin conexión a internet",
       "body": "Conéctate para jugar el desafío diario de hoy.",
@@ -5332,6 +5340,7 @@ const es = {
     "guestsPlural": "invitados",
     "tookChallenge": "aceptaron el desafío",
     "signUpToAppear": "¡Regístrate para aparecer en la clasificación!",
+    "youreOnTheBoard": "¡Estás en el ranking! 🎉",
     "totalAttempts": "intentos",
     "yourPosition": "Tu puesto",
     "showMore": "Mostrar más",

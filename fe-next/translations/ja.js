@@ -410,6 +410,14 @@ const ja = {
     "pending": {
       "badge": "{count}件保留中"
     },
+    "queue": {
+      "title": "同期待ち",
+      "close": "閉じる",
+      "status": {
+        "queued": "待機中",
+        "rejected": "拒否"
+      }
+    },
     "daily": {
       "title": "インターネット未接続",
       "body": "今日のデイリーチャレンジをプレイするには接続してください。",
@@ -5365,6 +5373,7 @@ const ja = {
     "guestsPlural": "ゲスト",
     "tookChallenge": "{count}人がチャレンジしました",
     "signUpToAppear": "リーダーボードに表示されるには登録してください",
+    "youreOnTheBoard": "ランキングに載りました！🎉",
     "totalAttempts": "回",
     "yourPosition": "あなたの順位",
     "showMore": "もっと見る",

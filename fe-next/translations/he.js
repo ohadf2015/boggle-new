@@ -410,6 +410,14 @@ const he = {
     "pending": {
       "badge": "{count} ממתינות"
     },
+    "queue": {
+      "title": "ממתין לסנכרון",
+      "close": "סגור",
+      "status": {
+        "queued": "ממתין",
+        "rejected": "נדחה"
+      }
+    },
     "daily": {
       "title": "אין חיבור לאינטרנט",
       "body": "התחבר כדי לשחק את אתגר היומי של היום.",
@@ -5293,6 +5301,7 @@ const he = {
     "guestsPlural": "אורחים",
     "tookChallenge": "קיבלו את האתגר",
     "signUpToAppear": "הירשמו כדי להופיע בטבלה!",
+    "youreOnTheBoard": "אתה בטבלה! 🎉",
     "totalAttempts": "ניסיונות",
     "yourPosition": "המיקום שלך",
     "showMore": "הצג עוד",
