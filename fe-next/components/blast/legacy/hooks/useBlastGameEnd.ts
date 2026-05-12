@@ -35,6 +35,8 @@ interface GameEndDeps {
   waveConfig?: WaveConfig;
   objectives: { allObjectivesComplete: boolean };
   onGameEnd: (results: BlastResultsData) => void;
+  /** MP only: called after Sugar Crush animation — signal server to end game early on dead-end. */
+  onMPDeadEnd?: () => void;
   onWaveComplete?: (score: number, words: string[], clearPct: number) => void;
   /** Fires when board is cleared and highlight phase should start (SP only). */
   onHighlightStart?: (finalScore: number) => void;
@@ -180,6 +182,13 @@ export function useBlastGameEnd(deps: GameEndDeps) {
         // count toward the player's clear percentage.
         const tilesCleared = engine.gameState.tilesCleared;
         const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
+
+        // In MP, signal the server to end the game — Sugar Crush played for visual clarity,
+        // but results come from the server, not the client engine.
+        if (isMultiplayer) {
+          latestDeps.onMPDeadEnd?.();
+          return;
+        }
 
         // Advance the wave if the primary board-clear objective (90%+) is met.
         // Secondary objectives affect stars but don't block progression.

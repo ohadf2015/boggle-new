@@ -401,7 +401,7 @@ export default function PracticeWheelSandbox() {
       >
         <div className="absolute inset-0 pointer-events-none">
           <WordWheelPixiRing
-            selectedIndices={Array.from(usedIndices)}
+            selectedIndices={Array.from(usedIndices).map(idx => idx === 0 ? -1 : idx - 1)}
             radius={RADIUS_PX}
             combo={0}
             pointerPosRef={pointerPosRef}

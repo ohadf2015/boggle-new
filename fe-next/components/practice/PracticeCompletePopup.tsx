@@ -190,21 +190,9 @@ export default function PracticeCompletePopup({ open, mode, onDismiss }: Props) 
                   }}
                   className="inline-flex items-center justify-center w-full bg-neo-pink text-neo-cream border-3 border-neo-black rounded-neo py-2.5 px-4 font-neo-display font-black text-sm shadow-hard active:translate-y-px active:shadow-hard-pressed"
                 >
-                  {t('practice.wordHunt.playRealCta')}
+                  {t(`practice.${mode}.playRealCta`)}
                 </Link>
               </AdaptiveMotion.div>
-              {onDismiss && (
-                <AdaptiveMotion.button
-                  type="button"
-                  onClick={handleDismiss}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.32, duration: 0.2 }}
-                  className="text-neo-cream/70 hover:text-neo-cream font-neo-body text-xs underline underline-offset-2"
-                >
-                  {t('practice.keepPracticing')}
-                </AdaptiveMotion.button>
-              )}
             </div>
           </AdaptiveMotion.div>
         </div>
