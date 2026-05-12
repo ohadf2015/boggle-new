@@ -60,7 +60,8 @@ export const ES_CONFIG: LocaleConfig = {
   normalize: (s) => {
     let out = s.toUpperCase();
     for (const [accented, base] of Object.entries(ACCENT_MAP)) {
-      out = out.replaceAll(accented, base);
+      const regex = new RegExp(accented, 'g');
+      out = out.replace(regex, base);
     }
     return out;
   },
