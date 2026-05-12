@@ -123,9 +123,12 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
       tl.from('[data-scene-stat]', {
         y: 18, opacity: 0, duration: 0.4, stagger: 0.08,
       }, '-=0.15');
-      tl.from('[data-scene-award]', {
-        y: 14, opacity: 0, duration: 0.35, stagger: 0.08,
-      }, '-=0.1');
+      const awardEls = sceneRef.current?.querySelectorAll('[data-scene-award]');
+      if (awardEls && awardEls.length > 0) {
+        tl.from(awardEls, {
+          y: 14, opacity: 0, duration: 0.35, stagger: 0.08,
+        }, '-=0.1');
+      }
     }, sceneRef);
     return () => ctx.revert();
   }, [prefersReduced]);
