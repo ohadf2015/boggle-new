@@ -36,15 +36,15 @@ export function computeCycleProgress(
   allCompletedDates: string[],
   today: string,
 ): CycleProgress {
-  const uniqueDates = [...new Set(allCompletedDates)].sort()
+  const uniqueDateSet = new Set(allCompletedDates)
   const streak: string[] = []
-  const cursor = new Date(today)
+  const cursor = new Date(today + 'T00:00:00Z')
 
   while (true) {
-    const iso = cursor.toISOString().split('T')[0]
-    if (!uniqueDates.includes(iso)) break
+    const iso = cursor.toISOString().slice(0, 10)
+    if (!uniqueDateSet.has(iso)) break
     streak.unshift(iso)
-    cursor.setDate(cursor.getDate() - 1)
+    cursor.setUTCDate(cursor.getUTCDate() - 1)
   }
 
   if (streak.length === 0) {
