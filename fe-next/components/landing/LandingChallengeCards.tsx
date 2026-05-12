@@ -65,6 +65,9 @@ const FEATURED_MODES = new Set<LandingCardKey>([
 /** CSS stagger delay for each card index */
 const cardDelay = (index: number) => `${index * 0.07}s`;
 
+/** Modes with no content for Japanese locale — hidden from hub */
+const JA_HIDDEN_MODES = new Set<LandingCardKey>(['connections', 'wordCraft']);
+
 export function LandingChallengeCards({
   language,
   activePlayers,
@@ -137,6 +140,7 @@ export function LandingChallengeCards({
     if (!next.includes('connections')) next.push('connections');
     if (!next.includes('brainGym')) next.push('brainGym');
     if (wordCraftAllowed && !next.includes('wordCraft')) next.push('wordCraft');
+    if (language === 'ja') return next.filter((m) => !JA_HIDDEN_MODES.has(m));
     return next;
   })();
   // Guarantee blast always appears before adventure (regardless of popularity ranking)

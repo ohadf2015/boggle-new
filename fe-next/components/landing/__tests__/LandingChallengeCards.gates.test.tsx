@@ -130,3 +130,26 @@ describe('LandingChallengeCards — collapse-after-MP gate', () => {
     expect(spSection).toContainElement(screen.getByTestId('mode-landing.wordChainMode'));
   });
 });
+
+describe('LandingChallengeCards — Japanese locale gates', () => {
+  it('hides connections card for Japanese locale', () => {
+    mockUserEmail.mockReturnValue(undefined);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} language="ja" />);
+    expect(screen.queryByTestId('mode-landing.wordChainMode')).toBeNull();
+  });
+
+  it('shows connections card for English locale', () => {
+    mockUserEmail.mockReturnValue(undefined);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} language="en" />);
+    expect(screen.getByTestId('mode-landing.wordChainMode')).toBeInTheDocument();
+  });
+
+  it('hides wordCraft card for Japanese locale even for beta users', () => {
+    mockUserEmail.mockReturnValue('ohadf2015@gmail.com');
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} language="ja" />);
+    expect(screen.queryByTestId('mode-wordcraft.modeTitle')).toBeNull();
+  });
+});
