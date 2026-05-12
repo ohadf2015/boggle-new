@@ -84,6 +84,16 @@ export const EXPERIMENTS = {
   }),
 
   /**
+   * Blast v2 redesign flag. Controls rollout of new Blast game engine
+   * with updated mechanics, UI, and level generation pipeline.
+   */
+  'blast.v2': defineExperiment({
+    variants: ['control', 'v2'] as const,
+    default: 'control',
+    description: 'Blast v2 redesign rollout — new engine + rendering (control = legacy, v2 = new)',
+  }),
+
+  /**
    * Multi-game signup nudge threshold (existing experiment lifted into
    * registry for type safety). Match the live PostHog flag exactly.
    */
