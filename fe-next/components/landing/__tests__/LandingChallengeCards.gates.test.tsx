@@ -1,8 +1,7 @@
 /**
  * LandingChallengeCards — visibility gates
  *
- * 1. Word Craft is closed-beta. Non-allowlisted players must NOT see the card
- *    at all (not even a locked one).
+ * 1. Word Craft is now public — all users see the card.
  * 2. After a player has finished even one multiplayer round, the "More Game
  *    Modes" expander must not collapse extras — surface every mode directly.
  */
@@ -83,26 +82,19 @@ const baseProps = {
   dailyChallengeStats: { hasPlayed: false, hasSolved: null, currentStreak: 0, puzzleNumber: 1, loading: false },
 };
 
-describe('LandingChallengeCards — Word Craft beta gate', () => {
-  it('does NOT render the wordCraft card for a non-beta user', () => {
+describe('LandingChallengeCards — Word Craft visibility (now public)', () => {
+  it('renders the wordCraft card for any signed-in user', () => {
     mockUserEmail.mockReturnValue('random@example.com');
-    mockGamesCompleted.mockReturnValue(10); // veteran path so no collapse
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-wordcraft.modeTitle')).toBeNull();
-  });
-
-  it('renders the wordCraft card for an allowlisted beta email', () => {
-    mockUserEmail.mockReturnValue('ohadf2015@gmail.com');
     mockGamesCompleted.mockReturnValue(10);
     render(<LandingChallengeCards {...baseProps} />);
     expect(screen.getByTestId('mode-wordcraft.modeTitle')).toBeInTheDocument();
   });
 
-  it('does NOT render the wordCraft card when user is signed-out (no email)', () => {
+  it('renders the wordCraft card when signed out', () => {
     mockUserEmail.mockReturnValue(undefined);
     mockGamesCompleted.mockReturnValue(10);
     render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-wordcraft.modeTitle')).toBeNull();
+    expect(screen.getByTestId('mode-wordcraft.modeTitle')).toBeInTheDocument();
   });
 });
 
