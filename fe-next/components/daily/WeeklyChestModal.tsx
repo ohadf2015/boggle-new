@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import { Coins, Award, X } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { cn } from '@/lib/utils'
@@ -98,13 +99,14 @@ export default function WeeklyChestModal({ chest, onClose }: Props) {
           style={{ background: 'conic-gradient(from 0deg, transparent 0deg, rgba(255,225,53,0.12) 20deg, transparent 40deg, rgba(255,225,53,0.12) 60deg, transparent 80deg, rgba(255,225,53,0.12) 100deg, transparent 120deg, rgba(255,225,53,0.12) 140deg, transparent 160deg, rgba(255,225,53,0.12) 180deg, transparent 200deg, rgba(255,225,53,0.12) 220deg, transparent 240deg, rgba(255,225,53,0.12) 260deg, transparent 280deg, rgba(255,225,53,0.12) 300deg, transparent 320deg, rgba(255,225,53,0.12) 340deg, transparent 360deg)' }}
         />
 
-        <img
+        <Image
           ref={chestRef}
           src={CHEST_IMAGES[chest.tier]}
           alt={`${chest.tier} chest`}
           width={160}
           height={160}
           className="relative z-10"
+          unoptimized
         />
 
         <div ref={revealRef} className="flex flex-col items-center gap-4 relative z-10">
@@ -117,13 +119,13 @@ export default function WeeklyChestModal({ chest, onClose }: Props) {
 
           <div className="flex items-center gap-3">
             <Award className={cn('w-6 h-6', TIER_COLORS[chest.tier])} />
-            <img
+            <Image
               src={`/badges/weekly/badge-weekly-${chest.tier}.jpg`}
               alt={`${chest.tier} badge`}
               width={48}
               height={48}
               className="rounded-full border-2 border-neo-black shadow-hard"
-              onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+              unoptimized
             />
           </div>
 
