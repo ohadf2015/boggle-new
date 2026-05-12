@@ -1,7 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import { BlastGame } from '../BlastGame';
 import type { BlastLevel } from '@/lib/blast/v2/types';
+
+vi.mock('../BlastAtmosphereOverlay', () => ({
+  BlastAtmosphereOverlay: () => null,
+}));
+vi.mock('../BlastFxOverlay', () => ({
+  BlastFxOverlay: () => null,
+}));
+vi.mock('@/lib/blast/v2/fx', () => ({
+  useBlastFx: () => new Proxy({}, { get: () => () => {} }),
+}));
+
+import { BlastGame } from '../BlastGame';
 
 const mockLevel: BlastLevel = {
   id: 'game-test',
