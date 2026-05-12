@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { NextRequest } from 'next/server'
 
-vi.mock('@/utils/supabase/server')
+vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }))
+vi.mock('@/utils/logger', () => ({ __esModule: true, default: { error: vi.fn(), log: vi.fn(), warn: vi.fn() } }))
+// @/ alias not resolved for transitive imports in node env; re-export real module
+vi.mock('@/lib/daily/weeklyChest', () => import('../../../../../lib/daily/weeklyChest'))
 
 import { createClient } from '@/utils/supabase/server'
 import { GET } from './route'
