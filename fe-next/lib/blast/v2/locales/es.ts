@@ -1,5 +1,6 @@
 import type { LocaleConfig, ThemeDef } from '../locale-config';
 import type { ThemeKey } from '../types';
+import { bonusDictLoaders } from '../bonus-dict-loaders';
 
 const TILE_POOL_ES = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
 
@@ -70,7 +71,7 @@ export const ES_CONFIG: LocaleConfig = {
   tilePool: TILE_POOL_ES,
   wordLengthRange: { min: 3, max: 7 },
   themes: THEMES_ES,
-  bonusDictionary: async () => new Set<string>(),
+  bonusDictionary: bonusDictLoaders.es,
   fontStack: 'Fredoka, Rubik, system-ui',
   tileExtraPadding: 2,
 };

@@ -1,5 +1,6 @@
 import type { LocaleConfig, ThemeDef } from '../locale-config';
 import type { ThemeKey } from '../types';
+import { bonusDictLoaders } from '../bonus-dict-loaders';
 
 const TILE_POOL_HE = 'אבגדהוזחטיכלמנסעפצקרשת'.split(''); // 22 base, no finals
 const FINAL_FOLD: Record<string, string> = { 'ך':'כ','ם':'מ','ן':'נ','ף':'פ','ץ':'צ' };
@@ -62,6 +63,6 @@ export const HE_CONFIG: LocaleConfig = {
   tilePool: TILE_POOL_HE,
   wordLengthRange: { min: 3, max: 5 },
   themes: THEMES_HE,
-  bonusDictionary: async () => new Set<string>(),
+  bonusDictionary: bonusDictLoaders.he,
   fontStack: 'Rubik, system-ui',
 };

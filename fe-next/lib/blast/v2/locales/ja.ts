@@ -1,5 +1,6 @@
 import type { LocaleConfig, ThemeDef } from '../locale-config';
 import type { ThemeKey } from '../types';
+import { bonusDictLoaders } from '../bonus-dict-loaders';
 
 // Basic hiragana set (46 characters)
 const TILE_POOL_JA = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん'.split('');
@@ -59,7 +60,7 @@ export const JA_CONFIG: LocaleConfig = {
   tilePool: TILE_POOL_JA,
   wordLengthRange: { min: 2, max: 4 },
   themes: THEMES_JA,
-  bonusDictionary: async () => new Set<string>(),
+  bonusDictionary: bonusDictLoaders.ja,
   fontStack: 'Noto Sans JP, system-ui',
   tileExtraPadding: 2,
 };

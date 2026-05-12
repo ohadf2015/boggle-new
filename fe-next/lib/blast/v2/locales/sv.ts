@@ -1,5 +1,6 @@
 import type { LocaleConfig, ThemeDef } from '../locale-config';
 import type { ThemeKey } from '../types';
+import { bonusDictLoaders } from '../bonus-dict-loaders';
 
 const TILE_POOL_SV = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ'.split('');
 
@@ -54,6 +55,6 @@ export const SV_CONFIG: LocaleConfig = {
   tilePool: TILE_POOL_SV,
   wordLengthRange: { min: 3, max: 7 },
   themes: THEMES_SV,
-  bonusDictionary: async () => new Set<string>(),
+  bonusDictionary: bonusDictLoaders.sv,
   fontStack: 'Fredoka, Rubik, system-ui',
 };
