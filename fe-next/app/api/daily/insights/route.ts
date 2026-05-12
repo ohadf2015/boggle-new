@@ -53,10 +53,10 @@ export async function GET(req: NextRequest) {
     const { data: recent } = await supabase
       .from('daily_word_hunt_attempts').select('efficiency_score,puzzle_date')
       .eq('player_id', user.id).gte('puzzle_date', cutoff)
+      .order('puzzle_date', { ascending: false })
 
-    const recentScores = (recent ?? [])
-      .filter((r: { puzzle_date: string }) => r.puzzle_date !== date)
-      .map((r: { efficiency_score: number }) => r.efficiency_score ?? 0)
+    const prevAttempts = (recent ?? []).filter((r: { puzzle_date: string }) => r.puzzle_date !== date)
+    const recentScores = prevAttempts.map((r: { efficiency_score: number }) => r.efficiency_score ?? 0)
 
     if (recentScores.length >= 3) {
       const avg = recentScores.reduce((a: number, b: number) => a + b, 0) / recentScores.length
@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
       if (delta > 10) {
         insights.push({ type: 'speed', headlineKey: 'daily.insights.speed.headline',
           subKey: 'daily.insights.speed.sub', subParams: { n: delta }, lucideIcon: 'Gauge' })
-      } else if (score > (recent ?? []).filter((r: { puzzle_date: string }) => r.puzzle_date !== date)[0]?.efficiency_score) {
+      } else if (score > (prevAttempts[0]?.efficiency_score ?? 0)) {
         insights.push({ type: 'improved', headlineKey: 'daily.insights.improved.headline',
           subKey: 'daily.insights.improved.sub', lucideIcon: 'TrendingUp' })
       }

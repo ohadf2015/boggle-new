@@ -50,7 +50,9 @@ describe('GET /api/daily/insights', () => {
                 order: vi.fn(() => ({
                   limit: async () => ({ data: mockHistory, error: null }),
                 })),
-                gte: vi.fn(async () => ({ data: mockRecent, error: null })),
+                gte: vi.fn(() => ({
+                  order: vi.fn(async () => ({ data: mockRecent, error: null })),
+                })),
               }
             }
             return {}
