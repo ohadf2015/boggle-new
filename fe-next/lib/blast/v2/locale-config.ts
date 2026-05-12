@@ -1,5 +1,6 @@
 import type { Locale, ThemeKey } from './types';
 import { EN_CONFIG } from './locales/en';
+import { HE_CONFIG } from './locales/he';
 
 export type ThemeDef = {
   key: ThemeKey;
@@ -23,4 +24,5 @@ export type LocaleConfig = {
 
 export const LOCALE_CONFIGS: Record<Locale, LocaleConfig> = {
   en: EN_CONFIG,
+  he: HE_CONFIG,
 } as Record<Locale, LocaleConfig>;
