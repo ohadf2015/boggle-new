@@ -33,5 +33,16 @@ describe('useWeeklyChest', () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
     const claimed = await result.current.claim()
     expect(claimed?.tier).toBe('silver')
+    expect(global.fetch).toHaveBeenCalledTimes(3)
+  })
+
+  it('claim() returns null on failed POST', async () => {
+    global.fetch = vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ daysCompleted: 3, isClaimable: false, completedDates: [], cycleStart: '2026-05-06', cycleNumber: 1, pendingChest: null }) })
+      .mockResolvedValueOnce({ ok: false })
+    const { result } = renderHook(() => useWeeklyChest())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    const claimed = await result.current.claim()
+    expect(claimed).toBeNull()
   })
 })
