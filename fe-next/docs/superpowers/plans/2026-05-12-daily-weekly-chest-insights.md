@@ -771,68 +771,72 @@ git commit -m "feat(daily): insights API — personal best, first try, speed del
 **Files:**
 - Modify: `backend/routes/dailyChallenge/wordHuntRoutes.ts`
 
-- [ ] **Step 1: Find the submit handler in wordHuntRoutes.ts**
+- [ ] **Step 1: Add import at top of wordHuntRoutes.ts**
 
-```bash
-grep -n "daily_word_hunt_attempts\|\.insert\|submit" /Users/ohadfisher/git/boggle-new/fe-next/backend/routes/dailyChallenge/wordHuntRoutes.ts | head -20
-```
-
-Note the line number where the attempt insert happens.
-
-- [ ] **Step 2: Add import at top of wordHuntRoutes.ts**
-
-After the existing imports, add:
+At the top of `backend/routes/dailyChallenge/wordHuntRoutes.ts` after existing imports:
 
 ```typescript
 import { computeCycleProgress, computeWeekScore, getChestTier, type DayScore } from '@/lib/daily/weeklyChest'
 ```
 
-- [ ] **Step 3: Add chest-creation hook after successful attempt insert**
+- [ ] **Step 2: Add chest hook before res.json at line ~324**
 
-After the successful `daily_word_hunt_attempts` insert, add this block:
+The file uses `playerId` (confirmed at line 50) and ends the success path with:
+```typescript
+res.json({ success: true, alreadySubmitted: false, isRetry, penaltyApplied, data });
+```
+
+Insert this block BEFORE that `res.json` call:
 
 ```typescript
-// Check if this completion fills day 7 of the current cycle
-try {
-  const today = new Date().toISOString().split('T')[0]
-  const [puzzleRes, huntRes, wheelRes] = await Promise.all([
-    supabase.from('daily_puzzle_attempts').select('puzzle_date').eq('player_id', playerId),
-    supabase.from('daily_word_hunt_attempts').select('puzzle_date,efficiency_score').eq('player_id', playerId),
-    supabase.from('daily_word_wheel_attempts').select('puzzle_date,score,time_seconds').eq('player_id', playerId),
-  ])
-  const allDates = [
-    ...(puzzleRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
-    ...(huntRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
-    ...(wheelRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
-  ]
-  const progress = computeCycleProgress(allDates, today)
-  if (progress.isClaimable) {
-    const { data: existing } = await supabase
-      .from('daily_weekly_chests').select('id').eq('player_id', playerId).eq('cycle_start', progress.cycleStart)
-    if (!existing?.length) {
-      const cycleDateSet = new Set(progress.completedDates)
-      const REWARDS = { bronze: { coins: 150, badge_id: 'badge_weekly_bronze' }, silver: { coins: 300, badge_id: 'badge_weekly_silver' }, gold: { coins: 600, badge_id: 'badge_weekly_gold' } } as const
-      const scores: DayScore[] = [
-        ...(huntRes.data ?? []).filter((r: { puzzle_date: string }) => cycleDateSet.has(r.puzzle_date)).map((r: { efficiency_score: number }) => ({ mode: 'word_hunt' as const, rawScore: r.efficiency_score ?? 0, timeSeconds: null })),
-      ]
-      const weekScore = computeWeekScore(scores)
-      const tier = getChestTier(weekScore)
-      await supabase.from('daily_weekly_chests').insert({
-        player_id: playerId, cycle_start: progress.cycleStart,
-        cycle_number: progress.cycleNumber, tier,
-        contents: { ...REWARDS[tier], week_score: weekScore },
-      })
-      // Include in this route's response so client can update hub immediately
-      Object.assign(responsePayload, { chestReady: true, chestTier: tier })
+// Weekly chest hook — non-fatal
+let chestReady = false
+let chestTier: string | undefined
+if (playerId) {
+  try {
+    const today = new Date().toISOString().split('T')[0]
+    const [puzzleRes, huntRes, wheelRes] = await Promise.all([
+      supabase.from('daily_puzzle_attempts').select('puzzle_date').eq('player_id', playerId),
+      supabase.from('daily_word_hunt_attempts').select('puzzle_date,efficiency_score').eq('player_id', playerId),
+      supabase.from('daily_word_wheel_attempts').select('puzzle_date,score,time_seconds').eq('player_id', playerId),
+    ])
+    const allDates = [
+      ...(puzzleRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
+      ...(huntRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
+      ...(wheelRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
+    ]
+    const progress = computeCycleProgress(allDates, today)
+    if (progress.isClaimable) {
+      const { data: existing } = await supabase
+        .from('daily_weekly_chests').select('id').eq('player_id', playerId).eq('cycle_start', progress.cycleStart)
+      if (!existing?.length) {
+        const cycleDateSet = new Set(progress.completedDates)
+        const REWARDS = { bronze: { coins: 150, badge_id: 'badge_weekly_bronze' }, silver: { coins: 300, badge_id: 'badge_weekly_silver' }, gold: { coins: 600, badge_id: 'badge_weekly_gold' } } as const
+        const scores: DayScore[] = (huntRes.data ?? [])
+          .filter((r: { puzzle_date: string }) => cycleDateSet.has(r.puzzle_date))
+          .map((r: { efficiency_score: number }) => ({ mode: 'word_hunt' as const, rawScore: r.efficiency_score ?? 0, timeSeconds: null }))
+        const weekScore = computeWeekScore(scores)
+        const tier = getChestTier(weekScore)
+        await supabase.from('daily_weekly_chests').insert({
+          player_id: playerId, cycle_start: progress.cycleStart,
+          cycle_number: progress.cycleNumber, tier,
+          contents: { ...REWARDS[tier], week_score: weekScore },
+        })
+        chestReady = true
+        chestTier = tier
+      }
     }
+  } catch (e) {
+    logger.error('API', `[WordHunt] weekly chest hook error: ${(e as Error).message}`)
   }
-} catch (e) {
-  // non-fatal: chest creation failure must not break submit
-  console.error('weekly chest hook error', e)
 }
 ```
 
-Note: `playerId` and `responsePayload` reference the existing variable names in the route — adapt to match them.
+Then update the `res.json` call to include `chestReady` and `chestTier`:
+
+```typescript
+res.json({ success: true, alreadySubmitted: false, isRetry, penaltyApplied, data, chestReady, chestTier });
+```
 
 - [ ] **Step 4: Run existing word-hunt tests — must still pass**
 
