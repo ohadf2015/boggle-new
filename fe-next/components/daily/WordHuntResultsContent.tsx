@@ -15,6 +15,7 @@ import { Eye, CircleDot, ArrowRight, CheckCircle2, Home } from 'lucide-react';
 import Link from 'next/link';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
+import DailyInsightStack from './DailyInsightStack';
 import WatchAdButton from './WatchAdButton';
 import WatchAdForRevealButton from '@/components/ads/WatchAdForRevealButton';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
@@ -276,6 +277,9 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         <StatsBlurb stats={stats} solved={result.solved} t={t} />
       </motion.div>
     )}
+
+    {/* Daily Insight Cards — personalized analytics on challenge performance */}
+    <DailyInsightStack mode="word_hunt" date={puzzleDate} />
 
     {/* PRIMARY CROSS-PROMO (variant): Word Wheel CTA above leaderboard. */}
     {crossPromoOrder === 'wheel-first' && wheelCtaNode}

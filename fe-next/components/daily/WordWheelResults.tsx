@@ -11,6 +11,7 @@ import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeChainCta from '@/components/practice/PracticeChainCta';
+import DailyInsightStack from './DailyInsightStack';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import type { Language } from '@/types';
 import type { WordWheelGameResult } from './WordWheelGame';
@@ -241,6 +242,16 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           </span>
           <span className="text-neo-cream/60 text-xs">{t('wordWheel.results.time')}</span>
         </div>
+      </motion.div>
+
+      {/* Daily Insight Cards — personalized analytics on challenge performance */}
+      <motion.div
+        className="w-full z-10"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.45, type: 'spring', stiffness: 300, damping: 26 }}
+      >
+        <DailyInsightStack mode="word_wheel" date={puzzleDate} />
       </motion.div>
 
       {/* Practice mode: replace cross-promos + leaderboard with chain CTA so the
