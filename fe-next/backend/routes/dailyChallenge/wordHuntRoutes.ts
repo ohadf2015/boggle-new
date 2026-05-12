@@ -29,6 +29,7 @@ import {
 } from './utils';
 import { completeMission } from '../../modules/dailyMissionsManager';
 import { updateDailyProfileStats } from './profileStats';
+import { computeCycleProgress, computeWeekScore, getChestTier, type DayScore } from '../../../lib/daily/weeklyChest';
 
 const router: Router = express.Router();
 
@@ -321,7 +322,53 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       }
     }
 
-    res.json({ success: true, alreadySubmitted: false, isRetry, penaltyApplied, data });
+    // Weekly chest hook — non-fatal
+    let chestReady = false
+    let chestTier: string | undefined
+    if (playerId) {
+      try {
+        const today = new Date().toISOString().split('T')[0]
+        const [puzzleRes, huntRes, wheelRes] = await Promise.all([
+          supabase.from('daily_puzzle_attempts').select('puzzle_date').eq('player_id', playerId),
+          supabase.from('daily_word_hunt_attempts').select('puzzle_date,efficiency_score').eq('player_id', playerId),
+          supabase.from('daily_word_wheel_attempts').select('puzzle_date,score,time_seconds').eq('player_id', playerId),
+        ])
+        const allDates = [
+          ...(puzzleRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
+          ...(huntRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
+          ...(wheelRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
+        ]
+        const progress = computeCycleProgress(allDates, today)
+        if (progress.isClaimable) {
+          const { data: existing } = await supabase
+            .from('daily_weekly_chests').select('id').eq('player_id', playerId).eq('cycle_start', progress.cycleStart)
+          if (!existing?.length) {
+            const REWARDS = {
+              bronze: { coins: 150, badge_id: 'badge_weekly_bronze' },
+              silver: { coins: 300, badge_id: 'badge_weekly_silver' },
+              gold:   { coins: 600, badge_id: 'badge_weekly_gold' },
+            } as const
+            const cycleDateSet = new Set(progress.completedDates)
+            const scores: DayScore[] = (huntRes.data ?? [])
+              .filter((r: { puzzle_date: string }) => cycleDateSet.has(r.puzzle_date))
+              .map((r: { efficiency_score: number }) => ({ mode: 'word_hunt' as const, rawScore: r.efficiency_score ?? 0, timeSeconds: null }))
+            const weekScore = computeWeekScore(scores)
+            const tier = getChestTier(weekScore)
+            await supabase.from('daily_weekly_chests').insert({
+              player_id: playerId, cycle_start: progress.cycleStart,
+              cycle_number: progress.cycleNumber, tier,
+              contents: { ...REWARDS[tier], week_score: weekScore },
+            })
+            chestReady = true
+            chestTier = tier
+          }
+        }
+      } catch (e) {
+        logger.error('API', `[WordHunt] weekly chest hook error: ${(e as Error).message}`)
+      }
+    }
+
+    res.json({ success: true, alreadySubmitted: false, isRetry, penaltyApplied, data, chestReady, chestTier });
   } catch (error) {
     const err = error as Error;
     logger.error('API', `Word Hunt submit error: ${err.message}`);
