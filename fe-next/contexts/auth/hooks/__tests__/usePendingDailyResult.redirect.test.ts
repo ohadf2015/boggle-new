@@ -40,8 +40,13 @@ vi.mock('@/utils/avatarConfig', () => ({
   getAvatarEmojiAndColor: vi.fn(() => ({ emoji: '🎯', color: '#000' })),
 }));
 
+vi.mock('@/utils/posthogEngagement', () => ({
+  trackDailySignupRank: vi.fn(),
+}));
+
 import { getPendingDailyResult, clearPendingDailyResult } from '@/utils/dailyChallenge';
 import toast from 'react-hot-toast';
+import { trackDailySignupRank } from '@/utils/posthogEngagement';
 import { usePendingDailyResult } from '../usePendingDailyResult';
 
 const makeProfile = (overrides = {}) => ({
@@ -130,5 +135,92 @@ describe('usePendingDailyResult — redirect + celebration', () => {
     await act(() => result.current.submitPendingDailyResult('user-1', makeProfile()));
     expect(mockPush).not.toHaveBeenCalled();
     expect(toast.success).not.toHaveBeenCalled();
+  });
+});
+
+const mockFetchWithStats = (yourStats: object | null) => {
+  global.fetch = vi.fn().mockImplementation((url: string) => {
+    if ((url as string).includes('/stats/')) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ yourStats }),
+      } as Response);
+    }
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({ success: true }),
+    } as Response);
+  });
+};
+
+describe('usePendingDailyResult — rank achievement copy', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(getPendingDailyResult).mockReturnValue(makePending() as never);
+  });
+
+  it('toasts with rank1 key when player is #1', async () => {
+    mockFetchWithStats({ rank: 1, percentile: 99, solved: true, attemptsUsed: 3 });
+    const { result } = renderHook(() => usePendingDailyResult());
+    await act(() => result.current.submitPendingDailyResult('user-1', makeProfile()));
+    expect(vi.mocked(toast.success).mock.calls[0][0]).toContain('daily.achievementRank1');
+  });
+
+  it('toasts with topTen key when rank exists and percentile >= 90', async () => {
+    mockFetchWithStats({ rank: 5, percentile: 92, solved: true, attemptsUsed: 2 });
+    const { result } = renderHook(() => usePendingDailyResult());
+    await act(() => result.current.submitPendingDailyResult('user-1', makeProfile()));
+    expect(vi.mocked(toast.success).mock.calls[0][0]).toContain('daily.achievementTopTen');
+  });
+
+  it('toasts with ranked key when rank exists and percentile < 90', async () => {
+    mockFetchWithStats({ rank: 15, percentile: 60, solved: true, attemptsUsed: 3 });
+    const { result } = renderHook(() => usePendingDailyResult());
+    await act(() => result.current.submitPendingDailyResult('user-1', makeProfile()));
+    expect(vi.mocked(toast.success).mock.calls[0][0]).toContain('daily.achievementRanked');
+  });
+
+  it('falls back to youreOnTheBoard when stats returns no rank', async () => {
+    mockFetchWithStats(null);
+    const { result } = renderHook(() => usePendingDailyResult());
+    await act(() => result.current.submitPendingDailyResult('user-1', makeProfile()));
+    expect(vi.mocked(toast.success).mock.calls[0][0]).toBe('daily.youreOnTheBoard');
+  });
+
+  it('falls back to youreOnTheBoard when stats fetch throws', async () => {
+    global.fetch = vi.fn().mockImplementation((url: string) => {
+      if ((url as string).includes('/stats/')) return Promise.reject(new Error('network'));
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ success: true }),
+      } as Response);
+    });
+    const { result } = renderHook(() => usePendingDailyResult());
+    await act(() => result.current.submitPendingDailyResult('user-1', makeProfile()));
+    expect(vi.mocked(toast.success).mock.calls[0][0]).toBe('daily.youreOnTheBoard');
+  });
+
+  it('fires trackDailySignupRank with rank and percentile on success', async () => {
+    mockFetchWithStats({ rank: 3, percentile: 85, solved: true, attemptsUsed: 2 });
+    const { result } = renderHook(() => usePendingDailyResult());
+    await act(() => result.current.submitPendingDailyResult('user-1', makeProfile()));
+    expect(trackDailySignupRank).toHaveBeenCalledWith({
+      rank: 3,
+      percentile: 85,
+      puzzleDate: '2026-05-13',
+      language: 'en',
+    });
+  });
+
+  it('fires trackDailySignupRank with undefined rank when stats unavailable', async () => {
+    mockFetchWithStats(null);
+    const { result } = renderHook(() => usePendingDailyResult());
+    await act(() => result.current.submitPendingDailyResult('user-1', makeProfile()));
+    expect(trackDailySignupRank).toHaveBeenCalledWith({
+      rank: undefined,
+      percentile: 0,
+      puzzleDate: '2026-05-13',
+      language: 'en',
+    });
   });
 });

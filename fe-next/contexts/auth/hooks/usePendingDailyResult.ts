@@ -23,6 +23,7 @@ import {
 import { updateProfile } from '@/lib/supabase';
 import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { trackDailySignupRank } from '@/utils/posthogEngagement';
 import logger from '@/utils/logger';
 import type { ProfileData } from '../authTypes';
 
@@ -136,7 +137,36 @@ export function usePendingDailyResult(): PendingDailyResultSubmission {
 
         if (response.ok) {
           logger.info('Successfully submitted pending daily result for new user');
-          toast.success(t('daily.youreOnTheBoard'), { duration: 4000 });
+
+          // Fetch rank for contextual celebration copy
+          let rank: number | undefined;
+          let percentile = 0;
+          try {
+            const statsRes = await fetch(
+              `/api/daily-challenge/word-hunt/stats/${pending.puzzleDate}/${pending.language}?playerId=${userId}`
+            );
+            if (statsRes.ok) {
+              const statsData = await statsRes.json();
+              rank = statsData?.yourStats?.rank;
+              percentile = statsData?.yourStats?.percentile ?? 0;
+            }
+          } catch {
+            // Non-critical — fall through to generic copy
+          }
+
+          let toastMsg: string;
+          if (rank === 1) {
+            toastMsg = t('daily.achievementRank1');
+          } else if (rank !== undefined && percentile >= 90) {
+            toastMsg = t('daily.achievementTopTen', { rank });
+          } else if (rank !== undefined) {
+            toastMsg = t('daily.achievementRanked', { rank });
+          } else {
+            toastMsg = t('daily.youreOnTheBoard');
+          }
+
+          toast.success(toastMsg, { duration: 4000 });
+          trackDailySignupRank({ rank, percentile, puzzleDate: pending.puzzleDate, language: pending.language });
           router.push(`/${pending.language}/daily?showLeaderboard=true`);
         } else {
           const errorText = await response.text();

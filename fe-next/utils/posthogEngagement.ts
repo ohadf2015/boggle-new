@@ -399,3 +399,14 @@ export function installTabVisibilityTracker(): () => void {
   document.addEventListener('visibilitychange', handler);
   return () => document.removeEventListener('visibilitychange', handler);
 }
+
+// ---------- Daily signup rank ----------
+
+export function trackDailySignupRank(data: {
+  rank: number | undefined;
+  percentile: number;
+  puzzleDate: string;
+  language: string;
+}): void {
+  safe(() => (posthog.capture as PHFn)('daily_signup_rank_revealed', data));
+}
