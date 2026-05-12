@@ -98,15 +98,15 @@ export async function POST() {
   const nowIso = new Date().toISOString()
 
   // Insert or update the chest record
+  let dbError: unknown
   if (existing?.[0]) {
-    // Update existing row (rare case where chest was created but not opened)
-    await supabase
+    const { error } = await supabase
       .from('daily_weekly_chests')
       .update({ tier, contents, opened_at: nowIso })
       .eq('id', existing[0].id)
+    dbError = error
   } else {
-    // Insert new chest record
-    await supabase.from('daily_weekly_chests').insert({
+    const { error } = await supabase.from('daily_weekly_chests').insert({
       player_id: user.id,
       cycle_start: progress.cycleStart,
       cycle_number: progress.cycleNumber,
@@ -114,7 +114,9 @@ export async function POST() {
       contents,
       opened_at: nowIso,
     })
+    dbError = error
   }
+  if (dbError) return NextResponse.json({ error: 'Failed to save chest' }, { status: 500 })
 
   // Award coins
   await awardCoinsServer(user.id, reward.coins, 'daily_weekly_chest', {
