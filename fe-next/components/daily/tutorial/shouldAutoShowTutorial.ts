@@ -3,7 +3,8 @@ export type DailyChallengePhase =
   | 'ready'
   | 'playing'
   | 'completed'
-  | 'already-played';
+  | 'already-played'
+  | 'offline-miss';
 
 export interface ShouldAutoShowTutorialInput {
   phase: DailyChallengePhase;
