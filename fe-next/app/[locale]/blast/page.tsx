@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { createClient } from '@/utils/supabase/server';
 import type { Locale } from '@/lib/blast/v2/types';
 import { buildRegistry } from '@/lib/blast/v2/level-source-registry';
 import { BlastV2PageClient } from './v2/BlastV2PageClient';
@@ -6,18 +7,26 @@ import BlastLegacyPageClient from './legacy/PageClient';
 
 const VALID_LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
 
-export default async function BlastPage({ params }: { params: { locale: string } }) {
+const BLAST_V2_TESTERS = new Set<string>(['ohadf2015@gmail.com']);
+
+export default async function BlastPage({
+  params,
+  searchParams,
+}: {
+  params: { locale: string };
+  searchParams?: { v2?: string };
+}) {
   if (!VALID_LOCALES.includes(params.locale as Locale)) {
     notFound();
   }
-
   const locale = params.locale as Locale;
 
-  // TODO: Wire flag gate. For now, always show v2.
-  // const flagValue = usePostHogFlag<string>('blast.v2', 'control');
-  // const useV2 = flagValue === 'v2';
-
-  const useV2 = true;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const email = user?.email?.toLowerCase() ?? null;
+  const isTester = email != null && BLAST_V2_TESTERS.has(email);
+  const explicitOptOut = searchParams?.v2 === 'off';
+  const useV2 = isTester && !explicitOptOut;
 
   if (useV2) {
     const registry = buildRegistry();
