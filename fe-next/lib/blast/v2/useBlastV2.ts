@@ -7,6 +7,7 @@ import {
   type SelectionState, type SelectionEvent, type ValidationResult,
 } from './engine';
 import { mechanicsForLevel } from './mechanic-flags';
+import { trackBlastWordFound, trackBlastWordRejected, trackBlastHintUsed } from './telemetry';
 
 type State = {
   level: BlastLevel;
@@ -37,6 +38,13 @@ function applyValidatedSubmit(state: State, cells: CellId[]): State {
   };
   const res = validateSelection(cells, ctx);
   if (res.kind === 'reject') {
+    // Track rejection with reason
+    trackBlastWordRejected({
+      level: state.level.levelNumber,
+      attempted_word: '', // Word not available in reject result
+      length: cells.length,
+      reason: res.reason,
+    });
     return { ...state, lastValidation: res, invalidShakeKey: state.invalidShakeKey + 1 };
   }
   const kind = res.kind === 'theme_match' ? 'theme' : 'bonus';
@@ -47,6 +55,17 @@ function applyValidatedSubmit(state: State, cells: CellId[]): State {
   let newChestProgress = state.chestProgress + outcome.chestProgressDelta;
   let newCascadeCount = state.cascadeCount;
   let newCoins = state.coins + outcome.coinsBase + outcome.coinsFromOverlays;
+
+  // Track initial word found (not cascade yet)
+  trackBlastWordFound({
+    level: state.level.levelNumber,
+    word: res.word,
+    axis: cells[0]?.[0] === 'c' && cells[cells.length - 1]?.[0] === 'c' ? 'H' : 'V', // Heuristic
+    length: res.word.length,
+    isCascade: false,
+    isBonus: kind === 'bonus',
+  });
+
   if (kind === 'theme') {
     newLevel = collapseCells(state.level, cells).level;
     while (true) {
@@ -54,6 +73,17 @@ function applyValidatedSubmit(state: State, cells: CellId[]): State {
       if (!cascade) break;
       newFound.add(cascade.word);
       newCascadeCount += 1;
+
+      // Track cascade word
+      trackBlastWordFound({
+        level: state.level.levelNumber,
+        word: cascade.word,
+        axis: 'H', // Cascades are typically horizontal
+        length: cascade.word.length,
+        isCascade: true,
+        isBonus: false,
+      });
+
       const cOut = scoreForWord(newLevel, cascade.cells, 'cascade');
       newCoins += cOut.coinsBase + cOut.coinsFromOverlays;
       newChestProgress += cOut.chestProgressDelta;
@@ -80,6 +110,11 @@ function reducer(state: State, action: Action): State {
     return { ...state, selection: t.state };
   }
   if (action.type === 'shuffle') {
+    trackBlastHintUsed({
+      level: state.level.levelNumber,
+      hint_type: 'shuffle',
+      coin_cost: 50,
+    });
     return { ...state, hintsUsed: state.hintsUsed + 1, coins: Math.max(0, state.coins - 50) };
   }
   return state;

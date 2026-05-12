@@ -34,25 +34,26 @@ export async function grantVeteranBonus(userId: string): Promise<{ grantedCoins:
   const supabase = getSupabase();
 
   // Check if veteran_bonus_granted already written
-  const { data: progress } = await supabase
+  const result = await supabase
     .from('blast_progress')
     .select('unlocks_seen')
     .eq('user_id', userId)
     .single();
+  const progress = result.data as any;
 
   if (progress?.unlocks_seen?.veteran_bonus_granted) {
     return { grantedCoins: 0 };
   }
 
   // Check if legacy Blast play history exists (any game_completed event with mode='blast')
-  const { data: hasPriorPlay } = await supabase.rpc('check_prior_blast_play', { user_id: userId });
+  const rpcResult = await (supabase.rpc as any)('check_prior_blast_play', { user_id: userId });
+  const hasPriorPlay = rpcResult.data;
   if (!hasPriorPlay) {
     return { grantedCoins: 0 };
   }
 
   // Mark granted, return 500 coins
-  await supabase
-    .from('blast_progress')
+  await (supabase.from('blast_progress') as any)
     .update({ unlocks_seen: { veteran_bonus_granted: true } })
     .eq('user_id', userId);
 

@@ -1,11 +1,13 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { BlastLevel } from '@/lib/blast/v2/types';
 import { markUnlockSeen, completeFtue, setSkipAll, type UnlocksSeen, type MechanicKey } from '@/lib/blast/v2/tutorial/unlocks-seen';
 import { useBlastV2 } from '@/lib/blast/v2/useBlastV2';
 import { useBlastProgress } from '@/lib/blast/v2/useBlastProgress';
 import { useBlastTutorial } from '@/hooks/useBlastTutorial';
 import { starRating } from '@/lib/blast/v2/anti-cheat';
+import { mechanicsForLevel } from '@/lib/blast/v2/mechanic-flags';
+import { trackBlastLevelStarted, trackBlastLevelCompleted, trackBlastLevelAbandoned } from '@/lib/blast/v2/telemetry';
 import { BlastBoard } from './BlastBoard';
 import { BlastHud } from './BlastHud';
 import { BlastLevelIntroCard } from './BlastLevelIntroCard';
@@ -61,10 +63,74 @@ export function BlastGame({
   onUpdateUnlocks,
 }: Props) {
   const [introDismissed, setIntroDismissed] = useState(false);
+  const [levelStartTime] = useState(() => Date.now());
   const { state, handlers } = useBlastV2(level);
   const { state: progressState, clearLevel, openChest, openMutation } = useBlastProgress();
   const [showChestModal, setShowChestModal] = useState(false);
   const tutorial = useBlastTutorial(level, unlocksSeen, isVeteranPlayer, onUpdateUnlocks ?? (() => {}));
+
+  // Track level start on intro dismissal
+  useEffect(() => {
+    if (introDismissed) {
+      const mechanics = mechanicsForLevel(level.levelNumber);
+      const mechanicKeys = Object.keys(mechanics).filter((k) => mechanics[k as keyof typeof mechanics]);
+      trackBlastLevelStarted({
+        level: level.levelNumber,
+        locale: level.locale,
+        theme: level.theme,
+        mechanics: mechanicKeys,
+      });
+    }
+  }, [introDismissed, level]);
+
+  // Track abandonment on unmount or when level complete
+  useEffect(() => {
+    return () => {
+      if (!introDismissed || state.status === 'levelComplete') return; // Only track if playing
+      trackBlastLevelAbandoned({
+        level: level.levelNumber,
+        locale: level.locale,
+        time_in_level_seconds: Math.round((Date.now() - levelStartTime) / 1000),
+        words_found_count: state.foundWords.size,
+      });
+    };
+  }, [introDismissed, state.status, state.foundWords, level, levelStartTime]);
+
+  // Track level completed and submit
+  useEffect(() => {
+    if (state.status === 'levelComplete' && introDismissed) {
+      const timeSeconds = Math.round((Date.now() - levelStartTime) / 1000);
+      const gemsCollected = Math.round(state.chestProgress * 10);
+
+      // Build submission for star rating
+      const submission = {
+        levelNumber: level.levelNumber,
+        locale: level.locale,
+        wordsFound: Array.from(state.foundWords),
+        timeSeconds,
+        hintsUsed: state.hintsUsed,
+        wrongAttempts: 0,
+        cascadesTriggered: state.cascadeCount,
+      };
+
+      const stars = starRating(submission, level);
+
+      trackBlastLevelCompleted({
+        level: level.levelNumber,
+        locale: level.locale,
+        theme: level.theme,
+        time_seconds: timeSeconds,
+        hints_used: state.hintsUsed,
+        cascades: state.cascadeCount,
+        stars,
+        coins_earned: state.coins,
+        gems_collected: gemsCollected,
+      });
+
+      // Submit to API
+      clearLevel(submission, state.coins, gemsCollected);
+    }
+  }, [state.status, introDismissed, state.cascadeCount, state.hintsUsed, level, state.coins, state.chestProgress, levelStartTime, state.foundWords, clearLevel]);
 
   const handleFtueComplete = () => {
     const updated = completeFtue(unlocksSeen);
@@ -87,26 +153,12 @@ export function BlastGame({
   // FX integration point: BlastFxOverlay mounts useBlastFx internally
   // Board ref is obtained internally by BlastBoard via useRef
 
-  // On level complete, submit to API
-  if (state.status === 'levelComplete' && !introDismissed) {
-    const submission = {
-      levelNumber: level.levelNumber,
-      locale: level.locale,
-      wordsFound: Array.from(state.foundWords),
-      timeSeconds: 0, // TODO: Plan 3 placeholder - track actual time
-      hintsUsed: state.hintsUsed,
-      wrongAttempts: 0, // TODO: Plan 3 placeholder - track wrong attempts
-      cascadesTriggered: state.cascadeCount,
-    };
-    const earnedCoins = state.coins;
-    const earnedGems = state.cascadeCount; // Stub: Plan 3 placeholder
-    clearLevel(submission, earnedCoins, earnedGems);
-
-    // If chest is now complete, show modal
-    if (progressState.chestProgress >= 1.0 && !showChestModal) {
+  // Show chest modal when complete
+  useEffect(() => {
+    if (state.status === 'levelComplete' && progressState.chestProgress >= 1.0 && !showChestModal) {
       setShowChestModal(true);
     }
-  }
+  }, [state.status, progressState.chestProgress, showChestModal]);
 
   if (!introDismissed) {
     return (
