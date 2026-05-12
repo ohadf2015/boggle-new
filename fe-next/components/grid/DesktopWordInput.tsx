@@ -41,6 +41,7 @@ const DesktopWordInput = memo<DesktopWordInputProps>(({
   const [typedWord, setTypedWord] = useState('');
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const composingRef = useRef(false);
   const isDesktop = useIsDesktop();
   const { t } = useLanguageSafe();
 
@@ -98,6 +99,8 @@ const DesktopWordInput = memo<DesktopWordInputProps>(({
   }, [onHighlightChange, onTypingModeChange]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Skip during IME composition \u2014 keyCode 229 is the "Process" key sent by many IMEs on Android/mobile
+    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
     if (e.key === 'Enter') {
       e.preventDefault();
       handleSubmit();
@@ -108,7 +111,12 @@ const DesktopWordInput = memo<DesktopWordInputProps>(({
   }, [handleSubmit, handleClear]);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    // Only allow letters
+    if (composingRef.current) {
+      // Don't filter or uppercase during IME composition \u2014 interrupts the input pipeline
+      setTypedWord(e.target.value);
+      return;
+    }
+    // Only allow letters (Latin, Hebrew, hiragana, katakana, CJK, extended-Latin)
     const value = e.target.value.replace(/[^a-zA-Z\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\u00C0-\u024F]/g, '');
     setTypedWord(value.toUpperCase());
   }, []);
@@ -152,6 +160,13 @@ const DesktopWordInput = memo<DesktopWordInputProps>(({
             value={typedWord}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
+            onCompositionStart={() => { composingRef.current = true; }}
+            onCompositionEnd={(e) => {
+              composingRef.current = false;
+              // Finalize: apply filter after IME commits the character
+              const value = e.currentTarget.value.replace(/[^a-zA-Z֐-׿぀-ゟ゠-ヿ一-鿿À-ɏ]/g, '');
+              setTypedWord(value);
+            }}
             disabled={!enabled}
             placeholder={t('desktopInput.placeholder') || 'Type a word...'}
             autoComplete="off"

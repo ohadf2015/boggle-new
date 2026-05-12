@@ -235,6 +235,7 @@ export function RealTimeDuelGame({
 
   const handleKeyPress = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.nativeEvent.isComposing || e.keyCode === 229) return;
       if (e.key === 'Enter') {
         handleSubmitWord();
       }

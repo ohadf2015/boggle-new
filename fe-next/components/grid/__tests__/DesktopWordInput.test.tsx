@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DesktopWordInput from '../DesktopWordInput';
 
@@ -131,5 +131,31 @@ describe('DesktopWordInput', () => {
   it('has proper aria-label', () => {
     render(<DesktopWordInput {...defaultProps} />);
     expect(screen.getByLabelText('Type a word to submit')).toBeInTheDocument();
+  });
+
+  it('does not submit on Enter when keyCode is 229 (IME Process key)', async () => {
+    const onWordSubmit = vi.fn();
+    const user = userEvent.setup();
+    render(<DesktopWordInput {...defaultProps} onWordSubmit={onWordSubmit} />);
+    const input = screen.getByRole('textbox');
+    await user.type(input, 'ab');
+    // Fire a keydown with keyCode 229 — the synthetic "Process" key sent during IME composition
+    fireEvent.keyDown(input, { key: 'Enter', keyCode: 229, code: 'Enter' });
+    expect(onWordSubmit).not.toHaveBeenCalled();
+  });
+
+  it('accepts kanji characters from JA dictionary boards', async () => {
+    const user = userEvent.setup();
+    const jaGrid = [
+      ['日', '本', '語', '学'],
+      ['漢', '字', '読', '書'],
+      ['単', '語', '文', '字'],
+      ['発', '音', '訓', '練'],
+    ];
+    render(<DesktopWordInput {...defaultProps} grid={jaGrid} language="ja" />);
+    const input = screen.getByRole('textbox');
+    await user.type(input, '日本');
+    // Kanji should not be filtered out — input retains the characters
+    expect(input).toHaveValue('日本');
   });
 });

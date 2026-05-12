@@ -86,6 +86,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
   }, [displayName, selectedAvatar, onComplete]);
 
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
+    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
     if (e.key === 'Enter' && !isSubmitting) {
       handleComplete();
     }

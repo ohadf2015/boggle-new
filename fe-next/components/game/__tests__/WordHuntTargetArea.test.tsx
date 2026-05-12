@@ -133,4 +133,15 @@ describe('WordHuntTargetArea', () => {
 
     expect(onSubmit).not.toHaveBeenCalled();
   });
+
+  it('does not submit on Enter when keyCode is 229 (IME Process key)', () => {
+    const onSubmit = vi.fn();
+    render(<WordHuntTargetArea {...defaultProps} onSubmit={onSubmit} />);
+
+    const input = screen.getByTestId('target-guess-input');
+    fireEvent.change(input, { target: { value: 'hello' } });
+    fireEvent.keyDown(input, { key: 'Enter', keyCode: 229 });
+
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
 });

@@ -99,6 +99,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
     if (e.key === 'Enter' && isNameValid) {
       handleSave();
     }

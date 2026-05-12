@@ -56,6 +56,7 @@ export function WordHuntTargetArea({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
     if (e.key === 'Enter') {
       handleSubmit();
     }

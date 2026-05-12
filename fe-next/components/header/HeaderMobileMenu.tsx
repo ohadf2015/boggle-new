@@ -492,6 +492,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                             maxLength={20}
                                                             className="bg-neo-navy/80 text-neo-white border-2 border-neo-cyan rounded-neo px-2 py-1 text-base font-bold focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[160px]"
                                                             onKeyDown={(e) => {
+                                                                if (e.nativeEvent.isComposing || e.keyCode === 229) return;
                                                                 if (e.key === 'Enter') handleSaveGuestName();
                                                                 if (e.key === 'Escape') setIsEditingGuestName(false);
                                                             }}
