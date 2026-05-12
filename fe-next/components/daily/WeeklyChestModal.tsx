@@ -7,9 +7,9 @@ import gsap from 'gsap'
 import type { PendingChest } from '@/hooks/useWeeklyChest'
 
 const CHEST_IMAGES: Record<string, string> = {
-  bronze: '/daily/chests/chest-bronze.png',
-  silver: '/daily/chests/chest-silver.png',
-  gold:   '/daily/chests/chest-gold.png',
+  bronze: '/daily/chests/chest-bronze.jpg',
+  silver: '/daily/chests/chest-silver.jpg',
+  gold:   '/daily/chests/chest-gold.jpg',
 }
 
 const TIER_COLORS: Record<string, string> = {
@@ -118,7 +118,7 @@ export default function WeeklyChestModal({ chest, onClose }: Props) {
           <div className="flex items-center gap-3">
             <Award className={cn('w-6 h-6', TIER_COLORS[chest.tier])} />
             <img
-              src={`/badges/weekly/badge-weekly-${chest.tier}.png`}
+              src={`/badges/weekly/badge-weekly-${chest.tier}.jpg`}
               alt={`${chest.tier} badge`}
               width={48}
               height={48}
