@@ -51,7 +51,7 @@ vi.mock('@/components/game/InGameScreen', () => ({
 
 // Capture the props passed to BlastGame
 let capturedBlastGameProps: any = null;
-vi.mock('@/components/blast/BlastGame', () => ({
+vi.mock('@/components/blast/legacy/BlastGame', () => ({
   BlastGame: (props: any) => {
     capturedBlastGameProps = props;
     return <div data-testid="blast-game" />;
@@ -62,7 +62,7 @@ vi.mock('@/components/game/BlastMoveCounter', () => ({
   BlastMoveCounter: () => <div data-testid="blast-move-counter" />,
 }));
 
-vi.mock('@/components/blast/hooks/useBlastMultiplayerBridge', () => ({
+vi.mock('@/components/blast/legacy/hooks/useBlastMultiplayerBridge', () => ({
   useBlastMultiplayerBridge: () => ({
     config: { gridSize: 4, specialTileChance: 0.15, language: 'en', difficulty: 'medium' },
     initialTileStates: null,

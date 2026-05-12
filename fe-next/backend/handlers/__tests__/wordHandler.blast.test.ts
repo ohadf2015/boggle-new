@@ -160,21 +160,21 @@ vi.mock('../../../backend/services/gameLifecycle/gameEnd', () => ({
   endGame: vi.fn(),
 }));
 
-vi.mock('@/components/blast/utils/clearTilesProcessor', () => ({
+vi.mock('@/components/blast/legacy/utils/clearTilesProcessor', () => ({
   processTilesForWord: vi.fn().mockReturnValue({
     next: [[{ letter: 'A', type: 'standard', isCleared: true }]],
     newlyClearedCount: 1,
   }),
 }));
 
-vi.mock('@/components/blast/utils/blastGravity', () => ({
+vi.mock('@/components/blast/legacy/utils/blastGravity', () => ({
   computeGravityResult: vi.fn().mockReturnValue({
     newGrid: [['A']],
     newTileStates: [[{ letter: 'A', type: 'standard', isCleared: true }]],
   }),
 }));
 
-vi.mock('@/components/blast/utils/blastLetterGenerator', () => ({
+vi.mock('@/components/blast/legacy/utils/blastLetterGenerator', () => ({
   createSeededRandom: vi.fn(() => () => 0.5),
 }));
 

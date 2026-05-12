@@ -6,8 +6,8 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { BlastTileState, BlastTileType } from '@/shared/types/blast';
-import type { BlastGameConfig } from '@/components/blast/types';
-import { generateTileStates, nextTileUid } from '@/components/blast/utils/blastTileGeneration';
+import type { BlastGameConfig } from '@/components/blast/legacy/types';
+import { generateTileStates, nextTileUid } from '@/components/blast/legacy/utils/blastTileGeneration';
 import { generateSeededLetterGrid } from '@/components/blastEngine/utils/blastWordSeeder';
 import { hasWordInMemoryCache } from '@/hooks/useDictionaryCache';
 import { tryValidateOffline } from '@/hooks/fastValidateWord';

@@ -24,7 +24,7 @@ import {
 } from '../ui/alert-dialog';
 import TournamentStandings from '../TournamentStandings';
 import InGameScreen from '../game/InGameScreen';
-import { useBlastMultiplayerBridge } from '@/components/blast/hooks/useBlastMultiplayerBridge';
+import { useBlastMultiplayerBridge } from '@/components/blast/legacy/hooks/useBlastMultiplayerBridge';
 import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
 import { StandardDesktopAdapter } from './desktop/StandardDesktopAdapter';
 import { WheelRushDesktopAdapter } from './desktop/WheelRushDesktopAdapter';
@@ -36,7 +36,7 @@ import { BlastDesktopAdapter } from './desktop/BlastDesktopAdapter';
 // 528 lines + Pixi/blast-specific deps, etc. ssr:false because each view
 // uses client-only hooks (sockets, sound effects, framer-motion).
 const BlastGame = dynamic(
-  () => import('@/components/blast/BlastGame').then(m => m.BlastGame),
+  () => import('@/components/blast/legacy/BlastGame').then(m => m.BlastGame),
   { ssr: false },
 );
 const WordHuntGame = dynamic(

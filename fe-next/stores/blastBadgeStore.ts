@@ -13,7 +13,7 @@
  */
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import type { BlastBadgeId } from '@/components/blast/utils/blastBadges';
+import type { BlastBadgeId } from '@/components/blast/legacy/utils/blastBadges';
 
 interface BlastBadgeState {
   /** IDs the player has unlocked at least once. */

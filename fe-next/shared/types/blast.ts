@@ -1,7 +1,7 @@
 /**
  * Canonical Blast Tile Type Definitions
  * Single source of truth for BlastTileType + BlastComboType used by both SP and MP blast modes.
- * All consumers import from here (directly or via @/components/blast/types re-export).
+ * All consumers import from here (directly or via @/components/blast/legacy/types re-export).
  */
 
 // ==================== Tile Type ====================

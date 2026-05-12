@@ -15,9 +15,9 @@ import {
   BLAST_RAINBOW_FLAT_BONUS,
 } from '@/shared/constants/blastMultiplayerConstants';
 
-import { getWaveConfig, getWaveDistribution } from '@/components/blast/utils/blastWaveConfig';
-import { rollSpecialType, createSeededRandom } from '@/components/blast/utils/blastLetterGenerator';
-import { overlayToTileStates } from '@/components/blast/utils/blastOverlayToTileStates';
+import { getWaveConfig, getWaveDistribution } from '@/components/blast/legacy/utils/blastWaveConfig';
+import { rollSpecialType, createSeededRandom } from '@/components/blast/legacy/utils/blastLetterGenerator';
+import { overlayToTileStates } from '@/components/blast/legacy/utils/blastOverlayToTileStates';
 
 // H2: per-game mutex set guarding the check→advance→broadcast sequence so a
 // second concurrent caller cannot double-advance on the same cleared snapshot.

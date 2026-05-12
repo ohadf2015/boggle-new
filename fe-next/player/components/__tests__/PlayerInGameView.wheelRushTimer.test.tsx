@@ -50,7 +50,7 @@ vi.mock('@/components/game/InGameScreen', () => ({
   default: () => <div data-testid="in-game-screen" />,
 }));
 
-vi.mock('@/components/blast/BlastGame', () => ({
+vi.mock('@/components/blast/legacy/BlastGame', () => ({
   BlastGame: () => <div data-testid="blast-game" />,
 }));
 
@@ -58,7 +58,7 @@ vi.mock('@/components/game/BlastMoveCounter', () => ({
   BlastMoveCounter: () => null,
 }));
 
-vi.mock('@/components/blast/hooks/useBlastMultiplayerBridge', () => ({
+vi.mock('@/components/blast/legacy/hooks/useBlastMultiplayerBridge', () => ({
   useBlastMultiplayerBridge: () => ({
     config: { gridSize: 4, specialTileChance: 0.15, language: 'en', difficulty: 'medium' },
     initialTileStates: null,

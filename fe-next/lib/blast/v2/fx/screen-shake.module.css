@@ -1,0 +1,29 @@
+[data-shake-key] {
+  animation: shake-light 300ms cubic-bezier(0.36, 0, 0.66, 0.33);
+}
+
+[data-shake-key*="1"],
+[data-shake-key*="3"],
+[data-shake-key*="5"],
+[data-shake-key*="7"],
+[data-shake-key*="9"] {
+  animation: shake-light 300ms cubic-bezier(0.36, 0, 0.66, 0.33);
+}
+
+@keyframes shake-light {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+@keyframes shake-medium {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+@keyframes shake-heavy {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-12px); }
+  75% { transform: translateX(12px); }
+}

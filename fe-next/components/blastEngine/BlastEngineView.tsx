@@ -19,15 +19,15 @@ import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
 import { ComboMilestoneAnnouncement } from '@/components/game/ComboMilestoneAnnouncement';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
-import { resolveBlastConfig, type BlastPhase, type BlastResultsData, type WaveResult } from '@/components/blast/types';
-import { getWaveConfig, getWaveDistribution, getWaveObjectives } from '@/components/blast/utils/blastWaveConfig';
-import { calculateEarnedStars } from '@/components/blast/utils/blastStarCalculator';
-import { saveBlastResult } from '@/components/blast/utils/saveBlastResult';
+import { resolveBlastConfig, type BlastPhase, type BlastResultsData, type WaveResult } from '@/components/blast/legacy/types';
+import { getWaveConfig, getWaveDistribution, getWaveObjectives } from '@/components/blast/legacy/utils/blastWaveConfig';
+import { calculateEarnedStars } from '@/components/blast/legacy/utils/blastStarCalculator';
+import { saveBlastResult } from '@/components/blast/legacy/utils/saveBlastResult';
 import {
   trackBlastRunStarted,
   trackBlastWaveCompleted,
   trackBlastRunEnded,
-} from '@/components/blast/utils/blastTelemetry';
+} from '@/components/blast/legacy/utils/blastTelemetry';
 import type { Language } from '@/shared/types/game';
 
 // Dynamically import the PixiJS game canvas (SSR-unsafe)

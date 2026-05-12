@@ -70,15 +70,15 @@ vi.mock('../../../modules/blastModeManager', () => ({
   endWaveAdvance: () => {},
 }));
 
-vi.mock('@/components/blast/utils/clearTilesProcessor', () => ({
+vi.mock('@/components/blast/legacy/utils/clearTilesProcessor', () => ({
   processTilesForWord: mocks.processTilesForWord,
 }));
 
-vi.mock('@/components/blast/utils/blastGravity', () => ({
+vi.mock('@/components/blast/legacy/utils/blastGravity', () => ({
   computeGravityResult: mocks.computeGravityResult,
 }));
 
-vi.mock('@/components/blast/utils/blastLetterGenerator', () => ({
+vi.mock('@/components/blast/legacy/utils/blastLetterGenerator', () => ({
   createSeededRandom: () => () => 0.5,
 }));
 

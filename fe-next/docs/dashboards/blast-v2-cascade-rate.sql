@@ -1,0 +1,18 @@
+-- Cascade trigger rate (target 0.3-0.6 per clear)
+-- Setup: In PostHog, create Trends insight:
+--  Event: blast_level_completed
+--  Custom aggregation: avg(cascades)
+--  Breakdown: theme (optional)
+--  Time series: Weekly
+--
+-- Measure: Average cascades per level completion
+-- Target: 0.3-0.6 (30-60% of clears have >= 1 cascade)
+--
+-- Interpretation:
+-- - < 0.2: board generation too predictable or word placement unfavorable
+-- - 0.3-0.6: sweet spot; feels rewarding without being random
+-- - > 1.0: cascade chains may be too easy to trigger (breaks game feel)
+--
+-- Alerts:
+-- - If theme X < 0.2, may need interestingness threshold bump
+-- - If global > 1.0, may cause scoring imbalance

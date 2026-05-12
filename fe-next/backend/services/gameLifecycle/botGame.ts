@@ -26,10 +26,10 @@ import {
   tryBeginWaveAdvance,
   endWaveAdvance,
 } from '../../modules/blastModeManager';
-import { processTilesForWord } from '@/components/blast/utils/clearTilesProcessor';
-import { computeGravityResult } from '@/components/blast/utils/blastGravity';
-import { createSeededRandom } from '@/components/blast/utils/blastLetterGenerator';
-import { getWaveConfig } from '@/components/blast/utils/blastWaveConfig';
+import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
+import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
+import { createSeededRandom } from '@/components/blast/legacy/utils/blastLetterGenerator';
+import { getWaveConfig } from '@/components/blast/legacy/utils/blastWaveConfig';
 import {
   BLAST_SPECIAL_TILE_CHANCE,
   BLAST_MP_DEFAULT_MAX_WAVES,

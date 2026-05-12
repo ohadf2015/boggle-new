@@ -75,7 +75,7 @@ vi.mock('@/components/game/InGameScreen', () => ({
 }));
 
 // Mock BlastGame — renders a testid so we can check if it's mounted
-vi.mock('@/components/blast/BlastGame', () => ({
+vi.mock('@/components/blast/legacy/BlastGame', () => ({
   BlastGame: (props: any) => (
     <div
       data-testid="blast-game"
@@ -91,7 +91,7 @@ vi.mock('@/components/game/BlastMoveCounter', () => ({
 }));
 
 // Mock useBlastMultiplayerBridge
-vi.mock('@/components/blast/hooks/useBlastMultiplayerBridge', () => ({
+vi.mock('@/components/blast/legacy/hooks/useBlastMultiplayerBridge', () => ({
   useBlastMultiplayerBridge: () => ({
     config: { gridSize: 4, specialTileChance: 0.15, language: 'en', difficulty: 'medium' },
     initialTileStates: null,
