@@ -21,6 +21,7 @@ vi.mock('@/utils/haptics/HapticsManager', () => ({
   haptics: {
     trigger: vi.fn().mockResolvedValue(undefined),
     triggerCustom: vi.fn().mockResolvedValue(undefined),
+    isEnabled: vi.fn().mockReturnValue(true),
   },
 }));
 

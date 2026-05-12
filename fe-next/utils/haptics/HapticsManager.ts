@@ -14,6 +14,15 @@ import {
 export class HapticsManager {
   private implementation: IHapticsImplementation | null = null;
   private initPromise: Promise<IHapticsImplementation> | null = null;
+  private enabled = true;
+
+  setEnabled(value: boolean): void {
+    this.enabled = value;
+  }
+
+  isEnabled(): boolean {
+    return this.enabled;
+  }
 
   private getImpl(): Promise<IHapticsImplementation> {
     if (this.implementation) return Promise.resolve(this.implementation);
@@ -38,12 +47,14 @@ export class HapticsManager {
   }
 
   async trigger(pattern: HapticPattern): Promise<void> {
+    if (!this.enabled) return;
     const impl = await this.getImpl();
     if (!impl.isSupported()) return;
     await impl.trigger(pattern);
   }
 
   async triggerCustom(pattern: CustomHapticPattern): Promise<void> {
+    if (!this.enabled) return;
     const impl = await this.getImpl();
     if (!impl.isSupported()) return;
     await impl.triggerCustom(pattern);
@@ -67,6 +78,10 @@ export class HapticsManager {
 
   async selection(): Promise<void> {
     await this.trigger(HapticPattern.SELECTION);
+  }
+
+  async legendary(): Promise<void> {
+    await this.trigger(HapticPattern.LEGENDARY);
   }
 }
 

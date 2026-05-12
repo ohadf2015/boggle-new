@@ -13,6 +13,8 @@ export enum HapticPattern {
   WARNING = 'warning',
   /** Selection change (picker, slider) */
   SELECTION = 'selection',
+  /** Legendary/epic moments — escalating crescendo pattern */
+  LEGENDARY = 'legendary',
 }
 
 /**

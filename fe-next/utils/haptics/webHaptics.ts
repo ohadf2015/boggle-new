@@ -16,6 +16,7 @@ export class WebHaptics implements IHapticsImplementation {
     [HapticPattern.ERROR]: [30, 40, 25, 35, 15, 30, 10],
     [HapticPattern.WARNING]: [20, 100, 20],
     [HapticPattern.SELECTION]: 5,
+    [HapticPattern.LEGENDARY]: [60, 40, 60, 40, 80, 40, 120],
   };
 
   isSupported(): boolean {

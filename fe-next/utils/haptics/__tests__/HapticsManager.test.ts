@@ -208,4 +208,75 @@ describe('HapticsManager', () => {
       expect(haptics).toBeInstanceOf(HapticsManager);
     });
   });
+
+  describe('setEnabled / isEnabled', () => {
+    it('should default to enabled', () => {
+      const manager = new HapticsManager();
+      expect(manager.isEnabled()).toBe(true);
+    });
+
+    it('isEnabled() reflects toggled state', () => {
+      const manager = new HapticsManager();
+      manager.setEnabled(false);
+      expect(manager.isEnabled()).toBe(false);
+      manager.setEnabled(true);
+      expect(manager.isEnabled()).toBe(true);
+    });
+
+    it('setEnabled(false) prevents trigger()', async () => {
+      (platform.isNative as any).mockReturnValue(false);
+      mockWebIsSupported.mockReturnValue(true);
+
+      const manager = new HapticsManager();
+      manager.setEnabled(false);
+      await manager.trigger(HapticPattern.TAP);
+
+      expect(mockWebTrigger).not.toHaveBeenCalled();
+    });
+
+    it('setEnabled(false) prevents triggerCustom()', async () => {
+      (platform.isNative as any).mockReturnValue(false);
+      mockWebIsSupported.mockReturnValue(true);
+
+      const manager = new HapticsManager();
+      manager.setEnabled(false);
+      await manager.triggerCustom({ duration: 50, intensity: HapticIntensity.MEDIUM });
+
+      expect(mockWebTriggerCustom).not.toHaveBeenCalled();
+    });
+
+    it('re-enabling after disable restores trigger()', async () => {
+      (platform.isNative as any).mockReturnValue(false);
+      mockWebIsSupported.mockReturnValue(true);
+
+      const manager = new HapticsManager();
+      manager.setEnabled(false);
+      manager.setEnabled(true);
+      await manager.trigger(HapticPattern.TAP);
+
+      expect(mockWebTrigger).toHaveBeenCalledWith(HapticPattern.TAP);
+    });
+  });
+
+  describe('legendary()', () => {
+    beforeEach(() => {
+      (platform.isNative as any).mockReturnValue(false);
+      mockWebIsSupported.mockReturnValue(true);
+    });
+
+    it('triggers LEGENDARY pattern', async () => {
+      const manager = new HapticsManager();
+      await manager.legendary();
+
+      expect(mockWebTrigger).toHaveBeenCalledWith(HapticPattern.LEGENDARY);
+    });
+
+    it('is suppressed when disabled', async () => {
+      const manager = new HapticsManager();
+      manager.setEnabled(false);
+      await manager.legendary();
+
+      expect(mockWebTrigger).not.toHaveBeenCalled();
+    });
+  });
 });

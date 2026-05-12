@@ -33,6 +33,7 @@ export class NativeHaptics implements IHapticsImplementation {
         [HapticPattern.ERROR]: () => Haptics.notification({ type: 'ERROR' }),
         [HapticPattern.WARNING]: () => Haptics.notification({ type: 'WARNING' }),
         [HapticPattern.SELECTION]: () => Haptics.selectionStart(),
+        [HapticPattern.LEGENDARY]: () => Haptics.notification({ type: 'SUCCESS' }),
       };
       await patternMap[pattern]();
     } catch (error) {

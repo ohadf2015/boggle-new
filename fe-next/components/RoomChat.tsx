@@ -12,6 +12,7 @@ import { useSocket } from '../utils/SocketContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { Send, MessageSquare, Bell } from 'lucide-react';
+import { haptics } from '@/utils/haptics/HapticsManager';
 import toast from 'react-hot-toast';
 import { useAnnouncer } from './GameAnnouncer';
 import { useCrazyGamesChatDisabled } from '@/hooks/useCrazyGamesSettingsBridge';
@@ -158,9 +159,9 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
           }
         );
 
-        // Vibrate on mobile
-        if (window.navigator && window.navigator.vibrate) {
-          window.navigator.vibrate(200);
+        // Short tap on incoming chat — gated by haptics toggle
+        if (haptics.isEnabled() && window.navigator?.vibrate) {
+          window.navigator.vibrate(30);
         }
       }
     }

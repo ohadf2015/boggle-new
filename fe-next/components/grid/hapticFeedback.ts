@@ -76,6 +76,7 @@ function dispatchNative(feel: NativeFeel): void {
 }
 
 function vibrate(webPattern: number | number[], native: NativeFeel): void {
+  if (!haptics.isEnabled()) return;
   if (isNative()) {
     dispatchNative(native);
     return;

@@ -5,6 +5,11 @@
 import { useCallback } from 'react';
 import { SOUND_EFFECTS, type SoundEffectOptions } from '@/lib/audio/soundEffectsConfig';
 import { haptics } from '@/utils/haptics/HapticsManager';
+import {
+  vibrateBlastBomb,
+  vibrateBlastLightning,
+  vibrateBlastPrism,
+} from '@/components/grid/hapticFeedback';
 
 type PlaySoundFn = (soundKey: keyof typeof SOUND_EFFECTS, options?: SoundEffectOptions) => void;
 
@@ -108,10 +113,10 @@ export function useSoundPlayFunctions(playSound: PlaySoundFn, guards: SoundGuard
   const playBossEntranceSound = useCallback(() => { playSound('bossEntrance', { volume: 0.8, requiresGameActive: false }); }, [playSound]);
   const playBossDefeatSound = useCallback(() => { playSound('bossDefeat', { volume: 0.8 }); haptics.success(); }, [playSound]);
 
-  // Blast tile sounds
-  const playBlastBombSound = useCallback(() => { playSound('blastBomb', { volume: 0.7 }); haptics.tap(); }, [playSound]);
-  const playBlastLightningSound = useCallback(() => { playSound('blastLightning', { volume: 0.7 }); haptics.tap(); }, [playSound]);
-  const playBlastPrismSound = useCallback(() => { playSound('blastPrism', { volume: 0.7 }); haptics.tap(); }, [playSound]);
+  // Blast tile sounds — use distinct rich patterns from hapticFeedback (not generic tap)
+  const playBlastBombSound = useCallback(() => { playSound('blastBomb', { volume: 0.7 }); vibrateBlastBomb(); }, [playSound]);
+  const playBlastLightningSound = useCallback(() => { playSound('blastLightning', { volume: 0.7 }); vibrateBlastLightning(); }, [playSound]);
+  const playBlastPrismSound = useCallback(() => { playSound('blastPrism', { volume: 0.7 }); vibrateBlastPrism(); }, [playSound]);
   const playBlastHighlightStingerSound = useCallback(() => { playSound('blastHighlightStinger', { volume: 0.8, requiresGameActive: false }); }, [playSound]);
 
   // Matchmaking & multiplayer
@@ -157,13 +162,13 @@ export function useSoundPlayFunctions(playSound: PlaySoundFn, guards: SoundGuard
   const playTimerHeartbeatSound = useCallback(() => { playSound('timerHeartbeat', { volume: 0.5 }); }, [playSound]);
   const playXpGainSound = useCallback(() => { playSound('xpGain', { volume: 0.5, requiresGameActive: false }); }, [playSound]);
 
-  // Legendary epic moment sounds
-  const playMegaCascadeSound = useCallback(() => { playSound('megaCascade', { volume: 0.9 }); haptics.success(); }, [playSound]);
-  const playUltraComboSound = useCallback(() => { playSound('ultraCombo', { volume: 0.9 }); haptics.success(); }, [playSound]);
-  const playBossDefeatLegendarySound = useCallback(() => { playSound('bossDefeatLegendary', { volume: 0.9, requiresGameActive: false }); haptics.success(); }, [playSound]);
-  const playLegendaryWordSound = useCallback(() => { playSound('legendaryWord', { volume: 0.8 }); haptics.success(); }, [playSound]);
-  const playEpicVictorySound = useCallback(() => { playSound('epicVictory', { volume: 0.9, requiresGameActive: false }); haptics.success(); }, [playSound]);
-  const playStreakLegendarySound = useCallback(() => { playSound('streakLegendary', { volume: 0.8, requiresGameActive: false }); haptics.success(); }, [playSound]);
+  // Legendary epic moment sounds — escalated pattern vs plain success
+  const playMegaCascadeSound = useCallback(() => { playSound('megaCascade', { volume: 0.9 }); haptics.legendary(); }, [playSound]);
+  const playUltraComboSound = useCallback(() => { playSound('ultraCombo', { volume: 0.9 }); haptics.legendary(); }, [playSound]);
+  const playBossDefeatLegendarySound = useCallback(() => { playSound('bossDefeatLegendary', { volume: 0.9, requiresGameActive: false }); haptics.legendary(); }, [playSound]);
+  const playLegendaryWordSound = useCallback(() => { playSound('legendaryWord', { volume: 0.8 }); haptics.legendary(); }, [playSound]);
+  const playEpicVictorySound = useCallback(() => { playSound('epicVictory', { volume: 0.9, requiresGameActive: false }); haptics.legendary(); }, [playSound]);
+  const playStreakLegendarySound = useCallback(() => { playSound('streakLegendary', { volume: 0.8, requiresGameActive: false }); haptics.legendary(); }, [playSound]);
 
   // New game mode sounds
   const playDrillStartSound = useCallback(() => { playSound('drillStart', { volume: 0.7 }); }, [playSound]);
