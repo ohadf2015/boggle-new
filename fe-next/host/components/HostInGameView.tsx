@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { Socket } from 'socket.io-client';
 import InGameScreen from '../../components/game/InGameScreen';
@@ -130,6 +130,8 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   // Blast multiplayer
   totalTime,
 }): React.ReactElement | null => {
+  const [showStopConfirm, setShowStopConfirm] = useState(false);
+
   // Get player's game history for trail display logic
   const { profile } = useAuth();
 
@@ -154,6 +156,16 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     if (!socket) return;
     socket.emit('submitTargetWord', { guess });
   }, [socket]);
+
+  // Stop game with confirmation
+  const handleStopGameClick = useCallback(() => {
+    setShowStopConfirm(true);
+  }, []);
+
+  const handleConfirmStopGame = useCallback(() => {
+    setShowStopConfirm(false);
+    onStopGame();
+  }, [onStopGame]);
 
   // Build leaderboard from players data
   const leaderboard = useMemo(() => {
@@ -195,58 +207,111 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   // Wheel-rush: dedicated view (no TV variant yet, host always renders it)
   if (gameMode === 'wheel-rush') {
     return (
-      <WheelRushView
-        socket={socket}
-        username={username}
-        leaderboard={leaderboard}
-        onQuit={onStopGame}
-        t={t}
-        remainingTime={remainingTime}
-      />
+      <>
+        <WheelRushView
+          socket={socket}
+          username={username}
+          leaderboard={leaderboard}
+          onQuit={handleStopGameClick}
+          t={t}
+          remainingTime={remainingTime}
+        />
+        {showStopConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+            <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
+              <p className="font-bold text-neo-cream text-lg mb-4 font-neo-display">{t('mp.stopGameConfirm')}</p>
+              <div className="flex gap-3 justify-center">
+                <button onClick={handleConfirmStopGame} className="bg-neo-pink border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
+                  {t('mp.stopGameYes')}
+                </button>
+                <button onClick={() => setShowStopConfirm(false)} className="bg-neo-cream border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
+                  {t('common.cancel')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
     );
   }
 
   // Blast with host playing: use dedicated BlastGame (same as PlayerInGameView)
   if (gameMode === 'blast' && hostPlaying) {
     return (
-      <BlastGame
-        config={blastBridge.config}
-        mode="multiplayer"
-        remainingTime={remainingTime}
-        totalTime={totalTime}
-        leaderboard={leaderboard}
-        username={username}
-        onGameEnd={() => {/* Server controls game end in multiplayer */}}
-        onQuit={onStopGame}
-        onWordWithComboType={handleBlastWordWithCombo}
-        initialTileStates={blastBridge.initialTileStates}
-        blastSeed={blastBridge.blastSeed}
-        waveNumber={blastBridge.waveNumber}
-      />
+      <>
+        <BlastGame
+          config={blastBridge.config}
+          mode="multiplayer"
+          remainingTime={remainingTime}
+          totalTime={totalTime}
+          leaderboard={leaderboard}
+          username={username}
+          onGameEnd={() => {/* Server controls game end in multiplayer */}}
+          onMPDeadEnd={() => socket?.emit('blastDeadEnd')}
+          onQuit={handleStopGameClick}
+          onWordWithComboType={handleBlastWordWithCombo}
+          initialTileStates={blastBridge.initialTileStates}
+          blastSeed={blastBridge.blastSeed}
+          waveNumber={blastBridge.waveNumber}
+        />
+        {showStopConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+            <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
+              <p className="font-bold text-neo-cream text-lg mb-4 font-neo-display">{t('mp.stopGameConfirm')}</p>
+              <div className="flex gap-3 justify-center">
+                <button onClick={handleConfirmStopGame} className="bg-neo-pink border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
+                  {t('mp.stopGameYes')}
+                </button>
+                <button onClick={() => setShowStopConfirm(false)} className="bg-neo-cream border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
+                  {t('common.cancel')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
     );
   }
 
   // Word-hunt with host playing: use dedicated WordHuntGame
   if (gameMode === 'word-hunt' && hostPlaying) {
     return (
-      <WordHuntGame
-        grid={tableData}
-        gameLanguage={roomLanguage}
-        leaderboard={leaderboard}
-        username={username}
-        score={leaderboard.find(p => p.username === username)?.score ?? 0}
-        onQuit={onStopGame}
-        onWordSubmit={onWordSubmit}
-        onWordHuntGuess={handleWordHuntGuess}
-        gameActive={true}
-        minWordLength={minWordLength}
-        socket={socket}
-        foundWords={foundWords}
-      />
+      <>
+        <WordHuntGame
+          grid={tableData}
+          gameLanguage={roomLanguage}
+          leaderboard={leaderboard}
+          username={username}
+          score={leaderboard.find(p => p.username === username)?.score ?? 0}
+          onQuit={handleStopGameClick}
+          onWordSubmit={onWordSubmit}
+          onWordHuntGuess={handleWordHuntGuess}
+          gameActive={true}
+          minWordLength={minWordLength}
+          socket={socket}
+          foundWords={foundWords}
+        />
+        {showStopConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+            <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
+              <p className="font-bold text-neo-cream text-lg mb-4 font-neo-display">{t('mp.stopGameConfirm')}</p>
+              <div className="flex gap-3 justify-center">
+                <button onClick={handleConfirmStopGame} className="bg-neo-pink border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
+                  {t('mp.stopGameYes')}
+                </button>
+                <button onClick={() => setShowStopConfirm(false)} className="bg-neo-cream border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
+                  {t('common.cancel')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
     );
   }
 
   return (
+    <>
     <div className="relative flex-1 flex flex-col min-h-0">
     <InGameScreen
       // Core identity
@@ -274,7 +339,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       leaderboard={leaderboard}
 
       // Callbacks
-      onExitRoom={onStopGame}
+      onExitRoom={handleStopGameClick}
       onWordSubmit={onWordSubmit}
 
       // Earthquake/Fire Round
@@ -293,6 +358,22 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       totalGamesPlayed={profile?.total_games}
     />
     </div>
+    {showStopConfirm && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+        <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
+          <p className="font-bold text-neo-cream text-lg mb-4 font-neo-display">{t('mp.stopGameConfirm')}</p>
+          <div className="flex gap-3 justify-center">
+            <button onClick={handleConfirmStopGame} className="bg-neo-pink border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
+              {t('mp.stopGameYes')}
+            </button>
+            <button onClick={() => setShowStopConfirm(false)} className="bg-neo-cream border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
+              {t('common.cancel')}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 

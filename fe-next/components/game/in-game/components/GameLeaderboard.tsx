@@ -51,7 +51,7 @@ function getComboInfo(level: number): { label: string; className: string } | nul
  */
 const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
   player,
-  isHost,
+  isHost: _isHost,
   dir,
   t,
   rankChange,
@@ -78,7 +78,8 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
         hover:-translate-x-px hover:-translate-y-px hover:shadow-hard
         focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-1
         ${player.rankStyle} ${dir === 'rtl' ? 'flex-row-reverse' : ''}
-        ${player.isMe ? 'ring-2 ring-neo-cyan/50' : ''}`}
+        ${player.isMe ? 'ring-2 ring-neo-cyan/50' : ''}
+        ${player.isHost ? 'border-l-4 border-l-neo-yellow' : ''}`}
     >
       {/* Rank badge with change indicator */}
       <div className="relative shrink-0">
@@ -126,6 +127,11 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
               {player.username}
             </span>
           </PlayerProfileTooltip>
+          {player.isHost && (
+            <span className="text-[9px] bg-neo-yellow text-neo-black px-1.5 py-0.5 rounded-neo font-black shrink-0 border border-neo-black">
+              HOST
+            </span>
+          )}
           {player.isMe && (
             <span className="text-[10px] bg-neo-black text-neo-cream px-1 py-0.5 rounded-neo font-bold shrink-0">
               {t('playerView.me')}

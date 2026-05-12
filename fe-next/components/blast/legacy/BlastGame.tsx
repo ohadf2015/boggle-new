@@ -57,6 +57,7 @@ interface BlastGameProps {
   cumulativeScore?: number;
   onWaveComplete?: (waveScore: number, waveWords: string[], clearPct: number) => void;
   onGameEnd: (results: BlastResultsData) => void;
+  onMPDeadEnd?: () => void;
   onHighlightStart?: (finalScore: number) => void;
   onQuit: () => void;
   onComboDetected?: (combos: SpecialCombo[]) => void;
@@ -85,6 +86,7 @@ export function BlastGame({
   cumulativeScore: _cumulativeScore = 0,
   onWaveComplete,
   onGameEnd,
+  onMPDeadEnd,
   onHighlightStart,
   onQuit,
   onComboDetected,
@@ -513,7 +515,7 @@ export function BlastGame({
   // Game end detection + Sugar Crush (extracted to useBlastGameEnd)
   const { sugarCrushActive } = useBlastGameEnd({
     engine, isMultiplayer, gridSize: config.gridSize,
-    waveConfig, objectives, onGameEnd: handleGameEnd, onWaveComplete,
+    waveConfig, objectives, onGameEnd: handleGameEnd, onMPDeadEnd, onWaveComplete,
     onHighlightStart,
     maxCombo: combo.maxCombo, sounds,
     setExplosionShake, explosionShakeTimerRef,

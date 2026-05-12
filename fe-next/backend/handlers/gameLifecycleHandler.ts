@@ -356,6 +356,17 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     endGame(io, gameCode);
   });
 
+  // Blast dead-end: client detected no valid moves remain, Sugar Crush played — end game now.
+  // Multiple players may emit this concurrently; endGame is idempotent.
+  socket.on('blastDeadEnd', () => {
+    if (!checkRateLimit(socket.id)) { socket.emit('rateLimited'); return; }
+    const gameCode = getGameBySocketId(socket.id);
+    if (!gameCode) return;
+    const game = getGame(gameCode);
+    if (!game || game.gameMode !== 'blast') return;
+    endGame(io, gameCode);
+  });
+
   // Debug: Get current game state (development only)
   socket.on('debugGameState', () => {
     if (process.env.NODE_ENV === 'production') return;
@@ -398,10 +409,12 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       if (!hasGameTimer(gameCode)) {
         const recoverySeconds = game.remainingTime ?? game.timerSeconds;
         if (recoverySeconds && recoverySeconds > 0) {
-          logger.warn('SOCKET', `Orphan timer recovery: restarting interval for ${gameCode} at ${recoverySeconds}s`);
-          Sentry.captureMessage('mp_server_timer_orphan_recovered', {
-            level: 'warning',
-            extra: {
+          logger.info('SOCKET', `Orphan timer recovery: restarting interval for ${gameCode} at ${recoverySeconds}s`);
+          Sentry.addBreadcrumb({
+            category: 'mp.timer',
+            message: 'mp_server_timer_orphan_recovered',
+            level: 'info',
+            data: {
               gameCode,
               gameState: game.gameState,
               remainingTime: game.remainingTime,

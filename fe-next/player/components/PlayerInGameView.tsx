@@ -292,6 +292,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             leaderboard={leaderboard}
             username={username}
             onGameEnd={() => {/* Server controls game end in multiplayer */}}
+            onMPDeadEnd={() => socket?.emit('blastDeadEnd')}
             onQuit={onExitRoom}
             onWordWithComboType={handleBlastWordWithCombo}
             initialTileStates={blastBridge.initialTileStates}
