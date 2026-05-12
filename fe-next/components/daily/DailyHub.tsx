@@ -18,6 +18,9 @@ import { getLastSevenDaysCompletion } from '@/utils/dailyChallenge/storage';
 import LastSevenDaysIndicator from './LastSevenDaysIndicator';
 import { formatTimeHHMMSS } from '@/shared/utils/timeFormatting';
 import type { Language } from '@/types';
+import WeeklyChestCard from './WeeklyChestCard';
+import WeeklyChestModal from './WeeklyChestModal';
+import type { PendingChest } from '@/hooks/useWeeklyChest';
 
 // ==========================================
 // Quest Card
@@ -122,6 +125,9 @@ export default function DailyHub() {
     return () => clearInterval(interval);
   }, []);
 
+  // Weekly chest modal
+  const [claimedChest, setClaimedChest] = React.useState<PendingChest | null>(null);
+
   return (
     <div className="flex-1 flex flex-col items-center bg-neo-navy min-h-screen px-4 pt-8 pb-bottom-stack sm:pb-8">
       <motion.div
@@ -168,6 +174,9 @@ export default function DailyHub() {
         {/* Last 7 days progress (DEDICATION) */}
         <LastSevenDaysIndicator days={lastSevenDays} />
 
+        {/* Weekly Chest */}
+        <WeeklyChestCard onChestClaimed={setClaimedChest} />
+
         {/* Quest Cards */}
         <div className="flex flex-col gap-3">
           <QuestCard
@@ -203,6 +212,10 @@ export default function DailyHub() {
           </span>
         </div>
       </motion.div>
+
+      {claimedChest && (
+        <WeeklyChestModal chest={claimedChest} onClose={() => setClaimedChest(null)} />
+      )}
     </div>
   );
 }
