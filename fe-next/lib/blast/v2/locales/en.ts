@@ -18,12 +18,13 @@ const T = (key: ThemeKey, words: string[]): ThemeDef => ({
 });
 
 const THEMES_EN: Record<ThemeKey, ThemeDef> = {
-  onboarding: T('onboarding', ['CAT', 'SUN', 'EGG']),
-  fruits: T('fruits', ['APPLE', 'BANANA', 'ORANGE', 'GRAPE']),
-  animals: T('animals', ['LION', 'BEAR', 'WOLF', 'HORSE']),
-  food: T('food', ['BREAD', 'RICE', 'SOUP', 'CAKE']),
-  ocean: T('ocean', ['WAVE', 'FISH', 'SHELL', 'SHARK']),
-  space: T('space', ['STAR', 'MOON', 'SUN', 'PLANET']),
+  onboarding: T('onboarding', ['CAT', 'SUN', 'EGG', 'DOG', 'BAT', 'BEE']),
+  fruits: T('fruits', ['APPLE', 'BANANA', 'ORANGE', 'GRAPE', 'MANGO', 'KIWI', 'CHERRY', 'PEAR', 'PLUM', 'PEACH', 'LEMON', 'LIME', 'MELON', 'PAPAYA', 'PINEAPPLE', 'COCONUT', 'AVOCADO', 'BERRY', 'BLUEBERRY', 'STRAWBERRY', 'RASPBERRY', 'BLACKBERRY', 'CRANBERRY', 'FIG', 'DATE', 'PRUNE', 'APRICOT', 'TANGERINE', 'CLEMENTINE', 'GRAPEFRUIT', 'POMEGRANATE']),
+  animals: T('animals', ['LION', 'BEAR', 'WOLF', 'HORSE', 'TIGER', 'ZEBRA', 'GIRAFFE', 'ELEPHANT', 'RHINO', 'HIPPO', 'DEER', 'MOOSE', 'ELK', 'ANTELOPE', 'CAMEL', 'LLAMA', 'ALPACA', 'PENGUIN', 'EAGLE', 'HAWK', 'OWL', 'PARROT', 'CROW', 'DUCK', 'SWAN', 'GOOSE', 'PENGUIN', 'SEAL', 'WHALE', 'DOLPHIN']),
+  food: T('food', ['BREAD', 'RICE', 'SOUP', 'CAKE', 'PIZZA', 'PASTA', 'SALAD', 'CHEESE', 'BUTTER', 'MILK', 'YOGURT', 'BACON', 'STEAK', 'CHICKEN', 'TURKEY', 'FISH', 'SHRIMP', 'LOBSTER', 'CRAB', 'OYSTER', 'CLAM', 'OLIVE', 'TOMATO', 'CARROT', 'CELERY', 'BROCCOLI', 'SPINACH', 'LETTUCE', 'PICKLE', 'PEPPER']),
+  ocean: T('ocean', ['WAVE', 'FISH', 'SHELL', 'SHARK', 'WHALE', 'DOLPHIN', 'SQUID', 'OCTOPUS', 'STARFISH', 'CORAL', 'SEAWEED', 'SAND', 'PEBBLE', 'ANCHOR', 'BOAT', 'SHIP', 'SAILOR', 'CAPTAIN', 'CREW', 'TREASURE', 'ISLAND', 'REEF', 'CURRENT', 'TIDE', 'SURGE', 'PEARL', 'SPONGE', 'CRAB', 'LOBSTER', 'SCALLOP']),
+  space: T('space', ['STAR', 'MOON', 'SUN', 'PLANET', 'COMET', 'METEOR', 'ASTEROID', 'GALAXY', 'NEBULA', 'BLACK HOLE', 'QUASAR', 'SATELLITE', 'ORBIT', 'GRAVITY', 'UNIVERSE', 'COSMOS', 'ROCKET', 'SHUTTLE', 'ASTRONAUT', 'ALIEN', 'UFO', 'TELESCOPE', 'OBSERVATORY', 'ECLIPSE', 'ECLIPSE', 'VOID', 'VACUUM', 'RADIATION', 'SOLAR WIND']),
+  // Other themes: continue with seed vocabulary for now, expand per Plan 6 Task 3
   nature: T('nature', ['TREE', 'LEAF', 'RIVER', 'STONE']),
   sports: T('sports', ['BALL', 'RUN', 'SCORE']),
   colors: T('colors', ['RED', 'BLUE', 'GREEN']),
