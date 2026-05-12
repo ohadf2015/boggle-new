@@ -11,9 +11,21 @@ import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureLevelCompletion } from '../useAdventureLevelCompletion';
 import { calculateAdventureXp } from '@/shared/utils/adventureXpUtils';
+import { useOfflineModeFlag } from '@/hooks/useOfflineModeFlag';
+import { useNetworkState } from '@/hooks/useNetworkState';
+import { getOfflineStore } from '@/lib/offline';
+import { enqueueScore } from '@/lib/offline/scoreQueue';
 
 vi.mock('@/shared/utils/adventureXpUtils');
+vi.mock('@/hooks/useOfflineModeFlag', () => ({ useOfflineModeFlag: vi.fn(() => false) }));
+vi.mock('@/hooks/useNetworkState', () => ({ useNetworkState: vi.fn(() => ({ online: true, slow: false, type: 'wifi', rttMs: 20 })) }));
+vi.mock('@/lib/offline', () => ({ getOfflineStore: vi.fn(() => Promise.resolve({})) }));
+vi.mock('@/lib/offline/scoreQueue', () => ({ enqueueScore: vi.fn(() => Promise.resolve('uuid-123')) }));
+
 const mockCalculateAdventureXp = calculateAdventureXp as any;
+const mockUseOfflineModeFlag = useOfflineModeFlag as ReturnType<typeof vi.fn>;
+const mockUseNetworkState = useNetworkState as ReturnType<typeof vi.fn>;
+const mockEnqueueScore = enqueueScore as ReturnType<typeof vi.fn>;
 
 describe('useAdventureLevelCompletion', () => {
   const mockAwardXp = vi.fn().mockReturnValue({ leveledUp: false });
@@ -446,6 +458,75 @@ describe('useAdventureLevelCompletion', () => {
           expect(payload.flashChallengeCompleted).toBe(false);
         });
       }
+    });
+  });
+
+  describe('offline mode enqueue', () => {
+    const offlineProps = {
+      ...defaultProps,
+      userId: 'user-abc',
+      gameState: { ...defaultProps.gameState, isComplete: true, stars: 2 },
+    };
+
+    beforeEach(() => {
+      mockUseOfflineModeFlag.mockReturnValue(true);
+      mockUseNetworkState.mockReturnValue({ online: false, slow: false, type: 'none', rttMs: 0 });
+      mockEnqueueScore.mockResolvedValue('uuid-123');
+    });
+
+    it('enqueues to score queue instead of calling saveCompletion when offline + flag on + authenticated', async () => {
+      renderHook(() => useAdventureLevelCompletion(offlineProps));
+
+      await vi.waitFor(() => expect(mockEnqueueScore).toHaveBeenCalled());
+      expect(mockSaveCompletion).not.toHaveBeenCalled();
+      const [, mode, payload] = mockEnqueueScore.mock.calls[0];
+      expect(mode).toBe('adventure');
+      expect(payload).toMatchObject({
+        world: 1,
+        level: 3,
+        stars: 2,
+        score: 100,
+        words: 2,
+      });
+    });
+
+    it('calls saveCompletion normally when flag is off (offline irrelevant)', async () => {
+      mockUseOfflineModeFlag.mockReturnValue(false);
+
+      renderHook(() => useAdventureLevelCompletion(offlineProps));
+
+      await vi.waitFor(() => expect(mockSaveCompletion).toHaveBeenCalled());
+      expect(mockEnqueueScore).not.toHaveBeenCalled();
+    });
+
+    it('calls saveCompletion normally when online even with flag on', async () => {
+      mockUseNetworkState.mockReturnValue({ online: true, slow: false, type: 'wifi', rttMs: 20 });
+
+      renderHook(() => useAdventureLevelCompletion(offlineProps));
+
+      await vi.waitFor(() => expect(mockSaveCompletion).toHaveBeenCalled());
+      expect(mockEnqueueScore).not.toHaveBeenCalled();
+    });
+
+    it('calls saveCompletion normally when userId absent (guest)', async () => {
+      renderHook(() =>
+        useAdventureLevelCompletion({ ...offlineProps, userId: undefined })
+      );
+
+      await vi.waitFor(() => expect(mockSaveCompletion).toHaveBeenCalled());
+      expect(mockEnqueueScore).not.toHaveBeenCalled();
+    });
+
+    it('does not enqueue when stars === 0 (failed level)', () => {
+      renderHook(() =>
+        useAdventureLevelCompletion({
+          ...offlineProps,
+          gameState: { ...offlineProps.gameState, stars: 0 },
+        })
+      );
+
+      expect(mockEnqueueScore).not.toHaveBeenCalled();
+      expect(mockSaveCompletion).not.toHaveBeenCalled();
     });
   });
 });

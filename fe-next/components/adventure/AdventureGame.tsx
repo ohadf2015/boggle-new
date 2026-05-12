@@ -374,6 +374,7 @@ const AdventureGame = memo<AdventureGameProps>(
       playerHealthPercent: bossOrch.playerHealthState.maxHP > 0 ? Math.round((bossOrch.playerHealthState.currentHP / bossOrch.playerHealthState.maxHP) * 100) : 100,
       flashChallengeGold: flashChallenge.isChallengeComplete && flashChallenge.activeChallenge
         ? flashChallenge.activeChallenge.rewardCoins : undefined,
+      userId: user?.id,
     });
     useAdventureTimerReport({
       timeRemaining,

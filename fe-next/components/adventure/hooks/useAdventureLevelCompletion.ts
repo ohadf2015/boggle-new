@@ -13,6 +13,10 @@ import { calculateAdventureXp } from '@/shared/utils/adventureXpUtils';
 import { generateLevelLoot } from '@/lib/adventure/lootGenerator';
 import { trackGameEnd } from '@/utils/growthTracking';
 import { useHaptics } from '@/hooks/useHaptics';
+import { useOfflineModeFlag } from '@/hooks/useOfflineModeFlag';
+import { useNetworkState } from '@/hooks/useNetworkState';
+import { getOfflineStore } from '@/lib/offline';
+import { enqueueScore } from '@/lib/offline/scoreQueue';
 import type { LootDrop } from '@/types/adventure';
 import type { LevelUpPayload } from '@/components/education/LevelUpCelebration';
 import type { BossTauntEvent } from '@/types/boss';
@@ -109,6 +113,8 @@ export interface UseAdventureLevelCompletionProps {
   playerHealthPercent?: number;
   /** Score retained from a previous retry (Salvage Claw upgrade) */
   retainedScore?: number;
+  /** Authenticated user ID — omit for guests (guests skip offline enqueue) */
+  userId?: string;
 }
 
 export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionProps) {
@@ -121,6 +127,8 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     isBossLevel, isBossActive, bossHealthPhase, playerIsDead,
     endBossBattle, triggerBossTaunt,
   } = props;
+  const offlineFlag = useOfflineModeFlag();
+  const { online } = useNetworkState();
 
   const [levelUpData, setLevelUpData] = useState<LevelUpPayload | null>(null);
   const [hasAwardedLevelRewards, setHasAwardedLevelRewards] = useState(false);
@@ -367,23 +375,42 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
         completionSavedRef.current = true;
         const longWords = gameState.wordsFound.filter(w => w.length >= 6).length;
         const timePlayed = Math.max(0, Math.floor(timerSeconds - timeRemaining));
-        saveCompletionRef.current(
-          levelConfig.world, levelConfig.level,
-          gameState.stars as 0 | 1 | 2 | 3,
-          gameState.score, gameState.wordsFound.length,
-          earnedGoldRef.current, longWords, gameState.wordsFound,
-          props.flashChallengeGold, timePlayed
-        ).then((success) => {
-          saveResolvedRef.current = true;
-          if (!success) {
+
+        if (offlineFlag && !online && props.userId) {
+          getOfflineStore().then(store =>
+            enqueueScore(store, 'adventure', {
+              world: levelConfig.world, level: levelConfig.level,
+              stars: gameState.stars, score: gameState.score,
+              words: gameState.wordsFound.length,
+              goldEarned: earnedGoldRef.current, longWords,
+              wordsFound: gameState.wordsFound,
+              flashChallengeGold: props.flashChallengeGold, timePlayed,
+            })
+          ).then(() => {
+            saveResolvedRef.current = true;
+          }).catch(() => {
+            saveResolvedRef.current = true;
             completionSaveFailedRef.current = true;
-          }
-        }).catch(() => {
-          saveResolvedRef.current = true;
-          // Mark as failed so Continue/Retry can retry — do NOT reset
-          // completionSavedRef (that would let this effect re-fire and cause 429 cascades)
-          completionSaveFailedRef.current = true;
-        });
+          });
+        } else {
+          saveCompletionRef.current(
+            levelConfig.world, levelConfig.level,
+            gameState.stars as 0 | 1 | 2 | 3,
+            gameState.score, gameState.wordsFound.length,
+            earnedGoldRef.current, longWords, gameState.wordsFound,
+            props.flashChallengeGold, timePlayed
+          ).then((success) => {
+            saveResolvedRef.current = true;
+            if (!success) {
+              completionSaveFailedRef.current = true;
+            }
+          }).catch(() => {
+            saveResolvedRef.current = true;
+            // Mark as failed so Continue/Retry can retry — do NOT reset
+            // completionSavedRef (that would let this effect re-fire and cause 429 cascades)
+            completionSaveFailedRef.current = true;
+          });
+        }
       }
 
       endAIDirectorRef.current();
