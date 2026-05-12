@@ -101,6 +101,33 @@ describe('Game Session Logger', () => {
       expect(sessionId).toBeNull();
     });
 
+    it('should prefer userId and clear guestSessionId when both are set (XOR constraint)', async () => {
+      const { createClient } = await import('@supabase/supabase-js');
+      const mockInsert = vi.fn(() => ({
+        select: vi.fn(() => ({
+          single: vi.fn(() => ({ data: { id: 'mock-session-id' }, error: null })),
+        })),
+      }));
+      (createClient as Mock).mockReturnValueOnce({
+        from: vi.fn(() => ({ insert: mockInsert })),
+      });
+
+      const sessionData: GameSessionData = {
+        userId: 'user-abc',
+        guestSessionId: 'guest-xyz',
+        mode: 'multiplayer',
+        language: 'en',
+        startedAt: new Date(),
+      };
+
+      const sessionId = await logGameSession(sessionData);
+
+      expect(sessionId).toBe('mock-session-id');
+      const insertedRow = (mockInsert.mock.calls as unknown[][])[0]![0] as Record<string, unknown>;
+      expect(insertedRow.user_id).toBe('user-abc');
+      expect(insertedRow.guest_session_id).toBeNull();
+    });
+
     it('should log daily challenge session for guest', async () => {
       const sessionData: GameSessionData = {
         guestSessionId: 'guest-456',

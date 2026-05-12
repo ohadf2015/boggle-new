@@ -2686,12 +2686,12 @@ const en = {
     "pts": "pts"
   },
   "multiplayerWelcome": {
-    "title": "Welcome to Multiplayer",
+    "title": "Game on. Find your people.",
     "tip": "Swipe letters to form words — longer words score more!"
   },
   "howToPlay": {
     "missionBriefing": "Mission Briefing",
-    "masterTheArena": "Master the LexiClash arena",
+    "masterTheArena": "Run the LexiClash arena",
     "connectingDots": "Connecting the dots",
     "levelUpGame": "Level up your point game",
     "nextStep": "Next",
@@ -2870,15 +2870,6 @@ const en = {
       "checkCorners": "Check the corners for hidden words!",
       "longerWords": "Longer words = more points! Try 5+ letters",
       "skillsUnlocked": "Skills unlocked! You're ready!"
-    },
-    "completion": {
-      "title": "Nailed it!",
-      "message": "You've got the moves! Ready for real competition?",
-      "finish": "Let's Battle!",
-      "continuePractice": "Keep Practicing",
-      "nextChallenge": "What's next?",
-      "tryDaily": "Try today's daily",
-      "tryQuickMatch": "Battle a bot"
     },
     "analysis": {
       "titleComplete": "Training Done!",
@@ -4512,7 +4503,7 @@ const en = {
     },
     "community": {
       "hero": "Community Workshop",
-      "heroSub": "Play, create, and share custom word puzzles with the community",
+      "heroSub": "Play. Build. Share. Repeat.",
       "title": "Community Workshop",
       "subtitle": "Play, create, and share custom word puzzles",
       "tabBoards": "Boards",
@@ -4768,6 +4759,8 @@ const en = {
     "sectionMultiplayerSubtitle": "Real players, live chaos",
     "sectionSoloTitle": "Solo",
     "sectionSoloSubtitle": "Train. Climb. Beat your best.",
+    "moreGameModes": "More Game Modes",
+    "moreGameModesHint": "Tap to explore",
     "arena": "Multiplayer",
     "arenaDesc": "Play solo or challenge friends!",
     "quickPlay": "Quick Play",
@@ -10960,6 +10953,10 @@ const en = {
     "almostDone": "Final stretch! Find more words!"
   },
   "toast": {
+    "found": "FOUND!",
+    "nah": "NAH.",
+    "seenIt": "SEEN IT.",
+    "jackpot": "JACKPOT!",
     "rejection": {
       "notInDictionary": "Not in dictionary",
       "alreadyFound": "Already found",
@@ -11241,7 +11238,7 @@ const en = {
   },
   "reengagement": {
     "ariaLabel": "Welcome back bonus",
-    "bonusMessage": "You've been away for {{days}} days. Here's a bonus to welcome you back!",
+    "bonusMessage": "{{days}} days off? Here — take this. Good to see you.",
     "rewardsAriaLabel": "Bonus rewards",
     "claimBonus": "Claim Bonus",
     "dismiss": "Maybe later"

@@ -2571,12 +2571,12 @@ const ja = {
     "pts": "pts"
   },
   "multiplayerWelcome": {
-    "title": "マルチプレイヤーへようこそ",
+    "title": "本番だ。仲間を見つけよう。",
     "tip": "文字をスワイプして単語を作ろう — 長い単語ほど高得点！"
   },
   "howToPlay": {
     "missionBriefing": "ミッションブリーフィング",
-    "masterTheArena": "LexiClashアリーナをマスター",
+    "masterTheArena": "アリーナを支配しよう",
     "connectingDots": "文字をつなげよう",
     "levelUpGame": "スコアをレベルアップ",
     "nextStep": "次へ",
@@ -2755,15 +2755,6 @@ const ja = {
       "checkCorners": "隅っこに隠れた単語をチェック！",
       "longerWords": "長い単語 = 高得点！5文字以上を狙え",
       "skillsUnlocked": "スキル解放！準備完了！"
-    },
-    "completion": {
-      "title": "完璧！",
-      "message": "操作マスターした！本番に挑戦する？",
-      "finish": "バトルへ！",
-      "continuePractice": "練習を続ける",
-      "nextChallenge": "次は？",
-      "tryDaily": "今日のデイリーに挑戦",
-      "tryQuickMatch": "ボットと対戦"
     },
     "analysis": {
       "titleComplete": "トレーニング完了！",
@@ -4025,7 +4016,7 @@ const ja = {
     },
     "community": {
       "hero": "コミュニティ工房",
-      "heroSub": "コミュニティでワードパズルを遊んで、作って、共有しよう",
+      "heroSub": "遊ぶ。作る。シェアする。繰り返す。",
       "title": "コミュニティ工房",
       "subtitle": "カスタムワードパズルを遊んで、作って、共有しよう",
       "tabBoards": "ボード",
@@ -4648,6 +4639,8 @@ const ja = {
     "sectionMultiplayerSubtitle": "リアルプレイヤーと即バトル",
     "sectionSoloTitle": "ひとり",
     "sectionSoloSubtitle": "鍛えて、伸ばして、自己ベスト更新",
+    "moreGameModes": "他のゲームモード",
+    "moreGameModesHint": "タップして見る",
     "arena": "マルチプレイヤー",
     "arenaDesc": "ソロでもフレンドとでも！",
     "quickPlay": "クイックプレイ",
@@ -10730,6 +10723,10 @@ const ja = {
     "almostDone": "ラストスパート！もっと見つけよう！"
   },
   "toast": {
+    "found": "見つけた！",
+    "nah": "ダメ。",
+    "seenIt": "もう見た。",
+    "jackpot": "大当たり！",
     "rejection": {
       "notInDictionary": "辞書にありません",
       "alreadyFound": "既に発見済み",
@@ -11129,7 +11126,7 @@ const ja = {
   },
   "reengagement": {
     "ariaLabel": "復帰ボーナス",
-    "bonusMessage": "{{days}}日間お休みでしたね。復帰ボーナスをどうぞ！",
+    "bonusMessage": "{{days}}日ぶり？これ受け取って。おかえり。",
     "rewardsAriaLabel": "ボーナス報酬",
     "welcomeBack": "おかえりなさい！",
     "missedYou": "お待ちしていました！復帰ボーナスをどうぞ。",

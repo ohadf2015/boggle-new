@@ -193,7 +193,8 @@ async function processPlayerResult(
       if (logGameSession) {
         await logGameSession({
           userId: authInfo.authUserId || null,
-          guestSessionId: authInfo.guestSessionId || null,
+          // XOR: authenticated user wins; never pass both
+          guestSessionId: authInfo.authUserId ? null : (authInfo.guestSessionId || null),
           mode: 'multiplayer',
           language: gameInfo.language || 'en',
           score: gameStats.score || 0,

@@ -60,7 +60,7 @@ export interface GameSessionData {
   guestSessionId?: string | null;
 
   // Game details
-  mode: 'singleplayer' | 'multiplayer' | 'daily_challenge';
+  mode: 'singleplayer' | 'multiplayer' | 'daily_challenge' | 'word_hunt';
   language: string;
   difficulty?: string | null;
 
@@ -133,10 +133,14 @@ export async function logGameSession(sessionData: GameSessionData): Promise<stri
   const client = getSupabaseClient();
   if (!client) return null;
 
-  // DB check_player_id constraint requires at least one identifier
+  // DB check_player_id constraint requires exactly one identifier (XOR)
   if (!sessionData.userId && !sessionData.guestSessionId) {
     logger.debug('GAME_SESSION_LOGGER', 'Skipping game session log: no player identifier');
     return null;
+  }
+  // When both are set, prefer authenticated userId (XOR enforcement)
+  if (sessionData.userId && sessionData.guestSessionId) {
+    sessionData = { ...sessionData, guestSessionId: null };
   }
 
   try {

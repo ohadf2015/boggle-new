@@ -2583,12 +2583,12 @@ const sv = {
     "pts": "poäng"
   },
   "multiplayerWelcome": {
-    "title": "Välkommen till Multiplayer",
+    "title": "Nu kör vi. Hitta ditt gäng.",
     "tip": "Svep över bokstäver för att bilda ord — längre ord ger mer poäng!"
   },
   "howToPlay": {
     "missionBriefing": "Uppdragsbriefing",
-    "masterTheArena": "Bemästra LexiClash-arenan",
+    "masterTheArena": "Ta över arenan",
     "connectingDots": "Koppla ihop bokstäverna",
     "levelUpGame": "Höj ditt poängspel",
     "nextStep": "Nästa",
@@ -2767,15 +2767,6 @@ const sv = {
       "checkCorners": "Kolla hörnen för dolda ord!",
       "longerWords": "Längre ord = fler poäng! Prova 5+ bokstäver",
       "skillsUnlocked": "Kunskaper upplåsta! Du är redo!"
-    },
-    "completion": {
-      "title": "Bra gjort!",
-      "message": "Du har koll! Redo för riktig tävling?",
-      "finish": "Nu kör vi!",
-      "continuePractice": "Fortsätt Öva",
-      "nextChallenge": "Vad händer nu?",
-      "tryDaily": "Prova dagens utmaning",
-      "tryQuickMatch": "Möt en bot"
     },
     "analysis": {
       "titleComplete": "Träning Klar!",
@@ -4040,7 +4031,7 @@ const sv = {
     },
     "community": {
       "hero": "Gemenskapens Verkstad",
-      "heroSub": "Spela, skapa och dela ordpussel med gemenskapen",
+      "heroSub": "Spela. Bygg. Dela. Igen.",
       "title": "Gemenskapens Verkstad",
       "subtitle": "Spela, skapa och dela anpassade ordpussel",
       "tabBoards": "Bräden",
@@ -4663,6 +4654,8 @@ const sv = {
     "sectionMultiplayerSubtitle": "Live, snabbt, riktiga spelare",
     "sectionSoloTitle": "Ensam",
     "sectionSoloSubtitle": "Träna. Klättra. Slå ditt rekord.",
+    "moreGameModes": "Fler spellägen",
+    "moreGameModesHint": "Tryck för att utforska",
     "arena": "Multiplayer",
     "arenaDesc": "Spela ensam eller utmana vänner!",
     "quickPlay": "Snabbspel",
@@ -10764,6 +10757,10 @@ const sv = {
     "almostDone": "Slutspurten! Hitta fler ord!"
   },
   "toast": {
+    "found": "HITTAD!",
+    "nah": "NEJ.",
+    "seenIt": "SETT DEN.",
+    "jackpot": "JACKPOTT!",
     "rejection": {
       "notInDictionary": "Inte i ordlistan",
       "alreadyFound": "Redan hittat",
@@ -11163,7 +11160,7 @@ const sv = {
   },
   "reengagement": {
     "ariaLabel": "Välkomstbonus",
-    "bonusMessage": "Du har varit borta i {{days}} dagar. Här är en bonus!",
+    "bonusMessage": "{{days}} dagars paus? Här, en bonus. Kul att se dig.",
     "rewardsAriaLabel": "Bonusbelöningar",
     "welcomeBack": "Välkommen tillbaka!",
     "missedYou": "Vi saknade dig! Här är en bonus för att komma igång igen.",

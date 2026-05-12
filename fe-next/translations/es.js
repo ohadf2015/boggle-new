@@ -2512,12 +2512,12 @@ const es = {
     "pts": "pts"
   },
   "multiplayerWelcome": {
-    "title": "Bienvenido al Multijugador",
+    "title": "Empieza el juego. Encuentra a los tuyos.",
     "tip": "Desliza sobre las letras para formar palabras — ¡las más largas valen más!"
   },
   "howToPlay": {
     "missionBriefing": "Informe de Misión",
-    "masterTheArena": "Domina la arena de LexiClash",
+    "masterTheArena": "Adueñate de la arena",
     "connectingDots": "Conectando las letras",
     "levelUpGame": "Sube tu nivel de puntuación",
     "nextStep": "Siguiente",
@@ -4184,15 +4184,6 @@ const es = {
       "longerWords": "Palabras largas = más puntos! Prueba 5+ letras",
       "skillsUnlocked": "¡Habilidades desbloqueadas! ¡Estás listo!"
     },
-    "completion": {
-      "title": "¡Bien hecho!",
-      "message": "¡Ya tienes las jugadas! ¿Listo para la competencia real?",
-      "finish": "¡A Batallar!",
-      "continuePractice": "Continuar Practicando",
-      "nextChallenge": "¿Qué sigue?",
-      "tryDaily": "Reto diario de hoy",
-      "tryQuickMatch": "Reta a un bot"
-    },
     "analysis": {
       "titleComplete": "¡Entrenamiento Completo!",
       "titleProgress": "¡Sigue Practicando!",
@@ -4453,7 +4444,7 @@ const es = {
     },
     "community": {
       "hero": "Taller Comunitario",
-      "heroSub": "Juega, crea y comparte rompecabezas de palabras con la comunidad",
+      "heroSub": "Juega. Crea. Comparte. Repite.",
       "title": "Taller Comunitario",
       "subtitle": "Juega, crea y comparte rompecabezas personalizados",
       "tabBoards": "Tableros",
@@ -4709,6 +4700,8 @@ const es = {
     "sectionMultiplayerSubtitle": "Jugadores reales, en vivo",
     "sectionSoloTitle": "En solitario",
     "sectionSoloSubtitle": "Entrena. Sube. Supérate.",
+    "moreGameModes": "Más modos de juego",
+    "moreGameModesHint": "Toca para explorar",
     "arena": "Multijugador",
     "arenaDesc": "¡Juega solo o desafía amigos!",
     "quickPlay": "Juego Rápido",
@@ -10860,6 +10853,10 @@ const es = {
     "almostDone": "¡Recta final! ¡Encuentra más palabras!"
   },
   "toast": {
+    "found": "¡ENCONTRADA!",
+    "nah": "NO.",
+    "seenIt": "YA LA VÍ.",
+    "jackpot": "¡PREMIO!",
     "rejection": {
       "notInDictionary": "No está en el diccionario",
       "alreadyFound": "Ya encontrada",
@@ -11259,7 +11256,7 @@ const es = {
   },
   "reengagement": {
     "ariaLabel": "Bono de bienvenida",
-    "bonusMessage": "Estuviste {{days}} días fuera. ¡Aquí tienes un bono de bienvenida!",
+    "bonusMessage": "¿{{days}} días sin venir? Toma esto. Qué bueno verte.",
     "rewardsAriaLabel": "Recompensas de bono",
     "welcomeBack": "¡Bienvenido de vuelta!",
     "missedYou": "¡Te echamos de menos! Aquí tienes un bono para volver al juego.",

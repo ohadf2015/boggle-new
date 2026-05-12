@@ -2596,12 +2596,12 @@ const he = {
     "pts": "נק׳"
   },
   "multiplayerWelcome": {
-    "title": "ברוכים הבאים למשחק רב-משתתפים",
+    "title": "המשחק התחיל. תמצאו את החבר'ה.",
     "tip": "החליקו על אותיות ליצירת מילים — מילים ארוכות שוות יותר!"
   },
   "howToPlay": {
     "missionBriefing": "תדריך משימה",
-    "masterTheArena": "שלטו בזירת LexiClash",
+    "masterTheArena": "תכניסו לכיס את זירת LexiClash",
     "connectingDots": "מחברים את הנקודות",
     "levelUpGame": "שדרגו את הניקוד שלכם",
     "nextStep": "הבא",
@@ -2780,15 +2780,6 @@ const he = {
       "checkCorners": "בדוק את הפינות - יש שם אוצרות!",
       "longerWords": "מילים ארוכות = יותר נקודות!",
       "skillsUnlocked": "כישורים נפתחו! מוכן לקרב!"
-    },
-    "completion": {
-      "title": "כל הכבוד!",
-      "message": "תפסת את הטריק! מוכנים למשחק האמיתי?",
-      "finish": "יאללה לקרב!",
-      "continuePractice": "המשך תרגול",
-      "nextChallenge": "מה הלאה?",
-      "tryDaily": "אתגר יומי",
-      "tryQuickMatch": "שחק נגד בוט"
     },
     "analysis": {
       "titleComplete": "האימון הושלם!",
@@ -4418,7 +4409,7 @@ const he = {
     },
     "community": {
       "hero": "סדנת הקהילה",
-      "heroSub": "שחקו, צרו ושתפו חידות מילים עם הקהילה",
+      "heroSub": "שחקו. תבנו. תשתפו. ושוב.",
       "title": "סדנת הקהילה",
       "subtitle": "שחקו, צרו ושתפו חידות מילים מותאמות",
       "tabBoards": "לוחות",
@@ -4674,6 +4665,8 @@ const he = {
     "sectionMultiplayerSubtitle": "חי, מהיר, מול שחקנים אמיתיים",
     "sectionSoloTitle": "לבד",
     "sectionSoloSubtitle": "אימון, התקדמות, שיא אישי",
+    "moreGameModes": "עוד מצבי משחק",
+    "moreGameModesHint": "הקישו לחקור",
     "arena": "מולטיפלייר",
     "arenaDesc": "שחקו לבד או אתגרו חברים!",
     "quickPlay": "משחק מהיר",
@@ -10735,6 +10728,10 @@ const he = {
     "almostDone": "הישורת האחרונה! מצאו עוד מילים!"
   },
   "toast": {
+    "found": "נמצא!",
+    "nah": "לא.",
+    "seenIt": "כבר הייתה.",
+    "jackpot": "ג'קפוט!",
     "rejection": {
       "notInDictionary": "לא במילון",
       "alreadyFound": "כבר נמצאה",
@@ -11133,7 +11130,7 @@ const he = {
   },
   "reengagement": {
     "ariaLabel": "בונוס חזרה למשחק",
-    "bonusMessage": "לא היית {{days}} ימים. הנה בונוס חזרה!",
+    "bonusMessage": "{{days}} ימים בלעדינו? קחו את זה. טוב שחזרתם.",
     "rewardsAriaLabel": "פרסי בונוס",
     "welcomeBack": "ברוך שובך!",
     "missedYou": "התגעגענו! הנה בונוס כדי לחזור למשחק.",
