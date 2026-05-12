@@ -1,18 +1,34 @@
 'use client';
+import { useState } from 'react';
 import { mechanicsForLevel } from '@/lib/blast/v2/mechanic-flags';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { BlastChestBadge } from './BlastChestBadge';
+import { BlastChestPreviewModal } from './BlastChestPreviewModal';
+import type { ChestContents } from '@/lib/blast/v2/chest-roll';
 
 type Props = {
   levelNumber: number;
   coins: number;
+  chestNumber: number;
   chestProgress: number;
+  chestContents: ChestContents | null;
   onShuffle: () => void;
   onHint: () => void;
 };
 
-export function BlastHud({ levelNumber, coins, chestProgress, onShuffle, onHint }: Props) {
+export function BlastHud({
+  levelNumber,
+  coins,
+  chestNumber,
+  chestProgress,
+  chestContents,
+  onShuffle,
+  onHint,
+}: Props) {
   const { t } = useLanguage();
   const mech = mechanicsForLevel(levelNumber);
+  const [showPreview, setShowPreview] = useState(false);
+
   return (
     <>
       <div className="flex items-center justify-between px-4 py-2 bg-[#0b1530] text-white">
@@ -20,10 +36,21 @@ export function BlastHud({ levelNumber, coins, chestProgress, onShuffle, onHint 
           {t('blast.level', `Level ${levelNumber}`, { n: String(levelNumber) })}
         </span>
         <span data-testid="coin-counter">🪙 {coins}</span>
-        <div data-testid="chest-pill" className="rounded-md border-2 border-white px-2 py-1 text-xs">
-          {t('blast.chest.pill', 'Chest #1')} {Math.round(chestProgress * 100)}%
-        </div>
+        <BlastChestBadge
+          chestNumber={chestNumber}
+          progress={chestProgress}
+          contents={chestContents}
+          onPreview={() => setShowPreview(true)}
+        />
       </div>
+      {chestContents && (
+        <BlastChestPreviewModal
+          chestNumber={chestNumber}
+          contents={chestContents}
+          isOpen={showPreview}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
       <div className="flex items-center justify-center gap-4 px-4 py-2">
         {mech.shuffleButton && (
           <button

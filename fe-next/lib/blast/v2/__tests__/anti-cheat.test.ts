@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { validateLevelClear, starRating } from '../anti-cheat';
+import { validateLevelClear, starRating, type ClearSubmission } from '../anti-cheat';
 import type { BlastLevel } from '../types';
-import type { ClearSubmission } from '../anti-cheat';
 
 const mockLevel: BlastLevel = {
   id: 'test-1',

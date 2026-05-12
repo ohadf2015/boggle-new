@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 import { validateLevelClear, starRating, type ClearSubmission } from '@/lib/blast/v2/anti-cheat';
 import { awardCoinsServer } from '@/backend/services/economy/awardCoins';
 import { NextRequest, NextResponse } from 'next/server';
