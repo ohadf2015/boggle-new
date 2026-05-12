@@ -1,0 +1,17 @@
+-- FTUE/mechanic card skip rate by card #
+-- Setup: In PostHog, create Trends insight:
+--  Event: blast_tutorial_seen
+--  Breakdown: mechanic (frozenTiles, bonusDictionary, etc.) + dismiss_via (button/skip_all)
+--  Time series: Cumulative %
+--
+-- Measure: % of players who dismiss/skip each mechanic card
+-- Target: < 30% skip rate per card (most players engage)
+--
+-- Key metrics:
+--  step_number (FTUE): 1-6 progression
+--  mechanic (unlock cards): which mechanics are being dismissed
+--  dismiss_via: skip_all = player wants no more tutorials, button = understood & moved on
+--
+-- Alerts:
+-- - If step 1-2 skip > 50%, FTUE too long or copy confusing
+-- - If mechanic card X skip > 60%, copy may be unclear or mechanic feels useless
