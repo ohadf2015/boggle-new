@@ -12,6 +12,7 @@ import { useIsPracticeVeteran } from '@/hooks/useIsPracticeVeteran';
 import { useUserStats } from '@/hooks/useUserStats';
 import { THRESHOLDS } from '@/utils/featureGates';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useAuth } from '@/contexts/AuthContext';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 
 interface DailyChallengePreloadedStats {
@@ -90,6 +91,7 @@ export function LandingChallengeCards({
   // Practice also disappears as soon as the player has finished any game —
   // a recorded personal best is a durable "I've played" signal that survives
   // localStorage clears for signed-in users.
+  const { isAdmin } = useAuth();
   const isVeteranRaw = useIsPracticeVeteran();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const hasPlayedAnyGame = !!playerAllTimeBest && playerAllTimeBest.score > 0;
@@ -132,7 +134,7 @@ export function LandingChallengeCards({
     const next = [...baseOrder];
     if (!next.includes('connections')) next.push('connections');
     if (!next.includes('brainGym')) next.push('brainGym');
-    if (!next.includes('wordCraft')) next.push('wordCraft');
+    if (isAdmin && !next.includes('wordCraft')) next.push('wordCraft');
     if (language === 'ja') return next.filter((m) => !JA_HIDDEN_MODES.has(m));
     return next;
   })();

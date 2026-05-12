@@ -1,7 +1,7 @@
 /**
  * LandingChallengeCards — visibility gates
  *
- * 1. Word Craft is now public — all users see the card.
+ * 1. Word Craft is admin-only. Non-admin players must NOT see the card.
  * 2. After a player has finished even one multiplayer round, the "More Game
  *    Modes" expander must not collapse extras — surface every mode directly.
  */
@@ -60,8 +60,9 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
 }));
 
 const mockUserEmail = vi.fn<[], string | undefined>(() => undefined);
+const mockIsAdmin = vi.fn(() => false);
 vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({ user: { email: mockUserEmail() } }),
+  useAuth: () => ({ user: { email: mockUserEmail() }, isAdmin: mockIsAdmin() }),
 }));
 
 vi.mock('@/hooks/useIsPracticeVeteran', () => ({ useIsPracticeVeteran: () => false }));
@@ -82,19 +83,27 @@ const baseProps = {
   dailyChallengeStats: { hasPlayed: false, hasSolved: null, currentStreak: 0, puzzleNumber: 1, loading: false },
 };
 
-describe('LandingChallengeCards — Word Craft visibility (now public)', () => {
-  it('renders the wordCraft card for any signed-in user', () => {
-    mockUserEmail.mockReturnValue('random@example.com');
+describe('LandingChallengeCards — Word Craft admin gate', () => {
+  it('does NOT render the wordCraft card for a non-admin user', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.queryByTestId('mode-wordcraft.modeTitle')).toBeNull();
+  });
+
+  it('renders the wordCraft card for an admin', () => {
+    mockIsAdmin.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(10);
     render(<LandingChallengeCards {...baseProps} />);
     expect(screen.getByTestId('mode-wordcraft.modeTitle')).toBeInTheDocument();
   });
 
-  it('renders the wordCraft card when signed out', () => {
+  it('does NOT render the wordCraft card when signed out', () => {
+    mockIsAdmin.mockReturnValue(false);
     mockUserEmail.mockReturnValue(undefined);
     mockGamesCompleted.mockReturnValue(10);
     render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.getByTestId('mode-wordcraft.modeTitle')).toBeInTheDocument();
+    expect(screen.queryByTestId('mode-wordcraft.modeTitle')).toBeNull();
   });
 });
 
