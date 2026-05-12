@@ -2141,6 +2141,12 @@ const es = {
     "goToLobby": "Ir al lobby",
     "you": "(Tú)",
     "betterLuckNextTime": "¡La próxima te desquitas!",
+    "loserFeedback": {
+      "almostPodium": "¡Casi en el podio!",
+      "goodFight": "¡Buen duelo!",
+      "solidTry": "¡Buen intento!",
+      "encouragement": "Cada partida te acerca más."
+    },
     "of": "de",
     "readyForNextRound": "¿Listos para la siguiente ronda?",
     "readyExplanation": "Marca listo para la siguiente ronda",
@@ -10449,6 +10455,19 @@ const es = {
       "title": "¿Primera vez? Bienvenido.",
       "body": "Tres calentamientos tranquilos, sin puntaje, sin reloj. Toca un mosaico para comenzar.",
       "startHere": "Empieza aquí"
+    }
+  },
+  "practice": {
+    "hub": {
+      "title": "Arena de Práctica",
+      "subtitle": "Domina los 3 modos para desbloquear el juego real",
+      "progress": "{count}/{total} completado",
+      "tip": {
+        "start": "Empieza con Caza Palabras — enseña a leer pistas",
+        "one": "¡Buen comienzo! Modo Clásico a continuación — entrenamiento de velocidad",
+        "two": "¡Casi! Modo Supervivencia = desafío definitivo",
+        "done": "¡Todos los modos dominados! ¡Listo para competencia real!"
+      }
     }
   },
   "practiceBadge": {

@@ -2213,6 +2213,12 @@ const sv = {
     "goToLobby": "Gå till lobby",
     "you": "(Du)",
     "betterLuckNextTime": "Nästa runda!",
+    "loserFeedback": {
+      "almostPodium": "Nästan på prispallen!",
+      "goodFight": "Bra kämpat!",
+      "solidTry": "Bra försök!",
+      "encouragement": "Du blir bättre för varje spel."
+    },
     "of": "av",
     "readyForNextRound": "Redo för nästa runda?",
     "hostStartDescription": "Starta ett nytt spel när alla är redo!",
@@ -10549,6 +10555,19 @@ const sv = {
       "title": "Första gången? Välkommen.",
       "body": "Tre lugna uppvärmningar, inga poäng, ingen klocka. Tryck på en ruta för att börja.",
       "startHere": "Börja här"
+    }
+  },
+  "practice": {
+    "hub": {
+      "title": "Övningsarenan",
+      "subtitle": "Bemästra alla 3 lägen för att låsa upp det riktiga spelet",
+      "progress": "{count}/{total} klart",
+      "tip": {
+        "start": "Börja med Ordjakt — det lär dig att läsa ledtrådar",
+        "one": "Bra start! Klassiskt läge näst — ren snabbhetsträning",
+        "two": "Nästan framme! Överlevnadsläge = ultimat utmaning",
+        "done": "Alla lägen bemästrade! Redo för riktig tävling!"
+      }
     }
   },
   "practiceBadge": {

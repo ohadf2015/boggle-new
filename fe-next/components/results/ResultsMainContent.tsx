@@ -26,6 +26,8 @@ import type { NearMiss } from '@/components/results/NearMissCard';
 import { WinStreakBadge } from '@/components/multiplayer/WinStreakBadge';
 import { NearRankTeaser } from '@/components/multiplayer/NearRankTeaser';
 import type { RankTier } from '@/shared/utils/eloRating';
+import ResultsLoserFeedback from '@/components/results/ResultsLoserFeedback';
+import { ShareButton } from '@/components/results/ShareButton';
 
 
 // ==============================================
@@ -96,6 +98,8 @@ export interface ResultsMainContentProps {
   };
   /** Coin reward earned this game */
   coinReward?: CoinReward | null;
+  /** Share card stats for the share button */
+  shareCardStats?: { maxCombo?: number; longestWord?: string };
 }
 
 // ==============================================
@@ -131,6 +135,8 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   isAuthenticated,
   isCurrentUserWinner,
   hideDetailsToggle,
+  shareCardStats,
+  onStartGame,
 }) {
   const reducedMotion = useReducedMotion();
   const { dir: _dir, language } = useLanguage();
@@ -207,6 +213,26 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
     ];
   }, [currentPlayerData, currentPlayerValidWords, uniqueWordsCount, t, language]);
 
+  // Share params for the share button
+  const shareParams = useMemo(() => {
+    if (!currentPlayerData) return null;
+    type ShareGameMode = 'singleplayer' | 'multiplayer' | 'blast' | 'daily' | 'adventure' | 'wordHunt';
+    const modeMap: Record<string, ShareGameMode> = {
+      blast: 'blast',
+      'word-hunt': 'wordHunt',
+    };
+    const resolvedMode: ShareGameMode = modeMap[gameMode ?? ''] ?? 'multiplayer';
+    return {
+      gameMode: resolvedMode,
+      score: currentPlayerData.score,
+      wordsFound: currentPlayerValidWords.length,
+      longestWord: shareCardStats?.longestWord,
+      maxCombo: shareCardStats?.maxCombo,
+      won: isCurrentUserWinner,
+      opponentScore: sortedScores.find(p => p.username !== username)?.score,
+    };
+  }, [currentPlayerData, currentPlayerValidWords.length, shareCardStats, isCurrentUserWinner, sortedScores, username, gameMode]);
+
   // Word Hunt status for current player
   const wordHuntStatus = useMemo(() => {
     if (!isWordHunt || !wordHuntSummary || !username) return undefined;
@@ -242,9 +268,23 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         />
       )}
 
+      {/* 1.5 LOSER FEEDBACK (rank 4+) */}
+      {currentPlayerData && currentPlayerRank > 3 && onStartGame && (
+        <ResultsLoserFeedback
+          rank={currentPlayerRank}
+          onPlayAgain={onStartGame}
+          t={t}
+        />
+      )}
+
       {/* 2. HIGHLIGHTS BAR */}
       {currentPlayerData && (
         <HighlightsBar stats={highlightStats} />
+      )}
+
+      {/* 2.3 SHARE BUTTON */}
+      {shareParams && (
+        <ShareButton params={shareParams} t={t} />
       )}
 
       {/* 2.5 REWARDS SUMMARY */}

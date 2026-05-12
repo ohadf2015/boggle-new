@@ -748,6 +748,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     wordHuntSummary,
     onPodiumReaction: sendReaction,
     coinReward,
+    shareCardStats,
   };
 
   // Word Hunt results data (shared between tabs) — memoized to avoid O(n²) per render

@@ -2316,6 +2316,12 @@ const en = {
     "goToLobby": "Lobby",
     "you": "(You)",
     "betterLuckNextTime": "Next round!",
+    "loserFeedback": {
+      "almostPodium": "So close to the podium!",
+      "goodFight": "Good fight!",
+      "solidTry": "Solid try!",
+      "encouragement": "You're getting closer with every game."
+    },
     "of": "of",
     "readyForNextRound": "Ready?",
     "hostStartDescription": "Start anytime!",
@@ -10745,6 +10751,19 @@ const en = {
       "title": "First time? Welcome.",
       "body": "Three quiet warmups, no scores, no clock. Tap a tile to start.",
       "startHere": "Start here"
+    }
+  },
+  "practice": {
+    "hub": {
+      "title": "Practice Arena",
+      "subtitle": "Master all 3 modes to unlock the real game",
+      "progress": "{count}/{total} complete",
+      "tip": {
+        "start": "Start with Word Hunt — it teaches clue reading",
+        "one": "Nice start! Classic mode next — pure speed training",
+        "two": "Almost there! Survival mode = ultimate challenge",
+        "done": "All modes mastered! Ready for real competition!"
+      }
     }
   },
   "practiceBadge": {

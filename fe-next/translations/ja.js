@@ -2201,6 +2201,12 @@ const ja = {
     "goToLobby": "ロビーへ",
     "you": "(あなた)",
     "betterLuckNextTime": "次はきっとうまくいく！",
+    "loserFeedback": {
+      "almostPodium": "もう少しで表彰台！",
+      "goodFight": "いい勝負だった！",
+      "solidTry": "よく頑張った！",
+      "encouragement": "ゲームのたびに上達してるよ。"
+    },
     "of": "/",
     "readyForNextRound": "次のラウンドの準備はいい？",
     "hostStartDescription": "全員の準備ができたら新しいゲームを始めよう！",
@@ -10515,6 +10521,19 @@ const ja = {
       "title": "はじめて？ようこそ。",
       "body": "静かなウォームアップ3つ、スコアなし、時計なし。タイルをタップして始めましょう。",
       "startHere": "ここから始める"
+    }
+  },
+  "practice": {
+    "hub": {
+      "title": "練習アリーナ",
+      "subtitle": "3つのモードをマスターしてリアルゲームを解放しよう",
+      "progress": "{count}/{total} 完了",
+      "tip": {
+        "start": "ワードハントから始めよう — ヒントの読み方を学べます",
+        "one": "いいスタート！次はクラシックモード — スピードトレーニング",
+        "two": "もうすぐ！サバイバルモード = 究極のチャレンジ",
+        "done": "全モードマスター！本物の競争の準備完了！"
+      }
     }
   },
   "practiceBadge": {

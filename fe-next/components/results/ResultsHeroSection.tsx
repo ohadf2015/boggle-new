@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import useReducedMotion from '@/hooks/useReducedMotion';
@@ -8,6 +8,7 @@ import Avatar from '../Avatar';
 import { formatRankOrdinal } from '@/utils/formatRankOrdinal';
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
 import type { Avatar as AvatarData } from '@/shared/types/game';
+import { fireFirstWinConfetti } from '@/utils/confettiUtils';
 
 // ============================================================
 // TYPES
@@ -125,8 +126,21 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
     t,
   }) => {
     const reducedMotion = useReducedMotion();
+    const cancelConfettiRef = useRef<(() => void) | null>(null);
     const accent = getAccent(rank);
     const isEliminated = isWordHunt && wordHuntStatus === 'eliminated';
+
+    // Cascading confetti burst for winner (rank 1)
+    useEffect(() => {
+      if (rank !== 1 || reducedMotion) return;
+      const timer = setTimeout(() => {
+        cancelConfettiRef.current = fireFirstWinConfetti(2500);
+      }, 800);
+      return () => {
+        clearTimeout(timer);
+        cancelConfettiRef.current?.();
+      };
+    }, [rank, reducedMotion]);
     const isSurvivedWordHunt = isWordHunt && wordHuntStatus === 'survived';
 
     // For eliminated, override accent to red
