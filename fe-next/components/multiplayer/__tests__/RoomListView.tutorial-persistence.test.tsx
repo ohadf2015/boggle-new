@@ -8,6 +8,33 @@ import RoomListView from '../RoomListView';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import * as contextualGuidanceStorage from '@/utils/contextualGuidanceStorage';
 
+// next/dynamic with ssr:false never resolves in jsdom — mock to resolve eagerly
+vi.mock('next/dynamic', () => ({
+  __esModule: true,
+  default: (importFn: () => Promise<{ default: React.ComponentType<Record<string, unknown>> }>) => {
+    const DynamicComp = (props: Record<string, unknown>) => {
+      const [Comp, setComp] = React.useState<React.ComponentType<Record<string, unknown>> | null>(null);
+      React.useEffect(() => {
+        void importFn().then((mod) => setComp(() => mod.default));
+      }, []);
+      if (!Comp) return null;
+      return React.createElement(Comp, props);
+    };
+    return DynamicComp;
+  },
+}));
+
+vi.mock('@/components/multiplayer/MultiplayerWelcomeCard', () => {
+  const MockCard = ({ onDismiss }: { onDismiss: () => void }) => (
+    <div data-testid="welcome-card">
+      <h2>Welcome to Multiplayer!</h2>
+      <button onClick={onDismiss} aria-label="Close tutorial">Close</button>
+    </div>
+  );
+  MockCard.displayName = 'MultiplayerWelcomeCard';
+  return { default: MockCard };
+});
+
 // Mock dependencies
 vi.mock('@/utils/contextualGuidanceStorage');
 vi.mock('@/hooks/usePullToRefresh', () => ({
