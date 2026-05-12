@@ -4,7 +4,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BlastReadyScreen, BlastWaveTransitionScreen, BlastResultsScreen } from '../BlastPhaseScreens';
-import type { BlastResultsData } from '@/components/blast/types';
+import type { BlastResultsData } from '@/components/blast/legacy/types';
 
 // Mock framer-motion to render children directly
 jest.mock('framer-motion', () => ({

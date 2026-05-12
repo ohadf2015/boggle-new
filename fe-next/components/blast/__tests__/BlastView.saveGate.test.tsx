@@ -32,7 +32,7 @@ vi.mock('@/components/motion/AdaptiveMotion', () => {
   };
 });
 
-vi.mock('@/components/blast/hooks/useBlastCheckpoint', () => ({
+vi.mock('@/components/blast/legacy/hooks/useBlastCheckpoint', () => ({
   useBlastCheckpoint: () => ({
     checkpoint: null,
     resumeFromWave: 1,
@@ -42,19 +42,19 @@ vi.mock('@/components/blast/hooks/useBlastCheckpoint', () => ({
 }));
 
 const saveBlastResult = vi.fn().mockResolvedValue(null);
-vi.mock('@/components/blast/utils/saveBlastResult', () => ({
+vi.mock('@/components/blast/legacy/utils/saveBlastResult', () => ({
   saveBlastResult: (...args: unknown[]) => saveBlastResult(...args),
 }));
 
 const blastGameProps: { current: any } = { current: null };
-vi.mock('@/components/blast/BlastGame', () => ({
+vi.mock('@/components/blast/legacy/BlastGame', () => ({
   BlastGame: (props: any) => {
     blastGameProps.current = props;
     return <div data-testid="mock-blast-game" />;
   },
 }));
 
-vi.mock('@/components/blast/BlastResultsSummary', () => ({
+vi.mock('@/components/blast/legacy/BlastResultsSummary', () => ({
   BlastResultsSummary: () => <div data-testid="mock-blast-results" />,
 }));
 
@@ -76,7 +76,7 @@ vi.mock('@/hooks/useRewardedFeatureUnlock', () => ({
   }),
 }));
 
-vi.mock('@/components/blast/utils/blastTelemetry', () => ({
+vi.mock('@/components/blast/legacy/utils/blastTelemetry', () => ({
   trackBlastRunEnded: vi.fn(),
 }));
 

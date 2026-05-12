@@ -9,7 +9,7 @@ import {
   VORTEX_PULL, CONFETTI_BURST, FIRE_EMBERS, FROST_CRYSTALS, ELECTRIC_RINGS,
   GOLD_STARS, DIAMOND_SHARDS,
 } from '@/lib/gameEngine/presets/particles';
-import type { BlastTileState, BlastTileType } from '@/components/blast/types';
+import type { BlastTileState, BlastTileType } from '@/components/blast/legacy/types';
 import {
   type TileRenderer,
   type PhysicsDebris,

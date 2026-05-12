@@ -22,7 +22,7 @@ import {
   CONFETTI_BURST, GOLD_STARS,
 } from '@/lib/gameEngine/presets/particles';
 import { useBlastClearEffects } from './useBlastClearEffects';
-import type { BlastTileState, BlastTileType } from '@/components/blast/types';
+import type { BlastTileState, BlastTileType } from '@/components/blast/legacy/types';
 
 interface BlastGameCanvasProps {
   tileStates: BlastTileState[][];

@@ -20,11 +20,11 @@ import {
   computeEarnedBadges,
   getBadgeDef,
   type BlastBadgeId,
-} from '@/components/blast/utils/blastBadges';
+} from '@/components/blast/legacy/utils/blastBadges';
 import { useBlastBadgeStore } from '@/stores/blastBadgeStore';
 import { triggerHaptic } from '@/utils/hapticFeedback';
-import { trackBlastBadgeUnlocked } from '@/components/blast/utils/blastTelemetry';
-import type { BlastResultsData } from '@/components/blast/types';
+import { trackBlastBadgeUnlocked } from '@/components/blast/legacy/utils/blastTelemetry';
+import type { BlastResultsData } from '@/components/blast/legacy/types';
 
 export interface EnrichedBadge {
   id: BlastBadgeId;

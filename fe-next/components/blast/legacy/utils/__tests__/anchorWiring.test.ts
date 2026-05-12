@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getWaveConfig, getWaveDistribution } from '@/components/blast/utils/blastWaveConfig';
+import { getWaveConfig, getWaveDistribution } from '@/components/blast/legacy/utils/blastWaveConfig';
 
 // Revival sprint 2026-05-10: anchor un-retired at wave 8+. FTUE cohort
 // (waves 1-7) still locks anchor out so first-time players don't see it.

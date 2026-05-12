@@ -2,8 +2,10 @@
 import { useReducer, useMemo } from 'react';
 import type { BlastLevel, CellId } from './types';
 import { LOCALE_CONFIGS } from './locale-config';
-import { reduceSelection, validateSelection, collapseCells, detectCascade, scoreForWord } from './engine';
-import type { SelectionState, SelectionEvent, ValidationResult } from './engine';
+import {
+  reduceSelection, validateSelection, collapseCells, detectCascade, scoreForWord,
+  type SelectionState, type SelectionEvent, type ValidationResult,
+} from './engine';
 import { mechanicsForLevel } from './mechanic-flags';
 
 type State = {

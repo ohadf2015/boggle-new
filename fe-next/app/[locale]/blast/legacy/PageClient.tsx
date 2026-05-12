@@ -15,7 +15,7 @@ function LoadingFallback(): React.JSX.Element {
 }
 
 const BlastView = nextDynamic(
-  () => import('@/components/blast/BlastView').then((m) => ({ default: m.BlastView })),
+  () => import('@/components/blast/legacy/BlastView').then((m) => ({ default: m.BlastView })),
   { loading: LoadingFallback, ssr: false },
 );
 

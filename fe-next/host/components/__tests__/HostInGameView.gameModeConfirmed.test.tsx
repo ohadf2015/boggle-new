@@ -40,7 +40,7 @@ vi.mock('@/components/ui/GameLoadingFallback', () => ({
   GameLoadingFallback: () => null,
 }));
 
-vi.mock('@/components/blast/hooks/useBlastMultiplayerBridge', () => ({
+vi.mock('@/components/blast/legacy/hooks/useBlastMultiplayerBridge', () => ({
   useBlastMultiplayerBridge: () => ({
     config: { gridSize: 4, specialTileChance: 0.15, language: 'en', difficulty: 'medium' },
     initialTileStates: null,
@@ -48,7 +48,7 @@ vi.mock('@/components/blast/hooks/useBlastMultiplayerBridge', () => ({
   }),
 }));
 
-vi.mock('@/components/blast/BlastGame', () => ({
+vi.mock('@/components/blast/legacy/BlastGame', () => ({
   BlastGame: () => <div data-testid="blast-game" />,
 }));
 

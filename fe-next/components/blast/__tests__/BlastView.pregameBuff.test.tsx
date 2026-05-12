@@ -33,7 +33,7 @@ vi.mock('@/components/motion/AdaptiveMotion', () => {
   };
 });
 
-vi.mock('@/components/blast/hooks/useBlastCheckpoint', () => ({
+vi.mock('@/components/blast/legacy/hooks/useBlastCheckpoint', () => ({
   useBlastCheckpoint: () => ({
     checkpoint: null,
     resumeFromWave: 1,
@@ -41,19 +41,19 @@ vi.mock('@/components/blast/hooks/useBlastCheckpoint', () => ({
   }),
 }));
 
-vi.mock('@/components/blast/utils/saveBlastResult', () => ({
+vi.mock('@/components/blast/legacy/utils/saveBlastResult', () => ({
   saveBlastResult: vi.fn().mockResolvedValue(null),
 }));
 
 const lastBlastGameProps: { current: any } = { current: null };
-vi.mock('@/components/blast/BlastGame', () => ({
+vi.mock('@/components/blast/legacy/BlastGame', () => ({
   BlastGame: (props: any) => {
     lastBlastGameProps.current = props;
     return <div data-testid="mock-blast-game">mock</div>;
   },
 }));
 
-vi.mock('@/components/blast/BlastResultsSummary', () => ({
+vi.mock('@/components/blast/legacy/BlastResultsSummary', () => ({
   BlastResultsSummary: () => <div />,
 }));
 

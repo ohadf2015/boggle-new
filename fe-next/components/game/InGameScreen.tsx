@@ -22,8 +22,8 @@ import { useKeyboardHelpState } from '@/hooks/useKeyboardHelpState';
 import { useLeadChangeDetection } from '@/hooks/useLeadChangeDetection';
 import type { WordFeedback } from './WordFormingArea';
 import type { FoundWord } from '@/shared/types/view';
-import { detectSpecialCombos } from '@/components/blast/utils/blastCombos';
-import type { BlastTileState } from '@/components/blast/types';
+import { detectSpecialCombos } from '@/components/blast/legacy/utils/blastCombos';
+import type { BlastTileState } from '@/components/blast/legacy/types';
 import type { SelectedCell } from '@/components/grid';
 
 // Extracted hooks

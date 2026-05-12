@@ -6,7 +6,7 @@ import { Star, Gift, Shield, Bomb, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { trackGameStart } from '@/utils/growthTracking';
-import { trackBlastRunEnded } from '@/components/blast/utils/blastTelemetry';
+import { trackBlastRunEnded } from '@/components/blast/legacy/utils/blastTelemetry';
 import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { BlastGame } from './BlastGame';

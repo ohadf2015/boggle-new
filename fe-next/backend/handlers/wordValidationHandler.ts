@@ -29,11 +29,11 @@ import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, 
 import { makePositionsMap } from '../modules/wordValidator.js';
 import { endGame } from '../services/gameLifecycle/gameEnd.js';
 import timerManager from '../utils/timerManager.js';
-import { processTilesForWord } from '@/components/blast/utils/clearTilesProcessor';
-import { computeGravityResult } from '@/components/blast/utils/blastGravity';
-import { createSeededRandom } from '@/components/blast/utils/blastLetterGenerator';
+import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
+import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
+import { createSeededRandom } from '@/components/blast/legacy/utils/blastLetterGenerator';
 import { BLAST_SPECIAL_TILE_CHANCE, BLAST_MP_DEFAULT_MAX_WAVES } from '@/shared/constants/blastMultiplayerConstants';
-import { getWaveConfig } from '@/components/blast/utils/blastWaveConfig';
+import { getWaveConfig } from '@/components/blast/legacy/utils/blastWaveConfig';
 import { restoreLife, getLifeBonus, computeDiscoveryClues } from '../modules/wordHuntManager.js';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
 

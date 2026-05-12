@@ -4,7 +4,7 @@
 // positions. Remaining cells are filled with weighted random letters.
 
 import type { Language } from '@/shared/types/game';
-import { generateBlastLetter, createSeededRandom } from '@/components/blast/utils/blastLetterGenerator';
+import { generateBlastLetter, createSeededRandom } from '@/components/blast/legacy/utils/blastLetterGenerator';
 
 /**
  * Hebrew final-form → regular-form mapping.

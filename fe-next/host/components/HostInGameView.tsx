@@ -4,11 +4,11 @@ import React, { useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import type { Socket } from 'socket.io-client';
 import InGameScreen from '../../components/game/InGameScreen';
-import { useBlastMultiplayerBridge } from '@/components/blast/hooks/useBlastMultiplayerBridge';
+import { useBlastMultiplayerBridge } from '@/components/blast/legacy/hooks/useBlastMultiplayerBridge';
 import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 
 const BlastGame = dynamic(
-  () => import('@/components/blast/BlastGame').then(m => ({ default: m.BlastGame })),
+  () => import('@/components/blast/legacy/BlastGame').then(m => ({ default: m.BlastGame })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
 );
 const WordHuntGame = dynamic(

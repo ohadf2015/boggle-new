@@ -22,9 +22,9 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { BlastResultsData } from '@/components/blast/types';
-import { useBlastBadgeUnlocks } from '@/components/blast/hooks/useBlastBadgeUnlocks';
-import { trackBlastResultsViewed } from '@/components/blast/utils/blastTelemetry';
+import type { BlastResultsData } from '@/components/blast/legacy/types';
+import { useBlastBadgeUnlocks } from '@/components/blast/legacy/hooks/useBlastBadgeUnlocks';
+import { trackBlastResultsViewed } from '@/components/blast/legacy/utils/blastTelemetry';
 
 // Lucide icon resolver for badge icon names stored as strings in blastBadges.ts.
 // Keeps the badge registry free of React imports (serializable, SSR-safe).

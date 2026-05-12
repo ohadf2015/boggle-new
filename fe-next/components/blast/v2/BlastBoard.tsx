@@ -2,8 +2,7 @@
 import { useRef, useCallback } from 'react';
 import { LayoutGroup, AnimatePresence } from 'framer-motion';
 import type { BlastLevel, CellId } from '@/lib/blast/v2/types';
-import type { SelectionState } from '@/lib/blast/v2/engine';
-import { cellId as makeCellId } from '@/lib/blast/v2/engine';
+import { cellId as makeCellId, type SelectionState } from '@/lib/blast/v2/engine';
 import { LOCALE_CONFIGS } from '@/lib/blast/v2/locale-config';
 import { BlastTile, type BlastTileState } from './BlastTile';
 import { BlastSelectionPath } from './BlastSelectionPath';

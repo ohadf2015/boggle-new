@@ -51,7 +51,7 @@ vi.mock('@/components/game/InGameScreen', () => ({
 
 // Capture the props passed to BlastGame
 let capturedBlastGameProps: any = null;
-vi.mock('@/components/blast/BlastGame', () => ({
+vi.mock('@/components/blast/legacy/BlastGame', () => ({
   BlastGame: (props: any) => {
     capturedBlastGameProps = props;
     return <div data-testid="blast-game" />;
@@ -78,7 +78,7 @@ const mockBridgeReturn = {
   blastSeed: 12345,
 };
 
-vi.mock('@/components/blast/hooks/useBlastMultiplayerBridge', () => ({
+vi.mock('@/components/blast/legacy/hooks/useBlastMultiplayerBridge', () => ({
   useBlastMultiplayerBridge: () => mockBridgeReturn,
 }));
 
