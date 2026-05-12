@@ -31,10 +31,11 @@ export function BlastFtueOverlay({ onComplete, isVeteran, onStepChange }: Props)
         setStep(4);
         setSkipTimeout(false);
       }, 2000);
-      return () => clearTimeout(timeout);
+      return;
     }
     if (step === 4) {
       setStep(5);
+      return;
     }
     if (step === 5) {
       setStep(6);
@@ -57,7 +58,7 @@ export function BlastFtueOverlay({ onComplete, isVeteran, onStepChange }: Props)
       >
         <motion.div
           className="bg-[#0b1530] border-neo-thick border-black rounded-neo p-6 max-w-sm text-center text-white space-y-4"
-          initial={{ scale: reducedMotion?.prefersReducedMotion ? 1 : 0.9 }}
+          initial={{ scale: reducedMotion === true ? 1 : 0.9 }}
           animate={{ scale: 1 }}
         >
           <div className="text-2xl font-bold">
@@ -111,7 +112,7 @@ export function BlastFtueOverlay({ onComplete, isVeteran, onStepChange }: Props)
             <div className="text-lg">
               {t('blast.tutorial.ftue.step2', 'Try it: drag from C to T')}
             </div>
-            {!reducedMotion?.prefersReducedMotion && (
+            {reducedMotion !== true && (
               <motion.svg
                 className="w-16 h-16 mx-auto"
                 viewBox="0 0 100 100"
@@ -138,7 +139,7 @@ export function BlastFtueOverlay({ onComplete, isVeteran, onStepChange }: Props)
               {t('blast.tutorial.ftue.step3', 'Letters above fall to fill the space')}
             </div>
             <div className="text-xs opacity-70">
-              {!reducedMotion?.prefersReducedMotion
+              {reducedMotion !== true
                 ? t('blast.tutorial.ftue.step3.hint', 'Watch the animation')
                 : t('blast.tutorial.ftue.step3.hint', 'Letters fall down')}
             </div>
@@ -187,7 +188,7 @@ export function BlastFtueOverlay({ onComplete, isVeteran, onStepChange }: Props)
             <div className="text-lg">
               {t('blast.tutorial.ftue.step5', 'Or tap each letter, double-tap to confirm')}
             </div>
-            {!reducedMotion?.prefersReducedMotion && (
+            {reducedMotion !== true && (
               <motion.svg
                 className="w-16 h-16 mx-auto"
                 viewBox="0 0 100 100"

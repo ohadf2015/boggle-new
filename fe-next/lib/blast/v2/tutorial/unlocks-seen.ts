@@ -19,7 +19,9 @@ export type UnlocksSeen = {
   ftue_completed?: boolean;
   skip_all?: boolean;
   veteran_bonus_granted?: boolean;
-} & Record<MechanicKey, boolean | undefined>;
+} & {
+  [key in MechanicKey]?: boolean;
+};
 
 export function validateUnlocksSeen(raw: unknown): UnlocksSeen {
   if (typeof raw !== 'object' || raw === null) {

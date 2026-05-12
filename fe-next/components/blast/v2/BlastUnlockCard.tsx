@@ -20,8 +20,8 @@ export function BlastUnlockCard({ mechanic, cardIndex, onDismiss, onSkipAll }: P
   return (
     <motion.div
       initial={{
-        opacity: reducedMotion?.prefersReducedMotion ? 1 : 0,
-        scale: reducedMotion?.prefersReducedMotion ? 1 : 0.9,
+        opacity: reducedMotion === true ? 1 : 0,
+        scale: reducedMotion === true ? 1 : 0.9,
       }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}

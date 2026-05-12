@@ -1,12 +1,7 @@
 'use client';
 import { useState } from 'react';
 import type { BlastLevel } from '@/lib/blast/v2/types';
-import type { UnlocksSeen, MechanicKey } from '@/lib/blast/v2/tutorial/unlocks-seen';
-import {
-  markUnlockSeen,
-  completeFtue,
-  setSkipAll,
-} from '@/lib/blast/v2/tutorial/unlocks-seen';
+import { markUnlockSeen, completeFtue, setSkipAll, type UnlocksSeen, type MechanicKey } from '@/lib/blast/v2/tutorial/unlocks-seen';
 import { useBlastV2 } from '@/lib/blast/v2/useBlastV2';
 import { useBlastProgress } from '@/lib/blast/v2/useBlastProgress';
 import { useBlastTutorial } from '@/hooks/useBlastTutorial';
