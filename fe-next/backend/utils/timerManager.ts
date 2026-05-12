@@ -166,6 +166,10 @@ export const clearGameTimer = (gameCode: string): boolean => {
   return timerManager.clearTimer(`game:${gameCode}`);
 };
 
+export const hasGameTimer = (gameCode: string): boolean => {
+  return timerManager.hasTimer(`game:${gameCode}`);
+};
+
 // Expose clearAll on globalThis for test cleanup across module instances.
 // Test-only — production bundles must not leak timer-control surface.
 if (process.env.NODE_ENV === 'test' || process.env.VITEST) {

@@ -11505,6 +11505,44 @@ const ja = {
         legendary: "伝説"
       }
     }
+  },
+  "connections": {
+    "title": "ワードブリッジ",
+    "subtitle": "両方をつなぐ言葉を見つけよう！",
+    "placeholder": "つなぐ言葉を入力...",
+    "submit": "送信",
+    "correct": "正解！",
+    "wrong": "不正解",
+    "lives": "ライフ",
+    "score": "スコア",
+    "streak": "連続",
+    "finished": "クリア！",
+    "finalScore": "最終スコア",
+    "playAgain": "もう一度プレイ",
+    "loading": "読み込み中...",
+    "noAccess": "このゲームモードは利用できません。",
+    "hintLabel": "ヒント",
+    "bonusPoints": "連続ボーナス！",
+    "wordChain": "単語1 + ? + 単語2",
+    "giveUp": "ギブアップ",
+    "solutionIs": "答え",
+    "like": "いいね",
+    "dislike": "よくない",
+    "next": "次へ",
+    "rateThis": "このパズルを評価",
+    "thanks": "フィードバックありがとう",
+    "xpEarned": "獲得XP",
+    "level": "レベル",
+    "outOfLives": "ライフ切れ！",
+    "reviveDescription": "短い広告を見てライフを補充し、このレベルを続けよう。",
+    "reviveAd": "広告を見てライフ3つ",
+    "adminRefill": "ライフ補充（管理者）",
+    "quitToMenu": "メニューに戻る",
+    "noAdAvailable": "現在広告がありません。後でもう一度お試しください。",
+    "revealHint": "ヒントを表示",
+    "revealHintAd": "広告を見てヒント",
+    "revealAnswerAd": "広告を見て答えを表示",
+    "adminGiveUp": "パズルをスキップ（管理者）"
   }
 };
 

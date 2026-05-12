@@ -75,10 +75,11 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
-  const currentAvatar = getOrCreateStoredCustomAvatar();
+  const [currentAvatar, setCurrentAvatar] = useState<CustomAvatarConfig>(() => getOrCreateStoredCustomAvatar());
 
   const handleAvatarSave = useCallback(async (config: CustomAvatarConfig) => {
     setStoredCustomAvatar(config);
+    setCurrentAvatar(config);
     onAvatarChange?.(config);
     setIsAvatarBuilderOpen(false);
     await updateProfile({ avatar_config: config }).catch(() => {});

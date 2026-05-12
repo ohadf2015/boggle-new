@@ -44,7 +44,8 @@ import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { checkSocketRateLimit } from '../middleware/rateLimiterRedis.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
-import { clearGameTimer } from '../utils/timerManager.js';
+import { clearGameTimer, hasGameTimer } from '../utils/timerManager.js';
+import * as Sentry from '@sentry/nextjs';
 import { saveGameState } from '../redisClient.js';
 import { inc, ensureGame } from '../utils/metrics.js';
 import { generateRandomAvatar } from '../utils/gameUtils.js';
@@ -387,6 +388,32 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     if (isInProgress(game.gameState)) {
       logger.info('SOCKET', `Sending game state to player who requested it in game ${gameCode}`);
       const recoveryGameMode = game.gameMode || 'classic';
+
+      // Orphan-timer recovery: state says in-progress but no setInterval is
+      // registered. Caused by a crash/race between `transitionGameState('START')`
+      // and `startGameTimer()`. Without this branch the client watchdog loops
+      // forever — server re-emits startGame with the same stale remainingTime
+      // and never restarts the clock. Defense-in-depth: idempotent, safe to
+      // call when timer is already running (`startGameTimer` clears first).
+      if (!hasGameTimer(gameCode)) {
+        const recoverySeconds = game.remainingTime ?? game.timerSeconds;
+        if (recoverySeconds && recoverySeconds > 0) {
+          logger.warn('SOCKET', `Orphan timer recovery: restarting interval for ${gameCode} at ${recoverySeconds}s`);
+          Sentry.captureMessage('mp_server_timer_orphan_recovered', {
+            level: 'warning',
+            extra: {
+              gameCode,
+              gameState: game.gameState,
+              remainingTime: game.remainingTime,
+              timerSeconds: game.timerSeconds,
+              gameSessionId: game.gameSessionId,
+            },
+          });
+          startGameTimer(io, gameCode, recoverySeconds);
+        }
+      }
+
+
       safeEmit(socket, 'startGame', {
         letterGrid: game.letterGrid,
         timerSeconds: game.remainingTime ?? game.timerSeconds,

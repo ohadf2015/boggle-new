@@ -844,6 +844,40 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     <ResultsDetailsContent {...detailsContentProps} />
   );
 
+  // Defensive empty state: if the round ended but no scores arrived (e.g. the
+  // 20s `requestResults` fallback fired with `{ scores: [] }`, or `finalScores`
+  // is null because of a socket reorder), every downstream layout collapses to
+  // nothing and the user sees a blank navy viewport. Render a visible
+  // "calculating results" card so the page is never truly empty.
+  if (sortedScores.length === 0) {
+    return (
+      <div
+        className="flex-1 flex flex-col items-center justify-center min-h-0 bg-neo-navy text-neo-cream relative"
+        style={{ background: 'radial-gradient(circle at center, var(--neo-navy-radial) 0%, var(--neo-navy) 70%)' }}
+        data-testid="results-empty-state"
+      >
+        <div className="flex flex-col items-center gap-4 px-6 text-center max-w-md">
+          <div className="w-12 h-12 rounded-full border-2 border-neo-cyan/40 border-t-neo-cyan animate-spin" aria-hidden="true" />
+          <h2 className="font-neo-display font-black text-2xl uppercase tracking-wide">
+            {t('results.calculating', 'Calculating results')}
+          </h2>
+          <p className="text-sm opacity-70">
+            {t('results.calculatingHint', 'Tallying scores and validating words — this only takes a moment.')}
+          </p>
+          {onReturnToRoom && (
+            <button
+              type="button"
+              onClick={onReturnToRoom}
+              className="mt-2 px-4 py-2 rounded-md border-2 border-neo-cyan/40 text-sm font-neo-display font-bold uppercase tracking-wide hover:bg-neo-cyan/10 transition-colors"
+            >
+              {t('results.backToLobby', 'Back to lobby')}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       {overlayModals}

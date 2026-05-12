@@ -140,10 +140,11 @@ function HostPreGameView({
   // survives mobile↔desktop layout swaps on device rotation (see audit UX-CRIT-5).
   const [isBoostPickerOpen, setIsBoostPickerOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
-  const currentAvatar = getOrCreateStoredCustomAvatar();
+  const [currentAvatar, setCurrentAvatar] = useState<CustomAvatarConfig>(() => getOrCreateStoredCustomAvatar());
 
   const handleAvatarSave = useCallback(async (config: CustomAvatarConfig) => {
     setStoredCustomAvatar(config);
+    setCurrentAvatar(config);
     onAvatarChange?.(config);
     setIsAvatarBuilderOpen(false);
     await updateProfile({ avatar_config: config }).catch(() => {});

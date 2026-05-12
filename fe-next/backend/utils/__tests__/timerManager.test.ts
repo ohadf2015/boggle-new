@@ -1,5 +1,5 @@
 import { vi, type Mock, type MockInstance } from 'vitest';
-import timerManager, { TimerManager, setGameTimer, clearGameTimer } from '../timerManager';
+import timerManager, { TimerManager, setGameTimer, clearGameTimer, hasGameTimer } from '../timerManager';
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -250,6 +250,31 @@ describe('setGameTimer (convenience)', () => {
 
   it('clearGameTimer returns false when not found', () => {
     expect(clearGameTimer('missing')).toBe(false);
+  });
+});
+
+describe('hasGameTimer (convenience)', () => {
+  it('returns true after setGameTimer registers an interval', () => {
+    const id = setInterval(vi.fn(), 1000) as any;
+    setGameTimer('LOBBY1', id);
+    expect(hasGameTimer('LOBBY1')).toBe(true);
+  });
+
+  it('returns false when no timer registered for game', () => {
+    expect(hasGameTimer('NEVERSTARTED')).toBe(false);
+  });
+
+  it('returns false after clearGameTimer', () => {
+    const id = setInterval(vi.fn(), 1000) as any;
+    setGameTimer('Z', id);
+    clearGameTimer('Z');
+    expect(hasGameTimer('Z')).toBe(false);
+  });
+
+  it('uses game: prefix (does not collide with raw key)', () => {
+    timerManager.setInterval('LOBBY2', vi.fn(), 1000);
+    expect(hasGameTimer('LOBBY2')).toBe(false);
+    timerManager.clearTimer('LOBBY2');
   });
 });
 

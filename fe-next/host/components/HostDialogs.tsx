@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { QrCode, Trophy, Share2 } from 'lucide-react';
+import { QrCode, Trophy, Share2, Bot } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
@@ -532,12 +532,13 @@ export const SoloStartConfirmDialog: React.FC<SoloStartConfirmDialogProps> = mem
           <Share2 className="w-4 h-4" />
           {t('hostView.inviteFriends')}
         </AlertDialogAction>
-        {/* Skip & Play with bots — SECONDARY */}
+        {/* Skip & Play with bots — SECONDARY (cyan tier; bot iconography) */}
         <AlertDialogAction
           data-testid="solo-dialog-bots"
           onClick={onConfirm}
-          className="w-full bg-neo-navy-light dark:bg-neo-navy/60 text-neo-cream border-2 border-neo-black/40 hover:border-neo-black/70"
+          className="w-full bg-neo-cyan-muted text-neo-black font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed flex items-center justify-center gap-2"
         >
+          <Bot className="w-4 h-4" aria-hidden="true" />
           {t('hostView.soloStartConfirm')}
         </AlertDialogAction>
       </AlertDialogFooter>

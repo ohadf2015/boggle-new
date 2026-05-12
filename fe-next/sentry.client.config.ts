@@ -228,6 +228,11 @@ Sentry.init({
     // PixiJS WebGL errors on low-end Android devices — not actionable
     /Cannot read properties of null.*alphaMode/i,
     /Unable to convert color/i,
+    // PixiJS wasm fallback chain on word-wheel — browser MIME quirk; ArrayBuffer
+    // path succeeds, page renders fine (JAVASCRIPT-NEXTJS-14J/14K/14M)
+    /wasm streaming compile failed.*Unexpected response MIME type/i,
+    /failed to asynchronously prepare wasm/i,
+    /falling back to ArrayBuffer instantiation/i,
     // Blast mode access rejection — expected for non-admin users trying blast
     /Blast mode requires special access/i,
     // DissolveEffect texture race — PixiJS texture not ready during effect init
