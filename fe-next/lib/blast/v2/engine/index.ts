@@ -1,0 +1,11 @@
+export { reduceSelection } from './selection-state';
+export type { SelectionState, SelectionEvent, SelectionTransition } from './selection-state';
+export { validateSelection } from './validation';
+export type { ValidationResult, ValidationContext } from './validation';
+export { collapseCells } from './collapse';
+export type { CollapseResult } from './collapse';
+export { detectCascade } from './cascade';
+export type { Cascade } from './cascade';
+export { scoreForWord } from './score';
+export type { ScoreOutcome } from './score';
+export { parseCell, cellId } from './cell-id';
