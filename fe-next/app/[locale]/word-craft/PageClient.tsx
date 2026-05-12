@@ -612,7 +612,7 @@ export default function WordCraftPageClient() {
             WordCraftBoardSection wraps the grid + Pixi stage so the player can pinch-zoom
             and see animations on premium cells / score events. */}
         <div className="flex-1 min-h-0 flex items-center justify-center">
-          <div className="relative aspect-square max-h-full max-w-full">
+          <div className="relative aspect-square h-full max-w-full">
             <WordCraftBoardSection
               board={game.state.board}
               pending={game.state.pendingPlacements}
