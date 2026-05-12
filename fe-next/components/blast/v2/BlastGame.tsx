@@ -1,8 +1,15 @@
 'use client';
 import { useState } from 'react';
 import type { BlastLevel } from '@/lib/blast/v2/types';
+import type { UnlocksSeen, MechanicKey } from '@/lib/blast/v2/tutorial/unlocks-seen';
+import {
+  markUnlockSeen,
+  completeFtue,
+  setSkipAll,
+} from '@/lib/blast/v2/tutorial/unlocks-seen';
 import { useBlastV2 } from '@/lib/blast/v2/useBlastV2';
 import { useBlastProgress } from '@/lib/blast/v2/useBlastProgress';
+import { useBlastTutorial } from '@/hooks/useBlastTutorial';
 import { starRating } from '@/lib/blast/v2/anti-cheat';
 import { BlastBoard } from './BlastBoard';
 import { BlastHud } from './BlastHud';
@@ -11,8 +18,16 @@ import { BlastLevelCompleteCard } from './BlastLevelCompleteCard';
 import { BlastChestOpenModal } from './BlastChestOpenModal';
 import { BlastFxOverlay } from './BlastFxOverlay';
 import { BlastAtmosphereOverlay } from './BlastAtmosphereOverlay';
+import { BlastFtueOverlay } from './BlastFtueOverlay';
+import { BlastUnlockCard } from './BlastUnlockCard';
 
-type Props = { level: BlastLevel; onAdvance: () => void };
+type Props = {
+  level: BlastLevel;
+  unlocksSeen?: UnlocksSeen;
+  isVeteranPlayer?: boolean;
+  onAdvance: () => void;
+  onUpdateUnlocks?: (unlocks: UnlocksSeen) => void;
+};
 
 // Mode color map
 const MODE_COLORS: Record<string, string> = {
@@ -43,11 +58,35 @@ const MODE_COLORS: Record<string, string> = {
   onboarding: '#BFFF00', // lime
 };
 
-export function BlastGame({ level, onAdvance }: Props) {
+export function BlastGame({
+  level,
+  unlocksSeen = {},
+  isVeteranPlayer = false,
+  onAdvance,
+  onUpdateUnlocks,
+}: Props) {
   const [introDismissed, setIntroDismissed] = useState(false);
   const { state, handlers } = useBlastV2(level);
   const { state: progressState, clearLevel, openChest, openMutation } = useBlastProgress();
   const [showChestModal, setShowChestModal] = useState(false);
+  const tutorial = useBlastTutorial(level, unlocksSeen, isVeteranPlayer, onUpdateUnlocks ?? (() => {}));
+
+  const handleFtueComplete = () => {
+    const updated = completeFtue(unlocksSeen);
+    onUpdateUnlocks?.(updated);
+  };
+
+  const handleUnlockCardDismiss = () => {
+    if (tutorial.showUnlockCard) {
+      const updated = markUnlockSeen(unlocksSeen, tutorial.showUnlockCard);
+      onUpdateUnlocks?.(updated);
+    }
+  };
+
+  const handleUnlockCardSkipAll = () => {
+    const updated = setSkipAll(unlocksSeen, true);
+    onUpdateUnlocks?.(updated);
+  };
 
   const modeColor = MODE_COLORS[level.theme] || '#BFFF00';
   // FX integration point: BlastFxOverlay mounts useBlastFx internally
@@ -75,7 +114,17 @@ export function BlastGame({ level, onAdvance }: Props) {
   }
 
   if (!introDismissed) {
-    return <BlastLevelIntroCard level={level} onDismiss={() => setIntroDismissed(true)} />;
+    return (
+      <>
+        <BlastLevelIntroCard level={level} onDismiss={() => setIntroDismissed(true)} />
+        {tutorial.showFtueOverlay && (
+          <BlastFtueOverlay
+            onComplete={handleFtueComplete}
+            isVeteran={isVeteranPlayer}
+          />
+        )}
+      </>
+    );
   }
 
   // Show chest open ceremony if chest is full
@@ -105,6 +154,14 @@ export function BlastGame({ level, onAdvance }: Props) {
 
   return (
     <div className="min-h-screen bg-[#0b1530] text-white">
+      {tutorial.showUnlockCard && (
+        <BlastUnlockCard
+          mechanic={tutorial.showUnlockCard}
+          cardIndex={tutorial.unlockCardIndex}
+          onDismiss={handleUnlockCardDismiss}
+          onSkipAll={handleUnlockCardSkipAll}
+        />
+      )}
       <BlastHud
         levelNumber={state.level.levelNumber}
         coins={progressState.coins}
