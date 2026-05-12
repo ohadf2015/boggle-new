@@ -230,7 +230,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   const router = useRouter();
   const params = useParams();
   const { isReconnecting, reconnectAttempt, maxReconnectAttempts, showAbortModal, triggerAbort } =
-    useReconnectFlow({ gameCode, username, gameActive, letterGrid });
+    useReconnectFlow({ gameCode, username, gameActive });
 
   const handleContinueSolo = useCallback(() => {
     if (typeof window !== 'undefined') {

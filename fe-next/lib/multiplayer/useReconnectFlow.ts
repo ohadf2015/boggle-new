@@ -1,15 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import type { Socket } from 'socket.io-client';
-import type { LetterGrid } from '@/shared/types/game';
 import { useSocket } from '@/utils/SocketContext';
 
 export interface ReconnectFlowOptions {
   gameCode: string;
   username: string;
   gameActive: boolean;
-  letterGrid: LetterGrid | null;
 }
 
 export interface ReconnectFlowApi {

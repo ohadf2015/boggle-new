@@ -69,7 +69,7 @@ describe('useReconnectFlow', () => {
     });
 
     const { result } = renderHook(() =>
-      useReconnectFlow({ gameCode: 'G1', username: 'alice', gameActive: true, letterGrid: null })
+      useReconnectFlow({ gameCode: 'G1', username: 'alice', gameActive: true })
     );
     expect(result.current.isReconnecting).toBe(false);
     expect(result.current.showAbortModal).toBe(false);
@@ -87,7 +87,7 @@ describe('useReconnectFlow', () => {
     });
 
     const { result } = renderHook(() =>
-      useReconnectFlow({ gameCode: 'G1', username: 'alice', gameActive: true, letterGrid: null })
+      useReconnectFlow({ gameCode: 'G1', username: 'alice', gameActive: true })
     );
     expect(result.current.isReconnecting).toBe(true);
   });
@@ -100,7 +100,7 @@ describe('useReconnectFlow', () => {
     });
 
     const { result } = renderHook(() =>
-      useReconnectFlow({ gameCode: 'G1', username: 'alice', gameActive: true, letterGrid: null })
+      useReconnectFlow({ gameCode: 'G1', username: 'alice', gameActive: true })
     );
 
     expect(result.current.showAbortModal).toBe(false);
@@ -120,7 +120,7 @@ describe('useReconnectFlow', () => {
     });
 
     renderHook(() =>
-      useReconnectFlow({ gameCode: 'GAME1', username: 'bob', gameActive: true, letterGrid: null })
+      useReconnectFlow({ gameCode: 'GAME1', username: 'bob', gameActive: true })
     );
 
     // Simulate disconnect then reconnect
@@ -142,7 +142,7 @@ describe('useReconnectFlow', () => {
     });
 
     renderHook(() =>
-      useReconnectFlow({ gameCode: 'GAME1', username: 'bob', gameActive: true, letterGrid: null })
+      useReconnectFlow({ gameCode: 'GAME1', username: 'bob', gameActive: true })
     );
 
     // Only connect — no prior disconnect
@@ -159,7 +159,7 @@ describe('useReconnectFlow', () => {
     });
 
     const { result } = renderHook(() =>
-      useReconnectFlow({ gameCode: 'G1', username: 'alice', gameActive: true, letterGrid: null })
+      useReconnectFlow({ gameCode: 'G1', username: 'alice', gameActive: true })
     );
 
     expect(result.current.lastServerSeq).toBe(0);
@@ -183,7 +183,7 @@ describe('useReconnectFlow', () => {
     });
 
     const { result } = renderHook(() =>
-      useReconnectFlow({ gameCode: 'G1', username: 'alice', gameActive: true, letterGrid: null })
+      useReconnectFlow({ gameCode: 'G1', username: 'alice', gameActive: true })
     );
     expect(result.current.maxReconnectAttempts).toBe(20);
   });
@@ -196,7 +196,7 @@ describe('useReconnectFlow', () => {
     });
 
     const { result } = renderHook(() =>
-      useReconnectFlow({ gameCode: 'G1', username: 'alice', gameActive: true, letterGrid: null })
+      useReconnectFlow({ gameCode: 'G1', username: 'alice', gameActive: true })
     );
 
     act(() => { handlers['reconnect_failed']?.forEach(h => h()); });
