@@ -89,7 +89,7 @@ describe('Game Session Logger', () => {
       expect(sessionId).toBe('mock-session-id');
     });
 
-    it('should log anonymously when neither userId nor guestSessionId provided', async () => {
+    it('should return null when neither userId nor guestSessionId provided (check_player_id constraint)', async () => {
       const sessionData: GameSessionData = {
         mode: 'singleplayer',
         language: 'en',
@@ -98,7 +98,7 @@ describe('Game Session Logger', () => {
 
       const sessionId = await logGameSession(sessionData);
 
-      expect(sessionId).toBe('mock-session-id');
+      expect(sessionId).toBeNull();
     });
 
     it('should log daily challenge session for guest', async () => {

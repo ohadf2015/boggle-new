@@ -22,6 +22,7 @@ const {
   mockSafeEmit,
   mockGetGameRoom,
   mockSentryCapture,
+  mockSentryBreadcrumb,
 } = vi.hoisted(() => ({
   mockCheckRateLimit: vi.fn().mockReturnValue(true),
   mockGetGameBySocketId: vi.fn(),
@@ -32,6 +33,7 @@ const {
   mockSafeEmit: vi.fn(),
   mockGetGameRoom: vi.fn().mockReturnValue('room:TEST'),
   mockSentryCapture: vi.fn(),
+  mockSentryBreadcrumb: vi.fn(),
 }));
 
 vi.mock('../../../backend/utils/rateLimiter', () => ({
@@ -97,6 +99,7 @@ vi.mock('../../../backend/utils/logger', () => ({
 }));
 vi.mock('@sentry/nextjs', () => ({
   captureMessage: mockSentryCapture,
+  addBreadcrumb: mockSentryBreadcrumb,
 }));
 vi.mock('../../../backend/handlers/gameStartHandler', () => ({
   registerStartGameHandler: vi.fn(),
@@ -170,9 +173,8 @@ describe('requestGameState — orphan timer recovery', () => {
 
     expect(mockStartGameTimer).toHaveBeenCalledTimes(1);
     expect(mockStartGameTimer).toHaveBeenCalledWith(fakeIo, 'ABC', 120);
-    expect(mockSentryCapture).toHaveBeenCalledWith(
-      'mp_server_timer_orphan_recovered',
-      expect.objectContaining({ level: 'warning' })
+    expect(mockSentryBreadcrumb).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'mp_server_timer_orphan_recovered', level: 'info' })
     );
   });
 

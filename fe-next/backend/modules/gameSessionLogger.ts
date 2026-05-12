@@ -133,6 +133,12 @@ export async function logGameSession(sessionData: GameSessionData): Promise<stri
   const client = getSupabaseClient();
   if (!client) return null;
 
+  // DB check_player_id constraint requires at least one identifier
+  if (!sessionData.userId && !sessionData.guestSessionId) {
+    logger.debug('GAME_SESSION_LOGGER', 'Skipping game session log: no player identifier');
+    return null;
+  }
+
   try {
     const { data, error } = await client
       .from('game_sessions')
