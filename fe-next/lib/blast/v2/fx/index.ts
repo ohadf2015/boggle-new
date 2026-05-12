@@ -50,7 +50,7 @@ export function useBlastFx({
   modeColor: string;
   pixiStage?: PIXI.Container;
 }): BlastFxApi {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotion() ?? false;
   const isHapticsEnabled =
     typeof window !== 'undefined' && localStorage.getItem('haptics-enabled') !== 'false';
 
