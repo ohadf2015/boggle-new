@@ -47,14 +47,14 @@ export function WordCraftBoardSection(props: Props) {
     >
       <div
         ref={boardRef}
-        className="relative"
+        className="relative w-full h-full"
         style={{ containerType: 'inline-size' }}
       >
         <WordCraftBoard
           board={props.board}
           pendingPlacements={props.pending}
           onCellClick={(r, c) => props.onCellTap({ row: r, col: c })}
-          onRecallPending={(tileId) => {
+          onRecallPending={(_tileId) => {
             // onCellDragOver/onCellDrop are for drag; recall is a separate handler
             // We'll call onRecallPending if it exists, otherwise do nothing
           }}

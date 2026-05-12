@@ -33,7 +33,7 @@ export function useBoardCoords(boardRef: RefObject<HTMLElement | null>): BoardCo
       cellRect(row, col) {
         const el = boardRef.current;
         if (!el) return null;
-        const cell = el.querySelector<HTMLElement>(`[data-row="${row}"][data-col="${col}"]`);
+        const cell = el.querySelector<HTMLElement>(`[data-board-cell="${row},${col}"]`);
         return cell?.getBoundingClientRect() ?? null;
       },
       scoreChipRect() {

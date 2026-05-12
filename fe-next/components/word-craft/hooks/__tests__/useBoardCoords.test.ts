@@ -9,8 +9,7 @@ function setupBoardEl(rows: number, cols: number) {
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const cell = document.createElement('div');
-      cell.dataset.row = String(r);
-      cell.dataset.col = String(c);
+      cell.dataset.boardCell = `${r},${c}`;
       cell.getBoundingClientRect = () => ({
         x: c * 40, y: r * 40, width: 40, height: 40,
         top: r * 40, left: c * 40, bottom: r * 40 + 40, right: c * 40 + 40,
