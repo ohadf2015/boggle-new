@@ -10,6 +10,9 @@
  * flips the flag and reports whether this call was the transition. Only that
  * caller shows the toast — so Capacitor webview + browser agree on which
  * completions have been seen, and navigating back to the page doesn't re-fire.
+ *
+ * DB columns word_hunt/adventure/community_completed are SLOT containers (0/1/2).
+ * getDailyQuestModes() determines which DailyQuestMode fills each slot per day.
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -18,8 +21,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { addCoins, GRAND_SLAM_BONUS } from '@/utils/coinManager';
+import {
+  getDailyQuestModes,
+  QUEST_MODE_HREFS,
+  type DailyQuestMode,
+} from '@/shared/dailyQuestPool';
 
-export type MissionType = 'wordHunt' | 'adventure' | 'community';
+export type MissionType = DailyQuestMode;
 
 export interface Mission {
   type: MissionType;
@@ -36,22 +44,18 @@ export interface UseDailyMissionsReturn {
   refresh: () => Promise<void>;
 }
 
-const MISSION_HREFS: Record<MissionType, string> = {
-  wordHunt: '/daily',
-  adventure: '/adventure',
-  community: '/multiplayer',
-};
-
 // XP reward per individual daily quest (mirrors DAILY_QUEST_CONFIGS in QuestHub)
 const PER_QUEST_XP = 100;
 
-type CelebrationKey = 'word_hunt' | 'adventure' | 'community' | 'grand_slam';
+// Slot 0 → word_hunt, slot 1 → adventure, slot 2 → community (DB column prefixes)
+const SLOT_COLUMNS = [
+  'word_hunt_completed',
+  'adventure_completed',
+  'community_completed',
+] as const;
+const SLOT_CELEBRATION_KEYS = ['word_hunt', 'adventure', 'community'] as const;
 
-const MISSION_TO_CELEBRATION: Record<MissionType, CelebrationKey> = {
-  wordHunt: 'word_hunt',
-  adventure: 'adventure',
-  community: 'community',
-};
+type CelebrationKey = 'word_hunt' | 'adventure' | 'community' | 'grand_slam';
 
 interface MissionRow {
   word_hunt_completed: boolean;
@@ -65,16 +69,26 @@ interface MissionRow {
 }
 
 function buildMissions(data: MissionRow | null): Mission[] {
-  const d = data || {
+  const modes = getDailyQuestModes();
+  const d = data ?? {
     word_hunt_completed: false,
     adventure_completed: false,
     community_completed: false,
   };
-  return [
-    { type: 'wordHunt', completed: d.word_hunt_completed, href: MISSION_HREFS.wordHunt },
-    { type: 'adventure', completed: d.adventure_completed, href: MISSION_HREFS.adventure },
-    { type: 'community', completed: d.community_completed, href: MISSION_HREFS.community },
-  ];
+  return modes.map((mode, i) => ({
+    type: mode,
+    completed: d[SLOT_COLUMNS[i]],
+    href: QUEST_MODE_HREFS[mode],
+  }));
+}
+
+function getModeToCelebration(): Record<DailyQuestMode, CelebrationKey> {
+  const modes = getDailyQuestModes();
+  const result = {} as Record<DailyQuestMode, CelebrationKey>;
+  modes.forEach((mode, i) => {
+    result[mode] = SLOT_CELEBRATION_KEYS[i];
+  });
+  return result;
 }
 
 async function requestCelebration(key: CelebrationKey): Promise<boolean> {
@@ -102,19 +116,13 @@ export function useDailyMissions(): UseDailyMissionsReturn {
   const [missions, setMissions] = useState<Mission[]>(buildMissions(null));
   const [grandSlamClaimed, setGrandSlamClaimed] = useState(false);
   const [loading, setLoading] = useState(true);
-  // Celebrated flags from server — used to gate which transitions require a
-  // POST. Completed-but-already-celebrated missions never fire a toast.
   const celebratedRef = useRef<Record<CelebrationKey, boolean>>({
     word_hunt: false,
     adventure: false,
     community: false,
     grand_slam: false,
   });
-  // Last seen completion state — to detect false→true transitions between
-  // fetches (completing a game in another tab, for example).
-  const prevMissionsMapRef = useRef<Record<MissionType, boolean> | null>(null);
   const prevGrandSlamRef = useRef<boolean>(false);
-  // Guard against concurrent POSTs for the same key within one session.
   const inFlightRef = useRef<Set<CelebrationKey>>(new Set());
 
   const tryCelebrate = useCallback(
@@ -128,7 +136,7 @@ export function useDailyMissions(): UseDailyMissionsReturn {
       const newlyCelebrated = await requestCelebration(key);
       inFlightRef.current.delete(key);
       if (!isMounted.current) return;
-      celebratedRef.current[key] = true; // either we flipped it, or it was already true
+      celebratedRef.current[key] = true;
       if (newlyCelebrated) show(true);
     },
     [],
@@ -202,27 +210,17 @@ export function useDailyMissions(): UseDailyMissionsReturn {
   const completedCount = missions.filter(m => m.completed).length;
   const isGrandSlam = completedCount === missions.length && missions.length > 0;
 
-  // On every missions change: for any mission that is completed but not yet
-  // celebrated server-side, POST to /api/daily-missions/celebrate. Only the
-  // caller that server reports as "newlyCelebrated" shows the toast — which
-  // means a single mission fires exactly once per day across devices.
   useEffect(() => {
     if (loading) return;
-    const currentMap: Record<MissionType, boolean> = {
-      wordHunt: missions.find(m => m.type === 'wordHunt')?.completed ?? false,
-      adventure: missions.find(m => m.type === 'adventure')?.completed ?? false,
-      community: missions.find(m => m.type === 'community')?.completed ?? false,
-    };
-
-    const keys: MissionType[] = ['wordHunt', 'adventure', 'community'];
-    for (const type of keys) {
-      if (!currentMap[type]) continue;
-      const celebrationKey = MISSION_TO_CELEBRATION[type];
-      if (celebratedRef.current[celebrationKey]) continue;
+    const modeToCelebration = getModeToCelebration();
+    for (const mission of missions) {
+      if (!mission.completed) continue;
+      const celebrationKey = modeToCelebration[mission.type as DailyQuestMode];
+      if (!celebrationKey || celebratedRef.current[celebrationKey]) continue;
       void tryCelebrate(celebrationKey, () => {
         import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
           showQuestCompletionToast({
-            questName: t(`dailyMissions.${type}`),
+            questName: t(`dailyMissions.${mission.type}`),
             xpReward: PER_QUEST_XP,
             dedupKey: `mission:${celebrationKey}`,
             t,
@@ -231,11 +229,8 @@ export function useDailyMissions(): UseDailyMissionsReturn {
         });
       });
     }
-    prevMissionsMapRef.current = currentMap;
   }, [missions, loading, t, playQuestCompleteSound, tryCelebrate]);
 
-  // Grand Slam: fire once when all three complete, gated by server celebrated
-  // flag so a second device (or returning to the page) doesn't re-show it.
   useEffect(() => {
     if (loading) return;
     if (!isGrandSlam) {

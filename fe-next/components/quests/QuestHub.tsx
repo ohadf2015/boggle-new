@@ -10,9 +10,10 @@
  */
 
 import { useEffect, useMemo, useRef } from 'react';
-import { Trophy, Sword, Users, Gift, Sparkles, Target, Flame, Puzzle } from 'lucide-react';
+import { Trophy, Users, Gift, Sparkles, Target, Flame, Puzzle, Brain } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useDailyMissions, type MissionType } from '@/hooks/useDailyMissions';
+import { useDailyMissions } from '@/hooks/useDailyMissions';
+import { getDailyQuestModes, type DailyQuestMode } from '@/shared/dailyQuestPool';
 import { useWeeklyQuest } from '@/hooks/useWeeklyQuest';
 import { cn } from '@/lib/utils';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
@@ -59,9 +60,9 @@ const grandSlamVariants = {
   },
 };
 
-// --- Quest configs (no brain drill) ---
+// --- Quest configs ---
 interface DailyQuestConfig {
-  type: MissionType;
+  type: DailyQuestMode;
   icon: React.ElementType;
   nameKey: string;
   descKey: string;
@@ -71,8 +72,8 @@ interface DailyQuestConfig {
   xpReward: number;
 }
 
-const DAILY_QUEST_CONFIGS: DailyQuestConfig[] = [
-  {
+const ALL_QUEST_CONFIGS: Record<DailyQuestMode, DailyQuestConfig> = {
+  wordHunt: {
     type: 'wordHunt',
     icon: Trophy,
     nameKey: 'quests.daily.wordHunt.name',
@@ -82,29 +83,29 @@ const DAILY_QUEST_CONFIGS: DailyQuestConfig[] = [
     iconColorClass: 'text-neo-yellow',
     xpReward: 100,
   },
-  {
-    type: 'adventure',
-    icon: Sword,
-    nameKey: 'quests.daily.adventure.name',
-    descKey: 'quests.daily.adventure.desc',
-    accentColor: 'bg-neo-lime',
-    ringColor: 'stroke-neo-lime',
-    iconColorClass: 'text-neo-lime',
-    xpReward: 100,
-  },
-  {
-    type: 'community',
+  multiplayer: {
+    type: 'multiplayer',
     icon: Users,
-    nameKey: 'quests.daily.community.name',
-    descKey: 'quests.daily.community.desc',
+    nameKey: 'quests.daily.multiplayer.name',
+    descKey: 'quests.daily.multiplayer.desc',
     accentColor: 'bg-neo-pink',
     ringColor: 'stroke-neo-pink',
     iconColorClass: 'text-neo-pink',
     xpReward: 100,
   },
-];
+  brainDrills: {
+    type: 'brainDrills',
+    icon: Brain,
+    nameKey: 'quests.daily.brainDrills.name',
+    descKey: 'quests.daily.brainDrills.desc',
+    accentColor: 'bg-neo-purple',
+    ringColor: 'stroke-neo-purple',
+    iconColorClass: 'text-neo-purple',
+    xpReward: 100,
+  },
+};
 
-const TOTAL_DAILY = DAILY_QUEST_CONFIGS.length;
+const TOTAL_DAILY = 3;
 
 // --- Weekly quest difficulty colors ---
 const DIFFICULTY_STYLES: Record<string, { color: string; border: string; bg: string }> = {
@@ -430,11 +431,16 @@ export function QuestHub() {
     }
   }, [allComplete, loading, t, addCoins]);
 
-  // Filter to only the 3 quests we show (no brain drill)
-  const dailyCompleted = useMemo(() => DAILY_QUEST_CONFIGS.filter((config) => {
+  // Today's 3 quest configs from the daily rotation
+  const dailyQuestConfigs = useMemo(
+    () => getDailyQuestModes().map((mode) => ALL_QUEST_CONFIGS[mode]),
+    [],
+  );
+
+  const dailyCompleted = useMemo(() => dailyQuestConfigs.filter((config) => {
     const mission = missions.find((m) => m.type === config.type);
     return mission?.completed ?? false;
-  }).length, [missions]);
+  }).length, [dailyQuestConfigs, missions]);
 
   if (loading) {
     return (
@@ -484,7 +490,7 @@ export function QuestHub() {
           initial="hidden"
           animate="visible"
         >
-          {DAILY_QUEST_CONFIGS.map((config) => {
+          {dailyQuestConfigs.map((config) => {
             const mission = missions.find((m) => m.type === config.type);
             return (
               <AdaptiveMotion.div key={config.type} variants={cardVariants}>

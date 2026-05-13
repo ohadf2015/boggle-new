@@ -10836,8 +10836,8 @@ const he = {
     "grandSlamDesc": "השלימו את כל 3 לבונוס",
     "grandSlamBonus": "קופסת מסתורין + XP 500+",
     "wordHunt": "ציד מילים יומי",
-    "adventure": "הרפתקה יומית",
-    "community": "משחק מרובה משתתפים",
+    "multiplayer": "משחק מרובה משתתפים",
+    "brainDrills": "אימון מוח",
     "completed": "הושלם!",
     "progress": "משימות {{current}}/3"
   },
@@ -10868,13 +10868,13 @@ const he = {
         "name": "ציד מילים יומי",
         "desc": "מצאו 10+ מילים באתגר היומי"
       },
-      "adventure": {
-        "name": "משימת הרפתקה",
-        "desc": "השלימו לפחות שלב אחד בהרפתקה"
-      },
-      "community": {
+      "multiplayer": {
         "name": "משחק מרובה משתתפים",
         "desc": "שחקו משחק מרובה משתתפים"
+      },
+      "brainDrills": {
+        "name": "אימון מוח",
+        "desc": "השלימו תרגיל מוח"
       }
     },
     "reward": {

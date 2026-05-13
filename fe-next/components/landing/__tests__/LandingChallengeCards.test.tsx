@@ -135,23 +135,22 @@ describe('LandingChallengeCards', () => {
       mockIsVeteran.mockReturnValue(false);
       mockIsOnCG.mockReturnValue(true);
       render(<LandingChallengeCards {...baseProps} />);
-      // veteran-equivalent: quickPlay shows (not practice)
-      expect(screen.getByText('landing.quickPlay')).toBeInTheDocument();
-      expect(screen.queryByText('landing.practice')).not.toBeInTheDocument();
+      // quickPlay removed — practice now shows to all users
+      expect(screen.queryByText('landing.quickPlay')).not.toBeInTheDocument();
     });
   });
 
-  describe('quickPlay / practice mutual exclusivity', () => {
+  describe('practice visibility (quickPlay removed)', () => {
     afterEach(() => mockIsVeteran.mockReturnValue(false));
 
-    it('veterans see quickPlay but not practice', () => {
+    it('veterans do not see the practice card', () => {
       mockIsVeteran.mockReturnValue(true);
       render(<LandingChallengeCards {...baseProps} />);
-      expect(screen.getByText('landing.quickPlay')).toBeInTheDocument();
       expect(screen.queryByText('landing.practice')).not.toBeInTheDocument();
+      expect(screen.queryByText('landing.quickPlay')).not.toBeInTheDocument();
     });
 
-    it('newcomers see practice but not quickPlay', () => {
+    it('newcomers see practice and no quickPlay', () => {
       mockIsVeteran.mockReturnValue(false);
       render(<LandingChallengeCards {...baseProps} />);
       expect(screen.getByText('landing.practice')).toBeInTheDocument();

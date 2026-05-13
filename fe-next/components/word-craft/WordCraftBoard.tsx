@@ -25,11 +25,13 @@ export interface WordCraftBoardProps {
 }
 
 // Brand-tinted premium squares (no text labels). Each premium kind gets a distinct neo-color.
+// Saturation tier (TW > DW, TL > DL) + inset ring on the rarer 3x tiles so players can read
+// the bonus pattern at a glance on small/dark mobile screens.
 const PREMIUM_TINT: Record<PremiumKind, string> = {
-  TW: 'bg-neo-pink/15',  // Triple word
-  DW: 'bg-neo-pink/10',  // Double word (lighter than TW)
-  TL: 'bg-neo-cyan/15',  // Triple letter
-  DL: 'bg-neo-cyan/10',  // Double letter (lighter than TL)
+  TW: 'bg-neo-pink/60 ring-1 ring-inset ring-neo-pink',     // Triple word — boldest
+  DW: 'bg-neo-pink/30',                                      // Double word — softer pink
+  TL: 'bg-neo-cyan/55 ring-1 ring-inset ring-neo-cyan',     // Triple letter — boldest cyan
+  DL: 'bg-neo-cyan/25',                                      // Double letter — softer cyan
 };
 
 /** Build the set of axis-hint cells (N/E/S/W neighbors) for a single anchor. */
@@ -128,8 +130,8 @@ function WordCraftBoardImpl({
                   : pending
                     ? 'bg-neo-lime text-neo-navy shadow-[0_3px_0_0_rgba(0,0,0,0.9)] ring-2 ring-neo-lime-light hover:ring-neo-pink hover:rotate-1'
                     : isCenter
-                      ? 'bg-neo-pink/35 text-neo-cream'
-                      : (cell.premium && PREMIUM_TINT[cell.premium]) || 'bg-neo-navy-light/40',
+                      ? 'bg-neo-pink text-neo-cream ring-1 ring-inset ring-neo-pink-light'
+                      : (cell.premium && PREMIUM_TINT[cell.premium]) || 'bg-neo-navy-light/80',
                 isDragTarget && 'bg-neo-cyan/30 ring-4 ring-neo-cyan scale-110 z-10',
                 isAxisHint && !isDragTarget && 'wc-axis-hint',
                 isReticle && !isDragTarget && 'ring-4 ring-neo-yellow ring-offset-1 ring-offset-black z-10',

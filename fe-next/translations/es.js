@@ -10961,8 +10961,8 @@ const es = {
     "grandSlamDesc": "Completa las 3 para un bonus",
     "grandSlamBonus": "+500 XP + Caja Misteriosa",
     "wordHunt": "Caza de Palabras Diaria",
-    "adventure": "Aventura Diaria",
-    "community": "Partida Multijugador",
+    "multiplayer": "Partida Multijugador",
+    "brainDrills": "Entrenamiento Mental",
     "completed": "¡Completado!",
     "progress": "{{current}}/3 Misiones"
   },
@@ -10993,13 +10993,13 @@ const es = {
         "name": "Caza de Palabras Diaria",
         "desc": "Encuentra 10+ palabras en el desafío diario"
       },
-      "adventure": {
-        "name": "Misión de Aventura",
-        "desc": "Completa al menos 1 nivel de aventura"
-      },
-      "community": {
+      "multiplayer": {
         "name": "Partida Multijugador",
         "desc": "Juega una partida multijugador"
+      },
+      "brainDrills": {
+        "name": "Entrenamiento Mental",
+        "desc": "Completa una sesión de Brain Drill"
       }
     },
     "reward": {

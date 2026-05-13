@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Swords, BookOpen, Map, Bomb, Zap, Link2, Brain, Sparkles, ChevronDown, Layers } from 'lucide-react';
+import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
@@ -46,10 +46,10 @@ interface LandingChallengeCardsProps {
  * `'connections'` and `'brainGym'` are landing-only synthetic modes routing
  * to `/connections` and `/brain` respectively.
  */
-type LandingCardKey = LandingGameMode | 'quickPlay' | 'connections' | 'brainGym' | 'wordCraft';
+type LandingCardKey = LandingGameMode | 'connections' | 'brainGym' | 'wordCraft';
 
 /** Default card order when no server data available */
-const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'quickPlay', 'arena', 'practice', 'blast', 'connections', 'brainGym'];
+const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'practice', 'blast', 'connections', 'brainGym'];
 
 /**
  * Featured landing modes — surfaces every shippable mode so players can
@@ -57,7 +57,7 @@ const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'quickPlay', 'arena', 'practic
  * sidebar nav. Newcomer/veteran branches still bias which solo card leads.
  */
 const FEATURED_MODES = new Set<LandingCardKey>([
-  'daily', 'arena', 'blast', 'practice', 'quickPlay',
+  'daily', 'arena', 'blast', 'practice',
   'connections', 'brainGym', 'wordCraft',
 ]);
 
@@ -149,23 +149,16 @@ export function LandingChallengeCards({
     }
     return order;
   })();
-  const withQuickPlay: LandingCardKey[] = serverOrder.includes('quickPlay')
-    ? serverOrder
-    : (() => {
-        const next = [...serverOrder];
-        const dailyIdx = next.indexOf('daily');
-        next.splice(dailyIdx >= 0 ? dailyIdx + 1 : 0, 0, 'quickPlay');
-        return next;
-      })();
-  // Mutual exclusivity: newcomers see practice (not quickPlay), veterans see quickPlay (not practice)
-  const progressFiltered: LandingCardKey[] = isVeteran
-    ? withQuickPlay.filter((m) => m !== 'practice')
-    : withQuickPlay.filter((m) => m !== 'quickPlay');
+  // Veterans have completed practice — remove it so it doesn't compete for
+  // the featured-row slot or the SP grid (they don't need the onramp).
+  const practiceFiltered: LandingCardKey[] = isVeteran
+    ? serverOrder.filter((m) => m !== 'practice')
+    : serverOrder;
   const orderedBeforeFeatured: LandingCardKey[] = isNewbie && !isVeteran
-    ? (['practice', 'daily', ...progressFiltered.filter((m) => m !== 'practice' && m !== 'daily')] as LandingCardKey[])
-    : progressFiltered[0] === 'daily'
-    ? progressFiltered
-    : (['daily', ...progressFiltered.filter((m) => m !== 'daily')] as LandingCardKey[]);
+    ? (['practice', 'daily', ...practiceFiltered.filter((m) => m !== 'practice' && m !== 'daily')] as LandingCardKey[])
+    : practiceFiltered[0] === 'daily'
+    ? practiceFiltered
+    : (['daily', ...practiceFiltered.filter((m) => m !== 'daily')] as LandingCardKey[]);
   // Final step: cull to the featured allowlist so landing shows a small,
   // high-intent set instead of every available mode.
   const cardOrder: LandingCardKey[] = orderedBeforeFeatured.filter((m) => FEATURED_MODES.has(m));
@@ -175,27 +168,6 @@ export function LandingChallengeCards({
     const style = { animationDelay: cardDelay(index) } as React.CSSProperties;
 
     switch (mode) {
-      case 'quickPlay':
-        // Lands on the multiplayer lobby (room list + create button). Was
-        // auto-creating a private bot room which surprised players — they
-        // expected to pick a room or invite friends. Bare /multiplayer gives
-        // them the full lobby surface with no forced auto-start.
-        return (
-          <div key="quickPlay" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
-            <ModeCard
-              title={t('landing.quickPlay')}
-              description={t('landing.quickPlayDesc')}
-              href={`/${language}/multiplayer`}
-              icon={<Zap className="w-6 h-6" />}
-              modeImage="/modes/quick-play.png"
-              variant="cyan"
-              highlighted={isVeteran}
-              highlightLabel={isVeteran && !practiceWinsHighlight ? t('onboarding.welcome.startHere') : undefined}
-              onClick={() => { trackModeSelected('quickPlay', 'home'); trackLandingCtaClick('mode_card', { mode: 'quickPlay', variant: 'cyan' }); }}
-            />
-          </div>
-        );
-
       case 'arena':
         return (
           <div key="arena" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
@@ -329,14 +301,14 @@ export function LandingChallengeCards({
     }
   };
 
-  const MP_MODES = new Set<LandingCardKey>(['arena', 'quickPlay']);
+  const MP_MODES = new Set<LandingCardKey>(['arena']);
   const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft']);
   // Newcomer-essential modes — always visible above the fold. Everything else
   // collapses into a "More Game Modes" expander to reduce choice paralysis
   // without removing the cards from the DOM (preserves SEO + AI-crawler links).
   // Arena (multiplayer) stays surfaced for newbies so the live-rooms entry
   // point isn't buried — players consistently asked for it on landing.
-  const ESSENTIAL_FOR_NEWBIES = new Set<LandingCardKey>(['daily', 'practice', 'quickPlay', 'arena']);
+  const ESSENTIAL_FOR_NEWBIES = new Set<LandingCardKey>(['daily', 'practice', 'arena']);
 
   const heroCards = cardOrder.filter((m) => m === 'daily');
   const mpCardsAll = cardOrder.filter((m) => MP_MODES.has(m));

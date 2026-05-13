@@ -397,6 +397,11 @@ export async function processBrainDrillCompletion(
   const previousLevel = priorSnapshot?.level ?? 1;
   const levelPromoted = nextProgress.level > previousLevel;
 
+  // Fire-and-forget: mark brainDrills quest slot complete for today
+  import('@/backend/modules/dailyMissionsManager').then(({ completeMissionForMode }) => {
+    completeMissionForMode(userId, 'brainDrills').catch(() => {});
+  });
+
   return {
     ok: true,
     body: {

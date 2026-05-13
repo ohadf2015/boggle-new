@@ -20,6 +20,15 @@ vi.mock('@/hooks/useDailyMissions', () => ({
   useDailyMissions: () => mockUseDailyMissions(),
 }));
 
+// Fix rotation to [wordHunt, multiplayer, brainDrills] for all tests
+vi.mock('@/shared/dailyQuestPool', async () => {
+  const actual = await vi.importActual<typeof import('@/shared/dailyQuestPool')>('@/shared/dailyQuestPool');
+  return {
+    ...actual,
+    getDailyQuestModes: vi.fn().mockReturnValue(['wordHunt', 'multiplayer', 'brainDrills']),
+  };
+});
+
 const mockUseWeeklyQuest = vi.fn();
 vi.mock('@/hooks/useWeeklyQuest', () => ({
   useWeeklyQuest: () => mockUseWeeklyQuest(),
@@ -38,10 +47,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'quests.progress': `${params?.completed ?? 0}/${params?.total ?? 0}`,
         'quests.daily.wordHunt.name': 'Daily Word Hunt',
         'quests.daily.wordHunt.desc': 'Find 10+ words in today\'s Daily Challenge',
-        'quests.daily.adventure.name': 'Adventure Quest',
-        'quests.daily.adventure.desc': 'Complete at least 1 adventure level',
-        'quests.daily.community.name': 'Community Play',
-        'quests.daily.community.desc': 'Play a multiplayer game with others',
+        'quests.daily.multiplayer.name': 'Multiplayer Match',
+        'quests.daily.multiplayer.desc': 'Play a multiplayer game with others',
+        'quests.daily.brainDrills.name': 'Brain Workout',
+        'quests.daily.brainDrills.desc': 'Complete a Brain Drill session',
+
         'quests.reward.xp': `+${params?.xp ?? 0} XP`,
         'quests.reward.gold': `+${params?.gold ?? 0} Gold`,
         'quests.go': 'GO',
@@ -95,8 +105,8 @@ import { QuestHub } from '../QuestHub';
 const defaultMissions = {
   missions: [
     { type: 'wordHunt' as const, completed: false, href: '/daily' },
-    { type: 'adventure' as const, completed: false, href: '/adventure' },
-    { type: 'community' as const, completed: false, href: '/community' },
+    { type: 'multiplayer' as const, completed: false, href: '/multiplayer' },
+    { type: 'brainDrills' as const, completed: false, href: '/brain-drills' },
   ],
   completedCount: 0,
   isGrandSlam: false,
@@ -130,20 +140,19 @@ describe('QuestHub', () => {
     expect(screen.getByText("Today's Quests")).toBeInTheDocument();
   });
 
-  it('renders 3 daily quests (no brain drill)', () => {
+  it('renders 3 daily quests from rotation', () => {
     render(<QuestHub />);
+    // rotation mock: [wordHunt, multiplayer, brainDrills]
     expect(screen.getByText('Daily Word Hunt')).toBeInTheDocument();
-    expect(screen.getByText('Adventure Quest')).toBeInTheDocument();
-    expect(screen.getByText('Community Play')).toBeInTheDocument();
-    // Brain drill should NOT appear
-    expect(screen.queryByText(/brain/i)).not.toBeInTheDocument();
+    expect(screen.getByText('Multiplayer Match')).toBeInTheDocument();
+    expect(screen.getByText('Brain Workout')).toBeInTheDocument();
   });
 
   it('shows quest descriptions', () => {
     render(<QuestHub />);
     expect(screen.getByText("Find 10+ words in today's Daily Challenge")).toBeInTheDocument();
-    expect(screen.getByText('Complete at least 1 adventure level')).toBeInTheDocument();
     expect(screen.getByText('Play a multiplayer game with others')).toBeInTheDocument();
+    expect(screen.getByText('Complete a Brain Drill session')).toBeInTheDocument();
   });
 
   it('shows GO button for incomplete quests', () => {
@@ -157,8 +166,8 @@ describe('QuestHub', () => {
       ...defaultMissions,
       missions: [
         { type: 'wordHunt' as const, completed: true, href: '/daily' },
-        { type: 'adventure' as const, completed: false, href: '/adventure' },
-        { type: 'community' as const, completed: false, href: '/community' },
+        { type: 'multiplayer' as const, completed: false, href: '/multiplayer' },
+        { type: 'brainDrills' as const, completed: false, href: '/brain-drills' },
       ],
       completedCount: 1,
     });
@@ -173,8 +182,8 @@ describe('QuestHub', () => {
       ...defaultMissions,
       missions: [
         { type: 'wordHunt' as const, completed: true, href: '/daily' },
-        { type: 'adventure' as const, completed: true, href: '/adventure' },
-        { type: 'community' as const, completed: true, href: '/community' },
+        { type: 'multiplayer' as const, completed: true, href: '/multiplayer' },
+        { type: 'brainDrills' as const, completed: true, href: '/brain-drills' },
       ],
       completedCount: 3,
       isGrandSlam: true,
@@ -195,13 +204,14 @@ describe('QuestHub', () => {
     // QuestCard should prepend /${language} to hrefs
     const links = screen.getAllByRole('link');
     const hrefs = links.map(link => link.getAttribute('href'));
+    // rotation mock: [wordHunt, multiplayer, brainDrills]
     expect(hrefs).toContain('/en/daily');
-    expect(hrefs).toContain('/en/adventure');
-    expect(hrefs).toContain('/en/community');
+    expect(hrefs).toContain('/en/multiplayer');
+    expect(hrefs).toContain('/en/brain-drills');
     // Should NOT have locale-less paths
     expect(hrefs).not.toContain('/daily');
-    expect(hrefs).not.toContain('/adventure');
-    expect(hrefs).not.toContain('/community');
+    expect(hrefs).not.toContain('/multiplayer');
+    expect(hrefs).not.toContain('/brain-drills');
   });
 
   it('shows overall progress count', () => {
@@ -209,8 +219,8 @@ describe('QuestHub', () => {
       ...defaultMissions,
       missions: [
         { type: 'wordHunt' as const, completed: true, href: '/daily' },
-        { type: 'adventure' as const, completed: false, href: '/adventure' },
-        { type: 'community' as const, completed: false, href: '/community' },
+        { type: 'multiplayer' as const, completed: false, href: '/multiplayer' },
+        { type: 'brainDrills' as const, completed: false, href: '/brain-drills' },
       ],
       completedCount: 1,
     });

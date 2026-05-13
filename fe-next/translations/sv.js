@@ -10865,8 +10865,8 @@ const sv = {
     "grandSlamDesc": "Slutför alla 3 för en bonusbelöning",
     "grandSlamBonus": "+500 XP + Mysterilåda",
     "wordHunt": "Daglig Ordjakt",
-    "adventure": "Dagligt Äventyr",
-    "community": "Multiplayer-match",
+    "multiplayer": "Multiplayer-match",
+    "brainDrills": "Hjärnträning",
     "completed": "Klart!",
     "progress": "{{current}}/3 Uppdrag"
   },
@@ -10897,13 +10897,13 @@ const sv = {
         "name": "Daglig Ordjakt",
         "desc": "Hitta 10+ ord i dagens utmaning"
       },
-      "adventure": {
-        "name": "Äventyrsuppdrag",
-        "desc": "Klara minst 1 äventyrsnivå"
-      },
-      "community": {
+      "multiplayer": {
         "name": "Multiplayer-match",
         "desc": "Spela ett multiplayerspel"
+      },
+      "brainDrills": {
+        "name": "Hjärnträning",
+        "desc": "Genomför en Brain Drill-session"
       }
     },
     "reward": {

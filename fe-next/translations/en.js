@@ -11077,8 +11077,8 @@ const en = {
     "grandSlamDesc": "Complete all 3 for a bonus reward",
     "grandSlamBonus": "+500 XP + Mystery Box",
     "wordHunt": "Daily Word Hunt",
-    "adventure": "Daily Adventure",
-    "community": "Multiplayer Match",
+    "multiplayer": "Multiplayer Match",
+    "brainDrills": "Brain Workout",
     "completed": "Completed!",
     "progress": "{{current}}/3 Missions"
   },
@@ -11109,13 +11109,13 @@ const en = {
         "name": "Daily Word Hunt",
         "desc": "Find 10+ words in today's Daily Challenge"
       },
-      "adventure": {
-        "name": "Adventure Quest",
-        "desc": "Complete at least 1 adventure level"
-      },
-      "community": {
+      "multiplayer": {
         "name": "Multiplayer Match",
         "desc": "Play a multiplayer game with others"
+      },
+      "brainDrills": {
+        "name": "Brain Workout",
+        "desc": "Complete a Brain Drill session"
       }
     },
     "reward": {

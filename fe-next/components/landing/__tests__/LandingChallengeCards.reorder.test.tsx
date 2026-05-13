@@ -76,12 +76,12 @@ describe('LandingChallengeCards reordering (MP/SP split)', () => {
     );
   });
 
-  it('veteran: practice card omitted (quickPlay replaces it); no featured row', () => {
+  it('veteran: practice card entirely absent (not in featured row or SP grid)', () => {
     mockIsVeteran.mockReturnValueOnce(true);
     render(<LandingChallengeCards {...baseProps} />);
     expect(screen.queryByTestId('landing-section-practice-featured')).toBeNull();
     expect(screen.queryByText('landing.practice')).toBeNull();
-    expect(screen.getByText('landing.quickPlay')).toBeInTheDocument();
+    expect(screen.queryByText('landing.quickPlay')).toBeNull();
   });
 
   it('renders blast when most popular (still inside SP section)', () => {

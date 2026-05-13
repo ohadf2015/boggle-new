@@ -38,10 +38,19 @@ vi.mock('@/lib/utils', () => ({
   cn: (...args: unknown[]) => args.filter(Boolean).join(' '),
 }));
 
+// Fix rotation to [wordHunt, multiplayer, brainDrills] for all tests
+vi.mock('@/shared/dailyQuestPool', async () => {
+  const actual = await vi.importActual<typeof import('@/shared/dailyQuestPool')>('@/shared/dailyQuestPool');
+  return {
+    ...actual,
+    getDailyQuestModes: vi.fn().mockReturnValue(['wordHunt', 'multiplayer', 'brainDrills']),
+  };
+});
+
 const baseMissions = [
   { type: 'wordHunt' as const, completed: false, href: '/daily' },
-  { type: 'adventure' as const, completed: false, href: '/adventure' },
-  { type: 'community' as const, completed: false, href: '/multiplayer' },
+  { type: 'multiplayer' as const, completed: false, href: '/multiplayer' },
+  { type: 'brainDrills' as const, completed: false, href: '/brain-drills' },
 ];
 
 beforeEach(() => {
@@ -88,12 +97,13 @@ describe('DailyMissionsHub', () => {
     expect(screen.getByText('dailyMissions.title')).toBeTruthy();
   });
 
-  it('renders all 3 mission rows', () => {
+  it('renders all 3 mission rows from rotation', () => {
     render(<DailyMissionsHub />);
 
+    // rotation mock: [wordHunt, multiplayer, brainDrills]
     expect(screen.getByText('dailyMissions.wordHunt')).toBeTruthy();
-    expect(screen.getByText('dailyMissions.adventure')).toBeTruthy();
-    expect(screen.getByText('dailyMissions.community')).toBeTruthy();
+    expect(screen.getByText('dailyMissions.multiplayer')).toBeTruthy();
+    expect(screen.getByText('dailyMissions.brainDrills')).toBeTruthy();
   });
 
   it('renders progress text', () => {
@@ -146,8 +156,9 @@ describe('DailyMissionsHub', () => {
 
     const links = screen.getAllByRole('link');
     const hrefs = links.map(l => l.getAttribute('href'));
+    // rotation mock: [wordHunt, multiplayer, brainDrills]
     expect(hrefs).toContain('/en/daily');
-    expect(hrefs).toContain('/en/adventure');
     expect(hrefs).toContain('/en/multiplayer');
+    expect(hrefs).toContain('/en/brain-drills');
   });
 });

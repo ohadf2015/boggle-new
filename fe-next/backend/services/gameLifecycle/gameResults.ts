@@ -13,6 +13,7 @@ import type { PushLocale } from '../../utils/pushTranslations';
 import type { GameResultsOutput } from '../../modules/supabase/gameProcessing';
 import type { UserAuthInfo } from '../../modules/supabase/client';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
+import { completeMissionForMode } from '../../modules/dailyMissionsManager';
 import type { GameStats } from '@/shared/weeklyQuestTemplates';
 import { getSocketById, safeEmit } from '../../utils/socketHelpers';
 import { incrementWordApproval } from '../../redis/wordApproval';
@@ -265,6 +266,14 @@ export async function recordGameResultsToSupabase(
 
     // Update weekly quest progress for each authenticated player
     await updateWeeklyQuestProgressForPlayers(scoresArray, game, userAuthMap, io);
+
+    // Fire-and-forget: mark multiplayer quest slot complete for each human player
+    for (const p of humanScores) {
+      const authUserId = (game.users?.[p.username] as UserData | undefined)?.authUserId;
+      if (authUserId) {
+        completeMissionForMode(authUserId, 'multiplayer').catch(() => {});
+      }
+    }
 
     // Increment word approval counts for dictionary words
     // OPTIMIZATION: Batch all operations with Promise.all instead of sequential awaits

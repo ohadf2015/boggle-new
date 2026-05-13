@@ -49,7 +49,7 @@ vi.mock('@/components/daily/DailyChallengeBanner', () => {
   return { __esModule: true, default: DailyChallengeBanner };
 });
 
-const mockIsVeteran = vi.fn(() => true); // veteran → shows quickPlay, skips practice
+const mockIsVeteran = vi.fn(() => false); // practice shows to all users
 vi.mock('@/hooks/useIsPracticeVeteran', () => ({
   useIsPracticeVeteran: () => mockIsVeteran(),
 }));
@@ -70,11 +70,9 @@ describe('LandingChallengeCards — mode_selected tracking', () => {
   });
 
   it.each([
-    ['landing.quickPlay', 'quickPlay'],
     ['landing.arena', 'arena'],
     ['landing.blastMode', 'blast'],
   ])('clicking %s card fires trackModeSelected(%s, "home")', (title, mode) => {
-    mockIsVeteran.mockReturnValue(true); // skip practice, show quickPlay
     render(<LandingChallengeCards {...baseProps} />);
     fireEvent.click(screen.getByTestId(`mode-${title}`));
     expect(trackModeSelected).toHaveBeenCalledWith(mode, 'home');

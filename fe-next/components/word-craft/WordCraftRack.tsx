@@ -106,7 +106,9 @@ function WordCraftRackImpl({
               onSelect(isSelected ? null : tile.id);
             }}
             className={cn(
-              'relative w-14 h-16 sm:w-16 sm:h-[72px] flex items-center justify-center touch-manipulation shrink-0 snap-center',
+              // touch-none (not touch-manipulation) so mobile single-finger drag is
+              // not hijacked by the rack's overflow-x-auto scroller or browser pan.
+              'relative w-14 h-16 sm:w-16 sm:h-[72px] flex items-center justify-center touch-none shrink-0 snap-center',
               'rounded-neo border-neo-thick border-black',
               'transition-all duration-200 ease-out',
               tilt,

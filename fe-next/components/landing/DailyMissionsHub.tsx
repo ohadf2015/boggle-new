@@ -7,10 +7,11 @@
  */
 
 import Link from 'next/link';
-import { Trophy, Sword, Users, Check, Gift } from 'lucide-react';
+import { Trophy, Users, Brain, Check, Gift } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDailyMissions, type MissionType } from '@/hooks/useDailyMissions';
+import { getDailyQuestModes, type DailyQuestMode } from '@/shared/dailyQuestPool';
 import { cn } from '@/lib/utils';
 import { DailyAvatarPartCard } from '@/components/avatar/DailyAvatarPartCard';
 
@@ -22,29 +23,33 @@ interface MissionConfig {
   translationKey: string;
 }
 
-const MISSION_CONFIGS: MissionConfig[] = [
-  {
+const ALL_MISSION_CONFIGS: Record<DailyQuestMode, MissionConfig> = {
+  wordHunt: {
     type: 'wordHunt',
     icon: Trophy,
     borderColor: 'border-s-neo-yellow',
     dotColor: 'bg-neo-yellow',
     translationKey: 'dailyMissions.wordHunt',
   },
-  {
-    type: 'adventure',
-    icon: Sword,
-    borderColor: 'border-s-neo-lime',
-    dotColor: 'bg-neo-lime',
-    translationKey: 'dailyMissions.adventure',
-  },
-  {
-    type: 'community',
+  multiplayer: {
+    type: 'multiplayer',
     icon: Users,
     borderColor: 'border-s-neo-pink',
     dotColor: 'bg-neo-pink',
-    translationKey: 'dailyMissions.community',
+    translationKey: 'dailyMissions.multiplayer',
   },
-];
+  brainDrills: {
+    type: 'brainDrills',
+    icon: Brain,
+    borderColor: 'border-s-neo-purple',
+    dotColor: 'bg-neo-purple',
+    translationKey: 'dailyMissions.brainDrills',
+  },
+};
+
+const MISSION_CONFIGS: MissionConfig[] = getDailyQuestModes().map(
+  (mode) => ALL_MISSION_CONFIGS[mode],
+);
 
 function ProgressDots({
   missions,

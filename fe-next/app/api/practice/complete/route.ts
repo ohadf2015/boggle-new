@@ -28,8 +28,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { completeMissionForMode } = await import('@/backend/modules/dailyMissionsManager');
-  await completeMissionForMode(user.id, 'practice').catch(() => {});
-
   return NextResponse.json({ ok: true });
 }

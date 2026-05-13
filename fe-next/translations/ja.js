@@ -10831,8 +10831,8 @@ const ja = {
     "grandSlamDesc": "3つ全てクリアでボーナス",
     "grandSlamBonus": "+500 XP + ミステリーボックス",
     "wordHunt": "デイリーワードハント",
-    "adventure": "デイリーアドベンチャー",
-    "community": "マルチプレイヤーマッチ",
+    "multiplayer": "マルチプレイヤーマッチ",
+    "brainDrills": "ブレインドリル",
     "completed": "完了！",
     "progress": "{{current}}/3 ミッション"
   },
@@ -10863,13 +10863,13 @@ const ja = {
         "name": "デイリーワードハント",
         "desc": "デイリーチャレンジで10個以上の単語を見つけよう"
       },
-      "adventure": {
-        "name": "アドベンチャークエスト",
-        "desc": "アドベンチャーを1レベル以上クリアしよう"
-      },
-      "community": {
+      "multiplayer": {
         "name": "マルチプレイヤーマッチ",
         "desc": "マルチプレイヤーゲームをプレイしよう"
+      },
+      "brainDrills": {
+        "name": "ブレインドリル",
+        "desc": "ブレインドリルセッションをクリアしよう"
       }
     },
     "reward": {

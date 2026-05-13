@@ -3,7 +3,6 @@ import { render, cleanup } from '@testing-library/react';
 import { BlastAtmosphereOverlay } from '../BlastAtmosphereOverlay';
 import * as framerMotion from 'framer-motion';
 
-// Mock framer-motion
 vi.mock('framer-motion', async () => {
   const actual = await vi.importActual<typeof framerMotion>('framer-motion');
   return {
@@ -12,24 +11,20 @@ vi.mock('framer-motion', async () => {
   };
 });
 
-// Mock pixi.js
 vi.mock('pixi.js', async () => {
   const actual = await vi.importActual<any>('pixi.js');
 
   class MockApplication {
-    stage = {
-      addChild: vi.fn(),
-    };
-    ticker = {
-      add: vi.fn(),
-    };
+    stage = { addChild: vi.fn() };
+    ticker = { add: vi.fn() };
+    canvas = document.createElement('canvas');
+    init = vi.fn().mockResolvedValue(undefined);
     destroy = vi.fn();
   }
 
   class MockGraphics {
-    beginFill = vi.fn().mockReturnThis();
-    drawCircle = vi.fn().mockReturnThis();
-    endFill = vi.fn().mockReturnThis();
+    circle = vi.fn().mockReturnThis();
+    fill = vi.fn().mockReturnThis();
     filters: any[] = [];
     alpha = 1;
     x = 0;
@@ -37,7 +32,7 @@ vi.mock('pixi.js', async () => {
   }
 
   class MockBlurFilter {
-    constructor(public radius: number) {}
+    constructor(public opts: unknown) {}
   }
 
   return {
@@ -54,38 +49,34 @@ describe('BlastAtmosphereOverlay', () => {
     cleanup();
   });
 
-  it('should mount and render canvas with correct test id', () => {
+  it('should mount and render container with correct test id', () => {
     const { container } = render(<BlastAtmosphereOverlay modeColor="#ec4899" />);
-    const canvas = container.querySelector('[data-testid="blast-atmosphere"]');
+    const el = container.querySelector('[data-testid="blast-atmosphere"]');
 
-    expect(canvas).toBeInTheDocument();
-    expect(canvas).toHaveClass('absolute');
-    expect(canvas).toHaveClass('inset-0');
-    expect(canvas).toHaveClass('pointer-events-none');
+    expect(el).toBeInTheDocument();
+    expect(el).toHaveClass('absolute');
+    expect(el).toHaveClass('inset-0');
+    expect(el).toHaveClass('pointer-events-none');
   });
 
   it('should apply correct z-index style', () => {
     const { container } = render(<BlastAtmosphereOverlay modeColor="#ec4899" />);
-    const canvas = container.querySelector('[data-testid="blast-atmosphere"]') as HTMLCanvasElement;
+    const el = container.querySelector('[data-testid="blast-atmosphere"]') as HTMLElement;
 
-    expect(canvas).toHaveStyle('zIndex: 1');
+    expect(el).toHaveStyle('zIndex: 1');
   });
 
   it('should handle modeColor prop', () => {
     const { rerender, container } = render(<BlastAtmosphereOverlay modeColor="#ec4899" />);
-    let canvas = container.querySelector('[data-testid="blast-atmosphere"]');
-    expect(canvas).toBeInTheDocument();
+    expect(container.querySelector('[data-testid="blast-atmosphere"]')).toBeInTheDocument();
 
     rerender(<BlastAtmosphereOverlay modeColor="#00FFFF" />);
-    canvas = container.querySelector('[data-testid="blast-atmosphere"]');
-    expect(canvas).toBeInTheDocument();
+    expect(container.querySelector('[data-testid="blast-atmosphere"]')).toBeInTheDocument();
   });
 
   it('should cleanup on unmount', () => {
     const { unmount } = render(<BlastAtmosphereOverlay modeColor="#ec4899" />);
-
     unmount();
-    // If cleanup completes without error, the component cleaned up properly
     expect(true).toBe(true);
   });
 });

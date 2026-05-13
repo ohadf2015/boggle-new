@@ -32,10 +32,12 @@ export default async function BlastPage({
 
   if (useV2) {
     const registry = buildRegistry();
-    const level = await registry.curated.resolve(1, locale).catch((error: unknown) => {
-      console.error('Failed to load blast v2 level:', error);
-      return null;
-    });
+    const level = await registry.curated.resolve(1, locale)
+      .catch(() => locale !== 'en' ? registry.curated.resolve(1, 'en') : Promise.reject(new Error('no en pack')))
+      .catch((error: unknown) => {
+        console.error('Failed to load blast v2 level:', error);
+        return null;
+      });
     if (level) return <BlastV2PageClient level={level} />;
     // fall through to legacy if curated pack missing for this locale
   }

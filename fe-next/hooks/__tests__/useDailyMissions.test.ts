@@ -50,6 +50,15 @@ vi.mock('@/hooks/useInterstitialAd', () => ({
   }),
 }));
 
+// Fix rotation to [wordHunt, multiplayer, brainDrills] for all tests
+vi.mock('@/shared/dailyQuestPool', async () => {
+  const actual = await vi.importActual<typeof import('@/shared/dailyQuestPool')>('@/shared/dailyQuestPool');
+  return {
+    ...actual,
+    getDailyQuestModes: vi.fn().mockReturnValue(['wordHunt', 'multiplayer', 'brainDrills']),
+  };
+});
+
 const { mockAddCoins } = vi.hoisted(() => ({ mockAddCoins: vi.fn() }));
 vi.mock('@/utils/coinManager', async () => {
   const actual = await vi.importActual<typeof import('@/utils/coinManager')>('@/utils/coinManager');
@@ -138,8 +147,9 @@ describe('useDailyMissions', () => {
       expect(result.current.loading).toBe(false);
     });
 
+    // Rotation: [wordHunt, multiplayer, brainDrills] → hrefs from QUEST_MODE_HREFS
     const hrefs = result.current.missions.map(m => m.href);
-    expect(hrefs).toEqual(['/daily', '/adventure', '/multiplayer']);
+    expect(hrefs).toEqual(['/daily', '/multiplayer', '/brain-drills']);
   });
 
   it('sets grandSlamClaimed from DB data', async () => {
@@ -250,6 +260,7 @@ describe('useDailyMissions', () => {
     document.dispatchEvent(new Event('visibilitychange'));
 
     await waitFor(() => {
+      // rotation mock: slot 0 = wordHunt → toast key dailyMissions.wordHunt
       expect(showQuestCompletionToast).toHaveBeenCalledWith(
         expect.objectContaining({
           questName: 'dailyMissions.wordHunt',
