@@ -27,14 +27,24 @@ describe('teacher_access_requests RLS', () => {
 
   it('anon CANNOT update rows', async () => {
     const sb = anonClient();
-    const { error } = await sb.from('teacher_access_requests')
+    const testEmail = `rls-update-test-${Date.now()}@example.com`;
+    // 1. Insert a row as anon (allowed by RLS).
+    const ins = await sb.from('teacher_access_requests').insert({
+      email: testEmail,
+      full_name: 'Update Test',
+      role: 'teacher',
+      locale: 'en',
+      use_case: 'integration test for update RLS',
+    });
+    expect(ins.error).toBeNull();
+
+    // 2. Try to update that same row as anon.
+    const upd = await sb.from('teacher_access_requests')
       .update({ status: 'approved' })
-      .eq('email', 'anything@example.com');
-    // RLS blocks the update - either error is returned or rows array is empty
-    // When UPDATE violates RLS on matching rows, error is returned.
-    // When no rows match the WHERE clause, success is returned with 0 rows.
-    // This test verifies that if there WAS an error, we didn't get one from invalid permissions.
-    // The key test is that anon cannot SELECT, which is verified above.
-    expect(error).toBeNull();
+      .eq('email', testEmail)
+      .select();
+
+    // 3. RLS should block: no error, but zero rows returned.
+    expect(upd.data).toEqual([]);
   });
 });
