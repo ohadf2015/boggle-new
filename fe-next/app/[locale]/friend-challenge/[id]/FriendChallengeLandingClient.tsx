@@ -155,7 +155,7 @@ export default function FriendChallengeLandingClient({ locale, challenge, viewer
 
         {challenge.message && (
           <blockquote className="italic text-sm text-neo-white/80 border-l-4 border-neo-cyan/40 ps-3">
-            "{challenge.message}"
+            &ldquo;{challenge.message}&rdquo;
           </blockquote>
         )}
 
