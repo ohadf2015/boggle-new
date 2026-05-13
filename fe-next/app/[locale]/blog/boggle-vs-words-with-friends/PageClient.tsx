@@ -146,7 +146,7 @@ export default function BoggleVsWwfPageClient(): React.ReactElement {
 
           <div className={cn('mt-12 pt-6 border-t', isDarkMode ? 'border-slate-700' : 'border-gray-200')}>
             <div className="flex flex-wrap gap-4">
-              <Link href={`/${locale}/words-with-friends-alternative`}>
+              <Link href="/en/words-with-friends-alternative">
                 <Button className="rounded-neo border-3 border-neo-black bg-neo-pink text-neo-navy font-bold shadow-hard hover:shadow-hard-lg">
                   {content.tryAlternative}
                 </Button>

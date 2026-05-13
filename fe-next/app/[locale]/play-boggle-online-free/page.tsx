@@ -263,7 +263,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
         {/* WORDS WITH FRIENDS CROSS-LINK BANNER */}
         <section className="mt-12">
           <Link
-            href={`/${locale}/words-with-friends-alternative`}
+            href="/en/words-with-friends-alternative"
             className="group relative flex items-center justify-between gap-4 overflow-hidden rounded-neo border-4 border-neo-black bg-neo-pink p-5 shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:p-6"
           >
             <div className="absolute inset-0 texture-halftone-comic opacity-20" aria-hidden="true" />

@@ -18,9 +18,9 @@ const en = {
     "locale": "en_US",
     "language": "English",
     "leaderboard": {
-      "title": "Best Competitive Word Game Leaderboard — Global Daily, Weekly & All-Time Rankings | LexiClash",
-      "description": "The best competitive word game with global leaderboards. Live daily, weekly, and all-time rankings across 8 modes. Filter by language, country, or mode. Updated in real time.",
-      "ogTitle": "Competitive Word Game Leaderboard — Global Rankings, Daily / Weekly / All-Time",
+      "title": "Best Competitive Word Games with Global Leaderboards 2026 | LexiClash",
+      "description": "The best competitive word games with global leaderboards. Live daily, weekly, and all-time rankings across 8 modes. Filter by language, country, or mode. Updated in real time.",
+      "ogTitle": "Best Competitive Word Games with Global Leaderboards 2026",
       "ogDescription": "Climb the global word game leaderboard. Daily, weekly, and all-time rankings across 8 modes. Free, no signup."
     },
     "profile": {

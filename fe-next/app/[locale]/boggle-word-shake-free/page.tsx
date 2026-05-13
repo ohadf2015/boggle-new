@@ -206,7 +206,7 @@ export default async function BoggleWordShakeFreePage({ params }: PageProps) {
               <h3 className="font-bold text-neo-lime">Daily Word Wheel</h3>
               <p className="mt-1 text-xs text-neo-gray-200">New puzzle every day</p>
             </Link>
-            <Link href={`/${locale}/words-with-friends-alternative`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink/40">
+            <Link href="/en/words-with-friends-alternative" className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink/40">
               <h3 className="font-bold text-neo-pink">vs Words With Friends</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Real-time, not turn-based</p>
             </Link>

@@ -442,7 +442,7 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Detailed Comparisons</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            <Link href={`/${locale}/words-with-friends-alternative`} className="rounded-neo border-3 border-neo-pink/60 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink">
+            <Link href="/en/words-with-friends-alternative" className="rounded-neo border-3 border-neo-pink/60 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink">
               <h3 className="font-bold text-neo-pink">Words With Friends Alternative</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Real-time multiplayer, free, no download</p>
             </Link>
