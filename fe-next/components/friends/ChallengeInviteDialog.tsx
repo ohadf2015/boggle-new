@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { Target, Send, Zap, Skull, Swords, MessageCircle, Timer } from 'lucide-react';
+import { Target, Send, Zap, Skull, Swords, MessageCircle, Timer, Trophy, Users } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -26,11 +26,14 @@ interface ChallengeInviteDialogProps {
   className?: string;
 }
 
+export type ChallengeFlow = 'async' | 'live';
+
 interface GameSettings {
   language?: string;
   timerSeconds?: number;
   mode?: string;
   message?: string;
+  flow?: ChallengeFlow;
 }
 
 const TIMER_PRESETS: ReadonlyArray<{ seconds: number; label: string }> = [
@@ -72,6 +75,7 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
 }) => {
   const { t, language } = useLanguage();
 
+  const [flow, setFlow] = useState<ChallengeFlow>('async');
   const [mode, setMode] = useState<ModeId>('classic');
   const [timerSeconds, setTimerSeconds] = useState<number>(120);
   const [message, setMessage] = useState<string>('');
@@ -80,6 +84,7 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const reset = useCallback(() => {
+    setFlow('async');
     setMode('classic');
     setTimerSeconds(120);
     setMessage('');
@@ -96,6 +101,7 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
         timerSeconds,
         mode,
         message: message.trim() || undefined,
+        flow,
       });
       reset();
       onClose();
@@ -104,7 +110,7 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
     } finally {
       setIsLoading(false);
     }
-  }, [friendId, language, timerSeconds, mode, message, onSendChallenge, onClose, reset, t]);
+  }, [friendId, language, timerSeconds, mode, message, flow, onSendChallenge, onClose, reset, t]);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -137,6 +143,48 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
           >
             {t('friends.challenges.inviteMessage', { name: friendUsername })}
           </p>
+
+          {/* FLOW — async vs live segmented control */}
+          <div>
+            <div
+              role="radiogroup"
+              aria-label={t('friends.challenges.flowPicker.label')}
+              className="grid grid-cols-2 gap-2"
+            >
+              {(['async', 'live'] as const).map((f) => {
+                const isActive = flow === f;
+                const Icon = f === 'async' ? Trophy : Users;
+                return (
+                  <button
+                    key={f}
+                    type="button"
+                    role="radio"
+                    aria-checked={isActive}
+                    onClick={() => setFlow(f)}
+                    disabled={isLoading}
+                    className={cn(
+                      'flex flex-col items-center gap-1.5 px-3 py-3 rounded-neo border-3 border-neo-black',
+                      'font-black uppercase tracking-tight text-xs transition-all duration-100',
+                      isActive
+                        ? (f === 'async'
+                            ? 'bg-neo-lime text-neo-black shadow-hard-pressed translate-x-px translate-y-px'
+                            : 'bg-neo-pink text-neo-white shadow-hard-pressed translate-x-px translate-y-px')
+                        : 'bg-neo-cream dark:bg-neo-navy-light text-neo-black dark:text-neo-white shadow-hard hover:-translate-y-0.5 hover:shadow-hard-lg',
+                      isLoading && 'opacity-60 cursor-not-allowed'
+                    )}
+                  >
+                    <Icon className="w-5 h-5 stroke-3" aria-hidden={true} />
+                    <span>
+                      {t(f === 'async' ? 'friends.challenges.flowPicker.async' : 'friends.challenges.flowPicker.live')}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-xs mt-2 text-center text-current/60 font-bold">
+              {t(flow === 'async' ? 'friends.challenges.async.subcopy' : 'friends.challenges.live.subcopy')}
+            </p>
+          </div>
 
           {/* MODE — chip row */}
           <div>
@@ -273,7 +321,7 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
             ) : (
               <>
                 <Send className="w-5 h-5 stroke-3" aria-hidden="true" />
-                {t('friends.challenges.send')}
+                {t(flow === 'async' ? 'friends.challenges.cta.async' : 'friends.challenges.cta.live')}
               </>
             )}
           </button>

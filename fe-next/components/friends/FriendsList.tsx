@@ -311,8 +311,34 @@ const FriendsList: React.FC<FriendsListProps> = ({
   const handleSendChallenge = useCallback(async (
     friendId: string,
     challengeType: 'new_game' | 'join_room',
-    settings?: { language?: string; timerSeconds?: number; mode?: string; message?: string }
+    settings?: { language?: string; timerSeconds?: number; mode?: string; message?: string; flow?: 'async' | 'live' }
   ) => {
+    // ASYNC flow — stash config; producer hook in SP results POSTs after game-end.
+    if (settings?.flow === 'async') {
+      try {
+        sessionStorage.setItem(
+          'pendingAsyncChallenge',
+          JSON.stringify({
+            friendUserId: friendId,
+            friendUsername: challengeFriend?.displayName || challengeFriend?.username,
+            gameMode: settings.mode || 'classic',
+            language: settings.language || language || 'en',
+            durationSeconds: settings.timerSeconds ?? 120,
+            message: settings.message,
+            createdAt: Date.now(),
+          }),
+        );
+      } catch {
+        toast.error(t('friends.errors.sendFailed'));
+        throw new Error('STORAGE_FAILED');
+      }
+      toast.success(t('friends.challenges.async.playInstruction'));
+      setChallengeFriend(null);
+      router.push(`/${language}/?asyncChallenge=new`);
+      return;
+    }
+
+    // LIVE flow — existing real-time MP path.
     if (!giftSocket || !isGiftSocketConnected) {
       toast.error(t('friends.errors.sendFailed'));
       throw new Error('NOT_CONNECTED');
@@ -340,13 +366,10 @@ const FriendsList: React.FC<FriendsListProps> = ({
     }
     toast.success(t('friends.challenges.sent'));
     setChallengeFriend(null);
-    // Sender joins the room immediately and waits for the friend. Without
-    // this they sit on /friends and the recipient enters an empty room with
-    // no opponent — meaning no scores to compare when the game ends.
     if (result.data.roomCode) {
       router.push(`/${language}/multiplayer?room=${result.data.roomCode}`);
     }
-  }, [giftSocket, isGiftSocketConnected, t, router, language]);
+  }, [giftSocket, isGiftSocketConnected, t, router, language, challengeFriend]);
 
   // Gift sending via Socket.IO
   const handleSendGift = useCallback((gift: GiftPayload) => {
