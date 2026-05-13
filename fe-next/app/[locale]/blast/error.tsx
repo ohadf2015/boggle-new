@@ -30,7 +30,9 @@ export default function BlastError({
   };
 
   useEffect(() => {
-    console.error('Blast error:', error);
+    // Log error.message (string) — passing the Error object makes Sentry's
+    // console-capture stringify TypeError's non-enumerable props as `{}`.
+    console.error('Blast error:', error.message || String(error));
     captureError(error, {
       errorBoundary: { type: 'blast-error', digest: error.digest },
     });

@@ -1,27 +1,50 @@
 'use client';
 import { useEffect, useRef } from 'react';
-import * as PIXI from 'pixi.js';
 
 export function BlastFxOverlay() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const appRef = useRef<PIXI.Application | null>(null);
 
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
-    // resizeTo crashes PIXI's resize plugin under reparenting; CSS sizes the
-    // canvas visually, and backgroundAlpha:0 keeps the internal bitmap invisible.
-    const app = new PIXI.Application({
-      view: canvas,
-      backgroundAlpha: 0,
-      antialias: true,
-    });
-    appRef.current = app;
-    return () => {
+    let cancelled = false;
+    let appInstance: import('pixi.js').Application | null = null;
+
+    (async () => {
+      const PIXI = await import('pixi.js');
+      if (cancelled) return;
+
+      // Pixi v8: zero-arg constructor + await init(). v7's `new Application(opts)`
+      // silently skips plugin setup, then destroy() crashes calling `_cancelResize`.
+      const app = new PIXI.Application();
       try {
-        app.destroy(false, { children: true });
+        await app.init({
+          canvas,
+          backgroundAlpha: 0,
+          antialias: true,
+        });
       } catch {
-        // PIXI sometimes throws on destroy under fast unmount; non-fatal.
+        return;
+      }
+
+      if (cancelled) {
+        try {
+          app.destroy(true, { children: true });
+        } catch {
+          // safe under fast unmount
+        }
+        return;
+      }
+
+      appInstance = app;
+    })();
+
+    return () => {
+      cancelled = true;
+      try {
+        appInstance?.destroy(true, { children: true });
+      } catch {
+        // safe: app may not have finished init
       }
     };
   }, []);

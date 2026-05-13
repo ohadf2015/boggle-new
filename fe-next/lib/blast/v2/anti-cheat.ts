@@ -11,6 +11,7 @@ export type ClearSubmission = {
   hintsUsed: number;
   wrongAttempts: number;
   cascadesTriggered: number;
+  submissionId?: string;
 };
 
 export type ClearValidation = { ok: true } | { ok: false; reason: string };

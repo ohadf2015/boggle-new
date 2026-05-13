@@ -322,11 +322,17 @@ Sentry.init({
     /no txrsid/i,
     // console.warn(stack) from React internals — no message, just stack frames (JAVASCRIPT-NEXTJS-11C)
     /^\s*at https?:\/\/[^\s]+\/_next\/static\/chunks\//,
-    // LogRocket internal quota/memory warnings — third-party, non-actionable (JAVASCRIPT-NEXTJS-11T, 11Y)
+    // LogRocket internal quota/memory warnings — third-party, non-actionable (JAVASCRIPT-NEXTJS-11T, 11Y, 15K)
     /LogRocket.*filter manager.*too much memory/i,
     /LogRocket.*Session quota exceeded/i,
     /LogRocket.*Navigation rate limit/i,
+    /LogRocket is using too much memory/i,
     /Navigation rate limit exceeded/i,
+    // Coin sync rate-limits — policy, not bug. Downgraded at source but defense in depth (JAVASCRIPT-NEXTJS-15F, 15G)
+    /\[CoinContext\] Failed to add coins:.*TOO_MANY_REQUESTS/i,
+    /Coin sync API error:.*TOO_MANY_REQUESTS/i,
+    // Pixi v8 destroy before init — fixed at source in BlastFxOverlay; defense in depth (JAVASCRIPT-NEXTJS-15E)
+    /this\._cancelResize is not a function/i,
     // Third-party SDK chunk (`core.js:297`, fn `Tx`) — Supabase realtime broadcast
     // events with no payload. Not first-party; no .payload access in app code.
     /Cannot read properties of undefined \(reading 'payload'\)/i,

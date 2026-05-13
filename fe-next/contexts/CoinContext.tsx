@@ -264,7 +264,12 @@ export function CoinProvider({ children }: { children: ReactNode }) {
         fireCoinEarnedFx();
         return freshProfile?.total_coins ?? result.newBalance ?? (coins + amount);
       } else {
-        console.error('[CoinContext] Failed to add coins:', result.error);
+        // Rate-limits are expected under burst play — don't surface as Sentry errors.
+        if (result.error === 'TOO_MANY_REQUESTS') {
+          console.debug('[CoinContext] Coin sync rate-limited; balance will reconcile on next sync');
+        } else {
+          console.error('[CoinContext] Failed to add coins:', result.error);
+        }
         toast.error('Failed to update coin balance');
         return coins;
       }

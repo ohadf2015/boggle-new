@@ -369,7 +369,12 @@ export async function syncCoinsToDatabase(
 
     const data = await res.json();
     if (!res.ok || !data.success) {
-      logger.error('Coin sync API error:', data.error);
+      // Rate-limits are policy-driven, not bugs — don't ship them to Sentry.
+      if (data.error === 'TOO_MANY_REQUESTS' || res.status === 429) {
+        logger.debug('Coin sync rate-limited:', data.error);
+      } else {
+        logger.error('Coin sync API error:', data.error);
+      }
       return { success: false, error: data.error || 'Failed to sync coins' };
     }
 
