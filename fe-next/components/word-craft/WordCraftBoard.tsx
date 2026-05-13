@@ -24,14 +24,15 @@ export interface WordCraftBoardProps {
   reticle?: { row: number; col: number } | null;
 }
 
-// Brand-tinted premium squares (no text labels). Each premium kind gets a distinct neo-color.
-// Saturation tier (TW > DW, TL > DL) + inset ring on the rarer 3x tiles so players can read
-// the bonus pattern at a glance on small/dark mobile screens.
+// Brand-tinted premium squares (no text labels). Each premium kind gets a
+// distinct neo-color. Saturation tier preserves TW > DW and TL > DL ordering;
+// every tier now carries an inset ring — old DW @30% and DL @25% fell below
+// WCAG 3:1 on the navy base and disappeared on bright outdoor mobile screens.
 const PREMIUM_TINT: Record<PremiumKind, string> = {
-  TW: 'bg-neo-pink/60 ring-1 ring-inset ring-neo-pink',     // Triple word — boldest
-  DW: 'bg-neo-pink/30',                                      // Double word — softer pink
-  TL: 'bg-neo-cyan/55 ring-1 ring-inset ring-neo-cyan',     // Triple letter — boldest cyan
-  DL: 'bg-neo-cyan/25',                                      // Double letter — softer cyan
+  TW: 'bg-neo-pink/65 ring-2 ring-inset ring-neo-pink',       // Triple word — boldest
+  DW: 'bg-neo-pink/45 ring-1 ring-inset ring-neo-pink/70',    // Double word — softer pink
+  TL: 'bg-neo-cyan/60 ring-2 ring-inset ring-neo-cyan',       // Triple letter — boldest cyan
+  DL: 'bg-neo-cyan/40 ring-1 ring-inset ring-neo-cyan/70',    // Double letter — softer cyan
 };
 
 /** Build the set of axis-hint cells (N/E/S/W neighbors) for a single anchor. */
@@ -143,7 +144,11 @@ function WordCraftBoardImpl({
                       : (cell.premium && PREMIUM_TINT[cell.premium]) || 'bg-neo-navy-light/80',
                 isDragTarget && 'bg-neo-cyan/30 ring-4 ring-neo-cyan scale-110 z-10',
                 isAxisHint && !isDragTarget && 'wc-axis-hint',
-                isReticle && !isDragTarget && 'ring-4 ring-neo-yellow ring-offset-1 ring-offset-black z-10',
+                // Was ring-4 + ring-offset-1, eating ~10 px of an 11×11 cell
+                // (≈ 30 px wide) and obscuring the glyph for keyboard players.
+                // Halve to ring-2 and drop the offset so the underlying tile
+                // letter stays readable.
+                isReticle && !isDragTarget && 'ring-2 ring-neo-yellow z-10',
                 !isInteractive && !pending && 'cursor-not-allowed',
                 isInteractive && !pending && 'hover:bg-neo-cyan/15 active:scale-95',
                 inviteEmpty && 'wc-cell-invite',
