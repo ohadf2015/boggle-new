@@ -36,13 +36,15 @@ describe('ReengagementEmailV2 — component render', () => {
     expect(html).toMatch(/alt="LexiClash[^"]*"/);
   });
 
-  it('uses the bespoke kawaii-squad hero with descriptive alt text', async () => {
+  it('uses the bespoke kawaii Lexi hero (v4) with descriptive alt text', async () => {
     const html = await renderHtml();
-    // Hero is a custom-generated kawaii squad illustration (lime/pink ring, floating
-    // letter tiles), rendered specifically for the email letterbox under /email/.
-    expect(html).toContain('https://www.lexiclash.live/email/reengagement-hero-v3.jpg');
+    // v4 hero: purple chibi Lexi mascot peeking with "?" tile + lime/pink sunburst +
+    // floating S/T/A/R/K tiles. Locale-agnostic, single 1104×468 JPEG under /email/.
+    expect(html).toContain('https://www.lexiclash.live/email/reengagement-hero-v4.jpg');
     // Alt mentions brand + the visual subject (a11y + brand recall when images blocked)
-    expect(html).toMatch(/alt="LexiClash[^"]*squad[^"]*"/);
+    expect(html).toMatch(/alt="LexiClash[^"]*"/);
+    // Old v3 asset must be fully retired
+    expect(html).not.toContain('reengagement-hero-v3');
     // Hero card is hard-shadowed neo-brutalist — 6px offset shadow, no blur
     expect(html).toMatch(/box-shadow:[^"';]*6px 6px 0px/);
     // Hero card scales fluidly across email clients (max-width 560 + width 100%)
@@ -69,13 +71,13 @@ describe('ReengagementEmailV2 — component render', () => {
     expect(rtlShadows.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('hero illustration is locale-agnostic — same asset across all 5 languages', async () => {
-    // Single shared illustration (kawaii squad) carries no language-specific text,
+  it('hero illustration is locale-agnostic — same v4 asset across all 5 languages', async () => {
+    // Single shared illustration (kawaii Lexi) carries no language-specific text,
     // so the hero asset is identical across every locale.
     const heroUrls = new Set<string>();
     for (const lang of ['en', 'he', 'sv', 'ja', 'es']) {
       const html = await renderHtml({ language: lang });
-      const match = html.match(/src="(https:\/\/www\.lexiclash\.live\/email\/reengagement-hero-v3[^"]+)"/);
+      const match = html.match(/src="(https:\/\/www\.lexiclash\.live\/email\/reengagement-hero-v4[^"]+)"/);
       expect(match).not.toBeNull();
       heroUrls.add(match![1]);
       // Old per-locale OG cards must NOT leak back in
@@ -113,8 +115,9 @@ describe('ReengagementEmailV2 — component render', () => {
     expect(html).not.toMatch(/Today.{1,10}s hint is ready when you are/);
     // New punchier replacements (apostrophes get HTML-encoded → tolerate)
     expect(html).toMatch(/Today.{1,10}s word is waiting/);
-    // Witty pitch reframes the task as a quick achievement, not a chore.
-    expect(html).toContain('Easy win');
+    // Stronger pitch reframes the task as low-effort.
+    expect(html.toLowerCase()).toMatch(/30 seconds/);
+    expect(html.toLowerCase()).toMatch(/(don.{1,10}t overthink|easy win)/);
   });
 
   it('renders the giant letter tile with firstLetter', async () => {
@@ -204,6 +207,119 @@ describe('getReengagementSubjectV2 — subject rotation', () => {
     for (const lang of ['en', 'he', 'sv', 'ja', 'es']) {
       expect(SUBJECT_LINES[lang]).toHaveLength(6);
     }
+  });
+});
+
+describe('ReengagementEmailV2 — puzzle-row visual', () => {
+  it('renders a row of N tiles from wordLength prop, first filled with letter, rest blank', async () => {
+    const html = await renderHtml({ firstLetter: 'S', wordLength: 5 } as never);
+    // Filled tile contains the letter (visible Q-style match works for S too)
+    expect(html).toMatch(/>\s*S\s*</);
+    // Blank-tile slot has a non-breaking-space placeholder (so html escapes to &nbsp;)
+    const blanks = (html.match(/data-blank-tile="1"/g) || []).length;
+    // 5-letter word → 1 filled + 4 blanks
+    expect(blanks).toBe(4);
+  });
+
+  it('defaults to 4 blank tiles when wordLength is missing or out of range', async () => {
+    const html = await renderHtml();
+    const blanks = (html.match(/data-blank-tile="1"/g) || []).length;
+    expect(blanks).toBe(3); // default total 4 tiles → 1 filled + 3 blank
+  });
+
+  it('clamps wordLength to a 2–8 tile range to protect mobile layout', async () => {
+    const huge = await renderHtml({ wordLength: 99 } as never);
+    const hugeBlanks = (huge.match(/data-blank-tile="1"/g) || []).length;
+    expect(hugeBlanks).toBeLessThanOrEqual(7); // capped at 8 total
+
+    const tiny = await renderHtml({ wordLength: 1 } as never);
+    const tinyBlanks = (tiny.match(/data-blank-tile="1"/g) || []).length;
+    expect(tinyBlanks).toBeGreaterThanOrEqual(1); // floored at 2 total
+  });
+});
+
+describe('ReengagementEmailV2 — personalization hooks', () => {
+  it('renders the missed-days loss-aversion line when daysSinceLastPlay >= 7', async () => {
+    const html = await renderHtml({ daysSinceLastPlay: 14 } as never);
+    // Number is interpolated into the line
+    expect(html).toContain('14');
+    // The phrase contains "no-show" (EN copy)
+    expect(html.toLowerCase()).toContain('no-show');
+  });
+
+  it('hides the missed-days line when daysSinceLastPlay < 7 (avoids "1 days" weirdness)', async () => {
+    const html = await renderHtml({ daysSinceLastPlay: 3 } as never);
+    expect(html.toLowerCase()).not.toContain('no-show');
+  });
+
+  it('hides the missed-days line when daysSinceLastPlay is undefined', async () => {
+    const html = await renderHtml();
+    expect(html.toLowerCase()).not.toContain('no-show');
+  });
+
+  it('renders the social-proof line when playersToday >= 50', async () => {
+    const html = await renderHtml({ playersToday: 1847 } as never);
+    // Number rendered with locale grouping ("1,847" in en-US)
+    expect(html).toMatch(/1[,  ]?847/);
+    expect(html.toLowerCase()).toContain('already');
+  });
+
+  it('hides the social-proof line when playersToday < 50 (avoids "12 players" awkwardness)', async () => {
+    const html = await renderHtml({ playersToday: 12 } as never);
+    expect(html.toLowerCase()).not.toContain('already cracked');
+  });
+
+  it('renders the hours-left urgency chip when hoursUntilReset < 12', async () => {
+    const html = await renderHtml({ hoursUntilReset: 6 } as never);
+    expect(html).toMatch(/\b6h\b/);
+    expect(html.toLowerCase()).toMatch(/(reset|before)/);
+  });
+
+  it('hides the hours-left chip when reset is more than 12h away', async () => {
+    const html = await renderHtml({ hoursUntilReset: 18 } as never);
+    expect(html).not.toMatch(/\b18h\b/);
+  });
+
+  it('renders all 3 hooks together when all metrics are above threshold', async () => {
+    const html = await renderHtml({
+      daysSinceLastPlay: 21,
+      playersToday: 2400,
+      hoursUntilReset: 4,
+    } as never);
+    expect(html).toContain('21');
+    expect(html).toMatch(/2[,  ]?400/);
+    expect(html).toMatch(/\b4h\b/);
+  });
+
+  it('gracefully renders without errors when zero metrics are provided', async () => {
+    // No new props provided → component still renders, just without personalization chips.
+    const html = await renderHtml();
+    expect(html.length).toBeGreaterThan(1000);
+    expect(html).toContain('Ohad');
+  });
+
+  it('localizes the missed-days line in Hebrew', async () => {
+    const html = await renderHtml({ language: 'he', daysSinceLastPlay: 21 } as never);
+    expect(html).toContain('21');
+    expect(html).toMatch(/ימים/);
+  });
+
+  it('localizes the social-proof line in Japanese', async () => {
+    const html = await renderHtml({ language: 'ja', playersToday: 1200 } as never);
+    expect(html).toMatch(/1[,  ]?200/);
+    expect(html).toContain('人');
+  });
+
+  it('localizes the hours-left chip in Spanish', async () => {
+    const html = await renderHtml({ language: 'es', hoursUntilReset: 5 } as never);
+    expect(html).toMatch(/\b5h\b/);
+    expect(html.toLowerCase()).toContain('quedan');
+  });
+
+  it('localizes the missed-days line in Swedish', async () => {
+    const html = await renderHtml({ language: 'sv', daysSinceLastPlay: 18 } as never);
+    expect(html).toContain('18');
+    expect(html.toLowerCase()).toContain('dagar');
   });
 });
 

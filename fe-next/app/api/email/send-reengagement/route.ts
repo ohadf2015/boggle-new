@@ -58,13 +58,25 @@ export async function POST(request: NextRequest) {
           failed++;
           continue;
         }
-        const result = await sendReengagementEmail(recipient, 'en', fallback.letter, baseUrl);
+        const result = await sendReengagementEmail(
+          recipient,
+          'en',
+          fallback.letter,
+          baseUrl,
+          fallback.word.length,
+        );
         if (result.success) sent++;
         else { failed++; errors.push(`${recipient.email}: ${result.error}`); }
         continue;
       }
 
-      const result = await sendReengagementEmail(recipient, language, letterData.letter, baseUrl);
+      const result = await sendReengagementEmail(
+        recipient,
+        language,
+        letterData.letter,
+        baseUrl,
+        letterData.word.length,
+      );
       if (result.success) sent++;
       else { failed++; errors.push(`${recipient.email}: ${result.error}`); }
     }

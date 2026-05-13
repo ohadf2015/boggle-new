@@ -17,13 +17,27 @@ export async function GET(request: NextRequest) {
     he: 'צ', ja: 'あ', sv: 'S', es: 'P',
   };
 
+  // Override sample personalization data via query string so the preview
+  // can demo each chip state independently (e.g. ?days=14&players=1847&hours=6).
+  const sp = request.nextUrl.searchParams;
+  const num = (key: string) => {
+    const raw = sp.get(key);
+    if (raw == null) return undefined;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : undefined;
+  };
+
   const { html } = await generateReengagementEmailHtml({
     recipientName: previewNames[language] || 'Alex',
-    firstLetter: previewLetters[language] || 'W',
+    firstLetter: previewLetters[language] || 'S',
     language,
     unsubscribeUrl: `${baseUrl}/${locale}/unsubscribe`,
     playUrl: `${baseUrl}/${locale}/daily`,
     baseUrl,
+    wordLength: num('wordLength') ?? 5,
+    daysSinceLastPlay: num('days') ?? 14,
+    playersToday: num('players') ?? 1847,
+    hoursUntilReset: num('hours') ?? 6,
   });
 
   // Wrap with preview banner

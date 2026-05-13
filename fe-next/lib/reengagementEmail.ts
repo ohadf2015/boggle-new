@@ -17,6 +17,10 @@ import {
   generateUnsubscribeToken,
   isEmailServiceConfigured,
 } from '@/lib/email';
+import {
+  computeHoursUntilReset,
+  computeDaysSinceLastPlay,
+} from './reengagementEnrichment';
 
 import logger from '@/backend/utils/logger';
 
@@ -251,6 +255,51 @@ export async function getReengagementRecipients(): Promise<ReengagementRecipient
 // Send Functions
 // ==========================================
 
+// ==========================================
+// Enrichment Queries
+// ==========================================
+
+/**
+ * Cache module-level: aggregate count of distinct players who completed
+ * today's daily puzzle, keyed per `${language}-${puzzleDate}`. Refreshed
+ * on first call per cron run (cron is hourly; cache TTL is implicit via
+ * the date-keyed key — rolls over at UTC midnight).
+ */
+const playersTodayCache = new Map<string, number>();
+
+async function getPlayersToday(language: string): Promise<number | null> {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) return null;
+
+  const puzzleDate = getTodayDate();
+  const cacheKey = `${language}-${puzzleDate}`;
+  if (playersTodayCache.has(cacheKey)) return playersTodayCache.get(cacheKey) ?? null;
+
+  // count of attempts is a useful approximation; one row per player per puzzle.
+  const { count, error } = await supabase
+    .from('daily_puzzle_attempts')
+    .select('id', { count: 'exact', head: true })
+    .eq('puzzle_date', puzzleDate)
+    .eq('language', language);
+
+  if (error || count == null) return null;
+  playersTodayCache.set(cacheKey, count);
+  return count;
+}
+
+async function getLastPlayedDate(playerId: string): Promise<string | null> {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) return null;
+  const { data } = await supabase
+    .from('daily_puzzle_attempts')
+    .select('puzzle_date')
+    .eq('player_id', playerId)
+    .order('puzzle_date', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return data?.puzzle_date ?? null;
+}
+
 /**
  * Send a re-engagement email to a single recipient
  */
@@ -258,7 +307,8 @@ export async function sendReengagementEmail(
   recipient: ReengagementRecipient,
   language: string,
   firstLetter: string,
-  baseUrl: string
+  baseUrl: string,
+  wordLength?: number
 ): Promise<{ success: boolean; error?: string }> {
   if (!isEmailServiceConfigured()) {
     return { success: false, error: 'Email service not configured' };
@@ -289,6 +339,15 @@ export async function sendReengagementEmail(
   const playUrl = `${baseUrl}/${locale}/daily`;
   const recipientName = recipient.display_name || recipient.username || 'Word Hunter';
 
+  // Enrich with personalization data — each helper is fault-tolerant and
+  // returns null on failure; component soft-gates each chip independently.
+  const [lastPlayed, playersToday] = await Promise.all([
+    getLastPlayedDate(recipient.id),
+    getPlayersToday(language),
+  ]);
+  const daysSinceLastPlay = computeDaysSinceLastPlay(lastPlayed) ?? undefined;
+  const hoursUntilReset = computeHoursUntilReset(recipient.timezone || 'UTC');
+
   const { generateReengagementEmailHtml } = await import('./reengagementEmailTemplate');
   const { subject, html } = await withTimeout(
     generateReengagementEmailHtml({
@@ -298,6 +357,10 @@ export async function sendReengagementEmail(
       unsubscribeUrl,
       playUrl,
       baseUrl,
+      wordLength,
+      daysSinceLastPlay,
+      playersToday: playersToday ?? undefined,
+      hoursUntilReset,
     }),
     30000,
     'Email render timed out after 30 seconds'

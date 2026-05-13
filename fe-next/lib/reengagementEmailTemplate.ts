@@ -22,6 +22,14 @@ interface EmailTemplateParams {
   playUrl: string;
   /** @deprecated No longer used — image base is derived from NODE_ENV */
   baseUrl?: string;
+  /** Total letters in today's target word — drives tile-row width. */
+  wordLength?: number;
+  /** Days since user last played any daily puzzle. ≥7 to render. */
+  daysSinceLastPlay?: number;
+  /** Players who already solved today's word in this language. ≥50 to render. */
+  playersToday?: number;
+  /** Hours until daily reset in user's tz. <12 to render. */
+  hoursUntilReset?: number;
 }
 
 /**
@@ -31,11 +39,31 @@ export async function generateReengagementEmailHtml(params: EmailTemplateParams)
   subject: string;
   html: string;
 }> {
-  const { recipientName, firstLetter, language, unsubscribeUrl, playUrl } = params;
+  const {
+    recipientName,
+    firstLetter,
+    language,
+    unsubscribeUrl,
+    playUrl,
+    wordLength,
+    daysSinceLastPlay,
+    playersToday,
+    hoursUntilReset,
+  } = params;
 
   const subject = getReengagementSubject(language, firstLetter, recipientName);
 
-  const props = { recipientName, firstLetter, language, unsubscribeUrl, playUrl };
+  const props = {
+    recipientName,
+    firstLetter,
+    language,
+    unsubscribeUrl,
+    playUrl,
+    wordLength,
+    daysSinceLastPlay,
+    playersToday,
+    hoursUntilReset,
+  };
 
   const html = await render(ReengagementEmailV2(props));
 
