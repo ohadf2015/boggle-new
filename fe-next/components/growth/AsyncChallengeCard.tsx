@@ -138,7 +138,7 @@ export const AsyncChallengeCard: React.FC = memo(function AsyncChallengeCard() {
   const { t } = useLanguage();
   const router = useRouter();
   const { user } = useAuth();
-  const { challenges, pendingCount, loading } = useAsyncChallenge();
+  const { challenges, loading } = useAsyncChallenge();
   const pendingChallenges = challenges.filter(c => c.status === 'pending' && c.challengedId !== undefined);
 
   const completedRows: CompletedView[] = (challenges

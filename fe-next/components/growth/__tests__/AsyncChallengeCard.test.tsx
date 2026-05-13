@@ -139,7 +139,7 @@ describe('AsyncChallengeCard', () => {
     render(<AsyncChallengeCard />);
 
     fireEvent.click(screen.getByTestId('play-challenge-c1'));
-    expect(mockPush).toHaveBeenCalledWith('/challenge/c1');
+    expect(mockPush).toHaveBeenCalledWith('/friend-challenge/c1');
   });
 
   it('shows Challenge a Friend CTA when no pending challenges', () => {
