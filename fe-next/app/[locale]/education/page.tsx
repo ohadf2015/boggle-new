@@ -8,7 +8,7 @@ import {
   buildEducationBreadcrumbJsonLd,
   buildEducationCourseJsonLd,
 } from '@/lib/seo/educationJsonLd';
-import EducationPageClient from './PageClient';
+import { PageClient as EducationPageClient } from './PageClient';
 
 export const dynamic = 'force-dynamic';
 
