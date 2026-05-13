@@ -69,6 +69,24 @@ function WordCraftBoardImpl({
     [pendingPlacements, size],
   );
 
+  // Roving tabindex anchor: only ONE cell carries tabIndex=0 so keyboard
+  // users hit a single tab stop on the board instead of 121. Reticle drives
+  // the anchor when set; otherwise we fall back to center (or the first
+  // empty cell scanning row-major if center is already occupied). Arrow
+  // keys move the reticle and the anchor follows.
+  const tabAnchor = useMemo(() => {
+    if (reticle) return reticle;
+    if (!board.cells[centerIndex]?.[centerIndex]?.tile) {
+      return { row: centerIndex, col: centerIndex };
+    }
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        if (!board.cells[r][c].tile) return { row: r, col: c };
+      }
+    }
+    return { row: 0, col: 0 };
+  }, [reticle, board, size, centerIndex]);
+
   // Fewer cells → larger fonts. 11/13/15 boards each get a tuned glyph size.
   const tileFontClass = size <= 11 ? 'text-lg sm:text-xl' : size === 13 ? 'text-base sm:text-lg' : 'text-sm sm:text-base';
 
@@ -98,6 +116,7 @@ function WordCraftBoardImpl({
           const isDragTarget = dragHoverCell === key && isEmpty;
           const isAxisHint = axisHintCells.has(key) && isEmpty && !disabled;
           const isReticle = reticle?.row === r && reticle?.col === c;
+          const isTabAnchor = tabAnchor.row === r && tabAnchor.col === c;
 
           // Build a screen-reader label that includes tile state so blind
           // players know what's on the cell during keyboard navigation —
@@ -123,6 +142,7 @@ function WordCraftBoardImpl({
               data-axis-hint={isAxisHint ? 'true' : undefined}
               data-reticle={isReticle ? 'true' : undefined}
               aria-label={ariaLabel}
+              tabIndex={isTabAnchor ? 0 : -1}
               disabled={!isInteractive}
               onClick={() => {
                 if (!isInteractive) return;
@@ -150,7 +170,14 @@ function WordCraftBoardImpl({
                 // letter stays readable.
                 isReticle && !isDragTarget && 'ring-2 ring-neo-yellow z-10',
                 !isInteractive && !pending && 'cursor-not-allowed',
-                isInteractive && !pending && 'hover:bg-neo-cyan/15 active:scale-95',
+                // Desktop: explicit cursor + stronger hover tint so empty
+                // cells visibly invite interaction (was bg-neo-cyan/15 →
+                // bumped to /25 because /15 fades against the dark navy
+                // base on mid-brightness monitors). focus-visible ring is
+                // the keyboard-Tab affordance separate from the reticle.
+                isInteractive && !pending && 'cursor-pointer hover:bg-neo-cyan/25 active:scale-95',
+                isInteractive && 'focus-visible:ring-2 focus-visible:ring-neo-yellow focus-visible:z-10 focus-visible:outline-none',
+                pending && 'cursor-pointer',
                 inviteEmpty && 'wc-cell-invite',
                 inviteCenter && 'wc-cell-center-ping',
               )}

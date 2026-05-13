@@ -111,7 +111,10 @@ function WordCraftRackImpl({
               // player complaint 2026-05-13 "can't swipe to see more letters").
               // useWordCraftDrag direction-gates touch activation so
               // vertical-dominant motion still wins for drag-to-board.
+              // Desktop cursor: grab on draggable tiles, not-allowed when
+              // pending or disabled so mouse players see the affordance.
               'relative w-14 h-16 sm:w-16 sm:h-[72px] flex items-center justify-center touch-pan-x shrink-0 snap-center',
+              disabled || isPending ? 'cursor-not-allowed' : 'cursor-grab active:cursor-grabbing',
               'rounded-neo border-neo-thick border-black',
               'transition-all duration-200 ease-out',
               tilt,
