@@ -13,7 +13,13 @@ export interface FindBotMoveOptions {
   maxCandidates?: number;
 }
 
-const DEFAULT_MAX_LENGTH = 5;
+// Bot considers permutations of its 7-tile rack up to length 7. Earlier
+// versions capped at 5 to bound search time, but the ceiling meant the bot
+// could never play a bingo (7-letter, 50 pt bonus) and felt visibly weak
+// against any player who'd built vocabulary. Worst-case at length 7:
+// 7P2+...+7P7 ≈ 13,700 permutations × O(1) dictionary lookup, still well
+// under the 500 ms bot-turn budget on a phone.
+const DEFAULT_MAX_LENGTH = 7;
 
 function* permute<T>(arr: T[], k: number): Generator<T[]> {
   if (k === 0) {

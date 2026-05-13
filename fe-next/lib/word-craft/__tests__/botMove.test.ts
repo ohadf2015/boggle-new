@@ -81,6 +81,19 @@ describe('findBestBotMove', () => {
     }
   });
 
+  it('default maxLength allows a 7-letter bingo on the first move', () => {
+    const board = createBoard();
+    const rack = makeRack('STRAINS');
+    // STRAINS is 7 letters. With default maxLength (was 5, now 7), the bot
+    // should be able to find and play it on the empty board.
+    const dict = new Set(['STRAINS', 'STRAIN', 'STAIR', 'AIR']);
+    const move = findBestBotMove(board, rack, (w) => dict.has(w.toUpperCase()));
+    expect(move).not.toBeNull();
+    // Bot will pick the highest-scoring option; STRAINS at 7 tiles beats any
+    // shorter subword on the same row, so we expect length 7.
+    expect(move!.placements.length).toBe(7);
+  });
+
   it('respects maxLength option (caps permutation length)', () => {
     const board = createBoard();
     const rack = makeRack('STRAINS');

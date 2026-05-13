@@ -383,7 +383,9 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
     if (botTurnRunning.current) return;
     botTurnRunning.current = true;
     const handle = setTimeout(() => {
-      const move = findBestBotMove(state.board, state.bot.rack, isWordValid, { maxLength: 5 });
+      // Inherit botMove's DEFAULT_MAX_LENGTH (7) — old call passed an explicit
+      // 5 that capped the bot below bingo length and made it feel weak.
+      const move = findBestBotMove(state.board, state.bot.rack, isWordValid);
       if (move) {
         const result = validateAndScoreMove(state.board, move.placements, isWordValid);
         if (result.ok) {
