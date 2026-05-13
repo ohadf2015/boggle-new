@@ -6100,6 +6100,50 @@ const ja = {
         "survival": "サバイバル"
       },
       "sent": "チャレンジを送信しました！",
+      "accept": "受ける",
+      "acceptAndPlay": "受けてプレイ",
+      "accepted": "チャレンジを受けました！",
+      "acceptFailed": "チャレンジの受諾に失敗しました",
+      "decline": "断る",
+      "declined": "チャレンジを断りました",
+      "declineFailed": "チャレンジの拒否に失敗しました",
+      "friendAccepted": "{{name}}さんがチャレンジを受けました！",
+      "received": "チャレンジを受け取りました！",
+      "playNow": "今すぐプレイ",
+      "waitingForFriend": "{name}さんのプレイ待ち…",
+      "targetScoreLabel": "超えるスコア",
+      "targetScore": "{score}点を超えて勝とう",
+      "yourScore": "あなた",
+      "theirScore": "相手",
+      "declinedNotice": "このチャレンジは断られました。",
+      "expiredNotice": "このチャレンジは期限切れです。",
+      "expiredUnfinishedNotice": "終わる前に時間切れになりました。",
+      "title": {
+        "youSent": "あなたのチャレンジ",
+        "youReceived": "フレンドからのチャレンジ"
+      },
+      "flowPicker": {
+        "label": "チャレンジの種類",
+        "async": "私のスコアを超えろ",
+        "live": "リアルタイム対戦"
+      },
+      "async": {
+        "subcopy": "あなたが先にプレイ。相手にスコアが通知されます。",
+        "playInstruction": "プレイしてください — 後でチャレンジを送ります。",
+        "sent": "{name}さんにチャレンジを送りました！"
+      },
+      "live": {
+        "subcopy": "リアルタイム対戦。相手が受けたら一緒にプレイ。"
+      },
+      "cta": {
+        "async": "プレイして送信",
+        "live": "ライブチャレンジを送信"
+      },
+      "result": {
+        "win": "勝ち！{mine} 対 {theirs}",
+        "loss": "負け。{mine} 対 {theirs}",
+        "tie": "引き分け！{mine} 対 {theirs}"
+      },
       "errors": {
         "notFriends": "チャレンジを送るにはフレンドである必要があります。",
         "rateLimited": "少し待ってから再試行してください。",
@@ -6107,6 +6151,7 @@ const ja = {
         "validation": "チャレンジを送信できませんでした。内容を確認してください。"
       }
     },
+    "backToFriends": "フレンドに戻る",
     "copyInviteLink": "招待リンクをコピー",
     "linkCopied": "リンクをコピーしました！",
     "invitedByTitle": "{name} さんがあなたを招待しました！",

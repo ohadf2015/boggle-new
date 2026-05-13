@@ -6044,6 +6044,50 @@ const he = {
         "survival": "הישרדות"
       },
       "sent": "האתגר נשלח!",
+      "accept": "קבל",
+      "acceptAndPlay": "קבל ושחק",
+      "accepted": "האתגר התקבל!",
+      "acceptFailed": "קבלת האתגר נכשלה",
+      "decline": "דחה",
+      "declined": "האתגר נדחה",
+      "declineFailed": "דחיית האתגר נכשלה",
+      "friendAccepted": "‏{{name}} קיבל את האתגר שלך!",
+      "received": "קיבלת אתגר!",
+      "playNow": "שחק עכשיו",
+      "waitingForFriend": "ממתינים ש-{name} ישחקו…",
+      "targetScoreLabel": "ניקוד לעקיפה",
+      "targetScore": "השיגו {score} כדי לנצח",
+      "yourScore": "את/ה",
+      "theirScore": "הם",
+      "declinedNotice": "האתגר הזה נדחה.",
+      "expiredNotice": "תוקף האתגר פג.",
+      "expiredUnfinishedNotice": "לא הספקת להשלים את האתגר בזמן.",
+      "title": {
+        "youSent": "האתגר שלך",
+        "youReceived": "אתגר מחבר"
+      },
+      "flowPicker": {
+        "label": "סוג אתגר",
+        "async": "תעקפו את הניקוד שלי",
+        "live": "שחקו בזמן אמת"
+      },
+      "async": {
+        "subcopy": "אתם משחקים ראשונים. החבר מקבל הודעה עם הניקוד שלכם לעקוף.",
+        "playInstruction": "התחילו לשחק — נשלח את האתגר אחרי.",
+        "sent": "האתגר נשלח אל {name}!"
+      },
+      "live": {
+        "subcopy": "מירוץ בזמן אמת. אתם משחקים ביחד כשהחבר מקבל."
+      },
+      "cta": {
+        "async": "שחק ושלח",
+        "live": "שלח אתגר חי"
+      },
+      "result": {
+        "win": "ניצחת! {mine} מול {theirs}",
+        "loss": "הפסדת. {mine} מול {theirs}",
+        "tie": "תיקו! {mine} מול {theirs}"
+      },
       "errors": {
         "notFriends": "צריך להיות חברים כדי לשלוח אתגר.",
         "rateLimited": "רגע, חכו שנייה לפני ניסיון נוסף.",
@@ -6051,6 +6095,7 @@ const he = {
         "validation": "לא הצלחנו לשלוח את האתגר. בדקו את הפרטים ונסו שוב."
       }
     },
+    "backToFriends": "חזרה לחברים",
     "copyInviteLink": "העתק קישור הזמנה",
     "linkCopied": "הקישור הועתק!",
     "invitedByTitle": "‏{name} הזמינו אותך!",

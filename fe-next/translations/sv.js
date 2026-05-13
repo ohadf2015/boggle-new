@@ -6052,6 +6052,43 @@ const sv = {
         "survival": "Överlevnad"
       },
       "sent": "Utmaning skickad!",
+      "acceptAndPlay": "Acceptera & spela",
+      "declineFailed": "Kunde inte avvisa utmaning",
+      "playNow": "Spela nu",
+      "waitingForFriend": "Väntar på att {name} ska spela…",
+      "targetScoreLabel": "Poäng att slå",
+      "targetScore": "Slå {score} för att vinna",
+      "yourScore": "Du",
+      "theirScore": "Motspelare",
+      "declinedNotice": "Den här utmaningen avvisades.",
+      "expiredNotice": "Den här utmaningen gick ut.",
+      "expiredUnfinishedNotice": "Tiden tog slut innan utmaningen kunde avslutas.",
+      "title": {
+        "youSent": "Din utmaning",
+        "youReceived": "Vänutmaning"
+      },
+      "flowPicker": {
+        "label": "Typ av utmaning",
+        "async": "Slå min poäng",
+        "live": "Spela live"
+      },
+      "async": {
+        "subcopy": "Du spelar först. Din vän får din poäng att slå.",
+        "playInstruction": "Spela nu — vi skickar utmaningen efteråt.",
+        "sent": "Utmaning skickad till {name}!"
+      },
+      "live": {
+        "subcopy": "Realtidstävling. Ni spelar tillsammans när hen accepterar."
+      },
+      "cta": {
+        "async": "Spela & skicka",
+        "live": "Skicka live-utmaning"
+      },
+      "result": {
+        "win": "Du vann! {mine} mot {theirs}",
+        "loss": "Du förlorade. {mine} mot {theirs}",
+        "tie": "Oavgjort! {mine} mot {theirs}"
+      },
       "errors": {
         "notFriends": "Ni måste vara vänner för att skicka utmaningar.",
         "rateLimited": "Sakta ner — vänta lite innan du försöker igen.",

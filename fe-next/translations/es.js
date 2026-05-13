@@ -6101,12 +6101,49 @@ const es = {
       },
       "sent": "¡Desafío enviado!",
       "accept": "Aceptar",
+      "acceptAndPlay": "Aceptar y jugar",
       "accepted": "¡Desafío aceptado!",
       "acceptFailed": "Error al aceptar el desafío",
       "decline": "Rechazar",
       "declined": "Desafío rechazado",
+      "declineFailed": "Error al rechazar el desafío",
       "friendAccepted": "¡{{name}} aceptó tu desafío!",
       "received": "¡Desafío recibido!",
+      "playNow": "Jugar ahora",
+      "waitingForFriend": "Esperando a que {name} juegue…",
+      "targetScoreLabel": "Puntuación a superar",
+      "targetScore": "Supera {score} para ganar",
+      "yourScore": "Tú",
+      "theirScore": "Rival",
+      "declinedNotice": "Este desafío fue rechazado.",
+      "expiredNotice": "Este desafío caducó.",
+      "expiredUnfinishedNotice": "Este desafío se quedó sin tiempo antes de terminar.",
+      "title": {
+        "youSent": "Tu Desafío",
+        "youReceived": "Desafío de Amigo"
+      },
+      "flowPicker": {
+        "label": "Tipo de desafío",
+        "async": "Supera mi puntuación",
+        "live": "Jugar en vivo"
+      },
+      "async": {
+        "subcopy": "Juegas primero. A tu amigo le llegará tu puntuación para superar.",
+        "playInstruction": "Juega ahora — enviaremos el desafío después.",
+        "sent": "¡Desafío enviado a {name}!"
+      },
+      "live": {
+        "subcopy": "Carrera en vivo. Juegan juntos cuando acepte."
+      },
+      "cta": {
+        "async": "Jugar y enviar",
+        "live": "Enviar desafío en vivo"
+      },
+      "result": {
+        "win": "¡Ganaste! {mine} vs {theirs}",
+        "loss": "Perdiste. {mine} vs {theirs}",
+        "tie": "¡Empate! {mine} vs {theirs}"
+      },
       "errors": {
         "notFriends": "Tienen que ser amigos para enviar un desafío.",
         "rateLimited": "Más despacio — espera un momento antes de volver a intentarlo.",
@@ -6114,6 +6151,7 @@ const es = {
         "validation": "No pudimos enviar el desafío. Revisa los detalles e inténtalo de nuevo."
       }
     },
+    "backToFriends": "Volver a amigos",
     "copyInviteLink": "Copiar enlace de invitación",
     "linkCopied": "¡Enlace copiado!",
     "invitedByTitle": "¡{name} te invitó!",
