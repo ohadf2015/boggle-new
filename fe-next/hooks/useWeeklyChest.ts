@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 export interface PendingChest {
   tier: 'bronze' | 'silver' | 'gold'
@@ -57,16 +57,30 @@ function normalizeStatus(json: unknown): typeof DEFAULTS {
 export function useWeeklyChest(): WeeklyChestState {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState(DEFAULTS)
+  const mountedRef = useRef(true)
 
   const refresh = useCallback(() => {
     setLoading(true)
     fetch('/api/daily/weekly-chest/status')
-      .then(r => r.json())
-      .then(json => { setData(normalizeStatus(json)); setLoading(false) })
-      .catch(() => { setData(DEFAULTS); setLoading(false) })
+      .then(async r => {
+        // 429/5xx return error JSON; normalize coerces but we still skip the write
+        // entirely so a rate-limited refresh doesn't blank out previously-good data.
+        if (!r.ok) return null
+        return r.json()
+      })
+      .then(json => {
+        if (!mountedRef.current) return
+        if (json !== null) setData(normalizeStatus(json))
+        setLoading(false)
+      })
+      .catch(() => { if (mountedRef.current) setLoading(false) })
   }, [])
 
-  useEffect(() => { refresh() }, [refresh])
+  useEffect(() => {
+    mountedRef.current = true
+    refresh()
+    return () => { mountedRef.current = false }
+  }, [refresh])
 
   const claim = useCallback(async (): Promise<PendingChest | null> => {
     const res = await fetch('/api/daily/weekly-chest/claim', { method: 'POST' })

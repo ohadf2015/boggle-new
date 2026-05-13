@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, memo, useMemo, useRef } from 'react';
 import { useSafeInterval } from '@/hooks/useSafeTimeout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, ChevronDown, ChevronUp, Crown, Calendar, Users } from 'lucide-react';
@@ -172,6 +172,18 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   // Windowed pagination state — initialized around the current user
   const [windowRange, setWindowRange] = useState<{ start: number; end: number } | null>(null);
 
+  // Stable refs for unstable parent props. Without this, every parent re-render
+  // (from i18n `t`, inline-arrow callbacks, etc.) rebuilds the fetchers, which
+  // re-fires the polling effect → instant re-fetch + interval restack → 429.
+  const activeTabRef = useRef(activeTab);
+  activeTabRef.current = activeTab;
+  const onParticipantCountChangeRef = useRef(onParticipantCountChange);
+  onParticipantCountChangeRef.current = onParticipantCountChange;
+  const onCurrentUserRankChangeRef = useRef(onCurrentUserRankChange);
+  onCurrentUserRankChangeRef.current = onCurrentUserRankChange;
+  const tRef = useRef(t);
+  tRef.current = t;
+
   // Fetch today's leaderboard — merges Word Hunt + Word Wheel into combined score
   const fetchTodayLeaderboard = useCallback(async () => {
     if (!puzzleDate) return;
@@ -274,16 +286,17 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       setTodayWheelSolved(wheelSolved);
       setTodayGuestCount(guestCount);
 
-      if (onParticipantCountChange && activeTab === 'today') {
-        onParticipantCountChange(totalPlayers);
+      const cb = onParticipantCountChangeRef.current;
+      if (cb && activeTabRef.current === 'today') {
+        cb(totalPlayers);
       }
     } catch (err) {
       console.error('Failed to fetch today leaderboard:', err);
-      setTodayError(t('errors.failedToLoadLeaderboard'));
+      setTodayError(tRef.current('errors.failedToLoadLeaderboard'));
     } finally {
       setTodayLoading(false);
     }
-  }, [puzzleDate, language, onParticipantCountChange, activeTab, scope, t]);
+  }, [puzzleDate, language, scope]);
 
   // Fetch all-time leaderboard — merges Word Hunt + Word Wheel
   const fetchAllTimeLeaderboard = useCallback(async () => {
@@ -347,16 +360,17 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       setAllTimeParticipants(data);
       setAllTimeTotalCount(data.length);
 
-      if (onParticipantCountChange && activeTab === 'alltime') {
-        onParticipantCountChange(data.length);
+      const cb = onParticipantCountChangeRef.current;
+      if (cb && activeTabRef.current === 'alltime') {
+        cb(data.length);
       }
     } catch (err) {
       console.error('Failed to fetch all-time leaderboard:', err);
-      setAllTimeError(t('errors.failedToLoadLeaderboard'));
+      setAllTimeError(tRef.current('errors.failedToLoadLeaderboard'));
     } finally {
       setAllTimeLoading(false);
     }
-  }, [language, onParticipantCountChange, activeTab, scope, t]);
+  }, [language, scope]);
 
   // Initial fetch and polling
   const pollingInterval = useSafeInterval();
@@ -413,12 +427,13 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   const currentUserTodayIndex = todayParticipants.findIndex(isCurrentUserToday);
   const currentUserTodayData = currentUserTodayIndex >= 0 ? todayParticipants[currentUserTodayIndex] : null;
 
-  // Report current user's rank to parent
+  // Report current user's rank to parent (uses ref to keep deps stable)
   useEffect(() => {
-    if (onCurrentUserRankChange && activeTab === 'today') {
-      onCurrentUserRankChange(currentUserTodayData?.rank_position ?? null);
+    const cb = onCurrentUserRankChangeRef.current;
+    if (cb && activeTab === 'today') {
+      cb(currentUserTodayData?.rank_position ?? null);
     }
-  }, [currentUserTodayData?.rank_position, onCurrentUserRankChange, activeTab]);
+  }, [currentUserTodayData?.rank_position, activeTab]);
 
   // Get current data based on active tab
   // Filter all-time participants to only show those who have solved at least one challenge
