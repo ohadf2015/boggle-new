@@ -60,6 +60,7 @@ import { StatsCardGrid } from '@/components/results/shared';
 import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import { GameEmojiShareCard, type SingleplayerShareData } from '@/components/shared/GameEmojiShareCard';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { useAsyncChallengeProducer } from '@/hooks/useAsyncChallengeProducer';
 
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCard'), { ssr: false });
@@ -111,6 +112,24 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       submitLeaderboardScore(results.playerScore);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Async friend-challenge integration: fires POST (challenger flow) or
+  // PUT phase=challenged (friend flow) when a pending config is in sessionStorage.
+  // Spec: fe-next/docs/specs/2026-05-13-friend-challenge-async-design.md
+  const asyncChallengeBestWord = useMemo(() => {
+    return (results.playerWords || []).reduce(
+      (longest, w) => (w.length > longest.length ? w : longest),
+      '',
+    );
+  }, [results.playerWords]);
+  useAsyncChallengeProducer({
+    enabled: true,
+    score: results.playerScore,
+    words: results.playerWords || [],
+    bestWord: asyncChallengeBestWord || undefined,
+    letterGrid: results.grid,
+    gridSize: results.grid?.length ?? 4,
+  });
 
   const nextStepMode: NextStepMode = mode === 'practice' ? 'practice' : 'solo-bots';
 
