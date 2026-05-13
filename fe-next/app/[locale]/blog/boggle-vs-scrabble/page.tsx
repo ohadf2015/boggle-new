@@ -20,7 +20,7 @@ const DATE_PUBLISHED = '2026-03-28';
 const DATE_MODIFIED = '2026-05-08';
 
 const metaTitles: Record<string, string> = {
-  en: 'Boggle vs Scrabble: Honest Verdict After Years of Both (2026)',
+  en: 'Boggle vs Scrabble: Which Is Better? Honest 2026 Verdict',
   he: 'בוגל מול סקראבל: איזה משחק מילים באמת יותר טוב? (השוואה 2026)',
   sv: 'Boggle vs Scrabble: Vilket Ordspel Ar Egentligen Battre? (2026 Jamforelse)',
   ja: 'ボグル vs スクラブル：どちらの言葉ゲームが本当に優れている？（2026年比較）',
@@ -28,7 +28,7 @@ const metaTitles: Record<string, string> = {
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: 'Boggle vs Scrabble — honest verdict after years of both. 7 real differences in gameplay, strategy, brain benefits, social play. Pick yours in 2 minutes.',
+  en: 'Boggle vs Scrabble compared: 7 real differences in gameplay, strategy, brain benefits & social play. Find which word game wins for you in 2 minutes.',
   he: 'בוגל מול סקראבל — השוואה כנה של משחקיות, אסטרטגיה, גרסאות דיגיטליות, יתרונות מוחיים וחוויה חברתית. גלו איזה משחק מילים קלאסי מתאים לכם ב-2026.',
   sv: 'Boggle vs Scrabble — en arlig jamforelse av spelmekanik, strategi, digitala versioner, hjarnfordelar och social upplevelse. Ta reda pa vilket klassiskt ordspel som passar dig 2026.',
   ja: 'ボグル vs スクラブル — ゲームプレイ、戦略、デジタル版、脳トレ効果、ソーシャル体験の正直な比較。2026年、あなたに合った言葉ゲームを見つけよう。',

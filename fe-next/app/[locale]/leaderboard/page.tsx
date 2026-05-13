@@ -23,7 +23,7 @@ const seoContent: Record<string, {
   en: {
     title: 'LexiClash Leaderboard — Global Rankings & Top Players',
     description:
-      'See who dominates LexiClash. The leaderboard tracks daily, weekly, and all-time top scorers across all game modes. Climb the ranks by playing consistently, finding long words, and mastering combo chains.',
+      'Track daily, weekly & all-time top scorers in LexiClash across all game modes. Compete in Classic, Blast, Word Hunt & Daily Challenge — climb global rankings free.',
     features: [
       'Daily, weekly, and all-time rankings updated in real time',
       'Separate leaderboards for Classic, Blast, Word Hunt, and Daily Challenge modes',
