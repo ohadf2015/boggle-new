@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: 'Jugar Scrabble Online Gratis en Español — Multijugador con Amigos | LexiClash',
     description: 'Jugar Scrabble online en español gratis y sin registro. Crea sala, invita por enlace y compite en tiempo real. 10,000+ palabras. ¡Empieza ya!',
-    keywords: 'alternativa a scrabble online español multijugador, juego como scrabble online en español gratis, alternativa scrabble multijugador online, juego al estilo scrabble con amigos online, alternativa scrabble en español tiempo real, scrabble online en español multijugador, jugar scrabble alternativa gratis, scrabble en línea español alternativa, juegos de palabras online multijugador, apalabrados online gratis, juego de palabras multijugador, boggle online en español, juego de palabras online gratis, batalla de palabras tiempo real',
+    keywords: 'cruzaletras online, apalabrados online gratis, scrabble en linea, scrabble en línea español, jugar scrabble online en español, alternativa a scrabble online español multijugador, juego como scrabble online en español gratis, alternativa scrabble multijugador online, scrabble online en español multijugador, jugar scrabble gratis multijugador, juegos de palabras online multijugador, juego de palabras multijugador, boggle online en español, juego de palabras online gratis, batalla de palabras tiempo real, juegos de letras online',
     openGraph: {
       title: 'Jugar Scrabble Online Gratis en Español — Sin Registro, Multijugador | LexiClash',
       description: 'Jugar Scrabble online en español con amigos en tiempo real. Crea sala, invita por enlace. 100% gratis, sin descargas.',
@@ -138,7 +138,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
           </h2>
           <div className="space-y-3 font-neo-body text-sm leading-relaxed text-neo-white/70 sm:text-base">
             <p>
-              LexiClash es la alternativa moderna al Scrabble online en español: combina la profundidad estratégica de Scrabble, la velocidad en tiempo real de Boggle y el formato social de Apalabrados. Diseñada para amantes de las palabras, jugadores casuales y competitivos por igual.
+              LexiClash es la alternativa moderna al Scrabble online en español: combina la profundidad estratégica de Scrabble, la velocidad en tiempo real de Boggle y el formato social de Apalabrados (también conocido como Cruzaletras). Diseñada para amantes de las palabras, jugadores casuales y competitivos por igual.
             </p>
             <p>
               Juega con amigos, familia o rivales de todo el mundo hispanohablante. Una partida rápida de 15 minutos o una sesión competitiva más larga, LexiClash se adapta a tu ritmo. La interfaz funciona en escritorio y móvil, así que puedes jugar en cualquier lugar.

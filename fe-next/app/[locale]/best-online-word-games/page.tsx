@@ -142,6 +142,19 @@ const itemListJsonLd = JSON.stringify({
   ],
 });
 
+const articleJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '9 Best Online Word Games of 2026 (Free, No Download)',
+  description: 'A hands-on ranking of the 9 best free online word games of 2026 — Wordle, NYT Connections, Strands, Spelling Bee, Words With Friends, Scrabble GO, Wordscapes, Semantle, and LexiClash.',
+  datePublished: '2026-01-15',
+  dateModified: '2026-05-13',
+  author: { '@type': 'Organization', name: 'LexiClash Editorial Team', url: 'https://www.lexiclash.live' },
+  publisher: { '@type': 'Organization', name: 'LexiClash', url: 'https://www.lexiclash.live', logo: { '@type': 'ImageObject', url: 'https://www.lexiclash.live/icon-512.png' } },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': 'https://www.lexiclash.live/en/best-online-word-games' },
+  image: 'https://www.lexiclash.live/og-image-en.webp',
+});
+
 const games = [
   {
     name: 'LexiClash',
@@ -298,6 +311,7 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
       <Script id="ld-faq" type="application/ld+json">{faqJsonLd}</Script>
       <Script id="ld-itemlist" type="application/ld+json">{itemListJsonLd}</Script>
       <Script id="ld-videogame-lexiclash" type="application/ld+json">{lexiclashVideoGameJsonLd}</Script>
+      <Script id="ld-article" type="application/ld+json">{articleJsonLd}</Script>
 
       {/* STICKER MARQUEE */}
       <div className="border-y-3 border-neo-black bg-neo-yellow overflow-hidden">
@@ -310,9 +324,17 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <span className="mb-4 inline-block rotate-[-2deg] rounded-neo border-3 border-neo-black bg-neo-pink px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-white shadow-hard">★ The 2026 Word Game Index ★</span>
-        <h1 className="mb-6 font-neo-display text-4xl font-black leading-tight sm:text-5xl">
+        <h1 className="mb-3 font-neo-display text-4xl font-black leading-tight sm:text-5xl">
           We played every major word game<br /><span className="bg-neo-lime px-3 text-neo-navy shadow-hard inline-block rotate-[-1deg]">so you don&apos;t have to.</span>
         </h1>
+        <p className="mb-6 flex flex-wrap items-center gap-3 text-sm text-neo-gray-200">
+          <span className="inline-flex items-center gap-2">
+            <span className="font-bold uppercase tracking-widest text-neo-yellow">Last updated:</span>
+            <time dateTime="2026-05-13">May 13, 2026</time>
+          </span>
+          <span className="text-neo-gray-400">·</span>
+          <span>By the LexiClash Editorial Team — word-game players since 2024</span>
+        </p>
 
         <p className="mb-4 text-lg leading-relaxed text-neo-gray-200">
           We&apos;re word game people. The kind who play Wordle at midnight, keep three Words With Friends
