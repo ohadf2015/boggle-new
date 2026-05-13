@@ -444,6 +444,103 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
           </div>
         </section>
 
+        {/* Comparison Table — featured-snippet eligible */}
+        <section className="mb-12">
+          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">At-a-Glance Comparison</h2>
+          <p className="mb-4 text-sm text-neo-gray-200">
+            How the 9 best online word games of 2026 stack up on the features that actually matter — multiplayer, daily puzzles, free play, browser-based, and ad load.
+          </p>
+          <div className="overflow-x-auto rounded-neo border-3 border-neo-yellow shadow-hard">
+            <table className="w-full min-w-[640px] text-left text-sm">
+              <thead className="bg-neo-yellow text-neo-navy">
+                <tr>
+                  <th scope="col" className="px-3 py-2 font-neo-display uppercase tracking-wider">Game</th>
+                  <th scope="col" className="px-3 py-2 font-neo-display uppercase tracking-wider">Multiplayer</th>
+                  <th scope="col" className="px-3 py-2 font-neo-display uppercase tracking-wider">Daily Puzzle</th>
+                  <th scope="col" className="px-3 py-2 font-neo-display uppercase tracking-wider">Free</th>
+                  <th scope="col" className="px-3 py-2 font-neo-display uppercase tracking-wider">Browser</th>
+                  <th scope="col" className="px-3 py-2 font-neo-display uppercase tracking-wider">Best For</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neo-gray-400/30 bg-neo-navy-light/40">
+                <tr>
+                  <th scope="row" className="px-3 py-2 font-bold text-neo-pink">LexiClash</th>
+                  <td className="px-3 py-2 text-neo-lime">2-20 real-time</td>
+                  <td className="px-3 py-2 text-neo-lime">Wheel + Hunt</td>
+                  <td className="px-3 py-2 text-neo-lime">Yes</td>
+                  <td className="px-3 py-2 text-neo-lime">Yes</td>
+                  <td className="px-3 py-2">Real-time play with friends + groups</td>
+                </tr>
+                <tr>
+                  <th scope="row" className="px-3 py-2 font-bold">Wordle</th>
+                  <td className="px-3 py-2 text-neo-pink">No</td>
+                  <td className="px-3 py-2 text-neo-lime">1/day</td>
+                  <td className="px-3 py-2 text-neo-yellow">Freemium</td>
+                  <td className="px-3 py-2 text-neo-lime">Yes</td>
+                  <td className="px-3 py-2">2-min daily ritual</td>
+                </tr>
+                <tr>
+                  <th scope="row" className="px-3 py-2 font-bold">NYT Connections</th>
+                  <td className="px-3 py-2 text-neo-pink">No</td>
+                  <td className="px-3 py-2 text-neo-lime">1/day</td>
+                  <td className="px-3 py-2 text-neo-yellow">Freemium</td>
+                  <td className="px-3 py-2 text-neo-lime">Yes</td>
+                  <td className="px-3 py-2">Group dinner-table arguing</td>
+                </tr>
+                <tr>
+                  <th scope="row" className="px-3 py-2 font-bold">NYT Strands</th>
+                  <td className="px-3 py-2 text-neo-pink">No</td>
+                  <td className="px-3 py-2 text-neo-lime">1/day</td>
+                  <td className="px-3 py-2 text-neo-yellow">Freemium</td>
+                  <td className="px-3 py-2 text-neo-lime">Yes</td>
+                  <td className="px-3 py-2">Themed word-search lovers</td>
+                </tr>
+                <tr>
+                  <th scope="row" className="px-3 py-2 font-bold">NYT Spelling Bee</th>
+                  <td className="px-3 py-2 text-neo-pink">No</td>
+                  <td className="px-3 py-2 text-neo-lime">1/day</td>
+                  <td className="px-3 py-2 text-neo-yellow">Freemium</td>
+                  <td className="px-3 py-2 text-neo-lime">Yes</td>
+                  <td className="px-3 py-2">Vocabulary endurance</td>
+                </tr>
+                <tr>
+                  <th scope="row" className="px-3 py-2 font-bold">Words With Friends</th>
+                  <td className="px-3 py-2 text-neo-yellow">1v1 async</td>
+                  <td className="px-3 py-2 text-neo-pink">No</td>
+                  <td className="px-3 py-2 text-neo-yellow">Free w/ ads</td>
+                  <td className="px-3 py-2 text-neo-pink">App only</td>
+                  <td className="px-3 py-2">Async turn-based with 1 friend</td>
+                </tr>
+                <tr>
+                  <th scope="row" className="px-3 py-2 font-bold">Scrabble GO</th>
+                  <td className="px-3 py-2 text-neo-yellow">1v1 async</td>
+                  <td className="px-3 py-2 text-neo-pink">No</td>
+                  <td className="px-3 py-2 text-neo-yellow">Free w/ ads</td>
+                  <td className="px-3 py-2 text-neo-pink">App only</td>
+                  <td className="px-3 py-2">Traditional Scrabble rules</td>
+                </tr>
+                <tr>
+                  <th scope="row" className="px-3 py-2 font-bold">Wordscapes</th>
+                  <td className="px-3 py-2 text-neo-pink">No</td>
+                  <td className="px-3 py-2 text-neo-pink">No</td>
+                  <td className="px-3 py-2 text-neo-yellow">Free w/ ads</td>
+                  <td className="px-3 py-2 text-neo-pink">App only</td>
+                  <td className="px-3 py-2">Solo grind, 6000+ levels</td>
+                </tr>
+                <tr>
+                  <th scope="row" className="px-3 py-2 font-bold">Semantle / Contexto</th>
+                  <td className="px-3 py-2 text-neo-pink">No</td>
+                  <td className="px-3 py-2 text-neo-lime">1/day</td>
+                  <td className="px-3 py-2 text-neo-lime">Yes</td>
+                  <td className="px-3 py-2 text-neo-lime">Yes</td>
+                  <td className="px-3 py-2">Semantic-guessing puzzlers</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-3 text-xs text-neo-gray-300">Last updated: May 13, 2026. LexiClash is the only entry combining real-time multiplayer, daily puzzles, free play, and browser-based access.</p>
+        </section>
+
         {/* FAQ */}
         <section className="mb-12">
           <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>

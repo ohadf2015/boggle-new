@@ -21,9 +21,9 @@ const seoContent: Record<string, {
   faq: { question: string; answer: string }[];
 }> = {
   en: {
-    title: 'LexiClash Leaderboard — Global Rankings & Top Players',
+    title: 'Best Competitive Word Games — Global Leaderboards & Live Rankings',
     description:
-      'See who dominates LexiClash. The leaderboard tracks daily, weekly, and all-time top scorers across all game modes. Climb the ranks by playing consistently, finding long words, and mastering combo chains.',
+      'See who tops the best competitive word games with global leaderboards in 2026. LexiClash tracks daily, weekly, and all-time top scorers across all 8 game modes. Climb the ranks by playing consistently, finding long words, and mastering combo chains.',
     features: [
       'Daily, weekly, and all-time rankings updated in real time',
       'Separate leaderboards for Classic, Blast, Word Hunt, and Daily Challenge modes',
