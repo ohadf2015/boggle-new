@@ -1,12 +1,18 @@
 'use client'
 import { useEffect, useRef } from 'react'
-import { Calendar, Lock, LockOpen } from 'lucide-react'
+import Image from 'next/image'
+import { Calendar, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useWeeklyChest, type PendingChest } from '@/hooks/useWeeklyChest'
 import ChestProgressDots from './ChestProgressDots'
-import { cn } from '@/lib/utils'
 import gsap from 'gsap'
+
+const CHEST_IMG: Record<'bronze' | 'silver' | 'gold', string> = {
+  bronze: '/daily/chests/chest-bronze.jpg',
+  silver: '/daily/chests/chest-silver.jpg',
+  gold: '/daily/chests/chest-gold.jpg',
+}
 
 interface Props {
   onChestClaimed: (chest: PendingChest) => void
@@ -23,22 +29,49 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
     pendingChest,
     claim,
   } = useWeeklyChest()
-  const lockRef = useRef<HTMLDivElement>(null)
+  const chestRef = useRef<HTMLDivElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
 
+  // Card entrance (one-shot)
   useEffect(() => {
-    if (!isClaimable || !lockRef.current) return
+    if (!cardRef.current) return
     if (
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
     )
       return
-    const tween = gsap.to(lockRef.current, {
-      scale: 1.08,
-      yoyo: true,
-      repeat: -1,
-      duration: 0.8,
-      ease: 'sine.inOut',
+    gsap.from(cardRef.current, {
+      y: 16,
+      opacity: 0,
+      duration: 0.45,
+      ease: 'back.out(1.4)',
     })
+  }, [])
+
+  // Idle float; intensifies when claimable
+  useEffect(() => {
+    if (!chestRef.current) return
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    )
+      return
+    const tween = isClaimable
+      ? gsap.to(chestRef.current, {
+          scale: 1.12,
+          y: -3,
+          yoyo: true,
+          repeat: -1,
+          duration: 0.7,
+          ease: 'sine.inOut',
+        })
+      : gsap.to(chestRef.current, {
+          y: -2,
+          yoyo: true,
+          repeat: -1,
+          duration: 1.6,
+          ease: 'sine.inOut',
+        })
     return () => {
       tween.kill()
     }
@@ -51,14 +84,27 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
 
   if (loading) return null
 
-  const tier = pendingChest?.tier ?? 'silver'
+  const tier: 'bronze' | 'silver' | 'gold' = pendingChest?.tier ?? 'silver'
   const tierLabel = t(
     `daily.weeklyChest.tier${tier.charAt(0).toUpperCase() + tier.slice(1)}`
   )
 
   return (
-    <div className="rounded-neo border-2 border-black bg-neo-navy-light shadow-hard p-4 mb-4">
-      <div className="flex items-center justify-between mb-3">
+    <div
+      ref={cardRef}
+      className="w-full rounded-neo border-2 border-black bg-neo-navy-light shadow-hard p-4 relative overflow-hidden"
+    >
+      {isClaimable && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-60"
+          style={{
+            background:
+              'radial-gradient(ellipse at 85% 30%, rgba(255,225,53,0.18) 0%, transparent 55%)',
+          }}
+        />
+      )}
+      <div className="flex items-center justify-between mb-3 relative">
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-neo-cream/60" />
           <span className="font-neo-display font-black text-sm text-neo-white uppercase tracking-wider">
@@ -70,18 +116,28 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
         </span>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 relative">
         {cycleStart && (
           <ChestProgressDots
             completedDates={completedDates}
             cycleStart={cycleStart}
           />
         )}
-        <div ref={lockRef} className="ml-auto">
-          {isClaimable ? (
-            <LockOpen className="w-7 h-7 text-neo-yellow" />
-          ) : (
-            <Lock className="w-7 h-7 text-neo-white/40" />
+        <div ref={chestRef} className="ms-auto relative">
+          <Image
+            src={CHEST_IMG[tier]}
+            alt={tierLabel}
+            data-testid="chest-tier-thumb"
+            width={56}
+            height={56}
+            className="rounded-md border-2 border-neo-black shadow-hard-sm"
+            unoptimized
+          />
+          {isClaimable && (
+            <Sparkles
+              aria-hidden="true"
+              className="absolute -top-2 -end-2 w-4 h-4 text-neo-yellow drop-shadow"
+            />
           )}
         </div>
       </div>

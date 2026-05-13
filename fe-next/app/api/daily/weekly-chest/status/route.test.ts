@@ -1,9 +1,18 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterAll, beforeAll } from 'vitest'
 
 vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }))
 vi.mock('@/utils/logger', () => ({ __esModule: true, default: { error: vi.fn(), log: vi.fn(), warn: vi.fn() } }))
 // @/ alias not resolved for transitive imports in node env; re-export real module
 vi.mock('@/lib/daily/weeklyChest', () => import('../../../../../lib/daily/weeklyChest'))
+
+// Fixed "today" so date-dependent assertions stay stable as real time advances
+beforeAll(() => {
+  vi.useFakeTimers()
+  vi.setSystemTime(new Date('2026-05-12T12:00:00Z'))
+})
+afterAll(() => {
+  vi.useRealTimers()
+})
 
 import { createClient } from '@/utils/supabase/server'
 import { GET } from './route'

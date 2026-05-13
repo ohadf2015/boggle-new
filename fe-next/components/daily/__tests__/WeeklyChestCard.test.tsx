@@ -19,6 +19,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('gsap', () => ({
   default: {
     to: vi.fn().mockReturnValue({ kill: vi.fn() }),
+    from: vi.fn().mockReturnValue({ kill: vi.fn() }),
   },
 }))
 
@@ -98,5 +99,22 @@ describe('WeeklyChestCard', () => {
       content.includes('daily.weeklyChest.daysRemaining')
     )
     expect(text).toBeTruthy()
+  })
+
+  it('renders a tier chest image thumbnail', () => {
+    mockUseWeeklyChest.mockReturnValue({
+      ...defaultMockData,
+      pendingChest: { tier: 'gold', coins: 600, badgeId: 'b' },
+    })
+    render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+    const img = screen.getByTestId('chest-tier-thumb') as HTMLImageElement
+    expect(img).toBeTruthy()
+    expect(img.getAttribute('src') || '').toContain('chest-gold')
+  })
+
+  it('defaults to silver chest image when no pending tier', () => {
+    render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+    const img = screen.getByTestId('chest-tier-thumb') as HTMLImageElement
+    expect((img.getAttribute('src') || '')).toContain('chest-silver')
   })
 })

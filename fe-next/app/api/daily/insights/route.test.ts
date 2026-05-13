@@ -37,11 +37,12 @@ describe('GET /api/daily/insights', () => {
       { efficiency_score: 50, puzzle_date: '2026-05-10' },
       { efficiency_score: 55, puzzle_date: '2026-05-09' },
     ]
+    const mockPeers = [{ efficiency_score: 95 }, { efficiency_score: 40 }]
     vi.mocked(createClient).mockResolvedValue({
       auth: { getUser: async () => ({ data: { user: { id: 'u1' } }, error: null }) },
       from: vi.fn(() => ({
         select: vi.fn(() => ({
-          eq: vi.fn((k1: string, v1: string) => {
+          eq: vi.fn((k1: string) => {
             if (k1 === 'player_id') {
               return {
                 eq: vi.fn(() => ({
@@ -55,6 +56,9 @@ describe('GET /api/daily/insights', () => {
                 })),
               }
             }
+            if (k1 === 'puzzle_date') {
+              return { limit: async () => ({ data: mockPeers, error: null }) }
+            }
             return {}
           }),
         })),
@@ -64,5 +68,86 @@ describe('GET /api/daily/insights', () => {
     const body = await res.json()
     expect(Array.isArray(body.insights)).toBe(true)
     expect(body.insights.length).toBeLessThanOrEqual(3)
+  })
+
+  it('returns percentile insight when user is in top 20%', async () => {
+    // user score 90 beats 4 of 5 peers (incl self) → percentile = (4/5)*100 = 80 → top 20% → emit
+    const mockAttempt = { efficiency_score: 90, solved: false, attempts_used: 4 }
+    const mockHistory = [{ efficiency_score: 90 }, { efficiency_score: 60 }]
+    const mockRecent: Array<{ efficiency_score: number; puzzle_date: string }> = []
+    const mockPeers = [
+      { efficiency_score: 90 },
+      { efficiency_score: 50 },
+      { efficiency_score: 40 },
+      { efficiency_score: 30 },
+      { efficiency_score: 20 },
+    ]
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { getUser: async () => ({ data: { user: { id: 'u1' } }, error: null }) },
+      from: vi.fn(() => ({
+        select: vi.fn(() => ({
+          eq: vi.fn((k1: string) => {
+            if (k1 === 'player_id') {
+              return {
+                eq: vi.fn(() => ({ single: async () => ({ data: mockAttempt, error: null }) })),
+                order: vi.fn(() => ({ limit: async () => ({ data: mockHistory, error: null }) })),
+                gte: vi.fn(() => ({ order: vi.fn(async () => ({ data: mockRecent, error: null })) })),
+              }
+            }
+            if (k1 === 'puzzle_date') {
+              return { limit: async () => ({ data: mockPeers, error: null }) }
+            }
+            return {}
+          }),
+        })),
+      })),
+    } as never)
+    const res = await GET(req('word_hunt'))
+    const body = await res.json()
+    const types = body.insights.map((i: { type: string }) => i.type)
+    expect(types).toContain('percentile')
+    const p = body.insights.find((i: { type: string }) => i.type === 'percentile')
+    // top 20% — n should be ≤ 20
+    expect(p.subParams.n).toBeLessThanOrEqual(20)
+    expect(p.subParams.n).toBeGreaterThan(0)
+  })
+
+  it('skips percentile insight when user is below top 20%', async () => {
+    // user score 30 beats only 1 of 5 peers → 80th percentile from bottom → not top 20
+    const mockAttempt = { efficiency_score: 30, solved: false, attempts_used: 4 }
+    const mockHistory: Array<{ efficiency_score: number }> = []
+    const mockRecent: Array<{ efficiency_score: number; puzzle_date: string }> = []
+    const mockPeers = [
+      { efficiency_score: 90 },
+      { efficiency_score: 80 },
+      { efficiency_score: 70 },
+      { efficiency_score: 60 },
+      { efficiency_score: 30 },
+      { efficiency_score: 20 },
+    ]
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { getUser: async () => ({ data: { user: { id: 'u1' } }, error: null }) },
+      from: vi.fn(() => ({
+        select: vi.fn(() => ({
+          eq: vi.fn((k1: string) => {
+            if (k1 === 'player_id') {
+              return {
+                eq: vi.fn(() => ({ single: async () => ({ data: mockAttempt, error: null }) })),
+                order: vi.fn(() => ({ limit: async () => ({ data: mockHistory, error: null }) })),
+                gte: vi.fn(() => ({ order: vi.fn(async () => ({ data: mockRecent, error: null })) })),
+              }
+            }
+            if (k1 === 'puzzle_date') {
+              return { limit: async () => ({ data: mockPeers, error: null }) }
+            }
+            return {}
+          }),
+        })),
+      })),
+    } as never)
+    const res = await GET(req('word_hunt'))
+    const body = await res.json()
+    const types = body.insights.map((i: { type: string }) => i.type)
+    expect(types).not.toContain('percentile')
   })
 })

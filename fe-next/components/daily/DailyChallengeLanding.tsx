@@ -11,6 +11,7 @@ import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
 import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { getGuestFingerprint } from '@/utils/guestManager';
 import type { Language } from '@/types';
+import type { PendingChest } from '@/hooks/useWeeklyChest';
 
 import { ScoreGauntletBanner } from './ScoreGauntletBanner';
 import { DailyRewardPreview } from './DailyRewardPreview';
@@ -22,6 +23,9 @@ import { StreakCounter } from './landing/StreakCounter';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import { ConfettiBackground } from './landing/ConfettiBackground';
 import { FloatingDecorations } from './landing/FloatingDecorations';
+import WeeklyChestCard from './WeeklyChestCard';
+import WeeklyChestModal from './WeeklyChestModal';
+import DailyInsightStack from './DailyInsightStack';
 
 interface DailyChallengeLandingProps {
   onSelectWordHunt: () => void;
@@ -60,6 +64,7 @@ export function DailyChallengeLanding({
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
   // Defer Date.now()-derived value to client to avoid hydration mismatch (React #418)
   const [todayIso, setTodayIso] = useState<string>('');
+  const [claimedChest, setClaimedChest] = useState<PendingChest | null>(null);
 
   useEffect(() => {
     setGuestFingerprint(getGuestFingerprint());
@@ -359,6 +364,33 @@ export function DailyChallengeLanding({
           buttonText={t('daily.startQuest')}
           delay={0.25}
         />
+      )}
+
+      {/* Insights: surface "you improved" / "personal best" inline once any mode complete */}
+      {user && todayIso && (wordHuntStatus === 'won' || wordWheelPlayed) && (
+        <div className="w-full">
+          <DailyInsightStack
+            mode={wordHuntStatus === 'won' ? 'word_hunt' : 'word_wheel'}
+            date={todayIso}
+          />
+        </div>
+      )}
+
+      {/* Weekly Chest: 7-day progress + tier reward (authed only — guest has no server cycle) */}
+      {user && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 25 }}
+          className="w-full"
+          data-testid="weekly-chest-slot"
+        >
+          <WeeklyChestCard onChestClaimed={setClaimedChest} />
+        </motion.div>
+      )}
+
+      {claimedChest && (
+        <WeeklyChestModal chest={claimedChest} onClose={() => setClaimedChest(null)} />
       )}
 
       {/* Streak counter + freeze */}

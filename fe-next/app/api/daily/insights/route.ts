@@ -48,6 +48,20 @@ export async function GET(req: NextRequest) {
         subKey: 'daily.insights.firstTry.sub', subParams: { n: 8 }, lucideIcon: 'Target' })
     }
 
+    // Percentile vs all players today (top 20% only)
+    const { data: peers } = await supabase
+      .from('daily_word_hunt_attempts').select('efficiency_score')
+      .eq('puzzle_date', date).limit(500)
+    const peerScores = (peers ?? []).map((r: { efficiency_score: number }) => r.efficiency_score ?? 0)
+    if (peerScores.length >= 5) {
+      const below = peerScores.filter((s: number) => s < score).length
+      const rankPct = Math.max(1, Math.round(100 - (below / peerScores.length) * 100))
+      if (rankPct <= 20) {
+        insights.push({ type: 'percentile', headlineKey: 'daily.insights.percentile.headline',
+          subKey: 'daily.insights.percentile.sub', subParams: { n: rankPct }, lucideIcon: 'Zap' })
+      }
+    }
+
     // Speed vs 30-day average
     const cutoff = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0]
     const { data: recent } = await supabase
