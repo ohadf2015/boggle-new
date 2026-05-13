@@ -44,6 +44,8 @@ export type PushNotificationType =
   | 'challenge_accepted'
   | 'challenge_declined'
   | 'challenge_result'
+  | 'async_challenge_received'
+  | 'async_challenge_result'
   | 'gift_received'
   | 'level_up'
   | 'season_start';
@@ -59,6 +61,8 @@ const NOTIFICATION_TYPE_MAP: Record<PushNotificationType, string> = {
   challenge_accepted: 'social',
   challenge_declined: 'social',
   challenge_result: 'social',
+  async_challenge_received: 'social',
+  async_challenge_result: 'social',
   gift_received: 'social',
   turn_reminder: 'social',
   achievement: 'achievement',
@@ -540,6 +544,79 @@ export async function notifyChallengeResult(
       deepLink: '/friends',
       challengeId,
       outcome,
+    },
+  }, 'both');
+}
+
+/**
+ * Notify friend that an async friend challenge has arrived for them.
+ * Spec: fe-next/docs/specs/2026-05-13-friend-challenge-async-design.md §4.6
+ * Deep-links to /friend-challenge/{challengeId} so the friend lands on the
+ * accept/decline page that shows the target score.
+ */
+export async function notifyAsyncChallengeReceived(
+  toUserId: string,
+  fromUsername: string,
+  challengeId: string,
+  targetScore: number,
+  gameMode: string,
+): Promise<void> {
+  const locale = await getUserLocale(toUserId);
+  return triggerPush(toUserId, 'async_challenge_received', {
+    title: translatePush(locale, 'asyncChallenge.received.title', { sender: fromUsername }),
+    body: translatePush(locale, 'asyncChallenge.received.body', {
+      score: String(targetScore),
+      mode: gameMode,
+    }),
+    imageUrl: mascotImageUrl('play'),
+    data: {
+      type: 'async_challenge_received',
+      deepLink: `/friend-challenge/${challengeId}`,
+      challengeId,
+      targetScore: String(targetScore),
+      gameMode,
+    },
+  }, 'both');
+}
+
+/**
+ * Notify a participant of an async friend challenge result (both sides fire).
+ * Spec: fe-next/docs/specs/2026-05-13-friend-challenge-async-design.md §4.6
+ */
+export async function notifyAsyncChallengeResult(
+  toUserId: string,
+  opponentUsername: string,
+  challengeId: string,
+  didWin: boolean,
+  myScore: number,
+  theirScore: number,
+): Promise<void> {
+  const locale = await getUserLocale(toUserId);
+  const isTie = myScore === theirScore;
+  const outcome: 'win' | 'loss' | 'tie' = isTie ? 'tie' : didWin ? 'win' : 'loss';
+  const titleKey =
+    outcome === 'win' ? 'asyncChallenge.result.titleWin'
+    : outcome === 'loss' ? 'asyncChallenge.result.titleLoss'
+    : 'asyncChallenge.result.titleTie';
+  const bodyKey =
+    outcome === 'win' ? 'asyncChallenge.result.bodyWin'
+    : outcome === 'loss' ? 'asyncChallenge.result.bodyLoss'
+    : 'asyncChallenge.result.bodyTie';
+  return triggerPush(toUserId, 'async_challenge_result', {
+    title: translatePush(locale, titleKey, { opponent: opponentUsername }),
+    body: translatePush(locale, bodyKey, {
+      opponent: opponentUsername,
+      mine: String(myScore),
+      theirs: String(theirScore),
+    }),
+    imageUrl: mascotImageUrl(outcome === 'win' ? 'celebration' : outcome === 'loss' ? 'crying' : 'play'),
+    data: {
+      type: 'async_challenge_result',
+      deepLink: `/friend-challenge/${challengeId}`,
+      challengeId,
+      outcome,
+      mine: String(myScore),
+      theirs: String(theirScore),
     },
   }, 'both');
 }
