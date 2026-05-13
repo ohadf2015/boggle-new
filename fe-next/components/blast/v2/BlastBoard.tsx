@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import { LayoutGroup, AnimatePresence } from 'framer-motion';
 import type { BlastLevel, CellId } from '@/lib/blast/v2/types';
 import { cellId as makeCellId, type SelectionState } from '@/lib/blast/v2/engine';
@@ -43,43 +43,41 @@ export function BlastBoard({
   const tileState = (id: CellId): BlastTileState => (selectedSet.has(id) ? 'selected' : 'normal');
   const dir = config.rtl ? 'rtl' : 'ltr';
 
-  const lastEnteredRef = useRef<CellId | null>(null);
-  const selectionMode = selection.kind === 'active' ? selection.mode : null;
-  const handleBoardPointerMove = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
-      if (selectionMode !== 'drag') return;
+  // Window-level pointermove + elementFromPoint hit-test.
+  // Per-tile onPointerEnter does NOT fire on touch (Capacitor WKWebView
+  // implicit-capture); window-level pointermove with hit-test is the
+  // only mobile-safe way to track drag across siblings.
+  const isDragging = selection.kind === 'active' && selection.mode === 'drag';
+  const lastEnterRef = useRef<CellId | null>(null);
+  useEffect(() => {
+    if (!isDragging) {
+      lastEnterRef.current = null;
+      return;
+    }
+    const onMove = (e: PointerEvent) => {
       const el = document.elementFromPoint(e.clientX, e.clientY);
-      if (!el) return;
-      const tileEl = (el as HTMLElement).closest('[data-cell-id]') as HTMLElement | null;
-      if (!tileEl) return;
-      const id = tileEl.getAttribute('data-cell-id') as CellId | null;
-      if (!id) return;
-      if (lastEnteredRef.current === id) return;
-      lastEnteredRef.current = id;
-      onPointerEnter(id);
-    },
-    [selectionMode, onPointerEnter]
-  );
-
-  const handleTilePointerDown = useCallback(
-    (id: CellId, e: React.PointerEvent<HTMLDivElement>) => {
-      // Release implicit pointer capture so board-level pointermove + elementFromPoint
-      // can route drag to sibling tiles (touch devices capture by default).
-      try {
-        (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
-      } catch {
-        /* ignore — capture release is best-effort */
+      const tile = el instanceof Element ? el.closest('[data-cell-id]') : null;
+      if (tile instanceof HTMLElement) {
+        const id = tile.dataset.cellId as CellId | undefined;
+        if (id && id !== lastEnterRef.current) {
+          lastEnterRef.current = id;
+          onPointerEnter(id);
+        }
       }
-      lastEnteredRef.current = id;
-      onPointerDown(id);
-    },
-    [onPointerDown]
-  );
-
-  const cols = level.columns.length;
-  // Scale tile size by column count so the board fills its container snugly
-  // regardless of grid width (3 cols = chunky tiles; 6 cols = compact).
-  const tileSize = `min(calc((100% - ${(cols - 1) * 8 + 24}px) / ${cols}), ${Math.round(88 - Math.max(0, cols - 4) * 6)}px)`;
+    };
+    const onUp = () => {
+      lastEnterRef.current = null;
+      onPointerUp();
+    };
+    window.addEventListener('pointermove', onMove, { passive: true });
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+  }, [isDragging, onPointerEnter, onPointerUp]);
 
   return (
     <div
@@ -87,10 +85,9 @@ export function BlastBoard({
       dir={dir}
       data-shake-key={invalidShakeKey}
       data-testid="blast-board"
-      className="relative mx-auto flex items-end justify-center gap-2 px-3 pb-3 pt-2 touch-none"
-      style={{ ['--blast-tile-size' as string]: tileSize }}
+      className="relative flex items-end justify-center gap-2 p-4 touch-none select-none"
+      style={{ touchAction: 'none' }}
       onPointerUp={onPointerUp}
-      onPointerMove={handleBoardPointerMove}
     >
       <LayoutGroup>
         {level.columns.map((col) => (
@@ -109,7 +106,8 @@ export function BlastBoard({
                     state={tileState(id)}
                     modeColor={modeColor}
                     fontStack={config.fontStack}
-                    onPointerDown={(e) => handleTilePointerDown(id, e)}
+                    paddingExtra={config.tileExtraPadding}
+                    onPointerDown={() => onPointerDown(id)}
                   />
                 );
               })}

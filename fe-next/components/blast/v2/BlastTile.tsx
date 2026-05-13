@@ -1,5 +1,4 @@
 'use client';
-import type React from 'react';
 import { motion } from 'framer-motion';
 import type { CellId, TileFlag } from '@/lib/blast/v2/types';
 import styles from './BlastTile.module.css';
@@ -13,8 +12,10 @@ type Props = {
   state: BlastTileState;
   modeColor?: string;
   fontStack: string;
+  paddingExtra?: number;
   displayChar?: string;
-  onPointerDown?: (e: React.PointerEvent<HTMLDivElement>) => void;
+  onPointerDown?: () => void;
+  onPointerEnter?: () => void;
   onPointerUp?: () => void;
 };
 
@@ -25,8 +26,10 @@ export function BlastTile({
   state,
   modeColor = '#ec4899',
   fontStack,
+  paddingExtra,
   displayChar,
   onPointerDown,
+  onPointerEnter,
   onPointerUp,
 }: Props) {
   const frozen = flags.includes('frozen');
@@ -43,15 +46,21 @@ export function BlastTile({
       className={styles.tile}
       style={{
         fontFamily: fontStack,
+        padding: 8 + (paddingExtra ?? 0),
         background: frozen ? '#bae6fd' : modeColor,
         opacity: frozen ? 0.6 : 1,
       }}
+      whileTap={{ scale: 0.95 }}
       animate={state === 'selected' ? { scale: 1.05, y: -4 } : { scale: 1, y: 0 }}
       exit={state === 'just-cleared' ? { scale: 0, opacity: 0, rotate: 8 } : undefined}
       onPointerDown={(e) => {
-        e.preventDefault();
-        onPointerDown?.(e);
+        // Release implicit pointer capture so window-level pointermove
+        // can hit-test other tiles during a touch drag.
+        const t = e.currentTarget as Element & { releasePointerCapture?: (id: number) => void };
+        t.releasePointerCapture?.(e.pointerId);
+        onPointerDown?.();
       }}
+      onPointerEnter={() => onPointerEnter?.()}
       onPointerUp={() => onPointerUp?.()}
     >
       <span className={styles.letter}>{displayChar ?? letter}</span>

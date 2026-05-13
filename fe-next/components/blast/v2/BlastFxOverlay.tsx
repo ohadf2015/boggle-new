@@ -1,51 +1,30 @@
 'use client';
 import { useEffect, useRef } from 'react';
+import * as PIXI from 'pixi.js';
 
 export function BlastFxOverlay() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const appRef = useRef<PIXI.Application | null>(null);
 
   useEffect(() => {
-    if (!containerRef.current) return;
-    const container = containerRef.current;
-    let cancelled = false;
-    let appInstance: import('pixi.js').Application | null = null;
-
-    (async () => {
-      const PIXI = await import('pixi.js');
-      if (cancelled || !container) return;
-
-      const app = new PIXI.Application();
-      try {
-        await app.init({
-          backgroundAlpha: 0,
-          antialias: true,
-          width: 400,
-          height: 600,
-        });
-      } catch {
-        return;
-      }
-      if (cancelled) {
-        app.destroy(true, { children: true, texture: true });
-        return;
-      }
-
-      appInstance = app;
-      app.canvas.style.position = 'absolute';
-      app.canvas.style.inset = '0';
-      app.canvas.style.pointerEvents = 'none';
-      container.appendChild(app.canvas);
-    })();
-
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const parent = canvas.parentElement ?? undefined;
+    const app = new PIXI.Application({
+      view: canvas,
+      resizeTo: parent,
+      backgroundAlpha: 0,
+      antialias: true,
+    });
+    appRef.current = app;
     return () => {
-      cancelled = true;
-      appInstance?.destroy(true, { children: true, texture: true });
+      app.destroy();
     };
   }, []);
 
   return (
-    <div
-      ref={containerRef}
+    <canvas
+      ref={canvasRef}
       data-testid="blast-fx"
       className="absolute inset-0 pointer-events-none"
       style={{ zIndex: 10 }}
