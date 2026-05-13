@@ -16,7 +16,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { cn } from '@/lib/utils';
 import { GraduationCap, Users, BookOpen, Mail, ShieldCheck } from 'lucide-react';
 
-export default function TeacherProfilePageClient() {
+function TeacherProfileInner() {
   const { user, profile, loading, isAuthenticated } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
@@ -183,4 +183,10 @@ export default function TeacherProfilePageClient() {
       </div>
     </div>
   );
+}
+
+import { TeacherGate } from '@/components/education/TeacherGate';
+
+export default function TeacherProfilePage() {
+  return <TeacherGate><TeacherProfileInner /></TeacherGate>;
 }

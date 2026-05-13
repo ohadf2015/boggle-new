@@ -134,6 +134,10 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
             : 'header_or_menu';
         trackSignupCompleted(source);
         consumePendingSignupCompletion();
+        // Allowlist bridge: if this email was pre-approved for teacher access, consume the entry.
+        if (user?.email) {
+          fetch('/api/education/consume-allowlist', { method: 'POST' }).catch(() => {});
+        }
         // Auto-friend the inviter if a `?ref=<username>` was captured from an
         // invite link before this signup. Dynamic import avoids a hard cycle
         // between AuthContext and friends utilities. Result is dispatched as a

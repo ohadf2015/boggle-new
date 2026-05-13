@@ -46,7 +46,7 @@ export interface AnalyticsPageClientProps {
 // COMPONENT
 // ============================================
 
-export function AnalyticsPageClient({ classroomId, locale }: AnalyticsPageClientProps) {
+function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientProps) {
   const { user, loading: authLoading } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
@@ -300,4 +300,10 @@ export function AnalyticsPageClient({ classroomId, locale }: AnalyticsPageClient
       </div>
     </div>
   );
+}
+
+import { TeacherGate } from '@/components/education/TeacherGate';
+
+export function AnalyticsPageClient({ classroomId, locale }: AnalyticsPageClientProps) {
+  return <TeacherGate><AnalyticsPageClientInner classroomId={classroomId} locale={locale} /></TeacherGate>;
 }

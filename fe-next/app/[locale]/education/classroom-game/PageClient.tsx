@@ -10,7 +10,7 @@ import { ClassroomGameLobby } from '@/components/education/ClassroomGameLobby';
 import { cn } from '@/lib/utils';
 
 /**
- * Classroom Game Page
+ * ClassroomGameInner
  *
  * Education-specific multiplayer game that:
  * - Uses vocabulary from teacher's lessons (optional pre-selection via URL)
@@ -20,7 +20,7 @@ import { cn } from '@/lib/utils';
  *
  * lessonId is optional — when omitted, the lobby lets the teacher pick lessons.
  */
-export default function ClassroomGamePageClient() {
+function ClassroomGameInner() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
@@ -70,4 +70,10 @@ export default function ClassroomGamePageClient() {
       </main>
     </div>
   );
+}
+
+import { TeacherGate } from '@/components/education/TeacherGate';
+
+export default function ClassroomGamePage() {
+  return <TeacherGate><ClassroomGameInner /></TeacherGate>;
 }

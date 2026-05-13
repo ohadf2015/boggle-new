@@ -17,11 +17,11 @@ import { StudentProgressReport } from '@/components/teacher/reports/StudentProgr
 import { ClassProgressReport } from '@/components/teacher/reports/ClassProgressReport';
 
 /**
- * ReportsPageClient - Teacher Reports Page
+ * TeacherReportsInner - Teacher Reports Page
  *
  * Shows class and student progress reports with navigation between views.
  */
-export default function ReportsPageClient() {
+function TeacherReportsInner() {
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const router = useRouter();
@@ -155,4 +155,10 @@ export default function ReportsPageClient() {
       </div>
     </div>
   );
+}
+
+import { TeacherGate } from '@/components/education/TeacherGate';
+
+export default function TeacherReportsPage() {
+  return <TeacherGate><TeacherReportsInner /></TeacherGate>;
 }

@@ -13,7 +13,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 
 type Tab = 'lobby' | 'history' | 'classmates';
 
-export default function DuelsPageClient() {
+function DuelsPageClientInner() {
   const { user } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
@@ -127,4 +127,10 @@ export default function DuelsPageClient() {
       )}
     </div>
   );
+}
+
+import { TeacherGate } from '@/components/education/TeacherGate';
+
+export default function DuelsPage() {
+  return <TeacherGate><DuelsPageClientInner /></TeacherGate>;
 }

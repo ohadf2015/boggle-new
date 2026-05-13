@@ -9,7 +9,7 @@ import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import { Shield, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export default function TeacherPageClient() {
+function TeacherDashboardInner() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { user, profile, isAdmin, loading: authLoading } = useAuth();
@@ -67,4 +67,10 @@ export default function TeacherPageClient() {
   }
 
   return <TeacherDashboard />;
+}
+
+import { TeacherGate } from '@/components/education/TeacherGate';
+
+export default function TeacherPage() {
+  return <TeacherGate><TeacherDashboardInner /></TeacherGate>;
 }

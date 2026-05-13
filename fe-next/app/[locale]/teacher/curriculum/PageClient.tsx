@@ -15,11 +15,11 @@ import { CurriculumWordListBrowser } from '@/components/teacher/curriculum/Curri
 import { VocabularyLesson } from '@/lib/supabase/education';
 
 /**
- * CurriculumPageClient - Teacher Curriculum Page
+ * TeacherCurriculumInner - Teacher Curriculum Page
  *
  * Shows curriculum-aligned word lists with filtering and import functionality.
  */
-export default function CurriculumPageClient() {
+function TeacherCurriculumInner() {
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const router = useRouter();
@@ -55,4 +55,10 @@ export default function CurriculumPageClient() {
       </main>
     </div>
   );
+}
+
+import { TeacherGate } from '@/components/education/TeacherGate';
+
+export default function TeacherCurriculumPage() {
+  return <TeacherGate><TeacherCurriculumInner /></TeacherGate>;
 }
