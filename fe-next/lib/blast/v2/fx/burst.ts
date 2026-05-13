@@ -3,6 +3,13 @@ import gsap from 'gsap';
 import { loadTexture } from './spritesheets';
 import type { CellId } from '../types';
 
+export function hexToNum(hex: string, fallback = 0xbfff00): number {
+  const clean = hex.startsWith('#') ? hex.slice(1) : hex;
+  if (!/^[0-9a-fA-F]{6}$/.test(clean)) return fallback;
+  const n = parseInt(clean, 16);
+  return n >= 0 && n <= 0xffffff ? n : fallback;
+}
+
 function vibrateMedium(isHapticsEnabled: boolean) {
   if (!isHapticsEnabled || !navigator.vibrate) return;
   navigator.vibrate([40, 20, 40]);
@@ -50,7 +57,7 @@ export async function playWordFoundFx(
       const sprite = new PIXI.Sprite(tex);
       sprite.x = x;
       sprite.y = y;
-      sprite.tint = parseInt(modeColor.replace('#', '0x'));
+      sprite.tint = hexToNum(modeColor);
       pixiStage.addChild(sprite);
 
       let frameIndex = 0;
@@ -89,7 +96,7 @@ export async function playCascadeFx(
       const boardRect = board.getBoundingClientRect();
       sprite.x = rect.left - boardRect.left + rect.width / 2;
       sprite.y = rect.top - boardRect.top + rect.height / 2;
-      sprite.tint = parseInt(modeColor.replace('#', '0x'));
+      sprite.tint = hexToNum(modeColor);
       pixiStage.addChild(sprite);
 
       let frameIndex = 0;
