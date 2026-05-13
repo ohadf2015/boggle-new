@@ -6263,12 +6263,49 @@ const en = {
       },
       "sent": "Challenge sent!",
       "accept": "Accept",
+      "acceptAndPlay": "Accept & Play",
       "accepted": "Challenge accepted!",
       "acceptFailed": "Failed to accept challenge",
       "decline": "Decline",
       "declined": "Challenge declined",
+      "declineFailed": "Failed to decline challenge",
       "friendAccepted": "{{name}} accepted your challenge!",
       "received": "Challenge received!",
+      "playNow": "Play Now",
+      "waitingForFriend": "Waiting for {name} to play…",
+      "targetScoreLabel": "Score to beat",
+      "targetScore": "Beat {score} to win",
+      "yourScore": "You",
+      "theirScore": "Them",
+      "declinedNotice": "This challenge was declined.",
+      "expiredNotice": "This challenge expired.",
+      "expiredUnfinishedNotice": "This challenge ran out of time before being finished.",
+      "title": {
+        "youSent": "Your Challenge",
+        "youReceived": "Friend Challenge"
+      },
+      "flowPicker": {
+        "label": "Challenge type",
+        "async": "Beat my score",
+        "live": "Play live"
+      },
+      "async": {
+        "subcopy": "You play first. Your friend gets pushed your score to beat.",
+        "playInstruction": "Play your game now — we'll send the challenge after.",
+        "sent": "Challenge sent to {name}!"
+      },
+      "live": {
+        "subcopy": "Real-time race. Both of you play together when they accept."
+      },
+      "cta": {
+        "async": "Play & Send",
+        "live": "Send Live Challenge"
+      },
+      "result": {
+        "win": "You won! {mine} vs {theirs}",
+        "loss": "You lost. {mine} vs {theirs}",
+        "tie": "It's a tie! {mine} vs {theirs}"
+      },
       "errors": {
         "notFriends": "You need to be friends to challenge each other.",
         "rateLimited": "Slow down — give it a moment before trying again.",
@@ -6276,6 +6313,7 @@ const en = {
         "validation": "Couldn't send the challenge. Check the details and retry."
       }
     },
+    "backToFriends": "Back to friends",
     "copyInviteLink": "Copy invite link",
     "linkCopied": "Link copied!",
     "invitedByTitle": "{name} invited you!",
