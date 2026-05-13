@@ -337,6 +337,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       .eq('language', language)
       .gt('word_count', 0);
 
+    res.set('Cache-Control', 'public, max-age=20, s-maxage=20, stale-while-revalidate=60');
     res.json({
       data: rerankedData,
       totalParticipants: rerankedData.length,
@@ -396,6 +397,7 @@ router.get('/alltime-leaderboard/:language', async (req: Request<{ language: str
       .select('*', { count: 'exact', head: true })
       .eq('language', language);
 
+    res.set('Cache-Control', 'public, max-age=60, s-maxage=60, stale-while-revalidate=180');
     res.json({
       data: data || [],
       totalParticipants: count || data?.length || 0,

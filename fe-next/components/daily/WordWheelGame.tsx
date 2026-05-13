@@ -97,6 +97,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
   useEffect(() => {
     let cancelled = false;
+    let interval: ReturnType<typeof setInterval> | null = null;
     const fetchRivals = async () => {
       try {
         const today = new Date().toISOString().split('T')[0];
@@ -117,11 +118,34 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         setRivals(list);
       } catch { /* leaderboard is best-effort */ }
     };
+    const startPolling = () => {
+      if (interval) return;
+      interval = setInterval(fetchRivals, 60_000);
+    };
+    const stopPolling = () => {
+      if (interval) { clearInterval(interval); interval = null; }
+    };
+    const handleVisibility = () => {
+      if (typeof document === 'undefined') return;
+      if (document.hidden) {
+        stopPolling();
+      } else {
+        void fetchRivals();
+        startPolling();
+      }
+    };
     void fetchRivals();
-    // Refresh every 30s so late finishers who post higher scores during your
-    // game still appear in the pass-detection list.
-    const interval = setInterval(fetchRivals, 30_000);
-    return () => { cancelled = true; clearInterval(interval); };
+    startPolling();
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibility);
+    }
+    return () => {
+      cancelled = true;
+      stopPolling();
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibility);
+      }
+    };
   }, [language]);
 
   // Closest rival above me + pass detection

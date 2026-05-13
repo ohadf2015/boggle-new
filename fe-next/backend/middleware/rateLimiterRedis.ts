@@ -55,11 +55,39 @@ function getConnectionRateLimiter(): RateLimiterAbstract {
   return _connectionRateLimiter;
 }
 
+// Idempotent, high-poll-rate read paths that are safe to exempt from the
+// global per-IP HTTP limiter. Polled by /daily on 30s intervals, multiplied
+// across NAT'd users sharing IPs — they consumed disproportionate budget
+// while doing no mutation. Per-route protection lives at the route level
+// (DB query already lightweight + Cache-Control headers recommend client/CDN
+// cache).
+const RATE_LIMIT_EXEMPT_GET_PREFIXES = [
+  '/api/daily-challenge/word-hunt/leaderboard',
+  '/api/daily-challenge/word-hunt/alltime-leaderboard',
+  '/api/daily-challenge/word-wheel/leaderboard',
+  '/api/daily-challenge/word-wheel/alltime-leaderboard',
+  '/api/daily-challenge/leaderboard',
+  '/api/leaderboard',
+  '/api/single-player/leaderboard',
+];
+
+function isRateLimitExempt(req: { method?: string; path?: string }): boolean {
+  if (req.method !== 'GET') return false;
+  const path = req.path ?? '';
+  for (const prefix of RATE_LIMIT_EXEMPT_GET_PREFIXES) {
+    if (path.startsWith(prefix)) return true;
+  }
+  return false;
+}
+
 /**
  * Express middleware for HTTP rate limiting
  */
 export function httpRateLimitMiddleware() {
   return async (req: any, res: any, next: any) => {
+    if (isRateLimitExempt(req)) {
+      return next();
+    }
     // Use rightmost IP from X-Forwarded-For (proxy-appended, not client-controlled)
     const forwardedFor = req.headers['x-forwarded-for'];
     const forwardedIps = typeof forwardedFor === 'string' ? forwardedFor.split(',').map((s: string) => s.trim()).filter(Boolean) : [];

@@ -500,6 +500,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
 
     logger.info('API', `[WordHunt Leaderboard] ${date}/${language}: leaderboard=${totalParticipants}, totalPlayers=${totalPlayers}, totalSolved=${totalSolved}, guests=${guestPlayerCount}`);
 
+    res.set('Cache-Control', 'public, max-age=20, s-maxage=20, stale-while-revalidate=60');
     res.json({
       data: rerankedData,
       totalParticipants,
@@ -826,6 +827,7 @@ router.get('/alltime-leaderboard/:language', async (req: Request<{ language: str
       logger.warn('API', `Word Hunt all-time leaderboard count error: ${countError.message}`);
     }
 
+    res.set('Cache-Control', 'public, max-age=60, s-maxage=60, stale-while-revalidate=180');
     res.json({
       data: data || [],
       totalParticipants: count || data?.length || 0,

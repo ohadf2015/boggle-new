@@ -49,7 +49,7 @@ describe('rateLimiterRedis', () => {
 
     it('allows requests within limit and sets headers', async () => {
       const middleware = httpRateLimitMiddleware();
-      const req = { ip: 'test-http-ip', headers: {} };
+      const req = { ip: 'test-http-ip', method: 'POST', path: '/api/scores/sync', headers: {} };
       const headers: Record<string, unknown> = {};
       const res = {
         setHeader: (k: string, v: unknown) => { headers[k] = v; },
@@ -60,8 +60,50 @@ describe('rateLimiterRedis', () => {
 
       await middleware(req, res, next);
       expect(next).toHaveBeenCalled();
-      expect(headers['RateLimit-Limit']).toBe(100);
+      expect(headers['RateLimit-Limit']).toBe(600);
       expect(headers['RateLimit-Remaining']).toBeGreaterThanOrEqual(0);
+    });
+
+    it('skips limiter on idempotent leaderboard GETs', async () => {
+      const middleware = httpRateLimitMiddleware();
+      const paths = [
+        '/api/daily-challenge/word-hunt/leaderboard/2026-05-14/en',
+        '/api/daily-challenge/word-hunt/alltime-leaderboard/en',
+        '/api/daily-challenge/word-wheel/leaderboard/2026-05-14/he',
+        '/api/daily-challenge/word-wheel/alltime-leaderboard/he',
+        '/api/daily-challenge/leaderboard/2026-05-14/en',
+        '/api/leaderboard',
+        '/api/single-player/leaderboard',
+      ];
+      for (const path of paths) {
+        const req = { method: 'GET', path, headers: {}, ip: 'skip-ip' };
+        const headers: Record<string, unknown> = {};
+        const res = {
+          setHeader: (k: string, v: unknown) => { headers[k] = v; },
+          status: () => res,
+          json: () => {},
+        };
+        const next = vi.fn();
+        await middleware(req, res, next);
+        expect(next).toHaveBeenCalled();
+        // Skipped path: no rate-limit headers set
+        expect(headers['RateLimit-Limit']).toBeUndefined();
+      }
+    });
+
+    it('does NOT skip POST on a leaderboard path', async () => {
+      const middleware = httpRateLimitMiddleware();
+      const req = { method: 'POST', path: '/api/daily-challenge/word-hunt/leaderboard/2026-05-14/en', headers: {}, ip: 'post-ip' };
+      const headers: Record<string, unknown> = {};
+      const res = {
+        setHeader: (k: string, v: unknown) => { headers[k] = v; },
+        status: () => res,
+        json: () => {},
+      };
+      const next = vi.fn();
+      await middleware(req, res, next);
+      expect(next).toHaveBeenCalled();
+      expect(headers['RateLimit-Limit']).toBe(600);
     });
   });
 });
