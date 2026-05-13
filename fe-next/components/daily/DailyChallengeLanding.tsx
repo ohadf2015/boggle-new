@@ -14,12 +14,8 @@ import type { Language } from '@/types';
 import type { PendingChest } from '@/hooks/useWeeklyChest';
 
 import { ScoreGauntletBanner } from './ScoreGauntletBanner';
-import { DailyRewardPreview } from './DailyRewardPreview';
-import { StreakFreezeIndicator } from './StreakFreezeIndicator';
-import WatchAdForFreezeButton from './WatchAdForFreezeButton';
 import { DailyMissionsHeader } from './landing/DailyMissionsHeader';
 import { QuestCard } from './landing/QuestCard';
-import { StreakCounter } from './landing/StreakCounter';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import { ConfettiBackground } from './landing/ConfettiBackground';
 import { FloatingDecorations } from './landing/FloatingDecorations';
@@ -60,7 +56,6 @@ export function DailyChallengeLanding({
 
   // Word Wheel status from localStorage (no server endpoint for it yet)
   const [wordWheelStatus, setWordWheelStatus] = useState<'new' | 'played'>('new');
-  const [freezeCount, setFreezeCount] = useState(0);
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
   // Defer Date.now()-derived value to client to avoid hydration mismatch (React #418)
   const [todayIso, setTodayIso] = useState<string>('');
@@ -80,35 +75,15 @@ export function DailyChallengeLanding({
         ? 'won'
         : 'lost';
 
-  const streak = dailyStatus.currentStreak;
-
   // Check Word Wheel status from localStorage
   const checkWordWheelStatus = () => {
     const wwPlayed = hasPlayedWordWheelToday(currentLanguage);
     setWordWheelStatus(wwPlayed ? 'played' : 'new');
   };
 
-  // Fetch streak freeze count (authed users only — guests have no server streak)
-  const fetchFreezeCount = async () => {
-    if (!user?.id) {
-      setFreezeCount(0);
-      return;
-    }
-    try {
-      const res = await fetch('/api/streak');
-      if (res.ok) {
-        const data = await res.json();
-        setFreezeCount(data.freezesAvailable ?? 0);
-      }
-    } catch {
-      // Freeze count is optional — fail silently
-    }
-  };
-
-  // Initial check + fetch
+  // Initial check
   useEffect(() => {
     checkWordWheelStatus();
-    fetchFreezeCount();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLanguage, user?.id]);
 
@@ -118,7 +93,6 @@ export function DailyChallengeLanding({
       if (document.visibilityState === 'visible') {
         checkWordWheelStatus();
         dailyStatus.refresh();
-        fetchFreezeCount();
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -392,18 +366,6 @@ export function DailyChallengeLanding({
       {claimedChest && (
         <WeeklyChestModal chest={claimedChest} onClose={() => setClaimedChest(null)} />
       )}
-
-      {/* Streak counter + freeze */}
-      <StreakCounter streak={streak} />
-      <StreakFreezeIndicator freezeCount={freezeCount} t={t} />
-      {streak > 0 && (
-        <div className="flex justify-center mt-2">
-          <WatchAdForFreezeButton t={t} surface="daily_freeze" />
-        </div>
-      )}
-      {/* Streak preview is auth-only — guests don't get streak tracking (storage.ts:205) */}
-      {/* Pass streak + 1: today's claim becomes day N+1, where streak = days already completed */}
-      {user && <DailyRewardPreview currentStreakDay={streak + 1} t={t} />}
 
       {/* Leaderboard Teaser — only render after client-side date hydration */}
       {todayIso && (

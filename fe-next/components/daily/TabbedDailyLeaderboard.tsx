@@ -640,7 +640,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
               {scope === 'word-wheel' && <>🎡 {t('wordHunt.leaderboard.scopeWordWheel') || 'Word Wheel'}</>}
             </span>
           </h3>
-          {!isLoading && (
+          {!isLoading && !error && (
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium truncate">
               {activeTab === 'today' && totalCount > 0 ? (
                 <>
@@ -664,9 +664,9 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
                     </>
                   )}
                 </>
-              ) : (
+              ) : totalCount > 0 ? (
                 <>{totalCount} {totalCount === 1 ? t('daily.playerSingular') : t('daily.playersPlural')}</>
-              )}
+              ) : null}
             </p>
           )}
         </div>
