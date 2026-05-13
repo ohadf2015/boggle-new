@@ -9,15 +9,17 @@ vi.mock('@/components/landing', () => ({
 
 vi.mock('next/dynamic', () => ({ default: () => () => <div data-testid="onboarding-flow" /> }));
 
+const replaceMock = vi.fn();
 vi.mock('next/navigation', () => ({
   usePathname: () => '/en',
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), replace: replaceMock }),
 }));
 
 describe('HomePageClient invite parsing', () => {
   beforeEach(() => {
     sessionStorage.clear();
     localStorage.clear();
+    replaceMock.mockClear();
   });
 
   const setUrl = (search: string) => {
@@ -52,5 +54,25 @@ describe('HomePageClient invite parsing', () => {
     setUrl(`?room=ABC123&host=${longName}`);
     render(<HomePageClient />);
     expect(getPendingRoomInvite()?.hostName?.length ?? 0).toBeLessThanOrEqual(24);
+  });
+
+  it('redirects returning users with ?room= straight to /multiplayer (skip landing/friends)', () => {
+    localStorage.setItem('lexiclash_onboarding_completed', 'true');
+    setUrl('?room=ABC123&host=Alice');
+    render(<HomePageClient />);
+    expect(replaceMock).toHaveBeenCalledWith('/en/multiplayer?room=ABC123&host=Alice');
+  });
+
+  it('does NOT redirect new users — FTUE owns the invite hand-off', () => {
+    setUrl('?room=ABC123&host=Alice');
+    render(<HomePageClient />);
+    expect(replaceMock).not.toHaveBeenCalled();
+  });
+
+  it('does NOT redirect returning users when no ?room= param', () => {
+    localStorage.setItem('lexiclash_onboarding_completed', 'true');
+    setUrl('');
+    render(<HomePageClient />);
+    expect(replaceMock).not.toHaveBeenCalled();
   });
 });

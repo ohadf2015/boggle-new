@@ -376,61 +376,79 @@ export type Database = {
       }
       async_board_challenges: {
         Row: {
+          accepted_at: string | null
           challenged_best_word: string | null
           challenged_id: string
           challenged_score: number | null
           challenged_words: Json | null
           challenger_best_word: string | null
           challenger_id: string
-          challenger_score: number
-          challenger_words: Json
+          challenger_score: number | null
+          challenger_words: Json | null
+          completed_at: string | null
           created_at: string
+          duration_seconds: number
           expires_at: string
           game_mode: string
+          grid_seed: string | null
           grid_size: number
           id: string
+          language: string
           letter_grid: Json
           message: string | null
           played_at: string | null
           status: string
+          winner_user_id: string | null
         }
         Insert: {
+          accepted_at?: string | null
           challenged_best_word?: string | null
           challenged_id: string
           challenged_score?: number | null
           challenged_words?: Json | null
           challenger_best_word?: string | null
           challenger_id: string
-          challenger_score?: number
-          challenger_words?: Json
+          challenger_score?: number | null
+          challenger_words?: Json | null
+          completed_at?: string | null
           created_at?: string
+          duration_seconds?: number
           expires_at?: string
           game_mode?: string
+          grid_seed?: string | null
           grid_size?: number
           id?: string
+          language?: string
           letter_grid: Json
           message?: string | null
           played_at?: string | null
           status?: string
+          winner_user_id?: string | null
         }
         Update: {
+          accepted_at?: string | null
           challenged_best_word?: string | null
           challenged_id?: string
           challenged_score?: number | null
           challenged_words?: Json | null
           challenger_best_word?: string | null
           challenger_id?: string
-          challenger_score?: number
-          challenger_words?: Json
+          challenger_score?: number | null
+          challenger_words?: Json | null
+          completed_at?: string | null
           created_at?: string
+          duration_seconds?: number
           expires_at?: string
           game_mode?: string
+          grid_seed?: string | null
           grid_size?: number
           id?: string
+          language?: string
           letter_grid?: Json
           message?: string | null
           played_at?: string | null
           status?: string
+          winner_user_id?: string | null
         }
         Relationships: []
       }

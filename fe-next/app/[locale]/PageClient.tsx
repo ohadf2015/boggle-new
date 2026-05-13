@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite } from '@/utils/onboardingStorage';
@@ -42,26 +42,37 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   // Synchronous check: determine if user is new and parse URL invite params.
   // Kept synchronous (in useState initializer) so invite is saved before any
   // child effects that might redirect to /multiplayer read it.
-  const [isNewUser] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
+  // Returning users with an invite link must skip LandingView (which surfaces
+  // the friends activity feed) and drop straight into the MP lobby. New users
+  // still flow through FTUE — `useInviteOnboardingMode` consumes the invite
+  // from sessionStorage and routes after profile completion.
+  const [initialState] = useState<{ isNewUser: boolean; inviteRedirectUrl: string | null }>(() => {
+    if (typeof window === 'undefined') return { isNewUser: false, inviteRedirectUrl: null };
     const returning = hasCompletedOnboarding() || hasSupabaseSession();
-    // Save room invite (and optional host name) regardless of FTUE state
     const params = new URLSearchParams(window.location.search);
     const roomCode = params.get('room');
+    let inviteRedirectUrl: string | null = null;
     if (roomCode) {
       const rawHost = params.get('host') ?? '';
       const hostName = sanitizeHostName(rawHost) || undefined;
       savePendingRoomInvite(roomCode, hostName);
-      // Stamp landing time so downstream events can measure secondsSinceLanded
       sessionStorage.setItem('invite_landed_ts', String(Date.now()));
       trackInviteLanded({
         roomCode,
         hasHostName: !!hostName,
         isFirstTimeUser: !returning,
       });
+      if (returning) {
+        const localeMatch = window.location.pathname.match(/^\/([a-z]{2})(\/|$)/);
+        const locale = localeMatch?.[1] || 'en';
+        const redirectParams = new URLSearchParams({ room: roomCode });
+        if (hostName) redirectParams.set('host', hostName);
+        inviteRedirectUrl = `/${locale}/multiplayer?${redirectParams.toString()}`;
+      }
     }
-    return !returning;
+    return { isNewUser: !returning, inviteRedirectUrl };
   });
+  const { isNewUser, inviteRedirectUrl } = initialState;
 
   // Same-origin relative path captured from `?next=` so a play surface
   // (e.g. /practice) can redirect first-timers here, finish FTUE, then route
@@ -101,6 +112,14 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     setShowFTUE(false);
     if (pendingNext) router.push(pendingNext);
   }, [pendingNext, router]);
+
+  useEffect(() => {
+    if (inviteRedirectUrl) router.replace(inviteRedirectUrl);
+  }, [inviteRedirectUrl, router]);
+
+  if (inviteRedirectUrl) {
+    return <div className="fixed inset-0 bg-neo-navy z-50" />;
+  }
 
   if (showFTUE && routeAllowsOnboarding) {
     return <OnboardingFlow onComplete={handleFTUEComplete} />;
