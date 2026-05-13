@@ -103,15 +103,27 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: faqs.map((faq) => ({
-              '@type': 'Question',
-              name: faq.q,
-              acceptedAnswer: {
-                '@type': 'Answer',
-                text: faq.a,
+            '@graph': [
+              {
+                '@type': 'FAQPage',
+                mainEntity: faqs.map((faq) => ({
+                  '@type': 'Question',
+                  name: faq.q,
+                  acceptedAnswer: { '@type': 'Answer', text: faq.a },
+                })),
               },
-            })),
+              {
+                '@type': 'HowTo',
+                name: 'Hur man spelar Scrabble online på svenska gratis',
+                description: 'Spela Scrabble online på svenska gratis med vänner i realtid i 3 enkla steg — ingen nedladdning, ingen registrering.',
+                totalTime: 'PT1M',
+                step: [
+                  { '@type': 'HowToStep', name: 'Öppna LexiClash', text: 'Gå till lexiclash.live i valfri webbläsare på telefon, surfplatta eller dator. Ingen nedladdning krävs.' },
+                  { '@type': 'HowToStep', name: 'Skapa ett rum', text: 'Välj "Skapa rum" och dela länken via WhatsApp, Discord eller direktmeddelande. Upp till 20 spelare kan ansluta.' },
+                  { '@type': 'HowToStep', name: 'Hitta ord i realtid', text: 'Alla spelare ser samma rutnät samtidigt. Klicka eller dra för att skapa ord — längre ord ger fler poäng. Match varar 2-3 minuter.' },
+                ],
+              },
+            ],
           }),
         }}
       />

@@ -74,7 +74,7 @@ function WordCraftBoardImpl({
   // the anchor when set; otherwise we fall back to center (or the first
   // empty cell scanning row-major if center is already occupied). Arrow
   // keys move the reticle and the anchor follows.
-  const tabAnchor = useMemo(() => {
+  const tabAnchor = (() => {
     if (reticle) return reticle;
     if (!board.cells[centerIndex]?.[centerIndex]?.tile) {
       return { row: centerIndex, col: centerIndex };
@@ -85,7 +85,7 @@ function WordCraftBoardImpl({
       }
     }
     return { row: 0, col: 0 };
-  }, [reticle, board, size, centerIndex]);
+  })();
 
   // Fewer cells → larger fonts. 11/13/15 boards each get a tuned glyph size.
   const tileFontClass = size <= 11 ? 'text-lg sm:text-xl' : size === 13 ? 'text-base sm:text-lg' : 'text-sm sm:text-base';

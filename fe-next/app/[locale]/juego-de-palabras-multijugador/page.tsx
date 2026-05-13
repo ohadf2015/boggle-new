@@ -106,12 +106,27 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: FAQS.map((faq) => ({
-              '@type': 'Question',
-              name: faq.q,
-              acceptedAnswer: { '@type': 'Answer', text: faq.a },
-            })),
+            '@graph': [
+              {
+                '@type': 'FAQPage',
+                mainEntity: FAQS.map((faq) => ({
+                  '@type': 'Question',
+                  name: faq.q,
+                  acceptedAnswer: { '@type': 'Answer', text: faq.a },
+                })),
+              },
+              {
+                '@type': 'HowTo',
+                name: 'Cómo jugar Scrabble online en español gratis con amigos',
+                description: 'Juega Scrabble online en español gratis con amigos en tiempo real en 3 pasos — sin descargas, sin registro, en cualquier navegador.',
+                totalTime: 'PT1M',
+                step: [
+                  { '@type': 'HowToStep', name: 'Abrir LexiClash', text: 'Entra a lexiclash.live desde cualquier navegador en móvil, tablet o computadora. No requiere descarga.' },
+                  { '@type': 'HowToStep', name: 'Crear una sala', text: 'Pulsa "Crear sala" y comparte el enlace por WhatsApp, Discord o mensaje directo. Hasta 20 jugadores pueden unirse.' },
+                  { '@type': 'HowToStep', name: 'Encontrar palabras en tiempo real', text: 'Todos ven la misma cuadrícula al mismo tiempo. Haz clic o arrastra para formar palabras — las más largas dan más puntos. Partida de 2-3 minutos.' },
+                ],
+              },
+            ],
           }),
         }}
       />
