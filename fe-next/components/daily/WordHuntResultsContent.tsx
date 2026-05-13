@@ -196,6 +196,38 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     </motion.div>
   );
 
+  // When the other game is already done, the primary CTA goes back to the
+  // Daily Hub (which surfaces the combined leaderboard) instead of nagging
+  // the player to "complete the other challenge".
+  const backToDailyCtaNode = wordWheelPlayed && (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.22, type: 'spring', stiffness: 300, damping: 26 }}
+    >
+      <Link
+        href={`/${language}/daily`}
+        data-testid="back-to-daily-link"
+        className="flex items-center justify-between gap-3 w-full p-5 rounded-neo border-3 border-neo-black bg-neo-cyan shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
+      >
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
+            <Home className="w-7 h-7 text-neo-cyan" />
+          </div>
+          <div>
+            <span className="block font-neo-display font-black text-neo-black text-base leading-tight">
+              {t('wordHunt.results.backToDaily', 'Back to Daily Hub')}
+            </span>
+            <p className="text-neo-black/70 text-xs mt-0.5">
+              {t('wordHunt.results.backToDailyDesc', "See today's leaderboard")}
+            </p>
+          </div>
+        </div>
+        <ArrowRight className="w-6 h-6 text-neo-black shrink-0" />
+      </Link>
+    </motion.div>
+  );
+
   return (
   <div className="space-y-4">
     {/* Performance mascot — reacts to how many words the player found */}
@@ -281,8 +313,13 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     {/* Daily Insight Cards — personalized analytics on challenge performance */}
     <DailyInsightStack mode="word_hunt" date={puzzleDate} />
 
-    {/* PRIMARY CROSS-PROMO (variant): Word Wheel CTA above leaderboard. */}
-    {crossPromoOrder === 'wheel-first' && wheelCtaNode}
+    {/* PRIMARY CTA above leaderboard.
+        - If the wheel is still to-do → variant-controlled wheel cross-promo.
+        - If the wheel is already done → back-to-daily (to see the leaderboard).
+        The back-to-daily card always sits above the leaderboard so the player
+        sees a clear, useful next step instead of a stale cross-promo. */}
+    {backToDailyCtaNode}
+    {!wordWheelPlayed && crossPromoOrder === 'wheel-first' && wheelCtaNode}
 
     {/* FAIL state: Reveal target word + watch ad */}
     {!result.solved && (
@@ -448,35 +485,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       </motion.div>
     )}
 
-    {/* Back to Daily Hub — shown when both challenges complete */}
-    {wordWheelPlayed && (
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.36, type: 'spring', stiffness: 300, damping: 26 }}
-      >
-        <Link
-          href={`/${language}/daily`}
-          data-testid="back-to-daily-link"
-          className="flex items-center justify-between gap-3 w-full p-5 rounded-neo border-3 border-neo-black bg-neo-cyan shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
-        >
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
-              <Home className="w-7 h-7 text-neo-cyan" />
-            </div>
-            <div>
-              <span className="block font-neo-display font-black text-neo-black text-base leading-tight">
-                {t('wordHunt.results.backToDaily', 'Back to Daily Hub')}
-              </span>
-              <p className="text-neo-black/70 text-xs mt-0.5">
-                {t('wordHunt.results.backToDailyDesc', 'See today\'s full results')}
-              </p>
-            </div>
-          </div>
-          <ArrowRight className="w-6 h-6 text-neo-black shrink-0" />
-        </Link>
-      </motion.div>
-    )}
+    {/* Back-to-daily CTA lives above the leaderboard now (see primary CTA block). */}
 
     {/* Witty facts — supplementary, below the fold */}
     {stats && (

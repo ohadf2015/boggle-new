@@ -337,7 +337,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
                   {t('wordWheel.results.backToDaily', 'Back to Daily Hub')}
                 </span>
                 <p className="text-neo-black/70 text-xs mt-0.5">
-                  {t('wordWheel.results.backToDailyDesc', "See today's full results")}
+                  {t('wordWheel.results.backToDailyDesc', "See today's leaderboard")}
                 </p>
               </div>
             </div>

@@ -5632,7 +5632,7 @@ const es = {
       "dailyComplete": "¡Reto Diario completado!",
       "dailyCompleteDesc": "Ambos juegos hechos. ¡Vuelve mañana!",
       "backToDaily": "Volver al Reto Diario",
-      "backToDailyDesc": "Ver los resultados completos de hoy",
+      "backToDailyDesc": "Ver la tabla de clasificación de hoy",
       "tapPlayerHint": "Toca un jugador para ver lo que te perdiste"
     },
     "hub": {
@@ -5816,7 +5816,7 @@ const es = {
       "completeDailyTitle": "Termina el reto de hoy",
       "completeDailyDesc": "Juega Caza de Palabras para completar tu Reto Diario",
       "backToDaily": "Volver al Reto Diario",
-      "backToDailyDesc": "Ver los resultados completos de hoy",
+      "backToDailyDesc": "Ver la tabla de clasificación de hoy",
       "playerWordsTitle": "El camino de {{name}}",
       "youMissedWords": "Palabras que te perdiste",
       "tapPlayerHint": "Toca un jugador para ver su camino"
