@@ -642,12 +642,8 @@ export default function WordCraftPageClient() {
                 inputCountsRef.current.tap += 1;
                 game.placeOnBoard(cell.row, cell.col);
               }}
-              onCellDragOver={(cell) => {
-                // Not used in this component
-              }}
-              onCellDrop={(cell) => {
-                // Not used in this component
-              }}
+              onCellDragOver={() => {}}
+              onCellDrop={() => {}}
               onSceneCtx={setSceneCtx}
               isDisabled={game.state.turn !== 'player'}
               isFirstMove={isFirstMove}

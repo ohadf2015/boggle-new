@@ -48,6 +48,36 @@ describe('useBlastProgress', () => {
     expect(result.current.state.chestProgress).toBe(0.25);
   });
 
+  it('clearLevel forwards submissionId in request body (idempotency)', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ coins: 0, chestProgress: 0, chestNumber: 1 }),
+    });
+    global.fetch = mockFetch;
+
+    const { result } = renderHook(() => useBlastProgress());
+
+    const submission = {
+      levelNumber: 1,
+      locale: 'en' as const,
+      wordsFound: ['test'],
+      timeSeconds: 30,
+      hintsUsed: 0,
+      wrongAttempts: 0,
+      cascadesTriggered: 0,
+      submissionId: 'fixed-uuid-123',
+    };
+
+    result.current.clearLevel(submission, 100, 5);
+
+    await waitFor(() => {
+      expect(result.current.clearMutation.status).toBe('success');
+    });
+
+    const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+    expect(body.submissionId).toBe('fixed-uuid-123');
+  });
+
   it('openChest mutation resets chest progress and increments chest number', async () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,

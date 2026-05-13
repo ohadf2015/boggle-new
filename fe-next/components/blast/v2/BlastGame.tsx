@@ -67,6 +67,13 @@ export function BlastGame({
   const { state, handlers } = useBlastV2(level);
   const { state: progressState, clearLevel, openChest, openMutation } = useBlastProgress();
   const [showChestModal, setShowChestModal] = useState(false);
+  // Idempotency: one submission per level — prevents retry loop on state-feedback re-renders.
+  const submittedRef = useRef(false);
+  const submissionIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    submittedRef.current = false;
+    submissionIdRef.current = null;
+  }, [level.levelNumber, level.locale]);
   const tutorial = useBlastTutorial(level, unlocksSeen, isVeteranPlayer, onUpdateUnlocks ?? (() => {}));
 
   // Controlled FTUE step. Advances based on observable game-state transitions.
@@ -130,41 +137,48 @@ export function BlastGame({
     };
   }, [introDismissed, state.status, state.foundWords, level, levelStartTime]);
 
-  // Track level completed and submit
+  // Track level completed and submit — fires once per level transition.
   useEffect(() => {
-    if (state.status === 'levelComplete' && introDismissed) {
-      const timeSeconds = Math.round((Date.now() - levelStartTime) / 1000);
-      const gemsCollected = Math.round(state.chestProgress * 10);
+    if (state.status !== 'levelComplete' || !introDismissed) return;
+    if (submittedRef.current) return;
+    submittedRef.current = true;
 
-      // Build submission for star rating
-      const submission = {
-        levelNumber: level.levelNumber,
-        locale: level.locale,
-        wordsFound: Array.from(state.foundWords),
-        timeSeconds,
-        hintsUsed: state.hintsUsed,
-        wrongAttempts: 0,
-        cascadesTriggered: state.cascadeCount,
-      };
-
-      const stars = starRating(submission, level);
-
-      trackBlastLevelCompleted({
-        level: level.levelNumber,
-        locale: level.locale,
-        theme: level.theme,
-        time_seconds: timeSeconds,
-        hints_used: state.hintsUsed,
-        cascades: state.cascadeCount,
-        stars,
-        coins_earned: state.coins,
-        gems_collected: gemsCollected,
-      });
-
-      // Submit to API
-      clearLevel(submission, state.coins, gemsCollected);
+    if (!submissionIdRef.current) {
+      submissionIdRef.current = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     }
-  }, [state.status, introDismissed, state.cascadeCount, state.hintsUsed, level, state.coins, state.chestProgress, levelStartTime, state.foundWords, clearLevel]);
+
+    const timeSeconds = Math.round((Date.now() - levelStartTime) / 1000);
+    const gemsCollected = Math.round(state.chestProgress * 10);
+
+    const submission = {
+      levelNumber: level.levelNumber,
+      locale: level.locale,
+      wordsFound: Array.from(state.foundWords),
+      timeSeconds,
+      hintsUsed: state.hintsUsed,
+      wrongAttempts: 0,
+      cascadesTriggered: state.cascadeCount,
+      submissionId: submissionIdRef.current,
+    };
+
+    const stars = starRating(submission, level);
+
+    trackBlastLevelCompleted({
+      level: level.levelNumber,
+      locale: level.locale,
+      theme: level.theme,
+      time_seconds: timeSeconds,
+      hints_used: state.hintsUsed,
+      cascades: state.cascadeCount,
+      stars,
+      coins_earned: state.coins,
+      gems_collected: gemsCollected,
+    });
+
+    clearLevel(submission, state.coins, gemsCollected);
+  }, [state.status, introDismissed, level, levelStartTime, state.foundWords, state.hintsUsed, state.cascadeCount, state.coins, state.chestProgress, clearLevel]);
 
   const handleFtueComplete = () => {
     const updated = completeFtue(unlocksSeen);
