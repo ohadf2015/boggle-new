@@ -28,7 +28,8 @@ export default async function BlastPage({
   const email = user?.email?.toLowerCase() ?? null;
   const isTester = email != null && BLAST_V2_TESTERS.has(email);
   const explicitOptOut = resolvedSearch?.v2 === 'off';
-  const useV2 = isTester && !explicitOptOut;
+  const devForceV2 = resolvedSearch?.v2 === 'force' && process.env.NODE_ENV !== 'production';
+  const useV2 = (isTester || devForceV2) && !explicitOptOut;
 
   if (useV2) {
     const registry = buildRegistry();

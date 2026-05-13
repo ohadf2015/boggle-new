@@ -33,8 +33,26 @@ describe('useBlastV2 hook', () => {
     });
 
     expect(result.current.state.foundWords.has('CAT')).toBe(true);
-    expect(result.current.state.coins).toBe(150); // 30 (CAT) + 60 (SUN cascade) + 60 (EGG cascade)
+    // 30 (CAT theme: 3*10) + 60 (SUN cascade depth=1, mult=1.0: 3*20) + 90 (EGG cascade depth=2, mult=1.5: 3*20*1.5)
+    expect(result.current.state.coins).toBe(180);
     expect(result.current.state.cascadeCount).toBe(2);
+  });
+
+  it('exposes per-submission chain depth + monotonic chain event key for FX', () => {
+    const { result } = renderHook(() => useBlastV2(mockLevel));
+    expect(result.current.state.lastChainDepth).toBe(0);
+    expect(result.current.state.chainEventKey).toBe(0);
+
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(0, 1));
+      result.current.handlers.onPointerMove(cellId(0, 2));
+      result.current.handlers.onPointerUp();
+    });
+
+    // CAT triggered 2 cascades (SUN + EGG) → chain depth = 2 for this submission
+    expect(result.current.state.lastChainDepth).toBe(2);
+    expect(result.current.state.chainEventKey).toBe(1);
   });
 
   it('invalid selection triggers invalidShakeKey increment', () => {

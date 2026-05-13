@@ -1,5 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
-import { validateLevelClear, starRating, type ClearSubmission } from '@/lib/blast/v2/anti-cheat';
+import { applyAntiCheatCaps, applyAntiCheatCapsWithLevel, type ClearSubmission } from '@/lib/blast/v2/anti-cheat';
+import { buildRegistry } from '@/lib/blast/v2/level-source-registry';
+import { CURATED_LEVEL_CUTOFF } from '@/lib/blast/v2/level-source';
 import { awardCoinsServer } from '@/backend/services/economy/awardCoins';
 import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
@@ -41,16 +43,30 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // For now, do minimal validation (full validation needs level re-derive from Plan 1)
-  // Plan 3 stub: just validate basic structure
   if (!submission.wordsFound || !Array.isArray(submission.wordsFound)) {
     return NextResponse.json({ error: 'Invalid submission' }, { status: 400 });
   }
 
-  const stars = 1; // Default 1-star; real rating from starRating() after level is available
+  // Anti-cheat: prefer level-aware validation when the level is curated (1..CURATED_LEVEL_CUTOFF).
+  // For generated levels (31+), fall back to the level-less ceiling.
+  let capped;
+  if (submission.levelNumber <= CURATED_LEVEL_CUTOFF) {
+    try {
+      const level = await buildRegistry().curated.resolve(submission.levelNumber, submission.locale);
+      capped = applyAntiCheatCapsWithLevel(submission, submission.earnedCoins, level);
+    } catch {
+      // Pack missing / load failure — gracefully fall back to level-less caps.
+      capped = applyAntiCheatCaps(submission, submission.earnedCoins);
+    }
+  } else {
+    capped = applyAntiCheatCaps(submission, submission.earnedCoins);
+  }
+  if (!capped.ok) {
+    return NextResponse.json({ error: 'Invalid submission', reason: capped.reason }, { status: 400 });
+  }
 
-  // Award coins
-  const totalCoins = submission.earnedCoins;
+  const stars = 1; // Default 1-star; real rating from starRating() after level is available
+  const totalCoins = capped.trustedCoins;
   await awardCoinsServer(user.id, totalCoins, 'blast_v2_level_clear', {
     level: String(submission.levelNumber),
     stars: String(stars),
@@ -78,7 +94,7 @@ export async function POST(req: NextRequest) {
     locale: submission.locale,
     submission_id: submissionId,
     stars,
-    coins_earned: submission.earnedCoins,
+    coins_earned: totalCoins,
     gems_collected: submission.earnedGems,
     hints_used: submission.hintsUsed,
     cascades_triggered: submission.cascadesTriggered,

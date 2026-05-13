@@ -1,8 +1,17 @@
 'use client';
 import { useEffect, useRef } from 'react';
+import { classifyOvation, type OvationTier } from '@/lib/blast/v2/engine';
+import styles from './BlastFxOverlay.module.css';
 
-export function BlastFxOverlay() {
+type Props = {
+  chainEventKey?: number;
+  chainDepth?: number;
+  onChainOvation?: (tier: OvationTier) => void;
+};
+
+export function BlastFxOverlay({ chainEventKey, chainDepth, onChainOvation }: Props = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const lastEventKeyRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -49,11 +58,25 @@ export function BlastFxOverlay() {
     };
   }, []);
 
+  useEffect(() => {
+    if (chainEventKey === undefined) return;
+    if (chainEventKey === lastEventKeyRef.current) return;
+    lastEventKeyRef.current = chainEventKey;
+    const tier = classifyOvation(chainDepth ?? 0);
+    const canvas = canvasRef.current;
+    if (tier !== 'none') {
+      canvas?.setAttribute('data-ovation-tier', tier);
+      onChainOvation?.(tier);
+    } else {
+      canvas?.removeAttribute('data-ovation-tier');
+    }
+  }, [chainEventKey, chainDepth, onChainOvation]);
+
   return (
     <canvas
       ref={canvasRef}
       data-testid="blast-fx"
-      className="absolute inset-0 pointer-events-none"
+      className={`${styles.canvas} absolute inset-0 pointer-events-none`}
       style={{ zIndex: 10 }}
     />
   );

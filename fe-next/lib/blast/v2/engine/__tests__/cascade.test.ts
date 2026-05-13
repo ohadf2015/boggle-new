@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { detectCascade } from '../cascade';
+import { detectCascade, detectAllCascades } from '../cascade';
 import { cellId } from '../cell-id';
 import type { BlastLevel } from '../../types';
 import { LOCALE_CONFIGS } from '../../locale-config';
@@ -47,6 +47,73 @@ describe('cascade detection', () => {
     };
     const result = detectCascade(level, new Set(['AB']), LOCALE_CONFIGS.en);
     expect(result).toBeNull();
+  });
+
+  it('detectAllCascades returns every non-overlapping match in one pass', () => {
+    const level: BlastLevel = {
+      id: 'all-cascades-1',
+      levelNumber: 1,
+      locale: 'en',
+      theme: 'onboarding',
+      columns: [
+        { index: 0, tiles: ['C', 'A', 'T'] },
+        { index: 1, tiles: ['S', 'U', 'N'] },
+        { index: 2, tiles: ['D', 'O', 'G'] },
+      ],
+      words: ['CAT', 'SUN', 'DOG'],
+      resolvableOrder: ['CAT', 'SUN', 'DOG'],
+      tileFlags: {},
+      gravityMode: 'standard',
+      difficulty: 1,
+    };
+    const result = detectAllCascades(level, new Set(), LOCALE_CONFIGS.en);
+    expect(result.map((c) => c.word).sort()).toEqual(['CAT', 'DOG', 'SUN']);
+    expect(result).toHaveLength(3);
+  });
+
+  it('detectAllCascades resolves cell conflicts deterministically by level.words order', () => {
+    const level: BlastLevel = {
+      id: 'all-cascades-conflict',
+      levelNumber: 1,
+      locale: 'en',
+      theme: 'onboarding',
+      columns: [
+        { index: 0, tiles: ['C', 'A', 'R'] },
+        { index: 1, tiles: ['A', 'A', 'A'] },
+        { index: 2, tiles: ['T', 'A', 'M'] },
+      ],
+      words: ['CAT', 'RAM'],
+      resolvableOrder: ['CAT', 'RAM'],
+      tileFlags: {},
+      gravityMode: 'standard',
+      difficulty: 1,
+    };
+    const result = detectAllCascades(level, new Set(), LOCALE_CONFIGS.en);
+    const words = result.map((c) => c.word);
+    expect(words).toContain('CAT');
+    expect(words).toContain('RAM');
+    const allCells = result.flatMap((c) => c.cells);
+    expect(new Set(allCells).size).toBe(allCells.length);
+  });
+
+  it('detectAllCascades returns empty array when no matches', () => {
+    const level: BlastLevel = {
+      id: 'all-cascades-empty',
+      levelNumber: 1,
+      locale: 'en',
+      theme: 'onboarding',
+      columns: [
+        { index: 0, tiles: ['X'] },
+        { index: 1, tiles: ['Y'] },
+      ],
+      words: ['XY'],
+      resolvableOrder: ['XY'],
+      tileFlags: {},
+      gravityMode: 'standard',
+      difficulty: 1,
+    };
+    const result = detectAllCascades(level, new Set(['XY']), LOCALE_CONFIGS.en);
+    expect(result).toEqual([]);
   });
 
   it('detects cascade word in multiple directions', () => {

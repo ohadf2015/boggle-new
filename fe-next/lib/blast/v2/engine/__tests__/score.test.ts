@@ -61,6 +61,62 @@ describe('score helpers', () => {
     expect(result.coinsFromOverlays).toBe(10); // 2 * 5
   });
 
+  describe('chain-depth multiplier', () => {
+    it('chainDepth 1: no boost (first cascade is already 2× base)', () => {
+      const cells = [cellId(0, 0), cellId(1, 0)];
+      const result = scoreForWord(baseLevel, cells, 'cascade', 1);
+      expect(result.coinsBase).toBe(40); // 2 * 20 * 1.0
+      expect(result.chainMultiplier).toBe(1);
+    });
+
+    it('chainDepth 2: 1.5× boost', () => {
+      const cells = [cellId(0, 0), cellId(1, 0)];
+      const result = scoreForWord(baseLevel, cells, 'cascade', 2);
+      expect(result.coinsBase).toBe(60); // 2 * 20 * 1.5
+      expect(result.chainMultiplier).toBe(1.5);
+    });
+
+    it('chainDepth 3: 2× boost', () => {
+      const cells = [cellId(0, 0), cellId(1, 0)];
+      const result = scoreForWord(baseLevel, cells, 'cascade', 3);
+      expect(result.coinsBase).toBe(80); // 2 * 20 * 2
+      expect(result.chainMultiplier).toBe(2);
+    });
+
+    it('chainDepth 4: 3× boost', () => {
+      const cells = [cellId(0, 0), cellId(1, 0)];
+      const result = scoreForWord(baseLevel, cells, 'cascade', 4);
+      expect(result.coinsBase).toBe(120); // 2 * 20 * 3
+      expect(result.chainMultiplier).toBe(3);
+    });
+
+    it('chainDepth 5+: caps at 4× boost', () => {
+      const cells = [cellId(0, 0), cellId(1, 0)];
+      const r5 = scoreForWord(baseLevel, cells, 'cascade', 5);
+      const r9 = scoreForWord(baseLevel, cells, 'cascade', 9);
+      expect(r5.chainMultiplier).toBe(4);
+      expect(r9.chainMultiplier).toBe(4);
+      expect(r5.coinsBase).toBe(160); // 2 * 20 * 4
+    });
+
+    it('theme word ignores chainDepth (initial word, not a cascade)', () => {
+      const cells = [cellId(0, 0), cellId(1, 0), cellId(2, 0)];
+      const result = scoreForWord(baseLevel, cells, 'theme', 5);
+      expect(result.coinsBase).toBe(30); // 3 * 10, no chain boost
+      expect(result.chainMultiplier).toBe(1);
+    });
+
+    it('chain multiplier stacks with double_bonus tile', () => {
+      const level = { ...baseLevel, tileFlags: { [cellId(0, 0)]: ['double_bonus'] as const } };
+      const cells = [cellId(0, 0), cellId(1, 0)];
+      const result = scoreForWord(level, cells, 'cascade', 3);
+      // 2 * 20 = 40 base * double_bonus(2) = 80 * chain(2) = 160
+      expect(result.coinsBase).toBe(160);
+      expect(result.multiplier).toBe(2);
+      expect(result.chainMultiplier).toBe(2);
+    });
+  });
+
   it('gem overlay adds +0.02 per tile to chest progress', () => {
     const level = {
       ...baseLevel,

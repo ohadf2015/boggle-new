@@ -72,6 +72,7 @@ describe('BlastGame', () => {
     expect(screen.queryByTestId('complete-card')).not.toBeInTheDocument();
   });
 
+
   it('shows non-veteran FTUE overlay step 1 on level 1 AFTER intro dismisses', async () => {
     const mockLevel1 = { ...mockLevel, levelNumber: 1 };
     render(

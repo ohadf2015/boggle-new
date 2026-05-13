@@ -1,8 +1,14 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import type { BlastLevel } from '@/lib/blast/v2/types';
 import { markUnlockSeen, completeFtue, setSkipAll, type UnlocksSeen, type MechanicKey } from '@/lib/blast/v2/tutorial/unlocks-seen';
 import { useBlastV2 } from '@/lib/blast/v2/useBlastV2';
+import { detectAlmostWords } from '@/lib/blast/v2/engine';
+import { LOCALE_CONFIGS } from '@/lib/blast/v2/locale-config';
+import { useChainHaptics } from '@/lib/blast/v2/fx/useChainHaptics';
+import { useChainEventBus } from '@/lib/blast/v2/fx/useChainEventBus';
+import { BlastChainSoundListener } from '@/lib/blast/v2/fx/BlastChainSoundListener';
+import { useCompleteCardDelay } from '@/lib/blast/v2/fx/useCompleteCardDelay';
 import { useBlastProgress } from '@/lib/blast/v2/useBlastProgress';
 import { useBlastTutorial } from '@/hooks/useBlastTutorial';
 import { starRating } from '@/lib/blast/v2/anti-cheat';
@@ -65,6 +71,15 @@ export function BlastGame({
   const [introDismissed, setIntroDismissed] = useState(false);
   const [levelStartTime] = useState(() => Date.now());
   const { state, handlers } = useBlastV2(level);
+  useChainHaptics({ chainEventKey: state.chainEventKey, chainDepth: state.lastChainDepth });
+  useChainEventBus({ chainEventKey: state.chainEventKey, chainDepth: state.lastChainDepth });
+  // Cascade pacing — Royal Match style. Complete card delayed by `(chainDepth-1)*350 + 700`ms
+  // so each cascade beat + final ovation flash plays out visibly before the modal pops.
+  const showCompleteCard = useCompleteCardDelay({ status: state.status, chainDepth: state.lastChainDepth });
+  const almosts = useMemo(
+    () => detectAlmostWords(state.level, state.foundWords, LOCALE_CONFIGS[state.level.locale]),
+    [state.level, state.foundWords],
+  );
   const { state: progressState, clearLevel, openChest, openMutation } = useBlastProgress();
   const [showChestModal, setShowChestModal] = useState(false);
   // Idempotency: one submission per level — prevents retry loop on state-feedback re-renders.
@@ -237,7 +252,7 @@ export function BlastGame({
     );
   }
 
-  if (state.status === 'levelComplete') {
+  if (state.status === 'levelComplete' && showCompleteCard) {
     return (
       <BlastLevelCompleteCard
         coins={state.coins}
@@ -270,7 +285,8 @@ export function BlastGame({
       />
       <div className="relative">
         <BlastAtmosphereOverlay modeColor={modeColor} />
-        <BlastFxOverlay />
+        <BlastFxOverlay chainEventKey={state.chainEventKey} chainDepth={state.lastChainDepth} />
+        <BlastChainSoundListener />
         <BlastBoard
           level={state.level}
           selection={state.selection}
@@ -279,6 +295,7 @@ export function BlastGame({
           onPointerEnter={handlers.onPointerMove}
           onPointerUp={handlers.onPointerUp}
           modeColor={modeColor}
+          almosts={almosts}
         />
       </div>
       {tutorial.showFtueOverlay && !isVeteranPlayer && ftueStep !== null && (

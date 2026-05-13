@@ -20,6 +20,8 @@ type State = {
   cascadeCount: number;
   invalidShakeKey: number;
   lastValidation: ValidationResult | null;
+  lastChainDepth: number;
+  chainEventKey: number;
 };
 
 type Action =
@@ -84,13 +86,14 @@ function applyValidatedSubmit(state: State, cells: CellId[]): State {
         isBonus: false,
       });
 
-      const cOut = scoreForWord(newLevel, cascade.cells, 'cascade');
+      const cOut = scoreForWord(newLevel, cascade.cells, 'cascade', newCascadeCount);
       newCoins += cOut.coinsBase + cOut.coinsFromOverlays;
       newChestProgress += cOut.chestProgressDelta;
       newLevel = collapseCells(newLevel, cascade.cells).level;
     }
   }
   const allFound = state.level.words.every((w) => newFound.has(w));
+  const thisChainDepth = newCascadeCount - state.cascadeCount;
   return {
     ...state,
     level: newLevel,
@@ -100,6 +103,8 @@ function applyValidatedSubmit(state: State, cells: CellId[]): State {
     cascadeCount: newCascadeCount,
     lastValidation: res,
     status: allFound ? 'levelComplete' : 'playing',
+    lastChainDepth: thisChainDepth,
+    chainEventKey: state.chainEventKey + 1,
   };
 }
 
@@ -132,6 +137,8 @@ export function useBlastV2(initialLevel: BlastLevel) {
     cascadeCount: 0,
     invalidShakeKey: 0,
     lastValidation: null,
+    lastChainDepth: 0,
+    chainEventKey: 0,
   };
   const [state, dispatch] = useReducer(reducer, initial);
   const handlers = useMemo(

@@ -2,10 +2,11 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { LayoutGroup, AnimatePresence } from 'framer-motion';
 import type { BlastLevel, CellId } from '@/lib/blast/v2/types';
-import { cellId as makeCellId, type SelectionState } from '@/lib/blast/v2/engine';
+import { cellId as makeCellId, type SelectionState, type AlmostWord } from '@/lib/blast/v2/engine';
 import { LOCALE_CONFIGS } from '@/lib/blast/v2/locale-config';
 import { BlastTile, type BlastTileState } from './BlastTile';
 import { BlastSelectionPath } from './BlastSelectionPath';
+import { BlastAlmostGhost } from './BlastAlmostGhost';
 
 type Props = {
   level: BlastLevel;
@@ -15,6 +16,7 @@ type Props = {
   onPointerEnter: (cell: CellId) => void;
   onPointerUp: () => void;
   modeColor?: string;
+  almosts?: AlmostWord[];
 };
 
 export function BlastBoard({
@@ -25,6 +27,7 @@ export function BlastBoard({
   onPointerEnter,
   onPointerUp,
   modeColor = '#ec4899',
+  almosts,
 }: Props) {
   const config = LOCALE_CONFIGS[level.locale];
   const boardRef = useRef<HTMLDivElement>(null);
@@ -119,6 +122,12 @@ export function BlastBoard({
         cells={selection.kind === 'active' ? selection.cells : []}
         getCellCenter={getCellCenter}
         color={modeColor}
+      />
+      <BlastAlmostGhost
+        almosts={almosts ?? []}
+        hidden={selection.kind === 'active'}
+        modeColor={modeColor}
+        boardRef={boardRef}
       />
     </div>
   );

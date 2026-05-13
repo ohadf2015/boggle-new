@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, cleanup, waitFor } from '@testing-library/react';
 import { BlastFxOverlay } from '../BlastFxOverlay';
 
@@ -43,5 +43,53 @@ describe('BlastFxOverlay', () => {
     // Unmount synchronously, before dynamic import + init microtask settle.
     // The component's `cancelled` flag must prevent post-unmount destroy crash.
     expect(() => unmount()).not.toThrow();
+  });
+
+  describe('chain ovation reactivity', () => {
+    it('initial render carries no ovation attribute', () => {
+      const { container } = render(<BlastFxOverlay chainEventKey={0} chainDepth={0} />);
+      const canvas = container.querySelector('[data-testid="blast-fx"]') as HTMLCanvasElement;
+      expect(canvas.getAttribute('data-ovation-tier')).toBeNull();
+    });
+
+    it('chain depth 3 sets data-ovation-tier="big" on chainEventKey change', () => {
+      const { container, rerender } = render(<BlastFxOverlay chainEventKey={0} chainDepth={0} />);
+      rerender(<BlastFxOverlay chainEventKey={1} chainDepth={3} />);
+      const canvas = container.querySelector('[data-testid="blast-fx"]') as HTMLCanvasElement;
+      expect(canvas.getAttribute('data-ovation-tier')).toBe('big');
+    });
+
+    it('chain depth 5 sets data-ovation-tier="mega"', () => {
+      const { container, rerender } = render(<BlastFxOverlay chainEventKey={0} chainDepth={0} />);
+      rerender(<BlastFxOverlay chainEventKey={1} chainDepth={5} />);
+      const canvas = container.querySelector('[data-testid="blast-fx"]') as HTMLCanvasElement;
+      expect(canvas.getAttribute('data-ovation-tier')).toBe('mega');
+    });
+
+    it('depth 1 (no chain) does not set ovation attribute', () => {
+      const { container, rerender } = render(<BlastFxOverlay chainEventKey={0} chainDepth={0} />);
+      rerender(<BlastFxOverlay chainEventKey={1} chainDepth={1} />);
+      const canvas = container.querySelector('[data-testid="blast-fx"]') as HTMLCanvasElement;
+      expect(canvas.getAttribute('data-ovation-tier')).toBeNull();
+    });
+
+    it('fires onChainOvation callback with tier when chain event arrives', () => {
+      const onChainOvation = vi.fn();
+      const { rerender } = render(
+        <BlastFxOverlay chainEventKey={0} chainDepth={0} onChainOvation={onChainOvation} />,
+      );
+      expect(onChainOvation).not.toHaveBeenCalled();
+      rerender(<BlastFxOverlay chainEventKey={1} chainDepth={3} onChainOvation={onChainOvation} />);
+      expect(onChainOvation).toHaveBeenCalledWith('big');
+    });
+
+    it('does not fire callback for "none" tier (depth 0 or 1)', () => {
+      const onChainOvation = vi.fn();
+      const { rerender } = render(
+        <BlastFxOverlay chainEventKey={0} chainDepth={0} onChainOvation={onChainOvation} />,
+      );
+      rerender(<BlastFxOverlay chainEventKey={1} chainDepth={1} onChainOvation={onChainOvation} />);
+      expect(onChainOvation).not.toHaveBeenCalled();
+    });
   });
 });

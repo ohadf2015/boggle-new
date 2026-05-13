@@ -1,0 +1,35 @@
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8;
+}
+
+.ghost {
+  position: absolute;
+  left: calc(var(--ghost-col, 0) * (var(--blast-tile-size, 64px) + 0.5rem) + 1rem);
+  bottom: calc(var(--ghost-row, 0) * (var(--blast-tile-size, 64px) + 0.5rem) + 1rem);
+  width: var(--blast-tile-size, 64px);
+  height: var(--blast-tile-size, 64px);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-neo-display, 'Fredoka', system-ui, sans-serif);
+  font-weight: 800;
+  font-size: calc(var(--blast-tile-size, 64px) * 0.45);
+  opacity: 0.32;
+  border: 2px dashed currentColor;
+  border-radius: 14px;
+  animation: ghost-breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes ghost-breathe {
+  0%, 100% { opacity: 0.22; transform: scale(0.96); }
+  50%      { opacity: 0.45; transform: scale(1.02); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ghost {
+    animation: none;
+    opacity: 0.35;
+  }
+}
