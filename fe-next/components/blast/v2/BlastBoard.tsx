@@ -76,13 +76,19 @@ export function BlastBoard({
     [onPointerDown]
   );
 
+  const cols = level.columns.length;
+  // Scale tile size by column count so the board fills its container snugly
+  // regardless of grid width (3 cols = chunky tiles; 6 cols = compact).
+  const tileSize = `min(calc((100% - ${(cols - 1) * 8 + 24}px) / ${cols}), ${Math.round(88 - Math.max(0, cols - 4) * 6)}px)`;
+
   return (
     <div
       ref={boardRef}
       dir={dir}
       data-shake-key={invalidShakeKey}
       data-testid="blast-board"
-      className="relative flex items-end justify-center gap-2 p-4 touch-none"
+      className="relative mx-auto flex items-end justify-center gap-2 px-3 pb-3 pt-2 touch-none"
+      style={{ ['--blast-tile-size' as string]: tileSize }}
       onPointerUp={onPointerUp}
       onPointerMove={handleBoardPointerMove}
     >

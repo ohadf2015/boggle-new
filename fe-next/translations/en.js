@@ -8910,6 +8910,24 @@ const en = {
     }
   },
   "blast": {
+    "tutorial": {
+      "ftue": {
+        "skip": "Skip tutorial",
+        "step1": "Drag across letters to spell a word",
+        "step1Cta": "Tap to begin",
+        "step2": "Try it: drag from C to T",
+        "step2Hint": "Letters must be adjacent",
+        "step3": "Letters above fall to fill the space",
+        "step4": "Find 3 ANIMAL words",
+        "step5": "Or tap each letter, double-tap to confirm",
+        "step6": "Level 1! Watch your chest bar →"
+      },
+      "veteran": {
+        "title": "Welcome back!",
+        "body": "Blast has been redesigned. Enjoy the new levels!",
+        "cta": "Let's go"
+      }
+    },
     "continueModal": {
       "title": "Don't stop now!",
       "body": "You're out of moves. Watch a quick ad to keep your run alive.",
