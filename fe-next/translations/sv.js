@@ -5589,7 +5589,7 @@ const sv = {
       "dailyComplete": "Daglig utmaning klar!",
       "dailyCompleteDesc": "Båda spelen klara. Kom tillbaka imorgon!",
       "backToDaily": "Tillbaka till dagliga utmaningar",
-      "backToDailyDesc": "Se dagens fullständiga resultat",
+      "backToDailyDesc": "Se dagens topplista",
       "tapPlayerHint": "Tryck på en spelare för att se vad du missade"
     },
     "hub": {
@@ -5838,7 +5838,7 @@ const sv = {
       "completeDailyTitle": "Avsluta dagens utmaning",
       "completeDailyDesc": "Spela Ordjakt för att slutföra din dagliga utmaning",
       "backToDaily": "Tillbaka till dagliga utmaningar",
-      "backToDailyDesc": "Se dagens fullständiga resultat",
+      "backToDailyDesc": "Se dagens topplista",
       "playerWordsTitle": "{{name}}s väg",
       "youMissedWords": "Ord du missade",
       "tapPlayerHint": "Tryck på en spelare för att se deras väg"

@@ -5622,7 +5622,7 @@ const ja = {
       "dailyComplete": "デイリーチャレンジ達成！",
       "dailyCompleteDesc": "両方のゲーム完了。また明日！",
       "backToDaily": "デイリーハブに戻る",
-      "backToDailyDesc": "今日の全結果を見る",
+      "backToDailyDesc": "今日のリーダーボードを見る",
       "tapPlayerHint": "プレイヤーをタップして見逃した単語を確認"
     },
     "hub": {
@@ -5869,7 +5869,7 @@ const ja = {
       "completeDailyTitle": "今日のチャレンジを完了",
       "completeDailyDesc": "ワードハントをプレイしてデイリーチャレンジを達成",
       "backToDaily": "デイリーハブに戻る",
-      "backToDailyDesc": "今日の全結果を見る",
+      "backToDailyDesc": "今日のリーダーボードを見る",
       "playerWordsTitle": "{{name}}のルート",
       "youMissedWords": "見逃した単語",
       "tapPlayerHint": "プレイヤーをタップしてルートを確認"

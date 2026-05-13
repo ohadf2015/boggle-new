@@ -5696,7 +5696,7 @@ const en = {
       "dailyComplete": "Daily Challenge complete!",
       "dailyCompleteDesc": "Both games done. Come back tomorrow!",
       "backToDaily": "Back to Daily Hub",
-      "backToDailyDesc": "See today's full results",
+      "backToDailyDesc": "See today's leaderboard",
       "tapPlayerHint": "Tap a player to see what you missed"
     },
     "hub": {
@@ -5961,7 +5961,7 @@ const en = {
       "completeDailyTitle": "Finish today's challenge",
       "completeDailyDesc": "Play Word Hunt to complete your Daily Challenge",
       "backToDaily": "Back to Daily Hub",
-      "backToDailyDesc": "See today's full results",
+      "backToDailyDesc": "See today's leaderboard",
       "playerWordsTitle": "{{name}}'s path",
       "youMissedWords": "Words you missed",
       "tapPlayerHint": "Tap a player to see their path"
