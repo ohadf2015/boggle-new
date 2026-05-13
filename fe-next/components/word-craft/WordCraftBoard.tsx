@@ -98,6 +98,15 @@ function WordCraftBoardImpl({
           const isAxisHint = axisHintCells.has(key) && isEmpty && !disabled;
           const isReticle = reticle?.row === r && reticle?.col === c;
 
+          // Build a screen-reader label that includes tile state so blind
+          // players know what's on the cell during keyboard navigation —
+          // previously the label only read coords + premium type, never the
+          // actual letter placed there. Center cell announces "center start"
+          // on an empty board to surface the first-move requirement.
+          const occupant = pending ? `pending ${pending.letter}` : placedTile ? `letter ${placedTile.letter} value ${placedTile.value}` : 'empty';
+          const centerHint = isCenter && isEmpty && isFirstMove ? ' center start' : '';
+          const ariaLabel = `row ${r + 1} column ${c + 1}${cell.premium ? ` ${cell.premium}` : ''} ${occupant}${centerHint}`;
+
           return (
             <button
               key={key}
@@ -112,7 +121,7 @@ function WordCraftBoardImpl({
               data-drag-target={isDragTarget ? 'true' : undefined}
               data-axis-hint={isAxisHint ? 'true' : undefined}
               data-reticle={isReticle ? 'true' : undefined}
-              aria-label={`row ${r + 1} column ${c + 1}${cell.premium ? ` ${cell.premium}` : ''}`}
+              aria-label={ariaLabel}
               disabled={!isInteractive}
               onClick={() => {
                 if (!isInteractive) return;
