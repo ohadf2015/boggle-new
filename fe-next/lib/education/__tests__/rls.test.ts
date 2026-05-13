@@ -1,12 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { createClient } from '@supabase/supabase-js';
 
-const anonClient = () => createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const hasLiveEnv = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
 
-describe('teacher_access_requests RLS', () => {
+const anonClient = () => createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!);
+
+describe.skipIf(!hasLiveEnv)('teacher_access_requests RLS (live DB)', () => {
   it('anon CAN insert a new request', async () => {
     const sb = anonClient();
     const { error } = await sb.from('teacher_access_requests').insert({
