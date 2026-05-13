@@ -31,11 +31,19 @@ export function BlastHud({
 
   return (
     <>
-      <div className="flex items-center justify-between px-4 py-2 bg-[#0b1530] text-white">
-        <span data-testid="level-label">
+      <div className="flex items-center justify-between gap-3 px-4 py-3 bg-[#0b1530] text-white border-b border-white/10">
+        <span
+          data-testid="level-label"
+          className="text-sm font-bold uppercase tracking-wide opacity-90"
+        >
           {t('blast.level', `Level ${levelNumber}`, { n: String(levelNumber) })}
         </span>
-        <span data-testid="coin-counter">🪙 {coins}</span>
+        <span
+          data-testid="coin-counter"
+          className="text-sm font-semibold tabular-nums"
+        >
+          🪙 {coins}
+        </span>
         <BlastChestBadge
           chestNumber={chestNumber}
           progress={chestProgress}

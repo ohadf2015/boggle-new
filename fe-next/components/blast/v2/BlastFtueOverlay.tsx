@@ -103,7 +103,7 @@ export function BlastFtueOverlay({
               <path d="M3 12h18M12 3v18" stroke="white" strokeWidth="2" strokeLinecap="round" />
             </svg>
             <div className="text-white/70 text-sm">
-              {t('blast.tutorial.ftue.step1.cta', 'Tap to begin')}
+              {t('blast.tutorial.ftue.step1Cta', 'Tap to begin')}
             </div>
           </div>
         </motion.div>
@@ -125,7 +125,7 @@ export function BlastFtueOverlay({
                   {t('blast.tutorial.ftue.step2', 'Try it: drag from C to T')}
                 </div>
                 <div className="text-xs text-white/70">
-                  {t('blast.tutorial.ftue.step2.hint', 'Letters must be adjacent')}
+                  {t('blast.tutorial.ftue.step2Hint', 'Letters must be adjacent')}
                 </div>
               </>
             )}

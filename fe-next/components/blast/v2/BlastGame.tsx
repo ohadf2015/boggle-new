@@ -199,7 +199,7 @@ export function BlastGame({
   }
 
   return (
-    <div className="min-h-screen bg-[#0b1530] text-white">
+    <div className="min-h-screen flex flex-col bg-[#0b1530] text-white">
       {tutorial.showFtueOverlay && (
         <BlastFtueOverlay
           onComplete={handleFtueComplete}
@@ -227,10 +227,13 @@ export function BlastGame({
           /* Plan 5 wires hints */
         }}
       />
-      <div className="relative flex items-center justify-center px-4 py-6 sm:py-10">
+      <div className="relative flex flex-1 items-center justify-center px-3 py-4 min-h-[60vh]">
         <BlastAtmosphereOverlay modeColor={modeColor} />
         <BlastFxOverlay />
-        <div className="w-full max-w-[560px]" style={{ containerType: 'inline-size' }}>
+        <div
+          className="relative w-full max-w-[460px]"
+          style={{ containerType: 'inline-size' }}
+        >
           <BlastBoard
             level={state.level}
             selection={state.selection}
