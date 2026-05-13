@@ -43,14 +43,48 @@ export function BlastBoard({
   const tileState = (id: CellId): BlastTileState => (selectedSet.has(id) ? 'selected' : 'normal');
   const dir = config.rtl ? 'rtl' : 'ltr';
 
+  const lastEnteredRef = useRef<CellId | null>(null);
+  const selectionMode = selection.kind === 'active' ? selection.mode : null;
+  const handleBoardPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (selectionMode !== 'drag') return;
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      if (!el) return;
+      const tileEl = (el as HTMLElement).closest('[data-cell-id]') as HTMLElement | null;
+      if (!tileEl) return;
+      const id = tileEl.getAttribute('data-cell-id') as CellId | null;
+      if (!id) return;
+      if (lastEnteredRef.current === id) return;
+      lastEnteredRef.current = id;
+      onPointerEnter(id);
+    },
+    [selectionMode, onPointerEnter]
+  );
+
+  const handleTilePointerDown = useCallback(
+    (id: CellId, e: React.PointerEvent<HTMLDivElement>) => {
+      // Release implicit pointer capture so board-level pointermove + elementFromPoint
+      // can route drag to sibling tiles (touch devices capture by default).
+      try {
+        (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
+      } catch {
+        /* ignore — capture release is best-effort */
+      }
+      lastEnteredRef.current = id;
+      onPointerDown(id);
+    },
+    [onPointerDown]
+  );
+
   return (
     <div
       ref={boardRef}
       dir={dir}
       data-shake-key={invalidShakeKey}
       data-testid="blast-board"
-      className="relative flex items-end justify-center gap-2 p-4"
+      className="relative flex items-end justify-center gap-2 p-4 touch-none"
       onPointerUp={onPointerUp}
+      onPointerMove={handleBoardPointerMove}
     >
       <LayoutGroup>
         {level.columns.map((col) => (
@@ -69,9 +103,7 @@ export function BlastBoard({
                     state={tileState(id)}
                     modeColor={modeColor}
                     fontStack={config.fontStack}
-                    paddingExtra={config.tileExtraPadding}
-                    onPointerDown={() => onPointerDown(id)}
-                    onPointerEnter={() => selection.kind === 'active' && selection.mode === 'drag' && onPointerEnter(id)}
+                    onPointerDown={(e) => handleTilePointerDown(id, e)}
                   />
                 );
               })}

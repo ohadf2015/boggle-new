@@ -50,7 +50,7 @@ vi.mock('@/shared/dailyQuestPool', async () => {
 const baseMissions = [
   { type: 'wordHunt' as const, completed: false, href: '/daily' },
   { type: 'multiplayer' as const, completed: false, href: '/multiplayer' },
-  { type: 'brainDrills' as const, completed: false, href: '/brain-drills' },
+  { type: 'brainDrills' as const, completed: false, href: '/brain' },
 ];
 
 beforeEach(() => {
@@ -159,6 +159,6 @@ describe('DailyMissionsHub', () => {
     // rotation mock: [wordHunt, multiplayer, brainDrills]
     expect(hrefs).toContain('/en/daily');
     expect(hrefs).toContain('/en/multiplayer');
-    expect(hrefs).toContain('/en/brain-drills');
+    expect(hrefs).toContain('/en/brain');
   });
 });

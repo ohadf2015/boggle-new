@@ -149,7 +149,7 @@ describe('useDailyMissions', () => {
 
     // Rotation: [wordHunt, multiplayer, brainDrills] → hrefs from QUEST_MODE_HREFS
     const hrefs = result.current.missions.map(m => m.href);
-    expect(hrefs).toEqual(['/daily', '/multiplayer', '/brain-drills']);
+    expect(hrefs).toEqual(['/daily', '/multiplayer', '/brain']);
   });
 
   it('sets grandSlamClaimed from DB data', async () => {

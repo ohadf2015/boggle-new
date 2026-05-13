@@ -161,17 +161,7 @@ export function BlastGame({
   }, [state.status, progressState.chestProgress, showChestModal]);
 
   if (!introDismissed) {
-    return (
-      <>
-        <BlastLevelIntroCard level={level} onDismiss={() => setIntroDismissed(true)} />
-        {tutorial.showFtueOverlay && (
-          <BlastFtueOverlay
-            onComplete={handleFtueComplete}
-            isVeteran={isVeteranPlayer}
-          />
-        )}
-      </>
-    );
+    return <BlastLevelIntroCard level={level} onDismiss={() => setIntroDismissed(true)} />;
   }
 
   // Show chest open ceremony if chest is full
@@ -201,6 +191,9 @@ export function BlastGame({
 
   return (
     <div className="min-h-screen bg-[#0b1530] text-white">
+      {tutorial.showFtueOverlay && (
+        <BlastFtueOverlay onComplete={handleFtueComplete} isVeteran={isVeteranPlayer} />
+      )}
       {tutorial.showUnlockCard && (
         <BlastUnlockCard
           mechanic={tutorial.showUnlockCard}
@@ -220,18 +213,20 @@ export function BlastGame({
           /* Plan 5 wires hints */
         }}
       />
-      <div className="relative">
+      <div className="relative flex items-center justify-center px-4 py-6 sm:py-10">
         <BlastAtmosphereOverlay modeColor={modeColor} />
         <BlastFxOverlay />
-        <BlastBoard
-          level={state.level}
-          selection={state.selection}
-          invalidShakeKey={state.invalidShakeKey}
-          onPointerDown={handlers.onPointerDown}
-          onPointerEnter={handlers.onPointerMove}
-          onPointerUp={handlers.onPointerUp}
-          modeColor={modeColor}
-        />
+        <div className="w-full max-w-[560px]" style={{ containerType: 'inline-size' }}>
+          <BlastBoard
+            level={state.level}
+            selection={state.selection}
+            invalidShakeKey={state.invalidShakeKey}
+            onPointerDown={handlers.onPointerDown}
+            onPointerEnter={handlers.onPointerMove}
+            onPointerUp={handlers.onPointerUp}
+            modeColor={modeColor}
+          />
+        </div>
       </div>
     </div>
   );

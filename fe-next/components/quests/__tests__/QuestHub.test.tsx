@@ -106,7 +106,7 @@ const defaultMissions = {
   missions: [
     { type: 'wordHunt' as const, completed: false, href: '/daily' },
     { type: 'multiplayer' as const, completed: false, href: '/multiplayer' },
-    { type: 'brainDrills' as const, completed: false, href: '/brain-drills' },
+    { type: 'brainDrills' as const, completed: false, href: '/brain' },
   ],
   completedCount: 0,
   isGrandSlam: false,
@@ -167,7 +167,7 @@ describe('QuestHub', () => {
       missions: [
         { type: 'wordHunt' as const, completed: true, href: '/daily' },
         { type: 'multiplayer' as const, completed: false, href: '/multiplayer' },
-        { type: 'brainDrills' as const, completed: false, href: '/brain-drills' },
+        { type: 'brainDrills' as const, completed: false, href: '/brain' },
       ],
       completedCount: 1,
     });
@@ -183,7 +183,7 @@ describe('QuestHub', () => {
       missions: [
         { type: 'wordHunt' as const, completed: true, href: '/daily' },
         { type: 'multiplayer' as const, completed: true, href: '/multiplayer' },
-        { type: 'brainDrills' as const, completed: true, href: '/brain-drills' },
+        { type: 'brainDrills' as const, completed: true, href: '/brain' },
       ],
       completedCount: 3,
       isGrandSlam: true,
@@ -207,11 +207,11 @@ describe('QuestHub', () => {
     // rotation mock: [wordHunt, multiplayer, brainDrills]
     expect(hrefs).toContain('/en/daily');
     expect(hrefs).toContain('/en/multiplayer');
-    expect(hrefs).toContain('/en/brain-drills');
+    expect(hrefs).toContain('/en/brain');
     // Should NOT have locale-less paths
     expect(hrefs).not.toContain('/daily');
     expect(hrefs).not.toContain('/multiplayer');
-    expect(hrefs).not.toContain('/brain-drills');
+    expect(hrefs).not.toContain('/brain');
   });
 
   it('shows overall progress count', () => {
@@ -220,7 +220,7 @@ describe('QuestHub', () => {
       missions: [
         { type: 'wordHunt' as const, completed: true, href: '/daily' },
         { type: 'multiplayer' as const, completed: false, href: '/multiplayer' },
-        { type: 'brainDrills' as const, completed: false, href: '/brain-drills' },
+        { type: 'brainDrills' as const, completed: false, href: '/brain' },
       ],
       completedCount: 1,
     });

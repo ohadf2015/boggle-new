@@ -13,7 +13,7 @@ const COMMON_URLS = (locale: Locale) => ({
     singleplayer: `${BASE}/${locale}/singleplayer`,
     daily: `${BASE}/${locale}/daily`,
     adventure: `${BASE}/${locale}/adventure`,
-    brainDrills: `${BASE}/${locale}/brain-drills`,
+    brainDrills: `${BASE}/${locale}/brain`,
     education: `${BASE}/${locale}/education`,
     blog: `${BASE}/${locale}/blog`,
     rules: `${BASE}/${locale}/rules`,

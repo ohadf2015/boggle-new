@@ -72,7 +72,7 @@ describe('BlastGame', () => {
     expect(screen.queryByTestId('complete-card')).not.toBeInTheDocument();
   });
 
-  it('shows FTUE overlay on level 1 without ftue_completed', () => {
+  it('shows FTUE overlay on level 1 over game board (after intro dismissed)', async () => {
     const mockLevel1 = { ...mockLevel, levelNumber: 1 };
     render(
       <BlastGame
@@ -83,7 +83,13 @@ describe('BlastGame', () => {
       />
     );
 
-    // FTUE should show during intro phase
+    // Auto-dismiss intro
+    vi.advanceTimersByTime(1500);
+    await waitFor(() => {
+      expect(screen.getByTestId('blast-board')).toBeInTheDocument();
+    });
+
+    // FTUE overlay must render on the game screen
     expect(screen.getByText('Drag across letters to spell a word')).toBeInTheDocument();
   });
 

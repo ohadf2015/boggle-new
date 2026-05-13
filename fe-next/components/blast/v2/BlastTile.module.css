@@ -2,16 +2,17 @@
   position: relative;
   display: grid;
   place-items: center;
-  min-width: 60px;
-  min-height: 60px;
+  width: clamp(44px, 11cqi, 64px);
+  aspect-ratio: 1 / 1;
   border: 3px solid #0b1530;
   border-radius: 12px;
   box-shadow: 4px 4px 0 0 #0b1530;
   font-weight: 800;
-  font-size: 24px;
+  font-size: clamp(18px, 4.5cqi, 28px);
   color: #0b1530;
   user-select: none;
   touch-action: none;
+  cursor: pointer;
 }
 
 .tile[data-state="selected"] {

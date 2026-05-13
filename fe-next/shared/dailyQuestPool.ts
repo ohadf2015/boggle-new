@@ -19,7 +19,7 @@ export const DAILY_QUEST_POOL: DailyQuestMode[] = [
 export const QUEST_MODE_HREFS: Record<DailyQuestMode, string> = {
   wordHunt: '/daily',
   multiplayer: '/multiplayer',
-  brainDrills: '/brain-drills',
+  brainDrills: '/brain',
 };
 
 // LCG shuffle with Murmur3 finalizer to diffuse consecutive integer seeds
