@@ -6,13 +6,8 @@ import {
   getChestTier,
   type DayScore,
 } from '@/lib/daily/weeklyChest'
+import { selectChestPrize } from '@/lib/daily/chestPrizePool'
 import { awardCoinsServer } from '@/backend/services/economy/awardCoins'
-
-const CHEST_REWARDS = {
-  bronze: { coins: 150, badge_id: 'badge_weekly_bronze' },
-  silver: { coins: 300, badge_id: 'badge_weekly_silver' },
-  gold: { coins: 600, badge_id: 'badge_weekly_gold' },
-} as const
 
 export async function POST() {
   const supabase = await createClient()
@@ -24,7 +19,6 @@ export async function POST() {
 
   const today = new Date().toISOString().split('T')[0]
 
-  // Fetch all daily attempt records for the player
   const [puzzleRes, huntRes, wheelRes] = await Promise.all([
     supabase
       .from('daily_puzzle_attempts')
@@ -40,22 +34,18 @@ export async function POST() {
       .eq('player_id', user.id),
   ])
 
-  // Collect all unique dates where the player completed any daily
   const allDates = [
     ...(puzzleRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
     ...(huntRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
     ...(wheelRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
   ]
 
-  // Compute the current cycle progress
   const progress = computeCycleProgress(allDates, today)
 
-  // Check if chest is claimable (7 consecutive days completed)
   if (!progress.isClaimable) {
     return NextResponse.json({ error: 'Chest not ready' }, { status: 400 })
   }
 
-  // Check if already claimed in current cycle
   const { data: existing } = await supabase
     .from('daily_weekly_chests')
     .select('id, opened_at, tier, contents')
@@ -66,7 +56,6 @@ export async function POST() {
     return NextResponse.json({ error: 'Already claimed' }, { status: 409 })
   }
 
-  // Compute week score from scores in the current cycle
   const cycleDateSet = new Set(progress.completedDates)
   const scores: DayScore[] = [
     ...(huntRes.data ?? [])
@@ -93,11 +82,20 @@ export async function POST() {
 
   const weekScore = computeWeekScore(scores)
   const tier = getChestTier(weekScore)
-  const reward = CHEST_REWARDS[tier]
-  const contents = { ...reward, week_score: weekScore }
+
+  // Deterministic seed → retry-safe (same user + cycle = same prize).
+  const prize = selectChestPrize(tier, `${user.id}::${progress.cycleStart}`)
+
+  const contents = {
+    coins: prize.coins,
+    freezes: prize.freezes,
+    badge_id: prize.badgeId,
+    variant_id: prize.variantId,
+    label_key: prize.labelKey,
+    week_score: weekScore,
+  }
   const nowIso = new Date().toISOString()
 
-  // Insert or update the chest record
   let dbError: unknown
   if (existing?.[0]) {
     const { error } = await supabase
@@ -118,16 +116,40 @@ export async function POST() {
   }
   if (dbError) return NextResponse.json({ error: 'Failed to save chest' }, { status: 500 })
 
-  // Award coins
-  await awardCoinsServer(user.id, reward.coins, 'daily_weekly_chest', {
+  await awardCoinsServer(user.id, prize.coins, 'daily_weekly_chest', {
     tier,
     cycle_number: String(progress.cycleNumber),
+    variant_id: prize.variantId,
   })
+
+  // Grant streak freezes when the prize variant includes them. Soft-fail: if
+  // the engagement row doesn't exist yet, skip silently rather than block the
+  // chest claim — the player still gets coins + badge.
+  if (prize.freezes > 0) {
+    const { data: engagement } = await supabase
+      .from('player_engagement')
+      .select('streak_freezes_available')
+      .eq('player_id', user.id)
+      .maybeSingle()
+
+    if (engagement) {
+      await supabase
+        .from('player_engagement')
+        .update({
+          streak_freezes_available:
+            (engagement.streak_freezes_available || 0) + prize.freezes,
+        })
+        .eq('player_id', user.id)
+    }
+  }
 
   return NextResponse.json({
     tier,
-    coins: reward.coins,
-    badgeId: reward.badge_id,
+    coins: prize.coins,
+    freezes: prize.freezes,
+    badgeId: prize.badgeId,
+    variantId: prize.variantId,
+    labelKey: prize.labelKey,
     cycleNumber: progress.cycleNumber,
   })
 }

@@ -51,23 +51,25 @@ describe('DailyRewardPreview', () => {
     expect(timeline).toHaveTextContent('15');
   });
 
-  it('shows milestone proximity when near a badge milestone', () => {
-    // Day 5, next badge milestone is day 7 (weekly_warrior) = 2 days away
+  it('shows milestone proximity pointing at fortnight_fighter (week_warrior badge retired)', () => {
+    // Day 5: next badge milestone is now day 14 (fortnight_fighter) = 9 days away.
+    // The day-7 weekly_warrior badge was retired because the weekly chest now owns
+    // the 7-day milestone reward.
     render(<DailyRewardPreview currentStreakDay={5} t={mockT} />);
-    expect(screen.getByText(/2 days to Week Warrior/)).toBeInTheDocument();
+    expect(screen.getByText(/9 days to Fortnight Fighter/)).toBeInTheDocument();
   });
 
-  it('uses singular "1 day" copy when daysAway is 1 (streak 6 → week warrior)', () => {
-    render(<DailyRewardPreview currentStreakDay={6} t={mockT} />);
-    expect(screen.getByText(/1 day to Week Warrior badge!/)).toBeInTheDocument();
+  it('uses singular "1 day" copy when daysAway is 1 (streak 13 → fortnight fighter)', () => {
+    render(<DailyRewardPreview currentStreakDay={13} t={mockT} />);
+    expect(screen.getByText(/1 day to Fortnight Fighter badge!/)).toBeInTheDocument();
     expect(screen.queryByText(/1 days/)).not.toBeInTheDocument();
   });
 
-  it('shows celebration banner instead of "X days to next" when streak day equals a badge milestone', () => {
-    // Streak 7 = Week Warrior just earned
+  it('does NOT show a celebration banner on day 7 (chest replaces the warrior badge)', () => {
     render(<DailyRewardPreview currentStreakDay={7} t={mockT} />);
-    expect(screen.getByText(/Week Warrior unlocked/)).toBeInTheDocument();
-    expect(screen.queryByText(/days to Fortnight Fighter/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Week Warrior unlocked/)).not.toBeInTheDocument();
+    // Day 7 now points at the next *badge* milestone (fortnight, 7 days away).
+    expect(screen.getByText(/7 days to Fortnight Fighter badge!/)).toBeInTheDocument();
   });
 
   it('shows celebration for centurion milestone (day 100)', () => {
@@ -83,8 +85,8 @@ describe('DailyRewardPreview', () => {
 
   it('translates the badge label (not raw key) in milestone proximity', () => {
     render(<DailyRewardPreview currentStreakDay={5} t={mockT} />);
-    expect(screen.getByText(/Week Warrior/)).toBeInTheDocument();
-    expect(screen.queryByText(/weekWarrior/)).not.toBeInTheDocument();
+    expect(screen.getByText(/Fortnight Fighter/)).toBeInTheDocument();
+    expect(screen.queryByText(/fortnightFighter/)).not.toBeInTheDocument();
   });
 
   it('renders timeline dots for upcoming days', () => {

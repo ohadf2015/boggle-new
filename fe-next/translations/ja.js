@@ -5518,7 +5518,19 @@ const ja = {
       "claimButton": "チェストを開ける",
       "tierBronze": "ブロンズ",
       "tierSilver": "シルバー",
-      "tierGold": "ゴールド"
+      "tierGold": "ゴールド",
+      "freezesGranted": "ストリークシールド +{n}",
+      "prize": {
+        "coinPouch": "コインの袋",
+        "shieldStash": "シールド備蓄",
+        "luckyHaul": "幸運の収穫",
+        "coinChest": "コインチェスト",
+        "guardianPack": "守護者パック",
+        "silverBonanza": "シルバーボナンザ",
+        "dragonHoard": "ドラゴンの宝庫",
+        "fortressVault": "要塞の金庫",
+        "crownJackpot": "クラウンジャックポット"
+      }
     },
     "insights": {
       "personalBest": { "headline": "自己ベスト更新！", "sub": "記録より+{n}ポイント" },

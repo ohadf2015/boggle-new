@@ -117,6 +117,21 @@ describe('POST /api/daily/weekly-chest/claim', () => {
             ),
           }
         }
+        if (table === 'player_engagement') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                maybeSingle: vi.fn().mockResolvedValue({
+                  data: { streak_freezes_available: 0 },
+                  error: null,
+                }),
+              }),
+            }),
+            update: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+            }),
+          }
+        }
         return {
           select: vi.fn().mockReturnValue(
             createChainableMock([])
@@ -194,6 +209,21 @@ describe('POST /api/daily/weekly-chest/claim', () => {
             }),
           }
         }
+        if (table === 'player_engagement') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                maybeSingle: vi.fn().mockResolvedValue({
+                  data: { streak_freezes_available: 0 },
+                  error: null,
+                }),
+              }),
+            }),
+            update: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+            }),
+          }
+        }
         return {
           select: vi.fn().mockReturnValue(
             createChainableMock([])
@@ -224,17 +254,23 @@ describe('POST /api/daily/weekly-chest/claim', () => {
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(json.tier).toBe('gold')
-    expect(json.coins).toBe(600)
+    // Prize pool varies the exact coin amount per variant — assert range, not exact.
+    expect(json.coins).toBeGreaterThanOrEqual(500)
+    expect(json.coins).toBeLessThanOrEqual(800)
     expect(json.badgeId).toBe('badge_weekly_gold')
+    expect(json.variantId).toMatch(/^gold-/)
+    expect(json.labelKey).toMatch(/^daily\.weeklyChest\.prize\./)
     expect(json.cycleNumber).toBe(1)
+    expect(typeof json.freezes).toBe('number')
 
     expect(awardCoinsServer).toHaveBeenCalledWith(
       'user-123',
-      600,
+      json.coins,
       'daily_weekly_chest',
       expect.objectContaining({
         tier: 'gold',
         cycle_number: '1',
+        variant_id: expect.stringMatching(/^gold-/),
       })
     )
   })
@@ -291,6 +327,21 @@ describe('POST /api/daily/weekly-chest/claim', () => {
             }),
           }
         }
+        if (table === 'player_engagement') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                maybeSingle: vi.fn().mockResolvedValue({
+                  data: { streak_freezes_available: 0 },
+                  error: null,
+                }),
+              }),
+            }),
+            update: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+            }),
+          }
+        }
         return {
           select: vi.fn().mockReturnValue(
             createChainableMock([])
@@ -321,14 +372,17 @@ describe('POST /api/daily/weekly-chest/claim', () => {
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(json.tier).toBe('silver')
-    expect(json.coins).toBe(300)
+    expect(json.coins).toBeGreaterThanOrEqual(250)
+    expect(json.coins).toBeLessThanOrEqual(400)
+    expect(json.variantId).toMatch(/^silver-/)
 
     expect(awardCoinsServer).toHaveBeenCalledWith(
       'user-123',
-      300,
+      json.coins,
       'daily_weekly_chest',
       expect.objectContaining({
         tier: 'silver',
+        variant_id: expect.stringMatching(/^silver-/),
       })
     )
   })

@@ -5485,7 +5485,19 @@ const sv = {
       "claimButton": "Öppna kista",
       "tierBronze": "Brons",
       "tierSilver": "Silver",
-      "tierGold": "Guld"
+      "tierGold": "Guld",
+      "freezesGranted": "+{n} Streak Shield",
+      "prize": {
+        "coinPouch": "Myntpung",
+        "shieldStash": "Sköldförråd",
+        "luckyHaul": "Lyckofångst",
+        "coinChest": "Myntkista",
+        "guardianPack": "Väktarpaket",
+        "silverBonanza": "Silverskörd",
+        "dragonHoard": "Drakskatt",
+        "fortressVault": "Fästningsvalv",
+        "crownJackpot": "Kronjackpot"
+      }
     },
     "insights": {
       "personalBest": { "headline": "Nytt personbästa!", "sub": "+{n} poäng över ditt rekord" },

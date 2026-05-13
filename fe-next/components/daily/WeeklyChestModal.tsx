@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { Coins, Award, X } from 'lucide-react'
+import { Coins, Award, X, Snowflake } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { cn } from '@/lib/utils'
 import gsap from 'gsap'
@@ -117,6 +117,18 @@ export default function WeeklyChestModal({ chest, onClose }: Props) {
             </span>
           </div>
 
+          {chest.freezes && chest.freezes > 0 ? (
+            <div
+              data-testid="chest-freeze-bonus"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-neo border-2 border-neo-black bg-neo-cyan/15 shadow-hard-sm"
+            >
+              <Snowflake className="w-5 h-5 text-neo-cyan" />
+              <span className="font-neo-display font-black text-sm text-neo-cyan">
+                {t('daily.weeklyChest.freezesGranted', { n: chest.freezes }).replace('{n}', String(chest.freezes))}
+              </span>
+            </div>
+          ) : null}
+
           <div className="flex items-center gap-3">
             <Award className={cn('w-6 h-6', TIER_COLORS[chest.tier])} />
             <Image
@@ -128,6 +140,15 @@ export default function WeeklyChestModal({ chest, onClose }: Props) {
               unoptimized
             />
           </div>
+
+          {chest.labelKey ? (
+            <p
+              data-testid="chest-prize-label"
+              className="font-neo-display font-black text-base text-neo-cream uppercase tracking-wider"
+            >
+              {t(chest.labelKey)}
+            </p>
+          ) : null}
 
           <p className={cn('font-neo-display font-black text-lg uppercase tracking-wider', TIER_COLORS[chest.tier])}>
             {tierLabel}

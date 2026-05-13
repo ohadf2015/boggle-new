@@ -10,7 +10,10 @@ export const DAILY_REWARD_SCHEDULE = [
   { day: 2, coins: 15, label: 'warmup' },
   { day: 3, coins: 25, label: 'committed' },
   { day: 5, coins: 50, label: 'dedicated' },
-  { day: 7, coins: 100, badge: 'weekly_warrior', label: 'weekWarrior' },
+  // Day 7 badge ('weekly_warrior') retired 2026-05-13: the weekly chest now
+  // owns the 7-day milestone reward, so we keep the coin bonus but drop the
+  // redundant badge nag from the milestone preview.
+  { day: 7, coins: 100, label: 'weekWarrior' },
   { day: 14, coins: 200, badge: 'fortnight_fighter', label: 'fortnightFighter' },
   { day: 30, coins: 500, badge: 'monthly_master', label: 'monthlyMaster' },
   { day: 50, coins: 750, label: 'veteran' },

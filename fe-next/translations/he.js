@@ -5486,7 +5486,19 @@ const he = {
       "claimButton": "פתח תיבה",
       "tierBronze": "ברונזה",
       "tierSilver": "כסף",
-      "tierGold": "זהב"
+      "tierGold": "זהב",
+      "freezesGranted": "+{n} מגן רצף",
+      "prize": {
+        "coinPouch": "ארנק מטבעות",
+        "shieldStash": "מלאי מגנים",
+        "luckyHaul": "שלל מזל",
+        "coinChest": "תיבת מטבעות",
+        "guardianPack": "חבילת שומר",
+        "silverBonanza": "אוצר כסף",
+        "dragonHoard": "אוצר הדרקון",
+        "fortressVault": "כספת המבצר",
+        "crownJackpot": "ג'קפוט הכתר"
+      }
     },
     "insights": {
       "personalBest": { "headline": "שיא אישי חדש!", "sub": "+{n} נקודות מעל שיאך" },

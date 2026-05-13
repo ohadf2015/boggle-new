@@ -5528,7 +5528,19 @@ const es = {
       "claimButton": "Abrir cofre",
       "tierBronze": "Bronce",
       "tierSilver": "Plata",
-      "tierGold": "Oro"
+      "tierGold": "Oro",
+      "freezesGranted": "+{n} Escudo de Racha",
+      "prize": {
+        "coinPouch": "Bolsa de monedas",
+        "shieldStash": "Reserva de escudos",
+        "luckyHaul": "Botín de suerte",
+        "coinChest": "Cofre de monedas",
+        "guardianPack": "Paquete del guardián",
+        "silverBonanza": "Bonanza de plata",
+        "dragonHoard": "Tesoro del dragón",
+        "fortressVault": "Bóveda de la fortaleza",
+        "crownJackpot": "Premio de la corona"
+      }
     },
     "insights": {
       "personalBest": { "headline": "¡Nuevo récord personal!", "sub": "+{n} pts sobre tu récord" },

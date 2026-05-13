@@ -23,10 +23,10 @@ describe('dailyRewards', () => {
       expect(reward.label).toBe('starter');
     });
 
-    it('returns exact milestone reward for day 7 with badge', () => {
+    it('returns coins for day 7 without warrior badge (replaced by weekly chest)', () => {
       const reward = getRewardForDay(7);
       expect(reward.coins).toBe(100);
-      expect(reward.badge).toBe('weekly_warrior');
+      expect(reward.badge).toBeUndefined();
       expect(reward.label).toBe('weekWarrior');
     });
 
@@ -74,11 +74,11 @@ describe('dailyRewards', () => {
       expect(next!.coins).toBe(100);
     });
 
-    it('returns day 7 milestone when on day 6', () => {
+    it('returns day 7 milestone when on day 6 (no badge — replaced by weekly chest)', () => {
       const next = getNextMilestone(6);
       expect(next!.day).toBe(7);
       expect(next!.coins).toBe(100);
-      expect(next!.badge).toBe('weekly_warrior');
+      expect(next!.badge).toBeUndefined();
     });
 
     it('returns null when on day 100 (last milestone)', () => {
@@ -92,13 +92,15 @@ describe('dailyRewards', () => {
     });
 
     describe('with { badgeOnly: true }', () => {
-      it('skips non-badge milestones (day 1,2,3,5)', () => {
+      it('skips non-badge milestones AND the now-badgeless day-7 milestone', () => {
+        // Day 7 used to surface weekly_warrior; weekly chest replaces it,
+        // so the next badge milestone for a fresh user is fortnight_fighter (day 14).
         const next = getNextMilestone(0, { badgeOnly: true });
-        expect(next!.day).toBe(7);
-        expect(next!.badge).toBe('weekly_warrior');
+        expect(next!.day).toBe(14);
+        expect(next!.badge).toBe('fortnight_fighter');
       });
 
-      it('returns day 14 fortnight when on day 7 (just earned week badge)', () => {
+      it('returns day 14 fortnight when on day 7', () => {
         const next = getNextMilestone(7, { badgeOnly: true });
         expect(next!.day).toBe(14);
         expect(next!.badge).toBe('fortnight_fighter');

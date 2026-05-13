@@ -5590,7 +5590,19 @@ const en = {
       "claimButton": "Claim Chest",
       "tierBronze": "Bronze",
       "tierSilver": "Silver",
-      "tierGold": "Gold"
+      "tierGold": "Gold",
+      "freezesGranted": "+{n} Streak Freeze",
+      "prize": {
+        "coinPouch": "Coin Pouch",
+        "shieldStash": "Shield Stash",
+        "luckyHaul": "Lucky Haul",
+        "coinChest": "Coin Chest",
+        "guardianPack": "Guardian Pack",
+        "silverBonanza": "Silver Bonanza",
+        "dragonHoard": "Dragon Hoard",
+        "fortressVault": "Fortress Vault",
+        "crownJackpot": "Crown Jackpot"
+      }
     },
     "insights": {
       "personalBest": { "headline": "New personal best!", "sub": "+{n} pts vs your record" },

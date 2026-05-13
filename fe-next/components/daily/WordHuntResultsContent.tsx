@@ -129,7 +129,12 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   isStreakProtected = false,
   t,
 }) => {
-  const [wordWheelPlayed, setWordWheelPlayed] = useState(false);
+  // Lazy-init from localStorage so the cross-promo CTA doesn't flash on mount.
+  // If the player already finished the wheel, we want to show "Back to Daily Hub"
+  // on the very first paint, not after a useEffect fires.
+  const [wordWheelPlayed, setWordWheelPlayed] = useState(() =>
+    typeof window === 'undefined' ? false : hasPlayedWordWheelToday(language),
+  );
   useEffect(() => {
     const refresh = () => setWordWheelPlayed(hasPlayedWordWheelToday(language));
     refresh();

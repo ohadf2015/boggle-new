@@ -6,6 +6,10 @@ export interface PendingChest {
   coins: number
   badgeId: string
   cycleNumber?: number
+  // Prize-pool fields (server may omit on legacy chests; treat as optional).
+  freezes?: number
+  variantId?: string
+  labelKey?: string
 }
 
 export interface WeeklyChestState {
