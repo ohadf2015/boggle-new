@@ -13,14 +13,14 @@ interface PageProps {
 
 const SLUG = 'netflix-word-game-2026-rise';
 const DATE_PUBLISHED = '2026-04-29';
-const DATE_MODIFIED = '2026-04-29';
+const DATE_MODIFIED = '2026-05-13';
 
 const metaTitles: Record<string, string> = {
   en: 'Netflix Just Dropped a Word Game — 2026 Is the Year Word Games Took Over',
   he: 'נטפליקס שחררה משחק מילים — 2026 היא השנה של משחקי המילים',
   sv: 'Netflix släppte ett ordspel — 2026 är ordspelens år',
   ja: 'Netflixがワードゲームを投入 — 2026年はワードゲームの年',
-  es: 'Netflix lanza un juego de palabras — 2026, el año de los juegos de palabras',
+  es: 'Juego de Palabras Netflix — Por Qué 2026 es el Año del Boom (Análisis)',
 };
 
 const metaDescriptions: Record<string, string> = {
@@ -28,7 +28,7 @@ const metaDescriptions: Record<string, string> = {
   he: 'נטפליקס הוסיפה משחק מילים יומי וזה לא צירוף מקרים. למה כל שירות סטרימינג, אפליקציית אימון מוחי ופיד טיק־טוק פתאום בנויים סביב לוחות אותיות ב־2026.',
   sv: 'Netflix lade till ett dagligt ordspel och det är ingen tillfällighet. Varför varje streamingtjänst, hjärnträningsapp och TikTok-flöde plötsligt drivs av bokstavsrutnät 2026.',
   ja: 'Netflixがデイリーワードゲームを追加。偶然じゃない。なぜ全ストリーミング、脳トレアプリ、TikTokフィードが2026年に文字グリッドで動いているのか。',
-  es: 'Netflix agregó un juego de palabras diario y no es casualidad. Por qué cada streaming, app de entrenamiento cerebral y feed de TikTok ahora corre sobre grillas de letras en 2026.',
+  es: 'Juego de palabras de Netflix: por qué Netflix añadió un word game diario y cómo encaja en el boom de juegos de palabras de 2026. Análisis completo.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
