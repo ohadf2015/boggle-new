@@ -1,89 +1,44 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { BlastFtueOverlay } from '../BlastFtueOverlay';
 
-// Mock LanguageContext
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string, fallback: string) => fallback,
+    t: (_key: string, fallback: string) => fallback,
   }),
 }));
 
-describe('BlastFtueOverlay', () => {
-  it('renders step 1 with arrow and text', () => {
-    const onComplete = vi.fn();
-    render(<BlastFtueOverlay onComplete={onComplete} isVeteran={false} />);
-
+describe('BlastFtueOverlay (controlled)', () => {
+  it('renders step 1 message when step=1', () => {
+    render(<BlastFtueOverlay onComplete={vi.fn()} step={1} />);
     expect(screen.getByText('Drag across letters to spell a word')).toBeInTheDocument();
   });
 
-  it('advances to step 2 on pointerdown', async () => {
+  it('renders step 6 message + continue button when step=6', () => {
     const onComplete = vi.fn();
-    const onStepChange = vi.fn();
-    render(
-      <BlastFtueOverlay onComplete={onComplete} isVeteran={false} onStepChange={onStepChange} />
-    );
-
-    const overlay = screen.getByText('Drag across letters to spell a word').closest('div');
-    expect(overlay).toBeInTheDocument();
-
-    if (overlay?.parentElement) {
-      fireEvent.pointerDown(overlay.parentElement);
-    }
-
-    await waitFor(() => {
-      expect(screen.getByText('Try it: drag from C to T')).toBeInTheDocument();
-    });
-  });
-
-  it('shows veteran welcome message when isVeteran=true', () => {
-    const onComplete = vi.fn();
-    render(<BlastFtueOverlay onComplete={onComplete} isVeteran={true} />);
-
-    expect(screen.getByText('Welcome back!')).toBeInTheDocument();
-    expect(screen.getByText('Blast has been redesigned. Enjoy the new levels!')).toBeInTheDocument();
-  });
-
-  it('calls onComplete when veteran dismisses', async () => {
-    const onComplete = vi.fn();
-    render(<BlastFtueOverlay onComplete={onComplete} isVeteran={true} />);
-
-    const button = screen.getByText("Let's go");
-    fireEvent.click(button);
-
+    render(<BlastFtueOverlay onComplete={onComplete} step={6} />);
+    expect(screen.getByText(/Level 1 complete/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Continue'));
     expect(onComplete).toHaveBeenCalled();
   });
 
-  it('auto-advances from step 3 after 2 seconds', async () => {
-    const onComplete = vi.fn();
-    const onStepChange = vi.fn();
-    render(
-      <BlastFtueOverlay onComplete={onComplete} isVeteran={false} onStepChange={onStepChange} />
-    );
-
-    // Advance to step 2
-    const overlay = screen.getByText('Drag across letters to spell a word').closest('div');
-    if (overlay?.parentElement) {
-      fireEvent.pointerDown(overlay.parentElement);
-    }
-
-    await waitFor(() => {
-      expect(screen.getByText('Try it: drag from C to T')).toBeInTheDocument();
-    });
-
-    // Simulate step progression (this would normally come from parent event)
-    // For this test, we verify the component structure is correct
-    expect(onStepChange).toHaveBeenCalled();
+  it('renders nothing when step=null', () => {
+    const { container } = render(<BlastFtueOverlay onComplete={vi.fn()} step={null} />);
+    expect(container.querySelector('[data-testid="blast-ftue-spotlight"]')).toBeNull();
   });
 
-  it('displays step 6 with level complete message', async () => {
-    const onComplete = vi.fn();
-    const { rerender } = render(
-      <BlastFtueOverlay onComplete={onComplete} isVeteran={false} />
-    );
+  it('spotlight wrapper is pointer-events-none so taps reach the board', () => {
+    const { container } = render(<BlastFtueOverlay onComplete={vi.fn()} step={2} />);
+    const wrap = container.querySelector('[data-testid="blast-ftue-spotlight"]');
+    expect(wrap).toBeInTheDocument();
+    expect(wrap?.className).toMatch(/pointer-events-none/);
+  });
 
-    // Note: In a real scenario, step progression would be controlled by parent
-    // This test verifies the component can render without errors
-    expect(screen.getByText('Drag across letters to spell a word')).toBeInTheDocument();
+  it('veteran path shows welcome and dismisses via CTA', () => {
+    const onComplete = vi.fn();
+    render(<BlastFtueOverlay onComplete={onComplete} isVeteran={true} />);
+    expect(screen.getByText('Welcome back!')).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Let's go"));
+    expect(onComplete).toHaveBeenCalled();
   });
 });

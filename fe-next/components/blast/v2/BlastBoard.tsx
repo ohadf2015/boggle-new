@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import { LayoutGroup, AnimatePresence } from 'framer-motion';
 import type { BlastLevel, CellId } from '@/lib/blast/v2/types';
 import { cellId as makeCellId, type SelectionState } from '@/lib/blast/v2/engine';
@@ -43,13 +43,40 @@ export function BlastBoard({
   const tileState = (id: CellId): BlastTileState => (selectedSet.has(id) ? 'selected' : 'normal');
   const dir = config.rtl ? 'rtl' : 'ltr';
 
+  // Window-level pointermove + elementFromPoint hit-test.
+  // Per-tile onPointerEnter does NOT fire on touch (Capacitor WKWebView
+  // implicit-capture); window-level pointermove with hit-test is the
+  // only mobile-safe way to track drag across siblings.
+  const isDragging = selection.kind === 'active' && selection.mode === 'drag';
+  useEffect(() => {
+    if (!isDragging) return;
+    const onMove = (e: PointerEvent) => {
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      const tile = el instanceof Element ? el.closest('[data-cell-id]') : null;
+      if (tile instanceof HTMLElement) {
+        const id = tile.dataset.cellId as CellId | undefined;
+        if (id) onPointerEnter(id);
+      }
+    };
+    const onUp = () => onPointerUp();
+    window.addEventListener('pointermove', onMove, { passive: true });
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+  }, [isDragging, onPointerEnter, onPointerUp]);
+
   return (
     <div
       ref={boardRef}
       dir={dir}
       data-shake-key={invalidShakeKey}
       data-testid="blast-board"
-      className="relative flex items-end justify-center gap-2 p-4"
+      className="relative flex items-end justify-center gap-2 p-4 touch-none select-none"
+      style={{ touchAction: 'none' }}
       onPointerUp={onPointerUp}
     >
       <LayoutGroup>
@@ -71,7 +98,6 @@ export function BlastBoard({
                     fontStack={config.fontStack}
                     paddingExtra={config.tileExtraPadding}
                     onPointerDown={() => onPointerDown(id)}
-                    onPointerEnter={() => selection.kind === 'active' && selection.mode === 'drag' && onPointerEnter(id)}
                   />
                 );
               })}

@@ -1,52 +1,27 @@
 'use client';
-import { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+
+export type FtueStep = 1 | 2 | 3 | 4 | 5 | 6 | null;
 
 type Props = {
   onComplete: () => void;
   isVeteran?: boolean;
-  onStepChange?: (step: number) => void;
+  step?: FtueStep;
 };
 
-type FtueStep = 1 | 2 | 3 | 4 | 5 | 6;
+const MESSAGES: Record<Exclude<FtueStep, null>, { key: string; fallback: string }> = {
+  1: { key: 'blast.tutorial.ftue.step1', fallback: 'Drag across letters to spell a word' },
+  2: { key: 'blast.tutorial.ftue.step2', fallback: 'Nice — keep going!' },
+  3: { key: 'blast.tutorial.ftue.step3', fallback: 'Letters above fall to fill the space' },
+  4: { key: 'blast.tutorial.ftue.step4', fallback: 'Find more words to fill the chest bar' },
+  5: { key: 'blast.tutorial.ftue.step5', fallback: 'Or tap each letter, double-tap to confirm' },
+  6: { key: 'blast.tutorial.ftue.step6', fallback: 'Level 1 complete! Watch your chest bar →' },
+};
 
-export function BlastFtueOverlay({ onComplete, isVeteran, onStepChange }: Props) {
+export function BlastFtueOverlay({ onComplete, isVeteran, step = 1 }: Props) {
   const { t } = useLanguage();
   const reducedMotion = useReducedMotion();
-  const [step, setStep] = useState<FtueStep>(1);
-  const [skipTimeout, setSkipTimeout] = useState(false);
-
-  useEffect(() => onStepChange?.(step), [step, onStepChange]);
-
-  const handleDragStart = () => {
-    if (step === 1) setStep(2);
-  };
-
-  const handleWordFound = () => {
-    if (step === 2) {
-      setStep(3);
-      setSkipTimeout(true);
-      const timeout = setTimeout(() => {
-        setStep(4);
-        setSkipTimeout(false);
-      }, 2000);
-      return;
-    }
-    if (step === 4) {
-      setStep(5);
-      return;
-    }
-    if (step === 5) {
-      setStep(6);
-    }
-  };
-
-  const handleLevelComplete = () => {
-    if (step === 6) {
-      onComplete();
-    }
-  };
 
   if (isVeteran) {
     return (
@@ -78,149 +53,39 @@ export function BlastFtueOverlay({ onComplete, isVeteran, onStepChange }: Props)
     );
   }
 
+  if (step === null) return null;
+  const msg = MESSAGES[step];
+
+  // Spotlight pattern: full-screen wrapper is pointer-events-none so taps
+  // reach the board underneath. Only the message bubble (and step-6 button)
+  // claim pointer events.
   return (
-    <AnimatePresence mode="wait">
-      {step === 1 && (
+    <div
+      data-testid="blast-ftue-spotlight"
+      className="fixed inset-x-0 top-0 z-40 pointer-events-none flex justify-center"
+    >
+      <AnimatePresence mode="wait">
         <motion.div
-          key="step-1"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onPointerDown={handleDragStart}
-          className="fixed inset-0 flex items-center justify-center bg-black/75 z-50"
+          key={`ftue-step-${step}`}
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -20, opacity: 0 }}
+          transition={{ duration: reducedMotion === true ? 0 : 0.25 }}
+          className="pointer-events-auto mt-4 mx-4 max-w-md bg-[#0b1530] border-neo-thick border-black rounded-neo px-5 py-3 text-center text-white shadow-hard"
         >
-          <div className="space-y-4 text-center">
-            <div className="text-white text-lg">
-              {t('blast.tutorial.ftue.step1', 'Drag across letters to spell a word')}
-            </div>
-            <svg className="w-12 h-12 mx-auto" viewBox="0 0 24 24">
-              <path d="M3 12h18M12 3v18" stroke="white" strokeWidth="2" />
-            </svg>
+          <div className="text-sm font-bold" data-step={step}>
+            {t(msg.key, msg.fallback)}
           </div>
+          {step === 6 && (
+            <button
+              onClick={onComplete}
+              className="mt-3 px-4 py-2 bg-neo-pink border-neo-thick border-black rounded-neo text-sm font-bold"
+            >
+              {t('blast.tutorial.ftue.step6.cta', 'Continue')}
+            </button>
+          )}
         </motion.div>
-      )}
-
-      {step === 2 && (
-        <motion.div
-          key="step-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 flex items-center justify-center bg-black/75 z-50"
-        >
-          <div className="space-y-4 text-center text-white">
-            <div className="text-lg">
-              {t('blast.tutorial.ftue.step2', 'Try it: drag from C to T')}
-            </div>
-            {reducedMotion !== true && (
-              <motion.svg
-                className="w-16 h-16 mx-auto"
-                viewBox="0 0 100 100"
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <path d="M 20 50 Q 50 30, 80 50" stroke="white" strokeWidth="3" fill="none" />
-              </motion.svg>
-            )}
-          </div>
-        </motion.div>
-      )}
-
-      {step === 3 && (
-        <motion.div
-          key="step-3"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 flex items-center justify-center bg-black/75 z-50"
-        >
-          <div className="space-y-4 text-center text-white">
-            <div className="text-lg">
-              {t('blast.tutorial.ftue.step3', 'Letters above fall to fill the space')}
-            </div>
-            <div className="text-xs opacity-70">
-              {reducedMotion !== true
-                ? t('blast.tutorial.ftue.step3.hint', 'Watch the animation')
-                : t('blast.tutorial.ftue.step3.hint', 'Letters fall down')}
-            </div>
-            {skipTimeout && (
-              <motion.div
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 0.3 }}
-              >
-                ✓
-              </motion.div>
-            )}
-          </div>
-        </motion.div>
-      )}
-
-      {step === 4 && (
-        <motion.div
-          key="step-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 flex items-center justify-center bg-black/75 z-50"
-        >
-          <div className="space-y-4 text-center text-white">
-            <div className="text-lg font-bold">
-              {t('blast.tutorial.ftue.step4', 'Find 3 ANIMAL words')}
-            </div>
-            <div className="flex justify-center gap-2">
-              <span className="text-2xl">●</span>
-              <span className="text-2xl opacity-30">○</span>
-              <span className="text-2xl opacity-30">○</span>
-            </div>
-          </div>
-        </motion.div>
-      )}
-
-      {step === 5 && (
-        <motion.div
-          key="step-5"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 flex items-center justify-center bg-black/75 z-50"
-        >
-          <div className="space-y-4 text-center text-white">
-            <div className="text-lg">
-              {t('blast.tutorial.ftue.step5', 'Or tap each letter, double-tap to confirm')}
-            </div>
-            {reducedMotion !== true && (
-              <motion.svg
-                className="w-16 h-16 mx-auto"
-                viewBox="0 0 100 100"
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 0.8, repeat: Infinity }}
-              >
-                <circle cx="50" cy="50" r="20" fill="white" opacity="0.5" />
-              </motion.svg>
-            )}
-          </div>
-        </motion.div>
-      )}
-
-      {step === 6 && (
-        <motion.div
-          key="step-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={handleLevelComplete}
-          className="fixed inset-0 flex items-center justify-center bg-black/75 z-50"
-        >
-          <div className="space-y-4 text-center text-white">
-            <div className="text-2xl font-bold">
-              {t('blast.tutorial.ftue.step6', 'Level 1! Watch your chest bar →')}
-            </div>
-            <div className="text-sm opacity-70">
-              {t('blast.tutorial.ftue.step6.hint', 'Tap to continue')}
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+      </AnimatePresence>
+    </div>
   );
 }

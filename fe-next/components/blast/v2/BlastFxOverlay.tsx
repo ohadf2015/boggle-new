@@ -8,11 +8,12 @@ export function BlastFxOverlay() {
 
   useEffect(() => {
     if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const parent = canvas.parentElement ?? undefined;
     const app = new PIXI.Application({
-      view: canvasRef.current,
-      width: 400,
-      height: 600,
-      backgroundColor: 0x00000000,
+      view: canvas,
+      resizeTo: parent,
+      backgroundAlpha: 0,
       antialias: true,
     });
     appRef.current = app;

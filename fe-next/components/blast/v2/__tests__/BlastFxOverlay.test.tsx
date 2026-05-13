@@ -2,18 +2,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
 import { BlastFxOverlay } from '../BlastFxOverlay';
 
-// Mock pixi.js
+// Capture PIXI Application constructor args so we can assert config.
+const appCtorSpy = vi.fn();
+
 vi.mock('pixi.js', async () => {
   const actual = await vi.importActual<any>('pixi.js');
 
   class MockApplication {
-    stage = {
-      addChild: vi.fn(),
-    };
-    ticker = {
-      add: vi.fn(),
-    };
+    stage = { addChild: vi.fn() };
+    ticker = { add: vi.fn() };
     destroy = vi.fn();
+    renderer = { resize: vi.fn() };
+    constructor(opts: unknown) {
+      appCtorSpy(opts);
+    }
   }
 
   return {
@@ -51,5 +53,22 @@ describe('BlastFxOverlay', () => {
     unmount();
     // If cleanup completes without error, the component cleaned up properly
     expect(true).toBe(true);
+  });
+
+  it('mounts PIXI Application with transparent background (backgroundAlpha:0)', () => {
+    appCtorSpy.mockClear();
+    render(<BlastFxOverlay />);
+    expect(appCtorSpy).toHaveBeenCalled();
+    const opts = appCtorSpy.mock.calls[0][0];
+    // backgroundAlpha must be 0 — else PIXI paints opaque black over the board
+    expect(opts.backgroundAlpha).toBe(0);
+  });
+
+  it('does not hard-code 400x600 — sizes to parent via resizeTo', () => {
+    appCtorSpy.mockClear();
+    render(<BlastFxOverlay />);
+    const opts = appCtorSpy.mock.calls[0][0];
+    // Either resizeTo provided OR width/height absent so PIXI defaults to canvas attrs
+    expect(opts.resizeTo !== undefined || (opts.width === undefined && opts.height === undefined)).toBe(true);
   });
 });

@@ -54,7 +54,10 @@ export function BlastTile({
       animate={state === 'selected' ? { scale: 1.05, y: -4 } : { scale: 1, y: 0 }}
       exit={state === 'just-cleared' ? { scale: 0, opacity: 0, rotate: 8 } : undefined}
       onPointerDown={(e) => {
-        e.preventDefault();
+        // Release implicit pointer capture so window-level pointermove
+        // can hit-test other tiles during a touch drag.
+        const t = e.currentTarget as Element & { releasePointerCapture?: (id: number) => void };
+        t.releasePointerCapture?.(e.pointerId);
         onPointerDown?.();
       }}
       onPointerEnter={() => onPointerEnter?.()}

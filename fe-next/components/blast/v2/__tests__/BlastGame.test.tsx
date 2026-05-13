@@ -72,7 +72,7 @@ describe('BlastGame', () => {
     expect(screen.queryByTestId('complete-card')).not.toBeInTheDocument();
   });
 
-  it('shows FTUE overlay on level 1 without ftue_completed', () => {
+  it('shows non-veteran FTUE overlay step 1 on level 1 AFTER intro dismisses', async () => {
     const mockLevel1 = { ...mockLevel, levelNumber: 1 };
     render(
       <BlastGame
@@ -82,9 +82,26 @@ describe('BlastGame', () => {
         onAdvance={vi.fn()}
       />
     );
+    // Intro must dismiss first so FTUE coexists with the board (spotlight pattern).
+    vi.advanceTimersByTime(1500);
+    await waitFor(() => {
+      expect(screen.getByText('Drag across letters to spell a word')).toBeInTheDocument();
+    });
+    // Spotlight wrapper must be pointer-events-none so taps reach the board.
+    expect(screen.getByTestId('blast-ftue-spotlight').className).toMatch(/pointer-events-none/);
+  });
 
-    // FTUE should show during intro phase
-    expect(screen.getByText('Drag across letters to spell a word')).toBeInTheDocument();
+  it('shows veteran FTUE during intro phase when veteran', () => {
+    const mockLevel1 = { ...mockLevel, levelNumber: 1 };
+    render(
+      <BlastGame
+        level={mockLevel1}
+        unlocksSeen={{}}
+        isVeteranPlayer={true}
+        onAdvance={vi.fn()}
+      />
+    );
+    expect(screen.getByText('Welcome back!')).toBeInTheDocument();
   });
 
   it('calls onUpdateUnlocks when FTUE completes', async () => {

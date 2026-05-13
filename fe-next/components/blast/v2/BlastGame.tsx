@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { BlastLevel } from '@/lib/blast/v2/types';
 import { markUnlockSeen, completeFtue, setSkipAll, type UnlocksSeen, type MechanicKey } from '@/lib/blast/v2/tutorial/unlocks-seen';
 import { useBlastV2 } from '@/lib/blast/v2/useBlastV2';
@@ -15,7 +15,7 @@ import { BlastLevelCompleteCard } from './BlastLevelCompleteCard';
 import { BlastChestOpenModal } from './BlastChestOpenModal';
 import { BlastFxOverlay } from './BlastFxOverlay';
 import { BlastAtmosphereOverlay } from './BlastAtmosphereOverlay';
-import { BlastFtueOverlay } from './BlastFtueOverlay';
+import { BlastFtueOverlay, type FtueStep } from './BlastFtueOverlay';
 import { BlastUnlockCard } from './BlastUnlockCard';
 
 type Props = {
@@ -68,6 +68,40 @@ export function BlastGame({
   const { state: progressState, clearLevel, openChest, openMutation } = useBlastProgress();
   const [showChestModal, setShowChestModal] = useState(false);
   const tutorial = useBlastTutorial(level, unlocksSeen, isVeteranPlayer, onUpdateUnlocks ?? (() => {}));
+
+  // Controlled FTUE step. Advances based on observable game-state transitions.
+  const [ftueStep, setFtueStep] = useState<FtueStep>(1);
+  const prevSelectionKind = useRef(state.selection.kind);
+  const prevWordsFound = useRef(state.foundWords.size);
+  useEffect(() => {
+    if (!tutorial.showFtueOverlay || isVeteranPlayer) return;
+    const wasIdle = prevSelectionKind.current === 'idle';
+    const isActive = state.selection.kind === 'active';
+    if (wasIdle && isActive) {
+      setFtueStep((s) => (s === 1 ? 2 : s));
+    }
+    prevSelectionKind.current = state.selection.kind;
+  }, [state.selection.kind, tutorial.showFtueOverlay, isVeteranPlayer]);
+  useEffect(() => {
+    if (!tutorial.showFtueOverlay || isVeteranPlayer) return;
+    const curr = state.foundWords.size;
+    const prev = prevWordsFound.current;
+    if (curr > prev) {
+      setFtueStep((s) => {
+        if (s === 2) return 3;
+        if (s === 3 || s === 4) return curr >= 2 ? 5 : 4;
+        if (s === 5) return 6;
+        return s;
+      });
+    }
+    prevWordsFound.current = curr;
+  }, [state.foundWords, tutorial.showFtueOverlay, isVeteranPlayer]);
+  // Auto-advance step 3 → 4 after 2s so the "letters fall" beat doesn't trap players.
+  useEffect(() => {
+    if (ftueStep !== 3) return;
+    const t = setTimeout(() => setFtueStep((s) => (s === 3 ? 4 : s)), 2000);
+    return () => clearTimeout(t);
+  }, [ftueStep]);
 
   // Track level start on intro dismissal
   useEffect(() => {
@@ -164,10 +198,10 @@ export function BlastGame({
     return (
       <>
         <BlastLevelIntroCard level={level} onDismiss={() => setIntroDismissed(true)} />
-        {tutorial.showFtueOverlay && (
+        {tutorial.showFtueOverlay && isVeteranPlayer && (
           <BlastFtueOverlay
             onComplete={handleFtueComplete}
-            isVeteran={isVeteranPlayer}
+            isVeteran={true}
           />
         )}
       </>
@@ -233,6 +267,12 @@ export function BlastGame({
           modeColor={modeColor}
         />
       </div>
+      {tutorial.showFtueOverlay && !isVeteranPlayer && ftueStep !== null && (
+        <BlastFtueOverlay
+          step={ftueStep}
+          onComplete={handleFtueComplete}
+        />
+      )}
     </div>
   );
 }
