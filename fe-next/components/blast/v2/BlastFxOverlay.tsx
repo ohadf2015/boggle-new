@@ -9,16 +9,20 @@ export function BlastFxOverlay() {
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
-    const parent = canvas.parentElement ?? undefined;
+    // resizeTo crashes PIXI's resize plugin under reparenting; CSS sizes the
+    // canvas visually, and backgroundAlpha:0 keeps the internal bitmap invisible.
     const app = new PIXI.Application({
       view: canvas,
-      resizeTo: parent,
       backgroundAlpha: 0,
       antialias: true,
     });
     appRef.current = app;
     return () => {
-      app.destroy();
+      try {
+        app.destroy(false, { children: true });
+      } catch {
+        // PIXI sometimes throws on destroy under fast unmount; non-fatal.
+      }
     };
   }, []);
 
