@@ -8,9 +8,10 @@
  */
 
 import React, { memo, useCallback } from 'react';
-import { Swords, UserPlus } from 'lucide-react';
+import { Swords, UserPlus, Trophy, Frown, Equal } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useAsyncChallenge } from '@/hooks/useAsyncChallenge';
 import { cn } from '@/lib/utils';
 import type { AsyncBoardChallenge } from '@/shared/types/growth';
@@ -75,15 +76,101 @@ function ChallengeRow({
   );
 }
 
+interface CompletedView {
+  id: string;
+  opponentName: string | undefined;
+  myScore: number | null;
+  theirScore: number | null;
+  outcome: 'win' | 'loss' | 'tie';
+}
+
+function HistoryRow({
+  row,
+  onOpen,
+  t,
+}: {
+  row: CompletedView;
+  onOpen: (id: string) => void;
+  t: (k: string, v?: Record<string, string>) => string;
+}) {
+  const Icon = row.outcome === 'tie' ? Equal : row.outcome === 'win' ? Trophy : Frown;
+  const tone =
+    row.outcome === 'win'
+      ? 'bg-neo-lime/15 border-neo-lime/40 text-neo-lime'
+      : row.outcome === 'loss'
+      ? 'bg-neo-pink/15 border-neo-pink/40 text-neo-pink'
+      : 'bg-neo-cyan/15 border-neo-cyan/40 text-neo-cyan';
+  const label =
+    row.outcome === 'win' ? t('friends.challenges.result.win', {
+      mine: String(row.myScore ?? 0),
+      theirs: String(row.theirScore ?? 0),
+    })
+    : row.outcome === 'loss' ? t('friends.challenges.result.loss', {
+      mine: String(row.myScore ?? 0),
+      theirs: String(row.theirScore ?? 0),
+    })
+    : t('friends.challenges.result.tie', {
+      mine: String(row.myScore ?? 0),
+      theirs: String(row.theirScore ?? 0),
+    });
+  return (
+    <button
+      type="button"
+      data-testid={`history-row-${row.id}`}
+      onClick={() => onOpen(row.id)}
+      className={cn(
+        'w-full flex items-center gap-3 p-2 rounded-neo border text-start',
+        tone,
+      )}
+    >
+      <Icon className="w-5 h-5 shrink-0" aria-hidden="true" />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-bold text-neo-white truncate">
+          {row.opponentName ?? t('asyncChallenge.unknown')}
+        </p>
+        <p className="text-xs text-neo-white/60 truncate">{label}</p>
+      </div>
+    </button>
+  );
+}
+
 export const AsyncChallengeCard: React.FC = memo(function AsyncChallengeCard() {
   const { t } = useLanguage();
   const router = useRouter();
+  const { user } = useAuth();
   const { challenges, pendingCount, loading } = useAsyncChallenge();
   const pendingChallenges = challenges.filter(c => c.status === 'pending' && c.challengedId !== undefined);
 
+  const completedRows: CompletedView[] = (challenges
+    .filter(c => c.status === 'completed' && user?.id)
+    .slice(0, MAX_VISIBLE)
+    .map(c => {
+      const viewerIsChallenger = c.challengerId === user!.id;
+      const myScore = viewerIsChallenger ? c.challengerScore : c.challengedScore ?? null;
+      const theirScore = viewerIsChallenger ? c.challengedScore ?? null : c.challengerScore;
+      const opponentName = viewerIsChallenger ? c.challengedName : c.challengerName;
+      let outcome: 'win' | 'loss' | 'tie' = 'tie';
+      if ((myScore ?? 0) > (theirScore ?? 0)) outcome = 'win';
+      else if ((myScore ?? 0) < (theirScore ?? 0)) outcome = 'loss';
+      return {
+        id: c.id,
+        opponentName,
+        myScore: myScore ?? null,
+        theirScore: theirScore ?? null,
+        outcome,
+      };
+    })) as CompletedView[];
+
   const handlePlay = useCallback(
     (challengeId: string) => {
-      router.push(`/challenge/${challengeId}`);
+      router.push(`/friend-challenge/${challengeId}`);
+    },
+    [router]
+  );
+
+  const handleOpenHistory = useCallback(
+    (challengeId: string) => {
+      router.push(`/friend-challenge/${challengeId}`);
     },
     [router]
   );
@@ -166,6 +253,18 @@ export const AsyncChallengeCard: React.FC = memo(function AsyncChallengeCard() {
             {t('asyncChallenge.challengeFriend')}
           </button>
         </>
+      )}
+
+      {/* Recent results — surfaces completed challenges so user can review outcomes. */}
+      {completedRows.length > 0 && (
+        <div className="flex flex-col gap-1.5 mt-1">
+          <p className="text-xs font-bold uppercase tracking-wider text-neo-white/50">
+            {t('asyncChallenge.recentResults')}
+          </p>
+          {completedRows.map((row) => (
+            <HistoryRow key={row.id} row={row} onOpen={handleOpenHistory} t={t} />
+          ))}
+        </div>
       )}
     </div>
   );

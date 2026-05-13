@@ -11342,7 +11342,25 @@ const en = {
     "challengeFriend": "Challenge a Friend",
     "emptyDesc": "No pending challenges. Send one to a friend!",
     "moreCount": "+{{count}} more",
-    "unknown": "Unknown player"
+    "unknown": "Unknown player",
+    "recentResults": "Recent results",
+    "mode": {
+      "classic": "Classic",
+      "blast": "Blast",
+      "word-hunt": "Word Hunt"
+    },
+    "received": {
+      "title": "{sender} challenged you",
+      "body": "Beat {score} on {mode}"
+    },
+    "result": {
+      "titleWin": "You beat {opponent}!",
+      "titleLoss": "{opponent} beat you",
+      "titleTie": "Tied with {opponent}",
+      "bodyWin": "{mine} vs {theirs}",
+      "bodyLoss": "{mine} vs {theirs}",
+      "bodyTie": "{mine} vs {theirs}"
+    }
   },
   "recap": {
     "title": "Your Recap",
