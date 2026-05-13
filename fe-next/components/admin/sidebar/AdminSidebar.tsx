@@ -35,6 +35,7 @@ export function AdminSidebar({ moderationCount = 0 }: AdminSidebarProps) {
     { key: 'moderation', labelKey: 'admin.sidebar.moderation', icon: ShieldAlert, path: '/moderation', badge: moderationCount },
     { key: 'content', labelKey: 'admin.sidebar.content', icon: BookOpen, path: '/content' },
     { key: 'players', labelKey: 'admin.sidebar.players', icon: Users, path: '/players' },
+    { key: 'teacherAccess', labelKey: 'admin.nav.teacherAccess', icon: Users, path: '/teacher-access' },
     { key: 'system', labelKey: 'admin.sidebar.system', icon: Settings, path: '/system' },
   ];
 
