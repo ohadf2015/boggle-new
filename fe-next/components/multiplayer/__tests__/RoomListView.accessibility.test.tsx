@@ -197,30 +197,28 @@ describe('RoomListView accessibility', () => {
     });
   });
 
-  describe('responsive desktop width (audit C1)', () => {
-    // Mobile: max-w-2xl (672px). Desktop 1920×1080 was content-stuck-narrow at
-    // 672px in the 2026-05-02 viewport audit. Bump to lg:max-w-5xl (1024px)
-    // so the lobby breathes on desktop without re-architecting the lg layout.
-    it('keeps mobile cap and adds lg:max-w-5xl on desktop', () => {
+  describe('responsive desktop width (audit C1 + 2026-05-14 MP responsive sweep)', () => {
+    // Mobile: max-w-2xl (672px). Tablet-portrait+ (≥720px): max-w-5xl (1024px)
+    // so the 744px dead-zone (iPad portrait / split-view) gets side-by-side
+    // composition instead of stacking with wasted horizontal width.
+    it('keeps mobile cap and adds min-[720px]:max-w-5xl on tablet+', () => {
       const { container } = render(<RoomListView {...defaultProps} />);
       const root = container.querySelector('[dir]');
       expect(root).toHaveClass('max-w-2xl');
-      expect(root).toHaveClass('lg:max-w-5xl');
+      expect(root).toHaveClass('min-[720px]:max-w-5xl');
     });
 
-    it('body uses lg:grid 2-col split for desktop (audit C1 Tier 3)', () => {
-      // Tier 3: at lg+ split into a left rail (actions + welcome) and right
-      // pane (open-arenas list). Mobile keeps the existing single-column flow.
+    it('body uses min-[720px]:grid 2-col split for tablet+', () => {
+      // At 720+ split into a left rail (actions + welcome) and right
+      // pane (open-arenas list). Phone keeps single-column flow.
       const { container } = render(<RoomListView {...defaultProps} />);
-      // The room list is inside the right pane; find it then walk up to the
-      // grid container that hosts both columns.
       const list = container.querySelector('[role="list"]');
       expect(list).toBeTruthy();
-      // Walk up to find an ancestor with lg:grid + lg:grid-cols class
+      // Walk up to find an ancestor with min-[720px]:grid + min-[720px]:grid-cols
       let el: HTMLElement | null = list as HTMLElement | null;
       let foundGrid = false;
       while (el) {
-        if (/\blg:grid\b/.test(el.className) && /lg:grid-cols/.test(el.className)) {
+        if (/min-\[720px\]:grid\b/.test(el.className) && /min-\[720px\]:grid-cols/.test(el.className)) {
           foundGrid = true;
           break;
         }

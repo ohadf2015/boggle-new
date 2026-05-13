@@ -353,7 +353,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
           )}
         >
           <User size={14} />
-          <span className="hidden sm:inline">{t('auth.signIn')}</span>
+          <span className="hidden min-[820px]:inline">{t('auth.signIn')}</span>
         </Button>
         <Button
           size="sm"
@@ -363,8 +363,8 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
             'bg-neo-pink text-white hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.5)] border-2 border-neo-black'
           )}
         >
-          <span className="hidden sm:inline">{t('auth.signUp')}</span>
-          <span className="sm:hidden">+</span>
+          <span className="hidden min-[820px]:inline">{t('auth.signUp')}</span>
+          <span className="min-[820px]:hidden">+</span>
         </Button>
       </div>
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} showGuestStats={true} initialMode={authModalMode} />

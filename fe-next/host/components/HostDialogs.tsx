@@ -522,7 +522,7 @@ export const SoloStartConfirmDialog: React.FC<SoloStartConfirmDialogProps> = mem
           {t('hostView.soloStartDescription')}
         </AlertDialogDescription>
       </AlertDialogHeader>
-      <AlertDialogFooter className="flex-col gap-2 sm:flex-col">
+      <AlertDialogFooter className="flex-col gap-2 sm:flex-row sm:gap-3">
         {/* Invite Friends — PRIMARY */}
         <AlertDialogAction
           data-testid="solo-dialog-invite"

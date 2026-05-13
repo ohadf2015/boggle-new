@@ -277,7 +277,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                     <button
                         onClick={onSignIn}
                         className={cn(
-                            "flex items-center gap-1 shrink-0",
+                            "hidden min-[420px]:flex items-center gap-1 shrink-0",
                             "px-2.5 py-1.5 h-9 min-h-[36px]",
                             "bg-neo-cyan text-neo-black",
                             "border-2 border-neo-black",

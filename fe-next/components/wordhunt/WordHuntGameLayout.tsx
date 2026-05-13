@@ -124,7 +124,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   gameDir,
 }) => {
   return (
-    <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-x-hidden overflow-y-auto">
+    <div className="flex-1 flex flex-col min-[720px]:flex-row min-h-0 overflow-x-hidden overflow-y-auto">
       {/* Main game area — capped width on wider screens, with vertical rhythm between sections */}
       <div className="flex-1 flex flex-col min-h-0 overflow-y-auto overflow-x-hidden w-full max-w-3xl mx-auto gap-1.5 md:gap-2 [@media(max-height:560px)]:gap-0.5">
         {/* Score + Quit — compact */}
@@ -204,7 +204,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         </div>
 
         {/* MP Leaderboard — mobile strip. Cap by absolute px on short landscape so the grid keeps room. */}
-        <div className="shrink-0 max-h-[80px] [@media(min-height:560px)]:max-h-[10vh] overflow-y-auto lg:hidden">
+        <div className="shrink-0 max-h-[80px] [@media(min-height:560px)]:max-h-[10vh] overflow-y-auto min-[720px]:hidden">
           <WordHuntMPLeaderboard
             playerLives={playerLives}
             eliminatedPlayers={eliminatedPlayers}
@@ -216,7 +216,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
       </div>
 
       {/* MP Leaderboard — desktop sidebar */}
-      <div className="hidden lg:flex lg:flex-col lg:w-72 xl:w-80 lg:border-s-3 lg:border-neo-black lg:bg-neo-navy/50 lg:overflow-y-auto">
+      <div className="hidden min-[720px]:flex min-[720px]:flex-col min-[720px]:w-56 lg:w-72 xl:w-80 min-[720px]:border-s-3 min-[720px]:border-neo-black min-[720px]:bg-neo-navy/50 min-[720px]:overflow-y-auto">
         <WordHuntMPLeaderboard
           playerLives={playerLives}
           eliminatedPlayers={eliminatedPlayers}

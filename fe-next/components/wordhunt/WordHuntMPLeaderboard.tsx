@@ -84,7 +84,7 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
   return (
     <div className="px-2 py-1.5 [@media(max-height:560px)]:py-0.5">
       {/* Mobile: horizontal compact strip — top 2 opponents only, no self */}
-      <div className="flex gap-1.5 lg:hidden overflow-x-auto scrollbar-hide">
+      <div className="flex gap-1.5 min-[720px]:hidden overflow-x-auto scrollbar-hide">
         {mobileOpponents.map((player) => {
           const isEliminated = eliminatedSet.has(player.username);
           const life = playerLives[player.username] ?? 0;
@@ -158,7 +158,7 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
       </div>
 
       {/* Desktop sidebar: vertical detailed list */}
-      <div className="hidden lg:block">
+      <div className="hidden min-[720px]:block">
         <div className="text-xs font-bold text-neo-white/60 uppercase mb-1.5 tracking-wider">
           {t('wordHunt.mp.players')}
         </div>

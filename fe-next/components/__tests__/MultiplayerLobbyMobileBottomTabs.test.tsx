@@ -152,7 +152,7 @@ describe('Multiplayer Lobby Mobile/Desktop Layout Split', () => {
       const mobileContainer = desktopLayout.parentElement?.nextElementSibling;
 
       // Mobile container uses lg:hidden
-      expect(mobileContainer?.className).toContain('lg:hidden');
+      expect(mobileContainer?.className).toContain('min-[720px]:hidden');
     });
 
     it('should have start button in both desktop and mobile layouts', () => {
@@ -164,11 +164,11 @@ describe('Multiplayer Lobby Mobile/Desktop Layout Split', () => {
       // Two start buttons: one in desktop layout, one in mobile layout
       expect(startButtons.length).toBe(2);
 
-      // Find the desktop start button (inside hidden lg:flex container)
+      // Find the desktop start button (inside hidden min-[720px]:flex container)
       const desktopStartButton = startButtons.find((btn) => {
         let parent = btn.parentElement;
         while (parent) {
-          if (parent.className?.includes('lg:flex')) {
+          if (parent.className?.includes('min-[720px]:flex')) {
             return true;
           }
           parent = parent.parentElement;
@@ -221,7 +221,7 @@ describe('Multiplayer Lobby Mobile/Desktop Layout Split', () => {
       const mobileContainer = desktopLayout.parentElement?.nextElementSibling;
 
       // Mobile container uses lg:hidden
-      expect(mobileContainer?.className).toContain('lg:hidden');
+      expect(mobileContainer?.className).toContain('min-[720px]:hidden');
     });
 
     it('should have desktop two-column layout with chat', () => {

@@ -107,6 +107,7 @@ interface HostPreGameViewProps {
 function HostPreGameView({
   gameCode,
   roomLanguage,
+  language,
   username,
   t,
   timerValue,
@@ -396,13 +397,13 @@ function HostPreGameView({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {!isPrivate && (
-              <div className="lg:hidden">
+              <div className="min-[720px]:hidden">
                 <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />
               </div>
             )}
-            {/* UI-language switcher — distinct from board-language chip on the left;
-                lets every lobby player change app language without leaving the room. */}
-            <QuickLanguageSwitcher compact />
+            {/* UI-language switcher — only show when UI language differs from room/board language.
+                When they match (same flag on both chips), the chip is redundant clutter (visual audit 2026-05-14). */}
+            {language !== roomLanguage && <QuickLanguageSwitcher compact />}
             <AdvancedSettingsModal
               timerValue={timerValue}
               setTimerValue={setTimerValue}
@@ -429,8 +430,8 @@ function HostPreGameView({
       <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
         <h1 className="sr-only">{t('hostView.lobbyTitle')}</h1>
 
-        {/* Desktop Layout — two-column grid */}
-        <div className="hidden lg:flex lg:flex-col flex-1 min-h-0">
+        {/* Desktop Layout — two-column grid. Triggers at 720px so tablet-portrait (744px) gets side-by-side instead of stacking with wasted width. */}
+        <div className="hidden min-[720px]:flex min-[720px]:flex-col flex-1 min-h-0">
           <DesktopLobbyLayout
             leftContent={
               <>
@@ -491,8 +492,8 @@ function HostPreGameView({
           </div>
         </div>
 
-        {/* Mobile Layout — single scroll + sticky bottom start */}
-        <div className="lg:hidden flex flex-col flex-1 min-h-0">
+        {/* Mobile Layout — single scroll + sticky bottom start. Below 720px (phone portrait/landscape). */}
+        <div className="min-[720px]:hidden flex flex-col flex-1 min-h-0">
           <div className="flex-1 min-h-0 overflow-y-auto relative z-10">
             <div className="max-w-[600px] mx-auto px-4 py-3 gap-3 flex flex-col pb-3">
               <AnimatePresence>{renderBotCountdown()}</AnimatePresence>

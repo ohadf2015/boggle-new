@@ -179,7 +179,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
       <div
         dir={dir}
-        className="flex-1 min-h-0 bg-neo-navy relative flex flex-col w-full max-w-2xl lg:max-w-5xl mx-auto"
+        className="flex-1 min-h-0 bg-neo-navy relative flex flex-col w-full max-w-2xl min-[720px]:max-w-5xl mx-auto"
         {...pullToRefreshHandlers}
       >
         <PullToRefreshIndicator
@@ -257,7 +257,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             right pane = live-match status + open-arenas list. Mobile keeps
             single-column flow. The two wrapper divs share the parent gap-5
             so vertical rhythm matches the prior single-column layout. */}
-        <div className="flex-1 flex flex-col lg:grid lg:grid-cols-[minmax(280px,360px)_1fr] lg:items-start px-5 lg:px-6 gap-5 lg:gap-6 short:gap-2 medium-short:gap-3 overflow-y-auto pb-10 short:pb-4 medium-short:pb-6 safe-area-bottom pt-5 short:pt-2 medium-short:pt-3">
+        <div className="flex-1 flex flex-col min-[720px]:grid min-[720px]:grid-cols-[minmax(260px,300px)_1fr] lg:grid-cols-[minmax(300px,360px)_1fr] min-[720px]:items-start px-5 lg:px-6 gap-5 min-[720px]:gap-5 lg:gap-6 short:gap-2 medium-short:gap-3 overflow-y-auto pb-10 short:pb-4 medium-short:pb-6 safe-area-bottom pt-5 short:pt-2 medium-short:pt-3">
 
           {/* Left rail (mobile: in-flow) */}
           <div className="flex flex-col gap-5">

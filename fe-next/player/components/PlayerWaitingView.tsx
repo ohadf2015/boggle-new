@@ -472,8 +472,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
       {/* Main Content */}
       <main className="flex-1 min-h-0 overflow-hidden flex flex-col bg-neo-navy/95">
-        {/* Desktop Layout */}
-        <div className="hidden lg:block h-full">
+        {/* Desktop Layout — triggers at 720px (tablet portrait+) for parity with HostPreGameView */}
+        <div className="hidden min-[720px]:block h-full">
           <DesktopLobbyLayout
             leftContent={
               <>
@@ -507,8 +507,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
           />
         </div>
 
-        {/* Mobile Layout */}
-        <div className="lg:hidden flex flex-col flex-1 min-h-0">
+        {/* Mobile Layout — below 720px (phones) */}
+        <div className="min-[720px]:hidden flex flex-col flex-1 min-h-0">
           {renderMobileContent()}
         </div>
       </main>

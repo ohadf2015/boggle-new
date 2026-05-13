@@ -162,11 +162,11 @@ describe('Multiplayer Desktop Functionality Access', () => {
       // Verify at least one start button exists
       expect(startButtons.length).toBeGreaterThanOrEqual(1);
 
-      // Find the desktop start button (one that is NOT inside lg:hidden container)
+      // Find the desktop start button (one that is NOT inside min-[720px]:hidden container)
       const desktopStartButton = startButtons.find((btn) => {
         let parent = btn.parentElement;
         while (parent) {
-          if (parent.className?.includes('lg:hidden')) {
+          if (parent.className?.includes('min-[720px]:hidden')) {
             return false;
           }
           parent = parent.parentElement;

@@ -336,7 +336,7 @@ export function LandingChallengeCards({
   return (
     <div className="w-full max-w-5xl mx-auto xl:max-w-6xl space-y-5 md:space-y-6">
       {heroCards.length > 0 && (
-        <div className="grid grid-cols-1 max-w-3xl mx-auto">
+        <div className="grid grid-cols-1 max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto">
           {heroCards.map((mode) => renderCard(mode, nextIndex()))}
         </div>
       )}
@@ -346,7 +346,7 @@ export function LandingChallengeCards({
           data-testid="landing-section-mp"
           aria-label={t('landing.sectionMultiplayerTitle')}
         >
-          <div className={`grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 items-stretch ${mpCards.length >= 2 ? 'sm:grid-cols-2' : 'max-w-md mx-auto'}`}>
+          <div className={`grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 items-stretch ${mpCards.length >= 2 ? 'sm:grid-cols-2' : 'max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto'}`}>
             {mpCards.map((mode) => renderCard(mode, nextIndex()))}
           </div>
         </section>
@@ -357,7 +357,7 @@ export function LandingChallengeCards({
           data-testid="landing-section-practice-featured"
           aria-label={t('landing.practice')}
         >
-          <div className="grid grid-cols-1 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto">
             {renderCard('practice', nextIndex())}
           </div>
         </section>
@@ -369,8 +369,8 @@ export function LandingChallengeCards({
           aria-label={t('landing.sectionSoloTitle')}
         >
           <div className={`grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 items-stretch ${
-            spCards.length === 1 ? 'max-w-md mx-auto' :
-            spCards.length === 2 ? 'sm:grid-cols-2 max-w-3xl mx-auto' :
+            spCards.length === 1 ? 'max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto' :
+            spCards.length === 2 ? 'sm:grid-cols-2 max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto' :
             spCards.length >= 4 ? 'sm:grid-cols-2 xl:grid-cols-4' :
             'sm:grid-cols-2 md:grid-cols-3'
           }`}>
@@ -421,14 +421,14 @@ export function LandingChallengeCards({
           </summary>
           <div className="mt-2 px-4 pb-4 space-y-5">
             {mpCardsExtra.length > 0 && (
-              <div className={`grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 items-stretch ${mpCardsExtra.length >= 2 ? 'sm:grid-cols-2' : 'max-w-md mx-auto'}`}>
+              <div className={`grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 items-stretch ${mpCardsExtra.length >= 2 ? 'sm:grid-cols-2' : 'max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto'}`}>
                 {mpCardsExtra.map((mode) => renderCard(mode, nextIndex()))}
               </div>
             )}
             {spCardsExtra.length > 0 && (
               <div className={`grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 items-stretch ${
-                spCardsExtra.length === 1 ? 'max-w-md mx-auto' :
-                spCardsExtra.length === 2 ? 'sm:grid-cols-2 max-w-3xl mx-auto' :
+                spCardsExtra.length === 1 ? 'max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto' :
+                spCardsExtra.length === 2 ? 'sm:grid-cols-2 max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto' :
                 spCardsExtra.length >= 4 ? 'sm:grid-cols-2 xl:grid-cols-4' :
                 'sm:grid-cols-2 md:grid-cols-3'
               }`}>

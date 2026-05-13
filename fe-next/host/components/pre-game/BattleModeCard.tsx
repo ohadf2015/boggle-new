@@ -72,8 +72,9 @@ export function BattleModeCard({
       <h3 className="text-[10px] font-bold uppercase tracking-widest text-neo-cream/50 px-0.5">
         {t('hostView.battleMode')}
       </h3>
-      {/* Horizontal chips row — equal-width */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+      {/* Equal-width chips. 2×2 grid below 1024 (Spanish "CAZA DE PALABRAS" overflows
+          when 4 share a narrow rail at 720-1023); 4-col only when card has full width. */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5">
         {visibleModes.map(({ mode, icon, nameKey, activeBg }) => {
             const isActive = selectedGameMode === mode;
 
