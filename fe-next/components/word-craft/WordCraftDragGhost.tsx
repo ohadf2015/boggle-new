@@ -27,7 +27,12 @@ const LIFT_OFFSET_PX: Record<DragState['pointerType'], number> = {
  */
 function WordCraftDragGhostImpl({ drag, locale = 'en' }: WordCraftDragGhostProps) {
   if (!drag || !drag.active) return null;
-  const lift = LIFT_OFFSET_PX[drag.pointerType] ?? LIFT_OFFSET_PX.mouse;
+  const baseLift = LIFT_OFFSET_PX[drag.pointerType] ?? LIFT_OFFSET_PX.mouse;
+  // Short viewports (landscape phones, ~568 px) would float the 88 px touch
+  // ghost off-screen at the top — player can no longer see the cell they're
+  // targeting. Clamp to a quarter of the viewport height with a 32 px floor.
+  const viewportH = typeof window === 'undefined' ? 800 : window.innerHeight;
+  const lift = Math.max(32, Math.min(baseLift, Math.floor(viewportH / 4)));
   const locked = drag.hoverCell !== null;
   return (
     <div

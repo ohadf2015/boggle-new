@@ -10,25 +10,33 @@ interface ScoreFloatProps {
   encouragement: string
 }
 
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia) return false
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
 export function ScoreFloat({ score, overdrive, isBingo, encouragement }: ScoreFloatProps) {
   const scoreRef = useRef<HTMLDivElement>(null)
   const encRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!scoreRef.current) return
+    const rm = prefersReducedMotion()
+    // Reduced-motion: fade out in place instead of the 50 px upward float.
     gsap.fromTo(
       scoreRef.current,
       { y: 0, opacity: 1 },
-      { y: -50, opacity: 0, duration: 0.9, ease: 'power1.out' },
+      { y: rm ? 0 : -50, opacity: 0, duration: rm ? 0.4 : 0.9, ease: 'power1.out' },
     )
   }, [])
 
   useEffect(() => {
     if (!encRef.current || !encouragement) return
+    const rm = prefersReducedMotion()
     gsap.fromTo(
       encRef.current,
       { y: 0, opacity: 1 },
-      { y: -35, opacity: 0, duration: 1.2, delay: 0.15, ease: 'power1.out' },
+      { y: rm ? 0 : -35, opacity: 0, duration: rm ? 0.4 : 1.2, delay: 0.15, ease: 'power1.out' },
     )
   }, [encouragement])
 

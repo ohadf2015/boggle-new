@@ -11,6 +11,14 @@ interface HeatMeterProps {
   label: string         // i18n: t('wordcraft.heatLabel')
 }
 
+// Raw GSAP tweens don't honor prefers-reduced-motion the way Tailwind's
+// `animate-pulse` does, so the heat fill kept pulsing for users who'd
+// otherwise opted out of motion. Gate looping/extreme tweens behind this.
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia) return false
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
 export function HeatMeter({ heat, overdrive, burnout, label }: HeatMeterProps) {
   const fillRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -24,14 +32,16 @@ export function HeatMeter({ heat, overdrive, burnout, label }: HeatMeterProps) {
       : heat >= 60 ? '#FF6B35'  // orange warning
       : '#BFFF00'               // lime normal
 
+    const rm = prefersReducedMotion()
+
     gsap.to(fillRef.current, {
       width: `${heat}%`,
       backgroundColor: color,
-      duration: 0.4,
+      duration: rm ? 0 : 0.4,
       ease: 'power2.out',
     })
 
-    if (overdrive && !pulseRef.current) {
+    if (overdrive && !pulseRef.current && !rm) {
       pulseRef.current = gsap.to(fillRef.current, {
         scaleY: 1.1,
         yoyo: true,
@@ -39,7 +49,7 @@ export function HeatMeter({ heat, overdrive, burnout, label }: HeatMeterProps) {
         duration: 0.45,
         ease: 'sine.inOut',
       })
-    } else if (!overdrive && pulseRef.current) {
+    } else if ((!overdrive || rm) && pulseRef.current) {
       pulseRef.current.kill()
       pulseRef.current = null
       gsap.set(fillRef.current, { scaleY: 1 })
@@ -48,6 +58,7 @@ export function HeatMeter({ heat, overdrive, burnout, label }: HeatMeterProps) {
 
   useEffect(() => {
     if (!burnout || !containerRef.current) return
+    if (prefersReducedMotion()) return
     gsap.to(containerRef.current, {
       x: -5,
       duration: 0.05,
