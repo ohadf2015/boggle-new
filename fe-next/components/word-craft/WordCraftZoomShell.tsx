@@ -78,6 +78,10 @@ export function WordCraftZoomShell({
     startTy: number;
   } | null>(null);
   const lastTapRef = useRef<number>(0);
+  // Set true when a single-finger pan actually moves the board. Used to
+  // swallow the trailing click so the board cell under the player's finger
+  // doesn't get placed by accident at the end of a pan gesture.
+  const panMovedRef = useRef(false);
 
   const [scale, setScale] = useState(1);
   const [tx, setTx] = useState(0);
@@ -170,6 +174,7 @@ export function WordCraftZoomShell({
         const lastX = (e as unknown as { movementX: number }).movementX ?? 0;
         const lastY = (e as unknown as { movementY: number }).movementY ?? 0;
         if (lastX === 0 && lastY === 0) return;
+        panMovedRef.current = true;
         const next = clampTranslation(tx + lastX, ty + lastY, scale);
         setTx(next.tx);
         setTy(next.ty);
@@ -181,6 +186,25 @@ export function WordCraftZoomShell({
   const handlePointerEnd = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
     pointersRef.current.delete(e.pointerId);
     if (pointersRef.current.size < 2) gestureRef.current = null;
+
+    // If the gesture actually panned the board, swallow the click that follows
+    // pointerup. Otherwise a pan ending over a board cell silently places a
+    // tile, which players read as "the game just placed a tile randomly".
+    if (panMovedRef.current && pointersRef.current.size === 0) {
+      panMovedRef.current = false;
+      const wrapper = wrapperRef.current;
+      if (wrapper) {
+        // One-shot capture-phase blocker: the very next click on the wrapper
+        // (which is the one synthesized from this pointerup) is stopped, then
+        // the listener self-removes. Subsequent clicks pass through normally.
+        const block = (clickEvt: Event) => {
+          clickEvt.stopImmediatePropagation();
+          clickEvt.preventDefault();
+          wrapper.removeEventListener('click', block, true);
+        };
+        wrapper.addEventListener('click', block, true);
+      }
+    }
   }, []);
 
   // Re-snap into bounds if window resizes mid-zoom.

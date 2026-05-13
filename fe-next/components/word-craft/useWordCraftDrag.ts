@@ -26,6 +26,42 @@ export interface UseWordCraftDragArgs {
 }
 
 const DRAG_THRESHOLD_PX = 6;
+// Vertical-only fast lane for touch. Lifting a tile straight up off the rack
+// activates the drag on as little as 4 px of dy — we don't wait for the
+// hypot threshold. Pairs with `touch-pan-x` on rack tiles so horizontal
+// swipes scroll the rack instead.
+const TOUCH_VERTICAL_THRESHOLD_PX = 4;
+// Drop-snap radius. The board has 2 px gaps between cells; without a snap a
+// pointerup that lands dead-on in the gap returns null from elementFromPoint
+// and the drop silently fails. 24 px ≈ half a phone cell, the right ceiling
+// so we don't pull a tile two cells over by accident.
+const SNAP_RADIUS_PX = 24;
+
+/**
+ * Locate the nearest empty board cell to a viewport point.
+ * Falls back to nearest-center snap when the pointer is in a cell gap.
+ */
+function resolveDropCell(clientX: number, clientY: number): HTMLElement | null {
+  const direct = document.elementFromPoint(clientX, clientY);
+  const direct$ = direct instanceof Element ? direct.closest('[data-board-cell]') : null;
+  if (direct$ instanceof HTMLElement && direct$.dataset.tileState === 'empty') {
+    return direct$;
+  }
+  const cells = document.querySelectorAll<HTMLElement>('[data-board-cell][data-tile-state="empty"]');
+  let best: HTMLElement | null = null;
+  let bestDist = SNAP_RADIUS_PX;
+  for (const cell of cells) {
+    const r = cell.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    const d = Math.hypot(clientX - cx, clientY - cy);
+    if (d < bestDist) {
+      bestDist = d;
+      best = cell;
+    }
+  }
+  return best;
+}
 
 function vibrate(ms: number) {
   if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
@@ -46,22 +82,29 @@ function normalizePointerType(t: string | undefined): PointerKind {
  * Pointer-driven drag from rack → board cell.
  *
  * Begin: rack tile dispatches `begin()` on pointerdown.
- * Move:  global pointermove updates ghost position; resolves the cell under
- *        pointer via document.elementFromPoint and the [data-board-cell] attr.
- * Drop:  global pointerup. If pointer is over an empty cell, fires onDrop.
+ * Move:  global pointermove updates ghost position; resolves the cell via
+ *        resolveDropCell (direct-hit + nearest-center snap fallback).
+ * Drop:  global pointerup. If over a snap-eligible cell, fires onDrop.
  *
- * The drag is "active" only after the user moves past DRAG_THRESHOLD — below
- * that we leave it dormant, so a quick tap still falls through to the rack
- * button's onClick (which toggles selection, the existing tap-to-place flow).
+ * Touch activation routing:
+ *  - vertical-dominant motion ≥ TOUCH_VERTICAL_THRESHOLD_PX = drag wins
+ *    (lifting tile up off rack)
+ *  - hypot ≥ 6 px AND dy ≥ dx = drag wins (diagonal toward board)
+ *  - horizontal-dominant motion = drag stays dormant; browser handles
+ *    `touch-pan-x` scroll of the rack instead; the trailing click is
+ *    suppressed via consumeDropFlag()
  *
- * Haptic: we vibrate(8) once each time the hovered cell *changes* to a valid
- * drop target. That gives the player a physical-feeling "lock" cue without
- * spamming the motor.
+ * Mouse/pen activate on any movement (unchanged).
  */
 export function useWordCraftDrag({ onDrop }: UseWordCraftDragArgs) {
   const [drag, setDrag] = useState<DragState | null>(null);
   const startRef = useRef<{ x: number; y: number } | null>(null);
   const droppedRef = useRef(false);
+  // Horizontal swipe flag — when the browser doesn't fire pointercancel
+  // (e.g. rack already scrolled to the boundary) the click that follows
+  // pointerup would otherwise reach the rack tile's onClick. consumeDropFlag
+  // reads this and suppresses.
+  const horizontalSwipeRef = useRef(false);
   const lastHoverRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -72,19 +115,24 @@ export function useWordCraftDrag({ onDrop }: UseWordCraftDragArgs) {
       if (!start) return;
       const dx = e.clientX - start.x;
       const dy = e.clientY - start.y;
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
       const distanceSquared = dx * dx + dy * dy;
       const passedThreshold = distanceSquared >= DRAG_THRESHOLD_PX * DRAG_THRESHOLD_PX;
 
-      // Touch pointers only activate drag after exceeding threshold.
-      // Mouse/pen activate immediately on any movement.
-      const shouldActivate = drag.pointerType === 'touch' ? passedThreshold : distanceSquared > 0;
+      const verticalActivates = absDy >= TOUCH_VERTICAL_THRESHOLD_PX && absDy >= absDx;
+      const hypotVerticalActivates = passedThreshold && absDy >= absDx;
+      const shouldActivate =
+        drag.pointerType === 'touch'
+          ? verticalActivates || hypotVerticalActivates
+          : distanceSquared > 0;
 
-      const target = document.elementFromPoint(e.clientX, e.clientY);
-      const cellEl = target instanceof Element ? target.closest('[data-board-cell]') : null;
-      const hoverCell =
-        cellEl instanceof HTMLElement && cellEl.dataset.tileState === 'empty'
-          ? cellEl.dataset.boardCell ?? null
-          : null;
+      if (drag.pointerType === 'touch' && absDx >= 8 && absDx > absDy) {
+        horizontalSwipeRef.current = true;
+      }
+
+      const cellEl = resolveDropCell(e.clientX, e.clientY);
+      const hoverCell = cellEl?.dataset.boardCell ?? null;
 
       if (hoverCell && hoverCell !== lastHoverRef.current) {
         vibrate(8);
@@ -97,14 +145,8 @@ export function useWordCraftDrag({ onDrop }: UseWordCraftDragArgs) {
     };
 
     const finish = (e: PointerEvent) => {
-      const target = document.elementFromPoint(e.clientX, e.clientY);
-      const cellEl = target instanceof Element ? target.closest('[data-board-cell]') : null;
-      if (
-        cellEl instanceof HTMLElement &&
-        cellEl.dataset.tileState === 'empty' &&
-        cellEl.dataset.boardCell &&
-        drag.active
-      ) {
+      const cellEl = resolveDropCell(e.clientX, e.clientY);
+      if (cellEl && cellEl.dataset.boardCell && drag.active) {
         const [r, c] = cellEl.dataset.boardCell.split(',').map(Number);
         droppedRef.current = true;
         onDrop(drag.tileId, r, c);
@@ -118,6 +160,7 @@ export function useWordCraftDrag({ onDrop }: UseWordCraftDragArgs) {
       setDrag(null);
       startRef.current = null;
       lastHoverRef.current = null;
+      horizontalSwipeRef.current = false;
     };
 
     window.addEventListener('pointermove', move, { passive: true });
@@ -133,10 +176,13 @@ export function useWordCraftDrag({ onDrop }: UseWordCraftDragArgs) {
 
   const begin = useCallback(
     (tileId: string, letter: string, value: number, e: React.PointerEvent) => {
-      // Don't capture the pointer on the rack button — we want events on document
-      // so cells can detect hover. Just record the start position.
+      // Pinch guard: only respond to the primary pointer in a multi-touch
+      // sequence, so a second finger landing on a rack tile during a pinch
+      // can't kidnap the tile.
+      if (e.isPrimary === false) return;
       startRef.current = { x: e.clientX, y: e.clientY };
       droppedRef.current = false;
+      horizontalSwipeRef.current = false;
       lastHoverRef.current = null;
       setDrag({
         tileId,
@@ -152,13 +198,15 @@ export function useWordCraftDrag({ onDrop }: UseWordCraftDragArgs) {
     [],
   );
 
-  /** Returns true if the most recent gesture ended in a successful drop.
-   *  Rack tiles consult this in their click handler to suppress the toggle-select
-   *  click that otherwise fires after pointerup. */
+  /** Returns true if the most recent gesture (a) ended in a successful drop,
+   *  or (b) was a clear horizontal swipe on touch — in either case the rack
+   *  tile's onClick should be suppressed. Without (b) a partial-pan that
+   *  doesn't trigger browser pointercancel would still flip selection. */
   const consumeDropFlag = useCallback(() => {
-    const dropped = droppedRef.current;
+    const consumed = droppedRef.current || horizontalSwipeRef.current;
     droppedRef.current = false;
-    return dropped;
+    horizontalSwipeRef.current = false;
+    return consumed;
   }, []);
 
   return { drag, begin, consumeDropFlag };

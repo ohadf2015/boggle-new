@@ -493,6 +493,11 @@ export default function WordCraftPageClient() {
 
   // First-move flag drives center-star ping + rack glow.
   const isFirstMove = game.state.history.length === 0 && game.state.pendingPlacements.length === 0;
+  // Mobile chrome budget: HeatMeter + the empty-pending placeholder eat
+  // ~60 px of vertical that the 11×11 board needs back to keep cells
+  // tappable. Render each only when it carries info.
+  const showHeatMeter = game.state.heat > 0 || game.state.overdrive || game.state.burnout;
+  const showPendingStrip = game.state.pendingPlacements.length > 0;
   // True when player should pick a tile (no selection, no pending, dict ready, not burned out, their turn).
   const wantsPick =
     game.state.turn === 'player' &&
@@ -545,7 +550,7 @@ export default function WordCraftPageClient() {
         }}
       />
 
-      <main className="flex-1 min-h-0 px-3 py-2 max-w-[820px] mx-auto w-full flex flex-col gap-1.5 relative">
+      <main className="flex-1 min-h-0 px-3 py-1 max-w-[820px] mx-auto w-full flex flex-col gap-1 relative">
         {/* Topbar: back · title · BETA · How to play · loading */}
         <div className="flex items-center gap-2 shrink-0">
           <Button variant="outline" size="sm" onClick={() => router.push(`/${language}`)} className="shrink-0 h-8 px-2">
@@ -601,18 +606,25 @@ export default function WordCraftPageClient() {
           }}
         />
 
-        <HeatMeter
-          heat={game.state.heat}
-          overdrive={game.state.overdrive}
-          burnout={game.state.burnout}
-          label={t('wordcraft.heatLabel')}
-        />
+        {showHeatMeter ? (
+          <HeatMeter
+            heat={game.state.heat}
+            overdrive={game.state.overdrive}
+            burnout={game.state.burnout}
+            label={t('wordcraft.heatLabel')}
+          />
+        ) : null}
 
-        {/* Board fills remaining vertical space; aspect-square keeps it readable.
-            WordCraftBoardSection wraps the grid + Pixi stage so the player can pinch-zoom
-            and see animations on premium cells / score events. */}
-        <div className="flex-1 min-h-0 flex items-center justify-center">
-          <div className="relative aspect-square h-full max-w-full">
+        {/* Board fills the remaining flex space. Container-query sizing
+            (`100cqmin` on a `container-type: size` parent) gives the largest
+            square that fits both axes — beats `aspect-square h-full
+            max-w-full` which is height-bound and wastes 100–140 px on tall
+            portrait phones after chrome compression. */}
+        <div
+          className="flex-1 min-h-0 flex items-center justify-center"
+          style={{ containerType: 'size' }}
+        >
+          <div className="relative aspect-square" style={{ width: '100cqmin', height: '100cqmin' }}>
             <WordCraftBoardSection
               board={game.state.board}
               pending={game.state.pendingPlacements}
@@ -663,21 +675,23 @@ export default function WordCraftPageClient() {
           </div>
         ) : null}
 
-        <WordCraftPendingStrip
-          pending={game.state.pendingPlacements}
-          axis={axis}
-          onRecallOne={recallFromStrip}
-          onRecallAll={recallAllPending}
-          locale={locale}
-          labels={{
-            headerEmpty: t('wordcraft.pending.empty'),
-            recallAll: t('wordcraft.pending.recallAll'),
-            recallOne: t('wordcraft.pending.recallOne'),
-            axisHorizontal: t('wordcraft.axis.horizontal'),
-            axisVertical: t('wordcraft.axis.vertical'),
-            axisFlipAria: t('wordcraft.axis.flipAria'),
-          }}
-        />
+        {showPendingStrip ? (
+          <WordCraftPendingStrip
+            pending={game.state.pendingPlacements}
+            axis={axis}
+            onRecallOne={recallFromStrip}
+            onRecallAll={recallAllPending}
+            locale={locale}
+            labels={{
+              headerEmpty: t('wordcraft.pending.empty'),
+              recallAll: t('wordcraft.pending.recallAll'),
+              recallOne: t('wordcraft.pending.recallOne'),
+              axisHorizontal: t('wordcraft.axis.horizontal'),
+              axisVertical: t('wordcraft.axis.vertical'),
+              axisFlipAria: t('wordcraft.axis.flipAria'),
+            }}
+          />
+        ) : null}
 
         <WordCraftRack
           tiles={game.state.player.rack}

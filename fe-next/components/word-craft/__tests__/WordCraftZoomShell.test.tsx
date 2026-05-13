@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { WordCraftZoomShell } from '../WordCraftZoomShell';
 
@@ -85,6 +85,52 @@ describe('WordCraftZoomShell', () => {
     const reset = screen.queryByLabelText('Reset zoom');
     expect(reset).toBeInTheDocument();
     expect(reset?.textContent).toMatch(/×/); // scale chip rendered
+  });
+
+  it('swallows the click that follows a single-finger pan so it does not place a tile', () => {
+    const onChildClick = vi.fn();
+    render(
+      <WordCraftZoomShell>
+        <button type="button" data-testid="cell" onClick={onChildClick}>
+          cell
+        </button>
+      </WordCraftZoomShell>,
+    );
+    const region = screen.getByRole('region');
+    const cell = screen.getByTestId('cell');
+
+    // Engage zoom via double-tap so single-finger pan is enabled. Release
+    // the second tap pointer too so the next pointerdown counts as a fresh
+    // single finger (otherwise the shell would treat it as the second
+    // pinch pointer).
+    pointerDown(region, 1, 100, 100);
+    pointerUp(region, 1, 100, 100);
+    pointerDown(region, 2, 100, 100);
+    pointerUp(region, 2, 100, 100);
+
+    // Now pan with one finger: pointerdown + pointermove with movementX/Y so
+    // the shell registers actual displacement, then pointerup.
+    act(() => {
+      pointerDown(region, 3, 100, 100, 'touch');
+      fireEvent.pointerMove(region, {
+        pointerId: 3,
+        clientX: 130,
+        clientY: 110,
+        pointerType: 'touch',
+        movementX: 30,
+        movementY: 10,
+      });
+      pointerUp(region, 3, 130, 110, 'touch');
+    });
+
+    // Synthetic click on the child cell — must be swallowed by the
+    // capture-phase blocker installed on the wrapper.
+    fireEvent.click(cell);
+    expect(onChildClick).not.toHaveBeenCalled();
+
+    // A *second* click (later) must work again — the blocker is one-shot.
+    fireEvent.click(cell);
+    expect(onChildClick).toHaveBeenCalledTimes(1);
   });
 
   it('clamps scale to MAX even with extreme spreads', () => {

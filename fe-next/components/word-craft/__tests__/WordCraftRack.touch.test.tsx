@@ -9,7 +9,7 @@ const TILES: RackTile[] = [
 ];
 
 describe('WordCraftRack — mobile drag', () => {
-  it('rack tile buttons have touch-action:none so single-finger drag is not stolen by browser scroll', () => {
+  it('rack tile buttons use touch-pan-x so horizontal swipe scrolls the rack while vertical drag still wins', () => {
     render(
       <WordCraftRack
         tiles={TILES}
@@ -20,9 +20,14 @@ describe('WordCraftRack — mobile drag', () => {
       />,
     );
     const a = screen.getByRole('button', { name: /A/i });
-    // touch-manipulation still allows single-finger panning → mobile drag dies.
-    // touch-none commits the gesture to JS so pointermove reaches our drag hook.
-    expect(a.className).toMatch(/\btouch-none\b/);
+    // Was touch-none — drag-always-wins meant the rack could never be
+    // horizontally scrolled on phones where 7 tiles overflow the viewport
+    // (player complaint 2026-05-13: "can't swipe to see more letters").
+    // touch-pan-x: browser handles horizontal pan; useWordCraftDrag
+    // direction-gates touch activation on vertical-dominant motion so
+    // dragging a tile up onto the board still beats the scroller.
+    expect(a.className).toMatch(/\btouch-pan-x\b/);
+    expect(a.className).not.toMatch(/\btouch-none\b/);
     expect(a.className).not.toMatch(/\btouch-manipulation\b/);
   });
 });

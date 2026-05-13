@@ -20,6 +20,7 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
     x: number,
     y: number,
     _target?: EventTarget,
+    extra?: { isPrimary?: boolean },
   ): PointerEvent {
     return new PointerEvent(type, {
       bubbles: true,
@@ -27,6 +28,7 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
       pointerType,
       clientX: x,
       clientY: y,
+      isPrimary: extra?.isPrimary ?? true,
     });
   }
 
@@ -145,24 +147,145 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
     expect(result.current.drag?.y).toBe(103);
   });
 
-  it('touch pointer at exactly 6px boundary activates drag', () => {
+  it('touch pointer with vertical-only 4px movement activates drag (fast lane)', () => {
     const onDrop = vi.fn();
     const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
 
     act(() => {
-      const evt = createPointerEvent('pointerdown', 'touch', 0, 0);
-      result.current.begin('t-6', 'F', 6, evt as any);
+      const evt = createPointerEvent('pointerdown', 'touch', 100, 100);
+      result.current.begin('t-v', 'V', 1, evt as any);
     });
 
     act(() => {
-      // Move exactly at the threshold: 6px = sqrt(36) = threshold check is dx*dx + dy*dy >= 36
-      // 6,0 gives 36+0=36 which is >= 36
-      const evt = createPointerEvent('pointermove', 'touch', 6, 0);
+      // Pure vertical 4px upward — covers "lift tile straight up off rack".
+      const evt = createPointerEvent('pointermove', 'touch', 100, 96);
       window.dispatchEvent(evt);
     });
 
-    // At exactly 6px, should activate
     expect(result.current.drag?.active).toBe(true);
+  });
+
+  it('touch pointer with horizontal-only swipe does NOT activate drag (rack scroll wins)', () => {
+    const onDrop = vi.fn();
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+
+    act(() => {
+      const evt = createPointerEvent('pointerdown', 'touch', 50, 50);
+      result.current.begin('t-h', 'H', 1, evt as any);
+    });
+
+    act(() => {
+      const evt = createPointerEvent('pointermove', 'touch', 90, 50);
+      window.dispatchEvent(evt);
+    });
+
+    expect(result.current.drag?.active).toBe(false);
+  });
+
+  it('begin() ignores non-primary pointers so pinch second-finger never starts a drag', () => {
+    const onDrop = vi.fn();
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+
+    act(() => {
+      const evt = createPointerEvent('pointerdown', 'touch', 100, 100, undefined, {
+        isPrimary: false,
+      });
+      result.current.begin('t-pinch', 'P', 1, evt as any);
+    });
+
+    expect(result.current.drag).toBeNull();
+  });
+
+  it('horizontal swipe sets consumeDropFlag so the trailing click is suppressed', () => {
+    const onDrop = vi.fn();
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+
+    act(() => {
+      const evt = createPointerEvent('pointerdown', 'touch', 100, 100);
+      result.current.begin('t-swipe', 'S', 1, evt as any);
+    });
+
+    act(() => {
+      const evt = createPointerEvent('pointermove', 'touch', 115, 100);
+      window.dispatchEvent(evt);
+    });
+
+    act(() => {
+      const evt = createPointerEvent('pointerup', 'touch', 115, 100);
+      window.dispatchEvent(evt);
+    });
+
+    expect(onDrop).not.toHaveBeenCalled();
+    expect(result.current.consumeDropFlag()).toBe(true);
+    expect(result.current.consumeDropFlag()).toBe(false);
+  });
+
+  it('drop snap: pointerup in a 2px gap resolves to the nearest empty cell', () => {
+    const onDrop = vi.fn();
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+
+    const c1 = document.createElement('div');
+    c1.dataset.boardCell = '0,0';
+    c1.dataset.tileState = 'empty';
+    Object.defineProperty(c1, 'getBoundingClientRect', {
+      value: () => ({ left: 0, top: 0, right: 30, bottom: 30, width: 30, height: 30, x: 0, y: 0, toJSON: () => ({}) }),
+    });
+    const c2 = document.createElement('div');
+    c2.dataset.boardCell = '0,1';
+    c2.dataset.tileState = 'empty';
+    Object.defineProperty(c2, 'getBoundingClientRect', {
+      value: () => ({ left: 32, top: 0, right: 62, bottom: 30, width: 30, height: 30, x: 32, y: 0, toJSON: () => ({}) }),
+    });
+    container.appendChild(c1);
+    container.appendChild(c2);
+
+    act(() => {
+      const evt = createPointerEvent('pointerdown', 'mouse', 5, 5);
+      result.current.begin('t-snap', 'S', 1, evt as any);
+    });
+    act(() => {
+      const evt = createPointerEvent('pointermove', 'mouse', 8, 8);
+      window.dispatchEvent(evt);
+    });
+    act(() => {
+      vi.spyOn(document, 'elementFromPoint').mockReturnValue(document.body);
+      const evt = createPointerEvent('pointerup', 'mouse', 31, 15);
+      window.dispatchEvent(evt);
+      vi.spyOn(document, 'elementFromPoint').mockRestore();
+    });
+
+    expect(onDrop).toHaveBeenCalledTimes(1);
+    expect(onDrop).toHaveBeenCalledWith('t-snap', 0, 0);
+  });
+
+  it('drop snap: pointerup beyond SNAP_RADIUS_PX does not snap', () => {
+    const onDrop = vi.fn();
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+
+    const c1 = document.createElement('div');
+    c1.dataset.boardCell = '0,0';
+    c1.dataset.tileState = 'empty';
+    Object.defineProperty(c1, 'getBoundingClientRect', {
+      value: () => ({ left: 0, top: 0, right: 30, bottom: 30, width: 30, height: 30, x: 0, y: 0, toJSON: () => ({}) }),
+    });
+    container.appendChild(c1);
+
+    act(() => {
+      const evt = createPointerEvent('pointerdown', 'mouse', 5, 5);
+      result.current.begin('t-far', 'F', 1, evt as any);
+    });
+    act(() => {
+      const evt = createPointerEvent('pointermove', 'mouse', 8, 8);
+      window.dispatchEvent(evt);
+    });
+    act(() => {
+      vi.spyOn(document, 'elementFromPoint').mockReturnValue(document.body);
+      const evt = createPointerEvent('pointerup', 'mouse', 200, 200);
+      window.dispatchEvent(evt);
+      vi.spyOn(document, 'elementFromPoint').mockRestore();
+    });
+
+    expect(onDrop).not.toHaveBeenCalled();
   });
 
   it('touch: no drop fires if pointerup before threshold reached', () => {

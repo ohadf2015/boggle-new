@@ -106,9 +106,12 @@ function WordCraftRackImpl({
               onSelect(isSelected ? null : tile.id);
             }}
             className={cn(
-              // touch-none (not touch-manipulation) so mobile single-finger drag is
-              // not hijacked by the rack's overflow-x-auto scroller or browser pan.
-              'relative w-14 h-16 sm:w-16 sm:h-[72px] flex items-center justify-center touch-none shrink-0 snap-center',
+              // touch-pan-x lets the browser handle horizontal swipe of the
+              // rack (so all 7 tiles are reachable on narrow phones —
+              // player complaint 2026-05-13 "can't swipe to see more letters").
+              // useWordCraftDrag direction-gates touch activation so
+              // vertical-dominant motion still wins for drag-to-board.
+              'relative w-14 h-16 sm:w-16 sm:h-[72px] flex items-center justify-center touch-pan-x shrink-0 snap-center',
               'rounded-neo border-neo-thick border-black',
               'transition-all duration-200 ease-out',
               tilt,
