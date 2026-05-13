@@ -45,4 +45,41 @@ describe('useWeeklyChest', () => {
     const claimed = await result.current.claim()
     expect(claimed).toBeNull()
   })
+
+  it('returns safe defaults when API responds with an error payload', async () => {
+    global.fetch = makeFetch({ error: 'Unauthorized' })
+    const { result } = renderHook(() => useWeeklyChest())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.daysCompleted).toBe(0)
+    expect(result.current.completedDates).toEqual([])
+    expect(result.current.cycleStart).toBe('')
+    expect(result.current.isClaimable).toBe(false)
+    expect(result.current.pendingChest).toBeNull()
+  })
+
+  it('clamps daysCompleted to a finite number 0-7 even with junk values', async () => {
+    global.fetch = makeFetch({
+      daysCompleted: null,
+      completedDates: 'not-an-array',
+      cycleStart: undefined,
+      isClaimable: 'yes',
+      pendingChest: null,
+    })
+    const { result } = renderHook(() => useWeeklyChest())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(Number.isFinite(result.current.daysCompleted)).toBe(true)
+    expect(result.current.daysCompleted).toBe(0)
+    expect(Array.isArray(result.current.completedDates)).toBe(true)
+    expect(typeof result.current.cycleStart).toBe('string')
+    expect(result.current.isClaimable).toBe(false)
+  })
+
+  it('treats network failure as safe defaults (not undefined)', async () => {
+    global.fetch = vi.fn().mockRejectedValue(new Error('offline'))
+    const { result } = renderHook(() => useWeeklyChest())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.daysCompleted).toBe(0)
+    expect(result.current.completedDates).toEqual([])
+    expect(result.current.cycleStart).toBe('')
+  })
 })

@@ -31,6 +31,14 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
   } = useWeeklyChest()
   const chestRef = useRef<HTMLDivElement>(null)
   const cardRef = useRef<HTMLDivElement>(null)
+  const barRef = useRef<HTMLDivElement>(null)
+
+  // Defensive: callers may receive partial / error payloads. Always render integers.
+  const safeDays = Number.isFinite(daysCompleted)
+    ? Math.max(0, Math.min(7, Math.trunc(daysCompleted)))
+    : 0
+  const remaining = Math.max(0, 7 - safeDays)
+  const percent = Math.round((safeDays / 7) * 100)
 
   // Card entrance (one-shot)
   useEffect(() => {
@@ -47,6 +55,24 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
       ease: 'back.out(1.4)',
     })
   }, [])
+
+  // Animate progress bar fill on data change
+  useEffect(() => {
+    if (!barRef.current) return
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      barRef.current.style.width = `${percent}%`
+      return
+    }
+    const tween = gsap.to(barRef.current, {
+      width: `${percent}%`,
+      duration: 0.6,
+      ease: 'power2.out',
+    })
+    return () => { tween.kill() }
+  }, [percent])
 
   // Idle float; intensifies when claimable
   useEffect(() => {
@@ -104,6 +130,8 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
           }}
         />
       )}
+
+      {/* Header: title + day counter pill */}
       <div className="flex items-center justify-between mb-3 relative">
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-neo-cream/60" />
@@ -111,45 +139,82 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
             {t('daily.weeklyChest.title')}
           </span>
         </div>
-        <span className="text-xs text-neo-cream/50 font-bold">
-          {t('daily.weeklyChest.dayProgress').replace('{day}', String(daysCompleted))}
+        <span
+          className="text-[11px] font-black text-neo-navy bg-neo-yellow rounded-full px-2.5 py-0.5 border-2 border-neo-black shadow-hard-xs"
+          data-testid="chest-day-counter"
+        >
+          {safeDays}/7
         </span>
       </div>
 
-      <div className="flex items-center gap-3 relative">
-        {cycleStart && (
-          <ChestProgressDots
-            completedDates={completedDates}
-            cycleStart={cycleStart}
-          />
-        )}
-        <div ref={chestRef} className="ms-auto relative">
+      {/* Main row: chest + progress */}
+      <div className="flex items-center gap-4 relative">
+        <div ref={chestRef} className="relative shrink-0">
           <Image
             src={CHEST_IMG[tier]}
             alt={tierLabel}
             data-testid="chest-tier-thumb"
-            width={56}
-            height={56}
-            className="rounded-md border-2 border-neo-black shadow-hard-sm"
+            width={72}
+            height={72}
+            className="rounded-lg border-2 border-neo-black shadow-hard-sm"
             unoptimized
           />
           {isClaimable && (
             <Sparkles
               aria-hidden="true"
-              className="absolute -top-2 -end-2 w-4 h-4 text-neo-yellow drop-shadow"
+              className="absolute -top-2 -end-2 w-5 h-5 text-neo-yellow drop-shadow"
             />
           )}
         </div>
-      </div>
 
-      <p className="text-xs text-neo-cream/50 mt-2">
-        {isClaimable
-          ? t('daily.weeklyChest.claimReady')
-              .replace('{tier}', tierLabel)
-          : t('daily.weeklyChest.daysRemaining')
-              .replace('{n}', String(7 - daysCompleted))
-              .replace('{tier}', tierLabel)}
-      </p>
+        <div className="flex-1 min-w-0">
+          {/* Progress bar */}
+          <div
+            className="relative h-3 w-full rounded-full bg-neo-navy border-2 border-neo-black overflow-hidden"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={7}
+            aria-valuenow={safeDays}
+            aria-label={t('daily.weeklyChest.title')}
+            data-testid="chest-progress-bar"
+          >
+            <div
+              ref={barRef}
+              className="absolute inset-y-0 start-0 bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-yellow"
+              style={{ width: '0%' }}
+            />
+          </div>
+
+          {/* Status line: X of 7 + days remaining */}
+          <p className="mt-2 text-xs text-neo-cream/70 font-bold">
+            <span className="text-neo-white">
+              {t('daily.weeklyChest.dayProgress').replace('{day}', String(safeDays))}
+            </span>
+            {!isClaimable && (
+              <span className="ms-2 text-neo-cream/50">
+                · {t('daily.weeklyChest.daysRemaining')
+                    .replace('{n}', String(remaining))
+                    .replace('{tier}', tierLabel)}
+              </span>
+            )}
+            {isClaimable && (
+              <span className="ms-2 text-neo-yellow">
+                · {t('daily.weeklyChest.claimReady').replace('{tier}', tierLabel)}
+              </span>
+            )}
+          </p>
+
+          {/* Day markers (kept as `chest-dots` testid for existing tests) */}
+          {cycleStart && (
+            <div className="mt-2">
+              <ChestProgressDots
+                completedDates={completedDates}
+                cycleStart={cycleStart}
+              />
+            </div>
+          )}
+        </div>
+      </div>
 
       <AnimatePresence>
         {isClaimable && (

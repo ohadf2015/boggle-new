@@ -400,4 +400,31 @@ describe('TabbedDailyLeaderboard', () => {
       expect(screen.queryByText('Failed to load leaderboard')).not.toBeInTheDocument();
     });
   });
+
+  describe('header subtitle suppresses misleading counts on error', () => {
+    it('does NOT show "0 players" subtitle when the fetch fails', async () => {
+      (global.fetch as jest.Mock).mockImplementation(() =>
+        Promise.resolve({ ok: false, status: 500, text: () => Promise.resolve('boom') })
+      );
+
+      const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
+      const { container } = render(
+        <TabbedDailyLeaderboard
+          puzzleDate="2026-01-09"
+          language="en"
+          t={mockT}
+        />
+      );
+
+      // Wait for the error to render (proves loading is done)
+      expect(await screen.findByText('errors.failedToLoadLeaderboard')).toBeInTheDocument();
+
+      // The subtitle's "0 players" line must NOT appear when the load failed —
+      // showing both an error AND "0 players" looks broken (screenshot bug).
+      // mockT is identity, so the plural key leaks into the rendered text;
+      // when our fix lands the subtitle is hidden entirely on error.
+      expect(container.textContent || '').not.toContain('daily.playersPlural');
+      expect(container.textContent || '').not.toContain('daily.playerSingular');
+    });
+  });
 });

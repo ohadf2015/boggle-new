@@ -117,4 +117,45 @@ describe('WeeklyChestCard', () => {
     const img = screen.getByTestId('chest-tier-thumb') as HTMLImageElement
     expect((img.getAttribute('src') || '')).toContain('chest-silver')
   })
+
+  it('renders a progress bar with the correct aria value', () => {
+    render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+    const bar = screen.getByTestId('chest-progress-bar')
+    expect(bar.getAttribute('aria-valuenow')).toBe('4')
+    expect(bar.getAttribute('aria-valuemax')).toBe('7')
+  })
+
+  it('shows the day counter pill as N/7', () => {
+    render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+    expect(screen.getByTestId('chest-day-counter').textContent).toBe('4/7')
+  })
+
+  it('never renders the literal string "undefined" or "NaN"', () => {
+    // Simulate a broken/error API response that leaks through the hook layer.
+    mockUseWeeklyChest.mockReturnValue({
+      loading: false,
+      daysCompleted: undefined as unknown as number,
+      completedDates: [],
+      cycleStart: '',
+      cycleNumber: 1,
+      isClaimable: false,
+      pendingChest: null,
+      claim: vi.fn(),
+      refresh: vi.fn(),
+    })
+    const { container } = render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+    expect(container.textContent || '').not.toMatch(/undefined|NaN/)
+    expect(screen.getByTestId('chest-day-counter').textContent).toBe('0/7')
+    expect(screen.getByTestId('chest-progress-bar').getAttribute('aria-valuenow')).toBe('0')
+  })
+
+  it('clamps daysCompleted above 7 to 7 so the bar never overflows', () => {
+    mockUseWeeklyChest.mockReturnValue({
+      ...defaultMockData,
+      daysCompleted: 42,
+    })
+    render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+    expect(screen.getByTestId('chest-day-counter').textContent).toBe('7/7')
+    expect(screen.getByTestId('chest-progress-bar').getAttribute('aria-valuenow')).toBe('7')
+  })
 })
