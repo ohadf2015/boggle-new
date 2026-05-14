@@ -21,19 +21,17 @@ import { broadcastToRoom, broadcastToRoomExceptSender, volatileBroadcastToRoom, 
 import { calculateWordScore } from '../modules/scoringEngine.js';
 import { checkAndAwardAchievements } from '../modules/achievementManager.js';
 import { isSupabaseConfigured, savePlayerWord, recordPlayerWrongWord } from '../modules/supabaseServer.js';
-import { addWordToBlacklist, getGameBots, resyncBotsForNewGrid, stopAllBots } from '../modules/botManager.js';
+import { addWordToBlacklist, getGameBots, resyncBotsForNewGrid } from '../modules/botManager.js';
 import { inc, incPerGame } from '../utils/metrics.js';
 import logger from '../utils/logger.js';
 import { processLongWordEngagement } from './engagementHandler';
-import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, isBlastBoardCleared, advanceBlastWave, tryBeginWaveAdvance, endWaveAdvance } from '../modules/blastModeManager.js';
+import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, isBlastBoardCleared, regenerateBlastBoard, recordBlastBoardClear, tryBeginWaveAdvance, endWaveAdvance } from '../modules/blastModeManager.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
-import { endGame } from '../services/gameLifecycle/gameEnd.js';
 import timerManager from '../utils/timerManager.js';
 import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
 import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
 import { createSeededRandom } from '@/components/blast/legacy/utils/blastLetterGenerator';
-import { BLAST_SPECIAL_TILE_CHANCE, BLAST_MP_DEFAULT_MAX_WAVES } from '@/shared/constants/blastMultiplayerConstants';
-import { getWaveConfig } from '@/components/blast/legacy/utils/blastWaveConfig';
+import { BLAST_SPECIAL_TILE_CHANCE } from '@/shared/constants/blastMultiplayerConstants';
 import { restoreLife, getLifeBonus, computeDiscoveryClues } from '../modules/wordHuntManager.js';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
 
@@ -114,7 +112,8 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
           rng,
         });
 
-        // 2. Apply gravity — no refill so cleared tiles stay empty (like SP shrink mode)
+        // 2. Apply gravity WITH refill — timer-era Blast keeps the board alive
+        // for the whole countdown; tiles cascade and refill continuously.
         const gravityResult = computeGravityResult(
           blastState.grid,
           processResult.next,
@@ -124,7 +123,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
           undefined,
           0,
           rng,
-          false, // refill=false: tiles stay missing until board has no moves
+          true, // refill=true: continuous board for fixed-timer play
         );
 
         // 3. Update authoritative state
@@ -141,71 +140,40 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
           totalMoves,
         });
 
-        // 5. MP board-clear: advance wave or schedule endGame on final wave.
-        // H2: tryBeginWaveAdvance guards against a concurrent caller (human+bot
-        // or two bots) double-advancing on the same cleared snapshot.
+        // 5. MP board-clear (timer era): rare with refill on, but if a player
+        // fully clears the board, award a clear-bonus, regenerate overlay in
+        // place, and keep playing. The game ends ONLY on the shared timer.
         if (isBlastBoardCleared(gravityResult.newTileStates) && tryBeginWaveAdvance(gameCode)) {
           try {
-          const currentWave = blastState.wave ?? 1;
-          const maxWaves = BLAST_MP_DEFAULT_MAX_WAVES;
-          if (currentWave < maxWaves) {
-            // Mid-run: advance to next wave with fresh overlay/grid/seed.
-            const next = advanceBlastWave(blastState, gameCode, gravityResult.newGrid);
+            recordBlastBoardClear(blastState, username);
+            const next = regenerateBlastBoard(blastState, gameCode, gravityResult.newGrid);
             Object.assign(blastState, {
-              wave: next.wave,
               overlay: next.overlay,
               overlayMap: next.overlayMap,
               tileStates: next.tileStates,
               seed: next.seed,
               grid: next.grid,
-              playerMoves: next.playerMoves,
-              playerBonusMoves: next.playerBonusMoves,
-              totalMoves: next.totalMoves,
+              refillCount: next.refillCount,
             });
             const nextGrid = next.grid ?? gravityResult.newGrid;
-            // Keep letterGrid in lock-step with letterPositions; wordHandler's
-            // isWordOnBoardAsync walks letterGrid using letterPositions, and a
-            // mismatch silently rejects every wave 2+ word as wordNotOnBoard.
             game.letterGrid = nextGrid;
             game.letterPositions = makePositionsMap(nextGrid, (game.language || 'en'));
-            if (game.playerWords) {
-              for (const u of Object.keys(game.playerWords)) {
-                game.playerWords[u] = [];
-              }
-            }
-            if (game.playerWordsSet) {
-              for (const u of Object.keys(game.playerWordsSet)) {
-                game.playerWordsSet[u] = new Set();
-              }
-            }
-            const nextWaveNum = next.wave ?? currentWave + 1;
-            const archetype = getWaveConfig(nextWaveNum).archetype;
-            logger.info('BLAST', `Board cleared in ${gameCode} by ${username} — advancing to wave ${next.wave} (${archetype})`);
-            broadcastToRoom(io, getGameRoom(gameCode), 'blastWaveAdvance', {
-              wave: next.wave,
-              archetype,
-              grid: next.grid,
+            logger.info('BLAST', `Board cleared in ${gameCode} by ${username} — regenerating board (refill #${next.refillCount})`);
+            broadcastToRoom(io, getGameRoom(gameCode), 'blastBoardUpdate', {
+              grid: nextGrid,
               tileStates: next.tileStates,
               overlay: next.overlay,
               seed: next.seed,
+              clearedBy: '__board_regenerated__',
+              word: '',
+              clearedCount: 0,
+              totalMoves: blastState.totalMoves ?? 0,
             });
             void resyncBotsForNewGrid(
               getGameBots(gameCode),
-              next.grid ?? gravityResult.newGrid,
+              nextGrid,
               (game.language || 'en') as import('@/shared/types').Language,
             );
-          } else {
-            // Final wave cleared — schedule delayed endGame.
-            logger.info('BLAST', `Final wave ${currentWave} cleared in ${gameCode} by ${username} — scheduling endGame`);
-            stopAllBots(gameCode);
-            timerManager.setTimeout(`blastEnd:${gameCode}`, () => {
-              const currentGame = getGame(gameCode);
-              if (currentGame && currentGame.gameState === 'in-progress') {
-                logger.info('BLAST', `Ending game ${gameCode} after final wave clear`);
-                endGame(io, gameCode);
-              }
-            }, 1500);
-          }
           } finally {
             endWaveAdvance(gameCode);
           }
