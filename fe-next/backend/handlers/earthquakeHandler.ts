@@ -13,7 +13,7 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { LetterGrid, Language, DifficultyLevel, GridPosition } from '@/shared/types';
+import type { LetterGrid } from '@/shared/types';
 import type { GameState } from '../modules/gameState/types.js';
 
 import {
