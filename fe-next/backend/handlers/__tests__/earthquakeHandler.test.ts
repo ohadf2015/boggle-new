@@ -93,23 +93,17 @@ describe('executeEarthquakeSequence export (catalyst unification)', () => {
   });
 });
 
-describe('earthquakeHandler — mutual exclusion', () => {
-  const io = {} as Parameters<typeof earthquakeHandler.registerEarthquakeHandlers>[0];
+describe('triggerEarthquake socket handler removal (catalyst unification)', () => {
+  it('does not register a triggerEarthquake listener', () => {
+    const registered: string[] = [];
+    const fakeSocket = {
+      id: 'sock-1',
+      on: (event: string) => { registered.push(event); },
+    } as unknown as import('socket.io').Socket;
+    const fakeIo = {} as unknown as import('socket.io').Server;
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+    earthquakeHandler.registerEarthquakeHandlers(fakeIo, fakeSocket);
 
-  it('does NOT trigger earthquake if a round event is already active', () => {
-    const socket = createMockSocket('host-socket-id');
-    earthquakeHandler.registerEarthquakeHandlers(io, socket as never);
-
-    mockGetGameBySocketId.mockReturnValue('ABCD');
-    mockGetGame.mockReturnValue(makeGame({ activeRoundEvent: 'blizzard' }));
-
-    socket._emit('triggerEarthquake', { gameSessionId: '1' });
-
-    expect(mockUpdateGame).not.toHaveBeenCalled();
-    expect(mockBroadcastToRoom).not.toHaveBeenCalled();
+    expect(registered).not.toContain('triggerEarthquake');
   });
 });

@@ -18,7 +18,6 @@ import type { GameState } from '../modules/gameState/types.js';
 
 import {
   getGame,
-  getGameBySocketId,
   updateGame,
 } from '../modules/gameStateManager.js';
 
@@ -27,7 +26,6 @@ import { generateRandomTable } from '../utils/gameUtils.js';
 import { generateRichBoard } from '../utils/boardSelection.js';
 import { DIFFICULTIES } from '../utils/consts.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
-import { checkRateLimit } from '../utils/rateLimiter.js';
 import logger from '../utils/logger.js';
 import timerManager from '../utils/timerManager';
 import { gameCleanupEmitter } from '../events/gameCleanup';
@@ -42,11 +40,6 @@ gameCleanupEmitter.onGameReset(({ gameCode }) => {
 });
 
 // Types for payloads
-interface TriggerEarthquakePayload {
-  gameSessionId?: string;
-  triggerTime?: number;
-}
-
 interface DifficultyConfig {
   nameKey: string;
   rows: number;
@@ -73,72 +66,8 @@ function clearEarthquakeTimers(gameCode: string): void {
  * @param io - Socket.IO server instance
  * @param socket - Socket.IO socket instance
  */
-function registerEarthquakeHandlers(io: Server, socket: Socket): void {
-
-  /**
-   * Trigger earthquake sequence (host only)
-   * Payload: { gameSessionId, triggerTime }
-   */
-  socket.on('triggerEarthquake', (data: TriggerEarthquakePayload) => {
-    // Heavy weight: each trigger spawns a new grid + broadcasts to all players.
-    // Earthquakes naturally fire ~1/round so weight 5 is permissive but caps spam.
-    if (!checkRateLimit(socket.id, 5)) return;
-    const { gameSessionId, triggerTime } = data || {};
-
-    // Get game by socket ID
-    const gameCode = getGameBySocketId(socket.id);
-    if (!gameCode) {
-      logger.debug('EARTHQUAKE', `Socket ${socket.id} not in a game`);
-      return;
-    }
-
-    const game = getGame(gameCode);
-    if (!game) {
-      logger.debug('EARTHQUAKE', `Game ${gameCode} not found`);
-      return;
-    }
-
-    // Verify socket is the host
-    if (game.hostSocketId !== socket.id) {
-      logger.debug('EARTHQUAKE', `Non-host ${socket.id} tried to trigger earthquake in game ${gameCode}`);
-      return;
-    }
-
-    // Verify game is in progress
-    if (game.gameState !== 'in-progress') {
-      logger.debug('EARTHQUAKE', `Cannot trigger earthquake - game ${gameCode} not in progress (state: ${game.gameState})`);
-      return;
-    }
-
-    // Earthquake only applies to classic mode
-    if (game.gameMode && game.gameMode !== 'classic') {
-      logger.debug('EARTHQUAKE', `Cannot trigger earthquake in ${game.gameMode} mode for game ${gameCode}`);
-      return;
-    }
-
-    // Block earthquake if a round event (blizzard/lightning/meteor) is active
-    if (game.activeRoundEvent) {
-      logger.debug('EARTHQUAKE', `Cannot trigger earthquake - round event '${game.activeRoundEvent}' active in game ${gameCode}`);
-      return;
-    }
-
-    // Atomically check and set earthquake flag to prevent race conditions
-    // Two hosts might emit triggerEarthquake at the same time
-    if (game.earthquakeTriggered) {
-      logger.debug('EARTHQUAKE', `Earthquake already triggered for game ${gameCode}, ignoring duplicate`);
-      return;
-    }
-
-    // Mark as triggered IMMEDIATELY before any async work
-    // This prevents race conditions where two events check the flag simultaneously
-    game.earthquakeTriggered = true;
-    updateGame(gameCode, { earthquakeTriggered: true });
-
-    logger.info('EARTHQUAKE', `Host triggered earthquake for game ${gameCode} (triggerTime: ${triggerTime}s remaining)`);
-
-    // Execute earthquake sequence
-    executeEarthquakeSequence(io, gameCode, game);
-  });
+function registerEarthquakeHandlers(_io: Server, _socket: Socket): void {
+  // Earthquake is scheduled server-side by roundEventsManager; no socket events to register.
 }
 
 /**
