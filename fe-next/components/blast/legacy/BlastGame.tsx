@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import CircularTimer from '@/components/CircularTimer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -642,6 +643,8 @@ export function BlastGame({
           />
         ) : null}
         hintToast={<BlastHintToast target={hint.active} t={tAdapter} />}
+        remainingTime={_remainingTime}
+        totalTime={_totalTime}
         t={tAdapter}
       />
     </div>
