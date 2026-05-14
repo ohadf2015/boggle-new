@@ -9911,54 +9911,54 @@ const es = {
     },
     "analytics": {
       "accuracy": "Precisión",
-      "activeNow": "{{count}} activos ahora",
+      "activeNow": "{{count}} en línea",
       "activeStudentsToday": "Activos hoy",
       "assignLessons": "Asignar lecciones",
-      "assignLessonsHint": "Elige lecciones para tu clase",
+      "assignLessonsHint": "Elige qué practicarán",
       "avgAccuracy": "Precisión promedio",
-      "avgXpGain": "Ganancia XP promedio",
-      "backToClassroom": "Volver al aula",
-      "classAverageXp": "XP promedio de la clase",
-      "commonMistakes": "Errores comunes",
-      "completionRate": "Tasa de finalización",
+      "avgXpGain": "XP ganado (promedio)",
+      "backToClassroom": "Volver",
+      "classAverageXp": "XP promedio",
+      "commonMistakes": "Errores frecuentes",
+      "completionRate": "Finalización",
       "connecting": "Conectando...",
-      "connectionError": "Se perdió la conexión",
-      "createReviewLesson": "Crear lección de repaso",
+      "connectionError": "Conexión perdida",
+      "createReviewLesson": "Crear repaso",
       "daysAgo": "hace {{count}}d",
-      "error": "Error al cargar datos",
-      "exportReport": "Exportar reporte",
-      "inviteStudents": "Invitar estudiantes",
-      "lastActive": "Última actividad",
-      "lessonEffectiveness": "Impacto de lecciones",
-      "level": "Nivel {{level}}",
+      "error": "Error al cargar",
+      "exportReport": "Descargar reporte",
+      "inviteStudents": "Invitar alumnos",
+      "lastActive": "Última vez",
+      "lessonEffectiveness": "Impacto",
+      "level": "Nv. {{level}}",
       "live": "En vivo",
-      "loading": "Cargando estadísticas...",
+      "loading": "Cargando...",
       "mastery": "Dominio",
-      "masteryLevels": "Niveles de dominio",
-      "noActivity": "Sin actividad aún",
-      "noData": "Sin datos disponibles",
-      "noLessons": "Sin lecciones aún",
-      "noStudents": "Sin estudiantes aún",
-      "noVocabularyData": "Sin datos de vocabulario",
+      "masteryLevels": "Niveles",
+      "noActivity": "Sin actividad",
+      "noData": "Sin datos",
+      "noLessons": "Sin lecciones",
+      "noStudents": "Sin alumnos",
+      "noVocabularyData": "Sin datos",
       "offline": "Desconectado",
-      "practiceToSee": "Practica para ver estadísticas",
+      "practiceToSee": "Practica para ver más",
       "retry": "Reintentar",
-      "streak": "Racha de {{count}} días",
-      "struggling": "Necesita ayuda",
-      "student": "Estudiante",
-      "studentDetail": "Detalle del estudiante",
-      "studentProgress": "Progreso del estudiante",
-      "students": "Estudiantes",
-      "studentsNeedingHelp": "Estudiantes que necesitan ayuda",
-      "subtitle": "Seguimiento del rendimiento",
-      "title": "Panel de estadísticas",
+      "streak": "Racha {{count}}d",
+      "struggling": "Necesita apoyo",
+      "student": "Alumno",
+      "studentDetail": "Detalles",
+      "studentProgress": "Progreso",
+      "students": "Alumnos",
+      "studentsNeedingHelp": "Alumnos con dificultad",
+      "subtitle": "Monitoreo de clase",
+      "title": "Analytics",
       "today": "Hoy",
-      "updatedAgo": "Actualizado hace {{time}}",
-      "viewAssignments": "Ver tareas",
-      "viewLessons": "Ver lecciones",
-      "viewStudents": "Ver estudiantes",
-      "viewVocabulary": "Ver vocabulario",
-      "vocabularyMastery": "Dominio de vocabulario",
+      "updatedAgo": "Hace {{time}}",
+      "viewAssignments": "Tareas",
+      "viewLessons": "Lecciones",
+      "viewStudents": "Alumnos",
+      "viewVocabulary": "Vocabulario",
+      "vocabularyMastery": "Dominio",
       "yesterday": "Ayer"
     },
     "classroomGame": {
@@ -9992,34 +9992,34 @@ const es = {
     },
     "header": {
       "breadcrumbs": {
-        "analytics": "Estadísticas",
-        "classroomGame": "Juego del aula",
-        "classrooms": "Aulas",
+        "analytics": "Analytics",
+        "classroomGame": "Juego en clase",
+        "classrooms": "Mis aulas",
         "curriculum": "Currículo",
         "duels": "Duelos",
         "education": "Educación",
-        "join": "Unirse",
+        "join": "Unirme",
         "lessons": "Lecciones",
         "navigation": "Navegación",
-        "profile": "Perfil",
+        "profile": "Mi perfil",
         "reports": "Reportes",
-        "student": "Estudiante",
-        "teacher": "Profesor"
+        "student": "Alumno",
+        "teacher": "Maestro"
       },
-      "educationHome": "Inicio Educación",
+      "educationHome": "Inicio",
       "homeLink": "Inicio",
       "menu": "Menú",
-      "navigation": "Navegación educativa",
-      "studentDashboard": "Panel del estudiante",
+      "navigation": "Navegación",
+      "studentDashboard": "Tu panel",
       "subtitle": "Aprende jugando",
-      "teacherDashboard": "Panel del profesor",
-      "title": "LexiClash Educación"
+      "teacherDashboard": "Tu panel",
+      "title": "LexiClash Education"
     },
     "landing": {
       "duelTeaser": {
         "cta": "Reta a un amigo",
-        "headline": "Duelos de palabras",
-        "subtext": "Batalla con amigos en tiempo real"
+        "headline": "Duelos de Palabras",
+        "subtext": "Compite con amigos en tiempo real"
       },
       "freeAccess": "Gratis para todos",
       "goToDashboard": "Ir al panel",
@@ -10027,91 +10027,91 @@ const es = {
       "roleGuest": "Invitado",
       "roleStudent": "Estudiante",
       "roleTeacher": "Profesor",
-      "socialProof": "No eres el único que está aprendiendo.",
+      "socialProof": "No estás solo aprendiendo.",
       "student": "Estudiante",
       "studentCta": "Empezar a aprender",
       "studentDesc": "Aprende vocabulario jugando",
-      "studentFeature1": "Sigue tu progreso",
+      "studentFeature1": "Sigue tu avance",
       "studentFeature2": "Gana XP e insignias",
       "studentFeature3": "Reta a compañeros",
       "tagline": "Las palabras son poder",
       "teacher": "Profesor",
       "teacherCta": "Configurar clase",
-      "teacherDesc": "Gamifica las lecciones de vocabulario",
+      "teacherDesc": "Convierte las lecciones en juego",
       "teacherFeature1": "Estadísticas en tiempo real",
       "teacherFeature2": "Listas de palabras personalizadas",
-      "teacherFeature3": "Juegos en el aula",
-      "title": "LexiClash Educación",
+      "teacherFeature3": "Juegos en vivo para toda la clase",
+      "title": "LexiClash Education",
       "startGame": "Iniciar juego",
       "hero": {
-        "eyebrow": "Para maestros en aulas de inglés, hebreo, sueco, japonés y español",
-        "h1": "La plataforma de juegos de palabras construida para tu idioma — no traducida a él.",
-        "sub": "Multijugador en vivo, ejercicios cerebrales y 6 modos de juego. Sin anuncios para estudiantes. Gratis para maestros — solicita acceso en 60 segundos.",
+        "eyebrow": "Para docentes en aulas de inglés, hebreo, sueco, japonés y español",
+        "h1": "La plataforma de juegos de palabras nativa para tu idioma — no traducida.",
+        "sub": "Multijugador en vivo, entrenamientos cerebrales y 6 modos de juego. Sin anuncios para estudiantes. Gratis para maestros — acceso en 60 segundos.",
         "cta_primary": "Solicitar acceso de maestro",
-        "cta_secondary": "Verlo en acción"
+        "cta_secondary": "Ver en acción"
       },
       "moat": {
-        "title": "Por qué los maestros de 5 idiomas eligen LexiClash",
-        "subtitle": "Tres razones que podemos defender, no solo afirmar.",
+        "title": "Por qué docentes de 5 idiomas eligen LexiClash",
+        "subtitle": "Tres ventajas reales, no promesas.",
         "native_multilingual": {
           "tag": "Nativo",
-          "title": "Construido para tu idioma",
-          "body": "Hebreo de derecha a izquierda, japonés con kana e IME, palabras compuestas suecas, acentos españoles — todo manejado a nivel de motor. No es traducción de Google."
+          "title": "Diseñado para tu idioma",
+          "body": "Hebreo derecha-izquierda, japonés con kana e IME, palabras compuestas suecas, tildes españolas — todo a nivel de motor. Sin traducción automática."
         },
         "local_inventory": {
           "tag": "Local",
-          "title": "Inventario de palabras obtenido localmente",
-          "body": "Listas de palabras extraídas de Wikipedia local + diccionario Milog hebreo. Los estudiantes ven palabras culturalmente relevantes de su país — no libros de texto antiguos de K-12 de EE.UU."
+          "title": "Palabras de tu región",
+          "body": "Listas de Wikipedia local + diccionario Milog hebreo. Tus estudiantes practican palabras relevantes para su país — no de libros estadounidenses viejos."
         },
         "ad_free": {
           "tag": "Sin anuncios",
-          "title": "Sin anuncios para estudiantes. Siempre.",
-          "body": "Kahoot, Quizlet, Blooket — todos muestran anuncios a tus estudiantes. Nos comprometemos a cero anuncios en cada ruta educativa. Conscientes de COPPA + GDPR."
+          "title": "Cero anuncios. Punto.",
+          "body": "Kahoot, Quizlet, Blooket — todos muestran anuncios a tus alumnos. Nos comprometemos: cero anuncios en educación. COPPA + GDPR."
         }
       },
       "modes": {
-        "title": "6 modos de juego, una plataforma — rota para vencer el agotamiento",
-        "teaches": "Enseña",
+        "title": "6 modos en una plataforma — alterna para mantenerlos motivados",
+        "teaches": "Desarrolla",
         "classroom_game": {
-          "tag": "Directo",
+          "tag": "En vivo",
           "title": "Juego en clase",
-          "body": "Caza de palabras multijugador en vivo para toda la clase.",
+          "body": "Caza de palabras multijugador para toda la clase.",
           "teaches": "Vocabulario, ortografía, velocidad"
         },
         "vocab_duels": {
           "tag": "Duelo",
           "title": "Duelos de vocabulario",
-          "body": "Desafíos de vocabulario 1v1 asíncronos o en vivo.",
-          "teaches": "Retención, recuerdo"
+          "body": "Desafíos 1v1 síncronos o asincronos.",
+          "teaches": "Retención y recuerdo"
         },
         "brain_drills": {
           "tag": "Cerebro",
-          "title": "Ejercicios cerebrales",
-          "body": "Ejercicios de memoria, atención, velocidad de procesamiento.",
+          "title": "Entrenamientos cerebrales",
+          "body": "Memoria, atención y velocidad de procesamiento.",
           "teaches": "Habilidades cognitivas"
         },
         "daily_wordhunt": {
           "tag": "Diario",
           "title": "Caza de palabras diaria",
-          "body": "Nuevo acertijo cada día, tabla de clasificación por lugar.",
-          "teaches": "Práctica diaria"
+          "body": "Nuevo reto cada día con ranking por región.",
+          "teaches": "Hábito y consistencia"
         },
         "adventure": {
-          "tag": "Historias",
+          "tag": "Historia",
           "title": "Modo aventura",
-          "body": "Acertijos de palabras dirigidos por historias en mundos temáticos.",
-          "teaches": "Profundidad de vocabulario"
+          "body": "Retos de palabras narrativos en mundos temáticos.",
+          "teaches": "Vocabulario profundo"
         },
         "spelling_bee": {
-          "tag": "Abeja",
+          "tag": "Deletreo",
           "title": "Práctica de ortografía",
-          "body": "Ejercicios de ortografía dirigidos por voz, multiidioma.",
-          "teaches": "Ortografía"
+          "body": "Ejercicios guiados por voz, multiidioma.",
+          "teaches": "Ortografía y pronunciación"
         }
       },
       "compare": {
         "title": "Cómo se compara LexiClash",
-        "subtitle": "Verificaciones honestas — solo donde realmente entregamos.",
+        "subtitle": "Comparación honesta — solo donde ganamos.",
         "col": {
           "lexiclash": "LexiClash",
           "kahoot": "Kahoot!",
@@ -10119,70 +10119,70 @@ const es = {
           "wordwall": "Wordwall"
         },
         "row": {
-          "native_multilingual": "Multilingüe nativo (incl. RTL, IME)",
-          "ad_free_students": "Sin anuncios para estudiantes",
+          "native_multilingual": "Nativo multiidioma (RTL, IME)",
+          "ad_free_students": "Sin anuncios para alumnos",
           "live_multiplayer": "Multijugador en vivo",
-          "brain_training": "Ejercicios de entrenamiento cerebral",
+          "brain_training": "Entrenamientos cerebrales",
           "game_variety": "6+ modos de juego",
           "free_for_teachers": "Gratis para maestros verificados"
         }
       },
       "trust": {
         "title": "Construido sobre confianza",
-        "bullet1": "Sin anuncios en rutas educativas dirigidas a estudiantes.",
-        "bullet2": "Gestión de datos consciente de GDPR; solo telemetría de participación.",
-        "bullet3": "Compatible con COPPA para uso por estudiantes menores de 13 años."
+        "bullet1": "Cero anuncios en rutas educativas.",
+        "bullet2": "Datos manejados bajo GDPR; solo telemetría de uso.",
+        "bullet3": "Conforme a COPPA para menores de 13."
       },
       "faq": {
         "title": "Preguntas frecuentes",
         "q1": {
-          "q": "¿Cómo obtienen acceso los maestros?",
-          "a": "Solicita en /education/access — revisamos por correo electrónico y generalmente respondemos dentro de 24 horas."
+          "q": "¿Cómo obtengo acceso de maestro?",
+          "a": "Solicita en /education/access — revisamos manualmente y respondemos en <24h."
         },
         "q2": {
-          "q": "¿Es realmente gratis para aulas?",
-          "a": "Sí. Gratis para maestros verificados, sin anuncios en rutas dirigidas a estudiantes."
+          "q": "¿Es gratis para mi aula?",
+          "a": "Sí. Gratis para maestros verificados, sin anuncios garantizado."
         },
         "q3": {
           "q": "¿Funciona en hebreo, japonés, sueco y español?",
-          "a": "Sí — soporte nativo incluyendo hebreo de derecha a izquierda e IME de kana japonesa. No es traducción."
+          "a": "Sí — soporte nativo: hebreo RTL, IME de kana, acentos, etc. No traducción."
         },
         "q4": {
-          "q": "¿Cómo manejan la privacidad de los estudiantes?",
-          "a": "Conscientes de COPPA + GDPR. Sin seguimiento de anuncios en rutas educativas. Solo telemetría de participación."
+          "q": "¿Cómo cuidan la privacidad de mis estudiantes?",
+          "a": "COPPA + GDPR. Cero rastreo de anuncios. Solo telemetría de uso, consentida."
         },
         "q5": {
-          "q": "¿Pueden los estudiantes jugar sin una cuenta?",
-          "a": "Sí. El juego de invitado es compatible en la mayoría de los modos."
+          "q": "¿Pueden jugar mis alumnos sin cuenta?",
+          "a": "Sí. Modo invitado en casi todos los juegos."
         },
         "q6": {
-          "q": "¿Cómo es diferente de Kahoot, Quizlet o Wordwall?",
-          "a": "Profundidad multilingüe nativa, promesa sin anuncios, 6 modos de juego en una plataforma, e inventario de palabras obtenido localmente por idioma."
+          "q": "¿Qué me diferencia de Kahoot o Quizlet?",
+          "a": "Nativo multiidioma real, cero anuncios, 6 juegos en uno, y palabras de tu región."
         },
         "q7": {
-          "q": "¿Puedo rastrear el progreso de los estudiantes?",
-          "a": "Sí. Los maestros ven análisis por estudiante en el panel del maestro."
+          "q": "¿Veo el progreso de cada alumno?",
+          "a": "Sí. Panel de maestro con analytics por estudiante."
         },
         "q8": {
-          "q": "¿Funciona en Chromebooks, tabletas y teléfonos?",
-          "a": "Sí. Primero la web, sin instalación requerida."
+          "q": "¿Funciona en Chromebook, tablet y móvil?",
+          "a": "Sí. Web pura, sin instalar nada."
         }
       },
       "cta": {
-        "title": "¿Listo para llevar LexiClash a tu aula?",
-        "body": "Solicita acceso gratuito de maestro — toma 60 segundos, generalmente aprobado dentro de 24 horas.",
+        "title": "¿Listo para LexiClash en tu aula?",
+        "body": "Solicita acceso gratis — 60 segundos, aprobado en <24h.",
         "button": "Solicitar acceso de maestro"
       },
       "esl-word-games": {
         "course_name": "Juegos de palabras ESL de LexiClash",
-        "course_desc": "Juegos de vocabulario, ortografía y multijugador en vivo para aulas ESL en 5 idiomas."
+        "course_desc": "Vocabulario, ortografía y multijugador en vivo para aulas ESL — 5 idiomas nativos."
       },
       "vocabulary-games-classroom": {
         "course_name": "Juegos de vocabulario en clase",
-        "course_desc": "Juegos de vocabulario en vivo y asincrónico con análisis de maestro, sin anuncios para estudiantes."
+        "course_desc": "Juegos síncronos y asincronos con analytics de maestro, sin anuncios."
       },
-      "welcomeBack": "Bienvenido de nuevo",
-      "openDashboard": "Abrir panel del profesor"
+      "welcomeBack": "¡Bienvenido!",
+      "openDashboard": "Abrir panel de maestro"
     },
     "leaderboard": {
       "allTime": "Histórico",
@@ -10246,10 +10246,10 @@ const es = {
       "correctCount": "{{count}} correctas",
       "definition": "Definición",
       "dontKnow": "Saltar",
-      "encouragement0": "¡Sigue intentando!",
-      "encouragement100": "¡Puntaje perfecto!",
-      "encouragement50": "¡Buen esfuerzo!",
-      "encouragement80": "¡Muy bien!",
+      "encouragement0": "¡Sigue así!",
+      "encouragement100": "¡Perfecto!",
+      "encouragement50": "¡Muy bien!",
+      "encouragement80": "¡Excelente!",
       "finish": "Terminar",
       "flashcards": "Tarjetas",
       "foundWordsLabel": "Palabras encontradas",
@@ -10385,63 +10385,63 @@ const es = {
       "locked": "Bloqueado"
     },
     "reports": {
-      "title": "Reportes de Progreso",
-      "subtitle": "Genera reportes detallados para estudiantes y padres",
-      "classReport": "Reporte de la Clase",
-      "studentReport": "Reporte del Estudiante",
-      "exportPDF": "Exportar PDF",
-      "exportCSV": "Exportar CSV",
-      "generateReport": "Generar Reporte",
+      "title": "Reportes",
+      "subtitle": "Descargas en PDF para padres y alumnos",
+      "classReport": "Reporte de clase",
+      "studentReport": "Reporte de alumno",
+      "exportPDF": "PDF",
+      "exportCSV": "CSV",
+      "generateReport": "Generar",
       "generating": "Generando...",
-      "dateRange": "Rango de Fechas",
-      "allTime": "Todo el Tiempo",
-      "lastWeek": "Últimos 7 Días",
-      "lastMonth": "Últimos 30 Días",
-      "custom": "Rango Personalizado",
+      "dateRange": "Período",
+      "allTime": "Todo",
+      "lastWeek": "Últimos 7 días",
+      "lastMonth": "Últimos 30 días",
+      "custom": "Personalizado",
       "from": "Desde",
       "to": "Hasta",
-      "selectStudent": "Seleccionar Estudiante",
-      "allStudents": "Todos los Estudiantes",
-      "noDataAvailable": "No hay datos para este período",
-      "reportGenerated": "Reporte generado exitosamente",
-      "downloadReady": "Tu reporte está listo para descargar",
+      "selectStudent": "Elige alumno",
+      "allStudents": "Todos",
+      "noDataAvailable": "Sin datos",
+      "reportGenerated": "¡Listo!",
+      "downloadReady": "Descarga lista",
       "metrics": {
-        "wordsLearned": "Palabras Aprendidas",
-        "totalWords": "Total de Palabras",
+        "wordsLearned": "Palabras aprendidas",
+        "totalWords": "Total",
         "accuracy": "Precisión",
-        "practiceTime": "Tiempo de Práctica",
-        "currentStreak": "Racha Actual",
-        "longestStreak": "Racha Más Larga",
-        "sessionsCompleted": "Sesiones Completadas",
-        "averageScore": "Puntuación Promedio",
-        "masteryLevel": "Nivel de Dominio",
+        "practiceTime": "Tiempo",
+        "currentStreak": "Racha actual",
+        "longestStreak": "Mejor racha",
+        "sessionsCompleted": "Sesiones",
+        "averageScore": "Puntuación",
+        "masteryLevel": "Dominio",
         "improvement": "Mejora"
       },
       "classMetrics": {
-        "classAverage": "Promedio de la Clase",
-        "topPerformer": "Mejor Desempeño",
-        "mostImproved": "Mayor Mejora",
-        "needsAttention": "Necesita Atención",
-        "participationRate": "Tasa de Participación",
-        "completionRate": "Tasa de Finalización"
+        "classAverage": "Promedio",
+        "topPerformer": "Mejor",
+        "mostImproved": "Más mejora",
+        "needsAttention": "Necesitan apoyo",
+        "participationRate": "Participación",
+        "completionRate": "Finalización"
       },
       "sections": {
         "summary": "Resumen",
-        "wordMastery": "Dominio de Palabras",
-        "practiceHistory": "Historial de Práctica",
+        "wordMastery": "Dominio",
+        "practiceHistory": "Historial",
         "recommendations": "Recomendaciones"
       },
-      "studentRanking": "Ranking de Estudiantes",
-      "rank": "Puesto",
-      "student": "Estudiante",
+      "studentRanking": "Ranking",
+      "rank": "Pos.",
+      "student": "Alumno",
       "score": "Puntuación",
-      "noStudents": "No se encontraron estudiantes",
-      "printReport": "Imprimir Reporte",
-      "emailReport": "Enviar Reporte por Email",
+      "noStudents": "Sin alumnos",
+      "printReport": "Imprimir",
+      "emailReport": "Enviar por email",
       "error": {
-        "generateFailed": "Error al generar el reporte",
-        "exportFailed": "Error al exportar el reporte",
-        "noData": "No hay datos disponibles para el reporte"
+        "generateFailed": "Error al generar",
+        "exportFailed": "Error al descargar",
+        "noData": "Sin datos"
       }
     },
     "wordOfTheDay": {
@@ -10449,52 +10449,52 @@ const es = {
       "learnMore": "Saber Más"
     },
     "access": {
-      "h1": "Acceso de maestro en LexiClash",
-      "lede": "Cuéntanos sobre tu aula. Revisamos las solicitudes en menos de 24 horas.",
-      "full_name": "Tu nombre",
-      "email": "Correo",
-      "role": "¿Qué eres?",
-      "role_teacher": "Maestro en aula",
-      "role_tutor": "Tutor",
-      "role_admin": "Administrador de escuela",
-      "role_parent": "Padre / educación en el hogar",
-      "role_researcher": "Investigador",
+      "h1": "Solicitar acceso de maestro",
+      "lede": "Cuéntanos sobre tu aula. Revisamos a mano y respondemos en <24h.",
+      "full_name": "Tu nombre completo",
+      "email": "Tu email",
+      "role": "¿Cuál es tu rol?",
+      "role_teacher": "Maestro/a en aula",
+      "role_tutor": "Tutor/a",
+      "role_admin": "Admin de escuela",
+      "role_parent": "Padre/madre o educación en casa",
+      "role_researcher": "Investigador/a",
       "role_other": "Otro",
       "school_or_org": "Escuela u organización (opcional)",
-      "country": "Tu país (opcional)",
-      "use_case": "¿Para qué usarás LexiClash? (10-800 caracteres)",
+      "country": "País (opcional)",
+      "use_case": "¿Cómo usarías LexiClash? (10-800 caracteres)",
       "submit": "Enviar solicitud",
       "submitting": "Enviando…",
-      "submit_error": "Algo pasó. Intenta otra vez.",
-      "rate_limited": "Espera 24 horas e intenta de nuevo.",
-      "success_title": "¡Recibimos tu solicitud!",
-      "success_body": "Revisamos todas las solicitudes. Respuesta en 1-2 días.",
-      "success_next": "Revisaremos tu solicitud y te enviaremos un correo dentro de 1-2 días. Puedes cerrar esta página.",
-      "pending_title": "Tu solicitud está en cola",
-      "pending_body": "La recibimos. Te escribiremos pronto.",
-      "declined_title": "Esta vez no funcionó",
-      "declined_reapply": "Intenta de nuevo en cualquier momento. ¿Preguntas? Estamos aquí.",
-      "submitted_on": "Enviado",
-      "already_approved_title": "¡Ya estás aprobado!",
+      "submit_error": "Error. Intenta de nuevo.",
+      "rate_limited": "Demasiados intentos. Reintentar en 24h.",
+      "success_title": "¡Solicitud recibida!",
+      "success_body": "Revisamos todas manualmente. Respuesta en 1-2 días.",
+      "success_next": "Revisaremos tu solicitud y te escribiremos en 1-2 días. Puedes cerrar.",
+      "pending_title": "Tu solicitud está en revisión",
+      "pending_body": "Recibida. Te avisaremos pronto.",
+      "declined_title": "Esta vez no pudo ser",
+      "declined_reapply": "Puedes reintentar cuando quieras. ¿Dudas? Aquí estamos.",
+      "submitted_on": "Enviada el",
+      "already_approved_title": "¡Ya tienes acceso!",
       "go_to_teacher": "Ir al panel",
       "next": {
-        "step1_title": "Envía tu solicitud",
-        "step1_body": "Llena el formulario. Toma 60 segundos.",
+        "step1_title": "Envía el formulario",
+        "step1_body": "5 campos, 60 segundos.",
         "step2_title": "Revisamos",
-        "step2_body": "Una persona real lee cada solicitud. Generalmente en menos de 24h.",
-        "step3_title": "¡Listo!",
-        "step3_body": "Confirmación por correo + acceso inmediato."
+        "step2_body": "Persona real, generalmente <24h.",
+        "step3_title": "¡Acceso inmediato!",
+        "step3_body": "Confirmación por email y listo."
       },
-      "regular_game_title": "¿No eres maestro? No importa.",
-      "regular_game_body": "LexiClash es gratis para todos. Prueba un juego normal y vuelve si quieres herramientas de aula.",
+      "regular_game_title": "¿No eres maestro/a? Sin problema.",
+      "regular_game_body": "LexiClash es gratis para todos. Juega primero, solicita acceso después.",
       "try_mp": "Jugar multijugador",
-      "try_blast": "Prueba Blast",
-      "try_daily": "Palabra diaria"
+      "try_blast": "Probar Blast",
+      "try_daily": "Caza diaria"
     },
     "teacher": {
-      "welcome_banner_title": "¡Bienvenido! 🎉",
-      "welcome_banner_body": "Tu cuenta está lista. Ahora puedes crear aulas, asignar juegos y seguir el progreso.",
-      "welcome_banner_dismiss": "Entendido"
+      "welcome_banner_title": "¡Bienvenido, maestro! 🎉",
+      "welcome_banner_body": "Tu cuenta está lista. Crea aulas, asigna juegos y monitorea el progreso en tiempo real.",
+      "welcome_banner_dismiss": "Perfecto"
     }
   },
   "crazygames": {
