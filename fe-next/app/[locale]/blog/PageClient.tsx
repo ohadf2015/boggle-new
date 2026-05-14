@@ -130,6 +130,11 @@ const blogPosts: BlogPost[] = [
     date: '2026-04-29',
   },
   {
+    slug: 'most-popular-word-games-2026',
+    image: '/images/blog/most-popular-word-games-2026.jpg',
+    date: '2026-05-15',
+  },
+  {
     slug: 'free-word-games-online',
     image: '/images/blog/free-word-games-online.jpg',
     date: '2026-05-11',
@@ -282,6 +287,12 @@ const contentByLocale: Record<string, PageContent> = {
         readTime: '9 min read',
         category: 'Trends',
       },
+      'most-popular-word-games-2026': {
+        title: 'The Most Popular Online Word Games of 2026 — and Why They Exploded',
+        excerpt: 'A field guide to the word games everyone is actually playing in 2026 — Wordle, Connections, Strands, Words With Friends, Netflix Scattergories — and the four forces behind a $3.36B boom.',
+        readTime: '10 min read',
+        category: 'Trends',
+      },
       'free-word-games-online': {
         title: 'Free Word Games Online: The Honest Guide (No Pay-to-Win)',
         excerpt: 'A field guide to free word games that respect your time and wallet. Five-question red-flag checklist + the daily puzzle and PWA patterns that actually work in 2026.',
@@ -407,6 +418,12 @@ const contentByLocale: Record<string, PageContent> = {
         title: 'נטפליקס שחררה משחק מילים — 2026 היא השנה של משחקי המילים',
         excerpt: 'סטרימינג ענק, התמכרות לפאזל היומי, גל אימון מוחי וטיק־טוק שהפך פתרון לספורט צפייה. למה כל מסך פתאום רוצה שתאייתו.',
         readTime: '9 דקות קריאה',
+        category: 'טרנדים',
+      },
+      'most-popular-word-games-2026': {
+        title: 'משחקי המילים הכי פופולריים אונליין ב-2026 — ולמה הם התפוצצו',
+        excerpt: 'מדריך שטח למשחקי המילים שכולם באמת משחקים ב-2026 — Wordle, Connections, Strands, Words With Friends, Scattergories של נטפליקס — וארבעת הכוחות מאחורי תעשייה של 3.36 מיליארד דולר.',
+        readTime: '10 דקות קריאה',
         category: 'טרנדים',
       },
       'milat-hayom-habit': {
@@ -542,6 +559,12 @@ const contentByLocale: Record<string, PageContent> = {
         readTime: '9 min läsning',
         category: 'Trender',
       },
+      'most-popular-word-games-2026': {
+        title: 'De populäraste ordspelen online 2026 — och varför de exploderade',
+        excerpt: 'En fältguide till ordspelen alla faktiskt spelar 2026 — Wordle, Connections, Strands, Words With Friends, Netflix Scattergories — och de fyra krafterna bakom en boom på 3,36 miljarder dollar.',
+        readTime: '10 min läsning',
+        category: 'Trender',
+      },
       'ordspel-familjer': {
         title: 'Ordspel för Familjer: Hur Vi Hittade Något Att Göra Tillsammans Som Faktiskt Funkar',
         excerpt: 'En ärlig redogörelse om hur ordspel blev söndagens familjetradition: från sexåring till mormor på FaceTime. Vad fungerar och vad du bör undvika.',
@@ -669,6 +692,12 @@ const contentByLocale: Record<string, PageContent> = {
         readTime: '9分で読める',
         category: 'トレンド',
       },
+      'most-popular-word-games-2026': {
+        title: '2026年に最も人気のオンラインワードゲーム — そして、なぜ爆発したのか',
+        excerpt: '2026年にみんなが実際に遊んでいるワードゲームへのフィールドガイド — Wordle、Connections、Strands、Words With Friends、Netflix Scattergories — そして33.6億ドルのブームを支える4つの力。',
+        readTime: '10分で読めます',
+        category: 'トレンド',
+      },
     },
   },
   es: {
@@ -788,6 +817,12 @@ const contentByLocale: Record<string, PageContent> = {
         title: 'Netflix lanza un juego de palabras — 2026, el año de los juegos de palabras',
         excerpt: 'Gigantes del streaming, obsesión por el puzzle diario, boom del entrenamiento cerebral y un bucle social al estilo TikTok. Por qué cada pantalla quiere que deletrees.',
         readTime: '9 min de lectura',
+        category: 'Tendencias',
+      },
+      'most-popular-word-games-2026': {
+        title: 'Los juegos de palabras online más populares de 2026 — y por qué explotaron',
+        excerpt: 'Una guía de campo de los juegos de palabras que todos juegan de verdad en 2026 — Wordle, Connections, Strands, Words With Friends, Netflix Scattergories — y las cuatro fuerzas detrás de un boom de 3.360 millones de dólares.',
+        readTime: '10 min de lectura',
         category: 'Tendencias',
       },
       'alternativas-a-scrabble': {

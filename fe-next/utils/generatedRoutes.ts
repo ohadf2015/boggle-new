@@ -28,6 +28,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/blog/juegos-palabras-gratis",
   "/blog/milat-hayom-habit",
   "/blog/mishachke-milim-chinuch",
+  "/blog/most-popular-word-games-2026",
   "/blog/multilingual-word-learning",
   "/blog/multiplayer-word-games-social",
   "/blog/netflix-word-game-2026-rise",
