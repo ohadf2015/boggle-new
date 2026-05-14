@@ -35,6 +35,7 @@ describe('BlastBoard pointer-move drag selection', () => {
         onPointerDown={vi.fn()}
         onPointerEnter={onPointerEnter}
         onPointerUp={vi.fn()}
+        tileIds={mockLevel.columns.map((col, c) => col.tiles.map((_, r) => `t-${c}-${r}`))}
       />
     );
 
@@ -62,6 +63,7 @@ describe('BlastBoard pointer-move drag selection', () => {
         onPointerDown={vi.fn()}
         onPointerEnter={onPointerEnter}
         onPointerUp={vi.fn()}
+        tileIds={mockLevel.columns.map((col, c) => col.tiles.map((_, r) => `t-${c}-${r}`))}
       />
     );
 
@@ -88,6 +90,7 @@ describe('BlastBoard pointer-move drag selection', () => {
         onPointerDown={vi.fn()}
         onPointerEnter={onPointerEnter}
         onPointerUp={vi.fn()}
+        tileIds={mockLevel.columns.map((col, c) => col.tiles.map((_, r) => `t-${c}-${r}`))}
       />
     );
 
@@ -113,6 +116,7 @@ describe('BlastBoard pointer-move drag selection', () => {
         onPointerDown={vi.fn()}
         onPointerEnter={onPointerEnter}
         onPointerUp={vi.fn()}
+        tileIds={mockLevel.columns.map((col, c) => col.tiles.map((_, r) => `t-${c}-${r}`))}
       />
     );
 

@@ -31,6 +31,7 @@ describe('BlastBoard', () => {
         onPointerDown={vi.fn()}
         onPointerEnter={vi.fn()}
         onPointerUp={vi.fn()}
+        tileIds={mockLevel.columns.map((col, c) => col.tiles.map((_, r) => `t-${c}-${r}`))}
       />
     );
     expect(container.querySelector('[data-cell-id="c0r0"]')).toBeInTheDocument();
@@ -59,6 +60,7 @@ describe('BlastBoard', () => {
           onPointerDown={onDown}
           onPointerEnter={onEnter}
           onPointerUp={onUp}
+          tileIds={mockLevel.columns.map((col, c) => col.tiles.map((_, r) => `t-${c}-${r}`))}
         />
       );
       const startTile = container.querySelector('[data-cell-id="c0r0"]') as HTMLElement;
@@ -87,6 +89,7 @@ describe('BlastBoard', () => {
           onPointerDown={vi.fn()}
           onPointerEnter={vi.fn()}
           onPointerUp={onUp}
+          tileIds={mockLevel.columns.map((col, c) => col.tiles.map((_, r) => `t-${c}-${r}`))}
         />
       );
       const tile = container.querySelector('[data-cell-id="c0r0"]') as HTMLElement;
@@ -106,6 +109,7 @@ describe('BlastBoard', () => {
         onPointerDown={vi.fn()}
         onPointerEnter={vi.fn()}
         onPointerUp={vi.fn()}
+        tileIds={heLevel.columns.map((col, c) => col.tiles.map((_, r) => `t-${c}-${r}`))}
       />
     );
     const board = container.querySelector('[data-testid="blast-board"]');
