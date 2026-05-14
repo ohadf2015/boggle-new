@@ -5,7 +5,7 @@
  */
 
 import { useMemo } from 'react';
-import { useBlastTileOverlay, useBlastSeed, useBlastWave, useGameLanguage } from '@/hooks/gameState/store';
+import { useBlastTileOverlay, useBlastSeed, useGameLanguage } from '@/hooks/gameState/store';
 import type { LetterGrid } from '@/shared/types/game';
 import type { BlastTileState } from '@/shared/types/blast';
 import type { BlastGameConfig } from '../types';
@@ -20,7 +20,6 @@ interface UseBlastMultiplayerBridgeReturn {
   config: BlastGameConfig;
   initialTileStates: BlastTileState[][] | null;
   blastSeed: number | null;
-  waveNumber: number;
 }
 
 export function useBlastMultiplayerBridge({
@@ -29,7 +28,6 @@ export function useBlastMultiplayerBridge({
 }: UseBlastMultiplayerBridgeOptions): UseBlastMultiplayerBridgeReturn {
   const blastTileOverlay = useBlastTileOverlay();
   const blastSeed = useBlastSeed();
-  const blastWave = useBlastWave();
   const gameLanguage = useGameLanguage();
 
   const config: BlastGameConfig = useMemo(() => ({
@@ -45,5 +43,5 @@ export function useBlastMultiplayerBridge({
     return overlayToTileStates(blastTileOverlay, gridSize, blastSeed);
   }, [blastTileOverlay, gridSize, letterGrid, blastSeed]);
 
-  return { config, initialTileStates, blastSeed, waveNumber: blastWave };
+  return { config, initialTileStates, blastSeed };
 }

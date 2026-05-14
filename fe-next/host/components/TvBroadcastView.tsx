@@ -70,9 +70,6 @@ interface TvBroadcastViewProps {
   earthquakeState?: EarthquakeState;
   fireRoundActive?: boolean;
   fireRoundRemaining?: number;
-
-  // Blast mode
-  blastWave?: number;
 }
 
 // ==================== Component ====================
@@ -109,9 +106,6 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   earthquakeState = 'idle',
   fireRoundActive = false,
   fireRoundRemaining = 0,
-
-  // Blast mode
-  blastWave = 1,
 }) => {
   // Mode-overlay state read directly from store — keeps HostView from
   // re-rendering on word-hunt updates when the host isn't using TV broadcast.
@@ -330,7 +324,6 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         earthquakeState={earthquakeState}
         urgencyLevel={urgencyLevel}
         gameMode={gameMode}
-        blastWave={blastWave}
         wordHuntTargetLength={wordHuntTargetLength}
         wordHuntAliveCount={Object.keys(wordHuntPlayerLives).length - wordHuntEliminatedPlayers.length}
         t={t}

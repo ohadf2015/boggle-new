@@ -33,7 +33,6 @@ interface StartGameBroadcastExt extends StartGameBroadcast {
   blastTileOverlay?: BlastTileOverlay[];
   blastPlayerMoves?: Record<string, number>;
   blastSeed?: number | null;
-  blastWave?: number;
   blastGrid?: string[][];
   blastTileStates?: BlastTileState[][];
   wordHuntTargetLength?: number;
@@ -327,7 +326,6 @@ export function usePlayerGameEvents({
         const myMoves = reconnectMoves?.[username] ?? 0;
         storeUpdates.blastMovesUsed = myMoves;
         if (ext.blastSeed != null) storeUpdates.blastSeed = ext.blastSeed;
-        if (ext.blastWave != null) storeUpdates.blastWave = ext.blastWave;
         // Reconnect/late-join: apply current server board state if available
         if (ext.blastGrid && ext.blastTileStates) {
           storeUpdates.blastBoardUpdate = {
@@ -507,12 +505,6 @@ export function usePlayerGameEvents({
             store.setBlastTotalTileBonus(myStats.totalTileBonus || 0);
           }
         }
-        if (data.blastSummary.playerMoves) {
-          const myMoves = data.blastSummary.playerMoves[username];
-          if (myMoves !== undefined) {
-            store.setBlastMovesUsed(myMoves);
-          }
-        }
       }
 
       // Sync wheel rush stats from server for results screen
@@ -674,7 +666,6 @@ export function usePlayerGameEvents({
       // Reset blast mode state for next game
       const blastResetStore = useGameStore.getState();
       blastResetStore.setBlastTileOverlay([]);
-      blastResetStore.setBlastMovesUsed(0);
       blastResetStore.setBlastTotalTileBonus(0);
       blastResetStore.setBlastTotalTilesCleared(0);
       blastResetStore.setBlastSeed(null);
@@ -737,28 +728,30 @@ export function usePlayerGameEvents({
     };
 
     // Handle server-authoritative blast board update (MP board sync)
-    const handleBlastBoardUpdate = (data: { grid: string[][]; tileStates: BlastTileState[][]; clearedBy: string; word: string; clearedCount: number; totalMoves: number }) => {
+    // A full board-clear regenerate carries optional overlay + seed for lock-step sync.
+    // Regular per-word updates omit these fields.
+    const handleBlastBoardUpdate = (data: {
+      grid: string[][];
+      tileStates: BlastTileState[][];
+      clearedBy: string;
+      word: string;
+      clearedCount: number;
+      totalMoves: number;
+      overlay?: BlastTileOverlay[];
+      seed?: number;
+    }) => {
       logger.log('[PLAYER] Blast board update from', data.clearedBy, '- word:', data.word, 'cleared:', data.clearedCount);
+      // A full board-clear regenerates the overlay server-side; apply it so the
+      // client board stays in lock-step. Regular per-word updates omit overlay/seed.
+      if (data.overlay && typeof data.seed === 'number') {
+        useGameStore.setState({
+          blastTileOverlay: data.overlay,
+          blastSeed: data.seed,
+        });
+      }
       setBlastBoardUpdate(data);
     };
 
-    const handleBlastWaveAdvance = (data: { wave: number; archetype: string; grid: string[][]; tileStates: BlastTileState[][]; overlay: BlastTileOverlay[]; seed: number }) => {
-      logger.log('[PLAYER] Blast wave advance to wave', data.wave, '(', data.archetype, ')');
-      useGameStore.setState({
-        blastWave: data.wave,
-        blastTileOverlay: data.overlay,
-        blastSeed: data.seed,
-        blastMovesUsed: 0,
-        blastBoardUpdate: {
-          grid: data.grid,
-          tileStates: data.tileStates,
-          clearedBy: '__wave_advance__',
-          word: '',
-          clearedCount: 0,
-          totalMoves: 0,
-        },
-      });
-    };
 
     // Handle total board words count (for "words remaining" display)
     const handleTotalBoardWords = (data: { count: number }) => {
@@ -826,7 +819,6 @@ export function usePlayerGameEvents({
     socket.on('blastComboSync', handleBlastComboSync);
     socket.on('playerFoundWord', handlePlayerFoundWord);
     socket.on('blastBoardUpdate', handleBlastBoardUpdate);
-    socket.on('blastWaveAdvance', handleBlastWaveAdvance);
     socket.on('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
     socket.on('wordHuntTargetResult', handleWordHuntTargetResult);
     socket.on('wordHuntTargetFound', handleWordHuntTargetFound);
@@ -872,7 +864,6 @@ export function usePlayerGameEvents({
       socket.off('blastComboSync', handleBlastComboSync);
       socket.off('playerFoundWord', handlePlayerFoundWord);
       socket.off('blastBoardUpdate', handleBlastBoardUpdate);
-      socket.off('blastWaveAdvance', handleBlastWaveAdvance);
       socket.off('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
       socket.off('wordHuntTargetResult', handleWordHuntTargetResult);
       socket.off('wordHuntTargetFound', handleWordHuntTargetFound);

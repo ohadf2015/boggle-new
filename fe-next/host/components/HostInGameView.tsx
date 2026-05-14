@@ -298,7 +298,6 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           onWordWithComboType={handleBlastWordWithCombo}
           initialTileStates={blastBridge.initialTileStates}
           blastSeed={blastBridge.blastSeed}
-          waveNumber={blastBridge.waveNumber}
         />
         {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} />}
         {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}

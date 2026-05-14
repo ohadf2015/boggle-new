@@ -16,7 +16,6 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { setStoredUsername, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { useGameMode } from '@/hooks/gameState/store';
 import logger from '@/utils/logger';
-import { useBlastWave } from '@/hooks/gameState/selectors';
 import {
   sendCountdownComplete,
   stashStartGameMessageId,
@@ -158,7 +157,6 @@ const HostView: React.FC<HostViewProps> = memo(({
   // Mode-specific state from Zustand store (for TV broadcast).
   // wordHunt overlay state subscribed inside TvBroadcastView so this view
   // doesn't re-render on word-hunt ticks when host isn't broadcasting.
-  const blastWave = useBlastWave();
 
   // Earthquake/Fire Round state (managed via socket events)
   const [earthquakeState, setEarthquakeState] = useState<'idle' | 'warning' | 'shaking' | 'fire-round'>('idle');
@@ -732,7 +730,6 @@ const HostView: React.FC<HostViewProps> = memo(({
           earthquakeState={earthquakeState}
           fireRoundActive={fireRoundActive}
           fireRoundRemaining={fireRoundRemaining}
-          blastWave={blastWave}
         />
       )}
     </div>
