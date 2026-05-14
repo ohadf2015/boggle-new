@@ -15,6 +15,8 @@ export function validateChainLevel(level: BlastLevel): ChainValidation {
 
   for (let step = 0; step < order.length; step++) {
     const expected = order[step]!;
+    // Include all remaining words in the scan so we catch any future chain word
+    // becoming formable out of order (which is an error).
     const remaining = order.slice(step);
     const matches = scanFormableThemeWords(board, remaining, level.locale);
     const formable = new Set(matches.map((m) => m.word));
@@ -30,7 +32,17 @@ export function validateChainLevel(level: BlastLevel): ChainValidation {
       };
     }
 
-    const cells = matches.find((m) => m.word === expected)!.cells;
+    // Reject if the expected word is formable in multiple placements—
+    // the step would be ambiguous, breaking the strict forced-chain constraint.
+    const placements = matches.filter((m) => m.word === expected);
+    if (placements.length > 1) {
+      return {
+        ok: false,
+        reason: `step ${step + 1}: word "${expected}" formable in multiple placements`,
+      };
+    }
+
+    const cells = placements[0]!.cells;
     board = collapseCells(board, cells).level;
   }
 

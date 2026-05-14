@@ -61,4 +61,30 @@ describe('validateChainLevel', () => {
       expect(result.reason).toMatch(/leftover/i);
     }
   });
+
+  it('rejects a level where the expected word is formable in two placements', () => {
+    const bad: BlastLevel = {
+      id: 'en-chain-dup',
+      levelNumber: 1,
+      theme: 'onboarding',
+      locale: 'en',
+      words: ['CAT'],
+      resolvableOrder: ['CAT'],
+      tileFlags: {},
+      difficulty: 1,
+      columns: [
+        { index: 0, tiles: ['C'] },
+        { index: 1, tiles: ['A'] },
+        { index: 2, tiles: ['T'] },
+        { index: 3, tiles: ['C'] },
+        { index: 4, tiles: ['A'] },
+        { index: 5, tiles: ['T'] },
+      ],
+    };
+    const result = validateChainLevel(bad);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.reason).toMatch(/multiple placements/i);
+    }
+  });
 });
