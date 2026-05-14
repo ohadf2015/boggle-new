@@ -55,9 +55,9 @@ interface DifficultyConfig {
 
 // Earthquake configuration (matches frontend DEFAULT_EARTHQUAKE_CONFIG)
 const EARTHQUAKE_CONFIG = {
-  warningDurationMs: 2000,  // 2 seconds
-  shakeDurationMs: 1000,    // 1 second
-  fireRoundDurationSeconds: 15, // 15 seconds
+  warningDurationMs: 3000,  // 3 seconds
+  shakeDurationMs: 1500,    // 1.5 seconds
+  fireRoundDurationSeconds: 23, // 23 seconds (~1.5x previous 15s)
 };
 
 /**

@@ -45,7 +45,7 @@ vi.mock('../../events/gameCleanup', () => ({
   gameCleanupEmitter: { onGameEnd: vi.fn(), onGameReset: vi.fn() },
 }));
 
-import { registerEarthquakeHandlers } from '../earthquakeHandler';
+import { registerEarthquakeHandlers, EARTHQUAKE_CONFIG } from '../earthquakeHandler';
 import { getGame, getGameBySocketId, updateGame } from '../../modules/gameStateManager';
 import { broadcastToRoom } from '../../utils/socketHelpers';
 
@@ -78,6 +78,14 @@ function createMockSocket(id = 'host-socket-id') {
     _emit: (event: string, ...args: unknown[]) => handlers[event]?.(...args),
   };
 }
+
+describe('EARTHQUAKE_CONFIG durations (catalyst unification)', () => {
+  it('uses the scaled-up multiplayer durations', () => {
+    expect(EARTHQUAKE_CONFIG.warningDurationMs).toBe(3000);
+    expect(EARTHQUAKE_CONFIG.shakeDurationMs).toBe(1500);
+    expect(EARTHQUAKE_CONFIG.fireRoundDurationSeconds).toBe(23);
+  });
+});
 
 describe('earthquakeHandler — mutual exclusion', () => {
   const io = {} as Parameters<typeof registerEarthquakeHandlers>[0];
