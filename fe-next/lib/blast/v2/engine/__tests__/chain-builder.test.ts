@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { insertWord } from '../chain-builder';
+import { insertWord, buildChainLevel } from '../chain-builder';
 import { collapseCells } from '../collapse';
 import { scanFormableThemeWords } from '../word-scan';
-import type { BlastLevel } from '../../types';
+import type { BlastLevel, ChainLevelSpec } from '../../types';
+// TODO(task-4): import validateChainLevel from '../chain-validator';
 
 function lvl(columns: string[][]): BlastLevel {
   return {
@@ -43,5 +44,42 @@ describe('insertWord', () => {
     const a = insertWord(Sk, 'CAT', ['DOG'], 'en', 42);
     const b = insertWord(Sk, 'CAT', ['DOG'], 'en', 42);
     expect(a?.level.columns).toEqual(b?.level.columns);
+  });
+});
+
+describe('buildChainLevel', () => {
+  const spec: ChainLevelSpec = {
+    id: 'en-chain-01',
+    levelNumber: 1,
+    theme: 'onboarding',
+    locale: 'en',
+    columns: 4,
+    decoyTiles: 0,
+    chain: ['CAT', 'SUN', 'EGG'],
+  };
+
+  it('produces a level whose forward replay matches the chain', () => {
+    const level = buildChainLevel(spec, 7);
+    expect(level).not.toBeNull();
+    expect(level!.words).toEqual(['CAT', 'SUN', 'EGG']);
+    expect(level!.resolvableOrder).toEqual(['CAT', 'SUN', 'EGG']);
+  });
+
+  it('column count matches the spec', () => {
+    const level = buildChainLevel(spec, 7);
+    expect(level!.columns.length).toBe(4);
+  });
+
+  it('returns null for an impossible chain (word longer than columns)', () => {
+    const bad: ChainLevelSpec = { ...spec, columns: 2, chain: ['CAT'] };
+    expect(buildChainLevel(bad, 7)).toBeNull();
+  });
+
+  it('inserts the requested number of decoy tiles', () => {
+    const withDecoys: ChainLevelSpec = { ...spec, decoyTiles: 3 };
+    const level = buildChainLevel(withDecoys, 7)!;
+    const totalTiles = level.columns.reduce((n, c) => n + c.tiles.length, 0);
+    const wordTiles = spec.chain.join('').length;
+    expect(totalTiles).toBe(wordTiles + 3);
   });
 });
