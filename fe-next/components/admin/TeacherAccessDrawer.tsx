@@ -14,15 +14,16 @@ export function TeacherAccessDrawer({ row, onClose, onActioned }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const dialog = dialogRef.current;
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
         e.preventDefault();
         onClose();
       }
     }
-    dialogRef.current?.addEventListener('keydown', handleKeyDown);
+    dialog?.addEventListener('keydown', handleKeyDown);
     return () => {
-      dialogRef.current?.removeEventListener('keydown', handleKeyDown);
+      dialog?.removeEventListener('keydown', handleKeyDown);
     };
   }, [onClose]);
 
