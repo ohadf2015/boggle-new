@@ -711,7 +711,10 @@ const he = {
     "blizzardWarning": "סופת שלגים!",
     "lightningWarning": "מכת ברק!",
     "meteorWarning": "מטר מטאורים!",
-    "active": "פעיל"
+    "active": "פעיל",
+    "blizzardEffect": "אריחים קפואים לא ניתנים לשימוש עד שיפשירו",
+    "lightningEffect": "אריחים טעונים מזכים בנקודות בונוס — תפסו אותם מהר",
+    "meteorEffect": "אותיות חדשות נוחתות — מילים חדשות נפתחות"
   },
   "specialWord": {
     "bonus": "+{{bonus}} ⭐",
@@ -785,7 +788,8 @@ const he = {
     "brace": "תתכוננו!",
     "photosensitivity": "אורות מהבהבים! כבו בהגדרות",
     "fireRound": "🔥 סיבוב אש",
-    "multiplier": "×2 על הכל"
+    "multiplier": "×2 על הכל",
+    "effect": "כל הלוח מתחלף — צברו נקודות מהר לבונוס ×2"
   },
   "effects": {
     "preferenceTitle": "הגדרות אנימציה",

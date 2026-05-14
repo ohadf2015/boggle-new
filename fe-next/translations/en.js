@@ -702,7 +702,10 @@ const en = {
     "blizzardWarning": "Blizzard incoming!",
     "lightningWarning": "Lightning strike!",
     "meteorWarning": "Meteor shower!",
-    "active": "Active"
+    "active": "Active",
+    "blizzardEffect": "Frozen tiles can't be used until they thaw",
+    "lightningEffect": "Charged tiles score bonus points — grab them fast",
+    "meteorEffect": "New letters crash in — fresh words appear"
   },
   "specialWord": {
     "bonus": "+{{bonus}} ⭐",
@@ -776,7 +779,8 @@ const en = {
     "brace": "Brace yourself!",
     "photosensitivity": "Flashing lights coming! Disable in Settings",
     "fireRound": "🔥 FIRE ROUND",
-    "multiplier": "2× EVERYTHING"
+    "multiplier": "2× EVERYTHING",
+    "effect": "The whole board is replaced — score fast for 2× points"
   },
   "effects": {
     "preferenceTitle": "Animation Settings",

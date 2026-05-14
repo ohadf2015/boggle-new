@@ -711,7 +711,10 @@ const ja = {
     "blizzardWarning": "吹雪襲来！",
     "lightningWarning": "雷撃！",
     "meteorWarning": "流星群！",
-    "active": "発動中"
+    "active": "発動中",
+    "blizzardEffect": "凍ったタイルは溶けるまで使えません",
+    "lightningEffect": "帯電タイルはボーナス得点 — 早く取ろう",
+    "meteorEffect": "新しい文字が降ってくる — 新たな単語が出現"
   },
   "specialWord": {
     "bonus": "+{{bonus}} ⭐",
@@ -785,7 +788,8 @@ const ja = {
     "brace": "構えろ！",
     "photosensitivity": "点滅注意！設定で無効化できます",
     "fireRound": "🔥 ファイアラウンド",
-    "multiplier": "全て2倍"
+    "multiplier": "全て2倍",
+    "effect": "ボード全体が入れ替わる — 急いで得点して2倍ボーナス"
   },
   "effects": {
     "preferenceTitle": "アニメーション設定",

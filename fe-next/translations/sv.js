@@ -717,7 +717,10 @@ const sv = {
     "blizzardWarning": "Snöstorm!",
     "lightningWarning": "Blixtnedslag!",
     "meteorWarning": "Meteorskur!",
-    "active": "Aktiv"
+    "active": "Aktiv",
+    "blizzardEffect": "Frusna brickor kan inte användas förrän de tinar",
+    "lightningEffect": "Laddade brickor ger bonuspoäng — ta dem snabbt",
+    "meteorEffect": "Nya bokstäver slår ner — färska ord dyker upp"
   },
   "specialWord": {
     "bonus": "+{{bonus}} ⭐",
@@ -791,7 +794,8 @@ const sv = {
     "brace": "Håll i dig!",
     "photosensitivity": "Blinkande ljus! Inaktivera i inställningar",
     "fireRound": "🔥 ELDRUNDA",
-    "multiplier": "2× ALLT"
+    "multiplier": "2× ALLT",
+    "effect": "Hela brädet byts ut — poängjaga snabbt för 2× poäng"
   },
   "effects": {
     "preferenceTitle": "Animationsinställningar",

@@ -698,7 +698,10 @@ const es = {
     "blizzardWarning": "¡Ventisca entrante!",
     "lightningWarning": "¡Rayo!",
     "meteorWarning": "¡Lluvia de meteoritos!",
-    "active": "Activo"
+    "active": "Activo",
+    "blizzardEffect": "Las fichas congeladas no se pueden usar hasta que se descongelen",
+    "lightningEffect": "Las fichas cargadas dan puntos extra — atrápalas rápido",
+    "meteorEffect": "Caen letras nuevas — aparecen palabras frescas"
   },
   "specialWord": {
     "bonus": "+{{bonus}} ⭐",
@@ -772,7 +775,8 @@ const es = {
     "brace": "¡Prepárate!",
     "photosensitivity": "¡Luces parpadeantes! Desactiva en Ajustes",
     "fireRound": "🔥 RONDA DE FUEGO",
-    "multiplier": "2× TODO"
+    "multiplier": "2× TODO",
+    "effect": "Todo el tablero se reemplaza — anota rápido para 2× puntos"
   },
   "effects": {
     "preferenceTitle": "Ajustes de animación",
