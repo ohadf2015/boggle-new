@@ -88,9 +88,12 @@ describe('roundEventsManager', () => {
   });
 
   describe('scheduleRoundEvent', () => {
-    // Apply mock consistently for all tests in this describe block
+    // Mock Math.random to control pickRandomCatalyst output:
+    // pickRandomCatalyst = CATALYST_POOL[Math.floor(Math.random() * 4)]
+    // With CATALYST_POOL = ['blizzard', 'lightning', 'meteor', 'earthquake']
+    // Math.random() = 0 → CATALYST_POOL[0] = 'blizzard'
     beforeEach(() => {
-      vi.spyOn(roundEventsManagerModule, 'pickRandomCatalyst').mockReturnValue('blizzard');
+      vi.spyOn(Math, 'random').mockReturnValue(0);
     });
 
     it('picks a valid event type and schedules a timer', () => {
@@ -173,9 +176,9 @@ describe('roundEventsManager', () => {
   });
 
   describe('event lifecycle phases execute in order', () => {
-    // Apply mock consistently for lifecycle tests
+    // Mock Math.random to force 'blizzard' (index 0) for route determinism
     beforeEach(() => {
-      vi.spyOn(roundEventsManagerModule, 'pickRandomCatalyst').mockReturnValue('blizzard');
+      vi.spyOn(Math, 'random').mockReturnValue(0);
     });
 
     it('broadcasts warning → start → end in sequence', () => {
