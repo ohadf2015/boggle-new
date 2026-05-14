@@ -20,7 +20,7 @@ const metaTitles: Record<string, string> = {
   he: 'נטפליקס שחררה משחק מילים — 2026 היא השנה של משחקי המילים',
   sv: 'Netflix släppte ett ordspel — 2026 är ordspelens år',
   ja: 'Netflixがワードゲームを投入 — 2026年はワードゲームの年',
-  es: 'Juego de Palabras Netflix — Por Qué 2026 es el Año del Boom (Análisis)',
+  es: 'Juego de Palabras Netflix 2026 — Qué Es y Dónde Jugar Gratis',
 };
 
 const metaDescriptions: Record<string, string> = {
@@ -28,7 +28,7 @@ const metaDescriptions: Record<string, string> = {
   he: 'נטפליקס הוסיפה משחק מילים יומי וזה לא צירוף מקרים. למה כל שירות סטרימינג, אפליקציית אימון מוחי ופיד טיק־טוק פתאום בנויים סביב לוחות אותיות ב־2026.',
   sv: 'Netflix lade till ett dagligt ordspel och det är ingen tillfällighet. Varför varje streamingtjänst, hjärnträningsapp och TikTok-flöde plötsligt drivs av bokstavsrutnät 2026.',
   ja: 'Netflixがデイリーワードゲームを追加。偶然じゃない。なぜ全ストリーミング、脳トレアプリ、TikTokフィードが2026年に文字グリッドで動いているのか。',
-  es: 'Juego de palabras de Netflix: por qué Netflix añadió un word game diario y cómo encaja en el boom de juegos de palabras de 2026. Análisis completo.',
+  es: 'Descubre el juego de palabras Netflix 2026: qué es, cómo funciona y dónde jugar gratis sin descargas. Análisis del boom de word games en streaming.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
