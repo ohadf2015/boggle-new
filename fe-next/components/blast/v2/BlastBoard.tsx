@@ -7,6 +7,7 @@ import { LOCALE_CONFIGS } from '@/lib/blast/v2/locale-config';
 import { BlastTile, type BlastTileState } from './BlastTile';
 import { BlastSelectionPath } from './BlastSelectionPath';
 import { BlastAlmostGhost } from './BlastAlmostGhost';
+import { useCollapseTimeline } from './useCollapseTimeline';
 
 type Props = {
   level: BlastLevel;
@@ -34,6 +35,8 @@ export function BlastBoard({
   const config = LOCALE_CONFIGS[level.locale];
   const boardRef = useRef<HTMLDivElement>(null);
   const selectedSet = selection.kind === 'active' ? new Set(selection.cells) : new Set<CellId>();
+
+  useCollapseTimeline(boardRef, tileIds);
 
   const getCellCenter = useCallback((id: CellId) => {
     const board = boardRef.current;
