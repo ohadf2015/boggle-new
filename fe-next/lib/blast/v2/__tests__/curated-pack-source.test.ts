@@ -55,4 +55,14 @@ describe('CuratedPackSource', () => {
     const source = new CuratedPackSource(basePath);
     await expect(source.resolve(31, 'en')).rejects.toThrow(/outside curated range/);
   });
+
+  it('ignores pack-chain.json (forced-chain schema, not a curated pack)', async () => {
+    // pack-chain.json sits in the same dir but has the ChainLevelSpec schema
+    // (no `words`). The curated loader must skip it rather than choke on it.
+    const basePath = join(process.cwd(), 'content', 'blast', 'packs');
+    const source = new CuratedPackSource(basePath);
+    const lvl = await source.resolve(1, 'en');
+    expect(lvl.id).toBe('onboarding-1');
+    expect(lvl.words.length).toBeGreaterThan(0);
+  });
 });
