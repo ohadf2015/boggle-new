@@ -20,22 +20,19 @@ import {
   calculateBlastTileBonus,
   getTilesOnPath,
   recordBlastMove,
+  recordBlastBoardClear,
+  regenerateBlastBoard,
   getWordPath,
   isBlastBoardCleared,
-  advanceBlastWave,
   tryBeginWaveAdvance,
   endWaveAdvance,
 } from '../../modules/blastModeManager';
 import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
 import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
 import { createSeededRandom } from '@/components/blast/legacy/utils/blastLetterGenerator';
-import { getWaveConfig } from '@/components/blast/legacy/utils/blastWaveConfig';
 import {
   BLAST_SPECIAL_TILE_CHANCE,
-  BLAST_MP_DEFAULT_MAX_WAVES,
 } from '@/shared/constants/blastMultiplayerConstants';
-import timerManager from '../../utils/timerManager';
-import { endGame } from './gameEnd';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
 import * as botManager from '../../modules/botManager';
 import logger from '../../utils/logger';
@@ -275,69 +272,50 @@ export function startBotsForGame(
                 totalMoves,
               });
 
+              // Bots' word pools are computed from the grid snapshot; Blast
+              // mutates the grid every word, so resync after each board update
+              // or bots run dry and go idle (idle-bot bug, Phase 2).
+              void botManager.resyncBotsForNewGrid(
+                botManager.getGameBots(gameCode),
+                gravityResult.newGrid,
+                language,
+              );
+
               // MP board-clear parity with human path (wordValidationHandler):
-              // advance wave OR schedule endGame on final-wave clear.
+              // regenerate in place, never end the game on clear (timer-era Blast).
               if (isBlastBoardCleared(gravityResult.newTileStates) && tryBeginWaveAdvance(gameCode)) {
                 try {
-                const currentWave = blastState.wave ?? 1;
-                const maxWaves = BLAST_MP_DEFAULT_MAX_WAVES;
-                if (currentWave < maxWaves) {
-                  const next = advanceBlastWave(blastState, gameCode, gravityResult.newGrid);
+                  recordBlastBoardClear(blastState, username);
+                  const next = regenerateBlastBoard(blastState, gameCode, gravityResult.newGrid);
                   const nextGrid = next.grid ?? gravityResult.newGrid;
                   Object.assign(blastState, {
-                    wave: next.wave,
                     overlay: next.overlay,
                     overlayMap: next.overlayMap,
                     tileStates: next.tileStates,
                     seed: next.seed,
                     grid: nextGrid,
-                    playerMoves: next.playerMoves,
-                    playerBonusMoves: next.playerBonusMoves,
-                    totalMoves: next.totalMoves,
+                    refillCount: next.refillCount,
                   });
                   if (currentGame) {
-                    // Keep letterGrid + letterPositions in lock-step. The human
-                    // submitWord path walks letterGrid using letterPositions;
-                    // mismatches silently reject every wave 2+ word.
                     currentGame.letterGrid = nextGrid;
                     currentGame.letterPositions = makePositionsMap(nextGrid, (currentGame.language || 'en'));
-                    if (currentGame.playerWords) {
-                      for (const u of Object.keys(currentGame.playerWords)) {
-                        currentGame.playerWords[u] = [];
-                      }
-                    }
-                    if (currentGame.playerWordsSet) {
-                      for (const u of Object.keys(currentGame.playerWordsSet)) {
-                        currentGame.playerWordsSet[u] = new Set();
-                      }
-                    }
                   }
-                  const nextWaveNum = next.wave ?? currentWave + 1;
-                  const archetype = getWaveConfig(nextWaveNum).archetype;
-                  logger.info('BLAST', `Board cleared in ${gameCode} by bot ${username} — advancing to wave ${next.wave} (${archetype})`);
-                  broadcastToRoom(io, getGameRoom(gameCode), 'blastWaveAdvance', {
-                    wave: next.wave,
-                    archetype,
+                  logger.info('BLAST', `Board cleared in ${gameCode} by bot ${username} — regenerating board (refill #${next.refillCount})`);
+                  broadcastToRoom(io, getGameRoom(gameCode), 'blastBoardUpdate', {
                     grid: nextGrid,
                     tileStates: next.tileStates,
                     overlay: next.overlay,
                     seed: next.seed,
+                    clearedBy: '__board_regenerated__',
+                    word: '',
+                    clearedCount: 0,
+                    totalMoves: blastState.totalMoves ?? 0,
                   });
                   void botManager.resyncBotsForNewGrid(
                     botManager.getGameBots(gameCode),
                     nextGrid,
                     language,
                   );
-                } else {
-                  logger.info('BLAST', `Final wave ${currentWave} cleared in ${gameCode} by bot ${username} — scheduling endGame`);
-                  botManager.stopAllBots(gameCode);
-                  timerManager.setTimeout(`blastEnd:${gameCode}`, () => {
-                    const g = getGame(gameCode);
-                    if (g && g.gameState === 'in-progress') {
-                      endGame(io, gameCode);
-                    }
-                  }, 1500);
-                }
                 } finally {
                   endWaveAdvance(gameCode);
                 }
