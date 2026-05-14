@@ -57,6 +57,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
           <div className="text-center">
             <h2 className="text-3xl font-black uppercase text-neo-cream mb-2 tracking-wide">{t('earthquake.warning')}</h2>
             <p className="text-lg font-bold text-neo-cream/80">{t('earthquake.brace')}</p>
+            <p className="mt-2 text-sm font-bold text-neo-cream/90 leading-snug border-t-2 border-neo-cream/30 pt-2">{t('earthquake.effect')}</p>
           </div>
         </div>
       </div>
@@ -134,6 +135,9 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
                 </h2>
                 <p className="text-lg font-bold text-neo-cream/80">
                   {t('earthquake.brace')}
+                </p>
+                <p className="mt-2 text-sm font-bold text-neo-cream/90 leading-snug border-t-2 border-neo-cream/30 pt-2">
+                  {t('earthquake.effect')}
                 </p>
               </div>
 
