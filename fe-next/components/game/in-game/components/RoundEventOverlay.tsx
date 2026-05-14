@@ -27,24 +27,28 @@ const EDGE_GLOW: Record<RoundEventType, { color: string; rgb: string }> = {
 
 const EVENT_CONFIG: Record<RoundEventType, {
   warningText: string;
+  effectText: string;
   icon: string;
   warningBg: string;
   warningGlow: string;
 }> = {
   blizzard: {
     warningText: 'roundEvent.blizzardWarning',
+    effectText: 'roundEvent.blizzardEffect',
     icon: '❄️',
     warningBg: 'bg-linear-to-r from-blue-900/95 via-cyan-900/95 to-blue-900/95 border-cyan-300',
     warningGlow: 'shadow-[0_0_60px_rgba(96,165,250,0.8),0_0_120px_rgba(96,165,250,0.3)]',
   },
   lightning: {
     warningText: 'roundEvent.lightningWarning',
+    effectText: 'roundEvent.lightningEffect',
     icon: '⚡',
     warningBg: 'bg-linear-to-r from-indigo-900/95 via-purple-900/95 to-indigo-900/95 border-yellow-300',
     warningGlow: 'shadow-[0_0_60px_rgba(250,204,21,0.8),0_0_120px_rgba(250,204,21,0.3)]',
   },
   meteor: {
     warningText: 'roundEvent.meteorWarning',
+    effectText: 'roundEvent.meteorEffect',
     icon: '☄️',
     warningBg: 'bg-linear-to-r from-red-900/95 via-orange-900/95 to-red-900/95 border-orange-300',
     warningGlow: 'shadow-[0_0_60px_rgba(251,146,60,0.8),0_0_120px_rgba(251,146,60,0.3)]',
@@ -232,6 +236,16 @@ export const RoundEventOverlay = memo<RoundEventOverlayProps>(function RoundEven
                 className="text-xl sm:text-2xl uppercase tracking-[0.2em] font-bold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
               >
                 {t(config.warningText)}
+              </AdaptiveMotion.span>
+
+              {/* Effect description — explains what the catalyst does */}
+              <AdaptiveMotion.span
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.18, duration: 0.25, ease: 'easeOut' }}
+                className="text-sm sm:text-base font-medium text-white/90 text-center max-w-xs drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
+              >
+                {t(config.effectText)}
               </AdaptiveMotion.span>
 
               {/* Decorative line under text */}
