@@ -1,5 +1,5 @@
 import type { PlacedTile, RackTile, Direction } from './types';
-import { CENTER, getCell, isFirstMove, isInBounds, type Board } from './board';
+import { getCenter, getCell, isFirstMove, isInBounds, type Board } from './board';
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 
 export interface BotMove {
@@ -105,6 +105,7 @@ export function findBestBotMove(
   let best: BotMove | null = null;
   const empty = isFirstMove(board);
   const size = board.cells.length;
+  const center = getCenter(board.size);
 
   for (const { word, tiles } of candidateWords) {
     for (const direction of ['across', 'down'] as Direction[]) {
@@ -115,8 +116,8 @@ export function findBestBotMove(
           if (empty) {
             const coversCenter =
               direction === 'across'
-                ? r === CENTER && c <= CENTER && c + tiles.length - 1 >= CENTER
-                : c === CENTER && r <= CENTER && r + tiles.length - 1 >= CENTER;
+                ? r === center && c <= center && c + tiles.length - 1 >= center
+                : c === center && r <= center && r + tiles.length - 1 >= center;
             if (!coversCenter) continue;
           }
           const placements = placementsFromCandidate(tiles, r, c, direction);

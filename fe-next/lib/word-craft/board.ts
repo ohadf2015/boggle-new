@@ -131,3 +131,11 @@ export function isFirstMove(board: Board): boolean {
 // Backward compat: kept for legacy callers. New code should read `board.size`.
 export const BOARD_SIZE = 15;
 export const CENTER = 7;
+
+// Board-size-relative center. The star square — and the first-move
+// requirement to cover it — sits at the true middle of the grid, which is
+// (5,5) on 11x11, (6,6) on 13x13, (7,7) on 15x15. The legacy `CENTER = 7`
+// constant only matches 15x15; new code MUST use this.
+export function getCenter(size: BoardSize): number {
+  return Math.floor(size / 2);
+}

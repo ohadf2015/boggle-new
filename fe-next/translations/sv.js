@@ -11744,6 +11744,12 @@ const sv = {
       "tl": "TL · ×3 bokstav",
       "dl": "DL · ×2 bokstav"
     },
+    "premiumLabel": {
+      "tw": "3O",
+      "dw": "2O",
+      "tl": "3B",
+      "dl": "2B"
+    },
     "scoreDot": {
       "common": "1 poäng",
       "mid": "2–3 poäng",

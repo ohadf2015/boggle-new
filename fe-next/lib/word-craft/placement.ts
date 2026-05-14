@@ -81,6 +81,30 @@ function tileToPlacement(rackTile: RackTile, row: number, col: number): PlacedTi
 }
 
 export function resolveTap(rackTile: RackTile, pending: PlacedTile[], board: Board): ResolveResult {
+  if (pending.length === 0) return { reason: 'no-axis-yet' };
+
+  // One pending tile: no axis is locked yet, so default to building the word
+  // horizontally — drop the tap in the first empty cell to the right, falling
+  // back leftward at the board edge. This lets the player keep tapping rack
+  // letters to extend a word from the very first tile instead of dragging
+  // each one. Once a second tile lands, inferAxis takes over below.
+  if (pending.length === 1) {
+    const { row, col } = pending[0];
+    const size = board.cells.length;
+    const pendingSet = buildPendingPositionSet(pending);
+    for (let c = col + 1; c < size; c++) {
+      if (!isCellOccupied(board, pendingSet, row, c)) {
+        return { placement: tileToPlacement(rackTile, row, c) };
+      }
+    }
+    for (let c = col - 1; c >= 0; c--) {
+      if (!isCellOccupied(board, pendingSet, row, c)) {
+        return { placement: tileToPlacement(rackTile, row, c) };
+      }
+    }
+    return { reason: 'no-empty-on-axis' };
+  }
+
   const axis = inferAxis(pending);
   if (!axis) return { reason: 'no-axis-yet' };
   const next = nextEmptyAlongAxis(pending, board);

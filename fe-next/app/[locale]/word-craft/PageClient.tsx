@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useWordCraftGame } from '@/lib/word-craft/useWordCraftGame';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
@@ -75,6 +76,28 @@ export default function WordCraftPageClient() {
   const { loading: authLoading } = useAuth();
   const isRTL = language === 'he';
   const locale = (language ?? 'en') as SupportedLocale;
+
+  // Compact multiplier labels painted inside empty premium cells. Built once
+  // per locale so WordCraftBoard's memo isn't busted every render.
+  const premiumLabels = useMemo(
+    () => ({
+      TW: t('wordcraft.premiumLabel.tw'),
+      DW: t('wordcraft.premiumLabel.dw'),
+      TL: t('wordcraft.premiumLabel.tl'),
+      DL: t('wordcraft.premiumLabel.dl'),
+    }),
+    [t],
+  );
+
+  // Hide the global bottom nav while in WordCraft — it's an immersive,
+  // no-scroll screen and the nav was overlapping the board and rack. This
+  // also drops --bottom-nav-height to 0 so the h-svh layout reclaims the
+  // full viewport.
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
 
   const [dict, setDict] = useState<Set<string> | null>(null);
 
@@ -652,6 +675,7 @@ export default function WordCraftPageClient() {
               reticle={reticle}
               zoomLabel={t('wordcraft.zoomLabel')}
               zoomResetLabel={t('wordcraft.zoomReset')}
+              premiumLabels={premiumLabels}
             />
             {scoreFloat ? (
               <ScoreFloat
@@ -697,7 +721,7 @@ export default function WordCraftPageClient() {
           onTileDragStart={(tile, e) => beginTileDrag(tile.id, tile.letter, tile.value, e)}
           consumeDropFlag={consumeDropFlag}
           onFastTap={handleFastTap}
-          axisLocked={axis !== null}
+          axisLocked={game.state.pendingPlacements.length >= 1}
           draggingTileId={drag?.active ? drag.tileId : null}
           disabled={game.state.turn !== 'player' || !dict || game.state.burnout}
           ariaLabel={t('wordcraft.yourRack')}

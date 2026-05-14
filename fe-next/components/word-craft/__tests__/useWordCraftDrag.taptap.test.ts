@@ -165,6 +165,28 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
     expect(result.current.drag?.active).toBe(true);
   });
 
+  it('touch pointer dragging up-and-sideways toward the board activates the drag', () => {
+    // Horizontal-dominant motion that is ALSO clearly upward = the finger is
+    // heading to the board, not scrolling the rack. Previously this stayed
+    // inactive (both activation paths required absDy >= absDx) so diagonal
+    // drags silently died — the "dragging feels stuck" bug.
+    const onDrop = vi.fn();
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+
+    act(() => {
+      const evt = createPointerEvent('pointerdown', 'touch', 50, 100);
+      result.current.begin('t-diag', 'D', 1, evt as any);
+    });
+
+    act(() => {
+      // dx = +40, dy = -20 → horizontal-dominant but clearly upward
+      const evt = createPointerEvent('pointermove', 'touch', 90, 80);
+      window.dispatchEvent(evt);
+    });
+
+    expect(result.current.drag?.active).toBe(true);
+  });
+
   it('touch pointer with horizontal-only swipe does NOT activate drag (rack scroll wins)', () => {
     const onDrop = vi.fn();
     const { result } = renderHook(() => useWordCraftDrag({ onDrop }));

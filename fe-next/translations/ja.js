@@ -11718,6 +11718,12 @@ const ja = {
       "tl": "TL · ×3 レター",
       "dl": "DL · ×2 レター"
     },
+    "premiumLabel": {
+      "tw": "語3",
+      "dw": "語2",
+      "tl": "字3",
+      "dl": "字2"
+    },
     "scoreDot": {
       "common": "1点",
       "mid": "2〜3点",

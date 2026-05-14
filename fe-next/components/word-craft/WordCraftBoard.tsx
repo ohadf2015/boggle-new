@@ -22,6 +22,12 @@ export interface WordCraftBoardProps {
   locale?: string;
   /** Keyboard reticle position — renders a focus ring on this cell */
   reticle?: { row: number; col: number } | null;
+  /**
+   * Compact per-kind multiplier labels (e.g. TW → "3W") shown inside empty
+   * premium cells. Without this, the saturation-tier tints alone don't tell
+   * a player triple-word from double-word — they only differ by opacity.
+   */
+  premiumLabels?: Partial<Record<PremiumKind, string>>;
 }
 
 // Brand-tinted premium squares (no text labels). Each premium kind gets a
@@ -58,6 +64,7 @@ function WordCraftBoardImpl({
   dragHoverCell,
   locale = 'en',
   reticle,
+  premiumLabels,
 }: WordCraftBoardProps) {
   const size = board.size;
   const centerIndex = Math.floor(size / 2);
@@ -224,6 +231,17 @@ function WordCraftBoardImpl({
                 <span aria-hidden className="block w-1.5 h-1.5 rounded-full bg-neo-cyan/60" />
               ) : isCenter ? (
                 <span aria-hidden className={cn('drop-shadow', size <= 11 ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg')}>★</span>
+              ) : cell.premium && premiumLabels?.[cell.premium] ? (
+                // Compact multiplier label. aria-hidden — the cell's
+                // aria-label already announces the premium kind for SR users;
+                // this glyph is the sighted-player affordance. Hard black
+                // shadow keeps cream text legible on every tint tier.
+                <span
+                  aria-hidden
+                  className="font-neo-display font-black leading-none select-none text-neo-cream/95 text-[clamp(6px,2.4cqi,11px)] drop-shadow-[1px_1px_0_rgba(0,0,0,0.9)]"
+                >
+                  {premiumLabels[cell.premium]}
+                </span>
               ) : null}
             </button>
           );

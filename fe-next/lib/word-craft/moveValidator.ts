@@ -1,5 +1,5 @@
 import type { PlacedTile, ScoringTile, Direction } from './types';
-import { CENTER, getCell, isFirstMove, isInBounds, type Board } from './board';
+import { getCenter, getCell, isFirstMove, isInBounds, type Board } from './board';
 import { scoreWord, scoreTurn, BINGO_THRESHOLD } from './scoring';
 
 export type MoveError =
@@ -205,7 +205,8 @@ export function validateAndScoreMove(
   if (!main) return fail('NOT_CONTIGUOUS');
 
   if (isFirstMove(board)) {
-    const coversCenter = placements.some((p) => p.row === CENTER && p.col === CENTER);
+    const center = getCenter(board.size);
+    const coversCenter = placements.some((p) => p.row === center && p.col === center);
     if (!coversCenter) return fail('FIRST_MOVE_MUST_COVER_CENTER');
     if (main.tiles.length < 2) return fail('FIRST_MOVE_TOO_SHORT');
   } else {

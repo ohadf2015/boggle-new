@@ -36,6 +36,11 @@ const TOUCH_VERTICAL_THRESHOLD_PX = 4;
 // and the drop silently fails. 24 px ≈ half a phone cell, the right ceiling
 // so we don't pull a tile two cells over by accident.
 const SNAP_RADIUS_PX = 24;
+// Upward-travel activation. The rack sits below the board, so any decisive
+// upward motion is a drag-to-place — even when it's horizontal-dominant
+// (reaching for a board cell off to the side). Without this, diagonal drags
+// where dx > dy never activated and the gesture felt "stuck".
+const UPWARD_ACTIVATE_PX = 6;
 
 /**
  * Locate the nearest empty board cell to a viewport point.
@@ -122,12 +127,16 @@ export function useWordCraftDrag({ onDrop }: UseWordCraftDragArgs) {
 
       const verticalActivates = absDy >= TOUCH_VERTICAL_THRESHOLD_PX && absDy >= absDx;
       const hypotVerticalActivates = passedThreshold && absDy >= absDx;
+      // Heading up toward the board — wins even when horizontal-dominant.
+      const upwardActivates = dy <= -UPWARD_ACTIVATE_PX;
       const shouldActivate =
         drag.pointerType === 'touch'
-          ? verticalActivates || hypotVerticalActivates
+          ? verticalActivates || hypotVerticalActivates || upwardActivates
           : distanceSquared > 0;
 
-      if (drag.pointerType === 'touch' && absDx >= 8 && absDx > absDy) {
+      // Only a non-upward horizontal sweep is a rack scroll; an upward
+      // diagonal is a drag-to-board and must not be flagged as a swipe.
+      if (drag.pointerType === 'touch' && absDx >= 8 && absDx > absDy && dy > -UPWARD_ACTIVATE_PX) {
         horizontalSwipeRef.current = true;
       }
 

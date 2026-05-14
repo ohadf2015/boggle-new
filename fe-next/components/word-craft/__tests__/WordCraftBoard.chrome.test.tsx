@@ -15,32 +15,48 @@ function renderBoard(board: ReturnType<typeof createBoard>) {
 }
 
 describe('WordCraftBoard chrome', () => {
-  it('renders premium squares with brand-color tint classes (no text labels)', () => {
+  it('renders premium squares with brand-color tint classes and multiplier labels', () => {
     const board = createBoard(11);
-    const { container } = renderBoard(board);
+    const labels = { TW: '3W', DW: '2W', TL: '3L', DL: '2L' } as const;
+    const { container } = render(
+      <WordCraftBoard
+        board={board}
+        pendingPlacements={[]}
+        onCellClick={() => {}}
+        disabled={false}
+        premiumLabels={labels}
+      />,
+    );
 
-    // 11x11 layout: (0,0) is TW (triple word).
+    // 11x11 layout: (0,0) is TW (triple word). Tint stays pink; the cell now
+    // carries a compact multiplier label so players can tell tiers apart.
     const tw = container.querySelector('[data-board-cell="0,0"]');
     expect(tw).toBeTruthy();
-    // TW tint = neo-pink/15
     expect(tw?.className).toMatch(/bg-neo-pink/);
-    // No "TW" / "×3" text inside the empty premium cell.
-    expect(tw?.textContent).not.toMatch(/TW|×3/);
+    expect(tw?.textContent).toContain('3W');
 
     // (2,2) is DW (double word)
     const dw = container.querySelector('[data-board-cell="2,2"]');
     expect(dw?.className).toMatch(/bg-neo-pink/);
-    expect(dw?.textContent).not.toMatch(/DW|×2/);
+    expect(dw?.textContent).toContain('2W');
 
     // (4,1) is TL (triple letter)
     const tl = container.querySelector('[data-board-cell="4,1"]');
     expect(tl?.className).toMatch(/bg-neo-cyan/);
-    expect(tl?.textContent).not.toMatch(/TL|×3/);
+    expect(tl?.textContent).toContain('3L');
 
     // (4,3) is DL (double letter)
     const dl = container.querySelector('[data-board-cell="4,3"]');
     expect(dl?.className).toMatch(/bg-neo-cyan/);
-    expect(dl?.textContent).not.toMatch(/DL|×2/);
+    expect(dl?.textContent).toContain('2L');
+  });
+
+  it('omits premium labels when premiumLabels prop is not supplied', () => {
+    const board = createBoard(11);
+    const { container } = renderBoard(board);
+    const tw = container.querySelector('[data-board-cell="0,0"]');
+    expect(tw?.className).toMatch(/bg-neo-pink/);
+    expect(tw?.textContent).toBe('');
   });
 
   it('center cell has star glyph when empty', () => {

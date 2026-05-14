@@ -91,10 +91,33 @@ describe('nextEmptyAlongAxis', () => {
 });
 
 describe('resolveTap (fast-path)', () => {
-  it('returns no-axis-yet reason when fewer than 2 pending tiles', () => {
+  it('returns no-axis-yet reason when there are zero pending tiles', () => {
     const board = createBoard(15);
     const result = resolveTap(rackTile('A', 'r1'), [], board);
     expect(result).toEqual({ reason: 'no-axis-yet' });
+  });
+
+  it('with one pending tile, places the next tap horizontally to the right', () => {
+    const board = createBoard(15);
+    const result = resolveTap(rackTile('Z', 'r1'), [p(7, 7)], board);
+    expect(result).toEqual({
+      placement: { row: 7, col: 8, letter: 'Z', value: 1, isBlank: false, rackTileId: 'r1' },
+    });
+  });
+
+  it('with one pending tile at the right edge, falls back leftward', () => {
+    const board = createBoard(15);
+    const result = resolveTap(rackTile('Z', 'r1'), [p(7, 14)], board);
+    expect(result).toEqual({
+      placement: { row: 7, col: 13, letter: 'Z', value: 1, isBlank: false, rackTileId: 'r1' },
+    });
+  });
+
+  it('with one pending tile, skips an occupied neighbour cell', () => {
+    const board = createBoard(15);
+    placeTiles(board, [p(7, 8, 'X', 'placed-1')]);
+    const result = resolveTap(rackTile('Z', 'r1'), [p(7, 7)], board);
+    expect('placement' in result && result.placement.col).toBe(9);
   });
 
   it('places tile at next empty axis cell when axis is locked', () => {

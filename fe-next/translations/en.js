@@ -11617,6 +11617,12 @@ const en = {
       "tl": "TL · ×3 letter",
       "dl": "DL · ×2 letter"
     },
+    "premiumLabel": {
+      "tw": "3W",
+      "dw": "2W",
+      "tl": "3L",
+      "dl": "2L"
+    },
     "scoreDot": {
       "common": "1 point",
       "mid": "2–3 points",

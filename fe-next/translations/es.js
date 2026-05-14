@@ -11841,6 +11841,12 @@ const es = {
       "tl": "TL · ×3 letra",
       "dl": "DL · ×2 letra"
     },
+    "premiumLabel": {
+      "tw": "3P",
+      "dw": "2P",
+      "tl": "3L",
+      "dl": "2L"
+    },
     "scoreDot": {
       "common": "1 punto",
       "mid": "2–3 puntos",

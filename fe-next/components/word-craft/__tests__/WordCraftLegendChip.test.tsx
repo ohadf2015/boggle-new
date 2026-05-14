@@ -5,12 +5,15 @@ import { WordCraftLegendChip } from '../WordCraftLegendChip';
 const t = (k: string) => `[${k}]`;
 
 describe('WordCraftLegendChip', () => {
-  it('renders 4 premium swatches each with brand tint', () => {
+  it('renders 4 premium swatches whose tints match the board (pink word, cyan letter)', () => {
     const { container } = render(<WordCraftLegendChip t={t} />);
+    // Legend must mirror WordCraftBoard PREMIUM_TINT: word bonuses are pink,
+    // letter bonuses are cyan. Previously the legend used lime/purple, which
+    // disagreed with the actual board colours and confused players.
     expect(container.querySelector('[data-premium="TW"]')?.className).toMatch(/bg-neo-pink/);
-    expect(container.querySelector('[data-premium="DW"]')?.className).toMatch(/bg-neo-lime/);
+    expect(container.querySelector('[data-premium="DW"]')?.className).toMatch(/bg-neo-pink/);
     expect(container.querySelector('[data-premium="TL"]')?.className).toMatch(/bg-neo-cyan/);
-    expect(container.querySelector('[data-premium="DL"]')?.className).toMatch(/bg-neo-purple/);
+    expect(container.querySelector('[data-premium="DL"]')?.className).toMatch(/bg-neo-cyan/);
   });
 
   it('uses translation keys for labels', () => {

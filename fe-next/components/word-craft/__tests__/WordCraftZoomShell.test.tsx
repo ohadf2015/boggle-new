@@ -133,6 +133,57 @@ describe('WordCraftZoomShell', () => {
     expect(onChildClick).toHaveBeenCalledTimes(1);
   });
 
+  it('auto-zooms in when focusCells are supplied (active-play-follows)', () => {
+    render(
+      <WordCraftZoomShell focusCells={[{ row: 5, col: 5 }]} boardSize={11}>
+        <div data-testid="board">child</div>
+      </WordCraftZoomShell>,
+    );
+    // A single focus cell on an 11×11 board is a tiny box → scale climbs
+    // toward MAX, which surfaces the reset button.
+    expect(screen.getByLabelText('Reset zoom')).toBeInTheDocument();
+  });
+
+  it('auto-zoom eases back to 1x when focusCells become empty (turn end)', () => {
+    const { rerender } = render(
+      <WordCraftZoomShell focusCells={[{ row: 5, col: 5 }]} boardSize={11}>
+        <div data-testid="board">child</div>
+      </WordCraftZoomShell>,
+    );
+    expect(screen.getByLabelText('Reset zoom')).toBeInTheDocument();
+    rerender(
+      <WordCraftZoomShell focusCells={[]} boardSize={11}>
+        <div data-testid="board">child</div>
+      </WordCraftZoomShell>,
+    );
+    expect(screen.queryByLabelText('Reset zoom')).not.toBeInTheDocument();
+  });
+
+  it('a manual pinch suppresses auto-zoom follow until the turn ends', () => {
+    const { rerender } = render(
+      <WordCraftZoomShell focusCells={[{ row: 5, col: 5 }]} boardSize={11}>
+        <div data-testid="board">child</div>
+      </WordCraftZoomShell>,
+    );
+    const region = screen.getByRole('region');
+    // User pinches IN back toward 1× — a deliberate manual override.
+    pointerDown(region, 30, 100, 200, 'touch');
+    pointerDown(region, 31, 200, 200, 'touch');
+    act(() => {
+      pointerMove(region, 30, 140, 200, 'touch');
+      pointerMove(region, 31, 160, 200, 'touch');
+    });
+    pointerUp(region, 30, 140, 200, 'touch');
+    pointerUp(region, 31, 160, 200, 'touch');
+    // Word extends — auto-zoom must NOT re-grab the view.
+    rerender(
+      <WordCraftZoomShell focusCells={[{ row: 5, col: 5 }, { row: 5, col: 6 }]} boardSize={11}>
+        <div data-testid="board">child</div>
+      </WordCraftZoomShell>,
+    );
+    expect(screen.queryByLabelText('Reset zoom')).not.toBeInTheDocument();
+  });
+
   it('clamps scale to MAX even with extreme spreads', () => {
     render(
       <WordCraftZoomShell>

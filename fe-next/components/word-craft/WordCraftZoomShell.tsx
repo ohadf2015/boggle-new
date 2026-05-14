@@ -34,12 +34,24 @@ import { cn } from '@/lib/utils';
 const MIN_SCALE = 1;
 const MAX_SCALE = 2.0;
 const DOUBLE_TAP_MS = 280;
+// Fraction of the viewport the focused word should fill when auto-zooming.
+// Leaves context around the word so the player still sees where they are.
+const AUTO_FIT = 0.55;
 
 export interface WordCraftZoomShellProps {
   children: ReactNode;
   /** Optional aria-label for the wrapper. */
   ariaLabel?: string;
   resetLabel?: string;
+  /**
+   * Cells the view should keep centred and in frame — the active word's
+   * tiles, or the centre star on the first move. When these change the shell
+   * auto-zooms + pans to follow play. A manual pinch/pan/reset suppresses the
+   * follow until the cells clear (turn end).
+   */
+  focusCells?: ReadonlyArray<{ row: number; col: number }>;
+  /** N for the N×N board — maps cell coords to viewport fractions. */
+  boardSize?: number;
 }
 
 interface PointerInfo {
@@ -65,6 +77,8 @@ export function WordCraftZoomShell({
   children,
   ariaLabel = 'WordCraft board zoom shell',
   resetLabel = 'Reset zoom',
+  focusCells,
+  boardSize,
 }: WordCraftZoomShellProps) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const pointersRef = useRef<Map<number, PointerInfo>>(new Map());
@@ -87,6 +101,13 @@ export function WordCraftZoomShell({
   const [tx, setTx] = useState(0);
   const [ty, setTy] = useState(0);
 
+  // Auto-follow bookkeeping. `userControlled` flips on any manual gesture so
+  // the follow stops fighting the player; it re-arms when focus clears (turn
+  // end). `autoApplied` records that the follow currently owns the transform,
+  // so we only force a reset-out of a view the follow itself set.
+  const userControlledRef = useRef(false);
+  const autoAppliedRef = useRef(false);
+
   const isZoomed = scale > 1.001;
 
   const reset = useCallback(() => {
@@ -94,6 +115,11 @@ export function WordCraftZoomShell({
     setTx(0);
     setTy(0);
   }, []);
+
+  const handleManualReset = useCallback(() => {
+    userControlledRef.current = true;
+    reset();
+  }, [reset]);
 
   // Keep translation within a sensible range so the board can't wander
   // off-screen at high zoom.
@@ -116,6 +142,7 @@ export function WordCraftZoomShell({
 
       // Two fingers down → start pinch.
       if (pts.length === 2) {
+        userControlledRef.current = true;
         gestureRef.current = {
           startScale: scale,
           startDistance: distance(pts[0], pts[1]),
@@ -137,6 +164,7 @@ export function WordCraftZoomShell({
       if (pts.length === 1 && e.pointerType === 'touch') {
         const now = Date.now();
         if (now - lastTapRef.current < DOUBLE_TAP_MS) {
+          userControlledRef.current = true;
           if (isZoomed) reset();
           else setScale(2);
         }
@@ -175,6 +203,7 @@ export function WordCraftZoomShell({
         const lastY = (e as unknown as { movementY: number }).movementY ?? 0;
         if (lastX === 0 && lastY === 0) return;
         panMovedRef.current = true;
+        userControlledRef.current = true;
         const next = clampTranslation(tx + lastX, ty + lastY, scale);
         setTx(next.tx);
         setTy(next.ty);
@@ -219,6 +248,54 @@ export function WordCraftZoomShell({
     return () => window.removeEventListener('resize', handle);
   }, [clampTranslation, isZoomed, scale, tx, ty]);
 
+  // Auto-zoom "active-play-follows". Recomputed whenever the focused cells
+  // change: zoom in on the first move's centre star, then pan + ease the zoom
+  // out as the word grows. A manual gesture sets `userControlled` and we back
+  // off until the cells clear (turn submitted/recalled), which re-arms us.
+  const focusKey = useMemo(
+    () => (focusCells ?? []).map((c) => `${c.row},${c.col}`).join(';'),
+    [focusCells],
+  );
+
+  useEffect(() => {
+    if (focusKey === '' || !boardSize) {
+      // Nothing to follow — ease back out of an auto-set view and re-arm.
+      if (autoAppliedRef.current) {
+        autoAppliedRef.current = false;
+        setScale(1);
+        setTx(0);
+        setTy(0);
+      }
+      userControlledRef.current = false;
+      return;
+    }
+    if (userControlledRef.current) return;
+
+    const cells = focusCells ?? [];
+    let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
+    for (const c of cells) {
+      if (c.row < minR) minR = c.row;
+      if (c.row > maxR) maxR = c.row;
+      if (c.col < minC) minC = c.col;
+      if (c.col > maxC) maxC = c.col;
+    }
+    const boxFrac = Math.max((maxC - minC + 1) / boardSize, (maxR - minR + 1) / boardSize);
+    const nextScale = clamp(AUTO_FIT / boxFrac, MIN_SCALE, MAX_SCALE);
+
+    // Cell-grid centre of the focused box, as a 0..1 fraction of the board.
+    const centerFracX = (minC + maxC + 1) / (2 * boardSize);
+    const centerFracY = (minR + maxR + 1) / (2 * boardSize);
+    const rect = wrapperRef.current?.getBoundingClientRect();
+    const rawTx = rect ? -(centerFracX - 0.5) * rect.width * nextScale : 0;
+    const rawTy = rect ? -(centerFracY - 0.5) * rect.height * nextScale : 0;
+    const clamped = clampTranslation(rawTx, rawTy, nextScale);
+
+    autoAppliedRef.current = true;
+    setScale(nextScale);
+    setTx(clamped.tx);
+    setTy(clamped.ty);
+  }, [focusKey, boardSize, focusCells, clampTranslation]);
+
   const transformStyle = useMemo(
     () => ({
       transform: `translate(${tx}px, ${ty}px) scale(${scale})`,
@@ -248,7 +325,7 @@ export function WordCraftZoomShell({
       {isZoomed && (
         <button
           type="button"
-          onClick={reset}
+          onClick={handleManualReset}
           aria-label={resetLabel}
           data-wc-zoom-reset
           className={cn(

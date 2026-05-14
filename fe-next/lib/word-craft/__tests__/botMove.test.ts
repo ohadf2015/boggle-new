@@ -46,6 +46,16 @@ describe('findBestBotMove', () => {
     expect(move!.score).toBeGreaterThan(0);
   });
 
+  it('on an 11x11 board, plays a word covering the real center (5,5)', () => {
+    const board = createBoard(11);
+    const rack = makeRack('CATXYZ_');
+    const dict = new Set(['CAT', 'AT', 'CAB']);
+    const move = findBestBotMove(board, rack, (w) => dict.has(w.toUpperCase()));
+    expect(move).not.toBeNull();
+    expect(move!.placements.some((p) => p.row === 5 && p.col === 5)).toBe(true);
+    expect(move!.score).toBeGreaterThan(0);
+  });
+
   it('picks the higher-scoring word when multiple are valid', () => {
     const board = createBoard();
     const rack = makeRack('CATSZE_');

@@ -219,6 +219,39 @@ describe('validateAndScoreMove — connectivity (subsequent moves)', () => {
   });
 });
 
+describe('validateAndScoreMove — center is board-size relative', () => {
+  it('accepts an 11x11 first move covering its real center (5,5)', () => {
+    const board = createBoard(11);
+    const r = validateAndScoreMove(
+      board,
+      [place(5, 5, 'C'), place(5, 6, 'A'), place(5, 7, 'T')],
+      isValid,
+    );
+    expect(r.ok).toBe(true);
+  });
+
+  it('rejects an 11x11 first move on the old hardcoded center (7,7)', () => {
+    const board = createBoard(11);
+    const r = validateAndScoreMove(
+      board,
+      [place(7, 7, 'C'), place(7, 8, 'A'), place(7, 9, 'T')],
+      isValid,
+    );
+    expect(r.ok).toBe(false);
+    expect(r.reason).toBe('FIRST_MOVE_MUST_COVER_CENTER');
+  });
+
+  it('accepts a 13x13 first move covering its real center (6,6)', () => {
+    const board = createBoard(13);
+    const r = validateAndScoreMove(
+      board,
+      [place(6, 6, 'C'), place(6, 7, 'A'), place(6, 8, 'T')],
+      isValid,
+    );
+    expect(r.ok).toBe(true);
+  });
+});
+
 describe('validateAndScoreMove — scoring', () => {
   it('scores first move CAT on center DW: (3+1+1) * 2 = 10', () => {
     const board = createBoard();

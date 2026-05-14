@@ -5,11 +5,14 @@ interface Props {
   className?: string;
 }
 
+// Tints mirror WordCraftBoard's PREMIUM_TINT: word bonuses are pink, letter
+// bonuses are cyan, triple is the bolder tier. The legend previously used
+// lime/purple, which disagreed with the actual board and confused players.
 const SWATCHES = [
-  { kind: 'TW', tint: 'bg-neo-pink/30 border-neo-pink', i18n: 'wordcraft.legend.tw' },
-  { kind: 'DW', tint: 'bg-neo-lime/30 border-neo-lime', i18n: 'wordcraft.legend.dw' },
-  { kind: 'TL', tint: 'bg-neo-cyan/30 border-neo-cyan', i18n: 'wordcraft.legend.tl' },
-  { kind: 'DL', tint: 'bg-neo-purple/30 border-neo-purple', i18n: 'wordcraft.legend.dl' },
+  { kind: 'TW', tint: 'bg-neo-pink/65 border-neo-pink', i18n: 'wordcraft.legend.tw' },
+  { kind: 'DW', tint: 'bg-neo-pink/45 border-neo-pink/70', i18n: 'wordcraft.legend.dw' },
+  { kind: 'TL', tint: 'bg-neo-cyan/60 border-neo-cyan', i18n: 'wordcraft.legend.tl' },
+  { kind: 'DL', tint: 'bg-neo-cyan/40 border-neo-cyan/70', i18n: 'wordcraft.legend.dl' },
 ] as const;
 
 export function WordCraftLegendChip({ t, className }: Props) {
