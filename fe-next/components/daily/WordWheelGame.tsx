@@ -10,6 +10,7 @@ import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { WheelLetter, WordTile } from './WordWheelParts';
+import { useHoldToSubmit } from '@/hooks/useHoldToSubmit';
 import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
@@ -337,9 +338,54 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     }
   }, []);
 
+  // Shared add path — used by tap-add (handleLetterPress) and by the eager-add
+  // on hold-to-submit pointerdown. Writes builtLettersRef synchronously (in the
+  // same tick as setBuiltLetters) so the drag-engage guard in tryDragHit can
+  // read the updated value before the useEffect ref-mirror flushes.
+  const addLetter = useCallback((letter: string, wheelIndex: number, el: HTMLButtonElement) => {
+    builtLettersRef.current = [...builtLettersRef.current, { letter, wheelIndex }];
+    setBuiltLetters(prev => [...prev, { letter, wheelIndex }]);
+    playTileSelectSound();
+    haptic(10);
+    // Element position for particle effect
+    const rect = el.getBoundingClientRect();
+    const containerRect = gameContainerRef.current?.getBoundingClientRect();
+    if (containerRect) {
+      onEffect({
+        type: 'letterTap',
+        x: rect.left - containerRect.left + rect.width / 2,
+        y: rect.top - containerRect.top + rect.height / 2,
+      });
+    }
+  }, [onEffect, playTileSelectSound]);
+
+  // ── Hold-to-submit ── press-and-hold a wheel letter once the word is already
+  // at the minimum length (3) to auto-submit. Unused held letters are
+  // eager-added on pointerdown so the held letter is part of the submitted
+  // word. The 1s idle auto-submit (above) still covers passive submission.
+  const {
+    holdingIndex: holdActiveIndex,
+    onLetterPointerDown: holdPointerDown,
+    onLetterPointerEnd: holdPointerEnd,
+    cancelHold: holdCancel,
+    shouldSuppressClick: holdSuppressClick,
+    getEagerAddedIndex: holdGetEagerAdded,
+  } = useHoldToSubmit({
+    minLength: 3,
+    builtLettersRef,
+    usedIndicesRef,
+    draggingRef,
+    gameOverRef,
+    addLetter,
+    submit: () => handleSubmitRef.current(),
+    haptic,
+  });
+
   // ── Letter tap (toggle: add if unused, remove matching if already used;
   //    double-tap within DOUBLE_TAP_MS submits the built word) ──
   const handleLetterPress = useCallback((letter: string, wheelIndex: number, el: HTMLButtonElement) => {
+    // A just-completed hold gesture (or eager-add) swallows its trailing onClick.
+    if (holdSuppressClick()) return;
     if (gameOverRef.current) return;
     const now = Date.now();
     const last = lastTapRef.current;
@@ -356,26 +402,15 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
     if (existingIdx !== -1) {
       setBuiltLetters(prev => prev.filter((_, i) => i !== existingIdx));
+      builtLettersRef.current = builtLettersRef.current.filter((_, i) => i !== existingIdx);
       playButtonClickSound();
       haptic(8);
       lastTapRef.current = { idx: wheelIndex, time: now };
       return;
     }
-    setBuiltLetters(prev => [...prev, { letter, wheelIndex }]);
-    playTileSelectSound();
-    haptic(10);
+    addLetter(letter, wheelIndex, el);
     lastTapRef.current = { idx: wheelIndex, time: now };
-    // Get element position for particle effect
-    const rect = el.getBoundingClientRect();
-    const containerRect = gameContainerRef.current?.getBoundingClientRect();
-    if (containerRect) {
-      onEffect({
-        type: 'letterTap',
-        x: rect.left - containerRect.left + rect.width / 2,
-        y: rect.top - containerRect.top + rect.height / 2,
-      });
-    }
-  }, [onEffect, playTileSelectSound, playButtonClickSound]);
+  }, [addLetter, holdSuppressClick, playButtonClickSound]);
 
   // ── Drag-to-build handlers (additive only — skips letters already used) ──
   // Drag only engages once pointer moves to a DIFFERENT letter than the start,
@@ -392,17 +427,21 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       if (startIdx === null || idx === startIdx) return;
       dragEngagedRef.current = true;
       lastDragIdxRef.current = startIdx;
+      // Drag took over — abort any in-flight hold ring. Capture the eager-added
+      // index first so we don't re-add the start letter below.
+      const eagerIdx = holdGetEagerAdded();
+      holdCancel();
       const startBtn = document.querySelector<HTMLButtonElement>(
         `[data-wheel-index="${startIdx}"]`,
       );
-      if (startBtn && !usedIndicesRef.current.has(startIdx)) {
+      if (startBtn && !usedIndicesRef.current.has(startIdx) && eagerIdx !== startIdx) {
         handleLetterPress(startBtn.dataset.wheelLetter || '', startIdx, startBtn);
       }
     }
     if (usedIndicesRef.current.has(idx)) return;
     lastDragIdxRef.current = idx;
     handleLetterPress(btn.dataset.wheelLetter || '', idx, btn);
-  }, [handleLetterPress]);
+  }, [handleLetterPress, holdCancel, holdGetEagerAdded]);
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     draggingRef.current = true;
     dragEngagedRef.current = false;
@@ -911,6 +950,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           isUsed={usedIndices.has(-1)}
           index={-1}
           reducedMotion={prefersReducedMotion}
+          showHoldRing={holdActiveIndex === -1}
+          onHoldStart={(l, _, el) => holdPointerDown(l, -1, el)}
+          onHoldEnd={holdPointerEnd}
         />
         {/* Outer letters */}
         {outerLetters.map((letter, i) => (
@@ -924,6 +966,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             isUsed={usedIndices.has(i)}
             index={i}
             reducedMotion={prefersReducedMotion}
+            showHoldRing={holdActiveIndex === i}
+            onHoldStart={(l, _, el) => holdPointerDown(l, i, el)}
+            onHoldEnd={holdPointerEnd}
           />
         ))}
       </div>

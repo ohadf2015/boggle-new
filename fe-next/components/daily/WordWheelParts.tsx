@@ -4,6 +4,40 @@ import React, { useRef } from 'react';
 import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { HOLD_SUBMIT_MS } from '@/hooks/useHoldToSubmit';
+
+// ==========================================
+// Hold-to-submit progress ring
+// Functional feedback for a timed gesture, so it animates regardless of
+// prefers-reduced-motion (WCAG 2.3.3 "Essential" exception).
+// ==========================================
+
+const RING_CIRCUMFERENCE = 2 * Math.PI * 46; // r=46 in the 100x100 viewBox
+
+const HoldRing: React.FC = () => (
+  <svg
+    className="absolute inset-[-4px] pointer-events-none -rotate-90"
+    viewBox="0 0 100 100"
+    fill="none"
+    aria-hidden
+    data-testid="hold-ring"
+  >
+    <circle cx={50} cy={50} r={46} stroke="rgba(0,0,0,0.45)" strokeWidth={8} />
+    <m.circle
+      cx={50}
+      cy={50}
+      r={46}
+      stroke="#BFFF00"
+      strokeWidth={6}
+      strokeLinecap="round"
+      strokeDasharray={RING_CIRCUMFERENCE}
+      initial={{ strokeDashoffset: RING_CIRCUMFERENCE }}
+      animate={{ strokeDashoffset: 0 }}
+      transition={{ duration: HOLD_SUBMIT_MS / 1000, ease: 'linear' }}
+      style={{ filter: 'drop-shadow(0 0 4px rgba(191,255,0,0.85))' }}
+    />
+  </svg>
+);
 
 // ==========================================
 // Interactive Wheel Letter
@@ -19,10 +53,17 @@ export interface WheelLetterProps {
   index: number;
   /** When true, disables the breathing/pulse loop on the center letter (WCAG 2.3.3). */
   reducedMotion?: boolean;
+  /** Render the hold-to-submit progress ring around this letter. */
+  showHoldRing?: boolean;
+  /** Fires on pointerdown — drives hold-to-submit timing. */
+  onHoldStart?: (letter: string, index: number, el: HTMLButtonElement) => void;
+  /** Fires on pointerup / cancel / leave — cancels an in-flight hold. */
+  onHoldEnd?: () => void;
 }
 
 export const WheelLetter: React.FC<WheelLetterProps> = ({
   letter, isCenter, angle = 0, radius = 0, onPress, isUsed, index, reducedMotion = false,
+  showHoldRing = false, onHoldStart, onHoldEnd,
 }) => {
   const btnRef = useRef<HTMLButtonElement>(null);
   const { t } = useLanguage();
@@ -57,6 +98,12 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
       onClick={() => {
         if (btnRef.current) onPress(letter, index, btnRef.current);
       }}
+      onPointerDown={() => {
+        if (onHoldStart && btnRef.current) onHoldStart(letter, index, btnRef.current);
+      }}
+      onPointerUp={() => onHoldEnd?.()}
+      onPointerCancel={() => onHoldEnd?.()}
+      onPointerLeave={() => onHoldEnd?.()}
       // Symmetric press: previous { scaleX: 1.12, scaleY: 0.82 } stretched the
       // button non-uniformly, which on slow Android frames reads as "danced
       // but didn't commit" → users re-tap. PostHog 2026-04-27 rage-clicks on
@@ -80,6 +127,7 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
       data-wheel-index={index}
       data-wheel-used={isUsed ? 'true' : 'false'}
     >
+      {showHoldRing && <HoldRing />}
       {letter}
     </m.button>
   );
@@ -120,6 +168,7 @@ export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isC
     }}
     whileTap={{ scale: 0.85 }}
     aria-label={`${letter}. ${t('wordWheel.tapToRemove')}`}
+    data-testid="built-letter-tile"
   >
     {letter}
     <span
