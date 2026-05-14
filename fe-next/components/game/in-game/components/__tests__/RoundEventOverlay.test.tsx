@@ -3,8 +3,7 @@
  */
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { RoundEventOverlay } from '../RoundEventOverlay';
-import type { RoundEventState } from '../RoundEventOverlay';
+import { RoundEventOverlay, type RoundEventState } from '../RoundEventOverlay';
 
 // Mock motion
 vi.mock('@/components/motion/AdaptiveMotion', () => ({
