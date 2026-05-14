@@ -397,41 +397,36 @@ describe('useEarthquakeFireRound', () => {
     });
   });
 
-  describe('multiplayer mode', () => {
-    it('should emit socket event for multiplayer host instead of executing locally', () => {
-      const mockSocket = {
-        emit: vi.fn(),
-      } as unknown as Socket;
-
-      const onTimerPause = vi.fn();
+  describe('multiplayer path removal (catalyst unification)', () => {
+    it('never emits triggerEarthquake in multiplayer mode', () => {
+      const emit = vi.fn();
+      const socket = { emit } as unknown as Socket;
+      const onEarthquakeStart = vi.fn();
 
       const { result } = renderHook(() =>
         useEarthquakeFireRound({
           enabled: true,
-          gameDurationSeconds: 180,
-          currentTimeSeconds: 60,
-          language: 'en',
-          difficulty: 'MEDIUM',
           mode: 'multiplayer',
           isHost: true,
-          socket: mockSocket,
-          gameSessionId: 'test-session',
-          onTimerPause,
+          socket,
+          gameDurationSeconds: 120,
+          currentTimeSeconds: 120,
+          gameSessionId: 'sess-1',
+          language: 'en',
+          difficulty: 'MEDIUM',
+          onEarthquakeStart,
         })
       );
 
+      // Force a trigger attempt; in multiplayer it must be a no-op (server-driven).
       act(() => {
         result.current.forceEarthquake();
       });
 
-      // Should emit socket event, not execute locally
-      expect(mockSocket.emit).toHaveBeenCalledWith('triggerEarthquake', {
-        gameSessionId: 'test-session',
-        triggerTime: 60,
-      });
-
-      // Should NOT pause timer locally (backend will broadcast back)
-      expect(onTimerPause).not.toHaveBeenCalled();
+      // Should NOT emit socket event (server drives it instead)
+      expect(emit).not.toHaveBeenCalled();
+      // Should NOT trigger locally
+      expect(onEarthquakeStart).not.toHaveBeenCalled();
     });
   });
 

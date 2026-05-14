@@ -8,7 +8,6 @@ import {
   type UseEarthquakeFireRoundOptions,
   type UseEarthquakeFireRoundReturn,
   type EarthquakeConfig,
-  type TriggerEarthquakePayload,
 } from '@/shared/types/earthquake';
 import { useSafeTimeout, useSafeInterval } from './useSafeTimeout';
 
@@ -87,7 +86,8 @@ export function useEarthquakeFireRound(
 
   // Calculate trigger time (random time in last 24% of game, but at least 20 sec before end)
   useEffect(() => {
-    if (!enabled || triggerTimeRef.current !== null) return;
+    // Multiplayer earthquake is scheduled server-side (roundEventsManager) — never arm a client trigger.
+    if (!enabled || mode === 'multiplayer' || triggerTimeRef.current !== null) return;
 
     // Don't trigger for very short games
     if (gameDurationSeconds < config.minGameDurationSeconds) {
@@ -116,7 +116,7 @@ export function useEarthquakeFireRound(
     // Convert to "remaining time" for easier comparison
     const triggerTimeRemaining = gameDurationSeconds - randomElapsed;
     triggerTimeRef.current = Math.max(0, triggerTimeRemaining);
-  }, [enabled, gameDurationSeconds, config]);
+  }, [enabled, mode, gameDurationSeconds, config]);
 
   // Generate new grid for fire round
   const generateNewGrid = useCallback(() => {
@@ -192,6 +192,9 @@ export function useEarthquakeFireRound(
 
   // Trigger earthquake sequence
   const triggerEarthquake = useCallback((force = false) => {
+    // Multiplayer earthquake is server-driven; the client never triggers it.
+    if (mode === 'multiplayer') return;
+
     // Non-force triggers: check if already triggered or in progress
     if (!force) {
       if (earthquakeTriggeredRef.current || earthquakeState !== 'idle') {
@@ -201,19 +204,9 @@ export function useEarthquakeFireRound(
 
     earthquakeTriggeredRef.current = true;
 
-    // For multiplayer hosts, emit socket event instead of executing locally
-    if (mode === 'multiplayer' && isHost && socket) {
-      const payload: TriggerEarthquakePayload = {
-        gameSessionId: String(gameSessionId ?? ''),
-        triggerTime: currentTimeSeconds,
-      };
-      socket.emit('triggerEarthquake', payload);
-      return; // Backend will broadcast events back to all players including host
-    }
-
-    // Single-player or non-host: Execute earthquake sequence locally
+    // Single-player: execute earthquake sequence locally
     executeEarthquakeSequence();
-  }, [mode, isHost, socket, gameSessionId, currentTimeSeconds, executeEarthquakeSequence, earthquakeState]);
+  }, [mode, executeEarthquakeSequence, earthquakeState]);
 
   // Monitor time remaining and trigger earthquake at the right moment
   useEffect(() => {
