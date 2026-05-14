@@ -101,7 +101,7 @@ describe('AnchoredNativeBanner', () => {
   });
 
   it('margin is route-independent — nav floats via CSS var, not plugin margin', async () => {
-    mockPathname.current = '/education';
+    mockPathname.current = '/glossary';
     mockPlatform.current = 'android';
     mockSafeArea.current = { top: 24, bottom: 24, left: 0, right: 0 };
     render(<AnchoredNativeBanner />);
