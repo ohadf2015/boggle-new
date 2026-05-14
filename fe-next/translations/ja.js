@@ -6777,125 +6777,6 @@ const ja = {
     "hoursAgo": "{n}時間前",
     "daysAgo": "{n}日前"
   },
-  "education": {
-    "landing": {
-      "hero": {
-        "eyebrow": "英語・ヘブライ語・スウェーデン語・日本語・スペイン語の教室の先生向け",
-        "h1": "あなたの言語のために構築されたワードゲームプラットフォーム — 翻訳ではありません。",
-        "sub": "ライブマルチプレイヤー、脳トレ、6つのゲームモード。生徒向け広告なし。先生向け無料 — 60秒でアクセス申請。",
-        "cta_primary": "先生アクセスをリクエスト",
-        "cta_secondary": "実際に見る"
-      },
-      "moat": {
-        "title": "5言語の先生がLexiClashを選ぶ理由",
-        "subtitle": "主張するだけでなく、守ることができる3つの理由。",
-        "native_multilingual": { "tag": "ネイティブ", "title": "あなたの言語のために構築", "body": "ヘブライ語の右から左、日本語のかな・IME、スウェーデン語の複合語、スペイン語のアクセント — すべてエンジンレベルで処理。Google翻訳ではない。" },
-        "local_inventory": { "tag": "ローカル", "title": "ローカルで調達された単語リスト", "body": "あなたのロケールのWikipedia +ヘブライ語Milog辞書から引き出される単語リスト。生徒は米国K-12の教科書の遺物ではなく、自分の国から文化的に関連のある単語を見る。" },
-        "ad_free": { "tag": "広告なし", "title": "生徒向け広告なし。常に。", "body": "Kahoot、Quizlet、Blooket — すべて生徒に広告を表示。私たちはすべての教育ルートで広告なしを誓う。COPPA + GDPR対応。" }
-      },
-      "modes": {
-        "title": "6つのゲームモード、1つのプラットフォーム — ローテーションして疲労に勝つ",
-        "teaches": "教わる",
-        "classroom_game": { "tag": "ライブ", "title": "クラスルームゲーム", "body": "クラス全体向けのライブマルチプレイヤーワードハント。", "teaches": "語彙、綴り、速度" },
-        "vocab_duels": { "tag": "デュエル", "title": "語彙デュエル", "body": "非同期またはライブ1v1語彙チャレンジ。", "teaches": "保持、思い出す" },
-        "brain_drills": { "tag": "脳", "title": "脳トレ", "body": "記憶、注意、処理速度の運動。", "teaches": "認知スキル" },
-        "daily_wordhunt": { "tag": "毎日", "title": "毎日ワードハント", "body": "毎日新しいパズル、ロケール別ランキング。", "teaches": "毎日の練習" },
-        "adventure": { "tag": "ストーリー", "title": "アドベンチャーモード", "body": "テーマ別の世界を横断するストーリー駆動のワードパズル。", "teaches": "語彙の深さ" },
-        "spelling_bee": { "tag": "ビー", "title": "スペリングビー練習", "body": "音声主導のスペリング訓練、複数言語。", "teaches": "綴り" }
-      },
-      "compare": {
-        "title": "LexiClashはどう比較するか",
-        "subtitle": "誠実なチェック — 本当に提供できるところだけ。",
-        "col": { "lexiclash": "LexiClash", "kahoot": "Kahoot!", "quizlet": "Quizlet", "wordwall": "Wordwall" },
-        "row": {
-          "native_multilingual": "ネイティブマルチリンガル(RTL、IME含む)",
-          "ad_free_students": "生徒向け広告なし",
-          "live_multiplayer": "ライブマルチプレイヤー",
-          "brain_training": "脳トレドリル",
-          "game_variety": "6+ゲームモード",
-          "free_for_teachers": "認証済み先生向け無料"
-        }
-      },
-      "trust": {
-        "title": "信頼のために構築",
-        "bullet1": "生徒向け教育ルートに広告なし。",
-        "bullet2": "GDPRを認識したデータ処理; オプトインテレメトリーのみ。",
-        "bullet3": "13歳未満の生徒使用にCOPPA対応。"
-      },
-      "faq": {
-        "title": "よくある質問",
-        "q1": { "q": "先生がアクセスをどう取得しますか？", "a": "/education/accessで申請 — メールで確認し、通常24時間以内に返信。" },
-        "q2": { "q": "本当にクラスルーム向け無料ですか？", "a": "はい。認証済み先生向け無料、生徒向けルートに広告なし。" },
-        "q3": { "q": "ヘブライ語、日本語、スウェーデン語、スペイン語で機能しますか？", "a": "はい — ヘブライ語RTLと日本語かな/IMEを含むネイティブサポート。翻訳ではない。" },
-        "q4": { "q": "生徒のプライバシーをどのように取り扱いますか？", "a": "COPPA + GDPR認識。教育ルートに広告追跡なし。オプトインテレメトリーのみ。" },
-        "q5": { "q": "生徒はアカウントなしでプレイできますか？", "a": "はい。ゲストプレイはほとんどのモードで対応。" },
-        "q6": { "q": "Kahoot、Quizlet、Wordwallとどう異なりますか？", "a": "ネイティブマルチリンガルの深さ、広告なしの誓約、1つのプラットフォーム上の6ゲームモード、ロケール別のローカルで調達された単語リスト。" },
-        "q7": { "q": "生徒の進捗を追跡できますか？", "a": "はい。先生は先生ダッシュボードで生徒ごとの分析を見る。" },
-        "q8": { "q": "Chromebook、タブレット、携帯電話で機能しますか？", "a": "はい。ウェブファースト、インストール不要。" }
-      },
-      "cta": {
-        "title": "LexiClashをあなたのクラスルームに持ってくる準備はできていますか？",
-        "body": "無料先生アクセスを申請 — 60秒かかり、通常24時間以内に承認。",
-        "button": "先生アクセスをリクエスト"
-      },
-      "esl-word-games": {
-        "course_name": "LexiClash ESL単語ゲーム",
-        "course_desc": "ESLクラスルーム向けの語彙、綴り、ライブマルチプレイヤーゲーム(5言語)。"
-      },
-      "vocabulary-games-classroom": {
-        "course_name": "クラスルーム語彙ゲーム",
-        "course_desc": "先生分析付きライブおよび非同期語彙ゲーム、生徒向け広告なし。"
-      }
-    },
-    "access": {
-      "h1": "先生向けLexiClashアクセス",
-      "lede": "クラスのことを簡単に教えてください。24時間以内に確認します。",
-      "full_name": "お名前",
-      "email": "メール",
-      "role": "あなたは？",
-      "role_teacher": "学校の先生",
-      "role_tutor": "チューター",
-      "role_admin": "学校管理者",
-      "role_parent": "親 / ホームスクール",
-      "role_researcher": "研究者",
-      "role_other": "その他",
-      "school_or_org": "学校（任意）",
-      "country": "国（任意）",
-      "use_case": "LexiClashをどう使いたいですか？(10-800文字)",
-      "submit": "申請を送信",
-      "submitting": "送信中…",
-      "submit_error": "何かうまくいきませんでした。もう一度試してください。",
-      "rate_limited": "24時間待ってから試してください。",
-      "success_title": "申請が届きました！",
-      "success_body": "確認して1-2日以内にメールします。",
-      "success_next": "申請を確認して、1～2営業日以内にメールを送ります。このページは閉じていただいて問題ありません。",
-      "pending_title": "申請確認中です",
-      "pending_body": "受け取りました。すぐにご連絡します。",
-      "declined_title": "今回は審査が通りませんでした",
-      "declined_reapply": "いつでも申請できます。質問があればお気軽に。",
-      "submitted_on": "提出",
-      "already_approved_title": "既に審査が完了しています！",
-      "go_to_teacher": "ダッシュボードへ",
-      "next": {
-        "step1_title": "申請を送信",
-        "step1_body": "フォームを記入します。60秒で完了。",
-        "step2_title": "確認します",
-        "step2_body": "1件ずつ確認します。通常24時間以内。",
-        "step3_title": "完了！",
-        "step3_body": "確認メール送信＋すぐに使えます。"
-      },
-      "regular_game_title": "先生ではない？大丈夫です。",
-      "regular_game_body": "LexiClashは誰でも無料。普通のゲームで遊んで、教室機能が必要な時に戻ってください。",
-      "try_mp": "マルチプレイヤー",
-      "try_blast": "Blast",
-      "try_daily": "毎日の単語"
-    },
-    "teacher": {
-      "welcome_banner_title": "ようこそ！ 🎉",
-      "welcome_banner_body": "準備完了。クラスを作成して、ゲームを割り当てて、生徒の進度を見られます。",
-      "welcome_banner_dismiss": "わかりました"
-    }
-  },
   "admin": {
     "gameModePopularity": "ゲームモード人気",
     "totalGames": "合計",
@@ -7542,14 +7423,11 @@ const ja = {
       "streakActive": "この調子で！",
       "playToStart": "レベルをプレイして連続記録を始めよう",
       "bestStreak": "最高",
-      "dailyQuests": "デイリークエスト",
       "continue": "続ける",
       "worldMap": "ワールドマップ",
       "wordAlbum": "ワードアルバム",
       "bossRush": "ボスラッシュ",
-      "bossRushLocked": "全ボスを倒してボスラッシュを解放",
-      "allQuestsComplete": "デイリークエスト全達成！ボーナス獲得！",
-      "dailyQuestBonusComplete": "全クエスト達成！+50ボーナスゴールド"
+      "bossRushLocked": "全ボスを倒してボスラッシュを解放"
     },
     "share": {
       "perfectClear": "パーフェクトクリア",
@@ -10115,7 +9993,76 @@ const ja = {
       "teacherFeature2": "カスタム単語リスト",
       "teacherFeature3": "クラスゲーム",
       "title": "LexiClash 教育",
-      "startGame": "ゲーム開始"
+      "startGame": "ゲーム開始",
+      "hero": {
+        "eyebrow": "英語・ヘブライ語・スウェーデン語・日本語・スペイン語の教室の先生向け",
+        "h1": "あなたの言語のために構築されたワードゲームプラットフォーム — 翻訳ではありません。",
+        "sub": "ライブマルチプレイヤー、脳トレ、6つのゲームモード。生徒向け広告なし。先生向け無料 — 60秒でアクセス申請。",
+        "cta_primary": "先生アクセスをリクエスト",
+        "cta_secondary": "実際に見る"
+      },
+      "moat": {
+        "title": "5言語の先生がLexiClashを選ぶ理由",
+        "subtitle": "主張するだけでなく、守ることができる3つの理由。",
+        "native_multilingual": { "tag": "ネイティブ", "title": "あなたの言語のために構築", "body": "ヘブライ語の右から左、日本語のかな・IME、スウェーデン語の複合語、スペイン語のアクセント — すべてエンジンレベルで処理。Google翻訳ではない。" },
+        "local_inventory": { "tag": "ローカル", "title": "ローカルで調達された単語リスト", "body": "あなたのロケールのWikipedia +ヘブライ語Milog辞書から引き出される単語リスト。生徒は米国K-12の教科書の遺物ではなく、自分の国から文化的に関連のある単語を見る。" },
+        "ad_free": { "tag": "広告なし", "title": "生徒向け広告なし。常に。", "body": "Kahoot、Quizlet、Blooket — すべて生徒に広告を表示。私たちはすべての教育ルートで広告なしを誓う。COPPA + GDPR対応。" }
+      },
+      "modes": {
+        "title": "6つのゲームモード、1つのプラットフォーム — ローテーションして疲労に勝つ",
+        "teaches": "教わる",
+        "classroom_game": { "tag": "ライブ", "title": "クラスルームゲーム", "body": "クラス全体向けのライブマルチプレイヤーワードハント。", "teaches": "語彙、綴り、速度" },
+        "vocab_duels": { "tag": "デュエル", "title": "語彙デュエル", "body": "非同期またはライブ1v1語彙チャレンジ。", "teaches": "保持、思い出す" },
+        "brain_drills": { "tag": "脳", "title": "脳トレ", "body": "記憶、注意、処理速度の運動。", "teaches": "認知スキル" },
+        "daily_wordhunt": { "tag": "毎日", "title": "毎日ワードハント", "body": "毎日新しいパズル、ロケール別ランキング。", "teaches": "毎日の練習" },
+        "adventure": { "tag": "ストーリー", "title": "アドベンチャーモード", "body": "テーマ別の世界を横断するストーリー駆動のワードパズル。", "teaches": "語彙の深さ" },
+        "spelling_bee": { "tag": "ビー", "title": "スペリングビー練習", "body": "音声主導のスペリング訓練、複数言語。", "teaches": "綴り" }
+      },
+      "compare": {
+        "title": "LexiClashはどう比較するか",
+        "subtitle": "誠実なチェック — 本当に提供できるところだけ。",
+        "col": { "lexiclash": "LexiClash", "kahoot": "Kahoot!", "quizlet": "Quizlet", "wordwall": "Wordwall" },
+        "row": {
+          "native_multilingual": "ネイティブマルチリンガル(RTL、IME含む)",
+          "ad_free_students": "生徒向け広告なし",
+          "live_multiplayer": "ライブマルチプレイヤー",
+          "brain_training": "脳トレドリル",
+          "game_variety": "6+ゲームモード",
+          "free_for_teachers": "認証済み先生向け無料"
+        }
+      },
+      "trust": {
+        "title": "信頼のために構築",
+        "bullet1": "生徒向け教育ルートに広告なし。",
+        "bullet2": "GDPRを認識したデータ処理; オプトインテレメトリーのみ。",
+        "bullet3": "13歳未満の生徒使用にCOPPA対応。"
+      },
+      "faq": {
+        "title": "よくある質問",
+        "q1": { "q": "先生がアクセスをどう取得しますか？", "a": "/education/accessで申請 — メールで確認し、通常24時間以内に返信。" },
+        "q2": { "q": "本当にクラスルーム向け無料ですか？", "a": "はい。認証済み先生向け無料、生徒向けルートに広告なし。" },
+        "q3": { "q": "ヘブライ語、日本語、スウェーデン語、スペイン語で機能しますか？", "a": "はい — ヘブライ語RTLと日本語かな/IMEを含むネイティブサポート。翻訳ではない。" },
+        "q4": { "q": "生徒のプライバシーをどのように取り扱いますか？", "a": "COPPA + GDPR認識。教育ルートに広告追跡なし。オプトインテレメトリーのみ。" },
+        "q5": { "q": "生徒はアカウントなしでプレイできますか？", "a": "はい。ゲストプレイはほとんどのモードで対応。" },
+        "q6": { "q": "Kahoot、Quizlet、Wordwallとどう異なりますか？", "a": "ネイティブマルチリンガルの深さ、広告なしの誓約、1つのプラットフォーム上の6ゲームモード、ロケール別のローカルで調達された単語リスト。" },
+        "q7": { "q": "生徒の進捗を追跡できますか？", "a": "はい。先生は先生ダッシュボードで生徒ごとの分析を見る。" },
+        "q8": { "q": "Chromebook、タブレット、携帯電話で機能しますか？", "a": "はい。ウェブファースト、インストール不要。" }
+      },
+      "cta": {
+        "title": "LexiClashをあなたのクラスルームに持ってくる準備はできていますか？",
+        "body": "無料先生アクセスを申請 — 60秒かかり、通常24時間以内に承認。",
+        "button": "先生アクセスをリクエスト"
+      },
+      "esl-word-games": {
+        "course_name": "LexiClash ESL単語ゲーム",
+        "course_desc": "ESLクラスルーム向けの語彙、綴り、ライブマルチプレイヤーゲーム(5言語)。"
+      },
+      "vocabulary-games-classroom": {
+        "course_name": "クラスルーム語彙ゲーム",
+        "course_desc": "先生分析付きライブおよび非同期語彙ゲーム、生徒向け広告なし。"
+      },
+      "welcomeBack": "おかえりなさい",
+      "openDashboard": "教師ダッシュボードを開く"
     },
     "leaderboard": {
       "allTime": "全期間",
@@ -10385,6 +10332,49 @@ const ja = {
         "noData": "レポートに使用できるデータがありません"
       }
     },
+    "access": {
+      "h1": "先生向けLexiClashアクセス",
+      "lede": "クラスのことを簡単に教えてください。24時間以内に確認します。",
+      "full_name": "お名前",
+      "email": "メール",
+      "role": "あなたは？",
+      "role_teacher": "学校の先生",
+      "role_tutor": "チューター",
+      "role_admin": "学校管理者",
+      "role_parent": "親 / ホームスクール",
+      "role_researcher": "研究者",
+      "role_other": "その他",
+      "school_or_org": "学校（任意）",
+      "country": "国（任意）",
+      "use_case": "LexiClashをどう使いたいですか？(10-800文字)",
+      "submit": "申請を送信",
+      "submitting": "送信中…",
+      "submit_error": "何かうまくいきませんでした。もう一度試してください。",
+      "rate_limited": "24時間待ってから試してください。",
+      "success_title": "申請が届きました！",
+      "success_body": "確認して1-2日以内にメールします。",
+      "success_next": "申請を確認して、1～2営業日以内にメールを送ります。このページは閉じていただいて問題ありません。",
+      "pending_title": "申請確認中です",
+      "pending_body": "受け取りました。すぐにご連絡します。",
+      "declined_title": "今回は審査が通りませんでした",
+      "declined_reapply": "いつでも申請できます。質問があればお気軽に。",
+      "submitted_on": "提出",
+      "already_approved_title": "既に審査が完了しています！",
+      "go_to_teacher": "ダッシュボードへ",
+      "next": {
+        "step1_title": "申請を送信",
+        "step1_body": "フォームを記入します。60秒で完了。",
+        "step2_title": "確認します",
+        "step2_body": "1件ずつ確認します。通常24時間以内。",
+        "step3_title": "完了！",
+        "step3_body": "確認メール送信＋すぐに使えます。"
+      },
+      "regular_game_title": "先生ではない？大丈夫です。",
+      "regular_game_body": "LexiClashは誰でも無料。普通のゲームで遊んで、教室機能が必要な時に戻ってください。",
+      "try_mp": "マルチプレイヤー",
+      "try_blast": "Blast",
+      "try_daily": "毎日の単語"
+    }
   },
   "crazygames": {
     "ads": {

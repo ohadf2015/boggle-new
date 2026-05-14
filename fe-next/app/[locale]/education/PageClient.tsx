@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { EducationHero } from '@/components/education/EducationHero';
@@ -24,10 +25,29 @@ import {
  * All scroll animations respect prefers-reduced-motion
  */
 
+// Staggered cascade for the teacher shortcut bars (pattern: playful-staggered-list)
+const teacherStaggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } },
+};
+const teacherBarVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring' as const, stiffness: 300, damping: 24 },
+  },
+};
+const teacherBarVariantsReduced = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.15 } },
+};
+
 export function PageClient() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { isAuthenticated, loading, profile } = useAuth();
+  const shouldReduceMotion = useReducedMotion();
 
   // Auto-redirect authenticated students to /student dashboard
   useEffect(() => {
@@ -55,56 +75,76 @@ export function PageClient() {
     '.education-faq-q',
   ]);
 
+  const teacherBar = shouldReduceMotion
+    ? teacherBarVariantsReduced
+    : teacherBarVariants;
+
   return (
     <main className="min-h-screen bg-neo-navy">
-      {/* Teacher welcome banner for newly-approved teachers */}
+      {/* Teacher view: cascading shortcut bars + relevant redesign content */}
       {hasTeacherAccess && (
-        <div className="px-4 py-4">
-          <div className="mx-auto max-w-4xl">
-            <TeacherWelcomeBanner hasAccess={hasTeacherAccess} />
-          </div>
-        </div>
-      )}
+        <>
+          <motion.div
+            variants={teacherStaggerContainer}
+            initial="hidden"
+            animate="visible"
+          >
+            {/* Teacher welcome banner for newly-approved teachers */}
+            <motion.div variants={teacherBar} className="px-4 py-4">
+              <div className="mx-auto max-w-4xl">
+                <TeacherWelcomeBanner hasAccess={hasTeacherAccess} />
+              </div>
+            </motion.div>
 
-      {/* Auth-aware shortcut for teachers */}
-      {hasTeacherAccess && (
-        <div
-          data-testid="auth-dashboard-shortcut"
-          className="bg-neo-lime/10 border-b-2 border-neo-lime px-4 py-3 sm:py-4"
-        >
-          <div className="mx-auto max-w-3xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="flex flex-col gap-1">
-              <p className="text-sm text-neo-white/70">
-                {t('education.landing.welcomeBack')}
-              </p>
-              <p className="text-neo-white font-neo-display text-lg font-bold">
-                {profile?.display_name}
-              </p>
-            </div>
-            <a
-              href={`/${language}/teacher`}
-              data-testid="go-to-dashboard-link"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-neo-lime text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow"
+            {/* Auth-aware shortcut */}
+            <motion.div
+              variants={teacherBar}
+              data-testid="auth-dashboard-shortcut"
+              className="bg-neo-lime/10 border-b-2 border-neo-lime px-4 py-3 sm:py-4"
             >
-              {t('education.landing.openDashboard')}
-              <span>→</span>
-            </a>
-          </div>
-        </div>
-      )}
+              <div className="mx-auto max-w-3xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex flex-col gap-1">
+                  <p className="text-sm text-neo-white/70">
+                    {t('education.landing.welcomeBack')}
+                  </p>
+                  <p className="text-neo-white font-neo-display text-lg font-bold">
+                    {profile?.display_name}
+                  </p>
+                </div>
+                <a
+                  href={`/${language}/teacher`}
+                  data-testid="go-to-dashboard-link"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-neo-lime text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow"
+                >
+                  {t('education.landing.openDashboard')}
+                  <span>→</span>
+                </a>
+              </div>
+            </motion.div>
 
-      {/* Start Game shortcut for teachers */}
-      {hasTeacherAccess && (
-        <div className="bg-neo-navy-light border-b border-neo-white/10 px-4 py-3">
-          <div className="mx-auto max-w-3xl">
-            <a
-              href={`/${language}/multiplayer`}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-neo-cyan text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow"
+            {/* Start Game shortcut */}
+            <motion.div
+              variants={teacherBar}
+              className="bg-neo-navy-light border-b border-neo-white/10 px-4 py-3"
             >
-              {t('education.landing.startGame')}
-            </a>
+              <div className="mx-auto max-w-3xl">
+                <a
+                  href={`/${language}/multiplayer`}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-neo-cyan text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow"
+                >
+                  {t('education.landing.startGame')}
+                </a>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Fill the page with teacher-relevant content (no "request access" noise) */}
+          <div id="modes">
+            <SixModeTour />
           </div>
-        </div>
+          <ComparisonStrip />
+          <EducationFAQ />
+        </>
       )}
 
       {/* Marketing landing for unauthenticated and student views */}

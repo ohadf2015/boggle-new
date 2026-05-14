@@ -6804,125 +6804,6 @@ const en = {
     "hoursAgo": "{n}h ago",
     "daysAgo": "{n}d ago"
   },
-  "education": {
-    "landing": {
-      "hero": {
-        "eyebrow": "For teachers in EN / HE / SV / JA / ES classrooms",
-        "h1": "The word-game platform built for your language — not translated to it.",
-        "sub": "Live multiplayer, brain drills, and 6 game modes. Ad-free for students. Free for teachers — request access in 60 seconds.",
-        "cta_primary": "Request Teacher Access",
-        "cta_secondary": "See it in action"
-      },
-      "moat": {
-        "title": "Why teachers in 5 languages choose LexiClash",
-        "subtitle": "Three reasons we can defend, not just claim.",
-        "native_multilingual": { "tag": "Native", "title": "Built natively for your language", "body": "Hebrew right-to-left, Japanese kana with IME, Swedish compound words, Spanish accents — all handled at the engine level. Not Google-translated." },
-        "local_inventory": { "tag": "Local", "title": "Locally sourced word inventory", "body": "Word lists pulled from your locale's Wikipedia + Hebrew Milog dictionary. Students see culturally relevant words from their country — not US K-12 textbook leftovers." },
-        "ad_free": { "tag": "Ad-free", "title": "Ad-free for students. Ever.", "body": "Kahoot, Quizlet, Blooket — all show ads to your students. We pledge zero ads on every education route. COPPA + GDPR aware." }
-      },
-      "modes": {
-        "title": "6 modes, one platform — rotate to beat fatigue",
-        "teaches": "Teaches",
-        "classroom_game": { "tag": "Live", "title": "Classroom Game", "body": "Live multiplayer word hunt for the whole class.", "teaches": "Vocabulary, spelling, speed" },
-        "vocab_duels": { "tag": "Duel", "title": "Vocabulary Duels", "body": "Async or live 1v1 vocab challenges.", "teaches": "Retention, recall" },
-        "brain_drills": { "tag": "Brain", "title": "Brain Drills", "body": "Memory, attention, processing speed exercises.", "teaches": "Cognitive skills" },
-        "daily_wordhunt": { "tag": "Daily", "title": "Daily Wordhunt", "body": "New puzzle every day, leaderboard per locale.", "teaches": "Daily practice" },
-        "adventure": { "tag": "Story", "title": "Adventure Mode", "body": "Story-driven word puzzles across themed worlds.", "teaches": "Vocabulary depth" },
-        "spelling_bee": { "tag": "Bee", "title": "Spelling Bee Practice", "body": "Voice-led spelling drills, multi-language.", "teaches": "Spelling" }
-      },
-      "compare": {
-        "title": "How LexiClash compares",
-        "subtitle": "Honest checks — only where we genuinely deliver.",
-        "col": { "lexiclash": "LexiClash", "kahoot": "Kahoot!", "quizlet": "Quizlet", "wordwall": "Wordwall" },
-        "row": {
-          "native_multilingual": "Native multilingual (incl. RTL, IME)",
-          "ad_free_students": "Ad-free for students",
-          "live_multiplayer": "Live multiplayer",
-          "brain_training": "Brain training drills",
-          "game_variety": "6+ game modes",
-          "free_for_teachers": "Free for verified teachers"
-        }
-      },
-      "trust": {
-        "title": "Built for trust",
-        "bullet1": "No ads on student-facing education routes.",
-        "bullet2": "GDPR-aware data handling; opt-in telemetry only.",
-        "bullet3": "COPPA-compliant for under-13 student use."
-      },
-      "faq": {
-        "title": "Frequently asked questions",
-        "q1": { "q": "How do teachers get access?", "a": "Apply at /education/access — we review by email and typically respond within 24 hours." },
-        "q2": { "q": "Is it really free for classrooms?", "a": "Yes. Free for verified teachers, no ads on student-facing routes." },
-        "q3": { "q": "Does it work in Hebrew, Japanese, Swedish, and Spanish?", "a": "Yes — native support including Hebrew RTL and Japanese kana/IME. Not translation." },
-        "q4": { "q": "How do you handle student privacy?", "a": "COPPA + GDPR aware. No ad tracking on education routes. Opt-in telemetry only." },
-        "q5": { "q": "Can students play without an account?", "a": "Yes. Guest play is supported for most modes." },
-        "q6": { "q": "How is this different from Kahoot, Quizlet, or Wordwall?", "a": "Native multilingual depth, ad-free pledge, 6 game modes on one platform, and locally sourced word inventory per locale." },
-        "q7": { "q": "Can I track student progress?", "a": "Yes. Teachers see per-student analytics in the teacher dashboard." },
-        "q8": { "q": "Does it work on Chromebooks, tablets, and phones?", "a": "Yes. Web-first, no install required." }
-      },
-      "cta": {
-        "title": "Ready to bring LexiClash to your classroom?",
-        "body": "Apply for free teacher access — takes 60 seconds, typically approved within 24 hours.",
-        "button": "Request Teacher Access"
-      },
-      "esl-word-games": {
-        "course_name": "LexiClash ESL Word Games",
-        "course_desc": "Vocabulary, spelling, and live multiplayer games for ESL classrooms in 5 languages."
-      },
-      "vocabulary-games-classroom": {
-        "course_name": "Classroom Vocabulary Games",
-        "course_desc": "Live + async vocabulary games with teacher analytics, ad-free for students."
-      }
-    },
-    "access": {
-      "h1": "Apply for free teacher access",
-      "lede": "Tell us a bit about your classroom. We review by email, typically within 24 hours.",
-      "full_name": "Your full name",
-      "email": "Email address",
-      "role": "Your role",
-      "role_teacher": "Teacher",
-      "role_tutor": "Tutor",
-      "role_admin": "School administrator",
-      "role_parent": "Parent / homeschool",
-      "role_researcher": "Researcher",
-      "role_other": "Other",
-      "school_or_org": "School or organization (optional)",
-      "country": "Country (optional)",
-      "use_case": "How will you use LexiClash? (10-800 chars)",
-      "submit": "Send application",
-      "submitting": "Sending…",
-      "submit_error": "Something went wrong. Please try again.",
-      "rate_limited": "Too many requests. Please try again in 24 hours.",
-      "success_title": "Application sent!",
-      "success_body": "We will review and email you within 24 hours.",
-      "success_next": "We'll review your application and email you within 1-2 business days. You can close this page.",
-      "pending_title": "Your request is pending review",
-      "pending_body": "We have received your application and will email you soon.",
-      "declined_title": "Your request was not approved",
-      "declined_reapply": "You can submit another application anytime. Let us know if you have questions.",
-      "submitted_on": "Submitted",
-      "already_approved_title": "You already have teacher access.",
-      "go_to_teacher": "Open Teacher Dashboard",
-      "next": {
-        "step1_title": "Apply",
-        "step1_body": "Fill the form below — takes 60 seconds.",
-        "step2_title": "We review",
-        "step2_body": "A real human reads every application, typically within 24h.",
-        "step3_title": "You get access",
-        "step3_body": "We email confirmation; teacher tools unlock instantly."
-      },
-      "regular_game_title": "Not a teacher? No worries.",
-      "regular_game_body": "LexiClash is free to play for anyone. Try the regular game and come back if you want classroom features.",
-      "try_mp": "Play Multiplayer",
-      "try_blast": "Try Blast",
-      "try_daily": "Daily Challenge"
-    },
-    "teacher": {
-      "welcome_banner_title": "You're approved! Welcome, teacher! 🎉",
-      "welcome_banner_body": "Your teacher account is ready. You can now create classes, assign games, and track student progress.",
-      "welcome_banner_dismiss": "Got it"
-    }
-  },
   "tvTutorial": {
     "welcome": {
       "title": "TV Mode",
@@ -7463,14 +7344,11 @@ const en = {
       "streakActive": "Keep it going!",
       "playToStart": "Play a level to start your streak",
       "bestStreak": "Best",
-      "dailyQuests": "Daily Quests",
       "continue": "Continue",
       "worldMap": "World Map",
       "wordAlbum": "Word Album",
       "bossRush": "Boss Rush",
-      "bossRushLocked": "Defeat all bosses to unlock Boss Rush",
-      "allQuestsComplete": "All daily quests complete! Bonus earned!",
-      "dailyQuestBonusComplete": "All quests complete! +50 bonus gold"
+      "bossRushLocked": "Defeat all bosses to unlock Boss Rush"
     },
     "retryLevel": "Retry",
     "backToLevels": "World Map",
@@ -9917,7 +9795,76 @@ const en = {
       "teacherFeature2": "Custom word lists",
       "teacherFeature3": "Classroom games",
       "title": "LexiClash Education",
-      "startGame": "Start Game"
+      "startGame": "Start Game",
+      "hero": {
+        "eyebrow": "For teachers in EN / HE / SV / JA / ES classrooms",
+        "h1": "The word-game platform built for your language — not translated to it.",
+        "sub": "Live multiplayer, brain drills, and 6 game modes. Ad-free for students. Free for teachers — request access in 60 seconds.",
+        "cta_primary": "Request Teacher Access",
+        "cta_secondary": "See it in action"
+      },
+      "moat": {
+        "title": "Why teachers in 5 languages choose LexiClash",
+        "subtitle": "Three reasons we can defend, not just claim.",
+        "native_multilingual": { "tag": "Native", "title": "Built natively for your language", "body": "Hebrew right-to-left, Japanese kana with IME, Swedish compound words, Spanish accents — all handled at the engine level. Not Google-translated." },
+        "local_inventory": { "tag": "Local", "title": "Locally sourced word inventory", "body": "Word lists pulled from your locale's Wikipedia + Hebrew Milog dictionary. Students see culturally relevant words from their country — not US K-12 textbook leftovers." },
+        "ad_free": { "tag": "Ad-free", "title": "Ad-free for students. Ever.", "body": "Kahoot, Quizlet, Blooket — all show ads to your students. We pledge zero ads on every education route. COPPA + GDPR aware." }
+      },
+      "modes": {
+        "title": "6 modes, one platform — rotate to beat fatigue",
+        "teaches": "Teaches",
+        "classroom_game": { "tag": "Live", "title": "Classroom Game", "body": "Live multiplayer word hunt for the whole class.", "teaches": "Vocabulary, spelling, speed" },
+        "vocab_duels": { "tag": "Duel", "title": "Vocabulary Duels", "body": "Async or live 1v1 vocab challenges.", "teaches": "Retention, recall" },
+        "brain_drills": { "tag": "Brain", "title": "Brain Drills", "body": "Memory, attention, processing speed exercises.", "teaches": "Cognitive skills" },
+        "daily_wordhunt": { "tag": "Daily", "title": "Daily Wordhunt", "body": "New puzzle every day, leaderboard per locale.", "teaches": "Daily practice" },
+        "adventure": { "tag": "Story", "title": "Adventure Mode", "body": "Story-driven word puzzles across themed worlds.", "teaches": "Vocabulary depth" },
+        "spelling_bee": { "tag": "Bee", "title": "Spelling Bee Practice", "body": "Voice-led spelling drills, multi-language.", "teaches": "Spelling" }
+      },
+      "compare": {
+        "title": "How LexiClash compares",
+        "subtitle": "Honest checks — only where we genuinely deliver.",
+        "col": { "lexiclash": "LexiClash", "kahoot": "Kahoot!", "quizlet": "Quizlet", "wordwall": "Wordwall" },
+        "row": {
+          "native_multilingual": "Native multilingual (incl. RTL, IME)",
+          "ad_free_students": "Ad-free for students",
+          "live_multiplayer": "Live multiplayer",
+          "brain_training": "Brain training drills",
+          "game_variety": "6+ game modes",
+          "free_for_teachers": "Free for verified teachers"
+        }
+      },
+      "trust": {
+        "title": "Built for trust",
+        "bullet1": "No ads on student-facing education routes.",
+        "bullet2": "GDPR-aware data handling; opt-in telemetry only.",
+        "bullet3": "COPPA-compliant for under-13 student use."
+      },
+      "faq": {
+        "title": "Frequently asked questions",
+        "q1": { "q": "How do teachers get access?", "a": "Apply at /education/access — we review by email and typically respond within 24 hours." },
+        "q2": { "q": "Is it really free for classrooms?", "a": "Yes. Free for verified teachers, no ads on student-facing routes." },
+        "q3": { "q": "Does it work in Hebrew, Japanese, Swedish, and Spanish?", "a": "Yes — native support including Hebrew RTL and Japanese kana/IME. Not translation." },
+        "q4": { "q": "How do you handle student privacy?", "a": "COPPA + GDPR aware. No ad tracking on education routes. Opt-in telemetry only." },
+        "q5": { "q": "Can students play without an account?", "a": "Yes. Guest play is supported for most modes." },
+        "q6": { "q": "How is this different from Kahoot, Quizlet, or Wordwall?", "a": "Native multilingual depth, ad-free pledge, 6 game modes on one platform, and locally sourced word inventory per locale." },
+        "q7": { "q": "Can I track student progress?", "a": "Yes. Teachers see per-student analytics in the teacher dashboard." },
+        "q8": { "q": "Does it work on Chromebooks, tablets, and phones?", "a": "Yes. Web-first, no install required." }
+      },
+      "cta": {
+        "title": "Ready to bring LexiClash to your classroom?",
+        "body": "Apply for free teacher access — takes 60 seconds, typically approved within 24 hours.",
+        "button": "Request Teacher Access"
+      },
+      "esl-word-games": {
+        "course_name": "LexiClash ESL Word Games",
+        "course_desc": "Vocabulary, spelling, and live multiplayer games for ESL classrooms in 5 languages."
+      },
+      "vocabulary-games-classroom": {
+        "course_name": "Classroom Vocabulary Games",
+        "course_desc": "Live + async vocabulary games with teacher analytics, ad-free for students."
+      },
+      "welcomeBack": "Welcome back",
+      "openDashboard": "Open Teacher Dashboard"
     },
     "leaderboard": {
       "allTime": "All Time",
@@ -10191,6 +10138,54 @@ const en = {
       "studyTheseNext": "Study these next!",
       "practiceTheseWords": "Practice These Words",
       "vocabScore": "You found {{found}} of {{total}} vocabulary words!"
+    },
+    "access": {
+      "h1": "Apply for free teacher access",
+      "lede": "Tell us a bit about your classroom. We review by email, typically within 24 hours.",
+      "full_name": "Your full name",
+      "email": "Email address",
+      "role": "Your role",
+      "role_teacher": "Teacher",
+      "role_tutor": "Tutor",
+      "role_admin": "School administrator",
+      "role_parent": "Parent / homeschool",
+      "role_researcher": "Researcher",
+      "role_other": "Other",
+      "school_or_org": "School or organization (optional)",
+      "country": "Country (optional)",
+      "use_case": "How will you use LexiClash? (10-800 chars)",
+      "submit": "Send application",
+      "submitting": "Sending…",
+      "submit_error": "Something went wrong. Please try again.",
+      "rate_limited": "Too many requests. Please try again in 24 hours.",
+      "success_title": "Application sent!",
+      "success_body": "We will review and email you within 24 hours.",
+      "success_next": "We'll review your application and email you within 1-2 business days. You can close this page.",
+      "pending_title": "Your request is pending review",
+      "pending_body": "We have received your application and will email you soon.",
+      "declined_title": "Your request was not approved",
+      "declined_reapply": "You can submit another application anytime. Let us know if you have questions.",
+      "submitted_on": "Submitted",
+      "already_approved_title": "You already have teacher access.",
+      "go_to_teacher": "Open Teacher Dashboard",
+      "next": {
+        "step1_title": "Apply",
+        "step1_body": "Fill the form below — takes 60 seconds.",
+        "step2_title": "We review",
+        "step2_body": "A real human reads every application, typically within 24h.",
+        "step3_title": "You get access",
+        "step3_body": "We email confirmation; teacher tools unlock instantly."
+      },
+      "regular_game_title": "Not a teacher? No worries.",
+      "regular_game_body": "LexiClash is free to play for anyone. Try the regular game and come back if you want classroom features.",
+      "try_mp": "Play Multiplayer",
+      "try_blast": "Try Blast",
+      "try_daily": "Daily Challenge"
+    },
+    "teacher": {
+      "welcome_banner_title": "You're approved! Welcome, teacher! 🎉",
+      "welcome_banner_body": "Your teacher account is ready. You can now create classes, assign games, and track student progress.",
+      "welcome_banner_dismiss": "Got it"
     }
   },
   "crazygames": {
