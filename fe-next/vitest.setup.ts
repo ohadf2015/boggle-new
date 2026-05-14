@@ -357,8 +357,22 @@ vi.mock('framer-motion', () => {
     ) {
       return React.createElement(tag, { ref, ...props }, children);
     });
+  // Cache one component per tag — a fresh component identity per render
+  // makes React remount on every render, breaking controlled inputs and effects.
+  const componentCache = new Map<string, any>();
   const motion = new Proxy({} as Record<string, any>, {
-    get: (_target, prop: string) => createMotionComponent(prop),
+    get: (_target, prop: string) => {
+      if (!componentCache.has(prop)) {
+        componentCache.set(prop, createMotionComponent(prop));
+      }
+      return componentCache.get(prop);
+    },
+  });
+  const createMotionValue = () => ({
+    set: vi.fn(),
+    get: () => 0,
+    on: () => () => {},
+    onChange: () => () => {},
   });
   return {
     motion,
@@ -377,12 +391,21 @@ vi.mock('framer-motion', () => {
     },
     domAnimation: {},
     domMax: {},
-    useMotionValue: () => ({ set: vi.fn(), get: () => 0 }),
+    useMotionValue: () => createMotionValue(),
+    useMotionValueEvent: vi.fn(),
+    useMotionTemplate: () => '',
+    useInView: () => true,
+    useScroll: () => ({
+      scrollX: createMotionValue(),
+      scrollY: createMotionValue(),
+      scrollXProgress: createMotionValue(),
+      scrollYProgress: createMotionValue(),
+    }),
     useReducedMotion: () => false,
     useAnimation: () => ({ start: vi.fn(), set: vi.fn() }),
     useAnimationControls: () => ({ start: vi.fn(), set: vi.fn() }),
-    useSpring: (value: any) => value,
-    useTransform: (value: any) => value,
+    useSpring: () => createMotionValue(),
+    useTransform: () => createMotionValue(),
     animate: vi.fn(),
   };
 });

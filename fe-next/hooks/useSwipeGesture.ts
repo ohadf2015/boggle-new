@@ -160,7 +160,7 @@ export function useSwipeGesture({
 
   // Subscribe to x motion value changes
   useEffect(() => {
-    const unsubscribe = x.onChange((currentX) => {
+    const unsubscribe = x.on('change', (currentX) => {
       // Update direction
       if (currentX > 0) {
         setSwipeDirection('right');
