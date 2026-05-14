@@ -9,6 +9,7 @@ import { StartButton } from '../pre-game/StartButton';
 import { BattleModeCard } from '../pre-game/BattleModeCard';
 import { useHostSelectedGameMode } from '@/hooks/gameState/store';
 import { useGameActions } from '@/hooks/gameState';
+import { useAuth } from '@/contexts/AuthContext';
 import type { Language, DifficultyLevel, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { GameModeOption } from '@/components/GameModeSelector';
 
@@ -59,6 +60,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   tournamentCreating,
   setHostPlaying,
 }) => {
+  const { isAdmin } = useAuth();
   // TV mode = host is the screen, NOT a competitor. Strip the host record so
   // counts/roster only reflect joining players. Mirror of HostPreGameView's
   // host-not-playing filter (HostPreGameView.tsx:194-201).
@@ -144,6 +146,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
             selectedGameMode={selectedGameMode}
             setSelectedGameMode={setSelectedGameMode}
             t={t}
+            isAdmin={isAdmin}
           />
 
           {/* Start button — big for TV */}
