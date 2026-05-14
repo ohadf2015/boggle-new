@@ -2,8 +2,9 @@
  * Tests for ReengagementEmailV2 (emails/reengagement-v2.tsx)
  *
  * Pure rendering tests — no Supabase/Resend mocks needed.
- * Covers: 5-language render, RTL + flipped shadows, mascot asset,
- * CTA/preview/unsubscribe wiring, giant letter tile, subject rotation.
+ * Covers: 5-language render, RTL + flipped shadows + bidi-isolated name,
+ * v5 hero asset, lime caption band, CTA/preview/unsubscribe wiring,
+ * recessed tile board, subject rotation.
  */
 
 import { describe, it, expect } from 'vitest';
@@ -29,22 +30,24 @@ describe('ReengagementEmailV2 — component render', () => {
   it('renders HTML for English with greeting, pitch and CTA', async () => {
     const html = await renderHtml();
     expect(html).toContain('Ohad');
-    expect(html).toMatch(/you\s*good/);
-    // Apostrophes get HTML-encoded → match "Let" + "s go" loosely
-    expect(html).toMatch(/Let.{1,10}s go/);
-    // Branding now lives in the hero illustration alt text (text wordmark removed)
+    expect(html).toMatch(/long time no spell/);
+    // Apostrophes get HTML-encoded → match the CTA loosely
+    expect(html).toMatch(/Play today.{1,10}s word/i);
+    // Branding lives in the hero illustration alt text (text wordmark removed)
     expect(html).toMatch(/alt="LexiClash[^"]*"/);
   });
 
-  it('uses the bespoke kawaii Lexi hero (v4) with descriptive alt text', async () => {
+  it('uses the v5 cool dynamic Lexi hero with descriptive alt text', async () => {
     const html = await renderHtml();
-    // v4 hero: purple chibi Lexi mascot peeking with "?" tile + lime/pink sunburst +
-    // floating S/T/A/R/K tiles. Locale-agnostic, single 1104×468 JPEG under /email/.
-    expect(html).toContain('https://www.lexiclash.live/email/reengagement-hero-v4.jpg');
+    // v5 hero: cool "animation-still" Lexi (translucent white cube mascot,
+    // confident expression, motion streaks) bursting in with a "?" tile +
+    // tumbling neo-brutalist letter tiles. Locale-agnostic 1104×468 JPEG.
+    expect(html).toContain('https://www.lexiclash.live/email/reengagement-hero-v5.jpg');
     // Alt mentions brand + the visual subject (a11y + brand recall when images blocked)
     expect(html).toMatch(/alt="LexiClash[^"]*"/);
-    // Old v3 asset must be fully retired
+    // Old hero assets must be fully retired
     expect(html).not.toContain('reengagement-hero-v3');
+    expect(html).not.toContain('reengagement-hero-v4');
     // Hero card is hard-shadowed neo-brutalist — 6px offset shadow, no blur
     expect(html).toMatch(/box-shadow:[^"';]*6px 6px 0px/);
     // Hero card scales fluidly across email clients (max-width 560 + width 100%)
@@ -54,11 +57,11 @@ describe('ReengagementEmailV2 — component render', () => {
   it('wraps the action block (greeting → CTA) in a neo-brutalist card matching the hero', async () => {
     const html = await renderHtml();
     // The action card uses the same hard-shadow + thick border treatment as the
-    // hero card — both cards must appear so the email reads as two cohesive units
-    // rather than "card + loose stack".
+    // hero card + lime caption band — so the email reads as cohesive stacked
+    // units rather than "card + loose stack".
     const heroShadows = html.match(/6px 6px 0px/g) || [];
-    // ≥ 2 occurrences: hero card + action card (CTA + tile shadows are also there
-    // but this lower-bound proves the action wrapper exists).
+    // ≥ 3 occurrences: hero card + caption band + action card (CTA shadow is
+    // also there but this lower-bound proves the action wrapper exists).
     expect(heroShadows.length).toBeGreaterThanOrEqual(3);
     // Action card declares the action-card class so client CSS can target it.
     expect(html).toContain('action-card');
@@ -66,18 +69,26 @@ describe('ReengagementEmailV2 — component render', () => {
 
   it('flips the action-card hard-shadow X offset for Hebrew (RTL)', async () => {
     const html = await renderHtml({ language: 'he' });
-    // RTL shadows use negative X offset across BOTH cards (hero + action).
+    // RTL shadows use negative X offset across hero + caption band + action card.
     const rtlShadows = html.match(/-6px 6px 0px/g) || [];
     expect(rtlShadows.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('hero illustration is locale-agnostic — same v4 asset across all 5 languages', async () => {
-    // Single shared illustration (kawaii Lexi) carries no language-specific text,
+  it('isolates the recipient name as LTR so RTL punctuation cannot reorder it', async () => {
+    // A Latin name dropped raw into an RTL greeting drags the comma to the wrong
+    // side ("Fish ,הכל טוב?"). The name must render inside an LTR isolate span.
+    const html = await renderHtml({ language: 'he', recipientName: 'Fish' });
+    expect(html).toMatch(/<span[^>]*dir="ltr"[^>]*>Fish<\/span>/);
+    expect(html).toMatch(/unicode-bidi:\s*isolate/);
+  });
+
+  it('hero illustration is locale-agnostic — same v5 asset across all 5 languages', async () => {
+    // Single shared illustration (Lexi) carries no language-specific text,
     // so the hero asset is identical across every locale.
     const heroUrls = new Set<string>();
     for (const lang of ['en', 'he', 'sv', 'ja', 'es']) {
       const html = await renderHtml({ language: lang });
-      const match = html.match(/src="(https:\/\/www\.lexiclash\.live\/email\/reengagement-hero-v4[^"]+)"/);
+      const match = html.match(/src="(https:\/\/www\.lexiclash\.live\/email\/reengagement-hero-v5[^"]+)"/);
       expect(match).not.toBeNull();
       heroUrls.add(match![1]);
       // Old per-locale OG cards must NOT leak back in
@@ -86,25 +97,28 @@ describe('ReengagementEmailV2 — component render', () => {
     expect(heroUrls.size).toBe(1);
   });
 
-  it('renders the lime caption strip inside the hero card per locale', async () => {
-    // The MP-style caption strip lives INSIDE the hero card and replaces the v2
-    // pink "missed you" sub-line. Each locale ships its own caption.
+  it('renders the bold lime caption band per locale', async () => {
+    // The caption now lives in a dedicated lime color-block band between the
+    // hero and the action card. Each locale ships its own caption.
     const expected: Record<string, string> = {
-      en: "Today's word is waiting",
-      he: 'מילה אחת מחכה לך',
-      sv: 'Dagens ord väntar',
-      ja: '今日の単語、待機中',
-      es: 'La palabra de hoy te espera',
+      en: "Today's puzzle is live",
+      he: 'החידה של היום עלתה',
+      sv: 'Dagens pussel är ute',
+      ja: '今日のパズル、公開中',
+      es: 'El reto de hoy ya está',
     };
     for (const [lang, caption] of Object.entries(expected)) {
       const html = await renderHtml({ language: lang });
       // Apostrophes get HTML-encoded — match loosely for English only
       if (lang === 'en') {
-        expect(html).toMatch(/Today.{1,10}s word is waiting/);
+        expect(html).toMatch(/Today.{1,10}s puzzle is live/);
       } else {
         expect(html).toContain(caption);
       }
     }
+    // The band carries the caption-band class for client dark-mode targeting.
+    const enHtml = await renderHtml();
+    expect(enHtml).toContain('caption-band');
   });
 
   it('renders tightened copy — drops the kettle/PS/urgency cruft', async () => {
@@ -114,10 +128,10 @@ describe('ReengagementEmailV2 — component render', () => {
     expect(html).not.toContain('few friends asked about you');
     expect(html).not.toMatch(/Today.{1,10}s hint is ready when you are/);
     // New punchier replacements (apostrophes get HTML-encoded → tolerate)
-    expect(html).toMatch(/Today.{1,10}s word is waiting/);
+    expect(html).toMatch(/Today.{1,10}s puzzle is live/);
     // Stronger pitch reframes the task as low-effort.
     expect(html.toLowerCase()).toMatch(/30 seconds/);
-    expect(html.toLowerCase()).toMatch(/(don.{1,10}t overthink|easy win)/);
+    expect(html.toLowerCase()).toMatch(/whole thing/);
   });
 
   it('renders the giant letter tile with firstLetter', async () => {
@@ -143,37 +157,37 @@ describe('ReengagementEmailV2 — component render', () => {
     // RTL shadows use negative X offset
     expect(html).toContain('-6px 6px 0px');
     // Hebrew copy present
-    expect(html).toContain('הרמז שלך להיום');
+    expect(html).toContain('מתחילה באות');
   });
 
   it('renders Swedish copy', async () => {
     const html = await renderHtml({ language: 'sv' });
-    expect(html).toContain('Din ledtråd för idag');
-    expect(html).toContain('Nu kör vi');
+    expect(html).toContain('Börjar på');
+    expect(html).toContain('Spela dagens ord');
   });
 
   it('renders Japanese copy', async () => {
     const html = await renderHtml({ language: 'ja' });
-    expect(html).toContain('今日のヒント');
-    expect(html).toContain('いこう');
+    expect(html).toContain('最初の文字は');
+    expect(html).toContain('今日の単語で遊ぶ');
   });
 
   it('renders Spanish copy', async () => {
     const html = await renderHtml({ language: 'es' });
-    expect(html).toContain('Tu pista de hoy');
-    expect(html).toContain('Vamos');
+    expect(html).toContain('Empieza con');
+    expect(html).toContain('Jugar la palabra de hoy');
   });
 
   it('falls back to English for unknown language', async () => {
     const html = await renderHtml({ language: 'fr' });
-    expect(html).toContain('Your hint for today');
+    expect(html).toContain('Starts with');
   });
 
   it('also renders to plain text', async () => {
     const text = await render(ReengagementEmailV2(baseProps), { plainText: true });
     // Plain-text render uppercases headings — compare case-insensitively
     expect(text.toLowerCase()).toContain('ohad');
-    expect(text.toLowerCase()).toContain("let's go");
+    expect(text.toLowerCase()).toContain("play today's word");
   });
 });
 
@@ -236,6 +250,11 @@ describe('ReengagementEmailV2 — puzzle-row visual', () => {
     const tinyBlanks = (tiny.match(/data-blank-tile="1"/g) || []).length;
     expect(tinyBlanks).toBeGreaterThanOrEqual(1); // floored at 2 total
   });
+
+  it('renders the tiles inside a recessed game-board panel', async () => {
+    const html = await renderHtml();
+    expect(html).toContain('tile-board');
+  });
 });
 
 describe('ReengagementEmailV2 — personalization hooks', () => {
@@ -243,24 +262,24 @@ describe('ReengagementEmailV2 — personalization hooks', () => {
     const html = await renderHtml({ daysSinceLastPlay: 14 } as never);
     // Number is interpolated into the line
     expect(html).toContain('14');
-    // The phrase contains "no-show" (EN copy)
-    expect(html.toLowerCase()).toContain('no-show');
+    // The phrase contains "off the grid" (EN copy)
+    expect(html.toLowerCase()).toContain('off the grid');
   });
 
   it('hides the missed-days line when daysSinceLastPlay < 7 (avoids "1 days" weirdness)', async () => {
     const html = await renderHtml({ daysSinceLastPlay: 3 } as never);
-    expect(html.toLowerCase()).not.toContain('no-show');
+    expect(html.toLowerCase()).not.toContain('off the grid');
   });
 
   it('hides the missed-days line when daysSinceLastPlay is undefined', async () => {
     const html = await renderHtml();
-    expect(html.toLowerCase()).not.toContain('no-show');
+    expect(html.toLowerCase()).not.toContain('off the grid');
   });
 
   it('renders the social-proof line when playersToday >= 50', async () => {
     const html = await renderHtml({ playersToday: 1847 } as never);
     // Number rendered with locale grouping ("1,847" in en-US)
-    expect(html).toMatch(/1[,  ]?847/);
+    expect(html).toMatch(/1[,  ]?847/);
     expect(html.toLowerCase()).toContain('already');
   });
 
@@ -287,7 +306,7 @@ describe('ReengagementEmailV2 — personalization hooks', () => {
       hoursUntilReset: 4,
     } as never);
     expect(html).toContain('21');
-    expect(html).toMatch(/2[,  ]?400/);
+    expect(html).toMatch(/2[,  ]?400/);
     expect(html).toMatch(/\b4h\b/);
   });
 
@@ -306,14 +325,14 @@ describe('ReengagementEmailV2 — personalization hooks', () => {
 
   it('localizes the social-proof line in Japanese', async () => {
     const html = await renderHtml({ language: 'ja', playersToday: 1200 } as never);
-    expect(html).toMatch(/1[,  ]?200/);
+    expect(html).toMatch(/1[,  ]?200/);
     expect(html).toContain('人');
   });
 
   it('localizes the hours-left chip in Spanish', async () => {
     const html = await renderHtml({ language: 'es', hoursUntilReset: 5 } as never);
     expect(html).toMatch(/\b5h\b/);
-    expect(html.toLowerCase()).toContain('quedan');
+    expect(html.toLowerCase()).toContain('antes');
   });
 
   it('localizes the missed-days line in Swedish', async () => {

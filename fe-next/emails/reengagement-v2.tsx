@@ -2,12 +2,17 @@
  * Re-engagement Email v2 — LexiClash
  *
  * Conversion-tuned redesign:
- *  • Hero v4 (kawaii Lexi peeking with "?" tile + lime/pink sunburst)
- *  • Puzzle-row reveal: N tiles, first filled, rest hollow. Reads as a real
- *    partial word instead of "[tile] _ _ _ _" placeholder text.
+ *  • Hero v5 (cool, dynamic "animation-still" Lexi bursting in with a "?" tile
+ *    + motion streaks + tumbling neo-brutalist letter tiles). Not baby-kawaii.
+ *  • Layout rhythm: dark hero → bold lime caption band → dark action card with
+ *    a recessed "game board" panel for the puzzle-row → footer. Color-blocking
+ *    breaks the old monotonous two-identical-cards stack.
+ *  • Puzzle-row reveal: N tiles, first filled, rest hollow — reads as a real
+ *    partial word, sized phone-first (Gmail strips @media).
  *  • Three optional personalization hooks (loss aversion / social proof /
- *    urgency) that gracefully no-op when the metric is missing or below
- *    threshold — keeps the email coherent for users without history.
+ *    urgency) that gracefully no-op below threshold.
+ *  • Bidi-safe greeting: recipient name is isolated LTR so a Latin name can't
+ *    drag RTL punctuation to the wrong side.
  *  • Single primary CTA, no competing links above the fold.
  */
 
@@ -29,10 +34,13 @@ import {
 /* ───────────────────────── i18n copy ─────────────────────────
  * Voice: slightly sarcastic best-friend. Contractions, specifics,
  * zero hedging. Conditional hooks soft-gate per metric.
+ *
+ * `greetingTail` is rendered AFTER the recipient name (which is wrapped in an
+ * LTR isolate span) — so it must read naturally as "<name><greetingTail>".
  */
 
 interface Copy {
-  greeting: (name: string) => string;
+  greetingTail: string;
   caption: string;
   hint: string;
   pitch: string;
@@ -47,69 +55,69 @@ interface Copy {
 
 const COPY: Record<string, Copy> = {
   en: {
-    greeting: (n) => `${n}, you good?`,
-    caption: "Today's word is waiting",
-    hint: 'Your hint for today',
-    pitch: "One word. 30 seconds. Don't overthink it.",
-    cta: "Let's go",
+    greetingTail: ', long time no spell.',
+    caption: "Today's puzzle is live",
+    hint: 'Starts with',
+    pitch: "One word. 30 seconds. That's the whole thing.",
+    cta: "Play today's word",
     footerReason: 'You signed up for daily word reminders.',
     unsubscribe: 'Unsubscribe',
     privacy: 'Privacy',
-    missedDays: (n) => `${n} days no-show — let's fix that.`,
+    missedDays: (n) => `${n} days off the grid — your comeback word is ready.`,
     solvedToday: (n) => `${n} players already cracked today's word`,
     hoursLeft: (h) => `${h}h left before it resets`,
   },
   he: {
-    greeting: (n) => `${n}, הכל טוב?`,
-    caption: 'מילה אחת מחכה לך',
-    hint: 'הרמז שלך להיום',
-    pitch: 'מילה אחת. 30 שניות. בלי לחשוב יותר מדי.',
-    cta: 'יאללה',
+    greetingTail: ', מתגעגעים אליך.',
+    caption: 'החידה של היום עלתה',
+    hint: 'מתחילה באות',
+    pitch: 'מילה אחת. 30 שניות. וזהו.',
+    cta: 'שחקו את המילה של היום',
     footerReason: 'נרשמת לתזכורות מילה יומית.',
     unsubscribe: 'ביטול הרשמה',
     privacy: 'פרטיות',
-    missedDays: (n) => `${n} ימים בלי לשחק. די.`,
-    solvedToday: (n) => `${n} שחקנים כבר פתרו את המילה של היום`,
-    hoursLeft: (h) => `נשארו ${h}h עד הריסט`,
+    missedDays: (n) => `${n} ימים בלי מילה — הניצחון הקל מחכה לך.`,
+    solvedToday: (n) => `${n} שחקנים כבר פיצחו את המילה של היום`,
+    hoursLeft: (h) => `עוד ${h} שעות והחידה מתאפסת`,
   },
   sv: {
-    greeting: (n) => `${n}, allt bra?`,
-    caption: 'Dagens ord väntar',
-    hint: 'Din ledtråd för idag',
-    pitch: 'Ett ord. 30 sekunder. Tänk inte för mycket.',
-    cta: 'Nu kör vi',
+    greetingTail: ', det var ett tag sen.',
+    caption: 'Dagens pussel är ute',
+    hint: 'Börjar på',
+    pitch: 'Ett ord. 30 sekunder. Det är hela grejen.',
+    cta: 'Spela dagens ord',
     footerReason: 'Du anmälde dig till dagliga ordpåminnelser.',
     unsubscribe: 'Avprenumerera',
     privacy: 'Integritet',
-    missedDays: (n) => `${n} dagar utan dig.`,
+    missedDays: (n) => `${n} dagar utan ett ord — din lätta vinst väntar.`,
     solvedToday: (n) => `${n} spelare har redan löst dagens ord`,
     hoursLeft: (h) => `${h}h kvar innan det nollställs`,
   },
   ja: {
-    greeting: (n) => `${n}さん、元気？`,
-    caption: '今日の単語、待機中',
-    hint: '今日のヒント',
-    pitch: '一単語、30秒、考えすぎないで。',
-    cta: 'いこう',
+    greetingTail: 'さん、ひさしぶり。',
+    caption: '今日のパズル、公開中',
+    hint: '最初の文字は',
+    pitch: '一単語、30秒。それだけ。',
+    cta: '今日の単語で遊ぶ',
     footerReason: '毎日の単語リマインダーに登録してくれたよね。',
     unsubscribe: '配信停止',
     privacy: 'プライバシー',
-    missedDays: (n) => `${n}日も会ってないね。`,
-    solvedToday: (n) => `${n}人がもう今日の単語を解いた`,
-    hoursLeft: (h) => `リセットまであと${h}h`,
+    missedDays: (n) => `${n}日ぶり — かんたんな一勝が待ってるよ。`,
+    solvedToday: (n) => `${n}人がもう今日の単語を解いたよ`,
+    hoursLeft: (h) => `リセットまであと${h}時間`,
   },
   es: {
-    greeting: (n) => `${n}, ¿todo bien?`,
-    caption: 'La palabra de hoy te espera',
-    hint: 'Tu pista de hoy',
-    pitch: 'Una palabra. 30 segundos. No le des tantas vueltas.',
-    cta: 'Vamos',
+    greetingTail: ', cuánto tiempo.',
+    caption: 'El reto de hoy ya está',
+    hint: 'Empieza con',
+    pitch: 'Una palabra. 30 segundos. Eso es todo.',
+    cta: 'Jugar la palabra de hoy',
     footerReason: 'Te suscribiste a recordatorios diarios.',
     unsubscribe: 'Cancelar suscripción',
     privacy: 'Privacidad',
-    missedDays: (n) => `${n} días sin verte.`,
+    missedDays: (n) => `${n} días sin una palabra — tu victoria fácil te espera.`,
     solvedToday: (n) => `${n} jugadores ya resolvieron la palabra de hoy`,
-    hoursLeft: (h) => `quedan ${h}h antes del reset`,
+    hoursLeft: (h) => `${h}h antes de que se reinicie`,
   },
 };
 
@@ -175,8 +183,8 @@ export function getReengagementSubjectV2(
 
 /* ───────────────────────── Thresholds ───────────────────────── */
 
-// Below these floors, the chip would feel awkward ("1 days no-show", "12 already
-// cracked"). Above the urgency ceiling, the countdown stops being motivating.
+// Below these floors, the chip would feel awkward ("1 days off the grid", "12
+// already cracked"). Above the urgency ceiling, the countdown stops motivating.
 const MISSED_DAYS_FLOOR = 7;
 const SOLVED_TODAY_FLOOR = 50;
 const HOURS_LEFT_CEILING = 12;
@@ -204,16 +212,18 @@ interface ReengagementEmailV2Props {
 
 /* ───────────────────────── Assets ───────────────────────── */
 
-// v4 hero: bespoke kawaii Lexi mascot peeking from left with "?" tile + lime/pink
-// sunburst + floating S/T/A/R/K tiles drifting right. 1104×468 progressive JPEG,
-// ~70KB. Locale-agnostic (no text in image).
-const HERO_SRC = 'https://www.lexiclash.live/email/reengagement-hero-v4.jpg';
+// v5 hero: cool, dynamic "animation-still" Lexi (translucent white cube mascot,
+// confident smug expression, motion streaks) bursting in from the left with a
+// "?" tile + tumbling neo-brutalist letter tiles. 1104×468 JPEG, ~84KB.
+// Locale-agnostic (no text in image).
+const HERO_SRC = 'https://www.lexiclash.live/email/reengagement-hero-v5.jpg';
 
 /* ─── Palette (solid hex only — dark-mode safe) ─── */
 
 const C = {
   bg: '#14142b',
   bgAlt: '#1c1c3a',
+  board: '#0f0f22',
   badge: '#A8E600',
   hint: '#8B5CF6',
   letterFill: '#5CE0D6',
@@ -263,6 +273,7 @@ export default function ReengagementEmailV2({
   const rtl = language === 'he';
   const dir = rtl ? 'rtl' : 'ltr';
   const sh = rtl ? '-' : '';
+  const startAlign: 'left' | 'right' = rtl ? 'right' : 'left';
   const locale = ['he', 'sv', 'ja', 'es'].includes(language) ? language : 'en';
   const privacyUrl = `https://lexiclash.live/${locale}/privacy`;
   const year = new Date().getFullYear();
@@ -304,13 +315,15 @@ export default function ReengagementEmailV2({
             [data-ogsc] h1 { color: ${C.text} !important; }
             [data-ogsc] .cta-btn-v2 { background-color: ${C.lime} !important; color: ${C.black} !important; }
             [data-ogsc] .cta-td-v2 { background-color: ${C.lime} !important; }
-            [data-ogsc] .caption-strip { background-color: ${C.bg} !important; }
+            [data-ogsc] .caption-band { background-color: ${C.lime} !important; }
+            [data-ogsc] .caption-band-text { color: ${C.black} !important; }
             [data-ogsc] .missed-chip { background-color: ${C.pink} !important; color: ${C.black} !important; }
             [data-ogsc] .stats-chip { color: ${C.muted} !important; }
+            [data-ogsc] .tile-board { background-color: ${C.board} !important; }
             [data-ogsb] .body-v2 { background-color: ${C.bg} !important; }
             [data-ogsb] .cta-btn-v2 { background-color: ${C.lime} !important; }
             [data-ogsb] .cta-td-v2 { background-color: ${C.lime} !important; }
-            [data-ogsb] .caption-strip { background-color: ${C.bg} !important; }
+            [data-ogsb] .caption-band { background-color: ${C.lime} !important; }
             [data-ogsb] .missed-chip { background-color: ${C.pink} !important; }
             :root { color-scheme: dark !important; }
             @media (prefers-color-scheme: dark) {
@@ -318,27 +331,27 @@ export default function ReengagementEmailV2({
               h1 { color: ${C.text} !important; }
               .cta-btn-v2 { background-color: ${C.lime} !important; color: ${C.black} !important; }
               .cta-td-v2 { background-color: ${C.lime} !important; }
-              .caption-strip { background-color: ${C.bg} !important; }
+              .caption-band { background-color: ${C.lime} !important; }
+              .caption-band-text { color: ${C.black} !important; }
               .missed-chip { background-color: ${C.pink} !important; color: ${C.black} !important; }
               .stats-chip { color: ${C.muted} !important; }
+              .tile-board { background-color: ${C.board} !important; }
             }
             u + .body-v2 .cta-btn-v2 { background-color: ${C.lime} !important; color: ${C.black} !important; }
             u + .body-v2 .cta-td-v2 { background-color: ${C.lime} !important; }
-            @media (max-width: 480px) {
-              .h1-v2 { font-size: 26px !important; line-height: 1.25 !important; }
-              .hero-card { box-shadow: ${sh}4px 4px 0px ${C.black} !important; border-radius: 14px !important; }
-              .tile-cell { width: 52px !important; height: 64px !important; }
-              .tile-letter { font-size: 30px !important; line-height: 64px !important; }
-              .tile-gap { width: 6px !important; }
-              .pitch-v2 { font-size: 14px !important; }
-              .missed-chip { font-size: 12px !important; padding: 8px 14px !important; }
-              .stats-chip { font-size: 12px !important; }
+            /* Phone-first base sizes; desktop clients get an enhancement bump. */
+            @media (min-width: 600px) {
+              .h1-v2 { font-size: 30px !important; line-height: 1.2 !important; }
+              .tile-cell { width: 58px !important; height: 70px !important; }
+              .tile-letter { font-size: 32px !important; line-height: 70px !important; }
+              .tile-gap { width: 8px !important; }
+              .pitch-v2 { font-size: 17px !important; }
             }
           `}</style>
         </Head>
 
         <Preview>
-          {t.hint}: {firstLetter}… {t.cta.toLowerCase()}
+          {t.hint} {firstLetter}… {t.cta}
         </Preview>
 
         <Body className="body-v2" style={{
@@ -349,13 +362,13 @@ export default function ReengagementEmailV2({
           <table role="presentation" cellPadding={0} cellSpacing={0} width="100%" dir={dir}
             style={{ backgroundColor: C.bg }}>
             <tr>
-              <td align="center" style={{ padding: '48px 20px 40px' }}>
+              <td align="center" style={{ padding: '40px 18px 36px' }}>
                 <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
                   style={{ maxWidth: '560px' }} dir={dir}>
 
-                  {/* ── 1. HERO CARD — v4 Lexi banner + locale caption strip ── */}
+                  {/* ── 1. HERO CARD — v5 cool dynamic Lexi banner ── */}
                   <tr>
-                    <td align="center" style={{ paddingBottom: '28px' }}>
+                    <td align="center" style={{ paddingBottom: '18px' }}>
                       <table
                         role="presentation"
                         cellPadding={0}
@@ -380,7 +393,7 @@ export default function ReengagementEmailV2({
                             >
                               <Img
                                 src={HERO_SRC}
-                                alt="LexiClash — kawaii Lexi peeking with a letter tile"
+                                alt="LexiClash — Lexi bursting in with a letter tile"
                                 width="552"
                                 height="234"
                                 className="hero-banner"
@@ -396,16 +409,32 @@ export default function ReengagementEmailV2({
                             </Link>
                           </td>
                         </tr>
+                      </table>
+                    </td>
+                  </tr>
+
+                  {/* ── 2. LIME CAPTION BAND — bold color-block bridge ── */}
+                  <tr>
+                    <td align="center" style={{ paddingBottom: '18px' }}>
+                      <table
+                        role="presentation"
+                        cellPadding={0}
+                        cellSpacing={0}
+                        width="100%"
+                        className="caption-band"
+                        style={{
+                          maxWidth: '560px',
+                          borderCollapse: 'separate',
+                          backgroundColor: C.lime,
+                          border: `4px solid ${C.black}`,
+                          borderRadius: '14px',
+                          boxShadow: `${sh}6px 6px 0px ${C.black}`,
+                        }}>
                         <tr>
-                          <td className="caption-strip" style={{
-                            backgroundColor: C.bg,
-                            padding: '14px 20px',
-                            borderTop: `3px solid ${C.black}`,
-                            textAlign: 'center',
-                          }}>
-                            <Text style={{
-                              color: C.lime,
-                              fontSize: '13px',
+                          <td align="center" style={{ padding: '14px 20px' }}>
+                            <Text className="caption-band-text" style={{
+                              color: C.black,
+                              fontSize: '14px',
                               fontWeight: 700,
                               letterSpacing: '2px',
                               textTransform: 'uppercase' as const,
@@ -423,7 +452,7 @@ export default function ReengagementEmailV2({
                     </td>
                   </tr>
 
-                  {/* ── 2. ACTION CARD ── */}
+                  {/* ── 3. ACTION CARD ── */}
                   <tr>
                     <td align="center">
                       <table
@@ -441,46 +470,63 @@ export default function ReengagementEmailV2({
                           backgroundColor: C.bgAlt,
                         }}>
 
-                        {/* greeting */}
+                        {/* greeting — left-aligned (RTL: right) */}
                         <tr>
-                          <td align="center" style={{ padding: '32px 20px 18px' }}>
+                          <td style={{ padding: '30px 24px 0', textAlign: startAlign }}>
                             <Heading as="h1" className="h1-v2" style={{
                               color: C.text,
-                              fontSize: '32px',
+                              fontSize: '23px',
                               margin: 0,
                               fontWeight: 700,
-                              textAlign: 'center',
-                              lineHeight: '1.2',
-                              letterSpacing: '-0.5px',
+                              textAlign: startAlign,
+                              lineHeight: '1.25',
+                              letterSpacing: '-0.3px',
                               direction: dir,
                             }}>
-                              {t.greeting(recipientName)}
+                              <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>{recipientName}</span>
+                              {t.greetingTail}
                             </Heading>
+                          </td>
+                        </tr>
+
+                        {/* lime accent bar under greeting */}
+                        <tr>
+                          <td style={{ padding: '12px 24px 0', textAlign: startAlign }}>
+                            <table role="presentation" cellPadding={0} cellSpacing={0}
+                              align={startAlign} style={{ margin: 0 }}>
+                              <tr>
+                                <td style={{
+                                  width: '52px', height: '6px',
+                                  backgroundColor: C.lime, fontSize: 0, lineHeight: 0,
+                                }}>&nbsp;</td>
+                              </tr>
+                            </table>
                           </td>
                         </tr>
 
                         {/* loss-aversion chip — only if days ≥ 7 */}
                         {showMissedDays && (
                           <tr>
-                            <td align="center" style={{ paddingBottom: '20px' }}>
-                              <table role="presentation" cellPadding={0} cellSpacing={0} style={{ margin: '0 auto' }}>
+                            <td style={{ padding: '18px 24px 0', textAlign: startAlign }}>
+                              <table role="presentation" cellPadding={0} cellSpacing={0}
+                                align={startAlign} style={{ margin: 0 }}>
                                 <tr>
                                   <td
                                     className="missed-chip"
                                     style={{
                                       backgroundColor: C.pink,
                                       color: C.black,
-                                      fontSize: '13px',
+                                      fontSize: '12px',
                                       fontWeight: 700,
-                                      letterSpacing: '1.5px',
+                                      letterSpacing: '0.8px',
                                       textTransform: 'uppercase' as const,
-                                      padding: '10px 18px',
+                                      padding: '9px 16px',
                                       borderRadius: '999px',
                                       border: `3px solid ${C.black}`,
                                       boxShadow: `${sh}3px 3px 0px ${C.black}`,
                                       fontFamily: "'Fredoka', Arial, sans-serif",
                                       direction: dir,
-                                      textAlign: 'center',
+                                      textAlign: startAlign,
                                     }}>
                                     {t.missedDays(daysSinceLastPlay as number)}
                                   </td>
@@ -490,58 +536,94 @@ export default function ReengagementEmailV2({
                           </tr>
                         )}
 
-                        {/* puzzle-row reveal — N tiles, first filled */}
+                        {/* hint label */}
                         <tr>
-                          <td align="center" style={{ padding: '6px 20px 22px' }}>
-                            <table role="presentation" cellPadding={0} cellSpacing={0} dir={dir} style={{ margin: '0 auto' }}>
+                          <td style={{ padding: '22px 24px 8px', textAlign: startAlign }}>
+                            <Text style={{
+                              color: C.muted,
+                              fontSize: '11px',
+                              fontWeight: 700,
+                              letterSpacing: '2px',
+                              textTransform: 'uppercase' as const,
+                              margin: 0,
+                              textAlign: startAlign,
+                              direction: dir,
+                              fontFamily: "'Fredoka', Arial, sans-serif",
+                            }}>
+                              {t.hint}
+                            </Text>
+                          </td>
+                        </tr>
+
+                        {/* puzzle-row reveal — recessed game board, N tiles, first filled */}
+                        <tr>
+                          <td style={{ padding: '0 24px 4px' }}>
+                            <table
+                              role="presentation"
+                              cellPadding={0}
+                              cellSpacing={0}
+                              width="100%"
+                              className="tile-board"
+                              style={{
+                                backgroundColor: C.board,
+                                border: `3px solid ${C.black}`,
+                                borderRadius: '14px',
+                                borderCollapse: 'separate',
+                              }}>
                               <tr>
-                                <td
-                                  width={64}
-                                  height={76}
-                                  align="center"
-                                  valign="middle"
-                                  className="tile-cell"
-                                  style={{
-                                    width: '64px',
-                                    height: '76px',
-                                    backgroundColor: C.letterFill,
-                                    border: `4px solid ${C.black}`,
-                                    borderRadius: '12px',
-                                    boxShadow: `${sh}4px 4px 0px ${C.black}`,
-                                    textAlign: 'center',
-                                  }}
-                                >
-                                  <span className="tile-letter" style={{
-                                    color: C.black,
-                                    fontSize: '40px',
-                                    fontWeight: 700,
-                                    lineHeight: '76px',
-                                    fontFamily: "'Fredoka', Arial, sans-serif",
-                                    display: 'inline-block',
-                                  }}>
-                                    {firstLetter}
-                                  </span>
+                                <td align="center" style={{ padding: '18px 10px' }}>
+                                  <table role="presentation" cellPadding={0} cellSpacing={0} dir={dir} style={{ margin: '0 auto' }}>
+                                    <tr>
+                                      <td
+                                        width={44}
+                                        height={54}
+                                        align="center"
+                                        valign="middle"
+                                        className="tile-cell"
+                                        style={{
+                                          width: '44px',
+                                          height: '54px',
+                                          backgroundColor: C.letterFill,
+                                          border: `4px solid ${C.black}`,
+                                          borderRadius: '10px',
+                                          boxShadow: `${sh}3px 3px 0px ${C.black}`,
+                                          textAlign: 'center',
+                                        }}
+                                      >
+                                        <span className="tile-letter" style={{
+                                          color: C.black,
+                                          fontSize: '24px',
+                                          fontWeight: 700,
+                                          lineHeight: '54px',
+                                          fontFamily: "'Fredoka', Arial, sans-serif",
+                                          display: 'inline-block',
+                                        }}>
+                                          {firstLetter}
+                                        </span>
+                                      </td>
+                                      {blankTiles.flatMap((_, i) => [
+                                        <td key={`gap-${i}`} className="tile-gap" style={{ width: '6px' }}>&nbsp;</td>,
+                                        <td
+                                          key={`blank-${i}`}
+                                          data-blank-tile="1"
+                                          width={44}
+                                          height={54}
+                                          align="center"
+                                          valign="middle"
+                                          className="tile-cell"
+                                          style={{
+                                            width: '44px',
+                                            height: '54px',
+                                            backgroundColor: C.blankTileBg,
+                                            border: `4px solid ${C.black}`,
+                                            borderRadius: '10px',
+                                            boxShadow: `${sh}3px 3px 0px ${C.black}`,
+                                          }}
+                                        >&nbsp;</td>,
+                                      ])}
+                                    </tr>
+                                  </table>
                                 </td>
-                                {blankTiles.flatMap((_, i) => [
-                                  <td key={`gap-${i}`} className="tile-gap" style={{ width: '10px' }}>&nbsp;</td>,
-                                  <td
-                                    key={`blank-${i}`}
-                                    data-blank-tile="1"
-                                    width={64}
-                                    height={76}
-                                    align="center"
-                                    valign="middle"
-                                    className="tile-cell"
-                                    style={{
-                                      width: '64px',
-                                      height: '76px',
-                                      backgroundColor: C.blankTileBg,
-                                      border: `4px solid ${C.black}`,
-                                      borderRadius: '12px',
-                                      boxShadow: `${sh}4px 4px 0px ${C.black}`,
-                                    }}
-                                  >&nbsp;</td>,
-                                ])}
                               </tr>
                             </table>
                           </td>
@@ -549,17 +631,14 @@ export default function ReengagementEmailV2({
 
                         {/* pitch line */}
                         <tr>
-                          <td align="center" style={{ padding: '0 20px 18px' }}>
+                          <td style={{ padding: '18px 24px 0', textAlign: startAlign }}>
                             <Text className="pitch-v2" style={{
                               color: C.text,
-                              fontSize: '16px',
+                              fontSize: '15px',
                               fontWeight: 500,
                               lineHeight: '1.55',
-                              textAlign: 'center',
+                              textAlign: startAlign,
                               margin: 0,
-                              maxWidth: '440px',
-                              marginLeft: 'auto',
-                              marginRight: 'auto',
                               direction: dir,
                             }}>
                               {t.pitch}
@@ -570,15 +649,15 @@ export default function ReengagementEmailV2({
                         {/* stats strip — social proof + urgency, only if either fires */}
                         {showStatsStrip && (
                           <tr>
-                            <td align="center" style={{ padding: '0 20px 22px' }}>
+                            <td style={{ padding: '12px 24px 0', textAlign: startAlign }}>
                               <Text className="stats-chip" style={{
                                 color: C.muted,
                                 fontSize: '13px',
                                 fontWeight: 600,
-                                letterSpacing: '0.5px',
+                                letterSpacing: '0.3px',
                                 lineHeight: '1.5',
                                 margin: 0,
-                                textAlign: 'center',
+                                textAlign: startAlign,
                                 direction: dir,
                                 fontFamily: "'Fredoka', Arial, sans-serif",
                               }}>
@@ -600,33 +679,34 @@ export default function ReengagementEmailV2({
                           </tr>
                         )}
 
-                        {/* CTA */}
+                        {/* CTA — full-width block button */}
                         <tr>
-                          <td align="center" style={{ padding: '0 20px 32px' }}>
-                            <table role="presentation" cellPadding={0} cellSpacing={0}
-                              style={{ margin: '0 auto' }}>
+                          <td style={{ padding: '22px 24px 30px' }}>
+                            <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
+                              className="cta-td-v2" style={{
+                                backgroundColor: C.lime,
+                                borderRadius: '14px',
+                                border: `3px solid ${C.black}`,
+                                boxShadow: `${sh}6px 6px 0px ${C.black}`,
+                              }}>
                               <tr>
-                                <td align="center" className="cta-td-v2" style={{
-                                  backgroundColor: C.lime,
-                                  borderRadius: '16px',
-                                  border: `3px solid ${C.black}`,
-                                  boxShadow: `${sh}6px 6px 0px ${C.black}`,
-                                }}>
+                                <td align="center">
                                   <Button
                                     href={playUrl}
                                     className="cta-btn-v2"
                                     style={{
                                       boxSizing: 'border-box',
-                                      display: 'inline-block',
+                                      display: 'block',
+                                      width: '100%',
                                       backgroundColor: C.lime,
                                       color: C.black,
-                                      fontSize: '19px',
+                                      fontSize: '17px',
                                       fontWeight: 700,
                                       textDecoration: 'none',
-                                      padding: '20px 56px',
-                                      borderRadius: '16px',
+                                      padding: '16px 24px',
+                                      borderRadius: '14px',
                                       fontFamily: "'Fredoka', Arial, sans-serif",
-                                      letterSpacing: '1.5px',
+                                      letterSpacing: '0.8px',
                                       textAlign: 'center',
                                       textTransform: 'uppercase' as const,
                                     }}>
@@ -643,7 +723,7 @@ export default function ReengagementEmailV2({
 
                   <tr><td style={{ height: '28px', lineHeight: 0, fontSize: 0 }}>&nbsp;</td></tr>
 
-                  {/* ── 3. Footer ── */}
+                  {/* ── 4. Footer ── */}
                   <tr>
                     <td style={{ borderTop: `1px solid ${C.divider}`, paddingTop: '24px' }}>
                       <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
