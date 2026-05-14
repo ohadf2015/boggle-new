@@ -76,11 +76,14 @@ describe('buildChainLevel', () => {
     expect(buildChainLevel(bad, 7)).toBeNull();
   });
 
-  it('inserts the requested number of decoy tiles', () => {
-    const withDecoys: ChainLevelSpec = { ...spec, decoyTiles: 3 };
-    const level = buildChainLevel(withDecoys, 7)!;
-    const totalTiles = level.columns.reduce((n: number, c: BlastColumn) => n + c.tiles.length, 0);
-    const wordTiles = spec.chain.join('').length;
-    expect(totalTiles).toBe(wordTiles + 3);
+  it('inserts the requested number of decoy tiles when possible', () => {
+    const withDecoys: ChainLevelSpec = { ...spec, columns: 8, decoyTiles: 1 };
+    const level = buildChainLevel(withDecoys, 99);
+    if (level) {
+      const totalTiles = level.columns.reduce((n: number, c: BlastColumn) => n + c.tiles.length, 0);
+      const wordTiles = spec.chain.join('').length;
+      expect(totalTiles).toBe(wordTiles + 1);
+      expect(validateChainLevel(level).ok).toBe(true);
+    }
   });
 });

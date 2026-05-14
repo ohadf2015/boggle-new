@@ -1,6 +1,7 @@
 import type { BlastColumn, BlastLevel, CellId, ChainLevelSpec, Letter, Locale } from '../types';
 import { cellId } from './cell-id';
 import { scanFormableThemeWords } from './word-scan';
+import { validateChainLevel } from './chain-validator';
 import { LOCALE_CONFIGS } from '../locale-config';
 
 export type InsertResult = { level: BlastLevel; cells: CellId[] };
@@ -84,7 +85,7 @@ export function insertWord(
   return null;
 }
 
-const MAX_BUILD_ATTEMPTS = 200;
+const MAX_BUILD_ATTEMPTS = 500;
 
 function emptyColumns(count: number): BlastColumn[] {
   return Array.from({ length: count }, (_, index) => ({ index, tiles: [] as Letter[] }));
@@ -149,7 +150,9 @@ export function buildChainLevel(spec: ChainLevelSpec, seed: number): BlastLevel 
 }
 
 /**
- * Inserts decoy tiles into S_0 that never complete a theme word.
+ * Inserts decoy tiles into S_0 that preserve the chain's validity.
+ * Uses the ground truth: a decoy is valid iff validateChainLevel still passes.
+ * This is the only guarantee that the chain can be replayed correctly.
  */
 function insertDecoys(level: BlastLevel, spec: ChainLevelSpec, seed: number): BlastLevel | null {
   if (spec.decoyTiles <= 0) return level;
@@ -160,19 +163,22 @@ function insertDecoys(level: BlastLevel, spec: ChainLevelSpec, seed: number): Bl
 
   for (let placed = 0; placed < spec.decoyTiles; placed++) {
     let success = false;
-    for (let tries = 0; tries < 60 && !success; tries++) {
+    // Higher try limit since validation is expensive but accurate
+    for (let tries = 0; tries < 100 && !success; tries++) {
       const col = Math.floor(rand() * board.columns.length);
       const letter = pool[Math.floor(rand() * pool.length)]!;
-      const columns = cloneColumns(board.columns);
-      columns[col]!.tiles.push(letter);
-      const candidate: BlastLevel = { ...board, columns };
-      const matches = scanFormableThemeWords(candidate, spec.chain, spec.locale);
-      const formable = new Set(matches.map((m) => m.word));
-      if (formable.size <= 1 && (formable.size === 0 || formable.has(spec.chain[0]!))) {
+      const testColumns = cloneColumns(board.columns);
+      testColumns[col]!.tiles.push(letter);
+      const candidate: BlastLevel = { ...board, columns: testColumns };
+
+      // Ground truth: the level must still validate
+      const validation = validateChainLevel(candidate);
+      if (validation.ok) {
         board = candidate;
         success = true;
       }
     }
+
     if (!success) return null;
   }
   return board;
