@@ -157,6 +157,8 @@ export const BlastStage = memo(function BlastStage({
   t,
 }: BlastStageProps) {
   const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete, isDeadEnd } = gameState;
+  // MP Blast has timer props; SP Blast doesn't. Timer-era games hide the wave chip.
+  const isMultiplayer = remainingTime !== null && remainingTime !== undefined;
 
   const [showTileGuide, setShowTileGuide] = useState(false);
 
@@ -253,6 +255,7 @@ export const BlastStage = memo(function BlastStage({
         buffConsumed={buffConsumed}
         ddaBoostActive={ddaBoostActive}
         hintSlot={hintSlot}
+        isMultiplayer={isMultiplayer}
         t={t}
       />
       <BlastObjectiveBanner objectives={objectiveProgress} t={t} />

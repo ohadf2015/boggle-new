@@ -79,6 +79,8 @@ interface BlastHUDProps {
   ddaBoostActive?: boolean;
   /** Optional hint button slot — rendered beside Help when present. Wave 6+ only. */
   hintSlot?: React.ReactNode;
+  /** Whether this is multiplayer mode (timer-era, no waves). Hides wave chip in MP. */
+  isMultiplayer?: boolean;
   t: (key: string) => string | undefined;
 }
 
@@ -104,6 +106,7 @@ export function BlastHUD({
   buffConsumed = false,
   ddaBoostActive = false,
   hintSlot,
+  isMultiplayer = false,
   t,
 }: BlastHUDProps) {
   const clearPct = totalTiles > 0 ? Math.round((tilesCleared / totalTiles) * 100) : 0;
@@ -130,13 +133,16 @@ export function BlastHUD({
       {/* Top row: wave + buff slot + controls. Min-h fixed so chip toggles never reflow. */}
       <div className="flex items-center justify-between px-3 py-1.5 pt-safe min-h-[36px]">
         <div className="flex items-center gap-2 min-w-0">
-          <span
-            className="shrink-0 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border-2 border-neo-cyan/40 text-neo-cyan tabular-nums"
-            style={NO_TEXT_SHADOW_STYLE}
-            aria-label={`${t('blast.wave')} ${waveNumber}`}
-          >
-            W{waveNumber}
-          </span>
+          {/* Wave chip — hidden in MP (timer-era, no waves) */}
+          {!isMultiplayer && (
+            <span
+              className="shrink-0 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border-2 border-neo-cyan/40 text-neo-cyan tabular-nums"
+              style={NO_TEXT_SHADOW_STYLE}
+              aria-label={`${t('blast.wave')} ${waveNumber}`}
+            >
+              W{waveNumber}
+            </span>
+          )}
           {/* Lucky Boost chip — visible only when DDA assist is active. */}
           {ddaBoostActive && (
             <span
