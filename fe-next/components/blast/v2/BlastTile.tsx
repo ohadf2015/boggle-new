@@ -48,8 +48,9 @@ export function BlastTile({
       style={{
         fontFamily: fontStack,
         padding: 8 + (paddingExtra ?? 0),
-        background: frozen ? '#bae6fd' : modeColor,
-        opacity: frozen ? 0.6 : 1,
+        // Tile face (warm rest / pink selected / blue frozen) is owned by
+        // BlastTile.module.css. modeColor tints the selected-state accent.
+        ['--tile-mode-color' as string]: modeColor,
       }}
       whileTap={{ scale: 0.95 }}
       animate={state === 'selected' ? { scale: 1.05, y: -4 } : { scale: 1, y: 0 }}
