@@ -21,8 +21,34 @@ const mockLevel: BlastLevel = {
   difficulty: 1,
 };
 
+// Level designed so collapsing CAT reveals DOG.
+//   col0 = [C,A,T,D] bottom-up, col1 = [O], col2 = [G]
+//   initial grid (r = row index from bottom):
+//     r3: D . .
+//     r2: T . .
+//     r1: A . .
+//     r0: C O G
+//   CAT is the vertical column-0 run; DOG is NOT a straight line yet.
+//   After CAT is cleared, D falls to r0 → DOG spans row 0 (c0r0=D, c1r0=O, c2r0=G).
+const revealLevel: BlastLevel = {
+  id: 'useBlastV2-reveal-test',
+  levelNumber: 1,
+  locale: 'en',
+  theme: 'onboarding',
+  columns: [
+    { index: 0, tiles: ['C', 'A', 'T', 'D'] },
+    { index: 1, tiles: ['O'] },
+    { index: 2, tiles: ['G'] },
+  ],
+  words: ['CAT', 'DOG'],
+  resolvableOrder: ['CAT', 'DOG'],
+  tileFlags: {},
+  gravityMode: 'standard',
+  difficulty: 1,
+};
+
 describe('useBlastV2 hook', () => {
-  it('drag-select CAT: foundWords includes CAT, cascades triggered', () => {
+  it('drag-select CAT claims only CAT — no auto-claim of other words', () => {
     const { result } = renderHook(() => useBlastV2(mockLevel));
 
     act(() => {
@@ -33,15 +59,41 @@ describe('useBlastV2 hook', () => {
     });
 
     expect(result.current.state.foundWords.has('CAT')).toBe(true);
-    // 30 (CAT theme: 3*10) + 60 (SUN cascade depth=1, mult=1.0: 3*20) + 90 (EGG cascade depth=2, mult=1.5: 3*20*1.5)
-    expect(result.current.state.coins).toBe(180);
-    expect(result.current.state.cascadeCount).toBe(2);
+    // SUN + EGG are still on the board untouched — player must find them manually.
+    expect(result.current.state.foundWords.has('SUN')).toBe(false);
+    expect(result.current.state.foundWords.has('EGG')).toBe(false);
+    // Only CAT scored: 3 letters x 10 (theme). No cascade bonus.
+    expect(result.current.state.coins).toBe(30);
+    // Collapsing column 0 reveals nothing — SUN/EGG were already formable.
+    expect(result.current.state.cascadeCount).toBe(0);
+    expect(result.current.state.status).toBe('playing');
   });
 
-  it('exposes per-submission chain depth + monotonic chain event key for FX', () => {
-    const { result } = renderHook(() => useBlastV2(mockLevel));
+  it('counts collapse-revealed words as cascades for FX (revealLevel)', () => {
+    const { result } = renderHook(() => useBlastV2(revealLevel));
     expect(result.current.state.lastChainDepth).toBe(0);
     expect(result.current.state.chainEventKey).toBe(0);
+
+    // Drag CAT up column 0. Collapsing C/A/T drops D to row 0,
+    // making DOG (D-O-G across row 0) formable for the first time.
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(0, 1));
+      result.current.handlers.onPointerMove(cellId(0, 2));
+      result.current.handlers.onPointerUp();
+    });
+
+    expect(result.current.state.foundWords.has('CAT')).toBe(true);
+    // DOG was REVEALED, not claimed — player still has to drag it.
+    expect(result.current.state.foundWords.has('DOG')).toBe(false);
+    expect(result.current.state.cascadeCount).toBe(1);
+    expect(result.current.state.lastChainDepth).toBe(1);
+    expect(result.current.state.chainEventKey).toBe(1);
+    expect(result.current.state.status).toBe('playing');
+  });
+
+  it('manually finding the revealed word completes the level', () => {
+    const { result } = renderHook(() => useBlastV2(revealLevel));
 
     act(() => {
       result.current.handlers.onPointerDown(cellId(0, 0));
@@ -50,9 +102,16 @@ describe('useBlastV2 hook', () => {
       result.current.handlers.onPointerUp();
     });
 
-    // CAT triggered 2 cascades (SUN + EGG) → chain depth = 2 for this submission
-    expect(result.current.state.lastChainDepth).toBe(2);
-    expect(result.current.state.chainEventKey).toBe(1);
+    // After CAT collapses, DOG sits across row 0: c0r0=D, c1r0=O, c2r0=G.
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(1, 0));
+      result.current.handlers.onPointerMove(cellId(2, 0));
+      result.current.handlers.onPointerUp();
+    });
+
+    expect(result.current.state.foundWords.has('DOG')).toBe(true);
+    expect(result.current.state.status).toBe('levelComplete');
   });
 
   it('invalid selection triggers invalidShakeKey increment', () => {

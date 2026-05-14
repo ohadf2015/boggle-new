@@ -3,7 +3,7 @@ import { useReducer, useMemo } from 'react';
 import type { BlastLevel, CellId } from './types';
 import { LOCALE_CONFIGS } from './locale-config';
 import {
-  reduceSelection, validateSelection, collapseCells, detectCascade, scoreForWord,
+  reduceSelection, validateSelection, collapseCells, detectAllCascades, scoreForWord,
   type SelectionState, type SelectionEvent, type ValidationResult,
 } from './engine';
 import { mechanicsForLevel } from './mechanic-flags';
@@ -69,28 +69,17 @@ function applyValidatedSubmit(state: State, cells: CellId[]): State {
   });
 
   if (kind === 'theme') {
+    // Target words formable on the board BEFORE this collapse (already-found excluded).
+    const formableBefore = new Set(
+      detectAllCascades(state.level, newFound, config).map((c) => c.word),
+    );
     newLevel = collapseCells(state.level, cells).level;
-    while (true) {
-      const cascade = detectCascade(newLevel, newFound, config);
-      if (!cascade) break;
-      newFound.add(cascade.word);
-      newCascadeCount += 1;
-
-      // Track cascade word
-      trackBlastWordFound({
-        level: state.level.levelNumber,
-        word: cascade.word,
-        axis: 'H', // Cascades are typically horizontal
-        length: cascade.word.length,
-        isCascade: true,
-        isBonus: false,
-      });
-
-      const cOut = scoreForWord(newLevel, cascade.cells, 'cascade', newCascadeCount);
-      newCoins += cOut.coinsBase + cOut.coinsFromOverlays;
-      newChestProgress += cOut.chestProgressDelta;
-      newLevel = collapseCells(newLevel, cascade.cells).level;
-    }
+    // Words the collapse newly REVEALED. The player still finds these manually —
+    // they are counted only for chain FX + telemetry, NOT added to foundWords.
+    const revealed = detectAllCascades(newLevel, newFound, config)
+      .map((c) => c.word)
+      .filter((w) => !formableBefore.has(w));
+    newCascadeCount += revealed.length;
   }
   const allFound = state.level.words.every((w) => newFound.has(w));
   const thisChainDepth = newCascadeCount - state.cascadeCount;
