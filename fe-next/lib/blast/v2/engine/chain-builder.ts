@@ -1,6 +1,7 @@
-import type { BlastColumn, BlastLevel, CellId, Locale } from '../types';
+import type { BlastColumn, BlastLevel, CellId, ChainLevelSpec, Letter, Locale } from '../types';
 import { cellId } from './cell-id';
 import { scanFormableThemeWords } from './word-scan';
+import { LOCALE_CONFIGS } from '../locale-config';
 
 export type InsertResult = { level: BlastLevel; cells: CellId[] };
 
@@ -81,4 +82,98 @@ export function insertWord(
   }
 
   return null;
+}
+
+const MAX_BUILD_ATTEMPTS = 200;
+
+function emptyColumns(count: number): BlastColumn[] {
+  return Array.from({ length: count }, (_, index) => ({ index, tiles: [] as Letter[] }));
+}
+
+/**
+ * S_N: the last word laid flat on the floor of an otherwise empty board.
+ */
+function floorBoard(spec: ChainLevelSpec): BlastLevel | null {
+  const last = [...(spec.chain[spec.chain.length - 1] ?? '')];
+  if (last.length > spec.columns) return null;
+  const columns = emptyColumns(spec.columns);
+  const offset = Math.floor((spec.columns - last.length) / 2);
+  last.forEach((ch, i) => columns[offset + i]!.tiles.push(ch));
+  return {
+    id: spec.id,
+    levelNumber: spec.levelNumber,
+    theme: spec.theme,
+    locale: spec.locale,
+    words: [...spec.chain],
+    resolvableOrder: [...spec.chain],
+    tileFlags: {},
+    difficulty: spec.levelNumber,
+    columns,
+  };
+}
+
+/**
+ * Builds a forced-chain BlastLevel from a spec. Returns null if no seed within
+ * MAX_BUILD_ATTEMPTS yields a valid level (author should then tweak the chain).
+ */
+export function buildChainLevel(spec: ChainLevelSpec, seed: number): BlastLevel | null {
+  const longest = Math.max(...spec.chain.map((w) => [...w].length));
+  if (longest > spec.columns) return null;
+
+  const rand = rng(seed);
+  for (let attempt = 0; attempt < MAX_BUILD_ATTEMPTS; attempt++) {
+    const attemptSeed = Math.floor(rand() * 0xffffffff) || 1;
+    const base = floorBoard(spec);
+    if (!base) return null;
+
+    let board = base;
+    let ok = true;
+    for (let k = spec.chain.length - 2; k >= 0; k--) {
+      const word = spec.chain[k]!;
+      const others = spec.chain.slice(k + 1);
+      const stepSeed = (attemptSeed + k * 7919) >>> 0;
+      const res = insertWord(board, word, others, spec.locale, stepSeed);
+      if (!res) {
+        ok = false;
+        break;
+      }
+      board = res.level;
+    }
+    if (!ok) continue;
+
+    const withDecoys = insertDecoys(board, spec, attemptSeed);
+    if (!withDecoys) continue;
+    return withDecoys;
+  }
+  return null;
+}
+
+/**
+ * Inserts decoy tiles into S_0 that never complete a theme word.
+ */
+function insertDecoys(level: BlastLevel, spec: ChainLevelSpec, seed: number): BlastLevel | null {
+  if (spec.decoyTiles <= 0) return level;
+  const config = LOCALE_CONFIGS[spec.locale];
+  const pool = config.tilePool;
+  const rand = rng(seed);
+  let board = level;
+
+  for (let placed = 0; placed < spec.decoyTiles; placed++) {
+    let success = false;
+    for (let tries = 0; tries < 60 && !success; tries++) {
+      const col = Math.floor(rand() * board.columns.length);
+      const letter = pool[Math.floor(rand() * pool.length)]!;
+      const columns = cloneColumns(board.columns);
+      columns[col]!.tiles.push(letter);
+      const candidate: BlastLevel = { ...board, columns };
+      const matches = scanFormableThemeWords(candidate, spec.chain, spec.locale);
+      const formable = new Set(matches.map((m) => m.word));
+      if (formable.size <= 1 && (formable.size === 0 || formable.has(spec.chain[0]!))) {
+        board = candidate;
+        success = true;
+      }
+    }
+    if (!success) return null;
+  }
+  return board;
 }
