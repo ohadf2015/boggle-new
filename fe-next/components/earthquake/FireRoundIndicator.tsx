@@ -37,6 +37,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
             <div className="flex flex-col">
               <span className="text-sm font-black uppercase tracking-wide text-neo-cream leading-none">{t('earthquake.fireRound')}</span>
               <span className="text-xs font-bold text-neo-lime leading-none mt-0.5">{t('earthquake.multiplier')}</span>
+              <span className="max-w-[11rem] text-[10px] font-semibold text-neo-cream/85 leading-tight mt-1">{t('earthquake.effect')}</span>
             </div>
             <div className="ms-2 bg-neo-black/20 text-white rounded-neo px-2 py-1 border-2 border-neo-black/40">
               <span className="text-xl font-black text-neo-cream tabular-nums">{remainingSeconds}s</span>
@@ -124,6 +125,9 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
                 </span>
                 <span className="text-xs font-bold text-neo-lime leading-none mt-0.5">
                   {t('earthquake.multiplier')}
+                </span>
+                <span className="max-w-[11rem] text-[10px] font-semibold text-neo-cream/85 leading-tight mt-1">
+                  {t('earthquake.effect')}
                 </span>
               </div>
 
