@@ -30,7 +30,12 @@ export function BlastAtmosphereOverlay({ modeColor }: Props) {
         return;
       }
       if (cancelled) {
-        app.destroy(true, { children: true, texture: true });
+        try {
+          app.destroy(true, { children: true, texture: true });
+        } catch {
+          // safe under fast unmount: Pixi's destroy() throws "_cancelResize is
+          // not a function" on a double-destroy / destroy-during-init race.
+        }
         return;
       }
 
@@ -71,7 +76,11 @@ export function BlastAtmosphereOverlay({ modeColor }: Props) {
 
     return () => {
       cancelled = true;
-      appInstance?.destroy(true, { children: true, texture: true });
+      try {
+        appInstance?.destroy(true, { children: true, texture: true });
+      } catch {
+        // safe: app may not have finished init, or was already torn down.
+      }
     };
   }, [modeColor, prefersReducedMotion]);
 
