@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { insertWord, buildChainLevel } from '../chain-builder';
 import { collapseCells } from '../collapse';
 import { scanFormableThemeWords } from '../word-scan';
+import { validateChainLevel } from '../chain-validator';
 import type { BlastColumn, BlastLevel, ChainLevelSpec } from '../../types';
-// TODO(task-4): import validateChainLevel from '../chain-validator';
 
 function lvl(columns: string[][]): BlastLevel {
   return {
@@ -63,6 +63,7 @@ describe('buildChainLevel', () => {
     expect(level).not.toBeNull();
     expect(level!.words).toEqual(['CAT', 'SUN', 'EGG']);
     expect(level!.resolvableOrder).toEqual(['CAT', 'SUN', 'EGG']);
+    expect(validateChainLevel(level!).ok).toBe(true);
   });
 
   it('column count matches the spec', () => {
