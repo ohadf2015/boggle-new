@@ -4,7 +4,7 @@ export interface LevelSource {
   resolve(levelNumber: number, locale: Locale, userIdBucket?: string): Promise<BlastLevel>;
 }
 
-export type LevelSourceRegistry = { curated: LevelSource; generated: LevelSource };
+export type LevelSourceRegistry = { curated: LevelSource; generated: LevelSource; chain: LevelSource };
 
 export const CURATED_LEVEL_CUTOFF = 30;
 

@@ -4,22 +4,54 @@
   place-items: center;
   width: var(--blast-tile-size, clamp(48px, 18cqi, 88px));
   aspect-ratio: 1 / 1;
+  /* Neo-brutalist hard border: 3px solid, near-black */
   border: 3px solid #0b1530;
-  border-radius: 14px;
+  border-radius: 10px;
+  /* Hard offset drop shadow (no blur) — neo-brutalist style */
   box-shadow: 4px 4px 0 0 #0b1530;
+  /* Bevel/depth via inner highlights: top light + bottom shadow */
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.12),
+    4px 4px 0 0 #0b1530;
   font-weight: 800;
   font-size: calc(var(--blast-tile-size, 64px) * 0.45);
+  /* Warm off-white tile face in rest state */
+  background: #f4e9d8;
   color: #0b1530;
   user-select: none;
   touch-action: none;
   cursor: pointer;
+  /* Smooth state transitions for depth effect */
+  transition: all 120ms ease-out;
 }
 
+/* Selected state: electric accent color face + white letter */
 .tile[data-state="selected"] {
-  box-shadow: 6px 6px 0 0 #0b1530;
-  filter: brightness(1.15);
+  /* Deeper shadow in pressed state */
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.12),
+    6px 6px 0 0 #0b1530;
+  /* Accent color — modeColor prop tints it, pink default for Blast */
+  background: var(--tile-mode-color, #ec4899);
+  color: #ffffff;
+  /* Subtle lift animation on selection */
+  filter: brightness(1.1);
 }
 
+/* Just-cleared state: drop shadow effect as tile explodes out */
+.tile[data-state="just-cleared"] {
+  box-shadow: none;
+}
+
+/* Frozen tile styling: lighter blue tint with reduced opacity */
+.tile[data-state-frozen] {
+  background: #bae6fd;
+  opacity: 0.6;
+}
+
+/* Double bonus rainbow pulse animation */
 .tile[data-double-bonus] {
   animation: rainbow-pulse 1.6s linear infinite;
 }
@@ -38,6 +70,8 @@
 
 .letter {
   line-height: 1;
+  /* Bold display font for Fredoka */
+  font-family: inherit;
 }
 
 .coin,
@@ -66,5 +100,30 @@
   }
   50% {
     transform: scale(1.15);
+  }
+}
+
+.revealGlow {
+  position: absolute;
+  inset: -2px;
+  border-radius: 12px;
+  pointer-events: none;
+  box-shadow: 0 0 0 3px #06b6d4, 0 0 16px 4px #06b6d4;
+  animation: revealPulse 0.9s ease-in-out 2;
+}
+
+@keyframes revealPulse {
+  0%, 100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .revealGlow {
+    animation: none;
+    opacity: 0.6;
   }
 }

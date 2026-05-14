@@ -115,4 +115,20 @@ describe('BlastBoard', () => {
     const board = container.querySelector('[data-testid="blast-board"]');
     expect(board).toHaveAttribute('dir', 'rtl');
   });
+
+  it('renders a reveal glow over the cells passed in revealGlowCells', () => {
+    const { container } = render(
+      <BlastBoard
+        level={mockLevel}
+        selection={{ kind: 'idle' }}
+        invalidShakeKey={0}
+        onPointerDown={vi.fn()}
+        onPointerEnter={vi.fn()}
+        onPointerUp={vi.fn()}
+        tileIds={mockLevel.columns.map((col, c) => col.tiles.map((_, r) => `t-${c}-${r}`))}
+        revealGlowCells={['c0r0', 'c1r0']}
+      />
+    );
+    expect(container.querySelectorAll('[data-reveal-glow]').length).toBe(2);
+  });
 });

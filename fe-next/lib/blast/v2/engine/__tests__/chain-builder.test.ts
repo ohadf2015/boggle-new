@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { insertWord, buildChainLevel } from '../chain-builder';
 import { collapseCells } from '../collapse';
 import { scanFormableThemeWords } from '../word-scan';
+import { validateChainLevel } from '../chain-validator';
 import type { BlastColumn, BlastLevel, ChainLevelSpec } from '../../types';
-// TODO(task-4): import validateChainLevel from '../chain-validator';
 
 function lvl(columns: string[][]): BlastLevel {
   return {
@@ -63,6 +63,7 @@ describe('buildChainLevel', () => {
     expect(level).not.toBeNull();
     expect(level!.words).toEqual(['CAT', 'SUN', 'EGG']);
     expect(level!.resolvableOrder).toEqual(['CAT', 'SUN', 'EGG']);
+    expect(validateChainLevel(level!).ok).toBe(true);
   });
 
   it('column count matches the spec', () => {
@@ -75,11 +76,13 @@ describe('buildChainLevel', () => {
     expect(buildChainLevel(bad, 7)).toBeNull();
   });
 
-  it('inserts the requested number of decoy tiles', () => {
-    const withDecoys: ChainLevelSpec = { ...spec, decoyTiles: 3 };
-    const level = buildChainLevel(withDecoys, 7)!;
-    const totalTiles = level.columns.reduce((n: number, c: BlastColumn) => n + c.tiles.length, 0);
-    const wordTiles = spec.chain.join('').length;
-    expect(totalTiles).toBe(wordTiles + 3);
+  it('returns null when decoyTiles > 0 — decoys are currently unsupported', () => {
+    // A non-word decoy tile can never be cleared by the forced chain, so it
+    // is always "leftover" and fails validateChainLevel's empty-board check.
+    // Decoys are deferred until the win condition or placement model changes.
+    // When decoy support lands, replace this with a real placement assertion.
+    const withDecoys: ChainLevelSpec = { ...spec, columns: 8, decoyTiles: 1 };
+    expect(buildChainLevel(withDecoys, 99)).toBeNull();
   });
+
 });

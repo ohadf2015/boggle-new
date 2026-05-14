@@ -7,6 +7,8 @@ import { LOCALE_CONFIGS } from '@/lib/blast/v2/locale-config';
 import { BlastTile, type BlastTileState } from './BlastTile';
 import { BlastSelectionPath } from './BlastSelectionPath';
 import { BlastAlmostGhost } from './BlastAlmostGhost';
+import { useCollapseTimeline } from './useCollapseTimeline';
+import styles from './BlastTile.module.css';
 
 type Props = {
   level: BlastLevel;
@@ -18,6 +20,7 @@ type Props = {
   modeColor?: string;
   almosts?: AlmostWord[];
   tileIds: string[][];
+  revealGlowCells?: CellId[];
 };
 
 export function BlastBoard({
@@ -30,10 +33,14 @@ export function BlastBoard({
   modeColor = '#ec4899',
   almosts,
   tileIds,
+  revealGlowCells = [],
 }: Props) {
   const config = LOCALE_CONFIGS[level.locale];
   const boardRef = useRef<HTMLDivElement>(null);
   const selectedSet = selection.kind === 'active' ? new Set(selection.cells) : new Set<CellId>();
+  const revealGlowSet = new Set(revealGlowCells);
+
+  useCollapseTimeline(boardRef, tileIds);
 
   const getCellCenter = useCallback((id: CellId) => {
     const board = boardRef.current;
@@ -102,19 +109,24 @@ export function BlastBoard({
                 const id = makeCellId(col.index, row);
                 const flags = level.tileFlags[id] ?? [];
                 const tileKey = tileIds[c]?.[row] ?? id;
+                const hasRevealGlow = revealGlowSet.has(id);
                 return (
-                  <BlastTile
-                    key={tileKey}
-                    cellId={id}
-                    letter={letter}
-                    displayChar={config.displayChar(letter, row, col.tiles.length)}
-                    flags={flags}
-                    state={tileState(id)}
-                    modeColor={modeColor}
-                    fontStack={config.fontStack}
-                    paddingExtra={config.tileExtraPadding}
-                    onPointerDown={() => onPointerDown(id)}
-                  />
+                  <div key={tileKey} className="relative">
+                    <BlastTile
+                      cellId={id}
+                      letter={letter}
+                      displayChar={config.displayChar(letter, row, col.tiles.length)}
+                      flags={flags}
+                      state={tileState(id)}
+                      modeColor={modeColor}
+                      fontStack={config.fontStack}
+                      paddingExtra={config.tileExtraPadding}
+                      onPointerDown={() => onPointerDown(id)}
+                    />
+                    {hasRevealGlow && (
+                      <span data-reveal-glow className={styles.revealGlow} />
+                    )}
+                  </div>
                 );
               })}
             </AnimatePresence>

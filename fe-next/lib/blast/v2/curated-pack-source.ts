@@ -35,6 +35,9 @@ export class CuratedPackSource implements LevelSource {
     const files = await readdir(dir);
     for (const file of files) {
       if (!file.endsWith('.json')) continue;
+      // pack-chain.json is a forced-chain pack (ChainLevelSpec schema, owned by
+      // ChainPackSource) — not a curated BlastLevel pack. Skip it here.
+      if (file === 'pack-chain.json') continue;
       const raw = JSON.parse(await readFile(join(dir, file), 'utf-8')) as PackFile;
       for (const lvl of raw.levels) {
         if (lvl.levelNumber === levelNumber) {

@@ -41,11 +41,11 @@ describe('validateCuratedLevel', () => {
 });
 
 describe('CuratedPackSource', () => {
-  it('resolve(1, "en") returns valid level', async () => {
+  it('resolve(3, "en") returns valid level', async () => {
     const basePath = join(process.cwd(), 'content', 'blast', 'packs');
     const source = new CuratedPackSource(basePath);
-    const lvl = await source.resolve(1, 'en');
-    expect(lvl.levelNumber).toBe(1);
+    const lvl = await source.resolve(3, 'en');
+    expect(lvl.levelNumber).toBe(3);
     expect(lvl.locale).toBe('en');
     expect(lvl.words.length).toBeGreaterThan(0);
   });
@@ -54,5 +54,15 @@ describe('CuratedPackSource', () => {
     const basePath = join(process.cwd(), 'content', 'blast', 'packs');
     const source = new CuratedPackSource(basePath);
     await expect(source.resolve(31, 'en')).rejects.toThrow(/outside curated range/);
+  });
+
+  it('ignores pack-chain.json (forced-chain schema, not a curated pack)', async () => {
+    // pack-chain.json sits in the same dir but has the ChainLevelSpec schema
+    // (no `words`). The curated loader must skip it rather than choke on it.
+    const basePath = join(process.cwd(), 'content', 'blast', 'packs');
+    const source = new CuratedPackSource(basePath);
+    const lvl = await source.resolve(1, 'en');
+    expect(lvl.id).toBe('onboarding-1');
+    expect(lvl.words.length).toBeGreaterThan(0);
   });
 });
