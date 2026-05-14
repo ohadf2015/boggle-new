@@ -20,7 +20,7 @@ vi.mock('framer-motion', () => ({
         value = newValue;
         listeners.forEach((listener) => listener(newValue));
       },
-      onChange: (listener: (v: number) => void) => {
+      on: (_event: string, listener: (v: number) => void) => {
         listeners.add(listener);
         return () => listeners.delete(listener);
       },
@@ -37,13 +37,13 @@ vi.mock('framer-motion', () => ({
         return Math.max(outputRange[0], Math.min(outputRange[1], output));
       },
       set: vi.fn(),
-      onChange: (listener: (v: number) => void) => {
+      on: (_event: string, listener: (v: number) => void) => {
         listeners.add(listener);
         return () => listeners.delete(listener);
       },
     };
     // Subscribe to changes in source motion value
-    motionValue.onChange(() => {
+    motionValue.on('change', () => {
       listeners.forEach((listener) => listener(mockMotionValue.get()));
     });
     return mockMotionValue;
