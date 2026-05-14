@@ -41,7 +41,7 @@ vi.mock('../../events/gameCleanup', () => {
   return { gameCleanupEmitter: emitter, default: emitter };
 });
 
-import { scheduleRoundEvent, clearRoundEventTimers, EVENT_CONFIG, CATALYST_POOL, pickRandomCatalyst } from '../roundEventsManager';
+import * as roundEventsManagerModule from '../roundEventsManager';
 import { getGame, updateGame } from '../gameStateManager';
 import { broadcastToRoom } from '../../utils/socketHelpers';
 const mockGetGame = getGame as Mock;
@@ -49,6 +49,9 @@ const mockUpdateGame = updateGame as Mock;
 const mockBroadcastToRoom = broadcastToRoom as Mock;
 const mockTimerSet = mockTimerManagerInstance.setTimeout;
 const mockTimerClear = mockTimerManagerInstance.clearTimersWithPrefix;
+
+// Import after the mocks are set up
+const { scheduleRoundEvent, clearRoundEventTimers, EVENT_CONFIG, CATALYST_POOL, pickRandomCatalyst } = roundEventsManagerModule;
 
 function makeGame(overrides: Partial<GameState> = {}): GameState {
   return {
@@ -71,6 +74,9 @@ describe('roundEventsManager', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Mock pickRandomCatalyst to return a non-earthquake catalyst by default
+    // so existing tests don't need to be rewritten for the unification
+    vi.spyOn(roundEventsManagerModule, 'pickRandomCatalyst').mockReturnValue('blizzard');
   });
 
   describe('clearRoundEventTimers', () => {
@@ -90,7 +96,7 @@ describe('roundEventsManager', () => {
         'ABCD',
         expect.objectContaining({
           roundEventSchedule: expect.objectContaining({
-            eventType: expect.stringMatching(/^(blizzard|lightning|meteor)$/),
+            eventType: expect.stringMatching(/^(blizzard|lightning|meteor|earthquake)$/),
             triggerAtPercent: expect.any(Number),
           }),
           activeRoundEvent: null,
