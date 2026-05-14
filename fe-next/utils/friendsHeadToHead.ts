@@ -264,14 +264,15 @@ export async function getPendingChallenges(): Promise<FriendChallenge[]> {
     message?: string;
     status: 'pending' | 'accepted' | 'declined' | 'expired' | 'completed';
     created_at: string;
-    profiles: Array<{
+    // PostgREST returns a forward (many-to-one) FK embed as a single object, not an array.
+    profiles: {
       username: string;
       avatar_emoji?: string;
       avatar_color?: string;
-    }>;
+    } | null;
   }
   return (challenges as unknown as ChallengeWithRelations[]).map((c: ChallengeWithRelations) => {
-    const challenger = c.profiles?.[0];
+    const challenger = c.profiles;
     return {
       id: c.id,
       challengerId: c.challenger_id,
