@@ -39,6 +39,10 @@ describe('scanFormableThemeWords', () => {
     const board = lvl([['C'], ['A'], ['T'], ['C'], ['A'], ['T']]);
     const matches = scanFormableThemeWords(board, ['CAT']);
     expect(matches.length).toBe(2);
+    expect(matches.map((m) => m.cells)).toEqual([
+      ['c0r0', 'c1r0', 'c2r0'],
+      ['c3r0', 'c4r0', 'c5r0'],
+    ]);
   });
 
   it('respects locale normalization for Hebrew final forms', () => {
