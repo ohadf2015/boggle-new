@@ -1,3 +1,9 @@
+// Hebrew tile bag — regular forms only. Final (sofit) forms ך ם ן ף ץ are
+// NOT drawable tiles: hebrewDisplay.ts renders the final glyph at word-end
+// from the regular tile, and dictionary.ts normalizes sofit→regular on
+// lookup. Keeping sofit tiles in the bag let them be placed mid-word, and
+// the normalized dictionary then accepted the result as a real word — which
+// is how WORDBOT ended up playing impossible words.
 export const values: Record<string, number> = {
   א: 1,
   ב: 3,
@@ -10,18 +16,13 @@ export const values: Record<string, number> = {
   ט: 6,
   י: 1,
   כ: 4,
-  ך: 4,
   ל: 2,
   מ: 2,
-  ם: 2,
   נ: 3,
-  ן: 3,
   ס: 5,
   ע: 2,
   פ: 5,
-  ף: 5,
   צ: 6,
-  ץ: 6,
   ק: 6,
   ר: 2,
   ש: 2,
@@ -29,6 +30,8 @@ export const values: Record<string, number> = {
   _: 0,
 };
 
+// Sofit counts folded into their regular forms (total stays 100):
+// ך(2)→כ, ם(2)→מ, ן(2)→נ, ף(1)→פ, ץ(1)→צ.
 export const distribution: Record<string, number> = {
   א: 6,
   ב: 4,
@@ -40,19 +43,14 @@ export const distribution: Record<string, number> = {
   ח: 2,
   ט: 1,
   י: 12,
-  כ: 2,
-  ך: 2,
+  כ: 4,
   ל: 6,
-  מ: 3,
-  ם: 2,
-  נ: 3,
-  ן: 2,
+  מ: 5,
+  נ: 5,
   ס: 2,
   ע: 4,
-  פ: 2,
-  ף: 1,
-  צ: 2,
-  ץ: 1,
+  פ: 3,
+  צ: 3,
   ק: 2,
   ר: 6,
   ש: 3,

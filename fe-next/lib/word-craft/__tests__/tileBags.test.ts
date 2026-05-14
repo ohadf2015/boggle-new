@@ -42,6 +42,27 @@ describe('locale tile bags', () => {
     expect(distribution['א']).toBeGreaterThan(0);
   });
 
+  it('he bag has no final-form letters in distribution or values', () => {
+    // Final forms (sofit) must never be drawable tiles — hebrewDisplay.ts
+    // renders the final glyph at word-end from the regular tile. Keeping
+    // sofit tiles in the bag let the bot place them mid-word and the
+    // normalized dictionary accepted the result as a real word.
+    const { distribution, values } = getTileBag('he');
+    for (const sofit of ['ך', 'ם', 'ן', 'ף', 'ץ']) {
+      expect(distribution[sofit]).toBeUndefined();
+      expect(values[sofit]).toBeUndefined();
+    }
+  });
+
+  it('he bag redistributes sofit counts onto the regular forms', () => {
+    const { distribution } = getTileBag('he');
+    expect(distribution['כ']).toBe(4);
+    expect(distribution['מ']).toBe(5);
+    expect(distribution['נ']).toBe(5);
+    expect(distribution['פ']).toBe(3);
+    expect(distribution['צ']).toBe(3);
+  });
+
   it('es bag contains ñ (Ñ)', () => {
     const { distribution } = getTileBag('es');
     expect(distribution['Ñ']).toBeGreaterThan(0);

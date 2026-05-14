@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import { cn } from '@/lib/utils';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 /**
  * Pinch-zoom + 1-finger pan wrapper for the WordCraft board.
@@ -100,6 +101,15 @@ export function WordCraftZoomShell({
   const [scale, setScale] = useState(1);
   const [tx, setTx] = useState(0);
   const [ty, setTy] = useState(0);
+
+  const reducedMotion = usePrefersReducedMotion();
+
+  // Cinematic depth: while a zoom transition is in flight the board carries a
+  // slight blur (motion-blur feel) that snaps sharp once it settles. Tracked
+  // separately from `isZoomed` so the expensive filter only runs during the
+  // ~320ms camera move, not the whole time the player is panning around.
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const prevTransformRef = useRef({ scale: 1, tx: 0, ty: 0 });
 
   // Auto-follow bookkeeping. `userControlled` flips on any manual gesture so
   // the follow stops fighting the player; it re-arms when focus clears (turn
@@ -296,15 +306,33 @@ export function WordCraftZoomShell({
     setTy(clamped.ty);
   }, [focusKey, boardSize, focusCells, clampTranslation]);
 
-  const transformStyle = useMemo(
-    () => ({
+  // Flag a transition whenever the transform actually changes (not during a
+  // live pinch — that follows the finger 1:1 with no easing, so no blur).
+  useEffect(() => {
+    const prev = prevTransformRef.current;
+    if (prev.scale === scale && prev.tx === tx && prev.ty === ty) return;
+    prevTransformRef.current = { scale, tx, ty };
+    if (!gestureRef.current) setIsTransitioning(true);
+  }, [scale, tx, ty]);
+
+  const handleTransitionEnd = useCallback(() => setIsTransitioning(false), []);
+
+  const transformStyle = useMemo(() => {
+    const easing = 'cubic-bezier(0.65, 0, 0.35, 1)';
+    const transition = gestureRef.current
+      ? 'none'
+      : reducedMotion
+        ? 'transform 1ms linear'
+        : `transform 320ms ${easing}, filter 200ms ease-out`;
+    const blurred = !reducedMotion && isTransitioning && !gestureRef.current;
+    return {
       transform: `translate(${tx}px, ${ty}px) scale(${scale})`,
       transformOrigin: 'center center',
-      transition: gestureRef.current ? 'none' : 'transform 180ms ease-out',
+      transition,
+      filter: blurred ? 'blur(3px)' : 'none',
       willChange: 'transform',
-    }),
-    [scale, tx, ty],
-  );
+    };
+  }, [scale, tx, ty, reducedMotion, isTransitioning]);
 
   return (
     <div
@@ -319,9 +347,29 @@ export function WordCraftZoomShell({
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
     >
-      <div className="w-full h-full" style={transformStyle}>
+      <div
+        className="w-full h-full"
+        style={transformStyle}
+        data-wc-board
+        data-wc-transitioning={isTransitioning ? 'true' : 'false'}
+        onTransitionEnd={handleTransitionEnd}
+      >
         {children}
       </div>
+      {/* Cinematic vignette — darkens the board edges while zoomed so the
+          focused area reads as the camera's depth-of-field subject. */}
+      <div
+        data-wc-vignette
+        aria-hidden
+        className={cn(
+          'pointer-events-none absolute inset-0 z-[1] transition-opacity duration-300',
+          isZoomed && !reducedMotion ? 'opacity-100' : 'opacity-0',
+        )}
+        style={{
+          background:
+            'radial-gradient(ellipse at center, transparent 55%, rgba(26,26,46,0.78) 100%)',
+        }}
+      />
       {isZoomed && (
         <button
           type="button"

@@ -124,7 +124,10 @@ export function findBestBotMove(
           const result = validateAndScoreMove(board, placements, isWordValid);
           if (!result.ok || result.score === undefined) continue;
           if (!best || result.score > best.score) {
-            best = { placements, score: result.score, word };
+            // The played word can extend through existing board tiles, so the
+            // real main word (result.words[0]) differs from the rack word.
+            const playedWord = result.words?.[0]?.word ?? word;
+            best = { placements, score: result.score, word: playedWord };
           }
         }
       }

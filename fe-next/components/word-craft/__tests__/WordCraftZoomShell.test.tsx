@@ -184,6 +184,79 @@ describe('WordCraftZoomShell', () => {
     expect(screen.queryByLabelText('Reset zoom')).not.toBeInTheDocument();
   });
 
+  it('renders a vignette overlay that fades in only while zoomed', () => {
+    render(
+      <WordCraftZoomShell>
+        <div data-testid="board">child</div>
+      </WordCraftZoomShell>,
+    );
+    const region = screen.getByRole('region');
+    const vignette = region.querySelector('[data-wc-vignette]');
+    expect(vignette).not.toBeNull();
+    // Hidden at 1×.
+    expect(vignette!.className).toMatch(/opacity-0/);
+    // Zoom in via double-tap → vignette fades in.
+    act(() => {
+      pointerDown(region, 1, 100, 100);
+      pointerUp(region, 1, 100, 100);
+      pointerDown(region, 2, 100, 100);
+    });
+    expect(vignette!.className).toMatch(/opacity-100/);
+  });
+
+  it('marks the board transitioning on a zoom change and clears it on transitionend', () => {
+    render(
+      <WordCraftZoomShell>
+        <div data-testid="board">child</div>
+      </WordCraftZoomShell>,
+    );
+    const region = screen.getByRole('region');
+    const boardLayer = region.querySelector('[data-wc-board]') as HTMLElement;
+    expect(boardLayer).not.toBeNull();
+    expect(boardLayer.getAttribute('data-wc-transitioning')).toBe('false');
+    act(() => {
+      pointerDown(region, 1, 100, 100);
+      pointerUp(region, 1, 100, 100);
+      pointerDown(region, 2, 100, 100);
+    });
+    expect(boardLayer.getAttribute('data-wc-transitioning')).toBe('true');
+    act(() => {
+      fireEvent.transitionEnd(boardLayer);
+    });
+    expect(boardLayer.getAttribute('data-wc-transitioning')).toBe('false');
+  });
+
+  it('reduced motion: no blur filter is applied to the board while transitioning', () => {
+    const original = window.matchMedia;
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: query.includes('reduced-motion'),
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+    try {
+      render(
+        <WordCraftZoomShell>
+          <div data-testid="board">child</div>
+        </WordCraftZoomShell>,
+      );
+      const region = screen.getByRole('region');
+      const boardLayer = region.querySelector('[data-wc-board]') as HTMLElement;
+      act(() => {
+        pointerDown(region, 1, 100, 100);
+        pointerUp(region, 1, 100, 100);
+        pointerDown(region, 2, 100, 100);
+      });
+      expect(boardLayer.style.filter).not.toMatch(/blur/);
+    } finally {
+      window.matchMedia = original;
+    }
+  });
+
   it('clamps scale to MAX even with extreme spreads', () => {
     render(
       <WordCraftZoomShell>

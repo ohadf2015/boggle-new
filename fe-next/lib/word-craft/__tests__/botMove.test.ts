@@ -104,6 +104,28 @@ describe('findBestBotMove', () => {
     expect(move!.placements.length).toBe(7);
   });
 
+  it('reports the actual played word, not the rack permutation, when extending', () => {
+    const board = createBoard();
+    placeTiles(board, [place(7, 7, 'C'), place(7, 8, 'A'), place(7, 9, 'T')]);
+    const rack = makeRack('ERXYZ__');
+    // Bot plays ER at (7,10),(7,11). findMainWordSpan extends left through
+    // the existing CAT → the real word is CATER, not the rack word ER.
+    const dict = new Set(['CAT', 'ER', 'CATER']);
+    const move = findBestBotMove(board, rack, (w) => dict.has(w.toUpperCase()));
+    expect(move).not.toBeNull();
+    expect(move!.word).toBe('CATER');
+  });
+
+  it('returned word always satisfies the provided isWordValid predicate', () => {
+    const board = createBoard();
+    placeTiles(board, [place(7, 7, 'C'), place(7, 8, 'A'), place(7, 9, 'T')]);
+    const rack = makeRack('ERSOLM_');
+    const dict = new Set(['CAT', 'ER', 'CATER', 'SO', 'OS', 'CATERS']);
+    const isWordValid = (w: string) => dict.has(w.toUpperCase());
+    const move = findBestBotMove(board, rack, isWordValid);
+    if (move) expect(isWordValid(move.word)).toBe(true);
+  });
+
   it('respects maxLength option (caps permutation length)', () => {
     const board = createBoard();
     const rack = makeRack('STRAINS');
