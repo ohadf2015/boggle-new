@@ -153,4 +153,30 @@ describe('useBlastV2 hook', () => {
 
     expect(result.current.state.status).toBe('levelComplete');
   });
+
+  it('initializes tileIds parallel to the level columns', () => {
+    const { result } = renderHook(() => useBlastV2(revealLevel));
+    expect(result.current.state.tileIds).toEqual([
+      ['t-0-0', 't-0-1', 't-0-2', 't-0-3'],
+      ['t-1-0'],
+      ['t-2-0'],
+    ]);
+  });
+
+  it('preserves tile identity through a collapse', () => {
+    const { result } = renderHook(() => useBlastV2(revealLevel));
+
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(0, 1));
+      result.current.handlers.onPointerMove(cellId(0, 2));
+      result.current.handlers.onPointerUp();
+    });
+
+    expect(result.current.state.tileIds).toEqual([
+      ['t-0-3'],
+      ['t-1-0'],
+      ['t-2-0'],
+    ]);
+  });
 });

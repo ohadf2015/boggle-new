@@ -5,6 +5,9 @@ export type CollapseResult = {
   level: BlastLevel;
   thawedCells: CellId[];
   slidCells: { from: CellId; to: CellId }[];
+  // Per-column old-row -> new-row map for every tile that survived the collapse.
+  // Keyed by column index. Reflects vertical gravity only (lateral slides are in slidCells).
+  rowRemapByCol: Map<number, Map<number, number>>;
 };
 
 export function collapseCells(level: BlastLevel, popped: CellId[]): CollapseResult {
@@ -82,5 +85,41 @@ export function collapseCells(level: BlastLevel, popped: CellId[]): CollapseResu
     }
   }
 
-  return { level: resultLevel, thawedCells: thawed, slidCells: slid };
+  return { level: resultLevel, thawedCells: thawed, slidCells: slid, rowRemapByCol: flagRemapByCol };
+}
+
+// Produce post-collapse tileIds parallel to `collapse.level.columns`, given the
+// pre-collapse columns + pre-collapse tileIds. Surviving tiles keep their id and
+// move to their new slot; popped tiles' ids drop out; lateral-slid tiles' ids
+// move columns. Pure — mirrors the gravity collapseCells applied to the tiles.
+export function rebuildTileIds(
+  oldColumns: BlastColumn[],
+  oldTileIds: string[][],
+  collapse: CollapseResult,
+): string[][] {
+  // Step 1: vertical gravity — remap each surviving tile id to its new row.
+  const byColIndex = new Map<number, string[]>();
+  oldColumns.forEach((col, c) => {
+    const remap = collapse.rowRemapByCol.get(col.index);
+    const next = new Array<string>(remap ? remap.size : 0);
+    if (remap) {
+      for (const [oldRow, newRow] of remap) {
+        next[newRow] = oldTileIds[c]![oldRow]!;
+      }
+    }
+    byColIndex.set(col.index, next);
+  });
+
+  // Step 2: lateral slides (gravityMode 'lateral-slide' only).
+  for (const { from, to } of collapse.slidCells) {
+    const moving = byColIndex.get(parseCell(from).col);
+    const target = byColIndex.get(parseCell(to).col);
+    if (moving && target && moving.length > 0) {
+      target.push(moving[0]!);
+      byColIndex.set(parseCell(from).col, []);
+    }
+  }
+
+  // Emit parallel to the post-collapse column order.
+  return collapse.level.columns.map((col) => byColIndex.get(col.index) ?? []);
 }

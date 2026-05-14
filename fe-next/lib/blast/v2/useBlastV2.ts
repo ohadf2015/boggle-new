@@ -3,7 +3,7 @@ import { useReducer, useMemo } from 'react';
 import type { BlastLevel, CellId } from './types';
 import { LOCALE_CONFIGS } from './locale-config';
 import {
-  reduceSelection, validateSelection, collapseCells, detectAllCascades, scoreForWord,
+  reduceSelection, validateSelection, collapseCells, rebuildTileIds, detectAllCascades, scoreForWord,
   type SelectionState, type SelectionEvent, type ValidationResult,
 } from './engine';
 import { mechanicsForLevel } from './mechanic-flags';
@@ -22,6 +22,7 @@ type State = {
   lastValidation: ValidationResult | null;
   lastChainDepth: number;
   chainEventKey: number;
+  tileIds: string[][];
 };
 
 type Action =
@@ -54,6 +55,7 @@ function applyValidatedSubmit(state: State, cells: CellId[]): State {
   const newFound = new Set(state.foundWords);
   newFound.add(res.word);
   let newLevel = state.level;
+  let newTileIds = state.tileIds;
   let newChestProgress = state.chestProgress + outcome.chestProgressDelta;
   let newCascadeCount = state.cascadeCount;
   let newCoins = state.coins + outcome.coinsBase + outcome.coinsFromOverlays;
@@ -73,7 +75,9 @@ function applyValidatedSubmit(state: State, cells: CellId[]): State {
     const formableBefore = new Set(
       detectAllCascades(state.level, newFound, config).map((c) => c.word),
     );
-    newLevel = collapseCells(state.level, cells).level;
+    const collapse = collapseCells(state.level, cells);
+    newLevel = collapse.level;
+    newTileIds = rebuildTileIds(state.level.columns, state.tileIds, collapse);
     // The player still finds these manually — revealed.length feeds chain FX
     // and aggregate submission/completion telemetry, but foundWords is unchanged.
     const revealed = detectAllCascades(newLevel, newFound, config)
@@ -94,6 +98,7 @@ function applyValidatedSubmit(state: State, cells: CellId[]): State {
     status: allFound ? 'levelComplete' : 'playing',
     lastChainDepth: thisChainDepth,
     chainEventKey: state.chainEventKey + 1,
+    tileIds: newTileIds,
   };
 }
 
@@ -128,6 +133,7 @@ export function useBlastV2(initialLevel: BlastLevel) {
     lastValidation: null,
     lastChainDepth: 0,
     chainEventKey: 0,
+    tileIds: initialLevel.columns.map((col, c) => col.tiles.map((_, r) => `t-${c}-${r}`)),
   };
   const [state, dispatch] = useReducer(reducer, initial);
   const handlers = useMemo(

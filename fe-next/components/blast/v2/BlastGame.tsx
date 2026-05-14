@@ -296,6 +296,7 @@ export function BlastGame({
           onPointerUp={handlers.onPointerUp}
           modeColor={modeColor}
           almosts={almosts}
+          tileIds={state.tileIds}
         />
       </div>
       {tutorial.showFtueOverlay && !isVeteranPlayer && ftueStep !== null && (

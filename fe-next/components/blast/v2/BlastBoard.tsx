@@ -17,6 +17,7 @@ type Props = {
   onPointerUp: () => void;
   modeColor?: string;
   almosts?: AlmostWord[];
+  tileIds: string[][];
 };
 
 export function BlastBoard({
@@ -28,6 +29,7 @@ export function BlastBoard({
   onPointerUp,
   modeColor = '#ec4899',
   almosts,
+  tileIds,
 }: Props) {
   const config = LOCALE_CONFIGS[level.locale];
   const boardRef = useRef<HTMLDivElement>(null);
@@ -93,15 +95,16 @@ export function BlastBoard({
       onPointerUp={onPointerUp}
     >
       <LayoutGroup>
-        {level.columns.map((col) => (
+        {level.columns.map((col, c) => (
           <div key={col.index} className="flex flex-col-reverse gap-2" data-col={col.index}>
             <AnimatePresence>
               {col.tiles.map((letter, row) => {
                 const id = makeCellId(col.index, row);
                 const flags = level.tileFlags[id] ?? [];
+                const tileKey = tileIds[c]?.[row] ?? id;
                 return (
                   <BlastTile
-                    key={id}
+                    key={tileKey}
                     cellId={id}
                     letter={letter}
                     displayChar={config.displayChar(letter, row, col.tiles.length)}

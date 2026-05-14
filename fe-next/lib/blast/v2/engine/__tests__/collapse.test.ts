@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { collapseCells } from '../collapse';
+import { collapseCells, rebuildTileIds } from '../collapse';
 import { cellId } from '../cell-id';
 import type { BlastLevel } from '../../types';
 
@@ -78,5 +78,88 @@ describe('gravity collapse', () => {
     expect(col1.tiles).toEqual([]);
     expect(col2.tiles).toEqual(['Y']);
     expect(result.slidCells).toEqual([{ from: cellId(1, 0), to: cellId(0, 0) }]);
+  });
+});
+
+describe('collapseCells rowRemapByCol', () => {
+  it('maps each surviving tile old-row to its post-collapse row', () => {
+    const level: BlastLevel = {
+      id: 'remap-test',
+      levelNumber: 1,
+      locale: 'en',
+      theme: 'onboarding',
+      columns: [
+        { index: 0, tiles: ['A', 'B', 'C', 'D'] },
+        { index: 1, tiles: ['E', 'F'] },
+      ],
+      words: [],
+      resolvableOrder: [],
+      tileFlags: {},
+      gravityMode: 'standard',
+      difficulty: 1,
+    };
+    const result = collapseCells(level, [cellId(0, 0), cellId(0, 2)]);
+
+    const col0 = result.rowRemapByCol.get(0)!;
+    expect(col0.get(1)).toBe(0);
+    expect(col0.get(3)).toBe(1);
+    expect(col0.has(0)).toBe(false);
+    expect(col0.has(2)).toBe(false);
+
+    const col1 = result.rowRemapByCol.get(1)!;
+    expect(col1.get(0)).toBe(0);
+    expect(col1.get(1)).toBe(1);
+  });
+});
+
+describe('rebuildTileIds', () => {
+  it('keeps surviving tile ids attached as they fall (standard gravity)', () => {
+    const level: BlastLevel = {
+      id: 'rebuild-test',
+      levelNumber: 1,
+      locale: 'en',
+      theme: 'onboarding',
+      columns: [
+        { index: 0, tiles: ['A', 'B', 'C', 'D'] },
+        { index: 1, tiles: ['E'] },
+      ],
+      words: [],
+      resolvableOrder: [],
+      tileFlags: {},
+      gravityMode: 'standard',
+      difficulty: 1,
+    };
+    const tileIds = [['a', 'b', 'c', 'd'], ['e']];
+    const collapse = collapseCells(level, [cellId(0, 0), cellId(0, 2)]);
+
+    const next = rebuildTileIds(level.columns, tileIds, collapse);
+
+    expect(next[0]).toEqual(['b', 'd']);
+    expect(next[1]).toEqual(['e']);
+  });
+
+  it('moves a tile id across columns on a lateral slide', () => {
+    const level: BlastLevel = {
+      id: 'rebuild-slide-test',
+      levelNumber: 1,
+      locale: 'en',
+      theme: 'onboarding',
+      columns: [
+        { index: 0, tiles: ['A', 'B'] },
+        { index: 1, tiles: ['C'] },
+      ],
+      words: [],
+      resolvableOrder: [],
+      tileFlags: {},
+      gravityMode: 'lateral-slide',
+      difficulty: 1,
+    };
+    const tileIds = [['a', 'b'], ['c']];
+    const collapse = collapseCells(level, [cellId(0, 0), cellId(0, 1)]);
+
+    const next = rebuildTileIds(level.columns, tileIds, collapse);
+
+    expect(next[0]).toEqual(['c']);
+    expect(next[1]).toEqual([]);
   });
 });

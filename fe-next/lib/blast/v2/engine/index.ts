@@ -2,7 +2,7 @@ export { reduceSelection } from './selection-state';
 export type { SelectionState, SelectionEvent, SelectionTransition } from './selection-state';
 export { validateSelection } from './validation';
 export type { ValidationResult, ValidationContext } from './validation';
-export { collapseCells } from './collapse';
+export { collapseCells, rebuildTileIds } from './collapse';
 export type { CollapseResult } from './collapse';
 export { detectCascade, detectAllCascades } from './cascade';
 export type { Cascade } from './cascade';
