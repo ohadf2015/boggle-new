@@ -63,6 +63,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/daily/word-wheel",
   "/editorial-policy",
   "/education",
+  "/education/access",
   "/education/classroom-game",
   "/education/duels",
   "/education/esl-word-games",

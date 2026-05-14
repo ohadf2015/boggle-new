@@ -89,3 +89,5 @@ export function PageClient() {
     </main>
   );
 }
+
+export default PageClient;
