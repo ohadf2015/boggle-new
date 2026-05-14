@@ -147,7 +147,7 @@ function registerEarthquakeHandlers(io: Server, socket: Socket): void {
  * @param gameCode - Game code
  * @param game - Game object
  */
-function executeEarthquakeSequence(io: Server, gameCode: string, game: GameState): void {
+export function executeEarthquakeSequence(io: Server, gameCode: string, game: GameState): void {
   const room = getGameRoom(gameCode);
 
   logger.info('EARTHQUAKE', `Starting earthquake sequence for game ${gameCode}`);

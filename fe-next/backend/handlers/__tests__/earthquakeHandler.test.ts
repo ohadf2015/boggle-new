@@ -45,7 +45,7 @@ vi.mock('../../events/gameCleanup', () => ({
   gameCleanupEmitter: { onGameEnd: vi.fn(), onGameReset: vi.fn() },
 }));
 
-import { registerEarthquakeHandlers, EARTHQUAKE_CONFIG } from '../earthquakeHandler';
+import * as earthquakeHandler from '../earthquakeHandler';
 import { getGame, getGameBySocketId, updateGame } from '../../modules/gameStateManager';
 import { broadcastToRoom } from '../../utils/socketHelpers';
 
@@ -81,14 +81,20 @@ function createMockSocket(id = 'host-socket-id') {
 
 describe('EARTHQUAKE_CONFIG durations (catalyst unification)', () => {
   it('uses the scaled-up multiplayer durations', () => {
-    expect(EARTHQUAKE_CONFIG.warningDurationMs).toBe(3000);
-    expect(EARTHQUAKE_CONFIG.shakeDurationMs).toBe(1500);
-    expect(EARTHQUAKE_CONFIG.fireRoundDurationSeconds).toBe(23);
+    expect(earthquakeHandler.EARTHQUAKE_CONFIG.warningDurationMs).toBe(3000);
+    expect(earthquakeHandler.EARTHQUAKE_CONFIG.shakeDurationMs).toBe(1500);
+    expect(earthquakeHandler.EARTHQUAKE_CONFIG.fireRoundDurationSeconds).toBe(23);
+  });
+});
+
+describe('executeEarthquakeSequence export (catalyst unification)', () => {
+  it('is exported so the catalyst scheduler can invoke it', () => {
+    expect(typeof earthquakeHandler.executeEarthquakeSequence).toBe('function');
   });
 });
 
 describe('earthquakeHandler — mutual exclusion', () => {
-  const io = {} as Parameters<typeof registerEarthquakeHandlers>[0];
+  const io = {} as Parameters<typeof earthquakeHandler.registerEarthquakeHandlers>[0];
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -96,7 +102,7 @@ describe('earthquakeHandler — mutual exclusion', () => {
 
   it('does NOT trigger earthquake if a round event is already active', () => {
     const socket = createMockSocket('host-socket-id');
-    registerEarthquakeHandlers(io, socket as never);
+    earthquakeHandler.registerEarthquakeHandlers(io, socket as never);
 
     mockGetGameBySocketId.mockReturnValue('ABCD');
     mockGetGame.mockReturnValue(makeGame({ activeRoundEvent: 'blizzard' }));
