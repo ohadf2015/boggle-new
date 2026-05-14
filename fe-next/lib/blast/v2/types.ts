@@ -34,6 +34,19 @@ export type BlastLevel = {
   interestingnessScore?: number;
 };
 
+export type ChainLevelSpec = {
+  id: string;
+  levelNumber: number;
+  theme: ThemeKey;
+  locale: Locale;
+  /** Number of board columns. Must be >= the longest word in the chain. */
+  columns: number;
+  /** Count of decoy tiles that never complete a theme word. */
+  decoyTiles: number;
+  /** Ordered words; chain[0] is found first, chain[last] last. */
+  chain: string[];
+};
+
 export type MechanicSet = {
   coinOverlay: boolean;
   reverseSelection: boolean;

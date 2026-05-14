@@ -1,7 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BlastTile } from '../BlastTile';
-import { cellId } from '@/lib/blast/v2/engine';
+import type { CellId } from '@/lib/blast/v2/types';
+
+const cellId = (col: number, row: number): CellId => `c${col}r${row}` as CellId;
 
 describe('BlastTile', () => {
   const defaultProps = {
@@ -41,5 +43,22 @@ describe('BlastTile', () => {
     const { container } = render(<BlastTile {...defaultProps} flags={['double_bonus']} />);
     const tile = container.querySelector('[data-cell-id]');
     expect(tile).toHaveAttribute('data-double-bonus');
+  });
+
+  it('renders a tactile tile with a depth hook in rest state', () => {
+    const { container } = render(
+      <BlastTile {...defaultProps} state="normal" />,
+    );
+    const tile = container.querySelector('[data-cell-id]') as HTMLElement;
+    expect(tile).toBeTruthy();
+    expect(tile.getAttribute('data-depth')).toBe('rest');
+  });
+
+  it('marks the depth hook as pressed when selected', () => {
+    const { container } = render(
+      <BlastTile {...defaultProps} state="selected" />,
+    );
+    const tile = container.querySelector('[data-cell-id]') as HTMLElement;
+    expect(tile.getAttribute('data-depth')).toBe('pressed');
   });
 });

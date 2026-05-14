@@ -1,9 +1,10 @@
 'use client';
 import { useState, useEffect, useMemo, useRef } from 'react';
-import type { BlastLevel } from '@/lib/blast/v2/types';
+import type { BlastLevel, CellId } from '@/lib/blast/v2/types';
 import { markUnlockSeen, completeFtue, setSkipAll, type UnlocksSeen, type MechanicKey } from '@/lib/blast/v2/tutorial/unlocks-seen';
 import { useBlastV2 } from '@/lib/blast/v2/useBlastV2';
-import { detectAlmostWords } from '@/lib/blast/v2/engine';
+import { detectAlmostWords, detectAllCascades } from '@/lib/blast/v2/engine';
+import { scanFormableThemeWords } from '@/lib/blast/v2/engine/word-scan';
 import { LOCALE_CONFIGS } from '@/lib/blast/v2/locale-config';
 import { useChainHaptics } from '@/lib/blast/v2/fx/useChainHaptics';
 import { useChainEventBus } from '@/lib/blast/v2/fx/useChainEventBus';
@@ -80,6 +81,21 @@ export function BlastGame({
     () => detectAlmostWords(state.level, state.foundWords, LOCALE_CONFIGS[state.level.locale]),
     [state.level, state.foundWords],
   );
+  const [revealGlowCells, setRevealGlowCells] = useState<CellId[]>([]);
+  // Compute reveal glow cells when a word is found: glow the next formable word
+  useEffect(() => {
+    if (state.status === 'levelComplete') {
+      setRevealGlowCells([]);
+      return;
+    }
+    const cascades = detectAllCascades(state.level, state.foundWords, LOCALE_CONFIGS[state.level.locale]);
+    if (cascades.length > 0) {
+      // Glow the first (next) formable word
+      setRevealGlowCells(cascades[0].cells);
+    } else {
+      setRevealGlowCells([]);
+    }
+  }, [state.foundWords, state.level, state.status]);
   const { state: progressState, clearLevel, openChest, openMutation } = useBlastProgress();
   const [showChestModal, setShowChestModal] = useState(false);
   // Idempotency: one submission per level — prevents retry loop on state-feedback re-renders.
@@ -297,6 +313,7 @@ export function BlastGame({
           modeColor={modeColor}
           almosts={almosts}
           tileIds={state.tileIds}
+          revealGlowCells={revealGlowCells}
         />
       </div>
       {tutorial.showFtueOverlay && !isVeteranPlayer && ftueStep !== null && (

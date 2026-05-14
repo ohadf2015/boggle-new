@@ -1,0 +1,140 @@
+{
+  "locale": "en",
+  "levels": [
+    {
+      "id": "en-chain-01",
+      "levelNumber": 1,
+      "theme": "onboarding",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["CAT", "SUN", "EGG"]
+    },
+    {
+      "id": "en-chain-02",
+      "levelNumber": 2,
+      "theme": "fruits",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["FIG", "PEAR", "KIWI"]
+    },
+    {
+      "id": "en-chain-03",
+      "levelNumber": 3,
+      "theme": "animals",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["COW", "GOAT", "DEER"]
+    },
+    {
+      "id": "en-chain-04",
+      "levelNumber": 4,
+      "theme": "food",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["JAM", "RICE", "CAKE"]
+    },
+    {
+      "id": "en-chain-05",
+      "levelNumber": 5,
+      "theme": "colors",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["RED", "BLUE", "PINK"]
+    },
+    {
+      "id": "en-chain-06",
+      "levelNumber": 6,
+      "theme": "ocean",
+      "locale": "en",
+      "columns": 8,
+      "decoyTiles": 0,
+      "chain": ["CRAB", "SEAL", "WHALE", "SHARK"]
+    },
+    {
+      "id": "en-chain-07",
+      "levelNumber": 7,
+      "theme": "space",
+      "locale": "en",
+      "columns": 8,
+      "decoyTiles": 0,
+      "chain": ["MARS", "MOON", "STAR", "COMET"]
+    },
+    {
+      "id": "en-chain-08",
+      "levelNumber": 8,
+      "theme": "animals",
+      "locale": "en",
+      "columns": 8,
+      "decoyTiles": 0,
+      "chain": ["WOLF", "LION", "BEAR", "TIGER"]
+    },
+    {
+      "id": "en-chain-09",
+      "levelNumber": 9,
+      "theme": "fruits",
+      "locale": "en",
+      "columns": 8,
+      "decoyTiles": 0,
+      "chain": ["PLUM", "MANGO", "GRAPE", "LEMON"]
+    },
+    {
+      "id": "en-chain-10",
+      "levelNumber": 10,
+      "theme": "weather",
+      "locale": "en",
+      "columns": 8,
+      "decoyTiles": 0,
+      "chain": ["RAIN", "SNOW", "CLOUD", "STORM"]
+    },
+    {
+      "id": "en-chain-11",
+      "levelNumber": 11,
+      "theme": "animals",
+      "locale": "en",
+      "columns": 9,
+      "decoyTiles": 0,
+      "chain": ["HORSE", "ZEBRA", "PANDA", "KOALA", "OTTER"]
+    },
+    {
+      "id": "en-chain-12",
+      "levelNumber": 12,
+      "theme": "food",
+      "locale": "en",
+      "columns": 9,
+      "decoyTiles": 0,
+      "chain": ["BREAD", "PASTA", "SALAD", "HONEY", "OLIVE"]
+    },
+    {
+      "id": "en-chain-13",
+      "levelNumber": 13,
+      "theme": "nature",
+      "locale": "en",
+      "columns": 9,
+      "decoyTiles": 0,
+      "chain": ["RIVER", "BEACH", "CLIFF", "MARSH", "GROVE"]
+    },
+    {
+      "id": "en-chain-14",
+      "levelNumber": 14,
+      "theme": "space",
+      "locale": "en",
+      "columns": 9,
+      "decoyTiles": 0,
+      "chain": ["PLANET", "GALAXY", "METEOR", "ROCKET", "ORBITS"]
+    },
+    {
+      "id": "en-chain-15",
+      "levelNumber": 15,
+      "theme": "animals",
+      "locale": "en",
+      "columns": 9,
+      "decoyTiles": 0,
+      "chain": ["JAGUAR", "FALCON", "WALRUS", "BEAVER", "IGUANA"]
+    }
+  ]
+}

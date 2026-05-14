@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server';
 import { applyAntiCheatCaps, applyAntiCheatCapsWithLevel, type ClearSubmission } from '@/lib/blast/v2/anti-cheat';
-import { buildRegistry } from '@/lib/blast/v2/level-source-registry';
+import { buildRegistry, getLevelSourceForLevel } from '@/lib/blast/v2/level-source-registry';
 import { CURATED_LEVEL_CUTOFF } from '@/lib/blast/v2/level-source';
 import { awardCoinsServer } from '@/backend/services/economy/awardCoins';
 import { NextRequest, NextResponse } from 'next/server';
@@ -52,7 +52,8 @@ export async function POST(req: NextRequest) {
   let capped;
   if (submission.levelNumber <= CURATED_LEVEL_CUTOFF) {
     try {
-      const level = await buildRegistry().curated.resolve(submission.levelNumber, submission.locale);
+      const registry = buildRegistry();
+      const level = await getLevelSourceForLevel(submission.levelNumber, submission.locale, registry).resolve(submission.levelNumber, submission.locale);
       capped = applyAntiCheatCapsWithLevel(submission, submission.earnedCoins, level);
     } catch {
       // Pack missing / load failure — gracefully fall back to level-less caps.

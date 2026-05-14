@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import type { Locale } from '@/lib/blast/v2/types';
-import { buildRegistry } from '@/lib/blast/v2/level-source-registry';
+import { buildRegistry, getLevelSourceForLevel } from '@/lib/blast/v2/level-source-registry';
 import { BlastV2PageClient } from './v2/BlastV2PageClient';
 import BlastLegacyPageClient from './legacy/PageClient';
 
@@ -17,7 +17,7 @@ export default async function BlastPage({
   searchParams?: Promise<{ v2?: string }>;
 }) {
   const { locale: rawLocale } = await params;
-  const resolvedSearch = await searchParams;
+  const resolvedSearch = searchParams ? await searchParams : undefined;
   if (!VALID_LOCALES.includes(rawLocale as Locale)) {
     notFound();
   }
@@ -33,14 +33,15 @@ export default async function BlastPage({
 
   if (useV2) {
     const registry = buildRegistry();
-    const level = await registry.curated.resolve(1, locale)
-      .catch(() => locale !== 'en' ? registry.curated.resolve(1, 'en') : Promise.reject(new Error('no en pack')))
+    const levelNumber = 1;
+    const level = await getLevelSourceForLevel(levelNumber, locale, registry).resolve(levelNumber, locale)
+      .catch(() => locale !== 'en' ? getLevelSourceForLevel(levelNumber, 'en', registry).resolve(levelNumber, 'en') : Promise.reject(new Error('no en pack')))
       .catch((error: unknown) => {
         console.error('Failed to load blast v2 level:', error);
         return null;
       });
     if (level) return <BlastV2PageClient level={level} />;
-    // fall through to legacy if curated pack missing for this locale
+    // fall through to legacy if chain/curated pack missing for this locale
   }
 
   return <BlastLegacyPageClient />;
