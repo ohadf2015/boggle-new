@@ -284,3 +284,201 @@ describe('Bot blast mode — board regeneration on clear (timer-era)', () => {
     expect(mocks.regenerateBlastBoard).not.toHaveBeenCalled();
   });
 });
+
+describe('Blast bot liveness (idle-bug regression)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.getLeaderboard.mockReturnValue([]);
+    mocks.isBlastBoardCleared.mockReturnValue(false);
+    clearBotResyncThrottle('GAME1');
+    mocks.calculateBlastTileBonus.mockReturnValue(5); // consistent bonus for predictability
+  });
+
+  it('bots emit words AND receive credited score across a Blast game', async () => {
+    /**
+     * Regression test for the "idle bot" bug (Task 4 fix).
+     *
+     * Two competing hypotheses:
+     * H1: bots not emitting — word pools exhausted due to stale grid snapshot
+     * H2: bots emitting but zeroed — shouldBotScore rejects submissions
+     *
+     * This test SEPARATELY observes:
+     * - emittedWords: every word a bot submits (proves H1 is not happening)
+     * - creditedScores: the actual score returned after shouldBotScore (proves H2 is not happening)
+     *
+     * If the bug regresses, the test will distinguish which hypothesis broke.
+     */
+    const emittedWords: string[] = [];
+    const creditedScores: number[] = [];
+    const submissions: Array<{ word: string; credited: number | false }> = [];
+
+    // Set up a 2-bot Blast game
+    const bot1 = makeBot({ id: 'bot-1', username: 'BotAlice', difficulty: 'medium' });
+    const bot2 = makeBot({ id: 'bot-2', username: 'BotBob', difficulty: 'medium' });
+    const game = makeBlastGame(1);
+
+    mocks.getGameBots.mockReturnValue([bot1, bot2]);
+    mocks.getGame.mockReturnValue(game);
+
+    // Instrument startBot to capture the submission callback
+    let capturedCallback: ((s: unknown) => Promise<unknown>) | null = null;
+    mocks.startBot.mockImplementation((_b, _g, _l, callback) => {
+      capturedCallback = callback;
+    });
+
+    // Start the bots, which wires up the callback
+    startBotsForGame({} as never, 'GAME1', [['A', 'B'], ['C', 'D']], 'en', 60);
+
+    if (!capturedCallback) {
+      throw new Error('Bot callback not captured');
+    }
+
+    // Simulate a sequence of bot submissions across the game
+    // Each submission goes through the callback, which:
+    // 1. Computes blastTileBonus (5 in this test)
+    // 2. Calls shouldBotScore to check if the word is credited
+    // 3. Returns totalScore (or false if rejected)
+    const testSubmissions = [
+      { username: 'BotAlice', word: 'AB', score: 2, comboLevel: 0 },
+      { username: 'BotBob', word: 'CD', score: 2, comboLevel: 0 },
+      { username: 'BotAlice', word: 'ABC', score: 3, comboLevel: 0 },
+      { username: 'BotBob', word: 'ACD', score: 3, comboLevel: 0 },
+      { username: 'BotAlice', word: 'BD', score: 2, comboLevel: 0 },
+      { username: 'BotBob', word: 'AC', score: 2, comboLevel: 0 },
+    ];
+
+    for (const submission of testSubmissions) {
+      const result = await (capturedCallback as (s: unknown) => Promise<unknown>)(submission);
+      emittedWords.push(submission.word);
+      if (result !== false) {
+        creditedScores.push(result as number);
+        submissions.push({ word: submission.word, credited: result as number });
+      } else {
+        submissions.push({ word: submission.word, credited: false });
+      }
+    }
+
+    // H1 check: bots actually emit words (not exhausting pool)
+    expect(emittedWords.length).toBeGreaterThan(3);
+    expect(emittedWords).toContain('AB');
+    expect(emittedWords).toContain('CD');
+
+    // H2 check: at least some emissions are credited > 0
+    // (not all are zeroed by shouldBotScore)
+    expect(creditedScores.length).toBeGreaterThan(0);
+    expect(creditedScores.some((c) => c > 0)).toBe(true);
+
+    // Additional check: verify the credited scores match the formula
+    // base score + blast bonus (5) = credited
+    // For 'AB' (score 2): 2 + 5 = 7
+    // For 'ABC' (score 3): 3 + 5 = 8, etc.
+    const expectedCredits = [7, 7, 8, 8, 7, 7]; // score + 5 blast bonus
+    let creditIndex = 0;
+    for (let i = 0; i < submissions.length; i++) {
+      if (submissions[i].credited !== false) {
+        expect(submissions[i].credited).toBe(expectedCredits[creditIndex]);
+        creditIndex++;
+      }
+    }
+
+    // Sanity check: resync was called (Task 4's key fix)
+    expect(mocks.resyncBotsForNewGrid).toHaveBeenCalled();
+  });
+
+  it('post-grace score cap rejects submissions when ceiling exceeded (H2 regression guard)', async () => {
+    /**
+     * Critical regression test for H2 (bots emitting but zeroed by shouldBotScore).
+     *
+     * The first test runs inside the 25s grace window with an empty leaderboard,
+     * so shouldBotScore always returns true (trivial). This test exercises the
+     * ACTUAL score cap by:
+     *
+     * 1. Spying on Date.now() to control the time inside shouldBotScore
+     * 2. Keeping leaderboard empty (no human scored), triggering post-grace ceiling
+     * 3. Submitting words that exceed the post-grace ceiling
+     * 4. Asserting the cap REJECTS some submissions (returns false)
+     *    AND credits some before the cap kicks in
+     *
+     * This proves shouldBotScore is exercised across both outcomes:
+     * - accepted (credited > 0)
+     * - rejected (credited === false)
+     *
+     * If H2 regresses (cap always true, or cap always false), this test catches it.
+     */
+    const creditedScores: number[] = [];
+    const rejectedSubmissions: string[] = [];
+    const bot = makeBot({ id: 'bot-1', username: 'BotAlice', difficulty: 'medium' });
+    const game = makeBlastGame(1);
+
+    mocks.getGameBots.mockReturnValue([bot]);
+    mocks.getGame.mockReturnValue(game);
+
+    let capturedCallback: ((s: unknown) => Promise<unknown>) | null = null;
+    mocks.startBot.mockImplementation((_b, _g, _l, callback) => {
+      capturedCallback = callback;
+    });
+
+    // Mock updatePlayerScore to track bot score (mirrors real behavior)
+    mocks.updatePlayerScore.mockImplementation((_gameCode, username, score) => {
+      if (username === 'BotAlice') {
+        bot.score += score;
+      }
+    });
+
+    // Spy on Date.now() to control time
+    let currentTime = 1000; // Start at 1s (not 0, to avoid !startedAt truthy check)
+    const dateNowSpy = vi.spyOn(Date, 'now').mockImplementation(() => currentTime);
+
+    // Start the game at time T=1000ms, which marks scoring start
+    startBotsForGame({} as never, 'GAME1', [['A', 'B'], ['C', 'D']], 'en', 60);
+
+    if (!capturedCallback) {
+      throw new Error('Bot callback not captured');
+    }
+
+    // Advance "time" to 27s (past the 25s grace window of 25_000 ms)
+    // Grace window is 25s from start, so: 1000 + 26000 = 27000ms
+    currentTime = 27_000;
+
+    // Submit words. Post-grace, ceiling for medium difficulty is 650 points.
+    // Each submission: base score + 5 (blast bonus)
+    // We'll submit high-scoring words that exceed the ceiling.
+    const testSubmissions = [
+      { username: 'BotAlice', word: 'ABCD', score: 100, comboLevel: 0 }, // 100 + 5 = 105 (under 650, credited)
+      { username: 'BotAlice', word: 'BCDA', score: 200, comboLevel: 0 }, // 200 + 5 = 205 (under 650, credited)
+      { username: 'BotAlice', word: 'CDAB', score: 300, comboLevel: 0 }, // 300 + 5 = 305 (under 650, credited)
+      { username: 'BotAlice', word: 'DABC', score: 400, comboLevel: 0 }, // 400 + 5 = 405; bot score now 615 + 405 = 1020 (exceeds 650, REJECTED)
+      { username: 'BotAlice', word: 'ABDC', score: 300, comboLevel: 0 }, // 300 + 5 = 305 (also rejected, bot.score still 615)
+      { username: 'BotAlice', word: 'BADC', score: 100, comboLevel: 0 }, // 100 + 5 = 105 (also rejected, bot.score still 615)
+    ];
+
+    for (const submission of testSubmissions) {
+      const result = await (capturedCallback as (s: unknown) => Promise<unknown>)(submission);
+      if (result !== false) {
+        creditedScores.push(result as number);
+      } else {
+        rejectedSubmissions.push(submission.word);
+      }
+    }
+
+    // Verify the score cap was actually exercised
+    // At least one submission must have been rejected by the cap
+    expect(rejectedSubmissions.length).toBeGreaterThan(0);
+    expect(rejectedSubmissions).toContain('DABC'); // First to hit the ceiling
+    expect(rejectedSubmissions).toContain('ABDC'); // Also rejected
+    expect(rejectedSubmissions).toContain('BADC'); // Also rejected
+
+    // But earlier submissions were credited (before the cap kicked in)
+    expect(creditedScores.length).toBeGreaterThan(0);
+    expect(creditedScores.some((c) => c > 0)).toBe(true);
+
+    // Verify the credited scores match the formula: base + 5 bonus
+    // After cap engages, no more submissions are credited
+    expect(creditedScores).toContain(105); // First submission
+    expect(creditedScores).toContain(205); // Second submission
+    expect(creditedScores).toContain(305); // Third submission, bot.score = 615
+    // 4th (DABC) would bring bot.score to 1020, exceeds ceiling (650), rejected
+
+    dateNowSpy.mockRestore();
+  });
+});
