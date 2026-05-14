@@ -43,6 +43,7 @@ export function BlastTile({
       data-state={state}
       data-state-frozen={frozen ? '' : undefined}
       data-double-bonus={doubleBonus ? '' : undefined}
+      data-depth={state === 'selected' ? 'pressed' : 'rest'}
       className={styles.tile}
       style={{
         fontFamily: fontStack,
