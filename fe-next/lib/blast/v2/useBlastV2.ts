@@ -74,8 +74,8 @@ function applyValidatedSubmit(state: State, cells: CellId[]): State {
       detectAllCascades(state.level, newFound, config).map((c) => c.word),
     );
     newLevel = collapseCells(state.level, cells).level;
-    // Words the collapse newly REVEALED. The player still finds these manually —
-    // they are counted only for chain FX + telemetry, NOT added to foundWords.
+    // The player still finds these manually — revealed.length feeds chain FX
+    // and aggregate submission/completion telemetry, but foundWords is unchanged.
     const revealed = detectAllCascades(newLevel, newFound, config)
       .map((c) => c.word)
       .filter((w) => !formableBefore.has(w));
