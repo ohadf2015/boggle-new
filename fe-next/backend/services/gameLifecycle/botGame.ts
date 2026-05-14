@@ -107,6 +107,17 @@ export function clearBotVariance(gameCode: string): void {
 }
 
 /**
+ * Per-game throttle timestamps for per-word bot resync.
+ * Prevents running the grid solver on every word (300+ calls in a 3-bot game).
+ * Bots only need to resync at most every ~2s to avoid exhausting their word pool.
+ */
+const lastBotResyncAt = new Map<string, number>();
+
+export function clearBotResyncThrottle(gameCode: string): void {
+  lastBotResyncAt.delete(gameCode);
+}
+
+/**
  * Get the best human (non-bot) player's score in a game.
  */
 export function getBestHumanScore(gameCode: string): number {
@@ -272,14 +283,18 @@ export function startBotsForGame(
                 totalMoves,
               });
 
-              // Bots' word pools are computed from the grid snapshot; Blast
-              // mutates the grid every word, so resync after each board update
-              // or bots run dry and go idle (idle-bot bug, Phase 2).
-              void botManager.resyncBotsForNewGrid(
-                botManager.getGameBots(gameCode),
-                gravityResult.newGrid,
-                language,
-              );
+              // Throttled per-update resync — bots' word pools drift as the
+              // Blast grid mutates; refresh at most every 2s per game so they
+              // never go dry, without running the grid solver on every word.
+              const nowTs = Date.now();
+              if (nowTs - (lastBotResyncAt.get(gameCode) ?? 0) >= 2000) {
+                lastBotResyncAt.set(gameCode, nowTs);
+                void botManager.resyncBotsForNewGrid(
+                  botManager.getGameBots(gameCode),
+                  gravityResult.newGrid,
+                  language,
+                );
+              }
 
               // MP board-clear parity with human path (wordValidationHandler):
               // regenerate in place, never end the game on clear (timer-era Blast).
@@ -316,6 +331,9 @@ export function startBotsForGame(
                     nextGrid,
                     language,
                   );
+                  // Reset throttle so the next per-word resync window opens immediately
+                  // after the full regeneration
+                  lastBotResyncAt.set(gameCode, Date.now());
                 } finally {
                   endWaveAdvance(gameCode);
                 }

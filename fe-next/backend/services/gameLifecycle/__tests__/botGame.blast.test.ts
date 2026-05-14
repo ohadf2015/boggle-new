@@ -93,7 +93,7 @@ vi.mock('../../../modules/wordHuntManager', () => ({
   getLifeBonus: vi.fn(() => 0),
 }));
 
-import { startBotsForGame } from '../botGame';
+import { startBotsForGame, clearBotResyncThrottle } from '../botGame';
 import type { Bot } from '../../../modules/botBehavior';
 
 function makeBot(overrides: Partial<Bot> = {}): Bot {
@@ -167,6 +167,8 @@ describe('Bot blast mode — board regeneration on clear (timer-era)', () => {
     vi.clearAllMocks();
     mocks.getLeaderboard.mockReturnValue([]);
     mocks.isBlastBoardCleared.mockReturnValue(false);
+    // Reset throttle map so each test starts with an open window
+    clearBotResyncThrottle('GAME1');
     mocks.regenerateBlastBoard.mockImplementation((state, _code, grid) => ({
       ...state,
       refillCount: (state.refillCount ?? 0) + 1,
@@ -200,11 +202,12 @@ describe('Bot blast mode — board regeneration on clear (timer-era)', () => {
     expect(mocks.resyncBotsForNewGrid).toHaveBeenCalled();
   });
 
-  it('resyncs bots after every bot board update, not only on clear', async () => {
+  it('resyncs bots on per-word updates when throttle window is open (first submission)', async () => {
     mocks.isBlastBoardCleared.mockReturnValue(false); // normal word, board NOT cleared
     const bot = makeBot();
     mocks.getGameBots.mockReturnValue([bot]);
 
+    // First submission of the game has no throttle entry, so resync fires
     await invokeBotCallback(bot, makeBlastGame(1));
 
     expect(mocks.resyncBotsForNewGrid).toHaveBeenCalled();
