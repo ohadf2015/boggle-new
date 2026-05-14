@@ -150,36 +150,27 @@ export function buildChainLevel(spec: ChainLevelSpec, seed: number): BlastLevel 
 }
 
 /**
- * Inserts decoy tiles into S_0 that preserve the chain's validity.
- * Uses the ground truth: a decoy is valid iff validateChainLevel still passes.
- * This is the only guarantee that the chain can be replayed correctly.
+ * Inserts decoy tiles into a level that preserve the chain's validity.
+ *
+ * CURRENT LIMITATION: Decoys cannot be reliably placed because the validator
+ * requires the board to fully empty after all chain words are removed. Any decoy
+ * tile that doesn't fall into a position captured by a word removal becomes
+ * leftover and fails validation.
+ *
+ * For small, sparse chains, random placement occasionally succeeds by luck.
+ * For dense chains (4-5 words on 9 columns), the probability of a random tile
+ * landing in a captured position is near-zero, making placement computationally
+ * infeasible.
+ *
+ * WORKAROUND: Keep decoyTiles at 0 for all authored packs. Future improvements
+ * could:
+ * - Modify the validator to allow decoys if they're guaranteed to be cleared
+ * - Use graph analysis to identify which positions will be cleared and only
+ *   place decoys there
+ * - Relax the validator to allow non-empty boards (game-design choice)
  */
 function insertDecoys(level: BlastLevel, spec: ChainLevelSpec, seed: number): BlastLevel | null {
   if (spec.decoyTiles <= 0) return level;
-  const config = LOCALE_CONFIGS[spec.locale];
-  const pool = config.tilePool;
-  const rand = rng(seed);
-  let board = level;
-
-  for (let placed = 0; placed < spec.decoyTiles; placed++) {
-    let success = false;
-    // Higher try limit since validation is expensive but accurate
-    for (let tries = 0; tries < 100 && !success; tries++) {
-      const col = Math.floor(rand() * board.columns.length);
-      const letter = pool[Math.floor(rand() * pool.length)]!;
-      const testColumns = cloneColumns(board.columns);
-      testColumns[col]!.tiles.push(letter);
-      const candidate: BlastLevel = { ...board, columns: testColumns };
-
-      // Ground truth: the level must still validate
-      const validation = validateChainLevel(candidate);
-      if (validation.ok) {
-        board = candidate;
-        success = true;
-      }
-    }
-
-    if (!success) return null;
-  }
-  return board;
+  // For now, decoys cannot be placed reliably. Return null.
+  return null;
 }

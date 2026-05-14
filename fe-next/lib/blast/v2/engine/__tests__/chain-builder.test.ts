@@ -86,4 +86,5 @@ describe('buildChainLevel', () => {
       expect(validateChainLevel(level).ok).toBe(true);
     }
   });
+
 });
