@@ -1,0 +1,140 @@
+{
+  "locale": "he",
+  "levels": [
+    {
+      "id": "he-chain-01",
+      "levelNumber": 1,
+      "theme": "onboarding",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["חתול", "שמש", "ביצה"]
+    },
+    {
+      "id": "he-chain-02",
+      "levelNumber": 2,
+      "theme": "fruits",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["תפוח", "ענב", "אגס"]
+    },
+    {
+      "id": "he-chain-03",
+      "levelNumber": 3,
+      "theme": "animals",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["כלב", "פרה", "סוס"]
+    },
+    {
+      "id": "he-chain-04",
+      "levelNumber": 4,
+      "theme": "food",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["חמאה", "אורז", "עוגה"]
+    },
+    {
+      "id": "he-chain-05",
+      "levelNumber": 5,
+      "theme": "colors",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["צהוב", "כחול", "ירוק"]
+    },
+    {
+      "id": "he-chain-06",
+      "levelNumber": 6,
+      "theme": "ocean",
+      "locale": "he",
+      "columns": 7,
+      "decoyTiles": 0,
+      "chain": ["דג", "סרטה", "כריש", "צדפה"]
+    },
+    {
+      "id": "he-chain-07",
+      "levelNumber": 7,
+      "theme": "space",
+      "locale": "he",
+      "columns": 6,
+      "decoyTiles": 0,
+      "chain": ["ירח", "כוכב", "שמש", "מאדי"]
+    },
+    {
+      "id": "he-chain-08",
+      "levelNumber": 8,
+      "theme": "animals",
+      "locale": "he",
+      "columns": 6,
+      "decoyTiles": 0,
+      "chain": ["זאב", "דוב", "נמר", "אריה"]
+    },
+    {
+      "id": "he-chain-09",
+      "levelNumber": 9,
+      "theme": "fruits",
+      "locale": "he",
+      "columns": 7,
+      "decoyTiles": 0,
+      "chain": ["תפוז", "בננה", "מנגו", "ליממ"]
+    },
+    {
+      "id": "he-chain-10",
+      "levelNumber": 10,
+      "theme": "weather",
+      "locale": "he",
+      "columns": 6,
+      "decoyTiles": 0,
+      "chain": ["גשמ", "עננ", "שלג", "סופה"]
+    },
+    {
+      "id": "he-chain-11",
+      "levelNumber": 11,
+      "theme": "animals",
+      "locale": "he",
+      "columns": 7,
+      "decoyTiles": 0,
+      "chain": ["סוסה", "זברה", "פנדה", "קואלה", "נמיה"]
+    },
+    {
+      "id": "he-chain-12",
+      "levelNumber": 12,
+      "theme": "food",
+      "locale": "he",
+      "columns": 7,
+      "decoyTiles": 0,
+      "chain": ["גבינה", "פסטה", "סלט", "דבש", "פלפל"]
+    },
+    {
+      "id": "he-chain-13",
+      "levelNumber": 13,
+      "theme": "nature",
+      "locale": "he",
+      "columns": 7,
+      "decoyTiles": 0,
+      "chain": ["נהר", "חופי", "מערה", "אגמ", "יער"]
+    },
+    {
+      "id": "he-chain-14",
+      "levelNumber": 14,
+      "theme": "space",
+      "locale": "he",
+      "columns": 8,
+      "decoyTiles": 0,
+      "chain": ["כוכב", "גלקסיה", "מטאור", "רקטה", "מסלול"]
+    },
+    {
+      "id": "he-chain-15",
+      "levelNumber": 15,
+      "theme": "animals",
+      "locale": "he",
+      "columns": 8,
+      "decoyTiles": 0,
+      "chain": ["קרננ", "נמר", "פיל", "צבי", "עגור"]
+    }
+  ]
+}
