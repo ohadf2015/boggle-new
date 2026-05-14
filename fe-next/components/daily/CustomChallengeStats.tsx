@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Trophy, Users, Target, TrendingUp, Crown, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -141,7 +141,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
 
       {/* Key Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
@@ -152,9 +152,9 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
             <span className="text-sm font-bold uppercase text-slate-600">{t('daily.totalPlayers')}</span>
           </div>
           <div className="text-3xl font-black text-neo-black">{stats.totalAttempts}</div>
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
@@ -165,9 +165,9 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
             <span className="text-sm font-bold uppercase text-slate-600">{t('daily.solved')}</span>
           </div>
           <div className="text-3xl font-black text-neo-black">{stats.totalSolved}</div>
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
@@ -178,9 +178,9 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
             <span className="text-sm font-bold uppercase text-slate-600">{t('daily.solveRate')}</span>
           </div>
           <div className="text-3xl font-black text-neo-black">{stats.solveRate.toFixed(0)}%</div>
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
@@ -191,7 +191,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
             <span className="text-sm font-bold uppercase text-slate-600">{t('daily.beatCreator')}</span>
           </div>
           <div className="text-3xl font-black text-neo-black">{stats.beatCreatorCount}</div>
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Attempt Distribution */}
@@ -211,14 +211,14 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
                       {attempts} {t('daily.attempts')}
                     </span>
                     <div className="flex-1 h-8 bg-slate-100 rounded-lg overflow-hidden border-2 border-neo-black">
-                      <motion.div
+                      <m.div
                         initial={{ width: 0 }}
                         animate={{ width: `${percentage}%` }}
                         transition={{ duration: 0.5, delay: 0.1 * parseInt(attempts) }}
                         className="h-full bg-linear-to-r from-neo-cyan to-neo-pink flex items-center justify-end pe-2"
                       >
                         <span className="text-xs font-black text-neo-white">{count}</span>
-                      </motion.div>
+                      </m.div>
                     </div>
                   </div>
                 ) : null;
@@ -236,7 +236,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
           </h3>
           <div className="space-y-2">
             {leaderboard.map((entry, idx) => (
-              <motion.div
+              <m.div
                 key={`lb-${entry.user_id ?? idx}`}
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
@@ -253,7 +253,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
                     {entry.attempts_used} {t('daily.attempts')} • {Math.round(entry.efficiency_score)} {t('daily.points')}
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>

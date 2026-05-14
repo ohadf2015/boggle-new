@@ -12,7 +12,7 @@ import { GameBadge } from '../GameBadge';
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     span: ({ children, className, onClick, ...props }: any) => (
       <span className={className} onClick={onClick} data-testid="motion-span" {...props}>
         {children}

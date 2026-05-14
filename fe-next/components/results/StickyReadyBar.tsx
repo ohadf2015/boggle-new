@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Play, Crown, Check, X, Trophy } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -198,7 +198,7 @@ export default function StickyReadyBar({
 
       return (
         <div className="flex items-center gap-2" data-testid="auto-countdown">
-          <motion.button
+          <m.button
             data-testid="auto-countdown-cta"
             onClick={handleCountdownComplete}
             aria-disabled={hostStartGated}
@@ -248,7 +248,7 @@ export default function StickyReadyBar({
               )}
               <span className="tabular-nums text-sm opacity-70">{secondsLeft}</span>
             </span>
-          </motion.button>
+          </m.button>
           <button
             data-testid="auto-countdown-cancel"
             onClick={() => {
@@ -269,7 +269,7 @@ export default function StickyReadyBar({
     // Host — manual PLAY AGAIN
     if (isHost) {
       return (
-        <motion.button
+        <m.button
           onClick={() => {
             if (hostStartGated) return;
             clearCancelFlag();
@@ -297,14 +297,14 @@ export default function StickyReadyBar({
               <span>{t('results.playAgain')}</span>
             </>
           )}
-        </motion.button>
+        </m.button>
       );
     }
 
     // Non-host, not ready, countdown cancelled — manual ready
     if (isRevenge && winnerUsername) {
       return (
-        <motion.button
+        <m.button
           onClick={() => { clearCancelFlag(); onMarkReady(); }}
           whileTap={{ scale: 0.95 }}
           className={cn(btnBase, 'bg-neo-pink text-white')}
@@ -313,20 +313,20 @@ export default function StickyReadyBar({
             <Avatar userId={winnerUsername} customAvatar={winnerAvatar?.customAvatar} size="sm" className="w-full h-full" />
           </div>
           <span className="truncate">{t('results.revengeRematch', { player: winnerUsername })}</span>
-        </motion.button>
+        </m.button>
       );
     }
 
     // Winner — DEFEND TITLE
     return (
-      <motion.button
+      <m.button
         onClick={() => { clearCancelFlag(); onMarkReady(); }}
         whileTap={{ scale: 0.95 }}
         className={cn(btnBase, 'bg-neo-lime text-neo-black')}
       >
         <Crown className="w-5 h-5 shrink-0" />
         <span className="truncate">{t('results.defendTitle')}</span>
-      </motion.button>
+      </m.button>
     );
   }
 
@@ -338,7 +338,7 @@ export default function StickyReadyBar({
     return (
       <div className="flex flex-col gap-2 flex-1 min-w-0 pb-[env(safe-area-inset-bottom)]">
         {/* Series Winner Banner */}
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -352,18 +352,18 @@ export default function StickyReadyBar({
             <span className="text-neo-lime font-black text-sm">{seriesWinnerUsername}</span>
           </div>
           <span className="text-neo-cream/60 text-xs font-bold uppercase">{t('results.series.winner')}</span>
-        </motion.div>
+        </m.div>
 
         {/* New Series button (host only starts, non-host just sees the winner) */}
         {isHost && onNewSeries ? (
-          <motion.button
+          <m.button
             onClick={onNewSeries}
             whileTap={{ scale: 0.95 }}
             className={cn(btnBase, 'bg-neo-lime text-neo-black')}
           >
             <Play className="w-5 h-5 shrink-0" />
             <span>{t('results.series.newSeries')}</span>
-          </motion.button>
+          </m.button>
         ) : !isHost ? (
           <div className={cn(btnBase, 'bg-neo-white/10 text-neo-cream/60 pointer-events-none')}>
             <span>{t('results.series.waitingNewSeries')}</span>

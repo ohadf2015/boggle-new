@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Crown, Lock, Sparkles, Sword, Swords, Trophy, Zap } from 'lucide-react';
 import { useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -140,14 +140,14 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
   const v = prefersReduced ? reduced : awardVariants;
 
   return (
-    <motion.div
+    <m.div
       variants={containerVariants}
       initial="hidden"
       animate="show"
       className="space-y-3"
     >
       {/* ── Wheel Rush Match Recap hero card ── */}
-      <motion.div
+      <m.div
         variants={v}
         className="relative overflow-hidden p-3 rounded-neo border-3 border-neo-black shadow-hard bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy"
         data-testid="wheel-rush-match-recap"
@@ -175,7 +175,7 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
                 {t('wheelRush.results.stealRate') || 'Steal Rate'}
               </div>
               <div className="w-20 h-2 rounded-full bg-neo-black/60 border border-neo-white/15 overflow-hidden">
-                <motion.div
+                <m.div
                   className={`h-full rounded-full ${matchRecap.stealRate >= 50 ? 'bg-linear-to-r from-neo-pink to-neo-red' : 'bg-linear-to-r from-neo-cyan to-neo-lime'}`}
                   initial={prefersReduced ? { width: `${matchRecap.stealRate}%` } : { width: 0 }}
                   animate={{ width: `${matchRecap.stealRate}%` }}
@@ -211,18 +211,18 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
             </div>
           </div>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* ── Section header ── */}
-      <motion.div variants={v} className="flex items-center gap-2 px-1">
+      <m.div variants={v} className="flex items-center gap-2 px-1">
         <Sparkles className="w-4 h-4 text-neo-cyan" />
         <h3 className="text-sm font-black uppercase tracking-wider text-neo-cream/80">
           {t('wheelRush.results.boardDomination') || 'Wheel Domination'}
         </h3>
-      </motion.div>
+      </m.div>
 
       {/* ── Ranked score bars ── */}
-      <motion.div
+      <m.div
         variants={v}
         className="p-3 bg-neo-navy/60 border-3 border-neo-black rounded-neo shadow-hard-sm overflow-hidden"
       >
@@ -233,12 +233,12 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
             const isMe = username === currentUsername;
 
             return (
-              <motion.div key={username} variants={v} className="relative">
+              <m.div key={username} variants={v} className="relative">
                 <div className="flex items-center gap-2 mb-0.5">
                   {idx === 0 && (
-                    <motion.div variants={prefersReduced ? undefined : crownVariants}>
+                    <m.div variants={prefersReduced ? undefined : crownVariants}>
                       <Crown className="w-3.5 h-3.5 text-neo-yellow" />
-                    </motion.div>
+                    </m.div>
                   )}
                   <span className={`text-xs font-bold ${isMe ? 'text-neo-white underline decoration-neo-lime/40 underline-offset-2' : 'text-neo-cream/80'}`}>
                     {username}
@@ -249,24 +249,24 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
                 </div>
 
                 <div className="h-3 bg-neo-black/40 rounded-full overflow-hidden border border-neo-white/10">
-                  <motion.div
+                  <m.div
                     className={`h-full rounded-full ${color?.fill || 'bg-neo-cyan/80'} ${idx === 0 ? color?.glow || '' : ''}`}
                     style={{ width: `${Math.max(pct, 3)}%`, originX: 0 }}
                     variants={prefersReduced ? reduced : barVariants}
                     custom={pct}
                   />
                 </div>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>
-      </motion.div>
+      </m.div>
 
       {/* ── Awards ── */}
       {awards.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
           {awards.map((award, i) => (
-            <motion.div
+            <m.div
               key={award.titleKey}
               variants={v}
               data-testid="wheel-rush-award"
@@ -297,10 +297,10 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
                   </span>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 }

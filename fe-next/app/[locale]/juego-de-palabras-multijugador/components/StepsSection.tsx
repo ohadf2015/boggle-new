@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { STEPS } from '../data';
 
@@ -22,7 +22,7 @@ export function StepsSection() {
 
       <ol className="grid gap-5 sm:grid-cols-3 sm:gap-4">
         {STEPS.map((step, i) => (
-          <motion.li
+          <m.li
             key={step.n}
             initial={reduced ? false : { opacity: 0, y: 24, rotate: 0 }}
             whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
@@ -68,7 +68,7 @@ export function StepsSection() {
             <p className="mt-2 font-neo-body text-sm font-medium leading-snug">
               {step.body}
             </p>
-          </motion.li>
+          </m.li>
         ))}
       </ol>
     </section>

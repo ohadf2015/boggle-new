@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Lightbulb, ChevronLeft, ChevronRight, ExternalLink, FlaskConical, Quote } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -158,7 +158,7 @@ export default function ScientificTipsCarousel() {
         onTouchEnd={() => setIsPaused(false)}
       >
         {/* Animated gradient background */}
-        <motion.div
+        <m.div
           key={`gradient-${activeIndex}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -178,7 +178,7 @@ export default function ScientificTipsCarousel() {
         {/* Tip Content */}
         <div className="relative p-5 min-h-[180px]">
           <AnimatePresence mode="wait" custom={direction}>
-            <motion.div
+            <m.div
               key={activeIndex}
               custom={direction}
               variants={slideVariants}
@@ -190,7 +190,7 @@ export default function ScientificTipsCarousel() {
             >
               {/* Icon and main text */}
               <div className="flex items-start gap-4">
-                <motion.div
+                <m.div
                   initial={{ scale: 0.5, rotate: -10 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
@@ -200,7 +200,7 @@ export default function ScientificTipsCarousel() {
                   )}
                 >
                   <span className="text-3xl">{activeTip.icon}</span>
-                </motion.div>
+                </m.div>
                 <div className="flex-1 pt-1">
                   <p className={cn(
                     'text-base font-medium leading-relaxed',
@@ -212,7 +212,7 @@ export default function ScientificTipsCarousel() {
               </div>
 
               {/* Citation block */}
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
@@ -252,8 +252,8 @@ export default function ScientificTipsCarousel() {
                 >
                   <ExternalLink className="w-4 h-4" />
                 </a>
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
           </AnimatePresence>
         </div>
 
@@ -318,7 +318,7 @@ export default function ScientificTipsCarousel() {
 
         {/* Progress bar */}
         <div className="h-1 bg-slate-300 dark:bg-slate-700">
-          <motion.div
+          <m.div
             key={`progress-${activeIndex}`}
             initial={{ width: '0%' }}
             animate={{ width: isPaused ? undefined : '100%' }}

@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { LazyMotionRoot } from './LazyMotionRoot';
 
 // Check if this is a preview/staging environment (explicitly set or PR preview)
 // Only block indexing when NEXT_PUBLIC_IS_PREVIEW is explicitly true or when it's a PR preview
@@ -106,5 +107,5 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: RootLayoutProps): ReactNode {
-    return children;
+    return <LazyMotionRoot>{children}</LazyMotionRoot>;
 }

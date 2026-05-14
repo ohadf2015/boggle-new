@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { AlertTriangle, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -48,7 +48,7 @@ export function StreakWager({ currentCoins, currentStreak, onWager, onSkip }: St
         {PRESET_AMOUNTS.map((amount) => {
           const disabled = amount > maxWager;
           return (
-            <motion.button
+            <m.button
               key={amount}
               whileTap={disabled ? undefined : { scale: 0.95 }}
               disabled={disabled}
@@ -64,7 +64,7 @@ export function StreakWager({ currentCoins, currentStreak, onWager, onSkip }: St
               )}
             >
               {amount}
-            </motion.button>
+            </m.button>
           );
         })}
       </div>

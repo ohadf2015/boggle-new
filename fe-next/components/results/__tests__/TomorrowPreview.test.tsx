@@ -4,7 +4,7 @@ import TomorrowPreview from '../TomorrowPreview';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, style, ...rest }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} style={style} data-testid={rest['data-testid' as keyof typeof rest] as string}>
         {children}

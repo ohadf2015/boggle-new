@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { X } from 'lucide-react';
 import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
@@ -359,7 +359,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   });
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -406,7 +406,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         </div>
 
         {/* Timer (center - always visible and prominent) */}
-        <motion.div
+        <m.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="relative z-20"
@@ -417,10 +417,10 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           <div className="lg:hidden">
             <CircularTimer remainingTime={timer.remainingTime} totalTime={duration} size="md" />
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Score (right position) - vibrant yellow/lime gradient like multiplayer */}
-        <motion.div
+        <m.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="relative border-3 border-neo-black rounded-neo shadow-hard-lg px-3 md:px-4 py-1.5 min-w-[80px] md:min-w-[100px]"
@@ -429,7 +429,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           }}
         >
           <div className="text-center">
-            <motion.div
+            <m.div
               key={score}
               initial={{ scale: 1.3 }}
               animate={{ scale: 1 }}
@@ -437,12 +437,12 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
               style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
             >
               {score.toLocaleString()}
-            </motion.div>
+            </m.div>
             <div className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-neo-black/80">
               {t('common.score')}
             </div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Conditional mascots: panic when time runs low, onfire when on a hot streak */}
@@ -548,7 +548,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         showWord
         onComplete={clearPopup}
       />
-    </motion.div>
+    </m.div>
   );
 };
 

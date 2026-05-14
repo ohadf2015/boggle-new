@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Hash, Target, Coins, Sparkles, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -82,7 +82,7 @@ export const CelebrationHero = memo(function CelebrationHero({
   const speechMessage = getSpeechMessage(score, variant);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
@@ -110,27 +110,27 @@ export const CelebrationHero = memo(function CelebrationHero({
 
         {/* Floating decorations - desktop only */}
         <div className="hidden md:block absolute inset-0 pointer-events-none overflow-hidden">
-          <motion.div
+          <m.div
             className="absolute top-6 left-8 text-neo-lime/30"
             animate={{ y: [0, -8, 0], rotate: [0, 15, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           >
             <Sparkles className="w-6 h-6" />
-          </motion.div>
-          <motion.div
+          </m.div>
+          <m.div
             className="absolute top-12 right-12 text-neo-pink/30"
             animate={{ y: [0, -6, 0], rotate: [0, -10, 0] }}
             transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
           >
             <Trophy className="w-5 h-5" />
-          </motion.div>
-          <motion.div
+          </m.div>
+          <m.div
             className="absolute bottom-8 left-16 text-neo-cyan/20"
             animate={{ y: [0, -10, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
           >
             <Sparkles className="w-4 h-4" />
-          </motion.div>
+          </m.div>
         </div>
 
         <div className={cn(
@@ -139,7 +139,7 @@ export const CelebrationHero = memo(function CelebrationHero({
         )}>
           {/* Rank badge pill */}
           {message && (
-            <motion.span
+            <m.span
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
@@ -150,7 +150,7 @@ export const CelebrationHero = memo(function CelebrationHero({
               )}
             >
               {message}
-            </motion.span>
+            </m.span>
           )}
 
           {/* Announcement */}
@@ -166,7 +166,7 @@ export const CelebrationHero = memo(function CelebrationHero({
           </p>
 
           {/* Massive score number */}
-          <motion.div
+          <m.div
             initial={{ scale: 0.5 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.15, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
@@ -180,10 +180,10 @@ export const CelebrationHero = memo(function CelebrationHero({
             }}
           >
             {score}
-          </motion.div>
+          </m.div>
 
           {/* Inline stats bar */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
@@ -236,7 +236,7 @@ export const CelebrationHero = memo(function CelebrationHero({
                 </div>
               </div>
             )}
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Mascot with speech bubble - always show on desktop when score > 0 */}
@@ -273,7 +273,7 @@ export const CelebrationHero = memo(function CelebrationHero({
               </div>
 
               {/* Speech bubble */}
-              <motion.div
+              <m.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 1, duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
@@ -286,11 +286,11 @@ export const CelebrationHero = memo(function CelebrationHero({
                 <p className="text-neo-black font-black uppercase text-[10px] sm:text-xs whitespace-nowrap">
                   {speechMessage}
                 </p>
-              </motion.div>
+              </m.div>
             </div>
           </div>
         )}
       </div>
-    </motion.div>
+    </m.div>
   );
 });

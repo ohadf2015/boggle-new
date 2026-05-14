@@ -7,7 +7,7 @@
  * Uses framer-motion for animation. Respects reduced motion.
  */
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import type { ReactNode } from 'react';
 
 interface PulseGlowProps {
@@ -38,7 +38,7 @@ export function PulseGlow({
   }
 
   return (
-    <motion.div
+    <m.div
       className={`relative inline-block ${className}`}
       animate={{
         boxShadow: shouldReduceMotion
@@ -52,6 +52,6 @@ export function PulseGlow({
       style={{ borderRadius: 'inherit' }}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Mountain, Snowflake, Zap, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import useReducedMotion from '@/hooks/useReducedMotion';
@@ -36,7 +36,7 @@ export const CatalystTeaser = memo(function CatalystTeaser({ t }: CatalystTeaser
   const reducedMotion = useReducedMotion();
 
   return (
-    <motion.section
+    <m.section
       initial={reducedMotion ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.55, duration: 0.4 }}
@@ -54,7 +54,7 @@ export const CatalystTeaser = memo(function CatalystTeaser({ t }: CatalystTeaser
 
       <ul className="grid grid-cols-2 gap-2">
         {CATALYSTS.map((c, i) => (
-          <motion.li
+          <m.li
             key={c.id}
             initial={reducedMotion ? false : { opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -80,14 +80,14 @@ export const CatalystTeaser = memo(function CatalystTeaser({ t }: CatalystTeaser
                 {t(`catalystTeaser.${c.id}.desc`)}
               </span>
             </span>
-          </motion.li>
+          </m.li>
         ))}
       </ul>
 
       <p className="mt-3 text-center font-neo-body text-[10px] uppercase tracking-wider text-neo-cyan/80">
         {t('catalystTeaser.onePerGame')}
       </p>
-    </motion.section>
+    </m.section>
   );
 });
 

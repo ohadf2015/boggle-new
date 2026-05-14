@@ -7,7 +7,7 @@ import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: React.forwardRef(function MotionDiv(
       { children, ...props }: React.PropsWithChildren<Record<string, unknown>>,
       ref: React.Ref<HTMLDivElement>

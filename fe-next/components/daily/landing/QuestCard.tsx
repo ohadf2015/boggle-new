@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   Timer, Hourglass, Check, X, Loader2, Bell,
 } from 'lucide-react';
@@ -107,7 +107,7 @@ export function QuestCard({
   };
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, type: 'spring', stiffness: 300, damping: 25 }}
@@ -200,7 +200,7 @@ export function QuestCard({
               <span className="[&>svg]:w-4 [&>svg]:h-4">{icon}</span>
             </div>
             {!isLoadingStatus && isCompleted && (
-              <motion.div
+              <m.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 className={cn(
@@ -213,7 +213,7 @@ export function QuestCard({
                   ? <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />
                   : <X className="w-3 h-3 text-neo-black" strokeWidth={3} />
                 }
-              </motion.div>
+              </m.div>
             )}
           </div>
         ) : (
@@ -242,7 +242,7 @@ export function QuestCard({
                 </div>
 
                 {!isLoadingStatus && isCompleted && (
-                  <motion.div
+                  <m.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     className={cn(
@@ -255,7 +255,7 @@ export function QuestCard({
                       ? <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />
                       : <X className="w-3 h-3 text-neo-black" strokeWidth={3} />
                     }
-                  </motion.div>
+                  </m.div>
                 )}
 
                 {isLoadingStatus && (
@@ -307,7 +307,7 @@ export function QuestCard({
           </div>
         )}
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

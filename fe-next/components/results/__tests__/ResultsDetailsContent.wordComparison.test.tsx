@@ -9,7 +9,7 @@ import '@testing-library/jest-dom';
 import type { Player, WordObject } from '../types';
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children?: React.ReactNode }) => (
       <button {...props}>{children}</button>
     ),

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Send, X, Keyboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -130,7 +130,7 @@ const DesktopWordInput = memo<DesktopWordInputProps>(({
 
   return (
     <div className={cn('hidden md:flex justify-center mt-3', className)}>
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
@@ -184,7 +184,7 @@ const DesktopWordInput = memo<DesktopWordInputProps>(({
           {/* Clear button */}
           <AnimatePresence>
             {typedWord.length > 0 && (
-              <motion.button
+              <m.button
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.5 }}
@@ -194,12 +194,12 @@ const DesktopWordInput = memo<DesktopWordInputProps>(({
                 type="button"
               >
                 <X className="w-4 h-4 text-neo-black/50" />
-              </motion.button>
+              </m.button>
             )}
           </AnimatePresence>
 
           {/* Submit button */}
-          <motion.button
+          <m.button
             onClick={handleSubmit}
             disabled={!isSubmittable}
             whileTap={isSubmittable ? { scale: 0.9 } : undefined}
@@ -213,23 +213,23 @@ const DesktopWordInput = memo<DesktopWordInputProps>(({
             type="button"
           >
             <Send className="w-4 h-4" />
-          </motion.button>
+          </m.button>
         </div>
 
         {/* First-time hint */}
         <AnimatePresence>
           {!hasSubmitted && typedWord.length === 0 && enabled && (
-            <motion.p
+            <m.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="text-[10px] text-neo-white/50 text-center mt-1 font-bold"
             >
               {t('desktopInput.hint') || 'Type letters to find words · Enter to submit · Esc to clear'}
-            </motion.p>
+            </m.p>
           )}
         </AnimatePresence>
-      </motion.div>
+      </m.div>
     </div>
   );
 });

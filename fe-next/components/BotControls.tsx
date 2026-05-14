@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Bot, X, Wand2 } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { Switch } from './ui/switch';
@@ -158,7 +158,7 @@ const BotControls: React.FC<BotControlsProps> = ({
       {/* Error Message */}
       <AnimatePresence>
         {error && (
-          <motion.div
+          <m.div
             role="alert"
             aria-live="assertive"
             initial={{ opacity: 0, y: -10 }}
@@ -167,7 +167,7 @@ const BotControls: React.FC<BotControlsProps> = ({
             className="text-xs text-neo-red bg-neo-red/10 px-3 py-2 rounded-neo border-2 border-neo-red/30"
           >
             {error}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -209,7 +209,7 @@ const BotControls: React.FC<BotControlsProps> = ({
               {bots.map((bot) => {
                 const config = getDifficultyConfig(bot.botDifficulty);
                 return (
-                  <motion.div
+                  <m.div
                     key={bot.username}
                     layout
                     initial={{ opacity: 0, scale: 0.8 }}
@@ -234,7 +234,7 @@ const BotControls: React.FC<BotControlsProps> = ({
                     >
                       {config.icon}
                     </Badge>
-                    <motion.button
+                    <m.button
                       type="button"
                       onClick={() => handleRemoveBot(bot.username)}
                       disabled={disabled}
@@ -249,8 +249,8 @@ const BotControls: React.FC<BotControlsProps> = ({
                       )}
                     >
                       <X size={10} aria-hidden="true" />
-                    </motion.button>
-                  </motion.div>
+                    </m.button>
+                  </m.div>
                 );
               })}
             </AnimatePresence>

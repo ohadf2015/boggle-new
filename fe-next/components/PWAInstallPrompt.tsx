@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Download, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -102,7 +102,7 @@ export function PWAInstallPrompt() {
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
@@ -148,7 +148,7 @@ export function PWAInstallPrompt() {
             </button>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 
@@ -70,7 +70,7 @@ export const WinCinematic: React.FC<WinCinematicProps> = ({
   }, []);
 
   return (
-    <motion.div
+    <m.div
       data-testid="win-cinematic"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -79,48 +79,48 @@ export const WinCinematic: React.FC<WinCinematicProps> = ({
       onClick={handleClick}
     >
       {/* Puzzle label — number rendered explicitly so it's always in the DOM */}
-      <motion.div
+      <m.div
         initial={{ scale: 0, rotate: -10 }}
         animate={{ scale: 1, rotate: -3 }}
         transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.1 }}
         className="text-slate-500 text-sm font-black uppercase tracking-widest mb-4"
       >
         {t('wordHunt.title')} #{puzzleNumber}
-      </motion.div>
+      </m.div>
 
       {/* Rolling score */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
         className="text-[8rem] font-black text-neo-lime leading-none tabular-nums"
       >
         {displayScore}
-      </motion.div>
+      </m.div>
 
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3, type: 'spring', stiffness: 280, damping: 26 }}
         className="text-slate-400 text-lg font-bold uppercase tracking-widest"
       >
         {t('common.pts')}
-      </motion.div>
+      </m.div>
 
       {/* Tap to continue */}
       <AnimatePresence>
         {showTap && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ type: 'spring', stiffness: 280, damping: 26 }}
             className="absolute bottom-12 text-slate-500 text-sm uppercase tracking-widest"
           >
             {t('common.tapToContinue')}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </m.div>
   );
 };
 

@@ -29,7 +29,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     button: React.forwardRef(function MB({ children, ...props }: any, ref: any) {
       return <button ref={ref} {...props}>{children}</button>;

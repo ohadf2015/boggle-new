@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { List, Star, Flame, Zap, ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -188,7 +188,7 @@ const WordItem: React.FC<WordItemProps> = ({ word, isNew, t }) => {
       : 'text-neo-cream';
 
   return (
-    <motion.div
+    <m.div
       initial={isNew ? { opacity: 0, y: -20, scale: 0.9 } : false}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
@@ -237,7 +237,7 @@ const WordItem: React.FC<WordItemProps> = ({ word, isNew, t }) => {
           </span>
         )}
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

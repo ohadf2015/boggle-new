@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
     ),

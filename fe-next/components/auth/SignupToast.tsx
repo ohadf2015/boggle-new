@@ -8,7 +8,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { AlertTriangle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
@@ -46,7 +46,7 @@ export const SignupToast: React.FC<SignupToastProps> = ({
   return (
     <AnimatePresence>
       {isVisible && (
-        <motion.div
+        <m.div
           initial={{ y: -40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -40, opacity: 0 }}
@@ -72,7 +72,7 @@ export const SignupToast: React.FC<SignupToastProps> = ({
               games: mpGamesThisSession,
             })}
           </p>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

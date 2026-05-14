@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Target, TrendingUp, Trophy, Zap, Flame, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -98,7 +98,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
   const displayMisses = compact ? nearMisses.slice(0, 2) : nearMisses.slice(0, 3);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
@@ -124,7 +124,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
           const progressPercent = Math.round((nearMiss.current / nearMiss.target) * 100);
 
           return (
-            <motion.div
+            <m.div
               key={`${nearMiss.type}-${nearMiss.achievement ?? index}`}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
@@ -154,7 +154,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
                   {/* Progress bar */}
                   <div className="mt-2 relative">
                     <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                      <motion.div
+                      <m.div
                         initial={{ width: 0 }}
                         animate={{ width: `${progressPercent}%` }}
                         transition={{ duration: 0.8, delay: 0.7 + index * 0.1 }}
@@ -199,13 +199,13 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
                   </p>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           );
         })}
 
         {/* Play Again CTA */}
         {onPlayAgain && (
-          <motion.button
+          <m.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1, type: 'spring', stiffness: 300, damping: 26 }}
@@ -220,7 +220,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
             )}
           >
             {t('nearMiss.oneMoreGame')}
-          </motion.button>
+          </m.button>
         )}
       </div>
 
@@ -232,7 +232,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
           </p>
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 };
 

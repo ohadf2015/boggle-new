@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useState, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { HelpCircle, X } from 'lucide-react';
 
 interface ScoreBreakdownTooltipProps {
@@ -64,7 +64,7 @@ const ScoreBreakdownTooltip = memo<ScoreBreakdownTooltipProps>(({
         {isOpen && (
           <>
             {/* Backdrop to close on outside click */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -73,7 +73,7 @@ const ScoreBreakdownTooltip = memo<ScoreBreakdownTooltipProps>(({
             />
 
             {/* Tooltip content */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.9, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: -10 }}
@@ -120,7 +120,7 @@ const ScoreBreakdownTooltip = memo<ScoreBreakdownTooltipProps>(({
                 {/* Arrow pointer */}
                 <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-neo-cream border-l-3 border-t-3 border-neo-black rotate-45" />
               </div>
-            </motion.div>
+            </m.div>
           </>
         )}
       </AnimatePresence>

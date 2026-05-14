@@ -10,7 +10,7 @@ import { StreakFreezeIndicator } from '../StreakFreezeIndicator';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: any) => {
       const { initial, animate, transition, ...rest } = props;
       return <div {...rest}>{children}</div>;

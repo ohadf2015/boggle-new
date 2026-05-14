@@ -18,7 +18,7 @@ vi.mock('framer-motion', () => {
   ));
   MotionP.displayName = 'MotionP';
   return {
-    motion: {
+    m: {
       div: MotionDiv,
       h1: MotionH1,
       p: MotionP,

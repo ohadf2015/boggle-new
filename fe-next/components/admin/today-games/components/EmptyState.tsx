@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Calendar } from 'lucide-react';
 
 interface EmptyStateProps {
@@ -10,7 +10,7 @@ interface EmptyStateProps {
 
 export function EmptyState({ t }: EmptyStateProps) {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="flex flex-col items-center justify-center py-16 bg-slate-800/30 rounded-neo border-neo border-black"
@@ -22,6 +22,6 @@ export function EmptyState({ t }: EmptyStateProps) {
       <p className="text-slate-500">
         {t('admin.todayGames.noGamesHint')}
       </p>
-    </motion.div>
+    </m.div>
   );
 }

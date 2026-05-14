@@ -22,7 +22,7 @@ vi.mock('framer-motion', () => {
   MockMotionDiv.displayName = 'MockMotionDiv';
 
   return {
-    motion: {
+    m: {
       div: MockMotionDiv,
       span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
     },

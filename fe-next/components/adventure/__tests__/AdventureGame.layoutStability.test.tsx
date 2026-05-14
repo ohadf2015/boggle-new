@@ -77,7 +77,7 @@ vi.mock('framer-motion', () => {
   };
 
   return {
-    motion: motionProxy,
+    m: motionProxy,
     m: motionProxy,
     AnimatePresence: ({ children }: any) => children,
     LazyMotion: ({ children }: any) => children,

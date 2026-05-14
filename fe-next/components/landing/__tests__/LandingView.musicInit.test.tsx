@@ -64,7 +64,7 @@ vi.mock('framer-motion', () => {
     { get: () => ({ children, ...p }: React.PropsWithChildren<Record<string, unknown>>) => <div {...p}>{children}</div> }
   ) as never;
   return {
-    motion: motionObj, m: motionObj,
+    m: motionObj, m: motionObj,
     AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     useMotionValue: () => ({ get: () => 0, set: () => {}, on: () => () => {} }),
     useSpring: (v: unknown) => v, useInView: () => true, useReducedMotion: () => false, animate: () => ({ stop: () => {} }),

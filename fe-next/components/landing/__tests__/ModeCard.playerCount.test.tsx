@@ -5,7 +5,7 @@ import { Users } from 'lucide-react';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => (
       <div {...props}>{children}</div>
     ),

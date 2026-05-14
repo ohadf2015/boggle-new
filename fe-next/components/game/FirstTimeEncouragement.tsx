@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { Mascot, type MascotVariant } from '@/components/ui/Mascot';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { EncouragementTrigger } from '@/hooks/useFirstTimeEncouragement';
@@ -25,7 +25,7 @@ export default function FirstTimeEncouragement({ trigger, onDismiss }: FirstTime
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         key={trigger}
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -44,7 +44,7 @@ export default function FirstTimeEncouragement({ trigger, onDismiss }: FirstTime
         <span className="text-neo-black text-sm font-neo-body font-medium truncate">
           {t(config.key)}
         </span>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 }

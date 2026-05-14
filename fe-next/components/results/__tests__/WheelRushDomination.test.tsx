@@ -21,7 +21,7 @@ vi.mock('framer-motion', () => {
       React.createElement('div', { ...rest, ref }, children as React.ReactNode)
   );
   return {
-    motion: new Proxy({}, {
+    m: new Proxy({}, {
       get: (_t: Record<string, unknown>, prop: string) => {
         if (prop === 'div') return MotionDiv;
         // eslint-disable-next-line react/display-name

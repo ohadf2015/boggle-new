@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { RefreshCw, Crown, Gamepad2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -167,7 +167,7 @@ export const RoomList: React.FC<RoomListProps> = ({
 
   // Original full mode with Card wrapper
   return (
-    <motion.div
+    <m.div
       initial={{ x: -50, opacity: 0, rotate: 2 }}
       animate={{ x: 0, opacity: 1, rotate: 1 }}
       transition={{ duration: 0.5 }}
@@ -270,7 +270,7 @@ export const RoomList: React.FC<RoomListProps> = ({
           )}
         </CardContent>
       </Card>
-    </motion.div>
+    </m.div>
   );
 };
 
@@ -319,7 +319,7 @@ const EmptyRoomsState: React.FC<EmptyRoomsStateProps> = ({
 }) => (
   <div className="text-center py-6 text-neo-cream/90 space-y-4">
     {isJoinMode && (
-      <motion.div whileHover={{ x: -2, y: -2 }} whileTap={{ x: 2, y: 2 }}>
+      <m.div whileHover={{ x: -2, y: -2 }} whileTap={{ x: 2, y: 2 }}>
         <Button
           onClick={onSwitchToHostMode}
           className="bg-neo-pink text-neo-white"
@@ -327,7 +327,7 @@ const EmptyRoomsState: React.FC<EmptyRoomsStateProps> = ({
           <span className="me-2"><Crown /></span>
           {t('joinView.createRoom')}
         </Button>
-      </motion.div>
+      </m.div>
     )}
     <div className="flex justify-center">
       <Gamepad2 size={48} className="text-neo-cream/90" />

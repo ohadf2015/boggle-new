@@ -38,7 +38,7 @@ vi.mock('framer-motion', () => {
   MockMotionSpan.displayName = 'MockMotionSpan';
 
   return {
-    motion: {
+    m: {
       div: MockMotionDiv,
       span: MockMotionSpan,
     },

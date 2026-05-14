@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useMemo, useRef, useEffect, Fragment } from 'react';
-import { motion, LayoutGroup } from 'framer-motion';
+import { m, LayoutGroup } from 'framer-motion';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Users } from 'lucide-react';
 import TvPlayerCard from './TvPlayerCard';
@@ -94,7 +94,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
   if (!useVirtual) {
     return (
       <LayoutGroup>
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="h-full overflow-y-auto overscroll-contain scrollable-area p-4 flex flex-col gap-2"
@@ -133,7 +133,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
               )}
             </Fragment>
           ))}
-        </motion.div>
+        </m.div>
       </LayoutGroup>
     );
   }

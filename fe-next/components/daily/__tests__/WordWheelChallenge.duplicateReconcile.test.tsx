@@ -20,7 +20,7 @@ vi.mock('next/dynamic', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: new Proxy(
+  m: new Proxy(
     {},
     {
       get: () => ({ children, ...props }: React.ComponentProps<'div'>) => (

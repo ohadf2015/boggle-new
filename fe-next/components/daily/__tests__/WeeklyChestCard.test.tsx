@@ -24,7 +24,7 @@ vi.mock('gsap', () => ({
 }))
 
 vi.mock('framer-motion', () => ({
-  motion: new Proxy(
+  m: new Proxy(
     {},
     {
       get: (_t: unknown, prop: string) => {

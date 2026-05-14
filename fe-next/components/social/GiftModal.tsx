@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { X, Lightbulb, Shield, Coins } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -49,7 +49,7 @@ const GiftModal: React.FC<GiftModalProps> = ({
 
   return (
     <div data-testid="gift-modal" className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/60 backdrop-blur-xs">
-      <motion.div
+      <m.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
@@ -150,7 +150,7 @@ const GiftModal: React.FC<GiftModalProps> = ({
         >
           {t('socialGift.send', 'Send Gift')}
         </button>
-      </motion.div>
+      </m.div>
     </div>
   );
 };

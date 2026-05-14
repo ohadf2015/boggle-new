@@ -10,7 +10,7 @@ import type { AccumulatedClue } from '../types';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial: _i, animate: _a, exit: _e, transition: _t, ...domProps } = props as Record<string, unknown>;
       return <div {...(domProps as React.HTMLAttributes<HTMLDivElement>)}>{children}</div>;

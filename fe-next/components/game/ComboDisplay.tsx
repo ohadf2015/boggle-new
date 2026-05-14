@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, memo, useRef, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { getComboColors } from '../grid/comboColors';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -88,7 +88,7 @@ const Sparkle = memo<{
   size: number;
   delay: number;
 }>(({ angle, distance, color, size, delay }) => (
-  <motion.div
+  <m.div
     className="absolute pointer-events-none will-change-transform"
     style={{
       width: size,
@@ -116,7 +116,7 @@ const Sparkle = memo<{
     <svg viewBox="0 0 24 24" fill={color} className="w-full h-full drop-shadow-lg">
       <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
     </svg>
-  </motion.div>
+  </m.div>
 ));
 
 Sparkle.displayName = 'Sparkle';
@@ -199,7 +199,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
       )}
     >
       <AnimatePresence mode="wait">
-        <motion.div
+        <m.div
           key={`combo-${comboLevel}`}
           initial={{ scale: 0, opacity: 0, y: 10 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -247,7 +247,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                   strokeLinecap="round"
                 />
                 {/* Foreground arc (progress) */}
-                <motion.circle
+                <m.circle
                   cx="18"
                   cy="18"
                   r="15"
@@ -276,7 +276,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
           )}
 
           {/* Main combo text - clean text-based display without badge */}
-          <motion.div
+          <m.div
             animate={
               isDanger
                 ? {
@@ -333,7 +333,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
               }}
             >
               {/* Fire emoji - simplified animation for performance */}
-              <motion.span
+              <m.span
                 className="text-[1.1em]"
                 style={{
                   // Reset text styles for emoji to show properly
@@ -358,10 +358,10 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                 }}
               >
                 {isRainbow ? '🌈' : '🔥'}
-              </motion.span>
+              </m.span>
 
               {/* Combo count */}
-              <motion.span
+              <m.span
                 key={`level-${comboLevel}`}
                 initial={{ scale: 1.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -373,7 +373,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                 }}
               >
                 x{comboLevel}
-              </motion.span>
+              </m.span>
 
               {/* COMBO word - always visible now */}
               <span
@@ -389,7 +389,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
 
             {/* Glow effect behind text - extends beyond container for full visibility */}
             {!skipSparkles && (
-              <motion.div
+              <m.div
                 className="absolute inset-0 pointer-events-none -z-10 blur-md scale-[1.3] rounded-full"
                 animate={{
                   opacity: [0.3, 0.5, 0.3],
@@ -404,12 +404,12 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                 }}
               />
             )}
-          </motion.div>
+          </m.div>
 
           {/* Status text below for high combos - matches rarity */}
           {/* Hidden in compact mode to prevent overflow */}
           {isHighCombo && !compact && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               className={cn(
@@ -426,11 +426,11 @@ const ComboDisplay = memo<ComboDisplayProps>(({
               }}
             >
               {isInsaneCombo ? 'GODLIKE!' : rarity === 'mythic' ? 'MYTHIC!' : 'LEGENDARY!'}
-            </motion.div>
+            </m.div>
           )}
 
           {/* Burst effect on combo increase - enhanced with double ring */}
-          <motion.div
+          <m.div
             key={`burst-${comboLevel}`}
             className="absolute inset-0 rounded-full pointer-events-none"
             initial={{ scale: 0.8, opacity: 0.8 }}
@@ -442,7 +442,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
             }}
           />
           {/* Second burst ring - delayed for staggered effect */}
-          <motion.div
+          <m.div
             key={`burst2-${comboLevel}`}
             className="absolute inset-0 rounded-full pointer-events-none"
             initial={{ scale: 0.6, opacity: 0.6 }}
@@ -456,7 +456,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
           {/* Level Up flash - appears above combo when leveling up */}
           <AnimatePresence>
             {showLevelUp && !skipSparkles && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 10, scale: 0.5 }}
                 animate={{ opacity: 1, y: compact ? -28 : -35, scale: 1 }}
                 exit={{ opacity: 0, y: compact ? -40 : -50, scale: 0.8 }}
@@ -478,13 +478,13 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                 }}
               >
                 ⚡ +1
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
 
           {/* Mascot celebration for high combos (5+) - positioned to the left, doesn't affect layout */}
           {showMascot && (
-            <motion.div
+            <m.div
               data-testid="combo-mascot"
               className="absolute -inset-s-10 top-1/2 -translate-y-1/2 pointer-events-none"
               initial={{ scale: 0, opacity: 0, x: 20 }}
@@ -500,9 +500,9 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                 enableClick={false}
                 clipBorder="none"
               />
-            </motion.div>
+            </m.div>
           )}
-        </motion.div>
+        </m.div>
       </AnimatePresence>
 
       {/* Coin reward animation */}

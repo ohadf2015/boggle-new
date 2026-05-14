@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface AnimatedBoardGridProps {
@@ -102,7 +102,7 @@ export function AnimatedBoardGrid({
 
             return (
               <AnimatePresence mode="wait" key={`cell-${r}-${c}`}>
-                <motion.div
+                <m.div
                   key={`${revision}-${r}-${c}`}
                   // ── Entry: drop from above with bounce ──
                   initial={prefersReduced
@@ -155,7 +155,7 @@ export function AnimatedBoardGrid({
                   )}
                 >
                   {hasLetter ? letter : '\u00A0'}
-                </motion.div>
+                </m.div>
               </AnimatePresence>
             );
           })}
@@ -165,14 +165,14 @@ export function AnimatedBoardGrid({
       {/* Generating shimmer */}
       <AnimatePresence>
         {isGenerating && (
-          <motion.p
+          <m.p
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             className="text-center mt-2 font-neo-body text-xs text-neo-cyan/80 animate-pulse"
           >
             ✦ generating...
-          </motion.p>
+          </m.p>
         )}
       </AnimatePresence>
     </div>

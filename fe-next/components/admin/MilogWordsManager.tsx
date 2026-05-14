@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 
 interface MilogWord {
   id: string;
@@ -348,7 +348,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <AnimatePresence mode="popLayout">
             {words.map((word) => (
-              <motion.div
+              <m.div
                 key={word.id}
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -444,7 +444,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </m.div>
             ))}
           </AnimatePresence>
         </div>

@@ -18,7 +18,7 @@ vi.mock('framer-motion', () => {
     return rest;
   };
   return {
-    motion: {
+    m: {
       div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
         <div {...stripFramerProps(props)}>{children}</div>
       ),

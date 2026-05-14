@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 
@@ -185,7 +185,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         aria-valuemin={0}
         aria-valuemax={100}
       >
-        <motion.div
+        <m.div
           className={cn('h-full rounded-full', variantClasses[variant])}
           initial={{ width: 0 }}
           animate={{ width: `${clampedProgress}%` }}

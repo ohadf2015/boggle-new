@@ -22,7 +22,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     button: ({ children, onClick, ...rest }: React.ComponentProps<'button'>) => (
       <button onClick={onClick} {...rest}>{children}</button>
     ),

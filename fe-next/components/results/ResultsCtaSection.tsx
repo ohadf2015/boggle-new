@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Star, Play, Check, Swords } from 'lucide-react';
 import type { Player } from '@/components/results/types';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
@@ -62,7 +62,7 @@ export const ResultsCtaSection: React.FC<ResultsCtaSectionProps> = ({
   const showBotsOnlyNextStep = isBotsOnlyGame && !isHost && !isOnCrazyGamesPlatform;
 
   return (
-    <motion.div
+    <m.div
       initial={reducedMotion ? undefined : { opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 200, damping: 20, delay: ctaDelay }}
@@ -93,7 +93,7 @@ export const ResultsCtaSection: React.FC<ResultsCtaSectionProps> = ({
                     />
                   </div>
                 )}
-                <motion.button
+                <m.button
                   onClick={onStartGame}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.93 }}
@@ -106,7 +106,7 @@ export const ResultsCtaSection: React.FC<ResultsCtaSectionProps> = ({
                 >
                   <Play className="w-6 h-6" />
                   {t('results.playAgain')}
-                </motion.button>
+                </m.button>
               </div>
             ) : isCurrentPlayerReady ? (
               <div className="bg-emerald-500 text-white border-3 border-neo-black rounded-neo p-3 shadow-hard">
@@ -121,7 +121,7 @@ export const ResultsCtaSection: React.FC<ResultsCtaSectionProps> = ({
             ) : (
               <div className="space-y-1.5">
                 {currentPlayerRank > 1 && sortedScores.length > 1 && sortedScores[0]?.username ? (
-                  <motion.button
+                  <m.button
                     onClick={onMarkReady}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
@@ -134,9 +134,9 @@ export const ResultsCtaSection: React.FC<ResultsCtaSectionProps> = ({
                   >
                     <Swords className="w-6 h-6" />
                     {t('results.revengeRematch', { player: sortedScores[0].username })}
-                  </motion.button>
+                  </m.button>
                 ) : (
-                  <motion.button
+                  <m.button
                     onClick={onMarkReady}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
@@ -149,7 +149,7 @@ export const ResultsCtaSection: React.FC<ResultsCtaSectionProps> = ({
                   >
                     <Star className="w-6 h-6" />
                     {t('results.imReady')}
-                  </motion.button>
+                  </m.button>
                 )}
                 <p className="text-center text-xs text-neo-cream/60">
                   {t('results.readyExplanation')}
@@ -195,7 +195,7 @@ export const ResultsCtaSection: React.FC<ResultsCtaSectionProps> = ({
           )}
         </>
       )}
-    </motion.div>
+    </m.div>
   );
 };
 

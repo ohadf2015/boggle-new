@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Keyboard, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,7 +28,7 @@ export function KeyboardQuickTip({
   return (
     <AnimatePresence>
       {isVisible && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: -40 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -40 }}
@@ -47,19 +47,19 @@ export function KeyboardQuickTip({
           {/* Compact single-line content */}
           <div className="flex items-center gap-2">
             {/* Icon with glow pulse */}
-            <motion.div
+            <m.div
               className="shrink-0 w-7 h-7 bg-neo-lime text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center relative"
               animate={{ scale: [1, 1.08, 1] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
             >
               <Keyboard className="w-4 h-4" />
               {/* Glow effect */}
-              <motion.div
+              <m.div
                 className="absolute inset-0 w-7 h-7 bg-neo-lime rounded-neo blur-xs -z-10"
                 animate={{ opacity: [0.4, 0.8, 0.4] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
               />
-            </motion.div>
+            </m.div>
 
             {/* Text - single line, compact */}
             <div className="flex-1 min-w-0">
@@ -77,7 +77,7 @@ export function KeyboardQuickTip({
               <X className="w-3 h-3" />
             </button>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { TrendingUp, Target, ArrowUp, Swords, Zap, LucideIcon } from 'lucide-react';
 import { getAllSessionFacts, type SessionFact } from '../../utils/sessionStatsCalculator';
 import { cn } from '../../lib/utils';
@@ -75,7 +75,7 @@ const SessionStatsCard: React.FC<SessionStatsCardProps> = ({
           const styles = TYPE_STYLES[fact.type];
 
           return (
-            <motion.div
+            <m.div
               key={fact.type}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -108,15 +108,15 @@ const SessionStatsCard: React.FC<SessionStatsCardProps> = ({
                   {t(fact.translationKey, fact.translationParams)}
                 </p>
               </div>
-              <motion.span
+              <m.span
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: index * 0.1 + 0.2, type: 'spring', stiffness: 400 }}
                 className="shrink-0 text-lg font-black text-neo-cream"
               >
                 {fact.type === 'improvement' ? `+${fact.value}%` : fact.value}
-              </motion.span>
-            </motion.div>
+              </m.span>
+            </m.div>
           );
         })}
       </div>

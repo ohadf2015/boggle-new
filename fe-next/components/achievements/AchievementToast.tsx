@@ -9,7 +9,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -109,7 +109,7 @@ function AchievementToastContent({ payload, isVisible }: AchievementToastContent
   return (
     <AnimatePresence>
       {isVisible && (
-        <motion.div
+        <m.div
           initial={{ y: -28, opacity: 0, scale: 0.92 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}
           exit={{ y: -16, opacity: 0, scale: 0.96 }}
@@ -130,7 +130,7 @@ function AchievementToastContent({ payload, isVisible }: AchievementToastContent
           data-testid="achievement-toast"
         >
           {/* Shine sweep — rarer tiers run twice */}
-          <motion.div
+          <m.div
             aria-hidden
             initial={{ x: isRtl ? 240 : -240, opacity: 0 }}
             animate={{ x: isRtl ? -240 : 240, opacity: [0, 0.85, 0] }}
@@ -151,7 +151,7 @@ function AchievementToastContent({ payload, isVisible }: AchievementToastContent
 
           {/* Icon + glow ring + sparkles */}
           <div className="relative flex-shrink-0">
-            <motion.div
+            <m.div
               animate={{
                 boxShadow: [
                   `0 0 0 0 ${glow}`,
@@ -164,7 +164,7 @@ function AchievementToastContent({ payload, isVisible }: AchievementToastContent
               aria-hidden
               data-testid="achievement-toast-pulse-ring"
             />
-            <motion.div
+            <m.div
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.05, type: 'spring', stiffness: 360, damping: 12 }}
@@ -174,16 +174,16 @@ function AchievementToastContent({ payload, isVisible }: AchievementToastContent
               )}
               style={{ backgroundColor: tierColors.bg }}
             >
-              <motion.span
+              <m.span
                 className="text-lg leading-none"
                 animate={{ y: [0, -1.5, 0] }}
                 transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
               >
                 {achievement.icon}
-              </motion.span>
-            </motion.div>
+              </m.span>
+            </m.div>
             {sparkles.map((s, i) => (
-              <motion.span
+              <m.span
                 key={i}
                 aria-hidden
                 initial={{ opacity: 0, scale: 0 }}
@@ -201,13 +201,13 @@ function AchievementToastContent({ payload, isVisible }: AchievementToastContent
                 }}
               >
                 ✦
-              </motion.span>
+              </m.span>
             ))}
           </div>
 
           {/* Text content */}
           <div className="relative flex flex-col flex-1 min-w-0 leading-tight">
-            <motion.span
+            <m.span
               initial={{ opacity: 0, y: -3 }}
               animate={{ opacity: 0.7, y: 0 }}
               transition={{ delay: 0.12 }}
@@ -215,7 +215,7 @@ function AchievementToastContent({ payload, isVisible }: AchievementToastContent
             >
               <span>{titleText}</span>
               {tier && tierStyle.showRarityBadge && (
-                <motion.span
+                <m.span
                   initial={{ scale: 0, rotate: -8 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ delay: 0.22, type: 'spring', stiffness: 500, damping: 14 }}
@@ -228,10 +228,10 @@ function AchievementToastContent({ payload, isVisible }: AchievementToastContent
                   data-testid="achievement-toast-rarity"
                 >
                   {tier}
-                </motion.span>
+                </m.span>
               )}
-            </motion.span>
-            <motion.span
+            </m.span>
+            <m.span
               initial={{ opacity: 0, y: 3 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.18 }}
@@ -239,9 +239,9 @@ function AchievementToastContent({ payload, isVisible }: AchievementToastContent
               style={{ color: useLimeName ? 'var(--neo-lime)' : tierColors.text }}
             >
               {achievementName}
-            </motion.span>
+            </m.span>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

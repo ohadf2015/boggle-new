@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowRight, Coins, Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -67,7 +67,7 @@ const ScoreRevealV2: React.FC<ScoreRevealV2Props> = ({ score, onContinue, onSkip
   }, []);
 
   return (
-    <motion.div
+    <m.div
       data-testid="score-reveal-v2"
       initial={{ scale: 0.92, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
@@ -76,7 +76,7 @@ const ScoreRevealV2: React.FC<ScoreRevealV2Props> = ({ score, onContinue, onSkip
       dir={dir}
     >
       {/* Tier title — the hero. Asymmetric placement with mascot peeking from below-right. */}
-      <motion.div
+      <m.div
         initial={{ scale: 0.5, rotate: -8, opacity: 0 }}
         animate={{ scale: 1, rotate: -2.5, opacity: 1 }}
         transition={{ delay: 0.15, type: 'spring', stiffness: 360, damping: 14 }}
@@ -99,7 +99,7 @@ const ScoreRevealV2: React.FC<ScoreRevealV2Props> = ({ score, onContinue, onSkip
         </div>
 
         {/* Mascot peek — overlap bottom-right, breaks the rectangle */}
-        <motion.div
+        <m.div
           initial={{ scale: 0, x: 20, y: 10, rotate: 25 }}
           animate={{ scale: 1, x: 0, y: 0, rotate: 8 }}
           transition={{ delay: 0.55, type: 'spring', stiffness: 320, damping: 16 }}
@@ -114,10 +114,10 @@ const ScoreRevealV2: React.FC<ScoreRevealV2Props> = ({ score, onContinue, onSkip
             clipShape="circle"
             clipBorder={tier.accent === 'yellow' ? 'lime' : tier.accent}
           />
-        </motion.div>
+        </m.div>
 
         {/* Speech bubble — anchored opposite corner so it doesn't fight mascot */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.85, y: -4 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ delay: 0.85, type: 'spring', stiffness: 380, damping: 18 }}
@@ -131,13 +131,13 @@ const ScoreRevealV2: React.FC<ScoreRevealV2Props> = ({ score, onContinue, onSkip
           <span className="text-[11px] font-black text-neo-black uppercase tracking-wide font-neo-body">
             {t(`onboarding.ftue.v2.mascotReactions.${tier.key}`)}
           </span>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
 
       {/* Reward stack — asymmetric, gold dominant, streak overlapping */}
       <div className="relative mb-5 mt-4">
         {/* Gold reward — the big one */}
-        <motion.div
+        <m.div
           initial={{ y: 16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.65, type: 'spring', stiffness: 320, damping: 22 }}
@@ -157,10 +157,10 @@ const ScoreRevealV2: React.FC<ScoreRevealV2Props> = ({ score, onContinue, onSkip
               +{displayGold}
             </div>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Streak — offset, smaller, riding on top of gold's right edge */}
-        <motion.div
+        <m.div
           initial={{ y: 16, opacity: 0, rotate: 4 }}
           animate={{ y: 0, opacity: 1, rotate: 1.5 }}
           transition={{ delay: 0.85, type: 'spring', stiffness: 320, damping: 20 }}
@@ -181,11 +181,11 @@ const ScoreRevealV2: React.FC<ScoreRevealV2Props> = ({ score, onContinue, onSkip
               {t('onboarding.ftue.v2.streakStarted')}
             </div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Tomorrow hook — quiet, forward-pointing */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.05, duration: 0.4 }}
@@ -196,10 +196,10 @@ const ScoreRevealV2: React.FC<ScoreRevealV2Props> = ({ score, onContinue, onSkip
             {t('onboarding.ftue.v2.tomorrowBonus')}
           </span>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Primary CTA */}
-      <motion.button
+      <m.button
         data-testid="continue-button-v2"
         initial={{ scale: 0.94, opacity: 0 }}
         animate={{ scale: [0.94, 1.03, 1], opacity: 1 }}
@@ -215,7 +215,7 @@ const ScoreRevealV2: React.FC<ScoreRevealV2Props> = ({ score, onContinue, onSkip
       >
         {t('onboarding.ftue.v2.claimAndPlay')}
         <ArrowRight className="w-5 h-5" strokeWidth={3} />
-      </motion.button>
+      </m.button>
 
       {/* Footer row — score (tiny) + skip */}
       <div className="flex items-center justify-between mt-3 px-1">
@@ -231,7 +231,7 @@ const ScoreRevealV2: React.FC<ScoreRevealV2Props> = ({ score, onContinue, onSkip
           </button>
         )}
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Play, Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -37,7 +37,7 @@ export function PlayWithClassButton({
   const hasGame = !!activeGame;
 
   return (
-    <motion.div
+    <m.div
       initial={{ scale: 0.95, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
@@ -46,7 +46,7 @@ export function PlayWithClassButton({
         hasGame ? 'bg-neo-pink' : 'bg-neo-pink/80'
       )}
     >
-      <motion.button
+      <m.button
         onClick={handleClick}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -90,15 +90,15 @@ export function PlayWithClassButton({
             )}
           </div>
         </div>
-      </motion.button>
+      </m.button>
 
       {hasGame && (
-        <motion.div
+        <m.div
           className="absolute inset-0 rounded-neo border-neo border-neo-pink pointer-events-none"
           animate={{ opacity: [0.4, 0, 0.4] }}
           transition={{ duration: 2, repeat: Infinity }}
         />
       )}
-    </motion.div>
+    </m.div>
   );
 }

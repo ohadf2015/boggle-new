@@ -170,9 +170,9 @@ interface UseMascotImageAnimationReturn {
  * });
  *
  * return (
- *   <motion.div animate={animate} transition={transition}>
+ *   <m.div animate={animate} transition={transition}>
  *     <Image src="/mascot.png" alt="Mascot" />
- *   </motion.div>
+ *   </m.div>
  * );
  * ```
  */

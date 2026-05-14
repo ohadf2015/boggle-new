@@ -25,7 +25,7 @@ vi.mock('../../hooks/useCrazyGamesInvite', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
     h2: ({ children, ...props }: any) => <h2 {...props}>{children}</h2>,

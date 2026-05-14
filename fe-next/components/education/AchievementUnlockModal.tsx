@@ -13,7 +13,7 @@
 
 import { memo, useEffect, useId, useRef } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireLevelUpConfetti } from '@/utils/confettiUtils';
@@ -115,7 +115,7 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
     <AnimatePresence>
       {/* Toast Layout (Bronze/Silver) */}
       {isToast && (
-        <motion.div
+        <m.div
           role="dialog"
           aria-modal="false"
           aria-labelledby={titleId}
@@ -167,12 +167,12 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
               </p>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Full Modal Layout (Gold/Platinum) */}
       {isFullModal && (
-        <motion.div
+        <m.div
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
@@ -187,7 +187,7 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
           onClick={onClose}
         >
           {/* Modal Card */}
-          <motion.div
+          <m.div
             ref={modalRef}
             className={cn(
               'relative w-full max-w-md mx-4',
@@ -203,7 +203,7 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
             onClick={(e) => e.stopPropagation()}
           >
             {/* Celebration Mascot */}
-            <motion.div
+            <m.div
               className="mb-4"
               initial={{ scale: 0, rotate: -30 }}
               animate={{ scale: [0, 1.3, 1], rotate: [30, -15, 0] }}
@@ -217,7 +217,7 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
                 preload="metadata"
                 aria-hidden="true"
               />
-            </motion.div>
+            </m.div>
 
             {/* Title */}
             <h2
@@ -237,7 +237,7 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
             {/* Badge Display */}
             <div className="mb-6">
               <p className="text-neo-white/70 font-bold text-lg mb-2">{badgeText}</p>
-              <motion.div
+              <m.div
                 className={cn(
                   'inline-flex items-center justify-center',
                   'w-20 h-20 md:w-24 md:h-24',
@@ -252,11 +252,11 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
                 transition={{ delay: 0.4, type: 'spring', stiffness: 200 }}
               >
                 <span className="text-4xl md:text-5xl">{icon}</span>
-              </motion.div>
+              </m.div>
             </div>
 
             {/* Tier Badge */}
-            <motion.div
+            <m.div
               className={cn(
                 'mb-6 py-2 px-4 rounded-neo',
                 'border-neo'
@@ -272,10 +272,10 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
               <p className="font-bold text-sm uppercase tracking-wide" style={{ color: TIER_COLORS[tier] }}>
                 {tierName}
               </p>
-            </motion.div>
+            </m.div>
 
             {/* Continue Button */}
-            <motion.button
+            <m.button
               onClick={onClose}
               className={cn(
                 'w-full py-3 px-6',
@@ -292,9 +292,9 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
               transition={{ delay: 0.8 }}
             >
               {t('education.achievements.continue')}
-            </motion.button>
-          </motion.div>
-        </motion.div>
+            </m.button>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

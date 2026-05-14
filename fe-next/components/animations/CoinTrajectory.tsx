@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
 
@@ -201,7 +201,7 @@ export function CoinTrajectory({
           const { controlX, controlY } = getTrajectory(particle);
 
           return (
-            <motion.div
+            <m.div
               key={particle.id}
               className="absolute will-change-transform"
               style={{
@@ -241,7 +241,7 @@ export function CoinTrajectory({
             >
               {/* Trail effect */}
               {showTrail && enableGlowEffects && !isLowEnd && (
-                <motion.div
+                <m.div
                   className="absolute inset-0 rounded-full"
                   style={{
                     background: 'radial-gradient(circle, rgba(255,225,53,0.4) 0%, transparent 70%)',
@@ -258,14 +258,14 @@ export function CoinTrajectory({
                 />
               )}
               {renderCoin(particle.size)}
-            </motion.div>
+            </m.div>
           );
         })}
       </AnimatePresence>
 
       {/* Impact effect at target */}
       {arrivedCount > 0 && enableGlowEffects && !isLowEnd && (
-        <motion.div
+        <m.div
           className="absolute pointer-events-none"
           style={{
             left: targetPos.x,
@@ -283,7 +283,7 @@ export function CoinTrajectory({
               background: 'radial-gradient(circle, rgba(255,225,53,0.6) 0%, transparent 70%)',
             }}
           />
-        </motion.div>
+        </m.div>
       )}
     </div>
   );

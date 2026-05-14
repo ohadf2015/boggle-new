@@ -179,7 +179,7 @@ vi.mock('@/utils/mascotConfig', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, style, role, 'aria-label': ariaLabel, ...rest }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => (
       <div className={className} style={style} role={role} aria-label={ariaLabel}>{children}</div>
     ),

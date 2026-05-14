@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { TrendingUp, Users, Target, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -130,7 +130,7 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
   };
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
@@ -247,7 +247,7 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
                 const isAbove = scoreDiff > 0;
 
                 return (
-                  <motion.div
+                  <m.div
                     key={player.player_id}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -282,14 +282,14 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
                       {isAbove ? '+' : ''}
                       {scoreDiff.toLocaleString()}
                     </span>
-                  </motion.div>
+                  </m.div>
                 );
               })}
             </div>
           </div>
         )}
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 

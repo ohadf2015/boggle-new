@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { TrendingUp, ArrowLeft } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
@@ -416,25 +416,25 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           </>
         ) : (
           <div className="space-y-4">
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>{heroBlock}</motion.div>
-            {showShareImmediate && <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>{shareBlock}</motion.div>}
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>{leaderboardBlock}</motion.div>
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>{heroBlock}</m.div>
+            {showShareImmediate && <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>{shareBlock}</m.div>}
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>{leaderboardBlock}</m.div>
             <ResultsBannerSlot placement="singleplayer-complete" className="my-3" />
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>{statsBlock}</motion.div>
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>{statsBlock}</m.div>
             {isAuthenticated && coinReward?.awarded ? (
-              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.32 }}>
+              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.32 }}>
                 <DoubleGoldAdButton earnedAmount={coinReward.awarded} surface="sp_results_double" />
-              </motion.div>
+              </m.div>
             ) : null}
             {/* R7 — Rewarded gold top-up */}
             <SinglePlayerGoldTopUp t={t} />
-            {!showShareImmediate && <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>{shareBlock}</motion.div>}
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>{achievementsBlock}</motion.div>
+            {!showShareImmediate && <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>{shareBlock}</m.div>}
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>{achievementsBlock}</m.div>
             {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
             {signupBlock && (
-              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
                 {signupBlock}
-              </motion.div>
+              </m.div>
             )}
             {/* Inline banner ad (web iframe; native shows no inline banner) */}
             <CrazyGamesBanner size="320x50" />

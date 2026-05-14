@@ -19,7 +19,7 @@ vi.mock('@/components/game/WordFormingArea', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} style={style} {...props}>{children}</div>
     ),

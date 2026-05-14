@@ -36,7 +36,7 @@ vi.mock('@/contexts/AdventureThemeContext', () => {
 });
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, ...rest }: Record<string, unknown>) => (
       <div className={className as string} data-testid={rest['data-testid'] as string}>{children as React.ReactNode}</div>
     ),

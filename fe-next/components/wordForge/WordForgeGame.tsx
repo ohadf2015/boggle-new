@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useWordForgeRun } from '@/hooks/useWordForgeRun';
@@ -77,20 +77,20 @@ export default function WordForgeGame(): React.JSX.Element {
         {/* How it works — 3 short lines, staggered */}
         <div className="flex flex-col gap-1.5 text-sm text-neo-cream/50 font-neo-body text-center max-w-xs">
           {['🔤 Spell words on a Boggle grid', '🃏 Collect rune modifiers between rounds', '💥 Stack multipliers to break the score'].map((line, i) => (
-            <motion.span
+            <m.span
               key={line}
               initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: prefersReducedMotion ? 0 : 0.2 + i * 0.2, duration: 0.4 }}
             >
               {line}
-            </motion.span>
+            </m.span>
           ))}
         </div>
 
         {/* Stats (if player has progress) — slide in from below */}
         {run.progress && run.progress.totalRuns > 0 && (
-          <motion.div
+          <m.div
             className="flex gap-4 text-sm font-neo-body"
             initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -108,7 +108,7 @@ export default function WordForgeGame(): React.JSX.Element {
               <span className="text-neo-cream/50 text-xs">XP</span>
               <span className="block text-lg font-black text-neo-purple tabular-nums">{run.progress.totalXp}</span>
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {/* Start button */}

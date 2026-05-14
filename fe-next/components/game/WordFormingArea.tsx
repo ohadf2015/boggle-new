@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import Avatar from '@/components/Avatar';
@@ -176,7 +176,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
       <AnimatePresence mode="wait">
         {showEmpty ? (
           /* Empty state - subtle placeholder */
-          <motion.div
+          <m.div
             key="empty"
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.3 }}
@@ -192,10 +192,10 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
             )}>
               ···
             </span>
-          </motion.div>
+          </m.div>
         ) : (
           /* Main content - morphs between forming and feedback states */
-          <motion.div
+          <m.div
             key="content"
             layout
             initial={{ opacity: 0, scale: 0.85 }}
@@ -221,7 +221,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
             {/* Status icon - only for feedback states */}
             <AnimatePresence mode="popLayout">
               {showFeedback && (
-                <motion.span
+                <m.span
                   key={`icon-${visibleFeedback?.type}`}
                   initial={{ scale: 0, rotate: visibleFeedback?.type === 'accepted' ? -180 : 0 }}
                   animate={{
@@ -252,7 +252,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                       size="sm"
                     />
                   )}
-                </motion.span>
+                </m.span>
               )}
             </AnimatePresence>
 
@@ -276,7 +276,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
             {/* Letter count - only when forming */}
             <AnimatePresence mode="popLayout">
               {showForming && (
-                <motion.span
+                <m.span
                   key="letter-count"
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -289,14 +289,14 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   )}
                 >
                   {displayLetterCount}
-                </motion.span>
+                </m.span>
               )}
             </AnimatePresence>
 
             {/* Score badge - for accepted and foundByOther (partial credit) */}
             <AnimatePresence mode="popLayout">
               {showFeedback && (visibleFeedback?.type === 'accepted' || visibleFeedback?.type === 'foundByOther') && visibleFeedback.score !== undefined && visibleFeedback.score > 0 && (
-                <motion.span
+                <m.span
                   key="score"
                   initial={{ scale: 0, y: 8 }}
                   animate={{ scale: 1, y: 0 }}
@@ -308,14 +308,14 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   )}
                 >
                   +{visibleFeedback.score}
-                </motion.span>
+                </m.span>
               )}
             </AnimatePresence>
 
             {/* Rarity badge - for accepted feedback with non-common rarity */}
             <AnimatePresence mode="popLayout">
               {showFeedback && visibleFeedback?.type === 'accepted' && visibleFeedback.rarity && visibleFeedback.rarity !== 'common' && (
-                <motion.span
+                <m.span
                   key="rarity"
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -330,14 +330,14 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   )}
                 >
                   {visibleFeedback.rarity}
-                </motion.span>
+                </m.span>
               )}
             </AnimatePresence>
 
             {/* Lesson word indicator */}
             <AnimatePresence mode="popLayout">
               {showFeedback && visibleFeedback?.type === 'accepted' && visibleFeedback.fromLesson && (
-                <motion.span
+                <m.span
                   key="lesson"
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{
@@ -359,14 +359,14 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   aria-label={t('wordFeedback.lessonWordTitle')}
                 >
                   📚
-                </motion.span>
+                </m.span>
               )}
             </AnimatePresence>
 
             {/* Fire round bonus indicator */}
             <AnimatePresence mode="popLayout">
               {showFeedback && visibleFeedback?.type === 'accepted' && visibleFeedback.fireRoundActive && (
-                <motion.span
+                <m.span
                   key="fire"
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -378,14 +378,14 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   )}
                 >
                   {visibleFeedback.fireRoundBonus ? `🔥+${visibleFeedback.fireRoundBonus}` : '🔥2x'}
-                </motion.span>
+                </m.span>
               )}
             </AnimatePresence>
 
             {/* Golden letter bonus indicator */}
             <AnimatePresence mode="popLayout">
               {showFeedback && visibleFeedback?.type === 'accepted' && visibleFeedback.goldenBonus && visibleFeedback.goldenBonus > 0 && (
-                <motion.span
+                <m.span
                   key="golden"
                   initial={{ scale: 0, rotate: -15 }}
                   animate={{ scale: 1, rotate: 0 }}
@@ -397,13 +397,13 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   )}
                 >
                   ★+{visibleFeedback.goldenBonus}
-                </motion.span>
+                </m.span>
               )}
             </AnimatePresence>
 
             {/* Sparkle particles - for accepted */}
             {showFeedback && visibleFeedback?.type === 'accepted' && sparklePositions.map((pos, i) => (
-              <motion.div
+              <m.div
                 key={`sparkle-${i}`}
                 className="absolute w-2 h-2 bg-neo-lime rounded-full left-1/2 top-1/2"
                 initial={{ scale: 0, x: 0, y: 0 }}
@@ -419,7 +419,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
 
             {/* Burst ring - for accepted */}
             {showFeedback && visibleFeedback?.type === 'accepted' && (
-              <motion.div
+              <m.div
                 className="absolute inset-0 rounded-neo pointer-events-none"
                 initial={{ scale: 0.8, opacity: 1 }}
                 animate={{ scale: 1.6, opacity: 0 }}
@@ -430,7 +430,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
 
             {/* Red pulse - for rejected */}
             {showFeedback && visibleFeedback?.type === 'rejected' && (
-              <motion.div
+              <m.div
                 className="absolute inset-0 rounded-neo pointer-events-none bg-red-500/40"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: [0, 0.6, 0] }}
@@ -440,7 +440,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
 
             {/* Pink pulse - for duplicate and foundByOther */}
             {showFeedback && (visibleFeedback?.type === 'duplicate' || visibleFeedback?.type === 'foundByOther') && (
-              <motion.div
+              <m.div
                 className="absolute inset-0 rounded-neo pointer-events-none bg-pink-500/40"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: [0, 0.5, 0.3] }}
@@ -448,7 +448,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
               />
             )}
 
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

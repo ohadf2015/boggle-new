@@ -14,7 +14,7 @@ const stripMotionProps = (props: Record<string, unknown>) => {
 };
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     circle: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const rest = stripMotionProps(props);
       return <circle {...rest}>{children}</circle>;

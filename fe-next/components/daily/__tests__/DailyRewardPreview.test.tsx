@@ -4,7 +4,7 @@ import { DailyRewardPreview } from '../DailyRewardPreview';
 
 // Mock framer-motion to avoid animation issues in tests
 jest.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: React.forwardRef(function MockMotionDiv({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) {
       return <div ref={ref} {...props}>{children}</div>;
     }),

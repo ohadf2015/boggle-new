@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MODES } from '../data';
 
@@ -18,7 +18,7 @@ export function ModesShowcase() {
 
       <div className="grid gap-5 sm:grid-cols-3 sm:gap-4">
         {MODES.map((mode, i) => (
-          <motion.article
+          <m.article
             key={mode.name}
             initial={reduced ? false : { opacity: 0, y: 22 }}
             whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
@@ -48,7 +48,7 @@ export function ModesShowcase() {
             <p className="font-neo-body text-sm font-medium leading-snug">
               {mode.desc}
             </p>
-          </motion.article>
+          </m.article>
         ))}
       </div>
     </section>

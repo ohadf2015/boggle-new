@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Check, AlertTriangle, BookOpen, Save, X } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Socket } from 'socket.io-client';
@@ -148,7 +148,7 @@ export function HostWordSelector({
           const integration = selectedWords.find((w) => w.word === word.toLowerCase());
 
           return (
-            <motion.button
+            <m.button
               key={word}
               onClick={() => toggleWord(word)}
               whileTap={{ scale: 0.95 }}
@@ -174,7 +174,7 @@ export function HostWordSelector({
                   )
                 )}
               </div>
-            </motion.button>
+            </m.button>
           );
         })}
       </div>
@@ -219,14 +219,14 @@ export function HostWordSelector({
             {/* Error Message */}
             <AnimatePresence>
               {saveError && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   className="bg-red-500/20 border-2 border-red-500 text-red-200 p-3 rounded-neo mb-4"
                 >
                   {saveError}
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Crown, Medal, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -77,7 +77,7 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <motion.h3
+      <m.h3
         className="font-black text-neo-white uppercase text-sm sm:text-base text-center mb-6"
         initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -85,7 +85,7 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
       >
         <Crown className="w-5 h-5 text-neo-yellow inline-block me-2" aria-hidden="true" />
         <span className="neo-title-sm">{t('landing.hallOfFame')}</span>
-      </motion.h3>
+      </m.h3>
 
       <div className="flex gap-3 sm:gap-4 lg:gap-6 pb-4 pt-4 px-2 justify-center items-end flex-wrap">
         {podiumOrder.map((champ, idx) => {
@@ -94,7 +94,7 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
           const MedalIcon = MEDAL_ICONS[Math.min(originalIndex, 2)];
 
           return (
-            <motion.div
+            <m.div
               key={champ.username}
               custom={originalIndex}
               variants={cardVariants}
@@ -116,7 +116,7 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
                 config.elevated && 'sm:-mt-6 sm:w-38 md:w-44 lg:w-52 xl:w-56 sm:p-5 lg:p-6',
               )}
             >
-              <motion.div
+              <m.div
                 className="mb-1"
                 animate={originalIndex === 0
                   ? { rotate: [0, -10, 10, -5, 5, 0], y: [0, -4, 0] }
@@ -132,7 +132,7 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
                   config.medal,
                   originalIndex === 0 && 'w-7 h-7',
                 )} />
-              </motion.div>
+              </m.div>
 
               <div className={cn(
                 'relative',
@@ -161,7 +161,7 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
               <p className="text-neo-white/60 text-[10px] font-bold uppercase tracking-wider">
                 {t('landing.careerPoints')}
               </p>
-            </motion.div>
+            </m.div>
           );
         })}
       </div>

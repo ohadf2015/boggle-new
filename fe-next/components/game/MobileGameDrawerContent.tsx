@@ -8,7 +8,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Flame, Zap, Trophy, BookOpen, Target, Swords, Timer, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { FoundWord } from '@/shared/types/view';
@@ -193,7 +193,7 @@ export function MobileGameDrawerContent({
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-1.5">
         {statItems.map((item, i) => (
-          <motion.div
+          <m.div
             key={item.label}
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
@@ -217,7 +217,7 @@ export function MobileGameDrawerContent({
                 {item.value}
               </div>
             </div>
-          </motion.div>
+          </m.div>
         ))}
       </div>
 

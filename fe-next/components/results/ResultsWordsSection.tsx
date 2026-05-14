@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { BookOpen } from 'lucide-react';
 import type { Player } from '@/components/results/types';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
@@ -62,7 +62,7 @@ export const ResultsWordsSection: React.FC<ResultsWordsSectionProps> = ({
     <>
       {/* Top Achievements — pop in with slight rotate */}
       {gameAchievements.length > 0 && isStatsVisible && (
-        <motion.div
+        <m.div
           initial={reducedMotion ? undefined : { opacity: 0, scale: 0.9, rotate: -1 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
           transition={{ type: 'spring', stiffness: 250, damping: 16, delay: statsDelay + 0.18 }}
@@ -78,12 +78,12 @@ export const ResultsWordsSection: React.FC<ResultsWordsSectionProps> = ({
               index={i}
             />
           ))}
-        </motion.div>
+        </m.div>
       )}
 
       {/* Your Words — grouped by points, slides up */}
       {currentPlayerValidWords.length > 0 && isWordsVisible && (
-        <motion.div
+        <m.div
           initial={reducedMotion ? undefined : { opacity: 0, y: 20, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ type: 'spring', stiffness: 180, damping: 18, delay: wordsDelay }}
@@ -122,7 +122,7 @@ export const ResultsWordsSection: React.FC<ResultsWordsSectionProps> = ({
               )}
             </div>
           </CollapsibleSection>
-        </motion.div>
+        </m.div>
       )}
     </>
   );

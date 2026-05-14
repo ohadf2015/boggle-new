@@ -16,7 +16,7 @@ vi.mock('@/hooks/useReducedMotion', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, ...rest }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div className={className as string} data-testid={rest['data-testid'] as string}>{children}</div>
     ),

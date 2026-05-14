@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Pointer, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -67,25 +67,25 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
     >
       {/* Hard-pixel confetti — same vocabulary as CrazyGamesWelcome */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, rotate: -8 }}
           animate={{ opacity: 1, rotate: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
           className="absolute top-6 right-8 w-4 h-4 bg-neo-pink border-2 border-black"
         />
-        <motion.div
+        <m.div
           initial={{ opacity: 0, rotate: 12 }}
           animate={{ opacity: 1, rotate: 8 }}
           transition={{ duration: 0.6, delay: 0.5 }}
           className="absolute top-20 left-12 w-3 h-3 bg-neo-cyan border-2 border-black rotate-12"
         />
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.55 }}
           className="absolute bottom-32 right-16 w-5 h-5 bg-neo-lime border-2 border-black -rotate-12"
         />
-        <motion.div
+        <m.div
           initial={{ opacity: 0, rotate: 0 }}
           animate={{ opacity: 1, rotate: -15 }}
           transition={{ duration: 0.6, delay: 0.65 }}
@@ -101,7 +101,7 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
           } text-center items-center`}
         >
           {/* Step chip */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: DECEL }}
@@ -109,10 +109,10 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
           >
             <span className="w-1.5 h-1.5 bg-black rounded-full animate-pulse" />
             {t('onboarding.crazygames.tutorial.tag')}
-          </motion.div>
+          </m.div>
 
           {/* Hero — kinetic, with lime accent block on the verb */}
-          <motion.h1
+          <m.h1
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.05, ease: DECEL }}
@@ -126,20 +126,20 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
               {t('onboarding.crazygames.tutorial.heading')}
             </span>{' '}
             {t('onboarding.crazygames.tutorial.headingAccent')}
-          </motion.h1>
+          </m.h1>
 
           {/* Subtitle */}
-          <motion.p
+          <m.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.45, delay: 0.15 }}
             className="font-neo-body text-base sm:text-lg text-neo-cream/85 max-w-[44ch] leading-relaxed"
           >
             {t('onboarding.crazygames.tutorial.subtitle')}
-          </motion.p>
+          </m.p>
 
           {/* Status chip — phase-driven copy */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.25, ease: DECEL }}
@@ -147,7 +147,7 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
           >
             <AnimatePresence mode="wait">
               {completed ? (
-                <motion.div
+                <m.div
                   key="success"
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -159,9 +159,9 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
                   <span className="font-neo-display uppercase text-base sm:text-lg tracking-tight">
                     {t('onboarding.crazygames.tutorial.success')}
                   </span>
-                </motion.div>
+                </m.div>
               ) : autoTracing ? (
-                <motion.div
+                <m.div
                   key="watch"
                   initial={{ opacity: 0, x: isRTL ? 12 : -12 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -172,9 +172,9 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
                   <span className="font-neo-display uppercase text-sm sm:text-base tracking-tight">
                     {t('onboarding.crazygames.tutorial.watchMe')}
                   </span>
-                </motion.div>
+                </m.div>
               ) : (
-                <motion.div
+                <m.div
                   key="turn"
                   initial={{ opacity: 0, x: isRTL ? -12 : 12 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -188,14 +188,14 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
                   <span className="ms-auto inline-block px-2 py-0.5 bg-black text-neo-lime border-2 border-black rounded font-neo-display text-base sm:text-lg tracking-widest">
                     {demoConfig.word}
                   </span>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
-          </motion.div>
+          </m.div>
 
           {/* Skip — visible only while not yet completed */}
           {!completed && (
-            <motion.button
+            <m.button
               data-testid="crazygames-tutorial-skip"
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.75 }}
@@ -204,12 +204,12 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
               className="font-neo-display text-xs uppercase tracking-wider text-neo-cream/70 underline-offset-4 underline hover:text-neo-cream/95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan rounded-sm px-1 py-1"
             >
               {t('onboarding.crazygames.tutorial.skip')}
-            </motion.button>
+            </m.button>
           )}
         </div>
 
         {/* RIGHT — interactive grid on a tilted plinth, mirrors CrazyGamesWelcome */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.92, rotate: isRTL ? 2 : -2 }}
           animate={{ opacity: 1, scale: 1, rotate: isRTL ? 1.5 : -1.5 }}
           transition={{ duration: 0.6, delay: 0.2, ease: DECEL }}
@@ -244,7 +244,7 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
           {/* Pinned hint sticker — only while user is acting */}
           <AnimatePresence>
             {!autoTracing && !completed && (
-              <motion.div
+              <m.div
                 initial={{ scale: 0, rotate: 0 }}
                 animate={{ scale: 1, rotate: -10 }}
                 exit={{ scale: 0, opacity: 0 }}
@@ -252,10 +252,10 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
                 className={`absolute -top-3 ${isRTL ? '-left-3' : '-right-3'} w-14 h-14 rounded-full bg-neo-pink border-neo-thick border-black flex items-center justify-center font-neo-display text-[10px] uppercase text-black tracking-tight leading-none text-center shadow-hard`}
               >
                 {t('onboarding.crazygames.tutorial.tryIt')}
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

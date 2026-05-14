@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Trophy, Flame, Zap, BookOpen, Gamepad2, Type, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -64,7 +64,7 @@ export function PersonalRecords() {
   if (isLoading) return null;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
@@ -81,7 +81,7 @@ export function PersonalRecords() {
           />
         ))}
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

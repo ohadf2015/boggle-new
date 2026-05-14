@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { ArrowLeft, Check, RotateCcw, Shuffle } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeCompletePopup from './PracticeCompletePopup';
 import PracticePostCompleteChip from './PracticePostCompleteChip';
@@ -436,7 +436,7 @@ export default function PracticeWheelSandbox() {
       {/* Feedback toast — mirrors real WheelRush feedback chrome. */}
       <AnimatePresence>
         {feedback && (
-          <motion.div
+          <m.div
             key={feedback}
             data-testid="practice-wheel-feedback"
             initial={{ opacity: 0, y: -4, scale: 0.95 }}
@@ -461,7 +461,7 @@ export default function PracticeWheelSandbox() {
                 : feedback === 'dup'
                   ? t('practice.wheelRush.duplicate')
                   : t('practice.wheelRush.notAWord')}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -469,7 +469,7 @@ export default function PracticeWheelSandbox() {
           horizontally on bad / missing-center feedback (real-game parity).
           Empty state shows a tap-or-drag hint so first-timers don't stare
           at a blank rectangle. */}
-      <motion.div
+      <m.div
         className="flex items-end gap-1 min-h-[3rem]"
         data-testid="practice-built-word"
         animate={builderShake ? { x: [0, -8, 8, -6, 6, 0] } : { x: 0 }}
@@ -502,14 +502,14 @@ export default function PracticeWheelSandbox() {
             <Check className="w-5 h-5" aria-hidden />
           </button>
         )}
-      </motion.div>
+      </m.div>
 
       {/* Reset + Shuffle row — mirrors live WordWheelGame controls
           (RotateCcw + Shuffle icons, same neo-brutalist chrome). Visible
           always, sized for thumb reach without crowding the wheel. Stagger
           entrance keeps the controls feeling crafted on first paint. */}
       <div className="flex items-center justify-center gap-3" aria-label="wheel-controls">
-        <motion.button
+        <m.button
           type="button"
           data-testid="practice-wheel-reset"
           onClick={handleReset}
@@ -522,8 +522,8 @@ export default function PracticeWheelSandbox() {
           whileTap={{ scale: 0.92 }}
         >
           <RotateCcw className="w-5 h-5" aria-hidden />
-        </motion.button>
-        <motion.button
+        </m.button>
+        <m.button
           type="button"
           data-testid="practice-wheel-shuffle"
           onClick={handleShuffle}
@@ -535,7 +535,7 @@ export default function PracticeWheelSandbox() {
           whileTap={{ scale: 0.92, rotate: 90 }}
         >
           <Shuffle className="w-5 h-5" aria-hidden />
-        </motion.button>
+        </m.button>
       </div>
 
       {/* Found words — last-found highlight matches real
@@ -573,7 +573,7 @@ export default function PracticeWheelSandbox() {
 
       <AnimatePresence>
         {scorePopup && (
-          <motion.div
+          <m.div
             key={scorePopup.key}
             data-testid="practice-score-popup"
             initial={{ opacity: 0, y: 0, scale: 0.8 }}
@@ -584,7 +584,7 @@ export default function PracticeWheelSandbox() {
             className="absolute left-1/2 top-1/3 -translate-x-1/2 pointer-events-none px-3 py-1.5 rounded-neo border-2 border-neo-black bg-neo-purple text-neo-cream font-neo-display font-black text-base shadow-hard"
           >
             +{scorePopup.points} pts
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Coins, Gamepad2, Trophy, BarChart3, Target } from 'lucide-react';
 import { CoinBalance } from '@/components/CoinBalance';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -38,7 +38,7 @@ export function ProfileCoinsSection({
   const visibleTiles = compact ? tiles.slice(0, 2) : tiles;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
@@ -108,7 +108,7 @@ export function ProfileCoinsSection({
           {(profile?.lifetime_coins_earned || 0).toLocaleString()}
         </span>
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Eye, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Mascot } from '@/components/ui/Mascot';
@@ -37,7 +37,7 @@ export function SpectatorBanner({
   }
 
   return (
-    <motion.div
+    <m.div
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: -100, opacity: 0 }}
@@ -116,7 +116,7 @@ export function SpectatorBanner({
 
       {/* Animated dots */}
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 overflow-hidden">
-        <motion.div
+        <m.div
           className="h-full bg-white/30"
           animate={{
             x: ['-100%', '100%'],
@@ -129,7 +129,7 @@ export function SpectatorBanner({
           style={{ width: '30%' }}
         />
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

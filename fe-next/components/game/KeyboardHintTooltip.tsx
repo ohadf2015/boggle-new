@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Keyboard, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -93,7 +93,7 @@ export function KeyboardHintTooltip({
   return (
     <AnimatePresence>
       {isVisible && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, x: -20, scale: 0.9 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
           exit={{ opacity: 0, x: -20, scale: 0.9 }}
@@ -121,13 +121,13 @@ export function KeyboardHintTooltip({
           {/* Content */}
           <div className="flex items-start gap-2">
             {/* Icon with pulse animation */}
-            <motion.div
+            <m.div
               className="shrink-0 w-7 h-7 bg-neo-lime text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center"
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
             >
               <Keyboard className="w-4 h-4" />
-            </motion.div>
+            </m.div>
 
             {/* Text */}
             <div className="flex-1 min-w-0 pe-2">
@@ -140,21 +140,21 @@ export function KeyboardHintTooltip({
 
               {/* Keyboard shortcuts with animation */}
               <div className="flex flex-wrap gap-1 text-[10px]">
-                <motion.kbd
+                <m.kbd
                   className="px-1.5 py-0.5 bg-neo-black/30 rounded border border-white/20 font-mono"
                   animate={{ y: [0, -2, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0 }}
                 >
                   Type
-                </motion.kbd>
+                </m.kbd>
                 <span className="text-white/70">→</span>
-                <motion.kbd
+                <m.kbd
                   className="px-1.5 py-0.5 bg-neo-black/30 rounded border border-white/20 font-mono"
                   animate={{ y: [0, -2, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
                 >
                   Enter
-                </motion.kbd>
+                </m.kbd>
               </div>
             </div>
           </div>
@@ -174,7 +174,7 @@ export function KeyboardHintTooltip({
           >
             {t('keyboardHint.gotIt')}
           </button>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

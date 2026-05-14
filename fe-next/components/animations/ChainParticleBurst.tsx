@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { getWorldParticleConfig } from '@/lib/adventure/worldThemes';
 import { cn } from '@/lib/utils';
@@ -141,7 +141,7 @@ export function ChainParticleBurst({
       {/* Expanding ring effect */}
       {enableGlowEffects && !isLowEnd && (
         <>
-          <motion.div
+          <m.div
             className="absolute rounded-full border-4"
             style={{
               left: '50%',
@@ -157,7 +157,7 @@ export function ChainParticleBurst({
             transition={{ duration: config.duration / 1000, ease: 'easeOut' }}
           />
           {config.secondaryColor && (
-            <motion.div
+            <m.div
               className="absolute rounded-full border-2"
               style={{
                 left: '50%',
@@ -178,7 +178,7 @@ export function ChainParticleBurst({
 
       {/* Central glow */}
       {enableGlowEffects && !isLowEnd && (
-        <motion.div
+        <m.div
           className="absolute rounded-full"
           style={{
             left: '50%',
@@ -204,7 +204,7 @@ export function ChainParticleBurst({
           const endY = Math.sin(radians) * particle.distance;
 
           return (
-            <motion.div
+            <m.div
               key={particle.id}
               className="absolute"
               style={{
@@ -246,7 +246,7 @@ export function ChainParticleBurst({
                   }}
                 />
               )}
-            </motion.div>
+            </m.div>
           );
         })}
       </AnimatePresence>

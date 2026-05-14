@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Coins, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -129,7 +129,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
 
   // Full variant - large card with breakdown and hint
   return (
-    <motion.div
+    <m.div
       initial={{ scale: 0.8, opacity: 0, y: 10 }}
       animate={{ scale: 1, opacity: 1, y: 0 }}
       transition={{ delay: 0.3, type: 'spring', stiffness: 350, damping: 18 }}
@@ -147,12 +147,12 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
       />
       {/* Main reward display */}
       <div className="flex items-center justify-center gap-2 mb-1 relative z-10">
-        <motion.div
+        <m.div
           animate={{ rotate: [0, -10, 10, -5, 0] }}
           transition={{ delay: 0.8, duration: 0.5, ease: 'easeInOut' }}
         >
           <Coins className="w-6 h-6 text-neo-black" />
-        </motion.div>
+        </m.div>
         <span className="font-black text-2xl text-neo-black">+{reward.awarded}</span>
         <span className="text-sm font-bold text-neo-black/70">
           {t('reveal.coins')}
@@ -189,7 +189,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
           {t('reveal.usedForReveals')}
         </p>
       )}
-    </motion.div>
+    </m.div>
   );
 });
 
@@ -251,7 +251,7 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
 
   // Full variant - prominent teasing card
   return (
-    <motion.div
+    <m.div
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 22 }}
@@ -274,7 +274,7 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
       <p className="text-sm text-neo-cream/80 text-center font-bold">
         {formattedMessage}
       </p>
-    </motion.div>
+    </m.div>
   );
 });
 

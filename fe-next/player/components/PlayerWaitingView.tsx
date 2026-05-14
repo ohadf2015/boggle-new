@@ -2,7 +2,7 @@
 
 import React, { memo, useState, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X, Camera, Zap, Crosshair, Grid3X3, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
 import Avatar from '../../components/Avatar';
@@ -101,7 +101,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
   // ==================== Hero Card ====================
   const renderHeroCard = (): React.ReactElement => (
-    <motion.div
+    <m.div
       data-testid="waiting-status"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -193,7 +193,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
           </div>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 
   // ==================== Player Roster ====================
@@ -217,7 +217,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             const isMe = name === username;
 
             return (
-              <motion.div
+              <m.div
                 key={name}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -232,13 +232,13 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                   style={{ animationDelay: `${index * 200}ms` }}
                 >
                   {isHostPlayer && (
-                    <motion.div
+                    <m.div
                       className="absolute -top-3 left-1/2 -translate-x-1/2 z-10"
                       animate={{ rotate: [0, 5, -5, 0] }}
                       transition={{ duration: 2, repeat: Infinity, repeatDelay: 4 }}
                     >
                       <Crown className="w-4 h-4 text-neo-yellow" />
-                    </motion.div>
+                    </m.div>
                   )}
                   <div className={cn(
                     'w-16 h-16 rounded-full border-3 border-neo-black flex items-center justify-center overflow-hidden shadow-hard aspect-square',
@@ -266,7 +266,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                 <span className="text-[11px] font-bold truncate w-16 text-center text-neo-cream">
                   {name}
                 </span>
-              </motion.div>
+              </m.div>
             );
           })}
         </AnimatePresence>
@@ -336,7 +336,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     const step = steps[instructionStep] ?? steps[0];
 
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
@@ -356,7 +356,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
           {/* Interactive step content */}
           <AnimatePresence mode="wait">
-            <motion.div
+            <m.div
               key={instructionStep}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -369,7 +369,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                 <p className="font-bold text-neo-cream text-xs uppercase mb-0.5">{t(step.titleKey)}</p>
                 <p>{t(step.descKey)}</p>
               </div>
-            </motion.div>
+            </m.div>
           </AnimatePresence>
 
           {/* Step navigation */}
@@ -404,7 +404,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             </button>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     );
   };
 

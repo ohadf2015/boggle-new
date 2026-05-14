@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import Image from 'next/image';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
@@ -70,7 +70,7 @@ const ExplosiveBurstLayout = memo<ExplosiveBurstLayoutProps>(({
   }), []);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, scale: 0.3 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 1.2 }}
@@ -79,7 +79,7 @@ const ExplosiveBurstLayout = memo<ExplosiveBurstLayoutProps>(({
     >
       {/* Burst particles */}
       {particles.map((particle, i) => (
-        <motion.div
+        <m.div
           key={`p-${i}-${particle.x}-${particle.y}`}
           className={cn(
             'absolute rounded-full',
@@ -103,7 +103,7 @@ const ExplosiveBurstLayout = memo<ExplosiveBurstLayoutProps>(({
       ))}
 
       {/* Combo burst image behind content */}
-      <motion.div
+      <m.div
         className="absolute inset-0 flex items-center justify-center pointer-events-none"
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: [0, 1.8, 1.5], opacity: [0, 0.8, 0.4] }}
@@ -117,10 +117,10 @@ const ExplosiveBurstLayout = memo<ExplosiveBurstLayoutProps>(({
           height={400}
           className="opacity-70"
         />
-      </motion.div>
+      </m.div>
 
       {/* Glow effect */}
-      <motion.div
+      <m.div
         className="absolute inset-0 rounded-full"
         animate={{
           boxShadow: [
@@ -133,7 +133,7 @@ const ExplosiveBurstLayout = memo<ExplosiveBurstLayoutProps>(({
       />
 
       {/* Main content container */}
-      <motion.div
+      <m.div
         initial={{ scale: 0.5, rotate: -10 }}
         animate={{ scale: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 500, damping: 15 }}
@@ -146,7 +146,7 @@ const ExplosiveBurstLayout = memo<ExplosiveBurstLayoutProps>(({
         )}
       >
         {/* Mascot at top */}
-        <motion.div
+        <m.div
           className="absolute -top-16 left-1/2 -translate-x-1/2"
           initial={{ y: -50, scale: 0 }}
           animate={{ y: 0, scale: 1 }}
@@ -159,24 +159,24 @@ const ExplosiveBurstLayout = memo<ExplosiveBurstLayoutProps>(({
             className="drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]"
             clipBorder="none"
           />
-        </motion.div>
+        </m.div>
 
         {/* Content */}
         <div className="flex flex-col items-center gap-2 pt-8">
-          <motion.div
+          <m.div
             animate={{ rotate: [0, -10, 10, 0] }}
             transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 1 }}
           >
             <Icon className="w-12 h-12" />
-          </motion.div>
+          </m.div>
 
-          <motion.h3
+          <m.h3
             className="font-black uppercase tracking-wider text-3xl md:text-4xl text-center"
             animate={{ scale: [1, 1.05, 1] }}
             transition={{ duration: 0.5, repeat: Infinity }}
           >
             {headline}
-          </motion.h3>
+          </m.h3>
 
           {subtext && (
             <p className="font-bold text-lg opacity-90 text-center">
@@ -190,8 +190,8 @@ const ExplosiveBurstLayout = memo<ExplosiveBurstLayoutProps>(({
             </div>
           )}
         </div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 });
 

@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, memo } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -189,7 +189,7 @@ const PlayerArchetypeBadge = memo<PlayerArchetypeBadgeProps>(({
   const textColor = textColorMap[archetype.id] || 'text-neo-black';
 
   const BadgeContent = (
-    <motion.div
+    <m.div
       ref={badgeRef}
       className={cn(
         'inline-flex items-center font-black uppercase tracking-wide',
@@ -237,7 +237,7 @@ const PlayerArchetypeBadge = memo<PlayerArchetypeBadgeProps>(({
           return translated !== translationKey ? translated : archetype.name;
         })()}
       </span>
-    </motion.div>
+    </m.div>
   );
 
   if (!showTooltip) {
@@ -260,7 +260,7 @@ const PlayerArchetypeBadge = memo<PlayerArchetypeBadgeProps>(({
   const tooltipContent = (
     <AnimatePresence>
       {isOpen && isMounted && tooltipPosition && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: tooltipPosition.showAbove ? -5 : 5, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: tooltipPosition.showAbove ? -5 : 5, scale: 0.95 }}
@@ -323,7 +323,7 @@ const PlayerArchetypeBadge = memo<PlayerArchetypeBadgeProps>(({
           <p className="text-[10px] text-neo-black/70 mt-1.5 pt-1.5 border-t border-neo-black/10 relative z-10">
             {t('archetypes.hint')}
           </p>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

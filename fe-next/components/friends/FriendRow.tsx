@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Target, ChevronRight, Clock, Gift, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
@@ -98,7 +98,7 @@ export const FriendRow: React.FC<FriendRowProps> = ({
   }, [friend.isOnline, friend.lastSeenAt, t]);
 
   return (
-    <motion.div
+    <m.div
       role="button"
       tabIndex={0}
       whileHover={{ x: compact ? 0 : 2, y: compact ? 0 : -1 }}
@@ -208,7 +208,7 @@ export const FriendRow: React.FC<FriendRowProps> = ({
       )}
 
       {!compact && <ChevronRight className={cn('w-4 h-4 rtl:rotate-180', isDark ? 'text-gray-500' : 'text-gray-400')} />}
-    </motion.div>
+    </m.div>
   );
 };
 

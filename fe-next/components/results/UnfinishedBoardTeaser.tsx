@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { BookOpen } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -41,7 +41,7 @@ const UnfinishedBoardTeaser = memo<UnfinishedBoardTeaserProps>(({
   if (missedWords.length === 0) return null;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 280, damping: 24, delay: 0.5 }}
@@ -77,7 +77,7 @@ const UnfinishedBoardTeaser = memo<UnfinishedBoardTeaserProps>(({
           </div>
         ))}
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 

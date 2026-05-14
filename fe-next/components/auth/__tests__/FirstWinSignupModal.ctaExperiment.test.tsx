@@ -51,7 +51,7 @@ vi.mock('../hooks/useOAuthSignIn', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: new Proxy({}, {
+  m: new Proxy({}, {
     get: () => ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) =>
       <div {...props}>{children}</div>,
   }),

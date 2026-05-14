@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, FormEvent } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Gamepad2, RefreshCw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -53,7 +53,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
 
   return (
     <div className="flex-1 bg-neo-black text-white pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6">
-      <motion.div
+      <m.div
         initial={{ scale: 0, rotate: -3 }}
         animate={{ scale: 1, rotate: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
@@ -79,7 +79,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
           <CardContent className="space-y-3 sm:space-y-6">
             {/* Error Alert */}
             {error && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
@@ -87,7 +87,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
                 <div className="p-4 bg-neo-pink/20 text-white border-3 border-neo-pink rounded-neo">
                   <p className="text-neo-pink font-bold uppercase text-sm">{error}</p>
                 </div>
-              </motion.div>
+              </m.div>
             )}
 
             {/* Authenticated user - simplified view */}
@@ -104,7 +104,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
             ) : (
               /* Guest user - needs name input */
               <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-6">
-                <motion.div
+                <m.div
                   animate={usernameError ? { x: [-10, 10, -10, 10, 0] } : {}}
                   transition={{ duration: 0.4 }}
                   className="space-y-2"
@@ -152,7 +152,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
                       {t(usernameErrorKey || 'validation.usernameRequired')}
                     </p>
                   )}
-                </motion.div>
+                </m.div>
 
                 <JoinButton isJoining={isJoining} disabled={!username} t={t} />
 
@@ -161,7 +161,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
             )}
           </CardContent>
         </Card>
-      </motion.div>
+      </m.div>
     </div>
   );
 };
@@ -217,7 +217,7 @@ interface JoinButtonProps {
 }
 
 const JoinButton: React.FC<JoinButtonProps> = ({ isJoining, disabled, onClick, t }) => (
-  <motion.div whileHover={!isJoining ? { x: -2, y: -2 } : {}} whileTap={!isJoining ? { x: 2, y: 2 } : {}}>
+  <m.div whileHover={!isJoining ? { x: -2, y: -2 } : {}} whileTap={!isJoining ? { x: 2, y: 2 } : {}}>
     <Button
       type={onClick ? "button" : "submit"}
       onClick={onClick}
@@ -226,13 +226,13 @@ const JoinButton: React.FC<JoinButtonProps> = ({ isJoining, disabled, onClick, t
     >
       {isJoining ? (
         <>
-          <motion.span
+          <m.span
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             className="me-3 inline-block"
           >
             <RefreshCw size={24} aria-hidden="true" />
-          </motion.span>
+          </m.span>
           {t('joinView.joining')}
         </>
       ) : (
@@ -242,7 +242,7 @@ const JoinButton: React.FC<JoinButtonProps> = ({ isJoining, disabled, onClick, t
         </>
       )}
     </Button>
-  </motion.div>
+  </m.div>
 );
 
 interface SwitchToFullFormLinkProps {

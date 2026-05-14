@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { PlayerScore } from '@/hooks/useResultsData';
 import type { ConsolationCrown } from '@/utils/consolationCrowns';
@@ -63,7 +63,7 @@ export default function ConsolationRows({
         const rank = startRank + index;
 
         return (
-          <motion.div
+          <m.div
             key={player.username}
             custom={index}
             variants={reducedMotion ? undefined : rowVariants}
@@ -79,7 +79,7 @@ export default function ConsolationRows({
 
               {/* Crown image */}
               {crown && (
-                <motion.img
+                <m.img
                   src={crown.image}
                   alt=""
                   initial={reducedMotion ? undefined : { scale: 0, rotate: -20 }}
@@ -146,7 +146,7 @@ export default function ConsolationRows({
                 {formatScore(player.score)}
               </span>
             </div>
-          </motion.div>
+          </m.div>
         );
       })}
     </div>

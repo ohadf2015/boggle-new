@@ -5,7 +5,7 @@ import type { WeeklyQuestRow } from '@/lib/supabase/education/types';
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => (
       <div {...props}>{children}</div>
     ),

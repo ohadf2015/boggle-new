@@ -22,7 +22,7 @@ vi.mock('framer-motion', () => {
   const useSpring = (mv: { on: () => () => void }) => mv;
   const animate = () => ({ stop: () => {} });
   return {
-    motion: { div: Pass, h2: Pass, p: Pass, span: PassSpan, button: PassButton },
+    m: { div: Pass, h2: Pass, p: Pass, span: PassSpan, button: PassButton },
     AnimatePresence: ({ children }: React.PropsWithChildren) => React.createElement(React.Fragment, null, children),
     useReducedMotion: () => false,
     useMotionValue,

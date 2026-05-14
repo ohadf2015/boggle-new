@@ -11,7 +11,7 @@ vi.mock('@/utils/ThemeContext', () => ({
 
 // Mock framer-motion to avoid matchMedia issues
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: any) => {
       // Filter out framer-motion specific props
       const { custom, variants, initial, animate, exit, transition, layoutId, ...htmlProps } = props;

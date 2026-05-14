@@ -21,7 +21,7 @@ const mockFadeToTrack = vi.fn();
 
 // Mock framer-motion to avoid matchMedia issues
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial: _i, animate: _a, exit: _e, whileHover: _wh, whileTap: _wt, transition: _t, variants: _v, ...domProps } = props as Record<string, unknown>;
       return <div {...domProps}>{children}</div>;

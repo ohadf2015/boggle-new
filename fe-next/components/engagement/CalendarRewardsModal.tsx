@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Calendar, Gift, Zap, Sparkles, Shield, Crown, Flame } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogDescription } from '@/components/ui/dialog';
@@ -246,7 +246,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
 
               {/* Claim button for today */}
               {calendarStatus.canClaimToday && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mt-3 sm:mt-4"
@@ -265,7 +265,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                       </>
                     )}
                   </Button>
-                </motion.div>
+                </m.div>
               )}
 
               {/* Already claimed message */}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useReducer } from 'react';
-import { motion, AnimatePresence, useSpring } from 'framer-motion';
+import { m, AnimatePresence, useSpring } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
 import { Zap, Flame, Star, Crown } from 'lucide-react';
@@ -185,7 +185,7 @@ export function ComboIntensityBadge({
       {/* Pulse rings */}
       {showPulse && combo >= 5 && !isLowEnd && (
         <>
-          <motion.div
+          <m.div
             className={cn(
               'absolute inset-0 rounded-neo border-2',
               combo >= 20
@@ -205,7 +205,7 @@ export function ComboIntensityBadge({
             }}
           />
           {combo >= 10 && (
-            <motion.div
+            <m.div
               className={cn(
                 'absolute inset-0 rounded-neo border-2',
                 combo >= 20 ? 'border-neo-pink' : 'border-neo-orange'
@@ -226,7 +226,7 @@ export function ComboIntensityBadge({
       )}
 
       {/* Main badge */}
-      <motion.div
+      <m.div
         className={cn(
           'relative rounded-neo border-3 border-neo-black overflow-hidden',
           intensity.color,
@@ -262,7 +262,7 @@ export function ComboIntensityBadge({
         {/* Content */}
         <div className="relative z-10 flex items-center justify-center gap-1.5">
           {IconComponent && (
-            <motion.div
+            <m.div
               animate={
                 combo >= 10
                   ? {
@@ -278,7 +278,7 @@ export function ComboIntensityBadge({
               }}
             >
               <IconComponent className={cn(sizeConfig[size].icon, 'text-neo-black')} />
-            </motion.div>
+            </m.div>
           )}
           <span>{combo}x</span>
           {multiplier && multiplier > 1 && (
@@ -287,12 +287,12 @@ export function ComboIntensityBadge({
             </span>
           )}
         </div>
-      </motion.div>
+      </m.div>
 
       {/* +1 indicator */}
       <AnimatePresence>
         {showComboUp && (
-          <motion.div
+          <m.div
             className="absolute -top-4 left-1/2 pointer-events-none"
             initial={{ opacity: 0, y: 0, x: '-50%', scale: 0.8 }}
             animate={{ opacity: 1, y: -15, scale: 1 }}
@@ -308,7 +308,7 @@ export function ComboIntensityBadge({
             >
               +1
             </span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -318,7 +318,7 @@ export function ComboIntensityBadge({
           {particleAngles.map((angle, i) => {
             const radians = (angle * Math.PI) / 180;
             return (
-              <motion.div
+              <m.div
                 key={`particle-${i}`}
                 className="absolute w-2 h-2 border border-neo-black"
                 style={{

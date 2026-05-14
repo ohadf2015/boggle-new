@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ScoreCountUp } from './ScoreCountUp';
 import { StatsCardGrid, type StatCardItem } from './StatsCardGrid';
@@ -69,7 +69,7 @@ export function ResultsHero({
   className,
 }: ResultsHeroProps) {
   return (
-    <motion.div
+    <m.div
       data-testid="results-hero"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -83,12 +83,12 @@ export function ResultsHero({
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-size-[8px_8px]" />
 
       {/* Outcome label — h1 for a11y, first heading on page */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: -15, scale: 0.9 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 14 }}
       >
-        <motion.h1
+        <m.h1
           className={cn(
             'text-xl sm:text-2xl font-black uppercase tracking-wider',
             variant === 'win' ? 'text-neo-lime' : variant === 'loss' ? 'text-neo-pink' : 'text-neo-cyan',
@@ -103,11 +103,11 @@ export function ResultsHero({
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         >
           {outcomeLabel}
-        </motion.h1>
-      </motion.div>
+        </m.h1>
+      </m.div>
 
       {/* Mascot reaction */}
-      <motion.div
+      <m.div
         initial={{ scale: 0, rotate: -15 }}
         animate={{ scale: 1, rotate: 0 }}
         transition={{ delay: 0.15, type: 'spring', stiffness: 200, damping: 12 }}
@@ -121,22 +121,22 @@ export function ResultsHero({
           preload="metadata"
           aria-hidden="true"
         />
-      </motion.div>
+      </m.div>
 
       {/* Subtitle (e.g. puzzle number) */}
       {subtitle && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.15 }}
           className="text-xs text-slate-500 uppercase font-bold tracking-wider mt-1"
         >
           {subtitle}
-        </motion.div>
+        </m.div>
       )}
 
       {/* Score — the hero number */}
-      <motion.div
+      <m.div
         data-testid="score-area"
         initial={{ scale: 0.8, opacity: 0, y: 10 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -161,11 +161,11 @@ export function ResultsHero({
             {pointsLabel}
           </div>
         )}
-      </motion.div>
+      </m.div>
 
       {/* Badge (completion, streak milestone) */}
       {badge && (
-        <motion.div
+        <m.div
           initial={{ scale: 0, rotate: -10, y: 8 }}
           animate={{ scale: 1, rotate: 0, y: 0 }}
           transition={{ type: 'spring' as const, stiffness: 400, damping: 10, delay: 0.3 }}
@@ -177,12 +177,12 @@ export function ResultsHero({
           )}>
             {badge.text}
           </span>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Stats row */}
       {stats.length > 0 && (
-        <motion.div
+        <m.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -192,8 +192,8 @@ export function ResultsHero({
             cards={stats}
             variant={inlineStats ? 'inline' : 'grid'}
           />
-        </motion.div>
+        </m.div>
       )}
-    </motion.div>
+    </m.div>
   );
 }

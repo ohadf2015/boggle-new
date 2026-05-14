@@ -4,7 +4,7 @@ import { ComboMilestoneAnnouncement } from '../ComboMilestoneAnnouncement';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, transition, ...rest } = props;
       return <div {...rest}>{children}</div>;

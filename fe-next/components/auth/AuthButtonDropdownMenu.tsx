@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { User, LogOut, Trophy, ChevronDown, Users, Settings, Calendar, Gift, Shield } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Loader } from '@/components/ui/Loader';
@@ -77,7 +77,7 @@ export function AuthButtonDropdownMenu({
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         ref={dropdownRef}
         initial={{ opacity: 0, y: -10, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -218,7 +218,7 @@ export function AuthButtonDropdownMenu({
 
           <AnimatePresence>
             {isLanguageExpanded && (
-              <motion.div
+              <m.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
@@ -244,7 +244,7 @@ export function AuthButtonDropdownMenu({
                       <span>{lang.name}</span>
                     </Button>
                   ))}
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </div>
@@ -265,7 +265,7 @@ export function AuthButtonDropdownMenu({
           {isSigningOut ? <Loader size="sm" /> : <LogOut size={14} aria-hidden="true" />}
           <span>{t('auth.signOut')}</span>
         </Button>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 }

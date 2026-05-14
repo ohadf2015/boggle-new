@@ -41,7 +41,7 @@ vi.mock('../../events/gameCleanup', () => {
   return { gameCleanupEmitter: emitter, default: emitter };
 });
 
-import { scheduleRoundEvent, clearRoundEventTimers, EVENT_CONFIG } from '../roundEventsManager';
+import { scheduleRoundEvent, clearRoundEventTimers, EVENT_CONFIG, CATALYST_POOL, pickRandomCatalyst } from '../roundEventsManager';
 import { getGame, updateGame } from '../gameStateManager';
 import { broadcastToRoom } from '../../utils/socketHelpers';
 const mockGetGame = getGame as Mock;
@@ -120,24 +120,6 @@ describe('roundEventsManager', () => {
       expect(delayMs).toBeLessThanOrEqual(120_000 * 0.75);
     });
 
-    it('does NOT fire if earthquake already triggered', () => {
-      const game = makeGame();
-      scheduleRoundEvent(io, 'ABCD', game, 120);
-      const triggerCallback = mockTimerSet.mock.calls[0][1] as () => void;
-      mockGetGame.mockReturnValueOnce(makeGame({ gameState: 'in-progress', earthquakeTriggered: true }));
-      triggerCallback();
-      expect(mockBroadcastToRoom).not.toHaveBeenCalled();
-    });
-
-    it('does NOT fire if fire round is active', () => {
-      const game = makeGame();
-      scheduleRoundEvent(io, 'ABCD', game, 120);
-      const triggerCallback = mockTimerSet.mock.calls[0][1] as () => void;
-      mockGetGame.mockReturnValueOnce(makeGame({ gameState: 'in-progress', fireRoundActive: true }));
-      triggerCallback();
-      expect(mockBroadcastToRoom).not.toHaveBeenCalled();
-    });
-
     it('does NOT fire the event if game is no longer in-progress', () => {
       const game = makeGame();
       scheduleRoundEvent(io, 'ABCD', game, 120);
@@ -209,6 +191,26 @@ describe('roundEventsManager', () => {
       expect(EVENT_CONFIG.blizzard).toEqual({ durationMs: 18_000, warningMs: 3_000 });
       expect(EVENT_CONFIG.lightning).toEqual({ durationMs: 15_000, warningMs: 3_000 });
       expect(EVENT_CONFIG.meteor).toEqual({ durationMs: 12_000, warningMs: 3_000 });
+    });
+  });
+
+  describe('catalyst pool (catalyst unification)', () => {
+    it('contains exactly the four catalysts', () => {
+      expect([...CATALYST_POOL].sort()).toEqual(
+        ['blizzard', 'earthquake', 'lightning', 'meteor']
+      );
+    });
+
+    it('pickRandomCatalyst only ever returns a pool member', () => {
+      for (let i = 0; i < 200; i++) {
+        expect(CATALYST_POOL).toContain(pickRandomCatalyst());
+      }
+    });
+
+    it('pickRandomCatalyst can return earthquake', () => {
+      const seen = new Set<string>();
+      for (let i = 0; i < 500; i++) seen.add(pickRandomCatalyst());
+      expect(seen.has('earthquake')).toBe(true);
     });
   });
 });

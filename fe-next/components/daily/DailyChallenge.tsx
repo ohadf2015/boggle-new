@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useInterval } from '@/hooks/useSafeTimeout';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 
 import AutoHideHeader from '@/components/AutoHideHeader';
 import DailyWordHuntSurvival, { type SurvivalGameResult } from './DailyWordHuntSurvival';
@@ -424,9 +424,9 @@ const DailyChallenge: React.FC = () => {
 
       <AnimatePresence mode="wait">
         {phase === 'loading' && (
-          <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex items-center justify-center">
+          <m.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex items-center justify-center">
             <PageLoader size="lg" text={t('daily.loading')} />
-          </motion.div>
+          </m.div>
         )}
 
         {phase === 'ready' && (
@@ -471,9 +471,9 @@ const DailyChallenge: React.FC = () => {
         )}
 
         {phase === 'offline-miss' && (
-          <motion.div key="offline-miss" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex flex-col">
+          <m.div key="offline-miss" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex flex-col">
             <DailyOfflineFallback onRetry={() => setPhase('loading')} />
-          </motion.div>
+          </m.div>
         )}
 
         {(phase === 'completed' || phase === 'already-played') && storedResult && puzzleDate && (

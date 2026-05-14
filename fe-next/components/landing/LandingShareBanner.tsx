@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Users, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,7 +17,7 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-30px' }}
@@ -53,7 +53,7 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
           </div>
         </div>
 
-        <motion.div
+        <m.div
           className={cn(
             'relative flex items-center gap-1.5 shrink-0',
             'bg-neo-cyan text-neo-black',
@@ -68,8 +68,8 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
             {t('landing.shareButton')}
           </span>
           <ArrowIcon className="w-4 h-4" />
-        </motion.div>
+        </m.div>
       </button>
-    </motion.div>
+    </m.div>
   );
 }

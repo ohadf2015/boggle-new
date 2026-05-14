@@ -7,7 +7,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { WordHuntResult } from '@/utils/dailyChallenge';
 
@@ -73,7 +73,7 @@ export const AttemptHistory: React.FC<AttemptHistoryProps> = ({
             {t('wordHunt.title')}
           </h3>
         </div>
-        <motion.div
+        <m.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 15 }}
@@ -82,7 +82,7 @@ export const AttemptHistory: React.FC<AttemptHistoryProps> = ({
           <span className="text-xs font-black text-neo-cyan tabular-nums">
             {attemptsUsed} {t('common.attempts')}
           </span>
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Attempt grid */}
@@ -102,7 +102,7 @@ export const AttemptHistory: React.FC<AttemptHistoryProps> = ({
           const badge = getAttemptBadge(rowIdx, attemptsUsed, isCorrectRow);
 
           return (
-            <motion.div
+            <m.div
               key={rowIdx}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -133,7 +133,7 @@ export const AttemptHistory: React.FC<AttemptHistoryProps> = ({
                   const colors = FEEDBACK_COLORS[letterFb.feedback as keyof typeof FEEDBACK_COLORS] || FEEDBACK_COLORS.gray;
 
                   return (
-                    <motion.button
+                    <m.button
                       key={letterIdx}
                       initial={{ scale: 0, rotateX: -180 }}
                       animate={{
@@ -158,26 +158,26 @@ export const AttemptHistory: React.FC<AttemptHistoryProps> = ({
                       style={{ perspective: '400px' }}
                     >
                       {letterFb.letter}
-                    </motion.button>
+                    </m.button>
                   );
                 })}
               </div>
 
               {/* Green count indicator */}
               {!isCorrectRow && greenCount > 0 && (
-                <motion.span
+                <m.span
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: rowIdx * 0.1 + 0.4 }}
                   className="text-[10px] font-bold text-neo-lime/70 w-5"
                 >
                   {greenCount}✓
-                </motion.span>
+                </m.span>
               )}
 
               {/* Correct row badge */}
               {badge && (
-                <motion.span
+                <m.span
                   initial={{ opacity: 0, scale: 0, rotate: -20 }}
                   animate={{ opacity: 1, scale: 1, rotate: 0 }}
                   transition={{
@@ -189,14 +189,14 @@ export const AttemptHistory: React.FC<AttemptHistoryProps> = ({
                   className={cn("text-sm w-5", badge.color)}
                 >
                   {badge.emoji}
-                </motion.span>
+                </m.span>
               )}
 
               {/* Non-badge spacer for alignment */}
               {!badge && !(!isCorrectRow && greenCount > 0) && (
                 <span className="w-5" />
               )}
-            </motion.div>
+            </m.div>
           );
         })}
       </div>

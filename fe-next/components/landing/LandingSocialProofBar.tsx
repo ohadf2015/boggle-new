@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { motion, useInView, useMotionValue, useSpring, animate } from 'framer-motion';
+import { m, useInView, useMotionValue, useSpring, animate } from 'framer-motion';
 import { Users, Flame, Gamepad2, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -85,7 +85,7 @@ export function LandingSocialProofBar({
   if (pills.length === 0) return null;
 
   return (
-    <motion.div
+    <m.div
       className="flex flex-wrap justify-center items-stretch gap-3 sm:gap-4"
       initial="hidden"
       whileInView="visible"
@@ -95,7 +95,7 @@ export function LandingSocialProofBar({
       {pills.map((pill) => {
         const Icon = STAT_ICONS[pill.iconIdx];
         return (
-          <motion.div
+          <m.div
             key={pill.label}
             variants={{
               hidden: { opacity: 0, y: 20, scale: 0.9, rotate: -3 },
@@ -123,9 +123,9 @@ export function LandingSocialProofBar({
                 {pill.label}
               </span>
             </div>
-          </motion.div>
+          </m.div>
         );
       })}
-    </motion.div>
+    </m.div>
   );
 }

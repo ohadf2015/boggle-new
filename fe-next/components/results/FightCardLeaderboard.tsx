@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { ShieldCheck, Skull, Trophy, Crown, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -85,7 +85,7 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
   const accent = RANK_ACCENTS[rank] ?? DEFAULT_ACCENT;
 
   return (
-    <motion.div
+    <m.div
       initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
       animate={{ opacity: eliminated ? 0.4 : 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 22, delay: reducedMotion ? 0 : 0.06 * index }}
@@ -127,7 +127,7 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
         {/* Word Hunt: life bar */}
         {showProgressBar && participant.lifeRemaining !== undefined && (
           <div className="w-full h-1 bg-slate-800 mt-1 rounded-full overflow-hidden">
-            <motion.div
+            <m.div
               className={cn('h-full rounded-full', isCurrentPlayer ? 'bg-neo-cyan' : 'bg-neo-lime')}
               initial={{ width: 0 }}
               animate={{ width: `${Math.max(0, Math.min(100, participant.lifeRemaining * 100))}%` }}
@@ -148,7 +148,7 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
           participant.score.toLocaleString()
         )}
       </span>
-    </motion.div>
+    </m.div>
   );
 };
 

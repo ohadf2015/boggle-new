@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import type { DifficultyLevel } from '@/shared/types/game';
@@ -121,7 +121,7 @@ export const PresetSelector = memo<PresetSelectorProps>(function PresetSelector(
   const presetKeys = Object.keys(GAME_PRESETS) as PresetKey[];
 
   return (
-    <motion.div
+    <m.div
       className="flex gap-2"
       variants={containerVariants}
       initial="hidden"
@@ -133,7 +133,7 @@ export const PresetSelector = memo<PresetSelectorProps>(function PresetSelector(
         const colors = PRESET_COLORS[key];
 
         return (
-          <motion.button
+          <m.button
             key={key}
             variants={presetVariants}
             onClick={() => onPresetClick(key)}
@@ -156,7 +156,7 @@ export const PresetSelector = memo<PresetSelectorProps>(function PresetSelector(
             {/* Check badge */}
             <AnimatePresence>
               {isSelected && (
-                <motion.div
+                <m.div
                   variants={checkPopVariants}
                   initial="initial"
                   animate="animate"
@@ -164,25 +164,25 @@ export const PresetSelector = memo<PresetSelectorProps>(function PresetSelector(
                   className="absolute -top-1 -right-1 z-10"
                 >
                   <Check className="w-4 h-4 bg-neo-black text-neo-white rounded-full p-0.5" />
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
 
             {/* Emoji icon with bounce on selection */}
-            <motion.span
+            <m.span
               className="text-lg"
               variants={iconBounceVariants}
               animate={isSelected ? 'selected' : 'idle'}
             >
               {preset.icon}
-            </motion.span>
+            </m.span>
 
             <span className="text-[10px] font-black uppercase">{t(preset.nameKey)}</span>
             <span className="text-[9px] opacity-70">{preset.timer}min</span>
-          </motion.button>
+          </m.button>
         );
       })}
-    </motion.div>
+    </m.div>
   );
 });
 

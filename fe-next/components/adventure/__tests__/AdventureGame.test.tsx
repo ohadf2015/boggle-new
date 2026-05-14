@@ -305,7 +305,7 @@ vi.mock('framer-motion', () => {
   };
 
   return {
-    motion: motionComponents,
+    m: motionComponents,
     m: motionComponents,
     AnimatePresence: ({ children }: any) => children,
     useSpring,
@@ -569,14 +569,6 @@ vi.mock('@/hooks/useLexiStuckDetection', () => ({
 vi.mock('@/hooks/useGemDetectorHighlights', () => ({
   useGemDetectorHighlights: () => ({
     highlightedTiles: [],
-  }),
-}));
-
-vi.mock('@/hooks/useDailyQuests', () => ({
-  useDailyQuests: () => ({
-    quests: [],
-    refreshQuests: vi.fn(),
-    recordProgress: vi.fn(),
   }),
 }));
 

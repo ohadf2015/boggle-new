@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mascot } from '@/components/ui/Mascot';
 
@@ -23,7 +23,7 @@ export default function PracticeContinuePrompt({
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           className="fixed inset-0 z-[200] flex items-center justify-center bg-neo-black/60 px-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -32,7 +32,7 @@ export default function PracticeContinuePrompt({
           aria-modal="true"
           aria-labelledby="practice-continue-title"
         >
-          <motion.div
+          <m.div
             className="bg-neo-cream border-3 border-neo-black rounded-neo p-5 lg:p-6 shadow-hard max-w-sm w-full flex flex-col items-center gap-3"
             initial={{ scale: 0.9, y: 12, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
@@ -63,8 +63,8 @@ export default function PracticeContinuePrompt({
             >
               {t('practiceContinue.skip')}
             </button>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

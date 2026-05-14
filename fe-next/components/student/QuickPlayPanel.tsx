@@ -10,7 +10,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Zap, Swords, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
@@ -44,7 +44,7 @@ export default function QuickPlayPanel({ classroomId, userId }: QuickPlayPanelPr
   const hasLessons = lessons.length > 0;
 
   return (
-    <motion.div
+    <m.div
       className="grid grid-cols-1 sm:grid-cols-2 gap-4"
       initial="hidden"
       whileInView="visible"
@@ -55,7 +55,7 @@ export default function QuickPlayPanel({ classroomId, userId }: QuickPlayPanelPr
       }}
     >
       {/* Quick Practice Button */}
-      <motion.button
+      <m.button
         variants={{
           hidden: { opacity: 0, y: 20, scale: 0.92 },
           visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 350, damping: 20 } },
@@ -67,7 +67,7 @@ export default function QuickPlayPanel({ classroomId, userId }: QuickPlayPanelPr
         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
         className="relative p-6 rounded-neo border-3 border-black bg-neo-cyan shadow-hard disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center gap-3"
       >
-        <motion.div
+        <m.div
           className="w-14 h-14 rounded-neo border-2 border-black bg-white/30 flex items-center justify-center shadow-hard-sm"
           animate={!isNavigating && hasLessons ? { rotate: [0, -8, 8, -4, 0] } : {}}
           transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
@@ -77,7 +77,7 @@ export default function QuickPlayPanel({ classroomId, userId }: QuickPlayPanelPr
           ) : (
             <Zap className="w-8 h-8 text-black" />
           )}
-        </motion.div>
+        </m.div>
         <div className="text-center">
           <p className="text-xl font-neo-display font-black text-black">
             {t('student.dashboard.quickPractice')}
@@ -86,10 +86,10 @@ export default function QuickPlayPanel({ classroomId, userId }: QuickPlayPanelPr
             {t('student.dashboard.randomLesson')}
           </p>
         </div>
-      </motion.button>
+      </m.button>
 
       {/* Quick Duel Button */}
-      <motion.button
+      <m.button
         variants={{
           hidden: { opacity: 0, y: 20, scale: 0.92 },
           visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 350, damping: 20 } },
@@ -100,13 +100,13 @@ export default function QuickPlayPanel({ classroomId, userId }: QuickPlayPanelPr
         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
         className="relative p-6 rounded-neo border-3 border-black bg-neo-pink shadow-hard flex flex-col items-center gap-3"
       >
-        <motion.div
+        <m.div
           className="w-14 h-14 rounded-neo border-2 border-black bg-white/30 flex items-center justify-center shadow-hard-sm"
           animate={{ rotate: [0, 6, -6, 3, 0] }}
           transition={{ duration: 2, repeat: Infinity, repeatDelay: 4, ease: 'easeInOut' }}
         >
           <Swords className="w-8 h-8 text-black" />
-        </motion.div>
+        </m.div>
         <div className="text-center">
           <p className="text-xl font-neo-display font-black text-black">
             {t('student.dashboard.quickDuel')}
@@ -115,7 +115,7 @@ export default function QuickPlayPanel({ classroomId, userId }: QuickPlayPanelPr
             {t('student.dashboard.challengeClassmate')}
           </p>
         </div>
-      </motion.button>
-    </motion.div>
+      </m.button>
+    </m.div>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import type { Socket } from 'socket.io-client';
 import { useGameMode } from '@/hooks/gameState/store';
 import { cn } from '@/lib/utils';
@@ -115,7 +115,7 @@ const TvBlastActivityPanel = memo<{
           const colorKey = block.wordLength <= 3 ? 'short' : block.wordLength <= 5 ? 'medium' : 'long';
           const col = block.id % 6;
           return (
-            <motion.div
+            <m.div
               key={block.id}
               data-testid="cascade-block"
               initial={reducedMotion ? { opacity: 1 } : { y: -20, opacity: 1 }}
@@ -359,7 +359,7 @@ const TvActivityPanel = memo<TvActivityPanelProps>(({
       {/* Hype mascot — pops in during intense action bursts (uses existing game mascot) */}
       <AnimatePresence>
         {showHypeMascot && !reducedMotion && (
-          <motion.div
+          <m.div
             initial={{ y: 100, opacity: 0, scale: 0.5 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 80, opacity: 0, scale: 0.8 }}
@@ -376,7 +376,7 @@ const TvActivityPanel = memo<TvActivityPanelProps>(({
               unoptimized
               aria-hidden="true"
             />
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
       {/* Mode badge */}

@@ -11,7 +11,7 @@ import WinStreakDisplay from '../WinStreakDisplay';
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, style, ...props }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => (
       <div className={className} style={style} {...props}>{children}</div>
     ),

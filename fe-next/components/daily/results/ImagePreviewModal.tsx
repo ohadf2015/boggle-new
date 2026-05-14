@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Share2, Image as ImageIcon, ImageDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { ShareImageResult } from '@/utils/shareImageGenerator';
@@ -26,14 +26,14 @@ export function ImagePreviewModal({
   t,
 }: ImagePreviewModalProps): React.JSX.Element {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black/85 backdrop-blur-xs flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
-      <motion.div
+      <m.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 10 }}
@@ -91,7 +91,7 @@ export function ImagePreviewModal({
         >
           {t('daily.close')}
         </button>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }

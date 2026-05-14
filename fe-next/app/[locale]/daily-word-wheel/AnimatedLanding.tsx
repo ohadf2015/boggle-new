@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 interface AnimatedLandingProps {
   locale: string;
@@ -23,7 +23,7 @@ function HeroWheel() {
   return (
     <div className="relative mx-auto mb-6 h-36 w-36 sm:h-44 sm:w-44">
       {/* Outer glow ring — slow rotate for ambient motion */}
-      <motion.div
+      <m.div
         className="absolute inset-0 rounded-full border-2 border-dashed border-neo-lime/40"
         style={{ boxShadow: '0 0 40px rgba(191,255,0,0.15)' }}
         animate={{ rotate: 360 }}
@@ -31,17 +31,17 @@ function HeroWheel() {
       />
 
       {/* Center letter */}
-      <motion.div
+      <m.div
         className="absolute left-1/2 top-1/2 flex h-14 w-14 items-center justify-center rounded-full border-[3px] border-neo-black bg-neo-lime font-neo-display text-xl font-black text-neo-black shadow-[3px_3px_0px_black,0_0_20px_rgba(191,255,0,0.5)]"
         style={{ x: '-50%', y: '-50%' }}
         animate={{ scale: [1, 1.1, 1] }}
         transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
       >
         W
-      </motion.div>
+      </m.div>
 
       {/* Rotating wheel containing orbital letters — this makes the wheel actually spin */}
-      <motion.div
+      <m.div
         className="absolute inset-0"
         animate={{ rotate: 360 }}
         transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
@@ -53,7 +53,7 @@ function HeroWheel() {
           const x = Math.sin(rad) * r;
           const y = -Math.cos(rad) * r;
           return (
-            <motion.div
+            <m.div
               key={`${letter}-${i}`}
               className="absolute left-1/2 top-1/2 flex h-9 w-9 items-center justify-center rounded-full border-2 border-neo-black bg-neo-white font-neo-display text-sm font-bold text-neo-navy shadow-[2px_2px_0px_black]"
               initial={{ x: '-50%', y: '-50%', scale: 0, opacity: 0 }}
@@ -66,16 +66,16 @@ function HeroWheel() {
               transition={{ delay: 0.3 + i * 0.08, type: 'spring', stiffness: 400, damping: 15 }}
             >
               {/* Counter-rotate so glyphs stay upright while wheel spins */}
-              <motion.span
+              <m.span
                 animate={{ rotate: -360 }}
                 transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
               >
                 {letter}
-              </motion.span>
-            </motion.div>
+              </m.span>
+            </m.div>
           );
         })}
-      </motion.div>
+      </m.div>
     </div>
   );
 }
@@ -86,7 +86,7 @@ export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading,
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8" dir={isRtl ? 'rtl' : 'ltr'}>
       {/* Hero */}
-      <motion.section
+      <m.section
         className="mb-12 text-center"
         variants={stagger}
         initial="hidden"
@@ -94,30 +94,30 @@ export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading,
       >
         <HeroWheel />
 
-        <motion.div
+        <m.div
           className="mb-2 inline-block rounded-full border-2 border-neo-lime/40 bg-neo-lime/10 px-4 py-1"
           variants={scaleIn}
         >
           <span className="font-neo-display text-xs font-bold uppercase tracking-wider text-neo-lime">
             {hero.subtitle}
           </span>
-        </motion.div>
+        </m.div>
 
-        <motion.h1
+        <m.h1
           className="mb-4 font-neo-display text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl"
           variants={fadeUp}
         >
           {hero.title}
-        </motion.h1>
+        </m.h1>
 
-        <motion.p
+        <m.p
           className="mx-auto mb-8 max-w-2xl text-lg leading-relaxed text-neo-cream/80"
           variants={fadeUp}
         >
           {hero.description}
-        </motion.p>
+        </m.p>
 
-        <motion.div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4" variants={fadeUp}>
+        <m.div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4" variants={fadeUp}>
           <Link
             href={`/${locale}/daily/word-wheel`}
             className="w-full rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg active:shadow-hard-pressed active:translate-x-px active:translate-y-px sm:w-auto sm:px-8 sm:py-4"
@@ -130,23 +130,23 @@ export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading,
           >
             {hero.leaderboard}
           </Link>
-        </motion.div>
-      </motion.section>
+        </m.div>
+      </m.section>
 
       {/* Steps */}
-      <motion.section
+      <m.section
         className="mb-12"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-60px' }}
         variants={stagger}
       >
-        <motion.h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl" variants={fadeUp}>
+        <m.h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl" variants={fadeUp}>
           {stepsHeading}
-        </motion.h2>
+        </m.h2>
         <div className="space-y-4">
           {steps.map((item) => (
-            <motion.div
+            <m.div
               key={item.step}
               className="flex gap-4 rounded-neo border-[3px] border-neo-cyan/60 bg-neo-navy-light p-5 shadow-hard"
               variants={fadeUp}
@@ -159,26 +159,26 @@ export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading,
                 <h3 className="font-neo-display font-bold text-neo-cyan">{item.title}</h3>
                 <p className="text-sm text-neo-cream/80">{item.desc}</p>
               </div>
-            </motion.div>
+            </m.div>
           ))}
         </div>
-      </motion.section>
+      </m.section>
 
       {/* FAQ */}
       {faqItems.length > 0 && (
-        <motion.section
+        <m.section
           className="mb-12"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-60px' }}
           variants={stagger}
         >
-          <motion.h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl" variants={fadeUp}>
+          <m.h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl" variants={fadeUp}>
             {faqHeading}
-          </motion.h2>
+          </m.h2>
           <div className="space-y-4">
             {faqItems.map((faq, idx) => (
-              <motion.details
+              <m.details
                 key={`faq-${idx}-${faq.q}`}
                 className="group rounded-neo border-[3px] border-neo-cream/20 bg-neo-navy-light shadow-hard"
                 variants={fadeUp}
@@ -188,35 +188,35 @@ export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading,
                   <span className="text-neo-lime transition-transform group-open:rotate-180">&#9660;</span>
                 </summary>
                 <div className="border-t border-neo-cream/20 px-6 py-4 text-neo-cream/80">{faq.a}</div>
-              </motion.details>
+              </m.details>
             ))}
           </div>
-        </motion.section>
+        </m.section>
       )}
 
       {/* Final CTA */}
-      <motion.section
+      <m.section
         className="mb-12"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-60px' }}
         variants={stagger}
       >
-        <motion.h2 className="font-neo-display text-2xl font-bold sm:text-3xl" variants={fadeUp}>
+        <m.h2 className="font-neo-display text-2xl font-bold sm:text-3xl" variants={fadeUp}>
           {finalCta.heading}
-        </motion.h2>
-        <motion.p className="mt-4 text-neo-cream/80" variants={fadeUp}>
+        </m.h2>
+        <m.p className="mt-4 text-neo-cream/80" variants={fadeUp}>
           {finalCta.description}
-        </motion.p>
-        <motion.div className="mt-6" variants={scaleIn}>
+        </m.p>
+        <m.div className="mt-6" variants={scaleIn}>
           <Link
             href={`/${locale}/daily/word-wheel`}
             className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg active:shadow-hard-pressed active:translate-x-px active:translate-y-px"
           >
             {finalCta.button}
           </Link>
-        </motion.div>
-      </motion.section>
+        </m.div>
+      </m.section>
     </div>
   );
 }

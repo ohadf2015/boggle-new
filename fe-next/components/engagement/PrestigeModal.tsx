@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
@@ -117,7 +117,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
           <AnimatePresence mode="wait">
             {prestigeComplete ? (
               /* Success Animation */
-              <motion.div
+              <m.div
                 key="success"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -133,13 +133,13 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                   unoptimized
                   aria-hidden="true"
                 />
-                <motion.div
+                <m.div
                   animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] }}
                   transition={{ type: 'tween', duration: 0.5, repeat: 3 }}
                   className="text-7xl"
                 >
                   {PRESTIGE_CONFIG.DISPLAY[nextPrestigeLevel]?.icon || '⭐'}
-                </motion.div>
+                </m.div>
 
                 <div className="text-center">
                   <p className={cn('text-2xl font-black', colors.text.replace('text-', 'text-'))}>
@@ -152,7 +152,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
 
                 <div className="flex gap-2 mt-2">
                   {nextRewards.map((reward, rewardIdx) => (
-                    <motion.div
+                    <m.div
                       key={reward.value}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -160,13 +160,13 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                       className="text-3xl"
                     >
                       {reward.icon}
-                    </motion.div>
+                    </m.div>
                   ))}
                 </div>
-              </motion.div>
+              </m.div>
             ) : isConfirming ? (
               /* Confirmation View */
-              <motion.div
+              <m.div
                 key="confirm"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -228,10 +228,10 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     )}
                   </button>
                 </div>
-              </motion.div>
+              </m.div>
             ) : (
               /* Main View */
-              <motion.div
+              <m.div
                 key="main"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -292,7 +292,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
 
                       <div className="grid gap-2">
                         {nextRewards.map((reward, rewardIdx) => (
-                          <motion.div
+                          <m.div
                             key={reward.value}
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -316,14 +316,14 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                             {reward.type === 'title' && (
                               <Crown className={cn('w-4 h-4', canPrestige ? 'text-neo-lime' : 'text-neo-cream/60')} />
                             )}
-                          </motion.div>
+                          </m.div>
                         ))}
                       </div>
                     </div>
 
                     {/* Prestige Button */}
                     {canPrestige ? (
-                      <motion.button
+                      <m.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setIsConfirming(true)}
@@ -338,7 +338,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                       >
                         <Sparkles className="w-5 h-5 inline me-2" />
                         {t('xp.prestigeModal.prestigeTo', { level: toRoman(nextPrestigeLevel) })}
-                      </motion.button>
+                      </m.button>
                     ) : (
                       <div className="p-4 rounded-neo bg-neo-cream/5 border-2 border-white/10 text-center">
                         <p className="text-neo-cream/70 text-sm">
@@ -351,7 +351,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     )}
                   </>
                 )}
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </div>

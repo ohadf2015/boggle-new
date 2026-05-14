@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Crown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { LeadChangeEvent } from '@/hooks/useLeadChangeDetection';
@@ -15,7 +15,7 @@ export function LeadChangeBanner({ event }: LeadChangeBannerProps) {
   return (
     <AnimatePresence>
       {event && (
-        <motion.div
+        <m.div
           key={event.type + event.newLeader}
           data-testid="lead-change-banner"
           dir={dir}
@@ -39,7 +39,7 @@ export function LeadChangeBanner({ event }: LeadChangeBannerProps) {
               ? t('leadChange.tookLead')
               : t('leadChange.lostLead', { username: event.newLeader })}
           </span>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Gift } from 'lucide-react';
 import { CollectionGrid } from '@/components/CollectionGrid';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -26,7 +26,7 @@ export function ProfileCollection({
   const { t } = useLanguage();
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
@@ -66,7 +66,7 @@ export function ProfileCollection({
           {t('collectibles.shopComingSoon')}
         </p>
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

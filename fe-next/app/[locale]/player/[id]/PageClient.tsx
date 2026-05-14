@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   Trophy, Hash, Target, TrendingUp, Calendar,
   Swords, UserPlus, UserCheck, Clock, ArrowLeft, Star, Award,
@@ -165,7 +165,7 @@ export default function PlayerProfilePageClient() {
       </button>
 
       {/* Profile Header Card */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         className="rounded-neo-lg border-4 border-neo-black shadow-hard-lg bg-neo-navy p-5 sm:p-6 mb-4"
@@ -237,10 +237,10 @@ export default function PlayerProfilePageClient() {
             />}
           </div>
         )}
-      </motion.div>
+      </m.div>
 
       {/* Stats Grid */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
@@ -277,11 +277,11 @@ export default function PlayerProfilePageClient() {
           value={Object.values(profile.achievementCounts).reduce((a, b) => a + b, 0).toString()}
           label={t('profile.achievements')}
         />
-      </motion.div>
+      </m.div>
 
       {/* Achievement Counts */}
       {sortedAchievements.length > 0 && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -324,7 +324,7 @@ export default function PlayerProfilePageClient() {
               );
             })}
           </div>
-        </motion.div>
+        </m.div>
       )}
     </div>
   );

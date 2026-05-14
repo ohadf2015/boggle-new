@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { m, useInView } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export type StatColor = 'cyan' | 'pink' | 'lime' | 'purple';
@@ -61,7 +61,7 @@ export function StatCard({ icon, label, value, color, index = 0 }: StatCardProps
   const indexLabel = String(index + 1).padStart(2, '0');
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       initial={{ opacity: 0, y: 24 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -125,7 +125,7 @@ export function StatCard({ icon, label, value, color, index = 0 }: StatCardProps
           </div>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

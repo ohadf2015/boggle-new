@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, memo, useRef, useReducer } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
 
@@ -156,7 +156,7 @@ export const SelectionSparkle = memo(function SelectionSparkle({
           const endY = Math.sin(radians) * particle.distance;
 
           return (
-            <motion.div
+            <m.div
               key={particle.id}
               className="absolute"
               style={{
@@ -206,14 +206,14 @@ export const SelectionSparkle = memo(function SelectionSparkle({
                   }}
                 />
               )}
-            </motion.div>
+            </m.div>
           );
         })}
       </AnimatePresence>
 
       {/* Central flash */}
       {position && !isLowEnd && (
-        <motion.div
+        <m.div
           key={`flash-${triggerKey}`}
           className="absolute rounded-full"
           style={{

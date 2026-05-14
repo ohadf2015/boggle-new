@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { motion, AnimatePresence, useSpring } from 'framer-motion';
+import { m, AnimatePresence, useSpring } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -154,7 +154,7 @@ export function ComboTierBadge({
   // Animated variant
   return (
     <AnimatePresence mode="wait">
-      <motion.div
+      <m.div
         key={currentTier.threshold}
         className={cn(
           'rounded-neo border-3 border-neo-black shadow-hard',
@@ -183,7 +183,7 @@ export function ComboTierBadge({
         }}
       >
         {tierText}
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 }

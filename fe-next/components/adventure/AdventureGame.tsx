@@ -34,7 +34,6 @@ import { useInterstitialOnLevelComplete } from './hooks/useInterstitialOnLevelCo
 import { useLexiStuckDetection } from '@/hooks/useLexiStuckDetection';
 import { useGemDetectorHighlights } from '@/hooks/useGemDetectorHighlights';
 import { useFlashChallenge } from '@/hooks/useFlashChallenge';
-import { useDailyQuests } from '@/hooks/useDailyQuests';
 import { useChapterQuests } from '@/hooks/useChapterQuests';
 import { getChapterNumber } from '@/lib/adventure/questConfig';
 import { applyGemDetectorBoost, LEVELS_PER_WORLD } from '@/lib/adventure';
@@ -201,11 +200,6 @@ const AdventureGame = memo<AdventureGameProps>(
       playCoinCollectSound,
     });
 
-    const { recordProgress: recordQuestProgress } = useDailyQuests({
-      initialProgress: progression?.dailyQuestProgress,
-      lastQuestDate: progression?.dailyQuestDate,
-      currentWorld: progression?.currentWorld,
-    });
     const chapterNumber = getChapterNumber(levelConfig.level);
     const chapterQuests = useChapterQuests({ worldId: levelConfig.world, chapterNumber });
 
@@ -215,7 +209,7 @@ const AdventureGame = memo<AdventureGameProps>(
       playerCurrentHP: bossOrch.playerHealthState.currentHP, playerMaxHP: bossOrch.playerHealthState.maxHP,
       gridEffectTrigger: bossOrch.gridEffectTrigger,
       isChallengeComplete: flashChallenge.isChallengeComplete,
-      recordQuestProgress, chapterQuests, updateObjective,
+      chapterQuests, updateObjective,
     });
 
     useAdventureSFX({

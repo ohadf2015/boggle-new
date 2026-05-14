@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useInterval } from '@/hooks/useSafeTimeout';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Flame, Check, Clock, Sparkles, X, Star, Zap, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
@@ -232,33 +232,33 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
         {/* Sparkles for unplayed state - celebration accent */}
         {!hasPlayed && enableComplexAnimations && !prefersReducedMotion && (
           <>
-            <motion.div
+            <m.div
               className="absolute top-2 right-20 rtl:right-auto rtl:left-20 pointer-events-none"
               animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.3, 1], opacity: [0.6, 1, 0.6] }}
               transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             >
               <Sparkles className="w-4 h-4 text-neo-yellow" />
-            </motion.div>
-            <motion.div
+            </m.div>
+            <m.div
               className="absolute top-1 right-12 rtl:right-auto rtl:left-12 pointer-events-none"
               animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.2, 1], opacity: [0.5, 0.9, 0.5] }}
               transition={{ type: 'tween', duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
             >
               <Star className="w-3 h-3 text-neo-yellow fill-neo-yellow" />
-            </motion.div>
-            <motion.div
+            </m.div>
+            <m.div
               className="absolute bottom-12 right-4 rtl:right-auto rtl:left-4 pointer-events-none"
               animate={{ rotate: [0, 20, -20, 0], scale: [0.8, 1.1, 0.8], opacity: [0.4, 0.8, 0.4] }}
               transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
             >
               <Zap className="w-3 h-3 text-neo-yellow fill-neo-yellow" />
-            </motion.div>
+            </m.div>
           </>
         )}
 
         {/* Mode character — matches ModeCard sizing */}
         {!mascot && (
-          <motion.div
+          <m.div
             className={cn(
               'absolute pointer-events-none',
               isRTL ? 'bottom-0 left-0' : 'bottom-0 right-0'
@@ -290,7 +290,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
               }}
               sizes="(max-width: 640px) 96px, 192px"
             />
-          </motion.div>
+          </m.div>
         )}
 
         {/* Header: title + puzzle# chip + arrow/win-loss indicator */}
@@ -322,7 +322,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
 
           {/* Arrow (unplayed) or Win/Loss circular badge (played) — same slot */}
           {hasPlayed ? (
-            <motion.div
+            <m.div
               className={cn(
                 'flex items-center justify-center rounded-full border-2 border-neo-black shrink-0 shadow-hard-sm',
                 hasSolved ? 'bg-neo-lime text-neo-black' : 'bg-neo-pink text-neo-black'
@@ -341,7 +341,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
               ) : (
                 <X style={{ width: 'clamp(1rem, 4cqw, 1.5rem)', height: 'clamp(1rem, 4cqw, 1.5rem)' }} strokeWidth={3} />
               )}
-            </motion.div>
+            </m.div>
           ) : (
             <div
               className={cn(
@@ -366,7 +366,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
           style={{ gap: 'clamp(0.375rem, 1.5cqw, 0.5rem)' }}
         >
           {streak > 0 && (
-            <motion.span
+            <m.span
               className="inline-flex items-center bg-neo-white/10 text-neo-white font-bold rounded-neo border-2 border-neo-white/20"
               style={{
                 gap: 'clamp(0.25rem, 1cqw, 0.375rem)',
@@ -381,7 +381,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
                 style={{ width: 'clamp(0.625rem, 2.5cqw, 0.875rem)', height: 'clamp(0.625rem, 2.5cqw, 0.875rem)' }}
               />
               {streak} {t('daily.dayStreak')}
-            </motion.span>
+            </m.span>
           )}
           <span
             className="inline-flex items-center bg-neo-white/10 text-neo-white font-bold rounded-neo border-2 border-neo-white/20 tabular-nums"
@@ -402,30 +402,30 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
         {/* Shine + corner accent — matches ModeCard */}
         {enableComplexAnimations && !prefersReducedMotion && (
           <>
-            <motion.div
+            <m.div
               className="absolute inset-0 pointer-events-none overflow-hidden rounded-neo-lg"
               initial={false}
               animate={isHovered ? { opacity: 1 } : { opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <motion.div
+              <m.div
                 className="absolute inset-0 bg-linear-to-r from-transparent via-white/40 to-transparent"
                 initial={{ x: '-100%' }}
                 animate={isHovered ? { x: '200%' } : { x: '-100%' }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
               />
-            </motion.div>
+            </m.div>
 
-            <motion.div
+            <m.div
               className="absolute top-0 inset-e-0 w-16 h-16 pointer-events-none overflow-hidden rounded-neo-lg"
               initial={false}
             >
-              <motion.div
+              <m.div
                 className="absolute -top-8 -inset-e-8 w-16 h-16 bg-white/10 rotate-45"
                 animate={isHovered ? { scale: 1.2, opacity: 0.15 } : { scale: 1, opacity: 0.08 }}
                 transition={{ duration: 0.3 }}
               />
-            </motion.div>
+            </m.div>
           </>
         )}
       </div>

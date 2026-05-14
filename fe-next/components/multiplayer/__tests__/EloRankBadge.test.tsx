@@ -8,7 +8,7 @@ import { EloRankBadge } from '../EloRankBadge';
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, style, ...rest }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div className={className as string} style={style as React.CSSProperties}>{children}</div>
     ),

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '../../../../lib/utils';
 
 // ==================== Types ====================
@@ -32,7 +32,7 @@ export function DesktopLobbyLayout({
   className,
 }: DesktopLobbyLayoutProps): React.ReactElement {
   return (
-    <motion.div
+    <m.div
       data-testid="desktop-lobby-layout"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -59,7 +59,7 @@ export function DesktopLobbyLayout({
       >
         {rightContent}
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

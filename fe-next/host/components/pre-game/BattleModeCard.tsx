@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Shuffle, FileText, Target, Check } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import type { GameModeOption } from '@/components/GameModeSelector';
@@ -79,7 +79,7 @@ export function BattleModeCard({
             const isActive = selectedGameMode === mode;
 
             return (
-              <motion.button
+              <m.button
                 key={mode}
                 type="button"
                 whileTap={{ scale: 0.95 }}
@@ -98,7 +98,7 @@ export function BattleModeCard({
                 <span>{t(nameKey)}</span>
                 <AnimatePresence mode="wait">
                   {isActive && (
-                    <motion.div
+                    <m.div
                       key="check"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
@@ -106,10 +106,10 @@ export function BattleModeCard({
                       transition={{ type: 'spring', stiffness: 500, damping: 20 }}
                     >
                       <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />
-                    </motion.div>
+                    </m.div>
                   )}
                 </AnimatePresence>
-              </motion.button>
+              </m.button>
             );
           })}
       </div>

@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
@@ -55,7 +55,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
   ].filter(item => item.value > 0);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay: 0.5, type: 'spring', stiffness: 200, damping: 20 }}
@@ -75,31 +75,31 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
       {/* Header */}
       <div className="flex items-center justify-between mb-3 relative z-10">
         <div className="flex items-center gap-2">
-          <motion.span
+          <m.span
             animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
             transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
             className="text-xl"
           >
             ⭐
-          </motion.span>
+          </m.span>
           <h4 className="font-black text-neo-black dark:text-neo-cream uppercase text-sm">
             {t('xp.xpGained')}
           </h4>
         </div>
-        <motion.div
+        <m.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.7, ...SPRING_PRESETS.balanced }}
           className="bg-neo-black text-neo-cream px-3 py-1 rounded-neo font-black text-lg"
         >
           +{xpEarned}
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Breakdown items */}
       <div className="space-y-2 mb-3 relative z-10">
         {breakdownItems.map((item, index) => (
-          <motion.div
+          <m.div
             key={item.key}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -114,7 +114,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
               {item.label}
             </span>
             <span className="font-black text-neo-black dark:text-neo-cream">+{item.value}</span>
-          </motion.div>
+          </m.div>
         ))}
       </div>
 
@@ -135,7 +135,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
         {/* Animated XP bar — fills from previous level progress to current */}
         {!xpProgress.isMaxLevel && (
           <div className="h-3 bg-neo-black/20 rounded-full overflow-hidden border border-neo-black/30">
-            <motion.div
+            <m.div
               className="h-full rounded-full bg-linear-to-r from-neo-purple via-neo-pink to-neo-purple"
               initial={{ width: `${previousProgress.progressPercent}%` }}
               animate={{ width: `${xpProgress.progressPercent}%` }}
@@ -178,19 +178,19 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
 
       {/* Level Up celebration */}
       {levelUpData && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.8, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ delay: 0.9, ...SPRING_PRESETS.balanced }}
           className="mt-3 p-3 bg-neo-lime border-3 border-neo-black rounded-neo shadow-hard-sm text-center relative z-10"
         >
-          <motion.div
+          <m.div
             animate={{ scale: [1, 1.1, 1] }}
             transition={{ duration: 0.5, repeat: 3 }}
             className="text-2xl mb-1"
           >
             🎉
-          </motion.div>
+          </m.div>
           <p className="font-black text-neo-black uppercase text-sm">
             {t('xp.levelUp')}
           </p>
@@ -198,18 +198,18 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
             {levelUpData.oldLevel} {levelArrow} {levelUpData.newLevel}
           </p>
           {levelUpData.newTitles && levelUpData.newTitles.length > 0 && (
-            <motion.p
+            <m.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.1, type: 'spring', stiffness: 280, damping: 26 }}
               className="text-xs font-bold text-neo-pink mt-1"
             >
               {t('xp.titleUnlocked')}: {levelUpData.newTitles[0]}
-            </motion.p>
+            </m.p>
           )}
-        </motion.div>
+        </m.div>
       )}
-    </motion.div>
+    </m.div>
   );
 });
 

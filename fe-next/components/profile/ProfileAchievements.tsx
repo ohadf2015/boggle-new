@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { AchievementBadge } from '@/components/AchievementBadge';
 import { isHallOfFameAchievement } from '@/utils/achievementTiers';
 import { ACHIEVEMENT_ICONS, getAchievementIcon } from '@/constants/achievementIcons';
@@ -70,7 +70,7 @@ export function ProfileAchievements({
   return (
     <>
       {/* Section header */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay }}
@@ -82,10 +82,10 @@ export function ProfileAchievements({
         <span className="text-xs font-black uppercase text-neo-lime bg-neo-lime/10 px-3 py-1.5 rounded-full">
           {totalEarned} / {totalAchievements}
         </span>
-      </motion.div>
+      </m.div>
 
       {/* Hall of Fame Section */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay }}
@@ -103,10 +103,10 @@ export function ProfileAchievements({
         <div className="flex flex-wrap gap-2">
           {hallOfFameAchievements.map((achievement, index) => renderAchievementBadge(achievement, index))}
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Regular Achievements Section */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: delay + 0.05 }}
@@ -115,7 +115,7 @@ export function ProfileAchievements({
         <div className="flex flex-wrap gap-2">
           {regularAchievements.map((achievement, index) => renderAchievementBadge(achievement, index))}
         </div>
-      </motion.div>
+      </m.div>
     </>
   );
 }

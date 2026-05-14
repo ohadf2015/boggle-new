@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Check, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -48,7 +48,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
   // Deferred mode: gentle prompt after first game
   if (deferred) {
     return (
-      <motion.div
+      <m.div
         data-testid="deferred-profile-prompt"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -60,14 +60,14 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
         <p className="text-xs text-neo-black/70">
           {t('onboarding.profile.deferredSubtitle', 'Set up your profile to keep your stats!')}
         </p>
-      </motion.div>
+      </m.div>
     );
   }
 
   return (
     <div className="flex flex-col items-center space-y-4 sm:space-y-5 w-full max-w-md mx-auto">
       {/* Header */}
-      <motion.div
+      <m.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 26 }}
@@ -79,10 +79,10 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
         <p className="text-xs sm:text-sm text-neo-white/70">
           {t('onboarding.profile.subtitle')}
         </p>
-      </motion.div>
+      </m.div>
 
       {/* Avatar builder button + Name input */}
-      <motion.div
+      <m.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
@@ -128,7 +128,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
 
               {/* Validation indicator */}
               {displayName.length > 0 && (
-                <motion.div
+                <m.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 22 }}
@@ -144,7 +144,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
                   ) : (
                     <X className="text-neo-white text-sm" />
                   )}
-                </motion.div>
+                </m.div>
               )}
             </div>
 
@@ -169,7 +169,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
             </div>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 };

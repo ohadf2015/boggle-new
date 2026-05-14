@@ -11,7 +11,7 @@ vi.mock('framer-motion', () => {
   });
   MotionDiv.displayName = 'MotionDiv';
   return {
-    motion: { div: MotionDiv },
+    m: { div: MotionDiv },
     AnimatePresence: ({ children }: any) => children,
   };
 });

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import type { WordDiscovery } from './survival/types';
 
 interface DiscoveredWordsListProps {
@@ -33,7 +33,7 @@ export const DiscoveredWordsList: React.FC<DiscoveredWordsListProps> = ({ words,
       <div className="flex flex-wrap gap-1 px-1 max-h-[72px] overflow-y-auto scrollbar-thin scrollbar-thumb-neo-cream/10">
         <AnimatePresence mode="popLayout">
           {sortedWords.map((w) => (
-            <motion.span
+            <m.span
               key={`${w.word}-${w.timestamp}`}
               initial={{ opacity: 0, scale: 0.7 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -47,7 +47,7 @@ export const DiscoveredWordsList: React.FC<DiscoveredWordsListProps> = ({ words,
               }`}
             >
               {obfuscated ? '•'.repeat(w.word.length) : w.word}
-            </motion.span>
+            </m.span>
           ))}
         </AnimatePresence>
       </div>

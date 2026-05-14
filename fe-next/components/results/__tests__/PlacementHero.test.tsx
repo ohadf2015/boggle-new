@@ -8,13 +8,13 @@ vi.mock('framer-motion', () => {
   const actual = vi.importActual('framer-motion');
   return {
     ...actual,
-    motion: {
+    m: {
       div: (() => { const MotionDiv = React.forwardRef(({ children, className, onClick, style, 'data-testid': dataTestId }: React.PropsWithChildren<{ className?: string; onClick?: () => void; style?: React.CSSProperties; 'data-testid'?: string }>, ref: React.Ref<HTMLDivElement>) => (
         <div ref={ref} className={className} onClick={onClick} style={style} data-testid={dataTestId}>{children}</div>
-      )); MotionDiv.displayName = 'motion.div'; return MotionDiv; })(),
+      )); MotionDiv.displayName = 'm.div'; return MotionDiv; })(),
       span: (() => { const MotionSpan = React.forwardRef(({ children, className }: React.PropsWithChildren<{ className?: string }>, ref: React.Ref<HTMLSpanElement>) => (
         <span ref={ref} className={className}>{children}</span>
-      )); MotionSpan.displayName = 'motion.span'; return MotionSpan; })(),
+      )); MotionSpan.displayName = 'm.span'; return MotionSpan; })(),
     },
     useMotionValue: (initial: number) => ({
       get: () => initial,

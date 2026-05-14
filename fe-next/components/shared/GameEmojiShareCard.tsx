@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Copy, Check, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -239,7 +239,7 @@ export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t,
   const { header, rows: emojiRows, scoreLine } = getShareParts(data, t);
 
   return (
-    <motion.div
+    <m.div
       data-testid="game-emoji-share-card"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
@@ -288,7 +288,7 @@ export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t,
           {copied ? t('common.copied') : t('share.emojiCard.copy')}
         </Button>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

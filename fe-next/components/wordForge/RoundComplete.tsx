@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
@@ -62,7 +62,7 @@ export function RoundComplete({
     >
       {/* Floating particles */}
       {!prefersReducedMotion && particles.map((p, i) => (
-        <motion.div
+        <m.div
           key={`${p.x}-${i}`}
           className="absolute w-2 h-2 rounded-full bg-neo-lime/60"
           initial={{ y: 0, x: p.x, opacity: 1 }}
@@ -74,14 +74,14 @@ export function RoundComplete({
 
       <div>
         {/* Checkmark burst — bounces in */}
-        <motion.div
+        <m.div
           className="text-6xl mb-4 text-center"
           initial={prefersReducedMotion ? false : { scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 10 }}
         >
           ✅
-        </motion.div>
+        </m.div>
 
         <h2 className="text-2xl sm:text-3xl font-black uppercase text-neo-lime font-neo-display text-center motion-safe:animate-neo-pop">
           {t('wordForge.round')} {round} {t('wordForge.roundCleared')}!
@@ -101,13 +101,13 @@ export function RoundComplete({
           {wordsFound} {t('wordForge.wordsFound').toLowerCase()}
         </p>
 
-        <motion.p
+        <m.p
           className="text-xs text-neo-cream/30 font-neo-body text-center mt-6"
           animate={prefersReducedMotion ? {} : { opacity: [0.3, 1, 0.3] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         >
           {t('wordForge.tapToContinue')}
-        </motion.p>
+        </m.p>
       </div>
     </div>
   );

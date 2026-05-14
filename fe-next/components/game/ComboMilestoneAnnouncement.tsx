@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -43,7 +43,7 @@ export function ComboMilestoneAnnouncement({ comboLevel }: ComboMilestoneAnnounc
   return (
     <AnimatePresence>
       {milestone && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.5, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 1.5, y: -10 }}
@@ -65,7 +65,7 @@ export function ComboMilestoneAnnouncement({ comboLevel }: ComboMilestoneAnnounc
           )}>
             {milestone}
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

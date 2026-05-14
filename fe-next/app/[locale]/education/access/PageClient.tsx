@@ -48,7 +48,7 @@ export function PageClient() {
         )}
 
         {!hasAccess && status !== 'pending' && status !== 'declined' && (
-          <div className="mt-6 rounded-neo border-neo bg-neo-white p-6 text-neo-navy shadow-hard-lg">
+          <div className="mt-6 rounded-neo border-neo-thick bg-neo-navy-light p-6 text-neo-white shadow-hard-lg">
             <AccessRequestForm />
           </div>
         )}

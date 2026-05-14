@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -41,13 +41,13 @@ export function CollectionGrid({ collectibles, className }: CollectionGridProps)
         'text-center py-8',
         isDarkMode ? 'text-gray-500' : 'text-gray-400'
       )}>
-        <motion.span
+        <m.span
           className="text-4xl mb-2 block"
           animate={{ scale: [1, 1.15, 1], rotate: [0, -8, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         >
           🎁
-        </motion.span>
+        </m.span>
         <p>{t('collectibles.emptyCollection')}</p>
         <p className="text-sm mt-1">{t('collectibles.earnByPlaying')}</p>
       </div>
@@ -136,7 +136,7 @@ function CollectibleBadge({ item, index }: CollectibleBadgeProps) {
 
   return (
     <MobileTooltip content={tooltipContent} side="top" contentClassName="max-w-xs">
-      <motion.button
+      <m.button
         type="button"
         aria-label={`${itemName} - ${rarityLabel}${equippedLabel}`}
         initial={{ scale: 0, opacity: 0 }}
@@ -169,7 +169,7 @@ function CollectibleBadge({ item, index }: CollectibleBadgeProps) {
             ✓
           </span>
         )}
-      </motion.button>
+      </m.button>
     </MobileTooltip>
   );
 }

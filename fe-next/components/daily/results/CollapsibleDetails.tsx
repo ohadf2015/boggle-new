@@ -6,7 +6,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Coins, Timer, Sparkles } from 'lucide-react';
 import { getSurvivalBonusMessage } from './constants';
 
@@ -53,15 +53,15 @@ export const CollapsibleDetails: React.FC<CollapsibleDetailsProps> = ({
               )}
             </div>
           )}
-          <motion.div animate={{ rotate: expanded ? 180 : 0 }}>
+          <m.div animate={{ rotate: expanded ? 180 : 0 }}>
             <ChevronDown className="w-4 h-4 text-gray-500" />
-          </motion.div>
+          </m.div>
         </div>
       </button>
 
       <AnimatePresence>
         {expanded && (
-          <motion.div
+          <m.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -113,7 +113,7 @@ export const CollapsibleDetails: React.FC<CollapsibleDetailsProps> = ({
                 </div>
               )}
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

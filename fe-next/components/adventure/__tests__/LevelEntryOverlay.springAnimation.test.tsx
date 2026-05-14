@@ -23,7 +23,7 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
   }),
 }));
 
-// Track motion.div props to verify animation configuration
+// Track m.div props to verify animation configuration
 const capturedAnimations: Array<{
   animate: unknown;
   transition: unknown;
@@ -33,7 +33,7 @@ vi.mock('framer-motion', () => {
   const actual = vi.importActual('framer-motion');
   return {
     ...actual,
-    motion: {
+    m: {
       ...actual.motion,
       div: vi.fn().mockImplementation(({ children, animate, transition, ...props }) => {
         // Capture animation props for verification

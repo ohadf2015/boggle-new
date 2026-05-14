@@ -31,7 +31,7 @@ vi.mock('../../../contexts/SoundEffectsContext', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, whileHover, whileTap, transition, ...domProps } = props as Record<string, unknown>;
       return <div {...domProps}>{children}</div>;

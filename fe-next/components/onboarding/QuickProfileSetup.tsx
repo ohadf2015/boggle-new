@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Shuffle, Pencil, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { type CustomAvatarConfig, getRandomAvatarConfig } from '@/shared/types/customAvatar';
@@ -113,7 +113,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
   };
 
   return (
-    <motion.div
+    <m.div
       data-testid="quick-profile-setup"
       initial={{ y: 60, opacity: 0, scale: 0.95 }}
       animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -130,7 +130,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           />
         )}
         {/* Header */}
-        <motion.h2
+        <m.h2
           custom={0}
           variants={staggerChild}
           initial="hidden"
@@ -138,9 +138,9 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           className="text-xl font-black text-neo-black text-center mb-1"
         >
           {hasPendingInvite ? t('onboarding.ftue.friendIsWaiting') : t('onboarding.ftue.niceWork')}
-        </motion.h2>
+        </m.h2>
         {/* Avatar (clickable to open builder) + randomize */}
-        <motion.div
+        <m.div
           custom={1}
           variants={staggerChild}
           initial="hidden"
@@ -149,7 +149,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
         >
           <div className="flex items-center justify-center gap-3">
             <div className="flex flex-col items-center gap-1 shrink-0">
-              <motion.button
+              <m.button
                 onClick={handleRandomize}
                 whileHover={{ scale: 1.1, rotate: 180 }}
                 whileTap={{ scale: 0.9 }}
@@ -161,11 +161,11 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
                 aria-label={t('onboarding.ftue.randomize', 'Randomize avatar')}
               >
                 <Shuffle className="w-5 h-5 text-neo-black" />
-              </motion.button>
+              </m.button>
               <span className="text-[10px] font-bold text-neo-black/50">{t('onboarding.ftue.randomize', 'Randomize')}</span>
             </div>
             <div className="flex flex-col items-center gap-1 shrink-0">
-              <motion.button
+              <m.button
                 data-testid="avatar-edit-button"
                 onClick={() => setIsBuilderOpen(true)}
                 whileHover={{ scale: 1.05 }}
@@ -178,7 +178,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
                   'overflow-hidden bg-neo-white shadow-hard-sm'
                 )}>
                   <AnimatePresence mode="wait">
-                    <motion.div
+                    <m.div
                       key={avatarKey}
                       initial={{ scale: 0, rotate: -90 }}
                       animate={{ scale: 1, rotate: 0 }}
@@ -187,7 +187,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
                       className="w-full h-full"
                     >
                       <Avatar customAvatar={avatar} size="xl" />
-                    </motion.div>
+                    </m.div>
                   </AnimatePresence>
                 </div>
                 <div className={cn(
@@ -198,11 +198,11 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
                 )}>
                   <Pencil className="w-3.5 h-3.5 text-neo-black" />
                 </div>
-              </motion.button>
+              </m.button>
               <span className="text-[10px] font-bold text-neo-black/50">{t('onboarding.profile.tapToCustomize', 'Tap to customize')}</span>
             </div>
           </div>
-        </motion.div>
+        </m.div>
 
         <AvatarBuilderModal
           isOpen={isBuilderOpen}
@@ -213,7 +213,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
         />
 
         {/* Name input */}
-        <motion.div
+        <m.div
           custom={2}
           variants={staggerChild}
           initial="hidden"
@@ -222,7 +222,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           <label htmlFor="profile-name" className="block text-[10px] font-black text-neo-black/60 uppercase tracking-wide mb-1">
             {t('validation.usernameRequired')}
           </label>
-          <motion.div
+          <m.div
             className="relative"
             animate={
               showShake
@@ -256,7 +256,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
             {/* Success check badge — pops in when the name first becomes valid */}
             <AnimatePresence>
               {isNameValid && (
-                <motion.div
+                <m.div
                   key="valid-check"
                   initial={{ scale: 0, rotate: -45 }}
                   animate={{ scale: 1, rotate: 0 }}
@@ -266,18 +266,18 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
                   aria-hidden
                 >
                   <Check className="w-3.5 h-3.5 text-neo-black" strokeWidth={3} />
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
-          </motion.div>
+          </m.div>
           <div className="flex justify-between text-[10px] font-bold text-neo-black/40 mb-4 px-0.5">
             <span>{t('onboarding.ftue.nameHint')}</span>
             <span>{name.length}/20</span>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Submit button */}
-        <motion.button
+        <m.button
           custom={3}
           variants={staggerChild}
           initial="hidden"
@@ -295,9 +295,9 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           )}
         >
           {hasPendingInvite ? t('onboarding.ftue.joinFriendsGame') : t('onboarding.ftue.letsGo')}
-        </motion.button>
+        </m.button>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

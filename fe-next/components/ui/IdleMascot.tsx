@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import InteractiveMascot, {
   type ExtendedMascotVariant,
   type ActivityVariant,
@@ -128,7 +128,7 @@ export const IdleMascotWithEntrance = memo(function IdleMascotWithEntrance({
   const shouldAnimate = !prefersReducedMotion && enableComplexAnimations;
 
   return (
-    <motion.div
+    <m.div
       initial={shouldAnimate ? { opacity: 0, y: 12 } : undefined}
       animate={{ opacity: 1, y: 0 }}
       transition={{
@@ -139,7 +139,7 @@ export const IdleMascotWithEntrance = memo(function IdleMascotWithEntrance({
       }}
     >
       <IdleMascot {...props} />
-    </motion.div>
+    </m.div>
   );
 });
 

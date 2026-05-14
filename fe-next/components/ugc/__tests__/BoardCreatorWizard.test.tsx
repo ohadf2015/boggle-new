@@ -31,13 +31,13 @@ vi.mock('framer-motion', () => {
         const { initial, animate, exit, transition, whileInView, whileTap, whileHover, whileDrag, layout, ...rest } = props;
         return React.createElement(el, { ...rest, ref });
       });
-      Comp.displayName = `motion.${el}`;
+      Comp.displayName = `m.${el}`;
       motionCache[el] = Comp;
     }
     return motionCache[el];
   }
   return {
-    motion: new Proxy({}, { get: (_t: unknown, prop: string) => getMotionComponent(prop) }),
+    m: new Proxy({}, { get: (_t: unknown, prop: string) => getMotionComponent(prop) }),
     AnimatePresence: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
     useReducedMotion: () => false,
   };

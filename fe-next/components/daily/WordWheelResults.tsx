@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion, animate as fmAnimate } from 'framer-motion';
+import { m, animate as fmAnimate } from 'framer-motion';
 import { Star, ArrowRight, ArrowLeft, Flame, Crown, Zap, Type, Home } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -79,7 +79,7 @@ const CONFETTI_CONFIGS = generateConfettiConfigs(40);
 
 function ConfettiParticle({ delay, color, config }: { delay: number; color: string; config: ConfettiConfig }) {
   return (
-    <motion.div
+    <m.div
       className="absolute pointer-events-none"
       style={{
         left: `${config.left}%`,
@@ -146,7 +146,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   const confettiCount = result.score >= 80 ? 40 : result.score >= 50 ? 25 : 15;
 
   return (
-    <motion.div
+    <m.div
       className="relative flex flex-col items-center gap-5 w-full max-w-md mx-auto px-4 py-8 overflow-hidden"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -178,7 +178,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
       </div>
 
       {/* Title */}
-      <motion.div
+      <m.div
         className="text-center z-10"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -188,10 +188,10 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           {t('wordWheel.results.title')}
         </h2>
         <span className="text-neo-cream/60 text-sm">#{puzzleNumber}</span>
-      </motion.div>
+      </m.div>
 
       {/* Score circle */}
-      <motion.div
+      <m.div
         className={cn(
           'relative flex flex-col items-center justify-center w-36 h-36 rounded-full',
           'border-3 border-neo-black shadow-hard-lg z-10',
@@ -201,32 +201,32 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         animate={{ scale: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
       >
-        <motion.div
+        <m.div
           className={tier.color}
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.5, type: 'spring' }}
         >
           {tier.icon}
-        </motion.div>
+        </m.div>
         <span className={cn('font-neo-display font-black text-4xl', tier.color)}>
           {animatedScore}
         </span>
         <span className="text-neo-cream/50 text-xs">{t('wordWheel.scoreLabel')}</span>
-      </motion.div>
+      </m.div>
 
       {/* Tier message */}
-      <motion.p
+      <m.p
         className={cn('font-neo-display font-bold text-xl z-10', tier.color)}
         initial={{ scale: 0 }}
         animate={{ scale: [0, 1.2, 1] }}
         transition={{ delay: 0.8, duration: 0.4 }}
       >
         {t(tier.key)}
-      </motion.p>
+      </m.p>
 
       {/* Stats */}
-      <motion.div
+      <m.div
         className="grid grid-cols-2 gap-3 w-full z-10"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -242,35 +242,35 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           </span>
           <span className="text-neo-cream/60 text-xs">{t('wordWheel.results.time')}</span>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Daily Insight Cards — personalized analytics on challenge performance */}
-      <motion.div
+      <m.div
         className="w-full z-10"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.45, type: 'spring', stiffness: 300, damping: 26 }}
       >
         <DailyInsightStack mode="word_wheel" date={puzzleDate} />
-      </motion.div>
+      </m.div>
 
       {/* Practice mode: replace cross-promos + leaderboard with chain CTA so the
           player flows from one practice mode to the next without dead-ends. */}
       {isPractice && (
-        <motion.div
+        <m.div
           className="w-full z-10"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
         >
           <PracticeChainCta currentMode="wheelRush" />
-        </motion.div>
+        </m.div>
       )}
 
       {/* PRIMARY CROSS-PROMO: Word Hunt CTA — promoted above leaderboard so users
           finish today's daily-pair (mirrors Word Hunt results page treatment). */}
       {!isPractice && !hasPlayedWordHunt && (
-        <motion.div
+        <m.div
           className="w-full z-10"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -304,20 +304,20 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
                   </p>
                 </div>
               </div>
-              <motion.div
+              <m.div
                 animate={{ x: [0, 4, 0] }}
                 transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
               >
                 <ArrowRight className="w-6 h-6 text-neo-black shrink-0" />
-              </motion.div>
+              </m.div>
             </Link>
           </div>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Back to Daily Hub — both challenges complete */}
       {!isPractice && hasPlayedWordHunt && (
-        <motion.div
+        <m.div
           className="w-full z-10"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -343,12 +343,12 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
             </div>
             <ArrowRight className="w-6 h-6 text-neo-black shrink-0" />
           </Link>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Words found list */}
       {result.wordsFound.length > 0 && (
-        <motion.div
+        <m.div
           className="w-full z-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -359,7 +359,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           </h3>
           <div className="flex flex-wrap gap-1.5">
             {result.wordsFound.map((word, i) => (
-              <motion.span
+              <m.span
                 key={word}
                 className="px-2 py-0.5 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-cream text-xs font-semibold shadow-hard-xs"
                 initial={{ scale: 0 }}
@@ -367,10 +367,10 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
                 transition={{ delay: 0.7 + i * 0.05 }}
               >
                 {word} <span className="text-neo-lime">+{scoreWord(word)}</span>
-              </motion.span>
+              </m.span>
             ))}
           </div>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Hint: tap a player row to see diff */}
@@ -382,7 +382,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
 
       {/* Leaderboard — hidden in practice (no score persisted, would only confuse). */}
       {!isPractice && (
-        <motion.div
+        <m.div
           className="w-full z-10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -400,10 +400,10 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
             compact
             myWheelWordsFound={result.wordsFound}
           />
-        </motion.div>
+        </m.div>
       )}
 
-    </motion.div>
+    </m.div>
   );
 };
 

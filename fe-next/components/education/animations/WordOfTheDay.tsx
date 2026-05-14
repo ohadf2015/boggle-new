@@ -7,7 +7,7 @@
  * Characters animate in one-by-one via framer-motion stagger.
  */
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -45,7 +45,7 @@ export function WordOfTheDay({ word, definition, className = '' }: WordOfTheDayP
         </span>
       </div>
 
-      <motion.div
+      <m.div
         data-testid="wotd-word"
         className="text-xl font-neo-display text-neo-cream mb-1"
         variants={shouldReduceMotion ? undefined : CONTAINER_VARIANTS}
@@ -53,15 +53,15 @@ export function WordOfTheDay({ word, definition, className = '' }: WordOfTheDayP
         animate={shouldReduceMotion ? undefined : 'visible'}
       >
         {word.split('').map((char, i) => (
-          <motion.span
+          <m.span
             key={`${char}-${i}`}
             variants={shouldReduceMotion ? undefined : CHAR_VARIANTS}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           >
             {char}
-          </motion.span>
+          </m.span>
         ))}
-      </motion.div>
+      </m.div>
 
       {definition && (
         <p data-testid="wotd-definition" className="text-sm text-neo-cream/70 font-neo-body">

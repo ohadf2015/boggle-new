@@ -38,6 +38,7 @@ import {
   sendCountdownComplete,
   stashStartGameMessageId,
   consumeStashedMessageId,
+  wasStartGameHandled,
 } from '@/shared/utils/gameEventUtils';
 import {
   useFoundWords,
@@ -396,6 +397,24 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       return;
     }
 
+    // A normal game start is also processed by usePlayerGameEvents.handleStartGame
+    // (the socket listener), which does the store/timer/ack work and marks the
+    // messageId. When that already ran, this effect only drives the PlayerView-
+    // local reveal sequence — skip the redundant store setState, timer reset,
+    // and startGameAck. The effect stays the sole handler only when the socket
+    // listener is unmounted (player sitting on the results screen).
+    if (wasStartGameHandled('PLAYER', pendingGameStart.messageId)) {
+      const handledIsReconnect = !!(pendingGameStart as any).reconnect;
+      if (!handledIsReconnect) {
+        if (pendingGameStart.messageId) {
+          pendingMessageIdRef.current = pendingGameStart.messageId;
+        }
+        setShowModeReveal(true);
+      }
+      onGameStartConsumed();
+      return;
+    }
+
     const isReconnect = !!(pendingGameStart as any).reconnect;
     logger.log('[PLAYER] Processing pending game start:', isReconnect ? '(reconnect)' : '(new game)');
 
@@ -549,7 +568,11 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Map game mode to display label
   const modeRevealLabel = gameMode === 'blast' ? t('countdown.modeReveal.blast') : gameMode === 'word-hunt' ? t('countdown.modeReveal.wordHunt') : gameMode === 'wheel-rush' ? t('countdown.modeReveal.wheelRush') : t('countdown.modeReveal.classic');
 
-  if (!showGameView && !waitingForResults) {
+  // The mode-reveal / countdown sequence always routes through the main
+  // in-game-view return below, so GoRipplesAnimation (and ModeRevealOverlay)
+  // mount from exactly one tree position — no unmount/remount that would
+  // restart the countdown from 3.
+  if (!showGameView && !waitingForResults && !showModeReveal && !showStartAnimation) {
     // Show loading indicator when server is preparing the game
     if (isGameLoading) {
       return (
@@ -560,28 +583,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
               {t('common.preparingGame')}
             </div>
           </div>
-        </div>
-      );
-    }
-
-    // Show dramatic mode reveal overlay before countdown
-    if (showModeReveal) {
-      return (
-        <ModeRevealOverlay
-          modeLabel={modeRevealLabel}
-          seriesRoundNumber={seriesRoundNumber}
-          t={t}
-          onIntroDismiss={() => dispatchReveal({ type: 'endReveal' })}
-        />
-      );
-    }
-
-    // When countdown animation is active, only show the countdown overlay
-    // Don't render PlayerWaitingView underneath to avoid double loaders
-    if (showStartAnimation) {
-      return (
-        <div className="h-full bg-neo-navy flex items-center justify-center overflow-hidden">
-          <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} t={t} />
         </div>
       );
     }

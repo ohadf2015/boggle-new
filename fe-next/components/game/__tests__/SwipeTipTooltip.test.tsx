@@ -3,7 +3,7 @@ import { render, act } from '@testing-library/react';
 import SwipeTipTooltip from '../SwipeTipTooltip';
 
 vi.mock('framer-motion', () => ({
-  motion: new Proxy({}, {
+  m: new Proxy({}, {
     get: () => ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, transition, whileTap, ...rest } = props;
       return <div {...rest}>{children}</div>;

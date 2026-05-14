@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '../../lib/utils';
 
 interface Tab {
@@ -55,13 +55,13 @@ export function MobileTabBar({
             <div className="relative">
               <span className="text-xl">{tab.icon}</span>
               {tab.badge !== undefined && tab.badge > 0 && (
-                <motion.span
+                <m.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   className="absolute -top-1 -right-2 rtl:-right-auto rtl:-left-2 bg-neo-pink text-neo-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center border-2 border-neo-black"
                 >
                   {tab.badge > 99 ? '99+' : tab.badge}
-                </motion.span>
+                </m.span>
               )}
             </div>
             <span className="text-xs font-bold uppercase tracking-wide mt-1">

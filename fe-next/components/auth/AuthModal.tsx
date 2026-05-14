@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, type MutableRefObject } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, Mail, Eye, EyeOff, Wand2, Shield, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import Link from 'next/link';
@@ -348,14 +348,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
 
   return createPortal(
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
         onClick={onClose}
       >
-        <motion.div
+        <m.div
           ref={modalRef}
           role="dialog"
           aria-modal="true"
@@ -419,7 +419,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
           {/* Success Message */}
           <AnimatePresence>
             {success && (
-              <motion.div
+              <m.div
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
@@ -427,7 +427,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
               >
                 <Mail className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
                 <p className="text-sm font-bold text-emerald-300">{success}</p>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
 
@@ -452,7 +452,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
               ) : (
                 <div className="space-y-2.5">
                   {providers.map((provider, idx) => (
-                    <motion.div
+                    <m.div
                       key={provider.id}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -476,7 +476,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           </>
                         )}
                       </Button>
-                    </motion.div>
+                    </m.div>
                   ))}
                 </div>
               )}
@@ -760,7 +760,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
               {/* Error Message */}
               <AnimatePresence>
                 {error && (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -5 }}
@@ -768,7 +768,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                     role="alert"
                   >
                     <AlertCircle className="w-4 h-4 shrink-0" />{error}
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
             </>
@@ -809,8 +809,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
               </Link>
             </p>
           </div>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </AnimatePresence>,
     document.body
   );

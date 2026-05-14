@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -232,7 +232,7 @@ export function LevelUpCelebration({
   return (
     <AnimatePresence>
       {show && (
-        <motion.div
+        <m.div
           ref={containerRef}
           className={cn(
             'fixed inset-0 z-60 flex items-center justify-center',
@@ -254,7 +254,7 @@ export function LevelUpCelebration({
 
           {/* Radial glow */}
           {enableGlowEffects && !isLowEnd && (
-            <motion.div
+            <m.div
               className="absolute inset-0 pointer-events-none"
               animate={{
                 background: [
@@ -273,7 +273,7 @@ export function LevelUpCelebration({
             <div ref={badgeRef} className="level-badge relative inline-block mb-6">
               {/* Rotating ring */}
               {!isLowEnd && (
-                <motion.div
+                <m.div
                   className="absolute inset-0 rounded-full border-4 border-dashed border-neo-lime/50"
                   style={{ margin: -8 }}
                   animate={{ rotate: 360 }}
@@ -317,7 +317,7 @@ export function LevelUpCelebration({
             {rewards && (rewards.coins || rewards.unlocks?.length) && (
               <div className="level-rewards space-y-2">
                 {rewards.coins && (
-                  <motion.div
+                  <m.div
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-neo bg-linear-to-r from-amber-400 to-yellow-400 border-3 border-neo-black shadow-hard"
                     animate={
                       enableGlowEffects
@@ -336,11 +336,11 @@ export function LevelUpCelebration({
                     <span className="font-black text-neo-black">
                       +{rewards.coins} {t('common.coins')}
                     </span>
-                  </motion.div>
+                  </m.div>
                 )}
 
                 {rewards.unlocks?.map((unlock, i) => (
-                  <motion.div
+                  <m.div
                     key={unlock}
                     className="block text-neo-lime font-bold"
                     initial={{ opacity: 0, x: -10 }}
@@ -348,20 +348,20 @@ export function LevelUpCelebration({
                     transition={{ delay: 0.5 + i * 0.1 }}
                   >
                     🔓 {unlock}
-                  </motion.div>
+                  </m.div>
                 ))}
               </div>
             )}
 
             {/* Tap to continue */}
-            <motion.p
+            <m.p
               className="text-neo-white/50 text-sm mt-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 2 }}
             >
               {t('common.tapToContinue')}
-            </motion.p>
+            </m.p>
 
             {/* Celebration Mascot - appears after reveal */}
             {phase !== 'flash' && phase !== 'badge' && (
@@ -376,7 +376,7 @@ export function LevelUpCelebration({
               </div>
             )}
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

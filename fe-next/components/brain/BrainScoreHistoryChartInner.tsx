@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   XAxis,
   YAxis,
@@ -145,7 +145,7 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
   // Not enough data - show empty state
   if (chartData.length < 2) {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
@@ -171,14 +171,14 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
 
           {/* Empty state */}
           <div className="relative h-32 flex flex-col items-center justify-center">
-            <motion.div
+            <m.div
               initial={{ scale: 0.8, rotate: -5 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
               className="text-4xl mb-2"
             >
               📈
-            </motion.div>
+            </m.div>
             <h4 className={cn(
               'font-black uppercase text-sm mb-1',
               isDarkMode ? 'text-white' : 'text-neo-black'
@@ -193,12 +193,12 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
             </p>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
@@ -372,6 +372,6 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
           </div>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

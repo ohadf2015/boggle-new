@@ -24,7 +24,7 @@ import { getDuelStats, getDuelHistory, type DuelHistoryEntry, type DuelStatsResu
 import { Swords, Trophy, X, Minus, Flame } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { transformAchievementRow } from './achievementTransform';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ClassmatesList } from '@/components/education/duels/ClassmatesList';
 import { getStudentClassroom, getClassroomStudents, getLessons as getStudentLessons, type Classroom, type ClassroomStudent, type VocabularyLesson } from '@/lib/supabase/education';
 
@@ -340,7 +340,7 @@ export default function StudentProfilePageClient() {
               {/* Duel Stats Grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 {/* Wins */}
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
@@ -355,10 +355,10 @@ export default function StudentProfilePageClient() {
                   <div className="text-3xl font-neo-display font-black text-neo-white">
                     {duelStats.wins}
                   </div>
-                </motion.div>
+                </m.div>
 
                 {/* Losses */}
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
@@ -373,10 +373,10 @@ export default function StudentProfilePageClient() {
                   <div className="text-3xl font-neo-display font-black text-neo-white">
                     {duelStats.losses}
                   </div>
-                </motion.div>
+                </m.div>
 
                 {/* Win Rate */}
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
@@ -394,10 +394,10 @@ export default function StudentProfilePageClient() {
                       return ((duelStats.wins / total) * 100).toFixed(1);
                     })()}%
                   </div>
-                </motion.div>
+                </m.div>
 
                 {/* Win Streak */}
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
@@ -412,11 +412,11 @@ export default function StudentProfilePageClient() {
                   <div className="text-3xl font-neo-display font-black text-neo-white">
                     {duelStats.winStreak}
                   </div>
-                </motion.div>
+                </m.div>
 
                 {/* Draws (if any) - hidden if 0 */}
                 {duelStats.draws > 0 && (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.25 }}
@@ -431,7 +431,7 @@ export default function StudentProfilePageClient() {
                     <div className="text-3xl font-neo-display font-black text-neo-white">
                       {duelStats.draws}
                     </div>
-                  </motion.div>
+                  </m.div>
                 )}
               </div>
 
@@ -468,7 +468,7 @@ export default function StudentProfilePageClient() {
                         : duel.opponent_score;
 
                       return (
-                        <motion.div
+                        <m.div
                           key={duel.id}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -501,7 +501,7 @@ export default function StudentProfilePageClient() {
                           <div className="text-neo-white font-neo-display font-bold">
                             {score}
                           </div>
-                        </motion.div>
+                        </m.div>
                       );
                     })}
                   </div>
@@ -521,7 +521,7 @@ export default function StudentProfilePageClient() {
             </>
           ) : (
             // Empty state
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="p-8 bg-neo-navy/30 border-neo border-neo-black rounded-neo shadow-hard text-center"
@@ -533,7 +533,7 @@ export default function StudentProfilePageClient() {
               <div className="text-neo-white/50 font-neo-body text-sm">
                 {t('student.profile.challengePrompt')}
               </div>
-            </motion.div>
+            </m.div>
           )}
         </div>
 

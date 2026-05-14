@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Trash2, AlertTriangle, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -50,7 +50,7 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
   if (!user) return null;
 
   return (
-    <motion.section
+    <m.section
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
@@ -96,7 +96,7 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
         {/* Confirmation modal inline */}
         <AnimatePresence>
           {showConfirm && (
-            <motion.div
+            <m.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
@@ -163,10 +163,10 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
                   </button>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>
-    </motion.section>
+    </m.section>
   );
 }

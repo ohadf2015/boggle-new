@@ -4,7 +4,7 @@ import type { FoundWord } from '@/shared/types/view';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: Record<string, unknown>) => {
       const filteredProps = Object.fromEntries(
         Object.entries(props).filter(([key]) =>

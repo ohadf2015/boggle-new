@@ -31,7 +31,7 @@ vi.mock('../../../contexts/LanguageContext', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, style, onClick, ...rest }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div className={className as string} style={style as React.CSSProperties} onClick={onClick as React.MouseEventHandler} {...rest}>
         {children}

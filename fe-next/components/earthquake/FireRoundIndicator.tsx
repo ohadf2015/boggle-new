@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDisableFireRoundLights, useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 
@@ -55,7 +55,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
   return (
     <AnimatePresence>
       {isActive && (
-        <motion.div
+        <m.div
           className={`fixed z-50 ${positionClasses}`}
           initial={{ scale: 0, opacity: 0, y: -20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -76,7 +76,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
             {/* Flame background decoration */}
             <div className="absolute inset-0 overflow-hidden rounded-neo opacity-20 pointer-events-none">
               {[...Array(3)].map((_, i) => (
-                <motion.div
+                <m.div
                   key={`flame-${i}`}
                   className="absolute bottom-0 w-8 h-12 bg-neo-lime"
                   style={{
@@ -101,7 +101,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
             {/* Content */}
             <div className="relative z-10 flex items-center gap-2">
               {/* Fire emoji */}
-              <motion.span
+              <m.span
                 className="text-2xl"
                 animate={{
                   scale: [1, 1.2, 1],
@@ -115,7 +115,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
                 }}
               >
                 🔥
-              </motion.span>
+              </m.span>
 
               {/* Text */}
               <div className="flex flex-col">
@@ -129,7 +129,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
 
               {/* Countdown */}
               <div className="ms-2 bg-neo-black/20 text-white rounded-neo px-2 py-1 border-2 border-neo-black/40">
-                <motion.span
+                <m.span
                   key={remainingSeconds}
                   className="text-xl font-black text-neo-cream tabular-nums"
                   initial={{ scale: 1.3 }}
@@ -137,7 +137,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
                   transition={{ type: 'spring', stiffness: 400 }}
                 >
                   {remainingSeconds}s
-                </motion.span>
+                </m.span>
               </div>
             </div>
 
@@ -148,7 +148,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
                   const angle = (i * 90 + 45) * (Math.PI / 180);
                   const distance = 40;
                   return (
-                    <motion.div
+                    <m.div
                       key={`sparkle-${i}`}
                       className="absolute w-2 h-2 rounded-full bg-neo-lime border border-neo-black"
                       style={{
@@ -176,7 +176,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
 
           {/* Urgency indicator for last 5 seconds */}
           {remainingSeconds > 0 && remainingSeconds <= 5 && (
-            <motion.div
+            <m.div
               className="absolute -inset-1 border-2 border-neo-lime rounded-neo-lg pointer-events-none"
               animate={{
                 opacity: [0.3, 0.8, 0.3],
@@ -189,7 +189,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
               }}
             />
           )}
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

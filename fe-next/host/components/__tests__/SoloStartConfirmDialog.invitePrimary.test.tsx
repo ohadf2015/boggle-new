@@ -17,7 +17,7 @@ import { SoloStartConfirmDialog } from '../HostDialogs';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     button: ({ children, className, onClick, whileTap: _wt, ...props }: React.ComponentProps<'button'> & { whileTap?: unknown }) => (
       <button className={className} onClick={onClick} {...props}>{children}</button>
     ),

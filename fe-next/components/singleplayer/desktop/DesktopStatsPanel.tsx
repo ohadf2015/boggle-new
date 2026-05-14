@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Target } from 'lucide-react';
 import CircularTimer from '@/components/CircularTimer';
 import ComboDisplay from '@/components/game/ComboDisplay';
@@ -73,7 +73,7 @@ export const DesktopStatsPanel: React.FC<DesktopStatsPanelProps> = ({
 
       {/* Score Section - Lime gradient badge */}
       <div className="flex flex-col items-center">
-        <motion.div
+        <m.div
           key={score}
           initial={{ scale: 1.15 }}
           animate={{ scale: 1 }}
@@ -93,7 +93,7 @@ export const DesktopStatsPanel: React.FC<DesktopStatsPanelProps> = ({
               </div>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Combo Section - hidden in practice mode (no combos during learning) */}

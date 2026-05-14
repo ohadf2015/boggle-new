@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { Trophy, Sparkles, Check, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
@@ -125,14 +125,14 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
 
   return createPortal(
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-110 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs"
         onClick={(e) => e.stopPropagation()}
       >
-        <motion.div
+        <m.div
           initial={{ scale: 0.8, opacity: 0, y: 30 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.8, opacity: 0, y: 30 }}
@@ -149,13 +149,13 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
           {/* Trophy animation */}
-          <motion.div
+          <m.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', damping: 10, stiffness: 100, delay: 0.2 }}
             className="flex justify-center mb-6 relative"
           >
-            <motion.div
+            <m.div
               animate={{
                 rotate: [0, -10, 10, -10, 0],
                 scale: [1, 1.05, 1],
@@ -165,11 +165,11 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
             >
               <Trophy className="w-20 h-20 text-amber-400" />
               <Sparkles className="absolute -top-2 -right-2 w-8 h-8 text-yellow-300" />
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
 
           {/* Header */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
@@ -184,9 +184,9 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
             )}>
               {celebrationMsg.subtitle}
             </p>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
@@ -203,7 +203,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
 
               {/* Preview */}
               <div className="flex justify-center mb-4">
-                <motion.div
+                <m.div
                   key={selectedAvatar.id}
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -231,7 +231,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                   )}>
                     {selectedAvatar.name}
                   </div>
-                </motion.div>
+                </m.div>
               </div>
 
               {/* Avatar Grid */}
@@ -242,7 +242,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
 
                 {/* Regular Character Avatars */}
                 {AVATARS.map((avatar) => (
-                  <motion.button
+                  <m.button
                     key={avatar.id}
                     type="button"
                     onClick={() => {
@@ -269,7 +269,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                         <Check className="w-6 h-6 text-amber-600 drop-shadow-sm" />
                       </div>
                     )}
-                  </motion.button>
+                  </m.button>
                 ))}
               </div>
             </div>
@@ -338,9 +338,9 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                 </>
               )}
             </Button>
-          </motion.div>
-        </motion.div>
-      </motion.div>
+          </m.div>
+        </m.div>
+      </m.div>
     </AnimatePresence>,
     document.body
   );

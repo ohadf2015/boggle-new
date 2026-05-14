@@ -12,6 +12,7 @@ import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import timerManager from '../utils/timerManager';
 import { gameCleanupEmitter } from '../events/gameCleanup';
 import logger from '../utils/logger.js';
+import { executeEarthquakeSequence } from '../handlers/earthquakeHandler.js';
 
 // ==================== Types ====================
 
@@ -32,6 +33,19 @@ export const EVENT_CONFIG: Record<RoundEventType, { durationMs: number; warningM
   lightning: { durationMs: 15_000, warningMs: 3_000 },
   meteor: { durationMs: 12_000, warningMs: 3_000 },
 };
+
+export type CatalystType = RoundEventType | 'earthquake';
+
+export const CATALYST_POOL: readonly CatalystType[] = [
+  'blizzard',
+  'lightning',
+  'meteor',
+  'earthquake',
+] as const;
+
+export function pickRandomCatalyst(): CatalystType {
+  return CATALYST_POOL[Math.floor(Math.random() * CATALYST_POOL.length)];
+}
 
 const SCHEDULE_MIN_PERCENT = 0.50;
 const SCHEDULE_MAX_PERCENT = 0.75;
@@ -99,15 +113,15 @@ export function clearRoundEventTimers(gameCode: string): void {
 export function scheduleRoundEvent(
   io: Server,
   gameCode: string,
-  _game: GameState,
+  game: GameState,
   totalTimerSeconds: number
 ): void {
-  const eventType = pickRandomEventType();
+  const catalyst = pickRandomCatalyst();
   const triggerAtPercent =
     SCHEDULE_MIN_PERCENT + Math.random() * (SCHEDULE_MAX_PERCENT - SCHEDULE_MIN_PERCENT);
 
   updateGame(gameCode, {
-    roundEventSchedule: { eventType, triggerAtPercent },
+    roundEventSchedule: { eventType: catalyst, triggerAtPercent },
     activeRoundEvent: null,
   });
 
@@ -121,18 +135,24 @@ export function scheduleRoundEvent(
         clearRoundEventTimers(gameCode);
         return;
       }
-      if (currentGame.earthquakeTriggered || currentGame.fireRoundActive) {
-        clearRoundEventTimers(gameCode);
+
+      if (catalyst === 'earthquake') {
+        updateGame(gameCode, { earthquakeTriggered: true });
+        const armedGame = getGame(gameCode);
+        if (armedGame) {
+          executeEarthquakeSequence(io, gameCode, armedGame);
+        }
         return;
       }
-      executeRoundEvent(io, gameCode, currentGame, eventType as RoundEventType);
+
+      executeRoundEvent(io, gameCode, currentGame, catalyst as RoundEventType);
     },
     triggerDelayMs
   );
 
   logger.info(
     'ROUND_EVENT',
-    `Game ${gameCode}: scheduled '${eventType}' at ${Math.round(triggerAtPercent * 100)}% of game (${Math.round(triggerDelayMs / 1000)}s)`
+    `Game ${gameCode}: scheduled catalyst '${catalyst}' at ${Math.round(triggerAtPercent * 100)}% of game (${Math.round(triggerDelayMs / 1000)}s)`
   );
 }
 

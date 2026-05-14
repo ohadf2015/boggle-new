@@ -50,7 +50,7 @@ vi.mock('framer-motion', () => {
     ),
   };
   return {
-    motion: motionObj,
+    m: motionObj,
     m: motionObj,
     LazyMotion: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     domAnimation: {},

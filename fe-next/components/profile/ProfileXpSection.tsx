@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Zap } from 'lucide-react';
 import XpProgressBar, { getLevelFromXp } from '@/components/XpProgressBar';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -49,7 +49,7 @@ export function ProfileXpSection({
   }, [onProfileRefresh]);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
@@ -113,7 +113,7 @@ export function ProfileXpSection({
           </span>
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 }
 

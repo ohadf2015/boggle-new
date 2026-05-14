@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useMachine } from '@xstate/react';
 import type { LogicSequenceRiddle as LogicSequenceRiddleType } from '@/lib/word-vault/types';
 import type { WordVaultStore } from '@/lib/word-vault/state/gameStore';
@@ -78,7 +78,7 @@ export function LogicSequenceRiddle({ riddle, store: _store, onSolved }: Props) 
         {riddle.steps
           .filter((s) => !order.includes(s.id))
           .map((step) => (
-            <motion.button
+            <m.button
               key={step.id}
               type="button"
               onClick={() => handlePick(step.id)}
@@ -87,7 +87,7 @@ export function LogicSequenceRiddle({ riddle, store: _store, onSolved }: Props) 
               className="rounded border-4 border-white bg-pink-400 px-4 py-3 font-fredoka font-bold text-[#0b1220] shadow-[3px_3px_0_0_#000]"
             >
               {step.label.he}
-            </motion.button>
+            </m.button>
           ))}
       </div>
 
@@ -115,13 +115,13 @@ export function LogicSequenceRiddle({ riddle, store: _store, onSolved }: Props) 
       )}
 
       {isSolved && (
-        <motion.div
+        <m.div
           initial={{ scale: 0.6, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="rounded-md border-4 border-lime-300 bg-lime-300/20 px-6 py-3 text-center"
         >
           <p className="font-fredoka text-2xl font-black text-lime-200">הסדר נכון!</p>
-        </motion.div>
+        </m.div>
       )}
     </div>
   );

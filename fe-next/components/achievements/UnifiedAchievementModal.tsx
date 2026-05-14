@@ -15,7 +15,7 @@
 'use client';
 
 import React, { useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -182,7 +182,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -194,7 +194,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
         )}
         data-testid="unified-achievement-modal"
       >
-        <motion.div
+        <m.div
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.5, opacity: 0 }}
@@ -213,7 +213,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
           }}
         >
           {/* Celebration mascot */}
-          <motion.div
+          <m.div
             className="flex justify-center mb-2"
             initial={{ scale: 0, rotate: -20 }}
             animate={{ scale: 1, rotate: 0 }}
@@ -227,10 +227,10 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
               preload="metadata"
               aria-hidden="true"
             />
-          </motion.div>
+          </m.div>
 
           {/* Achievement Icon */}
-          <motion.div
+          <m.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 10 }}
@@ -244,10 +244,10 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
             }}
           >
             <span className="text-4xl">{normalized.icon}</span>
-          </motion.div>
+          </m.div>
 
           {/* Title */}
-          <motion.h2
+          <m.h2
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
@@ -257,10 +257,10 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
             )}
           >
             {titleText}
-          </motion.h2>
+          </m.h2>
 
           {/* Achievement Name */}
-          <motion.h3
+          <m.h3
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
@@ -268,11 +268,11 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
             style={{ color: tierColors?.text || 'var(--neo-lime)' }}
           >
             {normalized.name}
-          </motion.h3>
+          </m.h3>
 
           {/* Tier Badge */}
           {normalized.tier && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.5, type: 'spring', stiffness: 400, damping: 22 }}
@@ -285,21 +285,21 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
               >
                 {normalized.tier}
               </span>
-            </motion.div>
+            </m.div>
           )}
 
           {/* Achievement Description */}
-          <motion.p
+          <m.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, type: 'spring', stiffness: 280, damping: 26 }}
             className="text-center text-neo-white/80 text-sm"
           >
             {normalized.description}
-          </motion.p>
+          </m.p>
 
           {/* Continue Button - Neo-Lime (Green) */}
-          <motion.button
+          <m.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7, type: 'spring', stiffness: 280, damping: 26 }}
@@ -316,9 +316,9 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
             )}
           >
             {t('common.continue')}
-          </motion.button>
-        </motion.div>
-      </motion.div>
+          </m.button>
+        </m.div>
+      </m.div>
     </AnimatePresence>
   );
 }

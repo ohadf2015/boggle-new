@@ -44,7 +44,7 @@ vi.mock('../../../../../hooks/usePrefersReducedMotion', () => ({
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const safeProps: Record<string, unknown> = {};
       for (const [key, value] of Object.entries(props)) {

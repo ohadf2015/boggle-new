@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Sparkles, Eye, Share2, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -97,7 +97,7 @@ export function WotdReveal({ playerWords, className }: WotdRevealProps) {
   if (!word) return null;
 
   return (
-    <motion.div
+    <m.div
       data-testid="wotd-reveal"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
@@ -163,6 +163,6 @@ export function WotdReveal({ playerWords, className }: WotdRevealProps) {
         {copied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
         {copied ? t('common.copied') : t('share.emojiCard.share')}
       </button>
-    </motion.div>
+    </m.div>
   );
 }

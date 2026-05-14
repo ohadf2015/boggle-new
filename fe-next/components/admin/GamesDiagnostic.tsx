@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   RefreshCw,
   AlertTriangle,
@@ -83,7 +83,7 @@ export function GamesDiagnostic({ authToken }: GamesDiagnosticProps) {
       )}
 
       {data && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className="space-y-4"
@@ -176,7 +176,7 @@ export function GamesDiagnostic({ authToken }: GamesDiagnosticProps) {
               </div>
             </div>
           )}
-        </motion.div>
+        </m.div>
       )}
     </div>
   );

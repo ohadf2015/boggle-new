@@ -11,7 +11,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
@@ -105,31 +105,31 @@ export default function TeacherDashboard() {
       <EducationHeader />
       <TeacherOnboarding />
 
-      <motion.div
+      <m.div
         className="w-full max-w-5xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1"
         variants={stagger}
         initial="hidden"
         animate="visible"
       >
         {/* Greeting */}
-        <motion.div variants={slideUp} className="mb-6">
+        <m.div variants={slideUp} className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-neo-display font-black text-neo-white">
             {t('teacher.dashboard.title')}
           </h1>
           <p className="text-sm text-neo-white/60 font-neo-body mt-1">
             {t('teacher.dashboard.subtitle')}
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Teacher Welcome Banner */}
         {hasTeacherAccess && (
-          <motion.div variants={slideUp} className="mb-6">
+          <m.div variants={slideUp} className="mb-6">
             <TeacherWelcomeBanner hasAccess={hasTeacherAccess} />
-          </motion.div>
+          </m.div>
         )}
 
         {/* Tab Bar */}
-        <motion.div variants={slideUp} className="mb-6">
+        <m.div variants={slideUp} className="mb-6">
           <div
             className="inline-flex rounded-neo border-2 border-black bg-neo-navy-light p-1 gap-1 shadow-hard-sm"
             role="tablist"
@@ -157,14 +157,14 @@ export default function TeacherDashboard() {
               );
             })}
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Tab Content */}
         <AnimatePresence mode="wait">
           {activeTab === 'play' && (
-            <motion.div key="play" {...fadeSlide} className="space-y-6">
+            <m.div key="play" {...fadeSlide} className="space-y-6">
               {/* Start Game CTA */}
-              <motion.button
+              <m.button
                 onClick={() => router.push(`/${language}/education/classroom-game`)}
                 whileHover={{ y: -3, boxShadow: '6px 6px 0px black' }}
                 whileTap={{ scale: 0.98, y: 1, boxShadow: '2px 2px 0px black' }}
@@ -185,7 +185,7 @@ export default function TeacherDashboard() {
                     {t('education.classroomGame.startGameDescription')}
                   </p>
                 </div>
-              </motion.button>
+              </m.button>
 
               {/* Quick Start */}
               {hasRecentConfig && (
@@ -219,11 +219,11 @@ export default function TeacherDashboard() {
                   </p>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           )}
 
           {activeTab === 'prepare' && (
-            <motion.div key="prepare" {...fadeSlide} className="space-y-8">
+            <m.div key="prepare" {...fadeSlide} className="space-y-8">
               {/* Classrooms */}
               <section>
                 <div className="flex items-center gap-2 mb-4">
@@ -245,11 +245,11 @@ export default function TeacherDashboard() {
                 </div>
                 <LessonBuilder />
               </section>
-            </motion.div>
+            </m.div>
           )}
 
           {activeTab === 'review' && (
-            <motion.div key="review" {...fadeSlide} className="space-y-6">
+            <m.div key="review" {...fadeSlide} className="space-y-6">
               {classrooms.length === 0 ? (
                 <p className="text-neo-white/60 font-neo-body font-bold text-center py-8">
                   {t('teacher.dashboard.createClassroomFirst')}
@@ -314,10 +314,10 @@ export default function TeacherDashboard() {
                   )}
                 </>
               )}
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </m.div>
 
       {selectedClassroomId && (
         <AssignmentCreator

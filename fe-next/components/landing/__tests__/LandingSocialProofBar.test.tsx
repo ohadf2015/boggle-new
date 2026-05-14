@@ -11,7 +11,7 @@ vi.mock('framer-motion', () => {
   const motionObj = new Proxy({}, { get: (_, tag) => ({ children, ...props }: any) => React.createElement(tag as string, props, children) });
   const mockMotionValue = (init: number) => ({ get: () => init, set: () => {}, on: () => () => {} });
   return {
-    motion: motionObj,
+    m: motionObj,
     AnimatePresence: ({ children }: any) => children,
     useMotionValue: mockMotionValue,
     useSpring: (v: any) => v,

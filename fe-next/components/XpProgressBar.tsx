@@ -1,5 +1,5 @@
 import { memo, useMemo, useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
 import { cn } from '../lib/utils';
 import { Sparkles, Star } from 'lucide-react';
@@ -238,7 +238,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
         )}
       >
         {/* Animated fill */}
-        <motion.div
+        <m.div
           initial={{ width: 0 }}
           animate={{ width: `${progress.progressPercent}%` }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -250,7 +250,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
         />
 
         {/* Shimmer effect */}
-        <motion.div
+        <m.div
           initial={{ x: '-100%' }}
           animate={{ x: '200%' }}
           transition={{

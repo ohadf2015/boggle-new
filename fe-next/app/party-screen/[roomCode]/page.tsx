@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { io, Socket } from 'socket.io-client';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Monitor, Users, Clock, Trophy, Wifi, WifiOff, Maximize, Minimize, QrCode, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -251,7 +251,7 @@ export default function PartyScreen() {
         <div className="flex-1 flex flex-col items-center justify-center">
           {/* Phase indicator */}
           <AnimatePresence mode="wait">
-            <motion.div
+            <m.div
               key={gameState.phase}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -308,7 +308,7 @@ export default function PartyScreen() {
                       <div className="space-y-2">
                         <AnimatePresence mode="popLayout">
                           {gameState.recentWords.slice(0, 5).map((event) => (
-                            <motion.div
+                            <m.div
                               key={`${event.username}-${event.word}-${event.timestamp}`}
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
@@ -318,7 +318,7 @@ export default function PartyScreen() {
                               <span className="font-bold text-neo-cream">{event.username}</span>
                               <span className="font-black text-neo-lime uppercase">{event.word}</span>
                               <span className="text-neo-green font-bold">+{event.score}</span>
-                            </motion.div>
+                            </m.div>
                           ))}
                         </AnimatePresence>
                       </div>
@@ -326,7 +326,7 @@ export default function PartyScreen() {
                   )}
                 </div>
               )}
-            </motion.div>
+            </m.div>
           </AnimatePresence>
         </div>
 
@@ -340,7 +340,7 @@ export default function PartyScreen() {
           <div className="flex-1 overflow-y-auto space-y-2">
             <AnimatePresence mode="popLayout">
               {sortedPlayers.map((player, index) => (
-                <motion.div
+                <m.div
                   key={player.username}
                   layout
                   initial={{ opacity: 0, x: 20 }}
@@ -386,7 +386,7 @@ export default function PartyScreen() {
                   )}>
                     {player.score}
                   </div>
-                </motion.div>
+                </m.div>
               ))}
             </AnimatePresence>
 

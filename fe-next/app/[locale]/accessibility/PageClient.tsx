@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Eye, EyeOff, Volume2, VolumeX, Sparkles, Zap, Type, Contrast, Waves } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
@@ -155,7 +155,7 @@ export default function AccessibilitySettingsPageClient() {
       <Header />
       <div className="max-w-3xl mx-auto px-4 py-8 md:py-12 page-content-safe">
         {/* Page Title */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
@@ -170,12 +170,12 @@ export default function AccessibilitySettingsPageClient() {
             {t('accessibility.subtitle') ||
               'Customize your experience to meet your needs. These settings are saved locally.'}
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Settings Cards */}
         <div className="space-y-4">
           {settingsConfig.map((setting, index) => (
-            <motion.div
+            <m.div
               key={setting.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -205,7 +205,7 @@ export default function AccessibilitySettingsPageClient() {
                   aria-label={`${setting.enabled ? 'Disable' : 'Enable'} ${setting.title}`}
                   aria-pressed={setting.enabled}
                 >
-                  <motion.div
+                  <m.div
                     initial={false}
                     animate={{ x: setting.enabled ? 32 : 0 }}
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
@@ -216,15 +216,15 @@ export default function AccessibilitySettingsPageClient() {
                     ) : (
                       <EyeOff size={14} className="text-neo-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                     )}
-                  </motion.div>
+                  </m.div>
                 </button>
               </div>
-            </motion.div>
+            </m.div>
           ))}
         </div>
 
         {/* Info Footer */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.6 }}
@@ -234,7 +234,7 @@ export default function AccessibilitySettingsPageClient() {
             {t('accessibility.footer') ||
               'These settings are stored locally on your device. For additional system-level accessibility features, check your device settings.'}
           </p>
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

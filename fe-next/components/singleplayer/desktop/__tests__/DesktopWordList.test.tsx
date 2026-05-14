@@ -7,7 +7,7 @@ import { DesktopWordList } from '../DesktopWordList';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<object>) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: React.PropsWithChildren<object>) => <>{children}</>,

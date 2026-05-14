@@ -18,7 +18,7 @@
  */
 
 import React, { memo, useMemo, createContext, useContext, ReactNode } from 'react';
-import { motion, AnimatePresence, MotionProps } from 'framer-motion';
+import { m, AnimatePresence, MotionProps } from 'framer-motion';
 import { getPerformanceConfig } from '@/components/grid/performanceUtils';
 import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 
@@ -118,35 +118,35 @@ function createAdaptiveComponent(
  *
  * @example
  * // Before:
- * <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+ * <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
  *
  * // After:
  * <AdaptiveMotion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
  */
 export const AdaptiveMotion = {
-  div: createAdaptiveComponent('div', motion.div),
-  span: createAdaptiveComponent('span', motion.span),
-  button: createAdaptiveComponent('button', motion.button),
-  li: createAdaptiveComponent('li', motion.li),
-  ul: createAdaptiveComponent('ul', motion.ul),
-  p: createAdaptiveComponent('p', motion.p),
-  h1: createAdaptiveComponent('h1', motion.h1),
-  h2: createAdaptiveComponent('h2', motion.h2),
-  h3: createAdaptiveComponent('h3', motion.h3),
-  img: createAdaptiveComponent('img', motion.img),
-  a: createAdaptiveComponent('a', motion.a),
-  nav: createAdaptiveComponent('nav', motion.nav),
-  section: createAdaptiveComponent('section', motion.section),
-  article: createAdaptiveComponent('article', motion.article),
-  aside: createAdaptiveComponent('aside', motion.aside),
-  header: createAdaptiveComponent('header', motion.header),
-  footer: createAdaptiveComponent('footer', motion.footer),
-  main: createAdaptiveComponent('main', motion.main),
-  form: createAdaptiveComponent('form', motion.form),
-  input: createAdaptiveComponent('input', motion.input),
-  label: createAdaptiveComponent('label', motion.label),
-  svg: createAdaptiveComponent('svg', motion.svg),
-  path: createAdaptiveComponent('path', motion.path),
+  div: createAdaptiveComponent('div', m.div),
+  span: createAdaptiveComponent('span', m.span),
+  button: createAdaptiveComponent('button', m.button),
+  li: createAdaptiveComponent('li', m.li),
+  ul: createAdaptiveComponent('ul', m.ul),
+  p: createAdaptiveComponent('p', m.p),
+  h1: createAdaptiveComponent('h1', m.h1),
+  h2: createAdaptiveComponent('h2', m.h2),
+  h3: createAdaptiveComponent('h3', m.h3),
+  img: createAdaptiveComponent('img', m.img),
+  a: createAdaptiveComponent('a', m.a),
+  nav: createAdaptiveComponent('nav', m.nav),
+  section: createAdaptiveComponent('section', m.section),
+  article: createAdaptiveComponent('article', m.article),
+  aside: createAdaptiveComponent('aside', m.aside),
+  header: createAdaptiveComponent('header', m.header),
+  footer: createAdaptiveComponent('footer', m.footer),
+  main: createAdaptiveComponent('main', m.main),
+  form: createAdaptiveComponent('form', m.form),
+  input: createAdaptiveComponent('input', m.input),
+  label: createAdaptiveComponent('label', m.label),
+  svg: createAdaptiveComponent('svg', m.svg),
+  path: createAdaptiveComponent('path', m.path),
 };
 
 /**

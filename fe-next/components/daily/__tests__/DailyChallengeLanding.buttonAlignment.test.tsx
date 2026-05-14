@@ -54,7 +54,7 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, ...props }: any) => (
       <div className={className} {...props}>{children}</div>
     ),

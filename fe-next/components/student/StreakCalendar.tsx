@@ -8,7 +8,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -99,7 +99,7 @@ export default function StreakCalendar({ currentStreak, lastWinDate }: StreakCal
   }, [currentStreak, lastWinDate]);
 
   return (
-    <motion.div
+    <m.div
       className="p-5 rounded-neo border-3 border-black bg-neo-navy shadow-hard"
       variants={containerEntrance}
       initial="hidden"
@@ -108,33 +108,33 @@ export default function StreakCalendar({ currentStreak, lastWinDate }: StreakCal
     >
       {/* Header: Streak count */}
       <div className="flex items-center gap-3 mb-5">
-        <motion.div
+        <m.div
           className="w-10 h-10 rounded-neo bg-neo-lime border-3 border-black shadow-hard-sm flex items-center justify-center shrink-0"
           whileHover={{ scale: 1.15, rotate: -8 }}
           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
         >
           <Flame className="w-5 h-5 text-black" />
-        </motion.div>
+        </m.div>
         <p className="text-base font-neo-display font-black text-neo-white uppercase tracking-tight">
           {t('student.dashboard.streakCalendar')}
         </p>
-        <motion.div
+        <m.div
           variants={streakBadgePop}
           className="ms-auto flex items-center gap-2 bg-neo-lime border-3 border-black rounded-neo px-3 py-1 shadow-hard-sm"
         >
           <span className="text-xl font-neo-display font-black text-black tabular-nums">
             {currentStreak}
           </span>
-          <motion.div {...(currentStreak >= 3 ? flameFlicker : {})}>
+          <m.div {...(currentStreak >= 3 ? flameFlicker : {})}>
             <Flame className="w-5 h-5 text-neo-pink" />
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       </div>
 
       {/* 7-day calendar */}
       <div className="grid grid-cols-7 gap-2">
         {days.map((day) => (
-          <motion.div
+          <m.div
             key={day.index}
             variants={dayCell}
             data-testid={`day-${day.index}`}
@@ -154,7 +154,7 @@ export default function StreakCalendar({ currentStreak, lastWinDate }: StreakCal
               {day.dayName}
             </span>
             {day.isActive ? (
-              <motion.div
+              <m.div
                 animate={{
                   scale: [1, 1.2, 1],
                   rotate: [0, -5, 5, 0],
@@ -168,13 +168,13 @@ export default function StreakCalendar({ currentStreak, lastWinDate }: StreakCal
                 }}
               >
                 <Flame className="w-4 h-4 text-neo-pink" />
-              </motion.div>
+              </m.div>
             ) : (
               <div className="w-3 h-3 rounded-full bg-neo-white/20 border border-black/20" />
             )}
-          </motion.div>
+          </m.div>
         ))}
       </div>
-    </motion.div>
+    </m.div>
   );
 }

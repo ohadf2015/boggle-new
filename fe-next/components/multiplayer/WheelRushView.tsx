@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Socket } from 'socket.io-client';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { ChevronUp, RotateCcw, Shuffle, Sparkles } from 'lucide-react';
 import { WheelLetter, WordTile } from '@/components/daily/WordWheelParts';
@@ -518,7 +518,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       )}
 
       {/* Word builder (shared shake + motion) */}
-      <motion.div
+      <m.div
         className="relative w-full min-h-[52px] sm:min-h-[72px] flex items-center justify-center"
         animate={
           wordBuilderShake && !prefersReduced
@@ -535,14 +535,14 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         <div className="relative flex items-center justify-center gap-1 sm:gap-2 flex-wrap max-w-full w-full">
           {/* Placeholder is absolute-centered so layout never reflows when letters clear/repopulate
               (prevents post-reset horizontal shift). */}
-          <motion.span
+          <m.span
             aria-hidden={builtLetters.length > 0}
             className="absolute inset-0 flex items-center justify-center text-neo-cream/30 font-neo-display text-base sm:text-lg pointer-events-none"
             animate={{ opacity: builtLetters.length === 0 ? 1 : 0 }}
             transition={{ duration: 0.18 }}
           >
             {t('wordWheel.tapLetters') || 'Tap letters to build a word'}
-          </motion.span>
+          </m.span>
           {builtLetters.map((bl, i) => (
             <WordTile
               key={`${bl.wheelIndex}-${i}`}
@@ -555,7 +555,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         </div>
         <AnimatePresence>
           {feedback && (
-            <motion.div
+            <m.div
               className={cn(
                 'absolute -bottom-7 left-1/2 -translate-x-1/2 px-3 py-1 rounded-neo border-2 border-neo-black text-sm font-bold whitespace-nowrap z-20',
                 feedback.type === 'ok' ? 'bg-neo-lime text-neo-black' : 'bg-neo-red text-neo-white',
@@ -565,10 +565,10 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
               exit={{ opacity: 0, y: 10, scale: 0.8 }}
             >
               {feedback.msg}
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </m.div>
 
       {/* Points-to-pass next-rival hint. Reserved-height slot —
           ALWAYS rendered so toggling visibility never shifts the wheel.
@@ -579,7 +579,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       >
         <AnimatePresence>
           {nextRival && (
-            <motion.div
+            <m.div
               data-testid="mp-next-rival-pill"
               className="px-2.5 py-1 rounded-neo border-2 border-neo-cream/20 bg-neo-navy-light/60 text-[11px] sm:text-xs text-neo-cream/80 font-semibold flex items-center gap-1.5"
               initial={{ opacity: 0, y: -4 }}
@@ -596,7 +596,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
               <span dir="auto">
                 {t('wordWheel.pointsToPass', { count: pointsToPass, name: nextRival.username })}
               </span>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>
@@ -622,7 +622,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             radius={wheelRadius}
             combo={0}
           />
-          <motion.div
+          <m.div
             className="absolute inset-0 rounded-full border-2 border-neo-lime/20"
             style={{ boxShadow: '0 0 24px rgba(191,255,0,0.12), inset 0 0 24px rgba(191,255,0,0.06)' }}
             animate={{ opacity: [0.6, 1, 0.6] }}
@@ -658,7 +658,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         {/* Actions (Clear / Submit / Shuffle) — sit directly under the wheel
             so the player's thumb stays in the wheel's gravity well. */}
         <div className="flex items-center justify-center gap-3 shrink-0 mt-1">
-        <motion.button
+        <m.button
           type="button"
           onClick={handleClear}
           disabled={builtLetters.length === 0}
@@ -671,9 +671,9 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
           aria-label={t('wordWheel.clear') || 'Clear'}
         >
           <RotateCcw className="w-5 h-5" />
-        </motion.button>
+        </m.button>
 
-        <motion.button
+        <m.button
           type="button"
           onClick={handleSubmit}
           disabled={builtWord.length < MIN_LEN}
@@ -691,9 +691,9 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             <Sparkles className="w-5 h-5" />
             {t('wordWheel.submit') || 'Submit'}
           </div>
-        </motion.button>
+        </m.button>
 
-        <motion.button
+        <m.button
           type="button"
           onClick={handleShuffle}
           className={cn(
@@ -705,7 +705,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
           aria-label={t('wordWheel.shuffle') || 'Shuffle'}
         >
           <Shuffle className="w-5 h-5" />
-        </motion.button>
+        </m.button>
         </div>
       </div>
 

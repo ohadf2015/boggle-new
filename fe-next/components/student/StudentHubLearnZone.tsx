@@ -9,7 +9,7 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
@@ -65,7 +65,7 @@ export function StudentHubLearnZone({ userId, classroomId }: StudentHubLearnZone
       {/* F-24: Classroom game reward toast */}
       <AnimatePresence>
         {reward && (
-          <motion.div
+          <m.div
             role="status"
             aria-live="polite"
             initial={{ opacity: 0, y: -16, scale: 0.9 }}
@@ -85,7 +85,7 @@ export function StudentHubLearnZone({ userId, classroomId }: StudentHubLearnZone
             >
               ×
             </button>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -110,14 +110,14 @@ export function StudentHubLearnZone({ userId, classroomId }: StudentHubLearnZone
       <ChallengePanel playerId={userId} />
 
       {/* Lessons */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
         transition={{ type: 'spring', stiffness: 260, damping: 24 }}
       >
         <StudentLessonView />
-      </motion.div>
+      </m.div>
 
       {/* Collapsible Leaderboard */}
       {classroomId && (
@@ -134,7 +134,7 @@ export function StudentHubLearnZone({ userId, classroomId }: StudentHubLearnZone
             )}
           </button>
           {leaderboardOpen && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
@@ -144,7 +144,7 @@ export function StudentHubLearnZone({ userId, classroomId }: StudentHubLearnZone
                 classroomId={classroomId}
                 currentUserId={userId}
               />
-            </motion.div>
+            </m.div>
           )}
         </div>
       )}

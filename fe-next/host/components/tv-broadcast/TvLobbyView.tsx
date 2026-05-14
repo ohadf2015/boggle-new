@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Timer, Zap, Monitor } from 'lucide-react';
 import TvJoinBar from './TvJoinBar';
 import { PlayerRoster } from '../pre-game/PlayerRoster';
@@ -101,13 +101,13 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
         {/* Left column: Players */}
         <div className="col-span-2 flex flex-col gap-6">
           {/* Waiting headline */}
-          <motion.h1
+          <m.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-6xl font-neo-display font-black text-neo-cream text-center"
           >
             {t('tvLobby.waitingForPlayers')}
-          </motion.h1>
+          </m.h1>
 
           {/* Player roster — TV-sized */}
           <div className="flex-1">

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 const STORAGE_KEY = 'lexiclash_enter_hint_shown_count';
@@ -83,7 +83,7 @@ export function EnterKeyHint({
   return (
     <AnimatePresence>
       {isVisible && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 10, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 5, scale: 0.95 }}
@@ -96,7 +96,7 @@ export function EnterKeyHint({
           role="status"
           aria-live="polite"
         >
-          <motion.div
+          <m.div
             animate={{
               scale: [1, 1.05, 1],
               boxShadow: [
@@ -131,8 +131,8 @@ export function EnterKeyHint({
             >
               Enter
             </kbd>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

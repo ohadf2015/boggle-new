@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Trophy, Flame, X, Share2 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
@@ -268,7 +268,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
   if (compact) {
     return (
       <>
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className={cn(
@@ -279,7 +279,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           <span className={cn('text-sm font-bold', 'text-neo-cyan')}>
             {t('results.shareVictoryPrompt')}
           </span>
-          <motion.button
+          <m.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleShare}
@@ -294,8 +294,8 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           >
             <Share2 size={14} />
             <span>{t('results.share')}</span>
-          </motion.button>
-        </motion.div>
+          </m.button>
+        </m.div>
 
         <UnifiedShareModal
           isOpen={isShareModalOpen}
@@ -314,7 +314,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
   return (
     <>
       <AnimatePresence>
-        <motion.div
+        <m.div
           key="share-win-prompt"
           initial={{ opacity: 0, y: 20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -346,12 +346,12 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
 
         {/* Header with trophy */}
         <div className="flex items-center gap-3 mb-4">
-          <motion.div
+          <m.div
             animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.2, 1] }}
             transition={{ type: 'tween', duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
           >
             <Trophy className="text-3xl text-neo-lime drop-shadow-lg" />
-          </motion.div>
+          </m.div>
           <div>
             <h3 className={cn(
               'text-xl font-black uppercase tracking-wide',
@@ -372,7 +372,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
 
         {/* Streak badge */}
         {streakDays > 0 && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             className={cn(
@@ -384,12 +384,12 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           >
             <Flame className={streakDays >= 7 ? 'text-neo-pink' : 'text-neo-lime'} />
             {streakDays} {t('growth.dayStreak')}!
-          </motion.div>
+          </m.div>
         )}
 
         {/* Streak Encouragement - motivate sharing near milestones */}
         {streakEncouragement && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className={cn(
@@ -399,11 +399,11 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             )}
           >
             {streakEncouragement}
-          </motion.div>
+          </m.div>
         )}
 
         {/* Single Share CTA - tries native share first on mobile */}
-        <motion.button
+        <m.button
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleShare}
@@ -420,7 +420,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
         >
           <Share2 size={18} />
           <span>{t('results.shareYourVictory')}</span>
-        </motion.button>
+        </m.button>
 
         {/* Viral prompt */}
         <p className={cn(
@@ -429,7 +429,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
         )}>
           {t('results.challengeFriends')}
         </p>
-      </motion.div>
+      </m.div>
       </AnimatePresence>
 
       {/* Unified Share Modal */}

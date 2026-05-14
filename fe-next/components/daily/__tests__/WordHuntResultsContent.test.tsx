@@ -13,7 +13,7 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: null, profile: null, isAuthenticated: false }),
 }));
 vi.mock('framer-motion', () => ({
-  motion: { div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div> },
+  m: { div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div> },
   m: { div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div> },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useContext, memo, useCallback } from 'react';
 import { MessageSquare, X } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SocketContext } from '@/utils/SocketContext';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -88,7 +88,7 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
       {/* Unread badge — only visible when a new message arrives, auto-hides after 5s */}
       <AnimatePresence>
         {hasUnread && !isOpen && (
-          <motion.button
+          <m.button
             key="chat-badge"
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -106,12 +106,12 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
             aria-label={t('common.chat')}
           >
             <MessageSquare className="w-4 h-4 text-neo-lime" />
-            <motion.div
+            <m.div
               animate={{ scale: [1, 1.3, 1] }}
               transition={{ duration: 1.5, repeat: Infinity }}
               className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-neo-lime border border-neo-black rounded-full"
             />
-          </motion.button>
+          </m.button>
         )}
       </AnimatePresence>
 
@@ -120,7 +120,7 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
         {isOpen && (
           <>
             {/* Backdrop */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -129,7 +129,7 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
             />
 
             {/* Chat Sheet */}
-            <motion.div
+            <m.div
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
@@ -173,7 +173,7 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
                   variant="embedded"
                 />
               </div>
-            </motion.div>
+            </m.div>
           </>
         )}
       </AnimatePresence>

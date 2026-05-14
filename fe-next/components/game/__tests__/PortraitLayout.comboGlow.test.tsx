@@ -38,12 +38,12 @@ vi.mock('framer-motion', () => {
         return React.createElement(Tag, { ...domProps, style: cleanStyle, ref }, children);
       }
     );
-    Component.displayName = `motion.${Tag}`;
+    Component.displayName = `m.${Tag}`;
     return Component;
   };
 
   return {
-    motion: {
+    m: {
       div: createMotionComponent('div'),
       span: createMotionComponent('span'),
       p: createMotionComponent('p'),

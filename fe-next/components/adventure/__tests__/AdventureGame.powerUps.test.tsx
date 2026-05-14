@@ -67,7 +67,7 @@ vi.mock('framer-motion', () => {
   };
 
   return {
-    motion: {
+    m: {
       div: createMockMotion('div'),
       button: createMockMotion('button'),
       ul: createMockMotion('ul'),

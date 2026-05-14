@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useStore } from 'zustand';
 import { useMachine } from '@xstate/react';
 import type { Tile, WordConstraintRiddle as WordConstraintRiddleType } from '@/lib/word-vault/types';
@@ -80,7 +80,7 @@ export function WordConstraintRiddle({ riddle, store, onSolved }: Props) {
       <div className="flex flex-wrap items-center justify-center gap-3" dir="ltr">
         <AnimatePresence>
           {remainingTiles.map((tile) => (
-            <motion.button
+            <m.button
               key={tile.id}
               type="button"
               onClick={() => handleSelect(tile)}
@@ -93,7 +93,7 @@ export function WordConstraintRiddle({ riddle, store, onSolved }: Props) {
               className="grid h-16 w-16 place-items-center rounded-md border-4 border-white bg-pink-400 font-fredoka text-3xl font-black text-[#0b1220] shadow-[4px_4px_0_0_#000]"
             >
               {tile.letter}
-            </motion.button>
+            </m.button>
           ))}
         </AnimatePresence>
       </div>
@@ -146,13 +146,13 @@ export function WordConstraintRiddle({ riddle, store, onSolved }: Props) {
       )}
 
       {isSolved && (
-        <motion.div
+        <m.div
           initial={{ scale: 0.6, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="rounded-md border-4 border-lime-300 bg-lime-300/20 px-6 py-3 text-center"
         >
           <p className="font-fredoka text-2xl font-black text-lime-200">פתרת!</p>
-        </motion.div>
+        </m.div>
       )}
     </div>
   );

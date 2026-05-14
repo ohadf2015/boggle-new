@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import Image from 'next/image';
 import { Zap, Sword, Bomb, Search, CircleDot } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -36,7 +36,7 @@ const ArenaEmptyState: React.FC<ArenaEmptyStateProps> = ({
   const { t } = useLanguage();
 
   return (
-    <motion.div
+    <m.div
       data-testid="arena-empty-state"
       variants={containerVariants}
       initial="hidden"
@@ -48,7 +48,7 @@ const ArenaEmptyState: React.FC<ArenaEmptyStateProps> = ({
         className="absolute -top-10 -start-10 w-44 h-44 rounded-full bg-neo-lime/10 blur-2xl pointer-events-none"
       />
       <div className="relative flex items-start gap-4">
-        <motion.div
+        <m.div
           animate={{ y: [0, -6, 0], rotate: [-2, 2, -2] }}
           transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' as const }}
           className="shrink-0"
@@ -60,7 +60,7 @@ const ArenaEmptyState: React.FC<ArenaEmptyStateProps> = ({
             height={72}
             className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]"
           />
-        </motion.div>
+        </m.div>
         <div className="flex-1 min-w-0">
           <h3 className="font-neo-display text-neo-white font-black text-base sm:text-lg uppercase tracking-tight leading-tight">
             {t('multiplayerFlow.roomList.noRoomsYet')}
@@ -69,7 +69,7 @@ const ArenaEmptyState: React.FC<ArenaEmptyStateProps> = ({
             {t('multiplayerFlow.roomList.beTheLegend')}
           </p>
           {onQuickPlay && (
-            <motion.button
+            <m.button
               onClick={onQuickPlay}
               disabled={isQuickPlayLoading}
               whileHover={{ scale: 1.03 }}
@@ -85,7 +85,7 @@ const ArenaEmptyState: React.FC<ArenaEmptyStateProps> = ({
               <span className="text-neo-black font-black text-xs uppercase tracking-wide">
                 {t('multiplayerFlow.roomList.quickStart')}
               </span>
-            </motion.button>
+            </m.button>
           )}
         </div>
       </div>
@@ -105,7 +105,7 @@ const ArenaEmptyState: React.FC<ArenaEmptyStateProps> = ({
           </span>
         ))}
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

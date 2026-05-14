@@ -13,7 +13,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 // Mock framer-motion with ScoreCounter support
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, style, onClick, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} style={style} onClick={onClick} {...props}>{children}</div>
     ),

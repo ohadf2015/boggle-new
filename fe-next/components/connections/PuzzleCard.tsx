@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useAnimationControls } from 'framer-motion';
+import { m, AnimatePresence, useAnimationControls } from 'framer-motion';
 import { ThumbsUp, ThumbsDown, ArrowRight, Flag, Check, Lightbulb, Eye } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
@@ -130,7 +130,7 @@ export default function PuzzleCard({
 
   return (
     <AnimatePresence mode="wait">
-      <motion.div
+      <m.div
         key={puzzle.id}
         animate={shakeControls}
         initial={{ opacity: 0, y: 32, scale: 0.96 }}
@@ -161,7 +161,7 @@ export default function PuzzleCard({
 
         <AnimatePresence mode="wait">
           <div key={`chain-${puzzle.id}`} className="flex items-center justify-center gap-3 mb-6 flex-wrap">
-            <motion.span
+            <m.span
               custom={0}
               variants={WORD_CHIP_VARIANTS}
               initial="initial"
@@ -170,9 +170,9 @@ export default function PuzzleCard({
               className="font-neo-display text-2xl text-neo-cream font-bold tracking-wider px-3 py-1 rounded-neo border border-neo-white/20 bg-neo-navy shadow-hard-sm"
             >
               {puzzle.word1}
-            </motion.span>
+            </m.span>
 
-            <motion.span
+            <m.span
               custom={0.06}
               variants={WORD_CHIP_VARIANTS}
               initial="initial"
@@ -181,9 +181,9 @@ export default function PuzzleCard({
               className="text-neo-white/30 text-xl font-mono select-none"
             >
               +
-            </motion.span>
+            </m.span>
 
-            <motion.div
+            <m.div
               custom={0.12}
               variants={WORD_CHIP_VARIANTS}
               initial="initial"
@@ -200,24 +200,24 @@ export default function PuzzleCard({
               ].join(' ')}
             >
               {bridgeRevealed ? (
-                <motion.span
+                <m.span
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: 'spring' as const, stiffness: 400, damping: 14 }}
                 >
                   {puzzle.bridge}
-                </motion.span>
+                </m.span>
               ) : (
-                <motion.span
+                <m.span
                   animate={{ opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
                 >
                   ?
-                </motion.span>
+                </m.span>
               )}
-            </motion.div>
+            </m.div>
 
-            <motion.span
+            <m.span
               custom={0.18}
               variants={WORD_CHIP_VARIANTS}
               initial="initial"
@@ -226,9 +226,9 @@ export default function PuzzleCard({
               className="text-neo-white/30 text-xl font-mono select-none"
             >
               +
-            </motion.span>
+            </m.span>
 
-            <motion.span
+            <m.span
               custom={0.24}
               variants={WORD_CHIP_VARIANTS}
               initial="initial"
@@ -237,13 +237,13 @@ export default function PuzzleCard({
               className="font-neo-display text-2xl text-neo-cream font-bold tracking-wider px-3 py-1 rounded-neo border border-neo-white/20 bg-neo-navy shadow-hard-sm"
             >
               {puzzle.word2}
-            </motion.span>
+            </m.span>
           </div>
         </AnimatePresence>
 
         <AnimatePresence mode="wait">
           {showHint && (
-            <motion.p
+            <m.p
               key="hint"
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
@@ -253,11 +253,11 @@ export default function PuzzleCard({
             >
               <Lightbulb className="w-4 h-4" aria-hidden="true" />
               {puzzle.hint}
-            </motion.p>
+            </m.p>
           )}
 
           {isCorrect && (
-            <motion.p
+            <m.p
               key="correct"
               initial={{ opacity: 0, scale: 0.6 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -266,11 +266,11 @@ export default function PuzzleCard({
             >
               {t('connections.correct')}
               <Check className="w-5 h-5" aria-hidden="true" />
-            </motion.p>
+            </m.p>
           )}
 
           {state.status === 'wrong' && (
-            <motion.p
+            <m.p
               key="wrong"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -278,11 +278,11 @@ export default function PuzzleCard({
               className="text-neo-red text-center text-sm mb-4"
             >
               {t('connections.wrong')}
-            </motion.p>
+            </m.p>
           )}
 
           {isGaveUp && (
-            <motion.p
+            <m.p
               key="gaveUp"
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
@@ -290,7 +290,7 @@ export default function PuzzleCard({
               className="text-neo-red text-center text-sm font-bold mb-4"
             >
               {t('connections.solutionIs')}: <span className="text-neo-cream">{puzzle.bridge}</span>
-            </motion.p>
+            </m.p>
           )}
         </AnimatePresence>
 
@@ -315,7 +315,7 @@ export default function PuzzleCard({
             autoCapitalize="none"
             spellCheck={false}
           />
-          <motion.button
+          <m.button
             onClick={commitAndSubmit}
             disabled={isDisabled}
             whileHover={{ scale: 1.04, y: -1 }}
@@ -327,7 +327,7 @@ export default function PuzzleCard({
             ].join(' ')}
           >
             {t('connections.submit')}
-          </motion.button>
+          </m.button>
         </div>
 
         {/* Reveal-hint + reveal-answer / give-up row — active play only */}
@@ -336,7 +336,7 @@ export default function PuzzleCard({
             {/* Reveal hint button — only when puzzle has a hint and not yet revealed */}
             {puzzle.hint && !state.hintRevealed && (
               isAdmin ? (
-                <motion.button
+                <m.button
                   type="button"
                   onClick={onRevealHint}
                   whileHover={{ scale: 1.04 }}
@@ -345,9 +345,9 @@ export default function PuzzleCard({
                 >
                   <Lightbulb className="w-4 h-4" aria-hidden="true" />
                   {t('connections.revealHint')}
-                </motion.button>
+                </m.button>
               ) : revealHintAd.canShowAd ? (
-                <motion.button
+                <m.button
                   type="button"
                   onClick={revealHintAd.offer}
                   whileHover={{ scale: 1.04 }}
@@ -357,13 +357,13 @@ export default function PuzzleCard({
                 >
                   <Lightbulb className="w-4 h-4" aria-hidden="true" />
                   {t('connections.revealHintAd')}
-                </motion.button>
+                </m.button>
               ) : null
             )}
 
             {/* Reveal answer / give-up — admin gets free skip; non-admin gets ad-gated reveal */}
             {isAdmin ? (
-              <motion.button
+              <m.button
                 type="button"
                 onClick={onGiveUp}
                 whileHover={{ scale: 1.04 }}
@@ -372,9 +372,9 @@ export default function PuzzleCard({
               >
                 <Flag className="w-4 h-4" aria-hidden="true" />
                 {t('connections.adminGiveUp')}
-              </motion.button>
+              </m.button>
             ) : revealAnswerAd.canShowAd ? (
-              <motion.button
+              <m.button
                 type="button"
                 onClick={revealAnswerAd.offer}
                 whileHover={{ scale: 1.04 }}
@@ -384,13 +384,13 @@ export default function PuzzleCard({
               >
                 <Eye className="w-4 h-4" aria-hidden="true" />
                 {t('connections.revealAnswerAd')}
-              </motion.button>
+              </m.button>
             ) : null}
           </div>
         )}
 
         {isResolved && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25, type: 'spring', stiffness: 300, damping: 22 }}
@@ -402,7 +402,7 @@ export default function PuzzleCard({
                   {t('connections.rateThis')}
                 </p>
                 <div className="flex gap-3">
-                  <motion.button
+                  <m.button
                     onClick={() => onRate('like')}
                     whileHover={{ scale: 1.08, y: -1 }}
                     whileTap={{ scale: 0.94 }}
@@ -411,8 +411,8 @@ export default function PuzzleCard({
                   >
                     <ThumbsUp className="w-4 h-4" aria-hidden="true" />
                     {t('connections.like')}
-                  </motion.button>
-                  <motion.button
+                  </m.button>
+                  <m.button
                     onClick={() => onRate('dislike')}
                     whileHover={{ scale: 1.08, y: -1 }}
                     whileTap={{ scale: 0.94 }}
@@ -421,7 +421,7 @@ export default function PuzzleCard({
                   >
                     <ThumbsDown className="w-4 h-4" aria-hidden="true" />
                     {t('connections.dislike')}
-                  </motion.button>
+                  </m.button>
                 </div>
               </>
             ) : (
@@ -436,7 +436,7 @@ export default function PuzzleCard({
                 advance was hiding the prompt in 1.2s on correct answers
                 (ConnectionsGame.tsx) — feedback signal is now user-driven. */}
             {isResolved && (
-              <motion.button
+              <m.button
                 onClick={onNext}
                 whileHover={{ scale: 1.05, y: -1 }}
                 whileTap={{ scale: 0.96 }}
@@ -444,11 +444,11 @@ export default function PuzzleCard({
               >
                 {t('connections.next')}
                 <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} aria-hidden="true" />
-              </motion.button>
+              </m.button>
             )}
-          </motion.div>
+          </m.div>
         )}
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 }

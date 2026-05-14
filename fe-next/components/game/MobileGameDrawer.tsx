@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import { motion, useMotionValue, PanInfo } from 'framer-motion';
+import { m, useMotionValue, PanInfo } from 'framer-motion';
 import { ChevronUp, ChevronDown, BookOpen, Gem } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -53,7 +53,7 @@ export function MobileGameDrawer({
   }, []);
 
   return (
-    <motion.div
+    <m.div
       ref={containerRef}
       className="block lg:hidden fixed bottom-0 inset-x-0 z-40"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
@@ -63,7 +63,7 @@ export function MobileGameDrawer({
       transition={{ type: 'spring', stiffness: 400, damping: 35 }}
     >
       {/* Peek bar — always visible, shows key stats + drag handle */}
-      <motion.button
+      <m.button
         type="button"
         aria-expanded={isOpen}
         aria-label={t('game.drawer.toggle')}
@@ -100,14 +100,14 @@ export function MobileGameDrawer({
               </div>
               <div className="flex items-center gap-1">
                 <Gem className="w-3 h-3 text-neo-cream/50" />
-                <motion.span
+                <m.span
                   key={peekStats.score}
                   initial={{ scale: 1.2 }}
                   animate={{ scale: 1 }}
                   className="text-xs font-black text-neo-cream tabular-nums"
                 >
                   {peekStats.score}
-                </motion.span>
+                </m.span>
               </div>
             </div>
           )}
@@ -115,10 +115,10 @@ export function MobileGameDrawer({
           {/* Drag pill */}
           <div className="w-6 h-1 rounded-full bg-neo-cream/30" />
         </div>
-      </motion.button>
+      </m.button>
 
       {/* Expanded content */}
-      <motion.div
+      <m.div
         role="region"
         aria-label={t('game.drawer.content')}
         className={cn(
@@ -132,7 +132,7 @@ export function MobileGameDrawer({
         transition={{ type: 'spring', stiffness: 400, damping: 35 }}
       >
         {children}
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Brain, TrendingUp, Sparkles, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -84,7 +84,7 @@ export default function BrainScoreHero({
       <div className="flex items-center justify-between gap-2 mb-4 sm:mb-6">
         <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
           {/* Animated Brain Icon */}
-          <motion.div
+          <m.div
             className={cn(
               'w-12 h-12 sm:w-16 sm:h-16 rounded-neo border-3 border-neo-black flex items-center justify-center shrink-0',
               tierBadgeColor
@@ -100,7 +100,7 @@ export default function BrainScoreHero({
             }}
           >
             <Brain className="w-7 h-7 sm:w-10 sm:h-10 text-neo-black" />
-          </motion.div>
+          </m.div>
 
           <div className="min-w-0">
             <p className={cn(
@@ -110,7 +110,7 @@ export default function BrainScoreHero({
               {t('brain.score')}
             </p>
             <div className="flex items-baseline gap-1 sm:gap-2">
-              <motion.span
+              <m.span
                 className={cn(
                   'text-3xl sm:text-5xl font-black',
                   isDarkMode ? 'text-neo-white' : 'text-neo-black'
@@ -120,7 +120,7 @@ export default function BrainScoreHero({
                 transition={{ delay: 0.2 }}
               >
                 {score}
-              </motion.span>
+              </m.span>
               <span className={cn(
                 'text-base sm:text-xl font-bold',
                 isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
@@ -135,7 +135,7 @@ export default function BrainScoreHero({
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Share Button */}
           {onShare && (
-            <motion.button
+            <m.button
               whileTap={{ scale: 0.95 }}
               onClick={onShare}
               className={cn(
@@ -148,7 +148,7 @@ export default function BrainScoreHero({
               title={t('common.share')}
             >
               <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
-            </motion.button>
+            </m.button>
           )}
 
           {/* Activities Analyzed Badge */}
@@ -206,7 +206,7 @@ export default function BrainScoreHero({
             'h-5 rounded-full border-2 border-neo-black overflow-hidden',
             isDarkMode ? 'bg-slate-900' : 'bg-gray-300'
           )}>
-            <motion.div
+            <m.div
               className={cn('h-full', progressBarGradient)}
               initial={{ width: 0 }}
               animate={{ width: `${tierProgress}%` }}

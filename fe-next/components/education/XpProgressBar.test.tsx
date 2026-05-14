@@ -30,7 +30,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, style, initial, animate, transition, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       // For the progress bar fill, compute transform from animate prop (uses scaleX)
       const computedStyle = { ...style } as React.CSSProperties;
@@ -178,7 +178,7 @@ describe('XpProgressBar', () => {
       Object.defineProperty(window, 'matchMedia', {
         writable: true,
         value: vi.fn().mockImplementation(query => ({
-          matches: query === '(prefers-reduced-motion: reduce)',
+          matches: query === '(prefers-reduced-m: reduce)',
           media: query,
           onchange: null,
           addListener: vi.fn(),

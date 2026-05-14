@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, Copy, Check, Share2, Gift } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -44,7 +44,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
     <AnimatePresence>
       {isOpen && (
         <>
-          <motion.div
+          <m.div
             data-testid="share-modal-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -54,7 +54,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
             aria-hidden="true"
           />
 
-          <motion.div
+          <m.div
             ref={dialogRef}
             initial={{ opacity: 0, y: 60, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -208,7 +208,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
               )}
               <span aria-live="polite">{copied ? (t('common.copied')) : (t('common.copy'))}</span>
             </button>
-          </motion.div>
+          </m.div>
         </>
       )}
     </AnimatePresence>

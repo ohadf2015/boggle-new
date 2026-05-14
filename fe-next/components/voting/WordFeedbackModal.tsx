@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, memo, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ThumbsUp, ThumbsDown, Book, CheckCircle, HelpCircle } from 'lucide-react';
 import Avatar from '../Avatar';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -221,7 +221,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
         className="bg-neo-cream border-4 border-neo-black max-w-md overflow-hidden"
         dir={dir}
       >
-        <motion.div
+        <m.div
           key={currentWord.word}
           initial={{ opacity: 0, scale: 0.8, y: 50, rotate: -5 }}
           animate={{ opacity: 1, scale: 1, y: 0, rotate: -1 }}
@@ -250,16 +250,16 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
 
           <DialogBody className="space-y-4">
             {/* Encouragement - Dictionary focused */}
-            <motion.p
+            <m.p
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center text-neo-pink font-bold text-sm"
             >
               {encouragementSentence}
-            </motion.p>
+            </m.p>
             {/* Submitter Info */}
             {currentWord.submittedBy && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="flex flex-col items-center gap-1"
@@ -271,11 +271,11 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                 <span className="text-xs text-neo-cream/70 font-semibold">
                   {currentWord.submittedBy}
                 </span>
-              </motion.div>
+              </m.div>
             )}
 
             {/* Word Card - Cleaner, focused on the word */}
-            <motion.div
+            <m.div
               key={currentWord.word}
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
@@ -298,7 +298,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               {wordVoteInfo && (
                 <div className="mt-4 space-y-1">
                   <div className="h-2 bg-neo-black/20 rounded-full overflow-hidden">
-                    <motion.div
+                    <m.div
                       className={`h-full ${isValidForScoring ? 'bg-neo-cyan' : 'bg-neo-lime'}`}
                       initial={{ width: 0 }}
                       animate={{ width: `${progressPercent}%` }}
@@ -313,11 +313,11 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   </p>
                 </div>
               )}
-            </motion.div>
+            </m.div>
 
             {/* Voting Buttons */}
             {!hasVoted ? (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
@@ -385,9 +385,9 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   <ThumbsUp className="w-5 h-5" />
                   <span>{t('wordFeedback.realWord')}</span>
                 </button>
-              </motion.div>
+              </m.div>
             ) : (
-              <motion.div
+              <m.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 className="text-center py-4"
@@ -399,7 +399,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                     : (t('wordFeedback.thankYou'))
                   }
                 </span>
-              </motion.div>
+              </m.div>
             )}
 
             {/* Timer Bar */}
@@ -411,7 +411,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                 rounded-neo
                 overflow-hidden
               ">
-                <motion.div
+                <m.div
                   className={`h-full ${getTimerColor()} transition-colors duration-300`}
                   initial={{ width: '100%' }}
                   animate={{ width: `${timerProgress}%` }}
@@ -430,7 +430,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               </div>
             </div>
           </DialogBody>
-        </motion.div>
+        </m.div>
       </DialogContent>
     </Dialog>
   );

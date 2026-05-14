@@ -14,7 +14,7 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Target, Check, X, Loader2, Trophy, Frown, Equal } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -123,7 +123,7 @@ export default function FriendChallengeLandingClient({ locale, challenge, viewer
 
   return (
     <div className="min-h-screen bg-neo-navy text-neo-white p-4 flex items-center justify-center">
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 280, damping: 24 }}
@@ -286,7 +286,7 @@ export default function FriendChallengeLandingClient({ locale, challenge, viewer
         >
           {t('friends.backToFriends')}
         </button>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

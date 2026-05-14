@@ -12,7 +12,7 @@ import { Collapsible } from '../Collapsible';
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, ...props }: any) => (
       <div className={className} data-testid="motion-div" {...props}>
         {children}

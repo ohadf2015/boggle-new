@@ -49,7 +49,7 @@ vi.mock('@/lib/education/telemetry', () => ({
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, onClick, ...props }: any) => (
       <div onClick={onClick} {...props}>
         {children}

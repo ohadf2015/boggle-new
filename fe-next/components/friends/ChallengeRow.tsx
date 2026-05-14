@@ -29,7 +29,7 @@ export const ChallengeRow: React.FC<ChallengeRowProps> = ({
   const handleAccept = async () => {
     setLoading('accept');
     try {
-      await onAccept(challenge.challengeId);
+      await onAccept(challenge.id);
     } finally {
       setLoading(null);
     }
@@ -38,7 +38,7 @@ export const ChallengeRow: React.FC<ChallengeRowProps> = ({
   const handleDecline = async () => {
     setLoading('decline');
     try {
-      await onDecline(challenge.challengeId);
+      await onDecline(challenge.id);
     } finally {
       setLoading(null);
     }
@@ -67,7 +67,7 @@ export const ChallengeRow: React.FC<ChallengeRowProps> = ({
       <div className="flex items-center gap-1.5">
         {/* Accept */}
         <button
-          data-testid={`accept-challenge-${challenge.challengeId}`}
+          data-testid={`accept-challenge-${challenge.id}`}
           onClick={handleAccept}
           disabled={loading !== null}
           className={cn(
@@ -81,7 +81,7 @@ export const ChallengeRow: React.FC<ChallengeRowProps> = ({
         </button>
         {/* Decline */}
         <button
-          data-testid={`decline-challenge-${challenge.challengeId}`}
+          data-testid={`decline-challenge-${challenge.id}`}
           onClick={handleDecline}
           disabled={loading !== null}
           className={cn(

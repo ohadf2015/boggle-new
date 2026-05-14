@@ -3,7 +3,7 @@
 import { useEffect, useCallback, memo } from 'react';
 import Image from 'next/image';
 import { Users, UserPlus } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useCrazyGamesFriends } from '@/hooks/useCrazyGamesFriends';
@@ -54,7 +54,7 @@ const CrazyGamesFriendsStrip = memo(function CrazyGamesFriendsStrip({ roomId }: 
   }
 
   return (
-    <motion.section
+    <m.section
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.15 }}
@@ -117,7 +117,7 @@ const CrazyGamesFriendsStrip = memo(function CrazyGamesFriendsStrip({ roomId }: 
           ))
         )}
       </div>
-    </motion.section>
+    </m.section>
   );
 });
 

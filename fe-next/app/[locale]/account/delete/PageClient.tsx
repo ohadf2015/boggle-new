@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Trash2, AlertTriangle, Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import Header from '@/components/Header';
@@ -85,7 +85,7 @@ export default function DeleteAccountPageClient() {
     <div className={cn('min-h-screen', isDarkMode ? 'bg-neo-navy' : 'bg-gray-50')}>
       <Header />
       <div className="px-4 py-8 pt-20">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className={cardClass}
@@ -206,7 +206,7 @@ export default function DeleteAccountPageClient() {
               </Link>
             </div>
           )}
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

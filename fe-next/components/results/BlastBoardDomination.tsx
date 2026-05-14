@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Bomb, Crown, Flame, Gem, Sparkles, Sword, Trophy, Waves } from 'lucide-react';
 import { useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -183,21 +183,21 @@ export default function BlastBoardDomination({ playerStats, currentUsername }: B
   const v = prefersReduced ? reduced : awardVariants;
 
   return (
-    <motion.div
+    <m.div
       variants={containerVariants}
       initial="hidden"
       animate="show"
       className="space-y-3"
     >
       {/* ── Blast Match Recap hero card — Blast-only aggregate stats ── */}
-      <motion.div
+      <m.div
         variants={v}
         className="relative overflow-hidden p-3 rounded-neo border-3 border-neo-black shadow-hard bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy"
         data-testid="blast-match-recap"
       >
         {/* Decorative pulse aura — only when the match was intense */}
         {matchRecap.intensity >= 40 && !prefersReduced && (
-          <motion.div
+          <m.div
             aria-hidden
             className="absolute inset-0 bg-linear-to-br from-neo-pink/10 via-neo-orange/10 to-neo-lime/10 pointer-events-none"
             animate={{ opacity: [0.4, 0.8, 0.4] }}
@@ -229,7 +229,7 @@ export default function BlastBoardDomination({ playerStats, currentUsername }: B
                 {t('blast.results.intensity') || 'Intensity'}
               </div>
               <div className="w-20 h-2 rounded-full bg-neo-black/60 border border-neo-white/15 overflow-hidden">
-                <motion.div
+                <m.div
                   className={`h-full rounded-full ${matchRecap.intensity >= 70 ? 'bg-linear-to-r from-neo-pink via-neo-orange to-neo-red' : matchRecap.intensity >= 40 ? 'bg-linear-to-r from-neo-cyan to-neo-lime' : 'bg-neo-cyan/70'}`}
                   initial={prefersReduced ? { width: `${matchRecap.intensity}%` } : { width: 0 }}
                   animate={{ width: `${matchRecap.intensity}%` }}
@@ -277,18 +277,18 @@ export default function BlastBoardDomination({ playerStats, currentUsername }: B
             </div>
           </div>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* ── Section header ── */}
-      <motion.div variants={v} className="flex items-center gap-2 px-1">
+      <m.div variants={v} className="flex items-center gap-2 px-1">
         <Sparkles className="w-4 h-4 text-neo-orange" />
         <h3 className="text-sm font-black uppercase tracking-wider text-neo-cream/80">
           {t('blast.results.boardDomination')}
         </h3>
-      </motion.div>
+      </m.div>
 
       {/* ── Domination bars — who cleared the most ── */}
-      <motion.div
+      <m.div
         variants={v}
         className="p-3 bg-neo-navy/60 border-3 border-neo-black rounded-neo shadow-hard-sm overflow-hidden"
       >
@@ -299,7 +299,7 @@ export default function BlastBoardDomination({ playerStats, currentUsername }: B
             const isMe = username === currentUsername;
 
             return (
-              <motion.div
+              <m.div
                 key={username}
                 variants={v}
                 className="relative"
@@ -307,9 +307,9 @@ export default function BlastBoardDomination({ playerStats, currentUsername }: B
                 {/* Player row */}
                 <div className="flex items-center gap-2 mb-0.5">
                   {idx === 0 && (
-                    <motion.div variants={prefersReduced ? undefined : crownVariants}>
+                    <m.div variants={prefersReduced ? undefined : crownVariants}>
                       <Crown className="w-3.5 h-3.5 text-neo-yellow" />
-                    </motion.div>
+                    </m.div>
                   )}
                   <span className={`text-xs font-bold ${isMe ? 'text-neo-white' : 'text-neo-cream/80'} ${isMe ? 'underline decoration-neo-lime/40 underline-offset-2' : ''}`}>
                     {username}
@@ -321,24 +321,24 @@ export default function BlastBoardDomination({ playerStats, currentUsername }: B
 
                 {/* Bar */}
                 <div className="h-3 bg-neo-black/40 rounded-full overflow-hidden border border-neo-white/10">
-                  <motion.div
+                  <m.div
                     className={`h-full rounded-full ${color?.fill || 'bg-neo-lime/80'} ${idx === 0 ? color?.glow || '' : ''}`}
                     style={{ width: `${Math.max(pct, 3)}%`, originX: 0 }}
                     variants={prefersReduced ? reduced : barVariants}
                     custom={pct}
                   />
                 </div>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>
-      </motion.div>
+      </m.div>
 
       {/* ── Awards — fun "who did what best" callouts ── */}
       {awards.length > 0 && (
         <div className="grid grid-cols-2 gap-2">
           {awards.map((award, i) => (
-            <motion.div
+            <m.div
               key={award.titleKey}
               variants={v}
               className="relative p-2.5 bg-neo-navy/60 border-3 border-neo-black rounded-neo shadow-hard-sm overflow-hidden"
@@ -370,11 +370,11 @@ export default function BlastBoardDomination({ playerStats, currentUsername }: B
                   </span>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       )}
 
-    </motion.div>
+    </m.div>
   );
 }

@@ -12,7 +12,7 @@ import '@testing-library/jest-dom';
 
 // Mock framer-motion — render children immediately, pass through data-testid
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: React.forwardRef(function MotionDiv(
       { children, className, style, ...rest }: any,
       ref: any

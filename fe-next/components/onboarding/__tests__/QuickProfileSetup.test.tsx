@@ -15,7 +15,7 @@ vi.mock('framer-motion', () => {
     );
   });
   return {
-    motion: new Proxy({ div: MotionDiv, button: MotionDiv }, {
+    m: new Proxy({ div: MotionDiv, button: MotionDiv }, {
       get(target: any, prop: string) {
         return target[prop] || MotionDiv;
       },

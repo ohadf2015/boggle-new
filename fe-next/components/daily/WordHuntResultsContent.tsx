@@ -10,7 +10,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Eye, CircleDot, ArrowRight, CheckCircle2, Home } from 'lucide-react';
 import Link from 'next/link';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
@@ -155,7 +155,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   }, [trackCrossPromoExposure]);
 
   const wheelCtaNode = !wordWheelPlayed && (
-    <motion.div
+    <m.div
       data-testid="wordhunt-wheel-cta"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
@@ -190,22 +190,22 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
               </p>
             </div>
           </div>
-          <motion.div
+          <m.div
             animate={{ x: [0, 4, 0] }}
             transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
           >
             <ArrowRight className="w-6 h-6 text-neo-white shrink-0" />
-          </motion.div>
+          </m.div>
         </Link>
       </div>
-    </motion.div>
+    </m.div>
   );
 
   // When the other game is already done, the primary CTA goes back to the
   // Daily Hub (which surfaces the combined leaderboard) instead of nagging
   // the player to "complete the other challenge".
   const backToDailyCtaNode = wordWheelPlayed && (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.22, type: 'spring', stiffness: 300, damping: 26 }}
@@ -230,7 +230,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         </div>
         <ArrowRight className="w-6 h-6 text-neo-black shrink-0" />
       </Link>
-    </motion.div>
+    </m.div>
   );
 
   return (
@@ -272,7 +272,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
 
     {/* WIN state: Performance breakdown with 3 bars */}
     {result.solved && (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
@@ -290,29 +290,29 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
           extraTries={result.extraTries}
           t={t}
         />
-      </motion.div>
+      </m.div>
     )}
 
     {/* Rank badge - shows for both WIN and FAIL */}
     {stats && (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
       >
         <RankBadge stats={stats} t={t} />
-      </motion.div>
+      </m.div>
     )}
 
     {/* Single-stat narrative blurb — one compelling number in a sentence */}
     {stats && (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.18, type: 'spring', stiffness: 300, damping: 26 }}
       >
         <StatsBlurb stats={stats} solved={result.solved} t={t} />
-      </motion.div>
+      </m.div>
     )}
 
     {/* Daily Insight Cards — personalized analytics on challenge performance */}
@@ -397,7 +397,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     {crossPromoOrder === 'leaderboard-first' && wheelCtaNode}
 
     {/* Share/Retry Section */}
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.28, type: 'spring', stiffness: 300, damping: 26 }}
@@ -421,7 +421,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         onSpendStart={onSpendStart}
         t={t}
       />
-    </motion.div>
+    </m.div>
 
     {/* Inline signup for guests */}
     {!isAuthenticated && !inlineSignupDismissed && (
@@ -433,7 +433,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
 
     {/* Daily complete badge — shown once both games done */}
     {wordWheelPlayed && (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.32, type: 'spring', stiffness: 300, damping: 26 }}
@@ -449,12 +449,12 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
             </p>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     )}
 
     {/* Word Bridge (Connections) cross-promo — EN/HE only, after daily complete */}
     {wordWheelPlayed && (language === 'en' || language === 'he') && (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.34, type: 'spring', stiffness: 300, damping: 26 }}
@@ -487,20 +487,20 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
           </div>
           <ArrowRight className="w-6 h-6 text-neo-white shrink-0" />
         </Link>
-      </motion.div>
+      </m.div>
     )}
 
     {/* Back-to-daily CTA lives above the leaderboard now (see primary CTA block). */}
 
     {/* Witty facts — supplementary, below the fold */}
     {stats && (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
       >
         <DailyWordHuntFacts result={result} stats={stats} t={t} />
-      </motion.div>
+      </m.div>
     )}
 
     {/* Create Your Own Board + Language Options — visible, not collapsed */}

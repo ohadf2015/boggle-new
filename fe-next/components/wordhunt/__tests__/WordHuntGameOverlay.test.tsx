@@ -8,7 +8,7 @@ import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, initial, animate, transition, whileHover, whileTap, exit, ...props }: any) => <div {...props}>{children}</div>,
     span: ({ children, initial, animate, transition, whileHover, whileTap, exit, ...props }: any) => <span {...props}>{children}</span>,
     p: ({ children, initial, animate, transition, ...props }: any) => <p {...props}>{children}</p>,

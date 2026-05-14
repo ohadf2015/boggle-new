@@ -10,7 +10,7 @@ import CircularTimer from '../CircularTimer';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, animate, initial, transition, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
     ),

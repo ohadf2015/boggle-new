@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Trophy, Lock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ProfileData } from '@/contexts/auth/authTypes';
@@ -24,7 +24,7 @@ export function ProfileRankedProgress({
   const { t } = useLanguage();
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
@@ -80,7 +80,7 @@ export function ProfileRankedProgress({
             </span>
           </div>
           <div className="h-3 rounded-full overflow-hidden bg-neo-black border-2 border-neo-black">
-            <motion.div
+            <m.div
               className="h-full bg-neo-pink"
               initial={{ width: 0 }}
               animate={{ width: `${Math.min(100, ((profile?.casual_games || 0) / 10) * 100)}%` }}
@@ -89,7 +89,7 @@ export function ProfileRankedProgress({
           </div>
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 }
 

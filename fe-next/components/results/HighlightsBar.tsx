@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface HighlightsBarProps {
@@ -66,7 +66,7 @@ export default function HighlightsBar({ stats }: HighlightsBarProps) {
   if (!stats.length) return null;
 
   return (
-    <motion.section
+    <m.section
       variants={reducedMotion ? undefined : containerVariants}
       initial="hidden"
       animate="visible"
@@ -77,13 +77,13 @@ export default function HighlightsBar({ stats }: HighlightsBarProps) {
       )}
     >
       {stats.map((stat, index) => (
-        <motion.div
+        <m.div
           key={stat.label}
           className="contents"
           variants={reducedMotion ? undefined : statVariants}
         >
           {index > 0 && (
-            <motion.div
+            <m.div
               className="w-px h-8 bg-white/5 shrink-0"
               variants={reducedMotion ? undefined : dividerVariants}
             />
@@ -93,12 +93,12 @@ export default function HighlightsBar({ stats }: HighlightsBarProps) {
               {stat.label}
             </p>
             <div className="flex items-center justify-center gap-1.5">
-              <motion.span
+              <m.span
                 className={cn('text-xs', stat.color)}
                 variants={reducedMotion ? undefined : iconVariants}
               >
                 {stat.icon}
-              </motion.span>
+              </m.span>
               <span
                 className={cn(
                   'text-base font-black uppercase tracking-tight tabular-nums',
@@ -109,8 +109,8 @@ export default function HighlightsBar({ stats }: HighlightsBarProps) {
               </span>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       ))}
-    </motion.section>
+    </m.section>
   );
 }

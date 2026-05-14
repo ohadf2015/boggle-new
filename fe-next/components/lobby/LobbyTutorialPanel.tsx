@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Gamepad2, Zap, Trophy, ChevronLeft, ChevronRight, Globe } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Language } from '@/shared/types/game';
@@ -48,7 +48,7 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
       {/* Tutorial Content */}
       <div className="flex-1 flex flex-col items-center justify-center text-center gap-3">
         <AnimatePresence mode="wait">
-          <motion.div
+          <m.div
             key={step}
             initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -65,7 +65,7 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
             <p className="text-xs text-neo-cream/70 max-w-[240px]">
               {t(currentStep.descKey)}
             </p>
-          </motion.div>
+          </m.div>
         </AnimatePresence>
 
         {/* Step Dots & Navigation */}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import type { RuneCard, RuneCardDef } from '@/types/wordForge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -101,7 +101,7 @@ export function RunePicker({
           const styles = RARITY_STYLES[rune.rarity];
           const isPicking = pickingRune === rune.id;
           return (
-            <motion.button
+            <m.button
               key={rune.id}
               onClick={() => handleCardClick(rune)}
               initial={prefersReducedMotion ? false : { opacity: 0, y: 40 }}
@@ -150,7 +150,7 @@ export function RunePicker({
               )}>
                 {rune.rarity}
               </span>
-            </motion.button>
+            </m.button>
           );
         })}
       </div>

@@ -8,7 +8,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Flame, Clock, Eye, EyeOff, Skull, Zap, Target, BookOpen, Sparkles } from 'lucide-react';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
@@ -120,7 +120,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
   };
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
@@ -129,7 +129,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
       <div className="bg-neo-navy/90 rounded-neo-lg border-3 border-neo-black shadow-hard-lg overflow-hidden relative">
         {/* Ambient background glow matching score tier */}
         {solved && scoreBreakdown.total > 0 && (
-          <motion.div
+          <m.div
             className="absolute inset-0 pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -146,20 +146,20 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
             {t('daily.puzzleNumber').replace('{number}', String(puzzleNumber))}
           </span>
           {streakDays > 0 && (
-            <motion.div
+            <m.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: 'spring', stiffness: 500, damping: 15 }}
               className="flex items-center gap-1 text-orange-400"
             >
-              <motion.div
+              <m.div
                 animate={{ rotate: [0, -10, 10, -5, 0] }}
                 transition={{ delay: 0.8, duration: 0.6 }}
               >
                 <Flame className="w-3.5 h-3.5" />
-              </motion.div>
+              </m.div>
               <span className="text-xs font-bold">{streakDays}</span>
-            </motion.div>
+            </m.div>
           )}
         </div>
 
@@ -167,13 +167,13 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
         <div className="px-5 py-6 md:px-8 md:py-8 relative z-10">
           {solved ? (
             /* ===== WIN STATE — Speedometer Gauge ===== */
-            <motion.div
+            <m.div
               onClick={handleTapCelebrate}
               className="cursor-pointer select-none flex flex-col items-center gap-5"
               whileTap={{ scale: 0.98 }}
             >
               {/* Hero Gauge Ring — dramatic slam-in entrance */}
-              <motion.div
+              <m.div
                 initial={{ scale: 0.3, opacity: 0, rotate: -10 }}
                 animate={{ scale: 1, opacity: 1, rotate: 0 }}
                 transition={{
@@ -191,14 +191,14 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   color={gaugeColor}
                   delay={0.3}
                 />
-              </motion.div>
+              </m.div>
 
               {/* Attempt tier badge — Wordle-style "Genius!" label */}
               {(() => {
                 const tier = getAttemptTier(attemptsUsed);
                 if (!tier) return null;
                 return (
-                  <motion.div
+                  <m.div
                     initial={{ scale: 0, rotate: -8 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ delay: 0.35, type: 'spring', stiffness: 400, damping: 12 }}
@@ -219,12 +219,12 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                         {attemptsUsed}/10
                       </span>
                     </div>
-                  </motion.div>
+                  </m.div>
                 );
               })()}
 
               {/* Target Word with Eye Toggle */}
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
@@ -238,7 +238,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                     {wordHidden ? (
                       /* Hidden: dot placeholders */
                       displayedTargetWord.split('').map((_, i) => (
-                        <motion.span
+                        <m.span
                           key={`blank-${i}`}
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
@@ -246,12 +246,12 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                           className="inline-flex items-center justify-center w-8 h-10 bg-slate-800 rounded-neo border-2 border-slate-600 text-slate-500 font-black text-lg"
                         >
                           ?
-                        </motion.span>
+                        </m.span>
                       ))
                     ) : (
                       /* Revealed: letter tiles with 3D flip effect */
                       displayedTargetWord.split('').map((letter, i) => (
-                        <motion.span
+                        <m.span
                           key={`letter-${i}-${letter}`}
                           data-testid={`letter-${letter}`}
                           initial={{ scale: 0, rotateY: -90, opacity: 0 }}
@@ -266,7 +266,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                           style={{ perspective: '400px' }}
                         >
                           {letter}
-                        </motion.span>
+                        </m.span>
                       ))
                     )}
                   </div>
@@ -287,7 +287,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                     )}
                   </button>
                 </div>
-              </motion.div>
+              </m.div>
 
               {/* Score breakdown chips — staggered pop-in */}
               <div className="flex flex-wrap gap-2 justify-center">
@@ -296,7 +296,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   { color: 'neo-lime', icon: <Target className="w-3.5 h-3.5 inline-block" />, value: scoreBreakdown.accuracy },
                   { color: 'neo-pink', icon: <BookOpen className="w-3.5 h-3.5 inline-block" />, value: scoreBreakdown.exploration },
                 ].map((chip, i) => (
-                  <motion.span
+                  <m.span
                     key={chip.color}
                     custom={i}
                     variants={chipVariants}
@@ -305,22 +305,22 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                     className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-neo border-2 text-xs font-bold ${CHIP_STYLES[chip.color]}`}
                   >
                     {chip.icon} +{chip.value}
-                  </motion.span>
+                  </m.span>
                 ))}
               </div>
 
               {/* Tap to celebrate hint (mobile) */}
-              <motion.div
+              <m.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.2 }}
                 className="md:hidden text-[10px] text-slate-500"
               >
                 {t('wordHunt.results.tapToCelebrate')}
-              </motion.div>
+              </m.div>
 
               {/* Countdown — slides up with glow */}
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.0, type: 'spring', stiffness: 300, damping: 26 }}
@@ -335,18 +335,18 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                     {countdown}
                   </div>
                 </div>
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
           ) : (
             /* ===== FAIL STATE — Gauge at 0 with skull ===== */
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
               className="flex flex-col items-center gap-5"
             >
               {/* Gauge ring with 0 score — dramatic shake entrance */}
-              <motion.div
+              <m.div
                 initial={{ scale: 0.3, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{
@@ -369,7 +369,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 />
                 {/* Skull overlay with dramatic entrance */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <motion.div
+                  <m.div
                     initial={{ scale: 0, rotate: -30 }}
                     animate={{
                       scale: [0, 1.3, 1],
@@ -382,20 +382,20 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                     }}
                   >
                     <Skull className="w-12 h-12 text-neo-pink mb-1" />
-                  </motion.div>
-                  <motion.span
+                  </m.div>
+                  <m.span
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8 }}
                     className="text-neo-pink font-black text-sm uppercase tracking-wider"
                   >
                     {t('wordHunt.results.gameOver')}
-                  </motion.span>
+                  </m.span>
                 </div>
-              </motion.div>
+              </m.div>
 
               {/* Attempts used — slam counter */}
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 18 }}
@@ -407,20 +407,20 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 <div className="text-xs text-slate-500 uppercase font-medium mt-1">
                   {t('wordHunt.results.attemptsUsed')}
                 </div>
-              </motion.div>
+              </m.div>
 
               {/* Better luck message */}
-              <motion.div
+              <m.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
                 className="text-slate-400 font-medium text-sm text-center"
               >
                 {t('wordHunt.results.betterLuckNextTime')}
-              </motion.div>
+              </m.div>
 
               {/* Countdown */}
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8, type: 'spring', stiffness: 300, damping: 26 }}
@@ -435,12 +435,12 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                     {countdown}
                   </div>
                 </div>
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
           )}
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

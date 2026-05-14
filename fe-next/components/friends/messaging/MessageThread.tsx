@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, Target, ChevronLeft, Trash2 } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -117,7 +117,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: isRTL ? -20 : 20 }}
@@ -219,7 +219,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                   const showAvatar = index === filtered.length - 1 || filtered[index + 1]?.fromUserId !== message.fromUserId;
 
                   return (
-                    <motion.div
+                    <m.div
                       key={message.messageId}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -274,7 +274,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                       >
                         {/* Delete action menu */}
                         {deleteMenuId === message.messageId && isMine && onDeleteMessage && (
-                          <motion.div
+                          <m.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             className={cn(
@@ -304,7 +304,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                             >
                               <X className="w-3 h-3" />
                             </button>
-                          </motion.div>
+                          </m.div>
                         )}
                         <p className="wrap-break-word whitespace-pre-wrap text-sm">
                           {message.message}
@@ -330,13 +330,13 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                           )}
                         </div>
                       </div>
-                    </motion.div>
+                    </m.div>
                   );
                 })}
 
                 {/* Typing indicator */}
                 {typingUsername && (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className={cn(
@@ -369,7 +369,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                         )} style={{ animationDelay: '300ms' }} />
                       </div>
                     </div>
-                  </motion.div>
+                  </m.div>
                 )}
 
                 <div ref={messagesEndRef} />
@@ -389,7 +389,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
               placeholder={t('friends.typeMessage')}
             />
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

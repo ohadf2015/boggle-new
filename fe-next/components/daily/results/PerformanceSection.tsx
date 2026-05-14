@@ -7,7 +7,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Zap, Target, BookOpen, Coins, Lock, RotateCcw } from 'lucide-react';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
 import { ScoreGaugeRing } from './ScoreGaugeRing';
@@ -84,7 +84,7 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
   ];
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
@@ -93,7 +93,7 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
       {/* Three Mini Gauge Rings — dramatic staggered entrance */}
       <div className="flex justify-center gap-4 sm:gap-6">
         {rings.map((ring, index) => (
-          <motion.div
+          <m.div
             key={ring.label}
             initial={{ opacity: 0, scale: 0.3, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -115,29 +115,29 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
               label={undefined}
               icon={ring.icon}
             />
-            <motion.span
+            <m.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 + index * 0.2 }}
               className="text-[11px] font-bold text-slate-300"
             >
               {ring.label}
-            </motion.span>
-            <motion.span
+            </m.span>
+            <m.span
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 + index * 0.2 }}
               className="text-[10px] text-slate-500"
             >
               {ring.detail}
-            </motion.span>
-          </motion.div>
+            </m.span>
+          </m.div>
         ))}
       </div>
 
       {/* Extra Try Penalty — visible deduction */}
       {retryPenalty > 0 && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.9, type: 'spring', stiffness: 300, damping: 26 }}
@@ -157,7 +157,7 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
           <div className="text-[10px] text-slate-500 mt-1">
             {extraTries} {extraTries === 1 ? t('wordHunt.score.extraTry') : t('wordHunt.score.extraTries')} × {EXTRA_TRY_PENALTY} {t('wordHunt.score.points')}
           </div>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Coin Reward — Compact inline display */}
@@ -179,7 +179,7 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
           </div>
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 };
 

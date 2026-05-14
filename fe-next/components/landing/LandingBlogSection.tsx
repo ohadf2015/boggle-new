@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Calendar, Clock, ArrowRight, BookOpen } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -90,7 +90,7 @@ export function LandingBlogSection() {
         {recentPosts.map((post, i) => {
           const c = post.content[lang] || post.content.en;
           return (
-            <motion.div
+            <m.div
               key={post.slug}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -139,7 +139,7 @@ export function LandingBlogSection() {
                 </div>
               </div>
             </Link>
-            </motion.div>
+            </m.div>
           );
         })}
       </div>

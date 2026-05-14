@@ -41,7 +41,7 @@ vi.mock('framer-motion', () => {
   });
   motionComponent.displayName = 'Motion';
   const motionObj = new Proxy({}, { get: () => motionComponent });
-  return { motion: motionObj, useReducedMotion: () => false };
+  return { m: motionObj, useReducedMotion: () => false };
 });
 
 vi.mock('next/image', () => ({

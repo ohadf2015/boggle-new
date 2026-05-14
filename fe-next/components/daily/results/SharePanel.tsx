@@ -7,7 +7,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Copy, Check, Send, ImageDown, Mail, MessageSquare, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { XTwitterIcon, WhatsAppIcon, LinkedInIcon, FacebookIcon } from './icons';
@@ -54,14 +54,14 @@ export const SharePanel: React.FC<SharePanelProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto overscroll-contain scrollable-area"
           onClick={onClose}
         >
-          <motion.div
+          <m.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
@@ -151,7 +151,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
             {/* Secondary Share Options */}
             <AnimatePresence>
               {showMoreOptions && (
-                <motion.div
+                <m.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
@@ -199,7 +199,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                       )}
                     </Button>
                   </div>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
 
@@ -229,8 +229,8 @@ export const SharePanel: React.FC<SharePanelProps> = ({
             <Button onClick={onClose} variant="ghost" className="w-full mt-4">
               {t('daily.close')}
             </Button>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

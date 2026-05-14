@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, type KeyboardEvent } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -87,7 +87,7 @@ export function SeedWordTags({
       >
         <AnimatePresence mode="popLayout">
           {tags.map((tag, i) => (
-            <motion.span
+            <m.span
               key={`${tag}-${i}`}
               layout
               initial={{ scale: 0, rotate: -12 }}
@@ -134,7 +134,7 @@ export function SeedWordTags({
               >
                 <X className="w-3.5 h-3.5" />
               </button>
-            </motion.span>
+            </m.span>
           ))}
         </AnimatePresence>
 

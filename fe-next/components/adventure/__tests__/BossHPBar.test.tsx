@@ -17,7 +17,7 @@ import type { BossHealthState, BossPhase } from '../../../types/boss';
 // ==============================================
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...p }: any) => <div {...p}>{children}</div>,
     span: ({ children, ...p }: any) => <span {...p}>{children}</span>,
   },

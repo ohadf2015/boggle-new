@@ -385,6 +385,12 @@ export function useMultiplayerSocket(
 
     socketInstance.on('hostLeftRoomClosing', (data) => {
       intentionalLeaveRef.current = true;
+      // Cancel reconnect fallback — the room is closing, requesting game
+      // state would just emit into a dead room.
+      if (reconnectFallbackTimerRef.current) {
+        clearTimeout(reconnectFallbackTimerRef.current);
+        reconnectFallbackTimerRef.current = null;
+      }
       const opts = optionsRef.current;
       const resolvedMessage = resolveHostLeftMessage(data, opts.t, 'playerView.roomClosed');
       // Toast is fast feedback the moment the event arrives; the modal in
@@ -434,6 +440,11 @@ export function useMultiplayerSocket(
 
     socketInstance.on('sessionMigrated', (data) => {
       intentionalLeaveRef.current = true;
+      // Cancel reconnect fallback — this session was superseded by another tab.
+      if (reconnectFallbackTimerRef.current) {
+        clearTimeout(reconnectFallbackTimerRef.current);
+        reconnectFallbackTimerRef.current = null;
+      }
       logger.log('[SOCKET.IO] Session migrated:', data);
       toast(data.message || 'Your session was moved to another tab', {
         icon: '🔄',
@@ -514,8 +525,11 @@ export function useMultiplayerSocket(
     // server health checks from flagging this player as stale.
     // This is especially important on mobile where Socket.IO pings
     // may not be sufficient to detect a live but idle connection.
+    // Skip while the tab is hidden — a backgrounded tab shouldn't keep
+    // itself "online" indefinitely; handleVisibilityForReconnect below
+    // fires an immediate heartbeat the moment focus returns.
     heartbeatIntervalRef.current = setInterval(() => {
-      if (socketInstance.connected) {
+      if (socketInstance.connected && document.visibilityState === 'visible') {
         socketInstance.emit('presenceHeartbeat');
       }
     }, 20000);

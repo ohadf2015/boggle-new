@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Gift, Users, Copy, Check, Share2, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
@@ -159,7 +159,7 @@ export function ReferralCard() {
   }
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
@@ -297,7 +297,7 @@ export function ReferralCard() {
 
       <AnimatePresence>
         {showRewards && (
-          <motion.div
+          <m.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -321,7 +321,7 @@ export function ReferralCard() {
                 ⭐ 10 games: <span className="font-bold text-neo-pink">+200 XP</span>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -383,7 +383,7 @@ export function ReferralCard() {
           </p>
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 }
 

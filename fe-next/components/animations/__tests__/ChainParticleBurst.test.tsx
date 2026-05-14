@@ -10,7 +10,7 @@ vi.mock('@/lib/adventure/worldThemes');
 
 // Mock framer-motion to avoid animation complexity in tests
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, style, className, ...props }: any) => (
       <div style={style} className={className} data-testid="motion-div" {...props}>
         {children}

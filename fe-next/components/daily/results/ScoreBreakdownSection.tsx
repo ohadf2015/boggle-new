@@ -7,7 +7,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Zap, Target, BookOpen, TrendingUp } from 'lucide-react';
 import { getScoreBreakdown, type ScoreBreakdown } from '@/utils/aiHintGenerator';
 
@@ -117,26 +117,26 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
           <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
             {t('wordHunt.score.title')}
           </div>
-          <motion.div
+          <m.div
             initial={{ scale: 0.3, opacity: 0, y: 10 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 250, damping: 14 }}
             className="flex items-baseline justify-center gap-1"
           >
-            <motion.span
+            <m.span
               className={`text-5xl font-black ${isPerfect ? 'text-neo-lime' : 'text-white'}`}
               style={{
                 textShadow: isPerfect ? '0 0 20px rgba(191, 255, 0, 0.5)' : undefined,
               }}
             >
               {breakdown.total}
-            </motion.span>
+            </m.span>
             <span className="text-xl font-bold text-gray-500">/ 1000</span>
-          </motion.div>
+          </m.div>
 
           {/* Overall progress bar */}
           <div className="mt-3 h-2 bg-gray-800 rounded-full overflow-hidden border border-gray-700">
-            <motion.div
+            <m.div
               initial={{ width: 0 }}
               animate={{ width: `${(breakdown.total / 1000) * 100}%` }}
               transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -145,14 +145,14 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
           </div>
 
           {isPerfect && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 26 }}
               className="mt-2 text-neo-lime font-bold text-sm"
             >
               {t('wordHunt.score.perfect')}
-            </motion.div>
+            </m.div>
           )}
         </div>
       </div>
@@ -160,7 +160,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
       {/* Category breakdown */}
       <div className="p-4 space-y-3">
         {categories.map((category, index) => (
-          <motion.div
+          <m.div
             key={category.id}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -183,7 +183,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
 
               {/* Progress bar with overshoot spring */}
               <div className="h-2 bg-gray-800 rounded-full overflow-hidden relative">
-                <motion.div
+                <m.div
                   initial={{ width: 0 }}
                   animate={{ width: `${(category.score / category.maxScore) * 100}%` }}
                   transition={{
@@ -194,7 +194,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
                   className={`h-full rounded-full ${category.bgColor} relative overflow-hidden`}
                 >
                   {/* Shimmer sweep on the bar */}
-                  <motion.div
+                  <m.div
                     className="absolute inset-0"
                     style={{
                       background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
@@ -203,19 +203,19 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
                     animate={{ x: '200%' }}
                     transition={{ delay: 0.8 + index * 0.12, duration: 0.6 }}
                   />
-                </motion.div>
+                </m.div>
               </div>
 
               {/* Description */}
               <div className="text-xs text-gray-500 mt-0.5">{category.description}</div>
             </div>
-          </motion.div>
+          </m.div>
         ))}
       </div>
 
       {/* Improvement tip */}
       {improvementTip && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
@@ -230,7 +230,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
               </span>
             </span>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </div>
   );

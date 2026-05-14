@@ -53,7 +53,7 @@ vi.mock('framer-motion', () => {
   ));
   MotionSpan.displayName = 'MotionSpan';
   return {
-    motion: { button: MotionButton, div: MotionDiv, span: MotionSpan },
+    m: { button: MotionButton, div: MotionDiv, span: MotionSpan },
   };
 });
 

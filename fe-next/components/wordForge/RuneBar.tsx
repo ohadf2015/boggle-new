@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import type { RuneCard } from '@/types/wordForge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -82,7 +82,7 @@ export function RuneBar({ runes, maxSlots, triggeredRuneIds = [] }: RuneBarProps
         {slots.map((rune, i) => {
           const isTriggered = rune ? triggeredRuneIds.includes(rune.instanceId) : false;
           return (
-            <motion.button
+            <m.button
               key={rune?.instanceId ?? `slot-${i}`}
               onClick={() => rune && setInspecting(i)}
               disabled={!rune}
@@ -109,7 +109,7 @@ export function RuneBar({ runes, maxSlots, triggeredRuneIds = [] }: RuneBarProps
               aria-label={rune ? rune.def.name : `Empty rune slot ${i + 1}`}
             >
               {rune ? rune.def.icon : ''}
-            </motion.button>
+            </m.button>
           );
         })}
       </div>

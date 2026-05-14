@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import { Mascot, type MascotVariant } from '../../../../components/ui/Mascot';
@@ -30,7 +30,7 @@ const MascotBubbleLayout = memo<MascotBubbleLayoutProps>(({
   borderColor,
 }) => {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, x: -100, scale: 0.8 }}
       animate={{ opacity: 1, x: 0, scale: 1 }}
       exit={{ opacity: 0, x: 100, scale: 0.8 }}
@@ -38,7 +38,7 @@ const MascotBubbleLayout = memo<MascotBubbleLayoutProps>(({
       className="flex items-center gap-4"
     >
       {/* Mascot */}
-      <motion.div
+      <m.div
         initial={{ scale: 0, rotate: -20 }}
         animate={{ scale: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 500, damping: 20, delay: 0.1 }}
@@ -50,10 +50,10 @@ const MascotBubbleLayout = memo<MascotBubbleLayoutProps>(({
           className="drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]"
           clipBorder="none"
         />
-      </motion.div>
+      </m.div>
 
       {/* Speech Bubble */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, scale: 0.5, x: -20 }}
         animate={{ opacity: 1, scale: 1, x: 0 }}
         transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.15 }}
@@ -101,8 +101,8 @@ const MascotBubbleLayout = memo<MascotBubbleLayoutProps>(({
             )}
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 });
 

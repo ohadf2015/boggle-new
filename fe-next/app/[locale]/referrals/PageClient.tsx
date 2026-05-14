@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   Users,
   UserCheck,
@@ -51,7 +51,7 @@ function StatCard({
   delay: number;
 }) {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
@@ -67,7 +67,7 @@ function StatCard({
       <span className="text-xs font-bold text-neo-white/60 uppercase tracking-wide text-center">
         {label}
       </span>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -91,7 +91,7 @@ function MilestoneProgress({
   };
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.25 }}
@@ -152,7 +152,7 @@ function MilestoneProgress({
           </div>
         ))}
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -180,7 +180,7 @@ function ReferralList({ referrals }: { referrals: ReferralEntry[] }) {
 
   if (referrals.length === 0) {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.35 }}
@@ -190,12 +190,12 @@ function ReferralList({ referrals }: { referrals: ReferralEntry[] }) {
         <p className="text-sm font-bold text-neo-white/50">
           {t('referralDashboard.noReferrals')}
         </p>
-      </motion.div>
+      </m.div>
     );
   }
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.35 }}
@@ -237,7 +237,7 @@ function ReferralList({ referrals }: { referrals: ReferralEntry[] }) {
           </li>
         ))}
       </ul>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -381,7 +381,7 @@ export default function ReferralDashboardClient() {
         <MilestoneProgress milestones={data.milestones} totalJoined={data.totalJoined} />
 
         {/* Your link + QR */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -451,18 +451,18 @@ export default function ReferralDashboardClient() {
               {t('common.share')}
             </button>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Invite more CTA */}
         {data.referrals.length > 0 && data.totalJoined < 50 && (
-          <motion.p
+          <m.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.32 }}
             className="text-center text-sm font-bold text-neo-pink"
           >
             {t('referralDashboard.inviteMore')}
-          </motion.p>
+          </m.p>
         )}
 
         {/* Recent referrals list */}

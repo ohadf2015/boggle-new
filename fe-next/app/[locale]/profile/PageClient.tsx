@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence, PanInfo } from 'framer-motion';
+import { m, AnimatePresence, PanInfo } from 'framer-motion';
 import { User, ArrowLeft, ChevronLeft, ChevronRight, LayoutDashboard, BarChart3, Trophy, Gem } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useQueryState, parseAsStringLiteral } from 'nuqs';
@@ -290,7 +290,7 @@ export default function ProfilePageClient(): React.JSX.Element {
             </div>
           )}
 
-          <motion.div
+          <m.div
             className="h-full px-5 pt-2 pb-24 sm:pb-0 page-content-safe"
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
@@ -302,7 +302,7 @@ export default function ProfilePageClient(): React.JSX.Element {
 
           <AnimatePresence mode="wait">
             {activeSection === 'overview' && (
-              <motion.div
+              <m.div
                 key="overview"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -314,11 +314,11 @@ export default function ProfilePageClient(): React.JSX.Element {
                 <ProfileCoinsSection profile={profile} isDarkMode={isDarkMode} compact />
                 <CreatorProfileStats stats={getCreatorStats()} className="mt-4" />
                 <ProfileBackButtons activeGameSession={activeGameSession} isDarkMode={isDarkMode} />
-              </motion.div>
+              </m.div>
             )}
 
             {activeSection === 'stats' && (
-              <motion.div
+              <m.div
                 key="stats"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -327,11 +327,11 @@ export default function ProfilePageClient(): React.JSX.Element {
               >
                 <ProfileStatsGrid profile={profile} isDarkMode={isDarkMode} />
                 {isAdmin && <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} />}
-              </motion.div>
+              </m.div>
             )}
 
             {activeSection === 'achievements' && (
-              <motion.div
+              <m.div
                 key="achievements"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -339,21 +339,21 @@ export default function ProfilePageClient(): React.JSX.Element {
                 transition={{ duration: 0.2 }}
               >
                 <ProfileAchievements profile={profile} isDarkMode={isDarkMode} />
-              </motion.div>
+              </m.div>
             )}
 
             {activeSection === 'collection' && (
-              <motion.div
+              <m.div
                 key="collection"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.2 }}
               >
-                {user && <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mb-4"><ReferralCard /></motion.div>}
+                {user && <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mb-4"><ReferralCard /></m.div>}
                 <SeasonTrophyCase badges={seasonBadges} isLoading={isLoadingSeasonBadges} delay={0.32} />
                 <ProfileCollection collectibles={playerCollectibles} isLoading={isLoadingCollectibles} isDarkMode={isDarkMode} />
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.37 }} className="mt-4">
+                <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.37 }} className="mt-4">
                   <CosmeticCollection
                     rankTier={profile?.rank_tier || 'Bronze'}
                     streakDays={profile?.streak_days || 0}
@@ -361,14 +361,14 @@ export default function ProfilePageClient(): React.JSX.Element {
                     spendCoins={spendCoins}
 
                   />
-                </motion.div>
-                {user && <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}><EmailPreferences isDarkMode={isDarkMode} /></motion.div>}
+                </m.div>
+                {user && <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}><EmailPreferences isDarkMode={isDarkMode} /></m.div>}
                 <ProfileBackButtons activeGameSession={activeGameSession} isDarkMode={isDarkMode} />
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
 
-          </motion.div>
+          </m.div>
         </div>
 
       </div>
@@ -406,7 +406,7 @@ export default function ProfilePageClient(): React.JSX.Element {
 
           {/* 5. Referral */}
           {user && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+            <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
               <ReferralCard />
               <Link
                 href={`/${language}/referrals`}
@@ -414,7 +414,7 @@ export default function ProfilePageClient(): React.JSX.Element {
               >
                 {t('referralDashboard.title')} &rarr;
               </Link>
-            </motion.div>
+            </m.div>
           )}
 
           {/* 6. Achievements */}
@@ -435,9 +435,9 @@ export default function ProfilePageClient(): React.JSX.Element {
 
           {/* 8. Settings & Navigation */}
           {user && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+            <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
               <EmailPreferences isDarkMode={isDarkMode} />
-            </motion.div>
+            </m.div>
           )}
 
           <ProfileBackButtons activeGameSession={activeGameSession} isDarkMode={isDarkMode} />

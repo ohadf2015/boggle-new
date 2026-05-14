@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import {
   X,
@@ -126,14 +126,14 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
 
   return createPortal(
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
         onClick={handleClose}
       >
-        <motion.div
+        <m.div
           initial={{ scale: 0.8, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.8, opacity: 0, y: 20 }}
@@ -166,14 +166,14 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
           </button>
 
           {/* Header with celebration */}
-          <motion.div
+          <m.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 400, damping: 10, delay: 0.1 }}
             className="flex justify-center mb-4"
           >
             {hasPassed ? (
-              <motion.div
+              <m.div
                 animate={{ rotate: [0, 10, -10, 0] }}
                 transition={{ duration: 0.5, repeat: 3 }}
                 className={cn(
@@ -185,7 +185,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   'drop-shadow-[0_0_20px_rgba(34,197,94,0.5)]',
                   isDarkMode ? 'text-green-400' : 'text-green-600'
                 )} size={48} />
-              </motion.div>
+              </m.div>
             ) : (
               <div className={cn(
                 'p-4 rounded-2xl',
@@ -196,10 +196,10 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 )} size={48} />
               </div>
             )}
-          </motion.div>
+          </m.div>
 
           {/* Title */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, ...SPRING_PRESETS.balanced }}
@@ -227,10 +227,10 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 ? (t('training.analysis.subtitleComplete'))
                 : (t('training.analysis.subtitleProgress'))}
             </p>
-          </motion.div>
+          </m.div>
 
           {/* Progress bar */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25, type: 'spring', stiffness: 280, damping: 26 }}
@@ -248,7 +248,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
               'h-3 rounded-full overflow-hidden',
               isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
             )}>
-              <motion.div
+              <m.div
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercent}%` }}
                 transition={{ duration: 0.8, delay: 0.3 }}
@@ -260,10 +260,10 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 )}
               />
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Skills grid */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
@@ -275,7 +275,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
               const Icon = config.icon;
 
               return (
-                <motion.div
+                <m.div
                   key={skill}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -319,13 +319,13 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   )}>
                     {t(`training.analysis.skills.${skill}`) || config.label}
                   </p>
-                </motion.div>
+                </m.div>
               );
             })}
-          </motion.div>
+          </m.div>
 
           {/* Stats */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
@@ -384,11 +384,11 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 </p>
               </div>
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Tips for improvement (if not passed) */}
           {!hasPassed && summary.needsWork.length > 0 && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.45, type: 'spring', stiffness: 280, damping: 26 }}
@@ -419,11 +419,11 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   </li>
                 ))}
               </ul>
-            </motion.div>
+            </m.div>
           )}
 
           {/* Action Buttons */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
@@ -505,9 +505,9 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 )}
               </>
             )}
-          </motion.div>
-        </motion.div>
-      </motion.div>
+          </m.div>
+        </m.div>
+      </m.div>
     </AnimatePresence>,
     document.body
   );

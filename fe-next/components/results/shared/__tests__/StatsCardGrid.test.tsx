@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
   useReducedMotion: vi.fn(() => false),

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Copy, Check, Share2, Crown, Grid3X3, Grid2X2, Sparkles, Zap, X, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
@@ -196,7 +196,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
         <div className="max-h-[90vh] overflow-y-auto">
           {/* Header */}
             <div className="relative flex items-center justify-between p-3 sm:p-4 border-b-neo-thick border-neo-black bg-linear-to-br from-neo-lime to-neo-pink sticky top-0 z-10">
-              <motion.div
+              <m.div
                 className="flex items-center gap-3"
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
@@ -204,18 +204,18 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
               >
                 <div className="relative">
                   <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-neo-black drop-shadow-xs" strokeWidth={2.5} />
-                  <motion.div
+                  <m.div
                     className="absolute -top-1 -right-1"
                     animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }}
                     transition={{ type: 'tween', repeat: Infinity, duration: 2 }}
                   >
                     <Sparkles className="w-4 h-4 text-neo-pink" fill="currentColor" />
-                  </motion.div>
+                  </m.div>
                 </div>
                 <h2 className="font-bold text-xl sm:text-2xl uppercase tracking-tight text-neo-black drop-shadow-xs">
                   {t('daily.createChallengeTitle')}
                 </h2>
-              </motion.div>
+              </m.div>
               <button
                 onClick={handleClose}
                 aria-label={t('common.close')}
@@ -228,7 +228,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
             {/* Content */}
             <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
               {step === 'config' && (
-                <motion.div
+                <m.div
                   className="space-y-4"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -243,7 +243,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">{t('daily.pickDifficulty')}</p>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                      <motion.button
+                      <m.button
                         onClick={() => setBoardSize(5)}
                         whileHover={{ scale: 1.05, y: -4 }}
                         whileTap={{ scale: 0.95, y: 0 }}
@@ -261,7 +261,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                           <span className="text-xs sm:text-sm font-bold uppercase tracking-wide">{t('daily.classic')}</span>
                         </div>
                         {boardSize === 5 && (
-                          <motion.div
+                          <m.div
                             className="absolute -top-2 -right-2"
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1, rotate: 360 }}
@@ -270,11 +270,11 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                             <div className="bg-neo-pink border-3 border-neo-black rounded-full p-1 shadow-hard-sm">
                               <Check className="w-4 h-4 text-neo-white" strokeWidth={3} />
                             </div>
-                          </motion.div>
+                          </m.div>
                         )}
-                      </motion.button>
+                      </m.button>
 
-                      <motion.button
+                      <m.button
                         onClick={() => setBoardSize(7)}
                         whileHover={{ scale: 1.05, y: -4 }}
                         whileTap={{ scale: 0.95, y: 0 }}
@@ -292,7 +292,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                           <span className="text-xs sm:text-sm font-bold uppercase tracking-wide">{t('daily.pro')}</span>
                         </div>
                         {boardSize === 7 && (
-                          <motion.div
+                          <m.div
                             className="absolute -top-2 -right-2"
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1, rotate: 360 }}
@@ -301,14 +301,14 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                             <div className="bg-neo-pink border-3 border-neo-black rounded-full p-1 shadow-hard-sm">
                               <Check className="w-4 h-4 text-neo-white" strokeWidth={3} />
                             </div>
-                          </motion.div>
+                          </m.div>
                         )}
-                      </motion.button>
+                      </m.button>
                     </div>
                   </div>
 
                   {/* Word Input */}
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }}
@@ -337,19 +337,19 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       dir={language === 'he' ? 'rtl' : 'ltr'}
                     />
                     {wordError && (
-                      <motion.p
+                      <m.p
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="text-sm font-bold text-red-600 flex items-center gap-2"
                       >
                         <span className="inline-block w-1 h-1 rounded-full bg-red-600" />
                         {wordError}
-                      </motion.p>
+                      </m.p>
                     )}
-                  </motion.div>
+                  </m.div>
 
                   {/* Generate Button */}
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.4 }}
@@ -362,56 +362,56 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         <Zap className="w-6 h-6" strokeWidth={2.5} fill="currentColor" />
                         {t('daily.generateChallenge')}
                       </span>
-                      <motion.div
+                      <m.div
                         className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent"
                         animate={{ x: ['-100%', '200%'] }}
                         transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
                       />
                     </Button>
-                  </motion.div>
-                </motion.div>
+                  </m.div>
+                </m.div>
               )}
 
               {step === 'loading' && (
-                <motion.div
+                <m.div
                   className="flex flex-col items-center justify-center py-12 sm:py-16 space-y-6"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >
                   {/* Animated Loader */}
                   <div className="relative">
-                    <motion.div
+                    <m.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
                       className="relative"
                     >
                       <div className="w-20 h-20 sm:w-24 sm:h-24 border-neo-thick border-neo-pink rounded-full border-t-transparent" />
-                    </motion.div>
-                    <motion.div
+                    </m.div>
+                    <m.div
                       className="absolute inset-0 flex items-center justify-center"
                       animate={{ scale: [1, 1.2, 1] }}
                       transition={{ type: 'tween', duration: 1.5, repeat: Infinity }}
                     >
                       <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 text-neo-pink" strokeWidth={2.5} />
-                    </motion.div>
+                    </m.div>
                   </div>
 
                   {/* Loading Text */}
                   <div className="text-center space-y-2">
-                    <motion.p
+                    <m.p
                       className="text-lg sm:text-xl font-black text-neo-black dark:text-neo-white uppercase tracking-wide"
                       animate={{ opacity: [0.5, 1, 0.5] }}
                       transition={{ duration: 1.5, repeat: Infinity }}
                     >
                       {t('daily.generatingPuzzle')}
-                    </motion.p>
-                    <motion.div
+                    </m.p>
+                    <m.div
                       className="flex gap-1 justify-center"
                       initial="hidden"
                       animate="visible"
                     >
                       {[0, 1, 2].map((i) => (
-                        <motion.div
+                        <m.div
                           key={`dot-${i}`}
                           className="w-2 h-2 bg-neo-pink rounded-full"
                           variants={{
@@ -426,13 +426,13 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                           }}
                         />
                       ))}
-                    </motion.div>
+                    </m.div>
                   </div>
-                </motion.div>
+                </m.div>
               )}
 
               {step === 'share' && (
-                <motion.div
+                <m.div
                   className="space-y-6 text-center"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -441,7 +441,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   {/* Success Mascot with 3D effect */}
                   <div className="relative flex items-center justify-center h-32 sm:h-40">
                     {/* Background circle */}
-                    <motion.div
+                    <m.div
                       className="absolute w-24 h-24 sm:w-32 sm:h-32 bg-linear-to-br from-neo-lime to-neo-pink rounded-full border-neo-thick border-neo-black shadow-hard-lg"
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -449,7 +449,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     />
 
                     {/* Mascot popping out of circle (3D effect) */}
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0, scale: 0.95, rotate: -180, y: 20 }}
                       animate={{ opacity: 1, scale: 1, rotate: 0, y: -8 }}
                       transition={{ type: 'spring', bounce: 0.6, duration: 0.8, delay: 0.1 }}
@@ -462,11 +462,11 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         className="drop-shadow-2xl"
                         clipBorder="none"
                       />
-                    </motion.div>
+                    </m.div>
 
                     {/* Confetti particles */}
                     {[...Array(8)].map((_, i) => (
-                      <motion.div
+                      <m.div
                         key={`confetti-${i}`}
                         className="absolute top-1/2 left-1/2"
                         initial={{ scale: 0.95, x: 0, y: 0 }}
@@ -483,12 +483,12 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                           }`}
                           fill="currentColor"
                         />
-                      </motion.div>
+                      </m.div>
                     ))}
                   </div>
 
                   {/* Success Message */}
-                  <motion.div
+                  <m.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
@@ -497,10 +497,10 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       {t('daily.challengeCreated')}
                     </h3>
                     <p className="text-base text-slate-700 dark:text-slate-300 font-medium">{t('daily.challengeCreatedDesc')}</p>
-                  </motion.div>
+                  </m.div>
 
                   {/* Share URL Box */}
-                  <motion.div
+                  <m.div
                     className="flex items-center gap-2 bg-neo-cream border-3 border-neo-black rounded-xl p-3 shadow-hard-sm"
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
@@ -510,7 +510,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       <p className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase mb-1">{t('daily.challengeLink')}</p>
                       <p className="text-sm font-mono truncate text-neo-black font-bold">{shareUrl}</p>
                     </div>
-                    <motion.button
+                    <m.button
                       onClick={handleCopy}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
@@ -525,11 +525,11 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       ) : (
                         <Copy className="w-5 h-5 text-neo-black" strokeWidth={2.5} />
                       )}
-                    </motion.button>
-                  </motion.div>
+                    </m.button>
+                  </m.div>
 
                   {/* Share Button */}
-                  <motion.div
+                  <m.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.5 }}
@@ -558,10 +558,10 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     >
                       {t('daily.close')}
                     </Button>
-                  </motion.div>
+                  </m.div>
 
                   {/* Footer Hint */}
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.6 }}
@@ -571,12 +571,12 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       <Sparkles className="w-4 h-4 text-neo-pink" />
                       {t('daily.canPlayYourself')}
                     </p>
-                  </motion.div>
-                </motion.div>
+                  </m.div>
+                </m.div>
               )}
 
               {step === 'stats' && puzzleCode && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="space-y-4"
@@ -585,7 +585,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     puzzleCode={puzzleCode}
                     onClose={() => setStep('share')}
                   />
-                </motion.div>
+                </m.div>
               )}
             </div>
         </div>

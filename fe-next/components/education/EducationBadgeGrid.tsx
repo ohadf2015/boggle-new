@@ -12,7 +12,7 @@
  */
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Loader2, Trophy, Star } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAchievementPin, mergePinStatus } from '../../hooks/useAchievementPin';
@@ -177,7 +177,7 @@ export default function EducationBadgeGrid({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {pinnedBadges.map((achievement, i) => {
               return (
-                <motion.div
+                <m.div
                   key={`featured-${achievement.achievementKey}`}
                   initial={{ opacity: 0, scale: 0.9, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -200,7 +200,7 @@ export default function EducationBadgeGrid({
                     canPin={true}
                     isLoading={isPinLoading}
                   />
-                </motion.div>
+                </m.div>
               );
             })}
           </div>
@@ -261,7 +261,7 @@ export default function EducationBadgeGrid({
                 const canPinAchievement = achievement.isPinned || canPinMore;
 
                 return (
-                  <motion.div
+                  <m.div
                     key={achievement.achievementKey}
                     initial={{ opacity: 0, scale: 0.92 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -284,7 +284,7 @@ export default function EducationBadgeGrid({
                       canPin={canPinAchievement}
                       isLoading={isPinLoading}
                     />
-                  </motion.div>
+                  </m.div>
                 );
               })}
             </div>

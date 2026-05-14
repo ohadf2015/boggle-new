@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useReducedMotion } from '../utils/accessibility';
 import { formatTimeMMSS } from '@/shared/utils';
 import { preloadResultsChunks } from '@/utils/preloadResults';
@@ -76,7 +76,7 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
   const svgCenter = config.svgSize / 2;
 
   return (
-    <motion.div
+    <m.div
       role="timer"
       initial={reduceMotion ? { opacity: 1 } : { scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
@@ -118,7 +118,7 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
             />
 
             {/* Progress circle - solid Neo-Brutalist colors */}
-            <motion.circle
+            <m.circle
               cx={svgCenter}
               cy={svgCenter}
               r={radius}
@@ -146,7 +146,7 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
 
           {/* Timer text in the center - color change only for low time, pulse at very low time */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <motion.div
+            <m.div
               className={`${isCriticalTime ? 'text-4xl sm:text-5xl' : config.textSize} font-black ${isLowTime ? 'text-neo-red' : 'text-neo-cream'}`}
               animate={isCriticalTime && !reduceMotion ? {
                 scale: [1, 1.25, 1],
@@ -171,11 +171,11 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
               }}
             >
               {formatTimeMMSS(remainingTime)}
-            </motion.div>
+            </m.div>
           </div>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 

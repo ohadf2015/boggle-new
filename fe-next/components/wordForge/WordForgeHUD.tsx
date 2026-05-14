@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { motion, useSpring, useMotionValue, useTransform, useReducedMotion } from 'framer-motion';
+import { m, useSpring, useMotionValue, useTransform, useReducedMotion } from 'framer-motion';
 import type { ActiveBossConstraint } from '@/types/wordForge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -98,7 +98,7 @@ export function WordForgeHUD({
           ⏱ {timeRemaining}s
         </span>
 
-        <motion.span
+        <m.span
           className={cn(
             'text-lg font-black font-neo-display tabular-nums',
             isOverTarget ? 'text-neo-lime' : 'text-tier-gold',
@@ -107,7 +107,7 @@ export function WordForgeHUD({
           transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
         >
           <AnimatedNumber value={displayScore} />
-        </motion.span>
+        </m.span>
       </div>
 
       {/* Progress bar */}
@@ -126,7 +126,7 @@ export function WordForgeHUD({
 
       {/* Words found badge */}
       {wordsFoundCount > 0 && (
-        <motion.div
+        <m.div
           className="flex justify-center"
           animate={wordsPopping ? { scale: [1, 1.15, 1] } : { scale: 1 }}
           transition={{ type: 'tween', duration: 0.2 }}
@@ -134,7 +134,7 @@ export function WordForgeHUD({
           <span className="text-[10px] font-bold text-neo-cream/50 bg-neo-cream/10 px-2 py-0.5 rounded-neo border border-neo-cream/20">
             {wordsFoundCount} {t('wordForge.wordsFound').toLowerCase()}
           </span>
-        </motion.div>
+        </m.div>
       )}
     </div>
   );

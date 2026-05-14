@@ -18,7 +18,7 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, ...props }: any) => (
       <div className={className} {...props}>{children}</div>
     ),

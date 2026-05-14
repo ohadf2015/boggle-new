@@ -7,7 +7,7 @@
  */
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Globe } from 'lucide-react';
 
 interface GlobalRankBadgeProps {
@@ -20,7 +20,7 @@ interface GlobalRankBadgeProps {
  */
 export function GlobalRankBadge({ rank, label }: GlobalRankBadgeProps): React.ReactElement {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
@@ -31,6 +31,6 @@ export function GlobalRankBadge({ rank, label }: GlobalRankBadgeProps): React.Re
         <span className="text-sm font-bold text-neo-white">{label}:</span>
         <span className="text-lg font-black text-neo-cyan">#{rank}</span>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

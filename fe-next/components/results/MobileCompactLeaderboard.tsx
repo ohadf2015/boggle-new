@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useState, useEffect } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { RankBadge } from '@/components/ui/RankBadge';
 import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
@@ -41,7 +41,7 @@ function EmojiBubble({ emoji, onDone }: { emoji: string; onDone: () => void }) {
   }, [onDone]);
 
   return (
-    <motion.div
+    <m.div
       initial={{ scale: 0, y: 10, opacity: 0 }}
       animate={{ scale: 1, y: -8, opacity: 1 }}
       exit={{ scale: 0, opacity: 0 }}
@@ -51,7 +51,7 @@ function EmojiBubble({ emoji, onDone }: { emoji: string; onDone: () => void }) {
       {emoji}
       {/* Triangle pointer */}
       <div className="absolute -bottom-1.5 inset-e-3 w-3 h-3 bg-neo-cream border-b-3 border-s-3 border-neo-black rotate-45" />
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -86,7 +86,7 @@ const MobileCompactLeaderboard: React.FC<MobileCompactLeaderboardProps> = memo((
         const rowBubbles = activeBubbles.filter(r => r.username === participant.name);
 
         return (
-          <motion.div
+          <m.div
             key={participant.name}
             initial={reducedMotion ? undefined : { opacity: 0, x: xDirection }}
             animate={{ opacity: 1, x: 0 }}
@@ -105,7 +105,7 @@ const MobileCompactLeaderboard: React.FC<MobileCompactLeaderboardProps> = memo((
           >
             {/* Winner pulsing border glow */}
             {isWinner && !reducedMotion && (
-              <motion.div
+              <m.div
                 className="absolute inset-y-0 inset-s-0 w-1 bg-neo-lime"
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
@@ -124,13 +124,13 @@ const MobileCompactLeaderboard: React.FC<MobileCompactLeaderboardProps> = memo((
             </AnimatePresence>
 
             <div className="flex items-center gap-2 min-w-0">
-              <motion.div
+              <m.div
                 initial={reducedMotion ? undefined : { scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 15, delay: reducedMotion ? 0 : 0.06 * index + 0.12 }}
               >
                 <RankBadge rank={index + 1} />
-              </motion.div>
+              </m.div>
               <PlayerProfileTooltip
                 player={{
                   username: participant.name,
@@ -161,7 +161,7 @@ const MobileCompactLeaderboard: React.FC<MobileCompactLeaderboardProps> = memo((
                 delay={reducedMotion ? 0 : 60 * index + 200}
               />
             </span>
-          </motion.div>
+          </m.div>
         );
       })}
     </div>

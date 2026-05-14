@@ -270,7 +270,7 @@ vi.mock('framer-motion', () => {
     };
   };
   return {
-    motion: {
+    m: {
       div: createMockMotion('div'),
       button: createMockMotion('button'),
       ul: createMockMotion('ul'),
@@ -516,14 +516,6 @@ vi.mock('@/hooks/useFlashChallenge', () => ({
     startChallenge: vi.fn(),
     checkWord: vi.fn(),
     completeChallenge: vi.fn(),
-  }),
-}));
-
-vi.mock('@/hooks/useDailyQuests', () => ({
-  useDailyQuests: () => ({
-    quests: [],
-    refreshQuests: vi.fn(),
-    recordProgress: vi.fn(),
   }),
 }));
 

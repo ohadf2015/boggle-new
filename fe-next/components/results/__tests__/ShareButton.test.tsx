@@ -9,7 +9,7 @@ vi.mock('framer-motion', () => {
   const MotionButton = React.forwardRef(function MotionButton({ children, ...props }: any, ref: any) {
     return <button ref={ref} {...props}>{children}</button>;
   });
-  return { motion: { button: MotionButton } };
+  return { m: { button: MotionButton } };
 });
 
 // Mock clipboard

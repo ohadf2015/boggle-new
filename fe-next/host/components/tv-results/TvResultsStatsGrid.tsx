@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Hash, Ruler, Zap, Flame, Target, Trophy, type LucideIcon } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
 import { cn } from '../../../lib/utils';
@@ -195,14 +195,14 @@ const TvResultsStatsGrid = memo<TvResultsStatsGridProps>(({
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="grid grid-cols-2 md:grid-cols-3 gap-4"
         >
           {stats.map((stat, index) => (
-            <motion.div
+            <m.div
               key={stat.id}
               initial={{ y: 30, opacity: 0, rotateX: -20 }}
               animate={{ y: 0, opacity: 1, rotateX: 0 }}
@@ -254,9 +254,9 @@ const TvResultsStatsGrid = memo<TvResultsStatsGridProps>(({
                   </span>
                 </div>
               )}
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -13,7 +13,7 @@ export function BottomCTA({ locale }: BottomCTAProps) {
   const reduced = useReducedMotion();
 
   return (
-    <motion.section
+    <m.section
       initial={reduced ? false : { opacity: 0, y: 30, scale: 0.97 }}
       whileInView={reduced ? undefined : { opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: '-50px' }}
@@ -67,6 +67,6 @@ export function BottomCTA({ locale }: BottomCTAProps) {
           Desafío diario
         </Link>
       </div>
-    </motion.section>
+    </m.section>
   );
 }

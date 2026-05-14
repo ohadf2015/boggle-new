@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { Calendar, Sparkles } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useWeeklyChest, type PendingChest } from '@/hooks/useWeeklyChest'
 import ChestProgressDots from './ChestProgressDots'
@@ -218,7 +218,7 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
 
       <AnimatePresence>
         {isClaimable && (
-          <motion.button
+          <m.button
             initial={{ y: 12, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 12, opacity: 0 }}
@@ -227,7 +227,7 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
             className="mt-3 w-full py-2 rounded-neo border-2 border-black bg-neo-yellow text-neo-navy font-neo-display font-black text-sm shadow-hard active:shadow-hard-pressed active:translate-y-px"
           >
             {t('daily.weeklyChest.claimButton')}
-          </motion.button>
+          </m.button>
         )}
       </AnimatePresence>
     </div>

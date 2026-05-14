@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import type { BossConstraintDef } from '@/types/wordForge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
@@ -26,7 +26,7 @@ export function BossReveal({ constraint, round, roundTarget, onReady }: BossReve
     <div className="min-h-screen bg-[#0A0A1A] flex flex-col items-center justify-center gap-8 p-4 relative overflow-hidden">
       {/* Red vignette overlay for boss */}
       {isBoss && (
-        <motion.div
+        <m.div
           className="absolute inset-0 pointer-events-none"
           style={{
             background: 'radial-gradient(ellipse at center, transparent 40%, rgba(255,51,102,0.1) 100%)',
@@ -40,23 +40,23 @@ export function BossReveal({ constraint, round, roundTarget, onReady }: BossReve
       {/* Header */}
       {isBoss ? (
         <div className="flex items-center gap-2 text-neo-red motion-safe:animate-pulse-subtle z-10">
-          <motion.span
+          <m.span
             className="text-3xl"
             animate={prefersReducedMotion ? {} : { scale: [1, 1.2, 1] }}
             transition={{ type: 'tween', duration: 1, repeat: Infinity, ease: 'easeInOut' }}
           >
             ⚠️
-          </motion.span>
+          </m.span>
           <h2 className="text-2xl sm:text-3xl font-black uppercase font-neo-display tracking-tight">
             {t('wordForge.bossRound')}
           </h2>
-          <motion.span
+          <m.span
             className="text-3xl"
             animate={prefersReducedMotion ? {} : { scale: [1, 1.2, 1] }}
             transition={{ type: 'tween', duration: 1, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
           >
             ⚠️
-          </motion.span>
+          </m.span>
         </div>
       ) : (
         <h2 className="text-2xl sm:text-3xl font-black uppercase font-neo-display tracking-tight text-neo-cream motion-safe:animate-neo-pop">
@@ -66,20 +66,20 @@ export function BossReveal({ constraint, round, roundTarget, onReady }: BossReve
 
       {/* Constraint card (boss only) — rises from below */}
       {isBoss && (
-        <motion.div
+        <m.div
           className="bg-neo-cream border-4 border-neo-black shadow-hard-xl rounded-neo-lg p-6 max-w-sm w-full z-10"
           initial={prefersReducedMotion ? false : { y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 100, damping: 15 }}
         >
           <div className="flex items-center gap-3 mb-4">
-            <motion.span
+            <m.span
               className="text-4xl"
               animate={prefersReducedMotion ? {} : { rotate: [-3, 3, -2, 2, 0] }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
               {constraint.icon}
-            </motion.span>
+            </m.span>
             <h3 className="text-xl font-black uppercase text-neo-black font-neo-display">
               {constraint.name}
             </h3>
@@ -87,7 +87,7 @@ export function BossReveal({ constraint, round, roundTarget, onReady }: BossReve
           <p className="text-base text-neo-black/80 font-neo-body leading-relaxed">
             {t(constraint.descriptionKey)}
           </p>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Target score */}

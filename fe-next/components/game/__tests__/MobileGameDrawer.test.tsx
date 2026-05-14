@@ -3,7 +3,7 @@ import { MobileGameDrawer } from '../MobileGameDrawer';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, onClick, onDragEnd, animate, ...props }: Record<string, unknown>) => {
       const filteredProps = Object.fromEntries(
         Object.entries(props).filter(([key]) =>

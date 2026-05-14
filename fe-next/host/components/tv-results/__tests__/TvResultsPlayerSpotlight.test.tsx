@@ -9,7 +9,7 @@ vi.mock('framer-motion', () => {
   ));
   MotionDiv.displayName = 'MotionDiv';
   return {
-    motion: {
+    m: {
       div: MotionDiv,
       h3: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
         <h3 {...filterDomProps(props)}>{children}</h3>

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface ResultsLayoutProps {
@@ -40,7 +40,7 @@ export function ResultsLayout({
         {/* Desktop: 2-column layout for zones 2+3 — sidebar scales with viewport */}
         <div className="lg:grid lg:grid-cols-[1fr_minmax(320px,400px)] xl:grid-cols-[1fr_minmax(360px,440px)] lg:gap-6 lg:items-start mt-4">
           {/* Left column: actions + analysis */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
@@ -55,18 +55,18 @@ export function ResultsLayout({
                 {analysis}
               </div>
             )}
-          </motion.div>
+          </m.div>
 
           {/* Right column: sidebar (desktop only, below analysis on mobile) */}
           {sidebar && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
               className="mt-4 lg:mt-0 lg:sticky lg:top-4 space-y-3"
             >
               {sidebar}
-            </motion.div>
+            </m.div>
           )}
         </div>
       </div>

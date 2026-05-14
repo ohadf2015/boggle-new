@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FAQS, FAQ_ACCENTS } from '../data';
@@ -36,19 +36,19 @@ export function FaqAccordion() {
                 className="flex w-full items-center justify-between gap-4 px-5 py-4 text-start font-neo-display text-sm font-black uppercase tracking-wide text-neo-white transition-colors hover:text-neo-pink sm:text-base"
               >
                 <span className="flex-1">{faq.q}</span>
-                <motion.span
+                <m.span
                   animate={reduced ? undefined : { rotate: isOpen ? 180 : 0 }}
                   transition={{ type: 'spring', stiffness: 320, damping: 22 }}
                   className="grid h-8 w-8 shrink-0 place-items-center rounded-neo border-2 border-neo-black bg-neo-navy text-neo-pink shadow-hard-sm"
                   aria-hidden
                 >
                   <ChevronDown className="h-4 w-4" />
-                </motion.span>
+                </m.span>
               </button>
 
               <AnimatePresence initial={false}>
                 {isOpen && (
-                  <motion.div
+                  <m.div
                     id={`faq-panel-${i}`}
                     role="region"
                     initial={reduced ? false : { height: 0, opacity: 0 }}
@@ -60,7 +60,7 @@ export function FaqAccordion() {
                     <p className="border-t-2 border-dashed border-neo-white/15 px-5 py-4 font-neo-body text-sm leading-relaxed text-neo-white/75 sm:text-base">
                       {faq.a}
                     </p>
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
             </li>

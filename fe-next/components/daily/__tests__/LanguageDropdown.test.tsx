@@ -10,7 +10,7 @@ import { LanguageDropdown } from '../LanguageDropdown';
 
 vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  motion: new Proxy({}, { get: () => (props: Record<string, unknown>) => {
+  m: new Proxy({}, { get: () => (props: Record<string, unknown>) => {
     const { children, ...rest } = props as { children?: React.ReactNode } & Record<string, unknown>;
     return <div {...(rest as React.HTMLAttributes<HTMLDivElement>)}>{children}</div>;
   } }),

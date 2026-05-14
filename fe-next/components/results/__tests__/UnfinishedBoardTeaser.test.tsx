@@ -11,7 +11,7 @@ import UnfinishedBoardTeaser from '../UnfinishedBoardTeaser';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => (
       <div className={className} {...props}>{children}</div>
     ),

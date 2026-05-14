@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { RotateCw, Home, Share2, TrendingUp, TrendingDown, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -130,7 +130,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
 
   return (
     <div className="flex-1 min-h-screen flex items-center justify-center bg-neo-navy p-4 overflow-y-auto scrollable-area">
-      <motion.div
+      <m.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         className="max-w-md lg:max-w-3xl xl:max-w-4xl w-full space-y-4 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start"
@@ -165,7 +165,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
           </div>
 
           {/* Score Difference */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.6 }}
@@ -182,7 +182,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
             <span className="text-lg font-black">
               {scoreDiff > 0 ? '+' : '-'}{displayDiff} {t('challengeResults.pts')}
             </span>
-          </motion.div>
+          </m.div>
 
           {/* Stats Row */}
           <div className="grid grid-cols-2 gap-3 mt-3">
@@ -198,7 +198,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <motion.div
+        <m.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.7 }}
@@ -246,8 +246,8 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
             <CrazyGamesBanner size="320x50" />
           </div>
           <ResultsBannerSlot placement="challenge-complete" className="my-3" />
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </div>
   );
 };

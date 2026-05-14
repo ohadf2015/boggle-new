@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { MessageCircle, Send } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Loader } from '@/components/ui/Loader';
@@ -111,7 +111,7 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
   return (
     <div className={cn('space-y-2', className)}>
       {threads.map((thread, index) => (
-        <motion.button
+        <m.button
           key={thread.conversationId}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -168,7 +168,7 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
               {thread.unreadCount > 9 ? '9+' : thread.unreadCount}
             </span>
           )}
-        </motion.button>
+        </m.button>
       ))}
     </div>
   );

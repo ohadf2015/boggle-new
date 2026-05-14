@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { ArrowLeft, ImagePlus, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -101,7 +101,7 @@ function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
         {/* Stats HUD — appears when grid is generated */}
         <AnimatePresence>
           {generatedBoard && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 12, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8 }}
@@ -124,7 +124,7 @@ function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
               )}>
                 {t(`ugc.board.${generatedBoard.difficulty.toLowerCase()}`)}
               </span>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>
@@ -132,7 +132,7 @@ function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
       {/* Error */}
       <AnimatePresence>
         {generateError && (
-          <motion.p
+          <m.p
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0 }}
@@ -140,7 +140,7 @@ function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
             className="text-neo-red font-neo-body text-sm"
           >
             {generateError}
-          </motion.p>
+          </m.p>
         )}
       </AnimatePresence>
 
@@ -395,7 +395,7 @@ function PublishedStep({ creator }: { creator: UseBoardCreatorReturn }) {
   if (!publishedBoard) return null;
 
   return (
-    <motion.div
+    <m.div
       data-testid="step-published"
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
@@ -437,7 +437,7 @@ function PublishedStep({ creator }: { creator: UseBoardCreatorReturn }) {
       >
         {t('ugc.board.makeAnother')}
       </NeoButton>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -461,19 +461,19 @@ export function BoardCreatorWizard() {
       <div className="max-w-lg mx-auto border-neo border-black bg-black/20 shadow-hard rounded-neo p-6">
         <AnimatePresence mode="wait">
           {creator.step === 'configure' && (
-            <motion.div key="configure" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
+            <m.div key="configure" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
               <ConfigureStep creator={creator} />
-            </motion.div>
+            </m.div>
           )}
           {creator.step === 'preview' && (
-            <motion.div key="preview" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
+            <m.div key="preview" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
               <PreviewStep creator={creator} />
-            </motion.div>
+            </m.div>
           )}
           {creator.step === 'published' && (
-            <motion.div key="published" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
+            <m.div key="published" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
               <PublishedStep creator={creator} />
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

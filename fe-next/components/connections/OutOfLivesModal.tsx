@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Heart, Play, Loader2, LogOut } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
@@ -30,28 +30,28 @@ export default function OutOfLivesModal({ open, isAdmin, level, onRevive, onQuit
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/85 backdrop-blur-sm px-6"
           dir={isRTL ? 'rtl' : 'ltr'}
         >
-          <motion.div
+          <m.div
             initial={{ scale: 0.85, y: 40, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 320, damping: 24 }}
             className="relative w-full max-w-sm rounded-neo border-neo-thick border-neo-red bg-neo-navy-light shadow-hard-lg p-6 text-center"
           >
-            <motion.div
+            <m.div
               initial={{ scale: 0, rotate: -20 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 14 }}
               className="mx-auto mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-neo-red/15 border-neo-thick border-neo-red"
             >
               <Heart className="w-8 h-8 text-neo-red" aria-hidden="true" />
-            </motion.div>
+            </m.div>
 
             <h2 className="font-neo-display text-2xl text-neo-cream font-bold mb-2">
               {t('connections.outOfLives')}
@@ -62,7 +62,7 @@ export default function OutOfLivesModal({ open, isAdmin, level, onRevive, onQuit
 
             <div className="flex flex-col gap-3">
               {isAdmin ? (
-                <motion.button
+                <m.button
                   type="button"
                   onClick={onRevive}
                   whileHover={{ scale: 1.03, y: -1 }}
@@ -71,9 +71,9 @@ export default function OutOfLivesModal({ open, isAdmin, level, onRevive, onQuit
                 >
                   <Heart className="w-4 h-4" aria-hidden="true" />
                   {t('connections.adminRefill')}
-                </motion.button>
+                </m.button>
               ) : (
-                <motion.button
+                <m.button
                   type="button"
                   onClick={offer}
                   disabled={isLoading || !canShowAd}
@@ -87,7 +87,7 @@ export default function OutOfLivesModal({ open, isAdmin, level, onRevive, onQuit
                     <Play className="w-4 h-4" aria-hidden="true" />
                   )}
                   {t('connections.reviveAd')}
-                </motion.button>
+                </m.button>
               )}
 
               <button
@@ -103,8 +103,8 @@ export default function OutOfLivesModal({ open, isAdmin, level, onRevive, onQuit
                 <p className="text-neo-white/40 text-xs">{t('connections.noAdAvailable')}</p>
               )}
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

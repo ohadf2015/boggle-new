@@ -3,7 +3,7 @@ import { DuelDisconnectOverlay } from '../DuelDisconnectOverlay';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
 }));

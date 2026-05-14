@@ -33,7 +33,7 @@ vi.mock('framer-motion', async () => {
     return React.createElement('span', { ...props, ref }, children);
   });
   return {
-    motion: { div: MockDiv, button: MockButton, span: MockSpan },
+    m: { div: MockDiv, button: MockButton, span: MockSpan },
     AnimatePresence: ({ children }: any) => children,
   };
 });

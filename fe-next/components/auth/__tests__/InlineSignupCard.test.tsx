@@ -82,7 +82,7 @@ vi.mock('framer-motion', async () => {
   });
   function AnimatePresence({ children }: any) { return children; }
   return {
-    motion: { div: MotionDiv, li: MotionLi, section: MotionSection },
+    m: { div: MotionDiv, li: MotionLi, section: MotionSection },
     AnimatePresence,
   };
 });

@@ -1,5 +1,5 @@
 'use client';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { MechanicKey } from '@/lib/blast/v2/tutorial/unlocks-seen';
 import { getCardForMechanic } from '@/lib/blast/v2/tutorial/mechanic-cards';
@@ -18,7 +18,7 @@ export function BlastUnlockCard({ mechanic, cardIndex, onDismiss, onSkipAll }: P
   const showSkipLink = cardIndex > 0;
 
   return (
-    <motion.div
+    <m.div
       initial={{
         opacity: reducedMotion === true ? 1 : 0,
         scale: reducedMotion === true ? 1 : 0.9,
@@ -27,7 +27,7 @@ export function BlastUnlockCard({ mechanic, cardIndex, onDismiss, onSkipAll }: P
       exit={{ opacity: 0, scale: 0.9 }}
       className="fixed inset-0 flex items-center justify-center bg-black/50 z-40"
     >
-      <motion.div
+      <m.div
         className="bg-[#0b1530] border-neo-thick border-black rounded-neo p-8 max-w-sm space-y-4 text-white"
         animate={{ y: 0 }}
       >
@@ -54,7 +54,7 @@ export function BlastUnlockCard({ mechanic, cardIndex, onDismiss, onSkipAll }: P
             {t('blast.tutorial.unlock.skipFuture', 'Skip future tutorials')}
           </button>
         )}
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }

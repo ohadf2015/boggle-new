@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Trophy, Medal, Star } from 'lucide-react';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
@@ -89,7 +89,7 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
             const isTopThree = placement <= 3;
 
             return (
-              <motion.div
+              <m.div
                 key={player.playerId ?? player.username}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -174,7 +174,7 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>
@@ -188,7 +188,7 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
 
         {/* Winner announcement for completed tournament */}
         {isComplete && standings[0] && (
-          <motion.div
+          <m.div
             initial={{ scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', duration: 0.5 }}
@@ -204,7 +204,7 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
             <p className="text-lg font-semibold text-neo-black">
               {standings[0].totalScore} {t('hostView.totalScore').toLowerCase()}
             </p>
-          </motion.div>
+          </m.div>
         )}
       </div>
     </Card>

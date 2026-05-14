@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { BookOpen, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -39,7 +39,7 @@ export default function PostGameWordReview({
   }, [vocabularyWords, foundSet]);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3, type: 'spring', stiffness: 120, damping: 20 }}
@@ -104,13 +104,13 @@ export default function PostGameWordReview({
       )}
 
       {/* Practice button */}
-      <motion.button
+      <m.button
         whileTap={{ scale: 0.97 }}
         onClick={onPractice}
         className="w-full py-2.5 px-4 bg-neo-lime text-black font-bold rounded-neo border-neo shadow-hard text-sm active:shadow-hard-pressed active:translate-y-[2px] transition-all"
       >
         {t('education.postGame.practiceTheseWords')}
-      </motion.button>
-    </motion.div>
+      </m.button>
+    </m.div>
   );
 }

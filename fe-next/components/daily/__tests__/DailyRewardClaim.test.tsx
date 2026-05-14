@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { DailyRewardClaim } from '../DailyRewardClaim';
 
 jest.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: React.forwardRef(function MockMotionDiv({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) {
       return <div ref={ref} {...props}>{children}</div>;
     }),

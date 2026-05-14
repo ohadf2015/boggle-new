@@ -44,7 +44,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: new Proxy({}, {
+  m: new Proxy({}, {
     get: (_target: unknown, prop: string) => {
       return React.forwardRef(function MotionComponent(props: Record<string, unknown>, ref: React.Ref<unknown>) {
         const { children, initial: _i, animate: _a, exit: _e, transition: _t, whileHover: _wh, whileTap: _wt, ...rest } = props;

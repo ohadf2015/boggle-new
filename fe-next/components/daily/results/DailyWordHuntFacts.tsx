@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   Sparkles,
   Zap,
@@ -163,7 +163,7 @@ const EncouragementCard: React.FC<{
   const styles = COLOR_STYLES[fact.color];
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1, type: 'spring', stiffness: 300, damping: 25 }}
@@ -185,16 +185,16 @@ const EncouragementCard: React.FC<{
         {renderFactText(fact, t)}
       </p>
       {fact.value != null && (
-        <motion.span
+        <m.span
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: index * 0.1 + 0.2, type: 'spring', stiffness: 400 }}
           className="shrink-0 text-lg font-black text-neo-cream"
         >
           {fact.value}
-        </motion.span>
+        </m.span>
       )}
-    </motion.div>
+    </m.div>
   );
 };
 
@@ -206,7 +206,7 @@ const CoachTipCard: React.FC<{
   fact: WordHuntFact;
   t: DailyWordHuntFactsProps['t'];
 }> = ({ fact, t }) => (
-  <motion.div
+  <m.div
     initial={{ opacity: 0, y: 8 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
@@ -223,7 +223,7 @@ const CoachTipCard: React.FC<{
         {renderFactText(fact, t)}
       </p>
     </div>
-  </motion.div>
+  </m.div>
 );
 
 // ---------------------------------------------------------------------------
@@ -240,7 +240,7 @@ const InsightCard: React.FC<{
   const isPersonal = fact.type.startsWith('personal');
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.25, type: 'spring', stiffness: 300, damping: 26 }}
@@ -268,7 +268,7 @@ const InsightCard: React.FC<{
           {renderFactText(fact, t)}
         </p>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

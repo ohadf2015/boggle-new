@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, Keyboard, MousePointer, Type } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -83,7 +83,7 @@ export function KeyboardShortcutsOverlay({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <m.div
           ref={overlayRef}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -95,7 +95,7 @@ export function KeyboardShortcutsOverlay({
           aria-modal="true"
           aria-labelledby="keyboard-shortcuts-title"
         >
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -205,8 +205,8 @@ export function KeyboardShortcutsOverlay({
                 </span>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

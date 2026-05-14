@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useRef, useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Flame, Crown, Medal, Award, WifiOff, Clock, ArrowUp, ArrowDown, Heart, Skull } from 'lucide-react';
 import Image from 'next/image';
 import Avatar from '../../../components/Avatar';
@@ -145,7 +145,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
   }, [rank]);
 
   return (
-    <motion.div
+    <m.div
       layout
       layoutId={`player-${username}`}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
@@ -186,7 +186,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
         {/* Rank change arrow */}
         <AnimatePresence>
           {rankChange && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.5 }}
@@ -201,7 +201,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
               ) : (
                 <ArrowDown className="w-3 h-3" />
               )}
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>
@@ -289,7 +289,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
         <div className="relative">
           {/* Combo glow aura for high combos */}
           {comboLevel >= 5 && (
-            <motion.div
+            <m.div
               className="absolute -inset-3 pointer-events-none"
               animate={{ opacity: [0.4, 0.8, 0.4], scale: [0.95, 1.05, 0.95] }}
               transition={{ duration: 1, repeat: Infinity }}
@@ -302,9 +302,9 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
                 height={60}
                 className="opacity-80"
               />
-            </motion.div>
+            </m.div>
           )}
-          <motion.div
+          <m.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 400, damping: 22 }}
@@ -319,7 +319,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
           >
             <Flame className="w-4 h-4" />
             <span className="font-black text-sm">{comboLevel}x</span>
-          </motion.div>
+          </m.div>
         </div>
       )}
 
@@ -327,7 +327,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
       <div className="text-end flex items-center gap-2">
         <AnimatePresence>
           {scoreDelta !== null && (
-            <motion.div
+            <m.div
               data-testid="score-delta"
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -335,7 +335,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
               className="px-1.5 py-0.5 rounded-neo border-2 border-neo-black bg-green-400 text-neo-black font-black text-sm"
             >
               +{scoreDelta}
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
         <div>
@@ -360,13 +360,13 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
       </div>
 
       {/* Score Bar */}
-      <motion.div
+      <m.div
         data-testid="score-bar"
         className={cn('absolute bottom-0 left-0 h-1 rounded-b-neo', barColor)}
         animate={{ width: `${barPercentage}%` }}
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
       />
-    </motion.div>
+    </m.div>
   );
 });
 

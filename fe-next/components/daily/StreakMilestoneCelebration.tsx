@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useCallback, useMemo, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -155,14 +155,14 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4"
           onClick={onClose}
         >
-          <motion.div
+          <m.div
             initial={{ scale: 0.5, opacity: 0, rotate: -10 }}
             animate={{ scale: 1, opacity: 1, rotate: 0 }}
             exit={{ scale: 0.5, opacity: 0, rotate: 10 }}
@@ -187,27 +187,27 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
             </div>
 
             {/* Animated emoji */}
-            <motion.div
+            <m.div
               initial={{ scale: 0 }}
               animate={{ scale: [0, 1.3, 1] }}
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-8xl mb-4"
             >
               {emoji}
-            </motion.div>
+            </m.div>
 
             {/* Title with animation */}
-            <motion.h2
+            <m.h2
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
               className="text-3xl md:text-4xl font-black text-neo-black dark:text-white mb-2"
             >
               {title}
-            </motion.h2>
+            </m.h2>
 
             {/* Streak number */}
-            <motion.div
+            <m.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', delay: 0.4, stiffness: 400, damping: 22 }}
@@ -215,20 +215,20 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
             >
               <span className="text-4xl font-black text-white">{streak}</span>
               <span className="text-lg font-bold text-white/90">DAYS</span>
-            </motion.div>
+            </m.div>
 
             {/* Subtitle */}
-            <motion.p
+            <m.p
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
               className="text-gray-600 dark:text-gray-300 text-lg mb-6"
             >
               {subtitle}
-            </motion.p>
+            </m.p>
 
             {/* Dismiss button */}
-            <motion.div
+            <m.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6, type: 'spring', stiffness: 300, damping: 26 }}
@@ -239,9 +239,9 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
               >
                 Keep the streak going!
               </Button>
-            </motion.div>
-          </motion.div>
-        </motion.div>
+            </m.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { SeasonRankBadge } from '@/lib/seasonBadges';
 
@@ -42,7 +42,7 @@ export const SeasonBadgeCard: React.FC<SeasonBadgeCardProps> = ({
   });
   const rarityLabel = t(`seasonBadges.rarity.${badge.rarity}`);
 
-  const Wrapper = onClick ? motion.button : motion.div;
+  const Wrapper = onClick ? m.button : m.div;
 
   return (
     <Wrapper

@@ -54,7 +54,7 @@ vi.mock('@/hooks/useWordForgeRun', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: new Proxy({}, { get: () => (props: any) => <div {...props} /> }),
+  m: new Proxy({}, { get: () => (props: any) => <div {...props} /> }),
   useReducedMotion: () => false,
 }));
 

@@ -73,7 +73,7 @@ vi.mock('framer-motion', () => {
   MockMotionButton.displayName = 'MockMotionButton';
 
   return {
-    motion: {
+    m: {
       div: MockMotionDiv,
       button: MockMotionButton,
     },

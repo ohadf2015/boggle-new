@@ -17,7 +17,7 @@ vi.mock('@/components/ui/Mascot', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,

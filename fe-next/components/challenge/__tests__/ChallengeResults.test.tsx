@@ -35,7 +35,7 @@ vi.mock('@/components/results/ResultsWinnerBanner', () => {
 
 // --- Mock framer-motion ---
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, ...props }: React.PropsWithChildren<Record<string, unknown>>) =>
       <div className={className as string} {...props}>{children}</div>,
   },

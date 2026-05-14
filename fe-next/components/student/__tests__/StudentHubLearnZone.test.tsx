@@ -56,7 +56,7 @@ vi.mock('framer-motion', () => {
     return R.createElement('div', { ...rest, ref }, children);
   });
   return {
-    motion: { div: Div, button: Div },
+    m: { div: Div, button: Div },
     AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
   };
 });

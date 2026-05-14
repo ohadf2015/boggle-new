@@ -83,7 +83,7 @@ vi.mock('@/components/ui/PageLoader', () => ({
 
 // --- Mock framer-motion ---
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { animate, initial, transition, ...restProps } = props;
       return <div {...restProps}>{children}</div>;

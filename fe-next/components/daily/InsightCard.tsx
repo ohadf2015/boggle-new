@@ -1,6 +1,6 @@
 'use client'
 import { Trophy, Zap, Gauge, Target, Flame, TrendingUp } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 const ICONS = { Trophy, Zap, Gauge, Target, Flame, TrendingUp } as const
@@ -61,7 +61,7 @@ export default function InsightCard({
   const style = TYPE_STYLE[type] ?? TYPE_STYLE.improved
 
   return (
-    <motion.div
+    <m.div
       initial={{ x: 60, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{
@@ -76,7 +76,7 @@ export default function InsightCard({
         style.border
       )}
     >
-      <motion.div
+      <m.div
         initial={{ scale: 0, rotate: -20 }}
         animate={{ scale: 1, rotate: 0 }}
         transition={{
@@ -88,11 +88,11 @@ export default function InsightCard({
         className={cn('mb-2', style.icon)}
       >
         <Icon className="w-5 h-5" />
-      </motion.div>
+      </m.div>
       <p className="font-neo-display font-black text-sm text-neo-white leading-tight">
         {headline}
       </p>
       <p className="text-xs text-neo-cream/60 mt-0.5 leading-tight">{sub}</p>
-    </motion.div>
+    </m.div>
   )
 }

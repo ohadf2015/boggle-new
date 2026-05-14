@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { getRewardCoins } from '@/lib/dailyRewards';
 
 interface DailyRewardClaimProps {
@@ -27,13 +27,13 @@ export function DailyRewardClaim({ coinsEarned, currentStreakDay, badge, t }: Da
   const tomorrowCoins = getRewardCoins(currentStreakDay + 1);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       className="bg-neo-navy border-3 border-neo-black rounded-neo p-5 shadow-hard-sm text-center space-y-3"
     >
       {/* Coin reward */}
-      <motion.div
+      <m.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
@@ -41,11 +41,11 @@ export function DailyRewardClaim({ coinsEarned, currentStreakDay, badge, t }: Da
         <p className="text-2xl font-black text-neo-cyan">
           {interpolateTranslation(t('daily.rewardClaimed'), { coins: coinsEarned })}
         </p>
-      </motion.div>
+      </m.div>
 
       {/* Badge reveal */}
       {badge && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
@@ -53,18 +53,18 @@ export function DailyRewardClaim({ coinsEarned, currentStreakDay, badge, t }: Da
           <p className="text-lg font-bold text-neo-yellow">
             {interpolateTranslation(t('daily.milestoneReached'), { badge })}
           </p>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Come back tomorrow */}
-      <motion.p
+      <m.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8 }}
         className="text-sm text-neo-cream/60"
       >
         {interpolateTranslation(t('daily.comeBackTomorrow'), { coins: tomorrowCoins })}
-      </motion.p>
-    </motion.div>
+      </m.p>
+    </m.div>
   );
 }

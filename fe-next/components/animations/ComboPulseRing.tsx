@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, memo, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
 
@@ -122,7 +122,7 @@ export const ComboPulseRing = memo(function ComboPulseRing({
     >
       <AnimatePresence>
         {rings.map((ring) => (
-          <motion.div
+          <m.div
             key={ring.id}
             className="absolute rounded-full"
             style={{
@@ -183,7 +183,7 @@ export function ScreenEdgeGlow({
   const opacity = Math.min(intensity * 0.3, 0.4);
 
   return (
-    <motion.div
+    <m.div
       className={cn(
         'fixed inset-0 pointer-events-none z-[70]',
         className
@@ -202,7 +202,7 @@ export function ScreenEdgeGlow({
     >
       {/* Pulse animation for high intensity */}
       {intensity > 0.5 && (
-        <motion.div
+        <m.div
           className="absolute inset-0"
           animate={{
             opacity: [0, 0.2, 0],
@@ -217,7 +217,7 @@ export function ScreenEdgeGlow({
           }}
         />
       )}
-    </motion.div>
+    </m.div>
   );
 }
 

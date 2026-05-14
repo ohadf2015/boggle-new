@@ -3,7 +3,7 @@
 import React, { memo, useMemo } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Users } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { AnimatedCounter } from '../../../components/ui/AnimatedCounter';
 
 interface TvJoinBarProps {
@@ -31,7 +31,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
   }, [baseUrl, gameCode]);
 
   return (
-    <motion.div
+    <m.div
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -55,7 +55,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
             <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1" id="game-code-label">
               {t('tvBroadcast.gameCode')}
             </p>
-            <motion.div
+            <m.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
@@ -66,7 +66,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
               <span className="text-5xl md:text-6xl lg:text-7xl font-black tracking-[0.15em] uppercase" aria-label={`Game code: ${gameCode.split('').join(' ')}`}>
                 {gameCode}
               </span>
-            </motion.div>
+            </m.div>
           </div>
 
           {/* Right: QR Code */}
@@ -76,7 +76,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
               <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1">
                 {t('tvBroadcast.players')}
               </p>
-              <motion.div
+              <m.div
                 key={playerCount}
                 initial={{ scale: 1.15 }}
                 animate={{ scale: 1 }}
@@ -91,11 +91,11 @@ const TvJoinBar = memo<TvJoinBarProps>(({
                   size="xl"
                   formatValue={(v) => String(Math.round(v))}
                 />
-              </motion.div>
+              </m.div>
             </div>
 
             {/* QR Code */}
-            <motion.div
+            <m.div
               initial={{ rotate: -10, scale: 0.8 }}
               animate={{ rotate: 0, scale: 1 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -108,7 +108,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
                 bgColor="#ffffff"
                 fgColor="#000000"
               />
-            </motion.div>
+            </m.div>
           </div>
         </div>
 
@@ -121,7 +121,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
           </div>
         )}
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 

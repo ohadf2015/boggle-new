@@ -3,17 +3,17 @@ import { render, screen, act } from '@testing-library/react';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: Object.assign(React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> & { initial?: unknown; animate?: unknown; exit?: unknown; transition?: unknown }>(
       function MotionDiv({ children, initial, animate, exit, transition, ...props }, ref) {
         return <div ref={ref} {...props}>{children}</div>;
       }
-    ), { displayName: 'motion.div' }),
+    ), { displayName: 'm.div' }),
     p: Object.assign(React.forwardRef<HTMLParagraphElement, React.HTMLProps<HTMLParagraphElement> & { initial?: unknown; animate?: unknown; transition?: unknown }>(
       function MotionP({ children, initial, animate, transition, ...props }, ref) {
         return <p ref={ref} {...props}>{children}</p>;
       }
-    ), { displayName: 'motion.p' }),
+    ), { displayName: 'm.p' }),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { Share } from 'lucide-react';
 import { Mascot } from '@/components/ui/Mascot';
@@ -132,7 +132,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ x: slideDirection, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: slideDirection, opacity: 0 }}
@@ -150,7 +150,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
           <div className="p-3">
             <div className="flex items-center gap-3">
               {/* Compact icon */}
-              <motion.div
+              <m.div
                 initial={{ scale: 0.95, rotate: -90 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
@@ -165,30 +165,30 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                     <Mascot variant="trophy" size="xs" animated={false} clipBorder="none" />
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
 
               {/* Text content - more compact */}
               <div className="flex-1 min-w-0">
-                <motion.h3
+                <m.h3
                   initial={{ x: 10, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.15, ...SPRING_PRESETS.balanced }}
                   className="text-sm font-black uppercase text-neo-lime truncate"
                 >
                   {localizedAchievement.name}
-                </motion.h3>
-                <motion.p
+                </m.h3>
+                <m.p
                   initial={{ x: 10, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.2, ...SPRING_PRESETS.balanced }}
                   className="text-xs font-bold text-neo-white/90 line-clamp-1"
                 >
                   {localizedAchievement.description}
-                </motion.p>
+                </m.p>
               </div>
 
               {/* Action buttons */}
-              <motion.div
+              <m.div
                 initial={{ scale: 0.95 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 22 }}
@@ -211,25 +211,25 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                 <div className="w-6 h-6 bg-neo-pink border-2 border-neo-black rounded flex items-center justify-center text-xs font-black cursor-pointer hover:bg-neo-red transition-colors">
                   ✕
                 </div>
-              </motion.div>
+              </m.div>
             </div>
 
             {/* Compact progress bar */}
-            <motion.div
+            <m.div
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ delay: 0.25 }}
               className="mt-2 h-1.5 bg-neo-navy-light border border-neo-black rounded-sm overflow-hidden"
               style={{ transformOrigin: 'left' }}
             >
-              <motion.div
+              <m.div
                 className="h-full bg-neo-lime"
                 style={{ width: `${progress}%` }}
               />
-            </motion.div>
+            </m.div>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 };

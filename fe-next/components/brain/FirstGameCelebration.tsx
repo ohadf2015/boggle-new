@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Brain, Sparkles, X } from 'lucide-react';
 import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 import { cn } from '@/lib/utils';
@@ -64,7 +64,7 @@ export default function FirstGameCelebration({
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -75,7 +75,7 @@ export default function FirstGameCelebration({
         {showConfetti && (
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             {confettiValues.map((values, i) => (
-              <motion.div
+              <m.div
                 key={`confetti-particle-${i}`}
                 className={cn(
                   'absolute w-2 h-2 rounded-full',
@@ -108,7 +108,7 @@ export default function FirstGameCelebration({
         )}
 
         {/* Modal Content */}
-        <motion.div
+        <m.div
           initial={{ scale: 0.8, rotate: -5 }}
           animate={{ scale: 1, rotate: 0 }}
           exit={{ scale: 0.8, opacity: 0 }}
@@ -133,7 +133,7 @@ export default function FirstGameCelebration({
           </button>
 
           {/* Animated Brain Icon */}
-          <motion.div
+          <m.div
             className="flex justify-center mb-4"
             animate={{
               scale: [1, 1.1, 1],
@@ -148,10 +148,10 @@ export default function FirstGameCelebration({
             <div className="w-20 h-20 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black flex items-center justify-center">
               <Brain className="w-12 h-12 text-neo-black" />
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Title */}
-          <motion.h2
+          <m.h2
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 25 }}
@@ -161,10 +161,10 @@ export default function FirstGameCelebration({
             )}
           >
             {t('brain.firstGameComplete')}
-          </motion.h2>
+          </m.h2>
 
           {/* Subtitle */}
-          <motion.p
+          <m.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -174,10 +174,10 @@ export default function FirstGameCelebration({
             )}
           >
             {t('brain.baselineEstablished')}
-          </motion.p>
+          </m.p>
 
           {/* Overall Score */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4, type: "spring" }}
@@ -193,7 +193,7 @@ export default function FirstGameCelebration({
               {t('brain.overallScore')}
             </p>
             <div className="flex items-baseline justify-center gap-2">
-              <motion.span
+              <m.span
                 className={cn(
                   'text-5xl font-black',
                   isDarkMode ? 'text-neo-lime' : 'text-emerald-600'
@@ -203,7 +203,7 @@ export default function FirstGameCelebration({
                 transition={{ delay: 0.6 }}
               >
                 {overallScore}
-              </motion.span>
+              </m.span>
               <span className={cn(
                 'text-2xl font-bold',
                 isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
@@ -217,17 +217,17 @@ export default function FirstGameCelebration({
             )}>
               {t(`brain.tiers.${tier}`)}
             </p>
-          </motion.div>
+          </m.div>
 
           {/* Domain Scores Preview */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
             className="space-y-2 mb-6"
           >
             {Object.entries(domains).map(([key, value], index) => (
-              <motion.div
+              <m.div
                 key={key}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -257,12 +257,12 @@ export default function FirstGameCelebration({
                     </span>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
-          </motion.div>
+          </m.div>
 
           {/* Call to Action */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.2 }}
@@ -285,7 +285,7 @@ export default function FirstGameCelebration({
             >
               {t('brain.playAgain')}
             </button>
-          </motion.div>
+          </m.div>
 
           {/* Celebration Mascot - positioned at corner */}
           <div className="absolute -bottom-4 -right-4 sm:-bottom-6 sm:-right-6 pointer-events-none z-10">
@@ -297,8 +297,8 @@ export default function FirstGameCelebration({
               clipBorder="none"
             />
           </div>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </AnimatePresence>
   );
 }

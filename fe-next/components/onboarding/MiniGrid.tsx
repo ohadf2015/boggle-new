@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { m, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Check, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -251,7 +251,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
           viewBox={`0 0 ${svgSize.width} ${svgSize.height}`}
           style={{ width: '100%', height: 'auto', maxWidth: size === 3 ? 'min(300px,78vw)' : 'min(360px,85vw)', margin: '0 auto', display: 'block' }}
         >
-          <motion.path
+          <m.path
             d={linePath}
             fill="none"
             stroke="#84CC16"
@@ -294,7 +294,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
             const isFirstHint = isHint && showStartHint && selected.length === 0;
 
             return (
-              <motion.div
+              <m.div
                 key={cellKey}
                 className={cn(
                   'relative aspect-square rounded-neo border-3',
@@ -319,7 +319,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
               >
                 {/* Glow ring when selected */}
                 {isSel && (
-                  <motion.div
+                  <m.div
                     className="absolute inset-[-4px] rounded-neo border-2 border-neo-lime/40"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: [0.4, 0.7, 0.4], scale: 1 }}
@@ -329,18 +329,18 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                 )}
 
                 {/* Letter with pop animation */}
-                <motion.span
+                <m.span
                   className="relative z-10"
                   animate={isSel ? { scale: [1, 1.15, 1.05] } : { scale: 1 }}
                   transition={isSel ? { scale: { type: 'tween', duration: 0.4, ease: 'easeOut' } } : SPRING_BOUNCE}
                 >
                   {letter}
-                </motion.span>
+                </m.span>
 
                 {/* Selection order badge — juicy pop-in */}
                 <AnimatePresence>
                   {isSel && (
-                    <motion.div
+                    <m.div
                       initial={{ scale: 0, rotate: -120, opacity: 0 }}
                       animate={{ scale: 1, rotate: 0, opacity: 1 }}
                       exit={{ scale: 0, rotate: 90, opacity: 0 }}
@@ -348,14 +348,14 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                       className="absolute -top-2 -right-2 w-6 h-6 bg-neo-yellow border-2 border-neo-black rounded-full flex items-center justify-center text-[11px] font-black shadow-hard-sm pointer-events-none z-20"
                     >
                       {selIdx + 1}
-                    </motion.div>
+                    </m.div>
                   )}
                 </AnimatePresence>
 
                 {/* Pulsing "Start here" finger pointer */}
                 <AnimatePresence>
                   {isFirstHint && (
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0, y: 8, scale: 0.8 }}
                       animate={{ opacity: 1, y: [0, -4, 0], scale: 1 }}
                       exit={{ opacity: 0, y: -6, scale: 0.8 }}
@@ -372,17 +372,17 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                       </div>
                       {/* Tooltip arrow */}
                       <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-neo-yellow border-b-2 border-r-2 border-neo-black rotate-45" />
-                    </motion.div>
+                    </m.div>
                   )}
                 </AnimatePresence>
-              </motion.div>
+              </m.div>
             );
           })
         )}
       </div>
 
       {/* Word preview bar with animated progress */}
-      <motion.div
+      <m.div
         className="mt-5 text-center"
         dir={language === 'he' ? 'rtl' : 'ltr'}
         initial={{ opacity: 0, y: 12 }}
@@ -392,7 +392,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
       >
         <div className="inline-flex items-center gap-3 bg-neo-navy/90 backdrop-blur-xs text-neo-white border-3 border-neo-white/50 rounded-neo px-5 py-3 shadow-hard relative overflow-hidden">
           {/* Animated progress fill */}
-          <motion.div
+          <m.div
             className="absolute inset-0 bg-neo-lime/25 origin-left"
             animate={{ scaleX: progress }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -401,7 +401,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
           {demoWord.split('').map((targetLetter, i) => {
             const filled = i < selected.length;
             return (
-              <motion.span
+              <m.span
                 key={`mini-letter-${i}-${targetLetter}`}
                 className={cn(
                   'relative z-10 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-md font-black text-xl sm:text-2xl',
@@ -413,14 +413,14 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                 transition={filled ? SPRING_BOUNCE : undefined}
               >
                 {filled ? selected[i].letter : targetLetter}
-              </motion.span>
+              </m.span>
             );
           })}
 
           {/* Success checkmark with celebration burst */}
           <AnimatePresence>
             {showSuccess && (
-              <motion.div
+              <m.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 12 }}
@@ -429,7 +429,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                 <Check className="w-5 h-5 text-neo-black" strokeWidth={3} />
                 {/* Mini celebration particles */}
                 {[...Array(6)].map((_, i) => (
-                  <motion.div
+                  <m.div
                     key={`burst-${i}`}
                     className="absolute w-1.5 h-1.5 rounded-full bg-neo-yellow"
                     initial={{ x: 0, y: 0, opacity: 1 }}
@@ -442,20 +442,20 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                     transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
                   />
                 ))}
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </div>
 
         {/* Letter count with animated opacity */}
-        <motion.p
+        <m.p
           className="text-xs text-neo-white/80 font-bold mt-2"
           animate={{ opacity: selected.length > 0 ? 1 : 0.6 }}
           transition={{ duration: 0.2 }}
         >
           {selected.length}/{demoWord.length}
-        </motion.p>
-      </motion.div>
+        </m.p>
+      </m.div>
     </div>
   );
 };

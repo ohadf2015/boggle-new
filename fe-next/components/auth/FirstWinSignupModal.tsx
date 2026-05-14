@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { Trophy, TrendingUp, Medal, Users } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody } from '../ui/dialog';
@@ -118,14 +118,14 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
 
 
           {/* Trophy animation */}
-          <motion.div
+          <m.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', damping: 10, stiffness: 100, delay: 0.2 }}
             className="flex justify-center mb-4"
           >
             <div className="relative">
-              <motion.div
+              <m.div
                 animate={{
                   scale: [1, 1.1, 1],
                   rotate: [-5, 5, -5],
@@ -136,28 +136,28 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
                   className="text-6xl text-yellow-500 drop-shadow-[0_0_20px_rgb(234_179_8/0.5)]"
                   size={64}
                 />
-              </motion.div>
+              </m.div>
               {/* Sparkle effects */}
-              <motion.div
+              <m.div
                 className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2 w-4 h-4 bg-yellow-300 rounded-full"
                 animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
               />
-              <motion.div
+              <m.div
                 className="absolute -top-1 -left-3 rtl:-left-auto rtl:-right-3 w-3 h-3 bg-yellow-400 rounded-full"
                 animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
               />
-              <motion.div
+              <m.div
                 className="absolute -bottom-1 right-0 rtl:right-auto rtl:left-0 w-2 h-2 bg-orange-400 rounded-full"
                 animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, delay: 1 }}
               />
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Header */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
@@ -171,10 +171,10 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
             <p className={cn('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
               {t(subtitleKey)}
             </p>
-          </motion.div>
+          </m.div>
 
           {/* Benefits list */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
@@ -190,7 +190,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
             </p>
             <ul className="space-y-2">
               {benefits.map((benefit, index) => (
-                <motion.li
+                <m.li
                   key={benefit.translationKey}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -205,14 +205,14 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
                     size={16}
                   />
                   <span>{t(benefit.translationKey)}</span>
-                </motion.li>
+                </m.li>
               ))}
             </ul>
-          </motion.div>
+          </m.div>
 
           {/* Current stats teaser */}
           {guestStats && guestStats.gamesPlayed > 0 && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6, ...SPRING_PRESETS.balanced }}
@@ -229,23 +229,23 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
                   score: guestStats.totalScore,
                 })}
               </span>
-            </motion.div>
+            </m.div>
           )}
 
           {/* OAuth Sign In Buttons */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, ...SPRING_PRESETS.balanced }}
           >
             <OAuthButtonGroup onSignIn={signIn} loadingProvider={loadingProvider} />
-          </motion.div>
+          </m.div>
 
           {/* Error Message */}
           {error && <AuthErrorMessage message={error} className="mt-4" />}
 
           {/* Continue as Guest */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, type: 'spring', stiffness: 280, damping: 26 }}
@@ -260,7 +260,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
             >
               {t('auth.firstWin.maybeLater')}
             </button>
-          </motion.div>
+          </m.div>
 
           {/* Terms */}
           <AuthTermsFooter className="mt-4" />

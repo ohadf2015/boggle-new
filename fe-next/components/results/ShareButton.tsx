@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Share2, Check } from 'lucide-react';
 import { useShareResult } from '@/hooks/useShareResult';
 import type { ShareParams } from '@/shared/utils/shareResultGenerator';
@@ -16,7 +16,7 @@ export const ShareButton: React.FC<ShareButtonProps> = ({ params, t, className =
   const { copied, handleCopy } = useShareResult(params, t);
 
   return (
-    <motion.button
+    <m.button
       onClick={handleCopy}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.97 }}
@@ -33,7 +33,7 @@ export const ShareButton: React.FC<ShareButtonProps> = ({ params, t, className =
           {t('results.share')}
         </>
       )}
-    </motion.button>
+    </m.button>
   );
 };
 

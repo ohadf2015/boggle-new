@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 import TvGapIndicator from '../TvGapIndicator';
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: React.forwardRef(function MotionDiv(
       { children, className, style, ...rest }: any,
       ref: any

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 
@@ -27,7 +27,7 @@ const MinimalToastLayout = memo<MinimalToastLayoutProps>(({
   borderColor,
 }) => {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -49,7 +49,7 @@ const MinimalToastLayout = memo<MinimalToastLayoutProps>(({
           <span className="font-bold text-sm opacity-80">{headline}</span>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 

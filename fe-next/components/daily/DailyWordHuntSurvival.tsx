@@ -3,7 +3,7 @@
 import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { DiscoveredWordsList } from './DiscoveredWordsList';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import type { WordHuntEffect } from './WordHuntEffectsCanvas';
 
 const WordHuntEffectsCanvas = dynamic(
@@ -466,7 +466,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // Portrait/responsive layout
   // pt-3 ensures game header doesn't overlap with the sticky app header on mobile
   return (
-    <motion.div
+    <m.div
       ref={containerRef}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -520,7 +520,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           <span id={rewardId} className="absolute inset-0 pointer-events-none" />
           <AnimatePresence mode="wait">
             {state.feedbackType && (
-              <motion.div
+              <m.div
                 key={`${state.feedbackType}-${feedbackKeyRef.current}`}
                 initial={{ opacity: 0, y: -8, scale: 0.6 }}
                 animate={{ opacity: 1, y: 0, scale: [0.6, 1.08, 1] }}
@@ -544,7 +544,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                 {(state.feedbackType === 'valid-word' || state.feedbackType === 'target-found') && (
                   <span key={feedbackKeyRef.current} className="sparkle-burst" />
                 )}
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
           {/* Full confetti explosion when target word is found */}
@@ -634,7 +634,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       />
 
       {extraLifeModal}
-    </motion.div>
+    </m.div>
   );
 };
 

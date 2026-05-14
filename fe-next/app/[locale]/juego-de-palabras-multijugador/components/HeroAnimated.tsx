@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HERO_TILES, STATS } from '../data';
@@ -49,7 +49,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
         </span>
         <span className="mt-2 flex flex-wrap items-end gap-2 sm:gap-3">
           {HERO_TILES.map((tile, i) => (
-            <motion.span
+            <m.span
               key={`${tile.ch}-${i}`}
               initial={reduced ? false : { y: -40, opacity: 0, rotate: 0 }}
               animate={reduced ? undefined : { y: 0, opacity: 1 }}
@@ -70,7 +70,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
               )}
             >
               {tile.ch}
-            </motion.span>
+            </m.span>
           ))}
         </span>
       </h1>
@@ -103,7 +103,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
 
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
         {STATS.map((stat, i) => (
-          <motion.div
+          <m.div
             key={stat.label}
             initial={reduced ? false : { opacity: 0, y: 16 }}
             whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
@@ -121,7 +121,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
             <dd className="mt-0.5 font-neo-body text-[11px] font-bold uppercase tracking-wider text-neo-white/60 sm:text-xs">
               {stat.label}
             </dd>
-          </motion.div>
+          </m.div>
         ))}
       </dl>
     </section>

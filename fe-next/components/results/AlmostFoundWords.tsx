@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Ghost } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -32,7 +32,7 @@ const AlmostFoundWords = memo<AlmostFoundWordsProps>(({
   if (words.length === 0) return null;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.4 }}
@@ -51,7 +51,7 @@ const AlmostFoundWords = memo<AlmostFoundWordsProps>(({
         <div className="p-2 flex flex-wrap gap-1.5">
           <AnimatePresence mode="popLayout">
             {words.map((word, index) => (
-              <motion.button
+              <m.button
                 key={word.word}
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -77,12 +77,12 @@ const AlmostFoundWords = memo<AlmostFoundWordsProps>(({
                 <span className="text-[10px] font-black text-neo-lime/80">
                   +{word.score}
                 </span>
-              </motion.button>
+              </m.button>
             ))}
           </AnimatePresence>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 

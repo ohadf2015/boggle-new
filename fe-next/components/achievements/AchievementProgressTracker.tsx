@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Mascot } from '@/components/ui/Mascot';
@@ -240,7 +240,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       )}
       <AnimatePresence>
         {visibleAchievements.map((progress) => (
-          <motion.div
+          <m.div
             key={progress.key}
             initial={{ opacity: 0, x: 50, scale: 0.8 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
@@ -259,7 +259,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
 
             {/* Progress Bar */}
             <div className="w-full bg-neo-black/40 rounded-full h-2 overflow-hidden border border-neo-black/60">
-              <motion.div
+              <m.div
                 className="h-full bg-linear-to-r from-neo-cyan to-neo-pink"
                 initial={{ width: 0 }}
                 animate={{ width: `${Math.min(progress.percentage, 100)}%` }}
@@ -276,7 +276,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
                 {Math.round(progress.percentage)}%
               </span>
             </div>
-          </motion.div>
+          </m.div>
         ))}
       </AnimatePresence>
     </div>

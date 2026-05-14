@@ -3,7 +3,7 @@
 import React, { useMemo, useEffect, useState, useCallback, useDeferredValue, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import ExitRoomButton from '@/components/ExitRoomButton';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -198,14 +198,14 @@ function DesktopResultsLayout({
           </div>
 
           {/* RIGHT: Other players expanded + achievements */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, type: 'spring', stiffness: 120, damping: 20 }}
             className="space-y-4"
           >
             <ResultsDetailsContent {...detailsContentProps} />
-          </motion.div>
+          </m.div>
         </div>
 
         {/* CrazyGames banner ad — shown after results content */}
@@ -217,13 +217,13 @@ function DesktopResultsLayout({
       {/* Scroll indicator — subtle bouncing chevron at bottom */}
       <AnimatePresence>
         {showScrollIndicator && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30 pointer-events-none"
           >
-            <motion.div
+            <m.div
               animate={{ y: [0, 6, 0] }}
               transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
               className="flex flex-col items-center gap-0.5"
@@ -233,8 +233,8 @@ function DesktopResultsLayout({
                   <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>
@@ -956,7 +956,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         {/* Floating bottom bar — always-visible sticky CTA */}
         {gameCode && onReturnToRoom && (
           <div className="shrink-0 fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-50 text-neo-cream">
-            <motion.div
+            <m.div
               initial={{ y: 60, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 200, damping: 24, delay: 0.3 }}
@@ -982,7 +982,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                   isClassroom={!!lessonGameData}
                 />
               </div>
-            </motion.div>
+            </m.div>
           </div>
         )}
       </div>

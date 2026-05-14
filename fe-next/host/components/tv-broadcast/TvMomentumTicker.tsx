@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 
 interface TvMomentumTickerProps {
   playerScores: Record<string, number>;
@@ -87,7 +87,7 @@ const TvMomentumTicker = memo<TvMomentumTickerProps>(({
       className="w-full bg-neo-black/90 border-y-3 border-neo-yellow py-2 px-4 overflow-hidden"
     >
       <AnimatePresence mode="wait">
-        <motion.div
+        <m.div
           key={currentMessage}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -96,7 +96,7 @@ const TvMomentumTicker = memo<TvMomentumTickerProps>(({
           className="text-center font-black text-neo-yellow text-sm uppercase tracking-wide"
         >
           {currentMessage}
-        </motion.div>
+        </m.div>
       </AnimatePresence>
     </div>
   );

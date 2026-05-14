@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { getRewardForDay, getNextMilestone } from '@/lib/dailyRewards';
 
 interface DailyRewardPreviewProps {
@@ -32,7 +32,7 @@ export function DailyRewardPreview({ currentStreakDay, t }: DailyRewardPreviewPr
   });
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.35 }}
@@ -72,13 +72,13 @@ export function DailyRewardPreview({ currentStreakDay, t }: DailyRewardPreviewPr
               key={entry.day}
               className="relative z-[1] flex flex-col items-center gap-1.5 flex-1"
             >
-              <motion.div
+              <m.div
                 className={`w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-black border-2 ${dotClass}`}
                 animate={entry.isToday ? { scale: [1, 1.08, 1] } : undefined}
                 transition={entry.isToday ? { repeat: Infinity, duration: 2.5 } : undefined}
               >
                 {entry.coins}
-              </motion.div>
+              </m.div>
               <span className={`text-[10px] font-bold whitespace-nowrap ${labelClass}`}>
                 {entry.isToday
                   ? t('daily.today')
@@ -97,6 +97,6 @@ export function DailyRewardPreview({ currentStreakDay, t }: DailyRewardPreviewPr
           })}
         </p>
       )}
-    </motion.div>
+    </m.div>
   );
 }

@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Bell, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { shouldShowPushPrompt, dismissPushPrompt } from '@/utils/pushNotifications';
@@ -65,7 +65,7 @@ export function PushNotificationPrompt() {
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 40 }}
@@ -117,7 +117,7 @@ export function PushNotificationPrompt() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

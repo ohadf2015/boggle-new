@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion before imports
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     button: ({ children, className, ...props }: React.HTMLAttributes<HTMLButtonElement>) => (
       <button className={className} {...props}>{children}</button>
     ),

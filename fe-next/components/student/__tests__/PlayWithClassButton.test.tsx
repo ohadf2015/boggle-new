@@ -40,7 +40,7 @@ vi.mock('framer-motion', () => {
     return React.createElement('button', { ...rest, ref }, children);
   });
   return {
-    motion: { div: MockDiv, button: MockButton },
+    m: { div: MockDiv, button: MockButton },
     AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
   };
 });

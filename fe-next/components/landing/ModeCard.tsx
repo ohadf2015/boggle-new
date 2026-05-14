@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowRight, ArrowLeft, Users, LayoutGrid, Lock, Trophy, Clock, Signal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Loader } from '@/components/ui/Loader';
@@ -234,7 +234,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
 
       {/* Highlighted badge for first-time players */}
       {highlighted && highlightLabel && (
-        <motion.div
+        <m.div
           className={cn(
             'absolute top-2 z-10',
             isRTL ? 'left-2' : 'right-2'
@@ -259,12 +259,12 @@ const ModeCard: React.FC<ModeCardProps> = ({
             </span>
             {highlightLabel}
           </span>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Mode character — large blended illustration anchored to bottom-end */}
       {modeImage && !secondary && (
-        <motion.div
+        <m.div
           className={cn(
             'absolute pointer-events-none',
             isRTL ? 'bottom-0 left-0' : 'bottom-0 right-0'
@@ -297,7 +297,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
             }}
             sizes="(max-width: 640px) 96px, 192px"
           />
-        </motion.div>
+        </m.div>
       )}
 
       {/* Header with icon/title and arrow */}
@@ -489,31 +489,31 @@ const ModeCard: React.FC<ModeCardProps> = ({
       {enableComplexAnimations && !prefersReducedMotion && (
         <>
           {/* Shine effect on hover */}
-          <motion.div
+          <m.div
             className="absolute inset-0 pointer-events-none overflow-hidden rounded-neo-lg"
             initial={false}
             animate={isHovered ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <motion.div
+            <m.div
               className="absolute inset-0 bg-linear-to-r from-transparent via-white/40 to-transparent"
               initial={{ x: '-100%' }}
               animate={isHovered ? { x: '200%' } : { x: '-100%' }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
             />
-          </motion.div>
+          </m.div>
 
           {/* Decorative corner accent */}
-          <motion.div
+          <m.div
             className="absolute top-0 inset-e-0 w-16 h-16 pointer-events-none overflow-hidden rounded-neo-lg"
             initial={false}
           >
-            <motion.div
+            <m.div
               className="absolute -top-8 -inset-e-8 w-16 h-16 bg-white/10 rotate-45"
               animate={isHovered ? { scale: 1.2, opacity: 0.15 } : { scale: 1, opacity: 0.08 }}
               transition={{ duration: 0.3 }}
             />
-          </motion.div>
+          </m.div>
         </>
       )}
 

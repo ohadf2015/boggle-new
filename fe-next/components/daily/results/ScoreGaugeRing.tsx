@@ -8,7 +8,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useCountUp } from '@/hooks/useCountUp';
 
 export interface ScoreGaugeRingProps {
@@ -111,7 +111,7 @@ export const ScoreGaugeRing: React.FC<ScoreGaugeRingProps> = ({
     >
       {/* Pulsing glow aura behind the ring (large rings only) */}
       {isLargeRing && percentage > 0 && (
-        <motion.div
+        <m.div
           className="absolute inset-0 rounded-full pointer-events-none"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: [0, 0.4, 0.2, 0.35], scale: [0.8, 1.05, 1.02, 1.04] }}
@@ -141,7 +141,7 @@ export const ScoreGaugeRing: React.FC<ScoreGaugeRingProps> = ({
 
         {/* Tick marks (large rings only) */}
         {ticks.map((tick, i) => (
-          <motion.line
+          <m.line
             key={`${tick.x1}-${tick.y1}-${tick.x2}-${tick.y2}`}
             x1={tick.x1}
             y1={tick.y1}
@@ -169,7 +169,7 @@ export const ScoreGaugeRing: React.FC<ScoreGaugeRingProps> = ({
 
         {/* Glowing under-layer (wider, blurred version of the fill) */}
         {isLargeRing && percentage > 0 && (
-          <motion.circle
+          <m.circle
             cx={size / 2}
             cy={size / 2}
             r={radius}
@@ -187,7 +187,7 @@ export const ScoreGaugeRing: React.FC<ScoreGaugeRingProps> = ({
         )}
 
         {/* Animated fill arc */}
-        <motion.circle
+        <m.circle
           data-testid="gauge-fill"
           cx={size / 2}
           cy={size / 2}
@@ -208,7 +208,7 @@ export const ScoreGaugeRing: React.FC<ScoreGaugeRingProps> = ({
 
         {/* Sparkle particles along the filled arc */}
         {sparkles.map((s, i) => (
-          <motion.circle
+          <m.circle
             key={`sparkle-${i}`}
             cx={s.cx}
             cy={s.cy}
@@ -233,7 +233,7 @@ export const ScoreGaugeRing: React.FC<ScoreGaugeRingProps> = ({
       {showScore && (
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           {icon && <div className="mb-0.5">{icon}</div>}
-          <motion.span
+          <m.span
             data-testid="gauge-score"
             className="font-black leading-none tracking-tight"
             style={{
@@ -246,7 +246,7 @@ export const ScoreGaugeRing: React.FC<ScoreGaugeRingProps> = ({
             transition={{ delay: delay + 0.3, type: 'spring', stiffness: 300, damping: 20 }}
           >
             {animatedScore}
-          </motion.span>
+          </m.span>
           {maxScore > 0 && (
             <span
               className="text-slate-500 font-bold"

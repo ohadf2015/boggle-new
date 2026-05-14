@@ -7,7 +7,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: { div: ({ children, ...p }: any) => <div {...p}>{children}</div> },
+  m: { div: ({ children, ...p }: any) => <div {...p}>{children}</div> },
   m: { div: ({ children, ...p }: any) => <div {...p}>{children}</div> },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Flame, Zap, Crown, Gem, Star } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
@@ -90,7 +90,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
   // Compact inline badge version - neo-brutalist style
   if (compact) {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
         className={cn(
@@ -104,12 +104,12 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
         <span className="font-black">{currentStreak}</span>
         <span className="opacity-80">{t('growth.dayStreak')}</span>
         {tier && <span>{tier.emoji}</span>}
-      </motion.div>
+      </m.div>
     );
   }
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, scale: 0.9, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ type: 'spring', damping: 15, stiffness: 200 }}
@@ -122,7 +122,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
       {/* Background pulse for milestones */}
       <AnimatePresence>
         {showMilestone && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.15 }}
             exit={{ opacity: 0 }}
@@ -135,7 +135,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
         {/* Streak info */}
         <div className="flex items-center gap-3">
           {/* Animated icon with neo-brutalist badge */}
-          <motion.div
+          <m.div
             animate={
               showMilestone
                 ? { rotate: [0, -10, 10, -10, 0], scale: [1, 1.2, 1] }
@@ -153,7 +153,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
             )}
           >
             <Icon className={cn('w-6 h-6', tier?.text || 'text-neo-black')} />
-          </motion.div>
+          </m.div>
 
           <div>
             <div className="flex items-center gap-2">
@@ -217,7 +217,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
             'h-3 rounded-neo-pill border-2 border-neo-black overflow-hidden',
             'bg-neo-navy-light'
           )}>
-            <motion.div
+            <m.div
               initial={{ width: 0 }}
               animate={{
                 // Add 1 to numerator so day 1 shows progress (not 0%)
@@ -234,7 +234,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
       {/* Milestone celebration overlay - neo-brutalist */}
       <AnimatePresence>
         {showMilestone && (tierChanged || isNewBest) && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
@@ -244,7 +244,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
             )}
           >
             <div className="text-center">
-              <motion.div
+              <m.div
                 animate={{ scale: [0.8, 1.2, 1], rotate: [0, -5, 5, 0] }}
                 transition={{ duration: 0.4 }}
                 className={cn(
@@ -253,17 +253,17 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
                 )}
               >
                 {isNewBest ? '🏆' : tier?.emoji}
-              </motion.div>
+              </m.div>
               <div className="text-neo-white font-black text-lg uppercase tracking-wide">
                 {isNewBest
                   ? t('growth.newPersonalBest')
                   : `${tier?.name} ${t('growth.streakUnlocked')}`}
               </div>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </m.div>
   );
 });
 

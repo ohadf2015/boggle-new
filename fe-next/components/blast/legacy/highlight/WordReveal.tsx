@@ -1,18 +1,18 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 
 export function WordReveal({ word, visible }: { word: string; visible: boolean }) {
   const letters = Array.from(word);
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
+        <m.div
           data-testid="word-reveal"
           dir="auto"
           className="absolute top-[20%] left-1/2 -translate-x-1/2 z-[70] pointer-events-none flex gap-1"
           style={{ fontFamily: 'Fredoka, sans-serif', fontWeight: 700, fontSize: '80px' }}
         >
           {letters.map((ch, i) => (
-            <motion.span
+            <m.span
               key={`${ch}-${i}`}
               data-testid="word-reveal-letter"
               initial={{ y: 30, opacity: 0 }}
@@ -25,9 +25,9 @@ export function WordReveal({ word, visible }: { word: string; visible: boolean }
               }}
             >
               {ch}
-            </motion.span>
+            </m.span>
           ))}
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

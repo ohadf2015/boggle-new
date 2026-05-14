@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, memo, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 /**
@@ -179,7 +179,7 @@ const PresenceIndicator = memo<PresenceIndicatorProps>(({
       {/* Custom Tooltip */}
       <AnimatePresence>
         {showTooltip && tooltipVisible && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 5, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 5, scale: 0.9 }}
@@ -191,14 +191,14 @@ const PresenceIndicator = memo<PresenceIndicatorProps>(({
               {/* Arrow */}
               <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-slate-800" />
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
       <AnimatePresence mode="wait">
         {effectiveStatus === 'afk' ? (
           // AFK - Show animated zzz with staggered letters
-          <motion.div
+          <m.div
             key="afk"
             initial={{ opacity: 0, scale: 0.5, y: 5 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -207,7 +207,7 @@ const PresenceIndicator = memo<PresenceIndicatorProps>(({
           >
             <div className="flex items-end gap-0.5">
               {['Z', 'z', 'z'].map((letter, i) => (
-                <motion.span
+                <m.span
                   key={`zzz-${i}-${letter}`}
                   className={`${sizeConfig.zzz} font-black text-slate-900 drop-shadow-xs`}
                   style={{
@@ -226,20 +226,20 @@ const PresenceIndicator = memo<PresenceIndicatorProps>(({
                   }}
                 >
                   {letter}
-                </motion.span>
+                </m.span>
               ))}
             </div>
-          </motion.div>
+          </m.div>
         ) : effectiveStatus === 'idle' ? (
           // Idle - Show yellow moon/eye icon
-          <motion.div
+          <m.div
             key="idle"
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
             className={`flex items-center justify-center ${sizeConfig.container}`}
           >
-            <motion.div
+            <m.div
               className={`${sizeConfig.dot} rounded-full ${effectiveConfig.color} ring-2 ${effectiveConfig.ringColor}`}
               animate={{
                 opacity: [0.7, 1, 0.7],
@@ -250,17 +250,17 @@ const PresenceIndicator = memo<PresenceIndicatorProps>(({
                 ease: 'easeInOut',
               }}
             />
-          </motion.div>
+          </m.div>
         ) : (
           // Active - Show pulsing green dot
-          <motion.div
+          <m.div
             key="active"
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
             className={`flex items-center justify-center ${sizeConfig.container}`}
           >
-            <motion.div
+            <m.div
               className={`${sizeConfig.dot} rounded-full ${effectiveConfig.color} ring-2 ${effectiveConfig.ringColor}`}
               animate={{
                 scale: [1, 1.2, 1],
@@ -273,7 +273,7 @@ const PresenceIndicator = memo<PresenceIndicatorProps>(({
                 ease: 'easeInOut',
               }}
             />
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

@@ -17,7 +17,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     button: ({ children, className, onClick, ...props }: React.HTMLAttributes<HTMLButtonElement> & { onClick?: () => void }) => (
       <button className={className} onClick={onClick} {...props}>{children}</button>
     ),

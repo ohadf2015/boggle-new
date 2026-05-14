@@ -21,9 +21,9 @@ vi.mock('next/dynamic', () => ({
   },
 }));
 
-// --- framer-motion: pass-through ---
+// --- framer-m: pass-through ---
 vi.mock('framer-motion', () => ({
-  motion: new Proxy(
+  m: new Proxy(
     {},
     {
       get: () => ({ children, ...props }: React.ComponentProps<'div'>) => (

@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowRight, ArrowLeft, PencilRuler, Play, Star, Users, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -79,7 +79,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
   return (
     <div className={cn('w-full max-w-4xl mx-auto xl:max-w-5xl', className)}>
       {/* Section header */}
-      <motion.div
+      <m.div
         className="flex items-center justify-between mb-4"
         initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -102,7 +102,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
           {t('landing.viewAllBoards')}
           <ArrowIcon className="w-3 h-3 group-hover:translate-x-0.5 group-hover:rtl:-translate-x-0.5 transition-transform" />
         </Link>
-      </motion.div>
+      </m.div>
 
       {/* Board cards */}
       <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 lg:gap-4 xl:gap-5">
@@ -112,7 +112,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
             : null;
 
           return (
-            <motion.div
+            <m.div
               key={board.board_code}
               custom={i}
               variants={cardVariants}
@@ -202,13 +202,13 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
                   {t('ugc.gallery.play')}
                 </Link>
               </div>
-            </motion.div>
+            </m.div>
           );
         })}
       </div>
 
       {/* Create your own CTA */}
-      <motion.div
+      <m.div
         className="mt-4"
         initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -237,7 +237,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
           </div>
           <ArrowIcon className="w-4 h-4 text-neo-pink/60 group-hover:text-neo-pink transition-colors shrink-0" />
         </Link>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

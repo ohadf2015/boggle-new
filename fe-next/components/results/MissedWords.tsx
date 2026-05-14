@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useCallback, memo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Grid3X3, ChevronDown, EyeOff } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -86,7 +86,7 @@ const MissedWords = memo<MissedWordsProps>(({
   const allTotalPoints = allHighValueWords.reduce((sum, w) => sum + w.score, 0);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
@@ -120,7 +120,7 @@ const MissedWords = memo<MissedWordsProps>(({
               const hasPath = !!wordData.path && wordData.path.length > 0;
 
               return (
-                <motion.button
+                <m.button
                   key={wordData.word}
                   layout
                   initial={{ opacity: 0, scale: 0.7, y: 8, rotate: index % 2 === 0 ? -6 : 6 }}
@@ -161,7 +161,7 @@ const MissedWords = memo<MissedWordsProps>(({
                       isSelected ? 'text-neo-lime' : 'text-neo-cream/50'
                     )} />
                   )}
-                </motion.button>
+                </m.button>
               );
             })}
           </AnimatePresence>
@@ -185,17 +185,17 @@ const MissedWords = memo<MissedWordsProps>(({
                   : (t('common.showMore') || `Show ${allHighValueWords.length - maxDisplay} More`)
                 }
               </span>
-              <motion.div
+              <m.div
                 animate={{ rotate: showAll ? 180 : 0 }}
                 transition={{ duration: 0.2 }}
               >
                 <ChevronDown className="w-4 h-4" />
-              </motion.div>
+              </m.div>
             </button>
           </div>
         )}
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -20,7 +20,7 @@ export default function NewBadge({ className }: NewBadgeProps) {
   const { t } = useLanguage();
 
   return (
-    <motion.div
+    <m.div
       className={cn(
         'inline-flex items-center gap-1 px-2 py-0.5 rounded-neo border-2 border-neo-black',
         'bg-neo-lime',
@@ -37,6 +37,6 @@ export default function NewBadge({ className }: NewBadgeProps) {
       <span className="text-[10px] font-black uppercase text-neo-black">
         {t('brain.newBadge')}
       </span>
-    </motion.div>
+    </m.div>
   );
 }

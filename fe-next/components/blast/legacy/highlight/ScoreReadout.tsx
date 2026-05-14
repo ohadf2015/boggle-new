@@ -1,10 +1,10 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 
 export function ScoreReadout({ score, visible }: { score: number; visible: boolean }) {
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
+        <m.div
           initial={{ scale: 0, opacity: 0, rotate: -8 }}
           animate={{ scale: 1, opacity: 1, rotate: -4 }}
           exit={{ scale: 1.4, opacity: 0 }}
@@ -20,7 +20,7 @@ export function ScoreReadout({ score, visible }: { score: number; visible: boole
           }}
         >
           +{score}
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Coins, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
@@ -95,7 +95,7 @@ export function CoinBalance({
       <div className="absolute inset-0 rounded-neo-lg opacity-30 pointer-events-none bg-linear-to-t from-transparent via-white/20 to-white/40" />
 
       {/* Coin icon — rotate only when showAnimation explicitly enabled */}
-      <motion.div
+      <m.div
         animate={showAnimation ? { rotate: [0, -5, 5, 0] } : undefined}
         transition={showAnimation ? {
           duration: 2,
@@ -113,7 +113,7 @@ export function CoinBalance({
           aria-hidden="true"
           strokeWidth={2.5}
         />
-      </motion.div>
+      </m.div>
 
       {/* Coin count with enhanced styling */}
       <span className={cn(
@@ -125,7 +125,7 @@ export function CoinBalance({
 
       {/* Optional sparkle indicator */}
       {showSparkle && (
-        <motion.div
+        <m.div
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.7, 1, 0.7]
@@ -144,7 +144,7 @@ export function CoinBalance({
               'text-amber-600'
             )}
           />
-        </motion.div>
+        </m.div>
       )}
 
       {/* Bottom edge highlight for depth */}
@@ -154,7 +154,7 @@ export function CoinBalance({
 
   if (showAnimation) {
     return (
-      <motion.div
+      <m.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         whileHover={{ scale: 1.05, y: -2 }}
@@ -163,7 +163,7 @@ export function CoinBalance({
         className="cursor-pointer"
       >
         {content}
-      </motion.div>
+      </m.div>
     );
   }
 

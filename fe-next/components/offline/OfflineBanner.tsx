@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { WifiOff, X } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useNetworkState } from '@/hooks/useNetworkState';
@@ -38,7 +38,7 @@ export function OfflineBanner() {
   return (
     <AnimatePresence>
       {shouldShow && (
-        <motion.div
+        <m.div
           role="status"
           aria-live="polite"
           initial={{ y: -32, opacity: 0 }}
@@ -60,7 +60,7 @@ export function OfflineBanner() {
           >
             <X className="size-4" aria-hidden />
           </button>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

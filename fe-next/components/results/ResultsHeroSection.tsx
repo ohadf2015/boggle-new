@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import Avatar from '../Avatar';
@@ -160,7 +160,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
       rank > 1 && winnerScore !== undefined ? winnerScore - score : 0;
 
     return (
-        <motion.section
+        <m.section
           initial={reducedMotion ? undefined : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
@@ -170,7 +170,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
           {/* Rank Display — dramatic slam entrance */}
           <div className="relative z-10 flex flex-col items-center mb-6 medium-short:mb-2 short:mb-1">
             {isEliminated ? (
-              <motion.span
+              <m.span
                 initial={reducedMotion ? undefined : { opacity: 0, scale: 2, rotate: -8 }}
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 180, damping: 12, delay: 0.1 }}
@@ -180,9 +180,9 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 )}
               >
                 {t('results.eliminated')}
-              </motion.span>
+              </m.span>
             ) : (
-              <motion.span
+              <m.span
                 initial={reducedMotion ? undefined : { opacity: 0, scale: 3, y: -40 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.15 }}
@@ -193,11 +193,11 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 )}
               >
                 {rank}
-              </motion.span>
+              </m.span>
             )}
 
             {!isEliminated && (
-              <motion.div
+              <m.div
                 initial={reducedMotion ? undefined : { opacity: 0, scale: 0, y: 10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 18, delay: 0.45 }}
@@ -209,12 +209,12 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 <p className="text-xs medium-short:text-[10px] font-black uppercase tracking-[0.2em]">
                   {getRankLabel(rank, t)}
                 </p>
-              </motion.div>
+              </m.div>
             )}
           </div>
 
           {/* Pulsing Avatar — drops in from above */}
-          <motion.div
+          <m.div
             className="relative mb-8 medium-short:mb-4 short:mb-2"
             initial={reducedMotion ? undefined : { opacity: 0, y: -30, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -244,7 +244,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 className="w-full h-full rounded-full"
               />
             </div>
-            <motion.div
+            <m.div
               initial={reducedMotion ? undefined : { opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.75 }}
@@ -262,11 +262,11 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
               >
                 {username}
               </p>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
 
           {/* Score & gap — score counter starts after avatar lands */}
-          <motion.div
+          <m.div
             className="space-y-4 medium-short:space-y-2"
             initial={reducedMotion ? undefined : { opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -278,14 +278,14 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 skipAnimation={reducedMotion}
                 className="font-neo-display text-4xl medium-short:text-3xl short:text-2xl xs:text-5xl sm:text-7xl font-black text-white tabular-nums tracking-tighter drop-shadow-lg"
               />
-              <motion.p
+              <m.p
                 initial={reducedMotion ? undefined : { opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.2 }}
                 className="text-[10px] font-bold text-white/40 uppercase tracking-widest"
               >
                 {t('results.totalPoints')}
-              </motion.p>
+              </m.p>
             </div>
 
             {/* Word Hunt target badges */}
@@ -322,8 +322,8 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 {t('results.soClose', { points: gap })}
               </p>
             )}
-          </motion.div>
-        </motion.section>
+          </m.div>
+        </m.section>
     );
   },
 );

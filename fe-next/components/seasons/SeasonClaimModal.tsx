@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useReducedMotion, useMotionValue, useSpring, animate, type Transition } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion, useMotionValue, useSpring, animate, type Transition } from 'framer-motion';
 import Image from 'next/image';
 import { Crown, Target, Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -50,7 +50,7 @@ const SplitChars: React.FC<{ text: string; className?: string; delay?: number }>
   return (
     <span className={className} aria-label={text}>
       {Array.from(text).map((ch, i) => (
-        <motion.span
+        <m.span
           key={`${ch}-${i}`}
           aria-hidden="true"
           className="inline-block"
@@ -64,7 +64,7 @@ const SplitChars: React.FC<{ text: string; className?: string; delay?: number }>
           }}
         >
           {ch === ' ' ? ' ' : ch}
-        </motion.span>
+        </m.span>
       ))}
     </span>
   );
@@ -84,7 +84,7 @@ const StatTile: React.FC<{
     : { type: 'spring', stiffness: 320, damping: 18, delay: 0.55 + index * 0.08 };
   const idleWobble: Transition = { duration: 5 + index, repeat: Infinity, ease: 'easeInOut' };
   return (
-    <motion.div
+    <m.div
       className="relative bg-neo-navy-light border-neo-thick border-black rounded-neo p-3 text-center shadow-hard-sm overflow-hidden"
       initial={reduce ? false : { opacity: 0, y: 24, scale: 0.7, rotate: -4 }}
       animate={
@@ -105,7 +105,7 @@ const StatTile: React.FC<{
       </div>
       <p className="text-[10px] text-neo-cream/70 uppercase tracking-widest font-bold">{label}</p>
       <p className="font-neo-display font-black text-xl text-neo-cream leading-none mt-1">{value}</p>
-    </motion.div>
+    </m.div>
   );
 };
 
@@ -198,7 +198,7 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 texture-halftone"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -211,7 +211,7 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
         {!reduceMotion && (
           <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
             {CONFETTI.map((c, i) => (
-              <motion.span
+              <m.span
                 key={i}
                 className="absolute block"
                 style={{
@@ -239,7 +239,7 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
             ))}
           </div>
         )}
-        <motion.div
+        <m.div
           ref={dialogRef}
           tabIndex={-1}
           className={`
@@ -261,7 +261,7 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
         >
           <div className="text-center flex flex-col items-center gap-2">
             <div className="relative">
-              <motion.div
+              <m.div
                 initial={reduceMotion ? false : { scale: 0, rotate: -20 }}
                 animate={{ scale: 1, rotate: 0 }}
                 whileHover={reduceMotion
@@ -279,14 +279,14 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
                   data-testid={placementBadge ? 'season-placement-badge' : 'season-medal'}
                   data-rank={placementBadge?.rank}
                 />
-              </motion.div>
+              </m.div>
               {!reduceMotion && (
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden>
                   {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => {
                     const angle = (i * Math.PI) / 4;
                     const radius = 100;
                     return (
-                      <motion.span
+                      <m.span
                         key={i}
                         className="absolute w-2 h-2 bg-neo-yellow border-2 border-black rounded-sm"
                         initial={{ x: 0, y: 0, opacity: 0, scale: 0 }}
@@ -304,7 +304,7 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
                 </div>
               )}
             </div>
-            <motion.h2
+            <m.h2
               id="season-claim-title"
               className="font-neo-display font-black text-2xl text-neo-lime tracking-tight"
               initial={reduceMotion ? false : { opacity: 0, y: 8 }}
@@ -312,7 +312,7 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
               transition={stagger(0.35)}
             >
               {seasonName}
-            </motion.h2>
+            </m.h2>
             <h3 className="font-neo-display font-black text-2xl text-neo-pink uppercase tracking-tight">
               <SplitChars
                 text={
@@ -362,7 +362,7 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
           </div>
 
           {rewards.badges.length > 0 && (
-            <motion.div
+            <m.div
               className="flex flex-wrap gap-2 justify-center"
               initial={reduceMotion ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -376,10 +376,10 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
                   {badge.name}
                 </span>
               ))}
-            </motion.div>
+            </m.div>
           )}
 
-          <motion.div
+          <m.div
             initial={reduceMotion ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={stagger(0.68)}
@@ -416,7 +416,7 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
               <div className="relative">
                 {/* Pulsing halo — draws the eye to the primary action without blocking pointer */}
                 {!reduceMotion && !isClaiming && (
-                  <motion.span
+                  <m.span
                     aria-hidden="true"
                     className="pointer-events-none absolute inset-0 rounded-neo bg-neo-lime"
                     initial={{ opacity: 0.5, scale: 1 }}
@@ -424,7 +424,7 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
                     transition={{ duration: 1.6, repeat: Infinity, ease: 'easeOut' }}
                   />
                 )}
-                <motion.button
+                <m.button
                   onClick={onClaim}
                   disabled={isClaiming}
                   whileHover={reduceMotion ? undefined : { scale: 1.02, y: -1 }}
@@ -439,13 +439,13 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
                   aria-label={t('season.claimRewards')}
                 >
                   {t('season.claimRewards')}
-                </motion.button>
+                </m.button>
               </div>
               </>
             )}
-          </motion.div>
-        </motion.div>
-      </motion.div>
+          </m.div>
+        </m.div>
+      </m.div>
     </AnimatePresence>
   );
 };

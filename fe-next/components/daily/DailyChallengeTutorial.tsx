@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, ArrowRight, Check, Heart, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -156,7 +156,7 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/80 text-white flex items-center justify-center z-[100] p-4">
-      <motion.div
+      <m.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
@@ -191,7 +191,7 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
 
         {/* Step content with swipe support */}
         <AnimatePresence mode="wait">
-          <motion.div
+          <m.div
             key={currentStep}
             initial={{ opacity: 0, x: dir === 'rtl' ? -20 : 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -199,14 +199,14 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
             transition={{ duration: 0.2 }}
           >
             {renderStep()}
-          </motion.div>
+          </m.div>
         </AnimatePresence>
 
         {/* Swipe hint indicator - only shown on mobile */}
         <div className="block sm:hidden text-center text-xs text-gray-400 dark:text-gray-500 mt-4">
           {t('tutorial.swipeHint')}
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 };

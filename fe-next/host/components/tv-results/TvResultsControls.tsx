@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Play, SkipForward, QrCode, Users } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { cn } from '../../../lib/utils';
@@ -67,7 +67,7 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
+        <m.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 50, opacity: 0 }}
@@ -78,7 +78,7 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
             {/* Skip Button (only during animation) */}
             <div className="flex-1">
               {isAnimating && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                 >
@@ -90,7 +90,7 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                     <SkipForward className="w-5 h-5 me-2" />
                     {t('tvResults.skip')}
                   </Button>
-                </motion.div>
+                </m.div>
               )}
             </div>
 
@@ -98,7 +98,7 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
             <div className="flex items-center gap-4">
               {/* Players Ready Indicator */}
               {totalPlayers > 0 && (
-                <motion.div
+                <m.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   className={cn(
@@ -114,19 +114,19 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                     {t('tvResults.playersReady')}
                   </span>
                   {allReady && (
-                    <motion.span
+                    <m.span
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       className="text-lg"
                     >
                       🎉
-                    </motion.span>
+                    </m.span>
                   )}
-                </motion.div>
+                </m.div>
               )}
 
               {/* Start New Game / Next Round Button */}
-              <motion.div
+              <m.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.1 }}
@@ -149,12 +149,12 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                     ? `${showNextRound ? t('tvResults.nextRound') : t('tvResults.startNewGame')} (${secondsLeft}s)`
                     : (showNextRound ? t('tvResults.nextRound') : t('tvResults.startNewGame'))}
                 </Button>
-              </motion.div>
+              </m.div>
             </div>
 
             {/* QR Code Button */}
             <div className="flex-1 flex justify-end">
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
               >
@@ -166,10 +166,10 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                   <QrCode className="w-5 h-5 me-2" />
                   {t('tvResults.qrCode')}
                 </Button>
-              </motion.div>
+              </m.div>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

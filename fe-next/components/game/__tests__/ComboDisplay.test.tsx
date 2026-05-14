@@ -10,7 +10,7 @@ import ComboDisplay from '../ComboDisplay';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, animate, initial, transition, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
     ),
@@ -218,7 +218,7 @@ describe('ComboDisplay', () => {
       );
       const timerArc = container.querySelector('svg[viewBox="0 0 36 36"]');
       expect(timerArc).toBeInTheDocument();
-      // Danger state should apply red stroke color to the motion.circle
+      // Danger state should apply red stroke color to the m.circle
       const timerCircle = container.querySelector('[data-testid="timer-arc"]');
       expect(timerCircle).toBeInTheDocument();
       expect(timerCircle).toHaveAttribute('stroke', '#FF4444');

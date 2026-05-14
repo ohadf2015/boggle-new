@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useRef, useEffect, useState, useCallback, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Crown, Zap, TrendingUp, Flame, Gem, Snowflake, Bomb, Keyboard, MousePointer, Hand } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
@@ -250,12 +250,12 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
       {/* Header with Race Track theme */}
       <div className="bg-neo-navy text-neo-cream px-2 py-1 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <motion.div
+          <m.div
             animate={{ rotate: [0, 15, -15, 0] }}
             transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
           >
             <Zap className="w-3.5 h-3.5 text-neo-lime" />
-          </motion.div>
+          </m.div>
           <span className="text-[10px] font-black uppercase text-neo-cream tracking-wider">
             {t('leaderboard.liveRace')}
           </span>
@@ -269,14 +269,14 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
 
       {/* First-time hint - shows briefly */}
       {totalPlayers > 1 && (
-        <motion.div
+        <m.div
           initial={{ opacity: 1, height: 'auto' }}
           animate={{ opacity: 0, height: 0 }}
           transition={{ delay: 5, duration: 0.5 }}
           className="px-2 py-1 bg-neo-cyan/20 text-[9px] text-neo-black font-medium text-center overflow-hidden"
         >
           {t('leaderboard.hint')}
-        </motion.div>
+        </m.div>
       )}
 
       {/* Race Track Visualization */}
@@ -349,7 +349,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                     {/* Rank change indicator */}
                     <AnimatePresence>
                       {rankChange && (
-                        <motion.span
+                        <m.span
                           initial={{ opacity: 0, y: rankChange === 'up' ? 5 : -5 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0 }}
@@ -360,7 +360,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                           )}
                         >
                           {rankChange === 'up' ? '▲' : '▼'}
-                        </motion.span>
+                        </m.span>
                       )}
                     </AnimatePresence>
                   </div>
@@ -368,7 +368,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                   {/* Score change floating indicator */}
                   <AnimatePresence>
                     {scoreChange && (
-                      <motion.div
+                      <m.div
                         initial={{ opacity: 0, y: 0, x: 5 }}
                         animate={{ opacity: 1, y: -15, x: 5 }}
                         exit={{ opacity: 0, y: -25 }}
@@ -376,7 +376,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                         className="absolute -top-1 left-full text-[10px] font-black text-neo-lime whitespace-nowrap"
                       >
                         +{scoreChange.delta}
-                      </motion.div>
+                      </m.div>
                     )}
                   </AnimatePresence>
                 </div>
@@ -386,7 +386,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                   {/* Combo event badge */}
                   <AnimatePresence>
                     {comboEvent && comboEvent.username === player.username && comboEvent.username !== currentUsername && (
-                      <motion.div
+                      <m.div
                         key={`combo-${player.username}`}
                         data-testid={`combo-badge-${player.username}`}
                         initial={{ scale: 0, opacity: 0 }}
@@ -395,19 +395,19 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                         transition={{ duration: 0.5 }}
                       >
                         {getComboIcon(comboEvent.comboType)}
-                      </motion.div>
+                      </m.div>
                     )}
                   </AnimatePresence>
                   <AnimatePresence>
                     {isOnStreak(player.username) && (
-                      <motion.div
+                      <m.div
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: [1, 1.2, 1], opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
                         transition={{ scale: { type: 'tween', duration: 0.6, repeat: Infinity } }}
                       >
                         <Flame className="w-3 h-3 text-neo-orange" />
-                      </motion.div>
+                      </m.div>
                     )}
                   </AnimatePresence>
                   {player.inputMethod && (
@@ -446,7 +446,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
 
       {/* Your Status Bar - Motivational section */}
       <div className="px-2 pb-1.5">
-        <motion.div
+        <m.div
           className={cn(
             'relative flex items-center justify-between px-2 py-1.5 rounded-neo border-2',
             isLeading
@@ -494,7 +494,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
           </div>
 
           {/* Right side - your score */}
-          <motion.div
+          <m.div
             key={currentUser.score}
             initial={{ scale: 1.4 }}
             animate={{ scale: 1 }}
@@ -507,14 +507,14 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
             <span className="text-lg font-black text-neo-black tabular-nums">
               {currentUser.score}
             </span>
-          </motion.div>
+          </m.div>
 
           {/* Progress bar to next target */}
           {!isLeading && nextTarget && (
-            <motion.div
+            <m.div
               className="absolute -bottom-0.5 left-2 right-2 h-1 bg-neo-black/10 rounded-full overflow-hidden"
             >
-              <motion.div
+              <m.div
                 className={cn(
                   'h-full rounded-full',
                   isCloseToOvertaking
@@ -527,9 +527,9 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
               />
-            </motion.div>
+            </m.div>
           )}
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

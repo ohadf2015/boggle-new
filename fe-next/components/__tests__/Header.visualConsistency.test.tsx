@@ -6,7 +6,7 @@ import { useUnclaimedGifts } from '@/hooks/useUnclaimedGifts';
 
 // Mock framer-motion to avoid animation issues
 vi.mock('framer-motion', () => ({
-    motion: {
+    m: {
         button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
         div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     },

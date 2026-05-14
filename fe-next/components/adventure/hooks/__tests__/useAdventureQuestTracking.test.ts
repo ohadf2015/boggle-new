@@ -11,7 +11,6 @@ import { renderHook } from '@testing-library/react';
 import { useAdventureQuestTracking } from '../useAdventureQuestTracking';
 
 describe('useAdventureQuestTracking', () => {
-  const mockRecordQuestProgress = vi.fn();
   const mockChapterQuests = {
     recordWordsFound: vi.fn(),
     recordLongWord: vi.fn(),
@@ -31,62 +30,12 @@ describe('useAdventureQuestTracking', () => {
     playerMaxHP: 100,
     gridEffectTrigger: null,
     isChallengeComplete: false,
-    recordQuestProgress: mockRecordQuestProgress,
     chapterQuests: mockChapterQuests,
     updateObjective: mockUpdateObjective,
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  describe('comboStreak quest (M3 fix)', () => {
-    it('fires comboStreak when crossing from <5 to >=5', () => {
-      const { rerender } = renderHook(
-        (props) => useAdventureQuestTracking(props),
-        { initialProps: { ...defaultProps, comboCount: 4 } }
-      );
-
-      expect(mockRecordQuestProgress).not.toHaveBeenCalledWith('comboStreak');
-
-      rerender({ ...defaultProps, comboCount: 5 });
-      expect(mockRecordQuestProgress).toHaveBeenCalledWith('comboStreak');
-    });
-
-    it('does NOT fire comboStreak on subsequent increments (5→6→7)', () => {
-      const { rerender } = renderHook(
-        (props) => useAdventureQuestTracking(props),
-        { initialProps: { ...defaultProps, comboCount: 5 } }
-      );
-
-      mockRecordQuestProgress.mockClear();
-
-      rerender({ ...defaultProps, comboCount: 6 });
-      rerender({ ...defaultProps, comboCount: 7 });
-      rerender({ ...defaultProps, comboCount: 8 });
-
-      expect(mockRecordQuestProgress).not.toHaveBeenCalledWith('comboStreak');
-    });
-
-    it('fires again after combo resets and crosses 5 again', () => {
-      const { rerender } = renderHook(
-        (props) => useAdventureQuestTracking(props),
-        { initialProps: { ...defaultProps, comboCount: 5 } }
-      );
-
-      // First crossing
-      expect(mockRecordQuestProgress).toHaveBeenCalledWith('comboStreak');
-      mockRecordQuestProgress.mockClear();
-
-      // Reset combo
-      rerender({ ...defaultProps, comboCount: 0 });
-      // Build up again
-      rerender({ ...defaultProps, comboCount: 3 });
-      expect(mockRecordQuestProgress).not.toHaveBeenCalledWith('comboStreak');
-
-      rerender({ ...defaultProps, comboCount: 5 });
-      expect(mockRecordQuestProgress).toHaveBeenCalledWith('comboStreak');
-    });
   });
 
   describe('streakMaster chapter quest (M4 fix)', () => {

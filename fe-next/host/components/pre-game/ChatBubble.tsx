@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X } from 'lucide-react';
 import RoomChat from '../../../components/RoomChat';
 import { cn } from '../../../lib/utils';
@@ -36,7 +36,7 @@ export function ChatBubble({ gameCode, username, isHost, t }: ChatBubbleProps): 
     <>
       {/* Floating bubble button */}
       {!isOpen && (
-        <motion.button
+        <m.button
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           exit={{ scale: 0 }}
@@ -47,21 +47,21 @@ export function ChatBubble({ gameCode, username, isHost, t }: ChatBubbleProps): 
         >
           <MessageSquare className="w-6 h-6 text-neo-black" />
           {unreadCount > 0 && (
-            <motion.span
+            <m.span
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               className="absolute -top-1.5 -end-1.5 min-w-[22px] h-[22px] flex items-center justify-center rounded-full bg-neo-red border-2 border-neo-black text-[11px] font-black text-neo-white px-1 shadow-hard-sm"
             >
               {unreadCount > 99 ? '99+' : unreadCount}
-            </motion.span>
+            </m.span>
           )}
-        </motion.button>
+        </m.button>
       )}
 
       {/* Chat panel */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -98,7 +98,7 @@ export function ChatBubble({ gameCode, username, isHost, t }: ChatBubbleProps): 
                 onNewMessage={handleNewMessage}
               />
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </>

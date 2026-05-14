@@ -1,5 +1,5 @@
 'use client';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { CellId, TileFlag } from '@/lib/blast/v2/types';
 import styles from './BlastTile.module.css';
 
@@ -37,7 +37,7 @@ export function BlastTile({
   const hasGem = flags.includes('gem');
   const doubleBonus = flags.includes('double_bonus');
   return (
-    <motion.div
+    <m.div
       layout
       data-cell-id={id}
       data-state={state}
@@ -66,6 +66,6 @@ export function BlastTile({
       <span className={styles.letter}>{displayChar ?? letter}</span>
       {hasCoin && <span data-flag="coin" className={styles.coin} />}
       {hasGem && <span data-flag="gem" className={styles.gem} />}
-    </motion.div>
+    </m.div>
   );
 }

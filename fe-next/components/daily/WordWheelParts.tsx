@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -34,7 +34,7 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
   const offsetY = isCenter ? 0 : -Math.cos(rad) * radius;
 
   return (
-    <motion.button
+    <m.button
       ref={btnRef}
       type="button"
       className={cn(
@@ -81,7 +81,7 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
       data-wheel-used={isUsed ? 'true' : 'false'}
     >
       {letter}
-    </motion.button>
+    </m.button>
   );
 };
 
@@ -99,7 +99,7 @@ export interface WordTileProps {
 export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isCenter }) => {
   const { t } = useLanguage();
   return (
-  <motion.button
+  <m.button
     type="button"
     className={cn(
       'group relative w-8 h-10 sm:w-10 sm:h-12 md:w-12 md:h-14 rounded-neo border-3 border-neo-black flex items-center justify-center touch-manipulation',
@@ -128,6 +128,6 @@ export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isC
     >
       ×
     </span>
-  </motion.button>
+  </m.button>
   );
 };

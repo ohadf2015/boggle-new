@@ -61,10 +61,6 @@ export interface PlayerProgression {
   /** Unique words found across adventure mode (uppercase) */
   wordAlbum?: string[];
   wordAlbumClaimedMilestones?: number[];
-  /** questId → count (resets daily) */
-  dailyQuestProgress?: Record<string, number>;
-  /** YYYY-MM-DD for reset detection */
-  dailyQuestDate?: string;
   archetypeMastery?: Partial<Record<MasterableArchetype, ArchetypeMasteryState>>;
   completions: LevelCompletion[];
   createdAt: string;

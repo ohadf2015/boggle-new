@@ -7,7 +7,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Bell, BellOff, Calendar, Flame, Users, BarChart3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
@@ -94,7 +94,7 @@ export function NotificationCategoryPreferences() {
   const masterOff = !prefs.pushEnabled;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="rounded-neo border-neo border-slate-700 bg-slate-800/50 p-5"
@@ -149,7 +149,7 @@ export function NotificationCategoryPreferences() {
           disabled={masterOff}
         />
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

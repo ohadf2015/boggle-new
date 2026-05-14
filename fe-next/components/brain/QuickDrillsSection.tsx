@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Zap, Brain, Target, Shuffle, BookOpen, Lock, Info, type LucideIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -115,7 +115,7 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = EMP
               : 100;
 
             const drillButton = (
-              <motion.button
+              <m.button
                 key={drill.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -169,7 +169,7 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = EMP
                       'h-1.5 md:h-2 rounded-full border border-neo-black overflow-hidden',
                       isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
                     )}>
-                      <motion.div
+                      <m.div
                         className={cn('h-full', drill.bgColor)}
                         initial={{ width: 0 }}
                         animate={{ width: `${progressPercent}%` }}
@@ -184,7 +184,7 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = EMP
                     </p>
                   </div>
                 )}
-              </motion.button>
+              </m.button>
             );
 
             // Wrap locked drills in enhanced tooltip

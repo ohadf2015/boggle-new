@@ -8,7 +8,7 @@ import type { BlastResultsData } from '@/components/blast/legacy/types';
 
 // Mock framer-motion to render children directly
 jest.mock('framer-motion', () => ({
-  motion: new Proxy(
+  m: new Proxy(
     {},
     {
       get: () => ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (

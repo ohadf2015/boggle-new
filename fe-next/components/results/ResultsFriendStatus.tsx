@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { UserPlus, Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -153,7 +153,7 @@ export function AddFriendBadge({
 
   if (variant === 'inline') {
     return (
-      <motion.button
+      <m.button
         type="button"
         onClick={handleClick}
         disabled={busy}
@@ -169,12 +169,12 @@ export function AddFriendBadge({
       >
         {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <UserPlus className="w-3 h-3" />}
         {ariaLabel}
-      </motion.button>
+      </m.button>
     );
   }
 
   return (
-    <motion.button
+    <m.button
       type="button"
       onClick={handleClick}
       disabled={busy}
@@ -190,7 +190,7 @@ export function AddFriendBadge({
       title={ariaLabel}
     >
       {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserPlus className="w-3.5 h-3.5" />}
-    </motion.button>
+    </m.button>
   );
 }
 

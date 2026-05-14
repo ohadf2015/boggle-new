@@ -1,5 +1,5 @@
 'use client';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ChestContents } from '@/lib/blast/v2/chest-roll';
 
@@ -19,7 +19,7 @@ export function BlastChestOpenModal({ contents, isOpen, onClose }: Props) {
       data-testid="chest-modal"
       className="fixed inset-0 bg-[#0b1530]/95 grid place-items-center"
     >
-      <motion.div
+      <m.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         className={`space-y-6 text-center text-white p-8 rounded-lg border-4 border-white chest-tier-${contents.tier}`}
@@ -28,17 +28,17 @@ export function BlastChestOpenModal({ contents, isOpen, onClose }: Props) {
           {t('blast.chest.opened', 'Chest Opened!', { tier: contents.tier })}
         </h2>
 
-        <motion.div
+        <m.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
           <div className="text-6xl font-bold text-[#BFFF00]">{contents.coins}</div>
           <div className="text-lg">{t('blast.chest.coins', 'Coins')}</div>
-        </motion.div>
+        </m.div>
 
         {contents.boosts.length > 0 && (
-          <motion.div
+          <m.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.6 }}
@@ -50,17 +50,17 @@ export function BlastChestOpenModal({ contents, isOpen, onClose }: Props) {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {contents.avatarPart && (
-          <motion.div
+          <m.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.9 }}
           >
             <div className="text-lg">+1 {contents.avatarPart}</div>
-          </motion.div>
+          </m.div>
         )}
 
         <button
@@ -70,7 +70,7 @@ export function BlastChestOpenModal({ contents, isOpen, onClose }: Props) {
         >
           {t('blast.chest.continue', 'Continue')}
         </button>
-      </motion.div>
+      </m.div>
 
       <style>{`
         .chest-tier-wood { background: #8b6f47; }

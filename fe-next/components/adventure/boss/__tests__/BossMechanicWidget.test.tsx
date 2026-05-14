@@ -10,7 +10,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: React.forwardRef(function MockMotionDiv({ children, ...rest }: any, ref: any) {
       return <div ref={ref} {...rest}>{children}</div>;
     }),

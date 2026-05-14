@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import useReducedMotion from '@/hooks/useReducedMotion';
 
 // ============================================================
@@ -137,7 +137,7 @@ const idleBreathing = {
 const CelebratingArms: React.FC = () => (
   <>
     {/* Left arm — frenetic wave */}
-    <motion.path
+    <m.path
       d="M18,50 Q8,36 14,24"
       stroke="#1a1a2e"
       strokeWidth={4}
@@ -148,7 +148,7 @@ const CelebratingArms: React.FC = () => (
       style={{ transformOrigin: '18px 50px' }}
     />
     {/* Right arm — frenetic wave (offset) */}
-    <motion.path
+    <m.path
       d="M62,50 Q72,36 66,24"
       stroke="#1a1a2e"
       strokeWidth={4}
@@ -165,7 +165,7 @@ const CelebratingArms: React.FC = () => (
       { x: 2, y: 32, delay: 1.6, char: '✧' },
       { x: 72, y: 30, delay: 1.8, char: '✧' },
     ].map((s) => (
-      <motion.text
+      <m.text
         key={`${s.char}-${s.x}-${s.y}`}
         x={s.x} y={s.y} fontSize="7" fill="#FFE135"
         animate={{
@@ -182,7 +182,7 @@ const CelebratingArms: React.FC = () => (
         }}
       >
         {s.char}
-      </motion.text>
+      </m.text>
     ))}
   </>
 );
@@ -198,7 +198,7 @@ const RelaxedArms: React.FC = () => (
       fill="none"
     />
     {/* Right arm — thumbs up */}
-    <motion.g
+    <m.g
       animate={{ rotate: [0, 5, 0] }}
       transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
       style={{ transformOrigin: '62px 52px' }}
@@ -212,7 +212,7 @@ const RelaxedArms: React.FC = () => (
       />
       {/* Thumb */}
       <circle cx="66" cy="38" r="3" fill="#FFE135" stroke="#1a1a2e" strokeWidth={2} />
-    </motion.g>
+    </m.g>
   </>
 );
 
@@ -250,14 +250,14 @@ const PlacementMascot = memo<PlacementMascotProps>(({ rank, size = 80, className
   const isWinner = rank === 1;
 
   return (
-    <motion.div
+    <m.div
       data-testid="placement-mascot"
       className={className}
       variants={mascotEntrance}
       initial={reducedMotion ? 'visible' : 'hidden'}
       animate="visible"
     >
-      <motion.svg
+      <m.svg
         viewBox="0 0 80 90"
         width={size}
         height={size * 1.125}
@@ -273,7 +273,7 @@ const PlacementMascot = memo<PlacementMascotProps>(({ rank, size = 80, className
       >
         {/* Crown for winner */}
         {isWinner && (
-          <motion.g
+          <m.g
             data-testid="mascot-crown"
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -290,7 +290,7 @@ const PlacementMascot = memo<PlacementMascotProps>(({ rank, size = 80, className
             <circle cx="35" cy="15" r="1.5" fill="#FF1493" />
             <circle cx="40" cy="10" r="1.5" fill="#00FFFF" />
             <circle cx="45" cy="15" r="1.5" fill="#FF1493" />
-          </motion.g>
+          </m.g>
         )}
 
         {/* Body — chunky rounded square with thick border */}
@@ -320,24 +320,24 @@ const PlacementMascot = memo<PlacementMascotProps>(({ rank, size = 80, className
 
           {/* Eye sparkle for winner */}
           {expression === 'winner' && !reducedMotion && (
-            <motion.text
+            <m.text
               x="36" y="39" fontSize="6" fill="#FFE135"
               animate={{ opacity: [0, 1, 0], scale: [0.5, 1.4, 0.5], rotate: [0, 180, 360] }}
               transition={{ duration: 1.8, delay: 1.5, repeat: Infinity, repeatDelay: 3 }}
             >
               ✦
-            </motion.text>
+            </m.text>
           )}
 
           {/* Blush cheeks for winner/bronze */}
           {(expression === 'winner' || expression === 'bronze') && (
             <>
-              <motion.circle
+              <m.circle
                 cx="24" cy="47" r="4" fill="#FF6B6B"
                 animate={!reducedMotion ? { opacity: [0.25, 0.45, 0.25] } : undefined}
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               />
-              <motion.circle
+              <m.circle
                 cx="56" cy="47" r="4" fill="#FF6B6B"
                 animate={!reducedMotion ? { opacity: [0.25, 0.45, 0.25] } : undefined}
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
@@ -361,8 +361,8 @@ const PlacementMascot = memo<PlacementMascotProps>(({ rank, size = 80, className
         {/* Feet — two little ovals */}
         <ellipse cx="33" cy="67" rx="6" ry="3" fill="#1a1a2e" />
         <ellipse cx="47" cy="67" rx="6" ry="3" fill="#1a1a2e" />
-      </motion.svg>
-    </motion.div>
+      </m.svg>
+    </m.div>
   );
 });
 

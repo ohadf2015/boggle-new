@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Users, Gamepad2, Trophy, X } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -34,7 +34,7 @@ const MultiplayerWelcomeCard: React.FC<MultiplayerWelcomeCardProps> = ({ onDismi
   ];
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: -12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -12, transition: { duration: 0.15 } }}
@@ -87,7 +87,7 @@ const MultiplayerWelcomeCard: React.FC<MultiplayerWelcomeCardProps> = ({ onDismi
       <p className="text-slate-500 text-xs mt-3 italic">
         {t('multiplayerWelcome.tip')}
       </p>
-    </motion.div>
+    </m.div>
   );
 };
 

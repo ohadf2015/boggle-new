@@ -7,7 +7,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Trophy } from 'lucide-react';
 import type { WordHuntStats } from './types';
 
@@ -26,7 +26,7 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ stats, t }) => {
     : 1;
 
   return (
-    <motion.div
+    <m.div
       initial={{ scale: 0, rotate: -20, y: 30 }}
       animate={{ scale: [0, 1.15, 1], rotate: [-20, 3, 0], y: [30, -5, 0] }}
       transition={{
@@ -37,13 +37,13 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ stats, t }) => {
       }}
       className="flex flex-col items-center gap-2"
     >
-      <motion.div
+      <m.div
         animate={{ rotate: [0, -4, 4, -3, 3, 0] }}
         transition={{ delay: 1.3, duration: 0.6, ease: 'easeInOut' }}
         className="relative inline-flex items-center gap-3 px-5 py-3 bg-amber-400 rounded-neo border-3 border-neo-black shadow-hard overflow-hidden"
       >
         {/* Golden shimmer sweep */}
-        <motion.div
+        <m.div
           className="absolute inset-0 pointer-events-none"
           style={{
             background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.5) 50%, transparent 60%)',
@@ -52,12 +52,12 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ stats, t }) => {
           animate={{ x: '200%' }}
           transition={{ delay: 1.5, duration: 0.8, ease: 'easeInOut' }}
         />
-        <motion.div
+        <m.div
           animate={{ rotate: [0, 15, -15, 0] }}
           transition={{ delay: 1.4, duration: 0.5 }}
         >
           <Trophy className="w-5 h-5 text-neo-black" />
-        </motion.div>
+        </m.div>
         <div className="flex items-baseline gap-1.5">
           <span className="font-black text-neo-black text-xl leading-none">
             #{stats.yourStats.rank}
@@ -66,11 +66,11 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ stats, t }) => {
             {t('wordHunt.results.outOf').replace('{total}', String(stats.totalPlayers))}
           </span>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Percentile pill with glow — extra excitement for top 5% */}
       {percentile > 0 && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.5, y: 8 }}
           animate={
             percentile <= 5
@@ -90,9 +90,9 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ stats, t }) => {
           }}
         >
           {t('wordHunt.results.topPercentile').replace('{percentile}', String(percentile))}
-        </motion.div>
+        </m.div>
       )}
-    </motion.div>
+    </m.div>
   );
 };
 

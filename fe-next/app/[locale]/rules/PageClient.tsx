@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Script from 'next/script';
 import dynamic from 'next/dynamic';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Gamepad2, Trophy, Lightbulb, Users, ArrowLeft, Play, Bot, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -106,7 +106,7 @@ export default function RulesPageClient(): React.JSX.Element {
 
             <div className="max-w-4xl mx-auto px-2 sm:px-6 py-3 sm:py-10 page-content-safe flex-1">
                 {/* Page Header - Compact */}
-                <motion.div
+                <m.div
                     className="text-center mb-3 sm:mb-6"
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -118,10 +118,10 @@ export default function RulesPageClient(): React.JSX.Element {
                     <p className="text-sm sm:text-lg text-slate-600 dark:text-slate-300">
                         {t('howToPlay.description')}
                     </p>
-                </motion.div>
+                </m.div>
 
                 {/* HERO: Interactive Demo - First Thing Users See */}
-                <motion.section
+                <m.section
                     id="interactive-tutorial"
                     className="mb-4 sm:mb-8"
                     {...fadeInUp}
@@ -140,10 +140,10 @@ export default function RulesPageClient(): React.JSX.Element {
                             </div>
                         </CardContent>
                     </Card>
-                </motion.section>
+                </m.section>
 
                 {/* Game Modes - Merged Section */}
-                <motion.section
+                <m.section
                     className="mb-4 sm:mb-8"
                     {...fadeInUp}
                     transition={{ delay: 0.3 }}
@@ -227,12 +227,12 @@ export default function RulesPageClient(): React.JSX.Element {
                             </div>
                         </CardContent>
                     </Card>
-                </motion.section>
+                </m.section>
 
                 <InlineBannerAd webZone="content-page" className="my-4 sm:my-6" />
 
                 {/* Compact Scoring System - 3 Rows */}
-                <motion.section
+                <m.section
                     className="mb-4 sm:mb-8"
                     {...fadeInUp}
                     transition={{ delay: 0.4 }}
@@ -278,10 +278,10 @@ export default function RulesPageClient(): React.JSX.Element {
                             </p>
                         </CardContent>
                     </Card>
-                </motion.section>
+                </m.section>
 
                 {/* Quick Tips - 3 Inline Tips */}
-                <motion.section
+                <m.section
                     className="mb-4 sm:mb-8"
                     {...fadeInUp}
                     transition={{ delay: 0.5 }}
@@ -316,12 +316,12 @@ export default function RulesPageClient(): React.JSX.Element {
                             </div>
                         </CardContent>
                     </Card>
-                </motion.section>
+                </m.section>
 
                 <InlineBannerAd webZone="content-page" className="my-4 sm:my-6" />
 
                 {/* Call to Action */}
-                <motion.div
+                <m.div
                     className="text-center py-3 sm:py-6"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -356,11 +356,11 @@ export default function RulesPageClient(): React.JSX.Element {
                             </Link>
                         </Button>
                     </div>
-                </motion.div>
+                </m.div>
 
                 {/* Back to Home Button */}
                 <div className="text-center pb-3 sm:pb-6">
-                    <motion.div
+                    <m.div
                         whileHover={{ x: dir === 'rtl' ? 4 : -4 }}
                         whileTap={{ scale: 0.95 }}
                         className="inline-flex"
@@ -382,7 +382,7 @@ export default function RulesPageClient(): React.JSX.Element {
                             <ArrowLeft className={`w-4 h-4 sm:w-5 sm:h-5 ${dir === 'rtl' ? 'rotate-180' : ''}`} />
                             {t('common.backToMenu')}
                         </Link>
-                    </motion.div>
+                    </m.div>
                 </div>
             </div>
             </div>

@@ -9,7 +9,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 
 // Mock framer-motion before imports
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, custom, variants, initial, animate, exit, transition, layoutId, ...props }: any) => (
       <div className={className} {...props}>{children}</div>
     ),

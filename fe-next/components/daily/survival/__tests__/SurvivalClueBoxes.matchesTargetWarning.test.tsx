@@ -13,7 +13,7 @@ import { SurvivalClueBoxes } from '../SurvivalClueBoxes';
 import type { AccumulatedClue } from '../types';
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, transition, whileHover, whileTap, ...domProps } = props;
       return <div {...domProps}>{children}</div>;

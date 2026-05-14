@@ -7,7 +7,7 @@ import { DesktopStatsPanel } from '../DesktopStatsPanel';
 
 // Mock the framer-motion module
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<object>) => <div {...props}>{children}</div>,
   },
 }));

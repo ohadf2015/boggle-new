@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, Target, Sparkles, Zap, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -62,7 +62,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
   return (
     <AnimatePresence>
       {isVisible && (
-        <motion.div
+        <m.div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -70,7 +70,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
           transition={{ duration: 0.3 }}
         >
           {/* Backdrop */}
-          <motion.div
+          <m.div
             className="absolute inset-0 bg-black/70 backdrop-blur-xs"
             onClick={showCloseButton ? handleClose : undefined}
             initial={{ opacity: 0 }}
@@ -79,7 +79,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
           />
 
           {/* Popup Card */}
-          <motion.div
+          <m.div
             className={cn(
               'relative w-full max-w-sm overflow-hidden rounded-neo border-3 border-neo-black',
               'bg-neo-navy shadow-[8px_8px_0px_rgb(var(--neo-black))]',
@@ -93,7 +93,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
             {/* Close Button — delayed appearance */}
             <AnimatePresence>
               {showCloseButton && (
-                <motion.button
+                <m.button
                   onClick={handleClose}
                   className="absolute top-2 inset-e-2 z-30 flex items-center justify-center w-8 h-8 rounded-full bg-neo-black/60 text-neo-white/80 hover:text-neo-white hover:bg-neo-black/80 transition-colors"
                   initial={{ opacity: 0, scale: 0 }}
@@ -103,7 +103,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
                   aria-label={t('common.close') || 'Close'}
                 >
                   <X className="w-4 h-4" />
-                </motion.button>
+                </m.button>
               )}
             </AnimatePresence>
 
@@ -122,20 +122,20 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
               {/* Floating sparkles on image */}
               {canAnimate && (
                 <>
-                  <motion.div
+                  <m.div
                     className="absolute top-3 inset-s-4 z-10"
                     animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
                     transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                   >
                     <Sparkles className="w-5 h-5 text-neo-lime drop-shadow-lg" />
-                  </motion.div>
-                  <motion.div
+                  </m.div>
+                  <m.div
                     className="absolute bottom-6 inset-e-4 z-10"
                     animate={{ rotate: [0, -20, 20, 0], scale: [0.8, 1.2, 0.8], opacity: [0.5, 1, 0.5] }}
                     transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
                   >
                     <Zap className="w-4 h-4 text-neo-lime fill-neo-lime drop-shadow-lg" />
-                  </motion.div>
+                  </m.div>
                 </>
               )}
             </div>
@@ -143,13 +143,13 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
             {/* Content */}
             <div className="px-5 pb-5 pt-1 text-center">
               {/* Badge */}
-              <motion.span
+              <m.span
                 className="inline-flex items-center px-2.5 py-0.5 rounded-neo-sm bg-neo-lime text-neo-black text-[10px] font-black uppercase tracking-widest border border-neo-black mb-2"
                 animate={canAnimate ? { scale: [1, 1.08, 1] } : undefined}
                 transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 2 }}
               >
                 {t('wordHuntAnnouncement.badge')}
-              </motion.span>
+              </m.span>
 
               <h2 className="font-neo-display font-black text-2xl text-neo-white leading-tight mb-1.5">
                 {t('wordHuntPromo.title')}
@@ -160,7 +160,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
               </p>
 
               {/* CTA Button */}
-              <motion.button
+              <m.button
                 onClick={handlePlay}
                 className={cn(
                   'w-full flex items-center justify-center gap-2 py-3 px-6 rounded-neo border-3 border-neo-black',
@@ -179,12 +179,12 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
                 <Target className="w-5 h-5" />
                 {t('wordHuntPromo.cta')}
                 <ChevronRight className={cn('w-4 h-4', isRTL && 'rotate-180')} />
-              </motion.button>
+              </m.button>
 
               {/* Dismiss text — appears with close button */}
               <AnimatePresence>
                 {showCloseButton && (
-                  <motion.button
+                  <m.button
                     onClick={handleClose}
                     className="mt-3 text-xs text-neo-white/30 hover:text-neo-white/50 transition-colors"
                     initial={{ opacity: 0 }}
@@ -192,7 +192,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
                     transition={{ delay: 0.3 }}
                   >
                     {t('wordHuntPromo.dismiss')}
-                  </motion.button>
+                  </m.button>
                 )}
               </AnimatePresence>
             </div>
@@ -205,8 +205,8 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
                 backgroundSize: '6px 6px',
               }}
             />
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

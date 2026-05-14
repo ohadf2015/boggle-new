@@ -158,6 +158,10 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     gameDuration, handleShowResults, handleReturnToRoom, handleUpgradeToPlayer,
   } = useMultiplayerGameFlow({ socketRef, gameCode, isAuthenticated, refreshProfile });
 
+  // Stable reference: this is in the dep array of PlayerView's pendingGameStart
+  // effect — an inline arrow would re-fire game-start side effects every render.
+  const handleGameStartConsumed = useCallback(() => setPendingGameStart(null), [setPendingGameStart]);
+
   // Hide global footer only when in a game room or viewing results (not the lobby)
   useEffect(() => {
     setIsInGame(isActive || showResults);
@@ -409,7 +413,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             gameCode={gameCode} roomLanguage={roomLanguage ?? undefined}
             initialPlayers={playersInRoom} username={username}
             onShowResults={handleShowResults} pendingGameStart={pendingGameStart}
-            onGameStartConsumed={() => setPendingGameStart(null)} lessonData={lessonData}
+            onGameStartConsumed={handleGameStartConsumed} lessonData={lessonData}
             onUsernameChange={setUsername} autoStart={false}
             isPrivate={isPrivate || quickPlay}
             isQuickPlay={quickPlay}
@@ -424,7 +428,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           gameCode={gameCode} username={username}
           onShowResults={handleShowResults} initialPlayers={playersInRoom}
           pendingGameStart={pendingGameStart}
-          onGameStartConsumed={() => setPendingGameStart(null)}
+          onGameStartConsumed={handleGameStartConsumed}
           roomLanguage={roomLanguage} onUsernameChange={setUsername}
           seriesRoundNumber={seriesTracker.roundNumber}
         />

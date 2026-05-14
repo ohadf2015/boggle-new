@@ -21,7 +21,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
 
@@ -120,7 +120,7 @@ export function CoinSpendAnimation({
     >
       {/* Shrinking ring effect (opposite of burst) */}
       {enableGlowEffects && !isLowEnd && (
-        <motion.div
+        <m.div
           className="absolute rounded-full border-3 border-neo-orange"
           style={{
             left: '50%',
@@ -137,7 +137,7 @@ export function CoinSpendAnimation({
       )}
 
       {/* Amount badge with shake */}
-      <motion.div
+      <m.div
         className="absolute"
         style={{
           left: '50%',
@@ -162,7 +162,7 @@ export function CoinSpendAnimation({
             <span>🪙</span>
           </span>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Flying coin particles */}
       <AnimatePresence>
@@ -172,7 +172,7 @@ export function CoinSpendAnimation({
           const endY = Math.sin(radians) * particle.distance;
 
           return (
-            <motion.div
+            <m.div
               key={particle.id}
               className="absolute text-xl"
               style={{
@@ -197,7 +197,7 @@ export function CoinSpendAnimation({
               }}
             >
               🪙
-            </motion.div>
+            </m.div>
           );
         })}
       </AnimatePresence>
@@ -211,7 +211,7 @@ export function CoinSpendAnimation({
             const endY = Math.sin(radians) * (particle.distance * 0.7);
 
             return (
-              <motion.div
+              <m.div
                 key={`trail-${particle.id}`}
                 className="absolute w-2 h-2 rounded-full"
                 style={{

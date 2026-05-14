@@ -1,5 +1,5 @@
 import React, { useState, memo, useMemo, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Badge } from './ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { calculateTier, getTierProgress, TIER_COLORS, TIER_ICONS, TierName, TierColors } from '../utils/achievementTiers';
@@ -105,7 +105,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
     <TooltipProvider delayDuration={0}>
       <Tooltip open={open} onOpenChange={handleOpenChange}>
         <TooltipTrigger asChild onClick={handleClick} onTouchStart={handleTouchStart}>
-          <motion.button
+          <m.button
             initial={{ scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: index * 0.05, type: 'spring', stiffness: 300 }}
@@ -153,7 +153,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                 {tierIcon}
               </span>
             )}
-          </motion.button>
+          </m.button>
         </TooltipTrigger>
         <TooltipContent
           side="top"

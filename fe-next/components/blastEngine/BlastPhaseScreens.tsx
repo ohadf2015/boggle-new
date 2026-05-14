@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import NumberFlow from '@number-flow/react';
 import { useReward } from 'react-rewards';
 import {
@@ -70,7 +70,7 @@ export function BlastReadyScreen({ onStart, onBack, t }: BlastReadyScreenProps) 
       className="flex flex-col items-center justify-center min-h-screen p-4 gap-6"
       style={{ background: 'radial-gradient(ellipse at 50% 30%, #2d1b4e 0%, #0f0c29 70%, #080618 100%)' }}
     >
-      <motion.div
+      <m.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 200 }}
@@ -92,7 +92,7 @@ export function BlastReadyScreen({ onStart, onBack, t }: BlastReadyScreenProps) 
             {t('blast.ready.subtitle')}
           </p>
         </div>
-      </motion.div>
+      </m.div>
 
       <div
         className="rounded-2xl p-5 max-w-xs text-sm text-white/70 space-y-2.5 font-neo-body"
@@ -155,7 +155,7 @@ export function BlastWaveTransitionScreen({
       className="flex flex-col items-center justify-center min-h-screen p-4 gap-6"
       style={{ background: 'radial-gradient(ellipse at 50% 30%, #2d1b4e 0%, #0f0c29 70%, #080618 100%)' }}
     >
-      <motion.div
+      <m.div
         initial={{ y: -30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 150 }}
@@ -205,7 +205,7 @@ export function BlastWaveTransitionScreen({
             ))}
           </div>
         </div>
-      </motion.div>
+      </m.div>
 
       <Button
         onClick={onNextWave}
@@ -296,14 +296,14 @@ export function BlastResultsScreen({ results, onPlayAgain, onBack, t }: BlastRes
       className="flex flex-col items-center justify-start min-h-screen p-4 py-8 gap-5"
       style={{ background: 'radial-gradient(ellipse at 50% 30%, #2d1b4e 0%, #0f0c29 70%, #080618 100%)' }}
     >
-      <motion.div
+      <m.div
         variants={containerVariants}
         initial="hidden"
         animate="show"
         className="w-full max-w-sm flex flex-col gap-4"
       >
         {/* ─── 1. Final Score + Stars + PB delta ─── */}
-        <motion.div
+        <m.div
           variants={itemVariants}
           className="text-center p-6 rounded-2xl relative"
           style={{
@@ -360,11 +360,11 @@ export function BlastResultsScreen({ results, onPlayAgain, onBack, t }: BlastRes
                 : t('blast.results.fromBest', { best: previousBest })}
             </div>
           )}
-        </motion.div>
+        </m.div>
 
         {/* ─── 2. Rank card (gated on percentile) ─── */}
         {topPercent != null && (
-          <motion.div
+          <m.div
             variants={itemVariants}
             className="p-4 rounded-2xl"
             style={{
@@ -386,7 +386,7 @@ export function BlastResultsScreen({ results, onPlayAgain, onBack, t }: BlastRes
               className="relative h-2 rounded-full overflow-hidden"
               style={{ background: 'rgba(255,255,255,0.08)' }}
             >
-              <motion.div
+              <m.div
                 className="absolute left-0 top-0 h-full rounded-full"
                 style={{
                   background: 'linear-gradient(90deg, #00FFFF, #66FFFF)',
@@ -397,11 +397,11 @@ export function BlastResultsScreen({ results, onPlayAgain, onBack, t }: BlastRes
                 transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
               />
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {/* ─── 3. Best Moments grid ─── */}
-        <motion.div variants={itemVariants} className="grid grid-cols-3 gap-2">
+        <m.div variants={itemVariants} className="grid grid-cols-3 gap-2">
           <StatTile
             icon={<BookOpen className="w-4 h-4 text-neo-lime" />}
             label={t('blast.results.bestWord')}
@@ -417,10 +417,10 @@ export function BlastResultsScreen({ results, onPlayAgain, onBack, t }: BlastRes
             label={t('blast.results.bestWave')}
             value={bestWave ? `W${bestWave.waveNumber}` : '—'}
           />
-        </motion.div>
+        </m.div>
 
         {/* ─── 4. Totals grid ─── */}
-        <motion.div variants={itemVariants} className="grid grid-cols-2 gap-2">
+        <m.div variants={itemVariants} className="grid grid-cols-2 gap-2">
           <StatTile
             icon={<TrendingUp className="w-4 h-4 text-neo-cyan" />}
             label={t('blast.waves')}
@@ -431,11 +431,11 @@ export function BlastResultsScreen({ results, onPlayAgain, onBack, t }: BlastRes
             label={t('blast.words')}
             value={<NumberFlow value={wordsCount} />}
           />
-        </motion.div>
+        </m.div>
 
         {/* ─── 5. Badges row ─── */}
         {badges.length > 0 && (
-          <motion.div
+          <m.div
             variants={itemVariants}
             className="p-3 rounded-2xl"
             style={{
@@ -475,11 +475,11 @@ export function BlastResultsScreen({ results, onPlayAgain, onBack, t }: BlastRes
                 );
               })}
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {/* ─── 6. Actions ─── */}
-        <motion.div variants={itemVariants} className="flex gap-3 justify-center mt-2">
+        <m.div variants={itemVariants} className="flex gap-3 justify-center mt-2">
           <Button
             onClick={onPlayAgain}
             className="border-3 border-neo-black font-neo-display rounded-xl px-6"
@@ -499,8 +499,8 @@ export function BlastResultsScreen({ results, onPlayAgain, onBack, t }: BlastRes
           >
             {t('common.back')}
           </Button>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </div>
   );
 }

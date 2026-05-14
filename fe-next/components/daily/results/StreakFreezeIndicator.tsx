@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -34,7 +34,7 @@ export const StreakFreezeIndicator: React.FC<StreakFreezeIndicatorProps> = ({
   const isActive = isProtected;
 
   return (
-    <motion.div
+    <m.div
       data-testid="streak-freeze-indicator"
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
@@ -77,7 +77,7 @@ export const StreakFreezeIndicator: React.FC<StreakFreezeIndicatorProps> = ({
           {t('streak.freezeShieldHint')}
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

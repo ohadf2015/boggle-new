@@ -48,7 +48,7 @@ vi.mock('framer-motion', () => {
   );
   MotionButton.displayName = 'MotionButton';
   return {
-    motion: { div: MotionDiv, button: MotionButton },
+    m: { div: MotionDiv, button: MotionButton },
     AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     useReducedMotion: vi.fn().mockReturnValue(false),
   };

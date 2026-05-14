@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useEffect, useState } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
+import { m, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Crown, Medal, Award } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
 import { fireRankConfetti } from '../../../utils/confettiUtils';
@@ -202,14 +202,14 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
   const baseDelay = RANK_DELAYS[rank as keyof typeof RANK_DELAYS] || 0;
 
   return (
-    <motion.div
+    <m.div
       className={cn(
         'relative flex flex-col items-center',
         isWinner ? 'w-56 z-10' : 'w-48'
       )}
     >
       {/* Podium base rises up first */}
-      <motion.div
+      <m.div
         initial={{ clipPath: 'inset(100% 0 0 0)' }}
         animate={{ clipPath: 'inset(0% 0 0 0)' }}
         transition={{ duration: 0.6, delay: baseDelay, ease: [0.33, 1, 0.68, 1] }}
@@ -221,7 +221,7 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
         )}
       >
         {/* Player card content appears after podium rise */}
-        <motion.div
+        <m.div
           initial={{ y: 40, opacity: 0, scale: 0.85 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}
           exit={{ y: -50, opacity: 0 }}
@@ -233,7 +233,7 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
           className="flex flex-col items-center justify-end pt-8 pb-4 px-4 h-full"
         >
           {/* Rank Badge — spins in with escalating bounce */}
-          <motion.div
+          <m.div
             initial={{ scale: 0, rotate: -360 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{
@@ -250,10 +250,10 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
             )}
           >
             <Icon className={cn('w-7 h-7', config.textColor)} />
-          </motion.div>
+          </m.div>
 
           {/* Rank Label */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 26, delay: baseDelay + 0.7 }}
@@ -264,10 +264,10 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
             )}
           >
             {t(`tvResults.${labelKey}`)}
-          </motion.div>
+          </m.div>
 
           {/* Avatar — bouncy pop */}
-          <motion.div
+          <m.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{
@@ -285,10 +285,10 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
               size={isWinner ? 'xl' : 'lg'}
               className="border-4 border-neo-black shadow-hard"
             />
-          </motion.div>
+          </m.div>
 
           {/* Username */}
-          <motion.p
+          <m.p
             initial={{ opacity: 0, x: -15 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ type: 'spring', stiffness: 280, damping: 26, delay: baseDelay + 0.75 }}
@@ -302,10 +302,10 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
             title={player.username}
           >
             {player.username}
-          </motion.p>
+          </m.p>
 
           {/* Score — counts up from 0 with elastic overshoot */}
-          <motion.div
+          <m.div
             initial={{ scale: 0, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             transition={{
@@ -322,25 +322,25 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
           >
             <PodiumScoreCounter target={player.score} delay={baseDelay + 0.9} />
             <span className="text-sm font-bold ms-1 opacity-70">{t('tvResults.pts')}</span>
-          </motion.div>
+          </m.div>
 
           {/* Word Count */}
           {player.wordCount !== undefined && (
-            <motion.p
+            <m.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ type: 'spring', stiffness: 280, damping: 26, delay: baseDelay + 1.1 }}
               className={cn('text-sm font-bold opacity-70', config.textColor)}
             >
               {player.wordCount} {t('tvResults.words')}
-            </motion.p>
+            </m.p>
           )}
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
 
       {/* Winner glow pulse ring */}
       {isWinner && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: baseDelay + 1.2 }}
@@ -357,7 +357,7 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
           50% { box-shadow: 0 0 60px rgba(255,225,53,0.6), 0 0 100px rgba(255,107,53,0.2); }
         }
       `}</style>
-    </motion.div>
+    </m.div>
   );
 });
 

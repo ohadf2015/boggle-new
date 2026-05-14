@@ -10,7 +10,7 @@ vi.mock('framer-motion', () => {
     return <div {...safe}>{children}</div>;
   };
   const motionObj = new Proxy({}, { get: () => motionComponent });
-  return { motion: motionObj };
+  return { m: motionObj };
 });
 
 const t = (key: string) => key;

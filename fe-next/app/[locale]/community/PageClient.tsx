@@ -15,7 +15,7 @@ import {
   Users,
   TrendingUp,
 } from 'lucide-react';
-import { motion, useMotionValue, useTransform, animate, useInView } from 'framer-motion';
+import { m, useMotionValue, useTransform, animate, useInView } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
@@ -305,7 +305,7 @@ export default function CommunityPageClient() {
             >
               {/* Sliding background indicator */}
               {activeTab === key && (
-                <motion.div
+                <m.div
                   layoutId="community-tab-indicator"
                   className="absolute inset-0 bg-neo-lime border-2 border-black rounded-[3px] shadow-hard-sm"
                   transition={{ type: 'spring', stiffness: 380, damping: 30 }}

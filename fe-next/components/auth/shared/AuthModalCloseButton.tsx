@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/utils/ThemeContext';
@@ -21,7 +21,7 @@ export function AuthModalCloseButton({ onClose, className }: AuthModalCloseButto
   const isDarkMode = theme === 'dark';
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.2 }}
@@ -39,7 +39,7 @@ export function AuthModalCloseButton({ onClose, className }: AuthModalCloseButto
       >
         <X className="w-5 h-5" />
       </Button>
-    </motion.div>
+    </m.div>
   );
 }
 

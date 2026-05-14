@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { RefreshCw, Users, Gamepad2, Wifi, Clock, Crown, Bot, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -276,7 +276,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
 
       {/* Games Grid or Empty State */}
       {!hasAnyLive ? (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center justify-center py-16 bg-slate-800/30 rounded-neo border-neo border-black"
@@ -288,7 +288,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
           <p className="text-slate-500">
             {t('admin.live.noGamesHint')}
           </p>
-        </motion.div>
+        </m.div>
       ) : (
         <>
           {/* Active Games Section */}
@@ -406,7 +406,7 @@ function GameCard({ game, t }: { game: LiveGame; t: (key: string) => string }) {
   const stateLabel = game.gameState.replace('-', ' ');
 
   return (
-    <motion.div
+    <m.div
       layout
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -468,7 +468,7 @@ function GameCard({ game, t }: { game: LiveGame; t: (key: string) => string }) {
         </div>
         <span className="text-slate-500">{game.roomName}</span>
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

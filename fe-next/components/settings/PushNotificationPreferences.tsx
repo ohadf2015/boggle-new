@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Bell, BellOff, Clock, AlertTriangle, Check, Settings } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -41,7 +41,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
   // Show loading state
   if (isLoading) {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className={cn(
@@ -53,7 +53,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
         <div className="flex items-center justify-center py-4">
           <Loader size="md" />
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
@@ -98,7 +98,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
   }
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
@@ -283,7 +283,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
           </div>
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 }
 

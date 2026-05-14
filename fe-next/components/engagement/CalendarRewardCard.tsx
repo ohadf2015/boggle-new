@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Gift, Sparkles, Zap, Shield, Crown, Lock, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -91,7 +91,7 @@ export function CalendarRewardCard({
   const isMilestone = reward.isMilestone;
 
   return (
-    <motion.button
+    <m.button
       onClick={canClaim ? onClaim : undefined}
       disabled={!canClaim}
       className={cn(
@@ -163,7 +163,7 @@ export function CalendarRewardCard({
           TODAY
         </div>
       )}
-    </motion.button>
+    </m.button>
   );
 }
 

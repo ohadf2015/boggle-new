@@ -3,7 +3,7 @@
 import { memo, useEffect, useCallback, useMemo, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { m, useMotionValue, useTransform, animate } from 'framer-motion';
 import { ArrowLeft, Trophy, Crosshair, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -70,7 +70,7 @@ function FloatingSparkles({ tier }: { tier: Tier }) {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
       {sparkles.map(s => (
-        <motion.div
+        <m.div
           key={s.id}
           className="absolute rounded-full"
           style={{
@@ -132,7 +132,7 @@ function StaggeredText({ text, className, delay = 0 }: {
   delay?: number;
 }) {
   return (
-    <motion.p
+    <m.p
       className={className}
       initial="hidden"
       animate="visible"
@@ -143,7 +143,7 @@ function StaggeredText({ text, className, delay = 0 }: {
       aria-label={text}
     >
       {text.split('').map((char, i) => (
-        <motion.span
+        <m.span
           key={`${char}-${i}`}
           variants={{
             hidden: { opacity: 0, y: 10, scale: 0.8 },
@@ -154,9 +154,9 @@ function StaggeredText({ text, className, delay = 0 }: {
           style={{ whiteSpace: char === ' ' ? 'pre' : undefined }}
         >
           {char}
-        </motion.span>
+        </m.span>
       ))}
-    </motion.p>
+    </m.p>
   );
 }
 
@@ -273,7 +273,7 @@ const PracticeResults = memo(function PracticeResults({
         <div className="w-full max-w-md mx-auto space-y-5">
 
           {/* ── Hero: Mascot + Score + Encouragement ── */}
-          <motion.div
+          <m.div
             initial={reducedMotion ? false : { opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 26 }}
@@ -281,7 +281,7 @@ const PracticeResults = memo(function PracticeResults({
           >
             {/* Large celebratory mascot */}
             <div className="flex justify-center mb-4">
-              <motion.div
+              <m.div
                 className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-neo-cream/90 border-4 border-neo-black shadow-hard-lg flex items-center justify-center"
                 initial={reducedMotion ? false : { scale: 0, rotate: -15 }}
                 animate={reducedMotion
@@ -300,7 +300,7 @@ const PracticeResults = memo(function PracticeResults({
                 ) : (
                   <CelebrationMascotWithEntrance variant="celebration" size="md" delay={0.4} clipBorder="none" />
                 )}
-              </motion.div>
+              </m.div>
             </div>
 
             {/* Encouragement text */}
@@ -317,7 +317,7 @@ const PracticeResults = memo(function PracticeResults({
             )}
 
             {/* Big score */}
-            <motion.div
+            <m.div
               initial={reducedMotion ? false : { scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.15, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
@@ -328,21 +328,21 @@ const PracticeResults = memo(function PracticeResults({
               }}
             >
               {displayScore}
-            </motion.div>
+            </m.div>
 
             {/* Words found */}
-            <motion.p
+            <m.p
               initial={reducedMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
               className="text-white/70 text-sm font-bold mt-1"
             >
               {t('practiceResults.wordsFound', { count: validWordCount })}
-            </motion.p>
+            </m.p>
 
             {/* Practice streak chip — break-proof, increments per UTC day */}
             {practiceStreak > 0 && (
-              <motion.div
+              <m.div
                 initial={reducedMotion ? false : { scale: 0, rotate: -8 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.55, type: 'spring', stiffness: 380, damping: 18 }}
@@ -352,26 +352,26 @@ const PracticeResults = memo(function PracticeResults({
               >
                 <span aria-hidden>🔥</span>
                 <span className="text-sm">×{practiceStreak}</span>
-              </motion.div>
+              </m.div>
             )}
 
             {/* Subtitle */}
-            <motion.p
+            <m.p
               initial={reducedMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
               className="text-white/50 text-xs mt-2 max-w-[260px] mx-auto"
             >
               {t(subtitleKey)}
-            </motion.p>
-          </motion.div>
+            </m.p>
+          </m.div>
 
 
           {/* ── Catalyst teaser — surfaces what's coming in arena/adventure ── */}
           <CatalystTeaser t={t} />
 
           {/* ── Primary CTA: Word Hunt Daily — desktop big card; mobile uses sticky bottom only ── */}
-          <motion.div
+          <m.div
             initial={reducedMotion ? false : { opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
@@ -399,7 +399,7 @@ const PracticeResults = memo(function PracticeResults({
                   </div>
                 </div>
               ) : (
-                <motion.button
+                <m.button
                   onClick={handleWordHuntDaily}
                   animate={reducedMotion ? {} : { scale: [1, 1.03, 1] }}
                   transition={{
@@ -428,7 +428,7 @@ const PracticeResults = memo(function PracticeResults({
                     </span>
                   </div>
                   <Trophy className="w-5 h-5 text-amber-600" />
-                </motion.button>
+                </m.button>
               )}
             </div>
 
@@ -448,7 +448,7 @@ const PracticeResults = memo(function PracticeResults({
                 {t('practiceResults.goHome')}
               </button>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
 
@@ -456,7 +456,7 @@ const PracticeResults = memo(function PracticeResults({
       <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
         <div className="flex flex-col gap-2">
           {!dailyAlreadyPlayed && (
-            <motion.button
+            <m.button
               onClick={handleWordHuntDaily}
               animate={reducedMotion ? {} : { scale: [1, 1.03, 1] }}
               transition={{ duration: 2, repeat: ctaPulseRepeat, ease: 'easeInOut', repeatDelay: 1 }}
@@ -464,7 +464,7 @@ const PracticeResults = memo(function PracticeResults({
             >
               <Trophy className="w-4 h-4" />
               {t('practiceResults.wordHuntCta')}
-            </motion.button>
+            </m.button>
           )}
           <button
             onClick={onBackToLobby}

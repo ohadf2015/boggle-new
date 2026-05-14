@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Brain, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -203,7 +203,7 @@ export default function BrainTrainingPageClient() {
           backText={t('common.back')}
         />
         <div className="px-4 py-6 pb-24 max-w-4xl mx-auto flex-1">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className={cn(
@@ -235,7 +235,7 @@ export default function BrainTrainingPageClient() {
             >
               {t('brain.errors.retry')}
             </button>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     );
@@ -255,7 +255,7 @@ export default function BrainTrainingPageClient() {
           backText={t('common.back')}
         />
         <div className="px-4 py-6 pb-24 max-w-4xl mx-auto flex-1">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className={cn(
@@ -300,7 +300,7 @@ export default function BrainTrainingPageClient() {
                 {t('auth.signIn')}
               </button>
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Audit H2 — anonymous /brain showed only the sign-in card and 95%
               empty viewport on desktop. Surface the drill grid below the CTA
@@ -336,7 +336,7 @@ export default function BrainTrainingPageClient() {
           backText={t('common.back')}
         />
         <div className="px-4 py-6 pb-24 space-y-6 max-w-4xl mx-auto flex-1">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className={cn(
@@ -368,7 +368,7 @@ export default function BrainTrainingPageClient() {
             >
               {t('brain.empty.playNow')}
             </button>
-          </motion.div>
+          </m.div>
 
           {/* Show Quick Drills section even for new users */}
           <QuickDrillsSection drillProgress={drillProgress} />
@@ -393,7 +393,7 @@ export default function BrainTrainingPageClient() {
       {/* Main Content */}
       <div className="px-4 py-6 pb-24 space-y-6 max-w-4xl mx-auto flex-1">
         {/* Brain Score Hero */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
@@ -406,11 +406,11 @@ export default function BrainTrainingPageClient() {
             drillsCompleted={brainScore.drillsCompleted}
             onShare={() => setShowShareCard(true)}
           />
-        </motion.div>
+        </m.div>
 
         {/* Welcome Back Card (for returning users after 3+ days) */}
         {welcomeBackData.show && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.05 }}
@@ -423,31 +423,31 @@ export default function BrainTrainingPageClient() {
               currentStreak={brainScore.currentStreak}
               longestStreak={brainScore.longestStreak}
             />
-          </motion.div>
+          </m.div>
         )}
 
         {/* Radar Chart */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
           <CognitiveRadarChart domains={brainScore.domains} />
-        </motion.div>
+        </m.div>
 
         {/* Progress History Chart - only show if there's meaningful history */}
         {brainScoreHistory.length >= 2 && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.12 }}
           >
             <BrainScoreHistoryChart history={brainScoreHistory} />
-          </motion.div>
+          </m.div>
         )}
 
         {/* Cognitive Domains */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.15 }}
@@ -457,11 +457,11 @@ export default function BrainTrainingPageClient() {
             gamesAnalyzed={brainScore.gamesAnalyzed}
             recentGameScores={recentGameScores}
           />
-        </motion.div>
+        </m.div>
 
         {/* Personalized Drill Recommendation */}
         {brainScore.gamesAnalyzed >= 1 && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.18 }}
@@ -470,30 +470,30 @@ export default function BrainTrainingPageClient() {
               domains={brainScore.domains}
               gamesPlayed={brainScore.gamesAnalyzed}
             />
-          </motion.div>
+          </m.div>
         )}
 
         {/* Quick Drills */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
         >
           <QuickDrillsSection drillProgress={drillProgress} />
-        </motion.div>
+        </m.div>
 
         {/* Scientific Tips */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.3 }}
         >
           <ScientificTipsCarousel />
-        </motion.div>
+        </m.div>
 
         {/* Empty State for Users with Zero Games */}
         {brainScore.gamesAnalyzed === 0 && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className={cn(
@@ -514,7 +514,7 @@ export default function BrainTrainingPageClient() {
             )}>
               {t('brain.empty.description')}
             </p>
-          </motion.div>
+          </m.div>
         )}
       </div>
 

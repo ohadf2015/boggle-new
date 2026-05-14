@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import WordWheelGame, { type WordWheelGameResult } from './WordWheelGame';
@@ -358,7 +358,7 @@ const WordWheelChallenge: React.FC = () => {
       <AnimatePresence mode="wait">
         {/* Ready screen */}
         {phase === 'ready' && puzzle && (
-          <motion.div
+          <m.div
             key="ready"
             className="flex-1 flex flex-col items-center gap-6 px-4 pt-4 pb-bottom-stack sm:pb-6 overflow-y-auto"
             initial={{ opacity: 0 }}
@@ -393,26 +393,26 @@ const WordWheelChallenge: React.FC = () => {
             {/* Preview wheel */}
             <div className="relative w-44 h-44 flex items-center justify-center my-4">
               {/* Glow ring */}
-              <motion.div
+              <m.div
                 className="absolute inset-0 rounded-full border-2 border-neo-lime/20"
                 style={{ boxShadow: '0 0 30px rgba(191,255,0,0.15)' }}
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
               />
-              <motion.div
+              <m.div
                 className="w-16 h-16 rounded-full border-3 border-neo-black bg-neo-lime flex items-center justify-center font-neo-display font-black text-2xl text-neo-black shadow-[3px_3px_0px_black,0_0_20px_rgba(191,255,0,0.5)]"
                 animate={{ scale: [1, 1.08, 1] }}
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               >
                 {puzzle.centerLetter}
-              </motion.div>
+              </m.div>
               {puzzle.outerLetters.map((letter, i) => {
                 const angle = i * 60;
                 const rad = (angle * Math.PI) / 180;
                 const x = Math.sin(rad) * 60;
                 const y = -Math.cos(rad) * 60;
                 return (
-                  <motion.div
+                  <m.div
                     key={`${letter}-${i}`}
                     className="absolute inset-0 m-auto w-10 h-10 rounded-full border-2 border-neo-black bg-neo-white flex items-center justify-center font-neo-display font-bold text-sm text-neo-navy shadow-[2px_2px_0px_black,0_0_6px_rgba(191,255,0,0.12)]"
                     initial={{ scale: 0, x, y }}
@@ -420,12 +420,12 @@ const WordWheelChallenge: React.FC = () => {
                     transition={{ delay: i * 0.06, type: 'spring', stiffness: 400 }}
                   >
                     {letter}
-                  </motion.div>
+                  </m.div>
                 );
               })}
             </div>
 
-            <motion.button
+            <m.button
               type="button"
               onClick={handleStart}
               className="px-8 py-3 rounded-neo border-3 border-neo-black bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black font-neo-display font-black text-lg shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.3)] hover:shadow-[3px_3px_0px_black,0_0_22px_rgba(0,255,255,0.4)] active:shadow-hard-pressed active:translate-x-px active:translate-y-px transition-all"
@@ -434,7 +434,7 @@ const WordWheelChallenge: React.FC = () => {
               transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
             >
               {t('daily.play')}
-            </motion.button>
+            </m.button>
 
             {/* Tabbed leaderboard — parity with Word Hunt ready screen */}
             <div className="w-full max-w-md mt-2">
@@ -450,7 +450,7 @@ const WordWheelChallenge: React.FC = () => {
                 compact
               />
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {/* Playing */}
@@ -460,7 +460,7 @@ const WordWheelChallenge: React.FC = () => {
           </div>
         )}
         {phase === 'playing' && puzzle && (
-          <motion.div
+          <m.div
             key="playing"
             className="flex-1 flex flex-col items-center justify-start pt-3 sm:pt-4 pb-bottom-stack relative z-20 overflow-y-auto overscroll-contain"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -477,12 +477,12 @@ const WordWheelChallenge: React.FC = () => {
               language={language}
               practice={isPractice}
             />
-          </motion.div>
+          </m.div>
         )}
 
         {/* Completed / Already Played */}
         {(phase === 'completed' || phase === 'already-played') && gameResult && (
-          <motion.div
+          <m.div
             key="results"
             className="flex-1 flex flex-col items-center justify-center"
             initial={{ opacity: 0 }}
@@ -498,7 +498,7 @@ const WordWheelChallenge: React.FC = () => {
               currentPlayerId={isAuthenticated && profile ? profile.id : null}
               currentGuestFingerprint={!isAuthenticated ? (getGuestFingerprint() || null) : null}
             />
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Flame, Crosshair, Zap } from 'lucide-react';
 import CircularTimer from '../../../components/CircularTimer';
 
@@ -64,12 +64,12 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
     <div className="w-full px-4 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Left: LIVE badge + Mode badge */}
-        <motion.div
+        <m.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           className="flex items-center gap-2"
         >
-          <motion.div
+          <m.div
             data-testid="live-badge"
             className="flex items-center gap-2 bg-neo-red text-neo-cream px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm"
             animate={{
@@ -85,7 +85,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
             aria-label={t('tvBroadcast.liveGameInProgress')}
           >
             {/* Pulsing recording dot */}
-            <motion.div
+            <m.div
               data-testid="live-recording-dot"
               className="w-3 h-3 rounded-full bg-neo-cream"
               animate={{ scale: [1, 1.4, 1], opacity: [1, 0.7, 1] }}
@@ -93,26 +93,26 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
               aria-hidden="true"
             />
             <span className="font-black text-lg uppercase tracking-wider">{t('tvBroadcast.live')}</span>
-          </motion.div>
+          </m.div>
 
           {/* Game Mode Badge */}
           {gameMode && (
-            <motion.div
+            <m.div
               data-testid="mode-badge"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               className={`px-3 py-1 rounded-neo border-2 border-neo-black shadow-hard-sm font-bold text-sm uppercase ${MODE_COLORS[gameMode] || 'bg-neo-navy text-neo-cream'}`}
             >
               {t(MODE_KEYS[gameMode] || `tvBroadcast.mode.${gameMode}`)}
-            </motion.div>
+            </m.div>
           )}
-        </motion.div>
+        </m.div>
 
         {/* Center: Timer with heartbeat pulse */}
         <div className="flex-1 flex justify-center">
           {remainingTime !== null && (
             showHeartbeat ? (
-              <motion.div
+              <m.div
                 data-testid="timer-heartbeat"
                 data-urgency={urgencyLevel}
                 animate={{ scale: [1, 1.05, 1] }}
@@ -128,7 +128,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
                   totalTime={totalTimeSeconds}
                   size="lg"
                 />
-              </motion.div>
+              </m.div>
             ) : (
               <CircularTimer
                 remainingTime={remainingTime}
@@ -144,27 +144,27 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
           {/* Earthquake Warning */}
           <AnimatePresence>
             {earthquakeState === 'warning' && (
-              <motion.div
+              <m.div
                 initial={{ scale: 0, rotate: -10 }}
                 animate={{ scale: 1, rotate: 0 }}
                 exit={{ scale: 0, rotate: 10 }}
                 className="bg-neo-orange text-neo-black px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm"
               >
-                <motion.span
+                <m.span
                   animate={{ x: [-2, 2, -2] }}
                   transition={{ duration: 0.1, repeat: Infinity }}
                   className="font-black text-lg uppercase"
                 >
                   {t('tvBroadcast.earthquake')}
-                </motion.span>
-              </motion.div>
+                </m.span>
+              </m.div>
             )}
           </AnimatePresence>
 
           {/* Fire Round Badge (Classic mode) */}
           <AnimatePresence>
             {fireRoundActive && (
-              <motion.div
+              <m.div
                 initial={{ scale: 0, rotate: -10 }}
                 animate={{ scale: 1, rotate: 3 }}
                 exit={{ scale: 0, rotate: 10 }}
@@ -179,13 +179,13 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
                   <span className="text-xs font-bold">{t('tvBroadcast.twoXPoints')} • {fireRoundRemaining}s</span>
                 </div>
                 <Flame className="w-6 h-6 animate-bounce" />
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
 
           {/* Blast Wave Badge */}
           {gameMode === 'blast' && blastWave > 0 && (
-            <motion.div
+            <m.div
               key={`wave-${blastWave}`}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -195,12 +195,12 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
               <span className="font-black text-lg uppercase">
                 {t('tvBroadcast.blastWave', { wave: blastWave })}
               </span>
-            </motion.div>
+            </m.div>
           )}
 
           {/* Word Hunt Target + Alive Count */}
           {gameMode === 'word-hunt' && wordHuntTargetLength > 0 && (
-            <motion.div
+            <m.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="flex items-center gap-3 bg-neo-pink text-neo-cream px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm"
@@ -214,7 +214,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
                   {wordHuntAliveCount} {t('tvBroadcast.playersAlive')}
                 </span>
               </div>
-            </motion.div>
+            </m.div>
           )}
         </div>
       </div>

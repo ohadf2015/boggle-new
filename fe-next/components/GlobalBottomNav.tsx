@@ -9,7 +9,7 @@ import {
     Trophy, User as UserIcon, Settings as SettingsIcon, Users2, Gift, Target,
     BookOpen,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigation } from '../contexts/NavigationContext';
@@ -369,7 +369,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                             {/* Glow background behind active icon */}
                             <AnimatePresence>
                                 {isActive && (
-                                    <motion.div
+                                    <m.div
                                         layoutId="tab-glow"
                                         className={cn(
                                             "absolute inset-0 rounded-xl",
@@ -385,7 +385,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
 
                             {/* Active indicator pill at top */}
                             {isActive && (
-                                <motion.div
+                                <m.div
                                     layoutId="tab-indicator"
                                     className={cn(
                                         "absolute top-0 w-2 h-2 rounded-full -translate-y-1/2",
@@ -396,7 +396,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                             )}
 
                             {/* Icon with scale animation */}
-                            <motion.div
+                            <m.div
                                 animate={{
                                     scale: isActive ? 1.15 : 1,
                                     y: isActive ? -1 : 0,
@@ -453,10 +453,10 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                                         {socialBadgeCount > 9 ? '9+' : socialBadgeCount}
                                     </span>
                                 )}
-                            </motion.div>
+                            </m.div>
 
                             {/* Label */}
-                            <motion.span
+                            <m.span
                                 className={cn(
                                     "text-[10px] short:text-[9px] font-bold uppercase tracking-wide relative z-10 short:hidden medium-short:text-[9px]",
                                     isActive ? tab.color : "text-neo-white/40"
@@ -467,7 +467,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                                 transition={{ duration: 0.15 }}
                             >
                                 {t(tab.labelKey)}
-                            </motion.span>
+                            </m.span>
                         </button>
                     );
                 })}

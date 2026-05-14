@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export function BoardClearedCard({ finalScore, visible }: { finalScore: number; visible: boolean }) {
@@ -6,7 +6,7 @@ export function BoardClearedCard({ finalScore, visible }: { finalScore: number; 
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
@@ -35,7 +35,7 @@ export function BoardClearedCard({ finalScore, visible }: { finalScore: number; 
           >
             {finalScore}
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

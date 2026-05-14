@@ -6,7 +6,7 @@ import TvGameHeader from '../TvGameHeader';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: React.forwardRef(function MotionDiv(
       { children, className, style, ...rest }: any,
       ref: any

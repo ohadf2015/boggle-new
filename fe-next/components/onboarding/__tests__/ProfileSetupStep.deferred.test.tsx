@@ -11,7 +11,7 @@ vi.mock('framer-motion', () => {
     return <div ref={ref} {...props}>{children}</div>;
   });
   return {
-    motion: { div: MotionDiv },
+    m: { div: MotionDiv },
     AnimatePresence: function AnimatePresence({ children }: any) { return <>{children}</>; },
   };
 });

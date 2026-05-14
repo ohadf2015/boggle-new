@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { markModePlayedLogic } from '@/hooks/useDailyModeQuest';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import WatchAdButton from './WatchAdButton';
 import DoubleGoldAdButton from '@/components/ads/DoubleGoldAdButton';
 import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
@@ -197,7 +197,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   }, [shareImage, result.puzzleNumber]);
 
   return (
-    <motion.div
+    <m.div
       key="results"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -205,7 +205,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       className="flex-1 min-h-0 flex flex-col items-center justify-start p-4 page-content-safe overflow-y-auto overscroll-contain scrollable-area"
     >
       {/* Back button */}
-      <motion.div className="absolute top-24 sm:top-28 inset-s-4">
+      <m.div className="absolute top-24 sm:top-28 inset-s-4">
         <Button
           variant="ghost"
           size="sm"
@@ -215,7 +215,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           <ArrowLeft className="w-4 h-4 me-2 rtl:rotate-180" />
           {t('daily.home')}
         </Button>
-      </motion.div>
+      </m.div>
 
       {/* Main content - Cleaner design */}
       {/* On desktop: 2-column grid with score/share left, leaderboard right */}
@@ -263,7 +263,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
         )}
 
         {/* Share Section - Streamlined */}
-        <motion.div
+        <m.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -327,19 +327,19 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           </div>
 
           {copied && (
-            <motion.p
+            <m.p
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-sm text-neo-cyan font-medium"
             >
               {t('daily.copiedToClipboard')}
-            </motion.p>
+            </m.p>
           )}
 
-        </motion.div>
+        </m.div>
 
         {/* Emoji Share Card */}
-        <motion.div
+        <m.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.52 }}
@@ -354,10 +354,10 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             t={t}
             language={result.language}
           />
-        </motion.div>
+        </m.div>
 
         {/* Next Step - Suggest Multiplayer (unlimited games!) */}
-        <motion.div
+        <m.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.55 }}
@@ -367,10 +367,10 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             onBackToLobby={onBack}
             variant="mobile"
           />
-        </motion.div>
+        </m.div>
 
         {/* Next puzzle countdown */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
@@ -379,11 +379,11 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           <p className="text-xs text-neo-cream/50 font-bold uppercase tracking-wider">
             {t('daily.nextPuzzleIn')} <span className="font-bold text-neo-cyan">{countdown}</span>
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Words found - Collapsible (left column on desktop) */}
         {words.length > 0 && (
-          <motion.div
+          <m.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.8 }}
@@ -399,7 +399,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
 
             <AnimatePresence>
               {showWords && (
-                <motion.div
+                <m.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
@@ -419,10 +419,10 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                       </span>
                     ))}
                   </div>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
-          </motion.div>
+          </m.div>
         )}
       </div>{/* end left column */}
 
@@ -432,7 +432,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       {/* RIGHT COLUMN on desktop: leaderboard (on mobile rendered below via normal flow) */}
       <div>
         {/* Today's Players Leaderboard */}
-        <motion.div
+        <m.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.7 }}
@@ -449,7 +449,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             t={t}
             gameType="puzzle"
           />
-        </motion.div>
+        </m.div>
       </div>{/* end right column */}
 
       </div>{/* end lg:grid */}
@@ -491,7 +491,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           />
         )}
       </AnimatePresence>
-    </motion.div>
+    </m.div>
   );
 };
 

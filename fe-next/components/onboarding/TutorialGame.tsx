@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mascot } from '@/components/ui/Mascot';
@@ -40,7 +40,7 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete, attemptNumber =
       data-testid="tutorial-game"
       className="flex flex-col items-center justify-center min-h-screen bg-neo-navy p-4 relative overflow-hidden"
     >
-      <motion.div
+      <m.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 280, damping: 22 }}
@@ -48,7 +48,7 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete, attemptNumber =
       >
         <Mascot variant="celebration" size="xl" clipShape="circle" clipBorder="lime" />
 
-        <motion.div
+        <m.div
           initial={{ y: 16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.4 }}
@@ -60,9 +60,9 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete, attemptNumber =
           <p className="text-sm font-neo-body font-bold text-neo-black/80">
             {t('practiceWelcome.tip')}
           </p>
-        </motion.div>
+        </m.div>
 
-        <motion.button
+        <m.button
           data-testid="tutorial-continue"
           initial={{ y: 12, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -72,8 +72,8 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete, attemptNumber =
         >
           {t('practiceWelcome.cta')}
           <ArrowRight className="w-5 h-5" strokeWidth={3} />
-        </motion.button>
-      </motion.div>
+        </m.button>
+      </m.div>
     </div>
   );
 };

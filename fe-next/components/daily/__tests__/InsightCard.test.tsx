@@ -4,7 +4,7 @@ import InsightCard from '../InsightCard'
 import React from 'react'
 
 vi.mock('framer-motion', () => ({
-  motion: new Proxy(
+  m: new Proxy(
     {},
     {
       get: (_target, prop) => {

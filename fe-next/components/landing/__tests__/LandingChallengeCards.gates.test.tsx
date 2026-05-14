@@ -27,7 +27,7 @@ vi.mock('framer-motion', () => {
   const motionObj = new Proxy({}, { get: () => motionComponent });
   const AnimatePresence = ({ children }: any) => children;
   AnimatePresence.displayName = 'AnimatePresence';
-  return { motion: motionObj, AnimatePresence };
+  return { m: motionObj, AnimatePresence };
 });
 
 vi.mock('../ModeCard', () => {

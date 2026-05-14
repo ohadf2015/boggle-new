@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useCallback, memo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Bot } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -110,7 +110,7 @@ function PodiumEmojiBubble({ emoji, onDone }: { emoji: string; onDone: () => voi
   }, [onDone]);
 
   return (
-    <motion.div
+    <m.div
       initial={{ scale: 0, y: 10, opacity: 0 }}
       animate={{ scale: 1, y: -8, opacity: 1 }}
       exit={{ scale: 0, opacity: 0 }}
@@ -119,7 +119,7 @@ function PodiumEmojiBubble({ emoji, onDone }: { emoji: string; onDone: () => voi
     >
       {emoji}
       <div className="absolute -bottom-1.5 inset-s-1/2 -translate-x-1/2 rtl:translate-x-1/2 w-3 h-3 bg-neo-cream border-b-3 border-e-3 border-neo-black rotate-45" />
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -202,7 +202,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
   const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: compact ? 0.1 : 0.3 }}
@@ -230,7 +230,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
           const Icon = config.icon;
 
           return (
-            <motion.div
+            <m.div
               key={participant.name}
               initial={{
                 opacity: 0,
@@ -263,7 +263,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
               </div>
 
               {/* Crown/Medal icon above card for winner */}
-              <motion.div
+              <m.div
                 initial={{ scale: 0, y: 10 }}
                 animate={{ scale: 1, y: 0 }}
                 transition={{ delay: compact ? 0.1 : 0.4 + displayIndex * 0.1, type: 'spring', stiffness: 300, damping: 15 }}
@@ -275,10 +275,10 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                   'w-6 h-6 text-orange-400 drop-shadow-[0_2px_4px_rgba(251,146,60,0.5)]',
                   compact && 'scale-75'
                 )} />
-              </motion.div>
+              </m.div>
 
               {/* Player Card */}
-              <motion.div
+              <m.div
                 whileHover={{ scale: 1.05, y: -4 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleCardClick(rank, isCurrentPlayer)}
@@ -294,7 +294,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
 
                 {/* Winner glow pulse */}
                 {rank === 1 && !reducedMotion && (
-                  <motion.div
+                  <m.div
                     className="absolute inset-0 rounded-neo pointer-events-none"
                     animate={{
                       boxShadow: [
@@ -360,7 +360,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                     <ScoreCountUp to={participant.score} duration={1400} delay={reducedMotion ? 0 : 400 + displayIndex * 150} />
                   </span>
                 </div>
-              </motion.div>
+              </m.div>
 
               {/* Podium Base */}
               <div className={cn(
@@ -381,14 +381,14 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                   {rank}
                 </span>
               </div>
-            </motion.div>
+            </m.div>
           );
         })}
       </div>
 
       {/* Podium Floor */}
       <div className="w-full h-2 bg-neo-black rounded-b-neo -mt-[2px]" />
-    </motion.div>
+    </m.div>
   );
 });
 

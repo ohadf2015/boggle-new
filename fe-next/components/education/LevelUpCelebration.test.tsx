@@ -34,12 +34,12 @@ vi.mock('framer-motion', () => {
       } = props;
       return React.createElement(Element, { ...rest, ref }, children);
     });
-    Component.displayName = `motion.${Element}`;
+    Component.displayName = `m.${Element}`;
     return Component;
   };
 
   return {
-    motion: {
+    m: {
       div: createMockComponent('div'),
       span: createMockComponent('span'),
       button: createMockComponent('button'),

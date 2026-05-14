@@ -174,15 +174,6 @@ export {
   type ModifiableConfig,
 } from './weeklyModifiers';
 
-// Daily quests
-export {
-  getDailyQuests,
-  DAILY_QUEST_POOL,
-  DAILY_QUEST_COMPLETION_BONUS,
-  checkAllDailyQuestsComplete,
-  type DailyQuest,
-} from './dailyQuests';
-
 // Endless mode
 export {
   ENDLESS_MODE_CONFIG,

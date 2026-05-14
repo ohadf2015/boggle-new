@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { SeasonBadgeCard } from './SeasonBadgeCard';
@@ -24,7 +24,7 @@ export const SeasonTrophyCase: React.FC<SeasonTrophyCaseProps> = ({
   const count = badges.length;
 
   return (
-    <motion.section
+    <m.section
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
@@ -75,7 +75,7 @@ export const SeasonTrophyCase: React.FC<SeasonTrophyCaseProps> = ({
           ))}
         </div>
       )}
-    </motion.section>
+    </m.section>
   );
 };
 

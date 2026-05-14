@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Trophy, ArrowRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -90,7 +90,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
         </div>
         <div className="flex justify-center gap-3">
           {displayPlayers.map((player, i) => (
-            <motion.div
+            <m.div
               key={player.username}
               initial={{ opacity: 0, y: 12, scale: 0.9 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -132,7 +132,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
               <span className="font-black text-neo-lime text-xs">
                 {player.totalScore.toLocaleString()}
               </span>
-            </motion.div>
+            </m.div>
           ))}
         </div>
         <Link
@@ -157,7 +157,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
 
       <div className="space-y-1">
         {displayPlayers.map((player, i) => (
-          <motion.div
+          <m.div
             key={player.username}
             initial={{ opacity: 0, x: -16 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -202,7 +202,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
             <span className="font-black text-neo-lime text-sm">
               {player.totalScore.toLocaleString()}
             </span>
-          </motion.div>
+          </m.div>
         ))}
       </div>
 

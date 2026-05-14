@@ -9,7 +9,7 @@ vi.mock('framer-motion', () => {
   const actual = vi.importActual('framer-motion');
   return {
     ...actual,
-    motion: {
+    m: {
       div: React.forwardRef(function MotionDiv(
         { children, className, style, ...rest }: any,
         ref: any

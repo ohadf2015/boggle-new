@@ -43,7 +43,6 @@ import BossRushResults from './BossRushResults';
 import AdventureHub from './AdventureHub';
 import { HubWelcomeBanner } from './HubWelcomeBanner';
 import RunePanel from './RunePanel';
-import { useDailyQuests } from '@/hooks/useDailyQuests';
 import { forgeRune as forgeRuneLogic, equipRune as equipRuneLogic, unequipRune as unequipRuneLogic } from '@/lib/adventure/runeCatalog';
 
 const AdventureGame = dynamic(() => import('./AdventureGame'), { ssr: false, loading: () => <div className="h-screen bg-neo-navy flex items-center justify-center"><Loader2 className="w-12 h-12 text-neo-yellow animate-spin" /></div> });
@@ -103,8 +102,6 @@ function AdventureView(): React.JSX.Element {
 
   useEffect(() => { stopGlobalMusic(500); }, [stopGlobalMusic]);
 
-  // Daily quests and streak for hub
-  const { quests: dailyQuests } = useDailyQuests({ currentWorld: progression?.currentWorld });
   const { inventory } = useAdventureInventory();
   const streakDays = progression?.streak?.currentStreak ?? 0;
   const bestStreak = progression?.streak?.bestStreak ?? 0;
@@ -480,7 +477,6 @@ function AdventureView(): React.JSX.Element {
               <AdventureHub
                 streakDays={streakDays}
                 bestStreak={bestStreak}
-                dailyQuests={dailyQuests}
                 totalStars={totalStars}
                 playerLevel={playerLevel}
                 gold={gold}

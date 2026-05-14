@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Brain } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -90,7 +90,7 @@ const BrainPointsDisplay: React.FC<BrainPointsDisplayProps> = memo(({
 
     // Full variant - large card
     return (
-        <motion.div
+        <m.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.4, type: 'spring', stiffness: 400, damping: 22 }}
@@ -107,7 +107,7 @@ const BrainPointsDisplay: React.FC<BrainPointsDisplayProps> = memo(({
                     {t('brain.points')}
                 </span>
             </div>
-        </motion.div>
+        </m.div>
     );
 });
 

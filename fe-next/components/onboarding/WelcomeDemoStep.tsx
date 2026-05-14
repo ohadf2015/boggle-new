@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Pointer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mascot } from '@/components/ui/Mascot';
@@ -37,7 +37,7 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
   return (
     <div className="flex flex-col items-center space-y-3 sm:space-y-5">
       {/* Compact welcome header */}
-      <motion.div
+      <m.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
@@ -49,11 +49,11 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
         <h2 className="text-xl sm:text-2xl font-black text-neo-white uppercase">
           {t('onboarding.welcome.title')}
         </h2>
-      </motion.div>
+      </m.div>
 
       {/* Phase indicator */}
       {!demoCompleted && (
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
@@ -76,11 +76,11 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
               </div>
             </>
           )}
-        </motion.div>
+        </m.div>
       )}
 
       {/* Interactive demo grid */}
-      <motion.div
+      <m.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.3, type: 'spring', stiffness: 280, damping: 26 }}
@@ -96,11 +96,11 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
           autoTrace={autoTracing}
           onAutoTraceComplete={handleAutoTraceComplete}
         />
-      </motion.div>
+      </m.div>
 
       {/* Celebration — auto-proceed after brief delay */}
       {demoCompleted && (
-        <motion.div
+        <m.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -113,7 +113,7 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
 
       {/* Skip button - always visible */}
       {!demoCompleted && (
-        <motion.button
+        <m.button
           data-testid="skip-button"
           onClick={onDemoComplete}
           initial={{ opacity: 0 }}
@@ -122,7 +122,7 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
           className="text-neo-white/60 text-xs underline hover:text-neo-white/80 transition-colors"
         >
           {t('onboarding.skip')}
-        </motion.button>
+        </m.button>
       )}
     </div>
   );

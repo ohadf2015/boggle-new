@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Coins, Trophy, Star, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -115,7 +115,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
   return (
     <AnimatePresence>
       {showRewards && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
@@ -177,7 +177,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
               </span>
             )}
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

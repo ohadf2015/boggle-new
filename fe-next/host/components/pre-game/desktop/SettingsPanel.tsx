@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Check, Monitor, Shuffle, FileText, Target } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import type { GameModeOption } from '@/components/GameModeSelector';
@@ -88,7 +88,7 @@ export function SettingsPanel({
               const isSelected = selectedGameMode === mode;
 
               return (
-                <motion.button
+                <m.button
                   key={mode}
                   data-testid={`game-mode-${mode}`}
                   data-selected={isSelected}
@@ -123,7 +123,7 @@ export function SettingsPanel({
                   {isSelected && (
                     <Check className={cn('w-5 h-5 xl:w-6 xl:h-6', colors.text)} />
                   )}
-                </motion.button>
+                </m.button>
               );
             })}
           </div>

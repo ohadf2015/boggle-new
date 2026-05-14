@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useSafeInterval } from '@/hooks/useSafeTimeout';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Users, Trophy, ChevronDown, ChevronUp, Share2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/Loader';
@@ -250,7 +250,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
   // Empty state - no successful players on leaderboard
   if (!loading && filteredParticipants.length === 0) {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className={`
@@ -288,12 +288,12 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
               : t('daily.beFirstToPlay')}
           </p>
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       role="region"
@@ -350,7 +350,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
 
       {/* Current User Position Card - Shows when user is not in visible list */}
       {currentUserData && currentUserIndex >= maxVisible && !expanded && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-3 p-3 rounded-xl bg-linear-to-r from-neo-cyan/30 to-neo-cyan/10 border-2 border-neo-cyan shadow-[0_0_15px_rgba(0,255,255,0.2)]"
@@ -401,7 +401,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
               )}
             </div>
           </div>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Loading state */}
@@ -455,7 +455,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
 
           {/* Show more/less button */}
           {hasMore && (
-            <motion.button
+            <m.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               onClick={() => setExpanded(!expanded)}
@@ -472,11 +472,11 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
                   {t('daily.showMore')} ({filteredParticipants.length - maxVisible} {t('daily.more')})
                 </>
               )}
-            </motion.button>
+            </m.button>
           )}
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 };
 

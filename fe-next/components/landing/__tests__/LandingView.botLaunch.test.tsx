@@ -184,7 +184,7 @@ vi.mock('../ModeCard', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, onClick, ...props }: any) => (
       <div onClick={onClick} {...props}>{children}</div>
     ),

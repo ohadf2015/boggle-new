@@ -13,7 +13,7 @@ import type { LetterGrid } from '@/types';
 vi.mock('framer-motion', () => {
   const passthrough = ({ children, animate, initial, ...props }: any) => <div {...props}>{children}</div>;
   return {
-    motion: { div: passthrough },
+    m: { div: passthrough },
     m: { div: passthrough },
     AnimatePresence: ({ children }: any) => <>{children}</>,
     LazyMotion: ({ children }: any) => <>{children}</>,

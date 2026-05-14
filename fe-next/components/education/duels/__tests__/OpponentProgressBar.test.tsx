@@ -3,7 +3,7 @@ import { OpponentProgressBar } from '../OpponentProgressBar';
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
 }));

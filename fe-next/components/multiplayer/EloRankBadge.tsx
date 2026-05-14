@@ -8,7 +8,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { getRankTier } from '@/shared/utils/eloRating';
 
 export interface EloRankBadgeProps {
@@ -32,14 +32,14 @@ export const EloRankBadge: React.FC<EloRankBadgeProps> = ({
   const isCompact = size === 'compact';
 
   return (
-    <motion.div
+    <m.div
       className={`inline-flex items-center ${isCompact ? 'gap-1' : 'gap-2'}`}
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
     >
       {/* Tier color dot */}
-      <motion.div
+      <m.div
         className={`rounded-full border-2 border-neo-black ${isCompact ? 'w-3 h-3' : 'w-4 h-4'}`}
         style={{ backgroundColor: tier.color }}
       />
@@ -61,7 +61,7 @@ export const EloRankBadge: React.FC<EloRankBadgeProps> = ({
 
       {/* Rating change indicator */}
       {ratingChange !== undefined && ratingChange !== 0 && (
-        <motion.span
+        <m.span
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.3 }}
@@ -70,9 +70,9 @@ export const EloRankBadge: React.FC<EloRankBadgeProps> = ({
           }`}
         >
           {ratingChange > 0 ? `+${ratingChange}` : `${ratingChange}`}
-        </motion.span>
+        </m.span>
       )}
-    </motion.div>
+    </m.div>
   );
 };
 

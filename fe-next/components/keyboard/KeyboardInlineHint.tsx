@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Keyboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -106,7 +106,7 @@ export function KeyboardInlineHint({
   return (
     <AnimatePresence>
       {isVisible && (
-        <motion.button
+        <m.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 5 }}
@@ -126,13 +126,13 @@ export function KeyboardInlineHint({
           aria-label={t('keyboardInlineHint.fullMessage')}
         >
           {/* Keyboard icon with subtle animation */}
-          <motion.div
+          <m.div
             animate={{ scale: [1, 1.1, 1] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             className="text-neo-cyan group-hover:text-neo-lime transition-colors"
           >
             <Keyboard className="w-3.5 h-3.5" />
-          </motion.div>
+          </m.div>
 
           {/* Text */}
           <span>
@@ -143,7 +143,7 @@ export function KeyboardInlineHint({
           <span className="text-neo-cream/50 group-hover:text-neo-cream/70 transition-colors">
             ⌨️
           </span>
-        </motion.button>
+        </m.button>
       )}
     </AnimatePresence>
   );

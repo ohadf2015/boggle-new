@@ -10,7 +10,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       // Forward data-testid and other relevant props
       const safeProps: Record<string, unknown> = {};

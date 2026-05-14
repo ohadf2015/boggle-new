@@ -13,7 +13,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { WifiOff } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -47,7 +47,7 @@ export function DuelDisconnectOverlay({
   }, []);
 
   return (
-    <motion.div
+    <m.div
       data-testid="disconnect-overlay"
       className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-xs"
       initial={{ opacity: 0 }}
@@ -73,6 +73,6 @@ export function DuelDisconnectOverlay({
           </p>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

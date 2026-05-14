@@ -6,7 +6,7 @@
 'use client';
 
 import React, { useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -55,7 +55,7 @@ export const CoinUnlockCard: React.FC<CoinUnlockCardProps> = ({
   }, [canAffordAction, onClick, onSpendStart]);
 
   return (
-    <motion.div
+    <m.div
       ref={cardRef}
       whileHover={canAffordAction ? { scale: 1.02, y: -2 } : {}}
       whileTap={canAffordAction ? { scale: 0.98 } : {}}
@@ -93,7 +93,7 @@ export const CoinUnlockCard: React.FC<CoinUnlockCardProps> = ({
           {t('wordHunt.results.earnMoreHint')}
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 };
 

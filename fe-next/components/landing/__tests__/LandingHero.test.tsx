@@ -17,7 +17,7 @@ vi.mock('framer-motion', () => {
   const motionObj = new Proxy({}, { get: (_, tag) => motionComponent });
   const AnimatePresence = ({ children }: any) => children;
   AnimatePresence.displayName = 'AnimatePresence';
-  return { motion: motionObj, AnimatePresence };
+  return { m: motionObj, AnimatePresence };
 });
 
 vi.mock('@/components/ui/IdleMascot', () => {

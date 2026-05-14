@@ -132,6 +132,26 @@ export function consumeStashedMessageId(role: 'HOST' | 'PLAYER'): string | null 
 }
 
 /**
+ * Process-local record of the last startGame messageId fully handled per role.
+ * A normal MP game start is processed by two handlers — the socket listener in
+ * `usePlayerGameEvents` AND PlayerView's `pendingGameStart` effect. The socket
+ * listener marks the id here so the effect can skip the redundant store/timer/
+ * ack work, while still running its effect-only work (mode-reveal trigger). The
+ * effect stays the sole handler when the socket listener is unmounted (player
+ * sitting on the results screen).
+ */
+const handledStartGameIds: Record<string, string | null> = {};
+
+export function markStartGameHandled(role: 'HOST' | 'PLAYER', messageId: string | null | undefined): void {
+  handledStartGameIds[role] = messageId ?? null;
+}
+
+export function wasStartGameHandled(role: 'HOST' | 'PLAYER', messageId: string | null | undefined): boolean {
+  if (!messageId) return false;
+  return handledStartGameIds[role] === messageId;
+}
+
+/**
  * Trigger game over celebration with confetti
  */
 export function triggerGameOverCelebration(): void {

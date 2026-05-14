@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { RotateCcw, ArrowRight, Sparkles, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -93,7 +93,7 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
   }, []);
 
   return (
-    <motion.div
+    <m.div
       data-testid="score-reveal"
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
@@ -103,7 +103,7 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
     >
       {/* Floating sparkle decorations — positions randomized per render */}
       {sparkles.map((spark) => (
-        <motion.div
+        <m.div
           key={`spark-${spark.x}-${spark.y}-${spark.delay}`}
           initial={{ scale: 0, rotate: spark.startRotate }}
           animate={{ scale: [0, 1.2, 1], rotate: [spark.startRotate, 15, 0] }}
@@ -112,7 +112,7 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
           style={{ left: `${spark.x}%`, top: `${spark.y}%` }}
         >
           <Sparkles className={cn(spark.size, spark.color)} />
-        </motion.div>
+        </m.div>
       ))}
 
       <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-6 shadow-hard-lg text-center relative overflow-hidden">
@@ -127,26 +127,26 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
         />
 
         {/* Celebration header */}
-        <motion.div
+        <m.div
           initial={{ scale: 0, rotate: -20 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ delay: 0.1, type: 'spring', stiffness: 500, damping: 15 }}
           className="mb-1 relative"
         >
           <Trophy className="w-8 h-8 text-neo-lime mx-auto drop-shadow-[0_0_8px_rgba(191,255,0,0.5)]" />
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="text-xs font-black uppercase tracking-widest text-neo-black/50 mb-1"
         >
           {t('onboarding.ftue.niceWork')}
-        </motion.div>
+        </m.div>
 
         {/* Score display with decorative circle */}
-        <motion.div
+        <m.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.25, type: 'spring', stiffness: 400, damping: 18 }}
@@ -154,7 +154,7 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
         >
           <div className="relative inline-block">
             {/* Decorative ring */}
-            <motion.div
+            <m.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.4 }}
@@ -172,7 +172,7 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
             </div>
           </div>
           {isAboveAverage && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
@@ -183,12 +183,12 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
               )}
             >
               {t('onboarding.ftue.aboveAverage')}
-            </motion.div>
+            </m.div>
           )}
-        </motion.div>
+        </m.div>
 
         {/* Visual comparison bar */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
@@ -199,7 +199,7 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
             <span>{t('onboarding.ftue.averageScoreLabel')}</span>
           </div>
           <div className="relative h-5 bg-neo-black/10 rounded-full border-2 border-neo-black/20 overflow-hidden">
-            <motion.div
+            <m.div
               initial={{ width: 0 }}
               animate={{ width: `${barPercent}%` }}
               transition={{ delay: 0.7, duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }}
@@ -220,11 +220,11 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
             <span className="text-sm font-black text-neo-black">{score}</span>
             <span className="text-sm font-bold text-neo-black/50">{averageScore}</span>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Action buttons — Continue is primary */}
         <div className="flex flex-col gap-2 relative">
-          <motion.button
+          <m.button
             data-testid="continue-button"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: [0.9, 1.04, 1], opacity: 1 }}
@@ -240,7 +240,7 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
           >
             {t('onboarding.ftue.continue')}
             <ArrowRight className="w-5 h-5" />
-          </motion.button>
+          </m.button>
           <button
             onClick={onTryAgain}
             className={cn(
@@ -255,7 +255,7 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
           </button>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

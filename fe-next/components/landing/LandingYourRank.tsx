@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -48,7 +48,7 @@ export function LandingYourRank() {
   }
 
   return (
-    <motion.div
+    <m.div
       className={cn(
         'w-full max-w-md mx-auto lg:max-w-none',
         'bg-linear-to-r from-neo-navy-light to-neo-navy',
@@ -84,6 +84,6 @@ export function LandingYourRank() {
           {rank.total_score.toLocaleString()}
         </p>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

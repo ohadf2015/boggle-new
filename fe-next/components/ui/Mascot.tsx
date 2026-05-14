@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, Variants } from 'framer-motion';
+import { m, Variants } from 'framer-motion';
 import { memo, useMemo } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -681,7 +681,7 @@ export const Mascot = memo(function Mascot({
   const mediaClass = `object-contain w-full h-full ${hasClip ? 'scale-110' : ''} drop-shadow-lg`;
 
   return (
-    <motion.div
+    <m.div
       className={`relative shrink-0 ${SIZE_CLASSES[size]} ${className}`}
       variants={animationVariants}
       animate={shouldAnimate ? 'animate' : undefined}
@@ -711,7 +711,7 @@ export const Mascot = memo(function Mascot({
           />
         )}
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 
@@ -747,7 +747,7 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
   const mediaClass = `object-contain w-full h-full ${hasClip ? 'scale-110' : ''} drop-shadow-lg`;
 
   return (
-    <motion.div
+    <m.div
       className={`relative shrink-0 ${SIZE_CLASSES[size]} ${className}`}
       initial={{ scale: 0, opacity: 0, y: 20 }}
       animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -758,7 +758,7 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
         delay,
       }}
     >
-      <motion.div
+      <m.div
         className="w-full h-full"
         variants={loopVariants}
         animate={shouldAnimate ? 'animate' : undefined}
@@ -788,8 +788,8 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
             />
           )}
         </div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 });
 

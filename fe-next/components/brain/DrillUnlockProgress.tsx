@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Lock, Unlock, Shuffle, BookOpen, Sparkles, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -66,7 +66,7 @@ export default function DrillUnlockProgress({
       {justUnlocked.map((drill) => {
         const Icon = drill.icon;
         return (
-          <motion.div
+          <m.div
             key={`unlocked-${drill.drillType}`}
             initial={{ opacity: 0, scale: 0.9, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -75,7 +75,7 @@ export default function DrillUnlockProgress({
               'bg-linear-to-r from-neo-lime/20 to-neo-cyan/20'
             )}
           >
-            <motion.div
+            <m.div
               animate={{
                 scale: [1, 1.2, 1],
                 rotate: [0, 10, -10, 0],
@@ -91,7 +91,7 @@ export default function DrillUnlockProgress({
               )}
             >
               <Unlock className="w-5 h-5 text-neo-black" />
-            </motion.div>
+            </m.div>
 
             <div className="flex-1">
               <div className="flex items-center gap-2">
@@ -115,7 +115,7 @@ export default function DrillUnlockProgress({
               'w-6 h-6',
               'text-neo-white'
             )} />
-          </motion.div>
+          </m.div>
         );
       })}
 
@@ -126,7 +126,7 @@ export default function DrillUnlockProgress({
         const progress = (gamesPlayed / drill.gamesRequired) * 100;
 
         return (
-          <motion.div
+          <m.div
             key={`progress-${drill.drillType}`}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -171,7 +171,7 @@ export default function DrillUnlockProgress({
                 'h-2 rounded-full border border-neo-black overflow-hidden',
                 'bg-neo-navy-light'
               )}>
-                <motion.div
+                <m.div
                   className={cn('h-full', drill.color)}
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
@@ -184,7 +184,7 @@ export default function DrillUnlockProgress({
               'w-5 h-5',
               'text-neo-white/50'
             )} />
-          </motion.div>
+          </m.div>
         );
       })}
     </div>

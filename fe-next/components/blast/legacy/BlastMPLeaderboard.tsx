@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useBlastOpponentActivity } from '@/hooks/gameState/selectors';
@@ -65,7 +65,7 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
           const isMe = entry.username === username;
           const isFlashing = flashingUser === entry.username && !isMe;
           return (
-            <motion.div
+            <m.div
               key={entry.username}
               animate={
                 isFlashing
@@ -87,7 +87,7 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
               <span className="opacity-60 w-3 text-center">{i + 1}</span>
               <span className="truncate max-w-[72px]">{entry.username}</span>
               <span className="ms-auto">{entry.score}</span>
-            </motion.div>
+            </m.div>
           );
         })}
       </div>
@@ -95,7 +95,7 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
       {/* Transient opponent word-found toast — reinforces shared play */}
       <AnimatePresence>
         {latestActivity && latestActivity.username !== username && latestActivity.type === 'word' && latestActivity.word && (
-          <motion.div
+          <m.div
             key={latestActivity.id}
             initial={{ opacity: 0, y: -4, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -112,7 +112,7 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
                 <span className="text-neo-red">+{latestActivity.score}</span>
               )}
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

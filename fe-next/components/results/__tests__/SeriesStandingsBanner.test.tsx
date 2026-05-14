@@ -22,7 +22,7 @@ vi.mock('framer-motion', () => {
   ));
   MockSpan.displayName = 'MockMotionSpan';
   return {
-    motion: { div: MockDiv, span: MockSpan },
+    m: { div: MockDiv, span: MockSpan },
     AnimatePresence: ({ children }: any) => React.createElement(React.Fragment, null, children),
   };
 });

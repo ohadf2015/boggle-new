@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -32,7 +32,7 @@ export function LandingTopWords({ words }: LandingTopWordsProps) {
 
       <div className="flex gap-3 sm:gap-4 md:gap-5 lg:gap-6 overflow-x-auto pb-2 px-2 snap-x snap-mandatory scrollbar-hide justify-center">
         {displayWords.map((entry, wi) => (
-          <motion.div
+          <m.div
             key={entry.word}
             className="flex items-center gap-0.5 snap-center shrink-0"
             initial="hidden"
@@ -40,7 +40,7 @@ export function LandingTopWords({ words }: LandingTopWordsProps) {
             viewport={{ once: true }}
           >
             {entry.word.split('').map((letter, li) => (
-              <motion.div
+              <m.div
                 key={li}
                 custom={wi * entry.word.length + li}
                 variants={tileVariants}
@@ -55,9 +55,9 @@ export function LandingTopWords({ words }: LandingTopWordsProps) {
                 style={{ perspective: 600 }}
               >
                 {letter}
-              </motion.div>
+              </m.div>
             ))}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0, rotate: -20 }}
               whileInView={{ opacity: 1, scale: 1, rotate: 3 }}
               viewport={{ once: true }}
@@ -69,8 +69,8 @@ export function LandingTopWords({ words }: LandingTopWordsProps) {
               )}
             >
               {entry.score}
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         ))}
       </div>
     </div>

@@ -16,7 +16,7 @@ import { EnhancedPlayerList } from '../desktop/EnhancedPlayerList';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.ComponentProps<'div'> & { initial?: unknown; animate?: unknown; exit?: unknown; transition?: unknown }) => (
       <div {...props}>{children}</div>
     ),

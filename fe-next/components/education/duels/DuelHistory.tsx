@@ -15,7 +15,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Swords, Trophy, X, Minus, Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
@@ -201,7 +201,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
                 : duel.challenger_score;
 
             return (
-              <motion.div
+              <m.div
                 key={duel.id}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -244,7 +244,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
                     {opponentScore}
                   </p>
                 </div>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>

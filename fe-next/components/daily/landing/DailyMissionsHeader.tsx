@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getSecondsUntilNextDaily } from '@/utils/dailyChallenge/dateUtils';
 import { formatTimeHHMMSS } from '@/shared/utils';
@@ -40,7 +40,7 @@ export function DailyMissionsHeader({ completedCount }: DailyMissionsHeaderProps
   const { monthAbbr, dayNum } = dateLabel;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: -12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
@@ -85,7 +85,7 @@ export function DailyMissionsHeader({ completedCount }: DailyMissionsHeaderProps
         {/* Segmented progress: 2 blocks */}
         <div className="flex gap-1.5" role="progressbar" aria-valuenow={Math.round((completedCount / 2) * 100)} aria-valuemin={0} aria-valuemax={2} data-testid="xp-progress-bar">
           {[0, 1].map((i) => (
-            <motion.div
+            <m.div
               key={`segment-${i}`}
               className={cn(
                 'flex-1 h-3.5 rounded-md border-2 border-black overflow-hidden',
@@ -96,7 +96,7 @@ export function DailyMissionsHeader({ completedCount }: DailyMissionsHeaderProps
               transition={{ duration: 0.3, delay: i * 0.1 }}
             >
               {i < completedCount && (
-                <motion.div
+                <m.div
                   className={cn(
                     'h-full rounded-sm',
                     allDone ? 'bg-neo-lime shadow-[0_0_8px_rgba(191,255,0,0.4)]' : 'bg-neo-lime'
@@ -106,7 +106,7 @@ export function DailyMissionsHeader({ completedCount }: DailyMissionsHeaderProps
                   transition={{ duration: 0.5, delay: 0.2 + i * 0.15, ease: 'easeOut' }}
                 />
               )}
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </div>
@@ -123,6 +123,6 @@ export function DailyMissionsHeader({ completedCount }: DailyMissionsHeaderProps
           {formatTimeHHMMSS(countdown)}
         </p>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

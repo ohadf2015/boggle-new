@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 
 interface ScreenFlashOverlayProps {
   trigger: number;
@@ -17,7 +17,7 @@ export function ScreenFlashOverlay({ trigger, colorClass = 'bg-white' }: ScreenF
   return (
     <AnimatePresence>
       {trigger > 0 && (
-        <motion.div
+        <m.div
           key={trigger}
           data-testid="screen-flash"
           data-trigger={trigger}

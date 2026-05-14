@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useRef } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 type WordFeedback = 'none' | 'valid' | 'invalid' | 'duplicate';
@@ -173,7 +173,7 @@ export function WordForgeGrid({
             const isShaking = feedback === 'invalid' && inPath;
 
             return (
-              <motion.div
+              <m.div
                 key={tileKey}
                 onMouseDown={() => handleTileStart(ri, ci)}
                 onMouseEnter={() => handleTileEnter(ri, ci)}
@@ -206,7 +206,7 @@ export function WordForgeGrid({
                 )}
               >
                 {letter}
-              </motion.div>
+              </m.div>
             );
           })
         )}

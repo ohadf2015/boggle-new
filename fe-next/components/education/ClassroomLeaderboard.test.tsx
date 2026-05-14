@@ -49,7 +49,7 @@ vi.mock('@/components/motion/AdaptiveMotion', () => {
         const Comp = React.forwardRef(({ children, ...props }: any, ref: any) =>
           React.createElement(tag, { ...props, ref }, children)
         );
-        Comp.displayName = `motion.${tag}`;
+        Comp.displayName = `m.${tag}`;
         return Comp;
       },
     });

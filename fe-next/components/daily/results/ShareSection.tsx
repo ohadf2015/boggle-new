@@ -6,7 +6,7 @@
 'use client';
 
 import React, { useRef, useCallback, useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Share2, RotateCcw, Loader2, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CoinBalanceBadge } from '@/components/ui/CoinBalanceBadge';
@@ -118,7 +118,7 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
   }, [canAffordRetry, isRetrying, onRetry, onSpendStart, retryCost]);
 
   return (
-    <motion.div
+    <m.div
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
@@ -192,7 +192,7 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
           {t('wordHunt.results.challengeFriends')}
         </Button>
       )}
-    </motion.div>
+    </m.div>
   );
 };
 

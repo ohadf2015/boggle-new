@@ -10,7 +10,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
@@ -58,7 +58,7 @@ export default function StudentPageClient() {
 
       <div className="w-full max-w-5xl mx-auto px-4 py-4 sm:px-6 flex-1 space-y-6">
         {/* Page title + inline nav */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
@@ -90,11 +90,11 @@ export default function StudentPageClient() {
               {t('student.nav.achievements')}
             </Link>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Join Classroom CTA (when no classroom) */}
         {!classroomId && (
-          <motion.div
+          <m.div
             className="bg-neo-lime text-neo-black border-3 border-black rounded-neo shadow-hard p-6"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -115,7 +115,7 @@ export default function StudentPageClient() {
             >
               {t('student.joinClassroom')}
             </Link>
-          </motion.div>
+          </m.div>
         )}
 
         {/* ZONE 1: Play */}

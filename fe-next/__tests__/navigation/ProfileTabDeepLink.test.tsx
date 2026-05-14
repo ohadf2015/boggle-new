@@ -28,7 +28,7 @@ vi.mock('next/navigation', () => ({
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => {
       const { initial, animate, exit, transition, drag, dragConstraints, dragElastic, onDragEnd, whileHover, whileTap, ...domProps } = props;
       return <div {...domProps}>{children}</div>;

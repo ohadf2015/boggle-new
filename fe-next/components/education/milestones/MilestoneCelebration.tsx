@@ -9,7 +9,7 @@
 
 import { memo, useEffect, useId, useRef } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -70,7 +70,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
     return (
       <AnimatePresence>
         {/* Overlay */}
-        <motion.div
+        <m.div
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
@@ -85,7 +85,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
           onClick={onClose}
         >
           {/* Modal Card */}
-          <motion.div
+          <m.div
             ref={modalRef}
             className={cn(
               'relative w-full max-w-md mx-4',
@@ -101,7 +101,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
             onClick={(e) => e.stopPropagation()}
           >
             {/* Celebration Mascot */}
-            <motion.div
+            <m.div
               className="mb-4"
               initial={{ scale: 0, rotate: -30 }}
               animate={{ scale: [0, 1.3, 1], rotate: [30, -15, 0] }}
@@ -127,7 +127,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
                   aria-hidden="true"
                 />
               )}
-            </motion.div>
+            </m.div>
 
             {/* Title */}
             <h2
@@ -147,7 +147,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
               <p className="text-neo-white/70 font-bold text-lg mb-2">
                 {t('education.milestones.level')}
               </p>
-              <motion.div
+              <m.div
                 className={cn(
                   'inline-flex items-center justify-center',
                   'w-20 h-20 md:w-24 md:h-24',
@@ -167,13 +167,13 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
                 >
                   {level}
                 </span>
-              </motion.div>
+              </m.div>
             </div>
 
             {/* Rewards Section */}
             <div className="mb-6 space-y-3">
               {/* XP Bonus */}
-              <motion.div
+              <m.div
                 className={cn(
                   'p-3 rounded-neo',
                   'bg-neo-cyan/10 border-neo border-neo-cyan'
@@ -188,10 +188,10 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
                 <p className="text-2xl font-black text-neo-white">
                   +{xpBonus}
                 </p>
-              </motion.div>
+              </m.div>
 
               {/* Coin Bonus */}
-              <motion.div
+              <m.div
                 className={cn(
                   'p-3 rounded-neo',
                   'bg-neo-lime/10 border-neo border-neo-lime'
@@ -206,12 +206,12 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
                 <p className="text-2xl font-black text-neo-white">
                   +{coinBonus}
                 </p>
-              </motion.div>
+              </m.div>
             </div>
 
             {/* Title Unlock Section */}
             {title && (
-              <motion.div
+              <m.div
                 className={cn(
                   'mb-6 p-4 rounded-neo',
                   'bg-neo-pink/20 border-neo border-neo-pink'
@@ -226,11 +226,11 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
                 <p className="text-lg md:text-xl font-black text-neo-white">
                   {title}
                 </p>
-              </motion.div>
+              </m.div>
             )}
 
             {/* Continue Button */}
-            <motion.button
+            <m.button
               onClick={onClose}
               className={cn(
                 'w-full py-3 px-6',
@@ -247,9 +247,9 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
               transition={{ delay: 0.8 }}
             >
               {t('education.milestones.continue')}
-            </motion.button>
-          </motion.div>
-        </motion.div>
+            </m.button>
+          </m.div>
+        </m.div>
       </AnimatePresence>
     );
   }

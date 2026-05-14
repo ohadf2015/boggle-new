@@ -7,7 +7,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 vi.mock('framer-motion', () => ({
-  motion: new Proxy({}, {
+  m: new Proxy({}, {
     get: () => ({ children, ...props }: React.ComponentProps<'div'>) => <div {...props}>{children}</div>,
   }),
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,

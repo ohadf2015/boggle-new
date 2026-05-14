@@ -9,7 +9,7 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { ArrowLeft, Trophy, BarChart3 } from 'lucide-react';
 import { CoinSpendAnimation } from '@/components/animations/CoinSpendAnimation';
@@ -314,7 +314,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
   /** Stats tab - Shows immersive attempt history and animated statistics */
   const renderStatsContent = () => (
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -322,7 +322,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     >
       <AttemptHistory attempts={result.attempts} attemptsUsed={result.attemptsUsed} t={t} />
       {stats && <StatsSection stats={stats} result={result} t={t} />}
-    </motion.div>
+    </m.div>
   );
 
   // ============================================================================
@@ -341,7 +341,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   }
 
   return (
-    <motion.div
+    <m.div
       key="word-hunt-results"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -462,7 +462,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         />,
         document.body
       )}
-    </motion.div>
+    </m.div>
   );
 };
 

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -316,7 +316,7 @@ export default function ConnectionsGame() {
     if (cleared) {
       return (
         <div className="flex-1 flex items-center justify-center px-4 py-6">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.92, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 320, damping: 22 }}
@@ -342,7 +342,7 @@ export default function ConnectionsGame() {
               )}
             </div>
             <div className="flex flex-col gap-2">
-              <motion.button
+              <m.button
                 type="button"
                 onClick={handlePlayAgain}
                 whileHover={{ scale: 1.03, y: -1 }}
@@ -350,7 +350,7 @@ export default function ConnectionsGame() {
                 className="w-full rounded-neo border-neo-thick border-neo-lime bg-neo-lime text-neo-navy font-neo-display font-bold px-5 py-3 shadow-hard"
               >
                 {t('connections.playAgain')}
-              </motion.button>
+              </m.button>
               <button
                 type="button"
                 onClick={handleQuit}
@@ -359,7 +359,7 @@ export default function ConnectionsGame() {
                 {t('connections.quitToMenu')}
               </button>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       );
     }
@@ -388,7 +388,7 @@ export default function ConnectionsGame() {
       </div>
 
       {/* Header: lives + level + score — sticky so HUD stays visible while scrolling / mobile keyboard up */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring' as const, stiffness: 280, damping: 24, delay: 0.1 }}
@@ -408,7 +408,7 @@ export default function ConnectionsGame() {
             {Array.from({ length: MAX_LIVES }).map((_, i) => {
               const alive = i < state.lives;
               return (
-                <motion.span
+                <m.span
                   key={`life-${i}`}
                   animate={
                     alive
@@ -419,14 +419,14 @@ export default function ConnectionsGame() {
                   className="text-xl select-none leading-none"
                 >
                   {alive ? '❤️' : '🖤'}
-                </motion.span>
+                </m.span>
               );
             })}
           </div>
         </div>
 
         {/* LEVEL — neo-brutalist cyan badge */}
-        <motion.div
+        <m.div
           ref={levelBadgeRef}
           key={`level-${level}`}
           initial={{ scale: 0.8, rotate: -3 }}
@@ -443,7 +443,7 @@ export default function ConnectionsGame() {
               <span className="text-neo-navy/50 text-xs font-mono font-bold"> / {totalLevels}</span>
             </p>
           </div>
-        </motion.div>
+        </m.div>
 
         <div className="flex flex-col items-end gap-1 text-sm font-neo-body min-w-0">
           <p className="text-neo-lime text-[10px] uppercase tracking-widest font-neo-display font-bold leading-none">
@@ -452,7 +452,7 @@ export default function ConnectionsGame() {
           <div className="flex items-center gap-2">
           <AnimatePresence>
             {state.streak >= 2 && (
-              <motion.span
+              <m.span
                 key={`streak-${state.streak}`}
                 initial={{ scale: 0.5, opacity: 0, y: -8 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -461,12 +461,12 @@ export default function ConnectionsGame() {
                 className="text-neo-orange font-bold"
               >
                 🔥 ×{state.streak}
-              </motion.span>
+              </m.span>
             )}
           </AnimatePresence>
           <span className="text-neo-white/60">
             <AnimatePresence mode="popLayout">
-              <motion.span
+              <m.span
                 key={sessionScore + state.score}
                 initial={{ y: -14, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -475,12 +475,12 @@ export default function ConnectionsGame() {
                 className="text-neo-cyan font-bold inline-block"
               >
                 {(sessionScore + state.score).toLocaleString()}
-              </motion.span>
+              </m.span>
             </AnimatePresence>
           </span>
           </div>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* XP earned this session */}
       {xpEarned > 0 && (

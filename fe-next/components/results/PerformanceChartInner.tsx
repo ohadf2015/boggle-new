@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useEffect, useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   LineChart,
   Line,
@@ -350,7 +350,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
     const gamesNeeded = 2 - gamesPlayed;
 
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
@@ -397,15 +397,15 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
 
             {/* Overlay with message */}
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/60 text-white">
-              <motion.div
+              <m.div
                 initial={{ scale: 0.8, rotate: -5 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
                 className="text-4xl mb-2"
               >
                 📊
-              </motion.div>
-              <motion.div
+              </m.div>
+              <m.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
@@ -419,7 +419,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
                 <p className="text-white/60 text-xs px-4">
                   {t('chart.needMoreGamesDesc')}
                 </p>
-              </motion.div>
+              </m.div>
             </div>
           </div>
 
@@ -460,14 +460,14 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
             </div>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
   const trendMessage = trend ? getTrendMessage(trend) : '';
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
@@ -512,14 +512,14 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
 
         {/* Trend Message */}
         {trendMessage && !compact && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
             className="mb-3 px-3 py-2 bg-neo-cyan/20 border border-neo-cyan/40 rounded-neo"
           >
             <span className="text-xs font-bold text-neo-cyan">{trendMessage}</span>
-          </motion.div>
+          </m.div>
         )}
 
         {/* Chart - only render ResponsiveContainer when dimensions are valid */}
@@ -650,7 +650,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
           </div>
         )}
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

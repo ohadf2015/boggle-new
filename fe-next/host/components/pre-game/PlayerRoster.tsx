@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useCallback, useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Crown, X, Pencil, Check } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
 import { useSocket } from '../../../utils/SocketContext';
@@ -166,7 +166,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
               : (isBot ? botEntranceVariants : playerEntranceVariants);
 
             return (
-              <motion.div
+              <m.div
                 key={name}
                 layout
                 variants={variants}
@@ -244,7 +244,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
 
                   {/* Remove/kick button — always visible for bots, hover-only for humans */}
                   {!isMe && (
-                    <motion.button
+                    <m.button
                       initial={{ opacity: isBot ? 1 : 0, scale: isBot ? 1 : 0.5 }}
                       whileHover={{ scale: 1.2 }}
                       whileTap={{ scale: 0.9 }}
@@ -256,7 +256,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                       aria-label={isBot ? t('hostView.removeBot') : t('hostView.kickPlayer')}
                     >
                       <X className="w-3 h-3 text-white stroke-3" />
-                    </motion.button>
+                    </m.button>
                   )}
 
                   {/* Bot indicator — small emoji only */}
@@ -313,7 +313,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                     {isMe && canEditSelfName && <Pencil className="w-2.5 h-2.5 shrink-0 opacity-60" />}
                   </button>
                 )}
-              </motion.div>
+              </m.div>
             );
           })}
         </AnimatePresence>
@@ -321,7 +321,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
         {/* Add bot button — sized to match avatar tile so the row stays compact and aligned */}
         {!isFull && (
           <div className="shrink-0 flex flex-col items-center gap-1.5">
-            <motion.button
+            <m.button
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.92 }}
               onClick={() => handleAddBot('medium')}
@@ -333,7 +333,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
               )}
             >
               <span className="text-2xl font-black text-white/60 group-hover:text-neo-cyan transition-colors leading-none">+</span>
-            </motion.button>
+            </m.button>
             <span className={cn('font-black uppercase tracking-tight text-white/50 leading-tight text-center', compact ? 'text-[10px] w-[68px]' : 'text-[11px] w-[72px]')}>
               {t('hostView.bot')}
             </span>

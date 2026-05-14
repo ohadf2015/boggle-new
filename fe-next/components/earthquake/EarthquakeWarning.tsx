@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDisableEarthquakeEffects, useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 
@@ -67,7 +67,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
     <>
       <AnimatePresence>
         {isVisible && (
-          <motion.div
+          <m.div
             className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -75,7 +75,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
             transition={{ duration: 0.2 }}
           >
             {/* Semi-transparent backdrop */}
-            <motion.div
+            <m.div
               className="absolute inset-0 bg-neo-black/40 text-white backdrop-blur-xs pointer-events-none"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -83,7 +83,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
             />
 
           {/* Warning Card */}
-          <motion.div
+          <m.div
             className="relative z-10 mx-4 max-w-lg"
             initial={{ scale: 0.5, rotate: -10, y: 50 }}
             animate={{
@@ -111,7 +111,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
               }}
             >
               {/* Warning Icon */}
-              <motion.div
+              <m.div
                 className="text-center mb-3"
                 animate={{
                   scale: [1, 1.2, 1],
@@ -125,7 +125,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
                 }}
               >
                 <span className="text-6xl">⚠️</span>
-              </motion.div>
+              </m.div>
 
               {/* Warning Text */}
               <div className="text-center">
@@ -151,13 +151,13 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
                 }}
               />
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Particle effects - warning sparkles */}
           {distances.map((distance, i) => {
             const angle = (i * 45) * (Math.PI / 180);
             return (
-              <motion.div
+              <m.div
                 key={`particle-${i}-${distance}`}
                 className="absolute w-3 h-3 rounded-full bg-neo-red border-2 border-neo-black"
                 style={{
@@ -187,7 +187,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
             );
           })}
 
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
     </>

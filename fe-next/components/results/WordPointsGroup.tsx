@@ -13,7 +13,7 @@
  */
 
 import { memo, useMemo, useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { getPointColor, getTextColor } from './utils';
 import { WordChip } from './WordChip';
@@ -94,14 +94,14 @@ const SimpleWordSpan = memo<{
 
   if (animate) {
     return (
-      <motion.span
+      <m.span
         key={wordObj.word}
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.02 * Math.min(index, 10) }}
       >
         {content}
-      </motion.span>
+      </m.span>
     );
   }
 
@@ -122,7 +122,7 @@ const PointGroupRow = memo<{
   animate: boolean;
   groupIndex?: number;
 }>(({ points, words, t, getPlayerCountForWord, mode, animate, groupIndex = 0 }) => (
-  <motion.div
+  <m.div
     initial={{ opacity: 0, x: -12 }}
     animate={{ opacity: 1, x: 0 }}
     transition={{ delay: 0.05 * groupIndex, type: 'spring', stiffness: 300, damping: 26 }}
@@ -133,7 +133,7 @@ const PointGroupRow = memo<{
     <div className="flex flex-wrap gap-1">
       {words.map((wordObj, i) => (
         mode === 'chip' ? (
-          <motion.div
+          <m.div
             key={`${points}-${i}`}
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -143,7 +143,7 @@ const PointGroupRow = memo<{
               wordObj={wordObj}
               playerCount={getPlayerCountForWord?.(wordObj.word) ?? 0}
             />
-          </motion.div>
+          </m.div>
         ) : (
           <SimpleWordSpan
             key={`${points}-${i}`}
@@ -154,7 +154,7 @@ const PointGroupRow = memo<{
         )
       ))}
     </div>
-  </motion.div>
+  </m.div>
 ));
 
 PointGroupRow.displayName = 'PointGroupRow';
@@ -268,7 +268,7 @@ export const SharedWordsSection = memo<SharedWordsSectionProps>(({
       </p>
       <div className="flex flex-wrap gap-1">
         {duplicateWords.map((wordObj, i) => (
-          <motion.div
+          <m.div
             key={`duplicate-${i}`}
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -278,7 +278,7 @@ export const SharedWordsSection = memo<SharedWordsSectionProps>(({
               wordObj={wordObj}
               playerCount={getPlayerCountForWord?.(wordObj.word) ?? 0}
             />
-          </motion.div>
+          </m.div>
         ))}
       </div>
     </div>

@@ -7,7 +7,7 @@
 'use client';
 
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -86,7 +86,7 @@ export function WordHuntLifeBar({ life, maxLife }: WordHuntLifeBarProps) {
       aria-label={t('wordHunt.lifeBar')}
     >
       {/* Heart icon */}
-      <motion.div
+      <m.div
         className={cn(
           "shrink-0 flex items-center justify-center w-9 h-9 rounded-full",
           "border-3 border-neo-black shadow-hard-sm",
@@ -96,11 +96,11 @@ export function WordHuntLifeBar({ life, maxLife }: WordHuntLifeBarProps) {
         transition={{ duration: 1, repeat: isLow ? Infinity : 0, ease: 'easeInOut' }}
       >
         <Heart data-testid="heart-icon" className="w-4 h-4 text-white fill-white drop-shadow-[0_1px_2px_rgb(0_0_0/0.4)]" />
-      </motion.div>
+      </m.div>
 
       {/* Bar container — allow overflow for drips; glow scoped here to avoid parent jitter */}
       <div data-testid="word-hunt-life-bar-track" className={cn("flex-1 relative", colors.glow)}>
-        <motion.div
+        <m.div
           className={cn(
             "h-7 rounded-neo overflow-hidden border-3 shadow-hard-sm relative",
             "bg-neo-navy/80",
@@ -108,7 +108,7 @@ export function WordHuntLifeBar({ life, maxLife }: WordHuntLifeBarProps) {
           )}
         >
           {/* Fill — gradient classes transition smoothly via CSS */}
-          <motion.div
+          <m.div
             data-testid="word-hunt-life-bar-fill"
             className={cn(
               "h-full relative overflow-hidden bg-linear-to-r transition-colors duration-700 ease-in-out",
@@ -124,7 +124,7 @@ export function WordHuntLifeBar({ life, maxLife }: WordHuntLifeBarProps) {
               className="absolute inset-0 bg-linear-to-r from-transparent via-white/25 to-transparent animate-shimmer pointer-events-none"
             />
             <div className="absolute inset-x-0 top-0 h-[3px] bg-linear-to-r from-white/40 via-white/20 to-white/40 pointer-events-none" />
-          </motion.div>
+          </m.div>
 
           {/* Segments */}
           {segments.map((seg) => (
@@ -141,12 +141,12 @@ export function WordHuntLifeBar({ life, maxLife }: WordHuntLifeBarProps) {
               {Math.floor(life)}/{maxLife}
             </span>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Drip droplets — fall below the bar on damage */}
         <AnimatePresence>
           {drips.map((drip) => (
-            <motion.div
+            <m.div
               key={drip.id}
               data-testid="life-drip-droplet"
               className="absolute rounded-full pointer-events-none"

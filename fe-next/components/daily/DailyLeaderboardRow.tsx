@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Clock, Sparkles, Crown } from 'lucide-react';
 import { getRankDisplay } from '@/utils/rankingStyles';
 import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
@@ -35,7 +35,7 @@ export const TodayParticipantRow = memo<{
   const timeAgo = formatDistanceToNow(participant.completed_at, t);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
@@ -180,7 +180,7 @@ export const TodayParticipantRow = memo<{
           <span>{timeAgo}</span>
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 });
 
@@ -201,7 +201,7 @@ export const AllTimeParticipantRow = memo<{
   const countryFlag = getCountryFlag(participant.country_code);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
@@ -301,7 +301,7 @@ export const AllTimeParticipantRow = memo<{
           <div className="font-bold text-purple-600 dark:text-purple-400">{participant.best_efficiency}</div>
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 });
 
@@ -312,7 +312,7 @@ AllTimeParticipantRow.displayName = 'AllTimeParticipantRow';
 // ==========================================
 
 export const SkeletonRow = memo<{ index: number }>(({ index }) => (
-  <motion.div
+  <m.div
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
@@ -327,7 +327,7 @@ export const SkeletonRow = memo<{ index: number }>(({ index }) => (
       <div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
       <div className="h-3 w-16 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
     </div>
-  </motion.div>
+  </m.div>
 ));
 
 SkeletonRow.displayName = 'SkeletonRow';

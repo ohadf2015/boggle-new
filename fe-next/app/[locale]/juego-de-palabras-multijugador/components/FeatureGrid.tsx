@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { FEATURES } from '../data';
 
@@ -21,7 +21,7 @@ export function FeatureGrid() {
 
       <ul className="grid gap-3 sm:grid-cols-2 sm:gap-4">
         {FEATURES.map((feature, i) => (
-          <motion.li
+          <m.li
             key={feature.text}
             initial={reduced ? false : { opacity: 0, y: 18 }}
             whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
@@ -51,7 +51,7 @@ export function FeatureGrid() {
             <p className="pt-0.5 font-neo-body text-sm font-medium leading-snug text-neo-white sm:text-base">
               {feature.text}
             </p>
-          </motion.li>
+          </m.li>
         ))}
       </ul>
     </section>

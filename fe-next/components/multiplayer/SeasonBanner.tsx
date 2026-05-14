@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Crown, Trophy } from 'lucide-react';
 import { useSeason } from '@/hooks/useSeason';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -30,7 +30,7 @@ export const SeasonBanner: React.FC = () => {
   const tagline = taglineRaw && taglineRaw !== taglineKey ? taglineRaw : null;
 
   return (
-    <motion.div
+    <m.div
       className={`
         relative mx-4 mt-3 overflow-hidden
         rounded-neo border-neo-thick
@@ -171,6 +171,6 @@ export const SeasonBanner: React.FC = () => {
           )}
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 };

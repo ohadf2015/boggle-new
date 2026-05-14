@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -189,7 +189,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         />
 
         {/* Header — Arena Hub style */}
-        <motion.header
+        <m.header
           variants={headerVariants}
           initial={hasMountedRef.current ? false : "hidden"}
           animate="visible"
@@ -223,12 +223,12 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           >
             <HelpCircle className="w-5 h-5 text-neo-white" />
           </button>
-        </motion.header>
+        </m.header>
 
         {/* Hero banner — kawaii rivals + neon arena. Decorative; h1 in header
             owns the localized title. Aspect-locked for layout stability (no CLS),
             object-cover keeps focal point centered across viewports. */}
-        <motion.div
+        <m.div
           initial={hasMountedRef.current ? false : { opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut', delay: 0.05 }}
@@ -250,7 +250,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               />
             </div>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Scrollable Content. At lg+ split into a 2-column desktop layout
             (audit C1 Tier 3): left rail = welcome + actions + CG-friends,
@@ -288,7 +288,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
           {/* Live Match Status Bar */}
           {liveMatchCount > 0 && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               className="bg-neo-pink/10 border-2 border-neo-pink rounded-xl p-3 flex items-center justify-between"
@@ -300,11 +300,11 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 </span>
               </div>
               <Eye className="w-4 h-4 text-neo-pink" />
-            </motion.div>
+            </m.div>
           )}
 
           {/* Open Arenas Section */}
-          <motion.section
+          <m.section
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25 }}
@@ -320,7 +320,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                   </span>
                 )}
               </h2>
-              <motion.button
+              <m.button
                 onClick={onRefreshRooms}
                 disabled={roomsLoading}
                 whileHover={{ scale: 1.1, rotate: 90 }}
@@ -334,7 +334,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 ) : (
                   <RefreshCw className="w-4 h-4 text-neo-cream" />
                 )}
-              </motion.button>
+              </m.button>
             </div>
 
             {roomsLoading && activeRooms.length === 0 ? (
@@ -362,7 +362,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 ))}
               </div>
             ) : hasRooms ? (
-              <motion.div
+              <m.div
                 className="flex flex-col gap-3"
                 role="list"
                 aria-label={t('multiplayerFlow.roomList.roomsListLabel')}
@@ -376,7 +376,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                     const ModeIcon = mode.icon;
 
                     return (
-                      <motion.button
+                      <m.button
                         key={room.gameCode}
                         role="listitem"
                         aria-label={t('multiplayerFlow.roomList.joinRoomAction', { roomName: room.roomName || room.gameCode })}
@@ -468,15 +468,15 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                           )}
                           <ChevronRight className="w-4 h-4 text-white/40 shrink-0 rtl:rotate-180 group-hover:text-white/60 transition-colors" />
                         </div>
-                      </motion.button>
+                      </m.button>
                     );
                   })}
                 </AnimatePresence>
-              </motion.div>
+              </m.div>
             ) : (
               <ArenaEmptyState onQuickPlay={onQuickPlay} isQuickPlayLoading={isQuickPlayLoading} />
             )}
-          </motion.section>
+          </m.section>
           </div>
         </div>
 

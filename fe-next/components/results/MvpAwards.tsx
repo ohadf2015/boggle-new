@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import useReducedMotion from '@/hooks/useReducedMotion';
@@ -320,7 +320,7 @@ function AwardCard({
   const { def, username, value } = award;
 
   return (
-    <motion.div
+    <m.div
       initial={reducedMotion ? false : { opacity: 0, y: 20, scale: 0.8 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{
@@ -373,7 +373,7 @@ function AwardCard({
       <div
         className={`absolute top-0 right-0 w-6 h-6 ${def.borderColor.replace('border-', 'bg-')}/20 rounded-bl-neo`}
       />
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -405,7 +405,7 @@ function MvpAwards({
   return (
     <div className="space-y-2">
       {/* Section header */}
-      <motion.h3
+      <m.h3
         initial={reducedMotion ? false : { opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.2 }}
@@ -414,7 +414,7 @@ function MvpAwards({
         <span className="w-4 h-0.5 bg-neo-yellow/40 rounded-full" />
         {t('results.awards.title')}
         <span className="w-4 h-0.5 bg-neo-yellow/40 rounded-full" />
-      </motion.h3>
+      </m.h3>
 
       {/* Award cards grid — 2 columns on wider, 1 on narrow */}
       <div className="grid grid-cols-1 @sm:grid-cols-2 gap-2">

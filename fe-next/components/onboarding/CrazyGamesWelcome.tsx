@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Sparkles, Gamepad2, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -82,25 +82,25 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
     >
       {/* Decorative confetti — hard pixel squares scattered, not glow blobs */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, rotate: -8 }}
           animate={{ opacity: 1, rotate: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
           className="absolute top-6 right-8 w-4 h-4 bg-neo-pink border-2 border-black"
         />
-        <motion.div
+        <m.div
           initial={{ opacity: 0, rotate: 12 }}
           animate={{ opacity: 1, rotate: 8 }}
           transition={{ duration: 0.6, delay: 0.5 }}
           className="absolute top-20 left-12 w-3 h-3 bg-neo-cyan border-2 border-black rotate-12"
         />
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.55 }}
           className="absolute bottom-32 right-16 w-5 h-5 bg-neo-lime border-2 border-black -rotate-12"
         />
-        <motion.div
+        <m.div
           initial={{ opacity: 0, rotate: 0 }}
           animate={{ opacity: 1, rotate: -15 }}
           transition={{ duration: 0.6, delay: 0.65 }}
@@ -112,7 +112,7 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
         {/* LEFT — greeting block, intentionally left-aligned */}
         <div className={`flex flex-col gap-5 ${isRTL ? 'lg:text-right lg:items-end' : 'lg:text-left lg:items-start'} text-center items-center`}>
           {/* Tag chip — small surprise of personality */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: DECEL }}
@@ -120,10 +120,10 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
           >
             <span className="w-1.5 h-1.5 bg-black rounded-full animate-pulse" />
             {t('onboarding.crazygames.tagline')}
-          </motion.div>
+          </m.div>
 
           {/* Hero — display-only on the punch word, body font on intro line */}
-          <motion.h1
+          <m.h1
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.05, ease: DECEL }}
@@ -137,20 +137,20 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
             >
               {t('onboarding.crazygames.titleAccent')}
             </span>
-          </motion.h1>
+          </m.h1>
 
           {/* Subtitle — narrow column, body font */}
-          <motion.p
+          <m.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.45, delay: 0.15 }}
             className="font-neo-body text-base sm:text-lg text-neo-cream/85 max-w-[44ch] leading-relaxed"
           >
             {t('onboarding.crazygames.howTo')}
-          </motion.p>
+          </m.p>
 
           {/* CTA stack — one heavyweight primary, two side chips */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.25, ease: DECEL }}
@@ -184,11 +184,11 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
                 {t('onboarding.crazygames.playMultiplayer')}
               </button>
             </div>
-          </motion.div>
+          </m.div>
         </div>
 
         {/* RIGHT — demo on physical "plinth", slight tilt for charm */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.92, rotate: isRTL ? 2 : -2 }}
           animate={{ opacity: 1, scale: 1, rotate: isRTL ? 1.5 : -1.5 }}
           transition={{ duration: 0.6, delay: 0.2, ease: DECEL }}
@@ -203,7 +203,7 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
               <span className="font-neo-display text-[11px] uppercase tracking-[0.15em] text-neo-lime">
                 {t('onboarding.crazygames.demoCaption')}
               </span>
-              <motion.span
+              <m.span
                 animate={{ x: isRTL ? [0, -4, 0] : [0, 4, 0] }}
                 transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
                 className="font-neo-display text-[11px] uppercase tracking-[0.15em] text-neo-cream/70"
@@ -212,19 +212,19 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
                 {isRTL
                   ? `← ${getWelcomeDemoConfig(language).word.split('').join('-')}`
                   : `${getWelcomeDemoConfig(language).word.split('').join('-')} →`}
-              </motion.span>
+              </m.span>
             </div>
           </div>
           {/* Pinned sticker corner */}
-          <motion.div
+          <m.div
             initial={{ scale: 0, rotate: 0 }}
             animate={{ scale: 1, rotate: -12 }}
             transition={{ duration: 0.4, delay: 0.5, ease: DECEL }}
             className={`absolute -top-3 ${isRTL ? '-left-3' : '-right-3'} w-14 h-14 rounded-full bg-neo-pink border-neo-thick border-black flex items-center justify-center font-neo-display text-[10px] uppercase text-black tracking-tight leading-none text-center shadow-hard`}
           >
             {t('onboarding.crazygames.freeBadge')}
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       </div>
     </div>
   );

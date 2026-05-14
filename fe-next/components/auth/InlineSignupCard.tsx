@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { TrendingUp, Medal, Users, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getGuestStatsSummary } from '@/utils/guestManager';
@@ -45,7 +45,7 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
   const guestStats = getGuestStatsSummary();
 
   return (
-    <motion.section
+    <m.section
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 280, damping: 24 }}
@@ -75,7 +75,7 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
       {/* Benefits */}
       <ul className="space-y-2 mb-4">
         {benefits.map((benefit, index) => (
-          <motion.li
+          <m.li
             key={benefit.translationKey}
             initial={{ opacity: 0, x: -12 }}
             animate={{ opacity: 1, x: 0 }}
@@ -84,7 +84,7 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
           >
             <benefit.icon className="shrink-0 text-neo-cyan" size={16} aria-hidden />
             <span>{t(benefit.translationKey)}</span>
-          </motion.li>
+          </m.li>
         ))}
       </ul>
 
@@ -104,7 +104,7 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
       {error && <AuthErrorMessage message={error} className="mt-3" />}
 
       <AuthTermsFooter className="mt-3" />
-    </motion.section>
+    </m.section>
   );
 };
 

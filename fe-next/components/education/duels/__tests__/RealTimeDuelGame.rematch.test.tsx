@@ -9,12 +9,12 @@ vi.mock('@/hooks/useSafeTimeout', () => ({
   useInterval: vi.fn(),
 }));
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: Object.assign(
       React.forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {
         return <div ref={ref} {...props}>{children}</div>;
       }),
-      { displayName: 'motion.div' }
+      { displayName: 'm.div' }
     ),
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef, useCallback, forwardRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Coins, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -154,7 +154,7 @@ export const CoinCounterAnimated = forwardRef<HTMLDivElement, CoinCounterAnimate
         {/* Impact pulse ring */}
         <AnimatePresence>
           {showPulse && enableGlowEffects && !isLowEnd && (
-            <motion.div
+            <m.div
               className="absolute inset-0 rounded-neo-lg border-2 border-neo-lime"
               initial={{ scale: 1, opacity: 0.8 }}
               animate={{ scale: 1.5, opacity: 0 }}
@@ -165,7 +165,7 @@ export const CoinCounterAnimated = forwardRef<HTMLDivElement, CoinCounterAnimate
         </AnimatePresence>
 
         {/* Main coin badge */}
-        <motion.div
+        <m.div
           className={cn(
             'relative inline-flex items-center font-bold rounded-neo-lg overflow-hidden',
             'border-3 border-neo-black shadow-hard',
@@ -205,7 +205,7 @@ export const CoinCounterAnimated = forwardRef<HTMLDivElement, CoinCounterAnimate
           <div className="absolute inset-0 rounded-neo-lg opacity-30 pointer-events-none bg-linear-to-t from-transparent via-white/20 to-white/40" />
 
           {/* Coin icon with wobble */}
-          <motion.div
+          <m.div
             animate={
               isAnimating
                 ? { rotate: [0, -10, 10, -5, 5, 0] }
@@ -222,7 +222,7 @@ export const CoinCounterAnimated = forwardRef<HTMLDivElement, CoinCounterAnimate
               className={cn(sizeConfig[size].icon, 'text-amber-700 drop-shadow-xs')}
               strokeWidth={2.5}
             />
-          </motion.div>
+          </m.div>
 
           {/* Animated counter */}
           <span
@@ -236,12 +236,12 @@ export const CoinCounterAnimated = forwardRef<HTMLDivElement, CoinCounterAnimate
 
           {/* Bottom highlight */}
           <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-linear-to-r from-amber-600/50 via-amber-500/30 to-amber-600/50" />
-        </motion.div>
+        </m.div>
 
         {/* Added amount indicator */}
         <AnimatePresence>
           {addedAmount !== null && addedAmount > 0 && (
-            <motion.div
+            <m.div
               className="absolute -top-2 left-1/2 pointer-events-none"
               initial={{ opacity: 0, y: 0, x: '-50%', scale: 0.8 }}
               animate={{ opacity: 1, y: -30, scale: 1 }}
@@ -251,7 +251,7 @@ export const CoinCounterAnimated = forwardRef<HTMLDivElement, CoinCounterAnimate
               <span className="font-black text-neo-lime text-sm whitespace-nowrap drop-shadow-[0_2px_0_black]">
                 +{addedAmount}
               </span>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

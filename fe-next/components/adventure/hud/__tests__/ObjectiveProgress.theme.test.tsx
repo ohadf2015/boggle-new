@@ -26,7 +26,7 @@ vi.mock('@/contexts/AdventureThemeContext', () => ({
 
 // Mock Framer Motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,

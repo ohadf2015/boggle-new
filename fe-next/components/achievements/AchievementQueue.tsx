@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useMemo, useRef, useEffect, createContext, useContext, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { UnifiedAchievementModal } from './UnifiedAchievementModal';
 import type { CinematicPlayerProps } from '../adventure/boss/cinematics/CinematicPlayer';
@@ -219,7 +219,7 @@ function AchievementInlineToast({
   // to avoid the element extending beyond viewport bounds, which gets
   // clipped by overflow-x:clip on body (screen-fit class)
   const toast = (
-    <motion.div
+    <m.div
       data-testid="achievement-inline-toast"
       initial={{ y: -40, opacity: 0, scale: 0.92 }}
       animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -238,7 +238,7 @@ function AchievementInlineToast({
         }}
       >
         {/* Shine sweep — rarer tiers run twice */}
-        <motion.div
+        <m.div
           aria-hidden
           initial={{ x: isRtl ? 240 : -240, opacity: 0 }}
           animate={{ x: isRtl ? -240 : 240, opacity: [0, 0.85, 0] }}
@@ -258,7 +258,7 @@ function AchievementInlineToast({
 
         {/* Icon + glow ring + sparkles */}
         <div className="relative flex-shrink-0">
-          <motion.div
+          <m.div
             animate={{
               boxShadow: [
                 `0 0 0 0 ${glow}`,
@@ -270,7 +270,7 @@ function AchievementInlineToast({
             className="absolute inset-0 rounded-full"
             aria-hidden
           />
-          <motion.div
+          <m.div
             data-testid="achievement-inline-icon"
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
@@ -278,16 +278,16 @@ function AchievementInlineToast({
             className="relative w-9 h-9 flex items-center justify-center rounded-full border-2 border-neo-black"
             style={{ backgroundColor: iconBg }}
           >
-            <motion.span
+            <m.span
               className="text-lg leading-none"
               animate={{ y: [0, -1.5, 0] }}
               transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
             >
               {icon}
-            </motion.span>
-          </motion.div>
+            </m.span>
+          </m.div>
           {sparkles.map((s, i) => (
-            <motion.span
+            <m.span
               key={i}
               aria-hidden
               initial={{ opacity: 0, scale: 0 }}
@@ -305,13 +305,13 @@ function AchievementInlineToast({
               }}
             >
               ✦
-            </motion.span>
+            </m.span>
           ))}
         </div>
 
         {/* Text content */}
         <div className="relative flex flex-col flex-1 min-w-0 leading-tight">
-          <motion.span
+          <m.span
             initial={{ opacity: 0, y: -3 }}
             animate={{ opacity: 0.7, y: 0 }}
             transition={{ delay: 0.12 }}
@@ -319,7 +319,7 @@ function AchievementInlineToast({
           >
             <span>{t('achievements.unlocked')}</span>
             {tier && tierColors && tierStyle.showRarityBadge && (
-              <motion.span
+              <m.span
                 initial={{ scale: 0, rotate: -8 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.22, type: 'spring', stiffness: 500, damping: 14 }}
@@ -332,10 +332,10 @@ function AchievementInlineToast({
                 data-testid="achievement-inline-rarity"
               >
                 {tier}
-              </motion.span>
+              </m.span>
             )}
-          </motion.span>
-          <motion.span
+          </m.span>
+          <m.span
             data-testid="achievement-inline-name"
             initial={{ opacity: 0, y: 3 }}
             animate={{ opacity: 1, y: 0 }}
@@ -343,10 +343,10 @@ function AchievementInlineToast({
             className="font-black text-sm truncate text-neo-lime"
           >
             {name}
-          </motion.span>
+          </m.span>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 
   // Use portal to render at body level, escaping overflow constraints

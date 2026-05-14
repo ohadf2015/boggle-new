@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface GiftNotificationBadgeProps {
@@ -21,7 +21,7 @@ export function GiftNotificationBadge({ count, className }: GiftNotificationBadg
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0, opacity: 0 }}
@@ -35,7 +35,7 @@ export function GiftNotificationBadge({ count, className }: GiftNotificationBadg
           className
         )}
       >
-        <motion.span
+        <m.span
           animate={{
             scale: [1, 1.1, 1],
           }}
@@ -46,8 +46,8 @@ export function GiftNotificationBadge({ count, className }: GiftNotificationBadg
           }}
         >
           {count > 99 ? '99+' : count}
-        </motion.span>
-      </motion.div>
+        </m.span>
+      </m.div>
     </AnimatePresence>
   );
 }

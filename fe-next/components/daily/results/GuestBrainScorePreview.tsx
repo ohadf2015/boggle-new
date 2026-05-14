@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Brain, Lock, TrendingUp, Zap, Target, Lightbulb, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/Loader';
@@ -68,7 +68,7 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
   };
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={`relative bg-neo-purple dark:from-purple-900/20 dark:to-indigo-900/20 rounded-neo border-2 border-purple-200 dark:border-purple-700 overflow-hidden ${className}`}
@@ -162,7 +162,7 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
           </div>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

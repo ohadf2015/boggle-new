@@ -119,7 +119,7 @@ vi.mock('framer-motion', () => {
     span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
   };
   return {
-    motion: motionObj,
+    m: motionObj,
     m: motionObj,
     AnimatePresence: ({ children }: any) => <>{children}</>,
     useMotionValue: (init: number) => ({ get: () => init, set: () => {}, on: () => () => {} }),

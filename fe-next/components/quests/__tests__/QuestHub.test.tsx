@@ -81,7 +81,7 @@ vi.mock('framer-motion', () => {
   );
   Div.displayName = 'MockMotionDiv';
   return {
-    motion: { div: Div, button: 'button', span: 'span' },
+    m: { div: Div, button: 'button', span: 'span' },
     AnimatePresence: ({ children }: React.PropsWithChildren) =>
       React.createElement(React.Fragment, null, children),
   };

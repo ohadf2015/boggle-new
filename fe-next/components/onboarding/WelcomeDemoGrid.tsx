@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getWelcomeDemoConfig } from './demoConfigs';
 
@@ -69,7 +69,7 @@ const WelcomeDemoGrid: React.FC = () => {
                 rx={8}
                 fill="#000"
               />
-              <motion.rect
+              <m.rect
                 x={x}
                 y={y}
                 width={CELL}
@@ -117,7 +117,7 @@ const WelcomeDemoGrid: React.FC = () => {
       )}
 
       {/* Animated trace path */}
-      <motion.path
+      <m.path
         d={pathD}
         fill="none"
         stroke="#FF1493"
@@ -137,7 +137,7 @@ const WelcomeDemoGrid: React.FC = () => {
       />
 
       {/* Pointer dot follows the trace */}
-      <motion.circle
+      <m.circle
         r={9}
         fill="#FFFEF0"
         stroke="#000"

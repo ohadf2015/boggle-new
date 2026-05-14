@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { X, Trophy, Hash, Star } from 'lucide-react';
@@ -153,7 +153,7 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
                 <AnimatePresence mode="popLayout">
                   <div className="flex flex-wrap gap-1.5">
                     {sortedWords.map((word, idx) => (
-                      <motion.span
+                      <m.span
                         key={`${word}-${idx}`}
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -161,7 +161,7 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
                         className="inline-flex items-center px-2.5 py-1 rounded-neo border-2 border-neo-black bg-neo-white text-neo-navy text-xs sm:text-sm font-black uppercase shadow-hard-xs"
                       >
                         {word}
-                      </motion.span>
+                      </m.span>
                     ))}
                   </div>
                 </AnimatePresence>

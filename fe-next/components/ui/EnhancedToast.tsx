@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, Info, AlertTriangle, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -90,7 +90,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
   const { icon: Icon, bg, border, text } = config[toast.type];
 
   return (
-    <motion.div
+    <m.div
       layout
       initial={{ opacity: 0, y: 50, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -114,7 +114,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
     >
       {/* Progress bar */}
       <div className="absolute bottom-0 left-0 h-1 bg-neo-black/20">
-        <motion.div
+        <m.div
           className="h-full bg-neo-black/40"
           initial={{ width: '100%' }}
           animate={{ width: `${progress}%` }}
@@ -175,7 +175,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
           </button>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

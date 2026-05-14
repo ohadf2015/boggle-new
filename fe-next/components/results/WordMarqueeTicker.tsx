@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useRef } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface WordMarqueeTickerProps {
@@ -33,7 +33,7 @@ const WordMarqueeTicker: React.FC<WordMarqueeTickerProps> = memo(({
   const duration = Math.max(12, tickerWords.length * 3);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }}
@@ -79,7 +79,7 @@ const WordMarqueeTicker: React.FC<WordMarqueeTickerProps> = memo(({
 
       {/* Shimmer overlay — sweeps across the ticker */}
       {!reducedMotion && (
-        <motion.div
+        <m.div
           className="absolute inset-0 pointer-events-none z-10"
           style={{
             background: 'linear-gradient(90deg, transparent 0%, rgba(191,255,0,0.08) 20%, rgba(0,255,255,0.06) 40%, transparent 60%)',
@@ -95,7 +95,7 @@ const WordMarqueeTicker: React.FC<WordMarqueeTickerProps> = memo(({
           100% { transform: translateX(-50%); }
         }
       `}</style>
-    </motion.div>
+    </m.div>
   );
 });
 

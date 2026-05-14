@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Hand } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -106,7 +106,7 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
         {...swipeHandlers}
       >
         <AnimatePresence mode="wait">
-          <motion.div
+          <m.div
             key={currentStep}
             initial={{ opacity: 0, x: isRTL ? -30 : 30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -116,7 +116,7 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
           >
             {currentStep === 0 && <Step1SwipeAndColors isRTL={isRTL} t={t} />}
             {currentStep === 1 && <Step2FindWordAndClues targetWordLength={targetWordLength} t={t} />}
-          </motion.div>
+          </m.div>
         </AnimatePresence>
       </div>
 
@@ -156,7 +156,7 @@ const Step1SwipeAndColors: React.FC<{ isRTL: boolean; t: (key: string) => string
       <div className="relative inline-block shrink-0">
         <div className="grid grid-cols-3 gap-1">
           {letters.map((letter, idx) => (
-            <motion.div
+            <m.div
               key={`letter-${idx}-${letter}`}
               className={cn(
                 'w-9 h-9 sm:w-10 sm:h-10 rounded-lg border-2 border-neo-black flex items-center justify-center font-bold text-base sm:text-lg',
@@ -175,12 +175,12 @@ const Step1SwipeAndColors: React.FC<{ isRTL: boolean; t: (key: string) => string
               } : {}}
             >
               {letter}
-            </motion.div>
+            </m.div>
           ))}
         </div>
 
         {/* Animated Finger */}
-        <motion.div
+        <m.div
           className="absolute pointer-events-none"
           style={{ top: 0, left: 0 }}
           initial={{ x: isRTL ? 85 : 8, y: 8, opacity: 0 }}
@@ -197,7 +197,7 @@ const Step1SwipeAndColors: React.FC<{ isRTL: boolean; t: (key: string) => string
           }}
         >
           <Hand className="w-6 h-6 text-neo-black dark:text-neo-black fill-white dark:fill-neo-cream stroke-[2.5]" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} />
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Color Legend - Compact */}
@@ -236,7 +236,7 @@ const Step2FindWordAndClues: React.FC<{ targetWordLength: number; t: (key: strin
       <div className="flex flex-col items-center gap-3 shrink-0">
         <div className="flex justify-center gap-1.5 sm:gap-2">
           {Array.from({ length: displayLength }).map((_, idx) => (
-            <motion.div
+            <m.div
               key={`target-box-${idx}`}
               className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-neo-black border-2 border-neo-black flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-[2px_2px_0px_rgb(0,0,0)]"
               initial={{ scale: 0, rotateY: 90 }}
@@ -248,18 +248,18 @@ const Step2FindWordAndClues: React.FC<{ targetWordLength: number; t: (key: strin
                 damping: 26,
               }}
             >
-              <motion.span
+              <m.span
                 animate={{ opacity: [1, 0.5, 1] }}
                 transition={{ duration: 1.5, repeat: Infinity, delay: idx * 0.1 }}
               >
                 ?
-              </motion.span>
-            </motion.div>
+              </m.span>
+            </m.div>
           ))}
         </div>
 
         {/* Word discovery example - compact */}
-        <motion.div
+        <m.div
           className="flex items-center gap-2"
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
@@ -277,7 +277,7 @@ const Step2FindWordAndClues: React.FC<{ targetWordLength: number; t: (key: strin
           </div>
           <span className="text-base">→</span>
           <span className="text-base">💡</span>
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Description */}

@@ -13,7 +13,7 @@ import type { AccumulatedClue } from '../types';
 
 // Mock framer-motion to make tests synchronous
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, transition, whileHover, whileTap, ...domProps } = props;
       return <div {...domProps}>{children}</div>;

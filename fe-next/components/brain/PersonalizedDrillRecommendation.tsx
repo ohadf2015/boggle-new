@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Zap, Brain, Target, Shuffle, BookOpen, Lightbulb, ArrowRight, TrendingDown, type LucideIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -148,7 +148,7 @@ export default function PersonalizedDrillRecommendation({
   };
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
@@ -217,7 +217,7 @@ export default function PersonalizedDrillRecommendation({
 
           {/* Action Button */}
           {isUnlocked ? (
-            <motion.button
+            <m.button
               whileTap={{ scale: 0.95 }}
               onClick={handleStartDrill}
               className={cn(
@@ -229,7 +229,7 @@ export default function PersonalizedDrillRecommendation({
             >
               {t('brain.recommendation.startDrill')}
               <ArrowRight className="w-4 h-4 rtl:scale-x-[-1]" />
-            </motion.button>
+            </m.button>
           ) : (
             <div className={cn(
               'px-3 py-2 rounded-neo border-2 border-neo-black text-center',
@@ -253,6 +253,6 @@ export default function PersonalizedDrillRecommendation({
       )}>
         {t('brain.recommendation.scienceHint')}
       </p>
-    </motion.div>
+    </m.div>
   );
 }

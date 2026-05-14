@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowLeft, Volume2, VolumeX, Music, Bell, Eye, Sparkles, Zap, Languages, Monitor, MessageSquare, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -179,7 +179,7 @@ export default function SettingsPageClient(): React.JSX.Element {
         "py-3 sm:py-4 lg:py-6"
       )}>
         {/* Header */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           // Reduced margin: mobile 12px, sm 16px (was 24px)
@@ -212,7 +212,7 @@ export default function SettingsPageClient(): React.JSX.Element {
             unoptimized
             aria-hidden="true"
           />
-        </motion.div>
+        </m.div>
 
         {/* Settings Sections */}
         {/* Mobile: single column stack. xl: 2-column grid (Appearance+Audio left, Accessibility+Support right) */}
@@ -220,7 +220,7 @@ export default function SettingsPageClient(): React.JSX.Element {
           {/* Left column on xl: Appearance + Audio */}
           <div className="space-y-3 sm:space-y-4">
           {/* Appearance */}
-          <motion.section
+          <m.section
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -254,10 +254,10 @@ export default function SettingsPageClient(): React.JSX.Element {
                 </select>
               </SettingRow>
             </div>
-          </motion.section>
+          </m.section>
 
           {/* Audio */}
-          <motion.section
+          <m.section
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -304,13 +304,13 @@ export default function SettingsPageClient(): React.JSX.Element {
                 />
               </SettingRow>
             </div>
-          </motion.section>
+          </m.section>
           </div>{/* end left column */}
 
           {/* Right column on xl: Accessibility + Support */}
           <div className="space-y-3 sm:space-y-4">
           {/* Accessibility */}
-          <motion.section
+          <m.section
             id="accessibility"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -378,10 +378,10 @@ export default function SettingsPageClient(): React.JSX.Element {
                 />
               </SettingRow>
             </div>
-          </motion.section>
+          </m.section>
 
           {/* Notifications */}
-          <motion.section
+          <m.section
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35 }}
@@ -394,10 +394,10 @@ export default function SettingsPageClient(): React.JSX.Element {
               {t('settings.notifications')}
             </h2>
             <NotificationCategoryPreferences />
-          </motion.section>
+          </m.section>
 
           {/* Support & Feedback */}
-          <motion.section
+          <m.section
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
@@ -433,7 +433,7 @@ export default function SettingsPageClient(): React.JSX.Element {
               </div>
               <ChevronRight className={cn('w-5 h-5 rtl:rotate-180', isDarkMode ? 'text-gray-400' : 'text-gray-500')} />
             </Link>
-          </motion.section>
+          </m.section>
           </div>{/* end right column */}
         </div>{/* end grid */}
 
@@ -441,7 +441,7 @@ export default function SettingsPageClient(): React.JSX.Element {
         <DeleteAccountSection isDarkMode={isDarkMode} />
 
         {/* Footer */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -454,7 +454,7 @@ export default function SettingsPageClient(): React.JSX.Element {
           <p className={cn('text-xs', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
             {t('settings.savedAutomatically')}
           </p>
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 import TvMomentumTicker from '../TvMomentumTicker';
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: React.forwardRef(function MotionDiv(
       { children, className, style, ...rest }: any,
       ref: any

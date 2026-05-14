@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SeasonBanner } from '../SeasonBanner';
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, style, ...rest }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div className={className as string} style={style as React.CSSProperties} {...rest}>{children}</div>
     ),

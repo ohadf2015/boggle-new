@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowLeft, LogIn, ClipboardPaste } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -114,7 +114,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
     <div dir={dir} className="min-h-dvh bg-neo-navy flex flex-col">
       <EducationHeader showBackButton />
       <div className="flex-1 flex flex-col items-center justify-center p-4">
-        <motion.div
+        <m.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.3 }}
@@ -220,7 +220,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
             </div>
           </CardContent>
         </Card>
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

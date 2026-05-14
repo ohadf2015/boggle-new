@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 
 const AUTO_DISMISS_MS = 4000;
 const STORAGE_KEY = 'hasSeenDirectionHint';
@@ -71,7 +71,7 @@ const DirectionHintOverlay = memo<DirectionHintOverlayProps>(function DirectionH
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -80,7 +80,7 @@ const DirectionHintOverlay = memo<DirectionHintOverlayProps>(function DirectionH
           onClick={dismiss}
           data-testid="direction-hint-overlay"
         >
-          <motion.div
+          <m.div
             initial={{ scale: 0.8, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.8, opacity: 0, y: 20 }}
@@ -98,7 +98,7 @@ const DirectionHintOverlay = memo<DirectionHintOverlayProps>(function DirectionH
                   Array.from({ length: 3 }, (_, col) => {
                     const active = isCellActive(row, col);
                     return (
-                      <motion.div
+                      <m.div
                         key={`${row}-${col}`}
                         className={`flex items-center justify-center rounded border-2 ${
                           active
@@ -127,7 +127,7 @@ const DirectionHintOverlay = memo<DirectionHintOverlayProps>(function DirectionH
                     const from = getCenter(prev[0], prev[1]);
                     const to = getCenter(cell[0], cell[1]);
                     return (
-                      <motion.line
+                      <m.line
                         key={`${cell[0]}-${cell[1]}`}
                         x1={from.x}
                         y1={from.y}
@@ -152,18 +152,18 @@ const DirectionHintOverlay = memo<DirectionHintOverlayProps>(function DirectionH
             </p>
 
             {/* Progress bar */}
-            <motion.div
+            <m.div
               className="w-full h-1 bg-neo-yellow/40 rounded-full overflow-hidden"
             >
-              <motion.div
+              <m.div
                 className="h-full bg-neo-yellow rounded-full"
                 initial={{ width: '100%' }}
                 animate={{ width: '0%' }}
                 transition={{ duration: AUTO_DISMISS_MS / 1000, ease: 'linear' }}
               />
-            </motion.div>
-          </motion.div>
-        </motion.div>
+            </m.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

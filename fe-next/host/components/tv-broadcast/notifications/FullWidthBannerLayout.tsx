@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import { Mascot, type MascotVariant } from '../../../../components/ui/Mascot';
@@ -30,7 +30,7 @@ const FullWidthBannerLayout = memo<FullWidthBannerLayoutProps>(({
   borderColor,
 }) => {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 100, scaleX: 0.8 }}
       animate={{ opacity: 1, y: 0, scaleX: 1 }}
       exit={{ opacity: 0, y: 50, scaleX: 0.9 }}
@@ -45,37 +45,37 @@ const FullWidthBannerLayout = memo<FullWidthBannerLayoutProps>(({
     >
       <div className="flex items-center justify-between gap-6">
         {/* Left: Icon */}
-        <motion.div
+        <m.div
           animate={{ rotate: [0, -5, 5, 0], scale: [1, 1.1, 1] }}
           transition={{ duration: 0.6, repeat: Infinity }}
           className="shrink-0"
         >
           <Icon className="w-12 h-12 md:w-16 md:h-16" />
-        </motion.div>
+        </m.div>
 
         {/* Center: Content */}
         <div className="flex-1 text-center">
-          <motion.h3
+          <m.h3
             className="font-black uppercase tracking-wider text-3xl md:text-4xl lg:text-5xl"
             animate={{ scale: [1, 1.03, 1] }}
             transition={{ duration: 0.8, repeat: Infinity }}
           >
             {headline}
-          </motion.h3>
+          </m.h3>
           {subtext && (
-            <motion.p
+            <m.p
               className="font-bold text-lg md:text-xl opacity-90 mt-1"
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.9 }}
               transition={{ delay: 0.2, type: 'spring', stiffness: 280, damping: 26 }}
             >
               {subtext}
-            </motion.p>
+            </m.p>
           )}
         </div>
 
         {/* Right: Mascot */}
-        <motion.div
+        <m.div
           initial={{ scale: 0, rotate: 20 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: 'spring', stiffness: 500, damping: 20, delay: 0.15 }}
@@ -88,17 +88,17 @@ const FullWidthBannerLayout = memo<FullWidthBannerLayoutProps>(({
             className="drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]"
             clipBorder="none"
           />
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Animated accent line */}
-      <motion.div
+      <m.div
         className="absolute bottom-0 left-0 h-1 bg-neo-cream/50"
         initial={{ width: '100%' }}
         animate={{ width: '0%' }}
         transition={{ duration: 5, ease: 'linear' }}
       />
-    </motion.div>
+    </m.div>
   );
 });
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { Sparkles, Trophy, Target, Swords } from 'lucide-react';
@@ -113,7 +113,7 @@ export const SeasonAnnouncementModal: React.FC = () => {
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 texture-halftone"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -126,7 +126,7 @@ export const SeasonAnnouncementModal: React.FC = () => {
         {!reduceMotion && (
           <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
             {CONFETTI.map((c, i) => (
-              <motion.span
+              <m.span
                 key={i}
                 className="absolute block"
                 style={{
@@ -154,7 +154,7 @@ export const SeasonAnnouncementModal: React.FC = () => {
             ))}
           </div>
         )}
-        <motion.div
+        <m.div
           ref={dialogRef}
           tabIndex={-1}
           className="relative w-full max-w-md bg-neo-navy border-neo-thick border-black rounded-neo shadow-hard-lg p-6 flex flex-col gap-4 outline-none border-l-8 border-l-neo-lime max-h-[92vh] overflow-y-auto overflow-x-hidden"
@@ -171,7 +171,7 @@ export const SeasonAnnouncementModal: React.FC = () => {
             {/* Mascot with animated sparkle ring */}
             <div className="relative">
               {!reduceMotion && (
-                <motion.div
+                <m.div
                   className="absolute inset-0 rounded-full"
                   style={{
                     background:
@@ -184,7 +184,7 @@ export const SeasonAnnouncementModal: React.FC = () => {
                   aria-hidden="true"
                 />
               )}
-              <motion.div
+              <m.div
                 initial={reduceMotion ? false : { scale: 0, rotate: -15 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={
@@ -206,10 +206,10 @@ export const SeasonAnnouncementModal: React.FC = () => {
                     data-testid="season-announcement-mascot"
                   />
                 </div>
-              </motion.div>
+              </m.div>
             </div>
 
-            <motion.div
+            <m.div
               className="flex items-center gap-2 px-4 py-1.5 bg-neo-lime border-neo-thick border-black rounded-neo shadow-hard"
               initial={reduceMotion ? false : { opacity: 0, y: -8, scale: 0.8 }}
               animate={
@@ -224,9 +224,9 @@ export const SeasonAnnouncementModal: React.FC = () => {
                 {t('season.newSeason')}
               </span>
               <Sparkles className="w-4 h-4 text-black" aria-hidden="true" />
-            </motion.div>
+            </m.div>
 
-            <motion.h2
+            <m.h2
               id="season-announcement-title"
               className="font-neo-display font-black text-2xl text-neo-cream tracking-tight"
               initial={reduceMotion ? false : { opacity: 0, y: 8 }}
@@ -234,7 +234,7 @@ export const SeasonAnnouncementModal: React.FC = () => {
               transition={reduceMotion ? { duration: 0 } : { delay: 0.4 }}
             >
               {t('season.name', { number: season.id, theme: season.theme })}
-            </motion.h2>
+            </m.h2>
           </div>
 
           {/*
@@ -244,7 +244,7 @@ export const SeasonAnnouncementModal: React.FC = () => {
             Each tile: snappy spring entrance + idle wobble + hover lift.
           */}
           {prev && prevColor && (
-            <motion.div
+            <m.div
               className="grid grid-cols-3 gap-2 text-center"
               initial={reduceMotion ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -271,7 +271,7 @@ export const SeasonAnnouncementModal: React.FC = () => {
                   label: t('leaderboard.games'),
                 },
               ].map((tile, i) => (
-                <motion.div
+                <m.div
                   key={tile.label}
                   className="bg-neo-navy rounded-neo border-neo-thick border-black p-2 shadow-hard-sm"
                   initial={reduceMotion ? false : { opacity: 0, y: 18, scale: 0.7, rotate: -4 }}
@@ -304,12 +304,12 @@ export const SeasonAnnouncementModal: React.FC = () => {
                   <p className="text-[10px] text-neo-cream/70 uppercase tracking-wider mt-0.5 font-bold">
                     {tile.label}
                   </p>
-                </motion.div>
+                </m.div>
               ))}
-            </motion.div>
+            </m.div>
           )}
 
-          <motion.button
+          <m.button
             onClick={dismiss}
             className="
               w-full py-3 bg-neo-lime text-black font-neo-display font-black
@@ -324,9 +324,9 @@ export const SeasonAnnouncementModal: React.FC = () => {
             aria-label={t('season.continue')}
           >
             {t('season.continue')}
-          </motion.button>
-        </motion.div>
-      </motion.div>
+          </m.button>
+        </m.div>
+      </m.div>
     </AnimatePresence>
   );
 };

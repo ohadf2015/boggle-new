@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Swords } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 
@@ -35,7 +35,7 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
   if (compact) {
     return (
       <div className={cn('flex items-center gap-3', className)}>
-        <motion.button
+        <m.button
           onClick={onStartGame}
           disabled={disabled}
           className={cn(
@@ -55,7 +55,7 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
               <span>{t('hostView.startBattle')}</span>
             </>
           )}
-        </motion.button>
+        </m.button>
         <span className={cn(
           'text-[10px] font-bold uppercase whitespace-nowrap',
           playerCount === 0 ? 'text-neo-red' : 'text-slate-500'
@@ -68,7 +68,7 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
 
   return (
     <div className={cn('relative', className)}>
-      <motion.button
+      <m.button
         onClick={onStartGame}
         disabled={disabled}
         className={cn(
@@ -89,7 +89,7 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
             <span>{t('hostView.startBattle')}</span>
           </>
         )}
-      </motion.button>
+      </m.button>
       {/* Inline player count badge */}
       <div className="absolute end-3 top-1/2 -translate-y-1/2 bg-neo-black text-neo-lime text-[10px] font-black px-3 py-1 rounded-full border-2 border-neo-black shadow-hard-sm">
         {playerCount} / {maxPlayers}

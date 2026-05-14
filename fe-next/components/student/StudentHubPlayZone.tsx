@@ -8,7 +8,7 @@
  */
 
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PlayWithClassButton } from '@/components/student/PlayWithClassButton';
@@ -51,7 +51,7 @@ export function StudentHubPlayZone({ classroomId, userId, username }: StudentHub
           username={username}
         />
 
-        <motion.button
+        <m.button
           onClick={() => router.push(`/${language}/education/duels?classroomId=${classroomId}`)}
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -71,7 +71,7 @@ export function StudentHubPlayZone({ classroomId, userId, username }: StudentHub
               {t('student.dashboard.challengeClassmate')}
             </p>
           </div>
-        </motion.button>
+        </m.button>
       </div>
     </section>
   );

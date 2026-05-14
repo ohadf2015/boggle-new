@@ -8,7 +8,7 @@
  */
 
 import React, { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePowerHour } from '@/hooks/usePowerHour';
 import useReducedMotion from '@/hooks/useReducedMotion';
@@ -25,7 +25,7 @@ export const PowerHourBadge: React.FC = memo(() => {
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         data-testid="power-hour-badge"
         initial={reducedMotion ? false : { opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -50,7 +50,7 @@ export const PowerHourBadge: React.FC = memo(() => {
             {t('powerHour.expired')}
           </span>
         )}
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 });

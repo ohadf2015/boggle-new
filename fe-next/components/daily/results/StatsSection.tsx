@@ -7,7 +7,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Users, Target, TrendingUp, Heart, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCountUp } from '@/hooks/useCountUp';
@@ -35,14 +35,14 @@ const AnimatedStat: React.FC<{
     : String(animated);
 
   return (
-    <motion.span
+    <m.span
       className={className}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: delay / 1000, type: 'spring', stiffness: 300, damping: 25 }}
     >
       {display}{suffix}
-    </motion.span>
+    </m.span>
   );
 };
 
@@ -118,7 +118,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
 
         {/* Percentile badge */}
         {stats.yourStats?.solved && stats.yourStats.percentile !== undefined && (
-          <motion.div
+          <m.div
             initial={{ scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.6, type: 'spring', stiffness: 400, damping: 12 }}
@@ -130,26 +130,26 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
               </span>
             </div>
             {/* Shimmer sweep */}
-            <motion.div
+            <m.div
               className="absolute inset-0 rounded-full overflow-hidden pointer-events-none"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1 }}
             >
-              <motion.div
+              <m.div
                 className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent"
                 animate={{ x: ['-100%', '200%'] }}
                 transition={{ delay: 1.2, duration: 0.8, ease: 'easeInOut', repeat: Infinity, repeatDelay: 4 }}
               />
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </div>
 
       {/* Stat cards row */}
       <div className="grid grid-cols-3 gap-2">
         {statCards.map((card, idx) => (
-          <motion.div
+          <m.div
             key={card.label}
             initial={{ opacity: 0, y: 16, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -184,7 +184,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
             <span className="block text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-wide">
               {card.label}
             </span>
-          </motion.div>
+          </m.div>
         ))}
       </div>
 
@@ -213,7 +213,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
             const isYourAttempt = result.solved && result.attemptsUsed === attemptNum;
 
             return (
-              <motion.div
+              <m.div
                 key={attemptNum}
                 initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -234,7 +234,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
                 {/* Bar track */}
                 <div className="flex-1 h-5 bg-slate-700/50 rounded-sm overflow-hidden relative">
                   {/* Animated fill */}
-                  <motion.div
+                  <m.div
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.max(percentage, count > 0 ? 8 : 0)}%` }}
                     transition={{
@@ -249,21 +249,21 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
                     )}
                   >
                     {count > 0 && (
-                      <motion.span
+                      <m.span
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.9 + i * 0.08 }}
                         className="text-[10px] font-black text-white/90 tabular-nums drop-shadow-xs"
                       >
                         {count}
-                      </motion.span>
+                      </m.span>
                     )}
-                  </motion.div>
+                  </m.div>
                 </div>
 
                 {/* Your attempt marker */}
                 {isYourAttempt && (
-                  <motion.span
+                  <m.span
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{
@@ -275,10 +275,10 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
                     className="text-[10px] font-black text-neo-yellow uppercase w-8"
                   >
                     {t('common.you').toUpperCase()}
-                  </motion.span>
+                  </m.span>
                 )}
                 {!isYourAttempt && <span className="w-8" />}
-              </motion.div>
+              </m.div>
             );
           })}
         </div>
@@ -286,7 +286,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
 
       {/* Survival metrics (if available) */}
       {(stats.avgLifeRemaining != null || stats.avgEfficiencyScore != null) && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.4, type: 'spring', stiffness: 300, damping: 25 }}
@@ -322,7 +322,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
               </span>
             </div>
           )}
-        </motion.div>
+        </m.div>
       )}
     </div>
   );

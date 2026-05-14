@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import AutoHideHeader from '@/components/AutoHideHeader';
@@ -78,17 +78,17 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
       <main className="min-h-dvh bg-neo-navy text-white px-4 py-8 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl">
           {/* Page Title */}
-          <motion.h1
+          <m.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
             className="font-neo-display text-3xl sm:text-4xl font-bold text-center text-neo-yellow mb-8"
           >
             {label('wordOfTheDay', lang)}
-          </motion.h1>
+          </m.h1>
 
           {/* Today's Word Card */}
-          <motion.article
+          <m.article
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
@@ -169,7 +169,7 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
                 {copied ? label('copied', lang) : label('share', lang)}
               </button>
             </div>
-          </motion.article>
+          </m.article>
 
           {/* Ad between sections */}
           <InlineBannerAd webZone="content-page" className="mb-6" />
@@ -181,7 +181,7 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
             </h2>
             <div className="space-y-3 max-h-[500px] overflow-y-auto pe-1">
               {previousWords.map((word, i) => (
-                <motion.div
+                <m.div
                   key={word.dateKey}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -198,7 +198,7 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
                     <span className="text-xs text-neo-cream/50 ms-auto">{word.dateKey}</span>
                   </div>
                   <p className="text-sm text-neo-cream/80">{word.definition}</p>
-                </motion.div>
+                </m.div>
               ))}
             </div>
           </section>
@@ -207,7 +207,7 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
           <InlineBannerAd webZone="content-page" className="my-6" />
 
           {/* CTA */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
@@ -219,7 +219,7 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
             >
               {label('playNow', lang)}
             </Link>
-          </motion.div>
+          </m.div>
         </div>
       </main>
     </>

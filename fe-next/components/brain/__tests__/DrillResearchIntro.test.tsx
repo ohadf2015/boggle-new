@@ -12,7 +12,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  motion: {
+  m: {
     div: ({ children, className, role, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} role={role} {...props}>{children}</div>
     ),

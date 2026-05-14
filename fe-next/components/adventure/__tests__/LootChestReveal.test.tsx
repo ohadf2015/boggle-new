@@ -30,7 +30,7 @@ vi.mock('framer-motion', () => {
   });
   MockComponent.displayName = 'MockComponent';
   return {
-    motion: { div: MockComponent, button: MockComponent },
+    m: { div: MockComponent, button: MockComponent },
     AnimatePresence: ({ children }: any) => children,
   };
 });

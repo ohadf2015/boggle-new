@@ -1,7 +1,7 @@
 'use client';
 
 import React, { ReactNode } from 'react';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { m, AnimatePresence, Variants } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
 
@@ -99,7 +99,7 @@ export function PageTransition({
 
   return (
     <AnimatePresence mode="wait">
-      <motion.div
+      <m.div
         key={pageKey}
         className={className}
         variants={variants}
@@ -112,7 +112,7 @@ export function PageTransition({
         }}
       >
         {children}
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 }
@@ -151,7 +151,7 @@ export function MotionContainer({
   }
 
   return (
-    <motion.div
+    <m.div
       className={className}
       initial="hidden"
       animate="visible"
@@ -166,7 +166,7 @@ export function MotionContainer({
       }}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -208,13 +208,13 @@ export function MotionItem({
   };
 
   return (
-    <motion.div
+    <m.div
       className={className}
       variants={itemVariants[type]}
       transition={{ duration: 0.3, ease: 'easeOut' }}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -239,14 +239,14 @@ export function FadeIn({
   }
 
   return (
-    <motion.div
+    <m.div
       className={className}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration, delay }}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -269,14 +269,14 @@ export function ScaleOnHover({
   }
 
   return (
-    <motion.div
+    <m.div
       className={cn('cursor-pointer', className)}
       whileHover={{ scale }}
       whileTap={{ scale: scale * 0.95 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 

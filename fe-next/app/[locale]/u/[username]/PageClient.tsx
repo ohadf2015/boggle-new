@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, User as UserIcon } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSeasonBadges } from '@/hooks/useSeasonBadges';
@@ -63,7 +63,7 @@ export default function PublicProfilePageClient({ username }: { username: string
         </Link>
 
         {/* Hero header */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           className="rounded-neo-xl p-6 bg-neo-navy-light border-2 border-black shadow-hard-lg flex items-center gap-4"
@@ -87,7 +87,7 @@ export default function PublicProfilePageClient({ username }: { username: string
               </span>
             </div>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Season trophies — the marquee feature */}
         <SeasonTrophyCase

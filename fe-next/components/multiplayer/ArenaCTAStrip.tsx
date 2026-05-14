@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Zap, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Loader } from '@/components/ui/Loader';
@@ -33,14 +33,14 @@ const ArenaCTAStrip: React.FC<ArenaCTAStripProps> = ({
   const { t } = useLanguage();
 
   return (
-    <motion.section
+    <m.section
       data-testid="arena-cta-strip"
       variants={stripVariants}
       initial={skipEnterAnimation ? false : 'hidden'}
       animate="visible"
       className="flex flex-col sm:flex-row min-[720px]:flex-col gap-2.5"
     >
-      <motion.button
+      <m.button
         type="button"
         onClick={onQuickPlay}
         disabled={isQuickPlayLoading}
@@ -57,9 +57,9 @@ const ArenaCTAStrip: React.FC<ArenaCTAStripProps> = ({
         <span className="text-neo-black font-black text-base sm:text-lg uppercase tracking-tight">
           {t('multiplayerFlow.roomList.quickStart')}
         </span>
-      </motion.button>
+      </m.button>
 
-      <motion.button
+      <m.button
         type="button"
         onClick={onCreateRoom}
         aria-label={t('multiplayerFlow.roomList.createPrivateBattle')}
@@ -71,8 +71,8 @@ const ArenaCTAStrip: React.FC<ArenaCTAStripProps> = ({
         <span className="text-neo-pink font-black text-sm uppercase tracking-wide whitespace-nowrap">
           {t('multiplayerFlow.roomList.createPrivateBattle')}
         </span>
-      </motion.button>
-    </motion.section>
+      </m.button>
+    </m.section>
   );
 };
 

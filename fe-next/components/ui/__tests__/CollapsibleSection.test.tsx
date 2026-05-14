@@ -4,7 +4,7 @@ import CollapsibleSection from '../CollapsibleSection';
 
 // Mock framer-motion to avoid matchMedia issues
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: 'div',
     span: 'span',
   },

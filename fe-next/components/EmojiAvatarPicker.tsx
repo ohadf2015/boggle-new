@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Check, X, User, Paintbrush } from 'lucide-react';
 import Image from 'next/image';
 import { AVATARS, getAvatarPath, type AvatarConfig } from '@/utils/avatarConfig';
@@ -132,7 +132,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -142,7 +142,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
         aria-modal="true"
         aria-label={t('profile.chooseAvatar')}
       >
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
@@ -255,8 +255,8 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
               {t('common.save')}
             </button>
           </div>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
       )}
       {showBuilder && (
         <AvatarBuilderModal

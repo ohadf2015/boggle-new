@@ -18,7 +18,7 @@ vi.mock('framer-motion', () => {
     <span {...props}>{children}</span>
   );
   return {
-    motion: { div: passthrough, span: passthroughSpan },
+    m: { div: passthrough, span: passthroughSpan },
     m: { div: passthrough, span: passthroughSpan },
     AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
     LazyMotion: ({ children }: React.PropsWithChildren) => <>{children}</>,

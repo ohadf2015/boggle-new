@@ -8,7 +8,7 @@
  * Drops inline styles in favour of className — caller owns visual styling.
  */
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import type { ReactNode } from 'react';
 
 // stiffness 200 + damping 8 = maximum jelly feel with controlled overshoot
@@ -31,7 +31,7 @@ export function WobbleJellyCard({
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <motion.div
+    <m.div
       whileHover={
         disabled || shouldReduceMotion
           ? { opacity: 0.9 }
@@ -46,6 +46,6 @@ export function WobbleJellyCard({
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }

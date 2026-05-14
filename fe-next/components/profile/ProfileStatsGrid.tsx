@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Trophy, Star, Clock, BookOpenText } from 'lucide-react';
 import { StatCard } from './StatCard';
 import { formatTimePlayed } from '@/constants/achievementIcons';
@@ -23,7 +23,7 @@ export function ProfileStatsGrid({ profile, isDarkMode, delay = 0.1 }: ProfileSt
   const totalTime = profile?.total_time_played || 0;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
@@ -61,7 +61,7 @@ export function ProfileStatsGrid({ profile, isDarkMode, delay = 0.1 }: ProfileSt
         color="purple"
         index={3}
       />
-    </motion.div>
+    </m.div>
   );
 }
 

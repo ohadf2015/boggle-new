@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, memo, useMemo, useRef } from 'react';
 import { useSafeInterval } from '@/hooks/useSafeTimeout';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Trophy, ChevronDown, ChevronUp, Crown, Calendar, Users } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useFriends } from '@/hooks/useFriends';
@@ -616,7 +616,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
 
   return (
     <>
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
@@ -694,7 +694,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
 
       {/* Content area - loading/empty/participants */}
       {renderContent()}
-    </motion.div>
+    </m.div>
 
     <WordWheelWordsModal
       isOpen={!!wordsModalPlayer}

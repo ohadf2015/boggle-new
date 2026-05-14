@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useRef, useState, memo } from 'react';
-import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { m, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Crown, Medal, Hand } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { fireEquippedVictoryEffect } from '@/utils/victoryEffects';
@@ -250,7 +250,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
   const mascotVariant = getMascotVariant();
 
   return (
-    <motion.div
+    <m.div
       initial={reducedMotion ? undefined : { opacity: 0, scale: 0.88, y: 30, rotate: -2 }}
       animate={{ opacity: 1, scale: 1, y: 0, rotate: -1 }}
       transition={{ type: 'spring', stiffness: 180, damping: 18 }}
@@ -263,7 +263,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
       >
         {/* Ghost rank number — dramatic backdrop */}
         {variant === 'ranking' && (
-          <motion.div
+          <m.div
             className="absolute -top-3 -inset-s-2 sm:-top-5 sm:-inset-s-3 pointer-events-none select-none"
             initial={reducedMotion ? { opacity: 0.08 } : { opacity: 0, scale: 2.5, rotate: -20 }}
             animate={{ opacity: 0.08, scale: 1, rotate: -12 }}
@@ -272,7 +272,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
             <span className={`font-neo-display leading-none ${compact ? 'text-[100px]' : 'text-[120px] sm:text-[160px]'} ${styles.textClass}`}>
               {rank}
             </span>
-          </motion.div>
+          </m.div>
         )}
 
         {/* Radial spotlight from top center */}
@@ -285,7 +285,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
 
         {/* Animated accent border glow for top 3 */}
         {rank <= 3 && variant === 'ranking' && !reducedMotion && (
-          <motion.div
+          <m.div
             className="absolute inset-0 rounded-neo-lg pointer-events-none z-2"
             animate={{
               boxShadow: [
@@ -311,7 +311,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
 
         {/* Shimmer sweep */}
         {!reducedMotion && (
-          <motion.div
+          <m.div
             className="absolute inset-0 pointer-events-none"
             style={{
               background: 'linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.2) 48%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.2) 52%, transparent 70%)',
@@ -328,7 +328,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
           <div className="flex items-center gap-2.5 sm:gap-3">
             {/* Rank placement badge */}
             {variant === 'ranking' && (
-              <motion.div
+              <m.div
                 initial={reducedMotion ? undefined : { scale: 0, rotate: -30, y: -20 }}
                 animate={{ scale: 1, rotate: -3, y: 0 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 12 }}
@@ -351,12 +351,12 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                     {formatRankOrdinal(rank, t)}
                   </span>
                 </div>
-              </motion.div>
+              </m.div>
             )}
 
             {/* Avatar */}
             {winner.avatar && (
-              <motion.div
+              <m.div
                 initial={reducedMotion ? undefined : { scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
@@ -372,24 +372,24 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                     size={compact ? 'lg' : 'xl'}
                   />
                 </div>
-              </motion.div>
+              </m.div>
             )}
 
             {/* Name + Message */}
-            <motion.div
+            <m.div
               initial={reducedMotion ? undefined : { opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 26 }}
               className="text-start min-w-0 flex-1"
             >
-              <motion.span
+              <m.span
                 initial={reducedMotion ? undefined : { opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.45, duration: 0.3 }}
                 className={`inline-block ${styles.messageBgClass} ${styles.messageTextClass} text-[10px] sm:text-xs font-black uppercase px-1.5 py-0.5 border-2 border-neo-black rounded-neo shadow-hard-sm mb-0.5`}
               >
                 {getRankMessage()}
-              </motion.span>
+              </m.span>
               <h1
                 className={`font-black ${styles.textClass} uppercase leading-none truncate ${compact ? 'text-base sm:text-lg' : 'text-lg sm:text-xl md:text-2xl'}`}
                 style={{ textShadow: `2px 2px 0px ${styles.nameShadowColor}` }}
@@ -399,17 +399,17 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
               <p className={`text-[10px] sm:text-xs font-bold ${styles.textClass} opacity-70 uppercase mt-0.5`}>
                 {getAnnouncementText()}
               </p>
-            </motion.div>
+            </m.div>
           </div>
 
           {/* Row 2: Score — the HERO moment, centered and large */}
-          <motion.div
+          <m.div
             initial={reducedMotion ? undefined : { scale: 0.7, opacity: 0, y: 10 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ delay: 0.4, type: 'spring', stiffness: 250, damping: 14 }}
             className={`flex justify-center ${compact ? 'mt-2' : 'mt-3 sm:mt-4'}`}
           >
-            <motion.div
+            <m.div
               whileHover={{ scale: 1.04, rotate: 0, transition: { duration: 0.15 } }}
               className={`
                 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard-lg
@@ -419,7 +419,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
             >
               {/* Score shimmer */}
               {!reducedMotion && (
-                <motion.div
+                <m.div
                   className="absolute inset-0 pointer-events-none"
                   style={{
                     background: 'linear-gradient(110deg, transparent 30%, rgba(0,0,0,0.06) 50%, transparent 70%)',
@@ -432,7 +432,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
               <span className={`font-bold text-neo-black/50 uppercase tracking-widest ${compact ? 'text-[8px]' : 'text-[9px] sm:text-[10px]'}`}>
                 {t('results.points')}
               </span>
-              <motion.div
+              <m.div
                 initial={{ scale: 1 }}
                 animate={!reducedMotion ? { scale: [1, 1.15, 1] } : undefined}
                 transition={{ delay: 1.5, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
@@ -441,9 +441,9 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                   target={winner.score}
                   className={`font-black text-neo-black leading-none ${compact ? 'text-3xl sm:text-4xl' : 'text-4xl sm:text-5xl md:text-6xl'}`}
                 />
-              </motion.div>
-            </motion.div>
-          </motion.div>
+              </m.div>
+            </m.div>
+          </m.div>
         </div>
 
         {/* Mascot */}
@@ -469,7 +469,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
             )}
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 

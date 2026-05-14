@@ -28,7 +28,7 @@ vi.mock('framer-motion', () => {
   return {
     ...vi.importActual('framer-motion'),
     useReducedMotion: () => true,
-    motion: new Proxy({}, { get: makeMotion }),
+    m: new Proxy({}, { get: makeMotion }),
   };
 });
 

@@ -66,7 +66,7 @@ vi.mock('framer-motion', () => {
     }
   );
   return {
-  motion: {
+  m: {
     div: MockDiv,
     p: ({ children, className }: React.PropsWithChildren<React.HTMLAttributes<HTMLParagraphElement>>) => (
       <p className={className}>{children}</p>
@@ -124,7 +124,7 @@ vi.mock('@/components/results/MissedWords', () => {
   return { default: MockMissedWords };
 });
 
-// CatalystTeaser uses motion.section/motion.li — out of scope for this test, has its own suite
+// CatalystTeaser uses m.section/m.li — out of scope for this test, has its own suite
 vi.mock('../CatalystTeaser', () => ({
   __esModule: true,
   CatalystTeaser: () => <div data-testid="catalyst-teaser-stub" />,

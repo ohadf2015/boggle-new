@@ -1,5 +1,5 @@
 'use client';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export type FtueStep = 1 | 2 | 3 | 4 | 5 | 6 | null;
@@ -25,13 +25,13 @@ export function BlastFtueOverlay({ onComplete, isVeteran, step = 1 }: Props) {
 
   if (isVeteran) {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 flex items-center justify-center bg-black/75 z-50"
       >
-        <motion.div
+        <m.div
           className="bg-[#0b1530] border-neo-thick border-black rounded-neo p-6 max-w-sm text-center text-white space-y-4"
           initial={{ scale: reducedMotion === true ? 1 : 0.9 }}
           animate={{ scale: 1 }}
@@ -48,8 +48,8 @@ export function BlastFtueOverlay({ onComplete, isVeteran, step = 1 }: Props) {
           >
             {t('blast.tutorial.veteran.cta', "Let's go")}
           </button>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     );
   }
 
@@ -65,7 +65,7 @@ export function BlastFtueOverlay({ onComplete, isVeteran, step = 1 }: Props) {
       className="fixed inset-x-0 top-0 z-40 pointer-events-none flex justify-center"
     >
       <AnimatePresence mode="wait">
-        <motion.div
+        <m.div
           key={`ftue-step-${step}`}
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -84,7 +84,7 @@ export function BlastFtueOverlay({ onComplete, isVeteran, step = 1 }: Props) {
               {t('blast.tutorial.ftue.step6.cta', 'Continue')}
             </button>
           )}
-        </motion.div>
+        </m.div>
       </AnimatePresence>
     </div>
   );

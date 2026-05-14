@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -15,7 +15,7 @@ export function LandingBottomCTA({ onPlayClick }: LandingBottomCTAProps) {
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
 
   return (
-    <motion.div
+    <m.div
       className={cn(
         'w-full max-w-4xl mx-auto relative overflow-hidden',
         'bg-neo-navy',
@@ -43,7 +43,7 @@ export function LandingBottomCTA({ onPlayClick }: LandingBottomCTAProps) {
         <p className="text-neo-white/60 font-medium text-sm sm:text-base mb-8 max-w-lg mx-auto">
           {t('landing.welcomeSubtitle')}
         </p>
-        <motion.button
+        <m.button
           onClick={onPlayClick}
           className={cn(
             'relative inline-flex items-center gap-2 px-10 py-4 sm:px-12 sm:py-5',
@@ -57,8 +57,8 @@ export function LandingBottomCTA({ onPlayClick }: LandingBottomCTAProps) {
         >
           {t('landing.startPlaying')}
           <ArrowIcon className="w-5 h-5" />
-        </motion.button>
+        </m.button>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

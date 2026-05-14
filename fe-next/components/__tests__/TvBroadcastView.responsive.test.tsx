@@ -10,7 +10,7 @@ import { useTvSounds } from '@/host/hooks/useTvSounds';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, whileHover, whileTap, transition, ...domProps } = props as Record<string, unknown>;
       return <div {...domProps}>{children}</div>;

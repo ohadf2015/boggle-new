@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useSocket } from '@/utils/SocketContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 
 /**
  * Graduated reconnection UX delay.
@@ -122,7 +122,7 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
@@ -142,7 +142,7 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
         aria-label={config.label}
       >
         {/* Pulsing dot */}
-        <motion.div
+        <m.div
           animate={{ scale: [1, 1.2, 1], opacity: [1, 0.7, 1] }}
           transition={{ type: 'tween', duration: 1, repeat: Infinity, ease: 'easeInOut' }}
           className={cn(
@@ -159,18 +159,18 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
           {showExpandedState ? (
             <>
               {status === 'reconnecting' ? t('common.reconnecting') : t('common.connecting')}
-              <motion.span
+              <m.span
                 animate={{ opacity: [1, 0, 1] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
                 ...
-              </motion.span>
+              </m.span>
             </>
           ) : (
             config.label
           )}
         </span>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 };
@@ -252,7 +252,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
       {/* Tooltip */}
       <AnimatePresence>
         {showTooltip && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -4, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.95 }}
@@ -272,7 +272,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
               aria-hidden="true"
             />
             <span className="relative z-10">{config.description}</span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>
@@ -351,7 +351,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -100, opacity: 0 }}
@@ -371,7 +371,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
             <div className="flex items-center gap-3">
               {/* Pulsing indicator */}
               <div className="relative">
-                <motion.div
+                <m.div
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ type: 'tween', duration: 1.5, repeat: Infinity }}
                   className={cn(
@@ -417,7 +417,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
             {status === 'reconnecting' && reconnectAttempt > 0 && (
               <div className="flex flex-1 max-w-[200px] items-center gap-2">
                 <div className="flex-1 h-2 bg-neo-black/30 rounded-full overflow-hidden">
-                  <motion.div
+                  <m.div
                     className="h-full bg-neo-lime"
                     initial={{ width: 0 }}
                     animate={{ width: `${(reconnectAttempt / maxReconnectAttempts) * 100}%` }}
@@ -442,13 +442,13 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
               )}
               aria-label={t('connection.retry')}
             >
-              <motion.span
+              <m.span
                 animate={status === 'reconnecting' ? { rotate: 360 } : {}}
                 transition={{ duration: 1, repeat: status === 'reconnecting' ? Infinity : 0, ease: 'linear' }}
                 className="text-base"
               >
                 ↻
-              </motion.span>
+              </m.span>
               <span>{t('connection.retryNow')}</span>
             </button>
 
@@ -470,7 +470,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
             )}
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 };

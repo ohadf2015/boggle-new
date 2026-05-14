@@ -37,7 +37,7 @@ vi.mock('@/components/Avatar', () => {
 });
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...Object.fromEntries(Object.entries(props).filter(([k]) => !['initial', 'animate', 'transition', 'whileHover', 'whileTap'].includes(k)))}>{children}</div>
     ),

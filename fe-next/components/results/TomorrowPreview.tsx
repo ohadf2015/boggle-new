@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import useReducedMotion from '@/hooks/useReducedMotion';
 
@@ -61,7 +61,7 @@ const TomorrowPreview: React.FC<TomorrowPreviewProps> = memo(({ mode, onDismiss 
     : { initial: { y: 80, opacity: 0 }, animate: { y: 0, opacity: 1 }, exit: { y: 80, opacity: 0 } };
 
   return (
-    <motion.div
+    <m.div
       className="fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-[60] bg-neo-navy/95 backdrop-blur-xs border-t border-neo-yellow px-4 py-3 safe-area-bottom"
       initial={slideVariants.initial}
       animate={slideVariants.animate}
@@ -76,7 +76,7 @@ const TomorrowPreview: React.FC<TomorrowPreviewProps> = memo(({ mode, onDismiss 
           {seeYouText}
         </p>
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, X, Tv, QrCode, LayoutGrid, Trophy, Timer, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -142,7 +142,7 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -155,7 +155,7 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
         <div className="absolute inset-0 bg-neo-black/90" />
 
         {/* Tutorial card */}
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, y: 20 }}
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 20 }}
@@ -186,7 +186,7 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
           {/* Content */}
           <div className="p-6 pt-4">
             {/* Icon */}
-            <motion.div
+            <m.div
               key={step.id}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -196,10 +196,10 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
               <div className="w-20 h-20 rounded-full bg-neo-purple/20 border-3 border-neo-purple flex items-center justify-center text-neo-purple">
                 {step.icon}
               </div>
-            </motion.div>
+            </m.div>
 
             {/* Title */}
-            <motion.h2
+            <m.h2
               key={`title-${step.id}`}
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -207,10 +207,10 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
               className="text-2xl font-black text-neo-black text-center mb-3"
             >
               {t(step.titleKey)}
-            </motion.h2>
+            </m.h2>
 
             {/* Description */}
-            <motion.p
+            <m.p
               key={`desc-${step.id}`}
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -218,7 +218,7 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
               className="text-neo-black/80 text-center mb-6 leading-relaxed"
             >
               {t(step.descriptionKey)}
-            </motion.p>
+            </m.p>
 
             {/* Step indicator */}
             <p className="text-center text-sm text-neo-black/50 mb-4">
@@ -246,8 +246,8 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
               </Button>
             </div>
           </div>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </AnimatePresence>
   );
 };
@@ -281,7 +281,7 @@ export const TvHelpButton: React.FC<{
   onClick: () => void;
   t: (path: string) => string;
 }> = ({ onClick, t }) => (
-  <motion.button
+  <m.button
     whileHover={{ scale: 1.05 }}
     whileTap={{ scale: 0.95 }}
     onClick={onClick}
@@ -290,7 +290,7 @@ export const TvHelpButton: React.FC<{
     aria-label={t('tvTutorial.help')}
   >
     <HelpCircle className="w-5 h-5" />
-  </motion.button>
+  </m.button>
 );
 
 export default TvTutorialOverlay;

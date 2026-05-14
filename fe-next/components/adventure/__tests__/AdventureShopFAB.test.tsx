@@ -3,7 +3,7 @@ import AdventureShopFAB from '../AdventureShopFAB';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { whileHover, whileTap, initial, animate, transition, ...rest } = props;
       return <button {...rest}>{children}</button>;

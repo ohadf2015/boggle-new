@@ -13,7 +13,7 @@ import { useWordSubmission } from '@/hooks/useWordSubmission';
 import { generateRandomTable } from '@/utils/utils';
 import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   ArrowLeft,
   RotateCcw,
@@ -160,7 +160,7 @@ export default function SoloPracticeBoard({
   if (showComplete) {
     return (
       <div className="min-h-screen bg-neo-navy p-4 sm:p-6 flex items-center justify-center">
-        <motion.div
+        <m.div
           initial={{ scale: 0.8, opacity: 0, y: 30 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 260, damping: 20 }}
@@ -170,25 +170,25 @@ export default function SoloPracticeBoard({
           <div className="h-2 bg-linear-to-r from-neo-cyan via-neo-yellow to-neo-pink" />
 
           <div className="p-8 text-center">
-            <motion.div
+            <m.div
               initial={{ scale: 0, rotate: -30 }}
               animate={{ scale: 1, rotate: [0, 8, -5, 3, 0] }}
               transition={{ type: 'spring', stiffness: 400, damping: 12, delay: 0.2 }}
             >
               <Trophy className="w-16 h-16 mx-auto text-neo-yellow mb-4" />
-            </motion.div>
+            </m.div>
 
-            <motion.h2
+            <m.h2
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="text-2xl font-neo-display font-black text-neo-white uppercase mb-2"
             >
               {t('education.practice.complete')}
-            </motion.h2>
+            </m.h2>
 
             <div className="my-6 space-y-4">
-              <motion.div
+              <m.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 14, delay: 0.4 }}
@@ -197,15 +197,15 @@ export default function SoloPracticeBoard({
                 <Star className="w-6 h-6 text-neo-yellow" />
                 <span className="text-4xl font-neo-display font-black text-neo-cyan tabular-nums">{score}</span>
                 <span className="text-neo-white/60 font-bold">{t('education.practice.points')}</span>
-              </motion.div>
+              </m.div>
 
-              <motion.div
+              <m.div
                 className="grid grid-cols-2 gap-4 text-center"
                 initial="hidden"
                 animate="visible"
                 variants={{ visible: { transition: { staggerChildren: 0.1, delayChildren: 0.5 } } }}
               >
-                <motion.div
+                <m.div
                   variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
                   className="p-3 bg-neo-yellow/10 rounded-neo border-2 border-black shadow-hard-sm"
                 >
@@ -213,8 +213,8 @@ export default function SoloPracticeBoard({
                   <p className="text-xs text-neo-white/60 font-bold">
                     {t('education.practice.wordsFound')}
                   </p>
-                </motion.div>
-                <motion.div
+                </m.div>
+                <m.div
                   variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
                   className="p-3 bg-neo-cyan/10 rounded-neo border-2 border-black shadow-hard-sm"
                 >
@@ -222,13 +222,13 @@ export default function SoloPracticeBoard({
                   <p className="text-xs text-neo-white/60 font-bold">
                     {t('education.practice.vocabularyWords')}
                   </p>
-                </motion.div>
-              </motion.div>
+                </m.div>
+              </m.div>
             </div>
 
             {/* XP Session Summary */}
             {xpSessionData && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
@@ -239,20 +239,20 @@ export default function SoloPracticeBoard({
                     {xpSessionData.sessionMasteryMessage}
                   </p>
                 )}
-                <motion.p
+                <m.p
                   initial={{ scale: 0.8 }}
                   animate={{ scale: [1, 1.15, 1] }}
                   transition={{ delay: 0.9, duration: 0.4 }}
                   className="text-neo-white/80 font-neo-body font-bold"
                 >
                   +{xpSessionData.sessionXpEarned} {t('education.xp.xpGained')}
-                </motion.p>
-              </motion.div>
+                </m.p>
+              </m.div>
             )}
 
             {/* Vocabulary words found */}
             {vocabularyFound.length > 0 && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
@@ -261,7 +261,7 @@ export default function SoloPracticeBoard({
                 <p className="text-xs text-neo-white/50 font-bold mb-2">{t('education.practice.vocabularyWordsFound')}</p>
                 <div className="flex flex-wrap gap-2">
                   {vocabularyFound.map((word, i) => (
-                    <motion.span
+                    <m.span
                       key={word}
                       initial={{ opacity: 0, scale: 0 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -269,13 +269,13 @@ export default function SoloPracticeBoard({
                       className="px-2 py-1 bg-neo-cyan/20 text-neo-cyan text-sm rounded-neo border border-neo-cyan/30 font-neo-body font-bold"
                     >
                       {word}
-                    </motion.span>
+                    </m.span>
                   ))}
                 </div>
-              </motion.div>
+              </m.div>
             )}
 
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1 }}
@@ -300,9 +300,9 @@ export default function SoloPracticeBoard({
               >
                 {t('common.back')}
               </Button>
-            </motion.div>
+            </m.div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     );
   }

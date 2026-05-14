@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Rocket } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogBody, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
@@ -244,7 +244,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
         {/* Step content with animation and swipe support */}
         <DialogBody className="space-y-3 px-3 sm:px-6" {...swipeHandlers}>
           <AnimatePresence mode="wait">
-            <motion.div
+            <m.div
               key={currentStep}
               initial={{ opacity: 0, x: dir === 'rtl' ? -20 : 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -256,7 +256,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
               style={{ willChange: 'transform, opacity' }}
             >
               {renderStep()}
-            </motion.div>
+            </m.div>
           </AnimatePresence>
 
           {/* Swipe hint indicator - only shown on mobile */}

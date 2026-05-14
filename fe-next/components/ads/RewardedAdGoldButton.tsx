@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Play, Coins, Loader2, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -84,7 +84,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
   const burstCoins = Array.from({ length: 6 });
 
   return (
-    <motion.button
+    <m.button
       ref={btnRef}
       type="button"
       onClick={handleClick}
@@ -116,7 +116,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
     >
       {/* idle diagonal shimmer sweep */}
       {isIdle && !reducedMotion && (
-        <motion.span
+        <m.span
           aria-hidden
           className="absolute inset-0 pointer-events-none z-0"
           style={{
@@ -145,7 +145,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
       {/* coin particle burst on click */}
       <AnimatePresence>
         {burstKey > 0 && (
-          <motion.span
+          <m.span
             key={burstKey}
             aria-hidden
             className="absolute inset-0 pointer-events-none z-30"
@@ -159,7 +159,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
               const dx = Math.cos(angle) * 36;
               const dy = Math.sin(angle) * 28 - 8;
               return (
-                <motion.span
+                <m.span
                   key={`burst-${i}`}
                   className="absolute left-1/2 top-1/2 text-neo-yellow"
                   initial={{ x: 0, y: 0, scale: 0.4, opacity: 0 }}
@@ -167,10 +167,10 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
                   transition={{ duration: 0.7, ease: 'easeOut' }}
                 >
                   <Coins className="h-3 w-3 drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]" />
-                </motion.span>
+                </m.span>
               );
             })}
-          </motion.span>
+          </m.span>
         )}
       </AnimatePresence>
 
@@ -186,17 +186,17 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
       <span className="relative z-20 flex items-center gap-1">
         <span>{label}</span>
         {isIdle && (
-          <motion.span
+          <m.span
             className="inline-flex items-center gap-0.5 font-black text-neo-lime"
             animate={!reducedMotion ? { rotate: [0, -6, 6, 0] } : undefined}
             transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 2, ease: 'easeInOut' }}
           >
             <Coins className={isMd ? 'h-4 w-4' : 'h-3.5 w-3.5'} />
             +{goldAmount}
-          </motion.span>
+          </m.span>
         )}
       </span>
-    </motion.button>
+    </m.button>
   );
 };
 

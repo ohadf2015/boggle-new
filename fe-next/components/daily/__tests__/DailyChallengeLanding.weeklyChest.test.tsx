@@ -54,7 +54,7 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 vi.mock('framer-motion', () => ({
-  motion: new Proxy({}, {
+  m: new Proxy({}, {
     get: (_t: unknown, prop: string) => {
       return ({ children, ...rest }: React.PropsWithChildren<Record<string, unknown>>) =>
         React.createElement(prop, rest, children);

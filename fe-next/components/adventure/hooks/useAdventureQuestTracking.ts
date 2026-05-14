@@ -18,7 +18,6 @@ interface UseAdventureQuestTrackingParams {
   // Flash challenge
   isChallengeComplete: boolean;
   // Quest recorders
-  recordQuestProgress: (type: 'longWord' | 'comboStreak' | 'wordCount' | 'perfectStar' | 'speedRun' | 'bossDefeat' | 'mechanicUse', amount?: number) => void;
   chapterQuests: {
     recordWordsFound: (count: number) => void;
     recordLongWord: () => void;
@@ -35,7 +34,7 @@ export function useAdventureQuestTracking(params: UseAdventureQuestTrackingParam
     wordsFound, comboCount,
     isBossLevel, bossCurrentHP, bossMaxHP, playerCurrentHP, playerMaxHP, gridEffectTrigger,
     isChallengeComplete,
-    recordQuestProgress, chapterQuests, updateObjective,
+    chapterQuests, updateObjective,
   } = params;
 
   // Ref for chapterQuests to avoid having the object in useEffect deps.
@@ -74,37 +73,30 @@ export function useAdventureQuestTracking(params: UseAdventureQuestTrackingParam
     prevGridEffectRef.current = gridEffectTrigger;
   }, [gridEffectTrigger, updateObjective]);
 
-  // Daily quest progress: track words found, long words, and combos
+  // Chapter quest progress: track words found and long words
   const prevQuestWordsRef = useRef(wordsFound.length);
   useEffect(() => {
     const newWords = wordsFound.length - prevQuestWordsRef.current;
     if (newWords > 0) {
-      recordQuestProgress('wordCount', newWords);
       chapterQuestsRef.current.recordWordsFound(newWords);
       const latestWord = wordsFound[wordsFound.length - 1];
       if (latestWord && latestWord.length >= 6) {
-        recordQuestProgress('longWord');
         chapterQuestsRef.current.recordLongWord();
       }
     }
     prevQuestWordsRef.current = wordsFound.length;
-  }, [wordsFound, recordQuestProgress]);
+  }, [wordsFound]);
 
-  // Combo streak quest: only fire when crossing the 5-combo threshold
-  // (not on every subsequent increment within the same streak)
+  // Chapter quest: streak master — fire when a new streak begins
+  // (transition from 0 to positive), not on every word within a streak
   const prevComboRef = useRef(0);
   useEffect(() => {
     const prev = prevComboRef.current;
-    if (comboCount >= 5 && prev < 5) {
-      recordQuestProgress('comboStreak');
-    }
-    // Chapter quest: streak master — fire when a new streak begins
-    // (transition from 0 to positive), not on every word within a streak
     if (comboCount > 0 && prev === 0) {
       chapterQuestsRef.current.recordStreakMaster();
     }
     prevComboRef.current = comboCount;
-  }, [comboCount, recordQuestProgress]);
+  }, [comboCount]);
 
   // Chapter quest: flash challenge master
   useEffect(() => {

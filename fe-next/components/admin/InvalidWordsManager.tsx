@@ -19,7 +19,7 @@ import {
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { BulkApproveButton, AutoPromoteButton } from './invalid-words';
 
 interface InvalidWord {
@@ -523,7 +523,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
               const isProcessing = processing === key;
 
               return (
-                <motion.div
+                <m.div
                   key={key}
                   layout
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -635,7 +635,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </m.div>
               );
             })}
           </AnimatePresence>

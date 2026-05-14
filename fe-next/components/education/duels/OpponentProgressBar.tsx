@@ -11,7 +11,7 @@
  * - Neo-brutalist styling
  */
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export interface OpponentProgressBarProps {
@@ -38,7 +38,7 @@ export function OpponentProgressBar({
       data-testid="opponent-progress-bar"
     >
       {/* Player Side (Left) */}
-      <motion.div
+      <m.div
         data-side="player"
         className={cn(
           'h-full bg-neo-cyan flex items-center justify-between px-3',
@@ -54,10 +54,10 @@ export function OpponentProgressBar({
         <span className="text-neo-black font-neo-body font-bold text-sm ms-2">
           {myScore}
         </span>
-      </motion.div>
+      </m.div>
 
       {/* Opponent Side (Right) */}
-      <motion.div
+      <m.div
         data-side="opponent"
         className="h-full bg-neo-pink flex items-center justify-between px-3"
         initial={{ width: '50%' }}
@@ -70,7 +70,7 @@ export function OpponentProgressBar({
         <span className="text-neo-white font-neo-body font-bold text-sm truncate">
           {opponentName}
         </span>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

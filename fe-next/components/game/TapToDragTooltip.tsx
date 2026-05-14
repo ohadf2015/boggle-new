@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, Hand } from 'lucide-react';
 
 const AUTO_DISMISS_MS = 4000; // 4 seconds (faster)
@@ -146,7 +146,7 @@ const TapToDragTooltip = memo<TapToDragTooltipProps>(
     return (
       <AnimatePresence>
         {isVisible && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: 20, scale: 0.9 }}
             animate={isPopping
               ? { opacity: 0, scale: 1.05, x: 10 }
@@ -189,13 +189,13 @@ const TapToDragTooltip = memo<TapToDragTooltipProps>(
 
               {/* Compact Header */}
               <div className="flex items-center gap-1.5 mb-1.5">
-                <motion.div
+                <m.div
                   className="w-6 h-6 bg-linear-to-br from-neo-cyan to-neo-lime rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm"
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                 >
                   <Hand className="w-3 h-3 text-neo-black" />
-                </motion.div>
+                </m.div>
                 <h4 className="font-black text-neo-black text-xs uppercase tracking-wide">
                   {t('guidance.dragTutorial.title')}
                 </h4>
@@ -214,7 +214,7 @@ const TapToDragTooltip = memo<TapToDragTooltipProps>(
                         const isSelected = isCellSelected(rowIndex, colIndex);
 
                         return (
-                          <motion.div
+                          <m.div
                             key={`${rowIndex}-${colIndex}`}
                             className={`
                               flex items-center justify-center relative
@@ -236,14 +236,14 @@ const TapToDragTooltip = memo<TapToDragTooltipProps>(
                             }}
                           >
                             {letter}
-                          </motion.div>
+                          </m.div>
                         );
                       })
                     )}
 
                     {/* Finger indicator with pulse */}
                     {fingerPosition && (
-                      <motion.div
+                      <m.div
                         className="absolute z-20 pointer-events-none"
                         style={{
                           left: fingerPosition.x + 4 - 10,
@@ -265,12 +265,12 @@ const TapToDragTooltip = memo<TapToDragTooltipProps>(
                           </svg>
                         </div>
                         {/* Glow effect */}
-                        <motion.div
+                        <m.div
                           className="absolute inset-0 w-5 h-5 bg-neo-pink rounded-full blur-xs -z-10"
                           animate={{ opacity: [0.3, 0.6, 0.3] }}
                           transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
                         />
-                      </motion.div>
+                      </m.div>
                     )}
                   </div>
 
@@ -296,7 +296,7 @@ const TapToDragTooltip = memo<TapToDragTooltipProps>(
                           const y2 = getCenter(cell[0]);
 
                           return (
-                            <motion.line
+                            <m.line
                               key={`line-${i}-${cell[0]}-${cell[1]}`}
                               x1={x1}
                               y1={y1}
@@ -318,14 +318,14 @@ const TapToDragTooltip = memo<TapToDragTooltipProps>(
               </div>
 
               {/* Progress bar for auto-dismiss */}
-              <motion.div
+              <m.div
                 className="absolute bottom-0 left-0 h-0.5 bg-neo-cyan/50 rounded-b-lg"
                 initial={{ width: '100%' }}
                 animate={{ width: '0%' }}
                 transition={{ duration: AUTO_DISMISS_MS / 1000, ease: 'linear' }}
               />
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     );

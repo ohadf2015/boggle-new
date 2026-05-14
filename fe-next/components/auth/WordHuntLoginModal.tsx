@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Mail, Wand2, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { Button } from '../ui/button';
@@ -151,7 +151,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
 
         <DialogBody className="p-6 pt-0">
           {/* Content */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -164,21 +164,21 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
             <p className="text-sm text-gray-300">
               {t('auth.wordHunt.loginSubtitle')}
             </p>
-          </motion.div>
+          </m.div>
 
           {/* Success Message */}
           {success ? (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className="mb-4 p-4 rounded-lg bg-emerald-900/30 border border-emerald-500/50 text-center"
             >
               <p className="text-sm font-bold text-emerald-300">{success}</p>
-            </motion.div>
+            </m.div>
           ) : (
             <>
               {/* Sign In Buttons */}
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
@@ -211,7 +211,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                   )}
                   <span>{t('auth.signInWith', { provider: 'Discord' })}</span>
                 </Button>
-              </motion.div>
+              </m.div>
 
               {/* Email Form (OTP on native, magic link on web) */}
               {!showEmailForm ? (
@@ -223,7 +223,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                   <span>{t('auth.inlineSignup.orContinueWith')}</span>
                 </button>
               ) : (
-                <motion.form
+                <m.form
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   onSubmit={handleEmailSubmit}
@@ -291,24 +291,24 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                       </>
                     )}
                   </Button>
-                </motion.form>
+                </m.form>
               )}
             </>
           )}
 
           {/* Error Message */}
           {error && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="mb-4 p-3 rounded-lg bg-red-900/30 border border-red-500/50 text-red-300 text-sm"
             >
               <AlertCircle className="w-4 h-4 shrink-0 inline-block me-1" />{error}
-            </motion.div>
+            </m.div>
           )}
 
           {/* Skip Option */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
@@ -320,7 +320,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
             >
               {t('auth.wordHunt.skipCta')}
             </button>
-          </motion.div>
+          </m.div>
         </DialogBody>
       </DialogContent>
     </Dialog>

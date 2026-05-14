@@ -11,7 +11,7 @@ import { ComboTierBadge, getComboTier, COMBO_TIERS } from '../ComboTierBadge';
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, style, ...props }: any) => (
       <div className={className} style={style} data-testid="motion-div" {...props}>
         {children}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useMachine } from '@xstate/react';
 import type { CipherRiddle as CipherRiddleType } from '@/lib/word-vault/types';
 import type { WordVaultStore } from '@/lib/word-vault/state/gameStore';
@@ -68,7 +68,7 @@ export function CipherRiddle({ riddle, store: _store, onSolved }: Props) {
           const isSolved = solvedJars.has(jar.id);
           const isActive = activeJarId === jar.id;
           return (
-            <motion.button
+            <m.button
               key={jar.id}
               type="button"
               onClick={() => {
@@ -90,7 +90,7 @@ export function CipherRiddle({ riddle, store: _store, onSolved }: Props) {
             >
               <span>{isSolved ? jar.answer : jar.scrambled}</span>
               <span className="mt-1 font-rubik text-xs">{isSolved ? '✓' : 'צנצנת'}</span>
-            </motion.button>
+            </m.button>
           );
         })}
       </div>
@@ -136,13 +136,13 @@ export function CipherRiddle({ riddle, store: _store, onSolved }: Props) {
       )}
 
       {snapshot.value === 'solved' && (
-        <motion.div
+        <m.div
           initial={{ scale: 0.6, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="rounded-md border-4 border-lime-300 bg-lime-300/20 px-6 py-3 text-center"
         >
           <p className="font-fredoka text-2xl font-black text-lime-200">המזווה נפתח!</p>
-        </motion.div>
+        </m.div>
       )}
     </div>
   );

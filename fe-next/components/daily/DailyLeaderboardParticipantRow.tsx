@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Clock, Sparkles } from 'lucide-react';
 import { getRankDisplay, getRankRowClasses, getRankBadgeClasses } from '@/utils/rankingStyles';
 import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
@@ -27,7 +27,7 @@ const ParticipantRow = memo<{
   const timeAgo = formatDistanceToNow(participant.completed_at, t);
 
   return (
-    <motion.div
+    <m.div
       role="listitem"
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
@@ -127,7 +127,7 @@ const ParticipantRow = memo<{
           <span>{timeAgo}</span>
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 });
 

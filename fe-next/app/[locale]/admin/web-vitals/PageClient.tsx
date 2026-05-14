@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   Activity, RefreshCw, Monitor, Smartphone, Tablet,
   Wifi, WifiOff, TrendingDown, AlertCircle, CheckCircle
@@ -359,7 +359,7 @@ export default function WebVitalsPageClient() {
             const poorPercent = (stat.poor_count / stat.total_count) * 100;
 
             return (
-              <motion.div
+              <m.div
                 key={stat.metric_name}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -418,7 +418,7 @@ export default function WebVitalsPageClient() {
                     ⚠️ {poorPercent.toFixed(1)}% poor performance
                   </div>
                 )}
-              </motion.div>
+              </m.div>
             );
           })}
         </div>

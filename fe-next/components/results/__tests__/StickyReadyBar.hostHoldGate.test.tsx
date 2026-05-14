@@ -31,7 +31,7 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, style, ...p }: any) => <div className={className} style={style} {...p}>{children}</div>,
     button: React.forwardRef(function MB({ children, style, ...p }: any, ref: any) {
       return <button ref={ref} style={style} {...p}>{children}</button>;

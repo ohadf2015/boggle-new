@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import type { WordScoreResult } from '@/types/wordForge';
 import { cn } from '@/lib/utils';
 
@@ -47,7 +47,7 @@ export function ScoreFeedback({ lastScore }: ScoreFeedbackProps): React.JSX.Elem
         <div className="fixed inset-0 bg-tier-gold/10 pointer-events-none z-40" />
       )}
 
-      <motion.div
+      <m.div
         className="absolute bottom-20 left-0 right-0 flex justify-center pointer-events-none z-30"
         initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
         animate={{ opacity: visible ? 1 : 0, y: 0 }}
@@ -94,7 +94,7 @@ export function ScoreFeedback({ lastScore }: ScoreFeedbackProps): React.JSX.Elem
 
           {/* Total (GOLD) */}
           <span className="text-neo-cream/40">=</span>
-          <motion.span
+          <m.span
             className={cn(
               'font-black font-neo-display text-tier-gold',
               displayScore.totalScore >= 50 ? 'text-lg' : 'text-base',
@@ -104,20 +104,20 @@ export function ScoreFeedback({ lastScore }: ScoreFeedbackProps): React.JSX.Elem
             transition={{ duration: 0.3, delay: 0.1 }}
           >
             {displayScore.totalScore}
-          </motion.span>
+          </m.span>
 
           {/* Big score sparkle — spins once */}
           {displayScore.totalScore >= 100 && (
-            <motion.span
+            <m.span
               className="text-sm inline-block"
               animate={prefersReducedMotion ? {} : { rotate: 360 }}
               transition={{ duration: 0.5 }}
             >
               ✨
-            </motion.span>
+            </m.span>
           )}
         </div>
-      </motion.div>
+      </m.div>
     </>
   );
 }

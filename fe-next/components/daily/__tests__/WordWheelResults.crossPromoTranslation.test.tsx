@@ -17,7 +17,7 @@ import { sv } from '@/translations/sv';
 import { es } from '@/translations/es';
 
 vi.mock('framer-motion', () => ({
-  motion: new Proxy(
+  m: new Proxy(
     {},
     {
       get: () => ({ children, ...props }: React.ComponentProps<'div'>) => (

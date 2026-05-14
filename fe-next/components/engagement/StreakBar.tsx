@@ -9,7 +9,7 @@
 
 import React, { memo, useState, useEffect, useRef } from 'react';
 import { Flame, Coins } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
@@ -62,7 +62,7 @@ export const StreakBar: React.FC = memo(() => {
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         data-testid="streak-bar"
         initial={reducedMotion ? false : { opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -127,7 +127,7 @@ export const StreakBar: React.FC = memo(() => {
             {formatNumber(status.gold)}
           </span>
         </div>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 });

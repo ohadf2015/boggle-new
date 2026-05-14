@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useMemo, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '@/utils/accessibility';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
@@ -124,7 +124,7 @@ const FloatingCoinAnimation = memo<FloatingCoinAnimationProps>(({
   // For reduced motion or low-end devices, show a simple fade animation
   if (prefersReducedMotion || skipComplexAnimation) {
     return (
-      <motion.div
+      <m.div
         className={`fixed z-[100] pointer-events-none ${className || ''}`}
         style={{
           left: startPosition?.x ?? '50%',
@@ -140,7 +140,7 @@ const FloatingCoinAnimation = memo<FloatingCoinAnimationProps>(({
           <span>💰</span>
           <span>+{displayAmount}</span>
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
@@ -150,7 +150,7 @@ const FloatingCoinAnimation = memo<FloatingCoinAnimationProps>(({
         className={`fixed inset-0 z-[100] pointer-events-none overflow-hidden ${className || ''}`}
       >
         {/* Central coin burst with amount */}
-        <motion.div
+        <m.div
           className="absolute flex items-center gap-1.5"
           style={{
             left: startPosition?.x ?? '50%',
@@ -168,7 +168,7 @@ const FloatingCoinAnimation = memo<FloatingCoinAnimationProps>(({
             ease: 'easeOut',
           }}
         >
-          <motion.div
+          <m.div
             className="px-4 py-2 rounded-full bg-linear-to-r from-yellow-400 via-amber-400 to-orange-400 text-white font-black text-xl shadow-xl border-2 border-yellow-200"
             style={{
               filter: 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))',
@@ -185,20 +185,20 @@ const FloatingCoinAnimation = memo<FloatingCoinAnimationProps>(({
             }}
           >
             <span className="flex items-center gap-2">
-              <motion.span
+              <m.span
                 animate={{ rotate: [0, 15, -15, 0] }}
                 transition={{ duration: 0.5 }}
               >
                 💰
-              </motion.span>
+              </m.span>
               <span>+{displayAmount}</span>
             </span>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
 
         {/* Flying coin particles - using pre-computed positions to avoid calc() jank */}
         {particles.map((particle) => (
-          <motion.div
+          <m.div
             key={`coin-${particle.id}`}
             className="absolute w-6 h-6 text-2xl will-change-transform"
             style={{
@@ -234,12 +234,12 @@ const FloatingCoinAnimation = memo<FloatingCoinAnimationProps>(({
             }}
           >
             🪙
-          </motion.div>
+          </m.div>
         ))}
 
         {/* Sparkle effects */}
         {[...Array(6)].map((_, i) => (
-          <motion.div
+          <m.div
             key={`sparkle-${i}`}
             className="absolute w-2 h-2 rounded-full bg-yellow-300"
             style={{

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Zap, Target, Sparkles, Flame, Gem, BookOpen, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ScoreCountUp } from '@/components/results/shared';
@@ -44,20 +44,20 @@ function StatCell({ icon, value, label, numericValue, reducedMotion }: {
   reducedMotion: boolean | null;
 }) {
   return (
-    <motion.div
+    <m.div
       variants={reducedMotion ? cardReduced : cardVariant}
       className="flex flex-col items-center gap-1"
     >
-      <motion.div variants={reducedMotion ? undefined : iconBounce}>
+      <m.div variants={reducedMotion ? undefined : iconBounce}>
         {icon}
-      </motion.div>
+      </m.div>
       <span className="text-xl font-bold text-neo-white tabular-nums">
         {numericValue !== undefined ? (
           <>{typeof value === 'string' && value.startsWith('+') ? '+' : ''}<ScoreCountUp to={numericValue} duration={1200} delay={reducedMotion ? 0 : 400} /></>
         ) : value}
       </span>
       <span className="text-xs text-neo-cream/70">{label}</span>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -69,21 +69,21 @@ export default function BlastResultsSummary({ movesUsed, tilesCleared, tileBonus
   const hasRichStats = entries.length > 0;
 
   return (
-    <motion.div
+    <m.div
       variants={staggerContainer}
       initial="hidden"
       animate="show"
       className="space-y-2"
     >
       {/* Mode badge + Basic stats grid */}
-      <motion.div
+      <m.div
         variants={reducedMotion ? cardReduced : cardVariant}
         className="grid grid-cols-3 gap-2 p-3 bg-neo-navy/50 border-3 border-neo-black rounded-neo shadow-hard-sm border-t-4 border-t-neo-orange"
       >
         <StatCell icon={<Zap className="w-5 h-5 text-neo-yellow" />} numericValue={movesUsed} value={movesUsed} label={t('blast.multiplayer.moves')} reducedMotion={reducedMotion} />
         <StatCell icon={<Target className="w-5 h-5 text-neo-orange" />} numericValue={tilesCleared} value={tilesCleared} label={t('blast.multiplayer.tilesCleared')} reducedMotion={reducedMotion} />
         <StatCell icon={<Sparkles className="w-5 h-5 text-neo-cyan" />} value={`+${tileBonus}`} numericValue={tileBonus} label={t('blast.multiplayer.tileBonus')} reducedMotion={reducedMotion} />
-      </motion.div>
+      </m.div>
 
       {/* Rich per-player stats cards */}
       {hasRichStats && (
@@ -92,7 +92,7 @@ export default function BlastResultsSummary({ movesUsed, tilesCleared, tileBonus
             {t('blast.multiplayer.playerStats')}
           </h4>
           {entries.map(([username, stats]) => (
-            <motion.div
+            <m.div
               key={username}
               variants={reducedMotion ? cardReduced : cardVariant}
               className="p-3 bg-neo-navy/50 border-3 border-neo-black rounded-neo shadow-hard-sm"
@@ -128,10 +128,10 @@ export default function BlastResultsSummary({ movesUsed, tilesCleared, tileBonus
                   <span className="font-bold text-neo-white text-sm uppercase">{stats.bestWord}</span>
                 </div>
               )}
-            </motion.div>
+            </m.div>
           ))}
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 }

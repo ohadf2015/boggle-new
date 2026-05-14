@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Gamepad2, Sparkles, Target, RefreshCw, Brain } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
@@ -91,7 +91,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
   if (!isCurrentPlayer) {
     // Simple view for other players
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className="mt-3 p-4 rounded-neo border-2 border-neo-black bg-slate-100 dark:bg-slate-700"
@@ -106,13 +106,13 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
             {t('noWords.noWordsThisRound')}
           </span>
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
   // Full encouraging view for current player
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.1 }}
@@ -136,14 +136,14 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
         />
 
         {/* Floating decorative icons */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, rotate: -20 }}
           animate={{ opacity: 0.15, rotate: 15 }}
           transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.3 }}
           className="absolute top-2 right-2"
         >
           <Gamepad2 className="w-16 h-16 text-neo-black" />
-        </motion.div>
+        </m.div>
 
         <div className="relative z-10">
           {/* Crying mascot — Lexi commiserates with the player */}
@@ -153,14 +153,14 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
 
           {/* Header with emoji */}
           <div className="flex items-center gap-3 mb-3">
-            <motion.div
+            <m.div
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.2 }}
               className="w-12 h-12 rounded-neo bg-neo-lime border-3 border-neo-black shadow-hard flex items-center justify-center"
             >
               <span className="text-2xl">{encouragement.emoji}</span>
-            </motion.div>
+            </m.div>
             <div>
               <h3 className="text-lg font-black text-neo-black uppercase tracking-wide">
                 {encouragement.headline}
@@ -175,18 +175,18 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
           </div>
 
           {/* Encouraging message */}
-          <motion.p
+          <m.p
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.3 }}
             className="text-sm font-bold text-neo-black/90 leading-relaxed mb-4"
           >
             {encouragement.message}
-          </motion.p>
+          </m.p>
 
           {/* Tip box */}
           {encouragement.tip && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.4 }}
@@ -200,11 +200,11 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
                   {encouragement.tip}
                 </p>
               </div>
-            </motion.div>
+            </m.div>
           )}
 
           {/* "Next round" motivator */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.5 }}
@@ -214,12 +214,12 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
             <span className="text-xs font-black uppercase tracking-wide">
               {t('noWords.nextRoundIsYours')}
             </span>
-          </motion.div>
+          </m.div>
         </div>
       </div>
 
       {/* Fun fact / motivation strip */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.6 }}
@@ -228,8 +228,8 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
         <p className="text-[10px] font-black text-neo-black text-center uppercase tracking-wide">
           💡 {t('noWords.funFact')}
         </p>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 };
 

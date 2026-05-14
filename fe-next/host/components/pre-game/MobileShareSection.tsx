@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Check, Link2, Share2, Copy } from 'lucide-react';
 import Image from 'next/image';
 import { getJoinUrl, copyJoinUrl, shareViaWhatsApp } from '../../../utils/share';
@@ -78,7 +78,7 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
   // "do this next" not "optional extra". showHint adds wobble for empty rooms.
   const triggerButton = (
     <DialogTrigger asChild>
-      <motion.button
+      <m.button
         data-testid="mobile-share-trigger"
         whileTap={{ scale: 0.95 }}
         className={cn(
@@ -91,7 +91,7 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
       >
         <Share2 className={cn(compact ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
         <span>{t('share.invite')}</span>
-      </motion.button>
+      </m.button>
     </DialogTrigger>
   );
 
@@ -125,7 +125,7 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
           {/* Content */}
           <div className="p-4 space-y-3">
             {/* Room code — tap to copy */}
-            <motion.button
+            <m.button
               data-testid="invite-code-copy"
               onClick={handleCopyLink}
               whileTap={{ scale: 0.97 }}
@@ -147,7 +147,7 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
                 </div>
                 <AnimatePresence mode="wait">
                   {copied ? (
-                    <motion.div
+                    <m.div
                       key="check"
                       initial={{ scale: 0, rotate: -90 }}
                       animate={{ scale: 1, rotate: 0 }}
@@ -155,9 +155,9 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
                       className="w-10 h-10 rounded-full bg-neo-lime flex items-center justify-center"
                     >
                       <Check className="w-5 h-5 text-neo-black" />
-                    </motion.div>
+                    </m.div>
                   ) : (
-                    <motion.div
+                    <m.div
                       key="copy"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
@@ -165,16 +165,16 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
                       className="w-10 h-10 rounded-full bg-neo-black/30 flex items-center justify-center group-hover:bg-neo-lime/20 transition-colors"
                     >
                       <Copy className="w-4 h-4 text-neo-cream/70" />
-                    </motion.div>
+                    </m.div>
                   )}
                 </AnimatePresence>
               </div>
-            </motion.button>
+            </m.button>
 
             {/* Primary actions */}
             <div className="flex gap-2">
               {/* Copy Link */}
-              <motion.button
+              <m.button
                 data-testid="mobile-copy-link-button"
                 onClick={handleCopyLink}
                 whileTap={{ scale: 0.95 }}
@@ -187,10 +187,10 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
               >
                 {copied ? <Check className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
                 <span>{copied ? t('common.copied') : t('share.copyLink')}</span>
-              </motion.button>
+              </m.button>
 
               {/* WhatsApp */}
-              <motion.button
+              <m.button
                 data-testid="mobile-whatsapp-button"
                 onClick={handleWhatsAppShare}
                 whileTap={{ scale: 0.95 }}
@@ -199,12 +199,12 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
               >
                 <WhatsAppIcon size={18} />
                 <span>WhatsApp</span>
-              </motion.button>
+              </m.button>
             </div>
 
             {/* Native share — full width, secondary style */}
             {canShare && (
-              <motion.button
+              <m.button
                 data-testid="mobile-native-share"
                 onClick={handleNativeShare}
                 whileTap={{ scale: 0.97 }}
@@ -212,7 +212,7 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
               >
                 <Share2 className="w-4 h-4" />
                 <span>{t('share.more')}</span>
-              </motion.button>
+              </m.button>
             )}
           </div>
         </DialogContent>

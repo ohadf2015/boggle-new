@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -329,7 +329,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       >
         <AnimatePresence mode="wait">
           {!cgTutorialDone ? (
-            <motion.div
+            <m.div
               key="cg-tutorial"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -341,9 +341,9 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
                 onContinue={() => setCgTutorialDone(true)}
                 onSkip={() => setCgTutorialDone(true)}
               />
-            </motion.div>
+            </m.div>
           ) : (
-            <motion.div
+            <m.div
               key="cg-welcome"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -351,12 +351,12 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
               className="w-full"
             >
               <CrazyGamesWelcome onPlay={handleCrazyGamesPlay} />
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
         <AnimatePresence>
           {isNavigating && (
-            <motion.div
+            <m.div
               key="cg-welcome-loading"
               data-testid="onboarding-loading"
               initial={{ opacity: 0 }}
@@ -374,7 +374,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
               <p className="mt-4 font-neo-display text-neo-white text-lg uppercase tracking-wide">
                 {t('onboarding.loading')}
               </p>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>
@@ -401,7 +401,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       {/* Progress indicator — hidden during tutorial (gameplay fills the screen) */}
       <AnimatePresence>
         {showProgress && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -409,14 +409,14 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
             className="absolute top-6 z-10"
           >
             <OnboardingProgress currentStep={stepIndex} totalSteps={activeSteps.length} />
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
       {/* Skip Tutorial CTA — visible during tutorial step so users aren't trapped */}
       <AnimatePresence>
         {step === 'tutorial' && (
-          <motion.button
+          <m.button
             data-testid="onboarding-skip-tutorial"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -426,13 +426,13 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
             className="absolute top-4 end-4 z-20 min-h-[44px] px-3 py-2 text-xs font-bold uppercase tracking-wide text-neo-cream/70 hover:text-neo-cream bg-neo-navy/60 border-2 border-neo-cream/20 hover:border-neo-cream/40 rounded-neo focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan transition-colors"
           >
             {t('onboarding.skipTutorial')}
-          </motion.button>
+          </m.button>
         )}
       </AnimatePresence>
 
       {/* Step content */}
       <AnimatePresence mode="wait">
-        <motion.div
+        <m.div
           key={step}
           initial={{ opacity: 0, y: 24, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -441,7 +441,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           className="w-full max-w-sm sm:max-w-md lg:max-w-3xl mx-auto px-4 relative z-1"
         >
           {renderStep()}
-        </motion.div>
+        </m.div>
       </AnimatePresence>
 
       {/* Navigation loading overlay — covers the modal while the destination
@@ -449,7 +449,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           the underlying mode buttons. */}
       <AnimatePresence>
         {isNavigating && (
-          <motion.div
+          <m.div
             key="onboarding-loading"
             data-testid="onboarding-loading"
             initial={{ opacity: 0 }}
@@ -467,7 +467,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
             <p className="mt-4 font-neo-display text-neo-white text-lg uppercase tracking-wide">
               {t('onboarding.loading')}
             </p>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 

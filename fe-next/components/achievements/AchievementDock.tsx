@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
@@ -146,7 +146,7 @@ const AchievementDock = ({ achievements = EMPTY_ACHIEVEMENTS, className }: Achie
   return (
     <div className={cn('relative z-40', className)}>
       {/* Trophy Button - Neo-Brutalist */}
-      <motion.button
+      <m.button
         ref={buttonRef}
         onClick={handleToggle}
         whileHover={{ scale: 1.05, rotate: 3 }}
@@ -168,7 +168,7 @@ const AchievementDock = ({ achievements = EMPTY_ACHIEVEMENTS, className }: Achie
         <span className="text-2xl">🏆</span>
 
         {/* Count badge - Neo-Brutalist */}
-        <motion.span
+        <m.span
           key={achievements.length}
           initial={{ scale: 1.5 }}
           animate={{ scale: 1 }}
@@ -182,24 +182,24 @@ const AchievementDock = ({ achievements = EMPTY_ACHIEVEMENTS, className }: Achie
           )}
         >
           {achievements.length}
-        </motion.span>
+        </m.span>
 
         {/* Pulse ring for new achievement - single pulse, not infinite */}
         {hasNewAchievement && (
-          <motion.span
+          <m.span
             className="absolute inset-0 rounded-lg bg-neo-lime border-4 border-neo-black"
             initial={{ scale: 1, opacity: 0.8 }}
             animate={{ scale: 1.5, opacity: 0 }}
             transition={{ duration: 0.8 }}
           />
         )}
-      </motion.button>
+      </m.button>
 
       {/* Expanded Panel - Neo-Brutalist (rendered via Portal to escape overflow containers) */}
       {isMounted && createPortal(
         <AnimatePresence>
           {isExpanded && panelPosition && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.9, y: -10, rotate: -2 }}
               animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: -10 }}
@@ -231,7 +231,7 @@ const AchievementDock = ({ achievements = EMPTY_ACHIEVEMENTS, className }: Achie
                   {localizedAchievements.map((achievement, index) => (
                     <Tooltip key={`${achievement.name}-${index}`}>
                       <TooltipTrigger asChild>
-                        <motion.div
+                        <m.div
                           initial={index === localizedAchievements.length - 1 && hasNewAchievement ? {
                             x: 20,
                             opacity: 0,
@@ -260,7 +260,7 @@ const AchievementDock = ({ achievements = EMPTY_ACHIEVEMENTS, className }: Achie
                               {achievement.description}
                             </p>
                           </div>
-                        </motion.div>
+                        </m.div>
                       </TooltipTrigger>
                       <TooltipContent
                         side="left"
@@ -273,7 +273,7 @@ const AchievementDock = ({ achievements = EMPTY_ACHIEVEMENTS, className }: Achie
                   ))}
                 </TooltipProvider>
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>,
         document.body

@@ -13,7 +13,7 @@
  */
 
 import { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -106,7 +106,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
   // Badge variant: Full styled badge
   if (variant === 'badge') {
     return (
-      <motion.div
+      <m.div
         data-testid="streak-indicator"
         role="img"
         aria-label={ariaLabel}
@@ -124,7 +124,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
       >
         {/* Top row: Fire emoji + streak count */}
         <div className={cn('flex items-center', sizeConfig.gap)}>
-          <motion.span
+          <m.span
             animate={{ rotate: [0, -5, 5, 0] }}
             transition={{
               duration: 0.5,
@@ -135,7 +135,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
             className={sizeConfig.emoji}
           >
             <Flame className="w-4 h-4" />
-          </motion.span>
+          </m.span>
           <span className={cn(
             'font-neo-display font-black text-neo-black',
             sizeConfig.text
@@ -160,13 +160,13 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
             +{bonus}% XP
           </div>
         )}
-      </motion.div>
+      </m.div>
     );
   }
 
   // Inline variant: Compact inline display
   return (
-    <motion.div
+    <m.div
       data-testid="streak-indicator"
       role="img"
       aria-label={ariaLabel}
@@ -180,7 +180,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
         className
       )}
     >
-      <motion.span
+      <m.span
         animate={{ rotate: [0, -3, 3, 0] }}
         transition={{
           duration: 0.5,
@@ -191,7 +191,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
         className={sizeConfig.emoji}
       >
         <Flame className="w-4 h-4" />
-      </motion.span>
+      </m.span>
       <span className="font-neo-display font-black text-neo-pink">
         {currentStreak}
       </span>
@@ -203,7 +203,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
           (+{bonus}% XP)
         </span>
       )}
-    </motion.div>
+    </m.div>
   );
 });
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence, PanInfo } from 'framer-motion';
+import { m, AnimatePresence, PanInfo } from 'framer-motion';
 import {
   Gamepad2, Users, PlayCircle, Swords, Star, Flame,
   ArrowRight, ArrowLeft, Lightbulb,
@@ -163,7 +163,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
 
           <div className="space-y-4 relative">
             {items.map((item, index) => (
-              <motion.div
+              <m.div
                 key={item.id}
                 initial={{ x: isRTL ? 30 : -30, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
@@ -190,7 +190,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
                     {item.desc}
                   </p>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
@@ -203,7 +203,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
     <div className="space-y-4">
       {/* Instruction banner */}
       {!interactiveDemoCompleted && (
-        <motion.div
+        <m.div
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="bg-neo-lime/10 border-2 border-neo-lime/40 rounded-xl p-3 flex items-center justify-center gap-3"
@@ -215,11 +215,11 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             {t('onboarding.welcome.demoInstruction')}{' '}
             <span className="text-neo-lime font-black">{demoConfig.word}</span>
           </span>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Interactive demo grid */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className="px-2"
@@ -232,11 +232,11 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           onDemoComplete={() => setInteractiveDemoCompleted(true)}
           showHints={true}
         />
-      </motion.div>
+      </m.div>
 
       {/* Success message */}
       {interactiveDemoCompleted && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: 'spring', stiffness: 400, damping: 20 }}
@@ -246,7 +246,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             <Check className="w-5 h-5" />
             {t('onboarding.welcome.demoSuccess')}
           </div>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Tip card */}
@@ -278,7 +278,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             { letters: '5', points: '4', width: '60%' },
             { letters: '7+', points: '6+', width: '100%' },
           ].map((item, i) => (
-            <motion.div
+            <m.div
               key={`scoring-${item.letters}`}
               initial={{ x: isRTL ? 20 : -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
@@ -298,7 +298,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
                   {item.points} {t('howToPlay.pts').toUpperCase()}
                 </span>
               </div>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </div>
@@ -319,7 +319,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
       </div>
 
       {/* Pro tips */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
@@ -339,7 +339,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             </li>
           ))}
         </ul>
-      </motion.div>
+      </m.div>
     </div>
   );
 
@@ -353,7 +353,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
   })();
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="w-full bg-neo-navy overflow-hidden"
@@ -396,7 +396,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
         <div data-testid="compact-header" className="relative px-5 pb-5 pt-1">
           <div className="flex items-center gap-3.5">
             {/* Icon with glow ring */}
-            <motion.div
+            <m.div
               key={activeStep.id}
               initial={{ scale: 0.8, rotate: -10 }}
               animate={{ scale: 1, rotate: 0 }}
@@ -405,17 +405,17 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             >
               {React.createElement(activeStep.icon, { className: 'w-7 h-7 text-neo-black', strokeWidth: 2.5 })}
               {/* Pulse ring */}
-              <motion.div
+              <m.div
                 className={`absolute inset-0 rounded-xl border-2`}
                 style={{ borderColor: activeStep.accentColor }}
                 animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0, 0.6] }}
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               />
-            </motion.div>
+            </m.div>
 
             <div className="flex-1 min-w-0">
               <AnimatePresence mode="wait">
-                <motion.div
+                <m.div
                   key={activeStep.id}
                   initial={{ y: 8, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -425,7 +425,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
                   <h2 className="font-neo-display font-black text-xl text-white uppercase leading-none">
                     {activeStep.title}
                   </h2>
-                </motion.div>
+                </m.div>
               </AnimatePresence>
               <p className="text-slate-500 text-xs font-bold uppercase tracking-wide mt-1">
                 {activeStep.subtitle}
@@ -453,7 +453,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
                 aria-label={`${t('tutorial.stepLabel', { current: index + 1, total: steps.length })}: ${step.title}`}
               >
                 {isActive && (
-                  <motion.div
+                  <m.div
                     className="absolute inset-0 rounded-full"
                     style={{ background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)` }}
                     animate={{ x: ['-100%', '200%'] }}
@@ -471,7 +471,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
 
       {/* ─── Swipeable Content ─── */}
       <div data-testid="swipe-container" className="touch-pan-y">
-        <motion.div
+        <m.div
           data-testid="step-content"
           className="p-5 min-h-[260px] sm:min-h-[320px] max-h-[55vh] overflow-y-auto"
           drag="x"
@@ -480,7 +480,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           onDragEnd={handleDragEnd}
         >
           <AnimatePresence mode="wait">
-            <motion.div
+            <m.div
               key={currentStep}
               initial={{ opacity: 0, x: isRTL ? -30 : 30, scale: 0.97 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
@@ -488,9 +488,9 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
               {stepContent}
-            </motion.div>
+            </m.div>
           </AnimatePresence>
-        </motion.div>
+        </m.div>
       </div>
 
       {/* ─── Navigation Footer ─── */}
@@ -541,7 +541,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
 
         {/* Next / Done button */}
         {currentStep === steps.length - 1 ? (
-          <motion.button
+          <m.button
             onClick={onClose}
             whileTap={{ scale: 0.95 }}
             className="flex items-center gap-2 px-6 py-2.5 rounded-xl border-3 border-neo-black font-bold uppercase text-sm
@@ -551,9 +551,9 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           >
             <span>{t('howToPlay.done')}</span>
             <Check className="w-5 h-5" strokeWidth={3} />
-          </motion.button>
+          </m.button>
         ) : (
-          <motion.button
+          <m.button
             onClick={nextStep}
             whileTap={{ scale: 0.95 }}
             className="flex items-center gap-2 px-6 py-2.5 rounded-xl border-3 border-neo-black font-bold uppercase text-sm transition-all"
@@ -565,10 +565,10 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           >
             <span>{t('howToPlay.nextStep')}</span>
             <ArrowRight className="w-4 h-4 rtl:rotate-180" />
-          </motion.button>
+          </m.button>
         )}
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

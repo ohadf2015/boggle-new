@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Check, Hourglass, Bot } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
@@ -62,7 +62,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
   if (nonHostPlayers.length === 0) return null;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
@@ -75,7 +75,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
           <div className="absolute inset-0 bg-neo-navy-light/30" />
 
           {/* Animated progress fill */}
-          <motion.div
+          <m.div
             className={`absolute inset-y-0 left-0 ${
               allReady
                 ? 'bg-linear-to-r from-neo-lime/30 to-neo-cyan/30'
@@ -90,7 +90,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
           <div className="relative px-3 py-2 flex items-center gap-3">
             {/* Status icon + label */}
             <div className="flex items-center gap-1.5 shrink-0">
-              <motion.div
+              <m.div
                 animate={allReady ? { scale: [1, 1.2, 1] } : { rotate: [0, 10, -10, 0] }}
                 transition={{ type: 'tween', duration: 1.5, repeat: inf, repeatDelay: 0.5 }}
               >
@@ -99,7 +99,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                 ) : (
                   <Hourglass className="text-neo-lime w-3.5 h-3.5" />
                 )}
-              </motion.div>
+              </m.div>
               <span className="font-black text-[11px] uppercase tracking-wide text-neo-cream/80">
                 {allReady ? t('results.everyoneReady') : t('results.waitingForPlayers')}
               </span>
@@ -114,7 +114,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                   const isBot = player.isBot;
 
                   return (
-                    <motion.div
+                    <m.div
                       key={player.username}
                       layout
                       initial={{ opacity: 0, scale: 0, x: -10 }}
@@ -150,7 +150,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                         )}
 
                         {/* Ready/waiting micro-badge */}
-                        <motion.div
+                        <m.div
                           initial={false}
                           animate={isReady ? { scale: [0.8, 1.2, 1] } : { scale: 1 }}
                           transition={{ duration: 0.2 }}
@@ -164,15 +164,15 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                           {isReady ? (
                             <Check className="text-neo-black w-2.5 h-2.5" />
                           ) : (
-                            <motion.div
+                            <m.div
                               animate={{ opacity: [0.3, 1, 0.3] }}
                               transition={{ duration: 1.5, repeat: inf }}
                               className="w-1.5 h-1.5 rounded-full bg-neo-cream/40"
                             />
                           )}
-                        </motion.div>
+                        </m.div>
                       </div>
-                    </motion.div>
+                    </m.div>
                   );
                 })}
               </AnimatePresence>
@@ -196,7 +196,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
         {/* All ready celebration / waiting message - ultra compact */}
         <AnimatePresence>
           {allReady && (
-            <motion.div
+            <m.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
@@ -211,11 +211,11 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                     : (t('results.allPlayersReadyWaitingHost'))}
                 </p>
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

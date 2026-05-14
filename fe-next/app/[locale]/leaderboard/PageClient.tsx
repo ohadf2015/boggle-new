@@ -2,7 +2,7 @@
 
 // Note: Dynamic rendering is set in page.tsx (server component)
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import toast from 'react-hot-toast';
 import dynamic from 'next/dynamic';
 import { Trophy, ArrowLeft, RefreshCw, PencilRuler } from 'lucide-react';
@@ -161,7 +161,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
     <PageLayout onRefresh={handleRefresh} padding="md" maxWidth="4xl">
       <div className={cn('py-4')}>
         {/* Page Title */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-6"
@@ -216,7 +216,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
               )}
             </EnhancedButton>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Tab Switcher */}
         <div className="flex gap-2 mb-6 justify-center">
@@ -269,7 +269,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
         {/* User's Rank Card (if authenticated) */}
         {profile && userRank && (
           <div className="space-y-4 mb-6">
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className={cn(
@@ -342,7 +342,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                   </div>
                 </div>
               )}
-            </motion.div>
+            </m.div>
 
             {/* Near-Rank Progress Indicator */}
             <NearRankIndicator
@@ -394,7 +394,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           }
         >
           {/* Leaderboard Table */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -489,7 +489,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                 );
               })}
             </div>
-          </motion.div>
+          </m.div>
         </PageStateHandler>
 
         </>

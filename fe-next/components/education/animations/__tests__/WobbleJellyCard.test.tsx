@@ -9,7 +9,7 @@ import '@testing-library/jest-dom';
 import { WobbleJellyCard } from '../WobbleJellyCard';
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, ...rest }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => (
       <div className={className} data-testid="wobble-card" {...rest}>{children}</div>
     ),

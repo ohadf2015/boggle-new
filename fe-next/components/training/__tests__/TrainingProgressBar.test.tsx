@@ -28,7 +28,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 // Mock framer-motion to avoid animation issues
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { onClick, onKeyDown, role, tabIndex, className } = props as {
         onClick?: () => void;

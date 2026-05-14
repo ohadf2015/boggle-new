@@ -143,6 +143,37 @@ describe('AccessRequestForm Enhancements', () => {
     });
   });
 
+  describe('4. Completeness progress indicator', () => {
+    it('renders 3 progress tiles, none filled initially', () => {
+      render(<AccessRequestForm />);
+      const progress = screen.getByTestId('access-form-progress');
+      const tiles = progress.querySelectorAll('[data-progress-tile]');
+      expect(tiles).toHaveLength(3);
+      expect(progress.querySelectorAll('[data-progress-tile][data-filled="true"]')).toHaveLength(0);
+    });
+
+    it('fills tiles as each required field becomes valid', async () => {
+      const user = userEvent.setup();
+      render(<AccessRequestForm />);
+      const progress = screen.getByTestId('access-form-progress');
+      const filled = () => progress.querySelectorAll('[data-progress-tile][data-filled="true"]').length;
+
+      await user.type(screen.getByRole('textbox', { name: /Your full name/i }), 'John Doe');
+      expect(filled()).toBe(1);
+
+      await user.type(screen.getByRole('textbox', { name: /Email address/i }), 'john@example.com');
+      expect(filled()).toBe(2);
+
+      await user.type(screen.getByRole('textbox', { name: /How will you use/i }), 'Classroom vocabulary practice');
+      expect(filled()).toBe(3);
+    });
+
+    it('hides the progress indicator from assistive tech', () => {
+      render(<AccessRequestForm />);
+      expect(screen.getByTestId('access-form-progress')).toHaveAttribute('aria-hidden', 'true');
+    });
+  });
+
   describe('3. Post-Submit Guidance', () => {
     it('should show success message with next steps guidance', async () => {
       const user = userEvent.setup();

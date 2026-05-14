@@ -7,7 +7,7 @@ vi.useFakeTimers();
 
 // Mock framer-motion to render plain divs
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, onClick, ...props }: any) => {
       const { initial, animate, transition, exit, whileTap, variants, whileHover, ...rest } = props;
       return <div className={className} onClick={onClick} {...rest}>{children}</div>;

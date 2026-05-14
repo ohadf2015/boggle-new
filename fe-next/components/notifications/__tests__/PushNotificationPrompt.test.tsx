@@ -10,7 +10,7 @@ import type { ReactNode } from 'react';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({
       children,
       initial: _i,

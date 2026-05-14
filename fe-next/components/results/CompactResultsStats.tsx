@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Coins, TrendingUp, TrendingDown, Minus, Hash, Target, Lock, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -115,7 +115,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
 
 
   return (
-    <motion.div
+    <m.div
       className={cn(
         'bg-neo-navy border-3 border-neo-black rounded-neo p-3 sm:p-4 shadow-hard space-y-3',
         className
@@ -127,7 +127,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
       {/* Row 1: Core Stats + Rewards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
         {/* Words */}
-        <motion.div
+        <m.div
           variants={statCardVariants}
           whileHover={{ scale: 1.04, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } }}
           className="bg-white/10 rounded-neo border-2 border-white/20 p-2 sm:p-3 text-center"
@@ -141,10 +141,10 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
           <div className="text-[10px] sm:text-xs text-white/60 font-bold uppercase">
             {t('results.words')}
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Accuracy */}
-        <motion.div
+        <m.div
           variants={statCardVariants}
           whileHover={{ scale: 1.04, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } }}
           className="bg-white/10 rounded-neo border-2 border-white/20 p-2 sm:p-3 text-center"
@@ -160,11 +160,11 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
           <div className="text-[10px] sm:text-xs text-white/60 font-bold uppercase">
             {t('results.accuracy')}
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Coins - earned mode */}
         {hasCoinReward && !isTeasing && (
-          <motion.div
+          <m.div
             variants={statCardVariants}
             whileHover={{ scale: 1.04, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } }}
             className="bg-neo-lime/20 rounded-neo border-2 border-neo-lime/40 p-2 sm:p-3 text-center"
@@ -176,12 +176,12 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
             <div className="text-[10px] sm:text-xs text-neo-lime/70 font-bold uppercase">
               {t('reveal.coins')}
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {/* Coins - teasing mode for guests */}
         {hasCoinReward && isTeasing && (
-          <motion.div
+          <m.div
             variants={statCardVariants}
             whileHover={{ scale: 1.04, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } }}
             className="bg-slate-600/30 rounded-neo border-2 border-slate-500/50 p-2 sm:p-3 text-center"
@@ -194,7 +194,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
             <div className="text-[10px] sm:text-xs text-slate-400 font-bold">
               {t('coins.signInShort')}
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {/* Empty placeholders to maintain grid when fewer items */}
@@ -208,7 +208,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
 
       {/* Row 2: Sparkline + Archetype (only if we have either) */}
       {(hasSparkline || archetype) && (
-        <motion.div
+        <m.div
           variants={rowVariants}
           className="flex items-center justify-between gap-3 pt-2 border-t border-white/10"
         >
@@ -255,21 +255,21 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
           {archetype && (
             <PlayerArchetypeBadge archetype={archetype} size="sm" showTooltip={true} />
           )}
-        </motion.div>
+        </m.div>
       )}
 
       {/* Row 3: Achievement badges with stagger pop-in */}
       {achievements && achievements.length > 0 && (
         <div className="flex items-center gap-1.5 flex-wrap pt-2 border-t border-white/10">
-          <motion.div
+          <m.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring' as const, stiffness: 400, damping: 15, delay: 0.45 }}
           >
             <Award className="w-4 h-4 text-neo-lime shrink-0" />
-          </motion.div>
+          </m.div>
           {achievements.slice(0, MAX_VISIBLE_ACHIEVEMENTS).map((ach, i) => (
-            <motion.div
+            <m.div
               key={ach.key || ach.name || `ach-${i}`}
               custom={i}
               variants={achievementVariants}
@@ -277,21 +277,21 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
               animate="visible"
             >
               <AchievementBadge achievement={ach} index={i} />
-            </motion.div>
+            </m.div>
           ))}
           {achievements.length > MAX_VISIBLE_ACHIEVEMENTS && (
-            <motion.span
+            <m.span
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.7 }}
               className="text-xs font-bold text-white/60 px-1.5 py-0.5 bg-white/10 rounded-neo border border-white/20"
             >
               +{achievements.length - MAX_VISIBLE_ACHIEVEMENTS}
-            </motion.span>
+            </m.span>
           )}
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 });
 

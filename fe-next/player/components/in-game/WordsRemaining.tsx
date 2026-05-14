@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 interface WordsRemainingProps {
   /** Total words available on the board */
@@ -46,14 +46,14 @@ export const WordsRemaining = memo<WordsRemainingProps>(({
     // Compact version for landscape/mobile
     return (
       <div className="bg-neo-navy/80 text-white text-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
-        <motion.div
+        <m.div
           key={remaining}
           initial={{ scale: 1.2 }}
           animate={{ scale: 1 }}
           className="text-sm font-black leading-tight"
         >
           {remaining}
-        </motion.div>
+        </m.div>
         <div className="text-[10px] font-bold uppercase text-neo-cream/90">
           {minLength ? getLengthLabel() : (t('playerView.remaining'))}
         </div>
@@ -86,14 +86,14 @@ export const WordsRemaining = memo<WordsRemainingProps>(({
       <div className="p-3">
         {/* Remaining count */}
         <div className="text-center mb-2">
-          <motion.div
+          <m.div
             key={remaining}
             initial={{ scale: 1.3 }}
             animate={{ scale: 1 }}
             className="text-3xl font-black text-neo-cream leading-tight"
           >
             {remaining}
-          </motion.div>
+          </m.div>
           <div className="text-xs font-bold uppercase tracking-wide text-neo-cream/90">
             {remainingLabel}
           </div>
@@ -101,7 +101,7 @@ export const WordsRemaining = memo<WordsRemainingProps>(({
 
         {/* Progress bar */}
         <div className="h-3 bg-neo-black/30 text-white rounded-full overflow-hidden border-2 border-neo-black">
-          <motion.div
+          <m.div
             className="h-full bg-linear-to-r from-neo-lime to-neo-cyan rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}

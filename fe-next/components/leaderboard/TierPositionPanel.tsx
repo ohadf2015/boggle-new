@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useEffect, useMemo, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Avatar from '@/components/Avatar';
@@ -52,7 +52,7 @@ const TierPositionPanel: React.FC<Props> = memo(({ position, userId, className }
   }, [position.tier_id, position.rank_in_tier, position.tier_population, percentile]);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       className={cn('rounded-neo border-neo-thick shadow-hard-lg bg-neo-navy-light p-4', className)}
@@ -132,7 +132,7 @@ const TierPositionPanel: React.FC<Props> = memo(({ position, userId, className }
           </li>
         ))}
       </ul>
-    </motion.div>
+    </m.div>
   );
 });
 

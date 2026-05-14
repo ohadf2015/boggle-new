@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Search, Inbox, FolderOpen, Frown, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -87,7 +87,7 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
   };
 
   return (
-    <motion.div
+    <m.div
       className={cn(
         'flex flex-col items-center justify-center text-center',
         compact ? 'p-6' : 'p-8',
@@ -101,7 +101,7 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
     >
       {/* Icon or Mascot */}
       {mascotSrc ? (
-        <motion.div
+        <m.div
           className={cn('mb-6', compact ? 'w-16 h-16' : 'w-24 h-24')}
           variants={reduceMotion ? {} : itemVariants}
         >
@@ -114,9 +114,9 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
             unoptimized
             aria-hidden="true"
           />
-        </motion.div>
+        </m.div>
       ) : (
-        <motion.div
+        <m.div
           className={cn(
             'relative flex items-center justify-center rounded-neo-lg border-4 border-neo-black shadow-hard mb-6',
             compact ? 'w-16 h-16' : 'w-24 h-24',
@@ -143,23 +143,23 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
           {/* Decorative sparkles */}
           {!reduceMotion && !compact && (
             <>
-              <motion.div
+              <m.div
                 className="absolute -top-2 -right-2 w-4 h-4 bg-neo-pink rounded-full border-2 border-neo-black"
                 animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
                 transition={{ type: 'tween', duration: 2, repeat: Infinity }}
               />
-              <motion.div
+              <m.div
                 className="absolute -bottom-1 -left-2 w-3 h-3 bg-neo-cyan rounded-full border-2 border-neo-black"
                 animate={{ scale: [1, 1.3, 1], opacity: [0.7, 1, 0.7] }}
                 transition={{ type: 'tween', duration: 2, repeat: Infinity, delay: 0.5 }}
               />
             </>
           )}
-        </motion.div>
+        </m.div>
       )}
 
       {/* Title */}
-      <motion.h3
+      <m.h3
         className={cn(
           'font-black text-neo-black dark:text-neo-white uppercase tracking-tight',
           compact ? 'text-lg' : 'text-xl'
@@ -167,11 +167,11 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
         variants={reduceMotion ? {} : itemVariants}
       >
         {title}
-      </motion.h3>
+      </m.h3>
 
       {/* Description */}
       {description && (
-        <motion.p
+        <m.p
           className={cn(
             'font-medium text-neo-black/70 dark:text-neo-white/70 max-w-sm',
             compact ? 'text-sm mt-2' : 'text-base mt-3'
@@ -179,12 +179,12 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
           variants={reduceMotion ? {} : itemVariants}
         >
           {description}
-        </motion.p>
+        </m.p>
       )}
 
       {/* Action Button */}
       {action && (
-        <motion.div
+        <m.div
           className="mt-6"
           variants={reduceMotion ? {} : itemVariants}
         >
@@ -196,12 +196,12 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
           >
             {action.label}
           </EnhancedButton>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Secondary Action */}
       {secondaryAction && (
-        <motion.button
+        <m.button
           className={cn(
             'mt-3 text-sm font-bold text-neo-cyan hover:text-neo-cyan-light underline underline-offset-4 decoration-2 transition-colors',
             'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 rounded-neo px-2 py-1'
@@ -212,9 +212,9 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
           whileTap={{ scale: 0.98 }}
         >
           {secondaryAction.label}
-        </motion.button>
+        </m.button>
       )}
-    </motion.div>
+    </m.div>
   );
 };
 

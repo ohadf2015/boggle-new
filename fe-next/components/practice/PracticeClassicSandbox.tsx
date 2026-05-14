@@ -28,7 +28,7 @@ import { DiscoveredWordsList } from '@/components/daily/DiscoveredWordsList';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import InlineConfetti from '@/components/effects/InlineConfetti';
 import { WordFeedbackToast, type FeedbackType } from '@/components/daily/WordFeedbackToast';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 
 // Curated practice boards — Hebrew is finals-free (matches real letter
 // pool in lib/adventure/gridConstants.ts). Each board is hand-picked to
@@ -213,7 +213,7 @@ export default function PracticeClassicSandbox() {
       {/* Floating "+N pts" popup — mirrors live wheel game (lastWordScore). */}
       <AnimatePresence>
         {scorePopup && (
-          <motion.div
+          <m.div
             key={scorePopup.key}
             data-testid="practice-score-popup"
             initial={{ opacity: 0, y: 0, scale: 0.8 }}
@@ -224,7 +224,7 @@ export default function PracticeClassicSandbox() {
             className="absolute left-1/2 top-1/2 -translate-x-1/2 pointer-events-none px-3 py-1.5 rounded-neo border-2 border-neo-black bg-neo-lime text-neo-black font-neo-display font-black text-base shadow-hard"
           >
             +{scorePopup.word.length} pts
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 

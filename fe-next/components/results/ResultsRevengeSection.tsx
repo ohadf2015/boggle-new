@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import Avatar from '@/components/Avatar';
 import type { Player } from '@/components/results/types';
 
@@ -116,7 +116,7 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
     const prompt = getRevengePrompt(gapToWinner, winner.username, solvableWords.length, t);
 
     return (
-      <motion.section
+      <m.section
         initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 18, delay: revengeDelay }}
@@ -134,14 +134,14 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
                 className="w-full h-full"
               />
             </div>
-            <motion.div
+            <m.div
               initial={reducedMotion ? undefined : { scale: 0, rotate: -135 }}
               animate={{ scale: 1, rotate: 45 }}
               transition={{ type: 'spring', stiffness: 300, damping: 12, delay: revengeDelay + 0.2 }}
               className="relative z-30 bg-neo-pink border-2 border-black w-6 h-6 flex items-center justify-center shadow-hard-sm"
             >
               <span className="font-neo-display text-[9px] font-black text-white -rotate-45 leading-none">VS</span>
-            </motion.div>
+            </m.div>
             <div className="absolute right-0 w-8 h-8 rounded-full border-2 border-black overflow-hidden z-10 shadow-hard-sm">
               <Avatar
                 userId={winner.username}
@@ -169,7 +169,7 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
           </div>
 
           {/* Action */}
-          <motion.button
+          <m.button
             initial={reducedMotion ? undefined : { scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 350, damping: 14, delay: revengeDelay + 0.35 }}
@@ -178,9 +178,9 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
             className="shrink-0 bg-neo-pink px-3 py-2 border-2 border-black rounded-neo shadow-hard-sm text-[10px] font-black uppercase text-white"
           >
             {t('results.rematch')}
-          </motion.button>
+          </m.button>
         </div>
-      </motion.section>
+      </m.section>
     );
   }
 
@@ -195,7 +195,7 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
       : { title: t('results.defendTitle'), subtitle: '' };
 
     return (
-      <motion.section
+      <m.section
         initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 18, delay: revengeDelay }}
@@ -212,14 +212,14 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
                 className="w-full h-full"
               />
             </div>
-            <motion.div
+            <m.div
               initial={reducedMotion ? undefined : { scale: 0, rotate: -135 }}
               animate={{ scale: 1, rotate: 45 }}
               transition={{ type: 'spring', stiffness: 300, damping: 12, delay: revengeDelay + 0.2 }}
               className="relative z-30 bg-neo-lime border-2 border-black w-6 h-6 flex items-center justify-center shadow-hard-sm"
             >
               <span className="font-neo-display text-[9px] font-black text-neo-black -rotate-45 leading-none">VS</span>
-            </motion.div>
+            </m.div>
             {runnerUp && (
               <div className="absolute right-0 w-8 h-8 rounded-full border-2 border-black overflow-hidden z-10 shadow-hard-sm">
                 <Avatar
@@ -246,7 +246,7 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
           </div>
 
           {/* Action */}
-          <motion.button
+          <m.button
             initial={reducedMotion ? undefined : { scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 350, damping: 14, delay: revengeDelay + 0.35 }}
@@ -255,9 +255,9 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
             className="shrink-0 bg-neo-lime px-3 py-2 border-2 border-black rounded-neo shadow-hard-sm text-[10px] font-black uppercase text-neo-black"
           >
             {t('results.defendTitle')}
-          </motion.button>
+          </m.button>
         </div>
-      </motion.section>
+      </m.section>
     );
   }
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Trophy, Shield, Smartphone, BarChart3, Mail, Eye, EyeOff, X, Sparkles, Wand2, AlertCircle, type LucideIcon } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import Link from 'next/link';
@@ -240,7 +240,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
   const isAnyLoading = isLoading !== null;
 
   return (
-    <motion.div
+    <m.div
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       className={cn(
@@ -262,12 +262,12 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
       <div className="relative rounded-neo border-3 border-neo-lime/50 bg-neo-navy/90 shadow-hard-lg p-5 backdrop-blur-xs">
         {/* Sparkle decorations */}
         <div className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2">
-          <motion.div
+          <m.div
             animate={{ rotate: 360, scale: [1, 1.2, 1] }}
             transition={{ type: 'tween', duration: 3, repeat: Infinity, ease: 'linear' }}
           >
             <Sparkles className="w-6 h-6 text-neo-lime" />
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Dismiss button */}
@@ -284,7 +284,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
         {/* Mascot with speech bubble */}
         <div className="flex items-start gap-3 mb-4">
           {/* Mascot */}
-          <motion.div
+          <m.div
             initial={{ scale: 0, rotate: -20 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
@@ -298,10 +298,10 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
               clickAnimation="wiggle"
               tooltip={t('auth.inlineSignup.mascotTooltip')}
             />
-          </motion.div>
+          </m.div>
 
           {/* Speech bubble */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: -10, scale: 0.9 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ delay: 0.4, type: 'spring' }}
@@ -314,11 +314,11 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
             <p className="text-neo-black font-black text-sm leading-tight">
               {t(`auth.inlineSignup.${randomMessage}`) || t('auth.inlineSignup.funnyMessages.dontLeaveHanging')}
             </p>
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Title */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -330,17 +330,17 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
           <p className="text-sm text-neo-cream/60 mt-1">
             {t('auth.inlineSignup.subtitle')}
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Benefits Grid - compact */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
           className="grid grid-cols-2 gap-2 mb-4 p-3 bg-neo-navy-light/50 rounded-lg border border-neo-cream/15/50"
         >
           {benefits.map((benefit, idx) => (
-            <motion.div
+            <m.div
               key={benefit.key}
               initial={{ x: -10, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
@@ -351,28 +351,28 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
               <span className="text-neo-cream/60">
                 {t(`auth.dailyChallenge.benefits.${benefit.key}`) || benefit.key}
               </span>
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
 
         {/* Success Message */}
         <AnimatePresence>
           {success && (
-            <motion.div
+            <m.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               className="bg-neo-lime/20 border-2 border-neo-lime rounded-neo p-3 mb-4 text-center"
             >
               <p className="text-sm font-bold text-neo-lime">{success}</p>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
 
         {/* Error Message */}
         <AnimatePresence>
           {error && (
-            <motion.div
+            <m.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -380,14 +380,14 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
               role="alert"
             >
               <p className="text-sm font-bold text-red-300 flex items-center gap-2"><AlertCircle className="w-4 h-4 shrink-0" />{error}</p>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
 
         {!success && (
           <>
             {/* OAuth Buttons */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
@@ -422,11 +422,11 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                   </>
                 )}
               </Button>
-            </motion.div>
+            </m.div>
 
             {/* Email Form Toggle */}
             {!showEmailForm ? (
-              <motion.button
+              <m.button
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
@@ -435,9 +435,9 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
               >
                 <Mail className="w-4 h-4" />
                 <span>{t('auth.inlineSignup.orContinueWith')}</span>
-              </motion.button>
+              </m.button>
             ) : (
-              <motion.div
+              <m.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 className="space-y-3"
@@ -612,12 +612,12 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                     </div>
                   </form>
                 )}
-              </motion.div>
+              </m.div>
             )}
 
             {/* Continue as Guest - more prominent with humor */}
             {onDismiss && (
-              <motion.button
+              <m.button
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
@@ -630,7 +630,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                 <span className="hidden group-hover:inline text-neo-lime">
                   {t('auth.inlineSignup.skipHover')}
                 </span>
-              </motion.button>
+              </m.button>
             )}
           </>
         )}
@@ -647,7 +647,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
           </Link>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

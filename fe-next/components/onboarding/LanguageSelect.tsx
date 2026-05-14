@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowRight, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { SUPPORTED_GAME_LANGUAGES, LANGUAGE_CONFIG } from '@/lib/languageConfig';
@@ -47,37 +47,37 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-sm lg:max-w-2xl mx-auto gap-5 lg:gap-7">
       {/* Brand hero — animated LexiClash wordmark */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: -16, scale: 0.92 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 24 }}
         className="text-center mb-1 relative"
       >
         {/* Soft breathing halo behind the wordmark */}
-        <motion.div
+        <m.div
           aria-hidden
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[160%] rounded-full pointer-events-none"
           style={{ background: 'radial-gradient(circle, rgba(191,255,0,0.25) 0%, transparent 60%)' }}
           animate={{ scale: [1, 1.08, 1], opacity: [0.55, 0.9, 0.55] }}
           transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
         />
-        <motion.h1
+        <m.h1
           className="relative text-4xl lg:text-6xl font-neo-display font-black text-neo-lime tracking-tight"
           style={{ WebkitTextStroke: '1.5px rgba(0,0,0,0.3)' }}
           animate={{ rotate: [0, -1.5, 1.5, 0] }}
           transition={{ delay: 0.6, duration: 0.5, ease: 'easeInOut' }}
         >
           LexiClash
-        </motion.h1>
-        <motion.p
+        </m.h1>
+        <m.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.25 }}
           className="text-neo-cream/60 text-sm lg:text-base font-neo-body mt-1 lg:mt-2"
         >
           {t('onboarding.ftue.chooseLanguage', 'Choose your language')}
-        </motion.p>
-      </motion.div>
+        </m.p>
+      </m.div>
 
       {/* Language cards — 2-col on mobile, 4-col on desktop so all flags sit on one row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 lg:gap-4 w-full px-1">
@@ -86,7 +86,7 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
           const isSelected = selected === lang;
 
           return (
-            <motion.button
+            <m.button
               key={lang}
               data-testid={`lang-${lang}`}
               initial={{ opacity: 0, y: 20, scale: 0.9 }}
@@ -105,14 +105,14 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
             >
               {/* Selection check badge */}
               {isSelected && (
-                <motion.div
+                <m.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring', stiffness: 500, damping: 20 }}
                   className="absolute top-1.5 inset-e-1.5 w-5 h-5 bg-neo-lime border-2 border-neo-black rounded-full flex items-center justify-center"
                 >
                   <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />
-                </motion.div>
+                </m.div>
               )}
 
               <span className="text-3xl leading-none" role="img" aria-label={config.name}>
@@ -124,13 +124,13 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
               )}>
                 {config.nativeName}
               </span>
-            </motion.button>
+            </m.button>
           );
         })}
       </div>
 
       {/* CTA button */}
-      <motion.button
+      <m.button
         data-testid="language-continue"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -147,7 +147,7 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
       >
         {t('onboarding.ftue.letsPlay', "Let's Play")}
         <ArrowRight className="w-5 h-5" />
-      </motion.button>
+      </m.button>
     </div>
   );
 };

@@ -54,7 +54,7 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
 // Mock framer-motion to render elements without animation
 vi.mock('framer-motion', () => ({
   ...vi.importActual('framer-motion'),
-  motion: {
+  m: {
     div: ({ children, className, style, animate, initial, ...props }: React.ComponentProps<'div'> & { animate?: unknown; initial?: unknown }) => (
       <div className={className} style={style} {...props}>{children}</div>
     ),

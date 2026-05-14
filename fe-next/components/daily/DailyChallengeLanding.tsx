@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowLeft, Timer, CircleDot, Check, X, Eye } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -129,7 +129,7 @@ export function DailyChallengeLanding({
   const wordWheelPlayed = wordWheelStatus === 'played';
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ type: 'spring', stiffness: 280, damping: 26 }}
@@ -171,7 +171,7 @@ export function DailyChallengeLanding({
 
       {/* Quest 1: Word Hunt */}
       {wordHuntPlayed ? (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 25 }}
@@ -196,7 +196,7 @@ export function DailyChallengeLanding({
               'absolute inset-e-0 top-0 bottom-0 w-1.5 rounded-e-lg',
               wordHuntStatus === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
             )} />
-            <motion.div
+            <m.div
               data-testid={wordHuntStatus === 'won' ? 'won-badge' : 'lost-badge'}
               className={cn(
                 'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
@@ -211,7 +211,7 @@ export function DailyChallengeLanding({
                 ? <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
                 : <X className="w-6 h-6 text-neo-black" strokeWidth={3} />
               }
-            </motion.div>
+            </m.div>
             <div className="flex-1 min-w-0">
               <h2 className="text-xl font-neo-display font-black text-neo-cream leading-none">
                 {t('daily.wordHunt.title')}
@@ -235,7 +235,7 @@ export function DailyChallengeLanding({
               {t('daily.viewResults')}
             </div>
           </button>
-        </motion.div>
+        </m.div>
       ) : (
         <QuestCard
           challengeId="wordHunt"
@@ -270,7 +270,7 @@ export function DailyChallengeLanding({
 
       {/* Quest 2: Word Wheel */}
       {wordWheelPlayed ? (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 25 }}
@@ -290,7 +290,7 @@ export function DailyChallengeLanding({
             )}
           >
             <div className="absolute inset-e-0 top-0 bottom-0 w-1.5 rounded-e-lg bg-neo-cyan" />
-            <motion.div
+            <m.div
               data-testid="wheel-cleared-badge"
               className={cn(
                 'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
@@ -302,7 +302,7 @@ export function DailyChallengeLanding({
               transition={{ delay: 0.3, type: 'spring', stiffness: 200, damping: 15 }}
             >
               <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
-            </motion.div>
+            </m.div>
             <div className="flex-1 min-w-0">
               <h2 className="text-xl font-neo-display font-black text-neo-cream leading-none">
                 {t('wordWheel.hub.wordWheelQuest')}
@@ -321,7 +321,7 @@ export function DailyChallengeLanding({
               {t('daily.viewResults')}
             </div>
           </button>
-        </motion.div>
+        </m.div>
       ) : (
         <QuestCard
           challengeId="wordWheel"
@@ -352,7 +352,7 @@ export function DailyChallengeLanding({
 
       {/* Weekly Chest: 7-day progress + tier reward (authed only — guest has no server cycle) */}
       {user && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 25 }}
@@ -360,7 +360,7 @@ export function DailyChallengeLanding({
           data-testid="weekly-chest-slot"
         >
           <WeeklyChestCard onChestClaimed={setClaimedChest} />
-        </motion.div>
+        </m.div>
       )}
 
       {claimedChest && (
@@ -369,7 +369,7 @@ export function DailyChallengeLanding({
 
       {/* Leaderboard Teaser — only render after client-side date hydration */}
       {todayIso && (
-        <motion.div
+        <m.div
           className="w-full"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -386,8 +386,8 @@ export function DailyChallengeLanding({
             maxVisible={5}
             compact
           />
-        </motion.div>
+        </m.div>
       )}
-    </motion.div>
+    </m.div>
   );
 }

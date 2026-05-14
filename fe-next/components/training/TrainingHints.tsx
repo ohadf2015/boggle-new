@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, MoveUpRight, RotateCw, Compass, Trophy } from 'lucide-react';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -164,7 +164,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
       <AnimatePresence>
         {shouldShow && currentHint && config && (
           <>
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 30, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.98 }}
@@ -182,7 +182,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
               >
                 {/* Close button - appears after delay, less prominent */}
                 {showCloseButton && (
-                  <motion.button
+                  <m.button
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     onClick={handleDismiss}
@@ -193,7 +193,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
                     )}
                   >
                     <X size={12} />
-                  </motion.button>
+                  </m.button>
                 )}
 
                 {/* Colored accent bar */}
@@ -201,7 +201,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
 
                 <div className="flex items-start gap-3 mt-1">
                 {/* Icon with gentle animation */}
-                <motion.div
+                <m.div
                   animate={{
                     scale: [1, 1.05, 1],
                     rotate: currentHint === 'directionChange' ? [0, 45, 0] : [0, 5, -5, 0],
@@ -215,7 +215,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
                   className={cn('shrink-0 p-2 rounded-lg', config.bgColor)}
                 >
                   <config.icon className={config.color} size={24} />
-                </motion.div>
+                </m.div>
 
                 {/* Hint text */}
                 <div className="flex-1 pt-0.5">
@@ -232,7 +232,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
 
               {/* Progress bar - starts when hint becomes visible */}
               {isVisible && (
-                <motion.div
+                <m.div
                   className={cn('absolute bottom-0 left-0 h-1 rounded-b-xl', config.color.replace('text-', 'bg-'))}
                   initial={{ width: '100%' }}
                   animate={{ width: '0%' }}
@@ -240,7 +240,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
                 />
               )}
             </div>
-          </motion.div>
+          </m.div>
           </>
         )}
       </AnimatePresence>
@@ -248,7 +248,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
       {/* Training Complete Celebration - Non-blocking toast style */}
       <AnimatePresence>
         {showCelebration && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
@@ -265,12 +265,12 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
               )}
             >
               <div className="flex items-center gap-2">
-                <motion.div
+                <m.div
                   animate={{ rotate: [0, 15, -15, 0] }}
                   transition={{ duration: 0.5, repeat: 2 }}
                 >
                   <Trophy className="text-green-500" size={20} />
-                </motion.div>
+                </m.div>
                 <span className={cn(
                   'font-bold text-sm',
                   isDarkMode ? 'text-green-300' : 'text-green-700'
@@ -279,14 +279,14 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
                 </span>
               </div>
               {/* Progress bar showing auto-dismiss timer */}
-              <motion.div
+              <m.div
                 className="absolute bottom-0 left-0 h-0.5 bg-green-500 rounded-b-xl"
                 initial={{ width: '100%' }}
                 animate={{ width: '0%' }}
                 transition={{ duration: 4, ease: 'linear' }}
               />
             </button>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </>

@@ -31,7 +31,7 @@ vi.mock('framer-motion', () => {
   });
 
   return {
-    motion: {
+    m: {
       div: MotionDiv,
       p: MotionP,
     },

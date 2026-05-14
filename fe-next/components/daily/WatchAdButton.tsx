@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Play, Coins, CheckCircle, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { Button } from '@/components/ui/button';
@@ -119,7 +119,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
   if (variant === 'card') {
     // Full card variant for settings/dedicated section
     return (
-      <motion.div
+      <m.div
         whileHover={!isDisabled ? { scale: 1.02, y: -2 } : {}}
         whileTap={!isDisabled ? { scale: 0.98 } : {}}
         className={cn(
@@ -160,14 +160,14 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
             </div>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
   // Compact button variant (default)
   return (
     <AnimatePresence mode="wait">
-      <motion.div
+      <m.div
         key={showSuccess ? 'success' : status}
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -198,7 +198,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
             )}
           </span>
         </Button>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 };

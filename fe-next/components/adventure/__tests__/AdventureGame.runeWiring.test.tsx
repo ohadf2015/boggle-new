@@ -99,7 +99,7 @@ vi.mock('framer-motion', () => {
   const createMV = (v: any) => ({ get: () => v, set: vi.fn(), on: () => () => {}, onChange: () => () => {}, current: v });
   const motionComponents = { div: createMockMotion('div'), button: createMockMotion('button'), ul: createMockMotion('ul'), li: createMockMotion('li'), span: createMockMotion('span') };
   return {
-    motion: motionComponents, m: motionComponents,
+    m: motionComponents, m: motionComponents,
     AnimatePresence: ({ children }: any) => children,
     useSpring: (v: any) => createMV(typeof v === 'object' ? 0 : v),
     useTransform: (mv: any, fn: (v: any) => any) => createMV(fn(mv.get())),
@@ -212,7 +212,6 @@ vi.mock('../hooks/useAdventureBossOrchestration', () => ({
 
 vi.mock('@/hooks/useLexiStuckDetection', () => ({ useLexiStuckDetection: () => ({ isStuck: false, stuckDuration: 0, resetOnGameAction: vi.fn() }) }));
 vi.mock('@/hooks/useGemDetectorHighlights', () => ({ useGemDetectorHighlights: () => ({ highlightedTiles: [] }) }));
-vi.mock('@/hooks/useDailyQuests', () => ({ useDailyQuests: () => ({ quests: [], refreshQuests: vi.fn(), recordProgress: vi.fn() }) }));
 vi.mock('@/hooks/useChapterQuests', () => ({ useChapterQuests: () => ({ quests: [], refreshQuests: vi.fn(), recordProgress: vi.fn() }) }));
 vi.mock('@/hooks/useCrazyGamesLifecycle', () => ({ useCrazyGamesLifecycle: () => ({ gameplayStart: vi.fn(), gameplayStop: vi.fn(), happyTime: vi.fn(), loadingStart: vi.fn(), loadingStop: vi.fn() }) }));
 vi.mock('../hooks/useAdventureGameCallbacks', () => ({ useAdventureGameCallbacks: () => ({ handlePause: vi.fn(), handleResume: vi.fn(), handleExit: vi.fn() }) }));

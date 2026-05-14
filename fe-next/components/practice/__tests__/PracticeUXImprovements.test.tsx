@@ -60,7 +60,7 @@ vi.mock('next/link', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
 }));
@@ -117,7 +117,7 @@ describe('PracticeUXImprovements', () => {
    * - Skip button should have larger tap target: py-2 px-3
    * - Skip button should have pill styling: rounded-full border-2 bg-neo-cream/10
    * - Carousel parent should have overflow-x:hidden
-   * - motion.div should have touch-none
+   * - m.div should have touch-none
    */
   describe('Task 2: PracticeTutorialSheet skip button & scroll lock', () => {
     it('skip button exists with correct classes for pill styling', () => {
@@ -169,7 +169,7 @@ describe('PracticeUXImprovements', () => {
       expect(carousel).toHaveClass('overflow-hidden');
     });
 
-    it('motion.div inside carousel has touch-none for scroll lock', () => {
+    it('m.div inside carousel has touch-none for scroll lock', () => {
       const { container } = render(
         <PracticeTutorialSheet
           mode="classic"
@@ -177,7 +177,7 @@ describe('PracticeUXImprovements', () => {
           onContinue={vi.fn()}
         />
       );
-      // The draggable motion.div should have touch-none
+      // The draggable m.div should have touch-none
       const carousel = screen.getByTestId('practice-tutorial-carousel');
       const draggableDiv = carousel.querySelector('[class*="cursor-grab"]');
       expect(draggableDiv).toHaveClass('touch-none');

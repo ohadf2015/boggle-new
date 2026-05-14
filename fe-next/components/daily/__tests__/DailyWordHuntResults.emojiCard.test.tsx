@@ -62,7 +62,7 @@ vi.mock('@/shared/utils/wordNormalization', () => ({
 
 // ── framer-motion ────────────────────────────────────────────────────────────
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.ComponentProps<'div'>) => (
       <div {...props}>{children}</div>
     ),

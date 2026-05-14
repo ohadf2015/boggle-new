@@ -82,7 +82,7 @@ vi.mock('framer-motion', () => {
   MockMotionImg.displayName = 'MockMotionImg';
 
   return {
-    motion: {
+    m: {
       div: MockMotionDiv,
       h1: MockMotionH1,
       p: MockMotionP,

@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import {
   Zap, Target, BookOpen, Crown, Star, Dumbbell,
   Sparkles, Flame, TrendingUp, Compass, Activity, Scissors, Brain, Users,
@@ -466,14 +466,14 @@ const TvResultsAwards = memo<TvResultsAwardsProps>(({
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="space-y-4"
         >
           {/* Mascot Speech Bubble */}
-          <motion.div
+          <m.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -487,20 +487,20 @@ const TvResultsAwards = memo<TvResultsAwardsProps>(({
               className="absolute -bottom-2 left-6 w-4 h-4 bg-neo-cream border-b-3 border-r-3 border-neo-black"
               style={{ transform: 'rotate(45deg)' }}
             />
-          </motion.div>
+          </m.div>
 
-          <motion.h3
+          <m.h3
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 300, damping: 26 }}
             className="text-xl font-black uppercase tracking-wide text-neo-cream"
           >
             {t('tvResults.specialAwards')}
-          </motion.h3>
+          </m.h3>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {awards.map((award, index) => (
-              <motion.div
+              <m.div
                 key={award.id}
                 initial={{ rotateY: -90, opacity: 0 }}
                 animate={{ rotateY: 0, opacity: 1 }}
@@ -517,14 +517,14 @@ const TvResultsAwards = memo<TvResultsAwardsProps>(({
                 )}
               >
                 {/* Icon Badge — full spin */}
-                <motion.div
+                <m.div
                   initial={{ scale: 0, rotate: -360 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ delay: index * 0.25 + 0.35, type: 'spring', stiffness: 500, damping: 12 }}
                   className="absolute -top-4 -right-4 w-12 h-12 bg-neo-cream rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard"
                 >
                   <award.icon className="w-6 h-6 text-neo-black" />
-                </motion.div>
+                </m.div>
 
                 {/* Award Title */}
                 <h4 className="font-black text-lg uppercase text-neo-black mb-1 pe-8">
@@ -538,7 +538,7 @@ const TvResultsAwards = memo<TvResultsAwardsProps>(({
 
                 {/* Recipient — avatar pops in with bounce */}
                 <div className="flex items-center gap-3">
-                  <motion.div
+                  <m.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: index * 0.25 + 0.5, type: 'spring', stiffness: 400, damping: 8 }}
@@ -550,7 +550,7 @@ const TvResultsAwards = memo<TvResultsAwardsProps>(({
                       size="md"
                       className="border-3 border-neo-black shadow-hard-sm"
                     />
-                  </motion.div>
+                  </m.div>
                   <div className="flex-1 min-w-0">
                     <p className="font-black text-neo-black truncate">
                       {award.recipient.username}
@@ -560,10 +560,10 @@ const TvResultsAwards = memo<TvResultsAwardsProps>(({
                     </p>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

@@ -9,7 +9,7 @@ import '@testing-library/jest-dom';
 import { WordOfTheDay } from '../WordOfTheDay';
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, ...rest }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => (
       <div className={className} data-testid="motion-div" {...rest}>{children}</div>
     ),

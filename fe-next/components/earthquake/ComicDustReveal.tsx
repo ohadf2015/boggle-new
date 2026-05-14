@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { memo, useState, useEffect } from 'react';
 
 interface ComicDustRevealProps {
@@ -107,7 +107,7 @@ const ComicDustReveal = memo(({ visible, phase, intensity = 'medium' }: ComicDus
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
+        <m.div
           className="absolute inset-0 pointer-events-none z-50 overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -120,7 +120,7 @@ const ComicDustReveal = memo(({ visible, phase, intensity = 'medium' }: ComicDus
               <>
                 {/* Main dust cloud overlay */}
                 {dustClouds.map((cloud) => (
-                  <motion.div
+                  <m.div
                     key={`cloud-${cloud.id}`}
                     className="absolute rounded-full"
                     style={{
@@ -160,7 +160,7 @@ const ComicDustReveal = memo(({ visible, phase, intensity = 'medium' }: ComicDus
                 ))}
 
                 {/* Secondary dust layer for depth */}
-                <motion.div
+                <m.div
                   className="absolute inset-0"
                   style={{
                     background: `radial-gradient(ellipse at center,
@@ -177,7 +177,7 @@ const ComicDustReveal = memo(({ visible, phase, intensity = 'medium' }: ComicDus
 
                 {/* Swirling dust particles during cover */}
                 {dustParticles.map((particle) => (
-                  <motion.div
+                  <m.div
                     key={`cover-particle-${particle.id}`}
                     className="absolute rounded-full bg-amber-200/80"
                     style={{
@@ -211,7 +211,7 @@ const ComicDustReveal = memo(({ visible, phase, intensity = 'medium' }: ComicDus
             {phase === 'reveal' && (
               <>
                 {/* Central "POOF!" burst */}
-                <motion.div
+                <m.div
                   className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: [0, 1.5, 1.2], opacity: [0, 1, 0] }}
@@ -240,7 +240,7 @@ const ComicDustReveal = memo(({ visible, phase, intensity = 'medium' }: ComicDus
                     </defs>
 
                     {/* Star burst shape */}
-                    <motion.path
+                    <m.path
                       d="M100,10 L115,85 L190,100 L115,115 L100,190 L85,115 L10,100 L85,85 Z"
                       fill="url(#burstGradient)"
                       filter="url(#comicGlow)"
@@ -250,7 +250,7 @@ const ComicDustReveal = memo(({ visible, phase, intensity = 'medium' }: ComicDus
                     />
 
                     {/* Inner highlight */}
-                    <motion.circle
+                    <m.circle
                       cx="100"
                       cy="100"
                       r="30"
@@ -261,7 +261,7 @@ const ComicDustReveal = memo(({ visible, phase, intensity = 'medium' }: ComicDus
                       transition={{ duration: 0.3, delay: 0.1 }}
                     />
                   </svg>
-                </motion.div>
+                </m.div>
 
                 {/* Action lines radiating from center */}
                 <svg
@@ -277,7 +277,7 @@ const ComicDustReveal = memo(({ visible, phase, intensity = 'medium' }: ComicDus
                     const endY = 50 + Math.sin(angleRad) * line.length;
 
                     return (
-                      <motion.line
+                      <m.line
                         key={`action-line-${line.id}`}
                         x1={startX}
                         y1={startY}
@@ -300,7 +300,7 @@ const ComicDustReveal = memo(({ visible, phase, intensity = 'medium' }: ComicDus
 
                 {/* Small star bursts scattered around */}
                 {starBursts.map((star) => (
-                  <motion.div
+                  <m.div
                     key={`star-${star.id}`}
                     className="absolute"
                     style={{
@@ -320,12 +320,12 @@ const ComicDustReveal = memo(({ visible, phase, intensity = 'medium' }: ComicDus
                         strokeWidth="1"
                       />
                     </svg>
-                  </motion.div>
+                  </m.div>
                 ))}
 
                 {/* Dust particles flying outward during reveal */}
                 {dustParticles.map((particle) => (
-                  <motion.div
+                  <m.div
                     key={`reveal-particle-${particle.id}`}
                     className="absolute rounded-full"
                     style={{
@@ -359,7 +359,7 @@ const ComicDustReveal = memo(({ visible, phase, intensity = 'medium' }: ComicDus
                 ))}
 
                 {/* Circular reveal wipe */}
-                <motion.div
+                <m.div
                   className="absolute inset-0"
                   style={{
                     background: `radial-gradient(circle at center,
@@ -375,7 +375,7 @@ const ComicDustReveal = memo(({ visible, phase, intensity = 'medium' }: ComicDus
               </>
             )}
           </AnimatePresence>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

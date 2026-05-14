@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 
 interface ScoreCountUpProps {
   /** Starting value (default 0) */
@@ -84,7 +84,7 @@ export function ScoreCountUp({
   }
 
   return (
-    <motion.span
+    <m.span
       className={className}
       aria-label={`Score: ${to}`}
       aria-live="polite"
@@ -105,6 +105,6 @@ export function ScoreCountUp({
       }}
     >
       {display.toLocaleString()}
-    </motion.span>
+    </m.span>
   );
 }

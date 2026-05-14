@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Clock, Shuffle, RotateCcw, Sparkles, Flame, TrendingUp, ChevronUp, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -635,7 +635,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             <div data-testid="combo-slot" className="min-w-[56px] sm:min-w-[64px] flex justify-end shrink-0">
               <AnimatePresence>
                 {combo >= 2 && (
-                  <motion.div
+                  <m.div
                     className="flex items-center gap-1 px-1.5 py-0.5 rounded-neo border-2 border-neo-black bg-linear-to-r from-neo-pink to-neo-red shadow-[0_0_10px_rgba(255,20,147,0.4)] shrink-0"
                     initial={{ scale: 0, x: 20 }}
                     animate={{ scale: 1, x: 0 }}
@@ -644,14 +644,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
                   >
                     <Flame className="w-3.5 h-3.5 text-neo-white" />
                     <span className="font-neo-display font-black text-neo-white text-xs sm:text-sm">x{combo}</span>
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
             </div>
             <span className="text-neo-cream/60 text-xs sm:text-sm font-semibold truncate">
               {t('wordWheel.wordsFound', { count: wordsFound.length })}
             </span>
-            <motion.span
+            <m.span
               key={score}
               className="font-neo-display font-black text-neo-lime text-lg sm:text-xl shrink-0"
               initial={{ scale: 1.4 }}
@@ -659,7 +659,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               transition={{ type: 'spring', stiffness: 400 }}
             >
               {score}
-            </motion.span>
+            </m.span>
           </div>
         </div>
         {/* Timer progress bar — replaced by manual end-CTA in practice mode. */}
@@ -673,7 +673,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           </button>
         ) : (
           <div className="w-full h-1.5 rounded-full bg-neo-navy-light border border-neo-cream/10 overflow-hidden">
-            <motion.div
+            <m.div
               className={cn(
                 'h-full rounded-full',
                 timeLeft <= 10 ? 'bg-neo-red' : timeLeft <= 30 ? 'bg-neo-orange' : 'bg-linear-to-r from-neo-lime to-neo-cyan',
@@ -689,7 +689,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           Fixed height (not min-h) so popLayout tile-exit animations on submit
           don't briefly collapse/expand the box and cause the wheel cluster
           (flex-1 + justify-center sibling below) to re-center. */}
-      <motion.div
+      <m.div
         data-testid="word-builder"
         className="relative w-full h-[52px] sm:h-[72px] flex items-center justify-center"
         animate={
@@ -705,7 +705,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap max-w-full">
           <AnimatePresence mode="popLayout">
             {builtLetters.length === 0 ? (
-              <motion.span
+              <m.span
                 key="placeholder"
                 className="text-neo-cream/30 font-neo-display text-base sm:text-lg"
                 initial={{ opacity: 0 }}
@@ -713,7 +713,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
                 exit={{ opacity: 0 }}
               >
                 {t('wordWheel.tapLetters')}
-              </motion.span>
+              </m.span>
             ) : (
               builtLetters.map((bl, i) => (
                 <WordTile
@@ -732,7 +732,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               reached, but still tappable so users get a "too short" toast. */}
           <AnimatePresence>
             {builtLetters.length > 0 && (
-              <motion.button
+              <m.button
                 key="inline-submit-chip"
                 type="button"
                 data-testid="inline-submit-chip"
@@ -754,14 +754,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
                 transition={{ type: 'spring', stiffness: 600, damping: 22 }}
               >
                 <Check className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={3} />
-              </motion.button>
+              </m.button>
             )}
           </AnimatePresence>
         </div>
         {/* Inline feedback toast */}
         <AnimatePresence>
           {feedback && (
-            <motion.div
+            <m.div
               className={cn(
                 'absolute -bottom-7 left-1/2 -translate-x-1/2 px-3 py-1 rounded-neo border-2 border-neo-black text-sm font-bold whitespace-nowrap z-20',
                 feedback.type === 'success'
@@ -773,13 +773,13 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               exit={{ opacity: 0, y: 10, scale: 0.8 }}
             >
               {feedback.message}
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
         {/* Flying score */}
         <AnimatePresence>
           {lastWordScore !== null && (
-            <motion.div
+            <m.div
               key={`score-${Date.now()}`}
               className="absolute top-0 left-1/2 -translate-x-1/2 font-neo-display font-black text-neo-lime text-3xl pointer-events-none z-20"
               initial={{ opacity: 1, y: 0, scale: 0.5 }}
@@ -788,10 +788,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               transition={{ duration: 1, ease: 'easeOut' }}
             >
               +{lastWordScore}
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </m.div>
 
       {/* Points-to-pass next-rival hint — fixed-height reserved slot.
           h-* (not min-h-*) + whitespace-nowrap + truncate keeps the pill
@@ -804,7 +804,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       >
         <AnimatePresence>
           {nextRival && (
-            <motion.div
+            <m.div
               className="max-w-full px-2.5 py-1 rounded-neo border-2 border-neo-cream/20 bg-neo-navy-light/60 text-[11px] sm:text-xs text-neo-cream/80 font-semibold flex items-center gap-1.5 whitespace-nowrap"
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
@@ -821,7 +821,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               <span className="truncate">
                 {t('wordWheel.pointsToPass', { count: pointsToPass, name: nextRival.name })}
               </span>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>
@@ -831,7 +831,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 pointer-events-none flex flex-col items-center gap-1.5">
         <AnimatePresence>
           {passToasts.map((toast, i) => (
-            <motion.div
+            <m.div
               key={toast.id}
               className="px-3 py-1.5 rounded-neo border-3 border-neo-black bg-linear-to-r from-neo-pink to-neo-purple text-neo-white font-neo-display font-black text-sm shadow-[3px_3px_0px_black,0_0_18px_rgba(255,20,147,0.6)] flex items-center gap-1.5 whitespace-nowrap"
               initial={{ opacity: 0, y: -20, scale: 0.6, rotate: -4 }}
@@ -847,7 +847,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             >
               <TrendingUp className="w-4 h-4" />
               {t('wordWheel.passedPlayer', { name: toast.name })}
-            </motion.div>
+            </m.div>
           ))}
         </AnimatePresence>
       </div>
@@ -893,7 +893,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           isDraggingRef={draggingRef}
         />
         {/* Outer glow ring — breathing loop disabled under reduced-motion */}
-        <motion.div
+        <m.div
           className="absolute inset-0 rounded-full border-2 border-neo-lime/20"
           style={{ boxShadow: '0 0 24px rgba(191,255,0,0.12), inset 0 0 24px rgba(191,255,0,0.06)' }}
           animate={prefersReducedMotion ? { opacity: 0.85 } : { opacity: [0.6, 1, 0.6] }}
@@ -939,7 +939,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         className="w-full flex items-center justify-center gap-3 mt-1"
       >
         {/* Clear */}
-        <motion.button
+        <m.button
           type="button"
           onClick={handleClear}
           disabled={builtLetters.length === 0}
@@ -952,10 +952,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           aria-label={t('wordWheel.clear')}
         >
           <RotateCcw className="w-5 h-5" />
-        </motion.button>
+        </m.button>
 
         {/* Submit */}
-        <motion.button
+        <m.button
           type="button"
           onClick={handleSubmit}
           disabled={isValidating || builtWord.length < 3}
@@ -975,10 +975,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             <Sparkles className="w-5 h-5" />
             {t('wordWheel.submit')}
           </div>
-        </motion.button>
+        </m.button>
 
         {/* Shuffle */}
-        <motion.button
+        <m.button
           type="button"
           onClick={handleShuffle}
           className={cn(
@@ -990,7 +990,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           aria-label={t('wordWheel.shuffle')}
         >
           <Shuffle className="w-5 h-5" />
-        </motion.button>
+        </m.button>
       </div>
       </div>
 
@@ -1013,7 +1013,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         </h3>
         <div className="flex flex-wrap gap-1.5 overflow-y-auto pr-1 flex-1 min-h-0">
           {wordsFound.map((word) => (
-            <motion.span
+            <m.span
               key={word}
               className={cn(
                 'px-2.5 py-1 rounded-neo border-2 text-neo-cream text-xs font-semibold shadow-hard-xs h-fit',
@@ -1029,7 +1029,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               transition={prefersReducedMotion ? { duration: 0.2 } : { type: 'spring', stiffness: 500 }}
             >
               {displayWord(word)} <span className="text-neo-lime font-black">+{scoreWord(word)}</span>
-            </motion.span>
+            </m.span>
           ))}
         </div>
       </div>

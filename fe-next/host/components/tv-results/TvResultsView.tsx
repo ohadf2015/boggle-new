@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useMemo, useCallback, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Maximize, Minimize } from 'lucide-react';
 import { Socket } from 'socket.io-client';
 import TvResultsWinnersPodium from './TvResultsWinnersPodium';
@@ -215,7 +215,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
     <div className="fixed inset-0 bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 z-[60] overflow-hidden">
       {/* Fullscreen Toggle Button */}
       {isFullscreenSupported && (
-        <motion.button
+        <m.button
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           whileHover={{ scale: 1.1 }}
@@ -230,7 +230,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
           ) : (
             <Maximize className="w-6 h-6" />
           )}
-        </motion.button>
+        </m.button>
       )}
 
       {/* Main Content */}
@@ -238,7 +238,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
         {/* Header */}
         <AnimatePresence>
           {getPhaseVisibility('header') && (
-            <motion.header
+            <m.header
               initial={{ y: -50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -50, opacity: 0 }}
@@ -250,7 +250,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
                 <DJMascotWithEntrance size="lg" delay={0.5} />
               </div>
 
-              <motion.h1
+              <m.h1
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', stiffness: 400 }}
@@ -263,19 +263,19 @@ const TvResultsView = memo<TvResultsViewProps>(({
                 {showTournamentStandings
                   ? `${t('tvResults.tournamentStandings')}`
                   : t('tvResults.title')}
-              </motion.h1>
+              </m.h1>
 
               {isTournament && !showTournamentStandings && (
-                <motion.p
+                <m.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.3 }}
                   className="text-neo-cream/70 font-bold mt-2"
                 >
                   Round {tournamentData.currentRound} of {tournamentData.totalRounds}
-                </motion.p>
+                </m.p>
               )}
-            </motion.header>
+            </m.header>
           )}
         </AnimatePresence>
 
@@ -283,7 +283,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
         <div className="flex-1 overflow-hidden px-6 pb-32">
           {showTournamentStandings ? (
             // Tournament Standings View
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className="h-full flex items-center justify-center"
@@ -298,7 +298,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
                   />
                 )}
               </div>
-            </motion.div>
+            </m.div>
           ) : (
             // Regular Results View
             <div className="h-full grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">

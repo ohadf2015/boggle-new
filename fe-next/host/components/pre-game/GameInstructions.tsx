@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Grid3X3, Zap, Crosshair, Disc3, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import type { GameModeOption } from '@/components/GameModeSelector';
@@ -93,7 +93,7 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpe
   const step = steps[instructionStep] ?? steps[0];
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 24 }}
@@ -111,7 +111,7 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpe
       </div>
       <div className="px-3 pb-3">
         <AnimatePresence mode="wait">
-          <motion.div
+          <m.div
             key={instructionStep}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -140,7 +140,7 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpe
                 <p>{t(step.descKey)}</p>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </AnimatePresence>
         <div className="flex items-center justify-center gap-2 mt-3" role="group">
           <button
@@ -179,6 +179,6 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpe
           </button>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

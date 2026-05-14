@@ -7,7 +7,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }))
 
 vi.mock('framer-motion', () => ({
-  motion: new Proxy({}, {
+  m: new Proxy({}, {
     get: (_t: unknown, prop: string) => {
        
       return ({ children, ...rest }: any) => {

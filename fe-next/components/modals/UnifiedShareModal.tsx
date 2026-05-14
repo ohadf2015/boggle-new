@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useMemo, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { Copy, MessageCircle, Trophy, Flame, Check, Target, Mail, MessageSquare } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
@@ -250,7 +250,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
         <div className="p-4 space-y-4">
           {/* Post-game Stats Display - Enhanced Share Card */}
           {isPostGame && gameResult && (
-            <motion.div
+            <m.div
               initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               className="flex flex-col items-center gap-3"
@@ -264,7 +264,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
 
               {/* Player Archetype Badge */}
               {gameResult.archetype && (
-                <motion.div
+                <m.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.1 }}
@@ -274,7 +274,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   <span className="text-sm font-bold text-neo-cyan">
                     {gameResult.archetype.name}
                   </span>
-                </motion.div>
+                </m.div>
               )}
 
               {/* Main Stats Row */}
@@ -329,7 +329,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 <div className="flex items-center justify-center gap-3 flex-wrap">
                   {/* Longest Word */}
                   {gameResult.longestWord && (
-                    <motion.div
+                    <m.div
                       initial={{ scale: 0.9, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: 0.15 }}
@@ -341,11 +341,11 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                       <span className="text-white font-black text-sm uppercase">
                         {gameResult.longestWord}
                       </span>
-                    </motion.div>
+                    </m.div>
                   )}
                   {/* Achievements */}
                   {gameResult.achievements && gameResult.achievements.length > 0 && (
-                    <motion.div
+                    <m.div
                       initial={{ scale: 0.9, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: 0.2 }}
@@ -359,14 +359,14 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                           +{gameResult.achievements.length - 3}
                         </span>
                       )}
-                    </motion.div>
+                    </m.div>
                   )}
                 </div>
               )}
 
               {/* Placement Badge */}
               {gameResult.placement && gameResult.totalPlayers && gameResult.totalPlayers > 1 && (
-                <motion.div
+                <m.div
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.25 }}
@@ -390,13 +390,13 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   <span className="text-gray-400 text-xs">
                     / {gameResult.totalPlayers}
                   </span>
-                </motion.div>
+                </m.div>
               )}
-            </motion.div>
+            </m.div>
           )}
 
           {/* QR Code - Hidden on mobile, visible on desktop */}
-          <motion.div
+          <m.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.1 }}
@@ -417,10 +417,10 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 includeMargin={false}
               />
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Room Code Display */}
-          <motion.div
+          <m.div
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -442,17 +442,17 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
             >
               {copied ? <Check className="w-4 h-4 text-neo-black" /> : <Copy className="w-4 h-4 text-neo-black" />}
             </button>
-          </motion.div>
+          </m.div>
 
           {/* Simplified Share Options - Only Copy + WhatsApp */}
-          <motion.div
+          <m.div
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
             className="space-y-3"
           >
             {/* Primary: Copy Link - Full Width */}
-            <motion.button
+            <m.button
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.35 }}
@@ -478,10 +478,10 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 <Copy className="w-5 h-5" />
               )}
               <span>{copied ? t('share.linkCopied') : t('share.copyLink')}</span>
-            </motion.button>
+            </m.button>
 
             {/* Secondary: WhatsApp - Full Width */}
-            <motion.button
+            <m.button
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.4 }}
@@ -499,10 +499,10 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
             >
               <MessageCircle className="w-5 h-5" />
               <span>{t('share.whatsapp')}</span>
-            </motion.button>
+            </m.button>
 
             {/* More Platforms Toggle */}
-            <motion.button
+            <m.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.42 }}
@@ -525,11 +525,11 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
-            </motion.button>
+            </m.button>
 
             {/* Additional Share Platforms */}
             {showMorePlatforms && (
-              <motion.div
+              <m.div
                 id="more-platforms"
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
@@ -538,7 +538,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 className="grid grid-cols-2 gap-2"
               >
                 {/* Twitter/X */}
-                <motion.button
+                <m.button
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.05 }}
@@ -558,10 +558,10 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                   </svg>
                   <span>{t('share.twitter')}</span>
-                </motion.button>
+                </m.button>
 
                 {/* Discord */}
-                <motion.button
+                <m.button
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.1 }}
@@ -579,10 +579,10 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>{t('share.discord')}</span>
-                </motion.button>
+                </m.button>
 
                 {/* Email */}
-                <motion.button
+                <m.button
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.15 }}
@@ -600,11 +600,11 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 >
                   <Mail className="w-4 h-4" />
                   <span>{t('share.email')}</span>
-                </motion.button>
+                </m.button>
 
                 {/* SMS - Mobile Only */}
                 {isMobile && (
-                  <motion.button
+                  <m.button
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.2 }}
@@ -622,14 +622,14 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   >
                     <MessageCircle className="w-4 h-4" />
                     <span>{t('share.sms')}</span>
-                  </motion.button>
+                  </m.button>
                 )}
-              </motion.div>
+              </m.div>
             )}
 
             {/* Challenge a Friend (Post-game only, when challenge data is available) */}
             {isPostGame && challengeData && (
-              <motion.button
+              <m.button
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.42 }}
@@ -659,12 +659,12 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     ? t('share.linkCopied')
                     : t('challenge.challengeFriend')}
                 </span>
-              </motion.button>
+              </m.button>
             )}
 
             {/* Native Share (Mobile Only) */}
             {canNativeShare && (
-              <motion.button
+              <m.button
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.45 }}
@@ -680,9 +680,9 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 )}
               >
                 <span>{t('share.more')}</span>
-              </motion.button>
+              </m.button>
             )}
-          </motion.div>
+          </m.div>
         </div>
       </DialogContent>
     </Dialog>

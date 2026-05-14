@@ -13,6 +13,7 @@ import { resetComboState as resetComboStateUtil } from '@/shared/utils/comboUtil
 import {
   sendStartGameAck,
   stashStartGameMessageId,
+  markStartGameHandled,
   createHostLeftRoomClosingHandler,
 } from '@/shared/utils/gameEventUtils';
 import { useLetterGrid, useGameLanguage, useShowStartAnimation, useGameActions, useGameStore } from '@/hooks/gameState';
@@ -203,7 +204,6 @@ export function usePlayerGameEvents({
     setXpGainedData,
     setLevelUpData,
     setTotalBoardWords,
-    setBlastMovesUsed,
     setBlastComboSync,
     setBlastBoardUpdate,
     setWordHuntMyLife,
@@ -374,6 +374,10 @@ export function usePlayerGameEvents({
       }
 
       stashStartGameMessageId('PLAYER', data.messageId);
+      // Record this messageId so PlayerView's pendingGameStart effect skips
+      // its redundant store/timer/ack work — it stays the sole handler only
+      // when this socket listener is unmounted (player on results screen).
+      markStartGameHandled('PLAYER', data.messageId);
       sendStartGameAck(socket, data, 'PLAYER');
       onGameStart?.();
 

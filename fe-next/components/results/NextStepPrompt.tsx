@@ -2,7 +2,7 @@
 
 import React, { memo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Bot, ArrowLeft, ArrowRight, Sparkles, Trophy, Swords, Infinity as InfinityIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -154,7 +154,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
     const rematchText = t('closeLoss.rematch');
 
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
@@ -211,7 +211,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
             {backText}
           </button>
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
@@ -269,7 +269,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           )}
         >
           {/* Shine effect - pointer-events-none to allow button clicks */}
-          <motion.div
+          <m.div
             className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -skew-x-12 pointer-events-none"
             animate={{ x: ['-200%', '200%'] }}
             transition={{ duration: 3, repeat: inf, ease: 'easeInOut', repeatDelay: 2 }}
@@ -290,12 +290,12 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
                 {description}
               </p>
             </div>
-            <motion.div
+            <m.div
               animate={{ x: [0, 5, 0] }}
               transition={{ duration: 1.5, repeat: inf, ease: 'easeInOut' }}
             >
               <ArrowIcon className="w-6 h-6 text-neo-black" />
-            </motion.div>
+            </m.div>
           </div>
         </button>
 
@@ -314,7 +314,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
 
   // Desktop variant - full featured with animations
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
@@ -335,18 +335,18 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
       />
 
       {/* Sparkle decorations */}
-      <motion.div
+      <m.div
         className="absolute top-4 right-4 text-neo-black/50"
         animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
         transition={{ type: 'tween', duration: 4, repeat: inf, ease: 'easeInOut' }}
       >
         <Sparkles className="w-6 h-6" />
-      </motion.div>
+      </m.div>
 
       <div className="relative z-10 text-center space-y-5">
         {/* Header with Icon */}
         <div className="flex flex-col items-center gap-4">
-          <motion.div
+          <m.div
             className={cn(
               'p-4 rounded-neo-lg border-4 border-neo-black shadow-hard-lg',
               config.iconBg
@@ -355,7 +355,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
             transition={{ duration: 2, repeat: inf, ease: 'easeInOut' }}
           >
             {config.icon}
-          </motion.div>
+          </m.div>
 
           <div>
             <h3
@@ -388,19 +388,19 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           )}
         >
           {/* Button shine effect - pointer-events-none to allow button clicks */}
-          <motion.div
+          <m.div
             className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -skew-x-12 pointer-events-none"
             animate={{ x: ['-200%', '200%'] }}
             transition={{ duration: 2, repeat: inf, ease: 'easeInOut', repeatDelay: 1 }}
           />
           <span className="relative z-10">{t('nextStep.letsGo')}</span>
-          <motion.span
+          <m.span
             className="relative z-10"
             animate={{ x: [0, 5, 0] }}
             transition={{ duration: 1, repeat: inf, ease: 'easeInOut' }}
           >
             <ArrowIcon className="w-5 h-5 sm:w-6 sm:h-6" />
-          </motion.span>
+          </m.span>
         </button>
 
         {/* Secondary Back Button */}
@@ -422,7 +422,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           {backText}
         </button>
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 

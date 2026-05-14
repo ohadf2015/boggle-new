@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Zap, Brain, Target, Shuffle, BookOpen, TrendingUp, X, Star, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -176,7 +176,7 @@ export default function DrillProgressionOverlay({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -185,7 +185,7 @@ export default function DrillProgressionOverlay({
           style={{ backdropFilter: 'blur(8px)' }}
         >
           {/* Backdrop */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.8 }}
             exit={{ opacity: 0 }}
@@ -197,7 +197,7 @@ export default function DrillProgressionOverlay({
           />
 
           {/* Content Card */}
-          <motion.div
+          <m.div
             initial={{ scale: 0.8, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: -20 }}
@@ -222,7 +222,7 @@ export default function DrillProgressionOverlay({
 
             {/* Level-up celebration banner — shows above header when drill promoted player to new level */}
             {levelUp && levelUp.newLevel > levelUp.previousLevel && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: -12, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ type: 'spring', damping: 14, stiffness: 220, delay: 0.4 }}
@@ -235,12 +235,12 @@ export default function DrillProgressionOverlay({
                   {t('brain.drills.levelUp', { level: levelUp.newLevel })}
                 </span>
                 <Star className="h-4 w-4 text-neo-black" fill="currentColor" />
-              </motion.div>
+              </m.div>
             )}
 
             {/* Header */}
             <div className="text-center mb-6">
-              <motion.p
+              <m.p
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={cn(
@@ -249,8 +249,8 @@ export default function DrillProgressionOverlay({
                 )}
               >
                 {t('brain.drills.brainTraining')}
-              </motion.p>
-              <motion.h2
+              </m.p>
+              <m.h2
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1 }}
@@ -260,17 +260,17 @@ export default function DrillProgressionOverlay({
                 )}
               >
                 {t(`brain.domains.${targetDomain}`)}
-              </motion.h2>
+              </m.h2>
             </div>
 
             {/* Domain Icon with Animation */}
-            <motion.div
+            <m.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', damping: 12, stiffness: 200, delay: 0.2 }}
               className="flex justify-center mb-6"
             >
-              <motion.div
+              <m.div
                 animate={{
                   scale: [1, 1.1, 1],
                   rotate: [0, 5, -5, 0],
@@ -286,13 +286,13 @@ export default function DrillProgressionOverlay({
                 )}
               >
                 <Icon className="w-10 h-10 text-neo-black" />
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
 
             {/* Score Display */}
             <AnimatePresence>
               {showScore && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-center mb-4"
@@ -317,21 +317,21 @@ export default function DrillProgressionOverlay({
                     'h-3 mt-3 rounded-full border-2 border-neo-black overflow-hidden',
                     isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
                   )}>
-                    <motion.div
+                    <m.div
                       className={cn('h-full', domainConfig.bgColor)}
                       initial={{ width: `${previousDomainScore}%` }}
                       animate={{ width: `${newDomainScore}%` }}
                       transition={{ type: 'spring', stiffness: 80, damping: 15 }}
                     />
                   </div>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
 
             {/* Delta Display - Only show positive gains with upward arrow */}
             <AnimatePresence>
               {showDelta && scoreDelta > 0 && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, scale: 0.5, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ type: 'spring', damping: 15 }}
@@ -346,14 +346,14 @@ export default function DrillProgressionOverlay({
                       +{scoreDelta}
                     </span>
                   </div>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
 
             {/* Overall Score */}
             <AnimatePresence>
               {showOverall && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className={cn(
@@ -381,14 +381,14 @@ export default function DrillProgressionOverlay({
                       {t(`brain.tiers.${tier}`)}
                     </span>
                   </div>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
 
             {/* XP + Gold rewards */}
             <AnimatePresence>
               {showOverall && (xpAwarded !== undefined || goldAwarded !== undefined) && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
@@ -412,12 +412,12 @@ export default function DrillProgressionOverlay({
                       {t('brain.drills.goldEarned', { gold: goldAwarded ?? 0 })}
                     </div>
                   )}
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
 
             {/* Tap to close hint */}
-            <motion.p
+            <m.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.5 }}
               transition={{ delay: 2 }}
@@ -427,9 +427,9 @@ export default function DrillProgressionOverlay({
               )}
             >
               {t('common.tapToClose')}
-            </motion.p>
-          </motion.div>
-        </motion.div>
+            </m.p>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, memo, useRef, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, Hand } from 'lucide-react';
 import { getDemoConfig } from '../onboarding/demoConfigs';
 
@@ -159,7 +159,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
     return (
       <AnimatePresence>
         {isVisible && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={isPopping
               ? { opacity: 0, scale: 1.15, y: -20 }
@@ -230,7 +230,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                         const isSelected = isCellSelected(rowIndex, colIndex);
 
                         return (
-                          <motion.div
+                          <m.div
                             key={`${rowIndex}-${colIndex}`}
                             className={`
                               flex items-center justify-center relative
@@ -252,14 +252,14 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                             }}
                           >
                             {letter}
-                          </motion.div>
+                          </m.div>
                         );
                       })
                     )}
 
                     {/* Finger indicator */}
                     {fingerPosition && (
-                      <motion.div
+                      <m.div
                         className="absolute z-20 pointer-events-none"
                         style={{
                           left: fingerPosition.x + 8 - 12,
@@ -274,7 +274,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                             <path d="M12.5 2.5a2.5 2.5 0 00-2.5 2.5v8.5a.5.5 0 01-1 0V8a2 2 0 10-4 0v9a7 7 0 0014 0v-6a2 2 0 00-4 0v2.5a.5.5 0 01-1 0V5a2.5 2.5 0 00-2.5-2.5z"/>
                           </svg>
                         </div>
-                      </motion.div>
+                      </m.div>
                     )}
                   </div>
 
@@ -300,7 +300,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                           const y2 = getCenter(cell[0]);
 
                           return (
-                            <motion.line
+                            <m.line
                               key={`${x1}-${y1}-${x2}-${y2}`}
                               x1={x1}
                               y1={y1}
@@ -321,7 +321,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                 </div>
 
                 {/* Word display */}
-                <motion.div
+                <m.div
                   className={`
                     px-3 py-1 rounded-lg border-2 border-neo-black
                     font-black text-sm tracking-wider
@@ -335,11 +335,11 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                         .join('')
                     : DEMO_WORD}
                   {showSuccess && ' ✓'}
-                </motion.div>
+                </m.div>
               </div>
 
               {/* Tap to dismiss - more prominent with pulse animation */}
-              <motion.div
+              <m.div
                 className="flex items-center justify-center gap-1.5 mt-3 py-1.5 px-3 mx-auto w-fit
                   bg-neo-black/5 rounded-full border border-neo-black/20"
                 animate={{ scale: [1, 1.02, 1] }}
@@ -348,24 +348,24 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                 <span className="text-[11px] font-semibold text-neo-black/70 uppercase tracking-wide">
                   {t('common.tapToDismiss')}
                 </span>
-                <motion.span
+                <m.span
                   className="text-neo-cyan"
                   animate={{ y: [0, -2, 0] }}
                   transition={{ duration: 1, repeat: Infinity }}
                 >
                   <X className="w-3 h-3" />
-                </motion.span>
-              </motion.div>
+                </m.span>
+              </m.div>
 
               {/* Progress bar */}
-              <motion.div
+              <m.div
                 className="absolute bottom-0 left-0 h-1 bg-neo-cyan/40 rounded-b-lg"
                 initial={{ width: '100%' }}
                 animate={{ width: '0%' }}
                 transition={{ duration: AUTO_DISMISS_MS / 1000, ease: 'linear' }}
               />
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     );

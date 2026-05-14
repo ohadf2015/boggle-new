@@ -2,7 +2,7 @@
 
 import React, { useState, memo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
@@ -149,7 +149,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   const validationTooltipContent = (
     <AnimatePresence>
       {isOpen && isMounted && tooltipPosition && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: tooltipPosition.showAbove ? -5 : 5, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: tooltipPosition.showAbove ? -5 : 5, scale: 0.95 }}
@@ -192,7 +192,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           <p className="text-sm font-bold relative z-10">
             {displayReason}
           </p>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

@@ -19,7 +19,7 @@ import { getTextColor } from '../results/utils';
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div className={className as string} {...props}>{children}</div>
     ),

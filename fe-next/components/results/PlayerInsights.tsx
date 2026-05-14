@@ -1,5 +1,5 @@
 import React, { useMemo, memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Target, Zap, TrendingUp, BarChart3, Award, Sparkles, LucideIcon } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { getSpeedPatternDisplay, SPEED_PATTERNS, SpeedPattern } from '../../utils/gameInsights';
@@ -296,7 +296,7 @@ const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
   ];
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
@@ -304,7 +304,7 @@ const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
     >
       {/* Player Story Card - The headline insight */}
       {playerStory && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.95, rotate: -1 }}
           animate={{ opacity: 1, scale: 1, rotate: 1 }}
           transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
@@ -320,14 +320,14 @@ const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
           />
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-2">
-              <motion.span
+              <m.span
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
                 className="text-2xl"
               >
                 {playerStory.emoji}
-              </motion.span>
+              </m.span>
               <h3 className="text-lg font-black text-neo-cream uppercase tracking-wide">
                 {playerStory.headline}
               </h3>
@@ -337,7 +337,7 @@ const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
               {playerStory.story}
             </p>
           </div>
-        </motion.div>
+        </m.div>
       )}
 
       <h4 className="text-sm font-black uppercase tracking-wide text-foreground mb-2">
@@ -349,7 +349,7 @@ const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
         {insightCards.map((card, index) => {
           const Icon = card.icon;
           return (
-            <motion.div
+            <m.div
               key={card.label}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -380,13 +380,13 @@ const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
                   {card.subValue}
                 </div>
               )}
-            </motion.div>
+            </m.div>
           );
         })}
       </div>
 
       {/* Speed Pattern - Full width card */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
@@ -435,20 +435,20 @@ const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
             </span>
           </div>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Accuracy indicator */}
       {insights.accuracy !== undefined && insights.accuracy < 100 && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
           className="mt-1.5 text-[10px] font-bold text-foreground/90 text-center"
         >
           {t('insights.accuracy')}: {insights.accuracy}%
-        </motion.div>
+        </m.div>
       )}
-    </motion.div>
+    </m.div>
   );
 });
 

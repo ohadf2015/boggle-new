@@ -28,7 +28,7 @@ vi.mock('@/utils/ThemeContext', () => ({
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: React.forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {
       return <div ref={ref} {...props}>{children}</div>;
     }),

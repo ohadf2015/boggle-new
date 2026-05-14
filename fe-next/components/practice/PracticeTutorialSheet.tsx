@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Move, TrendingUp, Compass, Target, Route, Disc, Hand, Plus, type LucideIcon } from 'lucide-react';
-import { motion, type PanInfo } from 'framer-motion';
+import { m, type PanInfo } from 'framer-motion';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { haptics } from '@/utils/haptics';
@@ -174,7 +174,7 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
           className="relative w-full overflow-hidden rounded-neo border-2 border-neo-black shadow-hard"
         >
           <div className="relative aspect-[4/3] sm:aspect-video w-full">
-            <motion.div
+            <m.div
               className="absolute inset-0 cursor-grab active:cursor-grabbing touch-none"
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
@@ -216,7 +216,7 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
                   </div>
                 );
               })}
-            </motion.div>
+            </m.div>
             {/* Step ribbon */}
             <div className="absolute top-3 end-3 px-3 py-1 rounded-full bg-neo-navy border-2 border-neo-cream/60 text-neo-cream text-sm font-neo-display font-bold">
               {activeSlide + 1} / {tipKeys.length}

@@ -46,7 +46,7 @@ vi.mock('framer-motion', () => {
     }),
   };
   return {
-    motion: components,
+    m: components,
     m: components,
     AnimatePresence: ({ children }: any) => <>{children}</>,
   };

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
   Users,
@@ -631,7 +631,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
             <div className="space-y-2">
               {friends.length > 0 ? (
                 friends.map((friend, i) => (
-                  <motion.div
+                  <m.div
                     key={friend.id}
                     initial={{ opacity: 0, x: -12 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -645,7 +645,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                       onChallengeClick={() => setChallengeFriend(friend)}
                       onClick={() => setSelectedFriend(friend)}
                     />
-                  </motion.div>
+                  </m.div>
                 ))
               ) : (
                 <EnhancedEmptyState
@@ -715,7 +715,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                 </div>
                 <div className="space-y-2">
                   {pendingRequests.map((request, i) => (
-                    <motion.div
+                    <m.div
                       key={request.id}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -729,7 +729,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                         onDecline={() => handleDecline(request.id)}
                         language={language}
                       />
-                    </motion.div>
+                    </m.div>
                   ))}
                 </div>
               </div>

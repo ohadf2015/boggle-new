@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Mail, Bell, BellOff, Globe, Check } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -146,7 +146,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
 
   if (isLoading) {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className={cn(
@@ -157,12 +157,12 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
         <div className="flex items-center justify-center py-4">
           <Loader size="md" />
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
@@ -304,7 +304,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
       )}>
         {t('emailPreferences.unsubscribeInfo')}
       </p>
-    </motion.div>
+    </m.div>
   );
 }
 

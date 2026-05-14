@@ -50,7 +50,7 @@ vi.mock('../auth/shared', () => ({
 
 // Mock framer-motion to render without animation
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: React.forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {
       return <div ref={ref} {...props}>{children}</div>;
     }),

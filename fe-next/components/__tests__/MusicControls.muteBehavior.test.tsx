@@ -21,7 +21,7 @@ import '@testing-library/jest-dom';
 
 // Stub framer-motion to a passthrough so we don't need the real motion runtime.
 vi.mock('framer-motion', () => ({
-  motion: new Proxy({}, {
+  m: new Proxy({}, {
     get: () => (props: React.PropsWithChildren<Record<string, unknown>>) => {
       const { children, ...rest } = props;
       const safe: Record<string, unknown> = {};

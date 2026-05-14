@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export interface StatCardItem {
@@ -63,7 +63,7 @@ export function StatsCardGrid({ cards, variant = 'grid', className }: StatsCardG
 
   if (variant === 'inline') {
     return (
-      <motion.div
+      <m.div
         variants={container}
         initial="hidden"
         animate="show"
@@ -82,7 +82,7 @@ export function StatsCardGrid({ cards, variant = 'grid', className }: StatsCardG
                   className="w-px h-8 bg-slate-700"
                 />
               )}
-              <motion.div
+              <m.div
                 variants={prefersReduced ? cardReduced : cardVariant}
                 className="text-center px-3"
               >
@@ -97,17 +97,17 @@ export function StatsCardGrid({ cards, variant = 'grid', className }: StatsCardG
                 <div className="text-xs text-neo-cream/60 font-bold">
                   {card.label}
                 </div>
-              </motion.div>
+              </m.div>
             </React.Fragment>
           ))}
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
   // Grid variant — clean neo-brutalist cards
   return (
-    <motion.div
+    <m.div
       variants={container}
       initial="hidden"
       animate="show"
@@ -119,7 +119,7 @@ export function StatsCardGrid({ cards, variant = 'grid', className }: StatsCardG
       )}
     >
       {cards.map((card) => (
-        <motion.div
+        <m.div
           key={card.label}
           variants={prefersReduced ? cardReduced : cardVariant}
           className={cn(
@@ -136,8 +136,8 @@ export function StatsCardGrid({ cards, variant = 'grid', className }: StatsCardG
           <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
             {card.label}
           </div>
-        </motion.div>
+        </m.div>
       ))}
-    </motion.div>
+    </m.div>
   );
 }

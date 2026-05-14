@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
   AlertTriangle, Ban, BookOpen, Bot, Check, CheckCircle, Crown, FileText,
@@ -124,7 +124,7 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
@@ -134,7 +134,7 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-lime border-3 border-neo-black shadow-hard"
             style={{ minWidth: '200px', pointerEvents: 'auto' }}
           >
-            <motion.span
+            <m.span
               initial={{ opacity: 0, scale: 0.95, rotate: -180 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 300 }}
@@ -142,44 +142,44 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
               aria-hidden="true"
             >
               ✓
-            </motion.span>
+            </m.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {applyHebrewFinalLetters(word)}
             </span>
             {/* Show score if provided and greater than 0 */}
             {typeof score === 'number' && score > 0 && (
-              <motion.span
+              <m.span
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.15, type: 'spring', stiffness: 400, damping: 15 }}
                 className="px-2 py-1 bg-neo-cyan border-2 border-neo-black rounded font-black text-sm text-neo-black"
               >
                 +{score}
-              </motion.span>
+              </m.span>
             )}
             {/* Show fire round 2x multiplier badge */}
             {fireRoundActive && (
-              <motion.span
+              <m.span
                 initial={{ opacity: 0, scale: 0.95, rotate: -10 }}
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 15 }}
                 className="px-2 py-1 bg-linear-to-r from-neo-red to-neo-pink border-2 border-neo-black rounded font-black text-xs text-neo-cream"
               >
                 🔥 ×2
-              </motion.span>
+              </m.span>
             )}
             {/* Show combo bonus if present */}
             {typeof comboBonus === 'number' && comboBonus > 0 && (
-              <motion.span
+              <m.span
                 initial={{ opacity: 0, scale: 0.95, rotate: -10 }}
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ delay: 0.25, type: 'spring', stiffness: 400, damping: 15 }}
                 className="px-2 py-1 bg-neo-pink border-2 border-neo-black rounded font-black text-sm text-neo-black"
               >
                 +{comboBonus} {options.comboBonusLabel || 'combo!'}
-              </motion.span>
+              </m.span>
             )}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     ),
@@ -196,7 +196,7 @@ export const wordNeedsValidationToast = (word: string, options: WordNeedsValidat
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
@@ -204,20 +204,20 @@ export const wordNeedsValidationToast = (word: string, options: WordNeedsValidat
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-lime border-3 border-neo-black shadow-hard"
             style={{ minWidth: '200px', pointerEvents: 'auto' }}
           >
-            <motion.span
+            <m.span
               animate={{ rotate: [0, 10, -10, 0] }}
               transition={{ duration: 0.5, repeat: 2 }}
               className="text-2xl text-neo-black"
             >
               ⏳
-            </motion.span>
+            </m.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {applyHebrewFinalLetters(word)}
             </span>
             <span dir="auto" className="text-xs font-bold text-neo-black/70 uppercase">
               {options.pendingLabel || 'Pending'}
             </span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     ),
@@ -234,7 +234,7 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
@@ -242,13 +242,13 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-pink border-3 border-neo-black shadow-hard"
             style={{ minWidth: '220px', pointerEvents: 'auto' }}
           >
-            <motion.span
+            <m.span
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               className="text-2xl flex items-center justify-center"
             >
               <Bot className="text-neo-black" />
-            </motion.span>
+            </m.span>
             <div className="flex flex-col">
               <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
                 {applyHebrewFinalLetters(word)}
@@ -257,14 +257,14 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
                 {options.aiValidatingLabel || 'AI checking...'}
               </span>
             </div>
-            <motion.div
+            <m.div
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ type: 'tween', duration: 0.6, repeat: Infinity }}
               className="ms-auto"
             >
               <Loader size="sm" />
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
     ),
@@ -286,7 +286,7 @@ export const wordRejectedToast = (word: string, options: WordRejectedOptions & {
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9, x: 0 }}
             animate={{
               y: 0,
@@ -306,7 +306,7 @@ export const wordRejectedToast = (word: string, options: WordRejectedOptions & {
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-red border-3 border-neo-black shadow-hard"
             style={{ minWidth: '240px', pointerEvents: 'auto' }}
           >
-            <motion.span
+            <m.span
               initial={{ opacity: 0, scale: 0.95, rotate: -90 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
@@ -314,7 +314,7 @@ export const wordRejectedToast = (word: string, options: WordRejectedOptions & {
               aria-hidden="true"
             >
               {rejectionInfo.icon}
-            </motion.span>
+            </m.span>
             <div className="flex flex-col gap-0.5">
               <span dir="auto" className="font-black uppercase tracking-wide text-neo-white">
                 {applyHebrewFinalLetters(word)}
@@ -323,15 +323,15 @@ export const wordRejectedToast = (word: string, options: WordRejectedOptions & {
                 {displayMessage}
               </span>
             </div>
-            <motion.span
+            <m.span
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.15, type: 'spring', stiffness: 400, damping: 15 }}
               className="text-xl ms-auto text-neo-white"
             >
               ✗
-            </motion.span>
-          </motion.div>
+            </m.span>
+          </m.div>
         )}
       </AnimatePresence>
     ),
@@ -348,7 +348,7 @@ export const wordErrorToast = (message: string, options: WordErrorOptions = {}):
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9, x: 0 }}
             animate={{
               y: 0,
@@ -368,7 +368,7 @@ export const wordErrorToast = (message: string, options: WordErrorOptions = {}):
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-red border-3 border-neo-black shadow-hard"
             style={{ minWidth: '200px', pointerEvents: 'auto' }}
           >
-            <motion.span
+            <m.span
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
@@ -376,11 +376,11 @@ export const wordErrorToast = (message: string, options: WordErrorOptions = {}):
               aria-hidden="true"
             >
               ✗
-            </motion.span>
+            </m.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-white">
               {message}
             </span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     ),
@@ -398,7 +398,7 @@ export const neoSuccessToast = (message: string, options: NeoToastOptions = {}):
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
@@ -408,7 +408,7 @@ export const neoSuccessToast = (message: string, options: NeoToastOptions = {}):
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-lime border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
-            <motion.span
+            <m.span
               initial={{ opacity: 0, scale: 0.95, rotate: -180 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ delay: 0.1, type: 'spring' }}
@@ -416,11 +416,11 @@ export const neoSuccessToast = (message: string, options: NeoToastOptions = {}):
               aria-hidden="true"
             >
               {icon}
-            </motion.span>
+            </m.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {message}
             </span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     ),
@@ -439,7 +439,7 @@ export const neoErrorToast = (message: string, options: NeoToastOptions = {}): s
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9, x: 0 }}
             animate={{
               y: 0,
@@ -459,7 +459,7 @@ export const neoErrorToast = (message: string, options: NeoToastOptions = {}): s
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-red border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
-            <motion.span
+            <m.span
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
@@ -467,11 +467,11 @@ export const neoErrorToast = (message: string, options: NeoToastOptions = {}): s
               aria-hidden="true"
             >
               {icon}
-            </motion.span>
+            </m.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-white">
               {message}
             </span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     ),
@@ -489,7 +489,7 @@ export const neoInfoToast = (message: string, options: NeoToastOptions = {}): st
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
@@ -499,7 +499,7 @@ export const neoInfoToast = (message: string, options: NeoToastOptions = {}): st
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-cyan border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
-            <motion.span
+            <m.span
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, type: 'spring' }}
@@ -507,11 +507,11 @@ export const neoInfoToast = (message: string, options: NeoToastOptions = {}): st
               aria-hidden="true"
             >
               {icon}
-            </motion.span>
+            </m.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {message}
             </span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     ),
@@ -530,7 +530,7 @@ export const neoWarningToast = (message: string, options: NeoToastOptions = {}):
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{
               y: 0,
@@ -550,7 +550,7 @@ export const neoWarningToast = (message: string, options: NeoToastOptions = {}):
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-yellow border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
-            <motion.span
+            <m.span
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: [1, 1.2, 1] }}
               transition={{ delay: 0.1, type: 'spring', repeat: 1 }}
@@ -558,11 +558,11 @@ export const neoWarningToast = (message: string, options: NeoToastOptions = {}):
               aria-hidden="true"
             >
               {icon}
-            </motion.span>
+            </m.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {message}
             </span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     ),

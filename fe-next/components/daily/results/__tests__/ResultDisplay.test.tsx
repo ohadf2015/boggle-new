@@ -12,7 +12,7 @@ import { getScoreBreakdown } from '@/utils/aiHintGenerator';
 
 // Mock framer-motion to render immediately
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: any) => {
       const { initial, animate, transition, whileTap, exit, variants, whileHover, ...rest } = props;
       return <div {...rest}>{children}</div>;

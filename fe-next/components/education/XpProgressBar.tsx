@@ -14,7 +14,7 @@
  */
 
 import { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getXpProgress, type XpProgress } from '@/backend/modules/xpManager';
 import { cn } from '@/lib/utils';
@@ -152,7 +152,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
 
           {/* Recent XP gain indicator */}
           {recentXpGain && recentXpGain > 0 && (
-            <motion.span
+            <m.span
               data-testid="xp-recent-gain"
               role="status"
               aria-live="polite"
@@ -166,7 +166,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
               )}
             >
               +{recentXpGain}
-            </motion.span>
+            </m.span>
           )}
         </div>
       )}
@@ -183,7 +183,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
         )}
       >
         {/* Progress fill - uses scaleX for compositor-only animation */}
-        <motion.div
+        <m.div
           data-testid="xp-progress-fill"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: progress.progressPercent / 100 }}

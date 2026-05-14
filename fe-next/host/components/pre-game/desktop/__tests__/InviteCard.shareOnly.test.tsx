@@ -13,7 +13,7 @@ vi.mock('qrcode.react', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: new Proxy(
+  m: new Proxy(
     {},
     {
       get: (_t, tag: string) => {
@@ -29,7 +29,7 @@ vi.mock('framer-motion', () => ({
           } & Record<string, unknown>;
           return React.createElement(tag, rest, children);
         };
-        Comp.displayName = `motion.${tag}`;
+        Comp.displayName = `m.${tag}`;
         return Comp;
       },
     },

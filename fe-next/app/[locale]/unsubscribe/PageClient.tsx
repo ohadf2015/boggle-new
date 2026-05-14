@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Mail, CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -48,7 +48,7 @@ export default function UnsubscribePageClient() {
 
   return (
     <div className="flex-1 flex flex-col bg-neo-navy text-neo-cream items-center justify-center p-4">
-      <motion.div
+      <m.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="max-w-md w-full"
@@ -138,7 +138,7 @@ export default function UnsubscribePageClient() {
             <span className="text-neo-orange">Clash</span>
           </h2>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

@@ -41,7 +41,7 @@ vi.mock('@/utils/confettiUtils', () => ({
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: React.forwardRef<HTMLDivElement, React.PropsWithChildren<{ className?: string; onClick?: () => void }>>(
       function MotionDiv({ children, className, onClick, ...props }, ref) {
         return (

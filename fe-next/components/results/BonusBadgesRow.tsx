@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { XpGainedData, LevelUpData } from './types';
@@ -64,7 +64,7 @@ const BonusBadgesRow: React.FC<BonusBadgesRowProps> = memo(({
     <div className={cn('flex items-center gap-1.5 sm:gap-2 flex-wrap', className)}>
       {/* Combo Bonus */}
       {comboBonus > 0 && (
-        <motion.span
+        <m.span
           initial={{ scale: 0, rotate: -15, y: 10 }}
           animate={{ scale: 1, rotate: 0, y: 0 }}
           whileHover={{ scale: 1.12, rotate: -3, y: -2 }}
@@ -76,12 +76,12 @@ const BonusBadgesRow: React.FC<BonusBadgesRowProps> = memo(({
           )}
         >
           ⚡ +{comboBonus}
-        </motion.span>
+        </m.span>
       )}
 
       {/* Fire Round Bonus */}
       {fireRoundBonus > 0 && (
-        <motion.span
+        <m.span
           initial={{ scale: 0, rotate: 15, y: 10 }}
           animate={{ scale: 1, rotate: 0, y: 0 }}
           whileHover={{ scale: 1.12, rotate: 3, y: -2 }}
@@ -93,12 +93,12 @@ const BonusBadgesRow: React.FC<BonusBadgesRowProps> = memo(({
           )}
         >
           🔥 +{fireRoundBonus}
-        </motion.span>
+        </m.span>
       )}
 
       {/* XP Earned */}
       {xpGainedData && (
-        <motion.span
+        <m.span
           initial={{ scale: 0, rotate: -15, y: 10 }}
           animate={{ scale: 1, rotate: 0, y: 0 }}
           whileHover={{ scale: 1.12, rotate: -3, y: -2 }}
@@ -110,12 +110,12 @@ const BonusBadgesRow: React.FC<BonusBadgesRowProps> = memo(({
           )}
         >
           ⭐ +{xpGainedData.xpEarned} XP
-        </motion.span>
+        </m.span>
       )}
 
       {/* Level Up */}
       {levelUpData && (
-        <motion.span
+        <m.span
           initial={{ scale: 0, rotate: 15, y: 10 }}
           animate={{ scale: [0, 1.25, 0.9, 1.05, 1], rotate: [15, -5, 3, 0], y: [10, -4, 2, 0] }}
           whileHover={{ scale: 1.15, rotate: -3, y: -3 }}
@@ -127,7 +127,7 @@ const BonusBadgesRow: React.FC<BonusBadgesRowProps> = memo(({
           )}
         >
           🎉 Lvl {levelUpData.oldLevel} {levelArrow} {levelUpData.newLevel}
-        </motion.span>
+        </m.span>
       )}
     </div>
   );

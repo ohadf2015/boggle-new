@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Grid3X3, ChevronDown, ChevronUp } from 'lucide-react';
 import type { LetterGrid } from '@/types';
 
@@ -49,7 +49,7 @@ export const WordHuntBoardReview = memo<WordHuntBoardReviewProps>(({
 
   return (
     <div className="space-y-1">
-      <motion.button
+      <m.button
         onClick={() => setIsOpen(!isOpen)}
         whileTap={{ scale: 0.98 }}
         className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-neo-navy/50 border-3 border-neo-black rounded-neo shadow-hard-sm text-neo-cream/80 hover:text-neo-white transition-colors"
@@ -63,11 +63,11 @@ export const WordHuntBoardReview = memo<WordHuntBoardReviewProps>(({
         ) : (
           <ChevronDown className="w-4 h-4" />
         )}
-      </motion.button>
+      </m.button>
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div
+          <m.div
             data-testid="board-review-grid"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
@@ -111,7 +111,7 @@ export const WordHuntBoardReview = memo<WordHuntBoardReviewProps>(({
                 </span>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

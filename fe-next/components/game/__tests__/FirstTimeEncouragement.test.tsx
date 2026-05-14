@@ -6,7 +6,7 @@ import FirstTimeEncouragement from '../FirstTimeEncouragement';
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  motion: {
+  m: {
     div: ({ children, className, role, onClick, ...rest }: Record<string, unknown>) => (
       <div className={className as string} role={role as string} onClick={onClick as React.MouseEventHandler<HTMLDivElement>} aria-live={rest['aria-live'] as 'polite' | 'off' | 'assertive'}>
         {children as React.ReactNode}

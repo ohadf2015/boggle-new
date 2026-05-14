@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
   markAchievementEarned,
@@ -100,7 +100,7 @@ const FirstTimeAchievement = memo<FirstTimeAchievementProps>(({
   return (
     <AnimatePresence>
       {visible && config && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.8, y: position === 'top' ? -20 : 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: position === 'top' ? -20 : 20 }}
@@ -124,13 +124,13 @@ const FirstTimeAchievement = memo<FirstTimeAchievementProps>(({
             <InlineConfetti size="sm" duration={1800} />
 
             {/* Emoji */}
-            <motion.span
+            <m.span
               className="text-2xl"
               animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
               transition={{ type: 'tween', duration: 0.5, ease: 'easeInOut' }}
             >
               {config.emoji}
-            </motion.span>
+            </m.span>
 
             {/* Text */}
             <span className="text-neo-black font-bold text-sm whitespace-nowrap drop-shadow-md">
@@ -138,7 +138,7 @@ const FirstTimeAchievement = memo<FirstTimeAchievementProps>(({
             </span>
 
             {/* Sparkle effect */}
-            <motion.div
+            <m.div
               className="absolute inset-0 rounded-xl pointer-events-none"
               initial={{ opacity: 0 }}
               animate={{ opacity: [0, 0.5, 0] }}
@@ -148,7 +148,7 @@ const FirstTimeAchievement = memo<FirstTimeAchievementProps>(({
               }}
             />
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

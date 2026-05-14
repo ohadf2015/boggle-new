@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   RadarChart,
   PolarGrid,
@@ -94,7 +94,7 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
   ];
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4 }}
@@ -107,7 +107,7 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
       )}
     >
       {/* Animated background gradient overlay */}
-      <motion.div
+      <m.div
         className="absolute inset-0 opacity-10 pointer-events-none"
         animate={{
           background: [
@@ -125,7 +125,7 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
       />
       {/* Header */}
       <div className="relative z-10 flex items-center justify-center gap-2 mb-4">
-        <motion.div
+        <m.div
           animate={{ rotate: [0, 360] }}
           transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
         >
@@ -133,7 +133,7 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
             'w-6 h-6',
             isDarkMode ? 'text-neo-cyan' : 'text-purple-600'
           )} />
-        </motion.div>
+        </m.div>
         <h3 className={cn(
           'text-lg font-black uppercase tracking-wide text-center',
           isDarkMode ? 'text-neo-white' : 'text-neo-black'
@@ -235,7 +235,7 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
       {/* Legend */}
       <div className="relative z-10 flex items-center justify-center gap-2 mt-4">
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 border-neo-black bg-neo-cream/50">
-          <motion.div
+          <m.div
             className="w-3 h-3 rounded-full border-2 border-neo-black bg-linear-to-r from-neo-cyan via-purple-400 to-neo-pink"
             animate={{
               boxShadow: [
@@ -259,6 +259,6 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
           </span>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

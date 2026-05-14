@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Clock, User, Crown, Gamepad2, Smartphone, Monitor, Sparkles } from 'lucide-react';
 import type { UnifiedGame } from '../types';
 import { LANGUAGE_FLAGS, GAME_TYPE_ICONS, formatDuration, formatTime } from '../constants';
@@ -78,7 +78,7 @@ export function GameRow({ game, t }: GameRowProps) {
     game.device_type?.toLowerCase().includes('ios');
 
   return (
-    <motion.tr
+    <m.tr
       layout
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -168,7 +168,7 @@ export function GameRow({ game, t }: GameRowProps) {
       <td className="hidden md:table-cell px-4 py-3">
         <span className="font-mono text-xs text-slate-400">{game.game_code}</span>
       </td>
-    </motion.tr>
+    </m.tr>
   );
 }
 

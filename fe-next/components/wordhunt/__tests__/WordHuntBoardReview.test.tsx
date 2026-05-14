@@ -7,7 +7,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, initial, animate, transition, exit, ...props }: any) => <div {...props}>{children}</div>,
     button: ({ children, initial, animate, transition, whileHover, whileTap, exit, ...props }: any) => <button {...props}>{children}</button>,
   },

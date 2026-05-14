@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { EducationHero } from '@/components/education/EducationHero';
@@ -84,20 +84,20 @@ export function PageClient() {
       {/* Teacher view: cascading shortcut bars + relevant redesign content */}
       {hasTeacherAccess && (
         <>
-          <motion.div
+          <m.div
             variants={teacherStaggerContainer}
             initial="hidden"
             animate="visible"
           >
             {/* Teacher welcome banner for newly-approved teachers */}
-            <motion.div variants={teacherBar} className="px-4 py-4">
+            <m.div variants={teacherBar} className="px-4 py-4">
               <div className="mx-auto max-w-4xl">
                 <TeacherWelcomeBanner hasAccess={hasTeacherAccess} />
               </div>
-            </motion.div>
+            </m.div>
 
             {/* Auth-aware shortcut */}
-            <motion.div
+            <m.div
               variants={teacherBar}
               data-testid="auth-dashboard-shortcut"
               className="bg-neo-lime/10 border-b-2 border-neo-lime px-4 py-3 sm:py-4"
@@ -120,10 +120,10 @@ export function PageClient() {
                   <span>→</span>
                 </a>
               </div>
-            </motion.div>
+            </m.div>
 
             {/* Start Game shortcut */}
-            <motion.div
+            <m.div
               variants={teacherBar}
               className="bg-neo-navy-light border-b border-neo-white/10 px-4 py-3"
             >
@@ -135,8 +135,8 @@ export function PageClient() {
                   {t('education.landing.startGame')}
                 </a>
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
 
           {/* Fill the page with teacher-relevant content (no "request access" noise) */}
           <div id="modes">

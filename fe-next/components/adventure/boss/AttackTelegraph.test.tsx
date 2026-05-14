@@ -19,7 +19,7 @@ vi.mock('../../../hooks/usePrefersReducedMotion', () => ({
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.ComponentProps<'div'>) => (
       <div {...props}>{children}</div>
     ),

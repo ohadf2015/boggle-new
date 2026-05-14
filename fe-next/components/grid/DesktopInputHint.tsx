@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
 import { useIsExperiencedPlayer } from '@/hooks/useIsExperiencedPlayer';
@@ -49,7 +49,7 @@ const DesktopInputHint = memo<{ wordSubmitted?: boolean }>(({ wordSubmitted }) =
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
@@ -61,7 +61,7 @@ const DesktopInputHint = memo<{ wordSubmitted?: boolean }>(({ wordSubmitted }) =
               {t('desktopHint.tip')}
             </span>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

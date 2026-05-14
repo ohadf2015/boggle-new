@@ -10,7 +10,7 @@ let mockComboLevel = 0;
 
 // --- Core animation / motion mocks ---
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
       return <div {...domProps}>{children}</div>;

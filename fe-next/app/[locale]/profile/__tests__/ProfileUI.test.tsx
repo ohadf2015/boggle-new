@@ -85,7 +85,7 @@ vi.mock('@/components/profile/ReferralCard', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
     span: ({ children, ...props }: any) => <span {...props}>{children}</span>,

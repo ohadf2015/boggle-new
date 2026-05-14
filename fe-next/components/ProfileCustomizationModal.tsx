@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Check, X, Sparkles, ArrowRight } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFooter } from '@/components/ui/dialog';
@@ -146,7 +146,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
               {t('validation.usernameRequired')}
             </label>
             <div className="flex items-center gap-2">
-              <motion.div
+              <m.div
                 className="flex-1"
                 animate={showShake ? { x: [0, -6, 6, -4, 4, 0] } : {}}
                 transition={{ duration: 0.4 }}
@@ -174,12 +174,12 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                     isNameValid && !isEmpty && 'border-neo-lime'
                   )}
                 />
-              </motion.div>
+              </m.div>
 
               {/* Validation indicator */}
               <AnimatePresence>
                 {displayName.length > 0 && (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.5 }}
@@ -195,7 +195,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                     ) : (
                       <X className="text-neo-white w-4 h-4" />
                     )}
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
             </div>

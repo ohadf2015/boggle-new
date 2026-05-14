@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, memo, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Volume2, VolumeX, Volume1, Music, Smartphone } from 'lucide-react';
 import { useMusic } from '../contexts/MusicContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
@@ -135,7 +135,7 @@ const MusicControls: React.FC = memo(() => {
 
         {/* Playing indicator - Neo-Brutalist style */}
         {isPlaying && !isMuted && audioUnlocked && (
-          <motion.div
+          <m.div
             className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-neo-lime text-neo-black border-2 border-neo-black"
             animate={{ scale: [1, 1.2, 1] }}
             transition={{ type: 'tween', repeat: Infinity, duration: 1.5 }}
@@ -147,7 +147,7 @@ const MusicControls: React.FC = memo(() => {
       {hasMounted && createPortal(
         <AnimatePresence>
           {showSlider && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: -10, scale: 0.95, rotate: -2 }}
               animate={{ opacity: 1, y: 0, scale: 1, rotate: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -260,7 +260,7 @@ const MusicControls: React.FC = memo(() => {
                         style={{ height: '10px', top: '6px' }}
                       />
                       {/* Knob - circular, neo-brutalist with shadow */}
-                      <motion.div
+                      <m.div
                         className="absolute rounded-full bg-neo-cream border-2 border-neo-black shadow-hard-sm"
                         style={{ width: '16px', height: '16px', top: '3px' }}
                         animate={{ left: hapticsEnabled ? '26px' : '2px' }}
@@ -276,7 +276,7 @@ const MusicControls: React.FC = memo(() => {
                   </span>
                 )}
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>,
         document.body

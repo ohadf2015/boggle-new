@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { QrCode, Trophy, Share2, Bot } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../../components/ui/button';
@@ -160,7 +160,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = memo(function Val
                   const isValid = validations[item.word] !== undefined ? validations[item.word] : true;
 
                   return (
-                    <motion.button
+                    <m.button
                       key={`word-${item.word}`}
                       type="button"
                       initial={{ opacity: 0, scale: 0.9 }}
@@ -189,7 +189,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = memo(function Val
                           {item.playerCount} {t('joinView.players')}
                         </span>
                       )}
-                    </motion.button>
+                    </m.button>
                   );
                 })}
               </div>

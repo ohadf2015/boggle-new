@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { BookOpen, Play } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -71,7 +71,7 @@ const UnfinishedBoardCard = memo<UnfinishedBoardCardProps>(({
   const { t, dir } = useLanguage();
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
@@ -107,7 +107,7 @@ const UnfinishedBoardCard = memo<UnfinishedBoardCardProps>(({
             {t('unfinishedBoard.resumeDesc', { found: wordsFound, total: totalWords })}
           </p>
 
-          <motion.button
+          <m.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={onResume}
@@ -120,10 +120,10 @@ const UnfinishedBoardCard = memo<UnfinishedBoardCardProps>(({
           >
             <Play className="w-3.5 h-3.5" />
             {t('unfinishedBoard.resumeCta')}
-          </motion.button>
+          </m.button>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 

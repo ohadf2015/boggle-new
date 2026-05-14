@@ -8,7 +8,7 @@
  */
 
 import React, { memo, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import useReducedMotion from '@/hooks/useReducedMotion';
@@ -36,7 +36,7 @@ export const PowerHourActivation: React.FC<PowerHourActivationProps> = memo(
     return (
       <AnimatePresence>
         {visible && (
-          <motion.div
+          <m.div
             data-testid="power-hour-activation"
             initial={reducedMotion ? false : { opacity: 0, y: -40, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -53,7 +53,7 @@ export const PowerHourActivation: React.FC<PowerHourActivationProps> = memo(
             aria-live="assertive"
           >
             {/* Lightning bolt icon */}
-            <motion.span
+            <m.span
               data-testid="power-hour-bolt"
               animate={
                 reducedMotion
@@ -64,7 +64,7 @@ export const PowerHourActivation: React.FC<PowerHourActivationProps> = memo(
               className="text-neo-cyan"
             >
               <Zap className="w-10 h-10 fill-neo-cyan stroke-neo-cyan" />
-            </motion.span>
+            </m.span>
 
             {/* Title */}
             <h3 className="font-neo-display text-xl font-black text-neo-cyan">
@@ -75,7 +75,7 @@ export const PowerHourActivation: React.FC<PowerHourActivationProps> = memo(
             <p className="text-neo-white/80 text-sm font-neo-body">
               {t('powerHour.description')}
             </p>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     );

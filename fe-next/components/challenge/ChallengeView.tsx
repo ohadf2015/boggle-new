@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Target, ArrowLeft, AlertCircle, Crown, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SinglePlayerGame from '@/components/singleplayer/SinglePlayerGame';
@@ -149,7 +149,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
   if (phase === 'error') {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className={cn(
@@ -173,7 +173,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
           >
             {t('challengeView.backToHome')}
           </Button>
-        </motion.div>
+        </m.div>
       </div>
     );
   }
@@ -186,7 +186,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
 
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           className="max-w-md w-full space-y-6"
@@ -204,7 +204,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
           </button>
 
           {/* Challenge Card */}
-          <motion.div
+          <m.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.1 }}
@@ -215,14 +215,14 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
           >
             {/* Header */}
             <div className="text-center mb-6">
-              <motion.div
+              <m.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2, type: 'spring' }}
                 className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-neo-lime border-3 border-neo-black shadow-hard-md mb-3"
               >
                 <Target className="w-8 h-8 text-neo-black" />
-              </motion.div>
+              </m.div>
               <h1 className={cn(
                 'text-2xl font-black uppercase tracking-wide',
                 isDark ? 'text-white' : 'text-gray-900'
@@ -345,7 +345,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
             </div>
 
             {/* Start Button */}
-            <motion.button
+            <m.button
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleStartGame}
@@ -359,9 +359,9 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
             >
               <Zap className="w-6 h-6" />
               {t('challengeView.startChallenge')}
-            </motion.button>
-          </motion.div>
-        </motion.div>
+            </m.button>
+          </m.div>
+        </m.div>
       </div>
     );
   }

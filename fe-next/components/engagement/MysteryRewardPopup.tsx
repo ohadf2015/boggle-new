@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
 import { Sparkles, Gift, Zap, Star, Crown } from 'lucide-react';
@@ -185,14 +185,14 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
           <AnimatePresence mode="wait">
             {phase === 'chest' && (
               /* Chest Phase - Show mystery box */
-              <motion.div
+              <m.div
                 key="chest"
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 1.2, opacity: 0 }}
                 className="flex flex-col items-center gap-4"
               >
-                <motion.div
+                <m.div
                   animate={{
                     y: [0, -8, 0],
                     rotate: [0, -2, 2, 0]
@@ -205,30 +205,30 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                   className="text-8xl"
                 >
                   🎁
-                </motion.div>
+                </m.div>
                 <p className={cn('text-lg font-black uppercase', styles.text)}>
                   {t('mysteryReward.youFound')}
                 </p>
-                <motion.div
+                <m.div
                   animate={{ opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 1, repeat: Infinity }}
                   className="text-sm text-white/60"
                 >
                   {t('mysteryReward.opening')}
-                </motion.div>
-              </motion.div>
+                </m.div>
+              </m.div>
             )}
 
             {phase === 'opening' && (
               /* Opening Phase - Shaking/glowing animation */
-              <motion.div
+              <m.div
                 key="opening"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="flex flex-col items-center gap-4"
               >
-                <motion.div
+                <m.div
                   animate={{
                     scale: [1, 1.1, 1, 1.15, 1],
                     rotate: [-5, 5, -8, 8, 0],
@@ -244,8 +244,8 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                   )}
                 >
                   ✨
-                </motion.div>
-                <motion.div
+                </m.div>
+                <m.div
                   animate={{
                     scale: [1, 1.3, 1],
                     opacity: [0.7, 1, 0.7]
@@ -257,13 +257,13 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                   className={cn('text-xl font-black uppercase', styles.text)}
                 >
                   {t('mysteryReward.revealing')}
-                </motion.div>
-              </motion.div>
+                </m.div>
+              </m.div>
             )}
 
             {phase === 'reveal' && (
               /* Reveal Phase - Show the reward */
-              <motion.div
+              <m.div
                 key="reveal"
                 initial={{ scale: 0.95, opacity: 0, rotateY: 180 }}
                 animate={{ scale: 1, opacity: 1, rotateY: 0 }}
@@ -275,7 +275,7 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                 className="flex flex-col items-center gap-4 text-center"
               >
                 {/* Rarity Badge */}
-                <motion.div
+                <m.div
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.2 }}
@@ -289,10 +289,10 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                   )}
                 >
                   {rarity}
-                </motion.div>
+                </m.div>
 
                 {/* Reward Icon */}
-                <motion.div
+                <m.div
                   animate={{
                     scale: [1, 1.1, 1],
                   }}
@@ -309,10 +309,10 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                   )}
                 >
                   {getRewardIcon(reward.type)}
-                </motion.div>
+                </m.div>
 
                 {/* Reward Display */}
-                <motion.div
+                <m.div
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.3 }}
@@ -320,10 +320,10 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                   <p className="text-2xl font-black text-white">
                     {reward.display}
                   </p>
-                </motion.div>
+                </m.div>
 
                 {/* Trigger info */}
-                <motion.div
+                <m.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
@@ -341,10 +341,10 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                     {reward.triggerType === 'long_word' && (t('mysteryReward.longWordExplain'))}
                     {reward.triggerType === 'achievement' && (t('mysteryReward.achievementExplain'))}
                   </p>
-                </motion.div>
+                </m.div>
 
                 {/* Excited mascot */}
-                <motion.div
+                <m.div
                   initial={{ scale: 0, y: 20 }}
                   animate={{ scale: 1, y: 0 }}
                   transition={{ delay: 0.4, type: 'spring', stiffness: 250, damping: 15 }}
@@ -357,10 +357,10 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                     preload="metadata"
                     aria-hidden="true"
                   />
-                </motion.div>
+                </m.div>
 
                 {/* Tap to dismiss */}
-                <motion.button
+                <m.button
                   onClick={onClose}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -373,8 +373,8 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                   )}
                 >
                   {t('mysteryReward.awesome')}
-                </motion.button>
-              </motion.div>
+                </m.button>
+              </m.div>
             )}
           </AnimatePresence>
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { X, Edit, Check, Globe } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
@@ -113,7 +113,7 @@ export function ProfileHeader({
   const level = getLevelFromXp(profile?.total_xp || 0);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
@@ -277,7 +277,7 @@ export function ProfileHeader({
         initialConfig={profile?.avatar_config ?? getRandomAvatarConfig()}
         premium={avatarPremium}
       />
-    </motion.div>
+    </m.div>
   );
 }
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowLeft, Send, Mail, MessageSquare, User, CheckCircle, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { useRouter } from 'next/navigation';
@@ -76,7 +76,7 @@ export default function ContactPageClient(): React.JSX.Element {
         "py-3 sm:py-4"
       )}>
         {/* Header */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           // Reduced margin: mobile 12px, sm 16px (was 24px)
@@ -100,10 +100,10 @@ export default function ContactPageClient(): React.JSX.Element {
           )}>
             {t('contact.title')}
           </h1>
-        </motion.div>
+        </m.div>
 
         {/* Social Links */}
-        <motion.section
+        <m.section
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -171,10 +171,10 @@ export default function ContactPageClient(): React.JSX.Element {
               </div>
             </a>
           </div>
-        </motion.section>
+        </m.section>
 
         {/* Contact Form */}
-        <motion.section
+        <m.section
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -188,7 +188,7 @@ export default function ContactPageClient(): React.JSX.Element {
           </h2>
 
           {status === 'success' ? (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className={cn(
@@ -209,7 +209,7 @@ export default function ContactPageClient(): React.JSX.Element {
               >
                 {t('contact.sendAnother')}
               </Button>
-            </motion.div>
+            </m.div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name Field */}
@@ -291,14 +291,14 @@ export default function ContactPageClient(): React.JSX.Element {
 
               {/* Error Message */}
               {status === 'error' && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: -5 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="flex items-center gap-2 p-3 rounded-neo border-2 border-neo-red bg-neo-red/10 text-neo-red"
                 >
                   <AlertCircle className="w-5 h-5 shrink-0" />
                   <p className="text-sm font-medium">{errorMessage || t('contact.errorMessage')}</p>
-                </motion.div>
+                </m.div>
               )}
 
               {/* Submit Button */}
@@ -327,10 +327,10 @@ export default function ContactPageClient(): React.JSX.Element {
               </Button>
             </form>
           )}
-        </motion.section>
+        </m.section>
 
         {/* Footer Note */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
@@ -343,7 +343,7 @@ export default function ContactPageClient(): React.JSX.Element {
           <p className={cn('text-xs', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
             {t('contact.responseTime')}
           </p>
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

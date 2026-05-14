@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Play, DoorOpen, Check, Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -69,7 +69,7 @@ export function ResultsActionButtons({
   // Single player mode - just exit button
   if (!isMultiplayer) {
     return (
-      <motion.button
+      <m.button
         onClick={onExit}
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -80,13 +80,13 @@ export function ResultsActionButtons({
       >
         <DoorOpen className="w-5 h-5" />
         {t('common.exit')}
-      </motion.button>
+      </m.button>
     );
   }
 
   // Multiplayer mode
   return (
-    <motion.div
+    <m.div
       className="flex flex-col gap-2 w-full max-w-xs mt-2"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
@@ -95,7 +95,7 @@ export function ResultsActionButtons({
       {isHost ? (
         /* HOST: Start Game + Exit buttons */
         <>
-          <motion.button
+          <m.button
             onClick={onStartGame}
             whileHover={{ scale: 1.04, y: -1 }}
             whileTap={{ scale: 0.94 }}
@@ -103,8 +103,8 @@ export function ResultsActionButtons({
           >
             <Play className="w-5 h-5" />
             {t('hostView.startGame')}
-          </motion.button>
-          <motion.button
+          </m.button>
+          <m.button
             onClick={onExit}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.95 }}
@@ -112,12 +112,12 @@ export function ResultsActionButtons({
           >
             <DoorOpen className="w-4 h-4" />
             {t('results.leaveRoom')}
-          </motion.button>
+          </m.button>
         </>
       ) : isCurrentPlayerReady ? (
         /* PLAYER: Ready state (disabled) + Exit button */
         <>
-          <motion.button
+          <m.button
             onClick={onMarkReady}
             disabled
             initial={{ scale: 1 }}
@@ -127,11 +127,11 @@ export function ResultsActionButtons({
           >
             <Check className="w-5 h-5" />
             {t('results.ready')}
-          </motion.button>
+          </m.button>
           <p className="text-center text-[10px] text-neo-cream/50">
             {t('results.waitingForHost')}
           </p>
-          <motion.button
+          <m.button
             onClick={onExit}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.95 }}
@@ -139,13 +139,13 @@ export function ResultsActionButtons({
           >
             <DoorOpen className="w-4 h-4" />
             {t('results.leaveRoom')}
-          </motion.button>
+          </m.button>
         </>
       ) : (
         /* PLAYER: Not ready state — bouncy attention-grab + Explanation + Exit button */
         <>
           <div className="space-y-1">
-            <motion.button
+            <m.button
               onClick={onMarkReady}
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
@@ -155,12 +155,12 @@ export function ResultsActionButtons({
             >
               <Star className="w-5 h-5" />
               {t('results.imReady')}
-            </motion.button>
+            </m.button>
             <p className="text-center text-[10px] text-neo-cream/50">
               {t('results.readyExplanation')}
             </p>
           </div>
-          <motion.button
+          <m.button
             onClick={onExit}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.95 }}
@@ -168,9 +168,9 @@ export function ResultsActionButtons({
           >
             <DoorOpen className="w-4 h-4" />
             {t('results.leaveRoom')}
-          </motion.button>
+          </m.button>
         </>
       )}
-    </motion.div>
+    </m.div>
   );
 }

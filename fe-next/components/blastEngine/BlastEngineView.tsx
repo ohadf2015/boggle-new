@@ -10,7 +10,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { Zap, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { GameCanvas, type GameCanvasConfig } from '@/lib/gameEngine';
 import { BlastReadyScreen, BlastWaveTransitionScreen, BlastResultsScreen } from './BlastPhaseScreens';
 import { useBlastGameLoop } from './hooks/useBlastGameLoop';
@@ -410,7 +410,7 @@ export function BlastEngineView() {
               </span>
             </div>
           ) : game.wordsFound.length > 0 ? (
-            <motion.div
+            <m.div
               key={game.wordsFound.length}
               initial={{ scale: 1.3, opacity: 0, y: 8 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -438,7 +438,7 @@ export function BlastEngineView() {
               <span className="text-white/30 text-xs font-neo-body tabular-nums ms-1">
                 {game.wordsFound.length} {t('blast.words') || 'words'}
               </span>
-            </motion.div>
+            </m.div>
           ) : null}
         </div>
 

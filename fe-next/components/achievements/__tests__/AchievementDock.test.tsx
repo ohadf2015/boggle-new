@@ -36,7 +36,7 @@ vi.mock('framer-motion', () => {
     return filtered;
   };
   return {
-  motion: {
+  m: {
     div: React.forwardRef<HTMLDivElement, any>(
       function MotionDiv({ children, className, style, onClick, ...props }, ref) {
         return (

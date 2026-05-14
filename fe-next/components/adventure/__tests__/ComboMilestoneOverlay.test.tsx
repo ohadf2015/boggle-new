@@ -3,7 +3,7 @@ import { ComboMilestoneOverlay } from '../ComboMilestoneOverlay';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement> & {
       initial?: object; animate?: object; exit?: object; transition?: object
     }) => (

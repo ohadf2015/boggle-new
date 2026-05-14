@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { TrendingUp, Swords } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { WordObject } from './types';
@@ -92,7 +92,7 @@ const TurningPointCard = memo<TurningPointCardProps>(({ allPlayerWords, currentU
   if (!turningPoint) return null;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4, type: 'spring', stiffness: 280, damping: 26 }}
@@ -135,7 +135,7 @@ const TurningPointCard = memo<TurningPointCardProps>(({ allPlayerWords, currentU
           )}
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 

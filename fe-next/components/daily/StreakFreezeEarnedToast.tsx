@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 interface StreakFreezeEarnedToastProps {
   freezeCount: number;
@@ -21,7 +21,7 @@ export function StreakFreezeEarnedToast({ freezeCount, t, onDismiss }: StreakFre
   }, [onDismiss]);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -32,6 +32,6 @@ export function StreakFreezeEarnedToast({ freezeCount, t, onDismiss }: StreakFre
       <span className="ms-1 px-2 py-0.5 bg-neo-black/20 rounded text-xs font-black">
         {freezeCount}/3
       </span>
-    </motion.div>
+    </m.div>
   );
 }

@@ -8,7 +8,7 @@
  */
 
 import { useEffect, useState, useMemo, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassroomLeaderboard } from '@/hooks/useClassroomLeaderboard';
 import { useWinStreak } from '@/hooks/useWinStreak';
@@ -130,7 +130,7 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
 
   return (
     <>
-      <motion.div
+      <m.div
         variants={heroEntrance}
         initial="hidden"
         animate="visible"
@@ -138,7 +138,7 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
       >
         {/* Lime header with XP */}
         <div className="bg-neo-lime px-6 pt-5 pb-4">
-          <motion.div
+          <m.div
             className="absolute top-2 inset-e-2 z-10"
             initial={{ scale: 0, rotate: 30 }}
             animate={{ scale: 1, rotate: 0 }}
@@ -153,11 +153,11 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
               clickAnimation="bounce"
               animated
             />
-          </motion.div>
+          </m.div>
 
-          <motion.div variants={childFadeUp} className="flex items-center gap-4 pe-14 sm:pe-20">
-            <motion.div variants={levelBadgePop} className="relative shrink-0">
-              <motion.div
+          <m.div variants={childFadeUp} className="flex items-center gap-4 pe-14 sm:pe-20">
+            <m.div variants={levelBadgePop} className="relative shrink-0">
+              <m.div
                 className="w-14 h-14 rounded-neo bg-black border-3 border-black flex items-center justify-center shadow-hard-sm"
                 whileHover={{ scale: 1.15, rotate: -5 }}
                 whileTap={{ scale: 0.9 }}
@@ -166,15 +166,15 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
                 <span className="text-2xl font-neo-display font-black text-neo-lime tabular-nums">
                   {xpProgress.currentLevel}
                 </span>
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
 
             <div className="flex-1 min-w-0">
               <p className="text-sm font-neo-body font-bold text-black/70 mb-1">
                 {t('education.xp.level')} {xpProgress.currentLevel}
               </p>
               <div className="w-full h-4 rounded-neo border-2 border-black bg-black/20 overflow-hidden">
-                <motion.div
+                <m.div
                   className="h-full rounded-neo bg-black origin-left"
                   variants={xpBarFill}
                   custom={xpProgress.progressPercent}
@@ -184,61 +184,61 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
                 {xpProgress.xpInCurrentLevel} / {xpProgress.xpNeededForNextLevel} XP
               </p>
             </div>
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Dark body with stats */}
         <div className="bg-neo-navy-light px-6 py-4">
-          <motion.div variants={statsContainer} className="grid grid-cols-3 gap-3">
+          <m.div variants={statsContainer} className="grid grid-cols-3 gap-3">
             {/* Rank */}
-            <motion.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-neo border-neo-black bg-neo-navy border-l-4 border-l-neo-lime shadow-hard-sm text-center">
-              <motion.div
+            <m.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-neo border-neo-black bg-neo-navy border-l-4 border-l-neo-lime shadow-hard-sm text-center">
+              <m.div
                 className="w-9 h-9 rounded-neo bg-neo-lime border-2 border-black flex items-center justify-center shadow-hard-sm"
                 whileHover={{ scale: 1.2, rotate: -8 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
               >
                 <Trophy className="w-5 h-5 text-black" />
-              </motion.div>
+              </m.div>
               <p className="text-xs text-neo-cream/60 font-bold">{t('education.leaderboard.rank')}</p>
               <p className="text-xl font-black text-neo-white tabular-nums">
                 {typeof rank === 'number' ? `#${rank}` : rank}
               </p>
-            </motion.div>
+            </m.div>
 
             {/* Total XP */}
-            <motion.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-neo border-neo-black bg-neo-navy border-l-4 border-l-neo-cyan shadow-hard-sm text-center">
-              <motion.div
+            <m.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-neo border-neo-black bg-neo-navy border-l-4 border-l-neo-cyan shadow-hard-sm text-center">
+              <m.div
                 className="w-9 h-9 rounded-neo bg-neo-cyan border-2 border-black flex items-center justify-center shadow-hard-sm"
                 whileHover={{ scale: 1.2, rotate: 8 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
               >
                 <Zap className="w-5 h-5 text-black" />
-              </motion.div>
+              </m.div>
               <p className="text-xs text-neo-cream/60 font-bold">{t('education.leaderboard.totalXP')}</p>
               <p className="text-xl font-black text-neo-white tabular-nums">{totalXP.toLocaleString()}</p>
-            </motion.div>
+            </m.div>
 
             {/* Streak */}
-            <motion.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-neo border-neo-black bg-neo-navy border-l-4 border-l-neo-pink shadow-hard-sm text-center">
-              <motion.div
+            <m.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-neo border-neo-black bg-neo-navy border-l-4 border-l-neo-pink shadow-hard-sm text-center">
+              <m.div
                 className="w-9 h-9 rounded-neo bg-neo-pink border-2 border-black flex items-center justify-center shadow-hard-sm"
                 whileHover={{ scale: 1.2, rotate: -8 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
               >
                 <Flame className="w-5 h-5 text-white" />
-              </motion.div>
+              </m.div>
               <p className="text-xs text-neo-cream/60 font-bold">{t('education.leaderboard.streak')}</p>
               <p className="text-xl font-black text-neo-white tabular-nums">
                 {currentStreak} {t('common.days')}
               </p>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
 
           <div className="border-t-2 border-black/10 pt-4 mt-4">
             <MilestoneTracker totalXp={totalXP} />
           </div>
         </div>
-      </motion.div>
+      </m.div>
       <MilestoneCelebration
         milestone={milestonePayload}
         onClose={() => setMilestonePayload(null)}

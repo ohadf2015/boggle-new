@@ -12,7 +12,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} {...props}>{children}</div>
     ),

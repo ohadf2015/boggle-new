@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Users, Crown, Bot } from 'lucide-react';
 import Avatar from '../../../../components/Avatar';
 import PresenceIndicator from '../../../../components/PresenceIndicator';
@@ -97,7 +97,7 @@ export const EnhancedPlayerList = memo(function EnhancedPlayerList({
             const isMe = name === currentUsername;
 
             return (
-              <motion.div
+              <m.div
                 key={name}
                 data-testid={`player-card-${name}`}
                 initial={{ opacity: 0, x: -20, scale: 0.9 }}
@@ -176,14 +176,14 @@ export const EnhancedPlayerList = memo(function EnhancedPlayerList({
                 {!isMe && !isBot && (
                   <PresenceIndicator status={presence} size="md" />
                 )}
-              </motion.div>
+              </m.div>
             );
           })}
         </AnimatePresence>
 
         {/* Empty State - larger on desktop */}
         {filteredPlayers.length === 0 && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="flex flex-col items-center justify-center py-8 xl:py-12 text-center"
@@ -192,7 +192,7 @@ export const EnhancedPlayerList = memo(function EnhancedPlayerList({
             <p className="text-sm xl:text-base text-neo-cream/50">
               {t('hostView.waitingForPlayers')}
             </p>
-          </motion.div>
+          </m.div>
         )}
       </div>
     </div>

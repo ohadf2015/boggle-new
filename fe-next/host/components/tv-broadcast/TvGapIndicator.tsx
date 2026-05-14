@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useRef, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Flame } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 
@@ -51,7 +51,7 @@ const TvGapIndicator = memo<TvGapIndicatorProps>(({
   const label = t('tvBroadcast.ptsGap', { gap });
 
   return (
-    <motion.div
+    <m.div
       data-testid="gap-indicator"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -63,7 +63,7 @@ const TvGapIndicator = memo<TvGapIndicatorProps>(({
     >
       <AnimatePresence mode="wait">
         {isClosingFast ? (
-          <motion.div
+          <m.div
             key="closing"
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
@@ -73,9 +73,9 @@ const TvGapIndicator = memo<TvGapIndicatorProps>(({
             <span className="font-black text-sm text-neo-orange uppercase">
               {t('tvBroadcast.closingFast')}
             </span>
-          </motion.div>
+          </m.div>
         ) : (
-          <motion.div key="gap" className="flex items-center gap-1.5">
+          <m.div key="gap" className="flex items-center gap-1.5">
             <span className="text-neo-black/50 text-xs font-bold">
               {'--- '}
             </span>
@@ -86,10 +86,10 @@ const TvGapIndicator = memo<TvGapIndicatorProps>(({
             <span className="text-neo-black/50 text-xs font-bold">
               {' ---'}
             </span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </m.div>
   );
 });
 

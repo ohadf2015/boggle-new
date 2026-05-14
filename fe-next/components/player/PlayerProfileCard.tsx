@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Trophy, Swords, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
@@ -43,7 +43,7 @@ const PlayerProfileCard = memo<PlayerProfileCardProps>(({
   const tier = getPercentileTier(profile.percentile);
 
   return (
-    <motion.div
+    <m.div
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
       className={cn(
@@ -151,7 +151,7 @@ const PlayerProfileCard = memo<PlayerProfileCardProps>(({
           {t('profile.challenge')}
         </button>
       )}
-    </motion.div>
+    </m.div>
   );
 });
 

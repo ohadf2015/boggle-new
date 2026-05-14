@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
 
 const RING_SIZE_STYLE = { width: 120, height: 120 } as const;
@@ -65,14 +65,14 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
   const isGo = count === 0;
 
   return (
-    <motion.div
+    <m.div
       className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none overflow-hidden"
       initial={{ opacity: 1 }}
       animate={{ opacity: isFadingOut ? 0 : 1 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
     >
       {/* Soft background overlay for focus */}
-      <motion.div
+      <m.div
         className="absolute inset-0 bg-neo-navy/60"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -83,7 +83,7 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
       {/* Single subtle expanding ring for GO */}
       <AnimatePresence>
         {isGo && (
-          <motion.div
+          <m.div
             initial={{ scale: 0.5, opacity: 0.6 }}
             animate={{ scale: 2.5, opacity: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -95,7 +95,7 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
 
       {/* Main countdown/GO text */}
       <AnimatePresence mode="wait">
-        <motion.div
+        <m.div
           key={count}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -114,7 +114,7 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
           }}
         >
           {/* Subtle inner glow */}
-          <motion.div
+          <m.div
             className="absolute inset-0 rounded-neo"
             animate={{
               opacity: [0.1, 0.25, 0.1],
@@ -139,13 +139,13 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
           >
             {count > 0 ? count : (t?.('countdown.go') || 'GO!')}
           </span>
-        </motion.div>
+        </m.div>
       </AnimatePresence>
 
       {/* Quick tip hint during countdown */}
       <AnimatePresence>
         {count > 0 && !isFadingOut && (
-          <motion.p
+          <m.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -153,10 +153,10 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
             className="absolute bottom-[25%] text-center text-neo-white text-base sm:text-lg font-black px-6 py-2 bg-neo-black/40 rounded-neo backdrop-blur-xs"
           >
             {t?.('countdown.hint') || 'Swipe letters to form words!'}
-          </motion.p>
+          </m.p>
         )}
       </AnimatePresence>
-    </motion.div>
+    </m.div>
   );
 };
 

@@ -22,7 +22,7 @@ import type { GridTileState } from '@/types/adventure';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, onClick, onMouseDown, onMouseEnter, onTouchStart, ...props }: any) =>
       React.createElement(
         'div',
@@ -121,7 +121,7 @@ describe('AdventureTile', () => {
       expect(gridcell).toHaveAttribute('data-col', '0');
     });
 
-    it('should render as framer motion.div', () => {
+    it('should render as framer m.div', () => {
       const { container } = render(<AdventureTile {...defaultProps} />);
       const motionDiv = container.querySelector('[data-motion="true"]');
       expect(motionDiv).toBeInTheDocument();

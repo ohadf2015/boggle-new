@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Zap } from 'lucide-react';
 
 interface ResultsLoserFeedbackProps {
@@ -24,7 +24,7 @@ const ResultsLoserFeedback = memo<ResultsLoserFeedbackProps>(function ResultsLos
   if (rank <= 3) return null;
 
   return (
-    <motion.div
+    <m.div
       data-testid="loser-feedback"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
@@ -44,15 +44,15 @@ const ResultsLoserFeedback = memo<ResultsLoserFeedbackProps>(function ResultsLos
         </p>
       </div>
 
-      <motion.button
+      <m.button
         onClick={onPlayAgain}
         whileHover={{ scale: 1.04 }}
         whileTap={{ scale: 0.96 }}
         className="shrink-0 bg-neo-pink text-white text-xs font-black uppercase px-3 py-2 rounded-neo border-2 border-neo-black shadow-hard-sm"
       >
         {t('results.playAgain')}
-      </motion.button>
-    </motion.div>
+      </m.button>
+    </m.div>
   );
 });
 

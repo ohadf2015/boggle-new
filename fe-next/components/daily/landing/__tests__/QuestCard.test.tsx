@@ -27,7 +27,7 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.ComponentProps<'div'>) => <div {...props}>{children}</div>,
     span: ({ children, ...props }: React.ComponentProps<'span'>) => <span {...props}>{children}</span>,
     path: (props: React.SVGProps<SVGPathElement>) => <path {...props} />,

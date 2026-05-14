@@ -64,7 +64,7 @@ vi.mock('@/hooks/useCrazyGamesAuth', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,

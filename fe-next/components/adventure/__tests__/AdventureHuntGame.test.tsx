@@ -38,7 +38,7 @@ vi.mock('@/hooks/useUpgradeEffects', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: new Proxy({}, {
+  m: new Proxy({}, {
     get: (_t: unknown, prop: string) =>
       React.forwardRef(function MotionEl(props: Record<string, unknown>, ref: React.Ref<unknown>) {
         const { children, initial: _i, animate: _a, exit: _e, transition: _tr, ...rest } = props;

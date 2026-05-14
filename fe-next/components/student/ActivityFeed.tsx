@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Trophy, Award } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useClassroomActivity } from '@/hooks/useClassroomActivity';
@@ -101,7 +101,7 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
   // ==================== ACTIVITY LIST ====================
 
   return (
-    <motion.div
+    <m.div
       className={cn(
         'p-6 rounded-neo border-3 border-black bg-neo-cream shadow-hard-sm',
         isRTL && 'rtl'
@@ -118,22 +118,22 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
         },
       }}
     >
-      <motion.div
+      <m.div
         className="flex items-center gap-3 mb-4"
         variants={{ hidden: { opacity: 0, x: -12 }, visible: { opacity: 1, x: 0 } }}
       >
         <h2 className="text-xl font-neo-display font-black text-black">
           {t('student.dashboard.classroomActivity')}
         </h2>
-        <motion.span
+        <m.span
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 500, damping: 14, delay: 0.3 }}
           className="px-2 py-0.5 bg-neo-cyan border-2 border-black rounded-neo text-xs font-bold text-black shadow-hard-sm"
         >
           {activities.length}
-        </motion.span>
-      </motion.div>
+        </m.span>
+      </m.div>
 
       <div className="space-y-2">
         {activities.map((activity, index) => {
@@ -141,7 +141,7 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
           const isDuel = activity.type === 'duel_completed';
 
           return (
-            <motion.div
+            <m.div
               key={activity.id}
               data-testid={`activity-item-${activity.id}`}
               variants={{
@@ -166,7 +166,7 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
               )}
             >
               {/* Avatar */}
-              <motion.div
+              <m.div
                 className={cn(
                   'shrink-0 w-10 h-10 rounded-full border-2 border-black flex items-center justify-center text-lg shadow-hard-sm',
                   isCurrentUser ? 'bg-neo-cyan' : 'bg-neo-lime'
@@ -175,7 +175,7 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
               >
                 {activity.actorAvatar || '👤'}
-              </motion.div>
+              </m.div>
 
               {/* Content */}
               <div className="flex-1 min-w-0">
@@ -191,7 +191,7 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
               </div>
 
               {/* Icon */}
-              <motion.div
+              <m.div
                 data-testid={`activity-icon-${activity.type}`}
                 className={cn(
                   'shrink-0 w-9 h-9 rounded-neo border-2 border-black flex items-center justify-center shadow-hard-sm',
@@ -205,11 +205,11 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
                 ) : (
                   <Award className="w-5 h-5 text-black" />
                 )}
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
           );
         })}
       </div>
-    </motion.div>
+    </m.div>
   );
 }

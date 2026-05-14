@@ -292,7 +292,12 @@ function resetGameForNewRound(gameCode: string): boolean {
   } else if (currentState === 'waiting') {
     transitionSuccess = true;
   } else {
-    logger.info('GAME_STATE', `Reset called in unexpected state: ${currentState}`);
+    // Defensive recovery: reset was called from a state with no defined
+    // RESET/VALIDATION_COMPLETE edge (e.g. 'playing', 'countdown'). Force
+    // back to 'waiting' so the room isn't wedged — but this bypasses the
+    // state machine, so surface it loudly: reaching here means an upstream
+    // path ended a round without going through 'finished'/'validating'.
+    logger.warn('GAME_STATE', `Reset from unexpected state '${currentState}' for ${gameCode} — forcing 'waiting' (state-machine bypassed)`);
     game.gameState = 'waiting';
     transitionSuccess = true;
   }

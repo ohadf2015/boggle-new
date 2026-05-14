@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
@@ -76,7 +76,7 @@ export function OAuthButtonGroup({
   return (
     <div className={cn('space-y-3', className)}>
       {providers.map((provider, i) => (
-        <motion.div
+        <m.div
           key={provider.id}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -99,7 +99,7 @@ export function OAuthButtonGroup({
               {t('auth.signInWith', { provider: provider.label })}
             </span>
           </Button>
-        </motion.div>
+        </m.div>
       ))}
     </div>
   );

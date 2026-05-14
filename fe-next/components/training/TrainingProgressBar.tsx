@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Check, MoveUpRight, RotateCw, Target, Trophy, Sparkles, ChevronDown } from 'lucide-react';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -99,7 +99,7 @@ const SkillCheckpoint = memo<{
   const Icon = skill.icon;
 
   return (
-    <motion.div
+    <m.div
       initial={isJustUnlocked ? { scale: 0.8, opacity: 0 } : false}
       animate={isJustUnlocked ? { scale: [0.8, 1.2, 1], opacity: 1 } : { scale: 1, opacity: 1 }}
       transition={isJustUnlocked ? { type: 'spring', stiffness: 400, damping: 22 } : undefined}
@@ -118,13 +118,13 @@ const SkillCheckpoint = memo<{
         isCompleted ? 'bg-neo-lime/20' : skill.bgColor
       )}>
         {isCompleted ? (
-          <motion.div
+          <m.div
             initial={isJustUnlocked ? { rotate: -180, scale: 0 } : false}
             animate={isJustUnlocked ? { rotate: 0, scale: 1 } : undefined}
             transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 22 }}
           >
             <Check className="w-4 h-4 text-neo-lime" />
-          </motion.div>
+          </m.div>
         ) : (
           <Icon className={cn('w-4 h-4', skill.color)} />
         )}
@@ -142,15 +142,15 @@ const SkillCheckpoint = memo<{
 
       {/* Checkmark indicator */}
       {isCompleted && (
-        <motion.div
+        <m.div
           initial={isJustUnlocked ? { scale: 0 } : false}
           animate={isJustUnlocked ? { scale: [0, 1.3, 1] } : undefined}
           transition={{ delay: 0.3 }}
         >
           <Check className="w-4 h-4 text-neo-lime" />
-        </motion.div>
+        </m.div>
       )}
-    </motion.div>
+    </m.div>
   );
 });
 
@@ -217,7 +217,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
   // min-h-[44px] ensures touch target meets accessibility requirements
   if (compact && !expanded) {
     return (
-      <motion.button
+      <m.button
         onClick={onToggleExpand}
         whileTap={{ scale: 0.98 }}
         className={cn(
@@ -238,7 +238,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
           <>
             <span className="text-base font-bold min-w-[32px]">{completedCount}/{totalSkills}</span>
             <div className="flex-1 h-3 rounded-full bg-gray-200 dark:bg-slate-600 overflow-hidden">
-              <motion.div
+              <m.div
                 className={cn(
                   'h-full rounded-full',
                   progressVariant === 'success' ? 'bg-neo-lime' :
@@ -265,7 +265,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
             </div>
           </>
         )}
-      </motion.button>
+      </m.button>
     );
   }
 
@@ -286,7 +286,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
   } : {};
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
@@ -375,27 +375,27 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
       {/* Celebration when complete */}
       <AnimatePresence>
         {isComplete && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             className="mt-3 pt-3 border-t-2 border-neo-lime/30"
           >
             <div className="flex items-center justify-center gap-2 text-neo-lime">
-              <motion.div
+              <m.div
                 animate={{ rotate: [0, 15, -15, 0] }}
                 transition={{ duration: 0.5, repeat: 3 }}
               >
                 <Trophy className="w-5 h-5" />
-              </motion.div>
+              </m.div>
               <span className="font-bold text-sm">
                 {t('training.progress.readyForMultiplayer')}
               </span>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </m.div>
   );
 };
 

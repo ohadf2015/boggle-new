@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Gamepad2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -24,7 +24,7 @@ export const AutoJoiningState: React.FC<AutoJoiningStateProps> = ({
 
   return (
     <div className="flex-1 bg-neo-black text-white pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6">
-      <motion.div
+      <m.div
         initial={{ scale: 0, rotate: -3 }}
         animate={{ scale: 1, rotate: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
@@ -52,7 +52,7 @@ export const AutoJoiningState: React.FC<AutoJoiningStateProps> = ({
           <CardContent className="space-y-4">
             {/* Error Alert */}
             {error && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
@@ -60,14 +60,14 @@ export const AutoJoiningState: React.FC<AutoJoiningStateProps> = ({
                 <div className="p-4 bg-neo-pink/20 text-white border-3 border-neo-pink rounded-neo">
                   <p className="text-neo-pink font-bold uppercase text-sm">{error}</p>
                 </div>
-              </motion.div>
+              </m.div>
             )}
 
             {/* Loading animation */}
             <div className="flex justify-center py-4">
               <div className="flex space-x-3">
                 {[0, 1, 2].map((i) => (
-                  <motion.div
+                  <m.div
                     key={`dot-${i}`}
                     className="w-4 h-4 bg-neo-cyan border-2 border-neo-black rounded-neo"
                     animate={{
@@ -90,7 +90,7 @@ export const AutoJoiningState: React.FC<AutoJoiningStateProps> = ({
             </p>
           </CardContent>
         </Card>
-      </motion.div>
+      </m.div>
     </div>
   );
 };

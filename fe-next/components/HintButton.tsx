@@ -4,7 +4,7 @@
  */
 
 import React, { memo, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Lightbulb, Star } from 'lucide-react';
 import { Button } from './ui/button';
 import { Loader } from '@/components/ui/Loader';
@@ -119,7 +119,7 @@ const HintButton = memo<HintButtonProps>(({
       {/* Hint Display Popup - pointer-events-none wrapper prevents blocking grid interaction */}
       <AnimatePresence>
         {hint && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -169,14 +169,14 @@ const HintButton = memo<HintButtonProps>(({
                 {t('hints.tapOrEscToDismiss')}
               </div>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
       {/* Error Display */}
       <AnimatePresence>
         {error && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -185,7 +185,7 @@ const HintButton = memo<HintButtonProps>(({
             <div className="bg-neo-red text-white px-3 py-2 rounded-neo border-2 border-neo-black text-sm font-medium shadow-hard-sm">
               {error}
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

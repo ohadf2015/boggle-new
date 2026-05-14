@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -47,7 +47,7 @@ export default function LegalPageLayout({
         />
 
         {/* Page Title */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
@@ -64,10 +64,10 @@ export default function LegalPageLayout({
           )}>
             {t('legal.lastUpdated')}: {lastUpdated}
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Content */}
-        <motion.div
+        <m.div
           initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -88,7 +88,7 @@ export default function LegalPageLayout({
           )}>
             {children}
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Back Button */}
         <div className="mt-8 text-center">

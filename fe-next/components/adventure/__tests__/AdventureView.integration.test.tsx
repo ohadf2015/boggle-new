@@ -55,7 +55,7 @@ vi.mock('framer-motion', () => {
   };
 
   return {
-    motion: {
+    m: {
       div: createMockMotion('div'),
       button: createMockMotion('button'),
       ul: createMockMotion('ul'),
@@ -473,15 +473,6 @@ vi.mock('../AdventureHub', () => {
   return { default: MockAdventureHub };
 });
 
-// Mock useDailyQuests for hub
-vi.mock('@/hooks/useDailyQuests', () => ({
-  useDailyQuests: () => ({
-    quests: [],
-    recordProgress: vi.fn(),
-    completedQuests: [],
-    todayStr: '2026-03-18',
-  }),
-}));
 
 // Mock adventureStreak for hub
 vi.mock('@/lib/adventure/adventureStreak', () => ({

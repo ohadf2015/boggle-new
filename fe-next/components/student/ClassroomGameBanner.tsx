@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Play, X, Users, Radio } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -152,7 +152,7 @@ export function ClassroomGameBanner({
   // state still feels alive instead of looking broken.
   if (!activeGame) {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 260, damping: 22 }}
@@ -185,7 +185,7 @@ export function ClassroomGameBanner({
             {t('student.activeGame.idleHint')}
           </span>
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
@@ -193,7 +193,7 @@ export function ClassroomGameBanner({
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -100, opacity: 0 }}
@@ -273,7 +273,7 @@ export function ClassroomGameBanner({
             )}
           </button>
         </div>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 }

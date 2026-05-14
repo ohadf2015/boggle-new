@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { BookOpen, LogOut, Monitor } from 'lucide-react';
 import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -307,7 +307,7 @@ function HostPreGameView({
   const renderBotCountdown = (): React.ReactElement | null => {
     if (botCountdown === null) return null;
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
@@ -323,7 +323,7 @@ function HostPreGameView({
         >
           {t('common.cancel')}
         </button>
-      </motion.div>
+      </m.div>
     );
   };
 

@@ -45,7 +45,7 @@ vi.mock('framer-motion', () => {
   };
   const mv = { get: () => 0, set: vi.fn(), onChange: vi.fn(), on: vi.fn(() => vi.fn()), current: 0 };
   return {
-    motion: { div: createMockMotion('div'), button: createMockMotion('button'), span: createMockMotion('span'), p: createMockMotion('p') },
+    m: { div: createMockMotion('div'), button: createMockMotion('button'), span: createMockMotion('span'), p: createMockMotion('p') },
     AnimatePresence: ({ children }: any) => children,
     useMotionValue: () => mv,
     useTransform: () => mv,
@@ -154,9 +154,6 @@ vi.mock('@/lib/adventure/weeklyChallenge', () => ({
   getCurrentWeekId: () => 'w',
 }));
 
-vi.mock('@/hooks/useDailyQuests', () => ({
-  useDailyQuests: () => ({ quests: [], recordProgress: vi.fn(), completedQuests: [], todayStr: '' }),
-}));
 
 vi.mock('../AdventureHub', () => ({
   default: ({ onOpenWorldMap }: any) => (

@@ -2,7 +2,7 @@
 
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { Settings, Timer, Grid3X3, Type, Globe } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   Dialog,
   DialogContent,
@@ -90,14 +90,14 @@ export const AdvancedSettingsModal = memo<AdvancedSettingsModalProps>(function A
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <motion.button
+        <m.button
           whileTap={{ scale: 0.95 }}
           className="flex items-center gap-1.5 px-3 py-2 rounded-neo border-2 border-neo-white/20 bg-white/5 text-neo-cream/70 text-xs font-bold uppercase hover:bg-white/10 hover:border-neo-white/30 transition-all"
           aria-label={t('hostView.advancedSettings')}
         >
           <Settings className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">{t('hostView.settings')}</span>
-        </motion.button>
+        </m.button>
       </DialogTrigger>
       <DialogContent
         noDescription

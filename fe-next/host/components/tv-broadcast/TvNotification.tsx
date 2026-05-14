@@ -17,7 +17,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { MascotVariant } from '../../../components/ui/Mascot';
 
 // Hype banner images for specific notification types
@@ -365,7 +365,7 @@ const TvNotification = memo<TvNotificationProps>(({
   if (hypeBanner) {
     return (
       <div className="relative">
-        <motion.div
+        <m.div
           className="absolute -top-20 left-1/2 -translate-x-1/2 w-[500px] pointer-events-none z-0"
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 0.9 }}
@@ -379,7 +379,7 @@ const TvNotification = memo<TvNotificationProps>(({
             height={120}
             className="drop-shadow-[0_0_20px_rgba(255,200,0,0.5)]"
           />
-        </motion.div>
+        </m.div>
         <div className="relative z-10">{content}</div>
       </div>
     );

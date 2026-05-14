@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useState, useEffect, useRef } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 
 interface TvTimesUpOverlayProps {
   remainingTime: number | null;
@@ -46,7 +46,7 @@ const TvTimesUpOverlay = memo<TvTimesUpOverlayProps>(({ remainingTime, t, onTime
     >
       <AnimatePresence mode="wait">
         {showTimesUp ? (
-          <motion.div
+          <m.div
             key="times-up"
             data-testid="times-up-text"
             initial={{ scale: 0.3, opacity: 0 }}
@@ -60,9 +60,9 @@ const TvTimesUpOverlay = memo<TvTimesUpOverlayProps>(({ remainingTime, t, onTime
             <p className="text-xl md:text-2xl font-neo-body font-bold text-neo-cream mt-2 opacity-80">
               {t('tvBroadcast.timesUpSub')}
             </p>
-          </motion.div>
+          </m.div>
         ) : (
-          <motion.div
+          <m.div
             key={`countdown-${remainingTime}`}
             data-testid="countdown-number"
             initial={{ scale: 2, opacity: 0 }}
@@ -72,7 +72,7 @@ const TvTimesUpOverlay = memo<TvTimesUpOverlayProps>(({ remainingTime, t, onTime
             className="text-8xl md:text-[12rem] font-neo-display font-black text-neo-cream drop-shadow-[0_6px_0_black]"
           >
             {remainingTime}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

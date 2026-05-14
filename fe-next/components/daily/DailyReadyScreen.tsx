@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, Trophy, Target, UserCircle2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -132,7 +132,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
   }, [puzzleDate, language]);
 
   return (
-    <motion.div
+    <m.div
       key="ready"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -170,7 +170,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
 
         {/* Guest Mode Notice - Show only for anonymous users */}
         {!isAuthenticated && !isOnCrazyGamesPlatform && (
-          <motion.div
+          <m.div
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.05, type: 'spring', stiffness: 300, damping: 26 }}
@@ -187,12 +187,12 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
               {t('daily.guestModeBenefits')}
             </p>
-          </motion.div>
+          </m.div>
         )}
 
         {/* Challenge Banner (when arriving via challenge link) */}
         {isValidChallenge && (
-          <motion.div
+          <m.div
             initial={{ scale: 0.8, opacity: 0, y: -20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ delay: 0.05, type: 'spring', stiffness: 400, damping: 22 }}
@@ -219,18 +219,18 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             <div className="text-center mt-2 text-white/90 text-sm font-bold">
               {t('wordHunt.results.beatTheirScore')}
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {/* Hero Section - Puzzle Number (LARGE) */}
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
           className="space-y-2"
         >
           {/* Daily Badge - Simple text, no box */}
-          <motion.div
+          <m.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.05, type: 'spring', stiffness: 400, damping: 22 }}
@@ -240,7 +240,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             <span className="text-2xl font-black text-neo-black dark:text-white uppercase tracking-wide">
               {t('daily.badge')}
             </span>
-          </motion.div>
+          </m.div>
 
           {/* Challenge number and date - subtle styling */}
           <div className="flex items-center justify-center gap-2 text-gray-400 dark:text-gray-500">
@@ -248,11 +248,11 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             <span className="text-gray-300 dark:text-gray-600">•</span>
             <span className="text-sm">{formattedDate}</span>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* PRIMARY PLAY BUTTON — inline on desktop, sticky on mobile */}
         {/* Desktop inline button */}
-        <motion.div
+        <m.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
@@ -265,22 +265,22 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             <Target className="w-6 h-6" />
             {t('daily.playButton')}
           </button>
-        </motion.div>
+        </m.div>
 
         {/* Animated Tutorial Carousel */}
         {targetWordLength > 0 && (
-          <motion.div
+          <m.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
           >
             <DailyIntroCarousel targetWordLength={targetWordLength} />
-          </motion.div>
+          </m.div>
         )}
 
         {/* Secondary actions row — demoted from primary CTA, sits below carousel */}
         {isAuthenticated ? (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35, type: 'spring', stiffness: 280, damping: 26 }}
@@ -300,19 +300,19 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
               <Trophy className="w-4 h-4" />
               {t('daily.todaysPlayers')}
             </button>
-          </motion.div>
+          </m.div>
         ) : (
           <>
             {!isOnCrazyGamesPlatform && (
-              <motion.div
+              <m.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 26 }}
               >
                 <UnauthenticatedCreateChallengeSection language={language} t={t} onAuthRequired={handleAuthRequired} />
-              </motion.div>
+              </m.div>
             )}
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, type: 'spring', stiffness: 280, damping: 26 }}
@@ -324,14 +324,14 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
               >
                 <Trophy className="w-3 h-3" /> {t('daily.todaysPlayers')}
               </button>
-            </motion.div>
+            </m.div>
           </>
         )}
 
         {/* Collapsible Leaderboard */}
         <AnimatePresence>
           {showLeaderboard && (
-            <motion.div
+            <m.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
@@ -348,25 +348,25 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
                 t={t}
                 defaultTab="today"
               />
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
 
         {/* Note */}
-        <motion.p
+        <m.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
           className="text-xs text-gray-500 dark:text-gray-400"
         >
           {t('daily.samePuzzle')}
-        </motion.p>
+        </m.p>
 
         {/* (desktop play button moved up to appear right after hero section) */}
       </div>
 
       {/* Right column: desktop-only persistent leaderboard sidebar */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.25, type: 'spring', stiffness: 280, damping: 26 }}
@@ -392,13 +392,13 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             />
           </div>
         </div>
-      </motion.div>
+      </m.div>
 
       </div>
 
       {/* Mobile sticky play button — sits above bottom nav, below cookie consent */}
       <div className="sm:hidden fixed bottom-[var(--bottom-stack-height,0px)] inset-x-0 z-[100] px-4 pb-2 pointer-events-none">
-        <motion.div
+        <m.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
@@ -411,7 +411,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             <Target className="w-6 h-6" />
             {t('daily.playButton')}
           </button>
-        </motion.div>
+        </m.div>
       </div>
 
       <CreateChallengeModal
@@ -427,7 +427,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           initialMode="signup"
         />
       )}
-    </motion.div>
+    </m.div>
   );
 };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -30,7 +30,7 @@ export function StreakCounter({ streak }: StreakCounterProps) {
   const tier = getStreakTier(streak);
 
   return (
-    <motion.div
+    <m.div
       className="flex flex-col items-center gap-1 py-2"
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -67,6 +67,6 @@ export function StreakCounter({ streak }: StreakCounterProps) {
       <span className="text-[9px] font-bold text-neo-lime/60 uppercase tracking-widest">
         {t('daily.keepFireBurning')}
       </span>
-    </motion.div>
+    </m.div>
   );
 }

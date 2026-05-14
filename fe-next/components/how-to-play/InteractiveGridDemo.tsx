@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Flame, RotateCw, Play, Check } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -131,7 +131,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
       {/* Combo & Score Display */}
       <div className="flex items-center gap-1.5 sm:gap-3 flex-wrap justify-center min-h-[24px] sm:min-h-[28px]">
         {comboCount > 0 && (
-          <motion.div
+          <m.div
             key={comboCount}
             initial={{ scale: 0.5, opacity: 0, y: -10 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -141,10 +141,10 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
             <Badge className={`${comboCount >= 3 ? 'bg-neo-red shadow-[0_0_12px_rgba(255,140,0,0.5)]' : 'bg-gray-300'} text-neo-black border sm:border-2 border-neo-black font-bold text-[10px] sm:text-sm px-1.5 sm:px-2 py-0.5 whitespace-nowrap`}>
               {comboCount}x {comboCount >= 3 && `(${getComboMultiplier(comboCount)}×)`}
             </Badge>
-          </motion.div>
+          </m.div>
         )}
         {totalScore > 0 && (
-          <motion.div
+          <m.div
             key={totalScore}
             initial={{ scale: 1.3, rotate: -5 }}
             animate={{ scale: 1, rotate: 0 }}
@@ -153,7 +153,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
             <Badge className="bg-neo-lime text-neo-black border sm:border-2 border-neo-black font-bold text-[10px] sm:text-sm px-1.5 sm:px-2 py-0.5 shadow-hard-sm">
               {totalScore} pts
             </Badge>
-          </motion.div>
+          </m.div>
         )}
       </div>
 
@@ -166,7 +166,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
               const cellIndex = getCellIndex(rowIndex, colIndex);
 
               return (
-                <motion.div
+                <m.div
                   key={`${rowIndex}-${colIndex}`}
                   className={`
                     w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center relative
@@ -183,16 +183,16 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
                 >
                   {letter}
                   {isSelected && cellIndex >= 0 && (
-                    <motion.span
+                    <m.span
                       initial={{ scale: 0, rotate: -45 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ type: "spring", stiffness: 500 }}
                       className={`absolute -top-1 sm:-top-1.5 ${dir === 'rtl' ? '-left-1 sm:-left-1.5' : '-right-1 sm:-right-1.5'} w-4 h-4 sm:w-6 sm:h-6 bg-neo-pink text-white text-[9px] sm:text-xs font-bold rounded-full flex items-center justify-center border sm:border-2 border-neo-black shadow-hard-sm`}
                     >
                       {cellIndex + 1}
-                    </motion.span>
+                    </m.span>
                   )}
-                </motion.div>
+                </m.div>
               );
             })
           ))}
@@ -230,7 +230,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
               const y2 = cellRow * (cellSize + gap) + cellSize / 2;
 
               return (
-                <motion.line
+                <m.line
                   key={`${x1}-${y1}-${x2}-${y2}`}
                   x1={x1}
                   y1={y1}
@@ -252,7 +252,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
 
       {/* Current Word Display */}
       <div className="flex items-center gap-2 sm:gap-3 min-h-[32px] sm:min-h-[40px]">
-        <motion.div
+        <m.div
           className="bg-neo-cream px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border-2 sm:border-3 border-neo-black shadow-hard min-w-[80px] sm:min-w-[100px] text-center"
           animate={showSuccess ? { scale: [1, 1.05, 1] } : {}}
           transition={{ duration: 0.3 }}
@@ -262,9 +262,9 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
               ? selectedCells.map(([r, c]) => demoGrid[r]?.[c] ?? '').join('')
               : currentDemo.word}
           </span>
-        </motion.div>
+        </m.div>
         {showSuccess && (
-          <motion.div
+          <m.div
             initial={{ scale: 0, x: -10 }}
             animate={{ scale: 1, x: 0 }}
             transition={{ type: "spring", stiffness: 400 }}
@@ -272,7 +272,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
           >
             <Check className="w-4 h-4 sm:w-5 sm:h-5 text-neo-lime" />
             <span className="font-bold text-xs sm:text-base text-neo-lime">+{currentDemo.points}</span>
-          </motion.div>
+          </m.div>
         )}
       </div>
 

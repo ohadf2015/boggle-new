@@ -4,7 +4,7 @@ import { memo, useMemo, useState, useRef, useEffect } from 'react';
 import { fireConfetti } from '@/utils/confettiUtils';
 import type { Socket } from 'socket.io-client';
 import { Maximize, Minimize } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import TvTutorialOverlay, { TvHelpButton } from './tv-broadcast/TvTutorialOverlay';
 import TvJoinBar from './tv-broadcast/TvJoinBar';
 import TvGameHeader from './tv-broadcast/TvGameHeader';
@@ -234,7 +234,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       {/* Earthquake cracks overlay */}
       <AnimatePresence>
         {earthquakeState === 'shaking' && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -248,7 +248,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
               className="object-cover"
               sizes="100vw"
             />
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -263,7 +263,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       {/* Final Minute Banner */}
       <AnimatePresence>
         {showFinalMinuteBanner && (
-          <motion.div
+          <m.div
             initial={{ y: -80, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -80, opacity: 0 }}
@@ -277,7 +277,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
             <p className="text-sm font-bold text-center opacity-80">
               {t('tvBroadcast.notifications.everySecondCounts')}
             </p>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -288,7 +288,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
 
         {/* Fullscreen Toggle Button - Hidden on CrazyGames (they manage fullscreen) */}
         {showFullscreenButton && (
-          <motion.button
+          <m.button
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             whileHover={{ scale: 1.1 }}
@@ -303,12 +303,12 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
             ) : (
               <Maximize className="w-6 h-6" />
             )}
-          </motion.button>
+          </m.button>
         )}
       </div>
 
       {/* Join Bar (Kahoot-style) - Always visible, even in fullscreen */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 380, damping: 26 }}
@@ -319,7 +319,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
           playerCount={leaderboardData.length}
           t={t}
         />
-      </motion.div>
+      </m.div>
 
       {/* Game Header with Timer - Always visible */}
       <TvGameHeader
@@ -346,7 +346,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       {/* Fire Round Overlay — dramatic flame image + edge gradients */}
       <AnimatePresence>
         {fireRoundActive && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -356,7 +356,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
             aria-hidden="true"
           >
             {/* Fire frame overlay — illustrated flames on all edges */}
-            <motion.div
+            <m.div
               className="absolute inset-0"
               animate={{ opacity: [0.7, 1, 0.7] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
@@ -368,9 +368,9 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
                 className="object-cover mix-blend-screen"
                 sizes="100vw"
               />
-            </motion.div>
+            </m.div>
             {/* Bottom fire flames */}
-            <motion.div
+            <m.div
               className="absolute bottom-0 left-0 right-0 h-48"
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
@@ -382,10 +382,10 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
                 className="object-cover object-top mix-blend-screen"
                 sizes="100vw"
               />
-            </motion.div>
+            </m.div>
             {/* Heat vignette */}
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(255,80,0,0.2)_100%)]" />
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 

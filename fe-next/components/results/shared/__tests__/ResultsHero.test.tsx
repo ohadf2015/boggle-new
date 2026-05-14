@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: any) => {
       const { initial, animate, transition, whileHover, whileTap, ...rest } = props;
       return <div {...rest}>{children}</div>;

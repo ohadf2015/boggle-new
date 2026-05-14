@@ -9,7 +9,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, ...props }: React.ComponentProps<'div'>) => (
       <div {...props}>{children}</div>
     ),

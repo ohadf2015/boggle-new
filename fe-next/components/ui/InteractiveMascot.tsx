@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence, type TargetAndTransition } from 'framer-motion';
+import { m, AnimatePresence, type TargetAndTransition } from 'framer-motion';
 import { memo, useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -610,7 +610,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
 
   return (
     <div className={`relative inline-block ${className}`}>
-      <motion.div
+      <m.div
         data-testid="interactive-mascot"
         data-variant={variant}
         className={`relative ${sizeClassName || SIZE_CLASSES[size]} ${isInteractive ? 'cursor-pointer' : ''} focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2`}
@@ -626,14 +626,14 @@ export const InteractiveMascot = memo(function InteractiveMascot({
         animate={isClicked && shouldAnimate ? CLICK_ANIMATIONS[clickAnimation] : undefined}
       >
         {/* Idle animation wrapper */}
-        <motion.div
+        <m.div
           className="w-full h-full"
           animate={shouldAnimate && !isClicked ? idleAnimation : undefined}
         >
           {/* Image with crossfade on variant change */}
           {/* Fast transition (200ms) for smoother, less noticeable changes */}
           <AnimatePresence mode="wait">
-            <motion.div
+            <m.div
               key={currentVariant}
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -665,13 +665,13 @@ export const InteractiveMascot = memo(function InteractiveMascot({
                   />
                 )}
               </div>
-            </motion.div>
+            </m.div>
           </AnimatePresence>
-        </motion.div>
+        </m.div>
 
         {/* Hover glow effect */}
         {isInteractive && shouldAnimate && (
-          <motion.div
+          <m.div
             className="absolute inset-0 rounded-full bg-neo-lime/20 blur-xl -z-10"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{
@@ -686,7 +686,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
         {isClicked && shouldAnimate && (
           <>
             {[...Array(6)].map((_, i) => (
-              <motion.div
+              <m.div
                 key={`sparkle-${i}`}
                 className="absolute w-2 h-2 bg-neo-lime rounded-full"
                 style={{
@@ -714,11 +714,11 @@ export const InteractiveMascot = memo(function InteractiveMascot({
             ))}
           </>
         )}
-      </motion.div>
+      </m.div>
 
       {/* Tooltip */}
       {tooltip && showTooltip && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 5 }}
@@ -727,7 +727,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
           {tooltip}
           {/* Tooltip arrow */}
           <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-neo-black rotate-45" />
-        </motion.div>
+        </m.div>
       )}
     </div>
   );
@@ -744,7 +744,7 @@ export const InteractiveMascotWithEntrance = memo(function InteractiveMascotWith
   const shouldAnimate = !prefersReducedMotion && enableComplexAnimations;
 
   return (
-    <motion.div
+    <m.div
       initial={shouldAnimate ? { scale: 0, opacity: 0, y: 20 } : undefined}
       animate={{ scale: 1, opacity: 1, y: 0 }}
       transition={{
@@ -755,7 +755,7 @@ export const InteractiveMascotWithEntrance = memo(function InteractiveMascotWith
       }}
     >
       <InteractiveMascot {...props} />
-    </motion.div>
+    </m.div>
   );
 });
 

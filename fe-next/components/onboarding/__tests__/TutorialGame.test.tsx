@@ -13,7 +13,7 @@ vi.mock('framer-motion', () => {
     return <div ref={ref} {...p}>{children}</div>;
   });
   return {
-    motion: new Proxy({} as any, { get: () => Wrap }),
+    m: new Proxy({} as any, { get: () => Wrap }),
     AnimatePresence: ({ children }: any) => <>{children}</>,
   };
 });

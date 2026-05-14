@@ -10,7 +10,7 @@ import { render, screen, act } from '@testing-library/react';
 import { BossDialogue } from '../BossDialogue';
 
 vi.mock('framer-motion', () => ({
-  motion: { div: ({ children, ...p }: any) => <div {...p}>{children}</div> },
+  m: { div: ({ children, ...p }: any) => <div {...p}>{children}</div> },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 vi.mock('@/contexts/LanguageContext', () => ({

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Pointer, Star, Zap, Mouse } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
@@ -49,7 +49,7 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
   return (
     <div className="flex flex-col items-center space-y-4 sm:space-y-5 w-full max-w-lg mx-auto">
       {/* Header */}
-      <motion.div
+      <m.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 26 }}
@@ -61,10 +61,10 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
         <p className="text-xs sm:text-sm text-neo-white/70">
           {t('onboarding.quickTips.subtitle')}
         </p>
-      </motion.div>
+      </m.div>
 
       {/* Quick Tips - unified neutral styling */}
-      <motion.div
+      <m.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
@@ -74,7 +74,7 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
           {tips.map((tip, index) => {
             const Icon = tip.icon;
             return (
-              <motion.div
+              <m.div
                 key={tip.titleKey}
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
@@ -92,14 +92,14 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
                     {t(tip.textKey)}
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Practice Mode destination card */}
-      <motion.div
+      <m.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
@@ -118,7 +118,7 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
             </div>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 };

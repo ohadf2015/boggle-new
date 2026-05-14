@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Search, CircleDot, CheckCircle2, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -130,7 +130,7 @@ export default function DailyHub() {
 
   return (
     <div className="flex-1 flex flex-col items-center bg-neo-navy min-h-screen px-4 pt-8 pb-bottom-stack sm:pb-8">
-      <motion.div
+      <m.div
         className="w-full max-w-md flex flex-col gap-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -161,14 +161,14 @@ export default function DailyHub() {
 
         {/* Completion badge */}
         {bothDone && (
-          <motion.div
+          <m.div
             className="mx-auto px-4 py-2 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black font-neo-display font-black text-sm shadow-hard"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           >
             ✨ {t('daily.dailyDouble')}
-          </motion.div>
+          </m.div>
         )}
 
         {/* Last 7 days progress (DEDICATION) */}
@@ -211,7 +211,7 @@ export default function DailyHub() {
             {playedWH && playedWW ? '2/2' : playedWH || playedWW ? '1/2' : '0/2'}
           </span>
         </div>
-      </motion.div>
+      </m.div>
 
       {claimedChest && (
         <WeeklyChestModal chest={claimedChest} onClose={() => setClaimedChest(null)} />

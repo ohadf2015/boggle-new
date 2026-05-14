@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Crown, Trophy, SmilePlus } from 'lucide-react';
-import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
+import { m, useReducedMotion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { PlayerScore } from '@/hooks/useResultsData';
 import Avatar from '../Avatar';
@@ -100,7 +100,7 @@ function PodiumEmojiBubbleLocal({ emoji, onDone }: { emoji: string; onDone: () =
   }, [onDone]);
 
   return (
-    <motion.div
+    <m.div
       initial={{ scale: 0, y: 6, opacity: 0 }}
       animate={{ scale: 1, y: -6, opacity: 1 }}
       exit={{ scale: 0, opacity: 0 }}
@@ -109,7 +109,7 @@ function PodiumEmojiBubbleLocal({ emoji, onDone }: { emoji: string; onDone: () =
     >
       {emoji}
       <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-neo-cream border-b-3 border-r-3 border-neo-black rotate-45" />
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -141,7 +141,7 @@ function PodiumEmojiPicker({
     'left-1/2 -translate-x-1/2';
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       initial={{ opacity: 0, scale: 0.7, y: 4 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -158,7 +158,7 @@ function PodiumEmojiPicker({
           {r.emoji}
         </button>
       ))}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -200,14 +200,14 @@ export default function ResultsPodium({
   const top3 = players.slice(0, 3);
 
   return (
-    <motion.div
+    <m.div
       className="w-full"
       initial={reducedMotion ? undefined : { opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
       {/* Section header */}
-      <motion.div
+      <m.div
         className="flex items-center justify-center gap-1.5 mb-4 medium-short:mb-2"
         initial={reducedMotion ? undefined : { opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -217,7 +217,7 @@ export default function ResultsPodium({
         <span className="font-black text-[10px] text-white/30 uppercase tracking-wider">
           {t('results.matchResults') || 'Match Results'}
         </span>
-      </motion.div>
+      </m.div>
 
       <div className="grid grid-cols-3 items-end gap-1 px-1 max-w-xs mx-auto">
         {LAYOUT_ORDER.map((configIdx, layoutIdx) => {
@@ -245,7 +245,7 @@ export default function ResultsPodium({
           const baseDelay = REVEAL_DELAYS[layoutIdx];
 
           return (
-            <motion.div
+            <m.div
               key={player.username}
               className={cn('flex flex-col items-center', config.ptOffset)}
               initial={reducedMotion ? undefined : { opacity: 0 }}
@@ -269,7 +269,7 @@ export default function ResultsPodium({
               </div>
 
               {/* Avatar — bouncy drop-in */}
-              <motion.div
+              <m.div
                 className="relative mb-3 medium-short:mb-1.5"
                 initial={reducedMotion ? undefined : { opacity: 0, y: -25, scale: 0.6 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -281,7 +281,7 @@ export default function ResultsPodium({
                 }}
               >
                 {isFirst && (
-                  <motion.div
+                  <m.div
                     className="absolute inset-0 rounded-full bg-neo-lime/20 blur-md"
                     initial={reducedMotion ? undefined : { scale: 0 }}
                     animate={{ scale: [0, 1.3, 1] }}
@@ -305,7 +305,7 @@ export default function ResultsPodium({
 
                 {/* Crown for 1st — dramatic spin-in with overshoot */}
                 {isFirst ? (
-                  <motion.div
+                  <m.div
                     className="absolute -top-3 left-1/2 -translate-x-1/2 text-neo-lime drop-shadow-md"
                     initial={reducedMotion ? undefined : { scale: 0, rotate: -360, y: -20 }}
                     animate={{ scale: 1, rotate: 0, y: 0 }}
@@ -317,9 +317,9 @@ export default function ResultsPodium({
                     }}
                   >
                     <Crown className="w-5 h-5 fill-neo-lime" />
-                  </motion.div>
+                  </m.div>
                 ) : (
-                  <motion.div
+                  <m.div
                     initial={reducedMotion ? undefined : { scale: 0, rotate: -45 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ type: 'spring', delay: baseDelay + 0.25, stiffness: 400, damping: 15 }}
@@ -330,12 +330,12 @@ export default function ResultsPodium({
                     )}
                   >
                     {config.place}
-                  </motion.div>
+                  </m.div>
                 )}
-              </motion.div>
+              </m.div>
 
               {/* Name, Score & Emoji button — fade up after avatar */}
-              <motion.div
+              <m.div
                 className="text-center mb-3 min-w-0 px-1 relative"
                 initial={reducedMotion ? undefined : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -349,7 +349,7 @@ export default function ResultsPodium({
                 >
                   {displayName}
                 </p>
-                <motion.p
+                <m.p
                   initial={reducedMotion ? undefined : { opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: baseDelay + 0.35 }}
@@ -360,7 +360,7 @@ export default function ResultsPodium({
                   )}
                 >
                   {scoreDisplay}
-                </motion.p>
+                </m.p>
 
                 {/* Per-player actions — add-friend (always available) + emoji (when reactions wired) */}
                 {!isCurrentUser && (
@@ -395,10 +395,10 @@ export default function ResultsPodium({
                     )}
                   </div>
                 )}
-              </motion.div>
+              </m.div>
 
               {/* Podium bar — elastic grow from bottom with slight overshoot */}
-              <motion.div
+              <m.div
                 className={cn(
                   'w-full flex items-center justify-center font-neo-display font-black text-black',
                   config.barHeight,
@@ -418,18 +418,18 @@ export default function ResultsPodium({
                 }}
                 style={{ transformOrigin: 'bottom' }}
               >
-                <motion.span
+                <m.span
                   initial={reducedMotion ? undefined : { opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 15, delay: baseDelay + 0.45 }}
                 >
                   {config.place}
-                </motion.span>
-              </motion.div>
-            </motion.div>
+                </m.span>
+              </m.div>
+            </m.div>
           );
         })}
       </div>
-    </motion.div>
+    </m.div>
   );
 }

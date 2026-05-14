@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import type { GameMode } from '@/shared/types/game';
 
 const MODE_ICONS: Record<GameMode, string> = {
@@ -57,7 +57,7 @@ export function GameModeIntro({
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         data-testid="game-mode-intro"
         data-mode={mode}
         data-tv={isTv ? 'true' : undefined}
@@ -70,7 +70,7 @@ export function GameModeIntro({
         transition={{ duration: 0.3 }}
       >
         {/* Radial burst background in mode color */}
-        <motion.div
+        <m.div
           className={`absolute inset-0 bg-radial-gradient ${colors.from} ${colors.via} to-transparent pointer-events-none`}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 2.5, opacity: 1 }}
@@ -79,7 +79,7 @@ export function GameModeIntro({
         />
 
         {/* Ring burst effect */}
-        <motion.div
+        <m.div
           className="absolute w-40 h-40 rounded-full border-2 border-neo-cream/20 pointer-events-none"
           initial={{ scale: 0, opacity: 0.8 }}
           animate={{ scale: 6, opacity: 0 }}
@@ -87,7 +87,7 @@ export function GameModeIntro({
         />
 
         {/* Icon with dramatic spring entrance + continuous float */}
-        <motion.div
+        <m.div
           className={isTv ? 'text-8xl' : 'text-7xl'}
           initial={{ scale: 0, rotate: -30, y: 40 }}
           animate={{
@@ -102,10 +102,10 @@ export function GameModeIntro({
           }}
         >
           {icon}
-        </motion.div>
+        </m.div>
 
         {/* Title with scale + fade */}
-        <motion.h1
+        <m.h1
           className={`font-neo-display font-bold text-neo-white ${
             isTv ? 'text-6xl' : 'text-4xl'
           }`}
@@ -119,10 +119,10 @@ export function GameModeIntro({
           }}
         >
           {t(keys.name)}
-        </motion.h1>
+        </m.h1>
 
         {/* Description */}
-        <motion.p
+        <m.p
           className={`text-neo-white/80 max-w-md text-center ${
             isTv ? 'text-3xl' : 'text-lg'
           }`}
@@ -131,16 +131,16 @@ export function GameModeIntro({
           transition={{ delay: 0.45, duration: 0.5 }}
         >
           {t(keys.description)}
-        </motion.p>
+        </m.p>
 
         {/* Decorative bottom line */}
-        <motion.div
+        <m.div
           className="h-1 bg-linear-to-r from-transparent via-neo-cream/30 to-transparent rounded-full"
           initial={{ width: 0, opacity: 0 }}
           animate={{ width: isTv ? 300 : 200, opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.8, ease: 'easeOut' as const }}
         />
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 }

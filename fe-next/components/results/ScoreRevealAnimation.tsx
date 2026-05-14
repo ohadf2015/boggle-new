@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, memo, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Crown, Medal, Star, Zap, SkipForward } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -217,7 +217,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
     const isCurrentPlayer = player.isCurrentPlayer ?? player.username === currentUsername;
 
     return (
-      <motion.div
+      <m.div
         key={player.username}
         layout={enableComplexAnimations && isRevealing}
         initial={shouldAnimate ? { opacity: 0, x: -30, scale: 0.95 } : false}
@@ -279,7 +279,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
         </div>
 
         {/* Animated score */}
-        <motion.div
+        <m.div
           key={score}
           initial={isRevealing ? { scale: 1.1 } : false}
           animate={{ scale: 1 }}
@@ -292,24 +292,24 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
           )}
         >
           {score.toLocaleString()}
-        </motion.div>
+        </m.div>
 
         {/* Position change indicator */}
         <AnimatePresence>
           {lastPositionSwap &&
            sortedByDisplayed[position]?.username === player.username &&
            enableComplexAnimations && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.5 }}
               className="absolute inset-e-0 -top-2"
             >
               <Zap className="w-4 h-4 text-neo-lime" />
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </m.div>
     );
   }, [displayedScores, currentUsername, isRevealing, lastPositionSwap, sortedByDisplayed, enableComplexAnimations, shouldAnimate]);
 
@@ -317,12 +317,12 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
     <div className="space-y-2 relative">
       {/* Reveal progress bar (only during animation) */}
       {isRevealing && enableComplexAnimations && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scaleX: 0.8 }}
           animate={{ opacity: 1, scaleX: 1 }}
           className="h-2 bg-neo-black border-3 border-slate-700 overflow-hidden mb-3 shadow-hard-sm"
         >
-          <motion.div
+          <m.div
             className="h-full bg-linear-to-r from-neo-lime via-neo-cyan to-neo-lime"
             style={{
               boxShadow: '0 0 12px var(--neo-lime, #BFFF00)',
@@ -335,7 +335,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
               backgroundPosition: { duration: 1, repeat: Infinity, ease: 'linear' },
             }}
           />
-        </motion.div>
+        </m.div>
       )}
 
       {/* Player list - sorted by current displayed scores */}
@@ -345,7 +345,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
 
       {/* "Trading places" indicator during reveal */}
       {isRevealing && lastPositionSwap && enableComplexAnimations && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 40 }}
@@ -355,12 +355,12 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
             <Zap className="w-3.5 h-3.5" />
             {t('results.positionSwap')}
           </div>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Skip button — appears after 1s */}
       {isRevealing && canSkip && (
-        <motion.button
+        <m.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           onClick={handleSkip}
@@ -368,7 +368,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
         >
           <SkipForward className="w-3 h-3" />
           {t('results.skipReveal')}
-        </motion.button>
+        </m.button>
       )}
     </div>
   );

@@ -42,7 +42,7 @@ vi.mock('../MiniGrid', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: new Proxy({}, {
+  m: new Proxy({}, {
     get: () => ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
   }),
   AnimatePresence: ({ children }: any) => children,

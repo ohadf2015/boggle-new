@@ -9,7 +9,7 @@ import '@testing-library/jest-dom';
 import { PulseGlow } from '../PulseGlow';
 
 vi.mock('framer-motion', () => ({
-  motion: {
+  m: {
     div: ({ children, className, style, ...rest }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode; animate?: unknown }) => (
       <div className={className} style={style as React.CSSProperties} data-testid="pulse-glow-wrapper" data-animate={JSON.stringify((rest as Record<string, unknown>).animate)} {...rest}>{children}</div>
     ),

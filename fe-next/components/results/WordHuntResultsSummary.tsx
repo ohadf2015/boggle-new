@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Skull } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import WordHuntTipBadge from './WordHuntTipBadge';
@@ -78,7 +78,7 @@ export default function WordHuntResultsSummary({
   const currentPlayer = playerResults?.find(p => p.username === currentUsername);
 
   return (
-    <motion.div
+    <m.div
       variants={staggerContainer}
       initial="hidden"
       animate="show"
@@ -87,7 +87,7 @@ export default function WordHuntResultsSummary({
       {/* Survival highlight — unique to WHRS, not shown elsewhere.
           Target word, found-state, and words-found count are owned by
           ResultsHeroSection + HighlightsBar to avoid triple display. */}
-      <motion.section
+      <m.section
         variants={variant}
         className="flex justify-center items-center py-4 px-4 sm:px-6 bg-neo-gray/20 rounded-neo-lg border border-white/5"
       >
@@ -97,13 +97,13 @@ export default function WordHuntResultsSummary({
           </p>
           <span className="text-sm font-black text-neo-cyan tabular-nums">{formattedSurvivalTime}</span>
         </div>
-      </motion.section>
+      </m.section>
 
       {/* Elimination History — unique data: order eliminated. Player rows
           (avatar/score/winner) are already covered by ResultsPodium +
           ConsolationRows above the fold; this strip adds only the order chip. */}
       {eliminated && eliminated.length > 0 && (
-        <motion.section variants={variant} className="space-y-2">
+        <m.section variants={variant} className="space-y-2">
           <div className="flex items-center gap-2 px-2">
             <Skull className="w-3 h-3 text-neo-red/60" />
             <h3 className="text-[10px] font-bold text-neo-red/60 uppercase tracking-widest">
@@ -116,7 +116,7 @@ export default function WordHuntResultsSummary({
               const isCurrentUser = player.username === currentUsername;
               const eliminationOrder = eliminated.length - idx;
               return (
-                <motion.span
+                <m.span
                   key={player.username}
                   initial={reducedMotion ? undefined : { opacity: 0, x: dir === 'rtl' ? 12 : -12 }}
                   animate={{ opacity: isCurrentUser ? 1 : 0.7, x: 0 }}
@@ -133,7 +133,7 @@ export default function WordHuntResultsSummary({
                   {isCurrentUser && (
                     <span className="text-neo-pink">({t('results.you') || 'YOU'})</span>
                   )}
-                </motion.span>
+                </m.span>
               );
             })}
           </div>
@@ -155,12 +155,12 @@ export default function WordHuntResultsSummary({
               longestWordLength: currentPlayer.longestWordLength ?? 0,
             }} />
           )}
-        </motion.section>
+        </m.section>
       )}
 
       {/* Survived current user tip */}
       {currentPlayer && currentPlayer.survived && (
-        <motion.div variants={variant}>
+        <m.div variants={variant}>
           <WordHuntTipBadge stats={{
             score: currentPlayer.score,
             survived: true,
@@ -175,8 +175,8 @@ export default function WordHuntResultsSummary({
             avgWordLength: currentPlayer.avgWordLength ?? 0,
             longestWordLength: currentPlayer.longestWordLength ?? 0,
           }} />
-        </motion.div>
+        </m.div>
       )}
-    </motion.div>
+    </m.div>
   );
 }

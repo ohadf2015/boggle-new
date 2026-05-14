@@ -10,7 +10,7 @@ vi.mock('framer-motion', () => {
     ),
   );
   MotionButton.displayName = 'MotionButton';
-  return { motion: { button: MotionButton } };
+  return { m: { button: MotionButton } };
 });
 
 const t = (key: string) => key;

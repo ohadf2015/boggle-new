@@ -32,7 +32,7 @@ vi.mock('../../hooks/useCrazyGames', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  motion: new Proxy({}, {
+  m: new Proxy({}, {
     get: () => ({ children, ...props }: { children?: React.ReactNode; [k: string]: unknown }) =>
       React.createElement('div', props, children as React.ReactNode),
   }),

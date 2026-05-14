@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
 export function MascotReaction({ epicness, visible }: { epicness: number; visible: boolean }) {
@@ -6,7 +6,7 @@ export function MascotReaction({ epicness, visible }: { epicness: number; visibl
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
+        <m.div
           initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 100, opacity: 0 }}
@@ -21,7 +21,7 @@ export function MascotReaction({ epicness, visible }: { epicness: number; visibl
             unoptimized
             priority
           />
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

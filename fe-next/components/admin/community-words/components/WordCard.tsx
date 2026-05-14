@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Check, X, ThumbsUp, ThumbsDown, Calendar, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -37,7 +37,7 @@ export function WordCard({
   const languageInfo = LANGUAGES.find((l) => l.code === word.language);
 
   return (
-    <motion.div
+    <m.div
       layout
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -133,6 +133,6 @@ export function WordCard({
           </Button>
         </CardFooter>
       </Card>
-    </motion.div>
+    </m.div>
   );
 }
