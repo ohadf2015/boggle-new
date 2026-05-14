@@ -30,25 +30,6 @@ vi.mock('framer-motion', () => ({
       return (<button {...filteredProps} onClick={onClick as React.MouseEventHandler}>{children as React.ReactNode}</button>);
     },
   },
-  m: {
-    div: ({ children, onClick, onDragEnd, animate, ...props }: Record<string, unknown>) => {
-      const filteredProps = Object.fromEntries(
-        Object.entries(props).filter(([key]) =>
-          !['drag', 'dragConstraints', 'dragElastic', 'transition', 'initial', 'exit'].includes(key)
-        )
-      );
-      return (
-        <div
-          {...filteredProps}
-          onClick={onClick as React.MouseEventHandler}
-          data-animate={JSON.stringify(animate)}
-        >
-          {children as React.ReactNode}
-        </div>
-      );
-    },
-    span: ({ children, ...props }: Record<string, unknown>) => <span {...props}>{children as React.ReactNode}</span>,
-  },
   useMotionValue: () => ({ set: vi.fn(), get: () => 0 }),
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));

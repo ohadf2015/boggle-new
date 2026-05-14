@@ -344,6 +344,49 @@ afterAll(() => {
 // Cleanup After Each Test
 // ==========================================
 
+// ==========================================
+// Mock Framer Motion (Global)
+// ==========================================
+
+vi.mock('framer-motion', () => {
+  const React = require('react');
+  const createMotionComponent = (tag: string) =>
+    React.forwardRef(function MotionComponent(
+      { children, ...props }: any,
+      ref: any
+    ) {
+      return React.createElement(tag, { ref, ...props }, children);
+    });
+  const motion = new Proxy({} as Record<string, any>, {
+    get: (_target, prop: string) => createMotionComponent(prop),
+  });
+  return {
+    motion,
+    m: motion,
+    AnimatePresence: function AnimatePresence({ children }: any) {
+      return React.createElement(React.Fragment, {}, children);
+    },
+    LazyMotion: function LazyMotion({ children }: any) {
+      return React.createElement(React.Fragment, {}, children);
+    },
+    LayoutGroup: function LayoutGroup({ children }: any) {
+      return React.createElement(React.Fragment, {}, children);
+    },
+    MotionConfig: function MotionConfig({ children }: any) {
+      return React.createElement(React.Fragment, {}, children);
+    },
+    domAnimation: {},
+    domMax: {},
+    useMotionValue: () => ({ set: vi.fn(), get: () => 0 }),
+    useReducedMotion: () => false,
+    useAnimation: () => ({ start: vi.fn(), set: vi.fn() }),
+    useAnimationControls: () => ({ start: vi.fn(), set: vi.fn() }),
+    useSpring: (value: any) => value,
+    useTransform: (value: any) => value,
+    animate: vi.fn(),
+  };
+});
+
 afterEach(() => {
   vi.clearAllMocks();
 

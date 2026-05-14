@@ -10,7 +10,7 @@ vi.mock('framer-motion', () => {
   const motion = new Proxy({} as Record<string, any>, {
     get: (_t, prop: string) => createMotion(prop),
   });
-  return { motion, AnimatePresence: ({ children }: any) => <>{children}</> };
+  return { motion, m: motion, AnimatePresence: ({ children }: any) => <>{children}</> };
 });
 
 const mockMarkComplete = vi.fn();
