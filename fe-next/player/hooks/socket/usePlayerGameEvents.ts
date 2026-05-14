@@ -324,7 +324,6 @@ export function usePlayerGameEvents({
         storeUpdates.blastTileOverlay = ext.blastTileOverlay;
         const reconnectMoves = ext.blastPlayerMoves;
         const myMoves = reconnectMoves?.[username] ?? 0;
-        storeUpdates.blastMovesUsed = myMoves;
         if (ext.blastSeed != null) storeUpdates.blastSeed = ext.blastSeed;
         // Reconnect/late-join: apply current server board state if available
         if (ext.blastGrid && ext.blastTileStates) {

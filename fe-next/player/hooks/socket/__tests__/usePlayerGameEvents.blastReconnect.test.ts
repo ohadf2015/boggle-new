@@ -27,9 +27,9 @@ describe('usePlayerGameEvents — blast reconnect / late-join state restore', ()
     expect(source).toMatch(/storeUpdates\.blastTileOverlay\s*=\s*ext\.blastTileOverlay/);
   });
 
-  it('restores per-username blastMovesUsed from server', () => {
+  it('reads per-username moves from server for totalMoves in blastBoardUpdate', () => {
     expect(source).toMatch(/ext\.blastPlayerMoves/);
-    expect(source).toMatch(/storeUpdates\.blastMovesUsed\s*=\s*myMoves/);
+    expect(source).toMatch(/const myMoves\s*=\s*reconnectMoves/);
   });
 
   it('restores blastSeed for deterministic engine RNG', () => {
