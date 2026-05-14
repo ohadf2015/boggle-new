@@ -104,13 +104,13 @@ describe('MobileChatFab', () => {
     renderWithSocket(<MobileChatFab {...defaultProps} />);
 
     act(() => { simulateChatMessage('OtherPlayer'); });
-    const badge = screen.getByRole('button', { name: /chat/i });
-    expect(badge).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /chat/i })).toBeInTheDocument();
 
     act(() => { vi.advanceTimersByTime(5000); });
 
-    // AnimatePresence exit: opacity → 0
-    expect(badge).toHaveStyle({ opacity: '0' });
+    // After 5 seconds, hasUnread becomes false and AnimatePresence removes the badge
+    // With a mocked AnimatePresence, the badge is removed immediately (no exit animation runs)
+    expect(screen.queryByRole('button', { name: /chat/i })).not.toBeInTheDocument();
   });
 
   it('should open chat sheet when badge is tapped', () => {
@@ -132,8 +132,9 @@ describe('MobileChatFab', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /close/i }));
 
-    const chatSheet = screen.getByTestId('room-chat').closest('[class*="fixed bottom-0"]');
-    expect(chatSheet).toHaveStyle({ transform: 'translateY(100%)' });
+    // With a mocked AnimatePresence, the chat sheet is removed immediately (no exit animation runs)
+    // The real test is that the sheet is no longer in the document
+    expect(screen.queryByTestId('room-chat')).not.toBeInTheDocument();
   });
 
   it('should use "Host" as username when isHost is true', () => {

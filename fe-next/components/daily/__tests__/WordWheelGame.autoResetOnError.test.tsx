@@ -119,7 +119,7 @@ const builtLetterCount = () =>
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
 describe('WordWheelGame auto-reset after invalid submission', () => {
-  it('clears the built word ~2.5s after dictionary rejection without a manual reset click', async () => {
+  it('clears the built word ~1.5s after dictionary rejection (tap-mode) without a manual reset click', async () => {
     mountGame(false); // dictionary says invalid
 
     await buildAndSubmitInvalidWord();
@@ -128,15 +128,16 @@ describe('WordWheelGame auto-reset after invalid submission', () => {
     expect(screen.getByText('wordWheel.notInDictionary')).toBeInTheDocument();
     expect(builtLetterCount()).toBeGreaterThan(0);
 
-    // Just before 2.5s — letters still present.
-    await act(async () => { await sleep(2200); });
+    // Just before 1.5s — letters still present.
+    await act(async () => { await sleep(1200); });
     expect(builtLetterCount()).toBeGreaterThan(0);
 
-    // After 2.5s — auto-reset fires; allow exit animations to flush.
+    // After 1.5s — auto-reset fires (for tap/idle mode).
+    // The test uses tap submit (not drag), so auto-reset waits 1500ms.
     await waitFor(() => {
       expect(builtLetterCount()).toBe(0);
-    }, { timeout: 2000 });
-  }, 8000);
+    }, { timeout: 1000 });
+  }, 6000);
 
   it('cancels the pending auto-reset when the player taps a new letter mid-window', async () => {
     mountGame(false);
@@ -144,13 +145,14 @@ describe('WordWheelGame auto-reset after invalid submission', () => {
     await buildAndSubmitInvalidWord();
     expect(builtLetterCount()).toBeGreaterThan(0);
 
-    // 1s into the 2.5s window — player taps a fresh letter to retry.
-    await act(async () => { await sleep(1000); });
+    // 0.8s into the 1.5s window — player taps a fresh letter to retry.
+    // This resets the timeout (any builtLetters change cancels pending auto-reset).
+    await act(async () => { await sleep(800); });
     tap('[data-wheel-letter="D"]');
 
-    // Past the original 2.5s mark — the builder must still hold letters
-    // (the fresh tap cancelled the pending reset).
-    await act(async () => { await sleep(2000); });
+    // Past the original 1.5s mark — the builder must still hold letters
+    // (the fresh tap cancelled the pending reset and restarted any auto-reset timer).
+    await act(async () => { await sleep(1000); });
     expect(builtLetterCount()).toBeGreaterThan(0);
-  }, 8000);
+  }, 6000);
 });
