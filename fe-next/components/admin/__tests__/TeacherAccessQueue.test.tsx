@@ -33,4 +33,51 @@ describe('<TeacherAccessQueue>', () => {
     await user.click(screen.getByText('a@x.com'));
     expect(screen.getByText(/admin\.teacherAccess\.drawer_title/)).toBeInTheDocument();
   });
+
+  describe('keyboard navigation', () => {
+    it('rows have keyboard-navigable attributes', async () => {
+      render(<TeacherAccessQueue />);
+      await waitFor(() => screen.getByText('a@x.com'));
+
+      const row = screen.getByRole('button', { name: /admin\.teacherAccess\.row_open/ });
+      expect(row).toHaveAttribute('tabIndex', '0');
+      expect(row).toHaveAttribute('role', 'button');
+      expect(row).toHaveAttribute('aria-label');
+    });
+
+    it('opens drawer on Enter key press', async () => {
+      const user = userEvent.setup();
+      render(<TeacherAccessQueue />);
+      await waitFor(() => screen.getByText('a@x.com'));
+
+      const row = screen.getByRole('button', { name: /admin\.teacherAccess\.row_open/ });
+      row.focus();
+      await user.keyboard('{Enter}');
+
+      expect(screen.getByText(/admin\.teacherAccess\.drawer_title/)).toBeInTheDocument();
+    });
+
+    it('opens drawer on Space key press', async () => {
+      const user = userEvent.setup();
+      render(<TeacherAccessQueue />);
+      await waitFor(() => screen.getByText('a@x.com'));
+
+      const row = screen.getByRole('button', { name: /admin\.teacherAccess\.row_open/ });
+      row.focus();
+      await user.keyboard(' ');
+
+      expect(screen.getByText(/admin\.teacherAccess\.drawer_title/)).toBeInTheDocument();
+    });
+
+    it('aria-label includes teacher name', async () => {
+      render(<TeacherAccessQueue />);
+      await waitFor(() => screen.getByText('a@x.com'));
+
+      // Get the row by finding the element that contains the teacher name in its row
+      const rows = screen.getAllByRole('button', { name: /admin\.teacherAccess\.row_open/ });
+      expect(rows.length).toBeGreaterThan(0);
+      // First row should have "A" in the aria-label (the teacher name)
+      expect(rows[0]).toHaveAttribute('aria-label', expect.stringContaining('A'));
+    });
+  });
 });

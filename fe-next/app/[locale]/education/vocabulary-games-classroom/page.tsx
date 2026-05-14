@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
 import { getVocabClassroomContent, EDUCATION_LOCALES, type EducationLocale } from './content';
+import { EducationHeroBanner } from '@/components/education/EducationHeroBanner';
 import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
+import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
 import { educationCourseJsonLd } from '@/lib/seo/educationStructuredData';
 
 interface PageProps {
@@ -12,12 +14,21 @@ interface PageProps {
 const BASE_URL = 'https://www.lexiclash.live';
 const PAGE_PATH = '/education/vocabulary-games-classroom';
 
+const OG_IMAGE: Record<string, string> = {
+  en: 'education-hero-en.webp',
+  he: 'education-hero-he.webp',
+  sv: 'education-hero-sv.webp',
+  ja: 'education-hero-ja.webp',
+  es: 'education-hero-es.webp',
+};
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const isTargetLocale = EDUCATION_LOCALES.includes(locale as EducationLocale);
   const pageUrl = `${BASE_URL}/${locale}${PAGE_PATH}`;
   const c = getVocabClassroomContent(locale);
   const ogLocale = locale === 'he' ? 'he_IL' : locale === 'es' ? 'es_ES' : locale === 'sv' ? 'sv_SE' : locale === 'ja' ? 'ja_JP' : 'en_US';
+  const ogImage = `${BASE_URL}/images/${OG_IMAGE[locale as EducationLocale] ?? OG_IMAGE.en}`;
   return {
     title: c.metaTitle,
     description: c.metaDescription,
@@ -28,13 +39,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: ogLocale,
       type: 'website',
       url: pageUrl,
-      images: [{ url: `${BASE_URL}/og-image-en.webp`, width: 1200, height: 630, alt: 'LexiClash classroom vocabulary games' }],
+      images: [{ url: ogImage, width: 1200, height: 675, alt: c.ogTitle }],
     },
     twitter: {
       card: 'summary_large_image',
       title: c.ogTitle,
       description: c.twitterDescription,
-      images: [`${BASE_URL}/og-image-en.webp`],
+      images: [ogImage],
     },
     alternates: {
       canonical: pageUrl,
@@ -52,34 +63,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 
-const compareRows: ReadonlyArray<readonly [string, string, string, string, string]> = [
-  ['Free tier (full features)', '✓', 'Limited', '✓ basic', 'Limited'],
-  ['Free student accounts', '✓ always free', '✗ paid tiers', '✗ paid tiers', '✗ paid tiers'],
-  ['Word-formation gameplay', '✓ Boggle/Wheel/Anagram', '✗ flashcards', '✗ templates', '✗ quizzes'],
-  ['Live whole-class multiplayer', '✓', '✓ paid', '✗', '✓'],
-  ['1v1 vocabulary duels', '✓', '✓ paid', '✗', '✗'],
-  ['5 languages incl. RTL', '✓', '✗', '✗', '✗'],
-  ['Custom word lists', '✓', '✓', '✓', '✓'],
-  ['Class analytics dashboard', '✓ free', '✓ paid', 'Basic', '✓ paid'],
-];
-
-const features = [
-  { icon: '⚡', text: 'Free student accounts — quick signup, tracks XP and progress across sessions' },
-  { icon: '🎯', text: 'Three game modes: Boggle grid, Word Hunt, Word Wheel' },
-  { icon: '👥', text: 'Live multiplayer up to 30 students per session' },
-  { icon: '⚔️', text: '1v1 vocabulary duels for paired practice or sub-team rounds' },
-  { icon: '📚', text: 'Upload your own curriculum word lists — any unit, any subject' },
-  { icon: '🌍', text: 'Five languages: English, Hebrew (RTL), Spanish, Swedish, Japanese' },
-  { icon: '📊', text: 'Teacher dashboard: per-student accuracy + missed-word patterns' },
-  { icon: '💸', text: 'Free tier covers everything — no premium upsell' },
-];
-
-const useCases = [
-  { tag: 'WARM-UP', title: '5-minute opener', desc: 'Spin a quick Word Wheel from yesterday\'s vocabulary list to wake the class up.' },
-  { tag: 'REVIEW', title: 'End-of-unit recap', desc: 'Run a whole-class Boggle round on the unit\'s 30 target words; dashboard surfaces gaps.' },
-  { tag: 'ESL', title: 'Target-language practice', desc: 'Play in students\' target language — supports EN, HE, ES, SV, JA dictionaries.' },
-  { tag: 'SUB DAY', title: 'Substitute teacher activity', desc: 'Zero prep — sub picks a list, projects a code, students play. Done in 10 minutes.' },
-];
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
@@ -154,8 +137,13 @@ export default async function Page({ params }: PageProps) {
       <Script id="ld-vgc-course" type="application/ld+json">{JSON.stringify(courseJsonLd)}</Script>
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        {/* Hero banner with per-locale image */}
+        <EducationHeroBanner
+          title={`${c.heroH1.line1} ${c.heroH1.highlight} ${c.heroH1.line2} ${c.heroH1.line3}`}
+          subtitle={c.heroSubtitle}
+        />
 
-        <section className="grid items-center gap-10 lg:grid-cols-12">
+        <section className="grid items-center gap-10 lg:grid-cols-12 mt-12">
           <div className="lg:col-span-7">
             <span className="inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">
               {c.heroTag}
@@ -170,7 +158,7 @@ export default async function Page({ params }: PageProps) {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
-                <span className="block text-base sm:text-lg">▶ Start a Classroom Game</span>
+                <span className="block text-base sm:text-lg">{c.ctaPrimaryButtonLabel}</span>
                 <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">{c.ctaSubLabel}</span>
               </Link>
               <Link href={`/${locale}/education/duels`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:px-7">
@@ -179,10 +167,10 @@ export default async function Page({ params }: PageProps) {
               </Link>
             </div>
             <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs uppercase tracking-widest text-neo-gray-200">
-              <span className="inline-flex items-center gap-2"><span className="text-neo-lime">●</span> 5 languages</span>
-              <span>K-12 + adult ESL</span>
-              <span className="text-neo-yellow">free student accounts</span>
-              <span>5-min sessions</span>
+              <span className="inline-flex items-center gap-2"><span className="text-neo-lime">●</span> {c.metadataLabels.languages}</span>
+              <span>{c.metadataLabels.gradeLevel}</span>
+              <span className="text-neo-yellow">{c.metadataLabels.accounts}</span>
+              <span>{c.metadataLabels.duration}</span>
             </div>
           </div>
           <div className="lg:col-span-5">
@@ -197,26 +185,26 @@ export default async function Page({ params }: PageProps) {
           </div>
         </section>
 
-        <section className="mt-20">
+        <ScrollRevealSection className="mt-20">
           <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            What you <span className="text-neo-lime">get</span>.
+            {c.sections.whatYouGet}
           </h2>
           <ul className="grid gap-3 sm:grid-cols-2">
-            {features.map((f, i) => (
-              <li key={f.text} className="flex items-start gap-4 rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard"
+            {c.features.map((f, i) => (
+              <li key={f.text} className="flex items-start gap-4 rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard transition-all hover:shadow-hard-lg hover:-translate-x-0.5 hover:-translate-y-0.5"
                   style={{ transform: i % 3 === 0 ? 'rotate(-0.4deg)' : i % 3 === 1 ? 'rotate(0.3deg)' : 'rotate(0deg)' }}>
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-neo border-3 border-neo-black bg-neo-lime text-xl shadow-hard-sm" aria-hidden="true">{f.icon}</span>
                 <p className="pt-1.5 text-sm sm:text-base">{f.text}</p>
               </li>
             ))}
           </ul>
-        </section>
+        </ScrollRevealSection>
 
-        <section className="mt-20">
+        <ScrollRevealSection className="mt-20">
           <h2 className="mb-2 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            LexiClash <span className="text-neo-pink">vs</span> the usual suspects.
+            {c.sections.comparison}
           </h2>
-          <p className="mb-6 text-sm text-neo-gray-300 sm:text-base">A teacher-honest comparison. We&apos;re not for everyone — just for teachers who want word games without a paywall.</p>
+          <p className="mb-6 text-sm text-neo-gray-300 sm:text-base">{c.sections.comparisonSubtitle}</p>
           <div className="overflow-x-auto rounded-neo border-4 border-neo-black bg-neo-navy-light shadow-hard-lg">
             <table className="w-full border-collapse text-sm sm:text-base">
               <thead>
@@ -229,7 +217,7 @@ export default async function Page({ params }: PageProps) {
                 </tr>
               </thead>
               <tbody>
-                {compareRows.map((row, i) => (
+                {c.compareRows.map((row, i) => (
                   <tr key={row[0]} className={`border-b border-neo-gray-400/20 ${i % 2 ? 'bg-neo-navy/30' : ''}`}>
                     <td className="px-4 py-3 font-bold">{row[0]}</td>
                     <td className="px-4 py-3 text-center font-bold text-neo-lime">{row[1]}</td>
@@ -241,24 +229,24 @@ export default async function Page({ params }: PageProps) {
               </tbody>
             </table>
           </div>
-        </section>
+        </ScrollRevealSection>
 
-        <section className="mt-20">
+        <ScrollRevealSection className="mt-20">
           <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            How <span className="text-neo-cyan">teachers</span> use it.
+            {c.sections.howTeachersUse}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {useCases.map((u) => (
-              <div key={u.title} className="relative rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard">
+            {c.useCases.map((u) => (
+              <div key={u.title} className="relative rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:shadow-hard-lg hover:-translate-x-0.5 hover:-translate-y-0.5">
                 <span className="absolute -top-3 left-3 border-2 border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">{u.tag}</span>
                 <h3 className="mt-2 font-neo-display text-base font-black">{u.title}</h3>
                 <p className="mt-2 text-sm text-neo-gray-200">{u.desc}</p>
               </div>
             ))}
           </div>
-        </section>
+        </ScrollRevealSection>
 
-        <section className="mt-20">
+        <ScrollRevealSection className="mt-20">
           <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">
             {c.faqTitle}
           </h2>
@@ -273,7 +261,7 @@ export default async function Page({ params }: PageProps) {
               </details>
             ))}
           </div>
-        </section>
+        </ScrollRevealSection>
 
         <nav className="mt-16 flex flex-wrap gap-3 text-sm font-bold" aria-label="Related education resources">
           <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-cyan transition-all hover:bg-neo-navy">→ ESL Word Games</Link>
@@ -283,18 +271,15 @@ export default async function Page({ params }: PageProps) {
 
         <section className="mt-12 mb-12 rounded-neo border-4 border-neo-black bg-neo-yellow p-8 text-neo-navy shadow-hard-xl sm:p-12">
           <h2 className="font-neo-display text-4xl font-black leading-[0.95] sm:text-5xl">
-            Ten minutes left in class?
-            <br /><span className="bg-neo-navy px-3 text-neo-yellow">Run a vocab game.</span>
+            {c.ctaHeading}
+            <br /><span className="bg-neo-navy px-3 text-neo-yellow">{c.ctaSubtitle}</span>
           </h2>
-          <p className="mt-4 max-w-xl text-base font-bold sm:text-lg">
-            Pick a list. Show the code. Play. Review the dashboard. That&apos;s the whole loop.
-          </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg">
-              ▶ Start Classroom Game
+              {c.ctaPrimaryButtonLabel}
             </Link>
             <Link href={`/${locale}/education`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg">
-              See Education Hub
+              {c.ctaSecondaryButtonLabel}
             </Link>
           </div>
         </section>

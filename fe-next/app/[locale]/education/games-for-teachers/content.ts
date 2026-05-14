@@ -17,6 +17,15 @@ export type LocaleContent = {
     q: string;
     a: string;
   }>;
+  useCases: Array<{ tag: string; title: string; desc: string }>;
+  features: Array<{ icon: string; text: string }>;
+  sections: {
+    howYouUse: string;
+    ctaHeading: string;
+    ctaSubtitle: string;
+    ctaPrimaryButtonLabel: string;
+    ctaSecondaryButtonLabel: string;
+  };
 };
 
 export const EDUCATION_LOCALES = ['en', 'he', 'es', 'sv', 'ja'] as const;
@@ -41,6 +50,31 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       'Built for the teacher who has 5 minutes left in class and 30 students who need to move. Pick a list, students log in, play. The dashboard does the rest.',
     ctaSubLabel: 'Free account required • No credit card',
     faqTitle: 'Questions about classroom word games?',
+    useCases: [
+      { tag: '5-MIN', title: 'Lesson warm-up', desc: 'Open class with a quick Word Wheel from yesterday\'s vocab — wakes the room up.' },
+      { tag: 'REVIEW', title: 'End-of-unit recap', desc: 'Boggle round on the unit\'s 30 target words; dashboard surfaces gaps for review.' },
+      { tag: 'SUB-DAY', title: 'Substitute teacher', desc: 'Sub picks a saved list, projects code, students play. Zero permissions needed.' },
+      { tag: 'BREAK', title: 'Mid-lesson brain break', desc: '3-minute vocabulary duel between desk partners — energizes without losing focus.' },
+      { tag: 'ESL', title: 'Target-language drill', desc: 'Switch dictionaries (EN/ES/HE/SV/JA) per round for bilingual or ESL practice.' },
+      { tag: 'CLUB', title: 'After-school club', desc: 'Word-game club runs itself — daily challenges + leaderboard create natural engagement.' },
+    ],
+    features: [
+      { icon: '⏱️', text: 'Setup in under 60 seconds — pick list, share code, play' },
+      { icon: '✅', text: 'Free student accounts — one-time setup, tracks XP and progress across sessions' },
+      { icon: '📚', text: 'Upload custom curriculum word lists — any subject, any grade' },
+      { icon: '📊', text: 'Per-student accuracy + class-wide missed-word patterns' },
+      { icon: '👥', text: 'Live multiplayer up to 30 students; 1v1 duels for paired practice' },
+      { icon: '🌍', text: 'Five languages: English, Hebrew (RTL), Spanish, Swedish, Japanese' },
+      { icon: '💸', text: 'Free forever — no premium tier, no per-seat fee' },
+      { icon: '🔒', text: 'Student-safe: no chat, no DMs, no external links during play' },
+    ],
+    sections: {
+      howYouUse: 'How you use it.',
+      ctaHeading: '5 minutes left in class?',
+      ctaSubtitle: 'Pick a list, share the code, students play.',
+      ctaPrimaryButtonLabel: '▶ Start a Word Game',
+      ctaSecondaryButtonLabel: 'See Education Hub',
+    },
     faqs: [
       {
         q: 'What word games can I use with my class?',
@@ -69,58 +103,83 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
     ],
   },
   he: {
-    metaTitle: 'משחקי מילים חינמיים למורים — ללא הכנה, ניתוח כיתתי | לקסיקלאש',
+    metaTitle: 'משחקי מילים חינמיים למורים — ללא הכנה, אנליטיקה | LexiClash',
     metaDescription:
-      'משחקי מילים ברישת אינטרנט חינמיים מעוצבים לכיתות אמתיות: ללא הכנה, רשימות אוצר מילים מותאמות, ניתוח התקדמות לתלמיד. שימוש כתרגול 5 דקות, הפסקת מוח או יום חלופי. לתמיד חינם.',
+      'משחקי מילים בחינם לכיתות. ללא הכנה, רשימות שלך, עוקב התקדמות. 5 דקות, הפסקה או יום חלופי. לתמיד חינם.',
     ogTitle: 'משחקי מילים חינמיים למורים',
-    ogDescription: 'מעוצב למורה עם 5 דקות שנותרו בשיעור ו-30 תלמידים שצריכים לזוז.',
+    ogDescription: 'למורה עם 5 דקות שנותרו ו-30 תלמידים שצריכים לנוע.',
     twitterDescription:
-      'משחקי מילים חינמיים לכיתות. בחר רשימה, התלמידים נכנסים, משחקים. לוח המחוונים עוקב אחר התקדמות. ללא הכנה.',
+      'משחקי מילים חינמיים. בחר רשימה, התלמידים משחקים. דשבורד עוקב. ללא הכנה.',
     heroTag: '★ למורים ★ ללא הכנה ★',
     heroH1: {
       part1: 'משחקי מילים.',
       highlight: 'לכיתה.',
-      part2: 'בקליק אחד.',
+      part2: 'ללא הכנה.',
     },
     heroSubtitle:
-      'מעוצב למורה שיש לו 5 דקות בסוף השיעור ו-30 תלמידים שצריכים הנעה. בחר רשימה, התלמידים נכנסים, משחקים. לוח המחוונים עושה את השאר.',
-    ctaSubLabel: 'חשבון חינם נדרש • אין כרטיס אשראי',
+      'למורה עם 5 דקות בשיעור ו-30 תלמידים צריכים לזוז. בחר רשימה, תלמידים משחקים. הדשבורד עושה את הכל.',
+    ctaSubLabel: 'חשבון חינם • ללא כרטיס אשראי',
     faqTitle: 'שאלות על משחקי מילים בכיתה?',
+    useCases: [
+      { tag: '5-דקות', title: 'חימום', desc: 'Word Wheel מהר מאתמול — מעיר את החדר.' },
+      { tag: 'חזרה', title: 'סוף נושא', desc: 'Boggle על 30 המילים; דשבורד מציג פערים.' },
+      { tag: 'יום חלופי', title: 'מורה חלופי', desc: 'בוחר רשימה שמורה, משדר קוד. אפס הרשאות.' },
+      { tag: 'הפסקה', title: 'הפסקת מוח', desc: 'דו־קרב 3 דקות בין שולחנות — מעיר בלי להסיח דעת.' },
+      { tag: 'אנגלית', title: 'שפת היעד', desc: 'החלף מילונות (EN/ES/HE/SV/JA) — דו־לשוני ו-ESL.' },
+      { tag: 'מועדון', title: 'לאחר בית ספר', desc: 'משחקים רצים בעצמם — אתגרים יומיים + לוח דירוג = עניין טבעי.' },
+    ],
+    features: [
+      { icon: '⏱️', text: 'הגדרה בפחות מ-60 שניות — בחר, שתף קוד, משחק' },
+      { icon: '✅', text: 'חשבונות חינמיים — הגדרה חד-פעמית, תמיד עוקב' },
+      { icon: '📚', text: 'רשימות שלך — כל נושא, כל כיתה' },
+      { icon: '📊', text: 'דיוק לתלמיד + מילים קשות לכיתה' },
+      { icon: '👥', text: 'ריבוי משתתפים חי — עד 30 תלמידים; דו־קרבות זוגות' },
+      { icon: '🌍', text: '5 שפות: אנגלית, עברית (RTL), ספרדית, שוודית, יפנית' },
+      { icon: '💸', text: 'הכל חינם — ללא פרמיום' },
+      { icon: '🔒', text: 'בטוח: ללא צ\'אט, DM, קישורים חיצוניים בזמן משחק' },
+    ],
+    sections: {
+      howYouUse: 'כיצד אתה משתמש בזה.',
+      ctaHeading: '5 דקות נותרו בשיעור?',
+      ctaSubtitle: 'בחר רשימה, שתף את הקוד, תלמידים משחקים.',
+      ctaPrimaryButtonLabel: '▶ התחל משחק מילים',
+      ctaSecondaryButtonLabel: 'ראה מרכז חינוך',
+    },
     faqs: [
       {
-        q: 'אילו משחקי מילים אוכל להשתמש עם הכיתה?',
-        a: 'לקסיקלאש מציע משחקי מילים רבי משתתפים כמו בוגל (חפש מילים בחידות אותיות), גלגל מילים (צור מילים מגלגלים סובבים), וציד מילים (מירוץ למציאת מילים מוסתרות. כל משחק מאמן אוצר מילים, הכרת דפוסים וכתיב בזמן אמת.',
+        q: 'אילו משחקי מילים יש?',
+        a: 'Boggle (חפש בחידה), Word Wheel (בנה מגלגל), Word Hunt (מצא מטרה). כל משחק אמן: איות, דפוסים, מהירות.',
       },
       {
-        q: 'כמה זמן הכנה נדרש?',
-        a: 'אפס. יצור חשבון חינם, בחר או העלה רשימת אוצר מילים, שתף קישור או קוד עם התלמידים, והתחל לשחק. אין תוכניות שיעור, גיליונות עבודה או הכנת חומרים נדרשים. משחקים עובדים על כרומבוקים, טאבלטים וטלפונים.',
+        q: 'כמה הכנה?',
+        a: 'אפס. חשבון חינם, בחר או העלה רשימה, שתף קוד, משחק. ללא תוכנית שיעור, ללא גיליונות. עובד על כל מכשיר.',
       },
       {
-        q: 'האם אוכל להשתמש ברשימות אוצר מילים משלי?',
-        a: 'כן. העלה רשימות CSV, השתמש ברשימות תוכנית לימודים מובנות, או עזוב שתיהן. מורים יכולים לנעול אוצר מילים לנושאים מסוימים (יחידות, ערכות נושא, שפות) ולהשתמש שוב ברשימות בכיתות ובשנים.',
+        q: 'רשימות משלי?',
+        a: 'כן. CSV או מובנות. נעל לנושאים מסוימים, עשה שימוש חוזר בכיתות ובשנים.',
       },
       {
-        q: 'איך אני עוקב אחר התקדמות התלמיד?',
-        a: 'לוח המחוונים של הכיתה מציג ניקוד לכל תלמיד, דיוק מילים, מהירות ומדדי מעורבות בזמן אמת. הורד דוחות לפי כיתה, טווח תאריכים או סוג משחק. לא נדרש ציון ידני.',
+        q: 'איך אעקוב אחר התקדמות?',
+        a: 'דשבורד מציג ניקוד, דיוק, מהירות בזמן אמת. הורד דוחות. ללא ניקוד ידני.',
       },
       {
-        q: 'האם מורה חלופי יכול להשתמש בזה?',
-        a: 'בהחלט. שתף קוד שיעור עם המורה החלופי. התלמידים נכנסים, משחקים, וכל התוצאות מופיעות בלוח המחוונים שלך. מושלם ליום ללא מורה — לא נדרשת הכנה.',
+        q: 'מורה חלופי יכול?',
+        a: 'כן בהחלט. שתף קוד, הם משחקים, אתה רואה הכל בדשבורד. אפס הכנה ליום ללא מורה.',
       },
       {
-        q: 'האם אני צריך עגלת כרומבוק או חומרה מיוחדת?',
-        a: 'לא. כל מכשיר עם דפדפן עובד: כרומבוקים, iPad-ים, מחשבים ניידים או טלפונים של תלמידים. עובד גם בכיתות עם WiFi לקוי דרך נכסים שמור במטמון.',
+        q: 'צריך Chromebook או חומרה?',
+        a: 'לא. כל דפדפן: טלפונים, טאבלטים, מחשבים. עובד אפילו עם WiFi לקוי.',
       },
     ],
   },
   es: {
-    metaTitle: 'Juegos de palabras gratuitos para maestros — Sin preparación, análisis de clase | LexiClash',
+    metaTitle: 'Juegos gratis para maestros — Sin preparación, análisis | LexiClash',
     metaDescription:
-      'Juegos de palabras basados en navegador gratuitos diseñados para aulas reales: sin preparación, listas de vocabulario personalizadas, seguimiento del progreso por estudiante. Úsalos como calentamiento de 5 minutos, descanso mental o actividad de día de sustituto. Gratis para siempre.',
-    ogTitle: 'Juegos de palabras gratuitos para maestros',
-    ogDescription: 'Diseñado para el maestro con 5 minutos al final de clase y 30 estudiantes que necesitan moverse.',
+      'Juegos de palabras gratis para aulas. Sin preparación, tus listas, sigue el progreso. 5 minutos, descanso o día de sustituto. Gratis siempre.',
+    ogTitle: 'Juegos de palabras gratis para maestros',
+    ogDescription: 'Para el maestro con 5 minutos y 30 estudiantes que necesitan moverse.',
     twitterDescription:
-      'Juegos de palabras gratuitos para aulas. Elige una lista, los estudiantes inician sesión, juegan. El panel de control rastrea el progreso. Sin preparación.',
+      'Juegos gratis. Elige lista, estudiantes juegan. Panel rastrea. Sin preparación.',
     heroTag: '★ Para Maestros ★ Sin Preparación ★',
     heroH1: {
       part1: 'Juegos de palabras.',
@@ -128,44 +187,69 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       part2: 'Sin esfuerzo.',
     },
     heroSubtitle:
-      'Diseñado para el maestro que tiene 5 minutos al final de clase y 30 estudiantes que necesitan moverse. Elige una lista, los estudiantes inician sesión, juegan. El panel de control hace el resto.',
-    ctaSubLabel: 'Se requiere cuenta gratuita • Sin tarjeta de crédito',
-    faqTitle: '¿Preguntas sobre juegos de palabras en el aula?',
+      'Para el maestro con 5 minutos y 30 estudiantes que necesitan moverse. Elige una lista, estudiantes juegan. El panel hace el resto.',
+    ctaSubLabel: 'Cuenta gratis • Sin tarjeta de crédito',
+    faqTitle: '¿Preguntas sobre juegos?',
+    useCases: [
+      { tag: '5-MIN', title: 'Calentamiento de lección', desc: 'Abre la clase con un rápido Word Wheel del vocabulario de ayer - despierta la sala.' },
+      { tag: 'REVIEW', title: 'Recapitulación de fin de unidad', desc: 'Ronda Boggle en las 30 palabras objetivo de la unidad; el panel de control muestra brechas para revisar.' },
+      { tag: 'DÍA-SUB', title: 'Maestro sustituto', desc: 'Sub elige una lista guardada, proyecta código, estudiantes juegan. Cero permisos necesarios.' },
+      { tag: 'DESCANSO', title: 'Descanso cerebral a mitad de lección', desc: 'Duelo de vocabulario de 3 minutos entre compañeros de escritorio - energiza sin perder el enfoque.' },
+      { tag: 'ESL', title: 'Práctica en idioma objetivo', desc: 'Cambia diccionarios (EN/ES/HE/SV/JA) por ronda para práctica bilingüe o ESL.' },
+      { tag: 'CLUB', title: 'Club después de la escuela', desc: 'El club de juegos de palabras se ejecuta solo - desafíos diarios + clasificación crean compromiso natural.' },
+    ],
+    features: [
+      { icon: '⏱️', text: 'Setup en menos de 60 segundos — elige, comparte, juega' },
+      { icon: '✅', text: 'Cuentas gratis — una vez, luego siempre' },
+      { icon: '📚', text: 'Tus listas — cualquier materia, cualquier grado' },
+      { icon: '📊', text: 'Precisión por alumno + palabras difíciles' },
+      { icon: '👥', text: 'Multijugador — hasta 30; duelos de parejas' },
+      { icon: '🌍', text: '5 idiomas: inglés, hebreo (RTL), español, sueco, japonés' },
+      { icon: '💸', text: 'Gratis siempre — sin premium' },
+      { icon: '🔒', text: 'Seguro: sin chat, sin DM, sin enlaces externos' },
+    ],
+    sections: {
+      howYouUse: 'Cómo lo usas.',
+      ctaHeading: '¿5 minutos quedan en clase?',
+      ctaSubtitle: 'Elige una lista, comparte el código, estudiantes juegan.',
+      ctaPrimaryButtonLabel: '▶ Iniciar un juego de palabras',
+      ctaSecondaryButtonLabel: 'Ver centro de educación',
+    },
     faqs: [
       {
-        q: '¿Qué juegos de palabras puedo usar con mi clase?',
-        a: 'LexiClash ofrece juegos de palabras multijugador como Bogglé (encuentra palabras en cuadrículas de letras), Rueda de palabras (forma palabras a partir de ruedas giratorias) y Caza de palabras (carrera para encontrar palabras ocultas). Todos los juegos entrenan vocabulario, reconocimiento de patrones y ortografía en tiempo real.',
+        q: '¿Qué juegos hay?',
+        a: 'Boggle (busca en rejilla), Rueda (forma de rueda), Caza (encuentra ocultas). Todos: vocabulario, patrones, ortografía en tiempo real.',
       },
       {
-        q: '¿Cuánto tiempo de preparación se requiere?',
-        a: 'Cero. Crea una cuenta gratuita, elige o carga una lista de vocabulario, comparte un enlace o código con los estudiantes y comienza a jugar. No se necesitan planes de lección, hojas de trabajo ni preparación de materiales. Los juegos funcionan en Chromebooks, tablets y teléfonos.',
+        q: '¿Cuánta preparación?',
+        a: 'Cero. Cuenta gratis, elige o carga lista, comparte código, juega. Sin planes ni hojas. Funciona en todo.',
       },
       {
-        q: '¿Puedo usar mis propias listas de vocabulario?',
-        a: 'Sí. Carga listas CSV, usa listas de plan de estudios incorporadas o mezcla ambas. Los maestros pueden bloquear vocabulario a temas específicos (unidades, temas, idiomas) y reutilizar listas entre clases y años.',
+        q: '¿Mis listas?',
+        a: 'Sí. CSV o incorporadas o ambas. Bloquea por tema, reutiliza años.',
       },
       {
-        q: '¿Cómo hago un seguimiento del progreso de los estudiantes?',
-        a: 'El panel de control de la clase muestra puntuaciones por estudiante, precisión de palabras, velocidad y métricas de participación en tiempo real. Descarga informes por clase, rango de fechas o tipo de juego. No se requiere calificación manual.',
+        q: '¿Sigo progreso?',
+        a: 'Sí. Panel en tiempo real: puntuaciones, precisión, velocidad. Descargas reportes. Sin calificar manual.',
       },
       {
-        q: '¿Puede un maestro sustituto ejecutar esto?',
-        a: 'Absolutamente. Comparte un código de lección con el maestro sustituto. Los estudiantes inician sesión, juegan y ves todos los resultados en tu panel de control. Perfecto para días de sustituto — sin preparación necesaria.',
+        q: '¿Maestro sustituto?',
+        a: 'Claro. Comparte código, ellos juegan, ves todo en tu panel. Cero preparación esos días.',
       },
       {
-        q: '¿Necesito un carrito de Chromebook o hardware especial?',
-        a: 'No. Funciona cualquier dispositivo con un navegador: Chromebooks, iPads, laptops o teléfonos de estudiantes. Funciona en aulas con WiFi deficiente mediante activos en caché.',
+        q: '¿Chromebook o hardware?',
+        a: 'No. Cualquier dispositivo. Funciona hasta con WiFi deficiente.',
       },
     ],
   },
   sv: {
-    metaTitle: 'Gratis ordspel för lärare — Ingen förberedelse, klassanalys | LexiClash',
+    metaTitle: 'Gratis ordspel för lärare — Ingen förberedelse, analys | LexiClash',
     metaDescription:
-      'Gratis webbaserade ordspel designade för verkliga klassrum: ingen förberedelse, anpassade vokabulärlistor, spårning av elevens framsteg. Använd som 5-minuters uppvärmning, hjärnpaus eller vikarielektion. Gratis för alltid.',
+      'Gratis ordspel för klassrummet. Ingen förberedelse, dina listor, spår framsteg. 5 minuter, paus eller vikariedag. Gratis alltid.',
     ogTitle: 'Gratis ordspel för lärare',
-    ogDescription: 'Designat för läraren med 5 minuter kvar i lektionen och 30 elever som behöver röra sig.',
+    ogDescription: 'För läraren med 5 minuter och 30 elever som behöver röra sig.',
     twitterDescription:
-      'Gratis ordspel för klassrum. Välj en lista, eleverna loggar in och spelar. Instrumentpanelen spårar framsteg. Ingen förberedelse.',
+      'Gratis ordspel. Välj lista, elever spelar. Panel spårar. Ingen förberedelse.',
     heroTag: '★ För Lärare ★ Ingen Förberedelse ★',
     heroH1: {
       part1: 'Ordspel.',
@@ -173,9 +257,34 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       part2: 'Utan ansträngning.',
     },
     heroSubtitle:
-      'Designat för läraren som har 5 minuter kvar i lektionen och 30 elever som behöver röra sig. Välj en lista, eleverna loggar in och spelar. Instrumentpanelen gör resten.',
-    ctaSubLabel: 'Gratis konto krävs • Inget kreditkort',
-    faqTitle: 'Frågor om ordspel i klassrummet?',
+      'För läraren med 5 minuter och 30 elever som behöver röra sig. Välj lista, elever spelar. Panelen gör resten.',
+    ctaSubLabel: 'Gratis konto • Inget kreditkort',
+    faqTitle: 'Frågor om ordspel?',
+    useCases: [
+      { tag: '5-MIN', title: 'Lektionsuppvärmning', desc: 'Öppna lektionen med ett snabbt Word Wheel från gårdagens vokabulär - väcker upp klassrummet.' },
+      { tag: 'REVIEW', title: 'Sammanfattning vid enhetens slut', desc: 'Boggle-runda på enhetens 30 målord; instrumentpanelen visar luckor för granskning.' },
+      { tag: 'VIKAR-DAG', title: 'Vikarierande lärare', desc: 'Vikarie väljer en sparad lista, projicerar kod, elever spelar. Noll behörigheter behövs.' },
+      { tag: 'PAUS', title: 'Hjärnpaus mitt i lektionen', desc: '3-minuters ordförrådsduell mellan skrivbordskompisar - energiserar utan att tappa fokus.' },
+      { tag: 'SPRÅK', title: 'Målspråksövning', desc: 'Byt ordböcker (EN/ES/HE/SV/JA) per rond för tvåspråkig eller ESL-övning.' },
+      { tag: 'KLUBB', title: 'Efterskoleclub', desc: 'Ordspelsklubben kör sig själv - dagliga utmaningar + rankingslista skapar naturligt engagemang.' },
+    ],
+    features: [
+      { icon: '⏱️', text: 'Inställning på under 60 sekunder - välj lista, dela kod, spela' },
+      { icon: '✅', text: 'Gratis elevkonton - engångsinställning, spårar XP och framsteg under alla sessioner' },
+      { icon: '📚', text: 'Ladda upp anpassade läroplanordslistor - vilken ämne, vilken årskurs som helst' },
+      { icon: '📊', text: 'Noggrannhet per elev + klassomfattande mönster för förlorade ord' },
+      { icon: '👥', text: 'Liveflerspelar upp till 30 elever; 1v1-dueller för parövning' },
+      { icon: '🌍', text: 'Fem språk: engelska, hebreiska (RTL), spanska, svenska, japanska' },
+      { icon: '💸', text: 'Gratis för alltid - ingen premiumtier, ingen kostnad per säte' },
+      { icon: '🔒', text: 'Elevssäker: ingen chatt, inga DM, inga externa länkar under spel' },
+    ],
+    sections: {
+      howYouUse: 'Hur du använder det.',
+      ctaHeading: '5 minuter kvar i lektionen?',
+      ctaSubtitle: 'Välj en lista, dela koden, elever spelar.',
+      ctaPrimaryButtonLabel: '▶ Starta ett ordspel',
+      ctaSecondaryButtonLabel: 'Se utbildningshub',
+    },
     faqs: [
       {
         q: 'Vilka ordspel kan jag använda med min klass?',
@@ -204,23 +313,48 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
     ],
   },
   ja: {
-    metaTitle: ' teachers-free word games — No preparation, class analytics | LexiClash',
+    metaTitle: '無料単語ゲーム — 先生向け、準備なし | LexiClash',
     metaDescription:
-      '本当の教室のために設計された無料のウェブベースの単語ゲーム：準備不要、カスタマイズされた語彙リスト、生徒ごとの進度追跡。5分間のウォームアップ、脳休憩、または代替授業の活動として使用。永遠に無料。',
-    ogTitle:' teachers向けの無料単語ゲーム',
-    ogDescription: '授業の最後に5分残った先生と、移動が必要な30人の生徒のために設計されました。',
+      '教室向けの無料ゲーム。準備なし、あなたのリスト、進度追跡。5分、休憩、代講。ずっと無料。',
+    ogTitle: '無料単語ゲーム',
+    ogDescription: '5分残った先生と、30人が必要な先生向け。',
     twitterDescription:
-      '教室向けの無料単語ゲーム。リストを選択し、生徒がログインしてプレイします。ダッシュボードが進度を追跡します。準備不要。',
-    heroTag: '★教師向け ★ 準備不要 ★',
+      '無料ゲーム。リスト選んで、生徒がプレイ。ダッシュボード追跡。準備なし。',
+    heroTag: '★先生向け ★ 準備なし ★',
     heroH1: {
       part1: '単語ゲーム。',
       highlight: 'クラス向け。',
       part2: '簡単。',
     },
     heroSubtitle:
-      '授業の最後に5分残った先生と、移動が必要な30人の生徒のために設計されました。リストを選択し、生徒がログインしてプレイします。ダッシュボードが残りを行います。',
-    ctaSubLabel: '無料アカウント必須 • クレジットカード不要',
-    faqTitle: '教室での単語ゲームに関するご質問？',
+      '5分残った先生と、30人が動く必要があります。リスト選んで、生徒がプレイ。ダッシュボードが残りをやる。',
+    ctaSubLabel: '無料アカウント • クレジットカード不要',
+    faqTitle: 'ゲームについて？',
+    useCases: [
+      { tag: '5-MIN', title: 'レッスン開始', desc: '昨日の語彙から素早いワードホイールでクラスを開きます — 教室を起こしてくれます。' },
+      { tag: 'レビュー', title: 'ユニット終了時のまとめ', desc: 'ユニットの30の目標単語に対するボグルラウンド; ダッシュボードはレビューのためのギャップを表示します。' },
+      { tag: '代講', title: '代替教師', desc: '代講が保存されたリストを選択し、コードを表示し、生徒がプレイします。権限ゼロが必要。' },
+      { tag: '休憩', title: 'レッスン中の脳休憩', desc: 'デスクパートナー間の3分間の語彙デュエル — フォーカスを失わないで活力を与えます。' },
+      { tag: 'ESL', title: 'ターゲット言語ドリル', desc: 'ラウンドごとに辞書（EN/ES/HE/SV/JA）を切り替えるか、バイリンガルまたはESL練習用。' },
+      { tag: 'クラブ', title: '放課後クラブ', desc: '単語ゲームクラブは自分で実行します — 毎日のチャレンジ +ランキングが自然なエンゲージメントを作成します。' },
+    ],
+    features: [
+      { icon: '⏱️', text: '60秒以内にセットアップ — リストを選択、コードを共有、プレイ' },
+      { icon: '✅', text: '無料学生アカウント — 1回限りのセットアップ、すべてのセッション全体でXPと進度を追跡' },
+      { icon: '📚', text: 'カスタムカリキュラム語彙リストをアップロード — 任意の科目、任意のグレード' },
+      { icon: '📊', text: '学生ごとの精度 + クラス全体の単語ミスパターン' },
+      { icon: '👥', text: '最大30人の生徒のリアルタイムマルチプレイヤー; ペア練習用の1v1デュエル' },
+      { icon: '🌍', text: '5つの言語：英語、ヘブライ語（RTL）、スペイン語、スウェーデン語、日本語' },
+      { icon: '💸', text: '永遠に無料 — プレミアム層なし、座席当たりのコストなし' },
+      { icon: '🔒', text: '生徒向け安全：チャットなし、DM なし、プレイ中の外部リンクなし' },
+    ],
+    sections: {
+      howYouUse: 'それを使う方法。',
+      ctaHeading: '授業に5分残っていますか？',
+      ctaSubtitle: 'リストを選択し、コードを共有し、生徒がプレイします。',
+      ctaPrimaryButtonLabel: '▶ 単語ゲームを開始',
+      ctaSecondaryButtonLabel: '教育ハブを見る',
+    },
     faqs: [
       {
         q: 'クラスでどんな単語ゲームが使えますか？',

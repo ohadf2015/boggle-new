@@ -207,10 +207,54 @@ const RESOURCE_TITLES: Record<string, { heading: string; subhead: string; cards:
   },
 };
 
+type ResourceCard = { badge: string; title: string; desc: string };
+const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: ResourceCard; esl: ResourceCard; teachers: ResourceCard; spelling: ResourceCard }> = {
+  en: {
+    heading: 'Teacher Guides',
+    subhead: 'Deep-dive landing pages on specific use cases, with comparison tables, FAQs, and free word lists.',
+    vocab: { badge: 'Guide', title: 'Vocabulary Games for the Classroom', desc: 'No signup, 5 languages, free forever — vs Quizlet/Kahoot/Wordwall.' },
+    esl: { badge: 'ESL', title: 'ESL Word Games Online', desc: 'CEFR-scaled (A1→C2), 5 dictionaries, no student signup.' },
+    teachers: { badge: 'For Teachers', title: 'Word Games for Teachers', desc: 'Sub-day, brain-break, warm-up — zero prep, free forever.' },
+    spelling: { badge: 'Spelling Bee', title: 'Spelling Bee Practice Online', desc: '4-week training plan, custom word lists, 1v1 duels — Scripps prep.' },
+  },
+  he: {
+    heading: 'מדריכים למורים',
+    subhead: 'דפי נחיתה מעמיקים למקרי שימוש ספציפיים, עם טבלאות השוואה, שאלות נפוצות ורשימות מילים חינמיות.',
+    vocab: { badge: 'מדריך', title: 'משחקי אוצר מילים לכיתה', desc: 'בלי הרשמה, 5 שפות, חינם לתמיד — מול Quizlet/Kahoot/Wordwall.' },
+    esl: { badge: 'אנגלית', title: 'משחקי מילים באנגלית כשפה זרה', desc: 'מדורג לפי CEFR (A1→C2), 5 מילונים, בלי הרשמת תלמידים.' },
+    teachers: { badge: 'למורים', title: 'משחקי מילים למורים', desc: 'יום מילוי מקום, הפסקה מרעננת, חימום — אפס הכנה, חינם לתמיד.' },
+    spelling: { badge: 'איות', title: 'תרגול תחרות איות אונליין', desc: 'תוכנית אימון של 4 שבועות, רשימות מילים מותאמות, דואלי 1v1 — הכנה לתחרות.' },
+  },
+  sv: {
+    heading: 'Lärarguider',
+    subhead: 'Fördjupande sidor om specifika användningsfall, med jämförelsetabeller, vanliga frågor och gratis ordlistor.',
+    vocab: { badge: 'Guide', title: 'Ordförrådsspel för klassrummet', desc: 'Ingen registrering, 5 språk, gratis för alltid — jämfört med Quizlet/Kahoot/Wordwall.' },
+    esl: { badge: 'ESL', title: 'Ordspel för engelska online', desc: 'CEFR-skalad (A1→C2), 5 ordböcker, ingen elevregistrering.' },
+    teachers: { badge: 'För lärare', title: 'Ordspel för lärare', desc: 'Vikariedag, hjärnpaus, uppvärmning — noll förberedelse, gratis för alltid.' },
+    spelling: { badge: 'Stavning', title: 'Stavningstävling online', desc: '4-veckors träningsplan, anpassade ordlistor, 1v1-dueller — tävlingsförberedelse.' },
+  },
+  ja: {
+    heading: '教師向けガイド',
+    subhead: '比較表、よくある質問、無料単語リスト付きの、具体的な活用法を深掘りするページ。',
+    vocab: { badge: 'ガイド', title: '教室向け語彙ゲーム', desc: '登録不要、5言語、ずっと無料 — Quizlet/Kahoot/Wordwallと比較。' },
+    esl: { badge: 'ESL', title: 'オンライン英語単語ゲーム', desc: 'CEFR準拠（A1→C2）、5つの辞書、生徒の登録不要。' },
+    teachers: { badge: '教師向け', title: '教師のための単語ゲーム', desc: '代行日、頭の休憩、ウォームアップ — 準備ゼロ、ずっと無料。' },
+    spelling: { badge: 'スペリング', title: 'オンラインスペリング練習', desc: '4週間のトレーニングプラン、カスタム単語リスト、1対1デュエル — 大会対策。' },
+  },
+  es: {
+    heading: 'Guías para docentes',
+    subhead: 'Páginas detalladas sobre casos de uso específicos, con tablas comparativas, preguntas frecuentes y listas de palabras gratuitas.',
+    vocab: { badge: 'Guía', title: 'Juegos de vocabulario para el aula', desc: 'Sin registro, 5 idiomas, gratis para siempre — frente a Quizlet/Kahoot/Wordwall.' },
+    esl: { badge: 'ESL', title: 'Juegos de palabras en inglés online', desc: 'Escalado por CEFR (A1→C2), 5 diccionarios, sin registro de estudiantes.' },
+    teachers: { badge: 'Para docentes', title: 'Juegos de palabras para docentes', desc: 'Día de sustitución, descanso mental, calentamiento — cero preparación, gratis para siempre.' },
+    spelling: { badge: 'Concurso de Ortografía', title: 'Práctica de concurso de ortografía online', desc: 'Plan de entrenamiento de 4 semanas, listas personalizadas, duelos 1v1 — preparación para concursos.' },
+  },
+};
+
 function EducationResourceLinks({ locale }: { locale: string }) {
   const lang = locale in RESOURCE_TITLES ? locale : 'en';
   const t = RESOURCE_TITLES[lang];
-  const isEn = lang === 'en';
+  const rc = RESOURCE_CARDS[lang] ?? RESOURCE_CARDS.en;
 
   return (
     <section aria-label="Education resources" className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 border-t-3 border-neo-black/30">
@@ -238,50 +282,46 @@ function EducationResourceLinks({ locale }: { locale: string }) {
         </Link>
       </div>
 
-      {isEn && (
-        <>
-          <h2 className="mt-12 font-neo-display text-2xl sm:text-3xl font-black uppercase text-neo-white">
-            Teacher Guides
-          </h2>
-          <p className="mt-2 max-w-2xl text-sm sm:text-base text-neo-gray-200">
-            Deep-dive landing pages on specific use cases, with comparison tables, FAQs, and free word lists.
-          </p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Link
-              href={`/${locale}/education/vocabulary-games-classroom`}
-              className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
-            >
-              <span className="inline-block border-2 border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">Guide</span>
-              <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">Vocabulary Games for the Classroom</h3>
-              <p className="mt-2 text-xs text-neo-gray-200">No signup, 5 languages, free forever — vs Quizlet/Kahoot/Wordwall.</p>
-            </Link>
-            <Link
-              href={`/${locale}/education/esl-word-games`}
-              className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
-            >
-              <span className="inline-block border-2 border-neo-black bg-neo-cyan px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">ESL</span>
-              <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">ESL Word Games Online</h3>
-              <p className="mt-2 text-xs text-neo-gray-200">CEFR-scaled (A1→C2), 5 dictionaries, no student signup.</p>
-            </Link>
-            <Link
-              href={`/${locale}/education/games-for-teachers`}
-              className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
-            >
-              <span className="inline-block border-2 border-neo-black bg-neo-purple px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white">For Teachers</span>
-              <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">Word Games for Teachers</h3>
-              <p className="mt-2 text-xs text-neo-gray-200">Sub-day, brain-break, warm-up — zero prep, free forever.</p>
-            </Link>
-            <Link
-              href={`/${locale}/education/spelling-bee-practice`}
-              className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
-            >
-              <span className="inline-block border-2 border-neo-black bg-neo-pink px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white">Spelling Bee</span>
-              <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">Spelling Bee Practice Online</h3>
-              <p className="mt-2 text-xs text-neo-gray-200">4-week training plan, custom word lists, 1v1 duels — Scripps prep.</p>
-            </Link>
-          </div>
-        </>
-      )}
+      <h2 className="mt-12 font-neo-display text-2xl sm:text-3xl font-black uppercase text-neo-white">
+        {rc.heading}
+      </h2>
+      <p className="mt-2 max-w-2xl text-sm sm:text-base text-neo-gray-200">
+        {rc.subhead}
+      </p>
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Link
+          href={`/${locale}/education/vocabulary-games-classroom`}
+          className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+        >
+          <span className="inline-block border-2 border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">{rc.vocab.badge}</span>
+          <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.vocab.title}</h3>
+          <p className="mt-2 text-xs text-neo-gray-200">{rc.vocab.desc}</p>
+        </Link>
+        <Link
+          href={`/${locale}/education/esl-word-games`}
+          className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+        >
+          <span className="inline-block border-2 border-neo-black bg-neo-cyan px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">{rc.esl.badge}</span>
+          <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.esl.title}</h3>
+          <p className="mt-2 text-xs text-neo-gray-200">{rc.esl.desc}</p>
+        </Link>
+        <Link
+          href={`/${locale}/education/games-for-teachers`}
+          className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+        >
+          <span className="inline-block border-2 border-neo-black bg-neo-purple px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white">{rc.teachers.badge}</span>
+          <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.teachers.title}</h3>
+          <p className="mt-2 text-xs text-neo-gray-200">{rc.teachers.desc}</p>
+        </Link>
+        <Link
+          href={`/${locale}/education/spelling-bee-practice`}
+          className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+        >
+          <span className="inline-block border-2 border-neo-black bg-neo-pink px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white">{rc.spelling.badge}</span>
+          <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.spelling.title}</h3>
+          <p className="mt-2 text-xs text-neo-gray-200">{rc.spelling.desc}</p>
+        </Link>
+      </div>
     </section>
   );
 }

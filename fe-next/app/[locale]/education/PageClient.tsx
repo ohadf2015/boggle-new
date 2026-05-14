@@ -10,6 +10,7 @@ import { SixModeTour } from '@/components/education/SixModeTour';
 import { ComparisonStrip } from '@/components/education/ComparisonStrip';
 import { EducationFAQ } from '@/components/education/EducationFAQ';
 import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
+import { TeacherWelcomeBanner } from '@/components/education/TeacherWelcomeBanner';
 import {
   educationOrganizationJsonLd,
   breadcrumbJsonLd,
@@ -56,6 +57,15 @@ export function PageClient() {
 
   return (
     <main className="min-h-screen bg-neo-navy">
+      {/* Teacher welcome banner for newly-approved teachers */}
+      {hasTeacherAccess && (
+        <div className="px-4 py-4">
+          <div className="mx-auto max-w-4xl">
+            <TeacherWelcomeBanner hasAccess={hasTeacherAccess} />
+          </div>
+        </div>
+      )}
+
       {/* Auth-aware shortcut for teachers */}
       {hasTeacherAccess && (
         <div

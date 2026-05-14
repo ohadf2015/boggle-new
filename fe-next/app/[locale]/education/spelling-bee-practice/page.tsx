@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import { getSpellingBeeContent, type EducationLocale } from './content';
+import { EducationHeroBanner } from '@/components/education/EducationHeroBanner';
 import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
+import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -10,40 +13,58 @@ interface PageProps {
 const BASE_URL = 'https://www.lexiclash.live';
 const PAGE_PATH = '/education/spelling-bee-practice';
 
+const OG_IMAGE: Record<string, string> = {
+  en: 'education-hero-en.webp',
+  he: 'education-hero-he.webp',
+  sv: 'education-hero-sv.webp',
+  ja: 'education-hero-ja.webp',
+  es: 'education-hero-es.webp',
+};
+
+const OG_LOCALE: Record<string, string> = {
+  en: 'en_US',
+  he: 'he_IL',
+  sv: 'sv_SE',
+  ja: 'ja_JP',
+  es: 'es_ES',
+};
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  const isEn = locale === 'en';
-  const pageUrl = `${BASE_URL}/en${PAGE_PATH}`;
+  const pageUrl = `${BASE_URL}/${locale}${PAGE_PATH}`;
+  const c = getSpellingBeeContent(locale);
+  const ogImage = `${BASE_URL}/images/${OG_IMAGE[locale] ?? OG_IMAGE.en}`;
+  const ogLocale = OG_LOCALE[locale] ?? 'en_US';
   return {
-    title: 'Spelling Bee Practice Online — Free Word Games for Spelling Champions | LexiClash',
-    description: 'Free online spelling bee practice through word games. Boggle-style grids, anagram drills, word wheels, and 1v1 spelling duels. No signup, no app — just open the browser and start practicing for Scripps, regional bees, or classroom spelling tests.',
+    title: c.metaTitle,
+    description: c.metaDescription,
     keywords: 'spelling bee practice online, online spelling bee practice, spelling bee training, spelling games online, spelling practice free, scripps spelling bee practice, classroom spelling bee, spelling games for kids, spelling bee online, spelling competition practice',
     openGraph: {
-      title: 'Spelling Bee Practice Online — Free | LexiClash',
-      description: 'Free word games for spelling-bee training. Boggle, anagrams, word wheels, 1v1 duels.',
-      locale: 'en_US',
+      title: c.metaTitle,
+      description: c.metaDescription,
+      locale: ogLocale,
       type: 'website',
       url: pageUrl,
-      images: [{ url: `${BASE_URL}/og-image-en.webp`, width: 1200, height: 630, alt: 'LexiClash spelling bee practice' }],
+      images: [{ url: ogImage, width: 1200, height: 675, alt: c.metaTitle }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Free Spelling Bee Practice | LexiClash',
-      description: 'Word games for spelling-bee training. No signup.',
-      images: [`${BASE_URL}/og-image-en.webp`],
+      title: c.metaTitle,
+      description: c.metaDescription,
+      images: [ogImage],
     },
     alternates: {
       canonical: pageUrl,
       languages: {
-        'x-default': pageUrl,
-        en: pageUrl,
-        he: `${BASE_URL}/he/education`,
-        sv: `${BASE_URL}/sv/education`,
-        ja: `${BASE_URL}/ja/education`,
-        es: `${BASE_URL}/es/education`,
+        'x-default': `${BASE_URL}/en${PAGE_PATH}`,
+        en: `${BASE_URL}/en${PAGE_PATH}`,
+        he: `${BASE_URL}/he${PAGE_PATH}`,
+        sv: `${BASE_URL}/sv${PAGE_PATH}`,
+        ja: `${BASE_URL}/ja${PAGE_PATH}`,
+        es: `${BASE_URL}/es${PAGE_PATH}`,
       },
     },
-    robots: isEn ? { index: true, follow: true } : { index: false, follow: true },
+    robots: { index: true, follow: true },
   };
 }
 
@@ -137,8 +158,13 @@ export default async function Page({ params }: PageProps) {
       <Script id="ld-sb-breadcrumb" type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</Script>
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        {/* Hero banner with per-locale image */}
+        <EducationHeroBanner
+          title="Spelling Bee Practice Online. Free."
+          subtitle="Free online spelling bee practice through word games. Boggle-style grids, anagram drills, word wheels, and 1v1 spelling duels. No signup, no app — just open the browser and start practicing for Scripps, regional bees, or classroom spelling tests."
+        />
 
-        <section className="grid items-center gap-10 lg:grid-cols-12">
+        <section className="grid items-center gap-10 lg:grid-cols-12 mt-12">
           <div className="lg:col-span-8">
             <span className="inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">
               ★ Spelling Bee Prep ★ Free Forever ★
@@ -165,7 +191,7 @@ export default async function Page({ params }: PageProps) {
           </div>
         </section>
 
-        <section className="mt-20">
+        <ScrollRevealSection className="mt-20">
           <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
             Four <span className="text-neo-lime">drill modes</span>.
           </h2>
@@ -178,16 +204,16 @@ export default async function Page({ params }: PageProps) {
               </Link>
             ))}
           </div>
-        </section>
+        </ScrollRevealSection>
 
-        <section className="mt-20">
+        <ScrollRevealSection className="mt-20">
           <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
             4-week <span className="text-neo-cyan">training plan</span>.
           </h2>
           <p className="mb-6 max-w-2xl text-sm text-neo-gray-200">A structured prep routine for serious spelling-bee competitors. 10-15 minute daily sessions, distributed over 4 weeks.</p>
           <div className="space-y-3">
             {trainingPlan.map((p) => (
-              <div key={p.week} className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard">
+              <div key={p.week} className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:shadow-hard-lg hover:-translate-x-0.5 hover:-translate-y-0.5">
                 <div className="flex flex-wrap items-baseline gap-3">
                   <span className="border-2 border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-[11px] font-black uppercase tracking-widest text-neo-navy">{p.week}</span>
                   <h3 className="font-neo-display text-base font-black uppercase">{p.focus}</h3>
@@ -196,9 +222,9 @@ export default async function Page({ params }: PageProps) {
               </div>
             ))}
           </div>
-        </section>
+        </ScrollRevealSection>
 
-        <section className="mt-20">
+        <ScrollRevealSection className="mt-20">
           <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">
             Spelling-bee <span className="text-neo-pink">FAQ</span>.
           </h2>
@@ -213,7 +239,7 @@ export default async function Page({ params }: PageProps) {
               </details>
             ))}
           </div>
-        </section>
+        </ScrollRevealSection>
 
         <section className="mt-20 mb-12 rounded-neo border-4 border-neo-black bg-neo-yellow p-8 text-neo-navy shadow-hard-xl sm:p-12">
           <h2 className="font-neo-display text-4xl font-black leading-[0.95] sm:text-5xl">

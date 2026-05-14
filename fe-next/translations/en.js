@@ -6895,8 +6895,11 @@ const en = {
       "rate_limited": "Too many requests. Please try again in 24 hours.",
       "success_title": "Application sent!",
       "success_body": "We will review and email you within 24 hours.",
+      "success_next": "We'll review your application and email you within 1-2 business days. You can close this page.",
       "pending_title": "Your request is pending review",
       "pending_body": "We have received your application and will email you soon.",
+      "declined_title": "Your request was not approved",
+      "declined_reapply": "You can submit another application anytime. Let us know if you have questions.",
       "submitted_on": "Submitted",
       "already_approved_title": "You already have teacher access.",
       "go_to_teacher": "Open Teacher Dashboard",
@@ -6913,6 +6916,11 @@ const en = {
       "try_mp": "Play Multiplayer",
       "try_blast": "Try Blast",
       "try_daily": "Daily Challenge"
+    },
+    "teacher": {
+      "welcome_banner_title": "You're approved! Welcome, teacher! 🎉",
+      "welcome_banner_body": "Your teacher account is ready. You can now create classes, assign games, and track student progress.",
+      "welcome_banner_dismiss": "Got it"
     }
   },
   "tvTutorial": {
@@ -10276,6 +10284,52 @@ const en = {
       "streakWarning": "Streak at Risk Warning",
       "friendInvites": "Friend Challenge Invites",
       "weeklySummary": "Weekly Summary"
+    },
+    "teacherAccess": {
+      "title": "Teacher Access Requests",
+      "count": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "declined": "Declined",
+        "total": "Total"
+      },
+      "filter_status": "Status",
+      "filter_status_all": "All statuses",
+      "filter_locale": "Language",
+      "filter_country": "Country",
+      "refresh": "Refresh",
+      "row_open": "Open request from {name}",
+      "col": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "locale": "Language",
+        "country": "Country",
+        "status": "Status",
+        "submitted": "Submitted"
+      },
+      "page": "Page",
+      "export_csv": "Export CSV",
+      "close": "Close",
+      "drawer_title": "Teacher Access Request Details",
+      "field": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "locale": "Language",
+        "country": "Country",
+        "school": "School/Organization",
+        "status": "Status",
+        "submitted": "Submitted",
+        "use_case": "Use Case"
+      },
+      "admin_note": "Admin Note",
+      "approve": "Approve",
+      "decline": "Decline",
+      "approveSuccess": "Request approved successfully",
+      "declineSuccess": "Request declined successfully",
+      "approveError": "Failed to approve request",
+      "declineError": "Failed to decline request"
     }
   },
   "native": {

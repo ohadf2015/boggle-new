@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
 import { getEslWordGamesContent, EDUCATION_LOCALES, type EducationLocale } from './content';
+import { EducationHeroBanner } from '@/components/education/EducationHeroBanner';
 import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
+import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
 import { educationCourseJsonLd } from '@/lib/seo/educationStructuredData';
 
 interface PageProps {
@@ -12,12 +14,21 @@ interface PageProps {
 const BASE_URL = 'https://www.lexiclash.live';
 const PAGE_PATH = '/education/esl-word-games';
 
+const OG_IMAGE: Record<string, string> = {
+  en: 'education-hero-en.webp',
+  he: 'education-hero-he.webp',
+  sv: 'education-hero-sv.webp',
+  ja: 'education-hero-ja.webp',
+  es: 'education-hero-es.webp',
+};
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const isTargetLocale = EDUCATION_LOCALES.includes(locale as EducationLocale);
   const pageUrl = `${BASE_URL}/${locale}${PAGE_PATH}`;
   const c = getEslWordGamesContent(locale);
   const ogLocale = locale === 'he' ? 'he_IL' : locale === 'es' ? 'es_ES' : locale === 'sv' ? 'sv_SE' : locale === 'ja' ? 'ja_JP' : 'en_US';
+  const ogImage = `${BASE_URL}/images/${OG_IMAGE[locale as EducationLocale] ?? OG_IMAGE.en}`;
   return {
     title: c.metaTitle,
     description: c.metaDescription,
@@ -28,13 +39,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: ogLocale,
       type: 'website',
       url: pageUrl,
-      images: [{ url: `${BASE_URL}/og-image-en.webp`, width: 1200, height: 630, alt: 'LexiClash ESL word games' }],
+      images: [{ url: ogImage, width: 1200, height: 675, alt: c.ogTitle }],
     },
     twitter: {
       card: 'summary_large_image',
       title: c.ogTitle,
       description: c.twitterDescription,
-      images: [`${BASE_URL}/og-image-en.webp`],
+      images: [ogImage],
     },
     alternates: {
       canonical: pageUrl,
@@ -52,22 +63,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 
-const features = [
-  { icon: '🌍', text: 'Five built-in dictionaries: English, Spanish, Hebrew (RTL), Swedish, Japanese' },
-  { icon: '⚡', text: 'Free student accounts — quick one-time setup, then tracks progress forever' },
-  { icon: '👥', text: 'Live multiplayer up to 30 students; pair-up duels for 2-by-2 practice' },
-  { icon: '📈', text: 'Per-student accuracy + class-wide missed-word patterns' },
-  { icon: '🎯', text: 'Three game modes: Boggle grid, Word Hunt, Word Wheel' },
-  { icon: '📱', text: 'Works on any phone, tablet, Chromebook, or laptop browser' },
-  { icon: '⏱️', text: '5-minute warm-up format fits any lesson plan' },
-  { icon: '💸', text: 'Completely free — no premium tier, no per-seat fee' },
-];
-
-const proficiencyLevels = [
-  { tag: 'A1-A2', title: 'Beginner', desc: '3-4 letter words, longer timer, sight-word focus. Use the Word Wheel mode for guided practice.' },
-  { tag: 'B1-B2', title: 'Intermediate', desc: 'Mixed lengths, standard timer. Boggle grid surfaces vocabulary patterns and prefixes.' },
-  { tag: 'C1-C2', title: 'Advanced', desc: 'Long words, tight timer, custom advanced lists (TOEFL, IELTS, academic vocab).' },
-];
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
@@ -127,8 +122,13 @@ export default async function Page({ params }: PageProps) {
       <Script id="ld-esl-course" type="application/ld+json">{JSON.stringify(courseJsonLd)}</Script>
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        {/* Hero banner with per-locale image */}
+        <EducationHeroBanner
+          title={`${c.heroH1.highlight} ${c.heroH1.rest1} ${c.heroH1.rest2}`}
+          subtitle={c.heroSubtitle}
+        />
 
-        <section className="grid items-center gap-10 lg:grid-cols-12">
+        <section className="grid items-center gap-10 lg:grid-cols-12 mt-12">
           <div className="lg:col-span-8">
             <span className="inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-cyan px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">
               {c.heroTag}
@@ -153,37 +153,37 @@ export default async function Page({ params }: PageProps) {
           </div>
         </section>
 
-        <section className="mt-20">
+        <ScrollRevealSection className="mt-20">
           <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            Built for <span className="text-neo-cyan">English learners</span>.
+            {c.sections.builtFor}
           </h2>
           <ul className="grid gap-3 sm:grid-cols-2">
-            {features.map((f, i) => (
-              <li key={f.text} className="flex items-start gap-4 rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard"
+            {c.features.map((f, i) => (
+              <li key={f.text} className="flex items-start gap-4 rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard transition-all hover:shadow-hard-lg hover:-translate-x-0.5 hover:-translate-y-0.5"
                   style={{ transform: i % 3 === 0 ? 'rotate(-0.4deg)' : i % 3 === 1 ? 'rotate(0.3deg)' : 'rotate(0deg)' }}>
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-neo border-3 border-neo-black bg-neo-cyan text-xl shadow-hard-sm" aria-hidden="true">{f.icon}</span>
                 <p className="pt-1.5 text-sm sm:text-base">{f.text}</p>
               </li>
             ))}
           </ul>
-        </section>
+        </ScrollRevealSection>
 
-        <section className="mt-20">
+        <ScrollRevealSection className="mt-20">
           <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            Scale to <span className="text-neo-lime">CEFR</span> level.
+            {c.sections.scaleToCefr}
           </h2>
           <div className="grid gap-4 sm:grid-cols-3">
-            {proficiencyLevels.map((p) => (
-              <div key={p.title} className="relative rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard">
+            {c.proficiencyLevels.map((p) => (
+              <div key={p.title} className="relative rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:shadow-hard-lg hover:-translate-x-0.5 hover:-translate-y-0.5">
                 <span className="absolute -top-3 left-3 border-2 border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">{p.tag}</span>
                 <h3 className="mt-2 font-neo-display text-lg font-black">{p.title}</h3>
                 <p className="mt-2 text-sm text-neo-gray-200">{p.desc}</p>
               </div>
             ))}
           </div>
-        </section>
+        </ScrollRevealSection>
 
-        <section className="mt-20">
+        <ScrollRevealSection className="mt-20">
           <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">
             {c.faqTitle}
           </h2>
@@ -198,7 +198,7 @@ export default async function Page({ params }: PageProps) {
               </details>
             ))}
           </div>
-        </section>
+        </ScrollRevealSection>
 
         <nav className="mt-16 flex flex-wrap gap-3 text-sm font-bold" aria-label="Related education resources">
           <Link href={`/${locale}/education/vocabulary-games-classroom`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-lime transition-all hover:bg-neo-navy">→ Classroom Vocabulary Games</Link>
@@ -208,16 +208,15 @@ export default async function Page({ params }: PageProps) {
 
         <section className="mt-12 mb-12 rounded-neo border-4 border-neo-black bg-neo-cyan p-8 text-neo-navy shadow-hard-xl sm:p-12">
           <h2 className="font-neo-display text-4xl font-black leading-[0.95] sm:text-5xl">
-            Five minutes left?
-            <br /><span className="bg-neo-navy px-3 text-neo-cyan">Run a vocab round.</span>
+            {c.sections.ctaHeading}
+            <br /><span className="bg-neo-navy px-3 text-neo-cyan">{c.sections.ctaSubtitle}</span>
           </h2>
-          <p className="mt-4 max-w-xl text-base font-bold sm:text-lg">{c.heroSubtitle}</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-cyan shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg">
-              ▶ Start ESL Game
+              {c.sections.ctaPrimaryButtonLabel}
             </Link>
             <Link href={`/${locale}/education/vocabulary-games-classroom`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg">
-              See Classroom Games
+              {c.sections.ctaSecondaryButtonLabel}
             </Link>
           </div>
         </section>

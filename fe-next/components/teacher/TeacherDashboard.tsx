@@ -13,8 +13,10 @@ import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { TeacherOnboarding } from '@/components/education/TeacherOnboarding';
+import { TeacherWelcomeBanner } from '@/components/education/TeacherWelcomeBanner';
 import { cn } from '@/lib/utils';
 import ClassroomManager from './ClassroomManager';
 import LessonBuilder from './LessonBuilder';
@@ -55,6 +57,7 @@ const slideUp = {
 
 export default function TeacherDashboard() {
   const { t, language } = useLanguage();
+  const { profile } = useAuth();
   const router = useRouter();
   const isRTL = language === 'he';
   const [activeTab, setActiveTab] = useState<Tab>('play');
@@ -62,6 +65,9 @@ export default function TeacherDashboard() {
   const { getMostRecent, hasRecentConfig } = useRecentGameSettings();
   const { classrooms } = useClassrooms();
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
+
+  // Check if user has teacher access
+  const hasTeacherAccess = profile?.user_role === 'teacher' || profile?.is_admin === true;
 
   useEffect(() => {
     if (classrooms.length >= 1 && !selectedClassroomId) {
@@ -114,6 +120,13 @@ export default function TeacherDashboard() {
             {t('teacher.dashboard.subtitle')}
           </p>
         </motion.div>
+
+        {/* Teacher Welcome Banner */}
+        {hasTeacherAccess && (
+          <motion.div variants={slideUp} className="mb-6">
+            <TeacherWelcomeBanner hasAccess={hasTeacherAccess} />
+          </motion.div>
+        )}
 
         {/* Tab Bar */}
         <motion.div variants={slideUp} className="mb-6">

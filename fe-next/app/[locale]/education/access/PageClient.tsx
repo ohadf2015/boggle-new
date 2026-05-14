@@ -35,7 +35,19 @@ export function PageClient() {
           </div>
         )}
 
-        {!hasAccess && status !== 'pending' && (
+        {!hasAccess && status === 'declined' && (
+          <div className="mt-6 rounded-neo border-neo bg-neo-pink p-6 text-neo-white shadow-hard">
+            <h2 className="text-xl font-bold font-neo-display">{t('education.access.declined_title')}</h2>
+            {latestRequest?.admin_note && (
+              <div className="mt-3 rounded bg-neo-white/20 p-3">
+                <p className="text-sm">{latestRequest.admin_note}</p>
+              </div>
+            )}
+            <p className="mt-3 text-sm text-neo-white/80">{t('education.access.declined_reapply')}</p>
+          </div>
+        )}
+
+        {!hasAccess && status !== 'pending' && status !== 'declined' && (
           <div className="mt-6 rounded-neo border-neo bg-neo-white p-6 text-neo-navy shadow-hard-lg">
             <AccessRequestForm />
           </div>

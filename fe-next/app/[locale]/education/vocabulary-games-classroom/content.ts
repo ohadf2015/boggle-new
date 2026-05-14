@@ -17,6 +17,25 @@ export type LocaleContent = {
   whyPoints: [string, string, string, string];
   faqTitle: string;
   faqs: Array<{ q: string; a: string }>;
+  features: Array<{ icon: string; text: string }>;
+  compareRows: Array<readonly [string, string, string, string, string]>;
+  useCases: Array<{ tag: string; title: string; desc: string }>;
+  ctaHeading: string;
+  ctaSubtitle: string;
+  ctaPrimaryButtonLabel: string;
+  ctaSecondaryButtonLabel: string;
+  metadataLabels: {
+    languages: string;
+    gradeLevel: string;
+    accounts: string;
+    duration: string;
+  };
+  sections: {
+    whatYouGet: string;
+    comparison: string;
+    comparisonSubtitle: string;
+    howTeachersUse: string;
+  };
 };
 
 export const EDUCATION_LOCALES = ['en', 'he', 'es', 'sv', 'ja'] as const;
@@ -76,17 +95,59 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
         a: 'LexiClash is browser-based and runs on any internet connection. Works on school WiFi, tablets, Chromebooks, and desktops.',
       },
     ],
+    features: [
+      { icon: '⚡', text: 'Free student accounts — quick signup, tracks XP and progress across sessions' },
+      { icon: '🎯', text: 'Three game modes: Boggle grid, Word Hunt, Word Wheel' },
+      { icon: '👥', text: 'Live multiplayer up to 30 students per session' },
+      { icon: '⚔️', text: '1v1 vocabulary duels for paired practice or sub-team rounds' },
+      { icon: '📚', text: 'Upload your own curriculum word lists — any unit, any subject' },
+      { icon: '🌍', text: 'Five languages: English, Hebrew (RTL), Spanish, Swedish, Japanese' },
+      { icon: '📊', text: 'Teacher dashboard: per-student accuracy + missed-word patterns' },
+      { icon: '💸', text: 'Free tier covers everything — no premium upsell' },
+    ],
+    compareRows: [
+      ['Free tier (full features)', '✓', 'Limited', '✓ basic', 'Limited'],
+      ['Free student accounts', '✓ always free', '✗ paid tiers', '✗ paid tiers', '✗ paid tiers'],
+      ['Word-formation gameplay', '✓ Boggle/Wheel/Anagram', '✗ flashcards', '✗ templates', '✗ quizzes'],
+      ['Live whole-class multiplayer', '✓', '✓ paid', '✗', '✓'],
+      ['1v1 vocabulary duels', '✓', '✓ paid', '✗', '✗'],
+      ['5 languages incl. RTL', '✓', '✗', '✗', '✗'],
+      ['Custom word lists', '✓', '✓', '✓', '✓'],
+      ['Class analytics dashboard', '✓ free', '✓ paid', 'Basic', '✓ paid'],
+    ],
+    useCases: [
+      { tag: 'WARM-UP', title: '5-minute opener', desc: 'Spin a quick Word Wheel from yesterday\'s vocabulary list to wake the class up.' },
+      { tag: 'REVIEW', title: 'End-of-unit recap', desc: 'Run a whole-class Boggle round on the unit\'s 30 target words; dashboard surfaces gaps.' },
+      { tag: 'ESL', title: 'Target-language practice', desc: 'Play in students\' target language — supports EN, HE, ES, SV, JA dictionaries.' },
+      { tag: 'SUB DAY', title: 'Substitute teacher activity', desc: 'Zero prep — sub picks a list, projects a code, students play. Done in 10 minutes.' },
+    ],
+    ctaHeading: 'Ten minutes left in class?',
+    ctaSubtitle: 'Pick a list. Show the code. Play. Review the dashboard. That\'s the whole loop.',
+    ctaPrimaryButtonLabel: '▶ Start Classroom Game',
+    ctaSecondaryButtonLabel: 'See Education Hub',
+    metadataLabels: {
+      languages: '5 languages',
+      gradeLevel: 'K-12 + adult ESL',
+      accounts: 'free student accounts',
+      duration: '5-min sessions',
+    },
+    sections: {
+      whatYouGet: 'What you get.',
+      comparison: 'LexiClash vs the usual suspects.',
+      comparisonSubtitle: 'A teacher-honest comparison. We\'re not for everyone — just for teachers who want word games without a paywall.',
+      howTeachersUse: 'How teachers use it.',
+    },
   },
 
   he: {
     metaTitle: 'משחקי אוצר מילים חינמיים בכיתה — ריבוי משתתפים חי, 5 שפות | LexiClash',
     metaDescription:
-      'משחקי אוצר מילים חינמיים לכיתה. משחקי ריבוי משתתפים חיים לכיתה שלמה, דו־קרב אוצר מילים 1v1, וריאות מילים מותאמות לתוכנית הלימודים. תמיכה באנגלית, ספרדית, עברית, שוודית, ויפנית. פועל בכל דפדפן. חינם לתמיד.',
+      'משחקי אוצר מילים חינמיים לכיתה. ריבוי משתתפים חי בכיתה שלמה, דו־קרבות אוצר מילים 1v1, ורשימות מילים מהתוכנית. אנגלית, ספרדית, עברית, שוודית, יפנית. כל דפדפן. לתמיד חינם.',
     ogTitle: 'משחקי אוצר מילים חינמיים לכיתה',
     ogDescription:
-      'משחקי אוצר מילים חיים ריבוי משתתפים למורים. אתגרים לכיתה שלמה, דו־קרבות 1v1, רשימות מילים מותאמות, 5 שפות. חשבונות תלמידים תמיד חינמיים.',
+      'משחקי ריבוי משתתפים חיים למורים. אתגרים לכיתה שלמה, דו־קרבות 1v1, רשימות מילים משלכם, 5 שפות. חשבונות תלמידים תמיד חינמיים.',
     twitterDescription:
-      'משחק אוצר המילים בכיתה שמורים באמת משתמשים בו. משחקי ריבוי משתתפים חיים, דו־קרבות, רשימות המילים שלך, חמש שפות — חשבונות תלמידים תמיד חינמיים.',
+      'משחק אוצר המילים שמורים באמת משתמשים בו. ריבוי משתתפים חי, דו־קרבות, הרשימות שלכם, 5 שפות — חשבונות תלמידים חינמיים לתמיד.',
     heroTag: '★ למורים ★ חינם לתמיד ★',
     heroH1: {
       line1: 'חינם',
@@ -95,54 +156,96 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       line3: 'חשבונות חינמיים.',
     },
     heroSubtitle:
-      'משחק אוצר המילים בכיתה שמורים באמת משתמשים בו. משחקי ריבוי משתתפים חיים, דו־קרבות, רשימות המילים שלך, חמש שפות — חשבונות תלמידים תמיד חינמיים.',
+      'משחק אוצר המילים שמורים באמת משתמשים בו. ריבוי משתתפים חי, דו־קרבות, הרשימות שלכם, 5 שפות — חשבונות תלמידים חינמיים לתמיד.',
     ctaSubLabel: 'חינם · חשבונות תלמידים חינמיים',
     whyTitle: 'למה מורים בוחרים ב־LexiClash',
     whyPoints: [
-      'חשבונות תלמידים חינמיים. הרשמה מהירה בן 30 שנייה, ואז עוקב אחר נקודות והתקדמות לתמיד.',
-      'יצירת מילים, לא כרטיסי זיכרון. עדיף מ־Quizlet לאיות ו־recall.',
-      'חמש שפות עם מילונים מלאים. ESL, טבילה בעברית, דוּאָלִית בספרדית — הכל מקומי.',
-      'שכבה חינמית = כל התכונות. ללא פרמיום, ללא מודעות בכיתה.',
+      'חשבונות תלמידים חינמיים. הרשמה של 30 שניות, ואז עוקב אחר התקדמות לתמיד.',
+      'משחקי יצירת מילים, לא כרטיסיות. עדיף מ־Quizlet לאיות וזיכרון.',
+      '5 שפות עם מילונים מלאים. ESL, טבילה בעברית, ספרדית דו־לשונית — הכל בשפת אם.',
+      'כל התכונות בחינם. ללא פרמיום, ללא מודעות בכיתה.',
     ],
     faqTitle: 'שאלות נפוצות',
     faqs: [
       {
         q: 'האם תלמידים צריכים להירשם?',
-        a: 'כן, אבל זה חינם וקוקח 30 שניות. דוא״ל אחד או חשבון Google, וזהו. ללא כרטיס אשראי, ללא עלות נוספת.',
+        a: 'כן, אבל זה חינם וקוקח 30 שניות. דוא״ל אחד או חשבון Google — זהו. אין כרטיס אשראי, אין הפתעות.',
       },
       {
-        q: 'האם אנחנו יכולים להשתמש בריאות המילים שלנו?',
-        a: 'כן. העלו רשימת מילים מותאמת בלוח המורים שלכם, ואז הפעילו משחקי כיתה או דו־קרבות תוך שימוש בקוצ שלכם.',
+        q: 'האם אנחנו יכולים להשתמש ברשימות המילים שלנו?',
+        a: 'כן. העלו את רשימת המילים שלכם בדשבורד המורים, ואז הפעילו משחקי כיתה או דו־קרבות עם הקוצ שלכם.',
       },
       {
-        q: 'כמה זמן משחקים מקחים?',
-        a: 'משחקים נמשכים 3–5 דקות, מושלם לחימום, מעברים, או הפסקות פעילות. זמן קושי וזמן מגבילים ניתנים להתאמה.',
+        q: 'כמה זמן נמשכים משחקים?',
+        a: '3–5 דקות. מושלם לחימום, מעברים בין שיעורים, או הפסקות קטנות. אפשר להתאים את הקושי והזמן.',
       },
       {
-        q: 'איזה רמות כיתה זה תומך?',
-        a: 'מעוצב לכיתות 4–12, תוכניות ESL, חניכים למבוגרים, וכיתות דוּאָלִיוֹת. קושי מתאים לכל משחק.',
+        q: 'איזה גילאים זה מתאים?',
+        a: 'כיתות 4–12, תוכניות ESL, למידה למבוגרים, וכיתות דו־לשוניות. הקושי משתנה לפי משחק.',
       },
       {
-        q: 'האם אתם מוכרים נתוני תלמידים?',
-        a: 'לא. אנחנו לעולם לא מוכרים או משתפים נתוני תלמידים. תואם הורים/FERPA. מדיניות פרטיות מלאה זמינה.',
+        q: 'האם אתם מוכרים את הנתונים של התלמידים?',
+        a: 'לא. לעולם לא מוכרים ולא משתפים נתוני תלמידים. תואם FERPA. מדיניות פרטיות מלאה זמינה.',
       },
       {
-        q: 'מה לגבי בתי ספר לא מקוונים?',
-        a: 'LexiClash מבוסס דפדפן ופועל על כל חיבור אינטרנט. עובד על WiFi בבית ספר, טאבלטים, Chromebooks ושולחן עבודה.',
+        q: 'מה עם בתי ספר עם WiFi בעיתי?',
+        a: 'LexiClash פועל בכל דפדפן, בכל חיבור אינטרנט. עובד ב־WiFi בית ספרי, טאבלטים, Chromebooks וכל מכשיר.',
       },
     ],
+    features: [
+      { icon: '⚡', text: 'חשבונות חינמיים — הרשמה של 30 שניות, וריצה מלאה של התקדמות בכל סשן' },
+      { icon: '🎯', text: '3 משחקים: Boggle, Word Hunt, Word Wheel' },
+      { icon: '👥', text: 'ריבוי משתתפים חי — עד 30 תלמידים בסשן אחד' },
+      { icon: '⚔️', text: 'דו־קרבות 1v1 לתרגול זוגות או סיבובי קבוצות' },
+      { icon: '📚', text: 'העלו את רשימות המילים שלכם — כל יחידה, כל מקצוע' },
+      { icon: '🌍', text: '5 שפות: אנגלית, עברית (RTL), ספרדית, שוודית, יפנית' },
+      { icon: '📊', text: 'דשבורד למורים: דיוק לכל תלמיד + אנליטיקה של מילים קשות' },
+      { icon: '💸', text: 'הכל בחינם — אין פרמיום' },
+    ],
+    compareRows: [
+      ['כל התכונות בחינם', '✓', 'מוגבל', '✓ בסיסי', 'מוגבל'],
+      ['חשבונות תלמידים חינמיים', '✓ תמיד', '✗ בתשלום', '✗ בתשלום', '✗ בתשלום'],
+      ['משחקי יצירת מילים', '✓ Boggle/Wheel/Anagram', '✗ כרטיסיות', '✗ תבניות', '✗ חידונים'],
+      ['ריבוי משתתפים חי', '✓', '✓ בתשלום', '✗', '✓'],
+      ['דו־קרבות 1v1', '✓', '✓ בתשלום', '✗', '✗'],
+      ['5 שפות + RTL', '✓', '✗', '✗', '✗'],
+      ['רשימות מילים משלכם', '✓', '✓', '✓', '✓'],
+      ['דשבורד אנליטיקה', '✓ חינם', '✓ בתשלום', 'בסיסי', '✓ בתשלום'],
+    ],
+    useCases: [
+      { tag: 'חימום', title: 'פתיחה של 5 דקות', desc: 'Word Wheel מהיר מהרשימה של אתמול — מעיר את הכיתה.' },
+      { tag: 'חזרה', title: 'סיכום בסוף היחידה', desc: 'סיבוב Boggle על 30 המילים; הדשבורד מציג מילים שצריך לחזור עליהן.' },
+      { tag: 'ESL', title: 'תרגול בשפת היעד', desc: 'משחק בשפת הלימוד של התלמידים — EN, HE, ES, SV, JA.' },
+      { tag: 'יום חלופי', title: 'פעילות ליום ללא מורה', desc: 'ללא הכנה — בחר רשימה, שתף קוד, תלמידים משחקים. 10 דקות וסיים.' },
+    ],
+    ctaHeading: 'עשר דקות נותרו בשיעור?',
+    ctaSubtitle: 'בחר רשימה. הצג קוד. משחק. בדוק את לוח המחוונים. זהו כל הלולאה.',
+    ctaPrimaryButtonLabel: '▶ התחל משחק כיתה',
+    ctaSecondaryButtonLabel: 'ראה מרכז חינוך',
+    metadataLabels: {
+      languages: '5 שפות',
+      gradeLevel: 'כל הגילאים',
+      accounts: 'חשבונות תלמידים חינמיים',
+      duration: 'סשנים של 5 דקות',
+    },
+    sections: {
+      whatYouGet: 'מה אתה מקבל.',
+      comparison: 'LexiClash לעומת האחרים.',
+      comparisonSubtitle: 'השוואה כנה. לא לכולם — למורים שרוצים משחקי מילים בלי paywall.',
+      howTeachersUse: 'איך מורים משתמשים בזה.',
+    },
   },
 
   es: {
     metaTitle: 'Juegos de vocabulario gratis para el aula — Multijugador en vivo, 5 idiomas | LexiClash',
     metaDescription:
-      'Juegos de vocabulario gratis para el aula. Multijugador en vivo para toda la clase, duelos de vocabulario 1v1 y listas de palabras personalizadas. Compatible con inglés, español, hebreo, sueco y japonés. Funciona en cualquier navegador. Gratis para siempre.',
+      'Juegos de vocabulario gratis para la clase. Multijugador en vivo, duelos de vocabulario 1v1, tus listas de palabras. Inglés, español, hebreo, sueco, japonés. Cualquier navegador. Gratis siempre.',
     ogTitle: 'Juegos de vocabulario gratis para el aula',
     ogDescription:
-      'Juegos de vocabulario multijugador en vivo para maestros. Desafíos para toda la clase, duelos 1v1, listas de palabras personalizadas, 5 idiomas. Las cuentas de estudiantes siempre son gratis.',
+      'Juegos de vocabulario en vivo para maestros. Desafíos para toda la clase, duelos 1v1, tus listas, 5 idiomas. Cuentas de estudiantes siempre gratis.',
     twitterDescription:
-      'El juego de vocabulario del aula que los maestros realmente usan. Multijugador en vivo, duelos, tus listas de palabras, cinco idiomas — las cuentas de estudiantes siempre son gratis.',
-    heroTag: '★ Para Maestros ★ Gratis Para Siempre ★',
+      'El juego de vocabulario que los maestros usan. Multijugador en vivo, duelos, tus listas, 5 idiomas — cuentas de estudiantes siempre gratis.',
+    heroTag: '★ Para Maestros ★ Gratis Siempre ★',
     heroH1: {
       line1: 'Gratis',
       highlight: 'Vocabulario',
@@ -150,53 +253,95 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       line3: 'Cuentas gratis.',
     },
     heroSubtitle:
-      'El juego de vocabulario del aula que los maestros realmente usan. Multijugador en vivo, duelos, tus listas de palabras, cinco idiomas — las cuentas de estudiantes siempre son gratis.',
+      'El juego de vocabulario que los maestros usan. Multijugador en vivo, duelos, tus listas, 5 idiomas — cuentas de estudiantes siempre gratis.',
     ctaSubLabel: 'Gratis · Cuentas de estudiantes gratis',
     whyTitle: 'Por qué los maestros eligen LexiClash',
     whyPoints: [
-      'Cuentas de estudiantes gratis. Registro rápido en 30 segundos, luego rastrea XP y progreso para siempre.',
-      'Formación de palabras, no tarjetas. Mejor que Quizlet para ortografía y recuperación de memoria.',
-      'Cinco idiomas con diccionarios completos. ESL, inmersión en hebreo, bilingüe en español — todo nativo.',
-      'Capa gratis = todas las funciones. Sin premium, sin anuncios en el aula.',
+      'Cuentas gratis. Registro en 30 segundos, luego sigue el progreso para siempre.',
+      'Formar palabras, no tarjetas. Mejor que Quizlet para ortografía y memoria.',
+      '5 idiomas con diccionarios completos. ESL, inmersión hebraica, bilingüe español — todo nativo.',
+      'Todo gratis. Sin premium, sin anuncios en clase.',
     ],
     faqTitle: 'Preguntas Frecuentes',
     faqs: [
       {
-        q: '¿Necesitan los estudiantes registrarse?',
-        a: 'Sí, pero es gratis y toma 30 segundos. Un correo electrónico o cuenta de Google, eso es todo. Sin tarjeta de crédito, sin cargos adicionales.',
+        q: '¿Necesitan registrarse los estudiantes?',
+        a: 'Sí, pero es gratis y toma 30 segundos. Correo o cuenta Google. Sin tarjeta de crédito, sin sorpresas.',
       },
       {
-        q: '¿Podemos usar nuestras propias listas de palabras?',
-        a: 'Sí. Carga una lista de palabras personalizada en tu panel de maestro, luego inicia juegos de clase o duelos 1v1 usando tu vocabulario curricular.',
+        q: '¿Usamos nuestras propias listas de palabras?',
+        a: 'Sí. Sube la lista en tu panel de maestro y lanza juegos con tu vocabulario. Todo en el mismo lugar.',
       },
       {
-        q: '¿Cuánto duran los juegos?',
-        a: 'Los juegos duran 3–5 minutos, perfectos para calentamientos, transiciones o descansos de actividad. La dificultad y los límites de tiempo son personalizables.',
+        q: '¿Cuánto duran?',
+        a: '3–5 minutos. Perfectos para calentamientos, transiciones, descansos. La dificultad y el tiempo se ajustan.',
       },
       {
-        q: '¿Qué niveles de grado soporta?',
-        a: 'Diseñado para grados 4–12, programas ESL, aprendices adultos y aulas bilingües. La dificultad se ajusta por juego.',
+        q: '¿Qué grados soporta?',
+        a: 'Desde 4to grado hasta 12vo, ESL, adultos, bilingües. La dificultad se ajusta por juego.',
       },
       {
         q: '¿Venden datos de estudiantes?',
-        a: 'No. Nunca vendemos ni compartimos datos de estudiantes. Compatible con padres y FERPA. Política de privacidad completa disponible.',
+        a: 'No. Nunca. Cumplimos con FERPA. Privacidad total garantizada.',
       },
       {
-        q: '¿Qué hay de las escuelas sin conexión?',
-        a: 'LexiClash funciona en navegador y se ejecuta en cualquier conexión a Internet. Funciona en WiFi escolar, tabletas, Chromebooks y escritorios.',
+        q: '¿Si el WiFi es lento?',
+        a: 'LexiClash funciona en cualquier navegador y cualquier conexión. Carga en WiFi lento y funciona en todos los dispositivos.',
       },
     ],
+    features: [
+      { icon: '⚡', text: 'Cuentas gratis — registro rápido, sigue el progreso en todas las sesiones' },
+      { icon: '🎯', text: '3 juegos: Boggle, Word Hunt, Word Wheel' },
+      { icon: '👥', text: 'Multijugador en vivo — hasta 30 estudiantes por sesión' },
+      { icon: '⚔️', text: 'Duelos 1v1 para parejas o equipos' },
+      { icon: '📚', text: 'Carga tus listas — cualquier unidad, cualquier materia' },
+      { icon: '🌍', text: '5 idiomas: inglés, hebreo (RTL), español, sueco, japonés' },
+      { icon: '📊', text: 'Panel de maestro: precisión por alumno + palabras difíciles' },
+      { icon: '💸', text: 'Todo gratis — sin premium' },
+    ],
+    compareRows: [
+      ['Todo gratis', '✓', 'Limitado', '✓ básico', 'Limitado'],
+      ['Cuentas gratis', '✓ siempre', '✗ pago', '✗ pago', '✗ pago'],
+      ['Juegos de palabras', '✓ Boggle/Wheel/Anagrama', '✗ tarjetas', '✗ plantillas', '✗ cuestionarios'],
+      ['Multijugador', '✓', '✓ pago', '✗', '✓'],
+      ['Duelos 1v1', '✓', '✓ pago', '✗', '✗'],
+      ['5 idiomas + RTL', '✓', '✗', '✗', '✗'],
+      ['Tus listas', '✓', '✓', '✓', '✓'],
+      ['Panel analítico', '✓ gratis', '✓ pago', 'Básico', '✓ pago'],
+    ],
+    useCases: [
+      { tag: 'CALENTAMIENTO', title: 'Apertura de 5 minutos', desc: 'Word Wheel rápida de la lista de ayer — despierta la clase.' },
+      { tag: 'REPASO', title: 'Fin de unidad', desc: 'Boggle con las 30 palabras de la unidad; el panel muestra qué falta.' },
+      { tag: 'ESL', title: 'Práctica en idioma objetivo', desc: 'Elige el idioma de tus estudiantes — EN, HE, ES, SV, JA.' },
+      { tag: 'DÍA DE SUSTITUTO', title: 'Actividad fácil', desc: 'Sin preparación — elige una lista, proyecta código, estudiantes juegan. 10 minutos.' },
+    ],
+    ctaHeading: '¿Diez minutos al final de la clase?',
+    ctaSubtitle: 'Elige una lista. Muestra el código. Juega. Revisa el panel. Ese es todo el ciclo.',
+    ctaPrimaryButtonLabel: '▶ Iniciar juego de clase',
+    ctaSecondaryButtonLabel: 'Ver Hub educativo',
+    metadataLabels: {
+      languages: '5 idiomas',
+      gradeLevel: 'Grados 4-12 + ESL adultos',
+      accounts: 'cuentas de estudiantes gratis',
+      duration: 'sesiones de 5 minutos',
+    },
+    sections: {
+      whatYouGet: 'Lo que obtienes.',
+      comparison: 'LexiClash vs. los demás.',
+      comparisonSubtitle: 'Honesto. No para todos — solo para maestros que quieren juegos sin paywall.',
+      howTeachersUse: 'Cómo se usa.',
+    },
   },
 
   sv: {
     metaTitle: 'Gratis ordförråd spel för klassrummet — Live multiplayer, 5 språk | LexiClash',
     metaDescription:
-      'Gratis ordförråd spel för klassrummet. Live helklass multiplayer, 1v1 ordförråds dueller och anpassade ordlistor från läroplanen. Stöder engelska, spanska, hebreiska, svenska och japanska. Körs i vilken webbläsare som helst. Gratis för alltid.',
+      'Gratis ordförråd spel för klassrummet. Live multiplayer, 1v1 ordförrådsdueller, dina ordlistor. Engelska, spanska, hebreiska, svenska, japanska. Vilken webbläsare som helst. Gratis för alltid.',
     ogTitle: 'Gratis ordförråd spel för klassrummet',
     ogDescription:
-      'Live multiplayer ordförråd spel för lärare. Helklassutmaningar, 1v1 dueller, anpassade ordlistor, 5 språk. Studentkonton är alltid gratis.',
+      'Live multiplayer ordförråd spel för lärare. Helklassutmaningar, 1v1 dueller, dina ordlistor, 5 språk. Studentkonton alltid gratis.',
     twitterDescription:
-      'Ordförråds spelet för klassrummet som lärare faktiskt använder. Live multiplayer, dueller, dina ordlistor, fem språk — studentkonton är alltid gratis.',
+      'Ordförråds spelet som lärare faktiskt använder. Live multiplayer, dueller, dina ordlistor, 5 språk — studentkonton alltid gratis.',
     heroTag: '★ För Lärare ★ Gratis För Alltid ★',
     heroH1: {
       line1: 'Gratis',
@@ -205,54 +350,96 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       line3: 'Gratis konton.',
     },
     heroSubtitle:
-      'Ordförråds spelet för klassrummet som lärare faktiskt använder. Live multiplayer, dueller, dina ordlistor, fem språk — studentkonton är alltid gratis.',
+      'Ordförråds spelet som lärare använder. Live multiplayer, dueller, dina ordlistor, 5 språk — studentkonton gratis alltid.',
     ctaSubLabel: 'Gratis · Studentkonton gratis',
     whyTitle: 'Varför lärare väljer LexiClash',
     whyPoints: [
-      'Gratis studentkonton. Snabb registrering på 30 sekunder, sedan spårar XP och framsteg för alltid.',
+      'Gratis studentkonton. Registrering på 30 sekunder, sedan framsteg för alltid.',
       'Ordbildning, inte flashkort. Bättre än Quizlet för stavning och minne.',
-      'Fem språk med fullständiga ordböcker. ESL, hebreisk nedsänkning, spansk tvåspråkig — allt modersmål.',
-      'Gratis nivå = alla funktioner. Ingen premium, inga annonser i klassrummet.',
+      '5 språk med kompletta ordböcker. ESL, hebreisk nedsänkning, spansk tvåspråkig — allt modersmål.',
+      'Allt gratis. Ingen premium, inga annonser i klassrummet.',
     ],
     faqTitle: 'Vanliga Frågor',
     faqs: [
       {
-        q: 'Behöver studenter registrera sig?',
-        a: 'Ja, men det är gratis och tar 30 sekunder. En e-post eller Google-konto, det är allt. Inget kreditkort, ingen extra kostnad.',
+        q: 'Måste studenter registrera sig?',
+        a: 'Ja, men det är gratis och tar 30 sekunder. Mail eller Google-konto. Inget kreditkort, inga överraskningar.',
       },
       {
         q: 'Kan vi använda våra egna ordlistor?',
-        a: 'Ja. Ladda upp en anpassad ordlista i din lärarpanel, och starta sedan helklassspel eller 1v1 dueller med ditt läroplansordförråd.',
+        a: 'Ja. Ladda upp i ditt panel och starta spel med ditt ordförråd.',
       },
       {
-        q: 'Hur länge varar spelen?',
-        a: 'Spelen varar 3–5 minuter, perfekt för uppvärmning, övergångar eller aktivitetspausar. Svårighetsgrad och tidsgränser är anpassningsbara.',
+        q: 'Hur lång tid tar ett spel?',
+        a: '3–5 minuter. Perfekt för uppvärmning, övergångar, pauser. Svårighetsgrad och tid går att ändra.',
       },
       {
-        q: 'Vilka klassår stöds?',
-        a: 'Designat för årskurs 4–12, ESL-program, vuxenelever och tvåspråkiga klassrum. Svårighet justeras per spel.',
+        q: 'Vilka åldrar passar det?',
+        a: 'Från årskurs 4 upp till vuxna, ESL-program, tvåspråkiga klassrum. Svårigheten justeras per spel.',
       },
       {
-        q: 'Säljer ni studentdata?',
-        a: 'Nej. Vi säljer eller delar aldrig studentdata. Föräldra-/FERPA-kompatibel. Fullständig integritetspolicy tillgänglig.',
+        q: 'Säljer ni elevdata?',
+        a: 'Nej, aldrig. Vi följer FERPA. Fullständig integritet garanterad.',
       },
       {
-        q: 'Hur är det med offline-skolor?',
-        a: 'LexiClash är webbläsarbaserad och körs på alla internetanslutningar. Fungerar på skolans WiFi, surfplattor, Chromebooks och datorer.',
+        q: 'Fungerar det med dåligt WiFi?',
+        a: 'LexiClash fungerar i vilken webbläsare som helst och vilken anslutning som helst. Jobbar bra på skolans WiFi, tablets, Chromebooks, datorer.',
       },
     ],
+    features: [
+      { icon: '⚡', text: 'Gratis konton — registrering på 30 sekunder, spårar framsteg alltid' },
+      { icon: '🎯', text: '3 spel: Boggle, Word Hunt, Word Wheel' },
+      { icon: '👥', text: 'Live multiplayer — upp till 30 elever per spel' },
+      { icon: '⚔️', text: '1v1 dueller för par eller lag' },
+      { icon: '📚', text: 'Dina ordlistor — vilken enhet, vilket ämne som helst' },
+      { icon: '🌍', text: '5 språk: engelska, hebreiska (RTL), spanska, svenska, japanska' },
+      { icon: '📊', text: 'Lärarpanel: precision per elev + vilka ord som är svåra' },
+      { icon: '💸', text: 'Allt gratis — ingen premium' },
+    ],
+    compareRows: [
+      ['Allt gratis', '✓', 'Begränsad', '✓ grund', 'Begränsad'],
+      ['Gratis konton', '✓ alltid', '✗ betald', '✗ betald', '✗ betald'],
+      ['Ordbildningsspel', '✓ Boggle/Wheel/Anagram', '✗ kort', '✗ mallar', '✗ quiz'],
+      ['Live multiplayer', '✓', '✓ betald', '✗', '✓'],
+      ['1v1 dueller', '✓', '✓ betald', '✗', '✗'],
+      ['5 språk + RTL', '✓', '✗', '✗', '✗'],
+      ['Dina ordlistor', '✓', '✓', '✓', '✓'],
+      ['Analyspanel', '✓ gratis', '✓ betald', 'Grund', '✓ betald'],
+    ],
+    useCases: [
+      { tag: 'UPPVÄRMNING', title: '5-minutersöppnare', desc: 'Snabbt Word Wheel från gårdagens lista — väcker klassen.' },
+      { tag: 'REPETITION', title: 'Slut på enhet', desc: 'Boggle på enhetens 30 ord; panelen visar vad som saknas.' },
+      { tag: 'ESL', title: 'Målspråkspraktik', desc: 'Deras målspråk — EN, HE, ES, SV, JA.' },
+      { tag: 'VIKARD', title: 'Vikaraktivitet', desc: 'Noll förberedelse — välj lista, dela kod, eleverna spelar. 10 minuter.' },
+    ],
+    ctaHeading: 'Tio minuter kvar i lektionen?',
+    ctaSubtitle: 'Välj en lista. Visa koden. Spela. Granska panelen. Det är hela loopen.',
+    ctaPrimaryButtonLabel: '▶ Starta klassrumsspel',
+    ctaSecondaryButtonLabel: 'Se utbildningshub',
+    metadataLabels: {
+      languages: '5 språk',
+      gradeLevel: 'Årskurs 4-12 + vuxen ESL',
+      accounts: 'gratis studentkonton',
+      duration: '5-minuterssessioner',
+    },
+    sections: {
+      whatYouGet: 'Det du får.',
+      comparison: 'LexiClash vs. de andra.',
+      comparisonSubtitle: 'Ärlig jämförelse. Inte för alla — bara för lärare som vill ha ordspel utan paywall.',
+      howTeachersUse: 'Hur det fungerar.',
+    },
   },
 
   ja: {
     metaTitle: '無料の教室向け語彙ゲーム — ライブマルチプレイヤー、5言語 | LexiClash',
     metaDescription:
-      '無料の教室向け語彙ゲーム。全クラス向けのライブマルチプレイヤー、1v1語彙デュエル、カリキュラムに合わせたカスタム単語リスト。英語、スペイン語、ヘブライ語、スウェーデン語、日本語に対応。任意のブラウザで動作。永遠に無料。',
+      '無料で使える教室向けの語彙ゲーム。ライブマルチプレイヤー、1v1デュエル、自分の単語リスト。英語、スペイン語、ヘブライ語、スウェーデン語、日本語対応。どのブラウザでも動作。ずっと無料。',
     ogTitle: '無料の教室向け語彙ゲーム',
     ogDescription:
-      '教師向けのライブマルチプレイヤー語彙ゲーム。全クラス向けチャレンジ、1v1デュエル、カスタム単語リスト、5言語。生徒アカウントは常に無料。',
+      '先生向けのライブ語彙ゲーム。クラス全体チャレンジ、1v1デュエル、自分の単語リスト、5言語。学生アカウントはいつも無料。',
     twitterDescription:
-      '教師が実際に使用する教室向け語彙ゲーム。ライブマルチプレイヤー、デュエル、あなたの単語リスト、5言語 — 生徒アカウントは常に無料。',
-    heroTag: '★ 教師向け ★ 永遠に無料 ★',
+      '先生が実際に使う教室向け語彙ゲーム。ライブマルチプレイヤー、デュエル、あなたのリスト、5言語 — 学生アカウントはいつも無料。',
+    heroTag: '★ 先生向け ★ ずっと無料 ★',
     heroH1: {
       line1: '無料の',
       highlight: '語彙',
@@ -260,42 +447,84 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       line3: '無料アカウント。',
     },
     heroSubtitle:
-      '教師が実際に使用する教室向け語彙ゲーム。ライブマルチプレイヤー、デュエル、あなたの単語リスト、5言語 — 生徒アカウントは常に無料。',
-    ctaSubLabel: '無料 · 生徒アカウント無料',
+      '先生が実際に使う語彙ゲーム。ライブマルチプレイヤー、デュエル、あなたのリスト、5言語 — 学生アカウントはいつも無料。',
+    ctaSubLabel: '無料 · 学生アカウント無料',
     whyTitle: 'LexiClashが選ばれる理由',
     whyPoints: [
-      '無料の生徒アカウント。30秒の迅速な登録後、XPと進捗を永遠に追跡。',
-      '単語形成、フラッシュカードではない。綴りと想起力の点でQuizletより優れている。',
-      '完全な辞書を備えた5言語。ESL、ヘブライ語イマージョン、スペイン語バイリンガル — すべてネイティブ。',
-      '無料レベル = すべての機能。プレミアムなし、教室内に広告なし。',
+      '無料。30秒で登録して、あとはずっと成績が記録される。',
+      '単語を作るゲーム。フラッシュカードじゃない。スペリングと記憶で Quizlet より優れている。',
+      '5言語、完全な辞書付き。ESL、ヘブライ語コース、スペイン語バイリンガル — すべてネイティブ。',
+      'すべて無料。プレミアムなし、授業中に広告なし。',
     ],
     faqTitle: 'よくある質問',
     faqs: [
       {
-        q: '生徒は登録する必要がありますか？',
-        a: 'はい。ただし、無料で30秒かかります。メールアドレスまたはGoogleアカウント1つだけです。クレジットカード不要、追加料金なし。',
+        q: '生徒は登録が必要ですか？',
+        a: 'はい。でも無料で30秒だけです。メールアドレスか Google アカウント。クレジットカード不要、追加料金なし。',
       },
       {
-        q: '独自の単語リストを使用できますか？',
-        a: 'はい。教師用ダッシュボードにカスタム単語リストをアップロードしてから、カリキュラム語彙を使用してクラス全体または1v1デュエルゲームを開始できます。',
+        q: '自分の単語リストが使えますか？',
+        a: 'はい。教師用ダッシュボードにアップロードして、そのリストでクラスゲームや 1v1 デュエルができます。',
       },
       {
-        q: 'ゲームはどのくらいの時間ですか？',
-        a: 'ゲームは3〜5分間実行され、ウォームアップ、移行、またはアクティビティブレイクに最適です。難易度と時間制限はカスタマイズできます。',
+        q: 'ゲームは何分ですか？',
+        a: '3～5分。ウォームアップ、時間つなぎ、休憩に最適。難易度と時間は変更できます。',
       },
       {
-        q: 'どの学年をサポートしていますか？',
-        a: '4〜12年生、ESLプログラム、大人の学習者、バイリンガルクラス向けに設計されています。ゲームごとに難易度が調整されます。',
+        q: 'どの学年向け？',
+        a: '4年生～12年生、ESL、大人の学習者、バイリンガルクラス向け。ゲームごとに難易度が変わります。',
       },
       {
-        q: '生徒データを販売していますか？',
-        a: 'いいえ。生徒データを販売または共有することはありません。保護者/FERPA準拠。完全なプライバシーポリシーが利用可能です。',
+        q: '学生のデータを売っていますか？',
+        a: 'いいえ。売ったり共有したりしません。FERPA対応。プライバシーポリシーは完全です。',
       },
       {
-        q: 'オフラインの学校はどうですか？',
-        a: 'LexiClashはブラウザベースで、あらゆるインターネット接続で動作します。学校のWiFi、タブレット、Chromebook、デスクトップで動作します。',
+        q: 'WiFi が不安定な環境では？',
+        a: 'LexiClash はブラウザで動きます。学校の WiFi でも、タブレット、Chromebook、パソコンでもサポートしています。',
       },
     ],
+    features: [
+      { icon: '⚡', text: '無料。30秒登録で、全セッション成績記録。' },
+      { icon: '🎯', text: '3つのゲーム：Boggle、Word Hunt、Word Wheel' },
+      { icon: '👥', text: 'ライブマルチプレイヤー — 1セッション最大30人' },
+      { icon: '⚔️', text: '1v1 デュエル — ペアや小グループ練習向け' },
+      { icon: '📚', text: 'あなたの単語リスト — どの単元、どの科目でも' },
+      { icon: '🌍', text: '5言語：英語、ヘブライ語（RTL）、スペイン語、スウェーデン語、日本語' },
+      { icon: '📊', text: '先生用ダッシュボード：生徒ごとの成績 + 苦手な単語がわかる' },
+      { icon: '💸', text: 'すべて無料 — プレミアムなし' },
+    ],
+    compareRows: [
+      ['すべて無料', '✓', '限定的', '✓ 基本', '限定的'],
+      ['無料アカウント', '✓ いつも', '✗ 有料', '✗ 有料', '✗ 有料'],
+      ['単語ゲーム', '✓ Boggle/Wheel/Anagram', '✗ カード', '✗ テンプレート', '✗ クイズ'],
+      ['ライブマルチプレイヤー', '✓', '✓ 有料', '✗', '✓'],
+      ['1v1デュエル', '✓', '✓ 有料', '✗', '✗'],
+      ['5言語 + RTL', '✓', '✗', '✗', '✗'],
+      ['自分のリスト', '✓', '✓', '✓', '✓'],
+      ['ダッシュボード', '✓ 無料', '✓ 有料', '基本', '✓ 有料'],
+    ],
+    useCases: [
+      { tag: 'ウォームアップ', title: '5分のオープナー', desc: '昨日の単語リストから Word Wheel — クラスを起こします。' },
+      { tag: 'レビュー', title: '単元の終わり', desc: '単元の30語でクラス Boggle。ダッシュボードで足りない部分がわかります。' },
+      { tag: 'ESL', title: 'ターゲット言語', desc: '生徒の言語で — EN、HE、ES、SV、JA対応。' },
+      { tag: '代講', title: '代講用', desc: '準備なし — リスト選んで、コード見せて、生徒がプレイ。10分で終了。' },
+    ],
+    ctaHeading: '授業の終わりに10分残った？',
+    ctaSubtitle: 'リストを選択。コードを表示。プレイ。ダッシュボードを確認。それが全体のループです。',
+    ctaPrimaryButtonLabel: '▶ クラスルームゲームを開始',
+    ctaSecondaryButtonLabel: '教育ハブを見る',
+    metadataLabels: {
+      languages: '5言語',
+      gradeLevel: '4-12年生 + 成人ESL',
+      accounts: '無料の生徒アカウント',
+      duration: '5分間のセッション',
+    },
+    sections: {
+      whatYouGet: 'あなたが得るもの。',
+      comparison: 'LexiClash vs. 他のアプリ。',
+      comparisonSubtitle: '正直な比較。みんなに向いているわけじゃない — paywall なしの単語ゲームを求めてる先生だけ。',
+      howTeachersUse: '先生はどう使うか。',
+    },
   },
 };
 

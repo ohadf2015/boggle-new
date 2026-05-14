@@ -51,6 +51,7 @@ export function AccessRequestForm() {
       <div role="status" className="rounded-neo border-neo bg-neo-lime p-6 text-center">
         <h3 className="text-2xl font-bold text-neo-navy">{t('education.access.success_title')}</h3>
         <p className="mt-2 text-neo-navy/85">{t('education.access.success_body')}</p>
+        <p className="mt-3 text-sm text-neo-navy/75">{t('education.access.success_next')}</p>
       </div>
     );
   }
@@ -91,7 +92,7 @@ export function AccessRequestForm() {
           className="mt-1 w-full rounded-neo border-neo bg-neo-navy-light text-neo-white placeholder-neo-white/50 p-3" />
         <p className="text-xs text-neo-white/60 mt-1">{useCase.length}/800</p>
       </div>
-      {error && <p role="alert" className="text-neo-red font-semibold">{error}</p>}
+      {error && <p role="alert" aria-live="polite" className="text-neo-red font-semibold">{error}</p>}
       <button type="submit" disabled={!canSubmit}
         className="w-full rounded-neo bg-neo-lime px-4 py-3 font-bold text-neo-navy shadow-hard hover:shadow-hard-sm active:shadow-hard-pressed disabled:opacity-50 transition-all">
         {submitting ? t('education.access.submitting') : t('education.access.submit')}

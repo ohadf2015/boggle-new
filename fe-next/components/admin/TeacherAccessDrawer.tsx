@@ -1,6 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import toast from 'react-hot-toast';
 import type { TeacherAccessRequest } from '@/lib/education/types';
 
 interface Props { row: TeacherAccessRequest; onClose: () => void; onActioned: () => void; }
@@ -10,6 +11,20 @@ export function TeacherAccessDrawer({ row, onClose, onActioned }: Props) {
   const [note, setNote] = useState(row.admin_note || '');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    }
+    dialogRef.current?.addEventListener('keydown', handleKeyDown);
+    return () => {
+      dialogRef.current?.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onClose]);
 
   async function act(kind: 'approve' | 'decline') {
     setErr(null);
@@ -21,17 +36,20 @@ export function TeacherAccessDrawer({ row, onClose, onActioned }: Props) {
         body: kind === 'decline' ? JSON.stringify({ reason: note }) : undefined,
       });
       if (!res.ok) throw new Error(await res.text());
+      toast.success(t(`admin.teacherAccess.${kind}Success`));
       onActioned();
       onClose();
     } catch (e: any) {
-      setErr(e?.message || 'error');
+      const errorMsg = t(`admin.teacherAccess.${kind}Error`);
+      setErr(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-stretch justify-end bg-black/40" role="dialog" aria-labelledby="tar-drawer-title">
+    <div ref={dialogRef} className="fixed inset-0 z-50 flex items-stretch justify-end bg-black/40" role="dialog" aria-labelledby="tar-drawer-title">
       <div className="w-full max-w-xl bg-neo-white p-6 shadow-2xl overflow-y-auto">
         <button onClick={onClose} className="text-sm text-slate-500 underline">{t('admin.teacherAccess.close')}</button>
         <h2 id="tar-drawer-title" className="mt-2 text-2xl font-bold text-neo-navy">{t('admin.teacherAccess.drawer_title')}</h2>
