@@ -77,7 +77,7 @@ vi.mock('next/navigation', () => ({
     push: vi.fn(),
     replace: vi.fn(),
   }),
-  usePathname: () => '/teacher/reports',
+  usePathname: () => '/en/teacher/reports',
 }));
 
 vi.mock('@/lib/education/useTeacherAccess', () => ({

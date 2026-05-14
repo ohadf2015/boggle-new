@@ -25,7 +25,7 @@ vi.mock('@/contexts/AuthContext');
 vi.mock('@/hooks/useRealtimeClassroomProgress');
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
-  usePathname: () => '/teacher/classroom/test/analytics',
+  usePathname: () => '/en/teacher/classroom/test/analytics',
 }));
 
 vi.mock('@/lib/education/useTeacherAccess', () => ({

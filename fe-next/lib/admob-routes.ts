@@ -13,6 +13,7 @@ const GAME_ROUTES = [
   '/custom',
   '/party-screen',
   '/teacher',
+  '/education',
   '/student',
   '/auth/callback',
   '/hebrew-multiplayer-word-game',

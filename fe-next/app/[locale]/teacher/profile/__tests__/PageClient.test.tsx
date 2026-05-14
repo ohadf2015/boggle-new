@@ -17,7 +17,7 @@ vi.mock('@/contexts/LanguageContext');
 vi.mock('@/hooks/useClassroom');
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
-  usePathname: () => '/teacher/profile',
+  usePathname: () => '/en/teacher/profile',
 }));
 
 vi.mock('@/lib/education/useTeacherAccess', () => ({

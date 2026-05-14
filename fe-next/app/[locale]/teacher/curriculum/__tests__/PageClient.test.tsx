@@ -57,13 +57,14 @@ vi.mock('@/contexts/AuthContext', () => ({
 // Mock useSearchParams
 const mockSearchParams = new URLSearchParams();
 const mockPush = vi.fn();
+const mockReplace = vi.fn();
 vi.mock('next/navigation', () => ({
   useSearchParams: () => mockSearchParams,
   useRouter: () => ({
     push: mockPush,
-    replace: vi.fn(),
+    replace: mockReplace,
   }),
-  usePathname: () => '/teacher/curriculum',
+  usePathname: () => '/en/teacher/curriculum',
 }));
 
 vi.mock('@/lib/education/useTeacherAccess', () => ({
