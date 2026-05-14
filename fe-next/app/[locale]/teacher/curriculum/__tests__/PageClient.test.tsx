@@ -63,6 +63,11 @@ vi.mock('next/navigation', () => ({
     push: mockPush,
     replace: vi.fn(),
   }),
+  usePathname: () => '/teacher/curriculum',
+}));
+
+vi.mock('@/lib/education/useTeacherAccess', () => ({
+  useTeacherAccess: () => ({ hasAccess: true, status: 'approved', latestRequest: null, isLoading: false }),
 }));
 
 describe('CurriculumPageClient', () => {

@@ -17,6 +17,11 @@ vi.mock('@/contexts/LanguageContext');
 vi.mock('@/hooks/useClassroom');
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
+  usePathname: () => '/teacher/profile',
+}));
+
+vi.mock('@/lib/education/useTeacherAccess', () => ({
+  useTeacherAccess: () => ({ hasAccess: true, status: 'approved', latestRequest: null, isLoading: false }),
 }));
 vi.mock('@/components/education/EducationHeader', () => ({
   EducationHeader: ({ showBackButton }: { showBackButton?: boolean }) => (

@@ -25,6 +25,11 @@ vi.mock('@/contexts/AuthContext');
 vi.mock('@/hooks/useRealtimeClassroomProgress');
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
+  usePathname: () => '/teacher/classroom/test/analytics',
+}));
+
+vi.mock('@/lib/education/useTeacherAccess', () => ({
+  useTeacherAccess: () => ({ hasAccess: true, status: 'approved', latestRequest: null, isLoading: false }),
 }));
 
 // Mock all analytics components
