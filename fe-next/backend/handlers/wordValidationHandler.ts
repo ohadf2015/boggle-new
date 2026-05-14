@@ -27,7 +27,6 @@ import logger from '../utils/logger.js';
 import { processLongWordEngagement } from './engagementHandler';
 import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, isBlastBoardCleared, regenerateBlastBoard, recordBlastBoardClear, tryBeginWaveAdvance, endWaveAdvance } from '../modules/blastModeManager.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
-import timerManager from '../utils/timerManager.js';
 import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
 import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
 import { createSeededRandom } from '@/components/blast/legacy/utils/blastLetterGenerator';
