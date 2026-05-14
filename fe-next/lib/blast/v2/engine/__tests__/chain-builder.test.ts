@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { insertWord, buildChainLevel } from '../chain-builder';
 import { collapseCells } from '../collapse';
 import { scanFormableThemeWords } from '../word-scan';
-import type { BlastLevel, ChainLevelSpec } from '../../types';
+import type { BlastColumn, BlastLevel, ChainLevelSpec } from '../../types';
 // TODO(task-4): import validateChainLevel from '../chain-validator';
 
 function lvl(columns: string[][]): BlastLevel {
@@ -78,7 +78,7 @@ describe('buildChainLevel', () => {
   it('inserts the requested number of decoy tiles', () => {
     const withDecoys: ChainLevelSpec = { ...spec, decoyTiles: 3 };
     const level = buildChainLevel(withDecoys, 7)!;
-    const totalTiles = level.columns.reduce((n, c) => n + c.tiles.length, 0);
+    const totalTiles = level.columns.reduce((n: number, c: BlastColumn) => n + c.tiles.length, 0);
     const wordTiles = spec.chain.join('').length;
     expect(totalTiles).toBe(wordTiles + 3);
   });
