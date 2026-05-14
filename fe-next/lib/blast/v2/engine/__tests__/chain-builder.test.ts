@@ -76,15 +76,13 @@ describe('buildChainLevel', () => {
     expect(buildChainLevel(bad, 7)).toBeNull();
   });
 
-  it('inserts the requested number of decoy tiles when possible', () => {
+  it('returns null when decoyTiles > 0 — decoys are currently unsupported', () => {
+    // A non-word decoy tile can never be cleared by the forced chain, so it
+    // is always "leftover" and fails validateChainLevel's empty-board check.
+    // Decoys are deferred until the win condition or placement model changes.
+    // When decoy support lands, replace this with a real placement assertion.
     const withDecoys: ChainLevelSpec = { ...spec, columns: 8, decoyTiles: 1 };
-    const level = buildChainLevel(withDecoys, 99);
-    if (level) {
-      const totalTiles = level.columns.reduce((n: number, c: BlastColumn) => n + c.tiles.length, 0);
-      const wordTiles = spec.chain.join('').length;
-      expect(totalTiles).toBe(wordTiles + 1);
-      expect(validateChainLevel(level).ok).toBe(true);
-    }
+    expect(buildChainLevel(withDecoys, 99)).toBeNull();
   });
 
 });
