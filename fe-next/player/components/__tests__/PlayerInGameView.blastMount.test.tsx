@@ -85,11 +85,6 @@ vi.mock('@/components/blast/legacy/BlastGame', () => ({
   ),
 }));
 
-// Mock BlastMoveCounter
-vi.mock('@/components/game/BlastMoveCounter', () => ({
-  BlastMoveCounter: (props: any) => <div data-testid="blast-move-counter">{props.movesUsed}</div>,
-}));
-
 // Mock useBlastMultiplayerBridge
 vi.mock('@/components/blast/legacy/hooks/useBlastMultiplayerBridge', () => ({
   useBlastMultiplayerBridge: () => ({

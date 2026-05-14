@@ -54,10 +54,6 @@ vi.mock('@/components/blast/legacy/BlastGame', () => ({
   BlastGame: () => <div data-testid="blast-game" />,
 }));
 
-vi.mock('@/components/game/BlastMoveCounter', () => ({
-  BlastMoveCounter: () => null,
-}));
-
 vi.mock('@/components/blast/legacy/hooks/useBlastMultiplayerBridge', () => ({
   useBlastMultiplayerBridge: () => ({
     config: { gridSize: 4, specialTileChance: 0.15, language: 'en', difficulty: 'medium' },

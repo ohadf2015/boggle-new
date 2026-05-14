@@ -53,6 +53,9 @@ const BLAST_CONTINUE_BONUS_MOVES = 5;
 interface BlastGameProps {
   config: BlastGameConfig;
   mode?: 'singleplayer' | 'multiplayer';
+  // waveNumber: legacy singleplayer-only prop. MP Blast converted to timer-era (no waves).
+  // For MP, defaults to 1 (never passed by callers). SP uses for objectives/seeding.
+  // Kept as optional to maintain SP compatibility without forcing MP to pass it.
   waveNumber?: number;
   waveConfig?: WaveConfig;
   cumulativeScore?: number;
