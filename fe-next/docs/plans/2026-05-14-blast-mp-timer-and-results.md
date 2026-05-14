@@ -1073,9 +1073,79 @@ git commit -m "feat(blast): remove wave badge, add player timer, delete dead Bla
 
 ---
 
+### Task 13: Add Blast to the MP mode-picker, admin-only
+
+> Blast is currently absent from the host MP mode-picker entirely — hosts cannot select it from the UI. This task adds it, gated so only admins see it (UI gate only; the server gate in `gameStartHandler.ts` stays `is_admin` OR `blast_access` as the safety net).
+
+**Files:**
+- Modify: `fe-next/host/components/pre-game/BattleModeCard.tsx:28-53`, `:57-66`
+- Test: `fe-next/host/components/pre-game/__tests__/BattleModeCard.test.tsx` (existing or create)
+
+- [ ] **Step 1: Write the failing test**
+
+```tsx
+describe('BattleModeCard — Blast gating', () => {
+  it('shows Blast in the picker for admins', () => {
+    render(<BattleModeCard {...baseProps} isAdmin={true} />);
+    expect(screen.getByText(/blast/i)).toBeInTheDocument();
+  });
+
+  it('hides Blast from the picker for non-admins', () => {
+    render(<BattleModeCard {...baseProps} isAdmin={false} />);
+    expect(screen.queryByText(/blast/i)).not.toBeInTheDocument();
+  });
+});
+```
+
+> `baseProps` should match how `BattleModeCard` is already invoked by `HostPreGameView`. If the component does not currently receive `isAdmin`, add it as a prop (the parent `HostPreGameView` already computes `isAdmin` / `hasBlastAccess` via `useAuth()` — pass `isAdmin` down).
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `npm run test:frontend -- BattleModeCard`
+Expected: FAIL — Blast not in the picker at all.
+
+- [ ] **Step 3: Add a Blast entry to `MODES` and gate `visibleModes`**
+
+In `BattleModeCard.tsx`, add a `'blast'` entry to the `MODES` array (lines 28-53), matching the `ModeVisualConfig` shape of the existing entries. Pull Blast's icon / colors / label / description from the already-defined Blast visuals in `GameModeSelector.tsx` (`MODE_ICONS`, `MODE_ACTIVE_COLORS`, `MODE_GLOW` — read that file to copy the exact values; do not invent new visuals).
+
+Then change `visibleModes` (line 66) from:
+
+```typescript
+  const visibleModes = MODES;
+```
+
+to:
+
+```typescript
+  // Blast is admin-gated in the picker (UI gate only; server still allows
+  // is_admin OR blast_access). Non-admins never see it offered.
+  const visibleModes = isAdmin ? MODES : MODES.filter((m) => m.mode !== 'blast');
+```
+
+Ensure `isAdmin` is in scope — add it to the component's props (typed `isAdmin?: boolean`) and have `HostPreGameView` pass its existing `isAdmin` value.
+
+- [ ] **Step 4: Run test to verify it passes**
+
+Run: `npm run test:frontend -- BattleModeCard`
+Expected: PASS
+
+- [ ] **Step 5: Type-check**
+
+Run: `npx tsc --noEmit`
+Expected: PASS
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add fe-next/host/components/pre-game/BattleModeCard.tsx fe-next/host/components/pre-game/HostPreGameView.tsx fe-next/host/components/pre-game/__tests__/BattleModeCard.test.tsx
+git commit -m "feat(blast): add Blast to MP mode-picker, admin-only UI gate"
+```
+
+---
+
 ## PHASE 4 — Verification
 
-### Task 13: Full verification sweep
+### Task 14: Full verification sweep
 
 **Files:** none (verification only)
 
@@ -1097,6 +1167,7 @@ Expected: build succeeds.
 - [ ] **Step 4: Manual smoke (document result, do not skip)**
 
 `npm run dev` (port **3001**). Start an MP Blast game with bots:
+- As an admin host, Blast appears in the MP mode-picker; as a non-admin it does not.
 - Player view shows a counting-down timer; no wave badge, no move counter.
 - Bots visibly score throughout the game (not idle).
 - Game ends when the timer hits 0, not before.
@@ -1116,7 +1187,7 @@ git commit -m "chore(blast): verification fixups for timer + results redesign"
 
 ## Self-Review
 
-- **Spec coverage:** Part 1 (pure timer) → Tasks 1-5, 11, 12. Board-clear → refill+bonus → Tasks 2, 3, 4. Host timer setting respected → Task 1. Part 2 (bot idle) → Tasks 4, 6. Part 3 (results redesign) → Tasks 7-10. i18n → Task 8. SRV-M4 tradeoff → noted in Task 1's comment. All spec sections mapped.
+- **Spec coverage:** Part 1 (pure timer) → Tasks 1-5, 11, 12. Board-clear → refill+bonus → Tasks 2, 3, 4. Host timer setting respected → Task 1. Part 2 (bot idle) → Tasks 4, 6. Part 3 (results redesign) → Tasks 7-10. i18n → Task 8. SRV-M4 tradeoff → noted in Task 1's comment. Admin-only Blast in MP picker (added post-spec at user request) → Task 13. All spec sections mapped.
 - **Placeholder scan:** No TBD/TODO. The one judgement-dependent spot (Task 12 Step 2 / Task 10 Step 1) gives a concrete instruction ("mirror ClassicGame's CircularTimer", "identify the existing scores map") rather than vague filler — the executor reads one named file to copy an established pattern.
 - **Type consistency:** `BlastPlayerStats` gains `boardClears: number` in Task 2 and is used consistently in Tasks 7, 9. `regenerateBlastBoard` / `recordBlastBoardClear` signatures defined in Task 2 match call sites in Tasks 3, 4. `blastBoardUpdate` payload gains optional `overlay?`/`seed?` in Task 3, consumed in Task 11. Store field `blastBoardClears` defined in Task 7, selector `useBlastBoardClears` matches.
 - **Debugging caveat:** Phase 2 explicitly forks — Task 6 Step 2/3 instruct the executor to stop and re-plan if the repro shows H2 (score-cap zeroing) instead of H1 (stale pool). This is intentional, not a placeholder.
