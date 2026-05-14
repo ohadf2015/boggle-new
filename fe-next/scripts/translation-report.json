@@ -1,19 +1,19 @@
 {
   "summary": {
-    "totalKeysInCode": 4815,
+    "totalKeysInCode": 5027,
     "keyCountByLanguage": {
-      "en": 9164,
-      "he": 9217,
-      "sv": 9196,
-      "ja": 9127,
-      "es": 9257
+      "en": 8974,
+      "he": 9455,
+      "sv": 9310,
+      "ja": 9313,
+      "es": 9366
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 387,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 14,
+      "templateLiterals": 16,
       "fallbackUsages": 0,
-      "variableKeys": 6
+      "variableKeys": 11
     }
   },
   "runtimeRisks": {
@@ -48,44 +48,58 @@
       },
       {
         "pattern": "blast.objective.color${colorTag.charAt(0).toUpperCase()}${colorTag.slice(1)}",
-        "file": "components/blast/BlastHintToast.tsx",
+        "file": "components/blast/legacy/BlastHintToast.tsx",
         "line": 22,
         "context": "? (t(`blast.objective.color${colorTag.charAt(0).toUpperCase()}${colorTag.slice(1)}`) || colorTag)",
         "type": "template_literal"
       },
       {
         "pattern": "blast.tileGuide.${tileType}.name",
-        "file": "components/blast/BlastHintToast.tsx",
+        "file": "components/blast/legacy/BlastHintToast.tsx",
         "line": 26,
         "context": "const tileLabel = tileType ? (t(`blast.tileGuide.${tileType}.name`) || tileType) : '';",
         "type": "template_literal"
       },
       {
         "pattern": "blast.hint.toast.${target.i18nKey}",
-        "file": "components/blast/BlastHintToast.tsx",
+        "file": "components/blast/legacy/BlastHintToast.tsx",
         "line": 28,
         "context": "const template = t(`blast.hint.toast.${target.i18nKey}`) || defaultTemplate(target.i18nKey);",
         "type": "template_literal"
       },
       {
         "pattern": "blast.archetypes.${archetype}",
-        "file": "components/blast/BlastWaveIntro.tsx",
+        "file": "components/blast/legacy/BlastWaveIntro.tsx",
         "line": 37,
         "context": "const label = t(`blast.archetypes.${archetype}`) || '';",
         "type": "template_literal"
       },
       {
         "pattern": "blast.mascot.${mascotKey}",
-        "file": "components/blast/BlastWaveIntro.tsx",
+        "file": "components/blast/legacy/BlastWaveIntro.tsx",
         "line": 38,
         "context": "const mascotAlt = t(`blast.mascot.${mascotKey}`) || '';",
         "type": "template_literal"
       },
       {
         "pattern": "blast.combo.${detectedCombos[0].type}",
-        "file": "components/blast/hooks/useBlastWordHandler.ts",
+        "file": "components/blast/legacy/hooks/useBlastWordHandler.ts",
         "line": 155,
         "context": "effects.setComboTypeName(t(`blast.combo.${detectedCombos[0].type}`) || `${detectedCombos[0].type.toU",
+        "type": "template_literal"
+      },
+      {
+        "pattern": "mp.insights.rarity.${rarity}",
+        "file": "components/multiplayer/desktop/insights/RarityHeatChip.tsx",
+        "line": 34,
+        "context": "aria-label={t(`mp.insights.rarity.${rarity}`)}",
+        "type": "template_literal"
+      },
+      {
+        "pattern": "mp.insights.rarity.${rarity}",
+        "file": "components/multiplayer/desktop/insights/RarityHeatChip.tsx",
+        "line": 37,
+        "context": "<span>{t(`mp.insights.rarity.${rarity}`)}</span>",
         "type": "template_literal"
       },
       {
@@ -96,10 +110,10 @@
         "type": "template_literal"
       },
       {
-        "pattern": "dailyMissions.${type}",
+        "pattern": "dailyMissions.${mission.type}",
         "file": "hooks/useDailyMissions.ts",
-        "line": 225,
-        "context": "questName: t(`dailyMissions.${type}`),",
+        "line": 223,
+        "context": "questName: t(`dailyMissions.${mission.type}`),",
         "type": "template_literal"
       },
       {
@@ -160,11 +174,51 @@
         "type": "variable_key"
       },
       {
+        "pattern": "t(headerKey)",
+        "variable": "headerKey",
+        "file": "components/multiplayer/desktop/insights/GoalBanner.tsx",
+        "line": 28,
+        "context": "<ThemedPanel mode={mode} variant=\"rail\" header={t(headerKey)} testId=\"goal-banner\">",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(tipKey)",
+        "variable": "tipKey",
+        "file": "components/practice/PracticeCoachingTip.tsx",
+        "line": 47,
+        "context": "<p className=\"flex-1\">{t(tipKey)}</p>",
+        "type": "variable_key"
+      },
+      {
         "pattern": "t(labelKey)",
         "variable": "labelKey",
         "file": "components/seasons/SeasonLeaderboardTabs.tsx",
         "line": 65,
         "context": "{t(labelKey)}",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(default)",
+        "variable": "default",
+        "file": "lib/multiplayer/resolveHostLeftMessage.ts",
+        "line": 5,
+        "context": "* resolved as `data.message || t(default)` — the truthy English string always won.",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(defaultKey)",
+        "variable": "defaultKey",
+        "file": "lib/multiplayer/resolveHostLeftMessage.ts",
+        "line": 11,
+        "context": "*   3. `t(defaultKey)` — last-resort generic message.",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(defaultKey)",
+        "variable": "defaultKey",
+        "file": "lib/multiplayer/resolveHostLeftMessage.ts",
+        "line": 31,
+        "context": "if (defaultKey) return t(defaultKey);",
         "type": "variable_key"
       }
     ]
@@ -176,7 +230,3723 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "admin.accessDenied",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/PageClient.tsx",
+          "line": 54
+        },
+        {
+          "file": "app/[locale]/admin/wikipedia-words/PageClient.tsx",
+          "line": 32
+        },
+        {
+          "file": "app/[locale]/admin/word-bank/PageClient.tsx",
+          "line": 32
+        },
+        {
+          "file": "app/[locale]/admin/words/PageClient.tsx",
+          "line": 32
+        }
+      ]
+    },
+    {
+      "key": "admin.accessRequired",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/PageClient.tsx",
+          "line": 52
+        },
+        {
+          "file": "app/[locale]/admin/analytics/PageClient.tsx",
+          "line": 94
+        },
+        {
+          "file": "app/[locale]/admin/moderation/PageClient.tsx",
+          "line": 108
+        },
+        {
+          "file": "app/[locale]/admin/players/[id]/PageClient.tsx",
+          "line": 66
+        },
+        {
+          "file": "app/[locale]/admin/wikipedia-words/PageClient.tsx",
+          "line": 31
+        },
+        {
+          "file": "app/[locale]/admin/word-bank/PageClient.tsx",
+          "line": 31
+        },
+        {
+          "file": "app/[locale]/admin/words/PageClient.tsx",
+          "line": 31
+        }
+      ]
+    },
+    {
+      "key": "admin.acquisition.empty",
+      "usages": [
+        {
+          "file": "components/admin/analytics/AcquisitionSources.tsx",
+          "line": 115
+        }
+      ]
+    },
+    {
+      "key": "admin.acquisition.error",
+      "usages": [
+        {
+          "file": "components/admin/analytics/AcquisitionSources.tsx",
+          "line": 74
+        }
+      ]
+    },
+    {
+      "key": "admin.acquisition.title",
+      "usages": [
+        {
+          "file": "components/admin/analytics/AcquisitionSources.tsx",
+          "line": 91
+        }
+      ]
+    },
+    {
+      "key": "admin.activity.empty",
+      "usages": [
+        {
+          "file": "components/admin/overview/DailyActivityChart.tsx",
+          "line": 113
+        }
+      ]
+    },
+    {
+      "key": "admin.activity.error",
+      "usages": [
+        {
+          "file": "components/admin/overview/DailyActivityChart.tsx",
+          "line": 101
+        }
+      ]
+    },
+    {
+      "key": "admin.activity.signups",
+      "usages": [
+        {
+          "file": "components/admin/overview/DailyActivityChart.tsx",
+          "line": 154
+        }
+      ]
+    },
+    {
+      "key": "admin.activity.title",
+      "usages": [
+        {
+          "file": "components/admin/overview/DailyActivityChart.tsx",
+          "line": 73
+        }
+      ]
+    },
+    {
+      "key": "admin.activity.totalGames",
+      "usages": [
+        {
+          "file": "components/admin/overview/DailyActivityChart.tsx",
+          "line": 138
+        }
+      ]
+    },
+    {
+      "key": "admin.activity.uniquePlayers",
+      "usages": [
+        {
+          "file": "components/admin/overview/DailyActivityChart.tsx",
+          "line": 146
+        }
+      ]
+    },
+    {
+      "key": "admin.analytics.churnTitle",
+      "usages": [
+        {
+          "file": "components/admin/analytics/ChurnRiskPanel.tsx",
+          "line": 45
+        }
+      ]
+    },
+    {
+      "key": "admin.analytics.churnTotal",
+      "usages": [
+        {
+          "file": "components/admin/analytics/ChurnRiskPanel.tsx",
+          "line": 48
+        }
+      ]
+    },
+    {
+      "key": "admin.analytics.cohort",
+      "usages": [
+        {
+          "file": "components/admin/analytics/RetentionHeatmap.tsx",
+          "line": 69
+        }
+      ]
+    },
+    {
+      "key": "admin.analytics.funnelDay30",
+      "usages": [
+        {
+          "file": "components/admin/analytics/EngagementFunnel.tsx",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "key": "admin.analytics.funnelDay7",
+      "usages": [
+        {
+          "file": "components/admin/analytics/EngagementFunnel.tsx",
+          "line": 41
+        }
+      ]
+    },
+    {
+      "key": "admin.analytics.funnelFirstGame",
+      "usages": [
+        {
+          "file": "components/admin/analytics/EngagementFunnel.tsx",
+          "line": 40
+        }
+      ]
+    },
+    {
+      "key": "admin.analytics.funnelRegistered",
+      "usages": [
+        {
+          "file": "components/admin/analytics/EngagementFunnel.tsx",
+          "line": 39
+        }
+      ]
+    },
+    {
+      "key": "admin.analytics.funnelTitle",
+      "usages": [
+        {
+          "file": "components/admin/analytics/EngagementFunnel.tsx",
+          "line": 48
+        }
+      ]
+    },
+    {
+      "key": "admin.analytics.games",
+      "usages": [
+        {
+          "file": "components/admin/analytics/ChurnRiskPanel.tsx",
+          "line": 71
+        }
+      ]
+    },
+    {
+      "key": "admin.analytics.noChurnRisk",
+      "usages": [
+        {
+          "file": "components/admin/analytics/ChurnRiskPanel.tsx",
+          "line": 53
+        }
+      ]
+    },
+    {
+      "key": "admin.analytics.retentionTitle",
+      "usages": [
+        {
+          "file": "components/admin/analytics/RetentionHeatmap.tsx",
+          "line": 63
+        }
+      ]
+    },
+    {
+      "key": "admin.analytics.size",
+      "usages": [
+        {
+          "file": "components/admin/analytics/RetentionHeatmap.tsx",
+          "line": 70
+        }
+      ]
+    },
+    {
+      "key": "admin.analytics.title",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/analytics/PageClient.tsx",
+          "line": 116
+        }
+      ]
+    },
+    {
+      "key": "admin.authSessions.avgScore",
+      "usages": [
+        {
+          "file": "components/admin/analytics/AuthSessionsPanel.tsx",
+          "line": 111
+        }
+      ]
+    },
+    {
+      "key": "admin.authSessions.byLanguage",
+      "usages": [
+        {
+          "file": "components/admin/analytics/AuthSessionsPanel.tsx",
+          "line": 117
+        }
+      ]
+    },
+    {
+      "key": "admin.authSessions.byMode",
+      "usages": [
+        {
+          "file": "components/admin/analytics/AuthSessionsPanel.tsx",
+          "line": 116
+        }
+      ]
+    },
+    {
+      "key": "admin.authSessions.completionRate",
+      "usages": [
+        {
+          "file": "components/admin/analytics/AuthSessionsPanel.tsx",
+          "line": 112
+        }
+      ]
+    },
+    {
+      "key": "admin.authSessions.empty",
+      "usages": [
+        {
+          "file": "components/admin/analytics/AuthSessionsPanel.tsx",
+          "line": 91
+        }
+      ]
+    },
+    {
+      "key": "admin.authSessions.error",
+      "usages": [
+        {
+          "file": "components/admin/analytics/AuthSessionsPanel.tsx",
+          "line": 69
+        }
+      ]
+    },
+    {
+      "key": "admin.authSessions.title",
+      "usages": [
+        {
+          "file": "components/admin/analytics/AuthSessionsPanel.tsx",
+          "line": 88
+        },
+        {
+          "file": "components/admin/analytics/AuthSessionsPanel.tsx",
+          "line": 104
+        }
+      ]
+    },
+    {
+      "key": "admin.authSessions.totalGames",
+      "usages": [
+        {
+          "file": "components/admin/analytics/AuthSessionsPanel.tsx",
+          "line": 109
+        }
+      ]
+    },
+    {
+      "key": "admin.authSessions.uniqueUsers",
+      "usages": [
+        {
+          "file": "components/admin/analytics/AuthSessionsPanel.tsx",
+          "line": 110
+        }
+      ]
+    },
+    {
+      "key": "admin.content.approvedWords",
+      "usages": [
+        {
+          "file": "components/admin/content/WordAnalytics.tsx",
+          "line": 49
+        }
+      ]
+    },
+    {
+      "key": "admin.content.noReports",
+      "usages": [
+        {
+          "file": "components/admin/content/WordAnalytics.tsx",
+          "line": 63
+        }
+      ]
+    },
+    {
+      "key": "admin.content.pendingWords",
+      "usages": [
+        {
+          "file": "components/admin/content/WordAnalytics.tsx",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "key": "admin.content.topReported",
+      "usages": [
+        {
+          "file": "components/admin/content/WordAnalytics.tsx",
+          "line": 59
+        }
+      ]
+    },
+    {
+      "key": "admin.dashboard",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/PageClient.tsx",
+          "line": 109
+        }
+      ]
+    },
+    {
+      "key": "admin.email.errorNoEmail",
+      "usages": [
+        {
+          "file": "components/admin/EmailTestPanel.tsx",
+          "line": 97
+        }
+      ]
+    },
+    {
+      "key": "admin.email.hidePreview",
+      "usages": [
+        {
+          "file": "components/admin/EmailTestPanel.tsx",
+          "line": 284
+        }
+      ]
+    },
+    {
+      "key": "admin.email.preview",
+      "usages": [
+        {
+          "file": "components/admin/EmailTestPanel.tsx",
+          "line": 307
+        }
+      ]
+    },
+    {
+      "key": "admin.email.previewNote",
+      "usages": [
+        {
+          "file": "components/admin/EmailTestPanel.tsx",
+          "line": 318
+        }
+      ]
+    },
+    {
+      "key": "admin.email.recipientEmail",
+      "usages": [
+        {
+          "file": "components/admin/EmailTestPanel.tsx",
+          "line": 220
+        }
+      ]
+    },
+    {
+      "key": "admin.email.recipientName",
+      "usages": [
+        {
+          "file": "components/admin/EmailTestPanel.tsx",
+          "line": 235
+        }
+      ]
+    },
+    {
+      "key": "admin.email.sending",
+      "usages": [
+        {
+          "file": "components/admin/EmailTestPanel.tsx",
+          "line": 262
+        }
+      ]
+    },
+    {
+      "key": "admin.email.showPreview",
+      "usages": [
+        {
+          "file": "components/admin/EmailTestPanel.tsx",
+          "line": 285
+        }
+      ]
+    },
+    {
+      "key": "admin.email.title",
+      "usages": [
+        {
+          "file": "components/admin/EmailTestPanel.tsx",
+          "line": 162
+        }
+      ]
+    },
+    {
+      "key": "admin.gameModePopularity",
+      "usages": [
+        {
+          "file": "components/admin/overview/GameModePopularity.tsx",
+          "line": 47
+        }
+      ]
+    },
+    {
+      "key": "admin.geo.empty",
+      "usages": [
+        {
+          "file": "components/admin/analytics/CountryBreakdown.tsx",
+          "line": 91
+        }
+      ]
+    },
+    {
+      "key": "admin.geo.error",
+      "usages": [
+        {
+          "file": "components/admin/analytics/CountryBreakdown.tsx",
+          "line": 60
+        }
+      ]
+    },
+    {
+      "key": "admin.geo.guests",
+      "usages": [
+        {
+          "file": "components/admin/analytics/CountryBreakdown.tsx",
+          "line": 85
+        },
+        {
+          "file": "components/admin/analytics/CountryBreakdown.tsx",
+          "line": 118
+        }
+      ]
+    },
+    {
+      "key": "admin.geo.registered",
+      "usages": [
+        {
+          "file": "components/admin/analytics/CountryBreakdown.tsx",
+          "line": 83
+        },
+        {
+          "file": "components/admin/analytics/CountryBreakdown.tsx",
+          "line": 117
+        }
+      ]
+    },
+    {
+      "key": "admin.geo.title",
+      "usages": [
+        {
+          "file": "components/admin/analytics/CountryBreakdown.tsx",
+          "line": 79
+        }
+      ]
+    },
+    {
+      "key": "admin.guests.avgScore",
+      "usages": [
+        {
+          "file": "components/admin/analytics/GuestActivityPanel.tsx",
+          "line": 109
+        }
+      ]
+    },
+    {
+      "key": "admin.guests.byLanguage",
+      "usages": [
+        {
+          "file": "components/admin/analytics/GuestActivityPanel.tsx",
+          "line": 114
+        }
+      ]
+    },
+    {
+      "key": "admin.guests.byMode",
+      "usages": [
+        {
+          "file": "components/admin/analytics/GuestActivityPanel.tsx",
+          "line": 113
+        }
+      ]
+    },
+    {
+      "key": "admin.guests.empty",
+      "usages": [
+        {
+          "file": "components/admin/analytics/GuestActivityPanel.tsx",
+          "line": 89
+        }
+      ]
+    },
+    {
+      "key": "admin.guests.error",
+      "usages": [
+        {
+          "file": "components/admin/analytics/GuestActivityPanel.tsx",
+          "line": 67
+        }
+      ]
+    },
+    {
+      "key": "admin.guests.title",
+      "usages": [
+        {
+          "file": "components/admin/analytics/GuestActivityPanel.tsx",
+          "line": 86
+        },
+        {
+          "file": "components/admin/analytics/GuestActivityPanel.tsx",
+          "line": 102
+        }
+      ]
+    },
+    {
+      "key": "admin.guests.totalGames",
+      "usages": [
+        {
+          "file": "components/admin/analytics/GuestActivityPanel.tsx",
+          "line": 107
+        }
+      ]
+    },
+    {
+      "key": "admin.guests.uniqueGuests",
+      "usages": [
+        {
+          "file": "components/admin/analytics/GuestActivityPanel.tsx",
+          "line": 108
+        }
+      ]
+    },
+    {
+      "key": "admin.guests.windowDays",
+      "usages": [
+        {
+          "file": "components/admin/analytics/GuestActivityPanel.tsx",
+          "line": 103
+        }
+      ]
+    },
+    {
+      "key": "admin.invalidWords.reasons.dismissed",
+      "usages": [
+        {
+          "file": "components/admin/InvalidWordsManager.tsx",
+          "line": 308
+        }
+      ]
+    },
+    {
+      "key": "admin.invalidWords.reasons.unknown",
+      "usages": [
+        {
+          "file": "components/admin/InvalidWordsManager.tsx",
+          "line": 305
+        }
+      ]
+    },
+    {
+      "key": "admin.invalidWords.subtitle",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/invalid-words/PageClient.tsx",
+          "line": 98
+        }
+      ]
+    },
+    {
+      "key": "admin.invalidWords.title",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/invalid-words/PageClient.tsx",
+          "line": 95
+        }
+      ]
+    },
+    {
+      "key": "admin.kpi.thisWeek",
+      "usages": [
+        {
+          "file": "components/admin/overview/KPICards.tsx",
+          "line": 71
+        }
+      ]
+    },
+    {
+      "key": "admin.landingCardOrder",
+      "usages": [
+        {
+          "file": "components/admin/overview/GameModePopularity.tsx",
+          "line": 108
+        }
+      ]
+    },
+    {
+      "key": "admin.live.activeGames",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 298
+        }
+      ]
+    },
+    {
+      "key": "admin.live.auth",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 524
+        },
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 574
+        }
+      ]
+    },
+    {
+      "key": "admin.live.connectedPlayers",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 351
+        }
+      ]
+    },
+    {
+      "key": "admin.live.game",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 361
+        }
+      ]
+    },
+    {
+      "key": "admin.live.games",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 241
+        }
+      ]
+    },
+    {
+      "key": "admin.live.guest",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 524
+        },
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 574
+        }
+      ]
+    },
+    {
+      "key": "admin.live.lastUpdated",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 396
+        }
+      ]
+    },
+    {
+      "key": "admin.live.left",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 464
+        }
+      ]
+    },
+    {
+      "key": "admin.live.live",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 217
+        }
+      ]
+    },
+    {
+      "key": "admin.live.mode",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 324
+        }
+      ]
+    },
+    {
+      "key": "admin.live.noGames",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 286
+        }
+      ]
+    },
+    {
+      "key": "admin.live.noGamesHint",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 289
+        }
+      ]
+    },
+    {
+      "key": "admin.live.player",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 321
+        },
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 358
+        }
+      ]
+    },
+    {
+      "key": "admin.live.players",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 245
+        }
+      ]
+    },
+    {
+      "key": "admin.live.ranked",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 425
+        }
+      ]
+    },
+    {
+      "key": "admin.live.refresh",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 233
+        },
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 273
+        }
+      ]
+    },
+    {
+      "key": "admin.live.retry",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 192
+        }
+      ]
+    },
+    {
+      "key": "admin.live.score",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 327
+        },
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 367
+        }
+      ]
+    },
+    {
+      "key": "admin.live.singlePlayer",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 254
+        }
+      ]
+    },
+    {
+      "key": "admin.live.singlePlayerLive",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 314
+        }
+      ]
+    },
+    {
+      "key": "admin.live.sockets",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 249
+        }
+      ]
+    },
+    {
+      "key": "admin.live.started",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 330
+        },
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 466
+        }
+      ]
+    },
+    {
+      "key": "admin.live.status",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 364
+        }
+      ]
+    },
+    {
+      "key": "admin.live.subtitle",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/PageClient.tsx",
+          "line": 112
+        }
+      ]
+    },
+    {
+      "key": "admin.live.type",
+      "usages": [
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 333
+        },
+        {
+          "file": "components/admin/LiveMonitor.tsx",
+          "line": 370
+        }
+      ]
+    },
+    {
+      "key": "admin.loadingDashboard",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/PageClient.tsx",
+          "line": 152
+        }
+      ]
+    },
+    {
+      "key": "admin.loadingSession",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/PageClient.tsx",
+          "line": 71
+        }
+      ]
+    },
+    {
+      "key": "admin.milogWords.subtitle",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/milog-words/PageClient.tsx",
+          "line": 98
+        }
+      ]
+    },
+    {
+      "key": "admin.milogWords.title",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/milog-words/PageClient.tsx",
+          "line": 95
+        }
+      ]
+    },
+    {
+      "key": "admin.moderation.approve",
+      "usages": [
+        {
+          "file": "components/admin/moderation/ModerationQueue.tsx",
+          "line": 75
+        }
+      ]
+    },
+    {
+      "key": "admin.moderation.empty",
+      "usages": [
+        {
+          "file": "components/admin/moderation/ModerationQueue.tsx",
+          "line": 47
+        }
+      ]
+    },
+    {
+      "key": "admin.moderation.queueTitle",
+      "usages": [
+        {
+          "file": "components/admin/moderation/ModerationQueue.tsx",
+          "line": 39
+        }
+      ]
+    },
+    {
+      "key": "admin.moderation.reject",
+      "usages": [
+        {
+          "file": "components/admin/moderation/ModerationQueue.tsx",
+          "line": 84
+        }
+      ]
+    },
+    {
+      "key": "admin.moderation.title",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/moderation/PageClient.tsx",
+          "line": 130
+        }
+      ]
+    },
+    {
+      "key": "admin.nav.dailyChallenge",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/content/PageClient.tsx",
+          "line": 47
+        }
+      ]
+    },
+    {
+      "key": "admin.nav.dictionary",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/content/PageClient.tsx",
+          "line": 44
+        }
+      ]
+    },
+    {
+      "key": "admin.nav.email",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/system/PageClient.tsx",
+          "line": 77
+        }
+      ]
+    },
+    {
+      "key": "admin.nav.invalidWords",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/content/PageClient.tsx",
+          "line": 45
+        }
+      ]
+    },
+    {
+      "key": "admin.nav.milogWords",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/content/PageClient.tsx",
+          "line": 46
+        }
+      ]
+    },
+    {
+      "key": "admin.nav.webVitals",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/system/PageClient.tsx",
+          "line": 65
+        }
+      ]
+    },
+    {
+      "key": "admin.nav.wikipediaWords",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/content/PageClient.tsx",
+          "line": 48
+        }
+      ]
+    },
+    {
+      "key": "admin.nav.wordBank",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/content/PageClient.tsx",
+          "line": 49
+        }
+      ]
+    },
+    {
+      "key": "admin.noData",
+      "usages": [
+        {
+          "file": "components/admin/overview/GameModePopularity.tsx",
+          "line": 112
+        }
+      ]
+    },
+    {
+      "key": "admin.player.acquisition",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 223
+        }
+      ]
+    },
+    {
+      "key": "admin.player.avgScore",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 189
+        },
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 247
+        }
+      ]
+    },
+    {
+      "key": "admin.player.back",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/players/[id]/PageClient.tsx",
+          "line": 98
+        }
+      ]
+    },
+    {
+      "key": "admin.player.byLanguage",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 279
+        }
+      ]
+    },
+    {
+      "key": "admin.player.byMode",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 238
+        }
+      ]
+    },
+    {
+      "key": "admin.player.casual",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 299
+        },
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 334
+        }
+      ]
+    },
+    {
+      "key": "admin.player.coins",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 211
+        }
+      ]
+    },
+    {
+      "key": "admin.player.completed",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 246
+        }
+      ]
+    },
+    {
+      "key": "admin.player.dailyEmail",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 200
+        }
+      ]
+    },
+    {
+      "key": "admin.player.duration",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 318
+        }
+      ]
+    },
+    {
+      "key": "admin.player.economy",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 210
+        }
+      ]
+    },
+    {
+      "key": "admin.player.gameCode",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 312
+        }
+      ]
+    },
+    {
+      "key": "admin.player.hintsUsed",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 213
+        }
+      ]
+    },
+    {
+      "key": "admin.player.identity",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 198
+        }
+      ]
+    },
+    {
+      "key": "admin.player.joined",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 158
+        }
+      ]
+    },
+    {
+      "key": "admin.player.lang",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 317
+        }
+      ]
+    },
+    {
+      "key": "admin.player.lastGame",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 161
+        }
+      ]
+    },
+    {
+      "key": "admin.player.level",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 191
+        }
+      ]
+    },
+    {
+      "key": "admin.player.lifetimeCoins",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 212
+        }
+      ]
+    },
+    {
+      "key": "admin.player.loadError",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/players/[id]/PageClient.tsx",
+          "line": 112
+        }
+      ]
+    },
+    {
+      "key": "admin.player.longestWord",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 216
+        }
+      ]
+    },
+    {
+      "key": "admin.player.mmr",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 192
+        }
+      ]
+    },
+    {
+      "key": "admin.player.mode",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 244
+        },
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 316
+        }
+      ]
+    },
+    {
+      "key": "admin.player.noAcquisitionData",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 229
+        }
+      ]
+    },
+    {
+      "key": "admin.player.noGames",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 305
+        }
+      ]
+    },
+    {
+      "key": "admin.player.notFound",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/players/[id]/PageClient.tsx",
+          "line": 107
+        },
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 116
+        }
+      ]
+    },
+    {
+      "key": "admin.player.placement",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 315
+        }
+      ]
+    },
+    {
+      "key": "admin.player.ranked",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 299
+        },
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 334
+        }
+      ]
+    },
+    {
+      "key": "admin.player.recentGames",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 188
+        },
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 296
+        }
+      ]
+    },
+    {
+      "key": "admin.player.referrals",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 201
+        }
+      ]
+    },
+    {
+      "key": "admin.player.referrer",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 227
+        }
+      ]
+    },
+    {
+      "key": "admin.player.role",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 199
+        }
+      ]
+    },
+    {
+      "key": "admin.player.score",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 313
+        }
+      ]
+    },
+    {
+      "key": "admin.player.seasonScore",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 205
+        }
+      ]
+    },
+    {
+      "key": "admin.player.sessions",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 245
+        }
+      ]
+    },
+    {
+      "key": "admin.player.title",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/players/[id]/PageClient.tsx",
+          "line": 101
+        }
+      ]
+    },
+    {
+      "key": "admin.player.totalScore",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 190
+        },
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 248
+        }
+      ]
+    },
+    {
+      "key": "admin.player.utmCampaign",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 226
+        }
+      ]
+    },
+    {
+      "key": "admin.player.utmMedium",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 225
+        }
+      ]
+    },
+    {
+      "key": "admin.player.utmSource",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 224
+        }
+      ]
+    },
+    {
+      "key": "admin.player.when",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 319
+        }
+      ]
+    },
+    {
+      "key": "admin.player.winRate",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 193
+        }
+      ]
+    },
+    {
+      "key": "admin.player.words",
+      "usages": [
+        {
+          "file": "components/admin/players/PlayerDetailView.tsx",
+          "line": 314
+        }
+      ]
+    },
+    {
+      "key": "admin.preparingTools",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/PageClient.tsx",
+          "line": 153
+        }
+      ]
+    },
+    {
+      "key": "admin.sessionError",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/PageClient.tsx",
+          "line": 84
+        }
+      ]
+    },
+    {
+      "key": "admin.sidebar.analytics",
+      "usages": [
+        {
+          "file": "components/admin/sidebar/AdminBottomNav.tsx",
+          "line": 41
+        }
+      ]
+    },
+    {
+      "key": "admin.sidebar.content",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/content/PageClient.tsx",
+          "line": 59
+        },
+        {
+          "file": "components/admin/sidebar/AdminBottomNav.tsx",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "key": "admin.sidebar.moderation",
+      "usages": [
+        {
+          "file": "components/admin/sidebar/AdminBottomNav.tsx",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "key": "admin.sidebar.overview",
+      "usages": [
+        {
+          "file": "components/admin/sidebar/AdminBottomNav.tsx",
+          "line": 40
+        }
+      ]
+    },
+    {
+      "key": "admin.sidebar.players",
+      "usages": [
+        {
+          "file": "components/admin/sidebar/AdminBottomNav.tsx",
+          "line": 44
+        }
+      ]
+    },
+    {
+      "key": "admin.sidebar.system",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/system/PageClient.tsx",
+          "line": 55
+        },
+        {
+          "file": "components/admin/sidebar/AdminBottomNav.tsx",
+          "line": 45
+        }
+      ]
+    },
+    {
+      "key": "admin.system.down",
+      "usages": [
+        {
+          "file": "components/admin/overview/SystemHealth.tsx",
+          "line": 57
+        }
+      ]
+    },
+    {
+      "key": "admin.system.ok",
+      "usages": [
+        {
+          "file": "components/admin/overview/SystemHealth.tsx",
+          "line": 57
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.admin_note",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 53
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.approve",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 62
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.close",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.col.country",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 88
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.col.email",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 85
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.col.locale",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 87
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.col.name",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 84
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.col.role",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 86
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.col.status",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 89
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.col.submitted",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 90
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.decline",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 66
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.drawer_title",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.export_csv",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 120
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.field.country",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.field.email",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 40
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.field.locale",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.field.name",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 39
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.field.role",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 41
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.field.school",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 44
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.field.status",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 45
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.field.submitted",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 46
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.field.use_case",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 49
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.filter_country",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 72
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.filter_locale",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 65
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.filter_status",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 55
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.filter_status_all",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.page",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 116
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.refresh",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 77
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.title",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.allLanguages",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesFilters.tsx",
+          "line": 40
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.allModes",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesFilters.tsx",
+          "line": 65
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.allTypes",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesFilters.tsx",
+          "line": 53
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.casual",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GameRow.tsx",
+          "line": 47
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.casualOnly",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesFilters.tsx",
+          "line": 67
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.code",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesTable.tsx",
+          "line": 82
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.daily",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GameRow.tsx",
+          "line": 51
+        },
+        {
+          "file": "components/admin/today-games/components/GamesFilters.tsx",
+          "line": 56
+        },
+        {
+          "file": "components/admin/today-games/components/StatsBar.tsx",
+          "line": 32
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.drills",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesFilters.tsx",
+          "line": 57
+        },
+        {
+          "file": "components/admin/today-games/components/StatsBar.tsx",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.duration",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesTable.tsx",
+          "line": 74
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.filters",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesFilters.tsx",
+          "line": 31
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.first",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GameRow.tsx",
+          "line": 114
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.firstGame",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GameRow.tsx",
+          "line": 111
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.guest",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GameRow.tsx",
+          "line": 62
+        },
+        {
+          "file": "components/admin/today-games/components/GameRow.tsx",
+          "line": 105
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.language",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesTable.tsx",
+          "line": 55
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.lastUpdated",
+      "usages": [
+        {
+          "file": "components/admin/today-games/TodayGamesHistory.tsx",
+          "line": 126
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.multiplayer",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesFilters.tsx",
+          "line": 54
+        },
+        {
+          "file": "components/admin/today-games/components/StatsBar.tsx",
+          "line": 22
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.noGames",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/EmptyState.tsx",
+          "line": 20
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.noGamesHint",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/EmptyState.tsx",
+          "line": 23
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.of",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesTable.tsx",
+          "line": 102
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.player",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesTable.tsx",
+          "line": 49
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.ranked",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GameRow.tsx",
+          "line": 45
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.rankedOnly",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesFilters.tsx",
+          "line": 66
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.refresh",
+      "usages": [
+        {
+          "file": "components/admin/today-games/TodayGamesHistory.tsx",
+          "line": 88
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.retry",
+      "usages": [
+        {
+          "file": "components/admin/today-games/TodayGamesHistory.tsx",
+          "line": 60
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.score",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesTable.tsx",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.showing",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesTable.tsx",
+          "line": 100
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.time",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesTable.tsx",
+          "line": 41
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.title",
+      "usages": [
+        {
+          "file": "components/admin/today-games/TodayGamesHistory.tsx",
+          "line": 73
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.totalGames",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/StatsBar.tsx",
+          "line": 17
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.type",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesTable.tsx",
+          "line": 52
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.wordHunt",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GameRow.tsx",
+          "line": 49
+        },
+        {
+          "file": "components/admin/today-games/components/GamesFilters.tsx",
+          "line": 55
+        },
+        {
+          "file": "components/admin/today-games/components/StatsBar.tsx",
+          "line": 27
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.words",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesTable.tsx",
+          "line": 66
+        }
+      ]
+    },
+    {
+      "key": "admin.totalGames",
+      "usages": [
+        {
+          "file": "components/admin/overview/GameModePopularity.tsx",
+          "line": 107
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.actions",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankTable.tsx",
+          "line": 150
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.approve",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankTable.tsx",
+          "line": 220
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkActions.approveAll",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkActionsBar.tsx",
+          "line": 78
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkActions.approving",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkActionsBar.tsx",
+          "line": 77
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkActions.clearSelection",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkActionsBar.tsx",
+          "line": 131
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkActions.errorMessage",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkActionsBar.tsx",
+          "line": 117
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkActions.rejectAll",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkActionsBar.tsx",
+          "line": 90
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkActions.rejecting",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkActionsBar.tsx",
+          "line": 89
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkActions.selected",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkActionsBar.tsx",
+          "line": 66
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkActions.successMessage",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkActionsBar.tsx",
+          "line": 113
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.button",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/WordBankPanel.tsx",
+          "line": 146
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.errors",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkImportModal.tsx",
+          "line": 197
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.formatCsv",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkImportModal.tsx",
+          "line": 120
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.formatPlain",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkImportModal.tsx",
+          "line": 119
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.import",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkImportModal.tsx",
+          "line": 234
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.imported",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkImportModal.tsx",
+          "line": 189
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.importing",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkImportModal.tsx",
+          "line": 234
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.instructions",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkImportModal.tsx",
+          "line": 117
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.lengthFilter",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkImportModal.tsx",
+          "line": 121
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.noContent",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkImportModal.tsx",
+          "line": 40
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.result",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkImportModal.tsx",
+          "line": 185
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.showErrors",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkImportModal.tsx",
+          "line": 203
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.skipped",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkImportModal.tsx",
+          "line": 193
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.source",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkImportModal.tsx",
+          "line": 131
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.title",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkImportModal.tsx",
+          "line": 99
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.validationStatus",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkImportModal.tsx",
+          "line": 145
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.bulkImport.wordsLabel",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/BulkImportModal.tsx",
+          "line": 161
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.delete",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankTable.tsx",
+          "line": 265
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.description",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/word-bank/PageClient.tsx",
+          "line": 77
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.filters.search",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankFilters.tsx",
+          "line": 134
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.filters.searchLabel",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankFilters.tsx",
+          "line": 127
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.language",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankFilters.tsx",
+          "line": 63
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.loading",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankTable.tsx",
+          "line": 282
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.loadMore",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankTable.tsx",
+          "line": 282
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.noWordsFound",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankTable.tsx",
+          "line": 113
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.reject",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankTable.tsx",
+          "line": 230
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.source",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankFilters.tsx",
+          "line": 111
+        },
+        {
+          "file": "components/admin/word-bank/components/WordBankTable.tsx",
+          "line": 138
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.stats.activeWords",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankStatsCard.tsx",
+          "line": 49
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.stats.approved",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankStatsCard.tsx",
+          "line": 67
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.stats.blockedWords",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankStatsCard.tsx",
+          "line": 54
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.stats.bySource",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankStatsCard.tsx",
+          "line": 80
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.stats.pendingReview",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankStatsCard.tsx",
+          "line": 62
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.stats.rejected",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankStatsCard.tsx",
+          "line": 72
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.stats.title",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankStatsCard.tsx",
+          "line": 27
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.stats.totalWords",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankStatsCard.tsx",
+          "line": 44
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.status",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankFilters.tsx",
+          "line": 79
+        },
+        {
+          "file": "components/admin/word-bank/components/WordBankTable.tsx",
+          "line": 141
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.timesUsed",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankTable.tsx",
+          "line": 147
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.title",
+      "usages": [
+        {
+          "file": "app/[locale]/admin/word-bank/PageClient.tsx",
+          "line": 71
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.tryAdjustingFilters",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankTable.tsx",
+          "line": 114
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.validationStatus",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankFilters.tsx",
+          "line": 95
+        },
+        {
+          "file": "components/admin/word-bank/components/WordBankTable.tsx",
+          "line": 144
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.word",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/components/WordBankTable.tsx",
+          "line": 135
+        }
+      ]
+    },
+    {
+      "key": "admin.wordBank.wordList",
+      "usages": [
+        {
+          "file": "components/admin/word-bank/WordBankPanel.tsx",
+          "line": 143
+        }
+      ]
+    },
+    {
+      "key": "blast.chest.coins",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastChestOpenModal.tsx",
+          "line": 37
+        },
+        {
+          "file": "components/blast/v2/BlastChestPreviewModal.tsx",
+          "line": 35
+        }
+      ]
+    },
+    {
+      "key": "blast.chest.continue",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastChestOpenModal.tsx",
+          "line": 71
+        }
+      ]
+    },
+    {
+      "key": "blast.chest.opened",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastChestOpenModal.tsx",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "key": "blast.chest.preview",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastChestPreviewModal.tsx",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "key": "blast.chest.tier.label",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastChestPreviewModal.tsx",
+          "line": 32
+        }
+      ]
+    },
+    {
+      "key": "blast.chest.title",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastChestBadge.tsx",
+          "line": 23
+        }
+      ]
+    },
+    {
+      "key": "blast.close",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastChestPreviewModal.tsx",
+          "line": 52
+        }
+      ]
+    },
+    {
+      "key": "blast.complete.cascades",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastLevelCompleteCard.tsx",
+          "line": 21
+        }
+      ]
+    },
+    {
+      "key": "blast.complete.next",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastLevelCompleteCard.tsx",
+          "line": 29
+        }
+      ]
+    },
+    {
+      "key": "blast.complete.title",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastLevelCompleteCard.tsx",
+          "line": 17
+        }
+      ]
+    },
+    {
+      "key": "blast.hint",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastHud.tsx",
+          "line": 78
+        }
+      ]
+    },
+    {
+      "key": "blast.intro.level",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastLevelIntroCard.tsx",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "key": "blast.intro.wordCount",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastLevelIntroCard.tsx",
+          "line": 20
+        }
+      ]
+    },
+    {
+      "key": "blast.level",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastHud.tsx",
+          "line": 39
+        }
+      ]
+    },
+    {
+      "key": "blast.settings.tutorials",
+      "usages": [
+        {
+          "file": "components/settings/BlastTutorialReplaySection.tsx",
+          "line": 23
+        }
+      ]
+    },
+    {
+      "key": "blast.tutorial.ftue.label",
+      "usages": [
+        {
+          "file": "components/settings/BlastTutorialReplaySection.tsx",
+          "line": 33
+        }
+      ]
+    },
+    {
+      "key": "blast.tutorial.ftue.step6.cta",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastFtueOverlay.tsx",
+          "line": 84
+        }
+      ]
+    },
+    {
+      "key": "blast.tutorial.unlock.gotIt",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastUnlockCard.tsx",
+          "line": 46
+        }
+      ]
+    },
+    {
+      "key": "blast.tutorial.unlock.skipFuture",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastUnlockCard.tsx",
+          "line": 54
+        }
+      ]
+    },
+    {
+      "key": "education.access.already_approved_title",
+      "usages": [
+        {
+          "file": "app/[locale]/education/access/PageClient.tsx",
+          "line": 19
+        }
+      ]
+    },
+    {
+      "key": "education.access.country",
+      "usages": [
+        {
+          "file": "components/education/AccessRequestForm.tsx",
+          "line": 83
+        }
+      ]
+    },
+    {
+      "key": "education.access.email",
+      "usages": [
+        {
+          "file": "components/education/AccessRequestForm.tsx",
+          "line": 66
+        }
+      ]
+    },
+    {
+      "key": "education.access.full_name",
+      "usages": [
+        {
+          "file": "components/education/AccessRequestForm.tsx",
+          "line": 61
+        }
+      ]
+    },
+    {
+      "key": "education.access.go_to_teacher",
+      "usages": [
+        {
+          "file": "app/[locale]/education/access/PageClient.tsx",
+          "line": 21
+        }
+      ]
+    },
+    {
+      "key": "education.access.h1",
+      "usages": [
+        {
+          "file": "app/[locale]/education/access/PageClient.tsx",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "key": "education.access.lede",
+      "usages": [
+        {
+          "file": "app/[locale]/education/access/PageClient.tsx",
+          "line": 15
+        }
+      ]
+    },
+    {
+      "key": "education.access.pending_body",
+      "usages": [
+        {
+          "file": "app/[locale]/education/access/PageClient.tsx",
+          "line": 29
+        }
+      ]
+    },
+    {
+      "key": "education.access.pending_title",
+      "usages": [
+        {
+          "file": "app/[locale]/education/access/PageClient.tsx",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "key": "education.access.rate_limited",
+      "usages": [
+        {
+          "file": "components/education/AccessRequestForm.tsx",
+          "line": 38
+        }
+      ]
+    },
+    {
+      "key": "education.access.regular_game_body",
+      "usages": [
+        {
+          "file": "app/[locale]/education/access/PageClient.tsx",
+          "line": 56
+        }
+      ]
+    },
+    {
+      "key": "education.access.regular_game_title",
+      "usages": [
+        {
+          "file": "app/[locale]/education/access/PageClient.tsx",
+          "line": 55
+        }
+      ]
+    },
+    {
+      "key": "education.access.role",
+      "usages": [
+        {
+          "file": "components/education/AccessRequestForm.tsx",
+          "line": 71
+        }
+      ]
+    },
+    {
+      "key": "education.access.school_or_org",
+      "usages": [
+        {
+          "file": "components/education/AccessRequestForm.tsx",
+          "line": 78
+        }
+      ]
+    },
+    {
+      "key": "education.access.submit",
+      "usages": [
+        {
+          "file": "components/education/AccessRequestForm.tsx",
+          "line": 97
+        }
+      ]
+    },
+    {
+      "key": "education.access.submit_error",
+      "usages": [
+        {
+          "file": "components/education/AccessRequestForm.tsx",
+          "line": 38
+        },
+        {
+          "file": "components/education/AccessRequestForm.tsx",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "key": "education.access.submitted_on",
+      "usages": [
+        {
+          "file": "app/[locale]/education/access/PageClient.tsx",
+          "line": 32
+        }
+      ]
+    },
+    {
+      "key": "education.access.submitting",
+      "usages": [
+        {
+          "file": "components/education/AccessRequestForm.tsx",
+          "line": 97
+        }
+      ]
+    },
+    {
+      "key": "education.access.success_body",
+      "usages": [
+        {
+          "file": "components/education/AccessRequestForm.tsx",
+          "line": 53
+        }
+      ]
+    },
+    {
+      "key": "education.access.success_title",
+      "usages": [
+        {
+          "file": "components/education/AccessRequestForm.tsx",
+          "line": 52
+        }
+      ]
+    },
+    {
+      "key": "education.access.try_blast",
+      "usages": [
+        {
+          "file": "app/[locale]/education/access/PageClient.tsx",
+          "line": 59
+        }
+      ]
+    },
+    {
+      "key": "education.access.try_daily",
+      "usages": [
+        {
+          "file": "app/[locale]/education/access/PageClient.tsx",
+          "line": 60
+        }
+      ]
+    },
+    {
+      "key": "education.access.try_mp",
+      "usages": [
+        {
+          "file": "app/[locale]/education/access/PageClient.tsx",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "key": "education.access.use_case",
+      "usages": [
+        {
+          "file": "components/education/AccessRequestForm.tsx",
+          "line": 88
+        }
+      ]
+    },
+    {
+      "key": "education.landing.compare.subtitle",
+      "usages": [
+        {
+          "file": "components/education/ComparisonStrip.tsx",
+          "line": 45
+        }
+      ]
+    },
+    {
+      "key": "education.landing.compare.title",
+      "usages": [
+        {
+          "file": "components/education/ComparisonStrip.tsx",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "key": "education.landing.cta.body",
+      "usages": [
+        {
+          "file": "components/education/TeacherAccessCTA.tsx",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "key": "education.landing.cta.button",
+      "usages": [
+        {
+          "file": "components/education/TeacherAccessCTA.tsx",
+          "line": 20
+        }
+      ]
+    },
+    {
+      "key": "education.landing.cta.title",
+      "usages": [
+        {
+          "file": "components/education/TeacherAccessCTA.tsx",
+          "line": 11
+        }
+      ]
+    },
+    {
+      "key": "education.landing.faq.title",
+      "usages": [
+        {
+          "file": "components/education/EducationFAQ.tsx",
+          "line": 21
+        }
+      ]
+    },
+    {
+      "key": "education.landing.hero.cta_primary",
+      "usages": [
+        {
+          "file": "components/education/EducationHero.tsx",
+          "line": 52
+        }
+      ]
+    },
+    {
+      "key": "education.landing.hero.cta_secondary",
+      "usages": [
+        {
+          "file": "components/education/EducationHero.tsx",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "key": "education.landing.hero.eyebrow",
+      "usages": [
+        {
+          "file": "components/education/EducationHero.tsx",
+          "line": 38
+        }
+      ]
+    },
+    {
+      "key": "education.landing.hero.h1",
+      "usages": [
+        {
+          "file": "components/education/EducationHero.tsx",
+          "line": 41
+        }
+      ]
+    },
+    {
+      "key": "education.landing.hero.sub",
+      "usages": [
+        {
+          "file": "components/education/EducationHero.tsx",
+          "line": 44
+        }
+      ]
+    },
+    {
+      "key": "education.landing.moat.subtitle",
+      "usages": [
+        {
+          "file": "components/education/MoatTrifectaSection.tsx",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "key": "education.landing.moat.title",
+      "usages": [
+        {
+          "file": "components/education/MoatTrifectaSection.tsx",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "key": "education.landing.modes.teaches",
+      "usages": [
+        {
+          "file": "components/education/SixModeTour.tsx",
+          "line": 74
+        }
+      ]
+    },
+    {
+      "key": "education.landing.modes.title",
+      "usages": [
+        {
+          "file": "components/education/SixModeTour.tsx",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "key": "education.landing.openDashboard",
+      "usages": [
+        {
+          "file": "app/[locale]/education/PageClient.tsx",
+          "line": 79
+        }
+      ]
+    },
+    {
+      "key": "education.landing.trust.bullet1",
+      "usages": [
+        {
+          "file": "app/[locale]/education/PageClient.tsx",
+          "line": 156
+        }
+      ]
+    },
+    {
+      "key": "education.landing.trust.bullet2",
+      "usages": [
+        {
+          "file": "app/[locale]/education/PageClient.tsx",
+          "line": 160
+        }
+      ]
+    },
+    {
+      "key": "education.landing.trust.bullet3",
+      "usages": [
+        {
+          "file": "app/[locale]/education/PageClient.tsx",
+          "line": 164
+        }
+      ]
+    },
+    {
+      "key": "education.landing.trust.title",
+      "usages": [
+        {
+          "file": "app/[locale]/education/PageClient.tsx",
+          "line": 151
+        }
+      ]
+    },
+    {
+      "key": "education.landing.welcomeBack",
+      "usages": [
+        {
+          "file": "app/[locale]/education/PageClient.tsx",
+          "line": 68
+        }
+      ]
+    },
+    {
+      "key": "mp.abort.body",
+      "usages": [
+        {
+          "file": "components/multiplayer/MPGameAbortedModal.tsx",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "key": "mp.abort.continueSolo",
+      "usages": [
+        {
+          "file": "components/multiplayer/MPGameAbortedModal.tsx",
+          "line": 34
+        },
+        {
+          "file": "components/multiplayer/MPGameAbortedModal.tsx",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "key": "mp.abort.returnToLobby",
+      "usages": [
+        {
+          "file": "components/multiplayer/MPGameAbortedModal.tsx",
+          "line": 41
+        },
+        {
+          "file": "components/multiplayer/MPGameAbortedModal.tsx",
+          "line": 44
+        }
+      ]
+    },
+    {
+      "key": "mp.abort.title",
+      "usages": [
+        {
+          "file": "components/multiplayer/MPGameAbortedModal.tsx",
+          "line": 19
+        },
+        {
+          "file": "components/multiplayer/MPGameAbortedModal.tsx",
+          "line": 25
+        }
+      ]
+    },
+    {
+      "key": "mp.quality.degraded",
+      "usages": [
+        {
+          "file": "components/multiplayer/ConnectionQualityChip.tsx",
+          "line": 26
+        }
+      ]
+    },
+    {
+      "key": "mp.quality.reconnecting",
+      "usages": [
+        {
+          "file": "components/multiplayer/ConnectionQualityChip.tsx",
+          "line": 32
+        }
+      ]
+    },
+    {
+      "key": "mp.quality.weak",
+      "usages": [
+        {
+          "file": "components/multiplayer/ConnectionQualityChip.tsx",
+          "line": 32
+        }
+      ]
+    },
+    {
+      "key": "mp.reconnect.attempt",
+      "usages": [
+        {
+          "file": "components/multiplayer/ReconnectingOverlay.tsx",
+          "line": 33
+        }
+      ]
+    },
+    {
+      "key": "mp.reconnect.giveUp",
+      "usages": [
+        {
+          "file": "components/multiplayer/ReconnectingOverlay.tsx",
+          "line": 39
+        },
+        {
+          "file": "components/multiplayer/ReconnectingOverlay.tsx",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "key": "mp.reconnect.title",
+      "usages": [
+        {
+          "file": "components/multiplayer/ReconnectingOverlay.tsx",
+          "line": 20
+        },
+        {
+          "file": "components/multiplayer/ReconnectingOverlay.tsx",
+          "line": 30
+        }
+      ]
+    },
+    {
+      "key": "mp.stopGameConfirm",
+      "usages": [
+        {
+          "file": "host/components/HostInGameView.tsx",
+          "line": 268
+        },
+        {
+          "file": "host/components/HostInGameView.tsx",
+          "line": 308
+        },
+        {
+          "file": "host/components/HostInGameView.tsx",
+          "line": 347
+        },
+        {
+          "file": "host/components/HostInGameView.tsx",
+          "line": 424
+        }
+      ]
+    },
+    {
+      "key": "mp.stopGameYes",
+      "usages": [
+        {
+          "file": "host/components/HostInGameView.tsx",
+          "line": 271
+        },
+        {
+          "file": "host/components/HostInGameView.tsx",
+          "line": 311
+        },
+        {
+          "file": "host/components/HostInGameView.tsx",
+          "line": 350
+        },
+        {
+          "file": "host/components/HostInGameView.tsx",
+          "line": 427
+        }
+      ]
+    },
+    {
+      "key": "practice.again",
+      "usages": [
+        {
+          "file": "components/practice/PracticePostCompleteChip.tsx",
+          "line": 40
+        }
+      ]
+    },
+    {
+      "key": "practice.allDone",
+      "usages": [
+        {
+          "file": "components/practice/PracticeChainCta.tsx",
+          "line": 50
+        }
+      ]
+    },
+    {
+      "key": "practice.classic.notAWord",
+      "usages": [
+        {
+          "file": "components/practice/PracticeClassicSandbox.tsx",
+          "line": 138
+        }
+      ]
+    },
+    {
+      "key": "practice.coach.dismiss",
+      "usages": [
+        {
+          "file": "components/practice/PracticeCoachTip.tsx",
+          "line": 71
+        }
+      ]
+    },
+    {
+      "key": "practice.coach.label",
+      "usages": [
+        {
+          "file": "components/practice/PracticeCoachTip.tsx",
+          "line": 61
+        }
+      ]
+    },
+    {
+      "key": "practice.complete.title",
+      "usages": [
+        {
+          "file": "components/practice/PracticeCompleteBanner.tsx",
+          "line": 38
+        },
+        {
+          "file": "components/practice/PracticeCompletePopup.tsx",
+          "line": 103
+        }
+      ]
+    },
+    {
+      "key": "practice.endRun",
+      "usages": [
+        {
+          "file": "components/daily/WordWheelGame.tsx",
+          "line": 672
+        }
+      ]
+    },
+    {
+      "key": "practice.instructions.cta",
+      "usages": [
+        {
+          "file": "components/practice/PracticeInstructions.tsx",
+          "line": 187
+        }
+      ]
+    },
+    {
+      "key": "practice.instructions.title",
+      "usages": [
+        {
+          "file": "components/practice/PracticeInstructions.tsx",
+          "line": 102
+        },
+        {
+          "file": "components/practice/PracticeInstructions.tsx",
+          "line": 115
+        },
+        {
+          "file": "components/practice/PracticeInstructions.tsx",
+          "line": 165
+        }
+      ]
+    },
+    {
+      "key": "practice.keepPracticing",
+      "usages": [
+        {
+          "file": "components/practice/PracticeCompletePopup.tsx",
+          "line": 142
+        }
+      ]
+    },
+    {
+      "key": "practice.mistakeCoach.ariaLabel",
+      "usages": [
+        {
+          "file": "components/practice/PracticeMistakeCoach.tsx",
+          "line": 81
+        }
+      ]
+    },
+    {
+      "key": "practice.mistakeCoach.cta",
+      "usages": [
+        {
+          "file": "components/practice/PracticeMistakeCoach.tsx",
+          "line": 88
+        },
+        {
+          "file": "components/practice/PracticeMistakeCoach.tsx",
+          "line": 113
+        },
+        {
+          "file": "components/practice/PracticeMistakeCoach.tsx",
+          "line": 151
+        }
+      ]
+    },
+    {
+      "key": "practice.modifier.bonus",
+      "usages": [
+        {
+          "file": "components/practice/ModifierBanner.tsx",
+          "line": 23
+        }
+      ]
+    },
+    {
+      "key": "practice.modifier.todayLabel",
+      "usages": [
+        {
+          "file": "components/practice/ModifierBanner.tsx",
+          "line": 39
+        }
+      ]
+    },
+    {
+      "key": "practice.wheelRush.builderHint",
+      "usages": [
+        {
+          "file": "components/practice/PracticeWheelSandbox.tsx",
+          "line": 480
+        }
+      ]
+    },
+    {
+      "key": "practice.wheelRush.duplicate",
+      "usages": [
+        {
+          "file": "components/practice/PracticeWheelSandbox.tsx",
+          "line": 462
+        }
+      ]
+    },
+    {
+      "key": "practice.wheelRush.found",
+      "usages": [
+        {
+          "file": "components/practice/PracticeWheelSandbox.tsx",
+          "line": 458
+        }
+      ]
+    },
+    {
+      "key": "practice.wheelRush.needsCenter",
+      "usages": [
+        {
+          "file": "components/practice/PracticeWheelSandbox.tsx",
+          "line": 460
+        }
+      ]
+    },
+    {
+      "key": "practice.wheelRush.notAWord",
+      "usages": [
+        {
+          "file": "components/practice/PracticeWheelSandbox.tsx",
+          "line": 463
+        }
+      ]
+    },
+    {
+      "key": "practice.wheelRush.reset",
+      "usages": [
+        {
+          "file": "components/practice/PracticeWheelSandbox.tsx",
+          "line": 516
+        }
+      ]
+    },
+    {
+      "key": "practice.wheelRush.scoreChip",
+      "usages": [
+        {
+          "file": "components/practice/PracticeWheelSandbox.tsx",
+          "line": 375
+        }
+      ]
+    },
+    {
+      "key": "practice.wheelRush.shuffle",
+      "usages": [
+        {
+          "file": "components/practice/PracticeWheelSandbox.tsx",
+          "line": 530
+        }
+      ]
+    },
+    {
+      "key": "practice.wordHunt.discoveryHint",
+      "usages": [
+        {
+          "file": "components/practice/PracticeWordHuntSandbox.tsx",
+          "line": 295
+        }
+      ]
+    },
+    {
+      "key": "practice.wordHunt.discoveryTip",
+      "usages": [
+        {
+          "file": "components/practice/PracticeWordHuntSandbox.tsx",
+          "line": 335
+        }
+      ]
+    },
+    {
+      "key": "practice.wordHunt.discoveryTipNoClue",
+      "usages": [
+        {
+          "file": "components/practice/PracticeWordHuntSandbox.tsx",
+          "line": 297
+        }
+      ]
+    },
+    {
+      "key": "practice.wordHunt.goalChip",
+      "usages": [
+        {
+          "file": "components/practice/PracticeWordHuntSandbox.tsx",
+          "line": 380
+        }
+      ]
+    },
+    {
+      "key": "practice.wordHunt.livesNote",
+      "usages": [
+        {
+          "file": "components/practice/PracticeWordHuntSandbox.tsx",
+          "line": 363
+        },
+        {
+          "file": "components/practice/PracticeWordHuntSandbox.tsx",
+          "line": 401
+        }
+      ]
+    },
+    {
+      "key": "practice.wordHunt.realGameLabel",
+      "usages": [
+        {
+          "file": "components/practice/PracticeWordHuntSandbox.tsx",
+          "line": 366
+        }
+      ]
+    },
+    {
+      "key": "practice.wordHunt.shortWordTip",
+      "usages": [
+        {
+          "file": "components/practice/PracticeWordHuntSandbox.tsx",
+          "line": 179
+        }
+      ]
+    },
+    {
+      "key": "results.backToLobby",
+      "usages": [
+        {
+          "file": "components/views/ResultsPage.tsx",
+          "line": 874
+        }
+      ]
+    },
+    {
+      "key": "results.calculating",
+      "usages": [
+        {
+          "file": "components/views/ResultsPage.tsx",
+          "line": 863
+        }
+      ]
+    },
+    {
+      "key": "results.calculatingHint",
+      "usages": [
+        {
+          "file": "components/views/ResultsPage.tsx",
+          "line": 866
+        }
+      ]
+    },
+    {
+      "key": "wordHunt.results.wordsFound",
+      "usages": [
+        {
+          "file": "components/daily/WordHuntWordsModal.tsx",
+          "line": 75
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [
       "common.copiedToClipboard",
@@ -194,28 +3964,27 @@
       "tvBroadcast.timesUpSub",
       "auth.otp.codeSent",
       "auth.otp.enterCode",
-      "practice.instructions.wordHunt.scoring1",
-      "practice.instructions.wordHunt.scoring2",
-      "practice.instructions.wheelRush.scoring1",
-      "practice.instructions.wheelRush.scoring2",
       "daily.comeBackTomorrow",
       "daily.milestoneReached",
       "daily.rewardClaimed",
       "daily.streakFreezeEarned",
       "wordHunt.play",
       "wordHunt.categoryHint",
+      "wordHunt.mp.quality.degraded",
+      "wordHunt.mp.quality.weak",
+      "wordHunt.mp.quality.reconnecting",
+      "wordHunt.mp.reconnect.title",
+      "wordHunt.mp.reconnect.attempt",
+      "wordHunt.mp.reconnect.giveUp",
+      "wordHunt.mp.abort.title",
+      "wordHunt.mp.abort.body",
+      "wordHunt.mp.abort.continueSolo",
+      "wordHunt.mp.abort.returnToLobby",
       "multiplayer.nearRank",
       "multiplayer.oneMoreWin",
       "multiplayer.rankUp",
       "multiplayer.welcomeToTier",
       "multiplayer.winStreak",
-      "friends.challenges.accept",
-      "friends.challenges.accepted",
-      "friends.challenges.acceptFailed",
-      "friends.challenges.decline",
-      "friends.challenges.declined",
-      "friends.challenges.friendAccepted",
-      "friends.challenges.received",
       "adventure.share.perfectClear",
       "adventure.share.bestWord",
       "adventure.share.wordsFound",
@@ -253,16 +4022,105 @@
       "adventure.mutators.noHints.name",
       "adventure.mutators.speedRun.name",
       "adventure.mutators.wordMaster.name",
+      "blast.tutorial.ftue.skip",
+      "blast.tutorial.ftue.step1",
+      "blast.tutorial.ftue.step1Cta",
+      "blast.tutorial.ftue.step2",
+      "blast.tutorial.ftue.step2Hint",
+      "blast.tutorial.ftue.step3",
+      "blast.tutorial.ftue.step4",
+      "blast.tutorial.ftue.step5",
+      "blast.tutorial.ftue.step6",
+      "blast.tutorial.veteran.title",
+      "blast.tutorial.veteran.body",
+      "blast.tutorial.veteran.cta",
+      "notifications.admin.sendTitle",
+      "notifications.admin.selectPlayers",
+      "notifications.admin.chooseType",
+      "notifications.admin.writeMessage",
+      "notifications.admin.preview",
+      "notifications.admin.send",
+      "notifications.admin.sending",
+      "notifications.admin.sent",
+      "notifications.admin.recipients",
+      "notifications.admin.type",
+      "notifications.admin.sendingTo",
+      "notifications.admin.titleLabel",
+      "notifications.admin.titlePlaceholder",
+      "notifications.admin.bodyLabel",
+      "notifications.admin.bodyPlaceholder",
+      "notifications.admin.actionUrlLabel",
+      "notifications.admin.sendSuccess",
+      "notifications.admin.sendError",
       "wotd.title",
+      "asyncChallenge.recentResults",
+      "asyncChallenge.mode.classic",
+      "asyncChallenge.mode.blast",
+      "asyncChallenge.mode.word-hunt",
+      "asyncChallenge.received.title",
+      "asyncChallenge.received.body",
+      "asyncChallenge.result.titleWin",
+      "asyncChallenge.result.titleLoss",
+      "asyncChallenge.result.titleTie",
+      "asyncChallenge.result.bodyWin",
+      "asyncChallenge.result.bodyLoss",
+      "asyncChallenge.result.bodyTie",
       "wordForge.go"
     ],
     "sv": [
-      "practice.instructions.classic.scoring1",
-      "practice.instructions.classic.scoring2",
-      "practice.instructions.wordHunt.scoring1",
-      "practice.instructions.wordHunt.scoring2",
-      "practice.instructions.wheelRush.scoring1",
-      "practice.instructions.wheelRush.scoring2",
+      "wordHunt.mp.quality.degraded",
+      "wordHunt.mp.quality.weak",
+      "wordHunt.mp.quality.reconnecting",
+      "wordHunt.mp.reconnect.title",
+      "wordHunt.mp.reconnect.attempt",
+      "wordHunt.mp.reconnect.giveUp",
+      "wordHunt.mp.abort.title",
+      "wordHunt.mp.abort.body",
+      "wordHunt.mp.abort.continueSolo",
+      "wordHunt.mp.abort.returnToLobby",
+      "friends.backToFriends",
+      "blast.tutorial.ftue.skip",
+      "blast.tutorial.ftue.step1",
+      "blast.tutorial.ftue.step1Cta",
+      "blast.tutorial.ftue.step2",
+      "blast.tutorial.ftue.step2Hint",
+      "blast.tutorial.ftue.step3",
+      "blast.tutorial.ftue.step4",
+      "blast.tutorial.ftue.step5",
+      "blast.tutorial.ftue.step6",
+      "blast.tutorial.veteran.title",
+      "blast.tutorial.veteran.body",
+      "blast.tutorial.veteran.cta",
+      "notifications.admin.sendTitle",
+      "notifications.admin.selectPlayers",
+      "notifications.admin.chooseType",
+      "notifications.admin.writeMessage",
+      "notifications.admin.preview",
+      "notifications.admin.send",
+      "notifications.admin.sending",
+      "notifications.admin.sent",
+      "notifications.admin.recipients",
+      "notifications.admin.type",
+      "notifications.admin.sendingTo",
+      "notifications.admin.titleLabel",
+      "notifications.admin.titlePlaceholder",
+      "notifications.admin.bodyLabel",
+      "notifications.admin.bodyPlaceholder",
+      "notifications.admin.actionUrlLabel",
+      "notifications.admin.sendSuccess",
+      "notifications.admin.sendError",
+      "asyncChallenge.recentResults",
+      "asyncChallenge.mode.classic",
+      "asyncChallenge.mode.blast",
+      "asyncChallenge.mode.word-hunt",
+      "asyncChallenge.received.title",
+      "asyncChallenge.received.body",
+      "asyncChallenge.result.titleWin",
+      "asyncChallenge.result.titleLoss",
+      "asyncChallenge.result.titleTie",
+      "asyncChallenge.result.bodyWin",
+      "asyncChallenge.result.bodyLoss",
+      "asyncChallenge.result.bodyTie",
       "connections.title",
       "connections.subtitle",
       "connections.placeholder",
@@ -389,30 +4247,27 @@
       "tvBroadcast.timesUpSub",
       "auth.otp.codeSent",
       "auth.otp.enterCode",
-      "practice.instructions.classic.scoring1",
-      "practice.instructions.classic.scoring2",
-      "practice.instructions.wordHunt.scoring1",
-      "practice.instructions.wordHunt.scoring2",
-      "practice.instructions.wheelRush.scoring1",
-      "practice.instructions.wheelRush.scoring2",
       "daily.comeBackTomorrow",
       "daily.milestoneReached",
       "daily.rewardClaimed",
       "daily.streakFreezeEarned",
       "wordHunt.play",
       "wordHunt.categoryHint",
+      "wordHunt.mp.quality.degraded",
+      "wordHunt.mp.quality.weak",
+      "wordHunt.mp.quality.reconnecting",
+      "wordHunt.mp.reconnect.title",
+      "wordHunt.mp.reconnect.attempt",
+      "wordHunt.mp.reconnect.giveUp",
+      "wordHunt.mp.abort.title",
+      "wordHunt.mp.abort.body",
+      "wordHunt.mp.abort.continueSolo",
+      "wordHunt.mp.abort.returnToLobby",
       "multiplayer.nearRank",
       "multiplayer.oneMoreWin",
       "multiplayer.rankUp",
       "multiplayer.welcomeToTier",
       "multiplayer.winStreak",
-      "friends.challenges.accept",
-      "friends.challenges.accepted",
-      "friends.challenges.acceptFailed",
-      "friends.challenges.decline",
-      "friends.challenges.declined",
-      "friends.challenges.friendAccepted",
-      "friends.challenges.received",
       "adventure.share.perfectClear",
       "adventure.share.bestWord",
       "adventure.share.wordsFound",
@@ -424,70 +4279,48 @@
       "adventure.bosses.tutorialGotIt",
       "adventure.loot.fragment",
       "adventure.loot.luckyBonus",
-      "adventure.ascension.level1",
-      "adventure.ascension.level2",
-      "adventure.ascension.level3",
-      "adventure.ascension.level4",
-      "adventure.ascension.level5",
-      "adventure.ascension.level6",
-      "adventure.ascension.level7",
-      "adventure.ascension.level8",
-      "adventure.ascension.level9",
-      "adventure.ascension.level10",
-      "adventure.consumables.bossRevive.name",
-      "adventure.consumables.bossShield.name",
-      "adventure.consumables.doubleGold.name",
-      "adventure.consumables.extraHint.name",
-      "adventure.consumables.gridReroll.name",
-      "adventure.consumables.objectiveSkip.name",
-      "adventure.consumables.perfectStar.name",
-      "adventure.consumables.timerExtension.name",
-      "adventure.mutators.blindMode.name",
-      "adventure.mutators.chaosGrid.name",
-      "adventure.mutators.fragile.name",
-      "adventure.mutators.ironMan.name",
-      "adventure.mutators.minimalist.name",
-      "adventure.mutators.noHints.name",
-      "adventure.mutators.speedRun.name",
-      "adventure.mutators.wordMaster.name",
-      "wotd.title",
-      "wordForge.go",
-      "connections.title",
-      "connections.subtitle",
-      "connections.placeholder",
-      "connections.submit",
-      "connections.correct",
-      "connections.wrong",
-      "connections.lives",
-      "connections.score",
-      "connections.streak",
-      "connections.finished",
-      "connections.finalScore",
-      "connections.playAgain",
-      "connections.loading",
-      "connections.noAccess",
-      "connections.hintLabel",
-      "connections.bonusPoints",
-      "connections.wordChain",
-      "connections.giveUp",
-      "connections.solutionIs",
-      "connections.like",
-      "connections.dislike",
-      "connections.next",
-      "connections.rateThis",
-      "connections.thanks",
-      "connections.xpEarned",
-      "connections.level",
-      "connections.outOfLives",
-      "connections.reviveDescription",
-      "connections.reviveAd",
-      "connections.adminRefill",
-      "connections.quitToMenu",
-      "connections.noAdAvailable",
-      "connections.revealHint",
-      "connections.revealHintAd",
-      "connections.revealAnswerAd",
-      "connections.adminGiveUp",
+      "blast.tutorial.ftue.skip",
+      "blast.tutorial.ftue.step1",
+      "blast.tutorial.ftue.step1Cta",
+      "blast.tutorial.ftue.step2",
+      "blast.tutorial.ftue.step2Hint",
+      "blast.tutorial.ftue.step3",
+      "blast.tutorial.ftue.step4",
+      "blast.tutorial.ftue.step5",
+      "blast.tutorial.ftue.step6",
+      "blast.tutorial.veteran.title",
+      "blast.tutorial.veteran.body",
+      "blast.tutorial.veteran.cta",
+      "notifications.admin.sendTitle",
+      "notifications.admin.selectPlayers",
+      "notifications.admin.chooseType",
+      "notifications.admin.writeMessage",
+      "notifications.admin.preview",
+      "notifications.admin.send",
+      "notifications.admin.sending",
+      "notifications.admin.sent",
+      "notifications.admin.recipients",
+      "notifications.admin.type",
+      "notifications.admin.sendingTo",
+      "notifications.admin.titleLabel",
+      "notifications.admin.titlePlaceholder",
+      "notifications.admin.bodyLabel",
+      "notifications.admin.bodyPlaceholder",
+      "notifications.admin.actionUrlLabel",
+      "notifications.admin.sendSuccess",
+      "notifications.admin.sendError",
+      "asyncChallenge.recentResults",
+      "asyncChallenge.mode.classic",
+      "asyncChallenge.mode.blast",
+      "asyncChallenge.mode.word-hunt",
+      "asyncChallenge.received.title",
+      "asyncChallenge.received.body",
+      "asyncChallenge.result.titleWin",
+      "asyncChallenge.result.titleLoss",
+      "asyncChallenge.result.titleTie",
+      "asyncChallenge.result.bodyWin",
+      "asyncChallenge.result.bodyLoss",
+      "asyncChallenge.result.bodyTie",
       "connections.landing.metaTitle",
       "connections.landing.metaDescription",
       "connections.landing.metaKeywords",
@@ -563,6 +4396,58 @@
       "connections.landing.crossPromoCta"
     ],
     "es": [
+      "wordHunt.mp.quality.degraded",
+      "wordHunt.mp.quality.weak",
+      "wordHunt.mp.quality.reconnecting",
+      "wordHunt.mp.reconnect.title",
+      "wordHunt.mp.reconnect.attempt",
+      "wordHunt.mp.reconnect.giveUp",
+      "wordHunt.mp.abort.title",
+      "wordHunt.mp.abort.body",
+      "wordHunt.mp.abort.continueSolo",
+      "wordHunt.mp.abort.returnToLobby",
+      "blast.tutorial.ftue.skip",
+      "blast.tutorial.ftue.step1",
+      "blast.tutorial.ftue.step1Cta",
+      "blast.tutorial.ftue.step2",
+      "blast.tutorial.ftue.step2Hint",
+      "blast.tutorial.ftue.step3",
+      "blast.tutorial.ftue.step4",
+      "blast.tutorial.ftue.step5",
+      "blast.tutorial.ftue.step6",
+      "blast.tutorial.veteran.title",
+      "blast.tutorial.veteran.body",
+      "blast.tutorial.veteran.cta",
+      "notifications.admin.sendTitle",
+      "notifications.admin.selectPlayers",
+      "notifications.admin.chooseType",
+      "notifications.admin.writeMessage",
+      "notifications.admin.preview",
+      "notifications.admin.send",
+      "notifications.admin.sending",
+      "notifications.admin.sent",
+      "notifications.admin.recipients",
+      "notifications.admin.type",
+      "notifications.admin.sendingTo",
+      "notifications.admin.titleLabel",
+      "notifications.admin.titlePlaceholder",
+      "notifications.admin.bodyLabel",
+      "notifications.admin.bodyPlaceholder",
+      "notifications.admin.actionUrlLabel",
+      "notifications.admin.sendSuccess",
+      "notifications.admin.sendError",
+      "asyncChallenge.recentResults",
+      "asyncChallenge.mode.classic",
+      "asyncChallenge.mode.blast",
+      "asyncChallenge.mode.word-hunt",
+      "asyncChallenge.received.title",
+      "asyncChallenge.received.body",
+      "asyncChallenge.result.titleWin",
+      "asyncChallenge.result.titleLoss",
+      "asyncChallenge.result.titleTie",
+      "asyncChallenge.result.bodyWin",
+      "asyncChallenge.result.bodyLoss",
+      "asyncChallenge.result.bodyTie",
       "connections.landing.metaTitle",
       "connections.landing.metaDescription",
       "connections.landing.metaKeywords",
@@ -656,12 +4541,481 @@
       "leadChange.pointsAhead",
       "leadChange.wordsFound",
       "hostView.progressAnnouncement",
+      "education.teacher.activeGames",
+      "education.teacher.noActiveGames",
+      "admin.gameModePopularity",
+      "admin.totalGames",
+      "admin.landingCardOrder",
+      "admin.noData",
+      "admin.dashboard",
+      "admin.accessRequired",
+      "admin.accessDenied",
+      "admin.welcome",
+      "admin.loadingDashboard",
+      "admin.preparingTools",
+      "admin.loadingSession",
+      "admin.sessionError",
+      "admin.nav.players",
+      "admin.nav.dictionary",
+      "admin.nav.invalidWords",
+      "admin.nav.dailyChallenge",
+      "admin.nav.wikipediaWords",
+      "admin.nav.wordBank",
+      "admin.nav.webVitals",
+      "admin.nav.email",
+      "admin.nav.milogWords",
+      "admin.nav.teacherAccess",
+      "admin.teacherAccess.title",
+      "admin.teacherAccess.count.pending",
+      "admin.teacherAccess.count.approved",
+      "admin.teacherAccess.count.declined",
+      "admin.teacherAccess.count.total",
+      "admin.teacherAccess.filter_status",
+      "admin.teacherAccess.filter_status_all",
+      "admin.teacherAccess.filter_locale",
+      "admin.teacherAccess.filter_country",
+      "admin.teacherAccess.refresh",
+      "admin.teacherAccess.page",
+      "admin.teacherAccess.export_csv",
+      "admin.teacherAccess.col.name",
+      "admin.teacherAccess.col.email",
+      "admin.teacherAccess.col.role",
+      "admin.teacherAccess.col.locale",
+      "admin.teacherAccess.col.country",
+      "admin.teacherAccess.col.status",
+      "admin.teacherAccess.col.submitted",
+      "admin.teacherAccess.drawer_title",
+      "admin.teacherAccess.field.name",
+      "admin.teacherAccess.field.email",
+      "admin.teacherAccess.field.role",
+      "admin.teacherAccess.field.locale",
+      "admin.teacherAccess.field.country",
+      "admin.teacherAccess.field.school",
+      "admin.teacherAccess.field.status",
+      "admin.teacherAccess.field.submitted",
+      "admin.teacherAccess.field.use_case",
+      "admin.teacherAccess.admin_note",
+      "admin.teacherAccess.approve",
+      "admin.teacherAccess.decline",
+      "admin.teacherAccess.close",
+      "admin.sidebar.overview",
+      "admin.sidebar.analytics",
+      "admin.sidebar.moderation",
+      "admin.sidebar.content",
+      "admin.sidebar.players",
+      "admin.sidebar.guests",
+      "admin.sidebar.system",
+      "admin.sidebar.wordCraft",
+      "admin.kpi.dau",
+      "admin.kpi.gamesToday",
+      "admin.kpi.signupsToday",
+      "admin.kpi.stickiness",
+      "admin.kpi.totalPlayers",
+      "admin.kpi.totalWords",
+      "admin.kpi.thisWeek",
+      "admin.system.ok",
+      "admin.system.down",
+      "admin.analytics.title",
+      "admin.analytics.retentionTitle",
+      "admin.analytics.cohort",
+      "admin.analytics.size",
+      "admin.analytics.funnelTitle",
+      "admin.analytics.funnelRegistered",
+      "admin.analytics.funnelFirstGame",
+      "admin.analytics.funnelDay7",
+      "admin.analytics.funnelDay30",
+      "admin.analytics.churnTitle",
+      "admin.analytics.churnTotal",
+      "admin.analytics.noChurnRisk",
+      "admin.analytics.games",
+      "admin.moderation.title",
+      "admin.moderation.queueTitle",
+      "admin.moderation.empty",
+      "admin.moderation.approve",
+      "admin.moderation.reject",
+      "admin.moderation.investigate",
+      "admin.moderation.banPlayer",
+      "admin.moderation.warnPlayer",
+      "admin.moderation.playerDetail",
+      "admin.moderation.moderationHistory",
+      "admin.moderation.recentGames",
+      "admin.moderation.cheatSignals",
+      "admin.moderation.flaggedPlayers",
+      "admin.moderation.noFlags",
+      "admin.content.pendingWords",
+      "admin.content.approvedWords",
+      "admin.content.topReported",
+      "admin.content.noReports",
+      "admin.invalidWords.title",
+      "admin.invalidWords.subtitle",
+      "admin.invalidWords.word",
+      "admin.invalidWords.language",
+      "admin.invalidWords.count",
+      "admin.invalidWords.reason",
+      "admin.invalidWords.firstSubmitted",
+      "admin.invalidWords.lastSubmitted",
+      "admin.invalidWords.approve",
+      "admin.invalidWords.approved",
+      "admin.invalidWords.dismiss",
+      "admin.invalidWords.addToDictionary",
+      "admin.invalidWords.noResults",
+      "admin.invalidWords.pendingReview",
+      "admin.invalidWords.reasons.not_on_board",
+      "admin.invalidWords.reasons.not_in_dictionary",
+      "admin.invalidWords.reasons.peer_rejected",
+      "admin.invalidWords.reasons.dismissed",
+      "admin.invalidWords.reasons.unknown",
+      "admin.live.subtitle",
+      "admin.live.live",
+      "admin.live.games",
+      "admin.live.players",
+      "admin.live.sockets",
+      "admin.live.singlePlayer",
+      "admin.live.refresh",
+      "admin.live.retry",
+      "admin.live.noGames",
+      "admin.live.noGamesHint",
+      "admin.live.activeGames",
+      "admin.live.connectedPlayers",
+      "admin.live.player",
+      "admin.live.game",
+      "admin.live.status",
+      "admin.live.score",
+      "admin.live.type",
+      "admin.live.auth",
+      "admin.live.guest",
+      "admin.live.ranked",
+      "admin.live.left",
+      "admin.live.started",
+      "admin.live.lastUpdated",
+      "admin.live.singlePlayerLive",
+      "admin.live.mode",
+      "admin.email.title",
+      "admin.email.recipientEmail",
+      "admin.email.recipientName",
+      "admin.email.sendTest",
+      "admin.email.sending",
+      "admin.email.errorNoEmail",
+      "admin.email.showPreview",
+      "admin.email.hidePreview",
+      "admin.email.preview",
+      "admin.email.previewNote",
+      "admin.email.info",
+      "admin.todayGames.title",
+      "admin.todayGames.refresh",
+      "admin.todayGames.retry",
+      "admin.todayGames.totalGames",
+      "admin.todayGames.multiplayer",
+      "admin.todayGames.wordHunt",
+      "admin.todayGames.daily",
+      "admin.todayGames.drills",
+      "admin.todayGames.filters",
+      "admin.todayGames.allLanguages",
+      "admin.todayGames.allTypes",
+      "admin.todayGames.allModes",
+      "admin.todayGames.rankedOnly",
+      "admin.todayGames.casualOnly",
+      "admin.todayGames.time",
+      "admin.todayGames.player",
+      "admin.todayGames.type",
+      "admin.todayGames.language",
+      "admin.todayGames.score",
+      "admin.todayGames.words",
+      "admin.todayGames.duration",
+      "admin.todayGames.code",
+      "admin.todayGames.ranked",
+      "admin.todayGames.casual",
+      "admin.todayGames.guest",
+      "admin.todayGames.first",
+      "admin.todayGames.firstGame",
+      "admin.todayGames.noGames",
+      "admin.todayGames.noGamesHint",
+      "admin.todayGames.showing",
+      "admin.todayGames.of",
+      "admin.todayGames.lastUpdated",
+      "admin.templateEditor.previewTitle",
+      "admin.templateEditor.validationTitle",
+      "admin.templateEditor.missingPlaceholders",
+      "admin.templateEditor.unusedPlaceholders",
+      "admin.templateEditor.validTemplate",
+      "admin.wordBank.title",
+      "admin.wordBank.description",
+      "admin.wordBank.wordList",
+      "admin.wordBank.word",
+      "admin.wordBank.language",
+      "admin.wordBank.source",
+      "admin.wordBank.status",
+      "admin.wordBank.validationStatus",
+      "admin.wordBank.timesUsed",
+      "admin.wordBank.lastUsed",
+      "admin.wordBank.actions",
+      "admin.wordBank.approve",
+      "admin.wordBank.reject",
+      "admin.wordBank.delete",
+      "admin.wordBank.deleteWord",
+      "admin.wordBank.confirmDeleteWord",
+      "admin.wordBank.wordDeleted",
+      "admin.wordBank.stats.title",
+      "admin.wordBank.stats.totalWords",
+      "admin.wordBank.stats.activeWords",
+      "admin.wordBank.stats.blockedWords",
+      "admin.wordBank.stats.pendingReview",
+      "admin.wordBank.stats.approved",
+      "admin.wordBank.stats.rejected",
+      "admin.wordBank.stats.bySource",
+      "admin.wordBank.filters.allLanguages",
+      "admin.wordBank.filters.allStatuses",
+      "admin.wordBank.filters.allSources",
+      "admin.wordBank.filters.searchLabel",
+      "admin.wordBank.filters.search",
+      "admin.wordBank.filters.active",
+      "admin.wordBank.filters.blocked",
+      "admin.wordBank.filters.used",
+      "admin.wordBank.sources.static",
+      "admin.wordBank.sources.dictionary",
+      "admin.wordBank.sources.wikipedia",
+      "admin.wordBank.sources.admin",
+      "admin.wordBank.sources.ai",
+      "admin.wordBank.noWordsFound",
+      "admin.wordBank.tryAdjustingFilters",
+      "admin.wordBank.loadMore",
+      "admin.wordBank.loading",
+      "admin.wordBank.deleting",
+      "admin.wordBank.confirm",
+      "admin.wordBank.cancel",
+      "admin.wordBank.bulkImport.title",
+      "admin.wordBank.bulkImport.button",
+      "admin.wordBank.bulkImport.instructions",
+      "admin.wordBank.bulkImport.formatPlain",
+      "admin.wordBank.bulkImport.formatCsv",
+      "admin.wordBank.bulkImport.lengthFilter",
+      "admin.wordBank.bulkImport.source",
+      "admin.wordBank.bulkImport.validationStatus",
+      "admin.wordBank.bulkImport.wordsLabel",
+      "admin.wordBank.bulkImport.noContent",
+      "admin.wordBank.bulkImport.importing",
+      "admin.wordBank.bulkImport.import",
+      "admin.wordBank.bulkImport.result",
+      "admin.wordBank.bulkImport.imported",
+      "admin.wordBank.bulkImport.skipped",
+      "admin.wordBank.bulkImport.errors",
+      "admin.wordBank.bulkImport.showErrors",
+      "admin.wordBank.bulkActions.selected",
+      "admin.wordBank.bulkActions.approveAll",
+      "admin.wordBank.bulkActions.rejectAll",
+      "admin.wordBank.bulkActions.approving",
+      "admin.wordBank.bulkActions.rejecting",
+      "admin.wordBank.bulkActions.clearSelection",
+      "admin.wordBank.bulkActions.successMessage",
+      "admin.wordBank.bulkActions.errorMessage",
+      "admin.wordBank.wikipediaSync.title",
+      "admin.wordBank.wikipediaSync.description",
+      "admin.wordBank.wikipediaSync.syncNow",
+      "admin.wordBank.wikipediaSync.syncing",
+      "admin.wordBank.wikipediaSync.success",
+      "admin.activity.title",
+      "admin.activity.totalGames",
+      "admin.activity.uniquePlayers",
+      "admin.activity.signups",
+      "admin.activity.empty",
+      "admin.activity.error",
+      "admin.geo.title",
+      "admin.geo.registered",
+      "admin.geo.guests",
+      "admin.geo.empty",
+      "admin.geo.error",
+      "admin.acquisition.title",
+      "admin.acquisition.sources",
+      "admin.acquisition.mediums",
+      "admin.acquisition.campaigns",
+      "admin.acquisition.referrers",
+      "admin.acquisition.empty",
+      "admin.acquisition.error",
+      "admin.authSessions.title",
+      "admin.authSessions.totalGames",
+      "admin.authSessions.uniqueUsers",
+      "admin.authSessions.avgScore",
+      "admin.authSessions.completionRate",
+      "admin.authSessions.byMode",
+      "admin.authSessions.byLanguage",
+      "admin.authSessions.empty",
+      "admin.authSessions.error",
+      "admin.guests.title",
+      "admin.guests.totalGames",
+      "admin.guests.uniqueGuests",
+      "admin.guests.avgScore",
+      "admin.guests.byMode",
+      "admin.guests.byLanguage",
+      "admin.guests.windowDays",
+      "admin.guests.empty",
+      "admin.guests.error",
+      "admin.player.title",
+      "admin.player.back",
+      "admin.player.notFound",
+      "admin.player.loadError",
+      "admin.player.joined",
+      "admin.player.lastGame",
+      "admin.player.recentGames",
+      "admin.player.avgScore",
+      "admin.player.totalScore",
+      "admin.player.level",
+      "admin.player.mmr",
+      "admin.player.winRate",
+      "admin.player.identity",
+      "admin.player.role",
+      "admin.player.dailyEmail",
+      "admin.player.referrals",
+      "admin.player.seasonScore",
+      "admin.player.economy",
+      "admin.player.coins",
+      "admin.player.lifetimeCoins",
+      "admin.player.hintsUsed",
+      "admin.player.longestWord",
+      "admin.player.acquisition",
+      "admin.player.utmSource",
+      "admin.player.utmMedium",
+      "admin.player.utmCampaign",
+      "admin.player.referrer",
+      "admin.player.noAcquisitionData",
+      "admin.player.byLanguage",
+      "admin.player.byMode",
+      "admin.player.sessions",
+      "admin.player.completed",
+      "admin.player.ranked",
+      "admin.player.casual",
+      "admin.player.noGames",
+      "admin.player.gameCode",
+      "admin.player.score",
+      "admin.player.words",
+      "admin.player.placement",
+      "admin.player.mode",
+      "admin.player.lang",
+      "admin.player.duration",
+      "admin.player.when",
+      "admin.milogWords.title",
+      "admin.milogWords.subtitle",
       "quickPlay.daily",
       "quickPlay.classic",
       "quickPlay.blast",
       "quickPlay.wordHunt",
-      "education.teacher.activeGames",
-      "education.teacher.noActiveGames",
+      "notifications.education.landing.hero.eyebrow",
+      "notifications.education.landing.hero.h1",
+      "notifications.education.landing.hero.sub",
+      "notifications.education.landing.hero.cta_primary",
+      "notifications.education.landing.hero.cta_secondary",
+      "notifications.education.landing.moat.title",
+      "notifications.education.landing.moat.subtitle",
+      "notifications.education.landing.moat.native_multilingual.tag",
+      "notifications.education.landing.moat.native_multilingual.title",
+      "notifications.education.landing.moat.native_multilingual.body",
+      "notifications.education.landing.moat.local_inventory.tag",
+      "notifications.education.landing.moat.local_inventory.title",
+      "notifications.education.landing.moat.local_inventory.body",
+      "notifications.education.landing.moat.ad_free.tag",
+      "notifications.education.landing.moat.ad_free.title",
+      "notifications.education.landing.moat.ad_free.body",
+      "notifications.education.landing.modes.title",
+      "notifications.education.landing.modes.teaches",
+      "notifications.education.landing.modes.classroom_game.tag",
+      "notifications.education.landing.modes.classroom_game.title",
+      "notifications.education.landing.modes.classroom_game.body",
+      "notifications.education.landing.modes.classroom_game.teaches",
+      "notifications.education.landing.modes.vocab_duels.tag",
+      "notifications.education.landing.modes.vocab_duels.title",
+      "notifications.education.landing.modes.vocab_duels.body",
+      "notifications.education.landing.modes.vocab_duels.teaches",
+      "notifications.education.landing.modes.brain_drills.tag",
+      "notifications.education.landing.modes.brain_drills.title",
+      "notifications.education.landing.modes.brain_drills.body",
+      "notifications.education.landing.modes.brain_drills.teaches",
+      "notifications.education.landing.modes.daily_wordhunt.tag",
+      "notifications.education.landing.modes.daily_wordhunt.title",
+      "notifications.education.landing.modes.daily_wordhunt.body",
+      "notifications.education.landing.modes.daily_wordhunt.teaches",
+      "notifications.education.landing.modes.adventure.tag",
+      "notifications.education.landing.modes.adventure.title",
+      "notifications.education.landing.modes.adventure.body",
+      "notifications.education.landing.modes.adventure.teaches",
+      "notifications.education.landing.modes.spelling_bee.tag",
+      "notifications.education.landing.modes.spelling_bee.title",
+      "notifications.education.landing.modes.spelling_bee.body",
+      "notifications.education.landing.modes.spelling_bee.teaches",
+      "notifications.education.landing.compare.title",
+      "notifications.education.landing.compare.subtitle",
+      "notifications.education.landing.compare.col.lexiclash",
+      "notifications.education.landing.compare.col.kahoot",
+      "notifications.education.landing.compare.col.quizlet",
+      "notifications.education.landing.compare.col.wordwall",
+      "notifications.education.landing.compare.row.native_multilingual",
+      "notifications.education.landing.compare.row.ad_free_students",
+      "notifications.education.landing.compare.row.live_multiplayer",
+      "notifications.education.landing.compare.row.brain_training",
+      "notifications.education.landing.compare.row.game_variety",
+      "notifications.education.landing.compare.row.free_for_teachers",
+      "notifications.education.landing.trust.title",
+      "notifications.education.landing.trust.bullet1",
+      "notifications.education.landing.trust.bullet2",
+      "notifications.education.landing.trust.bullet3",
+      "notifications.education.landing.faq.title",
+      "notifications.education.landing.faq.q1.q",
+      "notifications.education.landing.faq.q1.a",
+      "notifications.education.landing.faq.q2.q",
+      "notifications.education.landing.faq.q2.a",
+      "notifications.education.landing.faq.q3.q",
+      "notifications.education.landing.faq.q3.a",
+      "notifications.education.landing.faq.q4.q",
+      "notifications.education.landing.faq.q4.a",
+      "notifications.education.landing.faq.q5.q",
+      "notifications.education.landing.faq.q5.a",
+      "notifications.education.landing.faq.q6.q",
+      "notifications.education.landing.faq.q6.a",
+      "notifications.education.landing.faq.q7.q",
+      "notifications.education.landing.faq.q7.a",
+      "notifications.education.landing.faq.q8.q",
+      "notifications.education.landing.faq.q8.a",
+      "notifications.education.landing.cta.title",
+      "notifications.education.landing.cta.body",
+      "notifications.education.landing.cta.button",
+      "notifications.education.landing.esl-word-games.course_name",
+      "notifications.education.landing.esl-word-games.course_desc",
+      "notifications.education.landing.vocabulary-games-classroom.course_name",
+      "notifications.education.landing.vocabulary-games-classroom.course_desc",
+      "notifications.education.access.h1",
+      "notifications.education.access.lede",
+      "notifications.education.access.full_name",
+      "notifications.education.access.email",
+      "notifications.education.access.role",
+      "notifications.education.access.role_teacher",
+      "notifications.education.access.role_tutor",
+      "notifications.education.access.role_admin",
+      "notifications.education.access.role_parent",
+      "notifications.education.access.role_researcher",
+      "notifications.education.access.role_other",
+      "notifications.education.access.school_or_org",
+      "notifications.education.access.country",
+      "notifications.education.access.use_case",
+      "notifications.education.access.submit",
+      "notifications.education.access.submitting",
+      "notifications.education.access.submit_error",
+      "notifications.education.access.rate_limited",
+      "notifications.education.access.success_title",
+      "notifications.education.access.success_body",
+      "notifications.education.access.pending_title",
+      "notifications.education.access.pending_body",
+      "notifications.education.access.submitted_on",
+      "notifications.education.access.already_approved_title",
+      "notifications.education.access.go_to_teacher",
+      "notifications.education.access.next.step1_title",
+      "notifications.education.access.next.step1_body",
+      "notifications.education.access.next.step2_title",
+      "notifications.education.access.next.step2_body",
+      "notifications.education.access.next.step3_title",
+      "notifications.education.access.next.step3_body",
+      "notifications.education.access.regular_game_title",
+      "notifications.education.access.regular_game_body",
+      "notifications.education.access.try_mp",
+      "notifications.education.access.try_blast",
+      "notifications.education.access.try_daily",
       "asyncChallenge.pending",
       "asyncChallenge.pendingCount",
       "asyncChallenge.challengeFrom",
@@ -787,30 +5141,381 @@
       "leadChange.pointsAhead",
       "leadChange.wordsFound",
       "hostView.progressAnnouncement",
+      "education.teacher.activeGames",
+      "education.teacher.noActiveGames",
+      "admin.gameModePopularity",
+      "admin.totalGames",
+      "admin.landingCardOrder",
+      "admin.noData",
+      "admin.dashboard",
+      "admin.accessRequired",
+      "admin.accessDenied",
+      "admin.welcome",
+      "admin.loadingDashboard",
+      "admin.preparingTools",
+      "admin.loadingSession",
+      "admin.sessionError",
+      "admin.nav.players",
+      "admin.nav.dictionary",
+      "admin.nav.invalidWords",
+      "admin.nav.dailyChallenge",
+      "admin.nav.wikipediaWords",
+      "admin.nav.wordBank",
+      "admin.nav.webVitals",
+      "admin.nav.email",
+      "admin.nav.milogWords",
+      "admin.nav.teacherAccess",
+      "admin.teacherAccess.title",
+      "admin.teacherAccess.count.pending",
+      "admin.teacherAccess.count.approved",
+      "admin.teacherAccess.count.declined",
+      "admin.teacherAccess.count.total",
+      "admin.teacherAccess.filter_status",
+      "admin.teacherAccess.filter_status_all",
+      "admin.teacherAccess.filter_locale",
+      "admin.teacherAccess.filter_country",
+      "admin.teacherAccess.refresh",
+      "admin.teacherAccess.page",
+      "admin.teacherAccess.export_csv",
+      "admin.teacherAccess.col.name",
+      "admin.teacherAccess.col.email",
+      "admin.teacherAccess.col.role",
+      "admin.teacherAccess.col.locale",
+      "admin.teacherAccess.col.country",
+      "admin.teacherAccess.col.status",
+      "admin.teacherAccess.col.submitted",
+      "admin.teacherAccess.drawer_title",
+      "admin.teacherAccess.field.name",
+      "admin.teacherAccess.field.email",
+      "admin.teacherAccess.field.role",
+      "admin.teacherAccess.field.locale",
+      "admin.teacherAccess.field.country",
+      "admin.teacherAccess.field.school",
+      "admin.teacherAccess.field.status",
+      "admin.teacherAccess.field.submitted",
+      "admin.teacherAccess.field.use_case",
+      "admin.teacherAccess.admin_note",
+      "admin.teacherAccess.approve",
+      "admin.teacherAccess.decline",
+      "admin.teacherAccess.close",
+      "admin.sidebar.overview",
+      "admin.sidebar.analytics",
+      "admin.sidebar.moderation",
+      "admin.sidebar.content",
+      "admin.sidebar.players",
+      "admin.sidebar.guests",
+      "admin.sidebar.system",
+      "admin.sidebar.wordCraft",
+      "admin.invalidWords.title",
+      "admin.invalidWords.subtitle",
+      "admin.invalidWords.word",
+      "admin.invalidWords.language",
+      "admin.invalidWords.count",
+      "admin.invalidWords.reason",
+      "admin.invalidWords.firstSubmitted",
+      "admin.invalidWords.lastSubmitted",
+      "admin.invalidWords.approve",
+      "admin.invalidWords.approved",
+      "admin.invalidWords.dismiss",
+      "admin.invalidWords.addToDictionary",
+      "admin.invalidWords.noResults",
+      "admin.invalidWords.pendingReview",
+      "admin.invalidWords.reasons.not_on_board",
+      "admin.invalidWords.reasons.not_in_dictionary",
+      "admin.invalidWords.reasons.peer_rejected",
+      "admin.invalidWords.reasons.dismissed",
+      "admin.invalidWords.reasons.unknown",
+      "admin.live.subtitle",
+      "admin.live.live",
+      "admin.live.games",
+      "admin.live.players",
+      "admin.live.sockets",
+      "admin.live.singlePlayer",
+      "admin.live.refresh",
+      "admin.live.retry",
+      "admin.live.noGames",
+      "admin.live.noGamesHint",
+      "admin.live.activeGames",
+      "admin.live.connectedPlayers",
+      "admin.live.player",
+      "admin.live.game",
+      "admin.live.status",
+      "admin.live.score",
+      "admin.live.type",
+      "admin.live.auth",
+      "admin.live.guest",
+      "admin.live.ranked",
+      "admin.live.left",
+      "admin.live.started",
+      "admin.live.lastUpdated",
+      "admin.live.singlePlayerLive",
+      "admin.live.mode",
+      "admin.email.title",
+      "admin.email.recipientEmail",
+      "admin.email.recipientName",
+      "admin.email.sendTest",
+      "admin.email.sending",
+      "admin.email.errorNoEmail",
+      "admin.email.showPreview",
+      "admin.email.hidePreview",
+      "admin.email.preview",
+      "admin.email.previewNote",
+      "admin.email.info",
+      "admin.todayGames.title",
+      "admin.todayGames.refresh",
+      "admin.todayGames.retry",
+      "admin.todayGames.totalGames",
+      "admin.todayGames.multiplayer",
+      "admin.todayGames.wordHunt",
+      "admin.todayGames.daily",
+      "admin.todayGames.drills",
+      "admin.todayGames.filters",
+      "admin.todayGames.allLanguages",
+      "admin.todayGames.allTypes",
+      "admin.todayGames.allModes",
+      "admin.todayGames.rankedOnly",
+      "admin.todayGames.casualOnly",
+      "admin.todayGames.time",
+      "admin.todayGames.player",
+      "admin.todayGames.type",
+      "admin.todayGames.language",
+      "admin.todayGames.score",
+      "admin.todayGames.words",
+      "admin.todayGames.duration",
+      "admin.todayGames.code",
+      "admin.todayGames.ranked",
+      "admin.todayGames.casual",
+      "admin.todayGames.guest",
+      "admin.todayGames.first",
+      "admin.todayGames.firstGame",
+      "admin.todayGames.noGames",
+      "admin.todayGames.noGamesHint",
+      "admin.todayGames.showing",
+      "admin.todayGames.of",
+      "admin.todayGames.lastUpdated",
+      "admin.templateEditor.previewTitle",
+      "admin.templateEditor.validationTitle",
+      "admin.templateEditor.missingPlaceholders",
+      "admin.templateEditor.unusedPlaceholders",
+      "admin.templateEditor.validTemplate",
+      "admin.wordBank.title",
+      "admin.wordBank.description",
+      "admin.wordBank.word",
+      "admin.wordBank.wordList",
+      "admin.wordBank.language",
+      "admin.wordBank.source",
+      "admin.wordBank.status",
+      "admin.wordBank.validationStatus",
+      "admin.wordBank.timesUsed",
+      "admin.wordBank.lastUsed",
+      "admin.wordBank.actions",
+      "admin.wordBank.approve",
+      "admin.wordBank.reject",
+      "admin.wordBank.delete",
+      "admin.wordBank.deleteWord",
+      "admin.wordBank.confirmDeleteWord",
+      "admin.wordBank.wordDeleted",
+      "admin.wordBank.stats.title",
+      "admin.wordBank.stats.totalWords",
+      "admin.wordBank.stats.activeWords",
+      "admin.wordBank.stats.blockedWords",
+      "admin.wordBank.stats.pendingReview",
+      "admin.wordBank.stats.approved",
+      "admin.wordBank.stats.rejected",
+      "admin.wordBank.stats.bySource",
+      "admin.wordBank.filters.allLanguages",
+      "admin.wordBank.filters.allStatuses",
       "admin.wordBank.filters.allValidationStatuses",
+      "admin.wordBank.filters.allSources",
+      "admin.wordBank.filters.searchLabel",
+      "admin.wordBank.filters.search",
+      "admin.wordBank.filters.active",
+      "admin.wordBank.filters.blocked",
+      "admin.wordBank.filters.used",
       "admin.wordBank.filters.pending",
       "admin.wordBank.filters.approved",
       "admin.wordBank.filters.rejected",
+      "admin.wordBank.sources.static",
+      "admin.wordBank.sources.dictionary",
+      "admin.wordBank.sources.wikipedia",
+      "admin.wordBank.sources.admin",
+      "admin.wordBank.sources.ai",
+      "admin.wordBank.noWordsFound",
+      "admin.wordBank.tryAdjustingFilters",
+      "admin.wordBank.loadMore",
+      "admin.wordBank.loading",
+      "admin.wordBank.deleting",
+      "admin.wordBank.confirm",
+      "admin.wordBank.cancel",
+      "admin.wordBank.bulkImport.button",
+      "admin.wordBank.bulkImport.title",
       "admin.wordBank.bulkImport.description",
+      "admin.wordBank.bulkImport.instructions",
+      "admin.wordBank.bulkImport.formatPlain",
+      "admin.wordBank.bulkImport.formatCsv",
+      "admin.wordBank.bulkImport.lengthFilter",
+      "admin.wordBank.bulkImport.source",
       "admin.wordBank.bulkImport.inputLabel",
       "admin.wordBank.bulkImport.placeholder",
       "admin.wordBank.bulkImport.options",
+      "admin.wordBank.bulkImport.validationStatus",
+      "admin.wordBank.bulkImport.wordsLabel",
+      "admin.wordBank.bulkImport.noContent",
       "admin.wordBank.bulkImport.sourcePlaceholder",
       "admin.wordBank.bulkImport.languagePlaceholder",
+      "admin.wordBank.bulkImport.importing",
+      "admin.wordBank.bulkImport.import",
+      "admin.wordBank.bulkImport.result",
+      "admin.wordBank.bulkImport.imported",
+      "admin.wordBank.bulkImport.skipped",
+      "admin.wordBank.bulkImport.errors",
+      "admin.wordBank.bulkImport.showErrors",
       "admin.wordBank.bulkImport.successMessage",
       "admin.wordBank.bulkImport.errorMessage",
+      "admin.wordBank.bulkActions.selected",
+      "admin.wordBank.bulkActions.approveAll",
+      "admin.wordBank.bulkActions.rejectAll",
+      "admin.wordBank.bulkActions.approving",
+      "admin.wordBank.bulkActions.rejecting",
+      "admin.wordBank.bulkActions.successMessage",
+      "admin.wordBank.bulkActions.errorMessage",
+      "admin.wordBank.bulkActions.clearSelection",
+      "admin.wordBank.wikipediaSync.title",
+      "admin.wordBank.wikipediaSync.description",
       "admin.wordBank.wikipediaSync.currentLanguage",
       "admin.wordBank.wikipediaSync.syncButton",
+      "admin.wordBank.wikipediaSync.syncNow",
+      "admin.wordBank.wikipediaSync.syncing",
+      "admin.wordBank.wikipediaSync.success",
       "admin.wordBank.wikipediaSync.successMessage",
       "admin.wordBank.wikipediaSync.errorMessage",
       "admin.wordBank.wikipediaSync.noFilesFound",
       "admin.wordBank.wikipediaSync.lastSynced",
+      "admin.kpi.dau",
+      "admin.kpi.gamesToday",
+      "admin.kpi.signupsToday",
+      "admin.kpi.stickiness",
+      "admin.kpi.totalPlayers",
+      "admin.kpi.totalWords",
+      "admin.kpi.thisWeek",
+      "admin.system.ok",
+      "admin.system.down",
+      "admin.activity.title",
+      "admin.activity.totalGames",
+      "admin.activity.uniquePlayers",
+      "admin.activity.signups",
+      "admin.activity.empty",
+      "admin.activity.error",
+      "admin.geo.title",
+      "admin.geo.registered",
+      "admin.geo.guests",
+      "admin.geo.empty",
+      "admin.geo.error",
+      "admin.acquisition.title",
+      "admin.acquisition.sources",
+      "admin.acquisition.mediums",
+      "admin.acquisition.campaigns",
+      "admin.acquisition.referrers",
+      "admin.acquisition.empty",
+      "admin.acquisition.error",
+      "admin.authSessions.title",
+      "admin.authSessions.totalGames",
+      "admin.authSessions.uniqueUsers",
+      "admin.authSessions.avgScore",
+      "admin.authSessions.completionRate",
+      "admin.authSessions.byMode",
+      "admin.authSessions.byLanguage",
+      "admin.authSessions.empty",
+      "admin.authSessions.error",
+      "admin.guests.title",
+      "admin.guests.totalGames",
+      "admin.guests.uniqueGuests",
+      "admin.guests.avgScore",
+      "admin.guests.byMode",
+      "admin.guests.byLanguage",
+      "admin.guests.windowDays",
+      "admin.guests.empty",
+      "admin.guests.error",
+      "admin.player.title",
+      "admin.player.back",
+      "admin.player.notFound",
+      "admin.player.loadError",
+      "admin.player.joined",
+      "admin.player.lastGame",
+      "admin.player.recentGames",
+      "admin.player.avgScore",
+      "admin.player.totalScore",
+      "admin.player.level",
+      "admin.player.mmr",
+      "admin.player.winRate",
+      "admin.player.identity",
+      "admin.player.role",
+      "admin.player.dailyEmail",
+      "admin.player.referrals",
+      "admin.player.seasonScore",
+      "admin.player.economy",
+      "admin.player.coins",
+      "admin.player.lifetimeCoins",
+      "admin.player.hintsUsed",
+      "admin.player.longestWord",
+      "admin.player.acquisition",
+      "admin.player.utmSource",
+      "admin.player.utmMedium",
+      "admin.player.utmCampaign",
+      "admin.player.referrer",
+      "admin.player.noAcquisitionData",
+      "admin.player.byLanguage",
+      "admin.player.byMode",
+      "admin.player.sessions",
+      "admin.player.completed",
+      "admin.player.ranked",
+      "admin.player.casual",
+      "admin.player.noGames",
+      "admin.player.gameCode",
+      "admin.player.score",
+      "admin.player.words",
+      "admin.player.placement",
+      "admin.player.mode",
+      "admin.player.lang",
+      "admin.player.duration",
+      "admin.player.when",
+      "admin.analytics.title",
+      "admin.analytics.retentionTitle",
+      "admin.analytics.cohort",
+      "admin.analytics.size",
+      "admin.analytics.funnelTitle",
+      "admin.analytics.funnelRegistered",
+      "admin.analytics.funnelFirstGame",
+      "admin.analytics.funnelDay7",
+      "admin.analytics.funnelDay30",
+      "admin.analytics.churnTitle",
+      "admin.analytics.churnTotal",
+      "admin.analytics.noChurnRisk",
+      "admin.analytics.games",
+      "admin.moderation.title",
+      "admin.moderation.queueTitle",
+      "admin.moderation.empty",
+      "admin.moderation.approve",
+      "admin.moderation.reject",
+      "admin.moderation.investigate",
+      "admin.moderation.banPlayer",
+      "admin.moderation.warnPlayer",
+      "admin.moderation.playerDetail",
+      "admin.moderation.moderationHistory",
+      "admin.moderation.recentGames",
+      "admin.moderation.cheatSignals",
+      "admin.moderation.flaggedPlayers",
+      "admin.moderation.noFlags",
+      "admin.content.pendingWords",
+      "admin.content.approvedWords",
+      "admin.content.topReported",
+      "admin.content.noReports",
+      "admin.milogWords.title",
+      "admin.milogWords.subtitle",
       "quickPlay.daily",
       "quickPlay.classic",
       "quickPlay.blast",
       "quickPlay.wordHunt",
-      "education.teacher.activeGames",
-      "education.teacher.noActiveGames",
       "asyncChallenge.pending",
       "asyncChallenge.pendingCount",
       "asyncChallenge.challengeFrom",
@@ -942,27 +5647,378 @@
       "quickPlay.classic",
       "quickPlay.blast",
       "quickPlay.wordHunt",
+      "education.teacher.activeGames",
+      "education.teacher.noActiveGames",
+      "admin.gameModePopularity",
+      "admin.totalGames",
+      "admin.landingCardOrder",
+      "admin.noData",
+      "admin.dashboard",
+      "admin.accessRequired",
+      "admin.accessDenied",
+      "admin.welcome",
+      "admin.loadingDashboard",
+      "admin.preparingTools",
+      "admin.loadingSession",
+      "admin.sessionError",
+      "admin.nav.players",
+      "admin.nav.dictionary",
+      "admin.nav.invalidWords",
+      "admin.nav.dailyChallenge",
+      "admin.nav.wikipediaWords",
+      "admin.nav.wordBank",
+      "admin.nav.webVitals",
+      "admin.nav.email",
+      "admin.nav.milogWords",
+      "admin.nav.teacherAccess",
+      "admin.teacherAccess.title",
+      "admin.teacherAccess.count.pending",
+      "admin.teacherAccess.count.approved",
+      "admin.teacherAccess.count.declined",
+      "admin.teacherAccess.count.total",
+      "admin.teacherAccess.filter_status",
+      "admin.teacherAccess.filter_status_all",
+      "admin.teacherAccess.filter_locale",
+      "admin.teacherAccess.filter_country",
+      "admin.teacherAccess.refresh",
+      "admin.teacherAccess.page",
+      "admin.teacherAccess.export_csv",
+      "admin.teacherAccess.col.name",
+      "admin.teacherAccess.col.email",
+      "admin.teacherAccess.col.role",
+      "admin.teacherAccess.col.locale",
+      "admin.teacherAccess.col.country",
+      "admin.teacherAccess.col.status",
+      "admin.teacherAccess.col.submitted",
+      "admin.teacherAccess.drawer_title",
+      "admin.teacherAccess.field.name",
+      "admin.teacherAccess.field.email",
+      "admin.teacherAccess.field.role",
+      "admin.teacherAccess.field.locale",
+      "admin.teacherAccess.field.country",
+      "admin.teacherAccess.field.school",
+      "admin.teacherAccess.field.status",
+      "admin.teacherAccess.field.submitted",
+      "admin.teacherAccess.field.use_case",
+      "admin.teacherAccess.admin_note",
+      "admin.teacherAccess.approve",
+      "admin.teacherAccess.decline",
+      "admin.teacherAccess.close",
+      "admin.sidebar.overview",
+      "admin.sidebar.analytics",
+      "admin.sidebar.moderation",
+      "admin.sidebar.content",
+      "admin.sidebar.players",
+      "admin.sidebar.guests",
+      "admin.sidebar.system",
+      "admin.sidebar.wordCraft",
+      "admin.invalidWords.title",
+      "admin.invalidWords.subtitle",
+      "admin.invalidWords.word",
+      "admin.invalidWords.language",
+      "admin.invalidWords.count",
+      "admin.invalidWords.reason",
+      "admin.invalidWords.firstSubmitted",
+      "admin.invalidWords.lastSubmitted",
+      "admin.invalidWords.approve",
+      "admin.invalidWords.approved",
+      "admin.invalidWords.dismiss",
+      "admin.invalidWords.addToDictionary",
+      "admin.invalidWords.noResults",
+      "admin.invalidWords.pendingReview",
+      "admin.invalidWords.reasons.not_on_board",
+      "admin.invalidWords.reasons.not_in_dictionary",
+      "admin.invalidWords.reasons.peer_rejected",
+      "admin.invalidWords.reasons.dismissed",
+      "admin.invalidWords.reasons.unknown",
+      "admin.live.subtitle",
+      "admin.live.live",
+      "admin.live.games",
+      "admin.live.players",
+      "admin.live.sockets",
+      "admin.live.singlePlayer",
+      "admin.live.refresh",
+      "admin.live.retry",
+      "admin.live.noGames",
+      "admin.live.noGamesHint",
+      "admin.live.activeGames",
+      "admin.live.connectedPlayers",
+      "admin.live.player",
+      "admin.live.game",
+      "admin.live.status",
+      "admin.live.score",
+      "admin.live.type",
+      "admin.live.auth",
+      "admin.live.guest",
+      "admin.live.ranked",
+      "admin.live.left",
+      "admin.live.started",
+      "admin.live.lastUpdated",
+      "admin.live.singlePlayerLive",
+      "admin.live.mode",
+      "admin.email.title",
+      "admin.email.recipientEmail",
+      "admin.email.recipientName",
+      "admin.email.sendTest",
+      "admin.email.sending",
+      "admin.email.errorNoEmail",
+      "admin.email.showPreview",
+      "admin.email.hidePreview",
+      "admin.email.preview",
+      "admin.email.previewNote",
+      "admin.email.info",
+      "admin.todayGames.title",
+      "admin.todayGames.refresh",
+      "admin.todayGames.retry",
+      "admin.todayGames.totalGames",
+      "admin.todayGames.multiplayer",
+      "admin.todayGames.wordHunt",
+      "admin.todayGames.daily",
+      "admin.todayGames.drills",
+      "admin.todayGames.filters",
+      "admin.todayGames.allLanguages",
+      "admin.todayGames.allTypes",
+      "admin.todayGames.allModes",
+      "admin.todayGames.rankedOnly",
+      "admin.todayGames.casualOnly",
+      "admin.todayGames.time",
+      "admin.todayGames.player",
+      "admin.todayGames.type",
+      "admin.todayGames.language",
+      "admin.todayGames.score",
+      "admin.todayGames.words",
+      "admin.todayGames.duration",
+      "admin.todayGames.code",
+      "admin.todayGames.ranked",
+      "admin.todayGames.casual",
+      "admin.todayGames.guest",
+      "admin.todayGames.first",
+      "admin.todayGames.firstGame",
+      "admin.todayGames.noGames",
+      "admin.todayGames.noGamesHint",
+      "admin.todayGames.showing",
+      "admin.todayGames.of",
+      "admin.todayGames.lastUpdated",
+      "admin.templateEditor.previewTitle",
+      "admin.templateEditor.validationTitle",
+      "admin.templateEditor.missingPlaceholders",
+      "admin.templateEditor.unusedPlaceholders",
+      "admin.templateEditor.validTemplate",
+      "admin.wordBank.title",
+      "admin.wordBank.description",
+      "admin.wordBank.word",
+      "admin.wordBank.wordList",
+      "admin.wordBank.language",
+      "admin.wordBank.source",
+      "admin.wordBank.status",
+      "admin.wordBank.validationStatus",
+      "admin.wordBank.timesUsed",
+      "admin.wordBank.lastUsed",
+      "admin.wordBank.actions",
+      "admin.wordBank.approve",
+      "admin.wordBank.reject",
+      "admin.wordBank.delete",
+      "admin.wordBank.deleteWord",
+      "admin.wordBank.confirmDeleteWord",
+      "admin.wordBank.wordDeleted",
+      "admin.wordBank.stats.title",
+      "admin.wordBank.stats.totalWords",
+      "admin.wordBank.stats.activeWords",
+      "admin.wordBank.stats.blockedWords",
+      "admin.wordBank.stats.pendingReview",
+      "admin.wordBank.stats.approved",
+      "admin.wordBank.stats.rejected",
+      "admin.wordBank.stats.bySource",
+      "admin.wordBank.filters.allLanguages",
+      "admin.wordBank.filters.allStatuses",
       "admin.wordBank.filters.allValidationStatuses",
+      "admin.wordBank.filters.allSources",
+      "admin.wordBank.filters.searchLabel",
+      "admin.wordBank.filters.search",
+      "admin.wordBank.filters.active",
+      "admin.wordBank.filters.blocked",
+      "admin.wordBank.filters.used",
       "admin.wordBank.filters.pending",
       "admin.wordBank.filters.approved",
       "admin.wordBank.filters.rejected",
+      "admin.wordBank.sources.static",
+      "admin.wordBank.sources.dictionary",
+      "admin.wordBank.sources.wikipedia",
+      "admin.wordBank.sources.admin",
+      "admin.wordBank.sources.ai",
+      "admin.wordBank.noWordsFound",
+      "admin.wordBank.tryAdjustingFilters",
+      "admin.wordBank.loadMore",
+      "admin.wordBank.loading",
+      "admin.wordBank.deleting",
+      "admin.wordBank.confirm",
+      "admin.wordBank.cancel",
+      "admin.wordBank.bulkImport.button",
+      "admin.wordBank.bulkImport.title",
       "admin.wordBank.bulkImport.description",
+      "admin.wordBank.bulkImport.instructions",
+      "admin.wordBank.bulkImport.formatPlain",
+      "admin.wordBank.bulkImport.formatCsv",
+      "admin.wordBank.bulkImport.lengthFilter",
+      "admin.wordBank.bulkImport.source",
       "admin.wordBank.bulkImport.inputLabel",
       "admin.wordBank.bulkImport.placeholder",
       "admin.wordBank.bulkImport.options",
+      "admin.wordBank.bulkImport.validationStatus",
+      "admin.wordBank.bulkImport.wordsLabel",
+      "admin.wordBank.bulkImport.noContent",
       "admin.wordBank.bulkImport.sourcePlaceholder",
       "admin.wordBank.bulkImport.languagePlaceholder",
+      "admin.wordBank.bulkImport.importing",
+      "admin.wordBank.bulkImport.import",
+      "admin.wordBank.bulkImport.result",
+      "admin.wordBank.bulkImport.imported",
+      "admin.wordBank.bulkImport.skipped",
+      "admin.wordBank.bulkImport.errors",
+      "admin.wordBank.bulkImport.showErrors",
       "admin.wordBank.bulkImport.successMessage",
       "admin.wordBank.bulkImport.errorMessage",
+      "admin.wordBank.bulkActions.selected",
+      "admin.wordBank.bulkActions.approveAll",
+      "admin.wordBank.bulkActions.rejectAll",
+      "admin.wordBank.bulkActions.approving",
+      "admin.wordBank.bulkActions.rejecting",
+      "admin.wordBank.bulkActions.successMessage",
+      "admin.wordBank.bulkActions.errorMessage",
+      "admin.wordBank.bulkActions.clearSelection",
+      "admin.wordBank.wikipediaSync.title",
+      "admin.wordBank.wikipediaSync.description",
       "admin.wordBank.wikipediaSync.currentLanguage",
       "admin.wordBank.wikipediaSync.syncButton",
+      "admin.wordBank.wikipediaSync.syncNow",
+      "admin.wordBank.wikipediaSync.syncing",
+      "admin.wordBank.wikipediaSync.success",
       "admin.wordBank.wikipediaSync.successMessage",
       "admin.wordBank.wikipediaSync.errorMessage",
       "admin.wordBank.wikipediaSync.noFilesFound",
       "admin.wordBank.wikipediaSync.lastSynced",
+      "admin.kpi.dau",
+      "admin.kpi.gamesToday",
+      "admin.kpi.signupsToday",
+      "admin.kpi.stickiness",
+      "admin.kpi.totalPlayers",
+      "admin.kpi.totalWords",
+      "admin.kpi.thisWeek",
+      "admin.system.ok",
+      "admin.system.down",
+      "admin.activity.title",
+      "admin.activity.totalGames",
+      "admin.activity.uniquePlayers",
+      "admin.activity.signups",
+      "admin.activity.empty",
+      "admin.activity.error",
+      "admin.geo.title",
+      "admin.geo.registered",
+      "admin.geo.guests",
+      "admin.geo.empty",
+      "admin.geo.error",
+      "admin.acquisition.title",
+      "admin.acquisition.sources",
+      "admin.acquisition.mediums",
+      "admin.acquisition.campaigns",
+      "admin.acquisition.referrers",
+      "admin.acquisition.empty",
+      "admin.acquisition.error",
+      "admin.authSessions.title",
+      "admin.authSessions.totalGames",
+      "admin.authSessions.uniqueUsers",
+      "admin.authSessions.avgScore",
+      "admin.authSessions.completionRate",
+      "admin.authSessions.byMode",
+      "admin.authSessions.byLanguage",
+      "admin.authSessions.empty",
+      "admin.authSessions.error",
+      "admin.guests.title",
+      "admin.guests.totalGames",
+      "admin.guests.uniqueGuests",
+      "admin.guests.avgScore",
+      "admin.guests.byMode",
+      "admin.guests.byLanguage",
+      "admin.guests.windowDays",
+      "admin.guests.empty",
+      "admin.guests.error",
+      "admin.player.title",
+      "admin.player.back",
+      "admin.player.notFound",
+      "admin.player.loadError",
+      "admin.player.joined",
+      "admin.player.lastGame",
+      "admin.player.recentGames",
+      "admin.player.avgScore",
+      "admin.player.totalScore",
+      "admin.player.level",
+      "admin.player.mmr",
+      "admin.player.winRate",
+      "admin.player.identity",
+      "admin.player.role",
+      "admin.player.dailyEmail",
+      "admin.player.referrals",
+      "admin.player.seasonScore",
+      "admin.player.economy",
+      "admin.player.coins",
+      "admin.player.lifetimeCoins",
+      "admin.player.hintsUsed",
+      "admin.player.longestWord",
+      "admin.player.acquisition",
+      "admin.player.utmSource",
+      "admin.player.utmMedium",
+      "admin.player.utmCampaign",
+      "admin.player.referrer",
+      "admin.player.noAcquisitionData",
+      "admin.player.byLanguage",
+      "admin.player.byMode",
+      "admin.player.sessions",
+      "admin.player.completed",
+      "admin.player.ranked",
+      "admin.player.casual",
+      "admin.player.noGames",
+      "admin.player.gameCode",
+      "admin.player.score",
+      "admin.player.words",
+      "admin.player.placement",
+      "admin.player.mode",
+      "admin.player.lang",
+      "admin.player.duration",
+      "admin.player.when",
+      "admin.analytics.title",
+      "admin.analytics.retentionTitle",
+      "admin.analytics.cohort",
+      "admin.analytics.size",
+      "admin.analytics.funnelTitle",
+      "admin.analytics.funnelRegistered",
+      "admin.analytics.funnelFirstGame",
+      "admin.analytics.funnelDay7",
+      "admin.analytics.funnelDay30",
+      "admin.analytics.churnTitle",
+      "admin.analytics.churnTotal",
+      "admin.analytics.noChurnRisk",
+      "admin.analytics.games",
+      "admin.moderation.title",
+      "admin.moderation.queueTitle",
+      "admin.moderation.empty",
+      "admin.moderation.approve",
+      "admin.moderation.reject",
+      "admin.moderation.investigate",
+      "admin.moderation.banPlayer",
+      "admin.moderation.warnPlayer",
+      "admin.moderation.playerDetail",
+      "admin.moderation.moderationHistory",
+      "admin.moderation.recentGames",
+      "admin.moderation.cheatSignals",
+      "admin.moderation.flaggedPlayers",
+      "admin.moderation.noFlags",
+      "admin.content.pendingWords",
+      "admin.content.approvedWords",
+      "admin.content.topReported",
+      "admin.content.noReports",
+      "admin.milogWords.title",
+      "admin.milogWords.subtitle",
       "adventure.gestureTutorial",
-      "education.teacher.activeGames",
-      "education.teacher.noActiveGames",
       "asyncChallenge.pending",
       "asyncChallenge.pendingCount",
       "asyncChallenge.challengeFrom",
@@ -1074,24 +6130,375 @@
     "es": [
       "hostView.progressAnnouncement",
       "playerView.loadFailed",
+      "admin.gameModePopularity",
+      "admin.totalGames",
+      "admin.landingCardOrder",
+      "admin.noData",
+      "admin.dashboard",
+      "admin.accessRequired",
+      "admin.accessDenied",
+      "admin.welcome",
+      "admin.loadingDashboard",
+      "admin.preparingTools",
+      "admin.loadingSession",
+      "admin.sessionError",
+      "admin.nav.players",
+      "admin.nav.dictionary",
+      "admin.nav.invalidWords",
+      "admin.nav.dailyChallenge",
+      "admin.nav.wikipediaWords",
+      "admin.nav.wordBank",
+      "admin.nav.webVitals",
+      "admin.nav.email",
+      "admin.nav.milogWords",
+      "admin.nav.teacherAccess",
+      "admin.teacherAccess.title",
+      "admin.teacherAccess.count.pending",
+      "admin.teacherAccess.count.approved",
+      "admin.teacherAccess.count.declined",
+      "admin.teacherAccess.count.total",
+      "admin.teacherAccess.filter_status",
+      "admin.teacherAccess.filter_status_all",
+      "admin.teacherAccess.filter_locale",
+      "admin.teacherAccess.filter_country",
+      "admin.teacherAccess.refresh",
+      "admin.teacherAccess.page",
+      "admin.teacherAccess.export_csv",
+      "admin.teacherAccess.col.name",
+      "admin.teacherAccess.col.email",
+      "admin.teacherAccess.col.role",
+      "admin.teacherAccess.col.locale",
+      "admin.teacherAccess.col.country",
+      "admin.teacherAccess.col.status",
+      "admin.teacherAccess.col.submitted",
+      "admin.teacherAccess.drawer_title",
+      "admin.teacherAccess.field.name",
+      "admin.teacherAccess.field.email",
+      "admin.teacherAccess.field.role",
+      "admin.teacherAccess.field.locale",
+      "admin.teacherAccess.field.country",
+      "admin.teacherAccess.field.school",
+      "admin.teacherAccess.field.status",
+      "admin.teacherAccess.field.submitted",
+      "admin.teacherAccess.field.use_case",
+      "admin.teacherAccess.admin_note",
+      "admin.teacherAccess.approve",
+      "admin.teacherAccess.decline",
+      "admin.teacherAccess.close",
+      "admin.sidebar.overview",
+      "admin.sidebar.analytics",
+      "admin.sidebar.moderation",
+      "admin.sidebar.content",
+      "admin.sidebar.players",
+      "admin.sidebar.guests",
+      "admin.sidebar.system",
+      "admin.sidebar.wordCraft",
+      "admin.invalidWords.title",
+      "admin.invalidWords.subtitle",
+      "admin.invalidWords.word",
+      "admin.invalidWords.language",
+      "admin.invalidWords.count",
+      "admin.invalidWords.reason",
+      "admin.invalidWords.firstSubmitted",
+      "admin.invalidWords.lastSubmitted",
+      "admin.invalidWords.approve",
+      "admin.invalidWords.approved",
+      "admin.invalidWords.dismiss",
+      "admin.invalidWords.addToDictionary",
+      "admin.invalidWords.noResults",
+      "admin.invalidWords.pendingReview",
+      "admin.invalidWords.reasons.not_on_board",
+      "admin.invalidWords.reasons.not_in_dictionary",
+      "admin.invalidWords.reasons.peer_rejected",
+      "admin.invalidWords.reasons.dismissed",
+      "admin.invalidWords.reasons.unknown",
+      "admin.live.subtitle",
+      "admin.live.live",
+      "admin.live.games",
+      "admin.live.players",
+      "admin.live.sockets",
+      "admin.live.singlePlayer",
+      "admin.live.refresh",
+      "admin.live.retry",
+      "admin.live.noGames",
+      "admin.live.noGamesHint",
+      "admin.live.activeGames",
+      "admin.live.connectedPlayers",
+      "admin.live.player",
+      "admin.live.game",
+      "admin.live.status",
+      "admin.live.score",
+      "admin.live.type",
+      "admin.live.auth",
+      "admin.live.guest",
+      "admin.live.ranked",
+      "admin.live.left",
+      "admin.live.started",
+      "admin.live.lastUpdated",
+      "admin.live.singlePlayerLive",
+      "admin.live.mode",
+      "admin.email.title",
+      "admin.email.recipientEmail",
+      "admin.email.recipientName",
+      "admin.email.sendTest",
+      "admin.email.sending",
+      "admin.email.errorNoEmail",
+      "admin.email.showPreview",
+      "admin.email.hidePreview",
+      "admin.email.preview",
+      "admin.email.previewNote",
+      "admin.email.info",
+      "admin.todayGames.title",
+      "admin.todayGames.refresh",
+      "admin.todayGames.retry",
+      "admin.todayGames.totalGames",
+      "admin.todayGames.multiplayer",
+      "admin.todayGames.wordHunt",
+      "admin.todayGames.daily",
+      "admin.todayGames.drills",
+      "admin.todayGames.filters",
+      "admin.todayGames.allLanguages",
+      "admin.todayGames.allTypes",
+      "admin.todayGames.allModes",
+      "admin.todayGames.rankedOnly",
+      "admin.todayGames.casualOnly",
+      "admin.todayGames.time",
+      "admin.todayGames.player",
+      "admin.todayGames.type",
+      "admin.todayGames.language",
+      "admin.todayGames.score",
+      "admin.todayGames.words",
+      "admin.todayGames.duration",
+      "admin.todayGames.code",
+      "admin.todayGames.ranked",
+      "admin.todayGames.casual",
+      "admin.todayGames.guest",
+      "admin.todayGames.first",
+      "admin.todayGames.firstGame",
+      "admin.todayGames.noGames",
+      "admin.todayGames.noGamesHint",
+      "admin.todayGames.showing",
+      "admin.todayGames.of",
+      "admin.todayGames.lastUpdated",
+      "admin.templateEditor.previewTitle",
+      "admin.templateEditor.validationTitle",
+      "admin.templateEditor.missingPlaceholders",
+      "admin.templateEditor.unusedPlaceholders",
+      "admin.templateEditor.validTemplate",
+      "admin.wordBank.title",
+      "admin.wordBank.description",
+      "admin.wordBank.word",
+      "admin.wordBank.wordList",
+      "admin.wordBank.language",
+      "admin.wordBank.source",
+      "admin.wordBank.status",
+      "admin.wordBank.validationStatus",
+      "admin.wordBank.timesUsed",
+      "admin.wordBank.lastUsed",
+      "admin.wordBank.actions",
+      "admin.wordBank.approve",
+      "admin.wordBank.reject",
+      "admin.wordBank.delete",
+      "admin.wordBank.deleteWord",
+      "admin.wordBank.confirmDeleteWord",
+      "admin.wordBank.wordDeleted",
+      "admin.wordBank.stats.title",
+      "admin.wordBank.stats.totalWords",
+      "admin.wordBank.stats.activeWords",
+      "admin.wordBank.stats.blockedWords",
+      "admin.wordBank.stats.pendingReview",
+      "admin.wordBank.stats.approved",
+      "admin.wordBank.stats.rejected",
+      "admin.wordBank.stats.bySource",
+      "admin.wordBank.filters.allLanguages",
+      "admin.wordBank.filters.allStatuses",
       "admin.wordBank.filters.allValidationStatuses",
+      "admin.wordBank.filters.allSources",
+      "admin.wordBank.filters.searchLabel",
+      "admin.wordBank.filters.search",
+      "admin.wordBank.filters.active",
+      "admin.wordBank.filters.blocked",
+      "admin.wordBank.filters.used",
       "admin.wordBank.filters.pending",
       "admin.wordBank.filters.approved",
       "admin.wordBank.filters.rejected",
+      "admin.wordBank.sources.static",
+      "admin.wordBank.sources.dictionary",
+      "admin.wordBank.sources.wikipedia",
+      "admin.wordBank.sources.admin",
+      "admin.wordBank.sources.ai",
+      "admin.wordBank.noWordsFound",
+      "admin.wordBank.tryAdjustingFilters",
+      "admin.wordBank.loadMore",
+      "admin.wordBank.loading",
+      "admin.wordBank.deleting",
+      "admin.wordBank.confirm",
+      "admin.wordBank.cancel",
+      "admin.wordBank.bulkImport.button",
+      "admin.wordBank.bulkImport.title",
       "admin.wordBank.bulkImport.description",
+      "admin.wordBank.bulkImport.instructions",
+      "admin.wordBank.bulkImport.formatPlain",
+      "admin.wordBank.bulkImport.formatCsv",
+      "admin.wordBank.bulkImport.lengthFilter",
+      "admin.wordBank.bulkImport.source",
       "admin.wordBank.bulkImport.inputLabel",
       "admin.wordBank.bulkImport.placeholder",
       "admin.wordBank.bulkImport.options",
+      "admin.wordBank.bulkImport.validationStatus",
+      "admin.wordBank.bulkImport.wordsLabel",
+      "admin.wordBank.bulkImport.noContent",
       "admin.wordBank.bulkImport.sourcePlaceholder",
       "admin.wordBank.bulkImport.languagePlaceholder",
+      "admin.wordBank.bulkImport.importing",
+      "admin.wordBank.bulkImport.import",
+      "admin.wordBank.bulkImport.result",
+      "admin.wordBank.bulkImport.imported",
+      "admin.wordBank.bulkImport.skipped",
+      "admin.wordBank.bulkImport.errors",
+      "admin.wordBank.bulkImport.showErrors",
       "admin.wordBank.bulkImport.successMessage",
       "admin.wordBank.bulkImport.errorMessage",
+      "admin.wordBank.bulkActions.selected",
+      "admin.wordBank.bulkActions.approveAll",
+      "admin.wordBank.bulkActions.rejectAll",
+      "admin.wordBank.bulkActions.approving",
+      "admin.wordBank.bulkActions.rejecting",
+      "admin.wordBank.bulkActions.successMessage",
+      "admin.wordBank.bulkActions.errorMessage",
+      "admin.wordBank.bulkActions.clearSelection",
+      "admin.wordBank.wikipediaSync.title",
+      "admin.wordBank.wikipediaSync.description",
       "admin.wordBank.wikipediaSync.currentLanguage",
       "admin.wordBank.wikipediaSync.syncButton",
+      "admin.wordBank.wikipediaSync.syncNow",
+      "admin.wordBank.wikipediaSync.syncing",
+      "admin.wordBank.wikipediaSync.success",
       "admin.wordBank.wikipediaSync.successMessage",
       "admin.wordBank.wikipediaSync.errorMessage",
       "admin.wordBank.wikipediaSync.noFilesFound",
       "admin.wordBank.wikipediaSync.lastSynced",
+      "admin.kpi.dau",
+      "admin.kpi.gamesToday",
+      "admin.kpi.signupsToday",
+      "admin.kpi.stickiness",
+      "admin.kpi.totalPlayers",
+      "admin.kpi.totalWords",
+      "admin.kpi.thisWeek",
+      "admin.system.ok",
+      "admin.system.down",
+      "admin.activity.title",
+      "admin.activity.totalGames",
+      "admin.activity.uniquePlayers",
+      "admin.activity.signups",
+      "admin.activity.empty",
+      "admin.activity.error",
+      "admin.geo.title",
+      "admin.geo.registered",
+      "admin.geo.guests",
+      "admin.geo.empty",
+      "admin.geo.error",
+      "admin.acquisition.title",
+      "admin.acquisition.sources",
+      "admin.acquisition.mediums",
+      "admin.acquisition.campaigns",
+      "admin.acquisition.referrers",
+      "admin.acquisition.empty",
+      "admin.acquisition.error",
+      "admin.authSessions.title",
+      "admin.authSessions.totalGames",
+      "admin.authSessions.uniqueUsers",
+      "admin.authSessions.avgScore",
+      "admin.authSessions.completionRate",
+      "admin.authSessions.byMode",
+      "admin.authSessions.byLanguage",
+      "admin.authSessions.empty",
+      "admin.authSessions.error",
+      "admin.guests.title",
+      "admin.guests.totalGames",
+      "admin.guests.uniqueGuests",
+      "admin.guests.avgScore",
+      "admin.guests.byMode",
+      "admin.guests.byLanguage",
+      "admin.guests.windowDays",
+      "admin.guests.empty",
+      "admin.guests.error",
+      "admin.player.title",
+      "admin.player.back",
+      "admin.player.notFound",
+      "admin.player.loadError",
+      "admin.player.joined",
+      "admin.player.lastGame",
+      "admin.player.recentGames",
+      "admin.player.avgScore",
+      "admin.player.totalScore",
+      "admin.player.level",
+      "admin.player.mmr",
+      "admin.player.winRate",
+      "admin.player.identity",
+      "admin.player.role",
+      "admin.player.dailyEmail",
+      "admin.player.referrals",
+      "admin.player.seasonScore",
+      "admin.player.economy",
+      "admin.player.coins",
+      "admin.player.lifetimeCoins",
+      "admin.player.hintsUsed",
+      "admin.player.longestWord",
+      "admin.player.acquisition",
+      "admin.player.utmSource",
+      "admin.player.utmMedium",
+      "admin.player.utmCampaign",
+      "admin.player.referrer",
+      "admin.player.noAcquisitionData",
+      "admin.player.byLanguage",
+      "admin.player.byMode",
+      "admin.player.sessions",
+      "admin.player.completed",
+      "admin.player.ranked",
+      "admin.player.casual",
+      "admin.player.noGames",
+      "admin.player.gameCode",
+      "admin.player.score",
+      "admin.player.words",
+      "admin.player.placement",
+      "admin.player.mode",
+      "admin.player.lang",
+      "admin.player.duration",
+      "admin.player.when",
+      "admin.analytics.title",
+      "admin.analytics.retentionTitle",
+      "admin.analytics.cohort",
+      "admin.analytics.size",
+      "admin.analytics.funnelTitle",
+      "admin.analytics.funnelRegistered",
+      "admin.analytics.funnelFirstGame",
+      "admin.analytics.funnelDay7",
+      "admin.analytics.funnelDay30",
+      "admin.analytics.churnTitle",
+      "admin.analytics.churnTotal",
+      "admin.analytics.noChurnRisk",
+      "admin.analytics.games",
+      "admin.moderation.title",
+      "admin.moderation.queueTitle",
+      "admin.moderation.empty",
+      "admin.moderation.approve",
+      "admin.moderation.reject",
+      "admin.moderation.investigate",
+      "admin.moderation.banPlayer",
+      "admin.moderation.warnPlayer",
+      "admin.moderation.playerDetail",
+      "admin.moderation.moderationHistory",
+      "admin.moderation.recentGames",
+      "admin.moderation.cheatSignals",
+      "admin.moderation.flaggedPlayers",
+      "admin.moderation.noFlags",
+      "admin.content.pendingWords",
+      "admin.content.approvedWords",
+      "admin.content.topReported",
+      "admin.content.noReports",
+      "admin.milogWords.title",
+      "admin.milogWords.subtitle",
       "quickPlay.daily",
       "quickPlay.classic",
       "quickPlay.blast",
