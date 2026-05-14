@@ -47,6 +47,14 @@ export const HostLeftGraceModal: React.FC<HostLeftGraceModalProps> = ({
   const [remaining, setRemaining] = useState<number>(seconds);
   const firedRef = useRef<boolean>(false);
 
+  // Keep the freshest onExit without putting it in the interval effect's deps —
+  // an inline onExit from the parent changes identity every render, which would
+  // otherwise tear down + restart the countdown (and visually snap it back).
+  const onExitRef = useRef(onExit);
+  useEffect(() => {
+    onExitRef.current = onExit;
+  }, [onExit]);
+
   useEffect(() => {
     if (!isOpen) return;
     setRemaining(seconds);
@@ -58,7 +66,7 @@ export const HostLeftGraceModal: React.FC<HostLeftGraceModalProps> = ({
           clearInterval(interval);
           if (!firedRef.current) {
             firedRef.current = true;
-            onExit();
+            onExitRef.current();
           }
           return 0;
         }
@@ -66,12 +74,12 @@ export const HostLeftGraceModal: React.FC<HostLeftGraceModalProps> = ({
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [isOpen, seconds, onExit]);
+  }, [isOpen, seconds]);
 
   const handleExitNow = () => {
     if (firedRef.current) return;
     firedRef.current = true;
-    onExit();
+    onExitRef.current();
   };
 
   return (

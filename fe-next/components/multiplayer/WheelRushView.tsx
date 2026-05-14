@@ -72,15 +72,19 @@ const ERROR_KEY: Record<WheelErrorCode, string> = {
   'duplicate': 'wordWheel.alreadyFound',
 };
 
-const FogCountdown: React.FC<{ endsAt: number }> = ({ endsAt }) => {
-  const [secs, setSecs] = useState(() => Math.max(0, Math.ceil((endsAt - Date.now()) / 1000)));
+export const FogCountdown: React.FC<{ endsAt: number }> = ({ endsAt }) => {
+  // Ref-driven: the 250ms tick writes textContent directly, never triggering a
+  // React re-render or subtree reconcile. Childless leaf — safe to mutate.
+  const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
-    const tick = () => setSecs(Math.max(0, Math.ceil((endsAt - Date.now()) / 1000)));
-    tick();
-    const id = setInterval(tick, 250);
+    const format = () => `${Math.max(0, Math.ceil((endsAt - Date.now()) / 1000))}s`;
+    if (ref.current) ref.current.textContent = format();
+    const id = setInterval(() => {
+      if (ref.current) ref.current.textContent = format();
+    }, 250);
     return () => clearInterval(id);
   }, [endsAt]);
-  return <span className="opacity-60 tabular-nums">{secs}s</span>;
+  return <span ref={ref} data-testid="fog-countdown" className="opacity-60 tabular-nums" />;
 };
 
 export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t, remainingTime, onFogProgressChange, isDesktopCanvas = false }) => {

@@ -100,6 +100,38 @@ describe('HostLeftGraceModal (UX audit 2026-05-04 #2)', () => {
     expect(onExit).toHaveBeenCalledTimes(1);
   });
 
+  it('does not reset the countdown when onExit identity changes mid-countdown', () => {
+    // A parent passing an inline onExit re-creates it every render. The countdown
+    // interval must not re-register (and reset to `seconds`) on that identity churn.
+    const { rerender } = render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} />);
+    act(() => {
+      vi.advanceTimersByTime(4000);
+    });
+    expect(screen.getByTestId('host-left-countdown').textContent).toContain('6');
+    // Parent re-renders with a brand-new onExit reference — should NOT reset countdown.
+    rerender(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} />);
+    expect(screen.getByTestId('host-left-countdown').textContent).toContain('6');
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+    expect(screen.getByTestId('host-left-countdown').textContent).toContain('4');
+  });
+
+  it('fires the latest onExit when countdown ends, even if onExit changed mid-countdown', () => {
+    const firstOnExit = vi.fn();
+    const secondOnExit = vi.fn();
+    const { rerender } = render(<HostLeftGraceModal isOpen={true} onExit={firstOnExit} seconds={3} />);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    rerender(<HostLeftGraceModal isOpen={true} onExit={secondOnExit} seconds={3} />);
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(firstOnExit).not.toHaveBeenCalled();
+    expect(secondOnExit).toHaveBeenCalledTimes(1);
+  });
+
   it('resets the countdown when isOpen flips false→true', () => {
     const { rerender } = render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} />);
     act(() => {
