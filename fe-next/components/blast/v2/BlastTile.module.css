@@ -102,3 +102,28 @@
     transform: scale(1.15);
   }
 }
+
+.revealGlow {
+  position: absolute;
+  inset: -2px;
+  border-radius: 12px;
+  pointer-events: none;
+  box-shadow: 0 0 0 3px #06b6d4, 0 0 16px 4px #06b6d4;
+  animation: revealPulse 0.9s ease-in-out 2;
+}
+
+@keyframes revealPulse {
+  0%, 100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .revealGlow {
+    animation: none;
+    opacity: 0.6;
+  }
+}
