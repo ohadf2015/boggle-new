@@ -279,7 +279,7 @@ export function BlastGame({
   }
 
   return (
-    <div className="min-h-screen bg-[#0b1530] text-white">
+    <div className="flex flex-col min-h-dvh bg-[#0b1530] text-white">
       {tutorial.showUnlockCard && (
         <BlastUnlockCard
           mechanic={tutorial.showUnlockCard}
@@ -299,7 +299,7 @@ export function BlastGame({
           /* Plan 5 wires hints */
         }}
       />
-      <div className="relative">
+      <div className="relative flex-1 flex items-end justify-center pb-[max(1rem,env(safe-area-inset-bottom))]">
         <BlastAtmosphereOverlay modeColor={modeColor} />
         <BlastFxOverlay chainEventKey={state.chainEventKey} chainDepth={state.lastChainDepth} />
         <BlastChainSoundListener />
