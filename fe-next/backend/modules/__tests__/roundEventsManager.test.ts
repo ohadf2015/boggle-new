@@ -2,7 +2,7 @@
  * Round Events Manager Tests
  */
 
-import { vi, type Mock, type MockInstance } from 'vitest';
+import { vi, type Mock } from 'vitest';
 import type { GameState } from '../gameState/types';
 
 // Mock dependencies before imports
@@ -50,8 +50,8 @@ const mockBroadcastToRoom = broadcastToRoom as Mock;
 const mockTimerSet = mockTimerManagerInstance.setTimeout;
 const mockTimerClear = mockTimerManagerInstance.clearTimersWithPrefix;
 
-// Import after the mocks are set up
-const { scheduleRoundEvent, clearRoundEventTimers, EVENT_CONFIG, CATALYST_POOL, pickRandomCatalyst } = roundEventsManagerModule;
+// Use destructuring from the module
+const { scheduleRoundEvent, clearRoundEventTimers, EVENT_CONFIG, CATALYST_POOL } = roundEventsManagerModule;
 
 function makeGame(overrides: Partial<GameState> = {}): GameState {
   return {
@@ -76,7 +76,12 @@ describe('roundEventsManager', () => {
     vi.clearAllMocks();
     // Mock pickRandomCatalyst to return a non-earthquake catalyst by default
     // so existing tests don't need to be rewritten for the unification
-    vi.spyOn(roundEventsManagerModule, 'pickRandomCatalyst').mockReturnValue('blizzard');
+    const spy = vi.spyOn(roundEventsManagerModule, 'pickRandomCatalyst');
+    spy.mockReturnValue('blizzard');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   describe('clearRoundEventTimers', () => {
@@ -177,8 +182,17 @@ describe('roundEventsManager', () => {
       triggerCb();
 
       // Collect all timer callbacks (start + end phases)
-      const startCb = mockTimerSet.mock.calls.find(([key]: [string]) => key.includes(':start'))?.[1] as (() => void) | undefined;
-      const endCb = mockTimerSet.mock.calls.find(([key]: [string]) => key.includes(':end'))?.[1] as (() => void) | undefined;
+      const startCall = mockTimerSet.mock.calls.find((call: unknown[]) => {
+        const key = call[0];
+        return typeof key === 'string' && key.includes(':start');
+      });
+      const startCb = startCall?.[1] as (() => void) | undefined;
+
+      const endCall = mockTimerSet.mock.calls.find((call: unknown[]) => {
+        const key = call[0];
+        return typeof key === 'string' && key.includes(':end');
+      });
+      const endCb = endCall?.[1] as (() => void) | undefined;
 
       // Execute start
       startCb?.();
@@ -209,14 +223,19 @@ describe('roundEventsManager', () => {
 
     it('pickRandomCatalyst only ever returns a pool member', () => {
       for (let i = 0; i < 200; i++) {
-        expect(CATALYST_POOL).toContain(pickRandomCatalyst());
+        expect(CATALYST_POOL).toContain(roundEventsManagerModule.pickRandomCatalyst());
       }
     });
 
     it('pickRandomCatalyst can return earthquake', () => {
+      // Restore the real pickRandomCatalyst for this test
+      vi.restoreAllMocks();
       const seen = new Set<string>();
-      for (let i = 0; i < 500; i++) seen.add(pickRandomCatalyst());
+      for (let i = 0; i < 500; i++) seen.add(roundEventsManagerModule.pickRandomCatalyst());
       expect(seen.has('earthquake')).toBe(true);
+      // Re-apply the mock for the other tests
+      const spy = vi.spyOn(roundEventsManagerModule, 'pickRandomCatalyst');
+      spy.mockReturnValue('blizzard');
     });
   });
 });

@@ -26,8 +26,6 @@ export interface RoundEventData {
 
 // ==================== Configuration ====================
 
-const EVENT_TYPES: RoundEventType[] = ['blizzard', 'lightning', 'meteor'];
-
 export const EVENT_CONFIG: Record<RoundEventType, { durationMs: number; warningMs: number }> = {
   blizzard: { durationMs: 18_000, warningMs: 3_000 },
   lightning: { durationMs: 15_000, warningMs: 3_000 },
@@ -64,10 +62,6 @@ gameCleanupEmitter.onGameReset(({ gameCode }) => {
 });
 
 // ==================== Helpers ====================
-
-function pickRandomEventType(): RoundEventType {
-  return EVENT_TYPES[Math.floor(Math.random() * EVENT_TYPES.length)];
-}
 
 function pickRandomTiles(
   grid: Array<Array<unknown>>,
@@ -113,7 +107,7 @@ export function clearRoundEventTimers(gameCode: string): void {
 export function scheduleRoundEvent(
   io: Server,
   gameCode: string,
-  game: GameState,
+  _game: GameState,
   totalTimerSeconds: number
 ): void {
   const catalyst = pickRandomCatalyst();
