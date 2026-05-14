@@ -781,6 +781,38 @@ describe('registerStartGameHandler', () => {
         expect.objectContaining({ timerSeconds: 90 }) // BLAST_MP_DEFAULT_TIMER
       );
     });
+
+    it('respects host-supplied timer for Blast instead of force-overriding to 90s', async () => {
+      mockSelectNextGameMode.mockReturnValue('blast');
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      await triggerStartGame(handlers, makePayload({ gameMode: 'blast', timerSeconds: 180 }));
+
+      expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+        mockIo,
+        'room:GAME1',
+        'startGame',
+        expect.objectContaining({ timerSeconds: 180 })
+      );
+    });
+
+    it('falls back to BLAST_MP_DEFAULT_TIMER (90) when no timer supplied for Blast', async () => {
+      mockSelectNextGameMode.mockReturnValue('blast');
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      const payload = makePayload({ gameMode: 'blast' });
+      delete (payload as any).timerSeconds;
+      await triggerStartGame(handlers, payload);
+
+      expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+        mockIo,
+        'room:GAME1',
+        'startGame',
+        expect.objectContaining({ timerSeconds: 90 })
+      );
+    });
   });
 
   // ─── Boost token bundling (race-fix) ─────────────────────────────────

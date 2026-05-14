@@ -264,7 +264,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       logger.info('SOCKET', `Game ${gameCode} auto-reset successful, state now: ${game.gameState}`);
     }
 
-    let validTimer = Math.max(30, Math.min(600, parseInt(String(timerSeconds), 10) || 120));
+    const rawTimer = parseInt(String(timerSeconds), 10);
 
     // Resolve host blast access up-front so we can both filter the random pool
     // (avoids rolling a mode the host can't start) AND gate explicit blast picks.
@@ -297,13 +297,13 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       ? selectNextGameMode(game.modeHistory || [], enabledModes)
       : gameMode as GameMode;
 
-    // Blast mode is balanced around BLAST_MP_DEFAULT_TIMER (90s) — word density
-    // and combo math assume the canonical window. Force-override any client-
-    // supplied timer so a host can't request 30s Blast and skew balance
-    // (audit SRV-M4).
-    if (resolvedMode === 'blast') {
-      validTimer = BLAST_MP_DEFAULT_TIMER;
-    }
+    // Timer: clamp host choice to the safe range. Blast falls back to its own
+    // 90s default (not the generic 120) when the host supplied nothing — but a
+    // host-chosen 1/2/3 min is now respected (was force-overridden, audit SRV-M4;
+    // override accepted by product 2026-05-14 — waves removed, fixed-window
+    // balance argument no longer holds).
+    const timerFallback = resolvedMode === 'blast' ? BLAST_MP_DEFAULT_TIMER : 120;
+    let validTimer = Math.max(30, Math.min(600, rawTimer || timerFallback));
 
     // Defense-in-depth: explicit blast pick (or any path that bypassed the pool
     // filter) must still pass the access gate. blastAllowed was resolved above.
