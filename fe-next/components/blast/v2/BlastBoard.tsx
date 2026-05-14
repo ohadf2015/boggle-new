@@ -115,7 +115,6 @@ export function BlastBoard({
                     <BlastTile
                       cellId={id}
                       letter={letter}
-                      displayChar={config.displayChar(letter, row, col.tiles.length)}
                       flags={flags}
                       state={tileState(id)}
                       modeColor={modeColor}
