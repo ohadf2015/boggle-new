@@ -5596,6 +5596,18 @@ const en = {
       "tierSilver": "Silver",
       "tierGold": "Gold",
       "freezesGranted": "+{n} Streak Freeze",
+      "info": {
+        "title": "How the Weekly Chest Works",
+        "howItWorks": "Finish a daily challenge each day. Seven days in a row fills your chest.",
+        "streakReset": "Miss a day and your streak resets — you start the 7-day run over.",
+        "tiersTitle": "Chest tiers",
+        "tierBronzeDesc": "Base reward for finishing the week.",
+        "tierSilverDesc": "Play well all week to reach it.",
+        "tierGoldDesc": "Top scores every day unlock it.",
+        "betterChest": "Score higher and faster each day to upgrade your chest tier.",
+        "projection": "On track for:",
+        "gotIt": "Got it"
+      },
       "prize": {
         "coinPouch": "Coin Pouch",
         "shieldStash": "Shield Stash",
@@ -8728,6 +8740,7 @@ const en = {
     "helpFrozen": "Takes 3 hits to break. Blocks cascade detection.",
     "foundWords": "Found Words",
     "noWordsLeft": "No words remaining!",
+    "moreLevelsComingSoon": "More levels coming soon!",
     "shuffle": "Shuffle",
     "morePoints": "more pts",
     "needScore": "Need {score}",

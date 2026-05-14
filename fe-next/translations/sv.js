@@ -5491,6 +5491,18 @@ const sv = {
       "tierSilver": "Silver",
       "tierGold": "Guld",
       "freezesGranted": "+{n} Streak Shield",
+      "info": {
+        "title": "Så funkar veckokistan",
+        "howItWorks": "Slutför en daglig utmaning varje dag. Sju dagar i rad fyller din kista.",
+        "streakReset": "Missar du en dag nollställs din svit – du börjar om på sju dagar.",
+        "tiersTitle": "Kistnivåer",
+        "tierBronzeDesc": "Grundbelöning för att klara veckan.",
+        "tierSilverDesc": "Spela bra hela veckan för att nå den.",
+        "tierGoldDesc": "Toppresultat varje dag låser upp den.",
+        "betterChest": "Högre och snabbare poäng varje dag uppgraderar din kistnivå.",
+        "projection": "På väg mot:",
+        "gotIt": "Uppfattat"
+      },
       "prize": {
         "coinPouch": "Myntpung",
         "shieldStash": "Sköldförråd",
@@ -8907,6 +8919,7 @@ const sv = {
     "helpFrozen": "Kräver 3 träffar att bryta. Blockerar kaskaddetektering.",
     "foundWords": "Hittade ord",
     "noWordsLeft": "Inga ord kvar!",
+    "moreLevelsComingSoon": "Fler nivåer kommer snart!",
     "shuffle": "Blanda",
     "morePoints": "fler poäng",
     "needScore": "Behöver {score}",

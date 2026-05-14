@@ -5492,6 +5492,18 @@ const he = {
       "tierSilver": "כסף",
       "tierGold": "זהב",
       "freezesGranted": "+{n} מגן רצף",
+      "info": {
+        "title": "איך עובדת התיבה השבועית",
+        "howItWorks": "סיימו אתגר יומי בכל יום. שבעה ימים ברצף ממלאים את התיבה.",
+        "streakReset": "פספסתם יום? הרצף מתאפס ומתחילים את שבעת הימים מחדש.",
+        "tiersTitle": "דרגות התיבה",
+        "tierBronzeDesc": "תגמול הבסיס על סיום השבוע.",
+        "tierSilverDesc": "שחקו טוב כל השבוע כדי להגיע אליה.",
+        "tierGoldDesc": "ניקוד גבוה בכל יום פותח אותה.",
+        "betterChest": "ניקוד גבוה ומהיר יותר בכל יום משדרג את דרגת התיבה.",
+        "projection": "בדרך אל:",
+        "gotIt": "הבנתי"
+      },
       "prize": {
         "coinPouch": "ארנק מטבעות",
         "shieldStash": "מלאי מגנים",
@@ -8886,6 +8898,7 @@ const he = {
     "helpFrozen": "דורש 3 פגיעות לשבירה. חוסם זיהוי מפל.",
     "foundWords": "מילים שנמצאו",
     "noWordsLeft": "לא נשארו מילים!",
+    "moreLevelsComingSoon": "עוד רמות בקרוב!",
     "shuffle": "ערבב",
     "morePoints": "נק' נוספות",
     "needScore": "צריך {score}",

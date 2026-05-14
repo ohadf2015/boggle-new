@@ -1,6 +1,7 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { BlastGame } from '@/components/blast/v2/BlastGame';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { BlastLevel } from '@/lib/blast/v2/types';
 import type { UnlocksSeen } from '@/lib/blast/v2/tutorial/unlocks-seen';
 
@@ -12,8 +13,9 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
   const [level, setLevel] = useState<BlastLevel>(initialLevel);
   const [unlocksSeen, setUnlocksSeen] = useState<UnlocksSeen>({});
   const [isVeteran] = useState(false);
-  const [advancing, setAdvancing] = useState(false);
   const [reachedEnd, setReachedEnd] = useState(false);
+  const advancingRef = useRef(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Plan 3 (DB) replaces this with a real progress fetch.
@@ -21,8 +23,8 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
   }, []);
 
   const handleAdvance = useCallback(async () => {
-    if (advancing) return;
-    setAdvancing(true);
+    if (advancingRef.current) return;
+    advancingRef.current = true;
     const nextNumber = level.levelNumber + 1;
     try {
       const res = await fetch(
@@ -38,14 +40,14 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
       console.error('Failed to load next blast level:', e);
       setReachedEnd(true);
     } finally {
-      setAdvancing(false);
+      advancingRef.current = false;
     }
-  }, [advancing, level.levelNumber, level.locale]);
+  }, [level.levelNumber, level.locale]);
 
   if (reachedEnd) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-[#0b1530] text-white">
-        <p className="font-neo-display text-2xl">More levels coming soon!</p>
+        <p className="font-neo-display text-2xl">{t('blast.moreLevelsComingSoon')}</p>
       </div>
     );
   }

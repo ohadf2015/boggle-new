@@ -5524,6 +5524,18 @@ const ja = {
       "tierSilver": "シルバー",
       "tierGold": "ゴールド",
       "freezesGranted": "ストリークシールド +{n}",
+      "info": {
+        "title": "週間チェストの仕組み",
+        "howItWorks": "毎日デイリーチャレンジをクリアしましょう。7日連続でチェストが満タンになります。",
+        "streakReset": "1日でも逃すと連続記録がリセットされ、7日間を最初からやり直します。",
+        "tiersTitle": "チェストのランク",
+        "tierBronzeDesc": "週をやり遂げた基本報酬。",
+        "tierSilverDesc": "1週間しっかりプレイすると到達。",
+        "tierGoldDesc": "毎日高得点を取ると解放。",
+        "betterChest": "毎日より高く速いスコアを出すとチェストのランクが上がります。",
+        "projection": "現在の見込み：",
+        "gotIt": "わかった"
+      },
       "prize": {
         "coinPouch": "コインの袋",
         "shieldStash": "シールド備蓄",
@@ -8933,6 +8945,7 @@ const ja = {
     "helpFrozen": "壊すには3回のヒットが必要。カスケード検出をブロック。",
     "foundWords": "見つけた単語",
     "noWordsLeft": "残りの単語はありません！",
+    "moreLevelsComingSoon": "もっとレベルが近日公開！",
     "shuffle": "シャッフル",
     "morePoints": "ポイント追加",
     "needScore": "{score}必要",

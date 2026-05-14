@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 import { BlastV2PageClient } from '../BlastV2PageClient';
 import type { BlastLevel } from '@/lib/blast/v2/types';
 
@@ -34,7 +35,11 @@ describe('BlastV2PageClient level advancement', () => {
       json: async () => level2,
     }) as unknown as typeof fetch;
 
-    render(<BlastV2PageClient level={level1} />);
+    render(
+      <LanguageProvider initialLanguage="en">
+        <BlastV2PageClient level={level1} />
+      </LanguageProvider>
+    );
     expect(screen.getByTestId('level-number').textContent).toBe('1');
 
     screen.getByTestId('advance').click();

@@ -5534,6 +5534,18 @@ const es = {
       "tierSilver": "Plata",
       "tierGold": "Oro",
       "freezesGranted": "+{n} Escudo de Racha",
+      "info": {
+        "title": "Cómo funciona el cofre semanal",
+        "howItWorks": "Completa un desafío diario cada día. Siete días seguidos llenan tu cofre.",
+        "streakReset": "Si fallas un día, tu racha se reinicia y empiezas los 7 días de nuevo.",
+        "tiersTitle": "Niveles del cofre",
+        "tierBronzeDesc": "Recompensa básica por completar la semana.",
+        "tierSilverDesc": "Juega bien toda la semana para alcanzarlo.",
+        "tierGoldDesc": "Las mejores puntuaciones cada día lo desbloquean.",
+        "betterChest": "Puntúa más alto y más rápido cada día para subir el nivel de tu cofre.",
+        "projection": "En camino a:",
+        "gotIt": "Entendido"
+      },
       "prize": {
         "coinPouch": "Bolsa de monedas",
         "shieldStash": "Reserva de escudos",
@@ -8979,6 +8991,7 @@ const es = {
     "helpFrozen": "Requiere 3 golpes para romper. Bloquea la detección de cascada.",
     "foundWords": "Palabras encontradas",
     "noWordsLeft": "¡No quedan palabras!",
+    "moreLevelsComingSoon": "¡Más niveles próximamente!",
     "shuffle": "Mezclar",
     "stuck": "¿Atascado?",
     "hint": "Pista",
