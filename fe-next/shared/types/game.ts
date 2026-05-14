@@ -401,6 +401,7 @@ export interface BlastPlayerStats {
   bestWord: string;
   tilesCleared: number;
   totalTileBonus: number;
+  boardClears: number;
 }
 
 /** Blast mode state tracked per game */
@@ -429,4 +430,6 @@ export interface BlastModeState {
    * overlay was rolled against (prevents overlay ↔ rules divergence).
    */
   wave?: number;
+  /** Number of times the board has been regenerated in place (timer-era refills). */
+  refillCount?: number;
 }

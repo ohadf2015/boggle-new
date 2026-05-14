@@ -11,7 +11,8 @@ import {
   getTilesOnPath,
   hashStringToSeed,
   isBlastBoardCleared,
-  advanceBlastWave,
+  regenerateBlastBoard,
+  recordBlastBoardClear,
   tryBeginWaveAdvance,
   endWaveAdvance,
 } from '../blastModeManager';
@@ -558,73 +559,39 @@ describe('blastModeManager', () => {
   });
 
   // ==========================================
-  // advanceBlastWave
+  // regenerateBlastBoard
   // ==========================================
-  describe('advanceBlastWave', () => {
-    const gameCode = 'ABCD';
-    const grid: string[][] = [
-      ['A', 'B', 'C', 'D'],
-      ['E', 'F', 'G', 'H'],
-      ['I', 'J', 'K', 'L'],
-      ['M', 'N', 'O', 'P'],
-    ];
-    const players = ['alice', 'bob'];
-
-    it('increments wave by 1', () => {
-      const state = initBlastModeState(grid, players, 1, hashStringToSeed(`${gameCode}:wave1`));
-      const next = advanceBlastWave(state, gameCode, grid);
-      expect(next.wave).toBe(2);
+  describe('regenerateBlastBoard', () => {
+    it('produces a fresh overlay without incrementing a wave counter', () => {
+      const grid = [['a', 'b'], ['c', 'd']];
+      const state = initBlastModeState(grid, ['alice'], 1, 12345);
+      state.refillCount = 0;
+      const next = regenerateBlastBoard(state, 'ROOM1', grid);
+      expect(next.refillCount).toBe(1);
+      expect(next.overlay).toBeDefined();
+      expect(next.tileStates.some((row) => row.some((t) => !t.isCleared))).toBe(true);
     });
 
-    it('preserves cumulative playerStats across waves', () => {
-      const state = initBlastModeState(grid, players, 1, hashStringToSeed(`${gameCode}:wave1`));
-      state.playerStats['alice'] = {
-        maxCombo: 5,
-        gemsCollected: 12,
-        wordsFound: ['hello', 'world'],
-        bestWord: 'world',
-        tilesCleared: 20,
-        totalTileBonus: 45,
-      };
-      const next = advanceBlastWave(state, gameCode, grid);
-      expect(next.playerStats['alice']).toEqual(state.playerStats['alice']);
+    it('preserves cumulative playerStats across regeneration', () => {
+      const grid = [['a', 'b'], ['c', 'd']];
+      const state = initBlastModeState(grid, ['alice'], 1, 1);
+      state.playerStats.alice = { maxCombo: 4, gemsCollected: 2, wordsFound: ['cab'], bestWord: 'cab', tilesCleared: 3, totalTileBonus: 5, boardClears: 0 };
+      const next = regenerateBlastBoard(state, 'ROOM1', grid);
+      expect(next.playerStats.alice.maxCombo).toBe(4);
+      expect(next.playerStats.alice.tilesCleared).toBe(3);
     });
+  });
 
-    it('resets playerMoves per wave', () => {
-      const state = initBlastModeState(grid, players, 1, hashStringToSeed(`${gameCode}:wave1`));
-      state.playerMoves['alice'] = 7;
-      state.playerMoves['bob'] = 3;
-      const next = advanceBlastWave(state, gameCode, grid);
-      expect(next.playerMoves['alice']).toBe(0);
-      expect(next.playerMoves['bob']).toBe(0);
-    });
-
-    it('produces deterministic overlay per (gameCode, wave)', () => {
-      const s1 = initBlastModeState(grid, players, 1, hashStringToSeed(`${gameCode}:wave1`));
-      const s2 = initBlastModeState(grid, players, 1, hashStringToSeed(`${gameCode}:wave1`));
-      const a = advanceBlastWave(s1, gameCode, grid);
-      const b = advanceBlastWave(s2, gameCode, grid);
-      expect(a.overlay).toEqual(b.overlay);
-      expect(a.seed).toBe(b.seed);
-    });
-
-    it('decorrelates overlay seed across waves', () => {
-      const state = initBlastModeState(grid, players, 1, hashStringToSeed(`${gameCode}:wave1`));
-      const wave2 = advanceBlastWave(state, gameCode, grid);
-      expect(wave2.seed).not.toBe(state.seed);
-    });
-
-    it('uses provided grid for new tileStates', () => {
-      const state = initBlastModeState(grid, players, 1, hashStringToSeed(`${gameCode}:wave1`));
-      const newGrid: string[][] = [
-        ['Q', 'R', 'S', 'T'],
-        ['U', 'V', 'W', 'X'],
-        ['Y', 'Z', 'A', 'B'],
-        ['C', 'D', 'E', 'F'],
-      ];
-      const next = advanceBlastWave(state, gameCode, newGrid);
-      expect(next.grid).toEqual(newGrid);
-      expect(next.tileStates.length).toBe(newGrid.length);
+  // ==========================================
+  // recordBlastBoardClear
+  // ==========================================
+  describe('recordBlastBoardClear', () => {
+    it('increments boardClears for the clearing player', () => {
+      const grid = [['a', 'b'], ['c', 'd']];
+      const state = initBlastModeState(grid, ['alice'], 1, 1);
+      recordBlastBoardClear(state, 'alice');
+      recordBlastBoardClear(state, 'alice');
+      expect(state.playerStats.alice.boardClears).toBe(2);
     });
   });
 

@@ -148,7 +148,7 @@ export function initBlastModeState(
   for (const player of players) {
     playerMoves[player] = 0;
     playerBonusMoves[player] = 0;
-    playerStats[player] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0 };
+    playerStats[player] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0, boardClears: 0 };
   }
 
   // Refill seed for gravity RNG.
@@ -203,7 +203,7 @@ export function recordBlastMove(
 
   // Update rich per-player stats (initialize lazily for late-joining players)
   if (!state.playerStats[username]) {
-    state.playerStats[username] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0 };
+    state.playerStats[username] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0, boardClears: 0 };
   }
   const stats = state.playerStats[username];
   if (comboLevel > stats.maxCombo) stats.maxCombo = comboLevel;
@@ -288,23 +288,33 @@ export function isBlastBoardCleared(tileStates: BlastTileState[][]): boolean {
 }
 
 /**
- * Advance blast state to the next wave (pure; caller applies via Object.assign).
- * Preserves cumulative playerStats; resets playerMoves / playerBonusMoves per wave.
- * Overlay seed is derived as hashStringToSeed(`{gameCode}:wave{N}`) so it is
- * deterministic across peers and reproducible on reconnect.
+ * Regenerate the blast board in place (pure; caller applies via Object.assign).
+ * Used when a board is fully cleared mid-timer: fresh overlay + tileStates, no
+ * wave concept. Preserves cumulative playerStats. Seed is derived deterministically
+ * from gameCode + refillCount so all peers reproduce the same board.
  */
-export function advanceBlastWave(
+export function regenerateBlastBoard(
   state: BlastModeState,
   gameCode: string,
   grid: string[][],
 ): BlastModeState {
-  const nextWave = (state.wave ?? 1) + 1;
-  const overlaySeed = hashStringToSeed(`${gameCode}:wave${nextWave}`);
-  const players = Object.keys(state.playerMoves);
-  const fresh = initBlastModeState(grid, players, nextWave, overlaySeed);
-  // Preserve cumulative stats.
-  fresh.playerStats = state.playerStats;
+  const refillCount = (state.refillCount ?? 0) + 1;
+  const overlaySeed = hashStringToSeed(`${gameCode}:refill${refillCount}`);
+  const players = Object.keys(state.playerStats);
+  const fresh = initBlastModeState(grid, players, 1, overlaySeed);
+  fresh.playerStats = state.playerStats; // preserve cumulative stats
+  fresh.refillCount = refillCount;
   return fresh;
+}
+
+/**
+ * Record that `username` fully cleared the board (timer-era bonus event).
+ */
+export function recordBlastBoardClear(state: BlastModeState, username: string): void {
+  if (!state.playerStats[username]) {
+    state.playerStats[username] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0, boardClears: 0 };
+  }
+  state.playerStats[username].boardClears = (state.playerStats[username].boardClears ?? 0) + 1;
 }
 
 /**
