@@ -10659,7 +10659,17 @@ const en = {
       feature1: "Chain combos",
       feature2: "Special tiles",
       feature3: "Cascade",
-      intro: { greet: "Tap, swipe, breathe. No rush." }
+      intro: { greet: "Tap, swipe, breathe. No rush." },
+      results: {
+        sceneTitle: "Blast Results",
+        finalScore: "Final Score",
+        comboChain: "Best Combo",
+        boardClears: "Board Clears",
+        gemsCollected: "Gems",
+        tilesCleared: "Tiles Cleared",
+        bestWord: "Best Word",
+        rank: "Rank"
+      }
     },
     wordHunt: {
       name: "Word Hunt",

@@ -10855,7 +10855,17 @@ const he = {
       feature1: "קומבו שרשרת",
       feature2: "אריחים מיוחדים",
       feature3: "מפל",
-      intro: { greet: "טפח, החלק, נשם. אין מירוץ." }
+      intro: { greet: "טפח, החלק, נשם. אין מירוץ." },
+      results: {
+        sceneTitle: "תוצאות בלאסט",
+        finalScore: "ניקוד סופי",
+        comboChain: "קומבו שיא",
+        boardClears: "ניקוי לוחות",
+        gemsCollected: "אבני חן",
+        tilesCleared: "אריחים שנוקו",
+        bestWord: "המילה הטובה ביותר",
+        rank: "דירוג"
+      }
     },
     wordHunt: {
       name: "ציד מילים",

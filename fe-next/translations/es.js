@@ -10660,7 +10660,17 @@ const es = {
       "feature1": "Combos en cadena",
       "feature2": "Fichas especiales",
       "feature3": "Cascada",
-      "intro": { "greet": "Toca, desliza, respira. Sin prisa." }
+      "intro": { "greet": "Toca, desliza, respira. Sin prisa." },
+      "results": {
+        "sceneTitle": "Resultados de Blast",
+        "finalScore": "Puntuación final",
+        "comboChain": "Mejor combo",
+        "boardClears": "Tableros despejados",
+        "gemsCollected": "Gemas",
+        "tilesCleared": "Fichas despejadas",
+        "bestWord": "Mejor palabra",
+        "rank": "Posición"
+      }
     },
     "wordHunt": {
       "name": "Caza de Palabras",

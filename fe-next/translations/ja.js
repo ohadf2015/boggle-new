@@ -10731,7 +10731,17 @@ const ja = {
       feature1: "チェーンコンボ",
       feature2: "特殊タイル",
       feature3: "カスケード",
-      intro: { greet: "タップ、スワイプ、呼吸。急がなくていい。" }
+      intro: { greet: "タップ、スワイプ、呼吸。急がなくていい。" },
+      results: {
+        sceneTitle: "ブラスト結果",
+        finalScore: "最終スコア",
+        comboChain: "最高コンボ",
+        boardClears: "ボードクリア",
+        gemsCollected: "ジェム",
+        tilesCleared: "クリアタイル",
+        bestWord: "ベストワード",
+        rank: "ランク"
+      }
     },
     wordHunt: {
       name: "ワードハント",

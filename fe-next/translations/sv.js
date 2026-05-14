@@ -10757,7 +10757,17 @@ const sv = {
       feature1: "Kedjekombos",
       feature2: "Specialbrickor",
       feature3: "Kaskad",
-      intro: { greet: "Tryck, dra, andas. Ingen brådska." }
+      intro: { greet: "Tryck, dra, andas. Ingen brådska." },
+      results: {
+        sceneTitle: "Blast-resultat",
+        finalScore: "Slutpoäng",
+        comboChain: "Bästa combo",
+        boardClears: "Brädesrensningar",
+        gemsCollected: "Ädelstenar",
+        tilesCleared: "Rensade rutor",
+        bestWord: "Bästa ord",
+        rank: "Placering"
+      }
     },
     wordHunt: {
       name: "Ordjakt",
