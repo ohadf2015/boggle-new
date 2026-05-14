@@ -7290,15 +7290,6 @@ const en = {
       "mechanicTrigger": "Trigger Mechanic",
       "noDamage": "Take No Damage"
     },
-    "daily": {
-      "wordCount": { "title": "Word Collector", "desc": "Find {{target}} words in adventure levels" },
-      "longWord": { "title": "Long Words", "desc": "Find {{target}} words with 5+ letters" },
-      "perfect": { "title": "Perfect Stars", "desc": "Earn {{target}} perfect star ratings" },
-      "combo": { "title": "Combo Master", "desc": "Reach a {{target}}x combo streak" },
-      "speed": { "title": "Speed Run", "desc": "Complete a level with {{target}}+ seconds remaining" },
-      "boss": { "title": "Boss Slayer", "desc": "Defeat {{target}} boss(es)" },
-      "mechanic": { "title": "Mechanic Expert", "desc": "Trigger world mechanics {{target}} times" }
-    },
     "tiles": {
       "gold": "Gold (3x points)",
       "ice": "Ice (obstacle)",
@@ -9806,24 +9797,71 @@ const en = {
       "moat": {
         "title": "Why teachers in 5 languages choose LexiClash",
         "subtitle": "Three reasons we can defend, not just claim.",
-        "native_multilingual": { "tag": "Native", "title": "Built natively for your language", "body": "Hebrew right-to-left, Japanese kana with IME, Swedish compound words, Spanish accents — all handled at the engine level. Not Google-translated." },
-        "local_inventory": { "tag": "Local", "title": "Locally sourced word inventory", "body": "Word lists pulled from your locale's Wikipedia + Hebrew Milog dictionary. Students see culturally relevant words from their country — not US K-12 textbook leftovers." },
-        "ad_free": { "tag": "Ad-free", "title": "Ad-free for students. Ever.", "body": "Kahoot, Quizlet, Blooket — all show ads to your students. We pledge zero ads on every education route. COPPA + GDPR aware." }
+        "native_multilingual": {
+          "tag": "Native",
+          "title": "Built natively for your language",
+          "body": "Hebrew right-to-left, Japanese kana with IME, Swedish compound words, Spanish accents — all handled at the engine level. Not Google-translated."
+        },
+        "local_inventory": {
+          "tag": "Local",
+          "title": "Locally sourced word inventory",
+          "body": "Word lists pulled from your locale's Wikipedia + Hebrew Milog dictionary. Students see culturally relevant words from their country — not US K-12 textbook leftovers."
+        },
+        "ad_free": {
+          "tag": "Ad-free",
+          "title": "Ad-free for students. Ever.",
+          "body": "Kahoot, Quizlet, Blooket — all show ads to your students. We pledge zero ads on every education route. COPPA + GDPR aware."
+        }
       },
       "modes": {
         "title": "6 modes, one platform — rotate to beat fatigue",
         "teaches": "Teaches",
-        "classroom_game": { "tag": "Live", "title": "Classroom Game", "body": "Live multiplayer word hunt for the whole class.", "teaches": "Vocabulary, spelling, speed" },
-        "vocab_duels": { "tag": "Duel", "title": "Vocabulary Duels", "body": "Async or live 1v1 vocab challenges.", "teaches": "Retention, recall" },
-        "brain_drills": { "tag": "Brain", "title": "Brain Drills", "body": "Memory, attention, processing speed exercises.", "teaches": "Cognitive skills" },
-        "daily_wordhunt": { "tag": "Daily", "title": "Daily Wordhunt", "body": "New puzzle every day, leaderboard per locale.", "teaches": "Daily practice" },
-        "adventure": { "tag": "Story", "title": "Adventure Mode", "body": "Story-driven word puzzles across themed worlds.", "teaches": "Vocabulary depth" },
-        "spelling_bee": { "tag": "Bee", "title": "Spelling Bee Practice", "body": "Voice-led spelling drills, multi-language.", "teaches": "Spelling" }
+        "classroom_game": {
+          "tag": "Live",
+          "title": "Classroom Game",
+          "body": "Live multiplayer word hunt for the whole class.",
+          "teaches": "Vocabulary, spelling, speed"
+        },
+        "vocab_duels": {
+          "tag": "Duel",
+          "title": "Vocabulary Duels",
+          "body": "Async or live 1v1 vocab challenges.",
+          "teaches": "Retention, recall"
+        },
+        "brain_drills": {
+          "tag": "Brain",
+          "title": "Brain Drills",
+          "body": "Memory, attention, processing speed exercises.",
+          "teaches": "Cognitive skills"
+        },
+        "daily_wordhunt": {
+          "tag": "Daily",
+          "title": "Daily Wordhunt",
+          "body": "New puzzle every day, leaderboard per locale.",
+          "teaches": "Daily practice"
+        },
+        "adventure": {
+          "tag": "Story",
+          "title": "Adventure Mode",
+          "body": "Story-driven word puzzles across themed worlds.",
+          "teaches": "Vocabulary depth"
+        },
+        "spelling_bee": {
+          "tag": "Bee",
+          "title": "Spelling Bee Practice",
+          "body": "Voice-led spelling drills, multi-language.",
+          "teaches": "Spelling"
+        }
       },
       "compare": {
         "title": "How LexiClash compares",
         "subtitle": "Honest checks — only where we genuinely deliver.",
-        "col": { "lexiclash": "LexiClash", "kahoot": "Kahoot!", "quizlet": "Quizlet", "wordwall": "Wordwall" },
+        "col": {
+          "lexiclash": "LexiClash",
+          "kahoot": "Kahoot!",
+          "quizlet": "Quizlet",
+          "wordwall": "Wordwall"
+        },
         "row": {
           "native_multilingual": "Native multilingual (incl. RTL, IME)",
           "ad_free_students": "Ad-free for students",
@@ -9841,14 +9879,38 @@ const en = {
       },
       "faq": {
         "title": "Frequently asked questions",
-        "q1": { "q": "How do teachers get access?", "a": "Apply at /education/access — we review by email and typically respond within 24 hours." },
-        "q2": { "q": "Is it really free for classrooms?", "a": "Yes. Free for verified teachers, no ads on student-facing routes." },
-        "q3": { "q": "Does it work in Hebrew, Japanese, Swedish, and Spanish?", "a": "Yes — native support including Hebrew RTL and Japanese kana/IME. Not translation." },
-        "q4": { "q": "How do you handle student privacy?", "a": "COPPA + GDPR aware. No ad tracking on education routes. Opt-in telemetry only." },
-        "q5": { "q": "Can students play without an account?", "a": "Yes. Guest play is supported for most modes." },
-        "q6": { "q": "How is this different from Kahoot, Quizlet, or Wordwall?", "a": "Native multilingual depth, ad-free pledge, 6 game modes on one platform, and locally sourced word inventory per locale." },
-        "q7": { "q": "Can I track student progress?", "a": "Yes. Teachers see per-student analytics in the teacher dashboard." },
-        "q8": { "q": "Does it work on Chromebooks, tablets, and phones?", "a": "Yes. Web-first, no install required." }
+        "q1": {
+          "q": "How do teachers get access?",
+          "a": "Apply at /education/access — we review by email and typically respond within 24 hours."
+        },
+        "q2": {
+          "q": "Is it really free for classrooms?",
+          "a": "Yes. Free for verified teachers, no ads on student-facing routes."
+        },
+        "q3": {
+          "q": "Does it work in Hebrew, Japanese, Swedish, and Spanish?",
+          "a": "Yes — native support including Hebrew RTL and Japanese kana/IME. Not translation."
+        },
+        "q4": {
+          "q": "How do you handle student privacy?",
+          "a": "COPPA + GDPR aware. No ad tracking on education routes. Opt-in telemetry only."
+        },
+        "q5": {
+          "q": "Can students play without an account?",
+          "a": "Yes. Guest play is supported for most modes."
+        },
+        "q6": {
+          "q": "How is this different from Kahoot, Quizlet, or Wordwall?",
+          "a": "Native multilingual depth, ad-free pledge, 6 game modes on one platform, and locally sourced word inventory per locale."
+        },
+        "q7": {
+          "q": "Can I track student progress?",
+          "a": "Yes. Teachers see per-student analytics in the teacher dashboard."
+        },
+        "q8": {
+          "q": "Does it work on Chromebooks, tablets, and phones?",
+          "a": "Yes. Web-first, no install required."
+        }
       },
       "cta": {
         "title": "Ready to bring LexiClash to your classroom?",
@@ -10962,7 +11024,7 @@ const en = {
     "daily": {
       "wordHunt": {
         "name": "Daily Word Hunt",
-        "desc": "Find 10+ words in today's Daily Challenge"
+        "desc": "Play today's Daily Challenge"
       },
       "multiplayer": {
         "name": "Multiplayer Match",

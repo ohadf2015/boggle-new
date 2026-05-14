@@ -7763,15 +7763,6 @@ const sv = {
       "mechanicTrigger": "Utlös Mekanism",
       "noDamage": "Ta Ingen Skada"
     },
-    "daily": {
-      "wordCount": { "title": "Ordsamlare", "desc": "Hitta {{target}} ord i äventyrsnivåer" },
-      "longWord": { "title": "Långa Ord", "desc": "Hitta {{target}} ord med 5+ bokstäver" },
-      "perfect": { "title": "Perfekta Stjärnor", "desc": "Få {{target}} perfekta stjärnbetyg" },
-      "combo": { "title": "Kombomästare", "desc": "Nå en {{target}}x kombosvit" },
-      "speed": { "title": "Snabblöpning", "desc": "Klara en nivå med {{target}}+ sekunder kvar" },
-      "boss": { "title": "Bossdödare", "desc": "Besegra {{target}} boss(ar)" },
-      "mechanic": { "title": "Mekanikexpert", "desc": "Utlös världsmekaniker {{target}} gånger" }
-    },
     "tiles": {
       "gold": "Guld (3x poäng)",
       "ice": "Is (hinder)",
@@ -9978,24 +9969,71 @@ const sv = {
       "moat": {
         "title": "Varför lärare på 5 språk väljer LexiClash",
         "subtitle": "Tre skäl som vi kan försvara, inte bara hävda.",
-        "native_multilingual": { "tag": "Inbyggt", "title": "Byggt för ditt språk", "body": "Hebreiska höger-till-vänster, japanska med kana och IME, svenska sammansatta ord, spanska accenter — allt hanteras på motornivå. Inte Google-översatt." },
-        "local_inventory": { "tag": "Lokalt", "title": "Lokalt sourced ordförråd", "body": "Ordlistor från din lokala Wikipedia + hebreisk Milog-ordbok. Elever ser kulturellt relevanta ord från sitt eget land — inte gamla amerikanska läroböcker från K-12." },
-        "ad_free": { "tag": "Reklamfritt", "title": "Reklamfritt för elever. Alltid.", "body": "Kahoot, Quizlet, Blooket — visa alla annonser för dina elever. Vi lovar noll annonser på alla utbildningsvägar. COPPA + GDPR-medveten." }
+        "native_multilingual": {
+          "tag": "Inbyggt",
+          "title": "Byggt för ditt språk",
+          "body": "Hebreiska höger-till-vänster, japanska med kana och IME, svenska sammansatta ord, spanska accenter — allt hanteras på motornivå. Inte Google-översatt."
+        },
+        "local_inventory": {
+          "tag": "Lokalt",
+          "title": "Lokalt sourced ordförråd",
+          "body": "Ordlistor från din lokala Wikipedia + hebreisk Milog-ordbok. Elever ser kulturellt relevanta ord från sitt eget land — inte gamla amerikanska läroböcker från K-12."
+        },
+        "ad_free": {
+          "tag": "Reklamfritt",
+          "title": "Reklamfritt för elever. Alltid.",
+          "body": "Kahoot, Quizlet, Blooket — visa alla annonser för dina elever. Vi lovar noll annonser på alla utbildningsvägar. COPPA + GDPR-medveten."
+        }
       },
       "modes": {
         "title": "6 spellägen, en plattform — variera för att slå trötthet",
         "teaches": "Lär",
-        "classroom_game": { "tag": "Direkt", "title": "Klassrumsspel", "body": "Livsord jakt för flera spelare för hela klassen.", "teaches": "Ordförråd, stavning, hastighet" },
-        "vocab_duels": { "tag": "Duell", "title": "Ordförrådsdueller", "body": "Asynkron eller live 1v1 ordförrådsutmaningar.", "teaches": "Retention, återkallelse" },
-        "brain_drills": { "tag": "Hjärna", "title": "Hjärnövningar", "body": "Minne, uppmärksamhet, bearbetningshastighetsövningar.", "teaches": "Kognitiva färdigheter" },
-        "daily_wordhunt": { "tag": "Daglig", "title": "Daglig ordjakt", "body": "Nytt pussel varje dag, lokala rankinglistor.", "teaches": "Daglig övning" },
-        "adventure": { "tag": "Story", "title": "Äventyrläge", "body": "Berättardrivna ordpussel över tematiska världar.", "teaches": "Ordförrådsdjup" },
-        "spelling_bee": { "tag": "Bi", "title": "Stavningsövning", "body": "Röstledd stavningsövning, flersprål.", "teaches": "Stavning" }
+        "classroom_game": {
+          "tag": "Direkt",
+          "title": "Klassrumsspel",
+          "body": "Livsord jakt för flera spelare för hela klassen.",
+          "teaches": "Ordförråd, stavning, hastighet"
+        },
+        "vocab_duels": {
+          "tag": "Duell",
+          "title": "Ordförrådsdueller",
+          "body": "Asynkron eller live 1v1 ordförrådsutmaningar.",
+          "teaches": "Retention, återkallelse"
+        },
+        "brain_drills": {
+          "tag": "Hjärna",
+          "title": "Hjärnövningar",
+          "body": "Minne, uppmärksamhet, bearbetningshastighetsövningar.",
+          "teaches": "Kognitiva färdigheter"
+        },
+        "daily_wordhunt": {
+          "tag": "Daglig",
+          "title": "Daglig ordjakt",
+          "body": "Nytt pussel varje dag, lokala rankinglistor.",
+          "teaches": "Daglig övning"
+        },
+        "adventure": {
+          "tag": "Story",
+          "title": "Äventyrläge",
+          "body": "Berättardrivna ordpussel över tematiska världar.",
+          "teaches": "Ordförrådsdjup"
+        },
+        "spelling_bee": {
+          "tag": "Bi",
+          "title": "Stavningsövning",
+          "body": "Röstledd stavningsövning, flersprål.",
+          "teaches": "Stavning"
+        }
       },
       "compare": {
         "title": "Hur LexiClash jämför",
         "subtitle": "Ärliga kontroller — bara där vi levererar.",
-        "col": { "lexiclash": "LexiClash", "kahoot": "Kahoot!", "quizlet": "Quizlet", "wordwall": "Wordwall" },
+        "col": {
+          "lexiclash": "LexiClash",
+          "kahoot": "Kahoot!",
+          "quizlet": "Quizlet",
+          "wordwall": "Wordwall"
+        },
         "row": {
           "native_multilingual": "Inbyggt flerspråkigt (inkl. RTL, IME)",
           "ad_free_students": "Reklamfritt för elever",
@@ -10013,14 +10051,38 @@ const sv = {
       },
       "faq": {
         "title": "Vanliga frågor",
-        "q1": { "q": "Hur får lärare åtkomst?", "a": "Ansök på /education/access — vi granskar via e-post och svarar vanligtvis inom 24 timmar." },
-        "q2": { "q": "Är det verkligen gratis för klassrum?", "a": "Ja. Gratis för verifierade lärare, inga annonser på elevfokuserade vägar." },
-        "q3": { "q": "Fungerar det på hebreiska, japanska, svenska och spanska?", "a": "Ja — inbyggt stöd inklusive hebreiska höger-till-vänster och japansk kana/IME. Inte översättning." },
-        "q4": { "q": "Hur hanterar ni elevernas integritet?", "a": "COPPA + GDPR-medveten. Ingen annonskörning på utbildningsvägar. Endast opt-in telemetri." },
-        "q5": { "q": "Kan elever spela utan konto?", "a": "Ja. Gästspel stöds på de flesta lägena." },
-        "q6": { "q": "Hur skiljer det sig från Kahoot, Quizlet eller Wordwall?", "a": "Inbyggt flerspråkigt djup, löfte om reklamfritt, 6 spellägen på en plattform och lokalt sourced ordförråd per språk." },
-        "q7": { "q": "Kan jag spåra elevernas framsteg?", "a": "Ja. Lärare ser elev-för-elev-analys på lärarpanelen." },
-        "q8": { "q": "Fungerar det på Chromebooks, surfplattor och telefoner?", "a": "Ja. Webbaserat, ingen installation krävs." }
+        "q1": {
+          "q": "Hur får lärare åtkomst?",
+          "a": "Ansök på /education/access — vi granskar via e-post och svarar vanligtvis inom 24 timmar."
+        },
+        "q2": {
+          "q": "Är det verkligen gratis för klassrum?",
+          "a": "Ja. Gratis för verifierade lärare, inga annonser på elevfokuserade vägar."
+        },
+        "q3": {
+          "q": "Fungerar det på hebreiska, japanska, svenska och spanska?",
+          "a": "Ja — inbyggt stöd inklusive hebreiska höger-till-vänster och japansk kana/IME. Inte översättning."
+        },
+        "q4": {
+          "q": "Hur hanterar ni elevernas integritet?",
+          "a": "COPPA + GDPR-medveten. Ingen annonskörning på utbildningsvägar. Endast opt-in telemetri."
+        },
+        "q5": {
+          "q": "Kan elever spela utan konto?",
+          "a": "Ja. Gästspel stöds på de flesta lägena."
+        },
+        "q6": {
+          "q": "Hur skiljer det sig från Kahoot, Quizlet eller Wordwall?",
+          "a": "Inbyggt flerspråkigt djup, löfte om reklamfritt, 6 spellägen på en plattform och lokalt sourced ordförråd per språk."
+        },
+        "q7": {
+          "q": "Kan jag spåra elevernas framsteg?",
+          "a": "Ja. Lärare ser elev-för-elev-analys på lärarpanelen."
+        },
+        "q8": {
+          "q": "Fungerar det på Chromebooks, surfplattor och telefoner?",
+          "a": "Ja. Webbaserat, ingen installation krävs."
+        }
       },
       "cta": {
         "title": "Redo att ta LexiClash till ditt klassrum?",
@@ -10224,7 +10286,10 @@ const sv = {
     },
     "teacher": {
       "activeGames": "aktiva spel",
-      "noActiveGames": "Inga aktiva spel"
+      "noActiveGames": "Inga aktiva spel",
+      "welcome_banner_title": "Välkommen! 🎉",
+      "welcome_banner_body": "Du är redo. Nu kan du skapa klasser, tilldela spel och spåra framsteg.",
+      "welcome_banner_dismiss": "Förstått"
     },
     "wordOfTheDay": {
       "title": "Dagens Ord",
@@ -11057,7 +11122,7 @@ const sv = {
     "daily": {
       "wordHunt": {
         "name": "Daglig Ordjakt",
-        "desc": "Hitta 10+ ord i dagens utmaning"
+        "desc": "Spela dagens utmaning"
       },
       "multiplayer": {
         "name": "Multiplayer-match",

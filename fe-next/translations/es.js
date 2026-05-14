@@ -8126,15 +8126,6 @@ const es = {
       "mechanicTrigger": "Activa Mecánica",
       "noDamage": "Sin Recibir Daño"
     },
-    "daily": {
-      "wordCount": { "title": "Coleccionista de Palabras", "desc": "Encuentra {{target}} palabras en niveles de aventura" },
-      "longWord": { "title": "Palabras Largas", "desc": "Encuentra {{target}} palabras con 5+ letras" },
-      "perfect": { "title": "Estrellas Perfectas", "desc": "Obtén {{target}} calificaciones de estrella perfecta" },
-      "combo": { "title": "Maestro del Combo", "desc": "Alcanza una racha de combo de {{target}}x" },
-      "speed": { "title": "Carrera Rápida", "desc": "Completa un nivel con {{target}}+ segundos restantes" },
-      "boss": { "title": "Cazador de Jefes", "desc": "Derrota a {{target}} jefe(s)" },
-      "mechanic": { "title": "Experto en Mecánicas", "desc": "Activa mecánicas de mundo {{target}} veces" }
-    },
     "tiles": {
       "gold": "Oro (3x puntos)",
       "ice": "Hielo (obstáculo)",
@@ -10062,24 +10053,71 @@ const es = {
       "moat": {
         "title": "Por qué los maestros de 5 idiomas eligen LexiClash",
         "subtitle": "Tres razones que podemos defender, no solo afirmar.",
-        "native_multilingual": { "tag": "Nativo", "title": "Construido para tu idioma", "body": "Hebreo de derecha a izquierda, japonés con kana e IME, palabras compuestas suecas, acentos españoles — todo manejado a nivel de motor. No es traducción de Google." },
-        "local_inventory": { "tag": "Local", "title": "Inventario de palabras obtenido localmente", "body": "Listas de palabras extraídas de Wikipedia local + diccionario Milog hebreo. Los estudiantes ven palabras culturalmente relevantes de su país — no libros de texto antiguos de K-12 de EE.UU." },
-        "ad_free": { "tag": "Sin anuncios", "title": "Sin anuncios para estudiantes. Siempre.", "body": "Kahoot, Quizlet, Blooket — todos muestran anuncios a tus estudiantes. Nos comprometemos a cero anuncios en cada ruta educativa. Conscientes de COPPA + GDPR." }
+        "native_multilingual": {
+          "tag": "Nativo",
+          "title": "Construido para tu idioma",
+          "body": "Hebreo de derecha a izquierda, japonés con kana e IME, palabras compuestas suecas, acentos españoles — todo manejado a nivel de motor. No es traducción de Google."
+        },
+        "local_inventory": {
+          "tag": "Local",
+          "title": "Inventario de palabras obtenido localmente",
+          "body": "Listas de palabras extraídas de Wikipedia local + diccionario Milog hebreo. Los estudiantes ven palabras culturalmente relevantes de su país — no libros de texto antiguos de K-12 de EE.UU."
+        },
+        "ad_free": {
+          "tag": "Sin anuncios",
+          "title": "Sin anuncios para estudiantes. Siempre.",
+          "body": "Kahoot, Quizlet, Blooket — todos muestran anuncios a tus estudiantes. Nos comprometemos a cero anuncios en cada ruta educativa. Conscientes de COPPA + GDPR."
+        }
       },
       "modes": {
         "title": "6 modos de juego, una plataforma — rota para vencer el agotamiento",
         "teaches": "Enseña",
-        "classroom_game": { "tag": "Directo", "title": "Juego en clase", "body": "Caza de palabras multijugador en vivo para toda la clase.", "teaches": "Vocabulario, ortografía, velocidad" },
-        "vocab_duels": { "tag": "Duelo", "title": "Duelos de vocabulario", "body": "Desafíos de vocabulario 1v1 asíncronos o en vivo.", "teaches": "Retención, recuerdo" },
-        "brain_drills": { "tag": "Cerebro", "title": "Ejercicios cerebrales", "body": "Ejercicios de memoria, atención, velocidad de procesamiento.", "teaches": "Habilidades cognitivas" },
-        "daily_wordhunt": { "tag": "Diario", "title": "Caza de palabras diaria", "body": "Nuevo acertijo cada día, tabla de clasificación por lugar.", "teaches": "Práctica diaria" },
-        "adventure": { "tag": "Historias", "title": "Modo aventura", "body": "Acertijos de palabras dirigidos por historias en mundos temáticos.", "teaches": "Profundidad de vocabulario" },
-        "spelling_bee": { "tag": "Abeja", "title": "Práctica de ortografía", "body": "Ejercicios de ortografía dirigidos por voz, multiidioma.", "teaches": "Ortografía" }
+        "classroom_game": {
+          "tag": "Directo",
+          "title": "Juego en clase",
+          "body": "Caza de palabras multijugador en vivo para toda la clase.",
+          "teaches": "Vocabulario, ortografía, velocidad"
+        },
+        "vocab_duels": {
+          "tag": "Duelo",
+          "title": "Duelos de vocabulario",
+          "body": "Desafíos de vocabulario 1v1 asíncronos o en vivo.",
+          "teaches": "Retención, recuerdo"
+        },
+        "brain_drills": {
+          "tag": "Cerebro",
+          "title": "Ejercicios cerebrales",
+          "body": "Ejercicios de memoria, atención, velocidad de procesamiento.",
+          "teaches": "Habilidades cognitivas"
+        },
+        "daily_wordhunt": {
+          "tag": "Diario",
+          "title": "Caza de palabras diaria",
+          "body": "Nuevo acertijo cada día, tabla de clasificación por lugar.",
+          "teaches": "Práctica diaria"
+        },
+        "adventure": {
+          "tag": "Historias",
+          "title": "Modo aventura",
+          "body": "Acertijos de palabras dirigidos por historias en mundos temáticos.",
+          "teaches": "Profundidad de vocabulario"
+        },
+        "spelling_bee": {
+          "tag": "Abeja",
+          "title": "Práctica de ortografía",
+          "body": "Ejercicios de ortografía dirigidos por voz, multiidioma.",
+          "teaches": "Ortografía"
+        }
       },
       "compare": {
         "title": "Cómo se compara LexiClash",
         "subtitle": "Verificaciones honestas — solo donde realmente entregamos.",
-        "col": { "lexiclash": "LexiClash", "kahoot": "Kahoot!", "quizlet": "Quizlet", "wordwall": "Wordwall" },
+        "col": {
+          "lexiclash": "LexiClash",
+          "kahoot": "Kahoot!",
+          "quizlet": "Quizlet",
+          "wordwall": "Wordwall"
+        },
         "row": {
           "native_multilingual": "Multilingüe nativo (incl. RTL, IME)",
           "ad_free_students": "Sin anuncios para estudiantes",
@@ -10097,14 +10135,38 @@ const es = {
       },
       "faq": {
         "title": "Preguntas frecuentes",
-        "q1": { "q": "¿Cómo obtienen acceso los maestros?", "a": "Solicita en /education/access — revisamos por correo electrónico y generalmente respondemos dentro de 24 horas." },
-        "q2": { "q": "¿Es realmente gratis para aulas?", "a": "Sí. Gratis para maestros verificados, sin anuncios en rutas dirigidas a estudiantes." },
-        "q3": { "q": "¿Funciona en hebreo, japonés, sueco y español?", "a": "Sí — soporte nativo incluyendo hebreo de derecha a izquierda e IME de kana japonesa. No es traducción." },
-        "q4": { "q": "¿Cómo manejan la privacidad de los estudiantes?", "a": "Conscientes de COPPA + GDPR. Sin seguimiento de anuncios en rutas educativas. Solo telemetría de participación." },
-        "q5": { "q": "¿Pueden los estudiantes jugar sin una cuenta?", "a": "Sí. El juego de invitado es compatible en la mayoría de los modos." },
-        "q6": { "q": "¿Cómo es diferente de Kahoot, Quizlet o Wordwall?", "a": "Profundidad multilingüe nativa, promesa sin anuncios, 6 modos de juego en una plataforma, e inventario de palabras obtenido localmente por idioma." },
-        "q7": { "q": "¿Puedo rastrear el progreso de los estudiantes?", "a": "Sí. Los maestros ven análisis por estudiante en el panel del maestro." },
-        "q8": { "q": "¿Funciona en Chromebooks, tabletas y teléfonos?", "a": "Sí. Primero la web, sin instalación requerida." }
+        "q1": {
+          "q": "¿Cómo obtienen acceso los maestros?",
+          "a": "Solicita en /education/access — revisamos por correo electrónico y generalmente respondemos dentro de 24 horas."
+        },
+        "q2": {
+          "q": "¿Es realmente gratis para aulas?",
+          "a": "Sí. Gratis para maestros verificados, sin anuncios en rutas dirigidas a estudiantes."
+        },
+        "q3": {
+          "q": "¿Funciona en hebreo, japonés, sueco y español?",
+          "a": "Sí — soporte nativo incluyendo hebreo de derecha a izquierda e IME de kana japonesa. No es traducción."
+        },
+        "q4": {
+          "q": "¿Cómo manejan la privacidad de los estudiantes?",
+          "a": "Conscientes de COPPA + GDPR. Sin seguimiento de anuncios en rutas educativas. Solo telemetría de participación."
+        },
+        "q5": {
+          "q": "¿Pueden los estudiantes jugar sin una cuenta?",
+          "a": "Sí. El juego de invitado es compatible en la mayoría de los modos."
+        },
+        "q6": {
+          "q": "¿Cómo es diferente de Kahoot, Quizlet o Wordwall?",
+          "a": "Profundidad multilingüe nativa, promesa sin anuncios, 6 modos de juego en una plataforma, e inventario de palabras obtenido localmente por idioma."
+        },
+        "q7": {
+          "q": "¿Puedo rastrear el progreso de los estudiantes?",
+          "a": "Sí. Los maestros ven análisis por estudiante en el panel del maestro."
+        },
+        "q8": {
+          "q": "¿Funciona en Chromebooks, tabletas y teléfonos?",
+          "a": "Sí. Primero la web, sin instalación requerida."
+        }
       },
       "cta": {
         "title": "¿Listo para llevar LexiClash a tu aula?",
@@ -11159,7 +11221,7 @@ const es = {
     "daily": {
       "wordHunt": {
         "name": "Caza de Palabras Diaria",
-        "desc": "Encuentra 10+ palabras en el desafío diario"
+        "desc": "Juega el desafío diario de hoy"
       },
       "multiplayer": {
         "name": "Partida Multijugador",
