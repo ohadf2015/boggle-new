@@ -47,14 +47,14 @@ The server is now the only party that knows which catalyst is coming — a minor
 
 ### 3. Durations — ~1.5× scale, per-catalyst pacing kept
 
-| Catalyst   | Now (warning + active)       | New (warning + active)         |
-|------------|------------------------------|--------------------------------|
-| Earthquake | 2s + 1s shake + 15s = 18s    | 3s + 1.5s shake + 22.5s = 27s  |
-| Blizzard   | 2s + 12s = 14s               | 3s + 18s = 21s                 |
-| Lightning  | 2s + 10s = 12s               | 3s + 15s = 18s                 |
-| Meteor     | 2s + 8s = 10s                | 3s + 12s = 15s                 |
+| Catalyst   | Now (warning + active)       | New (warning + active)            |
+|------------|------------------------------|-----------------------------------|
+| Earthquake | 2s + 1s shake + 15s = 18s    | 3s + 1.5s shake + 23s = 27.5s     |
+| Blizzard   | 2s + 12s = 14s               | 3s + 18s = 21s                    |
+| Lightning  | 2s + 10s = 12s               | 3s + 15s = 18s                    |
+| Meteor     | 2s + 8s = 10s                | 3s + 12s = 15s                    |
 
-Edits land in `DEFAULT_EARTHQUAKE_CONFIG` (`shared/types/earthquake.ts`) and the event config in `roundEventsManager.ts`. Server broadcast timers and client countdown displays must read these same constants so warning/active phases stay in sync.
+Earthquake values live in `EARTHQUAKE_CONFIG` in `backend/handlers/earthquakeHandler.ts` (the server/MP source — the `fireRoundStart` broadcast already sends `duration`, which the client countdown reads, so this single edit propagates to the client). Round-event values live in `EVENT_CONFIG` in `roundEventsManager.ts`. `DEFAULT_EARTHQUAKE_CONFIG` in `shared/types/earthquake.ts` drives single-player only and is left unchanged.
 
 ### 4. UI — keep both component systems, add clarity + polish
 
