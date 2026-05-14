@@ -17,7 +17,7 @@ export default async function BlastPage({
   searchParams?: Promise<{ v2?: string }>;
 }) {
   const { locale: rawLocale } = await params;
-  const resolvedSearch = await searchParams;
+  const resolvedSearch = searchParams ? await searchParams : undefined;
   if (!VALID_LOCALES.includes(rawLocale as Locale)) {
     notFound();
   }
