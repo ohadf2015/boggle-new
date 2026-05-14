@@ -135,6 +135,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
 
   // ─── Education ───
   addForAllLocales(routes, '/education', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.7 });
+  addForAllLocales(routes, '/education/access', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.8 });
   addForAllLocales(routes, '/education/duels', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.65 });
   addForAllLocales(routes, '/education/classroom-game', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.65 });
 

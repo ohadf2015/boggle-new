@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -229,6 +230,8 @@ export default async function Page({ params }: PageProps) {
             </Link>
           </div>
         </section>
+
+        <TeacherAccessCTA />
       </div>
     </main>
   );

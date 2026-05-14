@@ -293,3 +293,14 @@ Key differentiators vs competitors:
 - Daily AI-generated trending topic puzzles
 - 2-20+ players per room
 - Completely free with no paywalls
+
+# Education
+
+LexiClash Education — free classroom word games with native multilingual support (Hebrew RTL, Japanese, Swedish, Spanish), ad-free for students, request teacher access by email.
+
+- /education — overview, benefits, moat comparison
+- /education/access — apply for teacher access (60-second form)
+- /education/esl-word-games — for ESL/EFL teachers
+- /education/vocabulary-games-classroom — classroom vocabulary tools
+- /education/games-for-teachers — teacher feature overview
+- /education/spelling-bee-practice — spelling drills
