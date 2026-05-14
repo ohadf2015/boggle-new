@@ -54,11 +54,10 @@ export const useHostSelectedGameMode = () => useGameStore((state) => state.hostS
 
 // Blast multiplayer selectors
 export const useBlastTileOverlay = () => useGameStore((state) => state.blastTileOverlay);
-export const useBlastMovesUsed = (): number => useGameStore((state) => state.blastMovesUsed);
+export const useBlastBoardClears = (): number => useGameStore((state) => state.blastBoardClears);
 export const useBlastTotalTileBonus = (): number => useGameStore((state) => state.blastTotalTileBonus);
 export const useBlastTotalTilesCleared = (): number => useGameStore((state) => state.blastTotalTilesCleared);
 export const useBlastSeed = () => useGameStore((state) => state.blastSeed);
-export const useBlastWave = (): number => useGameStore((state) => state.blastWave);
 export const useBlastComboSync = () => useGameStore((state) => state.blastComboSync);
 export const useBlastOpponentActivity = () => useGameStore((state) => state.blastOpponentActivity);
 export const useBlastPlayerStats = () => useGameStore((state) => state.blastPlayerStats);
@@ -116,7 +115,7 @@ const getActions = (state: GameStore) => ({
   setGameMode: state.setGameMode,
   setHostSelectedGameMode: state.setHostSelectedGameMode,
   setBlastTileOverlay: state.setBlastTileOverlay,
-  setBlastMovesUsed: state.setBlastMovesUsed,
+  setBlastBoardClears: state.setBlastBoardClears,
   setBlastTotalTileBonus: state.setBlastTotalTileBonus,
   setBlastTotalTilesCleared: state.setBlastTotalTilesCleared,
   setBlastSeed: state.setBlastSeed,

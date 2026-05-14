@@ -47,7 +47,7 @@ export {
   useWordHuntTargetFound,
   useWordHuntEliminatedPlayers,
   useBlastTileOverlay,
-  useBlastMovesUsed,
+  useBlastBoardClears,
   useBlastSeed,
   useBlastComboSync,
   useGameActions,

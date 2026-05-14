@@ -55,11 +55,10 @@ const initialState: GameState = {
   gameModeConfirmed: false,
   hostSelectedGameMode: 'random',
   blastTileOverlay: [],
-  blastMovesUsed: 0,
+  blastBoardClears: 0,
   blastTotalTileBonus: 0,
   blastTotalTilesCleared: 0,
   blastSeed: null,
-  blastWave: 1,
   blastComboSync: null,
   blastOpponentActivity: [],
   blastPlayerStats: {},
@@ -320,8 +319,8 @@ export const useGameStore = create<GameStore>()(
       blastTileOverlay: applySetState(value, state.blastTileOverlay)
     })),
 
-    setBlastMovesUsed: (value) => set((state) => ({
-      blastMovesUsed: applySetState(value, state.blastMovesUsed)
+    setBlastBoardClears: (value) => set((state) => ({
+      blastBoardClears: applySetState(value, state.blastBoardClears)
     })),
 
     setBlastTotalTileBonus: (value) => set((state) => ({
@@ -334,10 +333,6 @@ export const useGameStore = create<GameStore>()(
 
     setBlastSeed: (value) => set((state) => ({
       blastSeed: applySetState(value, state.blastSeed)
-    })),
-
-    setBlastWave: (value) => set((state) => ({
-      blastWave: applySetState(value, state.blastWave)
     })),
 
     setBlastComboSync: (value) => set({ blastComboSync: value }),
@@ -433,9 +428,7 @@ export const useGameStore = create<GameStore>()(
         ...(data.boardTheme !== undefined && { boardTheme: data.boardTheme }),
         ...(data.gameMode !== undefined && { gameMode: data.gameMode }),
         ...(data.blastTileOverlay !== undefined && { blastTileOverlay: data.blastTileOverlay }),
-        ...(data.blastMovesUsed !== undefined && { blastMovesUsed: data.blastMovesUsed }),
         ...(data.blastSeed !== undefined && { blastSeed: data.blastSeed }),
-        ...(data.blastWave !== undefined && { blastWave: data.blastWave }),
         ...(data.wordHuntTargetLength !== undefined && { wordHuntTargetLength: data.wordHuntTargetLength }),
         ...(data.wordHuntMyLife !== undefined && { wordHuntMyLife: data.wordHuntMyLife }),
         ...(data.showStartAnimation !== undefined && { showStartAnimation: data.showStartAnimation }),
@@ -471,11 +464,10 @@ export const useGameStore = create<GameStore>()(
         xpGainedData: null,
         levelUpData: null,
         blastTileOverlay: [],
-        blastMovesUsed: 0,
+        blastBoardClears: 0,
         blastTotalTileBonus: 0,
         blastTotalTilesCleared: 0,
         blastSeed: null,
-        blastWave: 1,
         blastComboSync: null,
         blastOpponentActivity: [],
         blastPlayerStats: {},
@@ -532,11 +524,10 @@ export {
   useGameMode,
   useHostSelectedGameMode,
   useBlastTileOverlay,
-  useBlastMovesUsed,
+  useBlastBoardClears,
   useBlastTotalTileBonus,
   useBlastTotalTilesCleared,
   useBlastSeed,
-  useBlastWave,
   useBlastComboSync,
   useBlastOpponentActivity,
   useBlastPlayerStats,

@@ -66,12 +66,10 @@ export interface GameState {
 
   // Blast multiplayer state
   blastTileOverlay: BlastTileOverlay[];
-  blastMovesUsed: number;
+  blastBoardClears: number;
   blastTotalTileBonus: number;
   blastTotalTilesCleared: number;
   blastSeed: number | null;
-  /** Wave number the server rolled the overlay against — must match rules used client-side */
-  blastWave: number;
   blastComboSync: { comboType: string; username: string; id: string } | null;
   blastOpponentActivity: Array<{ id: string; username: string; type: 'word' | 'combo' | 'milestone'; word?: string; score?: number; comboLevel?: number; message?: string }>;
   /** Rich per-player blast stats from results */
@@ -151,11 +149,10 @@ export interface GameActions {
 
   // Blast multiplayer actions
   setBlastTileOverlay: (value: BlastTileOverlay[] | ((prev: BlastTileOverlay[]) => BlastTileOverlay[])) => void;
-  setBlastMovesUsed: (value: number | ((prev: number) => number)) => void;
+  setBlastBoardClears: (value: number | ((prev: number) => number)) => void;
   setBlastTotalTileBonus: (value: number | ((prev: number) => number)) => void;
   setBlastTotalTilesCleared: (value: number | ((prev: number) => number)) => void;
   setBlastSeed: (value: number | null | ((prev: number | null) => number | null)) => void;
-  setBlastWave: (value: number | ((prev: number) => number)) => void;
   setBlastComboSync: (value: { comboType: string; username: string; id: string } | null) => void;
   pushBlastOpponentActivity: (event: { id: string; username: string; type: 'word' | 'combo' | 'milestone'; word?: string; score?: number; comboLevel?: number; message?: string }) => void;
   setBlastPlayerStats: (value: Record<string, BlastPlayerStats> | ((prev: Record<string, BlastPlayerStats>) => Record<string, BlastPlayerStats>)) => void;
@@ -182,9 +179,7 @@ export interface GameActions {
     boardTheme?: BoardTheme | null;
     gameMode?: GameModeSelection;
     blastTileOverlay?: BlastTileOverlay[];
-    blastMovesUsed?: number;
     blastSeed?: number | null;
-    blastWave?: number;
     wordHuntTargetLength?: number;
     wordHuntMyLife?: number;
     showStartAnimation?: boolean;

@@ -31,7 +31,7 @@ import {
   useLevelUpData,
   useBoardTheme,
   useGameMode,
-  useBlastMovesUsed,
+  useBlastBoardClears,
   useBlastTotalTileBonus,
   useBlastTotalTilesCleared,
   useWordHuntTargetLength,
@@ -164,8 +164,8 @@ describe('selectors', () => {
       expect(result.current).toBe('classic');
     });
 
-    it('useBlastMovesUsed returns 0', () => {
-      const { result } = renderHook(() => useBlastMovesUsed());
+    it('useBlastBoardClears returns 0', () => {
+      const { result } = renderHook(() => useBlastBoardClears());
       expect(result.current).toBe(0);
     });
 
@@ -239,6 +239,12 @@ describe('selectors', () => {
       const { result } = renderHook(() => useWordHuntTargetFound());
       act(() => { useGameStore.getState().setWordHuntTargetFound(true); });
       expect(result.current).toBe(true);
+    });
+
+    it('useBlastBoardClears updates when setBlastBoardClears called', () => {
+      const { result } = renderHook(() => useBlastBoardClears());
+      act(() => { useGameStore.getState().setBlastBoardClears(3); });
+      expect(result.current).toBe(3);
     });
   });
 

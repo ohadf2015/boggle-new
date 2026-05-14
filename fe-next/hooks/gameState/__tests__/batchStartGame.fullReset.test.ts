@@ -20,7 +20,7 @@ describe('batchStartGame full state reset', () => {
       blastTotalTileBonus: 150,
       blastTotalTilesCleared: 42,
       blastBoardUpdate: { grid: [['A']], tileStates: [[0 as any]], clearedBy: 'x', word: 'test', clearedCount: 1, totalMoves: 5 },
-      blastMovesUsed: 25,
+      blastBoardClears: 3,
     });
 
     // Start a new Classic game
@@ -38,7 +38,7 @@ describe('batchStartGame full state reset', () => {
     expect(state.blastTotalTileBonus).toBe(0);
     expect(state.blastTotalTilesCleared).toBe(0);
     expect(state.blastBoardUpdate).toBeNull();
-    expect(state.blastMovesUsed).toBe(0);
+    expect(state.blastBoardClears).toBe(0);
   });
 
   it('resets UI and combo state when starting a new game', () => {
@@ -80,7 +80,6 @@ describe('batchStartGame full state reset', () => {
       minWordLength: 3,
       gameMode: 'blast',
       blastTileOverlay: [{ row: 0, col: 0, type: 'bomb' } as any],
-      blastMovesUsed: 0,
       blastSeed: 12345,
       gameActive: true,
       showStartAnimation: true,
