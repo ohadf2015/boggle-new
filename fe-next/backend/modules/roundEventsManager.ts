@@ -27,10 +27,10 @@ export interface RoundEventData {
 
 const EVENT_TYPES: RoundEventType[] = ['blizzard', 'lightning', 'meteor'];
 
-const EVENT_CONFIG: Record<RoundEventType, { durationMs: number; warningMs: number }> = {
-  blizzard: { durationMs: 12_000, warningMs: 2_000 },
-  lightning: { durationMs: 10_000, warningMs: 2_000 },
-  meteor: { durationMs: 8_000, warningMs: 2_000 },
+export const EVENT_CONFIG: Record<RoundEventType, { durationMs: number; warningMs: number }> = {
+  blizzard: { durationMs: 18_000, warningMs: 3_000 },
+  lightning: { durationMs: 15_000, warningMs: 3_000 },
+  meteor: { durationMs: 12_000, warningMs: 3_000 },
 };
 
 const SCHEDULE_MIN_PERCENT = 0.50;

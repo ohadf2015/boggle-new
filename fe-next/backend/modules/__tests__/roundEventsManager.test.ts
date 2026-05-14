@@ -41,7 +41,7 @@ vi.mock('../../events/gameCleanup', () => {
   return { gameCleanupEmitter: emitter, default: emitter };
 });
 
-import { scheduleRoundEvent, clearRoundEventTimers } from '../roundEventsManager';
+import { scheduleRoundEvent, clearRoundEventTimers, EVENT_CONFIG } from '../roundEventsManager';
 import { getGame, updateGame } from '../gameStateManager';
 import { broadcastToRoom } from '../../utils/socketHelpers';
 const mockGetGame = getGame as Mock;
@@ -201,6 +201,14 @@ describe('roundEventsManager', () => {
       expect(broadcastCalls).toContain('roundEventWarning');
       expect(broadcastCalls).toContain('roundEventStart');
       expect(broadcastCalls).toContain('roundEventEnd');
+    });
+  });
+
+  describe('EVENT_CONFIG durations (catalyst unification)', () => {
+    it('uses the scaled-up round-event durations', () => {
+      expect(EVENT_CONFIG.blizzard).toEqual({ durationMs: 18_000, warningMs: 3_000 });
+      expect(EVENT_CONFIG.lightning).toEqual({ durationMs: 15_000, warningMs: 3_000 });
+      expect(EVENT_CONFIG.meteor).toEqual({ durationMs: 12_000, warningMs: 3_000 });
     });
   });
 });
