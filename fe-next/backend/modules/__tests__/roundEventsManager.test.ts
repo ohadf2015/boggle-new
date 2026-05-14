@@ -74,10 +74,6 @@ describe('roundEventsManager', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Mock pickRandomCatalyst to return a non-earthquake catalyst by default
-    // so existing tests don't need to be rewritten for the unification
-    const spy = vi.spyOn(roundEventsManagerModule, 'pickRandomCatalyst');
-    spy.mockReturnValue('blizzard');
   });
 
   afterEach(() => {
@@ -92,6 +88,11 @@ describe('roundEventsManager', () => {
   });
 
   describe('scheduleRoundEvent', () => {
+    // Apply mock consistently for all tests in this describe block
+    beforeEach(() => {
+      vi.spyOn(roundEventsManagerModule, 'pickRandomCatalyst').mockReturnValue('blizzard');
+    });
+
     it('picks a valid event type and schedules a timer', () => {
       const game = makeGame();
       scheduleRoundEvent(io, 'ABCD', game, 120);
@@ -172,6 +173,11 @@ describe('roundEventsManager', () => {
   });
 
   describe('event lifecycle phases execute in order', () => {
+    // Apply mock consistently for lifecycle tests
+    beforeEach(() => {
+      vi.spyOn(roundEventsManagerModule, 'pickRandomCatalyst').mockReturnValue('blizzard');
+    });
+
     it('broadcasts warning → start → end in sequence', () => {
       const game = makeGame({ gameState: 'in-progress' });
       scheduleRoundEvent(io, 'ABCD', game, 60);
