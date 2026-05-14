@@ -46,12 +46,11 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useGameKeyboardShortcuts } from '@/hooks/useGameKeyboardShortcuts';
 import type { GameModeOption } from '@/components/GameModeSelector';
-import { useGameMode, useHostSelectedGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed, useBlastTotalTileBonus, useBlastTotalTilesCleared, useBlastPlayerStats, useWheelRushPlayerStats, useGameActions } from '@/hooks/gameState/store';
+import { useGameMode, useHostSelectedGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastPlayerStats, useWheelRushPlayerStats, useGameActions } from '@/hooks/gameState/store';
 import type { BlastPlayerStats, WheelRushPlayerStats } from '@/shared/types/game';
 import { resolveWheelRushStats } from '@/lib/results/wheelRushStatsFallback';
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
-const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
-const BlastBoardDomination = dynamic(() => import('@/components/results/BlastBoardDomination'), { ssr: false });
+const BlastResultsScene = dynamic(() => import('@/components/results/BlastResultsScene'), { ssr: false });
 const WheelRushResultsScene = dynamic(() => import('@/components/results/WheelRushResultsScene'), { ssr: false });
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const PostGameWordReview = dynamic(() => import('@/components/education/PostGameWordReview'), { ssr: false });
@@ -71,10 +70,8 @@ interface DesktopResultsLayoutProps {
   detailsContentProps: ResultsDetailsContentProps;
   resolvedGameMode: string | undefined;
   wordHuntResultsData: WordHuntResultsSummaryProps | undefined;
-  blastMovesUsed: number;
-  blastTotalTilesCleared: number;
-  blastTotalTileBonus: number;
   blastPlayerStats: Record<string, BlastPlayerStats>;
+  blastResultScores: Record<string, number>;
   wheelRushPlayerStats: Record<string, WheelRushPlayerStats>;
   currentUsername?: string;
   gameCode?: string;
@@ -92,10 +89,8 @@ function DesktopResultsLayout({
   detailsContentProps,
   resolvedGameMode,
   wordHuntResultsData,
-  blastMovesUsed,
-  blastTotalTilesCleared,
-  blastTotalTileBonus,
   blastPlayerStats,
+  blastResultScores,
   wheelRushPlayerStats,
   currentUsername,
   gameCode,
@@ -173,19 +168,12 @@ function DesktopResultsLayout({
             {resolvedGameMode === 'word-hunt' && wordHuntResultsData && (
               <WordHuntResultsSummary {...wordHuntResultsData} />
             )}
-            {resolvedGameMode === 'blast' && (
-              Object.keys(blastPlayerStats).length >= 2 ? (
-                <BlastBoardDomination
-                  playerStats={blastPlayerStats}
-                  currentUsername={currentUsername}
-                />
-              ) : (
-                <BlastResultsSummary
-                  movesUsed={blastMovesUsed}
-                  tilesCleared={blastTotalTilesCleared}
-                  tileBonus={blastTotalTileBonus}
-                />
-              )
+            {resolvedGameMode === 'blast' && Object.keys(blastPlayerStats).length > 0 && (
+              <BlastResultsScene
+                playerStats={blastPlayerStats}
+                scores={blastResultScores}
+                currentUsername={currentUsername}
+              />
             )}
             {/* Wheel-rush summary already rendered as the hero scene above
                 this layout's two-column grid. No secondary card needed. */}
@@ -299,9 +287,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   }, [setHostSelectedGameMode]);
   const wordHuntPlayerLives = useWordHuntPlayerLives();
   const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
-  const blastMovesUsed = useBlastMovesUsed();
-  const blastTotalTileBonus = useBlastTotalTileBonus();
-  const blastTotalTilesCleared = useBlastTotalTilesCleared();
   const blastPlayerStats = useBlastPlayerStats();
   const wheelRushPlayerStats = useWheelRushPlayerStats();
 
@@ -356,6 +341,15 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     gameMode: resolvedGameMode,
     wordHuntTargetFoundBy: wordHuntSummary?.targetFoundBy,
   });
+
+  // Build blast result scores map from sortedScores
+  const blastResultScores = useMemo(() => {
+    const scoreMap: Record<string, number> = {};
+    sortedScores.forEach(player => {
+      scoreMap[player.username] = player.score || 0;
+    });
+    return scoreMap;
+  }, [sortedScores]);
 
   // Wheel-rush hero is the page's centerpiece for that mode. The dedicated
   // server payload (wheelRushSummary.playerStats) can be missing when scoring
@@ -807,20 +801,13 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           <WordHuntResultsSummary {...wordHuntResultsData} />
         </div>
       )}
-      {resolvedGameMode === 'blast' && (
+      {resolvedGameMode === 'blast' && Object.keys(blastPlayerStats).length > 0 && (
         <div className="mb-3">
-          {Object.keys(blastPlayerStats).length >= 2 ? (
-            <BlastBoardDomination
-              playerStats={blastPlayerStats}
-              currentUsername={username}
-            />
-          ) : (
-            <BlastResultsSummary
-              movesUsed={blastMovesUsed}
-              tilesCleared={blastTotalTilesCleared}
-              tileBonus={blastTotalTileBonus}
-            />
-          )}
+          <BlastResultsScene
+            playerStats={blastPlayerStats}
+            scores={blastResultScores}
+            currentUsername={username}
+          />
         </div>
       )}
       {/* Wheel-rush summary already rendered as the hero scene above; no
@@ -995,10 +982,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         detailsContentProps={detailsContentProps}
         resolvedGameMode={resolvedGameMode}
         wordHuntResultsData={wordHuntResultsData}
-        blastMovesUsed={blastMovesUsed}
-        blastTotalTilesCleared={blastTotalTilesCleared}
-        blastTotalTileBonus={blastTotalTileBonus}
         blastPlayerStats={blastPlayerStats}
+        blastResultScores={blastResultScores}
         wheelRushPlayerStats={effectiveWheelRushStats}
         currentUsername={username}
         gameCode={gameCode}
