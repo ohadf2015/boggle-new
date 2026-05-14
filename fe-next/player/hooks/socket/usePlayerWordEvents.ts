@@ -197,7 +197,7 @@ export function usePlayerWordEvents({
       // Handle merged blast data (Fix 2) — extract from wordAccepted instead of separate blastWordAccepted
       if (data.blast) {
         const store = useGameStore.getState();
-        store.setBlastMovesUsed(data.blast.movesUsed);
+        // Note: blastMovesUsed removed (timer-era Blast tracks boardClears server-side)
         store.setBlastTotalTileBonus((prev: number) => prev + (data.blast!.tileBonus || 0));
         store.setBlastTotalTilesCleared((prev: number) => prev + (data.blast!.tilesCleared?.length || 0));
       }

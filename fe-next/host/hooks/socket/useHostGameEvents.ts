@@ -303,12 +303,8 @@ export function useHostGameEvents({
       if (extData.blastTileOverlay) {
         const store = useGameStore.getState();
         store.setBlastTileOverlay(extData.blastTileOverlay);
-        store.setBlastMovesUsed(0);
         if (extData.blastSeed != null) {
           store.setBlastSeed(extData.blastSeed);
-        }
-        if (extData.blastWave != null) {
-          store.setBlastWave(extData.blastWave);
         }
       }
 
@@ -475,12 +471,8 @@ export function useHostGameEvents({
             store.setBlastTotalTileBonus(myStats.totalTileBonus || 0);
           }
         }
-        if (data.blastSummary.playerMoves) {
-          const myMoves = data.blastSummary.playerMoves[username];
-          if (myMoves !== undefined) {
-            store.setBlastMovesUsed(myMoves);
-          }
-        }
+        // Note: blastMovesUsed removed (timer-era Blast tracks boardClears server-side)
+        // blastSummary.playerMoves is available on server but not synced to client store
       }
 
       // Sync wheel rush stats from server for results screen
@@ -572,7 +564,7 @@ export function useHostGameEvents({
 
       // Reset blast mode state for next game
       whStore.setBlastTileOverlay([]);
-      whStore.setBlastMovesUsed(0);
+      whStore.setBlastBoardClears(0);
       whStore.setBlastTotalTileBonus(0);
       whStore.setBlastTotalTilesCleared(0);
       whStore.setBlastSeed(null);
