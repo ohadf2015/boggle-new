@@ -1,5 +1,29 @@
 import type { PlacedTile, PremiumKind } from './types';
 
+// 7x7 board for run mode (phones) with 4-way mirror symmetry
+export const PREMIUM_LAYOUT_7: readonly string[] = [
+  'T..d..T',
+  '.D...D.',
+  '..t.t..',
+  'd..*..d',
+  '..t.t..',
+  '.D...D.',
+  'T..d..T',
+] as const;
+
+// 9x9 board for run mode (tablets) with 4-way mirror symmetry
+export const PREMIUM_LAYOUT_9: readonly string[] = [
+  'T...D...T',
+  '.d.....d.',
+  '..t...t..',
+  '...D.D...',
+  'D...*...D',
+  '...D.D...',
+  '..t...t..',
+  '.d.....d.',
+  'T...D...T',
+] as const;
+
 // 11x11 board with 4-way mirror symmetry across both axes.
 // 4 corner TW, 4 DW (one per quadrant), 4 TL. Total ~12 premiums.
 const PREMIUM_LAYOUT_11: readonly string[] = [
@@ -62,9 +86,11 @@ const CHAR_TO_PREMIUM: Record<string, PremiumKind | null> = {
   '*': null, // CENTER - no premium
 };
 
-export type BoardSize = 11 | 13 | 15;
+export type BoardSize = 7 | 9 | 11 | 13 | 15;
 
 const LAYOUTS: Record<BoardSize, readonly string[]> = {
+  7: PREMIUM_LAYOUT_7,
+  9: PREMIUM_LAYOUT_9,
   11: PREMIUM_LAYOUT_11,
   13: PREMIUM_LAYOUT_13,
   15: PREMIUM_LAYOUT_15,
@@ -95,8 +121,8 @@ export function getPremium(row: number, col: number, board: Board): PremiumKind 
 }
 
 export function createBoard(size: BoardSize = 15): Board {
-  if (size !== 11 && size !== 13 && size !== 15) {
-    throw new Error(`Board size must be 11, 13, or 15, got ${size}`);
+  if (size !== 7 && size !== 9 && size !== 11 && size !== 13 && size !== 15) {
+    throw new Error(`Board size must be 7, 9, 11, 13, or 15, got ${size}`);
   }
   const cells: BoardCell[][] = [];
   for (let r = 0; r < size; r++) {

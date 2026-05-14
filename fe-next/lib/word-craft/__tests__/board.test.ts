@@ -8,6 +8,8 @@ import {
   placeTiles,
   isFirstMove,
   isInBounds,
+  PREMIUM_LAYOUT_7,
+  PREMIUM_LAYOUT_9,
 } from '../board';
 import type { PlacedTile } from '../types';
 
@@ -136,5 +138,40 @@ describe('placeTiles', () => {
     const board = createBoard();
     placeTiles(board, [tile(7, 7, 'C', 3)]);
     expect(getCell(board, 7, 7).premium).toBe('DW');
+  });
+});
+
+describe('small run-mode boards', () => {
+  it('creates a 7x7 board with center at (3,3)', () => {
+    const board = createBoard(7);
+    expect(board.size).toBe(7);
+    expect(board.cells.length).toBe(7);
+    expect(board.cells[3].length).toBe(7);
+  });
+
+  it('creates a 9x9 board with center at (4,4)', () => {
+    const board = createBoard(9);
+    expect(board.size).toBe(9);
+    expect(board.cells.length).toBe(9);
+  });
+
+  it('7x7 premium layout is 4-way mirror symmetric', () => {
+    const L = PREMIUM_LAYOUT_7;
+    for (let r = 0; r < 7; r++) {
+      for (let c = 0; c < 7; c++) {
+        expect(L[r][c]).toBe(L[r][6 - c]);
+        expect(L[r][c]).toBe(L[6 - r][c]);
+      }
+    }
+  });
+
+  it('9x9 premium layout is 4-way mirror symmetric', () => {
+    const L = PREMIUM_LAYOUT_9;
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        expect(L[r][c]).toBe(L[r][8 - c]);
+        expect(L[r][c]).toBe(L[8 - r][c]);
+      }
+    }
   });
 });
