@@ -44,7 +44,9 @@ export class GeneratedLevelSource implements LevelSource {
       };
       const score = interestingnessScore(candidate);
       candidate.interestingnessScore = score;
-      if (score >= INTERESTINGNESS_THRESHOLD) return candidate;
+      if (score >= INTERESTINGNESS_THRESHOLD) {
+        return candidate;
+      }
     }
     throw new Error(`could not generate level ${levelNumber}/${locale} after ${MAX_REGEN_ATTEMPTS} attempts`);
   }

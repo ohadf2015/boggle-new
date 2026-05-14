@@ -13,3 +13,4 @@ export type { OvationTier } from './ovation';
 export { scoreForWord } from './score';
 export type { ScoreOutcome } from './score';
 export { parseCell, cellId } from './cell-id';
+export { findExtraWords } from './extra-word-check';
