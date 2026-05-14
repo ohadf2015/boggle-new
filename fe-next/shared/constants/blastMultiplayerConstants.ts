@@ -8,12 +8,6 @@ import { BLAST_TILE_TYPE_LIST, type BlastTileType } from '@/shared/types/blast';
 export const BLAST_BONUS_MOVE_COMBO_THRESHOLD = 3;
 export const BLAST_SPECIAL_TILE_CHANCE = 0.15;
 
-/**
- * MP Blast default wave count. 3-wave arc (~3 min session) ends on board clear
- * of wave 3. Can be overridden per-game later via GameState.blastMaxWaves.
- */
-export const BLAST_MP_DEFAULT_MAX_WAVES = 3;
-
 // Re-export canonical type for backward compat (consumers should prefer @/shared/types/blast)
 export type { BlastTileType } from '@/shared/types/blast';
 
