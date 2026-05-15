@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { BlastLevel, CellId } from '@/lib/blast/v2/types';
 import { markUnlockSeen, markConceptSeen, completeFtue, setSkipAll, type UnlocksSeen } from '@/lib/blast/v2/tutorial/unlocks-seen';
 import { useBlastV2 } from '@/lib/blast/v2/useBlastV2';
@@ -73,6 +74,19 @@ export function BlastGame({
   const [introDismissed, setIntroDismissed] = useState(false);
   const [levelStartTime] = useState(() => Date.now());
   const { state, handlers } = useBlastV2(level);
+  // Hide the global bottom nav while the board is mounted — without this the
+  // HUD + board + bottom nav exceed 100dvh on phones and force a page scroll.
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
+  // Initial board height — anchors the visual row count so the playfield
+  // doesn't shrink after the first clear. Captured ONCE per level mount.
+  const initialBoardRows = useMemo(
+    () => Math.max(1, ...level.columns.map((c) => c.tiles.length)),
+    [level],
+  );
   // Track the deepest cascade chain across the run for the results card.
   const [bestChainDepth, setBestChainDepth] = useState(0);
   useEffect(() => {
@@ -321,7 +335,7 @@ export function BlastGame({
   }
 
   return (
-    <div className="flex flex-col min-h-dvh bg-[#0b1530] text-white">
+    <div className="flex flex-col h-dvh overflow-hidden bg-[#0b1530] text-white">
       {tutorial.showUnlockCard && (
         <BlastUnlockCard
           mechanic={tutorial.showUnlockCard}
@@ -343,7 +357,7 @@ export function BlastGame({
           /* Plan 5 wires hints */
         }}
       />
-      <div className="relative flex-1 flex items-end justify-center pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <div className="relative flex-1 min-h-0 flex items-stretch justify-center pb-[max(0.5rem,env(safe-area-inset-bottom))] px-2">
         <BlastAtmosphereOverlay modeColor={modeColor} />
         <BlastFxOverlay
           chainEventKey={state.chainEventKey}
@@ -353,12 +367,12 @@ export function BlastGame({
           modeColor={modeColor}
         />
         <BlastChainSoundListener />
-        {/* Container-typed stage: caps board width so phones, tablets, and
-            wide desktops all get a centered, balanced playfield. `cqi` units
-            in BlastTile sizing measure THIS box, not the viewport. */}
+        {/* Size-typed stage: drives container-query tile sizing on BOTH axes.
+            Caps width on tablets/desktops; fills available height on phones.
+            Tile size = min(width-fit, height-fit) so a 6-col / 2-row board
+            no longer collapses to a thin strip at the bottom of the screen. */}
         <div
-          className="relative w-full max-w-[min(96vw,520px)] mx-auto flex items-end justify-center"
-          style={{ containerType: 'inline-size', aspectRatio: `${level.columns.length} / ${Math.max(...level.columns.map(c => c.tiles.length))}` }}
+          className="relative w-full max-w-[min(96vw,520px)] h-full mx-auto flex items-stretch justify-center"
         >
         <BlastBoard
           level={state.level}
@@ -371,6 +385,7 @@ export function BlastGame({
           almosts={almosts}
           tileIds={state.tileIds}
           revealGlowCells={revealGlowCells}
+          boardRows={initialBoardRows}
           onCommitSelection={(centers) => {
             clearCentersRef.current = centers;
           }}

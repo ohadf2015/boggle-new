@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback, useEffect, useMemo } from 'react';
 import { LayoutGroup, AnimatePresence, m } from 'framer-motion';
 import type { BlastLevel, CellId } from '@/lib/blast/v2/types';
 import { cellId as makeCellId, type SelectionState, type AlmostWord } from '@/lib/blast/v2/engine';
@@ -22,6 +22,12 @@ type Props = {
   tileIds: string[][];
   revealGlowCells?: CellId[];
   onCommitSelection?: (centers: Array<{ x: number; y: number }>) => void;
+  /**
+   * Stable count of cellWell rows to render per column. Anchored at the
+   * level's initial max row height so the play area doesn't shrink as
+   * tiles are cleared — board stays visually consistent.
+   */
+  boardRows: number;
 };
 
 export function BlastBoard({
@@ -36,6 +42,7 @@ export function BlastBoard({
   tileIds,
   revealGlowCells = [],
   onCommitSelection,
+  boardRows,
 }: Props) {
   const config = LOCALE_CONFIGS[level.locale];
   const boardRef = useRef<HTMLDivElement>(null);
@@ -114,28 +121,40 @@ export function BlastBoard({
     };
   }, [isDragging, onPointerEnter, onPointerUp, selection, onCommitSelection, getCellViewportCenter]);
 
+  // Cellwell row count: anchored at the level's tallest column at start so
+  // the board doesn't shrink as words clear. min(boardRows, current max) so
+  // we never shrink BELOW current tile heights either.
+  const visualRows = useMemo(() => {
+    const currentMax = Math.max(1, ...level.columns.map((c) => c.tiles.length));
+    return Math.max(boardRows, currentMax);
+  }, [boardRows, level.columns]);
+
   return (
     <div
       ref={boardRef}
       dir={dir}
       data-shake-key={invalidShakeKey}
       data-testid="blast-board"
-      className={`relative flex items-end justify-center gap-2 p-4 touch-none select-none ${styles.board}`}
+      data-board-rows={visualRows}
+      className={`relative flex items-end justify-center gap-2 p-4 touch-none select-none w-full h-full ${styles.board}`}
       style={{
         touchAction: 'none',
         // Drives container-query tile sizing: every tile reads
-        // --blast-tile-size derived from this column count so wide boards
-        // (7+ cols) stay inside the viewport instead of overflowing.
+        // --blast-tile-size derived from both column AND row counts so the
+        // board fills the available box on both axes (no more 3:1 wide-short
+        // strip when only 2 rows remain).
         ['--blast-cols' as string]: String(level.columns.length),
+        ['--blast-rows' as string]: String(visualRows),
       }}
       onPointerUp={onPointerUp}
     >
-      {/* Cell-well backdrop — empty inset slots line up perfectly with tile
-          positions. Reads as a real game board, not floating stickers. */}
+      {/* Cell-well backdrop — empty inset slots line up with tile positions.
+          Renders a FIXED `visualRows` wells per column so the board stays the
+          same size as tiles are cleared (Royal-Match style stable playfield). */}
       <div aria-hidden className="absolute inset-0 flex items-end justify-center gap-2 p-4 pointer-events-none">
         {level.columns.map((col) => (
           <div key={`well-${col.index}`} className="flex flex-col-reverse gap-2">
-            {col.tiles.map((_, row) => (
+            {Array.from({ length: visualRows }).map((_, row) => (
               <div key={`well-${col.index}-${row}`} className={styles.cellWell} />
             ))}
           </div>
@@ -153,13 +172,20 @@ export function BlastBoard({
                 // Framer's LayoutGroup tracks the keyed child — promoting
                 // this wrapper to <m.div layout> is what makes tiles SLIDE
                 // into their new positions after a collapse (gravity).
+                // `layout="position"` locks size animation off; only x/y
+                // animate, so tiles never inflate horizontally as a side
+                // effect of size measurement and the visual axis stays Y.
                 return (
                   <m.div
                     key={tileKey}
-                    layout
-                    // Bouncier spring: lower stiffness + damping → overshoot
-                    // on land so tiles "settle" instead of snapping into place.
-                    transition={{ type: 'spring', stiffness: 420, damping: 22, mass: 1.05, restDelta: 0.5 }}
+                    layout="position"
+                    // Tighter, punchier spring tuned for fall-from-above:
+                    // higher stiffness gives a snappier accelerate-then-land,
+                    // bumped mass + slightly lower damping keeps a small
+                    // overshoot so the landing reads as a "thump" rather than
+                    // a soft glide. Pairs with the squash timeline in
+                    // useCollapseTimeline for the secondary bounce.
+                    transition={{ type: 'spring', stiffness: 560, damping: 20, mass: 1.2, restDelta: 0.4 }}
                     className="relative"
                   >
                     <BlastTile

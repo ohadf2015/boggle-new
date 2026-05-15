@@ -2,13 +2,16 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { BlastLevel, ChainLevelSpec, Locale } from './types';
 import type { LevelSource } from './level-source';
-import { buildChainLevel } from './engine/chain-builder';
+import { buildChainLevel, type ExtraWordCheck } from './engine/chain-builder';
 import { validateChainLevel } from './engine/chain-validator';
+import { LOCALE_CONFIGS } from './locale-config';
+import { getBlastCommonWords } from './engine/common-words';
 
 type ChainPackFile = { locale: Locale; levels: ChainLevelSpec[] };
 
 export class ChainPackSource implements LevelSource {
   private cache = new Map<Locale, ChainPackFile>();
+  private extraCheckCache = new Map<Locale, ExtraWordCheck>();
 
   constructor(private basePath: string) {}
 
@@ -21,13 +24,32 @@ export class ChainPackSource implements LevelSource {
     return raw;
   }
 
+  // Common-word screen: rejects placements (horizontal OR vertical) that
+  // create a dictionary word outside the authored chain. Without this the
+  // newly-enabled vertical insertion produces incidental commons like "GEAR".
+  private async getExtraWordCheck(locale: Locale): Promise<ExtraWordCheck | undefined> {
+    const cached = this.extraCheckCache.get(locale);
+    if (cached) return cached;
+    try {
+      const isCommon = await getBlastCommonWords(locale);
+      const minLength = LOCALE_CONFIGS[locale].wordLengthRange.min;
+      const check: ExtraWordCheck = { isCommon, minLength };
+      this.extraCheckCache.set(locale, check);
+      return check;
+    } catch {
+      // Common-words list optional — skip the screen when missing.
+      return undefined;
+    }
+  }
+
   async resolve(levelNumber: number, locale: Locale): Promise<BlastLevel> {
     const pack = await this.load(locale);
     const spec = pack.levels.find((l) => l.levelNumber === levelNumber);
     if (!spec) {
       throw new Error(`ChainPackSource: no chain spec for ${locale} level ${levelNumber}`);
     }
-    const level = buildChainLevel(spec, levelNumber);
+    const extraCheck = await this.getExtraWordCheck(locale);
+    const level = buildChainLevel(spec, levelNumber, extraCheck);
     if (!level) {
       throw new Error(`ChainPackSource: buildChainLevel failed for ${spec.id}`);
     }
