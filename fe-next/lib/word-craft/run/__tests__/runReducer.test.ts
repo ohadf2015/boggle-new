@@ -1,5 +1,6 @@
 import { buildInitialRunState, runReducer } from '../runReducer';
-import { getRoundTarget } from '../runTargets';
+import { getRoundTarget, ROUND_COUNT } from '../runTargets';
+import { POWER_CARD_POOL } from '../powerCards';
 import type { PlacedTile } from '../../types';
 
 const init = () => buildInitialRunState({ seed: 42, locale: 'en', boardSize: 7 });
@@ -87,5 +88,86 @@ describe('runReducer placement actions', () => {
     const withErr = runReducer(init(), { type: 'SET_ERROR', message: 'INVALID_WORD' });
     expect(withErr.lastError).toBe('INVALID_WORD');
     expect(runReducer(withErr, { type: 'CLEAR_ERROR' }).lastError).toBeNull();
+  });
+});
+
+// helper: force a state into 'playing' with a given round score
+const playingWith = (score: number, round = 1) => {
+  let s = runReducer(init(), { type: 'START_RUN' });
+  s = { ...s, round: { ...s.round, round, target: s.round.target, score } };
+  return s;
+};
+
+describe('runReducer round flow', () => {
+  it('END_ROUND with score >= target marks roundPassed true and goes to roundResult', () => {
+    const s = playingWith(9999);
+    const next = runReducer(s, { type: 'END_ROUND' });
+    expect(next.phase).toBe('roundResult');
+    expect(next.roundPassed).toBe(true);
+  });
+
+  it('END_ROUND with score < target marks roundPassed false', () => {
+    const s = playingWith(0);
+    const next = runReducer(s, { type: 'END_ROUND' });
+    expect(next.phase).toBe('roundResult');
+    expect(next.roundPassed).toBe(false);
+  });
+
+  it('END_ROUND adds the round score to runTotal when passed', () => {
+    const s = playingWith(9999);
+    const next = runReducer(s, { type: 'END_ROUND' });
+    expect(next.runTotal).toBe(9999);
+  });
+
+  it('PROCEED after a failed round goes to runResult, not cleared', () => {
+    let s = runReducer(playingWith(0), { type: 'END_ROUND' });
+    s = runReducer(s, { type: 'PROCEED' });
+    expect(s.phase).toBe('runResult');
+    expect(s.cleared).toBe(false);
+  });
+
+  it('PROCEED after a passed non-final round goes to cardPick with 3 choices', () => {
+    let s = runReducer(playingWith(9999, 1), { type: 'END_ROUND' });
+    s = runReducer(s, { type: 'PROCEED' });
+    expect(s.phase).toBe('cardPick');
+    expect(s.cardChoice?.length).toBe(3);
+  });
+
+  it('PROCEED after passing the final round goes to runResult, cleared', () => {
+    let s = runReducer(playingWith(9999, ROUND_COUNT), { type: 'END_ROUND' });
+    s = runReducer(s, { type: 'PROCEED' });
+    expect(s.phase).toBe('runResult');
+    expect(s.cleared).toBe(true);
+  });
+
+  it('PICK_CARD appends the card, advances the round, and resets the board', () => {
+    let s = runReducer(playingWith(9999, 1), { type: 'END_ROUND' });
+    s = runReducer(s, { type: 'PROCEED' });
+    const chosen = s.cardChoice![0];
+    s = runReducer(s, { type: 'PICK_CARD', cardId: chosen.id });
+    expect(s.phase).toBe('playing');
+    expect(s.activeCards.map((c) => c.id)).toContain(chosen.id);
+    expect(s.round.round).toBe(2);
+    expect(s.round.score).toBe(0);
+    expect(s.pendingPlacements).toEqual([]);
+    expect(s.board.cells.every((row) => row.every((cell) => cell.tile === null))).toBe(true);
+  });
+
+  it('PICK_CARD applies a rackSize setup card (letterHoard => 10-tile rack)', () => {
+    let s = runReducer(playingWith(9999, 1), { type: 'END_ROUND' });
+    s = runReducer(s, { type: 'PROCEED' });
+    const letterHoard = POWER_CARD_POOL.find((c) => c.id === 'letterHoard')!;
+    s = { ...s, cardChoice: [letterHoard] };
+    s = runReducer(s, { type: 'PICK_CARD', cardId: 'letterHoard' });
+    expect(s.rack.length).toBe(10);
+  });
+
+  it('RESTART returns to a fresh intro state', () => {
+    let s = runReducer(playingWith(9999, 1), { type: 'END_ROUND' });
+    s = runReducer(s, { type: 'RESTART' });
+    expect(s.phase).toBe('intro');
+    expect(s.round.round).toBe(1);
+    expect(s.activeCards).toEqual([]);
+    expect(s.runTotal).toBe(0);
   });
 });

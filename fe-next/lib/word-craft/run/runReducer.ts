@@ -3,7 +3,8 @@ import { createBag, draw, type TileBag, type SupportedLocale } from '../tileBag'
 import { resolveDrag } from '../placement';
 import type { RackTile } from '../types';
 import type { RunState, RunAction } from './runTypes';
-import { getRoundBagSize, getRoundTarget } from './runTargets';
+import { getRoundBagSize, getRoundTarget, ROUND_COUNT } from './runTargets';
+import { drawCardChoices, type PowerCard } from './powerCards';
 
 export interface BuildRunOptions {
   seed: number;
@@ -13,6 +14,58 @@ export interface BuildRunOptions {
 
 function cloneBag(bag: TileBag): TileBag {
   return { tiles: [...bag.tiles], rng: bag.rng, nextId: bag.nextId };
+}
+
+function buildRoundSetup(cards: readonly PowerCard[]): {
+  rackSize: number;
+  extraBagTiles: number;
+  extraBlankTiles: number;
+} {
+  let rackSize = 8;
+  let extraBagTiles = 0;
+  let extraBlankTiles = 0;
+  for (const card of cards) {
+    if (!card.roundSetup) continue;
+    if (card.roundSetup.rackSize) rackSize = Math.max(rackSize, card.roundSetup.rackSize);
+    extraBagTiles += card.roundSetup.extraBagTiles ?? 0;
+    extraBlankTiles += card.roundSetup.extraBlankTiles ?? 0;
+  }
+  return { rackSize, extraBagTiles, extraBlankTiles };
+}
+
+function startRound(state: RunState, roundNumber: number, activeCards: PowerCard[]): RunState {
+  const setup = buildRoundSetup(activeCards);
+  const board = createBoard(state.boardSize);
+  const bag = createBag({
+    seed: state.seed + roundNumber * 101,
+    locale: state.locale,
+    bagSize: getRoundBagSize(roundNumber) + setup.extraBagTiles,
+  });
+  const drawn = draw(bag, setup.rackSize);
+  const blanks: RackTile[] = [];
+  for (let i = 0; i < setup.extraBlankTiles; i++) {
+    blanks.push({ id: `blank-r${roundNumber}-${i}`, letter: '_', value: 0, isBlank: true });
+  }
+  return {
+    ...state,
+    phase: 'playing',
+    board,
+    bag,
+    rack: [...drawn, ...blanks],
+    pendingPlacements: [],
+    selectedRackTileId: null,
+    activeCards,
+    round: {
+      round: roundNumber,
+      target: getRoundTarget(roundNumber, state.boardSize),
+      score: 0,
+      wordsPlayedThisRound: 0,
+    },
+    cardChoice: null,
+    roundPassed: false,
+    lastWordScore: null,
+    lastError: null,
+  };
 }
 
 export function buildInitialRunState(opts: BuildRunOptions): RunState {
@@ -129,6 +182,45 @@ export function runReducer(state: RunState, action: RunAction): RunState {
 
     case 'CLEAR_ERROR':
       return { ...state, lastError: null };
+
+    case 'END_ROUND': {
+      const passed = state.round.score >= state.round.target;
+      let runTotal = state.runTotal;
+      if (passed) {
+        let bonus = 0;
+        for (const card of state.activeCards) {
+          if (card.roundEndBonus) bonus += card.roundEndBonus(state.round.score, state.round.target);
+        }
+        runTotal = state.runTotal + state.round.score + bonus;
+      }
+      return { ...state, phase: 'roundResult', roundPassed: passed, runTotal };
+    }
+
+    case 'PROCEED': {
+      if (!state.roundPassed) {
+        return { ...state, phase: 'runResult', cleared: false };
+      }
+      if (state.round.round >= ROUND_COUNT) {
+        return { ...state, phase: 'runResult', cleared: true };
+      }
+      const ownedIds = state.activeCards.map((c) => c.id);
+      const cardChoice = drawCardChoices(state.seed + state.round.round * 31, ownedIds, 3);
+      return { ...state, phase: 'cardPick', cardChoice };
+    }
+
+    case 'PICK_CARD': {
+      const picked = (state.cardChoice ?? []).find((c) => c.id === action.cardId);
+      if (!picked) return state;
+      const activeCards = [...state.activeCards, picked];
+      return startRound(state, state.round.round + 1, activeCards);
+    }
+
+    case 'RESTART':
+      return buildInitialRunState({
+        seed: state.seed,
+        locale: state.locale,
+        boardSize: state.boardSize,
+      });
 
     default:
       return state;
