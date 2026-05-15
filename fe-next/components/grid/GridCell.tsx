@@ -279,6 +279,7 @@ const GridCell = memo<GridCellProps>(({
       reduceMotion={reduceMotion}
       selectionIndex={selectionIdx}
       escalation={escalation}
+      isDragging={isDragging}
     />
 
     <span

@@ -16,6 +16,10 @@ interface GridCellEffectsProps {
   /** Pre-computed escalation from parent. Stable ref per (depth, tier, combo)
    *  via getSelectionEscalation cache → memo holds across drag steps within a tier. */
   escalation: SelectionEscalation | null;
+  /** Active drag flag — when true we suppress heavy paint (blurred glow, WebGL
+   *  shader, large particle bursts). Drag-time effects must stay cheap; full
+   *  juice fires post-release when the word is committed. */
+  isDragging?: boolean;
 }
 
 /**
@@ -66,8 +70,15 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
   reduceMotion,
   selectionIndex,
   escalation,
+  isDragging = false,
 }) {
   if (!isSelected || effectiveRenderMode === 'minimal' || !escalation) return null;
+  // Drag-time render mode: keep the primary ripple (instant feedback for the
+  // newly-joined cell) but drop the heavier secondary glow (`filter: blur()`),
+  // glow ring border-shadow, escalation bursts, and the WebGL shader. Those
+  // re-mount when the cell stays selected after the user releases — combo
+  // bursts fire post-submit anyway.
+  const fullMode = effectiveRenderMode === 'full' && !isDragging;
 
   // Compound intensity: max of escalation tier and combo-derived intensity
   const compoundTier = Math.max(
@@ -90,7 +101,7 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
       />
 
       {/* Secondary glow pulse — full mode, compounds */}
-      {effectiveRenderMode === 'full' && (
+      {fullMode && (
         <m.div
           className="absolute inset-[-4px] pointer-events-none"
           style={{
@@ -126,7 +137,7 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
       )}
 
       {/* Sparkle burst — first letter gets extra flair (full mode only) */}
-      {isFirstSelected && !reduceMotion && effectiveRenderMode === 'full' && (
+      {isFirstSelected && !reduceMotion && fullMode && (
         <>
           {[...Array(6)].map((_, idx) => {
             const angle = (idx * 60) * (Math.PI / 180);
@@ -160,7 +171,7 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
 
       {/* Escalation burst particles — compounds: more particles, bigger, further at high combo */}
       {/* Variable ratio: 20% chance of 1.5x particle count for surprise "extra juice" */}
-      {escalation.showBurst && !reduceMotion && effectiveRenderMode === 'full' && !isFirstSelected && (
+      {escalation.showBurst && !reduceMotion && fullMode && !isFirstSelected && (
         <>
           {[...Array(Math.round(escalation.particleCount * (selectionIndex % 5 === 3 ? 1.5 : 1)))].map((_, idx) => {
             const angle = (idx * (360 / escalation.particleCount) + 30) * (Math.PI / 180);
@@ -196,7 +207,7 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
       )}
 
       {/* Combo-only burst — when short word (tier 0) but combo is active */}
-      {escalation.tier === 0 && !reduceMotion && effectiveRenderMode === 'full' && comboLevel >= 2 && (
+      {escalation.tier === 0 && !reduceMotion && fullMode && comboLevel >= 2 && (
         <>
           {[...Array(6)].map((_, idx) => {
             const angle = (idx * 60 + 30) * (Math.PI / 180);
@@ -231,12 +242,15 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
           })}
         </>
       )}
-      {/* WebGL shader overlay for high combos */}
-      <VFXTileEffect
-        comboLevel={comboLevel}
-        isSelected={isSelected}
-        reduceMotion={reduceMotion}
-      />
+      {/* WebGL shader overlay for high combos — skip during drag to keep the
+          pointer-move path off the GPU compositor. */}
+      {!isDragging && (
+        <VFXTileEffect
+          comboLevel={comboLevel}
+          isSelected={isSelected}
+          reduceMotion={reduceMotion}
+        />
+      )}
     </>
   );
 });

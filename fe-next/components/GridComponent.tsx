@@ -188,8 +188,33 @@ const GridComponent = memo<GridComponentProps>(({
     prevSelectedLengthRef.current = selectedCellsLength;
   }, [selectedCellsLength]);
 
-  useEffect(() => { onWordChange?.(formedWord, selectedCellsLength); }, [formedWord, selectedCellsLength, onWordChange]);
-  useEffect(() => { onSelectionChange?.(selectedCells); }, [selectedCells, onSelectionChange]);
+  // Guard onWordChange / onSelectionChange against same-value re-fires.
+  // Without these refs, every selectedCells ref change during drag fires the
+  // callbacks even when (word, count) and selection identity haven't shifted —
+  // each fire bubbles into useSelectionStore.setState and downstream
+  // consumers, doubling render cost on touch swipes.
+  const prevWordRef = useRef<{ word: string; count: number }>({ word: '', count: 0 });
+  useEffect(() => {
+    const prev = prevWordRef.current;
+    if (prev.word === formedWord && prev.count === selectedCellsLength) return;
+    prevWordRef.current = { word: formedWord, count: selectedCellsLength };
+    onWordChange?.(formedWord, selectedCellsLength);
+  }, [formedWord, selectedCellsLength, onWordChange]);
+
+  const prevSelectionRef = useRef<SelectedCell[] | null>(null);
+  useEffect(() => {
+    if (!onSelectionChange) return;
+    const prev = prevSelectionRef.current;
+    if (
+      prev &&
+      prev.length === selectedCells.length &&
+      prev.every((c, i) => c.row === selectedCells[i].row && c.col === selectedCells[i].col)
+    ) {
+      return;
+    }
+    prevSelectionRef.current = selectedCells;
+    onSelectionChange(selectedCells);
+  }, [selectedCells, onSelectionChange]);
 
   // Pre-compute Sets for O(1) lookups instead of O(n) .some() per cell during render
   const selectedCellsSet = useMemo(
@@ -448,7 +473,10 @@ const GridComponent = memo<GridComponentProps>(({
             gridTemplateColumns: `repeat(${gridDimensions.cols}, minmax(0, 1fr))`,
             gridTemplateRows: `repeat(${gridDimensions.rows}, minmax(0, 1fr))`,
             backgroundColor: ghostCells ? 'transparent' : 'var(--neo-cream)',
-            ...(currentTier >= 3 && !reduceMotion ? {
+            // Chromatic aberration on the whole board is a heavy compositor
+            // pass; suppress while the user is mid-drag so pointer moves don't
+            // re-rasterize the grid every frame. Re-applies after release.
+            ...(currentTier >= 3 && !reduceMotion && !isDragging ? {
               filter: 'drop-shadow(2px 0 0 rgba(0,255,255,0.25)) drop-shadow(-2px 0 0 rgba(255,51,102,0.25))',
             } : {}),
             ['--cell-font-size' as string]: `calc((100cqw / ${gridDimensions.cols}) * ${effectiveLargeText ? 0.70 : 0.50})`,

@@ -101,6 +101,11 @@ export function useGridInteraction({
   const autoSubmitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const gridMeasurementsRef = useRef<GridMeasurements | null>(null);
+  // Map of "row-col" → HTMLElement, built lazily on first lookup and
+  // invalidated alongside gridMeasurementsRef when the grid resizes. Avoids a
+  // querySelector per drag-step inside toggleDragClass (16+ DOM scans per word
+  // on long touch swipes).
+  const cellNodeMapRef = useRef<Map<string, HTMLElement> | null>(null);
   const pendingTouchRef = useRef<{ x: number; y: number } | null>(null);
   const rafIdRef = useRef<number | null>(null);
   // Track scheduling state separately from id so re-entry detection is
@@ -138,16 +143,36 @@ export function useGridInteraction({
     return getCellAtPosition(touchX, touchY, grid, measurements);
   }, [grid, getGridMeasurements]);
 
+  // Build (or rebuild) the cell-node map by scanning grid children once.
+  const getCellNodeMap = useCallback((): Map<string, HTMLElement> | null => {
+    const grid = gridRef.current;
+    if (!grid) return null;
+    if (cellNodeMapRef.current) return cellNodeMapRef.current;
+    const map = new Map<string, HTMLElement>();
+    const cells = grid.querySelectorAll<HTMLElement>('[data-row][data-col]');
+    cells.forEach((el) => {
+      map.set(`${el.dataset.row}-${el.dataset.col}`, el);
+    });
+    cellNodeMapRef.current = map;
+    return map;
+  }, [gridRef]);
+
   // Toggle 'blast-drag-selected' CSS class directly on GridCell DOM elements
   const toggleDragClass = useCallback((row: number, col: number, add: boolean) => {
-    const el = gridRef.current?.querySelector(`[data-row="${row}"][data-col="${col}"]`) as HTMLElement | null;
+    const map = getCellNodeMap();
+    const el = map?.get(`${row}-${col}`);
     if (el) {
       if (add) el.classList.add('blast-drag-selected');
       else el.classList.remove('blast-drag-selected');
     }
-  }, [gridRef]);
+  }, [getCellNodeMap]);
 
   const clearAllDragClasses = useCallback(() => {
+    const map = cellNodeMapRef.current;
+    if (map) {
+      map.forEach((el) => el.classList.remove('blast-drag-selected'));
+      return;
+    }
     gridRef.current?.querySelectorAll('.blast-drag-selected').forEach(el => {
       el.classList.remove('blast-drag-selected');
     });
@@ -493,7 +518,10 @@ export function useGridInteraction({
       handleTouchMove(mockEvent);
     }
 
-    // Hover highlight is throttled via RAF to avoid unnecessary re-renders
+    // Hover highlight is throttled via RAF. Skip entirely during active drag —
+    // hover state is meaningless mid-selection, and setHoveredCell would fire
+    // ~60Hz parent re-renders on top of the legit drag-state updates.
+    if (isTouchingRef.current) return;
     pendingMouseRef.current = { x: e.clientX, y: e.clientY };
     if (mouseRafIdRef.current === null) {
       mouseRafIdRef.current = requestAnimationFrame(() => {
@@ -632,18 +660,25 @@ export function useGridInteraction({
   useEffect(() => {
     const element = gridRef.current;
     if (!element) return;
-    const invalidateCache = () => { gridMeasurementsRef.current = null; };
+    const invalidateCache = () => {
+      gridMeasurementsRef.current = null;
+      cellNodeMapRef.current = null;
+    };
     const resizeObserver = new ResizeObserver(invalidateCache);
     resizeObserver.observe(element);
     window.addEventListener('orientationchange', invalidateCache);
     window.addEventListener('resize', invalidateCache);
-    // Invalidate after CSS transitions (e.g. board animating into position)
-    element.addEventListener('transitionend', invalidateCache);
+    // Note: deliberately NOT listening to 'transitionend' here. Every selected
+    // cell fires a 90–300ms shadow/background transition; bubbling those into
+    // a measurement-cache flush thrashed the cache mid-drag (next pointermove
+    // re-measured the grid via getBoundingClientRect on every cell). The
+    // ResizeObserver + orientation/resize fallback already covers real layout
+    // changes (board entrance animation finishes by triggering ResizeObserver
+    // when its final size lands).
     return () => {
       resizeObserver.disconnect();
       window.removeEventListener('orientationchange', invalidateCache);
       window.removeEventListener('resize', invalidateCache);
-      element.removeEventListener('transitionend', invalidateCache);
     };
   }, [gridRef]);
 
