@@ -26,20 +26,25 @@ export async function GET() {
 
     const today = new Date().toISOString().split('T')[0]
 
-    // Fetch all completed attempts across the three daily modes
+    // Fetch only *completed* attempts across the three daily modes. A day counts
+    // toward the streak only if the player actually finished the challenge —
+    // a failed Word Hunt or an abandoned (zero-word) puzzle/wheel does not.
     const [puzzleRes, huntRes, wheelRes] = await Promise.all([
       supabase
         .from('daily_puzzle_attempts')
         .select('puzzle_date')
-        .eq('player_id', user.id),
+        .eq('player_id', user.id)
+        .gt('word_count', 0),
       supabase
         .from('daily_word_hunt_attempts')
         .select('puzzle_date')
-        .eq('player_id', user.id),
+        .eq('player_id', user.id)
+        .eq('solved', true),
       supabase
         .from('daily_word_wheel_attempts')
         .select('puzzle_date')
-        .eq('player_id', user.id),
+        .eq('player_id', user.id)
+        .gt('word_count', 0),
     ])
 
     // Combine all attempt dates

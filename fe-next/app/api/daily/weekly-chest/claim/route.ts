@@ -19,19 +19,24 @@ export async function POST() {
 
   const today = new Date().toISOString().split('T')[0]
 
+  // Only *completed* attempts count toward the streak — keep this in sync with
+  // /api/daily/weekly-chest/status.
   const [puzzleRes, huntRes, wheelRes] = await Promise.all([
     supabase
       .from('daily_puzzle_attempts')
       .select('puzzle_date')
-      .eq('player_id', user.id),
+      .eq('player_id', user.id)
+      .gt('word_count', 0),
     supabase
       .from('daily_word_hunt_attempts')
       .select('puzzle_date,efficiency_score')
-      .eq('player_id', user.id),
+      .eq('player_id', user.id)
+      .eq('solved', true),
     supabase
       .from('daily_word_wheel_attempts')
       .select('puzzle_date,score,time_seconds')
-      .eq('player_id', user.id),
+      .eq('player_id', user.id)
+      .gt('word_count', 0),
   ])
 
   const allDates = [

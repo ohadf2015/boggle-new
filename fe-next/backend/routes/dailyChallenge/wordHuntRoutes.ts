@@ -337,10 +337,12 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
     if (playerId) {
       try {
         const today = new Date().toISOString().split('T')[0]
+        // Only *completed* attempts count toward the streak — keep in sync with
+        // /api/daily/weekly-chest/status + claim.
         const [puzzleRes, huntRes, wheelRes] = await Promise.all([
-          supabase.from('daily_puzzle_attempts').select('puzzle_date').eq('player_id', playerId),
-          supabase.from('daily_word_hunt_attempts').select('puzzle_date,efficiency_score').eq('player_id', playerId),
-          supabase.from('daily_word_wheel_attempts').select('puzzle_date,score,time_seconds').eq('player_id', playerId),
+          supabase.from('daily_puzzle_attempts').select('puzzle_date').eq('player_id', playerId).gt('word_count', 0),
+          supabase.from('daily_word_hunt_attempts').select('puzzle_date,efficiency_score').eq('player_id', playerId).eq('solved', true),
+          supabase.from('daily_word_wheel_attempts').select('puzzle_date,score,time_seconds').eq('player_id', playerId).gt('word_count', 0),
         ])
         const allDates = [
           ...(puzzleRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
