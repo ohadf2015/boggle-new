@@ -6,16 +6,13 @@ import { buildHomepageFaqJsonLd } from '@/lib/seo/homepageFaqJsonLd';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
 
-export const dynamic = 'force-dynamic';
-
 /**
  * Main landing page - Game mode selection
- * Users choose between Single Player and Multiplayer modes
+ *
+ * ISR: revalidate every 5 minutes. All client-only inputs (?room=, ?next=,
+ * FTUE state, auth) are consumed in PageClient via window/localStorage,
+ * so this route is safely static-renderable.
  */
-
-// ISR: Revalidate landing data every 5 minutes.
-// Mode card order is computed from gameModeStats at build/revalidation time,
-// so no per-request DB calls for card ordering.
 export const revalidate = 300;
 
 interface PageProps {
