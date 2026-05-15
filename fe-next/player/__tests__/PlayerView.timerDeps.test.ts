@@ -66,8 +66,13 @@ describe('PlayerView — timer effect dependency stability', () => {
     // This ensures late-join path doesn't cancel the timeout prematurely
     const startGameIdx = source.indexOf('const startGame = ()');
     expect(startGameIdx).toBeGreaterThan(0);
-    // Capture enough chars to include the full function body (typically <600 chars)
-    const startGameBody = source.slice(startGameIdx, startGameIdx + 1200);
+    // Slice from `const startGame = ()` up to the matching arrow-function closer
+    // (`\n    };\n` at the same indent). Fixed-byte windows have proven brittle —
+    // the body grew past a 1200-char window when the dedup-guard block was added.
+    const after = source.slice(startGameIdx);
+    const closeIdx = after.indexOf('\n    };\n');
+    expect(closeIdx).toBeGreaterThan(0);
+    const startGameBody = after.slice(0, closeIdx);
     expect(startGameBody).toMatch(/onGameStartConsumed\(\)/);
   });
 });
