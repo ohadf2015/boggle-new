@@ -6897,13 +6897,13 @@ const es = {
       "lastUpdated": "Última actualización",
       "source": {
         "search": "Búsqueda",
-        "social": "Red social",
+        "social": "Redes sociales",
         "ai": "IA",
         "portal": "Portal de juegos",
-        "email": "Email",
+        "email": "Correo",
         "push": "Notificación push",
-        "ads": "Anuncio",
-        "referral": "Referido",
+        "ads": "Anuncios",
+        "referral": "Referencia",
         "direct": "Directo",
         "unknown": "Desconocido"
       },
