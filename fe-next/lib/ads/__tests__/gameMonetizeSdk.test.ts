@@ -34,14 +34,16 @@ describe('gameMonetizeSdk loader', () => {
   });
 
   describe('getGameMonetizeId', () => {
-    it('returns NEXT_PUBLIC_GAMEMONETIZE_GAME_ID env var when set', () => {
+    it('returns NEXT_PUBLIC_GAMEMONETIZE_GAME_ID env var when set (override)', () => {
       vi.stubEnv('NEXT_PUBLIC_GAMEMONETIZE_GAME_ID', 'real-game-id-xyz');
       expect(getGameMonetizeId()).toBe('real-game-id-xyz');
     });
 
-    it('returns null when env var unset (no implicit fallback)', () => {
+    it('falls back to LexiClash hardcoded game-id when env empty', () => {
+      // Hardcoded fallback prevents the Next-inlining bug where
+      // optional-chain guarded process.env access skips inlining.
       vi.stubEnv('NEXT_PUBLIC_GAMEMONETIZE_GAME_ID', '');
-      expect(getGameMonetizeId()).toBeNull();
+      expect(getGameMonetizeId()).toBe('ewjut98kdj0bwggspg7qqy7qky3nv50j');
     });
   });
 

@@ -51,19 +51,35 @@ declare global {
 export const GAMEMONETIZE_SCRIPT_ID = 'gamemonetize-sdk';
 const SCRIPT_SRC = 'https://api.gamemonetize.com/sdk.js';
 
+/**
+ * Hardcoded game-id fallback for the LexiClash GameMonetize publisher
+ * account (ohadf2015@gmail.com, GM id 79676). Non-secret — game-ids are
+ * surfaced in every <script id="gamemonetize-sdk"> tag we serve.
+ *
+ * Pattern matches `h5GamesAds.getH5Client()` (hardcoded `ca-pub-...`) —
+ * lets us flip providers per-deploy via env override but still ship a
+ * working build if the env is absent. Also dodges the Next-inlining
+ * gotcha where `process.env?.X` (with optional-chain guard) is NOT
+ * inlined; the bare `process.env.X` reference IS.
+ */
+const DEFAULT_GAME_ID = 'ewjut98kdj0bwggspg7qqy7qky3nv50j';
+
 let loadPromise: Promise<void> | null = null;
 let configured = false;
 const eventListeners = new Set<(e: GameMonetizeEvent) => void>();
 
 /**
- * Returns the GameMonetize game-id from env. Returns null when unset or
- * empty — callers MUST treat null as "GameMonetize not configured".
+ * Returns the GameMonetize game-id. Falls back to the hardcoded
+ * publisher game-id when env is unset, so the SDK works on any deploy
+ * without an env round-trip.
+ *
+ * Direct `process.env.X` pattern (no optional chain) is required for
+ * Next.js to inline this at build time.
  */
 export function getGameMonetizeId(): string | null {
-  if (typeof process === 'undefined' || !process.env) return null;
-  const id = process.env.NEXT_PUBLIC_GAMEMONETIZE_GAME_ID;
-  if (typeof id !== 'string' || id.length === 0) return null;
-  return id;
+  const fromEnv = process.env.NEXT_PUBLIC_GAMEMONETIZE_GAME_ID;
+  if (typeof fromEnv === 'string' && fromEnv.length > 0) return fromEnv;
+  return DEFAULT_GAME_ID;
 }
 
 /** Subscribe to SDK events (multiplexed via SDK_OPTIONS.onEvent). */

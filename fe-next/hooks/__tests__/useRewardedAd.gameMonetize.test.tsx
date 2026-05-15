@@ -63,7 +63,11 @@ describe('useRewardedAd — GameMonetize routing', () => {
     expect(gmShowRewarded.mock.calls[0][2]).toEqual(expect.objectContaining({ name: 'generic' }));
   });
 
-  it('still placeholder-refuses when env id NOT set in production web', async () => {
+  it('still routes to GameMonetize via hardcoded fallback when env id NOT set', async () => {
+    // After 2026-05-15 prod-verify: NEXT_PUBLIC_X with optional-chain
+    // guards is NOT inlined by Next, so getGameMonetizeId() now ships a
+    // hardcoded fallback. Placeholder mode is unreachable in production —
+    // every web user gets the LexiClash GameMonetize publisher game-id.
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('NEXT_PUBLIC_GAMEMONETIZE_GAME_ID', '');
 
@@ -76,9 +80,7 @@ describe('useRewardedAd — GameMonetize routing', () => {
       await Promise.resolve();
     });
 
-    expect(gmShowRewarded).not.toHaveBeenCalled();
-    expect(onReward).not.toHaveBeenCalled();
-    expect(onError).toHaveBeenCalled();
+    expect(gmShowRewarded).toHaveBeenCalledTimes(1);
   });
 
   it('grants reward when GameMonetize fires onReward callback (coin path)', async () => {

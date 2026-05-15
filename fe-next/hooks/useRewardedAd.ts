@@ -191,11 +191,13 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   const shouldUseH5 = !shouldUseCrazyGames && !shouldUseAdMob && h5Ads.isAvailable && h5EnvEnabled && (isProd || hasH5TestFlag);
   // GameMonetize: web fallback when AdSense/H5 unavailable (different
   // approval program — accepts indie HTML5 without AdSense gate). Gated on
-  // game-id env, browser env, lower priority than H5 (so AdSense fill wins
-  // when both configured) but higher priority than placeholder.
+  // game-id (env override or hardcoded fallback per gameMonetizeSdk.ts),
+  // browser env, AND production runtime — same gating discipline as H5
+  // (we don't want GameMonetize firing in dev/test where simulation/
+  // placeholder paths serve the right semantics for QA).
   const hasGameMonetizeId = !!getGameMonetizeId();
   const shouldUseGameMonetize = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseH5
-    && gameMonetize.isAvailable && hasGameMonetizeId;
+    && gameMonetize.isAvailable && hasGameMonetizeId && isProd;
   // Simulation only in development — never award free gold in production
   const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseH5 && !shouldUseGameMonetize;
   // Placeholder: no ad platform available — still grant coins, log for admin

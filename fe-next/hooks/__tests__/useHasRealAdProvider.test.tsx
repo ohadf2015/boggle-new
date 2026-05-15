@@ -39,10 +39,14 @@ describe('useHasRealAdProvider', () => {
     expect(result.current).toBe(true);
   });
 
-  it('returns false in production with no provider', () => {
+  it('returns true in production via GameMonetize hardcoded fallback (no env, no other provider)', () => {
+    // Hardcoded fallback game-id (LexiClash GameMonetize publisher) means
+    // web users always have a real provider — placeholder mode unreachable
+    // in production now. Test that production+no-provider implicitly hits
+    // GameMonetize fallback rather than placeholder.
     vi.stubEnv('NODE_ENV', 'production');
     const { result } = renderHook(() => useHasRealAdProvider());
-    expect(result.current).toBe(false);
+    expect(result.current).toBe(true);
   });
 
   it('returns true in production when on CrazyGames platform', () => {
@@ -60,25 +64,20 @@ describe('useHasRealAdProvider', () => {
     expect(result.current).toBe(true);
   });
 
-  it('returns false in production when CrazyGames SDK loaded but not on platform', () => {
+  it('returns true in production when CrazyGames SDK loaded but not on platform (GameMonetize fallback)', () => {
+    // Even without CG-platform match, GameMonetize hardcoded fallback
+    // serves prod web — placeholder is unreachable in production.
     vi.stubEnv('NODE_ENV', 'production');
     crazyGamesState.isAvailable = true;
     crazyGamesState.isOnCrazyGamesPlatform = false;
     const { result } = renderHook(() => useHasRealAdProvider());
-    expect(result.current).toBe(false);
+    expect(result.current).toBe(true);
   });
 
-  it('returns true in production when GameMonetize game-id env is set (web fallback)', () => {
+  it('returns true in production when GameMonetize game-id env is set (explicit override)', () => {
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('NEXT_PUBLIC_GAMEMONETIZE_GAME_ID', 'real-gid');
     const { result } = renderHook(() => useHasRealAdProvider());
     expect(result.current).toBe(true);
-  });
-
-  it('returns false in production when GameMonetize env is empty string', () => {
-    vi.stubEnv('NODE_ENV', 'production');
-    vi.stubEnv('NEXT_PUBLIC_GAMEMONETIZE_GAME_ID', '');
-    const { result } = renderHook(() => useHasRealAdProvider());
-    expect(result.current).toBe(false);
   });
 });
