@@ -11949,6 +11949,60 @@ const es = {
       "mid": "2–3 puntos",
       "rare": "4–5 puntos",
       "legendary": "8+ puntos"
+    },
+    "run": {
+      "intro": {
+        "title": "Partida WordCraft",
+        "howTo": "Coloca palabras para superar el objetivo de cada ronda. Supera una ronda, toma una carta de poder y sube tu puntuación.",
+        "start": "Empezar partida"
+      },
+      "round": "Ronda {{n}} / {{total}}",
+      "score": "Puntos",
+      "target": "Objetivo",
+      "runTotal": "Total de la partida",
+      "submit": "Enviar palabra",
+      "recall": "Retirar",
+      "endRound": "Terminar ronda",
+      "proceed": "Continuar",
+      "restart": "Nueva partida",
+      "chips": "fichas",
+      "mult": "multiplicador",
+      "rarity": {
+        "common": "Común",
+        "rare": "Rara",
+        "legendary": "Legendaria"
+      },
+      "cardPick": {
+        "title": "Elige una carta de poder",
+        "subtitle": "Se acumula durante el resto de la partida."
+      },
+      "roundResult": {
+        "passed": "¡Objetivo superado!",
+        "passedSub": "Elige una carta de poder y sigue jugando.",
+        "failed": "¡Por poco!",
+        "failedSub": "No alcanzaste el objetivo esta ronda."
+      },
+      "runResult": {
+        "cleared": "¡Partida completada!",
+        "failed": "Fin de la partida",
+        "total": "Puntuación final",
+        "cardsTaken": "Cartas conseguidas",
+        "share": "Partida WordCraft: {{score}}"
+      },
+      "card": {
+        "vowelPower": { "name": "Poder Vocal", "desc": "Cada vocal vale +2 fichas." },
+        "longGame": { "name": "Juego Largo", "desc": "Las palabras de 5+ letras puntúan el doble." },
+        "combo": { "name": "Cadena de Combo", "desc": "Cada palabra después de la primera en la ronda suma +1 al multiplicador." },
+        "premiumHunter": { "name": "Cazador de Premios", "desc": "Cada casilla premium que uses suma +1 al multiplicador." },
+        "wildcardStash": { "name": "Reserva de Comodines", "desc": "Empieza cada ronda con una ficha en blanco." },
+        "quickHands": { "name": "Manos Rápidas", "desc": "Añade 4 fichas extra a la bolsa de cada ronda." },
+        "doubleDown": { "name": "Doble o Nada", "desc": "Tu primera palabra de cada ronda puntúa el triple." },
+        "rareLetters": { "name": "Letras Raras", "desc": "Las fichas de 4+ puntos dan +3 fichas cada una." },
+        "shortSweet": { "name": "Corto y Dulce", "desc": "Las palabras de tres letras reciben +15 fichas." },
+        "steadyBuild": { "name": "Construcción Firme", "desc": "Cada palabra recibe +5 fichas fijas." },
+        "overflow": { "name": "Desbordamiento", "desc": "Los puntos por encima del objetivo dan un 10% de bonificación." },
+        "letterHoard": { "name": "Reserva de Letras", "desc": "Tu atril tiene 10 fichas en lugar de 8." }
+      }
     }
   },
   "connections": {

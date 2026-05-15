@@ -11850,6 +11850,60 @@ const sv = {
       "mid": "2–3 poäng",
       "rare": "4–5 poäng",
       "legendary": "8+ poäng"
+    },
+    "run": {
+      "intro": {
+        "title": "WordCraft-runda",
+        "howTo": "Lägg ord för att slå varje rundas mål. Klara en runda, ta ett kraftkort och höj din poäng.",
+        "start": "Starta runda"
+      },
+      "round": "Runda {{n}} / {{total}}",
+      "score": "Poäng",
+      "target": "Mål",
+      "runTotal": "Total poäng",
+      "submit": "Skicka ord",
+      "recall": "Ångra",
+      "endRound": "Avsluta runda",
+      "proceed": "Fortsätt",
+      "restart": "Ny runda",
+      "chips": "marker",
+      "mult": "multiplikator",
+      "rarity": {
+        "common": "Vanlig",
+        "rare": "Sällsynt",
+        "legendary": "Legendarisk"
+      },
+      "cardPick": {
+        "title": "Välj ett kraftkort",
+        "subtitle": "Det gäller resten av rundan."
+      },
+      "roundResult": {
+        "passed": "Målet klarat!",
+        "passedSub": "Välj ett kraftkort och fortsätt.",
+        "failed": "Nästan!",
+        "failedSub": "Du nådde inte målet den här rundan."
+      },
+      "runResult": {
+        "cleared": "Rundan klar!",
+        "failed": "Rundan slut",
+        "total": "Slutpoäng",
+        "cardsTaken": "Insamlade kort",
+        "share": "WordCraft-runda: {{score}}"
+      },
+      "card": {
+        "vowelPower": { "name": "Vokalkraft", "desc": "Vokaler är värda +2 marker styck." },
+        "longGame": { "name": "Långt spel", "desc": "Ord med 5+ bokstäver ger dubbel poäng." },
+        "combo": { "name": "Combokedja", "desc": "Varje ord efter det första rundan ger +1 multiplikator." },
+        "premiumHunter": { "name": "Bonusjägare", "desc": "Varje bonusruta du använder ger +1 multiplikator." },
+        "wildcardStash": { "name": "Jokerförråd", "desc": "Börja varje runda med en blank bricka." },
+        "quickHands": { "name": "Snabba händer", "desc": "Lägger till 4 extra brickor i varje rundas påse." },
+        "doubleDown": { "name": "Dubbla upp", "desc": "Ditt första ord varje runda ger tredubbel poäng." },
+        "rareLetters": { "name": "Sällsynta bokstäver", "desc": "Brickor värda 4+ poäng ger +3 marker styck." },
+        "shortSweet": { "name": "Kort och gott", "desc": "Treboksstavsord får +15 marker." },
+        "steadyBuild": { "name": "Stadig bygge", "desc": "Varje ord får +5 fasta marker." },
+        "overflow": { "name": "Överflöd", "desc": "Poäng över målet ger 10% som bonus." },
+        "letterHoard": { "name": "Bokstavslager", "desc": "Ditt ställ rymmer 10 brickor istället för 8." }
+      }
     }
   },
   mp: {

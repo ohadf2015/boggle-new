@@ -11824,6 +11824,60 @@ const ja = {
       "mid": "2〜3点",
       "rare": "4〜5点",
       "legendary": "8点以上"
+    },
+    "run": {
+      "intro": {
+        "title": "WordCraft ラン",
+        "howTo": "単語を置いて各ラウンドの目標を超えよう。ラウンドをクリアしてパワーカードを獲得し、スコアを伸ばそう。",
+        "start": "ラン開始"
+      },
+      "round": "ラウンド {{n}} / {{total}}",
+      "score": "スコア",
+      "target": "目標",
+      "runTotal": "ラン合計",
+      "submit": "単語を送信",
+      "recall": "戻す",
+      "endRound": "ラウンド終了",
+      "proceed": "続ける",
+      "restart": "新しいラン",
+      "chips": "チップ",
+      "mult": "倍率",
+      "rarity": {
+        "common": "コモン",
+        "rare": "レア",
+        "legendary": "レジェンダリー"
+      },
+      "cardPick": {
+        "title": "パワーカードを選択",
+        "subtitle": "ランの残り全体で効果が続きます。"
+      },
+      "roundResult": {
+        "passed": "目標達成！",
+        "passedSub": "パワーカードを選んでランを続けよう。",
+        "failed": "あと少し！",
+        "failedSub": "このラウンドは目標に届きませんでした。"
+      },
+      "runResult": {
+        "cleared": "ランクリア！",
+        "failed": "ラン終了",
+        "total": "最終ランスコア",
+        "cardsTaken": "獲得したカード",
+        "share": "WordCraft ラン: {{score}}"
+      },
+      "card": {
+        "vowelPower": { "name": "母音パワー", "desc": "母音は1つにつき+2チップ。" },
+        "longGame": { "name": "ロングゲーム", "desc": "5文字以上の単語はスコア2倍。" },
+        "combo": { "name": "コンボチェーン", "desc": "ラウンド内で最初の単語以降、1語ごとに倍率+1。" },
+        "premiumHunter": { "name": "プレミアムハンター", "desc": "使ったプレミアムマスごとに倍率+1。" },
+        "wildcardStash": { "name": "ワイルドカード備蓄", "desc": "毎ラウンド、空白タイルを1枚持って開始。" },
+        "quickHands": { "name": "クイックハンド", "desc": "毎ラウンドの袋にタイルを4枚追加。" },
+        "doubleDown": { "name": "ダブルダウン", "desc": "毎ラウンド最初の単語はスコア3倍。" },
+        "rareLetters": { "name": "レアレター", "desc": "4点以上のタイルは1枚につき+3チップ。" },
+        "shortSweet": { "name": "ショート＆スイート", "desc": "3文字の単語に+15チップ。" },
+        "steadyBuild": { "name": "ステディビルド", "desc": "すべての単語に固定+5チップ。" },
+        "overflow": { "name": "オーバーフロー", "desc": "目標を超えたスコアの10%をボーナスとして獲得。" },
+        "letterHoard": { "name": "レターホード", "desc": "ラックが8枚ではなく10枚になる。" }
+      }
     }
   },
   mp: {
