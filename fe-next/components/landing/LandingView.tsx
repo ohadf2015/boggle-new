@@ -21,8 +21,8 @@ import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
 import { LandingBlogSection } from './LandingBlogSection';
 import { LandingHero } from './LandingHero';
 import { LandingCardsSkeleton } from './LandingCardsSkeleton';
+// SSR enabled: receives initialData (gamesToday) at server time → no skeleton flash above the fold.
 const LandingSocialProofBar = dynamic(() => import('./LandingSocialProofBar').then(m => m.LandingSocialProofBar), {
-  ssr: false,
   loading: () => <div className="h-10 w-full max-w-4xl mx-auto" />,
 });
 const LandingAvatarTeaser = dynamic(() => import('./LandingAvatarTeaser').then(m => m.LandingAvatarTeaser), {

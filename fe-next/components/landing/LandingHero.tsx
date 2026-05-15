@@ -6,10 +6,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { IdleMascotWithEntrance } from '@/components/ui/IdleMascot';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
 
+// SSR enabled: receives players from server initialData → above-the-fold sidebar paints with data, not skeleton.
 const LandingLeaderboardPreview = dynamic(
   () => import('./LandingLeaderboardPreview').then(m => m.LandingLeaderboardPreview),
   {
-    ssr: false,
     loading: () => <div className="w-full h-64 rounded-neo bg-neo-navy-light/50 animate-pulse" />,
   }
 );
