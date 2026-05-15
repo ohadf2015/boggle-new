@@ -8,7 +8,6 @@ import AutoHideFooter from '@/components/AutoHideFooter';
 import GlobalBottomNav from '@/components/GlobalBottomNav';
 import GoogleConsentMode from '@/components/GoogleConsentMode';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
-import PurpleAds from '@/components/PurpleAds';
 import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
 import PWAInstallPrompt from '@/components/PWAInstallPrompt';
@@ -165,7 +164,6 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
         },
         other: {
             'google-site-verification': '4Blim0yOh_Hl4uX9TFnRX71lagbldOOxg7PwrcEbhrc',
-            'purpleads-verification': '858431921a32e3ac048cd681',
             // Geo-targeting: signal to search engines this site is based in Israel
             'geo.region': 'IL',
             'geo.placename': 'Israel',
@@ -553,7 +551,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <GoogleConsentMode />
                 {/* Load external scripts with optimized strategies to prevent blocking */}
                 <GoogleAnalytics />
-                <PurpleAds />
                 <SocialMediaPixels />
                 <WebVitalsReporter />
                 <ServiceWorkerRegistration />
