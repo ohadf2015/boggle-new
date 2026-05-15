@@ -24,6 +24,7 @@ import { useMultiplayerSignupNudge } from '@/hooks/useMultiplayerSignupNudge';
 import { ResultsParallaxBackdrop, ResultsSectionReveal, ResultsScrollProgressRail } from '@/components/results/ResultsScrollEffects';
 import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
+import { useObservedHeight } from '@/hooks/useObservedHeight';
 
 const PostGameEngagement = dynamic(() => import('@/components/growth/PostGameEngagement'), { ssr: false });
 const DailyChallengeInvite = dynamic(() => import('@/components/growth/DailyChallengeInvite').then(m => m.DailyChallengeInvite), { ssr: false });
@@ -129,8 +130,12 @@ function DesktopResultsLayout({
     <div className="hidden md:flex md:flex-col md:flex-1 md:min-h-0 relative">
       <div
         ref={scrollRef}
-        className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area p-4 medium-short:p-2 desktop-medium-short:p-3 xl:p-6 pb-32 medium-short:pb-24 relative"
-        style={{ WebkitOverflowScrolling: 'touch' }}
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area p-4 medium-short:p-2 desktop-medium-short:p-3 xl:p-6 relative"
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          // Same CSS var as mobile — set by the ResultsPage outer wrapper.
+          paddingBottom: 'calc(var(--mp-results-cta-h, 8rem) + 1rem)',
+        }}
       >
         <ResultsParallaxBackdrop scrollRef={scrollRef} intensity={110} />
         <ResultsScrollProgressRail scrollRef={scrollRef} />
@@ -261,6 +266,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // Mobile inner scroll container — drives the parallax backdrop & section
   // reveals (window scroll is locked here; everything pages inside this div).
   const mobileScrollRef = useRef<HTMLDivElement>(null);
+
+  // Observe sticky-CTA height so the scroll containers can reserve real
+  // clearance — `pb-36` was static and got eaten when the bar grew (host
+  // mode selector + countdown + ready avatars).
+  const [setStickyBarRef, stickyBarHeight] = useObservedHeight<HTMLDivElement>();
 
   // Classroom lesson data from sessionStorage (set by ClassroomGameLobby)
   const lessonGameData = useMemo(() => {
@@ -907,7 +917,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
       <div
         className="flex-1 flex flex-col min-h-0 bg-neo-navy transition-colors duration-300 relative"
-        style={{ background: 'radial-gradient(circle at center, var(--neo-navy-radial) 0%, var(--neo-navy) 70%)' }}
+        style={{
+          background: 'radial-gradient(circle at center, var(--neo-navy-radial) 0%, var(--neo-navy) 70%)',
+          // Published to descendants so both mobile and desktop scroll
+          // containers can reserve dynamic bottom clearance. Only set once
+          // measured — otherwise the calc() fallback (9rem/8rem) covers
+          // first paint before ResizeObserver runs.
+          ...(stickyBarHeight > 0 && {
+            ['--mp-results-cta-h' as string]: `${stickyBarHeight}px`,
+          }),
+        } as React.CSSProperties}
       >
         {/* Subtle dot pattern */}
         <div
@@ -940,8 +959,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         {/* Scrollable content — everything in one flow */}
         <div
           ref={mobileScrollRef}
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-36 medium-short:pb-24 bg-neo-navy relative"
-          style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 bg-neo-navy relative"
+          style={{
+            overscrollBehavior: 'contain',
+            WebkitOverflowScrolling: 'touch',
+            // Reserve clearance for the fixed StickyReadyBar (height
+            // measured at runtime); fallback covers the pre-mount paint.
+            paddingBottom: 'calc(var(--mp-results-cta-h, 9rem) + 1rem)',
+          }}
         >
           <ResultsParallaxBackdrop scrollRef={mobileScrollRef} />
           <div className="max-w-lg mx-auto space-y-6 medium-short:space-y-3 relative z-10">
@@ -978,7 +1003,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
         {/* Floating bottom bar — always-visible sticky CTA */}
         {gameCode && onReturnToRoom && !isDesktopViewport && (
-          <div className="shrink-0 fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-50 text-neo-cream">
+          <div ref={setStickyBarRef} className="shrink-0 fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-50 text-neo-cream">
             <m.div
               initial={{ y: 60, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -1032,7 +1057,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
       {/* DESKTOP Sticky Ready Bar — pinned to bottom on md+ screens */}
       {gameCode && onReturnToRoom && isDesktopViewport && (
-        <div className="fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black safe-area-pb">
+        <div ref={setStickyBarRef} className="fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black safe-area-pb">
           <div className="max-w-6xl mx-auto px-4 py-2.5">
             <StickyReadyBar
               isHost={isHost}
