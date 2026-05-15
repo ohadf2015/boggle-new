@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback, useRef } from 'react';
+import Image from 'next/image';
 import { BlastGame } from '@/components/blast/v2/BlastGame';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { BlastLevel } from '@/lib/blast/v2/types';
@@ -44,10 +45,39 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
     }
   }, [level.levelNumber, level.locale]);
 
+  const handleRestart = useCallback(() => {
+    setLevel(initialLevel);
+    setReachedEnd(false);
+    advancingRef.current = false;
+  }, [initialLevel]);
+
   if (reachedEnd) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#0b1530] text-white">
-        <p className="font-neo-display text-2xl">{t('blast.moreLevelsComingSoon')}</p>
+      <div className="flex min-h-dvh items-center justify-center bg-[#0b1530] text-white px-6">
+        <div className="flex flex-col items-center gap-5 max-w-sm text-center">
+          <div className="relative w-40 h-40 animate-neo-pop">
+            <Image
+              src="/mascot/trophy-nobg.webp"
+              alt=""
+              fill
+              sizes="160px"
+              priority
+              className="object-contain drop-shadow-[3px_3px_0_#000]"
+            />
+          </div>
+          <h1 className="font-neo-display text-3xl leading-tight">
+            {t('blast.allCleared')}
+          </h1>
+          <p className="font-neo-body text-base text-white/80">
+            {t('blast.moreLevelsComingSoon')}
+          </p>
+          <button
+            onClick={handleRestart}
+            className="mt-2 px-6 py-3 bg-neo-lime border-neo-thick border-black rounded-neo font-neo-display text-lg text-black shadow-hard hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-hard-pressed transition-transform"
+          >
+            {t('blast.playAgain')}
+          </button>
+        </div>
       </div>
     );
   }

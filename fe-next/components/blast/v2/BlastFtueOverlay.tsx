@@ -126,19 +126,17 @@ export function BlastFtueOverlay({ onComplete, isVeteran, step = 1 }: Props) {
   );
 }
 
-// Cartoon finger pointing UP that drifts horizontally across the bottom-third
-// of the screen, miming a "swipe across letters" gesture. Pixel-art friendly
-// neo-brutalist stroke, no blur or gradient.
+// Anatomical pointing hand drifting across the board to mime a "swipe" gesture.
+// Index finger extended up, other fingers curled into the palm, thumb tucked,
+// blue sleeve cuff. A pulsing touch ring above the fingertip telegraphs the
+// tap target. Neo-brutalist: solid fills, 3px black stroke, hard drop shadow.
 function AnimatedFinger() {
   return (
-    <m.svg
+    <m.div
       data-testid="blast-ftue-finger"
       aria-hidden
-      width="56"
-      height="64"
-      viewBox="0 0 56 64"
-      className="absolute left-1/2 -translate-x-1/2 pointer-events-none drop-shadow-[2px_2px_0_#000]"
-      style={{ bottom: '28%' }}
+      className="absolute left-1/2 pointer-events-none"
+      style={{ bottom: '28%', marginLeft: -32 }}
       initial={{ x: -90, opacity: 0 }}
       animate={{
         x: [-90, 90, -90],
@@ -151,12 +149,40 @@ function AnimatedFinger() {
         times: [0, 0.15, 0.85, 1],
       }}
     >
-      {/* Wrist */}
-      <rect x="14" y="32" width="28" height="28" rx="6" fill="#FFE135" stroke="#000" strokeWidth="3" />
-      {/* Finger */}
-      <rect x="22" y="6" width="12" height="32" rx="6" fill="#FFE135" stroke="#000" strokeWidth="3" />
-      {/* Nail highlight */}
-      <rect x="25" y="9" width="6" height="4" rx="2" fill="#FFFFFF" />
-    </m.svg>
+      <svg
+        width="64"
+        height="84"
+        viewBox="0 0 64 84"
+        className="drop-shadow-[3px_3px_0_#000]"
+      >
+        {/* Pulsing touch ring above the fingertip */}
+        <m.circle
+          cx="32"
+          cy="9"
+          r={7}
+          fill="none"
+          stroke="#FFE135"
+          strokeWidth="2.5"
+          initial={{ opacity: 0.95 }}
+          animate={{ r: [6, 11, 6], opacity: [0.95, 0.25, 0.95] }}
+          transition={{ duration: 1.1, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        {/* Blue sleeve cuff */}
+        <rect x="8" y="66" width="48" height="16" rx="4" fill="#3B82F6" stroke="#000" strokeWidth="3" />
+        {/* Palm body */}
+        <rect x="14" y="40" width="36" height="30" rx="10" fill="#FFD8B0" stroke="#000" strokeWidth="3" />
+        {/* Curled middle-finger knuckle bump peeking above the palm */}
+        <circle cx="42" cy="40" r="6" fill="#FFD8B0" stroke="#000" strokeWidth="3" />
+        {/* Thumb tucked at the side */}
+        <ellipse cx="12" cy="50" rx="7" ry="10" fill="#FFD8B0" stroke="#000" strokeWidth="3" />
+        {/* Extended index finger pointing up */}
+        <rect x="26" y="10" width="14" height="38" rx="7" fill="#FFD8B0" stroke="#000" strokeWidth="3" />
+        {/* Knuckle crease lines */}
+        <path d="M27 24 H39" stroke="#000" strokeWidth="1.5" strokeLinecap="round" opacity="0.45" />
+        <path d="M27 34 H39" stroke="#000" strokeWidth="1.5" strokeLinecap="round" opacity="0.45" />
+        {/* Nail */}
+        <rect x="29" y="14" width="8" height="5" rx="2" fill="#FFF6E0" stroke="#000" strokeWidth="1.5" />
+      </svg>
+    </m.div>
   );
 }

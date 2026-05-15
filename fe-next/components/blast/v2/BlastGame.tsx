@@ -373,6 +373,7 @@ export function BlastGame({
             no longer collapses to a thin strip at the bottom of the screen. */}
         <div
           className="relative w-full max-w-[min(96vw,520px)] h-full mx-auto flex items-stretch justify-center"
+          style={{ zIndex: 10 }}
         >
         <BlastBoard
           level={state.level}
