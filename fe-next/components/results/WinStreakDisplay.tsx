@@ -71,7 +71,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
 
       // Trigger celebration confetti (skip in reduced-motion)
       if (!reducedMotion) fireConfetti({
-        particleCount: 50,
+        particleCount: 20,
         spread: 60,
         origin: { y: 0.7 },
         colors: ['#FFD700', '#FFA500', '#FF6347'],

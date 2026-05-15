@@ -78,7 +78,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
       setCelebrationFired(true);
       setTimeout(() => {
         fireConfetti({
-          particleCount: 60,
+          particleCount: 25,
           spread: 50,
           origin: { y: 0.7 },
           colors: ['#FFE135', '#FF6B35', '#00FFFF', '#a855f7'],

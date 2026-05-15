@@ -14,41 +14,27 @@ import { RANK_CONFIG } from '@/utils/rankingStyles';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import { ScoreCountUp } from '@/components/results/shared';
 
-// Fire confetti burst for a specific rank with custom origin
+// Fire confetti burst for a specific rank with custom origin.
+// Tuned down 2026-05-15: prior 80-particle x 4-volley burst per rank was overwhelming on MP results.
 const fireConfettiForRank = (rank: number, intensity: number = 1): void => {
-  const count = Math.floor(80 * intensity);
+  const count = Math.floor(30 * intensity);
   const colors = RANK_COLORS[rank] || RANK_COLORS[1];
 
   // Different origin positions for each rank (left, center, right)
   const originX = rank === 1 ? 0.5 : rank === 2 ? 0.25 : 0.75;
 
   fireConfetti({
-    particleCount: Math.floor(count * 0.25),
-    spread: 26,
-    startVelocity: 45,
+    particleCount: Math.floor(count * 0.5),
+    spread: 45,
+    startVelocity: 40,
     origin: { x: originX, y: 0.6 },
     colors,
   });
   fireConfetti({
-    particleCount: Math.floor(count * 0.2),
-    spread: 50,
-    origin: { x: originX, y: 0.6 },
-    colors,
-  });
-  fireConfetti({
-    particleCount: Math.floor(count * 0.35),
+    particleCount: Math.floor(count * 0.5),
     spread: 80,
     decay: 0.91,
-    scalar: 0.8,
-    origin: { x: originX, y: 0.6 },
-    colors,
-  });
-  fireConfetti({
-    particleCount: Math.floor(count * 0.2),
-    spread: 100,
-    startVelocity: 25,
-    decay: 0.92,
-    scalar: 1.1,
+    scalar: 0.85,
     origin: { x: originX, y: 0.6 },
     colors,
   });
@@ -156,20 +142,13 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
   // Get top 3 participants
   const top3 = normalizedParticipants.slice(0, 3);
 
-  // Fire staggered confetti bursts for top 3 on mount
+  // Fire a single confetti burst for the winner on mount.
+  // Tuned 2026-05-15: previously fired 3 staggered bursts (all top-3); too overwhelming.
   useEffect(() => {
     if (!showConfetti || top3.length === 0 || reducedMotion) return;
 
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    top3.forEach((_, index) => {
-      const rank = index + 1;
-      const delay = 600 + index * 300;
-      const intensity = 1 - index * 0.2;
-      const timer = setTimeout(() => fireConfettiForRank(rank, intensity), delay);
-      timers.push(timer);
-    });
-
-    return () => timers.forEach(timer => clearTimeout(timer));
+    const timer = setTimeout(() => fireConfettiForRank(1, 1), 600);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showConfetti, top3.length]); // Intentionally using length, not full array - only re-fire when count changes
 
