@@ -17,7 +17,7 @@
       "locale": "he",
       "columns": 6,
       "decoyTiles": 0,
-      "chain": ["אגס", "בננה", "תות"]
+      "chain": ["תפוח", "ענב", "אגס"]
     },
     {
       "id": "he-chain-03",
@@ -31,20 +31,20 @@
     {
       "id": "he-chain-04",
       "levelNumber": 4,
-      "theme": "family",
+      "theme": "food",
       "locale": "he",
       "columns": 6,
       "decoyTiles": 0,
-      "chain": ["אמא", "אבא", "בן"]
+      "chain": ["לחמ", "אורז", "עוגה"]
     },
     {
       "id": "he-chain-05",
       "levelNumber": 5,
-      "theme": "animals",
+      "theme": "colors",
       "locale": "he",
       "columns": 6,
       "decoyTiles": 0,
-      "chain": ["סוס", "כלב", "זאב"]
+      "chain": ["אדומ", "כחול", "ירוק"]
     },
     {
       "id": "he-chain-06",
@@ -53,7 +53,7 @@
       "locale": "he",
       "columns": 6,
       "decoyTiles": 0,
-      "chain": ["צדף", "כריש"]
+      "chain": ["דג", "סרטנ", "כריש", "צדפה"]
     },
     {
       "id": "he-chain-07",
@@ -62,7 +62,7 @@
       "locale": "he",
       "columns": 7,
       "decoyTiles": 0,
-      "chain": ["שמש", "כוכב", "ירח"]
+      "chain": ["ירח", "כוכב", "שמש", "מאדימ"]
     },
     {
       "id": "he-chain-08",
@@ -98,7 +98,7 @@
       "locale": "he",
       "columns": 7,
       "decoyTiles": 0,
-      "chain": ["זברה", "פנדה", "קואלה"]
+      "chain": ["סוסה", "זברה", "פנדה", "קואלה", "נמיה"]
     },
     {
       "id": "he-chain-12",
@@ -107,7 +107,7 @@
       "locale": "he",
       "columns": 7,
       "decoyTiles": 0,
-      "chain": ["סלט", "גבינה"]
+      "chain": ["גבינה", "פסטה", "סלט", "דבש", "פלפל"]
     },
     {
       "id": "he-chain-13",
@@ -116,7 +116,7 @@
       "locale": "he",
       "columns": 6,
       "decoyTiles": 0,
-      "chain": ["נהר", "אבן"]
+      "chain": ["נהר", "חופ", "מערה", "אגמ", "יער"]
     },
     {
       "id": "he-chain-14",
@@ -125,7 +125,7 @@
       "locale": "he",
       "columns": 8,
       "decoyTiles": 0,
-      "chain": ["כוכב", "גלקסיה"]
+      "chain": ["כוכב", "גלקסיה", "מטאור", "רקטה", "מסלול"]
     },
     {
       "id": "he-chain-15",
@@ -134,7 +134,7 @@
       "locale": "he",
       "columns": 6,
       "decoyTiles": 0,
-      "chain": ["נמר", "פיל"]
+      "chain": ["קרנפ", "נמר", "פיל", "צבי", "יענ"]
     }
   ]
 }
