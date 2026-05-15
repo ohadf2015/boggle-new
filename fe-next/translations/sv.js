@@ -9037,6 +9037,10 @@ const sv = {
       "failHint": "Rensa minst 90% av brädet för att gå vidare",
       "tryAgain": "Försök igen",
       "share": "Dela",
+      "sceneTitle": "Blast-resultat",
+      "finalScore": "Slutpoäng",
+      "comboChain": "Combo",
+      "boardClears": "Rensningar",
       "brag": {
         "legend": "Legend",
         "elite": "Elit",
@@ -11969,6 +11973,8 @@ const sv = {
     }
   },
   mp: {
+    stopGameConfirm: "Avsluta spelet för alla?",
+    stopGameYes: "Avsluta spelet",
     kbHint: {
       submit: "skicka",
       pop: "ta bort sista",

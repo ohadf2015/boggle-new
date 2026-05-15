@@ -25,6 +25,7 @@ export class ScreenFlash {
   private flashes: ActiveFlash[] = [];
   private width: number;
   private height: number;
+  private _destroyed = false;
 
   constructor(parent: Container, width: number, height: number) {
     this.width = width;
@@ -70,6 +71,7 @@ export class ScreenFlash {
 
   /** Call each frame with delta in seconds */
   update(deltaSec: number): void {
+    if (this._destroyed) return;
     for (let i = this.flashes.length - 1; i >= 0; i--) {
       this.flashes[i].elapsed += deltaSec;
       if (this.flashes[i].elapsed >= this.flashes[i].duration) {
@@ -111,6 +113,7 @@ export class ScreenFlash {
   }
 
   destroy(): void {
+    this._destroyed = true;
     this.flashes = [];
     this.graphics.destroy();
   }

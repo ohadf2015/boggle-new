@@ -8841,6 +8841,10 @@ const en = {
       "failHint": "Clear at least 90% of the board to advance",
       "tryAgain": "Try Again",
       "share": "Share",
+      "sceneTitle": "Blast Results",
+      "finalScore": "Final Score",
+      "comboChain": "Combo",
+      "boardClears": "Clears",
       "brag": {
         "legend": "Legend",
         "elite": "Elite",
@@ -11868,6 +11872,8 @@ const en = {
     }
   },
   mp: {
+    stopGameConfirm: "End the game for everyone?",
+    stopGameYes: "End Game",
     kbHint: {
       submit: "submit",
       pop: "remove last",

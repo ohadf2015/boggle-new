@@ -29,6 +29,7 @@ export class TrailRenderer {
   private points: TrailPoint[] = [];
   private config: TrailConfig;
   private maxPts: number;
+  private _destroyed = false;
 
   constructor(parent: Container, config: TrailConfig) {
     this.config = config;
@@ -58,6 +59,7 @@ export class TrailRenderer {
 
   /** Call each frame with delta in seconds */
   update(deltaSec: number): void {
+    if (this._destroyed) return;
     // Age all points and remove expired ones
     for (let i = this.points.length - 1; i >= 0; i--) {
       this.points[i].age += deltaSec;
@@ -70,6 +72,7 @@ export class TrailRenderer {
   }
 
   destroy(): void {
+    this._destroyed = true;
     this.points = [];
     this.graphics.destroy();
   }

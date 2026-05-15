@@ -9111,6 +9111,10 @@ const es = {
       "failHint": "Despeja al menos el 90% del tablero para avanzar",
       "tryAgain": "Intentar de Nuevo",
       "share": "Compartir",
+      "sceneTitle": "Resultados Blast",
+      "finalScore": "Puntuación final",
+      "comboChain": "Combo",
+      "boardClears": "Limpiadas",
       "brag": {
         "legend": "Leyenda",
         "elite": "Élite",
@@ -12105,6 +12109,8 @@ const es = {
     "adminGiveUp": "Saltar puzzle (admin)"
   },
   "mp": {
+    "stopGameConfirm": "¿Terminar el juego para todos?",
+    "stopGameYes": "Terminar juego",
     "kbHint": {
       "submit": "enviar",
       "pop": "borrar última",

@@ -9063,6 +9063,10 @@ const ja = {
       "failHint": "進むにはボードの90%以上をクリアしてください",
       "tryAgain": "もう一度",
       "share": "共有",
+      "sceneTitle": "ブラスト結果",
+      "finalScore": "最終スコア",
+      "comboChain": "コンボ",
+      "boardClears": "クリア",
       "brag": {
         "legend": "レジェンド",
         "elite": "エリート",
@@ -11943,6 +11947,8 @@ const ja = {
     }
   },
   mp: {
+    stopGameConfirm: "全員のゲームを終了しますか？",
+    stopGameYes: "ゲーム終了",
     kbHint: {
       submit: "送信",
       pop: "末尾削除",

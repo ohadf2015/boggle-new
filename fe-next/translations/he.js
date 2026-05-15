@@ -9017,6 +9017,10 @@ const he = {
       "failHint": "יש לנקות לפחות 90% מהלוח כדי להתקדם",
       "tryAgain": "נסה שוב",
       "share": "שתף",
+      "sceneTitle": "תוצאות בלאסט",
+      "finalScore": "ניקוד סופי",
+      "comboChain": "קומבו",
+      "boardClears": "ניקויים",
       "brag": {
         "legend": "אגדה",
         "elite": "עילית",
@@ -12066,6 +12070,8 @@ const he = {
     }
   },
   mp: {
+    stopGameConfirm: "לסיים את המשחק לכולם?",
+    stopGameYes: "סיים משחק",
     kbHint: {
       submit: "שלח",
       pop: "מחק אחרון",
