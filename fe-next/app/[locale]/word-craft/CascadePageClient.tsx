@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
@@ -9,6 +9,9 @@ import { useCascadeRun } from '@/lib/word-craft/cascade/useCascadeRun';
 import { CascadeBoard } from '@/components/word-craft/cascade/CascadeBoard';
 import { CascadeHUD } from '@/components/word-craft/cascade/CascadeHUD';
 import { CascadeJuiceLayer } from '@/components/word-craft/cascade/CascadeJuiceLayer';
+import { useCascadePixi } from '@/components/word-craft/cascade/useCascadePixi';
+import { WordCraftPixiStage } from '@/components/word-craft/WordCraftPixiStage';
+import type { SceneCtx } from '@/lib/word-craft/pixi/sceneCtx';
 import { CardPickScreen } from '@/components/word-craft/run/CardPickScreen';
 import { RoundResultScene } from '@/components/word-craft/run/RoundResultScene';
 import { RunResultScene } from '@/components/word-craft/run/RunResultScene';
@@ -187,8 +190,36 @@ export function CascadePageClient() {
     );
   }
 
-  // playing
+  // playing — Pixi feel layer (lazy, degrades silently)
   const burnedIds = state.lastSubmit?.burnedCellIds ?? [];
+  return <CascadePlayingView state={state} run={run} t={t} burnedIds={burnedIds} />;
+}
+
+interface PlayingViewProps {
+  state: ReturnType<typeof useCascadeRun>['state'];
+  run: ReturnType<typeof useCascadeRun>;
+  t: ReturnType<typeof useLanguage>['t'];
+  burnedIds: string[];
+}
+
+function CascadePlayingView({ state, run, t, burnedIds }: PlayingViewProps) {
+  const boardRef = useRef<HTMLDivElement | null>(null);
+  const [sceneCtx, setSceneCtx] = useState<SceneCtx | null>(null);
+  const onPixiReady = useCallback((ctx: SceneCtx) => setSceneCtx(ctx), []);
+  const reducedMotion = useMemo(
+    () =>
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true,
+    [],
+  );
+
+  useCascadePixi({
+    sceneCtx,
+    grid: state.grid,
+    lastSubmit: state.lastSubmit,
+    gameOver: state.fire.fireRow >= state.fire.totalRows,
+  });
+
   return (
     <div className="flex flex-col gap-3 p-3">
       <CascadeHUD
@@ -201,13 +232,18 @@ export function CascadePageClient() {
         fireTotalRows={state.fire.totalRows}
         comboCount={state.cascadeChainsThisRound}
       />
-      <div className="relative">
+      <div ref={boardRef} className="relative">
         <CascadeBoard
           grid={state.grid}
           diagonal={state.activeCards.some((c) => c.id === 'diagonal')}
           onSubmitPath={run.submitPath}
           recentlyBurnedIds={burnedIds}
           fireRow={state.fire.fireRow}
+        />
+        <WordCraftPixiStage
+          boardRef={boardRef}
+          reducedMotion={reducedMotion}
+          onReady={onPixiReady}
         />
         <CascadeJuiceLayer
           comboCount={state.cascadeChainsThisRound}

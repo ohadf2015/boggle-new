@@ -75,6 +75,7 @@ export function CascadeBoard({
             data-cell-id={cell.id}
             data-row={coords?.row}
             data-col={coords?.col}
+            data-board-cell={coords ? `${coords.row},${coords.col}` : undefined}
             className={clsx(
               'relative flex items-center justify-center',
               'rounded-neo border-neo border-black',
