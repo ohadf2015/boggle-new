@@ -274,8 +274,9 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     };
   }, [deferredLeaderboard, username]);
 
-  // Lead change detection
-  const leadChangeEvent = useLeadChangeDetection(leaderboard, username);
+  // Lead change detection — use deferred leaderboard so socket burst updates
+  // don't churn this hook + downstream sound effects during active drag.
+  const leadChangeEvent = useLeadChangeDetection(deferredLeaderboard, username);
 
   // Play sound on lead change
   useEffect(() => {
@@ -524,7 +525,6 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     earthquakeState,
     playerScore: playerData.score,
     playerRank: playerData.rank,
-    leaderboard,
     currentFeedback,
     isTypingMode: keyboardInput.isTypingMode,
     typedWord: keyboardInput.typedWord,

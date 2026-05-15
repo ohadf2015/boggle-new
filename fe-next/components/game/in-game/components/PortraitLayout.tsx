@@ -80,7 +80,12 @@ interface PortraitLayoutProps {
   // Player data
   playerScore: number;
   playerRank: number | null;
-  leaderboard: LeaderboardPlayer[];
+  /**
+   * Deferred leaderboard — consumed by all in-game derivations. Raw
+   * `leaderboard` is intentionally not threaded here so socket-burst updates
+   * don't propagate through this subtree mid-drag. Lead-change detection
+   * already runs in InGameScreen against the same deferred value.
+   */
   deferredLeaderboard: LeaderboardPlayer[];
   foundWords: FoundWord[];
 
@@ -185,7 +190,6 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   gameplayFocusMode,
   playerScore,
   playerRank,
-  leaderboard,
   deferredLeaderboard,
   foundWords,
   currentFeedback,
@@ -230,14 +234,15 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   // Combo event for leaderboard badges (from Zustand blastComboSync)
   const blastComboSync = useBlastComboSync();
 
-  // Derive avatar map from leaderboard for WordHunt player lives
+  // Derive avatar map from leaderboard for WordHunt player lives.
+  // Use deferred so socket-burst leaderboard updates don't recompute mid-drag.
   const playerAvatars = useMemo(() => {
-    const map: Record<string, typeof leaderboard[0]['avatar']> = {};
-    for (const p of leaderboard) {
+    const map: Record<string, typeof deferredLeaderboard[0]['avatar']> = {};
+    for (const p of deferredLeaderboard) {
       map[p.username] = p.avatar;
     }
     return map;
-  }, [leaderboard]);
+  }, [deferredLeaderboard]);
   const hapticsEnabled = useHapticsEnabled();
   const reduceMotion = useShouldReduceMotion();
 
@@ -247,7 +252,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
     [foundWords],
   );
   const compactLeaderboardPlayers = useMemo(
-    () => leaderboard.map((p) => ({
+    () => deferredLeaderboard.map((p) => ({
       username: p.username,
       score: p.score,
       rank: 0,
@@ -255,7 +260,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
       customAvatar: p.avatar?.customAvatar,
       inputMethod: p.username === username && isTypingMode ? 'keyboard' as const : null,
     })),
-    [leaderboard, username, isTypingMode],
+    [deferredLeaderboard, username, isTypingMode],
   );
 
   // Track floating score animation
@@ -465,7 +470,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                     <ScoreDisplay
                       score={playerScore}
                       rank={playerRank}
-                      leaderboardSize={leaderboard.length}
+                      leaderboardSize={deferredLeaderboard.length}
                       minWordLength={minWordLength}
                       t={t}
                       variant="mobile"
@@ -501,7 +506,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                     <ScoreDisplay
                       score={playerScore}
                       rank={playerRank}
-                      leaderboardSize={leaderboard.length}
+                      leaderboardSize={deferredLeaderboard.length}
                       minWordLength={minWordLength}
                       t={t}
                       variant="desktop"
@@ -651,7 +656,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               so single-player users can see their progress. */}
           {isPlaying && !gameplayFocusMode && (
             <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto md:space-y-1 shrink overflow-y-auto min-h-0 max-h-[120px] sm:max-h-[140px] medium-short:max-h-[88px] short:max-h-[80px] scrollbar-thin">
-              {leaderboard && leaderboard.length > 0 && (
+              {deferredLeaderboard && deferredLeaderboard.length > 0 && (
                 <CompactLeaderboard
                   players={compactLeaderboardPlayers}
                   currentUsername={username}
@@ -671,7 +676,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         {!gameplayFocusMode && (
           <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 shrink-0 min-h-0 overflow-y-auto">
             {/* Live race-track leaderboard with avatars (multiplayer only) */}
-            {leaderboard && leaderboard.length > 1 && (
+            {deferredLeaderboard && deferredLeaderboard.length > 1 && (
               <CompactLeaderboard
                 players={compactLeaderboardPlayers}
                 currentUsername={username}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect, useMemo, useRef, memo } from 'react';
 import type { SelectedCell } from './types';
 
 interface Props {
@@ -11,31 +11,68 @@ interface Props {
 
 interface Point { x: number; y: number; }
 
+/**
+ * Renders SVG connector line between selected cells during drag.
+ *
+ * Perf: per-cell getBoundingClientRect on every selection change forced a
+ * synchronous layout flush per drag step. On mid-tier mobile during MP
+ * classic, this stacked with socket-burst re-renders into visible drag
+ * stutter. We now measure each cell's center once on mount and on resize,
+ * cache by `${row}-${col}`, and look up by key during drag — zero layout
+ * reads per drag tick.
+ */
 const GridConnectorOverlay = memo<Props>(({ selectedCells, gridEl, color = '#BFFF00' }) => {
-  const [points, setPoints] = useState<Point[]>([]);
   const [size, setSize] = useState({ w: 0, h: 0 });
+  const centersRef = useRef<Map<string, Point>>(new Map());
+  const [measureTick, setMeasureTick] = useState(0);
 
   useEffect(() => {
     if (!gridEl) return;
-    const update = () => setSize({ w: gridEl.offsetWidth, h: gridEl.offsetHeight });
-    update();
-    const ro = new ResizeObserver(update);
+    let raf = 0;
+
+    const measure = () => {
+      const gridRect = gridEl.getBoundingClientRect();
+      setSize({ w: gridEl.offsetWidth, h: gridEl.offsetHeight });
+      const map = new Map<string, Point>();
+      const cells = gridEl.querySelectorAll<HTMLElement>('[data-row][data-col]');
+      cells.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        const key = `${el.dataset.row}-${el.dataset.col}`;
+        map.set(key, {
+          x: r.left - gridRect.left + r.width / 2,
+          y: r.top - gridRect.top + r.height / 2,
+        });
+      });
+      centersRef.current = map;
+      setMeasureTick((t) => t + 1);
+    };
+
+    measure();
+    raf = requestAnimationFrame(measure);
+
+    const ro = new ResizeObserver(measure);
     ro.observe(gridEl);
-    return () => ro.disconnect();
+
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
   }, [gridEl]);
 
-  useEffect(() => {
-    if (!gridEl || selectedCells.length < 2) { setPoints([]); return; }
-    const gridRect = gridEl.getBoundingClientRect();
+  const points = useMemo<Point[]>(() => {
+    // measureTick is the explicit invalidation signal for centersRef.current
+    // (a mutable ref ESLint can't reason about). Reading it here keeps the
+    // exhaustive-deps rule happy + makes the cache-bust intent obvious.
+    void measureTick;
+    if (!gridEl || selectedCells.length < 2) return [];
     const pts: Point[] = [];
+    const centers = centersRef.current;
     for (const cell of selectedCells) {
-      const el = gridEl.querySelector(`[data-row="${cell.row}"][data-col="${cell.col}"]`) as HTMLElement | null;
-      if (!el) continue;
-      const r = el.getBoundingClientRect();
-      pts.push({ x: r.left - gridRect.left + r.width / 2, y: r.top - gridRect.top + r.height / 2 });
+      const p = centers.get(`${cell.row}-${cell.col}`);
+      if (p) pts.push(p);
     }
-    setPoints(pts);
-  }, [selectedCells, gridEl]);
+    return pts;
+  }, [selectedCells, gridEl, measureTick]);
 
   if (!gridEl || points.length < 2) return null;
 
