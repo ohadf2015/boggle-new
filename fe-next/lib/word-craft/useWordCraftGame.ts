@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
-import { createBoard, getCell, isFirstMove, type Board } from './board';
+import { createBoard, getCell, isFirstMove, type Board, type BoardSize } from './board';
 import { createBag, draw, RACK_SIZE, remaining, swap as swapBag, type SupportedLocale, type TileBag } from './tileBag';
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 import { findBestBotMove } from './botMove';
@@ -51,7 +51,7 @@ type Action =
 
 const BOT_NAME = 'WordBot';
 
-function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale; viewportDims?: { size: 11 | 13 | 15; bagSize: number } }): WordCraftState {
+function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale; viewportDims?: { size: BoardSize; bagSize: number } }): WordCraftState {
   const seed = typeof init === 'number' ? init : init.seed;
   const boardSize = typeof init === 'number' ? 15 : (init.boardSize ?? 15);
   const locale = typeof init === 'number' ? 'en' : (init.locale ?? 'en');
