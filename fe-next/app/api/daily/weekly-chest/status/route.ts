@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
-import { computeCycleProgress } from '@/lib/daily/weeklyChest'
+import {
+  computeCycleProgress,
+  computeChestTierForCycle,
+  type HuntScoreRow,
+  type WheelScoreRow,
+} from '@/lib/daily/weeklyChest'
 import logger from '@/utils/logger'
 
 /**
@@ -37,12 +42,12 @@ export async function GET() {
         .gt('word_count', 0),
       supabase
         .from('daily_word_hunt_attempts')
-        .select('puzzle_date')
+        .select('puzzle_date,efficiency_score')
         .eq('player_id', user.id)
         .eq('solved', true),
       supabase
         .from('daily_word_wheel_attempts')
-        .select('puzzle_date')
+        .select('puzzle_date,score,time_seconds')
         .eq('player_id', user.id)
         .gt('word_count', 0),
     ])
@@ -56,6 +61,14 @@ export async function GET() {
 
     // Compute cycle progress
     const progress = computeCycleProgress(allDates, today)
+
+    // Projected tier — what tier the chest would be if claimed right now, based
+    // on the player's performance so far this cycle. Lets the UI stop guessing.
+    const { weekScore, tier: projectedTier } = computeChestTierForCycle(
+      progress.completedDates,
+      (huntRes.data ?? []) as HuntScoreRow[],
+      (wheelRes.data ?? []) as WheelScoreRow[],
+    )
 
     // Check for existing chest in this cycle
     const { data: existingChests } = await supabase
@@ -83,6 +96,8 @@ export async function GET() {
       daysCompleted: progress.daysCompleted,
       isClaimable,
       pendingChest,
+      weekScore,
+      projectedTier,
     })
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)

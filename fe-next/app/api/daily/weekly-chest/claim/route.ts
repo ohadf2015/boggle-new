@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import {
   computeCycleProgress,
-  computeWeekScore,
-  getChestTier,
-  type DayScore,
+  computeChestTierForCycle,
+  type HuntScoreRow,
+  type WheelScoreRow,
 } from '@/lib/daily/weeklyChest'
 import { selectChestPrize } from '@/lib/daily/chestPrizePool'
 import { awardCoinsServer } from '@/backend/services/economy/awardCoins'
@@ -61,32 +61,11 @@ export async function POST() {
     return NextResponse.json({ error: 'Already claimed' }, { status: 409 })
   }
 
-  const cycleDateSet = new Set(progress.completedDates)
-  const scores: DayScore[] = [
-    ...(huntRes.data ?? [])
-      .filter((r: { puzzle_date: string }) => cycleDateSet.has(r.puzzle_date))
-      .map(
-        (r: { efficiency_score: number }) =>
-          ({
-            mode: 'word_hunt' as const,
-            rawScore: r.efficiency_score ?? 0,
-            timeSeconds: null,
-          }) satisfies DayScore
-      ),
-    ...(wheelRes.data ?? [])
-      .filter((r: { puzzle_date: string }) => cycleDateSet.has(r.puzzle_date))
-      .map(
-        (r: { score: number; time_seconds: number }) =>
-          ({
-            mode: 'word_wheel' as const,
-            rawScore: r.score ?? 0,
-            timeSeconds: r.time_seconds,
-          }) satisfies DayScore
-      ),
-  ]
-
-  const weekScore = computeWeekScore(scores)
-  const tier = getChestTier(weekScore)
+  const { weekScore, tier } = computeChestTierForCycle(
+    progress.completedDates,
+    (huntRes.data ?? []) as HuntScoreRow[],
+    (wheelRes.data ?? []) as WheelScoreRow[],
+  )
 
   // Deterministic seed → retry-safe (same user + cycle = same prize).
   const prize = selectChestPrize(tier, `${user.id}::${progress.cycleStart}`)

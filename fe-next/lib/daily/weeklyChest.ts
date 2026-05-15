@@ -30,6 +30,39 @@ export function computeWeekScore(scores: DayScore[]): number {
   return Math.round(normalized.reduce((a, b) => a + b, 0) / normalized.length)
 }
 
+export interface HuntScoreRow {
+  puzzle_date: string
+  efficiency_score: number | null
+}
+
+export interface WheelScoreRow {
+  puzzle_date: string
+  score: number | null
+  time_seconds: number | null
+}
+
+// Compute the chest tier (and underlying week score) for a cycle, given the
+// completed dates in that cycle plus the raw score rows. Only rows whose
+// puzzle_date falls inside `completedDates` contribute. Shared by the claim
+// route (final tier) and the status route (projected tier).
+export function computeChestTierForCycle(
+  completedDates: string[],
+  huntRows: HuntScoreRow[],
+  wheelRows: WheelScoreRow[],
+): { weekScore: number; tier: ChestTier } {
+  const cycleDateSet = new Set(completedDates)
+  const scores: DayScore[] = [
+    ...huntRows
+      .filter(r => cycleDateSet.has(r.puzzle_date))
+      .map(r => ({ mode: 'word_hunt' as const, rawScore: r.efficiency_score ?? 0, timeSeconds: null })),
+    ...wheelRows
+      .filter(r => cycleDateSet.has(r.puzzle_date))
+      .map(r => ({ mode: 'word_wheel' as const, rawScore: r.score ?? 0, timeSeconds: r.time_seconds })),
+  ]
+  const weekScore = computeWeekScore(scores)
+  return { weekScore, tier: getChestTier(weekScore) }
+}
+
 // allCompletedDates: all ISO dates the player ever finished a daily (any mode)
 // today: ISO date string (YYYY-MM-DD)
 export function computeCycleProgress(

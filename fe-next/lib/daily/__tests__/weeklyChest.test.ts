@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { computeCycleProgress, computeWeekScore, getChestTier } from '../weeklyChest'
+import {
+  computeCycleProgress,
+  computeWeekScore,
+  getChestTier,
+  computeChestTierForCycle,
+} from '../weeklyChest'
 
 describe('getChestTier', () => {
   it('returns bronze for score < 40', () => expect(getChestTier(39)).toBe('bronze'))
@@ -71,5 +76,46 @@ describe('computeWeekScore', () => {
 
   it('treats zero time_seconds as 0 score for timed modes', () => {
     expect(computeWeekScore([{ mode: 'word_wheel', rawScore: 500, timeSeconds: 0 }])).toBe(0)
+  })
+})
+
+describe('computeChestTierForCycle', () => {
+  it('returns bronze + score 0 when no rows fall in the cycle', () => {
+    const r = computeChestTierForCycle([], [], [])
+    expect(r).toEqual({ weekScore: 0, tier: 'bronze' })
+  })
+
+  it('only counts rows whose puzzle_date is in the cycle', () => {
+    const r = computeChestTierForCycle(
+      ['2026-05-10', '2026-05-11'],
+      [
+        { puzzle_date: '2026-05-10', efficiency_score: 80 },
+        { puzzle_date: '2026-05-11', efficiency_score: 60 },
+        { puzzle_date: '2026-05-01', efficiency_score: 100 }, // outside cycle — ignored
+      ],
+      [],
+    )
+    expect(r.weekScore).toBe(70)
+    expect(r.tier).toBe('silver')
+  })
+
+  it('combines word_hunt and word_wheel rows', () => {
+    const r = computeChestTierForCycle(
+      ['2026-05-10', '2026-05-11'],
+      [{ puzzle_date: '2026-05-10', efficiency_score: 100 }],
+      [{ puzzle_date: '2026-05-11', score: 600, time_seconds: 60 }],
+    )
+    expect(r.weekScore).toBe(100)
+    expect(r.tier).toBe('gold')
+  })
+
+  it('tolerates null score fields', () => {
+    const r = computeChestTierForCycle(
+      ['2026-05-10'],
+      [{ puzzle_date: '2026-05-10', efficiency_score: null }],
+      [],
+    )
+    expect(r.weekScore).toBe(0)
+    expect(r.tier).toBe('bronze')
   })
 })

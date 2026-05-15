@@ -12,6 +12,8 @@ export interface PendingChest {
   labelKey?: string
 }
 
+export type ChestTier = 'bronze' | 'silver' | 'gold'
+
 export interface WeeklyChestState {
   loading: boolean
   daysCompleted: number
@@ -20,6 +22,10 @@ export interface WeeklyChestState {
   cycleNumber: number
   isClaimable: boolean
   pendingChest: PendingChest | null
+  /** Tier the chest would be if claimed right now, based on performance so far. */
+  projectedTier: ChestTier
+  /** 0-100 average performance score across this cycle's completed days. */
+  weekScore: number
   claim: () => Promise<PendingChest | null>
   refresh: () => void
 }
@@ -31,6 +37,8 @@ const DEFAULTS = {
   cycleNumber: 1,
   isClaimable: false,
   pendingChest: null as PendingChest | null,
+  projectedTier: 'bronze' as ChestTier,
+  weekScore: 0,
 }
 
 // Coerce server payloads (or error responses) into the strict shape the UI expects.
@@ -51,7 +59,24 @@ function normalizeStatus(json: unknown): typeof DEFAULTS {
   const pc = obj.pendingChest && typeof obj.pendingChest === 'object'
     ? (obj.pendingChest as PendingChest)
     : null
-  return { daysCompleted, completedDates, cycleStart, cycleNumber, isClaimable, pendingChest: pc }
+  const projectedTier: ChestTier =
+    obj.projectedTier === 'gold' || obj.projectedTier === 'silver' || obj.projectedTier === 'bronze'
+      ? obj.projectedTier
+      : 'bronze'
+  const rawWeekScore = Number(obj.weekScore)
+  const weekScore = Number.isFinite(rawWeekScore)
+    ? Math.max(0, Math.min(100, Math.round(rawWeekScore)))
+    : 0
+  return {
+    daysCompleted,
+    completedDates,
+    cycleStart,
+    cycleNumber,
+    isClaimable,
+    pendingChest: pc,
+    projectedTier,
+    weekScore,
+  }
 }
 
 export function useWeeklyChest(): WeeklyChestState {
