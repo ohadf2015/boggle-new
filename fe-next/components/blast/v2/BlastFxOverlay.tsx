@@ -255,13 +255,18 @@ export function BlastFxOverlay({
 
       appInstance = app;
 
-      const physics = new PhysicsWorld({ gravity: { x: 0, y: 400 }, gravityScale: 0.001 });
+      // Gravity tuned for "real chunks of tile" feel — y=1.4 with default
+      // scale 0.001 reads as roughly 1.4 px/ms² acceleration on debris,
+      // which gives a satisfying weight without overshoot. Heavier than the
+      // prior 400 because that was paired with a delta-units bug that fed
+      // the solver ~0.016 ms/frame, undersampling gravity by 1000×.
+      const physics = new PhysicsWorld({ gravity: { x: 0, y: 1.4 }, gravityScale: 0.001 });
       const particles = new ParticlePool(app.stage);
       const debris = new PhysicsDebris(app.stage, physics, {
         floorY: app.screen.height,
-        maxDebris: 80,
-        maxAge: 2.4,
-        pieceSize: 6,
+        maxDebris: 120,
+        maxAge: 2.6,
+        pieceSize: 8,
       });
       const shake = new ScreenShake();
       const scoreFly = new ScoreFlyManager(app.stage);
@@ -289,7 +294,10 @@ export function BlastFxOverlay({
 
       const tick = (ticker: any) => {
         const deltaSec = ticker.deltaMS / 1000;
-        physics.update(deltaSec);
+        // PhysicsWorld.update expects ms (Matter.js convention); everything
+        // else takes seconds. Mixing these previously fed 0.016 to the
+        // solver every frame, which made debris float instead of fall.
+        physics.update(ticker.deltaMS);
         particles.update(deltaSec);
         debris.update(deltaSec);
         shake.update(deltaSec);
@@ -358,7 +366,11 @@ export function BlastFxOverlay({
       particles.burst(ELECTRIC_RINGS, lx, ly, 10);
       particles.burst(CASCADE_SPARKLE, lx, ly, 6);
       particles.burst(BLAST_LETTER_POP, lx, ly, 14);
-      debris.spawn(lx, ly, tintColor, 10);
+      debris.spawn(lx, ly, tintColor, 16);
+      // Radial explosion force gives the new debris pieces an outward kick
+      // before gravity takes over — reads as a real shatter instead of a
+      // gravity-only sprinkle.
+      systems.physics.applyExplosion({ x: lx, y: ly }, 0.06, 140);
       spawnPulseRing(app, systems, lx, ly, tintColor);
       // RGB-split shockwave wrap on word found — extra polish over the solid
       // pulse ring. Only fire on the FIRST cell of a clear group to avoid

@@ -13,7 +13,6 @@ import { useUserStats } from '@/hooks/useUserStats';
 import { THRESHOLDS } from '@/utils/featureGates';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAuth } from '@/contexts/AuthContext';
-import { useExperiment } from '@/hooks/useExperiment';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 
 interface DailyChallengePreloadedStats {
@@ -67,14 +66,6 @@ const cardDelay = (index: number) => `${index * 0.07}s`;
 
 /** Modes with no content for Japanese locale — hidden from hub */
 const JA_HIDDEN_MODES = new Set<LandingCardKey>(['connections', 'wordCraft']);
-
-/**
- * Low-volume modes hidden when the `home-hide-dead-modes` experiment lands
- * on `hide-low-volume`. PostHog 14d had `connections` at 12 plays / 5 users
- * and `adventure` at 9 / 4 — both effectively dead and stealing real estate
- * from the top-volume modes (word-hunt, classic, blast).
- */
-const LOW_VOLUME_MODES = new Set<LandingCardKey>(['connections', 'adventure']);
 
 export function LandingChallengeCards({
   language,
@@ -170,23 +161,7 @@ export function LandingChallengeCards({
     : (['daily', ...practiceFiltered.filter((m) => m !== 'daily')] as LandingCardKey[]);
   // Final step: cull to the featured allowlist so landing shows a small,
   // high-intent set instead of every available mode.
-  const featuredFiltered: LandingCardKey[] = orderedBeforeFeatured.filter((m) => FEATURED_MODES.has(m));
-
-  // home-hide-dead-modes experiment: when the variant is `hide-low-volume`
-  // drop `connections` (and `adventure`, if it surfaced) from the grid so
-  // the top-volume modes get the row real estate. Exposure fires once when
-  // the cull actually changes the order to avoid polluting the bucket with
-  // sessions that never had a low-volume mode to hide.
-  const hideExp = useExperiment('home-hide-dead-modes');
-  const cardOrder: LandingCardKey[] = hideExp.variant === 'hide-low-volume'
-    ? featuredFiltered.filter((m) => !LOW_VOLUME_MODES.has(m))
-    : featuredFiltered;
-  if (
-    hideExp.variant === 'hide-low-volume' &&
-    cardOrder.length !== featuredFiltered.length
-  ) {
-    hideExp.trackExposure();
-  }
+  const cardOrder: LandingCardKey[] = orderedBeforeFeatured.filter((m) => FEATURED_MODES.has(m));
 
   /** Renders a card by mode key with staggered CSS animation */
   const renderCard = (mode: LandingCardKey, index: number) => {

@@ -2081,10 +2081,6 @@ const ja = {
     "newMessages": "新メッセージ"
   },
   "results": {
-    "playOneMore": {
-      "same": "もう一度プレイ",
-      "random": "別のモードを試す"
-    },
     "results": "バトルレポート",
     "share": "自慢する",
     "yourProgress": "今回の成績",
@@ -10707,9 +10703,6 @@ const ja = {
     label: "広告",
     rewarded: {
       watchForGold: "広告を見て+{amount}ゴールド",
-      watchForGoldDoubleXp: "ゴールド2倍 (+{amount})",
-      watchForGoldSkip: "今すぐ+{amount}ゴールド",
-      watchForGoldHint: "+{amount}ゴールド無料",
       earning: "視聴中...",
       earned: "+{amount}ゴールド獲得！",
       cooldown: "まもなく利用可能",

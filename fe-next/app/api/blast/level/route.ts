@@ -18,17 +18,29 @@ export async function GET(request: Request): Promise<Response> {
   }
   const locale = localeParam as Locale;
 
+  // Resolution chain: primary source → generator fallback. Chain & curated
+  // packs can fail to isolate words within their 500-attempt budget; when that
+  // happens we silently degrade to the generator instead of 404ing the player
+  // into a "more levels coming soon" dead-end mid-run.
+  const registry = buildRegistry();
+  const primary = getLevelSourceForLevel(levelNumber, locale, registry);
   try {
-    const registry = buildRegistry();
-    const level = await getLevelSourceForLevel(levelNumber, locale, registry).resolve(
-      levelNumber,
-      locale,
-    );
+    const level = await primary.resolve(levelNumber, locale);
     return NextResponse.json(level, {
       headers: { 'Cache-Control': 'public, max-age=3600' },
     });
-  } catch (error) {
-    console.error('[blast/level] resolve failed:', error);
+  } catch (primaryError) {
+    if (primary !== registry.generated) {
+      try {
+        const level = await registry.generated.resolve(levelNumber, locale);
+        return NextResponse.json(level, {
+          headers: { 'Cache-Control': 'public, max-age=3600' },
+        });
+      } catch (fallbackError) {
+        console.error('[blast/level] generator fallback failed:', fallbackError);
+      }
+    }
+    console.error('[blast/level] resolve failed:', primaryError);
     return NextResponse.json({ error: 'level not found' }, { status: 404 });
   }
 }

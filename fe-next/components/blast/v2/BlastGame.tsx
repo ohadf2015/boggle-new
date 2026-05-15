@@ -8,6 +8,7 @@ import { detectAlmostWords, detectAllCascades } from '@/lib/blast/v2/engine';
 import { scanFormableThemeWords } from '@/lib/blast/v2/engine/word-scan';
 import { LOCALE_CONFIGS } from '@/lib/blast/v2/locale-config';
 import { useChainHaptics } from '@/lib/blast/v2/fx/useChainHaptics';
+import { useBlastHaptics } from '@/lib/blast/v2/fx/useBlastHaptics';
 import { useChainEventBus } from '@/lib/blast/v2/fx/useChainEventBus';
 import { BlastChainSoundListener } from '@/lib/blast/v2/fx/BlastChainSoundListener';
 import { useCompleteCardDelay } from '@/lib/blast/v2/fx/useCompleteCardDelay';
@@ -99,6 +100,15 @@ export function BlastGame({
   // render).
   const [finalStats, setFinalStats] = useState<{ timeSeconds: number; gemsCollected: number; stars: number } | null>(null);
   useChainHaptics({ chainEventKey: state.chainEventKey, chainDepth: state.lastChainDepth });
+  // Selection-count derived from active drag — only counts cells that are
+  // currently part of the live trace, so backtracking doesn't double-tick.
+  const selectionCount = state.selection.kind === 'active' ? state.selection.cells.length : 0;
+  useBlastHaptics({
+    selectionCount,
+    invalidKey: state.invalidShakeKey,
+    foundCount: state.foundWords.size,
+    status: state.status,
+  });
   useChainEventBus({ chainEventKey: state.chainEventKey, chainDepth: state.lastChainDepth });
   // Cascade pacing — Royal Match style. Complete card delayed by `(chainDepth-1)*350 + 700`ms
   // so each cascade beat + final ovation flash plays out visibly before the modal pops.

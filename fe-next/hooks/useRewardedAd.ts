@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Howler } from 'howler';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -10,39 +10,7 @@ import { useGameMonetize } from '@/hooks/useGameMonetize';
 import { getGameMonetizeId } from '@/lib/ads/gameMonetizeSdk';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
-import { useExperiment } from '@/hooks/useExperiment';
 import type { RewardedSurface } from '@/lib/admob-config';
-
-// Decline-driven cooldown — when the rewarded-ad CTA was offered and the
-// user dismissed it, suppress further offers for the experiment-configured
-// window. PostHog 14d: 372 offers / 33 users / 27 watches = 11:1 offer
-// fatigue. Cooldown gives the offer time to feel fresh.
-const REWARDED_DECLINE_KEY = 'lexiclash_rad_last_decline_ms';
-
-function readLastDeclineMs(): number {
-  if (typeof window === 'undefined') return 0;
-  try {
-    const raw = window.localStorage.getItem(REWARDED_DECLINE_KEY);
-    if (!raw) return 0;
-    const n = Number(raw);
-    return Number.isFinite(n) ? n : 0;
-  } catch {
-    return 0;
-  }
-}
-
-function writeLastDeclineMs(): void {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(REWARDED_DECLINE_KEY, String(Date.now()));
-  } catch { /* quota */ }
-}
-
-function cooldownMsForVariant(variant: string): number {
-  if (variant === '10m-cooldown') return 10 * 60 * 1000;
-  if (variant === '30m-cooldown') return 30 * 60 * 1000;
-  return 0;
-}
 
 export type AdStatus = 'idle' | 'loading' | 'showing' | 'completed' | 'error';
 
@@ -242,24 +210,6 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
 
   const rewardAmount = rewards.WATCH_AD;
 
-  // Decline-cooldown experiment. Hides the CTA after a recent decline for
-  // 10 or 30 minutes (per variant). Re-evaluated on a 30s tick so the UI
-  // re-renders once the window expires.
-  const cooldownExp = useExperiment('rewarded-ad-cooldown-v1');
-  const cooldownMs = cooldownMsForVariant(cooldownExp.variant);
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    if (cooldownMs === 0) return;
-    const id = window.setInterval(() => setNow(Date.now()), 30_000);
-    return () => window.clearInterval(id);
-  }, [cooldownMs]);
-  const declineCooldownActive = useMemo(() => {
-    if (cooldownMs === 0) return false;
-    const last = readLastDeclineMs();
-    if (last === 0) return false;
-    return now - last < cooldownMs;
-  }, [cooldownMs, now]);
-
   const showAd = useCallback(() => {
     if (status === 'loading' || status === 'showing') {
       return; // Don't allow multiple simultaneous ads
@@ -343,10 +293,6 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       setStatus('error');
       setError(errorMsg);
       trackRewardedAdDeclined(errorMsg, platform, telemetrySurface);
-      // Persist last-decline so the cooldown experiment suppresses the
-      // next offer for its configured window. Cheap localStorage write.
-      writeLastDeclineMs();
-      if (cooldownMs > 0) setNow(Date.now());
       onAdError?.(errorMsg);
 
       // Reset to idle after showing error
@@ -422,7 +368,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       onAdStarted?.();
       awardCoinsAndNotify();
     }
-  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseH5, shouldUseGameMonetize, shouldUseSimulation, crazyGames, adMob, h5Ads, gameMonetize, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface, cooldownMs]);
+  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseH5, shouldUseGameMonetize, shouldUseSimulation, crazyGames, adMob, h5Ads, gameMonetize, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
 
   // Pre-load AdMob rewarded slot when caller signals likely intent (button
   // mount). CrazyGames SDK auto-prepares; simulation/placeholder paths
@@ -434,13 +380,6 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     void adMob.prepareRewarded({ surface });
   }, [shouldUseAdMob, adMob, surface]);
 
-  // canShowAd factors: daily cap, no-ads web build, decline cooldown.
-  // The cooldown gate fires the experiment exposure when it suppresses the
-  // CTA, so PostHog can attribute the variant's offer-rate suppression.
-  useEffect(() => {
-    if (declineCooldownActive) cooldownExp.trackExposure();
-  }, [declineCooldownActive, cooldownExp]);
-
   return {
     status,
     isAdAvailable,
@@ -449,7 +388,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     prepareAd,
     error,
     rewardAmount,
-    canShowAd: !isDailyLimitReached() && !(isPlaceholder && !isDev) && !declineCooldownActive,
+    canShowAd: !isDailyLimitReached() && !(isPlaceholder && !isDev),
     viewsToday: dailyViewCount,
     maxViews: MAX_DAILY_AD_VIEWS,
     isDailyLimitReached: isDailyLimitReached(),

@@ -98,10 +98,6 @@ export type GrowthEvent =
   | 'rewarded_ad_offered'
   | 'rewarded_ad_watched'
   | 'rewarded_ad_declined'
-  // Play-one-more CTA (`play-one-more-cta` experiment). Fires on render
-  // for non-control variants + on click.
-  | 'play_one_more_offered'
-  | 'play_one_more_clicked'
   // Preference
   | 'language_changed'
   // Onboarding funnel
@@ -174,11 +170,9 @@ let sessionId: string | null = null;
 const eventQueue: Array<{ event: GrowthEvent; data: GrowthEventData }> = [];
 const MAX_QUEUE_SIZE = 50;
 
-// Funnel-critical events emit ONLY under their canonical (unprefixed) name.
-// The historical dual-emit doubled every key event count and poisoned every
-// funnel ratio. Non-whitelisted events keep the `growth:` prefix so internal
-// dashboards stay grouped.
-const CANONICAL_ONLY_EMIT: ReadonlySet<GrowthEvent> = new Set<GrowthEvent>([
+// Funnel-critical events also emitted under their canonical (unprefixed)
+// name so PostHog dashboards resolve without a `growth:` rewrite.
+const CANONICAL_DUAL_EMIT: ReadonlySet<GrowthEvent> = new Set<GrowthEvent>([
   'game_started',
   'game_completed',
   'game_abandoned',
@@ -252,15 +246,13 @@ export const trackGrowthEvent = (event: GrowthEvent, data: GrowthEventData = {})
     }
   }
 
-  // Send to PostHog (no-ops when opted out or not initialized).
-  // Funnel-critical events emit canonical-only; everything else keeps the
-  // `growth:` prefix. Single emit per event — dual-emit poisoned every
-  // funnel ratio in PostHog (every count doubled).
+  // Send to PostHog (no-ops when opted out or not initialized)
   try {
-    if (CANONICAL_ONLY_EMIT.has(event)) {
+    posthog.capture(`growth:${event}`, enrichedData);
+    // Dual-emit canonical name for funnel/retention dashboards that query
+    // unprefixed events. Whitelisted to avoid doubling event volume.
+    if (CANONICAL_DUAL_EMIT.has(event)) {
       posthog.capture(event, enrichedData);
-    } else {
-      posthog.capture(`growth:${event}`, enrichedData);
     }
   } catch {
     // Silently fail if PostHog not initialized

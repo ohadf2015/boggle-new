@@ -2093,10 +2093,6 @@ const sv = {
     "newMessages": "Nya meddelanden"
   },
   "results": {
-    "playOneMore": {
-      "same": "Spela igen",
-      "random": "Prova nytt läge"
-    },
     "results": "Stridsrapport",
     "share": "Skryt",
     "yourProgress": "Hur det gick",
@@ -10733,9 +10729,6 @@ const sv = {
     label: "Annons",
     rewarded: {
       watchForGold: "Se reklam för +{amount} guld",
-      watchForGoldDoubleXp: "Dubbla guldet (+{amount})",
-      watchForGoldSkip: "Direkt +{amount} guld",
-      watchForGoldHint: "Gratis +{amount} guld",
       earning: "Tittar...",
       earned: "+{amount} guld tjänat!",
       cooldown: "Tillgänglig snart",

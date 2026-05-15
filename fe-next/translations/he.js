@@ -2107,10 +2107,6 @@ const he = {
     "newMessages": "הודעות חדשות"
   },
   "results": {
-    "playOneMore": {
-      "same": "סבב נוסף",
-      "random": "נסו מצב חדש"
-    },
     "results": "דו״ח קרב",
     "share": "תתגאו",
     "yourProgress": "ההתקדמות שלך",
@@ -10713,9 +10709,6 @@ const he = {
     label: "פרסומת",
     rewarded: {
       watchForGold: "צפו בפרסומת ל-+{amount} זהב",
-      watchForGoldDoubleXp: "הכפילו את הזהב (+{amount})",
-      watchForGoldSkip: "+{amount} זהב מיידי",
-      watchForGoldHint: "+{amount} זהב חינם",
       earning: "צופים...",
       earned: "+{amount} זהב הרווחתם!",
       cooldown: "זמין בקרוב",

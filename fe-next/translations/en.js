@@ -2197,10 +2197,6 @@ const en = {
     "newMessages": "New messages"
   },
   "results": {
-    "playOneMore": {
-      "same": "Play again",
-      "random": "Try a new mode"
-    },
     "results": "Battle Report",
     "share": "Brag",
     "yourProgress": "How You Did",
@@ -10618,9 +10614,6 @@ const en = {
     label: "Advertisement",
     rewarded: {
       watchForGold: "Watch ad for +{amount} gold",
-      watchForGoldDoubleXp: "Double your gold (+{amount})",
-      watchForGoldSkip: "Instant +{amount} gold",
-      watchForGoldHint: "Free +{amount} gold",
       earning: "Watching...",
       earned: "+{amount} gold earned!",
       cooldown: "Available soon",

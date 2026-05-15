@@ -87,7 +87,7 @@ describe('trackGameStart — engineMode prop mirrors mode', () => {
   ])('emits engineMode=%s for trackGameStart(%s)', async (mode) => {
     const { trackGameStart } = await import('../growthTracking');
     trackGameStart(mode);
-    const props = propsFor('game_started');
+    const props = propsFor('growth:game_started');
     expect(props?.engineMode).toBe(mode);
   });
 });
@@ -99,7 +99,7 @@ describe('mode_selected → game_started — funnel linkage', () => {
     trackGameStart('singleplayer');
 
     expect(propsFor('growth:mode_selected')?.engineMode).toBe('singleplayer');
-    expect(propsFor('game_started')?.engineMode).toBe('singleplayer');
+    expect(propsFor('growth:game_started')?.engineMode).toBe('singleplayer');
   });
 
   it('blast click then blast game_start share engineMode', async () => {
@@ -107,7 +107,7 @@ describe('mode_selected → game_started — funnel linkage', () => {
     trackModeSelected('blast', 'home');
     trackGameStart('blast');
     expect(propsFor('growth:mode_selected')?.engineMode).toBe('blast');
-    expect(propsFor('game_started')?.engineMode).toBe('blast');
+    expect(propsFor('growth:game_started')?.engineMode).toBe('blast');
   });
 
   it('arena click then multiplayer game_start share engineMode', async () => {
@@ -115,6 +115,6 @@ describe('mode_selected → game_started — funnel linkage', () => {
     trackModeSelected('arena', 'home');
     trackGameStart('multiplayer');
     expect(propsFor('growth:mode_selected')?.engineMode).toBe('multiplayer');
-    expect(propsFor('game_started')?.engineMode).toBe('multiplayer');
+    expect(propsFor('growth:game_started')?.engineMode).toBe('multiplayer');
   });
 });

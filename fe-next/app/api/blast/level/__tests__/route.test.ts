@@ -30,4 +30,19 @@ describe('GET /api/blast/level', () => {
     const res = await GET(req('http://test/api/blast/level?level=9999&locale=ja'));
     expect([404, 200]).toContain(res.status);
   });
+
+  it('falls back to generator when chain build fails for he level 2', async () => {
+    const res = await GET(req('http://test/api/blast/level?level=2&locale=he'));
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.levelNumber).toBe(2);
+    expect(body.locale).toBe('he');
+  });
+
+  it('falls back to generator when chain build fails for en level 20', async () => {
+    const res = await GET(req('http://test/api/blast/level?level=20&locale=en'));
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.levelNumber).toBe(20);
+  });
 });

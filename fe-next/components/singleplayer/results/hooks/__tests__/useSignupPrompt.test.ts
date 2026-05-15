@@ -1,22 +1,17 @@
 /**
- * useSignupPrompt tests — gate semantics for the signup-prompt-timing-v1
- * experiment.
+ * useSignupPrompt tests — gate semantics for first-win variant.
  *
- * Variants (typed registry):
- *   - 'control'                    : show once guest has ≥1 win (fallback after 5 games)
- *   - 'after-3-games'              : show after 3 games regardless of win
- *   - 'after-first-4-letter-word'  : handled outside this hook (no-op here)
+ * Prior bug: 'after-first-win' variant gated on games count (2), not actual win.
+ * Correct semantics:
+ *   - 'after-first-win': show once guest has ≥1 win (fallback after 5 games without win)
+ *   - 'after-third-game': show after 3 games regardless of win
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 const mockFlag = vi.fn<() => string>();
-const mockTrackExposure = vi.fn();
-vi.mock('@/hooks/useExperiment', () => ({
-  useExperiment: () => ({
-    variant: mockFlag() ?? 'control',
-    trackExposure: mockTrackExposure,
-  }),
+vi.mock('@/hooks/usePostHogFlag', () => ({
+  usePostHogFlag: (_flag: string, fallback: string) => mockFlag() ?? fallback,
 }));
 
 const mockStats = vi.fn();
@@ -39,7 +34,7 @@ const flushTimer = async (ms = 3600): Promise<void> => {
 
 beforeEach(() => {
   vi.useFakeTimers();
-  mockFlag.mockReturnValue('control');
+  mockFlag.mockReturnValue('after-first-win');
   mockStats.mockReturnValue({ games: 0, wins: 0 });
   mockTrackSignupFunnel.mockClear();
   if (typeof window !== 'undefined') {
@@ -51,7 +46,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('useSignupPrompt — control variant', () => {
+describe('useSignupPrompt — after-first-win variant', () => {
   it('does NOT show after 2 games with 0 wins', async () => {
     mockStats.mockReturnValue({ games: 2, wins: 0 });
     const { result } = renderHook(() =>
@@ -89,9 +84,9 @@ describe('useSignupPrompt — control variant', () => {
   });
 });
 
-describe('useSignupPrompt — after-3-games variant', () => {
+describe('useSignupPrompt — after-third-game variant', () => {
   beforeEach(() => {
-    mockFlag.mockReturnValue('after-3-games');
+    mockFlag.mockReturnValue('after-third-game');
   });
 
   it('does NOT show after 2 games', async () => {
@@ -115,7 +110,7 @@ describe('useSignupPrompt — after-3-games variant', () => {
 
 describe('useSignupPrompt — guestStatsChanged re-evaluation', () => {
   it('does not show on mount with empty stats, then shows after stats-change event grants a win', async () => {
-    mockFlag.mockReturnValue('control');
+    mockFlag.mockReturnValue('after-first-win');
     mockStats.mockReturnValue({ games: 0, wins: 0 });
     const { result } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
@@ -152,7 +147,7 @@ describe('useSignupPrompt — guestStatsChanged re-evaluation', () => {
 
 describe('useSignupPrompt — isFirstWin exposure', () => {
   it('exposes isFirstWin=true when shown via actual win', async () => {
-    mockFlag.mockReturnValue('control');
+    mockFlag.mockReturnValue('after-first-win');
     mockStats.mockReturnValue({ games: 1, wins: 1 });
     const { result } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
@@ -163,7 +158,7 @@ describe('useSignupPrompt — isFirstWin exposure', () => {
   });
 
   it('exposes isFirstWin=false when shown via 5-game fallback', async () => {
-    mockFlag.mockReturnValue('control');
+    mockFlag.mockReturnValue('after-first-win');
     mockStats.mockReturnValue({ games: 5, wins: 0 });
     const { result } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
@@ -173,8 +168,8 @@ describe('useSignupPrompt — isFirstWin exposure', () => {
     expect(result.current.isFirstWin).toBe(false);
   });
 
-  it('exposes isFirstWin=false for after-3-games variant', async () => {
-    mockFlag.mockReturnValue('after-3-games');
+  it('exposes isFirstWin=false for after-third-game variant', async () => {
+    mockFlag.mockReturnValue('after-third-game');
     mockStats.mockReturnValue({ games: 3, wins: 2 });
     const { result } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
@@ -195,7 +190,7 @@ describe('useSignupPrompt — isFirstWin exposure', () => {
 
 describe('useSignupPrompt — impression telemetry', () => {
   it('emits first_win_signup_shown when first-win qualifies via actual win', async () => {
-    mockFlag.mockReturnValue('control');
+    mockFlag.mockReturnValue('after-first-win');
     mockStats.mockReturnValue({ games: 1, wins: 1 });
     renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
@@ -206,7 +201,7 @@ describe('useSignupPrompt — impression telemetry', () => {
   });
 
   it('emits signup_prompt_shown when first-win qualifies via 5-game fallback', async () => {
-    mockFlag.mockReturnValue('control');
+    mockFlag.mockReturnValue('after-first-win');
     mockStats.mockReturnValue({ games: 5, wins: 0 });
     renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
@@ -216,8 +211,8 @@ describe('useSignupPrompt — impression telemetry', () => {
     expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', false);
   });
 
-  it('emits signup_prompt_shown for after-3-games variant', async () => {
-    mockFlag.mockReturnValue('after-3-games');
+  it('emits signup_prompt_shown for after-third-game variant', async () => {
+    mockFlag.mockReturnValue('after-third-game');
     mockStats.mockReturnValue({ games: 3, wins: 0 });
     renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
@@ -228,7 +223,7 @@ describe('useSignupPrompt — impression telemetry', () => {
   });
 
   it('does NOT emit when user does not qualify', async () => {
-    mockFlag.mockReturnValue('control');
+    mockFlag.mockReturnValue('after-first-win');
     mockStats.mockReturnValue({ games: 2, wins: 0 });
     renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
@@ -247,7 +242,7 @@ describe('useSignupPrompt — impression telemetry', () => {
   });
 
   it('does NOT emit twice across re-renders (sessionStorage guard)', async () => {
-    mockFlag.mockReturnValue('control');
+    mockFlag.mockReturnValue('after-first-win');
     mockStats.mockReturnValue({ games: 1, wins: 1 });
     const { rerender } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })

@@ -7,16 +7,7 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
-import { useExperiment } from '@/hooks/useExperiment';
 import { trackRewardedAdOffered } from '@/utils/growthTracking';
-
-/** Variant → translation key for the rewarded-ad CTA copy A/B. */
-const CTA_KEY_BY_VARIANT: Record<string, string> = {
-  control: 'ads.rewarded.watchForGold',
-  'double-xp': 'ads.rewarded.watchForGoldDoubleXp',
-  'skip-cooldown': 'ads.rewarded.watchForGoldSkip',
-  'free-hint': 'ads.rewarded.watchForGoldHint',
-};
 
 interface RewardedAdGoldButtonProps {
   goldAmount: number;
@@ -52,17 +43,11 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
     },
   });
 
-  // Variant-aware CTA copy. Fires exposure on mount so PostHog can join the
-  // variant assignment with the offer→watched funnel.
-  const copyExp = useExperiment('rewarded-ad-copy-v1');
-  const ctaKey = CTA_KEY_BY_VARIANT[copyExp.variant] ?? 'ads.rewarded.watchForGold';
-
   // Fire offer + warm the ad slot in one effect so the next tap resolves
   // without a network spinner. prepareAd is a no-op on web/CG/simulation.
   useEffect(() => {
-    trackRewardedAdOffered(surface, { copyVariant: copyExp.variant });
+    trackRewardedAdOffered(surface);
     prepareAd();
-    copyExp.trackExposure();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -78,7 +63,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
       ? t('ads.rewarded.earned').replace('{amount}', String(goldAmount))
       : capped
         ? t('ads.rewarded.cooldown')
-        : t(ctaKey).replace('{amount}', String(goldAmount));
+        : t('ads.rewarded.watchForGold').replace('{amount}', String(goldAmount));
 
   const Icon = isDone ? CheckCircle : isLoading ? Loader2 : Play;
   const isMd = size === 'md';

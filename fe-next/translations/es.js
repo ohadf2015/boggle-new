@@ -2022,10 +2022,6 @@ const es = {
     "newMessages": "Mensajes nuevos"
   },
   "results": {
-    "playOneMore": {
-      "same": "Jugar otra vez",
-      "random": "Probar otro modo"
-    },
     "results": "Reporte de Batalla",
     "share": "Presumir",
     "yourProgress": "Tu Progreso",
@@ -10706,9 +10702,6 @@ const es = {
     "label": "Anuncio",
     "rewarded": {
       "watchForGold": "Ver anuncio por +{amount} oro",
-      "watchForGoldDoubleXp": "Duplica el oro (+{amount})",
-      "watchForGoldSkip": "+{amount} oro al instante",
-      "watchForGoldHint": "+{amount} oro gratis",
       "earning": "Viendo...",
       "earned": "+{amount} oro ganado!",
       "cooldown": "Disponible pronto"

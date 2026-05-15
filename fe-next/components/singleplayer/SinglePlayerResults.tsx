@@ -18,7 +18,6 @@ import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 
 import NextStepPrompt, { type NextStepMode } from '@/components/results/NextStepPrompt';
 import AutoPlayCountdown from '@/components/results/AutoPlayCountdown';
-import PlayOneMoreCta from '@/components/results/PlayOneMoreCta';
 import TomorrowPreview from '@/components/results/TomorrowPreview';
 
 const UGCFeaturedStrip = dynamic(() => import('@/components/ugc/UGCFeaturedStrip'), { ssr: false });
@@ -317,14 +316,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   const ctaBlock = (
     <div className="space-y-3">
-      {/*
-        play-one-more-cta experiment — variant-gated oversized CTA above the
-        existing auto-play flow. Control renders nothing so the legacy UX
-        is unchanged. Non-control variants intentionally appear before the
-        countdown so the user sees the prominent CTA before the auto-route
-        kicks in.
-      */}
-      <PlayOneMoreCta onPlayAgain={onPlayAgain} surface="sp_results" />
       {!autoPlayCancelled ? (
         <AutoPlayCountdown
           onComplete={onPlayAgain}
