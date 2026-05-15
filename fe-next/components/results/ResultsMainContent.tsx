@@ -282,19 +282,23 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         <HighlightsBar stats={highlightStats} />
       )}
 
-      {/* 2.3 SHARE BUTTON */}
-      {shareParams && (
-        <ShareButton params={shareParams} t={t} />
-      )}
-
-      {/* 2.5 REWARDS SUMMARY */}
-      {coinReward && (
-        <RewardsSummary
-          coinReward={coinReward}
-          isAuthenticated={isAuthenticated}
-          winStreak={null}
-          isWinner={isCurrentUserWinner}
-        />
+      {/* 2.3 + 2.5 SHARE + REWARDS — single row to reclaim vertical space */}
+      {(shareParams || coinReward) && (
+        <div className="flex flex-wrap items-stretch gap-2">
+          {coinReward && (
+            <div className="flex-1 min-w-0 [&>*]:h-full">
+              <RewardsSummary
+                coinReward={coinReward}
+                isAuthenticated={isAuthenticated}
+                winStreak={null}
+                isWinner={isCurrentUserWinner}
+              />
+            </div>
+          )}
+          {shareParams && (
+            <ShareButton params={shareParams} t={t} className="shrink-0" />
+          )}
+        </div>
       )}
 
       {/* 3. TOP 3 PODIUM */}
