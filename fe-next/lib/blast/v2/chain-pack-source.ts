@@ -9,6 +9,11 @@ import { getBlastCommonWords } from './engine/common-words';
 
 type ChainPackFile = { locale: Locale; levels: ChainLevelSpec[] };
 
+// Floor the extra-word-check min length at 4. 3-letter "common" hits dominate
+// false positives (esp. Hebrew, where most 3-letter substrings are real roots)
+// and over-constrain placement to the point of unsolvability.
+const EXTRA_WORD_CHECK_MIN_LENGTH_FLOOR = 4;
+
 export class ChainPackSource implements LevelSource {
   private cache = new Map<Locale, ChainPackFile>();
   private extraCheckCache = new Map<Locale, ExtraWordCheck>();
@@ -32,7 +37,10 @@ export class ChainPackSource implements LevelSource {
     if (cached) return cached;
     try {
       const isCommon = await getBlastCommonWords(locale);
-      const minLength = LOCALE_CONFIGS[locale].wordLengthRange.min;
+      const minLength = Math.max(
+        EXTRA_WORD_CHECK_MIN_LENGTH_FLOOR,
+        LOCALE_CONFIGS[locale].wordLengthRange.min,
+      );
       const check: ExtraWordCheck = { isCommon, minLength };
       this.extraCheckCache.set(locale, check);
       return check;
@@ -49,7 +57,17 @@ export class ChainPackSource implements LevelSource {
       throw new Error(`ChainPackSource: no chain spec for ${locale} level ${levelNumber}`);
     }
     const extraCheck = await this.getExtraWordCheck(locale);
-    const level = buildChainLevel(spec, levelNumber, extraCheck);
+
+    // Tier 1: with extra-word-check (avoids incidental dictionary words on board).
+    let level = buildChainLevel(spec, levelNumber, extraCheck);
+
+    // Tier 2: fallback without extra-word-check. Better an occasional incidental
+    // word than an unplayable level. Solvability is the hard invariant; aesthetic
+    // cleanliness is soft. (Only triggers when tier 1 exhausted 500 attempts.)
+    if (!level && extraCheck) {
+      level = buildChainLevel(spec, levelNumber);
+    }
+
     if (!level) {
       throw new Error(`ChainPackSource: buildChainLevel failed for ${spec.id}`);
     }

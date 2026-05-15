@@ -15,9 +15,11 @@ import type { Language } from '@/shared/types/game';
 // ============================================================
 
 /**
- * Hebrew final letter mappings - convert final forms to regular forms
+ * Hebrew final-letter mappings — sofit form to regular form.
+ * Use when storing letters in any data structure that should be position-agnostic
+ * (boards, tile pools, dictionaries, validation sets).
  */
-const HEBREW_FINAL_TO_REGULAR: Record<string, string> = {
+export const HEBREW_FINAL_TO_REGULAR: Record<string, string> = {
   'ץ': 'צ',
   'ך': 'כ',
   'ם': 'מ',
@@ -26,15 +28,26 @@ const HEBREW_FINAL_TO_REGULAR: Record<string, string> = {
 };
 
 /**
- * Hebrew regular to final letter mappings
+ * Hebrew regular-to-sofit mapping. Apply ONLY at the display/render boundary —
+ * never on board state, never on stored words, never on dictionary keys.
  */
-const HEBREW_REGULAR_TO_FINAL: Record<string, string> = {
+export const HEBREW_REGULAR_TO_FINAL: Record<string, string> = {
   'צ': 'ץ',
   'כ': 'ך',
   'מ': 'ם',
   'נ': 'ן',
   'פ': 'ף'
 };
+
+/**
+ * Canonical Hebrew base alphabet (22 letters, regular forms only).
+ * This is the ONLY letter set that should ever appear on a playable board grid
+ * or tile pool. Sofit letters are display-only.
+ */
+export const HEBREW_BASE_LETTERS: readonly string[] = [
+  'א','ב','ג','ד','ה','ו','ז','ח','ט','י',
+  'כ','ל','מ','נ','ס','ע','פ','צ','ק','ר','ש','ת',
+];
 
 /**
  * Valid Hebrew letters (aleph to tav, including final forms)

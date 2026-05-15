@@ -1,10 +1,15 @@
 import type { LocaleConfig, ThemeDef } from '../locale-config';
 import type { ThemeKey } from '../types';
 import { bonusDictLoaders } from '../bonus-dict-loaders';
+import {
+  HEBREW_BASE_LETTERS,
+  HEBREW_FINAL_TO_REGULAR,
+  HEBREW_REGULAR_TO_FINAL,
+} from '@/shared/utils/wordNormalization';
 
-const TILE_POOL_HE = 'אבגדהוזחטיכלמנסעפצקרשת'.split(''); // 22 base, no finals
-const FINAL_FOLD: Record<string, string> = { 'ך':'כ','ם':'מ','ן':'נ','ף':'פ','ץ':'צ' };
-const NON_FINAL_TO_FINAL: Record<string, string> = { 'כ':'ך','מ':'ם','נ':'ן','פ':'ף','צ':'ץ' };
+const TILE_POOL_HE = [...HEBREW_BASE_LETTERS]; // 22 base, no finals — sofits applied only by displayChar
+const FINAL_FOLD = HEBREW_FINAL_TO_REGULAR;
+const NON_FINAL_TO_FINAL = HEBREW_REGULAR_TO_FINAL;
 const LETTER_FREQ_HE: Record<string, number> = {
   'י': 0.103, 'ו': 0.097, 'ה': 0.092, 'מ': 0.071, 'ל': 0.070,
   'ר': 0.068, 'נ': 0.067, 'א': 0.066, 'ת': 0.058, 'ב': 0.050,

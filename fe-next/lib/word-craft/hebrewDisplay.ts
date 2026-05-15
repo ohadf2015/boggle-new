@@ -1,21 +1,14 @@
 import type { Board } from './board';
 import type { PlacedTile } from './types';
+import { HEBREW_REGULAR_TO_FINAL } from '@/shared/utils/wordNormalization';
 
 /**
- * Hebrew final-letter display map. The bag holds *regular* forms
- * (מ, נ, פ, צ, כ) for simplicity, but Hebrew reading convention requires
- * the *sofit* variant (ם, ן, ף, ץ, ך) at end-of-word positions. This
- * module produces the rendered glyph without ever mutating the underlying
- * tile letter — so dict lookup, scoring, and serialization stay on the
- * regular form and only the user-visible glyph swaps.
+ * Hebrew sofit display. The bag holds *regular* forms; this module produces the
+ * rendered glyph without ever mutating the underlying tile letter — dict lookup,
+ * scoring, and serialization stay on the regular form and only the visible
+ * glyph swaps. Map shared with all other modes via shared/utils.
  */
-const REGULAR_TO_SOFIT: Record<string, string> = {
-  מ: 'ם',
-  נ: 'ן',
-  פ: 'ף',
-  צ: 'ץ',
-  כ: 'ך',
-};
+const REGULAR_TO_SOFIT = HEBREW_REGULAR_TO_FINAL;
 
 function isHebrewLetter(ch: string): boolean {
   if (!ch || ch.length === 0) return false;
