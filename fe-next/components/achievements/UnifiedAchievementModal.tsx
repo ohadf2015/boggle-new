@@ -14,7 +14,7 @@
 
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
@@ -142,21 +142,32 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
   const tierColors = normalized?.tier ? TIER_COLORS[normalized.tier] : null;
   const tierIcon = normalized?.tier ? TIER_ICONS[normalized.tier] : null;
 
+  // Stable identity for the current achievement so effects fire once per unlock,
+  // not once per parent re-render. `props` itself is a new object every render,
+  // which previously kept resetting the auto-dismiss timer indefinitely.
+  const unlockId = normalized
+    ? `${normalized.name}|${normalized.tier ?? ''}|${normalized.isNew ? 'new' : 'up'}`
+    : null;
+
+  // Latest-onClose ref so the timer always calls the freshest handler
+  // without re-binding the effect.
+  const onCloseRef = useRef(props.onClose);
+  useEffect(() => {
+    onCloseRef.current = props.onClose;
+  });
+
   // Auto-close after timeout
   useEffect(() => {
-    if (!normalized) return;
-
+    if (!unlockId) return;
     const timer = setTimeout(() => {
-      props.onClose();
+      onCloseRef.current?.();
     }, AUTO_DISMISS_MS);
-
     return () => clearTimeout(timer);
-  }, [normalized, props]);
+  }, [unlockId]);
 
-  // Play sound and fire confetti on mount
+  // Play sound and fire confetti once per unlock
   useEffect(() => {
-    if (!normalized) return;
-
+    if (!unlockId) return;
     playAchievementSound();
     fireConfetti({
       particleCount: 50,
@@ -164,7 +175,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
       origin: { y: 0.3 },
       colors: ['#BFFF00', '#00FFFF', '#FFE135', '#FF6B35', '#FF1493'],
     });
-  }, [normalized, playAchievementSound]);
+  }, [unlockId, playAchievementSound]);
 
   // Handle backdrop click
   const handleBackdropClick = (e: React.MouseEvent) => {
