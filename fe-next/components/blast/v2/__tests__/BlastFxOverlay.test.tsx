@@ -22,12 +22,12 @@ describe('BlastFxOverlay', () => {
     expect(canvas).toHaveClass('absolute', 'inset-0', 'pointer-events-none');
   });
 
-  it('applies correct z-index', () => {
+  it('applies correct z-index (above board, below HUD/modals)', () => {
     const { container } = render(
       <BlastFxOverlay chainEventKey={0} chainDepth={0} clearCenters={[]} clearEventKey={0} />,
     );
     const canvas = container.querySelector('[data-testid="blast-fx"]') as HTMLCanvasElement;
-    expect(canvas).toHaveStyle('zIndex: 10');
+    expect(canvas).toHaveStyle('zIndex: 30');
   });
 
   it('mounts then unmounts without throwing — proves v8 init+destroy contract', async () => {

@@ -2,6 +2,7 @@ import type { BlastColumn, BlastLevel, CellId, Locale, ThemeKey } from '../types
 import { hashStringToSeed, seededPRNG } from '../prng';
 import { columnCountForLevel, columnHeightRangeForLevel, validateSilhouette } from './silhouette';
 import { placeWords, type Grid } from './placement';
+import { placementRulesForLevel } from './placement-rules';
 import { rollTileFlags } from './tile-flags';
 import { interestingnessScore, INTERESTINGNESS_THRESHOLD } from './interestingness';
 import { mechanicsForLevel } from '../mechanic-flags';
@@ -31,7 +32,20 @@ export class GeneratedLevelSource implements LevelSource {
       const colRange = columnCountForLevel(levelNumber);
       const heightRange = columnHeightRangeForLevel(levelNumber);
       const cols = colRange.min + prng.intRange(colRange.max - colRange.min + 1);
-      const place = placeWords(words, { cols, maxHeight: heightRange.max }, prng);
+      const rules = placementRulesForLevel(levelNumber);
+      // Only require vertical if there's actually room. Below maxHeight 3 a
+      // 3-letter word can fit vertically, but heightRange.max already enforces
+      // the level's vertical ceiling — passing the flag is safe.
+      const place = placeWords(
+        words,
+        {
+          cols,
+          maxHeight: heightRange.max,
+          firstWordRowZero: rules.firstWordRowZero,
+          requireVerticalWord: rules.requireVerticalWord,
+        },
+        prng,
+      );
       if (!place.ok) continue;
       const sil = validateSilhouette(place.heights);
       if (!sil.ok) continue;

@@ -241,9 +241,12 @@ export function BlastFxOverlay({
       const lx = center.x - rect.left;
       const ly = center.y - rect.top;
       const variant = pickExplosionVariant();
-      particles.burst(variant, lx, ly, 18);
-      particles.burst(ELECTRIC_RINGS, lx, ly, 4);
-      debris.spawn(lx, ly, tintColor, 6);
+      // Heavier per-cell burst: was 18+4+6 → now 32+10+10. Combined with the
+      // higher z-index it reads as a real explosion instead of a glint.
+      particles.burst(variant, lx, ly, 32);
+      particles.burst(ELECTRIC_RINGS, lx, ly, 10);
+      particles.burst(CASCADE_SPARKLE, lx, ly, 6);
+      debris.spawn(lx, ly, tintColor, 10);
       spawnPulseRing(app, systems, lx, ly, tintColor);
     }
 
@@ -327,7 +330,11 @@ export function BlastFxOverlay({
       ref={canvasRef}
       data-testid="blast-fx"
       className={`${styles.canvas} absolute inset-0 pointer-events-none`}
-      style={{ zIndex: 10 }}
+      // z-index 30 keeps bursts above the board (which sits at auto inside
+      // a stacking context created by isolation: isolate). Earlier z=10
+      // sometimes ended up painted under tile transforms during chains;
+      // 30 leaves headroom for HUD/modals while keeping FX legible.
+      style={{ zIndex: 30 }}
     />
   );
 }

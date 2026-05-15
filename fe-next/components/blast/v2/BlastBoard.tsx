@@ -121,7 +121,13 @@ export function BlastBoard({
       data-shake-key={invalidShakeKey}
       data-testid="blast-board"
       className={`relative flex items-end justify-center gap-2 p-4 touch-none select-none ${styles.board}`}
-      style={{ touchAction: 'none' }}
+      style={{
+        touchAction: 'none',
+        // Drives container-query tile sizing: every tile reads
+        // --blast-tile-size derived from this column count so wide boards
+        // (7+ cols) stay inside the viewport instead of overflowing.
+        ['--blast-cols' as string]: String(level.columns.length),
+      }}
       onPointerUp={onPointerUp}
     >
       {/* Cell-well backdrop — empty inset slots line up perfectly with tile

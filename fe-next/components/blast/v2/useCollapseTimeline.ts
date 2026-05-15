@@ -30,16 +30,17 @@ export function useCollapseTimeline(
     const tiles = boardRef.current.querySelectorAll<HTMLElement>('[data-cell-id]');
     const tl = gsap.timeline();
     tiles.forEach((el, i) => {
-      // Land-bounce two-phase: hard squash to 0.66 (anticipation of landing
-      // weight) → snap-back overshoot to 1.06 → settle at 1.0. Reads as the
-      // tile having mass. Stagger 18ms per tile so cascades feel sequenced.
+      // Vertical-only land bounce: squash Y on impact then overshoot, with
+      // scaleX held at 1.0. Earlier versions warped X too which read as a
+      // horizontal drift during gravity — tiles should stay locked to their
+      // column. Stagger 18ms per tile so cascades feel sequenced.
       const startAt = i * 0.018;
       tl.fromTo(
         el,
         { scaleY: 1, scaleX: 1 },
         {
-          scaleY: 0.66,
-          scaleX: 1.18,
+          scaleY: 0.72,
+          scaleX: 1,
           duration: 0.11,
           ease: 'power3.in',
           transformOrigin: 'bottom center',
@@ -49,8 +50,8 @@ export function useCollapseTimeline(
       tl.to(
         el,
         {
-          scaleY: 1.06,
-          scaleX: 0.94,
+          scaleY: 1.08,
+          scaleX: 1,
           duration: 0.12,
           ease: 'power2.out',
         },
@@ -61,7 +62,7 @@ export function useCollapseTimeline(
         {
           scaleY: 1,
           scaleX: 1,
-          duration: 0.18,
+          duration: 0.22,
           ease: 'elastic.out(1.2, 0.5)',
         },
         startAt + 0.23,
