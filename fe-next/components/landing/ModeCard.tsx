@@ -10,6 +10,7 @@ import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTiltEffect } from '@/hooks/useTiltEffect';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { haptics } from '@/utils/haptics';
 
 export interface LiveBadgeProps {
   openRooms: number;
@@ -551,11 +552,21 @@ const ModeCard: React.FC<ModeCardProps> = ({
     );
   }
 
+  const handleLockedClick = () => {
+    haptics.tap();
+    onLockedClick?.();
+  };
+
+  const handleClick = () => {
+    haptics.tap();
+    onClick?.();
+  };
+
   if (locked) {
     return (
       <button
         type="button"
-        onClick={onLockedClick}
+        onClick={handleLockedClick}
         className={cn(wrapperClassName, 'text-left')}
         aria-label={`${title} - ${lockedMessage || 'Locked'}`}
       >
@@ -565,7 +576,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
   }
 
   return (
-    <Link href={href} className={wrapperClassName} onClick={onClick}>
+    <Link href={href} className={wrapperClassName} onClick={handleClick}>
       {cardContent}
     </Link>
   );

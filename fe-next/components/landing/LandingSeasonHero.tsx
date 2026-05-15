@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSeason } from '@/hooks/useSeason';
+import { haptics } from '@/utils/haptics';
 
 export const LandingSeasonHero: React.FC = () => {
   const { t } = useLanguage();
@@ -29,6 +30,7 @@ export const LandingSeasonHero: React.FC = () => {
       <Link
         href="/leaderboard"
         aria-label={`${seasonLabel} — ${ctaLabel}`}
+        onClick={() => haptics.tap()}
         className="group relative block isolate overflow-hidden rounded-neo border-neo border-black bg-neo-navy-light transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan"
         style={{
           borderColor: '#000',

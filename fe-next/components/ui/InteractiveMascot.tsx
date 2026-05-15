@@ -4,6 +4,7 @@ import { m, AnimatePresence, type TargetAndTransition } from 'framer-motion';
 import { memo, useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { haptics } from '@/utils/haptics';
 import { MascotVariant, getMascotImagePath, getMascotBgType, isVideoVariant, type MascotClipShape, type MascotBorderColor } from './Mascot';
 import { SilentVideo } from './SilentVideo';
 import {
@@ -590,6 +591,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
   const handleClick = useCallback(() => {
     if (!enableClick) return;
 
+    haptics.tap();
     setIsClicked(true);
     onClick?.();
 

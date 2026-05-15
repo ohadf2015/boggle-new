@@ -4,6 +4,7 @@ import { m } from 'framer-motion';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { haptics } from '@/utils/haptics';
 
 interface LandingBottomCTAProps {
   onPlayClick: () => void;
@@ -13,6 +14,11 @@ export function LandingBottomCTA({ onPlayClick }: LandingBottomCTAProps) {
   const { t, dir } = useLanguage();
   const isRTL = dir === 'rtl';
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
+
+  const handleClick = () => {
+    haptics.success();
+    onPlayClick();
+  };
 
   return (
     <m.div
@@ -44,7 +50,7 @@ export function LandingBottomCTA({ onPlayClick }: LandingBottomCTAProps) {
           {t('landing.welcomeSubtitle')}
         </p>
         <m.button
-          onClick={onPlayClick}
+          onClick={handleClick}
           className={cn(
             'relative inline-flex items-center gap-2 px-10 py-4 sm:px-12 sm:py-5',
             'bg-neo-lime text-neo-black font-black uppercase text-lg sm:text-xl',
