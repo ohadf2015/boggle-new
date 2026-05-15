@@ -1,11 +1,12 @@
 'use client'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { Calendar, Sparkles } from 'lucide-react'
+import { Calendar, Sparkles, Info } from 'lucide-react'
 import { m, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useWeeklyChest, type PendingChest } from '@/hooks/useWeeklyChest'
 import ChestProgressDots from './ChestProgressDots'
+import WeeklyChestInfoModal from './WeeklyChestInfoModal'
 import gsap from 'gsap'
 
 const CHEST_IMG: Record<'bronze' | 'silver' | 'gold', string> = {
@@ -27,11 +28,14 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
     cycleStart,
     isClaimable,
     pendingChest,
+    projectedTier,
+    weekScore,
     claim,
   } = useWeeklyChest()
-  const chestRef = useRef<HTMLDivElement>(null)
+  const chestRef = useRef<HTMLButtonElement>(null)
   const cardRef = useRef<HTMLDivElement>(null)
   const barRef = useRef<HTMLDivElement>(null)
+  const [infoOpen, setInfoOpen] = useState(false)
 
   // Defensive: callers may receive partial / error payloads. Always render integers.
   const safeDays = Number.isFinite(daysCompleted)
@@ -110,7 +114,9 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
 
   if (loading) return null
 
-  const tier: 'bronze' | 'silver' | 'gold' = pendingChest?.tier ?? 'silver'
+  // Pre-claim, show the *projected* tier (what they'd get right now) instead of a
+  // misleading hardcoded fallback. Once claimable, the real pending tier wins.
+  const tier: 'bronze' | 'silver' | 'gold' = pendingChest?.tier ?? projectedTier ?? 'bronze'
   const tierLabel = t(
     `daily.weeklyChest.tier${tier.charAt(0).toUpperCase() + tier.slice(1)}`
   )
@@ -149,7 +155,13 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
 
       {/* Main row: chest + progress */}
       <div className="flex items-center gap-4 relative">
-        <div ref={chestRef} className="relative shrink-0">
+        <button
+          ref={chestRef}
+          type="button"
+          onClick={() => setInfoOpen(true)}
+          aria-label={t('daily.weeklyChest.info.title')}
+          className="relative shrink-0 rounded-lg focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
+        >
           <Image
             src={CHEST_IMG[tier]}
             alt={tierLabel}
@@ -165,7 +177,13 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
               className="absolute -top-2 -end-2 w-5 h-5 text-neo-yellow drop-shadow"
             />
           )}
-        </div>
+          <span
+            aria-hidden="true"
+            className="absolute -bottom-1.5 -end-1.5 w-5 h-5 rounded-full border-2 border-neo-black bg-neo-cyan flex items-center justify-center shadow-hard-xs"
+          >
+            <Info className="w-3 h-3 text-neo-navy" strokeWidth={3} />
+          </span>
+        </button>
 
         <div className="flex-1 min-w-0">
           {/* Progress bar */}
@@ -230,6 +248,14 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
           </m.button>
         )}
       </AnimatePresence>
+
+      {infoOpen && (
+        <WeeklyChestInfoModal
+          projectedTier={tier}
+          weekScore={weekScore}
+          onClose={() => setInfoOpen(false)}
+        />
+      )}
     </div>
   )
 }

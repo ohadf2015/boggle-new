@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const mockUseWeeklyChest = vi.fn()
@@ -52,6 +52,8 @@ const defaultMockData = {
   cycleNumber: 1,
   isClaimable: false,
   pendingChest: null,
+  projectedTier: 'silver' as const,
+  weekScore: 55,
   claim: vi.fn(),
   refresh: vi.fn(),
 }
@@ -112,10 +114,25 @@ describe('WeeklyChestCard', () => {
     expect(img.getAttribute('src') || '').toContain('chest-gold')
   })
 
-  it('defaults to silver chest image when no pending tier', () => {
+  it('shows the projected-tier chest image when there is no pending chest', () => {
+    // projectedTier drives the thumbnail pre-claim — no more misleading hardcoded silver
     render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
     const img = screen.getByTestId('chest-tier-thumb') as HTMLImageElement
-    expect((img.getAttribute('src') || '')).toContain('chest-silver')
+    expect(img.getAttribute('src') || '').toContain('chest-silver')
+  })
+
+  it('reflects a gold projected tier in the chest thumbnail', () => {
+    mockUseWeeklyChest.mockReturnValue({ ...defaultMockData, projectedTier: 'gold' })
+    render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+    const img = screen.getByTestId('chest-tier-thumb') as HTMLImageElement
+    expect(img.getAttribute('src') || '').toContain('chest-gold')
+  })
+
+  it('opens the explainer modal when the chest is clicked', () => {
+    render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+    expect(screen.queryByText('daily.weeklyChest.info.streakReset')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'daily.weeklyChest.info.title' }))
+    expect(screen.getByText('daily.weeklyChest.info.streakReset')).toBeTruthy()
   })
 
   it('renders a progress bar with the correct aria value', () => {
