@@ -1,6 +1,6 @@
 'use client';
 import { useRef, useCallback, useEffect } from 'react';
-import { LayoutGroup, AnimatePresence } from 'framer-motion';
+import { LayoutGroup, AnimatePresence, m } from 'framer-motion';
 import type { BlastLevel, CellId } from '@/lib/blast/v2/types';
 import { cellId as makeCellId, type SelectionState, type AlmostWord } from '@/lib/blast/v2/engine';
 import { LOCALE_CONFIGS } from '@/lib/blast/v2/locale-config';
@@ -44,6 +44,7 @@ export function BlastBoard({
 
   useCollapseTimeline(boardRef, tileIds);
 
+  // Board-relative center — used by BlastSelectionPath (SVG inside board).
   const getCellCenter = useCallback((id: CellId) => {
     const board = boardRef.current;
     if (!board) return null;
@@ -52,6 +53,17 @@ export function BlastBoard({
     const r = el.getBoundingClientRect();
     const b = board.getBoundingClientRect();
     return { x: r.left - b.left + r.width / 2, y: r.top - b.top + r.height / 2 };
+  }, []);
+
+  // Viewport-absolute center — fed to BlastFxOverlay, which subtracts its
+  // own canvas rect. Decouples FX positioning from board layout/scroll.
+  const getCellViewportCenter = useCallback((id: CellId) => {
+    const board = boardRef.current;
+    if (!board) return null;
+    const el = board.querySelector(`[data-cell-id="${id}"]`) as HTMLElement | null;
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
   }, []);
 
   const tileState = (id: CellId): BlastTileState => (selectedSet.has(id) ? 'selected' : 'normal');
@@ -84,7 +96,7 @@ export function BlastBoard({
       // Report cleared cell centers before calling onPointerUp
       if (selection.kind === 'active' && onCommitSelection) {
         const centers = selection.cells
-          .map((cell) => getCellCenter(cell))
+          .map((cell) => getCellViewportCenter(cell))
           .filter((c): c is { x: number; y: number } => c !== null);
         if (centers.length > 0) {
           onCommitSelection(centers);
@@ -100,7 +112,7 @@ export function BlastBoard({
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
     };
-  }, [isDragging, onPointerEnter, onPointerUp, selection, onCommitSelection, getCellCenter]);
+  }, [isDragging, onPointerEnter, onPointerUp, selection, onCommitSelection, getCellViewportCenter]);
 
   return (
     <div
@@ -121,8 +133,16 @@ export function BlastBoard({
                 const flags = level.tileFlags[id] ?? [];
                 const tileKey = tileIds[c]?.[row] ?? id;
                 const hasRevealGlow = revealGlowSet.has(id);
+                // Framer's LayoutGroup tracks the keyed child — promoting
+                // this wrapper to <m.div layout> is what makes tiles SLIDE
+                // into their new positions after a collapse (gravity).
                 return (
-                  <div key={tileKey} className="relative">
+                  <m.div
+                    key={tileKey}
+                    layout
+                    transition={{ type: 'spring', stiffness: 700, damping: 38, mass: 0.9 }}
+                    className="relative"
+                  >
                     <BlastTile
                       cellId={id}
                       letter={letter}
@@ -136,7 +156,7 @@ export function BlastBoard({
                     {hasRevealGlow && (
                       <span data-reveal-glow className={styles.revealGlow} />
                     )}
-                  </div>
+                  </m.div>
                 );
               })}
             </AnimatePresence>

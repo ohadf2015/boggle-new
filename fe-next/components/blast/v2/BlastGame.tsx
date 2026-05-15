@@ -274,6 +274,8 @@ export function BlastGame({
       <BlastLevelCompleteCard
         coins={state.coins}
         cascadeCount={state.cascadeCount}
+        modeColor={modeColor}
+        levelNumber={level.levelNumber}
         onNext={onAdvance}
       />
     );
@@ -296,6 +298,8 @@ export function BlastGame({
         chestProgress={progressState.chestProgress}
         chestContents={progressState.chestContents}
         onShuffle={handlers.onShuffle}
+        modeColor={modeColor}
+        theme={level.theme}
         onHint={() => {
           /* Plan 5 wires hints */
         }}
@@ -307,6 +311,7 @@ export function BlastGame({
           chainDepth={state.lastChainDepth}
           clearCenters={clearCentersRef.current}
           clearEventKey={state.chainEventKey}
+          modeColor={modeColor}
         />
         <BlastChainSoundListener />
         <BlastBoard

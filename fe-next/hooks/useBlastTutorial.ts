@@ -24,6 +24,18 @@ export function useBlastTutorial(
     };
   }
 
+  // Tutorial ends after level 2. Levels 3+ are pure gameplay with no
+  // unlock cards or FTUE overlays — mechanics are discovered organically
+  // by playing. See feedback in conversation: "everything function like
+  // tutorial we should have the tutorial only first 2 levels".
+  if (level.levelNumber > 2) {
+    return {
+      showFtueOverlay: false,
+      showUnlockCard: null,
+      unlockCardIndex: -1,
+    };
+  }
+
   // Skip-all flag hides all future cards
   if (shouldSkipAll(unlocksSeen)) {
     return {

@@ -1,16 +1,20 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import { classifyOvation, type OvationTier } from '@/lib/blast/v2/engine';
-import { ParticlePool, PhysicsWorld, PhysicsDebris, ScreenShake, ScoreFlyManager } from '@/lib/gameEngine';
-import { TILE_EXPLOSION, CASCADE_SPARKLE, CONFETTI_BURST } from '@/lib/gameEngine/presets/particles';
+import { ParticlePool, PhysicsWorld, PhysicsDebris, ScreenShake, ScoreFlyManager, ScreenFlash } from '@/lib/gameEngine';
+import { TILE_EXPLOSION_VARIANTS, CASCADE_SPARKLE, CONFETTI_BURST, COMBO_FLASH, ELECTRIC_RINGS, GOLD_STARS } from '@/lib/gameEngine/presets/particles';
 import styles from './BlastFxOverlay.module.css';
 
 type Props = {
   chainEventKey?: number;
   chainDepth?: number;
+  // Viewport-absolute centers (clientX/clientY from getBoundingClientRect).
+  // FxOverlay subtracts its own canvas rect to land bursts on the cleared cell
+  // regardless of canvas vs board size mismatch.
   clearCenters?: Array<{ x: number; y: number }>;
   clearEventKey?: number;
   onChainOvation?: (tier: OvationTier) => void;
+  modeColor?: string;
 };
 
 interface Systems {
@@ -20,6 +24,16 @@ interface Systems {
   debris: PhysicsDebris;
   shake: ScreenShake;
   scoreFly: ScoreFlyManager;
+  flash: ScreenFlash;
+}
+
+function pickExplosionVariant(): typeof TILE_EXPLOSION_VARIANTS[number] {
+  const i = Math.floor(Math.random() * TILE_EXPLOSION_VARIANTS.length);
+  return TILE_EXPLOSION_VARIANTS[i];
+}
+
+function hexToNumber(hex: string): number {
+  return parseInt(hex.replace('#', ''), 16);
 }
 
 export function BlastFxOverlay({
@@ -28,13 +42,16 @@ export function BlastFxOverlay({
   clearCenters = [],
   clearEventKey,
   onChainOvation,
+  modeColor = '#BFFF00',
 }: Props = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const systemsRef = useRef<Systems | null>(null);
   const lastClearKeyRef = useRef<number | undefined>(undefined);
   const lastChainKeyRef = useRef<number | undefined>(undefined);
 
-  // Initialize Pixi + game systems
+  // Initialize Pixi + game systems. `resizeTo: canvas` makes Pixi keep its
+  // renderer + app.screen synchronized with the canvas DOM size — without
+  // this the screen defaulted to 800×600, putting bursts off-canvas.
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
@@ -45,13 +62,15 @@ export function BlastFxOverlay({
       const PIXI = await import('pixi.js');
       if (cancelled) return;
 
-      // Pixi v8: zero-arg constructor + await init()
       const app = new PIXI.Application();
       try {
         await app.init({
           canvas,
           backgroundAlpha: 0,
           antialias: true,
+          resizeTo: canvas,
+          autoDensity: true,
+          resolution: typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1,
         });
       } catch {
         return;
@@ -68,21 +87,20 @@ export function BlastFxOverlay({
 
       appInstance = app;
 
-      // Create game systems
       const physics = new PhysicsWorld({ gravity: { x: 0, y: 400 }, gravityScale: 0.001 });
       const particles = new ParticlePool(app.stage);
       const debris = new PhysicsDebris(app.stage, physics, {
         floorY: app.screen.height,
-        maxDebris: 60,
-        maxAge: 2.0,
-        pieceSize: 5,
+        maxDebris: 80,
+        maxAge: 2.4,
+        pieceSize: 6,
       });
       const shake = new ScreenShake();
       const scoreFly = new ScoreFlyManager(app.stage);
+      const flash = new ScreenFlash(app.stage, app.screen.width, app.screen.height);
 
-      systemsRef.current = { app, particles, physics, debris, shake, scoreFly };
+      systemsRef.current = { app, particles, physics, debris, shake, scoreFly, flash };
 
-      // Ticker: advance physics, particles, debris, shake, scoreFly
       const tick = (ticker: any) => {
         const deltaSec = ticker.deltaMS / 1000;
         physics.update(deltaSec);
@@ -90,16 +108,13 @@ export function BlastFxOverlay({
         debris.update(deltaSec);
         shake.update(deltaSec);
         scoreFly.update(deltaSec);
-
-        // Apply shake offset to stage
+        flash.update(deltaSec);
         const offset = shake.offset;
         app.stage.x = offset.x;
         app.stage.y = offset.y;
       };
-
       app.ticker.add(tick);
 
-      // Cleanup on unmount
       return () => {
         app.ticker.remove(tick);
         particles.destroy();
@@ -119,40 +134,48 @@ export function BlastFxOverlay({
     };
   }, []);
 
-  // Handle clear event: burst particles and debris at each cleared cell center
+  // Handle clear event: burst particles + debris + shockwave + shake at each
+  // cleared cell. Centers arrive viewport-absolute; subtract canvas rect to
+  // land them on the right pixel.
   useEffect(() => {
     if (clearEventKey === undefined || clearEventKey === lastClearKeyRef.current) return;
     lastClearKeyRef.current = clearEventKey;
-
     const systems = systemsRef.current;
-    if (!systems) return;
+    if (!systems || !canvasRef.current) return;
 
-    const { particles, debris, shake } = systems;
+    const rect = canvasRef.current.getBoundingClientRect();
+    const { particles, debris, shake, flash } = systems;
+    const tintColor = hexToNumber(modeColor);
 
     for (const center of clearCenters) {
-      // Burst particles at cleared cell
-      particles.burst(TILE_EXPLOSION, center.x, center.y, 12);
-      // Spawn debris tumbling
-      debris.spawn(center.x, center.y, 0xfff5e6, 3);
+      const lx = center.x - rect.left;
+      const ly = center.y - rect.top;
+      const variant = pickExplosionVariant();
+      particles.burst(variant, lx, ly, 14);
+      particles.burst(ELECTRIC_RINGS, lx, ly, 3);
+      debris.spawn(lx, ly, tintColor, 4);
     }
 
-    // Shake intensity based on number of cleared cells
-    if (clearCenters.length >= 5) {
+    // Screen flash + shake scale with clear size.
+    const n = clearCenters.length;
+    if (n >= 5) {
       shake.medium();
-    } else if (clearCenters.length > 0) {
+      flash.flash({ color: tintColor, intensity: 0.22, duration: 0.18 });
+    } else if (n >= 3) {
+      shake.light();
+      flash.flash({ color: tintColor, intensity: 0.15, duration: 0.14 });
+    } else if (n > 0) {
       shake.light();
     }
-  }, [clearEventKey, clearCenters]);
+  }, [clearEventKey, clearCenters, modeColor]);
 
-  // Handle chain event: ovation tier + center bursts + attribute
+  // Chain ovation: cascade tier → particle barrage + flash.
   useEffect(() => {
     if (chainEventKey === undefined || chainEventKey === lastChainKeyRef.current) return;
     lastChainKeyRef.current = chainEventKey;
 
     const tier = classifyOvation(chainDepth ?? 0);
     const canvas = canvasRef.current;
-
-    // Update HTML attribute for CSS animations
     if (tier !== 'none') {
       canvas?.setAttribute('data-ovation-tier', tier);
       onChainOvation?.(tier);
@@ -160,20 +183,28 @@ export function BlastFxOverlay({
       canvas?.removeAttribute('data-ovation-tier');
     }
 
-    // Fire particle bursts if systems are ready
     const systems = systemsRef.current;
     if (!systems) return;
 
-    const { particles, app } = systems;
+    const { particles, app, shake, flash } = systems;
     const centerX = app.screen.width / 2;
     const centerY = app.screen.height / 2;
+    const depth = chainDepth ?? 0;
 
-    // Base sparkle burst
-    particles.burst(CASCADE_SPARKLE, centerX, centerY, 8 + (chainDepth ?? 0) * 6);
-
-    // Mega tier gets extra confetti
+    particles.burst(CASCADE_SPARKLE, centerX, centerY, 8 + depth * 6);
+    if (depth >= 1) {
+      particles.burst(COMBO_FLASH, centerX, centerY, 18);
+    }
+    if (tier === 'big') {
+      particles.burst(GOLD_STARS, centerX, centerY, 22);
+      shake.medium();
+      flash.flash({ color: 0xffe135, intensity: 0.28, duration: 0.28 });
+    }
     if (tier === 'mega') {
-      particles.burst(CONFETTI_BURST, centerX, centerY, 40);
+      particles.burst(CONFETTI_BURST, centerX, centerY, 50);
+      particles.burst(GOLD_STARS, centerX, centerY, 30);
+      shake.heavy();
+      flash.flash({ color: 0xff1493, intensity: 0.38, duration: 0.4 });
     }
   }, [chainEventKey, chainDepth, onChainOvation]);
 

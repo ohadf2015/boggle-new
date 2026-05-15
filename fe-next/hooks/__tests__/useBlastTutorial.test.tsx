@@ -37,19 +37,8 @@ describe('useBlastTutorial', () => {
     expect(result.current.showUnlockCard).toBeNull();
   });
 
-  it('shows unlock card when mechanic is new at level 3', () => {
+  it('suppresses all unlock cards on level 3+ (tutorial ends after level 2)', () => {
     const unlocks: UnlocksSeen = { ftue_completed: true };
-    const { result } = renderHook(() =>
-      useBlastTutorial(mockLevel3, unlocks, false, () => {})
-    );
-
-    // Level 3 has coinOverlay which is at level 3
-    expect(result.current.showUnlockCard).toBe('coinOverlay');
-    expect(result.current.showFtueOverlay).toBe(false);
-  });
-
-  it('hides unlock card when mechanic is already seen', () => {
-    const unlocks: UnlocksSeen = { ftue_completed: true, coinOverlay: true };
     const { result } = renderHook(() =>
       useBlastTutorial(mockLevel3, unlocks, false, () => {})
     );
@@ -58,7 +47,18 @@ describe('useBlastTutorial', () => {
     expect(result.current.showFtueOverlay).toBe(false);
   });
 
-  it('hides all future cards when skip_all is true', () => {
+  it('suppresses unlock cards on level 13 even if mechanic never seen', () => {
+    const level13: BlastLevel = { levelNumber: 13, board: [['A']], theme: 'test' };
+    const unlocks: UnlocksSeen = { ftue_completed: true };
+    const { result } = renderHook(() =>
+      useBlastTutorial(level13, unlocks, false, () => {})
+    );
+
+    expect(result.current.showUnlockCard).toBeNull();
+    expect(result.current.showFtueOverlay).toBe(false);
+  });
+
+  it('skip_all also clears cards (defensive — superseded by level>2 gate)', () => {
     const unlocks: UnlocksSeen = { ftue_completed: true, skip_all: true };
     const { result } = renderHook(() =>
       useBlastTutorial(mockLevel3, unlocks, false, () => {})
@@ -78,12 +78,12 @@ describe('useBlastTutorial', () => {
     expect(result.current.showFtueOverlay).toBe(true);
   });
 
-  it('returns correct unlockCardIndex for ordering', () => {
+  it('returns unlockCardIndex=-1 after tutorial cutoff', () => {
     const unlocks: UnlocksSeen = { ftue_completed: true };
     const { result } = renderHook(() =>
       useBlastTutorial(mockLevel3, unlocks, false, () => {})
     );
 
-    expect(result.current.unlockCardIndex).toBeGreaterThanOrEqual(0);
+    expect(result.current.unlockCardIndex).toBe(-1);
   });
 });

@@ -7,7 +7,8 @@ import { interestingnessScore, INTERESTINGNESS_THRESHOLD } from './interestingne
 import { mechanicsForLevel } from '../mechanic-flags';
 import type { LocaleConfig } from '../locale-config';
 import type { LevelSource } from '../level-source';
-import { findExtraWords, getBlastCommonWords } from '../engine';
+import { findExtraWords } from '../engine';
+import { getBlastCommonWords } from '../engine/common-words';
 
 let MAX_REGEN_ATTEMPTS = 60;
 const LATERAL_SLIDE_CHANCE = 1 / 8;
