@@ -283,9 +283,9 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
     ctx.save();
     ctx.globalAlpha = bolt.opacity * fade;
 
-    // Outer glow
+    // Outer glow — shadowBlur is GPU-uploaded per call; keep low.
     ctx.shadowColor = bolt.glowColor;
-    ctx.shadowBlur = 18;
+    ctx.shadowBlur = 8;
     ctx.strokeStyle = bolt.glowColor;
     ctx.lineWidth = bolt.width + 4;
     ctx.lineCap = 'round';
@@ -315,7 +315,7 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
       ctx.globalAlpha = bolt.opacity * 0.6 * fade;
       ctx.strokeStyle = bolt.glowColor;
       ctx.lineWidth = bolt.width * 0.6;
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 5;
       ctx.beginPath();
       ctx.moveTo(branchStart.x, branchStart.y);
       let bx = branchStart.x;
@@ -490,37 +490,46 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
       }
 
       if (eventType === 'lightning') {
-        // Spawn lightning bolts with randomized intervals for unpredictability
+        // Spawn lightning bolts with randomized intervals for unpredictability.
+        // Double-strike removed: pre-fix it spawned 20% of the time, peaking at
+        // 4 simultaneous bolts and stuttering on mid-tier mobile.
         const interval = LIGHTNING_INTERVAL_MS + (Math.sin(now * 0.002) * 200);
         if (spawnTimerRef.current > interval) {
           spawnTimerRef.current = 0;
           spawnLightning(w, h);
-          // Occasional double-strike for drama, tuned below WCAG 2.3.1 flash threshold
-          if (Math.random() > 0.8) {
-            spawnLightning(w, h);
-          }
         }
+
+        const fadeOp = fadeOpacityRef.current;
+        const boltsActive = boltsRef.current.length > 0;
 
         // Soft screen flash — capped peak and faster decay to stay under photosensitivity threshold.
         // Skip entirely when user prefers reduced motion (WCAG 2.1 seizure guideline).
         const flashAge = spawnTimerRef.current;
         if (!prefersReducedMotion && flashAge < 70) {
           ctx.save();
-          ctx.globalAlpha = (1 - flashAge / 70) * 0.12 * fadeOpacityRef.current;
+          ctx.globalAlpha = (1 - flashAge / 70) * 0.12 * fadeOp;
           ctx.fillStyle = '#e8ecff';
           ctx.fillRect(0, 0, w, h);
           ctx.restore();
         }
 
-        // Ambient dark storm atmosphere with slow sine pulse (no random strobe)
-        ctx.save();
-        const ambientPulse = 0.035 + Math.sin(now * 0.0012) * 0.01;
-        ctx.globalAlpha = ambientPulse * fadeOpacityRef.current;
-        ctx.fillStyle = '#2a1a4e';
-        ctx.fillRect(0, 0, w, h);
-        ctx.restore();
+        // Ambient dark storm atmosphere — skip when overlay barely visible
+        // (fade-in/out) and when no bolts are active to avoid a wasted full-screen
+        // fillRect on every frame. Note: this lets the canvas-clear show through
+        // briefly between bolts, which is fine — the edge-glow DOM overlay still
+        // provides atmosphere.
+        if (boltsActive && fadeOp > 0.05) {
+          ctx.save();
+          const ambientPulse = 0.035 + Math.sin(now * 0.0012) * 0.01;
+          ctx.globalAlpha = ambientPulse * fadeOp;
+          ctx.fillStyle = '#2a1a4e';
+          ctx.fillRect(0, 0, w, h);
+          ctx.restore();
+        }
 
-        // Update & draw bolts
+        // Update & draw bolts. Per-frame segment jitter removed — bolts only live
+        // ~15 frames (250ms) so static geometry reads identically, and the mutation
+        // was the dominant CPU cost during the catalyst.
         const bolts = boltsRef.current;
         for (let i = bolts.length - 1; i >= 0; i--) {
           const b = bolts[i];
@@ -530,13 +539,6 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
           if (b.life >= b.maxLife) {
             bolts.splice(i, 1);
             continue;
-          }
-
-          // Jitter segments slightly for flicker
-          if (b.life % 2 === 0) {
-            for (let j = 1; j < b.segments.length - 1; j++) {
-              b.segments[j].x += (Math.random() - 0.5) * 4;
-            }
           }
 
           drawLightningBolt(ctx, b);

@@ -506,9 +506,10 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         timerSetTime(pendingGameStart.timerSeconds);
       }
       setMinWordLength(pendingGameStart.minWordLength ?? 2);
-      // Show mode reveal first, which will trigger countdown animation after 2s
+      // Skip ModeRevealOverlay — mode is already visible in lobby; the splash
+      // + GoRipplesAnimation read visually as two countdowns. Go straight to 3-2-1.
       revealedMessageIdRef.current = pendingGameStart.messageId ?? null;
-      setShowModeReveal(true);
+      setShowStartAnimation(true);
 
       // Trigger music immediately for synchronization
       handleGameStartMusic();

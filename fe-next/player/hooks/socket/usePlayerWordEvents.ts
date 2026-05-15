@@ -173,8 +173,13 @@ export function usePlayerWordEvents({
           customHaptic(GAME_HAPTICS.comboLevelUp);
         } else {
           newComboLevel = 0;
-          setComboLevel(0);
-          comboLevelRef.current = 0;
+          // Guard: avoid re-rendering ComboDisplay when already at 0.
+          // Without this, every non-chained word triggers setComboLevel(0)
+          // and re-paints the combo subtree mid-game.
+          if (currentComboLevel !== 0) {
+            setComboLevel(0);
+            comboLevelRef.current = 0;
+          }
         }
         setLastWordTime(now);
         lastWordTimeRef.current = now;
