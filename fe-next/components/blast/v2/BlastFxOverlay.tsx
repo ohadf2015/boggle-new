@@ -25,6 +25,8 @@ interface Systems {
   shake: ScreenShake;
   scoreFly: ScoreFlyManager;
   flash: ScreenFlash;
+  bloom: import('pixi-filters').BloomFilter | null;
+  rings: Array<{ g: import('pixi.js').Graphics; raf: number }>;
 }
 
 function pickExplosionVariant(): typeof TILE_EXPLOSION_VARIANTS[number] {
@@ -34,6 +36,82 @@ function pickExplosionVariant(): typeof TILE_EXPLOSION_VARIANTS[number] {
 
 function hexToNumber(hex: string): number {
   return parseInt(hex.replace('#', ''), 16);
+}
+
+const MAX_RINGS = 12;
+
+// Expanding stroked ring — "shockwave footprint" on each clear / ovation.
+// Skipped on prefers-reduced-motion.
+async function spawnPulseRing(
+  app: import('pixi.js').Application,
+  systems: { rings: Array<{ g: import('pixi.js').Graphics; raf: number }> },
+  cx: number,
+  cy: number,
+  color: number,
+  scaleMul = 1,
+) {
+  if (typeof window !== 'undefined'
+    && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  if (systems.rings.length >= MAX_RINGS) return;
+  const PIXI = await import('pixi.js');
+  const g = new PIXI.Graphics();
+  const baseRadius = Math.min(app.screen.width, app.screen.height) * 0.12 * scaleMul;
+  g.circle(0, 0, baseRadius).stroke({ color, width: 5, alpha: 1 });
+  g.x = cx;
+  g.y = cy;
+  app.stage.addChild(g);
+
+  const start = performance.now();
+  const duration = 500;
+  const entry = { g, raf: 0 };
+  systems.rings.push(entry);
+  const step = () => {
+    if (g.destroyed) return;
+    const t = Math.min((performance.now() - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    g.scale.set(0.4 + ease * 1.6);
+    g.alpha = 1 - t;
+    if (t >= 1) {
+      try { app.stage.removeChild(g); } catch { /* ok */ }
+      g.destroy();
+      const idx = systems.rings.indexOf(entry);
+      if (idx >= 0) systems.rings.splice(idx, 1);
+      return;
+    }
+    entry.raf = requestAnimationFrame(step);
+  };
+  entry.raf = requestAnimationFrame(step);
+}
+
+// Horizontal luminous bar sweeping top→bottom — cinematic on big clears / chains.
+async function spawnLightSweep(
+  app: import('pixi.js').Application,
+  _systems: unknown,
+  color: number,
+) {
+  if (typeof window !== 'undefined'
+    && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  const PIXI = await import('pixi.js');
+  const g = new PIXI.Graphics();
+  const barH = 8;
+  g.rect(0, -barH / 2, app.screen.width, barH).fill({ color, alpha: 0.75 });
+  g.y = -barH;
+  app.stage.addChild(g);
+  const start = performance.now();
+  const duration = 480;
+  const tick = () => {
+    if (g.destroyed) return;
+    const t = Math.min((performance.now() - start) / duration, 1);
+    g.y = t * (app.screen.height + barH) - barH;
+    g.alpha = 0.75 * (1 - t * t);
+    if (t >= 1) {
+      try { app.stage.removeChild(g); } catch { /* ok */ }
+      g.destroy();
+      return;
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
 }
 
 export function BlastFxOverlay({
@@ -99,7 +177,19 @@ export function BlastFxOverlay({
       const scoreFly = new ScoreFlyManager(app.stage);
       const flash = new ScreenFlash(app.stage, app.screen.width, app.screen.height);
 
-      systemsRef.current = { app, particles, physics, debris, shake, scoreFly, flash };
+      // Chain-scaled bloom filter — disabled at rest, ramps with cascade depth
+      // for that "screen-saturates" punch when chains stack.
+      let bloom: import('pixi-filters').BloomFilter | null = null;
+      try {
+        const { BloomFilter } = await import('pixi-filters');
+        bloom = new BloomFilter({ strength: 0, quality: 4 });
+        const prev = Array.isArray(app.stage.filters) ? app.stage.filters : [];
+        app.stage.filters = [...prev, bloom];
+      } catch {
+        // pixi-filters optional — skip bloom if import fails
+      }
+
+      systemsRef.current = { app, particles, physics, debris, shake, scoreFly, flash, bloom, rings: [] };
 
       const tick = (ticker: any) => {
         const deltaSec = ticker.deltaMS / 1000;
@@ -144,28 +234,32 @@ export function BlastFxOverlay({
     if (!systems || !canvasRef.current) return;
 
     const rect = canvasRef.current.getBoundingClientRect();
-    const { particles, debris, shake, flash } = systems;
+    const { particles, debris, shake, flash, app } = systems;
     const tintColor = hexToNumber(modeColor);
 
     for (const center of clearCenters) {
       const lx = center.x - rect.left;
       const ly = center.y - rect.top;
       const variant = pickExplosionVariant();
-      particles.burst(variant, lx, ly, 14);
-      particles.burst(ELECTRIC_RINGS, lx, ly, 3);
-      debris.spawn(lx, ly, tintColor, 4);
+      particles.burst(variant, lx, ly, 18);
+      particles.burst(ELECTRIC_RINGS, lx, ly, 4);
+      debris.spawn(lx, ly, tintColor, 6);
+      spawnPulseRing(app, systems, lx, ly, tintColor);
     }
 
-    // Screen flash + shake scale with clear size.
+    // Screen flash + shake scale with clear size. Bumped one tier across the
+    // board — playtest feedback was that small clears felt flat.
     const n = clearCenters.length;
     if (n >= 5) {
+      shake.heavy();
+      flash.flash({ color: tintColor, intensity: 0.32, duration: 0.24 });
+      spawnLightSweep(app, systems, tintColor);
+    } else if (n >= 3) {
       shake.medium();
       flash.flash({ color: tintColor, intensity: 0.22, duration: 0.18 });
-    } else if (n >= 3) {
-      shake.light();
-      flash.flash({ color: tintColor, intensity: 0.15, duration: 0.14 });
     } else if (n > 0) {
       shake.light();
+      flash.flash({ color: tintColor, intensity: 0.12, duration: 0.1 });
     }
   }, [clearEventKey, clearCenters, modeColor]);
 
@@ -186,7 +280,7 @@ export function BlastFxOverlay({
     const systems = systemsRef.current;
     if (!systems) return;
 
-    const { particles, app, shake, flash } = systems;
+    const { particles, app, shake, flash, bloom } = systems;
     const centerX = app.screen.width / 2;
     const centerY = app.screen.height / 2;
     const depth = chainDepth ?? 0;
@@ -195,16 +289,36 @@ export function BlastFxOverlay({
     if (depth >= 1) {
       particles.burst(COMBO_FLASH, centerX, centerY, 18);
     }
+    // Bloom ramp — saturates the screen as chains stack, eases back to 0.
+    if (bloom && depth >= 1) {
+      const targetStrength = Math.min(0.6 + depth * 1.6, 6);
+      bloom.strength = targetStrength;
+      const start = performance.now();
+      const fadeMs = 600 + depth * 120;
+      const fade = () => {
+        const t = Math.min((performance.now() - start) / fadeMs, 1);
+        if (bloom) bloom.strength = targetStrength * (1 - t);
+        if (t < 1) requestAnimationFrame(fade);
+      };
+      requestAnimationFrame(fade);
+    }
+    // Chain >= 2 → cinematic light sweep across the board.
+    if (depth >= 2) {
+      spawnLightSweep(app, systems, 0xffffff);
+    }
     if (tier === 'big') {
-      particles.burst(GOLD_STARS, centerX, centerY, 22);
-      shake.medium();
-      flash.flash({ color: 0xffe135, intensity: 0.28, duration: 0.28 });
+      particles.burst(GOLD_STARS, centerX, centerY, 28);
+      shake.heavy();
+      flash.flash({ color: 0xffe135, intensity: 0.34, duration: 0.32 });
+      spawnPulseRing(app, systems, centerX, centerY, 0xffe135, 1.5);
     }
     if (tier === 'mega') {
-      particles.burst(CONFETTI_BURST, centerX, centerY, 50);
-      particles.burst(GOLD_STARS, centerX, centerY, 30);
+      particles.burst(CONFETTI_BURST, centerX, centerY, 64);
+      particles.burst(GOLD_STARS, centerX, centerY, 40);
       shake.heavy();
-      flash.flash({ color: 0xff1493, intensity: 0.38, duration: 0.4 });
+      flash.flash({ color: 0xff1493, intensity: 0.45, duration: 0.45 });
+      spawnPulseRing(app, systems, centerX, centerY, 0xff1493, 2);
+      spawnPulseRing(app, systems, centerX, centerY, 0x00ffff, 2.4);
     }
   }, [chainEventKey, chainDepth, onChainOvation]);
 

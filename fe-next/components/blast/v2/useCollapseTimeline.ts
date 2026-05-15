@@ -30,18 +30,41 @@ export function useCollapseTimeline(
     const tiles = boardRef.current.querySelectorAll<HTMLElement>('[data-cell-id]');
     const tl = gsap.timeline();
     tiles.forEach((el, i) => {
+      // Land-bounce two-phase: hard squash to 0.66 (anticipation of landing
+      // weight) → snap-back overshoot to 1.06 → settle at 1.0. Reads as the
+      // tile having mass. Stagger 18ms per tile so cascades feel sequenced.
+      const startAt = i * 0.018;
       tl.fromTo(
         el,
-        { scaleY: 1 },
+        { scaleY: 1, scaleX: 1 },
         {
-          scaleY: 0.82,
-          duration: 0.09,
-          yoyo: true,
-          repeat: 1,
-          ease: 'power2.in',
+          scaleY: 0.66,
+          scaleX: 1.18,
+          duration: 0.11,
+          ease: 'power3.in',
           transformOrigin: 'bottom center',
         },
-        i * 0.012,
+        startAt,
+      );
+      tl.to(
+        el,
+        {
+          scaleY: 1.06,
+          scaleX: 0.94,
+          duration: 0.12,
+          ease: 'power2.out',
+        },
+        startAt + 0.11,
+      );
+      tl.to(
+        el,
+        {
+          scaleY: 1,
+          scaleX: 1,
+          duration: 0.18,
+          ease: 'elastic.out(1.2, 0.5)',
+        },
+        startAt + 0.23,
       );
     });
     return () => {

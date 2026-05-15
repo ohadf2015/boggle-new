@@ -120,13 +120,24 @@ export function BlastBoard({
       dir={dir}
       data-shake-key={invalidShakeKey}
       data-testid="blast-board"
-      className="relative flex items-end justify-center gap-2 p-4 touch-none select-none"
+      className={`relative flex items-end justify-center gap-2 p-4 touch-none select-none ${styles.board}`}
       style={{ touchAction: 'none' }}
       onPointerUp={onPointerUp}
     >
+      {/* Cell-well backdrop — empty inset slots line up perfectly with tile
+          positions. Reads as a real game board, not floating stickers. */}
+      <div aria-hidden className="absolute inset-0 flex items-end justify-center gap-2 p-4 pointer-events-none">
+        {level.columns.map((col) => (
+          <div key={`well-${col.index}`} className="flex flex-col-reverse gap-2">
+            {col.tiles.map((_, row) => (
+              <div key={`well-${col.index}-${row}`} className={styles.cellWell} />
+            ))}
+          </div>
+        ))}
+      </div>
       <LayoutGroup>
         {level.columns.map((col, c) => (
-          <div key={col.index} className="flex flex-col-reverse gap-2" data-col={col.index}>
+          <div key={col.index} className="flex flex-col-reverse gap-2 relative" data-col={col.index}>
             <AnimatePresence>
               {col.tiles.map((letter, row) => {
                 const id = makeCellId(col.index, row);
@@ -140,7 +151,9 @@ export function BlastBoard({
                   <m.div
                     key={tileKey}
                     layout
-                    transition={{ type: 'spring', stiffness: 700, damping: 38, mass: 0.9 }}
+                    // Bouncier spring: lower stiffness + damping → overshoot
+                    // on land so tiles "settle" instead of snapping into place.
+                    transition={{ type: 'spring', stiffness: 420, damping: 22, mass: 1.05, restDelta: 0.5 }}
                     className="relative"
                   >
                     <BlastTile

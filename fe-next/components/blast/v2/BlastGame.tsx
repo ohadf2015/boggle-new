@@ -82,20 +82,20 @@ export function BlastGame({
     [state.level, state.foundWords],
   );
   const [revealGlowCells, setRevealGlowCells] = useState<CellId[]>([]);
-  // Compute reveal glow cells when a word is found: glow the next formable word
+  // Tutorial-only: auto-glow the next formable word on L1–L2. Past L2 the board
+  // is pure puzzle — marking answers makes every level feel like a guided demo.
   useEffect(() => {
-    if (state.status === 'levelComplete') {
+    if (state.status === 'levelComplete' || level.levelNumber > 2) {
       setRevealGlowCells([]);
       return;
     }
     const cascades = detectAllCascades(state.level, state.foundWords, LOCALE_CONFIGS[state.level.locale]);
     if (cascades.length > 0) {
-      // Glow the first (next) formable word
       setRevealGlowCells(cascades[0].cells);
     } else {
       setRevealGlowCells([]);
     }
-  }, [state.foundWords, state.level, state.status]);
+  }, [state.foundWords, state.level, state.status, level.levelNumber]);
   const { state: progressState, clearLevel, openChest, openMutation } = useBlastProgress();
   const [showChestModal, setShowChestModal] = useState(false);
   // Idempotency: one submission per level — prevents retry loop on state-feedback re-renders.
@@ -314,6 +314,13 @@ export function BlastGame({
           modeColor={modeColor}
         />
         <BlastChainSoundListener />
+        {/* Container-typed stage: caps board width so phones, tablets, and
+            wide desktops all get a centered, balanced playfield. `cqi` units
+            in BlastTile sizing measure THIS box, not the viewport. */}
+        <div
+          className="relative w-full max-w-[min(96vw,520px)] mx-auto flex items-end justify-center"
+          style={{ containerType: 'inline-size', aspectRatio: `${level.columns.length} / ${Math.max(...level.columns.map(c => c.tiles.length))}` }}
+        >
         <BlastBoard
           level={state.level}
           selection={state.selection}
@@ -329,6 +336,7 @@ export function BlastGame({
             clearCentersRef.current = centers;
           }}
         />
+        </div>
       </div>
       {tutorial.showFtueOverlay && !isVeteranPlayer && ftueStep !== null && (
         <BlastFtueOverlay

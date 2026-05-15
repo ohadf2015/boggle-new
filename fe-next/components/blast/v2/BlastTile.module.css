@@ -1,3 +1,25 @@
+/* Board wrapper — sets up container query context for tile sizing and
+   draws a faint frame around the playing field. */
+.board {
+  container-type: inline-size;
+  border-radius: 18px;
+  isolation: isolate;
+}
+
+/* Empty slot frame behind each tile column. Same size & gap as tiles so
+   landed tiles align perfectly with their well. Inset shadow gives a
+   "tray" feel — neo-brutalist hard inner shadow, no blur. */
+.cellWell {
+  width: var(--blast-tile-size, clamp(48px, 18cqi, 88px));
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 2px dashed rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 2px 2px 0 rgba(0, 0, 0, 0.35),
+    inset -1px -1px 0 rgba(255, 255, 255, 0.04);
+}
+
 .tile {
   position: relative;
   display: grid;
