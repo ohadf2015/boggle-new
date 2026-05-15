@@ -46,6 +46,8 @@ import {
 } from '@/components/word-craft/wordCraftTelemetry';
 import { useAchievementQueue } from '@/components/achievements';
 import { cn } from '@/lib/utils';
+import { useWordCraftRunFlag } from '@/hooks/useWordCraftRunFlag';
+import { RunPageClient } from './RunPageClient';
 
 const ENCOURAGEMENT_COUNT = 8;
 const LINGUIST_STORAGE_KEY = 'wc_locales_played';
@@ -503,6 +505,11 @@ export default function WordCraftPageClient() {
     juice.invalidShake(cellEls);
   }, [game.state.lastError, game.state.pendingPlacements, juice]);
 
+  // Gate run-mode behind feature flag; fall back to legacy PageClient if disabled
+  const runModeEnabled = useWordCraftRunFlag();
+  if (runModeEnabled) {
+    return <RunPageClient />;
+  }
 
   if (authLoading) {
     return (
