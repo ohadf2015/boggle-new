@@ -10,6 +10,8 @@ import { resetComboState as resetComboStateUtil } from '@/shared/utils/comboUtil
 import {
   sendStartGameAck,
   stashStartGameMessageId,
+  wasStartGameHandled,
+  markStartGameHandled,
   createRoomClosedDueToInactivityHandler,
   triggerGameOverCelebration,
   showGameCompleteToast,
@@ -263,6 +265,16 @@ export function useHostGameEvents({
         return;
       }
 
+      // Self-dedup: if this messageId was already fully handled (either by
+      // this listener firing twice via re-register/StrictMode, or by HostView's
+      // pendingGameStart effect running first), skip the redundant
+      // store/timer/animation/ack work — otherwise the player sees the
+      // pre-game GoRipples countdown play twice.
+      if (data.messageId && wasStartGameHandled('HOST', data.messageId)) {
+        logger.log('[HOST] Ignoring duplicate startGame for messageId:', data.messageId);
+        return;
+      }
+
       const isReconnect = !!extData.reconnect;
       logger.log('[HOST] Received startGame event from server', isReconnect ? '(reconnect)' : '(new game)');
 
@@ -350,6 +362,10 @@ export function useHostGameEvents({
       // Stash messageId so the GoRipplesAnimation can emit `countdownComplete`
       // when it finishes — that's what now starts the server-side round timer.
       stashStartGameMessageId('HOST', data.messageId);
+      // Mark handled so HostView's pendingGameStart effect skips its
+      // redundant store/animation work — both handlers run for a normal
+      // start, and double setShowStartAnimation(true) replays GoRipples.
+      markStartGameHandled('HOST', data.messageId);
 
       // Send acknowledgment to server using shared utility
       sendStartGameAck(socket, data, 'HOST');

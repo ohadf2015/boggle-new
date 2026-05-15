@@ -39,6 +39,7 @@ import {
   stashStartGameMessageId,
   consumeStashedMessageId,
   wasStartGameHandled,
+  markStartGameHandled,
 } from '@/shared/utils/gameEventUtils';
 import {
   useFoundWords,
@@ -130,6 +131,11 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // `countdownComplete` once the GoRipplesAnimation finishes. Server gates
   // round-timer start on this signal, so the timer doesn't tick during 3-2-1.
   const pendingMessageIdRef = useRef<string | null>(null);
+  // Tracks the messageId we've already driven the mode-reveal/GoRipples
+  // sequence for. Server retries `startGame` for unacked clients with the
+  // SAME messageId — without this guard, each retry re-triggers
+  // setShowModeReveal(true) and the player sees the countdown twice.
+  const revealedMessageIdRef = useRef<string | null>(null);
 
   // Multiplayer timer - uses timestamp-based countdown that syncs with server
   // Initial time will be set when game starts via socket event
@@ -409,7 +415,13 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         if (pendingGameStart.messageId) {
           pendingMessageIdRef.current = pendingGameStart.messageId;
         }
-        setShowModeReveal(true);
+        // Skip if we've already driven the reveal for this messageId — server
+        // retries startGame for unacked clients with the SAME id, and re-firing
+        // setShowModeReveal(true) makes the countdown play a second time.
+        if (revealedMessageIdRef.current !== (pendingGameStart.messageId ?? null)) {
+          revealedMessageIdRef.current = pendingGameStart.messageId ?? null;
+          setShowModeReveal(true);
+        }
       }
       onGameStartConsumed();
       return;
@@ -495,6 +507,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       }
       setMinWordLength(pendingGameStart.minWordLength ?? 2);
       // Show mode reveal first, which will trigger countdown animation after 2s
+      revealedMessageIdRef.current = pendingGameStart.messageId ?? null;
       setShowModeReveal(true);
 
       // Trigger music immediately for synchronization
@@ -503,6 +516,11 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       if (pendingGameStart.messageId) {
         pendingMessageIdRef.current = pendingGameStart.messageId;
         stashStartGameMessageId('PLAYER', pendingGameStart.messageId);
+        // Mark handled so usePlayerGameEvents.handleStartGame's dedup guard
+        // short-circuits when the socket event arrives — otherwise both
+        // handlers set showStartAnimation=true at different times, GoRipples
+        // unmounts/remounts, and the player sees the countdown twice.
+        markStartGameHandled('PLAYER', pendingGameStart.messageId);
         socket.emit('startGameAck', { messageId: pendingGameStart.messageId });
         logger.log('[PLAYER] Sent startGameAck for pending game start, messageId:', pendingGameStart.messageId);
       }

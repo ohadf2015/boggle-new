@@ -20,6 +20,8 @@ import {
   sendCountdownComplete,
   stashStartGameMessageId,
   consumeStashedMessageId,
+  wasStartGameHandled,
+  markStartGameHandled,
 } from '@/shared/utils/gameEventUtils';
 
 // Extracted components
@@ -400,6 +402,15 @@ const HostView: React.FC<HostViewProps> = memo(({
   useEffect(() => {
     if (!pendingGameStart) return;
 
+    // Skip if useHostGameEvents.handleStartGame already drove the start for
+    // this messageId — both handlers run for a normal start, and double
+    // setShowStartAnimation(true) makes GoRipples unmount/remount and play
+    // the countdown twice.
+    if (wasStartGameHandled('HOST', pendingGameStart.messageId)) {
+      onGameStartConsumed?.();
+      return;
+    }
+
     // Initialize game state from pending data
     if (pendingGameStart.letterGrid) {
       state.setTableData(pendingGameStart.letterGrid);
@@ -412,6 +423,7 @@ const HostView: React.FC<HostViewProps> = memo(({
     // finishes — server gates the round timer on that signal.
     if (pendingGameStart.messageId) {
       stashStartGameMessageId('HOST', pendingGameStart.messageId);
+      markStartGameHandled('HOST', pendingGameStart.messageId);
     }
 
     // Reset states for new game and trigger animation
