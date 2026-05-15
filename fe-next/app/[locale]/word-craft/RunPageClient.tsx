@@ -1,0 +1,143 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
+import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
+import { useWordCraftRun } from '@/lib/word-craft/run/useWordCraftRun';
+import type { SupportedLocale } from '@/lib/word-craft/tileBag';
+import { WordCraftBoardSection } from '@/components/word-craft/WordCraftBoardSection';
+import { WordCraftRack } from '@/components/word-craft/WordCraftRack';
+import { RunHUD } from '@/components/word-craft/run/RunHUD';
+import { CardPickScreen } from '@/components/word-craft/run/CardPickScreen';
+import { RoundResultScene } from '@/components/word-craft/run/RoundResultScene';
+import { RunResultScene } from '@/components/word-craft/run/RunResultScene';
+
+export function RunPageClient() {
+  const { t, language } = useLanguage();
+  const locale = (language ?? 'en') as SupportedLocale;
+  useHideNavigation();
+
+  const [dict, setDict] = useState<Set<string> | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    loadWordCraftDictionary(locale).then((d) => {
+      if (!cancelled) setDict(d);
+    }).catch(() => {
+      if (!cancelled) setDict(new Set());
+    });
+    return () => { cancelled = true; };
+  }, [locale]);
+
+  const boardSize: 7 | 9 = typeof window !== 'undefined' && window.innerWidth >= 768 ? 9 : 7;
+  const run = useWordCraftRun({ seed: 1, dict, locale, boardSize });
+  const { state } = run;
+
+  if (!dict) {
+    return <div className="p-6 text-center font-neo-body text-neo-white/70">{t('common.loading')}</div>;
+  }
+
+  if (state.phase === 'intro') {
+    return (
+      <section className="flex flex-col items-center gap-4 p-6 text-center">
+        <h1 className="text-3xl font-neo-display text-neo-lime">{t('wordcraft.run.intro.title')}</h1>
+        <p className="max-w-md font-neo-body text-neo-white/80">{t('wordcraft.run.intro.howTo')}</p>
+        <button
+          type="button"
+          onClick={run.startRun}
+          className="animate-neo-press rounded-neo border-neo-thick border-neo-lime bg-neo-lime px-6 py-2 font-neo-display text-neo-navy shadow-hard"
+        >
+          {t('wordcraft.run.intro.start')}
+        </button>
+      </section>
+    );
+  }
+
+  if (state.phase === 'cardPick' && state.cardChoice) {
+    return <CardPickScreen cards={state.cardChoice} onPick={run.pickCard} />;
+  }
+
+  if (state.phase === 'roundResult') {
+    return (
+      <RoundResultScene
+        passed={state.roundPassed}
+        round={state.round.round}
+        roundScore={state.round.score}
+        target={state.round.target}
+        onProceed={run.proceed}
+      />
+    );
+  }
+
+  if (state.phase === 'runResult') {
+    return (
+      <RunResultScene
+        cleared={state.cleared}
+        runTotal={state.runTotal}
+        activeCards={state.activeCards}
+        onRestart={run.restart}
+      />
+    );
+  }
+
+  // state.phase === 'playing'
+  return (
+    <div className="flex flex-col gap-3 p-3">
+      <RunHUD
+        round={state.round.round}
+        target={state.round.target}
+        score={state.round.score}
+        runTotal={state.runTotal}
+        activeCards={state.activeCards}
+        tilesRemaining={run.tilesRemaining}
+      />
+      <WordCraftBoardSection
+        board={state.board}
+        pending={state.pendingPlacements}
+        selectedRackTile={state.selectedRackTileId ? state.rack.find((t) => t.id === state.selectedRackTileId) ?? null : null}
+        onCellTap={(cell: { row: number; col: number }) => {
+          if (state.selectedRackTileId) {
+            run.placeTile(state.selectedRackTileId, cell.row, cell.col);
+          }
+        }}
+        onCellDragOver={() => {}}
+        onCellDrop={() => {}}
+        onSceneCtx={() => {}}
+      />
+      <WordCraftRack
+        tiles={state.rack}
+        selectedId={state.selectedRackTileId}
+        pendingIds={new Set(state.pendingPlacements.map((p) => p.rackTileId))}
+        onSelect={run.selectRackTile}
+        ariaLabel={t('wordcraft.yourRack')}
+        locale={locale}
+      />
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={run.submitMove}
+          className="animate-neo-press rounded-neo border-neo border-neo-lime bg-neo-lime px-4 py-2 font-neo-display text-neo-navy shadow-hard"
+        >
+          {t('wordcraft.run.submit')}
+        </button>
+        <button
+          type="button"
+          onClick={run.recallAll}
+          className="animate-neo-press rounded-neo border-neo border-neo-cyan bg-neo-navy-light px-4 py-2 font-neo-body text-neo-cyan shadow-hard"
+        >
+          {t('wordcraft.run.recall')}
+        </button>
+        <button
+          type="button"
+          onClick={run.endRound}
+          className="animate-neo-press rounded-neo border-neo border-neo-pink bg-neo-navy-light px-4 py-2 font-neo-body text-neo-pink shadow-hard"
+        >
+          {t('wordcraft.run.endRound')}
+        </button>
+      </div>
+      {state.lastError && (
+        <p className="font-neo-body text-sm text-neo-red">{state.lastError}</p>
+      )}
+    </div>
+  );
+}
