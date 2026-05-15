@@ -10614,6 +10614,9 @@ const en = {
     label: "Advertisement",
     rewarded: {
       watchForGold: "Watch ad for +{amount} gold",
+      watchForGoldDoubleXp: "Double your gold (+{amount})",
+      watchForGoldSkip: "Instant +{amount} gold",
+      watchForGoldHint: "Free +{amount} gold",
       earning: "Watching...",
       earned: "+{amount} gold earned!",
       cooldown: "Available soon",

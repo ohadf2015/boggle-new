@@ -10702,6 +10702,9 @@ const es = {
     "label": "Anuncio",
     "rewarded": {
       "watchForGold": "Ver anuncio por +{amount} oro",
+      "watchForGoldDoubleXp": "Duplica el oro (+{amount})",
+      "watchForGoldSkip": "+{amount} oro al instante",
+      "watchForGoldHint": "+{amount} oro gratis",
       "earning": "Viendo...",
       "earned": "+{amount} oro ganado!",
       "cooldown": "Disponible pronto"

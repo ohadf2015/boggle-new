@@ -24,6 +24,10 @@ vi.mock('@/hooks/useRewardedAd', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useExperiment', () => ({
+  useExperiment: () => ({ variant: 'control', trackExposure: vi.fn() }),
+}));
+
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', direction: 'ltr' }),
 }));
@@ -44,7 +48,10 @@ describe('RewardedAdGoldButton analytics', () => {
     render(<RewardedAdGoldButton goldAmount={25} surface="player_waiting" />);
 
     expect(trackRewardedAdOffered).toHaveBeenCalledTimes(1);
-    expect(trackRewardedAdOffered).toHaveBeenCalledWith('player_waiting');
+    expect(trackRewardedAdOffered).toHaveBeenCalledWith(
+      'player_waiting',
+      expect.objectContaining({ copyVariant: 'control' }),
+    );
   });
 
   it('fires only once even on re-render', () => {
@@ -54,6 +61,9 @@ describe('RewardedAdGoldButton analytics', () => {
     rerender(<RewardedAdGoldButton goldAmount={50} surface="gold_top_up" />);
 
     expect(trackRewardedAdOffered).toHaveBeenCalledTimes(1);
-    expect(trackRewardedAdOffered).toHaveBeenCalledWith('gold_top_up');
+    expect(trackRewardedAdOffered).toHaveBeenCalledWith(
+      'gold_top_up',
+      expect.objectContaining({ copyVariant: 'control' }),
+    );
   });
 });

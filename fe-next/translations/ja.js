@@ -10703,6 +10703,9 @@ const ja = {
     label: "広告",
     rewarded: {
       watchForGold: "広告を見て+{amount}ゴールド",
+      watchForGoldDoubleXp: "ゴールド2倍 (+{amount})",
+      watchForGoldSkip: "今すぐ+{amount}ゴールド",
+      watchForGoldHint: "+{amount}ゴールド無料",
       earning: "視聴中...",
       earned: "+{amount}ゴールド獲得！",
       cooldown: "まもなく利用可能",

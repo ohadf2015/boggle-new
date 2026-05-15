@@ -10729,6 +10729,9 @@ const sv = {
     label: "Annons",
     rewarded: {
       watchForGold: "Se reklam för +{amount} guld",
+      watchForGoldDoubleXp: "Dubbla guldet (+{amount})",
+      watchForGoldSkip: "Direkt +{amount} guld",
+      watchForGoldHint: "Gratis +{amount} guld",
       earning: "Tittar...",
       earned: "+{amount} guld tjänat!",
       cooldown: "Tillgänglig snart",
