@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
-import { X, Hash, Zap } from 'lucide-react';
+import { Hash, Zap } from 'lucide-react';
 
 interface WordEntry {
   word: string;
@@ -41,29 +41,24 @@ export const WordHuntWordsModal: React.FC<WordHuntWordsModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
-      <DialogContent className="max-w-md bg-neo-navy border-neo-thick border-neo-black shadow-hard-lg p-0 overflow-hidden">
+      <DialogContent
+        className="max-w-md bg-neo-navy border-neo-thick border-neo-black shadow-hard-lg p-0 overflow-hidden"
+        closeButtonLabel={t('common.close', 'Close')}
+      >
         <VisuallyHidden.Root>
           <DialogTitle>{t('wordHunt.results.playerWordsTitle', `${playerName}'s path`)}</DialogTitle>
         </VisuallyHidden.Root>
 
         {/* Header */}
         <div className="relative bg-neo-lime text-neo-black p-4 border-b-3 border-neo-black">
-          <h2 className="font-neo-display font-black text-xl sm:text-2xl uppercase tracking-wide pe-10 truncate">
+          <h2 className="font-neo-display font-black text-xl sm:text-2xl uppercase tracking-wide pe-14 truncate">
             🎯 {playerName}
           </h2>
-          <p className="text-sm font-bold opacity-80 mt-0.5">
+          <p className="text-sm font-bold opacity-80 mt-0.5 pe-14">
             {diffMode
               ? t('wordHunt.results.youMissedWords', 'Words you missed')
               : t('wordHunt.results.playerWordsTitle', `${playerName}'s path`)}
           </p>
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-white hover:bg-neo-cream transition-colors shadow-hard-xs"
-            aria-label={t('common.close', 'Close')}
-          >
-            <X className="w-4 h-4" />
-          </button>
         </div>
 
         {/* Body */}

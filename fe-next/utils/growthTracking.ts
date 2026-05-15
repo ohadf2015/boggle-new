@@ -117,6 +117,7 @@ export type GrowthEvent =
   // CrazyGames portal short-flow funnel
   | 'cg_welcome_view'
   | 'cg_welcome_play'
+  | 'cg_welcome_dismissed'
   | 'cg_tutorial_view'
   | 'cg_tutorial_complete'
   | 'cg_tutorial_skip'

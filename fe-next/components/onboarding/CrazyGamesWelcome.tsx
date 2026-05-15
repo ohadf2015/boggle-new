@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { m } from 'framer-motion';
 import { Sparkles, Gamepad2, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -29,13 +29,35 @@ const DECEL = [0.22, 1, 0.36, 1] as const;
  * Locale comes from URL (always /<locale>/...), so no language picker.
  * Profile is deferred until after first game.
  */
+const AUTO_ROUTE_MS = 5000;
+const AUTO_ROUTE_TICK_MS = 1000;
+
 const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
   const { t, dir, language, setLanguage } = useLanguage();
   const { getSystemInfo } = useCrazyGames();
   const isRTL = dir === 'rtl';
 
+  // Intent flags — used to decide whether unmount counts as a dismissal.
+  // ctaFiredRef = user picked a mode (or auto-route resolved). dismissedRef = ESC/explicit dismiss already fired the event.
+  const ctaFiredRef = useRef(false);
+  const dismissedRef = useRef(false);
+  const autoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tickTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [remaining, setRemaining] = useState<number>(Math.ceil(AUTO_ROUTE_MS / 1000));
+
   useEffect(() => {
     trackGrowthEvent('cg_welcome_view', { source: 'crazygames' });
+  }, []);
+
+  const clearTimers = React.useCallback(() => {
+    if (autoTimerRef.current) {
+      clearTimeout(autoTimerRef.current);
+      autoTimerRef.current = null;
+    }
+    if (tickTimerRef.current) {
+      clearInterval(tickTimerRef.current);
+      tickTimerRef.current = null;
+    }
   }, []);
 
   // Auto-detect locale from CG country + browser. URL locale (default `en`)
@@ -69,15 +91,60 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handlePlay = (mode: CrazyGamesMode) => {
-    trackGrowthEvent('cg_welcome_play', { mode });
+  const handlePlay = React.useCallback((mode: CrazyGamesMode, opts: { auto?: boolean } = {}) => {
+    if (ctaFiredRef.current) return;
+    ctaFiredRef.current = true;
+    clearTimers();
+    trackGrowthEvent('cg_welcome_play', opts.auto ? { mode, auto: true } : { mode });
     onPlay(mode);
-  };
+  }, [clearTimers, onPlay]);
+
+  // 5s auto-route to daily for CG portal users who don't pick a mode.
+  // Why: PostHog data 2026-05-15 — 19/20 CG arrivals never reached game_started.
+  useEffect(() => {
+    autoTimerRef.current = setTimeout(() => {
+      handlePlay('daily', { auto: true });
+    }, AUTO_ROUTE_MS);
+    tickTimerRef.current = setInterval(() => {
+      setRemaining((r) => (r > 1 ? r - 1 : 0));
+    }, AUTO_ROUTE_TICK_MS);
+    return clearTimers;
+  }, [handlePlay, clearTimers]);
+
+  // ESC dismisses without auto-routing — emit dismissal so we can size the leak.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (ctaFiredRef.current || dismissedRef.current) return;
+      dismissedRef.current = true;
+      clearTimers();
+      trackGrowthEvent('cg_welcome_dismissed', { reason: 'esc' });
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [clearTimers]);
+
+  // Cancel the auto-route as soon as a user touches the modal — they're engaged,
+  // let them choose. Doesn't count as a dismissal (no event emitted here).
+  const handlePointerActivity = React.useCallback(() => {
+    if (ctaFiredRef.current || dismissedRef.current) return;
+    clearTimers();
+    setRemaining(0);
+  }, [clearTimers]);
+
+  // Unmount without CTA/dismissal = silent close (back button, route change).
+  useEffect(() => {
+    return () => {
+      if (ctaFiredRef.current || dismissedRef.current) return;
+      trackGrowthEvent('cg_welcome_dismissed', { reason: 'unmount' });
+    };
+  }, []);
 
   return (
     <div
       data-testid="crazygames-welcome"
       dir={dir}
+      onPointerDown={handlePointerActivity}
       className="relative w-full max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-8 overflow-hidden"
     >
       {/* Decorative confetti — hard pixel squares scattered, not glow blobs */}
@@ -165,6 +232,15 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
               <span>{t('onboarding.crazygames.playDaily')}</span>
               <span aria-hidden className="text-3xl font-black">{isRTL ? '←' : '→'}</span>
             </button>
+            {remaining > 0 && (
+              <p
+                data-testid="crazygames-welcome-autostart"
+                className="font-neo-display text-[11px] uppercase tracking-[0.15em] text-neo-cream/60 text-center"
+                aria-live="polite"
+              >
+                {t('onboarding.crazygames.autoStart', { n: remaining })}
+              </p>
+            )}
 
             <div className="grid grid-cols-2 gap-3">
               <button

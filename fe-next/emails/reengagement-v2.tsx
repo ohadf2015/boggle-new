@@ -315,15 +315,13 @@ export default function ReengagementEmailV2({
             [data-ogsc] h1 { color: ${C.text} !important; }
             [data-ogsc] .cta-btn-v2 { background-color: ${C.lime} !important; color: ${C.black} !important; }
             [data-ogsc] .cta-td-v2 { background-color: ${C.lime} !important; }
-            [data-ogsc] .caption-band { background-color: ${C.lime} !important; }
-            [data-ogsc] .caption-band-text { color: ${C.black} !important; }
+            [data-ogsc] .caption-band-text { color: ${C.lime} !important; }
             [data-ogsc] .missed-chip { background-color: ${C.pink} !important; color: ${C.black} !important; }
             [data-ogsc] .stats-chip { color: ${C.muted} !important; }
             [data-ogsc] .tile-board { background-color: ${C.board} !important; }
             [data-ogsb] .body-v2 { background-color: ${C.bg} !important; }
             [data-ogsb] .cta-btn-v2 { background-color: ${C.lime} !important; }
             [data-ogsb] .cta-td-v2 { background-color: ${C.lime} !important; }
-            [data-ogsb] .caption-band { background-color: ${C.lime} !important; }
             [data-ogsb] .missed-chip { background-color: ${C.pink} !important; }
             :root { color-scheme: dark !important; }
             @media (prefers-color-scheme: dark) {
@@ -331,8 +329,7 @@ export default function ReengagementEmailV2({
               h1 { color: ${C.text} !important; }
               .cta-btn-v2 { background-color: ${C.lime} !important; color: ${C.black} !important; }
               .cta-td-v2 { background-color: ${C.lime} !important; }
-              .caption-band { background-color: ${C.lime} !important; }
-              .caption-band-text { color: ${C.black} !important; }
+              .caption-band-text { color: ${C.lime} !important; }
               .missed-chip { background-color: ${C.pink} !important; color: ${C.black} !important; }
               .stats-chip { color: ${C.muted} !important; }
               .tile-board { background-color: ${C.board} !important; }
@@ -413,39 +410,38 @@ export default function ReengagementEmailV2({
                     </td>
                   </tr>
 
-                  {/* ── 2. LIME CAPTION BAND — bold color-block bridge ── */}
+                  {/* ── 2. CAPTION LABEL — section header, NOT a button ── */}
                   <tr>
-                    <td align="center" style={{ paddingBottom: '18px' }}>
-                      <table
-                        role="presentation"
-                        cellPadding={0}
-                        cellSpacing={0}
-                        width="100%"
-                        className="caption-band"
-                        style={{
-                          maxWidth: '560px',
-                          borderCollapse: 'separate',
-                          backgroundColor: C.lime,
-                          border: `4px solid ${C.black}`,
-                          borderRadius: '14px',
-                          boxShadow: `${sh}6px 6px 0px ${C.black}`,
-                        }}>
+                    <td align="center" style={{ paddingBottom: '14px' }}>
+                      <table role="presentation" cellPadding={0} cellSpacing={0}>
                         <tr>
-                          <td align="center" style={{ padding: '14px 20px' }}>
+                          <td align="center" style={{ padding: '4px 0' }}>
                             <Text className="caption-band-text" style={{
-                              color: C.black,
-                              fontSize: '14px',
+                              color: C.lime,
+                              fontSize: '12px',
                               fontWeight: 700,
-                              letterSpacing: '2px',
+                              letterSpacing: '3px',
                               textTransform: 'uppercase' as const,
                               margin: 0,
                               textAlign: 'center',
                               direction: dir,
                               fontFamily: "'Fredoka', Arial, sans-serif",
-                              lineHeight: '1.3',
+                              lineHeight: '1.4',
                             }}>
                               {t.caption}
                             </Text>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td align="center" style={{ paddingTop: '6px' }}>
+                            <table role="presentation" cellPadding={0} cellSpacing={0}>
+                              <tr>
+                                <td style={{
+                                  width: '40px', height: '3px',
+                                  backgroundColor: C.lime, fontSize: 0, lineHeight: 0,
+                                }}>&nbsp;</td>
+                              </tr>
+                            </table>
                           </td>
                         </tr>
                       </table>

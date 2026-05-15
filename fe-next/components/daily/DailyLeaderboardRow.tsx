@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react';
 import { m } from 'framer-motion';
-import { Clock, Sparkles, Crown } from 'lucide-react';
+import { Clock, Sparkles, Crown, Eye } from 'lucide-react';
 import { getRankDisplay } from '@/utils/rankingStyles';
 import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
 import Avatar from '@/components/Avatar';
@@ -126,23 +126,29 @@ export const TodayParticipantRow = memo<{
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); onViewWheelWords(participant); }}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-neo border border-neo-black/30 bg-neo-purple/15 hover:bg-neo-purple/30 text-neo-purple dark:text-neo-purple-light font-bold transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-neo border-2 border-neo-purple/60 bg-neo-purple/20 hover:bg-neo-purple/35 text-neo-purple dark:text-neo-purple-light font-bold transition-colors cursor-pointer shadow-hard-xs"
                   aria-label={t('wordWheel.viewWordsYouMissed') || t('wordWheel.viewSubmittedWords')}
                   title={t('wordWheel.viewWordsYouMissed') || t('wordWheel.viewSubmittedWords')}
                 >
-                  {participant.score} {t('wordHunt.leaderboard.pts')}
-                  <span aria-hidden className="text-[10px] opacity-70">👁</span>
+                  <span>{participant.score} {t('wordHunt.leaderboard.pts')}</span>
+                  <span aria-hidden className="flex items-center gap-1 ps-1.5 border-s border-neo-purple/40">
+                    <Eye className="w-3.5 h-3.5" />
+                    <span className="text-[11px] uppercase tracking-wide">{t('wordHunt.leaderboard.seeWords')}</span>
+                  </span>
                 </button>
               ) : scope === 'word-hunt' && onViewHuntWords && participant.player_id && !isCurrentUser && (participant.words_discovered?.length ?? 0) > 0 ? (
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); onViewHuntWords(participant); }}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-neo border border-neo-black/30 bg-neo-cyan/15 hover:bg-neo-cyan/30 text-neo-cyan font-bold transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-neo border-2 border-neo-cyan/60 bg-neo-cyan/20 hover:bg-neo-cyan/35 text-neo-cyan font-bold transition-colors cursor-pointer shadow-hard-xs"
                   aria-label={t('wordHunt.results.tapPlayerHint')}
                   title={t('wordHunt.results.tapPlayerHint')}
                 >
-                  {participant.score} {t('wordHunt.leaderboard.pts')}
-                  <span aria-hidden className="text-[10px] opacity-70">👁</span>
+                  <span>{participant.score} {t('wordHunt.leaderboard.pts')}</span>
+                  <span aria-hidden className="flex items-center gap-1 ps-1.5 border-s border-neo-cyan/40">
+                    <Eye className="w-3.5 h-3.5" />
+                    <span className="text-[11px] uppercase tracking-wide">{t('wordHunt.leaderboard.seeWords')}</span>
+                  </span>
                 </button>
               ) : (
                 <span className="text-purple-600 dark:text-purple-400 font-bold">
@@ -159,11 +165,12 @@ export const TodayParticipantRow = memo<{
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); onViewWheelWords(participant); }}
-                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-neo border border-neo-black/30 bg-neo-lime/10 hover:bg-neo-lime/25 text-neo-cyan dark:text-neo-lime font-bold transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-neo border-2 border-neo-lime/50 bg-neo-lime/15 hover:bg-neo-lime/30 text-neo-cyan dark:text-neo-lime font-bold transition-colors cursor-pointer"
                   aria-label={t('wordWheel.viewSubmittedWords')}
                   title={t('wordWheel.viewSubmittedWords')}
                 >
                   🎡 {participant.word_wheel_score}
+                  <Eye aria-hidden className="w-3 h-3 opacity-80" />
                 </button>
               ) : (
                 <span>🎡 {participant.word_wheel_score}</span>

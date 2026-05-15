@@ -180,16 +180,16 @@ const es = {
       "ogDescription": "Disena un puzzle de palabras, comparte con amigos y publica en la comunidad LexiClash."
     },
     "education": {
-      "title": "LexiClash Educacion - Juegos de Palabras para Aulas y Profesores",
-      "description": "Lleva juegos de palabras al aula! LexiClash Educacion ayuda a profesores a crear lecciones de vocabulario y seguir el progreso de los alumnos.",
-      "ogTitle": "LexiClash Educacion - Juegos para Aulas",
-      "ogDescription": "Juegos de palabras para aulas! Crea lecciones, sigue el progreso y haz divertido el aprendizaje."
+      "title": "LexiClash Education — Juegos de Palabras para Aulas y Docentes",
+      "description": "Trae juegos de palabras multijugador al aula. LexiClash Education ayuda a docentes a crear lecciones de vocabulario, monitorear progreso en tiempo real, y mantener a los estudiantes motivados sin anuncios.",
+      "ogTitle": "LexiClash Education — Juegos Multiidioma para Aulas",
+      "ogDescription": "Juegos de palabras para educadores. Sin anuncios. Lecciones multijugador en vivo + analytics por alumno."
     },
     "educationClassroomGame": {
-      "title": "Juego de Palabras para el Aula en Vivo - Panel del Profesor | LexiClash",
-      "description": "Inicia un juego de palabras en vivo para tu clase. El panel del profesor ejecuta una ronda multijugador en tiempo real — los alumnos se unen desde cualquier dispositivo, sin registro.",
-      "ogTitle": "Juego de Palabras para Aula en Vivo - Panel del Profesor",
-      "ogDescription": "Inicia una ronda multijugador para la clase — unete desde cualquier dispositivo, sin registro."
+      "title": "Juego en Vivo para la Clase — Panel del Docente | LexiClash",
+      "description": "Lanza un juego multijugador en tiempo real desde tu panel. Los estudiantes se unen desde cualquier dispositivo (teléfono, tablet, Chromebook) sin registro ni descarga. Un juego, toda la clase.",
+      "ogTitle": "Juego en Vivo para la Clase — Panel del Docente",
+      "ogDescription": "Inicia un juego multijugador para tu clase en 60 segundos. Sin descargas. Desde teléfono o tablet."
     },
     "dailyArchive": {
       "title": "Archivo del Desafio Diario - Puzzles Pasados y Clasificaciones | LexiClash",
@@ -336,16 +336,16 @@ const es = {
       "ogDescription": "¡Juega juegos de palabras de fiesta desde tu teléfono en tiempo real!"
     },
     "educationHub": {
-      "title": "Centro educativo — Juegos de palabras para aulas y profesores",
-      "description": "¡Usa LexiClash en tu aula! Crea lecciones de juegos de palabras, rastrea el vocabulario de los estudiantes y haz que el aprendizaje sea divertido.",
-      "ogTitle": "Centro educativo LexiClash",
-      "ogDescription": "¡Juegos de palabras para aulas — crea lecciones, rastrea progreso!"
+      "title": "Centro de Educación — Juegos Multiidioma para Docentes",
+      "description": "Plataforma nativa para docentes de inglés, hebreo, sueco, japonés y español. Crea lecciones de vocabulario, inicia juegos en vivo para toda la clase, monitorea progreso estudiantil. Sin anuncios garantizado.",
+      "ogTitle": "Centro de Educación LexiClash",
+      "ogDescription": "Juegos de palabras para docentes. 5 idiomas nativos. Multijugador en vivo + analytics. Gratis + sin anuncios."
     },
     "educationDuels": {
-      "title": "Duelos de vocabulario — Estudiante contra estudiante",
-      "description": "¡Desafía a tus compañeros a duelos de vocabulario! Batallas de palabras 1v1 en tiempo real que prueban ortografía y pensamiento rápido.",
-      "ogTitle": "Duelos de vocabulario - LexiClash educación",
-      "ogDescription": "¡Batallas de palabras 1v1 para practicar vocabulario!"
+      "title": "Duelos de Vocabulario — Estudiante vs Estudiante",
+      "description": "Desafía a compañeros en batallas de palabras 1 contra 1, síncronas o asincronos. Entrena vocabulario, ortografía, y velocidad mental contra oponentes reales.",
+      "ogTitle": "Duelos de Vocabulario — LexiClash Education",
+      "ogDescription": "Duelos 1v1 de palabras para estudiantes. Prueba vocabulario, ortografía, y reacción."
     },
     "communityBoard": {
       "title": "Puzzle comunitario — Tablero de palabras creado por jugadores",
@@ -5910,7 +5910,8 @@ const es = {
       "scopeCombined": "Combinado",
       "scopeWordHunt": "Caza de Palabras",
       "scopeWordWheel": "Rueda de Palabras",
-      "loadError": "No se pudo cargar la tabla — toca para reintentar"
+      "loadError": "No se pudo cargar la tabla — toca para reintentar",
+      "seeWords": "Ver palabras"
     },
     "shareMessage": {
       "header": "LexiClash Caza de Palabras #{number}",
@@ -9852,14 +9853,14 @@ const es = {
     }
   },
   "education": {
-    "reviewDue": "{{count}} palabras por repasar",
+    "reviewDue": "{{count}} palabras para repasar",
     "postGame": {
-      "wordsYouLearned": "Palabras que aprendiste",
+      "wordsYouLearned": "Palabras nuevas",
       "found": "Encontradas",
-      "wordsToLearn": "Palabras por aprender",
-      "studyTheseNext": "¡Estudia estas a continuación!",
-      "practiceTheseWords": "Practica estas palabras",
-      "vocabScore": "¡Encontraste {{found}} de {{total}} palabras de vocabulario!"
+      "wordsToLearn": "Próximas a estudiar",
+      "studyTheseNext": "Enfócate en estas palabras a continuación",
+      "practiceTheseWords": "Practica estas palabras mañana",
+      "vocabScore": "¡Acertaste {{found}} de {{total}} palabras!"
     },
     "duels": {
       "lobby": "Sala",
@@ -9908,128 +9909,128 @@ const es = {
       "upgraded": "¡Insignia mejorada a {{tier}}!"
     },
     "mastery": {
-      "flashcardPerfect": "¡Perfecto! ¡Dominaste las {{count}} palabras!",
-      "flashcardProgress": "¡Aprendiste {{count}} palabras!",
-      "newWordsDiscovered": "¡Descubriste {{count}} palabras nuevas!",
-      "keepPracticing": "¡Buena práctica! ¡Sigue encontrando palabras!",
-      "matchingPerfect": "¡Emparejamiento perfecto!",
-      "matchingProgress": "¡Emparejaste {{count}} pares!",
+      "flashcardPerfect": "¡Perfecto! Dominaste {{count}} palabras.",
+      "flashcardProgress": "¡Excelente! Aprendiste {{count}} palabras.",
+      "newWordsDiscovered": "Descubriste {{count}} palabras nuevas.",
+      "keepPracticing": "¡Bien! Sigue encontrando palabras.",
+      "matchingPerfect": "¡Emparejamiento sin fallos!",
+      "matchingProgress": "¡Bien! Emparejaste {{count}} pares.",
       "spellingPerfect": "¡Ortografía perfecta!",
-      "spellingProgress": "¡Deletreaste {{count}} palabras correctamente!",
+      "spellingProgress": "¡Bien! Ortografía correcta en {{count}} palabras.",
       "blitzResult": "¡Encontraste {{count}} palabras en 60 segundos!",
       "dailyChallengeComplete": "¡Desafío diario completado!",
-      "lessonMastered": "¡Lección dominada! ¡Conoces estas palabras!",
-      "lessonProgress": "¡Buen trabajo! Sigue practicando.",
+      "lessonMastered": "¡Lección completada! Dominas estas palabras.",
+      "lessonProgress": "¡Buen progreso! Sigue practicando.",
       "duel": {
-        "win": "¡Victoria! ¡Bien jugado!",
-        "loss": "¡Buen esfuerzo! ¡La próxima será!",
-        "draw": "¡Empate! ¡Rivales parejos!"
+        "win": "¡Victoria! Bien jugado.",
+        "loss": "Buena partida. Próxima vez ganas.",
+        "draw": "¡Empate! Rivales parejos."
       }
     },
     "analytics": {
       "accuracy": "Precisión",
-      "activeNow": "{{count}} en línea",
+      "activeNow": "{{count}} estudiantes activos",
       "activeStudentsToday": "Activos hoy",
       "assignLessons": "Asignar lecciones",
       "assignLessonsHint": "Elige qué practicarán",
       "avgAccuracy": "Precisión promedio",
-      "avgXpGain": "XP ganado (promedio)",
-      "backToClassroom": "Volver",
+      "avgXpGain": "XP ganado promedio",
+      "backToClassroom": "Volver a la clase",
       "classAverageXp": "XP promedio",
-      "commonMistakes": "Errores frecuentes",
-      "completionRate": "Finalización",
+      "commonMistakes": "Palabras problemáticas",
+      "completionRate": "Tasa de completado",
       "connecting": "Conectando...",
       "connectionError": "Conexión perdida",
-      "createReviewLesson": "Crear repaso",
-      "daysAgo": "hace {{count}}d",
-      "error": "Error al cargar",
+      "createReviewLesson": "Crear lección de repaso",
+      "daysAgo": "hace {{count}} días",
+      "error": "Error al cargar datos",
       "exportReport": "Descargar reporte",
-      "inviteStudents": "Invitar alumnos",
-      "lastActive": "Última vez",
-      "lessonEffectiveness": "Impacto",
-      "level": "Nv. {{level}}",
+      "inviteStudents": "Invitar estudiantes",
+      "lastActive": "Última actividad",
+      "lessonEffectiveness": "Eficacia",
+      "level": "Nivel {{level}}",
       "live": "En vivo",
       "loading": "Cargando...",
       "mastery": "Dominio",
       "masteryLevels": "Niveles",
-      "noActivity": "Sin actividad",
-      "noData": "Sin datos",
+      "noActivity": "Sin actividad reciente",
+      "noData": "Sin datos aún",
       "noLessons": "Sin lecciones",
-      "noStudents": "Sin alumnos",
-      "noVocabularyData": "Sin datos",
+      "noStudents": "Sin estudiantes",
+      "noVocabularyData": "Sin datos de vocabulario",
       "offline": "Desconectado",
-      "practiceToSee": "Practica para ver más",
+      "practiceToSee": "Los datos aparecen después de practicar",
       "retry": "Reintentar",
-      "streak": "Racha {{count}}d",
+      "streak": "Racha: {{count}} días",
       "struggling": "Necesita apoyo",
-      "student": "Alumno",
-      "studentDetail": "Detalles",
+      "student": "Estudiante",
+      "studentDetail": "Detalles del estudiante",
       "studentProgress": "Progreso",
-      "students": "Alumnos",
-      "studentsNeedingHelp": "Alumnos con dificultad",
-      "subtitle": "Monitoreo de clase",
-      "title": "Analytics",
+      "students": "Estudiantes",
+      "studentsNeedingHelp": "Estudiantes con dificultad",
+      "subtitle": "Panel de docente",
+      "title": "Analítica",
       "today": "Hoy",
-      "updatedAgo": "Hace {{time}}",
+      "updatedAgo": "Actualizado hace {{time}}",
       "viewAssignments": "Tareas",
       "viewLessons": "Lecciones",
-      "viewStudents": "Alumnos",
+      "viewStudents": "Estudiantes",
       "viewVocabulary": "Vocabulario",
-      "vocabularyMastery": "Dominio",
+      "vocabularyMastery": "Dominio de vocabulario",
       "yesterday": "Ayer"
     },
     "classroomGame": {
-      "classroomNotFound": "Aula no encontrada",
-      "classroomSession": "Sesión del aula",
-      "createClassroom": "Crear aula",
-      "createLesson": "Crear lección",
+      "classroomNotFound": "Clase no encontrada",
+      "classroomSession": "Sesión de clase",
+      "createClassroom": "Nueva clase",
+      "createLesson": "Nueva lección",
       "deselectAll": "Deseleccionar todo",
-      "gameCreated": "¡Juego creado!",
-      "gameSettings": "Ajustes del juego",
-      "lessonsSelected": "{{count}} lecciones seleccionadas",
+      "gameCreated": "¡Juego lanzado! Comparte el código.",
+      "gameSettings": "Configuración del juego",
+      "lessonsSelected": "{{count}} lecciones elegidas",
       "missingRequirements": "Faltan requisitos",
-      "multiLessonHelp": "Combina lecciones para más variedad",
-      "noClassrooms": "Aún no hay aulas",
-      "noLessonsAvailable": "Sin lecciones disponibles",
+      "multiLessonHelp": "Mezcla lecciones para más variedad",
+      "noClassrooms": "Aún no has creado clases",
+      "noLessonsAvailable": "Sin lecciones. Crea una primero.",
       "reviewAndStart": "Revisar e iniciar",
-      "scanToJoin": "Escanea para unirte",
-      "selectAllLessons": "Seleccionar todo",
-      "selectClassroom": "Elegir aula",
-      "selectClassroomAndLessons": "Preparar juego",
-      "selectClassroomAndLessonsDesc": "Elige un aula y las lecciones",
-      "selectLessons": "Elegir lecciones",
-      "shareCode": "Compartir código",
-      "shareCodeWithStudents": "Comparte el código con los estudiantes",
+      "scanToJoin": "Escanea para entrar",
+      "selectAllLessons": "Seleccionar todas",
+      "selectClassroom": "Elige una clase",
+      "selectClassroomAndLessons": "Configurar juego",
+      "selectClassroomAndLessonsDesc": "Elige clase y lecciones",
+      "selectLessons": "Elige lecciones",
+      "shareCode": "Código de entrada",
+      "shareCodeWithStudents": "Comparte este código con tu clase",
       "startGame": "Iniciar juego",
       "createRoom": "Crear sala",
-      "startGameDescription": "Lanzar el juego del aula",
-      "title": "Juego del aula",
-      "waitingForPlayers": "Esperando jugadores...",
+      "startGameDescription": "Lanza el juego en vivo",
+      "title": "Juego en vivo",
+      "waitingForPlayers": "Esperando que entren estudiantes...",
       "words": "{{count}} palabras"
     },
     "header": {
       "breadcrumbs": {
-        "analytics": "Analytics",
-        "classroomGame": "Juego en clase",
-        "classrooms": "Mis aulas",
+        "analytics": "Analítica",
+        "classroomGame": "Juego en vivo",
+        "classrooms": "Mis clases",
         "curriculum": "Currículo",
         "duels": "Duelos",
         "education": "Educación",
-        "join": "Unirme",
+        "join": "Entrar",
         "lessons": "Lecciones",
         "navigation": "Navegación",
-        "profile": "Mi perfil",
+        "profile": "Perfil",
         "reports": "Reportes",
-        "student": "Alumno",
-        "teacher": "Maestro"
+        "student": "Estudiante",
+        "teacher": "Docente"
       },
       "educationHome": "Inicio",
       "homeLink": "Inicio",
       "menu": "Menú",
       "navigation": "Navegación",
-      "studentDashboard": "Tu panel",
+      "studentDashboard": "Mi panel",
       "subtitle": "Aprende jugando",
-      "teacherDashboard": "Tu panel",
+      "teacherDashboard": "Mi panel",
       "title": "LexiClash Education"
     },
     "landing": {
@@ -10043,92 +10044,92 @@ const es = {
       "premium": "Premium",
       "roleGuest": "Invitado",
       "roleStudent": "Estudiante",
-      "roleTeacher": "Profesor",
-      "socialProof": "No estás solo aprendiendo.",
+      "roleTeacher": "Docente",
+      "socialProof": "Miles de docentes ya lo usan.",
       "student": "Estudiante",
       "studentCta": "Empezar a aprender",
-      "studentDesc": "Aprende vocabulario jugando",
-      "studentFeature1": "Sigue tu avance",
-      "studentFeature2": "Gana XP e insignias",
-      "studentFeature3": "Reta a compañeros",
-      "tagline": "Las palabras son poder",
-      "teacher": "Profesor",
-      "teacherCta": "Configurar clase",
-      "teacherDesc": "Convierte las lecciones en juego",
-      "teacherFeature1": "Estadísticas en tiempo real",
-      "teacherFeature2": "Listas de palabras personalizadas",
-      "teacherFeature3": "Juegos en vivo para toda la clase",
+      "studentDesc": "Aprende vocabulario jugando multijugador",
+      "studentFeature1": "Ve tu progreso en tiempo real",
+      "studentFeature2": "Gana XP, insignias y rachas",
+      "studentFeature3": "Compite contra compañeros",
+      "tagline": "El juego es el mejor maestro",
+      "teacher": "Docente",
+      "teacherCta": "Crear mi clase",
+      "teacherDesc": "Lecciones que enganchan. Datos que enseñan.",
+      "teacherFeature1": "Ve quién aprende y quién no",
+      "teacherFeature2": "Crea lecciones en 2 minutos",
+      "teacherFeature3": "Juega en vivo con toda la clase",
       "title": "LexiClash Education",
       "startGame": "Iniciar juego",
       "hero": {
-        "eyebrow": "Para docentes en aulas de inglés, hebreo, sueco, japonés y español",
-        "h1": "La plataforma de juegos de palabras nativa para tu idioma — no traducida.",
-        "sub": "Multijugador en vivo, entrenamientos cerebrales y 6 modos de juego. Sin anuncios para estudiantes. Gratis para maestros — acceso en 60 segundos.",
-        "cta_primary": "Solicitar acceso de maestro",
-        "cta_secondary": "Ver en acción"
+        "eyebrow": "Para docentes de inglés, hebreo, sueco, japonés y español",
+        "h1": "Juegos de palabras nativos — no traducidos. Multijugador en vivo directo en el navegador.",
+        "sub": "6 modos de juego, entrenamientos cerebrales, lecciones personalizadas. Cero anuncios. Gratis para docentes verificados. Acceso en menos de 60 segundos.",
+        "cta_primary": "Solicitar acceso como docente",
+        "cta_secondary": "Ver demo"
       },
       "moat": {
-        "title": "Por qué docentes de 5 idiomas eligen LexiClash",
-        "subtitle": "Tres ventajas reales, no promesas.",
+        "title": "¿Por qué docentes multiidiomas eligen LexiClash?",
+        "subtitle": "Tres ventajas reales. Sin compromisos.",
         "native_multilingual": {
           "tag": "Nativo",
           "title": "Diseñado para tu idioma",
-          "body": "Hebreo derecha-izquierda, japonés con kana e IME, palabras compuestas suecas, tildes españolas — todo a nivel de motor. Sin traducción automática."
+          "body": "Hebreo RTL, japonés con IME + kana, palabras compuestas suecas, diacríticos españoles. Todo a nivel de motor. Sin traducción automática."
         },
         "local_inventory": {
-          "tag": "Local",
-          "title": "Palabras de tu región",
-          "body": "Listas de Wikipedia local + diccionario Milog hebreo. Tus estudiantes practican palabras relevantes para su país — no de libros estadounidenses viejos."
+          "tag": "Palabras locales",
+          "title": "Vocabulario de tu región",
+          "body": "Palabras de Wikipedia local + diccionarios regionales (Milog hebreo, palabras españolas de España). Tus estudiantes aprenden lo que realmente hablan."
         },
         "ad_free": {
           "tag": "Sin anuncios",
-          "title": "Cero anuncios. Punto.",
-          "body": "Kahoot, Quizlet, Blooket — todos muestran anuncios a tus alumnos. Nos comprometemos: cero anuncios en educación. COPPA + GDPR."
+          "title": "Cero anuncios. Garantizado.",
+          "body": "Kahoot, Quizlet, Blooket muestran anuncios. Nosotros no. Compromiso total: cero anuncios para estudiantes. COPPA + GDPR certified."
         }
       },
       "modes": {
-        "title": "6 modos en una plataforma — alterna para mantenerlos motivados",
+        "title": "6 modos — rota para mantener el interés",
         "teaches": "Desarrolla",
         "classroom_game": {
           "tag": "En vivo",
           "title": "Juego en clase",
-          "body": "Caza de palabras multijugador para toda la clase.",
-          "teaches": "Vocabulario, ortografía, velocidad"
+          "body": "Búsqueda de palabras multijugador. Toda la clase compite en tiempo real.",
+          "teaches": "Vocabulario · Ortografía · Velocidad"
         },
         "vocab_duels": {
           "tag": "Duelo",
           "title": "Duelos de vocabulario",
-          "body": "Desafíos 1v1 síncronos o asincronos.",
-          "teaches": "Retención y recuerdo"
+          "body": "Batallas 1 contra 1 síncronos o asincronos entre compañeros.",
+          "teaches": "Retención · Recuerdo activo"
         },
         "brain_drills": {
           "tag": "Cerebro",
-          "title": "Entrenamientos cerebrales",
-          "body": "Memoria, atención y velocidad de procesamiento.",
-          "teaches": "Habilidades cognitivas"
+          "title": "Ejercicios mentales",
+          "body": "Memoria visual, velocidad de procesamiento, patrones cognitivos.",
+          "teaches": "Flexibilidad mental · Concentración"
         },
         "daily_wordhunt": {
           "tag": "Diario",
-          "title": "Caza de palabras diaria",
-          "body": "Nuevo reto cada día con ranking por región.",
-          "teaches": "Hábito y consistencia"
+          "title": "Caza diaria",
+          "body": "Nuevo desafío cada 24h. Ranking global + regional.",
+          "teaches": "Hábito · Consistencia · Competencia"
         },
         "adventure": {
           "tag": "Historia",
-          "title": "Modo aventura",
-          "body": "Retos de palabras narrativos en mundos temáticos.",
-          "teaches": "Vocabulario profundo"
+          "title": "Aventura narrativa",
+          "body": "Desafíos de palabras en mundos temáticos. Progresión clara.",
+          "teaches": "Vocabulario contextual · Narrativa"
         },
         "spelling_bee": {
-          "tag": "Deletreo",
-          "title": "Práctica de ortografía",
-          "body": "Ejercicios guiados por voz, multiidioma.",
-          "teaches": "Ortografía y pronunciación"
+          "tag": "Ortografía",
+          "title": "Práctica de pronunciación",
+          "body": "Ejercicios guiados por voz. Escucha, deletrea, aprende.",
+          "teaches": "Pronunciación · Ortografía · Audición"
         }
       },
       "compare": {
-        "title": "Cómo se compara LexiClash",
-        "subtitle": "Comparación honesta — solo donde ganamos.",
+        "title": "Comparativa: ¿Por qué LexiClash es diferente?",
+        "subtitle": "Honesta. Solo lo que importa.",
         "col": {
           "lexiclash": "LexiClash",
           "kahoot": "Kahoot!",
@@ -10136,59 +10137,59 @@ const es = {
           "wordwall": "Wordwall"
         },
         "row": {
-          "native_multilingual": "Nativo multiidioma (RTL, IME)",
-          "ad_free_students": "Sin anuncios para alumnos",
-          "live_multiplayer": "Multijugador en vivo",
-          "brain_training": "Entrenamientos cerebrales",
-          "game_variety": "6+ modos de juego",
-          "free_for_teachers": "Gratis para maestros verificados"
+          "native_multilingual": "Nativo multiidioma (RTL, IME, diacríticos)",
+          "ad_free_students": "Cero anuncios para estudiantes",
+          "live_multiplayer": "Multijugador en vivo + asincronos",
+          "brain_training": "Ejercicios mentales integrados",
+          "game_variety": "6 modos (no solo quizzes)",
+          "free_for_teachers": "Totalmente gratis para docentes"
         }
       },
       "trust": {
-        "title": "Construido sobre confianza",
-        "bullet1": "Cero anuncios en rutas educativas.",
-        "bullet2": "Datos manejados bajo GDPR; solo telemetría de uso.",
-        "bullet3": "Conforme a COPPA para menores de 13."
+        "title": "Privacidad y seguridad integradas",
+        "bullet1": "Cero anuncios. GDPR + COPPA certified.",
+        "bullet2": "Datos de estudiantes protegidos. Sin venta a terceros.",
+        "bullet3": "Auditoría anual de seguridad. Servidor EU."
       },
       "faq": {
         "title": "Preguntas frecuentes",
         "q1": {
-          "q": "¿Cómo obtengo acceso de maestro?",
-          "a": "Solicita en /education/access — revisamos manualmente y respondemos en <24h."
+          "q": "¿Cómo solicito acceso de docente?",
+          "a": "Ingresa en /education/access. Revisamos manualmente. Respuesta en menos de 24 horas."
         },
         "q2": {
-          "q": "¿Es gratis para mi aula?",
-          "a": "Sí. Gratis para maestros verificados, sin anuncios garantizado."
+          "q": "¿Cuesta dinero?",
+          "a": "No. Totalmente gratis para docentes verificados. Cero costos ocultos."
         },
         "q3": {
-          "q": "¿Funciona en hebreo, japonés, sueco y español?",
-          "a": "Sí — soporte nativo: hebreo RTL, IME de kana, acentos, etc. No traducción."
+          "q": "¿Soporta hebreo, japonés, sueco y español?",
+          "a": "Sí. Nativo real: hebreo RTL, IME japonés, diacríticos, palabras regionales. Sin traducción automática."
         },
         "q4": {
-          "q": "¿Cómo cuidan la privacidad de mis estudiantes?",
-          "a": "COPPA + GDPR. Cero rastreo de anuncios. Solo telemetría de uso, consentida."
+          "q": "¿Cómo cuidan los datos de mis estudiantes?",
+          "a": "GDPR + COPPA certified. Cero publicidad dirigida. Sin venta de datos."
         },
         "q5": {
-          "q": "¿Pueden jugar mis alumnos sin cuenta?",
-          "a": "Sí. Modo invitado en casi todos los juegos."
+          "q": "¿Necesitan crear cuenta para jugar?",
+          "a": "No. Modo invitado en casi todos los juegos. Entrada anónima."
         },
         "q6": {
-          "q": "¿Qué me diferencia de Kahoot o Quizlet?",
-          "a": "Nativo multiidioma real, cero anuncios, 6 juegos en uno, y palabras de tu región."
+          "q": "¿En qué se diferencia de Kahoot o Quizlet?",
+          "a": "6 modos de juego (no solo quizzes). Multijugador en vivo + asincronos. Nativo multiidioma. Cero anuncios."
         },
         "q7": {
-          "q": "¿Veo el progreso de cada alumno?",
-          "a": "Sí. Panel de maestro con analytics por estudiante."
+          "q": "¿Puedo ver el progreso individual de cada alumno?",
+          "a": "Sí. Panel de docente con analytics, gráficos de dominio, errores frecuentes por alumno."
         },
         "q8": {
-          "q": "¿Funciona en Chromebook, tablet y móvil?",
-          "a": "Sí. Web pura, sin instalar nada."
+          "q": "¿Funciona en Chromebook, iPad, y celulares?",
+          "a": "Sí. 100% web. Sin apps ni descargas. Funciona en navegadores modernos."
         }
       },
       "cta": {
-        "title": "¿Listo para LexiClash en tu aula?",
-        "body": "Solicita acceso gratis — 60 segundos, aprobado en <24h.",
-        "button": "Solicitar acceso de maestro"
+        "title": "¿Listo para traer LexiClash a tu aula?",
+        "body": "Solicita acceso gratis. 60 segundos. Aprobado en menos de 24 horas.",
+        "button": "Solicitar acceso como docente"
       },
       "esl-word-games": {
         "course_name": "Juegos de palabras ESL de LexiClash",

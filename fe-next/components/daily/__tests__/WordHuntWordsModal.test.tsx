@@ -10,8 +10,13 @@ vi.mock('framer-motion', () => ({
 }));
 
 vi.mock('@/components/ui/dialog', () => ({
-  Dialog: ({ open, children }: { open: boolean; children: React.ReactNode }) =>
-    open ? <div data-testid="dialog">{children}</div> : null,
+  Dialog: ({ open, onOpenChange, children }: { open: boolean; onOpenChange?: (o: boolean) => void; children: React.ReactNode }) =>
+    open ? (
+      <div data-testid="dialog">
+        {children}
+        <button type="button" aria-label="Close" onClick={() => onOpenChange?.(false)}>×</button>
+      </div>
+    ) : null,
   DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
 }));

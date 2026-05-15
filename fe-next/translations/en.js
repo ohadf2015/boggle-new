@@ -1947,6 +1947,7 @@ const en = {
       "playDaily": "Play Daily",
       "playPractice": "Practice",
       "playMultiplayer": "Multiplayer",
+      "autoStart": "Auto-starting in {{n}}s — tap any mode to choose",
       "demoCaption": "How to play",
       "freeBadge": "Free Forever",
       "demoAlt": "Letter grid showing how to trace a word path",
@@ -6055,7 +6056,8 @@ const en = {
       "scopeCombined": "Combined",
       "scopeWordHunt": "Word Hunt",
       "scopeWordWheel": "Word Wheel",
-      "loadError": "Couldn't load leaderboard — tap retry"
+      "loadError": "Couldn't load leaderboard — tap retry",
+      "seeWords": "See words"
     },
     "shareMessage": {
       "header": "LexiClash Word Hunt #{number}",
