@@ -14,6 +14,7 @@ import {
   sendStartGameAck,
   stashStartGameMessageId,
   markStartGameHandled,
+  wasStartGameHandled,
   createHostLeftRoomClosingHandler,
 } from '@/shared/utils/gameEventUtils';
 import { useLetterGrid, useGameLanguage, useShowStartAnimation, useGameActions, useGameStore } from '@/hooks/gameState';
@@ -220,6 +221,15 @@ export function usePlayerGameEvents({
     onShowResultsRef.current = onShowResults;
   }, [onShowResults]);
 
+  // Mirror host pattern: keep onGameStart in a ref so the socket-listener effect
+  // doesn't re-register every time the parent's callback identity changes
+  // (which would otherwise cause the startGame handler to register twice and
+  // fire twice on the same event — the "MP game starts twice" symptom).
+  const onGameStartRef = useRef(onGameStart);
+  useEffect(() => {
+    onGameStartRef.current = onGameStart;
+  }, [onGameStart]);
+
   // CRITICAL: Store gameTimer in a ref to avoid socket listener re-registration
   // The gameTimer object is new on every render, but its methods (setTime, reset) are stable
   // By using a ref, we prevent the useEffect from re-running on every render
@@ -274,6 +284,16 @@ export function usePlayerGameEvents({
       if (gameSessionIdRef.current !== null && ext.gameSessionId !== undefined &&
           ext.gameSessionId < gameSessionIdRef.current) {
         logger.log('[PLAYER] Ignoring stale startGame from old session');
+        return;
+      }
+
+      // Self-dedup: if this exact messageId was already fully handled (either
+      // by this listener firing twice, or by PlayerView's pendingGameStart
+      // effect running first), skip the redundant store/timer/music/ack work.
+      // This kills the "MP game starts twice" symptom regardless of cause —
+      // server re-emit, listener re-register, or React StrictMode double-mount.
+      if (data.messageId && wasStartGameHandled('PLAYER', data.messageId)) {
+        logger.log('[PLAYER] Ignoring duplicate startGame for messageId:', data.messageId);
         return;
       }
 
@@ -376,7 +396,7 @@ export function usePlayerGameEvents({
       // when this socket listener is unmounted (player on results screen).
       markStartGameHandled('PLAYER', data.messageId);
       sendStartGameAck(socket, data, 'PLAYER');
-      onGameStart?.();
+      onGameStartRef.current?.();
 
       const toastMessage = data.lateJoin
         ? (t('common.joinedGame') || 'Joined game!')
@@ -908,7 +928,8 @@ export function usePlayerGameEvents({
     // NOTE: earthquakeHandlers is memoized so it's safe to include
     earthquakeHandlers,
     handleHostLeftRoomClosing,
-    onGameStart,
+    // NOTE: onGameStart accessed via onGameStartRef to prevent socket listener
+    // re-registration when the parent's callback identity changes.
   ]);
 
   return { gameSessionIdRef };
