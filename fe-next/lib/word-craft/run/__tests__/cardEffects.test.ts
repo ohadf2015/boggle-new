@@ -1,6 +1,6 @@
 import { applyCardEffects } from '../cardEffects';
 import { POWER_CARD_POOL, type ScoreContext } from '../powerCards';
-import type { ScoringTile } from '../types';
+import type { ScoringTile } from '../../types';
 
 const tile = (letter: string, value: number, premium: ScoringTile['premium'] = null): ScoringTile => ({
   letter, value, premium,
