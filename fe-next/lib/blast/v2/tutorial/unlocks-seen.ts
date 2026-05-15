@@ -15,13 +15,21 @@ export const MECHANIC_KEYS = [
 
 export type MechanicKey = typeof MECHANIC_KEYS[number];
 
+// Concepts are board-layout ideas introduced as the generator unlocks new
+// placement freedom — separate from mechanic unlocks (gems/coins/frozen)
+// because they describe *where* words live, not what tiles do.
+export const CONCEPT_KEYS = ['anyRow', 'verticalWords'] as const;
+export type ConceptKey = typeof CONCEPT_KEYS[number];
+
+type ConceptSeen = { [K in ConceptKey as `concept_${K}`]?: boolean };
+
 export type UnlocksSeen = {
   ftue_completed?: boolean;
   skip_all?: boolean;
   veteran_bonus_granted?: boolean;
 } & {
   [key in MechanicKey]?: boolean;
-};
+} & ConceptSeen;
 
 export function validateUnlocksSeen(raw: unknown): UnlocksSeen {
   if (typeof raw !== 'object' || raw === null) {
@@ -49,6 +57,14 @@ export function markUnlockSeen(
   key: MechanicKey | 'ftue_completed',
 ): UnlocksSeen {
   return { ...unlocks, [key]: true };
+}
+
+export function markConceptSeen(unlocks: UnlocksSeen, key: ConceptKey): UnlocksSeen {
+  return { ...unlocks, [`concept_${key}`]: true };
+}
+
+export function hasSeenConcept(unlocks: UnlocksSeen, key: ConceptKey): boolean {
+  return unlocks[`concept_${key}`] === true;
 }
 
 export function shouldSkipAll(unlocks: UnlocksSeen): boolean {

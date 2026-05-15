@@ -45,22 +45,25 @@ export function BlastHud({
           boxShadow: `inset 0 -2px 0 ${modeColor}`,
         }}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <span
             aria-hidden
-            className="inline-block w-2 h-6 rounded-sm"
+            className="inline-block w-2 h-7 rounded-sm shrink-0"
             style={{ background: modeColor, boxShadow: `0 0 12px ${modeColor}` }}
           />
-          <div className="flex flex-col leading-tight">
+          <div className="flex flex-col leading-tight min-w-0">
             <span
               data-testid="level-label"
-              className="text-sm font-bold uppercase tracking-wide"
-              style={{ color: modeColor }}
+              className="text-[11px] font-bold uppercase tracking-wider opacity-70"
             >
               {t('blast.level', `Level ${levelNumber}`, { n: String(levelNumber) })}
             </span>
             {theme && (
-              <span className="text-[10px] uppercase tracking-wider opacity-60">
+              <span
+                data-testid="theme-label"
+                className="text-sm font-black uppercase tracking-wide truncate"
+                style={{ color: modeColor, textShadow: `1px 1px 0 #0b1530` }}
+              >
                 {t(`blast.themes.${theme}`, theme)}
               </span>
             )}

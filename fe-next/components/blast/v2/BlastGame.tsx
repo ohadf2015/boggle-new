@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import type { BlastLevel, CellId } from '@/lib/blast/v2/types';
-import { markUnlockSeen, completeFtue, setSkipAll, type UnlocksSeen, type MechanicKey } from '@/lib/blast/v2/tutorial/unlocks-seen';
+import { markUnlockSeen, markConceptSeen, completeFtue, setSkipAll, type UnlocksSeen } from '@/lib/blast/v2/tutorial/unlocks-seen';
 import { useBlastV2 } from '@/lib/blast/v2/useBlastV2';
 import { detectAlmostWords, detectAllCascades } from '@/lib/blast/v2/engine';
 import { scanFormableThemeWords } from '@/lib/blast/v2/engine/word-scan';
@@ -24,6 +24,7 @@ import { BlastFxOverlay } from './BlastFxOverlay';
 import { BlastAtmosphereOverlay } from './BlastAtmosphereOverlay';
 import { BlastFtueOverlay, type FtueStep } from './BlastFtueOverlay';
 import { BlastUnlockCard } from './BlastUnlockCard';
+import { BlastConceptIntroCard } from './BlastConceptIntroCard';
 
 type Props = {
   level: BlastLevel;
@@ -72,6 +73,17 @@ export function BlastGame({
   const [introDismissed, setIntroDismissed] = useState(false);
   const [levelStartTime] = useState(() => Date.now());
   const { state, handlers } = useBlastV2(level);
+  // Track the deepest cascade chain across the run for the results card.
+  const [bestChainDepth, setBestChainDepth] = useState(0);
+  useEffect(() => {
+    if (state.lastChainDepth > bestChainDepth) {
+      setBestChainDepth(state.lastChainDepth);
+    }
+  }, [state.lastChainDepth, bestChainDepth]);
+  // Finalized run stats — snapshot when the level transitions to complete so
+  // re-renders of the results card don't re-read Date.now() (impure during
+  // render).
+  const [finalStats, setFinalStats] = useState<{ timeSeconds: number; gemsCollected: number; stars: number } | null>(null);
   useChainHaptics({ chainEventKey: state.chainEventKey, chainDepth: state.lastChainDepth });
   useChainEventBus({ chainEventKey: state.chainEventKey, chainDepth: state.lastChainDepth });
   // Cascade pacing — Royal Match style. Complete card delayed by `(chainDepth-1)*350 + 700`ms
@@ -196,6 +208,7 @@ export function BlastGame({
     };
 
     const stars = starRating(submission, level);
+    setFinalStats({ timeSeconds, gemsCollected, stars });
 
     trackBlastLevelCompleted({
       level: level.levelNumber,
@@ -229,6 +242,13 @@ export function BlastGame({
     onUpdateUnlocks?.(updated);
   };
 
+  const handleConceptDismiss = () => {
+    if (tutorial.showConceptCard) {
+      const updated = markConceptSeen(unlocksSeen, tutorial.showConceptCard);
+      onUpdateUnlocks?.(updated);
+    }
+  };
+
   const modeColor = MODE_COLORS[level.theme] || '#BFFF00';
   // FX integration point: BlastFxOverlay mounts useBlastFx internally
   // Board ref is obtained internally by BlastBoard via useRef
@@ -254,6 +274,20 @@ export function BlastGame({
     );
   }
 
+  // Concept intro lands AFTER the level intro fades — players read the
+  // placement-rule explanation while still on a calm screen, then tap into
+  // the live board. Marks the concept seen on dismiss so the card never
+  // re-fires for the player.
+  if (tutorial.showConceptCard) {
+    return (
+      <BlastConceptIntroCard
+        concept={tutorial.showConceptCard}
+        modeColor={modeColor}
+        onDismiss={handleConceptDismiss}
+      />
+    );
+  }
+
   // Show chest open ceremony if chest is full
   if (showChestModal && progressState.chestContents) {
     return (
@@ -276,6 +310,11 @@ export function BlastGame({
         cascadeCount={state.cascadeCount}
         modeColor={modeColor}
         levelNumber={level.levelNumber}
+        wordsFound={state.foundWords.size}
+        timeSeconds={finalStats?.timeSeconds}
+        gemsCollected={finalStats?.gemsCollected}
+        bestChainDepth={bestChainDepth}
+        stars={finalStats?.stars}
         onNext={onAdvance}
       />
     );

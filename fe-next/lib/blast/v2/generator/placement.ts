@@ -43,13 +43,25 @@ function countOverlap(grid: Grid, cells: { col: number; row: number }[], word: s
   return n;
 }
 
+export type PlaceWordsOptions = {
+  cols: number;
+  maxHeight: number;
+  // L1–L3 foundation rule: pin the longest word horizontally on row 0 so the
+  // board reads as a clear starter row.
+  firstWordRowZero?: boolean;
+  // L6+ variety rule: guarantee at least one word lands vertically.
+  requireVerticalWord?: boolean;
+};
+
 export function placeWords(
-  words: string[], opts: { cols: number; maxHeight: number }, prng: PRNG,
+  words: string[], opts: PlaceWordsOptions, prng: PRNG,
 ): PlaceWordsResult {
   const sorted = [...words].sort((a, b) => b.length - a.length);
   let grid: Grid = { cols: opts.cols, rows: opts.maxHeight, cells: {} };
   const placements: Placement[] = [];
-  for (const word of sorted) {
+  let needVertical = opts.requireVerticalWord === true;
+  for (let wIdx = 0; wIdx < sorted.length; wIdx++) {
+    const word = sorted[wIdx]!;
     const candidates: { axis: 'H' | 'V'; col: number; row: number; reversed: boolean; overlap: number }[] = [];
     for (const axis of ['H', 'V'] as const) {
       const maxStartCol = axis === 'H' ? opts.cols - word.length : opts.cols - 1;
@@ -67,13 +79,34 @@ export function placeWords(
       }
     }
     if (candidates.length === 0) return { ok: false, reason: `cannot place ${word}` };
-    const hasOverlap = candidates.filter((c) => c.overlap > 0);
-    const pool = placements.length === 0 || hasOverlap.length === 0 ? candidates : hasOverlap;
+
+    // Foundation: first word horizontal on row 0.
+    let workingCandidates = candidates;
+    if (wIdx === 0 && opts.firstWordRowZero) {
+      const filtered = candidates.filter((c) => c.axis === 'H' && c.row === 0);
+      if (filtered.length === 0) return { ok: false, reason: 'first word cannot anchor row 0' };
+      workingCandidates = filtered;
+    }
+
+    // Variety: force vertical on the last word if no V has been placed yet
+    // and the constraint is still active. Holding the constraint until the
+    // final word lets earlier placements stay flexible while still guaranteeing
+    // a V eventually lands.
+    const isLast = wIdx === sorted.length - 1;
+    if (needVertical && isLast) {
+      const vOnly = workingCandidates.filter((c) => c.axis === 'V');
+      if (vOnly.length === 0) return { ok: false, reason: 'cannot satisfy requireVerticalWord' };
+      workingCandidates = vOnly;
+    }
+
+    const hasOverlap = workingCandidates.filter((c) => c.overlap > 0);
+    const pool = placements.length === 0 || hasOverlap.length === 0 ? workingCandidates : hasOverlap;
     const chosen = pool[prng.intRange(pool.length)]!;
     const placed = tryPlaceWord(word, grid, chosen.axis, chosen.col, chosen.row, chosen.reversed);
     if (!placed.ok) return { ok: false, reason: 'internal placement race' };
     grid = placed.nextGrid;
     placements.push({ word, axis: chosen.axis, cells: placed.cells });
+    if (chosen.axis === 'V') needVertical = false;
   }
   const heights = new Array(opts.cols).fill(0);
   for (const id of Object.keys(grid.cells) as CellId[]) {

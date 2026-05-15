@@ -6,18 +6,34 @@
   isolation: isolate;
 }
 
+/* Tile size adapts to column count: takes the board's inline-size, removes
+   gaps + padding, and divides by --blast-cols. Capped at 88px so wide
+   desktops don't blow up the tiles. Falls back to 18cqi for callers that
+   forget to pass the column count. */
+.board {
+  --blast-tile-gap: 8px;
+  --blast-tile-cap: 88px;
+  --blast-tile-min: 32px;
+  --blast-cols: 6;
+  --blast-tile-size: clamp(
+    var(--blast-tile-min),
+    calc((100cqi - (var(--blast-cols) - 1) * var(--blast-tile-gap) - 32px) / var(--blast-cols)),
+    var(--blast-tile-cap)
+  );
+}
+
 /* Empty slot frame behind each tile column. Same size & gap as tiles so
-   landed tiles align perfectly with their well. Inset shadow gives a
-   "tray" feel — neo-brutalist hard inner shadow, no blur. */
+   landed tiles align perfectly with their well. Soft inset shadow only —
+   no border — so empty columns disappear into the background instead of
+   reading as dashed letters behind the play area. */
 .cellWell {
   width: var(--blast-tile-size, clamp(48px, 18cqi, 88px));
   aspect-ratio: 1 / 1;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.025);
-  border: 2px dashed rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.018);
   box-shadow:
-    inset 2px 2px 0 rgba(0, 0, 0, 0.35),
-    inset -1px -1px 0 rgba(255, 255, 255, 0.04);
+    inset 0 2px 0 rgba(0, 0, 0, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.025);
 }
 
 .tile {
