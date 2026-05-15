@@ -6894,7 +6894,30 @@ const es = {
       "noGamesHint": "Los juegos aparecerán aquí cuando los jugadores empiecen a jugar",
       "showing": "Mostrando",
       "of": "de",
-      "lastUpdated": "Última actualización"
+      "lastUpdated": "Última actualización",
+      "source": {
+        "search": "Búsqueda",
+        "social": "Red social",
+        "ai": "IA",
+        "portal": "Portal de juegos",
+        "email": "Email",
+        "push": "Notificación push",
+        "ads": "Anuncio",
+        "referral": "Referido",
+        "direct": "Directo",
+        "unknown": "Desconocido"
+      },
+      "blast": "Blast",
+      "wordWheel": "Rueda de palabras",
+      "practice": "Práctica",
+      "dateRange": "Rango de fechas",
+      "range": {
+        "today": "Hoy",
+        "7d": "Últimos 7 días",
+        "30d": "Últimos 30 días",
+        "90d": "Últimos 90 días",
+        "all": "Todo el tiempo"
+      }
     },
     "templateEditor": {
       "previewTitle": "Vista previa con datos de muestra",

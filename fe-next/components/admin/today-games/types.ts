@@ -64,6 +64,9 @@ export interface GamesResponse {
     wordHuntGames: number;
     dailyChallengeGames: number;
     drillGames: number;
+    blastGames: number;
+    wordWheelGames: number;
+    practiceGames: number;
   };
 }
 
@@ -73,7 +76,15 @@ export interface TodayGamesHistoryProps {
 }
 
 // Filter and sort types
-export type GameTypeFilter = 'all' | 'multiplayer' | 'word_hunt' | 'daily_challenge' | 'drill';
+export type GameTypeFilter =
+  | 'all'
+  | 'multiplayer'
+  | 'word_hunt'
+  | 'daily_challenge'
+  | 'drill'
+  | 'blast'
+  | 'word_wheel'
+  | 'practice';
 export type SortField = 'created_at' | 'score' | 'word_count' | 'time_played';
 export type SortOrder = 'asc' | 'desc';
 
@@ -84,4 +95,7 @@ export interface GamesStats {
   wordHunt: number;
   daily: number;
   drills: number;
+  blast: number;
+  wordWheel: number;
+  practice: number;
 }

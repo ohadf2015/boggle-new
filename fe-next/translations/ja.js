@@ -6947,7 +6947,30 @@ const ja = {
       "noGamesHint": "プレイヤーがゲームを開始するとここに表示されます",
       "showing": "表示中",
       "of": "/",
-      "lastUpdated": "最終更新"
+      "lastUpdated": "最終更新",
+      "source": {
+        "search": "検索",
+        "social": "ソーシャル",
+        "ai": "AI",
+        "portal": "ゲームポータル",
+        "email": "メール",
+        "push": "プッシュ通知",
+        "ads": "広告",
+        "referral": "リファラル",
+        "direct": "直接アクセス",
+        "unknown": "不明"
+      },
+      "blast": "ブラスト",
+      "wordWheel": "ワードホイール",
+      "practice": "練習",
+      "dateRange": "期間",
+      "range": {
+        "today": "今日",
+        "7d": "過去7日間",
+        "30d": "過去30日間",
+        "90d": "過去90日間",
+        "all": "全期間"
+      }
     },
     "templateEditor": {
       "previewTitle": "サンプルデータでプレビュー",

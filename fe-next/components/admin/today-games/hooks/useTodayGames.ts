@@ -10,9 +10,10 @@ import type {
   GamesStats,
 } from '../types';
 import {
-  getTodayDateString,
   DEFAULT_PAGE_SIZE,
   AUTO_REFRESH_INTERVAL,
+  getDateRangeStart,
+  type DateRange,
 } from '../constants';
 
 interface UseTodayGamesOptions {
@@ -20,76 +21,72 @@ interface UseTodayGamesOptions {
 }
 
 interface UseTodayGamesReturn {
-  // Data
   data: GamesResponse | null;
   filteredGames: UnifiedGame[];
   stats: GamesStats;
   lastRefresh: number;
 
-  // Loading/Error states
   loading: boolean;
   error: string | null;
 
-  // Filters
   languageFilter: string;
   gameTypeFilter: GameTypeFilter;
   rankedFilter: string;
+  dateRange: DateRange;
   setLanguageFilter: (filter: string) => void;
   setGameTypeFilter: (filter: GameTypeFilter) => void;
   setRankedFilter: (filter: string) => void;
+  setDateRange: (range: DateRange) => void;
 
-  // Sorting
   sortField: SortField;
   sortOrder: SortOrder;
   handleSort: (field: SortField) => void;
 
-  // Pagination
   page: number;
   pageSize: number;
   setPage: (page: number | ((prev: number) => number)) => void;
 
-  // Actions
   refresh: () => void;
 }
 
 export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGamesReturn {
-  // Data state
   const [data, setData] = useState<GamesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now());
 
-  // Filter state
   const [languageFilter, setLanguageFilter] = useState<string>('all');
   const [gameTypeFilter, setGameTypeFilter] = useState<GameTypeFilter>('all');
   const [rankedFilter, setRankedFilter] = useState<string>('all');
+  const [dateRange, setDateRangeState] = useState<DateRange>('7d');
 
-  // Sort state
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
-  // Pagination state
   const [page, setPage] = useState(1);
   const pageSize = DEFAULT_PAGE_SIZE;
 
-  // Fetch games data
   const fetchTodayGames = useCallback(async () => {
     try {
-      const todayDate = getTodayDateString();
+      const startDate = getDateRangeStart(dateRange);
       const params = new URLSearchParams({
         page: page.toString(),
         pageSize: pageSize.toString(),
-        startDate: todayDate,
-        endDate: todayDate,
         sortBy: sortField,
         sortOrder: sortOrder,
       });
 
+      if (startDate) {
+        params.set('startDate', startDate);
+      }
       if (languageFilter !== 'all') {
         params.set('language', languageFilter);
       }
       if (rankedFilter !== 'all') {
         params.set('isRanked', rankedFilter);
+      }
+      if (gameTypeFilter !== 'all') {
+        params.set('gameType', gameTypeFilter);
       }
 
       const response = await fetch(`/api/admin/game-logs?${params.toString()}`, {
@@ -111,29 +108,27 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
     } finally {
       setLoading(false);
     }
-  }, [authToken, page, pageSize, sortField, sortOrder, languageFilter, rankedFilter]);
+  }, [authToken, page, pageSize, sortField, sortOrder, languageFilter, rankedFilter, gameTypeFilter, dateRange]);
 
-  // Fetch on mount and when dependencies change
   useEffect(() => {
     setLoading(true);
     fetchTodayGames();
   }, [fetchTodayGames]);
 
-  // Auto-refresh every 30 seconds
+  // Auto-refresh only for the live "today" view — historical ranges are stable.
   useEffect(() => {
+    if (dateRange !== 'today') return;
     const interval = setInterval(() => {
       fetchTodayGames();
     }, AUTO_REFRESH_INTERVAL);
     return () => clearInterval(interval);
-  }, [fetchTodayGames]);
+  }, [fetchTodayGames, dateRange]);
 
-  // Manual refresh handler
   const refresh = useCallback(() => {
     setLoading(true);
     fetchTodayGames();
   }, [fetchTodayGames]);
 
-  // Sort handler
   const handleSort = useCallback((field: SortField) => {
     if (sortField === field) {
       setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'));
@@ -144,7 +139,6 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
     setPage(1);
   }, [sortField]);
 
-  // Filter setters that reset page
   const handleSetLanguageFilter = useCallback((filter: string) => {
     setLanguageFilter(filter);
     setPage(1);
@@ -160,31 +154,17 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
     setPage(1);
   }, []);
 
-  // Filter games by type client-side (API doesn't have gameType filter)
-  const filteredGames = useMemo(() => {
-    if (!data?.games) return [];
-    if (gameTypeFilter === 'all') return data.games;
+  const handleSetDateRange = useCallback((range: DateRange) => {
+    setDateRangeState(range);
+    setPage(1);
+  }, []);
 
-    return data.games.filter((game) => {
-      switch (gameTypeFilter) {
-        case 'multiplayer':
-          return game.mode === 'ranked' || game.mode === 'casual';
-        case 'word_hunt':
-          return game.mode === 'word_hunt';
-        case 'daily_challenge':
-          return game.mode === 'daily_challenge';
-        case 'drill':
-          return game.mode === 'drill';
-        default:
-          return true;
-      }
-    });
-  }, [data?.games, gameTypeFilter]);
+  // Server already applied gameType filter — no client-side narrowing needed.
+  const filteredGames = useMemo(() => data?.games ?? [], [data?.games]);
 
-  // Calculate stats from breakdown
   const stats = useMemo((): GamesStats => {
     if (!data?.breakdown) {
-      return { total: 0, multiplayer: 0, wordHunt: 0, daily: 0, drills: 0 };
+      return { total: 0, multiplayer: 0, wordHunt: 0, daily: 0, drills: 0, blast: 0, wordWheel: 0, practice: 0 };
     }
     const b = data.breakdown;
     return {
@@ -193,44 +173,46 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
         b.guestGames +
         b.wordHuntGames +
         b.dailyChallengeGames +
-        b.drillGames,
+        b.drillGames +
+        (b.blastGames ?? 0) +
+        (b.wordWheelGames ?? 0) +
+        (b.practiceGames ?? 0),
       multiplayer: b.authenticatedGames + b.guestGames,
       wordHunt: b.wordHuntGames,
       daily: b.dailyChallengeGames,
       drills: b.drillGames,
+      blast: b.blastGames ?? 0,
+      wordWheel: b.wordWheelGames ?? 0,
+      practice: b.practiceGames ?? 0,
     };
   }, [data?.breakdown]);
 
   return {
-    // Data
     data,
     filteredGames,
     stats,
     lastRefresh,
 
-    // Loading/Error states
     loading,
     error,
 
-    // Filters
     languageFilter,
     gameTypeFilter,
     rankedFilter,
+    dateRange,
     setLanguageFilter: handleSetLanguageFilter,
     setGameTypeFilter: handleSetGameTypeFilter,
     setRankedFilter: handleSetRankedFilter,
+    setDateRange: handleSetDateRange,
 
-    // Sorting
     sortField,
     sortOrder,
     handleSort,
 
-    // Pagination
     page,
     pageSize,
     setPage,
 
-    // Actions
     refresh,
   };
 }

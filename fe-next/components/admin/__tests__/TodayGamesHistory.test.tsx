@@ -147,6 +147,9 @@ describe('TodayGamesHistory', () => {
       wordHuntGames: 0,
       dailyChallengeGames: 0,
       drillGames: 0,
+      blastGames: 0,
+      wordWheelGames: 0,
+      practiceGames: 0,
     },
   };
 
@@ -192,6 +195,9 @@ describe('TodayGamesHistory', () => {
         wordHuntGames: 0,
         dailyChallengeGames: 0,
         drillGames: 0,
+        blastGames: 0,
+        wordWheelGames: 0,
+        practiceGames: 0,
       },
     };
 
@@ -240,7 +246,7 @@ describe('TodayGamesHistory', () => {
     expect(capturedAuth).toBe('Bearer test-auth-token');
   });
 
-  it('includes today date in query params', async () => {
+  it('includes a date range in query params (default 7d)', async () => {
     let capturedUrl: string | null = null;
     server.use(
       http.get('*/api/admin/game-logs*', ({ request }) => {
@@ -255,9 +261,10 @@ describe('TodayGamesHistory', () => {
       expect(screen.getByText("Today's Games")).toBeInTheDocument();
     });
 
-    const today = new Date().toISOString().split('T')[0];
-    expect(capturedUrl).toContain(`startDate=${today}`);
-    expect(capturedUrl).toContain(`endDate=${today}`);
+    // Default range is 7d → startDate ≈ 7 days ago. Just assert startDate is present and ISO-shaped.
+    expect(capturedUrl).toMatch(/startDate=\d{4}-\d{2}-\d{2}/);
+    // endDate is no longer sent by default — server interprets missing endDate as "now"
+    expect(capturedUrl).not.toContain('endDate=');
   });
 
   it('filters by language when selected', async () => {
@@ -335,6 +342,9 @@ describe('TodayGamesHistory', () => {
         wordHuntGames: 1,
         dailyChallengeGames: 0,
         drillGames: 0,
+        blastGames: 0,
+        wordWheelGames: 0,
+        practiceGames: 0,
       },
     };
 
@@ -381,7 +391,7 @@ describe('TodayGamesHistory', () => {
     });
   });
 
-  it('auto-refreshes every 30 seconds', async () => {
+  it('auto-refreshes every 30 seconds when on the "today" range', async () => {
     vi.useFakeTimers();
     let callCount = 0;
     server.use(
@@ -397,13 +407,21 @@ describe('TodayGamesHistory', () => {
       expect(screen.getByText("Today's Games")).toBeInTheDocument();
     });
 
-    const countAfterMount = callCount;
+    // Default range is 7d (historical), which does not auto-refresh.
+    // Switch to "today" to enable the live polling loop.
+    const dateRangeSelect = screen.getAllByRole('combobox')[0];
+    fireEvent.change(dateRangeSelect, { target: { value: 'today' } });
 
-    // Advance timers by 30 seconds
+    await waitFor(() => {
+      expect(callCount).toBeGreaterThanOrEqual(2); // initial + after-range-change refetch
+    });
+    const countAfterRangeSwitch = callCount;
+
+    // Advance timers by 30 seconds — auto-refresh should fire
     await vi.advanceTimersByTimeAsync(30000);
 
     await waitFor(() => {
-      expect(callCount).toBeGreaterThan(countAfterMount);
+      expect(callCount).toBeGreaterThan(countAfterRangeSwitch);
     });
   });
 });

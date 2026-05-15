@@ -30,9 +30,11 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
     languageFilter,
     gameTypeFilter,
     rankedFilter,
+    dateRange,
     setLanguageFilter,
     setGameTypeFilter,
     setRankedFilter,
+    setDateRange,
     sortField,
     sortOrder,
     handleSort,
@@ -97,9 +99,11 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
         languageFilter={languageFilter}
         gameTypeFilter={gameTypeFilter}
         rankedFilter={rankedFilter}
+        dateRange={dateRange}
         onLanguageChange={setLanguageFilter}
         onGameTypeChange={setGameTypeFilter}
         onRankedChange={setRankedFilter}
+        onDateRangeChange={setDateRange}
         t={t}
       />
 

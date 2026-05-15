@@ -115,6 +115,60 @@ interface DrillSessionRow {
   profiles: ProfileEmbed;
 }
 
+interface BlastResultRow {
+  id: string;
+  user_id: string | null;
+  score: number | null;
+  tiles_cleared: number | null;
+  total_tiles: number | null;
+  clear_percentage: number | null;
+  words_found: number | null;
+  best_word: string | null;
+  max_combo: number | null;
+  stars: number | null;
+  difficulty: string | null;
+  language: string | null;
+  created_at: string | null;
+  profiles: ProfileEmbed;
+}
+
+interface WordWheelAttemptRow {
+  id: string;
+  player_id: string | null;
+  guest_fingerprint: string | null;
+  language: string;
+  puzzle_number: number;
+  score: number;
+  word_count: number;
+  time_seconds: number;
+  longest_word: string | null;
+  completed_at: string;
+  created_at: string;
+  display_name: string | null;
+  profiles: ProfileEmbed;
+}
+
+interface PracticeSessionRow {
+  id: string;
+  student_id: string;
+  classroom_id: string | null;
+  lesson_id: string;
+  practice_type: string;
+  score: number;
+  total_score: number;
+  words_attempted: number;
+  words_correct: number;
+  cards_correct: number;
+  cards_reviewed: number;
+  accuracy: number | null;
+  max_combo: number | null;
+  time_spent_seconds: number;
+  duration_seconds: number | null;
+  started_at: string;
+  completed_at: string | null;
+  profiles: ProfileEmbed;
+}
+
 /**
  * GET - Fetch game logs with filters and pagination
  * Includes both authenticated player games (from game_results) and guest games (from game_sessions)
@@ -145,74 +199,81 @@ export async function GET(request: NextRequest) {
     const sortOrder = searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc';
     // includeGuests=false also hides fully-anonymous games (user_id NULL). Default: include everyone.
     const includeGuests = searchParams.get('includeGuests') !== 'false';
+    // gameType narrows which source(s) we query. When omitted, every source is fetched and merged client-side.
+    const ALLOWED_GAME_TYPES = [
+      'multiplayer', 'word_hunt', 'daily_challenge', 'drill',
+      'blast', 'word_wheel', 'practice',
+    ] as const;
+    type GameTypeParam = typeof ALLOWED_GAME_TYPES[number];
+    const rawGameType = searchParams.get('gameType') ?? 'all';
+    const gameType: GameTypeParam | 'all' = (ALLOWED_GAME_TYPES as readonly string[]).includes(rawGameType)
+      ? (rawGameType as GameTypeParam)
+      : 'all';
+    const wants = (t: GameTypeParam) => gameType === 'all' || gameType === t;
 
     // Calculate offset
     const offset = (page - 1) * pageSize;
 
-    // Build query for game results with player profiles (authenticated users)
-    let authQuery = supabase
-      .from('game_results')
-      .select(`
-        id,
-        player_id,
-        game_code,
-        score,
-        word_count,
-        longest_word,
-        placement,
-        is_ranked,
-        language,
-        time_played,
-        created_at,
-        profiles:player_id (
-          username,
-          display_name,
-          avatar_emoji,
-          avatar_color
-        )
-      `, { count: 'exact' });
-
-    // Apply filters to auth query
-    if (language && language !== 'all') {
-      authQuery = authQuery.eq('language', language);
-    }
-
-    if (isRanked !== null && isRanked !== 'all') {
-      authQuery = authQuery.eq('is_ranked', isRanked === 'true');
-    }
-
-    if (startDate) {
-      authQuery = authQuery.gte('created_at', startDate);
-    }
-
-    if (endDate) {
-      authQuery = authQuery.lte('created_at', `${endDate}T23:59:59.999Z`);
-    }
-
-    // Apply sorting
     const ascending = sortOrder === 'asc';
-    authQuery = authQuery.order(sortBy, { ascending });
 
-    // Fetch authenticated games
-    const { data: authData, error: authError, count: authCount } = await authQuery;
+    // Build query for game results with player profiles (authenticated users)
+    let authGames: Array<Record<string, unknown>> = [];
+    let authCount = 0;
+    if (wants('multiplayer')) {
+      let authQuery = supabase
+        .from('game_results')
+        .select(`
+          id,
+          player_id,
+          game_code,
+          score,
+          word_count,
+          longest_word,
+          placement,
+          is_ranked,
+          language,
+          time_played,
+          created_at,
+          profiles:player_id (
+            username,
+            display_name,
+            avatar_emoji,
+            avatar_color
+          )
+        `, { count: 'exact' });
 
-    if (authError) {
-      console.error('[admin/game-logs] Auth query error:', authError);
-      return NextResponse.json({ error: authError.message }, { status: 500 });
+      if (language && language !== 'all') {
+        authQuery = authQuery.eq('language', language);
+      }
+      if (isRanked !== null && isRanked !== 'all') {
+        authQuery = authQuery.eq('is_ranked', isRanked === 'true');
+      }
+      if (startDate) {
+        authQuery = authQuery.gte('created_at', startDate);
+      }
+      if (endDate) {
+        authQuery = authQuery.lte('created_at', `${endDate}T23:59:59.999Z`);
+      }
+      authQuery = authQuery.order(sortBy, { ascending });
+
+      const { data: authData, error: authError, count: aCount } = await authQuery;
+      if (authError) {
+        console.error('[admin/game-logs] Auth query error:', authError);
+        return NextResponse.json({ error: authError.message }, { status: 500 });
+      }
+      authCount = aCount || 0;
+      authGames = ((authData as unknown as GameResultRow[]) || []).map((game) => ({
+        ...game,
+        is_guest: false,
+        mode: game.is_ranked ? 'ranked' : 'casual',
+      }));
     }
-
-    // Transform authenticated games
-    const authGames = ((authData as unknown as GameResultRow[]) || []).map((game) => ({
-      ...game,
-      is_guest: false,
-      mode: game.is_ranked ? 'ranked' : 'casual',
-    }));
 
     // Fetch guest games from game_sessions if includeGuests is true
     let guestGames: Array<Record<string, unknown>> = [];
     let guestCount = 0;
 
-    if (includeGuests) {
+    if (includeGuests && wants('multiplayer')) {
       let guestQuery = supabase
         .from('game_sessions')
         .select(`
@@ -338,7 +399,7 @@ export async function GET(request: NextRequest) {
     let wordHuntGames: Array<Record<string, unknown>> = [];
     let wordHuntCount = 0;
 
-    try {
+    if (wants('word_hunt')) try {
       let wordHuntQuery = supabase
         .from('daily_word_hunt_attempts')
         .select(`
@@ -430,7 +491,7 @@ export async function GET(request: NextRequest) {
     let dailyChallengeGames: Array<Record<string, unknown>> = [];
     let dailyChallengeCount = 0;
 
-    try {
+    if (wants('daily_challenge')) try {
       let dailyQuery = supabase
         .from('daily_puzzle_attempts')
         .select(`
@@ -500,7 +561,7 @@ export async function GET(request: NextRequest) {
     let drillGames: Array<Record<string, unknown>> = [];
     let drillCount = 0;
 
-    try {
+    if (wants('drill')) try {
       let drillQuery = supabase
         .from('drill_sessions')
         .select(`
@@ -567,15 +628,227 @@ export async function GET(request: NextRequest) {
       console.error('[admin/game-logs] Drill sessions fetch error:', error);
     }
 
+    // Fetch Blast results (Blast V2 — authenticated only)
+    let blastGames: Array<Record<string, unknown>> = [];
+    let blastCount = 0;
+
+    if (wants('blast') && isRanked !== 'true') try {
+      let blastQuery = supabase
+        .from('blast_results')
+        .select(`
+          id,
+          user_id,
+          score,
+          tiles_cleared,
+          total_tiles,
+          clear_percentage,
+          words_found,
+          best_word,
+          max_combo,
+          stars,
+          difficulty,
+          language,
+          created_at,
+          profiles:user_id (
+            username,
+            display_name,
+            avatar_emoji,
+            avatar_color
+          )
+        `, { count: 'exact' });
+
+      if (language && language !== 'all') {
+        blastQuery = blastQuery.eq('language', language);
+      }
+      if (startDate) {
+        blastQuery = blastQuery.gte('created_at', startDate);
+      }
+      if (endDate) {
+        blastQuery = blastQuery.lte('created_at', `${endDate}T23:59:59.999Z`);
+      }
+      blastQuery = blastQuery.order('created_at', { ascending });
+
+      const { data: blastData, error: blastError, count: bCount } = await blastQuery;
+
+      if (blastError) {
+        console.error('[admin/game-logs] Blast query error:', blastError);
+      } else {
+        blastCount = bCount || 0;
+        blastGames = ((blastData as unknown as BlastResultRow[]) || []).map((b) => ({
+          id: b.id,
+          player_id: b.user_id,
+          guest_session_id: null,
+          game_code: `blast_${b.difficulty ?? 'normal'}`,
+          score: b.score || 0,
+          word_count: b.words_found || 0,
+          longest_word: b.best_word || null,
+          placement: null,
+          is_ranked: false,
+          is_guest: !b.user_id,
+          mode: 'blast',
+          difficulty: b.difficulty,
+          language: b.language || 'en',
+          time_played: 0,
+          created_at: b.created_at || new Date().toISOString(),
+          profiles: b.profiles || null,
+        }));
+      }
+    } catch (error) {
+      console.error('[admin/game-logs] Blast fetch error:', error);
+    }
+
+    // Fetch Word Wheel daily attempts
+    let wordWheelGames: Array<Record<string, unknown>> = [];
+    let wordWheelCount = 0;
+
+    if (wants('word_wheel') && isRanked !== 'true') try {
+      let wheelQuery = supabase
+        .from('daily_word_wheel_attempts')
+        .select(`
+          id,
+          player_id,
+          guest_fingerprint,
+          language,
+          puzzle_number,
+          score,
+          word_count,
+          time_seconds,
+          longest_word,
+          completed_at,
+          created_at,
+          display_name,
+          profiles:player_id (
+            username,
+            display_name,
+            avatar_emoji,
+            avatar_color
+          )
+        `, { count: 'exact' });
+
+      if (language && language !== 'all') {
+        wheelQuery = wheelQuery.eq('language', language);
+      }
+      if (startDate) {
+        wheelQuery = wheelQuery.gte('created_at', startDate);
+      }
+      if (endDate) {
+        wheelQuery = wheelQuery.lte('created_at', `${endDate}T23:59:59.999Z`);
+      }
+      wheelQuery = wheelQuery.order('created_at', { ascending });
+
+      const { data: wheelData, error: wheelError, count: wCount } = await wheelQuery;
+
+      if (wheelError) {
+        console.error('[admin/game-logs] Word Wheel query error:', wheelError);
+      } else {
+        wordWheelCount = wCount || 0;
+        wordWheelGames = ((wheelData as unknown as WordWheelAttemptRow[]) || []).map((w) => ({
+          id: w.id,
+          player_id: w.player_id,
+          guest_session_id: w.guest_fingerprint,
+          game_code: `word_wheel_${w.puzzle_number}`,
+          score: w.score || 0,
+          word_count: w.word_count || 0,
+          longest_word: w.longest_word || null,
+          placement: null,
+          is_ranked: false,
+          is_guest: !w.player_id,
+          mode: 'word_wheel',
+          language: w.language,
+          time_played: w.time_seconds || 0,
+          created_at: w.created_at,
+          completed_at: w.completed_at,
+          profiles: w.profiles || (w.display_name ? { display_name: w.display_name } : null),
+        }));
+      }
+    } catch (error) {
+      console.error('[admin/game-logs] Word Wheel fetch error:', error);
+    }
+
+    // Fetch Classroom Practice sessions
+    let practiceGames: Array<Record<string, unknown>> = [];
+    let practiceCount = 0;
+
+    if (wants('practice') && isRanked !== 'true') try {
+      let practiceQuery = supabase
+        .from('practice_sessions')
+        .select(`
+          id,
+          student_id,
+          classroom_id,
+          lesson_id,
+          practice_type,
+          score,
+          total_score,
+          words_attempted,
+          words_correct,
+          cards_correct,
+          cards_reviewed,
+          accuracy,
+          max_combo,
+          time_spent_seconds,
+          duration_seconds,
+          started_at,
+          completed_at,
+          profiles:student_id (
+            username,
+            display_name,
+            avatar_emoji,
+            avatar_color
+          )
+        `, { count: 'exact' });
+
+      if (startDate) {
+        practiceQuery = practiceQuery.gte('started_at', startDate);
+      }
+      if (endDate) {
+        practiceQuery = practiceQuery.lte('started_at', `${endDate}T23:59:59.999Z`);
+      }
+      practiceQuery = practiceQuery.order('started_at', { ascending });
+
+      const { data: practiceData, error: practiceError, count: pCount } = await practiceQuery;
+
+      if (practiceError) {
+        console.error('[admin/game-logs] Practice query error:', practiceError);
+      } else {
+        practiceCount = pCount || 0;
+        practiceGames = ((practiceData as unknown as PracticeSessionRow[]) || []).map((p) => ({
+          id: p.id,
+          player_id: p.student_id,
+          guest_session_id: null,
+          game_code: `practice_${p.practice_type}`,
+          score: p.total_score || p.score || 0,
+          word_count: p.words_correct || 0,
+          longest_word: null,
+          placement: null,
+          is_ranked: false,
+          is_guest: false,
+          mode: 'practice',
+          drill_type: p.practice_type,
+          language: 'en',
+          time_played: p.duration_seconds || p.time_spent_seconds || 0,
+          created_at: p.started_at,
+          completed_at: p.completed_at,
+          profiles: p.profiles || null,
+        }));
+      }
+    } catch (error) {
+      console.error('[admin/game-logs] Practice fetch error:', error);
+    }
+
     // Combine and sort all games
-    const allGames = [...authGames, ...guestGames, ...wordHuntGames, ...dailyChallengeGames, ...drillGames].sort((a, b) => {
+    const allGames = [
+      ...authGames, ...guestGames, ...wordHuntGames, ...dailyChallengeGames, ...drillGames,
+      ...blastGames, ...wordWheelGames, ...practiceGames,
+    ].sort((a, b) => {
       const dateA = new Date(String((a as { created_at?: unknown }).created_at ?? '')).getTime();
       const dateB = new Date(String((b as { created_at?: unknown }).created_at ?? '')).getTime();
       return ascending ? dateA - dateB : dateB - dateA;
     });
 
     // Calculate total count
-    const totalCount = (authCount || 0) + guestCount + wordHuntCount + dailyChallengeCount + drillCount;
+    const totalCount = authCount + guestCount + wordHuntCount + dailyChallengeCount + drillCount
+      + blastCount + wordWheelCount + practiceCount;
 
     // Apply pagination to combined results
     const paginatedGames = allGames.slice(offset, offset + pageSize);
@@ -597,11 +870,14 @@ export async function GET(request: NextRequest) {
         hasPrevPage,
       },
       breakdown: {
-        authenticatedGames: authCount || 0,
+        authenticatedGames: authCount,
         guestGames: guestCount,
         wordHuntGames: wordHuntCount,
         dailyChallengeGames: dailyChallengeCount,
         drillGames: drillCount,
+        blastGames: blastCount,
+        wordWheelGames: wordWheelCount,
+        practiceGames: practiceCount,
       },
     });
   } catch (error) {

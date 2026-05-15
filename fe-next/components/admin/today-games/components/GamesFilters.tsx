@@ -3,24 +3,37 @@
 import React from 'react';
 import { Filter } from 'lucide-react';
 import type { GameTypeFilter } from '../types';
+import { DATE_RANGES, type DateRange } from '../constants';
 
 interface GamesFiltersProps {
   languageFilter: string;
   gameTypeFilter: GameTypeFilter;
   rankedFilter: string;
+  dateRange: DateRange;
   onLanguageChange: (value: string) => void;
   onGameTypeChange: (value: GameTypeFilter) => void;
   onRankedChange: (value: string) => void;
-  t: (key: string) => string;
+  onDateRangeChange: (value: DateRange) => void;
+  t: (key: string, fallback?: string) => string;
 }
+
+const DATE_RANGE_FALLBACK: Record<DateRange, string> = {
+  today: 'Today',
+  '7d': 'Last 7 days',
+  '30d': 'Last 30 days',
+  '90d': 'Last 90 days',
+  all: 'All time',
+};
 
 export function GamesFilters({
   languageFilter,
   gameTypeFilter,
   rankedFilter,
+  dateRange,
   onLanguageChange,
   onGameTypeChange,
   onRankedChange,
+  onDateRangeChange,
   t,
 }: GamesFiltersProps) {
   return (
@@ -31,6 +44,19 @@ export function GamesFilters({
           {t('admin.todayGames.filters')}:
         </span>
       </div>
+
+      <select
+        value={dateRange}
+        onChange={(e) => onDateRangeChange(e.target.value as DateRange)}
+        className="bg-slate-700 text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
+        aria-label={t('admin.todayGames.dateRange', 'Date range')}
+      >
+        {DATE_RANGES.map((range) => (
+          <option key={range} value={range}>
+            {t(`admin.todayGames.range.${range}`, DATE_RANGE_FALLBACK[range])}
+          </option>
+        ))}
+      </select>
 
       <select
         value={languageFilter}
@@ -55,6 +81,9 @@ export function GamesFilters({
         <option value="word_hunt">{t('admin.todayGames.wordHunt')}</option>
         <option value="daily_challenge">{t('admin.todayGames.daily')}</option>
         <option value="drill">{t('admin.todayGames.drills')}</option>
+        <option value="blast">{t('admin.todayGames.blast', 'Blast')}</option>
+        <option value="word_wheel">{t('admin.todayGames.wordWheel', 'Word Wheel')}</option>
+        <option value="practice">{t('admin.todayGames.practice', 'Practice')}</option>
       </select>
 
       <select

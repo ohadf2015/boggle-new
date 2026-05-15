@@ -6850,7 +6850,30 @@ const sv = {
       "noGamesHint": "Spel visas här när spelare börjar spela",
       "showing": "Visar",
       "of": "av",
-      "lastUpdated": "Senast uppdaterad"
+      "lastUpdated": "Senast uppdaterad",
+      "source": {
+        "search": "Sökmotor",
+        "social": "Sociala medier",
+        "ai": "AI",
+        "portal": "Spelportal",
+        "email": "E-post",
+        "push": "Pushnotis",
+        "ads": "Annons",
+        "referral": "Hänvisning",
+        "direct": "Direkt",
+        "unknown": "Okänd"
+      },
+      "blast": "Blast",
+      "wordWheel": "Ordhjul",
+      "practice": "Träning",
+      "dateRange": "Datumintervall",
+      "range": {
+        "today": "Idag",
+        "7d": "Senaste 7 dagarna",
+        "30d": "Senaste 30 dagarna",
+        "90d": "Senaste 90 dagarna",
+        "all": "All tid"
+      }
     },
     "templateEditor": {
       "previewTitle": "Förhandsgranska med exempeldata",
