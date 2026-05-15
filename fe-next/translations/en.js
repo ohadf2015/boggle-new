@@ -11766,6 +11766,60 @@ const en = {
       "mid": "2–3 points",
       "rare": "4–5 points",
       "legendary": "8+ points"
+    },
+    "run": {
+      "intro": {
+        "title": "WordCraft Run",
+        "howTo": "Place words to beat each round's target. Clear a round, grab a power card, push your score higher.",
+        "start": "Start Run"
+      },
+      "round": "Round {{n}} / {{total}}",
+      "score": "Score",
+      "target": "Target",
+      "runTotal": "Run total",
+      "submit": "Submit word",
+      "recall": "Recall",
+      "endRound": "End round",
+      "proceed": "Continue",
+      "restart": "New run",
+      "chips": "chips",
+      "mult": "mult",
+      "rarity": {
+        "common": "Common",
+        "rare": "Rare",
+        "legendary": "Legendary"
+      },
+      "cardPick": {
+        "title": "Pick a Power Card",
+        "subtitle": "It stacks for the rest of your run."
+      },
+      "roundResult": {
+        "passed": "Target cleared!",
+        "passedSub": "Pick a power card and keep the run going.",
+        "failed": "Just short!",
+        "failedSub": "You didn't reach the target this round."
+      },
+      "runResult": {
+        "cleared": "Run cleared!",
+        "failed": "Run over",
+        "total": "Final run score",
+        "cardsTaken": "Cards collected",
+        "share": "WordCraft Run: {{score}}"
+      },
+      "card": {
+        "vowelPower": { "name": "Vowel Power", "desc": "Vowels are worth +2 chips each." },
+        "longGame": { "name": "Long Game", "desc": "Words of 5+ letters score double." },
+        "combo": { "name": "Combo Chain", "desc": "Each word after the first this round adds +1 multiplier." },
+        "premiumHunter": { "name": "Premium Hunter", "desc": "Every premium square you use adds +1 multiplier." },
+        "wildcardStash": { "name": "Wildcard Stash", "desc": "Start every round with a blank tile." },
+        "quickHands": { "name": "Quick Hands", "desc": "Adds 4 extra tiles to every round's bag." },
+        "doubleDown": { "name": "Double Down", "desc": "Your first word each round scores triple." },
+        "rareLetters": { "name": "Rare Letters", "desc": "Tiles worth 4+ points give +3 chips each." },
+        "shortSweet": { "name": "Short & Sweet", "desc": "Three-letter words get +15 chips." },
+        "steadyBuild": { "name": "Steady Build", "desc": "Every word gets +5 flat chips." },
+        "overflow": { "name": "Overflow", "desc": "Score over the target carries 10% as a bonus." },
+        "letterHoard": { "name": "Letter Hoard", "desc": "Your rack holds 10 tiles instead of 8." }
+      }
     }
   },
   mp: {
