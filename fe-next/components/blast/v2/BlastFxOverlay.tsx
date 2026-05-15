@@ -83,6 +83,68 @@ async function spawnPulseRing(
   entry.raf = requestAnimationFrame(step);
 }
 
+// Chromatic shockwave wrap — three concentric rings in cyan/magenta/yellow
+// staggered ~50ms apart with slight scale offsets. Reads as a glitch/sci-fi
+// shockwave around the cleared cell, distinct from the solid pulse ring.
+// Spawned in addition to the pulse ring on word found.
+async function spawnShockwaveWrap(
+  app: import('pixi.js').Application,
+  systems: { rings: Array<{ g: import('pixi.js').Graphics; raf: number }> },
+  cx: number,
+  cy: number,
+) {
+  if (typeof window !== 'undefined'
+    && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  if (systems.rings.length >= MAX_RINGS) return;
+  const PIXI = await import('pixi.js');
+  // RGB-split shockwave: cyan slightly behind, yellow middle, magenta leading.
+  const layers: Array<{ color: number; delayMs: number; scaleStart: number; width: number }> = [
+    { color: 0x00ffff, delayMs: 0,   scaleStart: 0.35, width: 4 },
+    { color: 0xffe135, delayMs: 60,  scaleStart: 0.32, width: 3 },
+    { color: 0xff1493, delayMs: 120, scaleStart: 0.28, width: 3 },
+  ];
+  const t0 = performance.now();
+  const baseRadius = Math.min(app.screen.width, app.screen.height) * 0.13;
+  for (const layer of layers) {
+    if (systems.rings.length >= MAX_RINGS) return;
+    const g = new PIXI.Graphics();
+    g.circle(0, 0, baseRadius).stroke({ color: layer.color, width: layer.width, alpha: 0.95 });
+    g.x = cx;
+    g.y = cy;
+    g.scale.set(layer.scaleStart);
+    g.alpha = 0;
+    app.stage.addChild(g);
+
+    const duration = 460;
+    const entry = { g, raf: 0 };
+    systems.rings.push(entry);
+    const step = () => {
+      if (g.destroyed) return;
+      const now = performance.now();
+      const localT = now - t0 - layer.delayMs;
+      if (localT < 0) {
+        entry.raf = requestAnimationFrame(step);
+        return;
+      }
+      const t = Math.min(localT / duration, 1);
+      // ease-out cubic, expanding from scaleStart to 2.2
+      const ease = 1 - Math.pow(1 - t, 3);
+      g.scale.set(layer.scaleStart + ease * (2.2 - layer.scaleStart));
+      // fade in fast, hold, then fade out
+      g.alpha = t < 0.18 ? (t / 0.18) * 0.95 : 0.95 * (1 - (t - 0.18) / 0.82);
+      if (t >= 1) {
+        try { app.stage.removeChild(g); } catch { /* ok */ }
+        g.destroy();
+        const idx = systems.rings.indexOf(entry);
+        if (idx >= 0) systems.rings.splice(idx, 1);
+        return;
+      }
+      entry.raf = requestAnimationFrame(step);
+    };
+    entry.raf = requestAnimationFrame(step);
+  }
+}
+
 // Horizontal luminous bar sweeping top→bottom — cinematic on big clears / chains.
 async function spawnLightSweep(
   app: import('pixi.js').Application,
@@ -248,6 +310,12 @@ export function BlastFxOverlay({
       particles.burst(CASCADE_SPARKLE, lx, ly, 6);
       debris.spawn(lx, ly, tintColor, 10);
       spawnPulseRing(app, systems, lx, ly, tintColor);
+      // RGB-split shockwave wrap on word found — extra polish over the solid
+      // pulse ring. Only fire on the FIRST cell of a clear group to avoid
+      // saturating the rings pool when long words pop many tiles at once.
+      if (center === clearCenters[0]) {
+        spawnShockwaveWrap(app, systems, lx, ly);
+      }
     }
 
     // Screen flash + shake scale with clear size. Bumped one tier across the

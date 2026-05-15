@@ -9,10 +9,20 @@ const pack = JSON.parse(
   readFileSync(resolve(process.cwd(), 'content/blast/packs/he/pack-chain.json'), 'utf8'),
 ) as { locale: string; levels: ChainLevelSpec[] };
 
+// Mirror the en curve: tiers 4–6 extend the curated content to level 30.
+function expectedChainLength(n: number): number {
+  if (n <= 5) return 3;
+  if (n <= 10) return 4;
+  if (n <= 15) return 5;
+  if (n <= 20) return 6;
+  if (n <= 25) return 7;
+  return 8;
+}
+
 describe('he pack-chain.json', () => {
-  it('has exactly 15 levels numbered 1..15', () => {
+  it('has exactly 30 levels numbered 1..30', () => {
     expect(pack.levels.map((l) => l.levelNumber)).toEqual(
-      Array.from({ length: 15 }, (_, i) => i + 1),
+      Array.from({ length: 30 }, (_, i) => i + 1),
     );
   });
 
@@ -27,9 +37,7 @@ describe('he pack-chain.json', () => {
 
   it('respects the difficulty curve (chain length grows by tier)', () => {
     for (const spec of pack.levels) {
-      const n = spec.levelNumber;
-      const expected = n <= 5 ? 3 : n <= 10 ? 4 : 5;
-      expect(spec.chain.length, `${spec.id}`).toBe(expected);
+      expect(spec.chain.length, `${spec.id}`).toBe(expectedChainLength(spec.levelNumber));
     }
   });
 

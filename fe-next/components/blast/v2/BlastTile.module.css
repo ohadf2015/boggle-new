@@ -44,6 +44,15 @@
     inset 0 -1px 0 rgba(255, 255, 255, 0.025);
 }
 
+/* Column wrapper for live tiles — must hold a fixed width matching the well
+   beneath, otherwise an emptied column collapses to 0px and `justify-center`
+   shifts the remaining columns horizontally mid-fall. That sideways shift
+   is what made tiles read as "falling down AND to the side" during gravity. */
+.tileColumn {
+  width: var(--blast-tile-size, clamp(48px, 18cqi, 88px));
+  flex: 0 0 var(--blast-tile-size, clamp(48px, 18cqi, 88px));
+}
+
 .tile {
   position: relative;
   display: grid;

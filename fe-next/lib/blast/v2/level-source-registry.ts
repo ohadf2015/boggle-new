@@ -7,7 +7,7 @@ import type { Locale } from './types';
 import { resolve } from 'node:path';
 
 const CHAIN_LOCALES: Locale[] = ['en', 'he'];
-const CHAIN_MAX_LEVEL = 15;
+const CHAIN_MAX_LEVEL = 30;
 
 let cached: LevelSourceRegistry | null = null;
 

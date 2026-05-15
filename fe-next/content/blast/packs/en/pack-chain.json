@@ -135,6 +135,141 @@
       "columns": 9,
       "decoyTiles": 0,
       "chain": ["JAGUAR", "FALCON", "WALRUS", "BEAVER", "IGUANA"]
+    },
+    {
+      "id": "en-chain-16",
+      "levelNumber": 16,
+      "theme": "ocean",
+      "locale": "en",
+      "columns": 11,
+      "decoyTiles": 0,
+      "chain": ["WAVE", "REEF", "CORAL", "SHARK", "WHALE", "PEARL"]
+    },
+    {
+      "id": "en-chain-17",
+      "levelNumber": 17,
+      "theme": "nature",
+      "locale": "en",
+      "columns": 11,
+      "decoyTiles": 0,
+      "chain": ["TREE", "LEAF", "ROCK", "RIVER", "STONE", "FOREST"]
+    },
+    {
+      "id": "en-chain-18",
+      "levelNumber": 18,
+      "theme": "weather",
+      "locale": "en",
+      "columns": 11,
+      "decoyTiles": 0,
+      "chain": ["RAIN", "WIND", "SNOW", "CLOUD", "STORM", "FROST"]
+    },
+    {
+      "id": "en-chain-19",
+      "levelNumber": 19,
+      "theme": "fruits",
+      "locale": "en",
+      "columns": 11,
+      "decoyTiles": 0,
+      "chain": ["PLUM", "PEAR", "MANGO", "LEMON", "GRAPE", "PEACH"]
+    },
+    {
+      "id": "en-chain-20",
+      "levelNumber": 20,
+      "theme": "food",
+      "locale": "en",
+      "columns": 11,
+      "decoyTiles": 0,
+      "chain": ["RICE", "SOUP", "PASTA", "BREAD", "OLIVE", "BUTTER"]
+    },
+    {
+      "id": "en-chain-21",
+      "levelNumber": 21,
+      "theme": "animals",
+      "locale": "en",
+      "columns": 13,
+      "decoyTiles": 0,
+      "chain": ["WOLF", "BEAR", "LION", "HORSE", "TIGER", "ZEBRA", "RHINO"]
+    },
+    {
+      "id": "en-chain-22",
+      "levelNumber": 22,
+      "theme": "home",
+      "locale": "en",
+      "columns": 13,
+      "decoyTiles": 0,
+      "chain": ["DOOR", "BED", "ROOM", "CHAIR", "TABLE", "HOUSE", "WINDOW"]
+    },
+    {
+      "id": "en-chain-23",
+      "levelNumber": 23,
+      "theme": "school",
+      "locale": "en",
+      "columns": 13,
+      "decoyTiles": 0,
+      "chain": ["PEN", "DESK", "BOOK", "RULER", "PAPER", "CHALK", "PENCIL"]
+    },
+    {
+      "id": "en-chain-24",
+      "levelNumber": 24,
+      "theme": "space",
+      "locale": "en",
+      "columns": 13,
+      "decoyTiles": 0,
+      "chain": ["STAR", "MOON", "COMET", "ORBIT", "PLANET", "GALAXY", "NEBULA"]
+    },
+    {
+      "id": "en-chain-25",
+      "levelNumber": 25,
+      "theme": "transport",
+      "locale": "en",
+      "columns": 13,
+      "decoyTiles": 0,
+      "chain": ["CAR", "BIKE", "TRAIN", "PLANE", "TRUCK", "BOAT", "ROCKET"]
+    },
+    {
+      "id": "en-chain-26",
+      "levelNumber": 26,
+      "theme": "fruits",
+      "locale": "en",
+      "columns": 15,
+      "decoyTiles": 0,
+      "chain": ["FIG", "PEAR", "KIWI", "PLUM", "GRAPE", "MANGO", "LEMON", "ORANGE"]
+    },
+    {
+      "id": "en-chain-27",
+      "levelNumber": 27,
+      "theme": "ocean",
+      "locale": "en",
+      "columns": 15,
+      "decoyTiles": 0,
+      "chain": ["FISH", "REEF", "WAVE", "SHELL", "SHARK", "WHALE", "CORAL", "OCTOPUS"]
+    },
+    {
+      "id": "en-chain-28",
+      "levelNumber": 28,
+      "theme": "mythology",
+      "locale": "en",
+      "columns": 15,
+      "decoyTiles": 0,
+      "chain": ["ELF", "OGRE", "TROLL", "GIANT", "FAIRY", "GNOME", "DRAGON", "WIZARD"]
+    },
+    {
+      "id": "en-chain-29",
+      "levelNumber": 29,
+      "theme": "music",
+      "locale": "en",
+      "columns": 15,
+      "decoyTiles": 0,
+      "chain": ["DRUM", "SONG", "BAND", "FLUTE", "PIANO", "ORGAN", "GUITAR", "VIOLIN"]
+    },
+    {
+      "id": "en-chain-30",
+      "levelNumber": 30,
+      "theme": "science",
+      "locale": "en",
+      "columns": 15,
+      "decoyTiles": 0,
+      "chain": ["ATOM", "CELL", "BONE", "NERVE", "BRAIN", "BLOOD", "ENERGY", "GRAVITY"]
     }
   ]
 }
