@@ -234,15 +234,15 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           transition={{ duration: 0.4, ease: 'easeOut', delay: 0.05 }}
           className="px-5 lg:px-6 pt-3 lg:pt-5 short:pt-1.5 medium-short:pt-2 shrink-0"
         >
-          <div className="relative w-full overflow-hidden rounded-2xl border-3 border-neo-black shadow-hard">
-            <div className="relative w-full bg-neo-navy h-[140px] short:h-[70px] medium-short:h-[100px] sm:h-auto sm:aspect-[21/9] sm:short:h-[80px] sm:short:aspect-auto sm:medium-short:h-[110px] sm:medium-short:aspect-auto desktop-short:lg:h-[90px] desktop-short:lg:aspect-auto desktop-medium-short:lg:h-[140px] desktop-medium-short:lg:aspect-auto">
+          <div className="relative w-full mx-auto">
+            <div className="relative w-full max-w-[560px] lg:max-w-[720px] desktop-medium-short:lg:max-w-[520px] desktop-short:lg:max-w-[380px] mx-auto bg-neo-navy h-[140px] short:h-[70px] medium-short:h-[100px] sm:h-auto sm:aspect-[16/9] overflow-hidden rounded-2xl border-3 border-neo-black shadow-hard">
               <Image
                 src="/images/arena-hub-hero.jpg"
                 alt={t('multiplayerFlow.roomList.heroAlt')}
                 fill
                 priority
-                sizes="(min-width: 1024px) 1024px, 100vw"
-                className="object-cover object-[center_42%] lg:object-contain"
+                sizes="(min-width: 1024px) 720px, (min-width: 640px) 560px, 100vw"
+                className="object-cover object-center"
               />
               <div
                 aria-hidden="true"

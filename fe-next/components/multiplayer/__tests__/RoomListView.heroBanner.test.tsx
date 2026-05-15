@@ -59,11 +59,37 @@ const props = {
   isQuickPlayLoading: false,
 };
 
-describe('RoomListView hero banner — no clip', () => {
-  it('uses object-contain at lg+ so the full art is visible on desktop', () => {
+describe('RoomListView hero banner — no clip, no shrink', () => {
+  it('uses object-cover (no contain) since container aspect now matches source aspect', () => {
     render(<RoomListView {...props} />);
     const img = screen.getByAltText('multiplayerFlow.roomList.heroAlt');
-    expect(img.className).toMatch(/lg:object-contain/);
+    expect(img.className).toMatch(/object-cover/);
+    expect(img.className).not.toMatch(/lg:object-contain/);
+  });
+
+  it('frame aspect matches source art aspect (16/9) at sm+ to avoid letterbox waste', () => {
+    render(<RoomListView {...props} />);
+    const img = screen.getByAltText('multiplayerFlow.roomList.heroAlt');
+    const frame = img.parentElement as HTMLElement;
+    expect(frame.className).toMatch(/sm:aspect-\[16\/9\]/);
+    expect(frame.className).not.toMatch(/sm:aspect-\[21\/9\]/);
+    expect(frame.className).not.toMatch(/lg:aspect-\[64\/15\]/);
+  });
+
+  it('caps max-width on desktop so the hero does not sprawl full-bleed', () => {
+    render(<RoomListView {...props} />);
+    const img = screen.getByAltText('multiplayerFlow.roomList.heroAlt');
+    const frame = img.parentElement as HTMLElement;
+    expect(frame.className).toMatch(/lg:max-w-\[720px\]/);
+    expect(frame.className).toMatch(/mx-auto/);
+  });
+
+  it('shrinks proportionally (not via fixed 140px height) on desktop-medium-short laptops', () => {
+    render(<RoomListView {...props} />);
+    const img = screen.getByAltText('multiplayerFlow.roomList.heroAlt');
+    const frame = img.parentElement as HTMLElement;
+    expect(frame.className).toMatch(/desktop-medium-short:lg:max-w-\[/);
+    expect(frame.className).not.toMatch(/desktop-medium-short:lg:h-\[140px\]/);
   });
 
   it('does not anchor object-position at y=60% (which hid the ARENA HUB title)', () => {
@@ -72,14 +98,7 @@ describe('RoomListView hero banner — no clip', () => {
     expect(img.className).not.toMatch(/object-\[center_60%\]/);
   });
 
-  it('does not apply the extreme 64/15 desktop aspect that over-cropped the source', () => {
-    render(<RoomListView {...props} />);
-    const img = screen.getByAltText('multiplayerFlow.roomList.heroAlt');
-    const frame = img.parentElement as HTMLElement;
-    expect(frame.className).not.toMatch(/lg:aspect-\[64\/15\]/);
-  });
-
-  it('paints the frame with neo-navy so object-contain letterboxes blend with the art', () => {
+  it('paints the frame with neo-navy so any mobile-cover crop bands blend with the art', () => {
     render(<RoomListView {...props} />);
     const img = screen.getByAltText('multiplayerFlow.roomList.heroAlt');
     const frame = img.parentElement as HTMLElement;
