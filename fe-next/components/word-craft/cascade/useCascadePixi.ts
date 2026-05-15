@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useRef, type RefObject } from 'react';
 import type { SceneCtx } from '@/lib/word-craft/pixi/sceneCtx';
-import type { CascadeGrid } from '@/lib/word-craft/cascade/boardGrid';
-import { coordsOf } from '@/lib/word-craft/cascade/boardGrid';
+import { coordsOf, type CascadeGrid } from '@/lib/word-craft/cascade/boardGrid';
+import type { CascadePlacement } from '@/lib/word-craft/cascade/cascadeRunReducer';
 
 export interface UseCascadePixiArgs {
   sceneCtx: SceneCtx | null;
@@ -12,6 +12,7 @@ export interface UseCascadePixiArgs {
     totalScore: number;
     burnedCellIds: string[];
     chainWords: string[];
+    placements: CascadePlacement[];
   } | null;
   gameOver: boolean;
 }
@@ -32,9 +33,10 @@ export function useCascadePixi({ sceneCtx, grid, lastSubmit, gameOver }: UseCasc
     let cancelled = false;
     (async () => {
       try {
-        const [ripple, confetti] = await Promise.all([
+        const [ripple, confetti, wave] = await Promise.all([
           import('@/lib/word-craft/pixi/scenes/tilePlaceRipple'),
           import('@/lib/word-craft/pixi/scenes/scoreConfetti'),
+          import('@/lib/word-craft/pixi/scenes/wordCommitWave'),
         ]);
         if (cancelled || !sceneCtx) return;
         // Ripple each burned cell
@@ -42,6 +44,13 @@ export function useCascadePixi({ sceneCtx, grid, lastSubmit, gameOver }: UseCasc
           const coords = coordsOf(grid, cellId);
           if (!coords) continue;
           void ripple.playTilePlaceRipple(sceneCtx, coords);
+        }
+        // Gold-orb arc + per-tile burst trail toward the score chip
+        if (lastSubmit.placements.length > 0 && lastSubmit.totalScore > 0) {
+          void wave.playWordCommitWave(sceneCtx, {
+            placements: lastSubmit.placements,
+            totalScore: lastSubmit.totalScore,
+          });
         }
         // Score confetti for any chain combo
         if (lastSubmit.chainWords.length > 0) {

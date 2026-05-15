@@ -34,7 +34,7 @@ export function CascadeHUD({
     >
       <div className="flex items-center justify-between font-neo-display text-neo-cream">
         <span>{t('wordcraft.run.round', { n: round, total: CASCADE_ROUND_COUNT })}</span>
-        <span data-wc-cascade-score>
+        <span data-wc-cascade-score data-wc-score-chip>
           {t('wordcraft.run.score')}: <span className="text-neo-lime">{score}</span> / {target}
         </span>
       </div>

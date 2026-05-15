@@ -7,6 +7,7 @@ import { CASCADE_ROUND_COUNT, getCascadeRoundTarget, getFireRiseMs } from './rou
 import type { RunPhase, RoundState } from '../run/runTypes';
 import {
   createGrid,
+  coordsOf,
   type CascadeGrid,
 } from './boardGrid';
 import { validatePath } from './swipePath';
@@ -29,6 +30,13 @@ export interface CascadeRunOptions {
   isWord: (word: string) => boolean;
 }
 
+export interface CascadePlacement {
+  row: number;
+  col: number;
+  letter: string;
+  value: number;
+}
+
 export interface LastSubmitResult {
   word: string;
   baseScore: number;
@@ -36,6 +44,8 @@ export interface LastSubmitResult {
   totalScore: number;
   burnedCellIds: string[];
   chainWords: string[];
+  /** Pre-burn snapshot of the swiped path (for visual arc effects). */
+  placements: CascadePlacement[];
 }
 
 export interface CascadeRunState {
@@ -248,6 +258,21 @@ export function cascadeRunReducer(
 
       const totalScore = baseScore + chainScores.reduce((a, b) => a + b, 0);
 
+      // Pre-burn snapshot of the swiped path for visual arc/wave effects.
+      const placements: CascadePlacement[] = [];
+      for (let i = 0; i < action.path.length; i++) {
+        const cellIdx = state.grid.index.get(action.path[i]);
+        if (cellIdx === undefined) continue;
+        const c = coordsOf(state.grid, action.path[i]);
+        if (!c) continue;
+        placements.push({
+          row: c.row,
+          col: c.col,
+          letter: letters[i],
+          value: values[i],
+        });
+      }
+
       return {
         ...state,
         grid: finalGrid,
@@ -265,6 +290,7 @@ export function cascadeRunReducer(
           totalScore,
           burnedCellIds: burnIds,
           chainWords,
+          placements,
         },
         lastError: null,
       };
