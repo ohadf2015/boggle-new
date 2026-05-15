@@ -116,7 +116,11 @@ export class ParticleEmitter {
   // ─── Update Loop ────────────────────────────────────────────────
 
   update(deltaSec: number): void {
-    if (this._destroyed) return;
+    // Also bail when our underlying Graphics was destroyed by a parent
+    // (children:true) destroy that ran before our own destroy() — calling
+    // graphics.clear() on a destroyed Graphics throws "Cannot read
+    // properties of null (reading 'clear')".
+    if (this._destroyed || this.graphics?.destroyed) return;
 
     // Emission
     if (this._active) {

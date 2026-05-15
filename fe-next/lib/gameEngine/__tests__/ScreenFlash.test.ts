@@ -8,7 +8,10 @@ jest.mock('pixi.js', () => {
     clear: jest.fn().mockReturnThis(),
     rect: jest.fn().mockReturnThis(),
     fill: jest.fn().mockReturnThis(),
-    destroy: jest.fn(),
+    destroy: jest.fn(function (this: { destroyed: boolean }) {
+      this.destroyed = true;
+    }),
+    destroyed: false,
     alpha: 0,
     visible: false,
   };
@@ -78,5 +81,14 @@ describe('ScreenFlash', () => {
   it('should provide danger flash preset', () => {
     flash.danger();
     expect(flash.isActive).toBe(true);
+  });
+
+  it('does not crash if underlying graphics was destroyed by parent (children:true)', () => {
+    flash.flash({ color: 0xff0000, duration: 0.2, intensity: 0.8 });
+    // Simulate parent.destroy({ children: true }) flipping the Graphics.destroyed flag
+    // BEFORE our own ScreenFlash.destroy() runs — the production race that
+    // produced "Cannot read properties of null (reading 'clear')" in Sentry.
+    (flash as unknown as { graphics: { destroyed: boolean } }).graphics.destroyed = true;
+    expect(() => flash.update(0.1)).not.toThrow();
   });
 });

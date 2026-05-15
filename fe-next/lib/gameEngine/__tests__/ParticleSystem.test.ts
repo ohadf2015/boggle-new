@@ -183,4 +183,15 @@ describe('ParticlePool', () => {
     pool.destroy();
     // No errors thrown = success
   });
+
+  it('emitter update bails when underlying Graphics was destroyed by parent', () => {
+    const pool = new ParticlePool(parent);
+    const emitter = pool.create(makeConfig());
+    // Simulate parent.destroy({ children: true }) flipping Graphics.destroyed
+    // before ParticleEmitter.destroy() — guards the post-unmount tick race
+    // that produced "Cannot read properties of null (reading 'clear')".
+    (emitter as unknown as { graphics: { destroyed: boolean } }).graphics.destroyed = true;
+    expect(() => emitter.update(0.016)).not.toThrow();
+    pool.destroy();
+  });
 });

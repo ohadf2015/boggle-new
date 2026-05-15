@@ -90,4 +90,13 @@ describe('TrailRenderer', () => {
     expect(smallTrail.pointCount).toBeLessThanOrEqual(5);
     smallTrail.destroy();
   });
+
+  it('does not crash if Graphics was destroyed by parent (children:true)', () => {
+    trail.addPoint(10, 10);
+    trail.addPoint(20, 20);
+    // Simulate parent.destroy({ children: true }) flipping the Graphics.destroyed flag
+    // before TrailRenderer.destroy() is invoked.
+    (trail as unknown as { graphics: { destroyed: boolean } }).graphics.destroyed = true;
+    expect(() => trail.update(0.016)).not.toThrow();
+  });
 });

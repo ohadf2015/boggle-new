@@ -28,6 +28,8 @@ export function burnCells(grid: CascadeGrid, cellIds: ReadonlyArray<string>): Ca
 export interface GravityResult {
   grid: CascadeGrid;
   spawnedCellIds: string[];
+  /** True when the bag ran out while refilling — some top slots stay empty (letter:null). */
+  bagExhausted: boolean;
 }
 
 /**
@@ -40,6 +42,7 @@ export function applyGravity(grid: CascadeGrid, bag: TileBag): GravityResult {
   const cells = cloneCells(grid.cells);
   const { rows, cols } = grid;
   const spawnedCellIds: string[] = [];
+  let bagExhausted = false;
 
   for (let col = 0; col < cols; col++) {
     // Collect surviving letters (bottom to top) for this column
@@ -59,11 +62,21 @@ export function applyGravity(grid: CascadeGrid, bag: TileBag): GravityResult {
       };
       writeRow--;
     }
-    // Remaining top slots need new tiles from bag
+    // Remaining top slots need new tiles from bag.
+    // When the bag is exhausted, leave the slot empty (letter:null) and signal
+    // bagExhausted; the cascade engine and reducer end the round naturally
+    // rather than crashing the React tree.
     while (writeRow >= 0) {
       const [newTile] = draw(bag, 1);
       if (!newTile) {
-        throw new Error('applyGravity: bag empty, cannot refill grid');
+        bagExhausted = true;
+        cells[writeRow * cols + col] = {
+          id: cellIdFor(writeRow, col),
+          letter: null,
+          value: 0,
+        };
+        writeRow--;
+        continue;
       }
       cells[writeRow * cols + col] = {
         id: cellIdFor(writeRow, col),
@@ -86,5 +99,6 @@ export function applyGravity(grid: CascadeGrid, bag: TileBag): GravityResult {
   return {
     grid: { rows, cols, cells, index: rebuildIndex(cells) },
     spawnedCellIds,
+    bagExhausted,
   };
 }

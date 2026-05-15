@@ -71,7 +71,11 @@ export class ScreenFlash {
 
   /** Call each frame with delta in seconds */
   update(deltaSec: number): void {
-    if (this._destroyed) return;
+    // Bail if either this wrapper has been destroyed, or its underlying
+    // Pixi Graphics was destroyed by a parent.destroy({children:true}) call
+    // before our own destroy() ran (race we've seen during fast unmount on
+    // /:locale/blast and /:locale/word-craft).
+    if (this._destroyed || this.graphics?.destroyed) return;
     for (let i = this.flashes.length - 1; i >= 0; i--) {
       this.flashes[i].elapsed += deltaSec;
       if (this.flashes[i].elapsed >= this.flashes[i].duration) {

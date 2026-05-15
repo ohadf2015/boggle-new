@@ -59,7 +59,9 @@ export class TrailRenderer {
 
   /** Call each frame with delta in seconds */
   update(deltaSec: number): void {
-    if (this._destroyed) return;
+    // Bail if our Graphics was destroyed by a parent.destroy({children:true})
+    // before our own destroy() — guards the post-unmount tick race.
+    if (this._destroyed || this.graphics?.destroyed) return;
     // Age all points and remove expired ones
     for (let i = this.points.length - 1; i >= 0; i--) {
       this.points[i].age += deltaSec;

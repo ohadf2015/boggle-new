@@ -23,6 +23,8 @@ export interface BurnAndCascadeResult {
   finalGrid: CascadeGrid;
   chainWords: string[];
   chainScores: number[];
+  /** True when the tile bag ran out at any point in this burn+cascade sequence. */
+  bagExhausted: boolean;
 }
 
 /**
@@ -33,7 +35,12 @@ export interface BurnAndCascadeResult {
 export function burnAndCascadeAround(args: BurnAndCascadeArgs): BurnAndCascadeResult {
   const maxChains = args.maxChains ?? DEFAULT_MAX_CHAINS;
   let grid = burnCells(args.grid, args.initialBurnIds);
-  grid = applyGravity(grid, args.bag).grid;
+  let bagExhausted = false;
+  {
+    const r = applyGravity(grid, args.bag);
+    grid = r.grid;
+    if (r.bagExhausted) bagExhausted = true;
+  }
 
   const chainWords: string[] = [];
   const chainScores: number[] = [];
@@ -60,10 +67,12 @@ export function burnAndCascadeAround(args: BurnAndCascadeArgs): BurnAndCascadeRe
 
     const burnIds = matches.flatMap((m) => m.path);
     grid = burnCells(grid, burnIds);
-    grid = applyGravity(grid, args.bag).grid;
+    const r = applyGravity(grid, args.bag);
+    grid = r.grid;
+    if (r.bagExhausted) bagExhausted = true;
   }
 
-  return { finalGrid: grid, chainWords, chainScores };
+  return { finalGrid: grid, chainWords, chainScores, bagExhausted };
 }
 
 /** Convenience: are all cells of `grid` non-null? */

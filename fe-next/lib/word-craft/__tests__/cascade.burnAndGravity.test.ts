@@ -158,14 +158,28 @@ describe('cascade/burnAndGravity', () => {
       expect(spawnedCellIds).toEqual([cellIdFor(0, 0), cellIdFor(1, 0), cellIdFor(2, 0)]);
     });
 
-    it('throws when bag is empty and spawn is needed', () => {
+    it('leaves the slot empty and signals bagExhausted when bag is empty', () => {
       const bag = freshBag(1);
       const grid = createGrid(3, 3, bag);
       // Drain bag manually so spawn would have to come from empty
       while (bag.tiles.length > 0) bag.tiles.shift();
 
       const burned = burnCells(grid, [cellAt(grid, 0, 0)!.id]);
-      expect(() => applyGravity(burned, bag)).toThrow(/bag empty/i);
+      const { grid: g2, spawnedCellIds, bagExhausted } = applyGravity(burned, bag);
+      expect(bagExhausted).toBe(true);
+      expect(spawnedCellIds).toEqual([]);
+      // Top of column 0 is empty (letter:null); other columns untouched.
+      expect(cellAt(g2, 0, 0)!.letter).toBeNull();
+      expect(cellAt(g2, 0, 1)!.letter).not.toBeNull();
+      expect(cellAt(g2, 0, 2)!.letter).not.toBeNull();
+    });
+
+    it('reports bagExhausted=false on a normal refill', () => {
+      const bag = freshBag(2);
+      const grid = createGrid(3, 3, bag);
+      const burned = burnCells(grid, [cellAt(grid, 0, 0)!.id]);
+      const { bagExhausted } = applyGravity(burned, bag);
+      expect(bagExhausted).toBe(false);
     });
 
     it('is a no-op when no cells are burned', () => {
