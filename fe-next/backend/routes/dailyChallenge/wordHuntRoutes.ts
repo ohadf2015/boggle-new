@@ -201,7 +201,7 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
 
     const { data: existing, error: existingError } = await supabase
       .from('daily_word_hunt_attempts')
-      .select('id, extra_tries')
+      .select('id, extra_tries, solved')
       .eq('puzzle_date', puzzleDate)
       .eq('language', language)
       .eq(idColumn, idValue)
@@ -213,6 +213,10 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       return;
     }
 
+    // Captured BEFORE the update so weekly-quest credit can detect the
+    // solved=false → solved=true transition on a paid retry. May be reassigned
+    // on the race-update path below if the concurrent submit landed first.
+    let wasAlreadySolved = !!existing?.solved;
     const existingExtraTries = existing?.extra_tries || 0;
     const reportedExtraTries = Math.max(0, Math.round(clientExtraTries ?? 0));
     const { finalScore, penaltyApplied, isPaidRetry } = computeWordHuntRetryScore({
@@ -253,12 +257,13 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
         if ((insertError as { code?: string }).code === '23505') {
           const { data: raced } = await supabase
             .from('daily_word_hunt_attempts')
-            .select('id, extra_tries')
+            .select('id, extra_tries, solved')
             .eq('puzzle_date', puzzleDate)
             .eq('language', language)
             .eq(idColumn, idValue)
             .maybeSingle();
           if (raced) {
+            wasAlreadySolved = !!raced.solved;
             const racePayload: Record<string, unknown> = { ...insertData };
             const racedExtraTries = raced.extra_tries || 0;
             const racedScore = computeWordHuntRetryScore({
@@ -324,8 +329,10 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       }
     }
 
-    // Credit the `daily_challenges` weekly quest — only solved, first-attempt runs count.
-    if (shouldCreditDailyChallengeQuest({ mode: 'word_hunt', playerId, solved, isRetry })) {
+    // Credit the `daily_challenges` weekly quest on the submission that
+    // *transitions* the row to solved=true. Includes paid retries that flip
+    // a failed first attempt to solved.
+    if (shouldCreditDailyChallengeQuest({ mode: 'word_hunt', playerId, solved, isRetry, wasAlreadySolved })) {
       updateQuestProgress(playerId as string, { dailyChallengesCompleted: 1 }).catch((err) => {
         logger.error('API', `[WordHunt] weekly quest update failed for ${playerId}: ${(err as Error).message}`);
       });
