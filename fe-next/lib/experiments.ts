@@ -234,6 +234,115 @@ export const EXPERIMENTS = {
     description:
       'Blast chocolate spreader mechanic. treatment = waves may spawn chocolate cells that grow each turn unless touched + `stop_chocolate` objective. control = legacy waves only.',
   }),
+
+  /**
+   * Onboarding language-step auto-skip. When the browser locale already
+   * matches a supported app locale (en/he/sv/ja/es), skip the picker and
+   * persist the detected locale. PostHog 14d showed `language` step at 54
+   * users vs `tutorial` at 33 — pruning the picker should compress FTUE
+   * without losing intent.
+   * Conversion = onboarding_completed.
+   */
+  'onboarding-language-autoskip': defineExperiment({
+    variants: ['control', 'auto-skip'] as const,
+    default: 'control',
+    description:
+      'Onboarding language step. control = always show picker. auto-skip = when navigator.language ∈ supported locales, jump straight to tutorial with detected locale.',
+  }),
+
+  /**
+   * Onboarding profile→mode auto-route. Profile→onboarding_completed gap
+   * was 38% (34u → 21u). Variant routes finished profiles directly into
+   * Word Hunt (top-volume mode, 82 14d plays) instead of /practice.
+   * Conversion = first_game_played within 30s of profile complete.
+   */
+  'onboarding-postprofile-autoroute': defineExperiment({
+    variants: ['control', 'word-hunt', 'random'] as const,
+    default: 'control',
+    description:
+      'Where to send the user immediately after onboarding profile. control = /practice. word-hunt = /singleplayer?mode=word-hunt&autoStart=1. random = pick one of the top-3 volume modes.',
+  }),
+
+  /**
+   * Rewarded-ad CTA copy. 14d data: 372 offers, 27 watches (7%). Test
+   * value-prop framings — "Double XP", "Skip Cooldown", "Free Hint" —
+   * against generic "Watch Ad".
+   * Conversion = rewarded_ad_watched / rewarded_ad_offered.
+   */
+  'rewarded-ad-copy-v1': defineExperiment({
+    variants: ['control', 'double-xp', 'skip-cooldown', 'free-hint'] as const,
+    default: 'control',
+    description:
+      'Rewarded-ad button copy. control = "Watch Ad (+N coins)". double-xp = "DOUBLE your XP". skip-cooldown = "Skip the wait". free-hint = "Reveal a hint, free".',
+  }),
+
+  /**
+   * Rewarded-ad per-user cooldown. Today the ad CTA renders every game-end
+   * regardless of recent exposure, yielding offer:user ratio of 11:1 in
+   * 14d. Cooldown variant suppresses the offer for N minutes after the
+   * last decline so the prompt stays fresh.
+   * Conversion = rewarded_ad_watched per user-day.
+   */
+  'rewarded-ad-cooldown-v1': defineExperiment({
+    variants: ['control', '10m-cooldown', '30m-cooldown'] as const,
+    default: 'control',
+    description:
+      'Cooldown after a rewarded-ad decline. control = no cooldown. 10m = hide CTA for 10 min after decline. 30m = hide for 30 min.',
+  }),
+
+  /**
+   * Signup-prompt timing. Today the prompt fires after first completion.
+   * 14d data: prompt shown to 14 users, only 11 signups recorded — the
+   * trigger fires too rarely + too early. Variants delay the trigger and
+   * tie to behaviour rather than completion count.
+   * Conversion = signup_completed within 30 min of trigger.
+   */
+  'signup-prompt-timing-v1': defineExperiment({
+    variants: ['control', 'after-3-games', 'after-first-4-letter-word'] as const,
+    default: 'control',
+    description:
+      'When to show first-win signup nudge. control = first completion. after-3-games = after the 3rd game_completed of the session. after-first-4-letter-word = after the player finds their first ≥4-letter word.',
+  }),
+
+  /**
+   * Home grid mode-hiding. PostHog 14d: connections=12 plays/5 users,
+   * adventure=9/4 users — both effectively dead. Variant hides them
+   * from the default grid and exposes via an "all modes" drawer so the
+   * top modes get visual real estate.
+   * Conversion = home_mode_card_click → game_started.
+   */
+  'home-hide-dead-modes': defineExperiment({
+    variants: ['control', 'hide-low-volume'] as const,
+    default: 'control',
+    description:
+      'Home grid. control = all modes visible. hide-low-volume = connections + adventure tucked into an "all modes" drawer, top-5 modes promoted.',
+  }),
+
+  /**
+   * Game-end "play one more" CTA. Drives plays/session (3.03 in 14d).
+   * Variant adds an oversized 2-tap restart button using random mode
+   * (rotates so the user discovers variety).
+   * Conversion = next game_started within 30s of game_completed.
+   */
+  'play-one-more-cta': defineExperiment({
+    variants: ['control', 'random-mode', 'same-mode'] as const,
+    default: 'control',
+    description:
+      'Game-end secondary CTA. control = current results screen. random-mode = oversized "Play another (random)" CTA. same-mode = "Play again (same mode)".',
+  }),
+
+  /**
+   * Streak save modal. Day-streak XP curve drops users at D2/D3.
+   * Variant offers a one-time rewarded-ad streak save when the streak
+   * would otherwise expire within 4 hours.
+   * Conversion = streak_continued event.
+   */
+  'streak-save-modal': defineExperiment({
+    variants: ['off', 'on'] as const,
+    default: 'off',
+    description:
+      'Streak save modal. on = prompt user to watch ad to save expiring streak. off = current (no save).',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

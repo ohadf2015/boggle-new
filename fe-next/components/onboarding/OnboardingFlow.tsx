@@ -29,11 +29,33 @@ import CrazyGamesWelcome, { type CrazyGamesMode } from './CrazyGamesWelcome';
 import CrazyGamesTutorial from './CrazyGamesTutorial';
 import AuthModal from '@/components/auth/AuthModal';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
-
+import { useExperiment } from '@/hooks/useExperiment';
+import { locales } from '@/lib/i18n';
+import { practiceTargetUrl } from '@/lib/practice/practiceRoute';
+import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
+import type { Language } from '@/types';
 
 interface OnboardingFlowProps {
   onComplete: () => void;
 }
+
+/** Detect the first browser language that matches a supported app locale. */
+function detectSupportedBrowserLocale(): Language | null {
+  if (typeof navigator === 'undefined') return null;
+  const candidates = navigator.languages?.length ? navigator.languages : [navigator.language];
+  for (const raw of candidates) {
+    const primary = raw?.split('-')[0]?.toLowerCase();
+    if (primary && (locales as readonly string[]).includes(primary)) {
+      return primary as Language;
+    }
+  }
+  return null;
+}
+
+// Practice-mode pool for the random autoroute variant. word-hunt leads the
+// PostHog 14d volume table (82 plays), classic and wheelRush round out the
+// trio of supported practice landings.
+const RANDOM_AUTOROUTE_MODES: readonly PracticeMode[] = ['wordHunt', 'classic', 'wheelRush'];
 
 /**
  * OnboardingFlow - Orchestrates the full FTUE.
@@ -41,11 +63,30 @@ interface OnboardingFlowProps {
  * Full-screen with floating geometric background and progress dots.
  */
 const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
-  const { language, dir, t } = useLanguage();
+  const { language, setLanguage, dir, t } = useLanguage();
   const { isAuthenticated } = useAuth();
   const router = useRouter();
 
-  const [step, setStep] = useState<FlowStep>('language');
+  // Experiment: skip language picker when browser locale matches a supported
+  // app locale (en/he/sv/ja/es). PostHog 14d showed `language` step at 54
+  // unique users — pruning the picker compresses FTUE without losing intent.
+  const langAutoSkip = useExperiment('onboarding-language-autoskip');
+  // Experiment: where to route post-profile. Variant `word-hunt` skips the
+  // /practice intermediate; `random` rotates through top-volume modes.
+  const postProfileRoute = useExperiment('onboarding-postprofile-autoroute');
+
+  // Initial step. When the auto-skip variant is active AND the browser
+  // language matches a supported locale, persist that locale and skip the
+  // picker. Invite mode also benefits — it already skipped returningUser.
+  const initialStep = React.useMemo<FlowStep>(() => {
+    if (typeof window === 'undefined') return 'language';
+    if (langAutoSkip.variant !== 'auto-skip') return 'language';
+    const detected = detectSupportedBrowserLocale();
+    if (!detected) return 'language';
+    return 'tutorial';
+  }, [langAutoSkip.variant]);
+
+  const [step, setStep] = useState<FlowStep>(initialStep);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   // CG portal substep: tutorial first, then welcome with mode CTAs.
@@ -75,6 +116,24 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     startedAtRef.current = Date.now();
     trackOnboardingStart();
   }, []);
+
+  // Auto-skip language picker: persist the detected browser locale and
+  // pre-credit the `language` step so the funnel still records exposure.
+  // Runs once when the experiment lands on `auto-skip` AND we successfully
+  // resolved a supported locale.
+  const autoSkipFiredRef = useRef(false);
+  useEffect(() => {
+    if (autoSkipFiredRef.current) return;
+    if (langAutoSkip.variant !== 'auto-skip') return;
+    if (initialStep !== 'tutorial') return;
+    const detected = detectSupportedBrowserLocale();
+    if (!detected) return;
+    autoSkipFiredRef.current = true;
+    try { setLanguage(detected, { skipNavigation: true }); } catch { /* ignore */ }
+    stepsCompletedRef.current += 1;
+    trackOnboardingStep('language', { autoSkipped: true, detectedLocale: detected });
+    langAutoSkip.trackExposure();
+  }, [langAutoSkip, initialStep, setLanguage]);
 
   const emitCompleted = useCallback((extras: Record<string, unknown> = {}) => {
     if (completionEmittedRef.current) return;
@@ -224,16 +283,40 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         nameEdited,
       });
 
+      // Resolve post-profile route from the autoroute experiment. The
+      // hypothesis is that /practice is a low-engagement intermediate;
+      // routing straight into Word Hunt (top-volume mode) lifts
+      // first_game_played within 30s of profile complete.
       const pendingRoom = consumePendingRoomInvite();
+      let postProfileTarget = `/${language}/practice`;
+      let routeVariantTag: string = postProfileRoute.variant;
       if (pendingRoom) {
-        router.push(`/${language}/multiplayer?room=${pendingRoom}`);
-      } else {
-        router.push(`/${language}/practice`);
+        postProfileTarget = `/${language}/multiplayer?room=${pendingRoom}`;
+        routeVariantTag = 'invite';
+      } else if (postProfileRoute.variant === 'word-hunt') {
+        // Deep-link straight into the Word Hunt practice landing — top mode
+        // by 14d play volume. Skips /practice intermediate.
+        postProfileTarget = practiceTargetUrl('wordHunt', language);
+        postProfileRoute.trackExposure();
+      } else if (postProfileRoute.variant === 'random') {
+        const pick = RANDOM_AUTOROUTE_MODES[
+          Math.floor(Math.random() * RANDOM_AUTOROUTE_MODES.length)
+        ];
+        postProfileTarget = practiceTargetUrl(pick, language);
+        routeVariantTag = `random:${pick}`;
+        postProfileRoute.trackExposure();
       }
-      emitCompleted({ via: 'profile' });
+
+      // Emit completion BEFORE router.push — Next route transitions abort
+      // pending captures in the unloaded page, which dropped 38% of
+      // profile-complete users from the funnel (PostHog 14d: 34u finished
+      // profile, only 21u recorded onboarding_completed).
+      emitCompleted({ via: 'profile', routeVariant: routeVariantTag });
+
+      router.push(postProfileTarget);
       onComplete();
     },
-    [recordStep, isInviteMode, isNavigating, language, router, onComplete, emitCompleted]
+    [recordStep, isInviteMode, isNavigating, language, router, onComplete, emitCompleted, postProfileRoute]
   );
 
   // Step 0: Language selected — proceed to returningUser prompt
@@ -260,6 +343,9 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       if (isNavigating) return;
       setIsNavigating(true);
       markOnboardingComplete({ avatarId: 'custom', displayName: 'Player', selectedMode: mode === 'multiplayer' ? 'multi' : mode === 'daily' ? 'daily' : 'single' });
+      // Emit BEFORE router.push so the CG completion event survives the
+      // route transition (mirror fix to handleProfileComplete).
+      emitCompleted({ via: 'crazygames_welcome', selected_mode: mode });
       const route =
         mode === 'daily'
           ? `/${language}/daily`
@@ -267,7 +353,6 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
             ? `/${language}/multiplayer`
             : `/${language}/singleplayer?autoStart=practice`;
       router.push(route);
-      emitCompleted({ via: 'crazygames_welcome', selected_mode: mode });
       onComplete();
     },
     [isNavigating, language, router, onComplete, emitCompleted],

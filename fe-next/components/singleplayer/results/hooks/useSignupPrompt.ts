@@ -7,7 +7,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getGuestStats } from '@/utils/guestManager';
-import { usePostHogFlag } from '@/hooks/usePostHogFlag';
+import { useExperiment } from '@/hooks/useExperiment';
 import { trackSignupFunnel } from '@/utils/growthTracking';
 
 // Session storage key for tracking if signup prompt was shown
@@ -55,13 +55,20 @@ export function useSignupPrompt({
     return () => window.removeEventListener('guestStatsChanged', onChange);
   }, []);
 
-  // A/B test: 'after-first-win' gates on actual win (with 5-game fallback for non-winners);
-  // 'after-third-game' gates purely on games count.
-  const signupVariant = usePostHogFlag<string>('show-signup-after-first-win', 'after-first-win');
+  // Typed experiment: replaces legacy `show-signup-after-first-win` flag.
+  //  - control                       → legacy gate (first-win OR 5-game fallback).
+  //  - after-3-games                 → fire once games >= 3, regardless of wins.
+  //  - after-first-4-letter-word     → deferred (handled in the word-found
+  //    trigger pipeline; this hook stays inert for that variant).
+  const signupTiming = useExperiment('signup-prompt-timing-v1');
 
   useEffect(() => {
     if (disabled || isAuthenticated || hasUser || authLoading) return;
     if (typeof window === 'undefined') return;
+    // The 4-letter-word trigger lives outside this hook (future word-found
+    // wire). Skip the completion-driven gate entirely for that variant so we
+    // don't double-fire.
+    if (signupTiming.variant === 'after-first-4-letter-word') return;
 
     const alreadyShown = sessionStorage.getItem(SIGNUP_PROMPT_SHOWN_KEY);
     if (alreadyShown) return;
@@ -72,13 +79,13 @@ export function useSignupPrompt({
 
     // Emotional peak gating: ride the celebration. Fallback ensures non-winners
     // still convert before churning out.
-    const qualifies = signupVariant === 'after-third-game'
+    const qualifies = signupTiming.variant === 'after-3-games'
       ? games >= 3
       : wins >= 1 || games >= 5;
 
     if (!qualifies) return;
 
-    const qualifiesAsFirstWin = signupVariant !== 'after-third-game' && wins >= 1;
+    const qualifiesAsFirstWin = signupTiming.variant !== 'after-3-games' && wins >= 1;
 
     const timer = setTimeout(() => {
       setIsFirstWin(qualifiesAsFirstWin);
@@ -86,10 +93,13 @@ export function useSignupPrompt({
       sessionStorage.setItem(SIGNUP_PROMPT_SHOWN_KEY, 'true');
       shownVariantRef.current = { isFirstWin: qualifiesAsFirstWin };
       trackSignupFunnel('prompt_shown', qualifiesAsFirstWin);
+      // Exposure fires only when the prompt actually rendered — caller does
+      // not need to invoke trackExposure separately.
+      signupTiming.trackExposure();
     }, 3500);
 
     return () => clearTimeout(timer);
-  }, [isAuthenticated, hasUser, authLoading, disabled, signupVariant, statsVersion]);
+  }, [isAuthenticated, hasUser, authLoading, disabled, signupTiming, statsVersion]);
 
   const dismissSignupModal = useCallback(() => {
     setShowSignupModal(false);
