@@ -1,4 +1,5 @@
 'use client';
+import type * as React from 'react';
 import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -21,6 +22,80 @@ function formatTime(sec: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
+// Inline SVG icons — sized via currentColor so the tile's accent tint drives
+// stroke/fill. 24px viewBox, stroke 2px throughout for a unified weight that
+// the previous emoji-icons set (🪙⚡📖⏱️💎🔥) lacked. Each icon is a single
+// component so the stat tile renders identically across themes/locales.
+type IconProps = { className?: string };
+
+function CoinIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
+      strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9 9.5c.5-1 1.6-1.5 3-1.5s2.5.7 2.5 1.8c0 2.2-5 1.5-5 4 0 1.1 1.1 1.8 2.5 1.8s2.5-.5 3-1.5" />
+      <path d="M12 6v2M12 16v2" />
+    </svg>
+  );
+}
+
+function BoltIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M13 2 4 13.5h6L9 22l11-13.5h-6L13 2z" />
+    </svg>
+  );
+}
+
+function BookIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
+      strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+      <path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5z" />
+      <path d="M8 7h6M8 11h6" />
+    </svg>
+  );
+}
+
+function ClockIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
+      strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </svg>
+  );
+}
+
+function GemIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M6 3h12l3 6-9 12L3 9l3-6z" opacity="0.95" />
+      <path d="M6 3l3 6h6l3-6" stroke="rgba(0,0,0,0.35)" strokeWidth={1.2} fill="none" />
+      <path d="M9 9l3 12 3-12" stroke="rgba(0,0,0,0.35)" strokeWidth={1.2} fill="none" />
+    </svg>
+  );
+}
+
+function FlameIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M12 2c2 4 6 5 6 10a6 6 0 1 1-12 0c0-3 2-5 3-7 1 2 2 2 3 0z" />
+    </svg>
+  );
+}
+
+function StarIcon({ className, filled }: IconProps & { filled: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor"
+      strokeWidth={1.8} strokeLinejoin="round" className={className} aria-hidden>
+      <path d="m12 2 3 6.5 7 .9-5 4.9 1.3 7L12 17.8 5.7 21.3 7 14.4 2 9.4l7-.9L12 2z" />
+    </svg>
+  );
+}
+
+type TileDef = { key: string; Icon: (p: IconProps) => React.ReactElement; value: string; label: string };
+
 // Bigger, theme-tinted result card. Spring entrance + staggered stat reveal
 // so the moment feels earned. Theme color drives the title, border accent,
 // and the primary CTA — keeping each mode visually distinct.
@@ -42,16 +117,15 @@ export function BlastLevelCompleteCard({
   const showGems = typeof gemsCollected === 'number' && gemsCollected > 0;
   const showChain = typeof bestChainDepth === 'number' && bestChainDepth > 0;
   const showStars = typeof stars === 'number' && stars > 0;
-  // Stat tiles are rendered as a flex-wrap so 4–6 stats lay out cleanly on
-  // narrow phones without overflowing the card.
-  const tiles: Array<{ icon: string; value: string; label: string; key: string }> = [
-    { icon: '🪙', value: `+${coins}`, label: t('blast.complete.coins', 'Coins'), key: 'coins' },
-    { icon: '⚡', value: String(cascadeCount), label: t('blast.complete.cascadesLabel', 'Cascades'), key: 'cascades' },
+
+  const tiles: TileDef[] = [
+    { key: 'coins', Icon: CoinIcon, value: `+${coins}`, label: t('blast.complete.coins', 'Coins') },
+    { key: 'cascades', Icon: BoltIcon, value: String(cascadeCount), label: t('blast.complete.cascadesLabel', 'Cascades') },
   ];
-  if (showWords) tiles.push({ icon: '📖', value: String(wordsFound), label: t('blast.complete.wordsLabel', 'Words'), key: 'words' });
-  if (showTime) tiles.push({ icon: '⏱️', value: formatTime(timeSeconds!), label: t('blast.complete.timeLabel', 'Time'), key: 'time' });
-  if (showGems) tiles.push({ icon: '💎', value: String(gemsCollected), label: t('blast.complete.gemsLabel', 'Gems'), key: 'gems' });
-  if (showChain) tiles.push({ icon: '🔥', value: `x${bestChainDepth}`, label: t('blast.complete.chainLabel', 'Best Chain'), key: 'chain' });
+  if (showWords) tiles.push({ key: 'words', Icon: BookIcon, value: String(wordsFound), label: t('blast.complete.wordsLabel', 'Words') });
+  if (showTime) tiles.push({ key: 'time', Icon: ClockIcon, value: formatTime(timeSeconds!), label: t('blast.complete.timeLabel', 'Time') });
+  if (showGems) tiles.push({ key: 'gems', Icon: GemIcon, value: String(gemsCollected), label: t('blast.complete.gemsLabel', 'Gems') });
+  if (showChain) tiles.push({ key: 'chain', Icon: FlameIcon, value: `x${bestChainDepth}`, label: t('blast.complete.chainLabel', 'Best Chain') });
 
   return (
     <div
@@ -97,11 +171,19 @@ export function BlastLevelCompleteCard({
             initial={{ scale: 0, rotate: -20 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.4, type: 'spring', stiffness: 360 }}
-            className="mt-3 text-2xl tracking-widest"
+            className="mt-3 flex justify-center gap-1.5"
             aria-label={`${stars} stars`}
+            style={{ color: modeColor }}
           >
             {Array.from({ length: 3 }).map((_, i) => (
-              <span key={i} style={{ opacity: i < stars! ? 1 : 0.25 }}>★</span>
+              <span
+                key={i}
+                data-star-index={i}
+                data-star-filled={i < stars!}
+                style={{ opacity: i < stars! ? 1 : 0.28 }}
+              >
+                <StarIcon className="w-7 h-7" filled={i < stars!} />
+              </span>
             ))}
           </m.div>
         )}
@@ -109,7 +191,7 @@ export function BlastLevelCompleteCard({
           initial={{ y: 12, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="mt-6 flex flex-wrap justify-center gap-2"
+          className="mt-6 grid grid-cols-3 gap-2"
         >
           {tiles.map((tile, i) => (
             <m.div
@@ -118,11 +200,22 @@ export function BlastLevelCompleteCard({
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.55 + i * 0.06, type: 'spring', stiffness: 380 }}
               data-stat={tile.key}
-              className="rounded-lg p-3 bg-black/30 border border-white/10 min-w-[88px] grow basis-[28%]"
+              className="rounded-xl p-3 flex flex-col items-center"
+              style={{
+                background: `linear-gradient(180deg, color-mix(in srgb, ${modeColor} 14%, #0b1530) 0%, #0b1530 100%)`,
+                border: `1px solid color-mix(in srgb, ${modeColor} 35%, transparent)`,
+                boxShadow: `inset 0 1px 0 rgba(255,255,255,0.08), 2px 2px 0 rgba(0,0,0,0.35)`,
+              }}
             >
-              <div className="text-2xl leading-none">{tile.icon}</div>
-              <div className="text-xl font-bold tabular-nums mt-1">{tile.value}</div>
-              <div className="text-[10px] uppercase tracking-wider opacity-60 mt-1">
+              <div
+                data-stat-icon
+                className="w-7 h-7 flex items-center justify-center"
+                style={{ color: modeColor }}
+              >
+                <tile.Icon className="w-7 h-7" />
+              </div>
+              <div className="text-xl font-bold tabular-nums mt-1.5">{tile.value}</div>
+              <div className="text-[10px] uppercase tracking-wider opacity-65 mt-0.5">
                 {tile.label}
               </div>
             </m.div>

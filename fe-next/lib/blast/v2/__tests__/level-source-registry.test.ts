@@ -18,22 +18,18 @@ describe('level source registry', () => {
     expect(level.words.length).toBeGreaterThan(0);
   });
 
-  it('getLevelSourceForLevel returns chain for en level 1-15', () => {
+  it('getLevelSourceForLevel returns chain for en level 1-30', () => {
     const registry = buildRegistry();
     expect(getLevelSourceForLevel(1, 'en', registry)).toBe(registry.chain);
     expect(getLevelSourceForLevel(15, 'en', registry)).toBe(registry.chain);
+    expect(getLevelSourceForLevel(30, 'en', registry)).toBe(registry.chain);
   });
 
-  it('getLevelSourceForLevel returns chain for he level 1-15', () => {
+  it('getLevelSourceForLevel returns chain for he level 1-30', () => {
     const registry = buildRegistry();
     expect(getLevelSourceForLevel(1, 'he', registry)).toBe(registry.chain);
     expect(getLevelSourceForLevel(15, 'he', registry)).toBe(registry.chain);
-  });
-
-  it('getLevelSourceForLevel returns curated for en level 16-30', () => {
-    const registry = buildRegistry();
-    expect(getLevelSourceForLevel(16, 'en', registry)).toBe(registry.curated);
-    expect(getLevelSourceForLevel(30, 'en', registry)).toBe(registry.curated);
+    expect(getLevelSourceForLevel(30, 'he', registry)).toBe(registry.chain);
   });
 
   it('getLevelSourceForLevel returns generated for en level 31+', () => {

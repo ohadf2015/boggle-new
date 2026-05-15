@@ -162,7 +162,11 @@ export function BlastBoard({
       </div>
       <LayoutGroup>
         {level.columns.map((col, c) => (
-          <div key={col.index} className="flex flex-col-reverse gap-2 relative" data-col={col.index}>
+          <div
+            key={col.index}
+            className={`flex flex-col-reverse gap-2 relative ${styles.tileColumn}`}
+            data-col={col.index}
+          >
             <AnimatePresence>
               {col.tiles.map((letter, row) => {
                 const id = makeCellId(col.index, row);
