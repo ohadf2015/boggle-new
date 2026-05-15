@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { scoreWord, scoreTurn, BINGO_BONUS, BINGO_THRESHOLD } from '../scoring';
+import { scoreWord, scoreTurn, scoreWordChips, BINGO_BONUS, BINGO_THRESHOLD } from '../scoring';
 import type { ScoringTile } from '../types';
 
 const t = (letter: string, value: number, premium: ScoringTile['premium'] = null): ScoringTile =>
@@ -79,5 +79,24 @@ describe('scoreTurn', () => {
 
   it('zero words played returns 0', () => {
     expect(scoreTurn([], 0)).toBe(0);
+  });
+});
+
+describe('scoreWordChips', () => {
+  it('sums letter values into chips with baseMult 1 when no premiums', () => {
+    const result = scoreWordChips([t('C', 3), t('A', 1), t('T', 1)]);
+    expect(result).toEqual({ chips: 5, baseMult: 1 });
+  });
+
+  it('applies DL/TL letter multipliers to chips', () => {
+    const result = scoreWordChips([t('C', 3, 'DL'), t('A', 1, 'TL'), t('T', 1)]);
+    expect(result.chips).toBe(3 * 2 + 1 * 3 + 1); // 10
+    expect(result.baseMult).toBe(1);
+  });
+
+  it('accumulates DW/TW into baseMult, not chips', () => {
+    const result = scoreWordChips([t('C', 3, 'DW'), t('A', 1, 'TW'), t('T', 1)]);
+    expect(result.chips).toBe(5);
+    expect(result.baseMult).toBe(2 * 3); // 6
   });
 });

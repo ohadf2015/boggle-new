@@ -21,3 +21,17 @@ export function scoreTurn(words: readonly (readonly ScoringTile[])[], tilesPlace
   const total = words.reduce((sum, word) => sum + scoreWord(word), 0);
   return tilesPlacedThisTurn >= BINGO_THRESHOLD ? total + BINGO_BONUS : total;
 }
+
+export function scoreWordChips(tiles: readonly ScoringTile[]): { chips: number; baseMult: number } {
+  let chips = 0;
+  let baseMult = 1;
+  for (const tile of tiles) {
+    let letterScore = tile.value;
+    if (tile.premium === 'DL') letterScore *= 2;
+    else if (tile.premium === 'TL') letterScore *= 3;
+    chips += letterScore;
+    if (tile.premium === 'DW') baseMult *= 2;
+    else if (tile.premium === 'TW') baseMult *= 3;
+  }
+  return { chips, baseMult };
+}
