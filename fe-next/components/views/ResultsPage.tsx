@@ -19,7 +19,9 @@ import { useResultsSocketEvents } from '@/components/results/useResultsSocketEve
 import { useResultsData } from '@/hooks/useResultsData';
 import { useResultsSideEffects } from '@/hooks/useResultsSideEffects';
 import { useHideNavigation } from '@/contexts/NavigationContext';
+import { useIsDesktop } from '@/hooks/useMediaQuery';
 import { useMultiplayerSignupNudge } from '@/hooks/useMultiplayerSignupNudge';
+import { ResultsParallaxBackdrop, ResultsSectionReveal } from '@/components/results/ResultsScrollEffects';
 import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
 
@@ -100,7 +102,7 @@ function DesktopResultsLayout({
   userId,
   matchScore,
 }: DesktopResultsLayoutProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
 
   useEffect(() => {
@@ -127,27 +129,28 @@ function DesktopResultsLayout({
     <div className="hidden md:flex md:flex-col md:flex-1 md:min-h-0 relative">
       <div
         ref={scrollRef}
-        className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area p-4 medium-short:p-2 desktop-medium-short:p-3 xl:p-6 pb-32 medium-short:pb-24"
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area p-4 medium-short:p-2 desktop-medium-short:p-3 xl:p-6 pb-32 medium-short:pb-24 relative"
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
+        <ResultsParallaxBackdrop scrollRef={scrollRef} intensity={110} />
         {/* Top Bar with Exit Button */}
-        <div className="w-full max-w-5xl mx-auto flex items-center justify-end mb-4">
+        <div className="w-full max-w-5xl mx-auto flex items-center justify-end mb-4 relative z-10">
           <ExitRoomButton onClick={handleExitRoom} label={exitLabel || ''} />
         </div>
 
         {/* Wheel-rush hero scene takes the top slot for that mode; the
             standard cinematic block follows beneath for podium + ranks. */}
         {resolvedGameMode === 'wheel-rush' && Object.keys(wheelRushPlayerStats).length > 0 && (
-          <div className="w-full max-w-3xl mx-auto mb-6">
+          <ResultsSectionReveal index={0} flat className="w-full max-w-3xl mx-auto mb-6 relative z-10">
             <WheelRushResultsScene
               playerStats={wheelRushPlayerStats}
               currentUsername={currentUsername}
             />
-          </div>
+          </ResultsSectionReveal>
         )}
 
         {/* Full-width cinematic area: Hero + Podium + Consolation */}
-        <div className="w-full max-w-5xl mx-auto">
+        <ResultsSectionReveal index={1} flat className="w-full max-w-5xl mx-auto relative z-10">
           <ResultsMainContent
             {...mainContentProps}
             hideInlineCta={!!gameCode && !isBotsOnlyGame}
@@ -159,47 +162,54 @@ function DesktopResultsLayout({
               <GlobalRankBadge userId={userId} matchScore={matchScore} />
             </div>
           ) : null}
-        </div>
+        </ResultsSectionReveal>
 
         {/* Two-column area below the cinematic hero */}
-        <div className="w-full max-w-5xl mx-auto mt-6 medium-short:mt-3 desktop-medium-short:mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6 medium-short:gap-3 desktop-medium-short:gap-4">
+        <div className="w-full max-w-5xl mx-auto mt-6 medium-short:mt-3 desktop-medium-short:mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6 medium-short:gap-3 desktop-medium-short:gap-4 relative z-10">
           {/* LEFT: Game mode summary + social + engagement */}
           <div className="space-y-4">
             {resolvedGameMode === 'word-hunt' && wordHuntResultsData && (
-              <WordHuntResultsSummary {...wordHuntResultsData} />
+              <ResultsSectionReveal index={2}>
+                <WordHuntResultsSummary {...wordHuntResultsData} />
+              </ResultsSectionReveal>
             )}
             {resolvedGameMode === 'blast' && Object.keys(blastPlayerStats).length > 0 && (
-              <BlastResultsScene
-                playerStats={blastPlayerStats}
-                scores={blastResultScores}
-                currentUsername={currentUsername}
-              />
+              <ResultsSectionReveal index={2}>
+                <BlastResultsScene
+                  playerStats={blastPlayerStats}
+                  scores={blastResultScores}
+                  currentUsername={currentUsername}
+                />
+              </ResultsSectionReveal>
             )}
             {/* Wheel-rush summary already rendered as the hero scene above
                 this layout's two-column grid. No secondary card needed. */}
             {/* Add-friend affordance now lives inline on each player tile (Podium + ConsolationRows). */}
             {/* D1 retention CTA — outcome-aware Daily Challenge invite. Renders on CG too
                 (PostGameEngagement self-hides on CG; this one stays). */}
-            <DailyChallengeInvite isWinner={isCurrentUserWinner} />
-            <PostGameEngagement />
-            {postGameWordReview}
+            <ResultsSectionReveal index={4}>
+              <DailyChallengeInvite isWinner={isCurrentUserWinner} />
+            </ResultsSectionReveal>
+            <ResultsSectionReveal index={6}>
+              <PostGameEngagement />
+            </ResultsSectionReveal>
+            {postGameWordReview && (
+              <ResultsSectionReveal index={8}>
+                {postGameWordReview}
+              </ResultsSectionReveal>
+            )}
           </div>
 
           {/* RIGHT: Other players expanded + achievements */}
-          <m.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 120, damping: 20 }}
-            className="space-y-4"
-          >
+          <ResultsSectionReveal index={3} className="space-y-4">
             <ResultsDetailsContent {...detailsContentProps} />
-          </m.div>
+          </ResultsSectionReveal>
         </div>
 
         {/* CrazyGames banner ad — shown after results content */}
-        <div className="w-full max-w-5xl mx-auto mt-6">
+        <ResultsSectionReveal index={9} flat className="w-full max-w-5xl mx-auto mt-6 relative z-10">
           <CrazyGamesBanner size="728x90" />
-        </div>
+        </ResultsSectionReveal>
       </div>
 
       {/* Scroll indicator — subtle bouncing chevron at bottom */}
@@ -241,6 +251,15 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   }, [setIsInGame]);
 
   const router = useRouter();
+
+  // Render exactly one StickyReadyBar — mobile fixed bar OR desktop fixed bar.
+  // Previously both were always mounted (hidden via Tailwind), so two countdown
+  // intervals ran in parallel and could each fire onStartGame/onMarkReady.
+  const isDesktopViewport = useIsDesktop();
+
+  // Mobile inner scroll container — drives the parallax backdrop & section
+  // reveals (window scroll is locked here; everything pages inside this div).
+  const mobileScrollRef = useRef<HTMLDivElement>(null);
 
   // Classroom lesson data from sessionStorage (set by ClassroomGameLobby)
   const lessonGameData = useMemo(() => {
@@ -911,37 +930,53 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       </div>
 
       {/* MOBILE VIEW — single scroll, no tabs */}
-      <div className="md:hidden flex flex-col flex-1 min-h-0">
+      <div className="md:hidden flex flex-col flex-1 min-h-0 relative">
         {/* Exit-only header — podium already renders the 'matchResults' label */}
-        <div className="shrink-0 w-full flex items-center justify-end px-2 py-2">
+        <div className="shrink-0 w-full flex items-center justify-end px-2 py-2 relative z-10">
           <ExitRoomButton onClick={handleExitRoom} label="" className="w-11 h-11 min-w-[44px] min-h-[44px] p-0" />
         </div>
 
         {/* Scrollable content — everything in one flow */}
         <div
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-36 medium-short:pb-24 bg-neo-navy"
+          ref={mobileScrollRef}
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-36 medium-short:pb-24 bg-neo-navy relative"
           style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
         >
-          <div className="max-w-lg mx-auto space-y-6 medium-short:space-y-3">
-            {renderResultsTab()}
+          <ResultsParallaxBackdrop scrollRef={mobileScrollRef} />
+          <div className="max-w-lg mx-auto space-y-6 medium-short:space-y-3 relative z-10">
+            <ResultsSectionReveal index={0} flat>
+              {renderResultsTab()}
+            </ResultsSectionReveal>
             {/* Global rank badge — mobile, sub-podium */}
             {user?.id ? (
-              <div className="flex justify-center">
-                <GlobalRankBadge userId={user.id} matchScore={currentPlayerData?.score ?? 0} />
-              </div>
+              <ResultsSectionReveal index={1}>
+                <div className="flex justify-center">
+                  <GlobalRankBadge userId={user.id} matchScore={currentPlayerData?.score ?? 0} />
+                </div>
+              </ResultsSectionReveal>
             ) : null}
             {/* D1 retention CTA — Daily Challenge invite */}
-            <DailyChallengeInvite isWinner={isCurrentUserWinner} />
+            <ResultsSectionReveal index={2}>
+              <DailyChallengeInvite isWinner={isCurrentUserWinner} />
+            </ResultsSectionReveal>
             {/* CrazyGames banner ad — mobile size between results and details */}
-            <CrazyGamesBanner size="320x50" />
+            <ResultsSectionReveal index={3} flat>
+              <CrazyGamesBanner size="320x50" />
+            </ResultsSectionReveal>
             {/* Other players' details (inline, no tab switch needed) */}
-            {renderDetailsTab()}
-            {postGameWordReviewNode}
+            <ResultsSectionReveal index={4}>
+              {renderDetailsTab()}
+            </ResultsSectionReveal>
+            {postGameWordReviewNode && (
+              <ResultsSectionReveal index={5}>
+                {postGameWordReviewNode}
+              </ResultsSectionReveal>
+            )}
           </div>
         </div>
 
         {/* Floating bottom bar — always-visible sticky CTA */}
-        {gameCode && onReturnToRoom && (
+        {gameCode && onReturnToRoom && !isDesktopViewport && (
           <div className="shrink-0 fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-50 text-neo-cream">
             <m.div
               initial={{ y: 60, opacity: 0 }}
@@ -995,8 +1030,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       />
 
       {/* DESKTOP Sticky Ready Bar — pinned to bottom on md+ screens */}
-      {gameCode && onReturnToRoom && (
-        <div className="hidden md:block fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black safe-area-pb">
+      {gameCode && onReturnToRoom && isDesktopViewport && (
+        <div className="fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black safe-area-pb">
           <div className="max-w-6xl mx-auto px-4 py-2.5">
             <StickyReadyBar
               isHost={isHost}

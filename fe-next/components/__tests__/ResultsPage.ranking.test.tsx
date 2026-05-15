@@ -47,21 +47,37 @@ vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
 
-vi.mock('framer-motion', () => ({
-  m: {
-    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <div {...props}>{children}</div>
-    ),
-    button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <button {...props}>{children}</button>
-    ),
-    span: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <span {...props}>{children}</span>
-    ),
-  },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
-  useReducedMotion: () => false,
-}));
+vi.mock('framer-motion', () => {
+  const motionValueStub = () => ({
+    set: vi.fn(),
+    get: () => 0,
+    on: () => () => {},
+    onChange: () => () => {},
+  });
+  return {
+    m: {
+      div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+        <div {...props}>{children}</div>
+      ),
+      button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+        <button {...props}>{children}</button>
+      ),
+      span: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+        <span {...props}>{children}</span>
+      ),
+    },
+    AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+    useReducedMotion: () => false,
+    useScroll: () => ({
+      scrollX: motionValueStub(),
+      scrollY: motionValueStub(),
+      scrollXProgress: motionValueStub(),
+      scrollYProgress: motionValueStub(),
+    }),
+    useTransform: () => motionValueStub(),
+    useMotionValue: motionValueStub,
+  };
+});
 
 vi.mock('canvas-confetti', () => ({
   __esModule: true,

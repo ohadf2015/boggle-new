@@ -398,7 +398,7 @@ export function fireStreakConfetti(): void {
  * Neo-brutalist style with chunky particles and bold colors
  * @returns Cancel function to stop the animation (call on unmount)
  */
-export function fireFirstWinConfetti(durationMs: number = 2500): () => void {
+export function fireFirstWinConfetti(durationMs: number = 1500): () => void {
   const colors = NEO_BRUTALIST_COLORS;
   const end = Date.now() + durationMs;
   let rafId: number | null = null;
@@ -409,47 +409,48 @@ export function fireFirstWinConfetti(durationMs: number = 2500): () => void {
     if (cancelled) return;
     frameCount++;
 
-    // Only fire every 3rd frame to reduce particle count
-    if (frameCount % 3 === 0) {
+    // Side bursts every 6th frame — was every 3rd. Cuts particle drizzle in half
+    // without losing the cascading-from-the-corners shape.
+    if (frameCount % 6 === 0) {
       // Left side burst
       fireConfetti({
-        particleCount: 2, // Reduced from 5
+        particleCount: 1,
         angle: 60,
         spread: 50,
         origin: { x: 0, y: 0.6 },
         colors,
         startVelocity: 55,
         gravity: 1.0,
-        ticks: 180,
-        scalar: 1.3,
+        ticks: 160,
+        scalar: 1.2,
       });
 
       // Right side burst
       fireConfetti({
-        particleCount: 2, // Reduced from 5
+        particleCount: 1,
         angle: 120,
         spread: 50,
         origin: { x: 1, y: 0.6 },
         colors,
         startVelocity: 55,
         gravity: 1.0,
-        ticks: 180,
-        scalar: 1.3,
+        ticks: 160,
+        scalar: 1.2,
       });
     }
 
-    // Center burst occasionally
-    if (Math.random() > 0.85) {
+    // Center burst rare-ish punctuation only — was Math.random()>0.85.
+    if (Math.random() > 0.95) {
       fireConfetti({
-        particleCount: 6, // Reduced from 12
+        particleCount: 3,
         angle: 90,
         spread: 100,
         origin: { x: 0.5, y: 0.5 },
         colors,
         startVelocity: 40,
         gravity: 0.8,
-        ticks: 140,
-        scalar: 1.5,
+        ticks: 120,
+        scalar: 1.4,
       });
     }
 

@@ -47,8 +47,10 @@ export function useFirstWinCelebration({
 
     addCoins(FIRST_WIN_BONUS, 'First Win Bonus');
 
-    // Epic confetti burst using centralized utility
-    fireFirstWinConfetti(4000);
+    // First-win burst — keep it celebratory but short. Was 4000ms; long
+    // cascades stacked with the hero section's 1.2s burst into a wall of
+    // particles for the only-once-per-lifetime first-MP-win event.
+    fireFirstWinConfetti(2200);
 
     // Trigger haptic feedback
     hapticGameWin();
