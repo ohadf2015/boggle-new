@@ -67,4 +67,18 @@ describe('useHasRealAdProvider', () => {
     const { result } = renderHook(() => useHasRealAdProvider());
     expect(result.current).toBe(false);
   });
+
+  it('returns true in production when GameMonetize game-id env is set (web fallback)', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_GAMEMONETIZE_GAME_ID', 'real-gid');
+    const { result } = renderHook(() => useHasRealAdProvider());
+    expect(result.current).toBe(true);
+  });
+
+  it('returns false in production when GameMonetize env is empty string', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_GAMEMONETIZE_GAME_ID', '');
+    const { result } = renderHook(() => useHasRealAdProvider());
+    expect(result.current).toBe(false);
+  });
 });

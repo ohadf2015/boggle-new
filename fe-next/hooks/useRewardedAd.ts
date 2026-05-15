@@ -6,6 +6,8 @@ import { Howler } from 'howler';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAdMob } from '@/hooks/useAdMob';
 import { useH5GamesAds } from '@/hooks/useH5GamesAds';
+import { useGameMonetize } from '@/hooks/useGameMonetize';
+import { getGameMonetizeId } from '@/lib/ads/gameMonetizeSdk';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
 import type { RewardedSurface } from '@/lib/admob-config';
@@ -169,6 +171,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   const crazyGames = useCrazyGames();
   const adMob = useAdMob();
   const h5Ads = useH5GamesAds();
+  const gameMonetize = useGameMonetize();
 
   // Determine which ad platform to use (priority order)
   const shouldUseCrazyGames = crazyGames.isAvailable && crazyGames.isOnCrazyGamesPlatform;
@@ -186,10 +189,18 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     (typeof location !== 'undefined' && /[?&]h5ads_test=1/.test(location.search))
   );
   const shouldUseH5 = !shouldUseCrazyGames && !shouldUseAdMob && h5Ads.isAvailable && h5EnvEnabled && (isProd || hasH5TestFlag);
+  // GameMonetize: web fallback when AdSense/H5 unavailable (different
+  // approval program — accepts indie HTML5 without AdSense gate). Gated on
+  // game-id env, browser env, lower priority than H5 (so AdSense fill wins
+  // when both configured) but higher priority than placeholder.
+  const hasGameMonetizeId = !!getGameMonetizeId();
+  const shouldUseGameMonetize = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseH5
+    && gameMonetize.isAvailable && hasGameMonetizeId;
   // Simulation only in development — never award free gold in production
-  const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseH5;
+  const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseH5 && !shouldUseGameMonetize;
   // Placeholder: no ad platform available — still grant coins, log for admin
-  const isPlaceholder = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseH5 && !shouldUseSimulation;
+  const isPlaceholder = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseH5
+    && !shouldUseGameMonetize && !shouldUseSimulation;
 
   // Always available — placeholder grants coins when no real ads exist
   const isAdAvailable = true;
@@ -206,6 +217,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     const platformForDecline = shouldUseCrazyGames ? 'crazygames'
       : shouldUseAdMob ? 'admob'
       : shouldUseH5 ? 'h5-games'
+      : shouldUseGameMonetize ? 'gamemonetize'
       : shouldUseSimulation ? 'simulation'
       : 'no-ad-placeholder';
 
@@ -242,6 +254,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     const platform = shouldUseCrazyGames ? 'crazygames'
       : shouldUseAdMob ? 'admob'
       : shouldUseH5 ? 'h5-games'
+      : shouldUseGameMonetize ? 'gamemonetize'
       : shouldUseSimulation ? 'simulation'
       : 'no-ad-placeholder';
 
@@ -327,6 +340,17 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
         (reason) => { handleAdError(reason || 'Ad dismissed without reward'); },
         { name: surface },
       );
+    } else if (shouldUseGameMonetize) {
+      // Priority 1.85: GameMonetize SDK for web — fills when H5/AdSense
+      // unfilled (independent approval pool). Same no-SSV trust model as H5
+      // — server daily cap in /api/coins is the replay-protection backstop.
+      setStatus('showing');
+      onAdStarted?.();
+      gameMonetize.showRewarded(
+        () => { awardCoinsAndNotify(); },
+        (reason) => { handleAdError(reason || 'Ad dismissed without reward'); },
+        { name: surface },
+      );
     } else if (shouldUseSimulation) {
       // Priority 2: Simulation fallback for development/testing
       setStatus('showing');
@@ -342,7 +366,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       onAdStarted?.();
       awardCoinsAndNotify();
     }
-  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseH5, shouldUseSimulation, crazyGames, adMob, h5Ads, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
+  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseH5, shouldUseGameMonetize, shouldUseSimulation, crazyGames, adMob, h5Ads, gameMonetize, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
 
   // Pre-load AdMob rewarded slot when caller signals likely intent (button
   // mount). CrazyGames SDK auto-prepares; simulation/placeholder paths
