@@ -20,12 +20,11 @@ export default async function BlastPage({
   }
   const locale = rawLocale as Locale;
 
-  // V2 opt-in is now searchParam-only — was previously a Supabase auth lookup
-  // on every page load (50-200ms network roundtrip) checking a 1-email allowlist.
-  const explicitOptIn = resolvedSearch?.v2 === 'on' || resolvedSearch?.v2 === 'force';
+  // V2 is now the default. `?v2=off` opts back into legacy V1.
+  // (Previously gated by a Supabase auth allowlist — removed for perf: 50-200ms
+  // network roundtrip per page-load just to check a 1-email list.)
   const explicitOptOut = resolvedSearch?.v2 === 'off';
-  const devForceV2 = resolvedSearch?.v2 === 'force' && process.env.NODE_ENV !== 'production';
-  const useV2 = (explicitOptIn || devForceV2) && !explicitOptOut;
+  const useV2 = !explicitOptOut;
 
   if (useV2) {
     const registry = buildRegistry();
