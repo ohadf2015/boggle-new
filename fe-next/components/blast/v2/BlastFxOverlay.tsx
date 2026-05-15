@@ -27,6 +27,16 @@ interface Systems {
   flash: ScreenFlash;
   bloom: import('pixi-filters').BloomFilter | null;
   rings: Array<{ g: import('pixi.js').Graphics; raf: number }>;
+  // Flipped false on unmount. Each long-running closure (fade, lightSweep,
+  // pulse-ring step) checks it before scheduling its next RAF so we don't
+  // tick against a destroyed Pixi stage after fast navigation.
+  live: { current: boolean };
+  // RAF ids for the chain-ovation bloom fade and any other one-off animation
+  // not already tracked in `rings`. Cancelled on unmount.
+  rafs: Set<number>;
+  // setTimeouts (e.g. the delayed second pulse ring on multi-tile clears)
+  // cleared on unmount so they can't fire post-teardown.
+  timeouts: Set<ReturnType<typeof setTimeout>>;
 }
 
 function pickExplosionVariant(): typeof TILE_EXPLOSION_VARIANTS[number] {
@@ -40,11 +50,19 @@ function hexToNumber(hex: string): number {
 
 const MAX_RINGS = 12;
 
+// Helper accepting only the minimal liveness/tracking surface that the spawn
+// closures need — keeps signatures narrow while letting unmount kill anything
+// in flight.
+type SpawnContext = {
+  rings: Systems['rings'];
+  live: Systems['live'];
+};
+
 // Expanding stroked ring — "shockwave footprint" on each clear / ovation.
 // Skipped on prefers-reduced-motion.
 async function spawnPulseRing(
   app: import('pixi.js').Application,
-  systems: { rings: Array<{ g: import('pixi.js').Graphics; raf: number }> },
+  systems: SpawnContext,
   cx: number,
   cy: number,
   color: number,
@@ -52,8 +70,10 @@ async function spawnPulseRing(
 ) {
   if (typeof window !== 'undefined'
     && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  if (!systems.live.current) return;
   if (systems.rings.length >= MAX_RINGS) return;
   const PIXI = await import('pixi.js');
+  if (!systems.live.current) return; // unmounted while waiting on dynamic import
   const g = new PIXI.Graphics();
   const baseRadius = Math.min(app.screen.width, app.screen.height) * 0.12 * scaleMul;
   g.circle(0, 0, baseRadius).stroke({ color, width: 5, alpha: 1 });
@@ -66,7 +86,7 @@ async function spawnPulseRing(
   const entry = { g, raf: 0 };
   systems.rings.push(entry);
   const step = () => {
-    if (g.destroyed) return;
+    if (!systems.live.current || g.destroyed) return;
     const t = Math.min((performance.now() - start) / duration, 1);
     const ease = 1 - Math.pow(1 - t, 3);
     g.scale.set(0.4 + ease * 1.6);
@@ -89,14 +109,16 @@ async function spawnPulseRing(
 // Spawned in addition to the pulse ring on word found.
 async function spawnShockwaveWrap(
   app: import('pixi.js').Application,
-  systems: { rings: Array<{ g: import('pixi.js').Graphics; raf: number }> },
+  systems: SpawnContext,
   cx: number,
   cy: number,
 ) {
   if (typeof window !== 'undefined'
     && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  if (!systems.live.current) return;
   if (systems.rings.length >= MAX_RINGS) return;
   const PIXI = await import('pixi.js');
+  if (!systems.live.current) return;
   // RGB-split shockwave: cyan slightly behind, yellow middle, magenta leading.
   const layers: Array<{ color: number; delayMs: number; scaleStart: number; width: number }> = [
     { color: 0x00ffff, delayMs: 0,   scaleStart: 0.35, width: 4 },
@@ -119,7 +141,7 @@ async function spawnShockwaveWrap(
     const entry = { g, raf: 0 };
     systems.rings.push(entry);
     const step = () => {
-      if (g.destroyed) return;
+      if (!systems.live.current || g.destroyed) return;
       const now = performance.now();
       const localT = now - t0 - layer.delayMs;
       if (localT < 0) {
@@ -148,12 +170,14 @@ async function spawnShockwaveWrap(
 // Horizontal luminous bar sweeping top→bottom — cinematic on big clears / chains.
 async function spawnLightSweep(
   app: import('pixi.js').Application,
-  _systems: unknown,
+  systems: Pick<Systems, 'live' | 'rafs'>,
   color: number,
 ) {
   if (typeof window !== 'undefined'
     && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  if (!systems.live.current) return;
   const PIXI = await import('pixi.js');
+  if (!systems.live.current) return;
   const g = new PIXI.Graphics();
   const barH = 8;
   g.rect(0, -barH / 2, app.screen.width, barH).fill({ color, alpha: 0.75 });
@@ -161,8 +185,10 @@ async function spawnLightSweep(
   app.stage.addChild(g);
   const start = performance.now();
   const duration = 480;
+  let rafId = 0;
   const tick = () => {
-    if (g.destroyed) return;
+    systems.rafs.delete(rafId);
+    if (!systems.live.current || g.destroyed) return;
     const t = Math.min((performance.now() - start) / duration, 1);
     g.y = t * (app.screen.height + barH) - barH;
     g.alpha = 0.75 * (1 - t * t);
@@ -171,9 +197,11 @@ async function spawnLightSweep(
       g.destroy();
       return;
     }
-    requestAnimationFrame(tick);
+    rafId = requestAnimationFrame(tick);
+    systems.rafs.add(rafId);
   };
-  requestAnimationFrame(tick);
+  rafId = requestAnimationFrame(tick);
+  systems.rafs.add(rafId);
 }
 
 export function BlastFxOverlay({
@@ -251,7 +279,13 @@ export function BlastFxOverlay({
         // pixi-filters optional — skip bloom if import fails
       }
 
-      systemsRef.current = { app, particles, physics, debris, shake, scoreFly, flash, bloom, rings: [] };
+      systemsRef.current = {
+        app, particles, physics, debris, shake, scoreFly, flash, bloom,
+        rings: [],
+        live: { current: true },
+        rafs: new Set<number>(),
+        timeouts: new Set<ReturnType<typeof setTimeout>>(),
+      };
 
       const tick = (ticker: any) => {
         const deltaSec = ticker.deltaMS / 1000;
@@ -277,6 +311,20 @@ export function BlastFxOverlay({
 
     return () => {
       cancelled = true;
+      const sys = systemsRef.current;
+      if (sys) {
+        // Flip live FIRST so any RAF callback that fires before we finish
+        // tearing down sees the dead flag and bails out.
+        sys.live.current = false;
+        sys.timeouts.forEach((id) => clearTimeout(id));
+        sys.timeouts.clear();
+        sys.rafs.forEach((id) => cancelAnimationFrame(id));
+        sys.rafs.clear();
+        sys.rings.forEach((ring) => {
+          if (ring.raf) cancelAnimationFrame(ring.raf);
+        });
+        sys.rings.length = 0;
+      }
       systemsRef.current = null;
       try {
         appInstance?.destroy(true, { children: true });
@@ -320,8 +368,15 @@ export function BlastFxOverlay({
       }
       // Delayed second pulse ring at white for a percussive double-thud —
       // only when batching multiple clears (so single-tile chips stay quiet).
+      // Tracked so unmount can clear it before it fires against a destroyed
+      // Pixi stage.
       if (clearCenters.length >= 2) {
-        setTimeout(() => spawnPulseRing(app, systems, lx, ly, 0xffffff, 0.7), 70);
+        const handle = setTimeout(() => {
+          systems.timeouts.delete(handle);
+          if (!systems.live.current) return;
+          spawnPulseRing(app, systems, lx, ly, 0xffffff, 0.7);
+        }, 70);
+        systems.timeouts.add(handle);
       }
     }
 
@@ -368,17 +423,26 @@ export function BlastFxOverlay({
       particles.burst(COMBO_FLASH, centerX, centerY, 18);
     }
     // Bloom ramp — saturates the screen as chains stack, eases back to 0.
+    // RAF id tracked so unmount cancels it; otherwise the closure kept ticking
+    // and mutating a destroyed filter after fast navigation.
     if (bloom && depth >= 1) {
       const targetStrength = Math.min(0.6 + depth * 1.6, 6);
       bloom.strength = targetStrength;
       const start = performance.now();
       const fadeMs = 600 + depth * 120;
+      let fadeRaf = 0;
       const fade = () => {
+        systems.rafs.delete(fadeRaf);
+        if (!systems.live.current) return;
         const t = Math.min((performance.now() - start) / fadeMs, 1);
         if (bloom) bloom.strength = targetStrength * (1 - t);
-        if (t < 1) requestAnimationFrame(fade);
+        if (t < 1) {
+          fadeRaf = requestAnimationFrame(fade);
+          systems.rafs.add(fadeRaf);
+        }
       };
-      requestAnimationFrame(fade);
+      fadeRaf = requestAnimationFrame(fade);
+      systems.rafs.add(fadeRaf);
     }
     // Chain >= 2 → cinematic light sweep + comet trail across the board.
     if (depth >= 2) {

@@ -233,15 +233,17 @@ const ModeCard: React.FC<ModeCardProps> = ({
         </div>
       )}
 
-      {/* Highlighted badge for first-time players */}
+      {/* Highlighted badge for first-time players — inner `animate-ping` dot
+          already provides liveness via Tailwind CSS keyframes (browser
+          throttles them off-screen). A framer-motion repeat:Infinity scale
+          wrapper kept GPU paints firing on every mounted landing card and
+          showed up as steady CPU drain. Static wrapper is enough. */}
       {highlighted && highlightLabel && (
-        <m.div
+        <div
           className={cn(
             'absolute top-2 z-10',
             isRTL ? 'left-2' : 'right-2'
           )}
-          animate={{ scale: [1, 1.08, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
         >
           <span
             className={cn(
@@ -260,7 +262,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
             </span>
             {highlightLabel}
           </span>
-        </m.div>
+        </div>
       )}
 
       {/* Mode character — large blended illustration anchored to bottom-end */}
