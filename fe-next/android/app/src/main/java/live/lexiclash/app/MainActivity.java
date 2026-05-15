@@ -77,7 +77,7 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
      * because there is only one WebView in this Activity.
      */
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         WebView bridgeWebView = getBridge() != null ? getBridge().getWebView() : null;
         if (bridgeWebView != null) {
@@ -91,7 +91,7 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         WebView bridgeWebView = getBridge() != null ? getBridge().getWebView() : null;
         if (bridgeWebView != null) {
