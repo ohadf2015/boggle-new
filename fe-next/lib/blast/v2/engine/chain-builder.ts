@@ -2,9 +2,26 @@ import type { BlastColumn, BlastLevel, CellId, ChainLevelSpec, Letter, Locale } 
 import { cellId } from './cell-id';
 import { scanFormableThemeWords } from './word-scan';
 import { validateChainLevel } from './chain-validator';
+import { findExtraWords } from './extra-word-check';
 import { LOCALE_CONFIGS } from '../locale-config';
 
 export type InsertResult = { level: BlastLevel; cells: CellId[] };
+
+/**
+ * Optional extra-word screen. When provided, a placement is rejected if it
+ * introduces a board-formable common word that isn't part of the chain.
+ * Lets vertical insertion live alongside the existing common-word audit
+ * without forcing the author to babysit dictionary collisions.
+ */
+export type ExtraWordCheck = {
+  isCommon: (word: string) => boolean;
+  minLength: number;
+};
+
+function passesExtraWordCheck(level: BlastLevel, check: ExtraWordCheck | undefined): boolean {
+  if (!check) return true;
+  return findExtraWords(level, check.isCommon, check.minLength).length === 0;
+}
 
 /** Deterministic LCG so builds are reproducible per seed. */
 function rng(seed: number): () => number {
@@ -39,6 +56,7 @@ export function insertWord(
   otherWordsOnBoard: string[],
   locale: Locale,
   seed: number,
+  extraWordCheck?: ExtraWordCheck,
 ): InsertResult | null {
   const letters = [...word];
   const L = letters.length;
@@ -76,8 +94,87 @@ export function insertWord(
     const matches = scanFormableThemeWords(level, [word, ...otherWordsOnBoard], locale);
     const formableWords = new Set(matches.map((m) => m.word));
 
-    // Success: only `word` is formable.
-    if (formableWords.size === 1 && formableWords.has(word)) {
+    // Success: only `word` is formable AND no unintended common words appear.
+    if (
+      formableWords.size === 1 &&
+      formableWords.has(word) &&
+      passesExtraWordCheck(level, extraWordCheck)
+    ) {
+      return { level, cells };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Backward construction step — vertical variant. Inserts `word` as a single
+ * vertical run inside one column, such that scanning the column top-down
+ * yields `word`. Returns the new board and the cells (bottom-to-top) the
+ * word occupies, or null if no placement isolates the word.
+ *
+ * Why "reversed when written into tiles": word-scan reads vertical runs
+ * top-down (highest row first). To form "CAT" reading top→down we must have
+ * tiles[r+2]='C', tiles[r+1]='A', tiles[r]='T' — i.e., the letters are
+ * inserted at row r in REVERSE order so the bottom tile is the last letter.
+ */
+export function insertWordVertical(
+  Sk: BlastLevel,
+  word: string,
+  otherWordsOnBoard: string[],
+  locale: Locale,
+  seed: number,
+  extraWordCheck?: ExtraWordCheck,
+): InsertResult | null {
+  const letters = [...word];
+  const L = letters.length;
+  const cols = Sk.columns.length;
+  if (cols === 0 || L < 2) return null;
+
+  const rand = rng(seed);
+  type Cand = { c: number; r: number };
+  const candidates: Cand[] = [];
+
+  // Vertical placements: pick a column c, then a row r where the L-letter
+  // word will sit. Any r from 0 (bottom) up to current column height is valid
+  // (splice shifts existing tiles up). r=0 stacks the word ON TOP of the
+  // existing column tiles only if we splice at index `col.tiles.length`; so
+  // we enumerate r in [0, col.tiles.length] inclusive.
+  for (let c = 0; c < cols; c++) {
+    const h = Sk.columns[c]!.tiles.length;
+    for (let r = 0; r <= h; r++) {
+      candidates.push({ c, r });
+    }
+  }
+
+  const shuffled = shuffle(candidates, rand);
+
+  for (const { c, r } of shuffled) {
+    const columns = cloneColumns(Sk.columns);
+    const cells: CellId[] = [];
+
+    // Insert letters in FORWARD order. Each splice(r, 0, ch) pushes the
+    // previous letter up, so after L splices tiles[r]=last letter, …,
+    // tiles[r+L-1]=first letter. word-scan reads vertical runs top-down
+    // (highest row first), which then yields the forward word.
+    for (let i = 0; i < L; i++) {
+      columns[c]!.tiles.splice(r, 0, letters[i]!);
+    }
+    // Emit cells in bottom-to-top order (row r, r+1, … r+L-1) — engine
+    // convention is row 0 = bottom; consumers expect ascending rows.
+    for (let i = 0; i < L; i++) {
+      cells.push(cellId(c, r + i));
+    }
+
+    const level: BlastLevel = { ...Sk, columns };
+    const matches = scanFormableThemeWords(level, [word, ...otherWordsOnBoard], locale);
+    const formableWords = new Set(matches.map((m) => m.word));
+
+    if (
+      formableWords.size === 1 &&
+      formableWords.has(word) &&
+      passesExtraWordCheck(level, extraWordCheck)
+    ) {
       return { level, cells };
     }
   }
@@ -117,7 +214,11 @@ function floorBoard(spec: ChainLevelSpec): BlastLevel | null {
  * Builds a forced-chain BlastLevel from a spec. Returns null if no seed within
  * MAX_BUILD_ATTEMPTS yields a valid level (author should then tweak the chain).
  */
-export function buildChainLevel(spec: ChainLevelSpec, seed: number): BlastLevel | null {
+export function buildChainLevel(
+  spec: ChainLevelSpec,
+  seed: number,
+  extraWordCheck?: ExtraWordCheck,
+): BlastLevel | null {
   const longest = Math.max(...spec.chain.map((w) => [...w].length));
   if (longest > spec.columns) return null;
 
@@ -129,11 +230,22 @@ export function buildChainLevel(spec: ChainLevelSpec, seed: number): BlastLevel 
 
     let board = base;
     let ok = true;
+    // Coin-flip per step to pick orientation; fall back to the other axis if
+    // the chosen one can't isolate the word. This produces visually mixed
+    // levels — some words land as rows, others stack as columns — instead of
+    // every board being a flat horizontal scroll.
+    const orientRand = rng(attemptSeed ^ 0xa5a5a5a5);
     for (let k = spec.chain.length - 2; k >= 0; k--) {
       const word = spec.chain[k]!;
       const others = spec.chain.slice(k + 1);
       const stepSeed = (attemptSeed + k * 7919) >>> 0;
-      const res = insertWord(board, word, others, spec.locale, stepSeed);
+      const preferVertical = orientRand() < 0.5;
+      const first = preferVertical
+        ? insertWordVertical(board, word, others, spec.locale, stepSeed, extraWordCheck)
+        : insertWord(board, word, others, spec.locale, stepSeed, extraWordCheck);
+      const res = first ?? (preferVertical
+        ? insertWord(board, word, others, spec.locale, stepSeed, extraWordCheck)
+        : insertWordVertical(board, word, others, spec.locale, stepSeed, extraWordCheck));
       if (!res) {
         ok = false;
         break;

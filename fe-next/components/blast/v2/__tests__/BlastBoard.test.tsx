@@ -32,6 +32,7 @@ describe('BlastBoard', () => {
         onPointerEnter={vi.fn()}
         onPointerUp={vi.fn()}
         tileIds={mockLevel.columns.map((col, c) => col.tiles.map((_, r) => `t-${c}-${r}`))}
+        boardRows={3}
       />
     );
     expect(container.querySelector('[data-cell-id="c0r0"]')).toBeInTheDocument();

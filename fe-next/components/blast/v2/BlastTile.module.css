@@ -1,23 +1,31 @@
 /* Board wrapper — sets up container query context for tile sizing and
-   draws a faint frame around the playing field. */
+   draws a faint frame around the playing field. The wrapping flex parent
+   uses `containerType: size` so both width (cqi) and height (cqb) drive
+   tile sizing — boards stay big regardless of how few rows are filled. */
 .board {
-  container-type: inline-size;
+  container-type: size;
   border-radius: 18px;
   isolation: isolate;
 }
 
-/* Tile size adapts to column count: takes the board's inline-size, removes
-   gaps + padding, and divides by --blast-cols. Capped at 88px so wide
-   desktops don't blow up the tiles. Falls back to 18cqi for callers that
-   forget to pass the column count. */
+/* Tile size adapts to BOTH column count AND row count by taking the smaller
+   of width-fit and height-fit. Without the height constraint, a 6-col board
+   with only 2 rows of tiles produced a 3:1 ratio that pinned tiles to ~30px
+   on phones with most of the play area wasted. min(cqi, cqb) lets the board
+   fill its allotted box and pump tile size up to ~88px on tall phones.
+   Falls back to 18cqi for callers that forget to pass column/row counts. */
 .board {
   --blast-tile-gap: 8px;
   --blast-tile-cap: 88px;
   --blast-tile-min: 32px;
   --blast-cols: 6;
+  --blast-rows: 6;
   --blast-tile-size: clamp(
     var(--blast-tile-min),
-    calc((100cqi - (var(--blast-cols) - 1) * var(--blast-tile-gap) - 32px) / var(--blast-cols)),
+    min(
+      calc((100cqi - (var(--blast-cols) - 1) * var(--blast-tile-gap) - 32px) / var(--blast-cols)),
+      calc((100cqb - (var(--blast-rows) - 1) * var(--blast-tile-gap) - 32px) / var(--blast-rows))
+    ),
     var(--blast-tile-cap)
   );
 }

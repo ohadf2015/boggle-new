@@ -30,19 +30,20 @@ export function useCollapseTimeline(
     const tiles = boardRef.current.querySelectorAll<HTMLElement>('[data-cell-id]');
     const tl = gsap.timeline();
     tiles.forEach((el, i) => {
-      // Vertical-only land bounce: squash Y on impact then overshoot, with
-      // scaleX held at 1.0. Earlier versions warped X too which read as a
-      // horizontal drift during gravity — tiles should stay locked to their
-      // column. Stagger 18ms per tile so cascades feel sequenced.
-      const startAt = i * 0.018;
+      // Vertical-only land thump: deeper squash → stronger overshoot → elastic
+      // settle. scaleX is held at 1.0 throughout — earlier versions warped X
+      // too which read as horizontal drift during gravity. Tiles must stay
+      // locked to their column. Stagger 22ms per tile so cascades feel
+      // sequenced like Royal Match's drop cadence.
+      const startAt = i * 0.022;
       tl.fromTo(
         el,
         { scaleY: 1, scaleX: 1 },
         {
-          scaleY: 0.72,
+          scaleY: 0.62,
           scaleX: 1,
-          duration: 0.11,
-          ease: 'power3.in',
+          duration: 0.1,
+          ease: 'power4.in',
           transformOrigin: 'bottom center',
         },
         startAt,
@@ -50,20 +51,20 @@ export function useCollapseTimeline(
       tl.to(
         el,
         {
-          scaleY: 1.08,
+          scaleY: 1.14,
           scaleX: 1,
-          duration: 0.12,
+          duration: 0.13,
           ease: 'power2.out',
         },
-        startAt + 0.11,
+        startAt + 0.1,
       );
       tl.to(
         el,
         {
           scaleY: 1,
           scaleX: 1,
-          duration: 0.22,
-          ease: 'elastic.out(1.2, 0.5)',
+          duration: 0.28,
+          ease: 'elastic.out(1.4, 0.45)',
         },
         startAt + 0.23,
       );

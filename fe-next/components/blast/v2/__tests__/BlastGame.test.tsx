@@ -16,6 +16,12 @@ vi.mock('@/contexts/LanguageContext', () => ({
     t: (key: string, fallback: string) => fallback,
   }),
 }));
+// NavigationContext gates the global bottom-nav hide; BlastGame calls it on
+// mount/unmount. Tests don't ship a provider, so stub the hook.
+vi.mock('@/contexts/NavigationContext', () => ({
+  useHideNavigation: () => vi.fn(),
+  useNavigation: () => ({ isInGame: false, setIsInGame: vi.fn(), activeTab: 'home', setActiveTab: vi.fn() }),
+}));
 
 import { BlastGame } from '../BlastGame';
 
