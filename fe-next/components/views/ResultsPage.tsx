@@ -21,7 +21,7 @@ import { useResultsSideEffects } from '@/hooks/useResultsSideEffects';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
 import { useMultiplayerSignupNudge } from '@/hooks/useMultiplayerSignupNudge';
-import { ResultsParallaxBackdrop, ResultsSectionReveal } from '@/components/results/ResultsScrollEffects';
+import { ResultsParallaxBackdrop, ResultsSectionReveal, ResultsScrollProgressRail } from '@/components/results/ResultsScrollEffects';
 import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
 
@@ -133,6 +133,7 @@ function DesktopResultsLayout({
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
         <ResultsParallaxBackdrop scrollRef={scrollRef} intensity={110} />
+        <ResultsScrollProgressRail scrollRef={scrollRef} />
         {/* Top Bar with Exit Button */}
         <div className="w-full max-w-5xl mx-auto flex items-center justify-end mb-4 relative z-10">
           <ExitRoomButton onClick={handleExitRoom} label={exitLabel || ''} />

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, type ReactNode } from 'react';
-import { m, useScroll, useTransform, useReducedMotion, type MotionStyle } from 'framer-motion';
+import { m, useScroll, useTransform, useSpring, useReducedMotion, type MotionStyle } from 'framer-motion';
 
 interface ParallaxBackdropProps {
   /** Scroll container ref. Required — the page uses an inner scrollable, not window. */
@@ -101,6 +101,47 @@ export const ResultsSectionReveal: React.FC<SectionRevealProps> = ({
     >
       {children}
     </m.div>
+  );
+};
+
+interface ScrollProgressRailProps {
+  /** Scroll container to track. Same ref passed to ResultsParallaxBackdrop. */
+  scrollRef: React.RefObject<HTMLElement | null>;
+  /** Hide on mobile breakpoints (avoids clashing with the sticky ready bar). */
+  hideOnMobile?: boolean;
+}
+
+/**
+ * Electric scroll progress rail — vertical 3px lime→cyan→pink gradient pinned to
+ * the inline-end edge (right in LTR, left in RTL). Height tracks
+ * `scrollYProgress` of the inner scroll container; spring-smoothed so the rail
+ * settles tactilely without jitter on touch-momentum scrolls.
+ *
+ * Neo-brutalist hard-shadow styling. Hidden under reduced-motion since the rail
+ * IS the motion — a static partial rail would look broken.
+ */
+export const ResultsScrollProgressRail: React.FC<ScrollProgressRailProps> = ({
+  scrollRef,
+  hideOnMobile = true,
+}) => {
+  const reducedMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({ container: scrollRef as React.RefObject<HTMLElement> });
+  const smoothed = useSpring(scrollYProgress, { stiffness: 220, damping: 30, mass: 0.4 });
+  const height = useTransform(smoothed, [0, 1], ['0%', '100%']);
+
+  if (reducedMotion) return null;
+
+  return (
+    <m.div
+      aria-hidden
+      className={`${hideOnMobile ? 'hidden md:block' : 'block'} absolute top-0 rtl:left-1 ltr:right-1 w-[3px] z-30 pointer-events-none rounded-full will-change-[height]`}
+      style={{
+        height,
+        background:
+          'linear-gradient(180deg, var(--neo-lime, #BFFF00) 0%, var(--neo-cyan, #00FFFF) 50%, var(--neo-pink, #FF1493) 100%)',
+        boxShadow: '1px 1px 0 var(--neo-black, #000)',
+      }}
+    />
   );
 };
 
