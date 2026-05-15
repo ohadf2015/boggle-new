@@ -39,11 +39,9 @@ describe('gameMonetizeSdk loader', () => {
       expect(getGameMonetizeId()).toBe('real-game-id-xyz');
     });
 
-    it('falls back to LexiClash hardcoded game-id when env empty', () => {
-      // Hardcoded fallback prevents the Next-inlining bug where
-      // optional-chain guarded process.env access skips inlining.
+    it('returns null when env empty — IMA SDK must never auto-load (AdSense unapproved)', () => {
       vi.stubEnv('NEXT_PUBLIC_GAMEMONETIZE_GAME_ID', '');
-      expect(getGameMonetizeId()).toBe('ewjut98kdj0bwggspg7qqy7qky3nv50j');
+      expect(getGameMonetizeId()).toBeNull();
     });
   });
 

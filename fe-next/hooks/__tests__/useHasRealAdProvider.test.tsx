@@ -39,14 +39,13 @@ describe('useHasRealAdProvider', () => {
     expect(result.current).toBe(true);
   });
 
-  it('returns true in production via GameMonetize hardcoded fallback (no env, no other provider)', () => {
-    // Hardcoded fallback game-id (LexiClash GameMonetize publisher) means
-    // web users always have a real provider — placeholder mode unreachable
-    // in production now. Test that production+no-provider implicitly hits
-    // GameMonetize fallback rather than placeholder.
+  it('returns false in production without any provider — GameMonetize fallback removed (IMA SDK must not load)', () => {
+    // GameMonetize SDK transitively pulls Google IMA. AdSense rejected the
+    // site, so we removed the hardcoded fallback game-id. Without explicit
+    // env opt-in, web users get placeholder mode (no real provider).
     vi.stubEnv('NODE_ENV', 'production');
     const { result } = renderHook(() => useHasRealAdProvider());
-    expect(result.current).toBe(true);
+    expect(result.current).toBe(false);
   });
 
   it('returns true in production when on CrazyGames platform', () => {
@@ -64,14 +63,15 @@ describe('useHasRealAdProvider', () => {
     expect(result.current).toBe(true);
   });
 
-  it('returns true in production when CrazyGames SDK loaded but not on platform (GameMonetize fallback)', () => {
-    // Even without CG-platform match, GameMonetize hardcoded fallback
-    // serves prod web — placeholder is unreachable in production.
+  it('returns false in production when CrazyGames SDK loaded but not on platform — no GameMonetize fallback', () => {
+    // CG SDK loads on every page (sniffer), but isOnCrazyGamesPlatform
+    // false means user is on plain web. GameMonetize fallback removed
+    // (IMA SDK gated), so prod web without explicit env = placeholder.
     vi.stubEnv('NODE_ENV', 'production');
     crazyGamesState.isAvailable = true;
     crazyGamesState.isOnCrazyGamesPlatform = false;
     const { result } = renderHook(() => useHasRealAdProvider());
-    expect(result.current).toBe(true);
+    expect(result.current).toBe(false);
   });
 
   it('returns true in production when GameMonetize game-id env is set (explicit override)', () => {

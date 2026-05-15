@@ -63,11 +63,11 @@ describe('useRewardedAd — GameMonetize routing', () => {
     expect(gmShowRewarded.mock.calls[0][2]).toEqual(expect.objectContaining({ name: 'generic' }));
   });
 
-  it('still routes to GameMonetize via hardcoded fallback when env id NOT set', async () => {
-    // After 2026-05-15 prod-verify: NEXT_PUBLIC_X with optional-chain
-    // guards is NOT inlined by Next, so getGameMonetizeId() now ships a
-    // hardcoded fallback. Placeholder mode is unreachable in production —
-    // every web user gets the LexiClash GameMonetize publisher game-id.
+  it('does NOT route to GameMonetize when env id unset — IMA SDK must stay blocked (AdSense unapproved)', async () => {
+    // GameMonetize SDK transitively loads Google IMA (`imasdk.googleapis.com`).
+    // AdSense rejected the site (memory: adsense-rejection-2026-05-11), so
+    // we removed the hardcoded fallback game-id. Without explicit env opt-in
+    // GameMonetize must NOT fire — keeps IMA from ever loading.
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('NEXT_PUBLIC_GAMEMONETIZE_GAME_ID', '');
 
@@ -80,7 +80,7 @@ describe('useRewardedAd — GameMonetize routing', () => {
       await Promise.resolve();
     });
 
-    expect(gmShowRewarded).toHaveBeenCalledTimes(1);
+    expect(gmShowRewarded).not.toHaveBeenCalled();
   });
 
   it('grants reward when GameMonetize fires onReward callback (coin path)', async () => {
