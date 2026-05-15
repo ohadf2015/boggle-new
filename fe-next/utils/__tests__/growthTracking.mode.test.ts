@@ -40,7 +40,12 @@ vi.mock('@/utils/logger', () => ({
 import { trackGameStart, trackGameEnd, trackGameCompletion } from '../growthTracking';
 
 function findCapture(event: string): Record<string, unknown> | undefined {
-  const hit = captureMock.mock.calls.find(([name]) => name === `growth:${event}`);
+  // Canonical funnel events (game_started, game_completed, first_game_played,
+  // first_game_won, etc.) emit WITHOUT the `growth:` prefix to dedup PostHog.
+  // Helper accepts both shapes so legacy assertions keep working.
+  const hit = captureMock.mock.calls.find(
+    ([name]) => name === event || name === `growth:${event}`,
+  );
   return hit?.[1] as Record<string, unknown> | undefined;
 }
 

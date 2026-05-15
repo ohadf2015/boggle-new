@@ -1,9 +1,15 @@
 /**
- * Emit `growth:game_abandoned` when the user navigates away mid-game.
+ * Emit canonical `game_abandoned` when the user navigates away mid-game.
  *
  * The PostHog "Game Abandoned" goal saw zero conversions over 30 days because
- * no caller invoked `trackGameEnd(completed=false)` — players close the tab
- * rather than tap a quit button. A `pagehide` listener catches that path.
+ * (a) no caller invoked `trackGameEnd(completed=false)` — players close the
+ * tab rather than tap a quit button, and (b) `pagehide` alone misses
+ * backgrounded Capacitor webviews and modern browser tab-park flows.
+ *
+ * This module listens for BOTH `pagehide` and `visibilitychange→hidden`,
+ * sends the capture via `sendBeacon` transport so the request survives the
+ * unload, and uses a 5s engagement threshold so rapid tab-switches don't
+ * inflate the funnel.
  *
  * Active state is set by `trackGameStart` and cleared by `trackGameEnd` so
  * completed games do not emit a phantom abandon.
@@ -11,7 +17,7 @@
 
 import posthog from 'posthog-js';
 
-const MIN_ENGAGED_MS = 2000;
+const MIN_ENGAGED_MS = 5000;
 
 interface ActiveGame {
   mode: string;
@@ -30,19 +36,23 @@ export function markGameInactive(): void {
   active = null;
 }
 
-function emitAbandonIfActive() {
+function emitAbandonIfActive(reason: 'pagehide' | 'visibilitychange') {
   if (!active || alreadyEmitted) return;
   const durationMs = Date.now() - active.startedAt;
   if (durationMs < MIN_ENGAGED_MS) return;
 
   alreadyEmitted = true;
   try {
-    posthog.capture('growth:game_abandoned', {
-      mode: active.mode,
-      gameMode: active.mode,
-      durationSec: Math.round(durationMs / 1000),
-      reason: 'pagehide',
-    });
+    posthog.capture(
+      'game_abandoned',
+      {
+        mode: active.mode,
+        gameMode: active.mode,
+        durationSec: Math.round(durationMs / 1000),
+        reason,
+      },
+      { transport: 'sendBeacon' },
+    );
   } catch {
     // PostHog not initialized — analytics never block UX
   }
@@ -51,11 +61,19 @@ function emitAbandonIfActive() {
 export function installAbandonOnPagehide(): () => void {
   if (typeof window === 'undefined') return () => {};
 
-  const handler = () => emitAbandonIfActive();
-  window.addEventListener('pagehide', handler);
+  const pagehideHandler = () => emitAbandonIfActive('pagehide');
+  const visibilityHandler = () => {
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+      emitAbandonIfActive('visibilitychange');
+    }
+  };
+
+  window.addEventListener('pagehide', pagehideHandler);
+  document.addEventListener('visibilitychange', visibilityHandler);
 
   return () => {
-    window.removeEventListener('pagehide', handler);
+    window.removeEventListener('pagehide', pagehideHandler);
+    document.removeEventListener('visibilitychange', visibilityHandler);
   };
 }
 

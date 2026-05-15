@@ -170,9 +170,11 @@ let sessionId: string | null = null;
 const eventQueue: Array<{ event: GrowthEvent; data: GrowthEventData }> = [];
 const MAX_QUEUE_SIZE = 50;
 
-// Funnel-critical events also emitted under their canonical (unprefixed)
-// name so PostHog dashboards resolve without a `growth:` rewrite.
-const CANONICAL_DUAL_EMIT: ReadonlySet<GrowthEvent> = new Set<GrowthEvent>([
+// Funnel-critical events emit ONLY under their canonical (unprefixed) name.
+// The historical dual-emit doubled every key event count and poisoned every
+// funnel ratio. Non-whitelisted events keep the `growth:` prefix so internal
+// dashboards stay grouped.
+const CANONICAL_ONLY_EMIT: ReadonlySet<GrowthEvent> = new Set<GrowthEvent>([
   'game_started',
   'game_completed',
   'game_abandoned',
@@ -246,13 +248,15 @@ export const trackGrowthEvent = (event: GrowthEvent, data: GrowthEventData = {})
     }
   }
 
-  // Send to PostHog (no-ops when opted out or not initialized)
+  // Send to PostHog (no-ops when opted out or not initialized).
+  // Funnel-critical events emit canonical-only; everything else keeps the
+  // `growth:` prefix. Single emit per event — dual-emit poisoned every
+  // funnel ratio in PostHog (every count doubled).
   try {
-    posthog.capture(`growth:${event}`, enrichedData);
-    // Dual-emit canonical name for funnel/retention dashboards that query
-    // unprefixed events. Whitelisted to avoid doubling event volume.
-    if (CANONICAL_DUAL_EMIT.has(event)) {
+    if (CANONICAL_ONLY_EMIT.has(event)) {
       posthog.capture(event, enrichedData);
+    } else {
+      posthog.capture(`growth:${event}`, enrichedData);
     }
   } catch {
     // Silently fail if PostHog not initialized

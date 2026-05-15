@@ -1,9 +1,10 @@
 /**
- * Dual-emit canonical PostHog event names.
+ * Canonical PostHog event names (single-emit).
  *
- * Growth events are sent with a "growth:" prefix for historical reasons, but
- * the dashboards query canonical unprefixed names (e.g. "game_started").
- * This test locks in the dual-emit so both resolve.
+ * Funnel-critical events emit ONLY their canonical (unprefixed) name. The
+ * historical `growth:` dual-emit doubled every key event count and poisoned
+ * every funnel ratio in PostHog. Non-whitelisted events keep the `growth:`
+ * prefix so internal dashboards stay grouped.
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -38,25 +39,27 @@ beforeEach(() => {
   }
 });
 
-describe('trackGrowthEvent — canonical dual-emit', () => {
-  it('emits BOTH growth:game_started AND canonical game_started', async () => {
+describe('trackGrowthEvent — canonical single-emit', () => {
+  it('emits ONLY canonical game_started for whitelisted events', async () => {
     const { trackGameStart } = await import('../growthTracking');
     trackGameStart('classic');
 
     const eventNames = capture.mock.calls.map(c => c[0]);
-    expect(eventNames).toContain('growth:game_started');
     expect(eventNames).toContain('game_started');
+    expect(eventNames).not.toContain('growth:game_started');
 
     const canonical = capture.mock.calls.find(c => c[0] === 'game_started');
     expect(canonical?.[1]).toMatchObject({ mode: 'classic' });
   });
 
-  it('emits canonical game_completed with mode + score', async () => {
+  it('emits canonical game_completed (no growth: dupe) with mode + score', async () => {
     const { trackGameEnd } = await import('../growthTracking');
     trackGameEnd('adventure', 1234, 17, true, 90);
 
+    const completedNames = capture.mock.calls.map(c => c[0]).filter(n => n === 'game_completed' || n === 'growth:game_completed');
+    expect(completedNames).toEqual(['game_completed']);
+
     const canonical = capture.mock.calls.find(c => c[0] === 'game_completed');
-    expect(canonical).toBeDefined();
     expect(canonical?.[1]).toMatchObject({
       mode: 'adventure',
       score: 1234,
@@ -64,7 +67,7 @@ describe('trackGrowthEvent — canonical dual-emit', () => {
     });
   });
 
-  it('does NOT dual-emit non-whitelisted events', async () => {
+  it('keeps growth: prefix for non-whitelisted events (single-emit)', async () => {
     const { trackGrowthEvent } = await import('../growthTracking');
     trackGrowthEvent('page_view', {});
 

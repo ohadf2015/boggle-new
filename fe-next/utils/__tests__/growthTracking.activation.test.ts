@@ -41,8 +41,10 @@ describe('markFirstGameActivation', () => {
     markFirstGameActivation({ won: false, score: 60, wordCount: 3, mode: 'tutorial' });
 
     const names = capture.mock.calls.map(c => c[0]);
-    expect(names).toContain('growth:first_game_played');
+    // Canonical-only emit: first_game_played fires under its unprefixed
+    // name to dedup PostHog. Old `growth:first_game_played` is gone.
     expect(names).toContain('first_game_played');
+    expect(names).not.toContain('growth:first_game_played');
 
     const canonical = capture.mock.calls.find(c => c[0] === 'first_game_played');
     expect(canonical?.[1]).toMatchObject({ gameMode: 'tutorial', score: 60, wordCount: 3 });
@@ -53,8 +55,8 @@ describe('markFirstGameActivation', () => {
     markFirstGameActivation({ won: true, score: 60, wordCount: 3, mode: 'tutorial' });
 
     const names = capture.mock.calls.map(c => c[0]);
-    expect(names).toContain('growth:first_game_won');
     expect(names).toContain('first_game_won');
+    expect(names).not.toContain('growth:first_game_won');
   });
 
   it('does NOT emit first_game_won when won=false', async () => {
@@ -96,7 +98,7 @@ describe('markFirstGameActivation', () => {
 
     const names = capture.mock.calls.map(c => c[0]);
     expect(names).toContain('first_game_won');
-    expect(names).toContain('growth:first_game_won');
+    expect(names).not.toContain('growth:first_game_won');
     expect(names).not.toContain('first_game_played');
   });
 });
