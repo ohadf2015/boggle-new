@@ -82,7 +82,10 @@ export async function POST(request: NextRequest) {
               deepLink: copy.deepLink,
               variant: copy.variant,
               locale,
-              imageUrl: rival.avatarImage,
+              // Only forward rival avatar when HTTPS-safe; null lets the
+              // trigger fall back to the encouraging mascot. Rival COPY
+              // still fires either way — that's the whole point.
+              ...(rival.avatarImage ? { imageUrl: rival.avatarImage } : {}),
               kind: 'rival',
             });
             return;

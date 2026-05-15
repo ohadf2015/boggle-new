@@ -127,7 +127,23 @@ describe('findDailyChallengeRivals', () => {
     expect(result.get('user-1')!.username).toBe('R1');
   });
 
-  it('skips rivals with no avatar_image (FCM imageUrl needs HTTPS)', async () => {
+  it('legacy character-ID avatar_image (e.g. "broccoli-bob") resolves to null — modern path is avatar_config + mascot fallback', async () => {
+    // Character avatars are deprecated; the live system uses JSONB avatar_config
+    // which we cannot render to a hosted PNG yet. Rival still picked, image null,
+    // notifyDailyChallengeReminder falls back to mascot. Rival COPY still fires.
+    leaderboardResult.data = [
+      { player_id: 'user-1', username: 'Me', avatar_image: null, total_score: 1000 },
+      { player_id: 'rival-id', username: 'IdRival', avatar_image: 'broccoli-bob', total_score: 1050 },
+    ];
+    wordHuntAttemptsResult.data = [{ player_id: 'rival-id', solved: true }];
+
+    const result = await findDailyChallengeRivals(['user-1']);
+    const rival = result.get('user-1')!;
+    expect(rival.username).toBe('IdRival');
+    expect(rival.avatarImage).toBeNull();
+  });
+
+  it('picks rival with null avatar_image — sets avatarImage=null so push falls back to mascot', async () => {
     leaderboardResult.data = [
       { player_id: 'user-1', username: 'Me', avatar_image: null, total_score: 1000 },
       { player_id: 'rival-noavatar', username: 'NoAvatar', avatar_image: null, total_score: 1050 },
@@ -139,10 +155,12 @@ describe('findDailyChallengeRivals', () => {
     ];
 
     const result = await findDailyChallengeRivals(['user-1']);
-    expect(result.get('user-1')!.username).toBe('Good');
+    const rival = result.get('user-1')!;
+    expect(rival.username).toBe('NoAvatar');
+    expect(rival.avatarImage).toBeNull();
   });
 
-  it('skips rivals whose avatar_image is non-https (FCM drops it silently)', async () => {
+  it('picks rival whose avatar_image is non-https — sets avatarImage=null (FCM drops non-https silently)', async () => {
     leaderboardResult.data = [
       { player_id: 'user-1', username: 'Me', avatar_image: null, total_score: 1000 },
       { player_id: 'rival-http', username: 'Http', avatar_image: 'http://x/h.png', total_score: 1050 },
@@ -153,11 +171,27 @@ describe('findDailyChallengeRivals', () => {
       { player_id: 'rival-good', solved: true },
     ];
     const result = await findDailyChallengeRivals(['user-1']);
-    expect(result.get('user-1')!.username).toBe('Good');
+    const rival = result.get('user-1')!;
+    expect(rival.username).toBe('Http');
+    expect(rival.avatarImage).toBeNull();
+  });
+
+  it('low-score newcomers still get rivals (ABOVE_GAP_FLOOR widened to 5000)', async () => {
+    // User score=10 (brand-new). Rival 3000 ahead must qualify — previously
+    // capped at 500 and dropped to null, which is why cron almost never sent
+    // rival-themed pushes to fresh accounts.
+    leaderboardResult.data = [
+      { player_id: 'newcomer', username: 'Me', avatar_image: null, total_score: 10 },
+      { player_id: 'rival', username: 'R', avatar_image: 'https://x/r.png', total_score: 3000 },
+    ];
+    wordHuntAttemptsResult.data = [{ player_id: 'rival', solved: true }];
+    const result = await findDailyChallengeRivals(['newcomer']);
+    expect(result.get('newcomer')).not.toBeNull();
+    expect(result.get('newcomer')!.username).toBe('R');
   });
 
   it('caps "above" rivals so far-ahead veterans never demoralize newcomers', async () => {
-    // user score 200 (low). veteran 50k ahead (way past cap). near 200 ahead (within ABOVE_GAP_FLOOR=500).
+    // user score 200 (low). veteran 50k ahead (way past cap). near 200 ahead (within ABOVE_GAP_FLOOR=5000).
     leaderboardResult.data = [
       { player_id: 'user-1', username: 'Me', avatar_image: null, total_score: 200 },
       { player_id: 'veteran', username: 'Vet', avatar_image: 'https://x/v.png', total_score: 50200 },

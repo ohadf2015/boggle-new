@@ -3,12 +3,19 @@
  *
  * For each recipient userId, finds the closest-by-total_score leaderboard
  * neighbour who already completed today's daily (puzzle or word-hunt). Cron
- * uses the result to swap in a rival-themed push (avatar imageUrl + witty
- * "X already crushed it, your move" copy) instead of the neutral mascot copy.
+ * uses the result to swap in a rival-themed push (witty "X already crushed
+ * it, your move" copy + rival name/score) instead of the neutral mascot copy.
  *
  * Returns Map<userId, RivalCandidate | null>. Null = no actionable rival
- * (recipient missing from leaderboard, no completers, or only completers
- * have null avatar_image — FCM imageUrl needs HTTPS so we skip those).
+ * (recipient missing from leaderboard, or no completers at all).
+ *
+ * Avatar handling: the modern avatar is a JSONB `avatar_config` rendered
+ * client-side as SVG — there is no hosted PNG endpoint, so we cannot send
+ * the rival's actual face to FCM today. `avatarImage` resolves to the
+ * leaderboard column ONLY when it already happens to be an https URL
+ * (legacy users); otherwise null and the push trigger falls back to the
+ * mascot. The rival-themed COPY fires either way — that is the whole
+ * point of "dynamic rival".
  *
  * Performance: 3 queries (leaderboard, puzzle attempts, word-hunt attempts)
  * regardless of recipient count. Caller is the hourly cron, so amortized
@@ -23,7 +30,11 @@ export type RivalMode = 'puzzle' | 'wordHunt' | 'both';
 
 export interface RivalCandidate {
   username: string;
-  avatarImage: string;
+  /** HTTPS avatar URL, or null when leaderboard has no/non-https avatar.
+   *  Cron forwards this to FCM imageUrl only when non-null; otherwise the
+   *  push trigger falls back to the encouraging mascot. The avatar gate is
+   *  ONLY about the image — the rival-themed copy still fires either way. */
+  avatarImage: string | null;
   direction: RivalDirection;
   scoreGap: number;
   /** Which daily the rival cleared. `both` when they swept puzzle + word-hunt. */
@@ -34,6 +45,24 @@ export interface RivalCandidate {
   rankDelta: number;
   /** Other in-cap rivals beyond the primary — surfaces "and {N} others" social proof. */
   additionalCount: number;
+}
+
+/**
+ * Resolve a `leaderboard.avatar_image` into an HTTPS URL FCM can show.
+ *
+ * The modern avatar lives in `avatar_config` (JSONB, client-rendered SVG) —
+ * we do NOT have a server-rendered PNG endpoint for it yet, so this only
+ * returns a URL for legacy users whose `avatar_image` column already holds
+ * a hosted https URL (e.g. OAuth profile pictures). Anything else → null,
+ * and notifyDailyChallengeReminder defaults to the encouraging mascot.
+ *
+ * Exported for tests so we can lock down the "rival copy fires even when
+ * avatar resolves to null" contract.
+ */
+export function resolveRivalAvatarUrl(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  if (raw.startsWith('https://')) return raw;
+  return null;
 }
 
 interface LeaderboardRow {
@@ -119,13 +148,16 @@ export async function findDailyChallengeRivals(
   const lbByUser = new Map<string, LeaderboardRow>();
   for (const row of lbRows) lbByUser.set(row.player_id, row);
 
-  // Pre-build the candidate-rival list once: completers with HTTPS avatar +
-  // numeric score. FCM imageUrl drops silently on non-HTTPS (iOS
-  // UNNotificationAttachment + Android big-picture both require it).
+  // Pre-build the candidate-rival list once. `avatar_image` is typically a
+  // character ID like "broccoli-bob" pointing to /public/avatars/{id}.png —
+  // resolveRivalAvatarUrl turns that into a hosted HTTPS URL FCM can show.
+  // The previous code's `startsWith('https://')` gate emptied the pool in
+  // production (most users have character-ID avatars, not URLs) and silently
+  // dropped every rival push to generic copy.
   interface PoolEntry {
     id: string;
     username: string;
-    avatar: string;
+    avatar: string | null;
     score: number;
     rank: number | null;
     mode: RivalMode;
@@ -134,7 +166,6 @@ export async function findDailyChallengeRivals(
   for (const id of completers) {
     const row = lbByUser.get(id);
     if (!row) continue;
-    if (!row.avatar_image || !row.avatar_image.startsWith('https://')) continue;
     if (typeof row.total_score !== 'number') continue;
     const inPuzzle = puzzleCompleters.has(id);
     const inHunt = wordHuntCompleters.has(id);
@@ -142,7 +173,7 @@ export async function findDailyChallengeRivals(
     rivalPool.push({
       id,
       username: row.username || 'Rival',
-      avatar: row.avatar_image,
+      avatar: resolveRivalAvatarUrl(row.avatar_image),
       score: row.total_score,
       rank: typeof row.rank_position === 'number' ? row.rank_position : null,
       mode,
@@ -154,7 +185,8 @@ export async function findDailyChallengeRivals(
   // motivates). Symmetric cap on "below" keeps copy honest. Picks the next
   // closest within range — only falls back to null when no rival fits.
   const ABOVE_GAP_MAX_RATIO = 1.0;   // gap may equal user score (≈ 2× catch-up)
-  const ABOVE_GAP_FLOOR = 500;       // grace for low-score users so they still get rivals
+  const BELOW_GAP_MAX_RATIO = 1.0;   // mirror — defending lead within own range
+  const ABOVE_GAP_FLOOR = 5000;      // newcomers (score 0–5k) still match rivals up to 5k ahead
   const BELOW_GAP_FLOOR = 2000;      // tighter — defending lead matters less when gap is huge
 
   for (const userId of recipientIds) {
@@ -165,7 +197,7 @@ export async function findDailyChallengeRivals(
     }
     const myScore = me.total_score;
     const aboveCap = Math.max(ABOVE_GAP_FLOOR, Math.round(myScore * ABOVE_GAP_MAX_RATIO));
-    const belowCap = Math.max(BELOW_GAP_FLOOR, Math.round(myScore * ABOVE_GAP_MAX_RATIO));
+    const belowCap = Math.max(BELOW_GAP_FLOOR, Math.round(myScore * BELOW_GAP_MAX_RATIO));
 
     const myRank = typeof me.rank_position === 'number' ? me.rank_position : null;
 

@@ -63,7 +63,9 @@ export async function sendDailyChallengeReminders(): Promise<void> {
           deepLink: copy.deepLink,
           variant: copy.variant,
           locale,
-          imageUrl: rival.avatarImage,
+          // Mirror cron route: forward rival avatar only when HTTPS-safe;
+          // null lets the trigger fall back to the encouraging mascot.
+          ...(rival.avatarImage ? { imageUrl: rival.avatarImage } : {}),
           kind: 'rival',
         });
         return;
