@@ -1,4 +1,4 @@
-import { POWER_CARD_POOL, drawCardChoices, type ScoreContext, type ScoreModifier } from '../powerCards';
+import { POWER_CARD_POOL, drawCardChoices, type ScoreContext } from '../powerCards';
 import type { ScoringTile } from '../../types';
 
 const tile = (letter: string, value: number, premium: ScoringTile['premium'] = null): ScoringTile => ({
