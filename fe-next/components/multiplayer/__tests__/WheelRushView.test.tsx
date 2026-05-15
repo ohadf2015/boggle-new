@@ -219,6 +219,35 @@ describe('WheelRushView', () => {
     expect(socket.emit).toHaveBeenCalledWith('submitWheelWord', { word: 'CRANE' });
   });
 
+  // Parity with SP WordWheelGame: each wheel index appears in the built word at most
+  // once. Re-tapping a used letter must REMOVE it (toggle off), never add a second copy.
+  it('tapping a wheel letter twice toggles it off (parity with SP)', () => {
+    const socket = makeMockSocket();
+    const { container } = render(
+      <WheelRushView
+        socket={socket}
+        username="alice"
+        leaderboard={[{ username: 'alice', score: 0 }]}
+        onQuit={vi.fn()}
+        t={tStub}
+      />,
+    );
+    act(() => {
+      socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
+    });
+
+    const cBtn = container.querySelector<HTMLButtonElement>('[data-wheel-letter="C"]');
+    expect(cBtn).toBeTruthy();
+
+    // First tap → C is added.
+    act(() => { fireEvent.click(cBtn!); });
+    expect(container.querySelectorAll('[data-testid="built-letter-tile"]').length).toBe(1);
+
+    // Second tap on the same wheel letter → C is removed (toggle), not duplicated.
+    act(() => { fireEvent.click(cBtn!); });
+    expect(container.querySelectorAll('[data-testid="built-letter-tile"]').length).toBe(0);
+  });
+
   it('rejects 2-letter word locally without emitting (matches server min 3)', () => {
     const socket = makeMockSocket();
     render(

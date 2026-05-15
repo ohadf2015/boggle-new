@@ -317,12 +317,21 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     };
   }, [socket, flash]);
 
-  // Letter tap handler (matches SP signature)
+  // Letter tap handler — parity with SP WordWheelGame:386.
+  // Re-tap on a used wheel index toggles it off (removes from built word) instead
+  // of duplicating. Each wheelIndex appears at most once in builtLetters.
   const handleLetterPress = useCallback((letter: string, wheelIndex: number, _el: HTMLButtonElement) => {
+    const existingIdx = builtLettersRef.current.findIndex(bl => bl.wheelIndex === wheelIndex);
+    if (existingIdx !== -1) {
+      setBuiltLetters(prev => prev.filter((_, i) => i !== existingIdx));
+      playButtonClickSound();
+      haptic(8);
+      return;
+    }
     setBuiltLetters(prev => [...prev, { letter, wheelIndex }]);
     playTileSelectSound();
     haptic(10);
-  }, [playTileSelectSound]);
+  }, [playTileSelectSound, playButtonClickSound]);
 
   // Drag-to-build — drag engages only after pointer moves to a DIFFERENT letter,
   // so single taps are handled by the button's native onClick (no double-fire).
