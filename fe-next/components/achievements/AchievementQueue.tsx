@@ -410,11 +410,38 @@ export const AchievementQueueProvider = ({ children }: AchievementQueueProviderP
     providerTimerIdsRef.current.add(id);
   }, [processNext]);
 
-  // Queue a new achievement (max 5)
-  const queueAchievement = useCallback((achievement: AchievementPayload) => {
-    if (!achievement) return;
+  // Track currently-displayed achievement key for dedupe (refs to avoid re-binding)
+  const currentKeyRef = useRef<string | null>(null);
+  useEffect(() => {
+    currentKeyRef.current = currentAchievement?.key ?? null;
+  }, [currentAchievement]);
 
-    setQueue(prev => [...prev, achievement].slice(-5));
+  // Monotonic entry id so AnimatePresence remounts even when same key re-enters,
+  // ensuring useEffect re-runs and a fresh auto-dismiss timer is scheduled.
+  const entryIdRef = useRef(0);
+  const [currentEntryId, setCurrentEntryId] = useState(0);
+  useEffect(() => {
+    if (currentAchievement) {
+      entryIdRef.current += 1;
+      setCurrentEntryId(entryIdRef.current);
+    }
+  }, [currentAchievement]);
+
+  // Queue a new achievement (max 5, deduped by key)
+  const queueAchievement = useCallback((achievement: AchievementPayload) => {
+    if (!achievement?.key) return;
+
+    // Dedupe inside the setQueue updater so synchronous back-to-back calls
+    // (e.g. useAchievementSocketBridge + host/player session events firing the
+    // same payload) collapse to a single entry. Refs alone are not enough —
+    // they don't reflect pending state from the same React batch.
+    let skipped = false;
+    setQueue(prev => {
+      if (currentKeyRef.current === achievement.key) { skipped = true; return prev; }
+      if (prev.some(a => a.key === achievement.key)) { skipped = true; return prev; }
+      return [...prev, achievement].slice(-5);
+    });
+    if (skipped) return;
 
     // If not currently displaying, start immediately
     if (!isDisplayingRef.current) {
@@ -434,7 +461,7 @@ export const AchievementQueueProvider = ({ children }: AchievementQueueProviderP
       <AnimatePresence>
         {currentAchievement && (
           <AchievementInlineToast
-            key={currentAchievement.key}
+            key={`${currentAchievement.key}-${currentEntryId}`}
             achievement={currentAchievement}
             onDismiss={handleDismiss}
           />

@@ -32,12 +32,17 @@ export function validateAchievementData(data: any): data is { achievements: any[
 // ==================== Processing ====================
 
 /**
- * Process achievements from a socket event
- * Validates, queues, and returns valid achievements
+ * Process achievements from a socket event.
+ * Validates and returns valid achievements for local-state storage only.
+ *
+ * Toast queuing is owned by `useAchievementSocketBridge` (single global
+ * listener). The `queueAchievement` param is kept for API compatibility
+ * but is intentionally not called — duplicate enqueues from host/player
+ * session events caused stuck toasts via AnimatePresence same-key reuse.
  */
 export function processAchievements(
   data: any,
-  queueAchievement: (achievement: AchievementPayload) => void,
+  _queueAchievement: (achievement: AchievementPayload) => void,
   context: 'HOST' | 'PLAYER'
 ): AchievementPayload[] {
   if (!validateAchievementData(data)) {
@@ -52,16 +57,12 @@ export function processAchievements(
     data.achievements.map((a: any) => a?.key || a?.name || 'unknown').join(', ')
   );
 
-  // Queue valid achievements
   data.achievements.forEach((achievement: any) => {
-    if (isValidAchievement(achievement)) {
-      queueAchievement(achievement as AchievementPayload);
-    } else {
+    if (!isValidAchievement(achievement)) {
       logger.warn(`${logPrefix} Skipping invalid achievement:`, achievement);
     }
   });
 
-  // Filter and return valid achievements
   const validAchievements = data.achievements.filter(isValidAchievement) as AchievementPayload[];
 
   if (validAchievements.length > 0) {

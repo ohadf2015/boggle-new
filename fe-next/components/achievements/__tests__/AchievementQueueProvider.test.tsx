@@ -373,4 +373,38 @@ describe('AchievementQueueProvider', () => {
     // Max 5 achievements should have been shown
     expect(shownCount).toBeLessThanOrEqual(5);
   });
+
+  it('should dedupe rapid duplicate same-key calls to queueAchievement', () => {
+    // Bug repro: useAchievementSocketBridge + useHostPlayerEvents both listen to
+    // liveAchievementUnlocked → same payload enqueued twice. With AnimatePresence
+    // same-key reuse the second toast can stay stuck visible. Fix: dedupe by key.
+    const DoubleConsumer = () => {
+      const { queueAchievement } = useAchievementQueue();
+      return (
+        <button onClick={() => {
+          queueAchievement(testAchievement);
+          queueAchievement(testAchievement);
+        }}>
+          Trigger Double
+        </button>
+      );
+    };
+
+    render(
+      <LanguageProvider>
+        <AchievementQueueProvider>
+          <DoubleConsumer />
+        </AchievementQueueProvider>
+      </LanguageProvider>
+    );
+
+    act(() => { screen.getByText('Trigger Double').click(); });
+    act(() => { vi.advanceTimersByTime(150); });
+
+    expect(screen.getByTestId('achievement-inline-toast')).toBeInTheDocument();
+
+    // After dismiss + gap the duplicate must NOT resurface.
+    act(() => { vi.advanceTimersByTime(2500); });
+    expect(screen.queryByTestId('achievement-inline-toast')).not.toBeInTheDocument();
+  });
 });
