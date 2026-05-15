@@ -3,8 +3,8 @@
  * Shared tuning knobs for wheel-rush MP mode.
  */
 
-/** Round duration in seconds */
-export const WHEEL_RUSH_DURATION_SEC = 120;
+/** Default round duration in seconds. 60s = fast 1-minute rounds (design intent). Host can still override via timerSeconds. */
+export const WHEEL_RUSH_DURATION_SEC = 60;
 
 /** Steal-lock window: ms that first finder's word stays stealable before closing */
 export const WHEEL_RUSH_LOCK_MS = 3_000;

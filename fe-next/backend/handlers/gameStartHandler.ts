@@ -46,6 +46,7 @@ import { selectNextGameMode, ALL_GAME_MODES } from '../modules/gameModeSelector.
 import { initializePlayerData } from './playerDataInit.js';
 import { HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH } from '@/shared/constants/wordHuntMultiplayerConstants';
 import { BLAST_MP_DEFAULT_TIMER, DIFFICULTIES, DEFAULT_DIFFICULTY } from '@/shared/constants/gameConstants';
+import { WHEEL_RUSH_DURATION_SEC } from '@/shared/constants/wheelRushConstants';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { initBlastModeState, hashStringToSeed } from '../modules/blastModeManager.js';
 import { initWordHuntState, selectTargetWordWithFallback } from '../modules/wordHuntManager.js';
@@ -302,7 +303,10 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // host-chosen 1/2/3 min is now respected (was force-overridden, audit SRV-M4;
     // override accepted by product 2026-05-14 — waves removed, fixed-window
     // balance argument no longer holds).
-    const timerFallback = resolvedMode === 'blast' ? BLAST_MP_DEFAULT_TIMER : 120;
+    const timerFallback =
+      resolvedMode === 'blast' ? BLAST_MP_DEFAULT_TIMER :
+      resolvedMode === 'wheel-rush' ? WHEEL_RUSH_DURATION_SEC :
+      120;
     let validTimer = Math.max(30, Math.min(600, rawTimer || timerFallback));
 
     // Defense-in-depth: explicit blast pick (or any path that bypassed the pool

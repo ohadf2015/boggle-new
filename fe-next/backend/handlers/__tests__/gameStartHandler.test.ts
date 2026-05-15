@@ -813,6 +813,38 @@ describe('registerStartGameHandler', () => {
         expect.objectContaining({ timerSeconds: 90 })
       );
     });
+
+    it('falls back to WHEEL_RUSH_DURATION_SEC (60) when no timer supplied for wheel-rush', async () => {
+      mockSelectNextGameMode.mockReturnValue('wheel-rush');
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      const payload = makePayload({ gameMode: 'wheel-rush' });
+      delete (payload as any).timerSeconds;
+      await triggerStartGame(handlers, payload);
+
+      expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+        mockIo,
+        'room:GAME1',
+        'startGame',
+        expect.objectContaining({ timerSeconds: 60 })
+      );
+    });
+
+    it('respects host-supplied timer for wheel-rush instead of force-overriding to 60s', async () => {
+      mockSelectNextGameMode.mockReturnValue('wheel-rush');
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      await triggerStartGame(handlers, makePayload({ gameMode: 'wheel-rush', timerSeconds: 180 }));
+
+      expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+        mockIo,
+        'room:GAME1',
+        'startGame',
+        expect.objectContaining({ timerSeconds: 180 })
+      );
+    });
   });
 
   // ─── Boost token bundling (race-fix) ─────────────────────────────────

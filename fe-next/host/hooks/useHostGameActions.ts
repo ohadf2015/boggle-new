@@ -21,6 +21,7 @@ import type { Language, LetterGrid, DifficultyLevel } from '@/types';
 import type { TournamentData } from './useHostViewState';
 import type { BoardTheme } from '@/shared/types/socket';
 import { useGameMode, useHostSelectedGameMode } from '@/hooks/gameState';
+import { WHEEL_RUSH_DURATION_SEC } from '@/shared/constants/wheelRushConstants';
 
 interface UseHostGameActionsOptions {
   socket: Socket | null;
@@ -185,7 +186,10 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     }
 
     setTableData(newTable);
-    const seconds = timerValue * 60;
+    // Wheel-rush is design-locked to its 1-minute default (WHEEL_RUSH_DURATION_SEC).
+    const seconds = (hostSelectedGameMode === 'wheel-rush')
+      ? WHEEL_RUSH_DURATION_SEC
+      : timerValue * 60;
     setRemainingTime(seconds);
     setShowStartAnimation(true);
     setPlayerWordCounts({});
@@ -354,7 +358,9 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
         }
 
         setTableData(newTable);
-        const seconds = timerValue * 60;
+        const seconds = (hostSelectedGameMode === 'wheel-rush')
+          ? WHEEL_RUSH_DURATION_SEC
+          : timerValue * 60;
         setRemainingTime(seconds);
         setShowStartAnimation(true);
         setPlayerWordCounts({});
