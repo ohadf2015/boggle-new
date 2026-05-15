@@ -1,7 +1,11 @@
-import { describe, it, expect } from 'vitest';
-import { getBlastDictionary } from '../blast-dictionary';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { getBlastDictionary, clearBlastDictionaryCache } from '../blast-dictionary';
 
 describe('getBlastDictionary', () => {
+  beforeEach(() => {
+    clearBlastDictionaryCache();
+  });
+
   it('returns a predicate that validates real English words', async () => {
     const isWord = await getBlastDictionary('en');
     expect(isWord('CAT')).toBe(true);
@@ -45,5 +49,12 @@ describe('getBlastDictionary', () => {
     const isWord = await getBlastDictionary('ja');
     // Japanese test word (actual validation depends on dict content)
     expect(typeof (await getBlastDictionary('ja'))).toBe('function');
+  });
+
+  it('treats obscure dictionary words as valid (ACUS, ENG)', async () => {
+    const isWord = await getBlastDictionary('en');
+    // These ARE real dictionary words, even if uncommon
+    expect(isWord('ACUS')).toBe(true);
+    expect(isWord('ENG')).toBe(true);
   });
 });

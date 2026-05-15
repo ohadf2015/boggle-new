@@ -73,7 +73,10 @@ function fillEmpties(
   for (let c = 0; c < cols; c++) {
     for (let r = 0; r < heights[c]!; r++) {
       const id = `c${c}r${r}`;
-      if (!grid.cells[id as CellId]) out[id] = weightedLetter(config, prng);
+      if (!grid.cells[id as CellId]) {
+        // Pick a letter from the weighted distribution
+        out[id] = weightedLetter(config, prng);
+      }
     }
   }
   return out;
