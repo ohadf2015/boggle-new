@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
@@ -11,6 +11,12 @@ import { CascadeHUD } from '@/components/word-craft/cascade/CascadeHUD';
 import { CardPickScreen } from '@/components/word-craft/run/CardPickScreen';
 import { RoundResultScene } from '@/components/word-craft/run/RoundResultScene';
 import { RunResultScene } from '@/components/word-craft/run/RunResultScene';
+import {
+  trackCascadeCombo,
+  trackCascadeFireGameOver,
+  trackCascadeFireWarning,
+  trackCascadeWordSubmitted,
+} from '@/components/word-craft/cascade/cascadeTelemetry';
 
 export function CascadePageClient() {
   const { t, language } = useLanguage();
@@ -38,6 +44,85 @@ export function CascadePageClient() {
 
   const run = useCascadeRun({ seed: 1, dict, locale, boardSize });
   const { state } = run;
+
+  // ── Telemetry (single-emit per state transition, never on re-render) ──
+  const lastSubmitRef = useRef(state.lastSubmit);
+  useEffect(() => {
+    const submit = state.lastSubmit;
+    if (!submit || submit === lastSubmitRef.current) return;
+    lastSubmitRef.current = submit;
+    trackCascadeWordSubmitted({
+      round: state.round.round,
+      word: submit.word,
+      length: submit.word.length,
+      baseScore: submit.baseScore,
+      chainCount: 1 + submit.chainWords.length,
+      totalScore: submit.totalScore,
+      comboCountThisRound: state.cascadeChainsThisRound,
+    });
+    if (submit.chainWords.length > 0) {
+      trackCascadeCombo({
+        round: state.round.round,
+        chainCount: submit.chainWords.length,
+        totalScore: submit.totalScore,
+        chainWords: submit.chainWords,
+      });
+    }
+  }, [state.lastSubmit, state.round.round, state.cascadeChainsThisRound]);
+
+  const fireWarnedRoundRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (state.phase !== 'playing') return;
+    const halfway = state.fire.fireRow * 2 >= state.fire.totalRows;
+    if (!halfway) return;
+    if (fireWarnedRoundRef.current === state.round.round) return;
+    fireWarnedRoundRef.current = state.round.round;
+    const rowsLeft = state.fire.totalRows - state.fire.fireRow;
+    trackCascadeFireWarning({
+      round: state.round.round,
+      fireRow: state.fire.fireRow,
+      totalRows: state.fire.totalRows,
+      secondsToTop: Math.round((rowsLeft * state.fire.riseEveryMs) / 1000),
+    });
+  }, [
+    state.phase,
+    state.fire.fireRow,
+    state.fire.totalRows,
+    state.fire.riseEveryMs,
+    state.round.round,
+  ]);
+
+  // Reset the fire-warn dedup when a fresh round starts.
+  useEffect(() => {
+    if (state.phase === 'playing' && state.fire.fireRow === 0) {
+      fireWarnedRoundRef.current = null;
+    }
+  }, [state.phase, state.fire.fireRow]);
+
+  const lastRoundResultRef = useRef<'pending' | 'fired'>('pending');
+  useEffect(() => {
+    if (state.phase !== 'roundResult') {
+      lastRoundResultRef.current = 'pending';
+      return;
+    }
+    if (lastRoundResultRef.current === 'fired') return;
+    if (state.fire.fireRow < state.fire.totalRows) return; // not a fire game-over
+    lastRoundResultRef.current = 'fired';
+    trackCascadeFireGameOver({
+      round: state.round.round,
+      finalScore: state.round.score,
+      target: state.round.target,
+      passed: state.roundPassed,
+    });
+  }, [
+    state.phase,
+    state.fire.fireRow,
+    state.fire.totalRows,
+    state.round.round,
+    state.round.score,
+    state.round.target,
+    state.roundPassed,
+  ]);
 
   if (!dict) {
     return (
