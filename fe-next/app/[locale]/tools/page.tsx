@@ -3,7 +3,7 @@ import ToolsHubPageClient from './PageClient';
 import { getContent, type Locale } from './word-solver/content';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 
 type ValidLocale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 

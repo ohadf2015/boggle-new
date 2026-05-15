@@ -2,7 +2,7 @@ import FAQPageClient from './PageClient';
 import { loadTranslation } from '@/translations/loadTranslation';
 import { contentByLocale } from './content';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 import type { Metadata } from 'next';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 

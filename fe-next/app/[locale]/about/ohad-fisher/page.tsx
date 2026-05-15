@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 
 interface PageProps {
     params: Promise<{ locale: string }>;

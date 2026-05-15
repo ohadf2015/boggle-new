@@ -1,13 +1,10 @@
 import { notFound } from 'next/navigation';
-import { createClient } from '@/utils/supabase/server';
 import type { Locale } from '@/lib/blast/v2/types';
 import { buildRegistry, getLevelSourceForLevel } from '@/lib/blast/v2/level-source-registry';
 import { BlastV2PageClient } from './v2/BlastV2PageClient';
 import BlastLegacyPageClient from './legacy/PageClient';
 
 const VALID_LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
-
-const BLAST_V2_TESTERS = new Set<string>(['ohadf2015@gmail.com']);
 
 export default async function BlastPage({
   params,
@@ -23,13 +20,12 @@ export default async function BlastPage({
   }
   const locale = rawLocale as Locale;
 
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const email = user?.email?.toLowerCase() ?? null;
-  const isTester = email != null && BLAST_V2_TESTERS.has(email);
+  // V2 opt-in is now searchParam-only — was previously a Supabase auth lookup
+  // on every page load (50-200ms network roundtrip) checking a 1-email allowlist.
+  const explicitOptIn = resolvedSearch?.v2 === 'on' || resolvedSearch?.v2 === 'force';
   const explicitOptOut = resolvedSearch?.v2 === 'off';
   const devForceV2 = resolvedSearch?.v2 === 'force' && process.env.NODE_ENV !== 'production';
-  const useV2 = (isTester || devForceV2) && !explicitOptOut;
+  const useV2 = (explicitOptIn || devForceV2) && !explicitOptOut;
 
   if (useV2) {
     const registry = buildRegistry();

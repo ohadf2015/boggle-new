@@ -11,17 +11,11 @@ import GoogleAnalytics from '@/components/GoogleAnalytics';
 import PurpleAds from '@/components/PurpleAds';
 import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
-import PWAInstallPrompt from '@/components/PWAInstallPrompt';
-import AndroidAppRedirect from '@/components/AndroidAppRedirect';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
-import VersionChecker from '@/components/VersionChecker';
-import NewYearCountdown from '@/components/celebration/NewYearCountdown';
 import AnimationsLoader from '@/components/AnimationsLoader';
 import DictionaryPrewarmer from '@/components/DictionaryPrewarmer';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import { ToastContainer } from '@/components/ui/EnhancedToast';
-import { ChurnSignalTracker } from '@/components/engagement/ChurnSignalTracker';
-import SocialMediaPixels from '@/components/SocialMediaPixels';
 import { OfflineBanner } from '@/components/offline/OfflineBanner';
 import { OfflineSyncBridge } from '@/components/offline/OfflineSyncBridge';
 import { getLocalizedSchemaStrings } from '@/utils/seoLocalizedSchema';
@@ -42,6 +36,28 @@ const PushNotificationPrompt = nextDynamic(
 
 // Lazy-load cookie consent banner — only needed on first visit
 const CookieConsent = nextDynamic(() => import('@/components/CookieConsent'));
+
+// Non-critical components — deferred to keep landing-page JS small.
+// All are post-hydration effects that don't block first paint or LCP.
+const PWAInstallPrompt = nextDynamic(() => import('@/components/PWAInstallPrompt'), {
+  loading: () => null,
+});
+const AndroidAppRedirect = nextDynamic(() => import('@/components/AndroidAppRedirect'), {
+  loading: () => null,
+});
+const VersionChecker = nextDynamic(() => import('@/components/VersionChecker'), {
+  loading: () => null,
+});
+const NewYearCountdown = nextDynamic(() => import('@/components/celebration/NewYearCountdown'), {
+  loading: () => null,
+});
+const ChurnSignalTracker = nextDynamic(
+  () => import('@/components/engagement/ChurnSignalTracker').then(m => ({ default: m.ChurnSignalTracker })),
+  { loading: () => null }
+);
+const SocialMediaPixels = nextDynamic(() => import('@/components/SocialMediaPixels'), {
+  loading: () => null,
+});
 
 
 // Synchronously primes CSS vars from localStorage before paint to prevent CLS

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import ContactPageClient from './PageClient';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
