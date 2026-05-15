@@ -130,11 +130,13 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
     const accent = getAccent(rank);
     const isEliminated = isWordHunt && wordHuntStatus === 'eliminated';
 
-    // Cascading confetti burst for winner (rank 1)
+    // Cascading confetti burst for winner (rank 1) — short & restrained.
+    // Prior 2.5s cascade overlapped the podium reveal animations and felt
+    // overwhelming on repeated MP wins.
     useEffect(() => {
       if (rank !== 1 || reducedMotion) return;
       const timer = setTimeout(() => {
-        cancelConfettiRef.current = fireFirstWinConfetti(2500);
+        cancelConfettiRef.current = fireFirstWinConfetti(1200);
       }, 800);
       return () => {
         clearTimeout(timer);

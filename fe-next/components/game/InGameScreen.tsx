@@ -336,8 +336,13 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   useEffect(() => {
     if (!socket) return;
 
-    const handleGoldenLetters = (data: { goldenLetters?: Array<{ row: number; col: number }> }) => {
-      setGoldenLetters(data.goldenLetters ?? []);
+    const handleGoldenLetters = (data: { goldenLetters?: Array<{ row: number; col: number }>; reconnect?: boolean }) => {
+      // Only update when the payload explicitly carries goldenLetters. Reconnect /
+      // late-join startGame emits omit the field, which previously clobbered the
+      // existing golden tiles (stars vanished mid-game after a re-render).
+      if (data.goldenLetters !== undefined) {
+        setGoldenLetters(data.goldenLetters);
+      }
     };
 
     const handleRoundEventWarning = (data: { eventType: string }) => {
@@ -409,10 +414,11 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     };
   }, [socket]);
 
-  // Clear golden letters when game resets
-  useEffect(() => {
-    if (!gameActive) setGoldenLetters([]);
-  }, [gameActive]);
+  // Golden letters are now driven entirely by the server's startGame payload
+  // (which always includes the field, even as []). Don't pre-emptively clear
+  // when gameActive flickers — a transient false would wipe the tiles and the
+  // next round's payload re-broadcast is the only place that could restore
+  // them, which doesn't happen mid-round.
 
   // Ref to hold detected combo type from path (blast multiplayer)
   const comboTypeRef = useRef<string | null>(null);

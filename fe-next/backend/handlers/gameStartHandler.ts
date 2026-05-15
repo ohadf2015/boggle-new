@@ -117,9 +117,11 @@ function buildStartGamePayload(
     payload.wordHuntPlayerLives = game?.wordHuntState?.playerLives ?? {};
   }
 
-  if (game?.goldenLetters?.length) {
-    payload.goldenLetters = game.goldenLetters;
-  }
+  // Always include goldenLetters (even as []) on the fresh startGame payload so
+  // the client can distinguish "no goldens this round" from "reconnect with
+  // missing field". Reconnect / late-join / recovery emits add the field only
+  // when populated and the client treats omitted as "don't touch".
+  payload.goldenLetters = game?.goldenLetters ?? [];
 
   if (isRetry) {
     payload.retry = true;

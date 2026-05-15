@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo, useCallback, useDeferredValue, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { Socket } from 'socket.io-client';
 import { Button } from '../ui/button';
@@ -254,16 +254,19 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   // Desktop shell routing (standard mode only)
   const shellEnabled = useDesktopShellEnabled();
 
-  // Opponent word feed
+  // Opponent word feed. Defer the array + memoize the mapped shape so socket
+  // bursts of opponent words don't allocate a fresh insight array each render
+  // (which broke memo on every consumer downstream — esp. during local drag).
   const { feedItems: opponentFeedItems } = useOpponentWordFeed({ socket, currentPlayerName: username });
-  const opponentInsightWords = opponentFeedItems.map(item => ({
+  const deferredOpponentFeedItems = useDeferredValue(opponentFeedItems);
+  const opponentInsightWords = useMemo(() => deferredOpponentFeedItems.map(item => ({
     wordLength: item.wordLength,
     firstLetter: item.firstLetter,
     lastLetter: item.lastLetter,
     score: item.score,
     ts: item.timestamp,
     byUsername: item.playerName,
-  }));
+  })), [deferredOpponentFeedItems]);
 
   // Effective grid (player may have shufflingGrid fallback)
   const effectiveGrid = letterGrid || shufflingGrid || null;

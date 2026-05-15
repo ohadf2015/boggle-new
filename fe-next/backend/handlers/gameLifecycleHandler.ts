@@ -451,6 +451,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
           wordHuntEliminatedPlayers: game.wordHuntState.eliminatedPlayers || [],
           wordHuntPlayerLives: game.wordHuntState.playerLives || {},
         } : {}),
+        ...(game.goldenLetters?.length ? { goldenLetters: game.goldenLetters } : {}),
       });
     } else if (game.gameState === 'finished') {
       // Reconnecting to a finished game — resend results so the player sees the results screen

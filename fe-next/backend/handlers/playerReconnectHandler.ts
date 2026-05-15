@@ -262,6 +262,11 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
       reconnectPayload.wordHuntPlayerLives = game.wordHuntState.playerLives || {};
     }
 
+    // Replay golden letters so star tiles aren't lost on reconnect.
+    if (game.goldenLetters?.length) {
+      reconnectPayload.goldenLetters = game.goldenLetters;
+    }
+
     socket.emit('startGame', reconnectPayload);
 
     // Send current leaderboard and player's achievements so UI is fully restored
@@ -326,6 +331,11 @@ function handleLateJoin(socket: Socket, game: GameState, gameCode: string, usern
     lateJoinPayload.wordHuntTargetLength = game.wordHuntState.targetWordLength ?? 0;
     lateJoinPayload.wordHuntEliminatedPlayers = game.wordHuntState.eliminatedPlayers || [];
     lateJoinPayload.wordHuntPlayerLives = game.wordHuntState.playerLives || {};
+  }
+
+  // Include golden letters for late joiners so they see the star tiles too.
+  if (game.goldenLetters?.length) {
+    lateJoinPayload.goldenLetters = game.goldenLetters;
   }
 
   socket.emit('startGame', lateJoinPayload);
