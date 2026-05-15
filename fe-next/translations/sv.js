@@ -180,16 +180,16 @@ const sv = {
       "ogDescription": "Designa ett ordpussel, dela med vänner och publicera till LexiClash-gemenskapen."
     },
     "education": {
-      "title": "LexiClash Utbildning - Ordspel för Klassrum & Lärare",
-      "description": "Använd ordspel i klassrummet! LexiClash Utbildning hjälper lärare skapa ordförrådslektioner och följa elevernas framsteg.",
-      "ogTitle": "LexiClash Utbildning - Ordspel för Klassrum",
-      "ogDescription": "Ordspel för klassrum! Skapa lektioner, följ framsteg och gör ordlärande roligt."
+      "title": "LexiClash för lärare — Ordspel för klassrummet",
+      "description": "Lärare: skapa ordförrådslektioner, starta live-spel och spåra elevernas framsteg — helt utan annonser.",
+      "ogTitle": "LexiClash för lärare — Ordspel för klassrummet",
+      "ogDescription": "Ordspel för klassrummet. Skapa lektioner, starta live-spel, följ framsteg. Helt reklamfritt."
     },
     "educationClassroomGame": {
-      "title": "Ordspel för Klassrum Live - Lärardashboard | LexiClash",
-      "description": "Starta ett live-ordspel för klassrummet. Lärardashboarden kör en flerspelarrunda i realtid — elever ansluter från valfri enhet, ingen registrering.",
-      "ogTitle": "Ordspel för Klassrum Live - Lärardashboard",
-      "ogDescription": "Starta en flerspelarrunda för klassen — anslut från valfri enhet, ingen registrering."
+      "title": "Klassrumsspel — Lärarpanel i realtid | LexiClash",
+      "description": "Starta live-ordspel för hela klassen direkt från lärarpanelen. Eleverna ansluter från vilken enhet som helst — ingen registrering krävs.",
+      "ogTitle": "Klassrumsspel — Start nu",
+      "ogDescription": "Starta ett live-ordspel för klassen på sekunder. Eleverna ansluter utan registrering."
     },
     "dailyArchive": {
       "title": "Dagliga Utmaningens Arkiv - Tidigare Ordpussel & Topplistor | LexiClash",
@@ -336,16 +336,16 @@ const sv = {
       "ogDescription": "Spela ordspel från din telefon i realtid!"
     },
     "educationHub": {
-      "title": "Utbildningscenter — Ordspel för klassrum och lärare",
-      "description": "Använd LexiClash i ditt klassrum! Skapa ordspelslektioner, följ elevernas ordförråd och gör lärandet roligt.",
-      "ogTitle": "LexiClash utbildningscenter",
-      "ogDescription": "Ordspel för klassrum — skapa lektioner, följ framsteg!"
+      "title": "LexiClash för lärare — Klassrumscenter",
+      "description": "Skapa lektioner, starta live-spel, spåra elevernas framsteg. All ordförrådsinlärning på ett ställe — helt utan annonser.",
+      "ogTitle": "Klassrumscenter — LexiClash",
+      "ogDescription": "För lärare som vill göra ordförrådsinlärningen engagerande och rolig."
     },
     "educationDuels": {
-      "title": "Ordförrådsdueller — Elev mot elev ordstrider",
-      "description": "Utmana klasskamrater till ordförrådsdueller! 1-mot-1 ordstrider i realtid som testar stavning och snabbtänkande.",
-      "ogTitle": "Ordförrådsdueller - LexiClash utbildning",
-      "ogDescription": "1-mot-1 ordstrider för ordförrådsträning!"
+      "title": "Orddueller — Elev mot elev | LexiClash",
+      "description": "Elever kan utmana varandra i 1-mot-1-ordstrider för att träna ordförråd och stavning i realtid.",
+      "ogTitle": "Orddueller för klassrummet",
+      "ogDescription": "Låt elever tävla mot varandra i orddueller — engagerande ordförrådsträning."
     },
     "communityBoard": {
       "title": "Community-pussel — Spelarskapat ordpussel",
@@ -5932,7 +5932,8 @@ const sv = {
       "scopeCombined": "Kombinerat",
       "scopeWordHunt": "Ordjakt",
       "scopeWordWheel": "Ordhjul",
-      "loadError": "Kunde inte ladda topplistan — tryck igen"
+      "loadError": "Kunde inte ladda topplistan — tryck igen",
+      "seeWords": "Visa ord"
     },
     "shareMessage": {
       "header": "LexiClash Ordjakt #{number}",
@@ -9977,134 +9978,134 @@ const sv = {
       "title": "LexiClash Utbildning",
       "startGame": "Starta spel",
       "hero": {
-        "eyebrow": "För lärare i engelska, hebreiska, svenska, japanska och spanska klassrum",
-        "h1": "Ordspelsplattformen byggd för ditt språk — inte översatt till det.",
-        "sub": "Multiplayer-spel, hjärnövningar och 6 spellägen. Helt reklamfritt för elever. Kostnadsfritt för lärare — få åtkomst på 60 sekunder.",
-        "cta_primary": "Begär lärargång",
-        "cta_secondary": "Se det i aktion"
+        "eyebrow": "För ordundervisning på svenska, hebreiska, japanska, engelska och spanska",
+        "h1": "Ordspel byggt för ditt språk, inte översatt från engelska.",
+        "sub": "6 spellägen, multiplayer, hjärnövningar. Noll annonser för eleverna. Gratis för verifierade lärare.",
+        "cta_primary": "Få lärargång",
+        "cta_secondary": "Visa demo"
       },
       "moat": {
-        "title": "Varför lärare runt om i världen väljer LexiClash",
-        "subtitle": "Tre särdrag vi levererar på — inte bara påstår.",
+        "title": "Varför lärare väljer LexiClash framför Kahoot, Quizlet och Wordwall",
+        "subtitle": "Tre löften vi håller — inte bara påstår.",
         "native_multilingual": {
           "tag": "Inbyggt",
-          "title": "Byggt för ditt språk",
-          "body": "Hebreiska höger-till-vänster, japanska med kana och IME, svenska sammansatta ord, spanska accenter — allt är implementerat i motorn. Ingen Google Translate."
+          "title": "Verkligt flerspråkigt",
+          "body": "Hebreiska höger-till-vänster, japanska IME och kana, svenska sammansatta ord (ordspel, inte ord-spel), spanska accenter — allt i motorn, inte Google Translate."
         },
         "local_inventory": {
           "tag": "Lokalt",
-          "title": "Ord från din egen region",
-          "body": "Ordlistor från Wikipedia och lokala ordböcker — hebreiska Milog, svensk normalordbok. Dina elever lär sig ord från sitt eget land, inte gamla amerikanska läromedel."
+          "title": "Ord från elevernas egen ordbok",
+          "body": "Svenska ordlistor från normalordbok, hebreiska från Milog, japanska från JMdict — inte gamla amerikanska läromedel. Eleverna lär sig ord som faktiskt används i deras språk."
         },
         "ad_free": {
           "tag": "Reklamfritt",
-          "title": "Helt reklamfritt för elever",
-          "body": "Kahoot, Quizlet, Blooket — visa alla annonser för eleverna. Vi lovar: noll annonser på alla utbildningsvägar. COPPA och GDPR-anpassat."
+          "title": "Noll annonser för eleverna",
+          "body": "Kahoot, Quizlet och Blooket visar annonser. Vi gör inte det. COPPA och GDPR anpassad. Löfte: ingen tracking, ingen annonsering på utbildningsdelarna."
         }
       },
       "modes": {
-        "title": "6 spellägen på en plattform — byt för att slå monotonin",
+        "title": "Sex spellägen — varje elev lär på sitt sätt",
         "teaches": "Tränar",
         "classroom_game": {
           "tag": "Live",
-          "title": "Klassrumsspelet",
-          "body": "Live ordletande för hela klassen på en gång.",
-          "teaches": "Ordförråd, stavning, reaktionshastighet"
+          "title": "Klassrumsspel",
+          "body": "Hela klassen söker ord samtidigt på samma bräde. Du ser vem som ligger före i realtid.",
+          "teaches": "Ordförråd, stavning, snabbhet"
         },
         "vocab_duels": {
           "tag": "Duell",
-          "title": "Orddueller",
-          "body": "Ordutmaningar mellan två spelare — async eller live.",
-          "teaches": "Ordminne, återkallelse"
+          "title": "1 mot 1 orddueller",
+          "body": "Två elever tävlar asynkront eller live. Perfekt för att svara på utmaningar mellan kompisar.",
+          "teaches": "Ordåterkallelse, stavning"
         },
         "brain_drills": {
           "tag": "Hjärna",
           "title": "Hjärnövningar",
-          "body": "Minnesspel, uppmärksamhet, bearbetningshastighet.",
-          "teaches": "Kognitiv träning"
+          "body": "Minnesspel, mönsterigenkänning, snabbhet. Tränar fokus och kognitiv flexibilitet.",
+          "teaches": "Arbetsminne, uppmärksamhet"
         },
         "daily_wordhunt": {
           "tag": "Daglig",
-          "title": "Dagens ordjakt",
-          "body": "Ny pussel varje dag med lokal poängtavla.",
-          "teaches": "Daglig rutinövning"
+          "title": "Ordjakt varje dag",
+          "body": "Ett nytt pussel för alla varje dag. Eleverna jämför resultat och håller en svit.",
+          "teaches": "Daglig praktik, rutinuppbyggnad"
         },
         "adventure": {
           "tag": "Äventyr",
-          "title": "Äventyrsläget",
-          "body": "Ordpussel i berättelser och olika världar.",
-          "teaches": "Ordförrådsdjup"
+          "title": "Ordäventyr",
+          "body": "Pussellika gameplay i 10 världar. Eleverna utvecklar ordförråd genom progression.",
+          "teaches": "Djupare ordförrådskunskap"
         },
         "spelling_bee": {
           "tag": "Stavning",
-          "title": "Stavningsträning",
-          "body": "Röststyrd stavningsträning på flera språk.",
-          "teaches": "Stavning"
+          "title": "Stavningsövning",
+          "body": "Röststyrd stavning på svenska, hebreiska, japanska, engelska och spanska.",
+          "teaches": "Stavning genom lyssnande"
         }
       },
       "compare": {
-        "title": "Så skiljer sig LexiClash",
-        "subtitle": "Ärlig jämförelse — bara faktiska skillnader.",
+        "title": "Jämförelse med konkurrenter",
+        "subtitle": "Varför LexiClash skiljer sig åt",
         "col": {
           "lexiclash": "LexiClash",
-          "kahoot": "Kahoot!",
+          "kahoot": "Kahoot",
           "quizlet": "Quizlet",
           "wordwall": "Wordwall"
         },
         "row": {
-          "native_multilingual": "Inbyggt flerspråkigt (RTL, IME mm)",
-          "ad_free_students": "Reklamfritt för elever",
-          "live_multiplayer": "Live multiplayer",
-          "brain_training": "Hjärnövningar",
-          "game_variety": "6+ spellägen",
-          "free_for_teachers": "Kostnadsfritt för verifierade lärare"
+          "native_multilingual": "RTL, IME, regionala ordböcker",
+          "ad_free_students": "Noll annonser för elever",
+          "live_multiplayer": "Multiplayer ordspel",
+          "brain_training": "Hjärnövningar (minne, fokus)",
+          "game_variety": "6 olika spellägen",
+          "free_for_teachers": "Gratis för verifierade lärare"
         }
       },
       "trust": {
-        "title": "Byggt på förtroende",
-        "bullet1": "Noll annonser på elevplattformens alla delar.",
-        "bullet2": "GDPR-anpassat. Telemetri bara efter ditt godkännande.",
-        "bullet3": "COPPA-certifierat för barn under 13 år."
+        "title": "Elevernas säkerhet är vår prioritet",
+        "bullet1": "Noll annonser på alla utbildningsdelar.",
+        "bullet2": "GDPR och COPPA anpassad. Ingen tracking utan tillåtelse.",
+        "bullet3": "Säker för barn från 6 år och uppåt."
       },
       "faq": {
-        "title": "Vanliga frågor",
+        "title": "Vanliga frågor från lärare",
         "q1": {
-          "q": "Hur blir man lärare på LexiClash?",
-          "a": "Ansök på /education/access. Vi granskar per e-post och svarar oftast inom 24 timmar."
+          "q": "Hur får jag lärargång?",
+          "a": "Ansök på education/access — det tar två minuter. Vi granskar och svarar oftast inom 24 timmar."
         },
         "q2": {
-          "q": "Är det verkligen gratis?",
-          "a": "Ja — helt gratis för verifierade lärare, noll annonser på elevdelar."
+          "q": "Kostar det något?",
+          "a": "Nej. Helt gratis för verifierade lärare. Noll kostnader, noll annonser."
         },
         "q3": {
-          "q": "Fungerar det på hebreiska, japanska, svenska och spanska?",
-          "a": "Ja — fullt stöd inklusive hebreiska höger-till-vänster och japansk kana/IME. Inbyggt, inte översatt."
+          "q": "Stöder LexiClash hebreiska, japanska, svenska och spanska?",
+          "a": "Ja — fullt stöd. Hebreiska höger-till-vänster, japansk IME och kana, svenska sammansatta ord — allt är inbyggt."
         },
         "q4": {
-          "q": "Hur skyddar ni elevernas integritet?",
-          "a": "COPPA- och GDPR-anpassat. Ingen annonsspårning på undervisningsdelarna. Telemetri endast efter elevens godkännande."
+          "q": "Är det säkert för barn?",
+          "a": "Ja. GDPR och COPPA anpassad. Ingen tracking, ingen annonsspårning, ingen personlig data sprids."
         },
         "q5": {
-          "q": "Behöver eleverna ett konto?",
-          "a": "Nej — de flesta lägen går att spela som gäst utan registrering."
+          "q": "Måste eleverna skapa ett konto?",
+          "a": "Nej. De flesta spel spelar utan inloggning. Klassrumskoden räcker."
         },
         "q6": {
-          "q": "Hur skiljer LexiClash från Kahoot, Quizlet eller Wordwall?",
-          "a": "Inbyggt flerspråkigt stöd, löfte om reklamfritt, 6 spellägen på en plattform, och ordförråd från elevers eget land."
+          "q": "Vad gör LexiClash annorlunda?",
+          "a": "Sex spellägen, verkligt flerspråkigt, noll annonser, ordförråd från elevernas eget språk — och det kostar ingenting för lärare."
         },
         "q7": {
-          "q": "Kan jag se hur mina elever gör framsteg?",
-          "a": "Ja — lärarpanelen visar detaljerad statistik per elev och klass."
+          "q": "Kan jag följa elevernas framsteg?",
+          "a": "Ja. Lärarpanelen visar detaljerad statistik per elev och per klass — träffackerhet, ordförråd, sviter och mer."
         },
         "q8": {
-          "q": "Spelar det på Chromebook, tablet och telefon?",
-          "a": "Ja — webbgame, inget att installera."
+          "q": "Spelar det på Chromebook och telefon?",
+          "a": "Ja. Det är en webbapp — inget att installera. Fungerar överallt."
         }
       },
       "cta": {
-        "title": "Dags att ta LexiClash till klassrummet?",
-        "body": "Ansök om kostnadsfri lärargång — tar 60 sekunder och godkänns oftast samma dag.",
-        "button": "Begär lärargång"
+        "title": "Redo att börja?",
+        "body": "Två minuter att ansöka. Svar oftast samma dag. Sedan får du tillgång till alla lärarverktyg.",
+        "button": "Ansök nu"
       },
       "esl-word-games": {
         "course_name": "Ordspel för ESL och språkundervisning",
@@ -10303,9 +10304,9 @@ const sv = {
     },
     "teacher": {
       "activeGames": "aktiva spel",
-      "noActiveGames": "Inga aktiva spel",
-      "welcome_banner_title": "Du är godkänd! 🎉",
-      "welcome_banner_body": "Lärarkontot är klart. Du kan nu skapa klasser, starta spel och följa elevernas framsteg.",
+      "noActiveGames": "Inga aktiva spel just nu",
+      "welcome_banner_title": "Välkommen, lärare!",
+      "welcome_banner_body": "Du är nu godkänd. Skapa ditt första klassrum, lägg till elever och starta ett spel.",
       "welcome_banner_dismiss": "Stäng"
     },
     "wordOfTheDay": {
@@ -10389,47 +10390,47 @@ const sv = {
       }
     },
     "access": {
-      "h1": "Begär kostnadsfri lärargång",
-      "lede": "Berätta kort om vad du undervisar. Vi granskar per e-post och svarar oftast inom 24 timmar.",
-      "full_name": "Ditt namn",
-      "email": "E-postadress",
+      "h1": "Begär gratis lärargång",
+      "lede": "Fyll formuläret — tar två minuter. Vi granskar din ansökan och mailar ett svar samma dag oftast.",
+      "full_name": "Dit namn",
+      "email": "Din e-postadress",
       "role": "Din roll",
       "role_teacher": "Lärare",
-      "role_tutor": "Handledare/studierådgivare",
-      "role_admin": "Skolledare",
-      "role_parent": "Förälder/hemundervisning",
+      "role_tutor": "Handledare",
+      "role_admin": "Skolledare/rektor",
+      "role_parent": "Hemundervisning",
       "role_researcher": "Forskare",
       "role_other": "Annat",
-      "school_or_org": "Din skola eller organisation (valfritt)",
-      "country": "Ditt land (valfritt)",
-      "use_case": "Hur tänker du använda LexiClash? (10–800 tecken)",
+      "school_or_org": "Skola/organisation (valfritt)",
+      "country": "Land (valfritt)",
+      "use_case": "Hur tänker du använda LexiClash i ditt klassrum? (10–800 tecken)",
       "submit": "Skicka ansökan",
       "submitting": "Skickar…",
-      "submit_error": "Någonting gick fel. Försök igen senare.",
-      "rate_limited": "För många försök. Vänta 24 timmar och försök senare.",
-      "success_title": "Tack — vi mottog din ansökan!",
-      "success_body": "Vi granskar den och mailar dig ett svar.",
-      "success_next": "Vi granskar din ansökan och mailar dig inom 1–2 arbetsdagar. Du kan stänga denna sida.",
+      "submit_error": "Något gick fel. Försök igen senare.",
+      "rate_limited": "För många försök. Vänta 24 timmar.",
+      "success_title": "Ansökan mottagen!",
+      "success_body": "Vi granskar den och mailar dig snart.",
+      "success_next": "Vi mailar dig ett svar inom 1–2 arbetsdagar. Du kan stänga denna sida.",
       "pending_title": "Din ansökan granskas",
-      "pending_body": "Vi mottog den. Du hör från oss snart.",
-      "declined_title": "Godkännandet avslogs denna gång",
-      "declined_reapply": "Du kan ansöka igen när som helst. Fler frågor? Kontakta oss.",
+      "pending_body": "Vi undersöker den. Du hörs från oss snart.",
+      "declined_title": "Din ansökan avslogs denna gång",
+      "declined_reapply": "Du kan ansöka igen senare. Fler frågor? Mejla oss.",
       "submitted_on": "Skickad",
-      "already_approved_title": "Du har redan åtkomst!",
-      "go_to_teacher": "Gå till lärarpanelen",
+      "already_approved_title": "Du är redan godkänd!",
+      "go_to_teacher": "Till lärarpanelen",
       "next": {
-        "step1_title": "Ansöka",
-        "step1_body": "Fyll formuläret — tar en minut.",
-        "step2_title": "Vi granskar",
-        "step2_body": "En faktisk person läser varje ansökan. Oftast samma dag.",
-        "step3_title": "Du är godkänd",
-        "step3_body": "E-postbekräftelse + omedelbar åtkomst."
+        "step1_title": "Steg 1: Ansöka",
+        "step1_body": "Fyll formuläret. Två minuter.",
+        "step2_title": "Steg 2: Vi granskar",
+        "step2_body": "En människa läser varje ansökan. Oftast samma dag.",
+        "step3_title": "Steg 3: Du får åtkomst",
+        "step3_body": "Mejlbekräftelse + omedelbar åtkomst till alla lärarverktyg."
       },
       "regular_game_title": "Inte lärare?",
-      "regular_game_body": "LexiClash är helt gratis. Spela ett vanligt spel och återkom när du vill klassrumsverktyg.",
+      "regular_game_body": "Spela LexiClash gratis. Börja här, ansök om lärargång senare.",
       "try_mp": "Spela multiplayer",
       "try_blast": "Prova Blast",
-      "try_daily": "Dagliga utmaningar"
+      "try_daily": "Daglig utmaning"
     }
   },
   "crazygames": {

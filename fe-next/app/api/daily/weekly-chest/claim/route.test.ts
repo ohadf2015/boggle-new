@@ -10,36 +10,28 @@ vi.mock('@/backend/services/economy/awardCoins', () => ({
 
 vi.mock('@/lib/daily/weeklyChest', () => ({
   computeCycleProgress: vi.fn(),
-  computeWeekScore: vi.fn(),
-  getChestTier: vi.fn(),
+  computeChestTierForCycle: vi.fn(),
 }))
 
 import { createClient } from '@/utils/supabase/server'
 import { awardCoinsServer } from '@/backend/services/economy/awardCoins'
-import { computeCycleProgress, computeWeekScore, getChestTier } from '@/lib/daily/weeklyChest'
+import {
+  computeCycleProgress,
+  computeChestTierForCycle,
+} from '@/lib/daily/weeklyChest'
 import { POST } from './route'
 
 // Helper to create a chainable mock for Supabase query builder
 function createChainableMock(data: unknown) {
+  const leaf = { data, error: null }
   const mock = {
     eq: vi.fn().mockReturnValue({
-      data,
-      error: null,
-      eq: vi.fn().mockResolvedValue({
-        data,
-        error: null,
-      }),
+      ...leaf,
+      eq: vi.fn().mockResolvedValue(leaf),
+      gt: vi.fn().mockResolvedValue(leaf),
     }),
   }
   return mock
-}
-
-function createSelectMock(tableResponses: Record<string, unknown>) {
-  return {
-    select: vi.fn().mockImplementation((columns: string) =>
-      createChainableMock(tableResponses)
-    ),
-  }
 }
 
 describe('POST /api/daily/weekly-chest/claim', () => {
@@ -247,8 +239,7 @@ describe('POST /api/daily/weekly-chest/claim', () => {
       daysCompleted: 7,
       isClaimable: true,
     })
-    vi.mocked(computeWeekScore).mockReturnValue(75)
-    vi.mocked(getChestTier).mockReturnValue('gold')
+    vi.mocked(computeChestTierForCycle).mockReturnValue({ weekScore: 75, tier: 'gold' })
 
     const res = await POST()
     expect(res.status).toBe(200)
@@ -365,8 +356,7 @@ describe('POST /api/daily/weekly-chest/claim', () => {
       daysCompleted: 7,
       isClaimable: true,
     })
-    vi.mocked(computeWeekScore).mockReturnValue(55)
-    vi.mocked(getChestTier).mockReturnValue('silver')
+    vi.mocked(computeChestTierForCycle).mockReturnValue({ weekScore: 55, tier: 'silver' })
 
     const res = await POST()
     expect(res.status).toBe(200)

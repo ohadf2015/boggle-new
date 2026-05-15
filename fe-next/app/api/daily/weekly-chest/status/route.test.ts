@@ -38,9 +38,11 @@ function makeMockSupabase(opts: {
       if (table === 'daily_puzzle_attempts') {
         return {
           select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockResolvedValue({
-              data: opts.puzzleAttempts ?? [],
-              error: null,
+            eq: vi.fn().mockReturnValue({
+              gt: vi.fn().mockResolvedValue({
+                data: opts.puzzleAttempts ?? [],
+                error: null,
+              }),
             }),
           }),
         }
@@ -48,9 +50,11 @@ function makeMockSupabase(opts: {
       if (table === 'daily_word_hunt_attempts') {
         return {
           select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockResolvedValue({
-              data: opts.huntAttempts ?? [],
-              error: null,
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({
+                data: opts.huntAttempts ?? [],
+                error: null,
+              }),
             }),
           }),
         }
@@ -58,9 +62,11 @@ function makeMockSupabase(opts: {
       if (table === 'daily_word_wheel_attempts') {
         return {
           select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockResolvedValue({
-              data: opts.wheelAttempts ?? [],
-              error: null,
+            eq: vi.fn().mockReturnValue({
+              gt: vi.fn().mockResolvedValue({
+                data: opts.wheelAttempts ?? [],
+                error: null,
+              }),
             }),
           }),
         }
