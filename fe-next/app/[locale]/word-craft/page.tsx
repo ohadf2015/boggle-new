@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import WordCraftPageClient from './PageClient';
+import { GameGate } from './GameGate';
 
 export const metadata = {
   title: 'WordCraft Beta — LexiClash',
@@ -9,7 +9,7 @@ export const metadata = {
 export default function WordCraftPage() {
   return (
     <Suspense>
-      <WordCraftPageClient />
+      <GameGate />
     </Suspense>
   );
 }

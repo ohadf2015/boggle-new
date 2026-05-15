@@ -11869,6 +11869,37 @@ const en = {
         "overflow": { "name": "Overflow", "desc": "Score over the target carries 10% as a bonus." },
         "letterHoard": { "name": "Letter Hoard", "desc": "Your rack holds 10 tiles instead of 8." }
       }
+    },
+    "cascade": {
+      "intro": {
+        "title": "WordCraft Cascade",
+        "howTo": "Swipe a path through adjacent letters to spell a word. Burn tiles, trigger cascades, outrun the fire row.",
+        "start": "Start Cascade"
+      },
+      "endRound": "End round",
+      "combo": {
+        "chain": "Combo x{{n}}",
+        "double": "DOUBLE!",
+        "triple": "TRIPLE!",
+        "electric": "ELECTRIC!"
+      },
+      "fireWarning": "Fire rising — clear a long word!",
+      "error": {
+        "TOO_SHORT": "Word needs at least 3 letters.",
+        "NOT_CONTIGUOUS": "Letters must be adjacent.",
+        "REUSED_CELL": "Each letter can only be used once.",
+        "UNKNOWN_CELL": "That tile doesn't exist.",
+        "EMPTY_CELL": "Path goes through a burned tile.",
+        "INVALID_WORD": "Not a word."
+      },
+      "card": {
+        "pyro": { "name": "Pyro", "desc": "Words of 5+ letters burn one extra random tile." },
+        "frost": { "name": "Frost", "desc": "Words of 6+ letters pause the fire for 8 seconds." },
+        "diagonal": { "name": "Diagonal", "desc": "Swipe paths may include diagonal steps." },
+        "echo": { "name": "Echo", "desc": "First auto-cascade per round scores triple." },
+        "emberBoost": { "name": "Ember Boost", "desc": "Words score double when the fire is past halfway." },
+        "staticSpark": { "name": "Static Spark", "desc": "Every word gets +5 flat chips." }
+      }
     }
   },
   mp: {

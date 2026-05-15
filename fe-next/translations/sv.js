@@ -11993,6 +11993,37 @@ const sv = {
         "overflow": { "name": "Överflöd", "desc": "Poäng över målet ger 10% som bonus." },
         "letterHoard": { "name": "Bokstavslager", "desc": "Ditt ställ rymmer 10 brickor istället för 8." }
       }
+    },
+    "cascade": {
+      "intro": {
+        "title": "WordCraft Cascade",
+        "howTo": "Svep genom angränsande bokstäver för att stava ett ord. Bränn brickor, utlös sammanfall, springa före eldlinjen.",
+        "start": "Starta Cascade"
+      },
+      "endRound": "Avsluta runda",
+      "combo": {
+        "chain": "Combo x{{n}}",
+        "double": "DUBBEL!",
+        "triple": "TRIPPEL!",
+        "electric": "ELEKTRISK!"
+      },
+      "fireWarning": "Eld stiger — rensa ett långt ord!",
+      "error": {
+        "TOO_SHORT": "Ordet behöver minst 3 bokstäver.",
+        "NOT_CONTIGUOUS": "Bokstäver måste vara intill varandra.",
+        "REUSED_CELL": "Varje bokstav kan bara användas en gång.",
+        "UNKNOWN_CELL": "Den brickan finns inte.",
+        "EMPTY_CELL": "Vägen går genom en bränd bricka.",
+        "INVALID_WORD": "Det är inte ett ord."
+      },
+      "card": {
+        "pyro": { "name": "Pyro", "desc": "Ord med 5+ bokstäver bränner en extra slumpmässig bricka." },
+        "frost": { "name": "Frost", "desc": "Ord med 6+ bokstäver pausar elden i 8 sekunder." },
+        "diagonal": { "name": "Diagonal", "desc": "Svepvägar får inkludera diagonala steg." },
+        "echo": { "name": "Eko", "desc": "Första auto-sammanfall per runda ger tredubbel poäng." },
+        "emberBoost": { "name": "Glödande boost", "desc": "Ord ger dubbel poäng när elden är halvvägs." },
+        "staticSpark": { "name": "Statisk gnista", "desc": "Varje ord får +5 fasta marker." }
+      }
     }
   },
   mp: {
