@@ -22,6 +22,7 @@ const setHost = (hostname: string) => {
 
 describe('PurpleAds', () => {
   const originalEnv = process.env.NODE_ENV;
+  const originalEnabled = process.env.NEXT_PUBLIC_PURPLEADS_ENABLED;
   let win: WinExt;
 
   beforeEach(() => {
@@ -31,17 +32,29 @@ describe('PurpleAds', () => {
     setHost('lexiclash.live');
     // @ts-expect-error override readonly
     process.env.NODE_ENV = 'production';
+    process.env.NEXT_PUBLIC_PURPLEADS_ENABLED = 'true';
   });
 
   afterEach(() => {
     // @ts-expect-error restore
     process.env.NODE_ENV = originalEnv;
+    if (originalEnabled === undefined) {
+      delete process.env.NEXT_PUBLIC_PURPLEADS_ENABLED;
+    } else {
+      process.env.NEXT_PUBLIC_PURPLEADS_ENABLED = originalEnabled;
+    }
     vi.restoreAllMocks();
   });
 
-  it('renders script on production web host', () => {
+  it('renders script on production web host when enabled', () => {
     const { queryByTestId } = render(<PurpleAds />);
     expect(queryByTestId('purpleads-script')).not.toBeNull();
+  });
+
+  it('skips when NEXT_PUBLIC_PURPLEADS_ENABLED is not "true" (kill switch)', () => {
+    delete process.env.NEXT_PUBLIC_PURPLEADS_ENABLED;
+    const { queryByTestId } = render(<PurpleAds />);
+    expect(queryByTestId('purpleads-script')).toBeNull();
   });
 
   it('skips in development', () => {

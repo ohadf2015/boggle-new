@@ -21,6 +21,10 @@ export function PurpleAds() {
   const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
+    // Kill switch: NEXT_PUBLIC_PURPLEADS_ENABLED must be "true" to load.
+    // app.purpleads.io DNS went dead 2026-05-15 (ERR_NAME_NOT_RESOLVED);
+    // default-off until URL/DNS verified — flip env to re-enable.
+    if (process.env.NEXT_PUBLIC_PURPLEADS_ENABLED !== 'true') return;
     if (process.env.NODE_ENV === 'development') return;
 
     const w = window as WinExt;
