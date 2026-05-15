@@ -2093,6 +2093,10 @@ const sv = {
     "newMessages": "Nya meddelanden"
   },
   "results": {
+    "playOneMore": {
+      "same": "Spela igen",
+      "random": "Prova nytt läge"
+    },
     "results": "Stridsrapport",
     "share": "Skryt",
     "yourProgress": "Hur det gick",

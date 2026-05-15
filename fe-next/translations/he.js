@@ -2107,6 +2107,10 @@ const he = {
     "newMessages": "הודעות חדשות"
   },
   "results": {
+    "playOneMore": {
+      "same": "סבב נוסף",
+      "random": "נסו מצב חדש"
+    },
     "results": "דו״ח קרב",
     "share": "תתגאו",
     "yourProgress": "ההתקדמות שלך",

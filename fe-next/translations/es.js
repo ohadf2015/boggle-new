@@ -2022,6 +2022,10 @@ const es = {
     "newMessages": "Mensajes nuevos"
   },
   "results": {
+    "playOneMore": {
+      "same": "Jugar otra vez",
+      "random": "Probar otro modo"
+    },
     "results": "Reporte de Batalla",
     "share": "Presumir",
     "yourProgress": "Tu Progreso",

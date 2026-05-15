@@ -2081,6 +2081,10 @@ const ja = {
     "newMessages": "新メッセージ"
   },
   "results": {
+    "playOneMore": {
+      "same": "もう一度プレイ",
+      "random": "別のモードを試す"
+    },
     "results": "バトルレポート",
     "share": "自慢する",
     "yourProgress": "今回の成績",

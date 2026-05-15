@@ -2197,6 +2197,10 @@ const en = {
     "newMessages": "New messages"
   },
   "results": {
+    "playOneMore": {
+      "same": "Play again",
+      "random": "Try a new mode"
+    },
     "results": "Battle Report",
     "share": "Brag",
     "yourProgress": "How You Did",

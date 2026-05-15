@@ -98,6 +98,10 @@ export type GrowthEvent =
   | 'rewarded_ad_offered'
   | 'rewarded_ad_watched'
   | 'rewarded_ad_declined'
+  // Play-one-more CTA (`play-one-more-cta` experiment). Fires on render
+  // for non-control variants + on click.
+  | 'play_one_more_offered'
+  | 'play_one_more_clicked'
   // Preference
   | 'language_changed'
   // Onboarding funnel
