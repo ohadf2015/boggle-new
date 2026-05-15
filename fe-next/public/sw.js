@@ -5,7 +5,7 @@
 // list, or static asset URLs. The `activate` handler below deletes any
 // cache whose name !== CACHE_NAME, so bumping the version reliably evicts
 // stale assets for returning users. Format: lexiclash-v{MAJOR}-{YYYYMMDD}.
-const CACHE_NAME = 'lexiclash-v3-20260425';
+const CACHE_NAME = 'lexiclash-v4-20260515';
 
 // Cacheable: status 200 only, basic/default response type, GET requests.
 // Rejects 206 (Range), 0 (opaque), redirects, and CORS-restricted responses
@@ -129,7 +129,7 @@ self.addEventListener('fetch', (event) => {
           }
           return response;
         })
-        .catch(() => caches.match(request))
+        .catch(() => caches.match(request).then((cached) => cached || Response.error()))
     );
     return;
   }
@@ -145,7 +145,7 @@ self.addEventListener('fetch', (event) => {
           }
           return response;
         })
-        .catch(() => cached);
+        .catch(() => cached || Response.error());
       return cached || fetchPromise;
     })
   );
