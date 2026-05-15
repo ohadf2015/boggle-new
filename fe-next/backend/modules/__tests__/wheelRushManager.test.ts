@@ -8,7 +8,8 @@ import { describe, it, expect, vi } from 'vitest';
 vi.mock('../boggleSolver', () => ({
   getCachedTrie: vi.fn(() => ({})),
   getTrieNode: vi.fn((_trie: unknown, word: string) => {
-    const dict = new Set(['cane', 'canes', 'scan', 'scant', 'שלום', 'נלחם']);
+    // Real backend Hebrew trie stores normalized forms (sofit→regular); mock matches.
+    const dict = new Set(['cane', 'canes', 'scan', 'scant', 'שלומ', 'נלחמ']);
     return dict.has(word.toLowerCase()) ? { isWord: true } : null;
   }),
 }));
@@ -50,6 +51,19 @@ describe('wheelRushManager', () => {
       const b = generateWheelPuzzle('B', 'en');
       expect(a).not.toEqual(b);
     });
+
+    // Sofit parity with SP wordWheelGeneration: Hebrew wheel never carries final forms.
+    // 4 of 6 he sources end in ם (sofit mem); without normalization the wheel renders ם/ן/ך/ף/ץ.
+    it('Hebrew puzzle never contains sofit final forms', () => {
+      const sofits = new Set(['ך', 'ם', 'ן', 'ף', 'ץ']);
+      // Sample many seeds — sources are deterministic and one branch picks each in turn.
+      for (let i = 0; i < 50; i++) {
+        const p = generateWheelPuzzle(`HE-${i}`, 'he');
+        for (const l of p.allLetters) {
+          expect(sofits.has(l), `letter ${l} should not be sofit in seed HE-${i}`).toBe(false);
+        }
+      }
+    });
   });
 
   describe('validateWheelSubmission', () => {
@@ -75,6 +89,15 @@ describe('wheelRushManager', () => {
       const s = state();
       s.closed.push('CANE');
       expect(validateWheelSubmission(s, 'CANE', 'en').error).toBe('already-closed');
+    });
+
+    // Hebrew sofit normalization: keyboard input may send the final form (ם)
+    // while the wheel exposes only regular forms (מ). Validation must accept both.
+    it('Hebrew submission with sofit letter normalizes through validation', () => {
+      const puzzleHe = { centerLetter: 'ש', outerLetters: ['ל','ו','מ','נ','ח','ת'], allLetters: ['ש','ל','ו','מ','נ','ח','ת'] };
+      const sHe = initWheelRushState(puzzleHe, ['p1'], 1000);
+      // 'שלום' = ש-ל-ו-ם (last char is sofit mem — must normalize to מ which is in the wheel).
+      expect(validateWheelSubmission(sHe, 'שלום', 'he')).toEqual({ valid: true });
     });
   });
 

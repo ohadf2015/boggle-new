@@ -29,6 +29,7 @@ import logger from '../utils/logger.js';
 import timerManager from '../utils/timerManager.js';
 import { gameCleanupEmitter } from '../events/gameCleanup.js';
 import type { Language } from '@/shared/types/game';
+import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
 
 gameCleanupEmitter.onGameEnd(({ gameCode }) => {
   timerManager.clearTimersWithPrefix(`wheelRushReap:${gameCode}:`);
@@ -59,10 +60,15 @@ export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWh
   const state = game.wheelRushState;
   if (!state) { socket.emit('error', { message: 'Wheel state not initialized' }); return; }
 
-  const word = (data.word || '').toUpperCase().trim();
-  if (!word) { socket.emit('error', { message: 'Word required' }); return; }
+  const rawWord = (data.word || '').toUpperCase().trim();
+  if (!rawWord) { socket.emit('error', { message: 'Word required' }); return; }
 
   const lang = (game.language || 'en') as Language;
+  // Hebrew sofit collapse — wheel stores only regular forms; normalize once at the boundary
+  // so validation, application, dedup, and broadcast all see the same letter set.
+  const word = lang === 'he'
+    ? [...rawWord].map((c) => normalizeHebrewLetter(c)).join('')
+    : rawWord;
   const validation = validateWheelSubmission(state, word, lang);
   if (!validation.valid) {
     socket.emit('wheelWordResult', { word, accepted: false, error: validation.error });

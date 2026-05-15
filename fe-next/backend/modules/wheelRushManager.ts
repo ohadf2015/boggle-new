@@ -13,7 +13,16 @@ import {
   WHEEL_RUSH_PANGRAM_BONUS,
 } from '@/shared/constants/wheelRushConstants';
 import { calculateWordScoreByLength } from '@/shared/utils/scoring';
+import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
 import { getCachedTrie, getTrieNode, type TrieNode } from './boggleSolver';
+
+/** Per-char sofit→regular normalization for Hebrew. Mirrors SP wordWheelGeneration:87. */
+function normalizeWordForLang(word: string, language: Language): string {
+  if (language !== 'he') return word;
+  let out = '';
+  for (const c of word) out += normalizeHebrewLetter(c);
+  return out;
+}
 
 // Nine-letter seed sources (mirror of utils/dailyChallenge/wordWheelGeneration —
 // duplicated here because backend tsconfig rootDir forbids cross-import).
@@ -34,9 +43,18 @@ function mulberry32(seed: number): () => number {
   let a = seed;
   return () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
-function uniqueChars(word: string): string[] {
+function uniqueChars(word: string, language: Language = 'en'): string[] {
   const seen = new Set<string>(); const out: string[] = [];
-  for (const c of word) { const u = c.toUpperCase(); if (u === ' ' || seen.has(u)) continue; seen.add(u); out.push(u); }
+  for (const c of word) {
+    const u = c.toUpperCase();
+    if (u === ' ') continue;
+    // Hebrew: collapse final forms to their regular counterparts so the wheel never
+    // exposes ך/ם/ן/ף/ץ. Parity with SP wordWheelGeneration:87.
+    const norm = language === 'he' ? normalizeHebrewLetter(u) : u;
+    if (seen.has(norm)) continue;
+    seen.add(norm);
+    out.push(norm);
+  }
   return out;
 }
 
@@ -45,7 +63,7 @@ export function generateWheelPuzzle(gameCode: string, language: Language = 'en')
   const sources = NINE_LETTER_SOURCES[language] || NINE_LETTER_SOURCES.en;
   const rng = mulberry32(hashString(`wheel-rush-${gameCode}-${language}`));
   const src = sources[Math.floor(rng() * sources.length)];
-  let letters = uniqueChars(src);
+  let letters = uniqueChars(src, language);
   if (letters.length > 7) letters = letters.slice(0, 7);
   if (letters.length < 7) {
     const pool = language === 'he'
@@ -132,13 +150,15 @@ export interface WheelValidationResult {
   error?: WheelValidationError;
 }
 
-/** Pure validation — shape, letter set, dictionary, not-already-closed. */
+/** Pure validation — shape, letter set, dictionary, not-already-closed.
+ *  Hebrew submissions are normalized (sofit→regular) before any comparison so
+ *  keyboard or external clients sending the final form still match the wheel. */
 export function validateWheelSubmission(
   state: WheelRushModeState,
   word: string,
   language: Language = 'en',
 ): WheelValidationResult {
-  const upper = word.toUpperCase();
+  const upper = normalizeWordForLang(word.toUpperCase(), language);
   if (upper.length < WHEEL_RUSH_MIN_WORD_LEN) return { valid: false, error: 'too-short' };
   if (state.closed.includes(upper)) return { valid: false, error: 'already-closed' };
   if (!upper.includes(state.puzzle.centerLetter.toUpperCase())) return { valid: false, error: 'no-center' };
