@@ -8,6 +8,7 @@ import type { SupportedLocale } from '@/lib/word-craft/tileBag';
 import { useCascadeRun } from '@/lib/word-craft/cascade/useCascadeRun';
 import { CascadeBoard } from '@/components/word-craft/cascade/CascadeBoard';
 import { CascadeHUD } from '@/components/word-craft/cascade/CascadeHUD';
+import { CascadeJuiceLayer } from '@/components/word-craft/cascade/CascadeJuiceLayer';
 import { CardPickScreen } from '@/components/word-craft/run/CardPickScreen';
 import { RoundResultScene } from '@/components/word-craft/run/RoundResultScene';
 import { RunResultScene } from '@/components/word-craft/run/RunResultScene';
@@ -200,13 +201,26 @@ export function CascadePageClient() {
         fireTotalRows={state.fire.totalRows}
         comboCount={state.cascadeChainsThisRound}
       />
-      <CascadeBoard
-        grid={state.grid}
-        diagonal={state.activeCards.some((c) => c.id === 'diagonal')}
-        onSubmitPath={run.submitPath}
-        recentlyBurnedIds={burnedIds}
-        fireRow={state.fire.fireRow}
-      />
+      <div className="relative">
+        <CascadeBoard
+          grid={state.grid}
+          diagonal={state.activeCards.some((c) => c.id === 'diagonal')}
+          onSubmitPath={run.submitPath}
+          recentlyBurnedIds={burnedIds}
+          fireRow={state.fire.fireRow}
+        />
+        <CascadeJuiceLayer
+          comboCount={state.cascadeChainsThisRound}
+          lastWordScore={state.lastSubmit?.totalScore ?? null}
+          lastWord={state.lastSubmit?.word ?? null}
+          gameOver={state.fire.fireRow >= state.fire.totalRows}
+          comboLabels={{
+            double: t('wordcraft.cascade.combo.double', { defaultValue: 'DOUBLE!' }),
+            triple: t('wordcraft.cascade.combo.triple', { defaultValue: 'TRIPLE!' }),
+            electric: t('wordcraft.cascade.combo.electric', { defaultValue: 'ELECTRIC!' }),
+          }}
+        />
+      </div>
       <div className="flex gap-2">
         <button
           type="button"
