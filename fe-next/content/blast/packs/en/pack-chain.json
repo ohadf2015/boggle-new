@@ -62,7 +62,7 @@
       "locale": "en",
       "columns": 8,
       "decoyTiles": 0,
-      "chain": ["MARS", "MOON", "STAR", "COMET"]
+      "chain": ["MARS", "MOON", "STAR", "GALAXY"]
     },
     {
       "id": "en-chain-08",
@@ -116,7 +116,7 @@
       "locale": "en",
       "columns": 9,
       "decoyTiles": 0,
-      "chain": ["RIVER", "BEACH", "CLIFF", "MARSH", "GROVE"]
+      "chain": ["RIVER", "TREE", "LEAF", "STONE", "ROCK"]
     },
     {
       "id": "en-chain-14",
@@ -125,7 +125,7 @@
       "locale": "en",
       "columns": 9,
       "decoyTiles": 0,
-      "chain": ["PLANET", "GALAXY", "METEOR", "ROCKET", "ORBITS"]
+      "chain": ["COMET", "GALAXY", "NEBULA", "ROCKET", "ALIEN"]
     },
     {
       "id": "en-chain-15",

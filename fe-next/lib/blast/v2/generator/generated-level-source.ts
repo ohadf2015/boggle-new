@@ -7,8 +7,9 @@ import { interestingnessScore, INTERESTINGNESS_THRESHOLD } from './interestingne
 import { mechanicsForLevel } from '../mechanic-flags';
 import type { LocaleConfig } from '../locale-config';
 import type { LevelSource } from '../level-source';
+import { findExtraWords, getBlastCommonWords } from '../engine';
 
-const MAX_REGEN_ATTEMPTS = 25;
+let MAX_REGEN_ATTEMPTS = 60;
 const LATERAL_SLIDE_CHANCE = 1 / 8;
 
 export class GeneratedLevelSource implements LevelSource {
@@ -18,6 +19,8 @@ export class GeneratedLevelSource implements LevelSource {
     const config = this.configs[locale];
     const mechanics = mechanicsForLevel(levelNumber);
     const baseSeed = hashStringToSeed(`${levelNumber}:${locale}:${userIdBucket}`);
+    const isCommon = await getBlastCommonWords(locale);
+    const minLen = config.wordLengthRange.min;
     for (let attempt = 0; attempt < MAX_REGEN_ATTEMPTS; attempt++) {
       const prng = seededPRNG(baseSeed + attempt * 1000);
       const themeKey = pickTheme(prng, config);
@@ -45,6 +48,8 @@ export class GeneratedLevelSource implements LevelSource {
       const score = interestingnessScore(candidate);
       candidate.interestingnessScore = score;
       if (score >= INTERESTINGNESS_THRESHOLD) {
+        // Check for unintended common words before returning
+        if (findExtraWords(candidate, isCommon, minLen).length > 0) continue;
         return candidate;
       }
     }

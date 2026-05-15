@@ -17,7 +17,7 @@
       "locale": "he",
       "columns": 6,
       "decoyTiles": 0,
-      "chain": ["תפוח", "ענב", "אגס"]
+      "chain": ["אגס", "בננה", "תות"]
     },
     {
       "id": "he-chain-03",
@@ -31,20 +31,20 @@
     {
       "id": "he-chain-04",
       "levelNumber": 4,
-      "theme": "food",
+      "theme": "family",
       "locale": "he",
       "columns": 6,
       "decoyTiles": 0,
-      "chain": ["לחמ", "אורז", "עוגה"]
+      "chain": ["אמא", "אבא", "בן"]
     },
     {
       "id": "he-chain-05",
       "levelNumber": 5,
-      "theme": "colors",
+      "theme": "animals",
       "locale": "he",
       "columns": 6,
       "decoyTiles": 0,
-      "chain": ["אדומ", "כחול", "ירוק"]
+      "chain": ["סוס", "כלב", "זאב"]
     },
     {
       "id": "he-chain-06",
@@ -53,7 +53,7 @@
       "locale": "he",
       "columns": 6,
       "decoyTiles": 0,
-      "chain": ["דג", "סרטנ", "כריש", "צדפה"]
+      "chain": ["צדף", "כריש"]
     },
     {
       "id": "he-chain-07",
@@ -62,7 +62,7 @@
       "locale": "he",
       "columns": 7,
       "decoyTiles": 0,
-      "chain": ["ירח", "כוכב", "שמש", "מאדימ"]
+      "chain": ["שמש", "כוכב", "ירח"]
     },
     {
       "id": "he-chain-08",
@@ -98,7 +98,7 @@
       "locale": "he",
       "columns": 7,
       "decoyTiles": 0,
-      "chain": ["סוסה", "זברה", "פנדה", "קואלה", "נמיה"]
+      "chain": ["זברה", "פנדה", "קואלה"]
     },
     {
       "id": "he-chain-12",
@@ -107,7 +107,7 @@
       "locale": "he",
       "columns": 7,
       "decoyTiles": 0,
-      "chain": ["גבינה", "פסטה", "סלט", "דבש", "פלפל"]
+      "chain": ["סלט", "גבינה"]
     },
     {
       "id": "he-chain-13",
@@ -116,7 +116,7 @@
       "locale": "he",
       "columns": 6,
       "decoyTiles": 0,
-      "chain": ["נהר", "חופ", "מערה", "אגמ", "יער"]
+      "chain": ["נהר", "אבן"]
     },
     {
       "id": "he-chain-14",
@@ -125,7 +125,7 @@
       "locale": "he",
       "columns": 8,
       "decoyTiles": 0,
-      "chain": ["כוכב", "גלקסיה", "מטאור", "רקטה", "מסלול"]
+      "chain": ["כוכב", "גלקסיה"]
     },
     {
       "id": "he-chain-15",
@@ -134,7 +134,7 @@
       "locale": "he",
       "columns": 6,
       "decoyTiles": 0,
-      "chain": ["קרנפ", "נמר", "פיל", "צבי", "יענ"]
+      "chain": ["נמר", "פיל"]
     }
   ]
 }
