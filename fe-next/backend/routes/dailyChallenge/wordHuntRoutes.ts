@@ -30,6 +30,8 @@ import {
 import { completeMission } from '../../modules/dailyMissionsManager';
 import { updateDailyProfileStats } from './profileStats';
 import { computeCycleProgress, computeWeekScore, getChestTier, type DayScore } from '../../../lib/daily/weeklyChest';
+import { updateQuestProgress } from '../../modules/weeklyQuestManager';
+import { shouldCreditDailyChallengeQuest } from '../../../lib/daily/questCredit';
 
 const router: Router = express.Router();
 
@@ -320,6 +322,13 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       } catch (scoreError) {
         logger.error('API', `[WordHunt] Failed to update profile stats for ${playerId}: ${(scoreError as Error).message}`);
       }
+    }
+
+    // Credit the `daily_challenges` weekly quest — only solved, first-attempt runs count.
+    if (shouldCreditDailyChallengeQuest({ mode: 'word_hunt', playerId, solved, isRetry })) {
+      updateQuestProgress(playerId as string, { dailyChallengesCompleted: 1 }).catch((err) => {
+        logger.error('API', `[WordHunt] weekly quest update failed for ${playerId}: ${(err as Error).message}`);
+      });
     }
 
     // Weekly chest hook — non-fatal

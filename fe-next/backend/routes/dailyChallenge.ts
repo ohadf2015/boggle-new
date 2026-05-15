@@ -14,6 +14,8 @@ import { COIN_COSTS } from '../../utils/coinManager';
 import type { Language } from '../../types';
 import wordHuntRouter from './dailyChallenge/wordHuntRoutes';
 import wordWheelRouter from './dailyChallenge/wordWheelRoutes';
+import { updateQuestProgress } from '../modules/weeklyQuestManager';
+import { shouldCreditDailyChallengeQuest } from '../../lib/daily/questCredit';
 
 // Import types and utilities from extracted modules
 import {
@@ -393,6 +395,13 @@ router.post('/submit', async (req: SubmitRequest, res: Response): Promise<void> 
       rank = (authPlayersAbove ?? 0) + 1;
     } else if (rankData) {
       rank = rankData.rank_position;
+    }
+
+    // Credit the `daily_challenges` weekly quest — non-fatal, fire-and-forget.
+    if (shouldCreditDailyChallengeQuest({ mode: 'puzzle', playerId, isRetry, wordCount })) {
+      updateQuestProgress(playerId as string, { dailyChallengesCompleted: 1 }).catch((err) => {
+        logger.error('API', `[DailyChallenge] weekly quest update failed for ${playerId}: ${(err as Error).message}`);
+      });
     }
 
     res.json({

@@ -16,6 +16,8 @@ import {
   isValidLanguage,
 } from './utils';
 import { updateDailyProfileStats } from './profileStats';
+import { updateQuestProgress } from '../../modules/weeklyQuestManager';
+import { shouldCreditDailyChallengeQuest } from '../../../lib/daily/questCredit';
 
 const router: Router = express.Router();
 
@@ -166,6 +168,15 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
       } catch (scoreError) {
         logger.error('API', `[WordWheel] Failed to update profile stats for ${playerId}: ${(scoreError as Error).message}`);
       }
+    }
+
+    // Credit the `daily_challenges` weekly quest — non-fatal. This path only runs
+    // on a fresh insert (a duplicate submit returns early above), so it can never
+    // double-count.
+    if (shouldCreditDailyChallengeQuest({ mode: 'word_wheel', playerId, wordCount })) {
+      updateQuestProgress(playerId as string, { dailyChallengesCompleted: 1 }).catch((err) => {
+        logger.error('API', `[WordWheel] weekly quest update failed for ${playerId}: ${(err as Error).message}`);
+      });
     }
 
     res.json({ success: true, alreadySubmitted: false, data, rank });
