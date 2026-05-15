@@ -143,11 +143,14 @@ export default function WheelRushSpinCanvas({ reducedMotion = false, settleAngle
   );
 }
 
-function hslToHex(h: number, s: number, l: number): number {
+// Exported for tests. Must clamp every channel: Pixi v8 Color.set() throws on
+// negative inputs ("Unable to convert color -N") and f(n) can dip slightly
+// negative for low-lightness HSL values.
+export function hslToHex(h: number, s: number, l: number): number {
   s /= 100; l /= 100;
   const k = (n: number) => (n + h / 30) % 12;
   const a = s * Math.min(l, 1 - l);
   const f = (n: number) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-  const toByte = (v: number) => Math.round(v * 255);
+  const toByte = (v: number) => Math.max(0, Math.min(255, Math.round(v * 255) | 0));
   return (toByte(f(0)) << 16) | (toByte(f(8)) << 8) | toByte(f(4));
 }

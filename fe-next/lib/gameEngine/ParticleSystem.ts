@@ -5,39 +5,56 @@
 import { Container, Graphics } from 'pixi.js';
 import type { ParticleConfig, ActiveParticle, Vector2 } from './types';
 
-/** Parse hex color string (without #) to number */
-function hexToNum(hex: string): number {
-  return parseInt(hex, 16);
+// Pixi v8 Color.set() throws "Unable to convert color -N" on any negative input.
+// Every helper that produces a numeric color MUST stay in 0..0xFFFFFF.
+
+export function hexToNum(hex: string): number {
+  const stripped = hex.startsWith('#') ? hex.slice(1) : hex;
+  const n = parseInt(stripped, 16);
+  return Number.isFinite(n) && n >= 0 ? n & 0xffffff : 0;
 }
 
-/** Lerp between two values */
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
 
-/** Random float in range */
 function rand(min: number, max: number): number {
   return min + Math.random() * (max - min);
 }
 
-/** Lerp between two hex colors */
-function lerpColor(colors: number[], t: number): number {
-  if (colors.length === 1) return colors[0];
-  const idx = t * (colors.length - 1);
+function clampByte(x: number): number {
+  return Math.max(0, Math.min(255, x | 0));
+}
+
+function packRGB(color: number): number {
+  return (clampByte((color >> 16) & 0xff) << 16)
+    | (clampByte((color >> 8) & 0xff) << 8)
+    | clampByte(color & 0xff);
+}
+
+export function lerpColor(colors: number[], t: number): number {
+  if (colors.length === 0) return 0;
+  if (colors.length === 1) return packRGB(colors[0] ?? 0);
+
+  const ct = Math.max(0, Math.min(1, Number.isFinite(t) ? t : 0));
+  const idx = ct * (colors.length - 1);
   const lo = Math.floor(idx);
   const hi = Math.min(lo + 1, colors.length - 1);
   const frac = idx - lo;
 
-  const rA = (colors[lo] >> 16) & 0xff;
-  const gA = (colors[lo] >> 8) & 0xff;
-  const bA = colors[lo] & 0xff;
-  const rB = (colors[hi] >> 16) & 0xff;
-  const gB = (colors[hi] >> 8) & 0xff;
-  const bB = colors[hi] & 0xff;
+  const cLo = colors[lo] ?? 0;
+  const cHi = colors[hi] ?? 0;
 
-  const r = Math.round(lerp(rA, rB, frac));
-  const g = Math.round(lerp(gA, gB, frac));
-  const b = Math.round(lerp(bA, bB, frac));
+  const rA = (cLo >> 16) & 0xff;
+  const gA = (cLo >> 8) & 0xff;
+  const bA = cLo & 0xff;
+  const rB = (cHi >> 16) & 0xff;
+  const gB = (cHi >> 8) & 0xff;
+  const bB = cHi & 0xff;
+
+  const r = clampByte(Math.round(lerp(rA, rB, frac)));
+  const g = clampByte(Math.round(lerp(gA, gB, frac)));
+  const b = clampByte(Math.round(lerp(bA, bB, frac)));
   return (r << 16) | (g << 8) | b;
 }
 
