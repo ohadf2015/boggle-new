@@ -614,3 +614,48 @@ export const DIAMOND_SHARDS: ParticleConfig = {
   spawnConfig: { directions: 16 },
   shape: 'diamond',
 };
+
+// ─── Blast V2: Letter Pop Shockwave ──────────────────────────────────
+// White-hot star burst that lands on top of the per-tile clear FX. Very
+// short-lived, additive-blended — gives each clear a snappy "hit" feel
+// without overpowering the theme-color sparks.
+
+export const BLAST_LETTER_POP: ParticleConfig = {
+  maxParticles: 14,
+  frequency: 0.001,
+  emitterLifetime: 0.05,
+  particlesPerWave: 14,
+  lifetime: { min: 0.12, max: 0.28 },
+  speed: { min: 280, max: 520 },
+  gravity: { x: 0, y: 0 },
+  scale: { start: 1.6, end: 0 },
+  alpha: { start: 1, end: 0 },
+  rotationSpeed: { min: -180, max: 180 },
+  colors: ['ffffff', 'fffce0', 'ffffff'],
+  spawnShape: 'burst',
+  spawnConfig: { directions: 14 },
+  blendMode: 'add',
+  shape: 'star',
+};
+
+// ─── Blast V2: Comet Trail ───────────────────────────────────────────
+// Long-lived directional streaks for chain depth ≥ 2. Mimics a comet
+// shower across the screen — fewer particles, longer life, slight drag.
+
+export const BLAST_COMET_TRAIL: ParticleConfig = {
+  maxParticles: 24,
+  frequency: 0.001,
+  emitterLifetime: 0.15,
+  particlesPerWave: 12,
+  lifetime: { min: 0.55, max: 1.1 },
+  speed: { min: 320, max: 720 },
+  gravity: { x: 0, y: 60 },
+  scale: { start: 2.0, end: 0.1 },
+  alpha: { start: 0.95, end: 0 },
+  rotationSpeed: { min: -90, max: 90 },
+  colors: ['ffee88', 'ffffff', 'ffcc00', 'fff2b0'],
+  spawnShape: 'burst',
+  spawnConfig: { directions: 6 },
+  blendMode: 'add',
+  shape: 'rect',
+};

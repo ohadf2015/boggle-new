@@ -8593,17 +8593,51 @@ const en = {
     }
   },
   "blast": {
+    "level": "Level {n}",
+    "intro": {
+      "level": "Level {n}",
+      "wordCount": "{count} words"
+    },
+    "themes": {
+      "onboarding": "Onboarding",
+      "fruits": "Fruits",
+      "animals": "Animals",
+      "food": "Food",
+      "ocean": "Ocean",
+      "space": "Space",
+      "nature": "Nature",
+      "sports": "Sports",
+      "colors": "Colors",
+      "transport": "Transport",
+      "body": "Body",
+      "home": "Home",
+      "school": "School",
+      "tools": "Tools",
+      "weather": "Weather",
+      "music": "Music",
+      "jobs": "Jobs",
+      "family": "Family",
+      "numbers": "Numbers",
+      "feelings": "Feelings",
+      "mythology": "Mythology",
+      "science": "Science",
+      "travel": "Travel",
+      "art": "Art",
+      "time": "Time"
+    },
     "tutorial": {
       "ftue": {
         "skip": "Skip tutorial",
         "step1": "Drag across letters to spell a word",
         "step1Cta": "Tap to begin",
-        "step2": "Try it: drag from C to T",
+        "step2": "Nice — keep going!",
         "step2Hint": "Letters must be adjacent",
         "step3": "Letters above fall to fill the space",
-        "step4": "Find 3 ANIMAL words",
+        "step4": "Find more words to fill the chest bar",
         "step5": "Or tap each letter, double-tap to confirm",
-        "step6": "Level 1! Watch your chest bar →"
+        "step6": "Level 1 complete! Watch your chest bar →",
+        "step6Cta": "Continue",
+        "label": "Level 1 FTUE"
       },
       "veteran": {
         "title": "Welcome back!",
@@ -8698,7 +8732,13 @@ const en = {
     "title": "Blast Mode",
     "description": "Clear the board! Words explode tiles.",
     "progress": "Cleared",
-    "complete": "Board Cleared!",
+    "complete": {
+      "title": "Level Complete!",
+      "boardCleared": "Board Cleared!",
+      "coins": "Coins",
+      "cascadesLabel": "Cascades",
+      "next": "Next Level"
+    },
     "noMoreWords": "No more words possible",
     "giveUp": "End Game",
     "goldTile": "3x Score!",

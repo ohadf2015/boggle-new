@@ -8873,6 +8873,58 @@ const es = {
     }
   },
   "blast": {
+    "level": "Nivel {n}",
+    "intro": {
+      "level": "Nivel {n}",
+      "wordCount": "{count} palabras"
+    },
+    "themes": {
+      "onboarding": "Iniciación",
+      "fruits": "Frutas",
+      "animals": "Animales",
+      "food": "Comida",
+      "ocean": "Océano",
+      "space": "Espacio",
+      "nature": "Naturaleza",
+      "sports": "Deportes",
+      "colors": "Colores",
+      "transport": "Transporte",
+      "body": "Cuerpo",
+      "home": "Casa",
+      "school": "Escuela",
+      "tools": "Herramientas",
+      "weather": "Clima",
+      "music": "Música",
+      "jobs": "Profesiones",
+      "family": "Familia",
+      "numbers": "Números",
+      "feelings": "Sentimientos",
+      "mythology": "Mitología",
+      "science": "Ciencia",
+      "travel": "Viajes",
+      "art": "Arte",
+      "time": "Tiempo"
+    },
+    "tutorial": {
+      "ftue": {
+        "skip": "Saltar tutorial",
+        "step1": "Desliza por las letras para formar una palabra",
+        "step1Cta": "Toca para empezar",
+        "step2": "¡Bien — sigue así!",
+        "step2Hint": "Las letras deben ser adyacentes",
+        "step3": "Las letras de arriba caen para llenar el espacio",
+        "step4": "Encuentra más palabras para llenar la barra del cofre",
+        "step5": "O toca cada letra, doble toque para confirmar",
+        "step6": "¡Nivel 1 completado! Mira tu barra del cofre →",
+        "step6Cta": "Continuar",
+        "label": "Tutorial del nivel 1"
+      },
+      "veteran": {
+        "title": "¡Bienvenido de nuevo!",
+        "body": "Blast se ha rediseñado. ¡Disfruta de los nuevos niveles!",
+        "cta": "Vamos"
+      }
+    },
     "continueModal": {
       "title": "¡No pares ahora!",
       "body": "Te quedaste sin movimientos. Mira un anuncio rápido para seguir jugando.",
@@ -8960,7 +9012,13 @@ const es = {
     "title": "Modo Blast",
     "description": "¡Limpia el tablero! Las palabras explotan fichas.",
     "progress": "Limpiado",
-    "complete": "¡Tablero limpio!",
+    "complete": {
+      "title": "¡Nivel completado!",
+      "boardCleared": "¡Tablero limpio!",
+      "coins": "Monedas",
+      "cascadesLabel": "Cascadas",
+      "next": "Siguiente nivel"
+    },
     "noMoreWords": "No hay más palabras posibles",
     "giveUp": "Terminar juego",
     "goldTile": "¡3x puntos!",

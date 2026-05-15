@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { classifyOvation, type OvationTier } from '@/lib/blast/v2/engine';
 import { ParticlePool, PhysicsWorld, PhysicsDebris, ScreenShake, ScoreFlyManager, ScreenFlash } from '@/lib/gameEngine';
-import { TILE_EXPLOSION_VARIANTS, CASCADE_SPARKLE, CONFETTI_BURST, COMBO_FLASH, ELECTRIC_RINGS, GOLD_STARS } from '@/lib/gameEngine/presets/particles';
+import { TILE_EXPLOSION_VARIANTS, CASCADE_SPARKLE, CONFETTI_BURST, COMBO_FLASH, ELECTRIC_RINGS, GOLD_STARS, BLAST_LETTER_POP, BLAST_COMET_TRAIL } from '@/lib/gameEngine/presets/particles';
 import styles from './BlastFxOverlay.module.css';
 
 type Props = {
@@ -303,11 +303,13 @@ export function BlastFxOverlay({
       const lx = center.x - rect.left;
       const ly = center.y - rect.top;
       const variant = pickExplosionVariant();
-      // Heavier per-cell burst: was 18+4+6 → now 32+10+10. Combined with the
-      // higher z-index it reads as a real explosion instead of a glint.
+      // Heavier per-cell burst (32+10+6) reads as a real explosion. Layered
+      // BLAST_LETTER_POP adds a snappy white-hot starburst on top — the
+      // theme-tinted sparks keep the mode color, the star gives the hit feel.
       particles.burst(variant, lx, ly, 32);
       particles.burst(ELECTRIC_RINGS, lx, ly, 10);
       particles.burst(CASCADE_SPARKLE, lx, ly, 6);
+      particles.burst(BLAST_LETTER_POP, lx, ly, 14);
       debris.spawn(lx, ly, tintColor, 10);
       spawnPulseRing(app, systems, lx, ly, tintColor);
       // RGB-split shockwave wrap on word found — extra polish over the solid
@@ -315,6 +317,11 @@ export function BlastFxOverlay({
       // saturating the rings pool when long words pop many tiles at once.
       if (center === clearCenters[0]) {
         spawnShockwaveWrap(app, systems, lx, ly);
+      }
+      // Delayed second pulse ring at white for a percussive double-thud —
+      // only when batching multiple clears (so single-tile chips stay quiet).
+      if (clearCenters.length >= 2) {
+        setTimeout(() => spawnPulseRing(app, systems, lx, ly, 0xffffff, 0.7), 70);
       }
     }
 
@@ -373,9 +380,10 @@ export function BlastFxOverlay({
       };
       requestAnimationFrame(fade);
     }
-    // Chain >= 2 → cinematic light sweep across the board.
+    // Chain >= 2 → cinematic light sweep + comet trail across the board.
     if (depth >= 2) {
       spawnLightSweep(app, systems, 0xffffff);
+      particles.burst(BLAST_COMET_TRAIL, centerX, centerY, 16);
     }
     if (tier === 'big') {
       particles.burst(GOLD_STARS, centerX, centerY, 28);

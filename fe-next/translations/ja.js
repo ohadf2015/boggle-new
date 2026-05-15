@@ -8815,6 +8815,58 @@ const ja = {
     }
   },
   "blast": {
+    "level": "レベル{n}",
+    "intro": {
+      "level": "レベル{n}",
+      "wordCount": "{count}単語"
+    },
+    "themes": {
+      "onboarding": "はじめに",
+      "fruits": "フルーツ",
+      "animals": "動物",
+      "food": "食べ物",
+      "ocean": "海",
+      "space": "宇宙",
+      "nature": "自然",
+      "sports": "スポーツ",
+      "colors": "色",
+      "transport": "乗り物",
+      "body": "体",
+      "home": "家",
+      "school": "学校",
+      "tools": "道具",
+      "weather": "天気",
+      "music": "音楽",
+      "jobs": "職業",
+      "family": "家族",
+      "numbers": "数字",
+      "feelings": "感情",
+      "mythology": "神話",
+      "science": "科学",
+      "travel": "旅行",
+      "art": "芸術",
+      "time": "時間"
+    },
+    "tutorial": {
+      "ftue": {
+        "skip": "チュートリアルをスキップ",
+        "step1": "文字をなぞって単語をつくろう",
+        "step1Cta": "タップして開始",
+        "step2": "いいね、その調子！",
+        "step2Hint": "文字は隣り合っている必要があります",
+        "step3": "上の文字が落ちて空きを埋めます",
+        "step4": "もっと単語を見つけてチェストバーを満たそう",
+        "step5": "または各文字をタップ、ダブルタップで確定",
+        "step6": "レベル1クリア！チェストバーを見て →",
+        "step6Cta": "つづける",
+        "label": "レベル1チュートリアル"
+      },
+      "veteran": {
+        "title": "おかえりなさい！",
+        "body": "ブラストが新しくなりました。新ステージをお楽しみください！",
+        "cta": "はじめる"
+      }
+    },
     "continueModal": {
       "title": "まだ終わらせない！",
       "body": "手数がなくなりました。短い広告を見てプレイを続けよう。",
@@ -8902,7 +8954,13 @@ const ja = {
     "title": "ブラストモード",
     "description": "ボードをクリア！単語でタイルを爆破。",
     "progress": "クリア済み",
-    "complete": "ボードクリア！",
+    "complete": {
+      "title": "レベルクリア！",
+      "boardCleared": "ボードクリア！",
+      "coins": "コイン",
+      "cascadesLabel": "カスケード",
+      "next": "次のレベル"
+    },
     "noMoreWords": "もう単語がありません",
     "giveUp": "ゲーム終了",
     "goldTile": "3倍スコア！",

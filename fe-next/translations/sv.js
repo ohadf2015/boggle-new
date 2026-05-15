@@ -8789,6 +8789,58 @@ const sv = {
     }
   },
   "blast": {
+    "level": "Nivå {n}",
+    "intro": {
+      "level": "Nivå {n}",
+      "wordCount": "{count} ord"
+    },
+    "themes": {
+      "onboarding": "Introduktion",
+      "fruits": "Frukter",
+      "animals": "Djur",
+      "food": "Mat",
+      "ocean": "Hav",
+      "space": "Rymden",
+      "nature": "Natur",
+      "sports": "Sport",
+      "colors": "Färger",
+      "transport": "Transport",
+      "body": "Kropp",
+      "home": "Hem",
+      "school": "Skola",
+      "tools": "Verktyg",
+      "weather": "Väder",
+      "music": "Musik",
+      "jobs": "Yrken",
+      "family": "Familj",
+      "numbers": "Siffror",
+      "feelings": "Känslor",
+      "mythology": "Mytologi",
+      "science": "Vetenskap",
+      "travel": "Resor",
+      "art": "Konst",
+      "time": "Tid"
+    },
+    "tutorial": {
+      "ftue": {
+        "skip": "Hoppa över guiden",
+        "step1": "Dra över bokstäverna för att stava ett ord",
+        "step1Cta": "Tryck för att börja",
+        "step2": "Snyggt — fortsätt!",
+        "step2Hint": "Bokstäverna måste sitta intill varandra",
+        "step3": "Bokstäverna ovan faller och fyller utrymmet",
+        "step4": "Hitta fler ord för att fylla kistmätaren",
+        "step5": "Eller tryck på varje bokstav, dubbeltryck för att bekräfta",
+        "step6": "Nivå 1 klar! Håll koll på kistmätaren →",
+        "step6Cta": "Fortsätt",
+        "label": "Nivå 1-guide"
+      },
+      "veteran": {
+        "title": "Välkommen tillbaka!",
+        "body": "Blast har gjorts om. Njut av de nya nivåerna!",
+        "cta": "Kör"
+      }
+    },
     "continueModal": {
       "title": "Sluta inte nu!",
       "body": "Du har slut på drag. Titta på en snabb annons för att fortsätta.",
@@ -8876,7 +8928,13 @@ const sv = {
     "title": "Blast-läge",
     "description": "Rensa brädet! Ord spränger brickor.",
     "progress": "Rensat",
-    "complete": "Brädet rensat!",
+    "complete": {
+      "title": "Nivå klar!",
+      "boardCleared": "Brädet rensat!",
+      "coins": "Mynt",
+      "cascadesLabel": "Kaskader",
+      "next": "Nästa nivå"
+    },
     "noMoreWords": "Inga fler ord möjliga",
     "giveUp": "Avsluta spel",
     "goldTile": "3x poäng!",
