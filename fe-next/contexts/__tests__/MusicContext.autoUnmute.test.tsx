@@ -1,17 +1,16 @@
 import { vi, type Mock, } from 'vitest';
 /**
- * Tests for MusicContext auto-unmute on game start.
+ * Tests for MusicContext mute persistence.
  *
- * Two intents reconciled here:
- *  1. Stale-mute recovery — if `isMuted=true` was persisted from a prior session,
- *     the FIRST track played after unlock should auto-unmute so the user hears music.
- *  2. In-session mute persistence — once the user has heard music and explicitly
- *     mutes mid-session, subsequent `fadeToTrack` calls (e.g. route changes,
- *     game-mode transitions) MUST keep mute. Earlier code unmuted on every
- *     `fadeToTrack`, which made mute "come back" after navigation.
+ * Persisted mute MUST survive across sessions and mobile app cold starts.
+ * An earlier implementation auto-unmuted on the first track of a new provider
+ * lifetime ("stale-mute recovery"), which silently discarded the user's mute
+ * choice on every page reload / app launch. That logic has been removed —
+ * the `isMuted` flag stored in localStorage is now honored verbatim.
  *
- * Implementation guard: a one-shot ref (`hasAutoUnmuted`) lets auto-unmute fire once
- * per provider lifetime, after which mute state is honored verbatim.
+ * In-session mute also persists across `fadeToTrack` calls (route changes,
+ * game-mode transitions) — earlier code unmuted on every fade, which made
+ * mute "come back" after navigation.
  */
 
 import React from 'react';
@@ -138,7 +137,7 @@ function TestDailyChallengeFlowWithMute() {
   );
 }
 
-describe('MusicContext - Auto Unmute on Game Start', () => {
+describe('MusicContext - Mute Persistence', () => {
   // Store original hasFocus to restore later
   const originalHasFocus = document.hasFocus;
 
@@ -173,15 +172,14 @@ describe('MusicContext - Auto Unmute on Game Start', () => {
   });
 
 
-  describe('BUG: Music plays muted when isMuted=true at game start', () => {
-    it('should auto-unmute when user starts game after toggling mute', async () => {
-      // This test simulates the scenario where:
-      // 1. User mutes audio (isMuted becomes true)
-      // 2. User then clicks "Start Game" (unlockAudio is called)
-      // 3. BUG: Music plays at volume 0 because isMuted is still true
-      // 4. EXPECTED: unlockAudio should auto-unmute so user can hear game music
+  describe('persisted mute survives a fresh session', () => {
+    it('honors isMuted=true on the first track of the session (no auto-unmute)', async () => {
+      // Simulates the cold-start scenario:
+      // 1. User had isMuted=true persisted in localStorage from a previous session.
+      // 2. On app launch, MusicProvider hydrates with isMuted=true.
+      // 3. User starts a game → fadeToTrack runs for the first time this lifetime.
+      // 4. EXPECTED: Mute is honored — track plays at volume 0, isMuted stays true.
 
-      // Verify hasFocus mock is working
       expect(document.hasFocus()).toBe(true);
 
       render(
@@ -190,50 +188,39 @@ describe('MusicContext - Auto Unmute on Game Start', () => {
         </MusicProvider>
       );
 
-      // Initially audio should be locked and unmuted
       expect(screen.getByTestId('audio-unlocked').textContent).toBe('locked');
       expect(screen.getByTestId('is-muted').textContent).toBe('unmuted');
 
-      // GIVEN: User mutes audio (simulates localStorage having isMuted=true)
+      // Mute before the first track plays. This stands in for a hydrated
+      // isMuted=true from localStorage — fadeToTrack has not yet run.
       await act(async () => {
         fireEvent.click(screen.getByTestId('mute-button'));
       });
-
-      // Verify muted state
       expect(screen.getByTestId('is-muted').textContent).toBe('muted');
 
-      // WHEN: User clicks "Start Game" button (user gesture)
       await act(async () => {
         fireEvent.click(screen.getByTestId('start-button'));
       });
 
-      // Phase should change immediately
       expect(screen.getByTestId('phase').textContent).toBe('playing');
 
-      // Audio should be unlocked
       await waitFor(() => {
         expect(screen.getByTestId('audio-unlocked').textContent).toBe('unlocked');
       });
 
-      // Advance timers for internal delays
       await act(async () => {
         vi.advanceTimersByTime(200);
       });
 
-      // Music should start playing
       await waitFor(() => {
         expect(mockState.play).toHaveBeenCalled();
       });
 
-      // THEN: Fade should have been called
+      // The fade must target volume 0 (muted), and isMuted must remain true.
+      // If either of these flips, the auto-unmute regression is back.
       expect(mockState.fade).toHaveBeenCalled();
-
-      // AND: Music should fade to AUDIBLE volume (not 0)
-      // This is the CRITICAL assertion - if this fails, the bug exists
-      expect(mockState.lastFadeToVolume).toBeGreaterThan(0);
-
-      // AND: isMuted should be false after game start (auto-unmuted)
-      expect(screen.getByTestId('is-muted').textContent).toBe('unmuted');
+      expect(mockState.lastFadeToVolume).toBe(0);
+      expect(screen.getByTestId('is-muted').textContent).toBe('muted');
     });
 
     it('should persist in-session mute across track changes (no auto-unmute on subsequent fadeToTrack)', async () => {
