@@ -14,20 +14,26 @@ describe('BlastFxOverlay', () => {
   });
 
   it('mounts canvas with correct testid + neutral classes', () => {
-    const { container } = render(<BlastFxOverlay />);
+    const { container } = render(
+      <BlastFxOverlay chainEventKey={0} chainDepth={0} clearCenters={[]} clearEventKey={0} />,
+    );
     const canvas = container.querySelector('[data-testid="blast-fx"]');
     expect(canvas).toBeInTheDocument();
     expect(canvas).toHaveClass('absolute', 'inset-0', 'pointer-events-none');
   });
 
   it('applies correct z-index', () => {
-    const { container } = render(<BlastFxOverlay />);
+    const { container } = render(
+      <BlastFxOverlay chainEventKey={0} chainDepth={0} clearCenters={[]} clearEventKey={0} />,
+    );
     const canvas = container.querySelector('[data-testid="blast-fx"]') as HTMLCanvasElement;
     expect(canvas).toHaveStyle('zIndex: 10');
   });
 
   it('mounts then unmounts without throwing — proves v8 init+destroy contract', async () => {
-    const { unmount } = render(<BlastFxOverlay />);
+    const { unmount } = render(
+      <BlastFxOverlay chainEventKey={0} chainDepth={0} clearCenters={[]} clearEventKey={0} />,
+    );
     // Let dynamic import + async init resolve
     await waitFor(() => {
       // Pixi v8 init sets default canvas size 800x600 when no resizeTo
@@ -39,7 +45,9 @@ describe('BlastFxOverlay', () => {
   });
 
   it('unmounts before init resolves without throwing — async race safety', () => {
-    const { unmount } = render(<BlastFxOverlay />);
+    const { unmount } = render(
+      <BlastFxOverlay chainEventKey={0} chainDepth={0} clearCenters={[]} clearEventKey={0} />,
+    );
     // Unmount synchronously, before dynamic import + init microtask settle.
     // The component's `cancelled` flag must prevent post-unmount destroy crash.
     expect(() => unmount()).not.toThrow();
@@ -47,28 +55,57 @@ describe('BlastFxOverlay', () => {
 
   describe('chain ovation reactivity', () => {
     it('initial render carries no ovation attribute', () => {
-      const { container } = render(<BlastFxOverlay chainEventKey={0} chainDepth={0} />);
+      const { container } = render(
+        <BlastFxOverlay chainEventKey={0} chainDepth={0} clearCenters={[]} clearEventKey={0} />,
+      );
       const canvas = container.querySelector('[data-testid="blast-fx"]') as HTMLCanvasElement;
       expect(canvas.getAttribute('data-ovation-tier')).toBeNull();
     });
 
     it('chain depth 3 sets data-ovation-tier="big" on chainEventKey change', () => {
-      const { container, rerender } = render(<BlastFxOverlay chainEventKey={0} chainDepth={0} />);
-      rerender(<BlastFxOverlay chainEventKey={1} chainDepth={3} />);
+      const { container, rerender } = render(
+        <BlastFxOverlay chainEventKey={0} chainDepth={0} clearCenters={[]} clearEventKey={0} />,
+      );
+      rerender(
+        <BlastFxOverlay
+          chainEventKey={1}
+          chainDepth={3}
+          clearCenters={[]}
+          clearEventKey={0}
+        />,
+      );
       const canvas = container.querySelector('[data-testid="blast-fx"]') as HTMLCanvasElement;
       expect(canvas.getAttribute('data-ovation-tier')).toBe('big');
     });
 
     it('chain depth 5 sets data-ovation-tier="mega"', () => {
-      const { container, rerender } = render(<BlastFxOverlay chainEventKey={0} chainDepth={0} />);
-      rerender(<BlastFxOverlay chainEventKey={1} chainDepth={5} />);
+      const { container, rerender } = render(
+        <BlastFxOverlay chainEventKey={0} chainDepth={0} clearCenters={[]} clearEventKey={0} />,
+      );
+      rerender(
+        <BlastFxOverlay
+          chainEventKey={1}
+          chainDepth={5}
+          clearCenters={[]}
+          clearEventKey={0}
+        />,
+      );
       const canvas = container.querySelector('[data-testid="blast-fx"]') as HTMLCanvasElement;
       expect(canvas.getAttribute('data-ovation-tier')).toBe('mega');
     });
 
     it('depth 1 (no chain) does not set ovation attribute', () => {
-      const { container, rerender } = render(<BlastFxOverlay chainEventKey={0} chainDepth={0} />);
-      rerender(<BlastFxOverlay chainEventKey={1} chainDepth={1} />);
+      const { container, rerender } = render(
+        <BlastFxOverlay chainEventKey={0} chainDepth={0} clearCenters={[]} clearEventKey={0} />,
+      );
+      rerender(
+        <BlastFxOverlay
+          chainEventKey={1}
+          chainDepth={1}
+          clearCenters={[]}
+          clearEventKey={0}
+        />,
+      );
       const canvas = container.querySelector('[data-testid="blast-fx"]') as HTMLCanvasElement;
       expect(canvas.getAttribute('data-ovation-tier')).toBeNull();
     });
@@ -76,19 +113,47 @@ describe('BlastFxOverlay', () => {
     it('fires onChainOvation callback with tier when chain event arrives', () => {
       const onChainOvation = vi.fn();
       const { rerender } = render(
-        <BlastFxOverlay chainEventKey={0} chainDepth={0} onChainOvation={onChainOvation} />,
+        <BlastFxOverlay
+          chainEventKey={0}
+          chainDepth={0}
+          clearCenters={[]}
+          clearEventKey={0}
+          onChainOvation={onChainOvation}
+        />,
       );
       expect(onChainOvation).not.toHaveBeenCalled();
-      rerender(<BlastFxOverlay chainEventKey={1} chainDepth={3} onChainOvation={onChainOvation} />);
+      rerender(
+        <BlastFxOverlay
+          chainEventKey={1}
+          chainDepth={3}
+          clearCenters={[]}
+          clearEventKey={0}
+          onChainOvation={onChainOvation}
+        />,
+      );
       expect(onChainOvation).toHaveBeenCalledWith('big');
     });
 
     it('does not fire callback for "none" tier (depth 0 or 1)', () => {
       const onChainOvation = vi.fn();
       const { rerender } = render(
-        <BlastFxOverlay chainEventKey={0} chainDepth={0} onChainOvation={onChainOvation} />,
+        <BlastFxOverlay
+          chainEventKey={0}
+          chainDepth={0}
+          clearCenters={[]}
+          clearEventKey={0}
+          onChainOvation={onChainOvation}
+        />,
       );
-      rerender(<BlastFxOverlay chainEventKey={1} chainDepth={1} onChainOvation={onChainOvation} />);
+      rerender(
+        <BlastFxOverlay
+          chainEventKey={1}
+          chainDepth={1}
+          clearCenters={[]}
+          clearEventKey={0}
+          onChainOvation={onChainOvation}
+        />,
+      );
       expect(onChainOvation).not.toHaveBeenCalled();
     });
   });

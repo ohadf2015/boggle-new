@@ -105,6 +105,7 @@ export function BlastGame({
     submittedRef.current = false;
     submissionIdRef.current = null;
   }, [level.levelNumber, level.locale]);
+  const clearCentersRef = useRef<Array<{ x: number; y: number }>>([]);
   const tutorial = useBlastTutorial(level, unlocksSeen, isVeteranPlayer, onUpdateUnlocks ?? (() => {}));
 
   // Controlled FTUE step. Advances based on observable game-state transitions.
@@ -301,7 +302,12 @@ export function BlastGame({
       />
       <div className="relative flex-1 flex items-end justify-center pb-[max(1rem,env(safe-area-inset-bottom))]">
         <BlastAtmosphereOverlay modeColor={modeColor} />
-        <BlastFxOverlay chainEventKey={state.chainEventKey} chainDepth={state.lastChainDepth} />
+        <BlastFxOverlay
+          chainEventKey={state.chainEventKey}
+          chainDepth={state.lastChainDepth}
+          clearCenters={clearCentersRef.current}
+          clearEventKey={state.chainEventKey}
+        />
         <BlastChainSoundListener />
         <BlastBoard
           level={state.level}
@@ -314,6 +320,9 @@ export function BlastGame({
           almosts={almosts}
           tileIds={state.tileIds}
           revealGlowCells={revealGlowCells}
+          onCommitSelection={(centers) => {
+            clearCentersRef.current = centers;
+          }}
         />
       </div>
       {tutorial.showFtueOverlay && !isVeteranPlayer && ftueStep !== null && (

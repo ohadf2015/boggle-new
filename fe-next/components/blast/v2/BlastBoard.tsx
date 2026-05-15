@@ -21,6 +21,7 @@ type Props = {
   almosts?: AlmostWord[];
   tileIds: string[][];
   revealGlowCells?: CellId[];
+  onCommitSelection?: (centers: Array<{ x: number; y: number }>) => void;
 };
 
 export function BlastBoard({
@@ -34,6 +35,7 @@ export function BlastBoard({
   almosts,
   tileIds,
   revealGlowCells = [],
+  onCommitSelection,
 }: Props) {
   const config = LOCALE_CONFIGS[level.locale];
   const boardRef = useRef<HTMLDivElement>(null);
@@ -79,6 +81,15 @@ export function BlastBoard({
     };
     const onUp = () => {
       lastEnterRef.current = null;
+      // Report cleared cell centers before calling onPointerUp
+      if (selection.kind === 'active' && onCommitSelection) {
+        const centers = selection.cells
+          .map((cell) => getCellCenter(cell))
+          .filter((c): c is { x: number; y: number } => c !== null);
+        if (centers.length > 0) {
+          onCommitSelection(centers);
+        }
+      }
       onPointerUp();
     };
     window.addEventListener('pointermove', onMove, { passive: true });
@@ -89,7 +100,7 @@ export function BlastBoard({
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
     };
-  }, [isDragging, onPointerEnter, onPointerUp]);
+  }, [isDragging, onPointerEnter, onPointerUp, selection, onCommitSelection, getCellCenter]);
 
   return (
     <div
