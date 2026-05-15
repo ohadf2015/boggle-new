@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.webkit.WebView;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import com.getcapacitor.BridgeActivity;
@@ -65,6 +66,42 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         super.onNewIntent(intent);
         setIntent(intent);
         handleDeepLinkIntent(intent);
+    }
+
+    /**
+     * When backgrounded, freeze WebView JS timers + layout work. Lowers idle CPU
+     * and shrinks the WebView's working set so Android's low-memory killer is
+     * less likely to evict our process — which is what causes the "app reloads
+     * from scratch when you reopen it" symptom on remote-URL Capacitor apps.
+     * pauseTimers()/resumeTimers() are process-global on WebView; safe here
+     * because there is only one WebView in this Activity.
+     */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        WebView bridgeWebView = getBridge() != null ? getBridge().getWebView() : null;
+        if (bridgeWebView != null) {
+            try {
+                bridgeWebView.pauseTimers();
+                bridgeWebView.onPause();
+            } catch (Throwable t) {
+                android.util.Log.w("MainActivity", "WebView pause failed: " + t.getMessage());
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        WebView bridgeWebView = getBridge() != null ? getBridge().getWebView() : null;
+        if (bridgeWebView != null) {
+            try {
+                bridgeWebView.onResume();
+                bridgeWebView.resumeTimers();
+            } catch (Throwable t) {
+                android.util.Log.w("MainActivity", "WebView resume failed: " + t.getMessage());
+            }
+        }
     }
 
     private void ensureDefaultNotificationChannel() {
