@@ -162,4 +162,34 @@ describe('rebuildTileIds', () => {
     expect(next[0]).toEqual(['c']);
     expect(next[1]).toEqual([]);
   });
+
+  it('surviving tile ids keep their identity and shift to new positions after collapse', () => {
+    const level: BlastLevel = {
+      id: 'tile-stability-test',
+      levelNumber: 1,
+      locale: 'en',
+      theme: 'onboarding',
+      columns: [
+        { index: 0, tiles: ['C', 'A', 'T'] },
+        { index: 1, tiles: ['X', 'Y'] },
+      ],
+      words: ['CAT'],
+      resolvableOrder: ['CAT'],
+      tileFlags: {},
+      gravityMode: 'standard',
+      difficulty: 1,
+    };
+    const tileIds = [['t-0-0', 't-0-1', 't-0-2'], ['t-1-0', 't-1-1']];
+
+    // Pop the bottom of column 0 (the C at c0r0).
+    const collapse = collapseCells(level, [cellId(0, 0)]);
+    const newIds = rebuildTileIds(level.columns, tileIds, collapse);
+
+    // Column 0 was [C,A,T]; after popping C at row 0: [A,T] -> their ids t-0-1, t-0-2 survive at rows 0,1.
+    expect(newIds[0]).toEqual(['t-0-1', 't-0-2']);
+    // Column 1 untouched.
+    expect(newIds[1]).toEqual(['t-1-0', 't-1-1']);
+    // Popped tile id is gone.
+    expect(newIds.flat()).not.toContain('t-0-0');
+  });
 });
