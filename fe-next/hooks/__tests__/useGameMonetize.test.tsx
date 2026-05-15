@@ -26,11 +26,21 @@ vi.mock('@/lib/ads/gameMonetizeSdk', () => ({
   getGameMonetizeId: vi.fn(() => 'test-gid'),
 }));
 
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k }),
+}));
+
+const toastErrorMock = vi.fn();
+vi.mock('sonner', () => ({
+  toast: { error: (msg: string) => toastErrorMock(msg) },
+}));
+
 import { useGameMonetize } from '@/hooks/useGameMonetize';
 
 beforeEach(() => {
   initCalls.length = 0;
   showAdMock.mockReset();
+  toastErrorMock.mockReset();
   // Stub a minimal window.sdk surface — the hook drives it.
   (window as unknown as { sdk?: unknown }).sdk = {
     showAd: showAdMock,
@@ -116,5 +126,41 @@ describe('useGameMonetize', () => {
   it('isAvailable reflects browser environment', () => {
     const { result } = renderHook(() => useGameMonetize());
     expect(result.current.isAvailable).toBe(true);
+  });
+
+  it('fires ad-blocker toast once when SDK script is missing (window.sdk undefined)', async () => {
+    delete (window as unknown as { sdk?: unknown }).sdk;
+    const { result } = renderHook(() => useGameMonetize());
+    const onReward = vi.fn();
+    const onError = vi.fn();
+
+    await act(async () => {
+      result.current.showRewarded(onReward, onError, { name: 'r-blocked' });
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    // Second call must NOT fire toast again — one-time per hook instance.
+    await act(async () => {
+      result.current.showRewarded(onReward, onError, { name: 'r-blocked-2' });
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    expect(toastErrorMock).toHaveBeenCalledTimes(1);
+    expect(toastErrorMock).toHaveBeenCalledWith('ads.rewarded.blocked');
+    expect(onError).toHaveBeenCalledTimes(2);
+  });
+
+  it('does NOT fire ad-blocker toast on legitimate no-fill (showAd rejects)', async () => {
+    showAdMock.mockRejectedValue(new Error('no-ad-available'));
+    const { result } = renderHook(() => useGameMonetize());
+    const onReward = vi.fn();
+    const onError = vi.fn();
+
+    await act(async () => {
+      result.current.showRewarded(onReward, onError, { name: 'r-nofill' });
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    expect(toastErrorMock).not.toHaveBeenCalled();
+    expect(onError).toHaveBeenCalledTimes(1);
   });
 });

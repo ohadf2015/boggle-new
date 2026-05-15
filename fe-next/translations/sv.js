@@ -10667,7 +10667,8 @@ const sv = {
       watchForGold: "Se reklam för +{amount} guld",
       earning: "Tittar...",
       earned: "+{amount} guld tjänat!",
-      cooldown: "Tillgänglig snart"
+      cooldown: "Tillgänglig snart",
+      blocked: "Annonsblockerare hindrar belöningar. Inaktivera den för lexiclash.live för att tjäna guld."
     },
     doubleGold: {
       cta: "Dubbla belöningar +{amount}",

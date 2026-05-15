@@ -10647,7 +10647,8 @@ const he = {
       watchForGold: "צפו בפרסומת ל-+{amount} זהב",
       earning: "צופים...",
       earned: "+{amount} זהב הרווחתם!",
-      cooldown: "זמין בקרוב"
+      cooldown: "זמין בקרוב",
+      blocked: "חוסם פרסומות מונע מכם לזכות בתגמולים. כבו אותו עבור lexiclash.live כדי להרוויח זהב."
     },
     doubleGold: {
       cta: "תגמולים כפולים +{amount}",

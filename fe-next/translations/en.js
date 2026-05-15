@@ -10570,7 +10570,8 @@ const en = {
       watchForGold: "Watch ad for +{amount} gold",
       earning: "Watching...",
       earned: "+{amount} gold earned!",
-      cooldown: "Available soon"
+      cooldown: "Available soon",
+      blocked: "Ad blocker is preventing rewards. Disable it for lexiclash.live to earn gold."
     },
     doubleGold: {
       cta: "Double rewards +{amount}",

@@ -1,10 +1,12 @@
 'use client';
 
 import { useCallback, useRef } from 'react';
+import { toast } from 'sonner';
 import {
   initGameMonetizeAds,
   getGameMonetizeId,
 } from '@/lib/ads/gameMonetizeSdk';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 /**
  * Hook around GameMonetize SDK rewarded-video for web surface.
@@ -43,7 +45,9 @@ export interface UseGameMonetizeReturn {
 
 export function useGameMonetize(): UseGameMonetizeReturn {
   const initRef = useRef<Promise<void> | null>(null);
+  const blockedToastFiredRef = useRef(false);
   const isAvailable = typeof window !== 'undefined';
+  const { t } = useLanguage();
 
   const initialize = useCallback(async () => {
     if (!isAvailable) return;
@@ -72,8 +76,21 @@ export function useGameMonetize(): UseGameMonetizeReturn {
     const settle = (granted: boolean, reason?: string) => {
       if (settled) return;
       settled = true;
-      if (granted) onReward();
-      else onError?.(reason ?? 'gamemonetize-no-reward');
+      if (granted) {
+        onReward();
+        return;
+      }
+      // Ad-blocker fingerprint: SDK script never loaded → window.sdk undefined
+      // OR script onerror fired. Surface a one-time toast so the user
+      // understands why the watch-ad CTA is silently failing — without it,
+      // users see no feedback at all and assume the button is broken.
+      const isBlocked = reason === 'gamemonetize-sdk-missing'
+        || reason === 'gamemonetize-sdk-script-error';
+      if (isBlocked && !blockedToastFiredRef.current) {
+        blockedToastFiredRef.current = true;
+        try { toast.error(t('ads.rewarded.blocked')); } catch { /* toast unavailable */ }
+      }
+      onError?.(reason ?? 'gamemonetize-no-reward');
     };
 
     const fire = () => {
@@ -101,7 +118,7 @@ export function useGameMonetize(): UseGameMonetizeReturn {
       // partially loaded. If sdk missing, fire's own guard settles to error.
       fire();
     });
-  }, [isAvailable]);
+  }, [isAvailable, t]);
 
   return { initialize, showRewarded, isAvailable };
 }

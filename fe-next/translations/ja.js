@@ -10641,7 +10641,8 @@ const ja = {
       watchForGold: "広告を見て+{amount}ゴールド",
       earning: "視聴中...",
       earned: "+{amount}ゴールド獲得！",
-      cooldown: "まもなく利用可能"
+      cooldown: "まもなく利用可能",
+      blocked: "広告ブロッカーが報酬を妨げています。lexiclash.liveで無効にしてゴールドを獲得してください。"
     },
     doubleGold: {
       cta: "報酬2倍 +{amount}",
