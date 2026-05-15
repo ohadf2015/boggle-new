@@ -6,8 +6,12 @@ import type { LevelSourceRegistry, LevelSource } from './level-source';
 import type { Locale } from './types';
 import { resolve } from 'node:path';
 
+// Hand-authored content locales. Adding a locale here without matching pack
+// files in content/blast/packs/<locale>/ will throw at runtime.
 const CHAIN_LOCALES: Locale[] = ['en', 'he'];
+const CURATED_LOCALES: Locale[] = ['en', 'he'];
 const CHAIN_MAX_LEVEL = 30;
+const CURATED_MAX_LEVEL = 30;
 
 let cached: LevelSourceRegistry | null = null;
 
@@ -23,8 +27,9 @@ export function buildRegistry(): LevelSourceRegistry {
 }
 
 /**
- * Resolve the appropriate source for a given level number and locale.
- * Priority: chain (1-15 for en/he) → curated → generated.
+ * Priority: chain (1-30 for chain locales) → curated (1-30 for curated
+ * locales) → generated. sv/ja/es bypass pack lookups entirely so missing
+ * pack dirs do not 404 the API.
  */
 export function getLevelSourceForLevel(
   levelNumber: number,
@@ -34,5 +39,8 @@ export function getLevelSourceForLevel(
   if (CHAIN_LOCALES.includes(locale) && levelNumber >= 1 && levelNumber <= CHAIN_MAX_LEVEL) {
     return registry.chain;
   }
-  return levelNumber <= 30 ? registry.curated : registry.generated;
+  if (CURATED_LOCALES.includes(locale) && levelNumber <= CURATED_MAX_LEVEL) {
+    return registry.curated;
+  }
+  return registry.generated;
 }

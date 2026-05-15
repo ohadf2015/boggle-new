@@ -37,8 +37,12 @@ describe('level source registry', () => {
     expect(getLevelSourceForLevel(31, 'en', registry)).toBe(registry.generated);
   });
 
-  it('getLevelSourceForLevel returns curated for sv level 1 (non-chain locale)', () => {
+  it('getLevelSourceForLevel returns generated for sv/ja/es level 1 (no pack files)', () => {
+    // sv/ja/es have no pack dirs — route them to the generator from level 1
+    // so missing curated content does not 404 the API.
     const registry = buildRegistry();
-    expect(getLevelSourceForLevel(1, 'sv', registry)).toBe(registry.curated);
+    expect(getLevelSourceForLevel(1, 'sv', registry)).toBe(registry.generated);
+    expect(getLevelSourceForLevel(1, 'ja', registry)).toBe(registry.generated);
+    expect(getLevelSourceForLevel(1, 'es', registry)).toBe(registry.generated);
   });
 });
