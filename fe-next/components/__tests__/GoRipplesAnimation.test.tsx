@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { render, screen, act, waitFor } from '@testing-library/react';
-import GoRipplesAnimation from '../GoRipplesAnimation';
+import GoRipplesAnimation, { __resetGoRipplesDupGuard } from '../GoRipplesAnimation';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
@@ -49,10 +49,12 @@ vi.mock('../../contexts/SoundEffectsContext', () => ({
 describe('GoRipplesAnimation', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    __resetGoRipplesDupGuard();
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    __resetGoRipplesDupGuard();
   });
 
   it('starts countdown at 3', () => {
@@ -172,6 +174,54 @@ describe('GoRipplesAnimation', () => {
       vi.advanceTimersByTime(1000);
     });
     expect(onComplete).toHaveBeenCalled();
+  });
+
+  it('skips a duplicate countdown that mounts within the dup-guard window', async () => {
+    // First mount: full 3-2-1-GO + 1s GO hold + onComplete latches the timestamp.
+    const firstOnComplete = vi.fn();
+    const { unmount: unmountFirst } = render(
+      <GoRipplesAnimation onComplete={firstOnComplete} />
+    );
+    // Tick by 1s steps so each useEffect[count] cycle resolves cleanly.
+    act(() => { vi.advanceTimersByTime(1000); }); // 3 → 2
+    act(() => { vi.advanceTimersByTime(1000); }); // 2 → 1
+    act(() => { vi.advanceTimersByTime(1000); }); // 1 → 0 (GO!)
+    act(() => { vi.advanceTimersByTime(1000); }); // GO hold + complete
+    expect(firstOnComplete).toHaveBeenCalledTimes(1);
+    unmountFirst();
+
+    // Second mount within the guard window should NOT replay the countdown.
+    const secondOnComplete = vi.fn();
+    render(<GoRipplesAnimation onComplete={secondOnComplete} />);
+
+    // No countdown digits should be shown for the duplicate.
+    expect(screen.queryByText('3')).not.toBeInTheDocument();
+    expect(screen.queryByText('2')).not.toBeInTheDocument();
+    expect(screen.queryByText('GO!')).not.toBeInTheDocument();
+
+    // onComplete fires on next tick so parent unmounts the dup cleanly.
+    act(() => { vi.advanceTimersByTime(0); });
+    expect(secondOnComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('plays normally again after the dup-guard window expires', () => {
+    // Prime the latch with a completed countdown.
+    const firstOnComplete = vi.fn();
+    const { unmount } = render(<GoRipplesAnimation onComplete={firstOnComplete} />);
+    act(() => { vi.advanceTimersByTime(1000); });
+    act(() => { vi.advanceTimersByTime(1000); });
+    act(() => { vi.advanceTimersByTime(1000); });
+    act(() => { vi.advanceTimersByTime(1000); });
+    expect(firstOnComplete).toHaveBeenCalled();
+    unmount();
+
+    // Wait past the dup-guard (4000ms in real-time terms — fake timers don't
+    // advance Date.now, so use the test reset helper to clear the latch).
+    __resetGoRipplesDupGuard();
+
+    const secondOnComplete = vi.fn();
+    render(<GoRipplesAnimation onComplete={secondOnComplete} />);
+    expect(screen.getByText('3')).toBeInTheDocument();
   });
 
   it('handles unmount during countdown gracefully', () => {

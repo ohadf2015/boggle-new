@@ -292,6 +292,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     showInterstitial('multiplayer-round-complete');
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
+  // True from the moment exit is confirmed until the hard nav fires. We render
+  // a clean black wash so the user never sees a half-torn ResultsPage during
+  // the 200ms socket-disconnect delay or the browser nav-paint gap (which
+  // previously surfaced as "black screen with scrolling").
+  const [isExiting, setIsExiting] = useState<boolean>(false);
   // Score reveal animation state (Netflix Boggle Party-inspired "trading places" reveal)
   const [scoreRevealComplete, setScoreRevealComplete] = useState<boolean>(true);
 
@@ -508,6 +513,15 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   };
 
   const confirmExitRoom = () => {
+    // Switch to the exit wash NOW so the half-torn ResultsPage never paints
+    // during the socket-disconnect delay or the browser's nav-paint gap.
+    setIsExiting(true);
+    setShowExitConfirm(false);
+    // Release the body scroll lock immediately — the cleanup in
+    // useEffect(setIsInGame(true)) only fires on unmount, which a hard nav
+    // doesn't trigger before the new document paints.
+    setIsInGame(false);
+
     // Emit leaveRoom so backend properly removes/disconnects the player
     try {
       if (socket && gameCode && username) {
@@ -893,6 +907,15 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           )}
         </div>
       </div>
+    );
+  }
+
+  if (isExiting) {
+    return (
+      <div
+        data-testid="results-exit-wash"
+        className="fixed inset-0 z-[9999] bg-neo-navy"
+      />
     );
   }
 

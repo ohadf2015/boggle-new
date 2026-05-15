@@ -11,12 +11,28 @@ interface GoRipplesAnimationProps {
   t?: (key: string) => string;
 }
 
+// Module-level latch: blocks a duplicate mount within DUP_GUARD_MS of the last
+// completed countdown. MP `showStartAnimation` can race toggle false→true via
+// dual handlers (pendingGameStart effect + socket listener) when server retries
+// arrive without a stable messageId, causing GoRipples to remount and replay
+// 3-2-1-GO. Latch makes the second mount a no-op that immediately reports done.
+const DUP_GUARD_MS = 4000;
+let lastCompletedAt = 0;
+
+/** Test-only reset to clear the latch between test cases. */
+export function __resetGoRipplesDupGuard(): void {
+  lastCompletedAt = 0;
+}
+
 /**
  * Minimal & calm pre-game countdown with smooth animations
  * Clean 3-2-1-GO with soft cyan glow - easy on the eyes
  */
 const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }) => {
-  const [isVisible, setIsVisible] = useState(true);
+  // Lazy-init reads `Date.now()` only at first mount — keeps the render pure
+  // for the React Compiler while still latching the dup-guard verdict.
+  const [isDuplicate] = useState(() => Date.now() - lastCompletedAt < DUP_GUARD_MS);
+  const [isVisible, setIsVisible] = useState(!isDuplicate);
   const [count, setCount] = useState(3);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const { playCountdownBeep } = useSoundEffects();
@@ -28,6 +44,14 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
   useEffect(() => {
     onCompleteRef.current = onComplete;
   }, [onComplete]);
+
+  // Duplicate mount: skip everything, fire onComplete on next tick so the
+  // parent unmounts us cleanly without a second 3-2-1-GO sequence playing.
+  useEffect(() => {
+    if (!isDuplicate) return;
+    const id = setTimeout(() => onCompleteRef.current?.(), 0);
+    return () => clearTimeout(id);
+  }, [isDuplicate]);
 
   // Play beep for each countdown number
   useEffect(() => {
@@ -49,6 +73,7 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
 
       const completeTimer = setTimeout(() => {
         setIsVisible(false);
+        lastCompletedAt = Date.now();
         onCompleteRef.current?.();
       }, 1000);
 
