@@ -38,12 +38,20 @@ const THEMES_EN: Record<ThemeKey, ThemeDef> = {
   jobs: T('jobs', ['COOK', 'NURSE']),
   family: T('family', ['MOM', 'DAD']),
   numbers: T('numbers', ['ONE', 'TWO', 'TWELVE']),
-  feelings: T('feelings', ['HAPPY', 'SAD']),
-  mythology: T('mythology', ['DRAGON', 'GIANT']),
-  science: T('science', ['ATOM', 'CELL']),
-  travel: T('travel', ['MAP', 'TENT']),
-  art: T('art', ['PAINT', 'ART']),
-  time: T('time', ['DAY', 'WEEK']),
+  feelings: T('feelings', ['HAPPY', 'SAD', 'GLAD', 'PROUD', 'CALM', 'BRAVE', 'SHY', 'KIND', 'LOVE']),
+  mythology: T('mythology', ['ELF', 'OGRE', 'TROLL', 'GIANT', 'FAIRY', 'GNOME', 'NYMPH', 'PIXIE', 'GHOUL']),
+  science: T('science', ['ATOM', 'CELL', 'BONE', 'GENE', 'BRAIN', 'BLOOD', 'NERVE', 'VIRUS', 'LASER']),
+  travel: T('travel', ['MAP', 'TENT', 'BAG', 'CAR', 'TRAIN', 'PLANE', 'BOAT', 'HOTEL', 'BEACH']),
+  art: T('art', ['PAINT', 'ART', 'INK', 'BRUSH', 'CHALK', 'CLAY', 'CRAFT', 'DRAW', 'COLOR']),
+  time: T('time', ['DAY', 'WEEK', 'HOUR', 'YEAR', 'CLOCK', 'NIGHT', 'NOON', 'DAWN', 'DUSK']),
+  // Mood-tilted themes — read as a feeling rather than a noun category. Words
+  // are picked short and evocative so the level intro card lands the vibe in
+  // one beat.
+  joy: T('joy', ['JOY', 'HUGS', 'GRIN', 'GLAD', 'SMILE', 'LAUGH', 'MERRY', 'HAPPY', 'PARTY']),
+  cozy: T('cozy', ['NAP', 'WARM', 'COZY', 'SOFT', 'CALM', 'QUILT', 'SLEEP', 'PURR', 'CUDDLE']),
+  spooky: T('spooky', ['BAT', 'OWL', 'MASK', 'BONES', 'GHOST', 'WITCH', 'SCARY', 'SPOOK', 'DARK']),
+  magic: T('magic', ['ELF', 'WAND', 'WISH', 'RUNE', 'MAGIC', 'SPELL', 'CHARM', 'FAIRY', 'POTION']),
+  adventure: T('adventure', ['MAP', 'TENT', 'RAFT', 'HIKE', 'TREK', 'BRAVE', 'QUEST', 'SCOUT', 'CLIMB']),
 };
 
 export const EN_CONFIG: LocaleConfig = {

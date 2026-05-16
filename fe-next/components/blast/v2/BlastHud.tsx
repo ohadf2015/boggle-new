@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { m, useMotionValue, useTransform, animate } from 'framer-motion';
 import { mechanicsForLevel } from '@/lib/blast/v2/mechanic-flags';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -17,6 +17,11 @@ type Props = {
   onHint: () => void;
   modeColor?: string;
   theme?: string;
+  // Theme target words for this level (in chain order). Renders as a list of
+  // chips below the HUD so players see their progress as they play. Optional
+  // so old call sites keep working.
+  targetWords?: string[];
+  foundWords?: string[];
 };
 
 // Animated coin counter — pops to scale 1.18 on increment, eases back to 1.
@@ -68,10 +73,16 @@ export function BlastHud({
   onHint,
   modeColor = '#BFFF00',
   theme,
+  targetWords,
+  foundWords,
 }: Props) {
   const { t } = useLanguage();
   const mech = mechanicsForLevel(levelNumber);
   const [showPreview, setShowPreview] = useState(false);
+  const foundSet = useMemo(() => {
+    if (!foundWords) return new Set<string>();
+    return new Set(foundWords.map((w) => w.toUpperCase()));
+  }, [foundWords]);
 
   return (
     <>
@@ -132,6 +143,40 @@ export function BlastHud({
           isOpen={showPreview}
           onClose={() => setShowPreview(false)}
         />
+      )}
+      {targetWords && targetWords.length > 0 && (
+        <div
+          data-testid="hud-words-strip"
+          className="flex items-center justify-center gap-1.5 px-3 py-1.5 flex-wrap bg-[#0b1530]/80"
+          style={{ borderBottom: `1px solid color-mix(in srgb, ${modeColor} 25%, transparent)` }}
+        >
+          {targetWords.map((w) => {
+            const upper = w.toUpperCase();
+            const isFound = foundSet.has(upper);
+            return (
+              <m.span
+                key={upper}
+                data-testid={`hud-word-${upper}`}
+                data-found={isFound}
+                initial={false}
+                animate={{ scale: isFound ? [1, 1.18, 1] : 1 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+                className="text-[10px] font-black uppercase tracking-wider rounded-md px-2 py-0.5"
+                style={{
+                  background: isFound ? modeColor : 'rgba(255,255,255,0.08)',
+                  color: isFound ? '#0b1530' : 'rgba(255,255,255,0.55)',
+                  textDecoration: isFound ? 'none' : 'none',
+                  letterSpacing: isFound ? '0.05em' : '0.15em',
+                  boxShadow: isFound ? `0 0 8px color-mix(in srgb, ${modeColor} 60%, transparent)` : 'none',
+                  // Mask letters until found — so the puzzle is still a puzzle.
+                  filter: isFound ? 'none' : 'blur(0px)',
+                }}
+              >
+                {isFound ? upper : upper.replace(/./g, '•')}
+              </m.span>
+            );
+          })}
+        </div>
       )}
       {(mech.revealLetterHint || mech.revealWordHint) && (
         <div className="flex items-center justify-center gap-3 px-4 py-2">

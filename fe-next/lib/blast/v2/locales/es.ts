@@ -53,6 +53,11 @@ const THEMES_ES: Record<ThemeKey, ThemeDef> = {
   travel: T('travel', ['MAPA', 'TIENDA']),
   art: T('art', ['PINTURA', 'ARTE']),
   time: T('time', ['DÍA', 'SEMANA']),
+  joy: T('joy', ['ALEGRE', 'FELIZ', 'RISA', 'AMOR', 'PAZ']),
+  cozy: T('cozy', ['CALMA', 'SUAVE', 'TIBIO', 'SUEÑO', 'MANTA']),
+  spooky: T('spooky', ['MIEDO', 'BRUJA', 'NOCHE', 'MASCARA', 'OSCURO']),
+  magic: T('magic', ['MAGIA', 'HADA', 'HECHIZO', 'GENIO', 'ELFO']),
+  adventure: T('adventure', ['MAPA', 'VIAJE', 'TIENDA', 'RIO', 'MONTAÑA']),
 };
 
 export const ES_CONFIG: LocaleConfig = {

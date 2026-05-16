@@ -63,6 +63,12 @@ const MODE_COLORS: Record<string, string> = {
   art: '#FF1493', // pink
   time: '#BFFF00', // lime
   onboarding: '#BFFF00', // lime
+  // Mood themes — picked so the vibe reads at a glance.
+  joy: '#FFD93D', // sunny yellow
+  cozy: '#F4A261', // warm peach
+  spooky: '#9D4EDD', // ghostly purple
+  magic: '#A855F7', // arcane violet
+  adventure: '#F77F00', // adventurer orange
 };
 
 export function BlastGame({
@@ -335,6 +341,7 @@ export function BlastGame({
         modeColor={modeColor}
         levelNumber={level.levelNumber}
         wordsFound={state.foundWords.size}
+        wordsFoundList={Array.from(state.foundWords)}
         timeSeconds={finalStats?.timeSeconds}
         gemsCollected={finalStats?.gemsCollected}
         bestChainDepth={bestChainDepth}
@@ -358,11 +365,16 @@ export function BlastGame({
         levelNumber={state.level.levelNumber}
         coins={progressState.coins}
         chestNumber={progressState.chestNumber}
-        chestProgress={progressState.chestProgress}
+        // Live chest progress combines the server-known progress with the
+        // in-game accumulation (capped at 1) so the badge ticks forward as
+        // gems land instead of jumping at level-end.
+        chestProgress={Math.min(1, progressState.chestProgress + state.chestProgress)}
         chestContents={progressState.chestContents}
         onShuffle={handlers.onShuffle}
         modeColor={modeColor}
         theme={level.theme}
+        targetWords={level.words}
+        foundWords={Array.from(state.foundWords)}
         onHint={() => {
           /* Plan 5 wires hints */
         }}

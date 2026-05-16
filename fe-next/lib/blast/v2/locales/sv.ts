@@ -44,6 +44,11 @@ const THEMES_SV: Record<ThemeKey, ThemeDef> = {
   travel: T('travel', ['KARTA', 'TÄLT']),
   art: T('art', ['FÄRG', 'KONST']),
   time: T('time', ['DAG', 'VECKA']),
+  joy: T('joy', ['GLAD', 'SKRATT', 'LEENDE', 'LYCKA', 'KUL']),
+  cozy: T('cozy', ['VARM', 'MJUK', 'MYSIG', 'LUGN', 'SOVA']),
+  spooky: T('spooky', ['SPÖKE', 'HÄXA', 'MASK', 'NATT', 'MÖRK']),
+  magic: T('magic', ['MAGI', 'TROLL', 'FE', 'STAV', 'DRÖM']),
+  adventure: T('adventure', ['KARTA', 'TÄLT', 'RESA', 'BERG', 'FLOD']),
 };
 
 export const SV_CONFIG: LocaleConfig = {

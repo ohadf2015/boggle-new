@@ -9,12 +9,33 @@ type Props = {
   modeColor?: string;
   levelNumber?: number;
   wordsFound?: number;
+  /** Actual words the player formed this level — rendered as chips. */
+  wordsFoundList?: string[];
   timeSeconds?: number;
   gemsCollected?: number;
   bestChainDepth?: number;
   stars?: number;
   onNext: () => void;
 };
+
+// Pick a "story" line for the level result so the screen doesn't recite the
+// same metrics every time. The first highlight that matches wins.
+function pickHighlight(opts: {
+  stars?: number;
+  cascadeCount: number;
+  bestChainDepth?: number;
+  timeSeconds?: number;
+  wordsFound?: number;
+}): { label: string; tone: 'perfect' | 'chain' | 'speed' | 'scholar' | 'clean' } {
+  if (opts.stars === 3) return { label: 'PERFECT RUN', tone: 'perfect' };
+  if ((opts.bestChainDepth ?? 0) >= 3) return { label: 'CHAIN MASTER', tone: 'chain' };
+  if ((opts.cascadeCount ?? 0) >= 2) return { label: 'CASCADE!', tone: 'chain' };
+  if (typeof opts.timeSeconds === 'number' && opts.timeSeconds > 0 && opts.timeSeconds <= 25) {
+    return { label: 'SPEEDRUN', tone: 'speed' };
+  }
+  if ((opts.wordsFound ?? 0) >= 8) return { label: 'WORDSMITH', tone: 'scholar' };
+  return { label: 'LEVEL CLEAR', tone: 'clean' };
+}
 
 function formatTime(sec: number): string {
   const m = Math.floor(sec / 60);
@@ -105,6 +126,7 @@ export function BlastLevelCompleteCard({
   modeColor = '#BFFF00',
   levelNumber,
   wordsFound,
+  wordsFoundList,
   timeSeconds,
   gemsCollected,
   bestChainDepth,
@@ -115,13 +137,18 @@ export function BlastLevelCompleteCard({
   const showWords = typeof wordsFound === 'number' && wordsFound > 0;
   const showTime = typeof timeSeconds === 'number' && timeSeconds > 0;
   const showGems = typeof gemsCollected === 'number' && gemsCollected > 0;
-  const showChain = typeof bestChainDepth === 'number' && bestChainDepth > 0;
+  const showChain = typeof bestChainDepth === 'number' && bestChainDepth > 0 && cascadeCount > 0;
+  const showCascades = cascadeCount > 0;
   const showStars = typeof stars === 'number' && stars > 0;
 
+  const highlight = pickHighlight({ stars, cascadeCount, bestChainDepth, timeSeconds, wordsFound });
+
+  // Build the stat tile list — only include metrics that actually moved this
+  // run, so the card doesn't recite the same six tiles every time.
   const tiles: TileDef[] = [
     { key: 'coins', Icon: CoinIcon, value: `+${coins}`, label: t('blast.complete.coins', 'Coins') },
-    { key: 'cascades', Icon: BoltIcon, value: String(cascadeCount), label: t('blast.complete.cascadesLabel', 'Cascades') },
   ];
+  if (showCascades) tiles.push({ key: 'cascades', Icon: BoltIcon, value: String(cascadeCount), label: t('blast.complete.cascadesLabel', 'Cascades') });
   if (showWords) tiles.push({ key: 'words', Icon: BookIcon, value: String(wordsFound), label: t('blast.complete.wordsLabel', 'Words') });
   if (showTime) tiles.push({ key: 'time', Icon: ClockIcon, value: formatTime(timeSeconds!), label: t('blast.complete.timeLabel', 'Time') });
   if (showGems) tiles.push({ key: 'gems', Icon: GemIcon, value: String(gemsCollected), label: t('blast.complete.gemsLabel', 'Gems') });
@@ -188,10 +215,52 @@ export function BlastLevelCompleteCard({
           </m.div>
         )}
         <m.div
+          data-testid="complete-highlight"
+          data-highlight-tone={highlight.tone}
+          initial={{ scale: 0.7, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.45, type: 'spring', stiffness: 320 }}
+          className="mt-3 inline-block text-[11px] font-black uppercase tracking-[0.18em] px-3 py-1 rounded-full"
+          style={{
+            background: `color-mix(in srgb, ${modeColor} 22%, transparent)`,
+            border: `1.5px solid color-mix(in srgb, ${modeColor} 70%, transparent)`,
+            color: modeColor,
+            textShadow: `1px 1px 0 #0b1530`,
+          }}
+        >
+          {highlight.label}
+        </m.div>
+        {wordsFoundList && wordsFoundList.length > 0 && (
+          <m.div
+            data-testid="complete-words-list"
+            initial={{ y: 8, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="mt-4 flex flex-wrap justify-center gap-1.5"
+          >
+            {wordsFoundList.map((w, i) => (
+              <m.span
+                key={`${w}-${i}`}
+                initial={{ scale: 0.6, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.55 + i * 0.04, type: 'spring', stiffness: 380 }}
+                className="text-[11px] font-black uppercase tracking-wider rounded-md px-2 py-0.5"
+                style={{
+                  background: modeColor,
+                  color: '#0b1530',
+                  boxShadow: `0 0 8px color-mix(in srgb, ${modeColor} 50%, transparent)`,
+                }}
+              >
+                {w}
+              </m.span>
+            ))}
+          </m.div>
+        )}
+        <m.div
           initial={{ y: 12, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-6 grid grid-cols-3 gap-2"
+          transition={{ delay: 0.6 }}
+          className="mt-5 grid grid-cols-3 gap-2"
         >
           {tiles.map((tile, i) => (
             <m.div

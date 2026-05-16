@@ -12,7 +12,11 @@ export type ThemeKey =
   | 'nature' | 'sports' | 'colors' | 'transport' | 'body'
   | 'home' | 'school' | 'tools' | 'weather' | 'music'
   | 'jobs' | 'family' | 'numbers' | 'feelings'
-  | 'mythology' | 'science' | 'travel' | 'art' | 'time';
+  | 'mythology' | 'science' | 'travel' | 'art' | 'time'
+  // Mood-tilted themes: organized around a feeling/mode rather than a noun
+  // category. Author hand-picks short evocative words so each level reads as
+  // a vibe instead of a vocabulary drill.
+  | 'joy' | 'cozy' | 'spooky' | 'magic' | 'adventure';
 
 export type BlastColumn = {
   index: number;        // 0 = leftmost (rendered rightmost in HE RTL — render layer concern)
