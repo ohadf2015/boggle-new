@@ -9,17 +9,18 @@ const pack = JSON.parse(
   readFileSync(resolve(process.cwd(), 'content/blast/packs/en/pack-chain.json'), 'utf8'),
 ) as { locale: string; levels: ChainLevelSpec[] };
 
-// Difficulty curve — each 5-level tier bumps the chain length so progression
-// stays readable. Tiers 1–3 (3/4/5-word chains) are the original onboarding
-// arc; tiers 4–6 (6/7/8-word chains) extend the curated content from 15 → 30
-// levels before the generator takes over.
+// Difficulty curve — bumped one notch starting at the L6 sophistication gate.
+// Onboarding (1–5) stays at 3-word chains so newcomers can build pattern
+// recognition. From L6 each tier carries one extra word over the prior
+// curve (5/6/7/8/9 vs 4/5/6/7/8) — the added word is intentionally a less-
+// common, longer thematic pick so vocabulary AND chain depth both step up.
 function expectedChainLength(n: number): number {
   if (n <= 5) return 3;
-  if (n <= 10) return 4;
-  if (n <= 15) return 5;
-  if (n <= 20) return 6;
-  if (n <= 25) return 7;
-  return 8;
+  if (n <= 10) return 5;
+  if (n <= 15) return 6;
+  if (n <= 20) return 7;
+  if (n <= 25) return 8;
+  return 9;
 }
 
 describe('en pack-chain.json', () => {

@@ -1,4 +1,6 @@
 'use client';
+import { useEffect, useRef } from 'react';
+import { m, useMotionValue, animate } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ChestContents } from '@/lib/blast/v2/chest-roll';
 
@@ -7,32 +9,96 @@ type Props = {
   progress: number; // 0-1
   contents: ChestContents | null;
   onPreview: () => void;
+  modeColor?: string;
 };
 
-export function BlastChestBadge({ chestNumber, progress, contents, onPreview }: Props) {
+// Tier-color map drives the rim glow + progress fill so chests visibly
+// telegraph their value (wood = neutral, gold = warm, legendary = rainbow).
+const TIER_COLORS: Record<string, { rim: string; fill: string }> = {
+  wood:       { rim: '#a16207', fill: '#fbbf24' },
+  bronze:     { rim: '#9a3412', fill: '#fb923c' },
+  silver:     { rim: '#94a3b8', fill: '#e2e8f0' },
+  gold:       { rim: '#facc15', fill: '#fde047' },
+  legendary:  { rim: '#a855f7', fill: '#f472b6' },
+};
+
+export function BlastChestBadge({
+  chestNumber,
+  progress,
+  contents,
+  onPreview,
+  modeColor = '#BFFF00',
+}: Props) {
   const { t } = useLanguage();
+  const tier = contents?.tier ?? 'wood';
+  const tierColors = TIER_COLORS[tier] ?? TIER_COLORS.wood!;
+  const fillColor = tierColors.fill;
+  const rimColor = tierColors.rim;
+
+  // Animate the progress bar fill so percent updates after a word commit
+  // visibly tick forward instead of jumping. Tracked via motionValue +
+  // width transform on the inner fill div.
+  const widthMv = useMotionValue(progress);
+  const prev = useRef(progress);
+  useEffect(() => {
+    if (prev.current === progress) return;
+    const ctrl = animate(widthMv, progress, { duration: 0.6, ease: 'easeOut' });
+    prev.current = progress;
+    return () => ctrl.stop();
+  }, [progress, widthMv]);
   const percent = Math.round(progress * 100);
 
   return (
     <button
       onClick={onPreview}
       data-testid="chest-badge"
-      className="rounded-lg border-2 border-[#0b1530] bg-[#1a1a2e] text-white px-3 py-2 text-xs space-y-1"
+      className="rounded-xl px-3 py-1.5 text-xs space-y-1.5 text-white transition-transform active:scale-95"
+      style={{
+        background: 'rgba(0,0,0,0.45)',
+        border: `2px solid ${rimColor}`,
+        boxShadow: `2px 2px 0 0 #0b1530, 0 0 14px color-mix(in srgb, ${rimColor} 40%, transparent)`,
+      }}
     >
-      <div className="font-bold">
-        {t('blast.chest.title', `Chest #${chestNumber}`, { n: String(chestNumber) })}
+      <div className="flex items-center gap-1.5 leading-none">
+        <span aria-hidden style={{ filter: `drop-shadow(0 0 4px ${rimColor})` }}>📦</span>
+        <span
+          className="font-black text-sm tracking-wide"
+          style={{ color: '#fff', textShadow: `1px 1px 0 #0b1530` }}
+        >
+          {t(`blast.chest.tier.${tier}`, tier.toUpperCase())}
+        </span>
       </div>
-      <div className="w-20 h-2 bg-[#333] border border-white">
-        <div className="h-full bg-[#BFFF00]" style={{ width: `${percent}%` }} />
+      <div
+        className="w-24 h-2.5 rounded-full overflow-hidden"
+        style={{
+          background: 'rgba(0,0,0,0.5)',
+          border: `1px solid color-mix(in srgb, ${rimColor} 60%, transparent)`,
+        }}
+      >
+        <m.div
+          className="h-full rounded-full"
+          style={{
+            scaleX: widthMv,
+            transformOrigin: 'left center',
+            background: `linear-gradient(90deg, ${fillColor}, ${modeColor})`,
+            boxShadow: `0 0 8px ${fillColor}`,
+            width: '100%',
+          }}
+        />
       </div>
-      <div className="text-xs opacity-70">
-        {t(`blast.chest.tier.${contents?.tier ?? 'wood'}`, contents?.tier ?? 'Wood')} · {percent}%
+      <div
+        className="text-[10px] font-bold tabular-nums opacity-90 leading-none"
+        style={{ textShadow: `1px 1px 0 #0b1530` }}
+      >
+        {t('blast.chest.title', `Chest #${chestNumber}`, { n: String(chestNumber) })} · {percent}%
       </div>
       {contents && (
-        <div className="text-xs space-y-0.5">
-          <div>+{contents.coins} coins</div>
-          {contents.boosts.length > 0 && <div>+{contents.boosts.length} boost</div>}
-          {contents.avatarPart && <div>+1 avatar part</div>}
+        <div className="text-[10px] space-y-0.5 leading-tight opacity-95">
+          <div>+{contents.coins} {t('blast.chest.coinsSuffix', 'coins')}</div>
+          {contents.boosts.length > 0 && (
+            <div>+{contents.boosts.length} {t('blast.chest.boostSuffix', 'boost')}</div>
+          )}
+          {contents.avatarPart && <div>+1 {t('blast.chest.avatarSuffix', 'avatar part')}</div>}
         </div>
       )}
     </button>
