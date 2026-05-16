@@ -825,6 +825,14 @@
   --combined-safe-area-bottom: calc(max(var(--safe-area-bottom), var(--cap-safe-area-bottom)) + var(--admob-banner-height));
   --combined-safe-area-left: max(var(--safe-area-left), var(--cap-safe-area-left));
   --combined-safe-area-right: max(var(--safe-area-right), var(--cap-safe-area-right));
+
+  /* Safe area without the admob clearance — for elements that already
+     position above the admob banner via `bottom: var(--admob-banner-height)`.
+     Using --combined-safe-area-bottom for their inner padding would
+     double-count the banner. Critical for Android Capacitor where
+     env(safe-area-inset-bottom) reads 0 inside the WebView and the
+     real bottom inset only lives on --cap-safe-area-bottom. */
+  --safe-area-bottom-raw: max(var(--safe-area-bottom), var(--cap-safe-area-bottom));
 }
 
 /* Safe area utility classes */
@@ -834,6 +842,14 @@
 
 .safe-area-bottom {
   padding-bottom: var(--combined-safe-area-bottom);
+}
+
+/* Same as `.safe-area-bottom` but excludes the admob banner clearance — for
+   fixed elements that already use `bottom: var(--admob-banner-height)`. Uses
+   the Capacitor-aware --safe-area-bottom-raw so Android (where env() is 0
+   inside the WebView) still respects the gesture-nav inset. */
+.safe-area-pb {
+  padding-bottom: var(--safe-area-bottom-raw);
 }
 
 .safe-area-left {

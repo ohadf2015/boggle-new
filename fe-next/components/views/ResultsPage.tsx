@@ -21,7 +21,7 @@ import { useResultsSideEffects } from '@/hooks/useResultsSideEffects';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
 import { useMultiplayerSignupNudge } from '@/hooks/useMultiplayerSignupNudge';
-import { ResultsParallaxBackdrop, ResultsSectionReveal, ResultsScrollProgressRail } from '@/components/results/ResultsScrollEffects';
+import { ResultsParallaxBackdrop, ResultsSectionReveal, ResultsScrollProgressRail, ResultsHeroTilt } from '@/components/results/ResultsScrollEffects';
 import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
 import { useObservedHeight } from '@/hooks/useObservedHeight';
@@ -137,7 +137,7 @@ function DesktopResultsLayout({
           paddingBottom: 'calc(var(--mp-results-cta-h, 8rem) + 1rem)',
         }}
       >
-        <ResultsParallaxBackdrop scrollRef={scrollRef} intensity={110} />
+        <ResultsParallaxBackdrop scrollRef={scrollRef} intensity={140} />
         <ResultsScrollProgressRail scrollRef={scrollRef} />
         {/* Top Bar with Exit Button */}
         <div className="w-full max-w-5xl mx-auto flex items-center justify-end mb-4 relative z-10">
@@ -155,20 +155,24 @@ function DesktopResultsLayout({
           </ResultsSectionReveal>
         )}
 
-        {/* Full-width cinematic area: Hero + Podium + Consolation */}
-        <ResultsSectionReveal index={1} flat className="w-full max-w-5xl mx-auto relative z-10">
-          <ResultsMainContent
-            {...mainContentProps}
-            hideInlineCta={!!gameCode && !isBotsOnlyGame}
-          />
-          {/* Global percentile context — sits below podium so it lands as the player reads
-              their own row. Hides for guests (no userId). */}
-          {userId ? (
-            <div className="mt-2 flex justify-center">
-              <GlobalRankBadge userId={userId} matchScore={matchScore} />
-            </div>
-          ) : null}
-        </ResultsSectionReveal>
+        {/* Full-width cinematic area: Hero + Podium + Consolation.
+            Wrapped in ResultsHeroTilt so the podium gains a gentle 3D recede
+            as the player scrolls further into the page. */}
+        <ResultsHeroTilt scrollRef={scrollRef} className="w-full max-w-5xl mx-auto relative z-10">
+          <ResultsSectionReveal index={1} flat>
+            <ResultsMainContent
+              {...mainContentProps}
+              hideInlineCta={!!gameCode && !isBotsOnlyGame}
+            />
+            {/* Global percentile context — sits below podium so it lands as the player reads
+                their own row. Hides for guests (no userId). */}
+            {userId ? (
+              <div className="mt-2 flex justify-center">
+                <GlobalRankBadge userId={userId} matchScore={matchScore} />
+              </div>
+            ) : null}
+          </ResultsSectionReveal>
+        </ResultsHeroTilt>
 
         {/* Two-column area below the cinematic hero */}
         <div className="w-full max-w-5xl mx-auto mt-6 medium-short:mt-3 desktop-medium-short:mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6 medium-short:gap-3 desktop-medium-short:gap-4 relative z-10">
@@ -991,11 +995,13 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             paddingBottom: 'calc(var(--mp-results-cta-h, 9rem) + 1rem)',
           }}
         >
-          <ResultsParallaxBackdrop scrollRef={mobileScrollRef} />
+          <ResultsParallaxBackdrop scrollRef={mobileScrollRef} intensity={120} />
           <div className="max-w-lg mx-auto space-y-6 medium-short:space-y-3 relative z-10">
-            <ResultsSectionReveal index={0} flat>
-              {renderResultsTab()}
-            </ResultsSectionReveal>
+            <ResultsHeroTilt scrollRef={mobileScrollRef}>
+              <ResultsSectionReveal index={0} flat>
+                {renderResultsTab()}
+              </ResultsSectionReveal>
+            </ResultsHeroTilt>
             {/* Global rank badge — mobile, sub-podium */}
             {user?.id ? (
               <ResultsSectionReveal index={1}>
@@ -1033,7 +1039,18 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               transition={{ type: 'spring', stiffness: 200, damping: 24, delay: 0.3 }}
               className="bg-neo-navy/95 border-t border-neo-white/8 shadow-[0_-4px_24px_rgba(0,0,0,0.5)]"
             >
-              <div className="px-3 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))]">
+              {/* Inline style for padding-bottom: Tailwind arbitrary values
+                  don't survive multi-arg max() with var() reliably. Capacitor
+                  fix — Android WebView reports env(safe-area-inset-bottom) as
+                  0, so the real gesture-nav inset only arrives via
+                  --cap-safe-area-bottom (set by useSafeArea hook). */}
+              <div
+                className="px-3 pt-2.5"
+                style={{
+                  paddingBottom:
+                    'max(0.625rem, env(safe-area-inset-bottom, 0px), var(--cap-safe-area-bottom, 0px))',
+                }}
+              >
                 <StickyReadyBar
                   isHost={isHost}
                   isCurrentPlayerReady={isCurrentPlayerReady}
