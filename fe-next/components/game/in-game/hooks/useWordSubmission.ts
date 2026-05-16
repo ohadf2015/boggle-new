@@ -5,7 +5,7 @@ import type { Socket } from 'socket.io-client';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { FoundWord } from '@/shared/types/view';
 import type { WordFeedback } from '../../WordFormingArea';
-import { validateWordLocally, couldBeOnBoard } from '@/utils/clientWordValidator';
+import { validateWordLocally, couldBeOnBoard, normalizeWord } from '@/utils/clientWordValidator';
 import { hapticForWordScore, hapticError } from '@/utils/haptics';
 import type { TranslationFn } from '../types';
 
@@ -64,21 +64,40 @@ export function useWordSubmission(
   // This ensures the socket emit uses the latest value without waiting for re-render
   const fireRoundActiveRef = useRef(false);
 
+  // Keep the latest foundWords as a normalized Set behind a ref so
+  // `handleGridWordSubmit` doesn't have to depend on `normalizedFoundWords`
+  // identity. Without this, the array reference flipping on every word
+  // submission rebuilt the callback → broke GridComponent memo via the
+  // onWordSubmit prop → forced 16 GridCell equality re-checks per accept.
+  // The Set also gives O(1) duplicate lookup vs the array.some() + per-element
+  // normalizeWord() scan validateWordLocally falls back to.
+  const foundWordsSetRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const lang = (gameLanguage || 'en') as Language;
+    const next = new Set<string>();
+    for (const fw of normalizedFoundWords) {
+      const w = typeof fw === 'string' ? fw : fw.word;
+      if (w) next.add(normalizeWord(w, lang));
+    }
+    foundWordsSetRef.current = next;
+  }, [normalizedFoundWords, gameLanguage]);
+
   const handleGridWordSubmit = useCallback((formedWord: string, meta?: { inputMethod: 'kb' | 'drag' }): void => {
     if (!isPlaying) return;
 
     const currentLang = gameLanguage || 'en';
 
-    // Client-side validation
-    const validation = validateWordLocally(formedWord, currentLang, minWordLength, normalizedFoundWords);
+    // Client-side validation — pass the pre-normalized Set so the lookup is
+    // O(1) and doesn't have to re-normalize every previously-found word per
+    // submit.
+    const validation = validateWordLocally(formedWord, currentLang, minWordLength, foundWordsSetRef.current);
 
     if (!validation.isValid) {
       if (process.env.NODE_ENV === 'development') {
         console.warn('[WORD_SUBMIT] Client rejected word:', {
           word: formedWord,
           errorKey: validation.errorKey,
-          foundWordsCount: normalizedFoundWords.length,
-          foundWordsList: normalizedFoundWords.slice(0, 10).map(w => typeof w === 'string' ? w : w.word),
+          foundWordsCount: foundWordsSetRef.current.size,
         });
       }
       let msg: string;
@@ -150,11 +169,15 @@ export function useWordSubmission(
 
     // Add to local found words
     onWordSubmit?.(formedWord, meta);
+    // Intentionally NOT depending on `normalizedFoundWords`: we read the
+    // already-normalized Set through `foundWordsSetRef` which is refreshed by
+    // the effect above. Putting the array here would force a new callback
+    // identity per word found and re-break the GridComponent memo we just
+    // stabilised — defeating the purpose of this hook's perf shape.
   }, [
     isPlaying,
     gameLanguage,
     minWordLength,
-    normalizedFoundWords,
     letterGrid,
     gameActive,
     socket,
