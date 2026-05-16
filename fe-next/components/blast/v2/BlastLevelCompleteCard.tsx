@@ -1,6 +1,7 @@
 'use client';
+import { useEffect, useRef } from 'react';
 import type * as React from 'react';
-import { m } from 'framer-motion';
+import gsap from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 type Props = {
@@ -154,50 +155,215 @@ export function BlastLevelCompleteCard({
   if (showGems) tiles.push({ key: 'gems', Icon: GemIcon, value: String(gemsCollected), label: t('blast.complete.gemsLabel', 'Gems') });
   if (showChain) tiles.push({ key: 'chain', Icon: FlameIcon, value: `x${bestChainDepth}`, label: t('blast.complete.chainLabel', 'Best Chain') });
 
+  // GSAP timeline driving the entire reveal — card slam, title scale-pop with
+  // glow, star cascade, stat counter-up, words list chip pour, button bounce.
+  // Replaced framer-motion variants because the prior pass read as "one stagger
+  // wave" — same easing, same delay, same vibe across every tile. GSAP lets
+  // each beat hit a different ease + a synced confetti burst.
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const starsRef = useRef<HTMLDivElement>(null);
+  const tilesRef = useRef<HTMLDivElement>(null);
+  const wordsRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const reduce = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const card = cardRef.current;
+    if (!card || reduce) return;
+
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    // Card slam-in with a dramatic over-rotate + scale punch.
+    tl.fromTo(
+      card,
+      { scale: 0.45, opacity: 0, rotation: -6, y: 40 },
+      { scale: 1.05, opacity: 1, rotation: 0, y: 0, duration: 0.55, ease: 'back.out(1.8)' },
+    ).to(card, { scale: 1, duration: 0.18, ease: 'power2.out' });
+
+    // Title scale-pop with a quick yoyo glow flash.
+    if (titleRef.current) {
+      tl.fromTo(
+        titleRef.current,
+        { scale: 0.3, opacity: 0, letterSpacing: '0.4em' },
+        { scale: 1, opacity: 1, letterSpacing: '0em', duration: 0.45, ease: 'back.out(2.2)' },
+        '-=0.25',
+      ).fromTo(
+        titleRef.current,
+        { filter: 'brightness(2.6) drop-shadow(0 0 28px currentColor)' },
+        { filter: 'brightness(1) drop-shadow(0 0 0px currentColor)', duration: 0.5, ease: 'power2.out' },
+        '<',
+      );
+    }
+
+    // Stars cascade from above, one by one with a bounce.
+    if (starsRef.current) {
+      const stars = starsRef.current.querySelectorAll<HTMLElement>('[data-star-index]');
+      tl.fromTo(
+        stars,
+        { y: -60, scale: 0, opacity: 0, rotation: -180 },
+        {
+          y: 0,
+          scale: 1,
+          opacity: 1,
+          rotation: 0,
+          duration: 0.55,
+          stagger: 0.12,
+          ease: 'back.out(2.4)',
+        },
+        '-=0.2',
+      );
+    }
+
+    // Words found chips pour in with a stagger from below.
+    if (wordsRef.current) {
+      const chips = wordsRef.current.querySelectorAll<HTMLElement>('[data-word-chip]');
+      tl.fromTo(
+        chips,
+        { y: 22, scale: 0.5, opacity: 0 },
+        { y: 0, scale: 1, opacity: 1, duration: 0.45, stagger: 0.035, ease: 'back.out(2)' },
+        '-=0.3',
+      );
+    }
+
+    // Stat tiles pop up, then each value counter-ups from 0 to its real number.
+    if (tilesRef.current) {
+      const tileEls = tilesRef.current.querySelectorAll<HTMLElement>('[data-stat]');
+      tl.fromTo(
+        tileEls,
+        { y: 30, scale: 0.5, opacity: 0 },
+        {
+          y: 0,
+          scale: 1,
+          opacity: 1,
+          duration: 0.5,
+          stagger: 0.08,
+          ease: 'back.out(2)',
+        },
+        '-=0.15',
+      );
+
+      // Counter-up: numeric values tick from 0 to their final number for
+      // dramatic effect. Non-numeric values (like "1:23" time) are left as-is.
+      tileEls.forEach((tile, idx) => {
+        const valueEl = tile.querySelector<HTMLElement>('[data-stat-value]');
+        if (!valueEl) return;
+        const raw = valueEl.dataset.statValue ?? valueEl.textContent ?? '';
+        const numMatch = raw.match(/^([+x]?)(\d+)$/);
+        if (!numMatch) return;
+        const prefix = numMatch[1] ?? '';
+        const final = parseInt(numMatch[2] ?? '0', 10);
+        const obj = { n: 0 };
+        tl.to(
+          obj,
+          {
+            n: final,
+            duration: 0.6,
+            ease: 'power2.out',
+            onUpdate: () => {
+              valueEl.textContent = `${prefix}${Math.round(obj.n)}`;
+            },
+          },
+          `-=${0.5 - idx * 0.08}`,
+        );
+      });
+    }
+
+    // Button bounces in with a soft spring at the very end.
+    if (buttonRef.current) {
+      tl.fromTo(
+        buttonRef.current,
+        { y: 32, opacity: 0, scale: 0.8 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(1.8)' },
+        '-=0.1',
+      ).to(
+        buttonRef.current,
+        { scale: 1.04, duration: 0.35, repeat: -1, yoyo: true, ease: 'sine.inOut' },
+      );
+    }
+
+    // Confetti burst from the card centre — DOM-based so it doesn't depend on
+    // any Pixi initialization to render.
+    const container = containerRef.current;
+    if (container) {
+      const colors = [modeColor, '#ffffff', '#fbbf24', '#ec4899', '#00ffff', '#a855f7'];
+      const rect = card.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      const cx = rect.left - containerRect.left + rect.width / 2;
+      const cy = rect.top - containerRect.top + rect.height / 3;
+      for (let i = 0; i < 36; i++) {
+        const piece = document.createElement('span');
+        const tint = colors[i % colors.length]!;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 180 + Math.random() * 220;
+        Object.assign(piece.style, {
+          position: 'absolute',
+          left: `${cx}px`,
+          top: `${cy}px`,
+          width: '8px',
+          height: '12px',
+          marginLeft: '-4px',
+          marginTop: '-6px',
+          background: tint,
+          borderRadius: '2px',
+          boxShadow: `0 0 6px ${tint}`,
+          willChange: 'transform, opacity',
+          pointerEvents: 'none',
+        });
+        container.appendChild(piece);
+        gsap.to(piece, {
+          x: Math.cos(angle) * speed,
+          y: Math.sin(angle) * speed + 220,
+          rotation: (Math.random() - 0.5) * 720,
+          opacity: 0,
+          duration: 1.3 + Math.random() * 0.6,
+          ease: 'power2.in',
+          delay: 0.25 + (i % 12) * 0.02,
+          onComplete: () => piece.remove(),
+        });
+      }
+    }
+
+    return () => {
+      tl.kill();
+    };
+  }, [modeColor]);
+
   return (
     <div
+      ref={containerRef}
       data-testid="complete-card"
       className="relative grid place-items-center min-h-dvh overflow-hidden text-white"
       style={{
         background: `radial-gradient(ellipse 70% 60% at 50% 40%, color-mix(in srgb, ${modeColor} 22%, #0b1530) 0%, #0b1530 70%)`,
       }}
     >
-      <m.div
-        initial={{ scale: 0.5, opacity: 0, rotate: -3 }}
-        animate={{ scale: 1, opacity: 1, rotate: 0 }}
-        transition={{ type: 'spring', stiffness: 320, damping: 18 }}
+      <div
+        ref={cardRef}
         className="relative max-w-md w-[92%] px-6 py-8 rounded-2xl text-center"
         style={{
+          opacity: 0,
           background: '#16213e',
           border: `3px solid ${modeColor}`,
           boxShadow: `6px 6px 0 #0b1530, 0 0 60px color-mix(in srgb, ${modeColor} 35%, transparent)`,
         }}
       >
         {levelNumber !== undefined && (
-          <m.div
-            initial={{ y: -8, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.15 }}
-            className="text-xs uppercase tracking-[0.2em] opacity-70"
-          >
+          <div className="text-xs uppercase tracking-[0.2em] opacity-70">
             {t('blast.level', `Level ${levelNumber}`, { n: String(levelNumber) })}
-          </m.div>
+          </div>
         )}
-        <m.div
-          initial={{ scale: 0.7, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.25, type: 'spring', stiffness: 400 }}
+        <div
+          ref={titleRef}
           className="text-4xl font-black mt-2"
           style={{ color: modeColor, textShadow: `3px 3px 0 #0b1530` }}
         >
           {t('blast.complete.title', 'Level Complete!')}
-        </m.div>
+        </div>
         {showStars && (
-          <m.div
+          <div
+            ref={starsRef}
             data-testid="complete-stars"
-            initial={{ scale: 0, rotate: -20 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ delay: 0.4, type: 'spring', stiffness: 360 }}
             className="mt-3 flex justify-center gap-1.5"
             aria-label={`${stars} stars`}
             style={{ color: modeColor }}
@@ -207,19 +373,16 @@ export function BlastLevelCompleteCard({
                 key={i}
                 data-star-index={i}
                 data-star-filled={i < stars!}
-                style={{ opacity: i < stars! ? 1 : 0.28 }}
+                style={{ opacity: i < stars! ? 1 : 0.28, display: 'inline-block' }}
               >
                 <StarIcon className="w-7 h-7" filled={i < stars!} />
               </span>
             ))}
-          </m.div>
+          </div>
         )}
-        <m.div
+        <div
           data-testid="complete-highlight"
           data-highlight-tone={highlight.tone}
-          initial={{ scale: 0.7, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.45, type: 'spring', stiffness: 320 }}
           className="mt-3 inline-block text-[11px] font-black uppercase tracking-[0.18em] px-3 py-1 rounded-full"
           style={{
             background: `color-mix(in srgb, ${modeColor} 22%, transparent)`,
@@ -229,45 +392,34 @@ export function BlastLevelCompleteCard({
           }}
         >
           {highlight.label}
-        </m.div>
+        </div>
         {wordsFoundList && wordsFoundList.length > 0 && (
-          <m.div
+          <div
+            ref={wordsRef}
             data-testid="complete-words-list"
-            initial={{ y: 8, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.5 }}
             className="mt-4 flex flex-wrap justify-center gap-1.5"
           >
             {wordsFoundList.map((w, i) => (
-              <m.span
+              <span
                 key={`${w}-${i}`}
-                initial={{ scale: 0.6, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.55 + i * 0.04, type: 'spring', stiffness: 380 }}
+                data-word-chip
                 className="text-[11px] font-black uppercase tracking-wider rounded-md px-2 py-0.5"
                 style={{
                   background: modeColor,
                   color: '#0b1530',
                   boxShadow: `0 0 8px color-mix(in srgb, ${modeColor} 50%, transparent)`,
+                  display: 'inline-block',
                 }}
               >
                 {w}
-              </m.span>
+              </span>
             ))}
-          </m.div>
+          </div>
         )}
-        <m.div
-          initial={{ y: 12, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="mt-5 grid grid-cols-3 gap-2"
-        >
-          {tiles.map((tile, i) => (
-            <m.div
+        <div ref={tilesRef} className="mt-5 grid grid-cols-3 gap-2">
+          {tiles.map((tile) => (
+            <div
               key={tile.key}
-              initial={{ scale: 0.6, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.55 + i * 0.06, type: 'spring', stiffness: 380 }}
               data-stat={tile.key}
               className="rounded-xl p-3 flex flex-col items-center"
               style={{
@@ -283,18 +435,20 @@ export function BlastLevelCompleteCard({
               >
                 <tile.Icon className="w-7 h-7" />
               </div>
-              <div className="text-xl font-bold tabular-nums mt-1.5">{tile.value}</div>
+              <div
+                data-stat-value={tile.value}
+                className="text-xl font-bold tabular-nums mt-1.5"
+              >
+                {tile.value}
+              </div>
               <div className="text-[10px] uppercase tracking-wider opacity-65 mt-0.5">
                 {tile.label}
               </div>
-            </m.div>
+            </div>
           ))}
-        </m.div>
-        <m.button
-          initial={{ y: 16, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.55 + tiles.length * 0.06 + 0.1, type: 'spring', stiffness: 320 }}
-          whileTap={{ scale: 0.96 }}
+        </div>
+        <button
+          ref={buttonRef}
           onClick={onNext}
           className="mt-7 px-8 py-3 w-full rounded-lg font-black text-lg uppercase tracking-wide"
           style={{
@@ -305,8 +459,8 @@ export function BlastLevelCompleteCard({
           data-testid="next-btn"
         >
           {t('blast.complete.next', 'Next Level')} →
-        </m.button>
-      </m.div>
+        </button>
+      </div>
     </div>
   );
 }

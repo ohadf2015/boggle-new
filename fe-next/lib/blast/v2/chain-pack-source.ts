@@ -59,11 +59,15 @@ export class ChainPackSource implements LevelSource {
     const extraCheck = await this.getExtraWordCheck(locale);
 
     // Tier 1: with extra-word-check (avoids incidental dictionary words on board).
-    let level = buildChainLevel(spec, levelNumber, extraCheck);
+    // Capped at a smaller attempt budget for narrow grids — the screen rejects
+    // many placements once towers stack, so we fail fast and fall back rather
+    // than burn minutes searching.
+    const tier1Budget = spec.columns <= 5 ? 600 : 3000;
+    let level = buildChainLevel(spec, levelNumber, extraCheck, tier1Budget);
 
     // Tier 2: fallback without extra-word-check. Better an occasional incidental
     // word than an unplayable level. Solvability is the hard invariant; aesthetic
-    // cleanliness is soft. (Only triggers when tier 1 exhausted 500 attempts.)
+    // cleanliness is soft. (Only triggers when tier 1 exhausted attempts.)
     if (!level && extraCheck) {
       level = buildChainLevel(spec, levelNumber);
     }

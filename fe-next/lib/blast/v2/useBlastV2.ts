@@ -29,6 +29,17 @@ type Action =
   | { type: 'sel'; event: SelectionEvent }
   | { type: 'shuffle' };
 
+// Base chest contribution per word found. Every word ticks the bar so the
+// chest visibly fills during play — without this, levels that ship without
+// gem tiles (most curated chain levels in L1–L5) leave the bar stuck at 0%
+// the whole game. Scales with word length so longer chains feel more
+// rewarding. Gem tiles still stack their own delta on top via scoreForWord.
+function baseChestDeltaForWord(cellCount: number, kind: 'theme' | 'bonus'): number {
+  const base = kind === 'theme' ? 0.05 : 0.025; // 5% per theme word, 2.5% per bonus
+  const lengthBonus = Math.max(0, cellCount - 3) * 0.01; // +1% per letter past 3
+  return base + lengthBonus;
+}
+
 function applyValidatedSubmit(state: State, cells: CellId[]): State {
   const config = LOCALE_CONFIGS[state.level.locale];
   const mechanics = mechanicsForLevel(state.level.levelNumber);
@@ -56,7 +67,8 @@ function applyValidatedSubmit(state: State, cells: CellId[]): State {
   newFound.add(res.word);
   let newLevel = state.level;
   let newTileIds = state.tileIds;
-  let newChestProgress = state.chestProgress + outcome.chestProgressDelta;
+  const baseDelta = baseChestDeltaForWord(cells.length, kind);
+  let newChestProgress = state.chestProgress + outcome.chestProgressDelta + baseDelta;
   let newCascadeCount = state.cascadeCount;
   let newCoins = state.coins + outcome.coinsBase + outcome.coinsFromOverlays;
 

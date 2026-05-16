@@ -45,34 +45,12 @@ describe('en pack-chain.json', () => {
     }
   });
 
-  it('columns exceed the longest word in every chain', () => {
+  // Phone-readability cap — every level ships with at most 5 columns so each
+  // tile reads at ~60px+ on a 360px-wide phone. Words longer than 5 letters
+  // are placed vertically (single-column tower) by the chain builder.
+  it('caps columns at 5 across all levels', () => {
     for (const spec of pack.levels) {
-      const longest = Math.max(...spec.chain.map((w) => w.length));
-      expect(spec.columns, `${spec.id}`).toBeGreaterThan(longest);
-    }
-  });
-
-  // Phone-readability ceiling — long words (≥6 letters) shipped on phones at
-  // L16+ produced cramped tiles + horizontal scroll. Hard-capping the longest
-  // word at 5 keeps tile size legible without a redesign.
-  it('caps the longest word at 5 letters from L11 onward', () => {
-    for (const spec of pack.levels) {
-      if (spec.levelNumber < 11) continue;
-      const longest = Math.max(...spec.chain.map((w) => w.length));
-      expect(longest, `${spec.id}: word length ${longest} exceeds 5`).toBeLessThanOrEqual(5);
-    }
-  });
-
-  // Board-width ceiling — tile size shrinks linearly with column count on the
-  // narrow axis. Capping at 10 keeps tiles tappable on a 360px-wide phone
-  // (≈ 32px per tile) and a large step down from the prior 11–15 columns
-  // that produced thin strips on long chains. The 10-col allowance is for
-  // dense 9-word chains (L26-30) where the chain builder needs extra width
-  // to isolate all the words without dictionary collisions.
-  it('caps columns at 10 from L11 onward', () => {
-    for (const spec of pack.levels) {
-      if (spec.levelNumber < 11) continue;
-      expect(spec.columns, `${spec.id}: ${spec.columns} columns exceeds 10`).toBeLessThanOrEqual(10);
+      expect(spec.columns, `${spec.id}: ${spec.columns} columns exceeds 5`).toBeLessThanOrEqual(5);
     }
   });
 });

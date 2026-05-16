@@ -6,7 +6,7 @@
       "levelNumber": 1,
       "theme": "onboarding",
       "locale": "he",
-      "columns": 6,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["חתול", "שמש", "ביצה"]
     },
@@ -15,7 +15,7 @@
       "levelNumber": 2,
       "theme": "fruits",
       "locale": "he",
-      "columns": 6,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["תפוח", "ענב", "אגס"]
     },
@@ -33,7 +33,7 @@
       "levelNumber": 4,
       "theme": "food",
       "locale": "he",
-      "columns": 6,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["לחמ", "אורז", "עוגה"]
     },
@@ -42,7 +42,7 @@
       "levelNumber": 5,
       "theme": "colors",
       "locale": "he",
-      "columns": 6,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["אדומ", "כחול", "ירוק"]
     },
@@ -51,7 +51,7 @@
       "levelNumber": 6,
       "theme": "ocean",
       "locale": "he",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["דג", "סרטנ", "כריש", "צדפה", "ספינה"]
     },
@@ -60,7 +60,7 @@
       "levelNumber": 7,
       "theme": "space",
       "locale": "he",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["ירח", "כוכב", "שמש", "מאדימ", "מטאור"]
     },
@@ -69,7 +69,7 @@
       "levelNumber": 8,
       "theme": "animals",
       "locale": "he",
-      "columns": 6,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["זאב", "דוב", "נמר", "אריה", "תנינ"]
     },
@@ -78,7 +78,7 @@
       "levelNumber": 9,
       "theme": "fruits",
       "locale": "he",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["תפוז", "בננה", "מנגו", "לימונ", "אבטיח"]
     },
@@ -87,7 +87,7 @@
       "levelNumber": 10,
       "theme": "weather",
       "locale": "he",
-      "columns": 6,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["גשמ", "עננ", "שלג", "סופה", "ברק"]
     },
@@ -96,7 +96,7 @@
       "levelNumber": 11,
       "theme": "animals",
       "locale": "he",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["סוסה", "זברה", "פנדה", "קואלה", "נמיה", "צבוע"]
     },
@@ -105,7 +105,7 @@
       "levelNumber": 12,
       "theme": "food",
       "locale": "he",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["גבינה", "פסטה", "סלט", "דבש", "פלפל", "מרק"]
     },
@@ -114,7 +114,7 @@
       "levelNumber": 13,
       "theme": "nature",
       "locale": "he",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["נהר", "חופ", "מערה", "אגמ", "יער", "שדה"]
     },
@@ -123,7 +123,7 @@
       "levelNumber": 14,
       "theme": "space",
       "locale": "he",
-      "columns": 8,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["כוכב", "גלקסיה", "מטאור", "רקטה", "מסלול", "נבולה"]
     },
@@ -132,7 +132,7 @@
       "levelNumber": 15,
       "theme": "animals",
       "locale": "he",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["קרנפ", "נמר", "פיל", "צבי", "יענ", "חזיר"]
     },
@@ -141,7 +141,7 @@
       "levelNumber": 16,
       "theme": "ocean",
       "locale": "he",
-      "columns": 9,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["דג", "גל", "צדפ", "שונית", "כריש", "צלילה", "מדוזה"]
     },
@@ -150,7 +150,7 @@
       "levelNumber": 17,
       "theme": "nature",
       "locale": "he",
-      "columns": 8,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["עצ", "עלה", "סלע", "נהר", "אגמ", "מערה", "גשר"]
     },
@@ -159,7 +159,7 @@
       "levelNumber": 18,
       "theme": "weather",
       "locale": "he",
-      "columns": 8,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["גשמ", "רוח", "שלג", "עננ", "ברד", "סופה", "ברק"]
     },
@@ -168,7 +168,7 @@
       "levelNumber": 19,
       "theme": "fruits",
       "locale": "he",
-      "columns": 9,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["תפוז", "ענב", "אגס", "מנגו", "בננה", "אפרסק", "דובדבנ"]
     },
@@ -177,7 +177,7 @@
       "levelNumber": 20,
       "theme": "food",
       "locale": "he",
-      "columns": 8,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["אורז", "סלט", "פסטה", "עוגה", "לחמ", "גבינה", "פיתה"]
     },
@@ -186,7 +186,7 @@
       "levelNumber": 21,
       "theme": "animals",
       "locale": "he",
-      "columns": 10,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["דוב", "זאב", "פיל", "נמר", "סוס", "אריה", "קרנפ", "תוכי"]
     },
@@ -195,7 +195,7 @@
       "levelNumber": 22,
       "theme": "home",
       "locale": "he",
-      "columns": 10,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["דלת", "חדר", "כסא", "מיטה", "שולח", "ארונ", "מטבח", "מנורה"]
     },
@@ -204,7 +204,7 @@
       "levelNumber": 23,
       "theme": "school",
       "locale": "he",
-      "columns": 10,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["ספר", "עט", "כיתה", "מורה", "תיק", "לוח", "תלמיד", "שיעור"]
     },
@@ -213,7 +213,7 @@
       "levelNumber": 24,
       "theme": "space",
       "locale": "he",
-      "columns": 10,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["כוכב", "ירח", "שמש", "רקטה", "מאדימ", "גלקסיה", "מסלול", "נבולה"]
     },
@@ -222,7 +222,7 @@
       "levelNumber": 25,
       "theme": "transport",
       "locale": "he",
-      "columns": 10,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["מכונית", "אופניימ", "רכבת", "מטוס", "סירה", "אוטובוס", "אוניה", "אופנוע"]
     },
@@ -231,7 +231,7 @@
       "levelNumber": 26,
       "theme": "fruits",
       "locale": "he",
-      "columns": 12,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["תפוח", "ענב", "אגס", "מנגו", "תפוז", "לימונ", "בננה", "אננס", "דובדבנ"]
     },
@@ -240,7 +240,7 @@
       "levelNumber": 27,
       "theme": "ocean",
       "locale": "he",
-      "columns": 12,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["דג", "גל", "סרטנ", "צדפ", "כריש", "לוויתנ", "תמנונ", "אלמוג", "מדוזה"]
     },
@@ -249,7 +249,7 @@
       "levelNumber": 28,
       "theme": "mythology",
       "locale": "he",
-      "columns": 12,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["ענק", "פרא", "שד", "ננס", "פיה", "טרול", "דרקונ", "קוסמ", "מכשפה"]
     },
@@ -258,7 +258,7 @@
       "levelNumber": 29,
       "theme": "music",
       "locale": "he",
-      "columns": 12,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": ["תופ", "שיר", "להקה", "חליל", "כינור", "גיטרה", "פסנתר", "תזמורת", "מנגינה"]
     },
@@ -267,7 +267,7 @@
       "levelNumber": 30,
       "theme": "science",
       "locale": "he",
-      "columns": 12,
+      "columns": 7,
       "decoyTiles": 0,
       "chain": ["אטומ", "תא", "עצמ", "מוח", "דמ", "גנ", "אנרגיה", "כבידה", "מולקולה"]
     }

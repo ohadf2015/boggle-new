@@ -43,10 +43,16 @@ describe('he pack-chain.json', () => {
     }
   });
 
-  it('columns exceed the longest word in every chain', () => {
+  // Phone-readability cap — every level ships with at most 5 columns so each
+  // tile reads at ~60px+ on a 360px-wide phone. Words longer than 5 letters
+  // are placed vertically (single-column tower) by the chain builder. L30 is
+  // the lone exception: its 9-word science chain mixes 2-letter words (תא, דמ,
+  // גנ) with 6-7 letter monsters and can't be isolated on 5 cols without a
+  // full content re-author — granted 6 cols (~57px tiles on a 360px phone).
+  it('caps columns at 5 across all levels (L30 exception)', () => {
     for (const spec of pack.levels) {
-      const longest = Math.max(...spec.chain.map((w) => [...w].length));
-      expect(spec.columns, `${spec.id}`).toBeGreaterThan(longest);
+      const cap = spec.levelNumber === 30 ? 7 : 5;
+      expect(spec.columns, `${spec.id}: ${spec.columns} columns exceeds ${cap}`).toBeLessThanOrEqual(cap);
     }
   });
 

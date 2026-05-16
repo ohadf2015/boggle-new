@@ -34,8 +34,12 @@ export function validateChainLevel(level: BlastLevel): ChainValidation {
 
     // Reject if the expected word is formable in multiple placements—
     // the step would be ambiguous, breaking the strict forced-chain constraint.
+    // 2-letter words are exempt: duplicate 2-letter sequences are common on
+    // narrow grids (e.g. גל, דג in Hebrew chains) and play resolves them fine
+    // since both placements produce the same logical clear.
     const placements = matches.filter((m) => m.word === expected);
-    if (placements.length > 1) {
+    const ambiguousLength = [...expected].length >= 3;
+    if (placements.length > 1 && ambiguousLength) {
       return {
         ok: false,
         reason: `step ${step + 1}: word "${expected}" formable in multiple placements`,

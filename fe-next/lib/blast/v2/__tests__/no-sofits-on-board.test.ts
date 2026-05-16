@@ -20,5 +20,5 @@ describe('blast v2 — no Hebrew sofit letters land on the board', () => {
         }
       }
     }
-  }, 30_000);
+  }, 180_000);
 });

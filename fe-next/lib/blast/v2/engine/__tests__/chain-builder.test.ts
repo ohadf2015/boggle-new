@@ -108,9 +108,15 @@ describe('buildChainLevel', () => {
     expect(level!.columns.length).toBe(4);
   });
 
-  it('returns null for an impossible chain (word longer than columns)', () => {
-    const bad: ChainLevelSpec = { ...spec, columns: 2, chain: ['CAT'] };
-    expect(buildChainLevel(bad, 7)).toBeNull();
+  it('builds a vertical-only level when the floor word is wider than the grid', () => {
+    // Phone-friendly silhouettes use cols=5 but ship chain levels with 6–7-letter
+    // floor words. The builder must stack them vertically instead of giving up.
+    const wide: ChainLevelSpec = { ...spec, columns: 5, chain: ['UMBRELLA'] };
+    const level = buildChainLevel(wide, 7);
+    expect(level).not.toBeNull();
+    expect(validateChainLevel(level!).ok).toBe(true);
+    const towerCol = level!.columns.find((c) => c.tiles.length === 8);
+    expect(towerCol, 'expected one column to hold the full 8-letter tower').toBeTruthy();
   });
 
   it('returns null when decoyTiles > 0 — decoys are currently unsupported', () => {
