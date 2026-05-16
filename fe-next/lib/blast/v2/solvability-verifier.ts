@@ -44,13 +44,18 @@ export function verifyChainLevel(
   extraCheck?: ExtraWordCheck,
 ): LevelVerifyResult {
   const base = { id: spec.id, levelNumber: spec.levelNumber, locale: spec.locale };
-  const longest = Math.max(...spec.chain.map((w) => [...w].length));
-  if (longest > spec.columns) {
-    return { ...base, ok: false, reason: `longest word (${longest}) > columns (${spec.columns})` };
+  // Words longer than the grid width are valid — chain-builder stacks them as
+  // single-column vertical towers (phone-friendly 5-col cap). The build still
+  // needs at least one column.
+  if (spec.columns < 1) {
+    return { ...base, ok: false, reason: `invalid columns (${spec.columns})` };
   }
   // Tiered: try strict (with screen) first, fall back to relaxed (no screen).
   // Matches ChainPackSource.resolve so verifier reflects runtime behaviour.
-  let level = buildChainLevel(spec, spec.levelNumber, extraCheck);
+  // Narrow grids (≤5 cols) cap the screened budget — once towers stack the
+  // common-word screen rejects most placements, so we fail-fast and fall back.
+  const tier1Budget = spec.columns <= 5 ? 600 : 3000;
+  let level = buildChainLevel(spec, spec.levelNumber, extraCheck, tier1Budget);
   if (!level && extraCheck) {
     level = buildChainLevel(spec, spec.levelNumber);
   }

@@ -27,6 +27,7 @@ import { BlastAtmosphereOverlay } from './BlastAtmosphereOverlay';
 import { BlastFtueOverlay, type FtueStep } from './BlastFtueOverlay';
 import { BlastUnlockCard } from './BlastUnlockCard';
 import { BlastConceptIntroCard } from './BlastConceptIntroCard';
+import { BlastWordCelebration } from './BlastWordCelebration';
 
 type Props = {
   level: BlastLevel;
@@ -387,6 +388,12 @@ export function BlastGame({
           clearCenters={clearCentersRef.current}
           clearEventKey={state.chainEventKey}
           modeColor={modeColor}
+        />
+        <BlastWordCelebration
+          eventKey={state.chainEventKey}
+          centers={clearCentersRef.current}
+          modeColor={modeColor}
+          chainDepth={state.lastChainDepth}
         />
         <BlastChainSoundListener />
         {/* Size-typed stage: drives container-query tile sizing on BOTH axes.

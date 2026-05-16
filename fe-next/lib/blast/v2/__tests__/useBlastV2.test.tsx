@@ -163,6 +163,23 @@ describe('useBlastV2 hook', () => {
     ]);
   });
 
+  it('ticks chest progress on every word found, even without gem tiles', () => {
+    // Curated chain levels ship without gem tiles, so the old gem-only
+    // chestProgressDelta left the bar at 0% throughout play. Every word now
+    // contributes a base delta so the chest visibly fills.
+    const { result } = renderHook(() => useBlastV2(mockLevel));
+    expect(result.current.state.chestProgress).toBe(0);
+
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(0, 1));
+      result.current.handlers.onPointerMove(cellId(0, 2));
+      result.current.handlers.onPointerUp();
+    });
+
+    expect(result.current.state.chestProgress).toBeGreaterThan(0);
+  });
+
   it('preserves tile identity through a collapse', () => {
     const { result } = renderHook(() => useBlastV2(revealLevel));
 

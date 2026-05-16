@@ -123,11 +123,18 @@ export function insertWord(
     }
     const matches = scanFormableThemeWords(level, [word, ...otherWordsOnBoard], locale);
     const formableWords = new Set(matches.map((m) => m.word));
+    const wordPlacements = matches.filter((m) => m.word === word).length;
 
-    // Success: only `word` is formable AND no unintended common words appear.
+    // Success: only `word` is formable, no unintended common words appear,
+    // and (for words ≥3 letters) exactly one placement so the validator's
+    // strict chain check passes. Two-letter words are exempt — duplicate
+    // 2-letter sequences are unavoidable on narrow grids and still resolve
+    // unambiguously in play.
+    const placementOK = [...word].length >= 3 ? wordPlacements === 1 : wordPlacements >= 1;
     if (
       formableWords.size === 1 &&
       formableWords.has(word) &&
+      placementOK &&
       passesExtraWordCheck(level, extraWordCheck)
     ) {
       return { level, cells };
@@ -224,21 +231,40 @@ export function insertWordVertical(
 // (L26–L30) need deeper search to find a fully-isolated forced ordering.
 // The build is offline (resolve runs server-side then is cached), so a
 // pessimistic attempt budget costs nothing at runtime.
-const MAX_BUILD_ATTEMPTS = 2000;
+// Bumped again 2000 → 3000 for the 5-col phone-friendly silhouette where
+// horizontal placements are scarce (a 5-letter word only fits at cols 0-4)
+// and vertical isolation chains take longer to converge. Cap kept moderate so
+// the solvability verifier completes in reasonable time during CI.
+const MAX_BUILD_ATTEMPTS = 3000;
 
 function emptyColumns(count: number): BlastColumn[] {
   return Array.from({ length: count }, (_, index) => ({ index, tiles: [] as Letter[] }));
 }
 
 /**
- * S_N: the last word laid flat on the floor of an otherwise empty board.
+ * S_N: the last word as the starting board. Lays flat horizontally if it fits;
+ * stacks vertically in one column when the word is longer than the grid width
+ * (the 5-col phone-friendly silhouette ships levels with 6–7-letter floor words
+ * that must drop in as a single tower). Vertical letters are pushed in reverse
+ * because word-scan reads columns top-down.
  */
 function floorBoard(spec: ChainLevelSpec): BlastLevel | null {
   const last = [...(spec.chain[spec.chain.length - 1] ?? '')];
-  if (last.length > spec.columns) return null;
+  if (last.length === 0 || spec.columns < 1) return null;
   const columns = emptyColumns(spec.columns);
-  const offset = Math.floor((spec.columns - last.length) / 2);
-  last.forEach((ch, i) => columns[offset + i]!.tiles.push(ch));
+  if (last.length <= spec.columns) {
+    const offset = Math.floor((spec.columns - last.length) / 2);
+    last.forEach((ch, i) => columns[offset + i]!.tiles.push(ch));
+  } else {
+    // Vertical floor: stack the word in the center column. Letters land so the
+    // FIRST letter sits on top (tiles[L-1]) and the LAST letter sits on the
+    // floor (tiles[0]) — word-scan reads top-down, so the natural order spells
+    // the word.
+    const colIdx = Math.floor(spec.columns / 2);
+    for (let i = last.length - 1; i >= 0; i--) {
+      columns[colIdx]!.tiles.push(last[i]!);
+    }
+  }
   return {
     id: spec.id,
     levelNumber: spec.levelNumber,
@@ -260,13 +286,26 @@ export function buildChainLevel(
   spec: ChainLevelSpec,
   seed: number,
   extraWordCheck?: ExtraWordCheck,
+  maxAttempts: number = MAX_BUILD_ATTEMPTS,
 ): BlastLevel | null {
+  if (spec.columns < 1) return null;
   const longest = Math.max(...spec.chain.map((w) => [...w].length));
-  if (longest > spec.columns) return null;
+  // Phone-friendly silhouettes use cols=5 — long words still pass because
+  // insertWordVertical can stack them as a single tower; floorBoard does the
+  // same for the floor word. Reject only if the word is wider than what BOTH
+  // axes could hold (a 1×1 grid can't hold a 2-letter word).
 
   const rand = rng(seed);
-  const ceiling = columnHeightCeiling(spec.chain);
-  for (let attempt = 0; attempt < MAX_BUILD_ATTEMPTS; attempt++) {
+  // Narrow-grid relief: the original ceiling kept boards spread on 7–10-col
+  // levels, but the new 5-col cap leaves so little horizontal room that the
+  // placer hits dead ends. For grids ≤5 wide, allow towers up to the chain's
+  // total tile count — the placer needs every row it can get, and players
+  // simply see a more vertical silhouette which is fine on a phone.
+  const totalTiles = spec.chain.reduce((sum, w) => sum + [...w].length, 0);
+  const ceiling = spec.columns <= 5
+    ? totalTiles
+    : Math.max(longest + 1, columnHeightCeiling(spec.chain));
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const attemptSeed = Math.floor(rand() * 0xffffffff) || 1;
     const base = floorBoard(spec);
     if (!base) return null;
@@ -285,13 +324,23 @@ export function buildChainLevel(
       const word = spec.chain[k]!;
       const others = spec.chain.slice(k + 1);
       const stepSeed = (attemptSeed + k * 7919) >>> 0;
-      const preferVertical = orientRand() < 0.35;
+      // Words longer than the grid width can only be placed vertically — no
+      // need to try horizontal. The fallback is also skipped (would always
+      // fail with `L > cols`).
+      const tooWideForHorizontal = [...word].length > spec.columns;
+      // Narrow grids (≤5 cols) bias toward vertical placement — horizontal
+      // slots are scarce and most words need to stack to leave room for
+      // others. Wider grids keep the original 35% vertical bias.
+      const verticalBias = spec.columns <= 5 ? 0.7 : 0.35;
+      const preferVertical = tooWideForHorizontal || orientRand() < verticalBias;
       const first = preferVertical
         ? insertWordVertical(board, word, others, spec.locale, stepSeed, extraWordCheck, ceiling)
         : insertWord(board, word, others, spec.locale, stepSeed, extraWordCheck, ceiling);
-      const res = first ?? (preferVertical
-        ? insertWord(board, word, others, spec.locale, stepSeed, extraWordCheck, ceiling)
-        : insertWordVertical(board, word, others, spec.locale, stepSeed, extraWordCheck, ceiling));
+      const res = first ?? (tooWideForHorizontal
+        ? null
+        : preferVertical
+          ? insertWord(board, word, others, spec.locale, stepSeed, extraWordCheck, ceiling)
+          : insertWordVertical(board, word, others, spec.locale, stepSeed, extraWordCheck, ceiling));
       if (!res) {
         ok = false;
         break;

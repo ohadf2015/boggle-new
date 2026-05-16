@@ -17,6 +17,6 @@ describe('blast v2 — every shipped chain level is solvable', () => {
       }
       expect(failures).toHaveLength(0);
       expect(results.length).toBeGreaterThan(0);
-    }, 60_000);
+    }, 300_000);
   }
 });

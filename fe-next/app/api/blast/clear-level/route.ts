@@ -104,7 +104,16 @@ export async function POST(req: NextRequest) {
   });
 
   // Update progress via RPC
-  const chestDelta = submission.earnedGems * 0.02; // each gem = 2% chest progress
+  //
+  // Chest delta combines:
+  // - gems collected (legacy: each gem tile = 2% chest progress)
+  // - base words-found contribution (5% per theme word + 1% per letter past 3)
+  //   so chains without gem tiles still visibly fill the chest. Mirrors the
+  //   in-game baseChestDeltaForWord formula in useBlastV2.ts.
+  const wordsCount = submission.wordsFound.length;
+  const totalLetters = submission.wordsFound.reduce((sum, w) => sum + w.length, 0);
+  const wordBase = wordsCount * 0.05 + Math.max(0, totalLetters - wordsCount * 3) * 0.01;
+  const chestDelta = submission.earnedGems * 0.02 + wordBase;
   const { data: updated } = await supabase.rpc('increment_blast_progress', {
     p_user_id: user.id,
     p_chest_progress_delta: chestDelta,

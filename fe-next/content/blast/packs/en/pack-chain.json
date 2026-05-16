@@ -71,7 +71,7 @@
       "levelNumber": 6,
       "theme": "ocean",
       "locale": "en",
-      "columns": 6,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "CRAB",
@@ -86,7 +86,7 @@
       "levelNumber": 7,
       "theme": "space",
       "locale": "en",
-      "columns": 6,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "MARS",
@@ -101,7 +101,7 @@
       "levelNumber": 8,
       "theme": "animals",
       "locale": "en",
-      "columns": 6,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "WOLF",
@@ -116,7 +116,7 @@
       "levelNumber": 9,
       "theme": "fruits",
       "locale": "en",
-      "columns": 6,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "PLUM",
@@ -131,7 +131,7 @@
       "levelNumber": 10,
       "theme": "weather",
       "locale": "en",
-      "columns": 6,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "RAIN",
@@ -146,7 +146,7 @@
       "levelNumber": 11,
       "theme": "animals",
       "locale": "en",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "HORSE",
@@ -162,7 +162,7 @@
       "levelNumber": 12,
       "theme": "food",
       "locale": "en",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "BREAD",
@@ -178,7 +178,7 @@
       "levelNumber": 13,
       "theme": "nature",
       "locale": "en",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "RIVER",
@@ -194,7 +194,7 @@
       "levelNumber": 14,
       "theme": "space",
       "locale": "en",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "COMET",
@@ -210,7 +210,7 @@
       "levelNumber": 15,
       "theme": "animals",
       "locale": "en",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "TIGER",
@@ -226,7 +226,7 @@
       "levelNumber": 16,
       "theme": "ocean",
       "locale": "en",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "WAVE",
@@ -243,7 +243,7 @@
       "levelNumber": 17,
       "theme": "joy",
       "locale": "en",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "JOY",
@@ -260,7 +260,7 @@
       "levelNumber": 18,
       "theme": "cozy",
       "locale": "en",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "NAP",
@@ -277,7 +277,7 @@
       "levelNumber": 19,
       "theme": "fruits",
       "locale": "en",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "PLUM",
@@ -294,7 +294,7 @@
       "levelNumber": 20,
       "theme": "spooky",
       "locale": "en",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "BAT",
@@ -311,7 +311,7 @@
       "levelNumber": 21,
       "theme": "magic",
       "locale": "en",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "ELF",
@@ -329,7 +329,7 @@
       "levelNumber": 22,
       "theme": "home",
       "locale": "en",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "BED",
@@ -347,7 +347,7 @@
       "levelNumber": 23,
       "theme": "school",
       "locale": "en",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "PEN",
@@ -365,7 +365,7 @@
       "levelNumber": 24,
       "theme": "space",
       "locale": "en",
-      "columns": 7,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "MARS",
@@ -383,7 +383,7 @@
       "levelNumber": 25,
       "theme": "transport",
       "locale": "en",
-      "columns": 8,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "CAR",
@@ -401,7 +401,7 @@
       "levelNumber": 26,
       "theme": "adventure",
       "locale": "en",
-      "columns": 9,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "MAP",
@@ -420,7 +420,7 @@
       "levelNumber": 27,
       "theme": "ocean",
       "locale": "en",
-      "columns": 9,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "FISH",
@@ -439,7 +439,7 @@
       "levelNumber": 28,
       "theme": "mythology",
       "locale": "en",
-      "columns": 10,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "ELF",
@@ -458,7 +458,7 @@
       "levelNumber": 29,
       "theme": "music",
       "locale": "en",
-      "columns": 9,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "DRUM",
@@ -477,7 +477,7 @@
       "levelNumber": 30,
       "theme": "science",
       "locale": "en",
-      "columns": 9,
+      "columns": 5,
       "decoyTiles": 0,
       "chain": [
         "ATOM",
