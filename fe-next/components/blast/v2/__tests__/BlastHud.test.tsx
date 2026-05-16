@@ -10,18 +10,14 @@ describe('BlastHud', () => {
     expect(screen.getByTestId('coin-counter')).toHaveTextContent('100');
   });
 
-  it('lvl 5 shows shuffle button (mechanic gated at lvl 4)', () => {
-    render(
-      <BlastHud levelNumber={5} coins={100} chestProgress={0.5} onShuffle={vi.fn()} onHint={vi.fn()} />
-    );
-    expect(screen.getByTestId('shuffle-btn')).toBeInTheDocument();
-  });
-
-  it('lvl 1 hides shuffle button', () => {
-    render(
-      <BlastHud levelNumber={1} coins={100} chestProgress={0.5} onShuffle={vi.fn()} onHint={vi.fn()} />
-    );
-    expect(screen.queryByTestId('shuffle-btn')).not.toBeInTheDocument();
+  it('never renders the shuffle button — Blast V2 is shuffle-free at every level', () => {
+    for (const n of [1, 5, 9, 25, 100]) {
+      const { unmount } = render(
+        <BlastHud levelNumber={n} coins={100} chestProgress={0.5} onShuffle={vi.fn()} onHint={vi.fn()} />
+      );
+      expect(screen.queryByTestId('shuffle-btn')).not.toBeInTheDocument();
+      unmount();
+    }
   });
 
   it('lvl 18 shows hint button (mechanic gated at lvl 17)', () => {

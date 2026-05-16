@@ -18,6 +18,30 @@ export type ExtraWordCheck = {
   minLength: number;
 };
 
+/**
+ * Column-height ceiling for placement balance. Without this, three or four
+ * vertical inserts can land in the same column and produce a tower-shaped
+ * board (8+ tiles in one column, the rest near-empty). The ceiling forces
+ * vertical placements to spread across columns so the silhouette stays
+ * playable on phones.
+ */
+function columnHeightCeiling(chain: string[]): number {
+  const longest = Math.max(...chain.map((w) => [...w].length));
+  // longest + 1 allows ONE word's worth of vertical insertion to land on top
+  // of a horizontal placement of the same word's length without breaking
+  // chains where two long words MUST share a column. Tighter than +0 would
+  // make many he/lvl chains unsolvable; looser than +1 brings back the tower.
+  return longest + 1;
+}
+
+function maxColumnHeight(level: BlastLevel): number {
+  let max = 0;
+  for (const col of level.columns) {
+    if (col.tiles.length > max) max = col.tiles.length;
+  }
+  return max;
+}
+
 function passesExtraWordCheck(level: BlastLevel, check: ExtraWordCheck | undefined): boolean {
   if (!check) return true;
   return findExtraWords(level, check.isCommon, check.minLength).length === 0;
@@ -57,6 +81,7 @@ export function insertWord(
   locale: Locale,
   seed: number,
   extraWordCheck?: ExtraWordCheck,
+  heightCeiling?: number,
 ): InsertResult | null {
   const letters = [...word];
   const L = letters.length;
@@ -91,6 +116,11 @@ export function insertWord(
     }
 
     const level: BlastLevel = { ...Sk, columns };
+    // Height balance check — reject placements that produce a column taller
+    // than the chain's ceiling so boards stay spread instead of stacked.
+    if (heightCeiling !== undefined && maxColumnHeight(level) > heightCeiling) {
+      continue;
+    }
     const matches = scanFormableThemeWords(level, [word, ...otherWordsOnBoard], locale);
     const formableWords = new Set(matches.map((m) => m.word));
 
@@ -125,6 +155,7 @@ export function insertWordVertical(
   locale: Locale,
   seed: number,
   extraWordCheck?: ExtraWordCheck,
+  heightCeiling?: number,
 ): InsertResult | null {
   const letters = [...word];
   const L = letters.length;
@@ -142,6 +173,9 @@ export function insertWordVertical(
   // we enumerate r in [0, col.tiles.length] inclusive.
   for (let c = 0; c < cols; c++) {
     const h = Sk.columns[c]!.tiles.length;
+    // Hard-prune candidates that would obviously exceed the height ceiling;
+    // tiles count after the insert is h + L, so reject up front.
+    if (heightCeiling !== undefined && h + L > heightCeiling) continue;
     for (let r = 0; r <= h; r++) {
       candidates.push({ c, r });
     }
@@ -167,6 +201,9 @@ export function insertWordVertical(
     }
 
     const level: BlastLevel = { ...Sk, columns };
+    if (heightCeiling !== undefined && maxColumnHeight(level) > heightCeiling) {
+      continue;
+    }
     const matches = scanFormableThemeWords(level, [word, ...otherWordsOnBoard], locale);
     const formableWords = new Set(matches.map((m) => m.word));
 
@@ -182,7 +219,12 @@ export function insertWordVertical(
   return null;
 }
 
-const MAX_BUILD_ATTEMPTS = 500;
+// Bumped 500 → 2000 because (a) the column-height ceiling rejects a larger
+// share of candidate placements, and (b) sophisticated 8–9-word chains
+// (L26–L30) need deeper search to find a fully-isolated forced ordering.
+// The build is offline (resolve runs server-side then is cached), so a
+// pessimistic attempt budget costs nothing at runtime.
+const MAX_BUILD_ATTEMPTS = 2000;
 
 function emptyColumns(count: number): BlastColumn[] {
   return Array.from({ length: count }, (_, index) => ({ index, tiles: [] as Letter[] }));
@@ -223,6 +265,7 @@ export function buildChainLevel(
   if (longest > spec.columns) return null;
 
   const rand = rng(seed);
+  const ceiling = columnHeightCeiling(spec.chain);
   for (let attempt = 0; attempt < MAX_BUILD_ATTEMPTS; attempt++) {
     const attemptSeed = Math.floor(rand() * 0xffffffff) || 1;
     const base = floorBoard(spec);
@@ -234,18 +277,21 @@ export function buildChainLevel(
     // the chosen one can't isolate the word. This produces visually mixed
     // levels — some words land as rows, others stack as columns — instead of
     // every board being a flat horizontal scroll.
+    // Bias toward horizontal placements (0.65) so vertical stacks don't pile
+    // up into a single tower; the column-height ceiling enforces the same
+    // intent but the bias prevents wasted rejection cycles.
     const orientRand = rng(attemptSeed ^ 0xa5a5a5a5);
     for (let k = spec.chain.length - 2; k >= 0; k--) {
       const word = spec.chain[k]!;
       const others = spec.chain.slice(k + 1);
       const stepSeed = (attemptSeed + k * 7919) >>> 0;
-      const preferVertical = orientRand() < 0.5;
+      const preferVertical = orientRand() < 0.35;
       const first = preferVertical
-        ? insertWordVertical(board, word, others, spec.locale, stepSeed, extraWordCheck)
-        : insertWord(board, word, others, spec.locale, stepSeed, extraWordCheck);
+        ? insertWordVertical(board, word, others, spec.locale, stepSeed, extraWordCheck, ceiling)
+        : insertWord(board, word, others, spec.locale, stepSeed, extraWordCheck, ceiling);
       const res = first ?? (preferVertical
-        ? insertWord(board, word, others, spec.locale, stepSeed, extraWordCheck)
-        : insertWordVertical(board, word, others, spec.locale, stepSeed, extraWordCheck));
+        ? insertWord(board, word, others, spec.locale, stepSeed, extraWordCheck, ceiling)
+        : insertWordVertical(board, word, others, spec.locale, stepSeed, extraWordCheck, ceiling));
       if (!res) {
         ok = false;
         break;

@@ -122,6 +122,36 @@ describe('buildChainLevel', () => {
     expect(buildChainLevel(withDecoys, 99)).toBeNull();
   });
 
+  it('spreads tiles horizontally — no column exceeds longestWord + 1', () => {
+    // Regression guard: chain-pack levels were stacking multiple vertical
+    // insertions in the same column, producing 8+ tile-tall single columns
+    // (e.g. he/lvl-9 with all four words piled on the rightmost column).
+    // The placement balancer must keep column heights at most
+    // `longestWord.length + 1` so the board reads as a spread silhouette,
+    // not a tower.
+    const balanceSpec: ChainLevelSpec = {
+      id: 'he-chain-9-balance',
+      levelNumber: 9,
+      theme: 'fruits',
+      locale: 'he',
+      columns: 7,
+      decoyTiles: 0,
+      chain: ['תפוז', 'בננה', 'מנגו', 'לימונ'],
+    };
+    const longest = Math.max(...balanceSpec.chain.map((w) => [...w].length));
+    const ceiling = longest + 1; // 5 + 1 = 6 for he/lvl 9
+    let any = 0;
+    for (let seed = 1; seed <= 40; seed++) {
+      const level = buildChainLevel(balanceSpec, seed);
+      if (!level) continue;
+      any++;
+      for (const col of level.columns) {
+        expect(col.tiles.length).toBeLessThanOrEqual(ceiling);
+      }
+    }
+    expect(any).toBeGreaterThan(0); // at least some seeds must succeed
+  });
+
   it('produces at least one vertical placement across many seeds (chain not all horizontal)', () => {
     // With horizontal+vertical insertion both available, sweep seeds; at least
     // one resulting level must contain a column whose tiles spell one of the

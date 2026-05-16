@@ -48,7 +48,11 @@ function hexToNumber(hex: string): number {
   return parseInt(hex.replace('#', ''), 16);
 }
 
-const MAX_RINGS = 12;
+// Bumped from 12 → 28 because shockwave wrap now fires on every cleared cell
+// (was: first cell only). A 5-cell word produces ~25 ring graphics; the prior
+// cap silently dropped most of them. Each ring is a tiny Graphics object so
+// the pool size is still bounded.
+const MAX_RINGS = 28;
 
 // Helper accepting only the minimal liveness/tracking surface that the spawn
 // closures need — keeps signatures narrow while letting unmount kill anything
@@ -359,52 +363,59 @@ export function BlastFxOverlay({
       const lx = center.x - rect.left;
       const ly = center.y - rect.top;
       const variant = pickExplosionVariant();
-      // Heavier per-cell burst (32+10+6) reads as a real explosion. Layered
-      // BLAST_LETTER_POP adds a snappy white-hot starburst on top — the
-      // theme-tinted sparks keep the mode color, the star gives the hit feel.
-      particles.burst(variant, lx, ly, 32);
-      particles.burst(ELECTRIC_RINGS, lx, ly, 10);
-      particles.burst(CASCADE_SPARKLE, lx, ly, 6);
-      particles.burst(BLAST_LETTER_POP, lx, ly, 14);
-      debris.spawn(lx, ly, tintColor, 16);
+      // Heavier per-cell burst tuned for "real impact". Tripled core counts
+      // over the prior pass — playtest feedback was the bursts felt sparse
+      // on phone screens where each tile is ~80px and any single particle
+      // band looked thin. The bloom filter compresses density visually so
+      // we need real volume to read.
+      particles.burst(variant, lx, ly, 56);
+      particles.burst(ELECTRIC_RINGS, lx, ly, 18);
+      particles.burst(CASCADE_SPARKLE, lx, ly, 12);
+      particles.burst(BLAST_LETTER_POP, lx, ly, 22);
+      debris.spawn(lx, ly, tintColor, 28);
       // Radial explosion force gives the new debris pieces an outward kick
       // before gravity takes over — reads as a real shatter instead of a
       // gravity-only sprinkle.
-      systems.physics.applyExplosion({ x: lx, y: ly }, 0.06, 140);
-      spawnPulseRing(app, systems, lx, ly, tintColor);
+      systems.physics.applyExplosion({ x: lx, y: ly }, 0.11, 220);
+      // Dual-ring per cell — theme-tinted pulse + slightly larger white
+      // afterglow. The pair reads as a primary detonation + secondary heat
+      // shimmer; previously a single tinted ring blended into the bloom and
+      // disappeared on bright themes (lime/cyan).
+      spawnPulseRing(app, systems, lx, ly, tintColor, 1.15);
       // RGB-split shockwave wrap on word found — extra polish over the solid
-      // pulse ring. Only fire on the FIRST cell of a clear group to avoid
-      // saturating the rings pool when long words pop many tiles at once.
-      if (center === clearCenters[0]) {
-        spawnShockwaveWrap(app, systems, lx, ly);
-      }
-      // Delayed second pulse ring at white for a percussive double-thud —
-      // only when batching multiple clears (so single-tile chips stay quiet).
-      // Tracked so unmount can clear it before it fires against a destroyed
-      // Pixi stage.
-      if (clearCenters.length >= 2) {
-        const handle = setTimeout(() => {
-          systems.timeouts.delete(handle);
-          if (!systems.live.current) return;
-          spawnPulseRing(app, systems, lx, ly, 0xffffff, 0.7);
-        }, 70);
-        systems.timeouts.add(handle);
-      }
+      // pulse ring. Now fired on EVERY cell (was: first cell only) so the
+      // shockwave reads as a chained explosion along the cleared path
+      // instead of a single thump at the head. MAX_RINGS already caps
+      // saturation so long words can't melt the pool.
+      spawnShockwaveWrap(app, systems, lx, ly);
+      // Delayed white afterglow ring — fires on every clear now (not just
+      // multi-cell). Gives the percussive "thwip" follow-up that makes
+      // single-tile pops feel as satisfying as multi-tile bursts.
+      const handle = setTimeout(() => {
+        systems.timeouts.delete(handle);
+        if (!systems.live.current) return;
+        spawnPulseRing(app, systems, lx, ly, 0xffffff, 0.85);
+      }, 80);
+      systems.timeouts.add(handle);
     }
 
-    // Screen flash + shake scale with clear size. Bumped one tier across the
-    // board — playtest feedback was that small clears felt flat.
+    // Screen flash + shake scale with clear size. Bumped another tier — the
+    // bloom filter eats low-intensity flashes so on bright themes you saw
+    // nothing for small clears. Floor raised to 0.22 so even 1-cell pops
+    // register, ceiling raised to 0.5 so 5+ clears truly punch.
     const n = clearCenters.length;
     if (n >= 5) {
       shake.heavy();
-      flash.flash({ color: tintColor, intensity: 0.32, duration: 0.24 });
+      flash.flash({ color: tintColor, intensity: 0.5, duration: 0.32 });
       spawnLightSweep(app, systems, tintColor);
+      spawnLightSweep(app, systems, 0xffffff);
     } else if (n >= 3) {
       shake.medium();
-      flash.flash({ color: tintColor, intensity: 0.22, duration: 0.18 });
+      flash.flash({ color: tintColor, intensity: 0.36, duration: 0.24 });
+      spawnLightSweep(app, systems, tintColor);
     } else if (n > 0) {
-      shake.light();
-      flash.flash({ color: tintColor, intensity: 0.12, duration: 0.1 });
+      shake.medium();
+      flash.flash({ color: tintColor, intensity: 0.22, duration: 0.16 });
     }
   }, [clearEventKey, clearCenters, modeColor]);
 

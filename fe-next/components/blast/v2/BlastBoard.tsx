@@ -183,13 +183,14 @@ export function BlastBoard({
                   <m.div
                     key={tileKey}
                     layout="position"
-                    // Tighter, punchier spring tuned for fall-from-above:
-                    // higher stiffness gives a snappier accelerate-then-land,
-                    // bumped mass + slightly lower damping keeps a small
-                    // overshoot so the landing reads as a "thump" rather than
-                    // a soft glide. Pairs with the squash timeline in
-                    // useCollapseTimeline for the secondary bounce.
-                    transition={{ type: 'spring', stiffness: 560, damping: 20, mass: 1.2, restDelta: 0.4 }}
+                    // Heavier, faster fall — bumped stiffness 560→720 and
+                    // mass 1.2→1.6 so tiles accelerate harder and land with
+                    // a real thump. Damping nudged down (20→17) to keep the
+                    // tiny landing overshoot that pairs with the squash
+                    // timeline in useCollapseTimeline. Previous tuning felt
+                    // floaty on phones where the tile size + screen scale
+                    // made the spring travel time read as slow-mo.
+                    transition={{ type: 'spring', stiffness: 720, damping: 17, mass: 1.6, restDelta: 0.4 }}
                     className="relative"
                   >
                     <BlastTile

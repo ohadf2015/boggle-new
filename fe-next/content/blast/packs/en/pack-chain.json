@@ -53,7 +53,7 @@
       "locale": "en",
       "columns": 8,
       "decoyTiles": 0,
-      "chain": ["CRAB", "SEAL", "WHALE", "SHARK"]
+      "chain": ["CRAB", "SEAL", "WHALE", "SHARK", "JELLY"]
     },
     {
       "id": "en-chain-07",
@@ -62,7 +62,7 @@
       "locale": "en",
       "columns": 8,
       "decoyTiles": 0,
-      "chain": ["MARS", "MOON", "STAR", "GALAXY"]
+      "chain": ["MARS", "MOON", "STAR", "GALAXY", "NEBULA"]
     },
     {
       "id": "en-chain-08",
@@ -71,7 +71,7 @@
       "locale": "en",
       "columns": 8,
       "decoyTiles": 0,
-      "chain": ["WOLF", "LION", "BEAR", "TIGER"]
+      "chain": ["WOLF", "LION", "BEAR", "TIGER", "JAGUAR"]
     },
     {
       "id": "en-chain-09",
@@ -80,7 +80,7 @@
       "locale": "en",
       "columns": 8,
       "decoyTiles": 0,
-      "chain": ["PLUM", "MANGO", "GRAPE", "LEMON"]
+      "chain": ["PLUM", "MANGO", "GRAPE", "LEMON", "CHERRY"]
     },
     {
       "id": "en-chain-10",
@@ -89,7 +89,7 @@
       "locale": "en",
       "columns": 8,
       "decoyTiles": 0,
-      "chain": ["RAIN", "SNOW", "CLOUD", "STORM"]
+      "chain": ["RAIN", "SNOW", "CLOUD", "STORM", "THUNDER"]
     },
     {
       "id": "en-chain-11",
@@ -98,7 +98,7 @@
       "locale": "en",
       "columns": 9,
       "decoyTiles": 0,
-      "chain": ["HORSE", "ZEBRA", "PANDA", "KOALA", "OTTER"]
+      "chain": ["HORSE", "ZEBRA", "PANDA", "KOALA", "OTTER", "CHEETAH"]
     },
     {
       "id": "en-chain-12",
@@ -107,7 +107,7 @@
       "locale": "en",
       "columns": 9,
       "decoyTiles": 0,
-      "chain": ["BREAD", "PASTA", "SALAD", "HONEY", "OLIVE"]
+      "chain": ["BREAD", "PASTA", "SALAD", "HONEY", "OLIVE", "CHEESE"]
     },
     {
       "id": "en-chain-13",
@@ -116,16 +116,16 @@
       "locale": "en",
       "columns": 9,
       "decoyTiles": 0,
-      "chain": ["RIVER", "TREE", "LEAF", "STONE", "ROCK"]
+      "chain": ["RIVER", "TREE", "LEAF", "STONE", "ROCK", "CANYON"]
     },
     {
       "id": "en-chain-14",
       "levelNumber": 14,
       "theme": "space",
       "locale": "en",
-      "columns": 9,
+      "columns": 10,
       "decoyTiles": 0,
-      "chain": ["COMET", "GALAXY", "NEBULA", "ROCKET", "ALIEN"]
+      "chain": ["COMET", "GALAXY", "NEBULA", "ROCKET", "ALIEN", "ASTEROID"]
     },
     {
       "id": "en-chain-15",
@@ -134,7 +134,7 @@
       "locale": "en",
       "columns": 9,
       "decoyTiles": 0,
-      "chain": ["JAGUAR", "FALCON", "WALRUS", "BEAVER", "IGUANA"]
+      "chain": ["JAGUAR", "FALCON", "WALRUS", "BEAVER", "IGUANA", "GIRAFFE"]
     },
     {
       "id": "en-chain-16",
@@ -143,7 +143,7 @@
       "locale": "en",
       "columns": 11,
       "decoyTiles": 0,
-      "chain": ["WAVE", "REEF", "CORAL", "SHARK", "WHALE", "PEARL"]
+      "chain": ["WAVE", "REEF", "CORAL", "SHARK", "WHALE", "PEARL", "DOLPHIN"]
     },
     {
       "id": "en-chain-17",
@@ -152,7 +152,7 @@
       "locale": "en",
       "columns": 11,
       "decoyTiles": 0,
-      "chain": ["TREE", "LEAF", "ROCK", "RIVER", "STONE", "FOREST"]
+      "chain": ["TREE", "LEAF", "ROCK", "RIVER", "STONE", "FOREST", "CANYON"]
     },
     {
       "id": "en-chain-18",
@@ -161,7 +161,7 @@
       "locale": "en",
       "columns": 11,
       "decoyTiles": 0,
-      "chain": ["RAIN", "WIND", "SNOW", "CLOUD", "STORM", "FROST"]
+      "chain": ["RAIN", "WIND", "SNOW", "CLOUD", "STORM", "FROST", "RAINBOW"]
     },
     {
       "id": "en-chain-19",
@@ -170,7 +170,7 @@
       "locale": "en",
       "columns": 11,
       "decoyTiles": 0,
-      "chain": ["PLUM", "PEAR", "MANGO", "LEMON", "GRAPE", "PEACH"]
+      "chain": ["PLUM", "PEAR", "MANGO", "LEMON", "GRAPE", "PEACH", "APRICOT"]
     },
     {
       "id": "en-chain-20",
@@ -179,7 +179,7 @@
       "locale": "en",
       "columns": 11,
       "decoyTiles": 0,
-      "chain": ["RICE", "SOUP", "PASTA", "BREAD", "OLIVE", "BUTTER"]
+      "chain": ["RICE", "SOUP", "PASTA", "BREAD", "OLIVE", "BUTTER", "POPCORN"]
     },
     {
       "id": "en-chain-21",
@@ -188,7 +188,7 @@
       "locale": "en",
       "columns": 13,
       "decoyTiles": 0,
-      "chain": ["WOLF", "BEAR", "LION", "HORSE", "TIGER", "ZEBRA", "RHINO"]
+      "chain": ["WOLF", "BEAR", "LION", "HORSE", "TIGER", "ZEBRA", "RHINO", "ELEPHANT"]
     },
     {
       "id": "en-chain-22",
@@ -197,7 +197,7 @@
       "locale": "en",
       "columns": 13,
       "decoyTiles": 0,
-      "chain": ["DOOR", "BED", "ROOM", "CHAIR", "TABLE", "HOUSE", "WINDOW"]
+      "chain": ["DOOR", "BED", "ROOM", "CHAIR", "TABLE", "HOUSE", "WINDOW", "KITCHEN"]
     },
     {
       "id": "en-chain-23",
@@ -206,7 +206,7 @@
       "locale": "en",
       "columns": 13,
       "decoyTiles": 0,
-      "chain": ["PEN", "DESK", "BOOK", "RULER", "PAPER", "CHALK", "PENCIL"]
+      "chain": ["PEN", "DESK", "BOOK", "RULER", "PAPER", "CHALK", "PENCIL", "TEACHER"]
     },
     {
       "id": "en-chain-24",
@@ -215,7 +215,7 @@
       "locale": "en",
       "columns": 13,
       "decoyTiles": 0,
-      "chain": ["STAR", "MOON", "COMET", "ORBIT", "PLANET", "GALAXY", "NEBULA"]
+      "chain": ["STAR", "MOON", "COMET", "ORBIT", "PLANET", "GALAXY", "NEBULA", "ASTEROID"]
     },
     {
       "id": "en-chain-25",
@@ -224,7 +224,7 @@
       "locale": "en",
       "columns": 13,
       "decoyTiles": 0,
-      "chain": ["CAR", "BIKE", "TRAIN", "PLANE", "TRUCK", "BOAT", "ROCKET"]
+      "chain": ["CAR", "BIKE", "TRAIN", "PLANE", "TRUCK", "BOAT", "ROCKET", "SCOOTER"]
     },
     {
       "id": "en-chain-26",
@@ -233,7 +233,7 @@
       "locale": "en",
       "columns": 15,
       "decoyTiles": 0,
-      "chain": ["FIG", "PEAR", "KIWI", "PLUM", "GRAPE", "MANGO", "LEMON", "ORANGE"]
+      "chain": ["FIG", "PEAR", "KIWI", "PLUM", "GRAPE", "MANGO", "LEMON", "ORANGE", "APRICOT"]
     },
     {
       "id": "en-chain-27",
@@ -242,7 +242,7 @@
       "locale": "en",
       "columns": 15,
       "decoyTiles": 0,
-      "chain": ["FISH", "REEF", "WAVE", "SHELL", "SHARK", "WHALE", "CORAL", "OCTOPUS"]
+      "chain": ["FISH", "REEF", "WAVE", "SHELL", "SHARK", "WHALE", "CORAL", "OCTOPUS", "JELLYFISH"]
     },
     {
       "id": "en-chain-28",
@@ -251,7 +251,7 @@
       "locale": "en",
       "columns": 15,
       "decoyTiles": 0,
-      "chain": ["ELF", "OGRE", "TROLL", "GIANT", "FAIRY", "GNOME", "DRAGON", "WIZARD"]
+      "chain": ["ELF", "OGRE", "TROLL", "GIANT", "FAIRY", "GNOME", "DRAGON", "WIZARD", "UNICORN"]
     },
     {
       "id": "en-chain-29",
@@ -260,7 +260,7 @@
       "locale": "en",
       "columns": 15,
       "decoyTiles": 0,
-      "chain": ["DRUM", "SONG", "BAND", "FLUTE", "PIANO", "ORGAN", "GUITAR", "VIOLIN"]
+      "chain": ["DRUM", "SONG", "BAND", "FLUTE", "PIANO", "ORGAN", "GUITAR", "VIOLIN", "TRUMPET"]
     },
     {
       "id": "en-chain-30",
@@ -269,7 +269,7 @@
       "locale": "en",
       "columns": 15,
       "decoyTiles": 0,
-      "chain": ["ATOM", "CELL", "BONE", "NERVE", "BRAIN", "BLOOD", "ENERGY", "GRAVITY"]
+      "chain": ["ATOM", "CELL", "BONE", "NERVE", "BRAIN", "BLOOD", "ENERGY", "GRAVITY", "MOLECULE"]
     }
   ]
 }

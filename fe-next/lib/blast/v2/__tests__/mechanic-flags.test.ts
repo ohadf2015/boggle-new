@@ -12,8 +12,14 @@ describe('mechanicsForLevel', () => {
     expect(mechanicsForLevel(3).coinOverlay).toBe(true);
     expect(mechanicsForLevel(2).coinOverlay).toBe(false);
   });
-  it('level 5 unlocks shuffle button', () => {
-    expect(mechanicsForLevel(5).shuffleButton).toBe(true);
+  it('shuffle button is permanently disabled at every level', () => {
+    // Product decision: Blast V2 has no shuffle. Letters spread through
+    // organic gravity collapse + chain placement balance; explicit re-roll
+    // would break the deterministic chain puzzle.
+    expect(mechanicsForLevel(1).shuffleButton).toBe(false);
+    expect(mechanicsForLevel(5).shuffleButton).toBe(false);
+    expect(mechanicsForLevel(50).shuffleButton).toBe(false);
+    expect(mechanicsForLevel(100).shuffleButton).toBe(false);
   });
   it('level 8 unlocks frozen tiles', () => {
     expect(mechanicsForLevel(8).frozenTiles).toBe(true);
@@ -30,7 +36,10 @@ describe('mechanicsForLevel', () => {
   it('level 40 unlocks multi-word reveal', () => {
     expect(mechanicsForLevel(40).multiWordReveal).toBe(true);
   });
-  it('level 100 has every gate on', () => {
-    Object.values(mechanicsForLevel(100)).forEach((v) => expect(v).toBe(true));
+  it('level 100 has every gate on except permanently-off shuffleButton', () => {
+    const m = mechanicsForLevel(100);
+    const { shuffleButton, ...rest } = m;
+    expect(shuffleButton).toBe(false);
+    Object.values(rest).forEach((v) => expect(v).toBe(true));
   });
 });
