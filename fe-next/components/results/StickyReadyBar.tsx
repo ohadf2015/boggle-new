@@ -336,7 +336,7 @@ export default function StickyReadyBar({
     const btnBase = 'w-full h-14 border-3 border-black rounded-xl shadow-hard font-black text-base uppercase tracking-tight flex items-center justify-center gap-3';
 
     return (
-      <div className="flex flex-col gap-2 flex-1 min-w-0 pb-[env(safe-area-inset-bottom)]">
+      <div className="flex flex-col gap-2 flex-1 min-w-0">
         {/* Series Winner Banner */}
         <m.div
           initial={{ scale: 0.9, opacity: 0 }}

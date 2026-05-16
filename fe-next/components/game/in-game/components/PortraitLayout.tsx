@@ -36,7 +36,6 @@ import { BlastMultiplayerOverlay } from '../../BlastMultiplayerOverlay';
 import { WordHuntTargetArea } from '../../WordHuntTargetArea';
 import { WordHuntLifeBar } from '../../WordHuntLifeBar';
 import { WordHuntPlayerLives } from '../../WordHuntPlayerLives';
-import { DynamicEnergyBackground } from '@/components/singleplayer/game/components/DynamicEnergyBackground';
 import { ComboMilestoneAnnouncement } from '../../ComboMilestoneAnnouncement';
 import { ScreenFlashOverlay } from '../../ScreenFlashOverlay';
 import { useHapticsEnabled, useShouldReduceMotion } from '@/contexts/AccessibilityContext';
@@ -320,8 +319,11 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
   return (
     <>
-      {/* Dynamic Energy Background - animated vortex, aurora, particles */}
-      <DynamicEnergyBackground />
+      {/* Note: SP's DynamicEnergyBackground intentionally not rendered here.
+          MP gameplay needs every GPU/CPU cycle for grid drag selection; the
+          200%×200% rotating vortex + aurora + scanline + 4 particle layers
+          continuously composited during a drag was the dominant stutter
+          source on mid/low-end Android. */}
 
       {/* Countdown tension: screen border glow at ≤20s.
           WCAG 2.3.3 — pulsing is suppressed under prefers-reduced-motion; color still conveys urgency. */}

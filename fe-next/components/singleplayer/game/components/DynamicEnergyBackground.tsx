@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Circle, Triangle, Square, Sparkles } from 'lucide-react';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 const DELAY_1S_STYLE = { animationDelay: '1s' } as const;
 const DELAY_2S_STYLE = { animationDelay: '2s' } as const;
@@ -9,9 +10,17 @@ const DELAY_3S_STYLE = { animationDelay: '3s' } as const;
 
 /**
  * DynamicEnergyBackground - Animated background for Single Player mode
- * Features vortex rotation, aurora waves, floating particles, and scanlines
+ * Features vortex rotation, aurora waves, floating particles, and scanlines.
+ *
+ * Self-gates on device capability: the 200%×200% rotating vortex layer is a
+ * dominant GPU compositor cost. On low-end Android / reduced-motion sessions
+ * the layer combo would keep repainting while the player drags on the grid,
+ * showing up as drag-selection stutter. Returns null in those cases.
  */
-export function DynamicEnergyBackground(): React.ReactElement {
+export function DynamicEnergyBackground(): React.ReactElement | null {
+  const { isLowEnd, prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
+  if (isLowEnd || prefersReducedMotion || !enableComplexAnimations) return null;
+
   return (
     <>
       {/* Vortex Layer - Slow rotating radial gradient */}
