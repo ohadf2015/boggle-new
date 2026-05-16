@@ -185,12 +185,11 @@ export function BlastBoard({
                     layout="position"
                     // Heavier, faster fall — bumped stiffness 560→720 and
                     // mass 1.2→1.6 so tiles accelerate harder and land with
-                    // a real thump. Damping nudged down (20→17) to keep the
-                    // tiny landing overshoot that pairs with the squash
-                    // timeline in useCollapseTimeline. Previous tuning felt
-                    // floaty on phones where the tile size + screen scale
-                    // made the spring travel time read as slow-mo.
-                    transition={{ type: 'spring', stiffness: 720, damping: 17, mass: 1.6, restDelta: 0.4 }}
+                    // a real thump. Damping bumped to 32 so the spring lands
+                    // critically damped — no positional overshoot. The
+                    // landing punch lives entirely in the squash timeline
+                    // (useCollapseTimeline); doubling it here read as jelly.
+                    transition={{ type: 'spring', stiffness: 720, damping: 32, mass: 1.6, restDelta: 0.4 }}
                     className="relative"
                   >
                     <BlastTile

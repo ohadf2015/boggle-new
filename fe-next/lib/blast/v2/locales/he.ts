@@ -48,6 +48,11 @@ const THEMES_HE: Record<ThemeKey, ThemeDef> = {
   travel: T('travel', ['מפה','אוהל']),
   art: T('art', ['צבע','אומנות']),
   time: T('time', ['יום','שבוע']),
+  joy: T('joy', ['שמח','אהבה','צחוק','חיוכ','כיפ','אור','טוב']),
+  cozy: T('cozy', ['חמ','רכ','שקט','נינוח','מנוחה','שלוה','אש']),
+  spooky: T('spooky', ['שד','פחד','רוח','אפל','חושכ','מפלצת','מסכה']),
+  magic: T('magic', ['קסמ','פיה','שרביט','חלומ','ננס','מכשפ','כישופ','ברכה']),
+  adventure: T('adventure', ['מפה','אוהל','טיול','הר','חופ','יער','נהר','מסע','הרפתק']),
 };
 
 export const HE_AMBIGUOUS_BLOCKLIST = new Set<string>([]); // Plan 6 native review fills

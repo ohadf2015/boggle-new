@@ -30,19 +30,19 @@ export function useCollapseTimeline(
     const tiles = boardRef.current.querySelectorAll<HTMLElement>('[data-cell-id]');
     const tl = gsap.timeline();
     tiles.forEach((el, i) => {
-      // Vertical-only land thump — toned down per playtest feedback that the
-      // previous (0.62 squash → 1.14 overshoot → elastic settle) felt over-
-      // animated and "jelly". Softer values keep the impact readable without
-      // the bouncy elastic tail. scaleX held at 1.0 so tiles stay column-
-      // locked. Stagger 18ms per tile keeps the cascade cadence.
+      // Land thump — a single squash → settle. The previous tuning ended on
+      // `back.out(1.4)` which added a bouncy overshoot tail that felt jelly
+      // after gravity. Now a clean squash-and-settle with eased-out recovery;
+      // no extra bounce keyframe, so the tile reads as a heavy block rather
+      // than a rubber ball. Stagger 18ms per tile keeps the cascade cadence.
       const startAt = i * 0.018;
       tl.fromTo(
         el,
         { scaleY: 1, scaleX: 1 },
         {
-          scaleY: 0.86,
+          scaleY: 0.88,
           scaleX: 1,
-          duration: 0.08,
+          duration: 0.07,
           ease: 'power3.in',
           transformOrigin: 'bottom center',
         },
@@ -51,22 +51,12 @@ export function useCollapseTimeline(
       tl.to(
         el,
         {
-          scaleY: 1.04,
-          scaleX: 1,
-          duration: 0.1,
-          ease: 'power2.out',
-        },
-        startAt + 0.08,
-      );
-      tl.to(
-        el,
-        {
           scaleY: 1,
           scaleX: 1,
           duration: 0.18,
-          ease: 'back.out(1.4)',
+          ease: 'power2.out',
         },
-        startAt + 0.18,
+        startAt + 0.07,
       );
     });
     return () => {

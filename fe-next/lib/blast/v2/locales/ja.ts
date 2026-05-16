@@ -49,6 +49,11 @@ const THEMES_JA: Record<ThemeKey, ThemeDef> = {
   travel: T('travel', ['ちず', 'テント']),
   art: T('art', ['いろ', 'げいじゅつ']),
   time: T('time', ['ひ', 'しゅうかん']),
+  joy: T('joy', ['うれしい', 'えがお', 'わらい', 'たのしい']),
+  cozy: T('cozy', ['あたたかい', 'やわらかい', 'しずか', 'ねむい']),
+  spooky: T('spooky', ['こわい', 'おばけ', 'くらい', 'まじょ']),
+  magic: T('magic', ['まほう', 'ようせい', 'ねがい', 'ゆめ']),
+  adventure: T('adventure', ['ちず', 'たび', 'やま', 'かわ']),
 };
 
 export const JA_CONFIG: LocaleConfig = {

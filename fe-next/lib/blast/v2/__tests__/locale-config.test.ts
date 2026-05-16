@@ -42,4 +42,20 @@ describe('EN LocaleConfig', () => {
     const set = await result;
     expect(set).toBeInstanceOf(Set);
   });
+
+  // Mood-tilted themes — added so level intros can carry a vibe ("when you
+  // are happy") instead of a category name. Each locale must populate them
+  // because `Record<ThemeKey, ThemeDef>` requires every key.
+  it.each(['joy', 'cozy', 'spooky', 'magic', 'adventure'] as const)(
+    'EN ships a non-empty word pool for mood theme %s',
+    (key) => {
+      const pool = en.themes[key].wordPool;
+      expect(pool.length, `${key} pool`).toBeGreaterThan(0);
+      // Mood-theme words are intentionally short — keeps the pack-chain L11+
+      // ≤5-letter cap a single source of truth.
+      for (const w of pool) {
+        expect(w.length, `${key}: "${w}" longer than 6`).toBeLessThanOrEqual(6);
+      }
+    },
+  );
 });
