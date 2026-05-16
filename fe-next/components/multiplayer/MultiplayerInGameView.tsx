@@ -268,6 +268,35 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     byUsername: item.playerName,
   })), [deferredOpponentFeedItems]);
 
+  // Memoize the leaderboard → RosterPlayer and foundWords → LadderWord
+  // mappings. Without these useMemos every parent re-render (timer tick at
+  // ~1Hz, combo updates, etc.) allocated brand-new arrays which then broke
+  // memo on RosterRail / WordsLadder / MyStatsCard / OpponentInsightFeed,
+  // causing the whole desktop shell to re-render on every tick — visible as
+  // sluggish word-accept feedback in multiplayer classic.
+  const rosterPlayers = useMemo(
+    () => leaderboard.map(entry => ({
+      userId: entry.username ?? '',
+      username: entry.username,
+      score: entry.score,
+      wordCount: entry.wordCount,
+      status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
+      isYou: entry.username === username,
+      customAvatar: entry.avatar?.customAvatar ?? null,
+    })),
+    [leaderboard, username],
+  );
+  const ladderWords = useMemo(
+    () => foundWords.map(fw => ({
+      word: fw.word,
+      score: fw.score ?? 0,
+      ts: fw.timestamp ?? 0,
+      userId: username,
+      inputMethod: fw.inputMethod ?? 'drag',
+    })),
+    [foundWords, username],
+  );
+
   // Effective grid (player may have shufflingGrid fallback)
   const effectiveGrid = letterGrid || shufflingGrid || null;
 
@@ -347,24 +376,9 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
 
   // Desktop shell for classic mode
   if (shellEnabled && gameMode === 'classic') {
-    // Map leaderboard from MultiplayerInGameView shape to RosterPlayer shape
-    const rosterPlayers = leaderboard.map(entry => ({
-      userId: entry.username ?? '',
-      username: entry.username,
-      score: entry.score,
-      status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
-      isYou: entry.username === username,
-      customAvatar: entry.avatar?.customAvatar ?? null,
-    }));
-
-    // Map foundWords from FoundWord shape to LadderWord shape
-    const ladderWords = foundWords.map((fw) => ({
-      word: fw.word,
-      score: fw.score ?? 0,
-      ts: fw.timestamp ?? 0,
-      userId: username,
-      inputMethod: fw.inputMethod ?? 'drag',
-    }));
+    // rosterPlayers + ladderWords are memoized at the top of the component
+    // (see useMemo above) so timer-driven re-renders don't churn referential
+    // identity and trash downstream memo boundaries.
 
     // Build InGameScreen props object
     const inGameScreenProps = {
@@ -436,25 +450,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   // TypeScript doesn't narrow properly on 'wheel-rush' variant in some builds,
   // but the runtime value is correct (validated in backend/modules/gameModeSelector.ts)
   if ((gameMode as string) === 'wheel-rush' && shellEnabled) {
-    // Map leaderboard from MultiplayerInGameView shape to RosterPlayer shape
-    const rosterPlayers = leaderboard.map(entry => ({
-      userId: entry.username ?? '',
-      username: entry.username,
-      score: entry.score,
-      wordCount: entry.wordCount,
-      status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
-      isYou: entry.username === username,
-      customAvatar: entry.avatar?.customAvatar ?? null,
-    }));
-
-    // Map foundWords from FoundWord shape to LadderWord shape
-    const ladderWords = foundWords.map((fw) => ({
-      word: fw.word,
-      score: fw.score ?? 0,
-      ts: fw.timestamp ?? 0,
-      userId: username,
-      inputMethod: fw.inputMethod ?? 'drag',
-    }));
+    // rosterPlayers + ladderWords memoized at top of component.
 
     const wheelRushProps = {
       socket,
@@ -483,24 +479,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
 
   // Desktop shell for word-hunt mode
   if ((gameMode as string) === 'word-hunt' && shellEnabled) {
-    // Map leaderboard from MultiplayerInGameView shape to RosterPlayer shape
-    const rosterPlayers = leaderboard.map(entry => ({
-      userId: entry.username ?? '',
-      username: entry.username,
-      score: entry.score,
-      status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
-      isYou: entry.username === username,
-      customAvatar: entry.avatar?.customAvatar ?? null,
-    }));
-
-    // Map foundWords from FoundWord shape to LadderWord shape
-    const ladderWords = foundWords.map((fw) => ({
-      word: fw.word,
-      score: fw.score ?? 0,
-      ts: fw.timestamp ?? 0,
-      userId: username,
-      inputMethod: fw.inputMethod ?? 'drag',
-    }));
+    // rosterPlayers + ladderWords memoized at top of component.
 
     const wordHuntGameProps = {
       grid: effectiveGrid,
@@ -550,22 +529,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       />
     );
     if (shellEnabled) {
-      const rosterPlayers = leaderboard.map(entry => ({
-        userId: entry.username ?? '',
-        username: entry.username,
-        score: entry.score,
-        wordCount: entry.wordCount,
-        status: entry.disconnected ? ('disconnected' as const) : ('connected' as const),
-        isYou: entry.username === username,
-        customAvatar: entry.avatar?.customAvatar ?? null,
-      }));
-      const ladderWords = foundWords.map(fw => ({
-        word: fw.word,
-        score: fw.score ?? 0,
-        ts: fw.timestamp ?? 0,
-        userId: username,
-        inputMethod: fw.inputMethod ?? 'drag',
-      }));
+      // rosterPlayers + ladderWords memoized at top of component.
       return (
         <BlastDesktopAdapter
           roomId={gameCode}
