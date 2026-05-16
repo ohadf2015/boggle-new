@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export interface LadderWord {
@@ -21,10 +22,14 @@ interface WordsLadderProps {
  * - Stolen words shown with strike-through
  * - Top entry pulses (`animate-ladder-bump`) on insert; reduced-motion no-ops it
  * - aria-live="polite" so screen readers announce new words
+ *
+ * Memoized: parent re-renders on every timer tick (1Hz). Without memo + sort
+ * memoization the entire ladder re-sorted + re-rendered every second even with
+ * no new word, causing visible jank on word accept.
  */
-export function WordsLadder({ words, meId }: WordsLadderProps) {
+function WordsLadderImpl({ words, meId }: WordsLadderProps) {
   const { t } = useLanguage();
-  const sorted = [...words].sort((a, b) => b.ts - a.ts);
+  const sorted = useMemo(() => [...words].sort((a, b) => b.ts - a.ts), [words]);
 
   if (sorted.length === 0) {
     return (
@@ -71,3 +76,5 @@ export function WordsLadder({ words, meId }: WordsLadderProps) {
     </ul>
   );
 }
+
+export const WordsLadder = memo(WordsLadderImpl);

@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import Avatar from '@/components/Avatar';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
@@ -11,9 +12,16 @@ export interface RosterPlayer {
   customAvatar?: CustomAvatarConfig | null;
 }
 
-export function RosterRail({ players }: { players: RosterPlayer[] }) {
-  const sorted = [...players].sort((a, b) => b.score - a.score);
-  const maxScore = Math.max(...sorted.map(p => p.score), 1);
+function RosterRailImpl({ players }: { players: RosterPlayer[] }) {
+  // Memoize sort + maxScore so the timer-driven parent re-renders (1Hz) don't
+  // re-sort every render. The list itself rarely changes — sort only when
+  // `players` reference does.
+  const { sorted, maxScore } = useMemo(() => {
+    const s = [...players].sort((a, b) => b.score - a.score);
+    let max = 1;
+    for (const p of s) if (p.score > max) max = p.score;
+    return { sorted: s, maxScore: max };
+  }, [players]);
 
   return (
     <ul className="flex flex-col gap-2" data-component="roster-rail" aria-label="Players">
@@ -63,3 +71,5 @@ export function RosterRail({ players }: { players: RosterPlayer[] }) {
     </ul>
   );
 }
+
+export const RosterRail = memo(RosterRailImpl);

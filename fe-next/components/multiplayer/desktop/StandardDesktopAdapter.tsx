@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { memo, useMemo, type ReactNode } from 'react';
 import { MultiplayerDesktopShell } from './MultiplayerDesktopShell';
 import { RosterRail, type RosterPlayer } from './RosterRail';
 import { WordsLadder, type LadderWord } from './WordsLadder';
@@ -24,74 +24,121 @@ export interface StandardDesktopAdapterProps {
   startTimeMs?: number;
 }
 
-export function StandardDesktopAdapter(props: StandardDesktopAdapterProps) {
+function StandardDesktopAdapterImpl(props: StandardDesktopAdapterProps) {
   const { t } = useLanguage();
-  const slots: ShellSlots = {
-    left: {
-      roster: (
-        <ThemedPanel
-          mode="classic"
-          variant="rail"
-          header={t('mp.insights.rosterHeader')}
-          headerRight={`${props.leaderboard.length}`}
-          testId="standard-roster"
-        >
-          <RosterRail players={props.leaderboard} />
-        </ThemedPanel>
-      ),
-      modeBadge: (
-        <ThemedPanel mode="classic" variant="badge" testId="standard-mode-badge" withTexture>
-          <div className="flex items-center gap-3 animate-mp-shell-fade">
-            <CircularTimer
-              duration={props.totalTime}
-              initialRemainingTime={props.remainingTime}
-              isPlaying
-              size={80}
-              colorFamily="cyan"
-            />
-            <div className="flex flex-col">
-              <span className="text-[10px] font-mono opacity-50">MP</span>
-              <span className="font-neo-display font-bold text-xl uppercase tracking-wide">
-                {t('mp.modeName.classic')}
-              </span>
-            </div>
+  const {
+    roomId,
+    leaderboard,
+    foundWords,
+    remainingTime,
+    totalTime,
+    canvas,
+    meId,
+    opponentWords,
+    startTimeMs,
+  } = props;
+
+  // Memoize each slot subtree so timer-driven re-renders (e.g. remainingTime
+  // ticking each second) don't rebuild the entire ShellSlots graph and
+  // re-render every downstream insight component. Each slot only rebuilds
+  // when its actual inputs change.
+  const rosterSlot = useMemo(
+    () => (
+      <ThemedPanel
+        mode="classic"
+        variant="rail"
+        header={t('mp.insights.rosterHeader')}
+        headerRight={`${leaderboard.length}`}
+        testId="standard-roster"
+      >
+        <RosterRail players={leaderboard} />
+      </ThemedPanel>
+    ),
+    [t, leaderboard],
+  );
+
+  const modeBadgeSlot = useMemo(
+    () => (
+      <ThemedPanel mode="classic" variant="badge" testId="standard-mode-badge" withTexture>
+        <div className="flex items-center gap-3 animate-mp-shell-fade">
+          <CircularTimer
+            duration={totalTime}
+            initialRemainingTime={remainingTime}
+            isPlaying
+            size={80}
+            colorFamily="cyan"
+          />
+          <div className="flex flex-col">
+            <span className="text-[10px] font-mono opacity-50">MP</span>
+            <span className="font-neo-display font-bold text-xl uppercase tracking-wide">
+              {t('mp.modeName.classic')}
+            </span>
           </div>
-        </ThemedPanel>
-      ),
-      secondary: (
-        <MyStatsCard
-          mode="classic"
-          meId={props.meId}
-          foundWords={props.foundWords}
-          startTimeMs={props.startTimeMs}
-        />
-      ),
-    },
-    center: props.canvas,
-    right: {
-      wordsLadder: (
-        <ThemedPanel
-          mode="classic"
-          variant="rail"
-          header={t('mp.insights.foundHeader')}
-          headerRight={`${props.foundWords.length}`}
-          testId="standard-ladder"
-        >
-          <LatestScoreTickBanner mode="classic" meId={props.meId} leaderboard={props.leaderboard} />
-          <WordsLadder words={props.foundWords} meId={props.meId} />
-        </ThemedPanel>
-      ),
-      activityStream: (
-        <div className="flex flex-col gap-2">
-          <PaceDeltaChip mode="classic" leaderboard={props.leaderboard} meId={props.meId} />
-          {props.opponentWords && props.opponentWords.length > 0 && (
-            <OpponentInsightFeed mode="classic" opponentWords={props.opponentWords} />
-          )}
-          <KeyboardHintStrip />
         </div>
-      ),
-    },
-    meta: { mode: 'classic', roomId: props.roomId },
-  };
+      </ThemedPanel>
+    ),
+    [t, totalTime, remainingTime],
+  );
+
+  const secondarySlot = useMemo(
+    () => (
+      <MyStatsCard
+        mode="classic"
+        meId={meId}
+        foundWords={foundWords}
+        startTimeMs={startTimeMs}
+      />
+    ),
+    [meId, foundWords, startTimeMs],
+  );
+
+  const wordsLadderSlot = useMemo(
+    () => (
+      <ThemedPanel
+        mode="classic"
+        variant="rail"
+        header={t('mp.insights.foundHeader')}
+        headerRight={`${foundWords.length}`}
+        testId="standard-ladder"
+      >
+        <LatestScoreTickBanner mode="classic" meId={meId} leaderboard={leaderboard} />
+        <WordsLadder words={foundWords} meId={meId} />
+      </ThemedPanel>
+    ),
+    [t, foundWords, meId, leaderboard],
+  );
+
+  const activityStreamSlot = useMemo(
+    () => (
+      <div className="flex flex-col gap-2">
+        <PaceDeltaChip mode="classic" leaderboard={leaderboard} meId={meId} />
+        {opponentWords && opponentWords.length > 0 && (
+          <OpponentInsightFeed mode="classic" opponentWords={opponentWords} />
+        )}
+        <KeyboardHintStrip />
+      </div>
+    ),
+    [leaderboard, meId, opponentWords],
+  );
+
+  const slots: ShellSlots = useMemo(
+    () => ({
+      left: {
+        roster: rosterSlot,
+        modeBadge: modeBadgeSlot,
+        secondary: secondarySlot,
+      },
+      center: canvas,
+      right: {
+        wordsLadder: wordsLadderSlot,
+        activityStream: activityStreamSlot,
+      },
+      meta: { mode: 'classic', roomId },
+    }),
+    [rosterSlot, modeBadgeSlot, secondarySlot, canvas, wordsLadderSlot, activityStreamSlot, roomId],
+  );
+
   return <MultiplayerDesktopShell slots={slots} />;
 }
+
+export const StandardDesktopAdapter = memo(StandardDesktopAdapterImpl);
