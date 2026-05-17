@@ -225,7 +225,12 @@ export function BlastGame({
     }
 
     const timeSeconds = Math.round((Date.now() - levelStartTime) / 1000);
-    const gemsCollected = Math.round(state.chestProgress * 10);
+    // score.ts adds 0.02 chestProgress per gem tile, so the real gem count is
+    // chestProgress * 50. Pre-fix code used *10, which combined with backend
+    // `earnedGems * 0.02` produced an effective delta of 0.004/gem — chest
+    // sat at 0% level after level (the user-visible "chest not progressing"
+    // regression at level 6).
+    const gemsCollected = Math.round(state.chestProgress * 50);
 
     const submission = {
       levelNumber: level.levelNumber,

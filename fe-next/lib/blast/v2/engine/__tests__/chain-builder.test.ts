@@ -82,6 +82,37 @@ describe('insertWordVertical', () => {
     const b = insertWordVertical(Sk, 'CAT', ['DOG'], 'en', 42);
     expect(a?.level.columns).toEqual(b?.level.columns);
   });
+
+});
+
+describe('buildChainLevel column-height cap', () => {
+  it('never produces a tower-shaped column (regression: level 6 stacked 13-tall)', () => {
+    // Pre-fix, level 6's narrow-grid relief allowed ceiling=totalTiles, which
+    // let a 5-word chain collapse into a 13-tile single column. Cap is now
+    // silhouetteMax + 2 = 7 for levels 1–20 (≤5 cols).
+    const heavySpec: ChainLevelSpec = {
+      id: 'en-cap-test',
+      levelNumber: 6,
+      theme: 'ocean',
+      locale: 'en',
+      columns: 5,
+      decoyTiles: 0,
+      chain: ['CAT', 'SUN', 'DOG', 'EGG', 'BAT'],
+    };
+    // Level 6 spec → tower filter active. Chain totalTiles=15, cols=5 →
+    // towerCap = max(longest+2, avg+4) = max(5, 7) = 7. Pre-fix had no
+    // tower filter → towers up to 13.
+    let saw = false;
+    for (let seed = 1; seed <= 40; seed++) {
+      const level = buildChainLevel(heavySpec, seed);
+      if (!level) continue;
+      saw = true;
+      for (const col of level.columns) {
+        expect(col.tiles.length).toBeLessThanOrEqual(7);
+      }
+    }
+    expect(saw).toBe(true);
+  });
 });
 
 describe('buildChainLevel', () => {

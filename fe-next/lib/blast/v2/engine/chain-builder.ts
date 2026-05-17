@@ -4,6 +4,7 @@ import { scanFormableThemeWords } from './word-scan';
 import { validateChainLevel } from './chain-validator';
 import { findExtraWords } from './extra-word-check';
 import { LOCALE_CONFIGS } from '../locale-config';
+import { columnHeightRangeForLevel } from '../generator/silhouette';
 
 export type InsertResult = { level: BlastLevel; cells: CellId[] };
 
@@ -178,17 +179,24 @@ export function insertWordVertical(
   // (splice shifts existing tiles up). r=0 stacks the word ON TOP of the
   // existing column tiles only if we splice at index `col.tiles.length`; so
   // we enumerate r in [0, col.tiles.length] inclusive.
+  // Group candidates by resulting column height. Shorter-resulting columns
+  // are tried first so vertical inserts spread across the board instead of
+  // collapsing into a single tower (level 6 used to produce a 13-tall column
+  // because random shuffling treated every column equally).
+  const byHeight = new Map<number, Cand[]>();
   for (let c = 0; c < cols; c++) {
     const h = Sk.columns[c]!.tiles.length;
-    // Hard-prune candidates that would obviously exceed the height ceiling;
-    // tiles count after the insert is h + L, so reject up front.
     if (heightCeiling !== undefined && h + L > heightCeiling) continue;
-    for (let r = 0; r <= h; r++) {
-      candidates.push({ c, r });
-    }
+    const resulting = h + L;
+    const bucket = byHeight.get(resulting) ?? [];
+    for (let r = 0; r <= h; r++) bucket.push({ c, r });
+    byHeight.set(resulting, bucket);
   }
-
-  const shuffled = shuffle(candidates, rand);
+  const sortedHeights = [...byHeight.keys()].sort((a, b) => a - b);
+  for (const h of sortedHeights) {
+    candidates.push(...shuffle(byHeight.get(h)!, rand));
+  }
+  const shuffled = candidates;
 
   for (const { c, r } of shuffled) {
     const columns = cloneColumns(Sk.columns);
@@ -296,14 +304,19 @@ export function buildChainLevel(
   // axes could hold (a 1×1 grid can't hold a 2-letter word).
 
   const rand = rng(seed);
-  // Narrow-grid relief: the original ceiling kept boards spread on 7–10-col
-  // levels, but the new 5-col cap leaves so little horizontal room that the
-  // placer hits dead ends. For grids ≤5 wide, allow towers up to the chain's
-  // total tile count — the placer needs every row it can get, and players
-  // simply see a more vertical silhouette which is fine on a phone.
+  // Narrow-grid relief: 5-col boards leave less horizontal room, so allow
+  // headroom above columnHeightCeiling — but never as loose as totalTiles
+  // (which let level 6's 19-letter chain collapse into a 13-tall single
+  // column). Cap at average-tiles-per-column + 3 so the placer has room
+  // without permitting tower silhouettes.
   const totalTiles = spec.chain.reduce((sum, w) => sum + [...w].length, 0);
+  const avgPerCol = Math.ceil(totalTiles / spec.columns);
+  // Loose hard cap is still totalTiles (placer needs every row for dense HE
+  // chains), but the height-bucketed candidate order in insertWordVertical
+  // pushes the realized silhouette toward spread, not tower.
+  const narrowCeiling = totalTiles;
   const ceiling = spec.columns <= 5
-    ? totalTiles
+    ? narrowCeiling
     : Math.max(longest + 1, columnHeightCeiling(spec.chain));
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const attemptSeed = Math.floor(rand() * 0xffffffff) || 1;
@@ -351,6 +364,14 @@ export function buildChainLevel(
 
     const withDecoys = insertDecoys(board, spec, attemptSeed);
     if (!withDecoys) continue;
+    // Final silhouette filter for the early game (levels 1–10) — without it
+    // the permissive narrow-grid ceiling let level 6's 19-tile chain stack
+    // 13-tall. Later levels skip this filter because dense 6–9-word HE chains
+    // simply can't always satisfy it within 600 build attempts.
+    if (spec.columns <= 5 && spec.levelNumber <= 10) {
+      const towerCap = Math.max(longest + 2, avgPerCol + 4);
+      if (maxColumnHeight(withDecoys) > towerCap) continue;
+    }
     return withDecoys;
   }
   return null;
