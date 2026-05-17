@@ -27,8 +27,14 @@ vi.mock('next/image', () => ({
 // Mock AvatarRenderer
 vi.mock('@/components/avatar/AvatarRenderer', () => ({
   __esModule: true,
-  default: ({ config, size, mode }: { config: CustomAvatarConfig; size: number; mode?: string }) => (
-    <svg data-testid="custom-avatar" data-size={size} data-base={config.base} data-mode={mode ?? ''} />
+  default: ({ config, size, mode, disableEffects }: { config: CustomAvatarConfig; size: number; mode?: string; disableEffects?: boolean }) => (
+    <svg
+      data-testid="custom-avatar"
+      data-size={size}
+      data-base={config.base}
+      data-mode={mode ?? ''}
+      data-disable-effects={disableEffects ? 'true' : 'false'}
+    />
   ),
 }));
 
@@ -333,6 +339,23 @@ describe('Avatar', () => {
     it('forwards mode to fallback generated avatar', () => {
       render(<Avatar userId="abc123" mode="brain" />);
       expect(screen.getByTestId('custom-avatar').getAttribute('data-mode')).toBe('brain');
+    });
+  });
+
+  describe('disableEffects prop forwarding', () => {
+    it('does not forward disableEffects by default (tier animations enabled)', () => {
+      render(<Avatar customAvatar={SAMPLE_CUSTOM_AVATAR} />);
+      expect(screen.getByTestId('custom-avatar').getAttribute('data-disable-effects')).toBe('false');
+    });
+
+    it('forwards disableEffects=true to AvatarRenderer for custom avatar', () => {
+      render(<Avatar customAvatar={SAMPLE_CUSTOM_AVATAR} disableEffects />);
+      expect(screen.getByTestId('custom-avatar').getAttribute('data-disable-effects')).toBe('true');
+    });
+
+    it('forwards disableEffects=true to fallback generated avatar', () => {
+      render(<Avatar userId="abc123" disableEffects />);
+      expect(screen.getByTestId('custom-avatar').getAttribute('data-disable-effects')).toBe('true');
     });
   });
 });

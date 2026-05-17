@@ -42,6 +42,7 @@ function RosterRailImpl({ players }: { players: RosterPlayer[] }) {
                   size="sm"
                   customAvatar={p.customAvatar ?? undefined}
                   userId={p.userId}
+                  disableEffects
                 />
                 <span
                   data-testid={`status-dot-${p.userId}`}

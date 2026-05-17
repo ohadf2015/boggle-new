@@ -34,6 +34,13 @@ interface AvatarProps {
   mode?: AvatarMode;
   /** Equipped profile-frame cosmetic id (e.g. 'frame-gold'). 'frame-none'/null = no frame. */
   frame?: string | null;
+  /**
+   * Skip the per-tier CSS animation wrapper (idle breathing, glow-pulse drop-shadow,
+   * sparkles, holographic filter loop, conic-gradient ring). Use in in-match
+   * leaderboards/rosters where many avatars are visible at once — the continuous
+   * `filter: drop-shadow` keyframes are paint-bound and stack into significant jank.
+   */
+  disableEffects?: boolean;
 }
 
 /** Map a profile-frame cosmetic id to its avatar wrapper class. Returns null for no frame. */
@@ -64,6 +71,7 @@ const Avatar = memo<AvatarProps>((props) => {
     isLoading,
     mode,
     frame,
+    disableEffects,
   } = props;
   // Back-compat: legacy callers still pass `avatarImage`. Read via prop access
   // so this component does not surface its own deprecation diagnostic.
@@ -109,7 +117,7 @@ const Avatar = memo<AvatarProps>((props) => {
         data-avatar-type="custom"
         {...frameAttr}
       >
-        <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" mode={mode} />
+        <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" mode={mode} disableEffects={disableEffects} />
       </div>
     );
   }
@@ -123,7 +131,7 @@ const Avatar = memo<AvatarProps>((props) => {
       data-avatar-type="generated"
       {...frameAttr}
     >
-      <AvatarRenderer config={fallbackConfig} size={config.px} circular mode={mode} />
+      <AvatarRenderer config={fallbackConfig} size={config.px} circular mode={mode} disableEffects={disableEffects} />
     </div>
   );
 });
