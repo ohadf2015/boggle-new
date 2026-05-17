@@ -1,5 +1,3 @@
-'use client';
-
 import { memo, useId } from 'react';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { darken } from './parts/avatarDesignConstants';

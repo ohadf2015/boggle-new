@@ -1,5 +1,3 @@
-'use client';
-
 import { memo } from 'react';
 import { type CustomAvatarConfig, isEpicPart, isLegendaryPart, isPremiumPart } from '@/shared/types/customAvatar';
 import '@/styles/avatar-tier-animations.css';
