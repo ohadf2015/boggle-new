@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useRef, useMemo, type ReactNode } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { AdMob } from '@capacitor-community/admob';
+import { AdMob, AdmobConsentStatus } from '@capacitor-community/admob';
 import { getAdmobConfig, type AdmobConfig, type AdPlatform } from '@/lib/admob-config';
 
 interface AdMobContextValue {
@@ -34,15 +34,36 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   const initPromise = useRef<Promise<void> | null>(null);
 
   if (initPromise.current === null) {
-    initPromise.current = isAvailable
-      ? AdMob.initialize({ initializeForTesting: process.env.NODE_ENV !== 'production' })
-          .then(() => undefined)
+    // EU/GDPR: gather UMP consent BEFORE initialize. The plugin itself geo-gates
+    // (returns NOT_REQUIRED outside EEA), so no client-side EEA check needed.
+    // Errors in the consent flow must NOT block ads — fall through to initialize
+    // either way so non-EEA traffic stays unaffected if UMP backend is flaky.
+    const consentReady = isAvailable
+      ? AdMob.requestConsentInfo()
+          .then(async (info) => {
+            if (
+              info.status === AdmobConsentStatus.REQUIRED &&
+              info.isConsentFormAvailable
+            ) {
+              await AdMob.showConsentForm();
+            }
+          })
           .catch((err) => {
-            // warn (not error) so Sentry's captureConsole doesn't treat expected
-            // plugin-missing failures as errors.
-            console.warn('[AdMob] initialize failed', err);
+            console.warn('[AdMob] UMP consent flow failed', err);
           })
       : Promise.resolve();
+
+    initPromise.current = consentReady.then(() =>
+      isAvailable
+        ? AdMob.initialize({ initializeForTesting: process.env.NODE_ENV !== 'production' })
+            .then(() => undefined)
+            .catch((err) => {
+              // warn (not error) so Sentry's captureConsole doesn't treat expected
+              // plugin-missing failures as errors.
+              console.warn('[AdMob] initialize failed', err);
+            })
+        : undefined
+    );
   }
 
   useEffect(() => {

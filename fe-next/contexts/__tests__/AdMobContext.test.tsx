@@ -13,6 +13,14 @@ vi.mock('@capacitor/core', () => ({
 vi.mock('@capacitor-community/admob', () => ({
   AdMob: {
     initialize: vi.fn(() => Promise.resolve()),
+    requestConsentInfo: vi.fn(() => Promise.resolve({ status: 'NOT_REQUIRED', canRequestAds: true })),
+    showConsentForm: vi.fn(() => Promise.resolve({ status: 'OBTAINED', canRequestAds: true })),
+  },
+  AdmobConsentStatus: {
+    UNKNOWN: 'UNKNOWN',
+    NOT_REQUIRED: 'NOT_REQUIRED',
+    REQUIRED: 'REQUIRED',
+    OBTAINED: 'OBTAINED',
   },
 }));
 
@@ -54,6 +62,97 @@ describe('AdMobProvider', () => {
       );
     });
     expect(AdMob.initialize).toHaveBeenCalledWith({ initializeForTesting: true });
+  });
+
+  it('requests UMP consent BEFORE AdMob.initialize on native (EU/GDPR gate)', async () => {
+    vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+    vi.mocked(Capacitor.getPlatform).mockReturnValue('android');
+    const order: string[] = [];
+    vi.mocked(AdMob.requestConsentInfo).mockImplementationOnce(async () => {
+      order.push('requestConsentInfo');
+      return { status: 'NOT_REQUIRED' as never, canRequestAds: true };
+    });
+    vi.mocked(AdMob.initialize).mockImplementationOnce(async () => {
+      order.push('initialize');
+    });
+    let captured: ReturnType<typeof useAdMobContext> | null = null;
+    await act(async () => {
+      render(
+        <AdMobProvider>
+          <TestConsumer onMount={(ctx) => { captured = ctx; }} />
+        </AdMobProvider>
+      );
+    });
+    await captured!.whenReady();
+    expect(order).toEqual(['requestConsentInfo', 'initialize']);
+  });
+
+  it('shows UMP consent form when status === REQUIRED and form available', async () => {
+    vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+    vi.mocked(Capacitor.getPlatform).mockReturnValue('android');
+    vi.mocked(AdMob.requestConsentInfo).mockResolvedValueOnce({
+      status: 'REQUIRED' as never,
+      isConsentFormAvailable: true,
+      canRequestAds: false,
+    } as never);
+    let captured: ReturnType<typeof useAdMobContext> | null = null;
+    await act(async () => {
+      render(
+        <AdMobProvider>
+          <TestConsumer onMount={(ctx) => { captured = ctx; }} />
+        </AdMobProvider>
+      );
+    });
+    await captured!.whenReady();
+    expect(AdMob.showConsentForm).toHaveBeenCalled();
+  });
+
+  it('skips showConsentForm when status === NOT_REQUIRED (non-EEA)', async () => {
+    vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+    vi.mocked(Capacitor.getPlatform).mockReturnValue('android');
+    vi.mocked(AdMob.requestConsentInfo).mockResolvedValueOnce({
+      status: 'NOT_REQUIRED' as never,
+      canRequestAds: true,
+    } as never);
+    let captured: ReturnType<typeof useAdMobContext> | null = null;
+    await act(async () => {
+      render(
+        <AdMobProvider>
+          <TestConsumer onMount={(ctx) => { captured = ctx; }} />
+        </AdMobProvider>
+      );
+    });
+    await captured!.whenReady();
+    expect(AdMob.showConsentForm).not.toHaveBeenCalled();
+    expect(AdMob.initialize).toHaveBeenCalled();
+  });
+
+  it('still initializes AdMob even if requestConsentInfo throws (graceful degrade)', async () => {
+    vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+    vi.mocked(Capacitor.getPlatform).mockReturnValue('android');
+    vi.mocked(AdMob.requestConsentInfo).mockRejectedValueOnce(new Error('UMP network fail'));
+    let captured: ReturnType<typeof useAdMobContext> | null = null;
+    await act(async () => {
+      render(
+        <AdMobProvider>
+          <TestConsumer onMount={(ctx) => { captured = ctx; }} />
+        </AdMobProvider>
+      );
+    });
+    await captured!.whenReady();
+    expect(AdMob.initialize).toHaveBeenCalled();
+  });
+
+  it('does NOT call requestConsentInfo on web', async () => {
+    vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+    await act(async () => {
+      render(
+        <AdMobProvider>
+          <TestConsumer onMount={vi.fn()} />
+        </AdMobProvider>
+      );
+    });
+    expect(AdMob.requestConsentInfo).not.toHaveBeenCalled();
   });
 
   it('hasNoAds returns false (stub)', async () => {
