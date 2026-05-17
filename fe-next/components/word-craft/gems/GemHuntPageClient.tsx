@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { gsap } from 'gsap';
 import { ArrowLeft, Gem as GemLucide } from 'lucide-react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -52,6 +53,49 @@ export default function GemHuntPageClient() {
 
   const hunt = useGemHunt({ seed, dict, locale, boardSize: 11 });
   const { state } = hunt;
+
+  // GSAP collect burst: when state.lastCollection updates, fly each collected
+  // gem's icon from its board cell to its matching inventory chip. Clone the
+  // node so the original (now off-board) doesn't disrupt React's children.
+  const lastBurstTurnRef = useRef<number>(-1);
+  useEffect(() => {
+    if (!state.lastCollection.length) return;
+    if (state.turnIndex === lastBurstTurnRef.current) return;
+    lastBurstTurnRef.current = state.turnIndex;
+    for (const gem of state.lastCollection) {
+      const sourceEl = document.querySelector<HTMLElement>(`[data-gem-id="${gem.cellId}"]`);
+      const targetEl = document.querySelector<HTMLElement>(`[data-inv-cell="${gem.color}-${gem.rarity}"]`);
+      if (!sourceEl || !targetEl) continue;
+      const srcRect = sourceEl.getBoundingClientRect();
+      const dstRect = targetEl.getBoundingClientRect();
+      const clone = sourceEl.cloneNode(true) as HTMLElement;
+      clone.style.position = 'fixed';
+      clone.style.left = `${srcRect.left}px`;
+      clone.style.top = `${srcRect.top}px`;
+      clone.style.zIndex = '9999';
+      clone.style.pointerEvents = 'none';
+      document.body.appendChild(clone);
+      const dx = dstRect.left + dstRect.width / 2 - (srcRect.left + srcRect.width / 2);
+      const dy = dstRect.top + dstRect.height / 2 - (srcRect.top + srcRect.height / 2);
+      gsap.to(clone, {
+        x: dx,
+        y: dy,
+        scale: 0.6,
+        rotation: 360,
+        duration: 0.62,
+        ease: 'power2.in',
+        onComplete: () => {
+          gsap.to(clone, {
+            scale: 0,
+            opacity: 0,
+            duration: 0.18,
+            ease: 'back.in(2)',
+            onComplete: () => clone.remove(),
+          });
+        },
+      });
+    }
+  }, [state.lastCollection, state.turnIndex]);
 
   const tilesRemaining = state.bag.tiles.length;
 
