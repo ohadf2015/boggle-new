@@ -368,12 +368,15 @@ vi.mock('framer-motion', () => {
       return componentCache.get(prop);
     },
   });
-  const createMotionValue = () => ({
-    set: vi.fn(),
-    get: () => 0,
-    on: () => () => {},
-    onChange: () => () => {},
-  });
+  const createMotionValue = (initial: unknown = 0) => {
+    let value = initial;
+    return {
+      set: (v: unknown) => { value = v; },
+      get: () => value,
+      on: () => () => {},
+      onChange: () => () => {},
+    };
+  };
   return {
     motion,
     m: motion,
@@ -391,7 +394,7 @@ vi.mock('framer-motion', () => {
     },
     domAnimation: {},
     domMax: {},
-    useMotionValue: () => createMotionValue(),
+    useMotionValue: (initial?: unknown) => createMotionValue(initial),
     useMotionValueEvent: vi.fn(),
     useMotionTemplate: () => '',
     useInView: () => true,
@@ -405,7 +408,16 @@ vi.mock('framer-motion', () => {
     useAnimation: () => ({ start: vi.fn(), set: vi.fn() }),
     useAnimationControls: () => ({ start: vi.fn(), set: vi.fn() }),
     useSpring: () => createMotionValue(),
-    useTransform: () => createMotionValue(),
+    useTransform: (mv: unknown, rangeOrFn?: unknown) => {
+      // When called with a transform function, eagerly invoke with mv's current
+      // value so JSX children render strings/numbers instead of the MotionValue object.
+      if (typeof rangeOrFn === 'function') {
+        const current = (mv as { get?: () => unknown } | null)?.get?.() ?? 0;
+        try { return (rangeOrFn as (v: unknown) => unknown)(current); } catch { return ''; }
+      }
+      return createMotionValue();
+    },
+    useVelocity: () => createMotionValue(),
     animate: vi.fn(),
   };
 });

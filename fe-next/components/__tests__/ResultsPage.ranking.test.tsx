@@ -76,6 +76,8 @@ vi.mock('framer-motion', () => {
     }),
     useTransform: () => motionValueStub(),
     useMotionValue: motionValueStub,
+    useVelocity: () => motionValueStub(),
+    useSpring: () => motionValueStub(),
   };
 });
 

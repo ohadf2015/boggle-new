@@ -22,6 +22,12 @@ const { listeners, fireEvent } = vi.hoisted(() => {
 vi.mock('@capacitor-community/admob', () => ({
   AdMob: {
     initialize: vi.fn(() => Promise.resolve()),
+    // UMP consent shims — provider calls these before initialize. Default to
+    // NOT_REQUIRED so non-EEA path resolves immediately and tests don't hang.
+    requestConsentInfo: vi.fn(() =>
+      Promise.resolve({ status: 'NOT_REQUIRED', isConsentFormAvailable: false }),
+    ),
+    showConsentForm: vi.fn(() => Promise.resolve()),
     prepareRewardVideoAd: vi.fn(() => Promise.resolve()),
     showRewardVideoAd: vi.fn(() => Promise.resolve()),
     prepareInterstitial: vi.fn(() => Promise.resolve()),
@@ -37,6 +43,12 @@ vi.mock('@capacitor-community/admob', () => ({
         },
       });
     }),
+  },
+  AdmobConsentStatus: {
+    NOT_REQUIRED: 'NOT_REQUIRED',
+    OBTAINED: 'OBTAINED',
+    REQUIRED: 'REQUIRED',
+    UNKNOWN: 'UNKNOWN',
   },
   BannerAdSize: { ADAPTIVE_BANNER: 'ADAPTIVE_BANNER' },
   BannerAdPosition: { BOTTOM_CENTER: 'BOTTOM_CENTER' },
