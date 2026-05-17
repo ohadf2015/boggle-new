@@ -8,6 +8,7 @@ import { BlastTile, type BlastTileState } from './BlastTile';
 import { BlastSelectionPath } from './BlastSelectionPath';
 import { BlastAlmostGhost } from './BlastAlmostGhost';
 import { useCollapseTimeline } from './useCollapseTimeline';
+import { useInvalidShake } from './useInvalidShake';
 import styles from './BlastTile.module.css';
 
 type Props = {
@@ -50,6 +51,7 @@ export function BlastBoard({
   const revealGlowSet = new Set(revealGlowCells);
 
   useCollapseTimeline(boardRef, tileIds);
+  useInvalidShake(boardRef, invalidShakeKey);
 
   // Board-relative center — used by BlastSelectionPath (SVG inside board).
   const getCellCenter = useCallback((id: CellId) => {

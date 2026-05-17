@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import { m, useMotionValue, animate } from 'framer-motion';
+import gsap from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ChestContents } from '@/lib/blast/v2/chest-roll';
 
@@ -21,6 +22,11 @@ const TIER_COLORS: Record<string, { rim: string; fill: string }> = {
   gold:       { rim: '#facc15', fill: '#fde047' },
   legendary:  { rim: '#a855f7', fill: '#f472b6' },
 };
+
+function reducedMotion(): boolean {
+  return typeof window !== 'undefined'
+    && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
+}
 
 export function BlastChestBadge({
   chestNumber,
@@ -48,8 +54,78 @@ export function BlastChestBadge({
   }, [progress, widthMv]);
   const percent = Math.round(progress * 100);
 
+  // GSAP celebratory bounce + glow flash when the chest crosses to full.
+  // Separate from the framer fill tween so the two reactions don't fight
+  // for the same property surface. clearProps so the inline glow doesn't
+  // stick after the flash.
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const completedPrevRef = useRef(progress);
+  useEffect(() => {
+    const completedBefore = completedPrevRef.current >= 1;
+    const completedNow = progress >= 1;
+    completedPrevRef.current = progress;
+    if (!buttonRef.current || completedBefore || !completedNow) return;
+    if (reducedMotion()) return;
+    const el = buttonRef.current;
+    const tl = gsap.timeline();
+    tl.fromTo(
+      el,
+      { scale: 1 },
+      { scale: 1.14, duration: 0.18, ease: 'back.out(2)' },
+    ).to(el, {
+      scale: 1,
+      duration: 0.32,
+      ease: 'elastic.out(1, 0.5)',
+    });
+    tl.fromTo(
+      el,
+      { boxShadow: `2px 2px 0 0 #0b1530, 0 0 14px color-mix(in srgb, ${rimColor} 40%, transparent)` },
+      {
+        boxShadow: `2px 2px 0 0 #0b1530, 0 0 32px ${rimColor}`,
+        duration: 0.25,
+        yoyo: true,
+        repeat: 1,
+        ease: 'power2.out',
+        clearProps: 'boxShadow',
+      },
+      0,
+    );
+    return () => {
+      tl.kill();
+    };
+  }, [progress, rimColor]);
+
+  // Anticipation shimmer — slow diagonal sweep across the fill bar once
+  // progress is near full (>=85%). Pulls the eye to "soon" without
+  // overlapping the completion flash.
+  const shimmerRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = shimmerRef.current;
+    if (!el) return;
+    if (progress < 0.85 || progress >= 1 || reducedMotion()) {
+      gsap.set(el, { opacity: 0 });
+      return;
+    }
+    gsap.set(el, { opacity: 0, x: '-100%' });
+    const tween = gsap.to(el, {
+      x: '100%',
+      opacity: 1,
+      duration: 1.1,
+      ease: 'sine.inOut',
+      repeat: -1,
+      repeatDelay: 0.4,
+      onRepeat: () => {
+        gsap.set(el, { x: '-100%' });
+      },
+    });
+    return () => {
+      tween.kill();
+    };
+  }, [progress]);
+
   return (
     <button
+      ref={buttonRef}
       onClick={onPreview}
       data-testid="chest-badge"
       className="rounded-xl px-3 py-1.5 text-xs space-y-1.5 text-white transition-transform active:scale-95"
@@ -69,7 +145,7 @@ export function BlastChestBadge({
         </span>
       </div>
       <div
-        className="w-24 h-2.5 rounded-full overflow-hidden"
+        className="relative w-24 h-2.5 rounded-full overflow-hidden"
         style={{
           background: 'rgba(0,0,0,0.5)',
           border: `1px solid color-mix(in srgb, ${rimColor} 60%, transparent)`,
@@ -83,6 +159,16 @@ export function BlastChestBadge({
             background: `linear-gradient(90deg, ${fillColor}, ${modeColor})`,
             boxShadow: `0 0 8px ${fillColor}`,
             width: '100%',
+          }}
+        />
+        <div
+          ref={shimmerRef}
+          aria-hidden
+          className="absolute top-0 left-0 h-full w-1/3 pointer-events-none"
+          style={{
+            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.85) 50%, transparent 100%)',
+            opacity: 0,
+            mixBlendMode: 'screen',
           }}
         />
       </div>
