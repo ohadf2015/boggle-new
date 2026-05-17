@@ -1,5 +1,9 @@
 import { Suspense } from 'react';
-import { GameGate } from './GameGate';
+import dynamic from 'next/dynamic';
+
+const WordCraftPageClient = dynamic(() => import('./PageClient'), {
+  ssr: false,
+});
 
 export const metadata = {
   title: 'WordCraft Beta — LexiClash',
@@ -9,7 +13,7 @@ export const metadata = {
 export default function WordCraftPage() {
   return (
     <Suspense>
-      <GameGate />
+      <WordCraftPageClient />
     </Suspense>
   );
 }

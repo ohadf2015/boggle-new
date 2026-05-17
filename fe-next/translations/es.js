@@ -12091,37 +12091,6 @@ const es = {
         "overflow": { "name": "Desbordamiento", "desc": "Los puntos por encima del objetivo dan un 10% de bonificación." },
         "letterHoard": { "name": "Reserva de Letras", "desc": "Tu atril tiene 10 fichas en lugar de 8." }
       }
-    },
-    "cascade": {
-      "intro": {
-        "title": "WordCraft Cascade",
-        "howTo": "Desliza un camino por letras adyacentes para deletrear una palabra. Quema fichas, dispara cascadas, escapa de la fila de fuego.",
-        "start": "Comenzar Cascade"
-      },
-      "endRound": "Terminar ronda",
-      "combo": {
-        "chain": "Combo x{{n}}",
-        "double": "DOBLE!",
-        "triple": "TRIPLE!",
-        "electric": "ELECTRICO!"
-      },
-      "fireWarning": "El fuego sube — ¡despeja una palabra larga!",
-      "error": {
-        "TOO_SHORT": "La palabra necesita al menos 3 letras.",
-        "NOT_CONTIGUOUS": "Las letras deben ser adyacentes.",
-        "REUSED_CELL": "Cada letra se puede usar solo una vez.",
-        "UNKNOWN_CELL": "Esa ficha no existe.",
-        "EMPTY_CELL": "El camino pasa por una ficha quemada.",
-        "INVALID_WORD": "Eso no es una palabra."
-      },
-      "card": {
-        "pyro": { "name": "Piromancia", "desc": "Las palabras de 5+ letras queman una ficha aleatoria extra." },
-        "frost": { "name": "Escarcha", "desc": "Las palabras de 6+ letras pausan el fuego durante 8 segundos." },
-        "diagonal": { "name": "Diagonal", "desc": "Los caminos pueden incluir movimientos diagonales." },
-        "echo": { "name": "Eco", "desc": "La primera cascada automática por ronda puntúa el triple." },
-        "emberBoost": { "name": "Impulso de Brasas", "desc": "Las palabras puntúan el doble cuando el fuego está pasado el medio." },
-        "staticSpark": { "name": "Chispa Estática", "desc": "Cada palabra obtiene +5 fichas fijas." }
-      }
     }
   },
   "connections": {
