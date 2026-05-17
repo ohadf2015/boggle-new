@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { m, useMotionValue, useTransform, animate } from 'framer-motion';
+import { m, useMotionValue, animate } from 'framer-motion';
 import { mechanicsForLevel } from '@/lib/blast/v2/mechanic-flags';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { BlastChestBadge } from './BlastChestBadge';
@@ -29,9 +29,19 @@ type Props = {
 // fight when both fire at the same time after a word commit.
 function CoinDisplay({ coins, modeColor }: { coins: number; modeColor: string }) {
   const mv = useMotionValue(coins);
-  const display = useTransform(mv, (v) => Math.round(v).toLocaleString());
+  // Render via React state synced from the MotionValue. The earlier pattern
+  // (`<m.span>{useTransform(...)}</m.span>`) crashed under React 19 / current
+  // framer with "Objects are not valid as a React child" because the transform
+  // returns a MotionValue<string> instance, not a string. Subscribing via
+  // mv.on('change') keeps the smooth tween while passing a real string child.
+  const [display, setDisplay] = useState(() => Math.round(coins).toLocaleString());
   const scale = useMotionValue(1);
   const prev = useRef(coins);
+
+  useEffect(() => {
+    const unsub = mv.on('change', (v: number) => setDisplay(Math.round(v).toLocaleString()));
+    return unsub;
+  }, [mv]);
 
   useEffect(() => {
     if (prev.current === coins) return;
@@ -58,7 +68,7 @@ function CoinDisplay({ coins, modeColor }: { coins: number; modeColor: string })
       }}
     >
       <span aria-hidden style={{ filter: 'drop-shadow(0 0 4px #fbbf24)' }}>🪙</span>
-      <m.span>{display}</m.span>
+      <span>{display}</span>
     </m.div>
   );
 }
