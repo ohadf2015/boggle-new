@@ -559,6 +559,20 @@ module.exports = {
           "0%": { transform: "translateY(10px) scale(0.8)", opacity: "0" },
           "100%": { transform: "translateY(0) scale(1)", opacity: "1" },
         },
+        // CompactLeaderboard — cheap CSS replacements for framer-motion repeat:Infinity loops
+        "zap-wiggle": {
+          "0%, 80%, 100%": { transform: "rotate(0deg)" },
+          "85%": { transform: "rotate(15deg)" },
+          "92%": { transform: "rotate(-15deg)" },
+        },
+        "overtake-pulse": {
+          "0%, 100%": { boxShadow: "0 0 0 0 rgba(255,20,147,0)" },
+          "50%": { boxShadow: "0 0 0 4px rgba(255,20,147,0.3)" },
+        },
+        "streak-pulse": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.2)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -603,6 +617,10 @@ module.exports = {
         "mode-icon-bounce": "mode-icon-bounce 2s ease-in-out infinite",
         "mode-bomb-wobble": "mode-bomb-wobble 1.2s ease-in-out infinite",
         "mode-spark": "mode-spark 0.5s ease-out forwards",
+        // CompactLeaderboard (CSS replacements for old framer-motion repeat:Infinity loops)
+        "zap-wiggle": "zap-wiggle 2.5s ease-in-out infinite",
+        "overtake-pulse": "overtake-pulse 1.5s ease-in-out infinite",
+        "streak-pulse": "streak-pulse 0.6s ease-in-out infinite",
       },
       // Custom rotation values for tilts
       rotate: {

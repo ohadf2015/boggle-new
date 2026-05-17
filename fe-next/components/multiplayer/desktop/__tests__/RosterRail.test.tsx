@@ -2,8 +2,14 @@ import { render, screen } from '@testing-library/react';
 import { RosterRail } from '../RosterRail';
 
 vi.mock('@/components/Avatar', () => ({
-  default: ({ userId, customAvatar }: { userId?: string; customAvatar?: unknown }) => (
-    <span data-testid="avatar" data-uid={userId} data-has-custom={customAvatar ? 'true' : 'false'} />
+  __esModule: true,
+  default: ({ userId, customAvatar, disableEffects }: { userId?: string; customAvatar?: unknown; disableEffects?: boolean }) => (
+    <span
+      data-testid="avatar"
+      data-uid={userId}
+      data-has-custom={customAvatar ? 'true' : 'false'}
+      data-disable-effects={disableEffects ? 'true' : 'false'}
+    />
   ),
 }));
 
@@ -65,5 +71,13 @@ describe('RosterRail', () => {
     ];
     render(<RosterRail players={withAvatar} />);
     expect(screen.getByTestId('avatar').getAttribute('data-has-custom')).toBe('true');
+  });
+
+  it('renders avatars with effects disabled (no in-match tier animation churn)', () => {
+    render(<RosterRail players={players} />);
+    const avatars = screen.getAllByTestId('avatar');
+    for (const a of avatars) {
+      expect(a.getAttribute('data-disable-effects')).toBe('true');
+    }
   });
 });

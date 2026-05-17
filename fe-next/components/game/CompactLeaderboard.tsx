@@ -250,12 +250,12 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
       {/* Header with Race Track theme */}
       <div className="bg-neo-navy text-neo-cream px-2 py-1 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <m.div
-            animate={{ rotate: [0, 15, -15, 0] }}
-            transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+          <div
+            data-anim="zap-wiggle"
+            className="motion-safe:animate-zap-wiggle"
           >
             <Zap className="w-3.5 h-3.5 text-neo-lime" />
-          </m.div>
+          </div>
           <span className="text-[10px] font-black uppercase text-neo-cream tracking-wider">
             {t('leaderboard.liveRace')}
           </span>
@@ -339,6 +339,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                       avatarImage={player.avatarImage}
                       customAvatar={player.customAvatar}
                       size="md"
+                      disableEffects
                     />
 
                     {/* Score */}
@@ -398,18 +399,11 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                       </m.div>
                     )}
                   </AnimatePresence>
-                  <AnimatePresence>
-                    {isOnStreak(player.username) && (
-                      <m.div
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: [1, 1.2, 1], opacity: 1 }}
-                        exit={{ scale: 0, opacity: 0 }}
-                        transition={{ scale: { type: 'tween', duration: 0.6, repeat: Infinity } }}
-                      >
-                        <Flame className="w-3 h-3 text-neo-orange" />
-                      </m.div>
-                    )}
-                  </AnimatePresence>
+                  {isOnStreak(player.username) && (
+                    <div className="motion-safe:animate-streak-pulse">
+                      <Flame className="w-3 h-3 text-neo-orange" />
+                    </div>
+                  )}
                   {player.inputMethod && (
                     <span className="text-neo-black/40" title={player.inputMethod}>
                       {player.inputMethod === 'keyboard' ? <Keyboard className="w-2.5 h-2.5" /> :
@@ -446,19 +440,16 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
 
       {/* Your Status Bar - Motivational section */}
       <div className="px-2 pb-1.5">
-        <m.div
+        <div
+          data-anim={isCloseToOvertaking ? 'overtake-pulse' : undefined}
           className={cn(
             'relative flex items-center justify-between px-2 py-1.5 rounded-neo border-2',
             isLeading
               ? 'bg-linear-to-r from-neo-lime/50 to-neo-lime/50 border-neo-black'
               : isCloseToOvertaking
-                ? 'bg-neo-pink/20 border-neo-pink'
+                ? 'bg-neo-pink/20 border-neo-pink motion-safe:animate-overtake-pulse'
                 : 'bg-neo-cyan/10 border-neo-cyan/50'
           )}
-          animate={isCloseToOvertaking ? {
-            boxShadow: ['0 0 0 0 rgba(255,20,147,0)', '0 0 0 4px rgba(255,20,147,0.3)', '0 0 0 0 rgba(255,20,147,0)']
-          } : {}}
-          transition={{ duration: 1.5, repeat: isCloseToOvertaking ? Infinity : 0 }}
         >
           {/* Left side - status */}
           <div className="flex items-center gap-1.5">
@@ -511,25 +502,23 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
 
           {/* Progress bar to next target */}
           {!isLeading && nextTarget && (
-            <m.div
+            <div
               className="absolute -bottom-0.5 left-2 right-2 h-1 bg-neo-black/10 rounded-full overflow-hidden"
             >
-              <m.div
+              <div
                 className={cn(
-                  'h-full rounded-full',
+                  'h-full rounded-full transition-[width] duration-500 ease-out',
                   isCloseToOvertaking
                     ? 'bg-linear-to-r from-neo-pink to-neo-red'
                     : 'bg-linear-to-r from-neo-cyan to-neo-pink'
                 )}
-                initial={{ width: '0%' }}
-                animate={{
-                  width: `${Math.min(100, Math.max(5, (currentUser.score / (nextTarget.score || 1)) * 100))}%`
+                style={{
+                  width: `${Math.min(100, Math.max(5, (currentUser.score / (nextTarget.score || 1)) * 100))}%`,
                 }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
               />
-            </m.div>
+            </div>
           )}
-        </m.div>
+        </div>
       </div>
     </div>
   );
