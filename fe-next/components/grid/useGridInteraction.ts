@@ -331,6 +331,13 @@ export function useGridInteraction({
     const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     if (!hasMovedRef.current && totalMovement < getDeadzoneThreshold()) return;
     hasMovedRef.current = true;
+    // GridCell/GridCellEffects/GridComponent gate heavy paint (chromatic-
+    // aberration filter on the board, blur+glow, particle bursts, WebGL
+    // VFXTileEffect, transition strategy) on `isDragging`. The mouse path
+    // sets this in handleMouseMove; the touch path is what mobile MP players
+    // actually use. Without flipping it here, every per-letter re-render on
+    // mobile repaints the full effect stack and stutters after 2+ letters.
+    isDraggingRef.current = true;
     const currentCell = getCellAtPos(touchX, touchY);
     if (!currentCell) return;
     // Read from drag ref (no React state dependency during drag)
@@ -418,6 +425,7 @@ export function useGridInteraction({
   const handleTouchEnd = useCallback(() => {
     if (!interactive || !isTouchingRef.current) return;
     isTouchingRef.current = false;
+    isDraggingRef.current = false;
     if (autoSubmitTimeoutRef.current) {
       clearTimeout(autoSubmitTimeoutRef.current);
       autoSubmitTimeoutRef.current = null;
