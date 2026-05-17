@@ -99,10 +99,14 @@ interface PlayerInGameViewProps {
   minWordLength: number;
   comboLevel: number;
   comboLevelRef: React.MutableRefObject<number>;
-  /** Time remaining for combo as percentage (0-100), null when no active combo */
-  comboTimeRemaining?: number | null;
-  /** Whether combo timer is in danger zone (<30% remaining) */
-  comboDanger?: boolean;
+  /**
+   * Timestamp of the last accepted word — drives the combo-window countdown
+   * inside `ComboDisplayConnected`. The 10 Hz RAF state used to live in
+   * `PlayerView` and cascade through every memo boundary down here on every
+   * tick; passing the trigger value instead of the derived state keeps the
+   * shell stable during drag.
+   */
+  lastWordTime: number | null;
 
   // Player data
   foundWords: FoundWord[];
@@ -167,8 +171,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   minWordLength,
   comboLevel,
   comboLevelRef,
-  comboTimeRemaining,
-  comboDanger,
+  lastWordTime,
 
   // Player data
   foundWords,
@@ -378,8 +381,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
           minWordLength={minWordLength}
           comboLevel={comboLevel}
           comboLevelRef={comboLevelRef}
-          comboTimeRemaining={comboTimeRemaining}
-          comboDanger={comboDanger}
+          lastWordTime={lastWordTime}
 
           // Player data
           foundWords={foundWords}

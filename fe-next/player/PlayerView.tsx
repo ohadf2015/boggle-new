@@ -5,7 +5,6 @@ import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import { useSocket } from '../utils/SocketContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
-import { useComboTimer } from './hooks/useComboTimer';
 import { usePlayerMusic } from './hooks/usePlayerMusic';
 import { useFirstTimeTracking } from './hooks/useFirstTimeTracking';
 import { usePlayerExit } from './hooks/usePlayerExit';
@@ -257,8 +256,13 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Combo shield system
   const comboShieldsUsedRef = useRef<number>(0);
 
-  // Combo timer visual feedback (RAF-based, threshold updates)
-  const { comboTimeRemaining, comboDanger } = useComboTimer(comboLevel, lastWordTime);
+  // NOTE: the combo-window countdown (~10 Hz RAF) is owned by
+  // `ComboDisplayConnected` so its state doesn't cascade through
+  // PlayerInGameView → InGameScreen → PortraitLayout on every tick — that
+  // cascade stole frame budget from drag-time grid rendering on mobile MP
+  // classic ("UI feels stuck during selection"). Only `lastWordTime` (which
+  // changes once per accepted word) is threaded down; the connected wrapper
+  // computes `comboTimeRemaining` + `comboDanger` locally.
 
   // Tournament state
   const [tournamentData, _setTournamentData] = useState<TournamentData | null>(null);
@@ -704,8 +708,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         minWordLength={minWordLength}
         comboLevel={comboLevel}
         comboLevelRef={comboLevelRef}
-        comboTimeRemaining={comboTimeRemaining}
-        comboDanger={comboDanger}
+        lastWordTime={lastWordTime}
         foundWords={mappedFoundWords}
         leaderboard={leaderboard}
         totalBoardWords={totalBoardWords}

@@ -128,8 +128,12 @@ export interface MultiplayerInGameViewProps {
   minWordLength: number;
   comboLevel: number;
   comboLevelRef: React.RefObject<number>;
-  comboTimeRemaining?: number | null;
-  comboDanger?: boolean;
+  /**
+   * Timestamp of the last accepted word. The combo-window countdown lives in
+   * `ComboDisplayConnected` (see InGameScreen) — we forward the trigger, not
+   * the derived state.
+   */
+  lastWordTime?: number | null;
   timerValue?: number;
 
   // Player data
@@ -200,8 +204,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   minWordLength,
   comboLevel,
   comboLevelRef,
-  comboTimeRemaining,
-  comboDanger,
+  lastWordTime,
   timerValue,
 
   // Player data
@@ -391,8 +394,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       minWordLength,
       comboLevel,
       comboLevelRef,
-      comboTimeRemaining,
-      comboDanger,
+      lastWordTime,
       // Player data
       foundWords,
       leaderboard,
@@ -588,8 +590,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           minWordLength={minWordLength}
           comboLevel={comboLevel}
           comboLevelRef={comboLevelRef}
-          comboTimeRemaining={comboTimeRemaining}
-          comboDanger={comboDanger}
+          lastWordTime={lastWordTime}
           // Player data
           foundWords={foundWords}
           leaderboard={leaderboard}

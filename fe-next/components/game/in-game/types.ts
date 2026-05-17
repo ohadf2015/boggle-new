@@ -54,10 +54,13 @@ export interface InGameScreenProps {
   minWordLength?: number;
   comboLevel?: number;
   comboLevelRef?: MutableRefObject<number>;
-  /** Time remaining for combo as percentage (0-100), null when no active combo */
-  comboTimeRemaining?: number | null;
-  /** Whether combo timer is in danger zone (<30% remaining) */
-  comboDanger?: boolean;
+  /**
+   * Timestamp of the last accepted word. Threaded through to
+   * `ComboDisplayConnected`, which owns the ~10 Hz combo-window RAF so it
+   * doesn't cascade through 4 memo boundaries during a drag. Null when no
+   * combo has been started.
+   */
+  lastWordTime?: number | null;
 
   // Player data
   foundWords?: FoundWord[] | string[];
