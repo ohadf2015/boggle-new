@@ -113,21 +113,22 @@ function applyValidatedSubmit(
     isBonus: kind === 'bonus',
   });
 
-  if (kind === 'theme') {
-    // Target words formable on the board BEFORE this collapse (already-found excluded).
-    const formableBefore = new Set(
-      detectAllCascades(state.level, newFound, config).map((c) => c.word),
-    );
-    const collapse = collapseCells(state.level, cells);
-    newLevel = collapse.level;
-    newTileIds = rebuildTileIds(state.level.columns, state.tileIds, collapse);
-    // The player still finds these manually — revealed.length feeds chain FX
-    // and aggregate submission/completion telemetry, but foundWords is unchanged.
-    const revealed = detectAllCascades(newLevel, newFound, config)
-      .map((c) => c.word)
-      .filter((w) => !formableBefore.has(w));
-    newCascadeCount += revealed.length;
-  }
+  // Collapse on BOTH theme and bonus matches. Bonus covers the free-form
+  // dictionary path — without removing the consumed tiles a player who
+  // claims a non-target real word would still see the board unchanged and
+  // could remain stuck. Theme + bonus share the same collapse + cascade
+  // accounting so the chain FX work for either.
+  // Target words formable on the board BEFORE this collapse (already-found excluded).
+  const formableBefore = new Set(
+    detectAllCascades(state.level, newFound, config).map((c) => c.word),
+  );
+  const collapse = collapseCells(state.level, cells);
+  newLevel = collapse.level;
+  newTileIds = rebuildTileIds(state.level.columns, state.tileIds, collapse);
+  const revealed = detectAllCascades(newLevel, newFound, config)
+    .map((c) => c.word)
+    .filter((w) => !formableBefore.has(w));
+  newCascadeCount += revealed.length;
   const allFound = state.level.words.every((w) => newFound.has(w));
   const thisChainDepth = newCascadeCount - state.cascadeCount;
   // Snapshot the pre-submit slice so undo can rewind exactly this move.

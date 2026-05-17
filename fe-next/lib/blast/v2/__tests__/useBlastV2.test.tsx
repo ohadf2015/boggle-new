@@ -180,6 +180,25 @@ describe('useBlastV2 hook', () => {
     expect(result.current.state.chestProgress).toBeGreaterThan(0);
   });
 
+  it('free-form dictionary match collapses the consumed tiles', () => {
+    // Tiles selected across row 0 must be removed after a bonus match —
+    // otherwise the board stays identical and the player remains stuck.
+    const { result } = renderHook(() =>
+      useBlastV2(mockLevel, { dictionaryCheck: (w) => w.toLowerCase() === 'cse' }),
+    );
+    const initialColumn0Height = result.current.state.level.columns[0]!.tiles.length;
+
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(1, 0));
+      result.current.handlers.onPointerMove(cellId(2, 0));
+      result.current.handlers.onPointerUp();
+    });
+
+    // Column 0's bottom tile (C) was consumed → height drops by one.
+    expect(result.current.state.level.columns[0]!.tiles.length).toBe(initialColumn0Height - 1);
+  });
+
   it('accepts free-form dictionary words via dictionaryCheck option', () => {
     // Board row 0 across spells "CSE" — not in level.words. With
     // dictionaryCheck accepting it, useBlastV2 should treat it as a
