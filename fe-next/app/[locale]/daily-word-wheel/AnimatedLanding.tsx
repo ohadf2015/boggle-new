@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { m } from 'framer-motion';
+import { CalendarDays, Search, Timer, Trophy, type LucideIcon } from 'lucide-react';
 
 interface AnimatedLandingProps {
   locale: string;
@@ -16,6 +17,27 @@ interface AnimatedLandingProps {
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.12 } } } as const;
 const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } } };
 const scaleIn = { hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1, transition: { type: 'spring' as const, stiffness: 300, damping: 20 } } };
+
+const STEP_ICONS: LucideIcon[] = [CalendarDays, Search, Timer, Trophy];
+const STEP_ACCENTS = [
+  { border: 'border-neo-lime/60', ring: 'border-neo-lime', text: 'text-neo-lime', glow: '0 0 24px rgba(191,255,0,0.28)' },
+  { border: 'border-neo-cyan/60', ring: 'border-neo-cyan', text: 'text-neo-cyan', glow: '0 0 24px rgba(0,255,255,0.28)' },
+  { border: 'border-neo-pink/60', ring: 'border-neo-pink', text: 'text-neo-pink', glow: '0 0 24px rgba(255,20,147,0.28)' },
+  { border: 'border-neo-purple/60', ring: 'border-neo-purple', text: 'text-neo-purple', glow: '0 0 24px rgba(139,92,246,0.28)' },
+] as const;
+
+// Deterministic 4x4 mosaic — censors the glyph while staying SSR-stable.
+function PixelMask({ seed }: { seed: number }) {
+  const cells = Array.from({ length: 16 }, (_, i) => (seed * 31 + i * 7 + 3) % 3);
+  return (
+    <div className="grid h-full w-full grid-cols-4 grid-rows-4 overflow-hidden rounded-full" aria-hidden>
+      {cells.map((bucket, i) => {
+        const bg = bucket === 0 ? 'bg-neo-navy' : bucket === 1 ? 'bg-neo-navy-light' : 'bg-neo-cream/30';
+        return <span key={i} className={bg} />;
+      })}
+    </div>
+  );
+}
 
 // Decorative spinning wheel for the hero
 function HeroWheel() {
@@ -55,7 +77,7 @@ function HeroWheel() {
           return (
             <m.div
               key={`${letter}-${i}`}
-              className="absolute left-1/2 top-1/2 flex h-9 w-9 items-center justify-center rounded-full border-2 border-neo-black bg-neo-white font-neo-display text-sm font-bold text-neo-navy shadow-[2px_2px_0px_black]"
+              className="absolute left-1/2 top-1/2 flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-neo-black bg-neo-white shadow-[2px_2px_0px_black]"
               initial={{ x: '-50%', y: '-50%', scale: 0, opacity: 0 }}
               animate={{
                 x: `calc(-50% + ${x}px)`,
@@ -64,13 +86,15 @@ function HeroWheel() {
                 opacity: 1,
               }}
               transition={{ delay: 0.3 + i * 0.08, type: 'spring', stiffness: 400, damping: 15 }}
+              aria-label="hidden letter"
             >
-              {/* Counter-rotate so glyphs stay upright while wheel spins */}
+              {/* Censored — pixel mosaic instead of glyph. Counter-rotate keeps mask grid axis-aligned. */}
               <m.span
+                className="block h-full w-full"
                 animate={{ rotate: -360 }}
                 transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
               >
-                {letter}
+                <PixelMask seed={i + 1} />
               </m.span>
             </m.div>
           );
@@ -133,34 +157,58 @@ export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading,
         </m.div>
       </m.section>
 
-      {/* Steps */}
+      {/* Steps — icon-driven, alternating-direction entrance */}
       <m.section
         className="mb-12"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-60px' }}
-        variants={stagger}
+        variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.14 } } }}
       >
         <m.h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl" variants={fadeUp}>
           {stepsHeading}
         </m.h2>
-        <div className="space-y-4">
-          {steps.map((item) => (
-            <m.div
-              key={item.step}
-              className="flex gap-4 rounded-neo border-[3px] border-neo-cyan/60 bg-neo-navy-light p-5 shadow-hard"
-              variants={fadeUp}
-              whileHover={{ x: isRtl ? -4 : 4, transition: { duration: 0.2 } }}
-            >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-[3px] border-neo-lime font-neo-display text-lg font-bold text-neo-lime">
-                {item.step}
-              </span>
-              <div>
-                <h3 className="font-neo-display font-bold text-neo-cyan">{item.title}</h3>
-                <p className="text-sm text-neo-cream/80">{item.desc}</p>
-              </div>
-            </m.div>
-          ))}
+        <div className="grid gap-4 sm:grid-cols-2">
+          {steps.map((item, idx) => {
+            const Icon = STEP_ICONS[idx % STEP_ICONS.length];
+            const accent = STEP_ACCENTS[idx % STEP_ACCENTS.length];
+            const fromLeft = idx % 2 === 0;
+            const offset = (fromLeft ? -1 : 1) * (isRtl ? -32 : 32);
+            return (
+              <m.div
+                key={item.step}
+                className={`group relative flex gap-4 rounded-neo border-[3px] ${accent.border} bg-neo-navy-light p-5 shadow-hard`}
+                variants={{
+                  hidden: { opacity: 0, x: offset, y: 16, scale: 0.94 },
+                  visible: {
+                    opacity: 1,
+                    x: 0,
+                    y: 0,
+                    scale: 1,
+                    transition: { type: 'spring' as const, stiffness: 220, damping: 18 },
+                  },
+                }}
+                whileHover={{ y: -3, boxShadow: accent.glow, transition: { duration: 0.2 } }}
+              >
+                <m.span
+                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-[3px] ${accent.ring} bg-neo-navy ${accent.text}`}
+                  initial={{ rotate: -12, scale: 0 }}
+                  whileInView={{ rotate: 0, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.15 + idx * 0.08, type: 'spring', stiffness: 320, damping: 14 }}
+                >
+                  <Icon className="h-6 w-6" strokeWidth={2.5} aria-hidden />
+                </m.span>
+                <div className="min-w-0">
+                  <div className={`mb-1 font-neo-display text-xs font-bold uppercase tracking-wider ${accent.text}`}>
+                    {item.step}
+                  </div>
+                  <h3 className="font-neo-display font-bold text-neo-cream">{item.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-neo-cream/75">{item.desc}</p>
+                </div>
+              </m.div>
+            );
+          })}
         </div>
       </m.section>
 
