@@ -11969,6 +11969,14 @@ const ja = {
         "overflow": { "name": "オーバーフロー", "desc": "目標を超えたスコアの10%をボーナスとして獲得。" },
         "letterHoard": { "name": "レターホード", "desc": "ラックが8枚ではなく10枚になる。" }
       }
+    },
+    "territory": {
+      "label": "テリトリー",
+      "yours": "あなたのテリトリー",
+      "bots": "ボットのテリトリー",
+      "endgameHint": "ゲーム終了時に各 +2",
+      "captureYou": "{{count}} 占領 — +{{bonus}}!",
+      "captureBot": "ボットが {{count}} 占領 — +{{bonus}}!"
     }
   },
   mp: {

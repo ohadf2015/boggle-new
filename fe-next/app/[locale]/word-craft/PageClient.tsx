@@ -23,6 +23,7 @@ import { WordCraftDragGhost } from '@/components/word-craft/WordCraftDragGhost';
 import { WordCraftPendingStrip } from '@/components/word-craft/WordCraftPendingStrip';
 import { WordCraftLiveRegion } from '@/components/word-craft/WordCraftLiveRegion';
 import { WordCraftBoardSection } from '@/components/word-craft/WordCraftBoardSection';
+import { WordCraftTerritoryStrip } from '@/components/word-craft/WordCraftTerritoryStrip';
 import { WordCraftGameOverScene } from '@/components/word-craft/WordCraftGameOverScene';
 import { useWordCraftJuice } from '@/components/word-craft/useWordCraftJuice';
 import { useWordCraftDrag } from '@/components/word-craft/useWordCraftDrag';
@@ -45,6 +46,7 @@ import {
   type WordCraftInputMethod,
 } from '@/components/word-craft/wordCraftTelemetry';
 import { useAchievementQueue } from '@/components/achievements';
+import { countClaimed } from '@/lib/word-craft/territory';
 import { cn } from '@/lib/utils';
 import { useWordCraftRunFlag } from '@/hooks/useWordCraftRunFlag';
 import { RunPageClient } from './RunPageClient';
@@ -125,7 +127,15 @@ export default function WordCraftPageClient() {
     return fromUrl ? Number(fromUrl) : Math.floor(Math.random() * 1_000_000);
   }, []);
 
-  const game = useWordCraftGame({ seed, dict, locale });
+  // Territory mode is the default twist. Opt-out: ?classic=1 returns the
+  // legacy Scrabble-alt feel (no claims, no capture bonus, no endgame bonus).
+  const territoryEnabled = useMemo(() => {
+    if (typeof window === 'undefined') return true;
+    const classic = new URLSearchParams(window.location.search).get('classic');
+    return classic !== '1' && classic !== 'true';
+  }, []);
+
+  const game = useWordCraftGame({ seed, dict, locale, territoryEnabled });
   const juice = useWordCraftJuice();
   const { queueAchievement } = useAchievementQueue();
   const [sceneCtx, setSceneCtx] = useState<SceneCtx | null>(null);
@@ -293,6 +303,20 @@ export default function WordCraftPageClient() {
 
   // Score float state
   const [scoreFloat, setScoreFloat] = useState<{ score: number; overdrive: boolean; isBingo: boolean; encouragement: string; key: number } | null>(null);
+
+  // Transient capture toast — fires when a turn flips opponent-claimed cells.
+  // turnIndex is monotonic so a fresh capture always triggers re-render.
+  const [captureToast, setCaptureToast] = useState<{ by: 'player' | 'bot'; count: number; bonus: number; key: number } | null>(null);
+  const lastCaptureTurnRef = useRef<number>(-1);
+  useEffect(() => {
+    const cap = game.state.lastCapture;
+    if (!cap) return;
+    if (cap.turnIndex === lastCaptureTurnRef.current) return;
+    lastCaptureTurnRef.current = cap.turnIndex;
+    setCaptureToast({ by: cap.by, count: cap.cells.length, bonus: cap.bonus, key: cap.turnIndex });
+    const timer = setTimeout(() => setCaptureToast(null), 1800);
+    return () => clearTimeout(timer);
+  }, [game.state.lastCapture]);
 
   // --- Juice: tile place ---
   const prevPendingIdsRef = useRef<Set<string>>(new Set());
@@ -636,6 +660,19 @@ export default function WordCraftPageClient() {
           }}
         />
 
+        {territoryEnabled ? (
+          <WordCraftTerritoryStrip
+            playerCount={countClaimed(game.state.board, 'player')}
+            botCount={countClaimed(game.state.board, 'bot')}
+            labels={{
+              territoryLabel: t('wordcraft.territory.label'),
+              yourTerritory: t('wordcraft.territory.yours'),
+              botTerritory: t('wordcraft.territory.bots'),
+              endgameBonusHint: t('wordcraft.territory.endgameHint'),
+            }}
+          />
+        ) : null}
+
         {showHeatMeter ? (
           <HeatMeter
             heat={game.state.heat}
@@ -768,6 +805,22 @@ export default function WordCraftPageClient() {
           className="absolute left-1/2 -translate-x-1/2 top-[calc(72px+8px)] z-40 max-w-[90%] px-3 py-2 bg-neo-red/95 border-2 border-black text-white text-sm rounded-neo shadow-hard-lg font-neo-body"
         >
           {errorMessage}
+        </div>
+      ) : null}
+
+      {/* Capture toast — celebrates flipping opponent cells. Auto-dismiss 1.8s. */}
+      {captureToast ? (
+        <div
+          key={captureToast.key}
+          role="status"
+          className={cn(
+            'absolute left-1/2 -translate-x-1/2 top-[calc(72px+40px)] z-40 px-3 py-1.5 border-neo-thick border-black rounded-neo shadow-hard-lg font-neo-display font-black text-sm uppercase tracking-wider animate-neo-pop',
+            captureToast.by === 'player' ? 'bg-neo-cyan text-neo-navy' : 'bg-neo-pink text-neo-cream',
+          )}
+        >
+          {captureToast.by === 'player'
+            ? t('wordcraft.territory.captureYou', { count: captureToast.count, bonus: captureToast.bonus })
+            : t('wordcraft.territory.captureBot', { count: captureToast.count, bonus: captureToast.bonus })}
         </div>
       ) : null}
 

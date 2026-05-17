@@ -11,6 +11,12 @@ export interface BotMove {
 export interface FindBotMoveOptions {
   maxLength?: number;
   maxCandidates?: number;
+  /**
+   * Optional callback to add per-candidate bonus to ranking (e.g. territory
+   * capture points). Returning 0 is fine. Called only for candidates that
+   * pass validation, so it's cheap.
+   */
+  extraScore?: (placements: PlacedTile[], wordCells: { row: number; col: number }[][]) => number;
 }
 
 // Bot considers permutations of its 7-tile rack up to length 7. Earlier
@@ -103,6 +109,7 @@ export function findBestBotMove(
   }
 
   let best: BotMove | null = null;
+  let bestRanked = -Infinity;
   const empty = isFirstMove(board);
   const size = board.cells.length;
   const center = getCenter(board.size);
@@ -123,11 +130,19 @@ export function findBestBotMove(
           const placements = placementsFromCandidate(tiles, r, c, direction);
           const result = validateAndScoreMove(board, placements, isWordValid);
           if (!result.ok || result.score === undefined) continue;
-          if (!best || result.score > best.score) {
+          const bonus = options.extraScore
+            ? options.extraScore(placements, result.words?.map((w) => w.cells) ?? [])
+            : 0;
+          const ranked = result.score + bonus;
+          if (!best || ranked > bestRanked) {
             // The played word can extend through existing board tiles, so the
             // real main word (result.words[0]) differs from the rack word.
+            // Stored `score` is the base validator score (no territory bonus)
+            // so the reducer's commit path can add territory captures without
+            // double-counting them.
             const playedWord = result.words?.[0]?.word ?? word;
             best = { placements, score: result.score, word: playedWord };
+            bestRanked = ranked;
           }
         }
       }

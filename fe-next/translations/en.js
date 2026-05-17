@@ -11871,6 +11871,14 @@ const en = {
         "overflow": { "name": "Overflow", "desc": "Score over the target carries 10% as a bonus." },
         "letterHoard": { "name": "Letter Hoard", "desc": "Your rack holds 10 tiles instead of 8." }
       }
+    },
+    "territory": {
+      "label": "Territory",
+      "yours": "Your territory",
+      "bots": "Bot territory",
+      "endgameHint": "+2 each at game end",
+      "captureYou": "Captured {{count}} — +{{bonus}}!",
+      "captureBot": "Bot captured {{count}} — +{{bonus}}!"
     }
   },
   mp: {

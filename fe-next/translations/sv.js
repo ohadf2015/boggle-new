@@ -11995,6 +11995,14 @@ const sv = {
         "overflow": { "name": "Överflöd", "desc": "Poäng över målet ger 10% som bonus." },
         "letterHoard": { "name": "Bokstavslager", "desc": "Ditt ställ rymmer 10 brickor istället för 8." }
       }
+    },
+    "territory": {
+      "label": "Territorium",
+      "yours": "Ditt territorium",
+      "bots": "Botens territorium",
+      "endgameHint": "+2 vardera vid spelets slut",
+      "captureYou": "Erövrade {{count}} — +{{bonus}}!",
+      "captureBot": "Boten erövrade {{count}} — +{{bonus}}!"
     }
   },
   mp: {

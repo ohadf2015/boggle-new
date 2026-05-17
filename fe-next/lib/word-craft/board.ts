@@ -96,9 +96,12 @@ const LAYOUTS: Record<BoardSize, readonly string[]> = {
   15: PREMIUM_LAYOUT_15,
 };
 
+export type CellOwner = 'player' | 'bot' | null;
+
 export interface BoardCell {
   premium: PremiumKind | null;
   tile: PlacedTile | null;
+  claim?: CellOwner;
 }
 
 export interface Board {

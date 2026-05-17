@@ -18,6 +18,7 @@ export interface ScoredWord {
   score: number;
   tiles: ScoringTile[];
   direction: Direction;
+  cells: { row: number; col: number }[];
 }
 
 export interface MoveResult {
@@ -67,12 +68,13 @@ function buildWordTiles(
   board: Board,
   placements: PlacedTile[],
   span: WordSpan,
-): { tiles: ScoringTile[]; word: string } | null {
+): { tiles: ScoringTile[]; word: string; cells: { row: number; col: number }[] } | null {
   const newCoords = newTilesIndex(placements);
   const placementByCoord = new Map<string, PlacedTile>();
   for (const p of placements) placementByCoord.set(`${p.row},${p.col}`, p);
 
   const tiles: ScoringTile[] = [];
+  const cells: { row: number; col: number }[] = [];
   let word = '';
   for (let i = span.start; i <= span.end; i++) {
     const row = span.direction === 'across' ? span.axisIndex : i;
@@ -97,8 +99,9 @@ function buildWordTiles(
     }
     word += letter;
     tiles.push({ letter, value, premium });
+    cells.push({ row, col });
   }
-  return { tiles, word };
+  return { tiles, word, cells };
 }
 
 function findMainWordSpan(
@@ -223,6 +226,7 @@ export function validateAndScoreMove(
       score: scoreWord(main.tiles),
       tiles: main.tiles,
       direction,
+      cells: main.cells,
     });
   }
 
@@ -240,6 +244,7 @@ export function validateAndScoreMove(
       score: scoreWord(cross.tiles),
       tiles: cross.tiles,
       direction: crossSpan.direction,
+      cells: cross.cells,
     });
   }
 

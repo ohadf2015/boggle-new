@@ -141,6 +141,7 @@ function WordCraftBoardImpl({
               role="gridcell"
               data-board-cell={key}
               data-premium={cell.premium ?? ''}
+              data-claim={placedTile && cell.claim ? cell.claim : undefined}
               data-tile-id={pending?.rackTileId ?? placedTile?.rackTileId ?? undefined}
               data-tile-state={pending ? 'pending' : placedTile ? 'placed' : 'empty'}
               data-cell-invite={inviteEmpty ? 'true' : undefined}
@@ -163,7 +164,11 @@ function WordCraftBoardImpl({
                 'relative aspect-square flex items-center justify-center select-none touch-manipulation',
                 'transition-all duration-150',
                 placedTile
-                  ? 'bg-neo-cream text-neo-navy shadow-[0_2px_0_0_rgba(0,0,0,0.85)]'
+                  ? cn(
+                      'bg-neo-cream text-neo-navy shadow-[0_2px_0_0_rgba(0,0,0,0.85)]',
+                      cell.claim === 'player' && 'ring-2 ring-inset ring-neo-cyan',
+                      cell.claim === 'bot' && 'ring-2 ring-inset ring-neo-pink',
+                    )
                   : pending
                     ? 'bg-neo-lime text-neo-navy shadow-[0_3px_0_0_rgba(0,0,0,0.9)] ring-2 ring-neo-lime-light hover:ring-neo-pink hover:rotate-1'
                     : isCenter

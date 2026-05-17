@@ -12093,6 +12093,14 @@ const es = {
         "overflow": { "name": "Desbordamiento", "desc": "Los puntos por encima del objetivo dan un 10% de bonificación." },
         "letterHoard": { "name": "Reserva de Letras", "desc": "Tu atril tiene 10 fichas en lugar de 8." }
       }
+    },
+    "territory": {
+      "label": "Territorio",
+      "yours": "Tu territorio",
+      "bots": "Territorio del bot",
+      "endgameHint": "+2 cada uno al final",
+      "captureYou": "¡Capturaste {{count}} — +{{bonus}}!",
+      "captureBot": "¡El bot capturó {{count}} — +{{bonus}}!"
     }
   },
   "connections": {

@@ -7,6 +7,7 @@ import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 import { findBestBotMove } from './botMove';
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
 import { getBoardDims } from './boardDimensions';
+import { applyClaims, endgameTerritoryBonus, resolveCaptures, type Coord, type Owner } from './territory';
 import type { PlacedTile, PlayerState, RackTile } from './types';
 
 export type Turn = 'player' | 'bot' | 'over';
@@ -16,6 +17,13 @@ interface MoveHistoryEntry {
   words: string[];
   score: number;
   placedTileIds: string[];
+}
+
+export interface LastCapture {
+  by: Owner;
+  cells: Coord[];
+  bonus: number;
+  turnIndex: number;
 }
 
 export interface WordCraftState {
@@ -33,6 +41,8 @@ export interface WordCraftState {
   overdrive: boolean;
   overdriveWarns: number;
   burnout: boolean;
+  territoryEnabled: boolean;
+  lastCapture: LastCapture | null;
 }
 
 type Action =
@@ -40,22 +50,23 @@ type Action =
   | { type: 'PLACE_PENDING'; placement: PlacedTile }
   | { type: 'RECALL_PENDING'; rackTileId: string }
   | { type: 'CLEAR_PENDING' }
-  | { type: 'COMMIT_PLAYER'; placements: PlacedTile[]; score: number; words: string[] }
-  | { type: 'COMMIT_BOT'; placements: PlacedTile[]; score: number; words: string[] }
+  | { type: 'COMMIT_PLAYER'; placements: PlacedTile[]; score: number; words: string[]; wordCells?: Coord[][] }
+  | { type: 'COMMIT_BOT'; placements: PlacedTile[]; score: number; words: string[]; wordCells?: Coord[][] }
   | { type: 'SET_ERROR'; message: string | null }
   | { type: 'PASS' }
   | { type: 'SWAP'; tilesToReturn: RackTile[]; replacements: RackTile[] }
   | { type: 'END_GAME' }
   | { type: 'BURNOUT_SKIP' }
-  | { type: 'RESET'; seed: number; boardSize: 13 | 15; locale: SupportedLocale };
+  | { type: 'RESET'; seed: number; boardSize: 13 | 15; locale: SupportedLocale; territoryEnabled?: boolean };
 
 const BOT_NAME = 'WordBot';
 
-function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale; viewportDims?: { size: BoardSize; bagSize: number } }): WordCraftState {
+function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale; viewportDims?: { size: BoardSize; bagSize: number }; territoryEnabled?: boolean }): WordCraftState {
   const seed = typeof init === 'number' ? init : init.seed;
   const boardSize = typeof init === 'number' ? 15 : (init.boardSize ?? 15);
   const locale = typeof init === 'number' ? 'en' : (init.locale ?? 'en');
   const viewportDims = typeof init === 'number' ? undefined : init.viewportDims;
+  const territoryEnabled = typeof init === 'number' ? true : (init.territoryEnabled ?? true);
 
   const finalBoardSize = viewportDims?.size ?? boardSize;
   const bag = createBag({ seed, locale, bagSize: viewportDims?.bagSize });
@@ -76,6 +87,8 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
     overdrive: false,
     overdriveWarns: 0,
     burnout: false,
+    territoryEnabled,
+    lastCapture: null,
   };
 }
 
@@ -83,36 +96,78 @@ function commitMove(
   state: WordCraftState,
   who: 'player' | 'bot',
   placements: PlacedTile[],
-  score: number,
+  baseScore: number,
   words: string[],
+  wordCells: Coord[][] | undefined,
 ): WordCraftState {
   const playedIds = new Set(placements.map((p) => p.rackTileId));
   const owner = who === 'player' ? state.player : state.bot;
   const remainingRack = owner.rack.filter((t) => !playedIds.has(t.id));
   const replenish = draw(state.bag, RACK_SIZE - remainingRack.length);
   const newRack = [...remainingRack, ...replenish];
-  const updatedOwner: PlayerState = { ...owner, score: owner.score + score, rack: newRack };
-  const newBoardCells = state.board.cells.map((row) => row.map((c) => ({ ...c })));
+
+  // Stamp newly-placed tiles into the board first so capture logic walks an
+  // accurate snapshot. Territory claim is applied next.
+  const tilePlacedCells = state.board.cells.map((row) => row.map((c) => ({ ...c })));
   for (const p of placements) {
-    newBoardCells[p.row][p.col].tile = p;
+    tilePlacedCells[p.row][p.col].tile = p;
   }
-  const newBoard: Board = { cells: newBoardCells, size: state.board.size };
+  const tilePlacedBoard: Board = { cells: tilePlacedCells, size: state.board.size };
+
+  let captureBonus = 0;
+  let lastCapture: LastCapture | null = state.lastCapture;
+  let nextBoard: Board = tilePlacedBoard;
+  if (state.territoryEnabled) {
+    const lists = wordCells ?? [];
+    // resolveCaptures must see the PRIOR board (before claiming this turn's
+    // placements) so newly-placed cells aren't flagged as "anchors of the
+    // opponent". Use state.board, not tilePlacedBoard.
+    const capture = resolveCaptures(state.board, placements, lists, who);
+    captureBonus = capture.bonus;
+    nextBoard = applyClaims(tilePlacedBoard, placements, capture.capturedCells, who);
+    if (capture.capturedCells.length > 0) {
+      lastCapture = {
+        by: who,
+        cells: capture.capturedCells,
+        bonus: capture.bonus,
+        turnIndex: state.history.length,
+      };
+    }
+  }
+
+  const totalScore = baseScore + captureBonus;
+  const updatedOwner: PlayerState = { ...owner, score: owner.score + totalScore, rack: newRack };
   const next: WordCraftState = {
     ...state,
-    board: newBoard,
+    board: nextBoard,
     player: who === 'player' ? updatedOwner : state.player,
     bot: who === 'bot' ? updatedOwner : state.bot,
     pendingPlacements: [],
     selectedRackTileId: null,
-    history: [...state.history, { who, words, score, placedTileIds: placements.map((p) => p.rackTileId) }],
+    history: [...state.history, { who, words, score: totalScore, placedTileIds: placements.map((p) => p.rackTileId) }],
     lastError: null,
     consecutivePasses: 0,
     turn: who === 'player' ? 'bot' : 'player',
+    lastCapture,
   };
   if (newRack.length === 0) {
     next.turn = 'over';
   }
+  if (next.turn === 'over' && state.territoryEnabled) {
+    return applyEndgameTerritory(next);
+  }
   return next;
+}
+
+function applyEndgameTerritory(state: WordCraftState): WordCraftState {
+  const playerBonus = endgameTerritoryBonus(state.board, 'player');
+  const botBonus = endgameTerritoryBonus(state.board, 'bot');
+  if (playerBonus === 0 && botBonus === 0) return state;
+  return {
+    ...state,
+    player: { ...state.player, score: state.player.score + playerBonus },
+    bot: { ...state.bot, score: state.bot.score + botBonus },
+  };
 }
 
 function reducer(state: WordCraftState, action: Action): WordCraftState {
@@ -136,7 +191,7 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
     case 'CLEAR_PENDING':
       return { ...state, pendingPlacements: [], selectedRackTileId: null };
     case 'COMMIT_PLAYER': {
-      const base = commitMove(state, 'player', action.placements, action.score, action.words);
+      const base = commitMove(state, 'player', action.placements, action.score, action.words, action.wordCells);
       const wasOverdrive = state.overdrive;
       if (wasOverdrive) {
         // Cashing overdrive: reset heat to 60, clear overdrive state
@@ -160,7 +215,7 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
       };
     }
     case 'COMMIT_BOT': {
-      const base = commitMove(state, 'bot', action.placements, action.score, action.words);
+      const base = commitMove(state, 'bot', action.placements, action.score, action.words, action.wordCells);
       // Bot moves do not affect heat state
       return {
         ...base,
@@ -212,7 +267,7 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
     // Used when locale or board size changes mid-session — wipes the game so a
     // Hebrew player who switched from /en doesn't keep the English bag.
     case 'RESET':
-      return buildInitial({ seed: action.seed, boardSize: action.boardSize, locale: action.locale });
+      return buildInitial({ seed: action.seed, boardSize: action.boardSize, locale: action.locale, territoryEnabled: action.territoryEnabled ?? state.territoryEnabled });
     default:
       return state;
   }
@@ -223,18 +278,19 @@ export interface UseWordCraftGameOptions {
   dict: Set<string> | null;
   locale?: SupportedLocale;
   boardSize?: 13 | 15;
+  territoryEnabled?: boolean;
 }
 
 export { reducer as wordCraftReducer, buildInitial as buildInitialState }
 
-export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15 }: UseWordCraftGameOptions) {
+export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true }: UseWordCraftGameOptions) {
   // Capture viewport dims at initialization and lock them for the game lifetime
   const initialDimsRef = useRef(
     getBoardDims(typeof window === 'undefined' ? 1024 : window.innerWidth)
   );
   const initialDims = initialDimsRef.current;
 
-  const initArg = useMemo(() => ({ seed, boardSize, locale, viewportDims: initialDims }), [seed, boardSize, locale, initialDims]);
+  const initArg = useMemo(() => ({ seed, boardSize, locale, viewportDims: initialDims, territoryEnabled }), [seed, boardSize, locale, initialDims, territoryEnabled]);
   const [state, dispatch] = useReducer(reducer, initArg, buildInitial);
 
   // Locale-aware dict lookup. Hebrew dict is loaded with sofit→regular
@@ -272,13 +328,13 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
   // Locale or board-size flipping mid-session must restart the game so the
   // bag matches the active alphabet. (useReducer init is a one-shot so the
   // useMemo above isn't enough.)
-  const previousResetKeyRef = useRef(`${locale}|${boardSize}`);
+  const previousResetKeyRef = useRef(`${locale}|${boardSize}|${territoryEnabled}`);
   useEffect(() => {
-    const key = `${locale}|${boardSize}`;
+    const key = `${locale}|${boardSize}|${territoryEnabled}`;
     if (previousResetKeyRef.current === key) return;
     previousResetKeyRef.current = key;
-    dispatch({ type: 'RESET', seed, boardSize, locale });
-  }, [locale, boardSize, seed]);
+    dispatch({ type: 'RESET', seed, boardSize, locale, territoryEnabled });
+  }, [locale, boardSize, seed, territoryEnabled]);
 
   const selectRackTile = useCallback(
     (id: string | null) => dispatch({ type: 'SELECT_RACK_TILE', id }),
@@ -356,6 +412,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       placements: state.pendingPlacements,
       score: result.score ?? 0,
       words: result.words?.map((w) => w.word) ?? [],
+      wordCells: result.words?.map((w) => w.cells) ?? [],
     });
   }, [dict, state.turn, state.board, state.pendingPlacements, isWordValid]);
 
@@ -385,7 +442,13 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
     const handle = setTimeout(() => {
       // Inherit botMove's DEFAULT_MAX_LENGTH (7) — old call passed an explicit
       // 5 that capped the bot below bingo length and made it feel weak.
-      const move = findBestBotMove(state.board, state.bot.rack, isWordValid);
+      const move = findBestBotMove(state.board, state.bot.rack, isWordValid, {
+        // Territory bias: rank candidate by score + capture potential so the
+        // bot doesn't ignore juicy flips. No-op when territory is disabled.
+        extraScore: state.territoryEnabled
+          ? (placements, wordCells) => resolveCaptures(state.board, placements, wordCells, 'bot').bonus
+          : undefined,
+      });
       if (move) {
         const result = validateAndScoreMove(state.board, move.placements, isWordValid);
         if (result.ok) {
@@ -394,6 +457,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
             placements: move.placements,
             score: result.score ?? 0,
             words: result.words?.map((w) => w.word) ?? [],
+            wordCells: result.words?.map((w) => w.cells) ?? [],
           });
         } else {
           dispatch({ type: 'PASS' });
@@ -407,7 +471,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       clearTimeout(handle);
       botTurnRunning.current = false;
     };
-  }, [state.turn, dict, state.board, state.bot.rack, isWordValid]);
+  }, [state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid]);
 
   const isFirstMoveOfGame = useMemo(() => isFirstMove(state.board), [state.board]);
   const tilesRemaining = useMemo(() => remaining(state.bag), [state.bag]);

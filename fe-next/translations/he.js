@@ -12092,6 +12092,14 @@ const he = {
         "overflow": { "name": "גלישה", "desc": "ניקוד מעל היעד מעניק בונוס של 10%." },
         "letterHoard": { "name": "אוצר אותיות", "desc": "המעמד מחזיק 10 אריחים במקום 8." }
       }
+    },
+    "territory": {
+      "label": "טריטוריה",
+      "yours": "הטריטוריה שלך",
+      "bots": "טריטוריית הבוט",
+      "endgameHint": "+2 לכל אריח בסוף המשחק",
+      "captureYou": "כבשת {{count}} — +{{bonus}}!",
+      "captureBot": "הבוט כבש {{count}} — +{{bonus}}!"
     }
   },
   mp: {
