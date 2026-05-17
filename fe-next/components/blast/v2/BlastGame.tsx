@@ -4,7 +4,6 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { BlastLevel, CellId } from '@/lib/blast/v2/types';
 import { markUnlockSeen, markConceptSeen, completeFtue, setSkipAll, type UnlocksSeen } from '@/lib/blast/v2/tutorial/unlocks-seen';
 import { useBlastV2 } from '@/lib/blast/v2/useBlastV2';
-import { getBlastDictionary } from '@/lib/blast/v2/engine/blast-dictionary';
 import { detectAlmostWords, detectAllCascades } from '@/lib/blast/v2/engine';
 import { scanFormableThemeWords } from '@/lib/blast/v2/engine/word-scan';
 import { LOCALE_CONFIGS } from '@/lib/blast/v2/locale-config';
@@ -82,25 +81,7 @@ export function BlastGame({
 }: Props) {
   const [introDismissed, setIntroDismissed] = useState(false);
   const [levelStartTime] = useState(() => Date.now());
-  // Free-form dictionary predicate. Loaded asynchronously per locale and
-  // held in state so a re-render lights up the broader vocabulary the
-  // moment it's available. Until then validation falls back to the
-  // theme/bonus paths exactly as before.
-  const [dictCheck, setDictCheck] = useState<((w: string) => boolean) | undefined>(undefined);
-  useEffect(() => {
-    let cancelled = false;
-    getBlastDictionary(level.locale)
-      .then((predicate) => {
-        if (!cancelled) setDictCheck(() => predicate);
-      })
-      .catch(() => {
-        /* Dictionary load failed — keep theme-only validation. */
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [level.locale]);
-  const { state, handlers } = useBlastV2(level, { dictionaryCheck: dictCheck });
+  const { state, handlers } = useBlastV2(level);
   // Hide the global bottom nav while the board is mounted — without this the
   // HUD + board + bottom nav exceed 100dvh on phones and force a page scroll.
   const setIsInGame = useHideNavigation();
