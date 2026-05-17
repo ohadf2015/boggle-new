@@ -3,6 +3,16 @@
 echo "🔍 Running pre-push checks (parallel)..."
 echo ""
 
+# vitest 4.x's rolldown bundle imports `styleText` from `node:util`, which is
+# unavailable on Node ≤20. If a Node ≥22 is installed under nvm, prefer it so
+# the hook isn't crippled by a stale system `node` higher up on PATH.
+for nv in v22 v23 v24; do
+  for d in "$HOME/.nvm/versions/node"/$nv*/bin; do
+    [ -x "$d/node" ] && PATH="$d:$PATH" && break 2
+  done
+done
+export PATH
+
 cd fe-next
 
 # Collect changed files once (fast: no subshell per-file)
