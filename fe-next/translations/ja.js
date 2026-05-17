@@ -9177,6 +9177,8 @@ const ja = {
       "rule4": "ボードをクリアして次へ進もう"
     },
     "hint": "ヒント",
+    "undo": "取り消し",
+    "undoTooltip": "直前の操作を取り消す",
     "stuck": "詰まった？",
     "hintCooldown": "使用済",
     "waveClearBanner": "ウェーブクリア！",

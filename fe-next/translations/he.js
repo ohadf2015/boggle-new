@@ -9131,6 +9131,8 @@ const he = {
       "rule4": "נקו את הלוח כדי להתקדם"
     },
     "hint": "רמז",
+    "undo": "בטל",
+    "undoTooltip": "בטל את המהלך האחרון",
     "stuck": "תקוע?",
     "hintCooldown": "שומש",
     "waveClearBanner": "גל הושלם!",

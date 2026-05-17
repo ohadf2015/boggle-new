@@ -9079,6 +9079,8 @@ const es = {
     "shuffle": "Mezclar",
     "stuck": "¿Atascado?",
     "hint": "Pista",
+    "undo": "Deshacer",
+    "undoTooltip": "Deshacer último movimiento",
     "morePoints": "más pts",
     "needScore": "Necesitas {score}",
     "totalScore": "Total",

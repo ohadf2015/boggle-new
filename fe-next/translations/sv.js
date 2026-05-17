@@ -9151,6 +9151,8 @@ const sv = {
       "rule4": "Rensa brädet för att avancera"
     },
     "hint": "Tips",
+    "undo": "Ångra",
+    "undoTooltip": "Ångra senaste draget",
     "stuck": "Fastnat?",
     "hintCooldown": "Använt",
     "waveClearBanner": "Vågen klar!",

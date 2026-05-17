@@ -8932,6 +8932,8 @@ const en = {
       "rule4": "Clear the board to advance"
     },
     "hint": "Hint",
+    "undo": "Undo",
+    "undoTooltip": "Reverse last move",
     "stuck": "Stuck?",
     "hintCooldown": "Used",
     "waveClearBanner": "Wave Clear!",

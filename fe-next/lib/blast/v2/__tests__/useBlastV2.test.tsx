@@ -180,6 +180,98 @@ describe('useBlastV2 hook', () => {
     expect(result.current.state.chestProgress).toBeGreaterThan(0);
   });
 
+  it('accepts free-form dictionary words via dictionaryCheck option', () => {
+    // Board row 0 across spells "CSE" — not in level.words. With
+    // dictionaryCheck accepting it, useBlastV2 should treat it as a
+    // bonus match and add it to foundWords.
+    const { result } = renderHook(() =>
+      useBlastV2(mockLevel, { dictionaryCheck: (w) => w.toLowerCase() === 'cse' }),
+    );
+
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(1, 0));
+      result.current.handlers.onPointerMove(cellId(2, 0));
+      result.current.handlers.onPointerUp();
+    });
+
+    expect(result.current.state.foundWords.size).toBe(1);
+    // Stored normalized (lowercase from config.normalize).
+    expect(
+      [...result.current.state.foundWords].some((w) => w.toLowerCase() === 'cse'),
+    ).toBe(true);
+  });
+
+  it('exposes canUndo=false and a no-op undo before any move', () => {
+    const { result } = renderHook(() => useBlastV2(mockLevel));
+    expect(result.current.state.canUndo).toBe(false);
+    act(() => {
+      result.current.handlers.onUndo();
+    });
+    expect(result.current.state.foundWords.size).toBe(0);
+  });
+
+  it('undo restores prior level state after a successful submit', () => {
+    const { result } = renderHook(() => useBlastV2(mockLevel));
+    const initialCoins = result.current.state.coins;
+    const initialColumns = result.current.state.level.columns;
+    const initialTileIds = result.current.state.tileIds;
+
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(0, 1));
+      result.current.handlers.onPointerMove(cellId(0, 2));
+      result.current.handlers.onPointerUp();
+    });
+
+    expect(result.current.state.foundWords.has('CAT')).toBe(true);
+    expect(result.current.state.canUndo).toBe(true);
+
+    act(() => {
+      result.current.handlers.onUndo();
+    });
+
+    expect(result.current.state.foundWords.has('CAT')).toBe(false);
+    expect(result.current.state.foundWords.size).toBe(0);
+    expect(result.current.state.coins).toBe(initialCoins);
+    expect(result.current.state.level.columns).toEqual(initialColumns);
+    expect(result.current.state.tileIds).toEqual(initialTileIds);
+    expect(result.current.state.canUndo).toBe(false);
+    expect(result.current.state.status).toBe('playing');
+  });
+
+  it('undo stack supports multiple successive reversals', () => {
+    const { result } = renderHook(() => useBlastV2(mockLevel));
+
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(0, 1));
+      result.current.handlers.onPointerMove(cellId(0, 2));
+      result.current.handlers.onPointerUp();
+    });
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(1, 0));
+      result.current.handlers.onPointerMove(cellId(1, 1));
+      result.current.handlers.onPointerMove(cellId(1, 2));
+      result.current.handlers.onPointerUp();
+    });
+
+    expect(result.current.state.foundWords.has('CAT')).toBe(true);
+    expect(result.current.state.foundWords.has('SUN')).toBe(true);
+
+    act(() => {
+      result.current.handlers.onUndo();
+    });
+    expect(result.current.state.foundWords.has('SUN')).toBe(false);
+    expect(result.current.state.foundWords.has('CAT')).toBe(true);
+
+    act(() => {
+      result.current.handlers.onUndo();
+    });
+    expect(result.current.state.foundWords.has('CAT')).toBe(false);
+    expect(result.current.state.canUndo).toBe(false);
+  });
+
   it('preserves tile identity through a collapse', () => {
     const { result } = renderHook(() => useBlastV2(revealLevel));
 

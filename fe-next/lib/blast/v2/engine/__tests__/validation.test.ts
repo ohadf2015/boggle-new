@@ -124,4 +124,61 @@ describe('validation pipeline', () => {
       expect(result.reason).toBe('unknown');
     }
   });
+
+  it('free-form dictionary word accepted as bonus when dictionaryCheck provided', () => {
+    // Board: row 0 across spells "CSE" — not in level.words, not in bonusDict.
+    // dictionaryCheck accepts "cse" → treat as bonus.
+    const ctxWithDict: ValidationContext = {
+      ...mockContext,
+      dictionaryCheck: (w) => w.toLowerCase() === 'cse',
+    };
+    const result = validateSelection(
+      [cellId(0, 0), cellId(1, 0), cellId(2, 0)],
+      ctxWithDict,
+    );
+    expect(result.kind).toBe('bonus');
+    if (result.kind === 'bonus') {
+      expect(result.word.toLowerCase()).toBe('cse');
+    }
+  });
+
+  it('free-form dictionary word accepted in reverse', () => {
+    // "ESC" reversed is "CSE" — dict has "esc".
+    const ctxWithDict: ValidationContext = {
+      ...mockContext,
+      dictionaryCheck: (w) => w.toLowerCase() === 'esc',
+    };
+    const result = validateSelection(
+      [cellId(0, 0), cellId(1, 0), cellId(2, 0)],
+      ctxWithDict,
+    );
+    expect(result.kind).toBe('bonus');
+  });
+
+  it('dictionaryCheck rejection still falls through to unknown', () => {
+    const ctxWithDict: ValidationContext = {
+      ...mockContext,
+      dictionaryCheck: () => false,
+    };
+    const result = validateSelection(
+      [cellId(0, 0), cellId(1, 0)],
+      ctxWithDict,
+    );
+    expect(result.kind).toBe('reject');
+    if (result.kind === 'reject') {
+      expect(result.reason).toBe('unknown');
+    }
+  });
+
+  it('theme match prefers theme_match over dictionaryCheck bonus', () => {
+    const ctxWithDict: ValidationContext = {
+      ...mockContext,
+      dictionaryCheck: () => true,
+    };
+    const result = validateSelection(
+      [cellId(0, 0), cellId(0, 1), cellId(0, 2)],
+      ctxWithDict,
+    );
+    expect(result.kind).toBe('theme_match');
+  });
 });

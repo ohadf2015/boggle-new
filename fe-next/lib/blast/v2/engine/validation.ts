@@ -13,6 +13,11 @@ export type ValidationContext = {
   foundWords: Set<string>;
   bonusDict: Set<string>;
   bonusDictEnabled: boolean;
+  // Free-form fallback: when present, any normalized candidate (forward or
+  // reversed) that the predicate accepts and that wasn't already matched by
+  // level.words / bonusDict is treated as a bonus match. Lets players claim
+  // any real dictionary word on the board so they can never get stuck.
+  dictionaryCheck?: (word: string) => boolean;
 };
 
 function checkStraightContiguous(cells: CellId[]): { axis: 'H' | 'V' } | { reject: 'axis' | 'gap' } {
@@ -66,6 +71,11 @@ export function validateSelection(cells: CellId[], ctx: ValidationContext): Vali
   if (ctx.bonusDictEnabled) {
     for (const candidate of [forward, reversed]) {
       if (ctx.bonusDict.has(candidate)) return { kind: 'bonus', word: candidate };
+    }
+  }
+  if (ctx.dictionaryCheck) {
+    for (const candidate of [forward, reversed]) {
+      if (ctx.dictionaryCheck(candidate)) return { kind: 'bonus', word: candidate };
     }
   }
   return { kind: 'reject', reason: 'unknown' };

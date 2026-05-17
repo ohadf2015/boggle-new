@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { BlastHud } from '../BlastHud';
 
 describe('BlastHud', () => {
@@ -25,5 +25,52 @@ describe('BlastHud', () => {
       <BlastHud levelNumber={18} coins={100} chestProgress={0.5} onShuffle={vi.fn()} onHint={vi.fn()} />
     );
     expect(screen.getByTestId('hint-btn')).toBeInTheDocument();
+  });
+
+  it('renders undo button when canUndo and onUndo provided', () => {
+    render(
+      <BlastHud
+        levelNumber={1}
+        coins={100}
+        chestProgress={0.5}
+        onShuffle={vi.fn()}
+        onHint={vi.fn()}
+        canUndo={true}
+        onUndo={vi.fn()}
+      />
+    );
+    expect(screen.getByTestId('undo-btn')).toBeInTheDocument();
+  });
+
+  it('hides undo button when canUndo is false', () => {
+    render(
+      <BlastHud
+        levelNumber={1}
+        coins={100}
+        chestProgress={0.5}
+        onShuffle={vi.fn()}
+        onHint={vi.fn()}
+        canUndo={false}
+        onUndo={vi.fn()}
+      />
+    );
+    expect(screen.queryByTestId('undo-btn')).not.toBeInTheDocument();
+  });
+
+  it('invokes onUndo when undo button clicked', () => {
+    const onUndo = vi.fn();
+    render(
+      <BlastHud
+        levelNumber={1}
+        coins={100}
+        chestProgress={0.5}
+        onShuffle={vi.fn()}
+        onHint={vi.fn()}
+        canUndo={true}
+        onUndo={onUndo}
+      />
+    );
+    fireEvent.click(screen.getByTestId('undo-btn'));
+    expect(onUndo).toHaveBeenCalledTimes(1);
   });
 });

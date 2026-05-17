@@ -22,6 +22,11 @@ type Props = {
   // so old call sites keep working.
   targetWords?: string[];
   foundWords?: string[];
+  // Reverse-move support: when canUndo is true the HUD renders an Undo button
+  // beside the hint button. Lets players rewind a misplaced clear so they
+  // never get stuck mid-level.
+  canUndo?: boolean;
+  onUndo?: () => void;
 };
 
 // Animated coin counter — pops to scale 1.18 on increment, eases back to 1.
@@ -85,6 +90,8 @@ export function BlastHud({
   theme,
   targetWords,
   foundWords,
+  canUndo = false,
+  onUndo,
 }: Props) {
   const { t } = useLanguage();
   const mech = mechanicsForLevel(levelNumber);
@@ -188,19 +195,36 @@ export function BlastHud({
           })}
         </div>
       )}
-      {(mech.revealLetterHint || mech.revealWordHint) && (
+      {((mech.revealLetterHint || mech.revealWordHint) || (canUndo && onUndo)) && (
         <div className="flex items-center justify-center gap-3 px-4 py-2">
-          <button
-            onClick={onHint}
-            data-testid="hint-btn"
-            className="px-4 py-2 rounded-md font-bold text-[#0b1530] transition-transform active:scale-95"
-            style={{
-              background: 'white',
-              boxShadow: `2px 2px 0 #0b1530`,
-            }}
-          >
-            {t('blast.hint', 'Hint')}
-          </button>
+          {canUndo && onUndo && (
+            <button
+              onClick={onUndo}
+              data-testid="undo-btn"
+              aria-label={t('blast.undoTooltip', 'Reverse last move')}
+              className="px-4 py-2 rounded-md font-bold text-[#0b1530] transition-transform active:scale-95 inline-flex items-center gap-1.5"
+              style={{
+                background: modeColor,
+                boxShadow: `2px 2px 0 #0b1530`,
+              }}
+            >
+              <span aria-hidden>↶</span>
+              {t('blast.undo', 'Undo')}
+            </button>
+          )}
+          {(mech.revealLetterHint || mech.revealWordHint) && (
+            <button
+              onClick={onHint}
+              data-testid="hint-btn"
+              className="px-4 py-2 rounded-md font-bold text-[#0b1530] transition-transform active:scale-95"
+              style={{
+                background: 'white',
+                boxShadow: `2px 2px 0 #0b1530`,
+              }}
+            >
+              {t('blast.hint', 'Hint')}
+            </button>
+          )}
         </div>
       )}
     </>
