@@ -37,6 +37,9 @@ vi.mock('../components/WordFormingAreaConnected', () => ({
 vi.mock('../../ComboDisplay', () => ({
   default: () => <div data-testid="combo-display" />,
 }));
+vi.mock('../../ComboDisplayConnected', () => ({
+  ComboDisplayConnected: () => <div data-testid="combo-display-connected" />,
+}));
 
 vi.mock('../../CompactLeaderboard', () => ({
   default: () => <div data-testid="compact-leaderboard" />,

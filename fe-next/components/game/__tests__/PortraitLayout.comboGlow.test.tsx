@@ -85,6 +85,9 @@ vi.mock('@/components/game/ComboDisplay', () => {
   };
   return { default: MockCombo };
 });
+vi.mock('@/components/game/ComboDisplayConnected', () => ({
+  ComboDisplayConnected: () => <div>ComboDisplayConnected</div>,
+}));
 vi.mock('@/components/game/CompactLeaderboard', () => {
   const MockLeaderboard = () => {
     return <div>CompactLeaderboard</div>;
