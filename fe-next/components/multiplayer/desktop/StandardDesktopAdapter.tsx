@@ -1,4 +1,5 @@
 import { memo, useMemo, type ReactNode } from 'react';
+import type { Socket } from 'socket.io-client';
 import { MultiplayerDesktopShell } from './MultiplayerDesktopShell';
 import { RosterRail, type RosterPlayer } from './RosterRail';
 import { WordsLadder, type LadderWord } from './WordsLadder';
@@ -6,7 +7,7 @@ import { KeyboardHintStrip } from './KeyboardHintStrip';
 import { ThemedPanel } from './ThemedPanel';
 import CircularTimer from '../../ui/CircularTimer';
 import { MyStatsCard } from './insights/MyStatsCard';
-import { OpponentInsightFeed, type OpponentWord } from './insights/OpponentInsightFeed';
+import { OpponentInsightFeedConnected } from './insights/OpponentInsightFeedConnected';
 import { PaceDeltaChip } from './insights/PaceDeltaChip';
 import { LatestScoreTickBanner } from './insights/LatestScoreTickBanner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -20,7 +21,11 @@ export interface StandardDesktopAdapterProps {
   totalTime: number;
   canvas: ReactNode;
   meId?: string;
-  opponentWords?: OpponentWord[];
+  /** Socket reference for self-subscribing opponent-insight feed. Owning the
+   *  `opponentWordFound` listener inside the feed (rather than the parent
+   *  game view) keeps drag-selection rendering off the path of opponent
+   *  socket bursts. */
+  socket?: Socket | null;
   startTimeMs?: number;
 }
 
@@ -34,7 +39,7 @@ function StandardDesktopAdapterImpl(props: StandardDesktopAdapterProps) {
     totalTime,
     canvas,
     meId,
-    opponentWords,
+    socket,
     startTimeMs,
   } = props;
 
@@ -112,13 +117,17 @@ function StandardDesktopAdapterImpl(props: StandardDesktopAdapterProps) {
     () => (
       <div className="flex flex-col gap-2">
         <PaceDeltaChip mode="classic" leaderboard={leaderboard} meId={meId} />
-        {opponentWords && opponentWords.length > 0 && (
-          <OpponentInsightFeed mode="classic" opponentWords={opponentWords} />
+        {socket && meId && (
+          <OpponentInsightFeedConnected
+            mode="classic"
+            socket={socket}
+            currentPlayerName={meId}
+          />
         )}
         <KeyboardHintStrip />
       </div>
     ),
-    [leaderboard, meId, opponentWords],
+    [leaderboard, meId, socket],
   );
 
   const slots: ShellSlots = useMemo(

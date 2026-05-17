@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useCallback, useDeferredValue, useMemo, useState } from 'react';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { Socket } from 'socket.io-client';
 import { Button } from '../ui/button';
@@ -58,8 +58,7 @@ import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { BoardTheme } from '@/shared/types/socket';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import { OpponentWordFeed } from '@/components/multiplayer/OpponentWordFeed';
-import { useOpponentWordFeed } from '@/hooks/useOpponentWordFeed';
+import { OpponentWordFeedConnected } from '@/components/multiplayer/OpponentWordFeedConnected';
 import { useGameMode } from '@/hooks/gameState/store';
 
 // ==================== Types ====================
@@ -254,19 +253,10 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   // Desktop shell routing (standard mode only)
   const shellEnabled = useDesktopShellEnabled();
 
-  // Opponent word feed. Defer the array + memoize the mapped shape so socket
-  // bursts of opponent words don't allocate a fresh insight array each render
-  // (which broke memo on every consumer downstream — esp. during local drag).
-  const { feedItems: opponentFeedItems } = useOpponentWordFeed({ socket, currentPlayerName: username });
-  const deferredOpponentFeedItems = useDeferredValue(opponentFeedItems);
-  const opponentInsightWords = useMemo(() => deferredOpponentFeedItems.map(item => ({
-    wordLength: item.wordLength,
-    firstLetter: item.firstLetter,
-    lastLetter: item.lastLetter,
-    score: item.score,
-    ts: item.timestamp,
-    byUsername: item.playerName,
-  })), [deferredOpponentFeedItems]);
+  // Opponent feed state lives inside the feed components themselves
+  // (OpponentWordFeedConnected / OpponentInsightFeedConnected) — pushing the
+  // `useOpponentWordFeed` subscription out of this parent stops socket bursts
+  // of opponent words from re-rendering the whole game shell mid-drag.
 
   // Memoize the leaderboard → RosterPlayer and foundWords → LadderWord
   // mappings. Without these useMemos every parent re-render (timer tick at
@@ -440,7 +430,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         remainingTime={remainingTime ?? 0}
         totalTime={totalTime ?? 180}
         meId={username}
-        opponentWords={opponentInsightWords}
+        socket={socket}
         canvas={<InGameScreen {...inGameScreenProps} />}
       />
     );
@@ -471,7 +461,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         totalTime={totalTime ?? 60}
         fogProgress={fogProgress}
         meId={username}
-        opponentWords={opponentInsightWords}
+        socket={socket}
         canvas={<WheelRushView {...wheelRushProps} isDesktopCanvas />}
       />
     );
@@ -505,7 +495,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         totalTime={totalTime ?? 180}
         targetCategory=""
         meId={username}
-        opponentWords={opponentInsightWords}
+        socket={socket}
         canvas={<WordHuntGame {...wordHuntGameProps} />}
       />
     );
@@ -538,7 +528,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           remainingTime={remainingTime ?? 0}
           totalTime={totalTime ?? 60}
           meId={username}
-          opponentWords={opponentInsightWords}
+          socket={socket}
           comboCount={comboLevel}
           comboMultiplier={1 + comboLevel * 0.1}
           canvas={blastCanvas}
@@ -577,7 +567,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       )}
     >
       <div className="relative flex-1 flex flex-col min-h-0">
-        <OpponentWordFeed feedItems={opponentFeedItems} t={t} />
+        <OpponentWordFeedConnected socket={socket} currentPlayerName={username} t={t} />
         <InGameScreen
           // Core identity
           username={username}

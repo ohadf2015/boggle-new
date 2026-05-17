@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { Socket } from 'socket.io-client';
 import { MultiplayerDesktopShell } from './MultiplayerDesktopShell';
 import { RosterRail, type RosterPlayer } from './RosterRail';
 import { WordsLadder, type LadderWord } from './WordsLadder';
@@ -6,7 +7,7 @@ import { KeyboardHintStrip } from './KeyboardHintStrip';
 import { ThemedPanel } from './ThemedPanel';
 import CircularTimer from '../../ui/CircularTimer';
 import { MyStatsCard } from './insights/MyStatsCard';
-import { OpponentInsightFeed, type OpponentWord } from './insights/OpponentInsightFeed';
+import { OpponentInsightFeedConnected } from './insights/OpponentInsightFeedConnected';
 import { PaceDeltaChip } from './insights/PaceDeltaChip';
 import { LatestScoreTickBanner } from './insights/LatestScoreTickBanner';
 import { CategoryBanner } from './insights/CategoryBanner';
@@ -23,7 +24,8 @@ export interface WordHuntDesktopAdapterProps {
   targetCategory: string;
   canvas: ReactNode;
   meId?: string;
-  opponentWords?: OpponentWord[];
+  /** Socket reference for self-subscribing opponent-insight feed (see BlastDesktopAdapter). */
+  socket?: Socket | null;
   startTimeMs?: number;
   huntFound?: number;
   huntTarget?: number;
@@ -90,8 +92,12 @@ export function WordHuntDesktopAdapter(props: WordHuntDesktopAdapterProps) {
       activityStream: (
         <div className="flex flex-col gap-2">
           <PaceDeltaChip mode="word-hunt" leaderboard={props.leaderboard} meId={props.meId} />
-          {props.opponentWords && props.opponentWords.length > 0 && (
-            <OpponentInsightFeed mode="word-hunt" opponentWords={props.opponentWords} />
+          {props.socket && props.meId && (
+            <OpponentInsightFeedConnected
+              mode="word-hunt"
+              socket={props.socket}
+              currentPlayerName={props.meId}
+            />
           )}
           <KeyboardHintStrip />
         </div>

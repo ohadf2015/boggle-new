@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { Socket } from 'socket.io-client';
 import { MultiplayerDesktopShell } from './MultiplayerDesktopShell';
 import { RosterRail, type RosterPlayer } from './RosterRail';
 import { WordsLadder, type LadderWord } from './WordsLadder';
@@ -6,7 +7,7 @@ import { KeyboardHintStrip } from './KeyboardHintStrip';
 import { ThemedPanel } from './ThemedPanel';
 import CircularTimer from '../../ui/CircularTimer';
 import { MyStatsCard } from './insights/MyStatsCard';
-import { OpponentInsightFeed, type OpponentWord } from './insights/OpponentInsightFeed';
+import { OpponentInsightFeedConnected } from './insights/OpponentInsightFeedConnected';
 import { PaceDeltaChip } from './insights/PaceDeltaChip';
 import { LatestScoreTickBanner } from './insights/LatestScoreTickBanner';
 import { GoalBanner, type BlastGoal } from './insights/GoalBanner';
@@ -24,7 +25,10 @@ export interface BlastDesktopAdapterProps {
   totalTime: number;
   canvas: ReactNode;
   meId?: string;
-  opponentWords?: OpponentWord[];
+  /** Socket reference for self-subscribing opponent-insight feed. The
+   *  feed handles its own `opponentWordFound` listener so socket bursts
+   *  don't cascade into a shell-wide re-render mid-drag. */
+  socket?: Socket | null;
   startTimeMs?: number;
   goal?: BlastGoal;
   comboCount?: number;
@@ -97,8 +101,12 @@ export function BlastDesktopAdapter(props: BlastDesktopAdapterProps) {
         <div className="flex flex-col gap-2">
           <ComboCounter mode="blast" count={props.comboCount ?? 0} multiplier={props.comboMultiplier ?? 1} />
           <PaceDeltaChip mode="blast" leaderboard={props.leaderboard} meId={props.meId} />
-          {props.opponentWords && props.opponentWords.length > 0 && (
-            <OpponentInsightFeed mode="blast" opponentWords={props.opponentWords} />
+          {props.socket && props.meId && (
+            <OpponentInsightFeedConnected
+              mode="blast"
+              socket={props.socket}
+              currentPlayerName={props.meId}
+            />
           )}
           <KeyboardHintStrip />
         </div>
