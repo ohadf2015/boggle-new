@@ -12,6 +12,7 @@ import { GameLeaderboard } from '../GameLeaderboard';
 import type { ExtendedLeaderboardPlayer } from '@/shared/types/view';
 
 vi.mock('@/components/motion/AdaptiveMotion', () => ({
+  __esModule: true,
   AdaptiveMotion: {
     div: ({ children, className }: React.PropsWithChildren<{ className?: string }>) => (
       <div className={className}>{children}</div>
@@ -20,16 +21,19 @@ vi.mock('@/components/motion/AdaptiveMotion', () => ({
 }));
 
 vi.mock('@/components/Avatar', () => ({
+  __esModule: true,
   default: ({ disableEffects }: { disableEffects?: boolean }) => (
     <div data-testid="avatar" data-disable-effects={disableEffects ? 'true' : 'false'} />
   ),
 }));
 
 vi.mock('@/components/ui/PlayerProfileTooltip', () => ({
+  __esModule: true,
   default: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
 
 vi.mock('@/components/PresenceIndicator', () => ({
+  __esModule: true,
   default: () => null,
 }));
 

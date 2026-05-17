@@ -12,23 +12,32 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-vi.mock('framer-motion', () => {
-  const actual = vi.importActual('framer-motion');
-  return {
-    ...actual,
-    m: {
-      div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-      span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
-    },
-    AnimatePresence: ({ children }: any) => children,
-  };
-});
+vi.mock('framer-motion', () => ({
+  __esModule: true,
+  m: {
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
+  },
+  AnimatePresence: ({ children }: any) => children,
+}));
 
 vi.mock('../../Avatar', () => ({
   __esModule: true,
   default: ({ disableEffects }: { disableEffects?: boolean }) => (
     <div data-testid="avatar" data-disable-effects={disableEffects ? 'true' : 'false'} />
   ),
+}));
+
+vi.mock('../../ui/PlayerProfileTooltip', () => ({
+  __esModule: true,
+  default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+vi.mock('@/utils/confettiUtils', () => ({
+  __esModule: true,
+  fireConfetti: () => {},
+  NEO_BRUTALIST_COLORS: [],
+  NEO_BRUTALIST_SHAPES: [],
 }));
 
 import { CompactLeaderboard, CompactPlayer } from '../CompactLeaderboard';

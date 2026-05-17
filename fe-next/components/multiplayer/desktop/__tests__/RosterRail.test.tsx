@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { RosterRail } from '../RosterRail';
 
 vi.mock('@/components/Avatar', () => ({
+  __esModule: true,
   default: ({ userId, customAvatar, disableEffects }: { userId?: string; customAvatar?: unknown; disableEffects?: boolean }) => (
     <span
       data-testid="avatar"
