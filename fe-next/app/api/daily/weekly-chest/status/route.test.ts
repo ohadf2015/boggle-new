@@ -22,7 +22,7 @@ function makeMockSupabase(opts: {
   puzzleAttempts?: Array<{ puzzle_date: string }>
   huntAttempts?: Array<{ puzzle_date: string }>
   wheelAttempts?: Array<{ puzzle_date: string }>
-  existingChests?: Array<{ tier: string; contents: any; opened_at: string | null }>
+  existingChests?: Array<{ cycle_start?: string; tier: string; contents: any; opened_at: string | null }>
 } = {}) {
   const user = opts.user !== undefined ? opts.user : { id: 'user-1' }
 
@@ -72,17 +72,17 @@ function makeMockSupabase(opts: {
         }
       }
       if (table === 'daily_weekly_chests') {
+        // Route now does a single `.eq('player_id', …)` and awaits — so the
+        // outer `.eq` itself must resolve. Keep `.eq().eq()` working as a
+        // fallback for any caller still chaining.
+        const resolved = { data: opts.existingChests ?? [], error: null }
+        const thenable = {
+          ...resolved,
+          eq: vi.fn().mockResolvedValue(resolved),
+          then: (onFulfilled: any) => Promise.resolve(resolved).then(onFulfilled),
+        }
         return {
-          select: vi.fn().mockReturnValue({
-            eq: vi
-              .fn()
-              .mockReturnValue({
-                eq: vi.fn().mockResolvedValue({
-                  data: opts.existingChests ?? [],
-                  error: null,
-                }),
-              }),
-          }),
+          select: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue(thenable) }),
         }
       }
       return {
@@ -191,6 +191,7 @@ describe('GET /api/daily/weekly-chest/status', () => {
         huntAttempts: dates.map((d) => ({ puzzle_date: d })),
         existingChests: [
           {
+            cycle_start: '2026-05-06',
             tier: 'gold',
             contents: { coins: 500, badge_id: 'badge-123' },
             opened_at: null,
@@ -209,6 +210,51 @@ describe('GET /api/daily/weekly-chest/status', () => {
     expect(body.pendingChest.badgeId).toBe('badge-123')
   })
 
+  it('surfaces an UNCLAIMED prior cycle even after a new week started', async () => {
+    // Today is 2026-05-12. Player completed days 2026-05-01..2026-05-07 (a full
+    // chest cycle) but never claimed it, and now days 2026-05-12 alone — the
+    // streak from today only counts 1 day, but the prior chest is still owed.
+    const priorCycle = [
+      '2026-05-01','2026-05-02','2026-05-03','2026-05-04',
+      '2026-05-05','2026-05-06','2026-05-07',
+    ]
+    vi.mocked(createClient).mockResolvedValue(
+      makeMockSupabase({
+        huntAttempts: [...priorCycle, '2026-05-12'].map(d => ({ puzzle_date: d })),
+        // No chest row at all — never claimed.
+        existingChests: [],
+      }) as any
+    )
+    const res = await GET()
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.isClaimable).toBe(true)
+    expect(body.cycleStart).toBe('2026-05-01')
+    expect(body.daysCompleted).toBe(7)
+    expect(body.completedDates).toEqual(priorCycle)
+  })
+
+  it('falls back to in-progress cycle when prior cycle WAS claimed', async () => {
+    const priorCycle = [
+      '2026-05-01','2026-05-02','2026-05-03','2026-05-04',
+      '2026-05-05','2026-05-06','2026-05-07',
+    ]
+    vi.mocked(createClient).mockResolvedValue(
+      makeMockSupabase({
+        huntAttempts: [...priorCycle, '2026-05-12'].map(d => ({ puzzle_date: d })),
+        existingChests: [
+          { cycle_start: '2026-05-01', tier: 'silver', contents: { coins: 250 }, opened_at: '2026-05-08T10:00:00Z' },
+        ],
+      }) as any
+    )
+    const res = await GET()
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.isClaimable).toBe(false)
+    expect(body.daysCompleted).toBe(1)
+    expect(body.cycleStart).toBe('2026-05-12')
+  })
+
   it('returns null pendingChest when already claimed (opened_at set)', async () => {
     const today = '2026-05-12'
     const cycleStart = '2026-05-06'
@@ -223,6 +269,7 @@ describe('GET /api/daily/weekly-chest/status', () => {
         huntAttempts: dates.map((d) => ({ puzzle_date: d })),
         existingChests: [
           {
+            cycle_start: '2026-05-06',
             tier: 'gold',
             contents: { coins: 500 },
             opened_at: '2026-05-12T10:00:00Z',

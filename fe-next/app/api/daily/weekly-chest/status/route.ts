@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 import {
   computeCycleProgress,
   computeChestTierForCycle,
+  findCompletedCycles,
   type HuntScoreRow,
   type WheelScoreRow,
 } from '@/lib/daily/weeklyChest'
@@ -59,25 +60,49 @@ export async function GET() {
       ...(wheelRes.data ?? []).map((r: any) => r.puzzle_date),
     ]
 
-    // Compute cycle progress
-    const progress = computeCycleProgress(allDates, today)
+    // Pull every chest row this player owns so we can detect prior unclaimed
+    // cycles — chests that became claimable but never got picked up before a
+    // new week started.
+    const { data: chestRows } = await supabase
+      .from('daily_weekly_chests')
+      .select('cycle_start, tier, contents, opened_at')
+      .eq('player_id', user.id)
+
+    const openedCycleStarts = new Set(
+      (chestRows ?? [])
+        .filter((c: any) => !!c.opened_at)
+        .map((c: any) => c.cycle_start as string)
+    )
+
+    // Find any fully-completed 7-day chunks across the player's history that
+    // haven't been claimed yet. Oldest unclaimed wins so backlog clears in order.
+    const completedCycles = findCompletedCycles(allDates)
+    const unclaimed = completedCycles.find(c => !openedCycleStarts.has(c.cycleStart))
+
+    // Backdated path: prior cycle still owed — surface it as the active cycle so
+    // the player can still claim what they earned even after a new week began.
+    // In-progress path: show current streak from `today` backward.
+    const progress = unclaimed
+      ? {
+          cycleStart: unclaimed.cycleStart,
+          cycleNumber: unclaimed.cycleNumber,
+          completedDates: unclaimed.completedDates,
+          daysCompleted: 7,
+          isClaimable: true,
+        }
+      : computeCycleProgress(allDates, today)
 
     // Projected tier — what tier the chest would be if claimed right now, based
-    // on the player's performance so far this cycle. Lets the UI stop guessing.
+    // on the player's performance so far this cycle.
     const { weekScore, tier: projectedTier } = computeChestTierForCycle(
       progress.completedDates,
       (huntRes.data ?? []) as HuntScoreRow[],
       (wheelRes.data ?? []) as WheelScoreRow[],
     )
 
-    // Check for existing chest in this cycle
-    const { data: existingChests } = await supabase
-      .from('daily_weekly_chests')
-      .select('tier, contents, opened_at')
-      .eq('player_id', user.id)
-      .eq('cycle_start', progress.cycleStart)
-
-    const existingChest = existingChests?.[0]
+    const existingChest = (chestRows ?? []).find(
+      (c: any) => c.cycle_start === progress.cycleStart
+    )
     const alreadyClaimed = !!existingChest?.opened_at
     const isClaimable = progress.isClaimable && !alreadyClaimed
 

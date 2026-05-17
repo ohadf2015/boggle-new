@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 import {
   computeCycleProgress,
   computeChestTierForCycle,
+  findCompletedCycles,
   type HuntScoreRow,
   type WheelScoreRow,
 } from '@/lib/daily/weeklyChest'
@@ -45,19 +46,39 @@ export async function POST() {
     ...(wheelRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
   ]
 
-  const progress = computeCycleProgress(allDates, today)
+  // Pull every chest row for this player so we can resolve which cycle the
+  // claim should apply to — current in-progress streak OR an older unclaimed
+  // chest that the player never picked up before the next week began.
+  const { data: allChests } = await supabase
+    .from('daily_weekly_chests')
+    .select('id, cycle_start, opened_at, tier, contents')
+    .eq('player_id', user.id)
+
+  const openedCycleStarts = new Set(
+    (allChests ?? []).filter((c: any) => !!c.opened_at).map((c: any) => c.cycle_start as string)
+  )
+
+  const completedCycles = findCompletedCycles(allDates)
+  const oldestUnclaimed = completedCycles.find(c => !openedCycleStarts.has(c.cycleStart))
+
+  const liveProgress = computeCycleProgress(allDates, today)
+  const progress = oldestUnclaimed
+    ? {
+        cycleStart: oldestUnclaimed.cycleStart,
+        cycleNumber: oldestUnclaimed.cycleNumber,
+        completedDates: oldestUnclaimed.completedDates,
+        daysCompleted: 7,
+        isClaimable: true,
+      }
+    : liveProgress
 
   if (!progress.isClaimable) {
     return NextResponse.json({ error: 'Chest not ready' }, { status: 400 })
   }
 
-  const { data: existing } = await supabase
-    .from('daily_weekly_chests')
-    .select('id, opened_at, tier, contents')
-    .eq('player_id', user.id)
-    .eq('cycle_start', progress.cycleStart)
+  const existing = (allChests ?? []).filter((c: any) => c.cycle_start === progress.cycleStart)
 
-  if (existing?.[0]?.opened_at) {
+  if (existing[0]?.opened_at) {
     return NextResponse.json({ error: 'Already claimed' }, { status: 409 })
   }
 

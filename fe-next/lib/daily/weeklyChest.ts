@@ -63,6 +63,45 @@ export function computeChestTierForCycle(
   return { weekScore, tier: getChestTier(weekScore) }
 }
 
+export interface CompletedCycle {
+  cycleStart: string
+  cycleNumber: number
+  completedDates: string[]
+}
+
+// Scan all completed dates and return every fully-finished 7-day chunk.
+// A chunk = 7 consecutive ISO dates with no gap. Multiple chunks may exist if
+// the player completed several streaks (consecutive or separated by gaps).
+// `cycleNumber` reflects the order of completed cycles across the player's
+// history (1 = first, 2 = second, …). Returned in chronological order so
+// callers can pick the oldest unclaimed chest.
+export function findCompletedCycles(allCompletedDates: string[]): CompletedCycle[] {
+  const unique = Array.from(new Set(allCompletedDates))
+    .filter(d => typeof d === 'string' && d.length === 10)
+    .sort()
+  const cycles: CompletedCycle[] = []
+  let runStart = 0
+  let cycleNumber = 0
+  for (let i = 0; i < unique.length; i++) {
+    if (i > 0) {
+      const prev = new Date(unique[i - 1] + 'T00:00:00Z').getTime()
+      const cur = new Date(unique[i] + 'T00:00:00Z').getTime()
+      if (cur - prev !== 86_400_000) runStart = i
+    }
+    const runLen = i - runStart + 1
+    if (runLen > 0 && runLen % 7 === 0) {
+      const startIdx = i - 6
+      cycleNumber++
+      cycles.push({
+        cycleStart: unique[startIdx],
+        cycleNumber,
+        completedDates: unique.slice(startIdx, i + 1),
+      })
+    }
+  }
+  return cycles
+}
+
 // allCompletedDates: all ISO dates the player ever finished a daily (any mode)
 // today: ISO date string (YYYY-MM-DD)
 export function computeCycleProgress(

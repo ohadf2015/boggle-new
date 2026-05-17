@@ -4,6 +4,7 @@ import {
   computeWeekScore,
   getChestTier,
   computeChestTierForCycle,
+  findCompletedCycles,
 } from '../weeklyChest'
 
 describe('getChestTier', () => {
@@ -117,5 +118,70 @@ describe('computeChestTierForCycle', () => {
     )
     expect(r.weekScore).toBe(0)
     expect(r.tier).toBe('bronze')
+  })
+})
+
+describe('findCompletedCycles', () => {
+  it('returns empty array when fewer than 7 consecutive days', () => {
+    expect(findCompletedCycles([])).toEqual([])
+    expect(findCompletedCycles(['2026-05-10','2026-05-11','2026-05-12'])).toEqual([])
+  })
+
+  it('returns one cycle for exactly 7 consecutive days', () => {
+    const dates = [
+      '2026-05-06','2026-05-07','2026-05-08',
+      '2026-05-09','2026-05-10','2026-05-11','2026-05-12',
+    ]
+    const cycles = findCompletedCycles(dates)
+    expect(cycles).toHaveLength(1)
+    expect(cycles[0].cycleStart).toBe('2026-05-06')
+    expect(cycles[0].cycleNumber).toBe(1)
+    expect(cycles[0].completedDates).toEqual(dates)
+  })
+
+  it('returns one cycle when 10 consecutive days completed (next cycle still in progress)', () => {
+    const dates = Array.from({ length: 10 }, (_, i) => {
+      const d = new Date('2026-05-01T00:00:00Z')
+      d.setUTCDate(d.getUTCDate() + i)
+      return d.toISOString().slice(0, 10)
+    })
+    const cycles = findCompletedCycles(dates)
+    expect(cycles).toHaveLength(1)
+    expect(cycles[0].cycleStart).toBe('2026-05-01')
+  })
+
+  it('returns two cycles for 14 consecutive days', () => {
+    const dates = Array.from({ length: 14 }, (_, i) => {
+      const d = new Date('2026-05-01T00:00:00Z')
+      d.setUTCDate(d.getUTCDate() + i)
+      return d.toISOString().slice(0, 10)
+    })
+    const cycles = findCompletedCycles(dates)
+    expect(cycles).toHaveLength(2)
+    expect(cycles[0].cycleStart).toBe('2026-05-01')
+    expect(cycles[1].cycleStart).toBe('2026-05-08')
+    expect(cycles[0].cycleNumber).toBe(1)
+    expect(cycles[1].cycleNumber).toBe(2)
+  })
+
+  it('handles gap: completed-cycle on past run + new run in progress', () => {
+    // Completed run May 1-7, gap, partial run May 12-14
+    const dates = [
+      '2026-05-01','2026-05-02','2026-05-03','2026-05-04',
+      '2026-05-05','2026-05-06','2026-05-07',
+      '2026-05-12','2026-05-13','2026-05-14',
+    ]
+    const cycles = findCompletedCycles(dates)
+    expect(cycles).toHaveLength(1)
+    expect(cycles[0].cycleStart).toBe('2026-05-01')
+  })
+
+  it('dedupes duplicate date strings', () => {
+    const dates = [
+      '2026-05-06','2026-05-06','2026-05-07','2026-05-08',
+      '2026-05-09','2026-05-10','2026-05-11','2026-05-12',
+    ]
+    const cycles = findCompletedCycles(dates)
+    expect(cycles).toHaveLength(1)
   })
 })
