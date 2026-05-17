@@ -29,12 +29,18 @@ export interface RivalReminderTemplate {
 export interface RivalReminderTemplateSet {
   above: RivalReminderTemplate[];
   below: RivalReminderTemplate[];
+  /**
+   * Used when scoreGap === 0 (rival on same season score). Avoids
+   * grammatically awkward "ahead/behind by 0" phrasing. 6 variants to
+   * stay compatible with tier-based picker (`VARIANT_TIERS`).
+   */
+  tied: RivalReminderTemplate[];
 }
 
 const EN: RivalReminderTemplateSet = {
   above: [
     { title: '{rival} just posted today 👀', body: "They're {gap} ahead of you. {hoursLeft}h to claw back." },
-    { title: 'Maya pace alert 🏃', body: '{rival} crushed today\'s daily. Your turn — they\'re only {gap} ahead.' },
+    { title: 'Pace alert from {rival} 🏃', body: '{rival} crushed today\'s daily. Your turn — they\'re only {gap} ahead.' },
     { title: '{rival} made their move ♟️', body: "Counter in 60 seconds. {hoursLeft}h on the clock." },
     { title: 'You\'re behind by {gap} 📈', body: "{rival} just played. The board's still warm — go." },
     { title: '{rival} cleared today\'s daily 🎯', body: "Don't let them sit pretty. {hoursLeft}h left." },
@@ -48,25 +54,44 @@ const EN: RivalReminderTemplateSet = {
     { title: 'Stay ahead of {rival} 🏆', body: "They played today. {gap} pts cushion — make it bigger." },
     { title: 'Rival check 🔍', body: "{rival} cleared today's daily. {hoursLeft}h to answer." },
   ],
+  tied: [
+    { title: '{rival} matched your score 🎯', body: "You're tied for the season. Daily resets at midnight." },
+    { title: 'Tied with {rival} ⚖️', body: 'Today decides the tiebreaker. Resets at midnight.' },
+    { title: '{rival} caught up 🪞', body: "Dead even. {hoursLeft}h to break the tie." },
+    { title: 'Tiebreaker open ⚖️', body: '{rival} pulled even. {hoursLeft}h to pull ahead.' },
+    { title: '⏰ Tied with {rival}', body: 'Last {hoursLeft}h to break the tie.' },
+    { title: '🔁 {rival} = you', body: 'Only {hoursLeft}h left to settle it.' },
+  ],
 };
 
 // Hebrew — RTL. AI-authored, native review pending.
+// Note: rival names are wrapped with U+2068/U+2069 (FSI/PDI) at render time
+// in `rivalReminderCopy.ts` so Latin names stay readable inside RTL flow.
+// Phrasing favors noun forms (no gendered verbs) — works for any rival.
 const HE: RivalReminderTemplateSet = {
   above: [
-    { title: '👀 {rival} כבר שיחק היום', body: 'הם {gap} נקודות לפניך. {hoursLeft} שעות לסגור פערים.' },
-    { title: '🏃 התראת קצב', body: '{rival} פיצח את היומי. תורך — נשארו רק {gap} נקודות.' },
-    { title: '♟️ {rival} עשה את המהלך שלו', body: 'נגד-מהלך תוך 60 שניות. {hoursLeft} שעות על השעון.' },
-    { title: '📈 פיגור של {gap}', body: '{rival} בדיוק שיחק. הלוח עדיין חם — קדימה.' },
-    { title: '🎯 {rival} סגר את היומי', body: 'אל תיתן להם לשבת בנחת. נשארו {hoursLeft} שעות.' },
-    { title: '🪟 חלון להשיג', body: '{rival} העלה תוצאה. פער של {gap}. {hoursLeft} שעות לסגור.' },
+    { title: '👀 {rival} כבר על הלוח היום', body: 'בפער של {gap} נק׳ לפניך. {hoursLeft} שעות לסגור.' },
+    { title: '🏃 קצב של {rival}', body: 'היומי של {rival} כבר נסגר. תורך — רק {gap} נק׳ פער.' },
+    { title: '♟️ המהלך של {rival}', body: 'נגד-מהלך תוך 60 שניות. {hoursLeft} שעות על השעון.' },
+    { title: '📈 פער של {gap} נק׳', body: 'התוצאה של {rival} עלתה. הלוח עדיין חם — קדימה.' },
+    { title: '🎯 {rival} — היומי סגור', body: 'אל תניחו להם לשבת בנחת. {hoursLeft} שעות נותרו.' },
+    { title: '🪟 חלון לתפיסה', body: 'תוצאה חדשה ל-{rival}. פער של {gap}. {hoursLeft} שעות לסגור.' },
   ],
   below: [
-    { title: '🔥 {rival} ממש מאחוריך', body: 'הם בדיוק שיחקו היום. רק {gap} ביניכם. הגן.' },
-    { title: '📊 שים לב — {rival} מתקרב', body: 'הם פיצחו את היומי. {hoursLeft} שעות להרחיב את היתרון.' },
-    { title: '🛡️ מצב שמירת יתרון', body: '{rival} בדיוק קלע. רזרבת ה-{gap} שלך מצטמצמת.' },
-    { title: '🥊 {rival} הכה ראשון', body: 'אל תיתן להם לשמור על המומנטום. היומי פתוח.' },
-    { title: '🏆 הישאר לפני {rival}', body: 'הם שיחקו היום. כרית של {gap} נק׳ — הגדל אותה.' },
-    { title: '🔍 בדיקת יריב', body: '{rival} סגר את היומי. {hoursLeft} שעות לענות.' },
+    { title: '🔥 {rival} צמוד אליך', body: 'בפער של {gap} בלבד. הגנה — היומי פתוח.' },
+    { title: '📊 שים לב — {rival} מתקרב', body: 'היומי של {rival} נסגר. {hoursLeft} שעות להרחיב יתרון.' },
+    { title: '🛡️ הגנה על יתרון', body: 'תוצאה חדשה ל-{rival}. רזרבת ה-{gap} שלך מצטמצמת.' },
+    { title: '🥊 {rival} הקדים', body: 'אל תניחו להם לשמור על המומנטום. היומי פתוח.' },
+    { title: '🏆 שמור על היתרון מול {rival}', body: '{gap} נק׳ הפרש — הגדל אותו.' },
+    { title: '🔍 בדיקת יריב', body: '{rival} — היומי סגור. {hoursLeft} שעות לענות.' },
+  ],
+  tied: [
+    { title: '🎯 שיוויון מול {rival}', body: 'תיקו בעונה. היומי מתאפס בחצות.' },
+    { title: '⚖️ {rival} ואתה — תיקו', body: 'היום מכריע. מתאפס בחצות.' },
+    { title: '🪞 {rival} השווה את התוצאה', body: 'אותו ניקוד בדיוק. {hoursLeft} שעות לפרוץ.' },
+    { title: '⚖️ שובר שוויון פתוח', body: '{rival} השווה. {hoursLeft} שעות לעקוף.' },
+    { title: '⏰ תיקו מול {rival}', body: 'נותרו {hoursLeft} שעות לשבור שיוויון.' },
+    { title: '🔁 {rival} = אתה', body: 'רק {hoursLeft} שעות להכריע.' },
   ],
 };
 
@@ -88,6 +113,14 @@ const SV: RivalReminderTemplateSet = {
     { title: 'Håll dig före {rival} 🏆', body: 'De spelade idag. {gap} p kudde — gör den större.' },
     { title: 'Rivalkoll 🔍', body: '{rival} löste dagens. {hoursLeft}h att svara.' },
   ],
+  tied: [
+    { title: '{rival} matchade din poäng 🎯', body: 'Lika i säsongen. Återställs vid midnatt.' },
+    { title: 'Lika med {rival} ⚖️', body: 'Idag avgör. Återställs vid midnatt.' },
+    { title: '{rival} kom ikapp 🪞', body: 'Helt lika. {hoursLeft}h att bryta dödläget.' },
+    { title: 'Avgörande öppet ⚖️', body: '{rival} gick lika. {hoursLeft}h att gå om.' },
+    { title: '⏰ Lika med {rival}', body: 'Sista {hoursLeft}h att bryta dödläget.' },
+    { title: '🔁 {rival} = du', body: 'Bara {hoursLeft}h att avgöra.' },
+  ],
 };
 
 // Japanese — AI-authored, native review pending.
@@ -108,6 +141,14 @@ const JA: RivalReminderTemplateSet = {
     { title: '🏆 {rival} の前にいよう', body: '今日プレイ済。{gap} 点クッション — 増やせ。' },
     { title: '🔍 ライバルチェック', body: '{rival} がデイリー突破。{hoursLeft} 時間で応えろ。' },
   ],
+  tied: [
+    { title: '🎯 {rival} と同点', body: 'シーズン互角。デイリーは深夜にリセット。' },
+    { title: '⚖️ {rival} と並んだ', body: '今日が決定戦。深夜にリセット。' },
+    { title: '🪞 {rival} に並ばれた', body: '完全に互角。残り {hoursLeft} 時間で抜け出せ。' },
+    { title: '⚖️ 同点ブレーカー解放', body: '{rival} が並んだ。{hoursLeft} 時間で前へ。' },
+    { title: '⏰ {rival} と同点', body: '残り {hoursLeft} 時間で決着を。' },
+    { title: '🔁 {rival} = あなた', body: '残り {hoursLeft} 時間で決めろ。' },
+  ],
 };
 
 // Spanish — AI-authored, native review pending.
@@ -127,6 +168,14 @@ const ES: RivalReminderTemplateSet = {
     { title: '{rival} pegó primero 🥊', body: 'No les regales el ritmo. El diario está abierto.' },
     { title: 'Mantente sobre {rival} 🏆', body: 'Jugó hoy. {gap} pts de margen — hazlo más grande.' },
     { title: 'Chequeo de rival 🔍', body: '{rival} cerró el diario. {hoursLeft}h para responder.' },
+  ],
+  tied: [
+    { title: '{rival} igualó tu puntaje 🎯', body: 'Empate de temporada. Se reinicia a medianoche.' },
+    { title: 'Empatados con {rival} ⚖️', body: 'Hoy decide. Se reinicia a medianoche.' },
+    { title: '{rival} te alcanzó 🪞', body: 'Empate exacto. {hoursLeft}h para romperlo.' },
+    { title: 'Desempate abierto ⚖️', body: '{rival} te empató. {hoursLeft}h para adelantar.' },
+    { title: '⏰ Empate con {rival}', body: 'Últimas {hoursLeft}h para romper el empate.' },
+    { title: '🔁 {rival} = tú', body: 'Solo {hoursLeft}h para decidirlo.' },
   ],
 };
 

@@ -83,6 +83,19 @@ function fill(template: string, vars: Record<string, string | number>): string {
   );
 }
 
+/**
+ * Wrap rival username in Unicode bidi isolate markers for RTL locales so
+ * Latin/mixed-script names render as a self-contained unit inside Hebrew
+ * flow. Without this, "{rival} סגר את היומי" with rival="Maya" reorders
+ * unpredictably depending on adjacent punctuation. FSI (U+2068) +
+ * PDI (U+2069) survives FCM/APNs payloads and is honored by Android +
+ * iOS notification renderers.
+ */
+function bidiWrap(name: string, locale: PushLocale): string {
+  if (locale === 'he') return `⁨${name}⁩`;
+  return name;
+}
+
 export function currentUrgencyTier(hoursLeft: number): UrgencyTier {
   const h = Math.max(1, Math.round(hoursLeft));
   if (h <= 3) return 'urgent';
@@ -180,11 +193,14 @@ export function pickRivalReminderCopy(input: RivalReminderInput): RivalReminderC
       ? locale
       : 'en';
   const set = RIVAL_REMINDER_TEMPLATES_BY_LOCALE[localeKey];
-  const table = set[direction];
+  // Same-score rivals (gap === 0) get a dedicated tied set so we never
+  // render the grammatically broken "ahead by 0" / "פיגור של 0" copy.
+  const isTied = gap === 0;
+  const table = isTied ? set.tied : set[direction];
   const t = table[variant] ?? table[0];
 
   const vars = {
-    rival: rivalUsername,
+    rival: bidiWrap(rivalUsername, localeKey),
     gap,
     hoursLeft: hours,
     mode: MODE_LABEL[localeKey][mode],
@@ -208,7 +224,8 @@ export function pickRivalReminderCopy(input: RivalReminderInput): RivalReminderC
   const deepLink =
     `/daily?src=push&kind=rival&dir=${direction}&v=${variant}` +
     `&h=${hours}&t=${tier}&m=${mode}&rs=${rivalScore}` +
-    `&rd=${Math.trunc(rankDelta)}&n=${additionalCount}`;
+    `&rd=${Math.trunc(rankDelta)}&n=${additionalCount}` +
+    (isTied ? '&tied=1' : '');
 
   return { title, body, deepLink, variant };
 }

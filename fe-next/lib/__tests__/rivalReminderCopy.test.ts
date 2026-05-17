@@ -241,4 +241,74 @@ describe('pickRivalReminderCopy', () => {
       expect(c.body).not.toContain('{hoursLeft}');
     });
   });
+
+  describe('tied (scoreGap === 0)', () => {
+    it.each(['en', 'he', 'sv', 'ja', 'es'] as const)(
+      '%s: does NOT render "ahead/behind by 0" phrasing when gap is 0',
+      (loc) => {
+        const c = pickRivalReminderCopy({
+          userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: loc,
+          rivalUsername: 'Maya', direction: 'above', scoreGap: 0,
+        });
+        // No stray "0" near gap-mentioning words for any locale
+        expect(c.body).not.toMatch(/(?:by|של|av|de|差)\s*0\b/i);
+        expect(c.title).not.toMatch(/(?:by|של|av|de|差)\s*0\b/i);
+        // Rival name still present
+        expect(`${c.title} ${c.body}`).toContain('Maya');
+      }
+    );
+
+    it('hebrew gap=0 specifically: no "פיגור של 0" or "{gap} נקודות" type phrases', () => {
+      for (let i = 0; i < 12; i++) {
+        const c = pickRivalReminderCopy({
+          userId: `u${i}`, date: '2026-05-10', hoursLeft: 8, locale: 'he',
+          rivalUsername: 'Maya', direction: 'above', scoreGap: 0,
+        });
+        const blob = `${c.title} ${c.body}`;
+        expect(blob).not.toContain('פיגור של 0');
+        expect(blob).not.toMatch(/\b0\s*נקודות/);
+        expect(blob).not.toMatch(/פער של 0/);
+      }
+    });
+
+    it('encodes tied=1 in the deep link when scoreGap === 0', () => {
+      const c = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: 'en',
+        rivalUsername: 'Maya', direction: 'above', scoreGap: 0,
+      });
+      expect(c.deepLink).toContain('tied=1');
+    });
+
+    it('omits tied=1 when scoreGap > 0', () => {
+      const c = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: 'en',
+        rivalUsername: 'Maya', direction: 'above', scoreGap: 5,
+      });
+      expect(c.deepLink).not.toContain('tied=1');
+    });
+  });
+
+  describe('hebrew bidi isolation', () => {
+    it('wraps a latin rival name with U+2068/U+2069 in Hebrew title or body', () => {
+      const c = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: 'he',
+        rivalUsername: 'Maya', direction: 'above', scoreGap: 100,
+      });
+      const blob = `${c.title}\n${c.body}`;
+      expect(blob).toContain('⁨Maya⁩');
+    });
+
+    it('does NOT wrap rival name with bidi controls in en/sv/ja/es', () => {
+      for (const loc of ['en', 'sv', 'ja', 'es'] as const) {
+        const c = pickRivalReminderCopy({
+          userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: loc,
+          rivalUsername: 'Maya', direction: 'above', scoreGap: 100,
+        });
+        const blob = `${c.title}\n${c.body}`;
+        expect(blob).not.toContain('⁨');
+        expect(blob).not.toContain('⁩');
+        expect(blob).toContain('Maya');
+      }
+    });
+  });
 });
