@@ -175,4 +175,62 @@ describe('pickDailyReminderCopy', () => {
     // English paths have ASCII — no CJK or Hebrew
     expect(/[֐-׿぀-ヿ㐀-鿿]/.test(copy.title)).toBe(false);
   });
+
+  describe('gender-aware grammar', () => {
+    const heTable = DAILY_REMINDER_TEMPLATES_BY_LOCALE.he;
+    const heFemaleBodyIdx = heTable.findIndex((t) => t.bodyFemale);
+    const heFemaleTitleIdx = heTable.findIndex((t) => t.titleFemale);
+
+    function findUserForVariant(targetIdx: number, locale: 'he' | 'es'): string {
+      for (let i = 0; i < 2000; i++) {
+        const uid = `seed-${locale}-${i}`;
+        const c = pickDailyReminderCopy({ userId: uid, date: '2026-05-17', hoursLeft: 5, locale });
+        if (c.variant === targetIdx) return uid;
+      }
+      throw new Error('no userId found for variant ' + targetIdx);
+    }
+
+    it('he female avatar picks bodyFemale when template provides one', () => {
+      const userId = findUserForVariant(heFemaleBodyIdx, 'he');
+      const male = pickDailyReminderCopy({ userId, date: '2026-05-17', hoursLeft: 5, locale: 'he', gender: 'male' });
+      const female = pickDailyReminderCopy({ userId, date: '2026-05-17', hoursLeft: 5, locale: 'he', gender: 'female' });
+      expect(female.body).toBe((heTable[heFemaleBodyIdx].bodyFemale as string).replace(/\{hoursLeft\}/g, '5'));
+      expect(female.body).not.toBe(male.body);
+    });
+
+    it('he female avatar picks titleFemale when template provides one', () => {
+      const userId = findUserForVariant(heFemaleTitleIdx, 'he');
+      const male = pickDailyReminderCopy({ userId, date: '2026-05-17', hoursLeft: 5, locale: 'he', gender: 'male' });
+      const female = pickDailyReminderCopy({ userId, date: '2026-05-17', hoursLeft: 5, locale: 'he', gender: 'female' });
+      expect(female.title).not.toBe(male.title);
+    });
+
+    it('missing gender falls through to neutral/masculine default', () => {
+      const userId = findUserForVariant(heFemaleBodyIdx, 'he');
+      const def = pickDailyReminderCopy({ userId, date: '2026-05-17', hoursLeft: 5, locale: 'he' });
+      const male = pickDailyReminderCopy({ userId, date: '2026-05-17', hoursLeft: 5, locale: 'he', gender: 'male' });
+      expect(def.body).toBe(male.body);
+    });
+
+    it('locales with no gendered overrides return identical copy for male/female', () => {
+      for (const locale of ['en', 'sv', 'ja'] as const) {
+        for (let i = 0; i < 20; i++) {
+          const a = pickDailyReminderCopy({ userId: `u-${i}`, date: '2026-05-17', hoursLeft: 5, locale, gender: 'male' });
+          const b = pickDailyReminderCopy({ userId: `u-${i}`, date: '2026-05-17', hoursLeft: 5, locale, gender: 'female' });
+          expect(a.title).toBe(b.title);
+          expect(a.body).toBe(b.body);
+        }
+      }
+    });
+
+    it('es template "campeón" -> "campeona" for female avatar', () => {
+      const esTable = DAILY_REMINDER_TEMPLATES_BY_LOCALE.es;
+      const idx = esTable.findIndex((t) => t.body.includes('campeón'));
+      expect(idx).toBeGreaterThan(-1);
+      const userId = findUserForVariant(idx, 'es');
+      const female = pickDailyReminderCopy({ userId, date: '2026-05-17', hoursLeft: 5, locale: 'es', gender: 'female' });
+      expect(female.body).toContain('campeona');
+      expect(female.body).not.toContain('campeón');
+    });
+  });
 });

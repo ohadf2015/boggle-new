@@ -17,6 +17,14 @@ import type { PushLocale } from '@/backend/utils/pushTranslations';
 export interface DailyReminderTemplate {
   title: string;
   body: string;
+  /**
+   * Optional female-grammar overrides. Used by locales with gendered imperatives /
+   * adjectives (Hebrew, Spanish). When the user's avatar gender is female and an
+   * override is present, it replaces the neutral/masculine default. Locales with
+   * no grammar gender (en, sv, ja) can leave these unset.
+   */
+  titleFemale?: string;
+  bodyFemale?: string;
 }
 
 const EN: DailyReminderTemplate[] = [
@@ -38,23 +46,36 @@ const EN: DailyReminderTemplate[] = [
 ];
 
 // Hebrew — RTL. Punctuation order intentional for proper rendering.
-// Native review needed.
+// titleFemale / bodyFemale override masculine grammar when avatar gender is female.
+// Native review needed (per feedback-ai-hebrew-translation).
 const HE: DailyReminderTemplate[] = [
   { title: '📞 המוח שלך מתקשר', body: 'אומר שהיומי של היום עוד לא נפתר. נשארו {hoursLeft} שעות.' },
-  { title: '⏰ טיק-טק, אלוף המילים', body: 'האתגר היומי לא יפתור את עצמו. {hoursLeft} שעות על השעון.' },
-  { title: '📖 תפנית בעלילה', body: 'עוד לא שיחקת היום. תתקן את זה ב-60 שניות.' },
+  { title: '⏰ טיק-טק, אלוף המילים', body: 'האתגר היומי לא יפתור את עצמו. {hoursLeft} שעות על השעון.',
+    titleFemale: '⏰ טיק-טק, אלופת המילים' },
+  { title: '📖 תפנית בעלילה', body: 'עוד לא שיחקת היום. תתקן את זה ב-60 שניות.',
+    bodyFemale: 'עוד לא שיחקת היום. תתקני את זה ב-60 שניות.' },
   { title: '🧩 הלוח מתגעגע אליך', body: 'האותיות מוכנות. {hoursLeft} שעות עד שהדלת נסגרת.' },
-  { title: '✍️ פאזל אחד. השם שלך.', body: 'האתגר היומי מחכה לאלוף.' },
-  { title: '🔥 בדיקת רצף', body: 'אל תתן ל-{hoursLeft} שעות לחמוק — שמור על השרשרת חיה.' },
-  { title: '😷 היומי שלך הודיע על מחלה', body: 'סתם צחקנו. הוא רוצה קרב. תיכנס.' },
-  { title: '🧙 נשארו {hoursLeft} שעות, קוסם מילים', body: 'סיבוב מהיר לפני שהלוח מתאפס.' },
-  { title: '🤫 האותיות מרכלות', body: 'הן אומרות שעזבת אותן. תוכיח שהן טועות.' },
-  { title: '👻 אל תתן להיום להעלם', body: '60 שניות. זה כל מה שהיומי צריך.' },
+  { title: '✍️ פאזל אחד. השם שלך.', body: 'האתגר היומי מחכה לאלוף.',
+    bodyFemale: 'האתגר היומי מחכה לאלופה.' },
+  { title: '🔥 בדיקת רצף', body: 'אל תתן ל-{hoursLeft} שעות לחמוק — שמור על השרשרת חיה.',
+    bodyFemale: 'אל תתני ל-{hoursLeft} שעות לחמוק — שמרי על השרשרת חיה.' },
+  { title: '😷 היומי שלך הודיע על מחלה', body: 'סתם צחקנו. הוא רוצה קרב. תיכנס.',
+    bodyFemale: 'סתם צחקנו. הוא רוצה קרב. תיכנסי.' },
+  { title: '🧙 נשארו {hoursLeft} שעות, קוסם מילים', body: 'סיבוב מהיר לפני שהלוח מתאפס.',
+    titleFemale: '🧙 נשארו {hoursLeft} שעות, קוסמת מילים' },
+  { title: '🤫 האותיות מרכלות', body: 'הן אומרות שעזבת אותן. תוכיח שהן טועות.',
+    bodyFemale: 'הן אומרות שעזבת אותן. תוכיחי שהן טועות.' },
+  { title: '👻 אל תתן להיום להעלם', body: '60 שניות. זה כל מה שהיומי צריך.',
+    titleFemale: '👻 אל תתני להיום להיעלם' },
   { title: '🔍 אתגר: לא פתור', body: 'האם היום יישא את השם שלך? {hoursLeft} שעות נשארו.' },
   { title: '💌 תזכורת עדינה', body: 'היומי פתוח. המוח חם. קדימה.' },
-  { title: '⏳ השעון אומר {hoursLeft} שעות', body: 'האתגר היומי אומר: בוא תיקח אותי.' },
-  { title: '🚨 אזעקת חובב מילים', body: 'הפאזל של היום עוד לא פגש את ניצחו. אתה?' },
-  { title: '🏁 ספרינט עד חצות?', body: 'נשארו {hoursLeft} שעות לפתור. פחות אם תזדרז.' },
+  { title: '⏳ השעון אומר {hoursLeft} שעות', body: 'האתגר היומי אומר: בוא תיקח אותי.',
+    bodyFemale: 'האתגר היומי אומר: בואי תיקחי אותי.' },
+  { title: '🚨 אזעקת חובב מילים', body: 'הפאזל של היום עוד לא פגש את ניצחו. אתה?',
+    titleFemale: '🚨 אזעקת חובבת מילים',
+    bodyFemale: 'הפאזל של היום עוד לא פגש את ניצחו. את?' },
+  { title: '🏁 ספרינט עד חצות?', body: 'נשארו {hoursLeft} שעות לפתור. פחות אם תזדרז.',
+    bodyFemale: 'נשארו {hoursLeft} שעות לפתור. פחות אם תזדרזי.' },
 ];
 
 const SV: DailyReminderTemplate[] = [
@@ -99,10 +120,12 @@ const ES: DailyReminderTemplate[] = [
   { title: '¡Tic tac, mago de palabras! ⏰', body: 'El reto no se resuelve sólo. Quedan {hoursLeft}h en el reloj.' },
   { title: 'Giro inesperado 📖', body: 'Aún no has jugado hoy. Arréglalo en 60 segundos.' },
   { title: 'El tablero te extraña 🧩', body: 'Las letras están listas. Quedan {hoursLeft}h hasta que cierre.' },
-  { title: 'Un puzle. Tu nombre. ✍️', body: 'El reto diario está esperando un campeón.' },
+  { title: 'Un puzle. Tu nombre. ✍️', body: 'El reto diario está esperando un campeón.',
+    bodyFemale: 'El reto diario está esperando una campeona.' },
   { title: '¡Revisión de racha! 🔥', body: 'No dejes que se vayan {hoursLeft}h — mantén viva la cadena.' },
   { title: 'Tu reto se reportó enfermo 😷', body: '¡Mentira! Quiere pelea. Métete ya.' },
-  { title: '{hoursLeft}h restantes, mago de palabras 🧙', body: 'Una ronda rápida antes de que el tablero se reinicie.' },
+  { title: '{hoursLeft}h restantes, mago de palabras 🧙', body: 'Una ronda rápida antes de que el tablero se reinicie.',
+    titleFemale: '{hoursLeft}h restantes, maga de palabras 🧙' },
   { title: 'Las letras están chismeando 🤫', body: 'Dicen que las dejaste en visto. Demuéstrales que no.' },
   { title: '¡No dejes que hoy te ignore! 👻', body: '60 segundos. Eso es todo lo que necesita el reto.' },
   { title: 'Reto: sin resolver 🔍', body: '¿Llevará hoy tu nombre? Quedan {hoursLeft}h.' },

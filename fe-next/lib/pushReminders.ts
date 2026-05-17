@@ -32,6 +32,18 @@ const SMART_WINDOW_MINUTES = 60;
 export interface DailyPushRecipient {
   userId: string;
   locale: PushLocale;
+  /** Avatar gender for gendered-grammar copy (Hebrew, Spanish). Defaults to 'male' on the avatar schema, so missing/legacy rows fall through to the neutral/masculine template. */
+  gender?: 'male' | 'female';
+}
+
+/** Pull gender from a profiles.avatar_config jsonb row (defensive on legacy/null rows). */
+function extractGender(avatarConfig: unknown): 'male' | 'female' | undefined {
+  if (avatarConfig && typeof avatarConfig === 'object') {
+    const g = (avatarConfig as { gender?: unknown }).gender;
+    if (g === 'female') return 'female';
+    if (g === 'male') return 'male';
+  }
+  return undefined;
 }
 
 export async function getDailyChallengePushRecipients(): Promise<DailyPushRecipient[]> {
@@ -56,11 +68,12 @@ export async function getDailyChallengePushRecipients(): Promise<DailyPushRecipi
 
   const userIds = Array.from(new Set(tokens.map((t: { user_id: string }) => t.user_id)));
 
-  // Pull `language` alongside scheduling fields so the cron can avoid an
-  // N+1 round-trip to profiles for every getUserLocale() call downstream.
+  // Pull `language` + `avatar_config` alongside scheduling fields so the cron
+  // can avoid an N+1 round-trip downstream — locale + gender both come in one
+  // query.
   const { data: profiles, error: profilesErr } = await supabase
     .from('profiles')
-    .select('id, timezone, last_daily_push_sent_at, language')
+    .select('id, timezone, last_daily_push_sent_at, language, avatar_config')
     .in('id', userIds);
 
   if (profilesErr) {
@@ -131,6 +144,7 @@ export async function getDailyChallengePushRecipients(): Promise<DailyPushRecipi
     timezone: string | null;
     last_daily_push_sent_at: string | null;
     language: string | null;
+    avatar_config: unknown;
   }>) {
     if (playedIds.has(p.id)) continue;
     if (optedOut.has(p.id)) continue;
@@ -144,7 +158,8 @@ export async function getDailyChallengePushRecipients(): Promise<DailyPushRecipi
     if (localHour < REMINDER_HOUR_MIN || localHour > REMINDER_HOUR_MAX) continue;
 
     const locale: PushLocale = isPushLocale(p.language) ? p.language : 'en';
-    recipients.push({ userId: p.id, locale });
+    const gender = extractGender(p.avatar_config);
+    recipients.push({ userId: p.id, locale, ...(gender ? { gender } : {}) });
   }
 
   return recipients;
@@ -188,7 +203,7 @@ export async function getSmartDailyChallengePushRecipients(
   const [profilesRes, avgRes, puzzleRes, wordHuntRes, prefRes] = await Promise.all([
     supabase
       .from('profiles')
-      .select('id, timezone, last_daily_push_sent_at, language')
+      .select('id, timezone, last_daily_push_sent_at, language, avatar_config')
       .in('id', userIds),
     supabase
       .from('v_user_daily_play_avg')
@@ -230,6 +245,7 @@ export async function getSmartDailyChallengePushRecipients(
     timezone: string | null;
     last_daily_push_sent_at: string | null;
     language: string | null;
+    avatar_config: unknown;
   }>;
   if (profiles.length === 0) return [];
 
@@ -298,7 +314,8 @@ export async function getSmartDailyChallengePushRecipients(
     }
 
     const locale: PushLocale = isPushLocale(p.language) ? p.language : 'en';
-    recipients.push({ userId: p.id, locale });
+    const gender = extractGender(p.avatar_config);
+    recipients.push({ userId: p.id, locale, ...(gender ? { gender } : {}) });
   }
 
   return recipients;

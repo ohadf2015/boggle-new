@@ -25,11 +25,19 @@ export type { DailyReminderTemplate };
 export const DAILY_REMINDER_TEMPLATES: DailyReminderTemplate[] =
   DAILY_REMINDER_TEMPLATES_BY_LOCALE.en;
 
+export type ReminderGender = 'male' | 'female';
+
 export interface DailyReminderInput {
   userId: string;
   date: string; // YYYY-MM-DD
   hoursLeft: number;
   locale?: PushLocale;
+  /**
+   * Optional avatar gender. When 'female', uses the template's femaleTitle/
+   * bodyFemale override if present (Hebrew + Spanish have gendered grammar).
+   * Missing or 'male' uses the default masculine/neutral form.
+   */
+  gender?: ReminderGender;
 }
 
 export interface DailyReminderCopy {
@@ -52,7 +60,7 @@ function fill(template: string, hoursLeft: number): string {
 }
 
 export function pickDailyReminderCopy(input: DailyReminderInput): DailyReminderCopy {
-  const { userId, date, hoursLeft, locale } = input;
+  const { userId, date, hoursLeft, locale, gender } = input;
   const variant = hashString(`${userId}|${date}`) % DAILY_REMINDER_TEMPLATE_COUNT;
   const hours = Math.max(1, Math.round(hoursLeft));
   const deepLink = `/daily?src=push&v=${variant}&h=${hours}`;
@@ -61,9 +69,16 @@ export function pickDailyReminderCopy(input: DailyReminderInput): DailyReminderC
   const table = DAILY_REMINDER_TEMPLATES_BY_LOCALE[localeKey] ?? DAILY_REMINDER_TEMPLATES_BY_LOCALE.en;
   const t = table[variant] ?? table[0];
 
+  // Female-grammar override only fires when (a) avatar gender is female and
+  // (b) the template author provided a femaleTitle/bodyFemale string. Locales
+  // without grammar gender (en, sv, ja) carry no overrides and pass through.
+  const isFemale = gender === 'female';
+  const title = isFemale && t.titleFemale ? t.titleFemale : t.title;
+  const body = isFemale && t.bodyFemale ? t.bodyFemale : t.body;
+
   return {
-    title: fill(t.title, hours),
-    body: fill(t.body, hours),
+    title: fill(title, hours),
+    body: fill(body, hours),
     deepLink,
     variant,
   };

@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
       let rivalSent = 0;
       const results = await Promise.allSettled(
-        recipients.map(async ({ userId, locale }) => {
+        recipients.map(async ({ userId, locale, gender }) => {
           const rival = rivalsByUser.get(userId) ?? null;
           if (rival) {
             const copy = pickRivalReminderCopy({
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
             });
             return;
           }
-          const copy = pickDailyReminderCopy({ userId, date, hoursLeft, locale });
+          const copy = pickDailyReminderCopy({ userId, date, hoursLeft, locale, gender });
           await notifyDailyChallengeReminder(userId, {
             title: copy.title,
             body: copy.body,
