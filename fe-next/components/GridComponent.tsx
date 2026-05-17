@@ -592,7 +592,7 @@ const GridComponent = memo<GridComponentProps>(({
           dust={earthquakeDust}
         />
 
-        <GridConnectorOverlay selectedCells={selectedCells} gridEl={gridRef.current} />
+        <GridConnectorOverlay selectedCells={selectedCells} gridEl={gridRef.current} comboLevel={effectiveCombo} />
 
         {interactive && (
           <>

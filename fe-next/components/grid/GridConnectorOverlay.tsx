@@ -2,11 +2,15 @@
 
 import { useState, useEffect, useMemo, useRef, memo } from 'react';
 import type { SelectedCell } from './types';
+import { getSelectionEscalation } from './selectionEscalation';
 
 interface Props {
   selectedCells: SelectedCell[];
   gridEl: HTMLDivElement | null;
   color?: string;
+  /** Same value GridCell uses for its lift transform — keeps line endpoints
+   *  glued to the visible (lifted) tile center instead of the layout center. */
+  comboLevel?: number;
 }
 
 interface Point { x: number; y: number; }
@@ -17,11 +21,20 @@ interface Point { x: number; y: number; }
  * Perf: per-cell getBoundingClientRect on every selection change forced a
  * synchronous layout flush per drag step. On mid-tier mobile during MP
  * classic, this stacked with socket-burst re-renders into visible drag
- * stutter. We now measure each cell's center once on mount and on resize,
+ * stutter. We measure each cell's center once on mount and on resize,
  * cache by `${row}-${col}`, and look up by key during drag — zero layout
  * reads per drag tick.
+ *
+ * Alignment: cached centers are layout-rest. Selected tiles get a
+ * Framer Motion `y: liftY` translate (−2..−10 px, varies per selection
+ * index + combo via getSelectionEscalation). We mirror that math here
+ * so line endpoints track the visible lifted tile center instead of
+ * sitting below it.
+ *
+ * Render: one <polyline> not N <line>s — single DOM node + attribute
+ * update per drag step, vs N keyed-child diffs.
  */
-const GridConnectorOverlay = memo<Props>(({ selectedCells, gridEl, color = '#BFFF00' }) => {
+const GridConnectorOverlay = memo<Props>(({ selectedCells, gridEl, color = '#BFFF00', comboLevel = 0 }) => {
   const [size, setSize] = useState({ w: 0, h: 0 });
   const centersRef = useRef<Map<string, Point>>(new Map());
   const [measureTick, setMeasureTick] = useState(0);
@@ -59,22 +72,28 @@ const GridConnectorOverlay = memo<Props>(({ selectedCells, gridEl, color = '#BFF
     };
   }, [gridEl]);
 
-  const points = useMemo<Point[]>(() => {
+  const pointsStr = useMemo<string>(() => {
     // measureTick is the explicit invalidation signal for centersRef.current
     // (a mutable ref ESLint can't reason about). Reading it here keeps the
     // exhaustive-deps rule happy + makes the cache-bust intent obvious.
     void measureTick;
-    if (!gridEl || selectedCells.length < 2) return [];
-    const pts: Point[] = [];
+    if (!gridEl || selectedCells.length < 2) return '';
     const centers = centersRef.current;
-    for (const cell of selectedCells) {
+    const len = selectedCells.length;
+    let out = '';
+    for (let i = 0; i < len; i++) {
+      const cell = selectedCells[i];
       const p = centers.get(`${cell.row}-${cell.col}`);
-      if (p) pts.push(p);
+      if (!p) continue;
+      // Mirror GridCell's `y: liftY` transform so the line endpoint sits
+      // on the visible lifted tile center, not the layout rest center.
+      const liftY = getSelectionEscalation(i, len, comboLevel).liftY;
+      out += (out ? ' ' : '') + `${p.x},${p.y + liftY}`;
     }
-    return pts;
-  }, [selectedCells, gridEl, measureTick]);
+    return out;
+  }, [selectedCells, gridEl, measureTick, comboLevel]);
 
-  if (!gridEl || points.length < 2) return null;
+  if (!gridEl || !pointsStr) return null;
 
   return (
     <svg
@@ -82,18 +101,15 @@ const GridConnectorOverlay = memo<Props>(({ selectedCells, gridEl, color = '#BFF
       viewBox={`0 0 ${size.w} ${size.h}`}
       preserveAspectRatio="none"
     >
-      {points.slice(1).map((p, i) => (
-        <line
-          key={i}
-          x1={points[i].x} y1={points[i].y}
-          x2={p.x} y2={p.y}
-          stroke={color}
-          strokeWidth="4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          opacity="0.85"
-        />
-      ))}
+      <polyline
+        points={pointsStr}
+        fill="none"
+        stroke={color}
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity="0.85"
+      />
     </svg>
   );
 });
