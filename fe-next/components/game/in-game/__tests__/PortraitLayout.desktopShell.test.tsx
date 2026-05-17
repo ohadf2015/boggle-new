@@ -37,6 +37,9 @@ vi.mock('../components/WordFormingAreaConnected', () => ({
 vi.mock('../../ComboDisplay', () => ({
   default: () => <div data-testid="combo-display" />,
 }));
+vi.mock('../../ComboDisplayConnected', () => ({
+  ComboDisplayConnected: () => <div data-testid="combo-display-connected" />,
+}));
 
 vi.mock('../../CompactLeaderboard', () => ({
   default: () => <div data-testid="compact-leaderboard" />,
@@ -157,8 +160,7 @@ describe('PortraitLayout desktop-shell timer suppression', () => {
     showStartAnimation: false,
     gameLanguage: 'en' as const,
     comboLevel: 0,
-    comboTimeRemaining: null,
-    comboDanger: false,
+    lastWordTime: null,
     fireRoundActive: false,
     minWordLength: 2,
     hasAnimated: true,

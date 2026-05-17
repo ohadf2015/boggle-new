@@ -85,6 +85,9 @@ vi.mock('@/components/game/ComboDisplay', () => {
   };
   return { default: MockCombo };
 });
+vi.mock('@/components/game/ComboDisplayConnected', () => ({
+  ComboDisplayConnected: () => <div>ComboDisplayConnected</div>,
+}));
 vi.mock('@/components/game/CompactLeaderboard', () => {
   const MockLeaderboard = () => {
     return <div>CompactLeaderboard</div>;
@@ -174,8 +177,7 @@ const baseProps = {
   showStartAnimation: false,
   gameLanguage: 'en' as const,
   comboLevel: 0,
-  comboTimeRemaining: null,
-  comboDanger: false,
+  lastWordTime: null,
   fireRoundActive: false,
   minWordLength: 3,
   hasAnimated: true,

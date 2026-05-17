@@ -69,8 +69,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   minWordLength = 2,
   comboLevel = 0,
   comboLevelRef,
-  comboTimeRemaining = null,
-  comboDanger = false,
+  lastWordTime = null,
 
   // Player data
   foundWords = [],
@@ -524,8 +523,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     showStartAnimation,
     gameLanguage: gameLanguage || 'en',
     comboLevel,
-    comboTimeRemaining,
-    comboDanger,
+    lastWordTime,
     fireRoundActive,
     hasAnimated: hasAnimatedRef.current,
     earthquakeState,

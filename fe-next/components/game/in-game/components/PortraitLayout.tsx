@@ -12,7 +12,7 @@ import CircularTimer from '@/components/CircularTimer';
 import RoomChat from '@/components/RoomChat';
 import { type WordFeedback } from '../../WordFormingArea';
 import { WordFormingAreaConnected } from './WordFormingAreaConnected';
-import ComboDisplay from '../../ComboDisplay';
+import { ComboDisplayConnected } from '../../ComboDisplayConnected';
 import CompactLeaderboard from '../../CompactLeaderboard';
 import { useBlastComboSync } from '@/hooks/gameState/store';
 import { shouldShowKeyboardTrails } from '../../keyboardTrailsUtils';
@@ -66,8 +66,13 @@ interface PortraitLayoutProps {
   showStartAnimation: boolean;
   gameLanguage: Language;
   comboLevel: number;
-  comboTimeRemaining: number | null;
-  comboDanger: boolean;
+  /**
+   * Timestamp of the last accepted word — drives the combo-window countdown
+   * inside `ComboDisplayConnected`. The ~10 Hz RAF state used to live in
+   * `PlayerView` and cascade through 4 memo boundaries down to ComboDisplay;
+   * pushing the subscription down keeps drag-time re-renders cheap.
+   */
+  lastWordTime: number | null;
   fireRoundActive: boolean;
   minWordLength: number;
 
@@ -180,8 +185,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   showStartAnimation,
   gameLanguage,
   comboLevel,
-  comboTimeRemaining,
-  comboDanger,
+  lastWordTime,
   fireRoundActive,
   minWordLength,
   hasAnimated,
@@ -413,11 +417,10 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   className="flex lg:hidden justify-center items-center h-[32px]"
                   data-testid="combo-row-mobile"
                 >
-                  <ComboDisplay
+                  <ComboDisplayConnected
                     comboLevel={comboLevel}
+                    lastWordTime={lastWordTime}
                     compact
-                    timeRemaining={comboTimeRemaining}
-                    isDanger={comboDanger}
                   />
                 </div>
               )}
@@ -488,11 +491,10 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   >
                     <div className="h-[32px] flex items-center justify-end">
                       {comboLevel > 0 ? (
-                        <ComboDisplay
+                        <ComboDisplayConnected
                           comboLevel={comboLevel}
+                          lastWordTime={lastWordTime}
                           compact
-                          timeRemaining={comboTimeRemaining}
-                          isDanger={comboDanger}
                         />
                       ) : (
                         <AdaptiveMotion.div
