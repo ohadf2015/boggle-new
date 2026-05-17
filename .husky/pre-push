@@ -41,15 +41,24 @@ PID_LINT=$!
 PID_TSC=$!
 
 # Tests (backend + frontend in parallel within this job)
+#
+# --no-file-parallelism is required: vitest 4.x's experimental cache dir
+# (`node_modules/.experimental-vitest-cache`) races between worker threads,
+# producing 1000+ phantom ENOENT failures on large fan-outs (e.g. when a
+# hub component is touched and --changed pulls 1000+ test files). Serial
+# execution eliminates the race; cache is wiped before each run so the
+# next worker pool starts clean.
 (
   FAIL=0
 
+  rm -rf node_modules/.experimental-vitest-cache 2>/dev/null
+
   if [ -n "$BACKEND_FILES" ]; then
-    ./node_modules/.bin/vitest run --config=backend/vitest.config.ts --reporter=verbose --changed origin/master --passWithNoTests 2>&1 || FAIL=1
+    ./node_modules/.bin/vitest run --config=backend/vitest.config.ts --reporter=verbose --changed origin/master --passWithNoTests --no-file-parallelism 2>&1 || FAIL=1
   fi
 
   if [ -n "$FRONTEND_FILES" ]; then
-    ./node_modules/.bin/vitest run --reporter=verbose --changed origin/master --passWithNoTests 2>&1 || FAIL=1
+    ./node_modules/.bin/vitest run --reporter=verbose --changed origin/master --passWithNoTests --no-file-parallelism 2>&1 || FAIL=1
   fi
 
   if [ -z "$BACKEND_FILES" ] && [ -z "$FRONTEND_FILES" ]; then
