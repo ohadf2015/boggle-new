@@ -12003,6 +12003,51 @@ const sv = {
       "endgameHint": "+2 vardera vid spelets slut",
       "captureYou": "Erövrade {{count}} — +{{bonus}}!",
       "captureBot": "Boten erövrade {{count}} — +{{bonus}}!"
+    },
+    "gems": {
+      "title": "Ädelstensjakt",
+      "hud": {
+        "crownsWon": "Kronor",
+        "score": "Poäng",
+        "turn": "Drag"
+      },
+      "inventory": {
+        "title": "Förråd",
+        "transmuteCta": "Kombinera 3",
+        "transmuteAria": "Kombinera 3 för uppgradering",
+        "crownGoal": "Skaffa 1 krona av varje färg"
+      },
+      "shop": {
+        "title": "Butik",
+        "cost": "Kostnad",
+        "insufficient": "Sten saknas",
+        "purchased": "Köpt"
+      },
+      "ability": {
+        "portal": {
+          "name": "Portal",
+          "desc": "Markera två rutor för att länka en väg över brädet."
+        },
+        "joker": {
+          "name": "Joker",
+          "desc": "Förvandla en bricka till wildcard detta drag."
+        },
+        "reroll": {
+          "name": "Slå om",
+          "desc": "Byt ut butikens erbjudanden mot nya."
+        }
+      },
+      "win": {
+        "titleWon": "Alla 4 kronor!",
+        "titleLost": "Slut på brickor",
+        "subtitleWon": "Du samlade alla kronstenar. Jakten klar.",
+        "subtitleLost": "Påsen tog slut innan du hann färdigt. Försök igen!",
+        "restart": "Ny jakt"
+      },
+      "error": {
+        "insufficientGems": "Inte tillräckligt med stenar för förmågan.",
+        "cannotTransmute": "Behöver 3 av samma sällsynthet för att kombinera."
+      }
     }
   },
   mp: {

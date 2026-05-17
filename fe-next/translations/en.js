@@ -11879,6 +11879,51 @@ const en = {
       "endgameHint": "+2 each at game end",
       "captureYou": "Captured {{count}} — +{{bonus}}!",
       "captureBot": "Bot captured {{count}} — +{{bonus}}!"
+    },
+    "gems": {
+      "title": "Gem Hunt",
+      "hud": {
+        "crownsWon": "Crowns",
+        "score": "Score",
+        "turn": "Turn"
+      },
+      "inventory": {
+        "title": "Inventory",
+        "transmuteCta": "Combine 3",
+        "transmuteAria": "Combine 3 to upgrade",
+        "crownGoal": "Get 1 crown of each color"
+      },
+      "shop": {
+        "title": "Shop",
+        "cost": "Cost",
+        "insufficient": "Need gem",
+        "purchased": "Bought"
+      },
+      "ability": {
+        "portal": {
+          "name": "Portal",
+          "desc": "Mark two tiles to link a path across the board."
+        },
+        "joker": {
+          "name": "Joker",
+          "desc": "Turn one rack tile into a wildcard this turn."
+        },
+        "reroll": {
+          "name": "Reroll",
+          "desc": "Replace the shop offers with new ones."
+        }
+      },
+      "win": {
+        "titleWon": "All 4 Crowns!",
+        "titleLost": "Out of Tiles",
+        "subtitleWon": "You collected every crown gem. Hunt complete.",
+        "subtitleLost": "Bag emptied before you could finish. Try again!",
+        "restart": "New Hunt"
+      },
+      "error": {
+        "insufficientGems": "Not enough gems for that ability.",
+        "cannotTransmute": "Need 3 of the same rarity to combine."
+      }
     }
   },
   mp: {

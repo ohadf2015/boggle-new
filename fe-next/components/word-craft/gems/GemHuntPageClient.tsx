@@ -1,0 +1,262 @@
+'use client';
+
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Gem as GemLucide } from 'lucide-react';
+import Header from '@/components/Header';
+import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
+import { PageLoader } from '@/components/ui/PageLoader';
+import { useGemHunt } from '@/lib/word-craft/gems/useGemHunt';
+import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
+import type { SupportedLocale } from '@/lib/word-craft/tileBag';
+import { WordCraftBoard } from '@/components/word-craft/WordCraftBoard';
+import { WordCraftRack } from '@/components/word-craft/WordCraftRack';
+import { GemHuntHUD } from './GemHuntHUD';
+import { GemInventory } from './GemInventory';
+import { GemShop } from './GemShop';
+import { GemCellOverlay } from './GemCellOverlay';
+import { GemHuntWinScene } from './GemHuntWinScene';
+import { cn } from '@/lib/utils';
+import type { AbilityKind } from '@/lib/word-craft/gems/types';
+
+export default function GemHuntPageClient() {
+  const router = useRouter();
+  const { t, language } = useLanguage();
+  const isRTL = language === 'he';
+  const locale = (language ?? 'en') as SupportedLocale;
+
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
+
+  const [dict, setDict] = useState<Set<string> | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    loadWordCraftDictionary(locale).then((d) => {
+      if (!cancelled) setDict(d);
+    }).catch(() => {
+      if (!cancelled) setDict(new Set());
+    });
+    return () => { cancelled = true; };
+  }, [locale]);
+
+  const [seed] = useState(() => {
+    if (typeof window === 'undefined') return 1;
+    const fromUrl = new URLSearchParams(window.location.search).get('seed');
+    return fromUrl ? Number(fromUrl) : Math.floor(Math.random() * 1_000_000);
+  });
+
+  const hunt = useGemHunt({ seed, dict, locale, boardSize: 11 });
+  const { state } = hunt;
+
+  const tilesRemaining = state.bag.tiles.length;
+
+  // Build the i18n bundle once per locale.
+  const abilityName: Record<AbilityKind, string> = {
+    portal: t('wordcraft.gems.ability.portal.name'),
+    joker: t('wordcraft.gems.ability.joker.name'),
+    reroll: t('wordcraft.gems.ability.reroll.name'),
+  };
+  const abilityDesc: Record<AbilityKind, string> = {
+    portal: t('wordcraft.gems.ability.portal.desc'),
+    joker: t('wordcraft.gems.ability.joker.desc'),
+    reroll: t('wordcraft.gems.ability.reroll.desc'),
+  };
+
+  const pendingPlacementSet = useMemo(
+    () => new Set(state.pendingPlacements.map((p) => p.rackTileId)),
+    [state.pendingPlacements],
+  );
+
+  const handleCellClick = useCallback(
+    (row: number, col: number) => hunt.placeOnBoard(row, col),
+    [hunt],
+  );
+
+  const handleRecallPending = useCallback(
+    (rackTileId: string) => hunt.recallTile(rackTileId),
+    [hunt],
+  );
+
+  const handleSubmit = useCallback(() => hunt.submitMove(), [hunt]);
+  const handleRecallAll = useCallback(() => hunt.recallAll(), [hunt]);
+  const handleRestart = useCallback(() => {
+    window.location.reload();
+  }, []);
+
+  const errorMessage = (() => {
+    const e = state.lastError;
+    if (!e) return null;
+    if (e === 'DICT_LOADING') return t('wordcraft.error.dictLoading');
+    if (e === 'INSUFFICIENT_GEMS') return t('wordcraft.gems.error.insufficientGems');
+    if (e === 'CANNOT_TRANSMUTE') return t('wordcraft.gems.error.cannotTransmute');
+    if (e.startsWith('INVALID_WORD:')) return t('wordcraft.error.invalidWord', { word: e.slice('INVALID_WORD:'.length) });
+    if (e === 'FIRST_MOVE_MUST_COVER_CENTER') return t('wordcraft.error.mustCoverCenter');
+    if (e === 'FIRST_MOVE_TOO_SHORT') return t('wordcraft.error.tooShort');
+    if (e === 'NOT_LINEAR') return t('wordcraft.error.notLinear');
+    if (e === 'NOT_CONTIGUOUS') return t('wordcraft.error.notContiguous');
+    if (e === 'DISCONNECTED') return t('wordcraft.error.disconnected');
+    if (e === 'OUT_OF_BOUNDS') return t('wordcraft.error.outOfBounds');
+    return e;
+  })();
+
+  return (
+    <div
+      className={cn(
+        'flex flex-col w-full h-svh overflow-hidden relative',
+        'bg-neo-navy texture-halftone',
+        isRTL && 'rtl',
+      )}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[200px] bg-gradient-to-b from-neo-cyan/15 via-neo-yellow/8 to-transparent"
+      />
+      <Header />
+
+      <main className="flex-1 min-h-0 px-2 py-1 max-w-[820px] mx-auto w-full flex flex-col gap-1.5 relative">
+        <div className="flex items-center gap-2 shrink-0">
+          <Button variant="outline" size="sm" onClick={() => router.push(`/${language}`)} className="shrink-0 h-8 px-2">
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+          <span aria-hidden className="inline-flex items-center justify-center w-7 h-7 rounded-neo bg-neo-cyan text-neo-navy border-2 border-black shadow-hard-sm rotate-[-4deg]">
+            <GemLucide className="w-4 h-4" />
+          </span>
+          <h1 className="text-lg font-neo-display font-black text-neo-white tracking-tight">
+            {t('wordcraft.gems.title')}
+          </h1>
+          <span className="px-1.5 py-0.5 text-[9px] font-neo-display font-black uppercase tracking-widest bg-neo-yellow text-neo-navy rounded border-2 border-black shadow-hard-sm rotate-[3deg]">
+            BETA
+          </span>
+        </div>
+
+        {!dict ? (
+          <div className="flex items-center gap-2 px-2 py-1 bg-neo-navy-light border-2 border-black rounded-neo shrink-0">
+            <PageLoader size="sm" />
+            <span className="text-xs text-neo-cream">{t('wordcraft.loadingDict')}</span>
+          </div>
+        ) : null}
+
+        <GemHuntHUD
+          inventory={state.inventory}
+          totalScore={state.totalScore}
+          tilesRemaining={tilesRemaining}
+          turnIndex={state.turnIndex}
+          labels={{
+            crownsWon: t('wordcraft.gems.hud.crownsWon'),
+            score: t('wordcraft.gems.hud.score'),
+            bagRemaining: t('wordcraft.bagRemaining'),
+            turn: t('wordcraft.gems.hud.turn'),
+          }}
+        />
+
+        <GemShop
+          shop={state.shop}
+          inventory={state.inventory}
+          pendingAbilities={state.pendingAbilities}
+          onBuy={hunt.buyAbility}
+          onReroll={hunt.rerollShop}
+          labels={{
+            title: t('wordcraft.gems.shop.title'),
+            cost: t('wordcraft.gems.shop.cost'),
+            insufficient: t('wordcraft.gems.shop.insufficient'),
+            purchased: t('wordcraft.gems.shop.purchased'),
+            abilityName,
+            abilityDesc,
+          }}
+        />
+
+        {/* Board with gem overlay */}
+        <div
+          className="flex-1 min-h-0 flex items-center justify-center"
+          style={{ containerType: 'size' }}
+        >
+          <div className="relative aspect-square" style={{ width: '100cqmin', height: '100cqmin' }}>
+            <WordCraftBoard
+              board={state.board}
+              pendingPlacements={state.pendingPlacements}
+              onCellClick={handleCellClick}
+              onRecallPending={handleRecallPending}
+              disabled={state.outcome !== null || !dict}
+              hasSelectedTile={!!state.selectedRackTileId}
+              isFirstMove={state.turnIndex === 0 && state.pendingPlacements.length === 0}
+              locale={locale}
+            />
+            <GemCellOverlay gemCells={state.gemCells} />
+          </div>
+        </div>
+
+        <GemInventory
+          inventory={state.inventory}
+          onTransmute={hunt.transmuteGem}
+          labels={{
+            title: t('wordcraft.gems.inventory.title'),
+            transmuteCta: t('wordcraft.gems.inventory.transmuteCta'),
+            transmuteAria: t('wordcraft.gems.inventory.transmuteAria'),
+            crownGoal: t('wordcraft.gems.inventory.crownGoal'),
+          }}
+        />
+
+        <WordCraftRack
+          tiles={state.rack}
+          selectedId={state.selectedRackTileId}
+          pendingIds={pendingPlacementSet}
+          onSelect={hunt.selectRackTile}
+          disabled={state.outcome !== null || !dict}
+          ariaLabel={t('wordcraft.yourRack')}
+          locale={locale}
+        />
+
+        <div className="flex gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={state.pendingPlacements.length === 0 || !dict || state.outcome !== null}
+            className="flex-1 rounded-neo border-neo-thick border-black bg-neo-lime px-3 py-2 font-neo-display text-sm font-black uppercase tracking-wider text-neo-navy shadow-hard disabled:opacity-50 disabled:cursor-not-allowed active:translate-y-0.5 active:shadow-hard-pressed"
+          >
+            {t('wordcraft.submit')}
+          </button>
+          <button
+            type="button"
+            onClick={handleRecallAll}
+            disabled={state.pendingPlacements.length === 0}
+            className="rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-2 font-neo-display text-sm font-black uppercase tracking-wider text-neo-cream shadow-hard disabled:opacity-50"
+          >
+            {t('wordcraft.recall')}
+          </button>
+        </div>
+      </main>
+
+      {errorMessage ? (
+        <div
+          role="alert"
+          className="absolute left-1/2 -translate-x-1/2 top-[calc(72px+8px)] z-40 max-w-[90%] px-3 py-2 bg-neo-red/95 border-2 border-black text-white text-sm rounded-neo shadow-hard-lg font-neo-body"
+        >
+          {errorMessage}
+        </div>
+      ) : null}
+
+      {state.outcome !== null ? (
+        <GemHuntWinScene
+          totalScore={state.totalScore}
+          turnIndex={state.turnIndex}
+          outcome={state.outcome}
+          onRestart={handleRestart}
+          labels={{
+            titleWon: t('wordcraft.gems.win.titleWon'),
+            titleLost: t('wordcraft.gems.win.titleLost'),
+            subtitleWon: t('wordcraft.gems.win.subtitleWon'),
+            subtitleLost: t('wordcraft.gems.win.subtitleLost'),
+            score: t('wordcraft.gems.hud.score'),
+            turns: t('wordcraft.gems.hud.turn'),
+            restart: t('wordcraft.gems.win.restart'),
+          }}
+        />
+      ) : null}
+    </div>
+  );
+}

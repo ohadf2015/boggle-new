@@ -12100,6 +12100,51 @@ const he = {
       "endgameHint": "+2 לכל אריח בסוף המשחק",
       "captureYou": "כבשת {{count}} — +{{bonus}}!",
       "captureBot": "הבוט כבש {{count}} — +{{bonus}}!"
+    },
+    "gems": {
+      "title": "ציד אבני חן",
+      "hud": {
+        "crownsWon": "כתרים",
+        "score": "ניקוד",
+        "turn": "תור"
+      },
+      "inventory": {
+        "title": "מלאי",
+        "transmuteCta": "שלב 3",
+        "transmuteAria": "שלב 3 כדי לשדרג",
+        "crownGoal": "השג כתר אחד מכל צבע"
+      },
+      "shop": {
+        "title": "חנות",
+        "cost": "מחיר",
+        "insufficient": "חסר אבן",
+        "purchased": "נקנה"
+      },
+      "ability": {
+        "portal": {
+          "name": "שער",
+          "desc": "סמן שני אריחים כדי לקשר נתיב על הלוח."
+        },
+        "joker": {
+          "name": "ג׳וקר",
+          "desc": "הפוך אריח אחד לאות חופשית בתור זה."
+        },
+        "reroll": {
+          "name": "גלגול מחדש",
+          "desc": "החלף את הצעות החנות בחדשות."
+        }
+      },
+      "win": {
+        "titleWon": "כל 4 הכתרים!",
+        "titleLost": "נגמרו האריחים",
+        "subtitleWon": "אספת את כל כתרי האבן. הציד הושלם.",
+        "subtitleLost": "השק התרוקן לפני הסיום. נסה שוב!",
+        "restart": "ציד חדש"
+      },
+      "error": {
+        "insufficientGems": "אין מספיק אבנים ליכולת.",
+        "cannotTransmute": "נדרשות 3 מאותה דרגה לשילוב."
+      }
     }
   },
   mp: {

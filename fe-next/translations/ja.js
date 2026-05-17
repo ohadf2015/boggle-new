@@ -11977,6 +11977,51 @@ const ja = {
       "endgameHint": "ゲーム終了時に各 +2",
       "captureYou": "{{count}} 占領 — +{{bonus}}!",
       "captureBot": "ボットが {{count}} 占領 — +{{bonus}}!"
+    },
+    "gems": {
+      "title": "ジェムハント",
+      "hud": {
+        "crownsWon": "クラウン",
+        "score": "スコア",
+        "turn": "ターン"
+      },
+      "inventory": {
+        "title": "インベントリ",
+        "transmuteCta": "3つを合成",
+        "transmuteAria": "3つを合成してアップグレード",
+        "crownGoal": "各色のクラウンを1つ集める"
+      },
+      "shop": {
+        "title": "ショップ",
+        "cost": "コスト",
+        "insufficient": "ジェム不足",
+        "purchased": "購入済"
+      },
+      "ability": {
+        "portal": {
+          "name": "ポータル",
+          "desc": "2つのマスを指定してボード上の経路をつなぐ。"
+        },
+        "joker": {
+          "name": "ジョーカー",
+          "desc": "ラックのタイルを今ターン中ワイルドにする。"
+        },
+        "reroll": {
+          "name": "リロール",
+          "desc": "ショップの提供を新しいものに入れ替える。"
+        }
+      },
+      "win": {
+        "titleWon": "4つのクラウン獲得！",
+        "titleLost": "タイル切れ",
+        "subtitleWon": "すべてのクラウンジェムを集めました。ハント完了。",
+        "subtitleLost": "袋が空になりました。もう一度挑戦しよう！",
+        "restart": "新しいハント"
+      },
+      "error": {
+        "insufficientGems": "アビリティ用のジェムが足りません。",
+        "cannotTransmute": "合成には同レアリティが3つ必要です。"
+      }
     }
   },
   mp: {

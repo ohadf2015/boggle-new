@@ -12101,6 +12101,51 @@ const es = {
       "endgameHint": "+2 cada uno al final",
       "captureYou": "¡Capturaste {{count}} — +{{bonus}}!",
       "captureBot": "¡El bot capturó {{count}} — +{{bonus}}!"
+    },
+    "gems": {
+      "title": "Caza de Gemas",
+      "hud": {
+        "crownsWon": "Coronas",
+        "score": "Puntos",
+        "turn": "Turno"
+      },
+      "inventory": {
+        "title": "Inventario",
+        "transmuteCta": "Combinar 3",
+        "transmuteAria": "Combina 3 para mejorar",
+        "crownGoal": "Consigue 1 corona de cada color"
+      },
+      "shop": {
+        "title": "Tienda",
+        "cost": "Coste",
+        "insufficient": "Falta gema",
+        "purchased": "Comprado"
+      },
+      "ability": {
+        "portal": {
+          "name": "Portal",
+          "desc": "Marca dos casillas para enlazar un camino en el tablero."
+        },
+        "joker": {
+          "name": "Comodín",
+          "desc": "Convierte una ficha en comodín este turno."
+        },
+        "reroll": {
+          "name": "Rerrolar",
+          "desc": "Reemplaza las ofertas de la tienda."
+        }
+      },
+      "win": {
+        "titleWon": "¡4 coronas!",
+        "titleLost": "Sin fichas",
+        "subtitleWon": "Recolectaste todas las gemas corona. Caza completada.",
+        "subtitleLost": "Se vació la bolsa antes de terminar. ¡Inténtalo de nuevo!",
+        "restart": "Nueva caza"
+      },
+      "error": {
+        "insufficientGems": "Gemas insuficientes para esa habilidad.",
+        "cannotTransmute": "Necesitas 3 de la misma rareza para combinar."
+      }
     }
   },
   "connections": {
