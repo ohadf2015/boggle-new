@@ -97,11 +97,18 @@ export const RollingNumber = memo(function RollingNumber({
   }, [value, animateOnChange, springValue]);
 
   useEffect(() => {
+    // Guard: in some test environments useTransform returns a stub without
+    // `.on` (jsdom + framer-motion v12 under React strict-mode double-render);
+    // fall back to displaying the value directly so we don't throw.
+    if (typeof roundedValue?.on !== 'function') {
+      setDisplayValue(value);
+      return;
+    }
     const unsubscribe = roundedValue.on('change', (latest) => {
       setDisplayValue(latest);
     });
     return unsubscribe;
-  }, [roundedValue]);
+  }, [roundedValue, value]);
 
   const { language } = useLanguageSafe();
   const formattedValue = compact

@@ -63,6 +63,11 @@ PID_TSC=$!
 
   rm -rf node_modules/.experimental-vitest-cache 2>/dev/null
 
+  # NODE_OPTIONS bumps heap to 8GB — required when --changed fans out to
+  # 1000+ test files (hub-component edits) and serial execution accumulates
+  # memory across files, otherwise vitest gets OOM-killed mid-run.
+  export NODE_OPTIONS="${NODE_OPTIONS:-} --max-old-space-size=8192"
+
   if [ -n "$BACKEND_FILES" ]; then
     ./node_modules/.bin/vitest run --config=backend/vitest.config.ts --reporter=verbose --changed origin/master --passWithNoTests --no-file-parallelism 2>&1 || FAIL=1
   fi
