@@ -1,25 +1,36 @@
 /**
  * Rival lookup for the daily-challenge push reminder.
  *
- * For each recipient userId, finds the closest-by-total_score leaderboard
+ * For each recipient userId, finds the closest-by-DAILY-SEASON-SCORE leaderboard
  * neighbour who already completed today's daily (puzzle or word-hunt). Cron
  * uses the result to swap in a rival-themed push (witty "X already crushed
  * it, your move" copy + rival name/score) instead of the neutral mascot copy.
  *
+ * Score basis: sum of `daily_puzzle_attempts.score` over the CURRENT SEASON
+ * window per player — not lifetime, not all-modes leaderboard.total_score
+ * (which mixes MP/blast/etc). The gap in the push copy reflects how the
+ * rival is doing in the daily challenge for this season, which is the
+ * comparison frame the player actually cares about for THIS push.
+ *
+ * Word-hunt has no numeric score column — solves count as "completed today"
+ * (rival pool membership) but contribute 0 to the gap. A word-hunt-only
+ * rival can still surface if their prior-day daily-puzzle aggregate puts
+ * them within the floor; otherwise the cap drops them naturally.
+ *
+ * Caveat: `rankDelta` is still derived from `leaderboard.rank_position`
+ * (all-modes season rank). Copy that combines gap + rank can read oddly —
+ * tighten in a follow-up if it surfaces in QA.
+ *
  * Returns Map<userId, RivalCandidate | null>. Null = no actionable rival
- * (recipient missing from leaderboard, or no completers at all).
+ * (recipient missing from leaderboard, no current season, or no completers).
  *
  * Avatar handling: the modern avatar is a JSONB `avatar_config` rendered
- * client-side as SVG — there is no hosted PNG endpoint, so we cannot send
- * the rival's actual face to FCM today. `avatarImage` resolves to the
- * leaderboard column ONLY when it already happens to be an https URL
- * (legacy users); otherwise null and the push trigger falls back to the
- * mascot. The rival-themed COPY fires either way — that is the whole
- * point of "dynamic rival".
+ * client-side as SVG. Server-render path lives at `/api/avatar/png/[id]`;
+ * `avatarImage` falls back to legacy https avatar_image otherwise.
  *
- * Performance: 3 queries (leaderboard, puzzle attempts, word-hunt attempts)
- * regardless of recipient count. Caller is the hourly cron, so amortized
- * per-tick cost is bounded.
+ * Performance: 5 queries per tick (RPC season-id, seasons row, today
+ * puzzle, today word-hunt, leaderboard, season-window puzzle scores) —
+ * still bounded by lbIds.in() filter. Caller is the hourly cron.
  */
 
 import logger from '@/backend/utils/logger';
@@ -48,20 +59,32 @@ export interface RivalCandidate {
 }
 
 /**
- * Resolve a `leaderboard.avatar_image` into an HTTPS URL FCM can show.
+ * Resolve a rival's avatar to an HTTPS URL that FCM can fetch.
  *
- * The modern avatar lives in `avatar_config` (JSONB, client-rendered SVG) —
- * we do NOT have a server-rendered PNG endpoint for it yet, so this only
- * returns a URL for legacy users whose `avatar_image` column already holds
- * a hosted https URL (e.g. OAuth profile pictures). Anything else → null,
- * and notifyDailyChallengeReminder defaults to the encouraging mascot.
+ * Order of preference:
+ *   1. Modern path — `avatar_config` (JSONB) → server-rendered PNG via
+ *      `/api/avatar/png/[playerId]`. Most production users have this.
+ *   2. Legacy path — `avatar_image` already an https URL (OAuth profile
+ *      pictures from Google sign-in).
+ *   3. null — mascot fallback in `notifyDailyChallengeReminder`.
  *
- * Exported for tests so we can lock down the "rival copy fires even when
- * avatar resolves to null" contract.
+ * `playerId` is required for the PNG endpoint URL. `baseUrl` defaults to
+ * `NEXT_PUBLIC_APP_URL` and falls back to the production host.
  */
-export function resolveRivalAvatarUrl(raw: string | null | undefined): string | null {
-  if (!raw) return null;
-  if (raw.startsWith('https://')) return raw;
+export function resolveRivalAvatarUrl(
+  rawAvatarImage: string | null | undefined,
+  avatarConfig: unknown,
+  playerId: string,
+  baseUrlOverride?: string
+): string | null {
+  const baseUrl =
+    baseUrlOverride ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    'https://lexiclash.live';
+  if (avatarConfig && typeof avatarConfig === 'object') {
+    return `${baseUrl.replace(/\/$/, '')}/api/avatar/png/${encodeURIComponent(playerId)}`;
+  }
+  if (rawAvatarImage && rawAvatarImage.startsWith('https://')) return rawAvatarImage;
   return null;
 }
 
@@ -69,7 +92,7 @@ interface LeaderboardRow {
   player_id: string;
   username: string | null;
   avatar_image: string | null;
-  total_score: number | null;
+  avatar_config: unknown;
   rank_position: number | null;
 }
 
@@ -86,6 +109,49 @@ export async function findDailyChallengeRivals(
   }
 
   const today = getTodayDate();
+
+  // Resolve current season window first — score basis is sum of
+  // daily_puzzle_attempts.score over [start_date, end_date]. No current
+  // season → no rival pushes this tick (fail-soft).
+  const seasonIdResp = await (
+    supabase as unknown as { rpc: (n: string) => Promise<{ data: unknown; error: unknown }> }
+  ).rpc('get_current_season_id');
+  const seasonId =
+    typeof seasonIdResp?.data === 'number' ? (seasonIdResp.data as number) : null;
+  let seasonStart: string | null = null;
+  let seasonEnd: string | null = null;
+  if (seasonId !== null) {
+    const sRes = await (
+      supabase as unknown as {
+        from: (t: string) => {
+          select: (s: string) => {
+            eq: (
+              c: string,
+              v: unknown
+            ) => {
+              maybeSingle: () => Promise<{
+                data: { start_date?: string; end_date?: string } | null;
+                error: unknown;
+              }>;
+            };
+          };
+        };
+      }
+    )
+      .from('seasons')
+      .select('start_date, end_date')
+      .eq('id', seasonId)
+      .maybeSingle();
+    if (sRes.data) {
+      seasonStart = sRes.data.start_date ?? null;
+      seasonEnd = sRes.data.end_date ?? null;
+    }
+  }
+  if (!seasonStart || !seasonEnd) {
+    logger.error?.('PUSH_RIVAL', 'no current season window — skipping rival pushes');
+    for (const id of recipientIds) out.set(id, null);
+    return out;
+  }
 
   // Wave 1: today's completers. Bounded result set (a few k rows max — only
   // today's daily players) regardless of leaderboard size.
@@ -124,10 +190,9 @@ export async function findDailyChallengeRivals(
   }
   const completers = new Set<string>([...puzzleCompleters, ...wordHuntCompleters]);
 
-  // Wave 2: leaderboard rows scoped to recipients ∪ completers ONLY. The
-  // leaderboard view spans 95k+ rows — an unscoped SELECT here was the same
-  // pattern that drove the 2026-05-06 95% DB CPU regression. .in() keeps
-  // the per-tick row count bounded to recipients + today's-completers.
+  // Wave 2: leaderboard rows for metadata only (username/avatar/rank) —
+  // total_score is NOT used for scoring anymore. Scoped to recipients ∪
+  // completers to keep per-tick row count bounded (see 2026-05-06 regression).
   const lbIds = Array.from(new Set<string>([...recipientIds, ...completers]));
   if (lbIds.length === 0) {
     for (const id of recipientIds) out.set(id, null);
@@ -135,7 +200,7 @@ export async function findDailyChallengeRivals(
   }
   const lbRes = await supabase
     .from('leaderboard')
-    .select('player_id, username, avatar_image, total_score, rank_position')
+    .select('player_id, username, avatar_image, avatar_config, rank_position')
     .in('player_id', lbIds);
 
   if (lbRes.error) {
@@ -148,12 +213,40 @@ export async function findDailyChallengeRivals(
   const lbByUser = new Map<string, LeaderboardRow>();
   for (const row of lbRows) lbByUser.set(row.player_id, row);
 
-  // Pre-build the candidate-rival list once. `avatar_image` is typically a
-  // character ID like "broccoli-bob" pointing to /public/avatars/{id}.png —
-  // resolveRivalAvatarUrl turns that into a hosted HTTPS URL FCM can show.
-  // The previous code's `startsWith('https://')` gate emptied the pool in
-  // production (most users have character-ID avatars, not URLs) and silently
-  // dropped every rival push to generic copy.
+  // Wave 3: per-player season-window puzzle score aggregate. We sum in JS
+  // (Supabase JS client has no SUM/group_by). Row count is bounded by
+  // lbIds × season-length-days × 1-attempt-per-day = O(lbIds × ~30).
+  const seasonScoresRes = await supabase
+    .from('daily_puzzle_attempts')
+    .select('player_id, score')
+    .gte('puzzle_date', seasonStart)
+    .lte('puzzle_date', seasonEnd)
+    .in('player_id', lbIds);
+
+  if (seasonScoresRes.error) {
+    logger.error?.(
+      'PUSH_RIVAL',
+      `season puzzle aggregate query failed: ${seasonScoresRes.error.message}`
+    );
+    for (const id of recipientIds) out.set(id, null);
+    return out;
+  }
+
+  const seasonScoreByPlayer = new Map<string, number>();
+  for (const row of (seasonScoresRes.data ?? []) as Array<{
+    player_id: string | null;
+    score: number | null;
+  }>) {
+    if (!row.player_id || typeof row.score !== 'number') continue;
+    seasonScoreByPlayer.set(
+      row.player_id,
+      (seasonScoreByPlayer.get(row.player_id) ?? 0) + row.score
+    );
+  }
+
+  // Pre-build the candidate-rival list once. Score = season-window daily-
+  // puzzle aggregate (NOT leaderboard.total_score). Word-hunt-only completers
+  // get score 0 + their prior puzzle aggregate — typically caught by the cap.
   interface PoolEntry {
     id: string;
     username: string;
@@ -166,36 +259,35 @@ export async function findDailyChallengeRivals(
   for (const id of completers) {
     const row = lbByUser.get(id);
     if (!row) continue;
-    if (typeof row.total_score !== 'number') continue;
+    const seasonScore = seasonScoreByPlayer.get(id) ?? 0;
     const inPuzzle = puzzleCompleters.has(id);
     const inHunt = wordHuntCompleters.has(id);
     const mode: RivalMode = inPuzzle && inHunt ? 'both' : inPuzzle ? 'puzzle' : 'wordHunt';
     rivalPool.push({
       id,
       username: row.username || 'Rival',
-      avatar: resolveRivalAvatarUrl(row.avatar_image),
-      score: row.total_score,
+      avatar: resolveRivalAvatarUrl(row.avatar_image, row.avatar_config, id),
+      score: seasonScore,
       rank: typeof row.rank_position === 'number' ? row.rank_position : null,
       mode,
     });
   }
 
-  // Cap "above" rivals so a 50k-point veteran doesn't get surfaced to a
-  // 200-point newcomer ("they're 49,800 ahead" demoralizes more than
-  // motivates). Symmetric cap on "below" keeps copy honest. Picks the next
-  // closest within range — only falls back to null when no rival fits.
+  // Caps scaled to daily-puzzle range (typical day-score ~50-300, season
+  // aggregate ~0-10k for engaged players). Old leaderboard-scale floors
+  // (5000/2000) would have made everyone in-range.
   const ABOVE_GAP_MAX_RATIO = 1.0;   // gap may equal user score (≈ 2× catch-up)
   const BELOW_GAP_MAX_RATIO = 1.0;   // mirror — defending lead within own range
-  const ABOVE_GAP_FLOOR = 5000;      // newcomers (score 0–5k) still match rivals up to 5k ahead
-  const BELOW_GAP_FLOOR = 2000;      // tighter — defending lead matters less when gap is huge
+  const ABOVE_GAP_FLOOR = 500;       // newcomers (puzzle aggregate 0–500) still match rivals up to 500 ahead
+  const BELOW_GAP_FLOOR = 200;       // tighter — defending lead matters less when gap is huge
 
   for (const userId of recipientIds) {
     const me = lbByUser.get(userId);
-    if (!me || typeof me.total_score !== 'number') {
+    if (!me) {
       out.set(userId, null);
       continue;
     }
-    const myScore = me.total_score;
+    const myScore = seasonScoreByPlayer.get(userId) ?? 0;
     const aboveCap = Math.max(ABOVE_GAP_FLOOR, Math.round(myScore * ABOVE_GAP_MAX_RATIO));
     const belowCap = Math.max(BELOW_GAP_FLOOR, Math.round(myScore * BELOW_GAP_MAX_RATIO));
 

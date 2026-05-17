@@ -4,31 +4,59 @@
  */
 
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { findDailyChallengeRivals } from '../dailyChallengeRivals';
+import { findDailyChallengeRivals, resolveRivalAvatarUrl } from '../dailyChallengeRivals';
 
-function makeBuilder(result: { data: unknown; error: unknown }) {
+/**
+ * Builder mock. `lazyResult` lets the result reflect data the test sets AFTER
+ * beforeEach (e.g. season-puzzle aggregate derived from leaderboardResult).
+ */
+function makeBuilder(
+  resultOrFn:
+    | { data: unknown; error: unknown }
+    | (() => { data: unknown; error: unknown })
+) {
+  const resolve = () =>
+    typeof resultOrFn === 'function' ? resultOrFn() : resultOrFn;
   const b: Record<string, unknown> = {};
-  const methods = ['select', 'eq', 'neq', 'is', 'in', 'gt', 'gte', 'lt', 'lte', 'not'];
+  const methods = ['select', 'eq', 'neq', 'is', 'in', 'gt', 'gte', 'lt', 'lte', 'not', 'limit', 'order'];
   methods.forEach((m) => {
     b[m] = vi.fn().mockReturnValue(b);
   });
-  b.then = (resolve: (v: unknown) => void) => resolve(result);
+  b.maybeSingle = vi.fn(() => Promise.resolve(resolve()));
+  b.single = vi.fn(() => Promise.resolve(resolve()));
+  b.then = (r: (v: unknown) => void) => r(resolve());
   return b;
 }
 
-const { mockFrom, leaderboardResult, puzzleAttemptsResult, wordHuntAttemptsResult } =
-  vi.hoisted(() => ({
-    mockFrom: vi.fn(),
-    leaderboardResult: { data: [] as unknown[], error: null },
-    puzzleAttemptsResult: { data: [] as unknown[], error: null },
-    wordHuntAttemptsResult: { data: [] as unknown[], error: null },
-  }));
+const {
+  mockFrom,
+  mockRpc,
+  leaderboardResult,
+  puzzleAttemptsResult,
+  wordHuntAttemptsResult,
+  seasonResult,
+  seasonPuzzleResult,
+} = vi.hoisted(() => ({
+  mockFrom: vi.fn(),
+  mockRpc: vi.fn(),
+  leaderboardResult: { data: [] as unknown[], error: null },
+  puzzleAttemptsResult: { data: [] as unknown[], error: null },
+  wordHuntAttemptsResult: { data: [] as unknown[], error: null },
+  seasonResult: {
+    data: { id: 2, start_date: '2026-05-01', end_date: '2026-05-31' } as unknown,
+    error: null,
+  },
+  // null = auto-derive from leaderboardResult so existing tests keep their
+  // total_score values as the "season-puzzle aggregate" the new code reads.
+  // Tests that need an asymmetry (today rival ≠ season total) set explicit rows.
+  seasonPuzzleResult: { data: null as unknown[] | null, error: null },
+}));
 
 vi.mock('../email', async () => {
   const actual = await vi.importActual<typeof import('../email')>('../email');
   return {
     ...actual,
-    getSupabaseAdmin: () => ({ from: mockFrom }),
+    getSupabaseAdmin: () => ({ from: mockFrom, rpc: mockRpc }),
     getTodayDate: () => '2026-05-10',
   };
 });
@@ -37,11 +65,67 @@ beforeEach(() => {
   leaderboardResult.data = [];
   puzzleAttemptsResult.data = [];
   wordHuntAttemptsResult.data = [];
+  seasonResult.data = { id: 2, start_date: '2026-05-01', end_date: '2026-05-31' };
+  seasonResult.error = null;
+  seasonPuzzleResult.data = null;
+  seasonPuzzleResult.error = null;
+
+  mockRpc.mockImplementation((name: string) => {
+    if (name === 'get_current_season_id') {
+      return Promise.resolve({ data: 2, error: null });
+    }
+    return Promise.resolve({ data: null, error: null });
+  });
+
+  let puzzleCallCount = 0;
   mockFrom.mockImplementation((table: string) => {
     if (table === 'leaderboard') return makeBuilder(leaderboardResult);
-    if (table === 'daily_puzzle_attempts') return makeBuilder(puzzleAttemptsResult);
+    if (table === 'daily_puzzle_attempts') {
+      // 1st call = today's-completers filter (.gt score 0). 2nd = season-window aggregate.
+      const which = puzzleCallCount++;
+      if (which === 0) return makeBuilder(puzzleAttemptsResult);
+      return makeBuilder(() => {
+        if (seasonPuzzleResult.data !== null) return seasonPuzzleResult;
+        // Auto-derive from leaderboardResult.total_score so existing test data
+        // (which only sets leaderboard rows) still drives scoring expectations
+        // — total_score in tests stands in for the season puzzle aggregate.
+        const rows = (leaderboardResult.data as Array<{ player_id: string; total_score: number | null }>)
+          .filter((r) => r && typeof r.total_score === 'number')
+          .map((r) => ({ player_id: r.player_id, score: r.total_score }));
+        return { data: rows, error: null };
+      });
+    }
     if (table === 'daily_word_hunt_attempts') return makeBuilder(wordHuntAttemptsResult);
+    if (table === 'seasons') return makeBuilder(seasonResult);
     return makeBuilder({ data: [], error: null });
+  });
+});
+
+describe('resolveRivalAvatarUrl', () => {
+  it('returns /api/avatar/png/:id when avatar_config is present (modern users)', () => {
+    const url = resolveRivalAvatarUrl(null, { base: 'round' }, 'abc-123', 'https://lex.test');
+    expect(url).toBe('https://lex.test/api/avatar/png/abc-123');
+  });
+
+  it('strips trailing slash from baseUrl', () => {
+    const url = resolveRivalAvatarUrl(null, { base: 'round' }, 'abc-123', 'https://lex.test/');
+    expect(url).toBe('https://lex.test/api/avatar/png/abc-123');
+  });
+
+  it('falls back to https avatar_image when avatar_config is null', () => {
+    const url = resolveRivalAvatarUrl('https://cdn/x.png', null, 'abc-123', 'https://lex.test');
+    expect(url).toBe('https://cdn/x.png');
+  });
+
+  it('returns null when neither avatar_config nor https avatar_image exist', () => {
+    expect(resolveRivalAvatarUrl(null, null, 'abc-123', 'https://lex.test')).toBeNull();
+    expect(resolveRivalAvatarUrl('broccoli-bob', null, 'abc-123', 'https://lex.test')).toBeNull();
+    expect(resolveRivalAvatarUrl('http://insecure', null, 'abc-123', 'https://lex.test')).toBeNull();
+  });
+
+  it('avatar_config wins over legacy https avatar_image (modern path preferred)', () => {
+    const url = resolveRivalAvatarUrl('https://cdn/x.png', { base: 'round' }, 'abc-123', 'https://lex.test');
+    expect(url).toBe('https://lex.test/api/avatar/png/abc-123');
   });
 });
 
@@ -176,13 +260,13 @@ describe('findDailyChallengeRivals', () => {
     expect(rival.avatarImage).toBeNull();
   });
 
-  it('low-score newcomers still get rivals (ABOVE_GAP_FLOOR widened to 5000)', async () => {
-    // User score=10 (brand-new). Rival 3000 ahead must qualify — previously
-    // capped at 500 and dropped to null, which is why cron almost never sent
-    // rival-themed pushes to fresh accounts.
+  it('low-score newcomers still get rivals within daily-puzzle floor (ABOVE_GAP_FLOOR=500)', async () => {
+    // User season-puzzle aggregate=10 (brand-new). Rival 300 ahead must qualify —
+    // floors are now sized for daily-puzzle scale (typical day-score ~50-300),
+    // not lifetime leaderboard scale.
     leaderboardResult.data = [
       { player_id: 'newcomer', username: 'Me', avatar_image: null, total_score: 10 },
-      { player_id: 'rival', username: 'R', avatar_image: 'https://x/r.png', total_score: 3000 },
+      { player_id: 'rival', username: 'R', avatar_image: 'https://x/r.png', total_score: 300 },
     ];
     wordHuntAttemptsResult.data = [{ player_id: 'rival', solved: true }];
     const result = await findDailyChallengeRivals(['newcomer']);
@@ -190,12 +274,13 @@ describe('findDailyChallengeRivals', () => {
     expect(result.get('newcomer')!.username).toBe('R');
   });
 
-  it('caps "above" rivals so far-ahead veterans never demoralize newcomers', async () => {
-    // user score 200 (low). veteran 50k ahead (way past cap). near 200 ahead (within ABOVE_GAP_FLOOR=5000).
+  it('caps "above" rivals so far-ahead season-puzzle veterans never demoralize newcomers', async () => {
+    // user season-puzzle aggregate 50 (low). veteran 5000 ahead (way past cap).
+    // near 200 ahead (within ABOVE_GAP_FLOOR=500).
     leaderboardResult.data = [
-      { player_id: 'user-1', username: 'Me', avatar_image: null, total_score: 200 },
-      { player_id: 'veteran', username: 'Vet', avatar_image: 'https://x/v.png', total_score: 50200 },
-      { player_id: 'near', username: 'Near', avatar_image: 'https://x/n.png', total_score: 400 },
+      { player_id: 'user-1', username: 'Me', avatar_image: null, total_score: 50 },
+      { player_id: 'veteran', username: 'Vet', avatar_image: 'https://x/v.png', total_score: 5050 },
+      { player_id: 'near', username: 'Near', avatar_image: 'https://x/n.png', total_score: 250 },
     ];
     wordHuntAttemptsResult.data = [
       { player_id: 'veteran', solved: true },
@@ -207,8 +292,8 @@ describe('findDailyChallengeRivals', () => {
 
   it('returns null when only out-of-range rivals exist', async () => {
     leaderboardResult.data = [
-      { player_id: 'user-1', username: 'Me', avatar_image: null, total_score: 100 },
-      { player_id: 'veteran', username: 'Vet', avatar_image: 'https://x/v.png', total_score: 99999 },
+      { player_id: 'user-1', username: 'Me', avatar_image: null, total_score: 10 },
+      { player_id: 'veteran', username: 'Vet', avatar_image: 'https://x/v.png', total_score: 9999 },
     ];
     wordHuntAttemptsResult.data = [{ player_id: 'veteran', solved: true }];
     const result = await findDailyChallengeRivals(['user-1']);
@@ -339,6 +424,69 @@ describe('findDailyChallengeRivals', () => {
 
       const c = (await findDailyChallengeRivals(['u1'])).get('u1')!;
       expect(c.additionalCount).toBe(0);
+    });
+
+    it('rival with avatar_config gets /api/avatar/png/:id URL (modern path)', async () => {
+      process.env.NEXT_PUBLIC_APP_URL = 'https://lex.test';
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, avatar_config: null, total_score: 1000, rank_position: 50 },
+        {
+          player_id: 'rival-modern',
+          username: 'Modern',
+          avatar_image: null,
+          avatar_config: { base: 'round', skinColor: '#FFDBB4' },
+          total_score: 1050,
+          rank_position: 45,
+        },
+      ];
+      wordHuntAttemptsResult.data = [{ player_id: 'rival-modern', solved: true }];
+
+      const r = await findDailyChallengeRivals(['u1']);
+      expect(r.get('u1')!.avatarImage).toBe('https://lex.test/api/avatar/png/rival-modern');
+    });
+
+    it('uses season-window daily_puzzle_attempts aggregate (not leaderboard.total_score) for gap', async () => {
+      // Leaderboard total_score says rival is 5000 ahead — old code would have
+      // used that. New code reads aggregated daily-puzzle scores per season,
+      // which we explicitly set to a tiny gap of 100. Push should reflect 100.
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 999999, rank_position: 50 },
+        { player_id: 'r1', username: 'R1', avatar_image: 'https://x/r.png', total_score: 999999, rank_position: 40 },
+      ];
+      wordHuntAttemptsResult.data = [{ player_id: 'r1', solved: true }];
+      seasonPuzzleResult.data = [
+        { player_id: 'u1', score: 200 },
+        { player_id: 'u1', score: 100 },   // u1 total = 300
+        { player_id: 'r1', score: 400 },   // r1 total = 400, gap = 100
+      ];
+
+      const c = (await findDailyChallengeRivals(['u1'])).get('u1')!;
+      expect(c.scoreGap).toBe(100);
+      expect(c.rivalScore).toBe(400);
+    });
+
+    it('returns null when current season cannot be resolved (RPC returns null)', async () => {
+      mockRpc.mockImplementationOnce(() => Promise.resolve({ data: null, error: null }));
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 1000, rank_position: 50 },
+        { player_id: 'r1', username: 'R1', avatar_image: 'https://x/r.png', total_score: 1050, rank_position: 45 },
+      ];
+      wordHuntAttemptsResult.data = [{ player_id: 'r1', solved: true }];
+
+      const r = await findDailyChallengeRivals(['u1']);
+      expect(r.get('u1')).toBeNull();
+    });
+
+    it('returns null when seasons row is missing (no start/end window)', async () => {
+      seasonResult.data = null;
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 1000, rank_position: 50 },
+        { player_id: 'r1', username: 'R1', avatar_image: 'https://x/r.png', total_score: 1050, rank_position: 45 },
+      ];
+      wordHuntAttemptsResult.data = [{ player_id: 'r1', solved: true }];
+
+      const r = await findDailyChallengeRivals(['u1']);
+      expect(r.get('u1')).toBeNull();
     });
 
     it('additionalCount ignores out-of-cap rivals (far veterans not counted)', async () => {
