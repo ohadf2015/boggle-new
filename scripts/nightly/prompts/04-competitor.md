@@ -4,7 +4,7 @@ You are running the nightly competitor + Reddit research lane for LexiClash. Tod
 __LEARNINGS__
 
 ═══ SKILLS TO USE ═══
-From the **Specialized Skills** table above, invoke the skills listed for **lane 03 competitor/reddit** unless they conflict with this lane's hard rules. `humanizer` is especially important for Reddit drafts — they must not read AI-written.
+From the **Specialized Skills** table above, invoke the skills listed for **lane 04 competitor/reddit** unless they conflict with this lane's hard rules. `humanizer` is especially important for Reddit drafts — they must not read AI-written.
 
 ═══ GOAL ═══
 Surface (a) viral word-game concepts worth borrowing, (b) Reddit threads where LexiClash is genuinely relevant and a careful reply could organically improve visibility.

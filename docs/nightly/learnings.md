@@ -30,11 +30,12 @@ Per-lane skill recommendations, evidence-weighted. Each lane prompt reads this s
 | Lane | Recommended skills | Evidence |
 |---|---|---|
 | 01 triage | `superpowers:systematic-debugging`, `code-review` (validates fix before commit) | seed |
-| 02 engagement | none yet — data needed | seed |
-| 03 competitor/reddit | `humanizer` (Reddit drafts), `ux-writer` (idea phrasing) | seed |
-| 04 landing | `frontend-design`, `impeccable:craft`, `animate-ai`, `usability-psychologist`, `web-interface-guidelines` (post-edit review) | seed |
-| 05 SEO | `seo-daily` (mandatory), `humanizer` (meta descriptions) | seed |
-| 06 self-learn | none — keep prompt-only | seed |
+| 02 perf | `superpowers:systematic-debugging` (backend slow-query diagnosis), `web-interface-guidelines` (frontend CWV review), `code-review` | seed |
+| 03 engagement | none yet — data needed | seed |
+| 04 competitor/reddit | `humanizer` (Reddit drafts), `ux-writer` (idea phrasing) | seed |
+| 05 landing | `frontend-design`, `impeccable:craft`, `animate-ai`, `usability-psychologist`, `web-interface-guidelines` (post-edit review) | seed |
+| 06 SEO | `seo-daily` (mandatory), `humanizer` (meta descriptions) | seed |
+| 07 self-learn | none — keep prompt-only | seed |
 
 **Rules for lane 6 when updating this table:**
 - Add a skill to a lane only if invoking it correlated with a shipped (not reverted) outcome in ≥2 nights.

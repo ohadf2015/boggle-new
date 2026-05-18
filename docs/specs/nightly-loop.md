@@ -5,16 +5,17 @@ Status: **shipping** · Owner: ohadfisher · Triggers: macOS launchd 00:00 local
 ## Goal
 Every night, autonomously improve LexiClash across error-rate, engagement, UX, content, and SEO — push to master, alert via Telegram. Get better at this over time.
 
-## Scope (6 lanes, sequential)
+## Scope (7 lanes, sequential)
 
 | # | Lane | Model | Inputs (read) | Outputs (write) | Per-lane diff cap |
 |---|---|---|---|---|---|
 | 1 | **Triage** | sonnet | sentry MCP, supabase MCP advisor, posthog MCP `$exception` | root-cause fixes; security-adjacent → human queue | 8 files |
-| 2 | **Engagement A/B + flag hygiene** | sonnet | posthog funnels last 24h vs 7d baseline | new typed experiment behind flag; remove decided flags (≥7d, p<0.05, n≥1000); add analytics for next-day insight | 8 files |
-| 3 | **Competitor + Reddit** | sonnet | Firecrawl r/wordgames, r/dailygames /top/week + top portals | `docs/nightly/ideas/YYYY-MM-DD.md` backlog (no code) | 1 file |
-| 4 | **Landing/CVR** | opus | posthog landing conversion 14d; ground-truth audit (sitemap, llms.txt) | one landing variant behind `landing_variant_v{n}`, 5 locales, `frontend-design` + `animate-ai` skills | 8 files |
-| 5 | **SEO/GEO** | sonnet | GSC + Bing WMT 28d | invokes existing `seo-daily` skill `--no-pr` | 8 files |
-| 6 | **Self-learn** | opus | last 7 reports + commit outcomes | rewrites (not appends) `docs/nightly/learnings.md` ≤200 lines | 1 file |
+| 2 | **Performance** | sonnet | `db_perf_top_query_audit`, `pg_stat_statements`, posthog `$web_vitals` (LCP/INP/CLS) p75, bundle sizes vs `perf-baseline.json` | indexes (advisor-justified only), N+1 fixes, image priority/dimensions, dynamic imports for below-fold heavy chunks; rewrites `perf-baseline.json` | 8 files |
+| 3 | **Engagement A/B + flag hygiene** | sonnet | posthog funnels last 24h vs 7d baseline | new typed experiment behind flag; remove decided flags (≥7d, p<0.05, n≥1000); add analytics for next-day insight | 8 files |
+| 4 | **Competitor + Reddit** | sonnet | Firecrawl r/wordgames, r/dailygames /top/week + top portals | `docs/nightly/ideas/YYYY-MM-DD.md` backlog + reply drafts (no code) | 2 files |
+| 5 | **Landing/CVR** | opus | posthog landing conversion 14d; ground-truth audit (sitemap, llms.txt) | one landing variant behind `landing_variant_v{n}`, 5 locales, `frontend-design` + `animate-ai` skills | 8 files |
+| 6 | **SEO/GEO** | sonnet | GSC + Bing WMT 28d | invokes existing `seo-daily` skill `--no-pr` | 8 files |
+| 7 | **Self-learn** | opus | last 7 reports + commit outcomes | rewrites (not appends) `docs/nightly/learnings.md` ≤200 lines | 1 file |
 
 Sequential because lanes 1/2/4/5 all touch `fe-next/**`. Parallel = file stomps (memory: `feedback-parallel-agents-overlap`).
 
