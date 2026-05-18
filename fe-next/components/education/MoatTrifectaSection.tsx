@@ -1,10 +1,12 @@
 'use client';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useScrollReveal } from '@/lib/animation/useScrollReveal';
+import { useGsapReveal } from '@/lib/animation/useGsapReveal';
 
 /**
  * Design: 3 cards with mode-specific accent colors (neo-lime, neo-cyan, neo-pink)
- * Stagger: each card delays by 120ms from previous, driven by parent visibility
+ * The h2/subtitle sit on the page's dark navy background — they must use light
+ * text. The cards themselves are cream, so internal text stays navy.
+ * GSAP staggers the heading, subtitle, then cards on scroll-in.
  */
 
 const PILLARS = [
@@ -15,37 +17,35 @@ const PILLARS = [
 
 export function MoatTrifectaSection() {
   const { t } = useLanguage();
-  const [ref, visible] = useScrollReveal<HTMLDivElement>({ once: true });
+  const ref = useGsapReveal<HTMLDivElement>({
+    selector: '[data-moat-item]',
+    y: 28,
+    stagger: 0.12,
+    duration: 0.7,
+  });
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-12 sm:py-16">
       <div ref={ref}>
         <h2
-          className={`text-3xl font-neo-display font-black text-neo-navy text-center transition-all duration-700 ${
-            visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`}
+          data-moat-item
+          className="text-3xl font-neo-display font-black text-neo-white text-center"
         >
           {t('education.landing.moat.title')}
         </h2>
         <p
-          className={`mt-2 text-center text-neo-navy/60 transition-all duration-700 ${
-            visible ? 'opacity-100' : 'opacity-0'
-          }`}
-          style={{ transitionDelay: visible ? '80ms' : '0ms' }}
+          data-moat-item
+          className="mt-2 text-center text-neo-white/70"
         >
           {t('education.landing.moat.subtitle')}
         </p>
 
         <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {PILLARS.map((p, i) => (
+          {PILLARS.map((p) => (
             <article
               key={p.key}
-              style={{
-                transitionDelay: visible ? `${200 + i * 120}ms` : '0ms',
-              }}
-              className={`rounded-neo border-neo-thick ${p.borderAccent} bg-neo-cream p-6 shadow-hard-lg transition-all duration-700 ${
-                visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-              }`}
+              data-moat-item
+              className={`rounded-neo border-neo-thick ${p.borderAccent} bg-neo-cream p-6 shadow-hard-lg transition-transform hover:-translate-y-1`}
             >
               <div className={`mb-4 inline-block rounded-full ${p.accent} px-3 py-1 text-xs font-bold text-neo-navy uppercase`}>
                 {t(`education.landing.moat.${p.key}.tag`)}
