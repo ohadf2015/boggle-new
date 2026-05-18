@@ -25,7 +25,7 @@ Sequential because lanes 1/2/4/5 all touch `fe-next/**`. Parallel = file stomps 
 3. Single end-of-run commit listing all lanes (advisor: per-lane commits = many rollback targets + many Railway deploys).
 4. `git push origin master` (project pref: direct master, no PR).
 5. Spawn background `health-monitor.sh` — watches PostHog `$pageview` last 60min and Sentry `event_count` last 15min for **30 min post-push**, Telegrams if >2× baseline.
-6. Telegram digest: `sendDocument(report.md)` + `sendMessage` headline.
+6. **Manager summary** (Sonnet, ≤4 min budget, ~$0.01/run): reads `docs/nightly/reports/$TODAY.md` and composes a narrative ≤1200-char Telegram message with TL;DR / Key wins / Concerns / Tomorrow. Sent via `sendMessage` BEFORE the full-report `sendDocument`. Fallback on timeout: tactical headline. Founder reads the summary in 20 seconds, opens the attachment only when something looks off.
 
 ## Safety
 - **Lock file** `~/.cache/lexi-nightly.lock` with `pid + mtime`; ignore lock if pid dead OR mtime >2h (crashed run).
