@@ -5491,6 +5491,7 @@ const sv = {
       "tierSilver": "Silver",
       "tierGold": "Guld",
       "freezesGranted": "+{n} Streak Shield",
+      "freezesGrantedPlural": "+{n} Streak Shields",
       "info": {
         "title": "Så funkar veckokistan",
         "howItWorks": "Slutför en daglig utmaning varje dag. Sju dagar i rad fyller din kista.",

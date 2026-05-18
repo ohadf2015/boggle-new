@@ -5534,6 +5534,7 @@ const es = {
       "tierSilver": "Plata",
       "tierGold": "Oro",
       "freezesGranted": "+{n} Escudo de Racha",
+      "freezesGrantedPlural": "+{n} Escudos de Racha",
       "info": {
         "title": "Cómo funciona el cofre semanal",
         "howItWorks": "Completa un desafío diario cada día. Siete días seguidos llenan tu cofre.",

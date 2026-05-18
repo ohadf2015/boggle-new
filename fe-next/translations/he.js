@@ -5493,6 +5493,7 @@ const he = {
       "tierSilver": "כסף",
       "tierGold": "זהב",
       "freezesGranted": "+{n} מגן רצף",
+      "freezesGrantedPlural": "+{n} מגני רצף",
       "info": {
         "title": "איך עובדת התיבה השבועית",
         "howItWorks": "סיימו אתגר יומי בכל יום. שבעה ימים ברצף ממלאים את התיבה.",
