@@ -16,6 +16,9 @@ Rewritten by **lane 6** each night from the prior 7 reports. **≤200 lines.** A
 - Headless Claude writing new realtime tables — burned 94% DB CPU once. Hard-banned.
 - Demoting `logger.warn → debug` to clean Sentry — root-cause or queue, never silence.
 
+## Core principle (granted by user)
+- **Anything repeatable → script it.** If a lane finds itself doing the same sequence of WebSearch / WebFetch / SQL / shell on multiple nights, codify it as a helper script under `scripts/nightly/lib/` or `scripts/nightly/tools/`. Lane 7 (self-learn) is explicitly empowered to create AND update these helpers. Each new script must be: (a) under 200 lines, (b) idempotent, (c) syntax-checked with `bash -n`, (d) referenced from at least one lane prompt.
+
 ## Permissions (granted by user)
 - **Experimental game modes OK** — lane 05 (landing) may ship a NEW game mode behind a typed flag with ≤10% rollout, provided: (a) flag default = off, (b) Playwriter E2E QA covers happy path + edge cases, (c) prior week's `loop-improvements/*.md` flagged a viable concept, (d) mode is reachable only via `?mode=<flag>` deep-link or rollout-flagged hub entry. Never expose to 100% from a nightly run — that requires human review.
 

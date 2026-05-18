@@ -312,6 +312,11 @@ if [ "$NO_MONITOR" = "0" ] && [ "$NO_CHANGE_MODE" = "0" ] && [ "$DRY_RUN" = "0" 
   nohup "$LIB_DIR/health-monitor.sh" "$NEW_SHA" \
     >> "$LOG_DIR/health-monitor.log" 2>&1 &
   disown 2>/dev/null || true
+
+  log "spawning Railway deploy check (10 min)"
+  nohup "$LIB_DIR/railway-deploy-check.sh" "$NEW_SHA" \
+    >> "$LOG_DIR/railway-check.log" 2>&1 &
+  disown 2>/dev/null || true
 fi
 
 # --- manager summary (Sonnet composes a narrative digest from today's report) -

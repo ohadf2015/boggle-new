@@ -92,6 +92,15 @@ Write `docs/nightly/loop-improvements/__TODAY__.md`:
 3. ...
 (3-7 items max. Skip vapid "improve docs" — must be actionable.)
 
+## New helper scripts to ship (you may create these directly)
+> Per user principle: anything repeatable → script it. If you spot a pattern that fires ≥3 nights, codify it under `scripts/nightly/tools/<name>.sh`. Suggested patterns:
+> - data extractors (PostHog HogQL templates, Supabase common queries, GSC API wrappers)
+> - report formatters (Markdown → Telegram, JSON → digest)
+> - guardrail checks (sanity caps, MCP health probes, lint-changed-files-only)
+
+- **<script-name.sh>** — what it does, why it removes manual repetition. Where it's called from. Effort: S/M/L. Counts toward the 8-file cap.
+(0-3 items. Skip if no recurring pattern justifies one.)
+
 ## New product/feature ideas surfaced by this week's data
 - <idea grounded in lane 02 perf metrics OR lane 03 funnel deltas OR lane 04 competitor research>
 - ...
