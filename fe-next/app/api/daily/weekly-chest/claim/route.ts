@@ -6,6 +6,7 @@ import {
   findCompletedCycles,
   type HuntScoreRow,
   type WheelScoreRow,
+  type PuzzleScoreRow,
 } from '@/lib/daily/weeklyChest'
 import { selectChestPrize } from '@/lib/daily/chestPrizePool'
 import { awardCoinsServer } from '@/backend/services/economy/awardCoins'
@@ -25,7 +26,7 @@ export async function POST() {
   const [puzzleRes, huntRes, wheelRes] = await Promise.all([
     supabase
       .from('daily_puzzle_attempts')
-      .select('puzzle_date')
+      .select('puzzle_date,score,time_seconds')
       .eq('player_id', user.id)
       .gt('word_count', 0),
     supabase
@@ -86,6 +87,7 @@ export async function POST() {
     progress.completedDates,
     (huntRes.data ?? []) as HuntScoreRow[],
     (wheelRes.data ?? []) as WheelScoreRow[],
+    (puzzleRes.data ?? []) as PuzzleScoreRow[],
   )
 
   // Deterministic seed → retry-safe (same user + cycle = same prize).

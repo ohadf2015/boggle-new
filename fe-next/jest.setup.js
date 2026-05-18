@@ -104,10 +104,15 @@ const createMatchMediaMock = () => (query) => ({
   dispatchEvent: jest.fn(),
 });
 
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: createMatchMediaMock(),
-});
+// `window` is only defined under the jsdom test environment — node-env tests
+// (e.g. API route tests) skip the matchMedia stub since nothing in them
+// touches the browser API.
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: createMatchMediaMock(),
+  });
+}
 
 // Mock ResizeObserver - use class syntax to ensure proper instantiation
 class MockResizeObserver {

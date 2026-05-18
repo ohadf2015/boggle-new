@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 
-vi.mock('gsap', () => ({ default: { from: vi.fn(), to: vi.fn() } }))
+vi.mock('gsap', () => ({ __esModule: true, default: { from: vi.fn(), to: vi.fn() } }))
 
 import ChestProgressDots from '../ChestProgressDots'
 
