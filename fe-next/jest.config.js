@@ -21,6 +21,8 @@ const customJestConfig = {
   testEnvironment: 'jsdom',
 
   // Setup files to run after Jest is initialized
+  // setupFiles runs BEFORE the test file (so before any jest.mock hoisted
+  // to the top). Use it for the jest.mock wrapper that injects __esModule.
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 
   // Test file patterns - specifically for frontend

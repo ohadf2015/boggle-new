@@ -21,7 +21,11 @@ const vi = {
   advanceTimersByTime: (ms) => jest.advanceTimersByTime(ms),
   advanceTimersByTimeAsync: (ms) => jest.advanceTimersByTime(ms),
   runAllTimers: () => jest.runAllTimers(),
+  runAllTimersAsync: async () => jest.runAllTimers(),
   runOnlyPendingTimers: () => jest.runOnlyPendingTimers(),
+  runOnlyPendingTimersAsync: async () => jest.runOnlyPendingTimers(),
+  clearAllTimers: () => jest.clearAllTimers(),
+  getTimerCount: () => jest.getTimerCount(),
   setSystemTime: (date) => jest.setSystemTime(date),
   getRealSystemTime: () => Date.now(),
   stubGlobal: (name, value) => {
@@ -42,7 +46,21 @@ const vi = {
   hoisted: (factory) => factory(),
   resetModules: () => jest.resetModules(),
   dynamicImportSettled: () => Promise.resolve(),
-  waitFor: (cb) => cb(),
+  doMock: (...args) => jest.doMock(...args),
+  importActual: (path) => Promise.resolve(jest.requireActual(path)),
+  waitFor: async (cb, opts) => {
+    const deadline = Date.now() + ((opts && opts.timeout) || 1000);
+    let lastErr;
+    while (Date.now() < deadline) {
+      try {
+        const r = await cb();
+        if (r !== false) return r;
+      } catch (e) { lastErr = e; }
+      await new Promise((res) => setTimeout(res, (opts && opts.interval) || 25));
+    }
+    if (lastErr) throw lastErr;
+    throw new Error('vi.waitFor: timed out');
+  },
 };
 
 module.exports = {
