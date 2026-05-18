@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.claude.nightly-loop</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/ohadfisher/git/boggle-new/scripts/nightly/run.sh</string>
+    </array>
+
+    <!-- Fire at 00:00 local. If mac asleep, launchd silently skips; the
+         heartbeat preflight (see run.sh) catches missed runs on next wake
+         between 00:00 and 06:00 via ~/.cache/lexi-nightly/last-run mtime. -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>0</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/ohadfisher/git/boggle-new</string>
+
+    <!-- launchd inherits no shell PATH. Includes nvm node + homebrew + gcloud. -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/ohadfisher/.nvm/versions/node/v22.22.0/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>HOME</key>
+        <string>/Users/ohadfisher</string>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/ohadfisher/logs/lexi-nightly/launchd-stdout.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/ohadfisher/logs/lexi-nightly/launchd-stderr.log</string>
+
+    <key>LowPriorityIO</key>
+    <true/>
+
+    <!-- Hard wall clock: 60 min. Lane budgets sum to ~50 min worst-case. -->
+    <key>TimeOut</key>
+    <integer>3600</integer>
+
+    <!-- Skip if mac asleep at trigger; do NOT wake from sleep. -->
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>
