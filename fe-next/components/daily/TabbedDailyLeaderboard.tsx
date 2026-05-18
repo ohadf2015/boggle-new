@@ -584,7 +584,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
                 isCurrentUser={isCurrentUserToday(participant)}
                 compact={compact}
                 t={t}
-                onViewWheelWords={openWheelWords}
+                onViewWheelWords={myWheelWordsFound !== undefined ? openWheelWords : undefined}
                 onViewHuntWords={myHuntWordsDiscovered !== undefined ? openHuntWords : undefined}
                 scope={scope}
               />

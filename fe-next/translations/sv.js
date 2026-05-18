@@ -5261,6 +5261,8 @@ const sv = {
     "samePuzzle": "Samma pussel för alla världen över. Dela dina resultat för att utmana vänner!",
     "alreadyPlayed": "Redan spelat idag",
     "completed": "Klart!",
+    "questPlayedSubtitle": "Redan spelat idag",
+    "questPlayedCta": "Daglig översikt",
     "chooseQuest": "Välj Din Dagliga Quest",
     "dailyMissions": "Dagliga Uppdrag",
     "journeyProgress": "Reseframsteg",
@@ -5618,7 +5620,10 @@ const sv = {
       "dailyCompleteDesc": "Båda spelen klara. Kom tillbaka imorgon!",
       "backToDaily": "Tillbaka till dagliga utmaningar",
       "backToDailyDesc": "Se dagens topplista",
-      "tapPlayerHint": "Tryck på en spelare för att se vad du missade"
+      "tapPlayerHint": "Tryck på en spelare för att se vad du missade",
+      "showLess": "Visa mindre",
+      "showMoreCount": "Visa alla (+{count} till)",
+      "perfectBanner": "Ordmästare!"
     },
     "hub": {
       "wordWheelQuest": "Ordhjul",

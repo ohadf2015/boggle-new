@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { AnimatePresence, m } from 'framer-motion';
+import { Star, Type, Timer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import WordWheelGame, { type WordWheelGameResult } from './WordWheelGame';
@@ -42,6 +43,19 @@ const WordWheelEffectsCanvas = dynamic(
 // ==========================================
 
 type WordWheelPhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played';
+
+// Deterministic 4×4 pixel mosaic that fills an outer letter tile in the
+// ready-screen preview wheel. Seed-based so SSR + client render the same
+// pattern (no hydration mismatch) and each tile gets a different splatter.
+const CENSOR_BUCKETS = ['bg-neo-navy', 'bg-neo-navy-light', 'bg-neo-cream/30'] as const;
+function CensorTile({ seed }: { seed: number }) {
+  const cells = Array.from({ length: 16 }, (_, i) => (seed * 31 + i * 7 + 3) % 3);
+  return (
+    <div className="grid h-full w-full grid-cols-4 grid-rows-4" aria-hidden>
+      {cells.map((b, i) => <span key={i} className={CENSOR_BUCKETS[b]} />)}
+    </div>
+  );
+}
 
 const WORD_WHEEL_DURATION = 120; // 2 minutes
 
@@ -374,23 +388,31 @@ const WordWheelChallenge: React.FC = () => {
               </span>
             </div>
 
-            {/* Instruction cards */}
+            {/* Instruction cards — icon-driven, color-coded per rule */}
             <div className="flex flex-col gap-2 max-w-xs w-full">
-              <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light">
-                <span className="text-neo-lime text-lg">⭐</span>
+              <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-xs">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-neo border-2 border-neo-lime/60 bg-neo-lime/15 text-neo-lime">
+                  <Star className="h-4 w-4" strokeWidth={2.5} aria-hidden />
+                </span>
                 <span className="text-neo-cream/80 text-sm">{t('wordWheel.centerLetterRule')}</span>
               </div>
-              <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light">
-                <span className="text-neo-cyan text-lg">🔤</span>
+              <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-xs">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-neo border-2 border-neo-cyan/60 bg-neo-cyan/15 text-neo-cyan">
+                  <Type className="h-4 w-4" strokeWidth={2.5} aria-hidden />
+                </span>
                 <span className="text-neo-cream/80 text-sm">{t('wordWheel.minLetters', { min: '3' })}</span>
               </div>
-              <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light">
-                <span className="text-neo-pink text-lg">⏱</span>
+              <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-xs">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-neo border-2 border-neo-pink/60 bg-neo-pink/15 text-neo-pink">
+                  <Timer className="h-4 w-4" strokeWidth={2.5} aria-hidden />
+                </span>
                 <span className="text-neo-cream/80 text-sm">{t('wordWheel.timeLimit')}</span>
               </div>
             </div>
 
-            {/* Preview wheel */}
+            {/* Preview wheel — outer letters censored before play to keep the
+                pre-game scout from cheating (you only see the center letter,
+                everything else is a deterministic pixel mosaic). */}
             <div className="relative w-44 h-44 flex items-center justify-center my-4">
               {/* Glow ring */}
               <m.div
@@ -413,13 +435,15 @@ const WordWheelChallenge: React.FC = () => {
                 const y = -Math.cos(rad) * 60;
                 return (
                   <m.div
-                    key={`${letter}-${i}`}
-                    className="absolute inset-0 m-auto w-10 h-10 rounded-full border-2 border-neo-black bg-neo-white flex items-center justify-center font-neo-display font-bold text-sm text-neo-navy shadow-[2px_2px_0px_black,0_0_6px_rgba(191,255,0,0.12)]"
+                    key={`outer-${i}`}
+                    data-testid="preview-outer-letter"
+                    className="absolute inset-0 m-auto w-10 h-10 rounded-full border-2 border-neo-black bg-neo-white overflow-hidden shadow-[2px_2px_0px_black,0_0_6px_rgba(191,255,0,0.12)]"
                     initial={{ scale: 0, x, y }}
                     animate={{ scale: 1, x, y }}
                     transition={{ delay: i * 0.06, type: 'spring', stiffness: 400 }}
+                    aria-label="hidden letter"
                   >
-                    {letter}
+                    <CensorTile seed={i + 1} />
                   </m.div>
                 );
               })}

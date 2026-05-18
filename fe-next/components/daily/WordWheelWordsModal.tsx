@@ -5,7 +5,13 @@ import { m, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { Trophy, Hash, Star } from 'lucide-react';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import type { Language } from '@/types';
+
+// Diff mode caps the "what I missed" intel at this count so the modal stays
+// scannable. Anything past this is overwhelming and dilutes the lesson — the
+// player can still see everything via the toggle if they want.
+const DIFF_TOP_LIMIT = 5;
 
 interface WordWheelWordsModalProps {
   isOpen: boolean;
@@ -35,6 +41,13 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [payload, setPayload] = useState<WordsPayload | null>(null);
+  const [showAll, setShowAll] = useState(false);
+
+  // Reset the expand state every open so a previous session's choice doesn't
+  // leak into a different opponent's view.
+  useEffect(() => {
+    if (isOpen) setShowAll(false);
+  }, [isOpen, playerId]);
 
   useEffect(() => {
     if (!isOpen || !playerId) return;
@@ -86,7 +99,17 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
   const words = diffMode && mySet
     ? allWords.filter(w => !mySet.has(w.toUpperCase()))
     : allWords;
-  const sortedWords = [...words].sort((a, b) => b.length - a.length || a.localeCompare(b));
+  const sortedWords = useMemo(
+    () => [...words].sort((a, b) => b.length - a.length || a.localeCompare(b)),
+    [words],
+  );
+  // In diff mode collapse to the top-N most-impressive (longest) missed words.
+  // Non-diff (full submitted list) keeps showing everything since the player has
+  // already played and might want the full picture.
+  const collapsed = diffMode && !showAll;
+  const visibleWords = collapsed ? sortedWords.slice(0, DIFF_TOP_LIMIT) : sortedWords;
+  const remainingCount = sortedWords.length - DIFF_TOP_LIMIT;
+  const showToggle = diffMode && sortedWords.length > DIFF_TOP_LIMIT;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
@@ -145,21 +168,38 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
                     : t('wordWheel.noWordsSubmitted')}
                 </p>
               ) : (
-                <AnimatePresence mode="popLayout">
-                  <div className="flex flex-wrap gap-1.5">
-                    {sortedWords.map((word, idx) => (
-                      <m.span
-                        key={`${word}-${idx}`}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: idx * 0.015, type: 'spring', stiffness: 500, damping: 25 }}
-                        className="inline-flex items-center px-2.5 py-1 rounded-neo border-2 border-neo-black bg-neo-white text-neo-navy text-xs sm:text-sm font-black uppercase shadow-hard-xs"
-                      >
-                        {word}
-                      </m.span>
-                    ))}
-                  </div>
-                </AnimatePresence>
+                <>
+                  <AnimatePresence mode="popLayout">
+                    <div className="flex flex-wrap gap-1.5">
+                      {visibleWords.map((word, idx) => (
+                        <m.span
+                          key={`${word}-${idx}`}
+                          data-testid="missed-word-chip"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: idx * 0.015, type: 'spring', stiffness: 500, damping: 25 }}
+                          className="inline-flex items-center px-2.5 py-1 rounded-neo border-2 border-neo-black bg-neo-white text-neo-navy text-xs sm:text-sm font-black uppercase shadow-hard-xs"
+                        >
+                          {language === 'he' ? applyHebrewFinalLetters(word) : word}
+                        </m.span>
+                      ))}
+                    </div>
+                  </AnimatePresence>
+
+                  {showToggle && (
+                    <button
+                      type="button"
+                      data-testid="missed-words-toggle"
+                      onClick={() => setShowAll(v => !v)}
+                      className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-neo-cyan/80 hover:text-neo-cyan focus-visible:outline-hidden focus-visible:underline transition-colors"
+                    >
+                      {showAll
+                        ? (t('wordWheel.results.showLess') || 'Show less')
+                        : (t('wordWheel.results.showMoreCount')?.replace('{count}', String(remainingCount))
+                            || `Show all (+${remainingCount} more)`)}
+                    </button>
+                  )}
+                </>
               )}
             </>
           )}

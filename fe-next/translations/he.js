@@ -5275,6 +5275,8 @@ const he = {
     "samePuzzle": "אותה חידה לכולם בעולם. שתפו את התוצאות שלכם לאתגר חברים!",
     "alreadyPlayed": "כבר שיחקתם היום",
     "completed": "הושלם!",
+    "questPlayedSubtitle": "כבר שיחקתם היום",
+    "questPlayedCta": "לעמוד האתגר",
     "quitConfirm": "בטוחים שאתם רוצים לצאת? ההתקדמות תאבד ולא תוכלו לשחק שוב את החידה של היום.",
     "quitConfirmTitle": "לצאת מהאתגר?",
     "imSure": "אני בטוח/ה",
@@ -5620,7 +5622,10 @@ const he = {
       "dailyCompleteDesc": "שני המשחקים הושלמו. חזור מחר!",
       "backToDaily": "חזרה לאתגר היומי",
       "backToDailyDesc": "צפה בטבלת המובילים של היום",
-      "tapPlayerHint": "לחץ על שחקן כדי לראות מה פספסת"
+      "tapPlayerHint": "לחץ על שחקן כדי לראות מה פספסת",
+      "showLess": "הצג פחות",
+      "showMoreCount": "הצג הכול (+{count} נוספות)",
+      "perfectBanner": "אלוף המילים!"
     },
     "hub": {
       "wordWheelQuest": "גלגל מילים",
