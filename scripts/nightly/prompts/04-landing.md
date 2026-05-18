@@ -3,6 +3,9 @@ You are running the nightly landing/CVR lane for LexiClash. Today: __TODAY__. Wo
 ═══ LEARNINGS FROM PRIOR RUNS ═══
 __LEARNINGS__
 
+═══ SKILLS TO USE ═══
+From the **Specialized Skills** table above, invoke the skills listed for **lane 04 landing**. Design-quality skills (`frontend-design` or `impeccable:craft`) are MANDATORY here. Use `web-interface-guidelines` or `code-review` for the post-edit review pass.
+
 ═══ GOAL ═══
 Pick the WORST-converting landing page with ≥200 sessions in the last 14d and ship ONE variant behind a typed flag `landing_variant_<slug>_v1`. Goal = lift sign-up or game-start conversion.
 

@@ -16,7 +16,7 @@ __LEARNINGS__
   • Lane budget overruns (8-file cap hits) → "tighter scope needed"
 
 ═══ STEP 2 — Structure ═══
-Use this skeleton (preserve the **memory anchors** section verbatim — those are pinned rules from CLAUDE.md memory):
+Use this skeleton (preserve sections marked **DO NOT EDIT** verbatim):
 
 ```markdown
 # Nightly Learnings — accumulated playbook deltas
@@ -35,12 +35,24 @@ Rewritten by **lane 6** each night from prior 7 reports. **≤200 lines.**
 - <watch item> — first noticed <date>, status: <open|resolving>
 - ...
 
+## Specialized Skills (maintained by lane 6)
+[UPDATE this table based on outcome evidence — see rules below the table]
+
 ## Reddit reply etiquette (lane 3 sub-output)
-[preserve previous section verbatim]
+[preserve verbatim]
 
 ## Stat-framing reminders (memory anchors — DO NOT EDIT)
-[preserve previous section verbatim]
+[preserve verbatim]
 ```
+
+═══ STEP 2b — Update Specialized Skills table ═══
+For each lane, mine the last 7 reports for skill mentions + outcome (shipped vs reverted vs alerted):
+- Add a skill to a lane's row if it correlated with a shipped outcome in ≥2 nights.
+- Remove a skill from a lane if its inclusion correlated with reverts ≥2 of the last 3 nights.
+- Cap each row at 4 skills; drop lowest-evidence first.
+- Evidence column must be specific: `"shipped 3/3 last week"`, `"reverted 2/3 — overdesign"`, or `"seed"` if no data yet.
+- Lane 4 (landing) ALWAYS keeps `frontend-design` or `impeccable:craft` (one of them) — design quality is non-negotiable.
+- Lane 5 (SEO) ALWAYS keeps `seo-daily` (mandatory).
 
 ═══ STEP 3 — Discipline ═══
 - Drop entries older than 14d unless still active (replace, not accumulate).

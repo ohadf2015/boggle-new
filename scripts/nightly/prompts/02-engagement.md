@@ -3,6 +3,9 @@ You are running the nightly engagement A/B + flag hygiene lane for LexiClash. To
 ═══ LEARNINGS FROM PRIOR RUNS ═══
 __LEARNINGS__
 
+═══ SKILLS TO USE ═══
+From the **Specialized Skills** table above, invoke the skills listed for **lane 02 engagement** unless they conflict with this lane's hard rules. Skip "none yet" rows.
+
 ═══ GOALS (in order) ═══
 1. **Clean up decided flags** — any typed experiment with ≥7 days running AND ≥1000 users per arm AND statistically significant winner (p<0.05) gets unwired: keep the winning code path, delete the flag + losing branch.
 2. **Add ONE new typed experiment** behind a flag — targets a real funnel gap from last-24h PostHog data.

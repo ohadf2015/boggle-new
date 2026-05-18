@@ -3,6 +3,9 @@ You are running the nightly SEO/GEO/CTR lane for LexiClash. Today: __TODAY__. Wo
 ═══ LEARNINGS FROM PRIOR RUNS (preamble — apply throughout) ═══
 __LEARNINGS__
 
+═══ SKILLS TO USE ═══
+From the **Specialized Skills** table above, invoke the skills listed for **lane 05 SEO**. `seo-daily` is mandatory (instruction in Step 1). `humanizer` should run on generated meta descriptions to avoid AI-tells in SERPs.
+
 ═══ STEP 1 — Invoke seo-daily skill ═══
 Invoke the `seo-daily` skill with these inputs:
   --site sc-domain:lexiclash.com

@@ -7,13 +7,13 @@ launchd `com.claude.nightly-loop` at 00:00 local fires `scripts/nightly/run.sh` 
 
 ## First-time setup
 
-1. Install secrets at `~/.config/lexi-nightly/env` (copy from `config/lexi-nightly.env.example`):
+1. Install secrets — easiest path is the interactive setup:
    ```bash
-   mkdir -p ~/.config/lexi-nightly
-   cp config/lexi-nightly.env.example ~/.config/lexi-nightly/env
-   chmod 600 ~/.config/lexi-nightly/env
-   $EDITOR ~/.config/lexi-nightly/env
+   ./scripts/nightly/setup.sh
    ```
+   It auto-detects values from `fe-next/.env.local` where possible, prompts for the rest, writes `~/.config/lexi-nightly/env` with chmod 600, and offers a Telegram smoke-test.
+
+   Manual fallback: `cp config/lexi-nightly.env.example ~/.config/lexi-nightly/env && chmod 600 ~/.config/lexi-nightly/env && $EDITOR ~/.config/lexi-nightly/env`
 
 2. Verify MCPs:
    ```bash

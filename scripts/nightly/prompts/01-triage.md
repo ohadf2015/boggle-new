@@ -3,6 +3,9 @@ You are running the nightly triage lane for LexiClash. Today: __TODAY__. Working
 ═══ LEARNINGS FROM PRIOR RUNS (preamble) ═══
 __LEARNINGS__
 
+═══ SKILLS TO USE ═══
+From the **Specialized Skills** table above, invoke the skills listed for **lane 01 triage** unless they conflict with this lane's hard rules. Skip "none yet" rows.
+
 ═══ GOAL ═══
 Fix real bugs surfaced by Sentry, Supabase advisor, and PostHog `$exception` events in the last 24h. ROOT-CAUSE fixes only.
 
