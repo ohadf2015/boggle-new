@@ -12,7 +12,7 @@ Every night, autonomously improve LexiClash across error-rate, engagement, UX, c
 | 1 | **Triage** | sonnet | sentry MCP, supabase MCP advisor, posthog MCP `$exception` | root-cause fixes; security-adjacent → human queue | 8 files |
 | 2 | **Performance** | sonnet | `db_perf_top_query_audit`, `pg_stat_statements`, posthog `$web_vitals` (LCP/INP/CLS) p75, bundle sizes vs `perf-baseline.json` | indexes (advisor-justified only), N+1 fixes, image priority/dimensions, dynamic imports for below-fold heavy chunks; rewrites `perf-baseline.json` | 8 files |
 | 3 | **Engagement A/B + flag hygiene** | sonnet | posthog funnels last 24h vs 7d baseline | new typed experiment behind flag; remove decided flags (≥7d, p<0.05, n≥1000); add analytics for next-day insight | 8 files |
-| 4 | **Competitor + Reddit** | sonnet | Firecrawl r/wordgames, r/dailygames /top/week + top portals | `docs/nightly/ideas/YYYY-MM-DD.md` backlog + reply drafts (no code) | 2 files |
+| 4 | **Competitor + Reddit** | sonnet | `WebSearch` + `WebFetch` against `old.reddit.com/r/wordgames` / `r/dailygames` / r/Anagrams + portal sites; `agent-browser` skill fallback for JS-only pages | `docs/nightly/ideas/YYYY-MM-DD.md` backlog + reply drafts (no code) | 2 files |
 | 5 | **Landing/CVR** | opus | posthog landing conversion 14d; ground-truth audit (sitemap, llms.txt) | one landing variant behind `landing_variant_v{n}`, 5 locales, `frontend-design` + `animate-ai` skills | 8 files |
 | 6 | **SEO/GEO** | sonnet | GSC + Bing WMT 28d | invokes existing `seo-daily` skill `--no-pr` | 8 files |
 | 7 | **Self-learn** | opus | last 7 reports + commit outcomes | rewrites (not appends) `docs/nightly/learnings.md` ≤200 lines | 1 file |
@@ -61,7 +61,6 @@ TELEGRAM_BOT_TOKEN=
 TELEGRAM_CHAT_ID=
 POSTHOG_PERSONAL_API_KEY=
 POSTHOG_PROJECT_ID=
-FIRECRAWL_API_KEY=                # optional — lane 3 skips if missing
 SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=        # advisor + execute_sql via MCP already configured
 ```
@@ -75,4 +74,4 @@ launchd `StartCalendarInterval` 00:00 = **skipped if mac asleep**, no wake. Hone
 - Keep `com.claude.sentry-bugs.plist` every 4h — covers in-day spikes lane 1 won't catch until next nightly.
 
 ## Out of scope
-- Auto-rollback. Auto-merge for security-adjacent. Self-host Firecrawl (use hosted API; skip if missing). New realtime publication adds.
+- Auto-rollback. Auto-merge for security-adjacent. New realtime publication adds. Firecrawl integration (replaced by native WebSearch/WebFetch + agent-browser).

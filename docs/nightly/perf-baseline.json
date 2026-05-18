@@ -1,0 +1,15 @@
+{
+  "date": "1970-01-01",
+  "note": "Seed file — first nightly run rewrites this with real measurements.",
+  "backend": {
+    "top_queries": [],
+    "advisor_warnings_count": 0
+  },
+  "frontend": {
+    "by_route": []
+  },
+  "bundle": {
+    "total_kb": 0,
+    "top_chunks": []
+  }
+}

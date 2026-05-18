@@ -11,21 +11,36 @@ Surface (a) viral word-game concepts worth borrowing, (b) Reddit threads where L
 
 **NO code edits. NO commits.** Two markdown files only.
 
-═══ STEP 1 — Crawl via Firecrawl ═══
-Use the Firecrawl hosted API with `$FIRECRAWL_API_KEY`. Endpoint: `POST https://api.firecrawl.dev/v1/scrape` and `/v1/search`.
+═══ TOOLS — use these (NO external API key needed) ═══
+- **`WebSearch`** — broad discovery ("site:reddit.com r/wordgames best of week", "indie word game launches reddit 2026", etc.)
+- **`WebFetch`** — pull specific URLs. **Prefer `old.reddit.com/r/<sub>/top/?t=week` for plain HTML** — the new reddit.com requires JS and returns near-empty content to WebFetch.
+- **`agent-browser` skill** — fallback ONLY if WebFetch returns empty on a JS-heavy site (e.g., a tournament results page that hydrates client-side). Most targets work fine with WebFetch + the `old.reddit.com` workaround.
 
-Targets (use `/v1/scrape` with `formats: ["markdown"]`):
-  • https://www.reddit.com/r/wordgames/top/?t=week
-  • https://www.reddit.com/r/dailygames/top/?t=week
-  • https://www.reddit.com/r/Anagrams/top/?t=month
-  • https://www.reddit.com/r/Scrabble/top/?t=week
-  • https://www.reddit.com/r/languagelearning/search/?q=word%20game&sort=top&t=month
-  • https://poki.com/en/word
-  • https://www.crazygames.com/c/word
+If a target returns 429/403 (Reddit sometimes rate-limits unauthenticated reads): retry once with a 30-second wait, then move on. Do not block the lane on a single source.
 
-Skip targets that return 4xx/5xx — log and move on. Total crawl budget: 15 requests max.
+═══ STEP 1 — Discover via WebSearch ═══
+Run 3-5 broad WebSearch queries to find what's trending. Examples:
+- `WebSearch("reddit r/wordgames top this week site:reddit.com")`
+- `WebSearch("reddit r/dailygames top this week site:reddit.com")`
+- `WebSearch("indie word game launch 2026")`
+- `WebSearch("viral wordle clone 2026")`
+- `WebSearch("anagram game new release reddit")`
 
-═══ STEP 2 — Idea backlog (file 1) ═══
+Keep the SERP snippets — they often contain the post titles + upvote counts you need without further fetching.
+
+═══ STEP 2 — Deep-fetch the highest-signal candidates ═══
+Pick 3-6 URLs from search results worth pulling in full:
+- `WebFetch("https://old.reddit.com/r/wordgames/top/?t=week", "list top posts with title, upvotes, comment count, permalink")`
+- `WebFetch("https://old.reddit.com/r/dailygames/top/?t=week", "...")`
+- `WebFetch("https://old.reddit.com/r/Anagrams/top/?t=month", "...")`
+- `WebFetch("https://poki.com/en/word", "list top word games + featured concepts")`
+- `WebFetch("https://www.crazygames.com/c/word", "...")`
+
+For each fetch use a *narrow prompt* — telling WebFetch exactly what facts you want extracted reduces noise.
+
+If WebFetch returns essentially-empty content (likely JS-only render), invoke the `agent-browser` skill to navigate the URL and extract via DOM — but do this MAX twice per run, it's slower.
+
+═══ STEP 3 — Idea backlog (file 1) ═══
 Write `docs/nightly/ideas/__TODAY__.md`:
 
 ```
@@ -45,7 +60,7 @@ Write `docs/nightly/ideas/__TODAY__.md`:
 - portal/site: <feature> — why it converts
 ```
 
-═══ STEP 3 — Reddit reply candidates (file 2) ═══
+═══ STEP 4 — Reddit reply candidates (file 2) ═══
 Write `docs/nightly/ideas/__TODAY__-reddit.md`:
 
 ```
@@ -78,12 +93,14 @@ Rules for picking threads:
   • Skip threads with <5 upvotes (low reach)
   • Max 6 threads
 
-═══ STEP 4 — Append to nightly report ═══
+═══ STEP 5 — Append to nightly report ═══
 Append to `docs/nightly/reports/__TODAY__.md`:
 
 ```
-### Lane 3 — Competitor + Reddit research
+### Lane 4 — Competitor + Reddit research
+- Sources fetched: <count> (WebFetch + WebSearch + agent-browser if used)
 - Concepts surfaced: <count> (see docs/nightly/ideas/__TODAY__.md)
 - Reddit reply candidates: <count> (see docs/nightly/ideas/__TODAY__-reddit.md)
 - Top idea: <one-line>
+- Sources that failed (rate-limited / empty): <list or "none">
 ```

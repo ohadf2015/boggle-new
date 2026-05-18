@@ -17,8 +17,8 @@ Rewritten by **lane 6** each night from the prior 7 reports. **≤200 lines.** A
 - Demoting `logger.warn → debug` to clean Sentry — root-cause or queue, never silence.
 
 ## Open watches (carry forward until proven)
-- Lane 3 (Firecrawl) cost: monitor monthly spend; cap at $20/mo or switch to weekly cadence.
-- Lane 4 (landing variants) coverage: only ship 1 variant/week to avoid flag explosion.
+- Lane 04 (competitor) Reddit access: `old.reddit.com` may rate-limit unauthenticated fetches — if WebFetch returns 429 on >50% of attempts for a week, consider switching to the Reddit JSON API via OAuth.
+- Lane 05 (landing variants) coverage: only ship 1 variant/week to avoid flag explosion.
 - Self-learn drift: if `learnings.md` hits 200 lines for 3 nights running, the rotation logic is broken — investigate.
 
 ## Specialized Skills (maintained by lane 6)

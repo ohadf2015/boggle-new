@@ -69,15 +69,24 @@ preflight_check() {
   }
 
   # --- MCP servers alive ----------------------------------------------
+  # posthog + sentry are HARD requirements (every lane uses them).
+  # supabase is SOFT: lanes 1+2 prefer the MCP but can fall back to direct SQL
+  # via SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY env vars; lanes 3-7 don't use it.
+  # Source: web-research best-practice "graceful degradation over hard fail" for
+  # autonomous nightly jobs.
   local mcp_status
   mcp_status=$(claude mcp list 2>&1 || true)
-  for srv in posthog supabase sentry; do
+  for srv in posthog sentry; do
     if ! echo "$mcp_status" | grep -q "^${srv}:.*✓ Connected"; then
-      echo "preflight: ABORT — MCP server '$srv' not connected"
+      echo "preflight: ABORT — MCP server '$srv' not connected (hard requirement)"
       echo "$mcp_status" | grep "^${srv}:" || echo "  (not in list)"
       return 1
     fi
   done
+  if ! echo "$mcp_status" | grep -q "^supabase:.*✓ Connected"; then
+    echo "preflight: WARN — supabase MCP not connected; lanes 1+2 will degrade to direct SQL via env."
+    echo "$mcp_status" | grep "^supabase:" || echo "  (not in list)"
+  fi
 
   # --- required env ----------------------------------------------------
   local missing=()

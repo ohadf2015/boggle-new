@@ -51,7 +51,6 @@ fi
 export PROJECT_DIR LIB_DIR LANES_DIR LOG_DIR RUN_LOG REPORT TODAY DATE_TAG
 export TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID
 export POSTHOG_PERSONAL_API_KEY POSTHOG_PROJECT_ID POSTHOG_HOST
-export FIRECRAWL_API_KEY
 export SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY
 export NIGHTLY_DISABLED
 
@@ -196,13 +195,16 @@ DIRTY_COUNT=$(git status --porcelain | wc -l | tr -d ' ')
 log "total dirty files: $DIRTY_COUNT"
 
 if [ "$DIRTY_COUNT" = "0" ]; then
-  log "no changes from any lane — done"
-  echo -e "\n**Outcome:** no shippable changes." >> "$REPORT"
-  tg_doc "$REPORT" "🌙 nightly $TODAY — *no shippable changes*"
-  exit 0
+  log "no changes from any lane — composing summary anyway"
+  echo -e "\n**Outcome:** no shippable changes (baselines stable, no errors to fix)." >> "$REPORT"
+  # User wants a daily summary EVERY day, even if quiet. Compose a brief one.
+  NEW_SHA="$START_SHA"  # nothing pushed; baseline sha is "this morning"
+  NO_CHANGE_MODE=1
+else
+  NO_CHANGE_MODE=0
 fi
 
-if [ "$DIRTY_COUNT" -gt 30 ]; then
+if [ "$NO_CHANGE_MODE" = "0" ] && [ "$DIRTY_COUNT" -gt 30 ]; then
   log "ABORT: total diff $DIRTY_COUNT > 30 (sanity cap); reverting all"
   git checkout -- . 2>/dev/null || true
   git clean -fd 2>/dev/null || true
@@ -212,8 +214,10 @@ if [ "$DIRTY_COUNT" -gt 30 ]; then
 fi
 
 # --- build/lint/test gate (authoritative) ---------------------------------
-gate_ok=0
+gate_ok="${gate_ok:-0}"
+[ "$NO_CHANGE_MODE" = "1" ] && gate_ok=1
 for attempt in 1 2; do
+  [ "$gate_ok" = "1" ] && break
   log "gate attempt $attempt: fe-next lint + test + build:fast"
   (
     cd fe-next
@@ -240,10 +244,11 @@ if [ "$gate_ok" = "0" ]; then
   exit 1
 fi
 
-# --- commit ---------------------------------------------------------------
-LANE_SUMMARY=$(printf '%s\n' "${LANE_RESULTS[@]}" | sed 's/^/  /')
-MSG_FILE=$(mktemp)
-cat > "$MSG_FILE" <<EOF
+# --- commit + push (skipped entirely when NO_CHANGE_MODE=1) ---------------
+if [ "$NO_CHANGE_MODE" = "0" ]; then
+  LANE_SUMMARY=$(printf '%s\n' "${LANE_RESULTS[@]}" | sed 's/^/  /')
+  MSG_FILE=$(mktemp)
+  cat > "$MSG_FILE" <<EOF
 chore(nightly): autonomous improvement loop ${TODAY}
 
 Lanes:
@@ -255,44 +260,43 @@ Native-review locales flagged in individual lane outputs.
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 EOF
 
-if [ "$DRY_RUN" = "1" ]; then
-  log "DRY RUN — would commit:"
-  cat "$MSG_FILE" | sed 's/^/  | /' | tee -a "$RUN_LOG"
-  log "DRY RUN — skipping push"
-  echo -e "\n**Outcome:** DRY RUN ($DIRTY_COUNT files staged but not committed)." >> "$REPORT"
-  exit 0
+  if [ "$DRY_RUN" = "1" ]; then
+    log "DRY RUN — would commit:"
+    cat "$MSG_FILE" | sed 's/^/  | /' | tee -a "$RUN_LOG"
+    log "DRY RUN — skipping push, but composing summary"
+    echo -e "\n**Outcome:** DRY RUN ($DIRTY_COUNT files staged but not committed)." >> "$REPORT"
+    NEW_SHA="DRY-RUN-${START_SHA:0:7}"
+    rm -f "$MSG_FILE"
+  else
+    git add -A
+    git commit -F "$MSG_FILE" >> "$RUN_LOG" 2>&1 || {
+      log "commit failed (likely pre-commit hook). See log."
+      tg_alert "nightly $TODAY: commit failed — pre-commit hook? See \`$RUN_LOG\`."
+      exit 1
+    }
+    NEW_SHA=$(git rev-parse HEAD)
+    log "committed $NEW_SHA"
+    rm -f "$MSG_FILE"
+
+    if [ "$NO_PUSH" = "1" ]; then
+      log "--no-push — skipping push (will still compose + send summary)"
+      echo -e "\n**Outcome:** committed \`$NEW_SHA\` locally (not pushed)." >> "$REPORT"
+    else
+      log "pushing master..."
+      if git push origin master >> "$RUN_LOG" 2>&1; then
+        log "pushed $NEW_SHA"
+        echo -e "\n**Outcome:** ✅ shipped \`$NEW_SHA\`" >> "$REPORT"
+      else
+        log "push failed"
+        tg_alert "nightly $TODAY: push failed for \`$NEW_SHA\`. Local commit kept. See \`$RUN_LOG\`."
+        exit 1
+      fi
+    fi
+  fi
 fi
 
-git add -A
-git commit -F "$MSG_FILE" >> "$RUN_LOG" 2>&1 || {
-  log "commit failed (likely pre-commit hook). See log."
-  tg_alert "nightly $TODAY: commit failed — pre-commit hook? See \`$RUN_LOG\`."
-  exit 1
-}
-NEW_SHA=$(git rev-parse HEAD)
-log "committed $NEW_SHA"
-rm -f "$MSG_FILE"
-
-# --- push -----------------------------------------------------------------
-if [ "$NO_PUSH" = "1" ]; then
-  log "--no-push — skipping push"
-  echo -e "\n**Outcome:** committed \`$NEW_SHA\` locally (not pushed)." >> "$REPORT"
-  tg_doc "$REPORT" "🌙 nightly $TODAY — committed \`${NEW_SHA:0:7}\` (no push)"
-  exit 0
-fi
-
-log "pushing master..."
-if git push origin master >> "$RUN_LOG" 2>&1; then
-  log "pushed $NEW_SHA"
-  echo -e "\n**Outcome:** ✅ shipped \`$NEW_SHA\`" >> "$REPORT"
-else
-  log "push failed"
-  tg_alert "nightly $TODAY: push failed for \`$NEW_SHA\`. Local commit kept. See \`$RUN_LOG\`."
-  exit 1
-fi
-
-# --- post-push monitor ----------------------------------------------------
-if [ "$NO_MONITOR" = "0" ]; then
+# --- post-push monitor (skip in no-change / dry-run / no-push) ------------
+if [ "$NO_MONITOR" = "0" ] && [ "$NO_CHANGE_MODE" = "0" ] && [ "$DRY_RUN" = "0" ] && [ "$NO_PUSH" = "0" ]; then
   log "spawning health monitor (30 min)"
   nohup "$LIB_DIR/health-monitor.sh" "$NEW_SHA" \
     >> "$LOG_DIR/health-monitor.log" 2>&1 &
@@ -305,6 +309,8 @@ SUMMARY_FILE=$(mktemp -t nightly-summary.XXXXXX)
 SUMMARY_PROMPT=$(mktemp -t summary-prompt.XXXXXX)
 cat > "$SUMMARY_PROMPT" <<PROMPT_EOF
 You are writing a daily manager-summary Telegram message for the LexiClash founder. Read \`docs/nightly/reports/${TODAY}.md\` (today's nightly report) and any per-lane outputs referenced inside it.
+
+Mode: $([ "$NO_CHANGE_MODE" = "1" ] && echo "NO-CHANGE NIGHT (no lanes shipped fixes — baselines stable, no errors). Keep the summary BRIEF and honest about it. Highlight what was checked + that everything looks healthy. Skip 'Key wins' if there genuinely were none." || echo "Changes shipped. Lead with concrete impact.")
 
 Compose a concise narrative summary (≤1200 characters total, Telegram Markdown). Structure:
 

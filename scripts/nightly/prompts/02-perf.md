@@ -53,11 +53,9 @@ For routes with **p75 LCP > 2500ms**, **INP > 200ms**, or **CLS > 0.1**:
     - CLS source: image without dimensions, late-rendered ads → reserve space with `aspect-ratio` or `min-h`
 
 ═══ STEP 3 — Bundle size delta ═══
-After STEP 1 + STEP 2 edits, before exiting:
-```bash
-cd fe-next && du -sb .next/static/chunks/*.js 2>/dev/null | sort -nr | head -20 > /tmp/chunks-now.txt
-```
-Compare to last night's `docs/nightly/perf-baseline.json[chunks]`. Flag any chunk >50KB heavier than baseline (likely caused by a new dependency or barrel-import regression).
+Read `docs/nightly/perf-baseline.json`. If the `"date"` field is `"1970-01-01"` (seed file) OR the file is missing, this is the FIRST nightly run — there is no baseline yet, so SKIP regression comparison and proceed to STEP 4 with today's measurements as the new baseline.
+
+If a real baseline exists, compare today's `du -sb .next/static/chunks/*.js | sort -nr | head -20` against baseline `bundle.top_chunks`. Flag any chunk >50KB heavier (likely a new dependency or barrel-import regression).
 
 If a regression chunk is yours from earlier in this lane → fix in place. If from elsewhere → log to `docs/nightly/perf-watch.md` for human review.
 

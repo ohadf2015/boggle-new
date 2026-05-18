@@ -103,11 +103,6 @@ prompt "PostHog host" \
        "https://us.i.posthog.com (default) or https://eu.i.posthog.com"
 [ -z "${POSTHOG_HOST:-}" ] && POSTHOG_HOST="https://us.i.posthog.com"
 
-prompt "Firecrawl API key (optional — lane 3 skips if blank)" \
-       "FIRECRAWL_API_KEY" \
-       "https://firecrawl.dev/app/api-keys (paid plan)" \
-       --secret
-
 prompt "Supabase URL" \
        "SUPABASE_URL" \
        "Default: https://hdtmpkicuxvtmvrmtybx.supabase.co"
@@ -127,7 +122,6 @@ TELEGRAM_CHAT_ID="${TELEGRAM_CHAT_ID:-}"
 POSTHOG_PERSONAL_API_KEY="${POSTHOG_PERSONAL_API_KEY:-}"
 POSTHOG_PROJECT_ID="${POSTHOG_PROJECT_ID:-}"
 POSTHOG_HOST="${POSTHOG_HOST}"
-FIRECRAWL_API_KEY="${FIRECRAWL_API_KEY:-}"
 SUPABASE_URL="${SUPABASE_URL}"
 SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-}"
 # NIGHTLY_DISABLED=1   # uncomment to pause without unloading launchd
