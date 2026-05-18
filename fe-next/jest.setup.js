@@ -34,7 +34,22 @@ if (typeof globalThis.vi === 'undefined') {
     setSystemTime: (date) => jest.setSystemTime(date),
     resetModules: () => jest.resetModules(),
     hoisted: (factory) => factory(),
-    stubGlobal: (name, value) => { globalThis[name] = value; },
+    stubGlobal: (name, value) => {
+      if (!globalThis.vi._stubbedGlobals) globalThis.vi._stubbedGlobals = new Map();
+      if (!globalThis.vi._stubbedGlobals.has(name)) {
+        globalThis.vi._stubbedGlobals.set(name, globalThis[name]);
+      }
+      globalThis[name] = value;
+    },
+    unstubAllGlobals: () => {
+      if (!globalThis.vi._stubbedGlobals) return;
+      for (const [name, original] of globalThis.vi._stubbedGlobals) {
+        if (original === undefined) delete globalThis[name];
+        else globalThis[name] = original;
+      }
+      globalThis.vi._stubbedGlobals.clear();
+    },
+    unstubAllEnvs: () => {},
     dynamicImportSettled: () => Promise.resolve(),
   };
 }

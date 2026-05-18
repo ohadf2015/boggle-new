@@ -24,8 +24,21 @@ const vi = {
   runOnlyPendingTimers: () => jest.runOnlyPendingTimers(),
   setSystemTime: (date) => jest.setSystemTime(date),
   getRealSystemTime: () => Date.now(),
-  stubGlobal: (name, value) => { globalThis[name] = value; },
+  stubGlobal: (name, value) => {
+    if (!vi._stubbedGlobals) vi._stubbedGlobals = new Map();
+    if (!vi._stubbedGlobals.has(name)) vi._stubbedGlobals.set(name, globalThis[name]);
+    globalThis[name] = value;
+  },
+  unstubAllGlobals: () => {
+    if (!vi._stubbedGlobals) return;
+    for (const [name, original] of vi._stubbedGlobals) {
+      if (original === undefined) delete globalThis[name];
+      else globalThis[name] = original;
+    }
+    vi._stubbedGlobals.clear();
+  },
   stubEnv: (name, value) => { process.env[name] = value; },
+  unstubAllEnvs: () => {},
   hoisted: (factory) => factory(),
   resetModules: () => jest.resetModules(),
   dynamicImportSettled: () => Promise.resolve(),

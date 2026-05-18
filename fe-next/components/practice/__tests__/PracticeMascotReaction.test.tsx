@@ -11,6 +11,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('next/image', () => ({
+  __esModule: true,
   default: (p: Record<string, unknown>) => {
     // eslint-disable-next-line @next/next/no-img-element
     return <img alt="" {...p} />;

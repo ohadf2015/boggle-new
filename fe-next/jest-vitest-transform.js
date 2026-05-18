@@ -40,7 +40,7 @@ function replaceViHoisted(code) {
 function preprocessVitest(src) {
   // Check for vitest import OR bare vi.mock/vi.fn usage (some files skip the import)
   const hasVitestImport = src.includes("from 'vitest'") || src.includes('from "vitest"');
-  const hasViUsage = /\bvi\.(mock|fn|spyOn|mocked|unmock|hoisted|useFakeTimers|useRealTimers|advanceTimersByTime|runAllTimers|resetAllMocks|clearAllMocks|restoreAllMocks|resetModules|setSystemTime|stubGlobal|dynamicImportSettled)\b/.test(src);
+  const hasViUsage = /\bvi\.(mock|fn|spyOn|mocked|unmock|hoisted|useFakeTimers|useRealTimers|advanceTimersByTime|runAllTimers|resetAllMocks|clearAllMocks|restoreAllMocks|resetModules|setSystemTime|stubGlobal|unstubAllGlobals|unstubAllEnvs|dynamicImportSettled)\b/.test(src);
 
   if (!hasVitestImport && !hasViUsage) {
     return src;
@@ -87,7 +87,71 @@ function preprocessVitest(src) {
   // Top-level `await import(...)` → `require(...)` (Jest runs CJS, no top-level await)
   code = code.replace(/\bawait\s+import\s*\(/g, 'require(');
 
+  // Auto-inject `__esModule: true` into jest.mock factories that expose a
+  // `default:` export. Under Vitest the namespace is treated as ESM, so
+  // `import X from 'mod'` resolves to `.default` automatically. Jest's CJS
+  // interop only does that lookup when the module advertises `__esModule`.
+  // Without this, `import Default from 'mocked'` yields the whole exports
+  // object (e.g. `{ default: Component }`) and React renders "Element type
+  // is invalid: ... got: object". Many test files forget the flag — fix it
+  // once here instead of touching every file.
+  code = code.replace(
+    /(jest\.mock\([^,]+,\s*(?:async\s*)?\(\s*\)\s*=>\s*\(\{)(\s*)(?!\s*__esModule\b)([^}]*\bdefault\s*:)/g,
+    '$1$2__esModule: true,$2$3'
+  );
+
+  // Vitest's `expect(value, message)` (2-arg form) → strip the message.
+  // Jest 29+ throws "Expect takes at most one argument" on the second arg.
+  // We can't carry the message through, so we drop it; the assertion still
+  // reports the line + matcher when it fails.
+  code = stripExpectSecondArg(code);
+
   return code;
+}
+
+// expect(value, 'message') has a string second arg we need to remove.
+// Use balanced-paren matching because `value` may itself contain commas
+// (e.g. expect(obj.foo(a, b), 'msg')) which a flat regex would mis-split.
+function stripExpectSecondArg(code) {
+  const out = [];
+  let i = 0;
+  while (i < code.length) {
+    const next = code.indexOf('expect(', i);
+    if (next === -1) { out.push(code.slice(i)); break; }
+    // Ensure word boundary — skip false positives like `notExpect(`.
+    const before = next > 0 ? code[next - 1] : '';
+    if (/[A-Za-z0-9_$]/.test(before)) { out.push(code.slice(i, next + 7)); i = next + 7; continue; }
+    out.push(code.slice(i, next));
+    const argStart = next + 7;
+    let depth = 1;
+    let inStr = null;
+    let topCommas = [];
+    let j = argStart;
+    while (j < code.length && depth > 0) {
+      const ch = code[j];
+      if (inStr) {
+        if (ch === '\\') { j += 2; continue; }
+        if (ch === inStr) inStr = null;
+      } else if (ch === '"' || ch === "'" || ch === '`') {
+        inStr = ch;
+      } else if (ch === '(' || ch === '[' || ch === '{') depth++;
+      else if (ch === ')' || ch === ']' || ch === '}') depth--;
+      else if (ch === ',' && depth === 1) topCommas.push(j);
+      j++;
+    }
+    // j-1 is the closing `)` of expect(...).
+    out.push('expect(');
+    if (depth === 0 && topCommas.length >= 1) {
+      const firstComma = topCommas[0];
+      out.push(code.slice(argStart, firstComma));
+      out.push(code.slice(j - 1, j));
+      i = j;
+    } else {
+      out.push(code.slice(argStart, j));
+      i = j;
+    }
+  }
+  return out.join('');
 }
 
 module.exports = {

@@ -8,6 +8,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 vi.mock('next/script', () => ({
+  __esModule: true,
   default: ({ children, ...p }: any) => <script {...p}>{children}</script>,
 }));
 

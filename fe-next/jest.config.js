@@ -140,9 +140,11 @@ const customJestConfig = {
   // Verbose output
   verbose: true,
 
-  // Transform patterns
+  // Transform patterns. earcut ships as native ESM (`export default`) which
+  // Jest's CJS loader chokes on. pixi.js transitively imports it, so allow
+  // Jest to transform both packages instead of skipping them.
   transformIgnorePatterns: [
-    '/node_modules/',
+    '/node_modules/(?!(earcut|pixi\\.js)/)',
     '^.+\\.module\\.(css|sass|scss)$',
   ],
 };
