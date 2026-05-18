@@ -1,5 +1,5 @@
 #!/bin/bash
-# Lane 2 — Engagement A/B + flag hygiene.
+# Lane 3 — Engagement A/B + flag hygiene.
 # Sonnet · 12 min cap · ≤8 files
 set -uo pipefail
 LIB_DIR="$(dirname "$0")/../lib"

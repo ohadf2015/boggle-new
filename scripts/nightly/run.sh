@@ -22,6 +22,10 @@ REPORT="$PROJECT_DIR/docs/nightly/reports/${TODAY}.md"
 
 mkdir -p "$LOG_DIR" "$(dirname "$REPORT")"
 
+# Orchestrator PID — exported so preflight writes the RIGHT pid into the lock
+# file even when sourced from a subshell context.
+export NIGHTLY_PID="$$"
+
 # --- flags -----------------------------------------------------------------
 DRY_RUN=0; NO_PUSH=0; NO_MONITOR=0; ONLY=""; SKIP=""
 for arg in "$@"; do
@@ -42,7 +46,14 @@ else
   echo "FATAL: ~/.config/lexi-nightly/env missing"
   exit 1
 fi
-export PROJECT_DIR
+# Export so lane subshells inherit. (set -a above auto-exports vars during the
+# source, but only for THAT block — re-export explicitly to be safe across shells.)
+export PROJECT_DIR LIB_DIR LANES_DIR LOG_DIR RUN_LOG REPORT TODAY DATE_TAG
+export TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID
+export POSTHOG_PERSONAL_API_KEY POSTHOG_PROJECT_ID POSTHOG_HOST
+export FIRECRAWL_API_KEY
+export SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY
+export NIGHTLY_DISABLED
 
 # --- helpers ---------------------------------------------------------------
 log() { echo "[$(date +%H:%M:%S)] $*" | tee -a "$RUN_LOG"; }
@@ -58,26 +69,42 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# snapshot_pre_lane → echoes a tarball path containing tracked + untracked-non-ignored.
-# Why not `git stash create -u`? Returns empty when only untracked changes exist,
-# which is the common case for early lanes (lane 3 writes only new files).
+# snapshot_pre_lane → echoes a directory path containing a full mirror of the
+# working tree (excluding heavy dirs). Uses rsync so the revert can handle:
+#   - tracked modifications (replayed)
+#   - untracked-only state (replayed)
+#   - DELETIONS (replayed — git stash + tar lose this)
+#   - executable bits + symlinks (preserved by rsync -a)
+# Tested in 4 scenarios + 1000-file speed (~220ms).
 snapshot_pre_lane() {
   local snap
-  snap=$(mktemp -t lexi-snap.XXXXXX.tar)
-  git ls-files -comz --exclude-standard | tar -cf "$snap" --null -T - 2>/dev/null || true
+  snap=$(mktemp -d -t lexi-snap.XXXXXX)
+  rsync -a --delete \
+    --exclude='.git' \
+    --exclude='node_modules' \
+    --exclude='.next' \
+    --exclude='.turbo' \
+    --exclude='.claude/worktrees' \
+    --exclude='dist' --exclude='build' --exclude='coverage' \
+    "$PROJECT_DIR/" "$snap/" 2>/dev/null || true
   echo "$snap"
 }
 
-# revert_to_pre_lane <tarball_path>
-# Reset working tree to HEAD, clean untracked, restore the tarball.
-# Preserves changes from prior successful lanes (they were in the tarball).
+# revert_to_pre_lane <snapshot_dir>
+# Mirror the snapshot back onto the working tree with --delete (removes files
+# the lane added). Preserves prior lanes' work because they were in the snapshot.
 revert_to_pre_lane() {
   local snap="$1"
-  git reset --hard HEAD 2>/dev/null || true
-  git clean -fd 2>/dev/null || true
-  if [ -n "$snap" ] && [ -f "$snap" ]; then
-    tar -xf "$snap" 2>/dev/null || true
-    rm -f "$snap"
+  if [ -n "$snap" ] && [ -d "$snap" ]; then
+    rsync -a --delete \
+      --exclude='.git' \
+      --exclude='node_modules' \
+      --exclude='.next' \
+      --exclude='.turbo' \
+      --exclude='.claude/worktrees' \
+      --exclude='dist' --exclude='build' --exclude='coverage' \
+      "$snap/" "$PROJECT_DIR/" 2>/dev/null || true
+    rm -rf "$snap"
   fi
 }
 
@@ -88,8 +115,12 @@ log "========================================"
 log "nightly-loop start ${DATE_TAG} dry=$DRY_RUN no-push=$NO_PUSH only=$ONLY skip=$SKIP"
 log "========================================"
 
-if ! preflight_check 2>&1 | tee -a "$RUN_LOG"; then
+# NOTE: do NOT pipe preflight through tee — that puts the function in a subshell
+# where $$ resolves to the subshell PID (not run.sh's), poisoning lock-staleness
+# checks. Redirect instead.
+if ! preflight_check >> "$RUN_LOG" 2>&1; then
   log "preflight failed — aborting"
+  tail -20 "$RUN_LOG" 2>/dev/null
   tg_alert "preflight failed at $(date '+%H:%M'). See \`$RUN_LOG\`."
   exit 1
 fi

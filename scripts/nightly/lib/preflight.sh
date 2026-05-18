@@ -30,17 +30,21 @@ preflight_check() {
   fi
 
   # --- lock with pid + mtime ------------------------------------------
+  # IMPORTANT: caller must pass the orchestrator PID via $NIGHTLY_PID env var
+  # (set by run.sh before calling). $$ here would be the subshell PID and
+  # poison the staleness check next run.
+  local self_pid="${NIGHTLY_PID:-$$}"
   if [ -f "$LOCK_FILE" ]; then
     local pid=$(cat "$LOCK_FILE" 2>/dev/null | head -1)
     local lock_age=$(( $(date +%s) - $(stat -f %m "$LOCK_FILE" 2>/dev/null || echo 0) ))
-    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null && [ "$lock_age" -lt 7200 ]; then
+    if [ -n "$pid" ] && [ "$pid" != "$self_pid" ] && kill -0 "$pid" 2>/dev/null && [ "$lock_age" -lt 7200 ]; then
       echo "preflight: ABORT — another nightly is running (pid=$pid, age=${lock_age}s)"
       return 1
     fi
     echo "preflight: stale lock (pid=$pid, age=${lock_age}s) — clearing"
     rm -f "$LOCK_FILE"
   fi
-  echo "$$" > "$LOCK_FILE"
+  echo "$self_pid" > "$LOCK_FILE"
 
   # --- git tree state --------------------------------------------------
   cd "$PROJECT_DIR" || { echo "preflight: cd $PROJECT_DIR failed"; return 1; }

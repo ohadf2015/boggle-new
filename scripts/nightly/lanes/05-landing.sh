@@ -1,5 +1,5 @@
 #!/bin/bash
-# Lane 4 — Landing/CVR variant (frontend-design + animate-ai).
+# Lane 5 — Landing/CVR variant (frontend-design + animate-ai).
 # Opus · 18 min cap · ≤8 files
 set -uo pipefail
 LIB_DIR="$(dirname "$0")/../lib"

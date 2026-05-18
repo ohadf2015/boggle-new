@@ -11,6 +11,9 @@ ENV_FILE="$HOME/.config/lexi-nightly/env"
 PROJECT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 
 mkdir -p "$(dirname "$ENV_FILE")"
+# Pre-create the launchd log directory (launchd cannot mkdir parents for
+# StandardOutPath; missing dir = silent skip with error 72).
+mkdir -p "$HOME/logs/lexi-nightly"
 
 # --- helpers ---------------------------------------------------------------
 existing() {

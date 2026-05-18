@@ -1,5 +1,5 @@
 #!/bin/bash
-# Lane 3 — Competitor + Reddit research (Firecrawl). Research only — no code edits.
+# Lane 4 — Competitor + Reddit research (Firecrawl). Research only — no code edits.
 # Sonnet · 10 min cap · 2 files (idea backlog + reddit replies)
 set -uo pipefail
 LIB_DIR="$(dirname "$0")/../lib"

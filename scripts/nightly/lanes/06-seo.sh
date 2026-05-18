@@ -1,5 +1,5 @@
 #!/bin/bash
-# Lane 5 — SEO/GEO/CTR. Reuses existing seo-daily skill.
+# Lane 6 — SEO/GEO/CTR. Reuses existing seo-daily skill.
 # Sonnet · 12 min cap · ≤8 files
 set -uo pipefail
 LIB_DIR="$(dirname "$0")/../lib"
