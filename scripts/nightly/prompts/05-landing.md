@@ -37,6 +37,8 @@ Invoke the `frontend-design` skill (or `impeccable:craft`) with the existing pag
 
 Optionally invoke `animate-ai` for ONE entrance animation IF it serves CTA visibility — never gratuitous. Honor `prefers-reduced-motion`.
 
+OPTIONAL — image generation via mcp-image: if the variant needs a hero illustration AND no existing asset fits, use `mcp__mcp-image__generate_image` to produce one. Prompt should match brand context (read `.impeccable.md`): kawaii marshmallow cube mascot, white bg, electric color-coded modes (lime/pink/cyan/purple). Save under `fe-next/public/landing/<slug>-<n>.png`. Skip generation if it adds >2 files to the diff (per-lane cap is 8).
+
 ═══ STEP 3 — Ship as variant ═══
 - Add typed flag `landing_variant_<slug>_v1` to the experiments registry (grep `experiments/` or `getTypedExperiment` for pattern).
 - Variant rendered when flag = `'variant'`; default = current page (control).
