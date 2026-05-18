@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { AdMob, BannerAdSize, BannerAdPosition, RewardAdPluginEvents } from '@capacitor-community/admob';
+import { AdMob, BannerAdSize, BannerAdPosition, RewardAdPluginEvents, InterstitialAdPluginEvents } from '@capacitor-community/admob';
 import { useAdMobContext } from '@/contexts/AdMobContext';
 import type { RewardedSurface, BannerVariant } from '@/lib/admob-config';
 
@@ -95,7 +95,14 @@ export function useAdMob() {
     }
   }, [hasNoAds, getConfig, whenReady]);
 
-  const showInterstitial = useCallback(async () => {
+  // Resolves when the interstitial dismisses, fails, or never serves.
+  // Callers (e.g. MP host's "play again") await this so the next-round emit
+  // doesn't fire while a fullscreen overlay is still in front of the player
+  // — that's what previously stranded the player on a blank white screen
+  // when AdMob's prepare → show pipeline finished after results had painted.
+  // Safety timeout caps the wait in case Dismissed never arrives.
+  const INTERSTITIAL_SAFETY_TIMEOUT_MS = 15000;
+  const showInterstitial = useCallback(async (): Promise<void> => {
     recordGameEnd();
     if (!shouldShowInterstitial()) return;
     const config = getConfig();
@@ -103,11 +110,49 @@ export function useAdMob() {
     // Record before show — gate uses this counter, recording after a thrown
     // showInterstitial would let a broken plugin re-fire indefinitely.
     recordInterstitialShown();
-    try {
-      await whenReady();
-      await AdMob.prepareInterstitial({ adId: config.interstitialAdId });
-      await AdMob.showInterstitial();
-    } catch {}
+
+    const handles: Array<{ remove: () => void | Promise<void> }> = [];
+    let settled = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    await new Promise<void>((resolve) => {
+      const settle = () => {
+        if (settled) return;
+        settled = true;
+        if (timer) { clearTimeout(timer); timer = null; }
+        handles.forEach((h) => { try { h.remove(); } catch {} });
+        handles.length = 0;
+        resolve();
+      };
+
+      // Register listeners BEFORE prepare so a fast plugin can't fire
+      // Dismissed/FailedToShow before we're listening.
+      Promise.all([
+        AdMob.addListener(InterstitialAdPluginEvents.Dismissed, settle),
+        AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, settle),
+        AdMob.addListener(InterstitialAdPluginEvents.FailedToLoad, settle),
+      ])
+        .then((resolved) => {
+          if (settled) {
+            resolved.forEach((h) => { try { h.remove(); } catch {} });
+            return;
+          }
+          handles.push(...resolved);
+        })
+        .catch(() => { /* listener registration is best-effort */ });
+
+      timer = setTimeout(settle, INTERSTITIAL_SAFETY_TIMEOUT_MS);
+
+      (async () => {
+        try {
+          await whenReady();
+          await AdMob.prepareInterstitial({ adId: config.interstitialAdId });
+          await AdMob.showInterstitial();
+        } catch {
+          settle();
+        }
+      })();
+    });
   }, [recordGameEnd, shouldShowInterstitial, recordInterstitialShown, getConfig, whenReady]);
 
   const showBanner = useCallback(async (position = BannerAdPosition.BOTTOM_CENTER, margin?: number, opts?: ShowBannerOptions) => {
