@@ -67,7 +67,7 @@ SUPABASE_SERVICE_ROLE_KEY=        # advisor + execute_sql via MCP already config
 `gcloud ADC` + `~/.config/bing-wmt/credentials` continue to gate lane 5 (existing).
 
 ## Asleep mac
-launchd `StartCalendarInterval` 00:00 = **skipped if mac asleep**, no wake. Preflight checks `~/.cache/lexi-nightly/last-run` mtime; if >36h ago AND current hour 00–06, runs on first wake (heartbeat plist `StartInterval: 3600` triggers preflight, which decides). Honest contract: "runs once per calendar day if mac is awake some time between 00:00 and 06:00."
+launchd `StartCalendarInterval` 00:00 = **skipped if mac asleep**, no wake. Honest contract: **"fires at 00:00 only; if mac is asleep at midnight that night is silently skipped."** If you need wake-on-trigger, add `StartInterval: 3600` as a second plist and let `preflight.sh`'s 18h dedupe handle duplicate fires — not shipped by default to keep mac-sleep behavior predictable. Preflight writes the last-run timestamp ONLY on successful completion (run.sh end), so aborted runs don't poison the next retry.
 
 ## Decommission
 - Unload + delete `com.claude.seo-daily.plist` (lane 5 subsumes it).

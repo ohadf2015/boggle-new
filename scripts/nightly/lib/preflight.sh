@@ -93,11 +93,15 @@ preflight_check() {
   [ -f "$HOME/.config/bing-wmt/credentials" ] \
     || echo "preflight: WARN — Bing WMT creds missing; lane 5 may degrade"
 
-  # --- mark last run ---------------------------------------------------
-  date +%s > "$LAST_RUN_FILE"
+  # NOTE: last-run timestamp written by run.sh ONLY on successful completion,
+  # not here — otherwise an aborted preflight would poison the 18h dedupe check.
 
   echo "preflight: OK — repo @ $(git rev-parse --short HEAD)"
   return 0
+}
+
+preflight_mark_success() {
+  date +%s > "${LAST_RUN_FILE:-$HOME/.cache/lexi-nightly/last-run}"
 }
 
 preflight_release_lock() {

@@ -58,6 +58,29 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# snapshot_pre_lane → echoes a tarball path containing tracked + untracked-non-ignored.
+# Why not `git stash create -u`? Returns empty when only untracked changes exist,
+# which is the common case for early lanes (lane 3 writes only new files).
+snapshot_pre_lane() {
+  local snap
+  snap=$(mktemp -t lexi-snap.XXXXXX.tar)
+  git ls-files -comz --exclude-standard | tar -cf "$snap" --null -T - 2>/dev/null || true
+  echo "$snap"
+}
+
+# revert_to_pre_lane <tarball_path>
+# Reset working tree to HEAD, clean untracked, restore the tarball.
+# Preserves changes from prior successful lanes (they were in the tarball).
+revert_to_pre_lane() {
+  local snap="$1"
+  git reset --hard HEAD 2>/dev/null || true
+  git clean -fd 2>/dev/null || true
+  if [ -n "$snap" ] && [ -f "$snap" ]; then
+    tar -xf "$snap" 2>/dev/null || true
+    rm -f "$snap"
+  fi
+}
+
 # --- preflight -------------------------------------------------------------
 # shellcheck disable=SC1091
 . "$LIB_DIR/preflight.sh"
@@ -111,16 +134,15 @@ for i in 1 2 3 4 5 6; do
   fi
 
   log "──────── lane $i: $lane ────────"
-  BEFORE_SHA=$(git rev-parse HEAD)
+  PRE_LANE=$(snapshot_pre_lane)
   BEFORE_DIRTY=$(git status --porcelain | wc -l | tr -d ' ')
 
   if NIGHTLY_DRY_RUN="$DRY_RUN" "$lane_script" 2>&1 | tee -a "$RUN_LOG"; then
     AFTER_DIRTY=$(git status --porcelain | wc -l | tr -d ' ')
     changed=$(( AFTER_DIRTY - BEFORE_DIRTY ))
     if [ "$changed" -gt 8 ]; then
-      log "lane $i — EXCEEDED 8-file cap ($changed); reverting lane changes to $BEFORE_SHA"
-      git reset --hard "$BEFORE_SHA" 2>/dev/null || true
-      git clean -fd 2>/dev/null || true
+      log "lane $i — EXCEEDED 8-file cap ($changed); reverting THIS lane only"
+      revert_to_pre_lane "$PRE_LANE"
       LANE_RESULTS+=("⚠️  lane $i ($lane) — cap exceeded, reverted")
       echo "- ⚠️  **$lane** — exceeded 8-file cap, reverted" >> "$REPORT"
     else
@@ -129,9 +151,8 @@ for i in 1 2 3 4 5 6; do
     fi
   else
     rc=$?
-    log "lane $i — exit $rc (continuing to next lane); reverting partial edits"
-    git reset --hard "$BEFORE_SHA" 2>/dev/null || true
-    git clean -fd 2>/dev/null || true
+    log "lane $i — exit $rc (continuing); reverting THIS lane only"
+    revert_to_pre_lane "$PRE_LANE"
     LANE_RESULTS+=("❌ lane $i ($lane) — exit $rc")
     echo "- ❌ **$lane** — failed (exit $rc), reverted" >> "$REPORT"
   fi
@@ -252,5 +273,6 @@ HEADLINE="🌙 nightly $TODAY shipped \`${NEW_SHA:0:7}\` · $DIRTY_COUNT files
 $(printf '%s\n' "${LANE_RESULTS[@]}" | head -6)"
 tg_doc "$REPORT" "$HEADLINE"
 
+preflight_mark_success
 log "nightly-loop complete"
 exit 0
