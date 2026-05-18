@@ -7,9 +7,23 @@ __LEARNINGS__
 From the **Specialized Skills** table above, invoke the skills listed for **lane 05 landing**. Design-quality skills (`frontend-design` or `impeccable:craft`) are MANDATORY here. Use `web-interface-guidelines` or `code-review` for the post-edit review pass.
 
 ═══ GOAL ═══
-Pick the WORST-converting landing page with ≥200 sessions in the last 14d and ship ONE variant behind a typed flag `landing_variant_<slug>_v1`. Goal = lift sign-up or game-start conversion.
+Default: pick the WORST-converting landing page with ≥200 sessions in the last 14d and ship ONE variant behind a typed flag `landing_variant_<slug>_v1`. Goal = lift sign-up or game-start conversion.
 
-**ONLY ONE landing variant per week** — if any `landing_variant_*_v1` flag is <7 days old, skip this lane and log "deferred — recent variant still measuring."
+**ONLY ONE landing variant per week** — if any `landing_variant_*_v1` flag is <7 days old, skip the landing variant and consider STEP 0 instead.
+
+═══ STEP 0 — Experimental game mode (optional, behind strict gate) ═══
+*Permission granted by user (see `Permissions` block in preamble).*
+
+Look at `docs/nightly/loop-improvements/*.md` from the last 3 nights AND `docs/nightly/ideas/*.md` from lane 4. If a NEW game-mode concept appears with **≥2 mentions of evidence (data citation + competitor signal)**, you MAY ship an EXPERIMENTAL implementation in place of the landing variant this week.
+
+Constraints (ALL must hold):
+- Flag default OFF. Rollout target ≤10% (e.g. `gameMode.experimentalRollout: 0.1`).
+- Reachable ONLY via `?mode=<slug>` deep-link OR a rollout-flagged hub tile. Never the default home CTA.
+- MUST include a Playwriter E2E QA run that covers: (a) deep-link reaches the mode, (b) one happy-path game completion, (c) Sentry tag confirms `game_mode=<slug>` event fired. Failed E2E = revert the entire lane.
+- Per-lane 8-file cap still applies — pick a tiny mode (one new route + minimal client logic). No new realtime tables. No new auth.getUser() calls.
+- Append a "playwriter-qa.md" snippet to today's report showing the script + run output.
+
+If no concept passes the gate, fall back to the landing variant path below.
 
 ═══ HARD RULES ═══
 - **Ground-truth audit** before writing copy: read `fe-next/public/llms.txt`, `fe-next/app/sitemap.ts`, and the actual mode pages your copy references. No fabricated features, modes, languages.

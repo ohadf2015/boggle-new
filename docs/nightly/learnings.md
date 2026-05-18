@@ -16,6 +16,9 @@ Rewritten by **lane 6** each night from the prior 7 reports. **≤200 lines.** A
 - Headless Claude writing new realtime tables — burned 94% DB CPU once. Hard-banned.
 - Demoting `logger.warn → debug` to clean Sentry — root-cause or queue, never silence.
 
+## Permissions (granted by user)
+- **Experimental game modes OK** — lane 05 (landing) may ship a NEW game mode behind a typed flag with ≤10% rollout, provided: (a) flag default = off, (b) Playwriter E2E QA covers happy path + edge cases, (c) prior week's `loop-improvements/*.md` flagged a viable concept, (d) mode is reachable only via `?mode=<flag>` deep-link or rollout-flagged hub entry. Never expose to 100% from a nightly run — that requires human review.
+
 ## Open watches (carry forward until proven)
 - Lane 04 (competitor) Reddit access: `old.reddit.com` may rate-limit unauthenticated fetches — if WebFetch returns 429 on >50% of attempts for a week, consider switching to the Reddit JSON API via OAuth.
 - Lane 05 (landing variants) coverage: only ship 1 variant/week to avoid flag explosion.

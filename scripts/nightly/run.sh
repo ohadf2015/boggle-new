@@ -366,9 +366,16 @@ if "${_to[@]}" claude -p "$(cat "$SUMMARY_PROMPT")" \
   --allowedTools '*' \
   --dangerously-skip-permissions \
   --model sonnet \
+  < /dev/null \
   > "$SUMMARY_FILE" 2>>"$RUN_LOG"; then
-  SUMMARY=$(cat "$SUMMARY_FILE")
-  log "manager summary composed ($(wc -c < "$SUMMARY_FILE") chars)"
+  # Strip leakage from Claude CLI startup + Explanatory output-style decorations:
+  #  - "Warning: no stdin data received..." (suppressed by </dev/null but belt-and-suspenders)
+  #  - `★ Insight ─` / `─────` divider lines from the Explanatory style
+  #  - Leading/trailing whitespace
+  SUMMARY=$(sed -E '/^[[:space:]]*Warning:/d; /^[`]?★ Insight/,/^[`]?─{5,}/d; /^─{5,}/d' "$SUMMARY_FILE" \
+            | awk 'NF{found=1} found' \
+            | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')
+  log "manager summary composed ($(echo -n "$SUMMARY" | wc -c) chars after cleanup)"
 else
   log "summary composer failed/timed out — minimal fallback"
   SUMMARY=$(printf '🌙 *%s* — \`%s\`\n\nManager summary composer failed. See attached report.\n\n%s' \
