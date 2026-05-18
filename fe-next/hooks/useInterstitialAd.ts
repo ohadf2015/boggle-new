@@ -24,8 +24,13 @@ export function useInterstitialAd() {
   const h5Ads = useH5GamesAds();
   const firedRef = useRef<Set<string>>(new Set());
 
+  // Returns a Promise that resolves once the ad cycle has fully completed
+  // (dismissed / failed / never shown). Callers can `await` it to gate
+  // subsequent actions — e.g. the MP host awaits this before emitting
+  // `startGame` so all players stay on results until the ad-watching host
+  // is done. Non-awaiting callers still get the prior fire-and-forget shape.
   const showInterstitial = useCallback(
-    (name: string) => {
+    async (name: string): Promise<void> => {
       if (firedRef.current.has(name)) return;
       firedRef.current.add(name);
 
@@ -41,7 +46,7 @@ export function useInterstitialAd() {
         return;
       }
       if (Capacitor.isNativePlatform()) {
-        adMob.showInterstitial();
+        await adMob.showInterstitial();
         return;
       }
       if (h5EnvEnabled && (isProd || hasH5TestFlag)) {

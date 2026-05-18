@@ -60,6 +60,13 @@ vi.mock('@capacitor-community/admob', () => ({
     Dismissed: 'onRewardedVideoAdDismissed',
     Rewarded: 'onRewardedVideoAdReward',
   },
+  InterstitialAdPluginEvents: {
+    Loaded: 'interstitialAdLoaded',
+    FailedToLoad: 'interstitialAdFailedToLoad',
+    Showed: 'interstitialAdShowed',
+    FailedToShow: 'interstitialAdFailedToShow',
+    Dismissed: 'interstitialAdDismissed',
+  },
 }));
 
 import { Capacitor } from '@capacitor/core';
@@ -192,16 +199,33 @@ describe('useAdMob', () => {
     expect(onReward).not.toHaveBeenCalled();
   });
 
+  // Drive showInterstitial through its event-gated promise: the call awaits
+  // Dismissed (or FailedToShow/FailedToLoad). Fire Dismissed after each
+  // attempt so the loop doesn't hang on the 15s safety timeout.
+  const drainInterstitial = async (
+    fn: () => Promise<void>,
+    count: number,
+  ): Promise<void> => {
+    for (let i = 0; i < count; i++) {
+      const p = fn();
+      // Two microtask flushes: one for listener registration, one for prepare/show.
+      await Promise.resolve();
+      await Promise.resolve();
+      fireEvent('interstitialAdDismissed');
+      await p;
+    }
+  };
+
   it('showInterstitial calls recordGameEnd and shows ad when conditions met', async () => {
     const wrapper = makeWrapper(true);
     const { result } = renderHook(() => useAdMob(), { wrapper });
     // Need 6 calls to pass warmup (3) and hit first interstitial (6th total = 3rd post-warmup)
     await act(async () => {
-      for (let i = 0; i < 5; i++) await result.current.showInterstitial();
+      await drainInterstitial(() => result.current.showInterstitial(), 5);
     });
     vi.clearAllMocks();
     await act(async () => {
-      await result.current.showInterstitial();
+      await drainInterstitial(() => result.current.showInterstitial(), 1);
     });
     expect(AdMob.prepareInterstitial).toHaveBeenCalled();
     expect(AdMob.showInterstitial).toHaveBeenCalled();
@@ -212,7 +236,7 @@ describe('useAdMob', () => {
     const { result } = renderHook(() => useAdMob(), { wrapper });
     // Drive 4 successful interstitial cycles: warmup (3) + 4*(3 cycles) = 15 game-ends.
     await act(async () => {
-      for (let i = 0; i < 15; i++) await result.current.showInterstitial();
+      await drainInterstitial(() => result.current.showInterstitial(), 15);
     });
     expect(AdMob.prepareInterstitial).toHaveBeenCalledTimes(4);
     expect(AdMob.showInterstitial).toHaveBeenCalledTimes(4);
@@ -220,10 +244,53 @@ describe('useAdMob', () => {
     // 5th eligible cycle (game-ends 16-18) — must be blocked by cap.
     vi.clearAllMocks();
     await act(async () => {
-      for (let i = 0; i < 3; i++) await result.current.showInterstitial();
+      await drainInterstitial(() => result.current.showInterstitial(), 3);
     });
     expect(AdMob.prepareInterstitial).not.toHaveBeenCalled();
     expect(AdMob.showInterstitial).not.toHaveBeenCalled();
+  });
+
+  it('showInterstitial resolves on Dismissed event (gates next-round emits)', async () => {
+    // The MP host awaits this promise before emitting startGame so other
+    // players stay on results while the fullscreen overlay is showing.
+    // Drive through warmup first, then verify the gated cycle.
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    await act(async () => {
+      await drainInterstitial(() => result.current.showInterstitial(), 5);
+    });
+
+    let resolved = false;
+    await act(async () => {
+      const p = result.current.showInterstitial().then(() => { resolved = true; });
+      await Promise.resolve();
+      await Promise.resolve();
+      // Before Dismissed: still pending.
+      expect(resolved).toBe(false);
+      fireEvent('interstitialAdDismissed');
+      await p;
+    });
+    expect(resolved).toBe(true);
+  });
+
+  it('showInterstitial resolves on FailedToLoad (no fill must not block the room)', async () => {
+    // If AdMob can't fill the ad, the host shouldn't be stuck waiting and the
+    // rest of the room shouldn't be frozen on the results page.
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    await act(async () => {
+      await drainInterstitial(() => result.current.showInterstitial(), 5);
+    });
+
+    let resolved = false;
+    await act(async () => {
+      const p = result.current.showInterstitial().then(() => { resolved = true; });
+      await Promise.resolve();
+      await Promise.resolve();
+      fireEvent('interstitialAdFailedToLoad');
+      await p;
+    });
+    expect(resolved).toBe(true);
   });
 
   it('showInterstitial skips ad during warmup', async () => {

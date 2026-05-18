@@ -38,6 +38,7 @@ import { ResultsModals } from '@/components/results/ResultsModals';
 import { ResultsMainContent, type ResultsMainContentProps } from '@/components/results/ResultsMainContent';
 import { ResultsDetailsContent, type ResultsDetailsContentProps } from '@/components/results/ResultsDetailsContent';
 import { PostRoundSummary } from '@/components/results/PostRoundSummary';
+import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import type { WordHuntResultsSummaryProps } from '@/components/results/WordHuntResultsSummary';
 const StickyReadyBar = dynamic(() => import('@/components/results/StickyReadyBar'), { ssr: false });
 import { ResultsFriendStatusProvider } from '@/components/results/ResultsFriendStatus';
@@ -216,10 +217,13 @@ function DesktopResultsLayout({
           </ResultsSectionReveal>
         </div>
 
-        {/* CrazyGames banner ad — shown after results content */}
+        {/* Post-game banner ad — CrazyGamesBanner covers the web iframe surface;
+            ResultsBannerSlot serves AdMob inside the native app (where
+            /multiplayer is in GAME_ROUTES so AnchoredNativeBanner stays hidden). */}
         <ResultsSectionReveal index={9} flat className="w-full max-w-5xl mx-auto mt-6 relative z-10">
           <CrazyGamesBanner size="728x90" />
         </ResultsSectionReveal>
+        <ResultsBannerSlot placement="multiplayer-round-complete" className="w-full max-w-5xl mx-auto mt-4 relative z-10" />
       </div>
 
       {/* Scroll indicator — subtle bouncing chevron at bottom */}
@@ -291,10 +295,13 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     }
   }, []);
 
+  // Hold the interstitial trigger until the host initiates a rematch (see
+  // handleStartGame) instead of firing on mount. AdMob's prepare → show
+  // pipeline takes a few seconds, so the prior mount-fire would paint a
+  // fullscreen overlay over the results page once the user had already
+  // started reading — and a partially-rendered creative left the user
+  // stranded on a blank white screen.
   const { showInterstitial } = useInterstitialAd();
-  useEffect(() => {
-    showInterstitial('multiplayer-round-complete');
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
   // True from the moment exit is confirmed until the hard nav fires. We render
   // a clean black wash so the user never sees a half-torn ResultsPage during
@@ -635,9 +642,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
   // Handle host starting a new game directly from results page
   // Must reset game state first (like handleStartNewGame in useHostGameActions)
-  const handleStartGame = useCallback(() => {
+  const handleStartGame = useCallback(async () => {
     if (!socket || !isHost) return;
     logger.log('[RESULTS] Host starting new game from results page');
+
+    // Awaiting the interstitial gates `startGame` so the other players stay
+    // on results while the host watches their ad — without this gate they
+    // would drop into round 2 alone while the host's fullscreen overlay
+    // still covered round 1's results. The promise resolves immediately when
+    // no ad is served (cadence skip, no fill, non-native), so the no-ad
+    // path stays as snappy as before.
+    await showInterstitial('multiplayer-round-complete');
 
     // If idle pre-generation hasn't completed yet, fall back to synchronous
     // generation here (rare — only if host clicks rematch within ~1 frame
@@ -1014,10 +1029,13 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             <ResultsSectionReveal index={2}>
               <DailyChallengeInvite isWinner={isCurrentUserWinner} />
             </ResultsSectionReveal>
-            {/* CrazyGames banner ad — mobile size between results and details */}
+            {/* Post-game banner ad — CrazyGamesBanner covers the web iframe surface;
+                ResultsBannerSlot serves AdMob inside the native app (where
+                /multiplayer is in GAME_ROUTES so AnchoredNativeBanner stays hidden). */}
             <ResultsSectionReveal index={3} flat>
               <CrazyGamesBanner size="320x50" />
             </ResultsSectionReveal>
+            <ResultsBannerSlot placement="multiplayer-round-complete" />
             {/* Other players' details (inline, no tab switch needed) */}
             <ResultsSectionReveal index={4}>
               {renderDetailsTab()}
