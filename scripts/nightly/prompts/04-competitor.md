@@ -12,11 +12,18 @@ Surface (a) viral word-game concepts worth borrowing, (b) Reddit threads where L
 **NO code edits. NO commits.** Two markdown files only.
 
 ═══ TOOLS — use these (NO external API key needed) ═══
-- **`WebSearch`** — broad discovery ("site:reddit.com r/wordgames best of week", "indie word game launches reddit 2026", etc.)
-- **`WebFetch`** — pull specific URLs. **Prefer `old.reddit.com/r/<sub>/top/?t=week` for plain HTML** — the new reddit.com requires JS and returns near-empty content to WebFetch.
-- **`agent-browser` skill** — fallback ONLY if WebFetch returns empty on a JS-heavy site (e.g., a tournament results page that hydrates client-side). Most targets work fine with WebFetch + the `old.reddit.com` workaround.
 
-If a target returns 429/403 (Reddit sometimes rate-limits unauthenticated reads): retry once with a 30-second wait, then move on. Do not block the lane on a single source.
+**Reddit access strategy** (proven, no auth):
+1. **Native JSON suffix** — append `.json` to any reddit URL to get JSON: `https://www.reddit.com/r/wordgames/top.json?t=week&limit=25`. Returns post titles, scores, comments_count, permalinks, selftexts directly. **Use this FIRST.** Higher rate limit than old.reddit.com.
+2. **pullpush.io archive** — if reddit.com blocks our IP (rare but happens): `https://api.pullpush.io/reddit/search/submission/?subreddit=wordgames&sort=desc&sort_type=score&size=20&after=7d`. Free, no auth, historical data with author + body. Works when reddit.com is hard-blocked.
+3. **old.reddit.com** — last-resort plain HTML at `old.reddit.com/r/<sub>/top/?t=week`. Sometimes blocked entirely in 2026 (lane 4 history: 100% block rate in mid-May 2026); try (1) and (2) first.
+
+For each Reddit target, try sources in order 1 → 2 → 3. Skip the source if it returns 4xx/5xx; do NOT block the lane on any single source.
+
+**Tools available:**
+- **`WebSearch`** — broad discovery: "site:reddit.com r/wordgames best of week", "indie word game launches reddit 2026". Use to find candidate threads.
+- **`WebFetch`** — pull JSON or HTML. For Reddit `.json` URLs, your fetch prompt should say "extract: title, score, num_comments, permalink, selftext (truncated 500 chars), url, author". For pullpush.io: "extract: data[].title, data[].score, data[].num_comments, data[].full_link, data[].selftext".
+- **`agent-browser` skill** — fallback ONLY if WebFetch returns empty on a JS-only site (e.g., a portal that hydrates client-side). Max twice per run.
 
 ═══ STEP 1 — Discover via WebSearch ═══
 Run 3-5 broad WebSearch queries to find what's trending. Examples:
@@ -29,16 +36,20 @@ Run 3-5 broad WebSearch queries to find what's trending. Examples:
 Keep the SERP snippets — they often contain the post titles + upvote counts you need without further fetching.
 
 ═══ STEP 2 — Deep-fetch the highest-signal candidates ═══
-Pick 3-6 URLs from search results worth pulling in full:
-- `WebFetch("https://old.reddit.com/r/wordgames/top/?t=week", "list top posts with title, upvotes, comment count, permalink")`
-- `WebFetch("https://old.reddit.com/r/dailygames/top/?t=week", "...")`
-- `WebFetch("https://old.reddit.com/r/Anagrams/top/?t=month", "...")`
+Reddit targets (try `.json` first, pullpush.io second):
+- `WebFetch("https://www.reddit.com/r/wordgames/top.json?t=week&limit=25", "extract top posts: title, score, num_comments, permalink, selftext(500), url, author")`
+- `WebFetch("https://www.reddit.com/r/dailygames/top.json?t=week&limit=25", "...")`
+- `WebFetch("https://www.reddit.com/r/Anagrams/top.json?t=month&limit=25", "...")`
+- `WebFetch("https://www.reddit.com/r/Scrabble/top.json?t=week&limit=25", "...")`
+
+If `.json` route returns 429/403/empty for a subreddit, fall back to pullpush.io for that one:
+- `WebFetch("https://api.pullpush.io/reddit/search/submission/?subreddit=wordgames&sort=desc&sort_type=score&size=20&after=7d", "extract data[]: title, score, num_comments, full_link, selftext")`
+
+Portal sites (different fetcher concerns — JS-heavy, prefer agent-browser if WebFetch returns near-empty):
 - `WebFetch("https://poki.com/en/word", "list top word games + featured concepts")`
-- `WebFetch("https://www.crazygames.com/c/word", "...")`
+- `WebFetch("https://www.crazygames.com/c/word", "list top word games + featured concepts")`
 
 For each fetch use a *narrow prompt* — telling WebFetch exactly what facts you want extracted reduces noise.
-
-If WebFetch returns essentially-empty content (likely JS-only render), invoke the `agent-browser` skill to navigate the URL and extract via DOM — but do this MAX twice per run, it's slower.
 
 ═══ STEP 3 — Idea backlog (file 1) ═══
 Write `docs/nightly/ideas/__TODAY__.md`:
@@ -93,14 +104,29 @@ Rules for picking threads:
   • Skip threads with <5 upvotes (low reach)
   • Max 6 threads
 
-═══ STEP 5 — Append to nightly report ═══
-Append to `docs/nightly/reports/__TODAY__.md`:
+═══ STEP 5 — Append to nightly report (CRITICAL for Telegram digest) ═══
+Append to `docs/nightly/reports/__TODAY__.md` — this exact format is parsed by the manager-summary lane to extract `top_reddit_link`, `top_reddit_draft`, `top_game_idea`:
 
 ```
 ### Lane 4 — Competitor + Reddit research
-- Sources fetched: <count> (WebFetch + WebSearch + agent-browser if used)
+- Sources fetched: <count> (.json + pullpush.io + portals)
 - Concepts surfaced: <count> (see docs/nightly/ideas/__TODAY__.md)
 - Reddit reply candidates: <count> (see docs/nightly/ideas/__TODAY__-reddit.md)
-- Top idea: <one-line>
-- Sources that failed (rate-limited / empty): <list or "none">
+- Top idea: <one-line — should ideally be a game-mode-improvement insight from data>
+- Sources that failed: <list or "none">
+
+#### Top Reddit pick of the day
+- Thread: <full permalink>
+- Subreddit: r/<name> (self-promo rule: <strict/loose/none>)
+- OP question: <1-line>
+- **Suggested reply (helpful-only):**
+> <text>
+
+#### Top game-mode improvement idea
+- Title: <name>
+- Source signal: <metric or thread that suggests this>
+- Effort: S/M/L
+- Why it'd help: <one-line>
 ```
+
+These two sub-sections feed directly into tomorrow's Telegram summary so the founder sees them inline (not just buried in attached file).

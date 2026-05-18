@@ -323,7 +323,7 @@ You are writing a daily Telegram message for the LexiClash founder. Read \`docs/
 
 Mode: $([ "$NO_CHANGE_MODE" = "1" ] && echo "NO-CHANGE NIGHT (no lanes shipped). Output 4-6 lines max: a one-line 'all clear' headline + a brief 'what was checked'. NO bullet sections. Skip 'wins' entirely." || echo "Changes shipped. Lead with concrete impact.")
 
-Compose the message in this MINIMAL format (≤800 chars total). One blank line between sections. Skip any section that is empty — do NOT print empty section markers.
+Compose the message in this MINIMAL format (≤1200 chars total). One blank line between sections. Skip any section that is empty — do NOT print empty section markers.
 
 \`\`\`
 🌙 *${TODAY}* — \`${NEW_SHA:0:7}\` · ${DIRTY_COUNT} files
@@ -336,6 +336,13 @@ Compose the message in this MINIMAL format (≤800 chars total). One blank line 
 
 ⚠️ <concern 1 — only if real>
 ⚠️ <concern 2>
+
+💬 *Reddit pick* (from lane 4's "Top Reddit pick of the day" — INCLUDE the full permalink AND the suggested reply as a quote, only if lane 4 produced one)
+> permalink: <url>
+> reply: <draft text, kept to ≤200 chars>
+
+🎮 *Game-mode idea* (from lane 4's "Top game-mode improvement idea" OR lane 7's "new product ideas")
+<one line: name + why>
 
 → <one-line tomorrow focus>
 \`\`\`
