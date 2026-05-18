@@ -25,14 +25,24 @@ existing() {
 }
 
 probe_dotenv() {
-  # Pull a value from fe-next/.env.local or fe-next/.env (without exposing content)
+  # Pull a value from fe-next/.env.local, .env, or root .env. Tries the exact
+  # key first, then common NEXT_PUBLIC_* aliases (most server secrets in this
+  # repo are exposed to the frontend with that prefix).
   local key="$1"
+  local aliases=("$key")
+  case "$key" in
+    SUPABASE_URL)   aliases+=(NEXT_PUBLIC_SUPABASE_URL) ;;
+    POSTHOG_HOST)   aliases+=(NEXT_PUBLIC_POSTHOG_HOST POSTHOG_API_HOST) ;;
+    # NEXT_PUBLIC_POSTHOG_KEY is the WRITE-side public key; the personal API
+    # key for HogQL queries is a different credential. Do NOT alias.
+  esac
   for f in "$PROJECT_DIR/fe-next/.env.local" "$PROJECT_DIR/fe-next/.env" "$PROJECT_DIR/.env"; do
-    if [ -f "$f" ]; then
+    [ -f "$f" ] || continue
+    for k in "${aliases[@]}"; do
       local v
-      v=$(grep -E "^${key}=" "$f" 2>/dev/null | head -1 | cut -d= -f2- | sed -e 's/^"//' -e 's/"$//')
+      v=$(grep -E "^${k}=" "$f" 2>/dev/null | head -1 | cut -d= -f2- | sed -e 's/^"//' -e 's/"$//')
       if [ -n "$v" ]; then echo "$v"; return; fi
-    fi
+    done
   done
 }
 
