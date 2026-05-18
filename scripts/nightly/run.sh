@@ -27,12 +27,13 @@ mkdir -p "$LOG_DIR" "$(dirname "$REPORT")"
 export NIGHTLY_PID="$$"
 
 # --- flags -----------------------------------------------------------------
-DRY_RUN=0; NO_PUSH=0; NO_MONITOR=0; ONLY=""; SKIP=""
+DRY_RUN=0; NO_PUSH=0; NO_MONITOR=0; NO_GATE=0; ONLY=""; SKIP=""
 for arg in "$@"; do
   case "$arg" in
     --dry-run)    DRY_RUN=1; NO_PUSH=1; NO_MONITOR=1 ;;
     --no-push)    NO_PUSH=1 ;;
     --no-monitor) NO_MONITOR=1 ;;
+    --no-gate)    NO_GATE=1 ;;   # skip lint/test/build — use ONLY for docs-only lanes (4)
     --only=*)     ONLY="${arg#--only=}" ;;
     --skip=*)     SKIP="${arg#--skip=}" ;;
     *) echo "unknown flag: $arg"; exit 2 ;;
@@ -207,7 +208,10 @@ fi
 if [ "$NO_CHANGE_MODE" = "0" ] && [ "$DIRTY_COUNT" -gt 30 ]; then
   log "ABORT: total diff $DIRTY_COUNT > 30 (sanity cap); reverting all"
   git checkout -- . 2>/dev/null || true
-  git clean -fd 2>/dev/null || true
+  # Preserve the run-time report + ideas dirs (their files document the run
+  # itself and are useful even when lane work is reverted).
+  git clean -fd -e 'docs/nightly/reports' -e 'docs/nightly/ideas' 2>/dev/null || true
+  mkdir -p "$(dirname "$REPORT")" "$PROJECT_DIR/docs/nightly/ideas"
   echo -e "\n**Outcome:** ABORTED — diff $DIRTY_COUNT > 30 sanity cap." >> "$REPORT"
   tg_alert "nightly $TODAY ABORTED — diff $DIRTY_COUNT files > 30 sanity cap. All changes reverted."
   exit 1
@@ -216,6 +220,10 @@ fi
 # --- build/lint/test gate (authoritative) ---------------------------------
 gate_ok="${gate_ok:-0}"
 [ "$NO_CHANGE_MODE" = "1" ] && gate_ok=1
+if [ "$NO_GATE" = "1" ]; then
+  log "--no-gate — skipping lint/test/build (only safe for docs-only lanes)"
+  gate_ok=1
+fi
 for attempt in 1 2; do
   [ "$gate_ok" = "1" ] && break
   log "gate attempt $attempt: fe-next lint + test + build:fast"
@@ -238,7 +246,10 @@ done
 if [ "$gate_ok" = "0" ]; then
   log "GATE FAILED — reverting all lane changes"
   git checkout -- . 2>/dev/null || true
-  git clean -fd 2>/dev/null || true
+  # Preserve the run-time report + ideas dirs (their files document the run
+  # itself and are useful even when lane work is reverted).
+  git clean -fd -e 'docs/nightly/reports' -e 'docs/nightly/ideas' 2>/dev/null || true
+  mkdir -p "$(dirname "$REPORT")" "$PROJECT_DIR/docs/nightly/ideas"
   echo -e "\n**Outcome:** GATE FAILED — lint/test/build failed twice. Reverted." >> "$REPORT"
   tg_alert "nightly $TODAY: build/lint/test gate failed twice. Diff reverted. See \`$RUN_LOG\`."
   exit 1

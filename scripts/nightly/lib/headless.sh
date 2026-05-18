@@ -58,7 +58,18 @@ PY
   echo "headless: lane=$lane_id model=$model timeout=${timeout_sec}s prompt=$(wc -c < "$rendered")B" | tee -a "$log_file"
 
   # Inherit env (claude needs HOME + its own oauth state). Secrets already exported.
-  timeout "${timeout_sec}s" \
+  # macOS ships without GNU timeout; prefer system `timeout`, fall back to
+  # gtimeout (brew coreutils) or perl alarm wrapper. Perl always present on macOS.
+  local timeout_cmd
+  if command -v timeout >/dev/null 2>&1; then
+    timeout_cmd=(timeout "${timeout_sec}s")
+  elif command -v gtimeout >/dev/null 2>&1; then
+    timeout_cmd=(gtimeout "${timeout_sec}s")
+  else
+    timeout_cmd=(/usr/bin/perl -e 'alarm shift; exec @ARGV or die "exec: $!"' -- "$timeout_sec")
+  fi
+
+  "${timeout_cmd[@]}" \
     claude -p "$(cat "$rendered")" \
       --allowedTools '*' \
       --dangerously-skip-permissions \
