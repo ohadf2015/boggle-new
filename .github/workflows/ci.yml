@@ -149,10 +149,18 @@ jobs:
             npm ci --prefer-offline --no-audit
           fi
 
+      - name: Build backend schemas (required by handler tests)
+        if: matrix.shard == 1
+        working-directory: fe-next
+        run: npm run build:schemas
+
       - name: Run backend tests (shard 1 only)
         if: matrix.shard == 1
         working-directory: fe-next
-        run: npx jest --config=backend/jest.config.js --ci --forceExit
+        # Backend uses Vitest, not Jest — the `backend/jest.config.js` this
+        # step used to reference doesn't exist in the repo. Match the
+        # `npm run test:backend` script.
+        run: npx vitest run --config backend/vitest.config.ts
         env:
           CI: true
 
