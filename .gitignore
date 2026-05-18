@@ -57,3 +57,4 @@ dump.rdb
 # Release signing keys
 *.keystore
 *.jks
+supabase/.temp/
