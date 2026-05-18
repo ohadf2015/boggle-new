@@ -5403,6 +5403,8 @@ const en = {
     "samePuzzle": "Same puzzle for everyone. How do you rank?",
     "alreadyPlayed": "Done Today!",
     "completed": "Complete!",
+    "questPlayedSubtitle": "Already played today",
+    "questPlayedCta": "View Daily Hub",
     "quitConfirm": "Quit? No replays today!",
     "quitConfirmTitle": "Quit?",
     "imSure": "Quit",
@@ -5726,7 +5728,10 @@ const en = {
       "dailyCompleteDesc": "Both games done. Come back tomorrow!",
       "backToDaily": "Back to Daily Hub",
       "backToDailyDesc": "See today's leaderboard",
-      "tapPlayerHint": "Tap a player to see what you missed"
+      "tapPlayerHint": "Tap a player to see what you missed",
+      "showLess": "Show less",
+      "showMoreCount": "Show all (+{count} more)",
+      "perfectBanner": "Word Wizard!"
     },
     "hub": {
       "wordWheelQuest": "Word Wheel",

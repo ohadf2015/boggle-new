@@ -5334,6 +5334,8 @@ const ja = {
     "samePuzzle": "世界中で同じパズル。結果をシェアして友達に挑戦！",
     "alreadyPlayed": "今日はプレイ済み",
     "completed": "完了！",
+    "questPlayedSubtitle": "今日はプレイ済み",
+    "questPlayedCta": "デイリーハブへ",
     "quitConfirm": "本当に終了しますか？進捗が失われ、今日のパズルは再プレイできません。",
     "quitConfirmTitle": "チャレンジを終了しますか？",
     "imSure": "終了する",
@@ -5651,7 +5653,10 @@ const ja = {
       "dailyCompleteDesc": "両方のゲーム完了。また明日！",
       "backToDaily": "デイリーハブに戻る",
       "backToDailyDesc": "今日のリーダーボードを見る",
-      "tapPlayerHint": "プレイヤーをタップして見逃した単語を確認"
+      "tapPlayerHint": "プレイヤーをタップして見逃した単語を確認",
+      "showLess": "閉じる",
+      "showMoreCount": "すべて表示 (+{count}件)",
+      "perfectBanner": "言葉の達人!"
     },
     "hub": {
       "wordWheelQuest": "ワードホイール",

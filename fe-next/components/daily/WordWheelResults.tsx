@@ -2,12 +2,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { m, animate as fmAnimate } from 'framer-motion';
-import { Star, ArrowRight, ArrowLeft, Flame, Crown, Zap, Type, Home } from 'lucide-react';
+import { Star, ArrowRight, ArrowLeft, Flame, Crown, Zap, Type, Home, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { cn } from '@/lib/utils';
 import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeChainCta from '@/components/practice/PracticeChainCta';
@@ -15,6 +17,13 @@ import DailyInsightStack from './DailyInsightStack';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import type { Language } from '@/types';
 import type { WordWheelGameResult } from './WordWheelGame';
+
+// Threshold for the "exceptional run" celebration — covers two cases:
+//   • score ≥ EXCELLENT_SCORE: graded run, almost-all-words tier
+//   • wordsFound ≥ EXCELLENT_WORD_COUNT: brute-coverage signal
+// Either trigger flips on extra confetti, layered sound, and the banner.
+const EXCELLENT_SCORE = 80;
+const EXCELLENT_WORD_COUNT = 20;
 
 interface WordWheelResultsProps {
   result: WordWheelGameResult;
@@ -109,8 +118,10 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
 }) => {
   const { t, language } = useLanguage();
   const { submitLeaderboardScore } = useCrazyGames();
+  const { playSound } = useSoundEffects();
   const isPractice = usePracticeFlag();
   const tier = getResultTier(result.score);
+  const isExceptional = result.score >= EXCELLENT_SCORE || result.wordsFound.length >= EXCELLENT_WORD_COUNT;
   const [showConfetti, setShowConfetti] = useState(false);
   const [animatedScore, setAnimatedScore] = useState(0);
 
@@ -143,7 +154,17 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
     return undefined;
   }, [result.score]);
 
-  const confettiCount = result.score >= 80 ? 40 : result.score >= 50 ? 25 : 15;
+  // Layered celebration for exceptional runs — partyTada lands ~700ms after
+  // the existing victoryFanfare from WordWheelGame so they sequence, not stack.
+  // crownVictory follows another ~500ms later to cap the moment.
+  useEffect(() => {
+    if (!isExceptional || isPractice) return;
+    const t1 = setTimeout(() => playSound('partyTada', { volume: 0.7, requiresGameActive: false }), 700);
+    const t2 = setTimeout(() => playSound('crownVictory', { volume: 0.6, requiresGameActive: false }), 1200);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [isExceptional, isPractice, playSound]);
+
+  const confettiCount = isExceptional ? 80 : result.score >= 50 ? 25 : 15;
 
   return (
     <m.div
@@ -224,6 +245,25 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
       >
         {t(tier.key)}
       </m.p>
+
+      {/* Exceptional-run banner — only renders for the top tier (almost-all
+          words / score ≥ 80). Mass + double Sparkles + spring scale gives it
+          the "this was special" feel without competing with the score circle. */}
+      {isExceptional && (
+        <m.div
+          data-testid="word-wheel-perfect-banner"
+          className="z-10 flex items-center gap-2 px-4 py-1.5 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black shadow-[3px_3px_0px_black,0_0_24px_rgba(191,255,0,0.55)]"
+          initial={{ scale: 0, y: -6 }}
+          animate={{ scale: [0, 1.18, 1], y: 0 }}
+          transition={{ delay: 1.0, duration: 0.55, type: 'spring', stiffness: 380, damping: 16 }}
+        >
+          <Sparkles className="w-4 h-4" strokeWidth={2.5} aria-hidden />
+          <span className="font-neo-display font-black text-sm tracking-wider uppercase">
+            {t('wordWheel.results.perfectBanner', 'Word Wizard!')}
+          </span>
+          <Sparkles className="w-4 h-4" strokeWidth={2.5} aria-hidden />
+        </m.div>
+      )}
 
       {/* Stats */}
       <m.div
@@ -366,7 +406,8 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.7 + i * 0.05 }}
               >
-                {word} <span className="text-neo-lime">+{scoreWord(word)}</span>
+                {gameLang === 'he' ? applyHebrewFinalLetters(word) : word}{' '}
+                <span className="text-neo-lime">+{scoreWord(word)}</span>
               </m.span>
             ))}
           </div>

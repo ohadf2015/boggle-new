@@ -5313,6 +5313,8 @@ const es = {
     "samePuzzle": "Mismo puzzle para todos en el mundo. ¡Comparte tus resultados para desafiar a amigos!",
     "alreadyPlayed": "Ya Jugaste Hoy",
     "completed": "¡Completado!",
+    "questPlayedSubtitle": "Ya jugaste hoy",
+    "questPlayedCta": "Ir al Reto Diario",
     "quitConfirm": "¿Seguro que quieres salir? Perderás tu progreso y no podrás jugar el puzzle de hoy de nuevo.",
     "quitConfirmTitle": "¿Salir del desafío?",
     "imSure": "Estoy seguro",
@@ -5661,7 +5663,10 @@ const es = {
       "dailyCompleteDesc": "Ambos juegos hechos. ¡Vuelve mañana!",
       "backToDaily": "Volver al Reto Diario",
       "backToDailyDesc": "Ver la tabla de clasificación de hoy",
-      "tapPlayerHint": "Toca un jugador para ver lo que te perdiste"
+      "tapPlayerHint": "Toca un jugador para ver lo que te perdiste",
+      "showLess": "Ver menos",
+      "showMoreCount": "Ver todas (+{count} más)",
+      "perfectBanner": "¡Mago de palabras!"
     },
     "hub": {
       "wordWheelQuest": "Rueda de palabras",
