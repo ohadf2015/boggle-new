@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useCallback, useMemo, memo, useState, useDeferredValue } from 'react';
+import { useRef, useEffect, useCallback, useMemo, memo, useState } from 'react';
 import {
   useBlastTileOverlay,
   useWordHuntTargetLength,
@@ -13,7 +13,7 @@ import {
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { useAnnouncer } from '../GameAnnouncer';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
-import { useSelectionStore, resetSelection } from '@/hooks/useSelectionStore';
+import { useSelectionStore, resetSelection, useFrozenWhileSelecting } from '@/hooks/useSelectionStore';
 import { useTapToDragGuidance } from '@/hooks/useTapToDragGuidance';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
@@ -203,9 +203,14 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
   const [lastWordFoundTime, setLastWordFoundTime] = useState<number>(() => (gameActive ? Date.now() : 0));
 
-  // Deferred values for smoother UI
-  const deferredLeaderboard = useDeferredValue(leaderboard);
-  const deferredFoundWords = useDeferredValue(foundWords);
+  // Freeze leaderboard/found-words while the player is mid-drag. Socket bursts
+  // (opponents scoring 4-6/sec in active MP rooms) used to cascade through
+  // PortraitLayout → CompactLeaderboard / GameLeaderboard during selection,
+  // stealing frame budget from the grid drag rendering ("UI stuck when
+  // selecting words"). The frozen value reveals the latest state the instant
+  // the player releases — leaderboard catches up immediately.
+  const deferredLeaderboard = useFrozenWhileSelecting(leaderboard);
+  const deferredFoundWords = useFrozenWhileSelecting(foundWords);
 
   // Refs
   const gameStatsRef = useRef<HTMLDivElement>(null);
