@@ -25,7 +25,11 @@ export function computeWeekScore(scores: DayScore[]): number {
   const normalized = scores.map(({ mode, rawScore, timeSeconds }) => {
     if (mode === 'word_hunt') return Math.min(100, rawScore)
     if (!timeSeconds || timeSeconds <= 0) return 0
-    return Math.min(100, (rawScore / timeSeconds) * 60 / 6) // 600 spm = 100
+    if (mode === 'word_wheel') return Math.min(100, (rawScore / timeSeconds) * 60 / 6) // 600 spm = 100
+    // Puzzle uses exponential per-word scoring (see shared/utils/scoring) so
+    // points-per-minute runs higher than the wheel: strong play is ~1200 SPM.
+    if (mode === 'puzzle') return Math.min(100, (rawScore / timeSeconds) * 60 / 12) // 1200 spm = 100
+    return 0
   })
   return Math.round(normalized.reduce((a, b) => a + b, 0) / normalized.length)
 }
@@ -41,14 +45,26 @@ export interface WheelScoreRow {
   time_seconds: number | null
 }
 
+export interface PuzzleScoreRow {
+  puzzle_date: string
+  score: number | null
+  time_seconds: number | null
+}
+
 // Compute the chest tier (and underlying week score) for a cycle, given the
 // completed dates in that cycle plus the raw score rows. Only rows whose
 // puzzle_date falls inside `completedDates` contribute. Shared by the claim
 // route (final tier) and the status route (projected tier).
+//
+// All three modes contribute to quality: a player who only plays the puzzle
+// every day can still climb to gold by playing well, and Hunt/Wheel quality
+// still matters too. Tier isn't just about showing up — it's about how good
+// the runs were.
 export function computeChestTierForCycle(
   completedDates: string[],
   huntRows: HuntScoreRow[],
   wheelRows: WheelScoreRow[],
+  puzzleRows: PuzzleScoreRow[] = [],
 ): { weekScore: number; tier: ChestTier } {
   const cycleDateSet = new Set(completedDates)
   const scores: DayScore[] = [
@@ -58,6 +74,9 @@ export function computeChestTierForCycle(
     ...wheelRows
       .filter(r => cycleDateSet.has(r.puzzle_date))
       .map(r => ({ mode: 'word_wheel' as const, rawScore: r.score ?? 0, timeSeconds: r.time_seconds })),
+    ...puzzleRows
+      .filter(r => cycleDateSet.has(r.puzzle_date))
+      .map(r => ({ mode: 'puzzle' as const, rawScore: r.score ?? 0, timeSeconds: r.time_seconds })),
   ]
   const weekScore = computeWeekScore(scores)
   return { weekScore, tier: getChestTier(weekScore) }

@@ -30,13 +30,136 @@ if (typeof globalThis.vi === 'undefined') {
     useRealTimers: () => jest.useRealTimers(),
     advanceTimersByTime: (ms) => jest.advanceTimersByTime(ms),
     runAllTimers: () => jest.runAllTimers(),
+    runAllTimersAsync: async () => jest.runAllTimers(),
     runOnlyPendingTimers: () => jest.runOnlyPendingTimers(),
+    runOnlyPendingTimersAsync: async () => jest.runOnlyPendingTimers(),
+    clearAllTimers: () => jest.clearAllTimers(),
+    getTimerCount: () => jest.getTimerCount(),
     setSystemTime: (date) => jest.setSystemTime(date),
     resetModules: () => jest.resetModules(),
     hoisted: (factory) => factory(),
-    stubGlobal: (name, value) => { globalThis[name] = value; },
+    stubGlobal: (name, value) => {
+      if (!globalThis.vi._stubbedGlobals) globalThis.vi._stubbedGlobals = new Map();
+      if (!globalThis.vi._stubbedGlobals.has(name)) {
+        globalThis.vi._stubbedGlobals.set(name, globalThis[name]);
+      }
+      globalThis[name] = value;
+    },
+    unstubAllGlobals: () => {
+      if (!globalThis.vi._stubbedGlobals) return;
+      for (const [name, original] of globalThis.vi._stubbedGlobals) {
+        if (original === undefined) delete globalThis[name];
+        else globalThis[name] = original;
+      }
+      globalThis.vi._stubbedGlobals.clear();
+    },
+    stubEnv: (name, value) => { process.env[name] = value; },
+    unstubAllEnvs: () => {},
     dynamicImportSettled: () => Promise.resolve(),
+    doMock: (...args) => jest.doMock(...args),
+    importActual: (path) => Promise.resolve(jest.requireActual(path)),
+    waitFor: async (cb, _opts) => {
+      // Simple polling shim — matches Vitest's vi.waitFor surface enough
+      // for tests that just need "retry until truthy / no-throw".
+      const deadline = Date.now() + ((_opts && _opts.timeout) || 1000);
+      let lastErr;
+      while (Date.now() < deadline) {
+        try {
+          const r = await cb();
+          if (r !== false) return r;
+        } catch (e) { lastErr = e; }
+        await new Promise((res) => setTimeout(res, (_opts && _opts.interval) || 25));
+      }
+      if (lastErr) throw lastErr;
+      throw new Error('vi.waitFor: timed out');
+    },
   };
+}
+
+// ==========================================
+// Browser API polyfills jsdom lacks
+// ==========================================
+if (typeof globalThis.window !== 'undefined') {
+  // PointerEvent (used by drag-gesture tests). Forward common Event props
+  // via super() (bubbles/cancelable/composed are read-only on Event) and copy
+  // PointerEvent-specific props as own properties.
+  if (typeof globalThis.PointerEvent === 'undefined') {
+    globalThis.PointerEvent = class PointerEvent extends Event {
+      constructor(type, props = {}) {
+        super(type, {
+          bubbles: !!props.bubbles,
+          cancelable: !!props.cancelable,
+          composed: !!props.composed,
+        });
+        const PTR_KEYS = [
+          'pointerId', 'pointerType', 'isPrimary', 'pressure', 'tangentialPressure',
+          'tiltX', 'tiltY', 'twist', 'clientX', 'clientY', 'screenX', 'screenY',
+          'movementX', 'movementY', 'altKey', 'ctrlKey', 'metaKey', 'shiftKey', 'button', 'buttons',
+        ];
+        for (const k of PTR_KEYS) if (k in props) this[k] = props[k];
+      }
+    };
+  }
+  // document.elementFromPoint — jsdom returns undefined; tests that need real
+  // hit-testing will still fail, but smoke tests that just call it won't crash.
+  if (typeof document !== 'undefined' && typeof document.elementFromPoint !== 'function') {
+    document.elementFromPoint = () => null;
+  }
+  // crypto.randomUUID — node 19+ has it on globalThis.crypto; ensure it's
+  // wired into both window.crypto and globalThis.crypto for jsdom.
+  if (globalThis.crypto && typeof globalThis.crypto.randomUUID !== 'function') {
+    try {
+      globalThis.crypto.randomUUID = require('crypto').randomUUID;
+    } catch (_) { /* node too old; leave undefined */ }
+  }
+}
+
+// TextDecoder / TextEncoder — present in modern node but not always on
+// jsdom's `window`. Some libs (esbuild bundles, util consumers) look on
+// global directly.
+if (typeof globalThis.TextDecoder === 'undefined') {
+  globalThis.TextDecoder = require('util').TextDecoder;
+}
+if (typeof globalThis.TextEncoder === 'undefined') {
+  globalThis.TextEncoder = require('util').TextEncoder;
+}
+
+// Web Fetch globals — node 18+ has them, but jsdom's window doesn't expose
+// them unless you opt in via `customExportConditions`. Mirror to globalThis
+// so route handlers and NextResponse-related code can load under jsdom.
+for (const name of ['Request', 'Response', 'Headers', 'fetch', 'FormData', 'Blob']) {
+  if (typeof globalThis[name] === 'undefined') {
+    try {
+      const fromUndici = require('undici')[name];
+      if (fromUndici) globalThis[name] = fromUndici;
+    } catch (_) {
+      // undici unavailable; fall back to anything node exposes on global
+      if (global[name]) globalThis[name] = global[name];
+    }
+  }
+}
+
+// Jest-only matcher polyfills for Vitest-isms.
+if (typeof expect !== 'undefined' && expect.extend) {
+  expect.extend({
+    toHaveBeenCalledOnce(received) {
+      const calls = received?.mock?.calls?.length ?? -1;
+      return {
+        pass: calls === 1,
+        message: () => `expected mock to have been called exactly once, but was called ${calls} time(s)`,
+      };
+    },
+  });
+}
+
+// describe.skipIf / it.skipIf — Vitest helpers Jest lacks.
+if (typeof describe !== 'undefined' && typeof describe.skipIf !== 'function') {
+  describe.skipIf = (cond) => (cond ? describe.skip : describe);
+  describe.runIf = (cond) => (cond ? describe : describe.skip);
+}
+if (typeof it !== 'undefined' && typeof it.skipIf !== 'function') {
+  it.skipIf = (cond) => (cond ? it.skip : it);
+  it.runIf = (cond) => (cond ? it : it.skip);
 }
 
 // ==========================================
@@ -104,10 +227,15 @@ const createMatchMediaMock = () => (query) => ({
   dispatchEvent: jest.fn(),
 });
 
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: createMatchMediaMock(),
-});
+// `window` is only defined under the jsdom test environment — node-env tests
+// (e.g. API route tests) skip the matchMedia stub since nothing in them
+// touches the browser API.
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: createMatchMediaMock(),
+  });
+}
 
 // Mock ResizeObserver - use class syntax to ensure proper instantiation
 class MockResizeObserver {

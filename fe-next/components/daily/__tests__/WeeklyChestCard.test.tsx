@@ -17,6 +17,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }))
 
 vi.mock('gsap', () => ({
+  __esModule: true,
   default: {
     to: vi.fn().mockReturnValue({ kill: vi.fn() }),
     from: vi.fn().mockReturnValue({ kill: vi.fn() }),
@@ -24,6 +25,7 @@ vi.mock('gsap', () => ({
 }))
 
 vi.mock('framer-motion', () => ({
+  __esModule: true,
   m: new Proxy(
     {},
     {
@@ -39,6 +41,7 @@ vi.mock('framer-motion', () => ({
 }))
 
 vi.mock('@/components/daily/ChestProgressDots', () => ({
+  __esModule: true,
   default: () => <div data-testid="chest-dots" />,
 }))
 

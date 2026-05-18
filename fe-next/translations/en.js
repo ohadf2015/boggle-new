@@ -5599,6 +5599,7 @@ const en = {
       "tierSilver": "Silver",
       "tierGold": "Gold",
       "freezesGranted": "+{n} Streak Freeze",
+      "freezesGrantedPlural": "+{n} Streak Freezes",
       "info": {
         "title": "How the Weekly Chest Works",
         "howItWorks": "Finish a daily challenge each day. Seven days in a row fills your chest.",

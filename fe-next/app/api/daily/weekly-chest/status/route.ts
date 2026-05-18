@@ -6,6 +6,7 @@ import {
   findCompletedCycles,
   type HuntScoreRow,
   type WheelScoreRow,
+  type PuzzleScoreRow,
 } from '@/lib/daily/weeklyChest'
 import logger from '@/utils/logger'
 
@@ -38,7 +39,7 @@ export async function GET() {
     const [puzzleRes, huntRes, wheelRes] = await Promise.all([
       supabase
         .from('daily_puzzle_attempts')
-        .select('puzzle_date')
+        .select('puzzle_date,score,time_seconds')
         .eq('player_id', user.id)
         .gt('word_count', 0),
       supabase
@@ -93,11 +94,13 @@ export async function GET() {
       : computeCycleProgress(allDates, today)
 
     // Projected tier — what tier the chest would be if claimed right now, based
-    // on the player's performance so far this cycle.
+    // on the player's performance so far this cycle. Puzzle/Hunt/Wheel all
+    // contribute equally so daily-puzzle-only players can still earn gold.
     const { weekScore, tier: projectedTier } = computeChestTierForCycle(
       progress.completedDates,
       (huntRes.data ?? []) as HuntScoreRow[],
       (wheelRes.data ?? []) as WheelScoreRow[],
+      (puzzleRes.data ?? []) as PuzzleScoreRow[],
     )
 
     const existingChest = (chestRows ?? []).find(

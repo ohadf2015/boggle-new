@@ -21,6 +21,8 @@ const customJestConfig = {
   testEnvironment: 'jsdom',
 
   // Setup files to run after Jest is initialized
+  // setupFiles runs BEFORE the test file (so before any jest.mock hoisted
+  // to the top). Use it for the jest.mock wrapper that injects __esModule.
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 
   // Test file patterns - specifically for frontend
@@ -140,9 +142,11 @@ const customJestConfig = {
   // Verbose output
   verbose: true,
 
-  // Transform patterns
+  // Transform patterns. earcut ships as native ESM (`export default`) which
+  // Jest's CJS loader chokes on. pixi.js transitively imports it, so allow
+  // Jest to transform both packages instead of skipping them.
   transformIgnorePatterns: [
-    '/node_modules/',
+    '/node_modules/(?!(earcut|pixi\\.js)/)',
     '^.+\\.module\\.(css|sass|scss)$',
   ],
 };

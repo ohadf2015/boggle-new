@@ -78,6 +78,29 @@ describe('computeWeekScore', () => {
   it('treats zero time_seconds as 0 score for timed modes', () => {
     expect(computeWeekScore([{ mode: 'word_wheel', rawScore: 500, timeSeconds: 0 }])).toBe(0)
   })
+
+  it('normalizes puzzle score/time so 1200 spm caps at 100', () => {
+    // 1200 points in 60s = 1200 spm = 100
+    expect(computeWeekScore([{ mode: 'puzzle', rawScore: 1200, timeSeconds: 60 }])).toBe(100)
+  })
+
+  it('rewards strong puzzle play without capping mediocre play', () => {
+    // 600 spm = 50 — a respectable but not gold-tier puzzle run.
+    expect(computeWeekScore([{ mode: 'puzzle', rawScore: 600, timeSeconds: 60 }])).toBe(50)
+  })
+
+  it('treats zero time_seconds as 0 for puzzle too', () => {
+    expect(computeWeekScore([{ mode: 'puzzle', rawScore: 1000, timeSeconds: 0 }])).toBe(0)
+  })
+
+  it('averages across all three modes', () => {
+    // hunt 100 + wheel 100 + puzzle 100 = avg 100 → gold
+    expect(computeWeekScore([
+      { mode: 'word_hunt', rawScore: 100, timeSeconds: null },
+      { mode: 'word_wheel', rawScore: 600, timeSeconds: 60 },
+      { mode: 'puzzle', rawScore: 1200, timeSeconds: 60 },
+    ])).toBe(100)
+  })
 })
 
 describe('computeChestTierForCycle', () => {
@@ -118,6 +141,36 @@ describe('computeChestTierForCycle', () => {
     )
     expect(r.weekScore).toBe(0)
     expect(r.tier).toBe('bronze')
+  })
+
+  it('counts puzzle quality so a puzzle-only week can still reach gold', () => {
+    // Player only played the daily puzzle for 7 days, but very well.
+    const dates = ['2026-05-06','2026-05-07','2026-05-08','2026-05-09','2026-05-10','2026-05-11','2026-05-12']
+    const puzzleRows = dates.map(d => ({ puzzle_date: d, score: 1500, time_seconds: 60 }))
+    const r = computeChestTierForCycle(dates, [], [], puzzleRows)
+    expect(r.tier).toBe('gold')
+    expect(r.weekScore).toBe(100)
+  })
+
+  it('gives bronze for puzzle-only weeks of mediocre play', () => {
+    const dates = ['2026-05-06','2026-05-07','2026-05-08','2026-05-09','2026-05-10','2026-05-11','2026-05-12']
+    const puzzleRows = dates.map(d => ({ puzzle_date: d, score: 300, time_seconds: 60 }))
+    // 300 spm / 12 = 25 → bronze
+    const r = computeChestTierForCycle(dates, [], [], puzzleRows)
+    expect(r.tier).toBe('bronze')
+  })
+
+  it('only counts puzzle rows whose puzzle_date is in the cycle', () => {
+    const r = computeChestTierForCycle(
+      ['2026-05-10'],
+      [],
+      [],
+      [
+        { puzzle_date: '2026-05-10', score: 1200, time_seconds: 60 }, // in cycle → 100
+        { puzzle_date: '2026-05-01', score: 100, time_seconds: 60 },  // outside cycle → ignored
+      ],
+    )
+    expect(r.weekScore).toBe(100)
   })
 })
 

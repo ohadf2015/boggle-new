@@ -4,6 +4,7 @@ import { MascotReaction } from '../MascotReaction';
 
 // Mock next/image for testing — strip Next-specific props before forwarding to native img
 vi.mock('next/image', () => ({
+  __esModule: true,
   default: (props: { src: string; alt: string; width?: number; height?: number }) => (
     // eslint-disable-next-line @next/next/no-img-element
     <img src={props.src} alt={props.alt} width={props.width} height={props.height} />

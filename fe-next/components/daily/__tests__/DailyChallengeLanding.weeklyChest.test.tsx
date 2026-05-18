@@ -40,12 +40,15 @@ vi.mock('@/hooks/useDailyChallengeStatus', () => ({
 
 // Stub heavy/animated children
 vi.mock('@/components/daily/WeeklyChestCard', () => ({
+  __esModule: true,
   default: () => <div data-testid="weekly-chest-card-stub" />,
 }));
 vi.mock('@/components/daily/WeeklyChestModal', () => ({
+  __esModule: true,
   default: () => <div data-testid="weekly-chest-modal-stub" />,
 }));
 vi.mock('@/components/daily/DailyInsightStack', () => ({
+  __esModule: true,
   default: () => <div data-testid="insight-stack-stub" />,
 }));
 vi.mock('next/navigation', () => ({
@@ -54,6 +57,7 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 vi.mock('framer-motion', () => ({
+  __esModule: true,
   m: new Proxy({}, {
     get: (_t: unknown, prop: string) => {
       return ({ children, ...rest }: React.PropsWithChildren<Record<string, unknown>>) =>

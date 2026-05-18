@@ -5526,6 +5526,7 @@ const ja = {
       "tierSilver": "シルバー",
       "tierGold": "ゴールド",
       "freezesGranted": "ストリークシールド +{n}",
+      "freezesGrantedPlural": "ストリークシールド +{n}",
       "info": {
         "title": "週間チェストの仕組み",
         "howItWorks": "毎日デイリーチャレンジをクリアしましょう。7日連続でチェストが満タンになります。",
