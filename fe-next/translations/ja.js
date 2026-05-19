@@ -5678,6 +5678,7 @@ const ja = {
     "dangerAlert": "危険！ライフが残り少ない！",
     "eliminatedAlert": "脱落しました！",
     "lastStanding": "最後の生き残り！",
+    "lowLifeSelf": "ライフが少ない！単語を見つけて回復しよう。",
     "welcome": {
       "title": "デイリーワードハント"
     },
@@ -5817,7 +5818,6 @@ const ja = {
       "matchesTargetWarning": "同じ文字数 — 送信すると1回消費",
       "knownLetters": "位置違い:",
       "syncingTarget": "ターゲット同期中…",
-      "lowLifeHint": "ライフが少ない！盤面で単語を見つけて回復しよう。",
       "accumulatedScore": "スコア",
       "autoClueUnlocked": "ヒント解放！",
       "clueRevealLetter": "文字が明らかに！",

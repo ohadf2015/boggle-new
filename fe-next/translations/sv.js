@@ -5646,6 +5646,7 @@ const sv = {
     "dangerAlert": "Fara! Lågt på liv!",
     "eliminatedAlert": "Du har eliminerats!",
     "lastStanding": "Sist man stående!",
+    "lowLifeSelf": "Lågt på liv! Hitta ord för att läka.",
     "title": "Ordjakt",
     "welcome": {
       "title": "Daglig Ordjakt"
@@ -5786,7 +5787,6 @@ const sv = {
       "matchesTargetWarning": "Samma längd — skicka förbrukar 1 försök",
       "knownLetters": "Fel plats:",
       "syncingTarget": "Synkar målordet…",
-      "lowLifeHint": "Lågt på liv! Hitta ord på brädet för att fylla på.",
       "accumulatedScore": "Poäng",
       "autoClueUnlocked": "Ledtråd upplåst!",
       "clueRevealLetter": "Bokstav avslöjad!",

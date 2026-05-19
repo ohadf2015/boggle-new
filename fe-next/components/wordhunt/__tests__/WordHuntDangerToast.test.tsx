@@ -14,6 +14,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
       if (key === 'wordHunt.dangerAlert' && params?.name) return `${params.name} is in danger!`;
       if (key === 'wordHunt.eliminatedAlert' && params?.name) return `${params.name} eliminated!`;
       if (key === 'wordHunt.lastStanding' && params?.count) return `Last ${params.count} standing!`;
+      if (key === 'wordHunt.lowLifeSelf') return 'Low on life! Find words to heal.';
       return key;
     },
     language: 'en',
@@ -52,6 +53,16 @@ describe('WordHuntDangerToast', () => {
     ];
     render(<WordHuntDangerToast toasts={toasts} onDismiss={vi.fn()} />);
     expect(screen.getByText('Bob eliminated!')).toBeTruthy();
+  });
+
+  it('renders a lowLifeSelf encouragement toast', () => {
+    const toasts: DangerToast[] = [
+      { id: 's1', type: 'lowLifeSelf', timestamp: Date.now() },
+    ];
+    render(<WordHuntDangerToast toasts={toasts} onDismiss={vi.fn()} />);
+    expect(screen.getByText('Low on life! Find words to heal.')).toBeTruthy();
+    const el = screen.getByText('Low on life! Find words to heal.').closest('[data-toast-type]');
+    expect(el?.getAttribute('data-toast-type')).toBe('lowLifeSelf');
   });
 
   it('renders a lastStanding toast', () => {

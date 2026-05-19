@@ -5690,6 +5690,7 @@ const es = {
     "dangerAlert": "¡Peligro! ¡Pocas vidas!",
     "eliminatedAlert": "¡Has sido eliminado!",
     "lastStanding": "¡Último en pie!",
+    "lowLifeSelf": "¡Vida baja! Encuentra palabras para curarte.",
     "welcome": {
       "title": "Caza de Palabras Diaria"
     },
@@ -5764,7 +5765,6 @@ const es = {
       "matchesTargetWarning": "Misma longitud — enviar gasta 1 intento",
       "knownLetters": "Mal ubicada:",
       "syncingTarget": "Sincronizando palabra…",
-      "lowLifeHint": "¡Vida baja! Encuentra palabras en el tablero para recuperarla.",
       "accumulatedScore": "Puntuación",
       "autoClueUnlocked": "¡Pista Desbloqueada!",
       "clueRevealLetter": "¡Letra revelada!",

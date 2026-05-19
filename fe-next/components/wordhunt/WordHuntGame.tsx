@@ -83,8 +83,8 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
     return () => clearTimeout(t);
   }, [gameActive, socket, bridge.targetLength]);
 
-  // Danger alert toasts (opponent danger / eliminated / last standing)
-  const { toasts: dangerToasts, dismissToast } = useWordHuntDangerAlerts();
+  // Danger alert toasts (own low-life encouragement + opponent danger / eliminated / last standing)
+  const { toasts: dangerToasts, dismissToast } = useWordHuntDangerAlerts(username);
 
   // Quick rules overlay (first time only)
   const [showQuickRules, setShowQuickRules] = useState(() => {

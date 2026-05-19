@@ -5647,6 +5647,7 @@ const he = {
     "dangerAlert": "סכנה! נשארו מעט חיים!",
     "eliminatedAlert": "הודחת!",
     "lastStanding": "האחרון שנשאר!",
+    "lowLifeSelf": "החיים אוזלים! מצאו מילים כדי להחלים.",
     "welcome": {
       "title": "ציד מילים יומי"
     },
@@ -5786,7 +5787,6 @@ const he = {
       "matchesTargetWarning": "אותו אורך — שליחה תנצל ניסיון",
       "knownLetters": "מקום שגוי:",
       "syncingTarget": "מסנכרן את מילת המטרה…",
-      "lowLifeHint": "החיים אוזלים! מצאו מילים על הלוח כדי לחדש אותם.",
       "accumulatedScore": "ניקוד",
       "autoClueUnlocked": "רמז נפתח!",
       "clueRevealLetter": "אות נחשפה!",

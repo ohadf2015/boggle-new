@@ -14,7 +14,7 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 
 export interface DangerToast {
   id: string;
-  type: 'danger' | 'eliminated' | 'lastStanding';
+  type: 'danger' | 'eliminated' | 'lastStanding' | 'lowLifeSelf';
   playerName?: string;
   count?: number;
   timestamp: number;
@@ -32,12 +32,16 @@ const TOAST_STYLES: Record<DangerToast['type'], string> = {
   danger: 'bg-yellow-500/90 border-yellow-700 text-black',
   eliminated: 'bg-neo-red/90 border-red-800 text-white',
   lastStanding: 'bg-neo-purple/90 border-purple-800 text-white',
+  // Self low-life: orange = urgency (design-system semantic), distinct from the
+  // yellow opponent-danger toast so the player reads it as "act now".
+  lowLifeSelf: 'bg-neo-orange/90 border-orange-800 text-black',
 };
 
 const TOAST_ICONS: Record<DangerToast['type'], string> = {
   danger: '\u26A0\uFE0F',
   eliminated: '\uD83D\uDC80',
   lastStanding: '\u2694\uFE0F',
+  lowLifeSelf: '\u2764\uFE0F',
 };
 
 function ToastItem({ toast, onDismiss }: { toast: DangerToast; onDismiss: (id: string) => void }) {
@@ -59,6 +63,9 @@ function ToastItem({ toast, onDismiss }: { toast: DangerToast; onDismiss: (id: s
       break;
     case 'lastStanding':
       message = t('wordHunt.lastStanding', { count: toast.count || 2 });
+      break;
+    case 'lowLifeSelf':
+      message = t('wordHunt.lowLifeSelf');
       break;
   }
 

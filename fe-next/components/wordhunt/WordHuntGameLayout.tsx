@@ -176,8 +176,6 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
             lifeGainAmount={lifeGainAmount}
             skipAnimations={false}
             onLifeGainComplete={() => {}}
-            label={t('wordHunt.lifeBar')}
-            lowLifeHint={t('wordHunt.survival.lowLifeHint')}
           />
         </div>
 
