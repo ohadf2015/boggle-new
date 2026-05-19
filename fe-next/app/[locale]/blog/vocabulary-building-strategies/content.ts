@@ -27,13 +27,15 @@ export const contentByLocale: Record<string, LocaleContent> = {
     authorBio: 'Self-taught vocabulary obsessive who keeps a word journal, plays word games competitively, and once cried tears of joy over the word "defenestration."',
     sections: [
       {
-        content: `Thirty days ago, I started an experiment. Learn as many new words as possible using only word games and cognitive science. No flashcard apps. No tutors. Just me, a notebook, and an embarrassing amount of Boggle.
+        content: `Thirty days ago, I started an experiment. Learn as many new words as possible using only word games and cognitive science. No flashcard apps. No tutors. No language courses. Just me, a notebook, a timer, and an embarrassing amount of Boggle.
 
-Result: 523 words. Not "I vaguely recognize this." Words I can spell, define, use in a sentence, and deploy to make my friends regret challenging me.
+Result: 523 words. Not "I vaguely recognize this." Words I can spell, define, use in a sentence, and deploy to make my friends regret challenging me in word games.
 
-What made this different: I didn't brute force it. Instead, I combined research-backed techniques that psychologists have been refining for over a century. Most people have never heard of them, even though the evidence is overwhelming.
+What made this different: I didn't brute force it with hours of flashcards. Instead, I combined research-backed techniques that psychologists have been refining for over a century. Most people have never heard of them, even though the evidence is overwhelming.
 
-I'll walk you through what worked, why, and how to replicate it. Full citations so you can fact-check.`,
+Why this matters: Most vocabulary-building advice is useless. Spend 30 minutes reading and you'll encounter maybe 5-10 new words. Spend 30 minutes with spaced repetition and active recall, and you'll retain 4x as many. The gap between common wisdom and actual science is absurd.
+
+I'll walk you through what worked, why it works, and how to replicate it. Full citations so you can fact-check. I'm a word nerd, not a neuroscientist—but I can tell you exactly what the research shows.`,
       },
       {
         title: 'The forgetting curve (and why it matters)',
@@ -71,67 +73,67 @@ The harder you fail, the stronger you remember.`,
 
 Morphology is the study of word parts—prefixes, suffixes, roots. English is built from Latin, Greek, Germanic roots. Those roots follow patterns. Once you learn EPHEMER- (lasting briefly), you unlock EPHEMERA, EPHEMERIS, EPHEMERON. One root, three words.
 
-Nation (2001) estimated that knowledge of 20 word families per week builds vocabulary at 4x the rate of learning isolated words.
+Nation (2001) estimated that knowledge of 20 word families per week builds vocabulary at 4x the rate of learning isolated words. Quadrupling your learning rate is not a marginal improvement—it's life-changing.
 
-I started grouping words by roots. MAGN- (great): MAGNIFICENT, MAGNITUDE, MAGNANIMOUS. CHRON- (time): CHRONOLOGICAL, CHRONIC, SYNCHRONIZE. Each new word arrived pre-wired to words I already knew.
+I started grouping words by roots. MAGN- (great): MAGNIFICENT, MAGNITUDE, MAGNANIMOUS. CHRON- (time): CHRONOLOGICAL, CHRONIC, SYNCHRONIZE. Each new word arrived pre-wired to words I already knew. The network was doing the cognitive work, not me.
 
-By week two, I was learning at double my initial rate. Not because I studied harder—because each new word was already connected to a network.
+By week two, I was learning at double my initial rate. Not because I studied harder—because each new word was already connected to a network. MAGNANIMOUS in a crossword? I already knew MAGN- (great) from previous words, and ANIM- (spirit) from ANIMATE. So MAGNANIMOUS, great-spirited, practically defined itself.
 
-For word games, morphology is a superpower. If you know -TION, -SION, -MENT, -NESS, -LY are common suffixes, you can extend base words systematically. AGREE becomes AGREEMENT, AGREEABLE, AGREEABLY—three words from one root.`,
+For word games, morphology is a superpower. If you know -TION, -SION, -MENT, -NESS, -LY are common suffixes, you can extend base words systematically. AGREE becomes AGREEMENT, AGREEABLE, AGREEABLY—three words from one root, and your opponents never see it coming.`,
       },
       {
         title: 'Bilingual leverage',
         content: `Playing word games in multiple languages made my English vocabulary better. Sounds backwards.
 
-Kroll and Stewart (1994) proposed that words in different languages share conceptual connections. Learning a word in one language strengthens the underlying concept, which helps related words in other languages.
+Kroll and Stewart (1994) proposed that words in different languages share conceptual connections. Learning a word in one language strengthens the underlying concept, which helps related words in other languages. It's not translation—it's interconnected depth.
 
 I tested this in Swedish. HUND (dog), HAND (hand), VATTEN (water) were immediately recognizable Germanic cognates. Then I noticed deeper connections. Learning UNGEFAR (approximately) led me to UNFAIR, then INEQUITABLE, then INIQUITY—a chain unlocked by one Swedish word.
 
-Adesope et al.'s 2010 meta-analysis found bilingual individuals outperformed monolinguals on vocabulary tests, even in their native language.
+Adesope et al.'s 2010 meta-analysis found bilingual individuals outperformed monolinguals on vocabulary tests, even in their native language. The theory: managing multiple linguistic systems creates a more flexible and interconnected mental lexicon.
 
 You don't need fluency. Basic exposure to cognates strengthens your vocabulary network. LUMINEUX (French bright) connects to LUMINOUS. CORAZON (Spanish heart) connects to CORONARY through Latin. Even TSUNAMI is TSUNAMI across languages.
 
-During weeks 3-4, I deliberately hunted for cross-linguistic hooks. Five minutes per review session. Retention improvement was noticeable.`,
+During weeks 3-4, I deliberately hunted for cross-linguistic hooks. Five minutes per review session. Retention improvement was noticeable. Words with multiple-language connections stuck better than monolingual words—more neural pathways, more retrieval routes.`,
       },
       {
         title: 'The actual daily routine (45 minutes total)',
-        content: `Science without implementation is trivia. Here's what I did:
+        content: `Science without implementation is trivia. Here's exactly what I did:
 
-Morning (15 min): Two rounds of Boggle. New words went straight into a physical notebook with definition and example sentence.
+Morning (15 min): Two rounds of Boggle. New words went straight into a physical notebook with definition and example sentence. I didn't overthink it—if I played a word I couldn't define, it got logged.
 
-Midday (15 min): Spaced repetition review. Cover the definition, try to recall it. Unmarked words got flagged for extra review.
+Midday (15 min): Spaced repetition review. Cover the definition, try to recall it from memory. Words I couldn't recall got flagged for extra review the next day.
 
-Evening (15 min): Read longform journalism or nonfiction with notebook open. Log unfamiliar words immediately.
+Evening (15 min): Read longform journalism or nonfiction with notebook open. Any unfamiliar word got logged immediately. The physical presence of the notebook changed my reading behavior—instead of glossing over unknown words, I engaged with them.
 
-Key rules:
+The structure matters. Forty-five minutes split into three chunks beats 45 minutes at once because you get multiple retrieval opportunities per day, and spacing between sessions gives your brain time to consolidate.
+
+Key non-negotiable rules:
 
 Write by hand. Handwriting engages motor areas that typing doesn't, creating additional memory traces (Mueller & Oppenheimer, 2014).
 
-Use the word within 24 hours. Forced production beats passive recognition.
+Use the word within 24 hours. Forced production beats passive recognition. Text a friend, drop it in an email, say it out loud.
 
-Play with others 2+ times per week. Social game sessions provide competitive motivation and emotional amplification—memories stick better when emotionally tagged.
+Play with others 2+ times per week. Social game sessions provide competitive motivation and emotional amplification—memories stick better when emotions are involved.
 
-No cramming. When the timer hit 15 minutes, I stopped.
-
-Frequency beats duration. Three 15-minute sessions outperform one 45-minute session because each session is a retrieval opportunity, and spacing gives your brain time to consolidate.`,
+No cramming. When 15 minutes ended, I stopped. Even if I was on a roll.`,
       },
       {
         title: 'What the results meant',
-        content: `At day 30: 523 words logged. Cold recall test: 447/523 correct (85.5%). Boggle scores up 22%. Average word length increased from 4.2 to 5.1 letters.
+        content: `At day 30: 523 words logged. Cold recall test: 447/523 correct (85.5%). Boggle scores up 22%. Average word length increased from 4.2 to 5.1 letters. I wasn't just finding more words—I was finding harder words.
 
-But the number 500 is misleading. Vocabulary isn't about accumulating discrete items like collecting stamps.
+But the number 500 is misleading. Vocabulary isn't about accumulating discrete items like collecting stamps. It's not quantity for quantity's sake.
 
 It's about building a network.
 
-By day 30, words I already knew had new connections. EPHEMERAL linked to EPHEMERA, linked to DIURNAL, linked to NOCTURNAL, linked to EQUINOX. The morphological connections made my entire vocabulary more accessible—for reading, writing, thinking.
+By day 30, words I already knew had new connections. EPHEMERAL linked to EPHEMERA, linked to DIURNAL, linked to NOCTURNAL, linked to EQUINOX. The morphological connections I'd deliberately built didn't just help me remember new words. They made my entire vocabulary more accessible—for reading, writing, thinking, communicating.
 
-Collins and Loftus (1975) called this network theory: words are nodes in an interconnected system. Activate one node, related nodes partially activate ("spreading activation"). More connections = easier retrieval.
+Collins and Loftus (1975) called this network theory: words are nodes in an interconnected system. Activate one node, related nodes partially activate through "spreading activation." More connections = easier and faster retrieval. That's not just neuroscience—it's how vocabulary actually lives in your brain.
 
-My 30 days didn't just add 500 nodes. It added thousands of new connections between existing nodes. Those connections are what make vocabulary useful.
+My 30 days didn't just add 500 nodes. It added thousands of new connections between existing nodes. Those connections are what make vocabulary useful beyond trivia.
 
-You don't need 30 days to start. Three new words per day, logged and reviewed with spacing, is 1,000 words per year. By month three, you'll be learning faster than month one.
+The good news: you don't need 30 days to start reaping rewards. Three new words per day, logged and reviewed with spacing, is 1,000 words per year. By month three, you'll be learning faster than month one because your morphological network is doing the heavy lifting.
 
-The techniques work. Word games make it fun. The only variable is whether you start.`,
+The techniques work. Word games make it fun. The only variable is whether you'll commit to the routine.`,
       },
     ],
     backToBlog: 'Back to Blog',
