@@ -8854,6 +8854,16 @@ const ja = {
   },
   "blast": {
     "level": "レベル{n}",
+    "results": {
+      "sceneTitle": "ブラスト結果",
+      "finalScore": "スコア",
+      "comboChain": "最高コンボ",
+      "boardClears": "ボードクリア",
+      "gemsCollected": "ジェム",
+      "tilesCleared": "タイル",
+      "bestWord": "最高の単語",
+      "rank": "順位"
+    },
     "intro": {
       "level": "レベル{n}",
       "wordCount": "{count}単語"

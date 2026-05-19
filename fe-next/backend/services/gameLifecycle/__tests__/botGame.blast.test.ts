@@ -213,6 +213,20 @@ describe('Bot blast mode — board regeneration on clear (timer-era)', () => {
     expect(mocks.resyncBotsForNewGrid).toHaveBeenCalled();
   });
 
+  it('bot path calls computeGravityResult with refill=true (MP parity with human path)', async () => {
+    // Regression: bot used refill=false, human used refill=true. Asymmetric refill
+    // caused the board to slowly shrink on bot moves while staying full on human moves.
+    // Both paths must keep the board alive through the shared timer.
+    mocks.isBlastBoardCleared.mockReturnValue(false);
+    await invokeBotCallback(makeBot(), makeBlastGame(1));
+
+    expect(mocks.computeGravityResult).toHaveBeenCalled();
+    const args = mocks.computeGravityResult.mock.calls[0] as unknown as unknown[];
+    // Signature: (grid, tileStates, gridSize, language, specialTileChance, customDist?, spawnModifier?, rng?, refill?)
+    // refill is the 9th arg (index 8)
+    expect(args[8]).toBe(true);
+  });
+
   it('board clear triggers recordBlastBoardClear', async () => {
     mocks.isBlastBoardCleared.mockReturnValue(true);
     const bot = makeBot();

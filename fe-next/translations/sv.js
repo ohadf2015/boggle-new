@@ -8828,6 +8828,16 @@ const sv = {
   },
   "blast": {
     "level": "Nivå {n}",
+    "results": {
+      "sceneTitle": "Blast-resultat",
+      "finalScore": "Poäng",
+      "comboChain": "Bästa combo",
+      "boardClears": "Brädet rensat",
+      "gemsCollected": "Ädelstenar",
+      "tilesCleared": "Brickor",
+      "bestWord": "Bästa ord",
+      "rank": "Placering"
+    },
     "intro": {
       "level": "Nivå {n}",
       "wordCount": "{count} ord"

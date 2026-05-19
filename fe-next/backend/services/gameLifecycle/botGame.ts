@@ -268,7 +268,7 @@ export function startBotsForGame(
                 blastState.grid, processResult.next, gridSize,
                 language, BLAST_SPECIAL_TILE_CHANCE,
                 undefined, 0, rng,
-                false, // no refill — tiles stay missing
+                true, // refill=true: parity with human path so board stays alive through timer
               );
 
               blastState.grid = gravityResult.newGrid;

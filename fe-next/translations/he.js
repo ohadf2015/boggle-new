@@ -8808,6 +8808,16 @@ const he = {
   },
   "blast": {
     "level": "שלב {n}",
+    "results": {
+      "sceneTitle": "תוצאות בלאסט",
+      "finalScore": "ניקוד",
+      "comboChain": "קומבו שיא",
+      "boardClears": "ניקוי לוחות",
+      "gemsCollected": "אבני חן",
+      "tilesCleared": "אריחים",
+      "bestWord": "מילה הכי טובה",
+      "rank": "דירוג"
+    },
     "intro": {
       "level": "שלב {n}",
       "wordCount": "{count} מילים"

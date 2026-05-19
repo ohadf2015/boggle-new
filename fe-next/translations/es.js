@@ -8912,6 +8912,16 @@ const es = {
   },
   "blast": {
     "level": "Nivel {n}",
+    "results": {
+      "sceneTitle": "Resultados Blast",
+      "finalScore": "Puntuación",
+      "comboChain": "Mejor combo",
+      "boardClears": "Tableros limpiados",
+      "gemsCollected": "Gemas",
+      "tilesCleared": "Fichas",
+      "bestWord": "Mejor palabra",
+      "rank": "Puesto"
+    },
     "intro": {
       "level": "Nivel {n}",
       "wordCount": "{count} palabras"

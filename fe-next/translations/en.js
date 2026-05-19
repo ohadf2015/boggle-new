@@ -8608,6 +8608,16 @@ const en = {
   },
   "blast": {
     "level": "Level {n}",
+    "results": {
+      "sceneTitle": "Blast Results",
+      "finalScore": "Score",
+      "comboChain": "Top Combo",
+      "boardClears": "Board Clears",
+      "gemsCollected": "Gems",
+      "tilesCleared": "Tiles",
+      "bestWord": "Best Word",
+      "rank": "Rank"
+    },
     "intro": {
       "level": "Level {n}",
       "wordCount": "{count} words"
