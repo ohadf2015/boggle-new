@@ -12,7 +12,7 @@ interface PageProps {
 
 const SLUG = 'word-games-for-brain-training';
 const DATE_PUBLISHED = '2025-12-20';
-const DATE_MODIFIED = '2026-03-10';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'Benefits of Playing Word Making Games for Brain Training (Research)',

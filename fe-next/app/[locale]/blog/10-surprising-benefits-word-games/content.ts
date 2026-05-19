@@ -18,11 +18,11 @@ export type LocaleContent = {
 };
 
 export const contentByLocale: Record<string, LocaleContent> = {
-  en: {
+en: {
     title: 'I Played Word Games Every Day for a Year. The Science Says My Brain Should Be Different Now.',
     subtitle: 'Spoiler: some of it actually did.',
     category: 'Research',
-    readTime: '9 min read',
+    readTime: '8 min read',
     authorName: 'Ohad Fisher',
     authorBio: 'Obsessive word game player, amateur neuroscience reader, and the person who ruins game night by taking too long on their turn.',
     sections: [
@@ -33,7 +33,7 @@ Last January, I decided to play at least one word game every single day for a fu
       },
       {
         title: 'The study that made me take this seriously',
-        content: `In 2019, researchers from the University of Exeter and King's College London published a study in the International Journal of Geriatric Psychiatry that tracked 19,000 adults aged 50 to 93. Not a typo. Nineteen thousand people.
+        content: `In 2019, researchers from the University of Exeter and King's College London published a study in the International Journal of Geriatric Psychiatry that tracked 19,000 adults aged 50 to 93.
 
 The people who regularly solved word puzzles showed reasoning abilities equivalent to someone ten years younger. And short-term memory of someone eight years younger. Not "marginally better." Not "statistically significant but practically meaningless." A full decade of cognitive difference.
 

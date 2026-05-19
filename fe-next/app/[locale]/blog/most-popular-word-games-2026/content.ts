@@ -33,7 +33,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle:
       'From a puzzle one guy built for his girlfriend to a $3.36 billion industry. Here are the word games everyone is actually playing in 2026 — and the surprisingly human reasons each one took off.',
     category: 'Trends',
-    readTime: '10 min read',
+    readTime: '8 min read',
     authorName: 'Ohad Fisher',
     authorBio:
       "I build word games for a living, which means I also play everyone else's word games \"for research\" until 2am. Bias fully acknowledged.",
@@ -41,10 +41,10 @@ export const contentByLocale: Record<string, LocaleContent> = {
       {
         content: `Let me give you one number to start with: $3.36 billion.
 
-That's the projected revenue of the word-games market in 2026 — up more than 50% since 2022, growing at roughly 9.6% a year. For a genre that, five years ago, basically meant "the crossword your grandparent does in pen," that is an absurd glow-up.
+That's the projected revenue of the word-games market in 2026 — up more than 50% since 2022, growing at roughly 9.6% a year. Five years ago, word games basically meant "the crossword your grandparent does in pen." Now it's a multi-billion dollar industry, and the games making it happen are deceptively simple.
 
 So what are people actually playing? And — the more interesting question — why did each of these games blow up the way it did? I went down the rabbit hole. Here's the honest field guide to the most popular online word games of 2026, with the origin story behind each one.`,
-        image: { src: HERO, alt: 'Neo-brutalist illustration of word game letter tiles exploding upward like a rocket' },
+        image: { src: '/images/blog/most-popular-word-games-2026.jpg', alt: 'Neo-brutalist illustration of word game letter tiles exploding upward like a rocket' },
       },
       {
         title: 'Wordle — the puzzle that went from 90 players to 2 million',
@@ -52,9 +52,9 @@ So what are people actually playing? And — the more interesting question — w
 
 Josh Wardle, a software engineer from Wales, built Wordle in 2021 as a gift for his partner, who loved word games. He named it after himself — Wardle, Wordle, you get it. No ads. No accounts. No leaderboard. Just one five-letter word a day.
 
-On November 1, 2021, it had 90 players. By the end of that month: 300,000. By January 2022: over 2 million daily players. That is not a typo — that is one of the fastest organic growth curves in the history of casual games, and it happened with a marketing budget of exactly zero.
+On November 1, 2021, it had 90 players. By the end of that month: 300,000. By January 2022: over 2 million daily players. That is not a typo — it's one of the fastest organic growth curves in the history of casual games, achieved with a marketing budget of exactly zero.
 
-The New York Times bought it at the end of January 2022 for a "low seven figures." In hindsight that price looks like a steal — Wordle became one of NYT Games' most reliable subscription drivers, and it's still pulling millions of daily players in 2026.
+The New York Times bought it at the end of January 2022 for "a low seven figures." That price looks prescient now — Wordle became one of NYT Games' most reliable subscription drivers, and it's still pulling millions of daily players in 2026.
 
 The genius wasn't the puzzle. It was the constraint: one game a day. You physically cannot binge it. Scarcity turned a simple word guess into a daily ritual.`,
       },
@@ -64,79 +64,51 @@ The genius wasn't the puzzle. It was the constraint: one game a day. You physica
 
 Connections launched in June 2023, created by NYT puzzle editor Wyna Liu. The format is deceptively mean: 16 words, sort them into 4 hidden groups of 4. The catch is that the puzzle deliberately plants overlap — words that look like they belong together but don't — so your first instinct is usually a trap.
 
-By 2024 it had racked up billions of plays and settled in as the second-most-played game in the entire NYT Games lineup. For a lot of players it's now the *first* thing they open, before Wordle.
+By 2024 it had settled in as the second-most-played game in the entire NYT Games lineup. For a lot of players it's now the *first* thing they open, before Wordle.
 
-Why did it hit? Because it's argument fuel. Wordle is solitary. Connections is the puzzle you scream about in the group chat — "how did you not see the purple category" — and that social friction is rocket fuel for a daily habit.`,
-        image: { src: IMG_MULTIPLAYER, alt: 'Friends arguing playfully over a word puzzle on their phones' },
+Why did it hit? Because it's argument fuel. Wordle is solitary. Connections is the puzzle you scream about in the group chat — "how did you not see the purple category?" — and that social friction becomes rocket fuel for a daily habit.`,
+        image: { src: '/images/blog/multiplayer-social.jpg', alt: 'Friends arguing playfully over a word puzzle on their phones' },
       },
       {
-        title: 'Strands & Spelling Bee — the rest of the puzzle empire',
-        content: `The NYT didn't stop at two.
+        title: 'The multi-grid arms race and the depths players crave',
+        content: `Wordle's success spawned a whole genre of "but harder" variants.
 
-**Spelling Bee** is the elder statesman — a weekly print puzzle since 2018, now a daily digital fixture. Seven letters, one mandatory center letter, build as many words as you can. It's the anti-Wordle: instead of one answer, you're chasing dozens, and there's always "one more word" pulling you back.
+**Quordle** (2022): four Wordles at once, nine guesses total. **Octordle** (also 2022): *eight* grids, thirteen guesses. These exist for players who found one Wordle too easy and wanted their morning coffee to come with a small panic attack.
 
-**Strands** arrived in March 2024 — a themed word search on a 6×8 grid, with a "spangram" that snakes across the whole board and ties the theme together. It's the cozy one. No timer, no fail state, just vibes and a theme to crack.
+**Squaredle** took a different approach — a Boggle-style 4×4 grid where you trace adjacent letters to find every word hidden in the board. No single answer, no limited guesses; just you versus the grid, hunting for the long words that score big.
 
-Put together, the NYT puzzle section has become a genuine subscription business in its own right. People now pay for *games* from a newspaper. That sentence would have sounded insane in 2019.`,
+The lesson here is subtle but important: there is real, durable demand for *depth*. Not everyone wants a 30-second puzzle. A meaningful slice of players wants a grid they can really chew on.`,
+        image: { src: '/images/blog/brain-training-words.jpg', alt: 'A dense letter grid puzzle illustration' },
       },
       {
-        title: 'The multi-grid arms race — Quordle, Octordle, Squaredle',
-        content: `Every hit spawns a "but harder" version, and Wordle spawned a whole genre of them.
-
-**Quordle** (Freddie Meyer, early 2022): four Wordles at once, nine guesses total. **Octordle** (Kenneth Crawford, also 2022): *eight* grids, thirteen guesses. These exist for the players who found one Wordle too easy and wanted their morning coffee to come with a small panic attack.
-
-**Squaredle** (Michael Giuffrida, 2022) went a different direction — a Boggle-style 4×4 grid where you trace adjacent letters to find every word hidden in the board. No single answer, no limited guesses; just you versus the grid, hunting for the long words that score big.
-
-The lesson here is subtle but important: there is real, durable demand for *depth*. Not everyone wants a 30-second puzzle. A meaningful slice of players want a grid they can really chew on.`,
-        image: { src: IMG_BRAIN, alt: 'A dense letter grid puzzle illustration' },
-      },
-      {
-        title: 'Words With Friends — the social lane that never died',
+        title: 'Words With Friends and the social lane that never died',
         content: `While the daily-puzzle world was exploding, the original word-game juggernaut just kept... going.
 
-Words With Friends — now under Take-Two Interactive — has crossed 6 billion lifetime downloads, and in late 2025 it shipped a whole suite of new single-player modes. There's even a TV game-show adaptation in development.
+Words With Friends — now under Take-Two Interactive — has crossed 6 billion lifetime downloads, and in late 2025 it shipped a whole suite of new single-player modes.
 
 It plays a completely different game from Wordle, literally and strategically. It's asynchronous, it's tile-based, and the whole point is *who* you're playing — your mum, your college roommate, that one friend who takes four days per turn. Wordle is a ritual. Words With Friends is a relationship.
 
 That distinction matters, because it's the gap a lot of newer games are racing to fill: the daily puzzle gives you the habit, but the multiplayer game gives you the people.`,
       },
       {
-        title: 'Netflix joins the party — Scattergories Daily',
-        content: `Here's the freshest data point, and honestly the clearest signal that word games have fully "made it."
-
-In April 2026, Netflix added **Scattergories Daily** to its games hub — a 60-second daily word challenge, themed around its own shows. Stranger Things prompts. Squid Game prompts. No ads, no in-app purchases, included with your subscription.
-
-Read that again: a streaming service that spends billions on prestige TV is now also in the daily-word-puzzle business. Why? Because a season of television gives subscribers a reason to open the app for a few weeks. A daily word game gives them a reason to open it *every single day* — for the cost of one engineer's salary. It's the cheapest retention tool in the entire content industry.
-
-When Netflix copies your genre, the genre has officially arrived.`,
-      },
-      {
-        title: 'So why did ALL of them explode? Four forces.',
+        title: 'Why did all of them explode? Four forces.',
         content: `Step back and the same four engines show up under every one of these games.
 
 **1. The daily habit loop.** One puzzle a day, a streak you'd hate to break. Scarcity beats abundance — you can't doom-scroll a thing that only exists once every 24 hours.
 
 **2. "Brain-good" guilt-free screen time.** A widely-cited study of 19,000+ adults over 50 found frequent word-puzzle players performed on some reasoning measures as if they were up to a decade younger. Whether or not you buy the strongest version of that claim, the *framing* is gold: word games are the rare app nobody nags you for opening.
 
-**3. The share button.** Wordle's little spoiler-free emoji grid turned every solve into free marketing. TikTok and Reels did the rest — "watch me solve this" became genuinely watchable content. Puzzles went from private to performative.
+**3. The share button.** Wordle's spoiler-free emoji grid turned every solve into free marketing. TikTok and Reels did the rest — "watch me solve this" became genuinely watchable content.
 
-**4. Going multilingual, finally.** For years, word games meant English. That's breaking fast — Hebrew daily-word games, Japanese kana puzzles, Spanish "juego de palabras" apps are all pulling real numbers. The next 100 million daily players won't be playing in English, and whoever builds the best non-English daily word game owns a wide-open category.`,
-        image: { src: IMG_VOCAB, alt: 'Word games spreading across multiple languages illustration' },
+**4. Going multilingual, finally.** For years, word games meant English. That's breaking fast — Hebrew daily-word games, Japanese kana puzzles, Spanish "juego de palabras" apps are all pulling real numbers. The next 100 million daily players won't be playing in English.`,
+        image: { src: '/images/blog/vocabulary-building.jpg', alt: 'Word games spreading across multiple languages illustration' },
       },
       {
-        title: 'Where LexiClash fits in all this',
-        content: `Quick, honest bias check: I make LexiClash, so of course I think there's a gap worth filling.
+        content: `The real story of 2026 isn't any single game. It's that "word game" stopped being a hobby and became *infrastructure* — the default way streaming services, news apps, and brain-training products earn a daily open.
 
-But here's the actual gap. The daily-puzzle games nailed the *habit*. The classic multiplayer games nailed the *people*. Very few games do both — a real-time, competitive word game that's also a daily ritual, and that works in five languages including Hebrew right-to-left.
+Five years ago that would have sounded ridiculous. Now there's a $3.36 billion industry, a Netflix tile, and a TikTok hashtag with billions of views all built on the simple pleasure of finding a word that wasn't obvious a second ago.
 
-That's the lane we're building in: the speed and trash-talk of multiplayer, the come-back-tomorrow pull of a daily challenge, no pay-to-win power-ups, free in the browser. If this whole article made you want to go play something — you don't have to leave this tab.`,
-      },
-      {
-        content: `The real story of 2026 isn't any single game. It's that "word game" stopped being a hobby and became *infrastructure* — the default way streaming services, news apps and brain-training products earn a daily open.
-
-Five years ago that would have sounded ridiculous. Now there's a $3.36 billion industry, a Netflix tile, and a TikTok hashtag with billions of views all built on the simple, ancient pleasure of finding a word that wasn't obvious a second ago.
-
-Grandma was right the whole time. The pen was just optional.`,
+Grandma was right all along. The pen was just optional.`,
       },
     ],
     backToBlog: 'Back to Blog',
@@ -144,7 +116,6 @@ Grandma was right the whole time. The pen was just optional.`,
     practice: 'Practice Solo',
     playMultiplayer: 'Play Multiplayer',
   },
-
   he: {
     title: 'משחקי המילים הכי פופולריים אונליין ב-2026 — ולמה הם התפוצצו',
     subtitle:

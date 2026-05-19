@@ -13,7 +13,7 @@ interface PageProps {
 
 const SLUG = 'netflix-word-game-2026-rise';
 const DATE_PUBLISHED = '2026-04-29';
-const DATE_MODIFIED = '2026-05-13';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'Netflix Just Dropped a Word Game — 2026 Is the Year Word Games Took Over',

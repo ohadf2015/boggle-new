@@ -13,7 +13,7 @@ interface PageProps {
 
 const SLUG = 'boggle-vs-words-with-friends';
 const DATE_PUBLISHED = '2026-03-28';
-const DATE_MODIFIED = '2026-03-28';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'Boggle vs Words With Friends 2026 - Real-Time vs Async Word Game Comparison',

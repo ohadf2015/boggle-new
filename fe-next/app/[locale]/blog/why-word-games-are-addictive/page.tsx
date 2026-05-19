@@ -12,7 +12,7 @@ interface PageProps {
 
 const SLUG = 'why-word-games-are-addictive';
 const DATE_PUBLISHED = '2025-11-12';
-const DATE_MODIFIED = '2026-03-12';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: "Why You Can't Stop Playing Word Games - The Psychology Explained",

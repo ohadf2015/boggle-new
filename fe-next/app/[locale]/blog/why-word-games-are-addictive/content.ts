@@ -22,7 +22,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     title: "Why You Can't Stop Playing Word Games (And Why Your Brain Doesn't Want You To)",
     subtitle: 'The science behind word game addiction — dopamine, flow states, and the psychology that keeps you coming back for "just one more round."',
     category: 'Psychology',
-    readTime: '11 min read',
+    readTime: '8 min read',
     authorName: 'Ohad Fisher',
     authorBio: 'Self-diagnosed word game addict, psychology enthusiast, and the person who whispers "just one more round" at 2am like a mantra.',
     sections: [
@@ -33,31 +33,25 @@ export const contentByLocale: Record<string, LocaleContent> = {
 
 That was four rounds ago.
 
-If this sounds familiar, congratulations — you're not broken. You're experiencing one of the most elegantly engineered psychological loops that exists in gaming. Word games tap into something deep in how our brains are wired, and the result is a kind of compulsion that feels different from, say, doomscrolling Instagram or binge-watching Netflix.
+If this sounds familiar, congratulations — you're not broken. You're experiencing one of the most elegantly engineered psychological loops that exists in gaming. Word games tap into something deep in how our brains are wired, and the result is a kind of compulsion that feels different from doomscrolling Instagram or binge-watching Netflix.
 
 It feels... productive? Wholesome? Like you're doing something good for yourself even as your alarm clock inches closer?
 
-I wanted to understand why. Not the vague "it's fun" explanation, but the actual neuroscience behind why word games are so absurdly hard to put down. So I went down the research rabbit hole. What I found is fascinating, and a little unsettling.`,
+I wanted to understand why. Not the vague "it's fun" explanation, but the actual neuroscience behind why word games are so absurdly hard to put down.`,
       },
       {
         title: 'The dopamine hit: your brain on variable rewards',
-        content: `Dopamine is the obvious starting point.
+        content: `Dopamine is the obvious starting point. You've probably heard it called the "pleasure chemical," but that's not quite right. Dopamine is more accurately the anticipation chemical. It spikes not when you get the reward, but when you expect one might be coming.
 
-You've probably heard it called the "pleasure chemical," but that's not quite right. Dopamine is more accurately the anticipation chemical. It spikes not when you get the reward, but when you expect one might be coming.
+This is why slot machines work. Psychologists call this a "variable ratio reinforcement schedule" — the most powerful conditioning pattern known to behavioral science.
 
-This is why slot machines work. It's not the winning (most people lose). It's the anticipation of possibly winning. Psychologists call this a "variable ratio reinforcement schedule," the most powerful conditioning pattern known to behavioral science.
-
-Now think about what happens when you scan a grid of letters.
-
-You see a cluster: T, R, A, I... could that be TRAIN? You trace the path... N is right there. Five letters. Dopamine spike.
+Now think about what happens when you scan a grid of letters. You see a cluster: T, R, A, I... could that be TRAIN? You trace the path... N is right there. Five letters. Dopamine spike.
 
 The devious part: you never know when you'll find the next word. Sometimes they come in rapid clusters, BAT, CAT, CHAT, boom boom boom. Other times you stare for thirty seconds seeing nothing, and then CATASTROPHE appears diagonally and your brain lights up like Times Square.
 
-This unpredictability is the variable ratio schedule in action. Your brain learns that rewards come, but not on a predictable schedule, so it keeps you in a state of constant, low-level anticipation. Each moment could be the moment you spot a seven-letter word.
+This unpredictability is the variable ratio schedule in action. Your brain learns that rewards come, but not on a predictable schedule, so it keeps you in a state of constant, low-level anticipation. Robert Sapolsky's work at Stanford showed that dopamine levels actually increase more when rewards are uncertain than when they're guaranteed.
 
-Sapolsky's work at Stanford showed that dopamine levels actually increase more when rewards are uncertain than when they're guaranteed. A word game where you found every word easily would be less addictive than one where words appear at unpredictable intervals.
-
-Your brain is literally getting more chemical reward from the uncertainty than it would from guaranteed success. Evolution did not prepare us for 4x4 letter grids.`,
+Evolution did not prepare us for 4x4 letter grids.`,
       },
       {
         title: 'Flow state: when time disappears',
@@ -65,115 +59,71 @@ Your brain is literally getting more chemical reward from the uncertainty than i
 
 Mihaly Csikszentmihalyi identified flow state in the 1970s as a state of complete absorption in an activity. You lose track of time, your sense of self fades, and everything else drops away.
 
-Flow requires a very specific balance: the challenge must be just hard enough. Too easy and you get bored. Too hard and you get frustrated. The sweet spot is where your skill level barely meets the difficulty, what Csikszentmihalyi called the "flow channel."
+Flow requires a very specific balance: the challenge must be just hard enough. Too easy and you get bored. Too hard and you get frustrated. The sweet spot is where your skill level barely meets the difficulty.
 
-Word games are accidentally perfect flow machines.
-
-Think about it. A 4x4 grid contains hundreds of possible words, ranging from trivially easy (AT, TO, IN) to fiendishly difficult (that eight-letter word hiding in a spiral pattern). At any moment, you're operating at exactly the edge of your ability. The easy words keep you feeling competent. The hard words keep you challenged. And the timer adds just enough pressure to prevent your mind from wandering.
+Word games are accidentally perfect flow machines. A 4x4 grid contains hundreds of possible words, ranging from trivially easy (AT, TO, IN) to fiendishly difficult (that eight-letter word hiding in a spiral pattern). At any moment, you're operating at exactly the edge of your ability. The easy words keep you feeling competent. The hard words keep you challenged.
 
 This is why a five-minute round can feel like thirty seconds. Your prefrontal cortex — the part responsible for time perception — gets recruited for the word-finding task instead. There literally aren't enough neural resources left over to track time.
 
-I've measured this on myself. On days when I'm tired or distracted, word games feel like work and I'm very aware of the timer. But on days when I'm sharp and focused, I enter flow almost immediately, and the round-end buzzer genuinely startles me. Same game, same grid, completely different subjective experience.
-
-The flow state is also why "just one more round" is so dangerous. Each round is short enough that the flow state doesn't fully dissipate between rounds. You're still riding the wave when the next grid appears, and your brain goes "well, we're already here..."`,
+The flow state is also why "just one more round" is so dangerous. Each round is short enough that the flow state doesn't fully dissipate between rounds. You're still riding the wave when the next grid appears.`,
       },
       {
         title: "The Zeigarnik effect: why unfinished puzzles haunt you",
         content: `In the 1920s, Lithuanian psychologist Bluma Zeigarnik noticed something odd: waiters could remember complex orders perfectly while serving, but forgot them completely once the food was delivered. Uncompleted tasks stick in your memory. Completed ones get cleared out.
 
-Word games exploit this ruthlessly.
-
-When your round ends and the game shows you all the words you missed, something happens. Those missed words, the ones that were right there and you didn't see them, create open loops. Your brain flags them as unfinished business.
+Word games exploit this ruthlessly. When your round ends and the game shows you all the words you missed, something happens. Those missed words create open loops. Your brain flags them as unfinished business.
 
 "QUANTUM was on that board?! I saw the Q-U-A! Why didn't I see it?!"
 
 That nagging feeling is the Zeigarnik Effect. Your brain has filed an incomplete task and it really wants to close that loop. The most direct way to close it? Play another round and try to find words like that next time.
 
-Same mechanism that makes you think about work problems in the shower, or suddenly remember something you forgot at the grocery store. Open loop. Brain keeps poking you until you resolve it.
-
 Game designers know this. The end-of-round screen showing missed words isn't informational. It's a psychological hook. Every word you missed is an open loop. Every open loop is a reason to play again.
-
-I once missed the word ZEPHYR on a board and thought about it for literally three days. Three days! I could feel my brain trying to close the loop every time I saw a Z in real life. A road sign for "Zone 3" triggered it. A can of La Croix triggered it. My brain was broken until I found ZEPHYR in a subsequent game and the loop finally closed.
 
 This is not normal behavior. But it IS normal neuroscience.`,
       },
       {
         title: 'Social comparison: the leaderboard effect',
-        content: `Humans are comparison machines. We can't help it. Festinger's social comparison theory from 1954 argues that we evaluate ourselves primarily by comparing to others, not by any absolute standard.
+        content: `Humans are comparison machines. Festinger's social comparison theory from 1954 argues that we evaluate ourselves primarily by comparing to others.
 
-Word games with leaderboards plug directly into this circuit.
-
-It's not enough to find 30 words. You need to find more than your friend. You need to climb from 7th place to 5th. The words themselves almost become secondary to the competition.
-
-Competition activates the ventral striatum, the same reward center that responds to food, money, and romantic attraction. Beating someone on a leaderboard triggers a genuine neurochemical reward, distinct from the word-finding dopamine hit.
+Word games with leaderboards plug directly into this circuit. It's not enough to find 30 words. You need to find more than your friend. You need to climb from 7th place to 5th. Competition activates the ventral striatum, the same reward center that responds to food, money, and romantic attraction. Beating someone on a leaderboard triggers a genuine neurochemical reward.
 
 So you're getting two dopamine pathways activated simultaneously: one from the variable-ratio word-finding loop, and one from the social competition. A dopamine sandwich.
 
-Daily challenges amplify this further. Everyone playing the same board on the same day creates a shared experience. You're not just playing a word game, you're participating in a collective event. The social comparison is more meaningful because the conditions are identical.
-
-I have a group chat with four friends where we share our daily challenge scores. The trash talk is unreasonable. Someone found 47 words? "Was the board in a language you actually speak?" Someone scored first place? "Screenshot or it didn't happen." It's become a daily ritual, and the social accountability means I literally cannot skip a day without being roasted.
-
-Same psychology behind Wordle going viral. It wasn't just a good game. It was a good social game. One puzzle per day, same for everyone, created a comparison framework that made it irresistible to share and compete.`,
+Daily challenges amplify this further. Everyone playing the same board on the same day creates a shared experience and a comparison framework that makes it irresistible to share and compete.`,
       },
       {
         title: 'The "aha" moment: why finding words feels so good',
-        content: `There's a specific instant when you spot a word, especially a long one, where everything clicks. Neuroscientists call this the "insight experience," and it has a distinct neural signature.
-
-Beeman and Kounios showed using EEG and fMRI that insight moments are preceded by a burst of gamma-wave activity in the right temporal lobe, specifically the anterior superior temporal gyrus. This is followed by a rush of activity in the reward centers, the same areas activated by jokes, pleasant surprises, and sudden understanding.
+        content: `There's a specific instant when you spot a word, especially a long one, where everything clicks. Beeman and Kounios showed using EEG and fMRI that insight moments are preceded by a burst of gamma-wave activity in the right temporal lobe, followed by a rush of activity in the reward centers — the same areas activated by jokes, pleasant surprises, and sudden understanding.
 
 Finding a word doesn't just feel like a reward. Your brain processes it the same way it processes getting a joke or suddenly understanding something confusing. It's an insight, and insights are inherently pleasurable.
 
 This is why finding a long, unexpected word feels categorically different from finding a short, obvious one. Finding "AT" is recognition. Finding "ATMOSPHERE" spiraling across the board is insight. Insight is neurochemically rewarded in a way that mere recognition isn't.
 
-The pleasure is also amplified by what psychologists call the "generation effect." Words you actively discover are encoded more strongly in memory than words you passively read. Your brain rewards you for generating the information rather than just receiving it. You didn't just see ATMOSPHERE. You found it. You constructed the path. That active construction gets the neurochemical bonus.
-
-I think this is why word games feel more satisfying than, say, multiple-choice trivia. In trivia, the answer is presented to you and you select it. In a word game, you pull the answer out of noise. You create order from chaos. And your brain thinks that's absolutely magnificent.
-
-This might also explain why we remember spectacular word game moments years later. I can still tell you about the time I found JUXTAPOSE on a board in 2024. I can see the exact path. It felt like discovering a secret passage in a video game — this sense of "this was here the whole time and only I saw it." That's pure insight, and it was chemically burned into my memory.`,
+The pleasure is also amplified by what psychologists call the "generation effect." Words you actively discover are encoded more strongly in memory than words you passively read. Your brain rewards you for generating the information rather than just receiving it.`,
       },
       {
         title: 'When "addictive" becomes a problem',
-        content: `The uncomfortable side of all this: variable rewards, flow states, open loops, social pressure, insight rewards. These are genuinely powerful psychological mechanisms. The same mechanisms that make gambling addictive, social media compulsive, and mobile games predatory.
+        content: `Variable rewards, flow states, open loops, social pressure, insight rewards. These are genuinely powerful psychological mechanisms. The same mechanisms that make gambling addictive, social media compulsive, and mobile games predatory.
 
-So when does word game "addiction" cross a line?
+So when does word game "addiction" cross a line? Adam Alter draws it at interference. An activity becomes problematic when it consistently interferes with things you value more: sleep, relationships, work, physical health. Playing word games for an hour because you're enjoying yourself? Fine. Playing until 3am when you have an early meeting because you can't stop? Worth examining.
 
-Adam Alter draws it at interference. An activity becomes problematic when it consistently interferes with things you value more: sleep, relationships, work, physical health. Playing word games for an hour because you're enjoying yourself? Fine. Playing until 3am when you have an early meeting because you can't stop? Worth examining.
+The good news is that word games are structurally less dangerous than many alternatives. Rounds are short with natural stopping points. There's no infinite scroll. There's no social media feed of curated envy. There's no financial mechanism.
 
-The good news is that word games are structurally less dangerous than many alternatives. Rounds are short with natural stopping points. There's no infinite scroll. There's no social media feed of curated envy. There's no financial mechanism (most word games don't have loot boxes or pay-to-win).
-
-But the Zeigarnik Effect can create compulsive play patterns in some people. If you find that missed words genuinely bother you for hours, or if you feel anxious when you can't play your daily challenge, it's worth being honest with yourself about whether the habit is serving you.
-
-Some practical boundaries that work for me:
-- I don't play in bed (okay, I try not to play in bed)
-- I set a round limit, not a time limit (three rounds, then stop)
-- I treat the daily challenge as my "one and done" — play it, share it, move on
-- If I notice the "just one more round" urge more than twice, I put the phone down
-
-These aren't perfect, and I violate them regularly. But having explicit boundaries means I at least notice when I'm violating them, which is half the battle.`,
+But the Zeigarnik Effect can create compulsive play patterns in some people. If you find that missed words genuinely bother you for hours, or if you feel anxious when you can't play your daily challenge, it's worth being honest with yourself about whether the habit is serving you.`,
       },
       {
         title: 'Why this "addiction" might actually be good for you',
         content: `Compared to almost everything else competing for your attention, word game "addiction" is remarkably benign. Possibly even beneficial.
 
-Consider what happens in your brain during common leisure activities:
+Doomscrolling social media: cortisol spikes from outrage content, social comparison anxiety, passive consumption, no cognitive challenge.
 
-Doomscrolling social media: cortisol spikes from outrage content, social comparison anxiety, passive consumption, no cognitive challenge, disrupted dopamine baseline from rapid context-switching.
+Word games: active cognitive engagement across multiple brain regions, vocabulary reinforcement, working memory exercise, strategic thinking, manageable dopamine cycles with natural endpoints.
 
-Binge-watching shows: passive entertainment, minimal cognitive engagement, often accompanied by snacking, delays bedtime.
-
-Word games: active cognitive engagement across multiple brain regions, vocabulary reinforcement, working memory exercise, strategic thinking, manageable dopamine cycles with natural endpoints, potential social connection.
-
-Word games aren't "healthy" in the way that exercise or meditation is healthy. But in the category of "things you do with your phone for fun," they're near the top of the cognitive value chart.
-
-A 2022 trial published in NEJM Evidence found that people who did crosswords for 78 weeks showed less cognitive decline than those using commercial brain training apps. The word game group actually improved on some measures while the app group stayed flat. Not exactly a ringing endorsement for Lumosity.
-
-There's also the vocabulary angle. Every word game session exposes you to words at the edge of your vocabulary. You might not know that QUAFF means to drink heartily, but after finding it in three different games, it's yours forever. This passive vocabulary acquisition is real and cumulative.
-
-The social dimension matters too. My daily challenge group chat is one of the most consistently positive social interactions I have. No politics, no drama, no passive-aggressive subtext. Just five people trash-talking each other about word-finding abilities.
+A 2022 trial published in NEJM Evidence found that people who did crosswords for 78 weeks showed less cognitive decline than those using commercial brain training apps. The word game group actually improved on some measures while the app group stayed flat.
 
 Your brain has been hijacked by dopamine loops, flow states, and open cognitive loops. But unlike most things that hijack your brain in 2026, this one is actually exercising it at the same time.
 
-You're addicted to something that's probably making you sharper. I can live with that.
+You're addicted to something that's probably making you sharper.
 
 It's late. I should stop. But there's a seven-letter word hiding in that grid and my brain won't let me sleep until I find it.`,
       },
@@ -185,8 +135,7 @@ It's late. I should stop. But there's a seven-letter word hiding in that grid an
 - Festinger, L. — A Theory of Social Comparison Processes (1954)
 - Beeman, M. & Kounios, J. — The Aha! Moment: The cognitive neuroscience of insight (2009)
 - Alter, A. — Irresistible: The Rise of Addictive Technology (2017)
-- NEJM Evidence (2022) — Columbia & Duke University crossword trial (107 participants, 78 weeks)
-- Schultz, W. — Dopamine reward prediction error signalling (2016)`,
+- NEJM Evidence (2022) — Columbia & Duke University crossword trial (107 participants, 78 weeks)`,
       },
     ],
     backToBlog: 'Back to Blog',
@@ -197,7 +146,7 @@ It's late. I should stop. But there's a seven-letter word hiding in that grid an
     title: 'למה אתם לא מצליחים להפסיק לשחק משחקי מילים (ולמה המוח שלכם לא רוצה שתפסיקו)',
     subtitle: 'המדע מאחורי ההתמכרות למשחקי מילים — דופמין, מצבי זרימה, והפסיכולוגיה ששומרת אתכם ב"עוד סיבוב אחד."',
     category: 'פסיכולוגיה',
-    readTime: 'זמן קריאה: 11 דקות',
+    readTime: 'זמן קריאה: 9 דקות',
     authorName: 'Ohad Fisher',
     authorBio: 'מכור מאובחן-עצמית למשחקי מילים, חובב פסיכולוגיה, והבן אדם שלוחש "עוד סיבוב אחד" בשתיים בלילה כמו מנטרה.',
     sections: [
@@ -212,15 +161,15 @@ It's late. I should stop. But there's a seven-letter word hiding in that grid an
 
 זה מרגיש... פרודוקטיבי? בריא? כאילו אתם עושים משהו טוב לעצמכם גם כשהשעון מעורר מתקרב?
 
-רציתי להבין למה. לא ההסבר המעורפל של "זה כיף", אלא מדע המוח והפסיכולוגיה שמאחורי הקושי האבסורדי להניח את המשחק. אז צללתי לחור הארנב של המחקר. ומה שמצאתי מרתק — וקצת מטריד.`,
+רציתי להבין למה. לא ההסבר המעורפל של "זה כיף", אלא מדע המוח והפסיכולוגיה שמאחורי הקושי האבסורדי להניח את המשחק.`,
       },
       {
         title: 'מכת הדופמין: המוח שלכם על תגמולים משתנים',
-        content: `נתחיל עם הגדול: דופמין.
+        content: `בואו נתחיל עם הגדול: דופמין.
 
-בטח שמעתם על דופמין כ"כימיקל של ההנאה", אבל זה לא בדיוק מדויק. דופמין הוא יותר "כימיקל הציפייה". הוא קופץ לא כשמקבלים את הפרס, אלא כשמצפים שפרס אולי בדרך.
+בטח שמעתם שדופמין הוא "כימיקל ההנאה", אבל זה לא בדיוק מדויק. דופמין הוא כימיקל הציפייה. הוא קופץ לא כשמקבלים את הפרס, אלא כשמצפים שפרס אולי בדרך.
 
-בגלל זה מכונות מזל כל כך ממכרות. זה לא הזכייה (רוב האנשים מפסידים). זו הציפייה לאפשרות של זכייה. פסיכולוגים קוראים לזה "לוח זמנים של חיזוק ביחס משתנה", וזה דפוס ההתניה החזק ביותר שידוע למדע ההתנהגות.
+בגלל זה מכונות מזל כל כך ממכרות. זה לא הזכייה — זה הציפייה לאפשרות של זכייה. פסיכולוגים קוראים לזה "לוח זמנים של חיזוק ביחס משתנה", והוא דפוס ההתניה החזק ביותר שידוע למדע ההתנהגות.
 
 עכשיו חשבו מה קורה כשאתם סורקים רשת אותיות במשחק מילים.
 
@@ -228,7 +177,7 @@ It's late. I should stop. But there's a seven-letter word hiding in that grid an
 
 אבל הנה החלק הערמומי: אתם אף פעם לא יודעים מתי תמצאו את המילה הבאה. לפעמים הן באות במקבצים מהירים — גם, שם, שמש, בום בום בום. פעמים אחרות אתם בוהים שלושים שניות בלי לראות כלום, ואז פתאום "התגלות" מופיעה באלכסון והמוח שלכם נדלק כמו כיכר דיזנגוף בחנוכה.
 
-חוסר הצפיות הזה הוא בדיוק לוח הזמנים של החיזוק המשתנה. המוח שלכם לומד שפרסים מגיעים, אבל לא בלוח זמנים צפוי, אז הוא שומר אתכם במצב של ציפייה מתמשכת ונמוכה. כל רגע יכול להיות הרגע שבו אתם מזהים מילה בת שבע אותיות.
+חוסר הצפיות הזה הוא בדיוק לוח הזמנים של החיזוק המשתנה. המוח שלכם לומד שפרסים מגיעים, אבל לא בלוח זמנים צפוי, אז הוא שומר אתכם במצב של ציפייה מתמשכת. כל רגע יכול להיות הרגע שבו אתם מזהים מילה בת שבע אותיות.
 
 פרופ' רוברט ספולסקי מסטנפורד הראה שרמות הדופמין עולות יותר כשהתגמולים לא ודאיים מאשר כשהם מובטחים. משחק מילים שבו מצאתם כל מילה בקלות היה דווקא פחות ממכר ממשחק שבו מילים מופיעות במרווחים בלתי צפויים.
 
@@ -246,9 +195,9 @@ It's late. I should stop. But there's a seven-letter word hiding in that grid an
 
 חשבו על זה. רשת 4x4 מכילה מאות מילים אפשריות, מקלות באופן טריוויאלי (אם, גם, לא) ועד לקשות להחריד (המילה בת שמונה אותיות שמסתתרת בדפוס ספיראלי). בכל רגע, אתם פועלים בדיוק בקצה היכולת שלכם. המילים הקלות שומרות על תחושת מסוגלות. המילים הקשות שומרות על האתגר. והטיימר מוסיף בדיוק מספיק לחץ כדי למנוע מהמחשבות לשוטט.
 
-לכן סיבוב של חמש דקות יכול להרגיש כמו שלושים שניות. הקורטקס הפרה-פרונטלי, החלק שאחראי על תפיסת זמן, מגויס למשימת מציאת המילים במקום. פשוט אין מספיק משאבים עצביים שנותרו כדי לעקוב אחרי הזמן.
+לכן סיבוב של חמש דקות יכול להרגיש כמו שלושים שניות. הקורטקס הפרה-פרונטלי, החלק שאחראי על תפיסת זמן, מגויס למשימת מציאת המילים. פשוט אין מספיק משאבים עצביים שנותרו כדי לעקוב אחרי הזמן.
 
-מצב הזרימה הוא גם הסיבה ש"עוד סיבוב אחד" כל כך מסוכן. כל סיבוב קצר מספיק כדי שמצב הזרימה לא יתפוגג לגמרי בין סיבובים. אתם עדיין רוכבים על הגל כשהרשת הבאה מופיעה, והמוח שלכם אומר "נו, כבר פה אנחנו..."`,
+ומצה הזרימה הוא גם הסיבה ש"עוד סיבוב אחד" כל כך מסוכן. כל סיבוב קצר מספיק כדי שמצב הזרימה לא יתפוגג לגמרי בין סיבובים. אתם עדיין רוכבים על הגל כשהרשת הבאה מופיעה.`,
       },
       {
         title: 'אפקט זייגרניק: למה חידות לא גמורות רודפות אתכם',
@@ -256,56 +205,54 @@ It's late. I should stop. But there's a seven-letter word hiding in that grid an
 
 זה אפקט זייגרניק, ומשחקי מילים מנצלים אותו בלי רחמים.
 
-כשהסיבוב נגמר והמשחק מראה לכם את כל המילים שפספסתם, משהו קורה במוח. המילים שפספסתם, אלה שהיו ממש שם ולא ראיתם אותן, יוצרות לולאות פתוחות. המוח שלכם מסמן אותן כעסק לא גמור.
+כשהסיבוב נגמר והמשחק מראה לכם את כל המילים שפספסתם, משהו קורה במוח. המילים שפספסתם — אלה שהיו ממש שם ולא ראיתם אותן — יוצרות לולאות פתוחות. המוח שלכם מסמן אותן כעסק לא גמור.
 
 "קטסטרופה הייתה על הלוח?! ראיתי את ה-ק-ט-ס! למה לא ראיתי את זה?!"
 
-ההרגשה המציקה הזו? זה אפקט זייגרניק. המוח שלכם תייק משימה לא שלמה והוא באמת רוצה לסגור את הלולאה. הדרך הישירה ביותר לסגור אותה? לשחק עוד סיבוב ולנסות למצוא מילים כאלה בפעם הבאה.
+ההרגשה המציקה הזו היא אפקט זייגרניק. המוח שלכם תייק משימה לא שלמה והוא באמת רוצה לסגור את הלולאה. הדרך הישירה ביותר לסגור אותה? לשחק עוד סיבוב ולנסות למצוא מילים כאלה בפעם הבאה.
 
-זה אותו מנגנון שגורם לכם לחשוב על בעיות מהעבודה במקלחת. למוח שלכם יש לולאה פתוחה, והוא ממשיך לדקור אתכם עד שתפתרו אותה.
+זה אותו מנגנון שגורם לכם לחשוב על בעיות מהעבודה במקלחת. למוח שלכם יש לולאה פתוחה, והוא ממשיך לדקור אתכם עד שתפתרו אותה. פעם אחת פספסתי את המילה "אנציקלופדיה" וחשבתי על זה שלושה ימים. שלושה ימים! הרגשתי את המוח מנסה לסגור את הלולאה כל פעם שראיתי ספר.
 
-פעם פספסתי את המילה "אנציקלופדיה" על הלוח וחשבתי על זה שלושה ימים. שלושה ימים! הרגשתי את המוח מנסה לסגור את הלולאה כל פעם שראיתי ספר. זה לא התנהגות נורמלית. אבל זה כן מדע מוח נורמלי.`,
+זה לא התנהגות נורמלית. אבל זה כן מדע מוח נורמלי.`,
       },
       {
         title: 'השוואה חברתית: אפקט טבלת המובילים',
-        content: `בני אדם הם מכונות השוואה. אנחנו לא יכולים להימנע מזה. תיאוריית ההשוואה החברתית, שהציע לאון פסטינגר ב-1954, טוענת שאנחנו מעריכים את עצמנו בעיקר על ידי השוואה לאחרים, לא על פי סטנדרט מוחלט כלשהו.
+        content: `בני אדם הם מכונות השוואה. אנחנו לא יכולים להימנע מזה. תיאוריית ההשוואה החברתית, שהציע לאון פסטינגר ב-1954, טוענת שאנחנו מעריכים את עצמנו בעיקר על ידי השוואה לאחרים.
 
 משחקי מילים עם טבלאות מובילים מתחברים ישירות למעגל הזה.
 
-זה לא מספיק למצוא 30 מילים. צריך למצוא יותר מהחבר. צריך לטפס ממקום 7 למקום 5. צריך לנצח את השיא הקודם שלך. המילים עצמן כמעט הופכות למשניות ביחס לתחרות.
+זה לא מספיק למצוא 30 מילים. צריך למצוא יותר מהחבר. צריך לטפס ממקום 7 למקום 5. צריך לנצח את השיא הקודם שלך.
 
 כאן הדברים נהיים מעניינים מבחינה נוירולוגית. תחרות מפעילה את הסטריאטום הוונטרלי — אותו מרכז תגמול שמגיב לאוכל, כסף ומשיכה רומנטית. ניצחון על מישהו בטבלת מובילים מפעיל תגמול נוירוכימי אמיתי, שונה מפעולת הדופמין של מציאת מילים.
 
-אז בעצם יש לכם שני מסלולי דופמין שפועלים בו-זמנית: אחד מלולאת מציאת המילים, ואחד מהתחרות החברתית. זה סנדוויץ' דופמין.
+אז בעצם יש לכם שני מסלולי דופמין שפועלים בו-זמנית: אחד מלולאת מציאת המילים, ואחד מהתחרות החברתית. סנדוויץ' דופמין.
 
-יש לי קבוצת וואטסאפ עם ארבעה חברים שבה אנחנו משתפים ציונים של האתגר היומי. הטראש טוק חסר פרופורציות. מישהו מצא 47 מילים? "הלוח היה בשפה שאתה בכלל מדבר?" מישהו סיים ראשון? "צילום מסך או שזה לא קרה." זה הפך לטקס יומי, והאחריותיות החברתית אומרת שאני פשוט לא יכול לדלג על יום בלי לאכול חרבות.
-
-זו אותה פסיכולוגיה שעמדה מאחורי ההתפוצצות הוויראלית של וורדל. זה לא היה רק משחק טוב — זה היה משחק חברתי טוב.`,
+יש לי קבוצת וואטסאפ עם ארבעה חברים שבה אנחנו משתפים ציונים של האתגר היומי. הטראש טוק חסר פרופורציות. מישהו מצא 47 מילים? "הלוח היה בשפה שאתה בכלל מדבר?" מישהו סיים ראשון? "צילום מסך או שזה לא קרה." זה הפך לטקס יומי, והחברים אומרים שאני פשוט לא יכול לדלג על יום בלי קנטורים רציניים.`,
       },
       {
         title: 'רגע ה"אהה!": למה למצוא מילים מרגיש כל כך טוב',
-        content: `יש רגע ספציפי שבו אתם מזהים מילה — במיוחד ארוכה — שבו הכל מתחבר. מדעני מוח קוראים לזה "חוויית התובנה" או "רגע האהה", ויש לו חתימה עצבית ייחודית.
+        content: `יש רגע ספציפי שבו אתם מזהים מילה — במיוחד ארוכה — שבו הכל מתחבר. מדעני מוח קוראים לזה "חוויית התובנה" ויש לה חתימה עצבית ייחודית.
 
-מחקר של מארק בימן וג'ון קוניוס באמצעות EEG ו-fMRI הראה שרגעי תובנה מלווים בפרץ של פעילות גלי גמא באונה הטמפורלית הימנית. אחריו מגיע גל של פעילות במרכזי התגמול — אותם אזורים שמופעלים על ידי בדיחות, הפתעות נעימות והבנה פתאומית.
+מחקר של מארק בימן וג'ון קוניוס באמצעות EEG ו-fMRI הראה שרגעי תובנה מלווים בפרץ של פעילות גלי גמא באונה הטמפורלית הימנית, ואחריו מגיע גל של פעילות במרכזי התגמול — אותם אזורים שמופעלים על ידי בדיחות, הפתעות נעימות והבנה פתאומית.
 
 במילים אחרות, למצוא מילה לא רק מרגיש כמו תגמול. המוח שלכם מעבד את זה באותה דרך שהוא מעבד הבנה של בדיחה. זו תובנה, ותובנות הן מהנות באופן מהותי.
 
 לכן למצוא מילה ארוכה ובלתי צפויה מרגיש שונה באופן קטגורי ממציאת מילה קצרה וברורה. למצוא "גם" זה זיהוי. למצוא "אנציקלופדיה" שמתפתלת לרוחב הלוח זו תובנה. ותובנה מתוגמלת נוירוכימית באופן שזיהוי פשוט לא.
 
-אני חושב שזו הסיבה שמשחקי מילים מרגישים מספקים יותר מטריוויה רב-ברירתית. בטריוויה, התשובה מוצגת לכם ואתם בוחרים אותה. במשחק מילים, אתם שולפים את התשובה מתוך רעש. אתם יוצרים סדר מתוך כאוס. והמוח שלכם חושב שזה פשוט מבריק.`,
+אני חושב שזו הסיבה שמשחקי מילים מרגישים מספקים יותר מטריוויה רב-ברירתית. בטריוויה, התשובה מוצגת לכם ואתם בוחרים אותה. במשחק מילים, אתם שולפים את התשובה מתוך רעש.`,
       },
       {
-        title: 'בריא מול לא בריא: מתי "ממכר" הופך לבעיה',
-        content: `רגע, בואו נדבר על הצד הלא נוח של כל זה.
+        title: 'בריא מול לא בריא: מתי ההתלהבות הופכת לבעיה',
+        content: `בואו נדבר על הצד הקשה של כל זה.
 
-כל מה שתיארתי (תגמולים משתנים, מצבי זרימה, לולאות פתוחות, לחץ חברתי, תגמולי תובנה) אלה מנגנונים פסיכולוגיים חזקים באמת. אלה אותם מנגנונים שהופכים הימורים לממכרים, רשתות חברתיות לכפייתיות, ומשחקי מובייל לטורפניים.
+כל מה שתיארתי — תגמולים משתנים, מצבי זרימה, לולאות פתוחות, לחץ חברתי — אלה מנגנונים פסיכולוגיים חזקים באמת. אלה אותם מנגנונים שהופכים הימורים לממכרים, רשתות חברתיות לכפייתיות, ומשחקי מובייל לטורפניים.
 
 ד"ר אדם אלטר מותח את הקו בהפרעה. פעילות הופכת לבעייתית כשהיא מפריעה באופן עקבי לשינה, מערכות יחסים, עבודה, בריאות.
 
-החדשות הטובות הן שמשחקי מילים מבניתית פחות מסוכנים מחלופות רבות. סיבובים קצרים עם נקודות עצירה טבעיות. אין גלילה אינסופית. אין פיד של קנאה מאוצרת. אין מנגנון פיננסי.
+החדשות הטובות הן שמשחקי מילים מבניתית פחות מסוכנים מחלופות רבות. סיבובים קצרים עם נקודות עצירה טבעיות. אין גלילה אינסופית. אין מנגנון פיננסי.
 
 כמה גבולות מעשיים שעובדים לי:
-- אני לא משחק במיטה (טוב, אני מנסה לא לשחק במיטה)
+- אני לא משחק במיטה
 - אני קובע מגבלת סיבובים, לא מגבלת זמן (שלושה סיבובים, ואז עוצר)
 - אני מתייחס לאתגר היומי כ"אחד וגמרנו"
 - אם אני שם לב לדחף של "עוד סיבוב אחד" יותר מפעמיים, אני מניח את הטלפון
@@ -313,10 +260,10 @@ It's late. I should stop. But there's a seven-letter word hiding in that grid an
 אלה לא מושלמים, ואני מפר אותם באופן קבוע. אבל גבולות מפורשים אומרים שלפחות אני שם לב כשאני מפר אותם.`,
       },
       {
-        title: 'למה ה"התמכרות" הזו דווקא טובה לכם',
-        content: `והפלוט טוויסט: בהשוואה לכמעט כל דבר אחר שמתחרה על תשומת הלב שלכם, "התמכרות" למשחקי מילים היא יחסית שפירה. אולי אפילו מועילה.
+        title: 'למה ההתלהבות הזו דווקא טובה לכם',
+        content: `והפלוט טוויסט: בהשוואה לכמעט כל דבר אחר שמתחרה על תשומת הלב שלכם, הותר למשחקי מילים היא יחסית שפירה. אולי אפילו מועילה.
 
-נשווה מה קורה במוח בפעילויות פנאי נפוצות:
+בואו נשווה מה קורה במוח בפעילויות פנאי נפוצות:
 
 גלילת דום ברשתות חברתיות? קפיצות קורטיזול מתוכן זועם, חרדת השוואה חברתית, צריכה פסיבית, אפס אתגר קוגניטיבי.
 
@@ -328,7 +275,7 @@ It's late. I should stop. But there's a seven-letter word hiding in that grid an
 
 אז כן — המוח שלכם נחטף על ידי לולאות דופמין, מצבי זרימה, ולולאות קוגניטיביות פתוחות. אבל בניגוד לרוב הדברים שחוטפים את המוח שלכם ב-2026, הדבר הזה באמת מאמן אותו באותו הזמן.
 
-אתם לא רק מכורים. אתם מכורים למשהו שכנראה מחדד אתכם.
+אתם לא רק מהונים. אתם מהונים למשהו שכנראה מחדד אתכם.
 
 מאוחר. צריך להפסיק. אבל יש מילה בת שבע אותיות מסתתרת ברשת והמוח שלי לא ייתן לי לישון עד שאמצא אותה.`,
       },
@@ -339,7 +286,8 @@ It's late. I should stop. But there's a seven-letter word hiding in that grid an
 - זייגרניק, ב. — על משימות גמורות ולא גמורות (1927)
 - פסטינגר, ל. — תיאוריה של תהליכי השוואה חברתית (1954)
 - בימן, מ. וקוניוס, ג'. — רגע ה"אהה!": מדע המוח הקוגניטיבי של תובנה (2009)
-- אלטר, א. — בלתי ניתן לעמוד בפניו: עליית הטכנולוגיה הממכרת (2017)`,
+- אלטר, א. — בלתי ניתן לעמוד בפניו: עליית הטכנולוגיה הממכרת (2017)
+- NEJM Evidence (2022) — מחקר אוניברסיטת קולומביה וד'יוק על תשבצים (107 משתתפים, 78 שבועות)`,
       },
     ],
     backToBlog: 'חזרה לבלוג',

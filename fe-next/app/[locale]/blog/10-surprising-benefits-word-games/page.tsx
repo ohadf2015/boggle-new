@@ -12,7 +12,7 @@ interface PageProps {
 
 const SLUG = '10-surprising-benefits-word-games';
 const DATE_PUBLISHED = '2025-06-15';
-const DATE_MODIFIED = '2026-02-20';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: '10 Benefits of Playing Word Games Daily - Science-Backed Results',

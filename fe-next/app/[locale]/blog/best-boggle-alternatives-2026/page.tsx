@@ -13,7 +13,7 @@ interface PageProps {
 
 const SLUG = 'best-boggle-alternatives-2026';
 const DATE_PUBLISHED = '2025-12-01';
-const DATE_MODIFIED = '2026-03-15';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'I Tested 6 Boggle Alternatives in 2026 — Here\'s What Actually Works',

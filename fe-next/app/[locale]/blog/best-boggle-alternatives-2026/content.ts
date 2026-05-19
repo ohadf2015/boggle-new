@@ -29,158 +29,153 @@ export const contentByLocale: Record<string, LocaleContent> = {
     sections: [
       {
         slug: 'intro',
-        content: `I've been chasing the Boggle high since I was twelve.
+        content: `I've been chasing the Boggle high since I was twelve. That plastic grid, sand timer, everyone hunched over notepads while your uncle insists "QAT" is a word—it is, Uncle Dave—and that specific cocktail of time pressure, pattern recognition, and competitive spite? Nothing else hits.
 
-You know the one. That rickety plastic grid, the sand timer flipping over, everyone hunched over their notepads scribbling furiously while your uncle insists "QAT" is a word (it is, Uncle Dave, but you spelled it wrong). That specific cocktail of time pressure, pattern recognition, and competitive spite? Nothing else hits quite like it.
+So naturally, I've spent an embarrassing amount of time and money trying every digital alternative to Boggle that promises to capture that feeling. Most of them don't. Some actively anger me. A handful are genuinely great.
 
-So naturally, I've spent an embarrassing amount of time, and honestly a fair amount of money, trying every digital word game that promises to recapture that feeling. Most of them don't. Some of them actively make me angry. A few are genuinely great.
-
-I'm going to be honest about all of them. Even the one I ended up liking the most.`,
+Below is my completely honest, occasionally unhinged ranking of the best alternatives to Boggle and other word games in 2026.`,
       },
       {
         slug: 'what-makes-good-word-game',
         title: 'What makes a good word game',
-        content: `Before I trash half this list (and I will), three things matter. A great word game needs:
+        content: `Before I trash half this list, three things matter. A great word game needs:
 
-That "aha" moment when you spot a word nobody else sees. Time pressure that makes your palms sweat. And some reason to come back tomorrow.
+That "aha" moment when you spot a word nobody else sees. Time pressure that makes your palms sweat. And a reason to come back tomorrow.
 
-Bonus points if it doesn't try to shake me down for $4.99 every time I lose. We'll get to that.`,
+Bonus: it doesn't beg for $4.99 every time you lose.`,
       },
       {
         slug: 'wordle',
         title: '1. Wordle',
-        content: `Getting this one out of the way. Wordle is brilliant. Josh Wardle (yes, that's really his name) created something genuinely perfect: one puzzle a day, six guesses, no more, no less. The constraint is the game. The shared experience of everyone solving the same puzzle is what made it a cultural phenomenon.
+        content: `Wordle is brilliant. One puzzle a day, six guesses. The constraint is the game. Josh Wardle created something genuinely perfect, and the shared experience of millions solving the same puzzle every day worldwide is why it became a cultural phenomenon when the New York Times acquired it in early 2022.
 
-My problem with Wordle: it takes about three minutes.
+My actual problem with it? It takes three minutes total.
 
-I don't mean that as a compliment. I mean I finish it on the toilet before my coffee kicks in and then I have nothing for the rest of the day. One puzzle. That's it. I'm an addict and you're giving me a single hit? Come on.
+I finish it on the toilet before my coffee kicks in. That's it for the entire day. One puzzle. Nothing else. I'm an addict and you're giving me a single hit? Come on.
 
-Also, and this is going to be controversial, it's not really a "word game" in the Boggle sense. It's a logic puzzle wearing word-game clothes. You're process-of-elimination-ing, not word-finding. Different skill. Still great. Just different.
+Also, and this will be controversial, it's not really a "word game" in the classic Boggle sense. It's a logic puzzle wearing word-game clothes. You're eliminating options methodically, not searching for words across a grid. It's a different skill entirely. Still great. Just different.
 
-Verdict: Perfect for what it is. Terrible if you want more than three minutes of daily entertainment.`,
+Verdict: Perfect for what it is. Terrible if you want sustained daily entertainment.`,
       },
       {
         slug: 'words-with-friends-2',
         title: '2. Words With Friends 2',
-        content: `Words With Friends has been around since 2009, which in app years makes it roughly 400 years old. It's got the biggest playerbase of any word game, period. Your aunt plays it. Your coworker plays it. That random person you matched with on a dating app in 2019 and never actually met plays it.
+        content: `Words With Friends has been around since 2009 (ancient in app years). Biggest playerbase of any word game, period. Your aunt plays it. Your coworker plays it.
 
-And you know what? The core game is solid. It's Scrabble with a different board layout. The dictionary is generous. Too generous, honestly. It accepts words I'm 90% sure aren't real. Finding opponents is never a problem.
+The core game is solid. It's Scrabble with a different board layout, which means the gameplay mechanics are proven. The dictionary is generous, maybe too generous. Finding opponents is never a problem given the massive playerbase.
 
-But the monetization.
+But the monetization kills any semblance of fair play.
 
-The power-ups. "Word Radar" literally shows you the best word on the board. "Swap+" lets you trade tiles without losing a turn. "Hindsight" shows you missed words. These aren't quality-of-life features. They're straight-up pay-to-win advantages.
+Power-ups like "Word Radar" literally show you the best word on the board. "Swap+" lets you trade tiles without losing a turn. These aren't quality-of-life convenience features. They're genuine pay-to-win advantages that shift outcomes. I've lost multiple games where I found significantly more words than my opponent, but they spent money on power-ups and I didn't.
 
-And the async format means you're waiting hours (sometimes days) for your opponent to play. I have games from three weeks ago that are still going. My opponent is either deeply strategic or has forgotten I exist.
+The async format also means waiting hours, sometimes days, between plays. I have games from three weeks ago that are still sitting unfinished.
 
-Verdict: Huge community, solid foundation, ruined by pay-to-win power-ups and the pace of a chess-by-mail tournament.`,
+Verdict: Huge community, solid foundation, ruined by pay-to-win power-ups and glacial pace.`,
       },
       {
         slug: 'wordscapes',
         title: '3. Wordscapes',
-        content: `Wordscapes is genuinely beautiful. Credit where due. The backgrounds are gorgeous. The progression system, unlocking new landscapes as you solve puzzles, scratches that completionist itch. The crossword-meets-anagram format is satisfying in a zen, solo kind of way.
+        content: `Wordscapes is genuinely beautiful. The backgrounds are gorgeous. Unlocking new landscapes as you progress scratches that completionist itch.
 
 For about two weeks.
 
-Then you realize every puzzle is basically the same. Find words from these letters. Fill in the crossword. Move on. There's no competition, no time pressure, no other humans involved. It's a word game for people who want to relax, which is fine, but I want to feel my heartbeat in my ears.
+Then you realize every puzzle is basically identical. Find words from letters. Fill in the crossword. Move to the next landscape. No competition, no time pressure, no other humans involved. It's word game meditation, which is perfectly fine for some people, but I personally want my heart racing when I play.
 
-Also, the ads. If you're not paying for premium, you're watching a 30-second ad every four puzzles. I once watched an ad for a game that was worse than the one I was already playing. Inception of mediocrity.
+Also the ads. Thirty-second spot every four puzzles unless you pay for premium. I once watched an ad for a worse game than the one I was playing.
 
-Verdict: Beautiful, relaxing, and about as exciting as alphabetizing your spice rack.`,
+Verdict: Beautiful, relaxing, about as exciting as alphabetizing your spice rack.`,
       },
       {
         slug: 'boggle-with-friends',
-        title: '4. Boggle With Friends (Zynga)',
-        content: `This one hurts the most because it should be the best. It's literally Boggle. Official Boggle. The grid, the timer, the word-finding. It's all there.
+        title: '4. Boggle With Friends',
+        content: `This one hurts most because it should be the best. It's literally Boggle. The grid, the timer, real-time word-finding against other players. This is what Boggle alternatives should aspire to be.
 
-And then Zynga did what Zynga does.
+Then Zynga did what Zynga does best: monetize everything.
 
-Power-ups. Freezing time. Revealing words. Scrambling the board. Things that fundamentally break the competitive integrity of what should be a pure skill game. I've lost game after game because I refuse to spend money on power-ups. And I know I found more words than my opponent. But they had "Word Clue" and "Freeze" and suddenly my 47-word game loses to their 31-word-plus-bonuses game.
+Power-ups that freeze time, reveal words, scramble the board strategically. These features fundamentally break the competitive integrity that makes word games fair. I've lost numerous games where I found 47 words versus an opponent with 31 words, but they purchased power-ups and bonuses that outweighed pure skill.
 
-The reviews on the App Store tell the whole story. Thousands of one-star reviews saying the same thing: "Great game ruined by pay-to-win." "I loved this until they added power-ups." "Losing to people who spend money isn't fun."
+The App Store reviews tell the whole story. Thousands of one-star ratings saying: "Great game ruined by pay-to-win." "I loved this until they added power-ups." "Losing to people who spend money isn't fun."
 
-They took the purest word game ever created and turned it into a slot machine. I'm not mad. I'm disappointed. (I'm also mad.)
+They took the purest word game ever created and turned it into a slot machine.
 
-Verdict: The closest thing to real Boggle, buried under a mountain of pay-to-win garbage. A tragedy.`,
+Verdict: Closest thing to real Boggle, buried under a mountain of pay-to-win garbage.`,
       },
       {
         slug: 'word-blitz',
         title: '5. Word Blitz',
-        content: `Word Blitz gets something right that a lot of these games miss: real-time competition. You and your opponent are both staring at the same grid at the same time, swiping words as fast as your thumbs can move. No waiting. No power-ups, mostly. Just pure speed.
+        content: `Word Blitz gets real-time competition right. You and your opponent stare at the same grid simultaneously, swiping words as fast as your thumbs can physically move. No waiting between turns. No power-ups ruining the experience (mostly). Pure speed and reflexes.
 
-It's fun! Genuinely fun! For the 90 seconds each round lasts.
+It's genuinely fun! For the 90 seconds each round lasts.
 
-The problem is there's not much else. No progression system worth mentioning. No daily challenges. No boss battles or special modes. It's one thing, fast Boggle, and it does that one thing well. But I burned out in about a month because there was nothing pulling me back except "do the same thing again."
+Then you realize there's nothing else. No progression system. No daily challenges. No special modes. It's one thing—fast Boggle—and it does that well. But I burned out in a month with nothing pulling me back except "do the same thing again."
 
-It's like a restaurant that serves amazing fries and literally nothing else. Great fries though.
+It's like a restaurant that serves amazing fries and literally nothing else.
 
 Verdict: Fast, pure, and fun. But thin. You'll love it for a month and then forget it exists.`,
       },
       {
         slug: 'lexiclash',
         title: '6. LexiClash',
-        content: `Full disclosure: this is the one I've been playing the most lately. I'll try to be fair about it.
+        content: `Full disclosure: this is what I've been playing most lately. I'll try to be fair.
 
-LexiClash is what happens when someone looks at Boggle and says "what if this, but more?" Real-time multiplayer where you're competing against actual humans on the same board simultaneously. Not async, not turn-based. Real-time. That alone makes it different from 90% of this list.
+LexiClash is what happens when someone looks at Boggle and says "what if this, but more?" Real-time multiplayer on the same board with actual humans. Not async, not turn-based. Real-time. That alone makes it different from 90% of this list.
 
-But the thing that actually hooked me was the variety. Daily challenges that change every day, with global leaderboards so you can see exactly how much better than you everyone else is. Thanks for that, devs. Boss battles where you're fighting AI opponents with special abilities. A blast mode that's basically "what if Boggle had combos and chain reactions." Word Hunt mode where everyone's racing to find specific target words.
+But what hooked me was variety. Daily challenges with global leaderboards. Boss battles against AI with special abilities. A blast mode that's basically Boggle with combos and chain reactions. Word Hunt where everyone races to find target words.
 
-It supports four languages, English, Hebrew, Swedish, and Japanese, which is a weird flex but means you can practice vocabulary in another language while getting destroyed by native speakers. Educational masochism.
+It supports four languages (English, Hebrew, Swedish, Japanese), which is useful if you want vocabulary practice in another language while native speakers destroy you. Educational masochism.
 
-Oh, and it's free. Actually free. No pay-to-win power-ups. No "watch this ad to continue." The monitization doesn't interfere with gameplay, which in 2026 feels almost radical.
+Most importantly. It's free. Genuinely, actually free. No pay-to-win power-ups. No "watch an ad to continue." Monetization doesn't interfere with gameplay at all, which in 2026 feels almost radical and refreshing.
 
-Where I have to be honest: it's newer, so the community is still growing. During off-peak hours, you might wait a bit for a multiplayer match. The solo modes fill the gap (and they're good), but if you're specifically looking for a game where you can find opponents at 3 AM on a Tuesday, Words With Friends still has LexiClash beat on sheer player count. For now.
+Honest part: it's newer, so during off-peak hours you might wait for a match. Solo modes fill the gap (and they're good), but if you specifically want opponents at 3 AM on Tuesday, Words With Friends still wins on player count. For now.
 
-The other thing, and this is minor, is that the UI can feel like a lot when you first open it. There's boss battles and daily challenges and practice mode and multiplayer lobbies and... it took me a day to figure out where everything was. Once I did, I was hooked. But the learning curve is real.
+UI can feel overwhelming at first—boss battles, daily challenges, practice mode, multiplayer lobbies, and more. Took me a day to navigate. Once I did, I was hooked. But there's a real learning curve.
 
-Verdict: The most fun I've had with a word game since actual physical Boggle. Not perfect, but it's the only one on this list I'm still playing daily three months later.`,
+Verdict: Most fun I've had with a word game since physical Boggle. Not perfect, but it's the only one on this list I'm still playing daily three months later.`,
       },
       {
         slug: 'comparison',
-        title: 'The comparison nobody asked for',
-        content: `Saving you some time with a comparison that would've saved me a lot of time.
+        title: 'The quick comparison',
+        content: `Want raw gameplay? Wordle for logic puzzles, Word Blitz for pure speed, LexiClash for depth and variety. Want a massive community? Words With Friends (bring your wallet). Want to relax? Wordscapes. Want to feel betrayed by capitalism? Boggle With Friends.
 
-Want just the raw gameplay? Wordle for logic, Word Blitz for speed, LexiClash for depth. Want a massive community? Words With Friends (bring your wallet). Want to relax? Wordscapes. Want to feel betrayed by capitalism? Boggle With Friends.
+What matters most to me when evaluating alternatives: does the game respect my time investment and my wallet? Let me break it down.
 
-What actually matters to me: does the game respect my time and my wallet? Wordle respects both but gives me too little. Words With Friends respects my time but not my wallet. Wordscapes respects neither (those ads, man). Boggle With Friends actively disrespects my wallet. Word Blitz respects both but gives me too little variety. LexiClash respects both and keeps me coming back.
+Wordle respects both but offers too little content. Words With Friends respects your time but not your wallet. Wordscapes respects neither (the constant ads are relentless). Boggle With Friends actively disrespects your wallet with essential power-ups. Word Blitz respects both your time and money but feels too shallow for long-term engagement. LexiClash respects both and actually keeps me coming back month after month.
 
-Your mileage may vary. I'm just one nerd with opinions.`,
+Your personal preferences will differ based on what matters most to you.
+
+That's the complete picture.`,
       },
       {
         slug: 'which-one-right-for-you',
         title: 'Which one is right for you',
-        content: `Everyone's brain works differently. Quick breakdown.
+        content: `If you want one daily puzzle to obsess over—Wordle. Perfect for that, nothing else.
 
-If you want one daily puzzle to obsess over, the kind you text your friends about and argue over at lunch. Wordle. Perfect for that and nothing else.
+If you want the biggest community with turn-based gameplay—Words With Friends. Just bring your wallet.
 
-If you want turn-based games with the biggest community on the planet, where you can always find an opponent. Words With Friends. Bring your wallet though, you'll need power-ups to compete at higher levels.
+If you want real-time chaos with actual competition—LexiClash. That's the Boggle energy.
 
-If you want real-time chaos with friends, the kind of game where you're yelling at your phone and your heart rate actually goes up. LexiClash. That's the Boggle energy.
+If you want relaxing solo play—Wordscapes.
 
-If you want a solo zen mode, something to unwind with while listening to a podcast. Wordscapes. No shame in that.
-
-If you want the classic Boggle feel without pay-to-win garbage, where skill actually determines who wins. Also LexiClash, honestly. I tried to find another option. Couldn't.
-
-If you want to feel nostalgic and then immediately angry. Boggle With Friends. You'll love the first five minutes.`,
+If you want classic Boggle feel without pay-to-win mechanics—also LexiClash. I tried to find another option. Couldn't.`,
       },
       {
         slug: 'getting-sentimental',
-        title: 'Getting sentimental',
-        content: `The thing about word games that none of these app descriptions capture: they make you feel smart. Not in a pretentious way. In a "holy crap, I found QUATERNION in a 4x4 grid" way. That moment of recognition, when your brain connects letters that nobody else connected. That's the dopamine hit I've been chasing since I was twelve.
+        title: 'Why this matters',
+        content: `Word games make you feel genuinely smart. Not in a pretentious or condescending way. In a "holy crap, I found QUATERNION in a 4x4 grid" way. That moment of recognition when your brain connects letters nobody else connected. That's the dopamine hit I've been chasing since age twelve.
 
-The best word games preserve that feeling. The worst ones bury it under monetization and gimmicks.
+The best games preserve that feeling. The worst bury it under monetization and gimmicks.
 
-I don't think there's a single perfect word game. Wordle comes close for its format. LexiClash comes close for mine. Your perfect game depends on whether you want a daily ritual or a competitive obsession, solo meditation or multiplayer mayhem.
+There's no single perfect word game. Wordle comes closest for its format. LexiClash for mine. Your perfect game depends on whether you want a daily ritual or competitive obsession, solo meditation or multiplayer mayhem.
 
 But whatever you pick, make sure it's one where you actually feel something when you find a great word. That's the whole point.
 
-Now if you'll excuse me, I have a daily challenge to finish and a boss to defeat. My 63-day streak isn't going to maintain itself.`,
+Now excuse me, I have a daily challenge to finish and a boss to defeat. My streak won't maintain itself.`,
       },
     ],
     backToBlog: 'Back to Blog',
     playDaily: 'Try LexiClash Free',
     startPracticing: 'Play Now',
   },
-
   he: {
     title: 'ניסיתי כל משחק מילים שמצאתי. רובם מאכזבים.',
     subtitle: 'דירוג כנה (ומעט מטורף) של משחקי המילים הטובים ביותר ב-2026.',

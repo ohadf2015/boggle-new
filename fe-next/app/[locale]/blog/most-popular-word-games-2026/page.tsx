@@ -14,7 +14,7 @@ interface PageProps {
 
 const SLUG = 'most-popular-word-games-2026';
 const DATE_PUBLISHED = '2026-05-15';
-const DATE_MODIFIED = '2026-05-15';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'The Most Popular Online Word Games of 2026 — and Why They Exploded',
