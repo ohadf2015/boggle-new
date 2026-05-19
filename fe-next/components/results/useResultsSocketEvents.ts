@@ -272,7 +272,14 @@ export function useResultsSocketEvents({
     logger.log('[RESULTS] Marking player as ready for next game');
     socket.emit('confirmReadyForNextGame');
     setIsCurrentPlayerReady(true);
-  }, [socket, isCurrentPlayerReady]);
+    // Optimistic — counter + avatar dot must flip locally instantly.
+    // Server `playersReadyUpdate` arrives a beat later (sometimes coalesced);
+    // without this the StickyReadyBar still shows "2/3 READY" with your own
+    // avatar grayed-out even though you tapped Ready.
+    if (username) {
+      setReadyUsernames(prev => prev.includes(username) ? prev : [...prev, username]);
+    }
+  }, [socket, isCurrentPlayerReady, username]);
 
   return {
     // State

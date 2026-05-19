@@ -13,7 +13,6 @@ import {
   removeUserFromGame,
   getUsernameBySocketId,
   getSocketIdByUsername,
-  getGameBySocketId,
   getGameUsers,
   getActiveRooms,
   isRoomEmpty,
@@ -254,19 +253,22 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
 
   // Handle leave room
   // Derive username from server-side mapping to prevent impersonation
-  socket.on('leaveRoom', ({ gameCode }: LeaveRoomPayload) => {
+  socket.on('leaveRoom', ({ gameCode, username: payloadUsername }: LeaveRoomPayload) => {
     // Light RL: each leave does state mutation + broadcast. Spam → repeated
     // updateUsers fanouts to all lobby clients.
     if (!checkRateLimit(socket.id)) return;
-    const username = getUsernameBySocketId(socket.id);
+    // Prefer socket-mapped username (auth source of truth) but fall back to
+    // the payload when the socket reconnected mid-session and lost its
+    // mapping. Without this fallback an explicit Exit silently no-ops and
+    // the user keeps showing as a "ghost" room member in the lobby.
+    const username = getUsernameBySocketId(socket.id) || payloadUsername;
     if (!gameCode || !username) return;
-
-    // Guard: if socket→game mapping already cleared (disconnect fired first), bail
-    const mappedGame = getGameBySocketId(socket.id);
-    if (!mappedGame || mappedGame !== gameCode) return;
 
     const game = getGame(gameCode);
     if (!game) return;
+    // Verify the user is actually a member of this game — guards against a
+    // malicious payload trying to evict someone else after a socket reconnect.
+    if (!game.users[username]) return;
 
     // Check if leaving user is the host
     const isLeavingUserHost = game.hostUsername === username;

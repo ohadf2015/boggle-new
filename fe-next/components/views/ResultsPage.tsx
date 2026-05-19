@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useEffect, useState, useCallback, useDeferredValue, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { m, AnimatePresence } from 'framer-motion';
@@ -1093,14 +1094,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           </div>
         </div>
 
-        {/* Floating bottom bar — always-visible sticky CTA */}
-        {gameCode && onReturnToRoom && !isDesktopViewport && (
-          <div ref={setStickyBarRef} className="shrink-0 fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-50 text-neo-cream">
+        {/* Floating bottom bar — portaled to <body> so no ancestor with
+            transform/filter/perspective can hijack `position: fixed` and turn
+            it into `absolute` (which caused the bar to scroll mid-page on
+            Android and let the DailyChallengeInvite render below it). */}
+        {gameCode && onReturnToRoom && !isDesktopViewport && typeof document !== 'undefined' && createPortal(
+          <div ref={setStickyBarRef} className="fixed bottom-0 inset-x-0 z-[100] text-neo-cream pointer-events-none">
             <m.div
               initial={{ y: 60, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 200, damping: 24, delay: 0.3 }}
-              className="bg-neo-navy/95 border-t border-neo-white/8 shadow-[0_-4px_24px_rgba(0,0,0,0.5)]"
+              className="bg-neo-navy/95 border-t border-neo-white/8 shadow-[0_-4px_24px_rgba(0,0,0,0.5)] pointer-events-auto"
             >
               {/* Inline style for padding-bottom: Tailwind arbitrary values
                   don't survive multi-arg max() with var() reliably. Capacitor
@@ -1134,7 +1138,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 />
               </div>
             </m.div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
 
@@ -1158,9 +1163,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         matchScore={currentPlayerData?.score ?? 0}
       />
 
-      {/* DESKTOP Sticky Ready Bar — pinned to bottom on md+ screens */}
-      {gameCode && onReturnToRoom && isDesktopViewport && (
-        <div ref={setStickyBarRef} className="fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black safe-area-pb">
+      {/* DESKTOP Sticky Ready Bar — pinned to bottom on md+ screens.
+          Portaled for the same ancestor-transform reason as mobile. */}
+      {gameCode && onReturnToRoom && isDesktopViewport && typeof document !== 'undefined' && createPortal(
+        <div ref={setStickyBarRef} className="fixed bottom-0 inset-x-0 z-[100] bg-neo-navy text-neo-cream border-t-4 border-neo-black safe-area-pb">
           <div className="max-w-6xl mx-auto px-4 py-2.5">
             <StickyReadyBar
               isHost={isHost}
@@ -1180,7 +1186,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               onNewSeries={handleNewSeries}
             />
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Exit Confirmation Dialog */}
