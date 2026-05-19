@@ -5,12 +5,11 @@ import { InlineBannerAd } from '@/components/ads';
 import { calculateWordScore } from '@/shared/utils/scoring';
 import { parseLetters, findAnagramsFromLetters } from '../lib/anagramLogic';
 import { loadDictionaryWords } from '@/app/api/word-solver/dictionaryLoader';
+import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
-const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
 const BASE_URL = 'https://www.lexiclash.live';
 
 interface PageParams {
@@ -34,35 +33,14 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const title = `Anagrams of ${upper} — Anagram Solver | LexiClash`;
   const description = `Find all words you can make from the letters ${upper}. Free anagram solver for Scrabble, Boggle, and word games.`;
   const url = `${BASE_URL}/${locale}/anagram/${letters}`;
-  const enUrl = `${BASE_URL}/en/anagram/${letters}`;
 
   return {
     title,
     description,
     openGraph: { type: 'website', url, title, description, siteName: 'LexiClash' },
-    alternates: {
-      canonical: locale === 'en' ? url : enUrl,
-      languages: Object.fromEntries([
-        ['x-default', `${BASE_URL}/en/anagram/${letters}`],
-        ...LOCALES.map(l => [l, `${BASE_URL}/${l}/anagram/${letters}`]),
-        ['en-IL', `${BASE_URL}/en/anagram/${letters}`],
-        ['he-IL', `${BASE_URL}/he/anagram/${letters}`],
-        ['en-US', `${BASE_URL}/en/anagram/${letters}`],
-        ['es-US', `${BASE_URL}/es/anagram/${letters}`],
-        ['en-GB', `${BASE_URL}/en/anagram/${letters}`],
-        ['en-SE', `${BASE_URL}/en/anagram/${letters}`],
-        ['sv-SE', `${BASE_URL}/sv/anagram/${letters}`],
-        ['en-JP', `${BASE_URL}/en/anagram/${letters}`],
-        ['ja-JP', `${BASE_URL}/ja/anagram/${letters}`],
-        ['en-ES', `${BASE_URL}/en/anagram/${letters}`],
-        ['es-ES', `${BASE_URL}/es/anagram/${letters}`],
-        ['en-MX', `${BASE_URL}/en/anagram/${letters}`],
-        ['es-MX', `${BASE_URL}/es/anagram/${letters}`],
-        ['en-AU', `${BASE_URL}/en/anagram/${letters}`],
-        ['es-AR', `${BASE_URL}/es/anagram/${letters}`],
-        ['es-CO', `${BASE_URL}/es/anagram/${letters}`],
-      ]),
-    },
+    // English-only content + index:locale==='en'. Self-referencing EN hreflang
+    // cluster (never declare the noindexed /he|/sv|/ja|/es siblings).
+    alternates: enOnlyAlternates(`/anagram/${letters}`),
     robots: { index: locale === 'en', follow: true },
   };
 }

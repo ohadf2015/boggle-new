@@ -5,6 +5,7 @@ import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
 import { HeScrabbleCrossLink } from '@/components/seo/HeScrabbleCrossLink';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
 
 const anagramSeoContent: Record<string, {
   title: string;
@@ -169,8 +170,6 @@ const anagramSeoContent: Record<string, {
 
 export const dynamic = 'force-dynamic';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
-const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
 const BASE_URL = 'https://www.lexiclash.live';
 
 export const revalidate = 86400;
@@ -201,13 +200,8 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
         'Enter any letters and find every word you can make. Free, instant, no signup. Built into LexiClash, the multiplayer word game with 30+ modes.',
       siteName: 'LexiClash',
     },
-    alternates: {
-      canonical: pageUrl,
-      languages: Object.fromEntries([
-        ['x-default', `${BASE_URL}/en/anagram`],
-        ...LOCALES.map((l) => [l, `${BASE_URL}/${l}/anagram`]),
-      ]),
-    },
+    // EN-only indexed hub — self-referencing EN hreflang (no noindexed siblings).
+    alternates: enOnlyAlternates('/anagram'),
     robots: { index: isEnglish, follow: true },
   };
 }

@@ -85,4 +85,73 @@ describe('sitemap', () => {
       expect(urls.has(`https://www.lexiclash.live/${locale}/daily/archive/${tomorrowStr}`)).toBe(false);
     }
   });
+
+  // ─── EN-only-indexed pages must be advertised EN-only ───
+  // These route groups set robots: { index: locale === 'en' } in their page
+  // metadata (English-only body / thin programmatic content). Emitting their
+  // he/sv/ja/es variants in the sitemap made Google crawl them only to obey a
+  // noindex tag — the "Excluded by noindex tag" coverage spike (GSC 2026-05-20,
+  // ~900 anagram + words + comparison URLs). Sitemap must match the noindex.
+
+  it('lists anagram solver seed pages for EN only (non-EN are noindexed)', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    // 'belt' is a seed (sorted form 'belt') — guaranteed present in anagramSeeds.
+    expect(urls.has('https://www.lexiclash.live/en/anagram/belt')).toBe(true);
+    for (const locale of ['he', 'sv', 'ja', 'es']) {
+      expect(
+        urls.has(`https://www.lexiclash.live/${locale}/anagram/belt`),
+        `sitemap should NOT advertise noindexed /${locale}/anagram/belt`,
+      ).toBe(false);
+    }
+  });
+
+  it('lists the anagram hub for EN only', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    expect(urls.has('https://www.lexiclash.live/en/anagram')).toBe(true);
+    for (const locale of ['he', 'sv', 'ja', 'es']) {
+      expect(urls.has(`https://www.lexiclash.live/${locale}/anagram`)).toBe(false);
+    }
+  });
+
+  it('lists programmatic /words pages (N-letter + starting-with) for EN only', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    expect(urls.has('https://www.lexiclash.live/en/words/3-letter-words')).toBe(true);
+    expect(urls.has('https://www.lexiclash.live/en/words/starting-with/a')).toBe(true);
+    for (const locale of ['he', 'sv', 'ja', 'es']) {
+      expect(urls.has(`https://www.lexiclash.live/${locale}/words/3-letter-words`)).toBe(false);
+      expect(urls.has(`https://www.lexiclash.live/${locale}/words/starting-with/a`)).toBe(false);
+    }
+  });
+
+  it('lists generic comparison pages for EN only (English-only body)', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    for (const slug of ['lexiclash-vs-wordle', 'lexiclash-vs-quizlet', 'lexiclash-vs-scrabble']) {
+      expect(urls.has(`https://www.lexiclash.live/en/${slug}`), `missing /en/${slug}`).toBe(true);
+      for (const locale of ['he', 'sv', 'ja', 'es']) {
+        expect(urls.has(`https://www.lexiclash.live/${locale}/${slug}`)).toBe(false);
+      }
+    }
+  });
+
+  it('keeps locale-specific comparison pages on their target locale', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    // These have a native localized body and are index:true only on their locale.
+    expect(urls.has('https://www.lexiclash.live/sv/lexiclash-vs-wordfeud')).toBe(true);
+    expect(urls.has('https://www.lexiclash.live/es/lexiclash-vs-apalabrados')).toBe(true);
+  });
+
+  // Regression guard: genuinely-localized routes must STILL appear in all five
+  // locales. Catches an over-eager refactor that narrows a localized route.
+  it('still lists genuinely-localized routes for all five locales', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    const localizedPaths = ['/multiplayer', '/daily', '/blog', '/blog/word-game-history', '/how-to-play'];
+    for (const path of localizedPaths) {
+      for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
+        expect(
+          urls.has(`https://www.lexiclash.live/${locale}${path}`),
+          `sitemap dropped localized ${locale}${path}`,
+        ).toBe(true);
+      }
+    }
+  });
 });

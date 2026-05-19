@@ -15,11 +15,10 @@ import { ScrollReveal, StaggerReveal } from '../../_components/ScrollReveal';
 import { AnimatedCounter } from '../../_components/AnimatedCounter';
 import { PulseCTA } from '../../_components/PulseCTA';
 import { LETTER_CONTENT } from './letterContent';
+import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
 
 export const dynamic = 'force-dynamic';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
-const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
 const BASE_URL = 'https://www.lexiclash.live';
 
 interface PageParams {
@@ -42,31 +41,10 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     title,
     description,
     openGraph: { type: 'website', url, title, description, siteName: 'LexiClash' },
-    alternates: {
-      // Body content is English-only across all locale prefixes — point canonical at /en/
-      // so Google does not flag /he, /sv, /es variants as duplicates with conflicting self-canonicals.
-      canonical: `${BASE_URL}/en/words/starting-with/${letter}`,
-      languages: Object.fromEntries([
-        ['x-default', `${BASE_URL}/en/words/starting-with/${letter}`],
-        ...LOCALES.map(l => [l, `${BASE_URL}/${l}/words/starting-with/${letter}`]),
-        ['en-IL', `${BASE_URL}/en/words/starting-with/${letter}`],
-        ['he-IL', `${BASE_URL}/he/words/starting-with/${letter}`],
-        ['en-US', `${BASE_URL}/en/words/starting-with/${letter}`],
-        ['es-US', `${BASE_URL}/es/words/starting-with/${letter}`],
-        ['en-GB', `${BASE_URL}/en/words/starting-with/${letter}`],
-        ['en-SE', `${BASE_URL}/en/words/starting-with/${letter}`],
-        ['sv-SE', `${BASE_URL}/sv/words/starting-with/${letter}`],
-        ['en-JP', `${BASE_URL}/en/words/starting-with/${letter}`],
-        ['ja-JP', `${BASE_URL}/ja/words/starting-with/${letter}`],
-        ['en-ES', `${BASE_URL}/en/words/starting-with/${letter}`],
-        ['es-ES', `${BASE_URL}/es/words/starting-with/${letter}`],
-        ['en-MX', `${BASE_URL}/en/words/starting-with/${letter}`],
-        ['es-MX', `${BASE_URL}/es/words/starting-with/${letter}`],
-        ['en-AU', `${BASE_URL}/en/words/starting-with/${letter}`],
-        ['es-AR', `${BASE_URL}/es/words/starting-with/${letter}`],
-        ['es-CO', `${BASE_URL}/es/words/starting-with/${letter}`],
-      ]),
-    },
+    // Body content is English-only across all locale prefixes — index:locale==='en'.
+    // Self-referencing EN hreflang cluster + canonical → /en (non-EN are noindexed,
+    // have no localized equivalent, so we never declare them as alternates).
+    alternates: enOnlyAlternates(`/words/starting-with/${letter}`),
     robots: { index: locale === 'en', follow: true },
   };
 }

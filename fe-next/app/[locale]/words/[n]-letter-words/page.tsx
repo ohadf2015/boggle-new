@@ -11,11 +11,10 @@ import {
   type WordLength,
 } from '../_utils/wordListData';
 import { getNLetterWordsFaqs } from '../_utils/wordPageFaqSchema';
+import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
 
 export const dynamic = 'force-dynamic';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
-const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
 const BASE_URL = 'https://www.lexiclash.live';
 
 interface PageParams {
@@ -75,35 +74,13 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const title = `All ${n}-Letter Words | LexiClash Word Game`;
   const description = `Browse all ${n}-letter words in the LexiClash dictionary. See every valid ${n}-letter word with its score and play it in a real-time word game.`;
   const url = `${BASE_URL}/${locale}/words/${n}-letter-words`;
-  const enUrl = `${BASE_URL}/en/words/${n}-letter-words`;
 
   return {
     title,
     description,
     openGraph: { type: 'website', url, title, description, siteName: 'LexiClash' },
-    alternates: {
-      canonical: locale === 'en' ? url : enUrl,
-      languages: Object.fromEntries([
-        ['x-default', `${BASE_URL}/en/words/${n}-letter-words`],
-        ...LOCALES.map(l => [l, `${BASE_URL}/${l}/words/${n}-letter-words`]),
-        ['en-IL', `${BASE_URL}/en/words/${n}-letter-words`],
-        ['he-IL', `${BASE_URL}/he/words/${n}-letter-words`],
-        ['en-US', `${BASE_URL}/en/words/${n}-letter-words`],
-        ['es-US', `${BASE_URL}/es/words/${n}-letter-words`],
-        ['en-GB', `${BASE_URL}/en/words/${n}-letter-words`],
-        ['en-SE', `${BASE_URL}/en/words/${n}-letter-words`],
-        ['sv-SE', `${BASE_URL}/sv/words/${n}-letter-words`],
-        ['en-JP', `${BASE_URL}/en/words/${n}-letter-words`],
-        ['ja-JP', `${BASE_URL}/ja/words/${n}-letter-words`],
-        ['en-ES', `${BASE_URL}/en/words/${n}-letter-words`],
-        ['es-ES', `${BASE_URL}/es/words/${n}-letter-words`],
-        ['en-MX', `${BASE_URL}/en/words/${n}-letter-words`],
-        ['es-MX', `${BASE_URL}/es/words/${n}-letter-words`],
-        ['en-AU', `${BASE_URL}/en/words/${n}-letter-words`],
-        ['es-AR', `${BASE_URL}/es/words/${n}-letter-words`],
-        ['es-CO', `${BASE_URL}/es/words/${n}-letter-words`],
-      ]),
-    },
+    // English word list, index:locale==='en'. Self-referencing EN hreflang.
+    alternates: enOnlyAlternates(`/words/${n}-letter-words`),
     robots: { index: locale === 'en', follow: true },
   };
 }

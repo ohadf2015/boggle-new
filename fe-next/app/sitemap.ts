@@ -55,6 +55,29 @@ function addForAllLocales(routes: MetadataRoute.Sitemap, path: string, opts: Sit
   });
 }
 
+// Helper: add a route for ONE locale only (default 'en').
+// Use for pages that set robots: { index: locale === '<x>' } in their metadata
+// — English-only-body comparisons and thin programmatic anagram/word-list pages.
+// Emitting their other-locale variants here made Google crawl ~900 URLs only to
+// hit a noindex tag (GSC "Excluded by noindex tag", 2026-05-20). hreflang is a
+// self-referencing single-locale cluster — never points at a noindexed sibling.
+function addForLocaleOnly(
+  routes: MetadataRoute.Sitemap,
+  path: string,
+  opts: SitemapOpts,
+  locale: (typeof LOCALES)[number] = 'en',
+) {
+  const url = `${BASE_URL}/${locale}${path}`;
+  routes.push({
+    url,
+    lastModified: opts.lastModified,
+    changeFrequency: opts.changeFrequency,
+    priority: opts.priority,
+    alternates: { languages: { 'x-default': url, [locale]: url } },
+    ...(opts.images ? { images: opts.images } : {}),
+  });
+}
+
 // Build ALL routes, then chunk them for generateSitemaps/sitemap
 function getAllRoutes(): MetadataRoute.Sitemap {
   const routes: MetadataRoute.Sitemap = [];
@@ -236,14 +259,18 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/leaderboard', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.8 });
 
   // ─── Comparison pages ───
-  addForAllLocales(routes, '/lexiclash-vs-wordle', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
-  addForAllLocales(routes, '/lexiclash-vs-scrabble', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
-  addForAllLocales(routes, '/lexiclash-vs-cabanagrams', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
-  addForAllLocales(routes, '/lexiclash-vs-puzzly-words', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
-  addForAllLocales(routes, '/lexiclash-vs-popple', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
-  addForAllLocales(routes, '/lexiclash-vs-quizlet', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
-  addForAllLocales(routes, '/lexiclash-vs-kahoot', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
-  addForAllLocales(routes, '/lexiclash-vs-wordwall', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  // English-only body (see e.g. app/[locale]/lexiclash-vs-wordle/page.tsx:
+  // "Body is English-only"). Pages set robots: { index: locale === 'en' } and
+  // hreflang each non-EN locale to its localized equivalent — so only the /en/
+  // URL is indexable here. Emit EN-only; non-EN crawls would just hit noindex.
+  addForLocaleOnly(routes, '/lexiclash-vs-wordle', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForLocaleOnly(routes, '/lexiclash-vs-scrabble', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForLocaleOnly(routes, '/lexiclash-vs-cabanagrams', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForLocaleOnly(routes, '/lexiclash-vs-puzzly-words', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForLocaleOnly(routes, '/lexiclash-vs-popple', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForLocaleOnly(routes, '/lexiclash-vs-quizlet', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForLocaleOnly(routes, '/lexiclash-vs-kahoot', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForLocaleOnly(routes, '/lexiclash-vs-wordwall', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
 
   // Per-locale competitor landings — locale-specific indexing for native switcher intent
   routes.push({
@@ -394,20 +421,23 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // ─── Words hub ───
   addForAllLocales(routes, '/words', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
 
-  // ─── Programmatic SEO: N-letter word pages (30 URLs) ───
+  // ─── Programmatic SEO: N-letter word pages (EN-only: 6 URLs) ───
+  // Page sets robots: { index: locale === 'en' } (English word lists). Non-EN
+  // variants are noindexed → emit EN-only to keep the sitemap crawl-clean.
   const wordLengths = [3, 4, 5, 6, 7, 8];
   wordLengths.forEach((n) => {
-    addForAllLocales(routes, `/words/${n}-letter-words`, {
+    addForLocaleOnly(routes, `/words/${n}-letter-words`, {
       lastModified: LAST_DEPLOYED,
       changeFrequency: 'monthly',
       priority: 0.7,
     });
   });
 
-  // ─── Programmatic SEO: Words starting with letter (130 URLs) ───
+  // ─── Programmatic SEO: Words starting with letter (EN-only: 26 URLs) ───
+  // Same English-only-indexed pattern as the N-letter pages above.
   const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
   alphabet.forEach((letter) => {
-    addForAllLocales(routes, `/words/starting-with/${letter}`, {
+    addForLocaleOnly(routes, `/words/starting-with/${letter}`, {
       lastModified: LAST_DEPLOYED,
       changeFrequency: 'monthly',
       priority: 0.65,
@@ -415,7 +445,8 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   });
 
   // Anagram hub page (parent of programmatic /anagram/[letters] routes).
-  addForAllLocales(routes, '/anagram', {
+  // EN-only indexed (app/[locale]/anagram/page.tsx robots: { index: isEnglish }).
+  addForLocaleOnly(routes, '/anagram', {
     lastModified: LAST_DEPLOYED,
     changeFrequency: 'monthly',
     priority: 0.7,
@@ -458,8 +489,10 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     anagramSeeds.map(s => s.toLowerCase().split('').sort().join(''))
   );
 
+  // EN-only indexed (app/[locale]/anagram/[letters]/page.tsx robots:
+  // { index: locale === 'en' }) — thin programmatic pages, English dictionary.
   Array.from(anagramSet).forEach((letters) => {
-    addForAllLocales(routes, `/anagram/${letters}`, {
+    addForLocaleOnly(routes, `/anagram/${letters}`, {
       lastModified: LAST_DEPLOYED,
       changeFrequency: 'monthly',
       priority: 0.6,
