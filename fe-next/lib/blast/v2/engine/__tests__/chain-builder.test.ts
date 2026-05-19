@@ -113,6 +113,36 @@ describe('buildChainLevel column-height cap', () => {
     }
     expect(saw).toBe(true);
   });
+
+  it('caps tower height on level 11+ narrow grids (regression: he-chain-11 stacked entire chain vertically)', () => {
+    // Hebrew level 11 ships ["סוסה","זברה","פנדה","קואלה","נמיה","צבוע"] — totalTiles=25,
+    // cols=5. Pre-fix, ceiling=totalTiles=25 and the silhouette filter was
+    // exempt for level>10, so the placer could stack the entire chain in
+    // a single 15+ tile column (see screenshot). Tower cap must apply on
+    // narrow grids regardless of level number.
+    const heSpec: ChainLevelSpec = {
+      id: 'he-chain-11',
+      levelNumber: 11,
+      theme: 'animals',
+      locale: 'he',
+      columns: 5,
+      decoyTiles: 0,
+      chain: ['סוסה', 'זברה', 'פנדה', 'קואלה', 'נמיה', 'צבוע'],
+    };
+    // chain totalTiles=25, longest=5, avg=ceil(25/5)=5 →
+    // towerCap = max(longest+2, avg+4) = max(7, 9) = 9. Much tighter
+    // than the 15+ tower the screenshot showed.
+    let saw = false;
+    for (let seed = 1; seed <= 20; seed++) {
+      const level = buildChainLevel(heSpec, seed);
+      if (!level) continue;
+      saw = true;
+      for (const col of level.columns) {
+        expect(col.tiles.length).toBeLessThanOrEqual(9);
+      }
+    }
+    expect(saw).toBe(true);
+  });
 });
 
 describe('buildChainLevel', () => {

@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
+import { haptics } from '@/utils/haptics/HapticsManager';
+import { HapticPattern } from '@/utils/haptics/types';
 import { useHaptics } from './haptics';
 
 type Args = {
@@ -31,6 +33,9 @@ export function useBlastHaptics({ selectionCount, invalidKey, foundCount, status
     if (invalidKey !== prevInvalid.current) {
       // Short stutter — distinct from the single light tick of a successful
       // tile entry. Players feel the rejection without an aggressive buzz.
+      // Fire both native (Capacitor) and web pulses so iOS doesn't silently
+      // drop the rejection cue.
+      void haptics.trigger(HapticPattern.ERROR).catch(() => {});
       navigator.vibrate?.([30, 40, 30]);
       prevInvalid.current = invalidKey;
     }

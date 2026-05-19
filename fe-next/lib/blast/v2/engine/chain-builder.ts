@@ -364,11 +364,16 @@ export function buildChainLevel(
 
     const withDecoys = insertDecoys(board, spec, attemptSeed);
     if (!withDecoys) continue;
-    // Final silhouette filter for the early game (levels 1–10) — without it
-    // the permissive narrow-grid ceiling let level 6's 19-tile chain stack
-    // 13-tall. Later levels skip this filter because dense 6–9-word HE chains
-    // simply can't always satisfy it within 600 build attempts.
-    if (spec.columns <= 5 && spec.levelNumber <= 10) {
+    // Silhouette filter: prevents the permissive narrow-grid ceiling from
+    // collapsing the entire chain into a single tower. Applies to all levels
+    // on cols≤5 WHEN no chain word is wider than the grid — the pre-fix
+    // exemption for level>10 let he-chain-11 stack a 15+ tile column (the
+    // screenshot regression). When a chain word IS wider than cols (e.g.
+    // he-chain-14 ships גלקסיה / 7-letters on cols=5) a tall column is
+    // structurally unavoidable, so we skip the filter and let the placer
+    // succeed within its attempt budget. Cap scales with chain density so
+    // dense late-game chains still place reliably.
+    if (spec.columns <= 5 && longest <= spec.columns) {
       const towerCap = Math.max(longest + 2, avgPerCol + 4);
       if (maxColumnHeight(withDecoys) > towerCap) continue;
     }
