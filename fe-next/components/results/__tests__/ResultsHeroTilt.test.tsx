@@ -1,6 +1,8 @@
 /**
- * ResultsHeroTilt — the cinematic hero block recedes into 3D as the user
- * scrolls. Reduced-motion users must get a plain wrapper (no transforms).
+ * ResultsHeroTilt — content stays flat (no rotateX/scale/opacity-dim) so
+ * the podium reads clearly. A tiny GSAP-scrubbed Y lift gives the hero a
+ * scroll-coupled beat without warping content. Reduced-motion users must
+ * get a plain wrapper.
  *
  * @vitest-environment jsdom
  */
@@ -12,15 +14,25 @@ import { ResultsHeroTilt } from '../ResultsScrollEffects';
 vi.mock('framer-motion', () => ({
   m: {
     div: ({ children, style, className, ...props }: React.PropsWithChildren<{ style?: React.CSSProperties; className?: string } & Record<string, unknown>>) => (
-      <div data-testid="hero-tilt" className={className} style={style as React.CSSProperties} {...props}>{children}</div>
+      <div className={className} style={style as React.CSSProperties} {...props}>{children}</div>
     ),
   },
-  useScroll: () => ({ scrollY: 0 }),
+  useScroll: () => ({ scrollY: 0, scrollYProgress: 0 }),
   useTransform: () => 0,
   useSpring: (v: unknown) => v,
   useVelocity: () => 0,
   useReducedMotion: vi.fn(() => false),
 }));
+
+vi.mock('gsap', () => ({
+  default: {
+    registerPlugin: vi.fn(),
+    to: vi.fn(() => ({ kill: vi.fn(), scrollTrigger: { kill: vi.fn() } })),
+    set: vi.fn(),
+    utils: { clamp: (min: number, max: number, v: number) => Math.max(min, Math.min(max, v)) },
+  },
+}));
+vi.mock('gsap/ScrollTrigger', () => ({ ScrollTrigger: { kill: vi.fn() } }));
 
 import { useReducedMotion } from 'framer-motion';
 
@@ -36,20 +48,25 @@ function Harness({ className }: { className?: string }) {
 }
 
 describe('ResultsHeroTilt', () => {
-  it('wraps content in a transform-perspective container', () => {
-    const { getByTestId, getByText } = render(<Harness className="podium" />);
-    const tilt = getByTestId('hero-tilt');
-    expect(tilt).toBeTruthy();
+  it('renders content flat (no rotateX/scale/opacity-dim)', () => {
+    const { container, getByText } = render(<Harness className="podium" />);
     expect(getByText('hero content')).toBeTruthy();
-    expect(tilt.className).toContain('podium');
-    const style = tilt.getAttribute('style') ?? '';
-    expect(style.toLowerCase()).toContain('transform-origin: top center');
+    const wrapper = container.querySelector('.podium');
+    expect(wrapper).toBeTruthy();
+    const style = (wrapper?.getAttribute('style') ?? '').toLowerCase();
+    expect(style).not.toContain('rotatex');
+    expect(style).not.toContain('perspective');
+    expect(style).not.toMatch(/\bscale\b/);
+    expect(style).toContain('transform-origin: top center');
   });
 
   it('falls back to a plain div under reduced motion (no transforms)', () => {
     vi.mocked(useReducedMotion).mockReturnValueOnce(true);
-    const { container, queryByTestId } = render(<Harness className="podium" />);
-    expect(queryByTestId('hero-tilt')).toBeNull();
-    expect(container.querySelector('.podium')).toBeTruthy();
+    const { container } = render(<Harness className="podium" />);
+    const wrapper = container.querySelector('.podium');
+    expect(wrapper).toBeTruthy();
+    const style = (wrapper?.getAttribute('style') ?? '').toLowerCase();
+    expect(style).not.toContain('transform-origin');
+    expect(style).not.toContain('will-change');
   });
 });

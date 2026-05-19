@@ -20,6 +20,16 @@ vi.mock('framer-motion', () => ({
   useReducedMotion: vi.fn(() => false),
 }));
 
+vi.mock('gsap', () => ({
+  default: {
+    registerPlugin: vi.fn(),
+    to: vi.fn(() => ({ kill: vi.fn(), scrollTrigger: { kill: vi.fn() } })),
+    set: vi.fn(),
+    utils: { clamp: (min: number, max: number, v: number) => Math.max(min, Math.min(max, v)) },
+  },
+}));
+vi.mock('gsap/ScrollTrigger', () => ({ ScrollTrigger: { kill: vi.fn() } }));
+
 import { useReducedMotion } from 'framer-motion';
 
 function Harness({ hideOnMobile }: { hideOnMobile?: boolean }) {

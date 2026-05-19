@@ -1,134 +1,208 @@
 'use client';
 
-import React, { useRef, type ReactNode } from 'react';
+import React, { useRef, useEffect, useState, type ReactNode } from 'react';
 import {
   m,
   useScroll,
   useTransform,
   useSpring,
-  useVelocity,
   useReducedMotion,
-  type MotionStyle,
 } from 'framer-motion';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+function useIsSmallViewport(): boolean {
+  const [isSmall, setIsSmall] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(max-width: 768px)');
+    const sync = () => setIsSmall(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+  return isSmall;
+}
 
 interface ParallaxBackdropProps {
-  /** Scroll container ref. Required — the page uses an inner scrollable, not window. */
   scrollRef: React.RefObject<HTMLElement | null>;
-  /** Translation amplitude (px) the inner layer drifts as the page scrolls. */
   intensity?: number;
 }
 
 /**
- * Multi-layer parallax backdrop pinned behind the results content.
+ * GSAP-driven parallax backdrop. ScrollTrigger batches transform updates
+ * onto GSAP's shared RAF ticker — measurably smoother than framer-motion's
+ * per-MotionValue subscriptions during iOS momentum scroll.
  *
- * Sits absolutely inside the page chrome and tracks the inner scroll container
- * (the MP results layout uses overflow-y inside; window scroll wouldn't catch
- * anything). Three layers drift at different rates so depth reads cleanly:
- *   - Back: slowest, cyan aura
- *   - Mid:  hue-shifting magenta+lime nebula, gently scales with depth
- *   - Front: scroll-velocity-driven highlight, springs into view on fast flicks
- * Disabled when reduced-motion is requested.
+ * Mobile: 0.55x intensity, drops the velocity flicker layer (paint cost).
+ * Desktop: full intensity + velocity-driven highlight on fast flicks.
  */
 export const ResultsParallaxBackdrop: React.FC<ParallaxBackdropProps> = ({
   scrollRef,
-  intensity = 80,
+  intensity = 140,
 }) => {
   const reducedMotion = useReducedMotion();
-  const { scrollY } = useScroll({ container: scrollRef as React.RefObject<HTMLElement> });
+  const isSmall = useIsSmallViewport();
+  const backRef = useRef<HTMLDivElement | null>(null);
+  const midRef = useRef<HTMLDivElement | null>(null);
+  const flickRef = useRef<HTMLDivElement | null>(null);
 
-  // Back layer drifts slowly; mid layer drifts faster + slight opposite hue.
-  const backY = useTransform(scrollY, [0, 600], [0, -intensity * 0.5]);
-  const midY = useTransform(scrollY, [0, 600], [0, -intensity]);
-  const auraScale = useTransform(scrollY, [0, 400], [1, 1.08]);
+  useEffect(() => {
+    if (reducedMotion) return;
+    const scroller = scrollRef.current;
+    const back = backRef.current;
+    const mid = midRef.current;
+    if (!scroller || !back || !mid) return;
 
-  // Hue rotation on the mid layer — gives the page a subtle dynamic color
-  // shift as the player scrolls without breaking the neo palette.
-  const hueShift = useTransform(scrollY, [0, 800], [0, 18]);
-  const midFilter = useTransform(hueShift, (h) => `hue-rotate(${h}deg)`);
+    const mult = isSmall ? 0.55 : 1;
+    const scrub = isSmall ? 0.6 : 0.4;
 
-  // Velocity-driven highlight layer — flickers in on fast scroll flicks,
-  // settles out on rest. Spring-smoothed so it never strobes.
-  const velocity = useVelocity(scrollY);
-  const smoothedVelocity = useSpring(velocity, { stiffness: 100, damping: 30, mass: 0.4 });
-  const velocityOpacity = useTransform(smoothedVelocity, [-2000, 0, 2000], [0.18, 0, 0.18]);
-  const velocityY = useTransform(smoothedVelocity, [-2000, 0, 2000], [40, 0, -40]);
+    const mkScrub = (target: HTMLElement, y: number) =>
+      gsap.to(target, {
+        y,
+        ease: 'none',
+        scrollTrigger: {
+          scroller,
+          trigger: scroller,
+          start: 'top top',
+          end: 'bottom top',
+          scrub,
+          invalidateOnRefresh: true,
+        },
+      });
+
+    const tweens: gsap.core.Tween[] = [
+      mkScrub(back, -intensity * 0.5 * mult),
+      mkScrub(mid, -intensity * mult),
+    ];
+
+    let cleanupFlick: (() => void) | undefined;
+    const flick = flickRef.current;
+    if (!isSmall && flick) {
+      gsap.set(flick, { opacity: 0, y: 0 });
+      let lastY = scroller.scrollTop;
+      let lastT = performance.now();
+      let raf = 0;
+      const onScroll = () => {
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          const now = performance.now();
+          const dt = Math.max(16, now - lastT);
+          const dy = scroller.scrollTop - lastY;
+          const v = (dy / dt) * 1000;
+          lastY = scroller.scrollTop;
+          lastT = now;
+          gsap.to(flick, {
+            opacity: Math.min(0.18, Math.abs(v) / 2000),
+            y: gsap.utils.clamp(-40, 40, -v / 50),
+            duration: 0.4,
+            ease: 'power2.out',
+            overwrite: 'auto',
+          });
+        });
+      };
+      scroller.addEventListener('scroll', onScroll, { passive: true });
+      cleanupFlick = () => {
+        scroller.removeEventListener('scroll', onScroll);
+        if (raf) cancelAnimationFrame(raf);
+      };
+    }
+
+    return () => {
+      cleanupFlick?.();
+      tweens.forEach((tw) => {
+        tw.scrollTrigger?.kill();
+        tw.kill();
+      });
+    };
+  }, [scrollRef, intensity, isSmall, reducedMotion]);
 
   if (reducedMotion) return null;
 
-  const backStyle: MotionStyle = {
-    y: backY,
-    background:
-      'radial-gradient(circle at 50% 30%, rgba(0,255,255,0.10) 0%, transparent 55%)',
-  };
-  const midStyle: MotionStyle = {
-    y: midY,
-    scale: auraScale,
-    filter: midFilter,
-    background:
-      'radial-gradient(circle at 30% 60%, rgba(255,20,147,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 40%, rgba(191,255,0,0.06) 0%, transparent 50%)',
-  };
-  const velocityStyle: MotionStyle = {
-    y: velocityY,
-    opacity: velocityOpacity,
-    background:
-      'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.10) 0%, transparent 60%)',
-  };
-
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
-      <m.div className="absolute inset-0" style={backStyle} />
-      <m.div className="absolute inset-0" style={midStyle} />
-      <m.div className="absolute inset-0" style={velocityStyle} />
+      <div
+        ref={backRef}
+        className="absolute inset-0 will-change-transform"
+        style={{
+          background:
+            'radial-gradient(circle at 50% 30%, rgba(0,255,255,0.10) 0%, transparent 55%)',
+          transform: 'translate3d(0,0,0)',
+        }}
+      />
+      <div
+        ref={midRef}
+        className="absolute inset-0 will-change-transform"
+        style={{
+          background:
+            'radial-gradient(circle at 30% 60%, rgba(255,20,147,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 40%, rgba(191,255,0,0.06) 0%, transparent 50%)',
+          transform: 'translate3d(0,0,0)',
+        }}
+      />
+      {!isSmall && (
+        <div
+          ref={flickRef}
+          className="absolute inset-0 will-change-transform"
+          style={{
+            background:
+              'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.10) 0%, transparent 60%)',
+          }}
+        />
+      )}
     </div>
   );
 };
 
 interface SectionRevealProps {
   children: ReactNode;
-  /** Order in the scroll flow — used to vary stagger delay/parallax direction. */
   index?: number;
   className?: string;
-  /** Disable the parallax Y drift on this section (default keeps a subtle drift). */
+  /** Kept for callsite API compat; per-section scroll drift removed. */
   flat?: boolean;
 }
 
 /**
- * Wraps a results section with a one-shot scroll-triggered reveal and a very
- * subtle parallax drift. Sections fade + lift on enter and gently translate as
- * the user keeps scrolling, giving the page depth without per-section work at
- * each callsite.
+ * Entrance-only reveal — Jackbox-style sticker drop. Adjacent sections
+ * shuffle in from opposite sides with a tiny rotate kick that springs to
+ * zero. No scroll-coupled drift: that made adjacent cards drift opposite
+ * directions while the user was trying to read, hurting readability on
+ * mobile.
  */
 export const ResultsSectionReveal: React.FC<SectionRevealProps> = ({
   children,
   index = 0,
   className,
-  flat = false,
 }) => {
   const reducedMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
-
-  // Alternate parallax direction so adjacent sections don't drift in lockstep.
-  const direction = index % 2 === 0 ? 1 : -1;
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start end', 'end start'],
-  });
-  const driftRange = flat ? 0 : 14;
-  const y = useTransform(scrollYProgress, [0, 1], [driftRange * direction, -driftRange * direction]);
 
   if (reducedMotion) {
     return <div ref={ref} className={className}>{children}</div>;
   }
 
+  const xFrom = index % 2 === 0 ? -10 : 10;
+  const rotateFrom = index % 2 === 0 ? -1.2 : 1.2;
+  const stagger = Math.min(index * 0.035, 0.18);
+
   return (
     <m.div
       ref={ref}
       className={className}
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2, margin: '0px 0px -10% 0px' }}
-      transition={{ type: 'spring', stiffness: 140, damping: 22, mass: 0.6 }}
-      style={flat ? undefined : { y }}
+      initial={{ opacity: 0, y: 22, x: xFrom, rotate: rotateFrom }}
+      whileInView={{ opacity: 1, y: 0, x: 0, rotate: 0 }}
+      viewport={{ once: true, amount: 0.15, margin: '0px 0px -8% 0px' }}
+      transition={{
+        type: 'spring',
+        stiffness: 200,
+        damping: 20,
+        mass: 0.55,
+        delay: stagger,
+      }}
     >
       {children}
     </m.div>
@@ -137,16 +211,15 @@ export const ResultsSectionReveal: React.FC<SectionRevealProps> = ({
 
 interface HeroTiltProps {
   children: ReactNode;
-  /** Scroll container ref — same one fed to ResultsParallaxBackdrop. */
   scrollRef: React.RefObject<HTMLElement | null>;
   className?: string;
 }
 
 /**
- * Gentle 3D tilt + lift applied to the cinematic hero block as the user
- * scrolls down. Translates a tiny amount upward, scales down 4%, and rotates
- * 6° on X — giving the top section a "leaning back" feel as new content
- * scrolls in below. No-ops under reduced-motion.
+ * Hero wrapper — was rotateX + scale + opacity-dim, which distorted the
+ * podium and washed out the leaderboard. Now flat with a GSAP-scrubbed
+ * -8px lift over the first 400px of scroll so the hero still feels alive
+ * without warping content.
  */
 export const ResultsHeroTilt: React.FC<HeroTiltProps> = ({
   children,
@@ -154,47 +227,58 @@ export const ResultsHeroTilt: React.FC<HeroTiltProps> = ({
   className,
 }) => {
   const reducedMotion = useReducedMotion();
-  const { scrollY } = useScroll({ container: scrollRef as React.RefObject<HTMLElement> });
-  const rotateX = useTransform(scrollY, [0, 400], [0, 6]);
-  const scale = useTransform(scrollY, [0, 400], [1, 0.96]);
-  const opacity = useTransform(scrollY, [0, 200, 500], [1, 1, 0.85]);
+  const innerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const scroller = scrollRef.current;
+    const target = innerRef.current;
+    if (!scroller || !target) return;
+    const tw = gsap.to(target, {
+      y: -8,
+      ease: 'none',
+      scrollTrigger: {
+        scroller,
+        trigger: scroller,
+        start: 'top top',
+        end: '+=400',
+        scrub: 0.5,
+        invalidateOnRefresh: true,
+      },
+    });
+    return () => {
+      tw.scrollTrigger?.kill();
+      tw.kill();
+    };
+  }, [scrollRef, reducedMotion]);
 
   if (reducedMotion) {
     return <div className={className}>{children}</div>;
   }
 
   return (
-    <m.div
+    <div
+      ref={innerRef}
       className={className}
       style={{
-        rotateX,
-        scale,
-        opacity,
-        transformPerspective: 1000,
         transformOrigin: 'top center',
         willChange: 'transform',
       }}
     >
       {children}
-    </m.div>
+    </div>
   );
 };
 
 interface ScrollProgressRailProps {
-  /** Scroll container to track. Same ref passed to ResultsParallaxBackdrop. */
   scrollRef: React.RefObject<HTMLElement | null>;
-  /** Hide on mobile breakpoints (avoids clashing with the sticky ready bar). */
   hideOnMobile?: boolean;
 }
 
 /**
- * Electric scroll progress rail — vertical 3px lime→cyan→pink gradient pinned to
- * the inline-end edge (right in LTR, left in RTL). Height tracks
- * `scrollYProgress` of the inner scroll container; spring-smoothed so the rail
- * settles tactilely without jitter on touch-momentum scrolls.
- *
- * Neo-brutalist hard-shadow styling. Hidden under reduced-motion since the rail
- * IS the motion — a static partial rail would look broken.
+ * Vertical scroll progress rail. Framer's single MotionValue->CSS-height
+ * path is the simplest and cheapest tool here — the visual *is* motion,
+ * so swapping to GSAP wouldn't gain anything.
  */
 export const ResultsScrollProgressRail: React.FC<ScrollProgressRailProps> = ({
   scrollRef,
