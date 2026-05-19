@@ -7,6 +7,6 @@ LIB_DIR="$(dirname "$0")/../lib"
 . "$LIB_DIR/headless.sh"
 
 LOG="${RUN_LOG:-/tmp/lane-02.log}"
-PROMPT="$(dirname "$0")/../prompts/02-engagement.md"
+PROMPT="$(dirname "$0")/../prompts/03-engagement.md"
 
 headless_run "02-engagement" "$PROMPT" "sonnet" 720 "$LOG"

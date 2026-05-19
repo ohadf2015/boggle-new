@@ -7,6 +7,6 @@ LIB_DIR="$(dirname "$0")/../lib"
 . "$LIB_DIR/headless.sh"
 
 LOG="${RUN_LOG:-/tmp/lane-06.log}"
-PROMPT="$(dirname "$0")/../prompts/06-self-learn.md"
+PROMPT="$(dirname "$0")/../prompts/07-self-learn.md"
 
 headless_run "06-self-learn" "$PROMPT" "opus" 300 "$LOG"

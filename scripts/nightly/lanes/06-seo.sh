@@ -7,7 +7,7 @@ LIB_DIR="$(dirname "$0")/../lib"
 . "$LIB_DIR/headless.sh"
 
 LOG="${RUN_LOG:-/tmp/lane-05.log}"
-PROMPT="$(dirname "$0")/../prompts/05-seo.md"
+PROMPT="$(dirname "$0")/../prompts/06-seo.md"
 
 if [ ! -f "$HOME/.config/gcloud/application_default_credentials.json" ]; then
   echo "lane-05: gcloud ADC missing — skipping SEO lane" | tee -a "$LOG"
