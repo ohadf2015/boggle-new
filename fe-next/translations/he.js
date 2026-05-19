@@ -6036,7 +6036,7 @@ const he = {
     "addFriendsToChallenge": "הוסף חברים כדי לאתגר",
     "challenge": "אתגר",
     "friend": "חבר",
-    "noFriendsYet": "החברה ריקה!",
+    "noFriendsYet": "החבר'ה עוד לא הגיעו!",
     "noPendingRequests": "אין בקשות ממתינות",
     "requestsWillAppearHere": "בקשות יופיעו כאן",
     "noUsersFound": "לא נמצאו משתמשים",

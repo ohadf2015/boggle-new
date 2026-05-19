@@ -6036,7 +6036,7 @@ const sv = {
     "addFriendsToChallenge": "Lägg till vänner för att utmana",
     "challenge": "Utmana",
     "friend": "Vän",
-    "noFriendsYet": "Inga polare än!",
+    "noFriendsYet": "Inga vänner än!",
     "noPendingRequests": "Inga väntande förfrågningar",
     "requestsWillAppearHere": "Förfrågningar visas här",
     "noUsersFound": "Inga användare hittades",
