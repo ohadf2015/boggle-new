@@ -8,6 +8,7 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import FloatingCoinAnimation from './FloatingCoinAnimation';
 import { InteractiveMascot } from '../ui/InteractiveMascot';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useIsSelecting } from '@/hooks/useSelectionStore';
 
 interface ComboDisplayProps {
   comboLevel: number;
@@ -145,6 +146,10 @@ const ComboDisplay = memo<ComboDisplayProps>(({
   const isMediumCombo = comboLevel >= 3;
   const isRainbow = comboColors.isRainbow;
   const showMascot = isHighCombo && !compact;
+  // Pause infinite ornamental motion while the user is mid-drag — frame budget
+  // belongs to grid rendering, not HUD decoration. Resumes the instant the
+  // selection clears (mirrors the deferred-leaderboard freeze pattern).
+  const isSelecting = useIsSelecting();
 
   // Track combo level changes for level-up effects
   const prevComboLevelRef = useRef(comboLevel);
@@ -166,8 +171,8 @@ const ComboDisplay = memo<ComboDisplayProps>(({
   const rarity = getComboRarity(comboLevel);
   const rarityColors = RARITY_COLORS[rarity];
 
-  // Skip sparkle effects on low-end devices for better performance
-  const skipSparkles = isLowEnd || !enableComplexAnimations || prefersReducedMotion;
+  // Skip sparkle + infinite motion on low-end devices or mid-drag for better performance
+  const skipSparkles = isLowEnd || !enableComplexAnimations || prefersReducedMotion || isSelecting;
 
   // Memoize sparkle data for performance - reduced distance in compact mode to prevent overflow
   const sparkleData = useMemo(() => {
@@ -275,34 +280,26 @@ const ComboDisplay = memo<ComboDisplayProps>(({
             </div>
           )}
 
-          {/* Main combo text - clean text-based display without badge */}
+          {/* Main combo text - clean text-based display without badge.
+              Infinite scale/opacity pulse suppressed while skipSparkles
+              (low-end devices OR mid-drag) — kept main thread free for grid. */}
           <m.div
             animate={
-              isDanger
-                ? {
-                    // Subtle danger pulse - gentle opacity fluctuation
-                    opacity: [1, 0.85, 1],
-                    scale: [1, 1.02, 1],
-                  }
+              skipSparkles
+                ? undefined
+                : isDanger
+                ? { opacity: [1, 0.85, 1], scale: [1, 1.02, 1] }
                 : isHighCombo
-                ? {
-                    scale: [1, 1.05, 1],
-                  }
+                ? { scale: [1, 1.05, 1] }
                 : undefined
             }
             transition={
-              isDanger
-                ? {
-                    duration: 0.8,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }
+              skipSparkles
+                ? undefined
+                : isDanger
+                ? { duration: 0.8, repeat: Infinity, ease: 'easeInOut' }
                 : isHighCombo
-                ? {
-                    duration: 0.5,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }
+                ? { duration: 0.5, repeat: Infinity, ease: 'easeInOut' }
                 : undefined
             }
             className={cn(
@@ -429,7 +426,9 @@ const ComboDisplay = memo<ComboDisplayProps>(({
             </m.div>
           )}
 
-          {/* Burst effect on combo increase - enhanced with double ring */}
+          {/* Burst effect on combo increase — single ring (was 2; the second
+              one cost twice the framer-motion bookkeeping for a barely-visible
+              stagger). */}
           <m.div
             key={`burst-${comboLevel}`}
             className="absolute inset-0 rounded-full pointer-events-none"
@@ -439,17 +438,6 @@ const ComboDisplay = memo<ComboDisplayProps>(({
             style={{
               border: `3px solid ${rarityColors.burst}`,
               boxShadow: `0 0 20px ${rarityColors.shadow}`,
-            }}
-          />
-          {/* Second burst ring - delayed for staggered effect */}
-          <m.div
-            key={`burst2-${comboLevel}`}
-            className="absolute inset-0 rounded-full pointer-events-none"
-            initial={{ scale: 0.6, opacity: 0.6 }}
-            animate={{ scale: 2, opacity: 0 }}
-            transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
-            style={{
-              border: `2px solid ${rarityColors.burst}`,
             }}
           />
 
