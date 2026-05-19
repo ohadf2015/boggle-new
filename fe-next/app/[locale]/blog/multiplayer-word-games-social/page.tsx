@@ -12,7 +12,7 @@ interface PageProps {
 
 const SLUG = 'multiplayer-word-games-social';
 const DATE_PUBLISHED = '2026-02-15';
-const DATE_MODIFIED = '2026-03-14';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'Online Multiplayer Word Games Free - Why Playing With Friends Is Better',
