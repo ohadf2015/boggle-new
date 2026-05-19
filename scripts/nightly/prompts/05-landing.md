@@ -11,27 +11,29 @@ Default: pick the WORST-converting landing page with ≥200 sessions in the last
 
 **ONLY ONE landing variant per week** — if any `landing_variant_*_v1` flag is <7 days old, skip the landing variant and consider STEP 0 instead.
 
-═══ STEP 0 — Experimental game mode (admin-only, no flag, no auto-QA) ═══
-*Permission granted by user (see `Permissions` block in preamble). Updated 2026-05-19: admin-only route, no rollout flag, no Playwriter mandate — user playtests manually then decides on rollout.*
+═══ STEP 0 — Experimental game mode (admin-only visibility on landing/hub) ═══
+*Permission granted by user (see `Permissions` block in preamble). Updated 2026-05-19: mode lives at its natural route; the hub tile that links to it is wrapped in an `isAdmin` check so only the admin sees the entry point. User playtests manually then decides on public rollout.*
 
 Look at `docs/nightly/loop-improvements/*.md` from the last 3 nights AND `docs/nightly/ideas/*.md` from lane 4. If a NEW game-mode concept appears with **≥2 mentions of evidence (data citation + competitor signal)**, you MAY ship an EXPERIMENTAL implementation in place of the landing variant this week.
 
 Constraints (ALL must hold):
-- **Admin-only route**: live at `fe-next/app/[locale]/admin/<mode-slug>/page.tsx`. Reuse the existing admin auth gate — grep for `isAdmin` / `requireAdmin` / `/admin/word-craft` to find the pattern (see memory `wordcraft-mvp-2026-05-04`). Non-admin users get the existing admin-gate redirect.
-- **No public exposure**: no entry in `fe-next/app/sitemap.ts`, no link from the home hub, no flag wiring. Only the admin user can reach it.
-- **No Playwriter mandate**: user playtests manually after you ship. Just make sure the page loads + the core loop works on your visual inspection during development.
-- **Per-lane 8-file cap** still applies — pick a tiny mode (one new route + minimal client logic + a route-scoped test). No new realtime tables. No new `auth.getUser()` calls (use local JWT verify).
-- **MUST emit the admin URL in the report** so the user sees the link in tomorrow's Telegram digest. Use this exact format in the lane-5 section of `docs/nightly/reports/__TODAY__.md`:
+- **Mode route at its natural slug**: `fe-next/app/[locale]/<mode-slug>/page.tsx`. The page itself is plain code — no auth gate, no admin lock. If a non-admin types the URL they get the game, but they should never have a path to discover it.
+- **Admin-only hub tile**: add the entry-point tile/card to the home/hub component (e.g., `fe-next/app/[locale]/page.tsx` or whatever the current hub is — grep for the existing mode tiles like Multiplayer/Daily/Adventure to find the pattern). Wrap it in `{isAdmin && <ExperimentalTile slug="<slug>" />}`. Reuse the existing `isAdmin` hook/helper — grep for `useIsAdmin` / `isAdmin` to find the pattern (memory `wordcraft-mvp-2026-05-04` ships an admin tile pattern).
+- **No sitemap entry, no llms.txt entry, no header nav link** — the URL exists, the discovery surface is gated.
+- **No rollout flag, no Playwriter mandate**: user playtests manually after you ship. Just make sure the page loads + the core loop works on your visual inspection during development.
+- **Per-lane 8-file cap** still applies — pick a tiny mode (one new route + minimal client logic + the hub-tile wiring + a route-scoped test). No new realtime tables. No new `auth.getUser()` calls.
+- **MUST emit the mode URL in the report** so the user sees the link in tomorrow's Telegram digest. Use this exact format in the lane-5 section of `docs/nightly/reports/__TODAY__.md`:
 
   ```
   #### Experimental game mode shipped
   - Mode: <name>
-  - Admin URL: https://lexiclash.com/en/admin/<slug>/  (mirrors on /he, /sv, /ja, /es)
-  - Local URL: http://localhost:3001/en/admin/<slug>/
+  - URL: https://lexiclash.com/en/<slug>/  (mirrors on /he, /sv, /ja, /es)
+  - Local URL: http://localhost:3001/en/<slug>/
+  - Hub tile: admin-only via `{isAdmin && ...}` in <hub file:line>
   - Concept: <one-line>
   - Lane-4 / loop-improvements evidence: <link or quote>
   - Files added: <list>
-  - Next step for user: open admin URL, play 1 round, send 👍/👎 to bot
+  - Next step for user: open URL or refresh home as admin, play 1 round, send 👍/👎 to bot
   ```
 
 If no concept passes the gate, fall back to the landing variant path below.
