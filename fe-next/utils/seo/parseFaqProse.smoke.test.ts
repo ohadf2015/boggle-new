@@ -8,15 +8,20 @@ import { contentByLocale as wwfContent } from '@/app/[locale]/blog/boggle-vs-wor
 
 describe('FAQ extraction smoke against real article content', () => {
   const locales = ['en', 'he', 'sv', 'ja', 'es'];
+  // boggle-vs-wordle/en was rewritten 2026-05-19 as flowing prose without a
+  // structured FAQ section — the other 4 locales still ship the Q/A block.
+  // Other articles' EN content still has FAQ. Skip wordle/en only.
   for (const locale of locales) {
-    it(`boggle-vs-wordle/${locale} extracts ≥3 Q/A`, () => {
-      const items = extractFaqFromSections(wordleContent[locale].sections);
-      expect(items.length).toBeGreaterThanOrEqual(3);
-      items.forEach((qa) => {
-        expect(qa.question.length).toBeGreaterThan(0);
-        expect(qa.answer.length).toBeGreaterThan(0);
+    if (locale !== 'en') {
+      it(`boggle-vs-wordle/${locale} extracts ≥3 Q/A`, () => {
+        const items = extractFaqFromSections(wordleContent[locale].sections);
+        expect(items.length).toBeGreaterThanOrEqual(3);
+        items.forEach((qa) => {
+          expect(qa.question.length).toBeGreaterThan(0);
+          expect(qa.answer.length).toBeGreaterThan(0);
+        });
       });
-    });
+    }
     it(`boggle-vs-scrabble/${locale} extracts ≥3 Q/A`, () => {
       const items = extractFaqFromSections(scrabbleContent[locale].sections);
       expect(items.length).toBeGreaterThanOrEqual(3);
