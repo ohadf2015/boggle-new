@@ -11886,6 +11886,8 @@ const sv = {
     },
     "modeTitle": "WordCraft",
     "modeDesc": "Strategisk ordstrid — bygg poäng, aktivera Överdrift och slå boten!",
+    "gemsModeTitle": "WordCraft: Ädelstensjakt",
+    "gemsModeDesc": "Jaga gömda ädelstenar på brädet, stapla bonusar och överlista boten för max byte!",
     "betaLocked": "Kräver betatillgång",
     "heatLabel": "Värme",
     "overdrive": "ÖVERDRIFT!",

@@ -11984,6 +11984,8 @@ const es = {
     },
     "modeTitle": "WordCraft",
     "modeDesc": "Batalla de palabras estratégica — acumula puntos, activa el Sobremarcha y vence al bot.",
+    "gemsModeTitle": "WordCraft: Caza de Gemas",
+    "gemsModeDesc": "Caza gemas ocultas en el tablero, acumula bonificaciones y supera al bot para el máximo botín.",
     "betaLocked": "Requiere acceso beta",
     "heatLabel": "Calor",
     "overdrive": "¡SOBREMARCHA!",
