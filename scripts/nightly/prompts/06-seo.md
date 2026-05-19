@@ -8,8 +8,8 @@ From the **Specialized Skills** table above, invoke the skills listed for **lane
 
 ═══ STEP 1 — Invoke seo-daily skill ═══
 Invoke the `seo-daily` skill with these inputs:
-  --site sc-domain:lexiclash.com
-  --bing-site https://lexiclash.com/
+  --site sc-domain:lexiclash.live
+  --bing-site https://lexiclash.live/
   --repo /Users/ohadfisher/git/boggle-new
   --days 28
   --no-pr      (project disallows branches; ship direct to master)
