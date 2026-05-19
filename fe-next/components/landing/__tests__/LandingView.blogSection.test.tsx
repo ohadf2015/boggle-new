@@ -16,6 +16,7 @@ import LandingView from '../LandingView';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { getRecentBlogPostsForLocale } from '@/lib/blog/data';
 
 vi.mock('@/contexts/AuthContext');
 vi.mock('@/contexts/LanguageContext');
@@ -111,12 +112,12 @@ describe('LandingView — homepage blog section', () => {
     const { container } = render(<LandingView />, { wrapper });
     const hrefs = Array.from(container.querySelectorAll('a')).map((a) => a.getAttribute('href') || '');
 
-    // Newest 3 (per LandingBlogSection.recentPosts) must be present.
-    expect(hrefs).toEqual(expect.arrayContaining([
-      '/en/blog/netflix-word-game-2026-rise',
-      '/en/blog/boggle-vs-wordle',
-      '/en/blog/boggle-vs-scrabble',
-    ]));
+    // Newest 3 must be present — derived from same data source as the component
+    // so a blog-rewrite that bumps a post into the top 3 doesn't break the test
+    // (the regression we're guarding is duplicated/stale hardcoded slugs, not
+    // the identity of the newest posts themselves).
+    const expectedSlugs = getRecentBlogPostsForLocale('en', 3).map((p) => `/en/blog/${p.slug}`);
+    expect(hrefs).toEqual(expect.arrayContaining(expectedSlugs));
 
     // The legacy slugs that were hardcoded in LandingSEOSection.blogLinks
     // must NOT leak through any other path on the homepage.
