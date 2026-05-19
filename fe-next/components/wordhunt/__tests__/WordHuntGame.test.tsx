@@ -314,4 +314,45 @@ describe('WordHuntGame', () => {
       expect(capturedLayoutProps.value!.letterCount).toBe(3);
     });
   });
+
+  describe('MP drag-FTUE wiring', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      localStorage.removeItem('mp_ftue_drag_v1');
+    });
+    afterEach(() => {
+      vi.useRealTimers();
+      localStorage.removeItem('mp_ftue_drag_v1');
+    });
+
+    it('passes a dragFTUE prop to the layout (hidden initially)', () => {
+      render(<WordHuntGame {...defaultProps} />);
+      const ftue = capturedLayoutProps.value!.dragFTUE as { visible: boolean; onDismiss: () => void };
+      expect(ftue).toBeTruthy();
+      expect(ftue.visible).toBe(false);
+      expect(typeof ftue.onDismiss).toBe('function');
+    });
+
+    it('does NOT pass FTUE in solo (no socket)', () => {
+      render(<WordHuntGame {...defaultProps} socket={null} />);
+      const ftue = capturedLayoutProps.value!.dragFTUE as { visible: boolean; onDismiss: () => void };
+      // Component still passes the prop, but visible never flips true for solo
+      act(() => { vi.advanceTimersByTime(25_000); });
+      expect(ftue.visible).toBe(false);
+    });
+
+    it('hides FTUE once the player has found a valid word', () => {
+      const { rerender } = render(<WordHuntGame {...defaultProps} />);
+      act(() => { vi.advanceTimersByTime(25_000); });
+      rerender(
+        <WordHuntGame
+          {...defaultProps}
+          foundWords={[{ word: 'HELLO', isValid: true, score: 10 }]}
+        />,
+      );
+      const ftue = capturedLayoutProps.value!.dragFTUE as { visible: boolean; onDismiss: () => void };
+      expect(ftue.visible).toBe(false);
+      expect(localStorage.getItem('mp_ftue_drag_v1')).toBe('dismissed');
+    });
+  });
 });

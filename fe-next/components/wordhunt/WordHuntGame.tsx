@@ -13,6 +13,8 @@ import { WordHuntCategoryHint } from './WordHuntCategoryHint';
 import { WordHuntFirstTimeNudges } from './WordHuntFirstTimeNudges';
 import { WordHuntQuickRules } from './WordHuntQuickRules';
 import { useWordHuntDangerAlerts } from '@/hooks/useWordHuntDangerAlerts';
+import { useMPFTUEIdle } from '@/hooks/useMPFTUEIdle';
+import { trackMpFtue } from '@/utils/posthogEngagement';
 import type { DeathRecapStats, DeathCause } from './WordHuntDeathRecap';
 import type { Socket } from 'socket.io-client';
 import type { LetterGrid, Language } from '@/types';
@@ -118,11 +120,21 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
     disablePathHighlighting: true,
   });
 
+  // MP drag-to-spell FTUE — shows after 20s of no drag / no word.
+  // Gated on socket presence so solo Survival never triggers it.
+  const validWordsFound = foundWords.filter(w => w.isValid !== false && !w.duplicate).length;
+  const ftue = useMPFTUEIdle({
+    enabled: !!socket && gameActive && !bridge.isGameOver,
+    wordsFound: validWordsFound,
+    onShown: () => trackMpFtue({ event: 'shown', mode: 'word_hunt' }),
+  });
+
   // Handle word change from grid swiping
   const handleWordChange = useCallback((word: string, count: number) => {
+    if (count > 0) ftue.markActivity();
     setFormedWord(word);
     setLetterCount(count);
-  }, []);
+  }, [ftue]);
 
   // Handle word submission — validate locally, emit to server, dual submission
   function handleWordSubmit(word: string) {
@@ -304,6 +316,14 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
 
       // Death recap
       deathRecapStats={deathRecapStats}
+
+      dragFTUE={{
+        visible: ftue.visible,
+        onDismiss: () => {
+          trackMpFtue({ event: 'dismissed', mode: 'word_hunt', reason: 'manual' });
+          ftue.dismiss();
+        },
+      }}
 
       // Common
       t={t}

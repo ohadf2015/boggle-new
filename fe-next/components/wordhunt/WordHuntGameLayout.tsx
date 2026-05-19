@@ -13,6 +13,7 @@ import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { AccumulatedClue, TargetAttempt } from '@/components/daily/survival/types';
 import type { HintLevel } from '@/utils/aiHintGenerator';
 import type { HighlightedCell } from '@/components/GridComponent';
+import { MPDragCoachmark } from '@/components/multiplayer/MPDragCoachmark';
 
 export interface WordHuntGameLayoutProps {
   // Header
@@ -67,6 +68,11 @@ export interface WordHuntGameLayoutProps {
   /** Suppress the MP game-over overlay entirely (e.g. in adventure mode). */
   hideGameOverOverlay?: boolean;
 
+  /** MP drag-FTUE coachmark control. Owner-component decides visibility +
+   *  dismissal; layout just mounts it inside the grid wrapper so the cursor
+   *  animation can read `[data-letter]` tile rects. */
+  dragFTUE?: { visible: boolean; onDismiss: () => void };
+
   // Common
   t: (key: string, params?: Record<string, string | number>) => string;
   gameDir: 'ltr' | 'rtl';
@@ -118,6 +124,8 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   deathRecapStats,
 
   hideGameOverOverlay,
+
+  dragFTUE,
 
   // Common
   t,
@@ -197,6 +205,17 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
               highlightedPath={highlightedPath}
               t={t}
             />
+
+            {/* MP drag-to-spell FTUE — only mounted in MP matches when
+                the player has been idle 20s; auto-hides on first word. */}
+            {dragFTUE?.visible && (
+              <MPDragCoachmark
+                t={t}
+                accent="pink"
+                targetSelector="[data-letter]:not([disabled])"
+                onDismiss={dragFTUE.onDismiss}
+              />
+            )}
 
             {/* Game over overlay — death or victory, then spectator mode */}
             {!hideGameOverOverlay && (
