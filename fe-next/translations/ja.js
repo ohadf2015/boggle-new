@@ -1305,8 +1305,7 @@ const ja = {
       "joining": "転送中...",
       "roomFull": "部屋が満員です",
       "roomFullSpectate": "部屋が満員です。観戦できます。",
-      "spectateButton": "観戦",
-      "differentLanguageNotice": "この部屋は{{language}}でプレイします。送信する単語も同じ言語にしてください。"
+      "spectateButton": "観戦"
     },
     "createModal": {
       "title": "バトルを開催",

@@ -1,17 +1,17 @@
 {
   "summary": {
-    "totalKeysInCode": 5027,
+    "totalKeysInCode": 5097,
     "keyCountByLanguage": {
-      "en": 8974,
-      "he": 9455,
-      "sv": 9310,
-      "ja": 9313,
-      "es": 9366
+      "en": 9292,
+      "he": 9653,
+      "sv": 9625,
+      "ja": 9628,
+      "es": 9680
     },
-    "missingFromEnglish": 387,
+    "missingFromEnglish": 346,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 16,
+      "templateLiterals": 19,
       "fallbackUsages": 0,
       "variableKeys": 11
     }
@@ -107,6 +107,27 @@
         "file": "components/results/ConsolationRows.tsx",
         "line": 127,
         "context": "{t(`results.crowns.${crown.id}`) || crown.name}",
+        "type": "template_literal"
+      },
+      {
+        "pattern": "wordcraft.run.rarity.${card.rarity}",
+        "file": "components/word-craft/run/PowerCardView.tsx",
+        "line": 23,
+        "context": "{t(`wordcraft.run.rarity.${card.rarity}`)}",
+        "type": "template_literal"
+      },
+      {
+        "pattern": "wordcraft.run.card.${card.id}.name",
+        "file": "components/word-craft/run/PowerCardView.tsx",
+        "line": 26,
+        "context": "{t(`wordcraft.run.card.${card.id}.name`)}",
+        "type": "template_literal"
+      },
+      {
+        "pattern": "wordcraft.run.card.${card.id}.desc",
+        "file": "components/word-craft/run/PowerCardView.tsx",
+        "line": 29,
+        "context": "{t(`wordcraft.run.card.${card.id}.desc`)}",
         "type": "template_literal"
       },
       {
@@ -1828,7 +1849,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 53
+          "line": 72
         }
       ]
     },
@@ -1837,7 +1858,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 62
+          "line": 81
         }
       ]
     },
@@ -1846,7 +1867,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 36
+          "line": 55
         }
       ]
     },
@@ -1918,7 +1939,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 66
+          "line": 85
         }
       ]
     },
@@ -1927,7 +1948,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 37
+          "line": 56
         }
       ]
     },
@@ -1936,7 +1957,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessQueue.tsx",
-          "line": 120
+          "line": 133
         }
       ]
     },
@@ -1945,7 +1966,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 43
+          "line": 62
         }
       ]
     },
@@ -1954,7 +1975,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 40
+          "line": 59
         }
       ]
     },
@@ -1963,7 +1984,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 42
+          "line": 61
         }
       ]
     },
@@ -1972,7 +1993,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 39
+          "line": 58
         }
       ]
     },
@@ -1981,7 +2002,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 41
+          "line": 60
         }
       ]
     },
@@ -1990,7 +2011,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 44
+          "line": 63
         }
       ]
     },
@@ -1999,7 +2020,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 45
+          "line": 64
         }
       ]
     },
@@ -2008,7 +2029,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 46
+          "line": 65
         }
       ]
     },
@@ -2017,7 +2038,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 49
+          "line": 68
         }
       ]
     },
@@ -2062,7 +2083,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessQueue.tsx",
-          "line": 116
+          "line": 129
         }
       ]
     },
@@ -2072,6 +2093,15 @@
         {
           "file": "components/admin/TeacherAccessQueue.tsx",
           "line": 77
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.row_open",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 106
         }
       ]
     },
@@ -2089,7 +2119,7 @@
       "usages": [
         {
           "file": "components/admin/today-games/components/GamesFilters.tsx",
-          "line": 40
+          "line": 66
         }
       ]
     },
@@ -2098,7 +2128,7 @@
       "usages": [
         {
           "file": "components/admin/today-games/components/GamesFilters.tsx",
-          "line": 65
+          "line": 94
         }
       ]
     },
@@ -2107,7 +2137,20 @@
       "usages": [
         {
           "file": "components/admin/today-games/components/GamesFilters.tsx",
-          "line": 53
+          "line": 79
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.blast",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesFilters.tsx",
+          "line": 84
+        },
+        {
+          "file": "components/admin/today-games/components/StatsBar.tsx",
+          "line": 42
         }
       ]
     },
@@ -2116,7 +2159,7 @@
       "usages": [
         {
           "file": "components/admin/today-games/components/GameRow.tsx",
-          "line": 47
+          "line": 68
         }
       ]
     },
@@ -2125,7 +2168,7 @@
       "usages": [
         {
           "file": "components/admin/today-games/components/GamesFilters.tsx",
-          "line": 67
+          "line": 96
         }
       ]
     },
@@ -2143,11 +2186,11 @@
       "usages": [
         {
           "file": "components/admin/today-games/components/GameRow.tsx",
-          "line": 51
+          "line": 72
         },
         {
           "file": "components/admin/today-games/components/GamesFilters.tsx",
-          "line": 56
+          "line": 82
         },
         {
           "file": "components/admin/today-games/components/StatsBar.tsx",
@@ -2156,11 +2199,20 @@
       ]
     },
     {
+      "key": "admin.todayGames.dateRange",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesFilters.tsx",
+          "line": 52
+        }
+      ]
+    },
+    {
       "key": "admin.todayGames.drills",
       "usages": [
         {
           "file": "components/admin/today-games/components/GamesFilters.tsx",
-          "line": 57
+          "line": 83
         },
         {
           "file": "components/admin/today-games/components/StatsBar.tsx",
@@ -2182,7 +2234,7 @@
       "usages": [
         {
           "file": "components/admin/today-games/components/GamesFilters.tsx",
-          "line": 31
+          "line": 44
         }
       ]
     },
@@ -2191,7 +2243,7 @@
       "usages": [
         {
           "file": "components/admin/today-games/components/GameRow.tsx",
-          "line": 114
+          "line": 144
         }
       ]
     },
@@ -2200,7 +2252,7 @@
       "usages": [
         {
           "file": "components/admin/today-games/components/GameRow.tsx",
-          "line": 111
+          "line": 141
         }
       ]
     },
@@ -2209,11 +2261,11 @@
       "usages": [
         {
           "file": "components/admin/today-games/components/GameRow.tsx",
-          "line": 62
+          "line": 83
         },
         {
           "file": "components/admin/today-games/components/GameRow.tsx",
-          "line": 105
+          "line": 135
         }
       ]
     },
@@ -2231,7 +2283,7 @@
       "usages": [
         {
           "file": "components/admin/today-games/TodayGamesHistory.tsx",
-          "line": 126
+          "line": 130
         }
       ]
     },
@@ -2240,7 +2292,7 @@
       "usages": [
         {
           "file": "components/admin/today-games/components/GamesFilters.tsx",
-          "line": 54
+          "line": 80
         },
         {
           "file": "components/admin/today-games/components/StatsBar.tsx",
@@ -2285,11 +2337,24 @@
       ]
     },
     {
+      "key": "admin.todayGames.practice",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesFilters.tsx",
+          "line": 86
+        },
+        {
+          "file": "components/admin/today-games/components/StatsBar.tsx",
+          "line": 52
+        }
+      ]
+    },
+    {
       "key": "admin.todayGames.ranked",
       "usages": [
         {
           "file": "components/admin/today-games/components/GameRow.tsx",
-          "line": 45
+          "line": 66
         }
       ]
     },
@@ -2298,7 +2363,7 @@
       "usages": [
         {
           "file": "components/admin/today-games/components/GamesFilters.tsx",
-          "line": 66
+          "line": 95
         }
       ]
     },
@@ -2307,7 +2372,7 @@
       "usages": [
         {
           "file": "components/admin/today-games/TodayGamesHistory.tsx",
-          "line": 88
+          "line": 90
         }
       ]
     },
@@ -2316,7 +2381,7 @@
       "usages": [
         {
           "file": "components/admin/today-games/TodayGamesHistory.tsx",
-          "line": 60
+          "line": 62
         }
       ]
     },
@@ -2352,7 +2417,7 @@
       "usages": [
         {
           "file": "components/admin/today-games/TodayGamesHistory.tsx",
-          "line": 73
+          "line": 75
         }
       ]
     },
@@ -2379,11 +2444,11 @@
       "usages": [
         {
           "file": "components/admin/today-games/components/GameRow.tsx",
-          "line": 49
+          "line": 70
         },
         {
           "file": "components/admin/today-games/components/GamesFilters.tsx",
-          "line": 55
+          "line": 81
         },
         {
           "file": "components/admin/today-games/components/StatsBar.tsx",
@@ -2397,6 +2462,19 @@
         {
           "file": "components/admin/today-games/components/GamesTable.tsx",
           "line": 66
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.wordWheel",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GamesFilters.tsx",
+          "line": 85
+        },
+        {
+          "file": "components/admin/today-games/components/StatsBar.tsx",
+          "line": 47
         }
       ]
     },
@@ -2890,6 +2968,24 @@
       ]
     },
     {
+      "key": "blast.chest.avatarSuffix",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastChestBadge.tsx",
+          "line": 187
+        }
+      ]
+    },
+    {
+      "key": "blast.chest.boostSuffix",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastChestBadge.tsx",
+          "line": 185
+        }
+      ]
+    },
+    {
       "key": "blast.chest.coins",
       "usages": [
         {
@@ -2899,6 +2995,15 @@
         {
           "file": "components/blast/v2/BlastChestPreviewModal.tsx",
           "line": 35
+        }
+      ]
+    },
+    {
+      "key": "blast.chest.coinsSuffix",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastChestBadge.tsx",
+          "line": 183
         }
       ]
     },
@@ -2943,7 +3048,7 @@
       "usages": [
         {
           "file": "components/blast/v2/BlastChestBadge.tsx",
-          "line": 23
+          "line": 179
         }
       ]
     },
@@ -2957,29 +3062,56 @@
       ]
     },
     {
-      "key": "blast.complete.cascades",
+      "key": "blast.complete.chainLabel",
       "usages": [
         {
           "file": "components/blast/v2/BlastLevelCompleteCard.tsx",
-          "line": 21
+          "line": 156
         }
       ]
     },
     {
-      "key": "blast.complete.next",
+      "key": "blast.complete.gemsLabel",
       "usages": [
         {
           "file": "components/blast/v2/BlastLevelCompleteCard.tsx",
-          "line": 29
+          "line": 155
         }
       ]
     },
     {
-      "key": "blast.complete.title",
+      "key": "blast.complete.timeLabel",
       "usages": [
         {
           "file": "components/blast/v2/BlastLevelCompleteCard.tsx",
-          "line": 17
+          "line": 154
+        }
+      ]
+    },
+    {
+      "key": "blast.complete.wordsLabel",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastLevelCompleteCard.tsx",
+          "line": 153
+        }
+      ]
+    },
+    {
+      "key": "blast.concept.gotIt",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastConceptIntroCard.tsx",
+          "line": 205
+        }
+      ]
+    },
+    {
+      "key": "blast.concept.tag",
+      "usages": [
+        {
+          "file": "components/blast/v2/BlastConceptIntroCard.tsx",
+          "line": 152
         }
       ]
     },
@@ -2988,34 +3120,7 @@
       "usages": [
         {
           "file": "components/blast/v2/BlastHud.tsx",
-          "line": 78
-        }
-      ]
-    },
-    {
-      "key": "blast.intro.level",
-      "usages": [
-        {
-          "file": "components/blast/v2/BlastLevelIntroCard.tsx",
-          "line": 16
-        }
-      ]
-    },
-    {
-      "key": "blast.intro.wordCount",
-      "usages": [
-        {
-          "file": "components/blast/v2/BlastLevelIntroCard.tsx",
-          "line": 20
-        }
-      ]
-    },
-    {
-      "key": "blast.level",
-      "usages": [
-        {
-          "file": "components/blast/v2/BlastHud.tsx",
-          "line": 39
+          "line": 225
         }
       ]
     },
@@ -3025,24 +3130,6 @@
         {
           "file": "components/settings/BlastTutorialReplaySection.tsx",
           "line": 23
-        }
-      ]
-    },
-    {
-      "key": "blast.tutorial.ftue.label",
-      "usages": [
-        {
-          "file": "components/settings/BlastTutorialReplaySection.tsx",
-          "line": 33
-        }
-      ]
-    },
-    {
-      "key": "blast.tutorial.ftue.step6.cta",
-      "usages": [
-        {
-          "file": "components/blast/v2/BlastFtueOverlay.tsx",
-          "line": 84
         }
       ]
     },
@@ -3061,415 +3148,6 @@
         {
           "file": "components/blast/v2/BlastUnlockCard.tsx",
           "line": 54
-        }
-      ]
-    },
-    {
-      "key": "education.access.already_approved_title",
-      "usages": [
-        {
-          "file": "app/[locale]/education/access/PageClient.tsx",
-          "line": 19
-        }
-      ]
-    },
-    {
-      "key": "education.access.country",
-      "usages": [
-        {
-          "file": "components/education/AccessRequestForm.tsx",
-          "line": 83
-        }
-      ]
-    },
-    {
-      "key": "education.access.email",
-      "usages": [
-        {
-          "file": "components/education/AccessRequestForm.tsx",
-          "line": 66
-        }
-      ]
-    },
-    {
-      "key": "education.access.full_name",
-      "usages": [
-        {
-          "file": "components/education/AccessRequestForm.tsx",
-          "line": 61
-        }
-      ]
-    },
-    {
-      "key": "education.access.go_to_teacher",
-      "usages": [
-        {
-          "file": "app/[locale]/education/access/PageClient.tsx",
-          "line": 21
-        }
-      ]
-    },
-    {
-      "key": "education.access.h1",
-      "usages": [
-        {
-          "file": "app/[locale]/education/access/PageClient.tsx",
-          "line": 14
-        }
-      ]
-    },
-    {
-      "key": "education.access.lede",
-      "usages": [
-        {
-          "file": "app/[locale]/education/access/PageClient.tsx",
-          "line": 15
-        }
-      ]
-    },
-    {
-      "key": "education.access.pending_body",
-      "usages": [
-        {
-          "file": "app/[locale]/education/access/PageClient.tsx",
-          "line": 29
-        }
-      ]
-    },
-    {
-      "key": "education.access.pending_title",
-      "usages": [
-        {
-          "file": "app/[locale]/education/access/PageClient.tsx",
-          "line": 28
-        }
-      ]
-    },
-    {
-      "key": "education.access.rate_limited",
-      "usages": [
-        {
-          "file": "components/education/AccessRequestForm.tsx",
-          "line": 38
-        }
-      ]
-    },
-    {
-      "key": "education.access.regular_game_body",
-      "usages": [
-        {
-          "file": "app/[locale]/education/access/PageClient.tsx",
-          "line": 56
-        }
-      ]
-    },
-    {
-      "key": "education.access.regular_game_title",
-      "usages": [
-        {
-          "file": "app/[locale]/education/access/PageClient.tsx",
-          "line": 55
-        }
-      ]
-    },
-    {
-      "key": "education.access.role",
-      "usages": [
-        {
-          "file": "components/education/AccessRequestForm.tsx",
-          "line": 71
-        }
-      ]
-    },
-    {
-      "key": "education.access.school_or_org",
-      "usages": [
-        {
-          "file": "components/education/AccessRequestForm.tsx",
-          "line": 78
-        }
-      ]
-    },
-    {
-      "key": "education.access.submit",
-      "usages": [
-        {
-          "file": "components/education/AccessRequestForm.tsx",
-          "line": 97
-        }
-      ]
-    },
-    {
-      "key": "education.access.submit_error",
-      "usages": [
-        {
-          "file": "components/education/AccessRequestForm.tsx",
-          "line": 38
-        },
-        {
-          "file": "components/education/AccessRequestForm.tsx",
-          "line": 43
-        }
-      ]
-    },
-    {
-      "key": "education.access.submitted_on",
-      "usages": [
-        {
-          "file": "app/[locale]/education/access/PageClient.tsx",
-          "line": 32
-        }
-      ]
-    },
-    {
-      "key": "education.access.submitting",
-      "usages": [
-        {
-          "file": "components/education/AccessRequestForm.tsx",
-          "line": 97
-        }
-      ]
-    },
-    {
-      "key": "education.access.success_body",
-      "usages": [
-        {
-          "file": "components/education/AccessRequestForm.tsx",
-          "line": 53
-        }
-      ]
-    },
-    {
-      "key": "education.access.success_title",
-      "usages": [
-        {
-          "file": "components/education/AccessRequestForm.tsx",
-          "line": 52
-        }
-      ]
-    },
-    {
-      "key": "education.access.try_blast",
-      "usages": [
-        {
-          "file": "app/[locale]/education/access/PageClient.tsx",
-          "line": 59
-        }
-      ]
-    },
-    {
-      "key": "education.access.try_daily",
-      "usages": [
-        {
-          "file": "app/[locale]/education/access/PageClient.tsx",
-          "line": 60
-        }
-      ]
-    },
-    {
-      "key": "education.access.try_mp",
-      "usages": [
-        {
-          "file": "app/[locale]/education/access/PageClient.tsx",
-          "line": 58
-        }
-      ]
-    },
-    {
-      "key": "education.access.use_case",
-      "usages": [
-        {
-          "file": "components/education/AccessRequestForm.tsx",
-          "line": 88
-        }
-      ]
-    },
-    {
-      "key": "education.landing.compare.subtitle",
-      "usages": [
-        {
-          "file": "components/education/ComparisonStrip.tsx",
-          "line": 45
-        }
-      ]
-    },
-    {
-      "key": "education.landing.compare.title",
-      "usages": [
-        {
-          "file": "components/education/ComparisonStrip.tsx",
-          "line": 42
-        }
-      ]
-    },
-    {
-      "key": "education.landing.cta.body",
-      "usages": [
-        {
-          "file": "components/education/TeacherAccessCTA.tsx",
-          "line": 14
-        }
-      ]
-    },
-    {
-      "key": "education.landing.cta.button",
-      "usages": [
-        {
-          "file": "components/education/TeacherAccessCTA.tsx",
-          "line": 20
-        }
-      ]
-    },
-    {
-      "key": "education.landing.cta.title",
-      "usages": [
-        {
-          "file": "components/education/TeacherAccessCTA.tsx",
-          "line": 11
-        }
-      ]
-    },
-    {
-      "key": "education.landing.faq.title",
-      "usages": [
-        {
-          "file": "components/education/EducationFAQ.tsx",
-          "line": 21
-        }
-      ]
-    },
-    {
-      "key": "education.landing.hero.cta_primary",
-      "usages": [
-        {
-          "file": "components/education/EducationHero.tsx",
-          "line": 52
-        }
-      ]
-    },
-    {
-      "key": "education.landing.hero.cta_secondary",
-      "usages": [
-        {
-          "file": "components/education/EducationHero.tsx",
-          "line": 58
-        }
-      ]
-    },
-    {
-      "key": "education.landing.hero.eyebrow",
-      "usages": [
-        {
-          "file": "components/education/EducationHero.tsx",
-          "line": 38
-        }
-      ]
-    },
-    {
-      "key": "education.landing.hero.h1",
-      "usages": [
-        {
-          "file": "components/education/EducationHero.tsx",
-          "line": 41
-        }
-      ]
-    },
-    {
-      "key": "education.landing.hero.sub",
-      "usages": [
-        {
-          "file": "components/education/EducationHero.tsx",
-          "line": 44
-        }
-      ]
-    },
-    {
-      "key": "education.landing.moat.subtitle",
-      "usages": [
-        {
-          "file": "components/education/MoatTrifectaSection.tsx",
-          "line": 36
-        }
-      ]
-    },
-    {
-      "key": "education.landing.moat.title",
-      "usages": [
-        {
-          "file": "components/education/MoatTrifectaSection.tsx",
-          "line": 28
-        }
-      ]
-    },
-    {
-      "key": "education.landing.modes.teaches",
-      "usages": [
-        {
-          "file": "components/education/SixModeTour.tsx",
-          "line": 74
-        }
-      ]
-    },
-    {
-      "key": "education.landing.modes.title",
-      "usages": [
-        {
-          "file": "components/education/SixModeTour.tsx",
-          "line": 42
-        }
-      ]
-    },
-    {
-      "key": "education.landing.openDashboard",
-      "usages": [
-        {
-          "file": "app/[locale]/education/PageClient.tsx",
-          "line": 79
-        }
-      ]
-    },
-    {
-      "key": "education.landing.trust.bullet1",
-      "usages": [
-        {
-          "file": "app/[locale]/education/PageClient.tsx",
-          "line": 156
-        }
-      ]
-    },
-    {
-      "key": "education.landing.trust.bullet2",
-      "usages": [
-        {
-          "file": "app/[locale]/education/PageClient.tsx",
-          "line": 160
-        }
-      ]
-    },
-    {
-      "key": "education.landing.trust.bullet3",
-      "usages": [
-        {
-          "file": "app/[locale]/education/PageClient.tsx",
-          "line": 164
-        }
-      ]
-    },
-    {
-      "key": "education.landing.trust.title",
-      "usages": [
-        {
-          "file": "app/[locale]/education/PageClient.tsx",
-          "line": 151
-        }
-      ]
-    },
-    {
-      "key": "education.landing.welcomeBack",
-      "usages": [
-        {
-          "file": "app/[locale]/education/PageClient.tsx",
-          "line": 68
         }
       ]
     },
@@ -3584,48 +3262,6 @@
       ]
     },
     {
-      "key": "mp.stopGameConfirm",
-      "usages": [
-        {
-          "file": "host/components/HostInGameView.tsx",
-          "line": 268
-        },
-        {
-          "file": "host/components/HostInGameView.tsx",
-          "line": 308
-        },
-        {
-          "file": "host/components/HostInGameView.tsx",
-          "line": 347
-        },
-        {
-          "file": "host/components/HostInGameView.tsx",
-          "line": 424
-        }
-      ]
-    },
-    {
-      "key": "mp.stopGameYes",
-      "usages": [
-        {
-          "file": "host/components/HostInGameView.tsx",
-          "line": 271
-        },
-        {
-          "file": "host/components/HostInGameView.tsx",
-          "line": 311
-        },
-        {
-          "file": "host/components/HostInGameView.tsx",
-          "line": 350
-        },
-        {
-          "file": "host/components/HostInGameView.tsx",
-          "line": 427
-        }
-      ]
-    },
-    {
       "key": "practice.again",
       "usages": [
         {
@@ -3688,7 +3324,7 @@
       "usages": [
         {
           "file": "components/daily/WordWheelGame.tsx",
-          "line": 672
+          "line": 711
         }
       ]
     },
@@ -3915,7 +3551,7 @@
       "usages": [
         {
           "file": "components/views/ResultsPage.tsx",
-          "line": 874
+          "line": 949
         }
       ]
     },
@@ -3924,7 +3560,7 @@
       "usages": [
         {
           "file": "components/views/ResultsPage.tsx",
-          "line": 863
+          "line": 938
         }
       ]
     },
@@ -3933,7 +3569,7 @@
       "usages": [
         {
           "file": "components/views/ResultsPage.tsx",
-          "line": 866
+          "line": 941
         }
       ]
     },
@@ -3942,7 +3578,7 @@
       "usages": [
         {
           "file": "components/daily/WordHuntWordsModal.tsx",
-          "line": 75
+          "line": 70
         }
       ]
     }
@@ -4022,18 +3658,6 @@
       "adventure.mutators.noHints.name",
       "adventure.mutators.speedRun.name",
       "adventure.mutators.wordMaster.name",
-      "blast.tutorial.ftue.skip",
-      "blast.tutorial.ftue.step1",
-      "blast.tutorial.ftue.step1Cta",
-      "blast.tutorial.ftue.step2",
-      "blast.tutorial.ftue.step2Hint",
-      "blast.tutorial.ftue.step3",
-      "blast.tutorial.ftue.step4",
-      "blast.tutorial.ftue.step5",
-      "blast.tutorial.ftue.step6",
-      "blast.tutorial.veteran.title",
-      "blast.tutorial.veteran.body",
-      "blast.tutorial.veteran.cta",
       "notifications.admin.sendTitle",
       "notifications.admin.selectPlayers",
       "notifications.admin.chooseType",
@@ -4052,6 +3676,44 @@
       "notifications.admin.actionUrlLabel",
       "notifications.admin.sendSuccess",
       "notifications.admin.sendError",
+      "notifications.teacherAccess.title",
+      "notifications.teacherAccess.count.pending",
+      "notifications.teacherAccess.count.approved",
+      "notifications.teacherAccess.count.declined",
+      "notifications.teacherAccess.count.total",
+      "notifications.teacherAccess.filter_status",
+      "notifications.teacherAccess.filter_status_all",
+      "notifications.teacherAccess.filter_locale",
+      "notifications.teacherAccess.filter_country",
+      "notifications.teacherAccess.refresh",
+      "notifications.teacherAccess.row_open",
+      "notifications.teacherAccess.col.name",
+      "notifications.teacherAccess.col.email",
+      "notifications.teacherAccess.col.role",
+      "notifications.teacherAccess.col.locale",
+      "notifications.teacherAccess.col.country",
+      "notifications.teacherAccess.col.status",
+      "notifications.teacherAccess.col.submitted",
+      "notifications.teacherAccess.page",
+      "notifications.teacherAccess.export_csv",
+      "notifications.teacherAccess.close",
+      "notifications.teacherAccess.drawer_title",
+      "notifications.teacherAccess.field.name",
+      "notifications.teacherAccess.field.email",
+      "notifications.teacherAccess.field.role",
+      "notifications.teacherAccess.field.locale",
+      "notifications.teacherAccess.field.country",
+      "notifications.teacherAccess.field.school",
+      "notifications.teacherAccess.field.status",
+      "notifications.teacherAccess.field.submitted",
+      "notifications.teacherAccess.field.use_case",
+      "notifications.teacherAccess.admin_note",
+      "notifications.teacherAccess.approve",
+      "notifications.teacherAccess.decline",
+      "notifications.teacherAccess.approveSuccess",
+      "notifications.teacherAccess.declineSuccess",
+      "notifications.teacherAccess.approveError",
+      "notifications.teacherAccess.declineError",
       "wotd.title",
       "asyncChallenge.recentResults",
       "asyncChallenge.mode.classic",
@@ -4068,6 +3730,7 @@
       "wordForge.go"
     ],
     "sv": [
+      "onboarding.crazygames.autoStart",
       "wordHunt.mp.quality.degraded",
       "wordHunt.mp.quality.weak",
       "wordHunt.mp.quality.reconnecting",
@@ -4079,18 +3742,6 @@
       "wordHunt.mp.abort.continueSolo",
       "wordHunt.mp.abort.returnToLobby",
       "friends.backToFriends",
-      "blast.tutorial.ftue.skip",
-      "blast.tutorial.ftue.step1",
-      "blast.tutorial.ftue.step1Cta",
-      "blast.tutorial.ftue.step2",
-      "blast.tutorial.ftue.step2Hint",
-      "blast.tutorial.ftue.step3",
-      "blast.tutorial.ftue.step4",
-      "blast.tutorial.ftue.step5",
-      "blast.tutorial.ftue.step6",
-      "blast.tutorial.veteran.title",
-      "blast.tutorial.veteran.body",
-      "blast.tutorial.veteran.cta",
       "notifications.admin.sendTitle",
       "notifications.admin.selectPlayers",
       "notifications.admin.chooseType",
@@ -4109,6 +3760,44 @@
       "notifications.admin.actionUrlLabel",
       "notifications.admin.sendSuccess",
       "notifications.admin.sendError",
+      "notifications.teacherAccess.title",
+      "notifications.teacherAccess.count.pending",
+      "notifications.teacherAccess.count.approved",
+      "notifications.teacherAccess.count.declined",
+      "notifications.teacherAccess.count.total",
+      "notifications.teacherAccess.filter_status",
+      "notifications.teacherAccess.filter_status_all",
+      "notifications.teacherAccess.filter_locale",
+      "notifications.teacherAccess.filter_country",
+      "notifications.teacherAccess.refresh",
+      "notifications.teacherAccess.row_open",
+      "notifications.teacherAccess.col.name",
+      "notifications.teacherAccess.col.email",
+      "notifications.teacherAccess.col.role",
+      "notifications.teacherAccess.col.locale",
+      "notifications.teacherAccess.col.country",
+      "notifications.teacherAccess.col.status",
+      "notifications.teacherAccess.col.submitted",
+      "notifications.teacherAccess.page",
+      "notifications.teacherAccess.export_csv",
+      "notifications.teacherAccess.close",
+      "notifications.teacherAccess.drawer_title",
+      "notifications.teacherAccess.field.name",
+      "notifications.teacherAccess.field.email",
+      "notifications.teacherAccess.field.role",
+      "notifications.teacherAccess.field.locale",
+      "notifications.teacherAccess.field.country",
+      "notifications.teacherAccess.field.school",
+      "notifications.teacherAccess.field.status",
+      "notifications.teacherAccess.field.submitted",
+      "notifications.teacherAccess.field.use_case",
+      "notifications.teacherAccess.admin_note",
+      "notifications.teacherAccess.approve",
+      "notifications.teacherAccess.decline",
+      "notifications.teacherAccess.approveSuccess",
+      "notifications.teacherAccess.declineSuccess",
+      "notifications.teacherAccess.approveError",
+      "notifications.teacherAccess.declineError",
       "asyncChallenge.recentResults",
       "asyncChallenge.mode.classic",
       "asyncChallenge.mode.blast",
@@ -4245,6 +3934,7 @@
       "multiplayerFlow.inviteFriend",
       "tvBroadcast.timesUp",
       "tvBroadcast.timesUpSub",
+      "onboarding.crazygames.autoStart",
       "auth.otp.codeSent",
       "auth.otp.enterCode",
       "daily.comeBackTomorrow",
@@ -4279,18 +3969,6 @@
       "adventure.bosses.tutorialGotIt",
       "adventure.loot.fragment",
       "adventure.loot.luckyBonus",
-      "blast.tutorial.ftue.skip",
-      "blast.tutorial.ftue.step1",
-      "blast.tutorial.ftue.step1Cta",
-      "blast.tutorial.ftue.step2",
-      "blast.tutorial.ftue.step2Hint",
-      "blast.tutorial.ftue.step3",
-      "blast.tutorial.ftue.step4",
-      "blast.tutorial.ftue.step5",
-      "blast.tutorial.ftue.step6",
-      "blast.tutorial.veteran.title",
-      "blast.tutorial.veteran.body",
-      "blast.tutorial.veteran.cta",
       "notifications.admin.sendTitle",
       "notifications.admin.selectPlayers",
       "notifications.admin.chooseType",
@@ -4309,6 +3987,44 @@
       "notifications.admin.actionUrlLabel",
       "notifications.admin.sendSuccess",
       "notifications.admin.sendError",
+      "notifications.teacherAccess.title",
+      "notifications.teacherAccess.count.pending",
+      "notifications.teacherAccess.count.approved",
+      "notifications.teacherAccess.count.declined",
+      "notifications.teacherAccess.count.total",
+      "notifications.teacherAccess.filter_status",
+      "notifications.teacherAccess.filter_status_all",
+      "notifications.teacherAccess.filter_locale",
+      "notifications.teacherAccess.filter_country",
+      "notifications.teacherAccess.refresh",
+      "notifications.teacherAccess.row_open",
+      "notifications.teacherAccess.col.name",
+      "notifications.teacherAccess.col.email",
+      "notifications.teacherAccess.col.role",
+      "notifications.teacherAccess.col.locale",
+      "notifications.teacherAccess.col.country",
+      "notifications.teacherAccess.col.status",
+      "notifications.teacherAccess.col.submitted",
+      "notifications.teacherAccess.page",
+      "notifications.teacherAccess.export_csv",
+      "notifications.teacherAccess.close",
+      "notifications.teacherAccess.drawer_title",
+      "notifications.teacherAccess.field.name",
+      "notifications.teacherAccess.field.email",
+      "notifications.teacherAccess.field.role",
+      "notifications.teacherAccess.field.locale",
+      "notifications.teacherAccess.field.country",
+      "notifications.teacherAccess.field.school",
+      "notifications.teacherAccess.field.status",
+      "notifications.teacherAccess.field.submitted",
+      "notifications.teacherAccess.field.use_case",
+      "notifications.teacherAccess.admin_note",
+      "notifications.teacherAccess.approve",
+      "notifications.teacherAccess.decline",
+      "notifications.teacherAccess.approveSuccess",
+      "notifications.teacherAccess.declineSuccess",
+      "notifications.teacherAccess.approveError",
+      "notifications.teacherAccess.declineError",
       "asyncChallenge.recentResults",
       "asyncChallenge.mode.classic",
       "asyncChallenge.mode.blast",
@@ -4396,6 +4112,7 @@
       "connections.landing.crossPromoCta"
     ],
     "es": [
+      "onboarding.crazygames.autoStart",
       "wordHunt.mp.quality.degraded",
       "wordHunt.mp.quality.weak",
       "wordHunt.mp.quality.reconnecting",
@@ -4406,18 +4123,6 @@
       "wordHunt.mp.abort.body",
       "wordHunt.mp.abort.continueSolo",
       "wordHunt.mp.abort.returnToLobby",
-      "blast.tutorial.ftue.skip",
-      "blast.tutorial.ftue.step1",
-      "blast.tutorial.ftue.step1Cta",
-      "blast.tutorial.ftue.step2",
-      "blast.tutorial.ftue.step2Hint",
-      "blast.tutorial.ftue.step3",
-      "blast.tutorial.ftue.step4",
-      "blast.tutorial.ftue.step5",
-      "blast.tutorial.ftue.step6",
-      "blast.tutorial.veteran.title",
-      "blast.tutorial.veteran.body",
-      "blast.tutorial.veteran.cta",
       "notifications.admin.sendTitle",
       "notifications.admin.selectPlayers",
       "notifications.admin.chooseType",
@@ -4436,6 +4141,45 @@
       "notifications.admin.actionUrlLabel",
       "notifications.admin.sendSuccess",
       "notifications.admin.sendError",
+      "notifications.teacherAccess.title",
+      "notifications.teacherAccess.count.pending",
+      "notifications.teacherAccess.count.approved",
+      "notifications.teacherAccess.count.declined",
+      "notifications.teacherAccess.count.total",
+      "notifications.teacherAccess.filter_status",
+      "notifications.teacherAccess.filter_status_all",
+      "notifications.teacherAccess.filter_locale",
+      "notifications.teacherAccess.filter_country",
+      "notifications.teacherAccess.refresh",
+      "notifications.teacherAccess.row_open",
+      "notifications.teacherAccess.col.name",
+      "notifications.teacherAccess.col.email",
+      "notifications.teacherAccess.col.role",
+      "notifications.teacherAccess.col.locale",
+      "notifications.teacherAccess.col.country",
+      "notifications.teacherAccess.col.status",
+      "notifications.teacherAccess.col.submitted",
+      "notifications.teacherAccess.page",
+      "notifications.teacherAccess.export_csv",
+      "notifications.teacherAccess.close",
+      "notifications.teacherAccess.drawer_title",
+      "notifications.teacherAccess.field.name",
+      "notifications.teacherAccess.field.email",
+      "notifications.teacherAccess.field.role",
+      "notifications.teacherAccess.field.locale",
+      "notifications.teacherAccess.field.country",
+      "notifications.teacherAccess.field.school",
+      "notifications.teacherAccess.field.status",
+      "notifications.teacherAccess.field.submitted",
+      "notifications.teacherAccess.field.use_case",
+      "notifications.teacherAccess.admin_note",
+      "notifications.teacherAccess.approve",
+      "notifications.teacherAccess.decline",
+      "notifications.teacherAccess.approveSuccess",
+      "notifications.teacherAccess.declineSuccess",
+      "notifications.teacherAccess.approveError",
+      "notifications.teacherAccess.declineError",
+      "ads.rewarded.blocked",
       "asyncChallenge.recentResults",
       "asyncChallenge.mode.classic",
       "asyncChallenge.mode.blast",
@@ -4541,8 +4285,6 @@
       "leadChange.pointsAhead",
       "leadChange.wordsFound",
       "hostView.progressAnnouncement",
-      "education.teacher.activeGames",
-      "education.teacher.noActiveGames",
       "admin.gameModePopularity",
       "admin.totalGames",
       "admin.landingCardOrder",
@@ -4575,6 +4317,7 @@
       "admin.teacherAccess.filter_locale",
       "admin.teacherAccess.filter_country",
       "admin.teacherAccess.refresh",
+      "admin.teacherAccess.row_open",
       "admin.teacherAccess.page",
       "admin.teacherAccess.export_csv",
       "admin.teacherAccess.col.name",
@@ -4598,6 +4341,10 @@
       "admin.teacherAccess.approve",
       "admin.teacherAccess.decline",
       "admin.teacherAccess.close",
+      "admin.teacherAccess.approveSuccess",
+      "admin.teacherAccess.declineSuccess",
+      "admin.teacherAccess.approveError",
+      "admin.teacherAccess.declineError",
       "admin.sidebar.overview",
       "admin.sidebar.analytics",
       "admin.sidebar.moderation",
@@ -4733,6 +4480,25 @@
       "admin.todayGames.showing",
       "admin.todayGames.of",
       "admin.todayGames.lastUpdated",
+      "admin.todayGames.source.search",
+      "admin.todayGames.source.social",
+      "admin.todayGames.source.ai",
+      "admin.todayGames.source.portal",
+      "admin.todayGames.source.email",
+      "admin.todayGames.source.push",
+      "admin.todayGames.source.ads",
+      "admin.todayGames.source.referral",
+      "admin.todayGames.source.direct",
+      "admin.todayGames.source.unknown",
+      "admin.todayGames.blast",
+      "admin.todayGames.wordWheel",
+      "admin.todayGames.practice",
+      "admin.todayGames.dateRange",
+      "admin.todayGames.range.today",
+      "admin.todayGames.range.7d",
+      "admin.todayGames.range.30d",
+      "admin.todayGames.range.90d",
+      "admin.todayGames.range.all",
       "admin.templateEditor.previewTitle",
       "admin.templateEditor.validationTitle",
       "admin.templateEditor.missingPlaceholders",
@@ -4898,124 +4664,8 @@
       "quickPlay.classic",
       "quickPlay.blast",
       "quickPlay.wordHunt",
-      "notifications.education.landing.hero.eyebrow",
-      "notifications.education.landing.hero.h1",
-      "notifications.education.landing.hero.sub",
-      "notifications.education.landing.hero.cta_primary",
-      "notifications.education.landing.hero.cta_secondary",
-      "notifications.education.landing.moat.title",
-      "notifications.education.landing.moat.subtitle",
-      "notifications.education.landing.moat.native_multilingual.tag",
-      "notifications.education.landing.moat.native_multilingual.title",
-      "notifications.education.landing.moat.native_multilingual.body",
-      "notifications.education.landing.moat.local_inventory.tag",
-      "notifications.education.landing.moat.local_inventory.title",
-      "notifications.education.landing.moat.local_inventory.body",
-      "notifications.education.landing.moat.ad_free.tag",
-      "notifications.education.landing.moat.ad_free.title",
-      "notifications.education.landing.moat.ad_free.body",
-      "notifications.education.landing.modes.title",
-      "notifications.education.landing.modes.teaches",
-      "notifications.education.landing.modes.classroom_game.tag",
-      "notifications.education.landing.modes.classroom_game.title",
-      "notifications.education.landing.modes.classroom_game.body",
-      "notifications.education.landing.modes.classroom_game.teaches",
-      "notifications.education.landing.modes.vocab_duels.tag",
-      "notifications.education.landing.modes.vocab_duels.title",
-      "notifications.education.landing.modes.vocab_duels.body",
-      "notifications.education.landing.modes.vocab_duels.teaches",
-      "notifications.education.landing.modes.brain_drills.tag",
-      "notifications.education.landing.modes.brain_drills.title",
-      "notifications.education.landing.modes.brain_drills.body",
-      "notifications.education.landing.modes.brain_drills.teaches",
-      "notifications.education.landing.modes.daily_wordhunt.tag",
-      "notifications.education.landing.modes.daily_wordhunt.title",
-      "notifications.education.landing.modes.daily_wordhunt.body",
-      "notifications.education.landing.modes.daily_wordhunt.teaches",
-      "notifications.education.landing.modes.adventure.tag",
-      "notifications.education.landing.modes.adventure.title",
-      "notifications.education.landing.modes.adventure.body",
-      "notifications.education.landing.modes.adventure.teaches",
-      "notifications.education.landing.modes.spelling_bee.tag",
-      "notifications.education.landing.modes.spelling_bee.title",
-      "notifications.education.landing.modes.spelling_bee.body",
-      "notifications.education.landing.modes.spelling_bee.teaches",
-      "notifications.education.landing.compare.title",
-      "notifications.education.landing.compare.subtitle",
-      "notifications.education.landing.compare.col.lexiclash",
-      "notifications.education.landing.compare.col.kahoot",
-      "notifications.education.landing.compare.col.quizlet",
-      "notifications.education.landing.compare.col.wordwall",
-      "notifications.education.landing.compare.row.native_multilingual",
-      "notifications.education.landing.compare.row.ad_free_students",
-      "notifications.education.landing.compare.row.live_multiplayer",
-      "notifications.education.landing.compare.row.brain_training",
-      "notifications.education.landing.compare.row.game_variety",
-      "notifications.education.landing.compare.row.free_for_teachers",
-      "notifications.education.landing.trust.title",
-      "notifications.education.landing.trust.bullet1",
-      "notifications.education.landing.trust.bullet2",
-      "notifications.education.landing.trust.bullet3",
-      "notifications.education.landing.faq.title",
-      "notifications.education.landing.faq.q1.q",
-      "notifications.education.landing.faq.q1.a",
-      "notifications.education.landing.faq.q2.q",
-      "notifications.education.landing.faq.q2.a",
-      "notifications.education.landing.faq.q3.q",
-      "notifications.education.landing.faq.q3.a",
-      "notifications.education.landing.faq.q4.q",
-      "notifications.education.landing.faq.q4.a",
-      "notifications.education.landing.faq.q5.q",
-      "notifications.education.landing.faq.q5.a",
-      "notifications.education.landing.faq.q6.q",
-      "notifications.education.landing.faq.q6.a",
-      "notifications.education.landing.faq.q7.q",
-      "notifications.education.landing.faq.q7.a",
-      "notifications.education.landing.faq.q8.q",
-      "notifications.education.landing.faq.q8.a",
-      "notifications.education.landing.cta.title",
-      "notifications.education.landing.cta.body",
-      "notifications.education.landing.cta.button",
-      "notifications.education.landing.esl-word-games.course_name",
-      "notifications.education.landing.esl-word-games.course_desc",
-      "notifications.education.landing.vocabulary-games-classroom.course_name",
-      "notifications.education.landing.vocabulary-games-classroom.course_desc",
-      "notifications.education.access.h1",
-      "notifications.education.access.lede",
-      "notifications.education.access.full_name",
-      "notifications.education.access.email",
-      "notifications.education.access.role",
-      "notifications.education.access.role_teacher",
-      "notifications.education.access.role_tutor",
-      "notifications.education.access.role_admin",
-      "notifications.education.access.role_parent",
-      "notifications.education.access.role_researcher",
-      "notifications.education.access.role_other",
-      "notifications.education.access.school_or_org",
-      "notifications.education.access.country",
-      "notifications.education.access.use_case",
-      "notifications.education.access.submit",
-      "notifications.education.access.submitting",
-      "notifications.education.access.submit_error",
-      "notifications.education.access.rate_limited",
-      "notifications.education.access.success_title",
-      "notifications.education.access.success_body",
-      "notifications.education.access.pending_title",
-      "notifications.education.access.pending_body",
-      "notifications.education.access.submitted_on",
-      "notifications.education.access.already_approved_title",
-      "notifications.education.access.go_to_teacher",
-      "notifications.education.access.next.step1_title",
-      "notifications.education.access.next.step1_body",
-      "notifications.education.access.next.step2_title",
-      "notifications.education.access.next.step2_body",
-      "notifications.education.access.next.step3_title",
-      "notifications.education.access.next.step3_body",
-      "notifications.education.access.regular_game_title",
-      "notifications.education.access.regular_game_body",
-      "notifications.education.access.try_mp",
-      "notifications.education.access.try_blast",
-      "notifications.education.access.try_daily",
+      "education.teacher.activeGames",
+      "education.teacher.noActiveGames",
       "asyncChallenge.pending",
       "asyncChallenge.pendingCount",
       "asyncChallenge.challengeFrom",
@@ -5141,8 +4791,6 @@
       "leadChange.pointsAhead",
       "leadChange.wordsFound",
       "hostView.progressAnnouncement",
-      "education.teacher.activeGames",
-      "education.teacher.noActiveGames",
       "admin.gameModePopularity",
       "admin.totalGames",
       "admin.landingCardOrder",
@@ -5175,6 +4823,7 @@
       "admin.teacherAccess.filter_locale",
       "admin.teacherAccess.filter_country",
       "admin.teacherAccess.refresh",
+      "admin.teacherAccess.row_open",
       "admin.teacherAccess.page",
       "admin.teacherAccess.export_csv",
       "admin.teacherAccess.col.name",
@@ -5198,6 +4847,10 @@
       "admin.teacherAccess.approve",
       "admin.teacherAccess.decline",
       "admin.teacherAccess.close",
+      "admin.teacherAccess.approveSuccess",
+      "admin.teacherAccess.declineSuccess",
+      "admin.teacherAccess.approveError",
+      "admin.teacherAccess.declineError",
       "admin.sidebar.overview",
       "admin.sidebar.analytics",
       "admin.sidebar.moderation",
@@ -5293,6 +4946,25 @@
       "admin.todayGames.showing",
       "admin.todayGames.of",
       "admin.todayGames.lastUpdated",
+      "admin.todayGames.source.search",
+      "admin.todayGames.source.social",
+      "admin.todayGames.source.ai",
+      "admin.todayGames.source.portal",
+      "admin.todayGames.source.email",
+      "admin.todayGames.source.push",
+      "admin.todayGames.source.ads",
+      "admin.todayGames.source.referral",
+      "admin.todayGames.source.direct",
+      "admin.todayGames.source.unknown",
+      "admin.todayGames.blast",
+      "admin.todayGames.wordWheel",
+      "admin.todayGames.practice",
+      "admin.todayGames.dateRange",
+      "admin.todayGames.range.today",
+      "admin.todayGames.range.7d",
+      "admin.todayGames.range.30d",
+      "admin.todayGames.range.90d",
+      "admin.todayGames.range.all",
       "admin.templateEditor.previewTitle",
       "admin.templateEditor.validationTitle",
       "admin.templateEditor.missingPlaceholders",
@@ -5516,6 +5188,8 @@
       "quickPlay.classic",
       "quickPlay.blast",
       "quickPlay.wordHunt",
+      "education.teacher.activeGames",
+      "education.teacher.noActiveGames",
       "asyncChallenge.pending",
       "asyncChallenge.pendingCount",
       "asyncChallenge.challengeFrom",
@@ -5647,8 +5321,6 @@
       "quickPlay.classic",
       "quickPlay.blast",
       "quickPlay.wordHunt",
-      "education.teacher.activeGames",
-      "education.teacher.noActiveGames",
       "admin.gameModePopularity",
       "admin.totalGames",
       "admin.landingCardOrder",
@@ -5681,6 +5353,7 @@
       "admin.teacherAccess.filter_locale",
       "admin.teacherAccess.filter_country",
       "admin.teacherAccess.refresh",
+      "admin.teacherAccess.row_open",
       "admin.teacherAccess.page",
       "admin.teacherAccess.export_csv",
       "admin.teacherAccess.col.name",
@@ -5704,6 +5377,10 @@
       "admin.teacherAccess.approve",
       "admin.teacherAccess.decline",
       "admin.teacherAccess.close",
+      "admin.teacherAccess.approveSuccess",
+      "admin.teacherAccess.declineSuccess",
+      "admin.teacherAccess.approveError",
+      "admin.teacherAccess.declineError",
       "admin.sidebar.overview",
       "admin.sidebar.analytics",
       "admin.sidebar.moderation",
@@ -5799,6 +5476,25 @@
       "admin.todayGames.showing",
       "admin.todayGames.of",
       "admin.todayGames.lastUpdated",
+      "admin.todayGames.source.search",
+      "admin.todayGames.source.social",
+      "admin.todayGames.source.ai",
+      "admin.todayGames.source.portal",
+      "admin.todayGames.source.email",
+      "admin.todayGames.source.push",
+      "admin.todayGames.source.ads",
+      "admin.todayGames.source.referral",
+      "admin.todayGames.source.direct",
+      "admin.todayGames.source.unknown",
+      "admin.todayGames.blast",
+      "admin.todayGames.wordWheel",
+      "admin.todayGames.practice",
+      "admin.todayGames.dateRange",
+      "admin.todayGames.range.today",
+      "admin.todayGames.range.7d",
+      "admin.todayGames.range.30d",
+      "admin.todayGames.range.90d",
+      "admin.todayGames.range.all",
       "admin.templateEditor.previewTitle",
       "admin.templateEditor.validationTitle",
       "admin.templateEditor.missingPlaceholders",
@@ -6019,6 +5715,8 @@
       "admin.milogWords.title",
       "admin.milogWords.subtitle",
       "adventure.gestureTutorial",
+      "education.teacher.activeGames",
+      "education.teacher.noActiveGames",
       "asyncChallenge.pending",
       "asyncChallenge.pendingCount",
       "asyncChallenge.challengeFrom",
@@ -6162,6 +5860,7 @@
       "admin.teacherAccess.filter_locale",
       "admin.teacherAccess.filter_country",
       "admin.teacherAccess.refresh",
+      "admin.teacherAccess.row_open",
       "admin.teacherAccess.page",
       "admin.teacherAccess.export_csv",
       "admin.teacherAccess.col.name",
@@ -6185,6 +5884,10 @@
       "admin.teacherAccess.approve",
       "admin.teacherAccess.decline",
       "admin.teacherAccess.close",
+      "admin.teacherAccess.approveSuccess",
+      "admin.teacherAccess.declineSuccess",
+      "admin.teacherAccess.approveError",
+      "admin.teacherAccess.declineError",
       "admin.sidebar.overview",
       "admin.sidebar.analytics",
       "admin.sidebar.moderation",
@@ -6280,6 +5983,25 @@
       "admin.todayGames.showing",
       "admin.todayGames.of",
       "admin.todayGames.lastUpdated",
+      "admin.todayGames.source.search",
+      "admin.todayGames.source.social",
+      "admin.todayGames.source.ai",
+      "admin.todayGames.source.portal",
+      "admin.todayGames.source.email",
+      "admin.todayGames.source.push",
+      "admin.todayGames.source.ads",
+      "admin.todayGames.source.referral",
+      "admin.todayGames.source.direct",
+      "admin.todayGames.source.unknown",
+      "admin.todayGames.blast",
+      "admin.todayGames.wordWheel",
+      "admin.todayGames.practice",
+      "admin.todayGames.dateRange",
+      "admin.todayGames.range.today",
+      "admin.todayGames.range.7d",
+      "admin.todayGames.range.30d",
+      "admin.todayGames.range.90d",
+      "admin.todayGames.range.all",
       "admin.templateEditor.previewTitle",
       "admin.templateEditor.validationTitle",
       "admin.templateEditor.missingPlaceholders",
