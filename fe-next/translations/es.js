@@ -1334,7 +1334,8 @@ const es = {
       "joining": "Entrando...",
       "roomFull": "La sala está llena",
       "roomFullSpectate": "La sala está llena. Puedes ser espectador.",
-      "spectateButton": "Espectador"
+      "spectateButton": "Espectador",
+      "differentLanguageNotice": "Esta sala juega en {{language}}. Las palabras enviadas deben estar en el mismo idioma."
     },
     "createModal": {
       "title": "Arma tu batalla",

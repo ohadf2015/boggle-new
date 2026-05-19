@@ -1301,7 +1301,8 @@ const en = {
       "joining": "Warping in...",
       "roomFull": "Room is full",
       "roomFullSpectate": "Room is full. You can spectate instead.",
-      "spectateButton": "Spectate"
+      "spectateButton": "Spectate",
+      "differentLanguageNotice": "This room plays in {{language}}. Submitted words must use the same language."
     },
     "createModal": {
       "title": "Host a Battle",

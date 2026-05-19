@@ -1305,7 +1305,8 @@ const he = {
       "joining": "נכנס...",
       "roomFull": "החדר מלא",
       "roomFullSpectate": "החדר מלא. אפשר לצפות במשחק.",
-      "spectateButton": "צפייה"
+      "spectateButton": "צפייה",
+      "differentLanguageNotice": "החדר משחק ב{{language}}. המילים שתשלח חייבות להיות באותה השפה."
     },
     "createModal": {
       "title": "פתח קרב",

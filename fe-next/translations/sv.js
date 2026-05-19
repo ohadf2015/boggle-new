@@ -1316,7 +1316,8 @@ const sv = {
       "joining": "Hoppar in...",
       "roomFull": "Rummet är fullt",
       "roomFullSpectate": "Rummet är fullt. Du kan titta på istället.",
-      "spectateButton": "Titta på"
+      "spectateButton": "Titta på",
+      "differentLanguageNotice": "Det här rummet spelar på {{language}}. Inskickade ord måste vara på samma språk."
     },
     "createModal": {
       "title": "Starta en strid",

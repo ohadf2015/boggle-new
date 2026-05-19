@@ -24,7 +24,15 @@ import {
 } from '@/utils/profileStorage';
 import { validateUsername } from '@/utils/validation';
 import { cn } from '@/lib/utils';
-import type { ActiveRoom } from '@/shared/types/game';
+import type { ActiveRoom, Language } from '@/shared/types/game';
+
+const LANGUAGE_NAME_KEY: Partial<Record<Language, string>> = {
+  en: 'joinView.english',
+  he: 'joinView.hebrew',
+  sv: 'joinView.swedish',
+  ja: 'joinView.japanese',
+  es: 'joinView.spanish',
+};
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -51,7 +59,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
   displayName,
   profileAvatar,
 }) => {
-  const { t, dir } = useLanguage();
+  const { t, dir, language: userLanguage } = useLanguage();
   const { updateProfile: updateAuthProfile } = useAuth();
 
   const [username, setUsername] = useState<string>('');
@@ -142,6 +150,17 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
               </div>
             </div>
           </div>
+
+          {room.language && room.language !== userLanguage && (
+            <div
+              data-testid="language-mismatch-notice"
+              className="rounded-neo border-2 border-neo-black bg-neo-cyan/10 px-3 py-2 text-xs font-bold text-neo-cyan"
+            >
+              {t('multiplayerFlow.joinModal.differentLanguageNotice', {
+                language: t(LANGUAGE_NAME_KEY[room.language] ?? 'joinView.english'),
+              })}
+            </div>
+          )}
 
           {/* Avatar + Name — compact inline layout */}
           <div className="flex items-center gap-3">
