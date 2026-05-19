@@ -3,18 +3,23 @@
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.claude.nightly-feedback-poll</string>
+    <string>com.claude.nightly-feedback-daemon</string>
 
     <key>ProgramArguments</key>
     <array>
         <string>/bin/bash</string>
-        <string>/Users/ohadfisher/git/boggle-new/scripts/nightly/lib/feedback-poll.sh</string>
+        <string>/Users/ohadfisher/git/boggle-new/scripts/nightly/lib/feedback-daemon.sh</string>
     </array>
 
-    <!-- Poll every 5 min to ack Telegram callbacks within their ~60s TTL.
-         Without this, button taps stay in "loading" UI forever. -->
-    <key>StartInterval</key>
-    <integer>300</integer>
+    <!-- Persistent long-poll daemon — keep alive forever -->
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+
+    <!-- Throttle restart on crash so we don't hammer if the script itself errors. -->
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
 
     <key>WorkingDirectory</key>
     <string>/Users/ohadfisher/git/boggle-new</string>
@@ -30,19 +35,11 @@
     </dict>
 
     <key>StandardOutPath</key>
-    <string>/Users/ohadfisher/logs/lexi-nightly/feedback-poll.log</string>
+    <string>/Users/ohadfisher/logs/lexi-nightly/feedback-daemon.log</string>
     <key>StandardErrorPath</key>
-    <string>/Users/ohadfisher/logs/lexi-nightly/feedback-poll.log</string>
+    <string>/Users/ohadfisher/logs/lexi-nightly/feedback-daemon.log</string>
 
     <key>LowPriorityIO</key>
-    <true/>
-
-    <!-- 30s hard timeout per poll. getUpdates long-poll is 2s; entire run
-         should finish in well under 10s. -->
-    <key>TimeOut</key>
-    <integer>30</integer>
-
-    <key>RunAtLoad</key>
     <true/>
 </dict>
 </plist>
