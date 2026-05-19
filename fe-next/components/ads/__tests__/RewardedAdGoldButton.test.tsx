@@ -106,4 +106,35 @@ describe('RewardedAdGoldButton', () => {
     render(<RewardedAdGoldButton goldAmount={25} surface="test" className="mt-4" />);
     expect(screen.getByRole('button')).toHaveClass('mt-4');
   });
+
+  test('renders nothing when no active ad provider (canShowAd false)', () => {
+    (useRewardedAd as jest.Mock).mockReturnValue({
+      status: 'idle',
+      isAdAvailable: true,
+      isPlaceholderCooldown: false,
+      showAd: mockShowAd,
+      prepareAd: vi.fn(),
+      error: null,
+      rewardAmount: 25,
+      canShowAd: false,
+    });
+    const { container } = render(<RewardedAdGoldButton goldAmount={20} surface="player_waiting" />);
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  test('renders the button when an active ad provider exists (canShowAd true)', () => {
+    (useRewardedAd as jest.Mock).mockReturnValue({
+      status: 'idle',
+      isAdAvailable: true,
+      isPlaceholderCooldown: false,
+      showAd: mockShowAd,
+      prepareAd: vi.fn(),
+      error: null,
+      rewardAmount: 25,
+      canShowAd: true,
+    });
+    render(<RewardedAdGoldButton goldAmount={20} surface="player_waiting" />);
+    expect(screen.getByRole('button')).toBeInTheDocument();
+  });
 });

@@ -12,8 +12,9 @@ vi.mock('@/utils/growthTracking', () => ({
   trackRewardedAdOffered: vi.fn(),
 }));
 
-vi.mock('@/hooks/useRewardedAd', () => ({
-  useRewardedAd: () => ({
+// Mutable hook state so each test can flip `canShowAd` (active ad provider).
+const adState = vi.hoisted(() => ({
+  current: {
     status: 'idle',
     isAdAvailable: true,
     isPlaceholderCooldown: false,
@@ -21,7 +22,12 @@ vi.mock('@/hooks/useRewardedAd', () => ({
     prepareAd: vi.fn(),
     error: null,
     rewardAmount: 25,
-  }),
+    canShowAd: true,
+  },
+}));
+
+vi.mock('@/hooks/useRewardedAd', () => ({
+  useRewardedAd: () => adState.current,
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -38,6 +44,14 @@ import { trackRewardedAdOffered } from '@/utils/growthTracking';
 describe('RewardedAdGoldButton analytics', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    adState.current.canShowAd = true;
+  });
+
+  it('does not fire offered when there is no active ad provider (canShowAd false)', () => {
+    adState.current.canShowAd = false;
+    render(<RewardedAdGoldButton goldAmount={20} surface="player_waiting" />);
+
+    expect(trackRewardedAdOffered).not.toHaveBeenCalled();
   });
 
   it('fires trackRewardedAdOffered on mount with caller-supplied surface', () => {

@@ -32,10 +32,15 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
   const reducedMotion = useReducedMotion();
 
   const btnRef = useRef<HTMLButtonElement>(null);
+  const offeredRef = useRef(false);
   const [glare, setGlare] = useState<{ x: number; y: number } | null>(null);
   const [burstKey, setBurstKey] = useState(0);
 
-  const { showAd, prepareAd, status, isPlaceholderCooldown } = useRewardedAd({
+  // `canShowAd` is false when no real ad provider can serve (web placeholder
+  // in prod) or the daily cap is hit — defaults to true so the button still
+  // renders for callers/tests that don't surface the flag. Real hook always
+  // returns an explicit boolean.
+  const { showAd, prepareAd, status, isPlaceholderCooldown, canShowAd = true } = useRewardedAd({
     surface: 'doubleGold',
     analyticsSurface: surface,
     onRewardEarned: (amount) => {
@@ -43,13 +48,17 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
     },
   });
 
-  // Fire offer + warm the ad slot in one effect so the next tap resolves
-  // without a network spinner. prepareAd is a no-op on web/CG/simulation.
+  // Fire offer + warm the ad slot once the button can actually show — only
+  // when an active ad provider exists. Gating here keeps the PostHog
+  // offer→watch funnel clean (no phantom offers for a hidden CTA). prepareAd
+  // is a no-op on web/CG/simulation.
   useEffect(() => {
+    if (!canShowAd || offeredRef.current) return;
+    offeredRef.current = true;
     trackRewardedAdOffered(surface);
     prepareAd();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [canShowAd]);
 
   const capped = isPlaceholderCooldown;
   const isLoading = status === 'loading' || status === 'showing';
@@ -82,6 +91,10 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
   }, [isDisabled, reducedMotion, showAd]);
 
   const burstCoins = Array.from({ length: 6 });
+
+  // No active ad provider (or daily cap reached) → hide the CTA entirely
+  // rather than show a button that grants nothing.
+  if (!canShowAd) return null;
 
   return (
     <m.button
