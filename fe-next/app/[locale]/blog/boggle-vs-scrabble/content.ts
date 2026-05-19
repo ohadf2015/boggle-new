@@ -22,7 +22,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     title: 'Boggle vs Scrabble: The Honest Showdown Nobody Asked For',
     subtitle: 'Two titans of the word game world. One chaotic, one strategic. Which one deserves your Friday night?',
     category: 'Versus',
-    readTime: '12 min read',
+    readTime: '10 min read',
     authorName: 'Ohad Fisher',
     authorBio: 'Owns three different editions of Scrabble and a Boggle set held together with duct tape. Has strong opinions about both.',
     sections: [
@@ -31,131 +31,99 @@ export const contentByLocale: Record<string, LocaleContent> = {
 
 My sister said Scrabble is the "real" word game and Boggle is "just a party trick." I said she only likes Scrabble because she memorized two-letter words from a cheat sheet. My dad told us both to shut up and play Monopoly. Nobody won that night.
 
-But the question stuck with me. Boggle vs Scrabble. It's the Coke vs Pepsi of word games, except both drinks are actually good and the argument is way more interesting. I've been playing both for over 20 years, and I have thoughts. Many of them.`,
+But the question stuck with me. Boggle vs Scrabble — it's the Coke vs Pepsi of word games, except both drinks are actually good and the argument is way more interesting. I've been playing both for over 20 years, and they're fundamentally different games. Not different in the way "chess" and "checkers" are different. More like "chess" and "speed chess played during an earthquake" different. That gap is the whole story.`,
       },
       {
-        title: 'A Brief, Slightly Dramatic History',
-        content: `Scrabble came first. Alfred Mosher Butts invented it during the Great Depression because apparently when the economy collapses, you make word games. Originally called "Lexiko" and then "Criss-Crosswords" (thank god they changed it), Scrabble got picked up by James Brunot in 1948 and slowly became the most famous board game on the planet. It's sold over 150 million copies. It's in 30 languages. There are international tournaments with prize money. People have cried at Scrabble tournaments. I respect that level of commitment.
+        title: 'The history: when both were invented',
+        content: `Scrabble came first. Alfred Mosher Butts invented it in 1933 during the Great Depression, because apparently when the economy collapses, you make word games. Originally called "Lexiko" (thank god they changed it), Scrabble got picked up by James Brunot in 1948 and slowly became the most famous board game on the planet. It's sold over 150 million copies. It's in 30 languages. There are international tournaments with prize money. People have cried at Scrabble tournaments. I respect that level of commitment.
 
 Boggle showed up later, in 1972, created by Allan Turoff and published by Parker Brothers. It was the rebellious younger sibling. No board. No tiles to place carefully. Just a tray of dice you shake like you're angry at the alphabet, a three-minute timer, and pure chaos. While Scrabble players were carefully calculating triple-word scores, Boggle players were scribbling words at light speed and arguing about whether "QI" counts.
 
 Both games survived the digital revolution. Both spawned countless imitators. But they have totally different ideas about what a word game should be.`,
       },
       {
-        title: 'Gameplay: Chess vs Speed Chess',
+        title: 'The setup: strategy vs chaos',
         content: `Here's the core difference and it matters more than anything else.
 
-Scrabble is turn-based strategy. You get seven tiles. You stare at them. You rearrange them on your rack like you're solving a puzzle (you literally are). You consider the board state, the remaining tiles, your opponent's likely moves. You place one word. Then you wait. A single Scrabble game takes 45 minutes to an hour, sometimes longer if someone is "thinking" (stalling).
+Scrabble is turn-based strategy. You get seven tiles. You stare at them. You rearrange them on your rack like you're solving a puzzle (you literally are). You consider the board state, the remaining tiles, your opponent's likely moves. You place one word. Then you wait. A single game takes 45 minutes to an hour, sometimes longer if someone is "thinking" (stalling).
 
 Boggle is real-time chaos. Everyone stares at the same 16-letter grid simultaneously. You have three minutes. Find every word you can. Go. There is no turn order. There is no waiting. There is only the sound of pencils scratching and the quiet panic of watching the sand run out.
 
 Scrabble rewards vocabulary depth and strategic positioning. Knowing obscure two-letter words (ZA, QI, XI, JO) is basically a superpower. Boggle rewards pattern recognition speed and spatial awareness. You need to see connections between adjacent letters faster than everyone else.
 
-I love both, but they exercise completely different parts of your brain. If Scrabble is chess, Boggle is speed chess played during an earthquake.`,
+These aren't just different strategies — they exercise completely different parts of your brain. If Scrabble is chess, Boggle is speed chess played during an earthquake.`,
       },
       {
-        title: 'The Social Experience',
+        title: 'Why the social experience splits them apart',
         content: `This is where the games really diverge.
 
-Scrabble is a two-to-four player game, but honestly it's best as a duel. You and one other person, locked in a slow-burning intellectual battle. There's trash talk, but it's sophisticated trash talk. "Oh, you're playing QUIZ without a U? Bold." It's intimate. It's personal. If you lose, you know exactly who beat you and how.
+Scrabble is best as a duel. You and one other person, locked in a slow-burning intellectual battle. There's trash talk, but it's sophisticated trash talk. "Oh, you're playing QUIZ without a U? Bold." It's intimate. It's personal. If you lose, you know exactly who beat you and how.
 
-Boggle is a party game wearing a word game's clothes. Six people around a table, everyone playing at once, nobody waiting, the timer running out and someone screaming "I HAD THAT ONE" when you read your list. The scoring system, where common words cancel out, means the real game is finding words nobody else spotted. It rewards creative weirdness.
+Boggle is a party game wearing a word game's clothes. Six people around a table, everyone playing at once, nobody waiting. The timer runs out and someone screams "I HAD THAT ONE" when you read your list. The scoring system, where common words cancel out, means the real game is finding words nobody else spotted. It rewards creative weirdness. No downtime. Everyone is always engaged. Always panicking. Always having a good time, or at least an intense time.
 
 Scrabble turns can get awkward. That silence while someone stares at their tiles for four minutes? Painful. In Boggle, there's no downtime. Everyone is always engaged. Always panicking. Always having a good time, or at least an intense time.
 
 For game night with friends who don't play word games regularly? Boggle, every time. For a date night where you both think vocabulary is attractive? Scrabble. I will not elaborate.`,
       },
       {
-        title: 'Digital Versions: The Good, The Bad, The Monetized',
-        content: `Both games have gone digital, and this is where things get complicated.
+        title: 'What neuroscience actually says about both',
+        content: `Both games are legitimately good for cognitive health — the science on this is pretty clear. Word games in general strengthen verbal fluency, working memory, and processing speed. But they do it differently.
 
-Scrabble's official app has changed hands more times than I can count. It's currently run by Scopely, and it's... fine? The AI opponents are decent. Online matchmaking works. But the monetization is aggressive. Power-ups that basically play the game for you. Tile swaps that remove the core challenge. It feels like they're selling you shortcuts to a game that's only fun because it's hard.
+According to the AIMS Neuroscience systematic review (2021), word searching activates at least four major brain regions simultaneously: Broca's area handles phonological processing (sounding out letter combinations in your head), Wernicke's area deals with meaning (is this a real word?), the dorsolateral prefrontal cortex acts as the executive coordinator, and the basal ganglia jump in when things get complicated.
+
+Scrabble engages strategic thinking, planning ahead, and deep vocabulary recall. A 2014 study from the University of Calgary found that competitive Scrabble players develop enhanced visual word recognition — they process letter combinations faster than non-players. The strategic element also exercises executive function and decision-making. You're not just looking for words; you're evaluating their position, defending against opponent moves, and balancing your rack for future turns.
+
+Boggle hits processing speed and rapid pattern recognition harder. The time pressure forces your brain into a different mode. You're not carefully deliberating; you're scanning, connecting, and deciding in milliseconds. This kind of rapid-fire word finding may be particularly beneficial for maintaining processing speed as you age, and it engages the visual-spatial networks in a way Scrabble doesn't need to.
+
+My take: play both. Scrabble for the deep, slow burn. Boggle for the fast, chaotic workout. Your brain will thank you for the variety.`,
+      },
+      {
+        title: 'The skill ceiling and why it matters',
+        content: `Scrabble has one of the highest skill ceilings of any board game, period. Top Scrabble players memorize the entire Official Scrabble Players Dictionary — all 180,000+ words. They study tile distribution probabilities. They know the optimal opening moves, the rack-balancing strategies, the endgame techniques. The gap between someone who plays on weekends and someone who memorized the entire dictionary is basically a different sport. It's not just that they know more words; they see the board in terms of probability and positioning in a way casual players can't.
+
+Boggle's skill ceiling is real but different. You can definitely get better at pattern recognition. Experienced players develop systematic scanning techniques, working through the grid methodically instead of randomly. They develop muscle memory for common letter clusters and learn to spot multi-directional words faster. But the element of randomness in each shake means that even a weaker player can occasionally beat an expert if the grid falls right.
+
+This is actually why Boggle is better for casual play. The skill gap is narrower, which means more people can have fun. Scrabble against someone who's way better than you? Brutal. You're losing by 200 points and there's nothing you can do about it. Boggle against someone better? You might still find a word they missed. That possibility keeps everyone engaged and having fun, even the underdog.
+
+For competitive play, Scrabble's depth is unmatched. There's a reason it has a World Championship and Boggle doesn't. But for 90% of people who just want to enjoy a word game with friends? The accessibility matters more than the ceiling.`,
+      },
+      {
+        title: 'Digital versions: where it gets messy',
+        content: `Scrabble's official app has changed hands more times than I can count. It's currently run by Scopely, and the monetization is aggressive. Power-ups that basically play the game for you. Tile swaps that remove the core challenge. It feels like they're selling you shortcuts to a game that's only fun because it's hard.
 
 Words With Friends is basically Diet Scrabble with a different board layout and the same monetization problems. It's the biggest async word game out there, but "Word Radar" showing you the best move is genuinely offensive to me. That's not a feature. That's surrender.
 
 Boggle's digital history is messier. Hasbro has released official versions that range from decent to abandoned. The real Boggle-style innovation happened in clones and spiritual successors. Ruzzle had a moment around 2013. Word Streak (formerly Boggle With Friends) existed and then kind of didn't.
 
-The best digital Boggle experience right now, and yes I'm biased because I write for this blog, is LexiClash. Real-time multiplayer, daily challenges, multiple game modes including a proper Boggle-style grid mode. No pay-to-win garbage. But I'll let you judge that yourself.
-
-The honest truth about digital word games: almost all of them are worse than the physical versions because they can't resist adding monetization that breaks the core experience.`,
+The honest truth: almost all digital word games are worse than the physical versions because they can't resist adding monetization that breaks the core experience. A few still believe in playing it straight, but they're rare.`,
       },
       {
-        title: 'Which Is Better for Your Brain?',
-        content: `I looked into the research because I'm that kind of person.
-
-Both games are good for cognitive health — the science on this is pretty clear. The science is pretty clear on word games in general: they strengthen verbal fluency, working memory, and processing speed. But they do it differently.
-
-Scrabble engages strategic thinking, planning ahead, and deep vocabulary recall. A 2014 study from the University of Calgary found that competitive Scrabble players develop enhanced visual word recognition, basically they process letter combinations faster than non-players. The strategic element also exercises executive function and decision-making.
-
-Boggle hits processing speed and rapid pattern recognition harder. The time pressure forces your brain into a different mode. You're not carefully deliberating; you're scanning, connecting, and deciding in milliseconds. Research on timed cognitive tasks suggests this kind of rapid-fire word finding may be particularly beneficial for maintaining processing speed as you age.
-
-My completely unscientific take: play both. Scrabble for the deep, slow burn. Boggle for the fast, chaotic workout. Your brain will thank you for the variety.
-
-If you can only pick one and you're worried about keeping your mind sharp? Boggle's time pressure probably gives you more cognitive bang per minute. Scrabble gives you more strategic depth per session. Neither is wrong.`,
-      },
-      {
-        title: 'The Skill Ceiling',
-        content: `Scrabble has one of the highest skill ceilings of any board game, period. Top Scrabble players memorize the entire Official Scrabble Players Dictionary. All 180,000+ words. They study tile distribution probabilities. They know the optimal opening moves, the rack-balancing strategies, the endgame techniques. The gap between someone who plays on weekends and someone who memorized the entire dictionary is basically a different sport.
-
-Boggle's skill ceiling is real but different. You can definitely get better at pattern recognition. Experienced players develop systematic scanning techniques, working through the grid methodically instead of randomly. But the element of randomness in each shake means that even a weaker player can occasionally beat an expert if the grid falls right.
-
-This is actually why I think Boggle is better for casual play. The skill gap is narrower, which means more people can have fun. Scrabble against someone who's way better than you? Brutal. You're losing by 200 points and there's nothing you can do about it. Boggle against someone better? You might still find a word they missed. That possibility keeps everyone engaged.
-
-For competitive play, Scrabble's depth is unmatched. There's a reason it has a World Championship and Boggle doesn't. But for 90% of people who just want to enjoy a word game with friends? The accessibility matters.`,
-      },
-      {
-        title: 'Cost and Accessibility',
+        title: 'Cost and accessibility',
         content: `Physical Scrabble: $20-30 for a standard set, and it'll last decades. You need exactly one other person who's willing to sit still for an hour. The barrier to entry is medium: you need to know enough words to form them on a board, and you need patience.
 
 Physical Boggle: $10-15, arguably the best bang-for-your-buck board game ever made. Works with any number of players (I've played with eight, it was chaos, I loved it). The barrier to entry is low: if you can spell three-letter words, you can play.
 
 Digital Scrabble: Free to download, expensive to enjoy without ads and power-up nagging. The freemium model actively degrades the experience.
 
-Digital Boggle: Harder to find a good free version, but when you do, it tends to be a cleaner experience because the game is simpler to implement and harder to monetize with power-ups (what are you going to sell, extra time? Actually, some of them do sell extra time. Gross.)
+Digital Boggle: Harder to find a good free version, but when you do, it tends to be a cleaner experience because the game is simpler to implement and harder to monetize with power-ups (though some of them do sell extra time, which is gross).
 
 Winner on pure accessibility: Boggle. Lower cost, lower skill barrier, more players, less time commitment. It's the word game that anyone can enjoy within 30 seconds of learning the rules.`,
       },
       {
-        title: 'So Which One Should You Play?',
+        title: 'Which one should you actually play?',
         content: `I'm not going to cop out and say "both." I mean, you should play both. But if you held my feet to the fire:
 
 Play Scrabble if you want depth. If you want a game you can study and improve at for years. If you enjoy the chess-like satisfaction of a perfectly placed seven-letter word across a triple-word score. If you have one reliable opponent who won't rage-quit when you play QUIXOTIC for 374 points.
 
 Play Boggle if you want intensity. If you want a game that gets your heart rate up and your brain firing on all cylinders. If you're playing with a group. If you have 10 minutes, not an hour. If you want everyone at the table engaged simultaneously instead of watching one person think.
 
-Play LexiClash if you want both experiences in a modern package. Daily challenges for the Wordle crowd. Real-time multiplayer for the Boggle addicts. Multiple modes for the people who can't pick just one thing. No pay-to-win power-ups because some of us still have principles.
-
 The real answer is that Boggle and Scrabble aren't competitors. They're complementary. One is a sprint, the other is a marathon. Both will make you better with words. Both will start arguments at family gatherings. Both are worth your time.`,
-      },
-      {
-        title: 'FAQ: The Questions People Actually Ask',
-        content: `Is Boggle harder than Scrabble?
-Different kind of hard. Scrabble is harder to master. Boggle is harder to perform under pressure. Most people find Boggle easier to pick up but Scrabble more rewarding long-term.
-
-Can playing Boggle or Scrabble actually make you smarter?
-"Smarter" is doing a lot of heavy lifting in that question. They improve verbal fluency, working memory, and processing speed. Whether that makes you "smarter" depends on your definition. They definitely make you better at word games, which is a kind of smart.
-
-Why is Scrabble more popular than Boggle?
-Longer games mean more engagement per session. The competitive scene is more established. And frankly, Scrabble had better marketing and distribution for decades. Boggle is more fun at parties but less famous. Life isn't fair.
-
-What's the best free online Boggle game?
-I'm biased, but LexiClash offers a free Boggle-style experience with real-time multiplayer. For pure Scrabble-style, the official app works but the monetization is rough.
-
-Are there word games that combine Boggle and Scrabble?
-Some modern word games try to blend the real-time element of Boggle with the strategic placement of Scrabble. LexiClash's various modes do this. Bananagrams in the physical world is another option, sort of speed-Scrabble.
-
-Is Scrabble good for learning English?
-Incredibly good. The strategic element means you're not just recognizing words but thinking about letter patterns, prefixes, suffixes, and word construction. Boggle helps with recognition speed. Use both for language learning.
-
-Boggle vs Scrabble: which is the better word game in 2026?
-For a 5-minute play with friends or family, Boggle wins — fast, chaotic, no setup, everyone scores in parallel. For a long evening of strategy and word-craft, Scrabble wins — placement, defense, and big-letter math reward thinking. In 2026, the real choice isn't either-or: free browser games like LexiClash blend both — the real-time letter grid of Boggle with the scoring depth of Scrabble — so you don't have to pick. If you only have one to choose: Boggle for parties, Scrabble for solo focus.`,
       },
     ],
     backToBlog: 'Back to Blog',
     playDaily: 'Try the Daily Challenge',
     startPracticing: 'Play Now',
   },
-
   he: {
     title: 'בוגל מול סקראבל: ההשוואה הכנה שאף אחד לא ביקש',
     subtitle: 'שני ענקי משחקי המילים. אחד כאוטי, אחד אסטרטגי. מי מנצח בערב משחקים?',

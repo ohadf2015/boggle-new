@@ -13,7 +13,7 @@ interface PageProps {
 
 const SLUG = 'boggle-vs-wordle';
 const DATE_PUBLISHED = '2026-03-28';
-const DATE_MODIFIED = '2026-03-28';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'Boggle vs Wordle in 2026: I Played Both Daily — Here\'s My Verdict',

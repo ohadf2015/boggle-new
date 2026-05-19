@@ -17,7 +17,7 @@ interface PageProps {
 
 const SLUG = 'boggle-vs-scrabble';
 const DATE_PUBLISHED = '2026-03-28';
-const DATE_MODIFIED = '2026-05-13';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'Boggle vs Scrabble: Honest Verdict After Years of Both (2026)',

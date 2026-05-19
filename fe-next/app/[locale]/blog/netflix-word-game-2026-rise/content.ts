@@ -32,103 +32,87 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle:
       "Streaming giants, daily-puzzle obsession, brain-training boom, and a TikTok-shaped social loop. Why every screen you own suddenly wants you spelling things.",
     category: 'Trends',
-    readTime: '9 min read',
+    readTime: '6 min read',
     authorName: 'Ohad Fisher',
     authorBio:
       "I make word games for a living and ruin my sleep schedule playing other people's word games for free. Bias acknowledged.",
     sections: [
       {
-        content: `So Netflix added a word game.
+        content: `Netflix added a word game. At first glance, that sounds boring: streaming service adds puzzle, cool, fine.
 
-I know — at first glance that sounds like the most boring sentence ever written. Streaming service adds tiny puzzle. Cool, fine, who cares.
+But I care. I make word games. I have stared at letter grids the way a sommelier stares at wine, and I can tell you: Netflix — the company that paid Adam Sandler nine figures for movies you forgot existed — moving into the daily-word-game business is not small. It's a signal. Something shifted in the entertainment economy.
 
-But I care. I make word games. I have spent the last few years staring at letter grids the way a sommelier stares at wine, and I can tell you: the fact that Netflix — Netflix, the people who paid Adam Sandler nine-figure sums to make movies you forgot existed — is now in the daily-word-game business is not a small thing. It's a tell. It's a signal that something has fundamentally shifted in the entertainment economy.
-
-2026 is the year word games stopped being a niche hobby for crossword grandmas and became actual prime-time content. And almost nobody is talking about why.
-
-Let's fix that.`,
-        image: { src: HERO, alt: 'Neo-brutalist illustration of word games taking over a TV screen' },
+2026 is the year word games stopped being niche hobby for crossword grandmas and became actual prime-time content. Almost nobody is talking about why.`,
+        image: { src: '/images/blog/netflix-word-games.jpg', alt: 'Neo-brutalist illustration of word games taking over a TV screen' },
       },
       {
         title: 'The Wordle bomb — and the four-year aftershock',
-        content: `To understand why Netflix is launching word games in 2026, you have to rewind to early 2022.
+        content: `To understand why Netflix is launching word games in 2026, rewind to early 2022.
 
-Josh Wardle, a Brooklyn engineer, built a tiny word puzzle for his girlfriend. He named it after himself: Wordle. He didn't add ads. He didn't add accounts. He didn't even add a leaderboard. The game just sat there at a sleepy URL, asking you to guess a five-letter word once a day.
+Josh Wardle, a Brooklyn engineer, built a tiny word puzzle for his girlfriend and named it after himself: Wordle. No ads. No accounts. No leaderboard. Just guess a five-letter word once a day.
 
-Within four months it had millions of daily players. The New York Times bought it for a "low seven figures" — a number that has aged about as well as Blockbuster's stock options. Wordle became one of NYT Games' most reliable subscription drivers. Connections, Strands, Spelling Bee — the entire NYT Games product line ballooned out of that one trapdoor moment.
+Within four months, millions of daily players. The New York Times bought it for "low seven figures" — a number that has aged about as well as Blockbuster's stock options. Wordle became NYT Games' most reliable subscription driver. Connections, Strands, Spelling Bee grew from that single trapdoor.
 
-That was 2022. The ripple has not stopped.
-
-Every product manager at every entertainment company watched what Wordle did to retention metrics and quietly went, "wait — we want THAT." Daily active users. Habit loops. Word-of-mouth virality. Zero marketing spend. A streak you'd lose your mind to maintain.
-
-So they all started building. Slowly at first. Then, by 2025, in a hurry. By 2026, it's a full-on stampede.`,
+Every product manager at every entertainment company watched and quietly thought: "we want THAT." Daily active users. Habit loops. Free virality. A streak you'd lose your mind to maintain. They all started building. By 2025, in a hurry. By 2026, it's a stampede.`,
       },
       {
         title: 'Why Netflix specifically — and why now',
-        content: `Netflix is not a games company. They are a "we will spend $17 billion on content this year" company. So why are they pouring engineering hours into a daily word puzzle?
+        content: `Netflix is not a games company. They spend $17 billion on content yearly. So why invest in a daily word puzzle?
 
-Because the math on prestige TV broke.
+Because prestige TV's math broke. A flagship drama season costs hundreds of millions; subscribers churn the day it ends. A daily word game costs roughly one mid-tier engineer's annual salary to maintain — and gives users a reason to open the app every single day.
 
-Producing one season of a flagship drama costs hundreds of millions. Subscribers churn the day the season ends. Meanwhile, a daily word game costs roughly the price of a mid-tier engineer's annual salary to maintain — and it gives users a reason to open the app every. single. day.
+That's it: a word game is the cheapest retention tool in all of content. A 200kb engagement machine.
 
-That's the math: a word game is the cheapest possible retention tool in the entire content world. It's a 200kb engagement ATM.
+Netflix's games division tested this quietly for years — brand tie-ins first, then mobile originals. The word game move is where the strategy surfaces. They noticed the average viewer doesn't have 90 minutes for a movie, but absolutely has four minutes for a puzzle while waiting for the kettle to boil.
 
-Netflix's games division has been quietly testing this for years — first with brand tie-ins (Squid Game challenges, Stranger Things minis), then with original mobile titles. The word game move is the strategy crystallizing in public. They've finally noticed that the average viewer doesn't always have 90 minutes for a movie, but absolutely has four minutes for a puzzle while waiting for the kettle.
-
-Disney+ is rumored to be exploring something similar. Apple News+ already has a daily puzzle subscription. Spotify has been running word-game ads relentlessly. The pattern is clear: every platform that wants daily opens is building a word puzzle around it.`,
-        image: { src: IMG_MULTIPLAYER, alt: 'Friends playing a word game together on phones' },
+Disney+, Apple News+, Spotify — all moving the same direction. Every platform wanting daily opens is building a word puzzle around it.`,
+        image: { src: '/images/blog/multiplayer-social.jpg', alt: 'Friends playing a word game together on phones' },
       },
       {
-        title: 'The brain-training boom (and why it actually has receipts this time)',
-        content: `Word games used to live in the same drawer as Lumosity ads — vaguely "good for your brain," scientifically dubious. That changed.
+        title: 'The brain-training boom with actual receipts',
+        content: `Word games used to live in the same drawer as Lumosity ads — vaguely "good for your brain," scientifically dubious.
 
-A 2019 study (Brooker et al., *International Journal of Geriatric Psychiatry*) followed over 19,000 adults aged 50+ playing word puzzles. The brain function of frequent puzzlers tested as if they were eight to ten years younger than non-puzzlers on certain reasoning measures. Eight to ten years. That's not a marketing claim — that's a peer-reviewed dataset.
+That changed. A 2019 study tracked over 19,000 adults aged 50+ who regularly solved word puzzles. People who puzzled frequently scored cognitively as if they were eight to ten years younger on reasoning measures. Eight to ten years. That's peer-reviewed data, not marketing.
 
-In 2024 and 2025, more meta-analyses piled on. Word puzzles correlate with delayed cognitive decline, better verbal fluency in bilinguals, improved attention control. The "wholesome screen time" framing went from wishful to defensible.
+Parents let their kids play word games. Spouses don't nag about them. Therapists recommend them. It's the rare digital habit that produces zero guilt — and guilt is the silent killer of every other app on your phone.
 
-This matters commercially because parents will let their kids play word games. Spouses will not nag about word games. Therapists will recommend word games. It's the rare digital habit that produces zero guilt — and guilt is the silent killer of every other app on your phone.
-
-Netflix knows this. Every platform knows this. "Brain-good" beats "brain-rot" in every focus group ever run.`,
-        image: { src: IMG_BRAIN, alt: 'Word games and brain training illustration' },
+Netflix knows this. Every platform knows it. "Brain-good" beats "brain-rot" in every focus group ever run.`,
+        image: { src: '/images/blog/brain-training-words.jpg', alt: 'Word games and brain training illustration' },
       },
       {
-        title: "TikTok turned puzzles into a spectator sport",
-        content: `Here's the part nobody saw coming.
+        title: 'TikTok turned puzzles into a spectator sport',
+        content: `Solving a puzzle used to be private. The subway. The bathroom. Not broadcast.
 
-Solving a word puzzle used to be private. You did it on the subway. You did it in the bathroom. You did NOT broadcast the experience.
+Then TikTok, Reels, and Shorts noticed that watching someone solve a puzzle in real-time with commentary is somehow incredibly watchable. The hashtag #wordgametok has billions of views. People film themselves solving Connections at 6am, post their Wordle streaks, livestream Strands with their grandma.
 
-Then TikTok, Reels, and Shorts noticed that "watching someone solve a puzzle in real-time with reaction commentary" is somehow incredibly watchable. The hashtag #wordgametok now has billions of views. People film themselves solving Connections at 6am. They post their Wordle streaks. They livestream Strands theme guesses with their grandma.
+Wordle's "I got it in 3" share button was, in retrospect, one of the decade's quietly genius product decisions — it turned every solve into free marketing.
 
-Word games became performative. Communal. Something to share, screenshot, argue about with strangers. The "I got it in 3" share button on Wordle was, in retrospect, one of the most quietly genius product decisions of the decade — it turned every solve into free marketing.
+Multiplayer word games slot perfectly here. You can clip the moment you steal a 9-letter word from your friend at the buzzer. You can rage-react when the algorithm gives better letters to the opponent. The game becomes content; the content drives more game.
 
-Multiplayer word games — like our own real-time matches at LexiClash, or Words With Friends async — slot perfectly into this culture. You can clip the moment you steal a 9-letter word from your friend at the buzzer. You can rage-react when the algorithm gives the other player better letters. The game becomes content, the content drives more game.
-
-This is the actual flywheel. Wordle started it; the algorithm-driven social platforms are running it on industrial scale.`,
+Wordle started it. The algorithm-driven social platforms are running it at industrial scale.`,
       },
       {
         title: 'The five-language reality',
-        content: `Here's a less-obvious 2026 trend: word games are finally going multilingual seriously.
+        content: `Word games are finally going multilingual seriously.
 
-For years, word games were anglocentric. Wordle in English, mostly. Crosswords in English, mostly. Spelling Bee literally only in English. If you spoke Hebrew or Japanese you were either out of luck or stuck with awkward translations.
+For years they were anglocentric. Wordle mostly English. Spelling Bee only English. Hebrew and Japanese speakers were either out of luck or stuck with awkward translations.
 
-That's changing fast. Hebrew word games — *Tzeruf*, *Milat HaYom* (מילת היום), our own LexiClash daily — are pulling real numbers in Israel. Japanese word games using kana grids are exploding. Spanish, Swedish, French — every major locale is getting first-class daily-word infrastructure.
+That's changing fast. Hebrew word games pull real numbers in Israel. Japanese word games using kana grids are exploding. Spanish, Swedish, French — every major locale is getting first-class daily infrastructure.
 
-This isn't charity localization; it's where the growth is. English-language puzzle markets are saturated. The next 100 million daily puzzle players are going to be Hebrew, Spanish, Hindi, Portuguese, Japanese, Indonesian. Whoever ships the best non-English daily word game in 2026 owns a category nobody's locked down yet.
-
-(Slight bias here: we ship in five languages including Hebrew RTL, which is the design equivalent of doing a handstand. But hand on heart, this trend is bigger than us.)`,
-        image: { src: IMG_VOCAB, alt: 'Vocabulary growing across languages illustration' },
+This isn't charity; it's where the growth is. English markets are saturated. The next 100 million daily-puzzle players are going to speak Hebrew, Spanish, Hindi, Portuguese, Japanese, Indonesian. Whoever ships the best non-English daily word game in 2026 owns a category nobody's locked down yet.`,
+        image: { src: '/images/blog/vocabulary-building.jpg', alt: 'Vocabulary growing across languages illustration' },
       },
       {
-        title: 'So what does Netflix entering the chat actually mean for you',
-        content: `If you're a player: more good word games to choose from than ever, and most of the best ones are free. The bar for production quality just rose. Daily puzzles are the new must-have feature; expect every entertainment app you use to add one in the next 18 months.
+        title: 'What this means for you',
+        content: `If you're a player: more good word games than ever, most free. The quality bar just rose.
 
-If you're a developer or designer: the gold rush is on, but the moat is no longer "make a clever puzzle." Wordle taught everyone how. The moat is community, multilingual coverage, real-time multiplayer, and — yes, awkwardly — being the first puzzle app users open every morning.
+If you're a developer: the gold rush is on, but the moat isn't "clever puzzle" anymore. Wordle taught everyone. The moat is now community, multilingual reach, real-time multiplayer, and being the first puzzle app users open every morning.
 
-If you're a parent or teacher: this is the rare tech trend you can lean into without flinching. Word games hit cognitive development, vocabulary, language exposure, attention training. They're one of the few "screens" with actual upside.
+If you're a parent or teacher: this is the rare tech trend you can lean into. Word games hit vocabulary, language exposure, attention training. They're one of the few screens with actual upside.
 
-And if you're me: I get to make word games for a living during the era word games eat the world. So that's pretty good.
+And if you're me: I make word games during the era word games eat the world. Pretty good.
 
-The Netflix word game launch is the headline. The actual story is that an entire entertainment ecosystem just admitted that a 4x4 grid of letters is a better daily-engagement product than most prestige TV. Wild times. Beautiful times. Time to go play.`,
+The Netflix headline is clear. The real story: an entire entertainment ecosystem just admitted that a 4x4 grid of letters is a better daily-engagement product than most prestige TV. Beautiful times. Time to go play.`,
       },
     ],
     backToBlog: 'Back to Blog',
@@ -136,7 +120,6 @@ The Netflix word game launch is the headline. The actual story is that an entire
     practice: "Practice Solo",
     playMultiplayer: "Play Multiplayer",
   },
-
   he: {
     title: 'נטפליקס שחררה משחק מילים — וזה לא צירוף מקרים. 2026 היא השנה שמשחקי מילים השתלטו על הכל.',
     subtitle:
