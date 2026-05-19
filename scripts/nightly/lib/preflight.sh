@@ -100,6 +100,12 @@ preflight_check() {
     return 1
   fi
 
+  # --- gtimeout availability (hard requirement for lane execution) ----
+  if ! command -v gtimeout >/dev/null 2>&1 && ! command -v timeout >/dev/null 2>&1; then
+    echo "preflight: ABORT — gtimeout/timeout missing. Install: brew install coreutils"
+    return 1
+  fi
+
   # --- credentials for lane 5 (warn, do not abort) --------------------
   [ -f "$HOME/.config/gcloud/application_default_credentials.json" ] \
     || echo "preflight: WARN — gcloud ADC missing; lane 5 (SEO) will skip"

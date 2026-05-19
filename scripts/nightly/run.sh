@@ -376,17 +376,18 @@ STYLE RULES (critical for readability):
 Output ONLY the message body. No preamble, no markdown fence around it.
 PROMPT_EOF
 
-# Same macOS-timeout fallback as headless.sh — bare \`timeout\` is absent on
-# stock macOS. Without this fallback, summary composer aborts with
-# "command not found" and the founder gets the tactical headline.
-if command -v timeout >/dev/null 2>&1; then
-  _to=(timeout 240s)
-elif command -v gtimeout >/dev/null 2>&1; then
-  _to=(gtimeout 240s)
+# Real GNU timeout (via coreutils, installed by setup). Earlier perl-alarm
+# fallback was broken — see headless.sh comment. If neither binary exists,
+# hard-fail with a clear "install coreutils" message.
+if command -v gtimeout >/dev/null 2>&1; then
+  _to=(gtimeout --kill-after=10s 240s)
+elif command -v timeout >/dev/null 2>&1; then
+  _to=(timeout --kill-after=10s 240s)
 else
-  _to=(/usr/bin/perl -e 'alarm shift; exec @ARGV or die "exec: $!"' -- 240)
+  log "FATAL — neither timeout nor gtimeout. Install: brew install coreutils"
+  _to=()
 fi
-if "${_to[@]}" claude -p "$(cat "$SUMMARY_PROMPT")" \
+if [ ${#_to[@]} -gt 0 ] && "${_to[@]}" claude -p "$(cat "$SUMMARY_PROMPT")" \
   --allowedTools '*' \
   --dangerously-skip-permissions \
   --model sonnet \

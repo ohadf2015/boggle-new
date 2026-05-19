@@ -15,6 +15,18 @@ mkdir -p "$(dirname "$ENV_FILE")"
 # StandardOutPath; missing dir = silent skip with error 72).
 mkdir -p "$HOME/logs/lexi-nightly"
 
+# Ensure GNU coreutils (gtimeout). The headless `claude -p` invocation NEEDS
+# a real timeout that survives `exec` — perl alarm doesn't (proven empirically).
+if ! command -v gtimeout >/dev/null 2>&1 && ! command -v timeout >/dev/null 2>&1; then
+  if command -v brew >/dev/null 2>&1; then
+    echo "▸ Installing coreutils (provides gtimeout) — required for lane timeouts..."
+    brew install coreutils
+  else
+    echo "⚠ gtimeout NOT installed and brew not available. Lane timeouts will fail."
+    echo "  Install manually: https://www.gnu.org/software/coreutils/"
+  fi
+fi
+
 # --- helpers ---------------------------------------------------------------
 existing() {
   # Echo existing value if env file already exists
