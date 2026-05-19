@@ -38,6 +38,8 @@ import { HostLeftGraceModal } from '@/components/multiplayer/HostLeftGraceModal'
 import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
 import type { Language, ActiveRoom, Avatar, GameMode } from '@/shared/types/game';
 import type { Socket } from 'socket.io-client';
+import { classifyRoomError } from '@/utils/multiplayer/roomErrorClassifier';
+import { MP_TOAST_IDS } from '@/utils/multiplayer/mpToastIds';
 
 // Dynamic imports for code splitting
 const HostView = nextDynamic(() => import('@/host/HostView'), {
@@ -231,13 +233,20 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     },
     onError: (data) => {
       setIsJoining(false);
-      if (data.message?.includes('not found') || data.message?.includes('Game not found') || data.message?.includes('closed')) {
-        // Audit MED #8 (2026-05-10): only show "your room timed out" nudge
-        // when the user was ACTIVELY in this room — not on cold invite-link
-        // follows where the silent redirect to lobby is the right UX.
-        // `isActive` discriminates: true = was playing this room, false = stale link.
+      // Classify by structured error CODE first (message substrings as legacy
+      // fallback). The old message-only matcher leaked raw English for the
+      // GAME_CLOSED paths whose custom message lacked "closed"/"not found".
+      const kind = classifyRoomError(data);
+      if (kind === 'gone') {
+        // Stale lobby tap or room torn down mid-join. Drop the dead room from
+        // the local list synchronously so a re-tap can't re-fire the same dead
+        // join before the server round-trip refreshes the list.
+        if (gameCode) setActiveRooms((rooms) => rooms.filter((r) => r.gameCode !== gameCode));
+        // Only show "your room timed out" nudge when the user was ACTIVELY in
+        // this room — not on cold invite-link follows where the silent redirect
+        // to lobby is the right UX. `isActive` discriminates: true = was playing.
         if (isActive) {
-          toast(t('multiplayerFlow.roomTimedOut'), { duration: 4000, icon: '⏱️' });
+          toast(t('multiplayerFlow.roomTimedOut'), { duration: 4000, icon: '⏱️', id: MP_TOAST_IDS.roomGone });
         }
         setError('');
         setGameCode(''); setPrefilledRoomCode(''); setIsActive(false); setIsHost(false); setIsPrivate(false);
@@ -248,18 +257,18 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           url.searchParams.delete('room');
           window.history.replaceState({}, '', url.pathname + (url.search || ''));
         }
-      } else if (data.message?.includes('already in use') || data.message?.includes('Game code already')) {
+      } else if (kind === 'codeExists') {
         setError(t('errors.gameCodeExists'));
-        toast.error(t('errors.gameCodeExists'), { duration: 4000, icon: '❌' });
+        toast.error(t('errors.gameCodeExists'), { duration: 4000, icon: '❌', id: MP_TOAST_IDS.codeExists });
         setIsActive(false); setIsHost(false); setAttemptingReconnect(false);
-      } else if (data.message?.includes('username') || data.message?.includes('Username')) {
+      } else if (kind === 'usernameTaken') {
         setError(t('errors.usernameTaken'));
-        toast.error(t('errors.usernameTaken'), { duration: 4000, icon: '❌' });
+        toast.error(t('errors.usernameTaken'), { duration: 4000, icon: '❌', id: MP_TOAST_IDS.usernameTaken });
         setIsActive(false); setAttemptingReconnect(false); setShouldAutoJoin(false); clearSession();
       } else {
-        const errorMsg = data.message || 'An error occurred';
+        const errorMsg = data.message || t('errors.generic');
         setError(errorMsg);
-        toast.error(errorMsg, { duration: 4000, icon: '❌' });
+        toast.error(errorMsg, { duration: 4000, icon: '❌', id: MP_TOAST_IDS.joinError });
       }
     },
     onGameStart: (data) => {
@@ -295,7 +304,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     onWarning: () => {},
     onRateLimited: () => {
       setIsJoining(false);
-      toast.error(t('multiplayerFlow.rateLimited'), { duration: 3000, icon: '⏳' });
+      toast.error(t('multiplayerFlow.rateLimited'), { duration: 3000, icon: '⏳', id: MP_TOAST_IDS.rateLimited });
     },
     onHostTransferred: (data) => { if (data.newHost === username) setIsHost(true); },
     t,

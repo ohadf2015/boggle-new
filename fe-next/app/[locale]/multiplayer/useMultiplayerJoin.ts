@@ -5,10 +5,11 @@
  * Extracted from PageClient.tsx for maintainability.
  */
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import type { Socket } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import logger from '@/utils/logger';
+import { MP_TOAST_IDS } from '@/utils/multiplayer/mpToastIds';
 import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
 import { setStoredUsername, getStoredAvatarId, getStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
@@ -117,6 +118,12 @@ export function useMultiplayerJoin({
   setError,
   setIsJoining,
 }: UseMultiplayerJoinOptions): HandleJoinFn {
+  // Synchronous double-submit guard. React's `isJoining` state (used to disable
+  // the button) updates asynchronously, so two rapid invocations — Enter key +
+  // button click, or auto-join racing a manual tap — can both pass the disabled
+  // check and double-emit. A ref flips synchronously, closing that window.
+  const inFlightRef = useRef(false);
+
   return useCallback(
     async (
       isHostMode: boolean,
@@ -130,6 +137,13 @@ export function useMultiplayerJoin({
         console.log(`[JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socket?.connected}`);
       }
 
+      if (inFlightRef.current) {
+        logger.debug('[JOIN] Ignoring duplicate join — a join is already in flight');
+        return;
+      }
+      inFlightRef.current = true;
+      const releaseInFlight = (): void => { inFlightRef.current = false; };
+
       // Wait for socket connection
       if (socket && !socket.connected) {
         logger.log('[JOIN] Socket exists but not connected, waiting...');
@@ -140,15 +154,17 @@ export function useMultiplayerJoin({
           if (socket.connected) { clearTimeout(timeout); socket.off('connect', onConnect); resolve(true); }
         });
         if (!connected) {
+          releaseInFlight();
           setError(t('errors.notConnected'));
-          toast.error(t('common.notConnected'), { duration: 3000, icon: '⚠️' });
+          toast.error(t('common.notConnected'), { duration: 3000, icon: '⚠️', id: MP_TOAST_IDS.notConnected });
           return;
         }
       }
 
       if (!socket?.connected) {
+        releaseInFlight();
         setError(t('errors.notConnected'));
-        toast.error(t('common.notConnected'), { duration: 3000, icon: '⚠️' });
+        toast.error(t('common.notConnected'), { duration: 3000, icon: '⚠️', id: MP_TOAST_IDS.notConnected });
         return;
       }
 
@@ -157,7 +173,8 @@ export function useMultiplayerJoin({
       const authLoadingTooLong = authLoadingStartTime && Date.now() - authLoadingStartTime > AUTH_LOADING_TIMEOUT;
 
       if (loading && !authLoadingTooLong) {
-        toast.error(t('common.loadingProfile'), { duration: 2000, icon: '⏳' });
+        releaseInFlight();
+        toast.error(t('common.loadingProfile'), { duration: 2000, icon: '⏳', id: MP_TOAST_IDS.loadingProfile });
         return;
       }
 
@@ -193,16 +210,28 @@ export function useMultiplayerJoin({
       setIsJoining(true);
 
       const safetyTimeout = setTimeout(() => {
+        releaseInFlight();
         setIsJoining(false);
         logger.debug('[JOIN] Safety timeout triggered');
-        toast.error(t('errors.connectionTimeout'), { duration: 4000, icon: '⚠️' });
+        toast.error(t('errors.connectionTimeout'), { duration: 4000, icon: '⚠️', id: MP_TOAST_IDS.connectionTimeout });
       }, 10000);
 
-      const clearSafetyTimeout = (): void => clearTimeout(safetyTimeout);
-      socket.once('joined', clearSafetyTimeout);
-      socket.once('error', clearSafetyTimeout);
-      socket.once('joinedAsSpectator', clearSafetyTimeout);
-      socket.once('rateLimited', clearSafetyTimeout);
+      // Resolve the in-flight join on any terminal server response. Use
+      // .on + explicit .off of ALL four events so no stale listener leaks
+      // across attempts — .once only auto-removes the one that fired, leaving
+      // the other three registered forever (slow accumulation on retries).
+      const resolveJoin = (): void => {
+        clearTimeout(safetyTimeout);
+        releaseInFlight();
+        socket.off('joined', resolveJoin);
+        socket.off('error', resolveJoin);
+        socket.off('joinedAsSpectator', resolveJoin);
+        socket.off('rateLimited', resolveJoin);
+      };
+      socket.on('joined', resolveJoin);
+      socket.on('error', resolveJoin);
+      socket.on('joinedAsSpectator', resolveJoin);
+      socket.on('rateLimited', resolveJoin);
 
       const codeToUse = overrideGameCode || gameCode;
 

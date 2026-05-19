@@ -234,7 +234,10 @@ describe('connectionHandler', () => {
       expect(mockRemoveUserFromGame).not.toHaveBeenCalled();
     });
 
-    it('closes room immediately if room becomes empty on player disconnect', () => {
+    it('does NOT close room immediately when the last player disconnects (reconnection-friendly)', () => {
+      // Regression: a transient mobile disconnect of the last player used to
+      // delete the room instantly, so the reconnecting socket hit
+      // GAME_NOT_FOUND ("room closed/inactive"). Mirror the host grace path.
       const game = makeGame({ users: { Player1: { socketId: 'socket-p1', isHost: false, disconnected: false, isBot: false } } });
       const { socket, handlers } = createMockSocket('socket-p1');
       registerConnectionHandlers(mockIo, socket);
@@ -246,9 +249,53 @@ describe('connectionHandler', () => {
 
       handlers['disconnect']('transport close');
 
-      expect(mockClearGameTimer).toHaveBeenCalledWith('GAME1');
-      expect(mockCleanupGameBots).toHaveBeenCalledWith('GAME1');
+      // Not deleted on the spot; a grace timer is armed instead.
+      expect(mockDeleteGame).not.toHaveBeenCalled();
+      expect(mockTimerManager.setTimeout).toHaveBeenCalledWith(
+        'reconnect:GAME1:Player1',
+        expect.any(Function),
+        expect.any(Number)
+      );
+    });
+
+    it('deletes the empty room only after the player grace expires without reconnect', () => {
+      const game = makeGame({ users: { Player1: { socketId: 'socket-p1', isHost: false, disconnected: false, isBot: false } } });
+      const { socket, handlers } = createMockSocket('socket-p1');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Player1');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(true);
+
+      handlers['disconnect']('transport close');
+      expect(mockDeleteGame).not.toHaveBeenCalled();
+
+      // Player never came back — grace timer fires, room is reaped.
+      vi.advanceTimersByTime(120000);
+
+      expect(mockRemoveUserFromGame).toHaveBeenCalledWith('GAME1', 'Player1');
       expect(mockDeleteGame).toHaveBeenCalledWith('GAME1');
+    });
+
+    it('preserves the empty room when the last player reconnects within grace', () => {
+      const game = makeGame({ users: { Player1: { socketId: 'socket-p1', isHost: false, disconnected: false, isBot: false } } });
+      const { socket, handlers } = createMockSocket('socket-p1');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Player1');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(true);
+
+      handlers['disconnect']('transport close');
+
+      // Reconnect before grace expiry clears the disconnected flag.
+      game.users.Player1.disconnected = false;
+      vi.advanceTimersByTime(120000);
+
+      expect(mockDeleteGame).not.toHaveBeenCalled();
+      expect(mockRemoveUserFromGame).not.toHaveBeenCalled();
     });
 
     it('registers reconnection timeout via timerManager', () => {

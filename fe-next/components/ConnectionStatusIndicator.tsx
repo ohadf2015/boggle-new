@@ -83,25 +83,6 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
   const { isConnected, isReconnecting, connectionError } = useSocket();
   const { t } = useLanguage();
   const statusConfig = useStatusConfig(t);
-  // 3-second success window after rising edge into 'connected' (UX audit 2026-05-04 #7).
-  // Confirms recovery to user, then dot hides so it doesn't clutter the HUD.
-  const [showSuccess, setShowSuccess] = useState(false);
-  const prevConnectedRef = useRef(false);
-
-  useEffect(() => {
-    const prev = prevConnectedRef.current;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    if (isConnected && !prev) {
-      setShowSuccess(true);
-      timer = setTimeout(() => setShowSuccess(false), 3000);
-    } else if (!isConnected && prev) {
-      setShowSuccess(false);
-    }
-    prevConnectedRef.current = isConnected;
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [isConnected]);
 
   const getStatus = (): ConnectionStatus => {
     if (isConnected) return 'connected';
@@ -112,13 +93,15 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
 
   const status = getStatus();
 
-  // 'connected' renders only during the success window; otherwise hide for clean HUD.
-  if (status === 'connected' && !showSuccess) {
+  // Problem-only indicator. Surfacing the healthy ('connected') and initial
+  // ('connecting') states is redundant noise in the lobby — the user can see
+  // the rooms loaded. Only genuine trouble (reconnecting / disconnected) shows.
+  if (status === 'connected' || status === 'connecting') {
     return null;
   }
 
   const config = statusConfig[status];
-  const showExpandedState = status === 'connecting' || status === 'reconnecting';
+  const showExpandedState = status === 'reconnecting';
 
   return (
     <AnimatePresence>
@@ -131,8 +114,6 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
           'flex items-center gap-2',
           'px-3 py-1.5 rounded-full',
           'border-2 border-neo-black shadow-hard-sm',
-          status === 'connected' && 'bg-neo-lime',
-          status === 'connecting' && 'bg-neo-cream',
           status === 'reconnecting' && 'bg-neo-cream',
           status === 'disconnected' && 'bg-neo-red',
           className
@@ -158,7 +139,7 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
         )}>
           {showExpandedState ? (
             <>
-              {status === 'reconnecting' ? t('common.reconnecting') : t('common.connecting')}
+              {t('common.reconnecting')}
               <m.span
                 animate={{ opacity: [1, 0, 1] }}
                 transition={{ duration: 1.5, repeat: Infinity }}

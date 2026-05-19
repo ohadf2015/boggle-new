@@ -322,21 +322,26 @@ function handlePlayerDisconnect(io: Server, _socket: Socket, game: Game, gameCod
     game.users[username].disconnected = true;
     game.users[username].disconnectedAt = Date.now();
 
-    // Check if room is now empty (all players disconnected)
+    // NOTE: previously we deleted the room immediately when this was the last
+    // active player (`isRoomEmpty(gameCode)`). That defeated the reconnection
+    // grace — a transient mobile disconnect destroyed the room, so the
+    // reconnecting socket hit GAME_NOT_FOUND ("room closed/inactive"). The host
+    // path already grace-closes (see handleHostDisconnect); mirror it here.
+    // Always arm the grace timer below; its expiry removes the player and
+    // deletes the room only if it is STILL empty. Explicit `leaveRoom` (the
+    // user pressed Exit) keeps its immediate teardown in playerJoinHandler —
+    // that's an intentional exit, not a transient drop.
     if (isRoomEmpty(gameCode)) {
-      logger.info('SOCKET', `Room ${gameCode} is empty after ${username} disconnected - closing immediately`);
-      clearGameTimer(gameCode);
-      cleanupGameBots(gameCode);
-      deleteGame(gameCode);
+      // Drop it from the lobby's joinable list right away (getActiveRooms
+      // excludes empty rooms) so nobody taps a room with nobody in it.
       broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
-      return;
+    } else {
+      // Room still has active players - notify them someone dropped.
+      broadcastToRoom(io, getGameRoom(gameCode), 'playerDisconnected', {
+        username,
+        message: `${username} disconnected. Waiting for reconnection...`
+      });
     }
-
-    // Room still has active players - notify and start reconnection grace period
-    broadcastToRoom(io, getGameRoom(gameCode), 'playerDisconnected', {
-      username,
-      message: `${username} disconnected. Waiting for reconnection...`
-    });
 
     // Start player reconnection grace period
     timerManager.setTimeout(`reconnect:${gameCode}:${username}`, () => {
