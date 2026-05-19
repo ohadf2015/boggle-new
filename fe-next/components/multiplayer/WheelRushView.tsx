@@ -17,6 +17,9 @@ import Avatar from '@/components/Avatar';
 import { MyWordsChips, type WordEntry } from './WheelRushPieces';
 import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
+import { useMPFTUEIdle } from '@/hooks/useMPFTUEIdle';
+import { MPDragCoachmark } from './MPDragCoachmark';
+import { trackMpFtue } from '@/utils/posthogEngagement';
 
 const WordWheelPixiRing = dynamic(() => import('@/components/daily/WordWheelPixiRing'), { ssr: false });
 
@@ -317,10 +320,19 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     };
   }, [socket, flash]);
 
+  // FTUE — drag-teaching coachmark after 20s of no activity / no word.
+  // Hides forever on first valid word; persists 'dismissed' to localStorage.
+  const ftue = useMPFTUEIdle({
+    enabled: !!puzzle,
+    wordsFound: myWords.length,
+    onShown: () => trackMpFtue({ event: 'shown', mode: 'wheel_rush' }),
+  });
+
   // Letter tap handler — parity with SP WordWheelGame:386.
   // Re-tap on a used wheel index toggles it off (removes from built word) instead
   // of duplicating. Each wheelIndex appears at most once in builtLetters.
   const handleLetterPress = useCallback((letter: string, wheelIndex: number, _el: HTMLButtonElement) => {
+    ftue.markActivity();
     const existingIdx = builtLettersRef.current.findIndex(bl => bl.wheelIndex === wheelIndex);
     if (existingIdx !== -1) {
       setBuiltLetters(prev => prev.filter((_, i) => i !== existingIdx));
@@ -331,7 +343,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     setBuiltLetters(prev => [...prev, { letter, wheelIndex }]);
     playTileSelectSound();
     haptic(10);
-  }, [playTileSelectSound, playButtonClickSound]);
+  }, [playTileSelectSound, playButtonClickSound, ftue]);
 
   // Drag-to-build — drag engages only after pointer moves to a DIFFERENT letter,
   // so single taps are handled by the button's native onClick (no double-fire).
@@ -659,6 +671,16 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
               index={i}
             />
           ))}
+          {ftue.visible && (
+            <MPDragCoachmark
+              t={t}
+              accent="pink"
+              onDismiss={() => {
+                trackMpFtue({ event: 'dismissed', mode: 'wheel_rush', reason: 'manual' });
+                ftue.dismiss();
+              }}
+            />
+          )}
         </div>
         <p className="text-neo-cream/40 text-xs text-center px-2">
           {t('wordWheel.centerLetterRule') || 'Must include center letter'} &middot; {(t('wordWheel.minLetters') || 'Min {min} letters').replace('{min}', String(MIN_LEN))}

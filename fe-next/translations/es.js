@@ -8899,6 +8899,10 @@ const es = {
       "locksmith": "Cerrajero",
       "bandit": "Bandido",
       "wordsmith": "Maestro de Palabras"
+    },
+    "ftue": {
+      "dragLabel": "¡Arrastra sobre las letras para deletrear!",
+      "dismiss": "Entendido"
     }
   },
   "blast": {

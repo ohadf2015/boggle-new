@@ -8841,6 +8841,10 @@ const ja = {
       "locksmith": "ロックスミス",
       "bandit": "バンディット",
       "wordsmith": "言葉の達人"
+    },
+    "ftue": {
+      "dragLabel": "文字をドラッグして単語を作ろう！",
+      "dismiss": "わかった"
     }
   },
   "blast": {

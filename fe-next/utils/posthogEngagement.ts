@@ -164,6 +164,21 @@ export function trackModalDismissed(args: {
   );
 }
 
+/** MP drag-FTUE lifecycle: shown when 20s idle hits; dismissed when user
+ *  taps the close button, hits Esc, or any pointer activity / first word. */
+export function trackMpFtue(args: {
+  event: 'shown' | 'dismissed';
+  mode: string;
+  reason?: 'activity' | 'first_word' | 'manual' | 'timeout';
+}): void {
+  safe(() =>
+    (posthog.capture as PHFn)(args.event === 'shown' ? 'mp_ftue_shown' : 'mp_ftue_dismissed', {
+      mode: args.mode,
+      reason: args.reason,
+    })
+  );
+}
+
 /** CTA click with location — lets you build click-through funnels per surface. */
 export function trackCtaClicked(args: {
   ctaId: string;

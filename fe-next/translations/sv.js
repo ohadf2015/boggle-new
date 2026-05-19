@@ -8815,6 +8815,10 @@ const sv = {
       "locksmith": "Låssmed",
       "bandit": "Bandit",
       "wordsmith": "Ordsmed"
+    },
+    "ftue": {
+      "dragLabel": "Dra över bokstäverna för att stava!",
+      "dismiss": "Uppfattat"
     }
   },
   "blast": {

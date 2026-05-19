@@ -8596,6 +8596,10 @@ const en = {
       "locksmith": "Locksmith",
       "bandit": "Bandit",
       "wordsmith": "Wordsmith"
+    },
+    "ftue": {
+      "dragLabel": "Drag across letters to spell!",
+      "dismiss": "Got it"
     }
   },
   "blast": {

@@ -8795,6 +8795,10 @@ const he = {
       "locksmith": "מנעולן",
       "bandit": "שודד",
       "wordsmith": "אמן מילים"
+    },
+    "ftue": {
+      "dragLabel": "גרור על האותיות כדי לאיית!",
+      "dismiss": "הבנתי"
     }
   },
   "blast": {
