@@ -259,121 +259,103 @@ The techniques work. Word games make it fun. The only variable is whether you'll
     practice: 'תרגלו עכשיו',
   },
   sv: {
-    title: 'Jag lärde mig 500 nya ord på 30 dagar (Så här gjorde jag)',
+    title: 'Jag knäckte 500 nya ord på 30 dagar. Metoden är löjligt enkel.',
     subtitle: 'Utspridd repetition, aktiv återkallelse, morfologihacks och dagliga rutiner som faktiskt fastnar. Inga flashcard-appar krävs.',
     category: 'Lärande',
-    readTime: '12 min läsning',
+    readTime: '8 min läsning',
     authorName: 'Ordnörden',
     authorBio: 'Självlärd ordförrådsbesatt som för en orddagbok, spelar ordspel tävlingsinriktat och en gång grät av glädje över ordet "defenestration."',
     sections: [
       {
-        content: `För trettio dagar sedan startade jag ett experiment. Reglerna var enkla: lär dig så många nya ord som möjligt på en månad med bara ordspel och forskningsbaserade tekniker. Inga dyra kurser. Inga språkkurser. Bara jag, en anteckningsbok, en timer och ett pinsamt antal timmar med Boggle.
+        content: `För trettio dagar sedan startade jag ett experiment. Reglerna var enkla: lär dig så många nya ord som möjligt på en månad med bara ordspel och vetenskap. Inga dyra kurser. Ingen lärare som vet bättre än mig. Bara jag, en anteckningsbok, en timer och en pinsam mängd Boggle.
 
-Resultatet? 500 nya ord. Inte "jag känner vagt igen det här"-ord — ord jag kan definiera, stava, använda i en mening och (avgörande) använda i ett ordspel för att få mina vänner att ångra att de utmanade mig.
+Resultatet? 523 ord. Inte "jag har ungefär sett det här"-ord — ord jag kan stava, definiera, använda i en mening och (avgörande) dra fram i ett ordspel för att få mina vänner att ångra att de utmanade mig.
 
-Men det som gjorde detta experiment annorlunda än alla andra försök att bygga ordförråd: jag använde inte rå kraft. Jag satt inte med flashcards i timmar. Istället använde jag en kombination av kognitionsvetenskapliga tekniker som forskare har förfinat i över ett sekel.`,
+Det som gjorde detta experiment annorlunda: jag använde inte rå kraft. Jag satt inte med flashcards i timmar. Istället kombinerade jag forskningsbaserade tekniker som psykologer har förfinat i över hundra år. De flesta människor har aldrig hört talas om dem. Ändå är bevisen överväldigande.`,
       },
       {
-        title: '30-dagarsexperimentet: Grundregler',
-        content: `Innan jag går in på teknikerna, låt mig lägga ut parametrarna. För "jag lärde mig 500 ord" betyder ingenting utan sammanhang.
+        title: 'Glömskekurvan (och varför den spelar roll)',
+        content: `1885 gjorde en tysk psykolog vid namn Hermann Ebbinghaus något radikalt: han mätte systematiskt hur snabbt människor glömmer. Hans metod var brutal — han memorerade meningslösa stavelser (DAX, BUP, ZOL) och testade sig själv vid ökande intervaller.
 
-Definition av "lärt mig": Jag kunde producera ordet från minnet, definiera det korrekt, stava det korrekt och använda det i sammanhang. Detta är vad forskare kallar "produktivt ordförråd", till skillnad från "receptivt ordförråd," som bara är att känna igen ett ord när man ser det.
+Det han upptäckte: utan repetition glömmer du cirka 70% av ny information på 24 timmar. Efter en vecka är omkring 90% borta.
 
-Ordkälla: Främst ordspel (Boggle, Scrabble-övning, korsord och dagliga ordpussel), kompletterat med läsning.
+Men här kommer det magiska. Varje gång du repeterar informationen vid rätt tidpunkt blir kurvan flytare. Minnet blir starkare. Intervallen mellan repetitioner blir längre.
 
-Tidsinvestering: Cirka 45 minuter per dag. Femton minuter ordspel, femton minuter repetition och femton minuter läsning. Teknikerna jag använde är utformade för att maximera bibehållande per minut av studier.
+Cepeda et al:s metaanalys från 2006 analyserade 254 studier med över 14 000 deltagare. Resultatet: utspridd repetition slag massaid övning varje gång, oavsett ålder och ämne.
 
-Vid dag 30 hade min anteckningsbok 523 poster. Några var obskyra. Några var praktiska. Och några var helt enkelt ljuvliga.`,
+I mitt experiment repeterade jag varje nytt ord efter 1, 3, 7, 14 och 28 dagar. Ingen app — bara en anteckningsbok och en kalender. Resultat: 85,5% bibehållande på dag 30. I tidigare försök utan utspridning glömde jag 15 av 20 ord redan nästa vecka.
+
+En princip. Det räcker för de flesta vinster.`,
       },
       {
-        title: 'Utspridd repetition: Ebbinghaus-kurvan som förändrade allt',
-        content: `1885 gjorde en tysk psykolog vid namn Hermann Ebbinghaus något ingen gjort förut: han mätte systematiskt hur snabbt människor glömmer saker. Hans metod var brutal: han memorerade listor av nonsensstavelser och testade sedan sig själv vid ökande intervaller.
+        title: 'Aktiv återkallelse: varför läsning inte räcker',
+        content: `Jag trodde länge att läsning var vägen till större ordförråd. Du möter ett ord, slår upp det, går vidare. Naturligt. Organiskt.
 
-Det han upptäckte kallas nu "glömskekurvan," och det är ett av de mest replikerade resultaten i hela psykologin. Utan någon repetition glömmer man cirka 70% av ny information inom 24 timmar. Inom en vecka har man förlorat cirka 90%.
+Det fungerar inte. Läsning är passiv. Din hjärna gör minsta möjliga ansträngning för att plocka ut mening från texten — inte tillräckligt för att bygga starka minnen.
 
-Men varje gång man repeterar informationen vid rätt ögonblick plattas kurvan ut. Minnet blir starkare. Intervallen mellan nödvändiga repetitioner blir längre.
+Aktiv återkallelse är motsatsen. Istället för att titta på ett ord och komma ihåg (igenkänning), börjar du med definitionen och tvingar din hjärna att producera ordet (återkallelse). Eller så ser du bokstäver AELNR och måste forma LEARN, RENAL, ALIEN. Det är exakt vad ordspel gör.
 
-Detta är utspridd repetition: att repetera information vid gradvis ökande intervaller. Repetition efter 1 dag, sedan 3, sedan 7, sedan 14, sedan 30 dagar. Varje repetition cementerar minnet fastare.
+Karpicke och Roediger visade 2008 i Science: återkallelseövning producerade 80% bättre långsiktigt minne än upprepad läsning. Åttio procent. Ansträngningen att dra ett ord från minnet — det är vad som cementerar det.
 
-En metaanalys av Cepeda et al. (2006) analyserade 254 studier och fann att utspridd övning producerade signifikant bättre långsiktigt bibehållande än massad övning i praktiskt taget varje typ av material och varje åldersgrupp.`,
+Det är därför ordspel är så effektiva. Varje gång du skannar ett rutnät och jagar fram EPHEMERAL gör du aktiv återkallelse. Spelet är själva studiesessionen.
+
+Det kontraintuitiva: misslyckade försök följda av rätt feedback skapar starkare minnen än lyckade försök. Kornell, Hays och Bjork 2009. Jag bekräftade det. QUAHOG (en typ av musla) fastnade direkt för att jag spelade det som ett desperat gissande. SANGUINE, som jag lugnt slog upp i en roman, tog tre sessioner.
+
+Ju hårdare du misslyckas, desto starkare minns du.`,
       },
       {
-        title: 'Aktiv återkallelse: Varför läsning inte räcker',
-        content: `Här är ett misstag jag gjorde i åratal: jag trodde att läsning var det bästa sättet att bygga ordförråd. Stöta på ett ord, slå upp det, gå vidare. Naturlig, organisk ordförrådstillväxt.
+        title: 'Ordfamiljer: fuskkoden',
+        content: `Den här tekniken gjorde den största skillnaden i mitt experiment.
 
-Det fungerar inte. Eller snarare, det fungerar, men det är otroligt långsamt och ineffektivt.
+Morfologi är studiet av orddelar — prefix, suffix, rötter. Engelska är byggt på latin, grekiska och germanska. De källorna följer mönster. När du lär dig mönstren slutar nya ord att vara slumpvisa bokstavssträngar. De blir pussel du kan lösa.
 
-Problemet är att läsning är passivt. Man känner igen ord, producerar dem inte. Hjärnan gör minimalt arbete för att extrahera mening från texten.
+Du lär dig EPHEMERAL (kortvarigt). Du lär dig EPHEMER- kommer från grekiskans "ephemeros" (varar en dag). Då låser du upp en familj: EPHEMERA, EPHEMERIS, EPHEMERON. En rot. Tre ord. Alla kopplade.
 
-Aktiv återkallelse är motsatsen. Istället för att titta på ett ord och komma ihåg dess definition (igenkänning), börjar man med definitionen och försöker producera ordet (återkallelse). Eller så tittar man på en blandad uppsättning bokstäver och försöker bilda ord, vilket är exakt vad ordspel gör.
+Nation 2001: kunskap om ungefär 20 ordfamiljer per vecka bygger ordförråd i ungefär fyra gånger hastigheten av att lära sig ord isolerat. Fyrdubbla din lärhastighet. Det är ingen marginell förbättring.
 
-Karpicke och Roediger (2008) publicerade en banbrytande studie i Science som visade att återkallelseövning producerade 80% bättre långsiktigt bibehållande än upprepat studerande av samma material. Åttio procent.
+Jag började gruppera nya ord efter rot. BENE- (bra): BENEVOLENT, BENEFICIAL, BENEDICTION. MAL- (dålig): MALEVOLENT, MALICIOUS, MALADY. CHRON- (tid): CHRONOLOGICAL, CHRONIC, SYNCHRONIZE.
 
-Därför är ordspel så effektiva ordförrådsbyggare. Varje gång man skannar ett bokstavsrutnät och drar ut ett ord från kaos av slumpvisa bokstäver gör man aktiv återkallelse. Spelet är studiesessionen. Man inser det bara inte för att man har kul.`,
+Vid vecka två lärde jag mig ord nästan två gånger så fort. Inte för att jag studerade hårdare. För att varje nytt ord kom förankopplat till ord jag redan kände. Nätverket gjorde jobbet.`,
       },
       {
-        title: 'Testeffekten: Misslyckande är poängen',
-        content: `Testeffekten, också kallad "återkallelseförbättrad inlärning", är fyndet att testning på material förbättrar minnet mer än ytterligare studietid.
+        title: 'Tvåspråkigt öppnar dörrar',
+        content: `Något överraskande: att spela ordspel på flera språk gjorde mig bättre på engelska.
 
-Här är den kontraintuitiva delen: testeffekten fungerar även när man svarar fel. Viss forskning tyder på att misslyckade återkallelseförsök, följda av korrekt feedback, producerar starkare minnen än lyckad återkallelse.
+Kroll och Stewart 1994: ord i olika språk delar konceptuella kopplingar. Lära en ord på ett språk stärker det underliggande konceptet. Det hjälper relaterade ord på andra språk.
 
-Kornell, Hays och Bjork (2009) demonstrerade detta i en studie. Deltagare som försökte och misslyckades med att svara på frågor, och sedan fick rätt svar, presterade bättre på ett slutprov än deltagare som helt enkelt studerade svaren.
+Jag testade genom att spela på svenska. Svenska delar germanska rötter med engelska: HUND, HAND, VATTEN var omedelbar igenkännbara. Men det intressanta var de mindre uppenbara kopplingarna. Ett svenskt ord öppnade tre engelska.
 
-Implikationen för ordförrådsbyggande är djupgående. När man stöter på ett okänt ord i ett ordspel och tänker "jag vet det här... jag har sett det förut...", den kampen, även om man misslyckas, får hjärnan att arbeta hårdare. Och det hårdare arbetet skapar ett starkare minnesspår.
+Adesope et al. 2010: tvåspråkiga överträffade enspråkiga på ordförrådstest — även på sitt modersmål. Teorin: att hantera flera språkliga system skapar ett mer flexibelt mentalt lexikon.
 
-Därför säger jag till folk: bli inte avskräckt när ett ordspel ställer dig. Varje ord du inte kan är en möjlighet. Varje misslyckat återkallelseförsök grundar hjärnan för ögonblicket du lär dig svaret.`,
+Du behöver inte vara flytande. Grundläggande exponering för kognater — ord som delar ursprung — kan stärka ditt nätverk. LUMINEUX (franska) kopplar till LUMINOUS. CORAZON (spanska) kopplar till CORONARY. Flera språk, flera vägar att hämta samma ord.`,
       },
       {
-        title: 'Ordfamiljer och morfologi: Fuskkoden ingen pratar om',
-        content: `Detta är tekniken som gjorde den största enskilda skillnaden i mitt experiment. Och den är chockerande underutnyttjad.
+        title: 'Rutinen som faktiskt fungerar (45 minuter totalt)',
+        content: `Vetenskap utan handling är bara trivia. Min dagliga rutin:
 
-Morfologi är studiet av orddelar: prefix, suffix och rötter. Engelska är ett Frankensteinspråk byggt från latin, grekiska, germanska, franska och ett dussin andra källor. Men de källorna följer mönster. När man lär sig mönstren slutar nya ord att vara slumpvisa bokstavssträngar och börjar vara pussel man kan avkoda.
+Morgon (15 min): Två omgångar Boggle. Nya ord direkt i anteckningsboken med definition och exempelmening.
 
-Här är ett exempel. Anta att du lär dig ordet EPHEMERAL (kortvarigt). Om du också lär dig att EPHEMER- kommer från grekiskans "ephemeros" som betyder "varar en dag," har du just låst upp en familj ord: EPHEMERA, EPHEMERIS, EPHEMERON. En rot, flera ord, alla sammankopplade.
+Mitt på dagen (15 min): Utspridd repetition. Dölj definitionen, försök återkalla, kontrollera.
 
-Nation (2001) uppskattade att kunskap om cirka 20 ordfamiljer per vecka kan bygga ordförråd i ungefär fyra gånger hastigheten av att lära sig enskilda ord isolerat.
+Kväll (15 min): Läsning med anteckningsboken öppen. Okänt ord → loggat omedelbar.
 
-Under mitt experiment började jag gruppera nya ord efter deras rötter. BENE- (bra): BENEVOLENT, BENEFICIAL, BENEDICTION. MAL- (dålig): MALEVOLENT, MALICIOUS, MALADY. CHRON- (tid): CHRONOLOGICAL, CHRONIC, SYNCHRONIZE.
+Det är allt. 45 minuter uppdelat i tre bitar slår 45 minuter på en gång. Du får flera återkallelsetillfällen per dag, plus vila mellan sessioner för konsolidering.
 
-Vid vecka två lärde jag mig ord i nästan dubbelt så snabb takt. Inte för att jag studerade hårdare, utan för att varje nytt ord kom förankopplat till ord jag redan kände.`,
+Ej förhandlingsbara regler: Skriv för hand — det engagerar motoriska områden som typning inte gör. Använd ordet inom 24 timmar. Spela med andra minst två gånger i veckan. Ingen pluggning när timern slutar.`,
       },
       {
-        title: 'Tvärlingvistisk överföring-3: Den flerspråkiga fördelen',
-        content: `Något jag inte förväntade mig: att spela ordspel på flera språk gjorde mig bättre på engelskt ordförråd.
+        title: 'Vad resultaten betydde',
+        content: `Dag 30: 523 ord loggade. Kalltest: 447 av 523 rätt (85,5%). Bogglescorer upp 22%. Genomsnittlig ordlängd från 4,2 till 5,1 bokstäver.
 
-Det låter paradoxalt, men forskningen stödjer det. Kroll och Stewart (1994) föreslog att ord i olika språk delar konceptuella kopplingar. När man lär sig ett ord på ett språk stärker man det underliggande konceptet, vilket gör relaterade ord på andra språk lättare att lära sig.
+Men siffran 500 är vilseledande. Ordförråd handlar inte om att samla diskreta föremål. Det handlar om att bygga ett nätverk.
 
-Jag testade detta genom att spela LexiClash på svenska. Svenska delar germanska rötter med engelska, så ord som HUND, HAND och VATTEN var omedelbart igenkännbara. Men den intressanta delen var de mindre uppenbara kopplingarna.
+Vid dag 30 hade redan lärt ord nya kopplingar. EPHEMERAL kopplade till EPHEMERA, till DIURNAL, till NOCTURNAL, till EQUINOX. De morfologiska kopplingar jag byggt hjälpte inte bara mig att minnas nya ord. De gjorde mitt helt ordförråd mer tillgängligt — för läsning, skrivning, tänkande, kommunikation.
 
-En metaanalys av Adesope et al. (2010) fann att tvåspråkiga individer konsekvent överpresterade enspråkiga på ordförrådstester, även på sitt modersmål. Teorin är att hanteringen av flera språkliga system skapar ett mer flexibelt och sammankopplat mentalt lexikon.
+Collins och Loftus 1975: ord är noder i ett sammankopplat system. Aktivera en nod, närliggande noder aktiveras genom "spreading activation." Fler kopplingar = snabbare hämtning. Det är inte bara neurovetenskap. Det är hur ordförråd faktiskt fungerar i din hjärna.
 
-Man behöver inte vara flytande på ett annat språk för att dra nytta av detta. Grundläggande exponering för kognater (ord som delar ursprung över språk) kan stärka ordförrådsnätverket.`,
-      },
-      {
-        title: 'Dagliga rutiner som faktiskt fungerar',
-        content: `Teknikerna ovan är vetenskapen. Men vetenskap utan implementering är bara trivia. Här är den dagliga rutin jag använde.
+Mina 30 dagar lade inte bara till 500 noder. De lade till tusentals kopplingar mellan befintliga noder. De kopplingarna är vad som gör ordförråd användbart.
 
-Morgon (15 minuter): Ordspelssession. Jag spelade två omgångar Boggle och använde resterande tid till att slå upp ord jag stött på men inte kunde definiera. Nya ord gick direkt i anteckningsboken.
-
-Mitt på dagen (15 minuter): Utspridd repetition. Jag bläddrade genom anteckningsboken och repeterade ord som var förfallna enligt mitt schema. Täckte definitionen, försökte återkalla den, kontrollerade, gick vidare.
-
-Kväll (15 minuter): Läsning. Jag läste femton minuter med anteckningsboken öppen. Varje okänt ord loggades omedelbart.
-
-Det är allt. Fyrtiofem minuter om dagen, uppdelat i tre hanterbara bitar. Nyckelinsikten är att frekvens spelar mer roll än varaktighet. Tre 15-minuterssessioner slår en 45-minuterssession varje gång.
-
-Oförhandlingsbara regler: Skriv för hand. Använd ordet inom 24 timmar. Spela med andra minst två gånger i veckan. Ingen pluggning.`,
-      },
-      {
-        title: 'Mäta framsteg (och varför det inte är vad du tror)',
-        content: `Vid slutet av 30 dagar hade jag 523 ord i min anteckningsbok. Men råsiffran är nästan meningslös. Det som spelar roll är bibehållande och användbarhet.
-
-Jag testade mig på tre sätt. Kall återkallelsetest: 447 av 523 korrekta (85,5%). Ordspelsprestanda: mina Boggle-poäng ökade med 22%, och min genomsnittliga ordlängd ökade från 4,2 till 5,1 bokstäver. Samtalsanvändning: vänner flaggade 31 tillfällen där jag använde ett ord de inte hört från mig förut.
-
-Men här är vad jag verkligen vill betona. Siffran 500 är imponerande men också missvisande. Den antyder att ordförrådsbyggande handlar om att samla diskreta objekt.
-
-Det gör det inte. Det handlar om att bygga ett nätverk. Vid slutet av experimentet kändes mitt mentala lexikon annorlunda. Ord jag redan kände hade nya kopplingar. De morfologiska och konceptuella kopplingarna hjälpte inte bara mig att komma ihåg nya ord. De gjorde hela mitt ordförråd mer tillgängligt.
-
-Du behöver inte 30 dagar för att börja se resultat. Skaffa en fysisk anteckningsbok. Spela ett ordspel om dagen. Logga tre nya ord. Repetera med utspridd repetition. Använd varje nytt ord inom 24 timmar. Femton till tjugo minuter om dagen.`,
+Du behöver inte 30 dagar för att börja se resultat. Tre nya ord per dag, loggade och repeterade med utspridning, är 1 000 ord per år. Vid månad tre lär du snabbare än månad ett. Nätverket gör det tunga arbetet.`,
       },
     ],
     backToBlog: 'Tillbaka till bloggen',

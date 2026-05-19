@@ -401,90 +401,96 @@ Det som gör mig mest entusiastisk är att ordspel blir sociala igen. Från rome
     title: 'De Azulejos Antiguos a Cuadrículas Digitales: La Alocada Historia de los Juegos de Palabras',
     subtitle: 'Ideas robadas, manía de crucigramas, la invención de un padre en casa, y una palabra de cinco letras que rompió internet.',
     category: 'Historia',
-    readTime: '11 min de lectura',
+    readTime: '6 min de lectura',
     authorName: 'Ohad Fisher',
     authorBio: 'Jugador obsesivo de juegos de palabras, historiador aficionado de conocimiento inútil, y la persona que tiene tres ediciones diferentes de Scrabble.',
     sections: [
       {
-        content: `Tengo una confesión. Tengo una réplica de una tablilla de cera romana. Está en mi escritorio junto al monitor, justo debajo de la nota que dice "RECUERDA COMER". La compré porque descubrí que los niños romanos practicaban juegos de palabras en estas cosas hace casi dos mil años, y pensé que era lo más genial que había escuchado jamás.
+        content: `Tengo una réplica de una tablilla de cera romana en mi escritorio. Está junto al monitor, bajo la nota que dice "ACUÉRDATE DE COMER". La compré porque descubrí que los niños romanos practicaban juegos de palabras en estas cosas hace casi dos mil años.
 
-Mi pareja piensa que necesito una intervención. Probablemente tenga razón.
+Mi pareja piensa que necesito ayuda. Probablemente tenga razón.
 
-Pero aquí está la cosa: la historia de los juegos de palabras es genuinamente una de las historias más salvajes e inesperadas de toda la cultura humana. Involucra acertijos egipcios antiguos, monjes medievales con demasiado tiempo libre, una amarga disputa de propiedad intelectual que destruyó amistades, una locura periodística que hizo que despidieran gente, y un ingeniero de software galés que accidentalmente creó un fenómeno global durante el confinamiento.`,
+Pero acá viene lo bueno: la historia de los juegos de palabras es genuinamente una de las historias más salvajes que ha producido la humanidad. Acertijos egipcios, monjes medievales con demasiado tiempo libre, una disputa de patentes que destrozó amistades, histeria periodística que costó empleos, e ingeniero de software galés que sin quererlo creó un fenómeno mundial en el confinamiento.
+
+Los juegos de palabras llevan cuatro mil años desquiciando a la gente.`,
       },
       {
-        title: 'Orígenes Antiguos: Cuando las Palabras Eran Magia',
-        content: `Los juegos de palabras más antiguos conocidos datan de hace aproximadamente cuatro mil años, y no se jugaban por diversión. Se creía genuinamente que tenían poder mágico.
+        title: 'Orígenes antiguos: cuando las palabras eran magia',
+        content: `Los juegos de palabras más antiguos datan de hace cuatro mil años, y no se jugaban por diversión. Se creía que tenían poder mágico.
 
-Los antiguos egipcios estaban obsesionados con los juegos de palabras. El Papiro de Leiden, datado alrededor del 1200 a.C., contiene una colección de acertijos y rompecabezas que los escribas usaban para ponerse a prueba mutuamente. En la cultura egipcia, conocer el "nombre verdadero" de algo te daba poder sobre ello. El dominio de las palabras era literalmente una forma de magia.
+Los antiguos egipcios estaban obsesionados. El Papiro de Leiden, datado alrededor de 1200 a.C., contiene acertijos y rompecabezas que los escribas usaban para competir. En la cultura egipcia, conocer el "nombre verdadero" de algo te daba poder sobre ello. Dominar las palabras era literalmente magia.
 
-Los griegos inventaron el acróstico. Los romanos amaban los cuadrados de palabras — cuadrículas donde las mismas palabras se leen tanto horizontal como verticalmente. El más famoso es el Cuadrado SATOR, encontrado grabado en muros a lo largo del Imperio Romano desde Pompeya hasta Manchester.`,
+Los griegos inventaron el acróstico — poemas donde la primera letra de cada línea forma una palabra. Los romanos amaban los cuadrados de palabras, cuadrículas donde las mismas palabras se leen horizontal y verticalmente. El más famoso es el Cuadrado SATOR, grabado en muros desde Pompeya hasta Manchester. Llevaba siglos siendo estudiado y debatido.
+
+Me gusta imaginar a esos soldados romanos raspando palabras en piedra mientras esperaban algo. La gente siempre necesitó entretenerse mentalmente.`,
       },
       {
-        title: 'Monjes Medievales y Acertijos del Renacimiento',
-        content: `Después de la caída de Roma, los juegos de palabras no desaparecieron. Se mudaron a los monasterios.
+        title: 'El Scrabble y el robo de ideas',
+        content: `Alfred Mosher Butts pasaba meses analizando las portadas del New York Times, contando frecuencias de letras a mano. Corría el 1933. La Gran Depresión había destrozado la construcción, y Butts, arquitecto desempleado, necesitaba algo en qué pensar.
 
-Los monjes medievales, con su combinación de alfabetización, aburrimiento y acceso a materiales de escritura, se convirtieron en entusiastas inventores de juegos de palabras. Crearon anagramas, palíndromos y elaboradas colecciones de acertijos. El Libro de Exeter, un manuscrito anglosajón del siglo X, contiene casi cien acertijos que son esencialmente juegos de palabras en forma poética.
+Creó "Lexiko", luego "Criss-Crosswords" — esencialmente, Scrabble. Las mismas fichas, el mismo tablero. Nadie lo quería. Parker Brothers dijo que no. Milton Bradley dijo que no. Todos dijeron que no.
 
-El Renacimiento trajo un enfoque más sistemático. Los eruditos italianos desarrollaron el "jeroglífico" — puzzles donde imágenes y letras se combinan para formar palabras. Estos se extendieron por Europa como un reguero de pólvora.`,
+Entonces llegó James Brunot. En 1948 compró los derechos, simplificó las reglas, cambió el nombre a "Scrabble" y comenzó a fabricar sets en su sala de estar. Los primeros años no vendía. Pero en 1952 el presidente de Macy's jugó Scrabble en vacaciones y quedó enganchado. Pidió para todas las tiendas Macy's. Las ventas explotaron. Dos años después, millones de copias.
+
+Butts, el inventor, recibió regalías. Brunot se hizo rico. Es un patrón que veremos una y otra vez: los creadores rara vez capturan el valor que generan.`,
       },
       {
-        title: 'La Historia del Scrabble: ¿Genialidad, Robo, o Ambos?',
-        content: `Déjenme contarles sobre Alfred Mosher Butts, porque su historia es tanto inspiradora como frustrante.
+        title: 'El craze de los crucigramas (viral de los años 20)',
+        content: `El primer crucigrama apareció el 21 de diciembre de 1913 en el New York World. Lo creó Arthur Wynne, periodista de Liverpool, en forma de diamante. Wynne lo llamó "Word-Cross".
 
-En 1933, Butts era un arquitecto desempleado en Nueva York — la Gran Depresión había destrozado la industria de la construcción. Sin nada más que tiempo, decidió inventar un juego de mesa. Pasó meses analizando las portadas del New York Times, contando frecuencias de letras a mano.
+Durante diez años, los crucigramas fueron una sección menor. Luego, en 1924, Richard Simon y M. Lincoln Schuster tuvieron una idea. La tía de Simon coleccionaba crucigramas y no encontraba un libro. Así que publicaron uno. Su primer libro como editorial nueva.
 
-Creó "Lexiko", luego lo refinó a "Criss-Crosswords" — esencialmente, Scrabble. Y nadie lo quería.
+Lo que sucedió fue uno de los primeros fenómenos virales de la historia mediática americana. Más de 350.000 copias el primer año. Los periódicos que no publicaban crucigramas perdían suscriptores. El New York Times, que después sería sinónimo de crucigramas, inicialmente se negó, llamándolos "una forma primitiva de ejercicio mental" en un editorial de 1924.
 
-En 1948, James Brunot compró los derechos, cambió el nombre a "Scrabble" y empezó a fabricar sets en su sala de estar. En 1952, el presidente de Macy's jugó Scrabble de vacaciones y le encantó. Las ventas explotaron.
+Los empleadores se quejaban de que los trabajadores resolvían en lugar de trabajar. El ferrocarril Baltimore and Ohio ponía diccionarios en todos sus trenes — los pasajeros no dejaban de discutir sobre ortografía. Una mujer de Chicago demandó a su marido por divorcio: era un "adicto a los crucigramas" que no le hablaba.
 
-Butts, el inventor, recibió regalías pero nunca se hizo rico. Brunot se volvió adinerado. Es un patrón que se repite en el mundo de los juegos de palabras: los creadores rara vez capturan el valor que crean.`,
+Las bibliotecas reportaron diccionarios robados. No prestados — robados. Gente arrancaba páginas de libros de referencia para resolver disputas sobre palabras.
+
+Esto es lo que hacen los juegos de palabras. El craze de crucigramas de 1920 fue idéntico al fenómeno Wordle de 2022: obsesión global, distracción en el trabajo, experiencia compartida.`,
       },
       {
-        title: 'La Locura de los Crucigramas: Cuando los Juegos de Palabras Se Hicieron Virales (Edición 1920s)',
-        content: `El primer crucigrama apareció el 21 de diciembre de 1913 en el periódico New York World, creado por Arthur Wynne de Liverpool.
+        title: 'Boggle y la revolución de la velocidad',
+        content: `En 1972, Allan Turoff, inventor de juguetes, creó algo que cambió fundamentalmente cómo funcionan los juegos de palabras. Su idea era brillantemente simple: ¿y si en lugar de tomar turnos, todos jugaran al mismo tiempo? ¿Y si el desafío no fuera solo vocabulario, sino velocidad?
 
-En 1924, Richard Simon y M. Lincoln Schuster publicaron el primer libro de crucigramas — su primer libro como editorial nueva. Vendió más de 350,000 copias en su primer año.
+Diseñó una cuadrícula de 4x4 de dados de letras en una bandeja cubierta. Agitas, volteas, inicia un temporizador de tres minutos, y todos buscan palabras simultáneamente. Cuando suena el timbre, comparan listas. Cualquier palabra que encontró más de uno se tilda. Solo tus hallazgos únicos cuentan.
 
-Los empleadores se quejaban de que los trabajadores hacían crucigramas en vez de trabajar. El ferrocarril Baltimore and Ohio puso diccionarios en todos sus trenes porque los pasajeros no dejaban de discutir sobre ortografía. Una mujer de Chicago demandó a su esposo por divorcio porque era un "adicto a los crucigramas" que no le hablaba.
+Fue revolucionario. Scrabble era cerebral y paciente. Boggle era frenético, competitivo, visceral. Transformó los juegos de palabras de un ejercicio intelectual solitario a experiencia social con tensión real. Parker Brothers lo comercializó y se volvió un éxito masivo. Para los años 80, era uno de los juegos de palabras más vendidos del mundo.
 
-Las bibliotecas reportaron que los diccionarios estaban siendo robados. No prestados — robados. La gente arrancaba páginas de los libros de referencia.`,
+Lo que amo de Boggle: democratizó los juegos de palabras. En Scrabble, los jugadores experimentados tienen ventaja enorme. En Boggle, un chico de doce años con buen ojo para patrones puede ganarle a un profesor de Literatura. La velocidad importa tanto como el vocabulario.
+
+Este es el ADN que LexiClash hereda: todos juegan simultáneamente en la misma cuadrícula, carrera contra el reloj.`,
       },
       {
-        title: 'Boggle: El Padre en Casa Que Lo Cambió Todo',
-        content: `En 1972, un inventor de juguetes llamado Allan Turoff creó algo que cambiaría fundamentalmente cómo funcionan los juegos de palabras.
+        title: 'El fenómeno Wordle',
+        content: `En octubre de 2021, Josh Wardle, ingeniero de software galés, lanzó un pequeño juego web que había hecho para su pareja durante el confinamiento. Le gustaban los juegos de palabras, y él quería darle algo para jugar.
 
-La idea de Turoff fue brillantemente simple: ¿y si, en lugar de turnarse, todos jugaran al mismo tiempo? ¿Y si el desafío no fuera solo vocabulario, sino velocidad?
+Lo llamó Wordle. Un puzzle por día. Seis intentos para encontrar una palabra de cinco letras. Sin app, sin cuenta, sin publicidades. Solo una cuadrícula limpia en un sitio web.
 
-Diseñó una cuadrícula de 4x4 de dados de letras en una bandeja cubierta. Agitar, voltear, iniciar un temporizador de tres minutos, y todos cazan palabras simultáneamente. Fue revolucionario. Scrabble era secuencial y paciente. Boggle era frenético, competitivo y visceral.
+Para enero de 2022, Wordle tenía 300.000 jugadores diarios. Para febrero, millones. El New York Times lo compró por una cifra reportada de siete dígitos.
 
-Este es el ADN que hereda LexiClash — todos juegan simultáneamente en la misma cuadrícula, en una carrera contra el reloj.`,
-      },
-      {
-        title: 'La Revolución Digital: De Words With Friends a Wordle',
-        content: `En 2009, Paul y David Bettner crearon Words With Friends. Seamos honestos: era Scrabble. Hasbro demandó. Llegaron a un acuerdo.
+Lo que hizo a Wordle especial no fue la mecánica. Juegos de "adivina la palabra" existían desde hace décadas. Fue la combinación de decisiones de diseño. Un puzzle por día significaba que todos resolvían el mismo. Experiencia compartida. Podías discutirlo sin spoilear. Esos cuadraditos de color que compartían en redes fueron geniales.
 
-En su pico, Words With Friends tenía más de 20 millones de usuarios activos diarios. Fue probablemente la mayor puerta de entrada a los juegos de palabras en la historia.
+Sin juego infinito, respetaba tu tiempo. Sin trampa de dopamina, sin "una ronda más" manipulatoria.
 
-Luego, en octubre de 2021, un ingeniero de software galés llamado Josh Wardle lanzó un pequeño juego web que había hecho para su pareja. Lo llamó Wordle. Un puzzle por día. Seis intentos para encontrar una palabra de cinco letras. Sin app, sin cuenta, sin anuncios.
+Sin monetización, se sentía genuino. En un mundo de juegos predatorios, Wordle era un regalo.
 
-Para enero de 2022, Wordle tenía 300,000 jugadores diarios. Para febrero, millones. El New York Times lo compró por una cifra reportada de siete dígitos.
+Josh Wardle, como Alfred Butts antes, creó algo que trajo alegría a millones. A diferencia de Butts, al menos recibió un buen pago. Pero el patrón se mantuvo: el juego transcendió a su creador casi instantáneamente.
 
-Lo que más me emociona es que los juegos de palabras se están volviendo sociales de nuevo. Desde soldados romanos grabando cuadrados SATOR en muros, pasando por los socialités de los años 20 discutiendo sobre crucigramas en trenes, hasta jugadores modernos compitiendo en cuadrículas digitales — el hilo es el mismo. Los humanos aman las palabras. Siempre lo han hecho. Siempre lo harán.`,
+Lo que más me fascina: Wordle probó que los juegos de palabras no necesitan mecánica compleja para cautivar. El atractivo está en el lenguaje mismo. La satisfacción de descartar posibilidades. El "eureka" cuando las letras encajan. Mismo dopamina que la gente persigue desde que escribas egipcios se retaban mutuamente con acertijos hace cuatro mil años.`,
       },
       {
         content: `Fuentes:
-- El Papiro de Leiden: Puzzles de palabras del antiguo Egipto (c. 1200 a.C.)
-- Acertijos del Libro de Exeter: Literatura anglosajona, siglo X
+- El Papiro de Leiden: Acertijos del antiguo Egipto y educación de escribas (c. 1200 a.C.)
 - Wynne, Arthur — Primer crucigrama, New York World, 21 de diciembre de 1913
-- Simon & Schuster — Primer libro de crucigramas (1924)
-- Butts, Alfred Mosher — Invención del Scrabble (1933-1948)
-- Turoff, Allan — Invención de Boggle (1972)
-- Wardle, Josh — Historia de la creación de Wordle, adquisición del New York Times (2022)`,
+- Simon & Schuster — Primer libro de crucigramas (1924), historia de la fundación
+- Butts, Alfred Mosher — Análisis de frecuencia de letras e invención del Scrabble (1933-1948)
+- Turoff, Allan — Invención de Boggle y acuerdo con Parker Brothers (1972)
+- Wardle, Josh — Historia de creación de Wordle, adquisición del New York Times (2022)`,
       },
     ],
     backToBlog: 'Volver al blog',
     tryDaily: 'Desafío diario',
     practice: 'Practicar',
   },
+
 };

@@ -583,157 +583,154 @@ Collinsは約28万語。TWLは約19万語。国際プレイでは9万語多く�
     practice: '練習',
   },
   es: {
-    title: 'Pasé un Fin de Semana en un Torneo Competitivo de Scrabble. No Estaba Preparado.',
-    subtitle: 'Lo que los escáneres fMRI, el conteo de fichas y una derrota devastadora contra una chica de 14 años me enseñaron sobre cómo piensan realmente los mejores jugadores.',
+    title: '¿Mis Grandes Secretos en Juegos de Palabras? Un Torneo Competitivo Me Los Arrebató en un Fin de Semana.',
+    subtitle: 'Lo que aprendí sobre cómo piensan realmente los campeones cuando una abuela de 72 años me pulverizó con palabras que ni existen — y por qué tu cerebro ya sabe cómo ganarles.',
     category: 'Juego Competitivo',
-    readTime: '10 min de lectura',
-    authorName: 'El Nerd de las Palabras',
-    authorBio: 'Jugador obsesivo de juegos de palabras, lector amateur de neurociencia, y la persona que arruina la noche de juegos por tomarse demasiado tiempo en su turno.',
+    readTime: '8 min de lectura',
+    authorName: 'Ohad Fisher',
+    authorBio: 'Obsesionado con las palabras, lector aficionado de neurociencia, y el tipo que arruina las cenas familiares porque se toma tres minutos en cada turno.',
     sections: [
       {
-        content: `Pensé que era bueno en los juegos de palabras.
+        content: `Estaba seguro de que era bueno en esto.
 
-O sea, gano en las noches de juegos familiares. Consistentemente. Conozco todas las palabras cortas que hacen que la gente diga "eso no es una palabra" antes de que les muestres el diccionario. Una vez coloqué una palabra de 8 letras en una casilla de triple puntuación y mi hermana no me habló por el resto de la cena.
+Gano en las noches de juegos con la familia. Consistentemente. Sé todos esos bichitos de dos letras que sacan a la gente: QI, ZA, XI. Una vez puse una palabra de ocho letras en una casilla triple en Scrabble y mi hermana no me dirigió la palabra en toda la comida.
 
-Así que cuando un amigo mencionó un torneo local de Scrabble, me inscribí. ¿Qué tan difícil podría ser?
+Así que cuando un amigo me invitó a un torneo sancionado, entré con el ego por las nubes. ¿Qué tan difícil puede ser?
 
-Difícil. La respuesta es muy, muy difícil. Me destruyeron completamente. Y en el proceso, aprendí más sobre cómo piensan realmente los jugadores expertos de lo que había aprendido en veinte años de juego casual. Parte está respaldado por neurociencia fascinante. Parte es simplemente... inquietante.`,
+Resultado: devastación total. Una derrota tras otra. Pero en ese fin de semana aprendí más sobre cómo juegan los maestros que en veinte años de jugar por ahí sin saber nada. Y lo mejor: la ciencia respalda casi todo. La neurociencia de por qué estos tipos son tan buenos te sorprenderá.`,
       },
       {
-        title: 'Lo Primero Que Me Impactó: A Nadie Le Importa Qué Significan las Palabras',
-        content: `Mi primera oponente fue una mujer tranquila llamada Carmen que parecía la abuela de cualquiera. Jugó una palabra que nunca había escuchado. La desafié. Ella sonrió.
+        title: 'Los expertos ven palabras, no significados',
+        content: `Mi primera rival fue una señora tranquila de setenta y pico. Jugó una palabra que nunca en mi vida había escuchado. Grité "¡eso no existe!" La señora sonrió.
 
-Era una palabra válida. Carmen no tenía idea de lo que significaba. Me lo dijo alegremente después del juego. "No aprendo definiciones," dijo. "Aprendo patrones de letras."
+Bueno, existía. La busqué después. No tenía la menor idea de qué significaba. "No aprendo definiciones," me dijo cuando terminámos. "Aprendo formas de letras."
 
-Me voló la cabeza. Pero resulta que Carmen es la norma, no la excepción. Una investigación publicada en Memory & Cognition encontró que los jugadores competitivos de Scrabble exhiben un reconocimiento visual de palabras fundamentalmente diferente al de los jugadores casuales. Dependen menos del significado de las palabras para juzgar si son reales. En cambio, se basan en información ortográfica — la forma visual y los patrones de letras.
+Me voló la cabeza. Pero resulta que ella es la norma en el circuito competitivo. Un estudio en Memory & Cognition encontró que los jugadores profesionales usan un sistema completamente distinto para reconocer palabras. No dependen del significado. Ven la forma visual, los patrones de letras — eso es todo lo que necesitan.
 
-Solo el 6,4% de los jugadores competitivos encuestados dijeron que "siempre" aprenden los significados. ¿El resto? "A veces" o "rara vez o nunca." Memorizan palabras como memorizarías números de teléfono — como secuencias, no como cosas con significado.
+Solo el 6,4% de los jugadores encuestados dijeron que "siempre" aprenden lo que significa cada palabra. El resto: "a veces" o "casi nunca." Memorizan palabras como memorizarías un número de teléfono. Secuencia pura. El significado es ruido.
 
-Me senté pensando en todas las horas que había dedicado a intentar entender palabras oscuras. Resulta que lo estaba haciendo completamente mal. Los profesionales tratan el vocabulario como una consulta de base de datos, no como una clase de literatura.`,
+Pensé en todas las horas que gasté tratando de entender palabritas raras del diccionario. Andaba totalmente perdido. Los maestros tratan el vocabulario como una búsqueda en base de datos. No como un curso de literatura.`,
       },
       {
-        title: 'Lo Que Revelan los Escáneres fMRI (Y Por Qué Nos Importa a Todos)',
-        content: `Después de ser demolido en mis tres primeros juegos, volví a casa y caí en una madriguera de investigación. Y aquí es donde se pone genuinamente interesante.
+        title: 'Lo que el cerebro de un campeón hace diferente',
+        content: `Después de los primeros tres desastres, volví a casa y caí en un hoyo de investigaciones de neurociencia. Y ahí es donde se pone extraño.
 
-Un estudio publicado en ScienceDirect usó fMRI — imagen por resonancia magnética funcional que observa tu cerebro iluminarse en tiempo real — para comparar 12 jugadores competitivos de Scrabble con 12 controles durante tareas de reconocimiento de palabras.
+Un estudio usó fMRI — eso que ve tu cerebro iluminarse en tiempo real — y comparó doce jugadores competitivos contra doce civiles mientras reconocen palabras.
 
-Los resultados fueron asombrosos. Cuando los jugadores expertos miraban cadenas de letras y tenían que decidir si eran palabras reales, activaron regiones cerebrales no típicamente asociadas con la recuperación de significado. En cambio, iluminaron áreas vinculadas a la memoria de trabajo y la percepción visual.
+Lo fascinante: cuando los expertos ven una cadena de letras y tienen que decidir si es palabra real, activan zonas del cerebro que nada tienen que ver con "entender significados." Se iluminan áreas de memoria de trabajo y percepción visual. Nada de la ruta semántica.
 
-En español claro: los expertos no piensan sobre las palabras. Las ven. De la misma manera que un gran maestro de ajedrez ve posiciones del tablero, un jugador top de Scrabble ve combinaciones de letras. La vía del significado — la que tú y yo usamos cuando leemos — se omite en gran medida.
+En cristiano: los mejores no *piensan* palabras. Las *ven*. Como un ajedrecista ve posiciones de tablero de un vistazo. El campeón de Scrabble ve combinaciones de letras. El camino del significado — el que usas cuando lees — se evita casi por completo.
 
-Esto significa que el reconocimiento experto de palabras es un proceso cognitivo fundamentalmente diferente. Estos jugadores literalmente han reconectado cómo sus cerebros manejan el lenguaje. No a través de un don genético. A través de la práctica.`,
+Significa que el reconocimiento de palabras en expertos es un proceso cognitivo radicalmente distinto. Estos tipos literalmente han recableado sus cerebros. No por genes. Por horas y horas de práctica.`,
       },
       {
-        title: 'Chunking: El Estudio de 1973 Que Lo Explica Todo',
-        content: `Para entender por qué ocurre esta reconexión cerebral, necesitas conocer uno de los experimentos más elegantes en ciencia cognitiva.
+        title: 'Chunking: el truco de los ajedrecistas que funciona igual en palabras',
+        content: `Para entender por qué pasa esto, hay un experimento de 1973 que lo explica todo.
 
-En 1973, William Chase y Herbert Simon hicieron algo brillante. Mostraron a expertos en ajedrez y novatos un tablero con piezas de una partida real, les dieron cinco segundos para mirar, y les pidieron reconstruirlo de memoria. Los expertos aplastaron a los novatos.
+Chase y Simon —dos psicólogos de la Universidad— pusieron a maestros de ajedrez y aprendices a ver un tablero real de un juego en progreso. Cinco segundos nada más. Luego: "reconstruye de memoria." Los maestros lo hicieron perfecto. Los aprendices, un desastre.
 
-Pero aquí viene el giro. Cuando mostraron piezas colocadas aleatoriamente, los expertos no fueron mejores que los principiantes.
+Aquí viene lo raro: cuando pusieron piezas *al azar* — posiciones que nunca ocurrirían en un juego real — los maestros también fallaron. No eran mejores que los aprendices.
 
-La explicación: los expertos no recuerdan piezas individuales. Recuerdan "chunks" — grupos de piezas que forman patrones reconocibles.
+¿Por qué? Los maestros no recuerdan piezas individuales. Recuerdan "chunks" — grupos que forman patrones reconocibles. Una estructura de peones típica. Un gambito común. Su ventaja es ese reconocimiento de patrones, no memoria bruta.
 
-Los juegos de palabras funcionan de manera idéntica. Cuando yo miro un atril de letras, veo fichas individuales. Cuando Carmen mira, ve clusters de letras: prefijos comunes como DES- o RE-, sufijos como -CIÓN o -MENTE. El tablero se transforma de una cuadrícula de letras aisladas en un paisaje de bloques de construcción.
+Los juegos de palabras funcionan exactamente igual. Cuando yo veo un atril, veo siete fichas sueltas. Cuando un maestro lo ve, ve clusters: los prefijos RE-, DES-, los sufijos -CIÓN, -MENTE, -ABLE. De repente el atril no es letras al azar, sino bloques de construcción listos para armar.
 
-Probé esto conmigo mismo después del torneo. Empecé a buscar conscientemente chunks en lugar de intentar construir palabras desde cero. La mejora fue casi inmediata. No porque de repente conociera más palabras, sino porque estaba procesando la información de manera más eficiente.`,
+Lo probé después del torneo. Dejé de intentar "crear" palabras. Empecé a buscar esos patrones conscientemente. La mejora fue instantánea. No porque de pronto supiera más palabras, sino porque procesaba la información sin fricción.`,
       },
       {
-        title: 'Conteo de Fichas: La Habilidad Que Me Separó de Todos',
-        content: `Aquí hay algo que nadie me dijo antes del torneo: los jugadores competitivos cuentan fichas.
+        title: 'Tracking: la herramienta secreta que nadie te enseña',
+        content: `Algo que nadie me mencionó antes del torneo: los jugadores competitivos cuentan fichas.
 
-No metafóricamente. Literalmente. Rastrean qué letras se han jugado y calculan qué queda en la bolsa. Al final del juego, los mejores jugadores saben — con casi total certeza — qué fichas tiene su oponente.
+Literalmente. Vigilan cuál ha salido del juego y calculan qué sigue disponible en la bolsa. Para el final, los tops saben con casi total certeza qué tiene el oponente.
 
-Piénsalo un segundo. Mientras tú intentas descifrar si una palabra existe, tu oponente está realizando un inventario mental de todas las fichas y calculando distribuciones de probabilidad. Es como jugar póker donde una persona puede contar cartas y la otra no.
+Déjalo reposar un segundo: mientras tú intenta descifrar si una palabra existe, tu oponente ejecuta un inventario mental de cien fichas y calcula distribuciones de probabilidad. Es póker donde uno puede contar cartas y el otro no.
 
-En los torneos, el conteo de fichas se considera una habilidad básica. No avanzada. Básica. Los jugadores usan una hoja de seguimiento con todas las fichas y las van tachando conforme se juegan.
+En los torneos, el tracking se considera *básico*. No avanzado. Básico. Los jugadores usan una hoja impresa con todas las fichas y las van tachando.
 
-No rastreé una sola ficha durante mis juegos del torneo. Mirando hacia atrás, es como haber aparecido a una partida de ajedrez sin saber cómo se mueve el caballo.`,
+Yo no trackeé una sola ficha en mis juegos. En retrospectiva, fue como llegar a una partida de ajedrez sin saber cómo se mueve el caballo.`,
       },
       {
-        title: 'Valores de Reserva: Las Matemáticas Detrás de Cada Turno',
-        content: `Después del torneo, me uní a un grupo de estudio de Scrabble online. (Sí, existen. Sí, son exactamente tan nerds como imaginas.) Aquí aprendí sobre los "valores de reserva."
+        title: 'Leave values: la matemática detrás de cada movimiento ganador',
+        content: `Después del torneo entré a un grupo de estudio de Scrabble online. (Sí, existen. Sí, son nerds de primera.) Ahí descubrí el concepto de "leave value."
 
-Cada turno en Scrabble competitivo no es solo sobre la palabra que juegas. Es sobre las letras que guardas en tu atril para el próximo turno. La "reserva" tiene un valor esperado calculable basado en teoría de probabilidad y datos de simulación.
+Cada turno no es solo la palabra que juegas. Es lo que dejas en tu atril. Esas fichas que quedan tienen un valor esperado calculable. Pura probabilidad.
 
-Por ejemplo: mantener una mezcla equilibrada de vocales y consonantes es casi siempre mejor que quedarse con todas las fichas de alto puntaje. Una S vale mucho más que su punto nominal porque puede pluralizar y engancharse a palabras existentes. Una ficha en blanco — que vale cero puntos — es la ficha más valiosa del juego por su flexibilidad.
+Ejemplo: mantener una mezcla de vocales y consonantes casi siempre gana a quedarte con todos los puntos altos. Una S vale mucho más que su punto nominal porque pluraliza y se engancha. Una ficha en blanco — que vale cero — es la más valiosa del juego por lo que puedes hacer con ella.
 
-Los mejores jugadores han internalizado estos valores. A veces juegan deliberadamente una palabra de menor puntuación porque deja mejores fichas.
+Los maestros internalizaron esto. A veces juegan deliberadamente una palabra de poca puntuación porque deja fichas mejores. Sacrifican ahora para ganar después.
 
-Este fue el mayor cambio de mentalidad para mí. Siempre evaluaba turnos por "¿cuántos puntos saqué?" Los mejores evalúan por "¿cuántos puntos saqué Y qué tan buena es mi reserva?" Es un problema de optimización completamente diferente.`,
+Para mí fue el mayor cambio de perspectiva. Yo evaluaba turnos: "¿cuántos puntos saqué?" Los tops evalúan: "¿cuántos puntos saqué Y qué tan fuerte queda mi atril?" Problema de optimización completamente distinto.`,
       },
       {
-        title: 'Bluffs en Scrabble: Sí, En Serio',
-        content: `OK. Necesito contarles sobre los "phonies."
+        title: 'Bluffear es válido — y legal',
+        content: `Una cosa que me hizo clic durante los torneos: puedes jugar palabras que no existen.
 
-En Scrabble competitivo, puedes jugar una palabra que no existe. A propósito. Si tu oponente no la desafía, la palabra se queda y obtienes los puntos.
+No por accidente. A propósito. Si nadie te desafía, la palabra se queda y ganas los puntos. Estrategia 100% legítima.
 
-Esta es una estrategia legítima y aceptada. Y te desestabiliza de maneras para las que no estaba preparado.
+Mi cuarto juego: el oponente jugó algo que parecía *casi real*. No lo desafié. Eran 86 puntos. Después, googléé. No era palabra. Nuestro oponente sonrió con cinismo. "Hay que desafiar siempre, hermano."
 
-Durante mi cuarto juego, mi oponente jugó una palabra que parecía... plausible. No la desafié. Valía 86 puntos. Después del juego, la busqué. No era una palabra válida. Mi oponente sonrió. "Hay que desafiar," dijo.
+Pero aquí está el nudo: si desafías y la palabra *sí es real*, pierdes tu turno. Cada desafío es una apuesta.
 
-Pero aquí está la tensión: si desafías una palabra y SÍ es válida, pierdes tu turno. Cada desafío es una apuesta.
+Los mejores convierten eso en arma. Saben qué palabritas falsas lucen más creíbles. El mejor bluff parece tan natural que ni jugadores veteranos se animan a desafiar.
 
-Los mejores jugadores convierten esta incertidumbre en arma. Saben qué palabras falsas parecen más creíbles. Los mejores bluffs se ven tan naturales que incluso oponentes experimentados dudan.
-
-Tengo sentimientos complicados al respecto. Parte de mí piensa que es antideportivo. Otra parte piensa que es el aspecto psicológicamente más fascinante del Scrabble competitivo. No solo juegas contra el tablero — juegas contra la confianza de tu oponente.`,
+Tengo sentimientos complicados. Parte de mí dice que es sucio. Otra parte — la que aprecia la estrategia — piensa que es lo más psicológicamente brillante del Scrabble competitivo. No juegas solo contra el tablero. Juegas contra la confianza del otro.`,
       },
       {
-        title: 'La Guerra de Diccionarios: Collins vs. TWL',
-        content: `Algo que no sabía antes de entrar al juego competitivo: hay dos diccionarios oficiales de Scrabble, y la comunidad está profundamente dividida sobre cuál es el "correcto."
+        title: 'La guerra de diccionarios: un lío que nadie te cuenta',
+        content: `Algo que ignoraba completamente antes de entrar al circuito: hay dos diccionarios oficiales y la comunidad está *radicalmente* dividida.
 
-Los torneos en Norteamérica usan el TWL (Tournament Word List). El resto del mundo anglófono — Reino Unido, Australia — usa Collins Scrabble Words, que es significativamente más grande.
+En Norteamérica usan TWL — unos 190.000 palabras. En el resto del mundo inglés (Reino Unido, Australia) usan Collins — casi 280.000 palabras. Eso son 90.000 palabras extras en juego internacional.
 
-Collins incluye unas 280.000 palabras. TWL tiene unas 190.000. Eso son 90.000 palabras adicionales disponibles en juego internacional.
+En español el tema es todavía más complejo. La RAE es la referencia, pero los debates son eternos: ¿vale "tiktok"? ¿Y "guasapear"? Las variaciones regionales — mexicano, argentino, español — hacen que un jugador colombiano y uno de Madrid tengan vocabularios de Scrabble sorprendentemente distintos.
 
-En el mundo hispanohablante tenemos nuestras propias batallas. La RAE es la referencia para el Scrabble en español, pero los debates son eternos. ¿Vale "güey"? ¿Y "croqueta"? Las variaciones regionales — mexicano, argentino, español — hacen que la cuestión del diccionario sea aún más compleja que en inglés. Un jugador colombiano y uno español pueden tener vocabularios de Scrabble sorprendentemente diferentes.
-
-Le pregunté a un jugador del torneo si esto le molestaba. Se encogió de hombros. "Son solo más palabras para aprender," dijo. Luego jugó una palabra de 64 puntos y dejé de hacer preguntas.`,
+Un tipo del torneo se encogió de hombros: "Son solo más palabras que aprender." Luego jugó una palabra de 64 puntos y dejé de hacer preguntas.`,
       },
       {
-        title: 'El Hábito de Práctica de 4,5 Horas Semanales',
-        content: `La investigación que rastreó los hábitos de práctica de jugadores competitivos encontró que dedican un promedio de 4,5 horas por semana a estudiar palabras. No jugar partidas — estudiar. Sentarse con listas de palabras y generadores de anagramas hasta que todo se vuelve automático.
+        title: '4,5 horas a la semana: el patrón que distingue amateurs de pros',
+        content: `La investigación que rastreó cómo entrenan los jugadores top encontró que dedican un promedio de 4,5 horas *semanales* a estudiar palabras. No jugar. Estudiar. Sentarse con listas de palabras y generadores de anagramas hasta que todo es automático.
 
-4,5 horas. Cada semana. Por años.
+4,5 horas. Todos los weeks. Durante años.
 
-Ese número pone a jugadores casuales como yo en perspectiva. Yo juego quizás tres partidas por semana y pensaba que era mucho.
+Ese número me puso en perspectiva. Yo juego quizás tres partidas semanales y pensaba que era "bastante."
 
-Pero aquí está lo que la investigación también encontró: el estudio se traduce en cambios cognitivos medibles. El acceso rápido a palabras — medido por tiempos de reacción en pruebas de laboratorio — se correlaciona directamente con el nivel de expertise. Cuanto más estudias, más rápido tu cerebro recupera palabras, y esta ventaja de velocidad persiste incluso fuera del contexto del juego.
+Lo fascinante del estudio: toda esa práctica se traduce en cambios cognitivos medibles. El acceso rápido a palabras — medido en tiempo de reacción en pruebas de laboratorio — correlaciona directamente con expertise. Cuanto más estudias, más rápido tu cerebro recupera palabras. Y esa ventaja de velocidad persiste *fuera* del juego.
 
-En otras palabras, los jugadores competitivos no solo mejoran en Scrabble. Sus cerebros realmente se vuelven más rápidos procesando lenguaje en general. La práctica cambia el hardware, no solo el software.`,
+En otras palabras: jugadores competitivos no solo mejoran en Scrabble. Sus cerebros se vuelven más rápidos procesando *lenguaje en general*. La práctica no es software. Es hardware.`,
       },
       {
-        title: 'La Psicología de la Que Nadie Habla',
-        content: `Quiero ser honesto sobre algo. El mundo del Scrabble competitivo es intenso de maneras que van más allá de la estrategia.
+        title: 'La psicología que no hablan en YouTube',
+        content: `Quiero ser franco: el mundo del Scrabble competitivo es intenso de maneras que van más allá de estrategia.
 
-El manejo del reloj es brutal. Las partidas de torneo usan relojes de ajedrez, típicamente 25 minutos por jugador. Se te acaba el tiempo y pierdes 10 puntos por minuto. Vi a un jugador que claramente iba ganando perder porque sobreanalizó sus últimos tres turnos.
+El manejo del reloj es brutal. Torneos usando relojes de ajedrez: 25 minutos por jugador. Se te acaba y pierdes 10 puntos por minuto. Vi a un jugador claramente ganador perder porque overthought sus últimas tres tiradas.
 
-Está el manejo emocional también. Recibir un atril de puras vocales cuando el juego está cerrado. Sacar la Q sin la U en un final apretado. Que tu oponente haga bingo dos veces seguidas mientras estás atascado.
+Luego está el peso psicológico. Recibir un atril de puras vocales cuando el juego está ajustado. Sacar la Q sin U en un final cerrado. Que el oponente haga bingo dos turnos seguidos.
 
-Y luego está la dinámica social. El Scrabble competitivo es, paradójicamente, una de las actividades competitivas más solitarias. Te sientas frente a alguien en casi silencio durante 45 minutos, encerrado en una batalla mental, luego das la mano y lo haces de nuevo con otro.
+Y la dinámica extraña: Scrabble competitivo es una de las actividades competitivas más solitarias que existen. Te sientas frente a alguien en silencio casi total 45 minutos, encerrado en batalla mental, luego das la mano y repites con el próximo.
 
-La chica de 14 años que me ganó en mi quinto juego fue amable al respecto. "Tienes un vocabulario muy bueno," dijo. "Solo necesitas aprender estrategia." Había estado compitiendo desde los nueve años.`,
+La chica de 14 que me ganó el quinto juego fue amable. "Tienes buen vocabulario," dijo. "Solo necesitas estrategia." Lleva compitiendo desde los nueve años.`,
       },
       {
-        title: '¿Qué Significa Esto Si Eres un Jugador Casual?',
-        content: `Esto es lo que me llevé a casa de la experiencia del torneo y la investigación:
+        title: 'Cómo robarte los trucos de los campeones',
+        content: `Lo que me llevé del torneo y los estudios:
 
-1. Busca patrones, no palabras completas. Esta es la palanca más grande. Entrénate para ver combinaciones comunes de letras — prefijos, sufijos, palabras de dos letras — en vez de intentar conjurar palabras enteras de la nada.
+1. Busca patrones, no palabras. Entrena tu ojo para ver combinaciones típicas — prefijos, sufijos, dos-letras — en lugar de "inventar" palabras del aire. Chunking es lo que marca la diferencia.
 
-2. Tu cerebro ya está cambiando cuando juegas. La investigación fMRI muestra que el reconocimiento visual de palabras mejora con la práctica, incluso en adultos. Cada juego que juegas está literalmente reconectando tus vías neuronales. No necesitas practicar 4,5 horas semanales — pero la consistencia importa más que la intensidad.
+2. Tu cerebro *ya está* cambiando cuando juegas. fMRI lo prueba: el reconocimiento visual mejora con práctica, incluso en adultos. Cada juego rewirea literalmente tus caminos neuronales. No necesitas 4,5 horas semanales — pero consistencia late intensidad.
 
-3. El significado está sobrevalorado (para fines del juego). Deja de intentar aprender qué significa cada palabra. Si juegas para ganar, aprende qué patrones de letras son válidos y sigue adelante.
+3. El significado está sobrevalorado (en este juego). Deja de intentar "aprender" qué significa cada palabra. Si juegas para ganar, memoriza patrones y muévete.
 
-4. Piensa en tu reserva. Incluso en juego casual, prestar atención a qué fichas conservas puede mejorar dramáticamente tus puntuaciones.
+4. Piensa en lo que dejas. Incluso en juego casual, estar atento a tus fichas sube dramáticamente puntos.
 
-5. La brecha entre casual y competitivo es enorme — y está bien. Fui al torneo pensando que estaba por encima del promedio. Aprendí que no estaba ni cerca. Pero esa brecha me enseñó más en un fin de semana que años de juego casual.
+5. La brecha entre casual y competitivo es enorme — y está OK. Entré pensando que era "por encima del promedio." Descubrí que estaba completamente perdido. Pero esa brecha me enseñó más en un fin de semana que años de juego random.
 
-La investigación muestra que el reconocimiento visual de palabras sigue mejorando en adultos. Lo que parece "talento natural" en jugadores expertos es casi siempre práctica acumulada — y prueba de que nuestros cerebros son más flexibles de lo que les damos crédito.
+La ciencia es clara: el reconocimiento de palabras sigue mejorando en adultos. Lo que parece "talento natural" en los campeones es casi siempre práctica acumulada — y evidencia de que nuestros cerebros son más plásticos de lo que creemos.
 
-En algún lugar, Carmen está practicando ahora mismo. Y la próxima vez que nos encontremos frente a un tablero de torneo, estaré listo.`,
+En algún lugar, esa señora está practicando ahora. La próxima vez que nos encontremos frente a un tablero de torneo, voy a estar listo.`,
       },
     ],
     backToBlog: 'Volver al Blog',
     tryDaily: 'Desafío Diario',
     practice: 'Practicar',
   },
+
 };
