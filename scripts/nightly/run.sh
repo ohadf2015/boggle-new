@@ -352,7 +352,13 @@ Compose the message in this MINIMAL format (≤1200 chars total). One blank line
 > permalink: <url>
 > reply: <draft text, kept to ≤200 chars>
 
-🎮 *Game-mode idea* (from lane 4's "Top game-mode improvement idea" OR lane 7's "new product ideas")
+🎮 *Game-mode shipped* (ONLY if lane 5 actually shipped an admin route this run — extract from `#### Experimental game mode shipped` section in the lane-5 report. Otherwise omit this block entirely.)
+> Mode: <name>
+> Admin URL: <full https URL>
+> <one-line concept>
+> → playtest + reply 👍/👎 to this bot
+
+🎮 *Game-mode idea* (only if no mode was shipped this run — surface the top concept from lane 4 / lane 7 instead)
 <one line: name + why>
 
 → <one-line tomorrow focus>

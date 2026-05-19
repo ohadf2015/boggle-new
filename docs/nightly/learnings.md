@@ -20,7 +20,7 @@ Rewritten by **lane 6** each night from the prior 7 reports. **≤200 lines.** A
 - **Anything repeatable → script it.** If a lane finds itself doing the same sequence of WebSearch / WebFetch / SQL / shell on multiple nights, codify it as a helper script under `scripts/nightly/lib/` or `scripts/nightly/tools/`. Lane 7 (self-learn) is explicitly empowered to create AND update these helpers. Each new script must be: (a) under 200 lines, (b) idempotent, (c) syntax-checked with `bash -n`, (d) referenced from at least one lane prompt.
 
 ## Permissions (granted by user)
-- **Experimental game modes OK** — lane 05 (landing) may ship a NEW game mode behind a typed flag with ≤10% rollout, provided: (a) flag default = off, (b) Playwriter E2E QA covers happy path + edge cases, (c) prior week's `loop-improvements/*.md` flagged a viable concept, (d) mode is reachable only via `?mode=<flag>` deep-link or rollout-flagged hub entry. Never expose to 100% from a nightly run — that requires human review.
+- **Experimental game modes — admin-only first** *(updated 2026-05-19)* — lane 05 (landing) may ship a NEW game mode at `fe-next/app/[locale]/admin/<slug>/page.tsx` reusing the existing admin auth gate (see memory `wordcraft-mvp-2026-05-04`). NO rollout flag, NO Playwriter mandate, NO sitemap entry. User playtests manually then decides on public rollout. The admin URL MUST appear in the manager-summary Telegram digest (`🎮` block).
 
 ## Open watches (carry forward until proven)
 - Lane 04 (competitor) Reddit access: `old.reddit.com` may rate-limit unauthenticated fetches — if WebFetch returns 429 on >50% of attempts for a week, consider switching to the Reddit JSON API via OAuth.

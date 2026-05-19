@@ -11,17 +11,28 @@ Default: pick the WORST-converting landing page with ≥200 sessions in the last
 
 **ONLY ONE landing variant per week** — if any `landing_variant_*_v1` flag is <7 days old, skip the landing variant and consider STEP 0 instead.
 
-═══ STEP 0 — Experimental game mode (optional, behind strict gate) ═══
-*Permission granted by user (see `Permissions` block in preamble).*
+═══ STEP 0 — Experimental game mode (admin-only, no flag, no auto-QA) ═══
+*Permission granted by user (see `Permissions` block in preamble). Updated 2026-05-19: admin-only route, no rollout flag, no Playwriter mandate — user playtests manually then decides on rollout.*
 
 Look at `docs/nightly/loop-improvements/*.md` from the last 3 nights AND `docs/nightly/ideas/*.md` from lane 4. If a NEW game-mode concept appears with **≥2 mentions of evidence (data citation + competitor signal)**, you MAY ship an EXPERIMENTAL implementation in place of the landing variant this week.
 
 Constraints (ALL must hold):
-- Flag default OFF. Rollout target ≤10% (e.g. `gameMode.experimentalRollout: 0.1`).
-- Reachable ONLY via `?mode=<slug>` deep-link OR a rollout-flagged hub tile. Never the default home CTA.
-- MUST include a Playwriter E2E QA run that covers: (a) deep-link reaches the mode, (b) one happy-path game completion, (c) Sentry tag confirms `game_mode=<slug>` event fired. Failed E2E = revert the entire lane.
-- Per-lane 8-file cap still applies — pick a tiny mode (one new route + minimal client logic). No new realtime tables. No new auth.getUser() calls.
-- Append a "playwriter-qa.md" snippet to today's report showing the script + run output.
+- **Admin-only route**: live at `fe-next/app/[locale]/admin/<mode-slug>/page.tsx`. Reuse the existing admin auth gate — grep for `isAdmin` / `requireAdmin` / `/admin/word-craft` to find the pattern (see memory `wordcraft-mvp-2026-05-04`). Non-admin users get the existing admin-gate redirect.
+- **No public exposure**: no entry in `fe-next/app/sitemap.ts`, no link from the home hub, no flag wiring. Only the admin user can reach it.
+- **No Playwriter mandate**: user playtests manually after you ship. Just make sure the page loads + the core loop works on your visual inspection during development.
+- **Per-lane 8-file cap** still applies — pick a tiny mode (one new route + minimal client logic + a route-scoped test). No new realtime tables. No new `auth.getUser()` calls (use local JWT verify).
+- **MUST emit the admin URL in the report** so the user sees the link in tomorrow's Telegram digest. Use this exact format in the lane-5 section of `docs/nightly/reports/__TODAY__.md`:
+
+  ```
+  #### Experimental game mode shipped
+  - Mode: <name>
+  - Admin URL: https://lexiclash.com/en/admin/<slug>/  (mirrors on /he, /sv, /ja, /es)
+  - Local URL: http://localhost:3001/en/admin/<slug>/
+  - Concept: <one-line>
+  - Lane-4 / loop-improvements evidence: <link or quote>
+  - Files added: <list>
+  - Next step for user: open admin URL, play 1 round, send 👍/👎 to bot
+  ```
 
 If no concept passes the gate, fall back to the landing variant path below.
 
