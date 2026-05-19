@@ -20,7 +20,7 @@ export type LocaleContent = {
 export const contentByLocale: Record<string, LocaleContent> = {
   en: {
     title: 'How Word Games Became My Anxiety Hack (And What Therapists Think About That)',
-    subtitle: 'Flow states, digital meditation, and the surprisingly thin line between healthy coping and avoidance. A personal story backed by real research.',
+    subtitle: 'Flow states, digital meditation, and the thin line between coping and avoidance. Real research. Personal story.',
     category: 'Mental Health',
     readTime: '9 min read',
     authorName: 'Ohad Fisher',
@@ -71,17 +71,17 @@ Social regulation: In multiplayer word games, there's a social component. Even c
         title: 'Mindfulness versus word games',
         content: `Researchers are noticing that the cognitive profile of focused game-play looks remarkably similar to mindfulness meditation.
 
-Adam Gazzaley, a neuroscientist at UCSF, found that certain structured cognitive tasks produce brain states similar to meditation — specifically, increased alpha wave activity in the prefrontal cortex and reduced activity in the default mode network. The default mode network is your brain's autopilot. It activates when you're not focused on anything specific, and it's the network most associated with rumination and worry. Meditation teaches you to quiet it. An absorbing word game quiets it on its own.
+Adam Gazzaley, a neuroscientist at UCSF, found that certain structured cognitive tasks produce brain states similar to meditation. Specifically: increased alpha wave activity in the prefrontal cortex and reduced activity in the default mode network. The default mode network is your brain's autopilot. It activates when you're not focused on anything specific, and it's the network most associated with rumination and worry. Meditation teaches you to quiet it. An absorbing word game quiets it on its own.
 
 I'm careful here. Word games are not meditation. Meditation builds long-term regulatory skills that gaming doesn't. A regular practice changes the structure of your brain over time.
 
-But word games provide an on-demand off-switch for the rumination machine. For people like me, who find traditional meditation aversive, that on-demand quality is valuable. Meditation is going to the gym regularly. Word games are taking the stairs instead of the elevator. One builds more strength over time. The other is more accessible and better than nothing.
+But word games provide an on-demand off-switch for the rumination machine. For people like me, who find traditional meditation aversive, that on-demand quality is valuable. Think of it this way: meditation is going to the gym regularly, while word games are taking the stairs instead of the elevator. One builds more strength over time. The other is more accessible and better than nothing.
 
 A 2023 study in Computers in Human Behavior found that participants who played cognitively engaging puzzle games for 20 minutes showed comparable reductions in state anxiety to those who completed a guided meditation session of equal length.`,
       },
       {
         title: 'What therapists actually think',
-        content: `I asked my own therapist what she thought about my word game habit. She said: "It sounds like you've found an adaptive coping strategy. The question isn't whether it works — it clearly does. The question is whether it's the only tool in your toolbox."
+        content: `I asked my own therapist what she thought about my word game habit. She said: "It sounds like you've found an adaptive coping strategy. The question isn't whether it works. Clearly it does. The question is whether it's the only tool in your toolbox."
 
 Fair point.
 
@@ -89,7 +89,7 @@ Rachel Kowert, a research psychologist who studies gaming and mental health, des
 
 A clinical psychologist I spoke with (who asked to remain anonymous) said she recommends puzzle games to some anxiety patients. "Not as a replacement for therapy or medication, but as a complement. I have clients who use word games as a bridge when they feel anxiety rising but can't do a full grounding exercise."
 
-She added something important: "Open-ended games can increase anxiety for some people because there are too many choices. Word games have constraints. A limited grid, a timer, specific rules. Those constraints are actually therapeutic for anxious minds because they reduce decision fatigue."
+She added something important: "Open-ended games can increase anxiety for some people because there are too many choices. Word games have constraints: a limited grid, a timer, specific rules. Those constraints are actually therapeutic for anxious minds because they reduce decision fatigue."
 
 Not every therapist was enthusiastic. One pointed out that any coping mechanism can become avoidance. "If someone is playing word games for six hours a day to avoid dealing with real problems, that's not coping. That's escape."
 
