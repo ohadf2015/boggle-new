@@ -9087,6 +9087,12 @@ const es = {
     "hint": "Pista",
     "undo": "Deshacer",
     "undoTooltip": "Deshacer último movimiento",
+    "undoAdGate": {
+      "title": "¿Más deshacer?",
+      "body": "Mira un anuncio corto para seguir revirtiendo movimientos. Tus dos primeros deshacer en cada nivel son siempre gratis.",
+      "watch": "Ver anuncio",
+      "cancel": "Ahora no"
+    },
     "morePoints": "más pts",
     "needScore": "Necesitas {score}",
     "totalScore": "Total",

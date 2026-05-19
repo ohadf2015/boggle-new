@@ -43,11 +43,11 @@ export function BlastUndoAdModal({ isOpen, modeColor = '#06b6d4', onWatchAd, onC
           >
             <div aria-hidden className="text-4xl">↶</div>
             <h2 className="text-xl font-black text-center" style={{ color: modeColor }}>
-              {t('blast.undo.adGate.title', 'More undos?')}
+              {t('blast.undoAdGate.title', 'More undos?')}
             </h2>
             <p className="text-sm text-white/80 text-center leading-relaxed">
               {t(
-                'blast.undo.adGate.body',
+                'blast.undoAdGate.body',
                 'Watch a short ad to keep reversing moves. Your first two undos each level are always free.',
               )}
             </p>
@@ -58,14 +58,14 @@ export function BlastUndoAdModal({ isOpen, modeColor = '#06b6d4', onWatchAd, onC
                 className="w-full px-5 py-3 rounded-lg font-bold text-[#0b1530] transition-transform active:scale-95"
                 style={{ background: modeColor, boxShadow: `2px 2px 0 #0b1530` }}
               >
-                {t('blast.undo.adGate.watch', 'Watch ad')}
+                {t('blast.undoAdGate.watch', 'Watch ad')}
               </button>
               <button
                 data-testid="blast-undo-ad-cancel"
                 onClick={onCancel}
                 className="w-full px-5 py-2 rounded-lg font-medium text-white/70 hover:text-white transition-colors"
               >
-                {t('blast.undo.adGate.cancel', 'Not now')}
+                {t('blast.undoAdGate.cancel', 'Not now')}
               </button>
             </div>
           </m.div>
