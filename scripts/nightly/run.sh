@@ -348,9 +348,21 @@ Compose the message in this MINIMAL format (≤1200 chars total). One blank line
 ⚠️ <concern 1 — only if real>
 ⚠️ <concern 2>
 
-💬 *Reddit pick* (from lane 4's "Top Reddit pick of the day" — INCLUDE the full permalink AND the suggested reply as a quote, only if lane 4 produced one)
-> permalink: <url>
-> reply: <draft text, kept to ≤200 chars>
+💬 *Reddit pick* (from lane 4's "Top Reddit pick of the day" — ONLY if lane 4 produced a LIVE permalink, not a pattern. If lane 4 only had pattern-based suggestions, OMIT this block entirely.)
+
+Format the block EXACTLY like this so the founder can tap-to-open the URL and tap-and-hold-to-copy the reply:
+
+\`\`\`
+💬 *Reddit pick* — r/<sub>
+<full https permalink on its own line, no quote prefix, so Telegram auto-links it>
+
+Reply (tap-hold to copy):
+\\\`\\\`\\\`
+<witty + accurate reply text, the EXACT string to paste into Reddit — no quotation marker, no markdown wrapping, ideally 30-60 words, plain text only>
+\\\`\\\`\\\`
+\`\`\`
+
+Why this format: Telegram renders a bare URL as a tappable link, and triple-backtick blocks are tap-and-hold copyable on mobile. The founder can open the thread + copy the comment in two taps.
 
 🎮 *Game-mode shipped* (ONLY if lane 5 actually shipped this run — extract from `#### Experimental game mode shipped` section in the lane-5 report. Otherwise omit this block entirely.)
 > Mode: <name>
