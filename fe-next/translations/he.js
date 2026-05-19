@@ -5585,6 +5585,8 @@ const he = {
     "lockedByOther": "נעול על ידי שחקן אחר",
     "yourWordStolen": "{by} גנב לך את המילה {word}!",
     "stealGain": "גניבה +{score}",
+    "allLettersUsed": "כל האותיות!",
+    "almostAllLetters": "כמעט הכל!",
     "inputPlaceholder": "הקלד מילה...",
     "tapLetters": "הקש או גרור אותיות כדי לבנות מילה",
     "tapToRemove": "הקש שוב על אות שהוספת כדי להסיר",

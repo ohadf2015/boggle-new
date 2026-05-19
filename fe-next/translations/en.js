@@ -5690,6 +5690,8 @@ const en = {
     "lockedByOther": "Locked by another player",
     "yourWordStolen": "{by} stole your word {word}!",
     "stealGain": "STEAL +{score}",
+    "allLettersUsed": "ALL LETTERS!",
+    "almostAllLetters": "ALMOST ALL!",
     "inputPlaceholder": "Type a word...",
     "tapLetters": "Tap or drag letters to build a word",
     "tapToRemove": "Tap an added letter again to remove it",

@@ -5626,6 +5626,8 @@ const es = {
     "lockedByOther": "Bloqueada por otro jugador",
     "yourWordStolen": "¡{by} te robó la palabra {word}!",
     "stealGain": "ROBO +{score}",
+    "allLettersUsed": "¡TODAS LAS LETRAS!",
+    "almostAllLetters": "¡CASI TODAS!",
     "inputPlaceholder": "Escribe una palabra...",
     "tapLetters": "Toca o arrastra letras para formar una palabra",
     "tapToRemove": "Toca otra vez una letra añadida para quitarla",

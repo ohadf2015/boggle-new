@@ -5583,6 +5583,8 @@ const sv = {
     "lockedByOther": "Låst av en annan spelare",
     "yourWordStolen": "{by} stal ditt ord {word}!",
     "stealGain": "STÖLD +{score}",
+    "allLettersUsed": "ALLA BOKSTÄVER!",
+    "almostAllLetters": "NÄSTAN ALLA!",
     "inputPlaceholder": "Skriv ett ord...",
     "tapLetters": "Tryck eller dra bokstäver för att bygga ett ord",
     "tapToRemove": "Tryck igen på en tillagd bokstav för att ta bort",

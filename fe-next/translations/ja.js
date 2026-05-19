@@ -5616,6 +5616,8 @@ const ja = {
     "lockedByOther": "他のプレイヤーがロック中",
     "yourWordStolen": "{by}に単語{word}を奪われました！",
     "stealGain": "スチール +{score}",
+    "allLettersUsed": "全文字使用！",
+    "almostAllLetters": "あと一文字！",
     "inputPlaceholder": "単語を入力...",
     "tapLetters": "文字をタップまたはドラッグして単語を作ろう",
     "tapToRemove": "追加した文字をもう一度タップで削除",

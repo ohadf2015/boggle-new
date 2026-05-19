@@ -9,12 +9,15 @@ import { WheelLetter, WordTile } from '@/components/daily/WordWheelParts';
 import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { isValidWordWheelWord } from '@/utils/dailyChallenge/wordWheelGeneration';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { WHEEL_RUSH_FOG_MS, WHEEL_RUSH_MIN_WORD_LEN } from '@/shared/constants/wheelRushConstants';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import Avatar from '@/components/Avatar';
 import { MyWordsChips, type WordEntry } from './WheelRushPieces';
+import { WheelRushHeader } from './WheelRushHeader';
+import { WheelRushCelebration, type WheelCelebration } from './WheelRushCelebration';
+import { classifyLetterCoverage } from '@/lib/wheelRush/letterCoverage';
+import { fireConfetti } from '@/utils/confettiUtils';
 import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
 import { useMPFTUEIdle } from '@/hooks/useMPFTUEIdle';
@@ -93,7 +96,7 @@ export const FogCountdown: React.FC<{ endsAt: number }> = ({ endsAt }) => {
 export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t, remainingTime, onFogProgressChange, isDesktopCanvas = false }) => {
   const {
     playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
-    playButtonClickSound, playBoardShuffleSound,
+    playButtonClickSound, playBoardShuffleSound, playLegendaryWordSound,
   } = useSoundEffects();
 
   const prefersReduced = useReducedMotion();
@@ -107,6 +110,10 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const [wordBuilderShake, setWordBuilderShake] = useState(false);
   const [fogActive, setFogActive] = useState(false);
   const [wheelRadius, setWheelRadius] = useState(72);
+  const [celebration, setCelebration] = useState<WheelCelebration | null>(null);
+  const celebrationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Ref-bridged so the once-bound socket onResult closure can reach the latest trigger.
+  const celebrateRef = useRef<(tier: 'all' | 'almost', word: string) => void>(() => {});
 
   const { floatingReactions, dismissReaction } = useQuickReactions({ socket, username });
 
@@ -229,6 +236,31 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     fbTimer.current = setTimeout(() => setFeedback(null), 1200);
   }, []);
 
+  // Wheel-coverage celebration — fires when an accepted word uses all (or
+  // all-but-one) distinct wheel letters, mirroring the daily-challenge pangram
+  // beat. Single keyed state so a second pangram replaces (re-animates) rather
+  // than queues. fireConfetti self-gates on reduced-motion/low-end devices.
+  const triggerCelebration = useCallback((tier: 'all' | 'almost', word: string) => {
+    setCelebration({ tier, word, key: Date.now() });
+    playLegendaryWordSound?.();
+    haptic([50, 30, 50, 30, 80]);
+    fireConfetti({
+      particleCount: tier === 'all' ? 60 : 36,
+      spread: tier === 'all' ? 110 : 80,
+      startVelocity: 50,
+      origin: { y: 0.5 },
+    });
+    if (celebrationTimerRef.current) clearTimeout(celebrationTimerRef.current);
+    celebrationTimerRef.current = setTimeout(() => {
+      celebrationTimerRef.current = null;
+      setCelebration(null);
+    }, 1900);
+  }, [playLegendaryWordSound]);
+  useEffect(() => { celebrateRef.current = triggerCelebration; }, [triggerCelebration]);
+  useEffect(() => () => {
+    if (celebrationTimerRef.current) { clearTimeout(celebrationTimerRef.current); celebrationTimerRef.current = null; }
+  }, []);
+
   // Socket wiring
   useEffect(() => {
     if (!socket) return;
@@ -282,6 +314,8 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         setMyWords(prev => [{ word: data.word, kind: 'stolen', score: data.score, stolenFrom: data.stolenFrom, ts: Date.now() }, ...prev]);
         flash('ok', tt('wordWheel.stealGain', { score: data.score ?? 0 }) || `+${data.score}`);
       }
+      const coverage = classifyLetterCoverage(data.word, pz?.allLetters ?? []);
+      if (coverage !== 'none') celebrateRef.current(coverage, data.word);
       accSfx();
       haptic(20);
       setBuiltLetters([]);
@@ -482,52 +516,17 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
 
   return (
     <div className="relative flex-1 flex flex-col min-h-0 bg-neo-navy p-3 md:p-4 gap-2 overflow-hidden">
-      {/* Top bar: leaderboard (fog-of-war) + quit — hidden in desktop shell (handled by side rails) */}
+      {/* Top bar: opponent progress rail + prominent self score + timer + quit
+          — hidden in desktop shell (handled by side rails). */}
       {!isDesktopCanvas && (
-        <div className="flex items-center justify-between gap-2 shrink-0 pt-[env(safe-area-inset-top)]">
-          <div className="flex items-center gap-1.5 overflow-x-auto flex-1 min-w-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {leaderboard.map(p => {
-              const isSelf = p.username === username;
-              const fogged = !isSelf && fogActive;
-              const wc = p.wordCount ?? 0;
-              return (
-                <div
-                  key={p.username}
-                  className={cn(
-                    'shrink-0 px-2.5 py-1 rounded-neo border-2 border-neo-black font-neo-display font-bold text-xs sm:text-sm shadow-hard whitespace-nowrap',
-                    isSelf ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-cream',
-                  )}
-                >
-                  <span className="opacity-80">{p.username}</span>
-                  <span className="mx-1 opacity-40">·</span>
-                  {fogged ? (
-                    <span className="tracking-wider">???</span>
-                  ) : (
-                    <span className="tabular-nums">{p.score}</span>
-                  )}
-                  {wc > 0 && (
-                    <span className="ms-1 text-[10px] sm:text-xs opacity-60 tabular-nums">{wc}w</span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-          {typeof remainingTime === 'number' && (
-            <div
-              data-testid="wheel-rush-timer"
-              aria-label={t('wordWheel.timeLeft') || 'Time Left'}
-              className={cn(
-                'shrink-0 px-2.5 py-1 rounded-neo border-2 border-neo-black font-neo-display font-bold text-xs sm:text-sm shadow-hard tabular-nums',
-                remainingTime <= 10
-                  ? 'bg-neo-red text-neo-white animate-pulse'
-                  : 'bg-neo-cyan text-neo-black',
-              )}
-            >
-              {Math.floor(Math.max(0, remainingTime) / 60)}:{String(Math.max(0, remainingTime) % 60).padStart(2, '0')}
-            </div>
-          )}
-          <Button size="sm" variant="destructive" onClick={onQuit} className="shrink-0">{t('common.quit') || 'Quit'}</Button>
-        </div>
+        <WheelRushHeader
+          leaderboard={leaderboard}
+          username={username}
+          fogActive={fogActive}
+          remainingTime={remainingTime}
+          onQuit={onQuit}
+          t={t}
+        />
       )}
 
       {fogActive && (
@@ -738,9 +737,14 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
           <Shuffle className="w-5 h-5" />
         </m.button>
         </div>
+
+        {/* Found-word chips ride directly under the actions inside the centered
+            cluster — keeps them in the wheel's gravity well instead of stranded
+            at the screen bottom. Fixed-height slot so the cluster never reflows. */}
+        {!isDesktopCanvas && <MyWordsChips words={myWords} />}
       </div>
 
-      {!isDesktopCanvas && <MyWordsChips words={myWords} />}
+      <WheelRushCelebration celebration={celebration} t={t} prefersReduced={!!prefersReduced} />
 
       <div className="pointer-events-none absolute inset-0 z-40">
         {floatingReactions.map(r => (
