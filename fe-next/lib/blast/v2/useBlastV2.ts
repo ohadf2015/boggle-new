@@ -40,6 +40,14 @@ type State = {
   cascadeCount: number;
   invalidShakeKey: number;
   lastValidation: ValidationResult | null;
+  // Cells of the most recently rejected submit. BlastGame uses this to retry
+  // an async dictionary lookup for free-form (non-theme) word validation when
+  // the local validator rejects with `reason: 'unknown'`.
+  lastRejectedCells: CellId[];
+  // Number of free undos the player has consumed this level. Drives the
+  // rewarded-ad gate: the first two undos cost nothing; further undos require
+  // confirming a rewarded ad via `markRewardedUndo`.
+  freeUndosUsed: number;
   lastChainDepth: number;
   chainEventKey: number;
   tileIds: string[][];
@@ -49,11 +57,17 @@ type State = {
 type Action =
   | { type: 'sel'; event: SelectionEvent; dictionaryCheck?: (word: string) => boolean }
   | { type: 'shuffle' }
-  | { type: 'undo' };
+  | { type: 'undo' }
+  | { type: 'forceBonus'; cells: CellId[]; word: string }
+  | { type: 'markRewardedUndo' };
 
 type UseBlastV2Options = {
   dictionaryCheck?: (word: string) => boolean;
 };
+
+// Free undos before the rewarded-ad gate. The fix-level-11 brief asks for
+// two free reverses; further undos require the player confirm a rewarded ad.
+export const FREE_UNDO_LIMIT = 2;
 
 // Base chest contribution per word found. Every word ticks the bar so the
 // chest visibly fills during play — without this, levels that ship without
@@ -90,7 +104,15 @@ function applyValidatedSubmit(
       length: cells.length,
       reason: res.reason,
     });
-    return { ...state, lastValidation: res, invalidShakeKey: state.invalidShakeKey + 1 };
+    return {
+      ...state,
+      lastValidation: res,
+      invalidShakeKey: state.invalidShakeKey + 1,
+      // Remember the rejected cells ONLY when the rejection is a candidate
+      // for async dictionary fallback. Shape/duplicate rejections are
+      // terminal — no point keeping them around to retry.
+      lastRejectedCells: res.reason === 'unknown' ? cells : [],
+    };
   }
   const kind = res.kind === 'theme_match' ? 'theme' : 'bonus';
   const outcome = scoreForWord(state.level, cells, kind);
@@ -160,6 +182,78 @@ function applyValidatedSubmit(
   };
 }
 
+/**
+ * Apply a bonus-word submit that has already been confirmed by an async
+ * dictionary lookup. Skips the local validator (the word isn't in `level.words`
+ * and the bonusDict feature flag may be off) but still runs the full
+ * collapse/cascade/snapshot pipeline so undo and FX behave identically.
+ */
+function applyForceBonus(state: State, cells: CellId[], word: string): State {
+  const config = LOCALE_CONFIGS[state.level.locale];
+  // Duplicate guard — engine validation would normally catch this, but we
+  // are bypassing it. Player can't re-claim the same dictionary word.
+  if (state.foundWords.has(word)) {
+    return { ...state, invalidShakeKey: state.invalidShakeKey + 1 };
+  }
+  const outcome = scoreForWord(state.level, cells, 'bonus');
+  const newFound = new Set(state.foundWords);
+  newFound.add(word);
+  const baseDelta = baseChestDeltaForWord(cells.length, 'bonus');
+  const newChestProgress = state.chestProgress + outcome.chestProgressDelta + baseDelta;
+  const newCoins = state.coins + outcome.coinsBase + outcome.coinsFromOverlays;
+
+  trackBlastWordFound({
+    level: state.level.levelNumber,
+    word,
+    axis: cells[0]?.[0] === 'c' && cells[cells.length - 1]?.[0] === 'c' ? 'H' : 'V',
+    length: word.length,
+    isCascade: false,
+    isBonus: true,
+  });
+
+  const formableBefore = new Set(
+    detectAllCascades(state.level, newFound, config).map((c) => c.word),
+  );
+  const collapse = collapseCells(state.level, cells);
+  const newLevel = collapse.level;
+  const newTileIds = rebuildTileIds(state.level.columns, state.tileIds, collapse);
+  const revealed = detectAllCascades(newLevel, newFound, config)
+    .map((c) => c.word)
+    .filter((w) => !formableBefore.has(w));
+  const newCascadeCount = state.cascadeCount + revealed.length;
+  const allFound = state.level.words.every((w) => newFound.has(w));
+  const thisChainDepth = newCascadeCount - state.cascadeCount;
+
+  const snapshot: HistoryEntry = {
+    level: state.level,
+    foundWords: new Set(state.foundWords),
+    coins: state.coins,
+    chestProgress: state.chestProgress,
+    cascadeCount: state.cascadeCount,
+    lastChainDepth: state.lastChainDepth,
+    chainEventKey: state.chainEventKey,
+    tileIds: state.tileIds,
+    status: state.status,
+  };
+  const newHistory = [...state.history, snapshot].slice(-UNDO_STACK_LIMIT);
+
+  return {
+    ...state,
+    level: newLevel,
+    foundWords: newFound,
+    coins: newCoins,
+    chestProgress: Math.min(1, newChestProgress),
+    cascadeCount: newCascadeCount,
+    lastValidation: { kind: 'bonus', word },
+    status: allFound ? 'levelComplete' : 'playing',
+    lastChainDepth: thisChainDepth,
+    chainEventKey: state.chainEventKey + 1,
+    tileIds: newTileIds,
+    history: newHistory,
+    lastRejectedCells: [],
+  };
+}
+
 function reducer(state: State, action: Action): State {
   if (action.type === 'sel') {
     const t = reduceSelection(state.selection, action.event);
@@ -173,6 +267,15 @@ function reducer(state: State, action: Action): State {
       coin_cost: 50,
     });
     return { ...state, hintsUsed: state.hintsUsed + 1, coins: Math.max(0, state.coins - 50) };
+  }
+  if (action.type === 'forceBonus') {
+    return applyForceBonus(state, action.cells, action.word);
+  }
+  if (action.type === 'markRewardedUndo') {
+    // Reset the free-undo counter so the next two undos are free again.
+    // The caller is responsible for actually playing the rewarded ad; this
+    // reducer only tracks the gate.
+    return { ...state, freeUndosUsed: 0 };
   }
   if (action.type === 'undo') {
     if (state.history.length === 0) return state;
@@ -194,6 +297,11 @@ function reducer(state: State, action: Action): State {
       status: prev.status,
       selection: { kind: 'idle' },
       lastValidation: null,
+      lastRejectedCells: [],
+      // Count this undo toward the rewarded-ad gate. BlastGame decides
+      // whether to allow the next undo or prompt the ad based on
+      // `freeUndosUsed >= FREE_UNDO_LIMIT`.
+      freeUndosUsed: state.freeUndosUsed + 1,
       history: newHistory,
     };
   }
@@ -212,6 +320,8 @@ export function useBlastV2(initialLevel: BlastLevel, options: UseBlastV2Options 
     cascadeCount: 0,
     invalidShakeKey: 0,
     lastValidation: null,
+    lastRejectedCells: [],
+    freeUndosUsed: 0,
     lastChainDepth: 0,
     chainEventKey: 0,
     tileIds: initialLevel.columns.map((col, c) => col.tiles.map((_, r) => `t-${c}-${r}`)),
@@ -233,11 +343,26 @@ export function useBlastV2(initialLevel: BlastLevel, options: UseBlastV2Options 
       onCancel: () => dispatch({ type: 'sel', event: { type: 'cancel' }, dictionaryCheck: dictRef.current }),
       onShuffle: () => dispatch({ type: 'shuffle' }),
       onUndo: () => dispatch({ type: 'undo' }),
+      // Async-confirmed dictionary bonus. BlastGame fires this after the
+      // local validator rejects with 'unknown' and the dictionary API confirms
+      // the candidate is a real word — the player gets credit retroactively
+      // so free-form play feels live, not after-the-fact.
+      onForceBonus: (cells: CellId[], word: string) =>
+        dispatch({ type: 'forceBonus', cells, word }),
+      // Player watched the rewarded ad to refresh their free-undo budget.
+      // Resets the counter so the next FREE_UNDO_LIMIT undos cost nothing.
+      onRewardedUndoGranted: () => dispatch({ type: 'markRewardedUndo' }),
     }),
     []
   );
   const stateWithCanUndo = useMemo(
-    () => ({ ...state, canUndo: state.history.length > 0 }),
+    () => ({
+      ...state,
+      canUndo: state.history.length > 0,
+      // True once the next undo would exceed the free quota — BlastGame uses
+      // this to gate the button behind a rewarded-ad modal.
+      needsRewardedAdForUndo: state.freeUndosUsed >= FREE_UNDO_LIMIT,
+    }),
     [state],
   );
   return { state: stateWithCanUndo, handlers };

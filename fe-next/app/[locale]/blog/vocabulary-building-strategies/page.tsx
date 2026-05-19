@@ -12,7 +12,7 @@ interface PageProps {
 
 const SLUG = 'vocabulary-building-strategies';
 const DATE_PUBLISHED = '2026-03-05';
-const DATE_MODIFIED = '2026-03-16';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'I Learned 500 New Words in 30 Days - Vocabulary Building Strategies',

@@ -12,7 +12,7 @@ interface PageProps {
 
 const SLUG = 'word-games-for-kids-education';
 const DATE_PUBLISHED = '2026-01-27';
-const DATE_MODIFIED = '2026-03-12';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'Free Word Games for Kids & Education - Spelling & Vocabulary Building',

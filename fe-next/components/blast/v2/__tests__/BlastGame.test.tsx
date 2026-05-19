@@ -22,6 +22,17 @@ vi.mock('@/contexts/NavigationContext', () => ({
   useHideNavigation: () => vi.fn(),
   useNavigation: () => ({ isInGame: false, setIsInGame: vi.fn(), activeTab: 'home', setActiveTab: vi.fn() }),
 }));
+// Rewarded-ad infrastructure pulls in AdMob/Coin contexts that aren't
+// provided in this unit test harness. Stub the hook so BlastGame can mount.
+vi.mock('@/hooks/useRewardedAd', () => ({
+  useRewardedAd: () => ({
+    showAd: vi.fn(),
+    isAdAvailable: false,
+    status: 'idle' as const,
+    rewardAmount: 0,
+    preload: vi.fn(),
+  }),
+}));
 
 import { BlastGame } from '../BlastGame';
 

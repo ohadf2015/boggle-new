@@ -12,7 +12,7 @@ interface PageProps {
 
 const SLUG = 'hebrew-word-games-guide';
 const DATE_PUBLISHED = '2025-10-24';
-const DATE_MODIFIED = '2026-03-08';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'Hebrew Word Games Guide - Free Online משחק מילים בעברית',

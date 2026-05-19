@@ -12,7 +12,7 @@ interface PageProps {
 
 const SLUG = 'word-games-and-mental-health';
 const DATE_PUBLISHED = '2025-10-05';
-const DATE_MODIFIED = '2026-02-28';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'Benefits of Playing Word Games for Mental Health & Anxiety Relief',

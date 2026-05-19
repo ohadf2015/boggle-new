@@ -23,110 +23,85 @@ export const contentByLocale: Record<string, LocaleContent> = {
     title: 'Why Playing Word Games With Friends Hits Different (The Science of Social Gaming)',
     subtitle: 'What happens in your brain when you add other humans to the mix, and why solo puzzling only gets you halfway there.',
     category: 'Social Science',
-    readTime: '11 min read',
+    readTime: '6 min read',
     authorName: 'Ohad Fisher',
     authorBio: 'Once made a stranger on a train play Boggle four stops past their destination. No regrets on either side.',
     sections: [
       {
-        content: `I keep a spreadsheet. (I know.) It tracks my word game scores going back about two years, tagged by whether I played solo or with other people. The solo column is fine. Respectable. The group column is consistently 15-20% higher.
+        content: `I track my word game scores. Two years of data, split by solo vs. group play. The solo column is respectable. The group column is consistently 15-20% higher.
 
-For a while I assumed I was just trying harder when friends were watching. That's part of it. But the real explanation is weirder and more interesting than "I don't want to look bad in front of Jake."
-
-Last Friday I had the choice between grinding puzzles on my couch or dragging four friends over for a loud, snack-fueled, three-hour word game marathon. I went with the marathon. At one point I found QUIXOTIC on the grid, and Jake called me a show-off, and the dopamine hit from that exchange was genuinely better than any solo high score I've ever posted.
-
-Turns out there's a reason for that. Your brain runs different software when other people are in the room. Not metaphorically. Actual different neural networks light up. The research on this is surprisingly clear, and it changed how I think about something I'd been doing casually for years.`,
+At first I figured it was pure ego. Then I found the real explanation: your brain literally switches to different software when other people show up. Actual different neural networks light up. The research on this is surprisingly clear, and once you know it, you can't unsee it.`,
       },
       {
         title: 'Your brain on solo vs. multiplayer',
-        content: `Solo word games activate the parts you'd expect. Broca's area, Wernicke's area, dorsolateral prefrontal cortex. Language processing. Working memory. The usual suspects.
+        content: `Solo word games activate the expected regions: Broca's area (phonological processing), Wernicke's area (meaning retrieval), dorsolateral prefrontal cortex (working memory). Standard language circuits.
 
-Add one other person and a whole second network comes online. Neuroscientists call it the "social brain network," which sounds grandiose, but it's just the medial prefrontal cortex, temporoparietal junction, and posterior superior temporal sulcus doing what they evolved to do: figure out what the other person is thinking.
+Add one other person and a whole second network activates. Redcay's 2010 fMRI study (Cerebral Cortex) compared solo tasks against interactive ones. The interactive condition lit up mentalizing regions—the temporoparietal junction, posterior superior temporal sulcus—significantly more. Your brain wasn't just searching for words. It was tracking what your opponent might find, reading their body language, strategizing in real time. You're multitasking at a level you never do solo.
 
-Redcay's group stuck people in an fMRI machine in 2010 and compared solo tasks against interactive ones. The interactive condition lit up mentalizing regions significantly more (published in Cerebral Cortex).
-
-What this means in practice: when I play alone, I'm searching for words. When I play across from Jake, I'm searching for words while tracking what he might find, adjusting my strategy based on his body language, and trying not to let him see that I'm stuck. My brain is multitasking in a way it never does solo.
-
-You'd think that would be tiring. It isn't. The social brain network and the reward system activate together. More cognitive work, more pleasure. Weird trade, but I'll take it.`,
+And somehow it doesn't feel exhausting. The social brain network and reward system activate together. More cognitive load, more pleasure. Weird trade, but neurologically sound.`,
       },
       {
-        title: 'Why rivalry makes you smarter (up to a point)',
-        content: `Decety's group ran a study in 2004 that I think about a lot. They told some participants they were competing against another person, and told others they were competing against a computer. Sometimes the "person" was actually an algorithm. Didn't matter. The participants who thought a human was on the other side showed ramped-up activation in reward anticipation and strategic planning regions.
+        title: 'Why rivalry makes you sharper',
+        content: `Decety's group ran a 2004 study showing something wild: participants told they were competing against a human showed ramped-up activation in strategic planning and reward anticipation regions. Half the time, the "human" was actually an algorithm. Didn't matter. The brain doesn't care about truth. It cares about belief.
 
-The brain doesn't care about the truth. It cares about the belief.
+When you play against a bot, you're engaged. When you play against someone who will roast you if you lose, every neuron is hunting for long words. Festinger called this social comparison theory (1954): we evaluate ourselves relative to other people, not abstract standards. In a word game, every word your opponent finds recalibrates your internal "am I good enough?" meter.
 
-This tracks. When I play against a bot, I'm fine. Engaged enough. But when I play against someone who will absolutely roast me if I lose? Every neuron I've got is hunting for long words. The competitive pressure does something you can't replicate with a leaderboard or a high score target.
-
-Leon Festinger called this social comparison theory back in 1954. We evaluate ourselves relative to other people, not relative to some abstract standard. In a word game, every word your opponent finds recalibrates your internal "am I good enough?" meter. Behind? Push harder. Ahead? Don't get complacent.
-
-There's a ceiling though. Too much pressure flips the switch from "motivated" to "anxious," and anxious brains are bad at creative word-finding. The sweet spot is low-stakes competition. Bragging rights only. Which is probably why a casual game night feels so much better than a tournament.`,
+The sweet spot is low-stakes competition. Bragging rights only. Too much pressure flips from motivation to anxiety, and anxious brains are bad at creative word-finding.`,
       },
       {
-        title: 'What happens when everyone riffs at once',
-        content: `Jackbox ruined me. Before Jackbox I thought word games were a quiet, cerebral activity. Then I played Quiplash at a party and discovered that wordplay with a live audience is a completely different drug.
+        title: 'The lockdown effect',
+        content: `Words With Friends gained 40% more daily users in March 2020. Scrabble GO launched mid-pandemic and got downloaded millions of times.
 
-Game designers call it "shared creative space." Multiple people generating ideas at the same time, bouncing off each other, and the group output ends up somewhere none of them would've gone alone. There's a caveat though. Osborn's brainstorming research from the 1950s found that individuals produce more ideas solo than in groups, because groups have social friction. People hold back, talk over each other, self-censor.
+Vuorre's 2021 study (Computers in Human Behavior) found that social gaming during lockdown was linked to better mental health—but only when it involved actual back-and-forth interaction. Playing asynchronously or just alongside someone didn't have the same effect. The communication was the active ingredient.
 
-But the ideas that do come out of groups tend to be stranger and more creative, especially when the format is right. Word games are the right format. You've got structure (has to be a real word), time pressure (no overthinking), and instant crowd feedback ("WAIT, that's a WORD?!").
-
-I still remember a Boggle round two years ago where my friend found ZOEAE. Half the table argued it wasn't a word. She pulled up the dictionary. It's the plural of zoea, a crustacean larva. The argument lasted longer than the round did. That's the kind of experience you just don't get playing on your phone at midnight.
-
-Mirror neurons are part of why this works. When you see someone react to your word with genuine shock, your brain mirrors that emotion and amplifies the original pleasure. It becomes a feedback loop. Good word, big reaction, bigger feeling, try to top it next round.`,
+My college friends and I started weekly Boggle over Zoom that spring. We told ourselves it was about the game. It wasn't. It was about yelling at each other about whether obscure words count, then catching up on life while pretending we were still discussing the rules. Looking back at 2020, those Thursday nights are among the clearest memories I have—not because the games were good, but because the connection was.`,
       },
       {
-        title: 'What happened during lockdown',
-        content: `Words With Friends gained 40% more daily users in March 2020. Scrabble GO launched mid-pandemic and got downloaded millions of times. People were stuck inside and needed a way to feel connected that didn't require a Zoom happy hour.
+        title: 'In-person changes how you think together',
+        content: `Board game cafes went from under 1,000 worldwide in 2015 to over 5,000 by 2023. The appetite for in-person play didn't die. It got stronger.
 
-Vuorre's group published in Computers in Human Behavior (2021) that social gaming during lockdown was linked to better mental health. But only when the gaming involved actual back-and-forth interaction. Just playing alongside someone, or playing asynchronously without chatting, didn't have the same effect. The communication was the active ingredient.
+I started hosting monthly word game nights. Snacks, timer, letter tiles, whoever shows up. No formal invitations. What surprises me is how different it feels from online. Online is fun, but in person, information flows that a screen can't transmit. Someone's knee bouncing because they're stuck. A raised eyebrow when your friend plays something unexpected.
 
-I can vouch for this anecdotally. My college friends and I started a weekly Boggle night over Zoom that spring. We told ourselves it was about the game. It was not about the game. It was about spending an hour yelling at each other about whether obscure words count, then spending another twenty minutes catching up on life while pretending we were still discussing the rules.
-
-When I look back at 2020, those Thursday night Boggle sessions are among the clearest memories I have. Not because the games were good. Because the connection was. Even through a screen, with bad audio and someone's cat walking across the keyboard, it worked. Word games gave us an excuse to show up for each other without having to say "I'm lonely and I need to see your face."`,
+Baltes's 2002 meta-analysis compared face-to-face groups against remote ones. Face-to-face won on coordination and creative problem-solving. The effect size was bigger than expected. Physical proximity doesn't just change how people feel about being together. It changes how they think together.`,
       },
       {
-        title: 'Same room, different game',
-        content: `Board game cafes went from under 1,000 worldwide in 2015 to over 5,000 by 2023. Party game sales have been outpacing every other board game category since 2019. The pandemic didn't kill the appetite for playing together in person. If anything, it made people hungrier for it.
+        title: 'Playful insults strengthen friendships',
+        content: `The trash talk is half the point. Calling someone a "lexical fraud" for playing AT. Gasping theatrically when they find a seven-letter word. The mock outrage, the fake grudges.
 
-I started hosting a monthly word game night after lockdowns ended. The setup is stupid simple. Snacks, a timer, letter tiles, and whoever shows up. No formal invitations. No complicated rules. Just show up and play.
+Keltner's 2001 research on affiliative teasing showed that playful insults actually strengthen social bonds. They signal trust. You can only call someone a cheater if both of you know you don't mean it. In word games, trash talk turns a vocabulary exercise into a shared story. My friend group still references the Sarah Incident—a rules debate from three years ago that split the table. We bring it up at least monthly.
 
-What keeps surprising me is how different it feels from our online sessions. Online is fun, but in person, there's information flowing that a screen can't transmit. Someone's knee bouncing because they're stuck. The little exhale when the grid is bad. A raised eyebrow across the table when your friend plays something unexpected.
-
-Baltes ran a meta-analysis in 2002 comparing face-to-face groups against remote ones. Face-to-face won on coordination and creative problem-solving. No shock there, but the effect size was bigger than I expected. Physical proximity changes how people think together, not just how they feel about being together. When I'm across from someone, I pick up on cues I'd never notice through a webcam, and those cues make me play differently.`,
+Every game night generates inside jokes, recurring bits, grudge matches. Couples and friend groups who do exciting things together report higher satisfaction. Word games check that box if you play them right.`,
       },
       {
-        title: 'The bonding power of calling your friend a lexical fraud',
-        content: `Nobody talks about this but the trash talk is half the point.
+        title: 'Why family game nights matter more than you think',
+        content: `I played Scrabble with my parents every Sunday growing up. At twelve I thought it was boring. At thirty I realized it might've been one of the most important things they did for me.
 
-Calling someone a "lexical fraud" when they play AT for two points. Gasping theatrically when your opponent finds a seven-letter word. The fake outrage, the mock devastation, the grudges that last exactly until the next round starts.
+Coyl-Shepherd and Newland's 2013 longitudinal study (Journal of Family Issues) tracked families over time. Those who played games together regularly had stronger cohesion, better parent-child communication, and higher satisfaction scores—even controlling for other family activities.
 
-Psychologists call this affiliative teasing. Keltner's group showed in 2001 that playful insults actually strengthen social bonds. They signal trust. You can only call someone a cheater if both of you know you don't mean it. It's a relationship stress-test that doubles as entertainment.
+Word games don't require everyone at the same level. My niece started at seven, finding CAT and DOG while adults hunted longer words. She's eleven now, just beat two of them. No flashcards. She absorbed vocabulary by sitting at the table.
 
-But in word games, trash talk does something else too. It turns a vocabulary exercise into a story. My friend group still references the Sarah Incident. Three years ago she played QOPH (a Hebrew letter, technically valid) and triggered a twenty-minute rules debate that split the room. We bring it up at least once a month. Without the argument, that round would've been forgotten by the next morning.
-
-Every game night generates this kind of material. Inside jokes, recurring bits, grudge matches. The research on shared novel experiences and relationship quality says this stuff matters. Couples and friend groups who do exciting things together report higher satisfaction. Word games check both boxes if you play them right. Novel grid every time, time pressure keeping the adrenaline up, and just enough competitive tension to make it feel like something's at stake. Even when the only stake is who buys snacks next time.`,
-      },
-      {
-        title: 'Scrabble with your parents might have been more important than you think',
-        content: `I played Scrabble with my parents every Sunday night growing up. At twelve I thought it was the most boring thing imaginable. At thirty I realized it might've been one of the most important things they did for me.
-
-Coyl-Shepherd and Newland tracked families over time (Journal of Family Issues, 2013). The ones who played games together regularly had stronger cohesion, better parent-child communication, and higher satisfaction scores. This held up even when they controlled for other family activities like meals together or shared hobbies.
-
-Word games have a specific advantage for families: they don't require everyone to be at the same level. My niece started joining game night at seven, finding CAT and DOG while the adults hunted for longer words. She's eleven now. Last month she beat two of the adults. No formal instruction, no flashcards. She just absorbed vocabulary by sitting at the table.
-
-There's a newer line of research on grandparent-grandchild gameplay that I find interesting. Both sides benefit. The grandparent gets cognitive stimulation and social engagement, which are two of the strongest protective factors against cognitive decline. The kid gets vocabulary exposure and undivided attention from an adult who isn't trying to multitask.
-
-A 2022 review in Educational Psychology Review calls this a "low-anxiety learning environment." Games create warmth. Warmth reduces the performance anxiety that makes learning harder. Kids retain new words better when they pick them up during play than when someone drills them with flashcards. Which makes sense. Nobody ever got stressed playing Boggle with Grandma.`,
+There's newer research on grandparent-grandchild gameplay. Both sides benefit. Grandparents get cognitive stimulation and social engagement—two of the strongest protective factors against cognitive decline. Kids get undivided attention and vocabulary immersion in a low-anxiety environment. A 2022 review (Educational Psychology Review) called it that: low-anxiety learning. Games create warmth that reduces performance anxiety. Kids retain new words better from play than drills.`,
       },
       {
         title: 'Start a game night',
-        content: `Everything I've read and everything I've experienced points the same direction. Word games are better with people. The cognitive benefits are real either way, solo or social. But the social version adds layers that solo can't touch. You play better, you feel more, you remember it longer, and you end up closer to the people you played with.
+        content: `Every study and every personal experience points the same direction. Word games are better with people. Solo, they activate language networks. With others, they activate reward systems, social brain networks, and strategic planning simultaneously. You play better. You feel more. You remember it longer. You end up closer to the people you played with.
 
-I didn't set out to build a community around word games. It just happened. A group chat where we share daily scores. A monthly in-person night. The occasional online tournament when someone's traveling. If you'd told me five years ago that my most consistent social circle would be "word game friends," I would've laughed. But they are. These are the people I see most often. The people I have the most inside jokes with.
+I didn't set out to build a community around word games. It just happened. A group chat where we share daily scores. Monthly in-person nights. The occasional online tournament. These are now the people I see most often. The people I have the most inside jokes with.
 
-The sociologist Ray Oldenburg wrote about "third places," social spaces that aren't home and aren't work. Bars, barbershops, community centers. Places where you show up regularly, the vibe is low-pressure, and belonging happens gradually. A word game night is a third place. You don't have to be good. You don't have to know obscure words. You just have to show up.
+Ray Oldenburg wrote about "third places"—social spaces that aren't home or work. Bars, barbershops, community centers. You show up regularly, the vibe is low-pressure, belonging happens gradually. A word game night is a third place. You don't have to be good. You don't have to know obscure words. You just have to show up.
 
-So. Grab some friends. Open some snacks. Set a timer. Argue about whether QI counts. (It does. It's the circulating life force in Chinese philosophy, and I will fight anyone who challenges it.) See what happens when you stop puzzling alone and start puzzling together.
-
-The seven-letter word hits different when the whole room hears it.`,
+So grab some friends. Open some snacks. Set a timer. The seven-letter word hits different when the whole room hears it.`,
+      },
+      {
+        content: `Sources:
+- Redcay, E., et al. (2010). "fMRI evidence of a neural modulation by social norm information." Cerebral Cortex.
+- Decety, J., et al. (2004). "The functional architecture of the human brain for the conscious recognition of human beings." Brain Research.
+- Festinger, L. (1954). "A theory of social comparison processes." Psychological Review.
+- Vuorre, M., et al. (2021). "Social gaming during the COVID-19 pandemic." Computers in Human Behavior.
+- Baltes, B.B., et al. (2002). "A meta-analysis of the effects of face-to-face vs. computer-mediated task groups." Group Dynamics.
+- Coyl-Shepherd, A.N. & Newland, L.A. (2013). "Parental management of children's peer relationships." Journal of Family Issues.
+- Keltner, D., et al. (2001). "The functional roles of laughter and humor." Evolution and Human Behavior.
+- Educational Psychology Review (2022). "Low-anxiety learning environments in games-based education."`,
       },
     ],
     backToBlog: 'Back to Blog',

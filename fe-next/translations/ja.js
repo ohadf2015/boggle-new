@@ -9190,6 +9190,12 @@ const ja = {
     "hint": "ヒント",
     "undo": "取り消し",
     "undoTooltip": "直前の操作を取り消す",
+    "undoAdGate": {
+      "title": "もっと取り消す？",
+      "body": "短い広告を見ると、さらに手を戻せます。各レベルの最初の2回は常に無料です。",
+      "watch": "広告を見る",
+      "cancel": "後で"
+    },
     "stuck": "詰まった？",
     "hintCooldown": "使用済",
     "waveClearBanner": "ウェーブクリア！",

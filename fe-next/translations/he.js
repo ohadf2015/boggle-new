@@ -6036,7 +6036,7 @@ const he = {
     "addFriendsToChallenge": "הוסף חברים כדי לאתגר",
     "challenge": "אתגר",
     "friend": "חבר",
-    "noFriendsYet": "החברה ריקה!",
+    "noFriendsYet": "החבר'ה עוד לא הגיעו!",
     "noPendingRequests": "אין בקשות ממתינות",
     "requestsWillAppearHere": "בקשות יופיעו כאן",
     "noUsersFound": "לא נמצאו משתמשים",
@@ -9144,6 +9144,12 @@ const he = {
     "hint": "רמז",
     "undo": "בטל",
     "undoTooltip": "בטל את המהלך האחרון",
+    "undoAdGate": {
+      "title": "עוד ביטולים?",
+      "body": "צפו במודעה קצרה כדי להמשיך לבטל מהלכים. שני הביטולים הראשונים בכל שלב הם תמיד חינם.",
+      "watch": "צפייה במודעה",
+      "cancel": "לא עכשיו"
+    },
     "stuck": "תקוע?",
     "hintCooldown": "שומש",
     "waveClearBanner": "גל הושלם!",

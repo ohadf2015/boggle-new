@@ -8945,6 +8945,12 @@ const en = {
     "hint": "Hint",
     "undo": "Undo",
     "undoTooltip": "Reverse last move",
+    "undoAdGate": {
+      "title": "More undos?",
+      "body": "Watch a short ad to keep reversing moves. Your first two undos each level are always free.",
+      "watch": "Watch ad",
+      "cancel": "Not now"
+    },
     "stuck": "Stuck?",
     "hintCooldown": "Used",
     "waveClearBanner": "Wave Clear!",

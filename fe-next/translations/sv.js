@@ -6036,7 +6036,7 @@ const sv = {
     "addFriendsToChallenge": "Lägg till vänner för att utmana",
     "challenge": "Utmana",
     "friend": "Vän",
-    "noFriendsYet": "Inga polare än!",
+    "noFriendsYet": "Inga vänner än!",
     "noPendingRequests": "Inga väntande förfrågningar",
     "requestsWillAppearHere": "Förfrågningar visas här",
     "noUsersFound": "Inga användare hittades",
@@ -9164,6 +9164,12 @@ const sv = {
     "hint": "Tips",
     "undo": "Ångra",
     "undoTooltip": "Ångra senaste draget",
+    "undoAdGate": {
+      "title": "Fler ångringar?",
+      "body": "Titta på en kort annons för att fortsätta ångra drag. Dina två första ångringar i varje nivå är alltid gratis.",
+      "watch": "Titta på annons",
+      "cancel": "Inte nu"
+    },
     "stuck": "Fastnat?",
     "hintCooldown": "Använt",
     "waveClearBanner": "Vågen klar!",
