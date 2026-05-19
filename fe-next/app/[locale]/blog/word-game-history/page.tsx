@@ -12,7 +12,7 @@ interface PageProps {
 
 const SLUG = 'word-game-history';
 const DATE_PUBLISHED = '2026-01-08';
-const DATE_MODIFIED = '2026-03-05';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'History of Word Games - From Ancient Tiles to Digital Grids',
