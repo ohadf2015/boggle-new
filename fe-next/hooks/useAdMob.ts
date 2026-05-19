@@ -35,11 +35,19 @@ export function useAdMob() {
     let rewarded = false;
     let settled = false;
     let dismissGraceTimer: ReturnType<typeof setTimeout> | null = null;
+    let safetyTimer: ReturnType<typeof setTimeout> | null = null;
     const REWARD_GRACE_MS = 750;
+    // Backstop for the v8 plugin's silent-stall case: poor network, backgrounded
+    // WebView, or a buggy mediation adapter can fire NO Rewarded/Dismissed/Failed
+    // event at all — leaving the UI's `status='showing'` flag forever-on and
+    // blocking the user from any further opt-in. AdMob's own rewarded video tops
+    // out at 30s, so 90s is well past any legitimate ad lifecycle.
+    const REWARD_SAFETY_TIMEOUT_MS = 90000;
     const handles: Array<{ remove: () => void | Promise<void> }> = [];
 
     const cleanup = () => {
       if (dismissGraceTimer) { clearTimeout(dismissGraceTimer); dismissGraceTimer = null; }
+      if (safetyTimer) { clearTimeout(safetyTimer); safetyTimer = null; }
       handles.forEach((h) => { try { h.remove(); } catch {} });
       handles.length = 0;
     };
@@ -82,6 +90,16 @@ export function useAdMob() {
             await whenReady();
             await AdMob.prepareRewardVideoAd({ adId });
             await AdMob.showRewardVideoAd();
+            // Arm the safety timer only AFTER show resolves — cold-start prepare
+            // can legitimately take several seconds and we don't want to settle
+            // before the user ever sees the ad. If the plugin then stalls and
+            // never fires Rewarded/Dismissed/Failed, this rescues the UI.
+            if (!settled) {
+              safetyTimer = setTimeout(
+                () => finishRef(false, 'Ad timed out — please try again'),
+                REWARD_SAFETY_TIMEOUT_MS,
+              );
+            }
           } catch (err) {
             const msg = err instanceof Error ? err.message : 'Ad failed';
             finishRef(false, msg);

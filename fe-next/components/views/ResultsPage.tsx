@@ -308,6 +308,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // the 200ms socket-disconnect delay or the browser nav-paint gap (which
   // previously surfaced as "black screen with scrolling").
   const [isExiting, setIsExiting] = useState<boolean>(false);
+  // True from the moment host taps rematch until either the next-round game
+  // mount unmounts us, or the safety reset fires. Covers two visual gaps that
+  // previously surfaced as "blank white screen": (1) the AdMob interstitial
+  // Activity transition gap on Android (WebView paint stalls briefly while
+  // the fullscreen Ad Activity tears down), (2) the post-Dismissed window
+  // before the new round's game-state arrives over the socket. A brand
+  // overlay covers both so the user never sees a white frame.
+  const [isStartingNextRound, setIsStartingNextRound] = useState<boolean>(false);
   // Score reveal animation state (Netflix Boggle Party-inspired "trading places" reveal)
   const [scoreRevealComplete, setScoreRevealComplete] = useState<boolean>(true);
 
@@ -636,8 +644,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   }, [roomLanguage]);
 
   const startGameTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const overlayReleaseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => {
     if (startGameTimeoutRef.current) clearTimeout(startGameTimeoutRef.current);
+    if (overlayReleaseTimerRef.current) clearTimeout(overlayReleaseTimerRef.current);
   }, []);
 
   // Handle host starting a new game directly from results page
@@ -646,13 +656,27 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     if (!socket || !isHost) return;
     logger.log('[RESULTS] Host starting new game from results page');
 
+    // Brand overlay covers the interstitial-Activity teardown frame and the
+    // post-Dismissed → game-mount socket gap so the user never sees a white
+    // WebView paint. Released after 15s as a safety hatch in case the round
+    // never starts (server unreachable, etc.). Ref-based so unmount cleanup
+    // clears the timer instead of firing setState on a dead component.
+    setIsStartingNextRound(true);
+    if (overlayReleaseTimerRef.current) clearTimeout(overlayReleaseTimerRef.current);
+    overlayReleaseTimerRef.current = setTimeout(() => setIsStartingNextRound(false), 15000);
+
     // Awaiting the interstitial gates `startGame` so the other players stay
     // on results while the host watches their ad — without this gate they
     // would drop into round 2 alone while the host's fullscreen overlay
     // still covered round 1's results. The promise resolves immediately when
     // no ad is served (cadence skip, no fill, non-native), so the no-ad
     // path stays as snappy as before.
-    await showInterstitial('multiplayer-round-complete');
+    try {
+      await showInterstitial('multiplayer-round-complete');
+    } catch (err) {
+      // Interstitial errors must never block the rematch flow.
+      logger.debug('[RESULTS] showInterstitial threw — continuing', err);
+    }
 
     // If idle pre-generation hasn't completed yet, fall back to synchronous
     // generation here (rare — only if host clicks rematch within ~1 frame
@@ -702,7 +726,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         logger.debug('[RESULTS] Game reset failed:', response?.error);
       }
     });
-  }, [socket, isHost, roomLanguage, selectedGameMode, preGeneratedGrid, gameCode]);
+  }, [socket, isHost, roomLanguage, selectedGameMode, preGeneratedGrid, gameCode, showInterstitial]);
 
   // Series (best-of-3) completion detection
   const isSeriesComplete = (seriesRoundNumber ?? 0) >= SERIES_TOTAL_GAMES;
@@ -935,6 +959,27 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         data-testid="results-exit-wash"
         className="fixed inset-0 z-[9999] bg-neo-navy"
       />
+    );
+  }
+
+  if (isStartingNextRound) {
+    return (
+      <div
+        data-testid="results-next-round-wash"
+        className="fixed inset-0 z-[9998] bg-neo-navy flex items-center justify-center"
+        role="status"
+        aria-live="polite"
+      >
+        <div className="flex flex-col items-center gap-4 font-neo-display text-neo-white">
+          <div
+            aria-hidden
+            className="w-12 h-12 rounded-full border-4 border-neo-pink border-t-transparent animate-spin"
+          />
+          <div className="text-lg tracking-wide uppercase">
+            {t('common.preparingGame')}
+          </div>
+        </div>
+      </div>
     );
   }
 

@@ -159,6 +159,56 @@ describe('useAdMob', () => {
     }
   });
 
+  // Regression: v8 plugin can silently stall on poor network or backgrounded
+  // WebView — no Rewarded/Dismissed/Failed event ever fires, leaving showAd's
+  // promise pending forever and the calling UI stuck in 'showing' state with
+  // the "Earning..." button label frozen. 90s safety timer must rescue.
+  it('showRewarded calls onError after safety timeout when plugin emits no events', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    try {
+      const wrapper = makeWrapper(true);
+      const { result } = renderHook(() => useAdMob(), { wrapper });
+      const onReward = vi.fn();
+      const onError = vi.fn();
+      await act(async () => {
+        const p = result.current.showRewarded(onReward, onError);
+        await Promise.resolve();
+        await Promise.resolve();
+        // No events fire — simulate silent stall. Advance past 90s safety cap.
+        await vi.advanceTimersByTimeAsync(91000);
+        await p;
+      });
+      expect(onReward).not.toHaveBeenCalled();
+      expect(onError).toHaveBeenCalledWith(expect.stringContaining('timed out'));
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('showRewarded does NOT trigger safety timeout when Rewarded fires normally', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    try {
+      const wrapper = makeWrapper(true);
+      const { result } = renderHook(() => useAdMob(), { wrapper });
+      const onReward = vi.fn();
+      const onError = vi.fn();
+      await act(async () => {
+        const p = result.current.showRewarded(onReward, onError);
+        await Promise.resolve();
+        await Promise.resolve();
+        fireEvent('onRewardedVideoAdReward', { type: 'coins', amount: 10 });
+        fireEvent('onRewardedVideoAdDismissed');
+        await p;
+        // Advance well past 90s — safety timer must have been cleared on cleanup.
+        await vi.advanceTimersByTimeAsync(91000);
+      });
+      expect(onReward).toHaveBeenCalledTimes(1);
+      expect(onError).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('showRewarded calls onError on FailedToShow', async () => {
     const wrapper = makeWrapper(true);
     const { result } = renderHook(() => useAdMob(), { wrapper });

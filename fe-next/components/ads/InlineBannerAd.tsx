@@ -81,13 +81,19 @@ export default function InlineBannerAd({
   }, [showBanner, hideBanner, safeArea.bottom, variant]);
 
   // Native: reserved slot (banner overlays this div's footprint).
+  // Slot gets neo-navy bg so the gap stays brand-themed when:
+  //   1. AdMob native banner view paints a white loading rect before fetch
+  //      resolves — until then, only the slot's bg is visible.
+  //   2. AdMob fails to fill (no-fill / network / mediation miss) — slot
+  //      remains visible with no overlay. Without bg, OS chrome can leak
+  //      white through the bottom safe-area band.
   if (Capacitor.isNativePlatform()) {
     return (
       <div
         ref={slotRef}
         aria-hidden
         className={className}
-        style={{ height: reservedHeight, width: '100%' }}
+        style={{ height: reservedHeight, width: '100%', backgroundColor: 'var(--neo-navy)' }}
         data-ad-slot="inline-banner"
       />
     );
