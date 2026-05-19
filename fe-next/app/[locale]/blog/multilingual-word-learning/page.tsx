@@ -12,7 +12,7 @@ interface PageProps {
 
 const SLUG = 'multilingual-word-learning';
 const DATE_PUBLISHED = '2025-08-10';
-const DATE_MODIFIED = '2026-03-05';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'Learn Languages Through Word Games - Free Multilingual Tips',
