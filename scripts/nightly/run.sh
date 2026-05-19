@@ -386,6 +386,8 @@ if "${_to[@]}" claude -p "$(cat "$SUMMARY_PROMPT")" \
   #  - Leading/trailing whitespace
   SUMMARY=$(sed -E '/^[[:space:]]*Warning:/d; /^[`]?★ Insight/,/^[`]?─{5,}/d; /^─{5,}/d' "$SUMMARY_FILE" \
             | awk 'NF{found=1} found' \
+            | sed -E '/^[[:space:]]*(Here.?s|Here is|This is)[[:space:]]+(the|your|a)[[:space:]]+(message|summary|digest)/I,/^---$|^$/d' \
+            | awk 'NF{found=1} found' \
             | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')
   log "manager summary composed ($(echo -n "$SUMMARY" | wc -c) chars after cleanup)"
 else

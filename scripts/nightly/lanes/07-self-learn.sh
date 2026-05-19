@@ -9,4 +9,4 @@ LIB_DIR="$(dirname "$0")/../lib"
 LOG="${RUN_LOG:-/tmp/lane-06.log}"
 PROMPT="$(dirname "$0")/../prompts/07-self-learn.md"
 
-headless_run "06-self-learn" "$PROMPT" "opus" 300 "$LOG"
+headless_run "06-self-learn" "$PROMPT" "opus" 480 "$LOG"
