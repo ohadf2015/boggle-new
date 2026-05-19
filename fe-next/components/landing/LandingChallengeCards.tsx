@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers } from 'lucide-react';
+import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers, Gem } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
@@ -46,7 +46,7 @@ interface LandingChallengeCardsProps {
  * `'connections'` and `'brainGym'` are landing-only synthetic modes routing
  * to `/connections` and `/brain` respectively.
  */
-type LandingCardKey = LandingGameMode | 'connections' | 'brainGym' | 'wordCraft';
+type LandingCardKey = LandingGameMode | 'connections' | 'brainGym' | 'wordCraft' | 'wordCraftGems';
 
 /** Default card order when no server data available */
 const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'practice', 'blast', 'connections', 'brainGym'];
@@ -58,14 +58,14 @@ const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'practice', 'blast', 
  */
 const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
-  'connections', 'brainGym', 'wordCraft',
+  'connections', 'brainGym', 'wordCraft', 'wordCraftGems',
 ]);
 
 /** CSS stagger delay for each card index */
 const cardDelay = (index: number) => `${index * 0.07}s`;
 
 /** Modes with no content for Japanese locale — hidden from hub */
-const JA_HIDDEN_MODES = new Set<LandingCardKey>(['connections', 'wordCraft']);
+const JA_HIDDEN_MODES = new Set<LandingCardKey>(['connections', 'wordCraft', 'wordCraftGems']);
 
 export function LandingChallengeCards({
   language,
@@ -135,6 +135,7 @@ export function LandingChallengeCards({
     if (!next.includes('connections')) next.push('connections');
     if (!next.includes('brainGym')) next.push('brainGym');
     if (isAdmin && !next.includes('wordCraft')) next.push('wordCraft');
+    if (isAdmin && !next.includes('wordCraftGems')) next.push('wordCraftGems');
     if (language === 'ja') return next.filter((m) => !JA_HIDDEN_MODES.has(m));
     return next;
   })();
@@ -296,13 +297,30 @@ export function LandingChallengeCards({
         );
       }
 
+      case 'wordCraftGems': {
+        return (
+          <div key="wordCraftGems" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+            <ModeCard
+              title={t('wordcraft.gemsModeTitle')}
+              description={t('wordcraft.gemsModeDesc')}
+              href={`/${language}/word-craft?mode=gems`}
+              icon={<Gem className="w-6 h-6" />}
+              modeImage="/modes/word-craft.png"
+              variant="purple"
+              badge="BETA"
+              onClick={() => { trackModeSelected('wordCraftGems' as never, 'home'); trackLandingCtaClick('mode_card', { mode: 'wordCraftGems', variant: 'purple' }); }}
+            />
+          </div>
+        );
+      }
+
       default:
         return null;
     }
   };
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordCraftGems']);
   // Newcomer-essential modes — always visible above the fold. Everything else
   // collapses into a "More Game Modes" expander to reduce choice paralysis
   // without removing the cards from the DOM (preserves SEO + AI-crawler links).

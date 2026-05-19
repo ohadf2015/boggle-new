@@ -3,6 +3,7 @@ import { m } from 'framer-motion';
 import { useReducedMotion } from '../utils/accessibility';
 import { formatTimeMMSS } from '@/shared/utils';
 import { preloadResultsChunks } from '@/utils/preloadResults';
+import { useIsSelecting } from '@/hooks/useSelectionStore';
 
 /**
  * CircularTimer Props
@@ -31,6 +32,7 @@ const SIZES = {
  */
 const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180, size = 'md', onTimerState }) => {
   const reduceMotion = useReducedMotion();
+  const isSelecting = useIsSelecting();
   const prevStateRef = useRef<'normal' | 'low' | 'veryLow' | 'critical'>('normal');
   const config = SIZES[size];
 
@@ -117,7 +119,9 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
               opacity="0.1"
             />
 
-            {/* Progress circle - solid Neo-Brutalist colors */}
+            {/* Progress circle - CSS transition is composited, runs without
+                JS frame work (the previous m.circle ran a 500ms framer-motion
+                tween per 1Hz prop change × 4 breakpoint-cloned mounts). */}
             <m.circle
               cx={svgCenter}
               cy={svgCenter}
@@ -128,9 +132,7 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
               strokeLinecap="square"
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
-              initial={{ strokeDashoffset: circumference }}
-              animate={{ strokeDashoffset }}
-              transition={{ duration: 0.5 }}
+              style={{ transition: 'stroke-dashoffset 0.5s linear' }}
             />
 
             {/* Outer ring */}
@@ -144,17 +146,21 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
             />
           </svg>
 
-          {/* Timer text in the center - color change only for low time, pulse at very low time */}
+          {/* Timer text in the center. The infinite scale/opacity pulse on
+              critical/veryLow time is suppressed while the user is mid-drag —
+              the grid drag rendering needs the main thread more than the timer
+              needs to throb. Drops the cost of 4 breakpoint-cloned mounts each
+              running their own framer-motion pulse loop at 5s remaining. */}
           <div className="absolute inset-0 flex items-center justify-center">
             <m.div
               className={`${isCriticalTime ? 'text-4xl sm:text-5xl' : config.textSize} font-black ${isLowTime ? 'text-neo-red' : 'text-neo-cream'}`}
-              animate={isCriticalTime && !reduceMotion ? {
+              animate={isSelecting ? {} : isCriticalTime && !reduceMotion ? {
                 scale: [1, 1.25, 1],
                 opacity: [1, 0.8, 1],
               } : isVeryLowTime && !reduceMotion ? {
                 scale: [1, 1.1, 1],
               } : {}}
-              transition={isCriticalTime ? {
+              transition={isSelecting ? {} : isCriticalTime ? {
                 duration: 0.35,
                 repeat: Infinity,
                 ease: 'easeInOut',

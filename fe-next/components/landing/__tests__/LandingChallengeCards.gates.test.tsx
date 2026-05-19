@@ -31,8 +31,8 @@ vi.mock('framer-motion', () => {
 });
 
 vi.mock('../ModeCard', () => {
-  const ModeCard = ({ title }: any) => (
-    <div data-testid={`mode-${title}`}>{title}</div>
+  const ModeCard = ({ title, href }: any) => (
+    <div data-testid={`mode-${title}`} data-href={href}>{title}</div>
   );
   ModeCard.displayName = 'ModeCard';
   return { __esModule: true, default: ModeCard };
@@ -104,6 +104,22 @@ describe('LandingChallengeCards — Word Craft admin gate', () => {
     mockGamesCompleted.mockReturnValue(10);
     render(<LandingChallengeCards {...baseProps} />);
     expect(screen.queryByTestId('mode-wordcraft.modeTitle')).toBeNull();
+  });
+
+  it('does NOT render the wordCraft Gem Hunt card for a non-admin', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.queryByTestId('mode-wordcraft.gemsModeTitle')).toBeNull();
+  });
+
+  it('renders the wordCraft Gem Hunt card for an admin with ?mode=gems href', () => {
+    mockIsAdmin.mockReturnValue(true);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    const card = screen.getByTestId('mode-wordcraft.gemsModeTitle');
+    expect(card).toBeInTheDocument();
+    expect(card.getAttribute('data-href')).toBe('/en/word-craft?mode=gems');
   });
 });
 

@@ -8,6 +8,7 @@ import { pickRivalReminderCopy } from '@/lib/rivalReminderCopy';
 import { getLocalHour, getTodayDate } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
 import { withCronLock } from '@/backend/redis/locking';
+import * as Sentry from '@sentry/nextjs';
 
 /**
  * POST /api/cron/daily-challenge-reminders
@@ -116,10 +117,26 @@ export async function POST(request: NextRequest) {
       // Single batched UPDATE instead of N parallel UPDATEs.
       await markDailyPushSentBatch(sentIds);
 
+      const noRivalSent = sent - rivalSent;
       logger.log(
-        `[Push Cron] Completed: ${sent} sent (${rivalSent} rival-themed), ${failed} failed`
+        `[Push Cron] Completed: ${sent} sent (${rivalSent} rival-themed, ${noRivalSent} no-rival), ${failed} failed`
       );
-      return { sent, failed, rivalSent };
+
+      // Sentry telemetry: confirms the no-rival branch (line 93) actually
+      // fires in prod. Only emit when something was sent — hourly "0/0"
+      // would dominate the Issues view.
+      if (sent > 0) {
+        Sentry.captureMessage('daily-challenge-reminders completed', {
+          level: 'info',
+          tags: {
+            cron: 'daily-challenge-reminders',
+            had_no_rival: noRivalSent > 0 ? 'yes' : 'no',
+          },
+          extra: { sent, failed, rivalSent, noRivalSent },
+        });
+      }
+
+      return { sent, failed, rivalSent, noRivalSent };
     });
 
     if (locked.status === 'skipped') {

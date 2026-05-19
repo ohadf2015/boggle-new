@@ -11763,6 +11763,8 @@ const en = {
     },
     "modeTitle": "WordCraft",
     "modeDesc": "A crafty word grid battle — score big, trigger Overdrive, and outwit the bot!",
+    "gemsModeTitle": "WordCraft: Gem Hunt",
+    "gemsModeDesc": "Hunt buried gems on the grid, stack bonuses, and outsmart the bot for max loot!",
     "betaLocked": "Beta access required",
     "heatLabel": "Heat",
     "overdrive": "OVERDRIVE!",
