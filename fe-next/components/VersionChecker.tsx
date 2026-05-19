@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useContext } from 'react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
+import NavigationContext from '@/contexts/NavigationContext';
 
 /**
  * VersionChecker Component
@@ -12,11 +13,20 @@ import { useLanguageSafe } from '@/contexts/LanguageContext';
  * 3. Unregisters service worker
  * 4. Forces page reload (only ONCE to avoid loops)
  *
- * This ensures users ALWAYS get the latest version after deployment.
+ * Mid-gameplay guard: when NavigationContext reports `isInGame`, the auto
+ * reload is deferred — the version flag is held and forceUpdate is triggered
+ * the moment `isInGame` flips back to false (user exits the game).
+ *
+ * This ensures users ALWAYS get the latest version after deployment without
+ * destroying an in-progress round.
  */
 export function VersionChecker() {
   const [newVersionAvailable, setNewVersionAvailable] = useState(false);
   const { t } = useLanguageSafe();
+  // Read context directly (not via useNavigation hook) so we never throw if
+  // VersionChecker is ever rendered outside the provider tree.
+  const nav = useContext(NavigationContext);
+  const isInGame = nav?.isInGame ?? false;
 
   // Get build time from environment (set at build in next.config.mjs)
   const currentBuildTime = process.env.NEXT_PUBLIC_BUILD_TIME;
@@ -104,17 +114,22 @@ export function VersionChecker() {
     };
   }, [checkForUpdates]);
 
-  // Auto-update almost immediately - brief flash so user knows why page reloaded
+  // Auto-update almost immediately - brief flash so user knows why page reloaded.
+  // Mid-gameplay: defer entirely. Once isInGame flips false the dep change
+  // re-runs this effect and the reload fires (with the same 1.5s grace).
   useEffect(() => {
-    if (newVersionAvailable) {
-      const timeout = setTimeout(forceUpdate, 1500);
-      return () => clearTimeout(timeout);
+    if (!newVersionAvailable) return undefined;
+    if (isInGame) {
+      console.log('[Version] Update available but user is in-game — deferring reload');
+      return undefined;
     }
-    return undefined;
-  }, [newVersionAvailable, forceUpdate]);
+    const timeout = setTimeout(forceUpdate, 1500);
+    return () => clearTimeout(timeout);
+  }, [newVersionAvailable, forceUpdate, isInGame]);
 
-  // Don't render anything - updates happen silently
-  if (!newVersionAvailable) {
+  // Stay silent unless we're about to reload. Hiding the banner mid-game keeps
+  // players from being distracted by a notification they can't act on.
+  if (!newVersionAvailable || isInGame) {
     return null;
   }
 
