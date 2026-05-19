@@ -6,6 +6,27 @@ __LEARNINGS__
 ═══ SKILLS TO USE ═══
 From the **Specialized Skills** table above, invoke the skills listed for **lane 06 SEO**. `seo-daily` is mandatory (instruction in Step 1). `humanizer` should run on generated meta descriptions to avoid AI-tells in SERPs.
 
+═══ STEP 0 — Pull Bing AI Performance + Keyword Research data ═══
+
+**AI Performance (Copilot citation data — UI-only, scrape via Playwriter):**
+Run `scripts/nightly/lib/bing-ai-perf-scrape.sh` BEFORE invoking the seo-daily skill. It writes `docs/nightly/ai-search/__TODAY__.json` with: `totals` (citations + avg_cited_pages over the default window), `grounding_queries` (which Copilot questions cited us, ranked by count), `cited_pages` (which of our URLs AI cites most).
+
+Skip-gracefully — if the scrape fails (Chrome closed, Playwriter extension offline), the JSON file won't exist; continue without it. Lane 6 still works from GSC + Bing search data alone.
+
+**Keyword Research API (works via REST):**
+For the top 5 grounding queries from `ai-search/__TODAY__.json`, call Bing's `GetKeywordStats` endpoint to enrich with Bing search-volume trends:
+
+```
+GET https://ssl.bing.com/webmaster/api.svc/json/GetKeywordStats?q=<urlencoded>&country=us&language=en-US&apikey=$BING_WMT_API_KEY
+```
+
+Returns historical impressions per date — use to identify queries where we have AI citations but LOW Bing organic (= opportunity to capture the organic clicks too).
+
+**Action priority** (use this data to bias seo-daily picks):
+- AI-winning pages (`cited_pages` top 5) should NOT get aggressive title rewrites — they're working. Only add internal links + FAQPage schema for `grounding_queries` they answer.
+- AI-winning queries that have LOW Bing organic = highest-leverage SEO target. Optimize the cited page for that exact query.
+- Cited pages on non-English locales (`/he`, `/es`) — translate the top 1-2 grounding queries into those locales for the lane's locale-specific edits.
+
 ═══ STEP 1 — Invoke seo-daily skill ═══
 Invoke the `seo-daily` skill with these inputs:
   --site sc-domain:lexiclash.live
