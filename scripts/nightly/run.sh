@@ -139,7 +139,7 @@ cat > "$REPORT" <<EOF
 EOF
 
 # --- run lanes -------------------------------------------------------------
-LANES=(01-triage 02-perf 03-engagement 04-competitor 05-landing 06-seo 07-self-learn)
+LANES=(01-triage 02-perf 03-engagement 04-competitor 05-landing 06-seo 07-self-learn 08-adsense)
 LANE_RESULTS=()
 
 should_run() {
@@ -149,7 +149,7 @@ should_run() {
   return 0
 }
 
-for i in 1 2 3 4 5 6 7; do
+for i in 1 2 3 4 5 6 7 8; do
   lane="${LANES[$((i-1))]}"
   if ! should_run "$i"; then
     log "lane $i ($lane) — skipped via flag"
