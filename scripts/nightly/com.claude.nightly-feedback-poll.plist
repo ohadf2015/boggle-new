@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.claude.nightly-feedback-poll</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/ohadfisher/git/boggle-new/scripts/nightly/lib/feedback-poll.sh</string>
+    </array>
+
+    <!-- Poll every 5 min to ack Telegram callbacks within their ~60s TTL.
+         Without this, button taps stay in "loading" UI forever. -->
+    <key>StartInterval</key>
+    <integer>300</integer>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/ohadfisher/git/boggle-new</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/ohadfisher/.nvm/versions/node/v22.22.0/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>HOME</key>
+        <string>/Users/ohadfisher</string>
+        <key>PROJECT_DIR</key>
+        <string>/Users/ohadfisher/git/boggle-new</string>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/ohadfisher/logs/lexi-nightly/feedback-poll.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/ohadfisher/logs/lexi-nightly/feedback-poll.log</string>
+
+    <key>LowPriorityIO</key>
+    <true/>
+
+    <!-- 30s hard timeout per poll. getUpdates long-poll is 2s; entire run
+         should finish in well under 10s. -->
+    <key>TimeOut</key>
+    <integer>30</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+</dict>
+</plist>

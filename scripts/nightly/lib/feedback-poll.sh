@@ -67,10 +67,21 @@ if [ -n "$NEW_RECORDS" ]; then
   echo "feedback-poll: appended $COUNT record(s) to $FB_DIR/${TODAY}.ndjson"
 fi
 
-# Acknowledge each callback so the user's UI clears
+# Acknowledge each callback so the user's UI clears.
+# CRITICAL: Telegram callback queries expire in ~60s. This script runs every
+# 5 min via com.claude.nightly-feedback-poll launchd plist, so taps get acked
+# within 5 min worst case (typically <2 min).
 echo "$RESP" | jq -r '.result[] | select(.callback_query != null) | .callback_query.id' | while read -r CQID; do
   [ -z "$CQID" ] && continue
-  "$TG" answer "$CQID" "✓ recorded for next run" >/dev/null 2>&1 || true
+  ACK_RESP=$(curl -sS --max-time 5 -X POST \
+    "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/answerCallbackQuery" \
+    --data-urlencode "callback_query_id=${CQID}" \
+    --data-urlencode "text=✓ recorded — affects next nightly")
+  ACK_OK=$(echo "$ACK_RESP" | jq -r '.ok // false')
+  if [ "$ACK_OK" != "true" ]; then
+    ACK_DESC=$(echo "$ACK_RESP" | jq -r '.description // ""')
+    echo "feedback-poll: ack failed for $CQID — $ACK_DESC"
+  fi
 done
 
 # Update last-seen pointer
