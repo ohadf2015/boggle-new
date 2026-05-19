@@ -112,6 +112,12 @@ preflight_check() {
   [ -f "$HOME/.config/bing-wmt/credentials" ] \
     || echo "preflight: WARN — Bing WMT creds missing; lane 5 may degrade"
 
+  # --- pull yesterday's Telegram-button feedback into docs/nightly/feedback/
+  # so lane prompts can read it as preamble + adjust strategy. Non-fatal.
+  if [ -x "$PROJECT_DIR/scripts/nightly/lib/feedback-poll.sh" ]; then
+    "$PROJECT_DIR/scripts/nightly/lib/feedback-poll.sh" 2>&1 | sed 's/^/  /'
+  fi
+
   # NOTE: last-run timestamp written by run.sh ONLY on successful completion,
   # not here — otherwise an aborted preflight would poison the 18h dedupe check.
 

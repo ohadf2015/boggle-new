@@ -3,6 +3,12 @@ You are running the nightly competitor + Reddit research lane for LexiClash. Tod
 ═══ LEARNINGS FROM PRIOR RUNS ═══
 __LEARNINGS__
 
+═══ RECENT TELEGRAM-BUTTON FEEDBACK ═══
+Read every `.ndjson` file in `docs/nightly/feedback/` (last 7 days). Each line is a callback_query event. Pay special attention to lines where `callback_data` starts with `reddit:` — that's the user's vote on YOUR PREVIOUS Reddit-pick drafts. Treat patterns:
+  - `reddit:will_post:*` → that subreddit / draft style worked, repeat it
+  - `reddit:skip:*` → that subreddit / draft style failed, deprioritize
+  - `reddit:redraft:*` → user wanted same thread, different reply tone; rewrite
+
 ═══ SKILLS TO USE ═══
 From the **Specialized Skills** table above, invoke the skills listed for **lane 04 competitor/reddit** unless they conflict with this lane's hard rules. `humanizer` is especially important for Reddit drafts — they must not read AI-written.
 

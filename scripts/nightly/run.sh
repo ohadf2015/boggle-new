@@ -422,9 +422,86 @@ else
 fi
 rm -f "$SUMMARY_PROMPT" "$SUMMARY_FILE"
 
-# Send the narrative summary FIRST, then attach the full report for deep-dive.
-tg_msg "$SUMMARY"
+# Send the narrative summary FIRST with feedback buttons.
+# Then attach the full report for deep-dive.
+RUN_SLUG="${TODAY//-/}"
+SUMMARY_KBD=$(cat <<KBD
+[[{"text":"👍 Good night","callback_data":"night:good:${RUN_SLUG}"},{"text":"👎 Meh","callback_data":"night:meh:${RUN_SLUG}"}]]
+KBD
+)
+if [ "$DRY_RUN" = "0" ]; then
+  "$TG" kbd "$SUMMARY" "$SUMMARY_KBD" >/dev/null 2>&1 || tg_msg "$SUMMARY"
+else
+  tg_msg "$SUMMARY"
+fi
 tg_doc "$REPORT" "Full report attached"
+
+# Extract actionable items from the report and send each as its OWN message
+# with its own feedback keyboard. Telegram inline-keyboards are per-message,
+# so one message = one feedback target. The user sees a clear actionable card.
+#
+# Patterns scraped from the report:
+#  - "#### Top Reddit pick of the day" block → 💬 Reddit pick card
+#  - "#### Experimental game mode shipped" block → 🎮 mode shipped card
+#  - "#### Top game-mode improvement idea" block → 🎮 idea card
+
+if [ "$DRY_RUN" = "0" ] && [ -f "$REPORT" ]; then
+  # Reddit pick: extract permalink + reply text
+  REDDIT_BLOCK=$(awk '/^#### Top Reddit pick of the day/,/^####|^$/' "$REPORT" | head -40)
+  PERMALINK=$(echo "$REDDIT_BLOCK" | grep -oE 'https?://[^[:space:]]+reddit\.com/[^[:space:])]*' | head -1)
+  if [ -n "$PERMALINK" ]; then
+    REDDIT_REPLY=$(echo "$REDDIT_BLOCK" | awk '/^\`\`\`$/{if(in_block){exit} else {in_block=1; next}} in_block' | head -8)
+    PICK_HASH=$(echo "$PERMALINK" | shasum | cut -c1-8)
+    REDDIT_MSG="💬 *Reddit pick* — tap URL to open thread, tap-hold the code block to copy the reply.
+
+$PERMALINK
+
+Reply:
+\`\`\`
+$REDDIT_REPLY
+\`\`\`"
+    REDDIT_KBD="[[{\"text\":\"👍 Will post\",\"callback_data\":\"reddit:will_post:${PICK_HASH}\"},{\"text\":\"👎 Skip\",\"callback_data\":\"reddit:skip:${PICK_HASH}\"}],[{\"text\":\"🔁 Different draft tomorrow\",\"callback_data\":\"reddit:redraft:${PICK_HASH}\"}]]"
+    "$TG" kbd "$REDDIT_MSG" "$REDDIT_KBD" >/dev/null 2>&1
+    log "sent Reddit-pick card (hash=$PICK_HASH)"
+  fi
+
+  # Game mode shipped: extract URL + name
+  MODE_BLOCK=$(awk '/^#### Experimental game mode shipped/,/^####|^$/' "$REPORT" | head -25)
+  MODE_URL=$(echo "$MODE_BLOCK" | grep -oE 'https?://lexiclash\.live/[^[:space:])]+' | head -1)
+  if [ -n "$MODE_URL" ]; then
+    MODE_NAME=$(echo "$MODE_BLOCK" | grep -oE '^- Mode: .*' | head -1 | sed 's/^- Mode: //')
+    SLUG=$(echo "$MODE_URL" | sed -E 's|^.*/([^/]+)/?$|\1|')
+    MODE_MSG="🎮 *New mode shipped* — $MODE_NAME
+
+$MODE_URL
+
+(admin-only tile on home; URL also works directly. Refresh the page if you don't see it.)
+
+Reply:
+- 👍 Keep building this direction
+- 👎 Drop it
+- 📐 Tweak — comment in chat with what to change"
+    MODE_KBD="[[{\"text\":\"👍 Keep it\",\"callback_data\":\"mode:keep:${SLUG}\"},{\"text\":\"👎 Drop it\",\"callback_data\":\"mode:drop:${SLUG}\"}],[{\"text\":\"📐 Tweak\",\"callback_data\":\"mode:tweak:${SLUG}\"},{\"text\":\"🚀 Promote to public\",\"callback_data\":\"mode:promote:${SLUG}\"}]]"
+    "$TG" kbd "$MODE_MSG" "$MODE_KBD" >/dev/null 2>&1
+    log "sent game-mode card (slug=$SLUG)"
+  fi
+
+  # Game mode idea (only if no mode was shipped — same heuristic): top concept from lane 4
+  if [ -z "${MODE_URL:-}" ]; then
+    IDEA_LINE=$(grep -m1 "^- Top idea:" "$REPORT" | sed 's/^- Top idea: //')
+    if [ -n "$IDEA_LINE" ]; then
+      IDEA_HASH=$(echo "$IDEA_LINE" | shasum | cut -c1-8)
+      IDEA_MSG="🎮 *Game-mode idea*
+
+$IDEA_LINE
+
+(no mode shipped tonight — flag below tells the loop whether to prioritize this for tomorrow.)"
+      IDEA_KBD="[[{\"text\":\"🚀 Build it tomorrow\",\"callback_data\":\"idea:build:${IDEA_HASH}\"},{\"text\":\"⏭️ Pass\",\"callback_data\":\"idea:pass:${IDEA_HASH}\"}]]"
+      "$TG" kbd "$IDEA_MSG" "$IDEA_KBD" >/dev/null 2>&1
+      log "sent game-mode-idea card (hash=$IDEA_HASH)"
+    fi
+  fi
+fi
 
 preflight_mark_success
 log "nightly-loop complete"

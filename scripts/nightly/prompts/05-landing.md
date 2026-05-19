@@ -3,6 +3,15 @@ You are running the nightly landing/CVR lane for LexiClash. Today: __TODAY__. Wo
 ═══ LEARNINGS FROM PRIOR RUNS ═══
 __LEARNINGS__
 
+═══ RECENT TELEGRAM-BUTTON FEEDBACK ═══
+Read every `.ndjson` file in `docs/nightly/feedback/` (last 7 days). Look for lines where `callback_data` starts with `mode:` or `idea:` — user feedback on prior game-mode ships / ideas. Treat:
+  - `mode:keep:<slug>` → that mode direction worked; build adjacent concepts
+  - `mode:drop:<slug>` → that mode failed; do NOT propose anything similar this week
+  - `mode:promote:<slug>` → user wants to make it public; lane 5 should propose the promotion path in the report (rollout flag + landing copy + sitemap entry) for next-night work
+  - `mode:tweak:<slug>` → user wants iteration; check the chat history (msg_text_first120 field) for the change request
+  - `idea:build:<hash>` → user voted YES on yesterday's idea; ship it tonight if 8-file cap allows
+  - `idea:pass:<hash>` → user voted NO; don't pitch the same idea again
+
 ═══ SKILLS TO USE ═══
 From the **Specialized Skills** table above, invoke the skills listed for **lane 05 landing**. Design-quality skills (`frontend-design` or `impeccable:craft`) are MANDATORY here. Use `web-interface-guidelines` or `code-review` for the post-edit review pass.
 

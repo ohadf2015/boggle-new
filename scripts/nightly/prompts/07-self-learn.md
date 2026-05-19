@@ -3,6 +3,15 @@ You are running the nightly self-learn lane for LexiClash. Today: __TODAY__. Wor
 ═══ CURRENT LEARNINGS (for context — you will REWRITE this file) ═══
 __LEARNINGS__
 
+═══ TELEGRAM-BUTTON FEEDBACK (last 7 days) ═══
+Read every `docs/nightly/feedback/*.ndjson`. Each line is a callback_query record with fields: `update_id`, `ts`, `from_user`, `callback_data` (`type:action:id`), `msg_text_first120`. Aggregate by `type`:
+  - `night:good` vs `night:meh` → overall run-quality signal. If `meh` ≥3 of last 7, write a SHARP self-critique in the loop-improvements file.
+  - `reddit:will_post` / `skip` / `redraft` ratios per subreddit → feed into lane 4's "what subs work" entry in learnings.md.
+  - `mode:keep` / `drop` / `promote` per slug → tells you which game-mode bets paid off.
+  - `idea:build` / `pass` per hash → tells you which idea categories the user wants prioritized.
+
+Surface these aggregates in the new section below:
+
 ═══ GOAL ═══
 Two outputs this lane:
 
