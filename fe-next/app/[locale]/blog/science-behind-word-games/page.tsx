@@ -12,7 +12,7 @@ interface PageProps {
 
 const SLUG = 'science-behind-word-games';
 const DATE_PUBLISHED = '2025-07-03';
-const DATE_MODIFIED = '2026-03-01';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'Word Games & Brain Health - Scientific Benefits Explained',
@@ -59,24 +59,24 @@ export default async function SciencePage({ params }: PageProps) {
         dateModified={DATE_MODIFIED}
         citations={[
           {
-            title: 'Vocabulary size and cognitive reserve in older adults',
-            url: 'https://pubmed.ncbi.nlm.nih.gov/26052078/',
-            publisher: 'PubMed / National Library of Medicine',
+            title: 'Leisure Activities and the Risk of Dementia in the Elderly',
+            url: 'https://www.nejm.org/doi/full/10.1056/NEJMoa022252',
+            publisher: 'New England Journal of Medicine (Verghese et al., 2003)',
           },
           {
-            title: 'Bilingualism as a contributor to cognitive reserve',
-            url: 'https://www.nature.com/articles/s41562-019-0769-1',
-            publisher: 'Nature Human Behaviour',
+            title: 'PROTECT study: word puzzle engagement and cognitive performance in adults aged 50+',
+            url: 'https://onlinelibrary.wiley.com/doi/10.1002/gps.5085',
+            publisher: 'International Journal of Geriatric Psychiatry (Brooker et al., 2019)',
           },
           {
-            title: 'Word games and executive function: a meta-analysis',
-            url: 'https://scholar.google.com/scholar?q=word+games+executive+function+meta-analysis',
-            publisher: 'Google Scholar',
+            title: 'Bilingualism as a protection against the onset of symptoms of dementia',
+            url: 'https://doi.org/10.1016/j.neuropsychologia.2006.10.009',
+            publisher: 'Neuropsychologia (Bialystok, Craik & Freedman, 2007)',
           },
           {
-            title: 'Crossword puzzles and memory in older adults (19,000-person study)',
-            url: 'https://www.nejm.org/doi/full/10.1056/NEJMoa2206999',
-            publisher: 'The New England Journal of Medicine',
+            title: 'FTC v. Lumos Labs: $2M settlement and $50M penalty judgment for deceptive advertising',
+            url: 'https://www.ftc.gov/news-events/news/press-releases/2016/01/lumosity-pay-2-million-settle-ftc-deceptive-advertising-charges',
+            publisher: 'U.S. Federal Trade Commission (2016)',
           },
         ]}
       />
