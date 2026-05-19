@@ -5815,6 +5815,7 @@ const ja = {
       "matchesTargetWarning": "同じ文字数 — 送信すると1回消費",
       "knownLetters": "位置違い:",
       "syncingTarget": "ターゲット同期中…",
+      "lowLifeHint": "ライフが少ない！盤面で単語を見つけて回復しよう。",
       "accumulatedScore": "スコア",
       "autoClueUnlocked": "ヒント解放！",
       "clueRevealLetter": "文字が明らかに！",

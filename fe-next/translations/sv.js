@@ -5784,6 +5784,7 @@ const sv = {
       "matchesTargetWarning": "Samma längd — skicka förbrukar 1 försök",
       "knownLetters": "Fel plats:",
       "syncingTarget": "Synkar målordet…",
+      "lowLifeHint": "Lågt på liv! Hitta ord på brädet för att fylla på.",
       "accumulatedScore": "Poäng",
       "autoClueUnlocked": "Ledtråd upplåst!",
       "clueRevealLetter": "Bokstav avslöjad!",

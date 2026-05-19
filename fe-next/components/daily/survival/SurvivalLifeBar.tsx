@@ -5,6 +5,7 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import { Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LifeGainAnimation } from '../LifeGainAnimation';
+import { MobileTooltip } from '@/components/ui/MobileTooltip';
 
 export interface SurvivalLifeBarProps {
   lifePoints: number;
@@ -13,6 +14,14 @@ export interface SurvivalLifeBarProps {
   lifeGainAmount: number | null;
   skipAnimations: boolean;
   onLifeGainComplete: () => void;
+  /** Neutral accessible label / tooltip shown while life is healthy. Optional —
+   *  when omitted (e.g. single-player Survival callers) the bar renders bare,
+   *  unchanged. */
+  label?: string;
+  /** Encouragement shown (as tooltip + aria-label) once life enters the red
+   *  danger tier (<=33) while the game is still running — nudges the player to
+   *  find words to heal. */
+  lowLifeHint?: string;
 }
 
 /** Color tier for the life bar */
@@ -32,11 +41,18 @@ export const SurvivalLifeBar = memo<SurvivalLifeBarProps>(({
   lifeGainAmount,
   skipAnimations,
   onLifeGainComplete,
+  label,
+  lowLifeHint,
 }) => {
   const pct = Math.min(100, Math.max(0, lifePoints));
   const tier = getLifeTier(pct);
   const isLow = pct <= 20;
   const isDanger = pct <= 33;
+
+  // Tooltip / accessible label: encourage healing once life hits the red danger
+  // tier (mirrored into aria-label so screen readers get the same nudge). Fall
+  // back to the neutral label otherwise. Don't nag once the game is over.
+  const tooltipText = isDanger && !isGameOver && lowLifeHint ? lowLifeHint : label;
 
   // Drip droplets + red flash on damage
   const prevLifeRef = useRef(lifePoints);
@@ -71,7 +87,7 @@ export const SurvivalLifeBar = memo<SurvivalLifeBarProps>(({
   // Segment markers for visual rhythm (every 25%)
   const segments = [25, 50, 75];
 
-  return (
+  const bar = (
     <div
       className={cn(
         "flex items-center gap-2 max-w-3xl mx-auto w-full relative py-1 [@media(max-height:560px)]:py-0 overflow-x-clip",
@@ -81,6 +97,7 @@ export const SurvivalLifeBar = memo<SurvivalLifeBarProps>(({
       aria-valuenow={Math.round(pct)}
       aria-valuemin={0}
       aria-valuemax={100}
+      aria-label={tooltipText || undefined}
     >
       {/* Life gain animation */}
       <LifeGainAnimation
@@ -222,6 +239,16 @@ export const SurvivalLifeBar = memo<SurvivalLifeBarProps>(({
         </AdaptiveAnimatePresence>
       </div>
     </div>
+  );
+
+  // Wrap in a tap/hover tooltip only when there's text to surface. MP passes
+  // label + lowLifeHint; single-player Survival callers pass neither, so the
+  // bar renders bare and unchanged (backward-compatible).
+  if (!tooltipText) return bar;
+  return (
+    <MobileTooltip content={tooltipText} side="top">
+      {bar}
+    </MobileTooltip>
   );
 });
 SurvivalLifeBar.displayName = 'SurvivalLifeBar';
