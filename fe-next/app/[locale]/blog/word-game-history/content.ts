@@ -22,160 +22,91 @@ export const contentByLocale: Record<string, LocaleContent> = {
     title: 'From Ancient Tiles to Digital Grids: The Wild History of Word Games',
     subtitle: 'Stolen ideas, crossword mania, a stay-at-home dad\'s invention, and one five-letter word that broke the internet.',
     category: 'History',
-    readTime: '11 min read',
+    readTime: '6 min read',
     authorName: 'Ohad Fisher',
     authorBio: 'Obsessive word game player, amateur historian of useless knowledge, and the person who owns three different editions of Scrabble.',
     sections: [
       {
-        content: `I have a confession. I own a replica of a Roman wax tablet. It sits on my desk next to my monitor, right below the sticky note that says "REMEMBER TO EAT LUNCH." I bought it because I found out that Roman schoolchildren used to practice word games on these things almost two thousand years ago, and I thought that was the coolest thing I'd ever heard.
+        content: `I own a replica of a Roman wax tablet. It sits on my desk next to my monitor, right below the sticky note that says "REMEMBER TO EAT LUNCH." I bought it because Roman schoolchildren practiced word games on these things almost two thousand years ago, and that felt like the coolest thing I'd ever heard.
 
-My partner thinks I need an intervention. She might be right.
+My partner thinks I need an intervention. She's probably right.
 
-The history of word games is genuinely one of the wildest stories in human culture. Ancient Egyptian riddles. Medieval monks with too much free time. A bitter IP dispute that tore apart friendships. A newspaper craze that got people fired. A Welsh software engineer who accidentally created a global phenomenon during lockdown.
+But here's the thing: the history of word games is genuinely one of the wildest stories in human culture. Ancient Egyptian riddles. Medieval monks with too much free time. A bitter IP dispute that tore apart friendships. A newspaper craze that got people fired. A Welsh software engineer who accidentally created a global phenomenon during lockdown.
 
-Word games as casual hobby? This story has more plot twists than a telenovela.`,
+Word games have been making us slightly unhinged for four thousand years.`,
       },
       {
         title: 'Ancient origins: when words were magic',
         content: `The oldest known word games date back roughly four thousand years, and they weren't played for fun. They were genuinely believed to have magical power.
 
-The ancient Egyptians were obsessed with wordplay. The Leiden Papyrus, dating to around 1200 BCE, contains riddles and word puzzles that scribes used to test each other. These weren't party tricks. In Egyptian culture, knowing the "true name" of something gave you power over it. Word mastery was literally a form of magic.
+The ancient Egyptians were obsessed with wordplay. The Leiden Papyrus, dating to around 1200 BCE, contains riddles and word puzzles that scribes used to test each other. In Egyptian culture, knowing the "true name" of something gave you power over it. Word mastery was literally a form of magic.
 
-The Greeks took it further. They invented the acrostic, poems where the first letters of each line spell out a word or message. Dionysius of Halicarnassus, a historian from the first century BCE, wrote about elaborate word puzzles used in education and political satire. If you could manipulate language cleverly, you could manipulate people. Some things never change.
+The Greeks invented the acrostic, poems where the first letters of each line spell out a word or message. The Romans were particularly fond of word squares, grids where the same words read both horizontally and vertically. The most famous is the SATOR Square, found scratched into walls across the Roman Empire from Pompeii to Manchester. It reads SATOR AREPO TENET OPERA ROTAS, and scholars have been arguing about what it means for centuries. Some think it's a Christian prayer encoded to avoid persecution. Others think it's just an ancient Roman doodling in the margins during a boring meeting.
 
-The Romans were particularly fond of word squares, grids where the same words read both horizontally and vertically. The most famous is the SATOR Square, found scratched into walls across the Roman Empire from Pompeii to Manchester. It reads SATOR AREPO TENET OPERA ROTAS, and scholars have been arguing about what it means for centuries. Some think it's a Christian prayer encoded to avoid persecution. Others think it's just an ancient Roman doodling in the margins during a boring meeting.
-
-I like to think about those Roman soldiers and merchants, scratching word puzzles into stone walls while waiting for something to happen. It's weirdly comforting. People have always needed something to do with their brains during downtime. We're not so different.`,
-      },
-      {
-        title: 'Medieval monks and Renaissance riddles',
-        content: `After Rome fell, word games didn't disappear. They moved into monasteries.
-
-Medieval monks, with their combination of literacy, boredom, and access to writing materials, became enthusiastic word game inventors. They created anagram puzzles, palindromes, and elaborate riddle collections. The Exeter Book, a tenth-century Anglo-Saxon manuscript, contains nearly a hundred riddles that are essentially word games in poetic form. Some are surprisingly risque for monks. One famous riddle describes something that "swells and stands up, lifts its covering" and the answer is... an onion. Sure it is, Brother Aelfric.
-
-The Renaissance brought a more systematic approach. Italian scholars developed the "rebus," puzzles where pictures and letters combine to form words or phrases. These spread across Europe like wildfire. Henry VIII's court entertained themselves with elaborate word games and anagram puzzles. Catherine of Aragon's name was anagrammed into "I, a rancid hot orange" by her detractors. Political insults via wordplay: a tradition as old as politics itself.
-
-But the real revolution wouldn't come until the industrial age, when mass literacy, cheap paper, and newspapers created the conditions for word games to go truly mainstream.`,
+I like to think about those Roman soldiers scratching word puzzles into stone walls while waiting for something to happen. People have always needed something to do with their brains during downtime. We're not so different.`,
       },
       {
         title: 'The Scrabble story: genius, theft, or both?',
-        content: `Alfred Mosher Butts. His story is both inspiring and infuriating.
+        content: `Alfred Mosher Butts spent months analyzing the front pages of The New York Times, counting letter frequencies by hand. It was 1933. The Great Depression had gutted the construction industry, and Butts, an unemployed architect, needed something to do.
 
-In 1933, Butts was an unemployed architect in New York City. The Great Depression had gutted the construction industry. With nothing but time on his hands, he decided to invent a board game. He spent months analyzing the front pages of The New York Times, counting letter frequencies by hand, to determine how many tiles of each letter the game should include.
+He created "Lexiko," then refined it into "Criss-Crosswords" — essentially Scrabble. Same letter tiles, same board, same scoring system. Nobody wanted it. Parker Brothers rejected it. Milton Bradley rejected it. Every major game company said no.
 
-He created something called "Lexiko," then refined it into "Criss-Crosswords." It was, essentially, Scrabble. Same letter tiles, same crossword-style board, same scoring system.
+Then James Brunot came along. In 1948, he bought the rights, simplified the rules, changed the name to "Scrabble," and started manufacturing sets in his living room. For the first few years it barely sold. But then, in 1952, the president of Macy's played Scrabble on vacation and loved it. He ordered sets for all Macy's stores. Sales exploded. Within two years, Scrabble was selling millions of copies.
 
-And nobody wanted it. Butts approached every major game company in America. They all said no. Parker Brothers rejected it. Milton Bradley rejected it. Everyone rejected it.
-
-Then James Brunot entered the picture. Brunot was a government bureaucrat who'd met Butts through mutual friends. He saw the game, loved it, and in 1948, bought the rights to manufacture it. He simplified the rules, changed the name to "Scrabble," and started making sets in his living room with his wife.
-
-For the first few years, it barely sold. Brunot was losing money. But then, in 1952, the president of Macy's department store played Scrabble on vacation and loved it. He ordered sets for Macy's stores. Sales exploded. Within two years, Scrabble was selling millions of copies.
-
-The complicated part: Butts, the inventor, received royalties, but Brunot became wealthy. Brunot eventually sold the rights to Selchow & Righter, who sold to Coleco, who went bankrupt, at which point Hasbro picked it up. Through all these transactions, Butts received relatively modest payments. He lived comfortably but never became rich from the game he invented.
-
-Butts, by all accounts, didn't seem bitter about it. He said he was grateful anyone played his game at all. But the story has always bugged me. The guy literally hand-counted letter frequencies from newspapers to design the perfect word game, and he ended up as a footnote while corporations made billions.
-
-This is a pattern we'll see again with word games: the creators rarely capture the value they create. Remember that when we get to Wordle.`,
+Butts, the inventor, received royalties. Brunot became wealthy. It's a pattern we'll see again: the creators rarely capture the value they create.`,
       },
       {
         title: 'The crossword craze (1920s viral)',
-        content: `Before Scrabble, there was the crossword. Its rise was absolutely bonkers.
-
-The first crossword puzzle appeared on December 21, 1913, in the New York World newspaper. It was created by Arthur Wynne, a journalist from Liverpool, and it was shaped like a diamond. Wynne called it a "Word-Cross" (a typesetter later accidentally swapped it to "Cross-Word," and the new name stuck).
+        content: `The first crossword puzzle appeared on December 21, 1913, in the New York World newspaper. It was created by Arthur Wynne, a journalist from Liverpool, and it was diamond-shaped. Wynne called it a "Word-Cross."
 
 For about ten years, crosswords were a minor newspaper feature. Then, in 1924, two young publishers named Richard Simon and M. Lincoln Schuster had an idea. Simon's aunt was a crossword fan and couldn't find a book of them. So Simon and Schuster published one. Their very first book as a brand-new publishing company.
 
-What happened next was one of the first viral phenomena in American media history.
+What happened next was one of the first viral phenomena in American media history. The book sold over 350,000 copies in its first year. Crossword puzzle books became the hottest gift in America. Newspapers that didn't run crosswords started losing subscribers. The New York Times, which would eventually become synonymous with crosswords, initially refused to run them, calling them "a primitive form of mental exercise" in a snooty 1924 editorial.
 
-The book sold over 350,000 copies in its first year. Crossword puzzle books became the hottest gift in America. Newspapers that didn't run crosswords started losing subscribers to those that did. The New York Times, which would eventually become synonymous with crosswords, initially refused to run them. Called them "a primitive form of mental exercise" in a snooty 1924 editorial. They didn't start publishing crosswords until 1942. Even then, they justified it as a "wartime diversion."
-
-The crossword craze of the 1920s was remarkably similar to the Wordle phenomenon of 2022. People became obsessed. Employers complained that workers were doing crosswords instead of working. The Baltimore and Ohio Railroad put dictionaries on all its trains because passengers kept arguing about spellings. A Chicago woman sued her husband for divorce because he was "a crossword puzzle addict" who wouldn't talk to her.
+Employers complained that workers were doing crosswords instead of working. The Baltimore and Ohio Railroad put dictionaries on all its trains because passengers kept arguing about spellings. A Chicago woman sued her husband for divorce because he was "a crossword puzzle addict" who wouldn't talk to her.
 
 Libraries reported that dictionaries were being stolen. Not borrowed. Stolen. People were cutting pages out of reference books to settle crossword disputes.
 
-This is what word games do to people. They've been making us slightly unhinged for a century.`,
+This is what word games do to people. The 1920s crossword craze looked remarkably like the 2022 Wordle phenomenon: global obsession, workplace distraction, shared experience.`,
       },
       {
-        title: 'Boggle: everyone plays at once',
-        content: `In 1972, a toy inventor named Allan Turoff created something that would fundamentally change how word games work.
-
-Turoff's insight was brilliantly simple: what if, instead of taking turns, everyone played at the same time? What if the challenge wasn't just vocabulary, but speed?
+        title: 'Boggle and the speed revolution',
+        content: `In 1972, toy inventor Allan Turoff created something that fundamentally changed how word games work. His insight was brilliantly simple: what if, instead of taking turns, everyone played at the same time? What if the challenge wasn't just vocabulary, but speed?
 
 He designed a 4x4 grid of letter dice in a covered tray. Shake it, flip it over, start a three-minute timer, and everyone simultaneously hunts for words. When the timer buzzes, you compare lists. Any word that more than one person found gets crossed out. Only your unique finds count.
 
-This was revolutionary. Scrabble and crosswords were sequential, cerebral, patient. Boggle was frantic, competitive, visceral. It turned word games from a solitary intellectual exercise into a social experience with genuine tension.
+This was revolutionary. Scrabble and crosswords were cerebral and patient. Boggle was frantic, competitive, visceral. It turned word games from a solitary intellectual exercise into a social experience with genuine tension. Parker Brothers picked it up and it became a massive hit. By the 1980s, it was one of the best-selling word games in the world.
 
-Parker Brothers (ironically, the same company that had rejected Scrabble decades earlier) picked up Boggle and it became a massive hit. By the 1980s, it was one of the best-selling word games in the world.
+What I love about Boggle is that it democratized word games. In Scrabble, experienced players have a massive advantage. In Boggle, a twelve-year-old with a good eye for patterns can beat a literature professor. Speed and pattern recognition matter as much as vocabulary size.
 
-What I love about Boggle is that it democratized word games in a way Scrabble never quite did. In Scrabble, experienced players have a massive advantage. They know the two-letter words, the Q-without-U words, the obscure high-scoring plays. Steep learning curve. Boggle is more egalitarian. A twelve-year-old with a good eye for patterns can beat a literature professor. Speed and pattern recognition matter as much as vocabulary size.
-
-This is the lineage LexiClash inherits. Everyone plays simultaneously on the same grid, racing against the clock. Pure Boggle DNA.`,
-      },
-      {
-        title: 'Words With Friends and the mobile era',
-        content: `Fast forward to 2009. The iPhone had been out for two years. The App Store was brand new. And two developers named Paul and David Bettner created Words With Friends.
-
-Words With Friends was Scrabble. The board was slightly different, the tile distribution was slightly different, but the core gameplay was identical. Hasbro sued. They eventually settled, and Zynga (which had acquired the game) paid an undisclosed sum. But by then, the genie was out of the bottle.
-
-Words With Friends did something Scrabble never could: it made word games a social network. You weren't just playing a game. You were maintaining a relationship. People played ongoing games with friends, family members, romantic partners, and strangers. The asynchronous format, take your turn whenever you want, meant games could last days or weeks.
-
-At its peak, Words With Friends had over 20 million daily active users. It was probably the single biggest gateway drug for word games in history. People who would never have picked up a physical Scrabble board were suddenly obsessing over triple-word scores.
-
-Then came the wave: Wordament, Ruzzle, Word Cookies, Wordscapes, dozens more. By 2020, word games were one of the most profitable categories in mobile gaming.
-
-But something was missing. Most of these games were designed around monetization. Loot boxes, energy systems, advertising. The actual word game experience was secondary to the business model. The soul of the thing was getting squeezed out.`,
+This is the DNA that LexiClash inherits: everyone plays simultaneously on the same grid, racing against the clock.`,
       },
       {
         title: 'Wordle: lightning in a bottle',
-        content: `And then, in October 2021, a Welsh software engineer named Josh Wardle released a little web game he'd made for his partner. She liked word games, and he wanted to give her something to play.
+        content: `In October 2021, a Welsh software engineer named Josh Wardle released a little web game he'd made for his partner during lockdown. She liked word games, and he wanted to give her something to play.
 
 He called it Wordle. One puzzle per day. Six guesses to find a five-letter word. No app, no account, no ads, no monetization whatsoever. Just a clean grid on a website.
 
 By January 2022, Wordle had 300,000 daily players. By February, it had millions. The New York Times bought it for a reported seven figures.
 
-What made Wordle special wasn't the gameplay. Guess-the-word games had existed for decades. It was the combination of design choices:
+What made Wordle special wasn't the gameplay. Guess-the-word games had existed for decades. It was the combination of design choices. One puzzle per day meant everyone was solving the same puzzle. Shared experience. You could discuss it without spoiling it. Those colored squares people shared on social media were genius.
 
-One puzzle per day meant everyone was solving the same puzzle. Shared experience. You could discuss it without spoiling it. Those colored squares people shared on social media were genius.
-
-No endless play meant it respected your time. You played for five minutes and you were done. No dopamine trap, no "one more round" manipulation.
+No endless play meant it respected your time. No dopamine trap, no "one more round" manipulation.
 
 No monetization meant it felt genuine. In a world of predatory free-to-play games, Wordle felt like a gift.
 
-Josh Wardle, like Alfred Butts before him, created something that brought joy to millions. Unlike Butts, he at least got a good payout when the Times bought it. But the pattern held: the game transcended its creator almost immediately.
+Josh Wardle, like Alfred Butts before him, created something that brought joy to millions. Unlike Butts, he at least got a good payout. But the pattern held: the game transcended its creator almost immediately.
 
-What interests me most about Wordle: it proved that word games don't need complex mechanics to captivate people. The appeal is in the language itself. The satisfaction of narrowing down possibilities, the "aha" moment when the letters click. Same dopamine hit people have been chasing since Egyptian scribes tested each other with riddles four thousand years ago.`,
-      },
-      {
-        title: 'Where this goes next',
-        content: `So where does this four-thousand-year story go next?
-
-The arc is clear: magical/religious origins, intellectual pursuit, mass entertainment, digital casual gaming. Each transition made word games more accessible. Sometimes sacrificed depth.
-
-The next big shift is multiplayer, multilingual, and real-time.
-
-For most of their history, word games were limited to one language at a time. You played Scrabble in English or French or Arabic, but never across languages. Now, platforms like LexiClash are building games where players compete in Hebrew, English, Swedish, Japanese, and Spanish. Sometimes in the same session. A Japanese player and a Swedish player solving the same grid in their respective languages, comparing scores. That's something entirely new in the history of word games.
-
-Real-time multiplayer word games are also changing fast. The Boggle model, everyone plays simultaneously, is getting layered with live leaderboards, combo systems, blast mechanics, boss battles. Word games borrowing from action game design. Works surprisingly well. The cognitive core is the same, but the packaging is a lot more fun.
-
-I'm also watching the intersection of word games and language learning. Historically, these have been separate categories. But there's no reason they have to be. A word game that teaches you vocabulary in a new language while you're having fun? That's what every edtech company has been chasing for decades, and we're closer to it than ever.
-
-Word games are becoming social again. That's the part I care about most. For a while, the mobile era turned them into solitary time-killers. Now, with real-time multiplayer and shared challenges, they're returning to their roots. Bringing people together. Sparking friendly competition.
-
-Roman soldiers scratching SATOR squares into walls. Twenties socialites arguing over crosswords on trains. Modern players racing each other on digital grids. The thread is the same. Humans love words. Love playing with them, competing over them, showing off our mastery of them.
-
-That's not going to change. The four-thousand-year streak continues.`,
+What interests me most about Wordle: it proved that word games don't need complex mechanics to captivate people. The appeal is in the language itself. The satisfaction of narrowing down possibilities. The "aha" moment when the letters click. Same dopamine hit people have been chasing since Egyptian scribes tested each other with riddles four thousand years ago.`,
       },
       {
         content: `Sources:
 - The Leiden Papyrus: Ancient Egyptian word puzzles and scribal education (c. 1200 BCE)
-- The Exeter Book riddles: Anglo-Saxon literature, 10th century CE
 - Wynne, Arthur — First crossword puzzle, New York World, December 21, 1913
 - Simon & Schuster — First crossword puzzle book (1924), company founding story
 - Butts, Alfred Mosher — Letter frequency analysis and the invention of Scrabble (1933-1948)
 - Turoff, Allan — Boggle invention and Parker Brothers deal (1972)
-- FTC v. Hasbro/Zynga — Words With Friends intellectual property dispute
-- Wardle, Josh — Wordle creation story, New York Times acquisition (2022)
-- Fatsis, Stefan — "Word Freak: Heartbreak, Triumph, Genius, and Obsession in the World of Competitive Scrabble Players" (2001)`,
+- Wardle, Josh — Wordle creation story, New York Times acquisition (2022)`,
       },
     ],
     backToBlog: 'Back to Blog',

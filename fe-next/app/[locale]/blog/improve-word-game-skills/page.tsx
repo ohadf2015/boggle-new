@@ -12,7 +12,7 @@ interface PageProps {
 
 const SLUG = 'improve-word-game-skills';
 const DATE_PUBLISHED = '2025-09-15';
-const DATE_MODIFIED = '2026-03-10';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'How to Find Words in Word Hunt & Boggle - Best Tips & Strategies',
@@ -57,6 +57,18 @@ export default async function ImproveSkillsPage({ params }: PageProps) {
         locale={locale}
         datePublished={DATE_PUBLISHED}
         dateModified={DATE_MODIFIED}
+        citations={[
+          {
+            title: 'Systematic review of fMRI studies on word processing',
+            url: 'https://www.aimspress.com/article/id/2114',
+            publisher: 'AIMS Neuroscience (2021)',
+          },
+          {
+            title: 'The expertise theory of deliberate practice',
+            url: 'https://psycnet.apa.org/doi/10.1037/0033-2909.112.3.475',
+            publisher: 'Psychological Bulletin (Ericsson, Krampe & Tesch-Römer, 1993)',
+          },
+        ]}
       />
       <ImproveSkillsPageClient />
     </>
