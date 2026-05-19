@@ -61,8 +61,13 @@ const SocialMediaPixels = nextDynamic(() => import('@/components/SocialMediaPixe
 
 // Synchronously primes CSS vars from localStorage before paint to prevent CLS
 // from AdMob SizeChanged async event and GlobalBottomNav ResizeObserver.
-// Static literal — no user input.
-const PRIME_CLS_VARS_SCRIPT = `(function(){try{var d=document.documentElement;var b=localStorage.getItem('lc_admob_h');var n=localStorage.getItem('lc_bottom_nav_h');if(b&&!isNaN(parseFloat(b)))d.style.setProperty('--admob-banner-height',parseFloat(b)+'px');if(n&&!isNaN(parseFloat(n)))d.style.setProperty('--bottom-nav-height',parseFloat(n)+'px');}catch(e){}})();`;
+// Static literal — no user input. Sanity cap at 200px: nav max ≈ 64 + 48px
+// safe-area = 112; banner max (ADAPTIVE on Android 15) ≈ 75 + safe-area ≈ 110.
+// Anything past 200 is a stale value from a pathological prior session (Android
+// 15+ safe-area plugin double-counted system bars and we cached the result) —
+// dropping it forces the runtime to re-measure cleanly, otherwise it haunts
+// this session via PRIME before useSafeArea / AnchoredNativeBanner can recover.
+const PRIME_CLS_VARS_SCRIPT = `(function(){try{var d=document.documentElement;var b=parseFloat(localStorage.getItem('lc_admob_h'));var n=parseFloat(localStorage.getItem('lc_bottom_nav_h'));if(!isNaN(b)&&b>=0&&b<=200)d.style.setProperty('--admob-banner-height',b+'px');else if(!isNaN(b))try{localStorage.removeItem('lc_admob_h')}catch(e){}if(!isNaN(n)&&n>=0&&n<=200)d.style.setProperty('--bottom-nav-height',n+'px');else if(!isNaN(n))try{localStorage.removeItem('lc_bottom_nav_h')}catch(e){}}catch(e){}})();`;
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 

@@ -18,6 +18,23 @@ const DEFAULT_INSETS: SafeAreaInsets = {
   right: 0,
 };
 
+// capacitor-plugin-safe-area on Android 15+ occasionally returns a bottom inset
+// that double-counts system bars (300+px) when the AdMob banner attaches. Letting
+// that through inflates GlobalBottomNav.paddingBottom so the tabs land mid-screen
+// with a same-color (bg-neo-navy) band below — visible as "dead space". Largest
+// legitimate inset on any shipped device: Dynamic Island top ≈ 59px, landscape
+// notch ≈ 47px, iPhone home-indicator = 34px, Android gesture nav ≤ 48px. 96px
+// gives ~30% headroom; anything past that is a plugin bug — drop to 0 (system
+// bar may slightly overlap content, far better than half-screen nav).
+const MAX_PLAUSIBLE_INSET_PX = 96;
+const sanitize = (n: number): number => (n > MAX_PLAUSIBLE_INSET_PX ? 0 : n);
+const sanitizeInsets = (raw: SafeAreaInsets): SafeAreaInsets => ({
+  top: sanitize(raw.top),
+  bottom: sanitize(raw.bottom),
+  left: sanitize(raw.left),
+  right: sanitize(raw.right),
+});
+
 /**
  * useSafeArea - Get device safe area insets
  *
@@ -60,8 +77,9 @@ export function useSafeArea(): SafeAreaInsets {
     // Initial fetch
     SafeArea.getSafeAreaInsets()
       .then(({ insets: fetchedInsets }) => {
-        setInsets(fetchedInsets);
-        updateCSSProperties(fetchedInsets);
+        const clean = sanitizeInsets(fetchedInsets);
+        setInsets(clean);
+        updateCSSProperties(clean);
       })
       .catch(() => {
         // Plugin unavailable — keep default zero insets (expected when capacitor-plugin-safe-area not registered)
@@ -69,8 +87,9 @@ export function useSafeArea(): SafeAreaInsets {
 
     // Listen for changes (e.g., orientation change)
     Promise.resolve(SafeArea.addListener('safeAreaChanged', ({ insets: newInsets }) => {
-      setInsets(newInsets);
-      updateCSSProperties(newInsets);
+      const clean = sanitizeInsets(newInsets);
+      setInsets(clean);
+      updateCSSProperties(clean);
     })).then((handle) => {
       listenerHandle = handle;
     }).catch(() => {

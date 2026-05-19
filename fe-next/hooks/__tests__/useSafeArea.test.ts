@@ -119,6 +119,44 @@ describe('useSafeArea', () => {
     expect(mockRemove).toHaveBeenCalled();
   });
 
+  it('should clamp pathologically large insets to 0 (Android 15+ WindowInsets bug)', async () => {
+    mockIsNative.mockReturnValue(true);
+    // capacitor-plugin-safe-area on Android 15+ can return inset that double-counts
+    // system bars (300+px) when AdMob attaches. Letting it through inflates
+    // nav paddingBottom → tabs land mid-screen with dead bg-color band below.
+    mockSafeArea.getSafeAreaInsets.mockResolvedValue({
+      insets: { top: 47, bottom: 312, left: 0, right: 0 },
+    });
+    mockSafeArea.addListener.mockResolvedValue({ remove: vi.fn() });
+
+    const { result } = renderHook(() => useSafeArea());
+
+    await waitFor(() => {
+      expect(result.current.bottom).toBe(0);
+      expect(result.current.top).toBe(47);
+      expect(document.documentElement.style.getPropertyValue('--cap-safe-area-bottom')).toBe('0px');
+    });
+  });
+
+  it('should also clamp inflated insets from safeAreaChanged events', async () => {
+    mockIsNative.mockReturnValue(true);
+    mockSafeArea.getSafeAreaInsets.mockResolvedValue({ insets: mockInsets });
+    let listenerCallback: ((data: { insets: SafeAreaInsets }) => void) = () => {};
+    mockSafeArea.addListener.mockImplementation((eventName, callback) => {
+      listenerCallback = callback as (data: { insets: SafeAreaInsets }) => void;
+      return Promise.resolve({ remove: vi.fn() });
+    });
+
+    const { result } = renderHook(() => useSafeArea());
+    await waitFor(() => expect(result.current).toEqual(mockInsets));
+
+    listenerCallback({ insets: { top: 200, bottom: 250, left: 0, right: 0 } });
+
+    await waitFor(() => {
+      expect(result.current).toEqual({ top: 0, bottom: 0, left: 0, right: 0 });
+    });
+  });
+
   it('should update insets when safeAreaChanged event fires', async () => {
     mockIsNative.mockReturnValue(true);
     mockSafeArea.getSafeAreaInsets.mockResolvedValue({ insets: mockInsets });
