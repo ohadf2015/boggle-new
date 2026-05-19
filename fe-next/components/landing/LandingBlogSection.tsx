@@ -8,53 +8,9 @@ import { Calendar, Clock, ArrowRight, BookOpen } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { safeToLocaleDateString } from '@/utils/bcp47Locale';
+import { blogPostsContent, getRecentBlogPostsForLocale } from '@/lib/blog/data';
 
-interface BlogPostData {
-  slug: string;
-  image: string;
-  date: string;
-  content: Record<string, { title: string; excerpt: string; readTime: string; category: string }>;
-}
-
-// Sorted by date descending — newest first. Keep in sync with `app/[locale]/blog/PageClient.tsx`.
-const recentPosts: BlogPostData[] = [
-  {
-    slug: 'netflix-word-game-2026-rise',
-    image: '/images/blog/netflix-word-games.jpg',
-    date: '2026-04-29',
-    content: {
-      en: { title: "Netflix Just Dropped a Word Game — 2026 Is the Year Word Games Took Over", excerpt: 'Streaming giants, daily-puzzle obsession, brain-training boom and a TikTok-shaped social loop. Why every screen you own suddenly wants you spelling things.', readTime: '9 min read', category: 'Trends' },
-      he: { title: 'נטפליקס שחררה משחק מילים — 2026 היא השנה של משחקי המילים', excerpt: 'סטרימינג ענק, התמכרות לפאזל היומי, גל אימון מוחי וטיק־טוק שהפך פתרון לספורט צפייה. למה כל מסך פתאום רוצה שתאייתו.', readTime: '9 דקות קריאה', category: 'טרנדים' },
-      sv: { title: 'Netflix släppte ett ordspel — 2026 är ordspelens år', excerpt: 'Streamingjättar, daglig pusselbesatthet, hjärnträningsboom och en TikTok-driven social loop. Varför varenda skärm plötsligt vill att du stavar.', readTime: '9 min läsning', category: 'Trender' },
-      ja: { title: 'Netflixがワードゲームを投入 — 2026年はワードゲームの年', excerpt: 'ストリーミング大手、デイリーパズル中毒、脳トレブーム、TikTok型ソーシャルループ。なぜあなたの全画面が突然「綴れ」と言ってくるのか。', readTime: '9分で読める', category: 'トレンド' },
-      es: { title: 'Netflix lanza un juego de palabras — 2026, el año de los juegos de palabras', excerpt: 'Gigantes del streaming, obsesión por el puzzle diario, boom del entrenamiento cerebral y un bucle social al estilo TikTok. Por qué cada pantalla quiere que deletrees.', readTime: '9 min de lectura', category: 'Tendencias' },
-    },
-  },
-  {
-    slug: 'boggle-vs-wordle',
-    image: '/images/blog/boggle-vs-wordle.jpg',
-    date: '2026-03-28',
-    content: {
-      en: { title: 'Boggle vs Wordle: One Grid, Two Completely Different Brain Workouts', excerpt: 'Pattern recognition versus deductive logic. Unlimited rounds versus one a day. Which word game actually fits your brain?', readTime: '9 min read', category: 'Comparison' },
-      he: { title: 'בוגל מול וורדל: שני משחקי מילים, שני מוחות שונים לגמרי', excerpt: 'זיהוי דפוסים מול היגיון דדוקטיבי. סיבובים אינסופיים מול פעם ביום. איזה משחק מילים באמת מתאים לכם?', readTime: '9 דקות קריאה', category: 'השוואה' },
-      sv: { title: 'Boggle vs Wordle: Två ordspel, två helt olika hjärnträningar', excerpt: 'Mönsterigenkänning mot deduktiv logik. Obegränsade rundor mot en om dagen. Vilket ordspel passar din hjärna?', readTime: '9 min läsning', category: 'Jämförelse' },
-      ja: { title: 'Boggle vs Wordle：同じ「言葉」でも全く違う脳トレ', excerpt: 'パターン認識 vs 演繹的推理。無制限ラウンド vs 1日1回。あなたの脳に合うワードゲームはどっち？', readTime: '9分で読める', category: '比較' },
-      es: { title: 'Boggle vs Wordle: Dos Juegos de Palabras, Dos Cerebros Distintos', excerpt: 'Reconocimiento de patrones vs lógica deductiva. Rondas ilimitadas vs una al día. ¿Cuál le va mejor a tu cerebro?', readTime: '9 min de lectura', category: 'Comparación' },
-    },
-  },
-  {
-    slug: 'boggle-vs-scrabble',
-    image: '/images/blog/boggle-vs-scrabble.jpg',
-    date: '2026-03-28',
-    content: {
-      en: { title: 'Boggle vs Scrabble: Speed Demon or Strategic Mastermind?', excerpt: 'One gives you 3 minutes and chaos. The other lets you stare at tiles for 20. Which classic word game is actually better?', readTime: '10 min read', category: 'Comparison' },
-      he: { title: 'בוגל מול סקרבל: מהירות או אסטרטגיה?', excerpt: 'אחד נותן לכם 3 דקות וכאוס. השני נותן לכם לבהות באריחים 20 דקות. איזה קלאסיקה באמת יותר טובה?', readTime: '10 דקות קריאה', category: 'השוואה' },
-      sv: { title: 'Boggle vs Scrabble: Fartdemon eller strategiskt geni?', excerpt: 'Det ena ger dig 3 minuter och kaos. Det andra låter dig stirra på brickor i 20. Vilken klassiker är bäst?', readTime: '10 min läsning', category: 'Jämförelse' },
-      ja: { title: 'Boggle vs Scrabble：スピード狂か戦略の達人か？', excerpt: '一方は3分間のカオス。もう一方は20分間タイルを見つめる。どっちのクラシックが本当に優れてる？', readTime: '10分で読める', category: '比較' },
-      es: { title: 'Boggle vs Scrabble: ¿Velocidad o Estrategia?', excerpt: 'Uno te da 3 minutos de caos. El otro te deja mirar fichas 20 minutos. ¿Cuál clásico es realmente mejor?', readTime: '10 min de lectura', category: 'Comparación' },
-    },
-  },
-];
+const RECENT_COUNT = 3;
 
 const sectionHeading: Record<string, string> = {
   en: 'Latest from the Blog',
@@ -77,6 +33,7 @@ export function LandingBlogSection() {
   const params = useParams();
   const locale = (params.locale as string) || language || 'en';
   const lang = locale in sectionHeading ? locale : 'en';
+  const recentPosts = getRecentBlogPostsForLocale(lang, RECENT_COUNT);
 
   return (
     <section className="w-full max-w-4xl mx-auto xl:max-w-5xl">
@@ -88,7 +45,9 @@ export function LandingBlogSection() {
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {recentPosts.map((post, i) => {
-          const c = post.content[lang] || post.content.en;
+          const localeContent = blogPostsContent[lang] || blogPostsContent.en;
+          const c = localeContent.posts[post.slug] || blogPostsContent.en.posts[post.slug];
+          if (!c) return null;
           return (
             <m.div
               key={post.slug}
