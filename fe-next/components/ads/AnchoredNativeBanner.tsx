@@ -73,7 +73,15 @@ export default function AnchoredNativeBanner() {
       // The var holds the nav's real offsetHeight (h-16 + safe-area paddingBottom), so:
       //   Android: plugin adds safe-area on top → margin = max(navHeight, safeBottom).
       //   iOS: plugin re-adds safeAreaLayoutGuide → subtract to avoid double-count.
-      const raw = document.documentElement.style.getPropertyValue('--bottom-nav-height').trim();
+      // Inline value wins; otherwise fall back to the CSS-declared default
+      // (`calc(64px + env(safe-area-inset-bottom))`) via computed style. Without
+      // this fallback, the banner reads navHeight=0 on first commit — because
+      // GlobalBottomNav's measuring useEffect (sibling subtree) runs AFTER ours
+      // — and would briefly paint OVER the bottom tabs until the MutationObserver
+      // catches up. Inline "0px" (nav explicitly hidden) still wins.
+      const root = document.documentElement;
+      const inline = root.style.getPropertyValue('--bottom-nav-height').trim();
+      const raw = inline || getComputedStyle(root).getPropertyValue('--bottom-nav-height').trim();
       const navHeight = Math.round(parseFloat(raw) || 0);
       return isAndroid
         ? Math.max(navHeight, safeBottom)
@@ -85,10 +93,16 @@ export default function AnchoredNativeBanner() {
       lastMargin = margin;
       await hideBanner();
       if (cancelled) return;
+      // Re-read after the hide await — GlobalBottomNav's height effect may have
+      // published a corrected nav height during the await (sibling effect race),
+      // and the MutationObserver's follow-up applyBanner could race with this one.
+      // Always show with the freshest value so the banner can't land below the nav.
+      const finalMargin = computeMargin();
+      lastMargin = finalMargin;
       // AnchoredNativeBanner renders only on non-game surfaces (profile,
       // leaderboard, blog, glossary, etc.) per isAllowedAdBannerRoute, so
       // we tag this as the 'content' variant for separate eCPM optimization.
-      await showBanner(BannerAdPosition.BOTTOM_CENTER, margin, { variant: 'content' });
+      await showBanner(BannerAdPosition.BOTTOM_CENTER, finalMargin, { variant: 'content' });
     };
 
     // Initial sync call preserves test contract (margin reflects nav present at mount).

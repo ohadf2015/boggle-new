@@ -307,7 +307,12 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
         const root = document.documentElement;
         if (isHidden) {
             root.style.setProperty('--bottom-nav-height', '0px');
-            try { localStorage.setItem('lc_bottom_nav_h', '0'); } catch {}
+            // Don't cache '0': the PRIME script in <head> would replay it next
+            // session and force inline=0 before this effect re-measures, leaving
+            // a window where the AdMob banner sits below the nav. Keep the last
+            // real measurement so the next session primes correctly; current
+            // runtime inline-write above already reflects the hidden state.
+            try { localStorage.removeItem('lc_bottom_nav_h'); } catch {}
             return;
         }
         const el = navRef.current;

@@ -190,6 +190,80 @@ describe('AnchoredNativeBanner', () => {
     document.documentElement.style.removeProperty('--bottom-nav-height');
   });
 
+  it('falls back to CSS-declared --bottom-nav-height when no inline value yet (Android first-paint race)', async () => {
+    // Repro: GlobalBottomNav's useEffect runs AFTER AnchoredNativeBanner's on first
+    // commit (sibling subtrees), so inline --bottom-nav-height is empty when the
+    // banner is first shown. CSS declares a default of `calc(64px + env(safe-area))`
+    // in :root. Read computed style so the banner clears the nav, not the safe area.
+    mockPathname.current = '/';
+    mockPlatform.current = 'android';
+    mockSafeArea.current = { top: 0, bottom: 24, left: 0, right: 0 };
+    document.documentElement.style.removeProperty('--bottom-nav-height');
+    // Simulate CSS-declared default via a stylesheet — getComputedStyle resolves this.
+    const style = document.createElement('style');
+    style.textContent = ':root { --bottom-nav-height: 96px; }';
+    document.head.appendChild(style);
+    try {
+      render(<AnchoredNativeBanner />);
+      await Promise.resolve();
+      expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 96, { variant: 'content' });
+    } finally {
+      document.head.removeChild(style);
+    }
+  });
+
+  it('inline --bottom-nav-height="0px" wins over CSS fallback (nav explicitly hidden)', async () => {
+    // When GlobalBottomNav publishes "0px" inline (nav hidden on /admin), respect
+    // it — don't lift the banner unnecessarily via the CSS fallback.
+    mockPathname.current = '/';
+    mockPlatform.current = 'android';
+    mockSafeArea.current = { top: 0, bottom: 24, left: 0, right: 0 };
+    document.documentElement.style.setProperty('--bottom-nav-height', '0px');
+    const style = document.createElement('style');
+    style.textContent = ':root { --bottom-nav-height: 96px; }';
+    document.head.appendChild(style);
+    try {
+      render(<AnchoredNativeBanner />);
+      await Promise.resolve();
+      // Inline 0 → navHeight=0 → margin = max(0, safeBottom=24) = 24.
+      expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 24, { variant: 'content' });
+    } finally {
+      document.documentElement.style.removeProperty('--bottom-nav-height');
+      document.head.removeChild(style);
+    }
+  });
+
+  it('re-reads margin after hideBanner so observer-driven updates during the await aren\'t lost', async () => {
+    // Race: applyBanner is mid-await on hideBanner when GlobalBottomNav publishes
+    // --bottom-nav-height. We must show with the latest value, not the stale one
+    // captured at the start of the call.
+    mockPathname.current = '/';
+    mockPlatform.current = 'android';
+    mockSafeArea.current = { top: 0, bottom: 24, left: 0, right: 0 };
+    // Start with no inline value; CSS fallback below provides the initial reading.
+    document.documentElement.style.removeProperty('--bottom-nav-height');
+    const style = document.createElement('style');
+    style.textContent = ':root { --bottom-nav-height: 96px; }';
+    document.head.appendChild(style);
+    // hideBanner resolves on the next microtask AFTER inline override is published —
+    // simulating GlobalBottomNav writing the var mid-await.
+    hideBanner.mockImplementationOnce(() => {
+      document.documentElement.style.setProperty('--bottom-nav-height', '128px');
+      return Promise.resolve();
+    });
+    try {
+      render(<AnchoredNativeBanner />);
+      await Promise.resolve();
+      await Promise.resolve();
+      // showBanner should be called with the LATEST nav-height (128), not the
+      // initial CSS-fallback reading (96).
+      expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 128, { variant: 'content' });
+    } finally {
+      document.documentElement.style.removeProperty('--bottom-nav-height');
+      document.head.removeChild(style);
+    }
+  });
+
   it('registers FailedToLoad and Closed listeners that reset --admob-banner-height', async () => {
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
