@@ -5782,6 +5782,7 @@ const sv = {
       "triesLeft": "försök kvar",
       "matchesTargetWarning": "Samma längd — skicka förbrukar 1 försök",
       "knownLetters": "Fel plats:",
+      "syncingTarget": "Synkar målordet…",
       "accumulatedScore": "Poäng",
       "autoClueUnlocked": "Ledtråd upplåst!",
       "clueRevealLetter": "Bokstav avslöjad!",

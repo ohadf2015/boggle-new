@@ -117,4 +117,27 @@ describe('WordHuntGame wiring', () => {
     render(<WordHuntGame {...defaultProps} />);
     expect(screen.getByTestId('category-hint')).toBeInTheDocument();
   });
+
+  it('emits requestGameState after 1.5s when targetLength is 0 and game is active (recovery)', async () => {
+    vi.useFakeTimers();
+    mockBridgeReturn.targetLength = 0;
+    const emit = vi.fn();
+    const socket = { emit } as { emit: ReturnType<typeof vi.fn> };
+    render(<WordHuntGame {...defaultProps} socket={socket as never} />);
+    expect(emit).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(1500);
+    expect(emit).toHaveBeenCalledWith('requestGameState');
+    vi.useRealTimers();
+  });
+
+  it('does NOT emit requestGameState once targetLength is set', async () => {
+    vi.useFakeTimers();
+    mockBridgeReturn.targetLength = 5;
+    const emit = vi.fn();
+    const socket = { emit } as { emit: ReturnType<typeof vi.fn> };
+    render(<WordHuntGame {...defaultProps} socket={socket as never} />);
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(emit).not.toHaveBeenCalledWith('requestGameState');
+    vi.useRealTimers();
+  });
 });

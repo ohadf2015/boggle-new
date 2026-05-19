@@ -67,6 +67,20 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
   // Bridge: convert Zustand MP state → SP-compatible props
   const bridge = useWordHuntMultiplayerBridge();
 
+  // Self-heal missing target metadata. If startGame was lost (clue tiles invisible),
+  // poll server via requestGameState. Recovery startGame carries wordHuntTargetLength;
+  // client guards apply it on same-session retry now. Cap at 3 attempts.
+  const recoveryAttemptsRef = useRef(0);
+  useEffect(() => {
+    if (!gameActive || !socket || bridge.targetLength > 0) return;
+    if (recoveryAttemptsRef.current >= 3) return;
+    const t = setTimeout(() => {
+      recoveryAttemptsRef.current += 1;
+      socket.emit('requestGameState');
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [gameActive, socket, bridge.targetLength]);
+
   // Danger alert toasts (opponent danger / eliminated / last standing)
   const { toasts: dangerToasts, dismissToast } = useWordHuntDangerAlerts();
 

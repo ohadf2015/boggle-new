@@ -320,19 +320,23 @@ export function useHostGameEvents({
         }
       }
 
-      // Set word hunt target length if present (mirrors player handler)
-      // Skip on same-session retry to avoid clobbering in-flight life/attempts.
-      if (extData.wordHuntTargetLength != null && extData.wordHuntTargetLength > 0 && !isSameSessionRetry) {
+      // Set word hunt target length if present (mirrors player handler).
+      // Target length + category are immutable per session — apply unconditionally
+      // so recovery/reconnect can heal a host that missed startGame (clue tiles bug).
+      // isSameSessionRetry only gates resetting in-flight life/attempts below.
+      if (extData.wordHuntTargetLength != null && extData.wordHuntTargetLength > 0) {
         const store = useGameStore.getState();
         store.setWordHuntTargetLength(extData.wordHuntTargetLength);
         store.setWordHuntTargetCategory(extData.wordHuntTargetCategory ?? null);
-        const serverLife = extData.wordHuntPlayerLives?.[username];
-        store.setWordHuntMyLife(typeof serverLife === 'number' ? serverLife : 100);
-        store.setWordHuntPlayerLives(extData.wordHuntPlayerLives || {});
-        store.setWordHuntTargetAttempts([]);
-        store.setWordHuntTargetFound(false);
-        store.setWordHuntEliminatedPlayers(extData.wordHuntEliminatedPlayers || []);
-        useGameStore.setState({ wordHuntDiscoveryClues: [], wordHuntKnownLetters: [] });
+        if (!isSameSessionRetry) {
+          const serverLife = extData.wordHuntPlayerLives?.[username];
+          store.setWordHuntMyLife(typeof serverLife === 'number' ? serverLife : 100);
+          store.setWordHuntPlayerLives(extData.wordHuntPlayerLives || {});
+          store.setWordHuntTargetAttempts([]);
+          store.setWordHuntTargetFound(false);
+          store.setWordHuntEliminatedPlayers(extData.wordHuntEliminatedPlayers || []);
+          useGameStore.setState({ wordHuntDiscoveryClues: [], wordHuntKnownLetters: [] });
+        }
       }
 
       // On reconnect, only restore grid/timer state — do NOT reset scores or replay animations.

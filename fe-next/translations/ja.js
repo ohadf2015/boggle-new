@@ -5813,6 +5813,7 @@ const ja = {
       "triesLeft": "回残り",
       "matchesTargetWarning": "同じ文字数 — 送信すると1回消費",
       "knownLetters": "位置違い:",
+      "syncingTarget": "ターゲット同期中…",
       "accumulatedScore": "スコア",
       "autoClueUnlocked": "ヒント解放！",
       "clueRevealLetter": "文字が明らかに！",

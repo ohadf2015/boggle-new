@@ -357,18 +357,24 @@ export function usePlayerGameEvents({
           };
         }
       }
-      if (ext.wordHuntTargetLength != null && ext.wordHuntTargetLength > 0 && !isSameSessionRetry) {
+      if (ext.wordHuntTargetLength != null && ext.wordHuntTargetLength > 0) {
+        // Target length + category are immutable per session — apply unconditionally
+        // so recovery/reconnect/late-join can heal a client that missed the original
+        // startGame (was: clue tiles missing). isSameSessionRetry only gates resetting
+        // in-flight state below.
         storeUpdates.wordHuntTargetLength = ext.wordHuntTargetLength;
         storeUpdates.wordHuntTargetCategory = ext.wordHuntTargetCategory ?? null;
-        const serverLife = ext.wordHuntPlayerLives?.[username];
-        storeUpdates.wordHuntMyLife = typeof serverLife === 'number' ? serverLife : 100;
-        storeUpdates.wordHuntPlayerLives = ext.wordHuntPlayerLives || {};
-        storeUpdates.wordHuntTargetAttempts = [];
-        storeUpdates.wordHuntTargetFound = false;
-        storeUpdates.wordHuntTargetFoundBy = null;
-        storeUpdates.wordHuntEliminatedPlayers = ext.wordHuntEliminatedPlayers || [];
-        storeUpdates.wordHuntDiscoveryClues = [];
-        storeUpdates.wordHuntKnownLetters = [];
+        if (!isSameSessionRetry) {
+          const serverLife = ext.wordHuntPlayerLives?.[username];
+          storeUpdates.wordHuntMyLife = typeof serverLife === 'number' ? serverLife : 100;
+          storeUpdates.wordHuntPlayerLives = ext.wordHuntPlayerLives || {};
+          storeUpdates.wordHuntTargetAttempts = [];
+          storeUpdates.wordHuntTargetFound = false;
+          storeUpdates.wordHuntTargetFoundBy = null;
+          storeUpdates.wordHuntEliminatedPlayers = ext.wordHuntEliminatedPlayers || [];
+          storeUpdates.wordHuntDiscoveryClues = [];
+          storeUpdates.wordHuntKnownLetters = [];
+        }
       }
       if (data.lateJoin) {
         storeUpdates.gameActive = true;

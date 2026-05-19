@@ -5906,6 +5906,7 @@ const en = {
       "triesLeft": "tries left",
       "matchesTargetWarning": "Same length — submitting uses 1 try",
       "knownLetters": "Wrong spot:",
+      "syncingTarget": "Syncing target word…",
       "accumulatedScore": "Score",
       "autoClueUnlocked": "Clue Unlocked!",
       "clueRevealLetter": "Letter revealed!",

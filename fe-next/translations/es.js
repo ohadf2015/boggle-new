@@ -5760,6 +5760,7 @@ const es = {
       "triesLeft": "intentos restantes",
       "matchesTargetWarning": "Misma longitud — enviar gasta 1 intento",
       "knownLetters": "Mal ubicada:",
+      "syncingTarget": "Sincronizando palabra…",
       "accumulatedScore": "Puntuación",
       "autoClueUnlocked": "¡Pista Desbloqueada!",
       "clueRevealLetter": "¡Letra revelada!",

@@ -135,23 +135,28 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           t={t}
         />
 
-        {/* Clue Boxes — tight vertical padding; on short landscape collapse outer padding too */}
+        {/* Clue Boxes — tight vertical padding; on short landscape collapse outer padding too.
+            Skeleton placeholder while server target metadata is in flight (recovery race). */}
         <div className={`px-2 [@media(max-height:560px)]:px-1 flex-shrink-0${wrongGuessShake ? ' animate-neo-shake' : ''}`}>
-          <SurvivalClueBoxes
-            currentHint={currentHint}
-            targetWord={'?'.repeat(targetLength)}
-            attempts={attempts}
-            accumulatedClues={accumulatedClues}
-            revealedLetters={new Set<number>()}
-            knownLetters={knownLetters}
-            latestAttemptFeedback={latestAttemptFeedback}
-            showFeedbackOverlay={showFeedbackOverlay}
-            isClueGaining={isClueGaining}
-            skipAnimations={false}
-            gameDir={gameDir}
-            t={t}
-            matchesTargetLength={matchesTargetLength}
-          />
+          {targetLength > 0 ? (
+            <SurvivalClueBoxes
+              currentHint={currentHint}
+              targetWord={'?'.repeat(targetLength)}
+              attempts={attempts}
+              accumulatedClues={accumulatedClues}
+              revealedLetters={new Set<number>()}
+              knownLetters={knownLetters}
+              latestAttemptFeedback={latestAttemptFeedback}
+              showFeedbackOverlay={showFeedbackOverlay}
+              isClueGaining={isClueGaining}
+              skipAnimations={false}
+              gameDir={gameDir}
+              t={t}
+              matchesTargetLength={matchesTargetLength}
+            />
+          ) : (
+            <ClueTilesSkeleton t={t} />
+          )}
         </div>
 
         {/* Life Bar — compact wrapper */}
@@ -173,10 +178,11 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           className="flex-1 min-h-0 px-1 relative overflow-hidden flex items-center justify-center"
           style={{ containerType: 'size' }}
         >
+          {/* Grid frame: square that fits the container. Cap raises on desktop so the
+              board fills more of the central column (was 440 → looked small at ≥1024px). */}
           <div
-            className="relative mx-auto"
+            className="relative mx-auto [--wh-grid-size:min(100cqw,100cqh,440px)] min-[1024px]:[--wh-grid-size:min(100cqw,100cqh,560px)] xl:[--wh-grid-size:min(100cqw,100cqh,620px)]"
             style={{
-              ['--wh-grid-size' as string]: 'min(100cqw, 100cqh, 440px)',
               width: 'var(--wh-grid-size)',
               height: 'var(--wh-grid-size)',
               aspectRatio: '1 / 1',
@@ -230,3 +236,35 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
 });
 
 WordHuntGameLayout.displayName = 'WordHuntGameLayout';
+
+/**
+ * Placeholder shown when MP word-hunt target metadata is missing (race / lost startGame).
+ * Mirrors the SurvivalClueBoxes shell so the layout doesn't shift when real data arrives.
+ * Auto-recovery in WordHuntGame emits `requestGameState` after 1.5s.
+ */
+function ClueTilesSkeleton({ t }: { t: (key: string) => string }) {
+  return (
+    <div
+      data-testid="wh-clue-skeleton"
+      className="mx-auto max-w-3xl w-full px-3 py-2 mb-0.5 rounded-neo-lg bg-neo-navy/30 dark:bg-neo-navy/50 border-2 border-neo-black/20 animate-pulse"
+      role="status"
+      aria-live="polite"
+      aria-label={t('wordHunt.survival.syncingTarget')}
+    >
+      <div className="text-center mb-2 text-xl sm:text-2xl font-black text-neo-cream/40">
+        {t('wordHunt.survival.syncingTarget')}
+      </div>
+      <div className="flex justify-center flex-wrap gap-2 sm:gap-2.5">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            key={i}
+            className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center border-2 rounded-neo font-bold shadow-hard bg-neo-black/60 border-neo-black text-neo-cream/40"
+          >
+            ?
+          </div>
+        ))}
+      </div>
+      <div className="min-h-[40px] sm:min-h-[44px] [@media(max-height:560px)]:min-h-0" />
+    </div>
+  );
+}
