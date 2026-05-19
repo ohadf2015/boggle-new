@@ -222,7 +222,7 @@ export function BlastHud({
                 boxShadow: `2px 2px 0 #0b1530`,
               }}
             >
-              {t('blast.hint', 'Hint')}
+              {t('blast.hint.label', 'Hint')}
             </button>
           )}
         </div>

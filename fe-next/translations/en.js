@@ -1,4 +1,4 @@
-// En translations
+// EN translations
 const en = {
   "flag": "🇺🇸",
   "name": "English",
@@ -96,10 +96,10 @@ const en = {
       "ogDescription": "Expert tips, strategies, and insights to improve your word game skills."
     },
     "adventure": {
-        "title": "Word Adventure Game - RPG Word Puzzle Free",
-        "description": "Embark on an epic word adventure! Battle bosses, conquer 100 levels across 10 themed worlds. Free RPG word puzzle game with special tiles, power-ups, and progression. No download needed.",
-        "ogTitle": "LexiClash Adventure - RPG Word Puzzle Game",
-        "ogDescription": "Battle bosses in an epic word adventure! 100 levels, 10 worlds, special tiles and power-ups. Free to play!"
+      "title": "Word Adventure Game - RPG Word Puzzle Free",
+      "description": "Embark on an epic word adventure! Battle bosses, conquer 100 levels across 10 themed worlds. Free RPG word puzzle game with special tiles, power-ups, and progression. No download needed.",
+      "ogTitle": "LexiClash Adventure - RPG Word Puzzle Game",
+      "ogDescription": "Battle bosses in an epic word adventure! 100 levels, 10 worlds, special tiles and power-ups. Free to play!"
     },
     "blast": {
       "title": "Blast Mode - Chain Words Into Explosive Combos | LexiClash",
@@ -490,7 +490,6 @@ const en = {
     "opponent": "Opponent",
     "coins": "coins",
     "xp": "XP",
-    "chat": "Chat",
     "connecting": "Connecting...",
     "signIn": "Sign In",
     "connectedToServer": "Ready to battle!",
@@ -1106,13 +1105,13 @@ const en = {
       "expressions": "Expressions",
       "eyeColor": "Eye Color",
       "nose": "Nose",
-      bodyStyles: {
-        default: "Default",
-        hoodie: "Hoodie",
-        suit: "Suit",
-        turtleneck: "Turtleneck",
-        offShoulder: "Off-Shoulder",
-        cropTop: "Crop Top"
+      "bodyStyles": {
+        "default": "Default",
+        "hoodie": "Hoodie",
+        "suit": "Suit",
+        "turtleneck": "Turtleneck",
+        "offShoulder": "Off-Shoulder",
+        "cropTop": "Crop Top"
       }
     },
     "premium": {
@@ -2203,7 +2202,7 @@ const en = {
     "topPlayers": "Podium",
     "otherPlayers": "The Rest",
     "foundWords": "found",
-    "yourPerformance": "Your Game",
+    "yourPerformance": "Your Performance",
     "viewDetails": "Deep Dive",
     "viewAllWords": "Words",
     "viewXpBreakdown": "XP",
@@ -2259,8 +2258,6 @@ const en = {
     "coinsEarned": "Coins Earned",
     "detailedAnalysis": "Full Breakdown",
     "gameStats": "Game Stats",
-    "accuracy": "Accuracy",
-    "yourPerformance": "Your Performance",
     "rewards": "Rewards",
     "standings": "Standings",
     "guestSavePrompt": "Sign in so your loot doesn't vanish!",
@@ -2273,7 +2270,7 @@ const en = {
     "time": "Time",
     "place": "Place",
     "words": "Words",
-    "bestWord": "Best",
+    "bestWord": "Best Word",
     "bestCombo": "Best Combo",
     "playersReady": "{count}/{total} Ready",
     "missedWords": "Missed",
@@ -2307,8 +2304,8 @@ const en = {
       "tank": "Most consistent scoring"
     },
     "everyoneReady": "All Set!",
-    "waitingForPlayers": "Waiting...",
-    "ready": "Ready!",
+    "waitingForPlayers": "Waiting for players to ready up...",
+    "ready": "Ready",
     "waiting": "Waiting...",
     "imReady": "Ready for Next Game",
     "youAreReady": "You're ready!",
@@ -2325,14 +2322,14 @@ const en = {
     "leadChanges": "{{count}} lead changes this game",
     "shareNarrativeWin": "I found {{word}} and scored {{score}} in LexiClash!",
     "shareNarrativeLoss": "I found {{words}} words for {{score}} pts in LexiClash!",
-    "revengeRematch": "Rematch vs {{player}}?",
+    "revengeRematch": "REMATCH",
     "markReadyDescription": "Tap when ready",
     "allReadyHostCanStart": "All set! Start anytime.",
     "allPlayersReadyWaitingHost": "Ready — host's turn",
     "hostWillStartWhenReady": "Host starts when ready",
     "performanceHistory": "History",
     "goToLobby": "Lobby",
-    "you": "(You)",
+    "you": "YOU",
     "betterLuckNextTime": "Next round!",
     "loserFeedback": {
       "almostPodium": "So close to the podium!",
@@ -2344,7 +2341,7 @@ const en = {
     "readyForNextRound": "Ready?",
     "hostStartDescription": "Start anytime!",
     "readyExplanation": "Ready up to show you're in!",
-    "defendTitle": "Defend Your Title!",
+    "defendTitle": "DEFEND TITLE",
     "aheadOf": "ahead of {player}",
     "findingWouldHaveTied": "Finding {words} would have tied it!",
     "showAllRankings": "+{count} more players",
@@ -2373,14 +2370,13 @@ const en = {
     "battleRankings": "Battle Rankings",
     "players": "Players",
     "survivors": "Survivors",
-    "eliminated": "Eliminated",
+    "eliminated": "ELIMINATED",
     "targetWord": "Target Word",
     "foundByYou": "Found by You!",
-    "survived": "Survived",
+    "survived": "SURVIVED",
     "ultimateChampion": "ULTIMATE CHAMPION",
     "risingContender": "RISING CONTENDER",
     "surviveLongerThan": "Survive longer than @{player}!",
-    "waitingForPlayers": "Waiting for players to ready up...",
     "waitingForHost": "Waiting for host to start next round...",
     "scoringTip": "Scoring Tip",
     "scoringTipText": "Longer words = bigger points!",
@@ -2421,40 +2417,15 @@ const en = {
     "target": "Target",
     "totalPoints": "Total Points",
     "revengeVs": "REVENGE vs {player}",
-    "defendTitle": "DEFEND TITLE",
-    "revengeRematch": "REMATCH",
-    "bestWord": "Best Word",
-    "wordsFound": "Words Found",
+    "wordsFound": "Words found",
     "score": "Score",
-    "ready": "Ready",
-    "aheadOf": "ahead of {player}",
-    "you": "YOU",
-    "words": "Words",
     "matchResults": "Match Results",
-    "eliminated": "ELIMINATED",
-    "survived": "SURVIVED",
     "ordinal1": "1ST PLACE",
     "ordinal2": "2ND PLACE",
     "ordinal3": "3RD PLACE",
     "ordinal4": "4TH PLACE",
     "ordinalN": "{n}TH PLACE",
     "soClose": "So close! Just {points} pts behind #1.",
-    "crowns": {
-      "sniper": "The Sniper",
-      "speedDemon": "Speed Demon",
-      "explorer": "The Explorer",
-      "scholar": "The Scholar",
-      "clutch": "Clutch Player",
-      "tank": "The Tank"
-    },
-    "crownDesc": {
-      "sniper": "Highest avg score per word",
-      "speedDemon": "Found the most words",
-      "explorer": "Found the most unique words",
-      "scholar": "Longest average word length",
-      "clutch": "Highest single-word score",
-      "tank": "Most consistent scoring"
-    },
     "potentialScore": "+{points} pts potential",
     "comparativeInsights": {
       "title": "How You Compared",
@@ -2489,7 +2460,6 @@ const en = {
       "newSeries": "New Series",
       "waitingNewSeries": "Waiting for host..."
     },
-    "wordsFound": "Words found",
     "shareVictoryPrompt": "Share your victory!",
     "victory": "VICTORY!",
     "wellPlayed": "WELL PLAYED!",
@@ -2501,7 +2471,10 @@ const en = {
     "streakOneMonth": "One day from a full month!",
     "streakWeeks": "{{weeks}} week streak!",
     "addFriend": "Add {name} as friend",
-    "requestSent": "Request sent!"
+    "requestSent": "Request sent!",
+    "backToLobby": "Back to lobby",
+    "calculating": "Calculating results",
+    "calculatingHint": "Tallying scores and validating words — this only takes a moment."
   },
   "nextStep": {
     "backToLobby": "Back to Lobby",
@@ -2598,7 +2571,8 @@ const en = {
     "rematch": "Rematch!",
     "rematchQuestion": "Rematch?",
     "almostHadIt": "You almost had it!",
-    "nailBiter": "What a nail-biter!"
+    "nailBiter": "What a nail-biter!",
+    "challengeBot": "Challenge a Bot"
   },
   "player": {
     "new": "NEW"
@@ -3309,20 +3283,6 @@ const en = {
     "defaultTitle": "One More Game?",
     "defaultMessage": "Keep the streak going — play again!"
   },
-  "almostFound": {
-    "title": "You Almost Found...",
-    "matchPercent": "{percent}% match",
-    "wouldHaveScored": "+{score} pts"
-  },
-  "closeLoss": {
-    "soClose": "So close!",
-    "justPoints": "Just {points} points away!",
-    "rematch": "Rematch!",
-    "rematchQuestion": "Rematch?",
-    "almostHadIt": "You almost had it!",
-    "nailBiter": "What a nail-biter!",
-    "challengeBot": "Challenge a Bot"
-  },
   "mysteryReward": {
     "title": "Mystery Reward",
     "youFound": "You Found a Mystery Reward!",
@@ -3952,7 +3912,7 @@ const en = {
       "winRate": "win rate"
     },
     "coins": "Coins",
-    "viewProfile": "Your Profile",
+    "viewProfile": "View Profile",
     "viewCoins": "Check your stash",
     "sections": {
       "overview": "Overview",
@@ -4028,9 +3988,6 @@ const en = {
     "topPercent": "Top {{percent}}%",
     "challenge": "Challenge",
     "addFriend": "Add Friend",
-    "friends": "Friends",
-    "requestSent": "Request Sent",
-    "viewProfile": "View Profile",
     "viewPublicProfile": "View Public Profile",
     "games": "Games"
   },
@@ -4764,7 +4721,7 @@ const en = {
       "vaultTitle": "Coin Vault",
       "vaultSubtitle": "Stash coins, unlock rewards"
     },
-    "playingNow": "Playing Now",
+    "playingNow": "playing",
     "welcomeTitle": "Words. Friends. Wins.",
     "welcomeSubtitle": "Free. No sign-up. No pay-to-win.",
     "playTodayChallenge": "Play Today's Challenge",
@@ -4783,8 +4740,6 @@ const en = {
     "sectionMultiplayerSubtitle": "Real players, live chaos",
     "sectionSoloTitle": "Solo",
     "sectionSoloSubtitle": "Train. Climb. Beat your best.",
-    "moreGameModes": "More Game Modes",
-    "moreGameModesHint": "Tap to explore",
     "arena": "Multiplayer",
     "arenaDesc": "Play solo or challenge friends!",
     "quickPlay": "Quick Play",
@@ -4811,7 +4766,6 @@ const en = {
     "signInToUnlock": "Sign in to unlock",
     "openRooms": "rooms",
     "playersLive": "live",
-    "playingNow": "playing",
     "tutorial": "Tutorial",
     "personalBest": "personal best",
     "shareModalTitle": "Invite Friends & Earn XP",
@@ -4872,7 +4826,6 @@ const en = {
     "hallOfFame": "Hall of Fame",
     "careerPoints": "Career Points",
     "gamesToday": "Games Today",
-    "gameModes": "Game Modes",
     "freeToPlay": "Free to Play",
     "wordHuntMode": "Word Hunt",
     "wordHuntModeDesc": "Find the target word as fast as you can — a fresh puzzle every day!",
@@ -4882,7 +4835,6 @@ const en = {
     "createBoardDesc": "Design a puzzle and share it with the world",
     "seo": {
       "stepLabel": "Step",
-
       "whatIsTitle": "What is LexiClash?",
       "whatIsContent": "LexiClash is a free, fast-paced multiplayer word game you can play right in your browser. Compete with friends in real-time word battles on a shared letter grid — find words, build combos, and climb the leaderboard. It's like Boggle meets Wordle, but multiplayer. No downloads, no sign-ups required. Available in English, Hebrew, Swedish, Japanese, and Spanish.",
       "whatIsShort": "Free multiplayer word battles in your browser. Find words, build combos, crush your friends. No downloads, no signup.",
@@ -5082,150 +5034,61 @@ const en = {
     }
   },
   "practice": {
-    "instructions": {
-      "title": "How to play",
-      "scoringLabel": "Scoring",
-      "cta": "Let's go!",
-      "classic": {
-        "line1": "Drag your finger across letters — they don't need to be in a row.",
-        "line2": "Diagonals count too. Any direction works!",
-        "line3": "Find 3 real words to win. No timer, no stress.",
-        "scoring1": "+2 points per letter.",
-        "scoring2": "Combo streaks add bonus points."
-      },
-      "wordHunt": {
-        "line1": "A secret word is hiding on the board. The category up top is your clue!",
-        "line2": "Try any guess — colours show which letters are close to the answer.",
-        "line3": "Crack the secret word to win. Take all the time you need.",
-        "scoring1": "+20 points for the target word.",
-        "scoring2": "+2 per letter for any other valid word."
-      },
-      "wheelRush": {
-        "line1": "Tap letters around the wheel to build a word.",
-        "line2": "The bright middle letter must appear in every word.",
-        "line3": "Find 3 real words to finish — easy does it!",
-        "scoring1": "+1 point per letter.",
-        "scoring2": "+5 bonus for using all 7 letters."
+    "hub": {
+      "title": "Practice Arena",
+      "subtitle": "Master all 3 modes to unlock the real game",
+      "progress": "{count}/{total} complete",
+      "tip": {
+        "start": "Start with Word Hunt — it teaches clue reading",
+        "one": "Nice start! Classic mode next — pure speed training",
+        "two": "Almost there! Survival mode = ultimate challenge",
+        "done": "All modes mastered! Ready for real competition!"
       }
     },
-    "modifier": {
-      "todayLabel": "Today's twist",
-      "bonus": "{{x}}× bonus",
-      "vowelOnly": "Vowel-only",
-      "vowelOnlyDesc": "Words made only of vowels",
-      "doubleLetter": "Double-letter",
-      "doubleLetterDesc": "Words with adjacent matching letters",
-      "sWords": "S-words",
-      "sWordsDesc": "Words starting with S"
-    },
-    "header": "Practice Mode",
-    "again": "Again",
-    "wordsFound": "Words Found",
-    "found": "Found!",
-    "invalid": "Not a word",
-    "duplicate": "Already found",
-    "reset": "Reset",
-    "backToTips": "Back to Tips",
-    "endRun": "Done — continue",
-    "allDone": "All practice modes done",
-    "keepPracticing": "Keep practicing",
-    "continueTo": {
-      "classic": "Next: Classic practice",
-      "wordHunt": "Next: Word Hunt practice",
-      "wheelRush": "Next: Wheel Rush practice"
+    "again": "Practice again",
+    "allDone": "All done!",
+    "classic": {
+      "notAWord": "Not a word"
     },
     "coach": {
-      "label": "Tip",
-      "dismiss": "Got it"
-    },
-    "tutorial": {
-      "drag": "Drag.",
-      "spin": "Spin to spell.",
-      "target": "Find the target.",
-      "diagonal": "Diagonals work too.",
-      "nice": "Nice!",
-      "goalComplete": "{count} words! ✨",
-      "idleNudge": "Try short words."
-    },
-    "classic": {
-      "instruction": "Tap adjacent tiles to spell a word, then submit. No timer, no score.",
-      "submit": "Submit",
-      "reset": "Reset",
-      "found": "Nice! Word added.",
-      "notAWord": "Not on this board — try another path.",
-      "duplicate": "Already found.",
-      "foundWordsLabel": "Found ({count})",
-      "playRealCta": "Play Classic now →"
-    },
-    "wordHunt": {
-      "instruction": "Tap letters to spell the target word. Green = right spot. Yellow = wrong spot.",
-      "targetLabel": "Target word",
-      "goalChip": "Find: {{word}}",
-      "submit": "Guess",
-      "backspace": "Undo",
-      "solved": "Solved! Great job.",
-      "huntGreet": "Hunt the hidden word!",
-      "huntInstruction": "A {length}-letter word is hiding on the board. Any valid word counts as a discovery — only {length}-letter words count as a guess and reveal color clues about the target.",
-      "triesLeft": "tries",
-      "feedbackCorrect": "right spot",
-      "feedbackWrongPlace": "wrong spot",
-      "feedbackNotInWord": "not in word",
-      "matchLength": "Submit to use a try!",
-      "boardEmpty": "Couldn't find a target on this board — generating a fresh one...",
-      "discoveries": "Bonus words found",
-      "giveUp": "Reveal target",
-      "chillChip": "No stress 🌱",
-      "categoryHint": "{length}-letter {category}",
-      "realGameLabel": "in real game",
-      "livesNote": "Real Word Hunt costs 1 life per wrong guess (max {max}). Practice gives you infinite tries.",
-      "bailoutCta": "I got it — let's play!",
-      "playRealCta": "Play the real game →",
-      "shortWordTip": "{word} is too short. In real Word Hunt you need {min}+ letters or you lose a life.",
-      "discoveryHint": "Bonus word found — clue letters revealed!",
-      "discoveryTipNoClue": "Valid word, but no target letters revealed. Try longer guesses!",
-      "discoveryTip": "Tip: Any valid word reveals clues! Short words unlock hints faster."
+      "dismiss": "Dismiss",
+      "label": "Coach"
     },
     "complete": {
-      "title": "Mode complete!",
-      "classic": "3 words found",
-      "wordHunt": "target solved",
-      "wheelRush": "3 words found"
+      "title": "Practice complete!"
+    },
+    "endRun": "End run",
+    "instructions": {
+      "cta": "Got it",
+      "title": "How to play"
+    },
+    "keepPracticing": "Keep practicing",
+    "mistakeCoach": {
+      "ariaLabel": "Coaching tip",
+      "cta": "Got it"
+    },
+    "modifier": {
+      "bonus": "{x}× bonus",
+      "todayLabel": "Today's modifier"
     },
     "wheelRush": {
-      "instruction": "Build words using the center letter (lime). Tap any other letters around it.",
-      "instructionShort": "Use the lime letter in every word — find {goal}.",
-      "submit": "Submit",
+      "builderHint": "Drag letters to build a word",
+      "duplicate": "Already found",
+      "found": "Nice!",
+      "needsCenter": "Use the center letter",
+      "notAWord": "Not a word",
       "reset": "Reset",
-      "shuffle": "Shuffle",
-      "builderHint": "Tap or drag letters",
-      "needsCenter": "Word must use the center letter.",
-      "tooShort": "Need at least 2 letters.",
-      "found": "Nice! Word added.",
-      "notAWord": "Not a word — try another.",
-      "duplicate": "Already found.",
-      "foundWordsLabel": "Found ({count})",
-      "scoreChip": "{score} pts",
-      "playRealCta": "Play Wheel Rush now →"
+      "scoreChip": "+{score}",
+      "shuffle": "Shuffle"
     },
-    "mistakeCoach": {
-      "ariaLabel": "Practice tip",
-      "cta": "Got it!",
-      "notAWord": {
-        "title": "Hmm — that's not a word!",
-        "body": "Try real dictionary words like STAR, CAT, or PLATE. Made-up letter combos won't count, but practice is free — keep exploring!"
-      },
-      "notAdjacent": {
-        "title": "Tiles need to touch!",
-        "body": "Each letter has to sit right next to the one before it — sides AND corners both count. Connect them like a chain!"
-      },
-      "diagonalsOk": {
-        "title": "Diagonals work too!",
-        "body": "Letters can connect in any of 8 directions — including diagonal jumps. Try going zig-zag for surprising finds!"
-      },
-      "needsCenter": {
-        "title": "Use the lime letter!",
-        "body": "Every word on the wheel must include the bright center letter. It's the puzzle's heartbeat — start with it!"
-      }
+    "wordHunt": {
+      "discoveryHint": "Find the hidden word",
+      "discoveryTip": "Tap letters to guess",
+      "discoveryTipNoClue": "Guess the word — no clues this time",
+      "goalChip": "Goal: {word}",
+      "livesNote": "You get {max} tries",
+      "realGameLabel": "Real game",
+      "shortWordTip": "Try a longer word"
     }
   },
   "practiceSwipe": {
@@ -5500,7 +5363,6 @@ const en = {
     "challengeStats": "Challenge Stats",
     "targetWord": "Target Word",
     "totalPlayers": "Total Players",
-    "solved": "Solved",
     "solveRate": "Solve Rate",
     "beatCreator": "Beat Creator",
     "attemptDistribution": "Attempt Distribution",
@@ -5549,7 +5411,7 @@ const en = {
       "skipToDaily": "Skip, I'll figure it out",
       "redirecting": "Heading to Daily Challenge..."
     },
-"wordHunt": {
+    "wordHunt": {
       "title": "Word Hunt",
       "subtitle": "Survival Mode",
       "desc": "Crack the word. 10 tries.",
@@ -5625,12 +5487,30 @@ const en = {
       }
     },
     "insights": {
-      "personalBest": { "headline": "New personal best!", "sub": "+{n} pts vs your record" },
-      "percentile": { "headline": "Elite today!", "sub": "Top {n}% of all players" },
-      "speed": { "headline": "Speed demon!", "sub": "{n}% faster than your avg" },
-      "firstTry": { "headline": "First try!", "sub": "Only {n}% solved it in 1" },
-      "streakComplete": { "headline": "Week complete!", "sub": "Your chest is ready to claim" },
-      "improved": { "headline": "Getting sharper!", "sub": "Better than yesterday" }
+      "personalBest": {
+        "headline": "New personal best!",
+        "sub": "+{n} pts vs your record"
+      },
+      "percentile": {
+        "headline": "Elite today!",
+        "sub": "Top {n}% of all players"
+      },
+      "speed": {
+        "headline": "Speed demon!",
+        "sub": "{n}% faster than your avg"
+      },
+      "firstTry": {
+        "headline": "First try!",
+        "sub": "Only {n}% solved it in 1"
+      },
+      "streakComplete": {
+        "headline": "Week complete!",
+        "sub": "Your chest is ready to claim"
+      },
+      "improved": {
+        "headline": "Getting sharper!",
+        "sub": "Better than yesterday"
+      }
     }
   },
   "dailyWordWheelLanding": {
@@ -5642,23 +5522,59 @@ const en = {
       "leaderboard": "View World Record"
     },
     "steps": {
-      "heading": "How the Daily Word Wheel Works",
-      "1": { "title": "New puzzle daily", "desc": "A fresh wheel of letters appears every day at midnight UTC. Everyone worldwide gets the same letters." },
-      "2": { "title": "Find words", "desc": "Form words using the wheel letters. Every word must include the center letter and be at least 3 letters long. Longer words = more points." },
-      "3": { "title": "Beat the clock", "desc": "Find as many words as possible before time runs out. Speed and vocabulary both matter." },
-      "4": { "title": "Compare globally", "desc": "See how you rank on the daily leaderboard. Chase the world record and track your streak." }
+      "1": {
+        "title": "New puzzle daily",
+        "desc": "A fresh wheel of letters appears every day at midnight UTC. Everyone worldwide gets the same letters."
+      },
+      "2": {
+        "title": "Find words",
+        "desc": "Form words using the wheel letters. Every word must include the center letter and be at least 3 letters long. Longer words = more points."
+      },
+      "3": {
+        "title": "Beat the clock",
+        "desc": "Find as many words as possible before time runs out. Speed and vocabulary both matter."
+      },
+      "4": {
+        "title": "Compare globally",
+        "desc": "See how you rank on the daily leaderboard. Chase the world record and track your streak."
+      },
+      "heading": "How the Daily Word Wheel Works"
     },
     "faq": {
       "heading": "Frequently Asked Questions",
       "items": [
-        { "q": "What is the Daily Word Wheel?", "a": "The Daily Word Wheel is a free daily word puzzle on LexiClash. Every day at midnight UTC, a new wheel of letters appears. Your goal is to find as many words as possible using those letters. Everyone worldwide plays the same puzzle." },
-        { "q": "How do I play?", "a": "You get a set of letters arranged in a wheel with one center letter. Form words using the letters — every word must include the center letter and be at least 3 letters long. Find as many words as possible before time runs out. Longer words score more points." },
-        { "q": "Is it free?", "a": "Yes, completely free. No download, no signup, no pay-to-win. Play in your browser on any device." },
-        { "q": "Can I see the world record?", "a": "Yes! After completing the puzzle, you can see the global leaderboard showing top scores for that day. The world record updates in real-time." },
-        { "q": "Do all words need the center letter?", "a": "Yes! Every word you submit must include the center letter of the wheel. This is the core constraint that makes the puzzle challenging." },
-        { "q": "What languages are available?", "a": "The Daily Word Wheel is available in English, Hebrew, Swedish, Japanese, and Spanish. Each language has its own dictionary and leaderboard." },
-        { "q": "Is this an alternative to the Daily Express word wheel?", "a": "LexiClash is an independent free word wheel puzzle game — not affiliated with the Daily Express newspaper. If you're looking for free word wheel puzzles online with a daily reset, leaderboards, and 5-language support, LexiClash is a great alternative. Play in your browser, no download or signup required." },
-        { "q": "Are word wheel puzzles free online here?", "a": "Yes — every word wheel puzzle is 100% free. No paywall, no premium tier, no signup. Just open the page and play." }
+        {
+          "q": "What is the Daily Word Wheel?",
+          "a": "The Daily Word Wheel is a free daily word puzzle on LexiClash. Every day at midnight UTC, a new wheel of letters appears. Your goal is to find as many words as possible using those letters. Everyone worldwide plays the same puzzle."
+        },
+        {
+          "q": "How do I play?",
+          "a": "You get a set of letters arranged in a wheel with one center letter. Form words using the letters — every word must include the center letter and be at least 3 letters long. Find as many words as possible before time runs out. Longer words score more points."
+        },
+        {
+          "q": "Is it free?",
+          "a": "Yes, completely free. No download, no signup, no pay-to-win. Play in your browser on any device."
+        },
+        {
+          "q": "Can I see the world record?",
+          "a": "Yes! After completing the puzzle, you can see the global leaderboard showing top scores for that day. The world record updates in real-time."
+        },
+        {
+          "q": "Do all words need the center letter?",
+          "a": "Yes! Every word you submit must include the center letter of the wheel. This is the core constraint that makes the puzzle challenging."
+        },
+        {
+          "q": "What languages are available?",
+          "a": "The Daily Word Wheel is available in English, Hebrew, Swedish, Japanese, and Spanish. Each language has its own dictionary and leaderboard."
+        },
+        {
+          "q": "Is this an alternative to the Daily Express word wheel?",
+          "a": "LexiClash is an independent free word wheel puzzle game — not affiliated with the Daily Express newspaper. If you're looking for free word wheel puzzles online with a daily reset, leaderboards, and 5-language support, LexiClash is a great alternative. Play in your browser, no download or signup required."
+        },
+        {
+          "q": "Are word wheel puzzles free online here?",
+          "a": "Yes — every word wheel puzzle is 100% free. No paywall, no premium tier, no signup. Just open the page and play."
+        }
       ]
     },
     "finalCta": {
@@ -5776,7 +5692,7 @@ const en = {
       "lifePoints": "Life Points",
       "eliminated": "Eliminated",
       "guessTarget": "Guess Target",
-      "submit": "Submit Guess",
+      "submit": "Submit Guess"
     },
     "mp": {
       "players": "Players",
@@ -5791,31 +5707,31 @@ const en = {
       "viewBoard": "View Board",
       "boardReview": "Board Review",
       "ladder": {
-        "empty": "No words yet — find the first one!",
+        "empty": "No words yet — find the first one!"
       },
       "kbHint": {
         "submit": "submit",
         "pop": "remove last",
-        "clear": "clear",
+        "clear": "clear"
       },
       "stopGameConfirm": "End the game for everyone?",
       "stopGameYes": "End Game",
       "quality": {
         "degraded": "Connection degraded",
         "weak": "Connection weak",
-        "reconnecting": "Reconnecting…",
+        "reconnecting": "Reconnecting…"
       },
       "reconnect": {
         "title": "Reconnecting…",
         "attempt": "Attempt",
-        "giveUp": "Give up",
+        "giveUp": "Give up"
       },
       "abort": {
         "title": "Game ended",
         "body": "Your words counted toward the final score. Words found:",
         "continueSolo": "Continue Solo",
-        "returnToLobby": "Return to lobby",
-      },
+        "returnToLobby": "Return to lobby"
+      }
     },
     "shareResult": "Share",
     "quitConfirmTitle": "Leave the Hunt?",
@@ -6003,7 +5919,8 @@ const en = {
       "backToDailyDesc": "See today's leaderboard",
       "playerWordsTitle": "{{name}}'s path",
       "youMissedWords": "Words you missed",
-      "tapPlayerHint": "Tap a player to see their path"
+      "tapPlayerHint": "Tap a player to see their path",
+      "wordsFound": "Words found"
     },
     "score": {
       "title": "Your Score",
@@ -6383,10 +6300,7 @@ const en = {
     "confirmBlock": "Block this user? They won't be able to contact you.",
     "block": "Block",
     "filterFriends": "Search friends...",
-    "noMatchingFriends": "No matching friends",
-    "blocked": "Blocked",
-    "blockedUsers": "Blocked Users",
-    "unblock": "Unblock"
+    "noMatchingFriends": "No matching friends"
   },
   "reveal": {
     "revealWord": "Reveal",
@@ -7058,17 +6972,14 @@ const en = {
       "forge": "Word Forge"
     },
     "mastery": {
-      "title": "Archetype Mastery",
+      "label": "Mastery",
       "tier": {
-        "none": "Unranked",
         "bronze": "Bronze",
         "silver": "Silver",
         "gold": "Gold",
+        "platinum": "Platinum",
         "diamond": "Diamond"
-      },
-      "progress": "{current}/{target} stars",
-      "bonusUnlocked": "Bonus unlocked: {description}",
-      "nextTier": "Next tier: {tier} ({remaining} stars needed)"
+      }
     },
     "runes": {
       "title": "Rune Collection",
@@ -7090,27 +7001,135 @@ const en = {
         "epic": "Epic",
         "legendary": "Legendary"
       },
-      "ember": { "name": "Ember Rune", "desc": "+10% score bonus" },
-      "inferno": { "name": "Inferno Rune", "desc": "+25% score bonus" },
-      "midas": { "name": "Midas Rune", "desc": "+15% gold bonus" },
-      "fortune": { "name": "Fortune Rune", "desc": "+40% gold bonus" },
-      "hourglass": { "name": "Hourglass Rune", "desc": "+5s bonus time" },
-      "eternity": { "name": "Eternity Rune", "desc": "+12s bonus time" },
-      "flow": { "name": "Flow Rune", "desc": "15% slower combo decay" },
-      "torrent": { "name": "Torrent Rune", "desc": "35% slower combo decay" },
-      "insight": { "name": "Insight Rune", "desc": "+1 hint charge" },
-      "oracle": { "name": "Oracle Rune", "desc": "+2 hint charges" },
-      "valor": { "name": "Valor Rune", "desc": "+20% boss damage" },
-      "dragonslayer": { "name": "Dragonslayer Rune", "desc": "+50% boss damage" }
+      "ember": {
+        "name": "Ember Rune",
+        "desc": "+10% score bonus"
+      },
+      "inferno": {
+        "name": "Inferno Rune",
+        "desc": "+25% score bonus"
+      },
+      "midas": {
+        "name": "Midas Rune",
+        "desc": "+15% gold bonus"
+      },
+      "fortune": {
+        "name": "Fortune Rune",
+        "desc": "+40% gold bonus"
+      },
+      "hourglass": {
+        "name": "Hourglass Rune",
+        "desc": "+5s bonus time"
+      },
+      "eternity": {
+        "name": "Eternity Rune",
+        "desc": "+12s bonus time"
+      },
+      "flow": {
+        "name": "Flow Rune",
+        "desc": "15% slower combo decay"
+      },
+      "torrent": {
+        "name": "Torrent Rune",
+        "desc": "35% slower combo decay"
+      },
+      "insight": {
+        "name": "Insight Rune",
+        "desc": "+1 hint charge"
+      },
+      "oracle": {
+        "name": "Oracle Rune",
+        "desc": "+2 hint charges"
+      },
+      "valor": {
+        "name": "Valor Rune",
+        "desc": "+20% boss damage"
+      },
+      "dragonslayer": {
+        "name": "Dragonslayer Rune",
+        "desc": "+50% boss damage"
+      }
     },
     "achievements": {
       "title": "Achievements",
+      "progress": "{{current}}/{{total}}",
       "earned": "earned",
+      "hidden": "Hidden",
+      "unlocked": "Achievement Unlocked!",
+      "upgraded": "Achievement Upgraded!",
       "categories": {
         "gameplay": "Gameplay",
-        "bosses": "Bosses",
+        "bosses": "Boss Battles",
         "progression": "Progression",
         "mastery": "Mastery"
+      },
+      "firstWord": {
+        "name": "First Steps",
+        "desc": "Find your first word"
+      },
+      "wordStreak5": {
+        "name": "Hot Streak",
+        "desc": "Build a 5x combo"
+      },
+      "wordStreak10": {
+        "name": "Unstoppable",
+        "desc": "Build a 10x combo"
+      },
+      "longWord6": {
+        "name": "Wordsmith",
+        "desc": "Find a 6+ letter word"
+      },
+      "longWord8": {
+        "name": "Linguist",
+        "desc": "Find an 8+ letter word"
+      },
+      "perfectLevel": {
+        "name": "Perfect Star",
+        "desc": "Complete a level with 3 stars"
+      },
+      "bossSlayer": {
+        "name": "Boss Slayer",
+        "desc": "Defeat a boss"
+      },
+      "bossSpeedrun": {
+        "name": "Speed Demon",
+        "desc": "Defeat a boss with 30+ seconds remaining"
+      },
+      "bossNoDamage": {
+        "name": "Untouchable",
+        "desc": "Defeat a boss without missing a word"
+      },
+      "allBosses": {
+        "name": "Champion",
+        "desc": "Defeat all bosses"
+      },
+      "worldComplete": {
+        "name": "World Traveler",
+        "desc": "Complete a world"
+      },
+      "starCollector50": {
+        "name": "Star Collector",
+        "desc": "Collect 50 stars"
+      },
+      "starCollector100": {
+        "name": "Constellation",
+        "desc": "Collect 100 stars"
+      },
+      "levelMaster": {
+        "name": "Level Master",
+        "desc": "Get 3 stars on 10 levels"
+      },
+      "skillUnlocked": {
+        "name": "Student",
+        "desc": "Unlock a skill"
+      },
+      "skillPathComplete": {
+        "name": "Specialist",
+        "desc": "Complete a skill path"
+      },
+      "comboKing": {
+        "name": "Combo King",
+        "desc": "Build a 15x combo"
       }
     },
     "hunt": {
@@ -7278,16 +7297,36 @@ const en = {
       "themedWord": "Themed word bonus!"
     },
     "world": {
-      "1": { "theme": "Nature & Garden" },
-      "2": { "theme": "Water & Flow" },
-      "3": { "theme": "Earth & Minerals" },
-      "4": { "theme": "Ocean & Travel" },
-      "5": { "theme": "Building & Craft" },
-      "6": { "theme": "Mystery & Puzzles" },
-      "7": { "theme": "Light & Reflection" },
-      "8": { "theme": "Space & Science" },
-      "9": { "theme": "Culture & Language" },
-      "10": { "theme": "Power & Knowledge" }
+      "1": {
+        "theme": "Nature & Garden"
+      },
+      "2": {
+        "theme": "Water & Flow"
+      },
+      "3": {
+        "theme": "Earth & Minerals"
+      },
+      "4": {
+        "theme": "Ocean & Travel"
+      },
+      "5": {
+        "theme": "Building & Craft"
+      },
+      "6": {
+        "theme": "Mystery & Puzzles"
+      },
+      "7": {
+        "theme": "Light & Reflection"
+      },
+      "8": {
+        "theme": "Space & Science"
+      },
+      "9": {
+        "theme": "Culture & Language"
+      },
+      "10": {
+        "theme": "Power & Knowledge"
+      }
     },
     "mode": {
       "classic": "Classic",
@@ -7441,16 +7480,6 @@ const en = {
       "totalScore": "Total Score",
       "timeTaken": "Time"
     },
-    "mastery": {
-      "label": "Mastery",
-      "tier": {
-        "bronze": "Bronze",
-        "silver": "Silver",
-        "gold": "Gold",
-        "platinum": "Platinum",
-        "diamond": "Diamond"
-      }
-    },
     "weeklyChallenge": {
       "title": "Weekly Challenge",
       "description": "Same grid for everyone — compete for the top score!",
@@ -7544,10 +7573,10 @@ const en = {
       "validationCancelled": "Validation was cancelled",
       "missingCenterLetter": "Must include the center letter!"
     },
-"live": {
+    "live": {
       "wordFound": "{{word}} found, plus {{points}} points"
     },
-"game": {
+    "game": {
       "title": "Adventure Mode",
       "hud": "Adventure HUD",
       "retryOptions": "Retry options",
@@ -8158,88 +8187,6 @@ const en = {
       "danger": "DANGER!",
       "healthLabel": "Player health: {{current}} / {{max}} ({{percentage}}%)"
     },
-    "achievements": {
-      "title": "Achievements",
-      "progress": "{{current}}/{{total}}",
-      "earned": "earned",
-      "hidden": "Hidden",
-      "unlocked": "Achievement Unlocked!",
-      "upgraded": "Achievement Upgraded!",
-      "categories": {
-        "gameplay": "Gameplay",
-        "bosses": "Boss Battles",
-        "progression": "Progression",
-        "mastery": "Mastery"
-      },
-      "firstWord": {
-        "name": "First Steps",
-        "desc": "Find your first word"
-      },
-      "wordStreak5": {
-        "name": "Hot Streak",
-        "desc": "Build a 5x combo"
-      },
-      "wordStreak10": {
-        "name": "Unstoppable",
-        "desc": "Build a 10x combo"
-      },
-      "longWord6": {
-        "name": "Wordsmith",
-        "desc": "Find a 6+ letter word"
-      },
-      "longWord8": {
-        "name": "Linguist",
-        "desc": "Find an 8+ letter word"
-      },
-      "perfectLevel": {
-        "name": "Perfect Star",
-        "desc": "Complete a level with 3 stars"
-      },
-      "bossSlayer": {
-        "name": "Boss Slayer",
-        "desc": "Defeat a boss"
-      },
-      "bossSpeedrun": {
-        "name": "Speed Demon",
-        "desc": "Defeat a boss with 30+ seconds remaining"
-      },
-      "bossNoDamage": {
-        "name": "Untouchable",
-        "desc": "Defeat a boss without missing a word"
-      },
-      "allBosses": {
-        "name": "Champion",
-        "desc": "Defeat all bosses"
-      },
-      "worldComplete": {
-        "name": "World Traveler",
-        "desc": "Complete a world"
-      },
-      "starCollector50": {
-        "name": "Star Collector",
-        "desc": "Collect 50 stars"
-      },
-      "starCollector100": {
-        "name": "Constellation",
-        "desc": "Collect 100 stars"
-      },
-      "levelMaster": {
-        "name": "Level Master",
-        "desc": "Get 3 stars on 10 levels"
-      },
-      "skillUnlocked": {
-        "name": "Student",
-        "desc": "Unlock a skill"
-      },
-      "skillPathComplete": {
-        "name": "Specialist",
-        "desc": "Complete a skill path"
-      },
-      "comboKing": {
-        "name": "Combo King",
-        "desc": "Build a 15x combo"
-      }
-    },
     "skills": {
       "title": "Skill Tree",
       "points": "Skill Points",
@@ -8398,24 +8345,56 @@ const en = {
       "level10": "Transcendent"
     },
     "consumables": {
-      "bossRevive": { "name": "Boss Revive" },
-      "bossShield": { "name": "Boss Shield" },
-      "doubleGold": { "name": "Double Gold" },
-      "extraHint": { "name": "Extra Hint" },
-      "gridReroll": { "name": "Grid Reroll" },
-      "objectiveSkip": { "name": "Objective Skip" },
-      "perfectStar": { "name": "Perfect Star" },
-      "timerExtension": { "name": "Timer Extension" }
+      "bossRevive": {
+        "name": "Boss Revive"
+      },
+      "bossShield": {
+        "name": "Boss Shield"
+      },
+      "doubleGold": {
+        "name": "Double Gold"
+      },
+      "extraHint": {
+        "name": "Extra Hint"
+      },
+      "gridReroll": {
+        "name": "Grid Reroll"
+      },
+      "objectiveSkip": {
+        "name": "Objective Skip"
+      },
+      "perfectStar": {
+        "name": "Perfect Star"
+      },
+      "timerExtension": {
+        "name": "Timer Extension"
+      }
     },
     "mutators": {
-      "blindMode": { "name": "Blind Mode" },
-      "chaosGrid": { "name": "Chaos Grid" },
-      "fragile": { "name": "Fragile" },
-      "ironMan": { "name": "Iron Man" },
-      "minimalist": { "name": "Minimalist" },
-      "noHints": { "name": "No Hints" },
-      "speedRun": { "name": "Speed Run" },
-      "wordMaster": { "name": "Word Master" }
+      "blindMode": {
+        "name": "Blind Mode"
+      },
+      "chaosGrid": {
+        "name": "Chaos Grid"
+      },
+      "fragile": {
+        "name": "Fragile"
+      },
+      "ironMan": {
+        "name": "Iron Man"
+      },
+      "minimalist": {
+        "name": "Minimalist"
+      },
+      "noHints": {
+        "name": "No Hints"
+      },
+      "speedRun": {
+        "name": "Speed Run"
+      },
+      "wordMaster": {
+        "name": "Word Master"
+      }
     },
     "collection": {
       "title": "Collection",
@@ -8533,16 +8512,46 @@ const en = {
       "prestigeCosmic": "Cosmic Prestige"
     },
     "weekly": {
-      "speedDemon": { "name": "Speed Demon", "desc": "Faster timer · ×1.5 score" },
-      "longWords": { "name": "Long Words", "desc": "4+ letter words · ×1.5 gold" },
-      "goldRush": { "name": "Gold Rush", "desc": "×2 gold · faster timer" },
-      "iceAge": { "name": "Ice Age", "desc": "Special tiles ×2 · ×1.3 score" },
-      "marathon": { "name": "Marathon", "desc": "Longer timer · ×0.8 score" },
-      "doubleOrNothing": { "name": "Double or Nothing", "desc": "×2 score · half timer" },
-      "wordSmith": { "name": "Word Smith", "desc": "5+ letter words · ×2 score" },
-      "treasureHunter": { "name": "Treasure Hunter", "desc": "×1.8 gold · ×1.5 special tiles" },
-      "blitz": { "name": "Blitz", "desc": "Fast timer · ×3 score" },
-      "zenMode": { "name": "Zen Mode", "desc": "Relaxed timer · half gold" }
+      "speedDemon": {
+        "name": "Speed Demon",
+        "desc": "Faster timer · ×1.5 score"
+      },
+      "longWords": {
+        "name": "Long Words",
+        "desc": "4+ letter words · ×1.5 gold"
+      },
+      "goldRush": {
+        "name": "Gold Rush",
+        "desc": "×2 gold · faster timer"
+      },
+      "iceAge": {
+        "name": "Ice Age",
+        "desc": "Special tiles ×2 · ×1.3 score"
+      },
+      "marathon": {
+        "name": "Marathon",
+        "desc": "Longer timer · ×0.8 score"
+      },
+      "doubleOrNothing": {
+        "name": "Double or Nothing",
+        "desc": "×2 score · half timer"
+      },
+      "wordSmith": {
+        "name": "Word Smith",
+        "desc": "5+ letter words · ×2 score"
+      },
+      "treasureHunter": {
+        "name": "Treasure Hunter",
+        "desc": "×1.8 gold · ×1.5 special tiles"
+      },
+      "blitz": {
+        "name": "Blitz",
+        "desc": "Fast timer · ×3 score"
+      },
+      "zenMode": {
+        "name": "Zen Mode",
+        "desc": "Relaxed timer · half gold"
+      }
     },
     "saveFailedWarning": "Progress not saved — check your connection",
     "retrySave": "Retry",
@@ -8609,14 +8618,60 @@ const en = {
   "blast": {
     "level": "Level {n}",
     "results": {
-      "sceneTitle": "Blast Results",
-      "finalScore": "Score",
-      "comboChain": "Top Combo",
-      "boardClears": "Board Clears",
+      "boardDomination": "Board Domination",
+      "matchRecap": "Blast Match Recap",
+      "totalTilesDemolished": "Tiles Demolished",
+      "intensity": "Intensity",
+      "peakCombo": "Peak Combo",
+      "totalGems": "Gems",
+      "demolitionKing": "Demolition King",
+      "comboMaster": "Combo Master",
+      "gemCollector": "Gem Collector",
+      "wordsmith": "Wordsmith",
+      "tilesCleared": "Tiles Cleared",
+      "maxCombo": "Max Combo",
       "gemsCollected": "Gems",
-      "tilesCleared": "Tiles",
       "bestWord": "Best Word",
-      "rank": "Rank"
+      "tiles": "tiles",
+      "newRecord": "NEW RECORD!",
+      "yourRank": "Your Rank",
+      "topPercent": "Top {pct}% this week",
+      "pbDelta": "+{delta} over your best",
+      "fromBest": "from previous best",
+      "biggestCombo": "Biggest Combo",
+      "bestWave": "Best Wave",
+      "wave": "Wave {n}",
+      "badgesEarned": "Badges Earned",
+      "newBadge": "NEW",
+      "waveFailed": "Wave Failed",
+      "needClearPct": "Needed {required}% cleared — you got {got}%",
+      "tilesShort": "Just {count} tiles short!",
+      "failHint": "Clear at least 90% of the board to advance",
+      "tryAgain": "Try Again",
+      "share": "Share",
+      "sceneTitle": "Blast Results",
+      "finalScore": "Final Score",
+      "comboChain": "Combo",
+      "boardClears": "Clears",
+      "brag": {
+        "legend": "Legend",
+        "elite": "Elite",
+        "great": "Great Run",
+        "solid": "Solid",
+        "nice": "Nice Try",
+        "beats": "You beat {pct}% of players",
+        "weeklyCohort": "This week's global cohort",
+        "score": "Score",
+        "combo": "Combo",
+        "bestWord": "Best Word",
+        "share": "Brag",
+        "shareAria": "Share your result",
+        "shareTitle": "LexiClash Blast",
+        "shareScore": "Scored {score} in Blast Mode",
+        "shareRank": "Top {pct}% this week",
+        "copied": "Copied to clipboard!",
+        "copyFailed": "Couldn't copy — try again"
+      }
     },
     "intro": {
       "level": "Level {n}",
@@ -8667,6 +8722,10 @@ const en = {
         "title": "Welcome back!",
         "body": "Blast has been redesigned. Enjoy the new levels!",
         "cta": "Let's go"
+      },
+      "unlock": {
+        "gotIt": "Got it",
+        "skipFuture": "Skip future tutorials"
       }
     },
     "continueModal": {
@@ -8729,29 +8788,98 @@ const en = {
       "5000": "5000+"
     },
     "tile": {
-      "gold":      { "name": "Gold",      "desc": "3× score + grants 1 bonus move." },
-      "silver":    { "name": "Silver",    "desc": "1.5× score. Extends countdowns by 1 move." },
-      "diamond":   { "name": "Diamond",   "desc": "5× score. Reveals hidden frost contents for 3 turns." },
-      "bomb":      { "name": "Bomb",      "desc": "Clears 3×3 area. Chains to nearby bombs." },
-      "lightning": { "name": "Lightning", "desc": "Clears entire column instantly." },
-      "prism":     { "name": "Prism",     "desc": "2 hits. Clears full row + column. Chains bombs and lightning." },
-      "rainbow":   { "name": "Rainbow",   "desc": "Copies the best special in your word and doubles it. Solo: 2× score." },
-      "ice":       { "name": "Ice",       "desc": "2 hits to break. Multi-hit defensive tile." },
-      "gem":       { "name": "Gem",       "desc": "3 hits to collect. Spawns 2 new specials on completion." },
-      "frozen":    { "name": "Frost",     "desc": "2 hits. Hides a special inside — could be a bomb, lightning, prism, gem, or rainbow." },
-      "magnet":    { "name": "Vortex",    "desc": "Pulls nearby tiles inward, then explodes the area." },
-      "mirror":    { "name": "Mirror",    "desc": "Copies the first offensive special in your word. Solo: 2× score." },
-      "wildcard":  { "name": "Wildcard",  "desc": "Matches any letter. Scores Scrabble value of the letter used." },
-      "countdown": { "name": "Countdown", "desc": "Ticks down each move. Defuse it in a word for +15 pts and 2 bonus moves. Let it expire: -50 pts and 3×3 blast." },
-      "shuffle":   { "name": "Shuffle",   "desc": "Rearranges all remaining letters on the board when cleared." },
-      "magma":     { "name": "Magma",     "desc": "Clears both diagonals (X-pattern) with 2× score multiplier." },
-      "portal":    { "name": "Portal",    "desc": "Teleport your word path through linked pairs. Clears both. 2× score. +5 bonus." },
-      "catalyst":  { "name": "Catalyst",  "desc": "+10 pts. Upgrades adjacent standard tiles into specials." },
-      "crystal":   { "name": "Crystal",   "desc": "Grows +1× each unused turn (max 5×). Multiplies your word score when used." },
-      "fuse":      { "name": "Fuse",      "desc": "Linked pair. Clear one to light its partner — defuse within 3 turns for +15 pts and 2 moves, or it detonates a 3×3 blast for -50 pts." },
-      "locked":    { "name": "Locked",    "desc": "Gated tile — can't be used in words. Clear its paired Key to unlock it." },
-      "key":       { "name": "Key",       "desc": "Unlocks adjacent Locked tiles (8-dir) when cleared in a word. +20 pts per unlock." },
-      "anchor":    { "name": "Anchor",    "desc": "Rewards long words. Adds +3 points per letter in the word when cleared." }
+      "gold": {
+        "name": "Gold",
+        "desc": "3× score + grants 1 bonus move."
+      },
+      "silver": {
+        "name": "Silver",
+        "desc": "1.5× score. Extends countdowns by 1 move."
+      },
+      "diamond": {
+        "name": "Diamond",
+        "desc": "5× score. Reveals hidden frost contents for 3 turns."
+      },
+      "bomb": {
+        "name": "Bomb",
+        "desc": "Clears 3×3 area. Chains to nearby bombs."
+      },
+      "lightning": {
+        "name": "Lightning",
+        "desc": "Clears entire column instantly."
+      },
+      "prism": {
+        "name": "Prism",
+        "desc": "2 hits. Clears full row + column. Chains bombs and lightning."
+      },
+      "rainbow": {
+        "name": "Rainbow",
+        "desc": "Copies the best special in your word and doubles it. Solo: 2× score."
+      },
+      "ice": {
+        "name": "Ice",
+        "desc": "2 hits to break. Multi-hit defensive tile."
+      },
+      "gem": {
+        "name": "Gem",
+        "desc": "3 hits to collect. Spawns 2 new specials on completion."
+      },
+      "frozen": {
+        "name": "Frost",
+        "desc": "2 hits. Hides a special inside — could be a bomb, lightning, prism, gem, or rainbow."
+      },
+      "magnet": {
+        "name": "Vortex",
+        "desc": "Pulls nearby tiles inward, then explodes the area."
+      },
+      "mirror": {
+        "name": "Mirror",
+        "desc": "Copies the first offensive special in your word. Solo: 2× score."
+      },
+      "wildcard": {
+        "name": "Wildcard",
+        "desc": "Matches any letter. Scores Scrabble value of the letter used."
+      },
+      "countdown": {
+        "name": "Countdown",
+        "desc": "Ticks down each move. Defuse it in a word for +15 pts and 2 bonus moves. Let it expire: -50 pts and 3×3 blast."
+      },
+      "shuffle": {
+        "name": "Shuffle",
+        "desc": "Rearranges all remaining letters on the board when cleared."
+      },
+      "magma": {
+        "name": "Magma",
+        "desc": "Clears both diagonals (X-pattern) with 2× score multiplier."
+      },
+      "portal": {
+        "name": "Portal",
+        "desc": "Teleport your word path through linked pairs. Clears both. 2× score. +5 bonus."
+      },
+      "catalyst": {
+        "name": "Catalyst",
+        "desc": "+10 pts. Upgrades adjacent standard tiles into specials."
+      },
+      "crystal": {
+        "name": "Crystal",
+        "desc": "Grows +1× each unused turn (max 5×). Multiplies your word score when used."
+      },
+      "fuse": {
+        "name": "Fuse",
+        "desc": "Linked pair. Clear one to light its partner — defuse within 3 turns for +15 pts and 2 moves, or it detonates a 3×3 blast for -50 pts."
+      },
+      "locked": {
+        "name": "Locked",
+        "desc": "Gated tile — can't be used in words. Clear its paired Key to unlock it."
+      },
+      "key": {
+        "name": "Key",
+        "desc": "Unlocks adjacent Locked tiles (8-dir) when cleared in a word. +20 pts per unlock."
+      },
+      "anchor": {
+        "name": "Anchor",
+        "desc": "Rewards long words. Adds +3 points per letter in the word when cleared."
+      }
     },
     "title": "Blast Mode",
     "description": "Clear the board! Words explode tiles.",
@@ -8761,7 +8889,11 @@ const en = {
       "boardCleared": "Board Cleared!",
       "coins": "Coins",
       "cascadesLabel": "Cascades",
-      "next": "Next Level"
+      "next": "Next Level",
+      "chainLabel": "Best Chain",
+      "gemsLabel": "Gems",
+      "timeLabel": "Time",
+      "wordsLabel": "Words"
     },
     "noMoreWords": "No more words possible",
     "giveUp": "End Game",
@@ -8808,7 +8940,7 @@ const en = {
     "noWordsLeft": "No words remaining!",
     "moreLevelsComingSoon": "Fresh levels are on the way.",
     "allCleared": "You cleared every level!",
-    "playAgain": "Play From Level 1",
+    "playAgain": "PLAY AGAIN",
     "shuffle": "Shuffle",
     "morePoints": "more pts",
     "needScore": "Need {score}",
@@ -8831,63 +8963,7 @@ const en = {
       "gems": "Gems",
       "bestWord": "Best Word",
       "wordsFoundCount": "Words",
-      "playerStats": "Player Stats",
-    },
-    "results": {
-      "boardDomination": "Board Domination",
-      "matchRecap": "Blast Match Recap",
-      "totalTilesDemolished": "Tiles Demolished",
-      "intensity": "Intensity",
-      "peakCombo": "Peak Combo",
-      "totalGems": "Gems",
-      "demolitionKing": "Demolition King",
-      "comboMaster": "Combo Master",
-      "gemCollector": "Gem Collector",
-      "wordsmith": "Wordsmith",
-      "tilesCleared": "Tiles Cleared",
-      "maxCombo": "Max Combo",
-      "gemsCollected": "Gems",
-      "bestWord": "Best Word",
-      "tiles": "tiles",
-      "newRecord": "NEW RECORD!",
-      "yourRank": "Your Rank",
-      "topPercent": "Top {pct}% this week",
-      "pbDelta": "+{delta} over your best",
-      "fromBest": "from previous best",
-      "biggestCombo": "Biggest Combo",
-      "bestWave": "Best Wave",
-      "wave": "Wave {n}",
-      "badgesEarned": "Badges Earned",
-      "newBadge": "NEW",
-      "waveFailed": "Wave Failed",
-      "needClearPct": "Needed {required}% cleared — you got {got}%",
-      "tilesShort": "Just {count} tiles short!",
-      "failHint": "Clear at least 90% of the board to advance",
-      "tryAgain": "Try Again",
-      "share": "Share",
-      "sceneTitle": "Blast Results",
-      "finalScore": "Final Score",
-      "comboChain": "Combo",
-      "boardClears": "Clears",
-      "brag": {
-        "legend": "Legend",
-        "elite": "Elite",
-        "great": "Great Run",
-        "solid": "Solid",
-        "nice": "Nice Try",
-        "beats": "You beat {pct}% of players",
-        "weeklyCohort": "This week's global cohort",
-        "score": "Score",
-        "combo": "Combo",
-        "bestWord": "Best Word",
-        "share": "Brag",
-        "shareAria": "Share your result",
-        "shareTitle": "LexiClash Blast",
-        "shareScore": "Scored {score} in Blast Mode",
-        "shareRank": "Top {pct}% this week",
-        "copied": "Copied to clipboard!",
-        "copyFailed": "Couldn't copy — try again"
-      }
+      "playerStats": "Player Stats"
     },
     "badges": {
       "firstBlast": "First Blast",
@@ -8955,7 +9031,21 @@ const en = {
       "rule3": "Special tiles explode, freeze & multiply",
       "rule4": "Clear the board to advance"
     },
-    "hint": "Hint",
+    "hint": {
+      "free": "FREE",
+      "ad": "HINT",
+      "aria": {
+        "free": "Free hint — costs 25 pts",
+        "ad": "Watch an ad for a hint — costs 25 pts"
+      },
+      "toast": {
+        "targetWord": "Try forming: {word}",
+        "colorPower": "Look for {color} tiles",
+        "collectType": "Find more {tileType}",
+        "clearAllType": "Clear remaining {tileType}"
+      },
+      "label": "Hint"
+    },
     "undo": "Undo",
     "undoTooltip": "Reverse last move",
     "undoAdGate": {
@@ -9029,20 +9119,6 @@ const en = {
       "comebackKid": "COMEBACK KID — {pct}% UNDER PRESSURE 💪",
       "survivor": "STILL STANDING — {pct}% CLEARED 👊"
     },
-    "hint": {
-      "free": "FREE",
-      "ad": "HINT",
-      "aria": {
-        "free": "Free hint — costs 25 pts",
-        "ad": "Watch an ad for a hint — costs 25 pts"
-      },
-      "toast": {
-        "targetWord": "Try forming: {word}",
-        "colorPower": "Look for {color} tiles",
-        "collectType": "Find more {tileType}",
-        "clearAllType": "Clear remaining {tileType}"
-      }
-    },
     "combo": {
       "bomb_bomb": "MEGA BLAST!",
       "bomb_lightning": "THUNDER BOMB!",
@@ -9103,33 +9179,104 @@ const en = {
     "wordsFound": "words",
     "gameOver": "GAME OVER",
     "waves": "waves",
-    "playAgain": "PLAY AGAIN",
     "tileGuide": {
       "title": "Tile Guide",
-      "standard": { "name": "Standard", "desc": "Basic tile — no special effect" },
-      "gold": { "name": "Gold", "desc": "×3 score + 1 bonus move" },
-      "silver": { "name": "Silver", "desc": "×1.5 score + extends countdowns by 1" },
-      "diamond": { "name": "Diamond", "desc": "×5 score + reveals frozen contents for 3 turns" },
-      "bomb": { "name": "Bomb", "desc": "Clears 3×3 area — chains to nearby bombs" },
-      "lightning": { "name": "Lightning", "desc": "Clears entire column — chains to other bolts" },
-      "prism": { "name": "Prism", "desc": "2 hits — clears row + column, spawns 2 specials" },
-      "rainbow": { "name": "Rainbow", "desc": "Copies best special in your word, or ×2 score" },
-      "ice": { "name": "Ice", "desc": "2 hits to break. Multi-hit defensive tile." },
-      "frozen": { "name": "Frozen", "desc": "2 hits — releases a hidden special inside" },
-      "gem": { "name": "Gem", "desc": "3 hits — spawns 2 specials + 2 bonus moves" },
-      "mirror": { "name": "Mirror", "desc": "Copies first offensive special in your word" },
-      "magnet": { "name": "Magnet", "desc": "Pulls nearby tiles inward, then explodes 3×3" },
-      "wildcard": { "name": "Wildcard", "desc": "Matches any letter — scores by letter rarity" },
-      "countdown": { "name": "Countdown", "desc": "Defuse before 0! +2 moves — or 50pt penalty" },
-      "shuffle": { "name": "Shuffle", "desc": "Rearranges all remaining letters on the board when cleared" },
-      "magma": { "name": "Magma", "desc": "Clears both diagonals (X-pattern) with 2× score multiplier" },
-      "portal": { "name": "Portal", "desc": "Teleport through linked pairs — clears both, ×2 word score" },
-      "catalyst": { "name": "Catalyst", "desc": "Upgrades all adjacent tiles to random specials" },
-      "crystal": { "name": "Crystal", "desc": "Grows +1× per unused turn (max 5×) — multiplies word score" },
-      "fuse": { "name": "Fuse", "desc": "Linked pair — clear one to light its partner, defuse in 3 turns or it blows!" },
-      "locked": { "name": "Locked", "desc": "Gated — clear its paired Key to unlock" },
-      "key": { "name": "Key", "desc": "Unlocks adjacent Locked tiles when cleared (+20 pts each)" },
-      "anchor": { "name": "Anchor", "desc": "Long-word bonus — +3 pts per letter in the word when cleared" }
+      "standard": {
+        "name": "Standard",
+        "desc": "Basic tile — no special effect"
+      },
+      "gold": {
+        "name": "Gold",
+        "desc": "×3 score + 1 bonus move"
+      },
+      "silver": {
+        "name": "Silver",
+        "desc": "×1.5 score + extends countdowns by 1"
+      },
+      "diamond": {
+        "name": "Diamond",
+        "desc": "×5 score + reveals frozen contents for 3 turns"
+      },
+      "bomb": {
+        "name": "Bomb",
+        "desc": "Clears 3×3 area — chains to nearby bombs"
+      },
+      "lightning": {
+        "name": "Lightning",
+        "desc": "Clears entire column — chains to other bolts"
+      },
+      "prism": {
+        "name": "Prism",
+        "desc": "2 hits — clears row + column, spawns 2 specials"
+      },
+      "rainbow": {
+        "name": "Rainbow",
+        "desc": "Copies best special in your word, or ×2 score"
+      },
+      "ice": {
+        "name": "Ice",
+        "desc": "2 hits to break. Multi-hit defensive tile."
+      },
+      "frozen": {
+        "name": "Frozen",
+        "desc": "2 hits — releases a hidden special inside"
+      },
+      "gem": {
+        "name": "Gem",
+        "desc": "3 hits — spawns 2 specials + 2 bonus moves"
+      },
+      "mirror": {
+        "name": "Mirror",
+        "desc": "Copies first offensive special in your word"
+      },
+      "magnet": {
+        "name": "Magnet",
+        "desc": "Pulls nearby tiles inward, then explodes 3×3"
+      },
+      "wildcard": {
+        "name": "Wildcard",
+        "desc": "Matches any letter — scores by letter rarity"
+      },
+      "countdown": {
+        "name": "Countdown",
+        "desc": "Defuse before 0! +2 moves — or 50pt penalty"
+      },
+      "shuffle": {
+        "name": "Shuffle",
+        "desc": "Rearranges all remaining letters on the board when cleared"
+      },
+      "magma": {
+        "name": "Magma",
+        "desc": "Clears both diagonals (X-pattern) with 2× score multiplier"
+      },
+      "portal": {
+        "name": "Portal",
+        "desc": "Teleport through linked pairs — clears both, ×2 word score"
+      },
+      "catalyst": {
+        "name": "Catalyst",
+        "desc": "Upgrades all adjacent tiles to random specials"
+      },
+      "crystal": {
+        "name": "Crystal",
+        "desc": "Grows +1× per unused turn (max 5×) — multiplies word score"
+      },
+      "fuse": {
+        "name": "Fuse",
+        "desc": "Linked pair — clear one to light its partner, defuse in 3 turns or it blows!"
+      },
+      "locked": {
+        "name": "Locked",
+        "desc": "Gated — clear its paired Key to unlock"
+      },
+      "key": {
+        "name": "Key",
+        "desc": "Unlocks adjacent Locked tiles when cleared (+20 pts each)"
+      },
+      "anchor": {
+        "name": "Anchor",
+        "desc": "Long-word bonus — +3 pts per letter in the word when cleared"
+      }
     },
     "highlight": {
       "captions": {
@@ -9142,20 +9289,41 @@ const en = {
       "skipLabel": "Skip",
       "reelLabel": "Highlight reel",
       "bestWord": "Best word"
+    },
+    "chest": {
+      "avatarSuffix": "avatar part",
+      "boostSuffix": "boost",
+      "coins": "Coins",
+      "coinsSuffix": "coins",
+      "continue": "Continue",
+      "opened": "Chest Opened!",
+      "preview": "Chest Preview",
+      "tier": {
+        "label": "Tier"
+      },
+      "title": "Reward Chest"
+    },
+    "close": "Close",
+    "concept": {
+      "gotIt": "Let's go",
+      "tag": "New"
+    },
+    "settings": {
+      "tutorials": "Replay Tutorials"
     }
   },
   "student": {
-        "hub": {
-          "playZone": "Play",
-          "learnZone": "Learn"
-        },
-        "nav": {
-          "profile": "My Profile",
-          "achievements": "Achievements"
-        },
-        "joinClassroom": "Join a Classroom",
-        "joinClassroomDescription": "Enter your teacher's code to join",
-        "activeGame": {
+    "hub": {
+      "playZone": "Play",
+      "learnZone": "Learn"
+    },
+    "nav": {
+      "profile": "My Profile",
+      "achievements": "Achievements"
+    },
+    "joinClassroom": "Join a Classroom",
+    "joinClassroomDescription": "Enter your teacher's code to join",
+    "activeGame": {
       "title": "Game Starting!",
       "teacherStarted": "{{teacher}} started a classroom game",
       "joinNow": "Join Game Now",
@@ -9459,21 +9627,6 @@ const en = {
     "lessons": {
       "assign": {
         "trigger": "Assign to Classroom",
-        "title": "Assign Lesson",
-        "lessonLabel": "Lesson",
-        "classroomLabel": "Classroom",
-        "selectClassroom": "Select a classroom",
-        "noClassrooms": "No classrooms available",
-        "button": "Assign Lesson",
-        "assigning": "Assigning...",
-        "success": "Lesson assigned successfully!",
-        "alreadyAssigned": "This lesson is already assigned to this classroom",
-        "error": "Failed to assign lesson"
-      }
-    },
-    "lessons": {
-      "assign": {
-        "trigger": "Assign to Classroom",
         "title": "Assign Lesson to Classroom",
         "lessonLabel": "Lesson",
         "classroomLabel": "Select Classroom",
@@ -9548,7 +9701,7 @@ const en = {
       "student": "Student",
       "wordsAttempted": "Attempted",
       "wordsMastered": "Mastered",
-      "accuracy": "Accuracy",
+      "accuracy": "Accuracy %",
       "lastActive": "Last Active",
       "noData": "No progress data yet",
       "noProgressYet": "No student progress for this lesson yet",
@@ -9556,7 +9709,6 @@ const en = {
       "assignLessons": "Assign lessons to start tracking student progress",
       "chartTitle": "Class Progress Over Time",
       "wordsLearned": "Words Learned",
-      "accuracy": "Accuracy %",
       "expandDetails": "View word breakdown",
       "exportCSV": "Export CSV",
       "exportSuccess": "Progress exported successfully!",
@@ -10405,363 +10557,6 @@ const en = {
       "title": "You received a gift!",
       "body": "{sender} sent you {xp} XP and {coins} coins!"
     },
-  "admin": {
-      "accessDenied": "Access Denied",
-      "accessRequired": "Access Required",
-      "acquisition": {
-        "empty": "Acquisition empty",
-        "error": "Acquisition error",
-        "title": "Acquisition title"
-      },
-      "activity": {
-        "empty": "Activity empty",
-        "error": "Activity error",
-        "signups": "Activity signups",
-        "title": "Activity title",
-        "totalGames": "Activity total Games",
-        "uniquePlayers": "Activity unique Players"
-      },
-      "analytics": {
-        "churnTitle": "Analytics churn Title",
-        "churnTotal": "Analytics churn Total",
-        "cohort": "Analytics cohort",
-        "funnelDay30": "Analytics funnel Day30",
-        "funnelDay7": "Analytics funnel Day7",
-        "funnelFirstGame": "Analytics funnel First Game",
-        "funnelRegistered": "Analytics funnel Registered",
-        "funnelTitle": "Analytics funnel Title",
-        "games": "Analytics games",
-        "noChurnRisk": "Analytics no Churn Risk",
-        "retentionTitle": "Analytics retention Title",
-        "size": "Analytics size",
-        "title": "Analytics title"
-      },
-      "authSessions": {
-        "avgScore": "Auth Sessions avg Score",
-        "byLanguage": "Auth Sessions by Language",
-        "byMode": "Auth Sessions by Mode",
-        "completionRate": "Auth Sessions completion Rate",
-        "empty": "Auth Sessions empty",
-        "error": "Auth Sessions error",
-        "title": "Auth Sessions title",
-        "totalGames": "Auth Sessions total Games",
-        "uniqueUsers": "Auth Sessions unique Users"
-      },
-      "content": {
-        "approvedWords": "Content approved Words",
-        "noReports": "Content no Reports",
-        "pendingWords": "Content pending Words",
-        "topReported": "Content top Reported"
-      },
-      "dashboard": "Dashboard",
-      "email": {
-        "errorNoEmail": "Email error No Email",
-        "hidePreview": "Email hide Preview",
-        "preview": "Email preview",
-        "previewNote": "Email preview Note",
-        "recipientEmail": "Email recipient Email",
-        "recipientName": "Email recipient Name",
-        "sending": "Email sending",
-        "showPreview": "Email show Preview",
-        "title": "Email title"
-      },
-      "gameModePopularity": "Game Mode Popularity",
-      "geo": {
-        "empty": "Geo empty",
-        "error": "Geo error",
-        "guests": "Geo guests",
-        "registered": "Geo registered",
-        "title": "Geo title"
-      },
-      "guests": {
-        "avgScore": "Guests avg Score",
-        "byLanguage": "Guests by Language",
-        "byMode": "Guests by Mode",
-        "empty": "Guests empty",
-        "error": "Guests error",
-        "title": "Guests title",
-        "totalGames": "Guests total Games",
-        "uniqueGuests": "Guests unique Guests",
-        "windowDays": "Guests window Days"
-      },
-      "invalidWords": {
-        "reasons": {
-          "dismissed": "Invalid Words reasons dismissed",
-          "unknown": "Invalid Words reasons unknown"
-        },
-        "subtitle": "Invalid Words subtitle",
-        "title": "Invalid Words title"
-      },
-      "kpi": {
-        "thisWeek": "Kpi this Week"
-      },
-      "landingCardOrder": "Landing Card Order",
-      "live": {
-        "activeGames": "Live active Games",
-        "auth": "Live auth",
-        "connectedPlayers": "Live connected Players",
-        "game": "Live game",
-        "games": "Live games",
-        "guest": "Live guest",
-        "lastUpdated": "Live last Updated",
-        "left": "Live left",
-        "live": "Live live",
-        "mode": "Live mode",
-        "noGames": "Live no Games",
-        "noGamesHint": "Live no Games Hint",
-        "player": "Live player",
-        "players": "Live players",
-        "ranked": "Live ranked",
-        "refresh": "Live refresh",
-        "retry": "Live retry",
-        "score": "Live score",
-        "singlePlayer": "Live single Player",
-        "singlePlayerLive": "Live single Player Live",
-        "sockets": "Live sockets",
-        "started": "Live started",
-        "status": "Live status",
-        "subtitle": "Live subtitle",
-        "type": "Live type"
-      },
-      "loadingDashboard": "Loading Dashboard",
-      "loadingSession": "Loading Session",
-      "milogWords": {
-        "subtitle": "Milog Words subtitle",
-        "title": "Milog Words title"
-      },
-      "moderation": {
-        "approve": "Moderation approve",
-        "empty": "Moderation empty",
-        "queueTitle": "Moderation queue Title",
-        "reject": "Moderation reject",
-        "title": "Moderation title"
-      },
-      "nav": {
-        "dailyChallenge": "Nav daily Challenge",
-        "dictionary": "Nav dictionary",
-        "email": "Nav email",
-        "invalidWords": "Nav invalid Words",
-        "milogWords": "Nav milog Words",
-        "webVitals": "Nav web Vitals",
-        "wikipediaWords": "Nav wikipedia Words",
-        "wordBank": "Nav word Bank"
-      },
-      "noData": "No Data",
-      "player": {
-        "acquisition": "Player acquisition",
-        "avgScore": "Player avg Score",
-        "back": "Player back",
-        "byLanguage": "Player by Language",
-        "byMode": "Player by Mode",
-        "casual": "Player casual",
-        "coins": "Player coins",
-        "completed": "Player completed",
-        "dailyEmail": "Player daily Email",
-        "duration": "Player duration",
-        "economy": "Player economy",
-        "gameCode": "Player game Code",
-        "hintsUsed": "Player hints Used",
-        "identity": "Player identity",
-        "joined": "Player joined",
-        "lang": "Player lang",
-        "lastGame": "Player last Game",
-        "level": "Player level",
-        "lifetimeCoins": "Player lifetime Coins",
-        "loadError": "Player load Error",
-        "longestWord": "Player longest Word",
-        "mmr": "Player mmr",
-        "mode": "Player mode",
-        "noAcquisitionData": "Player no Acquisition Data",
-        "noGames": "Player no Games",
-        "notFound": "Player not Found",
-        "placement": "Player placement",
-        "ranked": "Player ranked",
-        "recentGames": "Player recent Games",
-        "referrals": "Player referrals",
-        "referrer": "Player referrer",
-        "role": "Player role",
-        "score": "Player score",
-        "seasonScore": "Player season Score",
-        "sessions": "Player sessions",
-        "title": "Player title",
-        "totalScore": "Player total Score",
-        "utmCampaign": "Player utm Campaign",
-        "utmMedium": "Player utm Medium",
-        "utmSource": "Player utm Source",
-        "when": "Player when",
-        "winRate": "Player win Rate",
-        "words": "Player words"
-      },
-      "preparingTools": "Preparing Tools",
-      "sessionError": "Session Error",
-      "sidebar": {
-        "analytics": "Sidebar analytics",
-        "content": "Sidebar content",
-        "moderation": "Sidebar moderation",
-        "overview": "Sidebar overview",
-        "players": "Sidebar players",
-        "system": "Sidebar system"
-      },
-      "system": {
-        "down": "System down",
-        "ok": "System ok"
-      },
-      "teacherAccess": {
-        "admin_note": "Teacher Access admin_note",
-        "approve": "Teacher Access approve",
-        "close": "Teacher Access close",
-        "col": {
-          "country": "Teacher Access col country",
-          "email": "Teacher Access col email",
-          "locale": "Teacher Access col locale",
-          "name": "Teacher Access col name",
-          "role": "Teacher Access col role",
-          "status": "Teacher Access col status",
-          "submitted": "Teacher Access col submitted"
-        },
-        "decline": "Teacher Access decline",
-        "drawer_title": "Teacher Access drawer_title",
-        "export_csv": "Teacher Access export_csv",
-        "field": {
-          "country": "Teacher Access field country",
-          "email": "Teacher Access field email",
-          "locale": "Teacher Access field locale",
-          "name": "Teacher Access field name",
-          "role": "Teacher Access field role",
-          "school": "Teacher Access field school",
-          "status": "Teacher Access field status",
-          "submitted": "Teacher Access field submitted",
-          "use_case": "Teacher Access field use_case"
-        },
-        "filter_country": "Teacher Access filter_country",
-        "filter_locale": "Teacher Access filter_locale",
-        "filter_status": "Teacher Access filter_status",
-        "filter_status_all": "Teacher Access filter_status_all",
-        "page": "Teacher Access page",
-        "refresh": "Teacher Access refresh",
-        "row_open": "Teacher Access row_open",
-        "title": "Teacher Access title"
-      },
-      "todayGames": {
-        "allLanguages": "Today Games all Languages",
-        "allModes": "Today Games all Modes",
-        "allTypes": "Today Games all Types",
-        "blast": "Today Games blast",
-        "casual": "Today Games casual",
-        "casualOnly": "Today Games casual Only",
-        "code": "Today Games code",
-        "daily": "Today Games daily",
-        "dateRange": "Today Games date Range",
-        "drills": "Today Games drills",
-        "duration": "Today Games duration",
-        "filters": "Today Games filters",
-        "first": "Today Games first",
-        "firstGame": "Today Games first Game",
-        "guest": "Today Games guest",
-        "language": "Today Games language",
-        "lastUpdated": "Today Games last Updated",
-        "multiplayer": "Today Games multiplayer",
-        "noGames": "Today Games no Games",
-        "noGamesHint": "Today Games no Games Hint",
-        "of": "Today Games of",
-        "player": "Today Games player",
-        "practice": "Today Games practice",
-        "ranked": "Today Games ranked",
-        "rankedOnly": "Today Games ranked Only",
-        "refresh": "Today Games refresh",
-        "retry": "Today Games retry",
-        "score": "Today Games score",
-        "showing": "Today Games showing",
-        "time": "Today Games time",
-        "title": "Today Games title",
-        "totalGames": "Today Games total Games",
-        "type": "Today Games type",
-        "wordHunt": "Today Games word Hunt",
-        "wordWheel": "Today Games word Wheel",
-        "words": "Today Games words"
-      },
-      "totalGames": "Total Games",
-      "wordBank": {
-        "actions": "Word Bank actions",
-        "approve": "Word Bank approve",
-        "bulkActions": {
-          "approveAll": "Word Bank bulk Actions approve All",
-          "approving": "Word Bank bulk Actions approving",
-          "clearSelection": "Word Bank bulk Actions clear Selection",
-          "errorMessage": "Word Bank bulk Actions error Message",
-          "rejectAll": "Word Bank bulk Actions reject All",
-          "rejecting": "Word Bank bulk Actions rejecting",
-          "selected": "Word Bank bulk Actions selected",
-          "successMessage": "Word Bank bulk Actions success Message"
-        },
-        "bulkImport": {
-          "button": "Word Bank bulk Import button",
-          "errors": "Word Bank bulk Import errors",
-          "formatCsv": "Word Bank bulk Import format Csv",
-          "formatPlain": "Word Bank bulk Import format Plain",
-          "import": "Word Bank bulk Import import",
-          "imported": "Word Bank bulk Import imported",
-          "importing": "Word Bank bulk Import importing",
-          "instructions": "Word Bank bulk Import instructions",
-          "lengthFilter": "Word Bank bulk Import length Filter",
-          "noContent": "Word Bank bulk Import no Content",
-          "result": "Word Bank bulk Import result",
-          "showErrors": "Word Bank bulk Import show Errors",
-          "skipped": "Word Bank bulk Import skipped",
-          "source": "Word Bank bulk Import source",
-          "title": "Word Bank bulk Import title",
-          "validationStatus": "Word Bank bulk Import validation Status",
-          "wordsLabel": "Word Bank bulk Import words Label"
-        },
-        "delete": "Word Bank delete",
-        "description": "Word Bank description",
-        "filters": {
-          "search": "Word Bank filters search",
-          "searchLabel": "Word Bank filters search Label"
-        },
-        "language": "Word Bank language",
-        "loadMore": "Word Bank load More",
-        "loading": "Word Bank loading",
-        "noWordsFound": "Word Bank no Words Found",
-        "reject": "Word Bank reject",
-        "source": "Word Bank source",
-        "stats": {
-          "activeWords": "Word Bank stats active Words",
-          "approved": "Word Bank stats approved",
-          "blockedWords": "Word Bank stats blocked Words",
-          "bySource": "Word Bank stats by Source",
-          "pendingReview": "Word Bank stats pending Review",
-          "rejected": "Word Bank stats rejected",
-          "title": "Word Bank stats title",
-          "totalWords": "Word Bank stats total Words"
-        },
-        "status": "Word Bank status",
-        "timesUsed": "Word Bank times Used",
-        "title": "Word Bank title",
-        "tryAdjustingFilters": "Word Bank try Adjusting Filters",
-        "validationStatus": "Word Bank validation Status",
-        "word": "Word Bank word",
-        "wordList": "Word Bank word List"
-      },
-      "sendTitle": "Send Notification",
-      "selectPlayers": "Select Recipients",
-      "chooseType": "Choose Type",
-      "writeMessage": "Write Message",
-      "preview": "Preview",
-      "send": "Send",
-      "sending": "Sending...",
-      "sent": "Notification Sent!",
-      "recipients": "Recipients",
-      "type": "Type",
-      "sendingTo": "Sending to",
-      "titleLabel": "Title",
-      "titlePlaceholder": "Notification title...",
-      "bodyLabel": "Message",
-      "bodyPlaceholder": "Notification message...",
-      "actionUrlLabel": "Action URL",
-      "sendSuccess": "Notification sent successfully!",
-      "sendError": "Failed to send notification. Please try again."
-    },
     "prompt": {
       "title": "Stay in the Game!",
       "body": "Get reminders for daily challenges and streak warnings",
@@ -10856,7 +10651,6 @@ const en = {
     "winRate": "Win Rate",
     "winStreak": "Win Streak",
     "wins": "Wins",
-    "winStreak": "Win Streak",
     "wordsAccepted": "Words Accepted",
     "wordsRejected": "Words Rejected",
     "xpEarned": "XP Earned",
@@ -10926,78 +10720,123 @@ const en = {
   "lostByForfeit": "Lost by forfeit",
   "realtimeDuel": "Real-Time Duel",
   "duelComplete": "Duel Complete!",
-
-  // Challenge system (Daily + Weekly)
-  challenges: {
-    daily: {
-      title: "Daily Challenges",
-      resetsIn: "Resets in {{time}}",
-      claim: "Claim Reward",
-      claimed: "Claimed!",
-      completed: "Completed",
-      progress: "{current} / {target}",
-      xpReward: "+{xp} XP",
-      practiceSessions: "Practice Sessions",
-      practiceSessionsDesc: "Complete {target} practice sessions today",
-      wordsMastered: "Word Master",
-      wordsMasteredDesc: "Master {target} new words today",
-      duelPlayed: "Duel Player",
-      duelPlayedDesc: "Play {target} duel today",
-      duelWins: "Duel Winner",
-      duelWinsDesc: "Win {target} duels today",
-      perfectAccuracy: "Perfect Accuracy",
-      perfectAccuracyDesc: "Complete {target} session with 100% accuracy",
-      blitzHighScore: "Blitz Champion",
-      blitzHighScoreDesc: "Score {target} points in Blitz mode",
-      xpEarned: "XP Hunter",
-      xpEarnedDesc: "Earn {target} XP today",
-      duelStreak: "Duel Streak",
-      duelStreakDesc: "Win {target} duels in a row",
-      spellingPerfect: "Spelling Bee",
-      spellingPerfectDesc: "Get perfect spelling in {target} sessions",
+  "challenges": {
+    "daily": {
+      "title": "Daily Challenges",
+      "resetsIn": "Resets in {{time}}",
+      "claim": "Claim Reward",
+      "claimed": "Claimed!",
+      "completed": "Completed",
+      "progress": "{current} / {target}",
+      "xpReward": "+{xp} XP",
+      "practiceSessions": "Practice Sessions",
+      "practiceSessionsDesc": "Complete {target} practice sessions today",
+      "wordsMastered": "Word Master",
+      "wordsMasteredDesc": "Master {target} new words today",
+      "duelPlayed": "Duel Player",
+      "duelPlayedDesc": "Play {target} duel today",
+      "duelWins": "Duel Winner",
+      "duelWinsDesc": "Win {target} duels today",
+      "perfectAccuracy": "Perfect Accuracy",
+      "perfectAccuracyDesc": "Complete {target} session with 100% accuracy",
+      "blitzHighScore": "Blitz Champion",
+      "blitzHighScoreDesc": "Score {target} points in Blitz mode",
+      "xpEarned": "XP Hunter",
+      "xpEarnedDesc": "Earn {target} XP today",
+      "duelStreak": "Duel Streak",
+      "duelStreakDesc": "Win {target} duels in a row",
+      "spellingPerfect": "Spelling Bee",
+      "spellingPerfectDesc": "Get perfect spelling in {target} sessions"
     },
-    weekly: {
-      title: "Weekly Quests",
-      claim: "Claim Reward",
-      claimed: "Claimed!",
-      thisWeek: "This Week",
-      progress: "{current} / {target}",
-      masterWords: "Weekly Word Mastery",
-      masterWordsDesc: "Master {target} words this week",
+    "weekly": {
+      "title": "Weekly Quests",
+      "claim": "Claim Reward",
+      "claimed": "Claimed!",
+      "thisWeek": "This Week",
+      "progress": "{current} / {target}",
+      "masterWords": "Weekly Word Mastery",
+      "masterWordsDesc": "Master {target} words this week"
     },
-    claim: "Claim",
-    claimed: "Claimed",
-    loading: "Loading your challenges...",
-    noChallenges: "No challenges available",
-    completed: "Completed",
-    easy: "Easy",
-    medium: "Medium",
-    hard: "Hard",
-    watchAdRetry: "Watch Ad to Retry"
+    "claim": "Claim",
+    "claimed": "Claimed",
+    "loading": "Loading your challenges...",
+    "noChallenges": "No challenges available",
+    "completed": "Completed",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "watchAdRetry": "Watch Ad to Retry"
   },
-  quests: {
-    weeklyWordMastery: "Weekly Word Mastery",
-    weeklyWordMasteryDesc: "Master {target} words this week"
+  "quests": {
+    "title": "Quests",
+    "dailyTitle": "Today's Quests",
+    "weeklyTitle": "Weekly Quest",
+    "grandSlam": "Grand Slam!",
+    "grandSlamBonus": "+500 XP Bonus",
+    "grandSlamAvatar": "+1 Avatar Part",
+    "allComplete": "Quest Master!",
+    "allCompleteDesc": "All daily + weekly quests done! You're on fire!",
+    "avatarReward": "+1 Avatar Part",
+    "avatarPartCategory": {
+      "eyes": "Eyes",
+      "mouth": "Mouth",
+      "accessory": "Accessory",
+      "hair": "Hair",
+      "eyebrows": "Eyebrows",
+      "facialHair": "Facial Hair"
+    },
+    "completedAll": "All done for today!",
+    "progress": "{{completed}}/{{total}}",
+    "go": "GO",
+    "done": "Done!",
+    "daily": {
+      "wordHunt": {
+        "name": "Daily Word Hunt",
+        "desc": "Play today's Daily Challenge"
+      },
+      "multiplayer": {
+        "name": "Multiplayer Match",
+        "desc": "Play a multiplayer game with others"
+      },
+      "brainDrills": {
+        "name": "Brain Workout",
+        "desc": "Complete a Brain Drill session"
+      }
+    },
+    "reward": {
+      "xp": "+{{xp}} XP",
+      "gold": "+{{gold}} Gold"
+    },
+    "weeklyWordMastery": "Weekly Word Mastery",
+    "weeklyWordMasteryDesc": "Master {target} words this week",
+    "questOptions": "Quest options",
+    "completion": {
+      "title": "Quest Complete!",
+      "grandSlam": "GRAND SLAM!",
+      "grandSlamDesc": "All daily missions crushed!",
+      "xpReward": "+{{xp}} XP",
+      "goldReward": "+{{gold}} Gold"
+    }
   },
-  ads: {
-    label: "Advertisement",
-    rewarded: {
-      watchForGold: "Watch ad for +{amount} gold",
-      earning: "Watching...",
-      earned: "+{amount} gold earned!",
-      cooldown: "Available soon",
-      blocked: "Ad blocker is preventing rewards. Disable it for lexiclash.live to earn gold."
+  "ads": {
+    "label": "Advertisement",
+    "rewarded": {
+      "watchForGold": "Watch ad for +{amount} gold",
+      "earning": "Watching...",
+      "earned": "+{amount} gold earned!",
+      "cooldown": "Available soon",
+      "blocked": "Ad blocker is preventing rewards. Disable it for lexiclash.live to earn gold."
     },
-    doubleGold: {
-      cta: "Double rewards +{amount}",
-      earning: "Doubling..."
+    "doubleGold": {
+      "cta": "Double rewards +{amount}",
+      "earning": "Doubling..."
     },
-    reveal: {
-      freeViaAd: "Free reveal (ad)"
+    "reveal": {
+      "freeViaAd": "Free reveal (ad)"
     },
-    timeLow: {
-      cta: "Add +{seconds}s",
-      earning: "Adding time..."
+    "timeLow": {
+      "cta": "Add +{seconds}s",
+      "earning": "Adding time..."
     }
   },
   "features": {
@@ -11012,137 +10851,145 @@ const en = {
       "advancedSettingsDesc": "Fine-tune your game experience"
     }
   },
-  wordHuntAnnouncement: {
-    badge: "New in Multiplayer",
-    title: "Try Word Hunt Mode!",
-    subtitle: "Race to find the hidden target word",
+  "wordHuntAnnouncement": {
+    "badge": "New in Multiplayer",
+    "title": "Try Word Hunt Mode!",
+    "subtitle": "Race to find the hidden target word"
   },
-  wordHuntTips: {
-    needMoreWords: "You only found {{count}} words. Each word refills your life bar — scan rows and diagonals for quick 3-letter words before guessing the target.",
-    accuracyDrainsLife: "{{invalid}} invalid words ({{accuracy}}% accuracy) — each miss costs life. Stick to words you're sure about and save risky guesses for when your life is full.",
-    longerWordsSurvive: "Your avg word was {{avg}} letters. Words with 5+ letters score 2-3x more and give more life back — look for prefixes like UN-, RE-, or endings like -ING, -TION.",
-    shortWordsBetweenGuesses: "Between target guesses, find 2-3 short discovery words to refill your life bar. That buffer lets you survive wrong guesses.",
-    firstFinderPush: "You found it first with {{words}} words. To score even higher, rack up discovery words before going for the target — each one adds points.",
-    winnerLongerWords: "You won, but your avg word was {{avg}} letters. Aim for 5+ letter words — they score 2-3x more and could double your score.",
-    winnerMoreWords: "You won with {{count}} words. Scan the board faster — try reading diagonals and backwards to find words others miss.",
-    tooManyInvalid: "{{invalid}} invalid attempts ({{accuracy}}% accuracy). Each miss drains your life. Focus on certain words first, then try risky ones only with a full life bar.",
-    lifeManagement: "You finished at {{life}}% life — one more miss and you're out. Mix in short discovery words between target guesses to keep your life topped up.",
-    pushWordLength: "Your avg was {{avg}} letters (longest: {{longest}}). Try building on shorter words — if you see \"RAN\", look for \"RANGE\" or \"RANCH\" nearby.",
-    scanMoreWords: "Only {{count}} words found. Before guessing the target, spend 15-20 seconds scanning for easy 3-4 letter words — they give life and reveal letter clues.",
-    pushForFirst: "You placed #{{rank}}. To close the gap, find longer words (5+ letters) and keep your accuracy high — invalid words cost life without scoring.",
+  "wordHuntTips": {
+    "needMoreWords": "You only found {{count}} words. Each word refills your life bar — scan rows and diagonals for quick 3-letter words before guessing the target.",
+    "accuracyDrainsLife": "{{invalid}} invalid words ({{accuracy}}% accuracy) — each miss costs life. Stick to words you're sure about and save risky guesses for when your life is full.",
+    "longerWordsSurvive": "Your avg word was {{avg}} letters. Words with 5+ letters score 2-3x more and give more life back — look for prefixes like UN-, RE-, or endings like -ING, -TION.",
+    "shortWordsBetweenGuesses": "Between target guesses, find 2-3 short discovery words to refill your life bar. That buffer lets you survive wrong guesses.",
+    "firstFinderPush": "You found it first with {{words}} words. To score even higher, rack up discovery words before going for the target — each one adds points.",
+    "winnerLongerWords": "You won, but your avg word was {{avg}} letters. Aim for 5+ letter words — they score 2-3x more and could double your score.",
+    "winnerMoreWords": "You won with {{count}} words. Scan the board faster — try reading diagonals and backwards to find words others miss.",
+    "tooManyInvalid": "{{invalid}} invalid attempts ({{accuracy}}% accuracy). Each miss drains your life. Focus on certain words first, then try risky ones only with a full life bar.",
+    "lifeManagement": "You finished at {{life}}% life — one more miss and you're out. Mix in short discovery words between target guesses to keep your life topped up.",
+    "pushWordLength": "Your avg was {{avg}} letters (longest: {{longest}}). Try building on shorter words — if you see \"RAN\", look for \"RANGE\" or \"RANCH\" nearby.",
+    "scanMoreWords": "Only {{count}} words found. Before guessing the target, spend 15-20 seconds scanning for easy 3-4 letter words — they give life and reveal letter clues.",
+    "pushForFirst": "You placed #{{rank}}. To close the gap, find longer words (5+ letters) and keep your accuracy high — invalid words cost life without scoring."
   },
-  wordHuntDeathRecap: {
-    causeLifeDrain: "Life drained out",
-    causeWrongGuess: "Wrong guess finished you off",
-    statWords: "Words",
-    statWrongGuesses: "Wrong",
-    statSurvival: "Survived",
-    eliminatedOrder: "Out #{{order}} of {{total}}",
-    lessonWrongGuess: "Wrong target guesses cost {{penalty}} life each! You lost {{guesses}} guesses. Build up life with board words before risking a guess.",
-    lessonNoWords: "You only found {{count}} words! Swiping words on the board heals you. Find quick 3-letter words to stay alive.",
-    lessonShortWords: "Your average word was {{avg}} letters. Longer words heal more — 5-letter words give +8 life vs +3 for 3-letter words.",
-    lessonTooManyGuesses: "{{guesses}} wrong guesses cost you {{cost}} life total. Only guess the target when you have enough clues to be confident.",
-    lessonPacing: "Find 2-3 board words between each target guess. They heal you AND reveal clues about the hidden word.",
+  "wordHuntDeathRecap": {
+    "causeLifeDrain": "Life drained out",
+    "causeWrongGuess": "Wrong guess finished you off",
+    "statWords": "Words",
+    "statWrongGuesses": "Wrong",
+    "statSurvival": "Survived",
+    "eliminatedOrder": "Out #{{order}} of {{total}}",
+    "lessonWrongGuess": "Wrong target guesses cost {{penalty}} life each! You lost {{guesses}} guesses. Build up life with board words before risking a guess.",
+    "lessonNoWords": "You only found {{count}} words! Swiping words on the board heals you. Find quick 3-letter words to stay alive.",
+    "lessonShortWords": "Your average word was {{avg}} letters. Longer words heal more — 5-letter words give +8 life vs +3 for 3-letter words.",
+    "lessonTooManyGuesses": "{{guesses}} wrong guesses cost you {{cost}} life total. Only guess the target when you have enough clues to be confident.",
+    "lessonPacing": "Find 2-3 board words between each target guess. They heal you AND reveal clues about the hidden word."
   },
-  wordHuntRules: {
-    panel1Title: "Find the hidden word",
-    panel1Desc: "A secret target word is hidden. Use the clue boxes at the top to figure it out.",
-    panel2Title: "Your life is draining",
-    panel2Desc: "Your life bar ticks down every second. Swipe words on the board to heal yourself and stay alive.",
-    panel3Title: "Words reveal clues",
-    panel3Desc: "Board words that share letters with the target light up green and yellow clues — use them!",
-    panel4Title: "Wrong guesses cost life",
-    panel4Desc: "Guessing the wrong target word costs 15 life. Build up clues before you guess.",
-    goToPanel: "Go to rule {{panel}}",
-    gotIt: "Got it!",
-    skip: "Skip",
-    quickTipsTitle: "Quick Tips",
+  "wordHuntRules": {
+    "panel1Title": "Find the hidden word",
+    "panel1Desc": "A secret target word is hidden. Use the clue boxes at the top to figure it out.",
+    "panel2Title": "Your life is draining",
+    "panel2Desc": "Your life bar ticks down every second. Swipe words on the board to heal yourself and stay alive.",
+    "panel3Title": "Words reveal clues",
+    "panel3Desc": "Board words that share letters with the target light up green and yellow clues — use them!",
+    "panel4Title": "Wrong guesses cost life",
+    "panel4Desc": "Guessing the wrong target word costs 15 life. Build up clues before you guess.",
+    "goToPanel": "Go to rule {{panel}}",
+    "gotIt": "Got it!",
+    "skip": "Skip",
+    "quickTipsTitle": "Quick Tips"
   },
-  wordHuntNudge: {
-    lifeDrop: "Swipe words on the board to heal! Each word restores life.",
-    firstClue: "That word revealed a clue about the target! Check the boxes above.",
-    wrongGuess: "Wrong target guess costs -15 life! Build up clues first.",
+  "wordHuntNudge": {
+    "lifeDrop": "Swipe words on the board to heal! Each word restores life.",
+    "firstClue": "That word revealed a clue about the target! Check the boxes above.",
+    "wrongGuess": "Wrong target guess costs -15 life! Build up clues first."
   },
-  wordHuntPromo: {
-    title: "Try Word Hunt Mode!",
-    subtitle: "Race to find the hidden target word in multiplayer",
-    cta: "Play Word Hunt",
-    dismiss: "Maybe Later",
-    imageAlt: "Word Hunt multiplayer duel",
+  "wordHuntPromo": {
+    "title": "Try Word Hunt Mode!",
+    "subtitle": "Race to find the hidden target word in multiplayer",
+    "cta": "Play Word Hunt",
+    "dismiss": "Maybe Later",
+    "imageAlt": "Word Hunt multiplayer duel"
   },
-  gameModes: {
-    classic: {
-      name: "Classic",
-      description: "Find as many words as you can!",
-      feature1: "Timed",
-      feature2: "Score-based",
-      feature3: "Free-form",
-      intro: { greet: "Take your time. Just words." },
-      tutorial: {
-        tip1: "Tap adjacent tiles to spell",
-        tip2: "Longer words show off more",
-        tip3: "No timer — just explore"
+  "gameModes": {
+    "classic": {
+      "name": "Classic",
+      "description": "Find as many words as you can!",
+      "feature1": "Timed",
+      "feature2": "Score-based",
+      "feature3": "Free-form",
+      "intro": {
+        "greet": "Take your time. Just words."
+      },
+      "tutorial": {
+        "tip1": "Tap adjacent tiles to spell",
+        "tip2": "Longer words show off more",
+        "tip3": "No timer — just explore"
       }
     },
-    blast: {
-      name: "Blast",
-      description: "Clear tiles with combos and special powers!",
-      feature1: "Chain combos",
-      feature2: "Special tiles",
-      feature3: "Cascade",
-      intro: { greet: "Tap, swipe, breathe. No rush." },
-      results: {
-        sceneTitle: "Blast Results",
-        finalScore: "Final Score",
-        comboChain: "Best Combo",
-        boardClears: "Board Clears",
-        gemsCollected: "Gems",
-        tilesCleared: "Tiles Cleared",
-        bestWord: "Best Word",
-        rank: "Rank"
+    "blast": {
+      "name": "Blast",
+      "description": "Clear tiles with combos and special powers!",
+      "feature1": "Chain combos",
+      "feature2": "Special tiles",
+      "feature3": "Cascade",
+      "intro": {
+        "greet": "Tap, swipe, breathe. No rush."
+      },
+      "results": {
+        "sceneTitle": "Blast Results",
+        "finalScore": "Final Score",
+        "comboChain": "Best Combo",
+        "boardClears": "Board Clears",
+        "gemsCollected": "Gems",
+        "tilesCleared": "Tiles Cleared",
+        "bestWord": "Best Word",
+        "rank": "Rank"
       }
     },
-    wordHunt: {
-      name: "Word Hunt",
-      description: "Race to find the target word!",
-      feature1: "Target words",
-      feature2: "Speed race",
-      feature3: "Hints",
-      intro: { greet: "One word at a time. You've got this." },
-      tutorial: {
-        tip1: "Drag connected letters to spell the target word",
-        tip2: "Bonus words count too — find as many as you like",
-        tip3: "No timer, no life bar — explore freely"
+    "wordHunt": {
+      "name": "Word Hunt",
+      "description": "Race to find the target word!",
+      "feature1": "Target words",
+      "feature2": "Speed race",
+      "feature3": "Hints",
+      "intro": {
+        "greet": "One word at a time. You've got this."
+      },
+      "tutorial": {
+        "tip1": "Drag connected letters to spell the target word",
+        "tip2": "Bonus words count too — find as many as you like",
+        "tip3": "No timer, no life bar — explore freely"
       }
     },
-    wheelRush: {
-      name: "Wheel Rush",
-      description: "Race the wheel — steal words to win!",
-      feature1: "Steal-lock window",
-      feature2: "Fog of war",
-      feature3: "Pangram bonus",
-      intro: { greet: "Spin gently. Words come." },
-      tutorial: {
-        tip1: "Tap the lime center letter — it must appear in every word",
-        tip2: "Tap outer letters in any order",
-        tip3: "Try plural forms to extend a word"
+    "wheelRush": {
+      "name": "Wheel Rush",
+      "description": "Race the wheel — steal words to win!",
+      "feature1": "Steal-lock window",
+      "feature2": "Fog of war",
+      "feature3": "Pangram bonus",
+      "intro": {
+        "greet": "Spin gently. Words come."
+      },
+      "tutorial": {
+        "tip1": "Tap the lime center letter — it must appear in every word",
+        "tip2": "Tap outer letters in any order",
+        "tip3": "Try plural forms to extend a word"
       }
     },
-    intro: {
-      cta: "Let's go",
-      skip: "Skip tutorial"
+    "intro": {
+      "cta": "Let's go",
+      "skip": "Skip tutorial"
     },
-    tutorial: {
-      title: "How it works",
-      cta: "Let's play!"
+    "tutorial": {
+      "title": "How it works",
+      "cta": "Let's play!"
     },
-    random: "Random",
-    randomDescription: "Surprise me! Pick a random mode each round.",
-    randomFeature1: "Variety",
-    randomFeature2: "Surprise",
-    randomFeature3: "Mixed rules",
-    nextMode: "Next Mode",
-    randomizing: "Randomizing..."
+    "random": "Random",
+    "randomDescription": "Surprise me! Pick a random mode each round.",
+    "randomFeature1": "Variety",
+    "randomFeature2": "Surprise",
+    "randomFeature3": "Mixed rules",
+    "nextMode": "Next Mode",
+    "randomizing": "Randomizing..."
   },
   "presets": {
     "fast": "Quick",
@@ -11172,19 +11019,6 @@ const en = {
       "title": "First time? Welcome.",
       "body": "Three quiet warmups, no scores, no clock. Tap a tile to start.",
       "startHere": "Start here"
-    }
-  },
-  "practice": {
-    "hub": {
-      "title": "Practice Arena",
-      "subtitle": "Master all 3 modes to unlock the real game",
-      "progress": "{count}/{total} complete",
-      "tip": {
-        "start": "Start with Word Hunt — it teaches clue reading",
-        "one": "Nice start! Classic mode next — pure speed training",
-        "two": "Almost there! Survival mode = ultimate challenge",
-        "done": "All modes mastered! Ready for real competition!"
-      }
     }
   },
   "practiceBadge": {
@@ -11236,33 +11070,11 @@ const en = {
     "coinsEarned": "Coins Earned"
   },
   "leagueRivals": {
-    "title": "Weekly League",
-    "bronze": "Bronze",
-    "silver": "Silver",
-    "gold": "Gold",
-    "diamond": "Diamond",
-    "ruby": "Ruby",
-    "position": "Position",
-    "xp": "XP",
-    "promotionZone": "Promotion Zone",
-    "safeZone": "Safe Zone",
-    "relegationZone": "Relegation Zone",
-    "promoted": "Promoted!",
-    "relegated": "Relegated",
-    "stayed": "Stayed",
-    "weeklyRewards": "Weekly Rewards",
-    "coinsEarned": "Coins Earned",
-    "newWeekIn": "New week starts in",
-    "joinLeague": "Join League",
-    "yourPosition": "Your Position",
-    "top": "Top",
-    "standings": "Standings",
-    "noLeague": "Join a league to compete!",
-    "finalResults": "Final Results",
-    "viewStandings": "View Standings",
-    "xpToPromote": "{xp} XP to promote",
-    "xpAboveRelegation": "{xp} XP above relegation",
-    "positionOf": "#{position} of {total}"
+    "title": "Your League Rivals",
+    "ahead": "{{pts}} pts ahead",
+    "behind": "{{pts}} pts behind",
+    "you": "You",
+    "noRivals": "Climb the league to find rivals!"
   },
   "socialGift": {
     "title": "Send a Gift",
@@ -11333,55 +11145,55 @@ const en = {
       "optOut": "While some data collection is necessary for the game to function (like your username and scores), you can opt out of analytics and personalized ads in Settings > Privacy."
     }
   },
-  avatarBuilder: {
-    title: "Avatar Builder",
-    base: "Shape",
-    hair: "Hair",
-    eyes: "Eyes",
-    mouth: "Mouth",
-    facialHair: "Facial Hair",
-    accessories: "Accessories",
-    background: "Background",
-    skinColor: "Skin Color",
-    hairColor: "Hair Color",
-    accessoryColor: "Color",
-    shirtColor: "Shirt Color",
-    eyeColor: "Eye Color",
-    randomize: "Randomize",
-    undo: "Undo",
-    download: "Download",
-    save: "Save",
-    cancel: "Cancel",
-    buildCustom: "Build Your Own",
-    bgColor: "Background",
-    gender: "Body Type",
-    male: "Male",
-    female: "Female",
-    shape: "Shape",
-    style: "Style",
-    none: "None",
-    type: "Type",
-    nose: "Nose",
-    eyebrows: "Eyebrows",
-    expressions: "Expression",
-    facialHairStyle: "Style",
-    colorTheme: "Color Theme",
-    bodyStyle: "Outfit",
-    bodyStyles: {
-      default: "Default",
-      hoodie: "Hoodie",
-      suit: "Suit",
-      turtleneck: "Turtleneck",
-      offShoulder: "Off-Shoulder",
-      cropTop: "Crop Top"
+  "avatarBuilder": {
+    "title": "Avatar Builder",
+    "base": "Shape",
+    "hair": "Hair",
+    "eyes": "Eyes",
+    "mouth": "Mouth",
+    "facialHair": "Facial Hair",
+    "accessories": "Accessories",
+    "background": "Background",
+    "skinColor": "Skin Color",
+    "hairColor": "Hair Color",
+    "accessoryColor": "Color",
+    "shirtColor": "Shirt Color",
+    "eyeColor": "Eye Color",
+    "randomize": "Randomize",
+    "undo": "Undo",
+    "download": "Download",
+    "save": "Save",
+    "cancel": "Cancel",
+    "buildCustom": "Build Your Own",
+    "bgColor": "Background",
+    "gender": "Body Type",
+    "male": "Male",
+    "female": "Female",
+    "shape": "Shape",
+    "style": "Style",
+    "none": "None",
+    "type": "Type",
+    "nose": "Nose",
+    "eyebrows": "Eyebrows",
+    "expressions": "Expression",
+    "facialHairStyle": "Style",
+    "colorTheme": "Color Theme",
+    "bodyStyle": "Outfit",
+    "bodyStyles": {
+      "default": "Default",
+      "hoodie": "Hoodie",
+      "suit": "Suit",
+      "turtleneck": "Turtleneck",
+      "offShoulder": "Off-Shoulder",
+      "cropTop": "Crop Top"
     },
-    theme: {
-      classic: "Classic",
-      fire: "Fire",
-      electric: "Electric",
-      toxic: "Toxic",
-      royal: "Royal",
-      pop: "Pop"
+    "theme": {
+      "classic": "Classic",
+      "fire": "Fire",
+      "electric": "Electric",
+      "toxic": "Toxic",
+      "royal": "Royal",
+      "pop": "Pop"
     }
   },
   "encouragement": {
@@ -11444,57 +11256,6 @@ const en = {
     "completed": "Completed!",
     "progress": "{{current}}/3 Missions"
   },
-  "quests": {
-    "title": "Quests",
-    "dailyTitle": "Today's Quests",
-    "weeklyTitle": "Weekly Quest",
-    "grandSlam": "Grand Slam!",
-    "grandSlamBonus": "+500 XP Bonus",
-    "grandSlamAvatar": "+1 Avatar Part",
-    "allComplete": "Quest Master!",
-    "allCompleteDesc": "All daily + weekly quests done! You're on fire!",
-    "avatarReward": "+1 Avatar Part",
-    "avatarPartCategory": {
-      "eyes": "Eyes",
-      "mouth": "Mouth",
-      "accessory": "Accessory",
-      "hair": "Hair",
-      "eyebrows": "Eyebrows",
-      "facialHair": "Facial Hair"
-    },
-    "completedAll": "All done for today!",
-    "progress": "{{completed}}/{{total}}",
-    "go": "GO",
-    "done": "Done!",
-    "daily": {
-      "wordHunt": {
-        "name": "Daily Word Hunt",
-        "desc": "Play today's Daily Challenge"
-      },
-      "multiplayer": {
-        "name": "Multiplayer Match",
-        "desc": "Play a multiplayer game with others"
-      },
-      "brainDrills": {
-        "name": "Brain Workout",
-        "desc": "Complete a Brain Drill session"
-      }
-    },
-    "reward": {
-      "xp": "+{{xp}} XP",
-      "gold": "+{{gold}} Gold"
-    },
-    "weeklyWordMastery": "Weekly Word Mastery",
-    "weeklyWordMasteryDesc": "Master {target} words this week",
-    "questOptions": "Quest options",
-    "completion": {
-      "title": "Quest Complete!",
-      "grandSlam": "GRAND SLAM!",
-      "grandSlamDesc": "All daily missions crushed!",
-      "xpReward": "+{{xp}} XP",
-      "goldReward": "+{{gold}} Gold"
-    }
-  },
   "wotd": {
     "title": "Word of the Day",
     "teaser": "Word of the Day",
@@ -11517,13 +11278,6 @@ const en = {
     "forgot": "Forgot",
     "reviewComplete": "Review complete!",
     "empty": "Play games to discover rare words!"
-  },
-  "leagueRivals": {
-    "title": "Your League Rivals",
-    "ahead": "{{pts}} pts ahead",
-    "behind": "{{pts}} pts behind",
-    "you": "You",
-    "noRivals": "Climb the league to find rivals!"
   },
   "powerHour": {
     "activated": "Power Hour Activated!",
@@ -12060,7 +11814,9 @@ const en = {
       "playMicrocopy": "GO!",
       "browseRooms": "Or browse rooms ↓",
       "liveBadge": "LIVE",
-      "aria": { "section": "CrazyGames welcome" }
+      "aria": {
+        "section": "CrazyGames welcome"
+      }
     }
   },
   "dailyInvite": {
@@ -12227,18 +11983,54 @@ const en = {
         "share": "WordCraft Run: {{score}}"
       },
       "card": {
-        "vowelPower": { "name": "Vowel Power", "desc": "Vowels are worth +2 chips each." },
-        "longGame": { "name": "Long Game", "desc": "Words of 5+ letters score double." },
-        "combo": { "name": "Combo Chain", "desc": "Each word after the first this round adds +1 multiplier." },
-        "premiumHunter": { "name": "Premium Hunter", "desc": "Every premium square you use adds +1 multiplier." },
-        "wildcardStash": { "name": "Wildcard Stash", "desc": "Start every round with a blank tile." },
-        "quickHands": { "name": "Quick Hands", "desc": "Adds 4 extra tiles to every round's bag." },
-        "doubleDown": { "name": "Double Down", "desc": "Your first word each round scores triple." },
-        "rareLetters": { "name": "Rare Letters", "desc": "Tiles worth 4+ points give +3 chips each." },
-        "shortSweet": { "name": "Short & Sweet", "desc": "Three-letter words get +15 chips." },
-        "steadyBuild": { "name": "Steady Build", "desc": "Every word gets +5 flat chips." },
-        "overflow": { "name": "Overflow", "desc": "Score over the target carries 10% as a bonus." },
-        "letterHoard": { "name": "Letter Hoard", "desc": "Your rack holds 10 tiles instead of 8." }
+        "vowelPower": {
+          "name": "Vowel Power",
+          "desc": "Vowels are worth +2 chips each."
+        },
+        "longGame": {
+          "name": "Long Game",
+          "desc": "Words of 5+ letters score double."
+        },
+        "combo": {
+          "name": "Combo Chain",
+          "desc": "Each word after the first this round adds +1 multiplier."
+        },
+        "premiumHunter": {
+          "name": "Premium Hunter",
+          "desc": "Every premium square you use adds +1 multiplier."
+        },
+        "wildcardStash": {
+          "name": "Wildcard Stash",
+          "desc": "Start every round with a blank tile."
+        },
+        "quickHands": {
+          "name": "Quick Hands",
+          "desc": "Adds 4 extra tiles to every round's bag."
+        },
+        "doubleDown": {
+          "name": "Double Down",
+          "desc": "Your first word each round scores triple."
+        },
+        "rareLetters": {
+          "name": "Rare Letters",
+          "desc": "Tiles worth 4+ points give +3 chips each."
+        },
+        "shortSweet": {
+          "name": "Short & Sweet",
+          "desc": "Three-letter words get +15 chips."
+        },
+        "steadyBuild": {
+          "name": "Steady Build",
+          "desc": "Every word gets +5 flat chips."
+        },
+        "overflow": {
+          "name": "Overflow",
+          "desc": "Score over the target carries 10% as a bonus."
+        },
+        "letterHoard": {
+          "name": "Letter Hoard",
+          "desc": "Your rack holds 10 tiles instead of 8."
+        }
       }
     },
     "territory": {
@@ -12295,54 +12087,427 @@ const en = {
       }
     }
   },
-  mp: {
-    stopGameConfirm: "End the game for everyone?",
-    stopGameYes: "End Game",
-    kbHint: {
-      submit: "submit",
-      pop: "remove last",
-      clear: "clear"
+  "mp": {
+    "stopGameConfirm": "End the game for everyone?",
+    "stopGameYes": "End Game",
+    "kbHint": {
+      "submit": "submit",
+      "pop": "remove last",
+      "clear": "clear"
     },
-    ladder: {
-      empty: "No words yet — find the first one!"
+    "ladder": {
+      "empty": "No words yet — find the first one!"
     },
-    modeName: {
-      classic: "Standard",
-      wheelRush: "Wheel Rush",
-      wordHunt: "Word Hunt",
-      blast: "Blast"
+    "modeName": {
+      "classic": "Standard",
+      "wheelRush": "Wheel Rush",
+      "wordHunt": "Word Hunt",
+      "blast": "Blast"
     },
-    insights: {
-      rosterHeader: "Players",
-      foundHeader: "Found",
-      fogHeader: "Fog",
-      fogLabel: "Fog of War",
-      myStatsHeader: "Your stats",
-      bestWord: "Best",
-      wordsPerMin: "Pace",
-      kbBonusUses: "Keys",
-      opponentInsightHeader: "Rivals",
-      opponentInsightEmpty: "Quiet so far…",
-      paceDeltaPositive: "Leading",
-      paceDeltaNegative: "Trailing",
-      paceDeltaTied: "Tied",
-      categoryHeader: "Target",
-      huntProgressHeader: "Progress",
-      goalTypeTargetWord: "Target word",
-      goalTypeColorPower: "Color power",
-      goalTypeClassic: "Goal",
-      comboCounterHeader: "Combo",
-      comboMultiplierSuffix: "boost",
-      retiredTiles: "Retired",
-      luckyBoost: "Lucky boost",
-      spinCounterAria: "Spin {current} of {total}",
-      rarity: {
-        common: "Common",
-        uncommon: "Uncommon",
-        rare: "Rare",
-        legendary: "Legendary"
+    "insights": {
+      "rosterHeader": "Players",
+      "foundHeader": "Found",
+      "fogHeader": "Fog",
+      "fogLabel": "Fog of War",
+      "myStatsHeader": "Your stats",
+      "bestWord": "Best",
+      "wordsPerMin": "Pace",
+      "kbBonusUses": "Keys",
+      "opponentInsightHeader": "Rivals",
+      "opponentInsightEmpty": "Quiet so far…",
+      "paceDeltaPositive": "Leading",
+      "paceDeltaNegative": "Trailing",
+      "paceDeltaTied": "Tied",
+      "categoryHeader": "Target",
+      "huntProgressHeader": "Progress",
+      "goalTypeTargetWord": "Target word",
+      "goalTypeColorPower": "Color power",
+      "goalTypeClassic": "Goal",
+      "comboCounterHeader": "Combo",
+      "comboMultiplierSuffix": "boost",
+      "retiredTiles": "Retired",
+      "luckyBoost": "Lucky boost",
+      "spinCounterAria": "Spin {current} of {total}",
+      "rarity": {
+        "common": "Common",
+        "uncommon": "Uncommon",
+        "rare": "Rare",
+        "legendary": "Legendary"
       }
+    },
+    "abort": {
+      "body": "The host ended the match.",
+      "continueSolo": "Continue solo",
+      "returnToLobby": "Return to lobby",
+      "title": "Game ended"
+    },
+    "quality": {
+      "degraded": "Connection unstable",
+      "reconnecting": "Reconnecting…",
+      "weak": "Weak connection"
+    },
+    "reconnect": {
+      "attempt": "Trying to reconnect…",
+      "giveUp": "Leave game",
+      "title": "Reconnecting…"
     }
+  },
+  "admin": {
+    "accessDenied": "Access Denied",
+    "accessRequired": "Access Required",
+    "acquisition": {
+      "empty": "Acquisition empty",
+      "error": "Acquisition error",
+      "title": "Acquisition title"
+    },
+    "activity": {
+      "empty": "Activity empty",
+      "error": "Activity error",
+      "signups": "Activity signups",
+      "title": "Activity title",
+      "totalGames": "Activity total Games",
+      "uniquePlayers": "Activity unique Players"
+    },
+    "analytics": {
+      "churnTitle": "Analytics churn Title",
+      "churnTotal": "Analytics churn Total",
+      "cohort": "Analytics cohort",
+      "funnelDay30": "Analytics funnel Day30",
+      "funnelDay7": "Analytics funnel Day7",
+      "funnelFirstGame": "Analytics funnel First Game",
+      "funnelRegistered": "Analytics funnel Registered",
+      "funnelTitle": "Analytics funnel Title",
+      "games": "Analytics games",
+      "noChurnRisk": "Analytics no Churn Risk",
+      "retentionTitle": "Analytics retention Title",
+      "size": "Analytics size",
+      "title": "Analytics title"
+    },
+    "authSessions": {
+      "avgScore": "Auth Sessions avg Score",
+      "byLanguage": "Auth Sessions by Language",
+      "byMode": "Auth Sessions by Mode",
+      "completionRate": "Auth Sessions completion Rate",
+      "empty": "Auth Sessions empty",
+      "error": "Auth Sessions error",
+      "title": "Auth Sessions title",
+      "totalGames": "Auth Sessions total Games",
+      "uniqueUsers": "Auth Sessions unique Users"
+    },
+    "content": {
+      "approvedWords": "Content approved Words",
+      "noReports": "Content no Reports",
+      "pendingWords": "Content pending Words",
+      "topReported": "Content top Reported"
+    },
+    "dashboard": "Dashboard",
+    "email": {
+      "errorNoEmail": "Email error No Email",
+      "hidePreview": "Email hide Preview",
+      "preview": "Email preview",
+      "previewNote": "Email preview Note",
+      "recipientEmail": "Email recipient Email",
+      "recipientName": "Email recipient Name",
+      "sending": "Email sending",
+      "showPreview": "Email show Preview",
+      "title": "Email title"
+    },
+    "gameModePopularity": "Game Mode Popularity",
+    "geo": {
+      "empty": "Geo empty",
+      "error": "Geo error",
+      "guests": "Geo guests",
+      "registered": "Geo registered",
+      "title": "Geo title"
+    },
+    "guests": {
+      "avgScore": "Guests avg Score",
+      "byLanguage": "Guests by Language",
+      "byMode": "Guests by Mode",
+      "empty": "Guests empty",
+      "error": "Guests error",
+      "title": "Guests title",
+      "totalGames": "Guests total Games",
+      "uniqueGuests": "Guests unique Guests",
+      "windowDays": "Guests window Days"
+    },
+    "invalidWords": {
+      "reasons": {
+        "dismissed": "Invalid Words reasons dismissed",
+        "unknown": "Invalid Words reasons unknown"
+      },
+      "subtitle": "Invalid Words subtitle",
+      "title": "Invalid Words title"
+    },
+    "kpi": {
+      "thisWeek": "Kpi this Week"
+    },
+    "landingCardOrder": "Landing Card Order",
+    "live": {
+      "activeGames": "Live active Games",
+      "auth": "Live auth",
+      "connectedPlayers": "Live connected Players",
+      "game": "Live game",
+      "games": "Live games",
+      "guest": "Live guest",
+      "lastUpdated": "Live last Updated",
+      "left": "Live left",
+      "live": "Live live",
+      "mode": "Live mode",
+      "noGames": "Live no Games",
+      "noGamesHint": "Live no Games Hint",
+      "player": "Live player",
+      "players": "Live players",
+      "ranked": "Live ranked",
+      "refresh": "Live refresh",
+      "retry": "Live retry",
+      "score": "Live score",
+      "singlePlayer": "Live single Player",
+      "singlePlayerLive": "Live single Player Live",
+      "sockets": "Live sockets",
+      "started": "Live started",
+      "status": "Live status",
+      "subtitle": "Live subtitle",
+      "type": "Live type"
+    },
+    "loadingDashboard": "Loading Dashboard",
+    "loadingSession": "Loading Session",
+    "milogWords": {
+      "subtitle": "Milog Words subtitle",
+      "title": "Milog Words title"
+    },
+    "moderation": {
+      "approve": "Moderation approve",
+      "empty": "Moderation empty",
+      "queueTitle": "Moderation queue Title",
+      "reject": "Moderation reject",
+      "title": "Moderation title"
+    },
+    "nav": {
+      "dailyChallenge": "Nav daily Challenge",
+      "dictionary": "Nav dictionary",
+      "email": "Nav email",
+      "invalidWords": "Nav invalid Words",
+      "milogWords": "Nav milog Words",
+      "webVitals": "Nav web Vitals",
+      "wikipediaWords": "Nav wikipedia Words",
+      "wordBank": "Nav word Bank"
+    },
+    "noData": "No Data",
+    "player": {
+      "acquisition": "Player acquisition",
+      "avgScore": "Player avg Score",
+      "back": "Player back",
+      "byLanguage": "Player by Language",
+      "byMode": "Player by Mode",
+      "casual": "Player casual",
+      "coins": "Player coins",
+      "completed": "Player completed",
+      "dailyEmail": "Player daily Email",
+      "duration": "Player duration",
+      "economy": "Player economy",
+      "gameCode": "Player game Code",
+      "hintsUsed": "Player hints Used",
+      "identity": "Player identity",
+      "joined": "Player joined",
+      "lang": "Player lang",
+      "lastGame": "Player last Game",
+      "level": "Player level",
+      "lifetimeCoins": "Player lifetime Coins",
+      "loadError": "Player load Error",
+      "longestWord": "Player longest Word",
+      "mmr": "Player mmr",
+      "mode": "Player mode",
+      "noAcquisitionData": "Player no Acquisition Data",
+      "noGames": "Player no Games",
+      "notFound": "Player not Found",
+      "placement": "Player placement",
+      "ranked": "Player ranked",
+      "recentGames": "Player recent Games",
+      "referrals": "Player referrals",
+      "referrer": "Player referrer",
+      "role": "Player role",
+      "score": "Player score",
+      "seasonScore": "Player season Score",
+      "sessions": "Player sessions",
+      "title": "Player title",
+      "totalScore": "Player total Score",
+      "utmCampaign": "Player utm Campaign",
+      "utmMedium": "Player utm Medium",
+      "utmSource": "Player utm Source",
+      "when": "Player when",
+      "winRate": "Player win Rate",
+      "words": "Player words"
+    },
+    "preparingTools": "Preparing Tools",
+    "sessionError": "Session Error",
+    "sidebar": {
+      "analytics": "Sidebar analytics",
+      "content": "Sidebar content",
+      "moderation": "Sidebar moderation",
+      "overview": "Sidebar overview",
+      "players": "Sidebar players",
+      "system": "Sidebar system"
+    },
+    "system": {
+      "down": "System down",
+      "ok": "System ok"
+    },
+    "teacherAccess": {
+      "admin_note": "Teacher Access admin_note",
+      "approve": "Teacher Access approve",
+      "close": "Teacher Access close",
+      "col": {
+        "country": "Teacher Access col country",
+        "email": "Teacher Access col email",
+        "locale": "Teacher Access col locale",
+        "name": "Teacher Access col name",
+        "role": "Teacher Access col role",
+        "status": "Teacher Access col status",
+        "submitted": "Teacher Access col submitted"
+      },
+      "decline": "Teacher Access decline",
+      "drawer_title": "Teacher Access drawer_title",
+      "export_csv": "Teacher Access export_csv",
+      "field": {
+        "country": "Teacher Access field country",
+        "email": "Teacher Access field email",
+        "locale": "Teacher Access field locale",
+        "name": "Teacher Access field name",
+        "role": "Teacher Access field role",
+        "school": "Teacher Access field school",
+        "status": "Teacher Access field status",
+        "submitted": "Teacher Access field submitted",
+        "use_case": "Teacher Access field use_case"
+      },
+      "filter_country": "Teacher Access filter_country",
+      "filter_locale": "Teacher Access filter_locale",
+      "filter_status": "Teacher Access filter_status",
+      "filter_status_all": "Teacher Access filter_status_all",
+      "page": "Teacher Access page",
+      "refresh": "Teacher Access refresh",
+      "row_open": "Teacher Access row_open",
+      "title": "Teacher Access title"
+    },
+    "todayGames": {
+      "allLanguages": "Today Games all Languages",
+      "allModes": "Today Games all Modes",
+      "allTypes": "Today Games all Types",
+      "blast": "Today Games blast",
+      "casual": "Today Games casual",
+      "casualOnly": "Today Games casual Only",
+      "code": "Today Games code",
+      "daily": "Today Games daily",
+      "dateRange": "Today Games date Range",
+      "drills": "Today Games drills",
+      "duration": "Today Games duration",
+      "filters": "Today Games filters",
+      "first": "Today Games first",
+      "firstGame": "Today Games first Game",
+      "guest": "Today Games guest",
+      "language": "Today Games language",
+      "lastUpdated": "Today Games last Updated",
+      "multiplayer": "Today Games multiplayer",
+      "noGames": "Today Games no Games",
+      "noGamesHint": "Today Games no Games Hint",
+      "of": "Today Games of",
+      "player": "Today Games player",
+      "practice": "Today Games practice",
+      "ranked": "Today Games ranked",
+      "rankedOnly": "Today Games ranked Only",
+      "refresh": "Today Games refresh",
+      "retry": "Today Games retry",
+      "score": "Today Games score",
+      "showing": "Today Games showing",
+      "time": "Today Games time",
+      "title": "Today Games title",
+      "totalGames": "Today Games total Games",
+      "type": "Today Games type",
+      "wordHunt": "Today Games word Hunt",
+      "wordWheel": "Today Games word Wheel",
+      "words": "Today Games words"
+    },
+    "totalGames": "Total Games",
+    "wordBank": {
+      "actions": "Word Bank actions",
+      "approve": "Word Bank approve",
+      "bulkActions": {
+        "approveAll": "Word Bank bulk Actions approve All",
+        "approving": "Word Bank bulk Actions approving",
+        "clearSelection": "Word Bank bulk Actions clear Selection",
+        "errorMessage": "Word Bank bulk Actions error Message",
+        "rejectAll": "Word Bank bulk Actions reject All",
+        "rejecting": "Word Bank bulk Actions rejecting",
+        "selected": "Word Bank bulk Actions selected",
+        "successMessage": "Word Bank bulk Actions success Message"
+      },
+      "bulkImport": {
+        "button": "Word Bank bulk Import button",
+        "errors": "Word Bank bulk Import errors",
+        "formatCsv": "Word Bank bulk Import format Csv",
+        "formatPlain": "Word Bank bulk Import format Plain",
+        "import": "Word Bank bulk Import import",
+        "imported": "Word Bank bulk Import imported",
+        "importing": "Word Bank bulk Import importing",
+        "instructions": "Word Bank bulk Import instructions",
+        "lengthFilter": "Word Bank bulk Import length Filter",
+        "noContent": "Word Bank bulk Import no Content",
+        "result": "Word Bank bulk Import result",
+        "showErrors": "Word Bank bulk Import show Errors",
+        "skipped": "Word Bank bulk Import skipped",
+        "source": "Word Bank bulk Import source",
+        "title": "Word Bank bulk Import title",
+        "validationStatus": "Word Bank bulk Import validation Status",
+        "wordsLabel": "Word Bank bulk Import words Label"
+      },
+      "delete": "Word Bank delete",
+      "description": "Word Bank description",
+      "filters": {
+        "search": "Word Bank filters search",
+        "searchLabel": "Word Bank filters search Label"
+      },
+      "language": "Word Bank language",
+      "loadMore": "Word Bank load More",
+      "loading": "Word Bank loading",
+      "noWordsFound": "Word Bank no Words Found",
+      "reject": "Word Bank reject",
+      "source": "Word Bank source",
+      "stats": {
+        "activeWords": "Word Bank stats active Words",
+        "approved": "Word Bank stats approved",
+        "blockedWords": "Word Bank stats blocked Words",
+        "bySource": "Word Bank stats by Source",
+        "pendingReview": "Word Bank stats pending Review",
+        "rejected": "Word Bank stats rejected",
+        "title": "Word Bank stats title",
+        "totalWords": "Word Bank stats total Words"
+      },
+      "status": "Word Bank status",
+      "timesUsed": "Word Bank times Used",
+      "title": "Word Bank title",
+      "tryAdjustingFilters": "Word Bank try Adjusting Filters",
+      "validationStatus": "Word Bank validation Status",
+      "word": "Word Bank word",
+      "wordList": "Word Bank word List"
+    },
+    "sendTitle": "Send Notification",
+    "selectPlayers": "Select Recipients",
+    "chooseType": "Choose Type",
+    "writeMessage": "Write Message",
+    "preview": "Preview",
+    "send": "Send",
+    "sending": "Sending...",
+    "sent": "Notification Sent!",
+    "recipients": "Recipients",
+    "type": "Type",
+    "sendingTo": "Sending to",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Notification title...",
+    "bodyLabel": "Message",
+    "bodyPlaceholder": "Notification message...",
+    "actionUrlLabel": "Action URL",
+    "sendSuccess": "Notification sent successfully!",
+    "sendError": "Failed to send notification. Please try again."
   }
 };
 
