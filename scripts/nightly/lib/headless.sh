@@ -60,13 +60,18 @@ PY
   # Inherit env (claude needs HOME + its own oauth state). Secrets already exported.
   # macOS ships without GNU timeout; prefer system `timeout`, fall back to
   # gtimeout (brew coreutils) or perl alarm wrapper. Perl always present on macOS.
+  # Use real timeout (GNU coreutils via brew, or BSD on Linux). Hard-prefer
+  # gtimeout/timeout — earlier perl-alarm fallback was BROKEN: `perl -e 'alarm; exec'`
+  # replaces the perl process with claude, so SIGALRM never fires and claude
+  # hangs indefinitely. Confirmed empirically: lane 1 hung 67 min on 2026-05-19.
   local timeout_cmd
-  if command -v timeout >/dev/null 2>&1; then
-    timeout_cmd=(timeout "${timeout_sec}s")
-  elif command -v gtimeout >/dev/null 2>&1; then
-    timeout_cmd=(gtimeout "${timeout_sec}s")
+  if command -v gtimeout >/dev/null 2>&1; then
+    timeout_cmd=(gtimeout --kill-after=10s "${timeout_sec}s")
+  elif command -v timeout >/dev/null 2>&1; then
+    timeout_cmd=(timeout --kill-after=10s "${timeout_sec}s")
   else
-    timeout_cmd=(/usr/bin/perl -e 'alarm shift; exec @ARGV or die "exec: $!"' -- "$timeout_sec")
+    echo "headless: FATAL — neither timeout nor gtimeout found. Install: brew install coreutils" | tee -a "$log_file"
+    return 127
   fi
 
   "${timeout_cmd[@]}" \
@@ -74,6 +79,7 @@ PY
       --allowedTools '*' \
       --dangerously-skip-permissions \
       --model "$model" \
+      < /dev/null \
       2>&1 | tee -a "$log_file"
   local rc=${PIPESTATUS[0]}
 
