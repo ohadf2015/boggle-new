@@ -235,8 +235,14 @@ for attempt in 1 2; do
     cd fe-next
     npm run test 2>&1 | tail -30
   ) >> "$RUN_LOG" 2>&1 || { log "test failed (attempt $attempt)"; continue; }
+  # Clean Turbopack cache before build:fast — stale .next from prior runs (or
+  # from interactive dev sessions) poisons the build with phantom SSR errors
+  # (e.g., "AvatarUidContext / AvatarEyeColorContext SSR" trace). Confirmed
+  # empirically: rm -rf .next .turbo recovered build from a failed→passing
+  # state without any code change.
   (
     cd fe-next
+    rm -rf .next .turbo 2>/dev/null
     npm run build:fast 2>&1 | tail -30
   ) >> "$RUN_LOG" 2>&1 || { log "build failed (attempt $attempt)"; continue; }
   gate_ok=1
