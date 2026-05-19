@@ -19,151 +19,99 @@ export type LocaleContent = {
 
 export const contentByLocale: Record<string, LocaleContent> = {
   en: {
-    title: 'I Spent a Weekend at a Competitive Scrabble Tournament. I Was Not Prepared.',
-    subtitle: 'What fMRI scans, tile tracking, and a devastating loss to a 14-year-old taught me about how top players actually think.',
+    title: 'What a Scrabble Tournament Taught Me About How Top Players Really Think',
+    subtitle: 'Chess chunking, tile tracking, and why expert players see words completely differently than you do.',
     category: 'Competitive Play',
-    readTime: '10 min read',
+    readTime: '7 min read',
     authorName: 'Ohad Fisher',
     authorBio: 'Obsessive word game player, amateur neuroscience reader, and the person who ruins game night by taking too long on their turn.',
     sections: [
       {
         content: `I thought I was good at word games.
 
-I mean, I win at family game night. Consistently. I know QI and ZA and all the two-letter words that make people say "that's not a word" before you show them the dictionary. I once played QUIXOTIC on a triple word score and my sister didn't speak to me for the rest of Thanksgiving.
+I win at family game night. I know QI and ZA and all the two-letter words that make people say "that's not a word" before you show them the dictionary. Once I played QUIXOTIC on a triple word score and my sister didn't speak to me for the rest of Thanksgiving.
 
-So when a friend mentioned a local NASPA-sanctioned Scrabble tournament, I signed up. How hard could it be?
-
-Hard. The answer is very, very hard. I got absolutely destroyed. And in the process, I learned more about how expert word game players actually think than I'd picked up in twenty years of casual play. Some of it is backed by fascinating neuroscience. Some of it is just... unsettling.`,
+Then I entered a NASPA-sanctioned Scrabble tournament. Very hard. Very fast. I got demolished. But in one weekend I learned more about how expert word game players actually think than I'd picked up in twenty years of casual play. Some of it is backed by fascinating neuroscience. Some of it is just unsettling.`,
       },
       {
-        title: 'Nobody cares what words mean',
-        content: `My first opponent was a quiet woman named Diane who looked like she could be anyone's grandmother. She played CWMS on her second turn. I challenged it. She smiled.
+        title: 'Expert players see words as patterns, not meanings',
+        content: `My first opponent was a quiet woman named Diane. She played CWMS on her second turn. I challenged it. She smiled.
 
-CWMS is a valid Scrabble word. It's the plural of cwm, a geological term for a type of valley. Diane had no idea what it meant. She told me so, cheerfully, after the game. "I don't learn definitions," she said. "I learn letter patterns."
+CWMS is a valid Scrabble word. It's the plural of cwm, a geological term. Diane had no idea what it meant. "I don't learn definitions," she said after the game. "I learn letter patterns."
 
-This blew my mind at first. But it turns out Diane is the norm, not the exception. Research published in Memory & Cognition found that competitive Scrabble players exhibit fundamentally different visual word recognition compared to casual players. They're less reliant on word meaning to judge whether a word is real. Instead, they rely on orthographic information — the visual shape and letter patterns of words.
+This turned out to be the norm. Competitive Scrabble players rely on orthographic information, particularly the visual shape and letter combinations, much more than casual players. They memorize words like phone numbers. As sequences, not as things with meaning.
 
-Only 6.4% of competitive players surveyed said they "always" learn word meanings when studying. The rest? "Sometimes" or "rarely or never." They memorize words the way you'd memorize phone numbers. As sequences, not as things with significance.
-
-I sat there thinking about all the hours I'd spent trying to understand obscure words I'd found in the Scrabble dictionary. Turns out I'd been doing it completely wrong. The pros treat vocabulary like a database lookup, not a literature class.`,
+The contrast is stark. I'd spent hours trying to understand obscure words I found in the Scrabble dictionary. The pros treat the dictionary like a database lookup. That difference in approach explains a lot about why they're so much faster.`,
       },
       {
-        title: 'What fMRI scans reveal about expert players',
-        content: `After getting demolished in my first three games, I went home and fell down a research rabbit hole.
+        title: 'Chunking: why pattern recognition beats memory',
+        content: `Understanding expert performance starts with a 1973 experiment by William Chase and Herbert Simon.
 
-A study published in ScienceDirect used fMRI (functional magnetic resonance imaging, the kind that watches your brain light up in real time) to compare 12 competitive Scrabble players with 12 matched controls during word recognition tasks.
+They showed chess experts and beginners a board with pieces from a real game, gave them five seconds to look, then asked them to reconstruct it. Experts crushed beginners. But when they showed randomly placed pieces — positions that could never happen. The experts performed no better than beginners.
 
-The results were startling. When expert players looked at letter strings and had to decide if they were real words, they activated brain regions not typically associated with meaning retrieval. Instead, they lit up areas linked to working memory and visual perception. The regions you'd normally associate with "understanding" a word? Relatively quiet.
+The explanation: experts don't remember individual pieces. They remember "chunks," clusters that form recognizable patterns. A pawn structure. A common opening. Their advantage isn't raw memory. It's pattern recognition built through thousands of hours of experience.
 
-Put simply: experts don't think about words. They see them. The way a chess grandmaster sees board positions, a top Scrabble player sees letter combinations. The meaning pathway, the one you and I use when we read a book or have a conversation, gets largely bypassed.
+Word games work identically. When I look at a rack of letters, I see seven tiles. When Diane looks at the same rack, she sees letter clusters. UN-, RE-, -ING, -TION, QU, ZA. The board becomes a set of building blocks instead of isolated letters.
 
-This isn't a trivial academic finding. Expert word recognition is a completely different cognitive process from normal reading. These players have literally rewired how their brains handle language. Not through some genetic gift. Through practice.`,
+I tested this after the tournament. I started consciously looking for chunks instead of building words from scratch. The improvement was immediate. Not because I knew more words, but because I was processing information more efficiently.`,
       },
       {
-        title: 'Chunking: the 1973 study that explains everything',
-        content: `To understand why this brain rewiring happens, you need to know about one of the most elegant experiments in cognitive science.
+        title: 'Tile tracking: the skill nobody warns you about',
+        content: `Competitive players count tiles. Not metaphorically. They track which letters have been played and calculate what remains in the bag. By the endgame, top players know, with near certainty, what tiles their opponent is holding.
 
-In 1973, William Chase and Herbert Simon did something brilliant. They showed chess experts and novices a chessboard with pieces arranged from a real game, gave them five seconds to look, then asked them to reconstruct it from memory. Experts crushed novices. Not even close.
+While you're trying to figure out if a word is valid, your opponent is running a mental inventory of 100 tiles and computing probability distributions.
 
-But here's the twist. When they showed randomly placed pieces — positions that couldn't occur in a real game — the experts performed no better than beginners.
+At NASPA tournaments, tile tracking is considered basic. Not advanced. Basic. Players use a tracking sheet printed with all 100 tiles and cross them off as they're played. The mental math of knowing "there are two S's left and my opponent probably has one" fundamentally changes strategy.
 
-The explanation: experts don't remember individual pieces. They remember "chunks," clusters of pieces that form recognizable patterns. A specific pawn structure. A common opening formation. Their advantage isn't raw memory. It's pattern recognition built through thousands of hours of experience.
-
-Word games work identically. When I look at a rack of letters, I see seven individual tiles. When Diane looks at the same rack, she sees letter clusters. Common prefixes like UN- or RE-, suffixes like -ING or -TION, high-value combinations like QU or ZA. The board stops being a grid of isolated letters and becomes a set of building blocks.
-
-I tested this on myself after the tournament. I started consciously looking for chunks instead of trying to build words from scratch. The improvement was almost immediate. Not because I suddenly knew more words, but because I was processing the information more efficiently. My brain had fewer things to juggle.`,
+I didn't track a single tile during my tournament games. Looking back, it's like I showed up to chess without knowing how the knight moves.`,
       },
       {
-        title: 'Tile tracking, or the skill I didn\'t know existed',
-        content: `Nobody told me before the tournament: competitive players count tiles.
+        title: 'Speed and automaticity: the real edge',
+        content: `One more thing I noticed at the tournament: the top players play fast. Not recklessly fast. But decisively.
 
-Not metaphorically. They track which letters have been played and calculate what's left in the bag. By the endgame, top players know — with near certainty — what tiles their opponent is holding.
+The moment their opponent places a tile, they're already thinking about their next move. They don't hem and haw. They calculate, they decide, they play. Five, six, seven seconds per turn.
 
-Think about that for a second. While you're trying to figure out if BLORFT is a word, your opponent is running a mental inventory of 100 tiles and computing probability distributions. It's like playing poker where one person can count cards and the other can't.
+This speed comes from automaticity. Pattern recognition becomes so ingrained that looking at a rack and finding valid words requires almost no conscious effort. The same way you recognize a friend's face without analyzing individual features. Your brain does the work beneath conscious awareness.
 
-At NASPA tournaments, tile tracking is considered a basic skill. Not advanced. Basic. Players use a tracking sheet printed with all 100 tiles and cross them off as they're played. The mental math of knowing "there are two S's left and my opponent probably has one" fundamentally changes strategy. You stop playing defensively when you know they can't hit a triple word score with what they're holding.
+Research on expertise consistently shows that automaticity is the real marker of expert performance, more than IQ or raw processing speed. Expert players have offloaded so much word recognition to automatic processes that their conscious mind is freed up to think strategically about leave values, opponent psychology, clock management.
 
-I didn't track a single tile during my tournament games. Looking back, it's like I showed up to a chess match without knowing how the knight moves.`,
+That speed also carries psychological weight. When you play quickly, you signal confidence. Your opponent senses it. And in a game where uncertainty and psychology matter, that's a real advantage.`,
       },
       {
-        title: 'Leave values: the math behind every great turn',
-        content: `After the tournament, I joined an online Scrabble study group. They exist, and they're exactly as nerdy as you'd expect. This is where I learned about "leave values."
+        title: 'Leave values: the math behind every strong turn',
+        content: `After the tournament I joined an online study group. This is where I learned about "leave values."
 
-Every turn in competitive Scrabble isn't just about the word you play. It's about the letters you keep. The tiles remaining on your rack after you play have a calculable expected value based on probability theory and simulation data.
+Every turn isn't just about the word you play. It's about the letters you keep. The tiles remaining on your rack have a calculable expected value based on probability and historical data.
 
-Keeping a balanced mix of vowels and consonants is almost always better than keeping all high-point tiles. An S is worth far more than its one-point face value because it can pluralize and hook onto existing words. A blank tile, worth zero points, is the most valuable tile in the game because of its flexibility.
+A balanced mix of vowels and consonants is almost always better than all high-point tiles. An S is worth far more than one point because it can pluralize and hook onto existing words. A blank tile, worth zero points, is the most valuable tile because of its flexibility.
 
-Top players have internalized these values. They'll sometimes play a lower-scoring word deliberately because it leaves better tiles on their rack. Sacrifice-now-win-later thinking. It requires probabilistic reasoning that most casual players never consider.
+Top players have internalized these values. They'll sometimes play a lower-scoring word on purpose because it leaves better tiles. Sacrifice now, win later. It requires probabilistic reasoning that most casual players never consider.
 
-This was the biggest mindset shift for me. I'd always evaluated turns by "how many points did I score?" Top players evaluate turns by "how many points did I score AND how good is my leave?" It's a completely different optimization problem.`,
+I'd always evaluated turns by "how many points did I score?" Top players evaluate by "how many points did I score AND how good is my leave?" Completely different optimization problem.`,
       },
       {
-        title: 'Phonies and bluffing. Yes, really.',
-        content: `Phonies.
+        title: 'Tournament pressure and the cognitive load',
+        content: `Tournament games use chess clocks, typically 25 minutes per player. Run out of time and you lose 10 points per minute. I watched a player who was clearly winning lose because he overthought his last three turns.
 
-In competitive Scrabble, you can play a word that doesn't exist. On purpose. If your opponent doesn't challenge it, the word stays and you get the points.
+Clock management is brutal. But there's a deeper cognitive burden: holding tile probabilities, leave calculations, and strategic planning in working memory while under time pressure and staying emotionally balanced when the random draw goes against you.
 
-This is a legitimate, accepted strategy. It's called playing a "phony." And it messes with your head in ways I was completely unprepared for.
-
-During my fourth game, my opponent played REGLAZED. It looked plausible. Like it could be a word. I didn't challenge it. It scored 86 points. After the game, I looked it up. Not a word. My opponent grinned. "Gotta challenge," he said.
-
-The tension: if you challenge a word and it is valid, you lose your turn. So every challenge is a gamble. Do you waste a turn on a word that might be real, or let a potential fake score stand?
-
-Top players weaponize this uncertainty. They know which fake words look most plausible. They study "stems" — common letter combinations that form many valid words — and play words that fit the pattern but don't actually exist. The best phonies look so natural that even experienced opponents hesitate to challenge.
-
-I have complicated feelings about this. Part of me thinks it's unsporting. Another part thinks it's the most psychologically fascinating aspect of competitive Scrabble. You're not just playing the board. You're playing your opponent's confidence.`,
-      },
-      {
-        title: 'The dictionary war: Collins vs. TWL',
-        content: `There are two official Scrabble dictionaries, and the community is deeply divided over which one is "right."
-
-NASPA tournaments in North America use the TWL (Tournament Word List), currently TWL06. The rest of the English-speaking world, UK, Australia, parts of Asia, uses the Collins Scrabble Words dictionary, which is significantly larger.
-
-Collins includes about 280,000 words. TWL has about 190,000. That's 90,000 additional words available in international play. Words like AA, CH, GI, and hundreds of others that are perfectly valid in a Collins game but will get challenged off the board in a North American tournament.
-
-This creates a bizarre situation where the "best word" on a given rack depends entirely on which country you're playing in. Players who compete internationally need to know both dictionaries, which is like being bilingual in competitive terms.
-
-I asked a player at my tournament if this bothered him. He shrugged. "It's just more words to learn," he said. Then he played QANAT for 64 points and I stopped asking questions.`,
-      },
-      {
-        title: 'The 4.5-hour-per-week practice habit',
-        content: `Research tracking competitive Scrabble players' practice habits found they dedicate an average of 4.5 hours per week to studying words. Not playing games. Studying. Sitting with word lists and anagram generators, drilling letter combinations until they become automatic.
-
-4.5 hours. Every week. For years.
-
-That number puts casual players like me in perspective. I play maybe three games a week and I thought that was a lot. These players are treating Scrabble like a college course. Some study significantly more — multiple hours daily — especially before major tournaments.
-
-The finding that stuck with me: the studying pays off in measurable cognitive changes. Fast word access — measured by reaction times in laboratory tests — correlates directly with expertise level. The more you study, the faster your brain retrieves words, and this speed advantage persists even outside of game contexts.
-
-Competitive Scrabble players don't just get better at Scrabble. Their brains actually become faster at processing language in general. The practice changes the hardware, not just the software.`,
-      },
-      {
-        title: 'The psychology nobody talks about',
-        content: `The competitive Scrabble world is intense in ways that go beyond strategy.
-
-Clock management is brutal. Tournament games use chess clocks, typically 25 minutes per player. Run out of time and you lose 10 points per minute. I watched a player who was clearly winning lose because he overthought his last three turns and ran out of clock. The look on his face haunted me.
-
-There's the emotional management. Getting a rack of all vowels, AEIIOUU, when the game is close. Drawing the Q without a U in a tight endgame. Having your opponent bingo (play all seven tiles) twice in a row when you're stuck with a consonant-heavy rack. These things feel personal even though they're random. Handling that emotional rollercoaster while making optimal strategic decisions is a skill that doesn't show up in any study I've read.
-
-Then the social dynamics. Competitive Scrabble is, paradoxically, one of the loneliest competitive activities you can do. You sit across from someone in near-silence for 45 minutes, locked in a mental battle, then shake hands and do it again with someone else. The community is warm between games, genuinely friendly and welcoming. But during play, you're alone with your rack and the board.
-
-The 14-year-old who beat me in my fifth game was kind about it, at least. "You have a really good vocabulary," she said. "You just need to learn strategy." She'd been playing competitively since she was nine.`,
+The 14-year-old who beat me in my fifth game was kind about it. "You have a really good vocabulary," she said. "You just need to learn strategy." She'd been playing competitively since she was nine.`,
       },
       {
         title: 'What casual players can steal from the pros',
-        content: `What I took home from the tournament and the research I've read since:
+        content: `Here's what I took home:
 
-1. Look for patterns, not complete words. This is the single biggest lever. Train yourself to see common letter combinations — prefixes, suffixes, two-letter words — instead of trying to conjure whole words from thin air. The chunking research is clear: this is what separates experts from everyone else.
+1. Look for patterns, not complete words. Train yourself to see common letter combinations: prefixes, suffixes, two-letter words. Instead of trying to conjure whole words. The chunking research is clear: this is what separates experts from everyone else.
 
-2. Your brain is already changing when you play. The fMRI research shows that visual word recognition improves with practice, even in adults. Every game you play is rewiring your neural pathways. You don't have to practice 4.5 hours a week to benefit. Consistency matters more than intensity.
+2. Your brain is already changing when you play. Visual word recognition improves with practice, even in adults. Every game rewires your neural pathways slightly. You don't need 4.5 hours a week of study to benefit. Consistency matters more than intensity.
 
-3. Meaning is overrated (for game purposes). Stop trying to learn what every word means. If you're playing to win, learn which letter patterns are valid and move on. You can be a word game savant without being a walking dictionary.
+3. Meaning is overrated for game purposes. If you're playing to win, learn which letter patterns are valid and move on.
 
-4. Think about your leave. Even in casual play, paying attention to which tiles you keep can dramatically improve your scores. Don't dump all your good tiles for a flashy word if it leaves you with VVWK on your rack.
+4. Think about your leave. Even in casual play, paying attention to which tiles you keep dramatically improves scores. Don't dump all your good tiles for a flashy word if it leaves you with VVWK.
 
-5. The gap between casual and competitive is enormous. That's fine. I went to that tournament thinking I was above average. I learned I was nowhere close to competitive level. But that gap taught me more in one weekend than years of casual play. Sometimes getting humbled is the most educational experience there is.
+5. The gap between casual and competitive is enormous, and that's fine. Getting humbled is sometimes the most educational experience there is.
 
-Visual word recognition keeps improving in adults. What looks like "natural talent" in expert players is almost always accumulated practice. Our brains are more flexible than we give them credit for. You don't need to become a tournament player to benefit from thinking like one.
+Visual word recognition keeps improving in adults. What looks like natural talent in expert players is almost always accumulated practice. Our brains are more flexible than we give them credit for.
 
 Somewhere out there, Diane is practicing right now. And next time we meet across a tournament board, I'll be ready.`,
       },

@@ -12,7 +12,7 @@ interface PageProps {
 
 const SLUG = 'top-player-secrets';
 const DATE_PUBLISHED = '2025-08-28';
-const DATE_MODIFIED = '2026-02-25';
+const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: '7 Word Game Secrets Top Players Use - Free Tips',
