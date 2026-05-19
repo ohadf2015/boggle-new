@@ -9164,6 +9164,12 @@ const sv = {
     "hint": "Tips",
     "undo": "Ångra",
     "undoTooltip": "Ångra senaste draget",
+    "undoAdGate": {
+      "title": "Fler ångringar?",
+      "body": "Titta på en kort annons för att fortsätta ångra drag. Dina två första ångringar i varje nivå är alltid gratis.",
+      "watch": "Titta på annons",
+      "cancel": "Inte nu"
+    },
     "stuck": "Fastnat?",
     "hintCooldown": "Använt",
     "waveClearBanner": "Vågen klar!",

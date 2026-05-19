@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { BlastLevel, CellId } from '@/lib/blast/v2/types';
 import { markUnlockSeen, markConceptSeen, completeFtue, setSkipAll, type UnlocksSeen } from '@/lib/blast/v2/tutorial/unlocks-seen';
@@ -28,6 +28,10 @@ import { BlastFtueOverlay, type FtueStep } from './BlastFtueOverlay';
 import { BlastUnlockCard } from './BlastUnlockCard';
 import { BlastConceptIntroCard } from './BlastConceptIntroCard';
 import { BlastWordCelebration } from './BlastWordCelebration';
+import { BlastUndoAdModal } from './BlastUndoAdModal';
+import { useBlastDictionary } from '@/lib/blast/v2/useBlastDictionary';
+import { parseCell } from '@/lib/blast/v2/engine/cell-id';
+import { useRewardedAd } from '@/hooks/useRewardedAd';
 
 type Props = {
   level: BlastLevel;
@@ -82,6 +86,7 @@ export function BlastGame({
   const [introDismissed, setIntroDismissed] = useState(false);
   const [levelStartTime] = useState(() => Date.now());
   const { state, handlers } = useBlastV2(level);
+  const { verify: verifyDictionary } = useBlastDictionary(level.locale);
   // Hide the global bottom nav while the board is mounted — without this the
   // HUD + board + bottom nav exceed 100dvh on phones and force a page scroll.
   const setIsInGame = useHideNavigation();
@@ -120,9 +125,16 @@ export function BlastGame({
   // Cascade pacing — Royal Match style. Complete card delayed by `(chainDepth-1)*350 + 700`ms
   // so each cascade beat + final ovation flash plays out visibly before the modal pops.
   const showCompleteCard = useCompleteCardDelay({ status: state.status, chainDepth: state.lastChainDepth });
+  // Almost-word ghost letters — translucent glowing letters in empty cells
+  // that hint at completing a target word. Restricted to tutorial levels
+  // (L1–L2) because the ghosts floating above tall columns or near scattered
+  // tiles read as weird mid-air glow rather than a helpful nudge. Past the
+  // tutorial the board stays clean and the player relies on observation.
   const almosts = useMemo(
-    () => detectAlmostWords(state.level, state.foundWords, LOCALE_CONFIGS[state.level.locale]),
-    [state.level, state.foundWords],
+    () => (level.levelNumber > 2
+      ? []
+      : detectAlmostWords(state.level, state.foundWords, LOCALE_CONFIGS[state.level.locale])),
+    [state.level, state.foundWords, level.levelNumber],
   );
   const [revealGlowCells, setRevealGlowCells] = useState<CellId[]>([]);
   // Tutorial-only: auto-glow the next formable word on L1–L2. Past L2 the board
@@ -141,6 +153,91 @@ export function BlastGame({
   }, [state.foundWords, state.level, state.status, level.levelNumber]);
   const { state: progressState, clearLevel, openChest, openMutation } = useBlastProgress();
   const [showChestModal, setShowChestModal] = useState(false);
+  const [showUndoAdModal, setShowUndoAdModal] = useState(false);
+  const config = LOCALE_CONFIGS[level.locale];
+
+  // Async dictionary fallback. The local validator rejects with reason='unknown'
+  // for any non-theme word. We then ask /api/dictionary/check whether the
+  // candidate is a real word; if it is, we retroactively credit it as a bonus
+  // match via onForceBonus. Lets the player claim ANY valid dictionary word
+  // on the board instead of being stuck on the curated chain.
+  const dictRetryLockRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (state.lastValidation?.kind !== 'reject') return;
+    if (state.lastValidation.reason !== 'unknown') return;
+    const cells = state.lastRejectedCells;
+    if (cells.length < 2) return;
+
+    // Read letters from the level state that produced this rejection. Forward
+    // and reversed both checked — the rejection didn't pick a direction.
+    const letters = cells.map((id) => {
+      const { col, row } = parseCell(id);
+      const colObj = state.level.columns.find((c) => c.index === col);
+      return colObj?.tiles[row] ?? '';
+    });
+    const forward = config.normalize(letters.join(''));
+    const reversed = config.normalize(letters.slice().reverse().join(''));
+    if (!forward) return;
+
+    // De-dup retries: don't re-check the same word twice in a row. invalidShakeKey
+    // changes on every reject so we key the lock on it instead of the cells.
+    const key = `${state.invalidShakeKey}:${forward}|${reversed}`;
+    if (dictRetryLockRef.current === key) return;
+    dictRetryLockRef.current = key;
+
+    let cancelled = false;
+    (async () => {
+      const [fOk, rOk] = await Promise.all([
+        verifyDictionary(forward),
+        forward === reversed ? Promise.resolve(false) : verifyDictionary(reversed),
+      ]);
+      if (cancelled) return;
+      const accepted = fOk ? forward : rOk ? reversed : null;
+      if (accepted) {
+        handlers.onForceBonus(cells, accepted);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    state.lastValidation,
+    state.lastRejectedCells,
+    state.invalidShakeKey,
+    state.level.columns,
+    config,
+    verifyDictionary,
+    handlers,
+  ]);
+
+  // Rewarded-ad gate for additional undos. After the player burns through
+  // FREE_UNDO_LIMIT free undos, the next undo opens a confirmation modal;
+  // watching the ad refreshes the budget for two more free reverses.
+  const rewardedAd = useRewardedAd({
+    surface: 'retry',
+    rewardKind: 'feature',
+    onRewardEarned: () => {
+      handlers.onRewardedUndoGranted();
+      handlers.onUndo();
+      setShowUndoAdModal(false);
+    },
+    onAdError: () => {
+      // Ad failed to load — let the player undo anyway rather than soft-locking
+      // them. The free counter still resets so future undos behave normally.
+      handlers.onRewardedUndoGranted();
+      handlers.onUndo();
+      setShowUndoAdModal(false);
+    },
+  });
+
+  const handleUndoPressed = useCallback(() => {
+    if (state.needsRewardedAdForUndo) {
+      setShowUndoAdModal(true);
+      return;
+    }
+    handlers.onUndo();
+  }, [state.needsRewardedAdForUndo, handlers]);
   // Idempotency: one submission per level — prevents retry loop on state-feedback re-renders.
   const submittedRef = useRef(false);
   const submissionIdRef = useRef<string | null>(null);
@@ -382,7 +479,7 @@ export function BlastGame({
         targetWords={level.words}
         foundWords={Array.from(state.foundWords)}
         canUndo={state.canUndo && state.status === 'playing'}
-        onUndo={handlers.onUndo}
+        onUndo={handleUndoPressed}
         onHint={() => {
           /* Plan 5 wires hints */
         }}
@@ -435,6 +532,12 @@ export function BlastGame({
           onComplete={handleFtueComplete}
         />
       )}
+      <BlastUndoAdModal
+        isOpen={showUndoAdModal}
+        modeColor={modeColor}
+        onWatchAd={() => rewardedAd.showAd()}
+        onCancel={() => setShowUndoAdModal(false)}
+      />
     </div>
   );
 }
