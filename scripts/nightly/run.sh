@@ -238,15 +238,16 @@ for attempt in 1 2; do
     cd fe-next
     npm run test 2>&1 | tail -30
   ) >> "$RUN_LOG" 2>&1 || { log "test failed (attempt $attempt)"; continue; }
-  # Clean Turbopack cache before build:fast — stale .next from prior runs (or
-  # from interactive dev sessions) poisons the build with phantom SSR errors
-  # (e.g., "AvatarUidContext / AvatarEyeColorContext SSR" trace). Confirmed
-  # empirically: rm -rf .next .turbo recovered build from a failed→passing
-  # state without any code change.
+  # Build into an ISOLATED dir (.next-nightly via NEXT_BUILD_DIR, honoured by
+  # next.config.mjs). A running `npm run dev` server continuously writes .next;
+  # sharing it raced the build into phantom "AvatarUidContext/AvatarEyeColorContext
+  # SSR" errors and failed the gate on 2026-05-20. Isolating the dir means the
+  # nightly build can NEVER collide with an active dev session — mid-day or 02:30.
+  # We rm only our own dir (never the dev server's .next). Start clean each attempt.
   (
     cd fe-next
-    rm -rf .next .turbo 2>/dev/null
-    npm run build:fast 2>&1 | tail -30
+    rm -rf .next-nightly 2>/dev/null
+    NEXT_BUILD_DIR=.next-nightly npm run build:fast 2>&1 | tail -30
   ) >> "$RUN_LOG" 2>&1 || { log "build failed (attempt $attempt)"; continue; }
   gate_ok=1
   break

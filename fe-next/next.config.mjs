@@ -30,6 +30,14 @@ const isCrazyGamesForceDisabled = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED ===
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Build output dir. Default '.next'. The nightly improvement loop overrides it
+  // via NEXT_BUILD_DIR=.next-nightly so its `next build` writes to a separate dir
+  // and can NEVER collide with a running `npm run dev` server (which continuously
+  // writes .next) — that shared-cache race produced phantom Avatar SSR build
+  // errors and failed the nightly gate on 2026-05-20. Dev and Railway prod leave
+  // NEXT_BUILD_DIR unset → '.next', so their behaviour is unchanged.
+  distDir: process.env.NEXT_BUILD_DIR || '.next',
+
   // Standalone output for minimal Docker images.
   // The custom Express server is bundled separately by esbuild (dist/server.cjs),
   // so standalone's server.js is unused — we only want the minimal node_modules.
