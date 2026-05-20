@@ -694,11 +694,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         logger.debug('[RESULTS] resetGame callback timed out — attempting startGame anyway');
         socket.emit('startGame', {
           letterGrid: gridForGame,
-          timerSeconds: 120,
           language: roomLanguage,
           hostPlaying: true,
-          minWordLength: 2,
-          difficulty: 'MEDIUM',
           boardTheme: null,
           gameMode: selectedGameMode,
         });
@@ -715,11 +712,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
         socket.emit('startGame', {
           letterGrid: gridForGame,
-          timerSeconds: 120,
           language: roomLanguage,
           hostPlaying: true,
-          minWordLength: 2,
-          difficulty: 'MEDIUM',
           boardTheme: null,
           gameMode: selectedGameMode,
         });

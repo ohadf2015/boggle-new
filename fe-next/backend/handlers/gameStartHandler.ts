@@ -223,6 +223,17 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       return;
     }
 
+    // Rematch preservation: a rematch (ResultsPage) omits these fields, and
+    // resetGameForNewRound below wipes game.minWordLength — so snapshot the
+    // prior round's settings now and use them as fallbacks when the payload
+    // doesn't specify them. Keeps the host's chosen timer/difficulty/min-word
+    // across rounds instead of silently reverting to defaults.
+    const priorTimerSeconds = game.timerSeconds;
+    const priorDifficulty = game.difficulty;
+    const priorMinWordLength = game.minWordLength;
+    const effectiveDifficulty = difficulty ?? priorDifficulty ?? DEFAULT_DIFFICULTY;
+    const effectiveMinWordLength = minWordLength ?? priorMinWordLength ?? 2;
+
     // Mutex: prevent concurrent startGame flows for the same game
     if (gamesStarting.has(gameCode)) {
       logger.debug('SOCKET', `Rejected duplicate startGame for ${gameCode} (mutex held)`);
@@ -309,7 +320,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       resolvedMode === 'blast' ? BLAST_MP_DEFAULT_TIMER :
       resolvedMode === 'wheel-rush' ? WHEEL_RUSH_DURATION_SEC :
       120;
-    let validTimer = Math.max(30, Math.min(600, rawTimer || timerFallback));
+    let validTimer = Math.max(30, Math.min(600, rawTimer || priorTimerSeconds || timerFallback));
 
     // Defense-in-depth: explicit blast pick (or any path that bypassed the pool
     // filter) must still pass the access gate. blastAllowed was resolved above.
@@ -401,7 +412,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // Grid size honors host difficulty (EASY=5x5, MEDIUM=6x6, HARD=7x7).
     // Blast mode forces 6x6 regardless to keep its tile economy balanced.
     // Regenerate server-side for MP (anti-cheat) or when client sent no grid.
-    const dim = DIFFICULTIES[difficulty || DEFAULT_DIFFICULTY];
+    const dim = DIFFICULTIES[effectiveDifficulty];
     const gridRows = resolvedMode === 'blast' ? 6 : dim.rows;
     const gridCols = resolvedMode === 'blast' ? 6 : dim.cols;
     if (playerCount >= 2 || !letterGrid || letterGrid.length === 0) {
@@ -421,8 +432,8 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       remainingTime: validTimer,
       gameDuration: validTimer,
       language: gameLang,
-      minWordLength: minWordLength || 2,
-      difficulty: difficulty || 'MEDIUM',
+      minWordLength: effectiveMinWordLength,
+      difficulty: effectiveDifficulty,
       gameStartedAt: Date.now(),
       boardTheme: boardTheme || null,
       lessonVocabulary: lessonVocabulary,
@@ -545,7 +556,6 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     }
 
     const messageId = gameStartCoordinator.initializeSequence(gameCode, humanUsernames, timerSeconds);
-    const effectiveMinWordLength = minWordLength || 2;
 
     // Broadcast start
     broadcastToRoom(io, getGameRoom(gameCode), 'startGame',

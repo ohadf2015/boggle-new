@@ -948,4 +948,57 @@ describe('registerStartGameHandler', () => {
       );
     });
   });
+
+  // ─── Rematch settings preservation ───────────────────────────────────
+
+  describe('rematch settings preservation', () => {
+    it('preserves prior round difficulty/minWordLength/timerSeconds when payload omits them (MP rematch)', async () => {
+      // GIVEN: game in 'finished' state with prior settings
+      const game = makeGame({
+        gameState: 'finished',
+        difficulty: 'HARD',
+        minWordLength: 3,
+        timerSeconds: 180,
+        users: {
+          Host: { socketId: 'socket-host', isHost: true },
+          Player2: { socketId: 'socket-p2', isHost: false },
+        },
+      });
+      mockGetGame.mockReturnValue(game);
+      mockCanTransitionGameState.mockReturnValueOnce(false); // finished → needs reset
+      mockCanTransitionGameState.mockReturnValueOnce(true);   // second check for START transition
+
+      // Mock resetGameForNewRound to simulate real wipe of minWordLength
+      mockResetGameForNewRound.mockImplementation(() => {
+        game.minWordLength = undefined;
+        return true;
+      });
+
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      // WHEN: startGame payload omits difficulty, minWordLength, timerSeconds (like ResultsPage rematch)
+      const payload = makePayload({
+        gameMode: 'classic',
+        difficulty: undefined,
+        minWordLength: undefined,
+        timerSeconds: undefined,
+      });
+      delete (payload as any).difficulty;
+      delete (payload as any).minWordLength;
+      delete (payload as any).timerSeconds;
+
+      await triggerStartGame(handlers, payload);
+
+      // THEN: updateGame called with PRESERVED prior settings (not defaults)
+      expect(mockUpdateGame).toHaveBeenCalledWith(
+        'GAME1',
+        expect.objectContaining({
+          difficulty: 'HARD',
+          minWordLength: 3,
+          timerSeconds: 180,
+        })
+      );
+    });
+  });
 });
