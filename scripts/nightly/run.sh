@@ -111,6 +111,9 @@ revert_to_pre_lane() {
 # --- preflight -------------------------------------------------------------
 # shellcheck disable=SC1091
 . "$LIB_DIR/preflight.sh"
+# commit+push hardening (divergence/generated-file). Tested by test/git-ship.test.sh.
+# shellcheck disable=SC1091
+. "$LIB_DIR/git-ship.sh"
 log "========================================"
 log "nightly-loop start ${DATE_TAG} dry=$DRY_RUN no-push=$NO_PUSH only=$ONLY skip=$SKIP"
 log "========================================"
@@ -285,67 +288,12 @@ EOF
     NEW_SHA="DRY-RUN-${START_SHA:0:7}"
     rm -f "$MSG_FILE"
   else
-    git add -A
-    # Drop volatile generated artifacts a lane may have incidentally regenerated.
-    # fe-next/scripts/translation-report.json (find-missing-translations.js output)
-    # is tracked but content-volatile — committing it adds noise AND guarantees a
-    # rebase conflict whenever a concurrent commit regenerates the same file. This
-    # stranded the 2026-05-20 nightly push (origin's i18n fix regenerated it during
-    # the run). It is never an intended lane change. Unstage + restore so the next
-    # run's preflight doesn't see a dirty tree. See memory nightly-improvement-loop.
-    if git diff --cached --name-only | grep -qx 'fe-next/scripts/translation-report.json'; then
-      git reset -q HEAD -- fe-next/scripts/translation-report.json
-      git checkout -q -- fe-next/scripts/translation-report.json 2>/dev/null || true
-      log "excluded volatile fe-next/scripts/translation-report.json from commit"
-    fi
-
-    if git diff --cached --quiet; then
-      log "nothing to commit after excluding generated artifacts — treating as no-change"
-      echo -e "\n**Outcome:** no shippable changes (lanes touched only volatile generated files)." >> "$REPORT"
-      NEW_SHA="$START_SHA"
-      NO_CHANGE_MODE=1
-      rm -f "$MSG_FILE"
-    else
-      git commit -F "$MSG_FILE" >> "$RUN_LOG" 2>&1 || {
-        log "commit failed (likely pre-commit hook). See log."
-        tg_alert "nightly $TODAY: commit failed — pre-commit hook? See \`$RUN_LOG\`."
-        exit 1
-      }
-      NEW_SHA=$(git rev-parse HEAD)
-      log "committed $NEW_SHA"
-      rm -f "$MSG_FILE"
-
-      if [ "$NO_PUSH" = "1" ]; then
-        log "--no-push — skipping push (will still compose + send summary)"
-        echo -e "\n**Outcome:** committed \`$NEW_SHA\` locally (not pushed)." >> "$REPORT"
-      else
-        log "pushing master..."
-        if git push origin master >> "$RUN_LOG" 2>&1; then
-          log "pushed $NEW_SHA"
-          echo -e "\n**Outcome:** ✅ shipped \`$NEW_SHA\`" >> "$REPORT"
-        else
-          # Push rejected — almost always origin advanced during the ~60-min run.
-          # Our commit is already gate-vetted, so rebase onto origin + retry once.
-          log "push rejected — fetch+rebase onto origin/master, retry once"
-          if git fetch origin master --quiet \
-             && git rebase origin/master >> "$RUN_LOG" 2>&1 \
-             && git push origin master >> "$RUN_LOG" 2>&1; then
-            NEW_SHA=$(git rev-parse HEAD)
-            log "pushed after rebase $NEW_SHA"
-            echo -e "\n**Outcome:** ✅ shipped \`$NEW_SHA\` (rebased onto origin first)" >> "$REPORT"
-          else
-            conflict=$(git diff --name-only --diff-filter=U 2>/dev/null | head -3 | tr '\n' ' ')
-            git rebase --abort 2>/dev/null || true
-            log "push failed after rebase retry (conflict: ${conflict:-unknown})"
-            # backtick-wrap the filename(s): tg uses parse_mode=Markdown and most
-            # repo paths contain `_` (e.g. __tests__, snake_case) which would 400
-            # the send and drop the alert. Code-span protects them.
-            tg_alert "nightly $TODAY: push failed — rebase conflicted on \`${conflict:-unknown}\`. Local commit \`$NEW_SHA\` kept. See \`$RUN_LOG\`."
-            exit 1
-          fi
-        fi
-      fi
-    fi
+    # Commit + push with divergence/generated-file hardening. The whole block was
+    # extracted to lib/git-ship.sh and is proven by test/git-ship.test.sh across 5
+    # scenarios (clean push, non-overlap rebase, generated-file exclusion, no-change
+    # guard, genuine-conflict fail-safe). On unrecoverable failure it has already
+    # alerted + preserved a clean tree, so we just exit.
+    ship_nightly_commit || exit 1
   fi
 fi
 

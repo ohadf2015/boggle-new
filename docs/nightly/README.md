@@ -68,7 +68,7 @@ launchd `com.claude.nightly-loop` at 00:00 local fires `scripts/nightly/run.sh` 
 |---|---|
 | Telegram silent at 00:30 | `~/logs/lexi-nightly/launchd-stderr.log` |
 | Lane failed | `~/logs/lexi-nightly/run-*.log` → search `LANE n FAILED` |
-| Push rejected | `git fetch && git status` — divergence; ff-only protection caught it |
+| Push rejected | Self-heals: `lib/git-ship.sh` excludes volatile generated files + rebases onto origin + retries. Genuine same-file conflicts fail visibly (Telegram names the file, local commit kept, tree clean). Verify the logic any time you touch it: `bash scripts/nightly/test/git-ship.test.sh` (5 real-git scenarios, must be ALL GREEN) |
 | Build failed twice | The night's report writes `RUN-FAILED` and lists the error; lane diffs were not committed |
 | Sentry/PostHog spike alert at 00:45 | Background `health-monitor.sh` flagged >2× baseline; `git log -1` + `git revert` if needed |
 | MCP "Needs authentication" | Re-auth via Claude Code interactively: `claude` then `/mcp` |
