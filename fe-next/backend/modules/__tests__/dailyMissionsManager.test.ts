@@ -3,7 +3,8 @@
  */
 
 import { vi } from 'vitest';
-import { getDailyMissions, completeMission, checkAndClaimGrandSlam, markCelebrated, GRAND_SLAM_COIN_REWARD } from '../dailyMissionsManager';
+import { getDailyMissions, completeMission, completeMissionForMode, checkAndClaimGrandSlam, markCelebrated, GRAND_SLAM_COIN_REWARD } from '../dailyMissionsManager';
+import { getDailyQuestModes } from '../../../shared/dailyQuestPool';
 
 const { mockAwardCoins } = vi.hoisted(() => {
   const mockAwardCoins = vi.fn();
@@ -156,6 +157,49 @@ describe('completeMission', () => {
     const result = await completeMission(PLAYER_ID, 'word_hunt');
 
     expect(result.wordHunt).toBe(true);
+  });
+});
+
+describe('completeMissionForMode', () => {
+  // SLOT_COLUMNS = [word_hunt_completed, adventure_completed, community_completed].
+  // The mode that fills each slot rotates daily, so a mode MUST be credited to
+  // the column for the slot it occupies *that day* — never a hardcoded column.
+  // Regression guard for: completing the Word Hunt daily challenge marked
+  // word_hunt_completed (slot 0) statically; on days where slot 0 is the
+  // `multiplayer` mode the UI then showed "finished mp game".
+  const SLOT_COLUMNS = ['word_hunt_completed', 'adventure_completed', 'community_completed'] as const;
+
+  function setupCompleteMissionChain() {
+    // getDailyMissions (ensure row) + getDailyMissions (return updated) both read maybeSingle
+    mockMaybeSingle.mockResolvedValue({ data: EMPTY_ROW, error: null });
+    // update().eq().eq() resolves with no error
+    mockUpdate.mockReturnValue({
+      eq: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+    });
+  }
+
+  it('credits wordHunt to the slot column it occupies today, not always word_hunt_completed', async () => {
+    // 2026-05-20: modes = [multiplayer, wordHunt, brainDrills] → wordHunt is slot 1
+    const DATE = '2026-05-20';
+    const slot = getDailyQuestModes(DATE).indexOf('wordHunt');
+    expect(slot).toBe(1); // pins the fixture so the assertion below is meaningful
+    setupCompleteMissionChain();
+
+    await completeMissionForMode('player-123', 'wordHunt', DATE);
+
+    expect(mockUpdate).toHaveBeenCalledWith({ adventure_completed: true });
+    expect(mockUpdate).not.toHaveBeenCalledWith({ word_hunt_completed: true });
+  });
+
+  it('credits multiplayer to the slot column it occupies today', async () => {
+    // 2026-05-20: multiplayer is slot 0 → word_hunt_completed
+    const DATE = '2026-05-20';
+    const slot = getDailyQuestModes(DATE).indexOf('multiplayer');
+    setupCompleteMissionChain();
+
+    await completeMissionForMode('player-123', 'multiplayer', DATE);
+
+    expect(mockUpdate).toHaveBeenCalledWith({ [SLOT_COLUMNS[slot]]: true });
   });
 });
 
