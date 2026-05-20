@@ -4983,6 +4983,17 @@ const sv = {
     }
   },
   "practice": {
+    "hub": {
+      "title": "Övningsarenan",
+      "subtitle": "Bemästra alla 3 lägen för att låsa upp det riktiga spelet",
+      "progress": "{count}/{total} klart",
+      "tip": {
+        "start": "Börja med Ordjakt — det lär dig att läsa ledtrådar",
+        "one": "Bra start! Klassiskt läge näst — ren snabbhetsträning",
+        "two": "Nästan framme! Överlevnadsläge = ultimat utmaning",
+        "done": "Alla lägen bemästrade! Redo för riktig tävling!"
+      }
+    },
     "instructions": {
       "title": "Så spelar du",
       "scoringLabel": "Poäng",
@@ -5012,6 +5023,23 @@ const sv = {
       "doubleLetterDesc": "Ord med dubbla bokstäver",
       "sWords": "S-ord",
       "sWordsDesc": "Ord som börjar på S"
+    },
+    "tips": {
+      "classic": {
+        "line1": "Dra för att koppla bokstäver",
+        "line2": "Längre ord ger mer poäng",
+        "line3": "Hitta så många du kan"
+      },
+      "wordHunt": {
+        "line1": "Ett dolt ord per runda",
+        "line2": "Tryck på bokstäver för att gissa",
+        "line3": "Du har några försök"
+      },
+      "wheelRush": {
+        "line1": "Varje ord använder mitten",
+        "line2": "Dra bokstäver för att bygga ord",
+        "line3": "Slå klockan"
+      }
     },
     "header": "Övningsläge",
     "again": "Igen",
@@ -5077,7 +5105,8 @@ const sv = {
       "playRealCta": "Spela riktiga spelet →",
       "shortWordTip": "{word} är för kort. I riktiga Word Hunt behövs {min}+ bokstäver, annars förlorar du ett liv.",
       "discoveryHint": "Bonusord! Ledtrådsbokstäver avslöjade.",
-      "discoveryTipNoClue": "Giltigt ord — men inga målbokstäver avslöjade. Prova längre gissningar!"
+      "discoveryTipNoClue": "Giltigt ord — men inga målbokstäver avslöjade. Prova längre gissningar!",
+      "discoveryTip": "Tryck på bokstäver för att gissa"
     },
     "complete": {
       "title": "Läget klart!",
@@ -10307,6 +10336,11 @@ const sv = {
       "correctCount": "{{count}} rätt",
       "definition": "Betydelse",
       "dontKnow": "Hoppa över",
+      "mastery": {
+        "started": "Påbörjad",
+        "practicing": "Övar",
+        "mastered": "Bemästrad"
+      },
       "encouragement0": "Försök igen!",
       "encouragement100": "Perfekt!",
       "encouragement50": "Bra!",
@@ -10981,19 +11015,6 @@ const sv = {
       "title": "Första gången? Välkommen.",
       "body": "Tre lugna uppvärmningar, inga poäng, ingen klocka. Tryck på en ruta för att börja.",
       "startHere": "Börja här"
-    }
-  },
-  "practice": {
-    "hub": {
-      "title": "Övningsarenan",
-      "subtitle": "Bemästra alla 3 lägen för att låsa upp det riktiga spelet",
-      "progress": "{count}/{total} klart",
-      "tip": {
-        "start": "Börja med Ordjakt — det lär dig att läsa ledtrådar",
-        "one": "Bra start! Klassiskt läge näst — ren snabbhetsträning",
-        "two": "Nästan framme! Överlevnadsläge = ultimat utmaning",
-        "done": "Alla lägen bemästrade! Redo för riktig tävling!"
-      }
     }
   },
   "practiceBadge": {

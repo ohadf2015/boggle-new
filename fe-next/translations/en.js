@@ -5056,14 +5056,22 @@ const en = {
     "again": "Practice again",
     "allDone": "All done!",
     "classic": {
-      "notAWord": "Not a word"
+      "notAWord": "Not a word",
+      "playRealCta": "Play Classic now"
     },
     "coach": {
       "dismiss": "Dismiss",
       "label": "Coach"
     },
     "complete": {
-      "title": "Practice complete!"
+      "title": "Practice complete!",
+      "classic": "Classic",
+      "wordHunt": "Word Hunt",
+      "wheelRush": "Wheel Rush"
+    },
+    "continueTo": {
+      "wordHunt": "Next: Word Hunt",
+      "wheelRush": "Next: Wheel Rush"
     },
     "endRun": "End run",
     "instructions": {
@@ -5073,11 +5081,44 @@ const en = {
     "keepPracticing": "Keep practicing",
     "mistakeCoach": {
       "ariaLabel": "Coaching tip",
-      "cta": "Got it"
+      "cta": "Got it",
+      "notAWord": {
+        "title": "Not a word yet",
+        "body": "That combo isn't in our dictionary — try another path."
+      },
+      "notAdjacent": {
+        "title": "Letters must connect",
+        "body": "Pick letters that touch — side by side or corner to corner."
+      },
+      "diagonalsOk": {
+        "title": "Diagonals count!",
+        "body": "You can link letters across corners, not just straight lines."
+      },
+      "needsCenter": {
+        "title": "Use the center letter",
+        "body": "Every word must include the middle letter."
+      }
     },
     "modifier": {
       "bonus": "{x}× bonus",
       "todayLabel": "Today's modifier"
+    },
+    "tips": {
+      "classic": {
+        "line1": "Drag to connect letters",
+        "line2": "Longer words score more",
+        "line3": "Find as many as you can"
+      },
+      "wordHunt": {
+        "line1": "One hidden word per round",
+        "line2": "Tap letters to guess it",
+        "line3": "You get a few tries"
+      },
+      "wheelRush": {
+        "line1": "Every word uses the center",
+        "line2": "Drag letters to build words",
+        "line3": "Beat the clock"
+      }
     },
     "wheelRush": {
       "builderHint": "Drag letters to build a word",
@@ -5087,7 +5128,8 @@ const en = {
       "notAWord": "Not a word",
       "reset": "Reset",
       "scoreChip": "+{score}",
-      "shuffle": "Shuffle"
+      "shuffle": "Shuffle",
+      "playRealCta": "Play Wheel Rush now"
     },
     "wordHunt": {
       "discoveryHint": "Find the hidden word",
@@ -5096,7 +5138,9 @@ const en = {
       "goalChip": "Goal: {word}",
       "livesNote": "You get {max} tries",
       "realGameLabel": "Real game",
-      "shortWordTip": "Try a longer word"
+      "shortWordTip": "Try a longer word",
+      "playRealCta": "Play Word Hunt now",
+      "bailoutCta": "Skip to real game"
     }
   },
   "practiceSwipe": {
@@ -10247,6 +10291,11 @@ const en = {
       "correctCount": "{{count}} correct",
       "definition": "Definition",
       "dontKnow": "Skip",
+      "mastery": {
+        "started": "Started",
+        "practicing": "Practicing",
+        "mastered": "Mastered"
+      },
       "encouragement0": "Keep trying!",
       "encouragement100": "Perfect score!",
       "encouragement50": "Good effort!",

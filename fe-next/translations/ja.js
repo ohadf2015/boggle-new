@@ -4968,6 +4968,17 @@ const ja = {
     }
   },
   "practice": {
+    "hub": {
+      "title": "練習アリーナ",
+      "subtitle": "3つのモードをマスターしてリアルゲームを解放しよう",
+      "progress": "{count}/{total} 完了",
+      "tip": {
+        "start": "ワードハントから始めよう — ヒントの読み方を学べます",
+        "one": "いいスタート！次はクラシックモード — スピードトレーニング",
+        "two": "もうすぐ！サバイバルモード = 究極のチャレンジ",
+        "done": "全モードマスター！本物の競争の準備完了！"
+      }
+    },
     "instructions": {
       "title": "あそびかた",
       "scoringLabel": "スコア",
@@ -4997,6 +5008,23 @@ const ja = {
       "doubleLetterDesc": "同じ文字が連続する単語",
       "sWords": "Sの単語",
       "sWordsDesc": "Sで始まる単語"
+    },
+    "tips": {
+      "classic": {
+        "line1": "なぞって文字をつなげよう",
+        "line2": "長い単語ほど高得点",
+        "line3": "できるだけ多く見つけよう"
+      },
+      "wordHunt": {
+        "line1": "1ラウンドに隠れた単語1つ",
+        "line2": "文字をタップして推測",
+        "line3": "数回チャレンジできる"
+      },
+      "wheelRush": {
+        "line1": "毎回中央の文字を使う",
+        "line2": "文字をドラッグして単語を作る",
+        "line3": "時間内にクリア"
+      }
     },
     "header": "練習モード",
     "again": "もう一度",
@@ -5062,7 +5090,8 @@ const ja = {
       "playRealCta": "本番をプレイ →",
       "shortWordTip": "{word} は短すぎます。本番では{min}文字以上必要、足りないとライフを失います。",
       "discoveryHint": "ボーナスワード発見！ヒント文字が表示されました。",
-      "discoveryTipNoClue": "有効な単語ですが、ターゲットの文字は出ませんでした。もっと長い単語を試して！"
+      "discoveryTipNoClue": "有効な単語ですが、ターゲットの文字は出ませんでした。もっと長い単語を試して！",
+      "discoveryTip": "文字をタップして推測"
     },
     "complete": {
       "title": "モード完了！",
@@ -10333,6 +10362,11 @@ const ja = {
       "correctCount": "{{count}}問正解",
       "definition": "定義",
       "dontKnow": "スキップ",
+      "mastery": {
+        "started": "開始",
+        "practicing": "練習中",
+        "mastered": "習得済み"
+      },
       "encouragement0": "ドンマイ！続ければ必ず上達する！",
       "encouragement100": "パーフェクト！",
       "encouragement50": "いい感じ！",
@@ -10955,19 +10989,6 @@ const ja = {
       "title": "はじめて？ようこそ。",
       "body": "静かなウォームアップ3つ、スコアなし、時計なし。タイルをタップして始めましょう。",
       "startHere": "ここから始める"
-    }
-  },
-  "practice": {
-    "hub": {
-      "title": "練習アリーナ",
-      "subtitle": "3つのモードをマスターしてリアルゲームを解放しよう",
-      "progress": "{count}/{total} 完了",
-      "tip": {
-        "start": "ワードハントから始めよう — ヒントの読み方を学べます",
-        "one": "いいスタート！次はクラシックモード — スピードトレーニング",
-        "two": "もうすぐ！サバイバルモード = 究極のチャレンジ",
-        "done": "全モードマスター！本物の競争の準備完了！"
-      }
     }
   },
   "practiceBadge": {

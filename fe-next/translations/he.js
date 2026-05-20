@@ -5081,14 +5081,22 @@ const he = {
     "again": "תרגל שוב",
     "allDone": "סיימת!",
     "classic": {
-      "notAWord": "לא מילה"
+      "notAWord": "לא מילה",
+      "playRealCta": "שחק קלאסי עכשיו"
     },
     "coach": {
       "dismiss": "סגור",
       "label": "מאמן"
     },
     "complete": {
-      "title": "התרגול הושלם!"
+      "title": "התרגול הושלם!",
+      "classic": "קלאסי",
+      "wordHunt": "ציד מילים",
+      "wheelRush": "ריצת גלגל"
+    },
+    "continueTo": {
+      "wordHunt": "הבא: ציד מילים",
+      "wheelRush": "הבא: ריצת גלגל"
     },
     "endRun": "סיים סבב",
     "instructions": {
@@ -5098,11 +5106,44 @@ const he = {
     "keepPracticing": "המשך לתרגל",
     "mistakeCoach": {
       "ariaLabel": "טיפ אימון",
-      "cta": "הבנתי"
+      "cta": "הבנתי",
+      "notAWord": {
+        "title": "עדיין לא מילה",
+        "body": "הצירוף הזה לא קיים במילון שלנו — נסה דרך אחרת."
+      },
+      "notAdjacent": {
+        "title": "האותיות חייבות להתחבר",
+        "body": "בחר אותיות צמודות — זו לצד זו או בפינה."
+      },
+      "diagonalsOk": {
+        "title": "אלכסונים נחשבים!",
+        "body": "אפשר לחבר אותיות באלכסון, לא רק בקו ישר."
+      },
+      "needsCenter": {
+        "title": "השתמש באות המרכזית",
+        "body": "כל מילה חייבת לכלול את האות האמצעית."
+      }
     },
     "modifier": {
       "bonus": "בונוס {x}×",
       "todayLabel": "המאפיין של היום"
+    },
+    "tips": {
+      "classic": {
+        "line1": "גרור כדי לחבר אותיות",
+        "line2": "מילים ארוכות שוות יותר",
+        "line3": "מצא כמה שיותר מילים"
+      },
+      "wordHunt": {
+        "line1": "מילה נסתרת אחת בכל סבב",
+        "line2": "הקש על אותיות לניחוש",
+        "line3": "יש לך כמה ניסיונות"
+      },
+      "wheelRush": {
+        "line1": "כל מילה כוללת את האות המרכזית",
+        "line2": "גרור אותיות לבניית מילים",
+        "line3": "נצח את השעון"
+      }
     },
     "wheelRush": {
       "builderHint": "גרור אותיות לבניית מילה",
@@ -5112,7 +5153,8 @@ const he = {
       "notAWord": "לא מילה",
       "reset": "אפס",
       "scoreChip": "+{score}",
-      "shuffle": "ערבב"
+      "shuffle": "ערבב",
+      "playRealCta": "שחק ריצת גלגל עכשיו"
     },
     "wordHunt": {
       "discoveryHint": "מצא את המילה הנסתרת",
@@ -5121,7 +5163,9 @@ const he = {
       "goalChip": "מטרה: {word}",
       "livesNote": "יש לך {max} ניסיונות",
       "realGameLabel": "משחק אמיתי",
-      "shortWordTip": "נסה מילה ארוכה יותר"
+      "shortWordTip": "נסה מילה ארוכה יותר",
+      "playRealCta": "שחק ציד מילים עכשיו",
+      "bailoutCta": "דלג למשחק האמיתי"
     }
   },
   "practiceSwipe": {
@@ -10594,6 +10638,11 @@ const he = {
       "correctCount": "{{count}} נכונות",
       "definition": "הגדרה",
       "dontKnow": "דלג",
+      "mastery": {
+        "started": "התחלת",
+        "practicing": "בתרגול",
+        "mastered": "שלטת"
+      },
       "encouragement0": "ממשיכים! 💪",
       "encouragement100": "ציון מושלם! 🌟",
       "encouragement50": "יפה, עוד קצת!",

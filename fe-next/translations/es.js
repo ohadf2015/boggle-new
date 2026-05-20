@@ -5028,6 +5028,17 @@ const es = {
     }
   },
   "practice": {
+    "hub": {
+      "title": "Arena de Práctica",
+      "subtitle": "Domina los 3 modos para desbloquear el juego real",
+      "progress": "{count}/{total} completado",
+      "tip": {
+        "start": "Empieza con Caza Palabras — enseña a leer pistas",
+        "one": "¡Buen comienzo! Modo Clásico a continuación — entrenamiento de velocidad",
+        "two": "¡Casi! Modo Supervivencia = desafío definitivo",
+        "done": "¡Todos los modos dominados! ¡Listo para competencia real!"
+      }
+    },
     "instructions": {
       "title": "Cómo jugar",
       "scoringLabel": "Puntuación",
@@ -5063,6 +5074,23 @@ const es = {
       "doubleLetterDesc": "Palabras con letras dobles",
       "sWords": "Palabras con S",
       "sWordsDesc": "Palabras que empiezan con S"
+    },
+    "tips": {
+      "classic": {
+        "line1": "Arrastra para conectar letras",
+        "line2": "Las palabras largas valen más",
+        "line3": "Encuentra todas las que puedas"
+      },
+      "wordHunt": {
+        "line1": "Una palabra oculta por ronda",
+        "line2": "Toca letras para adivinar",
+        "line3": "Tienes varios intentos"
+      },
+      "wheelRush": {
+        "line1": "Cada palabra usa el centro",
+        "line2": "Arrastra letras para formar palabras",
+        "line3": "Vence al reloj"
+      }
     },
     "header": "Practica",
     "again": "De nuevo",
@@ -10391,6 +10419,11 @@ const es = {
       "correctCount": "{{count}} correctas",
       "definition": "Definición",
       "dontKnow": "Saltar",
+      "mastery": {
+        "started": "Iniciado",
+        "practicing": "Practicando",
+        "mastered": "Dominado"
+      },
       "encouragement0": "¡Sigue así!",
       "encouragement100": "¡Perfecto!",
       "encouragement50": "¡Muy bien!",
@@ -10883,19 +10916,6 @@ const es = {
       "title": "¿Primera vez? Bienvenido.",
       "body": "Tres calentamientos tranquilos, sin puntaje, sin reloj. Toca un mosaico para comenzar.",
       "startHere": "Empieza aquí"
-    }
-  },
-  "practice": {
-    "hub": {
-      "title": "Arena de Práctica",
-      "subtitle": "Domina los 3 modos para desbloquear el juego real",
-      "progress": "{count}/{total} completado",
-      "tip": {
-        "start": "Empieza con Caza Palabras — enseña a leer pistas",
-        "one": "¡Buen comienzo! Modo Clásico a continuación — entrenamiento de velocidad",
-        "two": "¡Casi! Modo Supervivencia = desafío definitivo",
-        "done": "¡Todos los modos dominados! ¡Listo para competencia real!"
-      }
     }
   },
   "practiceBadge": {
