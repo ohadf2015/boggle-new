@@ -1,14 +1,18 @@
 'use client';
 
 /**
- * Per-route status bar tint for Capacitor Android (and iOS).
+ * Per-route status bar icon tint for Capacitor Android (and iOS).
  *
- * Each game mode owns a brand color family. Tinting the system status bar to
- * match the active route is the kind of micro-detail that signals a
- * native-grade build — Wordle, Subway Surfers, Marvel Snap all do this.
+ * The bars themselves are transparent (edge-to-edge: see MainActivity
+ * EdgeToEdge.enable) so each route's own brand-colored bg shows through. What
+ * this hook tunes is the bar *icon* contrast: each game mode owns a brand color
+ * family, and we flip the bar icons light/dark based on that color's luminance
+ * so they stay legible against whatever the route paints behind them — the kind
+ * of micro-detail that signals a native-grade build.
  *
- * Bar style auto-flips to light/dark text based on luminance of the chosen
- * background so contrast stays legible on every theme.
+ * We deliberately do NOT set a bar background color: that maps to the
+ * deprecated-in-Android-15 Window.setStatusBarColor and is redundant under
+ * edge-to-edge.
  *
  * No-op on web. Plugin loaded dynamically to avoid Turbopack static-import
  * issues at module evaluation time.
@@ -73,7 +77,10 @@ export function useStatusBarTint(): void {
 
     import('@capacitor/status-bar')
       .then(({ StatusBar, Style }) => {
-        StatusBar.setBackgroundColor({ color }).catch(() => {});
+        // No setBackgroundColor: edge-to-edge (MainActivity EdgeToEdge.enable) keeps the
+        // bar transparent so the route's own bg shows through. setBackgroundColor maps to
+        // the deprecated-in-Android-15 Window.setStatusBarColor — flagged by Play Console.
+        // Only the icon contrast is adapted per route, via the modern setStyle path.
         StatusBar.setStyle({ style: useDarkText ? Style.Light : Style.Dark }).catch(() => {});
       })
       .catch((err) => {

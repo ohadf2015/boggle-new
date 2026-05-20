@@ -13,12 +13,12 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
-        <!-- Edge-to-edge: bars transparent, WebView draws underneath. -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:enforceNavigationBarContrast">false</item>
-        <item name="android:enforceStatusBarContrast">false</item>
+        <!--
+          Edge-to-edge (transparent bars, WebView underneath) is configured at runtime in
+          MainActivity via androidx.activity EdgeToEdge.enable(). The status/navigation bar
+          color + contrast theme attributes were removed: they are deprecated in Android 15
+          (API 35) and flagged by Play Console's edge-to-edge pre-launch check.
+        -->
     </style>
 
 
