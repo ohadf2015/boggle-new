@@ -6,6 +6,7 @@ import { Download, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { gameEvents } from '@/components/GoogleAnalytics';
+import { isAndroidBrowser } from '@/utils/androidApp';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -28,6 +29,11 @@ export function PWAInstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
+    // On Android the native app promo (AndroidAppInstallPromo) owns the install
+    // pitch — yield so the user never gets two install prompts. Desktop Chrome,
+    // where there is no native app, still gets the PWA banner.
+    if (isAndroidBrowser(navigator.userAgent)) return;
+
     // Check if user has dismissed prompt recently
     const dismissedUntil = localStorage.getItem('pwa_install_dismissed_until');
     if (dismissedUntil && Date.now() < parseInt(dismissedUntil)) {

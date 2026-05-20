@@ -1,6 +1,14 @@
 // Sv translations
 const sv = {
   "flag": "🇸🇪",
+  "androidAppPromo": {
+    "title": "Hämta LexiClash-appen",
+    "subtitle": "Spela smidigare och snabbare i den kostnadsfria Android-appen.",
+    "install": "Hämta på Google Play",
+    "dismiss": "Inte nu",
+    "close": "Stäng",
+    "imageAlt": "LexiClash-maskot som visar spelet på en Android-telefon"
+  },
   "name": "Svenska",
   "direction": "ltr",
   "logo": {

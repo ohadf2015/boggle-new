@@ -1,50 +1,28 @@
 'use client';
 
 import { useEffect } from 'react';
+import {
+  ANDROID_PACKAGE,
+  hasLexiClashInstalled,
+  isAndroidBrowser,
+  isCapacitorNative,
+  isStandaloneDisplay,
+} from '@/utils/androidApp';
 
-const ANDROID_PACKAGE = 'live.lexiclash.app';
 const SESSION_FLAG = 'android_app_redirect_tried';
 const DISMISS_KEY = 'android_app_redirect_dismissed_until';
 const DISMISS_DAYS = 7;
 
-type RelatedApp = { platform: string; id?: string; url?: string };
-
-function isCapacitorNative(): boolean {
-  if (typeof window === 'undefined') return false;
-  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
-  return Boolean(cap?.isNativePlatform?.());
-}
-
-function isAndroidChrome(ua: string): boolean {
-  if (!/Android/i.test(ua)) return false;
-  if (/wv\)|; wv\)/.test(ua)) return false;
-  if (/FBAN|FBAV|Instagram|Line\/|TikTok|MicroMessenger/i.test(ua)) return false;
-  return true;
-}
-
-async function hasLexiClashInstalled(): Promise<boolean> {
-  const nav = navigator as unknown as {
-    getInstalledRelatedApps?: () => Promise<RelatedApp[]>;
-  };
-  if (typeof nav.getInstalledRelatedApps !== 'function') return false;
-  try {
-    const apps = await nav.getInstalledRelatedApps();
-    return apps.some((a) => a.platform === 'play' && a.id === ANDROID_PACKAGE);
-  } catch {
-    return false;
-  }
-}
-
 export default function AndroidAppRedirect() {
   useEffect(() => {
     if (isCapacitorNative()) return;
-    if (!isAndroidChrome(navigator.userAgent)) return;
+    if (!isAndroidBrowser(navigator.userAgent)) return;
 
     if (sessionStorage.getItem(SESSION_FLAG)) return;
     const dismissedUntil = localStorage.getItem(DISMISS_KEY);
     if (dismissedUntil && Date.now() < parseInt(dismissedUntil, 10)) return;
 
-    if (window.matchMedia('(display-mode: standalone)').matches) return;
+    if (isStandaloneDisplay()) return;
 
     let cancelled = false;
     void hasLexiClashInstalled().then((installed) => {

@@ -1,6 +1,14 @@
 // EN translations
 const en = {
   "flag": "🇺🇸",
+  "androidAppPromo": {
+    "title": "Get the LexiClash App",
+    "subtitle": "Smoother, faster play on the free Android app.",
+    "install": "Get it on Google Play",
+    "dismiss": "Not now",
+    "close": "Close",
+    "imageAlt": "LexiClash mascot showing the game on an Android phone"
+  },
   "name": "English",
   "direction": "ltr",
   "logo": {

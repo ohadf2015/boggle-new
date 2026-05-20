@@ -44,6 +44,9 @@ const PWAInstallPrompt = nextDynamic(() => import('@/components/PWAInstallPrompt
 const AndroidAppRedirect = nextDynamic(() => import('@/components/AndroidAppRedirect'), {
   loading: () => null,
 });
+const AndroidAppInstallPromo = nextDynamic(() => import('@/components/AndroidAppInstallPromo'), {
+  loading: () => null,
+});
 const VersionChecker = nextDynamic(() => import('@/components/VersionChecker'), {
   loading: () => null,
 });
@@ -616,6 +619,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         <GlobalBottomNav />
                     </div>
                     <AndroidAppRedirect />
+                    <AndroidAppInstallPromo />
                     <PWAInstallPrompt />
                     <PushNotificationPrompt />
                     <EmailCaptureModal />

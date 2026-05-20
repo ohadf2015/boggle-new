@@ -1,6 +1,14 @@
 // HE translations
 const he = {
   "flag": "🇮🇱",
+  "androidAppPromo": {
+    "title": "הורידו את אפליקציית LexiClash",
+    "subtitle": "משחק חלק ומהיר יותר באפליקציית האנדרואיד החינמית.",
+    "install": "הורדה מ‑Google Play",
+    "dismiss": "לא עכשיו",
+    "close": "סגירה",
+    "imageAlt": "קמע LexiClash מציג את המשחק על טלפון אנדרואיד"
+  },
   "name": "עברית",
   "direction": "rtl",
   "logo": {

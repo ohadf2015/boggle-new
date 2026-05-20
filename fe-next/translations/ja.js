@@ -1,6 +1,14 @@
 // Ja translations
 const ja = {
   "flag": "🇯🇵",
+  "androidAppPromo": {
+    "title": "LexiClash アプリを入手",
+    "subtitle": "無料の Android アプリでより滑らかに、より速くプレイ。",
+    "install": "Google Play で手に入れよう",
+    "dismiss": "後で",
+    "close": "閉じる",
+    "imageAlt": "Android スマホでゲームを見せる LexiClash のマスコット"
+  },
   "name": "日本語",
   "direction": "ltr",
   "logo": {
