@@ -37,6 +37,7 @@ setup() { # creates ORIGIN (bare) + LOCAL clone + SIB clone, all sharing init co
     mkdir -p docs/nightly/reports fe-next/scripts fe-next/app
     echo base                       > base.txt
     echo '{"report":"base"}'        > fe-next/scripts/translation-report.json
+    echo '{"compilerOptions":{}}'   > fe-next/tsconfig.json
     printf 'export const x = 1;\n'  > fe-next/app/page.tsx
     git add -A; git commit -qm init; git branch -M master; git push -q origin master )
   git -c init.defaultBranch=master clone -q "$ORIGIN" "$SIB" 2>/dev/null
@@ -120,6 +121,19 @@ assert "no unmerged paths"        "[ -z \"\$(git diff --name-only --diff-filter=
 assert "alert names the conflict file" "printf '%s' \"\$ALERTS\" | grep -q 'page.tsx'"
 assert "origin NOT advanced by nightly" "git show origin/master:fe-next/app/page.tsx | grep -q '// origin'"
 assert "nightly's page.tsx NOT on origin" "! git show origin/master:fe-next/app/page.tsx | grep -q '// nightly'"
+
+echo "Scenario 6 — lane mutated BOTH generated files (translation-report + tsconfig) + a real doc → both excluded, doc shipped"
+setup
+echo "real lane doc" > docs/nightly/reports/2026-01-01.md
+echo '{"report":"NIGHTLY-regen"}'                 > fe-next/scripts/translation-report.json
+echo '{"compilerOptions":{},"_nextBuild":true}'   > fe-next/tsconfig.json   # simulate next build mutation
+ship_nightly_commit; rc=$?
+assert "returns 0"                          "[ $rc -eq 0 ]"
+assert "origin == local HEAD"               "[ \"\$(origin_head)\" = \"\$(git rev-parse HEAD)\" ]"
+assert "doc shipped"                        "git show origin/master:docs/nightly/reports/2026-01-01.md | grep -q 'real lane doc'"
+assert "translation-report NOT committed"   "! git show origin/master:fe-next/scripts/translation-report.json | grep -q NIGHTLY-regen"
+assert "tsconfig NOT committed"             "! git show origin/master:fe-next/tsconfig.json | grep -q _nextBuild"
+assert "tree clean (both restored)"         "local_clean"
 
 echo
 echo "──────────────────────────────────────────"

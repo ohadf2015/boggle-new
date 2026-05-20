@@ -29,6 +29,10 @@
 # and NOT package-lock.json (a lane dep change is legitimate, if rare).
 NIGHTLY_GENERATED_EXCLUDE=(
   "fe-next/scripts/translation-report.json"
+  # next build rewrites tsconfig.json (reformats it + injects the build's
+  # distDir type paths, e.g. .next-nightly/types). The gate build mutates it
+  # every run; it is never a deliberate nightly change, so never commit it.
+  "fe-next/tsconfig.json"
 )
 
 ship_nightly_commit() {
