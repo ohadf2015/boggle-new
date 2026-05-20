@@ -129,6 +129,15 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
         blastState.grid = gravityResult.newGrid;
         blastState.tileStates = gravityResult.newTileStates;
 
+        // Keep the authoritative board refs in sync with the live cascading
+        // board so the NEXT word's on-board validation (wordHandler
+        // isWordOnBoardAsync) and tile-path lookup run against the current
+        // grid — not the stale start-of-round grid. The board-clear branch
+        // below already does this; cascades need it every move too, otherwise
+        // every blast word after the first fails validation and never scores.
+        game.letterGrid = gravityResult.newGrid;
+        game.letterPositions = makePositionsMap(gravityResult.newGrid, (game.language || 'en'));
+
         // 4. Broadcast board update to ALL players
         broadcastToRoom(io, getGameRoom(gameCode), 'blastBoardUpdate', {
           grid: gravityResult.newGrid,
