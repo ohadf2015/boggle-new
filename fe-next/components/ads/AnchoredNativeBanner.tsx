@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Capacitor } from '@capacitor/core';
 import { AdMob, BannerAdPluginEvents, BannerAdPosition } from '@capacitor-community/admob';
@@ -8,10 +8,29 @@ import { useAdMob } from '@/hooks/useAdMob';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
 
+// The native AdMob banner is a native view layered ABOVE the WebView, so CSS
+// z-index can't put a modal or side-drawer on top of it — when one opens, the
+// banner paints OVER the overlay's content (e.g. covering a modal's Save/Cancel
+// row). Detect blocking overlays and hide the banner until they close.
+//   • Modals: every in-app modal sets `aria-modal="true"`/`role="dialog"` and
+//     unmounts when closed, so its presence in the DOM ⇒ a modal is open.
+//   • Side-nav drawer: doesn't use a dialog role but locks body scroll, so
+//     `body.style.overflow === 'hidden'` ⇒ the drawer (or a scroll-locking
+//     modal) is open.
+function hasBlockingOverlay(): boolean {
+  if (typeof document === 'undefined') return false;
+  if (document.body.style.overflow === 'hidden') return true;
+  return document.querySelector('[aria-modal="true"], [role="dialog"]') !== null;
+}
+
 export default function AnchoredNativeBanner() {
   const pathname = usePathname();
   const { showBanner, hideBanner } = useAdMob();
   const safeArea = useSafeArea();
+  // Lazy init reads the DOM synchronously so the banner effect's first run
+  // already knows an overlay is open — avoids a show-then-hide flash when the
+  // banner mounts onto a route that already has a modal/drawer open.
+  const [overlayOpen, setOverlayOpen] = useState<boolean>(() => hasBlockingOverlay());
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
@@ -54,6 +73,26 @@ export default function AnchoredNativeBanner() {
     };
   }, [safeArea.bottom]);
 
+  // Track open modals / side-nav drawer. Modals portal directly into <body> and
+  // the drawer toggles body's inline `overflow`, so a non-subtree childList +
+  // style observer on <body> catches every open/close without scanning the
+  // whole DOM on each mutation.
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    const update = () => setOverlayOpen(hasBlockingOverlay());
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(document.body, {
+      childList: true,
+      attributes: true,
+      attributeFilter: ['style'],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
 
@@ -62,7 +101,9 @@ export default function AnchoredNativeBanner() {
     const isAndroid = Capacitor.getPlatform() === 'android';
     const safeBottom = safeArea.bottom || 0;
 
-    if (!isAllowedAdBannerRoute(pathname)) {
+    // Hide while an overlay is open (banner would paint over it) or on gameplay
+    // routes. Re-runs when `overlayOpen` flips false → banner shows again.
+    if (overlayOpen || !isAllowedAdBannerRoute(pathname)) {
       hideBanner();
       document.documentElement.style.setProperty('--admob-banner-height', '0px');
       return () => { cancelled = true; };
@@ -126,7 +167,7 @@ export default function AnchoredNativeBanner() {
       cancelAnimationFrame(rafId);
       htmlObserver.disconnect();
     };
-  }, [pathname, showBanner, hideBanner, safeArea.bottom]);
+  }, [pathname, showBanner, hideBanner, safeArea.bottom, overlayOpen]);
 
   return null;
 }

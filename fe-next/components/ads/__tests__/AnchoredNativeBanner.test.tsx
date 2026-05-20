@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, cleanup } from '@testing-library/react';
+import { render, cleanup, waitFor } from '@testing-library/react';
 
 const { showBanner, hideBanner, mockPathname, addListener, mockPlatform, mockSafeArea } = vi.hoisted(() => ({
   showBanner: vi.fn(),
@@ -56,6 +56,8 @@ describe('AnchoredNativeBanner', () => {
     mockPathname.current = '/';
     mockPlatform.current = 'ios';
     mockSafeArea.current = { top: 0, bottom: 0, left: 0, right: 0 };
+    document.body.style.overflow = '';
+    document.querySelectorAll('[data-test-overlay]').forEach((el) => el.remove());
   });
   afterEach(cleanup);
 
@@ -262,6 +264,56 @@ describe('AnchoredNativeBanner', () => {
       document.documentElement.style.removeProperty('--bottom-nav-height');
       document.head.removeChild(style);
     }
+  });
+
+  it('hides banner while an aria-modal dialog is open (native banner would paint over the modal)', async () => {
+    mockPathname.current = '/';
+    const modal = document.createElement('div');
+    modal.setAttribute('data-test-overlay', '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    document.body.appendChild(modal);
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(showBanner).not.toHaveBeenCalled();
+    expect(hideBanner).toHaveBeenCalled();
+  });
+
+  it('hides banner while body scroll is locked (side-nav drawer open)', async () => {
+    mockPathname.current = '/';
+    document.body.style.overflow = 'hidden';
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(showBanner).not.toHaveBeenCalled();
+    expect(hideBanner).toHaveBeenCalled();
+  });
+
+  it('re-shows banner after the overlay closes', async () => {
+    mockPathname.current = '/';
+    const modal = document.createElement('div');
+    modal.setAttribute('data-test-overlay', '');
+    modal.setAttribute('aria-modal', 'true');
+    document.body.appendChild(modal);
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(showBanner).not.toHaveBeenCalled();
+
+    modal.remove();
+    await waitFor(() => expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0, { variant: 'content' }));
+  });
+
+  it('hides banner when an overlay opens after the banner was shown', async () => {
+    mockPathname.current = '/';
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(showBanner).toHaveBeenCalledTimes(1);
+
+    hideBanner.mockClear();
+    const modal = document.createElement('div');
+    modal.setAttribute('data-test-overlay', '');
+    modal.setAttribute('aria-modal', 'true');
+    document.body.appendChild(modal);
+    await waitFor(() => expect(hideBanner).toHaveBeenCalled());
   });
 
   it('registers FailedToLoad and Closed listeners that reset --admob-banner-height', async () => {
