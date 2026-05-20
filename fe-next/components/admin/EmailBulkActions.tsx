@@ -49,7 +49,9 @@ export function EmailBulkActions({
       const playerEndpoint =
         emailType === 'android-beta-launch'
           ? '/api/admin/send-android-beta-launch-to-player'
-          : '/api/admin/send-reengagement-to-player';
+          : emailType === 'android-release-launch'
+            ? '/api/admin/send-android-release-launch-to-player'
+            : '/api/admin/send-reengagement-to-player';
       const response = await fetch(playerEndpoint, {
         method: 'POST',
         signal: controller.signal,

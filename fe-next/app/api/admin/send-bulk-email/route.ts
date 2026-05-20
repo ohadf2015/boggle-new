@@ -17,23 +17,31 @@ import {
   generateGameModeAnnouncementHtml,
   type GameModeKey,
 } from '@/lib/gameModeAnnouncementEmail';
+import { sendAndroidReleaseLaunchToRecipient } from '@/lib/androidReleaseLaunchEmail';
 import { Resend } from 'resend';
 import { captureApiError } from '@/utils/sentry';
 import logger from '@/backend/utils/logger';
 
 export const maxDuration = 60;
 
-type BulkEmailType = 'reengagement' | 'game-mode-announcement';
+type BulkEmailType =
+  | 'reengagement'
+  | 'game-mode-announcement'
+  | 'android-release-launch';
 
 /**
  * POST /api/admin/send-bulk-email
  * Send emails to all eligible players. Admin-only.
  *
  * Body: {
- *   emailType: 'reengagement' | 'game-mode-announcement'
+ *   emailType: 'reengagement' | 'game-mode-announcement' | 'android-release-launch'
  *   mode?: GameModeKey (required for game-mode-announcement)
  *   dryRun?: boolean   (count recipients without sending)
  * }
+ *
+ * NOTE (android-release-launch): the hero image is hosted at
+ * lexiclash.live/email-assets/ — a deploy must land BEFORE a real blast or
+ * recipients get a broken image.
  */
 export async function POST(request: NextRequest) {
   if (!isEmailServiceConfigured()) {
@@ -64,7 +72,7 @@ export async function POST(request: NextRequest) {
     const mode: GameModeKey = body.mode || 'blast';
     const includeSubscribers = body.includeSubscribers === true;
 
-    if (!['reengagement', 'game-mode-announcement'].includes(emailType)) {
+    if (!['reengagement', 'game-mode-announcement', 'android-release-launch'].includes(emailType)) {
       return NextResponse.json({ error: 'Invalid emailType' }, { status: 400 });
     }
 
@@ -80,11 +88,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Supabase admin not configured' }, { status: 503 });
     }
 
-    // Get all subscribed players (not unsubscribed)
+    // Get all subscribed players (not unsubscribed).
+    // One-click unsubscribe flips daily_email_subscribed=false (see
+    // lib/email.ts unsubscribeByToken). IS DISTINCT FROM false keeps NULL +
+    // true. (Was filtering a nonexistent `email_subscribed` column → 500.)
     const { data: players, error: fetchError } = await adminSupabase
       .from('profiles')
-      .select('id, display_name, username, timezone, country_code, email_unsubscribe_token, email_subscribed')
-      .neq('email_subscribed', false);
+      .select('id, display_name, username, timezone, country_code, email_unsubscribe_token')
+      .neq('daily_email_subscribed', false);
 
     if (fetchError) {
       logger.error('BULK_EMAIL', 'Failed to fetch players:', fetchError);
@@ -163,6 +174,26 @@ export async function POST(request: NextRequest) {
           };
 
           const result = await sendReengagementEmail(recipient, language, firstLetter, baseUrl);
+          if (result.success) sent++;
+          else { failed++; errors.push(`${playerEmail}: ${result.error}`); }
+        } else if (emailType === 'android-release-launch') {
+          const language = await resolveUserLanguage(player.id, player.country_code);
+
+          let unsubToken = player.email_unsubscribe_token;
+          if (!unsubToken) {
+            unsubToken = generateUnsubscribeToken();
+            await adminSupabase
+              .from('profiles')
+              .update({ email_unsubscribe_token: unsubToken })
+              .eq('id', player.id);
+          }
+
+          const result = await sendAndroidReleaseLaunchToRecipient({
+            email: playerEmail,
+            recipientName: player.display_name || player.username || 'Word Hunter',
+            language,
+            unsubscribeUrl: `${baseUrl}/api/email/unsubscribe?token=${unsubToken}`,
+          });
           if (result.success) sent++;
           else { failed++; errors.push(`${playerEmail}: ${result.error}`); }
         } else {

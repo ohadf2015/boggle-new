@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, Send, CheckCircle, XCircle, Loader2, Eye, Calendar, UserX, Rocket, Smartphone } from 'lucide-react';
+import { Mail, Send, CheckCircle, XCircle, Loader2, Eye, Calendar, UserX, Rocket, Smartphone, PartyPopper } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,7 @@ interface EmailTestPanelProps {
 }
 
 type SendStatus = 'idle' | 'sending' | 'success' | 'error';
-type EmailType = 'reengagement' | 'daily-challenge' | 'game-mode-announcement' | 'android-beta-launch';
+type EmailType = 'reengagement' | 'daily-challenge' | 'game-mode-announcement' | 'android-beta-launch' | 'android-release-launch';
 type GameMode = 'blast' | 'wordhunt' | 'adventure';
 
 const EMAIL_TYPE_CONFIG = {
@@ -64,6 +64,18 @@ const EMAIL_TYPE_CONFIG = {
     previewEndpoint: '/api/admin/android-beta-launch-preview',
     previewTitle: 'Android Beta Launch Preview',
     infoText: 'Sends a test [TEST] Android closed-beta invite with Play Store CTA and LexiClash reminder block.',
+    color: 'neo-lime',
+    bgClass: 'bg-neo-lime',
+    borderClass: 'border-neo-lime',
+    textClass: 'text-neo-lime',
+  },
+  'android-release-launch': {
+    label: 'Android Release',
+    icon: PartyPopper,
+    endpoint: '/api/admin/send-test-android-release-launch',
+    previewEndpoint: '/api/admin/android-release-launch-preview',
+    previewTitle: 'Android Release Announcement Preview',
+    infoText: 'Public "now on Google Play" launch. [TEST] sends to one address; "Send to All" sends the REAL email (no prefix) to every subscribed user. Deploy must land first so the hero image resolves.',
     color: 'neo-lime',
     bgClass: 'bg-neo-lime',
     borderClass: 'border-neo-lime',
@@ -142,7 +154,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
     : process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.com';
 
   const previewUrl =
-    emailType === 'reengagement' || emailType === 'android-beta-launch'
+    emailType === 'reengagement' || emailType === 'android-beta-launch' || emailType === 'android-release-launch'
       ? `${baseUrl}${config.previewEndpoint}?language=${language}`
       : emailType === 'game-mode-announcement'
         ? `${baseUrl}${config.previewEndpoint}?language=${language}&mode=${gameMode}`
