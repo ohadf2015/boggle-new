@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeCompletePopup from './PracticeCompletePopup';
 import PracticePostCompleteChip from './PracticePostCompleteChip';
 import PracticeInstructions from './PracticeInstructions';
+import PracticeCoachTip from './PracticeCoachTip';
 import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
 import { usePracticeJuice } from './usePracticeJuice';
@@ -176,7 +177,11 @@ export default function PracticeClassicSandbox() {
         </div>
       </div>
 
-      <PracticeInstructions mode="classic" />
+      {/* Learn by doing: no upfront modal gate — the player lands on the
+          board with a gentle inline tip that retires the moment they spell
+          their first word. The "?" pill stays for on-demand reference. */}
+      <PracticeInstructions mode="classic" autoOpen={false} />
+      <PracticeCoachTip mode="classic" wordsFound={foundWords.length} />
       <PracticeMistakeCoach kind={coach.active} mode="classic" onClose={coach.close} />
 
       <div className="flex-1 min-h-0 flex items-center justify-center w-full">

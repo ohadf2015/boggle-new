@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeCompletePopup from './PracticeCompletePopup';
 import PracticePostCompleteChip from './PracticePostCompleteChip';
 import PracticeInstructions from './PracticeInstructions';
+import PracticeCoachTip from './PracticeCoachTip';
 import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
 import { usePracticeJuice } from './usePracticeJuice';
@@ -367,7 +368,10 @@ export default function PracticeWordHuntSandbox() {
         </div>
       </div>
 
-      <PracticeInstructions mode="wordHunt" />
+      {/* Learn by doing: drop straight onto the board with an inline tip that
+          retires once the player lands their first word. */}
+      <PracticeInstructions mode="wordHunt" autoOpen={false} />
+      <PracticeCoachTip mode="wordHunt" wordsFound={discoveries.length + (solved ? 1 : 0)} />
       <PracticeMistakeCoach kind={coach.active} mode="wordHunt" onClose={coach.close} />
 
       <div className="flex flex-col items-center gap-2 flex-1 min-h-0 w-full overflow-hidden">

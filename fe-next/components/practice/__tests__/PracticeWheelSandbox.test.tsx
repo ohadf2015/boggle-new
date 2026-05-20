@@ -87,9 +87,9 @@ describe('PracticeWheelSandbox redesigned', () => {
     expect(new Set(after.slice(1))).toEqual(new Set(before.slice(1)));
   });
 
-  it('does NOT render the rotating PracticeCoachTip', () => {
+  it('renders the inline PracticeCoachTip so the player learns by doing', () => {
     render(<PracticeWheelSandbox />);
-    expect(screen.queryByTestId('practice-coach-tip')).toBeNull();
+    expect(screen.getByTestId('practice-coach-tip')).toBeInTheDocument();
   });
 
   it('does NOT render competitive chrome (timer, combo, rivals)', () => {

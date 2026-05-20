@@ -67,4 +67,11 @@ describe('PracticeInstructions overlay', () => {
     // wordHunt was never dismissed — overlay should be visible
     expect(screen.getByTestId('practice-instructions')).toBeInTheDocument();
   });
+
+  it('does not auto-open when autoOpen is false — player lands on the board (learn by doing)', () => {
+    render(<PracticeInstructions mode="classic" autoOpen={false} />);
+    expect(screen.queryByTestId('practice-instructions')).toBeNull();
+    // The on-demand "?" pill is still available for reference.
+    expect(screen.getByTestId('practice-instructions-toggle')).toBeInTheDocument();
+  });
 });

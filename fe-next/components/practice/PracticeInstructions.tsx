@@ -53,6 +53,13 @@ const STORAGE_KEY = (mode: PracticeMode) => `lc_practice_help_dismissed_${mode}`
 
 interface Props {
   mode: PracticeMode;
+  /**
+   * When false, the help panel stays closed on mount and only the "?" pill
+   * shows — the player lands straight on the interactive board and learns by
+   * doing. The sandboxes pass false so they don't gate play behind a second
+   * modal after the pre-game tutorial sheet has already taught the mode.
+   */
+  autoOpen?: boolean;
 }
 
 /**
@@ -62,9 +69,9 @@ interface Props {
  * to play" lines + 2 "Scoring" lines + a "Got it" CTA. Dismissal persists
  * per-mode in localStorage, with a re-open "?" pill in the corner.
  */
-export default function PracticeInstructions({ mode }: Props) {
+export default function PracticeInstructions({ mode, autoOpen = true }: Props) {
   const { t } = useLanguage();
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(autoOpen);
 
   useEffect(() => {
     try {

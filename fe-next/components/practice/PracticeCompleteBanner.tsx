@@ -2,7 +2,6 @@
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { usePracticeStreak } from '@/hooks/usePracticeStreak';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
 interface Props {
@@ -15,13 +14,11 @@ interface Props {
  * in flow above the chain CTA so the eye naturally moves from "complete" →
  * "continue to next mode".
  *
- * Folds in the practice-streak chip when active so the milestone is felt
- * where it's earned (the player just bumped the streak — show it now, not
- * only on the hub).
+ * Deliberately streak-free: practice teaches the modes, it is not scored
+ * gameplay, so we don't put streak pressure on a tutorial completion.
  */
 export default function PracticeCompleteBanner({ mode }: Props) {
   const { t } = useLanguage();
-  const { current: streakDay } = usePracticeStreak();
 
   return (
     <AdaptiveMotion.div
@@ -37,15 +34,6 @@ export default function PracticeCompleteBanner({ mode }: Props) {
       <span className="font-neo-display font-black text-sm flex-1">
         {t('practice.complete.title')}
       </span>
-      {streakDay > 0 && (
-        <span
-          data-testid="practice-complete-banner-streak"
-          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-neo border-2 border-neo-black bg-neo-orange text-neo-black font-neo-display font-black text-[11px] uppercase tracking-wider"
-        >
-          <span aria-hidden>🔥</span>
-          {t('practiceHub.streakDays', { count: streakDay })}
-        </span>
-      )}
       <span className="font-neo-body text-xs opacity-80">
         {t(`practice.complete.${mode}`)}
       </span>

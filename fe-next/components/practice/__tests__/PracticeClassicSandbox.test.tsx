@@ -71,9 +71,9 @@ describe('PracticeClassicSandbox redesigned', () => {
     expect(screen.queryByRole('button', { name: 'practice.classic.reset' })).toBeNull();
   });
 
-  it('does NOT render the rotating PracticeCoachTip', () => {
+  it('renders the inline PracticeCoachTip so the player learns by doing', () => {
     render(<PracticeClassicSandbox />);
-    expect(screen.queryByTestId('practice-coach-tip')).toBeNull();
+    expect(screen.getByTestId('practice-coach-tip')).toBeInTheDocument();
   });
 
   it('renders a goal indicator pill (0/3)', () => {

@@ -39,17 +39,11 @@ describe('PracticeCompleteBanner', () => {
     );
   });
 
-  it('hides the streak chip when streak is 0 (no zero-state noise)', () => {
-    render(<PracticeCompleteBanner mode="classic" />);
-    expect(screen.queryByTestId('practice-complete-banner-streak')).toBeNull();
-  });
-
-  it('shows the streak day count once a session has been recorded', () => {
+  it('never renders a streak chip — practice teaches, it is not scored gameplay', () => {
+    // Even with an active streak recorded, the tutorial completion moment
+    // stays free of streak pressure.
     recordPracticeSession();
     render(<PracticeCompleteBanner mode="classic" />);
-    const chip = screen.getByTestId('practice-complete-banner-streak');
-    expect(chip).toBeInTheDocument();
-    expect(chip.textContent).toContain('practiceHub.streakDays');
-    expect(chip.textContent).toContain('1');
+    expect(screen.queryByTestId('practice-complete-banner-streak')).toBeNull();
   });
 });
