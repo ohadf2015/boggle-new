@@ -34,13 +34,22 @@ describe('useBlastCheckpoint', () => {
     expect(result.current.checkpoint?.highestWave).toBe(5);
   });
 
-  it('offers resumeFromWave = highestWave (not one back) so progress feels earned', () => {
+  it('resumes from the wave AFTER the highest cleared so progress advances', () => {
     const { result } = renderHook(() => useBlastCheckpoint());
     act(() => result.current.recordWaveReached(4));
-    expect(result.current.resumeFromWave).toBe(4);
+    // Cleared wave 4 → next session continues at wave 5, not a replay of 4.
+    expect(result.current.resumeFromWave).toBe(5);
   });
 
-  it('clamps resumeFromWave to at least 1', () => {
+  it('offers a resume after clearing only wave 1 (the "did not lose anything" case)', () => {
+    // Mirrors the user report: clear wave 1, quit, reopen — progress must persist.
+    const { result } = renderHook(() => useBlastCheckpoint());
+    act(() => result.current.recordWaveReached(1));
+    // resumeFromWave > 1 is what makes BlastView render the Resume button at all.
+    expect(result.current.resumeFromWave).toBe(2);
+  });
+
+  it('keeps resumeFromWave at 1 with no checkpoint (fresh start)', () => {
     const { result } = renderHook(() => useBlastCheckpoint());
     act(() => result.current.recordWaveReached(0));
     expect(result.current.resumeFromWave).toBe(1);
@@ -61,7 +70,8 @@ describe('useBlastCheckpoint', () => {
     );
     const { result } = renderHook(() => useBlastCheckpoint());
     expect(result.current.checkpoint?.highestWave).toBe(7);
-    expect(result.current.resumeFromWave).toBe(7);
+    // Resume continues past the highest cleared wave.
+    expect(result.current.resumeFromWave).toBe(8);
   });
 
   it('ignores corrupt storage entries without throwing', () => {

@@ -72,7 +72,11 @@ export function useBlastCheckpoint(): UseBlastCheckpointResult {
     setCheckpoint(null);
   }, []);
 
-  const resumeFromWave = Math.max(1, checkpoint?.highestWave ?? 1);
+  // Resume one wave PAST the highest cleared — beating wave N unlocks wave N+1.
+  // Returning highestWave (the just-cleared wave) made players replay a level
+  // they'd already won, which reads as "progress wasn't saved". No checkpoint
+  // means a fresh start at wave 1.
+  const resumeFromWave = checkpoint ? checkpoint.highestWave + 1 : 1;
 
   return { checkpoint, resumeFromWave, recordWaveReached, clear };
 }
