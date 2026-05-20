@@ -26,6 +26,11 @@ const EXPRESS_API_ROUTES: string[] = ['/api/leaderboard', '/api/geolocation', '/
 const NEXT_ADMIN_BODY_ROUTES: string[] = [
   '/api/admin/send-test-android-beta-launch',
   '/api/admin/send-android-beta-launch-to-player',
+  '/api/admin/send-test-android-release-launch',
+  '/api/admin/send-android-release-launch-to-player',
+  // Bulk "send to all" reads its body via request.json() too — without this it
+  // hung on every emailType (latent: was never registered).
+  '/api/admin/send-bulk-email',
   '/api/admin/season-reset',
 ];
 
@@ -183,6 +188,11 @@ function requestTimeout(): RequestHandler {
     '/api/admin/send-test-android-beta-launch',
     '/api/admin/send-android-beta-launch-to-player',
     '/api/admin/android-beta-launch-preview',
+    '/api/admin/send-test-android-release-launch',
+    '/api/admin/send-android-release-launch-to-player',
+    '/api/admin/android-release-launch-preview',
+    // Bulk send loops over all eligible users — easily exceeds the 30s global cap.
+    '/api/admin/send-bulk-email',
     // Non-critical analytics; route owns a 4s wall-clock cap (see route.ts).
     // Was hanging 30s before its own cap was added — see Railway logs 2026-05-01.
     '/api/analytics/guest-session',

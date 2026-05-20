@@ -16,6 +16,10 @@ describe('shouldExpressParseJsonBody', () => {
   it('skips parsing for Next-only admin POST routes — Express body-parser drains the IncomingMessage and Next request.json() then hangs forever', () => {
     expect(shouldExpressParseJsonBody('/api/admin/send-test-android-beta-launch')).toBe(false);
     expect(shouldExpressParseJsonBody('/api/admin/send-android-beta-launch-to-player')).toBe(false);
+    expect(shouldExpressParseJsonBody('/api/admin/send-test-android-release-launch')).toBe(false);
+    expect(shouldExpressParseJsonBody('/api/admin/send-android-release-launch-to-player')).toBe(false);
+    // Bulk send-to-all reads request.json() in the Next route too.
+    expect(shouldExpressParseJsonBody('/api/admin/send-bulk-email')).toBe(false);
   });
 
   it('skips parsing for non-API routes', () => {
