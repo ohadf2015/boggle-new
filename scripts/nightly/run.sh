@@ -304,9 +304,21 @@ EOF
         log "pushed $NEW_SHA"
         echo -e "\n**Outcome:** ✅ shipped \`$NEW_SHA\`" >> "$REPORT"
       else
-        log "push failed"
-        tg_alert "nightly $TODAY: push failed for \`$NEW_SHA\`. Local commit kept. See \`$RUN_LOG\`."
-        exit 1
+        # Push rejected — almost always origin advanced during the ~60-min run.
+        # Our commit is already gate-vetted, so rebase onto origin + retry once.
+        log "push rejected — fetch+rebase onto origin/master, retry once"
+        if git fetch origin master --quiet \
+           && git rebase origin/master >> "$RUN_LOG" 2>&1 \
+           && git push origin master >> "$RUN_LOG" 2>&1; then
+          NEW_SHA=$(git rev-parse HEAD)
+          log "pushed after rebase $NEW_SHA"
+          echo -e "\n**Outcome:** ✅ shipped \`$NEW_SHA\` (rebased onto origin first)" >> "$REPORT"
+        else
+          git rebase --abort 2>/dev/null || true
+          log "push failed after rebase retry"
+          tg_alert "nightly $TODAY: push failed (even after rebase) for \`$NEW_SHA\`. Local commit kept. See \`$RUN_LOG\`."
+          exit 1
+        fi
       fi
     fi
   fi

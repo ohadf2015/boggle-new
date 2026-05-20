@@ -63,10 +63,27 @@ preflight_check() {
 
   echo "preflight: fetching + ff-pulling master..."
   git fetch origin master --quiet || { echo "preflight: fetch failed"; return 1; }
-  git pull --ff-only origin master --quiet || {
-    echo "preflight: ABORT — ff-only pull failed (divergence)"
-    return 1
-  }
+  if ! git pull --ff-only origin master --quiet; then
+    # ff failed → local diverged from origin. Self-heal ONLY when every local-only
+    # commit is docs/-only (a stranded seo-daily report, or our own failed-push
+    # from a prior run). If ANY local-only commit touches non-docs paths, abort
+    # for manual review — never auto-rebase code we can't re-gate.
+    local non_docs
+    non_docs=$(git diff --name-only origin/master..master | grep -vE '^docs/' || true)
+    if [ -n "$non_docs" ]; then
+      echo "preflight: ABORT — diverged & local-only commits touch non-docs paths (manual review):"
+      echo "$non_docs" | sed 's/^/  /'
+      return 1
+    fi
+    echo "preflight: ff-only failed — local-only commits are docs-only, auto-rebasing onto origin/master"
+    if git rebase origin/master >/dev/null 2>&1; then
+      echo "preflight: auto-rebase OK"
+    else
+      git rebase --abort 2>/dev/null || true
+      echo "preflight: ABORT — auto-rebase onto origin/master conflicted (manual fix needed)"
+      return 1
+    fi
+  fi
 
   # --- MCP servers alive ----------------------------------------------
   # posthog + sentry are HARD requirements (every lane uses them).
