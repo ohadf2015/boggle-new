@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
-    description: 'Spela scrabble online på svenska gratis, utan registrering. Skapa rum, bjud in med länk och tävla i realtid med vänner. 10 000+ ord. Börja nu!',
+    description: 'Spela scrabble online svenska gratis — utan registrering eller nedladdning. Skapa rum, bjud in vänner med länk, tävla i realtid. 10 000+ ord. Börja nu!',
     keywords: 'ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid',
     openGraph: {
       title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
