@@ -27,7 +27,7 @@ import {
   isValidLanguage,
   computeWordHuntRetryScore,
 } from './utils';
-import { completeMission } from '../../modules/dailyMissionsManager';
+import { completeMissionForMode } from '../../modules/dailyMissionsManager';
 import { updateDailyProfileStats } from './profileStats';
 import { computeCycleProgress, computeWeekScore, getChestTier, type DayScore } from '../../../lib/daily/weeklyChest';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
@@ -306,9 +306,12 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
     const isRetry = !!existing;
     logger.info('API', `[WordHunt Submit] SUCCESS: id=${(data as { id?: string })?.id}, playerType=${playerId ? 'authenticated' : 'guest'}, displayName=${displayName}, solved=${solved}, isRetry=${isRetry}, isPaidRetry=${isPaidRetry}, penalty=${penaltyApplied}`);
 
-    // Mark daily mission as complete for authenticated users (fire-and-forget)
+    // Mark daily mission as complete for authenticated users (fire-and-forget).
+    // Credit the `wordHunt` *mode* — completeMissionForMode resolves which slot
+    // it occupies today. Writing a fixed column would credit whichever mode
+    // happens to fill that slot (e.g. multiplayer), showing the wrong quest done.
     if (playerId) {
-      completeMission(playerId, 'word_hunt').catch((err) => {
+      completeMissionForMode(playerId, 'wordHunt').catch((err) => {
         logger.error('API', `[WordHunt] Daily mission update failed for ${playerId}: ${(err as Error).message}`);
       });
     }
