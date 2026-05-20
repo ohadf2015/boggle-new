@@ -337,7 +337,10 @@ EOF
             conflict=$(git diff --name-only --diff-filter=U 2>/dev/null | head -3 | tr '\n' ' ')
             git rebase --abort 2>/dev/null || true
             log "push failed after rebase retry (conflict: ${conflict:-unknown})"
-            tg_alert "nightly $TODAY: push failed — rebase conflicted on: ${conflict:-unknown}. Local commit \`$NEW_SHA\` kept. See \`$RUN_LOG\`."
+            # backtick-wrap the filename(s): tg uses parse_mode=Markdown and most
+            # repo paths contain `_` (e.g. __tests__, snake_case) which would 400
+            # the send and drop the alert. Code-span protects them.
+            tg_alert "nightly $TODAY: push failed — rebase conflicted on \`${conflict:-unknown}\`. Local commit \`$NEW_SHA\` kept. See \`$RUN_LOG\`."
             exit 1
           fi
         fi
