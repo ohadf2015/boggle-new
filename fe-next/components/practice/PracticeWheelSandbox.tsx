@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeCompletePopup from './PracticeCompletePopup';
 import PracticePostCompleteChip from './PracticePostCompleteChip';
 import PracticeInstructions from './PracticeInstructions';
+import PracticeCoachTip from './PracticeCoachTip';
 import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
 import { usePracticeJuice } from './usePracticeJuice';
@@ -383,7 +384,10 @@ export default function PracticeWheelSandbox() {
         </div>
       </div>
 
-      <PracticeInstructions mode="wheelRush" />
+      {/* Learn by doing: no modal gate — an inline tip guides the first word
+          then steps aside. */}
+      <PracticeInstructions mode="wheelRush" autoOpen={false} />
+      <PracticeCoachTip mode="wheelRush" wordsFound={foundWords.length} />
       <PracticeMistakeCoach kind={coach.active} mode="wheelRush" onClose={coach.close} />
 
       {/* Wheel — uses real WheelLetter for visual parity, with the real

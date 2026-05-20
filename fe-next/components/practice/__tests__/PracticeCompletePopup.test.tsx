@@ -82,20 +82,10 @@ describe('PracticeCompletePopup', () => {
     expect(dialog).toHaveAttribute('aria-modal', 'true');
   });
 
-  it('exposes a "play real now" link to the matching live mode per practice mode', () => {
-    const { rerender } = render(<PracticeCompletePopup open mode="classic" />);
-    const classicLink = screen.getByTestId('practice-complete-popup-play-real');
-    expect(classicLink).toBeInTheDocument();
-    expect(classicLink.getAttribute('href')).toBe('/en/singleplayer');
-
-    rerender(<PracticeCompletePopup open mode="wordHunt" />);
-    expect(screen.getByTestId('practice-complete-popup-play-real').getAttribute('href')).toBe(
-      '/en/daily/word-hunt',
-    );
-
-    rerender(<PracticeCompletePopup open mode="wheelRush" />);
-    expect(screen.getByTestId('practice-complete-popup-play-real').getAttribute('href')).toBe(
-      '/en/daily/word-wheel',
-    );
+  it('shows a single primary CTA (continue) with no competing "play real" link', () => {
+    // Simplified flow: one clear next step out of the popup, not two CTAs.
+    render(<PracticeCompletePopup open mode="classic" />);
+    expect(screen.getByTestId('practice-chain-cta')).toBeInTheDocument();
+    expect(screen.queryByTestId('practice-complete-popup-play-real')).toBeNull();
   });
 });

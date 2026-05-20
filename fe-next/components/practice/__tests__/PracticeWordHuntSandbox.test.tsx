@@ -71,9 +71,9 @@ describe('PracticeWordHuntSandbox redesigned', () => {
     expect(screen.queryByRole('button', { name: 'practice.wordHunt.backspace' })).toBeNull();
   });
 
-  it('does NOT render the rotating PracticeCoachTip', () => {
+  it('renders the inline PracticeCoachTip so the player learns by doing', () => {
     render(<PracticeWordHuntSandbox />);
-    expect(screen.queryByTestId('practice-coach-tip')).toBeNull();
+    expect(screen.getByTestId('practice-coach-tip')).toBeInTheDocument();
   });
 
   it('does NOT render survival HUD (life bar, clue shop)', () => {
