@@ -9,6 +9,7 @@ const he = {
     "error": { "too_short": "קצר מדי — 3 אותיות לפחות", "bad_chain": "התחילו באות הזוהרת", "not_buildable": "השתמשו באותיות המגש", "duplicate": "כבר השתמשת במילה הזו", "not_in_dictionary": "לא במילון" },
     "celebration": { "highRise": "מתנשא!", "tall": "גבוה!", "skyscraper": "גורד שחקים!" },
     "leaderboard": { "title": "המגדלים המובילים", "error": "טעינת הלוח נכשלה", "empty": "אין עדיין מגדלים — היו הראשונים!" },
+    "share": { "button": "שיתוף", "text": "הגעתי ל-{m} מ' במגדל מילים — נסו לעקוף את המגדל שלי!" },
     "a11y": { "height": "גובה {m} מטר", "combo": "שרשרת {n}", "tile": "אות {letter}" }
   },
   "flag": "🇮🇱",

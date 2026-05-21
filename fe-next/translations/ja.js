@@ -9,6 +9,7 @@ const ja = {
     "error": { "too_short": "短すぎます — 3文字以上", "bad_chain": "光る文字で始めてください", "not_buildable": "トレイの文字を使ってください", "duplicate": "その単語は使用済みです", "not_in_dictionary": "辞書にありません" },
     "celebration": { "highRise": "ハイライズ！", "tall": "そびえ立つ！", "skyscraper": "摩天楼！" },
     "leaderboard": { "title": "トップタワー", "error": "ランキングを読み込めません", "empty": "まだ塔がありません — 最初の一人に！" },
+    "share": { "button": "シェア", "text": "ワードタワーで {m}m 達成 — 私の塔を超えてみて！" },
     "a11y": { "height": "高さ {m} メートル", "combo": "連鎖 {n}", "tile": "文字 {letter}" }
   },
   "flag": "🇯🇵",

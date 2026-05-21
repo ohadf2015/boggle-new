@@ -9,6 +9,7 @@ const es = {
     "error": { "too_short": "Muy corta — 3+ letras", "bad_chain": "Empieza con la letra brillante", "not_buildable": "Usa las letras de la bandeja", "duplicate": "Ya usaste esa palabra", "not_in_dictionary": "No está en el diccionario" },
     "celebration": { "highRise": "¡Edificio alto!", "tall": "¡Imponente!", "skyscraper": "¡RASCACIELOS!" },
     "leaderboard": { "title": "Torres principales", "error": "No se pudo cargar la clasificación", "empty": "Aún no hay torres — ¡sé el primero!" },
+    "share": { "button": "Compartir", "text": "¡Llegué a {m} m en Torre de Palabras — supera mi torre!" },
     "a11y": { "height": "Altura {m} metros", "combo": "cadena {n}", "tile": "Letra {letter}" }
   },
   "flag": "🇪🇸",

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, RotateCcw, Trophy } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Trophy, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -108,6 +108,22 @@ export function WordTowerPlay({ language, isInDictionary, initialGame, personalB
 
   const selectTileHaptic = useCallback((i: number) => { haptics.selection(); tower.selectTile(i); }, [haptics, tower]);
 
+  const shareTower = useCallback(async () => {
+    const g = gameRef.current;
+    const params = new URLSearchParams({
+      h: String(Math.round(g.heightM)),
+      f: String(g.floors.length),
+      b: biomeForHeight(g.heightM),
+      w: g.longestWord || '',
+    });
+    const imgUrl = `${window.location.origin}/api/word-tower/share?${params.toString()}`;
+    const text = t('wordTower.share.text', { m: Math.round(g.heightM) });
+    try {
+      if (navigator.share) await navigator.share({ title: 'Word Tower', text, url: imgUrl });
+      else await navigator.clipboard?.writeText(`${text} ${imgUrl}`);
+    } catch { /* user cancelled / unsupported */ }
+  }, [t]);
+
   // keyboard
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -143,6 +159,14 @@ export function WordTowerPlay({ language, isInDictionary, initialGame, personalB
           <ArrowLeft className="h-4 w-4" /> {t('common.backToHome')}
         </Link>
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={shareTower}
+            aria-label={t('wordTower.share.button')}
+            className="rounded-neo border-neo-thick border-black bg-neo-pink p-2 text-neo-white shadow-hard"
+          >
+            <Share2 className="h-4 w-4" />
+          </button>
           <button
             type="button"
             onClick={onOpenLeaderboard}

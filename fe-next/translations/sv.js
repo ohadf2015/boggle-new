@@ -9,6 +9,7 @@ const sv = {
     "error": { "too_short": "För kort — minst 3 bokstäver", "bad_chain": "Börja på den lysande bokstaven", "not_buildable": "Använd brickornas bokstäver", "duplicate": "Ordet är redan använt", "not_in_dictionary": "Inte i ordlistan" },
     "celebration": { "highRise": "Höghus!", "tall": "Skyhögt!", "skyscraper": "SKYSKRAPA!" },
     "leaderboard": { "title": "Topptorn", "error": "Kunde inte ladda topplistan", "empty": "Inga torn än — bli först!" },
+    "share": { "button": "Dela", "text": "Jag nådde {m} m i Ordtorn — slå mitt torn!" },
     "a11y": { "height": "Höjd {m} meter", "combo": "kedja {n}", "tile": "Bokstav {letter}" }
   },
   "flag": "🇸🇪",
