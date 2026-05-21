@@ -64,16 +64,22 @@ WheelRush (`backend/modules/wheelRushManager.ts` + `backend/handlers/wheelRushHa
 
 ---
 
-## 5. Phasing
+## 5. Phasing + status
 
-1. **Chain engine (`shared/utils/shiritori.ts`) — THIS COMMIT.** Pure functions + exhaustive TDD on the linguistic rules. De-risks the hardest part with zero infra.
-2. **`shiritoriManager.ts`** — room state machine + validation, unit-tested (mirror `wheelRushManager`).
-3. **Socket handler + `GameMode` registration + `gameStartHandler` wiring.**
-4. **Client UI** — turn rail, chain history, head-kana prompt, timer, IME-aware input.
-5. **Bot** — prefix lookup over hiragana dict.
-6. **i18n (5 locales) + native review; analytics events; landing/positioning** (しりとり SEO, per audit §6 targeting).
+1. ✅ **Chain engine (`shared/utils/shiritori.ts`)** — SHIPPED `b7989aab7`. Pure linguistic rules, 11 tests.
+2. ✅ **`shiritoriManager.ts`** — SHIPPED `2c1d2187c`. Room state machine, 10 tests.
+3. ✅ **Backend wiring (dormant)** — SHIPPED `6cb1c29f2`. `GameMode` union + `GameState.shiritoriState`, `SubmitShiritoriWordSchema`, `shiritoriHandler` (turn/chain/dict validation, ん-loss, timeout), `gameStartHandler` init, GameModeSelector Records. 14 tests, tsc clean.
+4. ⏳ **Client UI** — turn rail, chain history, head-kana prompt, turn timer, **IME-aware input**, with **pixi.js** visual layer + **GSAP** animations + polished UX/UI. *Needs the running stack to verify visually + a multiplayer playtest — cannot be validated headless.*
+5. ⏳ **Bot** — prefix lookup over the hiragana dict (`japanese_words.txt`) given required head + used set.
+6. ⏳ **i18n (5 locales) + JA native review; analytics events.**
 
-Each phase is independently shippable and testable. Ghost-traffic caveat still applies: this is a *bet* on JA acquisition — sequence marketing only after the mode is complete and dictionary depth (kuromoji, deferred) lands.
+### Phase 4 product requirements (from product owner, 2026-05-21)
+- **JA-only visibility.** The mode must be shown ONLY to players whose game language is Japanese. Encoded in `shared/utils/availableModes.ts` (`isShiritoriAvailable` / `availableMpModes`, tested) — the picker MUST derive its list from this; do not hardcode shiritori into `GameModeSelector.baseModes`.
+- **Mode image.** ✅ Generated + brand-styled + transparent: `fe-next/public/modes/shiritori.png` (kawaii marshmallow-cube mascot linking a hiragana chain, neo-brutalist).
+- **Landing page + SEO.** A dedicated しりとり landing page (ja-focused) with strong SEO: target keywords しりとり / 言葉ゲーム / オンライン対戦, `metadata` + `Article`/`Game` JSON-LD, the mascot image, and clear copy. Should be reachable/indexable for ja; the play CTA must only route into a *playable* mode (so it ships with Phase 4 UI, not before — a landing page CTA to a non-existent screen is a dead end).
+- **Known gap:** `StartGameSchema.gameMode` enum (`shared/schemas/socketSchemas.ts`, ~line 187) omits `'shiritori'` (and `'word-tower'`) — add `'shiritori'` before the client can start the mode.
+
+Each phase is independently shippable + testable. **The interactive pixi/GSAP UI + landing page require the running app to verify** (visual polish, multiplayer playtest) — they should be built in a session with the stack up, not shipped blind. Ghost-traffic caveat still applies: sequence JA marketing only after the mode is complete and dictionary depth (kuromoji, deferred) lands.
 
 ---
 
