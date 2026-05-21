@@ -30,7 +30,7 @@ import {
   sendVersusBomb,
   versusStandings,
 } from '@/lib/wordTower/versusMatch';
-import { serializeWordTowerState } from '@/lib/wordTower/wordTowerManager';
+import { clientTowerView } from '@/lib/wordTower/wordTowerManager';
 
 function broadcastTowerStandings(io: Server, gameCode: string): void {
   const game = getGame(gameCode);
@@ -76,7 +76,7 @@ export function handleSubmitTowerWord(io: Server, socket: Socket, data: SubmitTo
   socket.emit('towerWordResult', {
     accepted: true,
     result: outcome.result,
-    state: serializeWordTowerState(outcome.state.players[username].game),
+    state: clientTowerView(outcome.state.players[username].game),
   });
   broadcastTowerStandings(io, gameCode);
 }
@@ -87,7 +87,7 @@ export function handleScrambleTower(io: Server, socket: Socket): void {
   const { gameCode, username, game } = ctx;
   game.wordTowerVersusState = scrambleVersus(game.wordTowerVersusState!, username);
   socket.emit('towerTrayUpdate', {
-    state: serializeWordTowerState(game.wordTowerVersusState.players[username].game),
+    state: clientTowerView(game.wordTowerVersusState.players[username].game),
   });
   broadcastTowerStandings(io, gameCode);
 }
@@ -121,7 +121,7 @@ function handleRequestTowerState(socket: Socket): void {
   if (!ctx) return;
   const { username, game } = ctx;
   socket.emit('towerStateSync', {
-    you: serializeWordTowerState(game.wordTowerVersusState!.players[username].game),
+    you: clientTowerView(game.wordTowerVersusState!.players[username].game),
     standings: versusStandings(game.wordTowerVersusState!),
     endsAtMs: game.wordTowerVersusState!.endsAtMs,
   });

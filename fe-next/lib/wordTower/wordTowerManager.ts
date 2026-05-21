@@ -385,3 +385,30 @@ export function restoreWordTowerState(
     longestCombo: Math.max(0, saved.longestCombo ?? 0),
   };
 }
+
+/**
+ * Live client-renderable view of a tower (INCLUDES the tray, unlike the
+ * persistence blob). Sent over the socket so a versus client can render the
+ * tray + anchor + meters without exposing internal fields.
+ */
+export interface TowerClientView {
+  tray: string[];
+  anchorLetter: string;
+  scramblesLeft: number;
+  heightM: number;
+  combo: number;
+  floors: number;
+  bombCharge: number;
+}
+
+export function clientTowerView(s: WordTowerPlayerState): TowerClientView {
+  return {
+    tray: s.tray,
+    anchorLetter: s.anchorLetter,
+    scramblesLeft: s.scramblesLeft,
+    heightM: s.heightM,
+    combo: s.combo,
+    floors: s.floors.length,
+    bombCharge: s.bombCharge,
+  };
+}

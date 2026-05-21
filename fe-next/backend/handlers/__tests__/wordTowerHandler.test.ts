@@ -31,7 +31,7 @@ vi.mock('@/lib/wordTower/versusMatch', () => ({
   versusStandings: vi.fn(() => []),
 }));
 vi.mock('@/lib/wordTower/wordTowerManager', () => ({
-  serializeWordTowerState: vi.fn(() => ({ version: 1 })),
+  clientTowerView: vi.fn(() => ({ tray: ['A', 'B'], anchorLetter: 'A', scramblesLeft: 3, heightM: 0, combo: 0, floors: 0, bombCharge: 0 })),
 }));
 
 import { handleSubmitTowerWord, handleSendTowerBomb } from '../wordTowerHandler';
