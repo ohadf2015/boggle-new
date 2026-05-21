@@ -308,6 +308,32 @@ export function usePlayerGameEvents({
         && ext.gameSessionId !== undefined
         && prevSessionId === ext.gameSessionId;
 
+      // Results-skip race: a NEW round is starting, but we never processed
+      // results for the PREVIOUS session. The player was stuck on "calculating
+      // results" (validatedScores lost or beaten by this startGame) and is about
+      // to be pulled straight into the next round without ever seeing results.
+      // Best-effort recover the cached payload — the server only re-sends while
+      // still 'finished', so this wins only the slow-results (non-advanced) case
+      // — and always leave a breadcrumb so the race is visible in Sentry. We do
+      // NOT block the round; the server controls round flow.
+      // gameSessionIdRef inits to 0 (sentinel for "no game yet"), so a non-zero
+      // prevSessionId means a real prior round actually ran.
+      const isNewSession = prevSessionId !== 0
+        && ext.gameSessionId !== undefined
+        && ext.gameSessionId !== prevSessionId;
+      if (isNewSession && hasProcessedResultsRef.current !== prevSessionId) {
+        logger.log('[PLAYER] New round started before results were shown — recovering', {
+          prevSessionId, newSessionId: ext.gameSessionId,
+        });
+        socket.emit('requestResults');
+        addGameBreadcrumb('mp_results_skipped_by_next_round', {
+          role: 'player',
+          prevSessionId,
+          newSessionId: ext.gameSessionId,
+          processedSessionId: hasProcessedResultsRef.current,
+        });
+      }
+
       if (ext.gameSessionId !== undefined) {
         gameSessionIdRef.current = ext.gameSessionId;
       }
