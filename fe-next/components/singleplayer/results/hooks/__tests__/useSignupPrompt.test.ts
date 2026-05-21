@@ -24,6 +24,13 @@ vi.mock('@/utils/growthTracking', () => ({
   trackSignupFunnel: (...args: unknown[]) => mockTrackSignupFunnel(...args),
 }));
 
+// Cookie-consent gate: the prompt must hold until the user has resolved consent.
+// Default true so all pre-existing behaviour tests are unaffected.
+const mockConsentDecided = vi.fn<() => boolean>();
+vi.mock('@/hooks/useConsentDecided', () => ({
+  useConsentDecided: () => mockConsentDecided(),
+}));
+
 import { useSignupPrompt } from '../useSignupPrompt';
 
 const flushTimer = async (ms = 3600): Promise<void> => {
@@ -36,6 +43,7 @@ beforeEach(() => {
   vi.useFakeTimers();
   mockFlag.mockReturnValue('after-first-win');
   mockStats.mockReturnValue({ games: 0, wins: 0 });
+  mockConsentDecided.mockReturnValue(true);
   mockTrackSignupFunnel.mockClear();
   if (typeof window !== 'undefined') {
     window.sessionStorage.clear();
@@ -251,5 +259,35 @@ describe('useSignupPrompt — impression telemetry', () => {
     rerender();
     await flushTimer();
     expect(mockTrackSignupFunnel).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('useSignupPrompt — cookie consent gating', () => {
+  it('does NOT show while cookie consent is undecided, even if qualified', async () => {
+    mockConsentDecided.mockReturnValue(false);
+    mockStats.mockReturnValue({ games: 1, wins: 1 });
+    const { result } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(false);
+    expect(mockTrackSignupFunnel).not.toHaveBeenCalled();
+  });
+
+  it('shows once consent is decided (gate flips on re-render)', async () => {
+    mockConsentDecided.mockReturnValue(false);
+    mockStats.mockReturnValue({ games: 1, wins: 1 });
+    const { result, rerender } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(false);
+
+    // User clicks Accept/Decline → useConsentDecided flips → effect re-runs → timer starts.
+    mockConsentDecided.mockReturnValue(true);
+    rerender();
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(true);
+    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', true);
   });
 });

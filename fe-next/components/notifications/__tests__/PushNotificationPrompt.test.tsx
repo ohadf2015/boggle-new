@@ -61,6 +61,12 @@ vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: (...args: unknown[]) => mockTrackGrowthEvent(...args),
 }));
 
+// Cookie-consent gate: prompt holds until consent is resolved. Default true.
+const mockConsentDecided = vi.fn<() => boolean>();
+vi.mock('@/hooks/useConsentDecided', () => ({
+  useConsentDecided: () => mockConsentDecided(),
+}));
+
 describe('PushNotificationPrompt', () => {
   let originalNotification: typeof Notification;
 
@@ -68,6 +74,7 @@ describe('PushNotificationPrompt', () => {
     vi.clearAllMocks();
     originalNotification = window.Notification;
     mockShouldShow.mockReturnValue(true);
+    mockConsentDecided.mockReturnValue(true);
   });
 
   afterEach(() => {
@@ -104,6 +111,22 @@ describe('PushNotificationPrompt', () => {
 
       // THEN
       expect(container.firstChild).toBeNull();
+    });
+
+    it('should not render while cookie consent is undecided, even if qualified', () => {
+      // GIVEN - prompt qualifies but consent banner is still pending
+      mockShouldShow.mockReturnValue(true);
+      mockConsentDecided.mockReturnValue(false);
+
+      // WHEN
+      const { container } = render(<PushNotificationPrompt />);
+
+      // THEN - held back so it doesn't stack under the consent banner
+      expect(container.firstChild).toBeNull();
+      expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith(
+        'push_prompt_shown',
+        expect.anything(),
+      );
     });
 
     it('should show both action buttons', () => {

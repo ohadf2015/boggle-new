@@ -5,6 +5,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { Mail, Trophy, Calendar } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useConsentDecided } from '@/hooks/useConsentDecided';
 import { socialEvents } from './SocialMediaPixels';
 import {
   Dialog,
@@ -29,6 +30,9 @@ import {
 export function EmailCaptureModal() {
   const { t } = useLanguage();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
+  // Hold the modal until the cookie-consent decision is resolved — otherwise it opens
+  // behind the z-110 consent banner (this modal is z-90) and is revealed on dismiss.
+  const consentDecided = useConsentDecided();
   const [showModal, setShowModal] = useState(false);
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -69,6 +73,8 @@ export function EmailCaptureModal() {
     if (isEnabled !== true) return;
     // CrazyGames embed: never show email capture (platform forbids unsolicited capture)
     if (isOnCrazyGamesPlatform) return;
+    // Wait for the cookie-consent decision before competing for the screen.
+    if (!consentDecided) return;
 
     // Check if modal should be shown
     const checkShouldShow = () => {
@@ -113,7 +119,7 @@ export function EmailCaptureModal() {
     }, 10000);
 
     return () => clearTimeout(timer);
-  }, [isEnabled, isOnCrazyGamesPlatform]);
+  }, [isEnabled, isOnCrazyGamesPlatform, consentDecided]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

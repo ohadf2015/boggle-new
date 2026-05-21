@@ -14,10 +14,14 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { shouldShowPushPrompt, dismissPushPrompt } from '@/utils/pushNotifications';
 import { registerPushToken } from '@/utils/pushNotifications/tokenRegistration';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { useConsentDecided } from '@/hooks/useConsentDecided';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
 export function PushNotificationPrompt() {
   const { t } = useLanguage();
+  // Hold the prompt until cookie consent is resolved so it doesn't stack under the
+  // consent banner (z-110) while pending. Same modal-coordination rule as signup/email.
+  const consentDecided = useConsentDecided();
   const [visible, setVisible] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   useFocusTrap(dialogRef, visible, () => {
@@ -31,12 +35,13 @@ export function PushNotificationPrompt() {
   // `push_prompt_granted` so the show → grant funnel is computable. Without
   // this, MIN_GAMES_BEFORE_PROMPT=3 tuning is blind.
   useEffect(() => {
+    if (!consentDecided) return;
     const should = shouldShowPushPrompt();
     setVisible(should);
     if (should) {
       trackGrowthEvent('push_prompt_shown', {});
     }
-  }, []);
+  }, [consentDecided]);
 
   if (!visible) {
     return null;

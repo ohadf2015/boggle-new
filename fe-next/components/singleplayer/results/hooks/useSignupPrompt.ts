@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getGuestStats } from '@/utils/guestManager';
 import { usePostHogFlag } from '@/hooks/usePostHogFlag';
+import { useConsentDecided } from '@/hooks/useConsentDecided';
 import { trackSignupFunnel } from '@/utils/growthTracking';
 
 // Session storage key for tracking if signup prompt was shown
@@ -59,9 +60,15 @@ export function useSignupPrompt({
   // 'after-third-game' gates purely on games count.
   const signupVariant = usePostHogFlag<string>('show-signup-after-first-win', 'after-first-win');
 
+  // Hold the prompt until the cookie-consent decision is resolved. The consent banner
+  // (z-110, no backdrop) would otherwise sit on top of this modal (z-90), so the modal
+  // pops up *behind* it and gets revealed when the user clicks Decline/Accept.
+  const consentDecided = useConsentDecided();
+
   useEffect(() => {
     if (disabled || isAuthenticated || hasUser || authLoading) return;
     if (typeof window === 'undefined') return;
+    if (!consentDecided) return;
 
     const alreadyShown = sessionStorage.getItem(SIGNUP_PROMPT_SHOWN_KEY);
     if (alreadyShown) return;
@@ -89,7 +96,7 @@ export function useSignupPrompt({
     }, 3500);
 
     return () => clearTimeout(timer);
-  }, [isAuthenticated, hasUser, authLoading, disabled, signupVariant, statsVersion]);
+  }, [isAuthenticated, hasUser, authLoading, disabled, signupVariant, statsVersion, consentDecided]);
 
   const dismissSignupModal = useCallback(() => {
     setShowSignupModal(false);
