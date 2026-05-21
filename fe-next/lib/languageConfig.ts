@@ -84,3 +84,15 @@ export const RTL_LANGUAGES: Language[] = ['he'];
 export const isRtlLanguage = (lang: Language): boolean => {
   return RTL_LANGUAGES.includes(lang);
 };
+
+/**
+ * Text direction for content written in a given GAME language.
+ *
+ * Use this for in-game word surfaces (letter tiles, the word being built,
+ * found-word chips) so the board follows the language of the *words*, not the
+ * UI locale. A Hebrew-UI player in an English game must still see English
+ * words left-to-right. Null/undefined → 'ltr' (safe default).
+ */
+export const languageDir = (lang: Language | null | undefined): 'rtl' | 'ltr' => {
+  return lang && isRtlLanguage(lang) ? 'rtl' : 'ltr';
+};

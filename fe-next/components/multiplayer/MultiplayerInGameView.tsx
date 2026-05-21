@@ -341,6 +341,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         onQuit={handleQuit}
         t={t}
         remainingTime={remainingTime}
+        gameLanguage={gameLanguage}
       />
     );
   }
@@ -452,6 +453,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       t,
       remainingTime,
       onFogProgressChange: setFogProgress,
+      gameLanguage,
     };
 
     return (

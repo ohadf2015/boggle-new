@@ -12,6 +12,8 @@ import { isValidWordWheelWord } from '@/utils/dailyChallenge/wordWheelGeneration
 import { cn } from '@/lib/utils';
 import { WHEEL_RUSH_FOG_MS, WHEEL_RUSH_MIN_WORD_LEN } from '@/shared/constants/wheelRushConstants';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
+import type { Language } from '@/types';
+import { languageDir } from '@/lib/languageConfig';
 import Avatar from '@/components/Avatar';
 import { MyWordsChips, type WordEntry } from './WheelRushPieces';
 import { WheelRushHeader } from './WheelRushHeader';
@@ -59,6 +61,9 @@ interface Props {
   /** When true, hides the internal top-bar (leaderboard chips + timer + quit) and word chips —
    *  the MultiplayerDesktopShell handles those via the side rails. */
   isDesktopCanvas?: boolean;
+  /** Language of the GAME (not the UI). Drives word-display direction so an
+   *  English game reads left-to-right even for a Hebrew-UI (RTL) player. */
+  gameLanguage?: Language | null;
 }
 
 const MIN_LEN = WHEEL_RUSH_MIN_WORD_LEN;
@@ -93,7 +98,10 @@ export const FogCountdown: React.FC<{ endsAt: number }> = ({ endsAt }) => {
   return <span ref={ref} data-testid="fog-countdown" className="opacity-60 tabular-nums" />;
 };
 
-export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t, remainingTime, onFogProgressChange, isDesktopCanvas = false }) => {
+export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t, remainingTime, onFogProgressChange, isDesktopCanvas = false, gameLanguage }) => {
+  // Word surfaces follow the GAME language, not the UI locale. A Hebrew-UI
+  // player in an English game must still read words left-to-right.
+  const wordDir = languageDir(gameLanguage);
   const {
     playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
     playButtonClickSound, playBoardShuffleSound, playLegendaryWordSound,
@@ -552,7 +560,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             : { type: 'spring', stiffness: 300, damping: 20 }
         }
       >
-        <div className="relative flex items-center justify-center gap-1 sm:gap-2 flex-wrap max-w-full w-full">
+        <div dir={wordDir} className="relative flex items-center justify-center gap-1 sm:gap-2 flex-wrap max-w-full w-full">
           {/* Placeholder is absolute-centered so layout never reflows when letters clear/repopulate
               (prevents post-reset horizontal shift). */}
           <m.span
@@ -741,7 +749,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         {/* Found-word chips ride directly under the actions inside the centered
             cluster — keeps them in the wheel's gravity well instead of stranded
             at the screen bottom. Fixed-height slot so the cluster never reflows. */}
-        {!isDesktopCanvas && <MyWordsChips words={myWords} />}
+        {!isDesktopCanvas && <MyWordsChips words={myWords} dir={wordDir} />}
       </div>
 
       <WheelRushCelebration celebration={celebration} t={t} prefersReduced={!!prefersReduced} />
