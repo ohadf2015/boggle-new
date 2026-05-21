@@ -49,10 +49,16 @@ preflight_check() {
   # --- git tree state --------------------------------------------------
   cd "$PROJECT_DIR" || { echo "preflight: cd $PROJECT_DIR failed"; return 1; }
 
-  if ! git diff --quiet || ! git diff --cached --quiet; then
-    echo "preflight: ABORT — working tree dirty"
+  # The nightly INTENTIONALLY runs on top of the founder's WIP: it sweeps the
+  # dirty tree into the autonomous commit and ships it (run.sh snapshots the WIP
+  # first, so a gate failure restores it untouched and never pushes broken code).
+  # So a dirty tree must NOT abort. We only RECORD cleanliness — it gates the
+  # ff-pull below, which git refuses to run on a dirty tree.
+  local tree_clean=1
+  if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+    tree_clean=0
+    echo "preflight: working tree dirty — will run on top of WIP and ship it"
     git status --short
-    return 1
   fi
 
   local branch=$(git rev-parse --abbrev-ref HEAD)
@@ -61,28 +67,36 @@ preflight_check() {
     return 1
   fi
 
-  echo "preflight: fetching + ff-pulling master..."
-  git fetch origin master --quiet || { echo "preflight: fetch failed"; return 1; }
-  if ! git pull --ff-only origin master --quiet; then
-    # ff failed → local diverged from origin. Self-heal ONLY when every local-only
-    # commit is docs/-only (a stranded seo-daily report, or our own failed-push
-    # from a prior run). If ANY local-only commit touches non-docs paths, abort
-    # for manual review — never auto-rebase code we can't re-gate.
-    local non_docs
-    non_docs=$(git diff --name-only origin/master..master | grep -vE '^docs/' || true)
-    if [ -n "$non_docs" ]; then
-      echo "preflight: ABORT — diverged & local-only commits touch non-docs paths (manual review):"
-      echo "$non_docs" | sed 's/^/  /'
-      return 1
+  # ff-pull is an OPTIMIZATION, not a correctness requirement: git-ship rebases
+  # the nightly commit onto origin/master at push time. Both `git pull --ff-only`
+  # and `git rebase` REFUSE on a dirty tree, so skip the whole block when dirty
+  # and let the push-time rebase reconcile any divergence.
+  if [ "$tree_clean" = "1" ]; then
+    echo "preflight: fetching + ff-pulling master..."
+    git fetch origin master --quiet || { echo "preflight: fetch failed"; return 1; }
+    if ! git pull --ff-only origin master --quiet; then
+      # ff failed → local diverged from origin. Self-heal ONLY when every local-only
+      # commit is docs/-only (a stranded seo-daily report, or our own failed-push
+      # from a prior run). If ANY local-only commit touches non-docs paths, abort
+      # for manual review — never auto-rebase code we can't re-gate.
+      local non_docs
+      non_docs=$(git diff --name-only origin/master..master | grep -vE '^docs/' || true)
+      if [ -n "$non_docs" ]; then
+        echo "preflight: ABORT — diverged & local-only commits touch non-docs paths (manual review):"
+        echo "$non_docs" | sed 's/^/  /'
+        return 1
+      fi
+      echo "preflight: ff-only failed — local-only commits are docs-only, auto-rebasing onto origin/master"
+      if git rebase origin/master >/dev/null 2>&1; then
+        echo "preflight: auto-rebase OK"
+      else
+        git rebase --abort 2>/dev/null || true
+        echo "preflight: ABORT — auto-rebase onto origin/master conflicted (manual fix needed)"
+        return 1
+      fi
     fi
-    echo "preflight: ff-only failed — local-only commits are docs-only, auto-rebasing onto origin/master"
-    if git rebase origin/master >/dev/null 2>&1; then
-      echo "preflight: auto-rebase OK"
-    else
-      git rebase --abort 2>/dev/null || true
-      echo "preflight: ABORT — auto-rebase onto origin/master conflicted (manual fix needed)"
-      return 1
-    fi
+  else
+    echo "preflight: dirty tree — skipping ff-pull (git-ship rebases onto origin at push time)"
   fi
 
   # --- MCP servers alive ----------------------------------------------

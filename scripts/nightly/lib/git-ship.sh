@@ -95,6 +95,37 @@ ship_nightly_commit() {
     return 0
   fi
 
+  # The rebase (or its push) failed. If it stopped on a conflict confined ENTIRELY
+  # to docs/ — the loop's own machine-authored output (reports/ideas/loop-improvements,
+  # never human-contended source) — auto-resolve in favour of the nightly's fresh
+  # version and continue. This is the SAME `^docs/` trust boundary preflight uses for
+  # its docs-only auto-rebase, and it stops a trivial docs collision (e.g. a prior
+  # stranded report push) from wedging the whole loop. ANY non-docs conflict (real
+  # hand-written code) falls through to abort+alert — that correctly stops for a human.
+  local conflicted non_docs_conflict cf
+  conflicted=$(git diff --name-only --diff-filter=U 2>/dev/null)
+  if [ -n "$conflicted" ]; then
+    non_docs_conflict=$(printf '%s\n' "$conflicted" | grep -vE '^docs/' || true)
+    if [ -z "$non_docs_conflict" ]; then
+      log "rebase conflict confined to docs/ — auto-resolving with nightly version"
+      # During a rebase, --theirs is the commit being REPLAYED (our nightly commit),
+      # not origin. So --theirs keeps the nightly's fresh docs. (Rebase inverts the
+      # intuitive ours/theirs — origin is "ours"/HEAD here.)
+      while IFS= read -r cf; do
+        [ -n "$cf" ] && git checkout --theirs -- "$cf" 2>/dev/null
+      done <<< "$conflicted"
+      git add -A
+      if git rebase --continue >> "$RUN_LOG" 2>&1 \
+         && git push origin master >> "$RUN_LOG" 2>&1; then
+        NEW_SHA=$(git rev-parse HEAD)
+        log "pushed after docs-only auto-resolve $NEW_SHA"
+        echo -e "\n**Outcome:** ✅ shipped \`$NEW_SHA\` (auto-resolved docs/ conflict, rebased onto origin)" >> "$REPORT"
+        return 0
+      fi
+      log "docs-only auto-resolve unexpectedly failed — falling through to abort"
+    fi
+  fi
+
   # Genuine conflict (origin and a lane edited the same source file). Abort the
   # rebase to restore a clean tree + the intact local commit, then fail visibly.
   # Backtick-wrap the path: tg uses parse_mode=Markdown and most repo paths have

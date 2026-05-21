@@ -66,6 +66,9 @@ cleanup() {
   # shellcheck disable=SC1091
   . "$LIB_DIR/preflight.sh"
   preflight_release_lock
+  # On the success path the WIP snapshot is never reverted, so its tempdir leaks
+  # unless we sweep it here. (Revert paths null it out after consuming it.)
+  [ -n "${RUN_SNAPSHOT:-}" ] && rm -rf "$RUN_SNAPSHOT" 2>/dev/null
 }
 trap cleanup EXIT
 
@@ -141,6 +144,17 @@ cat > "$REPORT" <<EOF
 
 EOF
 
+# --- WIP snapshot + dirty baseline ----------------------------------------
+# The loop runs ON TOP OF the founder's uncommitted WIP and ships it. Snapshot the
+# FULL working tree NOW (after the report header is written, before any lane runs)
+# so every abort / gate-failure path can restore it byte-for-byte — we sweep WIP
+# into the commit on success, but on failure we must NEVER destroy it or push it
+# broken. Also record the pre-lane dirty count so the sanity cap below measures
+# LANE-introduced churn, not the founder's pre-existing WIP.
+RUN_SNAPSHOT=$(snapshot_pre_lane)
+BASELINE_DIRTY=$(git status --porcelain | wc -l | tr -d ' ')
+log "pre-lane WIP: $BASELINE_DIRTY dirty files (snapshot at $RUN_SNAPSHOT)"
+
 # --- run lanes -------------------------------------------------------------
 LANES=(01-triage 02-perf 03-engagement 04-competitor 05-landing 06-seo 07-self-learn 08-adsense)
 LANE_RESULTS=()
@@ -208,15 +222,16 @@ else
   NO_CHANGE_MODE=0
 fi
 
-if [ "$NO_CHANGE_MODE" = "0" ] && [ "$DIRTY_COUNT" -gt 30 ]; then
-  log "ABORT: total diff $DIRTY_COUNT > 30 (sanity cap); reverting all"
-  git checkout -- . 2>/dev/null || true
-  # Preserve the run-time report + ideas dirs (their files document the run
-  # itself and are useful even when lane work is reverted).
-  git clean -fd -e 'docs/nightly/reports' -e 'docs/nightly/ideas' 2>/dev/null || true
-  mkdir -p "$(dirname "$REPORT")" "$PROJECT_DIR/docs/nightly/ideas"
-  echo -e "\n**Outcome:** ABORTED — diff $DIRTY_COUNT > 30 sanity cap." >> "$REPORT"
-  tg_alert "nightly $TODAY ABORTED — diff $DIRTY_COUNT files > 30 sanity cap. All changes reverted."
+LANE_CHURN=$(( DIRTY_COUNT - BASELINE_DIRTY ))
+if [ "$NO_CHANGE_MODE" = "0" ] && [ "$LANE_CHURN" -gt 30 ]; then
+  log "ABORT: lane churn $LANE_CHURN (>$DIRTY_COUNT total - $BASELINE_DIRTY WIP) > 30 sanity cap; restoring pre-run tree"
+  # Restore the EXACT pre-lane tree (founder WIP intact, lane changes dropped). The
+  # snapshot was taken after the report header, so the header survives; re-append a
+  # clear failure Outcome below.
+  revert_to_pre_lane "$RUN_SNAPSHOT"; RUN_SNAPSHOT=""
+  mkdir -p "$(dirname "$REPORT")"
+  echo -e "\n**Outcome:** ABORTED — lane churn $LANE_CHURN files > 30 sanity cap. Pre-run WIP restored, lane changes dropped." >> "$REPORT"
+  tg_alert "nightly $TODAY ABORTED — lane churn $LANE_CHURN files > 30 sanity cap. Founder WIP restored, nothing pushed."
   exit 1
 fi
 
@@ -254,14 +269,15 @@ for attempt in 1 2; do
 done
 
 if [ "$gate_ok" = "0" ]; then
-  log "GATE FAILED — reverting all lane changes"
-  git checkout -- . 2>/dev/null || true
-  # Preserve the run-time report + ideas dirs (their files document the run
-  # itself and are useful even when lane work is reverted).
-  git clean -fd -e 'docs/nightly/reports' -e 'docs/nightly/ideas' 2>/dev/null || true
-  mkdir -p "$(dirname "$REPORT")" "$PROJECT_DIR/docs/nightly/ideas"
-  echo -e "\n**Outcome:** GATE FAILED — lint/test/build failed twice. Reverted." >> "$REPORT"
-  tg_alert "nightly $TODAY: build/lint/test gate failed twice. Diff reverted. See \`$RUN_LOG\`."
+  log "GATE FAILED — restoring pre-run tree (founder WIP preserved, lane changes dropped)"
+  # NEVER push broken code, and NEVER lose the founder's WIP. The snapshot is the
+  # founder's WIP + report header (taken before any lane ran), so restoring it keeps
+  # their WIP intact and discards only what the LANES added on top. The header
+  # survives; we re-append a clear failure Outcome below.
+  revert_to_pre_lane "$RUN_SNAPSHOT"; RUN_SNAPSHOT=""
+  mkdir -p "$(dirname "$REPORT")"
+  echo -e "\n**Outcome:** GATE FAILED — lint/test/build failed twice. Pre-run tree restored (founder WIP intact, lane changes dropped)." >> "$REPORT"
+  tg_alert "nightly $TODAY: build/lint/test gate failed twice. Founder WIP restored, nothing pushed. See \`$RUN_LOG\`."
   exit 1
 fi
 
@@ -487,6 +503,31 @@ $IDEA_LINE
       log "sent game-mode-idea card (hash=$IDEA_HASH)"
     fi
   fi
+fi
+
+# --- residual ship: push anything still dirty ------------------------------
+# git-ship appends the Outcome line to the report AFTER its own commit, so the main
+# ship always leaves that line (plus any other end-of-run writes) uncommitted. Left
+# alone it would dirty the tree for tomorrow — exactly what stranded the 2026-05-19
+# run. Sweep the residue into a follow-up commit so "more changes get pushed too"
+# and the tree ends CLEAN. Reuse ship_nightly_commit (fetch+rebase+docs-resolve);
+# point REPORT at /dev/null so its OWN Outcome append can't re-dirty the tree.
+if [ "$DRY_RUN" = "0" ] && [ "$NO_PUSH" = "0" ] && [ -n "$(git status --porcelain)" ]; then
+  log "residual changes after main ship — sweeping into a follow-up commit"
+  RESIDUAL_MSG=$(mktemp)
+  cat > "$RESIDUAL_MSG" <<EOF
+chore(nightly): post-run residue ${TODAY}
+
+Trailing changes after the main ship (report finalization, etc).
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+EOF
+  if MSG_FILE="$RESIDUAL_MSG" REPORT=/dev/null NO_CHANGE_MODE=0 ship_nightly_commit; then
+    log "residual ship OK ($(git rev-parse --short HEAD)); tree now $([ -z "$(git status --porcelain)" ] && echo clean || echo 'still dirty'))"
+  else
+    log "residual ship failed (non-fatal — main work already pushed; tree left for next run)"
+  fi
+  rm -f "$RESIDUAL_MSG"
 fi
 
 preflight_mark_success

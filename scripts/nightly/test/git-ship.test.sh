@@ -135,6 +135,55 @@ assert "translation-report NOT committed"   "! git show origin/master:fe-next/sc
 assert "tsconfig NOT committed"             "! git show origin/master:fe-next/tsconfig.json | grep -q _nextBuild"
 assert "tree clean (both restored)"         "local_clean"
 
+echo "Scenario 7 — origin & nightly both touch the SAME docs/ file → auto-resolved (nightly wins), push clean"
+setup
+echo "NIGHTLY report v2"          > docs/nightly/reports/2026-01-01.md
+advance_origin "docs/nightly/reports/2026-01-01.md=ORIGIN stranded report v1"
+ship_nightly_commit; rc=$?
+assert "returns 0 (docs conflict auto-resolved)" "[ $rc -eq 0 ]"
+assert "origin == local HEAD"                    "[ \"\$(origin_head)\" = \"\$(git rev-parse HEAD)\" ]"
+assert "nightly's docs version won"              "git show origin/master:docs/nightly/reports/2026-01-01.md | grep -q 'NIGHTLY report v2'"
+assert "origin's stranded version overwritten"   "! git show origin/master:docs/nightly/reports/2026-01-01.md | grep -q 'stranded report v1'"
+assert "tree clean"                              "local_clean"
+assert "no unmerged paths"                       "[ -z \"\$(git diff --name-only --diff-filter=U)\" ]"
+assert "no push-failed alert"                    "! printf '%s' \"\$ALERTS\" | grep -q 'push failed'"
+
+echo "Scenario 8 — conflict on BOTH a docs/ file AND a code file → NOT auto-resolved, fail visibly"
+setup
+echo "NIGHTLY report v2"                          > docs/nightly/reports/2026-01-01.md
+printf 'export const x = 2; // nightly\n'         > fe-next/app/page.tsx
+advance_origin "docs/nightly/reports/2026-01-01.md=ORIGIN report v1" \
+               "fe-next/app/page.tsx=export const x = 3; // origin"
+ship_nightly_commit; rc=$?
+assert "returns 1 (mixed conflict → human)"       "[ $rc -eq 1 ]"
+assert "local commit PRESERVED"                   "[ \"\$(git log -1 --pretty=%s)\" = 'chore(nightly): autonomous improvement loop test' ]"
+assert "tree CLEAN (rebase aborted)"              "local_clean"
+assert "no unmerged paths"                        "[ -z \"\$(git diff --name-only --diff-filter=U)\" ]"
+assert "alert names the code conflict"            "printf '%s' \"\$ALERTS\" | grep -q 'page.tsx'"
+assert "origin's code NOT clobbered"              "git show origin/master:fe-next/app/page.tsx | grep -q '// origin'"
+assert "nightly docs NOT half-shipped"            "! git show origin/master:docs/nightly/reports/2026-01-01.md | grep -q 'NIGHTLY report v2'"
+
+echo "Scenario 9 — residual ship: a 2nd ship_nightly_commit sweeps trailing changes and ends CLEAN"
+# git-ship appends the Outcome line to the report AFTER its own commit, so every
+# successful run leaves the tree dirty (this is what aborted the 2026-05-19 run).
+# run.sh now calls ship_nightly_commit a 2nd time at end-of-run with REPORT=/dev/null
+# so the residue (and any other trailing change) gets pushed too and the tree ends
+# clean for the NEXT run's preflight. Prove that pattern here.
+setup
+echo "lane work" > docs/nightly/reports/2026-01-01.md
+ship_nightly_commit; rc1=$?
+echo "**Outcome:** ✅ shipped" >> docs/nightly/reports/2026-01-01.md   # simulate post-commit append
+assert "first ship returned 0"            "[ $rc1 -eq 0 ]"
+assert "tree dirty after Outcome append"  "! local_clean"
+RES_MSG=$(mktemp); echo "chore(nightly): post-run residue test" > "$RES_MSG"
+# REPORT=/dev/null so the residual ship's OWN Outcome append can't re-dirty the tree.
+MSG_FILE="$RES_MSG" REPORT=/dev/null NO_CHANGE_MODE=0 ship_nightly_commit; rc2=$?
+assert "residual ship returned 0"         "[ $rc2 -eq 0 ]"
+assert "tree CLEAN after residual ship"   "local_clean"
+assert "residual change reached origin"   "git show origin/master:docs/nightly/reports/2026-01-01.md | grep -q 'Outcome'"
+assert "origin == local HEAD"             "[ \"\$(origin_head)\" = \"\$(git rev-parse HEAD)\" ]"
+assert "two distinct nightly commits"     "[ \"\$(git rev-list --count origin/master)\" -ge 3 ]"
+
 echo
 echo "──────────────────────────────────────────"
 echo "PASS=$PASS  FAIL=$FAIL"
