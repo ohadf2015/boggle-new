@@ -80,4 +80,40 @@ describe('RosterRail', () => {
       expect(a.getAttribute('data-disable-effects')).toBe('true');
     }
   });
+
+  it('crowns the top scorer (data-leader + decorative crown icon)', () => {
+    render(<RosterRail players={players} />);
+    const leader = screen.getByTestId('roster-row-u1'); // Alpha, top score
+    expect(leader).toHaveAttribute('data-leader', 'true');
+    expect(leader.querySelector('svg')).toBeTruthy(); // lucide Crown
+  });
+
+  it('does not crown non-leaders', () => {
+    render(<RosterRail players={players} />);
+    expect(screen.getByTestId('roster-row-u2')).toHaveAttribute('data-leader', 'false');
+    expect(screen.getByTestId('roster-row-u3')).toHaveAttribute('data-leader', 'false');
+  });
+
+  it('crowns nobody before the first point is scored', () => {
+    const fresh = [
+      { userId: 'u1', username: 'Alpha', score: 0, status: 'connected' as const, isYou: true },
+      { userId: 'u2', username: 'Beta', score: 0, status: 'connected' as const },
+    ];
+    render(<RosterRail players={fresh} />);
+    expect(screen.getByTestId('roster-row-u1')).toHaveAttribute('data-leader', 'false');
+    expect(screen.getByTestId('roster-row-u2')).toHaveAttribute('data-leader', 'false');
+  });
+
+  it('exposes rank position as a data attribute for each row', () => {
+    render(<RosterRail players={players} />);
+    expect(screen.getByTestId('roster-row-u1')).toHaveAttribute('data-rank', '1');
+    expect(screen.getByTestId('roster-row-u2')).toHaveAttribute('data-rank', '2');
+    expect(screen.getByTestId('roster-row-u3')).toHaveAttribute('data-rank', '3');
+  });
+
+  it('keeps the leader rank readable to assistive tech despite the crown', () => {
+    render(<RosterRail players={players} />);
+    // crown is decorative; the rank number survives in textContent (sr-only)
+    expect(screen.getByTestId('roster-row-u1').textContent).toMatch(/^1/);
+  });
 });
