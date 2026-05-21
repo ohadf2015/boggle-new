@@ -1,5 +1,15 @@
 // Es translations
 const es = {
+  "wordTower": {
+    "cardTitle": "Torre de Palabras",
+    "cardDesc": "Apila palabras hasta el cielo — vista de admin",
+    "loading": "Cargando diccionario…",
+    "biome": { "city": "Suelo", "sky": "Cielo", "stratosphere": "Estratosfera", "orbit": "Órbita", "nebula": "Nebulosa", "galaxy": "Galaxia" },
+    "hud": { "floors": "{n} pisos", "combo": "cadena {n}", "scramble": "Mezclar", "backspace": "Borrar", "build": "Construir", "restart": "Reiniciar" },
+    "error": { "too_short": "Muy corta — 3+ letras", "bad_chain": "Empieza con la letra brillante", "not_buildable": "Usa las letras de la bandeja", "duplicate": "Ya usaste esa palabra", "not_in_dictionary": "No está en el diccionario" },
+    "celebration": { "highRise": "¡Edificio alto!", "tall": "¡Imponente!", "skyscraper": "¡RASCACIELOS!" },
+    "a11y": { "height": "Altura {m} metros", "combo": "cadena {n}", "tile": "Letra {letter}" }
+  },
   "flag": "🇪🇸",
   "androidAppPromo": {
     "title": "Descarga la app de LexiClash",

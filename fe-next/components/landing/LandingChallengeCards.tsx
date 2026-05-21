@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers, Gem } from 'lucide-react';
+import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers, Gem, Building2 } from 'lucide-react';
 import ModeCard from './ModeCard';
+import { useExperiment } from '@/hooks/useExperiment';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
@@ -46,7 +47,7 @@ interface LandingChallengeCardsProps {
  * `'connections'` and `'brainGym'` are landing-only synthetic modes routing
  * to `/connections` and `/brain` respectively.
  */
-type LandingCardKey = LandingGameMode | 'connections' | 'brainGym' | 'wordCraft' | 'wordCraftGems';
+type LandingCardKey = LandingGameMode | 'connections' | 'brainGym' | 'wordCraft' | 'wordCraftGems' | 'wordTower';
 
 /** Default card order when no server data available */
 const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'practice', 'blast', 'connections', 'brainGym'];
@@ -58,7 +59,7 @@ const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'practice', 'blast', 
  */
 const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
-  'connections', 'brainGym', 'wordCraft', 'wordCraftGems',
+  'connections', 'brainGym', 'wordCraft', 'wordCraftGems', 'wordTower',
 ]);
 
 /** CSS stagger delay for each card index */
@@ -92,6 +93,9 @@ export function LandingChallengeCards({
   // a recorded personal best is a durable "I've played" signal that survives
   // localStorage clears for signed-in users.
   const { isAdmin } = useAuth();
+  // Word Tower is admin-only AND behind the `word-tower` experiment during dev.
+  const { variant: wordTowerVariant } = useExperiment('word-tower');
+  const wordTowerEnabled = isAdmin && wordTowerVariant === 'on';
   const isVeteranRaw = useIsPracticeVeteran();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const hasPlayedAnyGame = !!playerAllTimeBest && playerAllTimeBest.score > 0;
@@ -136,6 +140,7 @@ export function LandingChallengeCards({
     if (!next.includes('brainGym')) next.push('brainGym');
     if (isAdmin && !next.includes('wordCraft')) next.push('wordCraft');
     if (isAdmin && !next.includes('wordCraftGems')) next.push('wordCraftGems');
+    if (wordTowerEnabled && !next.includes('wordTower')) next.push('wordTower');
     if (language === 'ja') return next.filter((m) => !JA_HIDDEN_MODES.has(m));
     return next;
   })();
@@ -230,6 +235,21 @@ export function LandingChallengeCards({
               variant="orange"
               badge="NEW"
               onClick={() => { trackModeSelected('blast', 'home'); trackLandingCtaClick('mode_card', { mode: 'blast', variant: 'orange' }); }}
+            />
+          </div>
+        );
+
+      case 'wordTower':
+        return (
+          <div key="wordTower" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+            <ModeCard
+              title={t('wordTower.cardTitle')}
+              description={t('wordTower.cardDesc')}
+              href={`/${language}/word-tower`}
+              icon={<Building2 className="w-6 h-6" />}
+              variant="purple"
+              badge="ADMIN"
+              onClick={() => { trackLandingCtaClick('mode_card', { mode: 'wordTower', variant: 'purple' }); }}
             />
           </div>
         );

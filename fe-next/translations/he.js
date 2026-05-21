@@ -1,5 +1,15 @@
 // HE translations
 const he = {
+  "wordTower": {
+    "cardTitle": "מגדל מילים",
+    "cardDesc": "בנו מגדל מילים עד השמיים — תצוגת אדמין",
+    "loading": "טוען מילון…",
+    "biome": { "city": "קרקע", "sky": "שמיים", "stratosphere": "סטרטוספירה", "orbit": "מסלול", "nebula": "ערפילית", "galaxy": "גלקסיה" },
+    "hud": { "floors": "{n} קומות", "combo": "שרשרת {n}", "scramble": "ערבוב", "backspace": "מחיקה", "build": "בנייה", "restart": "מחדש" },
+    "error": { "too_short": "קצר מדי — 3 אותיות לפחות", "bad_chain": "התחילו באות הזוהרת", "not_buildable": "השתמשו באותיות המגש", "duplicate": "כבר השתמשת במילה הזו", "not_in_dictionary": "לא במילון" },
+    "celebration": { "highRise": "מתנשא!", "tall": "גבוה!", "skyscraper": "גורד שחקים!" },
+    "a11y": { "height": "גובה {m} מטר", "combo": "שרשרת {n}", "tile": "אות {letter}" }
+  },
   "flag": "🇮🇱",
   "androidAppPromo": {
     "title": "הורידו את אפליקציית LexiClash",

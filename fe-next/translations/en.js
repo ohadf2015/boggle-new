@@ -1,5 +1,15 @@
 // EN translations
 const en = {
+  "wordTower": {
+    "cardTitle": "Word Tower",
+    "cardDesc": "Stack words sky-high — admin preview",
+    "loading": "Loading dictionary…",
+    "biome": { "city": "Ground", "sky": "Sky", "stratosphere": "Stratosphere", "orbit": "Orbit", "nebula": "Nebula", "galaxy": "Galaxy" },
+    "hud": { "floors": "{n} floors", "combo": "{n} chain", "scramble": "Scramble", "backspace": "Delete", "build": "Build", "restart": "Restart" },
+    "error": { "too_short": "Too short — 3+ letters", "bad_chain": "Start with the glowing letter", "not_buildable": "Use the tray letters", "duplicate": "Already used that word", "not_in_dictionary": "Not in the dictionary" },
+    "celebration": { "highRise": "High Rise!", "tall": "Towering!", "skyscraper": "SKYSCRAPER!" },
+    "a11y": { "height": "Height {m} meters", "combo": "combo {n}", "tile": "Letter {letter}" }
+  },
   "flag": "🇺🇸",
   "androidAppPromo": {
     "title": "Get the LexiClash App",

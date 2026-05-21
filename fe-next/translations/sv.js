@@ -1,5 +1,15 @@
 // Sv translations
 const sv = {
+  "wordTower": {
+    "cardTitle": "Ordtorn",
+    "cardDesc": "Stapla ord mot skyn — adminförhandsvisning",
+    "loading": "Laddar ordlista…",
+    "biome": { "city": "Mark", "sky": "Himmel", "stratosphere": "Stratosfär", "orbit": "Omloppsbana", "nebula": "Nebulosa", "galaxy": "Galax" },
+    "hud": { "floors": "{n} våningar", "combo": "{n} kedja", "scramble": "Blanda", "backspace": "Radera", "build": "Bygg", "restart": "Börja om" },
+    "error": { "too_short": "För kort — minst 3 bokstäver", "bad_chain": "Börja på den lysande bokstaven", "not_buildable": "Använd brickornas bokstäver", "duplicate": "Ordet är redan använt", "not_in_dictionary": "Inte i ordlistan" },
+    "celebration": { "highRise": "Höghus!", "tall": "Skyhögt!", "skyscraper": "SKYSKRAPA!" },
+    "a11y": { "height": "Höjd {m} meter", "combo": "kedja {n}", "tile": "Bokstav {letter}" }
+  },
   "flag": "🇸🇪",
   "androidAppPromo": {
     "title": "Hämta LexiClash-appen",

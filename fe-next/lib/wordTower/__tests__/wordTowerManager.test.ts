@@ -1,16 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
-// Mock the dictionary so pure-logic tests don't depend on loaded word lists.
-vi.mock('../../dictionary', () => {
-  const valid = new Set([
-    'cat', 'tar', 'rat', 'area', 'tree', 'eaten', 'tennis', 'startle',
-    'שלום', 'מים', 'casa', 'arroz',
-  ]);
-  return {
-    isValidWord: (word: string, _language: string): boolean | null =>
-      valid.has(word.toLowerCase()) ? true : false,
-  };
-});
+// Dictionary is injected, so tests pass a canonical (UPPERCASE) membership set.
+const DICT = new Set(['CAT', 'TAR', 'RAT', 'AREA', 'TREE', 'EATEN', 'TENNIS', 'STARTLE', 'CASA', 'ARROZ']);
+const isInDict = (canonWord: string): boolean => DICT.has(canonWord);
 
 import {
   generateTray,
@@ -145,29 +137,29 @@ describe('wordTowerManager — validate', () => {
 
   it('accepts a valid chained, buildable, dictionary word', () => {
     const s = freshState();
-    expect(validateTowerWord(s, 'cat')).toEqual({ accepted: true });
+    expect(validateTowerWord(s, 'cat', isInDict)).toEqual({ accepted: true });
   });
 
   it('rejects a word that breaks the chain', () => {
     const s = freshState();
-    expect(validateTowerWord(s, 'rat')).toEqual({ accepted: false, error: 'bad_chain' });
+    expect(validateTowerWord(s, 'rat', isInDict)).toEqual({ accepted: false, error: 'bad_chain' });
   });
 
   it('rejects too-short words', () => {
     const s = freshState();
     s.anchorLetter = 'A';
-    expect(validateTowerWord(s, 'at')).toEqual({ accepted: false, error: 'too_short' });
+    expect(validateTowerWord(s, 'at', isInDict)).toEqual({ accepted: false, error: 'too_short' });
   });
 
   it('rejects a non-dictionary word', () => {
     const s = freshState();
-    expect(validateTowerWord(s, 'ctt')).toMatchObject({ accepted: false });
+    expect(validateTowerWord(s, 'ctt', isInDict)).toMatchObject({ accepted: false });
   });
 
   it('rejects a duplicate word', () => {
     const s = freshState();
     s.usedWords.add('CAT');
-    expect(validateTowerWord(s, 'cat')).toEqual({ accepted: false, error: 'duplicate' });
+    expect(validateTowerWord(s, 'cat', isInDict)).toEqual({ accepted: false, error: 'duplicate' });
   });
 });
 

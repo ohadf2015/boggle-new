@@ -234,6 +234,22 @@ export const EXPERIMENTS = {
     description:
       'Blast chocolate spreader mechanic. treatment = waves may spawn chocolate cells that grow each turn unless touched + `stop_chocolate` objective. control = legacy waves only.',
   }),
+
+  /**
+   * Word Tower solo game mode (Tower Bloxx + Shiritori word-chain). Admin-only
+   * during development: the landing-card + route are additionally gated on
+   * `isAdmin`, so `on` here only reveals the mode to admins. Flip in PostHog to
+   * widen rollout once the mode graduates. Email override keeps it live for the
+   * dev account without PostHog config.
+   */
+  'word-tower': defineExperiment({
+    variants: ['off', 'on'] as const,
+    default: 'off',
+    description: 'Word Tower solo mode — admin-gated dev preview. on = visible to admins.',
+    forceVariantByEmail: {
+      'ohadf2015@gmail.com': 'on',
+    },
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

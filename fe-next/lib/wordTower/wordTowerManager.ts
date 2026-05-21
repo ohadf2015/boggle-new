@@ -1,14 +1,15 @@
 /**
  * Word Tower — pure game logic (Phase 1, Solo MVP core).
  *
- * No socket, no DB, no React. Everything here is deterministic and unit-testable.
- * The server handler (wordTowerHandler.ts) and client store consume these functions.
+ * No socket, no DB, no React, no dictionary import. Everything here is
+ * deterministic and unit-testable. Dictionary validation is INJECTED so the
+ * same logic runs client-side (browser Set lookup) and server-side (backend
+ * dictionary) without divergence — see validateTowerWord's `isInDictionary`.
  *
  * Design: docs/2026-05-21-word-tower-game-mode-spec.md
  */
 import type { Language } from '@/shared/types/game';
 import { normalizeWord, sanitizeWord } from '@/shared/utils/wordNormalization';
-import { isValidWord } from '../dictionary';
 import {
   WORD_TOWER_TRAY_SIZE,
   WORD_TOWER_MIN_WORD_LEN,
@@ -219,14 +220,22 @@ export interface ValidationResult {
   error?: ValidationError;
 }
 
-export function validateTowerWord(state: WordTowerPlayerState, word: string): ValidationResult {
+/**
+ * @param isInDictionary predicate receiving the CANONICAL (sanitized, normalized,
+ *   uppercased) word. Client: `(w) => dictSet.has(w)`. Server: `(w) => backendLookup(w, lang)`.
+ */
+export function validateTowerWord(
+  state: WordTowerPlayerState,
+  word: string,
+  isInDictionary: (canonWord: string) => boolean,
+): ValidationResult {
   const { language } = state;
   const w = canon(word, language);
   if (w.length < WORD_TOWER_MIN_WORD_LEN) return { accepted: false, error: 'too_short' };
   if (chainStartLetter(word, language) !== state.anchorLetter) return { accepted: false, error: 'bad_chain' };
   if (!isBuildable(word, state.tray, state.anchorLetter, language)) return { accepted: false, error: 'not_buildable' };
   if (state.usedWords.has(w)) return { accepted: false, error: 'duplicate' };
-  if (isValidWord(sanitizeWord(word, language), language) !== true) return { accepted: false, error: 'not_in_dictionary' };
+  if (!isInDictionary(w)) return { accepted: false, error: 'not_in_dictionary' };
   return { accepted: true };
 }
 
