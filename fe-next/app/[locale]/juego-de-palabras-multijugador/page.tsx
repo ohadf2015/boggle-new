@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Scrabble Online en Español Gratis — Sin Registro | LexiClash',
-    description: 'Juega scrabble online en español gratis, sin registro ni descarga. Crea sala, invita amigos por enlace y compite en tiempo real. ¡Empieza en segundos!',
+    description: 'Jugar scrabble en español gratis — sin registro, sin descarga. Compite en tiempo real con amigos. Crea sala, invita por enlace. 10.000+ palabras. ¡Empieza ya!',
     keywords: 'cruzaletras online, apalabrados online gratis, scrabble en linea, scrabble en línea español, jugar scrabble online en español, alternativa a scrabble online español multijugador, juego como scrabble online en español gratis, alternativa scrabble multijugador online, scrabble online en español multijugador, jugar scrabble gratis multijugador, juegos de palabras online multijugador, juego de palabras multijugador, boggle online en español, juego de palabras online gratis, batalla de palabras tiempo real, juegos de letras online',
     openGraph: {
       title: 'Scrabble Online en Español Gratis — Sin Registro | LexiClash',
@@ -160,6 +160,17 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
             </p>
             <p>
               Compite en clasificaciones globales, obtén logros y desbloquea modos especiales. Las batallas de jefes añaden un giro PvE donde colaboras contra oponentes de IA. Los desafíos diarios traen rompecabezas nuevos cada día con recompensas exclusivas.
+            </p>
+            <p>
+              Para jugar scrabble en línea gratis sin registrarte, abre LexiClash en tu navegador, crea una sala y comparte el enlace. Funciona como juego de palabras gratis online en español sin instalación. Compite en{' '}
+              <Link href={`/${locale}/multiplayer`} className="text-neo-cyan underline">
+                modo multijugador en tiempo real
+              </Link>{' '}
+              contra amigos, o practica vocabulario en{' '}
+              <Link href={`/${locale}/singleplayer`} className="text-neo-lime underline">
+                modo individual
+              </Link>
+              . El diccionario incluye más de 10.000 palabras en español, ideal para expandir vocabulario y practicar ortografía mientras te diviertes.
             </p>
           </div>
         </section>

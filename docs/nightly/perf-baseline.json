@@ -1,14 +1,64 @@
 {
-  "date": "1970-01-01",
-  "note": "Seed file — first nightly run rewrites this with real measurements.",
+  "date": "2026-05-21",
+  "note": "First real baseline. Low web-vitals volume (57 events/24h) — all routes < 15 samples. Values directional, not statistically robust. Bundle measurement skipped (Railway deploys; no local .next build).",
   "backend": {
-    "top_queries": [],
-    "advisor_warnings_count": 0
+    "top_queries": [
+      {
+        "label": "supabase_realtime_wal_parser",
+        "query_preview": "SELECT wal->>$5 as type, wal->>$6 as schema ...",
+        "calls": 375504,
+        "mean_ms": 4.23,
+        "total_ms": 1587507,
+        "verdict": "INVESTIGATE: infrastructure overhead — publication now empty, cannot reduce further from app code. Monitor if pct_of_total exceeds 90%."
+      },
+      {
+        "label": "sync_coins_rpc",
+        "query_preview": "pgrst_call ... p_user_id uuid, p_amount integer, p_reason text, p_metadata jsonb",
+        "calls": 18761,
+        "mean_ms": 7.30,
+        "total_ms": 136907,
+        "verdict": "FIXED this run (migration perf_sync_coins_eliminate_select_for_update): SELECT FOR UPDATE eliminated, now single-UPDATE hot path."
+      },
+      {
+        "label": "profiles_update_last_seen_at",
+        "query_preview": "UPDATE profiles SET last_seen_at = ...",
+        "calls": 9372,
+        "mean_ms": 1.86,
+        "total_ms": 17425,
+        "verdict": "ok"
+      },
+      {
+        "label": "web_vitals_insert",
+        "query_preview": "INSERT INTO web_vitals ...",
+        "calls": 17090,
+        "mean_ms": 0.44,
+        "total_ms": 7556,
+        "verdict": "ok"
+      },
+      {
+        "label": "friend_messages_select",
+        "query_preview": "SELECT public.friend_messages.message, created_at ...",
+        "calls": 38321,
+        "mean_ms": 0.17,
+        "total_ms": 6459,
+        "verdict": "ok"
+      }
+    ],
+    "advisor_warnings_count": "deferred — unindexed_foreign_keys on admin tables intentionally kept (see 2026-04-29 cleanup)"
   },
   "frontend": {
-    "by_route": []
+    "note": "57 total $web_vitals events in 24h. All route samples n=4–11. Values are directional only.",
+    "thresholds": { "lcp_poor_ms": 4000, "inp_needs_improvement_ms": 200, "cls_poor": 0.25 },
+    "by_route": [
+      { "route": "/en/multiplayer", "p75_lcp": 5807, "p75_inp": 250, "p75_cls": 0.146, "n": 11, "flags": ["LCP_POOR", "INP_NEEDS_IMPROVEMENT"] },
+      { "route": "/he/multiplayer", "p75_lcp": 5346, "p75_inp": 106,  "p75_cls": 0.239, "n": 6,  "flags": ["LCP_POOR", "CLS_NEEDS_IMPROVEMENT"] },
+      { "route": "/he",             "p75_lcp": 3299, "p75_inp": 120,  "p75_cls": 0.118, "n": 11, "flags": ["LCP_NEEDS_IMPROVEMENT"] },
+      { "route": "/he/daily",       "p75_lcp": 3152, "p75_inp": 100,  "p75_cls": 1.153, "n": 4,  "flags": ["LCP_NEEDS_IMPROVEMENT", "CLS_POOR_LOW_SAMPLE"] },
+      { "route": "/he/admin",       "p75_lcp": 2413, "p75_inp": 228,  "p75_cls": 1.453, "n": 11, "flags": ["LCP_NEEDS_IMPROVEMENT", "INP_NEEDS_IMPROVEMENT", "CLS_POOR_ADMIN_ONLY"] }
+    ]
   },
   "bundle": {
+    "note": "Railway deploys — no local .next build. Measure on next local build or via Railway build logs.",
     "total_kb": 0,
     "top_chunks": []
   }

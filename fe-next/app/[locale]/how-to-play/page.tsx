@@ -3,6 +3,7 @@ import { getHowToPlayContent } from './content';
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
 
 export const dynamic = 'force-dynamic';
 
@@ -185,6 +186,7 @@ export default async function HowToPlayPage({ params }: PageParams) {
     return (
       <>
         <HowToPlayPageClient locale={locale} />
+        <GuidesCalloutLink locale={locale} />
         <GamePageSeoContent
           title={content.title}
           description={content.description}

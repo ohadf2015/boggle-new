@@ -16,8 +16,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
-    description: 'Spela scrabble online på svenska gratis, utan registrering. Skapa rum, bjud in med länk och tävla i realtid med vänner. 10 000+ ord. Börja nu!',
-    keywords: 'ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid',
+    description: 'Spela scrabble online på svenska gratis — ordhjul, boggle och mer. Utan registrering, utan nedladdning. Skapa rum, bjud in med länk. 10 000+ ord. Börja nu!',
+    keywords: 'ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid, ordhjul, ordhjul online, daglig ordhjul',
     openGraph: {
       title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
       description: 'Spela scrabble online på svenska med vänner i realtid. Skapa rum, bjud in med länk. Gratis, ingen registrering.',
@@ -92,7 +92,7 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
     },
     {
       q: 'Vilka spellägen finns?',
-      a: 'Spela multiplayer-rum, dagliga utmaningar, ordletare, blastläge och mer. Varje läge har unika regler och poängberäkning.',
+      a: 'Spela multiplayer-rum, dagliga utmaningar (ordhjul och ordjakt), ordletare, blastläge och mer. Varje läge har unika regler och poängberäkning. Ordhjulet är en daglig pussel där alla bokstäver ska inkludera mittenbokstaven.',
     },
   ];
 
@@ -149,7 +149,7 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
               'Realtids multiplayer-kamper med omedelbar poängåterkoppling',
               'Skapa rum och bjud in vänner via delbar länk',
               '10 000+ svenska ord i ordförrådet',
-              'Flera spellägen (Boggle, Letare, Blast)',
+              'Flera spellägen (Boggle, Ordhjul, Letare, Blast)',
               'Dagliga utmaningar med poängtabeller',
               'Bosskamper med unika vändningar',
               'Helt gratis, ingen nedladdning behövs',

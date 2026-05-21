@@ -56,22 +56,18 @@ export async function GET(_req: Request, { params }: RouteParams) {
       return new NextResponse('no avatar_config', { status: 404 });
     }
 
-    // Lazy-load to keep `react-dom/server` out of Turbopack's static import
-    // scan — top-level imports here trip the route's component-boundary check
-    // and fail production build.
-    const [{ default: React }, { renderToStaticMarkup }, { default: AvatarRenderer }] =
+    const [{ default: React }, { renderToStaticMarkup }, { default: AvatarRendererSsr }] =
       await Promise.all([
         import('react'),
         import('react-dom/server'),
-        import('@/components/avatar/AvatarRenderer'),
+        import('@/components/avatar/AvatarRendererSsr'),
       ]);
 
     const svg = renderToStaticMarkup(
-      React.createElement(AvatarRenderer, {
+      React.createElement(AvatarRendererSsr, {
         config,
         size: PNG_SIZE,
         circular: true,
-        disableEffects: true,
       })
     );
 
