@@ -4760,6 +4760,8 @@ const es = {
     "adventureModeDesc": "100 niveles en 10 mundos",
     "blastMode": "Modo Blast",
     "blastModeDesc": "¡Limpia el tablero!",
+    "blastClassic": "Blast Clásico",
+    "blastClassicDesc": "El motor original V1",
     "wordChainMode": "Cadena de Palabras",
     "wordChainModeDesc": "Conecta dos palabras con una",
     "wordForgeMode": "Forja de Palabras",

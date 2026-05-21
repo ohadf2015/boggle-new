@@ -4699,6 +4699,8 @@ const ja = {
     "adventureModeDesc": "10の世界で100レベル",
     "blastMode": "ブラストモード",
     "blastModeDesc": "ボードをクリアしよう！",
+    "blastClassic": "ブラスト クラシック",
+    "blastClassicDesc": "オリジナルのV1エンジン",
     "wordChainMode": "ワードチェーン",
     "wordChainModeDesc": "1つの言葉で2つの言葉をつなごう",
     "wordForgeMode": "ワードフォージ",

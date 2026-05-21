@@ -4714,6 +4714,8 @@ const sv = {
     "adventureModeDesc": "100 nivåer i 10 världar",
     "blastMode": "Blast-läge",
     "blastModeDesc": "Rensa brädet!",
+    "blastClassic": "Blast Classic",
+    "blastClassicDesc": "Den ursprungliga V1-motorn",
     "wordChainMode": "Ordkedja",
     "wordChainModeDesc": "Länka två ord med ett ord",
     "wordForgeMode": "Ordsmedjan",

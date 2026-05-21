@@ -4800,6 +4800,8 @@ const he = {
     "adventureModeDesc": "100 שלבים ב-10 עולמות",
     "blastMode": "מצב פיצוץ",
     "blastModeDesc": "נקו את הלוח!",
+    "blastClassic": "בלאסט קלאסי",
+    "blastClassicDesc": "מנוע V1 המקורי",
     "wordChainMode": "ראש זנב",
     "wordChainModeDesc": "חברו שתי מילים באמצעות מילה אחת",
     "wordForgeMode": "מסדת המילים",

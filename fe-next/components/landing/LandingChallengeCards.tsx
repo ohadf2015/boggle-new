@@ -47,7 +47,7 @@ interface LandingChallengeCardsProps {
  * `'connections'` and `'brainGym'` are landing-only synthetic modes routing
  * to `/connections` and `/brain` respectively.
  */
-type LandingCardKey = LandingGameMode | 'connections' | 'brainGym' | 'wordCraft' | 'wordCraftGems' | 'wordTower';
+type LandingCardKey = LandingGameMode | 'connections' | 'brainGym' | 'wordCraft' | 'wordCraftGems' | 'wordTower' | 'blastClassic';
 
 /** Default card order when no server data available */
 const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'practice', 'blast', 'connections', 'brainGym'];
@@ -59,7 +59,7 @@ const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'practice', 'blast', 
  */
 const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
-  'connections', 'brainGym', 'wordCraft', 'wordCraftGems', 'wordTower',
+  'connections', 'brainGym', 'wordCraft', 'wordCraftGems', 'wordTower', 'blastClassic',
 ]);
 
 /** CSS stagger delay for each card index */
@@ -141,6 +141,9 @@ export function LandingChallengeCards({
     if (isAdmin && !next.includes('wordCraft')) next.push('wordCraft');
     if (isAdmin && !next.includes('wordCraftGems')) next.push('wordCraftGems');
     if (wordTowerEnabled && !next.includes('wordTower')) next.push('wordTower');
+    // Blast Classic (legacy V1 engine) — admin-only card so both V1 + V2 (the
+    // public 'blast' card) are reachable. /blast?v2=off opts into the V1 engine.
+    if (isAdmin && !next.includes('blastClassic')) next.push('blastClassic');
     if (language === 'ja') return next.filter((m) => !JA_HIDDEN_MODES.has(m));
     return next;
   })();
@@ -235,6 +238,21 @@ export function LandingChallengeCards({
               variant="orange"
               badge="NEW"
               onClick={() => { trackModeSelected('blast', 'home'); trackLandingCtaClick('mode_card', { mode: 'blast', variant: 'orange' }); }}
+            />
+          </div>
+        );
+
+      case 'blastClassic':
+        return (
+          <div key="blastClassic" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+            <ModeCard
+              title={t('landing.blastClassic')}
+              description={t('landing.blastClassicDesc')}
+              href={`/${language}/blast?v2=off`}
+              icon={<Bomb className="w-6 h-6" />}
+              variant="orange"
+              badge="V1"
+              onClick={() => { trackLandingCtaClick('mode_card', { mode: 'blastClassic', variant: 'orange' }); }}
             />
           </div>
         );
