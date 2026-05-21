@@ -333,6 +333,32 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       return;
     }
 
+    // Word Tower is admin-only during development. UI hides it from non-admins;
+    // this server gate enforces it even if a client crafts the startGame emit
+    // directly. Never reachable via random roll (not in ALL_GAME_MODES).
+    if (resolvedMode === 'word-tower') {
+      const wtHostUser = Object.values(game.users).find((u) => u.isHost);
+      const wtHostAuthId = wtHostUser?.authUserId || (socket.data?.verifiedUserId as string | undefined);
+      const wtSupabase = getSupabase();
+      let wordTowerAllowed = false;
+      if (!wtSupabase) {
+        wordTowerAllowed = true; // dev/test (no Supabase) → allow
+      } else if (wtHostAuthId) {
+        const { data: wtProfile } = await wtSupabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', wtHostAuthId)
+          .single();
+        wordTowerAllowed = !!wtProfile?.is_admin;
+      }
+      if (!wordTowerAllowed) {
+        gamesStarting.delete(gameCode);
+        logger.debug('SOCKET', `Rejected word-tower for ${gameCode}: host not admin`);
+        emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: 'Word Tower is admin-only' });
+        return;
+      }
+    }
+
     // CRITICAL: Transition state FIRST to guard against concurrent startGame calls.
     // Only the first caller wins; all others bail out before any side effects.
     const transitionResult = transitionGameState(gameCode, 'START');

@@ -5,6 +5,7 @@ import { m, AnimatePresence } from 'framer-motion';
 import { Shuffle, FileText, Target, Check, Bomb, Building2 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import type { GameModeOption } from '@/components/GameModeSelector';
+import { useExperiment } from '@/hooks/useExperiment';
 
 interface BattleModeCardProps {
   selectedGameMode: GameModeOption;
@@ -78,7 +79,15 @@ export function BattleModeCard({
 
   // Blast is admin-gated in the picker (UI gate only; server still allows
   // is_admin OR blast_access). Non-admins never see it offered.
-  const visibleModes = isAdmin ? MODES : MODES.filter((m) => m.mode !== 'blast' && m.mode !== 'word-tower');
+  // Word Tower is admin-only AND behind the `word-tower` experiment (mirrors
+  // the solo gating; server enforces admin too). Blast stays admin-gated.
+  const { variant: wordTowerVariant } = useExperiment('word-tower');
+  const wordTowerEnabled = isAdmin && wordTowerVariant === 'on';
+  const visibleModes = MODES.filter((m) => {
+    if (m.mode === 'blast') return isAdmin;
+    if (m.mode === 'word-tower') return wordTowerEnabled;
+    return true;
+  });
 
   return (
     <section className="rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard overflow-hidden">
