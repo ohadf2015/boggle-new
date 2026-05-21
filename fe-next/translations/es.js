@@ -1895,6 +1895,7 @@ const es = {
     }
   },
   "playerView": {
+    "onlyLanguageWords": "Usa solo letras de este idioma",
     "wordsFound": "Palabras Encontradas",
     "wordsOnBoard": "Palabras en el Tablero",
     "wordsRemaining": "palabras restantes",
@@ -10888,6 +10889,10 @@ const es = {
         "tip2": "Toca las letras exteriores en cualquier orden",
         "tip3": "Prueba plurales para alargar la palabra"
       }
+    },
+    "shiritori": {
+      "name": "Shiritori",
+      "description": "¡Encadena palabras — cada una empieza con la última letra de la anterior!"
     },
     "intro": {
       "cta": "Vamos",

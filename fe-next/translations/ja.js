@@ -1745,6 +1745,7 @@ const ja = {
     }
   },
   "playerView": {
+    "onlyLanguageWords": "この言語の文字だけを使ってください",
     "wordsFound": "見つけた単語",
     "wordsOnBoard": "ボード上の単語",
     "wordsRemaining": "残り単語",
@@ -10961,6 +10962,10 @@ const ja = {
         tip2: "周りの文字は順不同でタップ",
         tip3: "複数形を試して単語を伸ばす"
       }
+    },
+    shiritori: {
+      name: "しりとり",
+      description: "前の言葉の最後の文字から始めよう！"
     },
     intro: {
       cta: "はじめよう",

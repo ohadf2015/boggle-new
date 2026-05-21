@@ -1885,6 +1885,7 @@ const en = {
     }
   },
   "playerView": {
+    "onlyLanguageWords": "Use only letters from this language",
     "getReadyHint": "Scan the grid now!",
     "wordsFound": "Words Found",
     "wordsOnBoard": "Words on Board",
@@ -11073,6 +11074,10 @@ const en = {
         "tip2": "Tap outer letters in any order",
         "tip3": "Try plural forms to extend a word"
       }
+    },
+    "shiritori": {
+      "name": "Shiritori",
+      "description": "Chain words — each begins with the last letter of the one before!"
     },
     "intro": {
       "cta": "Let's go",

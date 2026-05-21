@@ -1758,6 +1758,7 @@ const sv = {
     }
   },
   "playerView": {
+    "onlyLanguageWords": "Använd endast bokstäver från detta språk",
     "wordsFound": "Ord hittade",
     "wordsOnBoard": "Ord på brädet",
     "wordsRemaining": "ord kvar",
@@ -10987,6 +10988,10 @@ const sv = {
         tip2: "Tryck på yttre bokstäver i valfri ordning",
         tip3: "Prova pluralformer för att förlänga"
       }
+    },
+    shiritori: {
+      name: "Shiritori",
+      description: "Kedja ord — varje ord börjar på förra ordets sista bokstav!"
     },
     intro: {
       cta: "Sätt igång",
