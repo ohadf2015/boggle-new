@@ -13,6 +13,20 @@
 export const ANDROID_PACKAGE = 'live.lexiclash.app';
 export const PLAY_STORE_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`;
 
+/**
+ * Play Store URL carrying a Google Play Install Referrer, so installs sourced
+ * from an SEO landing page are attributable in Play Console.
+ *
+ * The `referrer` value is a urlencoded `utm_*` string; Play decodes it and
+ * exposes it via the Install Referrer API. `campaign` is typically the page
+ * slug; `locale` (optional) lands in `utm_content` for per-language attribution.
+ */
+export function playStoreUrlWithReferrer(campaign: string, locale?: string): string {
+  let referrer = `utm_source=seo&utm_medium=landing&utm_campaign=${campaign}`;
+  if (locale) referrer += `&utm_content=${locale}`;
+  return `${PLAY_STORE_URL}&referrer=${encodeURIComponent(referrer)}`;
+}
+
 type RelatedApp = { platform: string; id?: string; url?: string };
 
 /** True when running inside the Capacitor native shell (not a web browser). */
