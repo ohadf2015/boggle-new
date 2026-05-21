@@ -30,7 +30,9 @@ const NINE_LETTER_SOURCES: Record<string, string[]> = {
   en: ['BREATHING','COUNTRIES','DANGEROUS','EDUCATION','LANDSCAPE','MACHINERY','NIGHTCLUB','OPERATING','QUESTIONS','REACTIONS','BUILDINGS','CERTAINLY','DESERVING','FURNISHED','GROUNDING','PUBLISHED','RECOGNISE','SHOULDERS','CUSTOMERS','FRAGMENTS','MICROWAVE','PLUNDERED','MARKETING','PROVIDING'],
   he: ['מחשבונים','התלמידים','משחקיהם','מתכוננים','הרכבתיה','תלבושות'],
   sv: ['BOKSTAVER','DATORSPEL','FRIHANDIG','GRUNDKURS','HUVUDSIDA','LANDSTING','MUSIKBAND'],
-  ja: ['新しい世界','教育機関','自然環境','技術革新','文化交流','経済発展','社会問題','健康管理'],
+  // Hiragana readings of the original seed words (新しい世界 → あたらしいせかい …): a wheel is
+  // anagram play, which only works on phonetic kana, never on logographic kanji.
+  ja: ['あたらしいせかい','きょういくきかん','しぜんかんきょう','ぎじゅつかくしん','ぶんかこうりゅう','けいざいはってん','しゃかいもんだい','けんこうかんり'],
   es: ['RESPALDOS','CAMINANDO','ENCONTRAR','FABRICADO','GOBIERNO','HORMIGAS','INDOMABLE'],
 };
 
@@ -69,7 +71,7 @@ export function generateWheelPuzzle(gameCode: string, language: Language = 'en')
     const pool = language === 'he'
       ? ['א','ב','ג','ד','ה','ו','ח','י','כ','ל','מ','נ','ר','ש','ת']
       : language === 'ja'
-        ? ['日','月','火','水','木','金','土','人','大','小','上','下']
+        ? ['い','う','か','き','し','す','つ','て','と','な','に','の','ん','た','こ']
         : ['E','T','A','O','I','N','S','H','R','D','L','C','U','M'];
     const avail = pool.filter(l => !letters.includes(l));
     while (letters.length < 7 && avail.length) letters.push(avail.splice(Math.floor(rng() * avail.length), 1)[0]);

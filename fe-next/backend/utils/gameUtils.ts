@@ -82,6 +82,53 @@ export const kanjiCompounds: string[] = [
   "父母", "兄弟", "友人", "王国", "天地", "山川", "海空"
 ];
 
+/**
+ * Hiragana frequency weights for Japanese board generation.
+ *
+ * Japanese boards are HIRAGANA, not kanji: hiragana is a phonetic syllabary, so
+ * words are sequences of adjacent kana you can trace (ねこ = ne+ko) — exactly the
+ * Boggle primitive. A kanji grid cannot work (logographs aren't an alphabet you
+ * rearrange). Includes voiced (dakuten が-row), semi-voiced (handakuten ぱ-row),
+ * small kana (ゃゅょっ) and the long-vowel mark (ー) so common words like がっこう /
+ * きゅうりょう / ちょうり are spellable. Weights approximate corpus frequency.
+ * See docs/2026-05-21-japanese-multiplayer-gameplay-audit.md.
+ */
+export const japaneseHiraganaFrequency: Record<string, number> = {
+  // vowels
+  'あ': 8, 'い': 9, 'う': 8, 'え': 5, 'お': 6,
+  // k-row
+  'か': 7, 'き': 5, 'く': 5, 'け': 4, 'こ': 6,
+  // s-row
+  'さ': 4, 'し': 7, 'す': 5, 'せ': 4, 'そ': 3,
+  // t-row
+  'た': 6, 'ち': 4, 'つ': 5, 'て': 6, 'と': 6,
+  // n-row
+  'な': 5, 'に': 6, 'ぬ': 1, 'ね': 2, 'の': 7,
+  // h-row
+  'は': 4, 'ひ': 2, 'ふ': 2, 'へ': 2, 'ほ': 2,
+  // m-row
+  'ま': 4, 'み': 3, 'む': 2, 'め': 2, 'も': 3,
+  // y-row
+  'や': 2, 'ゆ': 2, 'よ': 3,
+  // r-row
+  'ら': 4, 'り': 5, 'る': 5, 'れ': 3, 'ろ': 2,
+  // w-row + syllabic n
+  'わ': 2, 'を': 1, 'ん': 7,
+  // dakuten (voiced)
+  'が': 3, 'ぎ': 1, 'ぐ': 1, 'げ': 1, 'ご': 2,
+  'ざ': 1, 'じ': 3, 'ず': 1, 'ぜ': 1, 'ぞ': 1,
+  'だ': 2, 'ぢ': 1, 'づ': 1, 'で': 3, 'ど': 2,
+  'ば': 1, 'び': 1, 'ぶ': 1, 'べ': 1, 'ぼ': 1,
+  // handakuten (semi-voiced) — rare
+  'ぱ': 1, 'ぴ': 1, 'ぷ': 1, 'ぺ': 1, 'ぽ': 1,
+  // small kana (modifiers) + long-vowel mark
+  'ゃ': 2, 'ゅ': 2, 'ょ': 2, 'っ': 3, 'ー': 2,
+};
+
+// Flattened weighted draw pool — each kana repeated by its frequency weight.
+const JAPANESE_HIRAGANA_POOL: string[] = Object.entries(japaneseHiraganaFrequency)
+  .flatMap(([kana, weight]) => Array<string>(weight).fill(kana));
+
 // Valid Hebrew letters set for filtering
 const validHebrewLettersSet = new Set<string>([
   'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י',
@@ -535,109 +582,23 @@ function tryPlaceWordSnake(
 }
 
 /**
- * Generate a Japanese board with embedded Kanji compounds
+ * Generate a Japanese board as a frequency-weighted HIRAGANA grid.
+ *
+ * Mirrors the random-fill model used for en/sv/es (a Boggle board is random; the
+ * dictionary supplies findability). Replaces the previous kanji grid, which could
+ * only surface ~3 pre-planted compounds per board — not a word game. Validation
+ * against the hiragana dictionary makes traced kana words discoverable.
  */
 export function generateJapaneseTable(rows: number, cols: number): LetterGrid {
-  const grid: (string | null)[][] = Array(rows).fill(null).map(() => Array(cols).fill(null));
-  const totalCells = rows * cols;
-  const targetCompounds = Math.floor(totalCells / 5);
-
-  const shuffledCompounds = [...kanjiCompounds].sort(() => Math.random() - 0.5);
-  const twoCharCompounds = shuffledCompounds.filter(w => w.length === 2);
-  const threeCharCompounds = shuffledCompounds.filter(w => w.length === 3);
-
-  let embeddedCount = 0;
-  const usedCells = new Set<string>();
-
-  for (const compound of threeCharCompounds) {
-    if (embeddedCount >= Math.floor(targetCompounds * 0.2)) break;
-    if (tryEmbedCompound(grid, compound, rows, cols, usedCells)) {
-      embeddedCount++;
-    }
-  }
-
-  for (const compound of twoCharCompounds) {
-    if (embeddedCount >= targetCompounds) break;
-    if (tryEmbedCompound(grid, compound, rows, cols, usedCells)) {
-      embeddedCount++;
-    }
-  }
-
+  const grid: LetterGrid = [];
   for (let i = 0; i < rows; i++) {
+    const row: string[] = [];
     for (let j = 0; j < cols; j++) {
-      if (grid[i][j] === null) {
-        grid[i][j] = japaneseLetters[Math.floor(Math.random() * japaneseLetters.length)];
-      }
+      row.push(JAPANESE_HIRAGANA_POOL[Math.floor(Math.random() * JAPANESE_HIRAGANA_POOL.length)]);
     }
+    grid.push(row);
   }
-
-  return grid as LetterGrid;
-}
-
-/**
- * Try to embed a compound word into the grid
- */
-function tryEmbedCompound(
-  grid: (string | null)[][],
-  compound: string,
-  rows: number,
-  cols: number,
-  usedCells: Set<string>
-): boolean {
-  const wordLen = compound.length;
-  const directions: Direction[] = [
-    { dr: 0, dc: 1 },
-    { dr: 0, dc: -1 },
-    { dr: 1, dc: 0 },
-    { dr: -1, dc: 0 },
-    { dr: 1, dc: 1 },
-    { dr: 1, dc: -1 },
-    { dr: -1, dc: -1 },
-    { dr: -1, dc: 1 },
-  ];
-
-  const shuffledDirs = [...directions].sort(() => Math.random() - 0.5);
-
-  const attempts = 50;
-  for (let attempt = 0; attempt < attempts; attempt++) {
-    const startRow = Math.floor(Math.random() * rows);
-    const startCol = Math.floor(Math.random() * cols);
-
-    for (const dir of shuffledDirs) {
-      const endRow = startRow + (wordLen - 1) * dir.dr;
-      const endCol = startCol + (wordLen - 1) * dir.dc;
-
-      if (endRow < 0 || endRow >= rows || endCol < 0 || endCol >= cols) {
-        continue;
-      }
-
-      let canPlace = true;
-      const cellsToUse: Cell[] = [];
-
-      for (let i = 0; i < wordLen; i++) {
-        const r = startRow + i * dir.dr;
-        const c = startCol + i * dir.dc;
-        const cellKey = `${r},${c}`;
-
-        if (grid[r][c] !== null && grid[r][c] !== compound[i]) {
-          canPlace = false;
-          break;
-        }
-
-        cellsToUse.push({ r, c, char: compound[i], key: cellKey });
-      }
-
-      if (canPlace) {
-        for (const cell of cellsToUse) {
-          grid[cell.r][cell.c] = cell.char;
-          usedCells.add(cell.key);
-        }
-        return true;
-      }
-    }
-  }
-
-  return false;
+  return grid;
 }
 
 // ==========================================

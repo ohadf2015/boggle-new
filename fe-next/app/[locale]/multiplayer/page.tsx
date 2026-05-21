@@ -183,6 +183,12 @@ export default async function MultiplayerPage({ params }: { params: Promise<{ lo
   const origin = 'https://www.lexiclash.live';
   return (
     <>
+      {/* Preload the lobby hero mascot from the FIRST server HTML response so the
+          browser fetches it while the (ssr:false) multiplayer JS downloads — the
+          mascot is the LCP element once the lobby mounts. first-timer variant is
+          the cold-visit case; returning users have it cached. React hoists this
+          rel=preload link into <head>. */}
+      <link rel="preload" as="image" href="/mascot/play.webp" type="image/webp" fetchPriority="high" />
       <VideoGameJsonLd
         mode="multiplayer"
         locale={locale}

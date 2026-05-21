@@ -64,6 +64,22 @@ describe('wheelRushManager', () => {
         }
       }
     });
+
+    // Japanese wheels must be HIRAGANA, not kanji: you can anagram phonetic kana,
+    // not logographs. Seeds were kanji-mixed (`新しい世界`) — incoherent for a wheel.
+    it('Japanese puzzle contains only hiragana — never kanji', () => {
+      const kanji = /[一-龯]/;
+      const hiragana = /^[぀-ゟー]$/;
+      for (let i = 0; i < 50; i++) {
+        const p = generateWheelPuzzle(`JA-${i}`, 'ja');
+        expect(p.allLetters).toHaveLength(7);
+        expect(new Set(p.allLetters).size).toBe(7);
+        for (const l of p.allLetters) {
+          expect(kanji.test(l), `letter ${l} is kanji in seed JA-${i}`).toBe(false);
+          expect(l, `letter ${l} not hiragana in seed JA-${i}`).toMatch(hiragana);
+        }
+      }
+    });
   });
 
   describe('validateWheelSubmission', () => {

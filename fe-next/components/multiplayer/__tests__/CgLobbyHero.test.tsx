@@ -96,4 +96,15 @@ describe('CgLobbyHero', () => {
     const section = screen.getByLabelText('cg.hero.aria.section');
     expect(section.getAttribute('dir')).toBe('rtl');
   });
+
+  it('marks the mascot as a high-priority, eager LCP image', () => {
+    // The hero mascot is the largest above-the-fold element once the (ssr:false)
+    // lobby mounts, so it is the LCP candidate. It must NOT lazy-load and should
+    // be fetched at high priority so it paints as early as the hero allows.
+    render(<CgLobbyHero variant="first-timer" displayName={null} onPlay={vi.fn()} onBrowse={vi.fn()} />);
+    const img = screen.getByTestId('cg-lobby-hero-mascot') as HTMLImageElement;
+    expect(img.getAttribute('loading')).toBe('eager');
+    expect(img.getAttribute('fetchpriority')).toBe('high');
+    expect(img.getAttribute('decoding')).toBe('async');
+  });
 });

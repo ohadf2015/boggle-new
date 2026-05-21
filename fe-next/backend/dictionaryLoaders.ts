@@ -132,30 +132,52 @@ export async function loadSwedishDictionary(
   return dict;
 }
 
+// Pure-hiragana (incl. small kana / dakuten) + the long-vowel mark ー (U+30FC).
+// Excludes katakana and kanji so junk fragments (`あるクロ`, `ある三里`) never enter
+// the validation set.
+const HIRAGANA_WORD_RE = /^[぀-ゟー]+$/;
+
+/**
+ * Japanese validation dictionary = pure-HIRAGANA words.
+ *
+ * Boards (Boggle grid + WheelRush) are hiragana, so the validation set must be
+ * hiragana. The primary source `japanese_words.txt` (~9.4k clean hiragana words)
+ * was previously loaded by nobody; we wire it here. The 128k kanji compounds are
+ * returned only as `compounds` for the legacy board-seeding consumer
+ * (`Dictionary.kanjiCompounds` / `getRandomKanjiCompounds`) — they are NOT
+ * reachable on a kana grid and never enter validation.
+ * See docs/2026-05-21-japanese-multiplayer-gameplay-audit.md.
+ */
 export async function loadJapaneseDictionary(
   safeReadFile: SafeReadFile
 ): Promise<{ words: Set<string>; compounds: string[] }> {
-  const [kanjiContent, japaneseApprovedContent] = await Promise.all([
+  const [hiraganaContent, kanjiContent, japaneseApprovedContent] = await Promise.all([
+    safeReadFile(path.join(__dirname, 'japanese_words.txt')),
     safeReadFile(path.join(__dirname, 'kanji_compounds.txt')),
     safeReadFile(path.join(__dirname, 'japanese_words_approved.txt')),
   ]);
 
-  let dict = new Set<string>();
-  let compounds: string[] = [];
-
-  if (kanjiContent) {
-    try {
-      compounds = kanjiContent.split('\n').map(w => w.trim()).filter(w => w.length > 0);
-      dict = new Set(compounds);
-      logger.debug('DICT', `Loaded ${dict.size} Japanese Kanji compounds from main dictionary`);
-
-      mergeApprovedWords(dict, japaneseApprovedContent, 'Japanese', (w) => w.trim());
-      logger.debug('DICT', `Total Japanese words: ${dict.size}`);
-    } catch (error) {
-      logger.error('DICT', `Error processing Japanese Kanji compounds: ${error}`);
+  const dict = new Set<string>();
+  const addHiragana = (content: string) => {
+    if (!content) return;
+    for (const raw of content.split('\n')) {
+      const w = raw.trim();
+      if (w.length > 0 && HIRAGANA_WORD_RE.test(w)) dict.add(w);
     }
+  };
+
+  try {
+    addHiragana(hiraganaContent);
+    addHiragana(japaneseApprovedContent); // clean hiragana entries from the community list
+  } catch (error) {
+    logger.error('DICT', `Error processing Japanese hiragana dictionary: ${error}`);
   }
 
+  const compounds = kanjiContent
+    ? kanjiContent.split('\n').map(w => w.trim()).filter(w => w.length > 0)
+    : [];
+
+  logger.debug('DICT', `Loaded ${dict.size} Japanese hiragana words; ${compounds.length} kanji compounds (seeding only)`);
   return { words: dict, compounds };
 }
 

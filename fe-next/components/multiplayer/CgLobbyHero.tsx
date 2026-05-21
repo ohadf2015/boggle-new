@@ -309,6 +309,12 @@ const CgLobbyHero: React.FC<CgLobbyHeroProps> = ({ variant, displayName, onPlay,
               src={MASCOT[variant]}
               alt=""
               data-testid="cg-lobby-hero-mascot"
+              // LCP element of the (ssr:false) lobby — never lazy-load it, and
+              // fetch it at high priority so it paints as soon as the hero mounts.
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+              draggable={false}
               className="w-full h-full object-cover scale-125 motion-reduce:!animate-none"
               animate={{ y: [0, -4, 0, -2, 0], rotate: [0, -1.2, 0, 1.2, 0] }}
               transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
