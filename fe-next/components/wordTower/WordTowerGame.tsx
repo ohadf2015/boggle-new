@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import type { SupportedLocale } from '@/lib/word-craft/tileBag';
@@ -72,9 +72,10 @@ export function WordTowerGame() {
 
   const ready = dictReady && progress !== null;
 
-  // Re-key WordTowerPlay on the resumed height so the lazy store init picks up
-  // the restored tower exactly once it's loaded.
-  const playKey = useMemo(() => (progress ? `wt-${progress.initialGame.heightM}` : 'wt-loading'), [progress]);
+  // useWordTower lazy-inits from initialGame only on first mount. Re-key on
+  // locale so switching language re-fetches progress and re-mounts the store
+  // with the freshly-restored tower for that locale's dictionary.
+  const playKey = `wt-${language}`;
 
   if (!ready) {
     return (

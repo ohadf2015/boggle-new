@@ -46,7 +46,9 @@ export function WordTowerPlay({ language, isInDictionary, initialGame, personalB
   // ── persistence: build payload + save (fetch or beacon) ──
   const gameRef = useRef(game);
   gameRef.current = game;
-  const lastSavedHeight = useRef(-1);
+  // Dedupe by floor count: skip a save if nothing was built since the last one
+  // (heightM always changes per word, so it can't dedupe; floor count can).
+  const lastSavedFloors = useRef(-1);
 
   const buildPayload = useCallback((g: WordTowerPlayerState) => ({
     heightM: g.heightM,
@@ -59,8 +61,8 @@ export function WordTowerPlay({ language, isInDictionary, initialGame, personalB
 
   const save = useCallback((beacon = false) => {
     const g = gameRef.current;
-    if (g.heightM === lastSavedHeight.current) return;
-    lastSavedHeight.current = g.heightM;
+    if (g.floors.length === lastSavedFloors.current) return;
+    lastSavedFloors.current = g.floors.length;
     const body = JSON.stringify(buildPayload(g));
     if (beacon && typeof navigator !== 'undefined' && navigator.sendBeacon) {
       navigator.sendBeacon('/api/word-tower/progress', new Blob([body], { type: 'application/json' }));
