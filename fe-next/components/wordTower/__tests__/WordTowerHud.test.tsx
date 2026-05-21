@@ -1,0 +1,82 @@
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { WordTowerHud, type WordTowerHudProps } from '../WordTowerHud';
+
+// t echoes key + params so labels are distinguishable in queries.
+const t = (key: string, params?: Record<string, string | number>) =>
+  params ? `${key}:${Object.values(params).join(',')}` : key;
+
+function makeProps(over: Partial<WordTowerHudProps> = {}): WordTowerHudProps {
+  return {
+    anchorLetter: 'C',
+    tray: ['A', 'T', 'R', 'E', 'A', 'E', 'N', 'T', 'I', 'S', 'L', 'T'],
+    selected: [],
+    word: 'C',
+    heightM: 12,
+    combo: 0,
+    scramblesLeft: 3,
+    floorsCount: 4,
+    biomeId: 'city',
+    lastError: null,
+    errorKey: 0,
+    lastResult: null,
+    resultKey: 0,
+    onSelectTile: vi.fn(),
+    onBackspace: vi.fn(),
+    onClear: vi.fn(),
+    onSubmit: vi.fn(),
+    onScramble: vi.fn(),
+    t,
+    dir: 'ltr',
+    ...over,
+  };
+}
+
+describe('WordTowerHud', () => {
+  it('disables Build until the word is 3+ letters', () => {
+    const { rerender } = render(<WordTowerHud {...makeProps({ word: 'CA' })} />);
+    expect(screen.getByRole('button', { name: /wordTower\.hud\.build/ })).toBeDisabled();
+    rerender(<WordTowerHud {...makeProps({ word: 'CAT' })} />);
+    expect(screen.getByRole('button', { name: /wordTower\.hud\.build/ })).toBeEnabled();
+  });
+
+  it('disables Scramble when no scrambles remain', () => {
+    const { rerender } = render(<WordTowerHud {...makeProps({ scramblesLeft: 0 })} />);
+    expect(screen.getByRole('button', { name: /wordTower\.hud\.scramble/ })).toBeDisabled();
+    rerender(<WordTowerHud {...makeProps({ scramblesLeft: 2 })} />);
+    expect(screen.getByRole('button', { name: /wordTower\.hud\.scramble/ })).toBeEnabled();
+  });
+
+  it('fires onSelectTile when a tray tile is tapped', () => {
+    const onSelectTile = vi.fn();
+    render(<WordTowerHud {...makeProps({ onSelectTile })} />);
+    // Tray index 2 is 'R' (unique letter → unambiguous aria-label).
+    fireEvent.click(screen.getByRole('button', { name: 'wordTower.a11y.tile:R' }));
+    expect(onSelectTile).toHaveBeenCalledWith(2);
+  });
+
+  it('shows the error message after a rejection', () => {
+    render(<WordTowerHud {...makeProps({ lastError: 'bad_chain', errorKey: 1 })} />);
+    expect(screen.getByText('wordTower.error.bad_chain')).toBeInTheDocument();
+  });
+
+  it('shows the floating reward popup on an accepted word', () => {
+    render(
+      <WordTowerHud
+        {...makeProps({
+          resultKey: 1,
+          lastResult: { floorAdded: true, meters: 4.2, combo: 2, scramblesEarned: 0, bombCharge: 1, tier: 'highRise', heightM: 16, biome: 'city' },
+        })}
+      />,
+    );
+    expect(screen.getByText('+4.2 m')).toBeInTheDocument();
+    expect(screen.getByText('wordTower.celebration.highRise')).toBeInTheDocument();
+  });
+
+  it('renders the combo chip only when combo > 1', () => {
+    const { rerender } = render(<WordTowerHud {...makeProps({ combo: 1 })} />);
+    expect(screen.queryByText(/wordTower\.hud\.combo/)).not.toBeInTheDocument();
+    rerender(<WordTowerHud {...makeProps({ combo: 5 })} />);
+    expect(screen.getByText(/wordTower\.hud\.combo/)).toBeInTheDocument();
+  });
+});
