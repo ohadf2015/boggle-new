@@ -13,6 +13,7 @@ const MODE_KEY_MAP: Record<GameMode, string> = {
   'word-hunt': 'wordHunt',
   'wheel-rush': 'wheelRush',
   'word-tower': 'wordTower',
+  shiritori: 'shiritori',
 };
 
 const GAME_MODES: { key: GameMode; icon: typeof LayoutGrid; color: string }[] = [
