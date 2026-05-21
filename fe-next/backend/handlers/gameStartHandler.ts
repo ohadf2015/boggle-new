@@ -613,6 +613,13 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       buildStartGamePayload(gameCode, letterGrid, validTimer, gameLang, effectiveMinWordLength, messageId, game.gameSessionId, boardTheme, resolvedMode)
     );
 
+    // Tell word-tower clients the per-player match is initialized so they can
+    // (re)pull their tower. Beats the requestTowerState race: the versus hook
+    // polls on mount during the countdown, before the match exists.
+    if (resolvedMode === 'word-tower') {
+      broadcastToRoom(io, getGameRoom(gameCode), 'towerMatchReady', {});
+    }
+
     // Broadcast wheel-rush init AFTER startGame so client has time to mount WheelRushView
     // and subscribe. Also handles late joiners via requestWheelRushState (see wheelRushHandler).
     if (resolvedMode === 'wheel-rush') {

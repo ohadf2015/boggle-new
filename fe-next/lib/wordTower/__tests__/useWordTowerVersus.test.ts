@@ -22,6 +22,15 @@ describe('useWordTowerVersus', () => {
     expect(m.emits.some((e) => e.event === 'requestTowerState')).toBe(true);
   });
 
+  it('re-requests tower state when the server signals the match is ready', () => {
+    const m = mockSocket();
+    renderHook(() => useWordTowerVersus({ socket: m.socket, selfId: 'me' }));
+    const before = m.emits.filter((e) => e.event === 'requestTowerState').length;
+    m.trigger('towerMatchReady', {});
+    const after = m.emits.filter((e) => e.event === 'requestTowerState').length;
+    expect(after).toBe(before + 1);
+  });
+
   it('applies towerStateSync (own tower + standings)', () => {
     const m = mockSocket();
     const { result } = renderHook(() => useWordTowerVersus({ socket: m.socket, selfId: 'me' }));

@@ -116,14 +116,26 @@ export function handleSendTowerBomb(io: Server, socket: Socket, data: SendTowerB
   logger.info('WORD_TOWER', `${username} bombed ${outcome.targetId} in ${gameCode} (-${outcome.removed} floors)`);
 }
 
-function handleRequestTowerState(socket: Socket): void {
-  const ctx = resolveMatch(socket);
-  if (!ctx) return;
-  const { username, game } = ctx;
+/**
+ * Benign state PULL — never emits an 'error'. The versus hook mounts during the
+ * pre-game countdown and polls before the per-player match is initialized
+ * (initialized in gameStartHandler only after the `startGame` broadcast). When
+ * not ready we no-op; the server pushes `towerMatchReady` on init and the client
+ * re-pulls. (The action handlers below keep the strict resolveMatch, which DOES
+ * error — submitting a word before init is a real misuse, polling is not.)
+ */
+export function handleRequestTowerState(socket: Socket): void {
+  const gameCode = getGameBySocketId(socket.id);
+  const username = getUsernameBySocketId(socket.id);
+  if (!gameCode || !username) return;
+  const game = getGame(gameCode);
+  if (!game || game.gameState !== 'in-progress' || game.gameMode !== 'word-tower' || !game.wordTowerVersusState) return;
+  const player = game.wordTowerVersusState.players[username];
+  if (!player) return;
   socket.emit('towerStateSync', {
-    you: clientTowerView(game.wordTowerVersusState!.players[username].game),
-    standings: versusStandings(game.wordTowerVersusState!),
-    endsAtMs: game.wordTowerVersusState!.endsAtMs,
+    you: clientTowerView(player.game),
+    standings: versusStandings(game.wordTowerVersusState),
+    endsAtMs: game.wordTowerVersusState.endsAtMs,
   });
 }
 

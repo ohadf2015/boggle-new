@@ -34,7 +34,7 @@ vi.mock('@/lib/wordTower/wordTowerManager', () => ({
   clientTowerView: vi.fn(() => ({ tray: ['A', 'B'], anchorLetter: 'A', scramblesLeft: 3, heightM: 0, combo: 0, floors: 0, bombCharge: 0 })),
 }));
 
-import { handleSubmitTowerWord, handleSendTowerBomb } from '../wordTowerHandler';
+import { handleSubmitTowerWord, handleSendTowerBomb, handleRequestTowerState } from '../wordTowerHandler';
 import { broadcastToRoom, volatileBroadcastToRoom } from '../../utils/socketHelpers';
 import { getGame, updatePlayerScore } from '../../modules/gameStateManager';
 import { submitVersusWord, sendVersusBomb } from '@/lib/wordTower/versusMatch';
@@ -95,5 +95,24 @@ describe('wordTowerHandler', () => {
     handleSendTowerBomb(mkIo(), sock, { targetPlayerId: 'p2' });
     expect(sock.emit).toHaveBeenCalledWith('towerBombResult', { sent: false, error: 'no_lead' });
     expect(broadcastToRoom).not.toHaveBeenCalled();
+  });
+
+  // requestTowerState is a benign PULL: a client may poll before the per-player
+  // match is initialized (during the pre-game countdown). It must NOT surface a
+  // user-facing 'error' for that race — the server pushes 'towerMatchReady'.
+  it('stays silent (no error) when requestTowerState arrives before init', () => {
+    (getGame as unknown as Mock).mockReturnValue({ ...gameBase, wordTowerVersusState: undefined });
+    const sock = mkSocket();
+    handleRequestTowerState(sock);
+    expect(sock.emit).not.toHaveBeenCalledWith('error', expect.anything());
+    expect(sock.emit).not.toHaveBeenCalledWith('towerStateSync', expect.anything());
+  });
+
+  it('emits towerStateSync once the match is initialized', () => {
+    (getGame as unknown as Mock).mockReturnValue(gameBase);
+    const sock = mkSocket();
+    handleRequestTowerState(sock);
+    expect(sock.emit).toHaveBeenCalledWith('towerStateSync', expect.objectContaining({ endsAtMs: 1 }));
+    expect(sock.emit).not.toHaveBeenCalledWith('error', expect.anything());
   });
 });

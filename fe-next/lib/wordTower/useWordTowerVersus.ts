@@ -94,11 +94,17 @@ export function useWordTowerVersus(opts: { socket: VersusSocket | null; selfId: 
       setState((s) => (d.targetId === selfId ? { ...s, lastBombHit: d, bombKey: s.bombKey + 1 } : { ...s, lastBombHit: d }));
     };
 
+    // Server signals the per-player match is initialized → (re)pull our tower.
+    // The mount poll below can land before init during the countdown; this is
+    // the authoritative catch-up.
+    const onMatchReady = () => socket.emit('requestTowerState');
+
     socket.on('towerStateSync', onSync);
     socket.on('towerStandings', onStandings);
     socket.on('towerWordResult', onWordResult);
     socket.on('towerTrayUpdate', onTray);
     socket.on('towerBombHit', onBombHit);
+    socket.on('towerMatchReady', onMatchReady);
     socket.emit('requestTowerState');
 
     return () => {
@@ -107,6 +113,7 @@ export function useWordTowerVersus(opts: { socket: VersusSocket | null; selfId: 
       socket.off('towerWordResult', onWordResult);
       socket.off('towerTrayUpdate', onTray);
       socket.off('towerBombHit', onBombHit);
+      socket.off('towerMatchReady', onMatchReady);
     };
   }, [socket, selfId]);
 
