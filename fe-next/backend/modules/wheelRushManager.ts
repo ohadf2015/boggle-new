@@ -30,9 +30,10 @@ const NINE_LETTER_SOURCES: Record<string, string[]> = {
   en: ['BREATHING','COUNTRIES','DANGEROUS','EDUCATION','LANDSCAPE','MACHINERY','NIGHTCLUB','OPERATING','QUESTIONS','REACTIONS','BUILDINGS','CERTAINLY','DESERVING','FURNISHED','GROUNDING','PUBLISHED','RECOGNISE','SHOULDERS','CUSTOMERS','FRAGMENTS','MICROWAVE','PLUNDERED','MARKETING','PROVIDING'],
   he: ['מחשבונים','התלמידים','משחקיהם','מתכוננים','הרכבתיה','תלבושות'],
   sv: ['BOKSTAVER','DATORSPEL','FRIHANDIG','GRUNDKURS','HUVUDSIDA','LANDSTING','MUSIKBAND'],
-  // Hiragana readings of the original seed words (新しい世界 → あたらしいせかい …): a wheel is
-  // anagram play, which only works on phonetic kana, never on logographic kanji.
-  ja: ['あたらしいせかい','きょういくきかん','しぜんかんきょう','ぎじゅつかくしん','ぶんかこうりゅう','けいざいはってん','しゃかいもんだい','けんこうかんり'],
+  // Single hiragana dictionary words with EXACTLY 7 unique kana — so the wheel fills
+  // from the seed alone AND the full word is findable as a pangram (parity with the
+  // English seeds). A wheel is anagram play: phonetic kana only, never kanji.
+  ja: ['りゅうがくせい','ゆうびんきょく','ひゃっかじてん','ちゅうしゃじょう','ていりゅうじょ','にゅうがくする','にゅういんする','めんどうくさい'],
   es: ['RESPALDOS','CAMINANDO','ENCONTRAR','FABRICADO','GOBIERNO','HORMIGAS','INDOMABLE'],
 };
 
