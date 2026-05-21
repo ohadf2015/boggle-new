@@ -9,7 +9,13 @@
  * SECURITY: All content is static string literals — no user input.
  */
 
-const CRAZYGAMES_FORCE_DISABLED = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED === 'false';
+// Opt-in load. The CrazyGames SDK only does anything inside a crazygames.com
+// iframe; on our own domains (lexiclash.live) it self-disables yet still costs a
+// third-party <script> on every page. PostHog (90d) showed the web/CrazyGames
+// rewarded path delivered 0 watches ever — all 27 successful rewarded watches
+// were native AdMob. So load the SDK ONLY when explicitly enabled for a
+// CrazyGames-distributed build (NEXT_PUBLIC_CRAZYGAMES_ENABLED=true).
+const CRAZYGAMES_ENABLED = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED === 'true';
 
 // Bootstrap calls sdkGameLoadingStart() immediately but does NOT call sdkGameLoadingStop().
 // The React CrazyGamesProvider calls loadingStop() once the app is interactive,
@@ -19,7 +25,7 @@ const CRAZYGAMES_FORCE_DISABLED = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED ===
 const BOOTSTRAP_CODE = `(function(){function isCgHost(){try{var h=window.location&&window.location.hostname;if(h==='icecream.me'||(h&&h.indexOf('.icecream.me',h.length-'.icecream.me'.length)!==-1))return true}catch(e){}return false}var inIframe=false;try{inIframe=window.self!==window.top}catch(e){inIframe=true}if(!inIframe&&!isCgHost()){window.__crazyGamesEnvironment='disabled';window.__crazyGamesReady=true;return}function isCrossOriginIframe(){if(!inIframe)return false;try{void window.parent.location.href;return false}catch(e){return true}}function isCgIframe(){try{if(window.location.ancestorOrigins&&window.location.ancestorOrigins.length){for(var i=0;i<window.location.ancestorOrigins.length;i++){if(window.location.ancestorOrigins[i].indexOf('crazygames.com')!==-1)return true}}}catch(e){}try{if(document.referrer&&document.referrer.indexOf('crazygames.com')!==-1)return true}catch(e){}if(isCgHost())return true;if(isCrossOriginIframe())return true;return false}if(isCgIframe())document.body&&document.body.classList.add('crazygames-embed');var attempts=0;function tryInit(){if(window.CrazyGames&&window.CrazyGames.SDK){window.CrazyGames.SDK.init().then(function(){return window.CrazyGames.SDK.getEnvironment()}).then(function(env){window.__crazyGamesEnvironment=env;window.__crazyGamesReady=true;if(env==='crazygames'){document.body&&document.body.classList.add('crazygames-embed');window.CrazyGames.SDK.game.sdkGameLoadingStart()}}).catch(function(){window.__crazyGamesEnvironment=isCgIframe()?'crazygames':'disabled';window.__crazyGamesReady=true;if(isCgIframe())document.body&&document.body.classList.add('crazygames-embed')})}else if(attempts<100){attempts++;setTimeout(tryInit,50)}else{window.__crazyGamesEnvironment=isCgIframe()?'crazygames':'disabled';window.__crazyGamesReady=true;if(isCgIframe())document.body&&document.body.classList.add('crazygames-embed')}}tryInit()})()`;
 
 export default function CrazyGamesScriptServer() {
-  if (CRAZYGAMES_FORCE_DISABLED) {
+  if (!CRAZYGAMES_ENABLED) {
     return null;
   }
 

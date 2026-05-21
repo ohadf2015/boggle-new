@@ -139,11 +139,21 @@ interface UseRewardedAdReturn {
 /**
  * Hook to show rewarded video ads and earn coins.
  *
+ * Provider reality (PostHog 90d, audited 2026-05-21): AdMob (native) is the
+ * ONLY provider that delivers — 27 successful watches, 0 from any web path.
+ * Web rewarded ads have a 0% fill rate (GameMonetize needs Google IMA, which
+ * our rejected-AdSense site can't load; CrazyGames only works inside its own
+ * iframe). So on production web the hook intentionally lands on `placeholder`,
+ * which makes `canShowAd` false and hides the watch-ad CTAs — better than
+ * promising a reward we can't grant.
+ *
  * Priority order:
- * 1. CrazyGames SDK - when running on CrazyGames platform
- * 1.5. AdMob - native Capacitor apps
+ * 1. CrazyGames SDK - only inside a CrazyGames-distributed build (opt-in env)
+ * 1.5. AdMob - native Capacitor apps (the only path with real fill)
+ * 1.75. H5 Games Ads - production web, gated off pending AdSense approval
+ * 1.85. GameMonetize - web fallback, disabled (0% fill; unset game-id in prod)
  * 2. Simulation fallback - for development/testing
- * 3. Placeholder - no ads available, grant coins with cooldown
+ * 3. Placeholder - no ads available; refuses rewards + hides CTA in prod
  *
  * @example
  * ```tsx
