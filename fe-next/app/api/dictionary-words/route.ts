@@ -11,6 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
+import { extractHiraganaWords } from '@/shared/constants/japaneseLetters';
 import * as fsp from 'fs/promises';
 import * as path from 'path';
 
@@ -111,18 +112,16 @@ async function loadDictionary(language: string): Promise<string[]> {
       const backendDir = path.join(process.cwd(), 'backend');
       const wordSet = new Set<string>();
 
-      const [kanjiContent, approvedContent] = await Promise.all([
-        fsp.readFile(path.join(backendDir, 'kanji_compounds.txt'), 'utf-8').catch(() => ''),
+      // HIRAGANA only — the client cache must match backend board generation +
+      // validation. Serving kanji_compounds here made the client reject the
+      // hiragana words the board can actually spell.
+      const [hiraganaContent, approvedContent] = await Promise.all([
+        fsp.readFile(path.join(backendDir, 'japanese_words.txt'), 'utf-8').catch(() => ''),
         fsp.readFile(path.join(backendDir, 'japanese_words_approved.txt'), 'utf-8').catch(() => ''),
       ]);
 
-      for (const content of [kanjiContent, approvedContent]) {
-        if (content) {
-          for (const line of content.split('\n')) {
-            const w = line.trim();
-            if (w.length > 0) wordSet.add(w);
-          }
-        }
+      for (const content of [hiraganaContent, approvedContent]) {
+        for (const w of extractHiraganaWords(content)) wordSet.add(w);
       }
 
       words = Array.from(wordSet);

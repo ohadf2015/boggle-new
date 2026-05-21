@@ -17,6 +17,10 @@ import {
 // Import word normalization for board verification
 import { normalizeWord } from '@/shared/utils/wordNormalization';
 
+// Japanese hiragana board pool — single source of truth shared with the frontend
+// grid, /api/dictionary-words, serverDicts validation, and the ja.dict.gz build.
+import { japaneseHiraganaFrequency, JAPANESE_HIRAGANA_POOL } from '@/shared/constants/japaneseLetters';
+
 // ==========================================
 // Type Definitions
 // ==========================================
@@ -82,52 +86,9 @@ export const kanjiCompounds: string[] = [
   "父母", "兄弟", "友人", "王国", "天地", "山川", "海空"
 ];
 
-/**
- * Hiragana frequency weights for Japanese board generation.
- *
- * Japanese boards are HIRAGANA, not kanji: hiragana is a phonetic syllabary, so
- * words are sequences of adjacent kana you can trace (ねこ = ne+ko) — exactly the
- * Boggle primitive. A kanji grid cannot work (logographs aren't an alphabet you
- * rearrange). Includes voiced (dakuten が-row), semi-voiced (handakuten ぱ-row),
- * small kana (ゃゅょっ) and the long-vowel mark (ー) so common words like がっこう /
- * きゅうりょう / ちょうり are spellable. Weights approximate corpus frequency.
- * See docs/2026-05-21-japanese-multiplayer-gameplay-audit.md.
- */
-export const japaneseHiraganaFrequency: Record<string, number> = {
-  // vowels
-  'あ': 8, 'い': 9, 'う': 8, 'え': 5, 'お': 6,
-  // k-row
-  'か': 7, 'き': 5, 'く': 5, 'け': 4, 'こ': 6,
-  // s-row
-  'さ': 4, 'し': 7, 'す': 5, 'せ': 4, 'そ': 3,
-  // t-row
-  'た': 6, 'ち': 4, 'つ': 5, 'て': 6, 'と': 6,
-  // n-row
-  'な': 5, 'に': 6, 'ぬ': 1, 'ね': 2, 'の': 7,
-  // h-row
-  'は': 4, 'ひ': 2, 'ふ': 2, 'へ': 2, 'ほ': 2,
-  // m-row
-  'ま': 4, 'み': 3, 'む': 2, 'め': 2, 'も': 3,
-  // y-row
-  'や': 2, 'ゆ': 2, 'よ': 3,
-  // r-row
-  'ら': 4, 'り': 5, 'る': 5, 'れ': 3, 'ろ': 2,
-  // w-row + syllabic n
-  'わ': 2, 'を': 1, 'ん': 7,
-  // dakuten (voiced)
-  'が': 3, 'ぎ': 1, 'ぐ': 1, 'げ': 1, 'ご': 2,
-  'ざ': 1, 'じ': 3, 'ず': 1, 'ぜ': 1, 'ぞ': 1,
-  'だ': 2, 'ぢ': 1, 'づ': 1, 'で': 3, 'ど': 2,
-  'ば': 1, 'び': 1, 'ぶ': 1, 'べ': 1, 'ぼ': 1,
-  // handakuten (semi-voiced) — rare
-  'ぱ': 1, 'ぴ': 1, 'ぷ': 1, 'ぺ': 1, 'ぽ': 1,
-  // small kana (modifiers) + long-vowel mark
-  'ゃ': 2, 'ゅ': 2, 'ょ': 2, 'っ': 3, 'ー': 2,
-};
-
-// Flattened weighted draw pool — each kana repeated by its frequency weight.
-const JAPANESE_HIRAGANA_POOL: string[] = Object.entries(japaneseHiraganaFrequency)
-  .flatMap(([kana, weight]) => Array<string>(weight).fill(kana));
+// Re-exported from the shared single source of truth (see import above) so existing
+// importers of `gameUtils` keep working while frontend/API/build all share one pool.
+export { japaneseHiraganaFrequency };
 
 // Valid Hebrew letters set for filtering
 const validHebrewLettersSet = new Set<string>([

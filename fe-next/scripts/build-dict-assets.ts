@@ -2,6 +2,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { buildDictBlob } from '../lib/offline/dictBundle';
+import { isHiraganaWord } from '../shared/constants/japaneseLetters';
 
 const ROOT = path.resolve(__dirname, '..');
 const OUT_DIR = path.join(ROOT, 'public', 'dicts');
@@ -50,10 +51,12 @@ const sources: Source[] = [
   },
   {
     locale: 'ja',
+    // HIRAGANA only — the offline/client dict must match board generation +
+    // backend validation. Kanji compounds can't be spelled on a kana board.
     collect: () => [
-      ...readLines(path.join(BACKEND, 'kanji_compounds.txt')),
+      ...readLines(path.join(BACKEND, 'japanese_words.txt')),
       ...readLines(path.join(BACKEND, 'japanese_words_approved.txt')),
-    ],
+    ].filter(isHiraganaWord),
   },
   {
     locale: 'es',

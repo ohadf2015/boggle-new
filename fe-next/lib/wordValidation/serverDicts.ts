@@ -5,6 +5,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
+import { extractHiraganaWords } from '@/shared/constants/japaneseLetters';
 
 let englishDict: Set<string> | null = null;
 let spanishDict: Set<string> | null = null;
@@ -85,14 +86,12 @@ function loadJapanese(): Set<string> {
   if (japaneseDict) return japaneseDict;
   japaneseDict = new Set<string>();
   const backendDir = path.join(process.cwd(), 'backend');
-  for (const file of ['kanji_compounds.txt', 'japanese_words_approved.txt']) {
+  // HIRAGANA only — must match backend Dictionary.japaneseWords / board grids.
+  // Loading kanji_compounds here would reject the hiragana words players score.
+  for (const file of ['japanese_words.txt', 'japanese_words_approved.txt']) {
     const p = path.join(backendDir, file);
     if (!fs.existsSync(p)) continue;
-    fs.readFileSync(p, 'utf-8')
-      .split('\n')
-      .map((w) => w.trim())
-      .filter((w) => w.length > 0)
-      .forEach((w) => japaneseDict!.add(w));
+    for (const w of extractHiraganaWords(fs.readFileSync(p, 'utf-8'))) japaneseDict.add(w);
   }
   return japaneseDict;
 }
