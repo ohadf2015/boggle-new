@@ -51,6 +51,7 @@ import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { initBlastModeState, hashStringToSeed } from '../modules/blastModeManager.js';
 import { initWordHuntState, selectTargetWordWithFallback } from '../modules/wordHuntManager.js';
 import { initWheelRushState, generateWheelPuzzle } from '../modules/wheelRushManager.js';
+import { initVersusMatch } from '@/lib/wordTower/versusMatch';
 import { initShiritoriState } from '../modules/shiritoriManager.js';
 import { getSupabase } from '../modules/supabase/client.js';
 import { autoAddBotsForSoloPlayer } from '../services/gameLifecycle/autoAddBots.js';
@@ -538,6 +539,20 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       const currentGame = getGame(gameCode);
       if (currentGame) {
         currentGame.shiritoriState = shiritoriState;
+      }
+    }
+
+    // Initialize Word Tower versus match state if needed (per-player towers).
+    if (resolvedMode === 'word-tower') {
+      const match = initVersusMatch(
+        gameCode,
+        gameLang,
+        playerUsernames.map((u) => ({ id: u, username: u })),
+        Date.now(),
+      );
+      const currentGame = getGame(gameCode);
+      if (currentGame) {
+        currentGame.wordTowerVersusState = match;
       }
     }
 

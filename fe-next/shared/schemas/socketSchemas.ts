@@ -234,6 +234,19 @@ export const SubmitWheelWordSchema = z.object({
   word: z.string().min(1).max(20).transform(s => s.toUpperCase().trim()),
 });
 
+/** Word Tower (versus) MP word submission — built from tray + anchor. */
+export const SubmitTowerWordSchema = z.object({
+  word: z.string().min(1).max(40).transform(s => s.trim()),
+});
+
+/** Word Tower (versus) — reroll the tray. */
+export const ScrambleTowerSchema = z.object({}).strict();
+
+/** Word Tower (versus) — drop a bomb on a rival's tower. */
+export const SendTowerBombSchema = z.object({
+  targetPlayerId: z.string().min(1).max(64),
+});
+
 /**
  * submitShiritoriWord event payload - Shiritori (しりとり) MP word-chain turn.
  * Hiragana words; game is resolved from the socket, like wheel-rush.
@@ -538,6 +551,9 @@ export type LeaveRoomData = z.infer<typeof LeaveRoomSchema>;
 export type StartGameData = z.infer<typeof StartGameSchema>;
 export type SubmitWordData = z.infer<typeof SubmitWordSchema>;
 export type SubmitWheelWordData = z.infer<typeof SubmitWheelWordSchema>;
+export type SubmitTowerWordData = z.infer<typeof SubmitTowerWordSchema>;
+export type ScrambleTowerData = z.infer<typeof ScrambleTowerSchema>;
+export type SendTowerBombData = z.infer<typeof SendTowerBombSchema>;
 export type SubmitShiritoriWordData = z.infer<typeof SubmitShiritoriWordSchema>;
 export type ChatMessageData = z.infer<typeof ChatMessageSchema>;
 export type AddBotData = z.infer<typeof AddBotSchema>;
