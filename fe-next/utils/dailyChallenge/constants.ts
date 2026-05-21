@@ -58,6 +58,9 @@ export function normalizeHebrewFinalLetters(text: string): string {
 
 export const DAILY_STORAGE_KEY = 'lexiclash_daily';
 export const WORD_HUNT_STORAGE_KEY = 'lexiclash_word_hunt';
+// Marks that the player bailed out of today's Word Hunt mid-game. Gates re-entry
+// behind a rewarded ad (native) without saving a result. Scoped per language+day.
+export const WORD_HUNT_FORFEIT_KEY = 'lexiclash_word_hunt_forfeit';
 export const WORD_WHEEL_STORAGE_KEY = 'lexiclash_word_wheel';
 export const DAILY_STREAK_KEY = 'lexiclash_daily_streak';
 export const GUEST_DAILY_PLAYER_KEY = 'lexiclash_guest_daily_player';

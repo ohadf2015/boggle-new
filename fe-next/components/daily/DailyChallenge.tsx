@@ -1,8 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useInterval } from '@/hooks/useSafeTimeout';
 import { m, AnimatePresence } from 'framer-motion';
+import { isNative } from '@/utils/platform';
+import { useRewardedAd } from '@/hooks/useRewardedAd';
 
 import AutoHideHeader from '@/components/AutoHideHeader';
 import DailyWordHuntSurvival, { type SurvivalGameResult } from './DailyWordHuntSurvival';
@@ -28,6 +31,9 @@ import {
   mapServerResultToStoredResult,
   getWordHuntTutorialKey,
   getWordHuntResultKey,
+  markWordHuntForfeitToday,
+  hasWordHuntForfeitToday,
+  clearWordHuntForfeitToday,
   type WordHuntResult,
   type StoredWordHuntResult,
 } from '@/utils/dailyChallenge';
@@ -60,6 +66,7 @@ const DailyChallenge: React.FC = () => {
   const isPractice = usePracticeFlag();
   const offlineFlag = useOfflineModeFlag();
   const { online } = useNetworkState();
+  const router = useRouter();
 
   // Game language state
   const urlLocale = language as Language;
@@ -91,6 +98,9 @@ const DailyChallenge: React.FC = () => {
   const [countdown, setCountdown] = useState<string>('');
   const [storedResult, setStoredResult] = useState<StoredWordHuntResult | null>(null);
   const [, setGameResult] = useState<SurvivalGameResult | null>(null);
+  // True when the player bailed mid-game today (no saved result). Re-entry is
+  // ad-gated on native; on web it degrades to a free replay.
+  const [forfeitedToday, setForfeitedToday] = useState(false);
   const [wasReset, setWasReset] = useState(false);
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
 
@@ -157,6 +167,10 @@ const DailyChallenge: React.FC = () => {
       const tutorialKey = getWordHuntTutorialKey(gameLanguage);
       const hasCompletedTutorial = typeof window !== 'undefined' && localStorage.getItem(tutorialKey) === 'true';
       setTutorialCompleted(hasCompletedTutorial);
+
+      // Mid-game forfeit today (no saved result) → gate re-entry behind a
+      // rewarded ad on native. Skipped for practice + post-retry replays.
+      setForfeitedToday(!isPractice && !wasJustReset && hasWordHuntForfeitToday(gameLanguage));
 
       // Practice mode: bypass already-played gates so the player can replay safely
       if (!wasJustReset && !isPractice) {
@@ -251,8 +265,39 @@ const DailyChallenge: React.FC = () => {
     setCountdown(formatTimeHHMMSS(seconds));
   }, 1000);
 
+  // Minimal "go to playing" used after a forfeit replay is granted (skips the
+  // already-played check — a forfeit never saves a result, so it always passes).
+  const beginPlaying = useCallback(() => {
+    clearWordHuntForfeitToday(gameLanguage);
+    setForfeitedToday(false);
+    unlockAudio();
+    trackDailyPuzzle('opened', 'word_hunt');
+    trackFeatureFirstUse('daily_word_hunt');
+    gameStartedAtRef.current = Date.now();
+    setPhase('playing');
+  }, [gameLanguage, unlockAudio]);
+
+  // Rewarded ad that unlocks a replay after a mid-game forfeit (native only;
+  // reward arrives via onRewardEarned, not a return value).
+  const { showAd, isAdAvailable, isPlaceholderCooldown } = useRewardedAd({
+    rewardKind: 'feature',
+    surface: 'retry',
+    onRewardEarned: () => beginPlaying(),
+  });
+
   // Handle game start with safety checks
   const handleStartGame = useCallback(async () => {
+    // Forfeit ad-gate: bailed mid-game today → watch a rewarded ad to replay on
+    // native. On web / when no ad is available, degrade to a free replay.
+    if (forfeitedToday) {
+      if (isNative() && isAdAvailable && !isPlaceholderCooldown) {
+        showAd();
+        return;
+      }
+      clearWordHuntForfeitToday(gameLanguage);
+      setForfeitedToday(false);
+    }
+
     unlockAudio();
 
     if (justResetRef.current) {
@@ -309,7 +354,7 @@ const DailyChallenge: React.FC = () => {
     trackFeatureFirstUse('daily_word_hunt');
     gameStartedAtRef.current = Date.now();
     setPhase('playing');
-  }, [gameLanguage, isAuthenticated, profile, t, unlockAudio, justResetRef, isPractice]);
+  }, [gameLanguage, isAuthenticated, profile, t, unlockAudio, justResetRef, isPractice, forfeitedToday, isAdAvailable, isPlaceholderCooldown, showAd]);
 
   // Handle game completion
   const handleGameComplete = useCallback((result: SurvivalGameResult, rescueMethod?: WordHuntRescueMethod) => {
@@ -414,7 +459,16 @@ const DailyChallenge: React.FC = () => {
     setShowTutorial(false);
   }, [gameLanguage]);
   const handleShowTutorial = useCallback(() => setShowTutorial(true), []);
-  const handleBack = useCallback(() => { window.location.href = `/${language}/daily`; }, [language]);
+  // Client-side nav (no hard reload) — a hard nav while the game-active
+  // beforeunload guard is armed can blank a Capacitor WebView (black screen).
+  const handleBack = useCallback(() => { router.push(`/${language}/daily`); }, [router, language]);
+
+  // Mid-game exit: record a forfeit (no result saved) so re-entry is ad-gated,
+  // then leave. Practice runs are exempt.
+  const handleQuitMidGame = useCallback(() => {
+    if (!isPractice) markWordHuntForfeitToday(gameLanguage);
+    router.push(`/${language}/daily`);
+  }, [isPractice, gameLanguage, router, language]);
 
   return (
     <div
@@ -457,12 +511,13 @@ const DailyChallenge: React.FC = () => {
 
         {phase === 'playing' && grid && targetWord && (
           <DailyWordHuntSurvival
+            key="playing"
             grid={grid}
             puzzleNumber={puzzleNumber}
             language={gameLanguage}
             targetWord={targetWord}
             onComplete={handleGameComplete}
-            onQuit={handleBack}
+            onQuit={handleQuitMidGame}
             puzzleDate={puzzleDate}
             currentPlayerId={isAuthenticated && profile ? profile.id : null}
             currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}

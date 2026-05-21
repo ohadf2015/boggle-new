@@ -37,6 +37,15 @@ export function useNavigationGuard({
   const isHandlingBackRef = useRef(false);
   // Track the current history state to detect back navigation
   const historyPushedRef = useRef(false);
+  // True once the page is actually unloading (hard nav / tab close). The
+  // teardown go(-1) must NOT fire then — racing an in-flight navigation can
+  // blank a Capacitor WebView (black screen on quit).
+  const unloadingRef = useRef(false);
+  // URL where the phantom entry was pushed. On teardown we only pop it (go(-1))
+  // if we're STILL on that URL — i.e. the guard was disabled while staying
+  // (game over → results). If we've navigated away (quit → router.push), the
+  // URLs differ and popping would bounce the user back. Avoids that race.
+  const phantomHrefRef = useRef('');
   // Store callback in ref to avoid effect re-runs when callback reference changes
   const onNavigationAttemptRef = useRef(onNavigationAttempt);
 
@@ -57,10 +66,16 @@ export function useNavigationGuard({
       return message;
     };
 
+    const handlePageHide = () => {
+      unloadingRef.current = true;
+    };
+
     window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('pagehide', handlePageHide);
 
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('pagehide', handlePageHide);
     };
   }, [enabled, message]);
 
@@ -70,6 +85,7 @@ export function useNavigationGuard({
 
     // Push a dummy state to history so we can intercept back button
     if (!historyPushedRef.current) {
+      phantomHrefRef.current = window.location.href;
       window.history.pushState({ gameGuard: true }, '', window.location.href);
       historyPushedRef.current = true;
     }
@@ -97,8 +113,13 @@ export function useNavigationGuard({
 
     return () => {
       window.removeEventListener('popstate', handlePopState);
-      // Pop the phantom history entry so back button works normally after guard teardown
-      if (historyPushedRef.current) {
+      // Pop the phantom history entry so back button works normally after guard
+      // teardown — but ONLY if we're still on the URL where it was pushed and the
+      // page isn't unloading. If we've navigated away (quit) or are mid hard-nav,
+      // go(-1) races the navigation and bounces/blanks the view.
+      const stillOnPhantom =
+        typeof window !== 'undefined' && window.location.href === phantomHrefRef.current;
+      if (historyPushedRef.current && !unloadingRef.current && stillOnPhantom) {
         window.history.go(-1);
       }
       historyPushedRef.current = false;

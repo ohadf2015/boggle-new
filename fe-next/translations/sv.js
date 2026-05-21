@@ -5348,9 +5348,9 @@ const sv = {
       "feature2": "Kombosystem",
       "feature3": "Global topplista"
     },
-    "quitConfirm": "Är du säker på att du vill avsluta? Dina framsteg går förlorade och du kommer inte kunna spela dagens pussel igen.",
-    "quitConfirmTitle": "Avsluta utmaning?",
-    "imSure": "Jag är säker",
+    "quitConfirm": "Dina framsteg sparas inte. Du måste titta på en annons för att spela igen idag.",
+    "quitConfirmTitle": "Lämna mitt i spelet?",
+    "imSure": "Lämna ändå",
     "wordsFound": "{count} ord hittade",
     "streak": "Svit",
     "streakDays": "{count} dagars svit!",

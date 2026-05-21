@@ -164,11 +164,25 @@ vi.mock('@/utils/dailyChallenge', () => ({
   getDailyStreak: vi.fn(() => 0),
   parseChallengeParam: vi.fn(() => null),
   clearWordHuntResultForRetry: vi.fn(),
+  markWordHuntForfeitToday: vi.fn(),
+  hasWordHuntForfeitToday: vi.fn(() => false),
+  clearWordHuntForfeitToday: vi.fn(),
   getGuestFingerprint: vi.fn(() => Promise.resolve('test-fingerprint')),
   mapServerResultToStoredResult: vi.fn(),
   GAME_LANGUAGE_KEY: 'daily_game_language',
   getWordHuntTutorialKey: vi.fn(() => 'word_hunt_tutorial_en'),
   getWordHuntResultKey: vi.fn(() => 'word_hunt_result_en'),
+}));
+
+// Rewarded-ad hook is wired for the mid-game forfeit gate; stub it so the test
+// doesn't reach the real ad SDKs.
+vi.mock('@/hooks/useRewardedAd', () => ({
+  useRewardedAd: () => ({
+    showAd: vi.fn(),
+    isAdAvailable: true,
+    isPlaceholderCooldown: false,
+    status: 'idle',
+  }),
 }));
 
 vi.mock('@/utils/playerProgressStorage', () => ({

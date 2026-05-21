@@ -18,7 +18,7 @@ import type {
 import {
   DAILY_STORAGE_KEY,
   WORD_HUNT_STORAGE_KEY,
-  WORD_WHEEL_STORAGE_KEY,
+  WORD_HUNT_FORFEIT_KEY,
   getWordHuntResultKey,
   getWordWheelResultKey,
 } from './constants';
@@ -226,6 +226,39 @@ export function clearWordHuntResultForRetry(language: Language): boolean {
   removeFromLocalStorage(awardKey);
 
   return true;
+}
+
+// ==========================================
+// Word Hunt forfeit marker (mid-game exit)
+// ==========================================
+
+/**
+ * Mark that the player bailed out of today's Word Hunt mid-game.
+ * Persists no result — it only flags that re-entry should be ad-gated (native).
+ */
+export function markWordHuntForfeitToday(language: Language): void {
+  const today = getDailyChallengeDate();
+  const key = `${WORD_HUNT_FORFEIT_KEY}_${language}_${today}`;
+  saveJsonToLocalStorage(key, true);
+}
+
+/**
+ * Whether the player forfeited today's Word Hunt without a saved result.
+ */
+export function hasWordHuntForfeitToday(language: Language): boolean {
+  const today = getDailyChallengeDate();
+  const key = `${WORD_HUNT_FORFEIT_KEY}_${language}_${today}`;
+  return getFromLocalStorage(key) !== null;
+}
+
+/**
+ * Clear today's forfeit marker — called once the replay is granted
+ * (rewarded ad watched on native, or free replay on web).
+ */
+export function clearWordHuntForfeitToday(language: Language): void {
+  const today = getDailyChallengeDate();
+  const key = `${WORD_HUNT_FORFEIT_KEY}_${language}_${today}`;
+  removeFromLocalStorage(key);
 }
 
 /**

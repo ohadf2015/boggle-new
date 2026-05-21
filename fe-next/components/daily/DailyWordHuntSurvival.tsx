@@ -152,9 +152,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     }
   };
 
+  // Disarm the navigation guard the instant the player confirms a quit, so its
+  // beforeunload/popstate handlers don't fire during the exit nav (black-screen race).
+  const [quitting, setQuitting] = useState(false);
+
   // Navigation guard
   useNavigationGuard({
-    enabled: !state.isGameOver,
+    enabled: !state.isGameOver && !quitting,
     message: t('wordHunt.quitConfirmMessage'),
     onNavigationAttempt: () => {
       actions.setShowQuitConfirm(true);
@@ -345,6 +349,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // Handle quit flow
   const handleQuitConfirm = () => {
     actions.setShowQuitConfirm(false);
+    setQuitting(true); // disarm guard before the exit nav
     onQuit();
   };
 
@@ -623,7 +628,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         title={t('daily.quitConfirmTitle')}
         description={
           t('daily.quitConfirm') ||
-          "If you quit, this will count as your attempt for today. You won't be able to try again until tomorrow."
+          "Your progress won't be saved. You'll need to watch an ad to play again today."
         }
         confirmText={t('daily.imSure')}
         cancelText={t('common.cancel')}
