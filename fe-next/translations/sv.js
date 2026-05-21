@@ -10,6 +10,7 @@ const sv = {
     "celebration": { "highRise": "Höghus!", "tall": "Skyhögt!", "skyscraper": "SKYSKRAPA!" },
     "leaderboard": { "title": "Topptorn", "error": "Kunde inte ladda topplistan", "empty": "Inga torn än — bli först!" },
     "share": { "button": "Dela", "text": "Jag nådde {m} m i Ordtorn — slå mitt torn!" },
+    "versus": { "title": "Tornrace", "bomb": "Bomba {name}", "waiting": "Väntar på motståndare…", "incoming": "Inkommande bomb!", "won": "Du vann!", "lost": "{name} vann" },
     "a11y": { "height": "Höjd {m} meter", "combo": "kedja {n}", "tile": "Bokstav {letter}" }
   },
   "flag": "🇸🇪",

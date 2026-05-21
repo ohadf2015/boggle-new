@@ -10,6 +10,7 @@ const en = {
     "celebration": { "highRise": "High Rise!", "tall": "Towering!", "skyscraper": "SKYSCRAPER!" },
     "leaderboard": { "title": "Top Towers", "error": "Couldn't load leaderboard", "empty": "No towers yet — be the first!" },
     "share": { "button": "Share", "text": "I reached {m} m in Word Tower — beat my tower!" },
+    "versus": { "title": "Tower Rush", "bomb": "Bomb {name}", "waiting": "Waiting for rivals…", "incoming": "Incoming bomb!", "won": "You won!", "lost": "{name} won" },
     "a11y": { "height": "Height {m} meters", "combo": "combo {n}", "tile": "Letter {letter}" }
   },
   "flag": "🇺🇸",

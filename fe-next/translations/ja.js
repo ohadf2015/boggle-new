@@ -10,6 +10,7 @@ const ja = {
     "celebration": { "highRise": "ハイライズ！", "tall": "そびえ立つ！", "skyscraper": "摩天楼！" },
     "leaderboard": { "title": "トップタワー", "error": "ランキングを読み込めません", "empty": "まだ塔がありません — 最初の一人に！" },
     "share": { "button": "シェア", "text": "ワードタワーで {m}m 達成 — 私の塔を超えてみて！" },
+    "versus": { "title": "タワーラッシュ", "bomb": "{name} を爆撃", "waiting": "対戦相手を待っています…", "incoming": "爆弾が来る！", "won": "勝利！", "lost": "{name} の勝ち" },
     "a11y": { "height": "高さ {m} メートル", "combo": "連鎖 {n}", "tile": "文字 {letter}" }
   },
   "flag": "🇯🇵",

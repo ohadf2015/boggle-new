@@ -10,6 +10,7 @@ const es = {
     "celebration": { "highRise": "¡Edificio alto!", "tall": "¡Imponente!", "skyscraper": "¡RASCACIELOS!" },
     "leaderboard": { "title": "Torres principales", "error": "No se pudo cargar la clasificación", "empty": "Aún no hay torres — ¡sé el primero!" },
     "share": { "button": "Compartir", "text": "¡Llegué a {m} m en Torre de Palabras — supera mi torre!" },
+    "versus": { "title": "Carrera de Torres", "bomb": "Bombardear a {name}", "waiting": "Esperando rivales…", "incoming": "¡Bomba entrante!", "won": "¡Ganaste!", "lost": "Ganó {name}" },
     "a11y": { "height": "Altura {m} metros", "combo": "cadena {n}", "tile": "Letra {letter}" }
   },
   "flag": "🇪🇸",
