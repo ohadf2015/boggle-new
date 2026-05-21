@@ -247,6 +247,7 @@ export function LandingChallengeCards({
               description={t('wordTower.cardDesc')}
               href={`/${language}/word-tower`}
               icon={<Building2 className="w-6 h-6" />}
+              modeImage="/modes/word-tower.png"
               variant="purple"
               badge="ADMIN"
               onClick={() => { trackLandingCtaClick('mode_card', { mode: 'wordTower', variant: 'purple' }); }}
