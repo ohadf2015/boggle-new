@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers, Gem, Building2 } from 'lucide-react';
 import ModeCard from './ModeCard';
-import { useExperiment } from '@/hooks/useExperiment';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
@@ -92,10 +91,9 @@ export function LandingChallengeCards({
   // Practice also disappears as soon as the player has finished any game —
   // a recorded personal best is a durable "I've played" signal that survives
   // localStorage clears for signed-in users.
+  // Word Tower, Blast Classic (V1), and Word Craft are admin-only dev previews —
+  // gated on `isAdmin` alone (same pattern), no extra experiment lock.
   const { isAdmin } = useAuth();
-  // Word Tower is admin-only AND behind the `word-tower` experiment during dev.
-  const { variant: wordTowerVariant } = useExperiment('word-tower');
-  const wordTowerEnabled = isAdmin && wordTowerVariant === 'on';
   const isVeteranRaw = useIsPracticeVeteran();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const hasPlayedAnyGame = !!playerAllTimeBest && playerAllTimeBest.score > 0;
@@ -140,7 +138,7 @@ export function LandingChallengeCards({
     if (!next.includes('brainGym')) next.push('brainGym');
     if (isAdmin && !next.includes('wordCraft')) next.push('wordCraft');
     if (isAdmin && !next.includes('wordCraftGems')) next.push('wordCraftGems');
-    if (wordTowerEnabled && !next.includes('wordTower')) next.push('wordTower');
+    if (isAdmin && !next.includes('wordTower')) next.push('wordTower');
     // Blast Classic (legacy V1 engine) — admin-only card so both V1 + V2 (the
     // public 'blast' card) are reachable. /blast?v2=off opts into the V1 engine.
     if (isAdmin && !next.includes('blastClassic')) next.push('blastClassic');
@@ -359,7 +357,7 @@ export function LandingChallengeCards({
   };
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordCraftGems']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordCraftGems', 'wordTower', 'blastClassic']);
   // Newcomer-essential modes — always visible above the fold. Everything else
   // collapses into a "More Game Modes" expander to reduce choice paralysis
   // without removing the cards from the DOM (preserves SEO + AI-crawler links).

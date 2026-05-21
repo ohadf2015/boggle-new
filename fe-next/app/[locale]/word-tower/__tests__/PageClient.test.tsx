@@ -21,7 +21,7 @@ beforeEach(() => {
 });
 
 describe('WordTowerPageClient gate', () => {
-  it('renders the game for an admin with the flag on', () => {
+  it('renders the game for an admin', () => {
     useAuth.mockReturnValue({ isAdmin: true, loading: false });
     render(<WordTowerPageClient />);
     expect(screen.getByTestId('word-tower-game')).toBeInTheDocument();
@@ -35,12 +35,12 @@ describe('WordTowerPageClient gate', () => {
     expect(replace).toHaveBeenCalledWith('/en');
   });
 
-  it('redirects an admin when the flag is off', () => {
+  it('renders for an admin even when the experiment flag is off (gate is admin-only)', () => {
     useAuth.mockReturnValue({ isAdmin: true, loading: false });
     useExperiment.mockReturnValue({ variant: 'off', trackExposure: vi.fn() });
     render(<WordTowerPageClient />);
-    expect(screen.queryByTestId('word-tower-game')).not.toBeInTheDocument();
-    expect(replace).toHaveBeenCalledWith('/en');
+    expect(screen.getByTestId('word-tower-game')).toBeInTheDocument();
+    expect(replace).not.toHaveBeenCalled();
   });
 
   it('does not redirect while auth is still loading', () => {

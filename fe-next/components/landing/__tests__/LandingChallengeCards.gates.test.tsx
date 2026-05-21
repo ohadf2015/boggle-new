@@ -123,6 +123,42 @@ describe('LandingChallengeCards — Word Craft admin gate', () => {
   });
 });
 
+describe('LandingChallengeCards — Word Tower admin solo gate', () => {
+  it('does NOT render the Word Tower card for a non-admin user', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.queryByTestId('mode-wordTower.cardTitle')).toBeNull();
+  });
+
+  it('renders the Word Tower SOLO card for an admin with /word-tower href', () => {
+    mockIsAdmin.mockReturnValue(true);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    const card = screen.getByTestId('mode-wordTower.cardTitle');
+    expect(card).toBeInTheDocument();
+    expect(card.getAttribute('data-href')).toBe('/en/word-tower');
+  });
+});
+
+describe('LandingChallengeCards — Blast Classic admin gate', () => {
+  it('does NOT render the Blast Classic card for a non-admin', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.queryByTestId('mode-landing.blastClassic')).toBeNull();
+  });
+
+  it('renders the Blast Classic V1 card for an admin with ?v2=off href', () => {
+    mockIsAdmin.mockReturnValue(true);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    const card = screen.getByTestId('mode-landing.blastClassic');
+    expect(card).toBeInTheDocument();
+    expect(card.getAttribute('data-href')).toBe('/en/blast?v2=off');
+  });
+});
+
 describe('LandingChallengeCards — collapse-after-MP gate', () => {
   it('renders the "More Game Modes" expander for a brand-new player (zero MP games)', () => {
     mockIsNewPlayer.mockReturnValue(true);

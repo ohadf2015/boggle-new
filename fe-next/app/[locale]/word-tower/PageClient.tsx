@@ -8,16 +8,18 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { WordTowerGame } from '@/components/wordTower/WordTowerGame';
 
 /**
- * Word Tower is admin-only during development AND behind the `word-tower`
- * experiment. Both must pass; otherwise we redirect home. Non-admins never see
- * the route exists (no flash of content).
+ * Word Tower solo is an admin-only dev preview — gated on `isAdmin` alone
+ * (matching the landing card + sibling admin previews). Non-admins are
+ * redirected home and never see the route exists (no flash of content).
+ * `trackExposure` still fires for admin-usage analytics on the `word-tower`
+ * experiment, but is no longer part of the access gate.
  */
 export function WordTowerPageClient() {
   const { language } = useLanguage();
   const router = useRouter();
   const { isAdmin, loading } = useAuth();
-  const { variant, trackExposure } = useExperiment('word-tower');
-  const allowed = isAdmin && variant === 'on';
+  const { trackExposure } = useExperiment('word-tower');
+  const allowed = isAdmin;
 
   useEffect(() => {
     if (allowed) trackExposure();
