@@ -19,6 +19,9 @@ import {
   validateTowerWord,
   applyTowerWord,
   scrambleTray,
+  serializeWordTowerState,
+  restoreWordTowerState,
+  WORD_TOWER_SAVE_VERSION,
 } from '../wordTowerManager';
 import {
   WORD_TOWER_TRAY_SIZE,
@@ -205,5 +208,55 @@ describe('wordTowerManager — apply', () => {
   it('starts with the configured number of scrambles', () => {
     const s = initWordTowerState({ gameCode: 'G', playerId: 'p1', language: 'en' });
     expect(s.scramblesLeft).toBe(WORD_TOWER_SCRAMBLES_START);
+  });
+});
+
+describe('wordTowerManager — serialize/restore', () => {
+  const opts = { gameCode: 'G', playerId: 'p1', language: 'en' as const };
+
+  it('round-trips a tower (height, combo, anchor, floors, usedWords) with a fresh tray', () => {
+    const base = initWordTowerState(opts);
+    const s = {
+      ...base,
+      heightM: 120,
+      combo: 4,
+      anchorLetter: 'T',
+      scramblesLeft: 2,
+      bombCharge: 3,
+      floors: [{ word: 'CAT', len: 3, meters: 2 }],
+      usedWords: new Set(['CAT', 'TAR']),
+      longestWord: 'CATS',
+      longestCombo: 7,
+    };
+    const blob = serializeWordTowerState(s);
+    expect(blob.version).toBe(WORD_TOWER_SAVE_VERSION);
+
+    const r = restoreWordTowerState(opts, blob);
+    expect(r.heightM).toBe(120);
+    expect(r.combo).toBe(4);
+    expect(r.anchorLetter).toBe('T');
+    expect(r.scramblesLeft).toBe(2);
+    expect(r.bombCharge).toBe(3);
+    expect(r.floors).toHaveLength(1);
+    expect(r.usedWords.has('CAT')).toBe(true);
+    expect(r.longestCombo).toBe(7);
+    expect(r.tray).toHaveLength(WORD_TOWER_TRAY_SIZE); // tray regenerated, not persisted
+  });
+
+  it('caps floors at 50 and usedWords at 200', () => {
+    const base = initWordTowerState(opts);
+    const s = {
+      ...base,
+      floors: Array.from({ length: 80 }, () => ({ word: 'X', len: 1, meters: 1 })),
+      usedWords: new Set(Array.from({ length: 300 }, (_, i) => `W${i}`)),
+    };
+    const blob = serializeWordTowerState(s);
+    expect(blob.floors).toHaveLength(50);
+    expect(blob.usedWords).toHaveLength(200);
+  });
+
+  it('returns a fresh tower for null or wrong-version blobs', () => {
+    expect(restoreWordTowerState(opts, null).heightM).toBe(0);
+    expect(restoreWordTowerState(opts, { version: 999 } as never).heightM).toBe(0);
   });
 });

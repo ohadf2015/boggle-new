@@ -95,17 +95,19 @@ export interface UseWordTowerOpts {
   sessionId?: string;
   /** Canonical-word membership predicate (client dictionary). */
   isInDictionary: (canonWord: string) => boolean;
+  /** Restored tower to resume from (Phase 2 persistence). */
+  initialGame?: WordTowerPlayerState;
 }
 
 export function useWordTower(opts: UseWordTowerOpts) {
-  const { language, sessionId = 'solo', isInDictionary } = opts;
+  const { language, sessionId = 'solo', isInDictionary, initialGame } = opts;
   const dictRef = useRef(isInDictionary);
   dictRef.current = isInDictionary;
 
   const [state, dispatch] = useReducer(
     reducer,
     undefined,
-    () => makeInitial(initWordTowerState({ gameCode: sessionId, playerId: 'solo', language })),
+    () => makeInitial(initialGame ?? initWordTowerState({ gameCode: sessionId, playerId: 'solo', language })),
   );
 
   const handlers = useMemo(

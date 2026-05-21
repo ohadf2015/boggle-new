@@ -326,3 +326,62 @@ export function scrambleTray(state: WordTowerPlayerState): WordTowerPlayerState 
     combo: 0,
   };
 }
+
+// --- persistence (Phase 2): serialize a compact, versioned save blob and
+//     restore from it. Tray is NOT persisted — it is regenerated fresh on
+//     resume (ephemeral). floors/usedWords are capped to keep the blob small;
+//     past the usedWords cap, very old words may be re-used — known minor
+//     dedup hole for Solo Endless (see spec §13). ---
+export const WORD_TOWER_SAVE_VERSION = 1;
+const SAVE_FLOORS_CAP = 50;
+const SAVE_USED_WORDS_CAP = 200;
+
+export interface WordTowerSaveState {
+  version: number;
+  anchorLetter: string;
+  combo: number;
+  scramblesLeft: number;
+  bombCharge: number;
+  heightM: number;
+  floorsCount: number;
+  longestWord: string;
+  longestCombo: number;
+  floors: WordTowerFloor[];
+  usedWords: string[];
+}
+
+export function serializeWordTowerState(state: WordTowerPlayerState): WordTowerSaveState {
+  return {
+    version: WORD_TOWER_SAVE_VERSION,
+    anchorLetter: state.anchorLetter,
+    combo: state.combo,
+    scramblesLeft: state.scramblesLeft,
+    bombCharge: state.bombCharge,
+    heightM: state.heightM,
+    floorsCount: state.floors.length,
+    longestWord: state.longestWord,
+    longestCombo: state.longestCombo,
+    floors: state.floors.slice(-SAVE_FLOORS_CAP),
+    usedWords: [...state.usedWords].slice(-SAVE_USED_WORDS_CAP),
+  };
+}
+
+export function restoreWordTowerState(
+  opts: InitOpts,
+  saved: WordTowerSaveState | null | undefined,
+): WordTowerPlayerState {
+  const base = initWordTowerState(opts);
+  if (!saved || saved.version !== WORD_TOWER_SAVE_VERSION) return base;
+  return {
+    ...base,
+    heightM: Math.max(0, saved.heightM ?? 0),
+    combo: Math.max(0, saved.combo ?? 0),
+    anchorLetter: saved.anchorLetter || base.anchorLetter,
+    scramblesLeft: Math.max(0, saved.scramblesLeft ?? base.scramblesLeft),
+    bombCharge: Math.max(0, saved.bombCharge ?? 0),
+    floors: Array.isArray(saved.floors) ? saved.floors : [],
+    usedWords: new Set(saved.usedWords ?? []),
+    longestWord: saved.longestWord ?? '',
+    longestCombo: Math.max(0, saved.longestCombo ?? 0),
+  };
+}

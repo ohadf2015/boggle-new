@@ -11,6 +11,7 @@ export interface WordTowerHudProps {
   selected: number[];
   word: string;
   heightM: number;
+  personalBestM: number;
   combo: number;
   scramblesLeft: number;
   floorsCount: number;
@@ -37,7 +38,7 @@ const TIER_KEY: Record<NonNullable<ApplyResult['tier']>, string> = {
 
 export function WordTowerHud(props: WordTowerHudProps) {
   const {
-    anchorLetter, tray, selected, word, heightM, combo, scramblesLeft, floorsCount,
+    anchorLetter, tray, selected, word, heightM, personalBestM, combo, scramblesLeft, floorsCount,
     biomeId, lastError, errorKey, lastResult, resultKey,
     onSelectTile, onBackspace, onClear, onSubmit, onScramble, t,
   } = props;
@@ -80,6 +81,11 @@ export function WordTowerHud(props: WordTowerHudProps) {
           <div className="font-neo-body text-xs uppercase tracking-wider text-neo-cyan">
             {t(`wordTower.biome.${biomeId}`)} · {t('wordTower.hud.floors', { n: floorsCount })}
           </div>
+          {personalBestM > 0 && (
+            <div className="font-neo-body text-[11px] font-bold text-neo-yellow">
+              {t('wordTower.hud.best', { m: Math.round(personalBestM) })}
+            </div>
+          )}
         </div>
         {combo > 1 && (
           <div className="animate-neo-pop rounded-neo border-neo-thick border-black bg-neo-orange px-3 py-2 shadow-hard">
