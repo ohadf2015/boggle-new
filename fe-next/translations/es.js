@@ -6511,6 +6511,8 @@ const es = {
     "responseTime": "Solemos responder en uno o dos días"
   },
   "bugReport": {
+    "menuLabel": "Reportar un error",
+    "close": "Listo",
     "title": "Reportar un Bug",
     "description": "¿Encontraste un fallo? ¡Ayúdanos a aplastarlo!",
     "whatHappened": "¿Qué pasó?",

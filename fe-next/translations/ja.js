@@ -6495,6 +6495,8 @@ const ja = {
     "responseTime": "だいたい1〜2日で返信するよ"
   },
   "bugReport": {
+    "menuLabel": "バグを報告",
+    "close": "完了",
     "title": "バグを報告",
     "description": "不具合を発見？退治を手伝って！",
     "whatHappened": "何が起きた？",

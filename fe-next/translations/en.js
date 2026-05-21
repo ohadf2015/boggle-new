@@ -6522,6 +6522,8 @@ const en = {
     "responseTime": "We usually reply in 1-2 days"
   },
   "bugReport": {
+    "menuLabel": "Report a Bug",
+    "close": "Done",
     "title": "Found a Bug?",
     "description": "Tell us and we'll squash it!",
     "whatHappened": "What broke?",

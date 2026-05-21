@@ -6468,6 +6468,8 @@ const sv = {
     "responseTime": "Vi svarar oftast inom en dag eller två"
   },
   "bugReport": {
+    "menuLabel": "Rapportera en bugg",
+    "close": "Klar",
     "title": "Rapportera en bugg",
     "description": "Hittat ett fel? Hjälp oss fixa det!",
     "whatHappened": "Vad hände?",

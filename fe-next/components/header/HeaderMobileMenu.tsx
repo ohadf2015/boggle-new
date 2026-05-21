@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { LazyMotion, domAnimation, m, AnimatePresence, type PanInfo } from 'framer-motion';
-import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, UserPlus, ChevronRight, Sparkles, User, Flame, Bell, Check, Pencil } from 'lucide-react';
+import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, UserPlus, ChevronRight, Sparkles, User, Flame, Bell, Check, Pencil, Bug } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
@@ -10,6 +10,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { cn } from '../../lib/utils';
 import AuthButton from '../auth/AuthButton';
 import MusicControls from '../MusicControls';
+import { ReportBugModal } from '../feedback/ReportBugModal';
 import { CoinBalance } from '../CoinBalance';
 import { GiftNotificationBadge } from '../gift/GiftNotificationBadge';
 import { QuickLanguageSwitcher } from '../QuickLanguageSwitcher';
@@ -103,6 +104,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     const { isLoading: cgLoading } = useCrazyGames();
     const queryClient = useQueryClient();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
+    const [showBugReport, setShowBugReport] = useState(false);
     const [lastSeenBadgeCount, setLastSeenBadgeCount] = useState<number>(() => {
         if (typeof window === 'undefined') return 0;
         const raw = window.localStorage.getItem('mobileMenu.lastSeenBadgeCount');
@@ -844,6 +846,29 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                         <SectionLabel>{t('common.info')}</SectionLabel>
                                     </m.div>
 
+                                    {/* Report a Bug — promoted to a prominent full-width action so
+                                        players can flag issues from anywhere. Routes to /api/feedback
+                                        (Supabase + Telegram + email). */}
+                                    <m.div variants={itemVariants}>
+                                        <button
+                                            type="button"
+                                            onClick={() => { closeMenu(); setShowBugReport(true); }}
+                                            className={cn(
+                                                "flex items-center gap-3 w-full px-4 py-3 text-sm font-bold rounded-neo",
+                                                "bg-linear-to-r from-neo-pink/30 to-neo-purple/20 text-neo-white",
+                                                "border-2 border-neo-pink/40",
+                                                "hover:border-neo-pink/60 hover:from-neo-pink/40",
+                                                "active:scale-[0.98]",
+                                                "transition-all duration-100"
+                                            )}
+                                        >
+                                            <MenuIcon className="bg-neo-pink/30 border-neo-pink/50">
+                                                <Bug className="w-4 h-4 text-neo-pink" aria-hidden="true" />
+                                            </MenuIcon>
+                                            <span>{t('bugReport.menuLabel')}</span>
+                                        </button>
+                                    </m.div>
+
                                     <m.div variants={itemVariants}>
                                         <div className="grid grid-cols-2 gap-1.5">
                                             <InfoLink href={`/${language}/about`} onClick={closeMenu} icon={<Info className="w-3.5 h-3.5" />} color="bg-neo-cyan/20 text-neo-cyan">{t('footer.about')}</InfoLink>
@@ -930,6 +955,8 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                 </LazyMotion>,
                 document.body
             )}
+
+            <ReportBugModal isOpen={showBugReport} onClose={() => setShowBugReport(false)} />
         </>
     );
 });

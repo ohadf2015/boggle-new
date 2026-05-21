@@ -6488,6 +6488,8 @@ const he = {
     "responseTime": "זמן מענה משוער: יום-יומיים עסקים"
   },
   "bugReport": {
+    "menuLabel": "דווח על באג",
+    "close": "סגור",
     "title": "דיווח על באג",
     "description": "מצאת תקלה? עזור לנו לתקן!",
     "whatHappened": "מה קרה?",
