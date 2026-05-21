@@ -28,6 +28,10 @@ export NIGHTLY_PID="$$"
 
 # --- flags -----------------------------------------------------------------
 DRY_RUN=0; NO_PUSH=0; NO_MONITOR=0; NO_GATE=0; ONLY=""; SKIP=""
+# Keep a timed-out lane's partial work (within the file cap) instead of reverting
+# it. Default OFF — the integration gate validates everything, and docs-only
+# salvage backstops a broken partial, but enabling this is the owner's call.
+KEEP_TIMEOUT_PARTIALS="${NIGHTLY_KEEP_TIMEOUT_PARTIALS:-0}"
 for arg in "$@"; do
   case "$arg" in
     --dry-run)    DRY_RUN=1; NO_PUSH=1; NO_MONITOR=1 ;;
@@ -214,10 +218,22 @@ for i in 1 2 3 4 5 6 7 8; do
     fi
   else
     rc=$?
-    log "lane $i — exit $rc (continuing); reverting THIS lane only"
-    revert_to_pre_lane "$PRE_LANE"
-    LANE_RESULTS+=("❌ lane $i ($lane) — exit $rc")
-    echo "- ❌ **$lane** — failed (exit $rc), reverted" >> "$REPORT"
+    AFTER_DIRTY=$(git status --porcelain | wc -l | tr -d ' ')
+    changed=$(( AFTER_DIRTY - BEFORE_DIRTY ))
+    if [ "$rc" = "124" ] && [ "$KEEP_TIMEOUT_PARTIALS" = "1" ] && [ "$changed" -ge 1 ] && [ "$changed" -le 8 ]; then
+      # Lane hit its time ceiling but left partial work within the file cap.
+      # KEEP it (flag-gated): the integration gate validates before anything
+      # ships, and docs-only salvage backstops a broken partial — so the time
+      # the lane already spent is recovered instead of discarded.
+      log "lane $i — TIMEOUT (124), kept $changed partial file(s) [KEEP_TIMEOUT_PARTIALS=1]"
+      LANE_RESULTS+=("⏱️  lane $i ($lane) — timeout, kept $changed partial file(s)")
+      echo "- ⏱️  **$lane** — timed out, kept $changed partial file(s) (gate-validated)" >> "$REPORT"
+    else
+      log "lane $i — exit $rc (continuing); reverting THIS lane only"
+      revert_to_pre_lane "$PRE_LANE"
+      LANE_RESULTS+=("❌ lane $i ($lane) — exit $rc")
+      echo "- ❌ **$lane** — failed (exit $rc), reverted" >> "$REPORT"
+    fi
   fi
 done
 
@@ -284,16 +300,44 @@ for attempt in 1 2; do
 done
 
 if [ "$gate_ok" = "0" ]; then
-  log "GATE FAILED — restoring pre-run tree (founder WIP preserved, lane changes dropped)"
-  # NEVER push broken code, and NEVER lose the founder's WIP. The snapshot is the
-  # founder's WIP + report header (taken before any lane ran), so restoring it keeps
-  # their WIP intact and discards only what the LANES added on top. The header
-  # survives; we re-append a clear failure Outcome below.
+  # NEVER push broken code, and NEVER lose the founder's WIP. But don't throw away
+  # a whole night's reports/ideas/learnings because one lane shipped breaking CODE.
+  # Lanes write docs under docs/ (repo root, OUTSIDE fe-next); the lint/test/build
+  # gate runs INSIDE fe-next, so docs can NEVER break it — the culprit is always a
+  # lane's fe-next code. Salvage: stash post-lane docs, restore the pre-run tree
+  # (drops lane code), re-apply docs, then RE-GATE founder-WIP+docs to be certain.
+  log "GATE FAILED — attempting docs-only salvage before full revert"
+  SALVAGE_DOCS=$(mktemp -d -t nightly-docs.XXXXXX)
+  rsync -a "$PROJECT_DIR/docs/" "$SALVAGE_DOCS/" 2>/dev/null
   revert_to_pre_lane "$RUN_SNAPSHOT"; RUN_SNAPSHOT=""
-  mkdir -p "$(dirname "$REPORT")"
-  echo -e "\n**Outcome:** GATE FAILED — lint/test/build failed twice. Pre-run tree restored (founder WIP intact, lane changes dropped)." >> "$REPORT"
-  tg_alert "nightly $TODAY: build/lint/test gate failed twice. Founder WIP restored, nothing pushed. See \`$RUN_LOG\`."
-  exit 1
+  PRISTINE=$(snapshot_pre_lane)            # pre-run tree, kept for the failure path
+  rsync -a "$SALVAGE_DOCS/" "$PROJECT_DIR/docs/" 2>/dev/null
+  rm -rf "$SALVAGE_DOCS"
+
+  log "docs-only salvage: re-gating founder-WIP + lane docs (no lane code)"
+  salvage_ok=0
+  if ( cd fe-next \
+        && npm run lint >>"$RUN_LOG" 2>&1 \
+        && npm run test >>"$RUN_LOG" 2>&1 \
+        && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast >>"$RUN_LOG" 2>&1; } ); then
+    salvage_ok=1
+  fi
+
+  if [ "$salvage_ok" = "1" ]; then
+    log "docs-only salvage PASSED — shipping reports/ideas/learnings, lane code dropped"
+    rm -rf "$PRISTINE"
+    gate_ok=1
+    echo -e "\n**Outcome:** GATE FAILED on lane code — DOCS-ONLY salvage shipped (reports/ideas/learnings kept, lane CODE dropped, founder WIP intact)." >> "$REPORT"
+    tg_alert "nightly $TODAY: code gate failed — shipped DOCS-ONLY (reports/ideas/learnings). Lane code dropped, founder WIP intact. See \`$RUN_LOG\`."
+    # fall through to commit; docs are now the only lane-introduced changes
+  else
+    log "docs-only salvage FAILED too (founder WIP not gate-clean) — full revert"
+    revert_to_pre_lane "$PRISTINE"
+    mkdir -p "$(dirname "$REPORT")"
+    echo -e "\n**Outcome:** GATE FAILED — lint/test/build failed; docs-only salvage also failed. Pre-run tree restored (founder WIP intact, all lane changes dropped)." >> "$REPORT"
+    tg_alert "nightly $TODAY: gate failed twice + docs salvage failed. Founder WIP restored, nothing pushed. See \`$RUN_LOG\`."
+    exit 1
+  fi
 fi
 
 # --- commit + push (skipped entirely when NO_CHANGE_MODE=1) ---------------

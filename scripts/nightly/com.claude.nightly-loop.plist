@@ -42,7 +42,12 @@
     <key>LowPriorityIO</key>
     <true/>
 
-    <!-- Hard wall clock: 60 min. Lane budgets sum to ~50 min worst-case. -->
+    <!-- NOTE: launchd's TimeOut is ADVISORY (passed to the job), NOT a hard
+         SIGKILL deadline — launchd will not force-terminate a running run.sh at
+         3600s. The real caps are the per-lane `gtimeout` wrappers in headless.sh
+         (sum ~99 min worst-case after the 2026-05-21 ceiling raises). Lanes
+         normally finish well under their ceilings; the sequential sum is a
+         safety bound, not the expected runtime. -->
     <key>TimeOut</key>
     <integer>3600</integer>
 
