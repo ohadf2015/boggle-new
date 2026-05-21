@@ -51,6 +51,7 @@ import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { initBlastModeState, hashStringToSeed } from '../modules/blastModeManager.js';
 import { initWordHuntState, selectTargetWordWithFallback } from '../modules/wordHuntManager.js';
 import { initWheelRushState, generateWheelPuzzle } from '../modules/wheelRushManager.js';
+import { initShiritoriState } from '../modules/shiritoriManager.js';
 import { getSupabase } from '../modules/supabase/client.js';
 import { autoAddBotsForSoloPlayer } from '../services/gameLifecycle/autoAddBots.js';
 import { scheduleRoundEvent } from '../modules/roundEventsManager.js';
@@ -528,6 +529,15 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       const currentGame = getGame(gameCode);
       if (currentGame) {
         currentGame.wheelRushState = wheelState;
+      }
+    }
+
+    // Initialize shiritori (しりとり) word-chain state if needed.
+    if (resolvedMode === 'shiritori') {
+      const shiritoriState = initShiritoriState(playerUsernames);
+      const currentGame = getGame(gameCode);
+      if (currentGame) {
+        currentGame.shiritoriState = shiritoriState;
       }
     }
 

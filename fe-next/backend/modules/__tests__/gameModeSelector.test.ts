@@ -60,7 +60,7 @@ describe('gameModeSelector', () => {
     });
 
     it('should produce a weighted distribution (classic ~40%, blast ~30%, word-hunt ~30%)', () => {
-      const counts: Record<GameMode, number> = { 'classic': 0, 'blast': 0, 'word-hunt': 0, 'wheel-rush': 0, 'word-tower': 0 };
+      const counts: Record<GameMode, number> = { 'classic': 0, 'blast': 0, 'word-hunt': 0, 'wheel-rush': 0, 'word-tower': 0, 'shiritori': 0 };
       const iterations = 10000;
 
       for (let i = 0; i < iterations; i++) {

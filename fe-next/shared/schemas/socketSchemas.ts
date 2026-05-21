@@ -235,6 +235,14 @@ export const SubmitWheelWordSchema = z.object({
 });
 
 /**
+ * submitShiritoriWord event payload - Shiritori (しりとり) MP word-chain turn.
+ * Hiragana words; game is resolved from the socket, like wheel-rush.
+ */
+export const SubmitShiritoriWordSchema = z.object({
+  word: z.string().min(1).max(50).transform(s => s.trim()),
+});
+
+/**
  * submitWordVote event payload - voting on community words
  * Note: voteType must be 'like' or 'dislike' to match database constraint
  */
@@ -420,6 +428,7 @@ export const ClientEventSchemas = {
   closeRoom: CloseRoomSchema,
   submitWord: SubmitWordSchema,
   submitWheelWord: SubmitWheelWordSchema,
+  submitShiritoriWord: SubmitShiritoriWordSchema,
   submitWordVote: SubmitWordVoteSchema,
   submitPeerValidationVote: SubmitPeerValidationVoteSchema,
   sendChatMessage: ChatMessageSchema,
@@ -529,6 +538,7 @@ export type LeaveRoomData = z.infer<typeof LeaveRoomSchema>;
 export type StartGameData = z.infer<typeof StartGameSchema>;
 export type SubmitWordData = z.infer<typeof SubmitWordSchema>;
 export type SubmitWheelWordData = z.infer<typeof SubmitWheelWordSchema>;
+export type SubmitShiritoriWordData = z.infer<typeof SubmitShiritoriWordSchema>;
 export type ChatMessageData = z.infer<typeof ChatMessageSchema>;
 export type AddBotData = z.infer<typeof AddBotSchema>;
 export type RemoveBotData = z.infer<typeof RemoveBotSchema>;

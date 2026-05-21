@@ -7,19 +7,10 @@
  */
 import { shiritoriHead, shiritoriTail, endsInN } from '@/shared/utils/shiritori';
 import { SHIRITORI_TURN_MS, SHIRITORI_MIN_WORD_LEN } from '@/shared/constants/shiritoriConstants';
+import type { ShiritoriModeState } from '@/shared/types/game';
 
-export interface ShiritoriState {
-  players: string[];
-  turnIndex: number;
-  chain: string[];
-  used: string[];
-  requiredHead: string | null;
-  startedAt: number;
-  turnDeadline: number;
-  eliminated: Record<string, boolean>;
-  finished: boolean;
-  winner: string | null;
-}
+/** Canonical state shape lives in shared/types so the Game object can hold it. */
+export type ShiritoriState = ShiritoriModeState;
 
 export type ShiritoriError = 'too-short' | 'already-used' | 'bad-chain' | 'not-a-word';
 export interface ShiritoriValidation {

@@ -269,6 +269,8 @@ export interface Game {
     discoveryWordCount?: number;
     [key: string]: unknown;
   } | null;
+  /** Shiritori (しりとり) word-chain state (present during shiritori games) */
+  shiritoriState?: ShiritoriModeState | null;
 }
 
 export interface RoomPlayerAvatar {
@@ -354,6 +356,27 @@ export interface WheelRushModeState {
   startedAt: number;
   /** Per-player domination stats for end-game awards screen */
   playerStats: Record<string, WheelRushPlayerStats>;
+}
+
+/** Shiritori (しりとり) word-chain mode state tracked per game. */
+export interface ShiritoriModeState {
+  /** Turn order. */
+  players: string[];
+  /** Index into `players` of whose turn it is. */
+  turnIndex: number;
+  /** Words played so far, in order. */
+  chain: string[];
+  /** Words already used this round (no repeats). */
+  used: string[];
+  /** Kana the next word must start with (null on the opening move). */
+  requiredHead: string | null;
+  startedAt: number;
+  /** Absolute epoch ms by which the current player must answer. */
+  turnDeadline: number;
+  /** Eliminated flag per player. */
+  eliminated: Record<string, boolean>;
+  finished: boolean;
+  winner: string | null;
 }
 
 // ==================== Tournament Types ====================
