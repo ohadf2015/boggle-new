@@ -187,9 +187,14 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           style={{ containerType: 'size' }}
         >
           {/* Grid frame: square that fits the container. Cap raises on desktop so the
-              board fills more of the central column (was 440 → looked small at ≥1024px). */}
+              board fills more of the central column (was 440 → looked small at ≥1024px).
+              `flex` (NOT items-center) is load-bearing: it lets the flex-1 SurvivalGridSection
+              fill this square on BOTH axes (width via flex-1, height via default stretch).
+              Without it the height chain collapses to auto, the inner .game-board-frame's
+              `max-height: min(--board-size, 100%)` clamp goes inert, and the viewport-based
+              --board-size overflows the slot → top/bottom rows clip under the chrome. */}
           <div
-            className="relative mx-auto [--wh-grid-size:min(100cqw,100cqh,440px)] min-[1024px]:[--wh-grid-size:min(100cqw,100cqh,560px)] xl:[--wh-grid-size:min(100cqw,100cqh,620px)]"
+            className="relative mx-auto flex [--wh-grid-size:min(100cqw,100cqh,440px)] min-[1024px]:[--wh-grid-size:min(100cqw,100cqh,560px)] xl:[--wh-grid-size:min(100cqw,100cqh,620px)]"
             style={{
               width: 'var(--wh-grid-size)',
               height: 'var(--wh-grid-size)',
