@@ -11,6 +11,14 @@ export interface ShowRewardedOptions {
   surface?: RewardedSurface;
 }
 
+// AdMob's native rewarded-video load tops out at ~30s before it gives up.
+// Blocking the UI in `status='showing'` for that whole window is the
+// "stuck 30s" bug. We cap the load wait far shorter: if `prepareRewardVideoAd`
+// hasn't resolved by here, free the UI with a retry message. The in-flight
+// prepare keeps warming the plugin's cache, so the *next* tap is usually
+// instant (preloaded).
+export const REWARD_PREPARE_TIMEOUT_MS = 12000;
+
 export interface ShowBannerOptions {
   variant?: BannerVariant;
 }
@@ -36,6 +44,7 @@ export function useAdMob() {
     let settled = false;
     let dismissGraceTimer: ReturnType<typeof setTimeout> | null = null;
     let safetyTimer: ReturnType<typeof setTimeout> | null = null;
+    let prepareTimer: ReturnType<typeof setTimeout> | null = null;
     const REWARD_GRACE_MS = 750;
     // Backstop for the v8 plugin's silent-stall case: poor network, backgrounded
     // WebView, or a buggy mediation adapter can fire NO Rewarded/Dismissed/Failed
@@ -48,6 +57,7 @@ export function useAdMob() {
     const cleanup = () => {
       if (dismissGraceTimer) { clearTimeout(dismissGraceTimer); dismissGraceTimer = null; }
       if (safetyTimer) { clearTimeout(safetyTimer); safetyTimer = null; }
+      if (prepareTimer) { clearTimeout(prepareTimer); prepareTimer = null; }
       handles.forEach((h) => { try { h.remove(); } catch {} });
       handles.length = 0;
     };
@@ -88,12 +98,24 @@ export function useAdMob() {
         (async () => {
           try {
             await whenReady();
+            // Bound the load: a cold/no-fill prepare can otherwise block the UI
+            // for AdMob's full ~30s internal load timeout (the "stuck 30s" bug).
+            // If we hit the cap, settle with a retry message; the in-flight
+            // prepare keeps warming the cache for the next tap.
+            prepareTimer = setTimeout(
+              () => finishRef(false, 'Ad not ready — please try again'),
+              REWARD_PREPARE_TIMEOUT_MS,
+            );
             await AdMob.prepareRewardVideoAd({ adId });
+            // Bailed out (prepare timeout fired, or a Failed* event already
+            // settled us). Do NOT show: the listeners are gone, so a shown ad
+            // would grant no reward. Leave the prepared ad cached for retry.
+            if (settled) return;
+            if (prepareTimer) { clearTimeout(prepareTimer); prepareTimer = null; }
             await AdMob.showRewardVideoAd();
-            // Arm the safety timer only AFTER show resolves — cold-start prepare
-            // can legitimately take several seconds and we don't want to settle
-            // before the user ever sees the ad. If the plugin then stalls and
-            // never fires Rewarded/Dismissed/Failed, this rescues the UI.
+            // Arm the safety timer only AFTER show resolves. If the plugin then
+            // stalls and never fires Rewarded/Dismissed/Failed, this rescues
+            // the UI.
             if (!settled) {
               safetyTimer = setTimeout(
                 () => finishRef(false, 'Ad timed out — please try again'),
@@ -110,6 +132,14 @@ export function useAdMob() {
       cleanup();
       const msg = err instanceof Error ? err.message : 'Ad failed';
       onError?.(msg);
+    }
+
+    // Re-warm the cache after a granted reward. The preload-on-mount only fires
+    // once, so without this the SECOND opt-in would cold-load again and risk
+    // the same stall. Only on success: the consumed ad is gone, so there's no
+    // concurrent in-flight prepare to collide with. Fire-and-forget.
+    if (rewarded) {
+      void AdMob.prepareRewardVideoAd({ adId }).catch(() => {});
     }
   }, [hasNoAds, getConfig, whenReady]);
 
