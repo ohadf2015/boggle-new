@@ -13,6 +13,8 @@ export const GAME_MODE_WEIGHTS: Record<GameMode, number> = {
   'blast': 0.25,
   'word-hunt': 0.25,
   'wheel-rush': 0.15,
+  // Word Tower is admin-gated + has its own versus flow — never auto-rotated.
+  'word-tower': 0,
 };
 
 /**

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { m } from 'framer-motion';
-import { Shuffle, FileText, Bomb, Crosshair, Disc3 } from 'lucide-react';
+import { Shuffle, FileText, Bomb, Crosshair, Disc3, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { GameMode } from '@/shared/types/game';
 
@@ -27,6 +27,7 @@ export const MODE_ICONS: Record<GameModeOption, React.ReactNode> = {
   blast: <Bomb className="w-4 h-4" />,
   'word-hunt': <Crosshair className="w-4 h-4" />,
   'wheel-rush': <Disc3 className="w-4 h-4" />,
+  'word-tower': <Building2 className="w-4 h-4" />,
 };
 
 export const MODE_ACTIVE_COLORS: Record<GameModeOption, string> = {
@@ -35,6 +36,7 @@ export const MODE_ACTIVE_COLORS: Record<GameModeOption, string> = {
   blast: 'bg-neo-pink/30 text-neo-pink border-neo-pink/60',
   'word-hunt': 'bg-neo-pink/30 text-neo-pink border-neo-pink/60',
   'wheel-rush': 'bg-neo-lime/30 text-neo-lime border-neo-lime/60',
+  'word-tower': 'bg-neo-purple/30 text-neo-purple border-neo-purple/60',
 };
 
 const MODE_GLOW: Record<GameModeOption, string> = {
@@ -43,6 +45,7 @@ const MODE_GLOW: Record<GameModeOption, string> = {
   blast: 'shadow-[0_0_10px_rgba(255,107,53,0.25)]',
   'word-hunt': 'shadow-[0_0_10px_rgba(255,20,147,0.25)]',
   'wheel-rush': 'shadow-[0_0_10px_rgba(191,255,0,0.25)]',
+  'word-tower': 'shadow-[0_0_10px_rgba(139,92,246,0.25)]',
 };
 
 export function getModeLabel(mode: GameModeOption, t: GameModeSelectorProps['t']): string {
@@ -52,6 +55,7 @@ export function getModeLabel(mode: GameModeOption, t: GameModeSelectorProps['t']
     blast: t('gameModes.blast.name'),
     'word-hunt': t('gameModes.wordHunt.name'),
     'wheel-rush': t('gameModes.wheelRush.name'),
+    'word-tower': t('wordTower.cardTitle'),
   };
   return labels[mode];
 }
@@ -67,6 +71,7 @@ export function getModeDescription(mode: GameModeOption, t: GameModeSelectorProp
     blast: t('gameModes.blast.description'),
     'word-hunt': t('gameModes.wordHunt.description'),
     'wheel-rush': t('gameModes.wheelRush.description'),
+    'word-tower': t('wordTower.cardDesc'),
   };
   return descriptions[mode];
 }

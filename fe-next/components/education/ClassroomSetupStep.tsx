@@ -12,6 +12,7 @@ const MODE_KEY_MAP: Record<GameMode, string> = {
   blast: 'blast',
   'word-hunt': 'wordHunt',
   'wheel-rush': 'wheelRush',
+  'word-tower': 'wordTower',
 };
 
 const GAME_MODES: { key: GameMode; icon: typeof LayoutGrid; color: string }[] = [
