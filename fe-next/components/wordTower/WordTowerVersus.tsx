@@ -62,7 +62,7 @@ export function WordTowerVersus({ socket, username, onQuit }: WordTowerVersusPro
 
   return (
     <div className="relative min-h-[100dvh] w-full overflow-hidden bg-neo-navy" dir={dir}>
-      <WordTowerScene floors={floors} biomeId={biomeId} resultKey={tower.state.resultKey} lastResult={null} />
+      <WordTowerScene floors={floors} biomeId={biomeId} resultKey={tower.state.resultKey} lastResult={null} dir={dir} />
 
       {/* Incoming-bomb red flash */}
       {tower.state.bombKey > 0 && (
