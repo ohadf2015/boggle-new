@@ -29,11 +29,15 @@ describe('PracticeInstructions overlay', () => {
     expect(list.querySelectorAll('li')).toHaveLength(3);
   });
 
-  it('uses mode-specific tip keys', () => {
+  it('uses mode-specific tip keys from the populated practice.tips.* namespace', () => {
+    // Regression: tips previously pointed at practice.instructions.<mode>.line*,
+    // which only ever held title+cta — so every tip line fell through to a
+    // "Translation missing" Sentry log (JAVASCRIPT-NEXTJS-151/152/154). The real
+    // copy lives under practice.tips.<mode>.line*.
     render(<PracticeInstructions mode="wheelRush" />);
-    expect(screen.getByText('practice.instructions.wheelRush.line1')).toBeInTheDocument();
-    expect(screen.getByText('practice.instructions.wheelRush.line2')).toBeInTheDocument();
-    expect(screen.getByText('practice.instructions.wheelRush.line3')).toBeInTheDocument();
+    expect(screen.getByText('practice.tips.wheelRush.line1')).toBeInTheDocument();
+    expect(screen.getByText('practice.tips.wheelRush.line2')).toBeInTheDocument();
+    expect(screen.getByText('practice.tips.wheelRush.line3')).toBeInTheDocument();
   });
 
   it('dismiss × button hides the overlay and shows the floating "?" pill', () => {

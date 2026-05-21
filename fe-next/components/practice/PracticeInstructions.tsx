@@ -31,21 +31,24 @@ const HERO_SRC: Record<PracticeMode, string> = {
   wheelRush: '/practice/help/practice-help-wheelrush.jpg',
 };
 
+// Tip copy lives under practice.tips.<mode>.line* (populated in all 5 locales).
+// practice.instructions.* only holds title + cta — pointing tips there made every
+// line fall through to a "Translation missing" Sentry log (JAVASCRIPT-NEXTJS-151/152/154).
 const TIPS_KEYS: Record<PracticeMode, [string, string, string]> = {
   classic: [
-    'practice.instructions.classic.line1',
-    'practice.instructions.classic.line2',
-    'practice.instructions.classic.line3',
+    'practice.tips.classic.line1',
+    'practice.tips.classic.line2',
+    'practice.tips.classic.line3',
   ],
   wordHunt: [
-    'practice.instructions.wordHunt.line1',
-    'practice.instructions.wordHunt.line2',
-    'practice.instructions.wordHunt.line3',
+    'practice.tips.wordHunt.line1',
+    'practice.tips.wordHunt.line2',
+    'practice.tips.wordHunt.line3',
   ],
   wheelRush: [
-    'practice.instructions.wheelRush.line1',
-    'practice.instructions.wheelRush.line2',
-    'practice.instructions.wheelRush.line3',
+    'practice.tips.wheelRush.line1',
+    'practice.tips.wheelRush.line2',
+    'practice.tips.wheelRush.line3',
   ],
 };
 
