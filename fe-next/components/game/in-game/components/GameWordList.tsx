@@ -8,6 +8,15 @@ import type { TranslationFn } from '../types';
 
 const ROTATE_STYLE = { transform: 'rotate(1deg)' } as const;
 
+/**
+ * Compact (mobile) view caps how many word chips mount. The container is a
+ * ~50px `overflow-hidden` box, so only the newest couple of rows are ever
+ * visible — mounting all N found words just made Framer Motion reconcile dozens
+ * of clipped, invisible chips on every server `wordAccepted`, competing with
+ * live touch interactions on the main thread (MP mobile INP regression).
+ */
+export const COMPACT_MAX_VISIBLE = 12;
+
 interface GameWordListProps {
   foundWords: FoundWord[];
   minWordLength: number;
@@ -25,7 +34,12 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
   t,
   compact = false,
 }) {
-  const reversedWords = React.useMemo(() => [...foundWords].reverse(), [foundWords]);
+  // Compact view only: newest-first, capped at COMPACT_MAX_VISIBLE. The badge
+  // still reports the true total (foundWords.length) below.
+  const reversedWords = React.useMemo(
+    () => [...foundWords].reverse().slice(0, COMPACT_MAX_VISIBLE),
+    [foundWords],
+  );
 
   // Compact view for mobile (horizontal wrap)
   if (compact) {

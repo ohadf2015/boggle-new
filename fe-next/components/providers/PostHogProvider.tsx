@@ -23,6 +23,7 @@ import {
 } from '@/utils/posthogEngagement';
 import { filterEmptyException } from '@/utils/posthogExceptionFilter';
 import { installAbandonOnPagehide } from '@/utils/abandonOnPagehide';
+import { installInpAttributionTracker } from '@/utils/inpAttribution';
 
 let posthogInitialized = false;
 
@@ -115,6 +116,10 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     // sees zero conversions because players close the tab rather than tap quit.
     const uninstallAbandon = installAbandonOnPagehide();
 
+    // INP attribution — names which interaction/screen is slow (MP classic has
+    // the worst mobile INP). Captures `web_vitals_inp_attribution`.
+    const uninstallInp = installInpAttributionTracker();
+
     // React to consent changes — opt out only if user explicitly declines
     const unsubscribe = onConsentChange((state) => {
       if (!state.analytics) {
@@ -128,6 +133,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       if (platformRecheckId) clearTimeout(platformRecheckId);
       uninstallVisibility();
       uninstallAbandon();
+      uninstallInp();
       unsubscribe();
     };
   }, []);
