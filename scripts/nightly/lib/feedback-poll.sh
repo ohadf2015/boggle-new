@@ -16,6 +16,10 @@ fi
 
 PROJECT_DIR="${PROJECT_DIR:-/Users/ohadfisher/git/boggle-new}"
 STATE_FILE="$HOME/.cache/lexi-nightly/tg-last-update-id"
+# Free-text directives the founder texts the bot accumulate here between runs.
+# run.sh consumes (and archives) this at the START of each nightly so the
+# messages steer that night's lanes. See lib/user-directives.sh.
+PENDING_FILE="$HOME/.cache/lexi-nightly/pending-instructions.ndjson"
 FB_DIR="$PROJECT_DIR/docs/nightly/feedback"
 TODAY="$(date +%Y-%m-%d)"
 TG="$PROJECT_DIR/scripts/nightly/lib/telegram.sh"
@@ -31,8 +35,10 @@ LAST_ID=$(cat "$STATE_FILE" 2>/dev/null || echo 0)
 OFFSET=$((LAST_ID + 1))
 
 # Fetch up to 100 updates since LAST_ID. Long-poll timeout=2s.
+# allowed_updates = ["callback_query","message"] — button taps AND free-text
+# directives. %2C = comma.
 RESP=$(curl -sS --max-time 15 \
-  "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${OFFSET}&timeout=2&allowed_updates=%5B%22callback_query%22%5D")
+  "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${OFFSET}&timeout=2&allowed_updates=%5B%22callback_query%22%2C%22message%22%5D")
 
 OK=$(echo "$RESP" | jq -r '.ok // false')
 if [ "$OK" != "true" ]; then
@@ -46,7 +52,7 @@ if [ "$COUNT" = "0" ]; then
   exit 0
 fi
 
-echo "feedback-poll: $COUNT new callback(s) since update_id=$LAST_ID"
+echo "feedback-poll: $COUNT new update(s) since update_id=$LAST_ID"
 
 # Parse each callback into a structured record. Keys:
 #   update_id, ts (epoch), from_user, callback_data (type:action:id), msg_text
@@ -64,7 +70,33 @@ NEW_RECORDS=$(echo "$RESP" | jq -c '.result[]
 # Append to today's accumulator (newline-delimited JSON for easy parsing)
 if [ -n "$NEW_RECORDS" ]; then
   echo "$NEW_RECORDS" >> "$FB_DIR/${TODAY}.ndjson"
-  echo "feedback-poll: appended $COUNT record(s) to $FB_DIR/${TODAY}.ndjson"
+  echo "feedback-poll: appended callback record(s) to $FB_DIR/${TODAY}.ndjson"
+fi
+
+# --- free-text directives --------------------------------------------------
+# Messages the founder TEXTS the bot (not button taps) become directives for
+# the NEXT nightly run. Persist the full text to the pending accumulator and
+# confirm receipt so the founder knows the channel is live. Skip slash-commands.
+MSG_RECORDS=$(echo "$RESP" | jq -c '.result[]
+  | select(.message.text != null)
+  | select((.message.text | startswith("/")) | not)
+  | {
+      update_id: .update_id,
+      ts: .message.date,
+      from_user: (.message.from.username // .message.from.first_name // "founder"),
+      text: .message.text
+    }')
+
+if [ -n "$MSG_RECORDS" ]; then
+  echo "$MSG_RECORDS" >> "$PENDING_FILE"
+  echo "$MSG_RECORDS" >> "$FB_DIR/${TODAY}.ndjson"
+  MSG_N=$(echo "$MSG_RECORDS" | grep -c '')
+  echo "feedback-poll: queued $MSG_N directive(s) for next nightly → $PENDING_FILE"
+  echo "$MSG_RECORDS" | while read -r rec; do
+    [ -z "$rec" ] && continue
+    snippet=$(echo "$rec" | jq -r '.text' | head -c 60)
+    "$TG" msg "✓ queued for next nightly: _${snippet}_" >/dev/null 2>&1 || true
+  done
 fi
 
 # Acknowledge each callback so the user's UI clears.

@@ -29,7 +29,11 @@ fi
 
 PROJECT_DIR="${PROJECT_DIR:-/Users/ohadfisher/git/boggle-new}"
 STATE_FILE="$HOME/.cache/lexi-nightly/tg-last-update-id"
+# Free-text directives accumulate here; run.sh consumes at the start of each
+# nightly so the founder's texts steer that night. See lib/user-directives.sh.
+PENDING_FILE="$HOME/.cache/lexi-nightly/pending-instructions.ndjson"
 FB_DIR="$PROJECT_DIR/docs/nightly/feedback"
+TG="$PROJECT_DIR/scripts/nightly/lib/telegram.sh"
 LOG_PREFIX="feedback-daemon"
 
 mkdir -p "$(dirname "$STATE_FILE")" "$FB_DIR"
@@ -41,8 +45,9 @@ while true; do
   OFFSET=$((LAST_ID + 1))
 
   # Long-poll with 30s server-side timeout. Curl gets 35s ceiling.
+  # allowed_updates = ["callback_query","message"] — taps AND free-text directives.
   RESP=$(curl -sS --max-time 35 \
-    "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${OFFSET}&timeout=30&allowed_updates=%5B%22callback_query%22%5D" 2>/dev/null) || RESP='{"ok":false,"description":"curl error"}'
+    "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${OFFSET}&timeout=30&allowed_updates=%5B%22callback_query%22%2C%22message%22%5D" 2>/dev/null) || RESP='{"ok":false,"description":"curl error"}'
 
   OK=$(echo "$RESP" | jq -r '.ok // false' 2>/dev/null)
   if [ "$OK" != "true" ]; then
@@ -87,6 +92,30 @@ while true; do
         callback_id: .callback_query.id,
         msg_text_first120: ((.callback_query.message.text // "") | .[0:120])
       }' >> "$FB_DIR/${TODAY}.ndjson"
+
+  # --- free-text directives ------------------------------------------------
+  # Messages the founder TEXTS the bot become directives for the NEXT nightly.
+  # Persist full text to the pending accumulator + confirm receipt. Skip /cmds.
+  MSG_RECORDS=$(echo "$RESP" | jq -c '.result[]
+    | select(.message.text != null)
+    | select((.message.text | startswith("/")) | not)
+    | {
+        update_id: .update_id,
+        ts: .message.date,
+        from_user: (.message.from.username // .message.from.first_name // "founder"),
+        text: .message.text
+      }' 2>/dev/null)
+  if [ -n "$MSG_RECORDS" ]; then
+    echo "$MSG_RECORDS" >> "$PENDING_FILE"
+    echo "$MSG_RECORDS" >> "$FB_DIR/${TODAY}.ndjson"
+    MSG_N=$(echo "$MSG_RECORDS" | grep -c '')
+    echo "[$LOG_PREFIX]   queued $MSG_N directive(s) for next nightly"
+    echo "$MSG_RECORDS" | while read -r rec; do
+      [ -z "$rec" ] && continue
+      snippet=$(echo "$rec" | jq -r '.text' | head -c 60)
+      "$TG" msg "✓ queued for next nightly: _${snippet}_" >/dev/null 2>&1 || true
+    done
+  fi
 
   # Persist offset
   NEW_MAX=$(echo "$RESP" | jq '[.result[].update_id] | max // 0')

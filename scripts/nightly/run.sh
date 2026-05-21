@@ -117,6 +117,9 @@ revert_to_pre_lane() {
 # commit+push hardening (divergence/generated-file). Tested by test/git-ship.test.sh.
 # shellcheck disable=SC1091
 . "$LIB_DIR/git-ship.sh"
+# founder free-text directives (texted to the bot) → active block for this run.
+# shellcheck disable=SC1091
+. "$LIB_DIR/user-directives.sh"
 log "========================================"
 log "nightly-loop start ${DATE_TAG} dry=$DRY_RUN no-push=$NO_PUSH only=$ONLY skip=$SKIP"
 log "========================================"
@@ -143,6 +146,18 @@ cat > "$REPORT" <<EOF
 **Log:** \`$RUN_LOG\`
 
 EOF
+
+# --- founder directives ----------------------------------------------------
+# Consume any messages the founder texted the bot since the last run and render
+# them into the active directive block (headless.sh prepends it to every lane).
+consume_user_directives >> "$RUN_LOG" 2>&1 || true
+ACTIVE_DIRECTIVES_FILE="${ACTIVE_DIRECTIVES_FILE:-$HOME/.cache/lexi-nightly/active-directives.md}"
+export ACTIVE_DIRECTIVES_FILE
+if [ -s "$ACTIVE_DIRECTIVES_FILE" ]; then
+  DIRECTIVE_CT=$(grep -c '^- ' "$ACTIVE_DIRECTIVES_FILE" 2>/dev/null || echo 0)
+  log "founder directives applied this run: $DIRECTIVE_CT"
+  echo "**Founder directives applied:** $DIRECTIVE_CT (texted to the bot — see lane outputs)" >> "$REPORT"
+fi
 
 # --- WIP snapshot + dirty baseline ----------------------------------------
 # The loop runs ON TOP OF the founder's uncommitted WIP and ships it. Snapshot the

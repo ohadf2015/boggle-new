@@ -55,6 +55,18 @@ text = (text
 sys.stdout.write(text)
 PY
 
+  # Prepend the founder's directives (texted to the bot) at the TOP of the
+  # prompt — higher priority than the carried-forward learnings playbook.
+  # consume_user_directives() (lib/user-directives.sh) writes this file at the
+  # start of the run; it is empty when the founder texted nothing.
+  local directives_file="${ACTIVE_DIRECTIVES_FILE:-$HOME/.cache/lexi-nightly/active-directives.md}"
+  if [ -s "$directives_file" ]; then
+    local combined
+    combined=$(mktemp -t "lane-${lane_id}-combined.XXXXXX")
+    cat "$directives_file" "$rendered" > "$combined" && mv "$combined" "$rendered"
+    echo "headless: prepended founder directives ($(wc -c < "$directives_file" | tr -d ' ')B) to lane=$lane_id" | tee -a "$log_file"
+  fi
+
   echo "headless: lane=$lane_id model=$model timeout=${timeout_sec}s prompt=$(wc -c < "$rendered")B" | tee -a "$log_file"
 
   # Inherit env (claude needs HOME + its own oauth state). Secrets already exported.
