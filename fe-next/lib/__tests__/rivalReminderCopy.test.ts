@@ -288,6 +288,55 @@ describe('pickRivalReminderCopy', () => {
     });
   });
 
+  describe('message clarity — no redundant time, clean multi-rival tail', () => {
+    it('he midday tied: does not repeat the "שעות" (hours) phrase', () => {
+      // Production repro: template body "{hoursLeft} שעות לפרוץ" plus the
+      // appended urgency suffix "נשארו {hoursLeft} שעות" rendered "8 שעות" twice.
+      for (let i = 0; i < 12; i++) {
+        const c = pickRivalReminderCopy({
+          userId: `u${i}`, date: '2026-05-10', hoursLeft: 8, locale: 'he',
+          rivalUsername: 'Maya', direction: 'above', scoreGap: 0,
+        });
+        const occurrences = (c.body.match(/שעות/g) || []).length;
+        expect(occurrences).toBeLessThanOrEqual(1);
+      }
+    });
+
+    it('en midday tied: does not repeat the hours figure', () => {
+      for (let i = 0; i < 12; i++) {
+        const c = pickRivalReminderCopy({
+          userId: `u${i}`, date: '2026-05-10', hoursLeft: 8, locale: 'en',
+          rivalUsername: 'Maya', direction: 'above', scoreGap: 0,
+        });
+        const occurrences = (c.body.match(/8h/g) || []).length;
+        expect(occurrences).toBeLessThanOrEqual(1);
+      }
+    });
+
+    it('en morning tied: does not say "resets at midnight" twice', () => {
+      for (let i = 0; i < 12; i++) {
+        const c = pickRivalReminderCopy({
+          userId: `u${i}`, date: '2026-05-10', hoursLeft: 20, locale: 'en',
+          rivalUsername: 'Maya', direction: 'above', scoreGap: 0,
+        });
+        const occurrences = (c.body.toLowerCase().match(/resets at midnight/g) || []).length;
+        expect(occurrences).toBeLessThanOrEqual(1);
+      }
+    });
+
+    it('he tied: multi-rival tail does not glue into a trailing hours phrase', () => {
+      // Production repro: "...ועוד 2 כאלה נשארו 8 שעות." — the count clause ran
+      // straight into the (duplicate) hours suffix with no sentence boundary.
+      const c = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: 'he',
+        rivalUsername: 'Maya', direction: 'above', scoreGap: 0,
+        additionalCount: 2,
+      });
+      expect(c.body).not.toContain('כאלה נשארו');
+      expect(c.body).toContain('2');
+    });
+  });
+
   describe('hebrew bidi isolation', () => {
     it('wraps a latin rival name with U+2068/U+2069 in Hebrew title or body', () => {
       const c = pickRivalReminderCopy({

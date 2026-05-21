@@ -11,8 +11,11 @@
  * This is the "urgency escalation" axis without 3×ing the localized string
  * count — the picker filters by tier, then hashes within the pair.
  *
- * Multi-rival framing: when `additionalCount > 0`, an "and {N} more" tail
- * (locale-aware) is appended so social proof beats single-rival in cohorts.
+ * Multi-rival framing: when `additionalCount > 0`, a locale-aware "{N} more
+ * rivals played today" clause is appended so social proof beats single-rival
+ * in cohorts. The generic urgency suffix is only appended when the chosen
+ * template doesn't already carry its own time cue — avoids double-stating the
+ * hours/midnight ("8h to break the tie. 8h left today.").
  *
  * Sharper context: `mode`, `rivalScore`, `rankDelta` are exposed both as
  * template placeholders ({mode}, {rivalScore}, {rankDelta}) and as deep-link
@@ -104,21 +107,44 @@ export function currentUrgencyTier(hoursLeft: number): UrgencyTier {
 }
 
 /**
- * Locale-aware "and N more" tail. Returns '' when count <= 0 so the body
- * trims cleanly. Leading space included so callers can concat without
- * having to think about whitespace.
+ * Locale-aware multi-rival clause. Returns '' when count <= 0. A complete,
+ * self-contained sentence (with terminal punctuation) so it never runs into an
+ * adjacent clause — the old bare " ועוד N כאלה" fragment glued onto whatever
+ * followed it ("ועוד 2 כאלה נשארו 8 שעות"). No leading space: the caller joins
+ * clauses with a single space.
  */
 function othersTail(locale: PushLocale, n: number): string {
   if (n <= 0) return '';
   switch (locale) {
-    case 'he': return ` ועוד ${n} כאלה`;
-    case 'sv': return ` och ${n} till`;
-    case 'ja': return ` 他${n}人も`;
-    case 'es': return ` y ${n} más`;
+    case 'he': return `ועוד ${n} יריבים שיחקו היום.`;
+    case 'sv': return `${n} rivaler till spelade idag.`;
+    case 'ja': return `他${n}人もプレイ済み。`;
+    case 'es': return `${n} rivales más jugaron hoy.`;
     case 'en':
     default:
-      return ` and ${n} more`;
+      return `${n} more rivals played today.`;
   }
+}
+
+function normalizeForDedup(s: string): string {
+  return s.toLowerCase().replace(/[.!?。．、，,\s]+/g, ' ').trim();
+}
+
+/**
+ * Tier templates already carry their own time cue (a {hoursLeft} count, or a
+ * "resets at midnight" line). Appending the generic urgency suffix on top of
+ * that double-states it ("8h to break the tie. 8h left today." / "8 שעות
+ * לפרוץ. נשארו 8 שעות."). Only append when the suffix adds NEW information:
+ *   - skip if the raw template body already contains {hoursLeft}
+ *   - skip if the rendered suffix text already appears in the rendered body
+ */
+function shouldAppendUrgencySuffix(
+  rawTemplateBody: string,
+  renderedBody: string,
+  renderedSuffix: string
+): boolean {
+  if (rawTemplateBody.includes('{hoursLeft}')) return false;
+  return !normalizeForDedup(renderedBody).includes(normalizeForDedup(renderedSuffix));
 }
 
 /**
@@ -212,13 +238,19 @@ export function pickRivalReminderCopy(input: RivalReminderInput): RivalReminderC
   };
 
   const bodyBase = fill(t.body, vars);
-  const tail =
-    bodyBase.includes(vars.others) || additionalCount <= 0
-      ? ''
-      : othersTail(localeKey, additionalCount);
-  const urgencySuffix = fill(URGENCY_SUFFIX[localeKey][tier], vars);
 
-  const body = `${bodyBase}${tail} ${urgencySuffix}`.trim();
+  const otherClause =
+    additionalCount > 0 && !bodyBase.includes(vars.others) ? vars.others : '';
+
+  const renderedSuffix = fill(URGENCY_SUFFIX[localeKey][tier], vars);
+  const suffixClause = shouldAppendUrgencySuffix(t.body, bodyBase, renderedSuffix)
+    ? renderedSuffix
+    : '';
+
+  const body = [bodyBase, otherClause, suffixClause]
+    .filter(Boolean)
+    .join(' ')
+    .trim();
   const title = fill(t.title, vars);
 
   const deepLink =

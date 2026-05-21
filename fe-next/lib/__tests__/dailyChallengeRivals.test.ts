@@ -4,7 +4,7 @@
  */
 
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { findDailyChallengeRivals, resolveRivalAvatarUrl } from '../dailyChallengeRivals';
+import { findDailyChallengeRivals, resolveRivalAvatarUrl, resolveRivalName } from '../dailyChallengeRivals';
 
 /**
  * Builder mock. `lazyResult` lets the result reflect data the test sets AFTER
@@ -126,6 +126,37 @@ describe('resolveRivalAvatarUrl', () => {
   it('avatar_config wins over legacy https avatar_image (modern path preferred)', () => {
     const url = resolveRivalAvatarUrl('https://cdn/x.png', { base: 'round' }, 'abc-123', 'https://lex.test');
     expect(url).toBe('https://lex.test/api/avatar/png/abc-123');
+  });
+});
+
+describe('resolveRivalName', () => {
+  it('prefers display_name over username', () => {
+    expect(resolveRivalName('Maya Cohen', 'Player_9662314e')).toBe('Maya Cohen');
+  });
+
+  it('falls back to username when display_name is null/blank', () => {
+    expect(resolveRivalName(null, 'WordWizard')).toBe('WordWizard');
+    expect(resolveRivalName('   ', 'WordWizard')).toBe('WordWizard');
+  });
+
+  it('returns null for an auto-generated Player_<hex> username with no display_name', () => {
+    expect(resolveRivalName(null, 'Player_9662314e')).toBeNull();
+    expect(resolveRivalName(undefined, 'Player_0a1b2c3d')).toBeNull();
+  });
+
+  it('does NOT treat a user-chosen name that merely begins with "Player" as a placeholder', () => {
+    expect(resolveRivalName(null, 'PlayerOne')).toBe('PlayerOne');
+    expect(resolveRivalName(null, 'Player_Awesome')).toBe('Player_Awesome');
+  });
+
+  it('trims surrounding whitespace from the resolved name', () => {
+    expect(resolveRivalName('  Maya  ', null)).toBe('Maya');
+    expect(resolveRivalName(null, '  WordWizard  ')).toBe('WordWizard');
+  });
+
+  it('returns null when nothing usable is available', () => {
+    expect(resolveRivalName(null, null)).toBeNull();
+    expect(resolveRivalName('', '')).toBeNull();
   });
 });
 
@@ -502,6 +533,54 @@ describe('findDailyChallengeRivals', () => {
       const c = (await findDailyChallengeRivals(['u1'])).get('u1')!;
       expect(c.username).toBe('Near');
       expect(c.additionalCount).toBe(0);
+    });
+  });
+
+  describe('rival name resolution (display name, not Player_<id>)', () => {
+    it('surfaces the rival display_name in preference to the username handle', async () => {
+      leaderboardResult.data = [
+        { player_id: 'user-1', username: 'Me', display_name: null, avatar_image: null, total_score: 1000 },
+        {
+          player_id: 'rival-1',
+          username: 'Player_9662314e',
+          display_name: 'Maya',
+          avatar_image: 'https://x/r.png',
+          total_score: 1050,
+        },
+      ];
+      wordHuntAttemptsResult.data = [{ player_id: 'rival-1', solved: true }];
+
+      const rival = (await findDailyChallengeRivals(['user-1'])).get('user-1')!;
+      expect(rival.username).toBe('Maya');
+    });
+
+    it('skips a closer anonymous Player_<hex> rival in favour of a named one', async () => {
+      leaderboardResult.data = [
+        { player_id: 'user-1', username: 'Me', display_name: null, avatar_image: null, total_score: 1000 },
+        // Closer (gap 10) but anonymous → must be skipped.
+        { player_id: 'rival-anon', username: 'Player_9662314e', display_name: null, avatar_image: 'https://x/a.png', total_score: 1010 },
+        // Further (gap 80) but has a real handle → chosen.
+        { player_id: 'rival-named', username: 'WordSmith', display_name: null, avatar_image: 'https://x/n.png', total_score: 1080 },
+      ];
+      wordHuntAttemptsResult.data = [
+        { player_id: 'rival-anon', solved: true },
+        { player_id: 'rival-named', solved: true },
+      ];
+
+      const rival = (await findDailyChallengeRivals(['user-1'])).get('user-1')!;
+      expect(rival.username).toBe('WordSmith');
+      // Anonymous rival is not even counted toward the "and N more" framing.
+      expect(rival.additionalCount).toBe(0);
+    });
+
+    it('returns null (→ neutral reminder) when the only nearby rival is anonymous', async () => {
+      leaderboardResult.data = [
+        { player_id: 'user-1', username: 'Me', display_name: null, avatar_image: null, total_score: 1000 },
+        { player_id: 'rival-anon', username: 'Player_deadbeef', display_name: null, avatar_image: 'https://x/a.png', total_score: 1010 },
+      ];
+      wordHuntAttemptsResult.data = [{ player_id: 'rival-anon', solved: true }];
+
+      expect((await findDailyChallengeRivals(['user-1'])).get('user-1')).toBeNull();
     });
   });
 });

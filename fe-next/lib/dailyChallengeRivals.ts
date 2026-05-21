@@ -91,9 +91,38 @@ export function resolveRivalAvatarUrl(
 interface LeaderboardRow {
   player_id: string;
   username: string | null;
+  display_name: string | null;
   avatar_image: string | null;
   avatar_config: unknown;
   rank_position: number | null;
+}
+
+/**
+ * Auto-generated handle shape from `handle_new_user` (`Player_` + first 8 hex
+ * of the user UUID). Users who never customize keep this as their `username`,
+ * so it must NOT be shown in a push ("Player_9662314e matched your score").
+ * Anchored + exactly-8-hex so a deliberately chosen name like "Player_Awesome"
+ * is still treated as real.
+ */
+const PLACEHOLDER_USERNAME_RE = /^Player_[0-9a-f]{8}$/i;
+
+/**
+ * Resolve the friendliest presentable name for a rival, or null when only an
+ * auto-generated placeholder handle is available. Preference:
+ *   1. `display_name` (OAuth/chosen name) when non-blank
+ *   2. `username` when non-blank and not a `Player_<hex>` placeholder
+ *   3. null → caller drops this rival from the pool (falls back to the neutral
+ *      mascot reminder rather than leaking the raw player id).
+ */
+export function resolveRivalName(
+  displayName: string | null | undefined,
+  username: string | null | undefined
+): string | null {
+  const dn = displayName?.trim();
+  if (dn) return dn;
+  const un = username?.trim();
+  if (un && !PLACEHOLDER_USERNAME_RE.test(un)) return un;
+  return null;
 }
 
 export async function findDailyChallengeRivals(
@@ -200,7 +229,7 @@ export async function findDailyChallengeRivals(
   }
   const lbRes = await supabase
     .from('leaderboard')
-    .select('player_id, username, avatar_image, avatar_config, rank_position')
+    .select('player_id, username, display_name, avatar_image, avatar_config, rank_position')
     .in('player_id', lbIds);
 
   if (lbRes.error) {
@@ -259,13 +288,17 @@ export async function findDailyChallengeRivals(
   for (const id of completers) {
     const row = lbByUser.get(id);
     if (!row) continue;
+    // Drop rivals with no presentable name — a raw "Player_<id>" handle in a
+    // push reads like a bug. The recipient still gets the neutral reminder.
+    const name = resolveRivalName(row.display_name, row.username);
+    if (!name) continue;
     const seasonScore = seasonScoreByPlayer.get(id) ?? 0;
     const inPuzzle = puzzleCompleters.has(id);
     const inHunt = wordHuntCompleters.has(id);
     const mode: RivalMode = inPuzzle && inHunt ? 'both' : inPuzzle ? 'puzzle' : 'wordHunt';
     rivalPool.push({
       id,
-      username: row.username || 'Rival',
+      username: name,
       avatar: resolveRivalAvatarUrl(row.avatar_image, row.avatar_config, id),
       score: seasonScore,
       rank: typeof row.rank_position === 'number' ? row.rank_position : null,
