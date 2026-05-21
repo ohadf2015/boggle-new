@@ -82,6 +82,28 @@ Event `web_vitals_inp_attribution` with: `inp_value`, `inp_rating`, `interaction
 `interaction_type`, `input_delay`, `processing_duration`, `presentation_delay`, `load_state`,
 `longest_script_url`, `longest_script_duration`, `route_family`, `pathname`.
 
+The `onINP` listener is **global** (mounted once in `PostHogProvider`), so it captures every
+mode, not just MP. `route_family` (see `classifyRoute` in `utils/inpAttribution.ts`) buckets
+**all playable modes** — multiplayer, blast, word-hunt, wheel-rush, word-craft, word-tower,
+word-vault, word-forge, word-of-the-day, shiritori, practice, adventure, anagram, brain,
+connections, daily, party, challenge, singleplayer — so INP is sliceable per mode. It matches
+the *route segment* (not a substring), so SEO slugs like `brain-training-word-games` fall to
+`other`. Caveat: MP variants (classic/blast/wheel-rush) served under `/multiplayer?mode=…`
+share the `/multiplayer` path and bucket together — web-vitals carries no query string.
+
+Cross-mode comparison once data lands:
+```sql
+SELECT properties.route_family AS mode,
+       round(quantile(0.75)(toFloat(properties.inp_value)),0) AS inp_p75,
+       round(avg(toFloat(properties.input_delay)),0) AS avg_input_delay,
+       round(avg(toFloat(properties.processing_duration)),0) AS avg_processing,
+       count() AS n
+FROM events
+WHERE event = 'web_vitals_inp_attribution'
+  AND timestamp >= now() - INTERVAL 7 DAY AND properties.$device_type = 'Mobile'
+GROUP BY mode ORDER BY inp_p75 DESC
+```
+
 After 2–3 days of data, this answers definitively:
 - High **`input_delay`** during MP → main-thread contention. Fix = cut continuous work
   (e.g. throttle the combo RAF further when no combo is active; defer non-visual socket work).

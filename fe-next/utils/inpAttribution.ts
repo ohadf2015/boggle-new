@@ -36,21 +36,54 @@ export interface InpMetricLike {
   };
 }
 
+const LOCALE_SEGMENTS = new Set(['en', 'he', 'sv', 'ja', 'es']);
+
 /**
- * Bucket a pathname into a game-mode family — mirrors the route classification
- * used in the PostHog `$web_vitals` analysis so the two datasets line up. Order
- * matters: more specific matches first.
+ * The first route segment → game-mode family. Several distinct slugs fold into
+ * one family (e.g. `daily-word-wheel` → `daily`). MP variants (classic / blast /
+ * wheel-rush) served under `/multiplayer?mode=…` all share the `/multiplayer`
+ * path, so they bucket together — web-vitals only carries the pathname, not the
+ * query. Standalone-route modes split cleanly.
+ */
+const MODE_SEGMENTS: Readonly<Record<string, string>> = {
+  multiplayer: 'multiplayer',
+  blast: 'blast',
+  'word-hunt': 'word-hunt',
+  'wheel-rush': 'wheel-rush',
+  'word-craft': 'word-craft',
+  'word-tower': 'word-tower',
+  'word-vault': 'word-vault',
+  'word-forge': 'word-forge',
+  'word-of-the-day': 'word-of-the-day',
+  shiritori: 'shiritori',
+  practice: 'practice',
+  adventure: 'adventure',
+  anagram: 'anagram',
+  brain: 'brain',
+  connections: 'connections',
+  daily: 'daily',
+  'daily-word-wheel': 'daily',
+  party: 'party',
+  'party-screen': 'party',
+  challenge: 'challenge',
+  'friend-challenge': 'challenge',
+  singleplayer: 'singleplayer',
+  quests: 'quests',
+  words: 'words',
+};
+
+/**
+ * Bucket a pathname into a game-mode family so INP can be sliced per mode.
+ * Matches the *route segment* (after an optional locale prefix), not a
+ * substring — so SEO/marketing slugs like `brain-training-word-games` or
+ * `multiplayer-word-game-online` correctly fall through to `other` instead of
+ * being mistaken for the `brain` / `multiplayer` modes.
  */
 export function classifyRoute(pathname: string): string {
-  const p = pathname.toLowerCase();
-  if (p.includes('multiplayer')) return 'multiplayer';
-  if (p.includes('word-hunt')) return 'word-hunt';
-  if (p.includes('word-craft')) return 'word-craft';
-  if (p.includes('word-tower')) return 'word-tower';
-  if (p.includes('practice')) return 'practice';
-  if (p.includes('blast')) return 'blast';
-  if (p.includes('daily')) return 'daily';
-  return 'other';
+  const segments = pathname.toLowerCase().split('/').filter(Boolean);
+  let mode = segments[0];
+  if (mode && LOCALE_SEGMENTS.has(mode)) mode = segments[1];
+  return (mode && MODE_SEGMENTS[mode]) || 'other';
 }
 
 /** Flatten an INP metric + attribution into queryable PostHog properties. */
