@@ -2,7 +2,7 @@
 
 import React, { useCallback } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { Shuffle, FileText, Target, Check, Bomb } from 'lucide-react';
+import { Shuffle, FileText, Target, Check, Bomb, Building2 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import type { GameModeOption } from '@/components/GameModeSelector';
 
@@ -56,6 +56,12 @@ const MODES: ModeVisualConfig[] = [
     nameKey: 'gameModes.blast.name',
     activeBg: 'bg-neo-pink',
   },
+  {
+    mode: 'word-tower',
+    icon: <Building2 className="w-4 h-4" />,
+    nameKey: 'wordTower.cardTitle',
+    activeBg: 'bg-neo-purple',
+  },
 ];
 
 // ==================== Main Component ====================
@@ -72,7 +78,7 @@ export function BattleModeCard({
 
   // Blast is admin-gated in the picker (UI gate only; server still allows
   // is_admin OR blast_access). Non-admins never see it offered.
-  const visibleModes = isAdmin ? MODES : MODES.filter((m) => m.mode !== 'blast');
+  const visibleModes = isAdmin ? MODES : MODES.filter((m) => m.mode !== 'blast' && m.mode !== 'word-tower');
 
   return (
     <section className="rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard overflow-hidden">

@@ -23,6 +23,10 @@ const WheelRushView = dynamic(
   () => import('@/components/multiplayer/WheelRushView').then(m => ({ default: m.WheelRushView })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
 );
+const WordTowerVersus = dynamic(
+  () => import('@/components/wordTower/WordTowerVersus').then(m => ({ default: m.WordTowerVersus })),
+  { ssr: false, loading: () => <GameLoadingFallback /> },
+);
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
 import { cn } from '@/lib/utils';
@@ -299,6 +303,11 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
         remainingTime={remainingTime}
       />
     );
+  }
+
+  // Word Tower versus — per-player towers, no shared grid
+  if (gameMode === 'word-tower') {
+    return <WordTowerVersus socket={socket} username={username} onQuit={onExitRoom} />;
   }
 
   // Use letterGrid or shufflingGrid

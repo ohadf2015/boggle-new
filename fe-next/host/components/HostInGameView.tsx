@@ -23,6 +23,10 @@ const WheelRushView = dynamic(
   () => import('@/components/multiplayer/WheelRushView').then(m => ({ default: m.WheelRushView })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
 );
+const WordTowerVersus = dynamic(
+  () => import('@/components/wordTower/WordTowerVersus').then(m => ({ default: m.WordTowerVersus })),
+  { ssr: false, loading: () => <GameLoadingFallback /> },
+);
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { BoardTheme } from '@/shared/types/socket';
@@ -277,6 +281,17 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
             </div>
           </div>
         )}
+      </>
+    );
+  }
+
+  // Word Tower versus — per-player towers, no shared grid
+  if (gameMode === 'word-tower') {
+    return (
+      <>
+        <WordTowerVersus socket={socket} username={username} onQuit={handleStopGameClick} />
+        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} />}
+        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
       </>
     );
   }

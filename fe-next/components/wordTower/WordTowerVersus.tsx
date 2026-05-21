@@ -10,21 +10,25 @@
  * this is presentational glue over it.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { Delete, Shuffle, ArrowUp } from 'lucide-react';
+import { Delete, Shuffle, ArrowUp, LogOut } from 'lucide-react';
+import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { useSocket } from '../../utils/SocketContext';
 import { biomeForHeight } from '@/lib/wordTower/wordTowerManager';
 import { bankedBombs } from '@/lib/wordTower/versus';
 import { useWordTowerVersus, type VersusSocket } from '@/lib/wordTower/useWordTowerVersus';
 import { WordTowerScene } from './WordTowerScene';
 import { WordTowerVersusRail } from './WordTowerVersusRail';
 
-export function WordTowerVersus() {
+interface WordTowerVersusProps {
+  socket: Socket | null;
+  /** Authoritative per-player key (server keys match state by this username). */
+  username: string;
+  onQuit?: () => void;
+}
+
+export function WordTowerVersus({ socket, username, onQuit }: WordTowerVersusProps) {
   const { t, dir } = useLanguage();
-  const { profile, user } = useAuth();
-  const { socket } = useSocket();
-  const selfId = profile?.username || user?.email || 'you';
+  const selfId = username;
 
   const versusSocket = socket as unknown as VersusSocket | null;
   const tower = useWordTowerVersus({ socket: versusSocket, selfId });
@@ -67,9 +71,16 @@ export function WordTowerVersus() {
 
       {/* Top: timer + rival rail */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-3">
-        <div className="rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 py-2 shadow-hard backdrop-blur-sm">
-          <div className="font-neo-display text-2xl font-bold text-neo-white tabular-nums">{Math.round(you.heightM)}<span className="text-sm text-neo-cyan"> m</span></div>
-          {secondsLeft !== null && <div className="font-neo-body text-xs font-bold text-neo-orange tabular-nums">{secondsLeft}s</div>}
+        <div className="pointer-events-auto flex items-center gap-2">
+          {onQuit && (
+            <button type="button" onClick={onQuit} aria-label={t('common.backToHome')} className="rounded-neo border-neo-thick border-black bg-neo-navy/80 p-2 text-neo-white shadow-hard backdrop-blur-sm">
+              <LogOut className="h-4 w-4" />
+            </button>
+          )}
+          <div className="rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 py-2 shadow-hard backdrop-blur-sm">
+            <div className="font-neo-display text-2xl font-bold text-neo-white tabular-nums">{Math.round(you.heightM)}<span className="text-sm text-neo-cyan"> m</span></div>
+            {secondsLeft !== null && <div className="font-neo-body text-xs font-bold text-neo-orange tabular-nums">{secondsLeft}s</div>}
+          </div>
         </div>
         <div className="w-44 max-w-[45%]">
           <WordTowerVersusRail
