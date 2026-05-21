@@ -26,7 +26,6 @@ import type { NearMiss } from '@/components/results/NearMissCard';
 import { WinStreakBadge } from '@/components/multiplayer/WinStreakBadge';
 import { NearRankTeaser } from '@/components/multiplayer/NearRankTeaser';
 import type { RankTier } from '@/shared/utils/eloRating';
-import ResultsLoserFeedback from '@/components/results/ResultsLoserFeedback';
 import { ShareButton } from '@/components/results/ShareButton';
 
 
@@ -268,14 +267,9 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         />
       )}
 
-      {/* 1.5 LOSER FEEDBACK (rank 4+) */}
-      {currentPlayerData && currentPlayerRank > 3 && onStartGame && (
-        <ResultsLoserFeedback
-          rank={currentPlayerRank}
-          onPlayAgain={onStartGame}
-          t={t}
-        />
-      )}
+      {/* Loser-feedback card removed: the personalized Revenge/Defend card
+          below is the single significant encouraging line, so we don't stack a
+          second generic "good fight" message on top of it. */}
 
       {/* 2. HIGHLIGHTS BAR */}
       {currentPlayerData && (
@@ -324,12 +318,16 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         />
       )}
 
-      {/* 4. CONSOLATION ROWS (4th+ with archetype titles) */}
-      {consolationPlayers.length > 0 && (
+      {/* 4. CONSOLATION ROW — current player only (their placement + crown).
+          Keeps the recap focused on the player instead of listing every
+          also-ran. startRank carries their TRUE rank since ConsolationRows
+          derives rank from list index. */}
+      {currentPlayerRank > 3 && consolationPlayers.some(p => p.username === username) && (
         <ConsolationRows
-          players={consolationPlayers}
+          players={consolationPlayers.filter(p => p.username === username)}
           crowns={consolationCrowns}
           currentUsername={username}
+          startRank={currentPlayerRank}
           t={t}
         />
       )}

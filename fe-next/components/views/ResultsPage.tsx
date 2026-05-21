@@ -141,8 +141,10 @@ function DesktopResultsLayout({
       >
         <ResultsParallaxBackdrop scrollRef={scrollRef} intensity={140} />
         <ResultsScrollProgressRail scrollRef={scrollRef} />
-        {/* Top Bar with Exit Button */}
-        <div className="w-full max-w-5xl mx-auto flex items-center justify-end mb-4 relative z-10">
+        {/* Top Bar with Exit Button — kept on the start (left in LTR) edge to
+            match the in-game header, so the exit doesn't jump sides on the
+            game→results transition. */}
+        <div className="w-full max-w-5xl mx-auto flex items-center justify-start mb-4 relative z-10">
           <ExitRoomButton onClick={handleExitRoom} label={exitLabel || ''} />
         </div>
 
@@ -1033,8 +1035,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
       {/* MOBILE VIEW — single scroll, no tabs */}
       <div className="md:hidden flex flex-col flex-1 min-h-0 relative">
-        {/* Exit-only header — podium already renders the 'matchResults' label */}
-        <div className="shrink-0 w-full flex items-center justify-end px-2 py-2 relative z-10">
+        {/* Exit-only header — podium already renders the 'matchResults' label.
+            Start (left in LTR) edge matches the in-game header so the exit
+            doesn't jump sides on the game→results transition. */}
+        <div className="shrink-0 w-full flex items-center justify-start px-2 py-2 relative z-10">
           <ExitRoomButton onClick={handleExitRoom} label="" className="w-11 h-11 min-w-[44px] min-h-[44px] p-0" />
         </div>
 
