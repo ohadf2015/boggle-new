@@ -11865,7 +11865,8 @@ const ja = {
     "VALIDATION_INVALID_PAYLOAD": "無効なリクエストデータ",
     "VALIDATION_MISSING_FIELD": "必須フィールドがありません",
     "WORD_PROCESSING_ERROR": "単語を処理できませんでした。もう一度お試しください。",
-    "INTERNAL_ERROR": "問題が発生しました。もう一度お試しください。"
+    "INTERNAL_ERROR": "問題が発生しました。もう一度お試しください。",
+    "PLAYER_KICKED": "このルームから退出させられました"
   },
   "cg": {
     "hero": {

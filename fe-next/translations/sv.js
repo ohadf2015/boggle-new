@@ -11891,7 +11891,8 @@ const sv = {
     "VALIDATION_INVALID_PAYLOAD": "Ogiltig förfrågningsdata",
     "VALIDATION_MISSING_FIELD": "Obligatoriskt fält saknas",
     "WORD_PROCESSING_ERROR": "Kunde inte bearbeta ditt ord. Försök igen.",
-    "INTERNAL_ERROR": "Något gick sönder. Försök igen."
+    "INTERNAL_ERROR": "Något gick sönder. Försök igen.",
+    "PLAYER_KICKED": "Du har tagits bort från det här rummet"
   },
   "cg": {
     "hero": {

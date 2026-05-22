@@ -11988,7 +11988,8 @@ const es = {
     "VALIDATION_INVALID_PAYLOAD": "Datos de solicitud no válidos",
     "VALIDATION_MISSING_FIELD": "Falta un campo obligatorio",
     "WORD_PROCESSING_ERROR": "No se pudo procesar tu palabra. Inténtalo de nuevo.",
-    "INTERNAL_ERROR": "Algo falló. Inténtalo de nuevo."
+    "INTERNAL_ERROR": "Algo falló. Inténtalo de nuevo.",
+    "PLAYER_KICKED": "Te han expulsado de esta sala"
   },
   "cg": {
     "hero": {

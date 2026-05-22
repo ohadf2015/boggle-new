@@ -11891,7 +11891,8 @@ const en = {
     "VALIDATION_INVALID_PAYLOAD": "Invalid request data",
     "VALIDATION_MISSING_FIELD": "Missing required field",
     "WORD_PROCESSING_ERROR": "Couldn't process your word. Try again.",
-    "INTERNAL_ERROR": "Something broke. Please try again."
+    "INTERNAL_ERROR": "Something broke. Please try again.",
+    "PLAYER_KICKED": "You've been removed from this room"
   },
   "cg": {
     "hero": {

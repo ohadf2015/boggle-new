@@ -12270,7 +12270,8 @@ const he = {
     "VALIDATION_INVALID_PAYLOAD": "נתוני בקשה לא חוקיים",
     "VALIDATION_MISSING_FIELD": "חסר שדה חובה",
     "WORD_PROCESSING_ERROR": "לא ניתן לעבד את המילה. נסה שוב.",
-    "INTERNAL_ERROR": "משהו השתבש. נסה שוב."
+    "INTERNAL_ERROR": "משהו השתבש. נסה שוב.",
+    "PLAYER_KICKED": "הוסרת מהחדר הזה"
   },
   "cg": {
     "hero": {
