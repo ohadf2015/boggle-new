@@ -21,7 +21,7 @@ import {
  * the rest.
  */
 
-export type FeedbackSurface = 'mp_round' | 'singleplayer' | 'daily';
+export type FeedbackSurface = 'mp_round' | 'singleplayer' | 'daily' | 'word_hunt';
 
 export type FeedbackRating = 'bad' | 'ok' | 'great';
 

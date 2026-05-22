@@ -9,6 +9,7 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
+import GameFeedback from '@/components/feedback/GameFeedback';
 import { m } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { ArrowLeft, Trophy, BarChart3 } from 'lucide-react';
@@ -72,7 +73,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   onRetry,
   onGameLanguageChange,
 }) => {
-  const { t } = useLanguage();
+  const { t, language: uiLanguage } = useLanguage();
   const isPractice = usePracticeFlag();
   const { user, profile, isAuthenticated } = useAuth();
 
@@ -390,6 +391,17 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               {renderStatsContent()}
             </div>
           </div>
+        </div>
+        {/* End-of-game sentiment (game_feedback, surface=word_hunt) — fresh
+            completion only; shared throttle keeps it rare across surfaces. */}
+        <div className="mt-4 max-w-md mx-auto">
+          <GameFeedback
+            surface="word_hunt"
+            eligible={isNewCompletion}
+            gameMode="word-hunt"
+            language={uiLanguage}
+            throttleKey={String(puzzleNumber)}
+          />
         </div>
       </div>
 
