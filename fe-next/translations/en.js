@@ -4883,6 +4883,10 @@ const en = {
     "createYourBoard": "Create Your Own Board",
     "createBoardDesc": "Design a puzzle and share it with the world",
     "seo": {
+      "showcase3d": {
+        "title": "LexiClash — A World of Words | Free Multiplayer Word Game",
+        "description": "Scroll into a world of words: trace words on the board, chain combos, beat the room in real-time 1v3 battles, and take the crown. Free, browser-based, 5 languages — no download."
+      },
       "stepLabel": "Step",
       "whatIsTitle": "What is LexiClash?",
       "whatIsContent": "LexiClash is a free, fast-paced multiplayer word game you can play right in your browser. Compete with friends in real-time word battles on a shared letter grid — find words, build combos, and climb the leaderboard. It's like Boggle meets Wordle, but multiplayer. No downloads, no sign-ups required. Available in English, Hebrew, Swedish, Japanese, and Spanish.",

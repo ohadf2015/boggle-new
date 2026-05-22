@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import GameplayPanel, { type Mode } from '@/components/showcase3d/GameplayPanel';
 import Split3DHeading from '@/components/showcase3d/Split3DHeading';
 import FloatingCTA from '@/components/showcase3d/FloatingCTA';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -194,6 +195,18 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
 
   return (
     <main ref={main} className="bg-neo-navy text-neo-cream">
+      {/* crawlable, localized SEO/GEO content (visually hidden, in SSR HTML) */}
+      <GamePageSeoContent
+        asH1
+        title={`${t('showcase3d.heroBadge', 'A world of words')} — LexiClash`}
+        description={`${t('showcase3d.modesSub', 'Real rounds, real boards.')} ${t('showcase3d.bottomTitle', 'Your move. Make it loud.')} ${t('showcase3d.cap0Body', '')} ${t('showcase3d.cap1Body', '')}`}
+        features={[
+          `${t('showcase3d.mode1Tag', 'Solo · Daily')}: ${t('showcase3d.mode1Body', '')}`,
+          `${t('showcase3d.mode2Tag', 'Up to 1v3')}: ${t('showcase3d.mode2Body', '')}`,
+          `${t('showcase3d.mode3Tag', '5 languages')}: ${t('showcase3d.mode3Body', '')}`,
+        ]}
+      />
+
       {/* top playback bar — scrubs with the hero progress */}
       <div aria-hidden className="fixed inset-x-0 top-0 z-50 h-1 bg-neo-navy-light">
         <div ref={barRef} className="h-full origin-left bg-neo-lime" style={{ transform: 'scaleX(0)' }} />
