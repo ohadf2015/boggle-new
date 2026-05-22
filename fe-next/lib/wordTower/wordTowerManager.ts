@@ -67,7 +67,7 @@ export function chainLetter(word: string, language: Language): string {
 // matres lectionis). JA kana always end in a vowel sound, so the rule is off
 // there (that IS shiritori).
 const CHAIN_VOWELS: Record<Language, string> = {
-  en: 'AEIOU', he: 'אהוי', sv: 'AEIOU', es: 'AEIOU', ja: '',
+  en: 'AEIOU', he: 'אהוי', sv: 'AEIOU', es: 'AEIOU', ja: '', fr: 'AEIOU', de: 'AEIOU',
 };
 
 /**
