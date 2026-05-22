@@ -304,6 +304,9 @@ export function SocketProvider({ children }: SocketProviderProps) {
       // This is a fatal error - user needs to know reconnection completely failed
       logger.error('[SOCKET.IO] Reconnection failed after all attempts');
       setIsReconnecting(false);
+      // A deploy that never came back: stop showing the calm "updating" copy so
+      // the real error (with its retry/leave affordances) surfaces.
+      setIsServerUpdating(false);
       setConnectionError('Failed to reconnect to server');
     };
 
