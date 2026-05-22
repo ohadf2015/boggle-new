@@ -86,6 +86,18 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# Killed (Ctrl-C / `pkill -TERM`) before any normal exit branch → still report
+# instead of going silent. SIGKILL (-9) can't be trapped; SIGTERM/SIGINT can.
+# Guard on the composer being sourced — a kill during early preflight predates it.
+on_signal() {
+  trap - TERM INT   # disarm to avoid re-entrancy
+  if declare -F send_failure_digest >/dev/null 2>&1 && declare -F compose_failure_digest >/dev/null 2>&1; then
+    send_failure_digest "Run was killed (SIGTERM/SIGINT) before it could ship. Any completed lanes are listed above; nothing was committed or pushed."
+  fi
+  exit 143
+}
+trap on_signal TERM INT
+
 # snapshot_pre_lane / revert_to_pre_lane live in lib/wip-revert.sh (sourced
 # below). The revert is SCOPED — it undoes only a lane's own changes and never
 # reverts the founder's pre-existing WIP or deletes an untracked file, so a lane
@@ -118,7 +130,7 @@ log "========================================"
 if ! preflight_check >> "$RUN_LOG" 2>&1; then
   log "preflight failed — aborting"
   tail -20 "$RUN_LOG" 2>/dev/null
-  tg_alert "preflight failed at $(date '+%H:%M'). See \`$RUN_LOG\`."
+  send_failure_digest "Preflight failed (dirty tree, stale lock, or git divergence) — the run never started. Nothing changed."
   exit 1
 fi
 

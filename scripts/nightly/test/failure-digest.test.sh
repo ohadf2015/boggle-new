@@ -34,6 +34,50 @@ MSG2=$(compose_failure_digest "Lane churn 47 files > 30 sanity cap.")
 assert "churn reason present"        "printf '%s' \"\$MSG2\" | grep -q 'sanity cap'"
 assert "fallback when no lanes"      "printf '%s' \"\$MSG2\" | grep -q 'no lane results recorded'"
 
+# The exact scenario that prompted this: a run KILLED (SIGTERM) before any normal
+# exit branch must still fire the digest. Prove the trap pattern run.sh installs
+# (trap on_signal TERM INT, guarded on the composer being sourced) reaches the send.
+echo "── SIGTERM trap fires the digest ──"
+TRAP_OUT=$(mktemp); TRAP_SCRIPT=$(mktemp)
+cat > "$TRAP_SCRIPT" <<SCRIPT
+#!/bin/bash
+set -uo pipefail
+send_failure_digest()    { echo "DIGEST_SENT: \$1" > "$TRAP_OUT"; }
+compose_failure_digest() { :; }
+on_signal() {
+  trap - TERM INT
+  if declare -F send_failure_digest >/dev/null 2>&1 && declare -F compose_failure_digest >/dev/null 2>&1; then
+    send_failure_digest "Run was killed (SIGTERM/SIGINT) before it could ship."
+  fi
+  exit 143
+}
+trap on_signal TERM INT
+sleep 30
+SCRIPT
+bash "$TRAP_SCRIPT" & TPID=$!
+sleep 1; kill -TERM "$TPID" 2>/dev/null; wait "$TPID" 2>/dev/null
+assert "SIGTERM trap reaches send_failure_digest" "grep -q 'DIGEST_SENT' '$TRAP_OUT'"
+# And it stays silent if killed BEFORE the composer is sourced (guard works).
+TRAP_OUT2=$(mktemp); TRAP_SCRIPT2=$(mktemp)
+cat > "$TRAP_SCRIPT2" <<SCRIPT
+#!/bin/bash
+set -uo pipefail
+send_failure_digest() { echo "SENT" > "$TRAP_OUT2"; }   # composer NOT defined
+on_signal() {
+  trap - TERM INT
+  if declare -F send_failure_digest >/dev/null 2>&1 && declare -F compose_failure_digest >/dev/null 2>&1; then
+    send_failure_digest "x"
+  fi
+  exit 143
+}
+trap on_signal TERM INT
+sleep 30
+SCRIPT
+bash "$TRAP_SCRIPT2" & TPID2=$!
+sleep 1; kill -TERM "$TPID2" 2>/dev/null; wait "$TPID2" 2>/dev/null
+assert "guard skips send when composer unsourced" "[ ! -s '$TRAP_OUT2' ]"
+rm -f "$TRAP_OUT" "$TRAP_SCRIPT" "$TRAP_OUT2" "$TRAP_SCRIPT2"
+
 echo
 echo "failure-digest: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
