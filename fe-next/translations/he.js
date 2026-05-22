@@ -7,6 +7,7 @@ const he = {
     "loading": "טוען מילון…",
     "biome": { "city": "קרקע", "sky": "שמיים", "stratosphere": "סטרטוספירה", "orbit": "מסלול", "nebula": "ערפילית", "galaxy": "גלקסיה" },
     "hud": { "floors": "{n} קומות", "combo": "שרשרת {n}", "scramble": "ערבוב", "backspace": "מחיקה", "build": "בנייה", "restart": "מחדש", "best": "שיא {m} מ'", "possible": "{n} מילים", "clue": "רמז", "collapse": "כיווץ", "expand": "הרחבה", "rivalPassed": "עברת את {name}!", "stuck": "תקוע? אות חדשה" },
+    "milestone": { "m50": "מעל צמרות העצים! 🌳", "m150": "אזור העננים ☁️", "m400": "הציפורים מקנאות 🐦", "m900": "דופק בדלת של החלל 🚀", "m1800": "כמעט אסטרונאוט ✨" },
     "error": { "too_short": "קצר מדי — 3 אותיות לפחות", "bad_chain": "התחילו באות הזוהרת", "not_buildable": "השתמשו באותיות המגש", "duplicate": "כבר השתמשת במילה הזו", "not_in_dictionary": "לא במילון" },
     "celebration": { "highRise": "מתנשא!", "tall": "גבוה!", "skyscraper": "גורד שחקים!" },
     "leaderboard": { "title": "המגדלים המובילים", "error": "טעינת הלוח נכשלה", "empty": "אין עדיין מגדלים — היו הראשונים!" },

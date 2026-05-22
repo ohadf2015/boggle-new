@@ -19,8 +19,8 @@ export type ColumnCell =
 
 // Vibrant neo-brutalist saturation/lightness — bright enough for dark glyphs,
 // chroma high enough that hue-blended connectors still read as "both colours".
-const WORD_S = 0.82;
-const WORD_L = 0.56;
+const WORD_S = 0.72; // richer, less candy-bright — founder: tiles read too childish
+const WORD_L = 0.5;
 // Golden angle: consecutive words land ~137.5° apart on the wheel → maximal,
 // non-repeating hue separation so no two adjacent words ever look alike.
 const GOLDEN_ANGLE = 137.508;

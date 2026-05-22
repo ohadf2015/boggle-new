@@ -7,6 +7,7 @@ const es = {
     "loading": "Cargando diccionario…",
     "biome": { "city": "Suelo", "sky": "Cielo", "stratosphere": "Estratosfera", "orbit": "Órbita", "nebula": "Nebulosa", "galaxy": "Galaxia" },
     "hud": { "floors": "{n} pisos", "combo": "cadena {n}", "scramble": "Mezclar", "backspace": "Borrar", "build": "Construir", "restart": "Reiniciar", "best": "Mejor {m} m", "possible": "{n} palabras", "clue": "Pista", "collapse": "Contraer", "expand": "Expandir", "rivalPassed": "¡Superaste a {name}!", "stuck": "¿Atascado? Nueva letra" },
+    "milestone": { "m50": "¡Sobre las copas! 🌳", "m150": "Zona de nubes ☁️", "m400": "Los pájaros tienen envidia 🐦", "m900": "Tocando el espacio 🚀", "m1800": "Casi astronauta ✨" },
     "error": { "too_short": "Muy corta — 3+ letras", "bad_chain": "Empieza con la letra brillante", "not_buildable": "Usa las letras de la bandeja", "duplicate": "Ya usaste esa palabra", "not_in_dictionary": "No está en el diccionario" },
     "celebration": { "highRise": "¡Edificio alto!", "tall": "¡Imponente!", "skyscraper": "¡RASCACIELOS!" },
     "leaderboard": { "title": "Torres principales", "error": "No se pudo cargar la clasificación", "empty": "Aún no hay torres — ¡sé el primero!" },

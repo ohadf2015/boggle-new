@@ -18,6 +18,7 @@ import { WORD_TOWER_MIN_WORD_LEN } from '@/shared/constants/wordTowerConstants';
 import { countBuildableWords, pickClueWord } from '@/lib/wordTower/wordHints';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
 import { WordTowerRivalRail } from './WordTowerRivalRail';
+import { milestoneCrossed } from '@/lib/wordTower/milestones';
 import { WordTowerScene } from './WordTowerScene';
 import { WordTowerHud } from './WordTowerHud';
 
@@ -64,6 +65,18 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     () => tower.reroll(dictionary ? (a, tr) => countBuildableWords(dictionary, a, tr, WORD_TOWER_MIN_WORD_LEN) > 0 : undefined),
     [tower, dictionary],
   );
+
+  // Witty milestone toast on crossing a height landmark.
+  const [milestoneText, setMilestoneText] = useState<string | null>(null);
+  const prevMilestoneH = useRef(game.heightM);
+  useEffect(() => {
+    const hit = milestoneCrossed(prevMilestoneH.current, game.heightM);
+    prevMilestoneH.current = game.heightM;
+    if (!hit) return;
+    setMilestoneText(t(hit.key));
+    const id = setTimeout(() => setMilestoneText(null), 2400);
+    return () => clearTimeout(id);
+  }, [game.heightM]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const haptics = useHaptics();
   const { playCoinCollectSound, playChestOpenSound, playErrorSound } = useSoundEffects();
@@ -192,6 +205,16 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
 
       {/* Rival record lines you climb past — fed by the leaderboard. */}
       <WordTowerRivalRail rivals={rivals} viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} />
+
+      {/* Witty milestone toast */}
+      {milestoneText && (
+        <div
+          className="pointer-events-none absolute left-1/2 top-[16%] z-20 -translate-x-1/2 animate-neo-pop rounded-neo border-neo-thick border-black bg-neo-purple px-3 py-1.5 font-neo-display text-sm font-black text-neo-white shadow-hard"
+          aria-live="polite"
+        >
+          {milestoneText}
+        </div>
+      )}
 
       <div className="pointer-events-auto absolute inset-x-0 top-0 z-10 flex items-center justify-between p-3">
         <Link
