@@ -32,7 +32,9 @@ export default function Split3DHeading({
       const mm = gsap.matchMedia();
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         if (!ref.current) return;
-        const split = new SplitText(ref.current, { type: 'chars', charsClass: 's3-char' });
+        // split words AND chars: chars animate, but word wrappers keep words from
+        // breaking mid-word across lines (e.g. "Make it" splitting into "Make i / t").
+        const split = new SplitText(ref.current, { type: 'words,chars', charsClass: 's3-char' });
         gsap.from(split.chars, {
           yPercent: 110,
           autoAlpha: 0,
