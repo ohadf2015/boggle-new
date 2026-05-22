@@ -15,6 +15,7 @@ import {
 } from './towerSprites';
 import { BIOME_THEME } from './biomeTheme';
 import { WordTowerBackdrop } from './WordTowerBackdrop';
+import { WordTowerParallaxProps } from './WordTowerParallaxProps';
 import { WordTowerMascot } from './WordTowerMascot';
 
 interface SceneProps {
@@ -325,6 +326,8 @@ export function WordTowerScene(props: SceneProps) {
       />
       {/* Parallax ascent backdrop (stars/clouds/skyline scroll by altitude) */}
       <WordTowerBackdrop biomeId={props.biomeId} heightM={props.heightM} reducedMotion={props.reducedMotion} />
+      {/* Lazy altitude-reference props (balloon→birds→plane→satellite→UFO) behind the tower */}
+      <WordTowerParallaxProps heightM={props.heightM} reducedMotion={props.reducedMotion} />
       {/* Brand climb companion — pops in to cheer only when a word is built. */}
       <WordTowerMascot
         resultKey={props.resultKey}
