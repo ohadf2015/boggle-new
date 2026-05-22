@@ -165,11 +165,24 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
   const isRTL = locale === 'he';
   const playHref = `/${locale}`;
 
+  const main = useRef<HTMLElement>(null);
   const section = useRef<HTMLElement>(null);
   const pinWrap = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const modesRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
+  const scoreRef = useRef<HTMLSpanElement>(null); // live score, counts with scrub
+  const barRef = useRef<HTMLDivElement>(null); // top playback progress bar
+  const stRef = useRef<ScrollTrigger | null>(null); // scrub trigger, for chapter jump
+  const marqRef = useRef<gsap.core.Tween | null>(null); // marquee loop, velocity-reactive
+
+  // chapter rail: click to scrub-jump to a chapter's scroll position
+  const RAIL = ['Trace', 'Chain', 'Beat', 'Take'];
+  const jumpTo = (i: number) => {
+    const st = stRef.current;
+    if (!st) return;
+    window.scrollTo({ top: st.start + (i * 0.25) * (st.end - st.start), behavior: 'smooth' });
+  };
 
   const captions: Caption[] = [
     { badge: t('showcase3d.heroBadge', 'A world of words'), title: t('showcase3d.cap0Title', 'Trace the word'), body: t('showcase3d.cap0Body', 'Drag across the board — letters light up as you go.'), window: [0.0, 0.2] },
@@ -218,9 +231,26 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
         return;
       }
 
+      const segs = gsap.utils.toArray<HTMLElement>('.s3-railseg');
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: section.current, start: 'top top', end: '+=560%', pin: pinWrap.current, scrub: 0.6, invalidateOnRefresh: true },
+        scrollTrigger: {
+          trigger: section.current,
+          start: 'top top',
+          end: '+=560%',
+          pin: pinWrap.current,
+          scrub: 0.6,
+          invalidateOnRefresh: true,
+          // live HUD: progress drives the score counter, top bar, and active chapter
+          onUpdate: (self) => {
+            const p = self.progress;
+            if (scoreRef.current) scoreRef.current.textContent = Math.round(p * 99999).toLocaleString();
+            if (barRef.current) barRef.current.style.transform = `scaleX(${p})`;
+            const idx = Math.min(segs.length - 1, Math.floor(p * 4));
+            for (let i = 0; i < segs.length; i++) segs[i].classList.toggle('s3-railseg-on', i === idx);
+          },
+        },
       });
+      stRef.current = tl.scrollTrigger ?? null;
       tl.to(playhead, { frame: TOTAL - 1, ease: 'none', duration: 1, onUpdate: draw }, 0);
       captions.forEach((cap, i) => {
         const [enter, exit] = cap.window;
@@ -231,12 +261,22 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
     { scope: section },
   );
 
-  // page life: marquee loop, floating word-dust, CTA pop
+  // page life: marquee (velocity-reactive) + floating word-dust + CTA pop
   useGSAP(
     () => {
       const mm = gsap.matchMedia();
       mm.add('(prefers-reduced-motion: no-preference)', () => {
-        gsap.to('.s3-marquee-track', { xPercent: isRTL ? 50 : -50, repeat: -1, duration: 22, ease: 'none' });
+        marqRef.current = gsap.to('.s3-marquee-track', { xPercent: isRTL ? 50 : -50, repeat: -1, duration: 22, ease: 'none' });
+        // scroll faster -> marquee races; settles back to 1x as you slow
+        ScrollTrigger.create({
+          start: 0,
+          end: 'max',
+          onUpdate: (self) => {
+            if (!marqRef.current) return;
+            const boost = gsap.utils.clamp(1, 6, 1 + Math.abs(self.getVelocity()) / 450);
+            gsap.to(marqRef.current, { timeScale: boost, duration: 0.4, overwrite: true });
+          },
+        });
         gsap.to('.s3-dust', {
           y: '+=22',
           rotation: '+=10',
@@ -256,11 +296,16 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
         });
       });
     },
-    { scope: modesRef },
+    { scope: main },
   );
 
   return (
-    <main className="bg-neo-navy text-neo-cream">
+    <main ref={main} className="bg-neo-navy text-neo-cream">
+      {/* top playback bar — scrubs with the hero progress */}
+      <div aria-hidden className="fixed inset-x-0 top-0 z-50 h-1 bg-neo-navy-light">
+        <div ref={barRef} className="h-full origin-left bg-neo-lime" style={{ transform: 'scaleX(0)' }} />
+      </div>
+
       {/* ── PINNED MULTI-CHAPTER SCROLL-SCRUB HERO ───────────── */}
       <section ref={section} className="relative">
         <div ref={pinWrap} className="texture-halftone relative h-[100svh] w-full overflow-hidden bg-neo-navy">
@@ -269,6 +314,32 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
           <p className="absolute left-5 top-6 font-neo-display text-xl font-bold uppercase tracking-widest text-neo-lime drop-shadow-[2px_2px_0_rgb(10,10,18)] sm:left-10">
             LexiClash
           </p>
+
+          {/* live score — counts up as you scrub */}
+          <div className="absolute right-4 top-5 z-20 hidden items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-1.5 shadow-hard sm:flex">
+            <span className="font-neo-body text-[10px] font-bold uppercase tracking-widest text-neo-cream/55">
+              {t('showcase3d.scoreLabel', 'Score')}
+            </span>
+            <span ref={scoreRef} className="font-neo-display text-lg font-bold leading-none text-neo-lime tabular-nums">0</span>
+          </div>
+
+          {/* chapter rail — active highlights with scrub; click to jump */}
+          <div className="absolute right-4 top-1/2 z-20 hidden -translate-y-1/2 flex-col items-end gap-3 lg:flex">
+            {RAIL.map((label, i) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => jumpTo(i)}
+                aria-label={t(`showcase3d.rail${i}`, label)}
+                className="s3-railseg group flex items-center justify-end gap-2"
+              >
+                <span className="font-neo-display text-xs font-bold uppercase tracking-wide text-neo-cream/40 transition-all duration-200 group-hover:text-neo-cream/80 group-[.s3-railseg-on]:text-neo-cream">
+                  {t(`showcase3d.rail${i}`, label)}
+                </span>
+                <span className="h-3 w-3 rounded-full border-neo border-black bg-neo-cream/30 transition-all duration-200 group-[.s3-railseg-on]:scale-150 group-[.s3-railseg-on]:bg-neo-lime" />
+              </button>
+            ))}
+          </div>
           <div className="absolute inset-x-0 bottom-[14%] flex justify-center px-6">
             <div className="relative h-52 w-full max-w-2xl">
               {captions.map((cap, i) => (
