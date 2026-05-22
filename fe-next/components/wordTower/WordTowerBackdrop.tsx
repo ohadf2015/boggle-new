@@ -56,6 +56,9 @@ export function WordTowerBackdrop({
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      {/* Slow drifting aurora — gives the sky life + a sense of "changing"
+          weather. Soft electric tints, stronger as you climb into the dark. */}
+      <div className="wt-aurora absolute" style={{ opacity: 0.18 + stars * 0.42 }} />
       {/* Warm sun glow (low altitude only) */}
       <div
         className="absolute inset-0 transition-opacity duration-1000"
@@ -131,8 +134,22 @@ export function WordTowerBackdrop({
         .wt-cloud::before { width: 52%; height: 150%; left: 9%; top: -62%; }
         .wt-cloud::after  { width: 42%; height: 122%; right: 11%; top: -44%; }
         @keyframes wt-drift { from { transform: translateX(-30%); } to { transform: translateX(130vw); } }
+        /* Soft electric aurora that slowly drifts + breathes (no blur — neo). */
+        .wt-aurora {
+          inset: -25% -15%;
+          background:
+            radial-gradient(45% 35% at 28% 30%, rgba(0,255,255,0.30), transparent 70%),
+            radial-gradient(40% 32% at 72% 58%, rgba(139,92,246,0.30), transparent 70%),
+            radial-gradient(38% 28% at 55% 80%, rgba(255,20,147,0.18), transparent 70%);
+          animation: wt-aurora 26s ease-in-out infinite alternate;
+        }
+        @keyframes wt-aurora {
+          from { transform: translate(-4%, -3%) scale(1); }
+          to   { transform: translate(5%, 5%) scale(1.18); }
+        }
         @media (prefers-reduced-motion: reduce) {
           .wt-cloud { animation: none !important; }
+          .wt-aurora { animation: none !important; }
         }
       `}</style>
     </div>
