@@ -12313,6 +12313,15 @@ const he = {
     "tied": "תיקו",
     "yourTurn": "התור שלך",
     "botTurn": "WordBot חושב…",
+    "player1": "שחקן 1",
+    "player2": "שחקן 2",
+    "player1Turn": "תור שחקן 1",
+    "player2Turn": "תור שחקן 2",
+    "handoff": {
+      "passTo": "העבירו את המכשיר ל{name}",
+      "tapReady": "המדף של היריב מוסתר עד שיתחיל",
+      "start": "התחל תור"
+    },
     "gameOver": "המשחק נגמר",
     "winnerLabel": "{{name}} ניצח!",
     "bagRemaining": "שק",

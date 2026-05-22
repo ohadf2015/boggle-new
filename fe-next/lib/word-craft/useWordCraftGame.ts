@@ -43,6 +43,12 @@ export interface WordCraftState {
   burnout: boolean;
   territoryEnabled: boolean;
   lastCapture: LastCapture | null;
+  /**
+   * Hot-seat (pass-and-play): the "bot" side is a second human on the same
+   * device and the auto-bot is disabled. Heat/overdrive is neutralized so one
+   * side doesn't get a lopsided advantage.
+   */
+  hotseat: boolean;
 }
 
 type Action =
@@ -57,16 +63,17 @@ type Action =
   | { type: 'SWAP'; tilesToReturn: RackTile[]; replacements: RackTile[] }
   | { type: 'END_GAME' }
   | { type: 'BURNOUT_SKIP' }
-  | { type: 'RESET'; seed: number; boardSize: 13 | 15; locale: SupportedLocale; territoryEnabled?: boolean };
+  | { type: 'RESET'; seed: number; boardSize: 13 | 15; locale: SupportedLocale; territoryEnabled?: boolean; hotseat?: boolean };
 
 const BOT_NAME = 'WordBot';
 
-function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale; viewportDims?: { size: BoardSize; bagSize: number }; territoryEnabled?: boolean }): WordCraftState {
+function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale; viewportDims?: { size: BoardSize; bagSize: number }; territoryEnabled?: boolean; hotseat?: boolean }): WordCraftState {
   const seed = typeof init === 'number' ? init : init.seed;
   const boardSize = typeof init === 'number' ? 15 : (init.boardSize ?? 15);
   const locale = typeof init === 'number' ? 'en' : (init.locale ?? 'en');
   const viewportDims = typeof init === 'number' ? undefined : init.viewportDims;
   const territoryEnabled = typeof init === 'number' ? true : (init.territoryEnabled ?? true);
+  const hotseat = typeof init === 'number' ? false : (init.hotseat ?? false);
 
   const finalBoardSize = viewportDims?.size ?? boardSize;
   const bag = createBag({ seed, locale, bagSize: viewportDims?.bagSize });
@@ -89,6 +96,7 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
     burnout: false,
     territoryEnabled,
     lastCapture: null,
+    hotseat,
   };
 }
 
@@ -192,6 +200,11 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
       return { ...state, pendingPlacements: [], selectedRackTileId: null };
     case 'COMMIT_PLAYER': {
       const base = commitMove(state, 'player', action.placements, action.score, action.words, action.wordCells);
+      // Hot-seat: both humans submit through the player/bot seats; heat would
+      // only ever accrue for seat 1, a lopsided overdrive edge. Keep it inert.
+      if (state.hotseat) {
+        return base;
+      }
       const wasOverdrive = state.overdrive;
       if (wasOverdrive) {
         // Cashing overdrive: reset heat to 60, clear overdrive state
@@ -267,7 +280,7 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
     // Used when locale or board size changes mid-session — wipes the game so a
     // Hebrew player who switched from /en doesn't keep the English bag.
     case 'RESET':
-      return buildInitial({ seed: action.seed, boardSize: action.boardSize, locale: action.locale, territoryEnabled: action.territoryEnabled ?? state.territoryEnabled });
+      return buildInitial({ seed: action.seed, boardSize: action.boardSize, locale: action.locale, territoryEnabled: action.territoryEnabled ?? state.territoryEnabled, hotseat: action.hotseat ?? state.hotseat });
     default:
       return state;
   }
@@ -285,18 +298,23 @@ export interface UseWordCraftGameOptions {
    * words) makes the single-player bot beatable without feeling broken.
    */
   botSkillVariance?: number;
+  /**
+   * Hot-seat (pass-and-play) mode: the "bot" seat is a second human, the
+   * auto-bot is disabled, and both seats take input on their own turn.
+   */
+  hotseat?: boolean;
 }
 
 export { reducer as wordCraftReducer, buildInitial as buildInitialState }
 
-export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, botSkillVariance = 0.5 }: UseWordCraftGameOptions) {
+export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, botSkillVariance = 0.5, hotseat = false }: UseWordCraftGameOptions) {
   // Capture viewport dims at initialization and lock them for the game lifetime
   const initialDimsRef = useRef(
     getBoardDims(typeof window === 'undefined' ? 1024 : window.innerWidth)
   );
   const initialDims = initialDimsRef.current;
 
-  const initArg = useMemo(() => ({ seed, boardSize, locale, viewportDims: initialDims, territoryEnabled }), [seed, boardSize, locale, initialDims, territoryEnabled]);
+  const initArg = useMemo(() => ({ seed, boardSize, locale, viewportDims: initialDims, territoryEnabled, hotseat }), [seed, boardSize, locale, initialDims, territoryEnabled, hotseat]);
   const [state, dispatch] = useReducer(reducer, initArg, buildInitial);
 
   // Locale-aware dict lookup. Hebrew dict is loaded with sofit→regular
@@ -349,11 +367,13 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
 
   const placeOnBoard = useCallback(
     (row: number, col: number) => {
-      if (state.turn !== 'player') return;
+      // Hot-seat: either seat may act on its own turn; bot-mode: player only.
+      if (hotseat ? state.turn === 'over' : state.turn !== 'player') return;
       if (!state.selectedRackTileId) return;
       if (getCell(state.board, row, col).tile) return;
       if (state.pendingPlacements.some((p) => p.row === row && p.col === col)) return;
-      const tile = state.player.rack.find((t) => t.id === state.selectedRackTileId);
+      const activeRack = state.turn === 'bot' ? state.bot.rack : state.player.rack;
+      const tile = activeRack.find((t) => t.id === state.selectedRackTileId);
       if (!tile) return;
       const placement: PlacedTile = {
         row,
@@ -365,18 +385,19 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       };
       dispatch({ type: 'PLACE_PENDING', placement });
     },
-    [state.turn, state.selectedRackTileId, state.board, state.pendingPlacements, state.player.rack],
+    [hotseat, state.turn, state.selectedRackTileId, state.board, state.pendingPlacements, state.player.rack, state.bot.rack],
   );
 
   // Drag-to-place bypass: caller provides the tile id directly so we don't depend
   // on the async-updating selectedRackTileId. Used by the pointer-drag flow.
   const placeTileOnBoard = useCallback(
     (rackTileId: string, row: number, col: number) => {
-      if (state.turn !== 'player') return;
+      if (hotseat ? state.turn === 'over' : state.turn !== 'player') return;
       if (getCell(state.board, row, col).tile) return;
       if (state.pendingPlacements.some((p) => p.row === row && p.col === col)) return;
       if (state.pendingPlacements.some((p) => p.rackTileId === rackTileId)) return;
-      const tile = state.player.rack.find((t) => t.id === rackTileId);
+      const activeRack = state.turn === 'bot' ? state.bot.rack : state.player.rack;
+      const tile = activeRack.find((t) => t.id === rackTileId);
       if (!tile) return;
       const placement: PlacedTile = {
         row,
@@ -389,7 +410,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       dispatch({ type: 'PLACE_PENDING', placement });
       dispatch({ type: 'SELECT_RACK_TILE', id: null });
     },
-    [state.turn, state.board, state.pendingPlacements, state.player.rack],
+    [hotseat, state.turn, state.board, state.pendingPlacements, state.player.rack, state.bot.rack],
   );
 
   const recallTile = useCallback(
@@ -400,7 +421,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
   const recallAll = useCallback(() => dispatch({ type: 'CLEAR_PENDING' }), []);
 
   const submitMove = useCallback(() => {
-    if (state.turn !== 'player') return;
+    if (hotseat ? state.turn === 'over' : state.turn !== 'player') return;
     if (!dict) {
       dispatch({ type: 'SET_ERROR', message: 'DICT_LOADING' });
       return;
@@ -413,14 +434,16 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       });
       return;
     }
+    // Route the commit to whichever seat is acting. In bot-mode the turn is
+    // always 'player' here; in hot-seat the second human commits as 'bot'.
     dispatch({
-      type: 'COMMIT_PLAYER',
+      type: state.turn === 'bot' ? 'COMMIT_BOT' : 'COMMIT_PLAYER',
       placements: state.pendingPlacements,
       score: result.score ?? 0,
       words: result.words?.map((w) => w.word) ?? [],
       wordCells: result.words?.map((w) => w.cells) ?? [],
     });
-  }, [dict, state.turn, state.board, state.pendingPlacements, isWordValid]);
+  }, [hotseat, dict, state.turn, state.board, state.pendingPlacements, isWordValid]);
 
   const pass = useCallback(() => dispatch({ type: 'PASS' }), []);
 
@@ -441,6 +464,8 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
 
   const botTurnRunning = useRef(false);
   useEffect(() => {
+    // Hot-seat: the second seat is a human — never auto-play it.
+    if (hotseat) return;
     if (state.turn !== 'bot') return;
     if (!dict) return;
     if (botTurnRunning.current) return;
@@ -480,10 +505,12 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       clearTimeout(handle);
       botTurnRunning.current = false;
     };
-  }, [state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid, botSkillVariance]);
+  }, [hotseat, state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid, botSkillVariance]);
 
   const isFirstMoveOfGame = useMemo(() => isFirstMove(state.board), [state.board]);
   const tilesRemaining = useMemo(() => remaining(state.bag), [state.bag]);
+  // The seat whose turn it is — drives which rack the UI shows in hot-seat.
+  const activePlayer = state.turn === 'bot' ? state.bot : state.player;
 
   return {
     state,
@@ -498,5 +525,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
     swap,
     isFirstMoveOfGame,
     tilesRemaining,
+    isHotseat: hotseat,
+    activePlayer,
   };
 }

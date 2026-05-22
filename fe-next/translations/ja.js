@@ -11906,6 +11906,15 @@ const ja = {
     "tied": "引き分け",
     "yourTurn": "あなたの番",
     "botTurn": "WordBotが考え中…",
+    "player1": "プレイヤー1",
+    "player2": "プレイヤー2",
+    "player1Turn": "プレイヤー1のターン",
+    "player2Turn": "プレイヤー2のターン",
+    "handoff": {
+      "passTo": "{name}に端末を渡してください",
+      "tapReady": "開始するまで相手のラックは見えません",
+      "start": "ターンを開始"
+    },
     "gameOver": "ゲーム終了",
     "winnerLabel": "{{name}}の勝ち!",
     "bagRemaining": "袋",

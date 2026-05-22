@@ -12029,6 +12029,15 @@ const es = {
     "tied": "Empate",
     "yourTurn": "Tu turno",
     "botTurn": "WordBot está pensando…",
+    "player1": "Jugador 1",
+    "player2": "Jugador 2",
+    "player1Turn": "Turno del Jugador 1",
+    "player2Turn": "Turno del Jugador 2",
+    "handoff": {
+      "passTo": "Pasa el dispositivo a {name}",
+      "tapReady": "El atril del rival queda oculto hasta que empiece",
+      "start": "Empezar turno"
+    },
     "gameOver": "Fin del juego",
     "winnerLabel": "¡{{name}} gana!",
     "bagRemaining": "Bolsa",

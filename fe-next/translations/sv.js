@@ -11932,6 +11932,15 @@ const sv = {
     "tied": "Oavgjort",
     "yourTurn": "Din tur",
     "botTurn": "WordBot tänker…",
+    "player1": "Spelare 1",
+    "player2": "Spelare 2",
+    "player1Turn": "Spelare 1:s tur",
+    "player2Turn": "Spelare 2:s tur",
+    "handoff": {
+      "passTo": "Lämna enheten till {name}",
+      "tapReady": "Motståndarens bricka är dold tills de börjar",
+      "start": "Starta tur"
+    },
     "gameOver": "Spelet är slut",
     "winnerLabel": "{{name}} vinner!",
     "bagRemaining": "Påse",

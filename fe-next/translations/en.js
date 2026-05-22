@@ -11934,6 +11934,15 @@ const en = {
     "tied": "Tied",
     "yourTurn": "Your turn",
     "botTurn": "WordBot is thinking…",
+    "player1": "Player 1",
+    "player2": "Player 2",
+    "player1Turn": "Player 1's turn",
+    "player2Turn": "Player 2's turn",
+    "handoff": {
+      "passTo": "Pass the device to {name}",
+      "tapReady": "Their rack stays hidden until they start",
+      "start": "Start turn"
+    },
     "gameOver": "Game over",
     "winnerLabel": "{{name}} wins!",
     "bagRemaining": "Bag",

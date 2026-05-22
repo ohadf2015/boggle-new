@@ -23,6 +23,7 @@ import { WordCraftDragGhost } from '@/components/word-craft/WordCraftDragGhost';
 import { WordCraftPendingStrip } from '@/components/word-craft/WordCraftPendingStrip';
 import { WordCraftLiveRegion } from '@/components/word-craft/WordCraftLiveRegion';
 import { WordCraftBoardSection } from '@/components/word-craft/WordCraftBoardSection';
+import { WordCraftHandoff } from '@/components/word-craft/WordCraftHandoff';
 import { WordCraftTerritoryStrip } from '@/components/word-craft/WordCraftTerritoryStrip';
 import { WordCraftGameOverScene } from '@/components/word-craft/WordCraftGameOverScene';
 import { useWordCraftJuice } from '@/components/word-craft/useWordCraftJuice';
@@ -135,7 +136,27 @@ export default function WordCraftPageClient() {
     return classic !== '1' && classic !== 'true';
   }, []);
 
-  const game = useWordCraftGame({ seed, dict, locale, territoryEnabled });
+  // Hot-seat (pass-and-play) human vs human on one device: ?vs=human.
+  const hotseat = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return new URLSearchParams(window.location.search).get('vs') === 'human';
+  }, []);
+
+  const game = useWordCraftGame({ seed, dict, locale, territoryEnabled, hotseat });
+
+  // Pass-and-play hand-off curtain: when the turn flips between the two human
+  // seats, cover the screen so the incoming player can't see the outgoing
+  // player's rack. Shown on every turn change except the very first and the
+  // game-over transition.
+  const [showHandoff, setShowHandoff] = useState(false);
+  const prevTurnRef = useRef(game.state.turn);
+  useEffect(() => {
+    if (!hotseat) return;
+    if (game.state.turn !== prevTurnRef.current && game.state.turn !== 'over') {
+      setShowHandoff(true);
+    }
+    prevTurnRef.current = game.state.turn;
+  }, [hotseat, game.state.turn]);
   const juice = useWordCraftJuice();
   const { queueAchievement } = useAchievementQueue();
   const [sceneCtx, setSceneCtx] = useState<SceneCtx | null>(null);
@@ -198,7 +219,7 @@ export default function WordCraftPageClient() {
   // targeting for placements 3..7 of a turn.
   const handleFastTap = useCallback(
     (tile: { id: string }) => {
-      const rackTile = game.state.player.rack.find((t) => t.id === tile.id);
+      const rackTile = game.activePlayer.rack.find((t) => t.id === tile.id);
       if (!rackTile) return;
       const result = resolveTap(rackTile, game.state.pendingPlacements, game.state.board);
       if ('placement' in result) {
@@ -280,7 +301,7 @@ export default function WordCraftPageClient() {
     turn: game.state.turn,
     pendingPlacements: game.state.pendingPlacements,
     burnout: game.state.burnout,
-    playerRack: game.state.player.rack,
+    playerRack: game.activePlayer.rack,
     dict,
     axis,
     boardSize: game.state.board.size,
@@ -552,9 +573,18 @@ export default function WordCraftPageClient() {
   // tappable. Render each only when it carries info.
   const showHeatMeter = game.state.heat > 0 || game.state.overdrive || game.state.burnout;
   const showPendingStrip = game.state.pendingPlacements.length > 0;
+  // Whether the on-screen human may act now. Bot-mode: only on the player's
+  // turn. Hot-seat: either seat's turn, but not while the hand-off curtain is
+  // up or the game is over.
+  const canInteract = hotseat
+    ? game.state.turn !== 'over' && !showHandoff
+    : game.state.turn === 'player';
+  // The rack belonging to whoever is acting (player in bot-mode; the active
+  // seat in hot-seat).
+  const activeRack = game.activePlayer.rack;
   // True when player should pick a tile (no selection, no pending, dict ready, not burned out, their turn).
   const wantsPick =
-    game.state.turn === 'player' &&
+    canInteract &&
     !!dict &&
     !game.state.burnout &&
     !game.state.selectedRackTileId &&
@@ -651,10 +681,10 @@ export default function WordCraftPageClient() {
           turn={game.state.turn}
           tilesRemaining={game.tilesRemaining}
           labels={{
-            you: t('wordcraft.you'),
-            bot: t('wordcraft.bot'),
-            yourTurn: t('wordcraft.yourTurn'),
-            botTurn: t('wordcraft.botTurn'),
+            you: hotseat ? t('wordcraft.player1') : t('wordcraft.you'),
+            bot: hotseat ? t('wordcraft.player2') : t('wordcraft.bot'),
+            yourTurn: hotseat ? t('wordcraft.player1Turn') : t('wordcraft.yourTurn'),
+            botTurn: hotseat ? t('wordcraft.player2Turn') : t('wordcraft.botTurn'),
             gameOver: t('wordcraft.gameOver'),
             bagRemaining: t('wordcraft.bagRemaining'),
           }}
@@ -695,12 +725,12 @@ export default function WordCraftPageClient() {
             <WordCraftBoardSection
               board={game.state.board}
               pending={game.state.pendingPlacements}
-              selectedRackTile={game.state.selectedRackTileId ? game.state.player.rack.find((t) => t.id === game.state.selectedRackTileId) ?? null : null}
+              selectedRackTile={game.state.selectedRackTileId ? game.activePlayer.rack.find((t) => t.id === game.state.selectedRackTileId) ?? null : null}
               onCellTap={(cell) => {
                 // Visualize tap-to-place: ghost tile flies from rack to cell.
                 // Cures the "two-tap feels indirect" pain by showing motion.
                 const selId = game.state.selectedRackTileId;
-                const sel = selId ? game.state.player.rack.find((t) => t.id === selId) : null;
+                const sel = selId ? game.activePlayer.rack.find((t) => t.id === selId) : null;
                 if (sel) {
                   const fromEl = document.querySelector(`[data-rack-tile-id="${selId}"]`);
                   const toEl = document.querySelector(`[data-board-cell="${cell.row},${cell.col}"]`);
@@ -713,7 +743,7 @@ export default function WordCraftPageClient() {
               onCellDrop={() => {}}
               onRecallPending={recallFromBoard}
               onSceneCtx={setSceneCtx}
-              isDisabled={game.state.turn !== 'player'}
+              isDisabled={!canInteract}
               isFirstMove={isFirstMove}
               dragHoverCell={drag?.active ? drag.hoverCell : null}
               locale={locale}
@@ -759,7 +789,7 @@ export default function WordCraftPageClient() {
         ) : null}
 
         <WordCraftRack
-          tiles={game.state.player.rack}
+          tiles={activeRack}
           selectedId={game.state.selectedRackTileId}
           pendingIds={pendingIds}
           onSelect={game.selectRackTile}
@@ -768,22 +798,22 @@ export default function WordCraftPageClient() {
           onFastTap={handleFastTap}
           axisLocked={game.state.pendingPlacements.length >= 1}
           draggingTileId={drag?.active ? drag.tileId : null}
-          disabled={game.state.turn !== 'player' || !dict || game.state.burnout}
+          disabled={!canInteract || !dict || game.state.burnout}
           ariaLabel={t('wordcraft.yourRack')}
           hintPick={wantsPick && isFirstMove}
           locale={locale}
         />
 
         <WordCraftControls
-          canSubmit={game.state.pendingPlacements.length > 0 && !!dict && game.state.turn === 'player' && !game.state.burnout}
+          canSubmit={game.state.pendingPlacements.length > 0 && !!dict && canInteract && !game.state.burnout}
           canRecall={game.state.pendingPlacements.length > 0}
-          canSwap={game.state.player.rack.length > 0 && game.state.turn === 'player' && !game.state.burnout}
-          disabled={game.state.turn !== 'player' || !dict || game.state.burnout}
+          canSwap={activeRack.length > 0 && canInteract && !game.state.burnout}
+          disabled={!canInteract || !dict || game.state.burnout}
           onSubmit={submitMoveWithTelemetry}
           onRecall={recallAllPending}
           onPass={game.pass}
           onSwap={() => {
-            const toReturn = game.state.player.rack.filter((tile) => !pendingIds.has(tile.id));
+            const toReturn = activeRack.filter((tile) => !pendingIds.has(tile.id));
             game.swap(toReturn);
           }}
           labels={{
@@ -795,6 +825,20 @@ export default function WordCraftPageClient() {
         />
 
       </main>
+
+      {/* Pass-and-play hand-off curtain — hides the outgoing seat's rack from
+          the incoming human until they tap to start their turn. */}
+      {hotseat && showHandoff ? (
+        <WordCraftHandoff
+          incomingName={game.state.turn === 'bot' ? t('wordcraft.player2') : t('wordcraft.player1')}
+          onReady={() => setShowHandoff(false)}
+          labels={{
+            passTo: t('wordcraft.handoff.passTo'),
+            tapReady: t('wordcraft.handoff.tapReady'),
+            start: t('wordcraft.handoff.start'),
+          }}
+        />
+      ) : null}
 
       {/* Drag ghost — follows pointer over the whole viewport */}
       <WordCraftDragGhost drag={drag} locale={locale} />
