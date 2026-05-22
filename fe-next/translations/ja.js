@@ -8,6 +8,7 @@ const ja = {
     "biome": { "city": "地上", "sky": "空", "stratosphere": "成層圏", "orbit": "軌道", "nebula": "星雲", "galaxy": "銀河" },
     "hud": { "floors": "{n} 階", "combo": "{n} 連鎖", "scramble": "シャッフル", "backspace": "削除", "build": "建てる", "restart": "やり直す", "best": "ベスト {m} m", "possible": "{n} 単語", "clue": "ヒント", "collapse": "閉じる", "expand": "開く", "rivalPassed": "{name} を抜いた！", "stuck": "詰まった？新しい文字" },
     "milestone": { "m50": "木のてっぺん超え！🌳", "m150": "雲の中へ ☁️", "m400": "鳥もうらやむ 🐦", "m900": "宇宙までもうすぐ 🚀", "m1800": "ほぼ宇宙飛行士 ✨" },
+    "ach": { "unlocked": "実績解除！", "firstFloor": "最初の階", "tenFloors": "高層ビル", "skyHigh": "空高く", "wordsmith": "言葉の達人", "comboKing": "コンボ王", "rivalCrusher": "ライバル撃破", "unstoppable": "止まらない", "toTheMoon": "月まで" },
     "error": { "too_short": "短すぎます — 3文字以上", "bad_chain": "光る文字で始めてください", "not_buildable": "トレイの文字を使ってください", "duplicate": "その単語は使用済みです", "not_in_dictionary": "辞書にありません" },
     "celebration": { "highRise": "ハイライズ！", "tall": "そびえ立つ！", "skyscraper": "摩天楼！" },
     "leaderboard": { "title": "トップタワー", "error": "ランキングを読み込めません", "empty": "まだ塔がありません — 最初の一人に！" },
@@ -689,6 +690,8 @@ const ja = {
   "connection": {
     "reconnecting": "戻しています...",
     "disconnected": "一瞬切れちゃった！",
+    "serverUpdating": "アップデート中だよ！",
+    "serverUpdatingHint": "すぐ戻るよ — スコアは安全。",
     "attempt": "試行",
     "checkConnection": "オフラインみたい！",
     "retry": "再接続",

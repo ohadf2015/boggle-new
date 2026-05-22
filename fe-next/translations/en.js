@@ -8,6 +8,7 @@ const en = {
     "biome": { "city": "Ground", "sky": "Sky", "stratosphere": "Stratosphere", "orbit": "Orbit", "nebula": "Nebula", "galaxy": "Galaxy" },
     "hud": { "floors": "{n} floors", "combo": "{n} chain", "scramble": "Scramble", "backspace": "Delete", "build": "Build", "restart": "Restart", "best": "Best {m} m", "possible": "{n} words", "clue": "Clue", "collapse": "Collapse", "expand": "Expand", "rivalPassed": "Passed {name}!", "stuck": "Stuck? New letter" },
     "milestone": { "m50": "Above the treetops! 🌳", "m150": "Cloud territory ☁️", "m400": "The birds are jealous 🐦", "m900": "Knock knock, space? 🚀", "m1800": "Basically an astronaut now ✨" },
+    "ach": { "unlocked": "Achievement!", "firstFloor": "First Floor", "tenFloors": "Tower Block", "skyHigh": "Sky High", "wordsmith": "Wordsmith", "comboKing": "Combo King", "rivalCrusher": "Rival Crusher", "unstoppable": "Unstoppable", "toTheMoon": "To the Moon" },
     "error": { "too_short": "Too short — 3+ letters", "bad_chain": "Start with the glowing letter", "not_buildable": "Use the tray letters", "duplicate": "Already used that word", "not_in_dictionary": "Not in the dictionary" },
     "celebration": { "highRise": "High Rise!", "tall": "Towering!", "skyscraper": "SKYSCRAPER!" },
     "leaderboard": { "title": "Top Towers", "error": "Couldn't load leaderboard", "empty": "No towers yet — be the first!" },
@@ -694,6 +695,8 @@ const en = {
   "connection": {
     "reconnecting": "Getting you back in...",
     "disconnected": "Lost ya for a sec!",
+    "serverUpdating": "Fresh update incoming!",
+    "serverUpdatingHint": "Back in a sec — your game's safe.",
     "attempt": "Attempt",
     "checkConnection": "Hmm, you went offline!",
     "retry": "Try again",

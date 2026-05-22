@@ -8,6 +8,7 @@ const sv = {
     "biome": { "city": "Mark", "sky": "Himmel", "stratosphere": "Stratosfär", "orbit": "Omloppsbana", "nebula": "Nebulosa", "galaxy": "Galax" },
     "hud": { "floors": "{n} våningar", "combo": "{n} kedja", "scramble": "Blanda", "backspace": "Radera", "build": "Bygg", "restart": "Börja om", "best": "Bästa {m} m", "possible": "{n} ord", "clue": "Ledtråd", "collapse": "Fäll ihop", "expand": "Expandera", "rivalPassed": "Förbi {name}!", "stuck": "Fast? Ny bokstav" },
     "milestone": { "m50": "Över trädtopparna! 🌳", "m150": "Molnland ☁️", "m400": "Fåglarna är avundsjuka 🐦", "m900": "Knack knack, rymden? 🚀", "m1800": "Nästan astronaut nu ✨" },
+    "ach": { "unlocked": "Bedrift!", "firstFloor": "Första våningen", "tenFloors": "Höghus", "skyHigh": "Skyhögt", "wordsmith": "Ordkonstnär", "comboKing": "Combo-kung", "rivalCrusher": "Rivalkrossare", "unstoppable": "Ostoppbar", "toTheMoon": "Till månen" },
     "error": { "too_short": "För kort — minst 3 bokstäver", "bad_chain": "Börja på den lysande bokstaven", "not_buildable": "Använd brickornas bokstäver", "duplicate": "Ordet är redan använt", "not_in_dictionary": "Inte i ordlistan" },
     "celebration": { "highRise": "Höghus!", "tall": "Skyhögt!", "skyscraper": "SKYSKRAPA!" },
     "leaderboard": { "title": "Topptorn", "error": "Kunde inte ladda topplistan", "empty": "Inga torn än — bli först!" },
@@ -695,6 +696,8 @@ const sv = {
   "connection": {
     "reconnecting": "Vi fixar det...",
     "disconnected": "Tappade dig en sekund!",
+    "serverUpdating": "Färsk uppdatering på väg!",
+    "serverUpdatingHint": "Strax tillbaka — ditt spel är tryggt.",
     "attempt": "Försök",
     "checkConnection": "Hmm, du tappade nätet!",
     "retry": "Försök igen",

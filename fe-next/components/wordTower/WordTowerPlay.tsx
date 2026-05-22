@@ -19,6 +19,7 @@ import { countBuildableWords, pickClueWord } from '@/lib/wordTower/wordHints';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
 import { WordTowerRivalRail } from './WordTowerRivalRail';
 import { milestoneCrossed } from '@/lib/wordTower/milestones';
+import { newlyUnlocked, type Achievement } from '@/lib/wordTower/achievements';
 import { WordTowerScene } from './WordTowerScene';
 import { WordTowerHud } from './WordTowerHud';
 
@@ -77,6 +78,31 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     const id = setTimeout(() => setMilestoneText(null), 2400);
     return () => clearTimeout(id);
   }, [game.heightM]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Achievements — unlock once (persisted in localStorage), pop a trophy toast.
+  const achUnlocked = useRef<Set<string>>(new Set());
+  const achLoaded = useRef(false);
+  if (!achLoaded.current) {
+    achLoaded.current = true;
+    try { achUnlocked.current = new Set(JSON.parse(typeof localStorage !== 'undefined' ? localStorage.getItem('wt-achievements') || '[]' : '[]')); } catch { /* */ }
+  }
+  const [achToast, setAchToast] = useState<Achievement | null>(null);
+  useEffect(() => {
+    const stats = {
+      heightM: game.heightM,
+      floors: game.floors.length,
+      longestWord: (game.longestWord || '').length,
+      longestCombo: game.longestCombo,
+      passedRival: rivals.some((r) => game.heightM > r.heightM),
+    };
+    const fresh = newlyUnlocked(stats, achUnlocked.current);
+    if (fresh.length === 0) return;
+    fresh.forEach((ach) => achUnlocked.current.add(ach.id));
+    try { localStorage.setItem('wt-achievements', JSON.stringify([...achUnlocked.current])); } catch { /* */ }
+    setAchToast(fresh[fresh.length - 1]); // show the most impressive of the batch
+    const id = setTimeout(() => setAchToast(null), 2800);
+    return () => clearTimeout(id);
+  }, [game.heightM, game.floors.length, game.longestWord, game.longestCombo, rivals]);  
 
   const haptics = useHaptics();
   const { playCoinCollectSound, playChestOpenSound, playErrorSound } = useSoundEffects();
@@ -216,6 +242,17 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         </div>
       )}
 
+      {/* Achievement unlock toast */}
+      {achToast && (
+        <div
+          className="pointer-events-none absolute left-1/2 top-[23%] z-30 -translate-x-1/2 animate-neo-pop rounded-neo border-neo-thick border-black bg-neo-yellow px-3 py-2 text-center shadow-hard"
+          aria-live="polite"
+        >
+          <div className="font-neo-body text-[10px] font-bold uppercase tracking-wider text-black/60">{t('wordTower.ach.unlocked')}</div>
+          <div className="font-neo-display text-sm font-black text-black">{achToast.icon} {t(achToast.nameKey)}</div>
+        </div>
+      )}
+
       <div className="pointer-events-auto absolute inset-x-0 top-0 z-10 flex items-center justify-between p-3">
         <Link
           href={`/${language}`}
@@ -252,7 +289,9 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         </div>
       </div>
 
-      <div className="absolute inset-0 z-10">
+      {/* pointer-events-none so this full-screen layer doesn't shield the header
+          buttons or the pan catcher — the deck inside re-enables events on itself. */}
+      <div className="pointer-events-none absolute inset-0 z-10">
         <WordTowerHud
           anchorLetter={game.anchorLetter}
           tray={game.tray}
