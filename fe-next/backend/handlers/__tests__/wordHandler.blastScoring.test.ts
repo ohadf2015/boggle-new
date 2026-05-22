@@ -230,4 +230,89 @@ describe('wordHandler - Blast tile bonus in stored word details', () => {
     expect(scoreCall[2]).toBe(15); // score = wordScore + tileBonus
     expect(scoreCall[3]).toBe(true); // isDelta
   });
+
+  it('emits wordAccepted.score including the tile bonus so the per-word number matches the points actually awarded', async () => {
+    // GIVEN: Blast mode, word score 5, tile bonus 10 (total delta = 15)
+    // WHEN: Player submits a word
+    await handlers['submitWord']({ word: 'test' });
+
+    // THEN: the wordAccepted emit reports the full per-word delta (15), not the
+    // bare word score (5). Otherwise the live total (server-authoritative,
+    // includes tile bonus) outruns the sum of the player's per-word chips.
+    const emitCall = (mockSocket.emit as Mock).mock.calls.find((c: unknown[]) => c[0] === 'wordAccepted');
+    expect(emitCall).toBeDefined();
+    const payload = emitCall![1] as { score: number; blast?: { tileBonus: number } };
+    expect(payload.score).toBe(15); // 5 (word) + 10 (tile bonus)
+    // Breakdown is still available for any UI that wants to itemise it.
+    expect(payload.blast?.tileBonus).toBe(10);
+  });
+});
+
+describe('wordHandler - Blast combo resets on a miss (HUD/scoring parity)', () => {
+  let mockSocket: ReturnType<typeof createMockSocket>['socket'];
+  let handlers: ReturnType<typeof createMockSocket>['handlers'];
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    const mock = createMockSocket();
+    mockSocket = mock.socket;
+    handlers = mock.handlers;
+    registerWordHandlers(mockIo, mockSocket as any);
+
+    (getGameBySocketId as Mock).mockReturnValue('BLAST1');
+    (getUsernameBySocketId as Mock).mockReturnValue('testUser');
+    (getFirstFinder as Mock).mockReturnValue(null);
+    (isValidWordCached as Mock).mockResolvedValue(true);
+    (isDictionaryWord as Mock).mockReturnValue(true);
+    (isWordCommunityValid as Mock).mockReturnValue(false);
+    (isWordValidForScoring as Mock).mockReturnValue(false);
+  });
+
+  // The server combo (playerCombos) is what scoring uses; the client HUD resets
+  // its combo on every miss. Before this fix the server combo only climbed
+  // (reset per round, never on a miss), so the badge the player saw and the
+  // combo the server scored with diverged. Server must break the streak too.
+
+  it('resets the player combo to 0 when a Blast word is not on the board', async () => {
+    const game = makeBlastGame({ playerCombos: { testUser: 4 } });
+    (getGame as Mock).mockReturnValue(game);
+    (isWordOnBoardAsync as Mock).mockResolvedValue(false);
+
+    await handlers['submitWord']({ word: 'test' });
+
+    expect((game.playerCombos as Record<string, number>).testUser).toBe(0);
+  });
+
+  it('resets the player combo to 0 when a Blast word is rejected as not in the dictionary', async () => {
+    const game = makeBlastGame({ playerCombos: { testUser: 4 } });
+    (getGame as Mock).mockReturnValue(game);
+    (isWordOnBoardAsync as Mock).mockResolvedValue(true);
+    (isValidWordCached as Mock).mockResolvedValue(false); // not a real word
+
+    await handlers['submitWord']({ word: 'test' });
+
+    expect((game.playerCombos as Record<string, number>).testUser).toBe(0);
+  });
+
+  it('does NOT reset combo on a partial-credit confirmation find (it still counts as a chain)', async () => {
+    const game = makeBlastGame({ playerCombos: { testUser: 4 } });
+    (getGame as Mock).mockReturnValue(game);
+    (isWordOnBoardAsync as Mock).mockResolvedValue(true);
+    (getFirstFinder as Mock).mockReturnValue({ username: 'other', avatar: null });
+
+    await handlers['submitWord']({ word: 'test' });
+
+    // Existing behaviour: confirmation finds keep the streak alive (+1).
+    expect((game.playerCombos as Record<string, number>).testUser).toBe(5);
+  });
+
+  it('leaves combo intact on a miss in non-Blast mode (scope guard)', async () => {
+    const game = makeBlastGame({ gameMode: 'classic', playerCombos: { testUser: 4 } });
+    (getGame as Mock).mockReturnValue(game);
+    (isWordOnBoardAsync as Mock).mockResolvedValue(false);
+
+    await handlers['submitWord']({ word: 'test' });
+
+    expect((game.playerCombos as Record<string, number>).testUser).toBe(4);
+  });
 });

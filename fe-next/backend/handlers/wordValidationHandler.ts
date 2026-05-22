@@ -272,7 +272,10 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
 
   socket.emit('wordAccepted', {
     word: normalizedWord,
-    score: wordScore,
+    // Full per-word delta the player earned, so their live total (which the
+    // server credits with the tile bonus too) reconciles with the sum of their
+    // per-word chips. blastTileBonus is 0 outside Blast mode.
+    score: wordScore + blastTileBonus,
     baseScore: baseScore,
     comboBonus: comboBonus,
     comboLevel: safeComboLevel,

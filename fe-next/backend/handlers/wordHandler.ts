@@ -246,6 +246,17 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         }
       };
 
+      // Blast scoring reads the server-side combo (game.playerCombos), while the
+      // client combo HUD resets on every miss. Keep them in parity by breaking
+      // the streak server-side on the same misses the client resets on — so the
+      // "xN" badge the player sees matches the combo the server actually scores
+      // with. Blast-scoped: classic combo semantics are intentionally unchanged.
+      const breakBlastComboOnMiss = (): void => {
+        if (game.gameMode !== 'blast') return;
+        if (!game.playerCombos) game.playerCombos = {};
+        game.playerCombos[username] = 0;
+      };
+
       markUserActivity(gameCode, username);
 
       const normalizedWord = word.toLowerCase().trim().substring(0, 50);
@@ -256,6 +267,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
           word: normalizedWord,
           reason: 'inappropriate'
         });
+        breakBlastComboOnMiss();
         handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.PROFANITY, game);
         await releaseGraceLockIfNeeded();
         return;
@@ -268,6 +280,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
           word: normalizedWord,
           minLength: minLength
         });
+        breakBlastComboOnMiss();
         handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.TOO_SHORT, game);
         await releaseGraceLockIfNeeded();
         return;
@@ -277,6 +290,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       const shape = isWordShapeWeird(normalizedWord, (game.language || 'en') as Language);
       if (shape.weird) {
         socket.emit('wordRejected', { word: normalizedWord, reason: 'invalid_shape', detail: shape.reason });
+        breakBlastComboOnMiss();
         handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.INVALID_SHAPE, game);
         await releaseGraceLockIfNeeded();
         return;
@@ -291,6 +305,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
           playerWords: game.playerWords?.[username]?.slice(0, 10),
         });
         socket.emit('wordAlreadyFound', { word: normalizedWord });
+        breakBlastComboOnMiss();
         // Note: Not counted as spam - could be UX issue where user didn't see feedback
         await releaseGraceLockIfNeeded();
         return;
@@ -307,6 +322,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         inc('wordNotOnBoard');
         incPerGame(gameCode, 'wordNotOnBoard');
         socket.emit('wordNotOnBoard', { word: normalizedWord });
+        breakBlastComboOnMiss();
         handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.NOT_ON_BOARD, game);
         await releaseGraceLockIfNeeded();
         return;
@@ -369,6 +385,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
           word: normalizedWord,
           reason: 'not_in_dictionary'
         });
+        breakBlastComboOnMiss();
         handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.REJECTED, game);
       }
 
