@@ -4,11 +4,16 @@ interface Props {
   t: (k: string) => string;
   playerScore: number;
   botScore: number;
+  /** Seat names — override the default You/WordBot (e.g. hot-seat Player 1/2). */
+  playerName?: string;
+  botName?: string;
 }
 
-export function WordCraftGameOverScene({ t, playerScore, botScore }: Props) {
+export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName }: Props) {
   const isTie = playerScore === botScore;
-  const winnerName = playerScore > botScore ? t('wordcraft.you') : t('wordcraft.bot');
+  const winnerName = playerScore > botScore
+    ? (playerName ?? t('wordcraft.you'))
+    : (botName ?? t('wordcraft.bot'));
   const label = isTie
     ? t('wordcraft.tied')
     : t('wordcraft.winnerLabel').replace('{{name}}', winnerName);

@@ -875,6 +875,8 @@ export default function WordCraftPageClient() {
           t={t}
           playerScore={game.state.player.score}
           botScore={game.state.bot.score}
+          playerName={hotseat ? t('wordcraft.player1') : undefined}
+          botName={hotseat ? t('wordcraft.player2') : undefined}
         />
       ) : null}
     </div>
