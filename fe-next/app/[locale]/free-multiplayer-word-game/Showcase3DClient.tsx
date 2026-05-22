@@ -82,7 +82,7 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
     { side: 'left', accent: 'bg-neo-purple', tag: t('showcase3d.mode3Tag', '5 languages'), title: t('showcase3d.mode3', 'Play in your language'), body: t('showcase3d.mode3Body', 'Hebrew, English, Swedish, Japanese, Spanish — your words, your turf.'), video: '/videos/reddit-multilingual-showcase.mp4', poster: '/showcase3d/poster-reddit-multilingual-showcase.jpg' },
   ];
 
-  // pinned multi-chapter scroll-scrub (proven scroll-showcase machinery)
+  // pinned multi-chapter scroll-scrub: canvas frame-sequence driven by ScrollTrigger scrub
   useGSAP(
     () => {
       const canvas = canvasRef.current;

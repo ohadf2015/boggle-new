@@ -1,31 +1,6 @@
 // EN translations
 const en = {
   "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss"},
-  "scrollShowcase": {
-    "badge": "Scroll to play",
-    "heroTitle": "Words, but make it a party",
-    "heroSubtitle": "Race friends across electric word battles. Stack letters. Steal the win.",
-    "heroCta": "Play free now",
-    "scrollHint": "Keep scrolling",
-    "parallaxKicker": "Five languages. One champion.",
-    "parallaxTitle": "Every round is a fresh brawl",
-    "parallaxBody": "Boards spin up in seconds, tiles light up as you chain them, and the loudest scoreboard wins.",
-    "cardsTitle": "Pick your mode, pick your fight",
-    "cardSolo": "Solo runs",
-    "cardSoloDesc": "Beat your own best, no pressure.",
-    "cardVersus": "1v3 versus",
-    "cardVersusDesc": "Four players, one trophy.",
-    "cardDaily": "Daily challenge",
-    "cardDailyDesc": "Same board for everyone, every day.",
-    "ch2Kicker": "Win, brag, repeat",
-    "ch2TitleA": "Chain letters, watch them ignite",
-    "ch2BodyA": "Every valid word lights the board and pumps your combo meter.",
-    "ch2TitleB": "Last cube standing takes the crown",
-    "ch2BodyB": "Outscore three rivals in real time. Confetti optional, bragging mandatory.",
-    "finalTitle": "Your move, champ",
-    "finalBody": "Jump into a live room — no download, no signup wall.",
-    "finalCta": "Start playing"
-  },
   "wordTower": {
     "cardTitle": "Word Tower",
     "cardDesc": "Stack words sky-high — admin preview",
