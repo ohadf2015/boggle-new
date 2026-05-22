@@ -52,20 +52,32 @@ export function WordTowerRivalRail({ rivals, viewerHeightM, reducedMotion, t }: 
 
   return (
     <div ref={ref} className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      {markers.map((m) => (
-        <div
-          key={m.id}
-          className="absolute inset-x-0"
-          style={{ top: m.screenY, transition: reducedMotion ? 'none' : LINE_FLOW }}
-        >
-          <div className="mx-3 flex items-center gap-2">
-            <span className="whitespace-nowrap rounded-neo border-neo border-black bg-neo-navy/70 px-1.5 py-0.5 font-neo-body text-[10px] font-bold text-neo-white backdrop-blur-sm">
+      {markers.map((m, i) => {
+        // Alternate edges so multiple rivals don't overlap; a faint block-striped
+        // column rises to the record line — "their tower reaches this high".
+        const side = i % 2 === 0 ? 'start-1' : 'end-1';
+        const colH = Math.min(h, Math.max(90, h - m.screenY));
+        return (
+          <div
+            key={m.id}
+            className={`absolute ${side}`}
+            style={{ top: m.screenY, transition: reducedMotion ? 'none' : LINE_FLOW }}
+          >
+            <span className="absolute -top-5 start-0 whitespace-nowrap rounded-neo border-neo border-black bg-neo-navy/70 px-1.5 py-0.5 font-neo-body text-[10px] font-bold text-neo-white backdrop-blur-sm">
               {m.name} · {Math.round(m.heightM)}m
             </span>
-            <span className="h-0 flex-1 border-t border-dashed border-neo-white/30" />
+            <div
+              className="w-5 rounded-t-neo border-x border-t border-neo-white/25"
+              style={{
+                height: colH,
+                opacity: 0.22,
+                backgroundColor: 'rgba(255,255,255,0.10)',
+                backgroundImage: 'repeating-linear-gradient(0deg, rgba(255,255,255,0.18) 0 2px, transparent 2px 12px)',
+              }}
+            />
           </div>
-        </div>
-      ))}
+        );
+      })}
       {passed && (
         <div className="absolute left-1/2 top-[42%] -translate-x-1/2 animate-neo-pop rounded-neo border-neo-thick border-black bg-neo-yellow px-3 py-1.5 font-neo-display text-sm font-black text-black shadow-hard">
           {t('wordTower.hud.rivalPassed', { name: passed })}
