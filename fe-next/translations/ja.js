@@ -6,7 +6,7 @@ const ja = {
     "cardDesc": "言葉を積んで空へ — 管理者プレビュー",
     "loading": "辞書を読み込み中…",
     "biome": { "city": "地上", "sky": "空", "stratosphere": "成層圏", "orbit": "軌道", "nebula": "星雲", "galaxy": "銀河" },
-    "hud": { "floors": "{n} 階", "combo": "{n} 連鎖", "scramble": "シャッフル", "backspace": "削除", "build": "建てる", "restart": "やり直す", "best": "ベスト {m} m" },
+    "hud": { "floors": "{n} 階", "combo": "{n} 連鎖", "scramble": "シャッフル", "backspace": "削除", "build": "建てる", "restart": "やり直す", "best": "ベスト {m} m", "possible": "{n} 単語" },
     "error": { "too_short": "短すぎます — 3文字以上", "bad_chain": "光る文字で始めてください", "not_buildable": "トレイの文字を使ってください", "duplicate": "その単語は使用済みです", "not_in_dictionary": "辞書にありません" },
     "celebration": { "highRise": "ハイライズ！", "tall": "そびえ立つ！", "skyscraper": "摩天楼！" },
     "leaderboard": { "title": "トップタワー", "error": "ランキングを読み込めません", "empty": "まだ塔がありません — 最初の一人に！" },

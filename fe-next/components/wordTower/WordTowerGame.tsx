@@ -91,6 +91,7 @@ export function WordTowerGame() {
         key={playKey}
         language={language}
         isInDictionary={isInDictionary}
+        dictionary={dictRef.current}
         initialGame={progress!.initialGame}
         personalBestM={progress!.personalBestM}
         onOpenLeaderboard={openLeaderboard}

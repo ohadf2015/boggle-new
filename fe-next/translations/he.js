@@ -6,7 +6,7 @@ const he = {
     "cardDesc": "בנו מגדל מילים עד השמיים — תצוגת אדמין",
     "loading": "טוען מילון…",
     "biome": { "city": "קרקע", "sky": "שמיים", "stratosphere": "סטרטוספירה", "orbit": "מסלול", "nebula": "ערפילית", "galaxy": "גלקסיה" },
-    "hud": { "floors": "{n} קומות", "combo": "שרשרת {n}", "scramble": "ערבוב", "backspace": "מחיקה", "build": "בנייה", "restart": "מחדש", "best": "שיא {m} מ'" },
+    "hud": { "floors": "{n} קומות", "combo": "שרשרת {n}", "scramble": "ערבוב", "backspace": "מחיקה", "build": "בנייה", "restart": "מחדש", "best": "שיא {m} מ'", "possible": "{n} מילים" },
     "error": { "too_short": "קצר מדי — 3 אותיות לפחות", "bad_chain": "התחילו באות הזוהרת", "not_buildable": "השתמשו באותיות המגש", "duplicate": "כבר השתמשת במילה הזו", "not_in_dictionary": "לא במילון" },
     "celebration": { "highRise": "מתנשא!", "tall": "גבוה!", "skyscraper": "גורד שחקים!" },
     "leaderboard": { "title": "המגדלים המובילים", "error": "טעינת הלוח נכשלה", "empty": "אין עדיין מגדלים — היו הראשונים!" },

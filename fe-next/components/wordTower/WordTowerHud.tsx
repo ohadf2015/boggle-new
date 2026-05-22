@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef } from 'react';
-import { Delete, Shuffle, ArrowUp } from 'lucide-react';
+import { Delete, Shuffle, ArrowUp, Lightbulb } from 'lucide-react';
 import { comboMult, type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
 
@@ -15,6 +15,8 @@ export interface WordTowerHudProps {
   combo: number;
   scramblesLeft: number;
   floorsCount: number;
+  /** How many dictionary words are buildable from the current anchor + tray. */
+  possibleWords?: number | null;
   biomeId: WordTowerBiomeId;
   lastError: ValidationError | null;
   errorKey: number;
@@ -41,7 +43,7 @@ const TIER_KEY: Record<NonNullable<ApplyResult['tier']>, string> = {
 export function WordTowerHud(props: WordTowerHudProps) {
   const {
     anchorLetter, tray, selected, word, heightM, personalBestM, combo, scramblesLeft, floorsCount,
-    biomeId, lastError, errorKey, lastResult, resultKey,
+    possibleWords, biomeId, lastError, errorKey, lastResult, resultKey,
     onSelectTile, onBackspace, onClear, onSubmit, onScramble, onDeckHeight, t,
   } = props;
 
@@ -130,6 +132,16 @@ export function WordTowerHud(props: WordTowerHudProps) {
           <p key={`err-${errorKey}`} className="text-center font-neo-body text-sm font-bold text-neo-red">
             {t(`wordTower.error.${lastError}`)}
           </p>
+        )}
+
+        {/* "N words possible" hint — clarity on how many words exist now. */}
+        {possibleWords != null && (
+          <div className="flex justify-center">
+            <span className="inline-flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light/80 px-2 py-0.5 font-neo-body text-[11px] font-bold text-neo-cyan">
+              <Lightbulb className="h-3 w-3" />
+              {t('wordTower.hud.possible', { n: possibleWords })}
+            </span>
+          </div>
         )}
 
         {/* Tray */}

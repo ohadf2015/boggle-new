@@ -14,12 +14,16 @@ import {
   serializeWordTowerState,
   type WordTowerPlayerState,
 } from '@/lib/wordTower/wordTowerManager';
+import { WORD_TOWER_MIN_WORD_LEN } from '@/shared/constants/wordTowerConstants';
+import { countBuildableWords } from '@/lib/wordTower/wordHints';
 import { WordTowerScene } from './WordTowerScene';
 import { WordTowerHud } from './WordTowerHud';
 
 interface PlayProps {
   language: Language;
   isInDictionary: (canonWord: string) => boolean;
+  /** Client dictionary (canonical words) — drives the "N words possible" hint. */
+  dictionary: Set<string> | null;
   initialGame: WordTowerPlayerState;
   personalBestM: number;
   onOpenLeaderboard: () => void;
@@ -33,13 +37,20 @@ function usePrefersReducedMotion(): boolean {
   return ref.current;
 }
 
-export function WordTowerPlay({ language, isInDictionary, initialGame, personalBestM, onOpenLeaderboard }: PlayProps) {
+export function WordTowerPlay({ language, isInDictionary, dictionary, initialGame, personalBestM, onOpenLeaderboard }: PlayProps) {
   const { t, dir } = useLanguage();
   const reducedMotion = usePrefersReducedMotion();
   const tower = useWordTower({ language, sessionId: 'solo', isInDictionary, initialGame });
   const { game } = tower.state;
   const biomeId = useMemo(() => biomeForHeight(game.heightM), [game.heightM]);
   const personalBest = Math.max(personalBestM, game.heightM);
+
+  // "N words possible" hint — how many dictionary words the player could build
+  // from the current anchor + tray (recomputed only when those change).
+  const possibleWords = useMemo(
+    () => (dictionary ? countBuildableWords(dictionary, game.anchorLetter, game.tray, WORD_TOWER_MIN_WORD_LEN) : null),
+    [dictionary, game.anchorLetter, game.tray],
+  );
 
   const haptics = useHaptics();
   const { playCoinCollectSound, playChestOpenSound, playErrorSound } = useSoundEffects();
@@ -213,6 +224,7 @@ export function WordTowerPlay({ language, isInDictionary, initialGame, personalB
           combo={game.combo}
           scramblesLeft={game.scramblesLeft}
           floorsCount={game.floors.length}
+          possibleWords={possibleWords}
           biomeId={biomeId}
           lastError={tower.state.lastError}
           errorKey={tower.state.errorKey}
