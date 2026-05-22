@@ -16,6 +16,8 @@ import {
 } from '@/lib/wordTower/wordTowerManager';
 import { WORD_TOWER_MIN_WORD_LEN } from '@/shared/constants/wordTowerConstants';
 import { countBuildableWords, pickClueWord } from '@/lib/wordTower/wordHints';
+import type { RivalMarker } from '@/lib/wordTower/rivals';
+import { WordTowerRivalRail } from './WordTowerRivalRail';
 import { WordTowerScene } from './WordTowerScene';
 import { WordTowerHud } from './WordTowerHud';
 
@@ -27,6 +29,8 @@ interface PlayProps {
   initialGame: WordTowerPlayerState;
   personalBestM: number;
   onOpenLeaderboard: () => void;
+  /** Other players' records to climb past (empty = no rail). */
+  rivals?: RivalMarker[];
 }
 
 function usePrefersReducedMotion(): boolean {
@@ -37,7 +41,7 @@ function usePrefersReducedMotion(): boolean {
   return ref.current;
 }
 
-export function WordTowerPlay({ language, isInDictionary, dictionary, initialGame, personalBestM, onOpenLeaderboard }: PlayProps) {
+export function WordTowerPlay({ language, isInDictionary, dictionary, initialGame, personalBestM, onOpenLeaderboard, rivals = [] }: PlayProps) {
   const { t, dir } = useLanguage();
   const reducedMotion = usePrefersReducedMotion();
   const tower = useWordTower({ language, sessionId: 'solo', isInDictionary, initialGame });
@@ -180,6 +184,9 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         reducedMotion={reducedMotion}
         bottomInsetPx={deckHeight}
       />
+
+      {/* Rival record lines you climb past — fed by the leaderboard. */}
+      <WordTowerRivalRail rivals={rivals} viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} />
 
       <div className="pointer-events-auto absolute inset-x-0 top-0 z-10 flex items-center justify-between p-3">
         <Link

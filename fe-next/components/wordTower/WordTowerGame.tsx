@@ -9,6 +9,7 @@ import {
   type WordTowerPlayerState,
   type WordTowerSaveState,
 } from '@/lib/wordTower/wordTowerManager';
+import { useWordTowerRivals } from '@/lib/wordTower/useWordTowerRivals';
 import { WordTowerPlay } from './WordTowerPlay';
 import { WordTowerLeaderboard } from './WordTowerLeaderboard';
 
@@ -69,6 +70,7 @@ export function WordTowerGame() {
 
   const openLeaderboard = useCallback(() => setShowLeaderboard(true), []);
   const closeLeaderboard = useCallback(() => setShowLeaderboard(false), []);
+  const rivals = useWordTowerRivals();
 
   const ready = dictReady && progress !== null;
 
@@ -92,6 +94,7 @@ export function WordTowerGame() {
         language={language}
         isInDictionary={isInDictionary}
         dictionary={dictRef.current}
+        rivals={rivals}
         initialGame={progress!.initialGame}
         personalBestM={progress!.personalBestM}
         onOpenLeaderboard={openLeaderboard}
