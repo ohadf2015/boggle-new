@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import GameFeedback from '@/components/feedback/GameFeedback';
 import { markModePlayedLogic } from '@/hooks/useDailyModeQuest';
 import { m, AnimatePresence } from 'framer-motion';
 import WatchAdButton from './WatchAdButton';
@@ -460,6 +461,16 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       </div>
       <div className="flex justify-center py-2 md:hidden">
         <CrazyGamesBanner size="320x50" />
+      </div>
+      {/* End-of-game sentiment (game_feedback, surface=daily) — only on a fresh
+          completion; the shared throttle keeps it rare across all surfaces. */}
+      <div className="mt-2 mb-4 max-w-md mx-auto">
+        <GameFeedback
+          surface="daily"
+          eligible={isNewCompletion}
+          gameMode="daily"
+          throttleKey={String(result.puzzleNumber)}
+        />
       </div>
       </div>{/* end outer width wrapper */}
 

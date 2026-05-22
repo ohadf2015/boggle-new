@@ -133,12 +133,14 @@ export type GrowthEvent =
   // result was discarded, so PostHog couldn't tell dismiss from never-prompted.
   // Properties: { result: 'success' | 'dismiss' | 'already_signed_in' | 'error', errorCode? }.
   | 'cg_auth_prompt_outcome'
-  // Multiplayer between-rounds sentiment — fired by useRoundFeedback when a
-  // player taps the "how was that round?" card on the MP results screen.
-  // Properties: { rating: 'bad'|'ok'|'great', ratingValue: 1|2|3, gameMode,
-  // seriesRound?, gameCode, language }. NOT a funnel step — kept off
-  // CANONICAL_DUAL_EMIT.
-  | 'mp_round_feedback';
+  // In-game sentiment — a single `game_feedback` event fired by useGameFeedback
+  // when a player taps the "how was that?" card on an end-of-game surface
+  // (MP round, single-player, daily). Properties: { surface:
+  // 'mp_round'|'singleplayer'|'daily', rating: 'bad'|'ok'|'great', ratingValue:
+  // 1|2|3, gameMode?, language? }. NOT a funnel step — kept off
+  // CANONICAL_DUAL_EMIT. Consumed by the nightly improvement loop's feedback
+  // digest, so all surfaces stay one query.
+  | 'game_feedback';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =

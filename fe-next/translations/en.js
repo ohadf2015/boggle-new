@@ -1,6 +1,6 @@
 // EN translations
 const en = {
-  "roundFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss"},
+  "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss"},
   "scrollShowcase": {
     "badge": "Scroll to play",
     "heroTitle": "Words, but make it a party",

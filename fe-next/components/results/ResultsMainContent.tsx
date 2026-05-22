@@ -27,7 +27,7 @@ import { WinStreakBadge } from '@/components/multiplayer/WinStreakBadge';
 import { NearRankTeaser } from '@/components/multiplayer/NearRankTeaser';
 import type { RankTier } from '@/shared/utils/eloRating';
 import { ShareButton } from '@/components/results/ShareButton';
-import RoundFeedback from '@/components/feedback/RoundFeedback';
+import GameFeedback from '@/components/feedback/GameFeedback';
 
 
 // ==============================================
@@ -320,16 +320,20 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         />
       )}
 
-      {/* 3.6 BETWEEN-ROUNDS FEEDBACK — one-tap round sentiment → PostHog.
-          Self-gates on multiplayer + live room + not the series finale, and
-          shows at most once per room (see useRoundFeedback). */}
-      <RoundFeedback
-        gameCode={gameCode}
+      {/* 3.6 BETWEEN-ROUNDS FEEDBACK — one-tap round sentiment → PostHog
+          (game_feedback, surface=mp_round). Eligible only between live rounds
+          (multiplayer + room + not the series finale); the shared throttle in
+          useGameFeedback keeps it to ~once every few days across all surfaces. */}
+      <GameFeedback
+        surface="mp_round"
+        eligible={
+          isMultiplayer &&
+          !!gameCode &&
+          !(seriesRoundNumber != null && seriesRoundNumber >= (seriesTotalGames ?? 3))
+        }
         gameMode={gameMode}
         language={language}
-        isMultiplayer={isMultiplayer}
-        seriesRoundNumber={seriesRoundNumber}
-        seriesTotalGames={seriesTotalGames}
+        throttleKey={gameCode}
       />
 
       {/* 4. CONSOLATION ROW — current player only (their placement + crown).

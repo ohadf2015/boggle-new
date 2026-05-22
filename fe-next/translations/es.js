@@ -1,6 +1,6 @@
 // Es translations
 const es = {
-  "roundFeedback": {"prompt":"¿Qué te pareció la ronda?","bad":"Regular","ok":"Bien","great":"¡Me encantó!","thanks":"¡Gracias por tu opinión!","dismiss":"Cerrar"},
+  "gameFeedback": {"prompt":"¿Qué te pareció la ronda?","bad":"Regular","ok":"Bien","great":"¡Me encantó!","thanks":"¡Gracias por tu opinión!","dismiss":"Cerrar"},
   "wordTower": {
     "cardTitle": "Torre de Palabras",
     "cardDesc": "Apila palabras hasta el cielo — vista de admin",

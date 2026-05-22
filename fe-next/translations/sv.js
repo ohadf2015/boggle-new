@@ -1,6 +1,6 @@
 // Sv translations
 const sv = {
-  "roundFeedback": {"prompt":"Hur var rundan?","bad":"Sådär","ok":"Bra","great":"Älskade den!","thanks":"Tack för din feedback!","dismiss":"Stäng"},
+  "gameFeedback": {"prompt":"Hur var rundan?","bad":"Sådär","ok":"Bra","great":"Älskade den!","thanks":"Tack för din feedback!","dismiss":"Stäng"},
   "wordTower": {
     "cardTitle": "Ordtorn",
     "cardDesc": "Stapla ord mot skyn — adminförhandsvisning",

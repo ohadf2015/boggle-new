@@ -1,6 +1,6 @@
 // Ja translations
 const ja = {
-  "roundFeedback": {"prompt":"今のラウンドはどうだった？","bad":"うーん","ok":"良かった","great":"最高！","thanks":"フィードバックありがとう！","dismiss":"閉じる"},
+  "gameFeedback": {"prompt":"今のラウンドはどうだった？","bad":"うーん","ok":"良かった","great":"最高！","thanks":"フィードバックありがとう！","dismiss":"閉じる"},
   "wordTower": {
     "cardTitle": "ワードタワー",
     "cardDesc": "言葉を積んで空へ — 管理者プレビュー",

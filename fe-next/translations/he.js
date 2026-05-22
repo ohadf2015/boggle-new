@@ -1,6 +1,6 @@
 // HE translations
 const he = {
-  "roundFeedback": {"prompt":"איך היה הסיבוב?","bad":"ככה ככה","ok":"טוב","great":"אהבתי!","thanks":"תודה על המשוב!","dismiss":"סגירה"},
+  "gameFeedback": {"prompt":"איך היה הסיבוב?","bad":"ככה ככה","ok":"טוב","great":"אהבתי!","thanks":"תודה על המשוב!","dismiss":"סגירה"},
   "wordTower": {
     "cardTitle": "מגדל מילים",
     "cardDesc": "בנו מגדל מילים עד השמיים — תצוגת אדמין",

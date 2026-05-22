@@ -3,6 +3,7 @@
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
+import GameFeedback from '@/components/feedback/GameFeedback';
 import { TrendingUp, ArrowLeft } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
@@ -441,6 +442,17 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             {ctaBlock}{analysisBlock}
           </div>
         )}
+        {/* End-of-game sentiment (game_feedback, surface=singleplayer). Shared
+            throttle keeps it to ~once every few days across all surfaces. */}
+        <div className="mt-4 max-w-lg mx-auto">
+          <GameFeedback
+            surface="singleplayer"
+            eligible
+            gameMode={mode}
+            language={language}
+            throttleKey={results.gameSessionId}
+          />
+        </div>
       </div>
 
       {!isDesktop && (
