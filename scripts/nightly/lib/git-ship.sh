@@ -50,6 +50,23 @@ ship_nightly_commit() {
     fi
   done
 
+  # Founder WIP exclusion: never commit files the founder had dirty when the run
+  # STARTED — the autonomous loop must not sweep a human's concurrent work into its
+  # commit (this is how a manual `git add` or `git add -A` quietly captures WIP).
+  # run.sh records those paths at run start and passes the list via
+  # NIGHTLY_WIP_PROTECT. UNSTAGE only (no `git checkout`): the founder's changes
+  # stay on disk as uncommitted WIP, we just keep them out of the nightly commit.
+  if [ -n "${NIGHTLY_WIP_PROTECT:-}" ] && [ -s "$NIGHTLY_WIP_PROTECT" ]; then
+    local w
+    while IFS= read -r w; do
+      [ -z "$w" ] && continue
+      if git diff --cached --name-only | grep -qxF -- "$w"; then
+        git reset -q HEAD -- "$w"
+        log "excluded founder WIP $w from commit"
+      fi
+    done < "$NIGHTLY_WIP_PROTECT"
+  fi
+
   # Nothing of substance left → treat as a no-change night (no commit, no push).
   if git diff --cached --quiet; then
     log "nothing to commit after excluding generated artifacts — treating as no-change"

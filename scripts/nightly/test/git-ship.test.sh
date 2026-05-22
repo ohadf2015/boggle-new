@@ -184,6 +184,36 @@ assert "residual change reached origin"   "git show origin/master:docs/nightly/r
 assert "origin == local HEAD"             "[ \"\$(origin_head)\" = \"\$(git rev-parse HEAD)\" ]"
 assert "two distinct nightly commits"     "[ \"\$(git rev-list --count origin/master)\" -ge 3 ]"
 
+echo "Scenario 10 — founder WIP excluded from the commit (NIGHTLY_WIP_PROTECT)"
+# The autonomous nightly must never sweep a human's concurrent uncommitted work
+# into its commit. run.sh records the founder's pre-run dirty paths and passes
+# them via NIGHTLY_WIP_PROTECT; ship UNSTAGES those (keeps the working copy) so
+# they stay as uncommitted WIP and only lane changes get committed.
+setup
+printf 'FOUNDER edited base\n' > base.txt            # founder tracked WIP
+printf 'founder scratch\n'     > founder-draft.txt   # founder untracked WIP
+echo "lane work" > docs/nightly/reports/2026-01-01.md
+WIP_LIST=$(mktemp); printf 'base.txt\nfounder-draft.txt\n' > "$WIP_LIST"
+NIGHTLY_WIP_PROTECT="$WIP_LIST" ship_nightly_commit; rc=$?
+assert "returns 0"                            "[ $rc -eq 0 ]"
+assert "lane doc shipped"                     "git show origin/master:docs/nightly/reports/2026-01-01.md | grep -q 'lane work'"
+assert "founder tracked WIP NOT committed"    "git show origin/master:base.txt | grep -qx 'base'"
+assert "founder tracked WIP still dirty"      "git status --porcelain | grep -q '^ M base.txt'"
+assert "founder untracked NOT committed"      "! git ls-tree -r --name-only origin/master | grep -qx 'founder-draft.txt'"
+assert "founder untracked still present"      "[ -f founder-draft.txt ]"
+assert "founder untracked still untracked"    "git status --porcelain | grep -q '?? founder-draft.txt'"
+
+echo "Scenario 11 — WIP exclusion leaves nothing shippable → no-change, no push"
+# A run where the ONLY dirty files are the founder's WIP must NOT commit them.
+setup
+printf 'FOUNDER edited base\n' > base.txt
+WIP_LIST=$(mktemp); printf 'base.txt\n' > "$WIP_LIST"
+NIGHTLY_WIP_PROTECT="$WIP_LIST" ship_nightly_commit; rc=$?
+assert "returns 0 (no-change)"                "[ $rc -eq 0 ]"
+assert "NO_CHANGE_MODE=1"                     "[ \"$NO_CHANGE_MODE\" = 1 ]"
+assert "origin unchanged"                     "[ \"\$(origin_head)\" = \"$START_SHA\" ]"
+assert "founder WIP still dirty (kept)"       "git status --porcelain | grep -q '^ M base.txt'"
+
 echo
 echo "──────────────────────────────────────────"
 echo "PASS=$PASS  FAIL=$FAIL"

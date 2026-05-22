@@ -142,7 +142,16 @@ fi
 # LANE-introduced churn, not the founder's pre-existing WIP.
 RUN_SNAPSHOT=$(snapshot_pre_lane)
 BASELINE_DIRTY=$(git status --porcelain | wc -l | tr -d ' ')
-log "pre-lane WIP: $BASELINE_DIRTY dirty files (snapshot at $RUN_SNAPSHOT)"
+# Founder WIP paths at run start → git-ship excludes these from the nightly commit
+# so the autonomous loop never sweeps a human's concurrent work into its commit.
+# snapshot_pre_lane already computed this set; copy it to a STABLE file because the
+# snapshot dir is consumed by reverts. (Fallback recompute if the snapshot lacks it.)
+WIP_PROTECT_FILE="$(dirname "$RUN_LOG")/wip-protect-${DATE_TAG}.list"
+cp "$RUN_SNAPSHOT/.wip-protect.list" "$WIP_PROTECT_FILE" 2>/dev/null \
+  || { git diff --name-only; git diff --cached --name-only; \
+       git ls-files --others --exclude-standard; } | sort -u > "$WIP_PROTECT_FILE"
+export NIGHTLY_WIP_PROTECT="$WIP_PROTECT_FILE"
+log "pre-lane WIP: $BASELINE_DIRTY dirty files (snapshot $RUN_SNAPSHOT; protect list $WIP_PROTECT_FILE)"
 
 # --- run lanes -------------------------------------------------------------
 LANES=(01-triage 02-perf 03-engagement 04-competitor 05-landing 06-seo 07-self-learn 08-adsense)
