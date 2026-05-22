@@ -692,6 +692,9 @@ const en = {
       "name": "Gold Rush"
     }
   },
+  "easterEgg": {
+    "konami": "Whoa — secret unlocked! You're a legend. 🎉"
+  },
   "connection": {
     "reconnecting": "Getting you back in...",
     "disconnected": "Lost ya for a sec!",

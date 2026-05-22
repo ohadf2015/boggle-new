@@ -38,6 +38,7 @@ import { hasConsent } from '@/utils/cookieConsent';
 import { LogRocketIdentify } from '@/components/providers/LogRocketIdentify';
 import { PostHogProvider } from '@/components/providers/PostHogProvider';
 import GlobalCoinEarnFx from '@/components/animations/GlobalCoinEarnFx';
+import EasterEggListener from '@/components/EasterEggListener';
 
 
 import type { TranslationData } from '@/translations/loadTranslation';
@@ -200,6 +201,8 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                 {memoizedChildren}
                                                 {/* Global coin-earn VFX: sound + flying coins on every addCoins */}
                                                 <GlobalCoinEarnFx />
+                                                {/* Hidden Konami-code easter egg → fireworks + toast (cosmetic only) */}
+                                                <EasterEggListener />
                                                 {/* Season modals are gated to home route + first interaction + suspense delay
                                                     so they never interrupt gameplay or pop instantly on landing. */}
                                                 <HomeOnlySeasonGate>

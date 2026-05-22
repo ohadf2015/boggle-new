@@ -693,6 +693,9 @@ const es = {
       "name": "Fiebre del Oro"
     }
   },
+  "easterEgg": {
+    "konami": "¡Vaya — código secreto desbloqueado! Eres una leyenda. 🎉"
+  },
   "connection": {
     "reconnecting": "Te regresamos...",
     "disconnected": "¡Se cayó la conexión un momento!",

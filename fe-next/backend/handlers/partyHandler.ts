@@ -112,10 +112,14 @@ const inputSchema = z.object({
 
 // ==================== Helpers ====================
 
-function generateRoomCode(): string {
+// 6 chars to satisfy the shared GameCodeSchema (min 6) — keeps party codes
+// aligned with main multiplayer so they never diverge or fail validation.
+export const PARTY_ROOM_CODE_LENGTH = 6;
+
+export function generateRoomCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = '';
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < PARTY_ROOM_CODE_LENGTH; i++) {
     code += chars[Math.floor(Math.random() * chars.length)];
   }
   return code;

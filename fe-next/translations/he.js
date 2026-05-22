@@ -686,6 +686,9 @@ const he = {
       "name": "בהלת זהב"
     }
   },
+  "easterEgg": {
+    "konami": "וואו — סוד נחשף! אתה אגדה. 🎉"
+  },
   "connection": {
     "reconnecting": "מתחבר מחדש...",
     "disconnected": "אופס, נפלת לרגע!",

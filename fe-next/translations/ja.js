@@ -687,6 +687,9 @@ const ja = {
       "name": "ゴールドラッシュ"
     }
   },
+  "easterEgg": {
+    "konami": "おっと — 隠しコマンド発見！君は伝説だ。🎉"
+  },
   "connection": {
     "reconnecting": "戻しています...",
     "disconnected": "一瞬切れちゃった！",

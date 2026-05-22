@@ -214,6 +214,9 @@ export function SocketProvider({ children }: SocketProviderProps) {
   const reconnectAttemptRef = useRef<number>(0);
   const socketRef = useRef<Socket | null>(null);
   const bgTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Pending jittered reconnect scheduled by a serverShutdown (deploy) — tracked
+  // so we can cancel it on unmount and never fire connect() on a released socket.
+  const shutdownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Manual reconnect function
   const manualReconnect = useCallback(() => {
@@ -325,7 +328,9 @@ export function SocketProvider({ children }: SocketProviderProps) {
       // freshly-booted single instance isn't hit by every client at once.
       const delay = computeReconnectDelay(reconnectIn, reconnectJitterMs);
       logger.log(`[SOCKET.IO] Reconnecting in ${delay}ms (jittered) after server restart`);
-      setTimeout(() => {
+      if (shutdownTimerRef.current) clearTimeout(shutdownTimerRef.current);
+      shutdownTimerRef.current = setTimeout(() => {
+        shutdownTimerRef.current = null;
         socketInstance.connect();
       }, delay);
     };
@@ -440,6 +445,12 @@ export function SocketProvider({ children }: SocketProviderProps) {
           clearTimeout(bgTimerRef.current);
           bgTimerRef.current = null;
         }
+      }
+      // Cancel any pending deploy-reconnect so it can't fire connect() on a
+      // socket we're about to release.
+      if (shutdownTimerRef.current) {
+        clearTimeout(shutdownTimerRef.current);
+        shutdownTimerRef.current = null;
       }
       window.removeEventListener('online', handleOnline);
       releaseSharedSocket();

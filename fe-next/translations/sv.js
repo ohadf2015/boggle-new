@@ -693,6 +693,9 @@ const sv = {
       "name": "Guldrusch"
     }
   },
+  "easterEgg": {
+    "konami": "Oj — hemlig kod upplåst! Du är en legend. 🎉"
+  },
   "connection": {
     "reconnecting": "Vi fixar det...",
     "disconnected": "Tappade dig en sekund!",
