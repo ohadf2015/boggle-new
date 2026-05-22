@@ -70,6 +70,10 @@ export const WORD_TOWER_PROPS: ParallaxProp[] = [
   { id: 'pizza',      src: '/images/word-tower/wt-pizza.png',      atM: 700,  topPct: 22, xPct: 70, width: 100, depth: 1.05, rangeM: 70 },
   { id: 'cow',        src: '/images/word-tower/wt-cow.png',        atM: 1130, topPct: 26, xPct: 28, width: 112, depth: 0.9,  rangeM: 110 },
   { id: 'toaster',    src: '/images/word-tower/wt-toaster.png',    atM: 1700, topPct: 24, xPct: 66, width: 104, depth: 1.0,  rangeM: 150 },
+  // Cool sci-fi surprises up high.
+  { id: 'portal',     src: '/images/word-tower/wt-portal.png',     atM: 950,  topPct: 28, xPct: 24, width: 110, depth: 0.8,  rangeM: 90 },
+  { id: 'alien',      src: '/images/word-tower/wt-alien.png',      atM: 1450, topPct: 22, xPct: 70, width: 100, depth: 0.95, rangeM: 130 },
+  { id: 'spaceship',  src: '/images/word-tower/wt-spaceship.png',  atM: 2100, topPct: 26, xPct: 30, width: 120, depth: 0.9,  rangeM: 180 },
 ];
 
 /**
