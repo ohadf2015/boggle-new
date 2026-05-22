@@ -38,6 +38,7 @@ interface LiveCell {
   char: string | null;
   color: number;
   pending: boolean;
+  shared: boolean;
 }
 
 /**
@@ -75,10 +76,11 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
     if (!c) return;
 
     const { width: W, height: H } = engine;
-    const size = clamp(H * 0.085, 44, 64);
-    const gap = Math.round(size * 0.14);
+    const size = clamp(H * 0.082, 46, 66);
+    const gap = Math.round(size * 0.05); // tight stack → reads as one cohesive tower
     const rowH = size + gap;
-    const topY = H * 0.2; // top edge of the newest (top-most) tile
+    const topY = H * 0.17; // build line for the newest block, just under the crane
+    const trayTop = H * 0.72; // tower never renders into the tray zone below
     const centerX = W / 2;
     const half = size / 2;
 
@@ -95,17 +97,18 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
       char: cell.kind === 'letter' ? cell.char : null,
       color: cell.color,
       pending: false,
+      shared: cell.kind === 'letter' ? cell.shared : false,
     }));
     // The very first letter at game start is the chain seed (the foundation),
     // not a preview — render it solid so it reads as "start here", not a ghost.
-    pchars.forEach((ch, k) => live.push({ key: `s${C + k}`, pos: C + k, char: ch, color: pendingColor, pending: !(C === 0 && k === 0) }));
+    pchars.forEach((ch, k) => live.push({ key: `s${C + k}`, pos: C + k, char: ch, color: pendingColor, pending: !(C === 0 && k === 0), shared: false }));
 
     const total = live.length;
     const maxPos = total - 1;
     const centerY = (pos: number) => topY + (total - 1 - pos) * rowH + half;
 
     // Virtualize: only sprites whose row could be on-screen.
-    const visible = live.filter((l) => { const y = centerY(l.pos); return y > -rowH && y < H + rowH; });
+    const visible = live.filter((l) => { const y = centerY(l.pos); return y > -rowH && y < trayTop; });
     const visKeys = new Set(visible.map((v) => v.key));
 
     // Retire sprites that left the window (scrolled off → destroy; backspaced ghost → pop out).
@@ -121,7 +124,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
       const y = centerY(l.pos);
       const existing = registry.current.get(l.key);
       if (!existing) {
-        const tile = makeTile(l.char, size, l.color, l.pending);
+        const tile = makeTile(l.char, size, l.color, l.pending, l.shared);
         tile.x = centerX;
         tile.zIndex = l.pos;
         c.addChild(tile);
@@ -140,8 +143,8 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
         else moveTo(existing, y);
         if (existing.color !== l.color || existing.pending !== l.pending) {
           const lockingIn = existing.pending && !l.pending;
-          if (reducedMotion) paintTile(existing, l.color, l.pending);
-          else { recolor(existing, l.color, l.pending); if (lockingIn) bumpScale(existing); }
+          if (reducedMotion) paintTile(existing, l.color, l.pending, l.shared);
+          else { recolor(existing, l.color, l.pending, l.shared); if (lockingIn) bumpScale(existing); }
         }
       }
     }

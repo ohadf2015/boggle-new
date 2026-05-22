@@ -56,32 +56,57 @@ function run(tile: TileSprite, dur: number, delay: number, step: (k: number) => 
   requestAnimationFrame(tick);
 }
 
-/** (Re)draw a tile's face/shadow/glyph for a given fill + pending (ghost) state. */
-export function paintTile(tile: TileSprite, color: number, pending: boolean): void {
+/** Darken (f<1, multiply) or lighten (f>1, mix toward white) a packed RGB int. */
+function shade(hex: number, f: number): number {
+  const r = (hex >> 16) & 0xff, g = (hex >> 8) & 0xff, b = hex & 0xff;
+  if (f <= 1) return (Math.round(r * f) << 16) | (Math.round(g * f) << 8) | Math.round(b * f);
+  const t = Math.min(1, f - 1);
+  const mix = (c: number) => Math.round(c + (255 - c) * t);
+  return (mix(r) << 16) | (mix(g) << 8) | mix(b);
+}
+
+/**
+ * (Re)draw a tile as a chunky neo-brutalist building block: solid fill, a lit
+ * top edge + shaded base band (flat two-tone → 3D weight without gradients),
+ * hard black border, hard drop shadow. `shared` connectors wear a bright ring.
+ */
+export function paintTile(tile: TileSprite, color: number, pending: boolean, shared = false): void {
   const s = tile.size;
   const half = s / 2;
-  const r = Math.max(6, s * 0.18);
+  const r = Math.max(7, s * 0.2);
+  const inset = Math.ceil(r * 0.7);
+  const a = pending ? 0.5 : 1;
   tile.color = color;
   tile.pending = pending;
 
-  tile.shadow.clear().roundRect(-half + 3, -half + 4, s, s, r).fill({ color: 0x000000, alpha: pending ? 0.22 : 0.5 });
+  tile.shadow.clear().roundRect(-half + 4, -half + 5, s, s, r).fill({ color: 0x000000, alpha: pending ? 0.2 : 0.5 });
 
-  tile.face.clear();
-  tile.face.roundRect(-half, -half, s, s, r).fill({ color, alpha: pending ? 0.5 : 1 });
-  tile.face.roundRect(-half, -half, s, s, r).stroke({ color: 0x000000, width: 3, alignment: 1, alpha: pending ? 0.85 : 1 });
+  const g = tile.face;
+  g.clear();
+  g.roundRect(-half, -half, s, s, r).fill({ color, alpha: a });
+  // Flat two-tone block shading: lit top strip + darker base band (inset so the
+  // bands never collide with the rounded corners).
+  const topH = Math.round(s * 0.15);
+  const baseH = Math.round(s * 0.22);
+  g.rect(-half + inset, -half + Math.ceil(r * 0.5), s - inset * 2, topH).fill({ color: shade(color, 1.3), alpha: a * 0.9 });
+  g.rect(-half + inset, half - Math.ceil(r * 0.5) - baseH, s - inset * 2, baseH).fill({ color: shade(color, 0.6), alpha: a });
+  g.roundRect(-half, -half, s, s, r).stroke({ color: 0x000000, width: 3, alignment: 1, alpha: pending ? 0.85 : 1 });
+
+  if (shared && !pending) {
+    g.roundRect(-half + 4, -half + 4, s - 8, s - 8, Math.max(4, r - 3)).stroke({ color: 0xfffef0, width: 2, alpha: 0.75 });
+  }
   if (pending) {
-    // bright inner ring → reads as a holographic "about to lock in" preview
-    tile.face.roundRect(-half + 4, -half + 4, s - 8, s - 8, Math.max(3, r - 4)).stroke({ color: 0xffffff, width: 1.5, alpha: 0.55 });
+    g.roundRect(-half + 4, -half + 4, s - 8, s - 8, Math.max(4, r - 3)).stroke({ color: 0xffffff, width: 1.5, alpha: 0.55 });
   }
 
   if (tile.glyph) {
     tile.glyph.style.fill = textColorOn(color);
-    tile.glyph.alpha = pending ? 0.9 : 1;
+    tile.glyph.alpha = pending ? 0.92 : 1;
   }
 }
 
 /** Build a tile. `char === null` → a label-less brick (versus spoiler-free row). */
-export function makeTile(char: string | null, size: number, color: number, pending: boolean): TileSprite {
+export function makeTile(char: string | null, size: number, color: number, pending: boolean, shared = false): TileSprite {
   const tile = new Container() as TileSprite;
   tile.size = size;
   tile.color = color;
@@ -90,14 +115,15 @@ export function makeTile(char: string | null, size: number, color: number, pendi
   tile.shadow = new Graphics();
   tile.face = new Graphics();
   tile.glyph = char != null
-    ? new Text({ text: char, style: new TextStyle({ fontFamily: FONT, fontSize: Math.min(size * 0.58, 38), fontWeight: '700', fill: 0x000000 }) })
+    ? new Text({ text: char, style: new TextStyle({ fontFamily: FONT, fontSize: Math.min(size * 0.62, 40), fontWeight: '700', fill: 0x000000 }) })
     : null;
   tile.addChild(tile.shadow, tile.face);
   if (tile.glyph) {
     tile.glyph.anchor.set(0.5);
+    tile.glyph.y = -Math.round(size * 0.02); // optical-centre against the base band
     tile.addChild(tile.glyph);
   }
-  paintTile(tile, color, pending);
+  paintTile(tile, color, pending, shared);
   return tile;
 }
 
@@ -139,10 +165,10 @@ export function popOut(tile: TileSprite, onDone: () => void): void {
 }
 
 /** Lerp a tile's fill to a new colour (connector blend / ghost→solid lock-in). */
-export function recolor(tile: TileSprite, toColor: number, toPending: boolean): void {
+export function recolor(tile: TileSprite, toColor: number, toPending: boolean, toShared = false): void {
   const from = tile.color;
-  if (from === toColor && tile.pending === toPending) return;
-  run(tile, 340, 0, (k) => paintTile(tile, lerpHex(from, toColor, easeOutCubic(k)), toPending), () => paintTile(tile, toColor, toPending));
+  if (from === toColor && tile.pending === toPending) { paintTile(tile, toColor, toPending, toShared); return; }
+  run(tile, 340, 0, (k) => paintTile(tile, lerpHex(from, toColor, easeOutCubic(k)), toPending, toShared), () => paintTile(tile, toColor, toPending, toShared));
 }
 
 /** Quick scale pop — landing/lock-in juice. */
