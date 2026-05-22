@@ -19,12 +19,13 @@ const sampleFrames = (dir: string, total: number, n: number) =>
     return `${dir}/${String(idx).padStart(4, '0')}.jpg`;
   });
 
-// Four gameplay chapters scrub one after another: board → igniting → versus → mascot win.
-const CH1 = sampleFrames('/showcase3d/seq-board', 125, 78); // real animated correct-mascot word board
-const CH2 = sampleFrames('/scroll/seq/ch2', 130, 78); // letters chaining / igniting
-const CHVS = sampleFrames('/showcase3d/seq-vs', 80, 70); // real 1v3 versus footage
-const WIN = sampleFrames('/showcase3d/seq', 125, 94); // real animated correct-mascot world-of-words finale
-const FRAMES = [...CH1, ...CH2, ...CHVS, ...WIN];
+// Four no-mascot gameplay chapters scrub one after another, each with progressive
+// motion so scrubbing feels like driving the play: spell → combo → versus → win.
+const CH_BOARD = sampleFrames('/showcase3d/gp-board', 125, 84); // trace a word, tiles light up
+const CH_COMBO = sampleFrames('/showcase3d/gp-combo', 125, 80); // chain ignites, combo ticks up
+const CH_VS = sampleFrames('/showcase3d/gp-versus', 125, 80); // 1v3 live scoreboard battle
+const CH_WIN = sampleFrames('/showcase3d/gp-win', 125, 84); // WINNER banner + confetti
+const FRAMES = [...CH_BOARD, ...CH_COMBO, ...CH_VS, ...CH_WIN];
 const TOTAL = FRAMES.length;
 
 interface Showcase3DClientProps {
@@ -171,10 +172,10 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
   const ctaRef = useRef<HTMLElement>(null);
 
   const captions: Caption[] = [
-    { badge: t('showcase3d.heroBadge', 'A world of words'), title: t('showcase3d.cap0Title', 'Spot the word'), body: t('showcase3d.cap0Body', 'Drag across the board to spell. Letters everywhere — grab them.'), window: [0.0, 0.21] },
-    { title: t('showcase3d.cap1Title', 'Chain them. Light them up.'), body: t('showcase3d.cap1Body', 'Every word ignites the board and pumps your combo meter.'), window: [0.27, 0.45] },
-    { title: t('showcase3d.cap2Title', 'Go head-to-head'), body: t('showcase3d.cap2Body', 'Four cubes, one live board, zero mercy — steal words mid-round.'), window: [0.51, 0.68] },
-    { title: t('showcase3d.cap3Title', 'Land the win, out loud.'), body: t('showcase3d.cap3Body', 'Outscore the room and the cube goes wild. Bragging mandatory.'), window: [0.74, 0.99] },
+    { badge: t('showcase3d.heroBadge', 'A world of words'), title: t('showcase3d.cap0Title', 'Trace the word'), body: t('showcase3d.cap0Body', 'Drag across the board — letters light up as you go.'), window: [0.0, 0.2] },
+    { title: t('showcase3d.cap1Title', 'Chain the combo'), body: t('showcase3d.cap1Body', 'Link words back-to-back to ignite score multipliers.'), window: [0.27, 0.46] },
+    { title: t('showcase3d.cap2Title', 'Beat the room'), body: t('showcase3d.cap2Body', 'Outscore up to three rivals on one live board.'), window: [0.53, 0.71] },
+    { title: t('showcase3d.cap3Title', 'Take the crown'), body: t('showcase3d.cap3Body', 'Top the scoreboard and claim the win — out loud.'), window: [0.77, 0.99] },
   ];
 
   const modes: Mode[] = [
