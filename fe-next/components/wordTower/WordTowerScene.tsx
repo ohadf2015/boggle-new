@@ -96,7 +96,9 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
       color: cell.color,
       pending: false,
     }));
-    pchars.forEach((ch, k) => live.push({ key: `s${C + k}`, pos: C + k, char: ch, color: pendingColor, pending: true }));
+    // The very first letter at game start is the chain seed (the foundation),
+    // not a preview — render it solid so it reads as "start here", not a ghost.
+    pchars.forEach((ch, k) => live.push({ key: `s${C + k}`, pos: C + k, char: ch, color: pendingColor, pending: !(C === 0 && k === 0) }));
 
     const total = live.length;
     const maxPos = total - 1;
@@ -130,7 +132,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
         } else {
           dropIn(tile, y, 0, () => {
             bumpScale(tile);
-            engine.particles.burst(COMBO_FLASH, centerX, y - half, 5);
+            engine.particles.burst(COMBO_FLASH, centerX, y + half, 5); // puff at the tile's bottom edge (impact point)
           });
         }
       } else {
