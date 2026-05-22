@@ -9348,8 +9348,8 @@ const es = {
     },
     "objective": {
       "scoreTarget": "Anota {target} pts",
-      "collectType": "Recolecta {target} {tileType}",
-      "clearAllType": "Limpia todos los {tileType}",
+      "collectType": "Recolecta {target} fichas {tileType}",
+      "clearAllType": "Limpia todas las fichas {tileType}",
       "wordLength": "{target} palabras de {minWordLength}+ letras",
       "clearPercent": "Limpia {target}% del tablero",
       "targetWord": "Encuentra: {word}",

@@ -9266,8 +9266,8 @@ const sv = {
     },
     "objective": {
       "scoreTarget": "Nå {target} poäng",
-      "collectType": "Samla {target} {tileType}",
-      "clearAllType": "Rensa alla {tileType}",
+      "collectType": "Samla {target} {tileType}-brickor",
+      "clearAllType": "Rensa alla {tileType}-brickor",
       "wordLength": "{target} ord med {minWordLength}+ bokstäver",
       "clearPercent": "Rensa {target}% av brädet",
       "targetWord": "Hitta: {word}",

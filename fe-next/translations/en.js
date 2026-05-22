@@ -9182,8 +9182,8 @@ const en = {
     },
     "objective": {
       "scoreTarget": "Score {target} pts",
-      "collectType": "Collect {target} {tileType}",
-      "clearAllType": "Clear all {tileType}",
+      "collectType": "Collect {target} {tileType} tiles",
+      "clearAllType": "Clear all {tileType} tiles",
       "wordLength": "{target} words of {minWordLength}+ letters",
       "clearPercent": "Clear {target}% of the board",
       "targetWord": "Find: {word}",

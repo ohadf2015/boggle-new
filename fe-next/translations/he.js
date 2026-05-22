@@ -9490,8 +9490,8 @@ const he = {
     },
     "objective": {
       "scoreTarget": "השג {target} נק'",
-      "collectType": "אסוף {target} {tileType}",
-      "clearAllType": "נקה את כל ה{tileType}",
+      "collectType": "אסוף {target} אריחי {tileType}",
+      "clearAllType": "נקה את כל אריחי ה{tileType}",
       "wordLength": "{target} מילים של {minWordLength}+ אותיות",
       "clearPercent": "נקה {target}% מהלוח",
       "targetWord": "מצא: {word}",

@@ -26,12 +26,12 @@ function ObjectiveTilePreview({ tileType }: { tileType: BlastTileType }) {
       data-testid={`blast-objective-tile-preview-${tileType}`}
       aria-hidden="true"
       className={cn(
-        'shrink-0 inline-flex items-center justify-center w-[18px] h-[18px] rounded',
+        'shrink-0 inline-flex items-center justify-center w-[20px] h-[20px] rounded',
         visual.text,
       )}
       style={visual.style}
     >
-      {Icon ? <Icon className="w-3 h-3" strokeWidth={3} /> : null}
+      {Icon ? <Icon className="w-3.5 h-3.5" strokeWidth={2.25} /> : null}
     </span>
   );
 }

@@ -224,7 +224,14 @@ export const BlastTile = memo(function BlastTile({
   // during cascade chains, submitWord marks tiles cleared BEFORE the animation runs.
   // Without this, cascade clearing animations never play (tile goes invisible instantly).
   const isAnimatingClear = phase === 'clearing' || phase === 'anticipation' || phase === 'falling' || phase === 'appearing';
-  if (isCleared && !isAnimatingClear) {
+  // An empty-letter `standard` tile is an empty cell with nothing to show —
+  // never a playable white square. This also catches the invalid
+  // {standard, isCleared:false, letter:''} state an interrupted magnet/vortex
+  // letter-swap can strand (suspected root cause of "blank white tiles"; the
+  // engine-side swap/grid desync is tracked separately). Specials carry an
+  // icon rather than a letter, so only `standard` is treated as empty.
+  const isEmptyStandard = type === 'standard' && letter === '';
+  if (isEmptyStandard || (isCleared && !isAnimatingClear)) {
     return <div className="aspect-square opacity-0 pointer-events-none" aria-hidden="true" />;
   }
 
@@ -305,7 +312,7 @@ export const BlastTile = memo(function BlastTile({
       <span className="relative z-10" style={visual.text === 'text-white' ? TILE_TEXT_SHADOW_LIGHT_STYLE : TILE_TEXT_SHADOW_STYLE}>{letter}</span>
       {visual.indicator && (
         <span className={`absolute top-0.5 inset-e-0.5 leading-none pointer-events-none ${visual.text ?? ''}`} aria-hidden="true">
-          <visual.indicator className="w-[clamp(9px,2.4cqw,15px)] h-[clamp(9px,2.4cqw,15px)]" strokeWidth={2.5} />
+          <visual.indicator className="w-[clamp(11px,2.9cqw,17px)] h-[clamp(11px,2.9cqw,17px)]" strokeWidth={2.25} />
         </span>
       )}
       {hitsRemaining != null && hitsRemaining > 0 && (

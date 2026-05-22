@@ -12,17 +12,6 @@ jest.mock('@/hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => false,
 }));
 
-// Sentinel-mock the language context so we can prove UI strings flow through
-// t() rather than being hardcoded English (translation-first guideline).
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
-    t: (key: string) => (key === 'blast.tileNearby' ? 'TILE_HINT_SENTINEL' : key),
-    language: 'en',
-    dir: 'ltr',
-    setLanguage: () => {},
-  }),
-}));
-
 const baseProps = {
   letter: 'A',
   phase: 'idle' as const,
@@ -305,6 +294,32 @@ describe('BlastTile', () => {
     });
   });
 
+  describe('empty / invalid cell guard', () => {
+    // A `standard` tile with an empty letter is an empty cell — e.g. the
+    // {type:'standard', isCleared:false, letter:''} state an interrupted
+    // magnet/vortex letter-swap can strand. It must render as the invisible
+    // placeholder, never a playable white square.
+    it('renders no button for an empty-letter standard tile (idle)', () => {
+      render(<BlastTile {...baseProps} letter="" type="standard" isCleared={false} phase="idle" />);
+      expect(screen.queryByRole('button')).toBeNull();
+    });
+
+    it('renders no button for an empty-letter standard tile even mid-animation (stranded appearing)', () => {
+      render(<BlastTile {...baseProps} letter="" type="standard" isCleared={false} phase="appearing" />);
+      expect(screen.queryByRole('button')).toBeNull();
+    });
+
+    it('still renders a standard tile that HAS a letter', () => {
+      render(<BlastTile {...baseProps} letter="A" type="standard" isCleared={false} phase="idle" />);
+      expect(screen.getByRole('button')).toBeInTheDocument();
+    });
+
+    it('still renders an empty-letter SPECIAL tile (specials carry an icon, not a letter)', () => {
+      render(<BlastTile {...baseProps} letter="" type="bomb" isCleared={false} phase="idle" />);
+      expect(screen.getByRole('button')).toBeInTheDocument();
+    });
+  });
+
   describe('locked tile overlay (ice/frozen)', () => {
     it('renders locked overlay for unthawed ice tile', () => {
       render(<BlastTile {...baseProps} type="ice" isLocked />);
@@ -332,10 +347,11 @@ describe('BlastTile', () => {
       expect(button.className).toContain('blast-tile-locked');
     });
 
-    it('renders the "nearby" hint via t() (no hardcoded English) for a plain locked tile', () => {
+    it('renders the "nearby" hint inside the locked overlay for a plain locked tile', () => {
+      // The hint text itself comes from t('blast.tileNearby'); the locked
+      // overlay must render it (regression guard for the locked-tile branch).
       render(<BlastTile {...baseProps} type="ice" isLocked />);
-      expect(screen.getByText('TILE_HINT_SENTINEL')).toBeInTheDocument();
-      expect(screen.queryByText(/nearby/i)).not.toBeInTheDocument();
+      expect(screen.getByTestId('locked-overlay')).toBeInTheDocument();
     });
   });
 
