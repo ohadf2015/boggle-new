@@ -4,7 +4,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
+import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
 import { extractHiraganaWords } from '@/shared/constants/japaneseLetters';
 
 let englishDict: Set<string> | null = null;
@@ -25,7 +25,10 @@ async function loadSpanish(): Promise<Set<string>> {
   if (spanishDict) return spanishDict;
   const words = (await import('an-array-of-spanish-words', { with: { type: 'json' } }))
     .default as string[];
-  spanishDict = new Set(words.map((w) => w.toLowerCase()));
+  // Normalize at load to match validate-time normalization (accent-strip,
+  // ñ-preserve). Keeps this path symmetric with backend/dictionary.ts so the
+  // same word can't be valid live but rejected on offline-queue replay.
+  spanishDict = new Set(words.map((w) => normalizeSpanishWord(w)));
   return spanishDict;
 }
 
@@ -104,7 +107,7 @@ export async function validateWordOnServer(word: string, language: string): Prom
     case 'en':
       return (await loadEnglish()).has(trimmed.toLowerCase());
     case 'es':
-      return (await loadSpanish()).has(trimmed.toLowerCase());
+      return (await loadSpanish()).has(normalizeSpanishWord(trimmed));
     case 'he':
       return loadHebrew().has(normalizeHebrewWord(trimmed));
     case 'sv':

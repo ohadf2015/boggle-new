@@ -9,6 +9,7 @@ import * as path from 'path';
 import logger from './utils/logger';
 import {
   normalizeHebrewWord,
+  normalizeSpanishWord,
 } from '@/shared/utils/wordNormalization';
 
 export type SafeReadFile = (filePath: string) => Promise<string>;
@@ -205,11 +206,14 @@ export async function loadSpanishDictionary(
   safeReadFile: SafeReadFile
 ): Promise<Set<string>> {
   const spanishWords: string[] = require('an-array-of-spanish-words');
-  const dict = new Set(spanishWords.map(w => w.toLowerCase()));
+  // Normalize at load (accent-strip, ñ-preserve) so the Set matches validate-time
+  // normalizeSpanishWord. Without this, an auto-promoted accented word would be
+  // stored accented yet every lookup is accent-stripped → permanently unreachable.
+  const dict = new Set(spanishWords.map(w => normalizeSpanishWord(w)));
   logger.debug('DICT', `Loaded ${dict.size} Spanish words from main dictionary`);
 
   const approvedContent = await safeReadFile(path.join(__dirname, 'spanish_words_approved.txt'));
-  mergeApprovedWords(dict, approvedContent, 'Spanish');
+  mergeApprovedWords(dict, approvedContent, 'Spanish', (w) => normalizeSpanishWord(w.trim()));
   logger.debug('DICT', `Total Spanish words: ${dict.size}`);
   return dict;
 }
