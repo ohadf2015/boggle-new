@@ -145,10 +145,12 @@ export function WordTowerPlay({ language, isInDictionary, initialGame, personalB
       <WordTowerScene
         floors={game.floors}
         biomeId={biomeId}
+        heightM={game.heightM}
+        pendingWord={tower.word}
         resultKey={tower.state.resultKey}
+        errorKey={tower.state.errorKey}
         lastResult={tower.state.lastResult}
         reducedMotion={reducedMotion}
-        dir={dir}
       />
 
       <div className="pointer-events-auto absolute inset-x-0 top-0 z-10 flex items-center justify-between p-3">
