@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/sv/swedish-multiplayer-word-game`;
 
   return {
-    title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
-    description: 'Spela scrabble online på svenska gratis — ordhjul, boggle och mer. Utan registrering, utan nedladdning. Skapa rum, bjud in med länk. 10 000+ ord. Börja nu!',
+    title: 'Scrabble Online Svenska Gratis — Multiplayer | LexiClash',
+    description: 'Spela scrabble online på svenska gratis — ingen registrering, ingen nedladdning. Skapa rum, bjud in vänner med länk, tävla i realtid. 10 000+ ord.',
     keywords: 'ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid, ordhjul, ordhjul online, daglig ordhjul',
     openGraph: {
       title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
