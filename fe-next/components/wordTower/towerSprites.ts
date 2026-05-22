@@ -191,6 +191,7 @@ export function impactRing(parent: Container, x: number, y: number, baseRadius: 
   const ring = new Graphics();
   ring.x = x;
   ring.y = y;
+  ring.zIndex = 1_000_000; // above every tile (parent sorts by zIndex) so the shockwave isn't occluded
   parent.addChild(ring);
   const dur = 380;
   const t0 = performance.now();

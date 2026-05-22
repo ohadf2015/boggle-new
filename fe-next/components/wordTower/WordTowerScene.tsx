@@ -294,13 +294,15 @@ export function WordTowerScene(props: SceneProps) {
     const onMove = (e: PointerEvent) => { if (active) setPan(startPan + (e.clientY - startY)); };
     const onUp = () => { active = false; pan.current.dragging = false; };
     const onWheel = (e: WheelEvent) => { setPan(pan.current.y - e.deltaY); };
-    el.addEventListener('pointerdown', onDown);
+    // Capture phase: fire before Pixi's canvas-level interaction so the pan
+    // always starts even though the Pixi <canvas> sits inside this wrapper.
+    el.addEventListener('pointerdown', onDown, { capture: true });
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onUp);
     el.addEventListener('wheel', onWheel, { passive: true });
     return () => {
-      el.removeEventListener('pointerdown', onDown);
+      el.removeEventListener('pointerdown', onDown, { capture: true });
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
