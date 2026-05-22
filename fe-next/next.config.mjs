@@ -146,6 +146,13 @@ const nextConfig = {
         destination: '/en/about/ohad-fisher',
         permanent: true,
       },
+      // Slug consolidation: the underperforming text page (pos ~13, ~1 click/mo)
+      // folds into the richer showcase landing for the same intent.
+      {
+        source: '/:locale(en|he|sv|ja|es)/multiplayer-word-game-online',
+        destination: '/:locale/free-multiplayer-word-game',
+        permanent: true,
+      },
       // Redirect non-www to www (handled by hosting platform like Vercel/Railway)
       // This is a fallback for any requests that slip through
       {

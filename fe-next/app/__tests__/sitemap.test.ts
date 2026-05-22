@@ -50,7 +50,7 @@ describe('sitemap', () => {
     const required = [
       'https://www.lexiclash.live/en/words-with-friends-alternative',
       'https://www.lexiclash.live/en/online-word-games-with-friends',
-      'https://www.lexiclash.live/en/multiplayer-word-game-online',
+      'https://www.lexiclash.live/en/free-multiplayer-word-game',
       'https://www.lexiclash.live/en/play-boggle-online-free',
       'https://www.lexiclash.live/en/word-games-online-free',
     ];
