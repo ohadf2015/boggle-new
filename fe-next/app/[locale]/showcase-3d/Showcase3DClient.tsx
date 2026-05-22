@@ -10,6 +10,7 @@ import GameplayPanel, { type Mode } from '@/components/showcase3d/GameplayPanel'
 import Split3DHeading from '@/components/showcase3d/Split3DHeading';
 import FloatingCTA from '@/components/showcase3d/FloatingCTA';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import FaqAccordion from '@/components/showcase3d/FaqAccordion';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -312,6 +313,14 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
           </div>
         </div>
       </section>
+
+      {/* ── FAQ (visible + crawlable) ────────────────────────── */}
+      <FaqAccordion
+        title={t('showcase3d.faqTitle', 'Questions, answered')}
+        items={[1, 2, 3, 4, 5, 6]
+          .map((i) => ({ q: t(`showcase3d.faqQ${i}`, ''), a: t(`showcase3d.faqA${i}`, '') }))
+          .filter((f) => f.q && f.a)}
+      />
 
       {/* ── BOTTOM CTA ───────────────────────────────────────── */}
       <section ref={ctaRef} className="mx-auto max-w-6xl px-5 pb-28 lg:px-10">

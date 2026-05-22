@@ -63,6 +63,10 @@ const en = {
     "twitterDescription": "Challenge friends to real-time word battles! 🎮 Find words fast, build combos, climb leaderboards. Free to play, no download. Try now! 🔥",
     "locale": "en_US",
     "language": "English",
+    "showcase3d": {
+      "title": "Free Online Word Game | LexiClash - Real-Time Multiplayer",
+      "description": "Play LexiClash for free — a real-time multiplayer word game with up to 4 players. Build word combos, climb the global leaderboard, no download, no signup. Play now in your browser."
+    },
     "leaderboard": {
       "title": "Best Competitive Word Games with Global Leaderboards 2026 | LexiClash",
       "description": "The best competitive word games with global leaderboards. Live daily, weekly, and all-time rankings across 8 modes. Filter by language, country, or mode. Updated in real time.",
@@ -12647,7 +12651,20 @@ const en = {
     "mode3Body": "Hebrew, English, Swedish, Japanese, Spanish — your words, your turf.",
     "bottomTitle": "Your move. Make it loud.",
     "bottomCta": "Play LexiClash free",
-    "floatCta": "Play free"
+    "floatCta": "Play free",
+    "faqTitle": "Questions, answered",
+    "faqQ1": "Is LexiClash free to play?",
+    "faqA1": "Yes — LexiClash is a free online word game you play right in your browser. No download and no signup wall: open the page and you're in a round.",
+    "faqQ2": "Can I play multiplayer word battles with friends?",
+    "faqA2": "Yes. Jump into real-time 1v3 word battles where up to four players race on one live board — the multiplayer word game to reach for instead of taking slow turns.",
+    "faqQ3": "Is it like Scrabble?",
+    "faqA3": "Same love of words, much faster. Instead of placing tiles in turns, you trace words on a live grid against the clock — a quick, competitive Scrabble alternative you play online for free.",
+    "faqQ4": "What languages can I play in?",
+    "faqA4": "Five, each with its own dictionary: English, Hebrew, Swedish, Japanese, and Spanish. Play a word game in your own language.",
+    "faqQ5": "Do I need to download or sign up?",
+    "faqA5": "No. LexiClash runs in any modern browser on phone, tablet, or TV — no install and no account needed to start.",
+    "faqQ6": "Are there competitive leaderboards?",
+    "faqA6": "Yes — daily challenges and global leaderboards. Climb the daily rank, build combos, and top the board in one of the best free competitive word games online."
   }
 };
 
