@@ -118,8 +118,11 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
         />
       )}
 
-      {/* Glow ring — appears when EITHER system triggers (tier 1+ or combo 3+) */}
-      {compoundTier >= 1 && !reduceMotion && (
+      {/* Glow ring — appears when EITHER system triggers (tier 1+ or combo 3+).
+          fullMode-gated so its blurred box-shadow (redundant with the cell's own
+          escalation glow) is dropped mid-drag, per this component's render-mode
+          contract; it re-mounts on release. */}
+      {compoundTier >= 1 && !reduceMotion && fullMode && (
         <m.div
           className="absolute inset-[-6px] pointer-events-none"
           style={{
