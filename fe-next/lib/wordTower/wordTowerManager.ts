@@ -327,6 +327,36 @@ export function scrambleTray(state: WordTowerPlayerState): WordTowerPlayerState 
   };
 }
 
+/**
+ * Escape a dead-end chain. Shiritori forces the next word to start with the
+ * previous word's last letter — a word ending in a low-yield letter (Hebrew
+ * ו/ה, English vowels) can strand the player with zero buildable words and no
+ * way out (scramble keeps the anchor). This picks a FRESH anchor + tray to begin
+ * a new chain link, breaking the combo. When `isViableAnchor` is supplied (the
+ * client passes a dictionary check) it retries until the new anchor actually has
+ * buildable words, so it never re-strands you. Free — the broken combo is the
+ * only cost.
+ */
+export function rerollStart(
+  state: WordTowerPlayerState,
+  isViableAnchor?: (anchor: string, tray: string[]) => boolean,
+): WordTowerPlayerState {
+  const bag = [...(WORD_TOWER_LETTER_BAGS[state.language] || '')];
+  if (bag.length === 0) return state;
+  let draw = state.trayDraws;
+  let anchorLetter = state.anchorLetter;
+  let tray = state.tray;
+  for (let attempt = 0; attempt < 16; attempt++) {
+    const a = bag[Math.floor(mulberry32(hashString(`word-tower-${state.gameCode}-${state.playerId}-reanchor-${draw}`))() * bag.length)];
+    const tr = generateTray(state.gameCode, state.playerId, state.language, draw + 1, WORD_TOWER_TRAY_SIZE);
+    anchorLetter = a;
+    tray = tr;
+    draw += 2;
+    if (!isViableAnchor || isViableAnchor(a, tr)) break;
+  }
+  return { ...state, anchorLetter, tray, trayDraws: draw, combo: 0 };
+}
+
 // --- persistence (Phase 2): serialize a compact, versioned save blob and
 //     restore from it. Tray is NOT persisted — it is regenerated fresh on
 //     resume (ephemeral). floors/usedWords are capped to keep the blob small;

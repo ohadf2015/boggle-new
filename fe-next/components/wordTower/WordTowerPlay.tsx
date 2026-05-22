@@ -59,6 +59,11 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     () => (dictionary ? pickClueWord(dictionary, game.anchorLetter, game.tray, WORD_TOWER_MIN_WORD_LEN) : null),
     [dictionary, game.anchorLetter, game.tray],
   );
+  // Dead-end escape: re-anchor to a letter that actually has buildable words.
+  const reroll = useCallback(
+    () => tower.reroll(dictionary ? (a, tr) => countBuildableWords(dictionary, a, tr, WORD_TOWER_MIN_WORD_LEN) > 0 : undefined),
+    [tower, dictionary],
+  );
 
   const haptics = useHaptics();
   const { playCoinCollectSound, playChestOpenSound, playErrorSound } = useSoundEffects();
@@ -237,6 +242,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           floorsCount={game.floors.length}
           possibleWords={possibleWords}
           clueWord={clueWord}
+          onReroll={reroll}
           biomeId={biomeId}
           lastError={tower.state.lastError}
           errorKey={tower.state.errorKey}

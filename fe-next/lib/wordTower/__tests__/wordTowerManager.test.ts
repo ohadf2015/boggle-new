@@ -260,3 +260,38 @@ describe('wordTowerManager — serialize/restore', () => {
     expect(restoreWordTowerState(opts, { version: 999 } as never).heightM).toBe(0);
   });
 });
+
+import { rerollStart } from '../wordTowerManager';
+
+describe('rerollStart (dead-end escape)', () => {
+  const base = () => initWordTowerState({ gameCode: 'g1', playerId: 'p1', language: 'en' });
+
+  it('breaks the combo, advances trayDraws, keeps a full tray', () => {
+    const s = { ...base(), combo: 5 };
+    const r = rerollStart(s);
+    expect(r.combo).toBe(0);
+    expect(r.trayDraws).toBeGreaterThan(s.trayDraws);
+    expect(r.tray.length).toBe(s.tray.length);
+  });
+
+  it('preserves height and floors (it only restarts the chain link)', () => {
+    const s = { ...base(), heightM: 120, floors: [{ word: 'CAT', len: 3, meters: 6 }] };
+    const r = rerollStart(s);
+    expect(r.heightM).toBe(120);
+    expect(r.floors).toHaveLength(1);
+  });
+
+  it('retries until the new anchor is viable, then stops', () => {
+    const s = base();
+    // Only accept anchor 'E'; reroll must land on it (within the retry budget)
+    const r = rerollStart(s, (a) => a === 'E');
+    expect(r.anchorLetter).toBe('E');
+  });
+
+  it('does not hang when no anchor is ever viable (bounded retries)', () => {
+    const s = base();
+    const r = rerollStart(s, () => false);
+    expect(r.combo).toBe(0); // returns after the retry budget
+    expect(r.tray.length).toBeGreaterThan(0);
+  });
+});

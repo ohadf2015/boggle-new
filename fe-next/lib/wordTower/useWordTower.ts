@@ -15,6 +15,7 @@ import {
   validateTowerWord,
   applyTowerWord,
   scrambleTray,
+  rerollStart,
   type WordTowerPlayerState,
   type ApplyResult,
   type ValidationError,
@@ -40,6 +41,7 @@ type Action =
   | { type: 'clear' }
   | { type: 'submit'; isInDictionary: (canonWord: string) => boolean }
   | { type: 'scramble' }
+  | { type: 'rerollStart'; isViableAnchor?: (anchor: string, tray: string[]) => boolean }
   | { type: 'reset'; game: WordTowerPlayerState };
 
 /** Word currently being built: anchor letter + the selected tray tiles. */
@@ -78,6 +80,8 @@ function reducer(state: WordTowerUIState, action: Action): WordTowerUIState {
     }
     case 'scramble':
       return { ...state, game: scrambleTray(state.game), selected: [] };
+    case 'rerollStart':
+      return { ...state, game: rerollStart(state.game, action.isViableAnchor), selected: [], lastError: null };
     case 'reset':
       return makeInitial(action.game);
     default:
@@ -117,6 +121,7 @@ export function useWordTower(opts: UseWordTowerOpts) {
       clear: () => dispatch({ type: 'clear' }),
       submit: () => dispatch({ type: 'submit', isInDictionary: dictRef.current }),
       scramble: () => dispatch({ type: 'scramble' }),
+      reroll: (isViableAnchor?: (anchor: string, tray: string[]) => boolean) => dispatch({ type: 'rerollStart', isViableAnchor }),
       reset: () =>
         dispatch({ type: 'reset', game: initWordTowerState({ gameCode: sessionId, playerId: 'solo', language }) }),
     }),

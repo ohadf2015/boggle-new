@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Delete, Shuffle, ArrowUp, Lightbulb, ChevronDown, ChevronUp } from 'lucide-react';
+import { Delete, Shuffle, ArrowUp, Lightbulb, ChevronDown, ChevronUp, RotateCw } from 'lucide-react';
 import { comboMult, type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
 
@@ -19,6 +19,8 @@ export interface WordTowerHudProps {
   possibleWords?: number | null;
   /** A sample buildable word for the clue reveal (canonical form). */
   clueWord?: string | null;
+  /** Re-anchor to a fresh viable letter when the chain dead-ends. */
+  onReroll?: () => void;
   biomeId: WordTowerBiomeId;
   lastError: ValidationError | null;
   errorKey: number;
@@ -45,7 +47,7 @@ const TIER_KEY: Record<NonNullable<ApplyResult['tier']>, string> = {
 export function WordTowerHud(props: WordTowerHudProps) {
   const {
     anchorLetter, tray, selected, word, heightM, personalBestM, combo, scramblesLeft, floorsCount,
-    possibleWords, clueWord, biomeId, lastError, errorKey, lastResult, resultKey,
+    possibleWords, clueWord, onReroll, biomeId, lastError, errorKey, lastResult, resultKey,
     onSelectTile, onBackspace, onClear, onSubmit, onScramble, onDeckHeight, t,
   } = props;
 
@@ -165,19 +167,30 @@ export function WordTowerHud(props: WordTowerHudProps) {
         {/* "N words possible" + tap-for-clue (reveals a masked sample word). */}
         {possibleWords != null && (
           <div className="flex justify-center">
-            <button
-              type="button"
-              onClick={() => setClueShown(true)}
-              disabled={!clueWord || clueShown}
-              aria-label={t('wordTower.hud.clue')}
-              className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-navy-light/80 px-2 py-0.5 font-neo-body text-[11px] font-bold text-neo-cyan transition-transform active:translate-y-0.5 disabled:opacity-60"
-            >
-              <Lightbulb className="h-3 w-3" />
-              {t('wordTower.hud.possible', { n: possibleWords })}
-              {clueShown && maskedClue && (
-                <span className="ms-1 font-neo-display tracking-[0.25em] text-neo-yellow">{maskedClue}</span>
-              )}
-            </button>
+            {possibleWords === 0 && onReroll ? (
+              <button
+                type="button"
+                onClick={onReroll}
+                className="inline-flex items-center gap-1 rounded-neo border-neo border-black bg-neo-orange px-2.5 py-0.5 font-neo-body text-[11px] font-bold text-black transition-transform active:translate-y-0.5"
+              >
+                <RotateCw className="h-3 w-3" />
+                {t('wordTower.hud.stuck')}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setClueShown(true)}
+                disabled={!clueWord || clueShown}
+                aria-label={t('wordTower.hud.clue')}
+                className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-navy-light/80 px-2 py-0.5 font-neo-body text-[11px] font-bold text-neo-cyan transition-transform active:translate-y-0.5 disabled:opacity-60"
+              >
+                <Lightbulb className="h-3 w-3" />
+                {t('wordTower.hud.possible', { n: possibleWords })}
+                {clueShown && maskedClue && (
+                  <span className="ms-1 font-neo-display tracking-[0.25em] text-neo-yellow">{maskedClue}</span>
+                )}
+              </button>
+            )}
           </div>
         )}
 
