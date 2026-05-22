@@ -4,8 +4,8 @@ import {
   useState,
   type ChangeEvent,
   type CompositionEvent,
-  type FormEvent,
   type Ref,
+  type SyntheticEvent,
 } from 'react';
 
 /**
@@ -57,7 +57,9 @@ export function useImeText<T extends HTMLInputElement | HTMLTextAreaElement>(
   );
 
   const onChange = useCallback((e: ChangeEvent<T>) => apply(e.target.value), [apply]);
-  const onInput = useCallback((e: FormEvent<T>) => apply(e.currentTarget.value), [apply]);
+  // `onInput` carries a native input event; React's `FormEvent` alias is
+  // deprecated in React 19 types, so type it as the non-deprecated base.
+  const onInput = useCallback((e: SyntheticEvent<T>) => apply(e.currentTarget.value), [apply]);
   const onCompositionEnd = useCallback(
     (e: CompositionEvent<T>) => apply(e.currentTarget.value),
     [apply]
