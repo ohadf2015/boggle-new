@@ -207,8 +207,15 @@ export function createShutdownHandler(httpServer: HttpServer, io: Server): Shutd
     // Stop accepting new connections
     httpServer.close(() => lifecycleLogger.info('HTTP server closed'));
 
-    // Notify clients about shutdown
-    io.emit('serverShutdown', { reconnectIn: 5000, message: 'Server is restarting' });
+    // Notify clients about shutdown.
+    // reconnectIn = minimum wait; reconnectJitterMs = random spread on top.
+    // Each client reconnects at a random point in [reconnectIn, reconnectIn+jitter]
+    // so the freshly-booted (single) instance isn't hit by every client at once.
+    io.emit('serverShutdown', {
+      reconnectIn: 3000,
+      reconnectJitterMs: 9000,
+      message: 'Server is restarting',
+    });
     await new Promise<void>(resolve => setTimeout(resolve, 2000));
 
     // Shutdown worker pool

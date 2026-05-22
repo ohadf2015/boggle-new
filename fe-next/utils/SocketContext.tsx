@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, useCallback, useRef, Re
 import { io, Socket } from 'socket.io-client';
 import logger from '@/utils/logger';
 import { sanitizeRoomName } from '@/utils/consts';
+import { computeReconnectDelay } from '@/utils/reconnectDelay';
 import type { LetterGrid, Language, Avatar } from '@/types';
 
 // Socket.IO Context Value Type
@@ -11,6 +12,11 @@ export interface SocketContextValue {
   socket: Socket | null;
   isConnected: boolean;
   isReconnecting: boolean;
+  /** True only during a planned server restart (deploy) — distinct from a
+   *  user-side network drop. Lets the UI show reassuring "updating" copy
+   *  instead of an alarming "you went offline" message. Optional so local
+   *  context overrides (e.g. the in-game provider) need not supply it. */
+  isServerUpdating?: boolean;
   connectionError: string | null;
   getReconnectAttempt: () => number;
   maxReconnectAttempts: number;
@@ -203,6 +209,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isReconnecting, setIsReconnecting] = useState<boolean>(false);
+  const [isServerUpdating, setIsServerUpdating] = useState<boolean>(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const reconnectAttemptRef = useRef<number>(0);
   const socketRef = useRef<Socket | null>(null);
@@ -229,6 +236,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
       logger.log('[SOCKET.IO] Connected:', socketInstance.id);
       setIsConnected(true);
       setIsReconnecting(false);
+      setIsServerUpdating(false);
       setConnectionError(null);
     };
 
@@ -263,6 +271,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
       logger.log('[SOCKET.IO] Reconnected after', attemptNumber, 'attempts');
       setIsConnected(true);
       setIsReconnecting(false);
+      setIsServerUpdating(false);
       setConnectionError(null);
     };
 
@@ -295,13 +304,30 @@ export function SocketProvider({ children }: SocketProviderProps) {
       setConnectionError('Failed to reconnect to server');
     };
 
-    const handleServerShutdown = ({ reconnectIn, message }: { reconnectIn?: number; message: string }) => {
-      logger.log('[SOCKET.IO] Server shutdown notification:', message);
+    const handleServerShutdown = ({
+      reconnectIn,
+      reconnectJitterMs,
+      message,
+    }: {
+      reconnectIn?: number;
+      reconnectJitterMs?: number;
+      message?: string;
+    }) => {
+      logger.log('[SOCKET.IO] Server shutdown notification:', message ?? '(restart)');
+      // Planned restart — surface reassuring "updating" UI and show the in-game
+      // reconnecting overlay during the wait (a manual disconnect does NOT emit
+      // `reconnect_attempt`, so isReconnecting would otherwise stay false and the
+      // player would stare at a frozen board).
+      setIsServerUpdating(true);
+      setIsReconnecting(true);
       socketInstance.disconnect();
+      // Per-client jitter spreads the reconnect storm across a window so the
+      // freshly-booted single instance isn't hit by every client at once.
+      const delay = computeReconnectDelay(reconnectIn, reconnectJitterMs);
+      logger.log(`[SOCKET.IO] Reconnecting in ${delay}ms (jittered) after server restart`);
       setTimeout(() => {
-        logger.log('[SOCKET.IO] Attempting reconnection after server restart');
         socketInstance.connect();
-      }, reconnectIn || 5000);
+      }, delay);
     };
 
     const handleError = (error: unknown) => {
@@ -431,11 +457,12 @@ export function SocketProvider({ children }: SocketProviderProps) {
     socket,
     isConnected,
     isReconnecting,
+    isServerUpdating,
     connectionError,
     getReconnectAttempt,
     maxReconnectAttempts: SOCKET_CONFIG.reconnectionAttempts,
     manualReconnect
-  }), [socket, isConnected, isReconnecting, connectionError, getReconnectAttempt, manualReconnect]);
+  }), [socket, isConnected, isReconnecting, isServerUpdating, connectionError, getReconnectAttempt, manualReconnect]);
 
   return (
     <SocketContext.Provider value={value}>

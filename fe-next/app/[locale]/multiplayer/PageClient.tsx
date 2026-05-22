@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef, useContext } from 'react';
 import nextDynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { useSearchParams } from 'next/navigation';
@@ -369,10 +369,18 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     if (socket && !socket.connected) socket.connect();
   }, [socket]);
 
+  // PageClient renders UNDER the app-wide SocketProvider, so this reads the
+  // global socket context (the local provider below only wraps children). The
+  // global `serverShutdown` handler sets isServerUpdating during a deploy —
+  // forward it so the in-game ConnectionBanner shows calm "updating" copy.
+  const globalSocket = useContext(SocketContext);
+  const isServerUpdating = globalSocket?.isServerUpdating ?? false;
+
   const socketContextValue = useMemo(() => ({
     socket, isConnected, connectionError: error, isReconnecting: attemptingReconnect,
+    isServerUpdating,
     getReconnectAttempt: () => 0, maxReconnectAttempts: 20, manualReconnect: handleManualReconnect,
-  }), [socket, isConnected, error, attemptingReconnect, handleManualReconnect]);
+  }), [socket, isConnected, error, attemptingReconnect, isServerUpdating, handleManualReconnect]);
 
   const renderView = (): React.JSX.Element => {
     if (showResults) {

@@ -5,6 +5,7 @@ import { useSocket } from '@/utils/SocketContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { m, AnimatePresence } from 'framer-motion';
+import { connectionBannerCopy } from '@/utils/connectionBannerCopy';
 
 /**
  * Graduated reconnection UX delay.
@@ -276,6 +277,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
   const {
     isConnected,
     isReconnecting,
+    isServerUpdating,
     connectionError,
     getReconnectAttempt,
     maxReconnectAttempts,
@@ -294,6 +296,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
   };
 
   const status = getStatus();
+  const copy = connectionBannerCopy(status, !!isServerUpdating);
 
   // Graduated UX: delay banner appearance to avoid anxiety during brief drops.
   // Phase 1 (0-5s): Silent reconnection — most mobile dropouts resolve here.
@@ -339,12 +342,14 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         className={cn(
           'fixed top-0 left-0 right-0 z-50',
-          'bg-neo-red border-b-4 border-neo-black',
+          // Calm tone for a planned deploy; alarm-red only for a real drop.
+          copy.isUpdate ? 'bg-neo-cyan' : 'bg-neo-red',
+          'border-b-4 border-neo-black',
           'shadow-hard-lg',
           className
         )}
-        role="alert"
-        aria-live="assertive"
+        role={copy.isUpdate ? 'status' : 'alert'}
+        aria-live={copy.isUpdate ? 'polite' : 'assertive'}
       >
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -365,15 +370,19 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
               </div>
 
               <div className="flex flex-col gap-0.5">
-                <span className="text-neo-white font-bold text-sm">
-                  {status === 'reconnecting'
-                    ? t('connection.reconnecting')
-                    : t('connection.disconnected')
-                  }
+                <span className={cn('font-bold text-sm', copy.isUpdate ? 'text-neo-black' : 'text-neo-white')}>
+                  {t(copy.titleKey)}
                 </span>
 
+                {/* Reassuring hint during a planned deploy */}
+                {copy.isUpdate && copy.subtitleKey && (
+                  <span className="text-neo-black/80 text-xs font-bold">
+                    {t(copy.subtitleKey)}
+                  </span>
+                )}
+
                 {/* Progress indicator */}
-                {status === 'reconnecting' && reconnectAttempt > 0 && (
+                {!copy.isUpdate && status === 'reconnecting' && reconnectAttempt > 0 && (
                   <span className="text-neo-white/80 text-xs">
                     {t('connection.attempt')} {reconnectAttempt}/{maxReconnectAttempts}
                   </span>
