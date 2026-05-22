@@ -12,6 +12,17 @@ jest.mock('@/hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => false,
 }));
 
+// Sentinel-mock the language context so we can prove UI strings flow through
+// t() rather than being hardcoded English (translation-first guideline).
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string) => (key === 'blast.tileNearby' ? 'TILE_HINT_SENTINEL' : key),
+    language: 'en',
+    dir: 'ltr',
+    setLanguage: () => {},
+  }),
+}));
+
 const baseProps = {
   letter: 'A',
   phase: 'idle' as const,
@@ -319,6 +330,12 @@ describe('BlastTile', () => {
       render(<BlastTile {...baseProps} type="ice" isLocked />);
       const button = screen.getByRole('button');
       expect(button.className).toContain('blast-tile-locked');
+    });
+
+    it('renders the "nearby" hint via t() (no hardcoded English) for a plain locked tile', () => {
+      render(<BlastTile {...baseProps} type="ice" isLocked />);
+      expect(screen.getByText('TILE_HINT_SENTINEL')).toBeInTheDocument();
+      expect(screen.queryByText(/nearby/i)).not.toBeInTheDocument();
     });
   });
 

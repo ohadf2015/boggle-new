@@ -9151,6 +9151,7 @@ const en = {
     },
     "stuck": "Stuck?",
     "hintCooldown": "Used",
+    "tileNearby": "✦ nearby ✦",
     "waveClearBanner": "Wave Clear!",
     "tapToContinue": "Tap to continue",
     "levelComplete": "Level Complete!",

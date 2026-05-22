@@ -9464,6 +9464,7 @@ const he = {
     },
     "stuck": "תקוע?",
     "hintCooldown": "שומש",
+    "tileNearby": "✦ קרוב ✦",
     "waveClearBanner": "גל הושלם!",
     "tapToContinue": "הקש להמשיך",
     "levelComplete": "שלב הושלם!",

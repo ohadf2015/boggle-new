@@ -9323,6 +9323,7 @@ const es = {
     "helpDiamondLabel": "Diamante",
     "helpDiamond": "Multiplicador de 5x. La ficha de mayor valor.",
     "hintCooldown": "Usada",
+    "tileNearby": "✦ cerca ✦",
     "waveClearBanner": "¡Oleada Limpia!",
     "tapToContinue": "Toca para continuar",
     "levelComplete": "¡Nivel Completo!",

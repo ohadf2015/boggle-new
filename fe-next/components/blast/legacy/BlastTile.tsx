@@ -427,7 +427,7 @@ export const BlastTile = memo(function BlastTile({
                 })()
               ) : (
                 <span className="text-[clamp(0.3rem,1.2cqw,0.45rem)] text-cyan-200/80 font-neo-body leading-none -mt-px">
-                  ✦ nearby ✦
+                  {t('blast.tileNearby')}
                 </span>
               )}
             </span>

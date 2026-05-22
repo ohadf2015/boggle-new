@@ -100,6 +100,22 @@ describe('BlastObjectiveBanner', () => {
     expect(label).not.toBeNull();
   });
 
+  it('forces LTR direction on the progress fraction so RTL locales keep "current / target" order', () => {
+    // In Hebrew (RTL) the bidi algorithm reorders "80 / 200" into "200 / 80"
+    // unless the fraction span is explicitly isolated as dir="ltr".
+    render(
+      <BlastObjectiveBanner
+        objectives={[
+          progress('score_target', 80, 200),
+          progress('color_power', 2, 4, { minColorCount: 4, colorTag: 'pink' }),
+        ]}
+        t={t}
+      />,
+    );
+    expect(screen.getByText('80 / 200')).toHaveAttribute('dir', 'ltr');
+    expect(screen.getByText('2 / 4')).toHaveAttribute('dir', 'ltr');
+  });
+
   it('has no dismiss button (persistent)', () => {
     render(
       <BlastObjectiveBanner

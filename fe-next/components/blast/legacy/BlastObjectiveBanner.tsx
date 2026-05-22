@@ -91,7 +91,7 @@ export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
             )}
             <span dir="auto" className="flex-1 truncate">{formatObjectiveLabel(p.objective, t)}</span>
             {!isTargetWord && !isColorPower && (
-              <span className="shrink-0 text-white/70">
+              <span dir="ltr" className="shrink-0 text-white/70">
                 {Math.min(p.current, p.objective.target)} / {p.objective.target}
               </span>
             )}
@@ -101,7 +101,7 @@ export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
               </span>
             )}
             {isColorPower && (
-              <span className="shrink-0 text-white/70">
+              <span dir="ltr" className="shrink-0 text-white/70">
                 {p.current} / {p.objective.minColorCount}
               </span>
             )}

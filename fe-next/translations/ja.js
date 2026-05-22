@@ -9266,6 +9266,7 @@ const ja = {
     },
     "stuck": "詰まった？",
     "hintCooldown": "使用済",
+    "tileNearby": "✦ 近く ✦",
     "waveClearBanner": "ウェーブクリア！",
     "tapToContinue": "タップして続ける",
     "levelComplete": "レベルクリア！",

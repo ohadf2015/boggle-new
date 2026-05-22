@@ -9240,6 +9240,7 @@ const sv = {
     },
     "stuck": "Fastnat?",
     "hintCooldown": "Använt",
+    "tileNearby": "✦ nära ✦",
     "waveClearBanner": "Vågen klar!",
     "tapToContinue": "Tryck för att fortsätta",
     "levelComplete": "Nivå klar!",
