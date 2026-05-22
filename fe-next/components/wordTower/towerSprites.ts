@@ -135,15 +135,18 @@ export function placeInstant(tile: TileSprite, y: number): void {
   tile.scale.set(1);
 }
 
-/** Gravity drop entrance: falls from above with an overshoot bounce, fades in. */
+/** Gravity drop entrance: falls a SHORT distance into its slot with a monotonic
+ *  ease (no overshoot) so it lands flush against its neighbours — overshoot read
+ *  as a gap/jitter in the stacked column. The landing weight comes from
+ *  {@link squashLand}, not from the fall easing. */
 export function dropIn(tile: TileSprite, toY: number, delay: number, onLand?: () => void): void {
-  const fromY = toY - Math.max(64, tile.size * 1.6);
+  const fromY = toY - Math.max(36, tile.size * 0.7);
   tile.y = fromY;
   tile.alpha = 0;
   tile.scale.set(1);
-  run(tile, 440, delay, (k) => {
-    tile.y = fromY + (toY - fromY) * easeOutBack(k);
-    tile.alpha = Math.min(1, k * 2.2);
+  run(tile, 300, delay, (k) => {
+    tile.y = fromY + (toY - fromY) * easeOutCubic(k);
+    tile.alpha = Math.min(1, k * 2.6);
   }, () => { tile.y = toY; tile.alpha = 1; onLand?.(); });
 }
 
