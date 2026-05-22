@@ -88,18 +88,19 @@ export function WordTowerHud(props: WordTowerHudProps) {
           </div>
         </div>
       )}
-      {/* Top: one compact altitude readout — display-only, centered to clear the
-          back button + share/leaderboard/restart controls on either side. */}
-      <div className="pointer-events-none flex justify-center px-4 pt-16">
-        <div className="flex items-baseline gap-2 rounded-neo border-neo-thick border-black bg-neo-navy/80 px-4 py-1.5 shadow-hard backdrop-blur-sm">
-          <span className="font-neo-display text-2xl font-bold text-neo-white tabular-nums">
-            {heightM.toFixed(0)}<span className="text-sm text-neo-cyan"> m</span>
+      {/* Top: a compact altitude HUD pinned to the start side (display-only),
+          sitting under the back button so it never crowds the centre — the
+          tower owns the centre of the screen. */}
+      <div className="pointer-events-none flex justify-start px-3 pt-14">
+        <div className="flex flex-col items-start rounded-neo border-neo border-black bg-neo-navy/80 px-2.5 py-1 shadow-hard-sm backdrop-blur-sm">
+          <span className="font-neo-display text-xl font-bold leading-none text-neo-white tabular-nums">
+            {heightM.toFixed(0)}<span className="text-xs text-neo-cyan">m</span>
           </span>
-          <span className="font-neo-body text-[11px] uppercase tracking-wider text-neo-cyan">
+          <span className="font-neo-body text-[10px] uppercase leading-tight tracking-wider text-neo-cyan">
             {t(`wordTower.biome.${biomeId}`)} · {t('wordTower.hud.floors', { n: floorsCount })}
           </span>
           {personalBestM > 0 && (
-            <span className="font-neo-body text-[11px] font-bold text-neo-yellow">
+            <span className="font-neo-body text-[10px] font-bold leading-tight text-neo-yellow">
               {t('wordTower.hud.best', { m: Math.round(personalBestM) })}
             </span>
           )}
@@ -113,7 +114,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
           caps the play area (hides the busy parallax behind a clean surface). */}
       <div
         ref={deckRef}
-        className="pointer-events-auto space-y-3 rounded-t-neo border-t-neo-thick border-black bg-neo-navy/95 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md"
+        className="pointer-events-auto space-y-2 rounded-t-neo border-t-neo-thick border-black bg-neo-navy/95 px-4 pt-2.5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md"
       >
         {/* Word builder */}
         <div
@@ -132,7 +133,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
         )}
 
         {/* Tray */}
-        <div className="mx-auto grid max-w-md grid-cols-6 gap-2">
+        <div className="mx-auto grid max-w-md grid-cols-6 gap-1.5">
           {tray.map((letter, i) => {
             const isSel = selected.includes(i);
             return (
@@ -142,7 +143,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
                 disabled={isSel}
                 onClick={() => onSelectTile(i)}
                 aria-label={t('wordTower.a11y.tile', { letter })}
-                className={`flex aspect-square min-h-[44px] items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-2xl font-bold shadow-hard transition-transform active:translate-y-0.5 active:shadow-hard-pressed ${
+                className={`flex aspect-square min-h-[40px] items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-xl font-bold shadow-hard transition-transform active:translate-y-0.5 active:shadow-hard-pressed ${
                   isSel ? 'bg-neo-navy-light text-neo-white/30' : 'bg-neo-lime text-black hover:-translate-y-0.5'
                 }`}
               >
@@ -158,7 +159,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
             type="button"
             onClick={onScramble}
             disabled={scramblesLeft <= 0}
-            className="flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-purple px-3 py-3 font-neo-display font-bold text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
+            className="flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-purple px-3 py-2.5 font-neo-display font-bold text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
             aria-label={t('wordTower.hud.scramble')}
           >
             <Shuffle className="h-5 w-5" />
@@ -168,7 +169,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
             type="button"
             onClick={onBackspace}
             disabled={selected.length === 0}
-            className="rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-3 text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
+            className="rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-2.5 text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
             aria-label={t('wordTower.hud.backspace')}
           >
             <Delete className="h-5 w-5" />
@@ -177,7 +178,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
             type="button"
             onClick={onSubmit}
             disabled={!canSubmit}
-            className="flex flex-1 items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-cyan py-3 font-neo-display text-lg font-bold text-black shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
+            className="flex flex-1 items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-cyan py-2.5 font-neo-display text-lg font-bold text-black shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
           >
             <ArrowUp className="h-5 w-5" />
             {t('wordTower.hud.build')}
@@ -191,7 +192,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
 function Tile({ letter, variant }: { letter: string; variant: 'anchor' | 'selected' }) {
   return (
     <span
-      className={`flex h-11 w-11 items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-2xl font-bold shadow-hard ${
+      className={`flex h-9 w-9 items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-xl font-bold shadow-hard ${
         variant === 'anchor'
           ? 'bg-neo-yellow text-black ring-2 ring-neo-yellow ring-offset-2 ring-offset-neo-navy'
           : 'bg-neo-cyan text-black'

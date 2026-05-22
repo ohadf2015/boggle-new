@@ -127,4 +127,34 @@ describe('towerRowLayout (grounded camera)', () => {
     expect(after - at).toBeCloseTo(towerRowLayout({ pinCount: boundary, H, bottomInsetPx: inset }).rowH);
     expect(at).toBeLessThanOrEqual(towerRowLayout({ pinCount: boundary, H, bottomInsetPx: inset }).rowH);
   });
+
+  // ── Phase-1 polish: compact, cohesive stack (founder: tiles too big, tower
+  //    reads as floating blocks not a solid tower; new letters crammed at top). ──
+  it('caps tile size to a compact maximum even on tall canvases', () => {
+    expect(towerRowLayout({ pinCount: 5, H: 2000, bottomInsetPx: inset }).size).toBeLessThanOrEqual(54);
+  });
+
+  it('keeps a usable minimum tile size on short canvases', () => {
+    expect(towerRowLayout({ pinCount: 5, H: 300, bottomInsetPx: inset }).size).toBeGreaterThanOrEqual(38);
+  });
+
+  it('stacks rows nearly flush — a thin seam, never a loose gap or overlap', () => {
+    for (const h of [380, 700, 1000, 1400]) {
+      const l = towerRowLayout({ pinCount: 5, H: h, bottomInsetPx: 160 });
+      const seam = l.rowH - l.size;
+      expect(seam).toBeGreaterThan(0); // tiles must not overlap
+      expect(seam).toBeLessThanOrEqual(3); // cohesive tower, not detached floating blocks
+    }
+  });
+
+  it('parks the build line low enough to give a building word headroom above it', () => {
+    // The pending word grows UP from the committed top (the build line); if the
+    // line sits too near the screen top the new letters cram under the header and
+    // read as "detached above". Keep it in the upper-middle band.
+    for (const h of [700, 915, 1200]) {
+      const l = towerRowLayout({ pinCount: 8, H: h, bottomInsetPx: 200 });
+      expect(l.topCenter).toBeGreaterThanOrEqual(h * 0.22);
+      expect(l.topCenter).toBeLessThanOrEqual(h * 0.42); // but not so low it buries the tower
+    }
+  });
 });

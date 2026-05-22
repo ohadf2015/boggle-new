@@ -95,10 +95,11 @@ export interface TowerRowLayout {
  * bottom behind the deck — i.e. the camera follows the climb, Tower-Bloxx style.
  */
 export function towerRowLayout({ pinCount, H, bottomInsetPx }: TowerRowLayoutInput): TowerRowLayout {
-  const size = clamp(H * 0.082, 46, 66);
+  const size = clamp(H * 0.066, 38, 54); // compact blocks — was 0.082/46–66 (read too big)
   const half = size / 2;
-  const rowH = size + Math.round(size * 0.05); // tight stack → reads as one cohesive tower
-  const topCenter = H * 0.15 + half; // newest tile parks just under the crane
+  const rowH = size + 2; // ~2px seam → tiles read as one cohesive stacked tower, not floating blocks
+  const topCenter = H * 0.28 + half; // park the committed top in the upper-middle so a building word
+                                     // has headroom above it (was 0.15 → new letters crammed under the header)
   const baseCenter = H - bottomInsetPx - half - Math.round(size * 0.12); // grounded just above the deck
   // Overflow once the pinned top would rise above the build line; pan down to keep it there.
   const shift = pinCount > 0 ? Math.max(0, topCenter - baseCenter + (pinCount - 1) * rowH) : 0;

@@ -220,11 +220,9 @@ export function WordTowerScene(props: SceneProps) {
       />
       {/* Parallax ascent backdrop (stars/clouds/skyline scroll by altitude) */}
       <WordTowerBackdrop biomeId={props.biomeId} heightM={props.heightM} reducedMotion={props.reducedMotion} />
-      {/* Brand climb companion (replaces the crane) — reacts to word events. */}
+      {/* Brand climb companion — pops in to cheer only when a word is built. */}
       <WordTowerMascot
-        biomeId={props.biomeId}
         resultKey={props.resultKey}
-        errorKey={props.errorKey}
         lastResult={props.lastResult}
         reducedMotion={props.reducedMotion}
       />
