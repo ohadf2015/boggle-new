@@ -66,6 +66,16 @@ tg_msg()   { [ "$DRY_RUN" = "1" ] || "$TG" msg   "$@"; }
 tg_alert() { [ "$DRY_RUN" = "1" ] || "$TG" alert "$@"; }
 tg_doc()   { [ "$DRY_RUN" = "1" ] || "$TG" doc   "$@"; }
 
+# Failure digest: every failed-but-ran path sends this so a non-shipping night is
+# never silent (was: a one-line alert at best, nothing if killed mid-gate).
+# compose_failure_digest lives in lib/failure-digest.sh (deterministic, no LLM).
+send_failure_digest() {
+  LANE_SUMMARY_TEXT=$(printf '%s\n' "${LANE_RESULTS[@]:-}")
+  local digest; digest=$(compose_failure_digest "$1")
+  tg_msg "$digest"
+  [ -f "$REPORT" ] && tg_doc "$REPORT" "Full report (run did not ship)"
+}
+
 cleanup() {
   # shellcheck disable=SC1091
   . "$LIB_DIR/preflight.sh"
@@ -91,6 +101,10 @@ trap cleanup EXIT
 # Tested by test/wip-revert.test.sh.
 # shellcheck disable=SC1091
 . "$LIB_DIR/wip-revert.sh"
+# Failure digest composer (sent on every failed-but-ran path so a non-shipping
+# night is never silent). Tested by test/failure-digest.test.sh.
+# shellcheck disable=SC1091
+. "$LIB_DIR/failure-digest.sh"
 # founder free-text directives (texted to the bot) → active block for this run.
 # shellcheck disable=SC1091
 . "$LIB_DIR/user-directives.sh"
@@ -253,7 +267,7 @@ if [ "$NO_CHANGE_MODE" = "0" ] && [ "$LANE_CHURN" -gt 30 ]; then
   revert_to_pre_lane "$RUN_SNAPSHOT"; RUN_SNAPSHOT=""
   mkdir -p "$(dirname "$REPORT")"
   echo -e "\n**Outcome:** ABORTED — lane churn $LANE_CHURN files > 30 sanity cap. Pre-run WIP restored, lane changes dropped." >> "$REPORT"
-  tg_alert "nightly $TODAY ABORTED — lane churn $LANE_CHURN files > 30 sanity cap. Founder WIP restored, nothing pushed."
+  send_failure_digest "Lane churn $LANE_CHURN files exceeded the 30-file sanity cap — too many changes, aborted for safety. Founder WIP restored."
   exit 1
 fi
 
@@ -326,7 +340,7 @@ if [ "$gate_ok" = "0" ]; then
     revert_to_pre_lane "$PRISTINE"
     mkdir -p "$(dirname "$REPORT")"
     echo -e "\n**Outcome:** GATE FAILED — lint/test/build failed; docs-only salvage also failed. Pre-run tree restored (founder WIP intact, all lane changes dropped)." >> "$REPORT"
-    tg_alert "nightly $TODAY: gate failed twice + docs salvage failed. Founder WIP restored, nothing pushed. See \`$RUN_LOG\`."
+    send_failure_digest "Gate failed (lint/test/build) on both attempts, and the docs-only salvage also failed. All lane changes dropped, founder WIP intact."
     exit 1
   fi
 fi
@@ -360,7 +374,7 @@ EOF
     # scenarios (clean push, non-overlap rebase, generated-file exclusion, no-change
     # guard, genuine-conflict fail-safe). On unrecoverable failure it has already
     # alerted + preserved a clean tree, so we just exit.
-    ship_nightly_commit || exit 1
+    ship_nightly_commit || { send_failure_digest "Commit/push failed — likely a real merge conflict with origin/master. The local commit was preserved for a human to resolve."; exit 1; }
   fi
 fi
 
