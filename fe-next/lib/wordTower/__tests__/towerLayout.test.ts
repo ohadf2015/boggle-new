@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { courseTileLayout, biomeBackdrop } from '../towerLayout';
+import { courseTileLayout, biomeBackdrop, towerRowLayout } from '../towerLayout';
 
 describe('courseTileLayout', () => {
   it('returns one tile per code point (unicode-safe)', () => {
@@ -69,5 +69,62 @@ describe('biomeBackdrop', () => {
     const order = ['city', 'sky', 'stratosphere', 'orbit', 'nebula', 'galaxy'] as const;
     const vals = order.map((id) => biomeBackdrop(id).scaffold);
     for (let i = 1; i < vals.length; i++) expect(vals[i]!).toBeLessThanOrEqual(vals[i - 1]!);
+  });
+});
+
+describe('towerRowLayout (grounded camera)', () => {
+  const H = 1200;
+  const inset = 220;
+
+  it('empty tower applies no shift', () => {
+    const l = towerRowLayout({ pinCount: 0, H, bottomInsetPx: inset });
+    expect(l.shift).toBe(0);
+  });
+
+  it('short tower is grounded: base sits near the bottom (above the deck), no shift', () => {
+    const l = towerRowLayout({ pinCount: 3, H, bottomInsetPx: inset });
+    expect(l.shift).toBe(0);
+    // base (pos 0) centred at baseCenter, which is above the control deck
+    expect(l.centerY(0)).toBe(l.baseCenter);
+    expect(l.baseCenter + l.half).toBeLessThanOrEqual(H - inset);
+  });
+
+  it('grounded tower never pushes its newest tile above the build line', () => {
+    const l = towerRowLayout({ pinCount: 6, H, bottomInsetPx: inset });
+    expect(l.shift).toBe(0);
+    // top committed tile stays at or below topCenter (i.e. under the crane line)
+    expect(l.centerY(5)).toBeGreaterThanOrEqual(l.topCenter);
+  });
+
+  it('tall tower overflows: newest committed tile is pinned at the build line', () => {
+    const pinCount = 20;
+    const l = towerRowLayout({ pinCount, H, bottomInsetPx: inset });
+    expect(l.shift).toBeGreaterThan(0);
+    expect(l.centerY(pinCount - 1)).toBeCloseTo(l.topCenter);
+    // base has scrolled below the viewport bottom (off-screen / behind the deck)
+    expect(l.centerY(0)).toBeGreaterThan(H - inset);
+  });
+
+  it('centerY is monotonic in pos by exactly one row height (no overlaps)', () => {
+    const l = towerRowLayout({ pinCount: 10, H, bottomInsetPx: inset });
+    for (let p = 0; p < 9; p++) {
+      expect(l.centerY(p) - l.centerY(p + 1)).toBeCloseTo(l.rowH);
+    }
+  });
+
+  it('shift grows continuously across the overflow boundary (no camera jump)', () => {
+    // Find the boundary pinCount where shift first becomes positive.
+    let boundary = 0;
+    for (let n = 1; n < 60; n++) {
+      if (towerRowLayout({ pinCount: n, H, bottomInsetPx: inset }).shift > 0) { boundary = n; break; }
+    }
+    expect(boundary).toBeGreaterThan(1);
+    const before = towerRowLayout({ pinCount: boundary - 1, H, bottomInsetPx: inset }).shift;
+    const at = towerRowLayout({ pinCount: boundary, H, bottomInsetPx: inset }).shift;
+    const after = towerRowLayout({ pinCount: boundary + 1, H, bottomInsetPx: inset }).shift;
+    expect(before).toBe(0);
+    // each extra committed row adds exactly one rowH of downward travel
+    expect(after - at).toBeCloseTo(towerRowLayout({ pinCount: boundary, H, bottomInsetPx: inset }).rowH);
+    expect(at).toBeLessThanOrEqual(towerRowLayout({ pinCount: boundary, H, bottomInsetPx: inset }).rowH);
   });
 });

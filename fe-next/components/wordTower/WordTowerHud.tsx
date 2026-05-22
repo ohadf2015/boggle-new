@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Delete, Shuffle, ArrowUp } from 'lucide-react';
 import { comboMult, type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
@@ -25,6 +25,8 @@ export interface WordTowerHudProps {
   onClear: () => void;
   onSubmit: () => void;
   onScramble: () => void;
+  /** Reports the bottom control-deck height (px) so the tower can ground just above it. */
+  onDeckHeight?: (px: number) => void;
   t: (key: string, params?: Record<string, string | number>) => string;
   dir: 'ltr' | 'rtl';
 }
@@ -40,11 +42,24 @@ export function WordTowerHud(props: WordTowerHudProps) {
   const {
     anchorLetter, tray, selected, word, heightM, personalBestM, combo, scramblesLeft, floorsCount,
     biomeId, lastError, errorKey, lastResult, resultKey,
-    onSelectTile, onBackspace, onClear, onSubmit, onScramble, t,
+    onSelectTile, onBackspace, onClear, onSubmit, onScramble, onDeckHeight, t,
   } = props;
 
   const mult = comboMult(combo);
   const canSubmit = word.length >= 3;
+
+  // Measure the control deck so the Pixi tower can ground exactly on top of it.
+  const deckRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = deckRef.current;
+    if (!el || !onDeckHeight) return;
+    const report = () => onDeckHeight(el.offsetHeight);
+    report();
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(report);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [onDeckHeight]);
 
   const liveText = useMemo(() => {
     if (resultKey > 0 && lastResult) {
@@ -55,7 +70,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
   }, [resultKey, lastResult, heightM, combo, t]);
 
   return (
-    <div className="pointer-events-auto relative flex h-full flex-col justify-between">
+    <div className="pointer-events-none relative flex h-full flex-col justify-between">
       {/* Floating reward popup on each accepted word */}
       {resultKey > 0 && lastResult && (
         <div
@@ -69,37 +84,37 @@ export function WordTowerHud(props: WordTowerHudProps) {
           )}
           <div className="font-neo-display text-2xl font-bold text-neo-lime drop-shadow-[2px_2px_0_#000]">
             +{lastResult.meters.toFixed(1)} m
+            {combo > 1 && <span className="ms-2 text-neo-orange">×{mult.toFixed(1)}</span>}
           </div>
         </div>
       )}
-      {/* Top: altitude + biome + combo */}
-      <div className="flex items-start justify-between p-4">
-        <div className="rounded-neo border-neo-thick border-black bg-neo-navy/80 px-4 py-2 shadow-hard backdrop-blur-sm">
-          <div className="font-neo-display text-3xl font-bold text-neo-white tabular-nums">
-            {heightM.toFixed(0)}<span className="text-lg text-neo-cyan"> m</span>
-          </div>
-          <div className="font-neo-body text-xs uppercase tracking-wider text-neo-cyan">
+      {/* Top: one compact altitude readout — display-only, centered to clear the
+          back button + share/leaderboard/restart controls on either side. */}
+      <div className="pointer-events-none flex justify-center px-4 pt-16">
+        <div className="flex items-baseline gap-2 rounded-neo border-neo-thick border-black bg-neo-navy/80 px-4 py-1.5 shadow-hard backdrop-blur-sm">
+          <span className="font-neo-display text-2xl font-bold text-neo-white tabular-nums">
+            {heightM.toFixed(0)}<span className="text-sm text-neo-cyan"> m</span>
+          </span>
+          <span className="font-neo-body text-[11px] uppercase tracking-wider text-neo-cyan">
             {t(`wordTower.biome.${biomeId}`)} · {t('wordTower.hud.floors', { n: floorsCount })}
-          </div>
+          </span>
           {personalBestM > 0 && (
-            <div className="font-neo-body text-[11px] font-bold text-neo-yellow">
+            <span className="font-neo-body text-[11px] font-bold text-neo-yellow">
               {t('wordTower.hud.best', { m: Math.round(personalBestM) })}
-            </div>
+            </span>
           )}
         </div>
-        {combo > 1 && (
-          <div className="animate-neo-pop rounded-neo border-neo-thick border-black bg-neo-orange px-3 py-2 shadow-hard">
-            <span className="font-neo-display text-xl font-bold text-black">×{mult.toFixed(1)}</span>
-            <span className="ms-1 font-neo-body text-xs font-bold text-black">{t('wordTower.hud.combo', { n: combo })}</span>
-          </div>
-        )}
       </div>
 
       {/* Screen-reader live announcements */}
       <div aria-live="polite" className="sr-only">{liveText}</div>
 
-      {/* Bottom controls */}
-      <div className="space-y-3 p-4">
+      {/* Bottom controls — a solid "control deck" that grounds the rack and
+          caps the play area (hides the busy parallax behind a clean surface). */}
+      <div
+        ref={deckRef}
+        className="pointer-events-auto space-y-3 rounded-t-neo border-t-neo-thick border-black bg-neo-navy/95 px-4 pb-5 pt-3 shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md"
+      >
         {/* Word builder */}
         <div
           key={`builder-${errorKey}`}

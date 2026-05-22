@@ -61,6 +61,51 @@ export function courseTileLayout(word: string, courseW: number, opts: CourseOpts
   return { tiles, width, height: size };
 }
 
+/** Inputs for the grounded tower-camera row layout. */
+export interface TowerRowLayoutInput {
+  /** Committed rows the camera pins on. Pending preview rows are NOT counted —
+   *  building a word must not bob the settled tower. */
+  pinCount: number;
+  /** Canvas height (px). */
+  H: number;
+  /** Height (px) of the bottom control deck; the tower never grounds into it. */
+  bottomInsetPx: number;
+}
+
+export interface TowerRowLayout {
+  size: number;
+  half: number;
+  rowH: number;
+  /** Centre-y the newest committed tile is pinned to once the tower overflows. */
+  topCenter: number;
+  /** Centre-y of the base tile while the tower is short enough to stand grounded. */
+  baseCenter: number;
+  /** Downward camera travel applied once the committed tower outgrows the window. */
+  shift: number;
+  /** Centre-y for a tile at stack position `pos` (0 = base, growing upward). */
+  centerY: (pos: number) => number;
+}
+
+/**
+ * Grounded tower camera. The base stands just above the control deck and the
+ * stack grows UP toward the crane build line (fixes the old top-anchored model
+ * where the base floated/culled below the tray). Once the committed tower is
+ * taller than the visible band, the whole stack pans DOWN (`shift`) so the
+ * newest tile stays pinned at the build line and the base scrolls off the
+ * bottom behind the deck — i.e. the camera follows the climb, Tower-Bloxx style.
+ */
+export function towerRowLayout({ pinCount, H, bottomInsetPx }: TowerRowLayoutInput): TowerRowLayout {
+  const size = clamp(H * 0.082, 46, 66);
+  const half = size / 2;
+  const rowH = size + Math.round(size * 0.05); // tight stack → reads as one cohesive tower
+  const topCenter = H * 0.15 + half; // newest tile parks just under the crane
+  const baseCenter = H - bottomInsetPx - half - Math.round(size * 0.12); // grounded just above the deck
+  // Overflow once the pinned top would rise above the build line; pan down to keep it there.
+  const shift = pinCount > 0 ? Math.max(0, topCenter - baseCenter + (pinCount - 1) * rowH) : 0;
+  const centerY = (pos: number) => baseCenter - pos * rowH + shift;
+  return { size, half, rowH, topCenter, baseCenter, shift, centerY };
+}
+
 /** Per-biome opacities for the construction backdrop layers (0..1). */
 export interface BiomeBackdrop {
   /** Scaffold rails framing the tower. */

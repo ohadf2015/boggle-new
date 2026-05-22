@@ -73,10 +73,19 @@ describe('WordTowerHud', () => {
     expect(screen.getByText('wordTower.celebration.highRise')).toBeInTheDocument();
   });
 
-  it('renders the combo chip only when combo > 1', () => {
-    const { rerender } = render(<WordTowerHud {...makeProps({ combo: 1 })} />);
-    expect(screen.queryByText(/wordTower\.hud\.combo/)).not.toBeInTheDocument();
-    rerender(<WordTowerHud {...makeProps({ combo: 5 })} />);
-    expect(screen.getByText(/wordTower\.hud\.combo/)).toBeInTheDocument();
+  it('surfaces the combo multiplier in the reward popup only when combo > 1', () => {
+    const result = { floorAdded: true, meters: 4.2, combo: 2, scramblesEarned: 0, bombCharge: 1, tier: 'highRise', heightM: 16, biome: 'city' } as const;
+    // combo === 1 → no multiplier shown
+    const { rerender } = render(<WordTowerHud {...makeProps({ resultKey: 1, combo: 1, lastResult: result })} />);
+    expect(screen.queryByText(/×/)).not.toBeInTheDocument();
+    // combo > 1 → multiplier rides along with the "+Xm" reward
+    rerender(<WordTowerHud {...makeProps({ resultKey: 1, combo: 5, lastResult: result })} />);
+    expect(screen.getByText(/×/)).toBeInTheDocument();
+  });
+
+  it('reports its control-deck height so the tower can ground above it', () => {
+    const onDeckHeight = vi.fn();
+    render(<WordTowerHud {...makeProps({ onDeckHeight })} />);
+    expect(onDeckHeight).toHaveBeenCalled();
   });
 });

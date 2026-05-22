@@ -1,9 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, RotateCcw, Trophy, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { Language } from '@/shared/types/game';
@@ -42,6 +43,17 @@ export function WordTowerPlay({ language, isInDictionary, initialGame, personalB
 
   const haptics = useHaptics();
   const { playCoinCollectSound, playChestOpenSound, playErrorSound } = useSoundEffects();
+
+  // Hide the global bottom nav for the duration of gameplay (full-screen mode).
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
+
+  // Control-deck height (measured by the HUD) → the tower grounds just above it.
+  const [deckHeight, setDeckHeight] = useState(220);
+  const onDeckHeight = useCallback((px: number) => setDeckHeight(px), []);
 
   // ── persistence: build payload + save (fetch or beacon) ──
   const gameRef = useRef(game);
@@ -151,6 +163,7 @@ export function WordTowerPlay({ language, isInDictionary, initialGame, personalB
         errorKey={tower.state.errorKey}
         lastResult={tower.state.lastResult}
         reducedMotion={reducedMotion}
+        bottomInsetPx={deckHeight}
       />
 
       <div className="pointer-events-auto absolute inset-x-0 top-0 z-10 flex items-center justify-between p-3">
@@ -210,6 +223,7 @@ export function WordTowerPlay({ language, isInDictionary, initialGame, personalB
           onClear={tower.clear}
           onSubmit={tower.submit}
           onScramble={tower.scramble}
+          onDeckHeight={onDeckHeight}
           t={t}
           dir={dir}
         />

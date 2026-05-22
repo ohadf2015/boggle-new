@@ -18,7 +18,12 @@ import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
  * `reducedMotion` every parallax offset collapses to zero (opacities only).
  */
 
-const PX_PER_M = 2.4; // screen px of parallax travel per metre climbed
+const PX_PER_M = 5.2; // screen px of parallax travel per metre climbed
+// Height updates land discretely (one jump per accepted word). Easing every
+// altitude-driven offset turns those jumps into a continuous glide — the single
+// change that makes the ascent read as motion rather than a static jolt.
+const EASE = 'cubic-bezier(0.22,1,0.36,1)';
+const FLOW = `transform 900ms ${EASE}, background-position 900ms ${EASE}, opacity 1000ms ease-out`;
 
 const SKYLINE = 'M0 26 L0 14 L6 14 L6 8 L12 8 L12 16 L18 16 L18 5 L23 5 L23 16 L30 16 L30 11 L36 11 L36 18 L44 18 L44 7 L49 7 L49 18 L56 18 L56 13 L63 13 L63 4 L68 4 L68 15 L75 15 L75 9 L81 9 L81 17 L88 17 L88 6 L93 6 L93 16 L100 16 L100 26 Z';
 
@@ -57,21 +62,24 @@ export function WordTowerBackdrop({
         style={{ opacity: sun, background: 'radial-gradient(120% 70% at 82% 8%, rgba(255,247,214,0.85), rgba(255,236,180,0.25) 28%, transparent 55%)' }}
       />
 
-      {/* Three parallax star sheets (far→near). Fade in with altitude. */}
-      <div className="absolute inset-0 transition-opacity duration-1000" style={{ opacity: Math.min(1, stars + 0.04), backgroundPosition: starPos(0.12), ...starSheet(340, 1, 1) }} />
-      <div className="absolute inset-0 transition-opacity duration-1000" style={{ opacity: stars * 0.85, backgroundPosition: starPos(0.32), ...starSheet(260, 1.5, 4) }} />
-      <div className="absolute inset-0 transition-opacity duration-1000" style={{ opacity: stars * 0.7, backgroundPosition: starPos(0.62), ...starSheet(200, 2, 7) }} />
+      {/* Three parallax star sheets (far→near). Widely separated depths so the
+          near field streaks past while the far field barely creeps — the depth
+          cue that sells real distance. Fade in with altitude. */}
+      <div className="absolute inset-0" style={{ transition: FLOW, opacity: Math.min(1, stars + 0.04), backgroundPosition: starPos(0.2), ...starSheet(340, 1, 1) }} />
+      <div className="absolute inset-0" style={{ transition: FLOW, opacity: stars * 0.85, backgroundPosition: starPos(0.55), ...starSheet(260, 1.5, 4) }} />
+      <div className="absolute inset-0" style={{ transition: FLOW, opacity: stars * 0.72, backgroundPosition: starPos(1.05), ...starSheet(200, 2.4, 7) }} />
 
       {/* Distant celestial bodies — the "and beyond". Fade in deep, drift slow. */}
-      <div className="absolute inset-0 transition-opacity duration-1000" style={{ opacity: stars }}>
-        <div className="absolute h-28 w-28 rounded-full" style={{ left: '14%', top: '22%', transform: `translateY(${-slide(0.08, 600)}px)`, background: 'radial-gradient(circle at 35% 30%, #ffe7a8, #d98a3a 55%, #7a3f12 100%)', boxShadow: '0 0 48px rgba(255,200,120,0.35)' }} />
-        <div className="absolute h-16 w-16 rounded-full" style={{ right: '16%', top: '40%', transform: `translateY(${-slide(0.05, 600)}px)`, background: 'radial-gradient(circle at 40% 35%, #cfe8ff, #6f8fc0 60%, #2a3a66 100%)', boxShadow: '0 0 30px rgba(150,190,255,0.3)' }} />
+      <div className="absolute inset-0" style={{ transition: FLOW, opacity: stars }}>
+        <div className="absolute h-28 w-28 rounded-full" style={{ left: '14%', top: '22%', transition: FLOW, transform: `translateY(${-slide(0.18, 700)}px)`, background: 'radial-gradient(circle at 35% 30%, #ffe7a8, #d98a3a 55%, #7a3f12 100%)', boxShadow: '0 0 48px rgba(255,200,120,0.35)' }} />
+        <div className="absolute h-16 w-16 rounded-full" style={{ right: '16%', top: '40%', transition: FLOW, transform: `translateY(${-slide(0.1, 700)}px)`, background: 'radial-gradient(circle at 40% 35%, #cfe8ff, #6f8fc0 60%, #2a3a66 100%)', boxShadow: '0 0 30px rgba(150,190,255,0.3)' }} />
       </div>
 
-      {/* Far city skyline — light, atmospheric (recedes into the haze). Slow parallax. */}
+      {/* Far city skyline — light, atmospheric (recedes into the haze). Slow
+          parallax. Raised to peek above the control deck at low altitude. */}
       <svg
-        className="absolute inset-x-0 bottom-[8%] h-[22%] w-full transition-opacity duration-1000"
-        style={{ opacity: b.skyline * 0.7, transform: `translateY(${slide(0.7, 1400)}px)` }}
+        className="absolute inset-x-0 bottom-[20%] h-[20%] w-full"
+        style={{ opacity: b.skyline * 0.7, transition: FLOW, transform: `translateY(${slide(0.85, 1400)}px)` }}
         viewBox="0 0 100 26"
         preserveAspectRatio="none"
       >
@@ -80,8 +88,8 @@ export function WordTowerBackdrop({
 
       {/* Drifting clouds — fall away as you climb. */}
       <div
-        className="absolute inset-0 transition-opacity duration-1000"
-        style={{ opacity: Math.min(1, b.clouds + sun * 0.5), transform: `translateY(${slide(0.9, 1500)}px)` }}
+        className="absolute inset-0"
+        style={{ opacity: Math.min(1, b.clouds + sun * 0.5), transition: FLOW, transform: `translateY(${slide(1.05, 1500)}px)` }}
       >
         <div className="wt-cloud" style={{ top: '12%', width: 180, height: 50, animationDuration: '64s' }} />
         <div className="wt-cloud" style={{ top: '30%', width: 120, height: 36, animationDuration: '92s', animationDelay: '-30s' }} />
@@ -91,28 +99,24 @@ export function WordTowerBackdrop({
 
       {/* Near city skyline — darker silhouette in front. Faster parallax. */}
       <svg
-        className="absolute inset-x-0 bottom-[6%] h-[30%] w-full transition-opacity duration-1000"
-        style={{ opacity: b.skyline, transform: `translateY(${slide(1.15, 1700)}px)` }}
+        className="absolute inset-x-0 bottom-[17%] h-[26%] w-full"
+        style={{ opacity: b.skyline, transition: FLOW, transform: `translateY(${slide(1.35, 1700)}px)` }}
         viewBox="0 0 100 26"
         preserveAspectRatio="none"
       >
         <path fill="#1c2c4a" d={SKYLINE} />
       </svg>
 
-      {/* Ground / street the tower rises from — slides off as you leave land. */}
-      <div
-        className="absolute inset-x-0 bottom-0 h-[8%] border-t-2 border-black transition-opacity duration-1000"
-        style={{ opacity: b.skyline, background: 'linear-gradient(180deg,#243a2a,#16241a)', transform: `translateY(${slide(1.3, 1800)}px)` }}
-      />
-
-      {/* Tower crane: mast, jib, counterweight, swaying hook over the build line */}
-      <div className="absolute inset-0 transition-opacity duration-1000" style={{ opacity: b.crane }}>
-        <div className="absolute right-[11%] top-0 h-[30%] w-2.5 border-x-2 border-black" style={{ background: '#f4b740' }} />
+      {/* Tower crane: mast, jib, counterweight, short swaying hook over the build
+          line. Slides up & away once you climb past it (a horizon fixture, not a
+          lifter), so a grounded tower never appears to dangle from it. */}
+      <div className="absolute inset-0" style={{ opacity: b.crane, transition: FLOW, transform: `translateY(${-slide(0.55, 900)}px)` }}>
+        <div className="absolute right-[11%] top-0 h-[26%] w-2.5 border-x-2 border-black" style={{ background: '#f4b740' }} />
         <div className="absolute right-[8%] top-[6%] left-[34%] h-2.5 border-y-2 border-black" style={{ background: '#f4b740' }} />
         <div className="absolute right-[6%] top-[3%] h-5 w-9 border-2 border-black bg-neo-yellow" />
         <div className="absolute right-[10%] top-[6%] h-4 w-4 border-2 border-black" style={{ background: '#c98a1f' }} />
         <div className="wt-hook absolute left-[46%] top-[6%]">
-          <div className="mx-auto w-[3px] bg-black" style={{ height: '92px' }} />
+          <div className="mx-auto w-[3px] bg-black" style={{ height: '34px' }} />
           <div className="mx-auto h-3 w-4 rounded-b-full border-2 border-t-0 border-black bg-neo-yellow" />
         </div>
       </div>

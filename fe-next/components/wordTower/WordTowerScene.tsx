@@ -7,6 +7,7 @@ import { CONFETTI_BURST, COMBO_FLASH, GOLD_STARS } from '@/lib/gameEngine/preset
 import type { WordTowerFloor, ApplyResult } from '@/lib/wordTower/wordTowerManager';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
 import { buildTowerColumn, wordColor } from '@/lib/wordTower/towerColumn';
+import { towerRowLayout } from '@/lib/wordTower/towerLayout';
 import {
   makeTile, paintTile, placeInstant, dropIn, moveTo, popOut, recolor, bumpScale, shakeX,
   type TileSprite,
@@ -27,9 +28,9 @@ interface SceneProps {
   errorKey: number;
   lastResult: ApplyResult | null;
   reducedMotion?: boolean;
+  /** Height (px) of the bottom control deck — the tower grounds just above it. */
+  bottomInsetPx?: number;
 }
-
-const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 
 /** One live row in the unified (committed ++ pending) stack. */
 interface LiveCell {
@@ -47,7 +48,7 @@ interface LiveCell {
  * recolours in place, removed pending tiles pop out, survivors slide. Fires the
  * per-word celebration FX.
  */
-function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, lastResult, reducedMotion }: SceneProps) {
+function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, lastResult, reducedMotion, bottomInsetPx = 220 }: SceneProps) {
   const engine = useGameEngine();
   const containerRef = useRef<Container | null>(null);
   const registry = useRef<Map<string, TileSprite>>(new Map());
@@ -76,17 +77,14 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
     if (!c) return;
 
     const { width: W, height: H } = engine;
-    const size = clamp(H * 0.082, 46, 66);
-    const gap = Math.round(size * 0.05); // tight stack → reads as one cohesive tower
-    const rowH = size + gap;
-    const topY = H * 0.17; // build line for the newest block, just under the crane
-    const trayTop = H * 0.72; // tower never renders into the tray zone below
     const centerX = W / 2;
-    const half = size / 2;
 
     // Build the unified bottom→top stack: committed letters/bricks + pending ghosts.
     const committed = buildTowerColumn(floors);
     const C = committed.length;
+    // Grounded camera: base stands on the deck, stack grows up, camera pans once
+    // the committed tower (NOT the pending preview) overflows the window.
+    const { size, half, rowH, centerY } = towerRowLayout({ pinCount: C, H, bottomInsetPx });
     const pendingColor = wordColor(floors.length);
     // Skip the anchor (pendingWord[0]) when it's already the committed top.
     const pchars = C === 0 ? Array.from(pendingWord) : Array.from(pendingWord).slice(1);
@@ -105,10 +103,11 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
 
     const total = live.length;
     const maxPos = total - 1;
-    const centerY = (pos: number) => topY + (total - 1 - pos) * rowH + half;
 
-    // Virtualize: only sprites whose row could be on-screen.
-    const visible = live.filter((l) => { const y = centerY(l.pos); return y > -rowH && y < trayTop; });
+    // Virtualize: keep rows that could be on-screen. The base may slide behind
+    // the opaque deck (y > H − deck) once the tower overflows — keep rendering
+    // it (it tucks behind the deck) until it leaves the viewport entirely.
+    const visible = live.filter((l) => { const y = centerY(l.pos); return y > -rowH * 1.5 && y < H + rowH; });
     const visKeys = new Set(visible.map((v) => v.key));
 
     // Retire sprites that left the window (scrolled off → destroy; backspaced ghost → pop out).
@@ -151,7 +150,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
 
     firstRender.current = false;
     prevMaxPos.current = maxPos;
-  }, [floors, pendingWord, engine, reducedMotion]);
+  }, [floors, pendingWord, engine, reducedMotion, bottomInsetPx]);
 
   // Shake the stack when a word is rejected.
   useEffect(() => {
