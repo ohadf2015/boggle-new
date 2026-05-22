@@ -144,45 +144,58 @@ export function useBlastDebris(
       // forever during a transient unmounted window. Per-fragment
       // `d.graphic.destroyed` checks below + the rafId cleanup on real unmount
       // already handle correctness.
-      const now = performance.now() / 1000;
-      const debris = debrisRef.current;
-      for (let i = debris.length - 1; i >= 0; i--) {
-        const d = debris[i];
-        if (d.graphic.destroyed) {
-          debris.splice(i, 1);
-          continue;
-        }
-        const age = now - d.createdAt;
+      try {
+        const now = performance.now() / 1000;
+        const debris = debrisRef.current;
+        for (let i = debris.length - 1; i >= 0; i--) {
+          const d = debris[i];
+          try {
+            if (d.graphic.destroyed) {
+              debris.splice(i, 1);
+              continue;
+            }
+            const age = now - d.createdAt;
 
-        if (age > DEBRIS_LIFETIME) {
-          try { physics.removeBody(d.bodyId); } catch { /* noop */ }
-          if (!d.graphic.destroyed) d.graphic.destroy();
-          debris.splice(i, 1);
-          continue;
-        }
+            if (age > DEBRIS_LIFETIME) {
+              try { physics.removeBody(d.bodyId); } catch { /* noop */ }
+              if (!d.graphic.destroyed) d.graphic.destroy();
+              debris.splice(i, 1);
+              continue;
+            }
 
-        const state = physics.getBodyState(d.bodyId);
-        // Pixi v8's recursive parent destroy can null a child's internal
-        // `_position` *before* flipping `destroyed`, so `.x =` would throw
-        // "Cannot set properties of null". Guard on `position` too.
-        if (state && !d.graphic.destroyed && d.graphic.position) {
-          d.graphic.x = state.position.x;
-          d.graphic.y = state.position.y;
-          d.graphic.rotation = state.angle;
-          // Aggressive fade: start at 10% of lifetime so fragments dissolve
-          // almost the entire flight, never sitting opaque on a tile.
-          const fadeStart = DEBRIS_LIFETIME * 0.1;
-          const peakAlpha = 0.85;
-          d.graphic.alpha = age > fadeStart
-            ? peakAlpha * (1 - (age - fadeStart) / (DEBRIS_LIFETIME - fadeStart))
-            : peakAlpha;
-        } else if (!state) {
-          // Physics body vanished — destroy orphan graphic
-          if (!d.graphic.destroyed) d.graphic.destroy();
-          debris.splice(i, 1);
+            const state = physics.getBodyState(d.bodyId);
+            // Pixi v8's recursive parent destroy can null a child's internal
+            // `_position` *before* flipping `destroyed`, so `.x =` would throw
+            // "Cannot set properties of null". Guard on `position` too.
+            if (state && !d.graphic.destroyed && d.graphic.position) {
+              d.graphic.x = state.position.x;
+              d.graphic.y = state.position.y;
+              d.graphic.rotation = state.angle;
+              // Aggressive fade: start at 10% of lifetime so fragments dissolve
+              // almost the entire flight, never sitting opaque on a tile.
+              const fadeStart = DEBRIS_LIFETIME * 0.1;
+              const peakAlpha = 0.85;
+              d.graphic.alpha = age > fadeStart
+                ? peakAlpha * (1 - (age - fadeStart) / (DEBRIS_LIFETIME - fadeStart))
+                : peakAlpha;
+            } else if (!state) {
+              // Physics body vanished — destroy orphan graphic
+              if (!d.graphic.destroyed) d.graphic.destroy();
+              debris.splice(i, 1);
+            }
+          } catch {
+            // A torn-down Pixi graphic threw mid-sweep (v8 destroys recursively
+            // and can null internals before flipping `destroyed`). Drop this one
+            // fragment and keep sweeping — never let it strand the rest on-board.
+            try { physics.removeBody(debris[i]?.bodyId); } catch { /* noop */ }
+            debris.splice(i, 1);
+          }
         }
+      } finally {
+        // Always reschedule — a throw must never kill the loop, or every
+        // remaining fragment freezes mid-board (the explosion-remnant artifact).
+        rafId = requestAnimationFrame(tick);
       }
-      rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);

@@ -40,7 +40,7 @@ vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
 });
 vi.stubGlobal('cancelAnimationFrame', () => { rafCb = null; });
 
-import { Container } from 'pixi.js';
+import { Container, Graphics } from 'pixi.js';
 import { PhysicsWorld } from '@/lib/gameEngine/PhysicsWorld';
 import { useBlastDebris, safeHexToNum } from '../useBlastDebris';
 
@@ -174,6 +174,53 @@ describe('useBlastDebris — static walls', () => {
 
     expect(physics.getAllBodyStates().length - wallCount).toBe(0);
 
+    perfSpy.mockRestore();
+    unmount();
+  });
+
+  it('RAF tick keeps sweeping the rest + reschedules even if one fragment graphic.destroy() throws (Pixi v8 teardown race)', () => {
+    // Given — Pixi v8 can throw when an op runs against a torn-down graphic.
+    // If that throw escapes the per-frame tick, the `requestAnimationFrame(tick)`
+    // reschedule never runs and ALL remaining debris freezes mid-board (the
+    // "explosion remnants stuck on tiles" symptom). The sweep must be resilient:
+    // one bad fragment removes itself, the rest still age out, and the loop
+    // continues on the next frame.
+    const physics = new PhysicsWorld({ gravity: { x: 0, y: 0 } });
+    const camera = new Container();
+    let nowMs = 1000;
+    const perfSpy = vi.spyOn(performance, 'now').mockImplementation(() => nowMs);
+
+    const { result, unmount } = renderHook(() => useBlastDebris(40, 8, camera, physics));
+
+    // Spawn several fragments across two tiles (≥2 so siblings survive the throw)
+    result.current.spawnDebris([
+      { row: 0, col: 0, type: 'standard' },
+      { row: 1, col: 1, type: 'standard' },
+    ]);
+
+    const wallCount = physics.getAllBodyStates().filter(b => b.label === 'wall').length;
+    expect(physics.getAllBodyStates().length - wallCount).toBeGreaterThan(1);
+
+    // Make the FIRST destroy() call throw — simulates a torn-down graphic.
+    let firstDestroy = true;
+    const destroySpy = vi
+      .spyOn(Graphics.prototype, 'destroy')
+      .mockImplementation(function (this: { destroyed: boolean }) {
+        if (firstDestroy) {
+          firstDestroy = false;
+          throw new Error('pixi v8 teardown race');
+        }
+        this.destroyed = true;
+      });
+
+    // When — age every fragment past lifetime and run one tick.
+    nowMs += 2000;
+    expect(() => { if (rafCb) rafCb(nowMs); }).not.toThrow();
+
+    // Then — every fragment body is cleaned despite the throw (loop didn't abort).
+    expect(physics.getAllBodyStates().length - wallCount).toBe(0);
+
+    destroySpy.mockRestore();
     perfSpy.mockRestore();
     unmount();
   });
