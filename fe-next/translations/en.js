@@ -3132,6 +3132,30 @@ const en = {
       "name": "First Victory",
       "description": "Won your very first game"
     },
+    "CONSONANT_CULT": {
+      "name": "Consonant Cult",
+      "description": "Found a valid word with zero vowels"
+    },
+    "VOWEL_HOARDER": {
+      "name": "Vowel Hoarder",
+      "description": "One word with every vowel — A, E, I, O, U"
+    },
+    "ROGUE_Q": {
+      "name": "Rogue Q",
+      "description": "Played a Q with no U in sight"
+    },
+    "LEVIATHAN": {
+      "name": "Leviathan",
+      "description": "Unleashed a 12-letter monster word"
+    },
+    "NO_REPEATS": {
+      "name": "No Repeats",
+      "description": "An 8+ letter word with no repeated letters"
+    },
+    "FLAWLESS_VICTORY": {
+      "name": "Flawless Victory",
+      "description": "Won without a single wrong guess"
+    },
     "DAILY_DOUBLE": {
       "name": "Daily Double",
       "description": "Crushed both challenges today"

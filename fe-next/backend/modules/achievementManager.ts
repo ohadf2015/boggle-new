@@ -6,6 +6,7 @@
 import type { Game, WordDetail } from '@/shared/types/game';
 const { translations } = require('../../translations/index.js');
 import logger from '../utils/logger';
+import { hasNoVowels, hasAllVowels, isQWithoutU, isLongIsogram, LEVIATHAN_MIN_LENGTH } from './achievements/wordFeats';
 
 // Achievement icons (language-independent)
 export const ACHIEVEMENT_ICONS: Record<string, string> = {
@@ -61,6 +62,14 @@ export const ACHIEVEMENT_ICONS: Record<string, string> = {
   PALINDROME_HUNTER: '🪞',    // Submitted a palindrome word of 4+ letters
   COMEBACK_CHAMPION: '🦾',    // Won MP after late-game push from behind
   FIRST_GAME_WIN: '🌱',       // Win first ever game
+
+  // RARE "word feat" achievements — clever word properties (Hall of Fame)
+  CONSONANT_CULT: '🧩',       // A valid 4+ letter word with NO vowels (rhythm, crypt)
+  VOWEL_HOARDER: '🌀',        // One word containing every vowel A,E,I,O,U
+  ROGUE_Q: '🦂',              // A valid word with Q and no U (qi, qat, qoph)
+  LEVIATHAN: '🐋',            // A monster 12+ letter word
+  NO_REPEATS: '🔷',           // An 8+ letter isogram (every letter distinct)
+  FLAWLESS_VICTORY: '🛡️',     // Won a game without a single invalid submission
 };
 
 export interface Achievement {
@@ -327,6 +336,32 @@ export function checkLiveAchievements(
     if (lower === lower.split('').reverse().join('')) {
       newAchievements.push(addAchievementAndReturn('PALINDROME_HUNTER'));
     }
+  }
+
+  // ── Rare "word feat" achievements (Hall of Fame) ──────────────────────────
+  // Consonant Cult - a valid 4+ letter word with NO vowels (rhythm, crypt, nymph)
+  if (isCurrentWordValid && !achievements.includes('CONSONANT_CULT') && hasNoVowels(word)) {
+    newAchievements.push(addAchievementAndReturn('CONSONANT_CULT'));
+  }
+
+  // Vowel Hoarder - one word containing every vowel A, E, I, O, U (sequoia)
+  if (isCurrentWordValid && !achievements.includes('VOWEL_HOARDER') && hasAllVowels(word)) {
+    newAchievements.push(addAchievementAndReturn('VOWEL_HOARDER'));
+  }
+
+  // Rogue Q - a valid word with Q and no U (qi, qat, qoph)
+  if (isCurrentWordValid && !achievements.includes('ROGUE_Q') && isQWithoutU(word)) {
+    newAchievements.push(addAchievementAndReturn('ROGUE_Q'));
+  }
+
+  // Leviathan - a monster 12+ letter word
+  if (isCurrentWordValid && !achievements.includes('LEVIATHAN') && word.length >= LEVIATHAN_MIN_LENGTH) {
+    newAchievements.push(addAchievementAndReturn('LEVIATHAN'));
+  }
+
+  // No Repeats - an 8+ letter isogram (every letter distinct)
+  if (isCurrentWordValid && !achievements.includes('NO_REPEATS') && isLongIsogram(word)) {
+    newAchievements.push(addAchievementAndReturn('NO_REPEATS'));
   }
 
   return newAchievements;
@@ -607,6 +642,20 @@ export function awardFinalAchievements(game: Game, users: string[]): void {
 
       if (myScore > maxOtherScore && myScore - maxOtherScore < 5 && !currentAchievements.includes('PHOTO_FINISH')) {
         currentAchievements.push('PHOTO_FINISH');
+      }
+
+      // Flawless Victory - won the game without a single invalid submission
+      // (and put up a real game: 10+ valid words). Rare + deeply satisfying.
+      const myAllWords = (game.playerWordDetails[username] || []);
+      const myValidCount = myAllWords.filter(w => w.validated === true).length;
+      if (
+        myScore > maxOtherScore &&
+        myAllWords.length >= 10 &&
+        myValidCount >= 10 &&
+        myAllWords.every(w => w.validated === true) &&
+        !currentAchievements.includes('FLAWLESS_VICTORY')
+      ) {
+        currentAchievements.push('FLAWLESS_VICTORY');
       }
 
       // Comeback Champion - winner whose total points scored in last 25% of game

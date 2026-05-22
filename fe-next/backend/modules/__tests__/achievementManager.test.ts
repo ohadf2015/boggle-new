@@ -457,3 +457,101 @@ describe('LIFETIME_ACHIEVEMENT_THRESHOLDS', () => {
     });
   });
 });
+
+describe('checkLiveAchievements — rare word feats', () => {
+  function liveResult(word: string, validated = true) {
+    const game = buildGame({
+      playerWordDetails: {
+        alice: [{ word, validated, timeSinceStart: 5 } as WordDetail],
+      },
+    });
+    return checkLiveAchievements(game, 'alice', word, 5);
+  }
+
+  it('awards CONSONANT_CULT for a vowelless 4+ letter word', () => {
+    expect(liveResult('rhythm')).toContainEqual(expect.objectContaining({ key: 'CONSONANT_CULT' }));
+  });
+  it('does not award CONSONANT_CULT for a word with a vowel', () => {
+    expect(liveResult('rhyme')).not.toContainEqual(expect.objectContaining({ key: 'CONSONANT_CULT' }));
+  });
+
+  it('awards VOWEL_HOARDER for a word with all five vowels', () => {
+    expect(liveResult('sequoia')).toContainEqual(expect.objectContaining({ key: 'VOWEL_HOARDER' }));
+  });
+
+  it('awards ROGUE_Q for a Q-word with no U', () => {
+    expect(liveResult('qat')).toContainEqual(expect.objectContaining({ key: 'ROGUE_Q' }));
+  });
+  it('does not award ROGUE_Q when a U is present', () => {
+    expect(liveResult('quiz')).not.toContainEqual(expect.objectContaining({ key: 'ROGUE_Q' }));
+  });
+
+  it('awards LEVIATHAN for a 12+ letter word', () => {
+    expect(liveResult('spellbinding')).toContainEqual(expect.objectContaining({ key: 'LEVIATHAN' }));
+  });
+  it('does not award LEVIATHAN for an 11-letter word', () => {
+    expect(liveResult('outstanding')).not.toContainEqual(expect.objectContaining({ key: 'LEVIATHAN' }));
+  });
+
+  it('awards NO_REPEATS for an 8+ letter isogram', () => {
+    expect(liveResult('computers')).toContainEqual(expect.objectContaining({ key: 'NO_REPEATS' }));
+  });
+  it('does not award NO_REPEATS when a letter repeats', () => {
+    expect(liveResult('balloons')).not.toContainEqual(expect.objectContaining({ key: 'NO_REPEATS' }));
+  });
+
+  it('awards none of the feats when the word is invalid', () => {
+    const r = liveResult('rhythm', false);
+    expect(r).not.toContainEqual(expect.objectContaining({ key: 'CONSONANT_CULT' }));
+  });
+
+  it('all rare-feat achievements have icons defined', () => {
+    ['CONSONANT_CULT', 'VOWEL_HOARDER', 'ROGUE_Q', 'LEVIATHAN', 'NO_REPEATS', 'FLAWLESS_VICTORY']
+      .forEach(key => expect(ACHIEVEMENT_ICONS[key]).toBeDefined());
+  });
+});
+
+describe('awardFinalAchievements — FLAWLESS_VICTORY', () => {
+  function tenValidWords(prefix: string): WordDetail[] {
+    return Array.from({ length: 10 }, (_, i) =>
+      ({ word: `${prefix}${i}`, validated: true, timeSinceStart: 10 + i } as WordDetail));
+  }
+
+  it('awards the winner who had zero invalid submissions and 10+ words', () => {
+    const game = buildGame({
+      gameDuration: 180,
+      playerWordDetails: {
+        alice: tenValidWords('catz'),
+        bob: [{ word: 'dog', validated: true, timeSinceStart: 20 } as WordDetail],
+      },
+      users: {
+        alice: { isBot: false } as Game['users'][string],
+        bob: { isBot: false } as Game['users'][string],
+      },
+    });
+
+    awardFinalAchievements(game, ['alice', 'bob']);
+
+    expect(game.playerAchievements.alice).toContain('FLAWLESS_VICTORY');
+  });
+
+  it('does NOT award when the winner had an invalid submission', () => {
+    const dirty = tenValidWords('catz');
+    dirty.push({ word: 'zzzz', validated: false, timeSinceStart: 30 } as WordDetail);
+    const game = buildGame({
+      gameDuration: 180,
+      playerWordDetails: {
+        alice: dirty,
+        bob: [{ word: 'dog', validated: true, timeSinceStart: 20 } as WordDetail],
+      },
+      users: {
+        alice: { isBot: false } as Game['users'][string],
+        bob: { isBot: false } as Game['users'][string],
+      },
+    });
+
+    awardFinalAchievements(game, ['alice', 'bob']);
+
+    expect(game.playerAchievements.alice || []).not.toContain('FLAWLESS_VICTORY');
+  });
+});

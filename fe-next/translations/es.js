@@ -2833,6 +2833,30 @@ const es = {
       "name": "Primera victoria",
       "description": "Ganaste tu primera partida"
     },
+    "CONSONANT_CULT": {
+      "name": "Culto de consonantes",
+      "description": "Encontraste una palabra válida sin vocales"
+    },
+    "VOWEL_HOARDER": {
+      "name": "Acaparador de vocales",
+      "description": "Una palabra con todas las vocales — A, E, I, O, U"
+    },
+    "ROGUE_Q": {
+      "name": "Q rebelde",
+      "description": "Jugaste una Q sin ninguna U"
+    },
+    "LEVIATHAN": {
+      "name": "Leviatán",
+      "description": "Desataste un monstruo de 12 letras"
+    },
+    "NO_REPEATS": {
+      "name": "Sin repetir",
+      "description": "Una palabra de 8+ letras sin ninguna repetida"
+    },
+    "FLAWLESS_VICTORY": {
+      "name": "Victoria impecable",
+      "description": "Ganaste sin un solo intento fallido"
+    },
     "DAILY_DOUBLE": {
       "name": "Doble Diario",
       "description": "Aplastaste ambos retos de hoy"

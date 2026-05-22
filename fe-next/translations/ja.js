@@ -3042,6 +3042,30 @@ const ja = {
       "name": "初勝利",
       "description": "最初の試合に勝利"
     },
+    "CONSONANT_CULT": {
+      "name": "子音の教団",
+      "description": "母音なしの有効な単語を発見"
+    },
+    "VOWEL_HOARDER": {
+      "name": "母音コレクター",
+      "description": "A・E・I・O・U 全部入りの単語"
+    },
+    "ROGUE_Q": {
+      "name": "孤高のQ",
+      "description": "UなしでQを使った"
+    },
+    "LEVIATHAN": {
+      "name": "リヴァイアサン",
+      "description": "12文字以上の超大作を解き放った"
+    },
+    "NO_REPEATS": {
+      "name": "重複なし",
+      "description": "同じ文字が一つもない8文字以上の単語"
+    },
+    "FLAWLESS_VICTORY": {
+      "name": "完全勝利",
+      "description": "ミスゼロで勝利した"
+    },
     "DAILY_DOUBLE": {
       "name": "デイリー・ダブル",
       "description": "今日の2つのチャレンジを完全制覇！"

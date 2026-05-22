@@ -3159,6 +3159,30 @@ const he = {
       "name": "ניצחון ראשון",
       "description": "ניצחת במשחק הראשון שלך"
     },
+    "CONSONANT_CULT": {
+      "name": "כת העיצורים",
+      "description": "מצאת מילה תקינה בלי אף תנועה"
+    },
+    "VOWEL_HOARDER": {
+      "name": "אספן התנועות",
+      "description": "מילה אחת עם כל התנועות — A, E, I, O, U"
+    },
+    "ROGUE_Q": {
+      "name": "Q בודד",
+      "description": "שיחקת Q בלי U בכלל"
+    },
+    "LEVIATHAN": {
+      "name": "לווייתן",
+      "description": "שחררת מילת ענק של 12 אותיות"
+    },
+    "NO_REPEATS": {
+      "name": "בלי כפילויות",
+      "description": "מילה של 8+ אותיות בלי אות שחוזרת"
+    },
+    "FLAWLESS_VICTORY": {
+      "name": "ניצחון מושלם",
+      "description": "ניצחת בלי אף ניחוש שגוי"
+    },
     "DAILY_DOUBLE": {
       "name": "דאבל יומי 🏆",
       "description": "ריסקת את שני האתגרים היום!"

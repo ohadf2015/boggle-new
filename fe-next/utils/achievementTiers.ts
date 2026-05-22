@@ -18,6 +18,14 @@ export const HALL_OF_FAME_ACHIEVEMENTS = new Set([
   'PRECISION_MASTER',   // 45+ words with 100% accuracy
   'ANAGRAM_ARTIST',     // 2 consecutive anagram words (luck + skill)
 
+  // Rare "word feat" achievements (clever + very hard)
+  'CONSONANT_CULT',     // 4+ letter word with no vowels
+  'VOWEL_HOARDER',      // one word with every vowel A,E,I,O,U
+  'ROGUE_Q',            // a Q with no U
+  'LEVIATHAN',          // a 12+ letter word
+  'NO_REPEATS',         // 8+ letter isogram
+  'FLAWLESS_VICTORY',   // won with zero invalid submissions
+
   // Top-tier lifetime achievements (require significant dedication)
   'LEGEND',             // 100 wins total
   'CENTURION',          // 100 games played

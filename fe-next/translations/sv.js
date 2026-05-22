@@ -3054,6 +3054,30 @@ const sv = {
       "name": "Första segern",
       "description": "Vann din allra första match"
     },
+    "CONSONANT_CULT": {
+      "name": "Konsonantkulten",
+      "description": "Hittade ett giltigt ord helt utan vokaler"
+    },
+    "VOWEL_HOARDER": {
+      "name": "Vokalsamlaren",
+      "description": "Ett ord med alla vokaler — A, E, I, O, U"
+    },
+    "ROGUE_Q": {
+      "name": "Ensamt Q",
+      "description": "Spelade ett Q helt utan U"
+    },
+    "LEVIATHAN": {
+      "name": "Leviatan",
+      "description": "Släppte loss ett monster på 12 bokstäver"
+    },
+    "NO_REPEATS": {
+      "name": "Inga upprepningar",
+      "description": "Ett ord på 8+ bokstäver utan en enda upprepad"
+    },
+    "FLAWLESS_VICTORY": {
+      "name": "Felfri seger",
+      "description": "Vann utan en enda felgissning"
+    },
     "DAILY_DOUBLE": {
       "name": "Dubbel Daglig",
       "description": "Klarade båda utmaningarna idag"
