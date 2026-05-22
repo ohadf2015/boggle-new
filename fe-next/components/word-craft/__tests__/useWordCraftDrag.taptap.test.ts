@@ -280,6 +280,40 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
     expect(onDrop).toHaveBeenCalledWith('t-snap', 0, 0);
   });
 
+  it('drop snap: a near-miss ~28px from a cell center still snaps (forgiving radius)', () => {
+    // GIVEN one empty 30px cell at origin (center 15,15)
+    const onDrop = vi.fn();
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+
+    const c1 = document.createElement('div');
+    c1.dataset.boardCell = '0,0';
+    c1.dataset.tileState = 'empty';
+    Object.defineProperty(c1, 'getBoundingClientRect', {
+      value: () => ({ left: 0, top: 0, right: 30, bottom: 30, width: 30, height: 30, x: 0, y: 0, toJSON: () => ({}) }),
+    });
+    container.appendChild(c1);
+
+    act(() => {
+      const evt = createPointerEvent('pointerdown', 'mouse', 5, 5);
+      result.current.begin('t-near', 'N', 1, evt as any);
+    });
+    act(() => {
+      const evt = createPointerEvent('pointermove', 'mouse', 8, 8);
+      window.dispatchEvent(evt);
+    });
+    act(() => {
+      vi.spyOn(document, 'elementFromPoint').mockReturnValue(document.body);
+      // WHEN releasing 28px below the cell center (15,43) — beyond the old
+      // 24px radius but within a more forgiving 32px radius.
+      const evt = createPointerEvent('pointerup', 'mouse', 15, 43);
+      window.dispatchEvent(evt);
+      vi.spyOn(document, 'elementFromPoint').mockRestore();
+    });
+
+    // THEN the tile still lands on the nearest empty cell
+    expect(onDrop).toHaveBeenCalledWith('t-near', 0, 0);
+  });
+
   it('drop snap: pointerup beyond SNAP_RADIUS_PX does not snap', () => {
     const onDrop = vi.fn();
     const { result } = renderHook(() => useWordCraftDrag({ onDrop }));

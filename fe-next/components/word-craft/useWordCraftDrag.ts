@@ -33,9 +33,10 @@ const DRAG_THRESHOLD_PX = 6;
 const TOUCH_VERTICAL_THRESHOLD_PX = 4;
 // Drop-snap radius. The board has 2 px gaps between cells; without a snap a
 // pointerup that lands dead-on in the gap returns null from elementFromPoint
-// and the drop silently fails. 24 px ≈ half a phone cell, the right ceiling
-// so we don't pull a tile two cells over by accident.
-const SNAP_RADIUS_PX = 24;
+// and the drop silently fails. Widened 24→32 px to make landing a tile more
+// forgiving (the #1 "dragging is fiddly" complaint) — still under a full
+// phone cell (~30 px) so we won't pull a tile two cells over by accident.
+const SNAP_RADIUS_PX = 32;
 // Upward-travel activation. The rack sits below the board, so any decisive
 // upward motion is a drag-to-place — even when it's horizontal-dominant
 // (reaching for a board cell off to the side). Without this, diagonal drags
