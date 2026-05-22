@@ -5,7 +5,7 @@ import { getComboColors, type PerformanceMode } from './index';
 import GridCellEffects from './GridCellEffects';
 import RoundEventTileEffects from './RoundEventTileEffects';
 import DoubleClickIndicator from './DoubleClickIndicator';
-import { getSelectionEscalation, getEscalationBackground, getEscalationShake } from './selectionEscalation';
+import { getSelectionEscalation, composeEscalationStyle } from './selectionEscalation';
 
 /** Cell position for highlighted paths */
 export interface HighlightedCell {
@@ -243,15 +243,9 @@ const GridCell = memo<GridCellProps>(({
         background: 'linear-gradient(135deg, #F97316, #EF4444)',
       } : isSelected && comboColors.flicker ? {
         animation: 'flicker 0.1s infinite alternate'
-      } : isSelected && escalation && escalation.tier >= 1 ? {
-        ...getEscalationBackground(selectionIdx, selectedCellsLength, escalationCombo),
-        ...(!reduceMotion && getEscalationShake(selectedCellsLength, escalationCombo) ? {
-          animation: [
-            getEscalationBackground(selectionIdx, selectedCellsLength, escalationCombo).animation,
-            getEscalationShake(selectedCellsLength, escalationCombo),
-          ].filter(Boolean).join(', '),
-        } : {}),
-      } : {}),
+      } : isSelected && escalation && escalation.tier >= 1
+        ? composeEscalationStyle(selectionIdx, selectedCellsLength, escalationCombo, reduceMotion)
+        : {}),
       ...(isFrozen && !isSelected ? {
         background: 'linear-gradient(135deg, rgba(186,230,253,0.6), rgba(147,197,253,0.4), rgba(186,230,253,0.6))',
         pointerEvents: 'none' as const,

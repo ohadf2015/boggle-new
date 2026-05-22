@@ -229,3 +229,27 @@ export function getEscalationShake(
   if (esc.tier === 2) return 'escalation-breathe-2 1.0s ease-in-out infinite';
   return 'escalation-breathe-3 0.7s ease-in-out infinite';
 }
+
+/**
+ * Compose the full inline style a selected tile applies for its escalation tier:
+ * the tier background gradient plus the breathing animation (unless reduced motion).
+ *
+ * Hoisted out of GridCell's JSX, where the prior inline form called
+ * getEscalationBackground + getEscalationShake TWICE each (4 calls) per selected
+ * cell per render. Selected cells re-render on every letter added during a drag,
+ * so collapsing to one call site each trims redundant work on the hottest path.
+ */
+export function composeEscalationStyle(
+  selectionIndex: number,
+  totalSelected: number,
+  comboLevel: number,
+  reduceMotion: boolean,
+): React.CSSProperties {
+  const bg = getEscalationBackground(selectionIndex, totalSelected, comboLevel);
+  const shake = reduceMotion ? undefined : getEscalationShake(totalSelected, comboLevel);
+  if (!shake) return bg;
+  return {
+    ...bg,
+    animation: [bg.animation, shake].filter(Boolean).join(', '),
+  };
+}

@@ -1,4 +1,4 @@
-import { getSelectionEscalation, getEscalationBackground, getEscalationShake } from '../selectionEscalation';
+import { getSelectionEscalation, getEscalationBackground, getEscalationShake, composeEscalationStyle } from '../selectionEscalation';
 
 describe('getSelectionEscalation', () => {
   describe('tier calculation based on word length', () => {
@@ -216,5 +216,54 @@ describe('getEscalationShake', () => {
   it('combo boosts breathe tier', () => {
     // 3 letters + combo 4 → tier 2 → breathe-2
     expect(getEscalationShake(3, 4)).toBe('escalation-breathe-2 1.0s ease-in-out infinite');
+  });
+});
+
+describe('composeEscalationStyle', () => {
+  // Composes getEscalationBackground + getEscalationShake into the single style
+  // object GridCell applies to selected tiles. Replaces the prior inline JSX that
+  // called each helper twice (4 calls) per selected cell per render.
+
+  it('returns empty style at tier 0 (no background, no animation)', () => {
+    expect(composeEscalationStyle(0, 2, 0, false)).toEqual({});
+  });
+
+  it('tier 1 with motion: gradient background + breathe-1 animation', () => {
+    const style = composeEscalationStyle(0, 3, 0, false);
+    expect(style.background).toContain('#FF6B35');
+    expect(style.animation).toBe('escalation-breathe-1 1.4s ease-in-out infinite');
+  });
+
+  it('tier 3 with motion: composes rainbow-cell AND breathe-3 animations', () => {
+    const style = composeEscalationStyle(0, 7, 0, false);
+    expect(style.animation).toContain('rainbow-cell');
+    expect(style.animation).toContain('escalation-breathe-3');
+  });
+
+  it('reduceMotion drops the breathe animation but keeps background animation', () => {
+    // Tier 3 background carries its own rainbow-cell animation; breathe must not be appended.
+    const reduced = composeEscalationStyle(0, 7, 0, true);
+    expect(reduced.animation).toBe('rainbow-cell 2s ease infinite');
+    expect(reduced.animation).not.toContain('escalation-breathe');
+  });
+
+  it('reduceMotion at tier 1 yields a background with no animation', () => {
+    const reduced = composeEscalationStyle(0, 3, 0, true);
+    expect(reduced.background).toContain('#FF6B35');
+    expect(reduced.animation).toBeUndefined();
+  });
+
+  it('matches the legacy inline composition exactly (motion on)', () => {
+    // Parity guard: replicate the old JSX logic and assert equality.
+    const idx = 2, total = 5, combo = 1, reduceMotion = false;
+    const bg = getEscalationBackground(idx, total, combo);
+    const shake = getEscalationShake(total, combo);
+    const legacy = {
+      ...bg,
+      ...(!reduceMotion && shake
+        ? { animation: [bg.animation, shake].filter(Boolean).join(', ') }
+        : {}),
+    };
+    expect(composeEscalationStyle(idx, total, combo, reduceMotion)).toEqual(legacy);
   });
 });
