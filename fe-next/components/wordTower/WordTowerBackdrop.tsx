@@ -107,20 +107,6 @@ export function WordTowerBackdrop({
         <path fill="#1c2c4a" d={SKYLINE} />
       </svg>
 
-      {/* Tower crane: mast, jib, counterweight, short swaying hook over the build
-          line. Slides up & away once you climb past it (a horizon fixture, not a
-          lifter), so a grounded tower never appears to dangle from it. */}
-      <div className="absolute inset-0" style={{ opacity: b.crane, transition: FLOW, transform: `translateY(${-slide(0.55, 900)}px)` }}>
-        <div className="absolute right-[11%] top-0 h-[26%] w-2.5 border-x-2 border-black" style={{ background: '#f4b740' }} />
-        <div className="absolute right-[8%] top-[6%] left-[34%] h-2.5 border-y-2 border-black" style={{ background: '#f4b740' }} />
-        <div className="absolute right-[6%] top-[3%] h-5 w-9 border-2 border-black bg-neo-yellow" />
-        <div className="absolute right-[10%] top-[6%] h-4 w-4 border-2 border-black" style={{ background: '#c98a1f' }} />
-        <div className="wt-hook absolute left-[46%] top-[6%]">
-          <div className="mx-auto w-[3px] bg-black" style={{ height: '34px' }} />
-          <div className="mx-auto h-3 w-4 rounded-b-full border-2 border-t-0 border-black bg-neo-yellow" />
-        </div>
-      </div>
-
       <style>{`
         .wt-cloud {
           position: absolute;
@@ -133,10 +119,8 @@ export function WordTowerBackdrop({
           animation-iteration-count: infinite;
         }
         @keyframes wt-drift { from { transform: translateX(-30%); } to { transform: translateX(130vw); } }
-        @keyframes wt-sway { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(5px) rotate(1deg); } }
-        .wt-hook { transform-origin: top center; animation: wt-sway 5s ease-in-out infinite; }
         @media (prefers-reduced-motion: reduce) {
-          .wt-cloud, .wt-hook { animation: none !important; }
+          .wt-cloud { animation: none !important; }
         }
       `}</style>
     </div>

@@ -14,6 +14,7 @@ import {
 } from './towerSprites';
 import { BIOME_THEME } from './biomeTheme';
 import { WordTowerBackdrop } from './WordTowerBackdrop';
+import { WordTowerMascot } from './WordTowerMascot';
 
 interface SceneProps {
   floors: WordTowerFloor[];
@@ -217,8 +218,16 @@ export function WordTowerScene(props: SceneProps) {
         style={{ background: theme.bg }}
         aria-hidden
       />
-      {/* Parallax ascent backdrop (stars/clouds/skyline/crane scroll by altitude) */}
+      {/* Parallax ascent backdrop (stars/clouds/skyline scroll by altitude) */}
       <WordTowerBackdrop biomeId={props.biomeId} heightM={props.heightM} reducedMotion={props.reducedMotion} />
+      {/* Brand climb companion (replaces the crane) — reacts to word events. */}
+      <WordTowerMascot
+        biomeId={props.biomeId}
+        resultKey={props.resultKey}
+        errorKey={props.errorKey}
+        lastResult={props.lastResult}
+        reducedMotion={props.reducedMotion}
+      />
       {config && (
         <GameCanvas config={config} usePhysics={false} className="absolute inset-0">
           <TowerCanvasLayer {...props} />
