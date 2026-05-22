@@ -119,7 +119,7 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
         scrollTrigger: {
           trigger: section.current,
           start: 'top top',
-          end: '+=560%',
+          end: '+=1000%', // long pin = each frame gets more scroll = no fast-forward feel
           pin: pinWrap.current,
           scrub: 0.6,
           invalidateOnRefresh: true,
@@ -195,7 +195,11 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
         <div ref={pinWrap} className="texture-halftone relative h-[100svh] w-full overflow-hidden bg-neo-navy">
           <canvas ref={canvasRef} className="absolute inset-0 h-full w-full object-cover" />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-neo-navy via-neo-navy/40 to-neo-navy/15" />
-          <p className="absolute left-5 top-6 font-neo-display text-xl font-bold uppercase tracking-widest text-neo-lime drop-shadow-[2px_2px_0_rgb(10,10,18)] sm:left-10">
+          {/* right-edge fade so the score + chapter rail stay legible above the video */}
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-64 bg-gradient-to-l from-neo-navy/90 via-neo-navy/45 to-transparent lg:block" />
+          {/* top fade for the score chip + wordmark */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28 bg-gradient-to-b from-neo-navy/85 to-transparent" />
+          <p className="absolute left-5 top-6 z-20 font-neo-display text-xl font-bold uppercase tracking-widest text-neo-lime drop-shadow-[2px_2px_0_rgb(10,10,18)] sm:left-10">
             LexiClash
           </p>
 
