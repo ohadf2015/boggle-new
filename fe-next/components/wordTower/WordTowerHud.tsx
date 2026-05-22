@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Delete, Shuffle, ArrowUp, Lightbulb } from 'lucide-react';
+import { Delete, Shuffle, ArrowUp, Lightbulb, ChevronDown, ChevronUp } from 'lucide-react';
 import { comboMult, type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
 
@@ -55,10 +55,11 @@ export function WordTowerHud(props: WordTowerHudProps) {
   // Clue: reveal a masked sample word on demand; reset when the anchor changes.
   const [clueShown, setClueShown] = useState(false);
   useEffect(() => { setClueShown(false); }, [anchorLetter]);
-  const maskedClue = useMemo(
-    () => (clueWord ? Array.from(clueWord).map((c, i) => (i < 2 ? c : '·')).join('') : ''),
-    [clueWord],
-  );
+  const maskedClue = useMemo(() => {
+    if (!clueWord) return '';
+    const cs = Array.from(clueWord);
+    return cs.map((c, i) => (i < cs.length - 1 ? c : '·')).join(''); // reveal all but the last letter
+  }, [clueWord]);
 
   // Mobile drawer: the deck collapses to a peek bar to free the screen for the tower.
   const [deckOpen, setDeckOpen] = useState(true);
@@ -129,16 +130,19 @@ export function WordTowerHud(props: WordTowerHudProps) {
           caps the play area (hides the busy parallax behind a clean surface). */}
       <div
         ref={deckRef}
-        className="pointer-events-auto space-y-2 rounded-t-neo border-t-neo-thick border-black bg-neo-navy/95 px-4 pt-1.5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md"
+        className={`pointer-events-auto space-y-2 rounded-t-neo border-t-neo-thick border-black bg-neo-navy/95 px-4 pt-1.5 shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md ${deckOpen ? 'pb-[calc(env(safe-area-inset-bottom)+1.5rem)]' : 'pb-[calc(env(safe-area-inset-bottom)+0.5rem)]'}`}
       >
         {/* Drawer grip — collapse the deck to free the screen for the tower. */}
         <button
           type="button"
           onClick={() => setDeckOpen((o) => !o)}
           aria-label={t(deckOpen ? 'wordTower.hud.collapse' : 'wordTower.hud.expand')}
-          className="mx-auto flex w-full items-center justify-center py-1"
+          className="mx-auto flex w-full flex-col items-center justify-center gap-0.5 py-2"
         >
-          <span className="h-1.5 w-12 rounded-full bg-neo-white/40" />
+          <span className="h-1.5 w-12 rounded-full bg-neo-white/50" />
+          {deckOpen
+            ? <ChevronDown className="h-3.5 w-3.5 text-neo-white/50" />
+            : <ChevronUp className="h-3.5 w-3.5 text-neo-white/50" />}
         </button>
         {deckOpen && (
         <div className="space-y-2">

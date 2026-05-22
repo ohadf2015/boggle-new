@@ -46,9 +46,9 @@ describe('countBuildableWords', () => {
 describe('pickClueWord', () => {
   const dict = new Set(['CAT', 'CARE', 'CART', 'CARETAKER', 'DOG']);
 
-  it('returns the shortest buildable word starting with the anchor', () => {
-    // anchor C, tray A,R,T,E → CAT(3), CARE(4), CART(4) buildable → shortest CAT
-    expect(pickClueWord(dict, 'C', ['A', 'R', 'T', 'E'], 3)).toBe('CAT');
+  it('prefers a meatier word (>=4) so the masked clue shows more than 2 letters', () => {
+    // anchor C, tray A,R,T,E → CAT(3), CARE(4), CART(4); prefers shortest >=4 → CARE
+    expect(pickClueWord(dict, 'C', ['A', 'R', 'T', 'E'], 3)).toBe('CARE');
   });
 
   it('returns null when nothing is buildable', () => {
@@ -56,9 +56,10 @@ describe('pickClueWord', () => {
     expect(pickClueWord(dict, '', ['A'], 3)).toBeNull();
   });
 
-  it('honours the minimum length', () => {
+  it('honours the minimum length and prefers a 4+ letter word', () => {
     const d = new Set(['GO', 'GOT', 'GOAT']);
-    expect(pickClueWord(d, 'G', ['O', 'T', 'A'], 3)).toBe('GOT'); // GO excluded (len 2)
+    expect(pickClueWord(d, 'G', ['O', 'T', 'A'], 3)).toBe('GOAT'); // GO excluded (len2); GOAT preferred over GOT
+    expect(pickClueWord(new Set(['GO', 'GOT']), 'G', ['O', 'T'], 3)).toBe('GOT'); // no 4+ → shortest >=3
   });
 
   it('only returns a word actually buildable from the tray multiset', () => {

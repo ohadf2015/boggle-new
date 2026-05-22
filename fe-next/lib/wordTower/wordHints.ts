@@ -59,11 +59,17 @@ export function pickClueWord(
   avail.set(anchor, 1);
   for (const t of tray) avail.set(t, (avail.get(t) ?? 0) + 1);
 
-  let best: string | null = null;
+  // Prefer the shortest word of length >= 4 (so the masked reveal shows more
+  // than the bare minimum); fall back to the shortest word overall.
+  const PREF = Math.max(minLen, 4);
+  let best: string | null = null;      // shortest with length >= PREF
+  let fallback: string | null = null;  // shortest overall (>= minLen)
   for (const w of dict) {
     if (w.length < minLen) continue;
     if (w[0] !== anchor) continue;
-    if (best !== null && w.length >= best.length) continue; // can't improve
+    const improvesFallback = fallback === null || w.length < fallback.length;
+    const improvesBest = w.length >= PREF && (best === null || w.length < best.length);
+    if (!improvesFallback && !improvesBest) continue;
     const need = new Map<string, number>();
     let ok = true;
     for (const ch of w) {
@@ -72,8 +78,8 @@ export function pickClueWord(
       if (n > (avail.get(ch) ?? 0)) { ok = false; break; }
     }
     if (!ok) continue;
-    best = w;
-    if (w.length === minLen) break; // nothing shorter is allowed
+    if (improvesFallback) fallback = w;
+    if (improvesBest) best = w;
   }
-  return best;
+  return best ?? fallback;
 }
