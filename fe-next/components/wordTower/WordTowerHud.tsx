@@ -113,7 +113,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
           caps the play area (hides the busy parallax behind a clean surface). */}
       <div
         ref={deckRef}
-        className="pointer-events-auto space-y-3 rounded-t-neo border-t-neo-thick border-black bg-neo-navy/95 px-4 pb-5 pt-3 shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md"
+        className="pointer-events-auto space-y-3 rounded-t-neo border-t-neo-thick border-black bg-neo-navy/95 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md"
       >
         {/* Word builder */}
         <div

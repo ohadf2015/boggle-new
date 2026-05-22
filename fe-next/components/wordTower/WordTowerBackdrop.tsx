@@ -108,16 +108,28 @@ export function WordTowerBackdrop({
       </svg>
 
       <style>{`
+        /* Puffy cloud: a flat-bottomed body with two lobes on top (pseudo-els),
+           so it reads as a real cloud silhouette rather than a fuzzy blob. */
         .wt-cloud {
           position: absolute;
           left: 0;
-          border-radius: 9999px;
-          background: radial-gradient(closest-side, rgba(255,255,255,0.85), rgba(255,255,255,0.2));
-          filter: blur(1px);
+          background: #ffffff;
+          border-radius: 100px 100px 38px 38px;
+          opacity: 0.9;
+          filter: drop-shadow(0 6px 0 rgba(120,150,190,0.18));
           animation-name: wt-drift;
           animation-timing-function: linear;
           animation-iteration-count: infinite;
         }
+        .wt-cloud::before,
+        .wt-cloud::after {
+          content: '';
+          position: absolute;
+          background: #ffffff;
+          border-radius: 50%;
+        }
+        .wt-cloud::before { width: 52%; height: 150%; left: 9%; top: -62%; }
+        .wt-cloud::after  { width: 42%; height: 122%; right: 11%; top: -44%; }
         @keyframes wt-drift { from { transform: translateX(-30%); } to { transform: translateX(130vw); } }
         @media (prefers-reduced-motion: reduce) {
           .wt-cloud { animation: none !important; }
