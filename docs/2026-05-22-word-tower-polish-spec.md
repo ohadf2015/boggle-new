@@ -61,8 +61,8 @@ TDD the **logic**, not pixels (per `.claude/rules/22-tdd-strict.md`): `towerRowL
 - **Phase 1 — DONE** (`e45787682` + `96cc1b5c0`): compact tiles (38–54px) + flush 2px seam + build line 0.15→0.28; mascot gated via `useTimedReveal`, `sm`, circle clip, word-complete only; compact start-side altitude chip; smaller tray/builder tiles; tighter deck + bottom inset. 7 tests.
 - **Phase 2 — DONE** (`d86b163a0`): escalating placement juice — `squashLand` + self-cleaning `impactRing` + `letterPlacementFx` (pure, tested) scaling particles/ring with the letter's depth in the word; reduced-motion snaps instantly. 5 tests.
 - **Phase 3 — DONE** (`d2fca9f49` + `17ce78628`): drag/wheel camera-pan on the Pixi container with `towerPanMin`/`clampPan` (pure, tested); auto-snap to build line on letter-add/submit (240ms snap < 440ms drop → FX on-screen); keep-window widened to the full pannable range; capture-phase pointer binding so it fires over the canvas; impact-ring z-order fix. 7 tests.
-- **Phase 5 — DONE** (`<pending push>`): `countBuildableWords` (pure, tested) → "N words possible" Lightbulb chip; dict threaded Game→Play; `hud.possible` ×5 locales.
-- **Phase 4 — PENDING founder live-verification** (admin gate blocks headless screenshots). Image-MCP band assets + rembg + DOM parallax layers behind the canvas + lazy-mount by altitude + GSAP drift/bob.
+- **Phase 5 — DONE** (`016374337`): `countBuildableWords` (pure, tested) → "N words possible" Lightbulb chip; dict threaded Game→Play; `hud.possible` ×5 locales.
+- **Phase 4 — DONE** (`a07174114`): 5 image-MCP assets (balloon/birds/plane/satellite/UFO) rembg'd to transparent PNGs; `parallaxProps` (pure, tested) — one altitude window drives both lazy-mount + parallax offset/fade; `WordTowerParallaxProps` DOM layer behind the Pixi canvas, next/image lazy-load, GSAP idle bob, reduced-motion safe. **Still wants founder live-verification (admin gate blocks headless).**
 
 ## Phase 6 — Rival towers (#10), design note (NOT built this pass)
 
