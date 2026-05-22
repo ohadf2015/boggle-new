@@ -41,13 +41,27 @@ export interface ActiveParallaxProp extends ParallaxProp {
 /** Screen px of parallax travel per metre climbed (matches WordTowerBackdrop). */
 export const PROP_PX_PER_M = 5.2;
 
-/** The climb's prop set, spread across the altitude bands. */
+/**
+ * The climb's prop set, spread densely across the altitude bands with variety —
+ * alternating sides, varied depth (0.6 far → 1.15 near) and size, so the ascent
+ * always has one or two different references gliding past. Ground→space:
+ * kite · balloon · drone · birds · paraglider · plane · helicopter · satellite ·
+ * rocket · astronaut · UFO · comet · ringed planet.
+ */
 export const WORD_TOWER_PROPS: ParallaxProp[] = [
-  { id: 'balloon',   src: '/images/word-tower/wt-balloon.png',   atM: 30,  topPct: 30, xPct: 16, width: 92,  depth: 1.05, rangeM: 70 },
-  { id: 'birds',     src: '/images/word-tower/wt-birds.png',     atM: 70,  topPct: 22, xPct: 68, width: 110, depth: 0.9,  rangeM: 80 },
-  { id: 'plane',     src: '/images/word-tower/wt-plane.png',     atM: 140, topPct: 34, xPct: 22, width: 124, depth: 1.1,  rangeM: 95 },
-  { id: 'satellite', src: '/images/word-tower/wt-satellite.png', atM: 300, topPct: 26, xPct: 70, width: 104, depth: 0.7,  rangeM: 120 },
-  { id: 'ufo',       src: '/images/word-tower/wt-ufo.png',       atM: 600, topPct: 24, xPct: 30, width: 126, depth: 0.85, rangeM: 170 },
+  { id: 'kite',        src: '/images/word-tower/wt-kite.png',        atM: 16,  topPct: 28, xPct: 74, width: 80,  depth: 1.1,  rangeM: 60 },
+  { id: 'balloon',     src: '/images/word-tower/wt-balloon.png',     atM: 32,  topPct: 30, xPct: 16, width: 92,  depth: 1.05, rangeM: 64 },
+  { id: 'drone',       src: '/images/word-tower/wt-drone.png',       atM: 54,  topPct: 20, xPct: 60, width: 84,  depth: 1.15, rangeM: 60 },
+  { id: 'birds',       src: '/images/word-tower/wt-birds.png',       atM: 78,  topPct: 22, xPct: 28, width: 110, depth: 0.9,  rangeM: 70 },
+  { id: 'paraglider',  src: '/images/word-tower/wt-paraglider.png',  atM: 104, topPct: 32, xPct: 72, width: 110, depth: 1.0,  rangeM: 76 },
+  { id: 'plane',       src: '/images/word-tower/wt-plane.png',       atM: 138, topPct: 36, xPct: 20, width: 124, depth: 1.1,  rangeM: 85 },
+  { id: 'helicopter',  src: '/images/word-tower/wt-helicopter.png',  atM: 184, topPct: 24, xPct: 66, width: 116, depth: 1.05, rangeM: 88 },
+  { id: 'satellite',   src: '/images/word-tower/wt-satellite.png',   atM: 256, topPct: 26, xPct: 24, width: 104, depth: 0.7,  rangeM: 110 },
+  { id: 'rocket',      src: '/images/word-tower/wt-rocket.png',      atM: 360, topPct: 30, xPct: 70, width: 120, depth: 0.95, rangeM: 120 },
+  { id: 'astronaut',   src: '/images/word-tower/wt-astronaut.png',   atM: 472, topPct: 22, xPct: 28, width: 100, depth: 0.8,  rangeM: 124 },
+  { id: 'ufo',         src: '/images/word-tower/wt-ufo.png',         atM: 600, topPct: 24, xPct: 66, width: 126, depth: 0.85, rangeM: 150 },
+  { id: 'comet',       src: '/images/word-tower/wt-comet.png',       atM: 770, topPct: 18, xPct: 30, width: 130, depth: 1.0,  rangeM: 160 },
+  { id: 'planetRing',  src: '/images/word-tower/wt-planet-ring.png', atM: 950, topPct: 26, xPct: 68, width: 142, depth: 0.6,  rangeM: 200 },
 ];
 
 /**
