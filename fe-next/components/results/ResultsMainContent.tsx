@@ -27,6 +27,7 @@ import { WinStreakBadge } from '@/components/multiplayer/WinStreakBadge';
 import { NearRankTeaser } from '@/components/multiplayer/NearRankTeaser';
 import type { RankTier } from '@/shared/utils/eloRating';
 import { ShareButton } from '@/components/results/ShareButton';
+import RoundFeedback from '@/components/feedback/RoundFeedback';
 
 
 // ==============================================
@@ -116,6 +117,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   currentPlayerValidWords,
   currentPlayerRank,
   username,
+  gameCode,
   gameMode,
   t,
   allPlayerWords,
@@ -135,7 +137,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   isCurrentUserWinner,
   hideDetailsToggle,
   shareCardStats,
-  onStartGame,
+  onStartGame: _onStartGame,
 }) {
   const reducedMotion = useReducedMotion();
   const { dir: _dir, language } = useLanguage();
@@ -317,6 +319,18 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           t={t}
         />
       )}
+
+      {/* 3.6 BETWEEN-ROUNDS FEEDBACK — one-tap round sentiment → PostHog.
+          Self-gates on multiplayer + live room + not the series finale, and
+          shows at most once per room (see useRoundFeedback). */}
+      <RoundFeedback
+        gameCode={gameCode}
+        gameMode={gameMode}
+        language={language}
+        isMultiplayer={isMultiplayer}
+        seriesRoundNumber={seriesRoundNumber}
+        seriesTotalGames={seriesTotalGames}
+      />
 
       {/* 4. CONSOLATION ROW — current player only (their placement + crown).
           Keeps the recap focused on the player instead of listing every

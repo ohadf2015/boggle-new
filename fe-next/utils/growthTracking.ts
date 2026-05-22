@@ -26,6 +26,7 @@ import { markGameActive, markGameInactive } from '@/utils/abandonOnPagehide';
 export type GrowthEvent =
   // Acquisition
   | 'page_view'
+  | 'landing_view'
   | 'referral_link_clicked'
   | 'room_joined_via_link'
   | 'room_joined_via_code'
@@ -39,6 +40,8 @@ export type GrowthEvent =
   | 'game_completed'
   | 'game_abandoned'
   | 'mode_selected'
+  | 'results_viewed'
+  | 'replay_countdown_shown'
   // Retention
   | 'return_visit'
   | 'streak_continued'
@@ -129,7 +132,13 @@ export type GrowthEvent =
   // invocation. Closes the 0-signups blind spot for CG cohort: pre-fix the
   // result was discarded, so PostHog couldn't tell dismiss from never-prompted.
   // Properties: { result: 'success' | 'dismiss' | 'already_signed_in' | 'error', errorCode? }.
-  | 'cg_auth_prompt_outcome';
+  | 'cg_auth_prompt_outcome'
+  // Multiplayer between-rounds sentiment — fired by useRoundFeedback when a
+  // player taps the "how was that round?" card on the MP results screen.
+  // Properties: { rating: 'bad'|'ok'|'great', ratingValue: 1|2|3, gameMode,
+  // seriesRound?, gameCode, language }. NOT a funnel step — kept off
+  // CANONICAL_DUAL_EMIT.
+  | 'mp_round_feedback';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =
