@@ -7,6 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GameplayPanel, { type Mode } from '@/components/showcase3d/GameplayPanel';
+import Split3DHeading from '@/components/showcase3d/Split3DHeading';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -135,8 +136,9 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
       tl.to(playhead, { frame: TOTAL - 1, ease: 'none', duration: 1, onUpdate: draw }, 0);
       captions.forEach((cap, i) => {
         const [enter, exit] = cap.window;
-        tl.fromTo(`.s3-cap-${i}`, { autoAlpha: 0, yPercent: 26 }, { autoAlpha: 1, yPercent: 0, duration: 0.07 }, enter);
-        tl.to(`.s3-cap-${i}`, { autoAlpha: 0, yPercent: -26, duration: 0.07 }, exit);
+        // captions tilt up into place in 3D (transform-only — safe to ride the scrub)
+        tl.fromTo(`.s3-cap-${i}`, { autoAlpha: 0, yPercent: 28, rotationX: 38, transformPerspective: 700 }, { autoAlpha: 1, yPercent: 0, rotationX: 0, duration: 0.07 }, enter);
+        tl.to(`.s3-cap-${i}`, { autoAlpha: 0, yPercent: -28, rotationX: -24, duration: 0.07 }, exit);
       });
     },
     { scope: section },
@@ -230,7 +232,7 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
                       {cap.badge}
                     </span>
                   )}
-                  <h2 className="mt-2 font-neo-display text-4xl font-bold leading-[0.95] text-neo-cream drop-shadow-[3px_3px_0_rgba(0,0,0,0.85)] sm:text-6xl">{cap.title}</h2>
+                  <h2 className="mt-2 font-neo-display text-4xl font-bold leading-[0.95] text-neo-cream sm:text-6xl" style={{ textShadow: '0 2px 0 #0a0a12,0 4px 0 #0a0a12,0 5px 0 rgba(0,255,255,0.5),0 7px 0 #0a0a12,0 12px 18px rgba(0,0,0,0.55)' }}>{cap.title}</h2>
                   <p className="mx-auto mt-3 max-w-xl font-neo-body text-base text-neo-cream/90 drop-shadow-[2px_2px_0_rgba(0,0,0,0.7)] sm:text-lg">{cap.body}</p>
                 </div>
               ))}
@@ -274,7 +276,7 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
         ))}
 
         <div className="relative z-10 mx-auto max-w-6xl">
-          <h2 className="mb-4 font-neo-display text-3xl font-bold sm:text-4xl">{t('showcase3d.modesTitle', 'Three ways to clash')}</h2>
+          <Split3DHeading text={t('showcase3d.modesTitle', 'Three ways to clash')} className="mb-4 font-neo-display text-3xl font-bold sm:text-4xl" />
           <p className="mb-16 max-w-[48ch] font-neo-body text-neo-cream/65">{t('showcase3d.modesSub', 'Real rounds, real boards — each one slides in as you scroll.')}</p>
           <div className="flex flex-col gap-24">
             {modes.map((mode) => (
@@ -289,7 +291,7 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
         <div className="s3-cta-pop relative overflow-hidden rounded-neo-xl border-neo-thick border-black bg-neo-lime px-7 py-14 text-black shadow-hard-xl sm:px-12 sm:py-20">
           <span aria-hidden className="s3-dust absolute right-6 top-6 grid h-14 w-14 rotate-12 place-items-center rounded-neo border-neo-thick border-black bg-neo-navy font-neo-display text-2xl font-bold text-neo-cream shadow-hard">W</span>
           <span aria-hidden className="s3-dust absolute bottom-8 right-24 grid h-10 w-10 -rotate-6 place-items-center rounded-neo border-neo-thick border-black bg-neo-pink font-neo-display text-lg font-bold text-black shadow-hard">!</span>
-          <h2 className="relative z-10 max-w-[18ch] font-neo-display text-[clamp(2rem,5vw,3.5rem)] font-bold leading-[0.95]">{t('showcase3d.bottomTitle', 'Your move. Make it loud.')}</h2>
+          <Split3DHeading text={t('showcase3d.bottomTitle', 'Your move. Make it loud.')} className="relative z-10 max-w-[18ch] font-neo-display text-[clamp(2rem,5vw,3.5rem)] font-bold leading-[0.95]" />
           <Link
             href={playHref}
             className="relative z-10 mt-7 inline-block rounded-neo border-neo-thick border-black bg-neo-navy px-8 py-4 font-neo-display text-lg font-bold text-neo-cream shadow-hard-lg transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-0.5"
