@@ -71,6 +71,12 @@ function shade(hex: number, f: number): number {
  * hard black border, hard drop shadow. `shared` connectors wear a bright ring.
  */
 export function paintTile(tile: TileSprite, color: number, pending: boolean, shared = false): void {
+  // A queued tween or its `done()` callback can fire after the tile was
+  // destroyed mid-build (rapid re-renders retire tiles while a word is typed),
+  // leaving `face`/`shadow` torn down. Bail instead of `.clear()` on a null —
+  // Sentry JAVASCRIPT-NEXTJS-1CK.
+  if (tile.destroyed || !tile.face || !tile.shadow) return;
+
   const s = tile.size;
   const half = s / 2;
   const r = Math.max(7, s * 0.2);
