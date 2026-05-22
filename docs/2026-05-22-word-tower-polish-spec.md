@@ -56,6 +56,27 @@
 
 TDD the **logic**, not pixels (per `.claude/rules/22-tdd-strict.md`): `towerRowLayout` math, mascot visibility, camera clamp/snap, word-count. Visual layout (HUD classes, asset placement) verified live via dev server (port 3001) + Playwriter, Hebrew (`?locale=he`) RTL included.
 
+## Progress log
+
+- **Phase 1 — DONE** (`e45787682` + `96cc1b5c0`): compact tiles (38–54px) + flush 2px seam + build line 0.15→0.28; mascot gated via `useTimedReveal`, `sm`, circle clip, word-complete only; compact start-side altitude chip; smaller tray/builder tiles; tighter deck + bottom inset. 7 tests.
+- **Phase 2 — DONE** (`d86b163a0`): escalating placement juice — `squashLand` + self-cleaning `impactRing` + `letterPlacementFx` (pure, tested) scaling particles/ring with the letter's depth in the word; reduced-motion snaps instantly. 5 tests.
+- **Phase 3 — DONE** (`d2fca9f49` + `17ce78628`): drag/wheel camera-pan on the Pixi container with `towerPanMin`/`clampPan` (pure, tested); auto-snap to build line on letter-add/submit (240ms snap < 440ms drop → FX on-screen); keep-window widened to the full pannable range; capture-phase pointer binding so it fires over the canvas; impact-ring z-order fix. 7 tests.
+- **Phase 5 — DONE** (`<pending push>`): `countBuildableWords` (pure, tested) → "N words possible" Lightbulb chip; dict threaded Game→Play; `hud.possible` ×5 locales.
+- **Phase 4 — PENDING founder live-verification** (admin gate blocks headless screenshots). Image-MCP band assets + rembg + DOM parallax layers behind the canvas + lazy-mount by altitude + GSAP drift/bob.
+
+## Phase 6 — Rival towers (#10), design note (NOT built this pass)
+
+Goal: in SOLO, show other players' towers so the climber wants to pass them.
+
+Prior art: **versus mode already exists** (`WordTowerVersus` + `WordTowerVersusRail` consuming `VersusStanding { playerId, username, heightM, rank, ... }`). That's a live-multiplayer rail; solo needs *asynchronous* rivals (leaderboard top-N / friends / your own PB ghost).
+
+Proposed shape (so future work doesn't repaint):
+```ts
+interface WordTowerRival { id: string; name: string; heightM: number; isYou?: boolean; }
+interface WordTowerRivalSource { rivals(currentHeightM: number): WordTowerRival[]; } // leaderboard | friends | pb-ghost
+```
+Render: faint, non-interactive **ghost-silhouette towers** flanking the active tower (parallax-depth, behind the live tower), each with a height tick + name; a "passing!" pulse when `currentHeightM` crosses a rival's `heightM`. Feed initial data from `/api/word-tower/leaderboard` (already exists). Keep them in a DOM layer (or a separate Pixi sub-container) so they never interfere with the active-tower diff/pan.
+
 ## Out of scope / deferred
 
 - Versus-mode changes (this is solo polish).
