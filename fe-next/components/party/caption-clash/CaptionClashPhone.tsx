@@ -11,6 +11,7 @@ import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { usePartySounds } from '@/hooks/usePartySounds';
+import { useImeText } from '@/hooks/useImeText';
 
 // ==================== Types ====================
 
@@ -50,7 +51,13 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
   const partySounds = usePartySounds();
   const [phase, setPhase] = useState<PhonePhase>('waiting');
   const [imageData, setImageData] = useState<ImageReadyData | null>(null);
-  const [captionText, setCaptionText] = useState('');
+  const {
+    value: captionText,
+    isEmpty: captionEmpty,
+    getValue: getCaption,
+    reset: resetCaption,
+    inputProps: captionInputProps,
+  } = useImeText<HTMLTextAreaElement>({ maxLength: 200 });
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [submissions, setSubmissions] = useState<CaptionSubmission[]>([]);
   const [votedId, setVotedId] = useState<string | null>(null);
@@ -74,7 +81,7 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
     const onImageReady = (data: ImageReadyData) => {
       setImageData(data);
       setPhase('writing');
-      setCaptionText('');
+      resetCaption();
       setVotedId(null);
       setSubmissions([]);
       setCurrentReveal(null);
@@ -118,11 +125,13 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
   }, [socket]);
 
   const handleSubmitCaption = useCallback(() => {
-    if (!captionText.trim() || phase !== 'writing') return;
-    onSendInput({ gameId: 'caption-clash', action: 'submit-caption', text: captionText.trim() });
+    if (phase !== 'writing') return;
+    const text = getCaption();
+    if (!text) return;
+    onSendInput({ gameId: 'caption-clash', action: 'submit-caption', text });
     setPhase('submitted');
     partySounds.onSubmit();
-  }, [captionText, phase, onSendInput, partySounds]);
+  }, [getCaption, phase, onSendInput, partySounds]);
 
   const handleLaugh = useCallback(() => {
     if (!currentReveal) return;
@@ -190,8 +199,7 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
         ) : (
           <div className="flex-1 flex flex-col">
             <textarea
-              value={captionText}
-              onChange={(e) => setCaptionText(e.target.value.slice(0, 200))}
+              {...captionInputProps}
               placeholder={t('party.writeCaptionPlaceholder') || 'Write your caption...'}
               maxLength={200}
               autoFocus
@@ -209,15 +217,15 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
               </span>
               <button
                 onClick={handleSubmitCaption}
-                disabled={!captionText.trim()}
-                className="
+                aria-disabled={captionEmpty}
+                className={`
                   bg-neo-pink border-3 border-neo-black rounded-neo shadow-hard
                   px-6 py-3 font-neo-display text-neo-black uppercase font-bold
                   transition-all duration-100
                   hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg
                   active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed
-                  disabled:opacity-30 disabled:cursor-not-allowed
-                "
+                  ${captionEmpty ? 'opacity-30 cursor-not-allowed' : ''}
+                `}
               >
                 {t('party.submit') || 'Submit'}
               </button>

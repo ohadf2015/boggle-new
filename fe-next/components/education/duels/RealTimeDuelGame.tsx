@@ -22,6 +22,7 @@ import { Swords, Trophy, Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useDuelSocket } from '@/hooks/useDuelSocket';
+import { useImeText } from '@/hooks/useImeText';
 import type {
   DuelStartedData,
   WordAcceptedData,
@@ -92,7 +93,13 @@ export function RealTimeDuelGame({
   const [startTime, setStartTime] = useState<string>('');
   const [timeLimit, setTimeLimit] = useState<number>(180);
   const [timeRemaining, setTimeRemaining] = useState<number>(180);
-  const [currentWord, setCurrentWord] = useState('');
+  const {
+    value: currentWord,
+    isEmpty: currentWordEmpty,
+    getValue: getCurrentWord,
+    reset: resetCurrentWord,
+    inputProps: wordInputProps,
+  } = useImeText<HTMLInputElement>();
   const [words, setWords] = useState<WordStatus[]>([]);
   const [myScore, setMyScore] = useState(0);
   const [_myWordCount, setMyWordCount] = useState(0);
@@ -217,21 +224,22 @@ export function RealTimeDuelGame({
   // ============================================
 
   const handleSubmitWord = useCallback(() => {
-    if (!currentWord.trim()) return;
+    const raw = getCurrentWord();
+    if (!raw) return;
 
-    const word = currentWord.trim().toUpperCase();
+    const word = raw.toUpperCase();
 
     // Check if word already submitted
     if (words.find((w) => w.word === word)) {
-      setCurrentWord('');
+      resetCurrentWord();
       return;
     }
 
     // Add word as pending
     setWords((prev) => [...prev, { word, status: 'pending' }]);
     submitWord(duelId, word);
-    setCurrentWord('');
-  }, [currentWord, duelId, submitWord, words]);
+    resetCurrentWord();
+  }, [getCurrentWord, resetCurrentWord, duelId, submitWord, words]);
 
   const handleKeyPress = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -442,8 +450,7 @@ export function RealTimeDuelGame({
           <div className="flex gap-2 mb-4">
             <input
               type="text"
-              value={currentWord}
-              onChange={(e) => setCurrentWord(e.target.value)}
+              {...wordInputProps}
               onKeyDown={handleKeyPress}
               placeholder={t('duels.typeWord')}
               data-testid="word-input"
@@ -451,9 +458,12 @@ export function RealTimeDuelGame({
             />
             <button
               onClick={handleSubmitWord}
-              disabled={!currentWord.trim()}
+              aria-disabled={currentWordEmpty}
               data-testid="submit-word-btn"
-              className="px-4 py-2 bg-neo-lime text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className={cn(
+                'px-4 py-2 bg-neo-lime text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all',
+                currentWordEmpty && 'opacity-50 cursor-not-allowed'
+              )}
             >
               {t('duels.addWord')}
             </button>

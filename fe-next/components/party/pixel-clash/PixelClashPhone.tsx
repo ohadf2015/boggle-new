@@ -12,6 +12,7 @@ import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DrawingCanvas, type DrawingData, type DrawingCanvasHandle } from './DrawingCanvas';
 import { usePartySounds } from '@/hooks/usePartySounds';
+import { useImeText } from '@/hooks/useImeText';
 
 // ==================== Types ====================
 
@@ -62,8 +63,20 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
   const { t } = useLanguage();
   const partySounds = usePartySounds();
   const [phase, setPhase] = useState<PhonePhase>('waiting');
-  const [promptText, setPromptText] = useState('');
-  const [guessText, setGuessText] = useState('');
+  const {
+    value: promptText,
+    isEmpty: promptEmpty,
+    getValue: getPrompt,
+    reset: resetPrompt,
+    inputProps: promptInputProps,
+  } = useImeText<HTMLInputElement>({ maxLength: 50 });
+  const {
+    value: guessText,
+    isEmpty: guessEmpty,
+    getValue: getGuess,
+    reset: resetGuess,
+    inputProps: guessInputProps,
+  } = useImeText<HTMLInputElement>({ maxLength: 50 });
   const [assignment, setAssignment] = useState<AssignmentData | null>(null);
   const [relayPrompt, setRelayPrompt] = useState('');
   const [relayReference, setRelayReference] = useState<DrawingData | null>(null);
@@ -92,7 +105,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
       if (data.phase === 'write-prompt') {
         // Legacy — prompts now auto-assigned, but keep for safety
         setPhase('write-prompt');
-        setPromptText('');
+        resetPrompt();
         strokesRef.current = [];
       } else if (data.phase === 'drawing') {
         // Telephone mode: assignment comes separately via party:pixel:assignment
@@ -120,7 +133,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
         setPhase('drawing');
       } else {
         setPhase('guessing');
-        setGuessText('');
+        resetGuess();
       }
     };
 
@@ -175,11 +188,12 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
   }, [phase, onSendInput]);
 
   const handleSubmitPrompt = useCallback(() => {
-    if (!promptText.trim()) return;
-    onSendInput({ gameId: 'pixel-clash', action: 'submit-prompt', text: promptText.trim() });
+    const text = getPrompt();
+    if (!text) return;
+    onSendInput({ gameId: 'pixel-clash', action: 'submit-prompt', text });
     setPhase('submitted');
     partySounds.onSubmit();
-  }, [promptText, onSendInput, partySounds]);
+  }, [getPrompt, onSendInput, partySounds]);
 
   const handleSubmitDrawing = useCallback(() => {
     const strokes = strokesRef.current;
@@ -200,11 +214,13 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
   }, [assignment, phase, onSendInput, partySounds]);
 
   const handleSubmitGuess = useCallback(() => {
-    if (!guessText.trim() || !assignment?.chainId) return;
-    onSendInput({ gameId: 'pixel-clash', action: 'guess', text: guessText.trim(), chainId: assignment.chainId });
+    if (!assignment?.chainId) return;
+    const text = getGuess();
+    if (!text) return;
+    onSendInput({ gameId: 'pixel-clash', action: 'guess', text, chainId: assignment.chainId });
     setPhase('submitted');
     partySounds.onSubmit();
-  }, [guessText, assignment, onSendInput, partySounds]);
+  }, [getGuess, assignment, onSendInput, partySounds]);
 
   const handleSubmitVote = useCallback(() => {
     if (!showdownVote.best) return;
@@ -235,8 +251,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
 
         <input
           type="text"
-          value={promptText}
-          onChange={e => setPromptText(e.target.value.slice(0, 50))}
+          {...promptInputProps}
           placeholder={t('party.promptPlaceholder')}
           maxLength={50}
           autoFocus
@@ -250,15 +265,15 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
 
         <button
           onClick={handleSubmitPrompt}
-          disabled={!promptText.trim()}
-          className="
+          aria-disabled={promptEmpty}
+          className={`
             bg-neo-cyan border-3 border-neo-black rounded-neo shadow-hard
             px-6 py-3 font-neo-display text-neo-black uppercase font-bold
             transition-all duration-100
             hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg
             active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed
-            disabled:opacity-30 disabled:cursor-not-allowed
-          "
+            ${promptEmpty ? 'opacity-30 cursor-not-allowed' : ''}
+          `}
         >
           {t('party.submit')}
         </button>
@@ -343,8 +358,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
 
         <input
           type="text"
-          value={guessText}
-          onChange={e => setGuessText(e.target.value.slice(0, 50))}
+          {...guessInputProps}
           placeholder={t('party.typeGuess')}
           maxLength={50}
           autoFocus
@@ -358,13 +372,13 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
 
         <button
           onClick={handleSubmitGuess}
-          disabled={!guessText.trim()}
-          className="
+          aria-disabled={guessEmpty}
+          className={`
             bg-neo-cyan border-3 border-neo-black rounded-neo shadow-hard
             px-6 py-3 font-neo-display text-neo-black uppercase font-bold
             active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed
-            disabled:opacity-30 disabled:cursor-not-allowed
-          "
+            ${guessEmpty ? 'opacity-30 cursor-not-allowed' : ''}
+          `}
         >
           {t('party.submit')}
         </button>

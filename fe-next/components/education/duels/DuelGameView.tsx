@@ -21,6 +21,7 @@ import { Swords, Check, X, Trophy, Flame, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getDuelById } from '@/lib/supabase/education/duels';
 import { useDuelSocket, type DuelCompletedData, type ScoreSubmittedData } from '@/hooks/useDuelSocket';
+import { useImeText } from '@/hooks/useImeText';
 import { cn } from '@/lib/utils';
 import { Loader } from '@/components/ui/Loader';
 import { PageLoader } from '@/components/ui/PageLoader';
@@ -65,7 +66,13 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
   // State
   const [phase, setPhase] = useState<GamePhase>('loading');
   const [duelData, setDuelData] = useState<DuelData | null>(null);
-  const [currentWord, setCurrentWord] = useState('');
+  const {
+    value: currentWord,
+    isEmpty: currentWordEmpty,
+    getValue: getCurrentWord,
+    reset: resetCurrentWord,
+    inputProps: wordInputProps,
+  } = useImeText<HTMLInputElement>();
   const [wordsFound, setWordsFound] = useState<string[]>([]);
   const [validatedScore, setValidatedScore] = useState<ScoreSubmittedData | null>(null);
   const [result, setResult] = useState<DuelCompletedData | null>(null);
@@ -183,14 +190,15 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
   // ============================================
 
   const handleAddWord = useCallback(() => {
-    if (!currentWord.trim()) return;
+    const raw = getCurrentWord();
+    if (!raw) return;
 
-    const word = currentWord.trim().toUpperCase();
+    const word = raw.toUpperCase();
     if (!wordsFound.includes(word)) {
       setWordsFound((prev) => [...prev, word]);
     }
-    setCurrentWord('');
-  }, [currentWord, wordsFound]);
+    resetCurrentWord();
+  }, [getCurrentWord, resetCurrentWord, wordsFound]);
 
   const handleSubmitScore = useCallback(() => {
     if (wordsFound.length === 0) return;
@@ -433,16 +441,18 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           <div className="flex gap-2 mb-4">
             <input
               type="text"
-              value={currentWord}
-              onChange={(e) => setCurrentWord(e.target.value)}
+              {...wordInputProps}
               onKeyDown={handleKeyPress}
               placeholder={t('duels.typeWord')}
               className="flex-1 px-4 py-2 bg-neo-navy text-neo-white border-neo rounded-neo shadow-hard focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
             />
             <button
               onClick={handleAddWord}
-              disabled={!currentWord.trim()}
-              className="px-4 py-2 bg-neo-lime text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-disabled={currentWordEmpty}
+              className={cn(
+                'px-4 py-2 bg-neo-lime text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all',
+                currentWordEmpty && 'opacity-50 cursor-not-allowed'
+              )}
             >
               {t('duels.addWord')}
             </button>

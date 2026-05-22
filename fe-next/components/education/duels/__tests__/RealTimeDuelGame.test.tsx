@@ -421,4 +421,43 @@ describe('RealTimeDuelGame', () => {
       expect(mockAwardGameCoins).toHaveBeenCalledWith('duel-456', 'multiplayer', 50, 2, 2);
     });
   });
+
+  it('submits a Hebrew word typed via IME composition (Android GBoard) — submit not stuck disabled', async () => {
+    render(
+      <RealTimeDuelGame
+        duelId="duel-123"
+        studentId="student-123"
+        opponentName="Bob"
+      />
+    );
+
+    const startData: DuelStartedData = {
+      duelId: 'duel-123',
+      boardState: [['A', 'B'], ['C', 'D']],
+      startTime: new Date().toISOString(),
+      timeLimit: 180,
+      players: ['student-123', 'opponent-456'],
+    };
+    mockListeners['duel:started']?.(startData);
+
+    await waitFor(() => screen.getByTestId('word-input'));
+
+    const input = screen.getByTestId('word-input') as HTMLInputElement;
+    const submitBtn = screen.getByTestId('submit-word-btn');
+
+    // Before typing: submit is aria-disabled (not real `disabled`, so a tap can
+    // still flush the IME composition buffer).
+    expect(submitBtn).toHaveAttribute('aria-disabled', 'true');
+
+    // Android GBoard Hebrew: composition buffers into the DOM value; onChange
+    // may not fire until commit. The component must sync via compositionEnd.
+    fireEvent.compositionStart(input);
+    Object.defineProperty(input, 'value', { configurable: true, writable: true, value: 'שלום' });
+    fireEvent.compositionEnd(input, { data: 'שלום' });
+
+    expect(submitBtn).toHaveAttribute('aria-disabled', 'false');
+
+    fireEvent.click(submitBtn);
+    expect(mockSubmitWord).toHaveBeenCalledWith('duel-123', 'שלום');
+  });
 });
