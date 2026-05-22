@@ -10,7 +10,7 @@ import { buildTowerColumn, wordColor } from '@/lib/wordTower/towerColumn';
 import { letterPlacementFx } from '@/lib/wordTower/placementFx';
 import { towerRowLayout, towerPanMin, clampPan } from '@/lib/wordTower/towerLayout';
 import {
-  makeTile, paintTile, placeInstant, dropIn, moveTo, popOut, recolor, bumpScale, shakeX, squashLand, impactRing,
+  makeTile, paintTile, placeInstant, dropIn, popOut, recolor, bumpScale, shakeX, squashLand, impactRing,
   type TileSprite,
 } from './towerSprites';
 import { BIOME_THEME } from './biomeTheme';
@@ -41,6 +41,8 @@ interface PanState {
   y: number;
   /** Most-negative offset allowed (reveals the base); 0 when the tower fits. */
   panMin: number;
+  /** Grounded climb-follow offset (px) applied to the container alongside pan. */
+  shift: number;
   /** True while the user is actively dragging (suppresses the auto-snap). */
   dragging: boolean;
   /** The live tower container (set on mount). */
@@ -93,7 +95,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
     const ps = panState.current; // stable object for the component's life
     const c = new Container();
     c.sortableChildren = true;
-    c.y = ps.y;
+    c.y = ps.shift + ps.y;
     engine.camera.addChild(c);
     containerRef.current = c;
     ps.container = c;
@@ -121,12 +123,15 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
     const C = committed.length;
     // Grounded camera: base stands on the deck, stack grows up, camera pans once
     // the committed tower (NOT the pending preview) overflows the window.
-    const { size, half, rowH, centerY } = towerRowLayout({ pinCount: C, H, bottomInsetPx });
-    // How far down the user can pan to review the tower — also widens the keep
-    // window below so panned-to floors are already materialised (the diff does
-    // NOT re-run mid-pan; the container just translates).
+    const { size, half, rowH, centerY, baseCenter, shift } = towerRowLayout({ pinCount: C, H, bottomInsetPx });
+    // RIGID STACK: every tile sits at a FIXED local y (no shift) so tiles never
+    // move relative to each other. The climb-follow (shift) and the user pan are
+    // applied ONLY to the whole container (container.y = shift + pan) — so an
+    // inter-tile gap is impossible; the column always moves as one piece.
+    const localY = (pos: number) => baseCenter - pos * rowH;
     const panMin = towerPanMin(centerY(0), H, bottomInsetPx, half);
     panState.current.panMin = panMin;
+    panState.current.shift = shift;
     const pendingColor = wordColor(floors.length);
     // Skip the anchor (pendingWord[0]) when it's already the committed top.
     const pchars = C === 0 ? Array.from(pendingWord) : Array.from(pendingWord).slice(1);
@@ -146,23 +151,22 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
     const total = live.length;
     const maxPos = total - 1;
 
-    // Virtualize against the full PANNABLE range (not just the current viewport),
-    // so every floor the user can scroll down to is already on the stage — panning
-    // only translates the container, it never re-runs this diff.
-    const visible = live.filter((l) => { const y = centerY(l.pos); return y > -rowH * 1.5 && y < H + rowH - panMin; });
-    const visKeys = new Set(visible.map((v) => v.key));
+    // Materialise the WHOLE live stack (committed + pending). No viewport cull —
+    // the container translate moves everything, so culling by screen position
+    // would fight the pan. Realistic towers are tens of tiles — cheap for Pixi.
+    const liveKeys = new Set(live.map((l) => l.key));
 
-    // Retire sprites that left the window (scrolled off → destroy; backspaced ghost → pop out).
+    // Retire sprites no longer in the stack (a backspaced pending ghost).
     for (const [key, tile] of Array.from(registry.current)) {
-      if (visKeys.has(key)) continue;
+      if (liveKeys.has(key)) continue;
       registry.current.delete(key);
       if (!reducedMotion && tile.pending) popOut(tile, () => { try { tile.destroy({ children: true }); } catch { /* */ } });
       else { try { tile.destroy({ children: true }); } catch { /* */ } }
     }
 
-    // Add newcomers / update survivors.
-    for (const l of visible) {
-      const y = centerY(l.pos);
+    // Add newcomers / update survivors — survivors keep their FIXED local y.
+    for (const l of live) {
+      const y = localY(l.pos);
       const existing = registry.current.get(l.key);
       if (!existing) {
         const tile = makeTile(l.char, size, l.color, l.pending, l.shared);
@@ -174,8 +178,8 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
         if (firstRender.current || reducedMotion || !isNewTop) {
           placeInstant(tile, y);
         } else {
-          // Escalating placement juice: each deeper letter in the word lands with
-          // a heavier squash, a bigger shockwave ring, and more impact particles.
+          // Escalating placement juice: each deeper letter lands with a heavier
+          // squash, a bigger shockwave ring, and more impact particles.
           const depth = l.pending ? Math.max(0, l.pos - C) : 0;
           const fx = letterPlacementFx(depth);
           dropIn(tile, y, 0, () => {
@@ -185,8 +189,9 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
           });
         }
       } else {
-        if (reducedMotion) placeInstant(existing, y);
-        else moveTo(existing, y);
+        // Fixed local y → reposition ONLY on a real layout change (resize); never
+        // for the climb — that is the container's job, keeping the stack rigid.
+        if (Math.abs(existing.y - y) > 0.5) placeInstant(existing, y);
         if (existing.color !== l.color || existing.pending !== l.pending) {
           const lockingIn = existing.pending && !l.pending;
           if (reducedMotion) paintTile(existing, l.color, l.pending, l.shared);
@@ -195,23 +200,22 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
       }
     }
 
-    // ── User-scroll camera ──
-    // Refresh the pan extent (how far down the now-taller tower can be reviewed),
-    // then snap back to the build line whenever the player ACTS (adds a letter /
-    // commits a word) so the new tile + its drop FX always land on-screen — even
-    // if they had panned down to review the lower floors. A pure resize keeps the
-    // current pan (re-clamped), it doesn't yank the view.
+    // ── Camera = climb-follow (shift) + user pan, applied to the WHOLE container ──
+    // On any action (letter add / commit) snap the pan to 0 and glide the camera
+    // to the new build-line height. The glide moves the rigid stack as ONE piece
+    // (so no inter-tile gap can appear) and starts before the 300ms tile drop, so
+    // new-tile FX land on-screen. A pure resize keeps the user's pan.
     const snapKey = `${floors.length}|${pendingWord}`;
     const actioned = snapKey !== prevSnapKey.current;
     prevSnapKey.current = snapKey;
     if (!panState.current.dragging) {
-      if (actioned && panState.current.y !== 0) {
+      if (actioned) {
         panState.current.y = 0;
-        if (reducedMotion) c.y = 0;
-        else snapContainerY(c, 0, 240, () => panState.current.dragging); // starts before the 440ms drop → FX lands on-screen
+        if (reducedMotion || firstRender.current) c.y = shift;
+        else snapContainerY(c, shift, 280, () => panState.current.dragging);
       } else {
-        panState.current.y = clampPan(panState.current.y, panState.current.panMin);
-        c.y = panState.current.y;
+        panState.current.y = clampPan(panState.current.y, panMin);
+        c.y = shift + panState.current.y;
       }
     }
 
@@ -260,7 +264,7 @@ export function WordTowerScene(props: SceneProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{ w: number; h: number } | null>(null);
   const theme = BIOME_THEME[props.biomeId];
-  const pan = useRef<PanState>({ y: 0, panMin: 0, dragging: false, container: null });
+  const pan = useRef<PanState>({ y: 0, panMin: 0, shift: 0, dragging: false, container: null });
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -283,7 +287,7 @@ export function WordTowerScene(props: SceneProps) {
     const setPan = (next: number) => {
       pan.current.y = clampPan(next, pan.current.panMin);
       const c = pan.current.container;
-      if (c && !c.destroyed) c.y = pan.current.y;
+      if (c && !c.destroyed) c.y = pan.current.shift + pan.current.y;
     };
     const onDown = (e: PointerEvent) => {
       if (pan.current.panMin === 0) return; // short tower — nothing below to reveal
