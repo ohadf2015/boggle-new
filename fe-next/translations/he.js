@@ -5893,6 +5893,7 @@ const he = {
       "matchesTargetWarning": "אותו אורך — שליחה תנצל ניסיון",
       "knownLetters": "מקום שגוי:",
       "syncingTarget": "מסנכרן את מילת המטרה…",
+      "healHint": "כל מילה מרפאת — מצאו את המילה הנסתרת כדי לנצח",
       "accumulatedScore": "ניקוד",
       "autoClueUnlocked": "רמז נפתח!",
       "clueRevealLetter": "אות נחשפה!",

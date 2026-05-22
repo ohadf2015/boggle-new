@@ -212,6 +212,11 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     joinRoom(socket, getGameRoom(gameCode));
     leaveRoom(socket, LOBBY_ROOM); // Stop receiving lobby broadcasts while in-game
 
+    // `gameInProgress` lets the client arm the lost-`startGame` safety-net for
+    // late joiners (it already does this for reconnections). Without it, a
+    // late-join `startGame` that races the client's listener registration is
+    // lost silently → player stuck on a default grid while the real mode runs.
+    const gameInProgress = shouldSendGameState(game.gameState);
     socket.emit('joined', {
       success: true,
       gameCode,
@@ -220,11 +225,12 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       roomName: game.roomName,
       language: game.language,
       isPrivate: game.isPrivate || false,
-      users: getGameUsers(gameCode)
+      users: getGameUsers(gameCode),
+      gameInProgress
     });
 
     // If game is in progress, send current state (use state machine helper)
-    if (shouldSendGameState(game.gameState)) {
+    if (gameInProgress) {
       handleLateJoin(socket, game, gameCode, username);
     }
 

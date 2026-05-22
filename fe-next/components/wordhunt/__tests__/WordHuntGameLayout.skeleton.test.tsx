@@ -59,3 +59,15 @@ describe('WordHuntGameLayout clue-tile fallback', () => {
     expect(screen.getByTestId('real-clue-boxes')).toBeInTheDocument();
   });
 });
+
+describe('WordHuntGameLayout heal hint', () => {
+  it('shows the "any word heals" survival hint once the target is loaded', () => {
+    render(<WordHuntGameLayout {...baseProps} targetLength={5} currentHint={{ hint: '_ _ _ _ _', level: 0, unlockCost: 0 }} />);
+    expect(screen.getByTestId('wh-heal-hint')).toHaveTextContent('wordHunt.survival.healHint');
+  });
+
+  it('hides the heal hint while target metadata is still syncing', () => {
+    render(<WordHuntGameLayout {...baseProps} targetLength={0} />);
+    expect(screen.queryByTestId('wh-heal-hint')).not.toBeInTheDocument();
+  });
+});

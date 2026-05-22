@@ -167,6 +167,19 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           )}
         </div>
 
+        {/* Persistent dual-mechanic reminder. The auto-dismissing quick-rules
+            card vanishes in 8s, leaving players thinking they must spell the
+            hidden word; this one-liner stays so it's always clear that ANY
+            valid word heals and only matching the target wins. */}
+        {targetLength > 0 && (
+          <p
+            data-testid="wh-heal-hint"
+            className="shrink-0 px-2 text-center text-[11px] sm:text-xs font-neo-body text-neo-cream/70 leading-tight"
+          >
+            {t('wordHunt.survival.healHint')}
+          </p>
+        )}
+
         {/* Life Bar — compact wrapper */}
         <div className="px-2 shrink-0">
           <SurvivalLifeBar

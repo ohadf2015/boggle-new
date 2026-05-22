@@ -27,7 +27,6 @@ import { useMultiplayerSession } from '@/hooks/useMultiplayerSession';
 import { useMultiplayerGameFlow } from '@/hooks/useMultiplayerGameFlow';
 import { useSeriesTracker } from '@/hooks/useSeriesTracker';
 import { usePlayerJoinLeaveNotifications } from '@/hooks/usePlayerJoinLeaveNotifications';
-import { useMultiplayerEventNotifications } from '@/hooks/useMultiplayerEventNotifications';
 import { useMultiplayerSounds } from '@/hooks/useMultiplayerSounds';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useMultiplayerJoin } from './useMultiplayerJoin';
@@ -182,7 +181,10 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     enabled: isActive,
     deferToQueue: gameActive,
   });
-  useMultiplayerEventNotifications({ currentUsername: username, t, enabled: isActive });
+  // Word Hunt elimination / danger feedback is owned by the in-game
+  // WordHuntDangerToast (capped, auto-dismissing, per-type styled). A second
+  // page-level toast stream was duplicating every elimination and stacking
+  // uncapped over the board — removed in favour of the single in-game source.
   const mpSounds = useMultiplayerSounds();
 
   const {

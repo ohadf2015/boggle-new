@@ -329,6 +329,7 @@ function handleLateJoin(socket: Socket, game: GameState, gameCode: string, usern
       game.wordHuntState.playerLives[username] = HUNT_INITIAL_LIFE;
     }
     lateJoinPayload.wordHuntTargetLength = game.wordHuntState.targetWordLength ?? 0;
+    lateJoinPayload.wordHuntTargetCategory = game.wordHuntState.targetCategory ?? null;
     lateJoinPayload.wordHuntEliminatedPlayers = game.wordHuntState.eliminatedPlayers || [];
     lateJoinPayload.wordHuntPlayerLives = game.wordHuntState.playerLives || {};
   }

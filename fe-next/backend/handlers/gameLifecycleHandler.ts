@@ -448,6 +448,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         } : {}),
         ...(recoveryGameMode === 'word-hunt' && game.wordHuntState ? {
           wordHuntTargetLength: game.wordHuntState.targetWordLength ?? 0,
+          wordHuntTargetCategory: game.wordHuntState.targetCategory ?? null,
           wordHuntEliminatedPlayers: game.wordHuntState.eliminatedPlayers || [],
           wordHuntPlayerLives: game.wordHuntState.playerLives || {},
         } : {}),

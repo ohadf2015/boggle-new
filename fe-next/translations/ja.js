@@ -5874,6 +5874,7 @@ const ja = {
       "matchesTargetWarning": "同じ文字数 — 送信すると1回消費",
       "knownLetters": "位置違い:",
       "syncingTarget": "ターゲット同期中…",
+      "healHint": "どんな単語でも回復 — 隠された単語を当てて勝利",
       "accumulatedScore": "スコア",
       "autoClueUnlocked": "ヒント解放！",
       "clueRevealLetter": "文字が明らかに！",

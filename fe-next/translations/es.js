@@ -5820,6 +5820,7 @@ const es = {
       "matchesTargetWarning": "Misma longitud — enviar gasta 1 intento",
       "knownLetters": "Mal ubicada:",
       "syncingTarget": "Sincronizando palabra…",
+      "healHint": "Cualquier palabra cura — adivina la palabra oculta para ganar",
       "accumulatedScore": "Puntuación",
       "autoClueUnlocked": "¡Pista Desbloqueada!",
       "clueRevealLetter": "¡Letra revelada!",

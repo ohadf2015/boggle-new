@@ -394,6 +394,9 @@ export interface JoinedPayload {
   language: Language;
   users: GameUser[];
   reconnected?: boolean;
+  /** True when joining a game already in progress (late join). Lets the client
+   *  arm the lost-`startGame` recovery fallback, same as a reconnection. */
+  gameInProgress?: boolean;
 }
 
 export interface JoinedAsSpectatorPayload {

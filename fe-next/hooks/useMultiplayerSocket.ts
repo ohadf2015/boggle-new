@@ -253,10 +253,15 @@ export function useMultiplayerSocket(
       optionsRef.current.onJoined(data);
       setAttemptingReconnect(false);
 
-      // Safety net: if this is a reconnection, the server sends startGame immediately after joined.
-      // If we don't receive startGame within 3 seconds, request game state explicitly.
-      // This handles edge cases where the startGame emit is lost.
-      if (data.reconnected) {
+      // Safety net: for a reconnection OR a late join into an in-progress game,
+      // the server sends startGame immediately after joined. If that emit races
+      // our `startGame` listener registration it can be lost — and a late joiner,
+      // unlike a reconnection, would otherwise be stuck on a default/classic grid
+      // (the in-game self-heal only runs once the mode view is mounted, which
+      // never happens if gameMode never arrives). Arm the same fallback so a
+      // missed startGame is recovered via requestGameState. `requestGameState` is
+      // server-guarded by isInProgress, so a stray call during lobby is a no-op.
+      if (data.reconnected || data.gameInProgress) {
         // Clear any previous fallback timer to prevent accumulation on rapid reconnects
         if (reconnectFallbackTimerRef.current) {
           clearTimeout(reconnectFallbackTimerRef.current);
@@ -265,7 +270,7 @@ export function useMultiplayerSocket(
 
         const fallbackTimer = setTimeout(() => {
           reconnectFallbackTimerRef.current = null;
-          logger.log('[SOCKET.IO] Requesting game state (startGame not received after reconnection)');
+          logger.log('[SOCKET.IO] Requesting game state (startGame not received after join/reconnect)');
           socketInstance.emit('requestGameState');
         }, 5000);
         reconnectFallbackTimerRef.current = fallbackTimer;

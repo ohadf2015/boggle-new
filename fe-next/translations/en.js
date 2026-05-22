@@ -5927,6 +5927,7 @@ const en = {
       "matchesTargetWarning": "Same length — submitting uses 1 try",
       "knownLetters": "Wrong spot:",
       "syncingTarget": "Syncing target word…",
+      "healHint": "Any word heals — find the hidden word to win",
       "accumulatedScore": "Score",
       "autoClueUnlocked": "Clue Unlocked!",
       "clueRevealLetter": "Letter revealed!",

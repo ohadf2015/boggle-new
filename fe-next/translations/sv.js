@@ -5843,6 +5843,7 @@ const sv = {
       "matchesTargetWarning": "Samma längd — skicka förbrukar 1 försök",
       "knownLetters": "Fel plats:",
       "syncingTarget": "Synkar målordet…",
+      "healHint": "Alla ord läker — hitta det dolda ordet för att vinna",
       "accumulatedScore": "Poäng",
       "autoClueUnlocked": "Ledtråd upplåst!",
       "clueRevealLetter": "Bokstav avslöjad!",
