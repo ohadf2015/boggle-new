@@ -248,6 +248,36 @@ describe('DuelGameView', () => {
       expect(input).toHaveValue('');
     });
 
+    it('adds a Hebrew word typed via IME composition (Android GBoard) without the button stuck disabled', async () => {
+      mockGetDuelById.mockResolvedValue({
+        data: mockDuelRow,
+        error: null,
+      });
+
+      render(<DuelGameView duelId="duel-123" studentId="student-1" />);
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText('Type a word...')).toBeInTheDocument();
+      });
+
+      const input = screen.getByPlaceholderText('Type a word...') as HTMLInputElement;
+      const addButton = screen.getByText('Add Word');
+
+      // Empty -> aria-disabled (not real `disabled`, so a tap still flushes IME)
+      expect(addButton).toHaveAttribute('aria-disabled', 'true');
+
+      // Android GBoard Hebrew: composition buffers into the DOM value; onChange
+      // may not fire until commit -> component syncs via compositionEnd.
+      fireEvent.compositionStart(input);
+      Object.defineProperty(input, 'value', { configurable: true, writable: true, value: 'שלום' });
+      fireEvent.compositionEnd(input, { data: 'שלום' });
+
+      expect(addButton).toHaveAttribute('aria-disabled', 'false');
+
+      fireEvent.click(addButton);
+      expect(screen.getByText('שלום')).toBeInTheDocument();
+    });
+
     it('should submit score with accumulated words', async () => {
       mockGetDuelById.mockResolvedValue({
         data: mockDuelRow,
