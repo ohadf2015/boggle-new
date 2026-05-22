@@ -12316,6 +12316,37 @@ const es = {
         "legendary": "Legendario"
       }
     }
+  },
+  "showcase3d": {
+    "heroBadge": "Un mundo de palabras",
+    "cap0Title": "Traza la palabra",
+    "cap0Body": "Arrastra sobre el tablero — las letras brillan mientras avanzas.",
+    "cap1Title": "Encadena el combo",
+    "cap1Body": "Vincula palabras consecutivas para activar multiplicadores de puntos.",
+    "cap2Title": "Domina la sala",
+    "cap2Body": "Supera a tres rivales en un tablero en directo.",
+    "cap3Title": "Toma la corona",
+    "cap3Body": "Domina la puntuación y reclama la victoria — en voz alta.",
+    "scrollHint": "Desplázate para jugar",
+    "scoreLabel": "Puntuación",
+    "rail0": "Traza",
+    "rail1": "Encadena",
+    "rail2": "Domina",
+    "rail3": "Corona",
+    "modesTitle": "Tres formas de luchar",
+    "modesSub": "Rondas reales, tableros reales — cada uno se desliza mientras desplazas.",
+    "mode1Tag": "Solo · Diario",
+    "mode1": "Un tablero. Un intento.",
+    "mode1Body": "La misma cuadrícula diaria para todos. Sube en la clasificación global antes de la medianoche.",
+    "mode2Tag": "Hasta 1v3",
+    "mode2": "Versus en directo para fiestas",
+    "mode2Body": "Cuatro cubos, un tablero en directo, sin piedad. El tablero más ruidoso gana.",
+    "mode3Tag": "5 idiomas",
+    "mode3": "Juega en tu idioma",
+    "mode3Body": "Hebreo, inglés, sueco, japonés, español — tus palabras, tu territorio.",
+    "bottomTitle": "Tu turno. Hazlo fuerte.",
+    "bottomCta": "Juega LexiClash gratis",
+    "floatCta": "Juega gratis"
   }
 };
 

@@ -12612,6 +12612,37 @@ const en = {
     "actionUrlLabel": "Action URL",
     "sendSuccess": "Notification sent successfully!",
     "sendError": "Failed to send notification. Please try again."
+  },
+  "showcase3d": {
+    "heroBadge": "A world of words",
+    "cap0Title": "Trace the word",
+    "cap0Body": "Drag across the board — letters light up as you go.",
+    "cap1Title": "Chain the combo",
+    "cap1Body": "Link words back-to-back to ignite score multipliers.",
+    "cap2Title": "Beat the room",
+    "cap2Body": "Outscore up to three rivals on one live board.",
+    "cap3Title": "Take the crown",
+    "cap3Body": "Top the scoreboard and claim the win — out loud.",
+    "scrollHint": "Scroll to play",
+    "scoreLabel": "Score",
+    "rail0": "Trace",
+    "rail1": "Chain",
+    "rail2": "Beat",
+    "rail3": "Take",
+    "modesTitle": "Three ways to clash",
+    "modesSub": "Real rounds, real boards — each one slides in as you scroll.",
+    "mode1Tag": "Solo · Daily",
+    "mode1": "One board. One shot.",
+    "mode1Body": "The same daily grid for everyone. Climb the global rank before midnight.",
+    "mode2Tag": "Up to 1v3",
+    "mode2": "Real-time party versus",
+    "mode2Body": "Four cubes, one live board, zero mercy. The loudest scoreboard wins.",
+    "mode3Tag": "5 languages",
+    "mode3": "Play in your language",
+    "mode3Body": "Hebrew, English, Swedish, Japanese, Spanish — your words, your turf.",
+    "bottomTitle": "Your move. Make it loud.",
+    "bottomCta": "Play LexiClash free",
+    "floatCta": "Play free"
   }
 };
 

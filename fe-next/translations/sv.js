@@ -12181,6 +12181,37 @@ const sv = {
         legendary: "Legendarisk"
       }
     }
+  },
+  showcase3d: {
+    heroBadge: "En värld av ord",
+    cap0Title: "Spela ordet",
+    cap0Body: "Dra över brädet — bokstäver lyser upp när du går.",
+    cap1Title: "Kedja combotill",
+    cap1Body: "Länka ord efter varandra och tända poängmultiplikatorer.",
+    cap2Title: "Besegra rummet",
+    cap2Body: "Överträffa upp till tre rivaler på en live-bräde.",
+    cap3Title: "Ta kronan",
+    cap3Body: "Toppa topplistan och hävda segern — högt och tydligt.",
+    scrollHint: "Rulla för att spela",
+    scoreLabel: "Poäng",
+    rail0: "Spela",
+    rail1: "Kedja",
+    rail2: "Besegra",
+    rail3: "Ta",
+    modesTitle: "Tre sätt att tävla",
+    modesSub: "Riktiga rundor, riktiga bräden — varje en glider in medan du rullar.",
+    mode1Tag: "Solo · Dagligt",
+    mode1: "En bräde. En chans.",
+    mode1Body: "Samma dagliga rutnät för alla. Klättra i den globala rankningen innan midnatt.",
+    mode2Tag: "Upp till 1v3",
+    mode2: "Realtids festerivaler",
+    mode2Body: "Fyra kuber, en live-bräde, ingen nåd. Det högaste poängtavlan vinner.",
+    mode3Tag: "5 språk",
+    mode3: "Spela på ditt språk",
+    mode3Body: "Hebreiska, engelska, svenska, japanska, spanska — dina ord, ditt territorium.",
+    bottomTitle: "Din tur. Gör ljud.",
+    bottomCta: "Spela LexiClash gratis",
+    floatCta: "Spela gratis"
   }
 };
 
