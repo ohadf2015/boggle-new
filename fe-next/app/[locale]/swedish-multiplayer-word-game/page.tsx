@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
-    description: 'Spela scrabble online på svenska gratis — ordhjul, boggle och mer. Utan registrering, utan nedladdning. Skapa rum, bjud in med länk. 10 000+ ord. Börja nu!',
+    description: 'Spela scrabble online på svenska gratis mot 2-20 spelare i realtid — utan registrering, utan nedladdning. Skapa rum, bjud in med länk. Prova även dagligt ordhjul och Ordjakt.',
     keywords: 'ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid, ordhjul, ordhjul online, daglig ordhjul',
     openGraph: {
       title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
@@ -221,6 +221,17 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
             Tävla på globala poängtabeller, tjäna prestationer och lås upp specialspellägen. Våra bosskamper lägger till
             en unik PvE-vändning där spelare samarbetar mot AI-motståndare. Dagliga utmaningar erbjuder nya pussel
             varje dag med exklusiva belöningar.
+          </p>
+          <p className="mt-4 text-neo-gray-200">
+            Utöver multiplayer hittar du{' '}
+            <Link href={`/${locale}/daily-word-wheel`} className="text-neo-cyan hover:underline">
+              dagligt ordhjul
+            </Link>
+            {' '}— snurra hjulet och hitta alla ord — och{' '}
+            <Link href={`/${locale}/daily`} className="text-neo-cyan hover:underline">
+              Ordjakt
+            </Link>
+            {' '}— gissa det dolda ordet på 10 försök. Båda är gratis, nya pussel varje dag.
           </p>
         </section>
         <NativePageEnhancements locale={locale} />

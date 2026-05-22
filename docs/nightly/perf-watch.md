@@ -18,18 +18,17 @@ Items flagged by the nightly performance lane that need human judgement or are o
 
 ---
 
-## [FRONTEND] Multiplayer LCP — 5806ms (POOR)
+## [FRONTEND] Multiplayer LCP — improving but still POOR
 
 **Severity:** High  
-**Routes:** `/en/multiplayer` (p75 5806ms, n=11), `/he/multiplayer` (p75 5346ms, n=6)  
+**Routes:** `/en/multiplayer` (p75 LCP: 5807ms 2026-05-21 → **4228ms 2026-05-22**, n=29)  
 **Threshold:** Good <2500ms, Poor >4000ms  
+**Update 2026-05-22:** Improved 27% (5807→4228ms). CLS also dramatically improved (0.146→0.026). INP flat at ~252ms. `/he/multiplayer` dropped below n=5 threshold today — no fresh data.  
 **Likely cause:** Game board / WebSocket handshake is the Largest Contentful Paint element. The game client (Pixi.js + GSAP + socket connection) must complete before any above-fold game UI appears.  
 **Not a quick fix.** Options:
 - Render a lightweight skeleton/lobby-waiting UI immediately (SSR), make it the LCP target. The heavy game client loads behind it.
 - Profile with Chrome DevTools to confirm what the actual LCP element is and its render timeline.
 - Consider `loading="eager"` + preconnect hint for the socket server domain.
-
-**Note:** n=11 is low but consistent across two locales — likely a real signal, not noise.
 
 ---
 
@@ -51,4 +50,47 @@ Items flagged by the nightly performance lane that need human judgement or are o
 
 ---
 
-*Last updated: 2026-05-21 by Lane 02 (perf)*
+## [FRONTEND] Hebrew home CLS — admin card skeleton mismatch
+
+**Severity:** Medium (admin-only, no real-user impact)  
+**Route:** `/he` (p75 CLS 0.118 → 1.119 regression, n=6)  
+**Detected:** 2026-05-22  
+**Root cause:** `LandingChallengeCards` adds 4 admin-only mode cards (`wordCraft`, `wordCraftGems`, `wordTower`, `blastClassic`) via `isAdmin` gate. `LandingCardsSkeleton` renders a fixed non-admin card count. When `hadSession=true` and auth resolves to admin, skeleton→admin-cards swap shifts layout significantly. All 6 sampled sessions are the founder's Hebrew locale sessions.  
+**Fix:** Pass `isAdmin` prop to `LandingCardsSkeleton` so it renders the correct number of skeleton cards for admins. Low priority — zero real-user impact until admin card set is publicly launched.  
+**File:** `fe-next/components/landing/LandingCardsSkeleton.tsx`, `LandingView.tsx:202` (passes `isAdmin` to Cards but not to Skeleton).
+
+---
+
+## [FRONTEND] English home LCP — 20956ms outlier
+
+**Severity:** Low (low confidence)  
+**Route:** `/en` (p75 LCP 20956ms, n=7)  
+**Detected:** 2026-05-22  
+**Caveat:** n=7 means p75 = 6th of 7 sessions. A single session with a 20s LCP (slow network, tab-backgrounded, or video preload) skews the p75 massively. INP=40ms and CLS=0.002 on the same route are excellent, inconsistent with a truly broken LCP.  
+**Action:** Do not act until n>30 with p75 consistently >4000ms. Watch for 3 nights. If `/en` LCP remains >4000ms with higher n, profile specifically: check if `showcase-3d` video assets are being preloaded on the home route.
+
+---
+
+## [FRONTEND] Japanese home — triple-poor signal (low confidence)
+
+**Severity:** Medium (low confidence — likely admin sessions)
+**Route:** `/ja` (p75 LCP 8775ms, INP 264ms, CLS 0.572, n=4)
+**Detected:** 2026-05-22 (new route, no prior baseline)
+**Pattern:** CLS 0.572 vs `/en` CLS 0.0018 on the same page template = 316x difference. Strong indicator of admin-session skeleton mismatch (founder tests in JA locale, same issue as `/he`). LCP 8775ms and INP 264ms at n=4 are statistically dominated by 1 slow session.
+**Image priority:** confirmed correct — `LandingHero.tsx:36` passes `priority={true}` to `IdleMascotWithEntrance`.
+**Action:** Do not act until n>15. If CLS stays >0.3 with confirmed non-admin sessions, apply same fix as `/he` skeleton: pass `isAdmin` to `LandingCardsSkeleton` so it renders the correct admin card count.
+
+---
+
+## [FRONTEND] Hebrew Word Tower — CLS at loading→game transition
+
+**Severity:** Medium (low confidence — likely admin/founder sessions)
+**Route:** `/he/word-tower` (p75 CLS 1.050, p75 LCP 2062ms, n=6)
+**Detected:** 2026-05-22 (new route signal)
+**Root cause:** `WordTowerGame.tsx:80-86` loading state renders `min-h-[100dvh]` flex-centered spinner. Real game renders `WordTowerPlay` (HUD at top + game board below) — height contract breaks on mount, causing CLS > 1.
+**Fix direction:** Loading state should mirror game structure: HUD-height placeholder at top + flex-fill content area below, instead of a single centered div. See `WordTowerHud.tsx:146` for HUD height constraints.
+**Action:** Do not act until n>15 with confirmed non-admin sessions. If CLS confirmed, implement loading skeleton matching HUD+board structure. Risk: LOW, but test Hebrew RTL carefully.
+
+---
+
+*Last updated: 2026-05-22 by Lane 02 (perf)*
