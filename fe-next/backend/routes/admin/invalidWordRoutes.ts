@@ -196,8 +196,7 @@ router.post('/auto-promote', async (req: AdminRequest, res: Response): Promise<v
     const { success, result, duration, error } = await triggerAutoPromotion();
 
     auditLog(req.adminUser, 'AUTO_PROMOTE_TRIGGERED', {
-      promoted: result.promoted, failed: result.failed,
-      submissionBased: result.words.submissionBased.length,
+      promoted: result.promoted, failed: result.failed, blocked: result.blocked,
       milogBased: result.words.milogBased.length,
       wiktionaryBased: result.words.wiktionaryBased.length,
       wiktionaryEsBased: result.words.wiktionaryEsBased.length,

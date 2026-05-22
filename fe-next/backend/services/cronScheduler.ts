@@ -365,12 +365,68 @@ export function startAutoPromotionCron() {
 }
 
 /**
+ * Start English/Spanish word-verification cron
+ * Runs daily at 02:00 UTC: verifies pending en/es rejected words against
+ * Wiktionary so the auto-promotion cron (every 4h) has verified words to promote.
+ * Hebrew is handled separately by the milog enrichment cron (04:00 UTC).
+ */
+export function startWordVerificationCron() {
+  const task = cron.schedule('0 2 * * *', async () => {
+    await withCronLock('cron:word-verification', 15 * 60 * 1000, async () => {
+      logger.info('CRON', 'Starting en/es word verification...');
+      const startTime = Date.now();
+
+      try {
+        const { runWordVerification } = await import('../modules/wordVerificationRunner');
+        const result = await runWordVerification();
+        const duration = Date.now() - startTime;
+        logger.info('CRON', `Word verification complete in ${duration}ms`, {
+          en: { processed: result.en.processed, verified: result.en.verified },
+          es: { processed: result.es.processed, verified: result.es.verified },
+        });
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+        logger.error('CRON', 'Word verification failed', { error: errorMsg });
+      }
+    });
+  }, {
+    timezone: 'UTC',
+  });
+
+  logger.info('CRON', 'Word verification cron started (runs daily at 02:00 UTC)');
+  return task;
+}
+
+/**
+ * Manual trigger for en/es word verification
+ * Used by admin dashboard
+ */
+export async function triggerWordVerification(): Promise<{
+  success: boolean;
+  totalVerified: number;
+  duration: number;
+  error?: string;
+}> {
+  logger.info('MANUAL', 'Starting manual word verification...');
+  const startTime = Date.now();
+  try {
+    const { runWordVerification } = await import('../modules/wordVerificationRunner');
+    const result = await runWordVerification();
+    return { success: true, totalVerified: result.totalVerified, duration: Date.now() - startTime };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('MANUAL', 'Word verification failed', { error: errorMsg });
+    return { success: false, totalVerified: 0, duration: Date.now() - startTime, error: errorMsg };
+  }
+}
+
+/**
  * Manual trigger for Auto-Promotion
  * Used by admin dashboard
  */
 export async function triggerAutoPromotion(): Promise<{
   success: boolean;
-  result: { promoted: number; failed: number; skipped?: boolean; words: { submissionBased: string[]; milogBased: string[]; wiktionaryBased: string[]; wiktionaryEsBased: string[] } };
+  result: { promoted: number; failed: number; blocked: number; skipped?: boolean; words: { milogBased: string[]; wiktionaryBased: string[]; wiktionaryEsBased: string[] } };
   duration: number;
   error?: string;
 }> {
@@ -390,11 +446,41 @@ export async function triggerAutoPromotion(): Promise<{
 
     return {
       success: false,
-      result: { promoted: 0, failed: 0, words: { submissionBased: [], milogBased: [], wiktionaryBased: [], wiktionaryEsBased: [] } },
+      result: { promoted: 0, failed: 0, blocked: 0, words: { milogBased: [], wiktionaryBased: [], wiktionaryEsBased: [] } },
       duration: Date.now() - startTime,
       error: errorMsg,
     };
   }
+}
+
+/**
+ * Start Dictionary Healing cron
+ * Runs daily at 03:30 UTC: re-checks already auto-promoted en/es words against
+ * the offensive filter and demotes any flagged slur/offensive terms.
+ */
+export function startDictionaryHealingCron() {
+  const task = cron.schedule('30 3 * * *', async () => {
+    await withCronLock('cron:dictionary-healing', 15 * 60 * 1000, async () => {
+      logger.info('CRON', 'Starting dictionary healing sweep...');
+      const startTime = Date.now();
+      try {
+        const { runDictionaryHealing } = await import('../modules/dictionaryHealing');
+        const result = await runDictionaryHealing();
+        const duration = Date.now() - startTime;
+        logger.info('CRON', `Dictionary healing complete in ${duration}ms`, {
+          scanned: result.scanned, demoted: result.demoted, words: result.words,
+        });
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+        logger.error('CRON', 'Dictionary healing failed', { error: errorMsg });
+      }
+    });
+  }, {
+    timezone: 'UTC',
+  });
+
+  logger.info('CRON', 'Dictionary healing cron started (runs daily at 03:30 UTC)');
+  return task;
 }
 
 /**
@@ -547,8 +633,14 @@ export function startAllCronJobs(): ScheduledTask[] {
   // Hebrew dictionary enrichment (04:00 UTC)
   tasks.push(startDictionaryEnrichmentCron());
 
+  // English/Spanish word verification (02:00 UTC) — feeds the auto-promotion cron
+  tasks.push(startWordVerificationCron());
+
   // Auto-promotion pipeline (every 4 hours)
   tasks.push(startAutoPromotionCron());
+
+  // Dictionary healing sweep (03:30 UTC) — demotes any promoted slurs
+  tasks.push(startDictionaryHealingCron());
 
   // Re-engagement emails (hourly — filters by local time 7-9 AM)
   tasks.push(startReengagementEmailCron());

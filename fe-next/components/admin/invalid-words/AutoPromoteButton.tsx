@@ -32,9 +32,11 @@ interface AutoPromoteButtonProps {
 interface AutoPromoteResult {
   promoted: number;
   failed: number;
+  blocked?: number;
   words: {
-    submissionBased: string[];
     milogBased: string[];
+    wiktionaryBased: string[];
+    wiktionaryEsBased: string[];
   };
 }
 
@@ -121,7 +123,7 @@ export function AutoPromoteButton({
             <AlertDialogDescription className="text-slate-300">
               <strong className="text-neo-cyan">{candidateCount}</strong> word{candidateCount !== 1 ? 's' : ''} will be automatically promoted to the dictionary.
               <br /><br />
-              This includes words with 10+ submissions (not in dictionary) and milog-verified Hebrew words. Promoted words become valid for all players.
+              This promotes only externally-verified words (Wiktionary for English/Spanish, milog for Hebrew); offensive/slur terms are filtered out automatically. Promoted words become valid for all players.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

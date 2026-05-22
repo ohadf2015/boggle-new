@@ -1,10 +1,18 @@
 /**
  * Auto-Promotion Module
- * Automatically promotes invalid words to the dictionary when confidence signals converge.
+ * Promotes invalid words to the dictionary when an external authority confirms them.
  *
- * Two promotion paths:
- * 1. Submission-based (all languages): submission_count >= MIN_SUBMISSIONS & reason = 'not_in_dictionary'
- * 2. Milog-based (Hebrew only): milog_status = 'verified' — immediate, no threshold
+ * Promotion paths (ALL gated by the offensive filter):
+ * 1. Milog-verified (Hebrew)
+ * 2. Wiktionary-verified (English)
+ * 3. Wiktionary-verified (Spanish)
+ *
+ * The old unverified `submission_count >= N` path was REMOVED on 2026-05-23
+ * (dictionary-self-improvement): it promoted any string that was submitted
+ * enough times with no content check — a slur/abuse risk on a 15+/TV party
+ * game, and useless at real volume. Verification is now the only auto gate;
+ * submission count is a *priority* signal inside the verification queue.
+ * Off-Wiktionary real words are handled by the admin review UI.
  */
 
 import logger from '../utils/logger';
@@ -12,11 +20,13 @@ import { addToCommunityCache } from './communityWordManager';
 import { getVerifiedWordsForPromotion } from '../services/milogWordVerifier';
 import { getVerifiedEnglishWordsForPromotion } from '../services/wiktionaryEnVerifier';
 import { getVerifiedSpanishWordsForPromotion } from '../services/wiktionaryEsVerifier';
+import { getVerifiedWordsForPromotionByLang } from '../services/wiktionaryVerifier';
+import { isOffensiveWord } from '../services/wiktionaryOffensiveFilter';
 import { getSupabase } from './supabaseServer';
 import { promoteWordToScores } from './wordPromotion';
+import { emitDictionaryRun } from './dictionaryPipelineTelemetry';
 
 export const AUTO_PROMOTION_CONFIG = {
-  MIN_SUBMISSIONS: 10,
   BATCH_LIMIT: 200,
   VOTES_TO_ADD: 10,
 } as const;
@@ -24,14 +34,20 @@ export const AUTO_PROMOTION_CONFIG = {
 export interface AutoPromotionResult {
   promoted: number;
   failed: number;
+  /** Verified words skipped because Wiktionary flagged them offensive/slur. */
+  blocked: number;
   skipped?: boolean;
   words: {
-    submissionBased: string[];
     milogBased: string[];
     wiktionaryBased: string[];
     wiktionaryEsBased: string[];
+    wiktionarySvBased: string[];
+    jishoBased: string[];
   };
 }
+
+type Supa = NonNullable<ReturnType<typeof getSupabase>>;
+type VerifiedWord = { id: string; word: string; url: string | null };
 
 // In-memory lock to prevent concurrent runs
 let isRunning = false;
@@ -41,22 +57,18 @@ export function _resetLockForTesting(): void {
   isRunning = false;
 }
 
-/**
- * Run the auto-promotion pipeline
- * 1. Submission-based: high-count not_in_dictionary words
- * 2. Milog-based: verified Hebrew words
- */
 export async function runAutoPromotion(): Promise<AutoPromotionResult> {
   if (isRunning) {
     logger.warn('AUTO_PROMOTE', 'Skipped: another run is in progress');
-    return { promoted: 0, failed: 0, skipped: true, words: { submissionBased: [], milogBased: [], wiktionaryBased: [], wiktionaryEsBased: [] } };
+    return { promoted: 0, failed: 0, blocked: 0, skipped: true, words: { milogBased: [], wiktionaryBased: [], wiktionaryEsBased: [], wiktionarySvBased: [], jishoBased: [] } };
   }
 
   isRunning = true;
   const result: AutoPromotionResult = {
     promoted: 0,
     failed: 0,
-    words: { submissionBased: [], milogBased: [], wiktionaryBased: [], wiktionaryEsBased: [] },
+    blocked: 0,
+    words: { milogBased: [], wiktionaryBased: [], wiktionaryEsBased: [], wiktionarySvBased: [], jishoBased: [] },
   };
 
   try {
@@ -66,181 +78,88 @@ export async function runAutoPromotion(): Promise<AutoPromotionResult> {
       return result;
     }
 
-    // --- Path 1: Submission-based promotion ---
-    await promoteBySubmissionCount(supabase, result);
+    // Path 1: Milog-verified Hebrew words
+    const milog = await getVerifiedWordsForPromotion();
+    await promoteVerified(supabase, milog, 'he', 'milog_verified', result.words.milogBased, result);
 
-    // --- Path 2: Milog-verified Hebrew words ---
-    await promoteByMilogVerification(supabase, result);
+    // Path 2: Wiktionary-verified English words
+    const en = await getVerifiedEnglishWordsForPromotion();
+    await promoteVerified(supabase, en, 'en', 'wiktionary_verified', result.words.wiktionaryBased, result);
 
-    // --- Path 3: Wiktionary-verified English words ---
-    await promoteByWiktionaryEnVerification(supabase, result);
+    // Path 3: Wiktionary-verified Spanish words
+    const es = await getVerifiedSpanishWordsForPromotion();
+    await promoteVerified(supabase, es, 'es', 'wiktionary_es_verified', result.words.wiktionaryEsBased, result);
 
-    // --- Path 4: Wiktionary-verified Spanish words ---
-    await promoteByWiktionaryEsVerification(supabase, result);
+    // Path 4: Wiktionary-verified Swedish words
+    const sv = await getVerifiedWordsForPromotionByLang('sv');
+    await promoteVerified(supabase, sv, 'sv', 'wiktionary_sv_verified', result.words.wiktionarySvBased, result);
 
-    logger.info('AUTO_PROMOTE', `Complete: ${result.promoted} promoted, ${result.failed} failed`);
+    // Path 5: Jisho/JMdict-verified Japanese words (offensive already filtered at verify time)
+    const ja = await getVerifiedWordsForPromotionByLang('ja');
+    await promoteVerified(supabase, ja, 'ja', 'jisho_verified', result.words.jishoBased, result);
+
+    logger.info('AUTO_PROMOTE', `Complete: ${result.promoted} promoted, ${result.blocked} blocked, ${result.failed} failed`);
+    await emitDictionaryRun('promote', { promoted: result.promoted, blocked: result.blocked, failed: result.failed });
     return result;
   } finally {
     isRunning = false;
   }
 }
 
-async function promoteBySubmissionCount(
-  supabase: NonNullable<ReturnType<typeof getSupabase>>,
+/**
+ * Promote a batch of externally-verified words for one language, skipping any
+ * the offensive filter flags. Per-word failures never abort the batch.
+ */
+async function promoteVerified(
+  supabase: Supa,
+  words: VerifiedWord[] | null | undefined,
+  language: string,
+  source: string,
+  bucket: string[],
   result: AutoPromotionResult
 ): Promise<void> {
-  const { data: candidates, error } = await supabase.rpc('get_auto_promotion_candidates', {
-    p_min_submissions: AUTO_PROMOTION_CONFIG.MIN_SUBMISSIONS,
-    p_limit: AUTO_PROMOTION_CONFIG.BATCH_LIMIT,
-  });
-
-  if (error) {
-    logger.error('AUTO_PROMOTE', `RPC error: ${error.message}`);
+  if (!words || words.length === 0) {
+    logger.info('AUTO_PROMOTE', `No ${source} candidates`);
     return;
   }
 
-  if (!candidates || candidates.length === 0) {
-    logger.info('AUTO_PROMOTE', 'No submission-based candidates');
-    return;
-  }
+  logger.info('AUTO_PROMOTE', `Processing ${words.length} ${source} candidates`);
 
-  logger.info('AUTO_PROMOTE', `Processing ${candidates.length} submission-based candidates`);
-
-  for (const candidate of candidates) {
+  for (const wordRecord of words) {
     try {
-      await addToCommunityCache(candidate.word, candidate.language);
+      // Safety gate — Wiktionary's own labels (slur/offensive/vulgar) block it.
+      if (await isOffensiveWord(wordRecord.word, language)) {
+        result.blocked++;
+        logger.warn('AUTO_PROMOTE', `Blocked (offensive): ${wordRecord.word} [${language}]`);
+        // Mark so it is removed from the verified-promotion queue permanently.
+        await supabase.rpc('update_verification_result', {
+          p_word_id: wordRecord.id,
+          p_status: 'rejected_type',
+          p_source: 'offensive_filter',
+          p_url: null,
+          p_word_type: null,
+          p_error: 'blocked: offensive/slur label',
+        });
+        continue;
+      }
 
-      await promoteWordToScores(supabase, candidate.word, candidate.language, {
+      await addToCommunityCache(wordRecord.word, language);
+      await promoteWordToScores(supabase, wordRecord.word, language, {
         votes: AUTO_PROMOTION_CONFIG.VOTES_TO_ADD,
         submitter: 'auto_promoted',
       });
-
-      await supabase.rpc('mark_word_auto_promoted', {
-        p_word_id: candidate.id,
-        p_source: 'submission_threshold',
-      });
-
-      result.promoted++;
-      result.words.submissionBased.push(candidate.word);
-      logger.info('AUTO_PROMOTE', `Promoted (submission): ${candidate.word} [${candidate.language}]`);
-    } catch (err) {
-      result.failed++;
-      const msg = err instanceof Error ? err.message : String(err);
-      logger.error('AUTO_PROMOTE', `Failed to promote "${candidate.word}": ${msg}`);
-    }
-  }
-}
-
-async function promoteByMilogVerification(
-  supabase: NonNullable<ReturnType<typeof getSupabase>>,
-  result: AutoPromotionResult
-): Promise<void> {
-  const milogWords = await getVerifiedWordsForPromotion();
-
-  if (!milogWords || milogWords.length === 0) {
-    logger.info('AUTO_PROMOTE', 'No milog-verified candidates');
-    return;
-  }
-
-  logger.info('AUTO_PROMOTE', `Processing ${milogWords.length} milog-verified candidates`);
-
-  for (const wordRecord of milogWords) {
-    try {
-      await addToCommunityCache(wordRecord.word, 'he');
-
-      await promoteWordToScores(supabase, wordRecord.word, 'he', {
-        votes: AUTO_PROMOTION_CONFIG.VOTES_TO_ADD,
-        submitter: 'auto_promoted',
-      });
-
       await supabase.rpc('mark_word_auto_promoted', {
         p_word_id: wordRecord.id,
-        p_source: 'milog_verified',
+        p_source: source,
       });
 
       result.promoted++;
-      result.words.milogBased.push(wordRecord.word);
-      logger.info('AUTO_PROMOTE', `Promoted (milog): ${wordRecord.word}`);
+      bucket.push(wordRecord.word);
+      logger.info('AUTO_PROMOTE', `Promoted (${source}): ${wordRecord.word} [${language}]`);
     } catch (err) {
       result.failed++;
       const msg = err instanceof Error ? err.message : String(err);
-      logger.error('AUTO_PROMOTE', `Failed to promote milog word "${wordRecord.word}": ${msg}`);
-    }
-  }
-}
-
-async function promoteByWiktionaryEnVerification(
-  supabase: NonNullable<ReturnType<typeof getSupabase>>,
-  result: AutoPromotionResult
-): Promise<void> {
-  const wiktionaryWords = await getVerifiedEnglishWordsForPromotion();
-
-  if (!wiktionaryWords || wiktionaryWords.length === 0) {
-    logger.info('AUTO_PROMOTE', 'No wiktionary-verified candidates');
-    return;
-  }
-
-  logger.info('AUTO_PROMOTE', `Processing ${wiktionaryWords.length} wiktionary-verified candidates`);
-
-  for (const wordRecord of wiktionaryWords) {
-    try {
-      await addToCommunityCache(wordRecord.word, 'en');
-
-      await promoteWordToScores(supabase, wordRecord.word, 'en', {
-        votes: AUTO_PROMOTION_CONFIG.VOTES_TO_ADD,
-        submitter: 'auto_promoted',
-      });
-
-      await supabase.rpc('mark_word_auto_promoted', {
-        p_word_id: wordRecord.id,
-        p_source: 'wiktionary_verified',
-      });
-
-      result.promoted++;
-      result.words.wiktionaryBased.push(wordRecord.word);
-      logger.info('AUTO_PROMOTE', `Promoted (wiktionary): ${wordRecord.word}`);
-    } catch (err) {
-      result.failed++;
-      const msg = err instanceof Error ? err.message : String(err);
-      logger.error('AUTO_PROMOTE', `Failed to promote wiktionary word "${wordRecord.word}": ${msg}`);
-    }
-  }
-}
-
-async function promoteByWiktionaryEsVerification(
-  supabase: NonNullable<ReturnType<typeof getSupabase>>,
-  result: AutoPromotionResult
-): Promise<void> {
-  const esWords = await getVerifiedSpanishWordsForPromotion();
-
-  if (!esWords || esWords.length === 0) {
-    logger.info('AUTO_PROMOTE', 'No wiktionary-es-verified candidates');
-    return;
-  }
-
-  logger.info('AUTO_PROMOTE', `Processing ${esWords.length} wiktionary-es-verified candidates`);
-
-  for (const wordRecord of esWords) {
-    try {
-      await addToCommunityCache(wordRecord.word, 'es');
-
-      await promoteWordToScores(supabase, wordRecord.word, 'es', {
-        votes: AUTO_PROMOTION_CONFIG.VOTES_TO_ADD,
-        submitter: 'auto_promoted',
-      });
-
-      await supabase.rpc('mark_word_auto_promoted', {
-        p_word_id: wordRecord.id,
-        p_source: 'wiktionary_es_verified',
-      });
-
-      result.promoted++;
-      result.words.wiktionaryEsBased.push(wordRecord.word);
-      logger.info('AUTO_PROMOTE', `Promoted (wiktionary-es): ${wordRecord.word}`);
-    } catch (err) {
-      result.failed++;
-      const msg = err instanceof Error ? err.message : String(err);
-      logger.error('AUTO_PROMOTE', `Failed to promote wiktionary-es word "${wordRecord.word}": ${msg}`);
+      logger.error('AUTO_PROMOTE', `Failed to promote "${wordRecord.word}": ${msg}`);
     }
   }
 }

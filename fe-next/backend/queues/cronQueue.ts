@@ -144,9 +144,21 @@ export async function registerAllCronJobs(): Promise<void> {
     await runDictionaryEnrichment();
   });
 
+  // English/Spanish Wiktionary verification (02:00 UTC) — feeds auto-promotion.
+  await registerCronJob('word-verification', '0 2 * * *', async () => {
+    const { runWordVerification } = await import('../modules/wordVerificationRunner');
+    await runWordVerification();
+  });
+
   await registerCronJob('auto-promotion', '0 */4 * * *', async () => {
     const { runAutoPromotion } = await import('../modules/autoPromotion');
     await runAutoPromotion();
+  });
+
+  // Dictionary healing sweep (03:30 UTC) — demotes any promoted slurs.
+  await registerCronJob('dictionary-healing', '30 3 * * *', async () => {
+    const { runDictionaryHealing } = await import('../modules/dictionaryHealing');
+    await runDictionaryHealing();
   });
 
   // Hourly tick: smart per-user scheduler picks recipients whose typical
