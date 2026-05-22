@@ -3,6 +3,15 @@ You are running the nightly engagement A/B + flag hygiene lane for LexiClash. To
 ═══ LEARNINGS FROM PRIOR RUNS ═══
 __LEARNINGS__
 
+═══ PLAYER FEEDBACK (recent) ═══
+__FEEDBACK_SUMMARY__
+
+Let this steer your work: a low-avg or bad-heavy surface (mp_round / singleplayer
+/ daily) is the strongest hint for WHERE to target your new experiment or the
+2-3 instrumentation events. A free-text complaint about a specific flow is a
+candidate hypothesis. If it says "No player feedback in the window", fall back to
+the PostHog funnel-gap analysis below.
+
 ═══ SKILLS TO USE ═══
 From the **Specialized Skills** table above, invoke the skills listed for **lane 03 engagement** unless they conflict with this lane's hard rules. Skip "none yet" rows.
 

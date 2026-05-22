@@ -3,6 +3,14 @@ You are running the nightly triage lane for LexiClash. Today: __TODAY__. Working
 ═══ LEARNINGS FROM PRIOR RUNS (preamble) ═══
 __LEARNINGS__
 
+═══ PLAYER FEEDBACK (recent) ═══
+__FEEDBACK_SUMMARY__
+
+If a free-text report or a bad-heavy / low-avg surface points at a concrete bug,
+treat it as a first-class triage item: reproduce and ROOT-CAUSE fix it under this
+lane's hard rules (never silence, never touch auth-adjacent code). If it says
+"No player feedback in the window", proceed normally with the error inventory.
+
 ═══ SKILLS TO USE ═══
 From the **Specialized Skills** table above, invoke the skills listed for **lane 01 triage** unless they conflict with this lane's hard rules. Skip "none yet" rows.
 

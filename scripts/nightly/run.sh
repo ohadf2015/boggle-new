@@ -133,6 +133,18 @@ if [ -s "$ACTIVE_DIRECTIVES_FILE" ]; then
   echo "**Founder directives applied:** $DIRECTIVE_CT (texted to the bot — see lane outputs)" >> "$REPORT"
 fi
 
+# --- player feedback digest ------------------------------------------------
+# Summarize recent player feedback ONCE — sentiment ratings (PostHog
+# growth:game_feedback) + bug reports (Supabase feedback_reports) — into a file
+# the lanes read via the __FEEDBACK_SUMMARY__ placeholder. Best-effort: the
+# digest always exits 0 and writes a valid (possibly empty-state) file.
+FEEDBACK_SUMMARY_FILE=$("$LIB_DIR/feedback-digest.sh" 2>>"$RUN_LOG" || true)
+export FEEDBACK_SUMMARY_FILE
+if [ -n "${FEEDBACK_SUMMARY_FILE:-}" ] && [ -s "$FEEDBACK_SUMMARY_FILE" ]; then
+  log "player feedback digest written: $FEEDBACK_SUMMARY_FILE"
+  echo "**Player feedback digest:** \`$FEEDBACK_SUMMARY_FILE\` (injected into triage + engagement lanes)" >> "$REPORT"
+fi
+
 # --- WIP snapshot + dirty baseline ----------------------------------------
 # The loop runs ON TOP OF the founder's uncommitted WIP and ships it. Snapshot the
 # FULL working tree NOW (after the report header is written, before any lane runs)

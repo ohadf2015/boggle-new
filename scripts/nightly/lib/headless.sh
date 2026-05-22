@@ -8,6 +8,8 @@
 #   __TODAY__         → YYYY-MM-DD
 #   __LEARNINGS__     → contents of docs/nightly/learnings.md (or empty)
 #   __PER_LANE_CAP__  → 8
+#   __FEEDBACK_SUMMARY__ → contents of $FEEDBACK_SUMMARY_FILE (player feedback
+#                          digest written before the lane loop; empty if none)
 #
 # Returns exit code from claude -p. Tees output to $log_file.
 # DOES NOT trust Claude's stdout claim of "clean" — caller runs build/test independently.
@@ -34,24 +36,32 @@ headless_run() {
   if [ -f "$learnings_file" ]; then
     learnings_content=$(cat "$learnings_file")
   fi
+  # Player-feedback digest written once before the lane loop (lib/feedback-digest.sh).
+  # Path is exported as FEEDBACK_SUMMARY_FILE; fall back to the conventional path.
+  local feedback_file="${FEEDBACK_SUMMARY_FILE:-$PROJECT_DIR/docs/nightly/feedback/summary-$today.md}"
 
   local rendered
   rendered=$(mktemp -t "lane-${lane_id}-prompt.XXXXXX")
   # Python: handles multi-line learnings cleanly (awk -v chokes on newlines,
   # sed chokes on special chars in the content).
-  /usr/bin/env python3 - "$today" "8" "${learnings_file}" "$prompt_file" > "$rendered" <<'PY'
+  /usr/bin/env python3 - "$today" "8" "${learnings_file}" "${feedback_file}" "$prompt_file" > "$rendered" <<'PY'
 import sys, os
-today, cap, learnings_path, prompt_path = sys.argv[1:5]
+today, cap, learnings_path, feedback_path, prompt_path = sys.argv[1:6]
 learnings = ''
 if learnings_path and os.path.exists(learnings_path):
     with open(learnings_path, encoding='utf-8') as f:
         learnings = f.read()
+feedback = ''
+if feedback_path and os.path.exists(feedback_path):
+    with open(feedback_path, encoding='utf-8') as f:
+        feedback = f.read()
 with open(prompt_path, encoding='utf-8') as f:
     text = f.read()
 text = (text
         .replace('__TODAY__', today)
         .replace('__PER_LANE_CAP__', cap)
-        .replace('__LEARNINGS__', learnings))
+        .replace('__LEARNINGS__', learnings)
+        .replace('__FEEDBACK_SUMMARY__', feedback.strip() or 'No player feedback in the window. Proceed normally.'))
 sys.stdout.write(text)
 PY
 
