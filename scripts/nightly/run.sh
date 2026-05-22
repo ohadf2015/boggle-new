@@ -76,44 +76,10 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# snapshot_pre_lane → echoes a directory path containing a full mirror of the
-# working tree (excluding heavy dirs). Uses rsync so the revert can handle:
-#   - tracked modifications (replayed)
-#   - untracked-only state (replayed)
-#   - DELETIONS (replayed — git stash + tar lose this)
-#   - executable bits + symlinks (preserved by rsync -a)
-# Tested in 4 scenarios + 1000-file speed (~220ms).
-snapshot_pre_lane() {
-  local snap
-  snap=$(mktemp -d -t lexi-snap.XXXXXX)
-  rsync -a --delete \
-    --exclude='.git' \
-    --exclude='node_modules' \
-    --exclude='.next' \
-    --exclude='.turbo' \
-    --exclude='.claude/worktrees' \
-    --exclude='dist' --exclude='build' --exclude='coverage' \
-    "$PROJECT_DIR/" "$snap/" 2>/dev/null || true
-  echo "$snap"
-}
-
-# revert_to_pre_lane <snapshot_dir>
-# Mirror the snapshot back onto the working tree with --delete (removes files
-# the lane added). Preserves prior lanes' work because they were in the snapshot.
-revert_to_pre_lane() {
-  local snap="$1"
-  if [ -n "$snap" ] && [ -d "$snap" ]; then
-    rsync -a --delete \
-      --exclude='.git' \
-      --exclude='node_modules' \
-      --exclude='.next' \
-      --exclude='.turbo' \
-      --exclude='.claude/worktrees' \
-      --exclude='dist' --exclude='build' --exclude='coverage' \
-      "$snap/" "$PROJECT_DIR/" 2>/dev/null || true
-    rm -rf "$snap"
-  fi
-}
+# snapshot_pre_lane / revert_to_pre_lane live in lib/wip-revert.sh (sourced
+# below). The revert is SCOPED — it undoes only a lane's own changes and never
+# reverts the founder's pre-existing WIP or deletes an untracked file, so a lane
+# can't flush concurrent human work. Proven by test/wip-revert.test.sh.
 
 # --- preflight -------------------------------------------------------------
 # shellcheck disable=SC1091
@@ -121,6 +87,10 @@ revert_to_pre_lane() {
 # commit+push hardening (divergence/generated-file). Tested by test/git-ship.test.sh.
 # shellcheck disable=SC1091
 . "$LIB_DIR/git-ship.sh"
+# WIP-safe snapshot/revert (scoped — never flushes concurrent founder work).
+# Tested by test/wip-revert.test.sh.
+# shellcheck disable=SC1091
+. "$LIB_DIR/wip-revert.sh"
 # founder free-text directives (texted to the bot) → active block for this run.
 # shellcheck disable=SC1091
 . "$LIB_DIR/user-directives.sh"
