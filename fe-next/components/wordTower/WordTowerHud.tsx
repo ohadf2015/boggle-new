@@ -64,6 +64,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
 
   // Measure the control deck so the Pixi tower can ground exactly on top of it.
   const deckRef = useRef<HTMLDivElement>(null);
+  const swipeStartY = useRef<number | null>(null);
   useEffect(() => {
     const el = deckRef.current;
     if (!el || !onDeckHeight) return;
@@ -133,9 +134,16 @@ export function WordTowerHud(props: WordTowerHudProps) {
         {/* Drawer grip — collapse the deck to free the screen for the tower. */}
         <button
           type="button"
-          onClick={() => setDeckOpen((o) => !o)}
+          onPointerDown={(e) => { swipeStartY.current = e.clientY; }}
+          onPointerUp={(e) => {
+            const start = swipeStartY.current;
+            swipeStartY.current = null;
+            const dy = start == null ? 0 : e.clientY - start;
+            if (Math.abs(dy) < 16) setDeckOpen((o) => !o); // tap toggles
+            else setDeckOpen(dy < 0); // swipe up = expand, down = collapse
+          }}
           aria-label={t(deckOpen ? 'wordTower.hud.collapse' : 'wordTower.hud.expand')}
-          className="mx-auto flex w-full flex-col items-center justify-center gap-0.5 py-2"
+          className="mx-auto flex w-full touch-none flex-col items-center justify-center gap-0.5 py-2"
         >
           <span className="h-1.5 w-12 rounded-full bg-neo-white/50" />
           {deckOpen

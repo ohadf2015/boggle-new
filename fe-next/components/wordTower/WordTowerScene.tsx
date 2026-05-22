@@ -276,44 +276,16 @@ export function WordTowerScene(props: SceneProps) {
     return () => ro.disconnect();
   }, []);
 
-  // Drag / wheel to pan the tower down and review the lower floors. Swipe up (or
-  // wheel down) reveals the base; the pan auto-snaps back on the next action.
-  useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-    let startY = 0;
-    let startPan = 0;
-    let active = false;
-    const setPan = (next: number) => {
-      pan.current.y = clampPan(next, pan.current.panMin);
-      const c = pan.current.container;
-      if (c && !c.destroyed) c.y = pan.current.shift + pan.current.y;
-    };
-    const onDown = (e: PointerEvent) => {
-      if (pan.current.panMin === 0) return; // short tower — nothing below to reveal
-      active = true;
-      pan.current.dragging = true;
-      startY = e.clientY;
-      startPan = pan.current.y;
-    };
-    const onMove = (e: PointerEvent) => { if (active) setPan(startPan + (e.clientY - startY)); };
-    const onUp = () => { active = false; pan.current.dragging = false; };
-    const onWheel = (e: WheelEvent) => { setPan(pan.current.y - e.deltaY); };
-    // Capture phase: fire before Pixi's canvas-level interaction so the pan
-    // always starts even though the Pixi <canvas> sits inside this wrapper.
-    el.addEventListener('pointerdown', onDown, { capture: true });
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
-    window.addEventListener('pointercancel', onUp);
-    el.addEventListener('wheel', onWheel, { passive: true });
-    return () => {
-      el.removeEventListener('pointerdown', onDown, { capture: true });
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onUp);
-      window.removeEventListener('pointercancel', onUp);
-      el.removeEventListener('wheel', onWheel);
-    };
-  }, []);
+  // Drag / wheel to pan the tower and review the lower floors. Handled by a
+  // dedicated catcher div (in the render) with React pointer handlers + pointer
+  // capture, so the gesture is owned outright instead of relying on pass-through
+  // to the Pixi canvas (which silently swallowed it on mobile).
+  const drag = useRef<{ y: number; pan: number } | null>(null);
+  const applyPan = (next: number) => {
+    pan.current.y = clampPan(next, pan.current.panMin);
+    const c = pan.current.container;
+    if (c && !c.destroyed) c.y = pan.current.shift + pan.current.y;
+  };
 
   const config = useMemo(
     () => (size ? { width: size.w, height: size.h, background: 0x000000, backgroundAlpha: 0 } : null),
@@ -343,6 +315,21 @@ export function WordTowerScene(props: SceneProps) {
           <TowerCanvasLayer {...props} panState={pan} />
         </GameCanvas>
       )}
+      {/* Pan catcher — owns the drag/wheel gesture over the sky. The control deck
+          + header (z-10, above) keep their taps; this only catches the open area. */}
+      <div
+        className="absolute inset-0 touch-none"
+        onPointerDown={(e) => {
+          if (pan.current.panMin === 0) return;
+          try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch { /* */ }
+          pan.current.dragging = true;
+          drag.current = { y: e.clientY, pan: pan.current.y };
+        }}
+        onPointerMove={(e) => { if (drag.current) applyPan(drag.current.pan + (e.clientY - drag.current.y)); }}
+        onPointerUp={() => { pan.current.dragging = false; drag.current = null; }}
+        onPointerCancel={() => { pan.current.dragging = false; drag.current = null; }}
+        onWheel={(e) => { if (pan.current.panMin !== 0) applyPan(pan.current.y - e.deltaY); }}
+      />
     </div>
   );
 }
