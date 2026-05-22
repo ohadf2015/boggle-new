@@ -95,13 +95,14 @@ export default function FloatingCTA({
   );
 
   return (
-    <div ref={wrap} className="fixed bottom-5 left-1/2 z-40 -translate-x-1/2 sm:left-auto sm:right-6 sm:translate-x-0" style={{ perspective: 500 }}>
+    <div ref={wrap} className="fixed right-3 top-3 z-[120] sm:right-5 sm:top-5" style={{ perspective: 500 }}>
       <Link
         ref={btn}
         href={href}
         style={{ '--sx': sign * REST, '--sy': REST, boxShadow: 'calc(var(--sx) * 1px) calc(var(--sy) * 1px) 0 rgb(10 10 18)' } as CSSProperties}
-        className="block rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3.5 font-neo-display text-base font-bold text-black will-change-transform sm:text-lg"
+        className="flex items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3.5 font-neo-display text-base font-bold text-black will-change-transform sm:px-7 sm:py-4 sm:text-xl"
       >
+        <span aria-hidden className="text-sm sm:text-base">▶</span>
         {label}
       </Link>
     </div>
