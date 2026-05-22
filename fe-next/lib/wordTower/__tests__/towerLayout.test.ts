@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { courseTileLayout, biomeBackdrop, towerRowLayout } from '../towerLayout';
+import { courseTileLayout, biomeBackdrop, towerRowLayout, towerPanMin, clampPan } from '../towerLayout';
 
 describe('courseTileLayout', () => {
   it('returns one tile per code point (unicode-safe)', () => {
@@ -156,5 +156,27 @@ describe('towerRowLayout (grounded camera)', () => {
       expect(l.topCenter).toBeGreaterThanOrEqual(h * 0.22);
       expect(l.topCenter).toBeLessThanOrEqual(h * 0.42); // but not so low it buries the tower
     }
+  });
+});
+
+describe('camera pan (user scroll to review the tower)', () => {
+  it('a short tower needs no pan — the base is already on screen', () => {
+    // base near mid-screen, well above the deck → nothing below to reveal
+    expect(towerPanMin(400, 900, 200, 27)).toBe(0);
+  });
+
+  it('a tall tower allows panning UP to bring the off-screen base into view', () => {
+    // base scrolled below the viewport bottom → pan must be negative to reveal it
+    const panMin = towerPanMin(1400, 900, 200, 27);
+    expect(panMin).toBeLessThan(0);
+    // panning by exactly panMin lands the base just above the deck
+    expect(1400 + panMin).toBeCloseTo(900 - 200 - 27);
+  });
+
+  it('clampPan keeps the offset within [panMin, 0]', () => {
+    expect(clampPan(50, -500)).toBe(0); // can't pan past the newest tile (sky above)
+    expect(clampPan(-200, -500)).toBe(-200); // mid-range allowed
+    expect(clampPan(-900, -500)).toBe(-500); // can't pan below the base
+    expect(clampPan(0, 0)).toBe(0); // degenerate (short tower) pins at 0
   });
 });

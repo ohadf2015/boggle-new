@@ -107,6 +107,22 @@ export function towerRowLayout({ pinCount, H, bottomInsetPx }: TowerRowLayoutInp
   return { size, half, rowH, topCenter, baseCenter, shift, centerY };
 }
 
+/**
+ * Lowest (most-negative) camera pan offset that brings the base tile fully into
+ * the play area just above the control deck. The user pans UP from the build
+ * line (pan 0) toward this floor to review the lower/older parts of the tower.
+ * Returns 0 when the whole tower already fits (nothing below to reveal).
+ */
+export function towerPanMin(baseTileCenterY: number, H: number, bottomInsetPx: number, half: number): number {
+  return Math.min(0, H - bottomInsetPx - half - baseTileCenterY);
+}
+
+/** Clamp a user pan offset to `[panMin, 0]` — can't pan above the newest tile
+ *  (only sky there) nor below the base. */
+export function clampPan(panY: number, panMin: number): number {
+  return Math.max(panMin, Math.min(0, panY));
+}
+
 /** Per-biome opacities for the construction backdrop layers (0..1). */
 export interface BiomeBackdrop {
   /** Scaffold rails framing the tower. */
