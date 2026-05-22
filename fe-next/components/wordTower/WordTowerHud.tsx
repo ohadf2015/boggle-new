@@ -210,7 +210,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
                 onClick={() => onSelectTile(i)}
                 aria-label={t('wordTower.a11y.tile', { letter })}
                 className={`flex aspect-square min-h-[40px] items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-xl font-bold shadow-hard transition-transform active:translate-y-0.5 active:shadow-hard-pressed ${
-                  isSel ? 'bg-neo-navy-light text-neo-white/30' : 'bg-neo-lime text-black hover:-translate-y-0.5'
+                  isSel ? 'bg-neo-navy-light text-neo-white/30' : 'bg-gradient-to-b from-neo-lime-light to-neo-lime text-black hover:-translate-y-0.5'
                 }`}
               >
                 {letter}

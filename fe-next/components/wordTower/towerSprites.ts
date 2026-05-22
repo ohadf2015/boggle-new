@@ -96,7 +96,7 @@ export function paintTile(tile: TileSprite, color: number, pending: boolean, sha
   const baseH = Math.round(s * 0.22);
   g.rect(-half + inset, -half + Math.ceil(r * 0.5), s - inset * 2, topH).fill({ color: shade(color, 1.3), alpha: a * 0.9 });
   g.rect(-half + inset, half - Math.ceil(r * 0.5) - baseH, s - inset * 2, baseH).fill({ color: shade(color, 0.6), alpha: a });
-  g.roundRect(-half, -half, s, s, r).stroke({ color: 0x000000, width: 3, alignment: 1, alpha: pending ? 0.85 : 1 });
+  g.roundRect(-half, -half, s, s, r).stroke({ color: 0x000000, width: Math.max(4, s * 0.06), alignment: 1, alpha: pending ? 0.85 : 1 });
 
   if (shared && !pending) {
     g.roundRect(-half + 4, -half + 4, s - 8, s - 8, Math.max(4, r - 3)).stroke({ color: 0xfffef0, width: 2, alpha: 0.75 });
