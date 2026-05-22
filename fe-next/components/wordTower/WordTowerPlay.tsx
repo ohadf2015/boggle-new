@@ -53,12 +53,12 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // "N words possible" hint — how many dictionary words the player could build
   // from the current anchor + tray (recomputed only when those change).
   const possibleWords = useMemo(
-    () => (dictionary ? countBuildableWords(dictionary, game.anchorLetter, game.tray, WORD_TOWER_MIN_WORD_LEN) : null),
-    [dictionary, game.anchorLetter, game.tray],
+    () => (dictionary ? countBuildableWords(dictionary, game.anchorLetter, game.tray, WORD_TOWER_MIN_WORD_LEN, game.usedWords) : null),
+    [dictionary, game.anchorLetter, game.tray, game.usedWords],
   );
   const clueWord = useMemo(
-    () => (dictionary ? pickClueWord(dictionary, game.anchorLetter, game.tray, WORD_TOWER_MIN_WORD_LEN) : null),
-    [dictionary, game.anchorLetter, game.tray],
+    () => (dictionary ? pickClueWord(dictionary, game.anchorLetter, game.tray, WORD_TOWER_MIN_WORD_LEN, game.usedWords) : null),
+    [dictionary, game.anchorLetter, game.tray, game.usedWords],
   );
   // Dead-end escape: re-anchor to a letter that actually has buildable words.
   const reroll = useCallback(

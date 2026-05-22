@@ -57,11 +57,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
   // Clue: reveal a masked sample word on demand; reset when the anchor changes.
   const [clueShown, setClueShown] = useState(false);
   useEffect(() => { setClueShown(false); }, [anchorLetter]);
-  const maskedClue = useMemo(() => {
-    if (!clueWord) return '';
-    const cs = Array.from(clueWord);
-    return cs.map((c, i) => (i < cs.length - 1 ? c : '·')).join(''); // reveal all but the last letter
-  }, [clueWord]);
+  const maskedClue = clueWord ?? ''; // reveal the FULL word — a masked clue led to wrong last-letter guesses ("not in dictionary")
 
   // Mobile drawer: the deck collapses to a peek bar to free the screen for the tower.
   const [deckOpen, setDeckOpen] = useState(true);

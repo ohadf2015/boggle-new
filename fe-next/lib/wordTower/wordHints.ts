@@ -18,6 +18,7 @@ export function countBuildableWords(
   anchor: string,
   tray: ReadonlyArray<string>,
   minLen: number,
+  usedWords?: ReadonlySet<string>,
 ): number {
   if (!anchor) return 0;
 
@@ -30,6 +31,7 @@ export function countBuildableWords(
   for (const w of dict) {
     if (w.length < minLen) continue;
     if (w[0] !== anchor) continue;
+    if (usedWords?.has(w)) continue;
     const need = new Map<string, number>();
     let ok = true;
     for (const ch of w) {
@@ -53,6 +55,7 @@ export function pickClueWord(
   anchor: string,
   tray: ReadonlyArray<string>,
   minLen: number,
+  usedWords?: ReadonlySet<string>,
 ): string | null {
   if (!anchor) return null;
   const avail = new Map<string, number>();
@@ -67,6 +70,7 @@ export function pickClueWord(
   for (const w of dict) {
     if (w.length < minLen) continue;
     if (w[0] !== anchor) continue;
+    if (usedWords?.has(w)) continue;
     const improvesFallback = fallback === null || w.length < fallback.length;
     const improvesBest = w.length >= PREF && (best === null || w.length < best.length);
     if (!improvesFallback && !improvesBest) continue;

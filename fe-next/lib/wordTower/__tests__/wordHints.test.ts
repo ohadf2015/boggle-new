@@ -68,3 +68,14 @@ describe('pickClueWord', () => {
     expect(pickClueWord(d, 'B', ['O', 'O', 'K'], 3)).toBe('BOOK');
   });
 });
+
+describe('usedWords exclusion', () => {
+  const d = new Set(['CAT', 'CAR', 'CART', 'CARE', 'DOG']);
+  it('countBuildableWords skips already-built words', () => {
+    expect(countBuildableWords(d, 'C', ['A', 'R', 'T', 'E'], 3)).toBe(4);
+    expect(countBuildableWords(d, 'C', ['A', 'R', 'T', 'E'], 3, new Set(['CAT']))).toBe(3);
+  });
+  it('pickClueWord never suggests a used word', () => {
+    expect(pickClueWord(d, 'C', ['A', 'R', 'T', 'E'], 3, new Set(['CARE', 'CART']))).toBe('CAT');
+  });
+});

@@ -63,6 +63,26 @@ export function chainLetter(word: string, language: Language): string {
   return c.charAt(c.length - 1);
 }
 
+// Word-final letters that tend to strand the Shiritori chain (vowels / Hebrew
+// matres lectionis). JA kana always end in a vowel sound, so the rule is off
+// there (that IS shiritori).
+const CHAIN_VOWELS: Record<Language, string> = {
+  en: 'AEIOU', he: 'אהוי', sv: 'AEIOU', es: 'AEIOU', ja: '',
+};
+
+/**
+ * The letter the NEXT word must start with. Normally the last letter; but if the
+ * word ends in a vowel (a frequent dead-end), the chain falls back to the letter
+ * BEFORE it — founder's rule, so a vowel ending never strands the player.
+ */
+export function nextChainAnchor(word: string, language: Language): string {
+  const c = canon(word, language);
+  const last = c.charAt(c.length - 1);
+  const vowels = CHAIN_VOWELS[language] || '';
+  if (vowels.includes(last) && c.length >= 2) return c.charAt(c.length - 2);
+  return last;
+}
+
 // --- tray generation (frequency-weighted, deterministic) ---
 export function generateTray(
   gameCode: string,
@@ -288,7 +308,7 @@ export function applyTowerWord(
     floors: [...state.floors, { word: w, len, meters }],
     heightM,
     combo,
-    anchorLetter: chainLetter(word, language),
+    anchorLetter: nextChainAnchor(word, language),
     tray,
     trayDraws: state.trayDraws + 1,
     scramblesLeft,

@@ -295,3 +295,14 @@ describe('rerollStart (dead-end escape)', () => {
     expect(r.tray.length).toBeGreaterThan(0);
   });
 });
+
+import { nextChainAnchor } from '../wordTowerManager';
+describe('nextChainAnchor (vowel-ending chain skip)', () => {
+  it('chains on the last letter for consonant endings', () => {
+    expect(nextChainAnchor('CAT', 'en')).toBe('T');
+  });
+  it('chains on the letter BEFORE a vowel ending', () => {
+    expect(nextChainAnchor('AREA', 'en')).toBe('E'); // ends A (vowel) -> use E
+    expect(nextChainAnchor('PIZZA', 'en')).toBe('Z'); // ends A -> use Z
+  });
+});
