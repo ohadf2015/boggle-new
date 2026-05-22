@@ -711,6 +711,7 @@ export default function WordCraftPageClient() {
               }}
               onCellDragOver={() => {}}
               onCellDrop={() => {}}
+              onRecallPending={recallFromBoard}
               onSceneCtx={setSceneCtx}
               isDisabled={game.state.turn !== 'player'}
               isFirstMove={isFirstMove}

@@ -15,6 +15,8 @@ interface Props {
   onCellTap(cell: { row: number; col: number }): void;
   onCellDragOver(cell: { row: number; col: number }): void;
   onCellDrop(cell: { row: number; col: number }): void;
+  /** Tap a pending (not-yet-submitted) tile on the board to send it back to the rack. */
+  onRecallPending?(rackTileId: string): void;
   onSceneCtx(ctx: SceneCtx): void;
   dragHoverCell?: string | null;
   isFirstMove?: boolean;
@@ -70,10 +72,7 @@ export function WordCraftBoardSection(props: Props) {
           board={props.board}
           pendingPlacements={props.pending}
           onCellClick={(r, c) => props.onCellTap({ row: r, col: c })}
-          onRecallPending={(_tileId) => {
-            // onCellDragOver/onCellDrop are for drag; recall is a separate handler
-            // We'll call onRecallPending if it exists, otherwise do nothing
-          }}
+          onRecallPending={props.onRecallPending}
           disabled={props.isDisabled}
           hasSelectedTile={!!props.selectedRackTile}
           isFirstMove={props.isFirstMove}
