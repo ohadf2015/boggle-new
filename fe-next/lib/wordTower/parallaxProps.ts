@@ -65,6 +65,11 @@ export const WORD_TOWER_PROPS: ParallaxProp[] = [
   { id: 'ufo',         src: '/images/word-tower/wt-ufo.png',         atM: 1260, topPct: 24, xPct: 66, width: 126, depth: 0.85, rangeM: 130 },
   { id: 'comet',       src: '/images/word-tower/wt-comet.png',       atM: 1560, topPct: 18, xPct: 30, width: 130, depth: 1.0,  rangeM: 150 },
   { id: 'planetRing',  src: '/images/word-tower/wt-planet-ring.png', atM: 1900, topPct: 26, xPct: 68, width: 142, depth: 0.6,  rangeM: 180 },
+  // Funny surprises — unexpected sights at altitude (cow in space, a flying toaster).
+  { id: 'duck',       src: '/images/word-tower/wt-duck.png',       atM: 300,  topPct: 30, xPct: 22, width: 96,  depth: 1.0,  rangeM: 40 },
+  { id: 'pizza',      src: '/images/word-tower/wt-pizza.png',      atM: 700,  topPct: 22, xPct: 70, width: 100, depth: 1.05, rangeM: 70 },
+  { id: 'cow',        src: '/images/word-tower/wt-cow.png',        atM: 1130, topPct: 26, xPct: 28, width: 112, depth: 0.9,  rangeM: 110 },
+  { id: 'toaster',    src: '/images/word-tower/wt-toaster.png',    atM: 1700, topPct: 24, xPct: 66, width: 104, depth: 1.0,  rangeM: 150 },
 ];
 
 /**
