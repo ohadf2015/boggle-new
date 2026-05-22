@@ -56,6 +56,12 @@ ship_nightly_commit() {
   # run.sh records those paths at run start and passes the list via
   # NIGHTLY_WIP_PROTECT. UNSTAGE only (no `git checkout`): the founder's changes
   # stay on disk as uncommitted WIP, we just keep them out of the nightly commit.
+  #
+  # KNOWN RESIDUAL (same window as lib/wip-revert.sh): the protect list is the
+  # founder's dirty set at run START. A file that was CLEAN at run start but the
+  # founder dirties DURING the run (and leaves uncommitted) is not on the list and
+  # WILL be swept into the commit. Closing that needs run-time attribution we don't
+  # have. Pre-existing WIP — the dominant case — is fully protected.
   if [ -n "${NIGHTLY_WIP_PROTECT:-}" ] && [ -s "$NIGHTLY_WIP_PROTECT" ]; then
     local w
     while IFS= read -r w; do
