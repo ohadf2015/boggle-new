@@ -128,7 +128,7 @@ describe('/api/cron/daily-challenge-reminders no-rival telemetry', () => {
     expect(mockPickRival).toHaveBeenCalledTimes(1);
   });
 
-  it('emits Sentry info message tagged with rival vs no-rival counts', async () => {
+  it('does not report a successful run to Sentry (kept out of the Issues view)', async () => {
     mockGetRecipients.mockResolvedValueOnce([
       { userId: 'u1', locale: 'en' },
       { userId: 'u2', locale: 'en' },
@@ -137,20 +137,16 @@ describe('/api/cron/daily-challenge-reminders no-rival telemetry', () => {
     mockNotify.mockResolvedValue(undefined);
     mockMarkBatch.mockResolvedValueOnce(undefined);
 
-    await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    const res = await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    const body = await res.json();
 
-    expect(mockCaptureMessage).toHaveBeenCalledTimes(1);
-    const [msg, opts] = mockCaptureMessage.mock.calls[0];
-    expect(msg).toContain('daily-challenge-reminders');
-    expect(opts.level).toBe('info');
-    expect(opts.tags).toMatchObject({
-      cron: 'daily-challenge-reminders',
-    });
-    expect(opts.extra).toMatchObject({
-      sent: 2,
-      rivalSent: 0,
-      noRivalSent: 2,
-    });
+    // Counts are still surfaced in the JSON response …
+    expect(res.status).toBe(200);
+    expect(body.sent).toBe(2);
+    expect(body.noRivalSent).toBe(2);
+    // … but the run is no longer an info-level Sentry event (was noise that
+    // dominated the Issues view — Sentry JAVASCRIPT-NEXTJS-1HF).
+    expect(mockCaptureMessage).not.toHaveBeenCalled();
   });
 
   it('skips Sentry telemetry when no recipients (avoid noise)', async () => {
