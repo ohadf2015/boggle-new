@@ -47,7 +47,13 @@ interface PanState {
   dragging: boolean;
   /** The live tower container (set on mount). */
   container: Container | null;
+  /** DOM wrapper for the backdrop + props — panned at a fraction of the tower
+   *  so the background parallaxes with the user's scroll, not just the climb. */
+  bgEl: HTMLDivElement | null;
 }
+
+/** Fraction of the user's pan applied to the background (parallax — bg slower). */
+const BG_PAN_DEPTH = 0.4;
 
 /** One live row in the unified (committed ++ pending) stack. */
 interface LiveCell {
@@ -209,13 +215,17 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
     const actioned = snapKey !== prevSnapKey.current;
     prevSnapKey.current = snapKey;
     if (!panState.current.dragging) {
+      const bg = panState.current.bgEl;
       if (actioned) {
         panState.current.y = 0;
         if (reducedMotion || firstRender.current) c.y = shift;
         else snapContainerY(c, shift, 280, () => panState.current.dragging);
+        // Glide the background back in sync with the camera snap.
+        if (bg) { bg.style.transition = reducedMotion ? 'none' : 'transform 280ms cubic-bezier(0.22,1,0.36,1)'; bg.style.transform = ''; }
       } else {
         panState.current.y = clampPan(panState.current.y, panMin);
         c.y = shift + panState.current.y;
+        if (bg) bg.style.transform = `translateY(${panState.current.y * BG_PAN_DEPTH}px)`;
       }
     }
 
@@ -264,7 +274,7 @@ export function WordTowerScene(props: SceneProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{ w: number; h: number } | null>(null);
   const theme = BIOME_THEME[props.biomeId];
-  const pan = useRef<PanState>({ y: 0, panMin: 0, shift: 0, dragging: false, container: null });
+  const pan = useRef<PanState>({ y: 0, panMin: 0, shift: 0, dragging: false, container: null, bgEl: null });
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -285,6 +295,8 @@ export function WordTowerScene(props: SceneProps) {
     pan.current.y = clampPan(next, pan.current.panMin);
     const c = pan.current.container;
     if (c && !c.destroyed) c.y = pan.current.shift + pan.current.y;
+    const bg = pan.current.bgEl;
+    if (bg) { bg.style.transition = 'none'; bg.style.transform = `translateY(${pan.current.y * BG_PAN_DEPTH}px)`; }
   };
 
   const config = useMemo(
@@ -294,16 +306,20 @@ export function WordTowerScene(props: SceneProps) {
 
   return (
     <div ref={wrapRef} className="absolute inset-0 touch-none overflow-hidden">
-      {/* Biome sky (cross-fades city → galaxy as you climb) */}
-      <div
-        className="absolute inset-0 transition-[background] duration-1000 ease-out"
-        style={{ background: theme.bg }}
-        aria-hidden
-      />
-      {/* Parallax ascent backdrop (stars/clouds/skyline scroll by altitude) */}
-      <WordTowerBackdrop biomeId={props.biomeId} heightM={props.heightM} reducedMotion={props.reducedMotion} />
-      {/* Lazy altitude-reference props (balloon→birds→plane→satellite→UFO) behind the tower */}
-      <WordTowerParallaxProps heightM={props.heightM} reducedMotion={props.reducedMotion} />
+      {/* Background layers grouped in one wrapper that the pan translates (at
+          BG_PAN_DEPTH) so the sky/props parallax with the user's scroll too. */}
+      <div ref={(el) => { pan.current.bgEl = el; }} className="absolute inset-0 will-change-transform">
+        {/* Biome sky (cross-fades city → galaxy as you climb) */}
+        <div
+          className="absolute inset-0 transition-[background] duration-1000 ease-out"
+          style={{ background: theme.bg }}
+          aria-hidden
+        />
+        {/* Parallax ascent backdrop (stars/clouds/skyline scroll by altitude) */}
+        <WordTowerBackdrop biomeId={props.biomeId} heightM={props.heightM} reducedMotion={props.reducedMotion} />
+        {/* Lazy altitude-reference props behind the tower */}
+        <WordTowerParallaxProps heightM={props.heightM} reducedMotion={props.reducedMotion} />
+      </div>
       {/* Brand climb companion — pops in to cheer only when a word is built. */}
       <WordTowerMascot
         resultKey={props.resultKey}
