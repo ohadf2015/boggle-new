@@ -176,6 +176,37 @@ export function bumpScale(tile: TileSprite, amount = 0.16): void {
   run(tile, 260, 0, (k) => tile.scale.set(1 + amount * Math.sin(k * Math.PI)), () => tile.scale.set(1));
 }
 
+/** Squash-and-recover on impact — gives a landing tile real weight (wide+short
+ *  then a soft tall rebound). Heavier feel than {@link bumpScale}. */
+export function squashLand(tile: TileSprite): void {
+  run(tile, 240, 0, (k) => {
+    const e = easeOutBack(k); // overshoots >1 mid-way → brief stretch on the rebound
+    tile.scale.set(1 + 0.22 * (1 - e), 1 - 0.22 * (1 - e));
+  }, () => tile.scale.set(1));
+}
+
+/** Expanding shockwave ring at an impact point. Self-cleaning (destroys itself
+ *  when the tween ends). `scaleMul` lets deeper letters punch a bigger ring. */
+export function impactRing(parent: Container, x: number, y: number, baseRadius: number, color: number, scaleMul = 1): void {
+  const ring = new Graphics();
+  ring.x = x;
+  ring.y = y;
+  parent.addChild(ring);
+  const dur = 380;
+  const t0 = performance.now();
+  const from = baseRadius * 0.35;
+  const to = baseRadius * 1.6 * scaleMul;
+  const tick = () => {
+    if (ring.destroyed) return;
+    const k = Math.min(1, (performance.now() - t0) / dur);
+    const r = from + (to - from) * easeOutCubic(k);
+    ring.clear().circle(0, 0, r).stroke({ color, width: Math.max(2, 4 * (1 - k)), alpha: 0.7 * (1 - k) });
+    if (k < 1) requestAnimationFrame(tick);
+    else { try { ring.destroy(); } catch { /* */ } }
+  };
+  requestAnimationFrame(tick);
+}
+
 /** Brief horizontal shake of a container (rejected word). Fire-and-forget. */
 export function shakeX(c: Container, mag = 9, dur = 320): void {
   const x0 = c.x;

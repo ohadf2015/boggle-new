@@ -7,9 +7,10 @@ import { CONFETTI_BURST, COMBO_FLASH, GOLD_STARS } from '@/lib/gameEngine/preset
 import type { WordTowerFloor, ApplyResult } from '@/lib/wordTower/wordTowerManager';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
 import { buildTowerColumn, wordColor } from '@/lib/wordTower/towerColumn';
+import { letterPlacementFx } from '@/lib/wordTower/placementFx';
 import { towerRowLayout } from '@/lib/wordTower/towerLayout';
 import {
-  makeTile, paintTile, placeInstant, dropIn, moveTo, popOut, recolor, bumpScale, shakeX,
+  makeTile, paintTile, placeInstant, dropIn, moveTo, popOut, recolor, bumpScale, shakeX, squashLand, impactRing,
   type TileSprite,
 } from './towerSprites';
 import { BIOME_THEME } from './biomeTheme';
@@ -133,9 +134,14 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
         if (firstRender.current || reducedMotion || !isNewTop) {
           placeInstant(tile, y);
         } else {
+          // Escalating placement juice: each deeper letter in the word lands with
+          // a heavier squash, a bigger shockwave ring, and more impact particles.
+          const depth = l.pending ? Math.max(0, l.pos - C) : 0;
+          const fx = letterPlacementFx(depth);
           dropIn(tile, y, 0, () => {
-            bumpScale(tile);
-            engine.particles.burst(COMBO_FLASH, centerX, y + half, 5); // puff at the tile's bottom edge (impact point)
+            squashLand(tile);
+            impactRing(c, centerX, y + half, half, l.color, fx.ringScale);
+            engine.particles.burst(COMBO_FLASH, centerX, y + half, fx.particles); // puff at the impact point
           });
         }
       } else {
