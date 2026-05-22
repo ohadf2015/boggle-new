@@ -19,12 +19,26 @@ preflight_check() {
     return 1
   fi
 
-  # --- missed-run heartbeat suppression --------------------------------
-  # If we ran in the last 18h, skip (avoid double-fire from launchd + heartbeat).
+  # --- once-per-day dedup ----------------------------------------------
+  # launchd fires at 00:00 LOCAL; with RunAtLoad=false and the Mac asleep the
+  # fire is DEFERRED to next wake, so a run's wall-clock time drifts later across
+  # days. A fixed rolling window (we used 18h) then wrongly suppresses the NEXT
+  # day's run once the prior run drifts into late morning — observed 2026-05-22,
+  # last success 05-21 11:15 → 05-22 02:39 wake-fire was only 15.4h later → killed.
+  # Dedup on the LOCAL CALENDAR DAY instead: at most one successful run per day.
+  # A 4h floor additionally kills a genuine double-fire straddling midnight
+  # (23:5x then 00:0x = different day). Two legitimate run.sh invocations are
+  # never <4h apart (single 00:00 calendar trigger + manual), so the floor never
+  # blocks a real run. NIGHTLY_NOW_EPOCH overrides "now" for deterministic tests.
+  local now=${NIGHTLY_NOW_EPOCH:-$(date +%s)}
   if [ -f "$LAST_RUN_FILE" ]; then
-    local age=$(( $(date +%s) - $(stat -f %m "$LAST_RUN_FILE" 2>/dev/null || echo 0) ))
-    if [ "$age" -lt 64800 ]; then
-      echo "preflight: ran $age s ago (<18h) — skipping duplicate run"
+    local last=$(stat -f %m "$LAST_RUN_FILE" 2>/dev/null || echo 0)
+    local age=$(( now - last ))
+    local last_day today_day
+    last_day=$(date -r "$last" +%Y-%m-%d 2>/dev/null || echo "")
+    today_day=$(date -r "$now" +%Y-%m-%d 2>/dev/null || echo "")
+    if [ "$last_day" = "$today_day" ] || [ "$age" -lt 14400 ]; then
+      echo "preflight: already ran ${age}s ago on ${last_day} (today=${today_day}) — skipping duplicate run"
       return 1
     fi
   fi

@@ -71,6 +71,50 @@ assert "returns 0"                    "[ $rc2 -eq 0 ]"
 assert "took the ff-pull path"        'printf "%s" "$OUT2" | grep -q "ff-pulling master"'
 assert "did NOT log dirty-skip"       '! printf "%s" "$OUT2" | grep -q "skipping ff-pull"'
 
+# ── once-per-day dedup ────────────────────────────────────────────────────
+# Regression guard for 2026-05-22: the OLD 18h rolling window suppressed a
+# legitimate next-day run whenever the prior run drifted into late morning
+# (sleep-deferred launchd makes run-times drift later each day). The rule is now
+# "at most one successful run per LOCAL CALENDAR DAY" + a 4h floor to kill a
+# genuine double-fire that straddles midnight. preflight reads NIGHTLY_NOW_EPOCH
+# (defaults to `date +%s`) so "now" is injectable and these cases are deterministic.
+epoch() { date -j -f '%Y-%m-%d %H:%M:%S' "$1" +%s; }
+( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null )  # ensure clean tree
+echo
+echo "once-per-day dedup"
+
+# A) the exact 05-22 bug: last run YESTERDAY 11:15, now TODAY 02:39 (age ~15.4h,
+#    DIFFERENT calendar day). Old 18h window skipped this; calendar-day must RUN.
+rm -f "$LOCK_FILE"; touch -t 202605211115.27 "$LAST_RUN_FILE"
+export NIGHTLY_NOW_EPOCH="$(epoch '2026-05-22 02:39:42')"
+OUTA=$(preflight_check 2>&1); rcA=$?
+assert "diff-day, age 15.4h → RUNS (the 05-22 regression)"  "[ $rcA -eq 0 ]"
+assert "  …and does NOT log a duplicate-skip"              '! printf "%s" "$OUTA" | grep -q "skipping duplicate"'
+
+# B) honors injected clock; SAME calendar day → SKIP. Anchored in 2020 so the
+#    assertion is independent of real wall-clock (old code, ignoring the inject,
+#    would compute a multi-year age > any window and wrongly RUN).
+rm -f "$LOCK_FILE"; touch -t 202001011200.00 "$LAST_RUN_FILE"
+export NIGHTLY_NOW_EPOCH="$(epoch '2020-01-01 12:30:00')"
+OUTB=$(preflight_check 2>&1); rcB=$?
+assert "same calendar day → SKIPS (return 1)"              "[ $rcB -eq 1 ]"
+assert "  …and logs a duplicate-skip"                      'printf "%s" "$OUTB" | grep -q "skipping duplicate"'
+
+# C) midnight straddle: DIFFERENT day but only 10min apart (<4h floor) → SKIP.
+rm -f "$LOCK_FILE"; touch -t 202001012355.00 "$LAST_RUN_FILE"
+export NIGHTLY_NOW_EPOCH="$(epoch '2020-01-02 00:05:00')"
+OUTC=$(preflight_check 2>&1); rcC=$?
+assert "diff day but <4h apart (midnight straddle) → SKIPS" "[ $rcC -eq 1 ]"
+
+# D) normal drift: different day, ~22h apart → RUNS.
+rm -f "$LOCK_FILE"; touch -t 202001011100.00 "$LAST_RUN_FILE"
+export NIGHTLY_NOW_EPOCH="$(epoch '2020-01-02 09:00:00')"
+OUTD=$(preflight_check 2>&1); rcD=$?
+assert "diff day, ~22h apart → RUNS"                       "[ $rcD -eq 0 ]"
+
+unset NIGHTLY_NOW_EPOCH
+rm -f "$LAST_RUN_FILE" "$LOCK_FILE"
+
 rm -rf "$ROOT"
 echo
 echo "──────────────────────────────────────────"
