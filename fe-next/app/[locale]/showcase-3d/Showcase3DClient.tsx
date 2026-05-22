@@ -20,10 +20,10 @@ const sampleFrames = (dir: string, total: number, n: number) =>
   });
 
 // Four gameplay chapters scrub one after another: board → igniting → versus → mascot win.
-const CH1 = sampleFrames('/showcase3d/seq-board', 90, 78); // correct-mascot word board ("PLAY")
+const CH1 = sampleFrames('/showcase3d/seq-board', 125, 78); // real animated correct-mascot word board
 const CH2 = sampleFrames('/scroll/seq/ch2', 130, 78); // letters chaining / igniting
 const CHVS = sampleFrames('/showcase3d/seq-vs', 80, 70); // real 1v3 versus footage
-const WIN = sampleFrames('/showcase3d/seq', 110, 94); // correct-mascot world-of-words finale
+const WIN = sampleFrames('/showcase3d/seq', 125, 94); // real animated correct-mascot world-of-words finale
 const FRAMES = [...CH1, ...CH2, ...CHVS, ...WIN];
 const TOTAL = FRAMES.length;
 
