@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { countBuildableWords } from '../wordHints';
+import { countBuildableWords, pickClueWord } from '../wordHints';
 
 describe('countBuildableWords', () => {
   // A small canonical (uppercase) dictionary.
@@ -40,5 +40,30 @@ describe('countBuildableWords', () => {
     const heb = new Set(['שלום', 'שלג', 'של']);
     // anchor ש, tray ל,ו,ם,ג → שלום (4) + שלג (3) buildable; של is len2
     expect(countBuildableWords(heb, 'ש', ['ל', 'ו', 'ם', 'ג'], 3)).toBe(2);
+  });
+});
+
+describe('pickClueWord', () => {
+  const dict = new Set(['CAT', 'CARE', 'CART', 'CARETAKER', 'DOG']);
+
+  it('returns the shortest buildable word starting with the anchor', () => {
+    // anchor C, tray A,R,T,E → CAT(3), CARE(4), CART(4) buildable → shortest CAT
+    expect(pickClueWord(dict, 'C', ['A', 'R', 'T', 'E'], 3)).toBe('CAT');
+  });
+
+  it('returns null when nothing is buildable', () => {
+    expect(pickClueWord(dict, 'C', ['X', 'Y'], 3)).toBeNull();
+    expect(pickClueWord(dict, '', ['A'], 3)).toBeNull();
+  });
+
+  it('honours the minimum length', () => {
+    const d = new Set(['GO', 'GOT', 'GOAT']);
+    expect(pickClueWord(d, 'G', ['O', 'T', 'A'], 3)).toBe('GOT'); // GO excluded (len 2)
+  });
+
+  it('only returns a word actually buildable from the tray multiset', () => {
+    const d = new Set(['BOOK']);
+    expect(pickClueWord(d, 'B', ['O', 'K'], 3)).toBeNull(); // needs two O
+    expect(pickClueWord(d, 'B', ['O', 'O', 'K'], 3)).toBe('BOOK');
   });
 });

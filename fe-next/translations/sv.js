@@ -6,7 +6,7 @@ const sv = {
     "cardDesc": "Stapla ord mot skyn — adminförhandsvisning",
     "loading": "Laddar ordlista…",
     "biome": { "city": "Mark", "sky": "Himmel", "stratosphere": "Stratosfär", "orbit": "Omloppsbana", "nebula": "Nebulosa", "galaxy": "Galax" },
-    "hud": { "floors": "{n} våningar", "combo": "{n} kedja", "scramble": "Blanda", "backspace": "Radera", "build": "Bygg", "restart": "Börja om", "best": "Bästa {m} m", "possible": "{n} ord" },
+    "hud": { "floors": "{n} våningar", "combo": "{n} kedja", "scramble": "Blanda", "backspace": "Radera", "build": "Bygg", "restart": "Börja om", "best": "Bästa {m} m", "possible": "{n} ord", "clue": "Ledtråd", "collapse": "Fäll ihop", "expand": "Expandera" },
     "error": { "too_short": "För kort — minst 3 bokstäver", "bad_chain": "Börja på den lysande bokstaven", "not_buildable": "Använd brickornas bokstäver", "duplicate": "Ordet är redan använt", "not_in_dictionary": "Inte i ordlistan" },
     "celebration": { "highRise": "Höghus!", "tall": "Skyhögt!", "skyscraper": "SKYSKRAPA!" },
     "leaderboard": { "title": "Topptorn", "error": "Kunde inte ladda topplistan", "empty": "Inga torn än — bli först!" },
@@ -87,9 +87,9 @@ const sv = {
     },
     "daily": {
       "title": "Dagligt Ordhjul & Ordjakt — Gratis Dagliga Ordpussel, Samma Bräde Över Hela Världen | LexiClash",
-      "description": "Dagligt Ordhjul + Ordjakt — gratis, ingen registrering. Samma bräde över hela världen, 10 försök (Wordle-stil), dela emoji-resultat och klättra på topplistan. Nytt pussel var 24:e timme.",
-      "ogTitle": "Dagligt Ordhjul — Dagens Gratis Ordpussel",
-      "ogDescription": "Dagligt Ordhjul + Ordjakt. Samma pussel över hela världen, dela resultat, bygg en strak. Gratis utan registrering."
+      "description": "Snurra dagliga ordhjulet och hitta alla ord — gratis, ingen registrering. Nytt pussel varje dag, samma bräde för alla spelare. Plus Ordjakt: gissa det dolda ordet på 10 försök.",
+      "ogTitle": "Dagligt Ordhjul — Snurra och hitta alla ord",
+      "ogDescription": "Dagliga ordhjulspussel gratis. Snurra hjulet, hitta alla ord, dela resultaten. Nytt pussel varje dag!"
     },
     "multiplayer": {
       "title": "Scrabble Online på Svenska — 2-20 Spelare, 8 Spellägen, Gratis | LexiClash",

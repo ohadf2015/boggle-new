@@ -15,7 +15,7 @@ import {
   type WordTowerPlayerState,
 } from '@/lib/wordTower/wordTowerManager';
 import { WORD_TOWER_MIN_WORD_LEN } from '@/shared/constants/wordTowerConstants';
-import { countBuildableWords } from '@/lib/wordTower/wordHints';
+import { countBuildableWords, pickClueWord } from '@/lib/wordTower/wordHints';
 import { WordTowerScene } from './WordTowerScene';
 import { WordTowerHud } from './WordTowerHud';
 
@@ -49,6 +49,10 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // from the current anchor + tray (recomputed only when those change).
   const possibleWords = useMemo(
     () => (dictionary ? countBuildableWords(dictionary, game.anchorLetter, game.tray, WORD_TOWER_MIN_WORD_LEN) : null),
+    [dictionary, game.anchorLetter, game.tray],
+  );
+  const clueWord = useMemo(
+    () => (dictionary ? pickClueWord(dictionary, game.anchorLetter, game.tray, WORD_TOWER_MIN_WORD_LEN) : null),
     [dictionary, game.anchorLetter, game.tray],
   );
 
@@ -225,6 +229,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           scramblesLeft={game.scramblesLeft}
           floorsCount={game.floors.length}
           possibleWords={possibleWords}
+          clueWord={clueWord}
           biomeId={biomeId}
           lastError={tower.state.lastError}
           errorKey={tower.state.errorKey}

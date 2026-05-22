@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Delete, Shuffle, ArrowUp, Lightbulb } from 'lucide-react';
 import { comboMult, type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
@@ -17,6 +17,8 @@ export interface WordTowerHudProps {
   floorsCount: number;
   /** How many dictionary words are buildable from the current anchor + tray. */
   possibleWords?: number | null;
+  /** A sample buildable word for the clue reveal (canonical form). */
+  clueWord?: string | null;
   biomeId: WordTowerBiomeId;
   lastError: ValidationError | null;
   errorKey: number;
@@ -43,12 +45,23 @@ const TIER_KEY: Record<NonNullable<ApplyResult['tier']>, string> = {
 export function WordTowerHud(props: WordTowerHudProps) {
   const {
     anchorLetter, tray, selected, word, heightM, personalBestM, combo, scramblesLeft, floorsCount,
-    possibleWords, biomeId, lastError, errorKey, lastResult, resultKey,
+    possibleWords, clueWord, biomeId, lastError, errorKey, lastResult, resultKey,
     onSelectTile, onBackspace, onClear, onSubmit, onScramble, onDeckHeight, t,
   } = props;
 
   const mult = comboMult(combo);
   const canSubmit = word.length >= 3;
+
+  // Clue: reveal a masked sample word on demand; reset when the anchor changes.
+  const [clueShown, setClueShown] = useState(false);
+  useEffect(() => { setClueShown(false); }, [anchorLetter]);
+  const maskedClue = useMemo(
+    () => (clueWord ? Array.from(clueWord).map((c, i) => (i < 2 ? c : '·')).join('') : ''),
+    [clueWord],
+  );
+
+  // Mobile drawer: the deck collapses to a peek bar to free the screen for the tower.
+  const [deckOpen, setDeckOpen] = useState(true);
 
   // Measure the control deck so the Pixi tower can ground exactly on top of it.
   const deckRef = useRef<HTMLDivElement>(null);
@@ -116,8 +129,19 @@ export function WordTowerHud(props: WordTowerHudProps) {
           caps the play area (hides the busy parallax behind a clean surface). */}
       <div
         ref={deckRef}
-        className="pointer-events-auto space-y-2 rounded-t-neo border-t-neo-thick border-black bg-neo-navy/95 px-4 pt-2.5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md"
+        className="pointer-events-auto space-y-2 rounded-t-neo border-t-neo-thick border-black bg-neo-navy/95 px-4 pt-1.5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md"
       >
+        {/* Drawer grip — collapse the deck to free the screen for the tower. */}
+        <button
+          type="button"
+          onClick={() => setDeckOpen((o) => !o)}
+          aria-label={t(deckOpen ? 'wordTower.hud.collapse' : 'wordTower.hud.expand')}
+          className="mx-auto flex w-full items-center justify-center py-1"
+        >
+          <span className="h-1.5 w-12 rounded-full bg-neo-white/40" />
+        </button>
+        {deckOpen && (
+        <div className="space-y-2">
         {/* Word builder */}
         <div
           key={`builder-${errorKey}`}
@@ -134,13 +158,22 @@ export function WordTowerHud(props: WordTowerHudProps) {
           </p>
         )}
 
-        {/* "N words possible" hint — clarity on how many words exist now. */}
+        {/* "N words possible" + tap-for-clue (reveals a masked sample word). */}
         {possibleWords != null && (
           <div className="flex justify-center">
-            <span className="inline-flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light/80 px-2 py-0.5 font-neo-body text-[11px] font-bold text-neo-cyan">
+            <button
+              type="button"
+              onClick={() => setClueShown(true)}
+              disabled={!clueWord || clueShown}
+              aria-label={t('wordTower.hud.clue')}
+              className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-navy-light/80 px-2 py-0.5 font-neo-body text-[11px] font-bold text-neo-cyan transition-transform active:translate-y-0.5 disabled:opacity-60"
+            >
               <Lightbulb className="h-3 w-3" />
               {t('wordTower.hud.possible', { n: possibleWords })}
-            </span>
+              {clueShown && maskedClue && (
+                <span className="ms-1 font-neo-display tracking-[0.25em] text-neo-yellow">{maskedClue}</span>
+              )}
+            </button>
           </div>
         )}
 
@@ -196,6 +229,8 @@ export function WordTowerHud(props: WordTowerHudProps) {
             {t('wordTower.hud.build')}
           </button>
         </div>
+        </div>
+        )}
       </div>
     </div>
   );
