@@ -8,6 +8,7 @@ import { useGSAP } from '@gsap/react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GameplayPanel, { type Mode } from '@/components/showcase3d/GameplayPanel';
 import Split3DHeading from '@/components/showcase3d/Split3DHeading';
+import FloatingCTA from '@/components/showcase3d/FloatingCTA';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -300,6 +301,8 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
           </Link>
         </div>
       </section>
+
+      <FloatingCTA href={playHref} label={t('showcase3d.floatCta', 'Play free')} isRTL={isRTL} hideBelow={ctaRef} />
     </main>
   );
 }
