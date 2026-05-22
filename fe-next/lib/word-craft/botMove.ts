@@ -17,6 +17,17 @@ export interface FindBotMoveOptions {
    * pass validation, so it's cheap.
    */
   extraScore?: (placements: PlacedTile[], wordCells: { row: number; col: number }[][]) => number;
+  /**
+   * Difficulty knob. 0 (default) = always pick the single strictly-best word,
+   * matching the old behavior. Higher values widen the pool of distinct words
+   * the bot picks from, so it sometimes plays a sub-optimal (but still legal)
+   * word — a deliberate, tunable nerf. The bot keeps its bingo capability;
+   * we never cap word length (see DEFAULT_MAX_LENGTH note). Pool size is
+   * `round(1 + skillVariance * 4)` distinct words, ranked best-first.
+   */
+  skillVariance?: number;
+  /** Injectable RNG (returns [0,1)) so difficulty selection is testable. */
+  rng?: () => number;
 }
 
 // Bot considers permutations of its 7-tile rack up to length 7. Earlier
@@ -98,6 +109,8 @@ export function findBestBotMove(
 ): BotMove | null {
   const maxLength = options.maxLength ?? DEFAULT_MAX_LENGTH;
   const maxCandidates = options.maxCandidates ?? Infinity;
+  const skillVariance = options.skillVariance ?? 0;
+  const rng = options.rng ?? Math.random;
 
   const candidateWords: { word: string; tiles: RackTile[] }[] = [];
   let seen = 0;
@@ -108,8 +121,10 @@ export function findBestBotMove(
     if (isWordValid(word)) candidateWords.push({ word, tiles: perm });
   }
 
-  let best: BotMove | null = null;
-  let bestRanked = -Infinity;
+  // Keep the single best-ranked placement for each distinct PLAYED word, so the
+  // difficulty pool spans different words rather than many placements of the
+  // same word (which would all score alike and make the nerf invisible).
+  const bestByWord = new Map<string, { move: BotMove; ranked: number }>();
   const empty = isFirstMove(board);
   const size = board.cells.length;
   const center = getCenter(board.size);
@@ -134,19 +149,31 @@ export function findBestBotMove(
             ? options.extraScore(placements, result.words?.map((w) => w.cells) ?? [])
             : 0;
           const ranked = result.score + bonus;
-          if (!best || ranked > bestRanked) {
-            // The played word can extend through existing board tiles, so the
-            // real main word (result.words[0]) differs from the rack word.
-            // Stored `score` is the base validator score (no territory bonus)
-            // so the reducer's commit path can add territory captures without
-            // double-counting them.
-            const playedWord = result.words?.[0]?.word ?? word;
-            best = { placements, score: result.score, word: playedWord };
-            bestRanked = ranked;
+          // The played word can extend through existing board tiles, so the
+          // real main word (result.words[0]) differs from the rack word.
+          // Stored `score` is the base validator score (no territory bonus)
+          // so the reducer's commit path can add territory captures without
+          // double-counting them.
+          const playedWord = result.words?.[0]?.word ?? word;
+          const prev = bestByWord.get(playedWord);
+          if (!prev || ranked > prev.ranked) {
+            bestByWord.set(playedWord, {
+              move: { placements, score: result.score, word: playedWord },
+              ranked,
+            });
           }
         }
       }
     }
   }
-  return best;
+
+  if (bestByWord.size === 0) return null;
+
+  // Rank distinct words best-first. Pool = top-K words; pick one via rng.
+  // K=1 at skillVariance 0 reproduces the strict-best behavior exactly.
+  const ranked = [...bestByWord.values()].sort((a, b) => b.ranked - a.ranked);
+  const poolSize = Math.max(1, Math.round(1 + skillVariance * 4));
+  const pool = ranked.slice(0, poolSize);
+  const idx = Math.min(pool.length - 1, Math.floor(rng() * pool.length));
+  return pool[idx].move;
 }

@@ -279,11 +279,17 @@ export interface UseWordCraftGameOptions {
   locale?: SupportedLocale;
   boardSize?: 13 | 15;
   territoryEnabled?: boolean;
+  /**
+   * Bot difficulty. 0 = always optimal; higher = picks from a wider pool of
+   * top words so it occasionally plays sub-optimally. Default 0.5 (top-3
+   * words) makes the single-player bot beatable without feeling broken.
+   */
+  botSkillVariance?: number;
 }
 
 export { reducer as wordCraftReducer, buildInitial as buildInitialState }
 
-export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true }: UseWordCraftGameOptions) {
+export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, botSkillVariance = 0.5 }: UseWordCraftGameOptions) {
   // Capture viewport dims at initialization and lock them for the game lifetime
   const initialDimsRef = useRef(
     getBoardDims(typeof window === 'undefined' ? 1024 : window.innerWidth)
@@ -448,6 +454,9 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
         extraScore: state.territoryEnabled
           ? (placements, wordCells) => resolveCaptures(state.board, placements, wordCells, 'bot').bonus
           : undefined,
+        // Difficulty: pick from the top-N words instead of always the best,
+        // so the bot is beatable. Bingo capability is preserved.
+        skillVariance: botSkillVariance,
       });
       if (move) {
         const result = validateAndScoreMove(state.board, move.placements, isWordValid);
@@ -471,7 +480,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       clearTimeout(handle);
       botTurnRunning.current = false;
     };
-  }, [state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid]);
+  }, [state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid, botSkillVariance]);
 
   const isFirstMoveOfGame = useMemo(() => isFirstMove(state.board), [state.board]);
   const tilesRemaining = useMemo(() => remaining(state.bag), [state.bag]);

@@ -135,4 +135,38 @@ describe('findBestBotMove', () => {
     expect(move).not.toBeNull();
     expect(move!.placements.length).toBeLessThanOrEqual(3);
   });
+
+  describe('skillVariance (bot difficulty knob)', () => {
+    const board = () => createBoard();
+    const rack = () => makeRack('CATSXYZ');
+    // Distinct first-move words of clearly separable score: CATS > CAT/SAT > AT/AS.
+    const dict = new Set(['CAT', 'CATS', 'SAT', 'AT', 'AS']);
+    const valid = (w: string) => dict.has(w.toUpperCase());
+
+    it('skillVariance 0 ignores rng and returns the strict best move', () => {
+      // GIVEN the strict-best baseline (no difficulty options)
+      const best = findBestBotMove(board(), rack(), valid);
+      // WHEN skill is 0 even with an rng that would pick the last candidate
+      const move = findBestBotMove(board(), rack(), valid, { skillVariance: 0, rng: () => 0.999 });
+      // THEN it still plays the optimal word
+      expect(move!.score).toBe(best!.score);
+      expect(move!.word).toBe(best!.word);
+    });
+
+    it('skillVariance > 0 with rng selecting the last candidate plays a weaker word', () => {
+      // GIVEN the strict best
+      const best = findBestBotMove(board(), rack(), valid);
+      // WHEN skill spreads the pool and rng lands on the lowest-ranked of the pool
+      const move = findBestBotMove(board(), rack(), valid, { skillVariance: 1, rng: () => 0.999 });
+      // THEN the bot plays a strictly lower-scoring word than its best
+      expect(move).not.toBeNull();
+      expect(move!.score).toBeLessThan(best!.score);
+    });
+
+    it('skillVariance > 0 with rng selecting the first candidate still returns the best', () => {
+      const best = findBestBotMove(board(), rack(), valid);
+      const move = findBestBotMove(board(), rack(), valid, { skillVariance: 1, rng: () => 0 });
+      expect(move!.score).toBe(best!.score);
+    });
+  });
 });
