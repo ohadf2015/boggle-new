@@ -135,11 +135,20 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
       });
       stRef.current = tl.scrollTrigger ?? null;
       tl.to(playhead, { frame: TOTAL - 1, ease: 'none', duration: 1, onUpdate: draw }, 0);
+      const sign = isRTL ? -1 : 1;
       captions.forEach((cap, i) => {
         const [enter, exit] = cap.window;
-        // captions tilt up into place in 3D (transform-only — safe to ride the scrub)
-        tl.fromTo(`.s3-cap-${i}`, { autoAlpha: 0, yPercent: 28, rotationX: 38, transformPerspective: 700 }, { autoAlpha: 1, yPercent: 0, rotationX: 0, duration: 0.07 }, enter);
-        tl.to(`.s3-cap-${i}`, { autoAlpha: 0, yPercent: -28, rotationX: -24, duration: 0.07 }, exit);
+        const sel = `.s3-cap-${i}`;
+        // 3D panel that tilts THROUGH its window as you scroll (all transform — safe on scrub):
+        // enters steeply pitched back + pushed into depth, settles, keeps rotating while held, tilts away.
+        tl.fromTo(
+          sel,
+          { autoAlpha: 0, yPercent: 42, rotationX: 78, rotationY: sign * -14, z: -260, transformPerspective: 620, transformOrigin: '50% 50% -60px' },
+          { autoAlpha: 1, yPercent: 0, rotationX: 10, rotationY: sign * -4, z: 0, duration: 0.06, ease: 'power2.out' },
+          enter,
+        );
+        tl.to(sel, { rotationX: -10, rotationY: sign * 6, duration: Math.max(0.01, exit - enter - 0.12), ease: 'none' }, enter + 0.06);
+        tl.to(sel, { autoAlpha: 0, yPercent: -42, rotationX: -78, z: -260, duration: 0.06, ease: 'power2.in' }, exit - 0.06);
       });
     },
     { scope: section },
@@ -237,7 +246,7 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
                       {cap.badge}
                     </span>
                   )}
-                  <h2 className="mt-2 font-neo-display text-4xl font-bold leading-[0.95] text-neo-cream sm:text-6xl" style={{ textShadow: '0 2px 0 #0a0a12,0 4px 0 #0a0a12,0 5px 0 rgba(0,255,255,0.5),0 7px 0 #0a0a12,0 12px 18px rgba(0,0,0,0.55)' }}>{cap.title}</h2>
+                  <h2 className="mt-2 font-neo-display text-4xl font-bold leading-[0.95] text-neo-cream sm:text-6xl" style={{ textShadow: '0 1px 0 #0a0a12,0 2px 0 #0a0a12,0 3px 0 #0a0a12,0 4px 0 #0a0a12,0 5px 0 rgba(0,255,255,0.65),0 6px 0 #0a0a12,0 7px 0 #0a0a12,0 8px 0 #0a0a12,0 10px 0 rgba(255,20,147,0.45),0 16px 24px rgba(0,0,0,0.6)' }}>{cap.title}</h2>
                   <p className="mx-auto mt-3 max-w-xl font-neo-body text-base text-neo-cream/90 drop-shadow-[2px_2px_0_rgba(0,0,0,0.7)] sm:text-lg">{cap.body}</p>
                 </div>
               ))}
