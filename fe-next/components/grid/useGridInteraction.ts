@@ -107,6 +107,12 @@ export function useGridInteraction({
   const dragSelectionRef = useRef<SelectedCell[]>([]);
   const startCellRef = useRef<SelectedCell | null>(null);
   const isTouchDeviceRef = useRef(false);
+  // Pointer type of the CURRENT interaction (not the device class). Idle
+  // auto-submit gates on this — a touch-capable PC (touchscreen laptop / 2-in-1)
+  // fires a stray window `touchstart` that flips isTouchDeviceRef forever, which
+  // wrongly killed mouse-driven idle auto-submit. This tracks what's actually
+  // driving the live selection: real TouchEvent = true, mouse = false.
+  const activePointerIsTouchRef = useRef(false);
   const lastDirectionRef = useRef<{ dx: number; dy: number } | null>(null);
   const autoSubmitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   // Desktop idle auto-submit (autoSubmitIdleMs). Guard prevents a re-arm during
@@ -299,11 +305,11 @@ export function useGridInteraction({
   // after their LAST letter. Touch devices are excluded — they submit on
   // finger lift, and an idle timer would fire on a mid-drag pause.
   useEffect(() => {
-    if (!interactive || autoSubmitIdleMs == null || isTouchDeviceRef.current) return;
+    if (!interactive || autoSubmitIdleMs == null || activePointerIsTouchRef.current) return;
     if (selectedCells.length < 3) { idleSubmitGuardRef.current = false; return; }
     if (idleSubmitGuardRef.current) return; // already auto-submitted this selection
     idleSubmitTimeoutRef.current = setTimeout(() => {
-      if (isTouchDeviceRef.current) return;
+      if (activePointerIsTouchRef.current) return;
       if (selectedCellsRef.current.length < 3) return;
       idleSubmitGuardRef.current = true;
       submitWord();
@@ -342,6 +348,9 @@ export function useGridInteraction({
       }
     }
     isTouchingRef.current = true;
+    // Real TouchEvent has `touches`; a mouse-routed call (handleMouseDown on a
+    // touch-capable device) does not — that distinction drives idle auto-submit.
+    activePointerIsTouchRef.current = 'touches' in event;
     hasMovedRef.current = false;
     isScrollGestureRef.current = false;
     // Cancel any in-progress fade-out so player can immediately start selecting
@@ -520,6 +529,7 @@ export function useGridInteraction({
     rowIndex: number, colIndex: number, letter: string, event: React.MouseEvent<HTMLDivElement>
   ) => {
     if (!isTouchDeviceRef.current) {
+      activePointerIsTouchRef.current = false;
       handleCellClick(rowIndex, colIndex, letter);
       if (selectedCells.length === 0 || isClickSelectMode) {
         isTouchingRef.current = true;

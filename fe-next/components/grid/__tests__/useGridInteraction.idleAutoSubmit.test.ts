@@ -118,7 +118,7 @@ describe('useGridInteraction — desktop idle auto-submit', () => {
     expect(onWordSubmit).not.toHaveBeenCalled();
   });
 
-  it('does NOT idle-auto-submit on a touch device (mobile uses release-to-submit)', () => {
+  it('does NOT idle-auto-submit during a real touch drag (mobile lifts a finger to submit)', () => {
     const onWordSubmit = vi.fn();
     const gridRef = buildRef();
     const { result } = renderHook(() =>
@@ -128,13 +128,51 @@ describe('useGridInteraction — desktop idle auto-submit', () => {
       })
     );
 
-    // Flip the hook's first-touch detector → treated as touch device.
-    act(() => { window.dispatchEvent(new Event('touchstart')); });
-
-    clickBuild(result, [[0, 0, 'A'], [0, 1, 'B'], [0, 2, 'C']]);
+    // Build a 3-letter word via real TouchEvents (finger still down).
+    act(() => {
+      result.current.handleTouchStart(0, 0, 'A', { touches: [{ clientX: 50, clientY: 50 }] } as unknown as React.TouchEvent<HTMLDivElement>);
+    });
+    act(() => {
+      result.current.handleTouchMove({ touches: [{ clientX: 150, clientY: 50 }], cancelable: true, preventDefault: vi.fn() } as unknown as TouchEvent);
+    });
+    act(() => {
+      result.current.handleTouchMove({ touches: [{ clientX: 250, clientY: 50 }], cancelable: true, preventDefault: vi.fn() } as unknown as TouchEvent);
+    });
     act(() => { vi.advanceTimersByTime(2000); });
 
+    // Finger is still down — release (handleTouchEnd) submits, idle must not.
     expect(onWordSubmit).not.toHaveBeenCalled();
+  });
+
+  it('idle-auto-submits a MOUSE drag even on a touch-capable device (touchscreen laptop)', () => {
+    const onWordSubmit = vi.fn();
+    const gridRef = buildRef();
+    const { result } = renderHook(() =>
+      useGridInteraction({
+        grid: mockGrid, interactive: true, comboLevel: 0,
+        onWordSubmit, gridRef, language: 'en', autoSubmitIdleMs: 1000,
+      })
+    );
+
+    // A stray touchstart flips the device-class flag (touchscreen PC). The
+    // gate must key off the live pointer type, not this — a mouse drag still
+    // auto-submits.
+    act(() => { window.dispatchEvent(new Event('touchstart')); });
+
+    // Mouse drag A→B→C (MouseEvents — no `touches`).
+    act(() => {
+      result.current.handleMouseDown(0, 0, 'A', { clientX: 50, clientY: 50 } as React.MouseEvent<HTMLDivElement>);
+    });
+    act(() => {
+      result.current.handleTouchMove({ clientX: 150, clientY: 50, cancelable: true, preventDefault: vi.fn() } as unknown as MouseEvent);
+    });
+    act(() => {
+      result.current.handleTouchMove({ clientX: 250, clientY: 50, cancelable: true, preventDefault: vi.fn() } as unknown as MouseEvent);
+    });
+    act(() => { vi.advanceTimersByTime(1000); });
+
+    expect(onWordSubmit).toHaveBeenCalledTimes(1);
+    expect(onWordSubmit.mock.calls[0][0]).toBe('ABC');
   });
 
   it('auto-submits on a drag-then-stall (>2 letters) and does NOT double-submit on the later mouseup', () => {
@@ -149,13 +187,13 @@ describe('useGridInteraction — desktop idle auto-submit', () => {
 
     // Mouse-driven drag A(0,0) → B(0,1) → C(0,2), then the player holds still.
     act(() => {
-      result.current.handleTouchStart(0, 0, 'A', { touches: [{ clientX: 50, clientY: 50 }] } as unknown as React.TouchEvent<HTMLDivElement>);
+      result.current.handleMouseDown(0, 0, 'A', { clientX: 50, clientY: 50 } as React.MouseEvent<HTMLDivElement>);
     });
     act(() => {
-      result.current.handleTouchMove({ touches: [{ clientX: 150, clientY: 50 }], cancelable: true, preventDefault: vi.fn() } as unknown as TouchEvent);
+      result.current.handleTouchMove({ clientX: 150, clientY: 50, cancelable: true, preventDefault: vi.fn() } as unknown as MouseEvent);
     });
     act(() => {
-      result.current.handleTouchMove({ touches: [{ clientX: 250, clientY: 50 }], cancelable: true, preventDefault: vi.fn() } as unknown as TouchEvent);
+      result.current.handleTouchMove({ clientX: 250, clientY: 50, cancelable: true, preventDefault: vi.fn() } as unknown as MouseEvent);
     });
 
     // Stall past the idle window → auto-submit fires once.
