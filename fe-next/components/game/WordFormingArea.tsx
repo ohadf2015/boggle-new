@@ -7,6 +7,14 @@ import { SPRING_PRESETS } from '@/lib/animation/presets';
 import Avatar from '@/components/Avatar';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+
+// How long the ✓/✗ note stays on screen after it arrives (ms).
+const FEEDBACK_VISIBLE_MS = 5000;
+// How long the just-submitted word bridges the gap until async feedback lands.
+// Covers the socket round-trip (50–200ms typ.). If nothing arrives by then the
+// word was abandoned (deselected, never submitted) so the pill clears rather
+// than linger forever.
+const BRIDGE_VISIBLE_MS = 1500;
 import { MIN_WORD_LENGTH } from '@/shared/constants/gameConstants';
 
 // Hebrew final letters (sofit) mapping - non-final to final form
@@ -85,6 +93,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
   const [lastWord, setLastWord] = useState<string>('');
   const [lastLetterCount, setLastLetterCount] = useState<number>(0);
   const feedbackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const bridgeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Track the last word being formed (so we can show it during feedback)
   useEffect(() => {
@@ -99,6 +108,12 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
   useEffect(() => {
     if (isFormingWord && visibleFeedback) {
       setVisibleFeedback(null);
+      // A fresh word starts a fresh cycle — kill the pending auto-clear so it
+      // can't later wipe the new bridge word out from under the player.
+      if (feedbackTimeoutRef.current) {
+        clearTimeout(feedbackTimeoutRef.current);
+        feedbackTimeoutRef.current = null;
+      }
     }
   }, [isFormingWord]); // eslint-disable-line react-hooks/exhaustive-deps -- Only trigger on forming state change
 
@@ -110,10 +125,13 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
       if (feedbackTimeoutRef.current) {
         clearTimeout(feedbackTimeoutRef.current);
       }
-      // Auto-clear feedback after 5 seconds as fallback
+      // Auto-clear feedback after the display window. Also drop the bridge word
+      // so the pill returns to empty instead of lingering as a stale plain pill.
       feedbackTimeoutRef.current = setTimeout(() => {
         setVisibleFeedback(null);
-      }, 5000);
+        setLastWord('');
+        feedbackTimeoutRef.current = null;
+      }, FEEDBACK_VISIBLE_MS);
     }
 
     return () => {
@@ -123,17 +141,35 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
     };
   }, [feedback]);
 
+  // Async-validation bridge: on submit the selection word clears synchronously,
+  // but the server's ✓/✗ lands a network round-trip later. Keep the just-formed
+  // word on screen during that gap so the pill morphs into feedback instead of
+  // flashing to the empty placeholder. Bounded: if no feedback arrives the word
+  // was abandoned, so clear it rather than linger.
+  useEffect(() => {
+    // Only bridge when the player has just stopped forming and no feedback is up.
+    if (word.length !== 0 || lastWord.length === 0 || visibleFeedback) return undefined;
+    bridgeTimeoutRef.current = setTimeout(() => {
+      setLastWord('');
+      bridgeTimeoutRef.current = null;
+    }, BRIDGE_VISIBLE_MS);
+    return () => {
+      if (bridgeTimeoutRef.current) {
+        clearTimeout(bridgeTimeoutRef.current);
+        bridgeTimeoutRef.current = null;
+      }
+    };
+  }, [word, lastWord, visibleFeedback]);
+
   // Determine current state
   const isForming = word.length > 0;
   const showFeedback = visibleFeedback !== null;
   const showForming = isForming && !showFeedback;
 
-  // Show content if we're forming OR have feedback OR have a last word to show
-  // Only show while actively forming or while feedback is on screen. A
-  // just-submitted word must NOT linger as a stale pill — the area returns to
-  // empty until the player starts a new word (lastWord is kept only as a
-  // pre-feedback bridge for async validation, not as a resting display).
-  const hasContent = showForming || showFeedback;
+  // Show content while forming, while feedback is on screen, OR during the
+  // time-bounded async-validation bridge. lastWord is NOT a resting display:
+  // the bridge / feedback effects clear it so a submitted word never lingers.
+  const hasContent = showForming || showFeedback || lastWord.length > 0;
 
   // Get display word - forming word, feedback word, or last word
   // Apply Hebrew final letters (sofit) transformation for proper display
