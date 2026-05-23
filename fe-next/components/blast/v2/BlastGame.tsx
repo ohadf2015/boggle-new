@@ -12,7 +12,7 @@ import { useBlastHaptics } from '@/lib/blast/v2/fx/useBlastHaptics';
 import { useChainEventBus } from '@/lib/blast/v2/fx/useChainEventBus';
 import { BlastChainSoundListener } from '@/lib/blast/v2/fx/BlastChainSoundListener';
 import { useCompleteCardDelay } from '@/lib/blast/v2/fx/useCompleteCardDelay';
-import { useBlastProgress } from '@/lib/blast/v2/useBlastProgress';
+import type { BlastProgressApi } from '@/lib/blast/v2/useBlastProgress';
 import { useBlastTutorial } from '@/hooks/useBlastTutorial';
 import { starRating } from '@/lib/blast/v2/anti-cheat';
 import { mechanicsForLevel } from '@/lib/blast/v2/mechanic-flags';
@@ -35,6 +35,7 @@ import { useRewardedAd } from '@/hooks/useRewardedAd';
 
 type Props = {
   level: BlastLevel;
+  progress: BlastProgressApi;
   unlocksSeen?: UnlocksSeen;
   isVeteranPlayer?: boolean;
   onAdvance: () => void;
@@ -78,6 +79,7 @@ const MODE_COLORS: Record<string, string> = {
 
 export function BlastGame({
   level,
+  progress,
   unlocksSeen = {},
   isVeteranPlayer = false,
   onAdvance,
@@ -151,7 +153,7 @@ export function BlastGame({
       setRevealGlowCells([]);
     }
   }, [state.foundWords, state.level, state.status, level.levelNumber]);
-  const { state: progressState, clearLevel, openChest, openMutation } = useBlastProgress();
+  const { state: progressState, clearLevel, openChest, openMutation } = progress;
   const [showChestModal, setShowChestModal] = useState(false);
   const [showUndoAdModal, setShowUndoAdModal] = useState(false);
   const config = LOCALE_CONFIGS[level.locale];

@@ -194,13 +194,18 @@ advance (guest): writeGuestProgress({currentLevel: next, locale})
   `useBlastProgress` fires the claim on authed load when the guest's localStorage level exceeds the
   server's, then clears the guest store.
 
+## Architecture note (resolved 2026-05-24)
+
+The initial cut gave BlastGame its **own** `useBlastProgress` instance, which meant two progress
+GETs per page load and a one-frame coin flicker on resume. Worse, seeding BlastGame's hook from
+props would have reset coins on every level advance (BlastGame is keyed, so it remounts). Fixed by
+**lifting the single instance to `BlastV2PageClient`** and passing it down as the `progress` prop
+(`BlastProgressApi`). One GET per load, no flicker, and coins/chest survive the keyed remount.
+
 ## Known limitations / accepted costs
 
-- **HUD coins flash 0 → real value for one frame on resume.** BlastGame's own `useBlastProgress`
-  instance fires its GET *after* the boot gate releases, so coins paint as 0 until it resolves.
-  This is the visible cost of the two-instance design (vs. lifting the hook). Acceptable.
-- **The boot loader also shows briefly for brand-new players** (`currentLevel === 1` still waits on
-  the GET). Cheap future win: short-circuit the loader when `progressLoaded && currentLevel === 1`.
+- **The boot loader shows briefly for brand-new players** (`currentLevel === 1` still waits on the
+  GET). Cheap future win: short-circuit the loader when `progressLoaded && currentLevel === 1`.
 
 ## Rollout / risk
 

@@ -24,10 +24,11 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
   const bootedRef = useRef(false);
   const { t } = useLanguage();
 
-  // NOTE: this is a second read of /api/blast/progress (BlastGame's own
-  // useBlastProgress instance reads it too for coins/chest). The endpoint is a
-  // cheap idempotent read; deduping the two instances is a future optimization.
-  const { state: progressState, currentLevel, progressLoaded, isGuest } = useBlastProgress();
+  // Single source of truth for progress. We own the one instance and hand it to
+  // BlastGame so there's exactly one progress GET per page load, and so coins /
+  // chest survive BlastGame's keyed remount on each level advance.
+  const progress = useBlastProgress();
+  const { state: progressState, currentLevel, progressLoaded, isGuest } = progress;
 
   // Resume the player's seen-tutorial flags so they don't re-watch FTUE prompts
   // (coin overlay, reverse selection, etc.) they already cleared on a prior run.
@@ -150,6 +151,7 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
     <BlastGame
       key={`${level.locale}-${level.levelNumber}`}
       level={level}
+      progress={progress}
       unlocksSeen={unlocksSeen}
       isVeteranPlayer={isVeteran}
       onAdvance={handleAdvance}

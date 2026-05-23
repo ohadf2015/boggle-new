@@ -35,6 +35,22 @@ vi.mock('@/hooks/useRewardedAd', () => ({
 }));
 
 import { BlastGame } from '../BlastGame';
+import type { BlastProgressApi } from '@/lib/blast/v2/useBlastProgress';
+
+// BlastGame now receives progress from its parent (BlastV2PageClient owns the
+// single useBlastProgress instance). Stub it for these unit tests.
+const makeProgress = (overrides: Partial<BlastProgressApi> = {}): BlastProgressApi => ({
+  state: { coins: 0, chestNumber: 1, chestProgress: 0, chestContents: null, unlocksSeenFlag: {}, veteranBonusGranted: false },
+  clearLevel: vi.fn(),
+  openChest: vi.fn(),
+  clearMutation: { status: 'idle' },
+  openMutation: { status: 'idle' },
+  currentLevel: 1,
+  maxLevelCleared: 0,
+  progressLoaded: true,
+  isGuest: false,
+  ...overrides,
+});
 
 const mockLevel: BlastLevel = {
   id: 'game-test',
@@ -60,12 +76,12 @@ describe('BlastGame', () => {
   });
 
   it('shows intro card initially', () => {
-    render(<BlastGame level={mockLevel} onAdvance={vi.fn()} />);
+    render(<BlastGame level={mockLevel} progress={makeProgress()} onAdvance={vi.fn()} />);
     expect(screen.getByTestId('intro-card')).toBeInTheDocument();
   });
 
   it('auto-dismisses intro card after 1500ms', async () => {
-    render(<BlastGame level={mockLevel} onAdvance={vi.fn()} />);
+    render(<BlastGame level={mockLevel} progress={makeProgress()} onAdvance={vi.fn()} />);
     vi.advanceTimersByTime(1500);
     await waitFor(() => {
       expect(screen.queryByTestId('intro-card')).not.toBeInTheDocument();
@@ -73,7 +89,7 @@ describe('BlastGame', () => {
   });
 
   it('shows board after intro dismisses', async () => {
-    render(<BlastGame level={mockLevel} onAdvance={vi.fn()} />);
+    render(<BlastGame level={mockLevel} progress={makeProgress()} onAdvance={vi.fn()} />);
     vi.advanceTimersByTime(1500);
     await waitFor(() => {
       expect(screen.getByTestId('blast-board')).toBeInTheDocument();
@@ -81,7 +97,7 @@ describe('BlastGame', () => {
   });
 
   it('shows complete card when all words found', async () => {
-    const { rerender } = render(<BlastGame level={mockLevel} onAdvance={vi.fn()} />);
+    const { rerender } = render(<BlastGame level={mockLevel} progress={makeProgress()} onAdvance={vi.fn()} />);
     vi.advanceTimersByTime(1500);
     await waitFor(() => {
       expect(screen.getByTestId('blast-board')).toBeInTheDocument();
@@ -95,6 +111,7 @@ describe('BlastGame', () => {
     render(
       <BlastGame
         level={mockLevel1}
+        progress={makeProgress()}
         unlocksSeen={{}}
         isVeteranPlayer={false}
         onAdvance={vi.fn()}
@@ -114,6 +131,7 @@ describe('BlastGame', () => {
     render(
       <BlastGame
         level={mockLevel1}
+        progress={makeProgress()}
         unlocksSeen={{}}
         isVeteranPlayer={true}
         onAdvance={vi.fn()}
@@ -128,6 +146,7 @@ describe('BlastGame', () => {
     render(
       <BlastGame
         level={mockLevel1}
+        progress={makeProgress()}
         unlocksSeen={{}}
         isVeteranPlayer={false}
         onAdvance={vi.fn()}

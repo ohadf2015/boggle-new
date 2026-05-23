@@ -169,3 +169,11 @@ export function useBlastProgress() {
     isGuest,
   };
 }
+
+/**
+ * The full progress API returned by {@link useBlastProgress}. BlastGame receives
+ * this from BlastV2PageClient (which owns the single instance) rather than
+ * calling the hook itself — one progress GET per page load, and coins/chest
+ * survive the keyed remount on each level advance.
+ */
+export type BlastProgressApi = ReturnType<typeof useBlastProgress>;
