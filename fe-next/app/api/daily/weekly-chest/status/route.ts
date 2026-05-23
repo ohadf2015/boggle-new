@@ -55,11 +55,19 @@ export async function GET() {
         .gt('word_count', 0),
     ])
 
-    // Combine all attempt dates
+    // Frozen days: a freeze the player spent to protect the chest cycle. They
+    // bridge continuity but carry no score row, so they never inflate the tier.
+    const { data: freezeRows } = await supabase
+      .from('daily_streak_freezes')
+      .select('frozen_date')
+      .eq('player_id', user.id)
+
+    // Combine all attempt dates + frozen (bridged) dates.
     const allDates = [
       ...(puzzleRes.data ?? []).map((r: any) => r.puzzle_date),
       ...(huntRes.data ?? []).map((r: any) => r.puzzle_date),
       ...(wheelRes.data ?? []).map((r: any) => r.puzzle_date),
+      ...(freezeRows ?? []).map((r: any) => r.frozen_date),
     ]
 
     // Pull every chest row this player owns so we can detect prior unclaimed

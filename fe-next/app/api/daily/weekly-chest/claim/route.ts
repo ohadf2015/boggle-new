@@ -42,10 +42,18 @@ export async function POST() {
       .gt('word_count', 0),
   ])
 
+  // Frozen days bridge cycle continuity but carry no score row — keep in sync
+  // with /api/daily/weekly-chest/status + the submit hook.
+  const { data: freezeRows } = await supabase
+    .from('daily_streak_freezes')
+    .select('frozen_date')
+    .eq('player_id', user.id)
+
   const allDates = [
     ...(puzzleRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
     ...(huntRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
     ...(wheelRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
+    ...(freezeRows ?? []).map((r: { frozen_date: string }) => r.frozen_date),
   ]
 
   // Pull every chest row for this player so we can resolve which cycle the

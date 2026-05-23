@@ -21,8 +21,9 @@ import { GET } from './route'
 function makeMockSupabase(opts: {
   user?: { id: string } | null
   puzzleAttempts?: Array<{ puzzle_date: string }>
-  huntAttempts?: Array<{ puzzle_date: string }>
+  huntAttempts?: Array<{ puzzle_date: string; efficiency_score?: number }>
   wheelAttempts?: Array<{ puzzle_date: string }>
+  frozenDates?: Array<{ frozen_date: string }>
   existingChests?: Array<{ cycle_start?: string; tier: string; contents: any; opened_at: string | null }>
 } = {}) {
   const user = opts.user !== undefined ? opts.user : { id: 'user-1' }
@@ -70,6 +71,14 @@ function makeMockSupabase(opts: {
           }),
         }
       }
+      if (table === 'daily_streak_freezes') {
+        // Route does .select('frozen_date').eq('player_id', …) then awaits.
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockResolvedValue({ data: opts.frozenDates ?? [], error: null }),
+          }),
+        }
+      }
       if (table === 'daily_weekly_chests') {
         // Route now does a single `.eq('player_id', …)` and awaits — so the
         // outer `.eq` itself must resolve. Keep `.eq().eq()` working as a
@@ -111,6 +120,32 @@ describe('GET /api/daily/weekly-chest/status', () => {
     expect(res.status).toBe(401)
     const body = await res.json()
     expect(body.error).toBe('Unauthorized')
+  })
+
+  it('a freeze bridges a single missed day so the cycle completes — and the frozen day does NOT pollute scoring', async () => {
+    // Cycle ending today (2026-05-12): days 05-06..05-12. Played 6 of them
+    // (missed 05-11) all at efficiency 900 → 90; a freeze row covers 05-11.
+    vi.mocked(createClient).mockResolvedValue(
+      makeMockSupabase({
+        huntAttempts: [
+          { puzzle_date: '2026-05-06', efficiency_score: 900 },
+          { puzzle_date: '2026-05-07', efficiency_score: 900 },
+          { puzzle_date: '2026-05-08', efficiency_score: 900 },
+          { puzzle_date: '2026-05-09', efficiency_score: 900 },
+          { puzzle_date: '2026-05-10', efficiency_score: 900 },
+          { puzzle_date: '2026-05-12', efficiency_score: 900 },
+        ],
+        frozenDates: [{ frozen_date: '2026-05-11' }],
+      }) as any,
+    )
+    const res = await GET()
+    const body = await res.json()
+    expect(body.daysCompleted).toBe(7)
+    expect(body.isClaimable).toBe(true)
+    // Frozen day excluded from scoring: avg of the six played days (90), not
+    // diluted to ~77 by counting the frozen day as a zero.
+    expect(body.weekScore).toBe(90)
+    expect(body.projectedTier).toBe('gold')
   })
 
   it('returns daysCompleted 0 when no attempts', async () => {

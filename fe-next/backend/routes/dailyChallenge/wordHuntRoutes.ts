@@ -39,6 +39,7 @@ import {
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
 import { shouldCreditDailyChallengeQuest } from '../../../lib/daily/questCredit';
 import { isSubmittableDate, isCatchUpDate } from '../../../utils/dailyChallenge/catchUp';
+import { freezeDateToBridge } from '../../../lib/daily/chestFreezeBridge';
 
 const router: Router = express.Router();
 
@@ -374,7 +375,40 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
           ...(huntRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
           ...(wheelRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
         ]
-        const progress = computeCycleProgress(allDates, today)
+
+        // Freeze bridge: a freeze the player earned (player_engagement pool, e.g.
+        // from a gold chest) can cover ONE missed daily so a nearly-complete
+        // chest cycle isn't cleared. Never on a catch-up submit. Frozen days then
+        // bridge continuity below but carry no score row, so they don't inflate
+        // the tier (computeChestTierForCycle filters scores by date).
+        let frozenDates: string[] = []
+        try {
+          const [{ data: freezeRows }, { data: engRow }] = await Promise.all([
+            supabase.from('daily_streak_freezes').select('frozen_date').eq('player_id', playerId),
+            supabase.from('player_engagement').select('streak_freezes_available').eq('player_id', playerId).maybeSingle(),
+          ])
+          frozenDates = (freezeRows ?? []).map((r: { frozen_date: string }) => r.frozen_date)
+          const freezesAvailable = engRow?.streak_freezes_available ?? 0
+          if (!isCatchupRow) {
+            const bridgeDate = freezeDateToBridge(allDates, today, freezesAvailable)
+            if (bridgeDate && !frozenDates.includes(bridgeDate)) {
+              const { error: insErr } = await supabase
+                .from('daily_streak_freezes')
+                .insert({ player_id: playerId, frozen_date: bridgeDate })
+              if (!insErr) {
+                await supabase.from('player_engagement')
+                  .update({ streak_freezes_available: freezesAvailable - 1 })
+                  .eq('player_id', playerId)
+                frozenDates.push(bridgeDate)
+                logger.info('API', `[WordHunt] freeze bridged missed daily ${bridgeDate} for ${playerId}`)
+              }
+            }
+          }
+        } catch (fe) {
+          logger.error('API', `[WordHunt] freeze bridge error: ${(fe as Error).message}`)
+        }
+
+        const progress = computeCycleProgress([...allDates, ...frozenDates], today)
         if (progress.isClaimable) {
           const { data: existing } = await supabase
             .from('daily_weekly_chests').select('id').eq('player_id', playerId).eq('cycle_start', progress.cycleStart)
