@@ -7,9 +7,18 @@ interface MultiplayerDesktopShellProps {
 
 /**
  * Three-column desktop shell. Mounts only on desktop (caller-gated via
- * `useDesktopShellEnabled`). A `@container` query gates the 3-col layout at
- * ≥1024px container width — below that, columns stack so iframe / admin frame
- * embeds collapse gracefully without forcing a horizontal scroll.
+ * `useDesktopShellEnabled`, viewport ≥1024px). A `@container` query gates the
+ * 3-col layout — below that, columns stack so iframe / admin frame embeds
+ * collapse gracefully without forcing a horizontal scroll.
+ *
+ * Breakpoint geometry (why @[960px] and these min tracks): the mount gate is a
+ * *viewport* query but this switch is a *container* query, and an ancestor
+ * (PlayerInGameView) adds `md:p-4` = 32px, so the container is viewport−32 at
+ * the mount threshold (≈992px when the viewport is 1024px). The breakpoint and
+ * the min track sum (200+500+200 + gap-4×2 + p-4×2 = 964px) both stay ≤992 so
+ * the 3-col layout fires cleanly the moment the shell mounts — no dead band
+ * where the shell is up but stacked single-column (the "grid alone on a wide
+ * screen" symptom). See MultiplayerDesktopShell.test.tsx for the contract.
  *
  * RTL safety: only logical/symmetric Tailwind classes (gap-, flex-, grid-cols-)
  * are used. No `ml-*` / `mr-*` / `pl-*` / `pr-*` — Tailwind's RTL plugin handles
@@ -20,7 +29,7 @@ export const MultiplayerDesktopShell = memo<MultiplayerDesktopShellProps>(({ slo
     <div className="@container w-full h-full" data-mp-shell-root>
       <div
         data-mp-shell
-        className="grid gap-4 p-4 h-full grid-cols-1 @[1024px]:grid-cols-[minmax(220px,1fr)_minmax(540px,720px)_minmax(220px,1fr)]"
+        className="grid gap-4 p-4 h-full grid-cols-1 @[960px]:grid-cols-[minmax(200px,1fr)_minmax(500px,720px)_minmax(200px,1fr)]"
       >
         {/* Left rail */}
         <aside className="flex flex-col gap-3 min-w-0" data-slot="left">

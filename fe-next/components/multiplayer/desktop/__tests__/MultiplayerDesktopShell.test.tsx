@@ -26,6 +26,37 @@ describe('MultiplayerDesktopShell', () => {
     expect(container.firstChild).toHaveClass('@container');
   });
 
+  it('fires the 3-col layout at a container width reachable once mounted, without min-track overflow', () => {
+    // The shell mounts when the *viewport* is >=1024px (useDesktopShellEnabled),
+    // but the inner 3-col switch is a *container* query. An ancestor
+    // (PlayerInGameView) applies `md:p-4` (16px each side), so the shell's
+    // container is at most viewport - 32px = 992px at the mount threshold.
+    // If the container-query breakpoint or the min track widths exceed that,
+    // the grid stacks to a single column (leaderboard pushed off the board) or
+    // overflows -- the "just the grid on screen" symptom on narrow desktops.
+    const MOUNT_VIEWPORT = 1024;
+    const ANCESTOR_PADDING = 16 * 2; // md:p-4 on PlayerInGameView wrapper
+    const containerAtMount = MOUNT_VIEWPORT - ANCESTOR_PADDING; // 992
+
+    const { container } = render(<MultiplayerDesktopShell slots={mkSlots()} />);
+    const shell = container.querySelector('[data-mp-shell]') as HTMLElement;
+    const cls = shell.className;
+
+    const bp = cls.match(/@\[(\d+)px\]:grid-cols-\[/);
+    expect(bp).toBeTruthy();
+    expect(Number(bp![1])).toBeLessThanOrEqual(containerAtMount);
+
+    const tpl = cls.match(
+      /grid-cols-\[minmax\((\d+)px,1fr\)_minmax\((\d+)px,720px\)_minmax\((\d+)px,1fr\)\]/,
+    );
+    expect(tpl).toBeTruthy();
+    const [, leftMin, centerMin, rightMin] = tpl!.map(Number);
+    const INTERNAL_GAP_PAD = 16 * 2 + 16 * 2; // gap-4 (x2 gaps) + p-4 (x2 sides)
+    expect(leftMin + centerMin + rightMin + INTERNAL_GAP_PAD).toBeLessThanOrEqual(
+      containerAtMount,
+    );
+  });
+
   it('uses logical (start/end) layout for RTL safety', () => {
     const { container } = render(<MultiplayerDesktopShell slots={mkSlots()} />);
     const shell = container.querySelector('[data-mp-shell]');
