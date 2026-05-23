@@ -114,6 +114,10 @@ trap on_signal TERM INT
 # Tested by test/wip-revert.test.sh.
 # shellcheck disable=SC1091
 . "$LIB_DIR/wip-revert.sh"
+# Isolated gate: validates ONLY authored changes in a throwaway worktree, never
+# touching founder WIP. Tested by test/gate-isolated.test.sh.
+# shellcheck disable=SC1091
+. "$LIB_DIR/gate-isolated.sh"
 # Failure digest composer (sent on every failed-but-ran path so a non-shipping
 # night is never silent). Tested by test/failure-digest.test.sh.
 # shellcheck disable=SC1091
@@ -308,37 +312,44 @@ fi
 # ceiling just blocked legitimate multi-file work, so it is gone.
 
 # --- build/lint/test gate (authoritative) ---------------------------------
+# PRIMARY: gate ONLY the nightly's authored changes, on a clean HEAD checkout, in
+# a throwaway worktree (lib/gate-isolated.sh). The founder's concurrent WIP can't
+# fail our gate and is never touched. This is what makes a daytime / dirty-tree
+# run shippable — the 2026-05-23 run aborted only because the in-place gate ran
+# lint over founder WIP. FALLBACK: if worktree setup fails (rc=2), the legacy
+# in-place whole-tree gate runs (degrades to old behaviour, never to "ship
+# unvalidated").
 gate_ok="${gate_ok:-0}"
 [ "$NO_CHANGE_MODE" = "1" ] && gate_ok=1
 if [ "$NO_GATE" = "1" ]; then
   log "--no-gate — skipping lint/test/build (only safe for docs-only lanes)"
   gate_ok=1
 fi
-for attempt in 1 2; do
-  [ "$gate_ok" = "1" ] && break
-  log "gate attempt $attempt: fe-next lint + test + build:fast"
-  (
-    cd fe-next
-    npm run lint 2>&1 | tail -20
-  ) >> "$RUN_LOG" 2>&1 || { log "lint failed (attempt $attempt)"; continue; }
-  (
-    cd fe-next
-    npm run test 2>&1 | tail -30
-  ) >> "$RUN_LOG" 2>&1 || { log "test failed (attempt $attempt)"; continue; }
-  # Build into an ISOLATED dir (.next-nightly via NEXT_BUILD_DIR, honoured by
-  # next.config.mjs). A running `npm run dev` server continuously writes .next;
-  # sharing it raced the build into phantom "AvatarUidContext/AvatarEyeColorContext
-  # SSR" errors and failed the gate on 2026-05-20. Isolating the dir means the
-  # nightly build can NEVER collide with an active dev session — mid-day or 02:30.
-  # We rm only our own dir (never the dev server's .next). Start clean each attempt.
-  (
-    cd fe-next
-    rm -rf .next-nightly 2>/dev/null
-    NEXT_BUILD_DIR=.next-nightly npm run build:fast 2>&1 | tail -30
-  ) >> "$RUN_LOG" 2>&1 || { log "build failed (attempt $attempt)"; continue; }
-  gate_ok=1
-  break
-done
+
+if [ "$gate_ok" = "0" ]; then
+  run_isolated_gate "$NIGHTLY_AUTHORED_FILE"; iso_rc=$?
+  case "$iso_rc" in
+    0) gate_ok=1 ;;
+    1) gate_ok=0; log "isolated gate FAILED — the nightly's own lane code broke lint/test/build" ;;
+    2)
+      log "isolated gate setup unavailable — falling back to in-place whole-tree gate"
+      for attempt in 1 2; do
+        [ "$gate_ok" = "1" ] && break
+        log "gate attempt $attempt: fe-next lint + test + build:fast (in-place fallback)"
+        ( cd fe-next; npm run lint 2>&1 | tail -20 ) >> "$RUN_LOG" 2>&1 \
+          || { log "lint failed (attempt $attempt)"; continue; }
+        ( cd fe-next; npm run test 2>&1 | tail -30 ) >> "$RUN_LOG" 2>&1 \
+          || { log "test failed (attempt $attempt)"; continue; }
+        # Build into an ISOLATED dir (.next-nightly via NEXT_BUILD_DIR) so a running
+        # dev server's .next is never shared (raced phantom SSR errors on 2026-05-20).
+        ( cd fe-next; rm -rf .next-nightly 2>/dev/null
+          NEXT_BUILD_DIR=.next-nightly npm run build:fast 2>&1 | tail -30 ) >> "$RUN_LOG" 2>&1 \
+          || { log "build failed (attempt $attempt)"; continue; }
+        gate_ok=1; break
+      done
+      ;;
+  esac
+fi
 
 if [ "$gate_ok" = "0" ]; then
   # NEVER push broken code, and NEVER touch the founder's WIP. But don't throw away
@@ -348,40 +359,33 @@ if [ "$gate_ok" = "0" ]; then
   # lane's fe-next code. Salvage: drop ONLY the nightly's own authored CODE (the
   # allowlist minus docs/), keep its authored docs, then re-gate. Everything not on
   # the allowlist — founder WIP, concurrent edits — is never touched, on any branch.
-  log "GATE FAILED — dropping the nightly's own lane CODE (keeping its authored docs; founder WIP untouched)"
+  log "GATE FAILED on lane code — dropping the nightly's own authored CODE (keeping its authored docs; founder WIP untouched)"
   AUTHORED_CODE=$(mktemp); grep -vE '^docs/' "$NIGHTLY_AUTHORED_FILE" > "$AUTHORED_CODE" || true
   revert_authored "$RUN_SNAPSHOT" "$AUTHORED_CODE"
   rm -f "$AUTHORED_CODE"
 
-  log "docs-only salvage: re-gating (lane code dropped; founder WIP + nightly's authored docs only)"
-  salvage_ok=0
-  if ( cd fe-next \
-        && npm run lint >>"$RUN_LOG" 2>&1 \
-        && npm run test >>"$RUN_LOG" 2>&1 \
-        && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast >>"$RUN_LOG" 2>&1; } ); then
-    salvage_ok=1
-  fi
+  # The remaining authored files are docs/ only. Docs live at the repo root,
+  # OUTSIDE fe-next, where lint/test/build run — so `clean master + docs` is
+  # gate-clean BY CONSTRUCTION (the isolated gate already proved the dropped CODE
+  # was the failure). No re-gate needed; founder WIP is never re-touched.
+  grep -E '^docs/' "$NIGHTLY_AUTHORED_FILE" > "${NIGHTLY_AUTHORED_FILE}.tmp" 2>/dev/null || true
+  mv "${NIGHTLY_AUTHORED_FILE}.tmp" "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || : > "$NIGHTLY_AUTHORED_FILE"
+  AUTHORED_COUNT=$(grep -c . "$NIGHTLY_AUTHORED_FILE" 2>/dev/null) || AUTHORED_COUNT=0
 
-  if [ "$salvage_ok" = "1" ]; then
-    log "docs-only salvage PASSED — shipping reports/ideas/learnings, lane code dropped"
-    # Narrow the allowlist to authored docs so the commit stages only those.
-    grep -E '^docs/' "$NIGHTLY_AUTHORED_FILE" > "${NIGHTLY_AUTHORED_FILE}.tmp" 2>/dev/null || true
-    mv "${NIGHTLY_AUTHORED_FILE}.tmp" "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || : > "$NIGHTLY_AUTHORED_FILE"
-    AUTHORED_COUNT=$(grep -c . "$NIGHTLY_AUTHORED_FILE" 2>/dev/null) || AUTHORED_COUNT=0
-    [ "$AUTHORED_COUNT" = "0" ] && { NO_CHANGE_MODE=1; NEW_SHA="$START_SHA"; }
-    gate_ok=1
-    echo -e "\n**Outcome:** GATE FAILED on lane code — DOCS-ONLY salvage shipped (reports/ideas/learnings kept, lane CODE dropped, founder WIP untouched)." >> "$REPORT"
-    tg_alert "nightly $TODAY: code gate failed — shipped DOCS-ONLY (reports/ideas/learnings). Lane code dropped, founder WIP untouched. See \`$RUN_LOG\`."
-    # fall through to commit; the allowlist now lists only the nightly's docs
-  else
-    log "docs-only salvage FAILED too (founder WIP not gate-clean) — dropping the nightly's authored docs too"
-    revert_authored "$RUN_SNAPSHOT" "$NIGHTLY_AUTHORED_FILE"
+  if [ "$AUTHORED_COUNT" = "0" ]; then
+    log "no authored docs to salvage either — nothing ships tonight (founder WIP untouched)"
     : > "$NIGHTLY_AUTHORED_FILE"
     mkdir -p "$(dirname "$REPORT")"
-    echo -e "\n**Outcome:** GATE FAILED — lint/test/build failed; docs-only salvage also failed. All of the nightly's own changes dropped; founder WIP untouched." >> "$REPORT"
-    send_failure_digest "Gate failed (lint/test/build) on both attempts, and the docs-only salvage also failed. Only the nightly's own changes were dropped; founder WIP untouched."
+    echo -e "\n**Outcome:** GATE FAILED on lane code; no docs to salvage. All of the nightly's own changes dropped; founder WIP untouched." >> "$REPORT"
+    send_failure_digest "Isolated gate failed (the nightly's own lane code broke lint/test/build) and there were no docs to salvage. Only the nightly's own changes were dropped; founder WIP untouched."
     exit 1
   fi
+
+  log "docs-only salvage — shipping reports/ideas/learnings, lane code dropped ($AUTHORED_COUNT docs)"
+  gate_ok=1
+  echo -e "\n**Outcome:** GATE FAILED on lane code — DOCS-ONLY salvage shipped (reports/ideas/learnings kept, lane CODE dropped, founder WIP untouched)." >> "$REPORT"
+  tg_alert "nightly $TODAY: code gate failed — shipped DOCS-ONLY (reports/ideas/learnings). Lane code dropped, founder WIP untouched. See \`$RUN_LOG\`."
+  # fall through to commit; the allowlist now lists only the nightly's docs
 fi
 
 # --- commit + push (skipped entirely when NO_CHANGE_MODE=1) ---------------
