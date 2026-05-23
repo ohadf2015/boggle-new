@@ -28,6 +28,7 @@ import { processLongWordEngagement } from './engagementHandler';
 import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, isBlastBoardCleared, regenerateBlastBoard, recordBlastBoardClear, tryBeginWaveAdvance, endWaveAdvance } from '../modules/blastModeManager.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
 import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
+import { applyVortexLetterSwaps } from '@/components/blast/legacy/utils/blastLetterSwaps';
 import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
 import { createSeededRandom } from '@/components/blast/legacy/utils/blastLetterGenerator';
 import { BLAST_SPECIAL_TILE_CHANCE } from '@/shared/constants/blastMultiplayerConstants';
@@ -110,6 +111,12 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
           currentWave: blastState.wave ?? 1,
           rng,
         });
+
+        // 1b. Apply vortex/magnet letter swaps to the authoritative grid so it
+        // stays aligned with the (already-swapped) tileStates in processResult.next.
+        // The server skipped this before, so its grid and tileStates disagreed and
+        // it broadcast blank tiles + a board the next word couldn't validate against.
+        blastState.grid = applyVortexLetterSwaps(blastState.grid, processResult.vortexLetterSwaps);
 
         // 2. Apply gravity WITH refill — timer-era Blast keeps the board alive
         // for the whole countdown; tiles cascade and refill continuously.

@@ -6,6 +6,7 @@ import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { generateTileStates } from '../utils/blastTileGeneration';
 import { guaranteeObjectiveTiles } from '../utils/blastObjectiveGuarantee';
 import { processTilesForWord } from '../utils/clearTilesProcessor';
+import { applyVortexLetterSwaps } from '../utils/blastLetterSwaps';
 import { applyBetweenTurnEffects } from '../utils/blastTileEffects';
 import { computeThawedCells } from './blastCellFilterLogic';
 import { computeGravityResult, type GravityResult } from '../utils/blastGravity';
@@ -289,16 +290,12 @@ export function useBlastEngine(
 
     if (word.length > bestWordRef.current.length) bestWordRef.current = word;
 
-    // Apply vortex letter swaps to grid
+    // Apply vortex letter swaps to grid (shared with the authoritative server
+    // via applyVortexLetterSwaps so both sides swap identically).
     if (vortexLetterSwaps.length > 0) {
       const baseGrid = effectiveGridRef.current;
       if (baseGrid) {
-        const swappedGrid = baseGrid.map(row => [...row]);
-        for (const swap of vortexLetterSwaps) {
-          const tmp = swappedGrid[swap.fromR][swap.fromC];
-          swappedGrid[swap.fromR][swap.fromC] = swappedGrid[swap.toR][swap.toC];
-          swappedGrid[swap.toR][swap.toC] = tmp;
-        }
+        const swappedGrid = applyVortexLetterSwaps(baseGrid, vortexLetterSwaps);
         setCurrentGrid(swappedGrid);
         effectiveGridRef.current = swappedGrid;
       }

@@ -164,6 +164,8 @@ import { getGame, getGameBySocketId, getUsernameBySocketId, addPlayerWord, getFi
 import { isWordOnBoardAsync } from '../modules/wordValidatorPool';
 import { isDictionaryWord, isValidWordCached } from '../dictionary';
 import { isWordCommunityValid, isWordValidForScoring } from '../modules/communityWordManager';
+import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
+import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
 import { registerWordHandlers } from '../handlers/wordHandler';
 
 function makeBlastGame(overrides = {}) {
@@ -244,5 +246,25 @@ describe('wordHandler - Blast board sync', () => {
     // After a blast word, the authoritative grid must equal the cascaded grid
     expect(game.letterGrid).toBe(SENTINEL_GRID);
     expect(game.blastModeState.grid).toBe(SENTINEL_GRID);
+  });
+
+  it('applies vortex/magnet letter swaps to the grid BEFORE gravity so the board the next word validates against matches what the player sees', async () => {
+    const game = makeBlastGame();
+    game.blastModeState.grid = [['A', 'B'], ['C', 'D']];
+    (getGame as Mock).mockReturnValue(game);
+
+    // A vortex pull swaps A (0,0) with D (1,1).
+    (processTilesForWord as Mock).mockReturnValueOnce({
+      next: [[{}, {}], [{}, {}]],
+      newlyClearedCount: 1,
+      vortexLetterSwaps: [{ fromR: 0, fromC: 0, toR: 1, toC: 1 }],
+    });
+
+    await handlers['submitWord']({ word: 'test', comboType: null });
+
+    // Gravity must run on the SWAPPED grid (A and D exchanged), not the stale one.
+    expect(computeGravityResult as Mock).toHaveBeenCalled();
+    const gridPassedToGravity = (computeGravityResult as Mock).mock.calls[0][0];
+    expect(gridPassedToGravity).toEqual([['D', 'B'], ['C', 'A']]);
   });
 });
