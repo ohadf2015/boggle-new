@@ -233,7 +233,7 @@ const MAX_BOARD_GENERATION_ATTEMPTS = 5;
 export function generateRandomTable(
   rows: number | null = null,
   cols: number | null = null,
-  language: Language = 'he',
+  language: Language = 'en',
   wordsToEmbed: string[] = []
 ): LetterGrid {
   // Use default difficulty if no rows/cols specified
@@ -251,8 +251,12 @@ export function generateRandomTable(
     letters = spanishLetterPool;
   } else if (language === 'ja') {
     return generateJapaneseTable(rows, cols);
-  } else {
+  } else if (language === 'he') {
     letters = hebrewLetters;
+  } else {
+    // Unknown/undefined language must NOT silently become Hebrew — that leaked a
+    // Hebrew board onto English players. Hebrew now requires an explicit 'he'.
+    letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   }
 
   // If we have words to embed, use enhanced generation
