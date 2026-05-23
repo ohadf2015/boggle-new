@@ -204,8 +204,18 @@ props would have reset coins on every level advance (BlastGame is keyed, so it r
 
 ## Known limitations / accepted costs
 
-- **The boot loader shows briefly for brand-new players** (`currentLevel === 1` still waits on the
-  GET). Cheap future win: short-circuit the loader when `progressLoaded && currentLevel === 1`.
+- **The boot loader shows briefly for ALL players, including brand-new ones** (~100–300ms — the
+  duration of the progress GET, plus a claim hop if coming from guest LS). This is a deliberate
+  regression vs. the pre-Plan-3b behavior, where `BlastGame` painted level 1 instantly while the
+  hook loaded in the background.
+
+  **Decision: keep the gate.** The only alternative is to render level 1 immediately and swap on
+  resume — but that shows a level-1 flash to returning players, which reads as "my progress was
+  lost" for the exact users whose progress we just started saving. Protecting that perception is
+  worth a brief branded-mascot loader on entry (standard game UX). A future refinement could
+  instant-paint genuinely-new players by persisting a synchronous client-side level hint for all
+  users (not just guests) and gating only when the hint is `> 1`; deferred as not worth the extra
+  state today.
 
 ## Rollout / risk
 
