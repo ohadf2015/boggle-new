@@ -117,19 +117,31 @@ export function buildTowerColumn(floors: ReadonlyArray<{ word: string }>): Colum
       return;
     }
 
-    chars.forEach((char, j) => {
-      // Connector: first char of a chained word === previous word's last char.
-      // Merge into the existing tile (tint = blend) instead of duplicating it.
-      if (j === 0 && i > 0) {
-        const prev = cells[cells.length - 1];
-        if (prev && prev.kind === 'letter') {
-          prev.color = blendColors(prev.color, color);
-          prev.shared = true;
-          return;
-        }
+    // Shared connector with the previous word: 1 char normally, 2 when the chain
+    // continued through a vowel ([before][vowel]). Detected by matching the prev
+    // word's tail to this word's head — merge those leading tiles (blend tint)
+    // rather than duplicate them, so the chain reads as one continuous ribbon.
+    let start = 0;
+    if (i > 0) {
+      const prev = Array.from(floors[i - 1].word ?? '');
+      const conn = sharedConnectorLen(prev, chars);
+      for (let k = 0; k < conn; k++) {
+        const cell = cells[cells.length - conn + k];
+        if (cell && cell.kind === 'letter') { cell.color = blendColors(cell.color, color); cell.shared = true; }
       }
-      cells.push({ kind: 'letter', char, color, shared: false });
-    });
+      start = conn;
+    }
+    for (let j = start; j < chars.length; j++) {
+      cells.push({ kind: 'letter', char: chars[j], color, shared: false });
+    }
   });
   return cells;
+}
+
+/** Length of the shared chain connector between consecutive words (0, 1, or 2). */
+function sharedConnectorLen(prev: string[], cur: string[]): number {
+  const pn = prev.length, cn = cur.length;
+  if (pn >= 2 && cn >= 2 && cur[0] === prev[pn - 2] && cur[1] === prev[pn - 1]) return 2;
+  if (pn >= 1 && cn >= 1 && cur[0] === prev[pn - 1]) return 1;
+  return 0;
 }

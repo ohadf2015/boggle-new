@@ -222,6 +222,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         biomeId={biomeId}
         heightM={game.heightM}
         pendingWord={tower.word}
+        anchorLen={game.anchorLetter.length}
         resultKey={tower.state.resultKey}
         errorKey={tower.state.errorKey}
         lastResult={tower.state.lastResult}

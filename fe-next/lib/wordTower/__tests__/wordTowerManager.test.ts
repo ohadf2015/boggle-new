@@ -302,7 +302,7 @@ describe('nextChainAnchor (vowel-ending chain skip)', () => {
     expect(nextChainAnchor('CAT', 'en')).toBe('T');
   });
   it('chains on the letter BEFORE a vowel ending', () => {
-    expect(nextChainAnchor('AREA', 'en')).toBe('E'); // ends A (vowel) -> use E
-    expect(nextChainAnchor('PIZZA', 'en')).toBe('Z'); // ends A -> use Z
+    expect(nextChainAnchor('AREA', 'en')).toBe('EA'); // ends A (vowel) -> [before][vowel] = EA
+    expect(nextChainAnchor('PIZZA', 'en')).toBe('ZA'); // ends A -> ZA
   });
 });

@@ -79,7 +79,9 @@ export function nextChainAnchor(word: string, language: Language): string {
   const c = canon(word, language);
   const last = c.charAt(c.length - 1);
   const vowels = CHAIN_VOWELS[language] || '';
-  if (vowels.includes(last) && c.length >= 2) return c.charAt(c.length - 2);
+  // Vowel ending → the next word starts with the letter BEFORE it AND the vowel
+  // (a 2-char anchor), keeping the vowel in the chain. Else just the last letter.
+  if (vowels.includes(last) && c.length >= 2) return c.slice(c.length - 2);
   return last;
 }
 
@@ -118,7 +120,8 @@ export function isBuildable(
 ): boolean {
   const w = canon(word, language);
   const avail = new Map<string, number>();
-  avail.set(anchorLetter, (avail.get(anchorLetter) || 0) + 1);
+  // The anchor (1 or 2 chars) supplies its letters free — they're the shared connector.
+  for (const ach of anchorLetter) avail.set(ach, (avail.get(ach) || 0) + 1);
   for (const t of tray) avail.set(t, (avail.get(t) || 0) + 1);
   for (const ch of w) {
     const n = avail.get(ch) || 0;
@@ -131,8 +134,8 @@ export function isBuildable(
 function consumeFromTray(tray: string[], canonWord: string, anchorLetter: string): string[] {
   const need = new Map<string, number>();
   for (const ch of canonWord) need.set(ch, (need.get(ch) || 0) + 1);
-  // Anchor supplies one instance of the start letter (it is not a tray tile).
-  if ((need.get(anchorLetter) || 0) > 0) need.set(anchorLetter, need.get(anchorLetter)! - 1);
+  // The anchor (1 or 2 chars) supplies its letters free (not tray tiles).
+  for (const ach of anchorLetter) { const n = need.get(ach) || 0; if (n > 0) need.set(ach, n - 1); }
   const out: string[] = [];
   for (const t of tray) {
     const n = need.get(t) || 0;
@@ -252,7 +255,7 @@ export function validateTowerWord(
   const { language } = state;
   const w = canon(word, language);
   if (w.length < WORD_TOWER_MIN_WORD_LEN) return { accepted: false, error: 'too_short' };
-  if (chainStartLetter(word, language) !== state.anchorLetter) return { accepted: false, error: 'bad_chain' };
+  if (!canon(word, language).startsWith(state.anchorLetter)) return { accepted: false, error: 'bad_chain' };
   if (!isBuildable(word, state.tray, state.anchorLetter, language)) return { accepted: false, error: 'not_buildable' };
   if (state.usedWords.has(w)) return { accepted: false, error: 'duplicate' };
   if (!isInDictionary(w)) return { accepted: false, error: 'not_in_dictionary' };

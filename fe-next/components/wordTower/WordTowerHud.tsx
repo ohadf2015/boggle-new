@@ -157,7 +157,9 @@ export function WordTowerHud(props: WordTowerHudProps) {
           key={`builder-${errorKey}`}
           className={`flex items-center justify-center gap-1.5 ${lastError && errorKey > 0 ? 'animate-neo-shake' : ''}`}
         >
-          <Tile letter={anchorLetter} variant="anchor" />
+          {Array.from(anchorLetter).map((ch, k) => (
+            <Tile key={`anchor-${k}`} letter={ch} variant="anchor" />
+          ))}
           {selected.map((idx, k) => (
             <Tile key={`${idx}-${k}`} letter={tray[idx] ?? ''} variant="selected" />
           ))}

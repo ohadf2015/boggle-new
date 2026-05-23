@@ -33,6 +33,8 @@ interface SceneProps {
   reducedMotion?: boolean;
   /** Height (px) of the bottom control deck — the tower grounds just above it. */
   bottomInsetPx?: number;
+  /** Anchor length (1 or 2) — how many leading pending chars are the connector. */
+  anchorLen?: number;
 }
 
 /** Shared camera-pan state between the DOM gesture layer and the Pixi layer. */
@@ -88,7 +90,7 @@ function snapContainerY(c: Container, toY: number, dur: number, cancelled: () =>
  * recolours in place, removed pending tiles pop out, survivors slide. Fires the
  * per-word celebration FX, and offsets the whole stack by the user's pan.
  */
-function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, lastResult, reducedMotion, bottomInsetPx = 220, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
+function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, lastResult, reducedMotion, bottomInsetPx = 220, anchorLen = 1, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
   const engine = useGameEngine();
   const containerRef = useRef<Container | null>(null);
   const registry = useRef<Map<string, TileSprite>>(new Map());
@@ -140,7 +142,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
     panState.current.shift = shift;
     const pendingColor = wordColor(floors.length);
     // Skip the anchor (pendingWord[0]) when it's already the committed top.
-    const pchars = C === 0 ? Array.from(pendingWord) : Array.from(pendingWord).slice(1);
+    const pchars = C === 0 ? Array.from(pendingWord) : Array.from(pendingWord).slice(anchorLen);
 
     const live: LiveCell[] = committed.map((cell, i) => ({
       key: `s${i}`,
@@ -231,7 +233,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
 
     firstRender.current = false;
     prevMaxPos.current = maxPos;
-  }, [floors, pendingWord, engine, reducedMotion, bottomInsetPx, panState]);
+  }, [floors, pendingWord, engine, reducedMotion, bottomInsetPx, anchorLen, panState]);
 
   // Shake the stack when a word is rejected.
   useEffect(() => {

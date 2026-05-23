@@ -24,13 +24,13 @@ export function countBuildableWords(
 
   // Available letters = the tray plus the anchor (the word's shared first letter).
   const avail = new Map<string, number>();
-  avail.set(anchor, 1);
+  for (const ach of anchor) avail.set(ach, (avail.get(ach) ?? 0) + 1);
   for (const t of tray) avail.set(t, (avail.get(t) ?? 0) + 1);
 
   let count = 0;
   for (const w of dict) {
     if (w.length < minLen) continue;
-    if (w[0] !== anchor) continue;
+    if (!w.startsWith(anchor)) continue;
     if (usedWords?.has(w)) continue;
     const need = new Map<string, number>();
     let ok = true;
@@ -59,7 +59,7 @@ export function pickClueWord(
 ): string | null {
   if (!anchor) return null;
   const avail = new Map<string, number>();
-  avail.set(anchor, 1);
+  for (const ach of anchor) avail.set(ach, (avail.get(ach) ?? 0) + 1);
   for (const t of tray) avail.set(t, (avail.get(t) ?? 0) + 1);
 
   // Prefer the shortest word of length >= 4 (so the masked reveal shows more
@@ -69,7 +69,7 @@ export function pickClueWord(
   let fallback: string | null = null;  // shortest overall (>= minLen)
   for (const w of dict) {
     if (w.length < minLen) continue;
-    if (w[0] !== anchor) continue;
+    if (!w.startsWith(anchor)) continue;
     if (usedWords?.has(w)) continue;
     const improvesFallback = fallback === null || w.length < fallback.length;
     const improvesBest = w.length >= PREF && (best === null || w.length < best.length);
