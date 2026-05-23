@@ -7,6 +7,7 @@ import { SPRING_PRESETS } from '@/lib/animation/presets';
 import Avatar from '@/components/Avatar';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { MIN_WORD_LENGTH } from '@/shared/constants/gameConstants';
 
 // Hebrew final letters (sofit) mapping - non-final to final form
 const HEBREW_FINAL_LETTERS: Record<string, string> = {
@@ -128,7 +129,11 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
   const showForming = isForming && !showFeedback;
 
   // Show content if we're forming OR have feedback OR have a last word to show
-  const hasContent = showForming || showFeedback || lastWord.length > 0;
+  // Only show while actively forming or while feedback is on screen. A
+  // just-submitted word must NOT linger as a stale pill — the area returns to
+  // empty until the player starts a new word (lastWord is kept only as a
+  // pre-feedback bridge for async validation, not as a resting display).
+  const hasContent = showForming || showFeedback;
 
   // Get display word - forming word, feedback word, or last word
   // Apply Hebrew final letters (sofit) transformation for proper display
@@ -273,9 +278,11 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                     : displayWord}
             </span>
 
-            {/* Letter count - only when forming */}
+            {/* Letter count - only once the word is long enough to be submittable.
+                Below MIN_WORD_LENGTH (e.g. a lone "A") the badge reads as a
+                Scrabble point value ("A 1"), so suppress it. */}
             <AnimatePresence mode="popLayout">
-              {showForming && (
+              {showForming && displayLetterCount >= MIN_WORD_LENGTH && (
                 <m.span
                   key="letter-count"
                   initial={{ scale: 0, opacity: 0 }}

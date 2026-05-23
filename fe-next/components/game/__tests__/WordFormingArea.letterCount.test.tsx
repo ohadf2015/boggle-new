@@ -53,3 +53,16 @@ describe('WordFormingArea letter-count badge', () => {
     expect(screen.getByText('2')).toBeInTheDocument();
   });
 });
+
+describe('WordFormingArea post-submit clearing', () => {
+  it('clears the word from the display once the player stops forming it (after submit)', () => {
+    const { rerender } = render(<WordFormingArea word="CAT" letterCount={3} feedback={null} />);
+    expect(screen.getByText('CAT')).toBeInTheDocument();
+
+    // Word submitted → trace path reset → word becomes empty, no active feedback.
+    rerender(<WordFormingArea word="" letterCount={0} feedback={null} />);
+
+    // The submitted word must not linger; the area returns to its empty state.
+    expect(screen.queryByText('CAT')).not.toBeInTheDocument();
+  });
+});
