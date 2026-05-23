@@ -109,6 +109,26 @@ describe('generateAndroidReleaseLaunchHtml (cached render)', () => {
     expect(lower).toMatch(/background-color:#00ffff;[^"]*3px solid #000000/);
   });
 
+  it('renders the LexiClash brand LOGO image (not the old text wordmark) in the header', async () => {
+    const en = await generateAndroidReleaseLaunchHtml({
+      recipientName: 'Alex', language: 'en',
+      unsubscribeUrl: 'https://example.com/unsub', playUrl: PLAY_STORE_URL,
+    });
+    expect(en.html).toContain('/email-assets/email-logo-en.png');
+    expect(en.html).toContain('alt="LexiClash"');
+    // the old plain-text "LEXICLASH" wordmark node must be gone
+    expect(en.html).not.toContain('>LEXICLASH<');
+  });
+
+  it('uses the Hebrew logo variant for he', async () => {
+    const he = await generateAndroidReleaseLaunchHtml({
+      recipientName: 'דנה', language: 'he',
+      unsubscribeUrl: 'https://example.com/unsub', playUrl: PLAY_STORE_URL,
+    });
+    expect(he.html).toContain('/email-assets/email-logo-he.png');
+    expect(he.html).not.toContain('/email-assets/email-logo-en.png');
+  });
+
   it('does NOT render the bare colored play emoji in the CTA', async () => {
     const { html } = await generateAndroidReleaseLaunchHtml({
       recipientName: 'Alex',

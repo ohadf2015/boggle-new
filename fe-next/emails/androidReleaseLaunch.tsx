@@ -40,6 +40,14 @@ export const HERO_IMAGE =
 export const PLAY_ICON_IMAGE =
   'https://www.lexiclash.live/email-assets/android-release-play-icon.png';
 
+// Brand wordmark logo (PNG — webp isn't email-safe). Background recolored to the
+// email navy so it floats seamlessly. he gets the Hebrew lockup; everyone else
+// the Latin one (brand is Latin "LexiClash" in all non-he locales).
+export const LOGO_IMAGE_EN =
+  'https://www.lexiclash.live/email-assets/email-logo-en.png';
+export const LOGO_IMAGE_HE =
+  'https://www.lexiclash.live/email-assets/email-logo-he.png';
+
 // Neo-brutalist palette (mirrors .claude/docs/design-system.md).
 const C = {
   bg: '#1a1a2e',
@@ -79,6 +87,7 @@ export default function AndroidReleaseLaunchEmail({
   // Semantic color map (mirrors in-app mode coding): daily→lime (primary),
   // multiplayer→pink, offline→cyan. Chip order matches the strings array.
   const chipColors = [C.lime, C.pink, C.cyan];
+  const logoSrc = rtl ? LOGO_IMAGE_HE : LOGO_IMAGE_EN;
 
   return (
     <Html lang={language} dir={dir}>
@@ -138,20 +147,22 @@ export default function AndroidReleaseLaunchEmail({
                   dir={dir}
                   style={{ maxWidth: '600px' }}
                 >
-                  {/* Wordmark */}
+                  {/* Brand logo (bg pre-flattened to the email navy → no seam) */}
                   <tr>
-                    <td
-                      align="center"
-                      style={{
-                        paddingBottom: '20px',
-                        fontFamily: FONT_STACK,
-                        fontSize: '24px',
-                        fontWeight: 700,
-                        letterSpacing: '1px',
-                        color: C.lime,
-                      }}
-                    >
-                      LEXICLASH
+                    <td align="center" style={{ paddingBottom: '22px' }}>
+                      <Img
+                        src={logoSrc}
+                        alt="LexiClash"
+                        width="184"
+                        style={{
+                          display: 'inline-block',
+                          width: '184px',
+                          maxWidth: '62%',
+                          height: 'auto',
+                          border: 0,
+                          outline: 'none',
+                        }}
+                      />
                     </td>
                   </tr>
 
