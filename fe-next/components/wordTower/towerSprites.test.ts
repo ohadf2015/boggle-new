@@ -9,14 +9,14 @@ vi.mock('pixi.js', () => ({
   TextStyle: class {},
 }));
 
-import { paintTile, type TileSprite } from './towerSprites';
+import { paintTile, drawBlockSurface, type TileSprite } from './towerSprites';
 
 // Minimal stand-in for a TileSprite. The unguarded paintTile mutates
 // color/pending then dereferences tile.shadow / tile.face — so a null on
 // either reproduces Sentry JAVASCRIPT-NEXTJS-1CK:
 // "Cannot read properties of null (reading 'clear')".
 const chainable = () => {
-  const g = { clear: vi.fn(() => g), roundRect: vi.fn(() => g), rect: vi.fn(() => g), fill: vi.fn(() => g), stroke: vi.fn(() => g) };
+  const g = { clear: vi.fn(() => g), roundRect: vi.fn(() => g), rect: vi.fn(() => g), circle: vi.fn(() => g), fill: vi.fn(() => g), stroke: vi.fn(() => g) };
   return g;
 };
 const fakeTile = (over: Partial<Record<keyof TileSprite, unknown>>): TileSprite =>
@@ -48,5 +48,40 @@ describe('paintTile teardown guard', () => {
     const tile = fakeTile({ destroyed: true, shadow });
     paintTile(tile, 0x00ff00, false);
     expect(shadow.clear).not.toHaveBeenCalled();
+  });
+});
+
+describe('paintTile isometric bevel', () => {
+  it('draws four edge bands (top + base + left + right) so blocks read as 3D bricks, not flat chiclets', () => {
+    const face = chainable();
+    const tile = fakeTile({ face });
+    paintTile(tile, 0x00ff00, false);
+    // top strip, base band, left bevel, right bevel
+    expect(face.rect).toHaveBeenCalledTimes(4);
+  });
+});
+
+describe('drawBlockSurface', () => {
+  it('paints window grids for the city surface', () => {
+    const g = chainable();
+    drawBlockSurface(g, 48, 'windows');
+    expect(g.fill).toHaveBeenCalled();
+    expect(g.rect).toHaveBeenCalled();
+  });
+
+  it('paints seam panels + rivets for the orbit surface', () => {
+    const g = chainable();
+    drawBlockSurface(g, 48, 'panels');
+    expect(g.fill).toHaveBeenCalled();
+  });
+
+  it('paints glinting facets for deep-space surfaces', () => {
+    const g = chainable();
+    drawBlockSurface(g, 48, 'facets');
+    expect(g.fill).toHaveBeenCalled();
+  });
+
+  it('never throws on a torn-down graphics (defensive, like paintTile)', () => {
+    expect(() => drawBlockSurface(null as unknown as never, 48, 'windows')).not.toThrow();
   });
 });

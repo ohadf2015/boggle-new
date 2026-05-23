@@ -9,6 +9,7 @@
  */
 import { Container, Graphics, Text, TextStyle } from 'pixi.js';
 import { textColorOn } from '@/lib/wordTower/towerColumn';
+import type { BlockSurface } from '@/lib/wordTower/blockGrade';
 import { tileVariation, type TileVariation } from './tileVariation';
 
 const FONT = 'Fredoka, Rubik, sans-serif';
@@ -18,6 +19,10 @@ const FONT = 'Fredoka, Rubik, sans-serif';
 export type TileSprite = Container & {
   face: Graphics;
   shadow: Graphics;
+  /** Static per-zone surface decoration (windows / panels / facets). Built once
+   *  at {@link makeTile}; never redrawn (a tile's altitude — hence biome — is
+   *  fixed the moment it is placed), so colour tweens skip it. */
+  detail: Graphics | null;
   glyph: Text | null;
   size: number;
   color: number;
@@ -100,12 +105,20 @@ export function paintTile(tile: TileSprite, color: number, pending: boolean, sha
   const g = tile.face;
   g.clear();
   g.roundRect(-half, -half, s, s, r).fill({ color: faceColor, alpha: a });
-  // Flat two-tone block shading: lit top strip + darker base band (inset so the
-  // bands never collide with the rounded corners).
+  // Isometric block shading: light reads from the top-LEFT, so a lit top strip +
+  // lit left edge meet at a bright corner, and a dark base band + dark right edge
+  // meet at a shadowed corner — giving each tile real extruded weight (a chunky
+  // building block) instead of a flat coloured chiclet. Inset so the bands never
+  // collide with the rounded corners.
+  const edge = Math.ceil(r * 0.5);
   const topH = Math.round(s * 0.15 * (v?.highlight ?? 1));
   const baseH = Math.round(s * 0.22);
-  g.rect(-half + inset, -half + Math.ceil(r * 0.5), s - inset * 2, topH).fill({ color: shade(faceColor, 1.3), alpha: a * 0.9 });
-  g.rect(-half + inset, half - Math.ceil(r * 0.5) - baseH, s - inset * 2, baseH).fill({ color: shade(faceColor, 0.6), alpha: a });
+  const sideW = Math.round(s * 0.13);
+  const innerH = s - inset * 2;
+  g.rect(-half + inset, -half + edge, s - inset * 2, topH).fill({ color: shade(faceColor, 1.32), alpha: a * 0.9 });
+  g.rect(-half + edge, -half + inset, sideW, innerH).fill({ color: shade(faceColor, 1.18), alpha: a * 0.7 });
+  g.rect(half - edge - sideW, -half + inset, sideW, innerH).fill({ color: shade(faceColor, 0.72), alpha: a * 0.85 });
+  g.rect(-half + inset, half - edge - baseH, s - inset * 2, baseH).fill({ color: shade(faceColor, 0.6), alpha: a });
   g.roundRect(-half, -half, s, s, r).stroke({ color: 0x000000, width: Math.max(4, s * 0.06), alignment: 1, alpha: pending ? 0.85 : 1 });
 
   if (shared && !pending) {
@@ -121,9 +134,53 @@ export function paintTile(tile: TileSprite, color: number, pending: boolean, sha
   }
 }
 
+/**
+ * Static per-zone surface decoration, drawn ONCE onto a tile's detail layer:
+ * city/sky tiles wear a recessed window grid (skyscraper), mid-altitude tiles
+ * wear riveted hull panels, deep-space tiles glint with crystalline facets. Tile
+ * coords are centred (−half..half), matching the face. Drawn in near-black /
+ * near-white with low alpha so it reads on any graded fill (and any ghost). */
+export function drawBlockSurface(g: Graphics | null, size: number, surface: BlockSurface): void {
+  if (!g) return;
+  const half = size / 2;
+  const dark = 0x05060a;
+  const lite = 0xfffef0;
+  if (surface === 'windows') {
+    // 2 columns × 3 rows of small recessed windows, a couple "lit".
+    const cols = 2, rows = 3;
+    const pad = size * 0.2;
+    const gw = (size - pad * 2) / (cols * 2 - 1);
+    const gh = (size - pad * 2) / (rows * 2 - 1);
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const x = -half + pad + c * gw * 2;
+        const y = -half + pad + r * gh * 2;
+        const lit = (r + c) % 3 === 0;
+        g.rect(x, y, gw, gh).fill({ color: lit ? 0xffe27a : dark, alpha: lit ? 0.5 : 0.3 });
+      }
+    }
+  } else if (surface === 'panels') {
+    // Two horizontal hull seams + four corner rivets.
+    const inset = size * 0.2;
+    const seamW = Math.max(1, size * 0.04);
+    g.rect(-half + inset, -size * 0.06, size - inset * 2, seamW).fill({ color: dark, alpha: 0.32 });
+    g.rect(-half + inset, size * 0.14, size - inset * 2, seamW).fill({ color: dark, alpha: 0.32 });
+    const rv = size * 0.05;
+    for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
+      g.circle(sx * (half - inset * 1.1), sy * (half - inset * 1.1), rv).fill({ color: lite, alpha: 0.4 });
+    }
+  } else {
+    // facets: a bright glint + two thin crystalline lines.
+    g.circle(-size * 0.12, -size * 0.12, size * 0.08).fill({ color: lite, alpha: 0.5 });
+    g.rect(-half + size * 0.22, half - size * 0.34, size * 0.5, Math.max(1, size * 0.03)).fill({ color: lite, alpha: 0.22 });
+    g.rect(half - size * 0.34, -half + size * 0.24, Math.max(1, size * 0.03), size * 0.42).fill({ color: lite, alpha: 0.22 });
+  }
+}
+
 /** Build a tile. `char === null` → a label-less brick (versus spoiler-free row).
- *  `pos` (position from the base) seeds the deterministic per-tile variation. */
-export function makeTile(char: string | null, size: number, color: number, pending: boolean, shared = false, pos?: number): TileSprite {
+ *  `pos` (position from the base) seeds the deterministic per-tile variation.
+ *  `surface` paints the zone decoration once (skipped for bricks). */
+export function makeTile(char: string | null, size: number, color: number, pending: boolean, shared = false, pos?: number, surface?: BlockSurface): TileSprite {
   const tile = new Container() as TileSprite;
   tile.size = size;
   tile.color = color;
@@ -132,10 +189,16 @@ export function makeTile(char: string | null, size: number, color: number, pendi
   if (pos != null) tile.variation = tileVariation(pos);
   tile.shadow = new Graphics();
   tile.face = new Graphics();
+  tile.detail = surface ? new Graphics() : null;
   tile.glyph = char != null
     ? new Text({ text: char, style: new TextStyle({ fontFamily: FONT, fontSize: Math.min(size * 0.62, 40), fontWeight: '700', fill: 0x000000 }) })
     : null;
   tile.addChild(tile.shadow, tile.face);
+  if (tile.detail) {
+    drawBlockSurface(tile.detail, size, surface!);
+    tile.detail.alpha = pending ? 0.4 : 0.85;
+    tile.addChild(tile.detail);
+  }
   if (tile.glyph) {
     tile.glyph.anchor.set(0.5);
     tile.glyph.y = -Math.round(size * 0.02); // optical-centre against the base band
@@ -187,6 +250,7 @@ export function popOut(tile: TileSprite, onDone: () => void): void {
 
 /** Lerp a tile's fill to a new colour (connector blend / ghost→solid lock-in). */
 export function recolor(tile: TileSprite, toColor: number, toPending: boolean, toShared = false): void {
+  if (tile.detail) tile.detail.alpha = toPending ? 0.4 : 0.85; // ghost→solid brightens the decoration too
   const from = tile.color;
   if (from === toColor && tile.pending === toPending) { paintTile(tile, toColor, toPending, toShared); return; }
   run(tile, 340, 0, (k) => paintTile(tile, lerpHex(from, toColor, easeOutCubic(k)), toPending, toShared), () => paintTile(tile, toColor, toPending, toShared));

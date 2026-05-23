@@ -6,7 +6,8 @@ import { GameCanvas, useGameEngine } from '@/lib/gameEngine';
 import { CONFETTI_BURST, COMBO_FLASH, GOLD_STARS } from '@/lib/gameEngine/presets/particles';
 import { biomeForHeight, type WordTowerFloor, type ApplyResult } from '@/lib/wordTower/wordTowerManager';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
-import { buildTowerColumn, wordColor } from '@/lib/wordTower/towerColumn';
+import { buildTowerColumn, cellAltitudes, wordColor } from '@/lib/wordTower/towerColumn';
+import { gradeBlockColor, blockSurface, type BlockSurface } from '@/lib/wordTower/blockGrade';
 import { viewAltitudeFor } from '@/lib/wordTower/viewAltitude';
 import { biomeBlendAt } from '@/lib/wordTower/biomeBlend';
 import { letterPlacementFx } from '@/lib/wordTower/placementFx';
@@ -65,6 +66,8 @@ interface LiveCell {
   pos: number; // position from the bottom — stable registry key
   char: string | null;
   color: number;
+  /** Zone decoration for this tile — by the biome at its OWN altitude. */
+  surface: BlockSurface;
   pending: boolean;
   shared: boolean;
 }
@@ -142,21 +145,31 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
     const panMin = towerPanMin(centerY(0), H, bottomInsetPx, half);
     panState.current.panMin = panMin;
     panState.current.shift = shift;
+    // Grade every committed tile by the biome at ITS OWN altitude (the tower
+    // spans city→space at once): the base reads bright-and-built, the top dim-
+    // and-neon, with the zone shifting continuously as you scroll the column.
+    const alts = cellAltitudes(floors);
     const pendingColor = wordColor(floors.length);
+    const topSurface = blockSurface(biomeId);
     // Skip the anchor (pendingWord[0]) when it's already the committed top.
     const pchars = C === 0 ? Array.from(pendingWord) : Array.from(pendingWord).slice(anchorLen);
 
-    const live: LiveCell[] = committed.map((cell, i) => ({
-      key: `s${i}`,
-      pos: i,
-      char: cell.kind === 'letter' ? cell.char : null,
-      color: cell.color,
-      pending: false,
-      shared: cell.kind === 'letter' ? cell.shared : false,
-    }));
+    const live: LiveCell[] = committed.map((cell, i) => {
+      const zone = biomeForHeight(alts[i] ?? 0);
+      return {
+        key: `s${i}`,
+        pos: i,
+        char: cell.kind === 'letter' ? cell.char : null,
+        color: gradeBlockColor(cell.color, zone),
+        surface: blockSurface(zone),
+        pending: false,
+        shared: cell.kind === 'letter' ? cell.shared : false,
+      };
+    });
     // The very first letter at game start is the chain seed (the foundation),
     // not a preview — render it solid so it reads as "start here", not a ghost.
-    pchars.forEach((ch, k) => live.push({ key: `s${C + k}`, pos: C + k, char: ch, color: pendingColor, pending: !(C === 0 && k === 0), shared: false }));
+    // Pending tiles grow at the current top → grade them by the live top biome.
+    pchars.forEach((ch, k) => live.push({ key: `s${C + k}`, pos: C + k, char: ch, color: gradeBlockColor(pendingColor, biomeId), surface: topSurface, pending: !(C === 0 && k === 0), shared: false }));
 
     const total = live.length;
     const maxPos = total - 1;
@@ -179,7 +192,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
       const y = localY(l.pos);
       const existing = registry.current.get(l.key);
       if (!existing) {
-        const tile = makeTile(l.char, size, l.color, l.pending, l.shared, l.pos);
+        const tile = makeTile(l.char, size, l.color, l.pending, l.shared, l.pos, l.surface);
         tile.x = centerX;
         tile.zIndex = l.pos;
         c.addChild(tile);

@@ -138,8 +138,38 @@ export function buildTowerColumn(floors: ReadonlyArray<{ word: string }>): Colum
   return cells;
 }
 
+/**
+ * Cumulative altitude (m) for each cell emitted by {@link buildTowerColumn},
+ * returned as a parallel array (same length, same order). Each cell is placed at
+ * the mid-point of its floor's metre band, so the scene can grade every tile by
+ * the biome at *its own* height (the tower spans city→space simultaneously).
+ * Mirrors buildTowerColumn's emission exactly — connector letters are merged
+ * into the previous floor, so they are NOT re-counted here.
+ */
+export function cellAltitudes(floors: ReadonlyArray<{ word: string; meters: number }>): number[] {
+  const alts: number[] = [];
+  let base = 0; // altitude at the bottom of the current floor
+  floors.forEach((floor, i) => {
+    const meters = floor.meters ?? 0;
+    const chars = Array.from(floor.word ?? '');
+    if (chars.length === 0) {
+      alts.push(base + meters / 2); // brick floor → one cell at mid-band
+      base += meters;
+      return;
+    }
+    const start = i > 0 ? sharedConnectorLen(Array.from(floors[i - 1].word ?? ''), chars) : 0;
+    const emitted = chars.length - start;
+    for (let j = 0; j < emitted; j++) {
+      const frac = emitted > 0 ? (j + 0.5) / emitted : 0.5;
+      alts.push(base + meters * frac);
+    }
+    base += meters;
+  });
+  return alts;
+}
+
 /** Length of the shared chain connector between consecutive words (0, 1, or 2). */
-function sharedConnectorLen(prev: string[], cur: string[]): number {
+export function sharedConnectorLen(prev: string[], cur: string[]): number {
   const pn = prev.length, cn = cur.length;
   if (pn >= 2 && cn >= 2 && cur[0] === prev[pn - 2] && cur[1] === prev[pn - 1]) return 2;
   if (pn >= 1 && cn >= 1 && cur[0] === prev[pn - 1]) return 1;

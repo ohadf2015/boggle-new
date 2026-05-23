@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildTowerColumn, wordColor, blendColors, hexToHsl } from '../towerColumn';
+import { buildTowerColumn, cellAltitudes, wordColor, blendColors, hexToHsl } from '../towerColumn';
 
 describe('buildTowerColumn', () => {
   it('empty tower → no cells', () => {
@@ -93,6 +93,42 @@ describe('blendColors', () => {
     // shorter arc from cyan to pink crosses the high end (180→328 directly = 148°)
     expect(hm).toBeGreaterThan(Math.min(ha, hb));
     expect(hm).toBeLessThan(Math.max(ha, hb));
+  });
+});
+
+describe('cellAltitudes', () => {
+  it('emits exactly one altitude per built cell (parallel to buildTowerColumn)', () => {
+    const floors = [{ word: 'CAT', meters: 6 }, { word: 'TOP', meters: 4 }, { word: 'PEN', meters: 5 }];
+    const cells = buildTowerColumn(floors);
+    const alts = cellAltitudes(floors);
+    expect(alts).toHaveLength(cells.length);
+  });
+
+  it('matches cell count even with merged connectors (shared letters are not double-counted)', () => {
+    const floors = [{ word: 'CAT', meters: 6 }, { word: 'TEA', meters: 4 }, { word: 'EAR', meters: 5 }];
+    const cells = buildTowerColumn(floors); // C A T E A R → 6 cells (E,A shared)
+    expect(cellAltitudes(floors)).toHaveLength(cells.length);
+  });
+
+  it('rises monotonically from base to top', () => {
+    const floors = [{ word: 'CAT', meters: 6 }, { word: 'TOP', meters: 60 }, { word: 'PEN', meters: 100 }];
+    const alts = cellAltitudes(floors);
+    for (let i = 1; i < alts.length; i++) expect(alts[i]).toBeGreaterThanOrEqual(alts[i - 1]!);
+  });
+
+  it('keeps base tiles near the ground and top tiles near the total height', () => {
+    const floors = [{ word: 'CAT', meters: 10 }, { word: 'TOP', meters: 90 }];
+    const alts = cellAltitudes(floors);
+    const total = 100;
+    expect(alts[0]!).toBeLessThan(10); // base tile is in the city
+    expect(alts[alts.length - 1]!).toBeLessThanOrEqual(total);
+    expect(alts[alts.length - 1]!).toBeGreaterThan(50); // top tile is high up
+  });
+
+  it('handles empty / brick floors', () => {
+    expect(cellAltitudes([])).toEqual([]);
+    const alts = cellAltitudes([{ word: '', meters: 2 }, { word: '', meters: 2 }]);
+    expect(alts).toHaveLength(2);
   });
 });
 
