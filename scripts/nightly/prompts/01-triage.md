@@ -63,7 +63,7 @@ Anything you skipped (auth-adjacent, ambiguous root cause, refactor needed, >8 f
 ```
 
 ═══ STEP 5 — Cap + finish ═══
-PER-LANE CAP: __PER_LANE_CAP__ files. If exceeded, revert lowest-priority edits.
+NO FILE-COUNT CAP — ship everything the work genuinely needs. The lint/test/build gate validates correctness and changes are encapsulated (only your own files are touched), so never drop real edits to hit a number; just keep the change focused + coherent.
 
 DO NOT COMMIT. DO NOT PUSH. Orchestrator does it.
 

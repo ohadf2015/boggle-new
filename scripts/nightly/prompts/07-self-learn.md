@@ -27,7 +27,7 @@ Two outputs this lane:
   • Patterns that shipped repeatedly without rollback → "what works"
   • Patterns that triggered Telegram alerts, were reverted, or hit gate failures → "what failed"
   • Specific file paths or modules that keep needing fixes → "carry-forward watches"
-  • Lane budget overruns (8-file cap hits) → "tighter scope needed"
+  • Lane timeouts (exit 124) → diagnose sleep-stall vs genuine-slow
   • Lanes that frequently produce empty output → prompt clarity issue
   • Lanes that timeout → infrastructure issue
   • Manager-summary signal quality → are the right things being surfaced?
@@ -107,7 +107,7 @@ Write `docs/nightly/loop-improvements/__TODAY__.md`:
 > - report formatters (Markdown → Telegram, JSON → digest)
 > - guardrail checks (sanity caps, MCP health probes, lint-changed-files-only)
 
-- **<script-name.sh>** — what it does, why it removes manual repetition. Where it's called from. Effort: S/M/L. Counts toward the 8-file cap.
+- **<script-name.sh>** — what it does, why it removes manual repetition. Where it's called from. Effort: S/M/L.
 (0-3 items. Skip if no recurring pattern justifies one.)
 
 ## New product/feature ideas surfaced by this week's data
@@ -132,7 +132,7 @@ Rules for the "Concrete improvements" list:
 - No emojis except memory anchors that already use them.
 
 ═══ STEP 5 — Cap + finish ═══
-PER-LANE CAP: 2 files (`docs/nightly/learnings.md` + `docs/nightly/loop-improvements/__TODAY__.md`).
+This lane writes 2 files: `docs/nightly/learnings.md` + `docs/nightly/loop-improvements/__TODAY__.md`.
 
 DO NOT COMMIT. DO NOT PUSH.
 

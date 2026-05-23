@@ -48,7 +48,7 @@ Both variants must be live by end of lane. Default = control.
 For 2-3 events PostHog showed as missing/inferred (e.g., funnel steps with no direct event), add a fire site at the relevant React/server boundary. Use existing `track()` / `posthog.capture()` API. Names = `<noun>_<verb>` lowercase.
 
 ═══ STEP 5 — Cap + finish ═══
-PER-LANE CAP: __PER_LANE_CAP__ files. If exceeded, drop the new instrumentation first (lowest priority), keep the experiment + flag cleanup.
+NO FILE-COUNT CAP — ship everything the work genuinely needs. The lint/test/build gate validates correctness and changes are encapsulated (only your own files are touched), so never drop real edits to hit a number; just keep the change focused + coherent.
 
 DO NOT COMMIT. DO NOT PUSH.
 

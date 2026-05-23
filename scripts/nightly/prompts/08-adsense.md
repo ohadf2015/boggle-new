@@ -72,7 +72,7 @@ If nothing clears the bar tonight, do NOTHING and say so in the report. A no-op 
   • Grep existing i18n keys before creating new ones.
 
 ═══ STEP 5 — Cap + finish ═══
-PER-LANE CAP: __PER_LANE_CAP__ files (orchestrator auto-reverts the whole lane if exceeded). Stay well under — this lane should rarely touch more than 3-4 files.
+NO FILE-COUNT CAP — but this lane is intentionally low-touch; rarely more than 3-4 files. The gate validates correctness; keep it focused.
 
 DO NOT COMMIT. DO NOT PUSH. The orchestrator (`scripts/nightly/run.sh`) runs the lint/test/build gate and commits + pushes once for all lanes.
 

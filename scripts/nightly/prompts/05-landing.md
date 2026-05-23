@@ -9,7 +9,7 @@ Read every `.ndjson` file in `docs/nightly/feedback/` (last 7 days). Look for li
   - `mode:drop:<slug>` → that mode failed; do NOT propose anything similar this week
   - `mode:promote:<slug>` → user wants to make it public; lane 5 should propose the promotion path in the report (rollout flag + landing copy + sitemap entry) for next-night work
   - `mode:tweak:<slug>` → user wants iteration; check the chat history (msg_text_first120 field) for the change request
-  - `idea:build:<hash>` → user voted YES on yesterday's idea; ship it tonight if 8-file cap allows
+  - `idea:build:<hash>` → user voted YES on yesterday's idea; ship it tonight
   - `idea:pass:<hash>` → user voted NO; don't pitch the same idea again
 
 ═══ SKILLS TO USE ═══
@@ -30,7 +30,7 @@ Constraints (ALL must hold):
 - **Admin-only hub tile**: add the entry-point tile/card to the home/hub component (e.g., `fe-next/app/[locale]/page.tsx` or whatever the current hub is — grep for the existing mode tiles like Multiplayer/Daily/Adventure to find the pattern). Wrap it in `{isAdmin && <ExperimentalTile slug="<slug>" />}`. Reuse the existing `isAdmin` hook/helper — grep for `useIsAdmin` / `isAdmin` to find the pattern (memory `wordcraft-mvp-2026-05-04` ships an admin tile pattern).
 - **No sitemap entry, no llms.txt entry, no header nav link** — the URL exists, the discovery surface is gated.
 - **No rollout flag, no Playwriter mandate**: user playtests manually after you ship. Just make sure the page loads + the core loop works on your visual inspection during development.
-- **Per-lane 8-file cap** still applies — pick a tiny mode (one new route + minimal client logic + the hub-tile wiring + a route-scoped test). No new realtime tables. No new `auth.getUser()` calls.
+- Pick a focused mode (one new route + minimal client logic + the hub-tile wiring + a route-scoped test). No file-count cap, but stay coherent. No new realtime tables. No new `auth.getUser()` calls.
 - **MUST emit the mode URL in the report** so the user sees the link in tomorrow's Telegram digest. Use this exact format in the lane-5 section of `docs/nightly/reports/__TODAY__.md`:
 
   ```
@@ -73,7 +73,7 @@ Invoke the `frontend-design` skill (or `impeccable:craft`) with the existing pag
 
 Optionally invoke `animate-ai` for ONE entrance animation IF it serves CTA visibility — never gratuitous. Honor `prefers-reduced-motion`.
 
-OPTIONAL — image generation via mcp-image: if the variant needs a hero illustration AND no existing asset fits, use `mcp__mcp-image__generate_image` to produce one. Prompt should match brand context (read `.impeccable.md`): kawaii marshmallow cube mascot, white bg, electric color-coded modes (lime/pink/cyan/purple). Save under `fe-next/public/landing/<slug>-<n>.png`. Skip generation if it adds >2 files to the diff (per-lane cap is 8).
+OPTIONAL — image generation via mcp-image: if the variant needs a hero illustration AND no existing asset fits, use `mcp__mcp-image__generate_image` to produce one. Prompt should match brand context (read `.impeccable.md`): kawaii marshmallow cube mascot, white bg, electric color-coded modes (lime/pink/cyan/purple). Save under `fe-next/public/landing/<slug>-<n>.png`. Prefer an existing asset; generate only if the variant truly needs a hero illustration.
 
 ═══ STEP 3 — Ship as variant ═══
 - Add typed flag `landing_variant_<slug>_v1` to the experiments registry (grep `experiments/` or `getTypedExperiment` for pattern).
@@ -85,7 +85,7 @@ OPTIONAL — image generation via mcp-image: if the variant needs a hero illustr
 Invoke `code-review` skill on your diff. Address findings before stopping. (NB: skill output is advisory; build/lint/test in shell is authoritative.)
 
 ═══ STEP 5 — Cap + finish ═══
-PER-LANE CAP: __PER_LANE_CAP__ files. If exceeded, drop animation or trim trust signals.
+NO FILE-COUNT CAP — ship everything the work genuinely needs. The lint/test/build gate validates correctness and changes are encapsulated (only your own files are touched), so never drop real edits to hit a number; just keep the change focused + coherent.
 
 DO NOT COMMIT. DO NOT PUSH.
 

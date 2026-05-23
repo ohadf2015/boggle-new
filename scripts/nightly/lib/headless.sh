@@ -7,7 +7,7 @@
 # Substitutes in prompt file:
 #   __TODAY__         → YYYY-MM-DD
 #   __LEARNINGS__     → contents of docs/nightly/learnings.md (or empty)
-#   __PER_LANE_CAP__  → 8
+#   __PER_LANE_CAP__  → 8 (DEPRECATED — file-count caps removed; substitution kept as harmless no-op)
 #   __FEEDBACK_SUMMARY__ → contents of $FEEDBACK_SUMMARY_FILE (player feedback
 #                          digest written before the lane loop; empty if none)
 #

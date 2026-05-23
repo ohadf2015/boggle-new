@@ -70,7 +70,7 @@ EXCEPTION: English-only intent (e.g. "esl word games") → `isTargetLocale` + `M
   • New routes update `fe-next/app/sitemap.ts` AND `fe-next/public/llms.txt` (if AI-discoverable).
 
 ═══ STEP 6 — Cap + finish ═══
-PER-LANE CAP: __PER_LANE_CAP__ files. If your edits exceed this, REVERT the lowest-priority ones until you're at or below.
+NO FILE-COUNT CAP — ship everything the work genuinely needs. The lint/test/build gate validates correctness and changes are encapsulated (only your own files are touched), so never drop real edits to hit a number; just keep the change focused + coherent.
 
 DO NOT COMMIT. DO NOT PUSH. The orchestrator (`scripts/nightly/run.sh`) commits + pushes once for all lanes after the build/lint/test gate.
 
