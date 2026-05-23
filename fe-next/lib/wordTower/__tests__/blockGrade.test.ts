@@ -37,16 +37,20 @@ describe('gradeBlockColor', () => {
     }
   });
 
-  it('reads as ONE building material per zone — word hue is suppressed (founder: blocks should not be colourful)', () => {
-    // Two maximally-different word hues, graded into the same zone, must land on
-    // essentially the same material colour (not two different bright chips).
+  it('is EXACTLY one colour per zone — word hue ignored entirely (founder: stick to one colour per surface)', () => {
+    // Any word colour graded into a zone yields the identical material — no
+    // per-word drift at all, so a zone reads as a single flat building colour.
     for (const { id } of WORD_TOWER_BIOMES) {
-      const red = gradeBlockColor(0xff0000, id);
-      const green = gradeBlockColor(0x00ff00, id);
-      const blue = gradeBlockColor(0x0000ff, id);
-      expect(channelDist(red, green)).toBeLessThan(40);
-      expect(channelDist(green, blue)).toBeLessThan(40);
-      expect(channelDist(red, blue)).toBeLessThan(40);
+      const ref = gradeBlockColor(0xff0000, id);
+      for (const base of [0x00ff00, 0x0000ff, 0xffffff, 0x000000, 0xbfff00, wordColor(7)]) {
+        expect(gradeBlockColor(base, id)).toBe(ref);
+      }
+    }
+  });
+
+  it('that one colour is the zone material', () => {
+    for (const { id } of WORD_TOWER_BIOMES) {
+      expect(gradeBlockColor(wordColor(3), id)).toBe(blockMaterial(id));
     }
   });
 

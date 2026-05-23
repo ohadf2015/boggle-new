@@ -27,11 +27,12 @@ Two threads:
 
 ## Changes
 
-### Phase 1 — Mature, zone-dominant block palette (pure, TDD)
+### Phase 1 — One mature material colour per zone (pure, TDD)
 `lib/wordTower/blockGrade.ts`
-- Re-key `GRADE` to a per-biome **material anchor** (hex) + strong `tint`/`mix` so the
-  zone material dominates and the per-word hue collapses to negligible variance
-  (per-tile texture still comes from `tileVariation` + the isometric bevel).
+- `MATERIAL[biome]` → ONE flat building-material hex per zone. `gradeBlockColor`
+  **ignores the word hue entirely** (founder: "stick to one colour for each
+  surface") — every tile in a zone is the identical material; per-tile life comes
+  only from the isometric bevel + faint monochrome tone jitter (same hue, ±brightness).
 - Anchors (read as building, not childish):
   - city `#7c8a99` weathered concrete · sky `#7d9bb8` pale steel-glass ·
     stratosphere `#6e6a7c` titanium dusk · orbit `#39505a` gunmetal teal ·
