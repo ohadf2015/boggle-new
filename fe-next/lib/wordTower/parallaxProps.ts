@@ -74,6 +74,13 @@ export const WORD_TOWER_PROPS: ParallaxProp[] = [
   { id: 'portal',     src: '/images/word-tower/wt-portal.png',     atM: 950,  topPct: 28, xPct: 24, width: 110, depth: 0.8,  rangeM: 90 },
   { id: 'alien',      src: '/images/word-tower/wt-alien.png',      atM: 1450, topPct: 22, xPct: 70, width: 100, depth: 0.95, rangeM: 130 },
   { id: 'spaceship',  src: '/images/word-tower/wt-spaceship.png',  atM: 2100, topPct: 26, xPct: 30, width: 120, depth: 0.9,  rangeM: 180 },
+  // More funny sights, slotted into the altitude gaps for variety on the climb.
+  { id: 'jetpackCat', src: '/images/word-tower/wt-jetpack-cat.png', atM: 140,  topPct: 24, xPct: 30, width: 92,  depth: 1.1,  rangeM: 36 },
+  { id: 'teacup',     src: '/images/word-tower/wt-teacup.png',      atM: 210,  topPct: 30, xPct: 70, width: 100, depth: 1.0,  rangeM: 46 },
+  { id: 'donut',      src: '/images/word-tower/wt-donut.png',       atM: 410,  topPct: 26, xPct: 26, width: 96,  depth: 1.05, rangeM: 60 },
+  { id: 'disco',      src: '/images/word-tower/wt-disco.png',       atM: 540,  topPct: 22, xPct: 68, width: 90,  depth: 0.9,  rangeM: 72 },
+  { id: 'narwhal',    src: '/images/word-tower/wt-narwhal.png',     atM: 880,  topPct: 24, xPct: 28, width: 110, depth: 0.85, rangeM: 90 },
+  { id: 'wizard',     src: '/images/word-tower/wt-wizard.png',      atM: 1350, topPct: 22, xPct: 70, width: 110, depth: 0.9,  rangeM: 120 },
 ];
 
 /**
