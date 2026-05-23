@@ -556,8 +556,11 @@ export function useGridInteraction({
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!interactive) return;
 
-    // Dragging detection runs immediately (cheap)
-    if (isTouchingRef.current && !isDraggingRef.current && !isTouchDeviceRef.current) {
+    // Dragging detection runs immediately (cheap). Gate on the live pointer
+    // type, not device class — on a touch-capable PC isTouchDeviceRef flips
+    // true after any stray touchstart, which would otherwise freeze mouse-drag
+    // selection (it never builds past the first cell → nothing to submit).
+    if (isTouchingRef.current && !isDraggingRef.current && !activePointerIsTouchRef.current) {
       const deltaX = e.clientX - startPosRef.current.x;
       const deltaY = e.clientY - startPosRef.current.y;
       const movement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
