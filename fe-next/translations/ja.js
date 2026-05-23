@@ -11,6 +11,7 @@ const ja = {
     "milestone": { "m50": "木のてっぺん超え！🌳", "m150": "雲の中へ ☁️", "m400": "鳥もうらやむ 🐦", "m250": "ドローンより上だ 🛸", "m650": "星雲の気分 🌌", "m900": "宇宙までもうすぐ 🚀", "m1300": "深宇宙の住人 👽", "m1800": "ほぼ宇宙飛行士 ✨" },
     "ach": { "unlocked": "実績解除！", "firstFloor": "最初の階", "tenFloors": "高層ビル", "skyHigh": "空高く", "wordsmith": "言葉の達人", "comboKing": "コンボ王", "rivalCrusher": "ライバル撃破", "unstoppable": "止まらない", "toTheMoon": "月まで", "skylineKing": "スカイラインの王", "centurion": "百階の戦士", "comboGod": "コンボの神", "wordWizard": "言葉の魔法使い", "galaxyClass": "ギャラクシー級", "deepSpace": "深宇宙" },
     "zone": { "entered": "新エリア" },
+    "landmark": { "skyscraper": "超高層ビルの上", "cloudBase": "雲の底", "jetStream": "ジェット気流", "weatherBalloon": "気象観測気球", "karman": "宇宙の境界", "aurora": "オーロラ", "deepSpace": "深宇宙" },
     "error": { "too_short": "短すぎます — 3文字以上", "bad_chain": "光る文字で始めてください", "not_buildable": "トレイの文字を使ってください", "duplicate": "その単語は使用済みです", "not_in_dictionary": "辞書にありません" },
     "celebration": { "highRise": "ハイライズ！", "tall": "そびえ立つ！", "skyscraper": "摩天楼！" },
     "leaderboard": { "title": "トップタワー", "error": "ランキングを読み込めません", "empty": "まだ塔がありません — 最初の一人に！" },

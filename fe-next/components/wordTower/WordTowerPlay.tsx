@@ -18,6 +18,7 @@ import { WORD_TOWER_MIN_WORD_LEN } from '@/shared/constants/wordTowerConstants';
 import { countBuildableWords, pickClueWord } from '@/lib/wordTower/wordHints';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
 import { WordTowerRivalRail } from './WordTowerRivalRail';
+import { WordTowerLandmarkRail } from './WordTowerLandmarkRail';
 import { milestoneCrossed } from '@/lib/wordTower/milestones';
 import { newlyUnlocked, type Achievement } from '@/lib/wordTower/achievements';
 import { WordTowerScene } from './WordTowerScene';
@@ -247,6 +248,10 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         personalBestM={personalBest}
         t={t}
       />
+
+      {/* World altitude landmarks you climb past (cloud base, jet stream, edge
+          of space…) — gives the height a real sense of place. */}
+      <WordTowerLandmarkRail viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} />
 
       {/* Rival record lines you climb past — fed by the leaderboard. */}
       <WordTowerRivalRail rivals={rivals} viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} />

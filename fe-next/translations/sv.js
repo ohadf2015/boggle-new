@@ -11,6 +11,7 @@ const sv = {
     "milestone": { "m50": "Över trädtopparna! 🌳", "m150": "Molnland ☁️", "m400": "Fåglarna är avundsjuka 🐦", "m250": "Högre än drönarna 🛸", "m650": "Nebulosakänsla 🌌", "m900": "Knack knack, rymden? 🚀", "m1300": "Bor i yttre rymden 👽", "m1800": "Nästan astronaut nu ✨" },
     "ach": { "unlocked": "Bedrift!", "firstFloor": "Första våningen", "tenFloors": "Höghus", "skyHigh": "Skyhögt", "wordsmith": "Ordkonstnär", "comboKing": "Combo-kung", "rivalCrusher": "Rivalkrossare", "unstoppable": "Ostoppbar", "toTheMoon": "Till månen", "skylineKing": "Skyline-kung", "centurion": "Centurion", "comboGod": "Combo-gud", "wordWizard": "Ordtrollkarl", "galaxyClass": "Galaxklass", "deepSpace": "Yttre rymden" },
     "zone": { "entered": "Ny zon" },
+    "landmark": { "skyscraper": "Skyskrapans topp", "cloudBase": "Molnbas", "jetStream": "Jetström", "weatherBalloon": "Väderballong", "karman": "Rymdens kant", "aurora": "Norrsken", "deepSpace": "Yttre rymden" },
     "error": { "too_short": "För kort — minst 3 bokstäver", "bad_chain": "Börja på den lysande bokstaven", "not_buildable": "Använd brickornas bokstäver", "duplicate": "Ordet är redan använt", "not_in_dictionary": "Inte i ordlistan" },
     "celebration": { "highRise": "Höghus!", "tall": "Skyhögt!", "skyscraper": "SKYSKRAPA!" },
     "leaderboard": { "title": "Topptorn", "error": "Kunde inte ladda topplistan", "empty": "Inga torn än — bli först!" },
