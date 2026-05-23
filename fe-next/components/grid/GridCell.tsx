@@ -5,7 +5,7 @@ import { getComboColors, type PerformanceMode } from './index';
 import GridCellEffects from './GridCellEffects';
 import RoundEventTileEffects from './RoundEventTileEffects';
 import DoubleClickIndicator from './DoubleClickIndicator';
-import { getSelectionEscalation, composeEscalationStyle } from './selectionEscalation';
+import { getSelectionEscalation, composeSelectedCellStyle } from './selectionEscalation';
 
 /** Cell position for highlighted paths */
 export interface HighlightedCell {
@@ -231,21 +231,23 @@ const GridCell = memo<GridCellProps>(({
         boxShadow: escalation?.glow ?? '0 0 0 2px rgba(255, 225, 53, 0.7), 0 0 8px rgba(255, 200, 100, 0.3)',
         borderColor: escalation?.borderColor,
       } as React.CSSProperties),
-      ...(isSelected && comboColors.isRainbow ? {
-        background: 'linear-gradient(135deg, #FF3366, #FF6B35, #FFE135, #BFFF00, #00FFFF, #FF1493, #8B5CF6)',
-        backgroundSize: '300% 300%',
-        animation: reduceMotion ? 'none' : `rainbow-cell ${Math.max(0.4, 2 - (selectedCellsLength - 6) * 0.2)}s ease infinite`
-      } : isSelected && comboLevel >= 5 ? {
-        background: 'linear-gradient(135deg, #FF6B35, #FF3366, #FF6B35)',
-        backgroundSize: '200% 200%',
-        animation: 'gradient-x 1.5s ease infinite'
-      } : isSelected && comboLevel >= 3 ? {
-        background: 'linear-gradient(135deg, #F97316, #EF4444)',
-      } : isSelected && comboColors.flicker ? {
-        animation: 'flicker 0.1s infinite alternate'
-      } : isSelected && escalation && escalation.tier >= 1
-        ? composeEscalationStyle(selectionIdx, selectedCellsLength, escalationCombo, reduceMotion)
-        : {}),
+      // Selected-cell background/animation. The infinite box-shadow/background
+      // animations (rainbow-cell, gradient-x, flicker, escalation-breathe) are
+      // the dominant paint cost — main-thread raster repaints every frame on
+      // every selected cell. Suppress them while a word is being built
+      // (selectedCellsLength > 0); the static escalation (tier color + glow +
+      // scale) still escalates per letter and paints once.
+      ...(isSelected ? composeSelectedCellStyle({
+        isRainbow: comboColors.isRainbow ?? false,
+        flicker: comboColors.flicker ?? false,
+        comboLevel,
+        selectionIndex: selectionIdx,
+        totalSelected: selectedCellsLength,
+        escalationCombo,
+        escalationTier: escalation?.tier ?? -1,
+        reduceMotion,
+        suppressAnimations: selectedCellsLength > 0,
+      }) : {}),
       ...(isFrozen && !isSelected ? {
         background: 'linear-gradient(135deg, rgba(186,230,253,0.6), rgba(147,197,253,0.4), rgba(186,230,253,0.6))',
         pointerEvents: 'none' as const,

@@ -1,4 +1,4 @@
-import { getSelectionEscalation, getEscalationBackground, getEscalationShake, composeEscalationStyle } from '../selectionEscalation';
+import { getSelectionEscalation, getEscalationBackground, getEscalationShake, composeEscalationStyle, composeSelectedCellStyle } from '../selectionEscalation';
 
 describe('getSelectionEscalation', () => {
   describe('tier calculation based on word length', () => {
@@ -265,5 +265,69 @@ describe('composeEscalationStyle', () => {
         : {}),
     };
     expect(composeEscalationStyle(idx, total, combo, reduceMotion)).toEqual(legacy);
+  });
+});
+
+describe('composeSelectedCellStyle — suppress continuous animations while selecting', () => {
+  // Paint cost: selected cells run INFINITE box-shadow/background-position
+  // animations (rainbow-cell, gradient-x, flicker, escalation-breathe). On
+  // multiple selected cells these repaint every frame on the main thread —
+  // "super slow on every device". While a word is being built we keep the
+  // static escalation (tier color + glow + scale) but drop the infinite
+  // animations; full juice remains in the static look + submit celebration.
+  const base = {
+    isRainbow: false,
+    flicker: false,
+    comboLevel: 0,
+    selectionIndex: 0,
+    totalSelected: 5,
+    escalationCombo: 0,
+    escalationTier: 2,
+    reduceMotion: false,
+  } as const;
+
+  const hasInfinite = (s: React.CSSProperties) =>
+    typeof s.animation === 'string' && s.animation.includes('infinite');
+
+  it('rainbow tile animates when NOT suppressed', () => {
+    const s = composeSelectedCellStyle({ ...base, isRainbow: true, totalSelected: 7, suppressAnimations: false });
+    expect(s.animation).toContain('rainbow-cell');
+    expect(s.animation).toContain('infinite');
+    // static gradient still present
+    expect(s.backgroundSize).toBe('300% 300%');
+  });
+
+  it('rainbow tile drops the infinite animation when suppressed (keeps static gradient)', () => {
+    const s = composeSelectedCellStyle({ ...base, isRainbow: true, totalSelected: 7, suppressAnimations: true });
+    expect(s.animation).toBe('none');
+    expect(s.backgroundSize).toBe('300% 300%'); // static look preserved
+  });
+
+  it('combo>=5 gradient-x animation is suppressed', () => {
+    const on = composeSelectedCellStyle({ ...base, comboLevel: 5, suppressAnimations: false });
+    expect(on.animation).toContain('gradient-x');
+    const off = composeSelectedCellStyle({ ...base, comboLevel: 5, suppressAnimations: true });
+    expect(hasInfinite(off)).toBe(false);
+  });
+
+  it('flicker animation is suppressed', () => {
+    const on = composeSelectedCellStyle({ ...base, flicker: true, suppressAnimations: false });
+    expect(on.animation).toContain('flicker');
+    const off = composeSelectedCellStyle({ ...base, flicker: true, suppressAnimations: true });
+    expect(off.animation).toBeUndefined();
+  });
+
+  it('escalation breathing animation is suppressed (static tier gradient kept)', () => {
+    const on = composeSelectedCellStyle({ ...base, escalationTier: 2, suppressAnimations: false });
+    expect(on.animation).toContain('breathe');
+    const off = composeSelectedCellStyle({ ...base, escalationTier: 2, suppressAnimations: true });
+    expect(hasInfinite(off)).toBe(false);
+    // tier-2 static background gradient still applied
+    expect(off.background).toContain('linear-gradient');
+  });
+
+  it('no selected styling for tier 0 / no combo', () => {
+    const s = composeSelectedCellStyle({ ...base, escalationTier: 0, suppressAnimations: true });
+    expect(s).toEqual({});
   });
 });

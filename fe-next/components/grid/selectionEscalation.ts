@@ -253,3 +253,66 @@ export function composeEscalationStyle(
     animation: [bg.animation, shake].filter(Boolean).join(', '),
   };
 }
+
+/**
+ * Compose the full background/animation style for a SELECTED cell — the
+ * rainbow / combo-gradient / flicker / escalation-tier branches that GridCell
+ * used to inline.
+ *
+ * `suppressAnimations` is the performance gate. The selected-cell styles run
+ * INFINITE box-shadow / background-position animations (rainbow-cell,
+ * gradient-x, flicker, escalation-breathe). Neither box-shadow nor
+ * background-position is GPU-composited, so each animates via main-thread
+ * raster repaints EVERY frame. With several cells selected this repaints
+ * continuously for the whole word build — the dominant cause of "grid feels
+ * super slow when selecting words" on every device, drag OR desktop click.
+ *
+ * While a word is being built (`suppressAnimations` = a selection is in
+ * progress) we keep the STATIC escalation look (tier gradient + glow + scale,
+ * which still escalate per letter and paint once) but drop the infinite
+ * animations. Reduced-motion users already got this; now everyone does during
+ * active selection. The expressive payoff lives in the static escalation + the
+ * word-submit celebration, not a continuous repaint storm.
+ */
+export function composeSelectedCellStyle(params: {
+  isRainbow: boolean;
+  flicker: boolean;
+  comboLevel: number;
+  selectionIndex: number;
+  totalSelected: number;
+  escalationCombo: number;
+  escalationTier: number;
+  reduceMotion: boolean;
+  suppressAnimations: boolean;
+}): React.CSSProperties {
+  const {
+    isRainbow, flicker, comboLevel, selectionIndex, totalSelected,
+    escalationCombo, escalationTier, reduceMotion, suppressAnimations,
+  } = params;
+  const noAnim = reduceMotion || suppressAnimations;
+
+  if (isRainbow) {
+    return {
+      background: 'linear-gradient(135deg, #FF3366, #FF6B35, #FFE135, #BFFF00, #00FFFF, #FF1493, #8B5CF6)',
+      backgroundSize: '300% 300%',
+      animation: noAnim ? 'none' : `rainbow-cell ${Math.max(0.4, 2 - (totalSelected - 6) * 0.2)}s ease infinite`,
+    };
+  }
+  if (comboLevel >= 5) {
+    return {
+      background: 'linear-gradient(135deg, #FF6B35, #FF3366, #FF6B35)',
+      backgroundSize: '200% 200%',
+      animation: noAnim ? 'none' : 'gradient-x 1.5s ease infinite',
+    };
+  }
+  if (comboLevel >= 3) {
+    return { background: 'linear-gradient(135deg, #F97316, #EF4444)' };
+  }
+  if (flicker) {
+    return noAnim ? {} : { animation: 'flicker 0.1s infinite alternate' };
+  }
+  if (escalationTier >= 1) {
+    return composeEscalationStyle(selectionIndex, totalSelected, escalationCombo, noAnim);
+  }
+  return {};
+}
