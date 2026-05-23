@@ -27,6 +27,7 @@ function makeMockSupabase(opts: {
   const existingIdempotent = opts.existingIdempotent ?? null;
   const existingProgress = opts.existingProgress ?? null;
   const existingBrainScore = opts.existingBrainScore ?? null;
+  const lastSessionScore = opts.lastSessionScore ?? null;
 
   return {
     rpc: vi.fn().mockResolvedValue({ data: [{ xp_granted: 30 }], error: null }),
@@ -39,6 +40,14 @@ function makeMockSupabase(opts: {
                 gte: vi.fn().mockReturnValue({
                   filter: vi.fn().mockReturnValue({
                     maybeSingle: vi.fn().mockResolvedValue({ data: existingIdempotent, error: null }),
+                  }),
+                }),
+                neq: vi.fn().mockReturnValue({
+                  order: vi.fn().mockReturnValue({
+                    limit: vi.fn().mockResolvedValue({
+                      data: lastSessionScore != null ? [{ score: lastSessionScore }] : [],
+                      error: null,
+                    }),
                   }),
                 }),
               }),
@@ -160,6 +169,76 @@ describe('processBrainDrillCompletion', () => {
       expect(result.body.brainScore).toBeDefined();
       expect(result.body.brainScore.targetDomain).toBeDefined();
       expect(typeof result.body.xpAwarded).toBe('number');
+    }
+  });
+
+  it('returns improvement signals; first ever play is not a personal best', async () => {
+    const supabase = makeMockSupabase();
+    const result = await processBrainDrillCompletion(
+      validBody,
+      'user-1',
+      'sub-uuid-3',
+      { supabase: supabase as unknown as never, source: 'offline-sync' },
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.body.improvement).toBeDefined();
+      expect(result.body.improvement.isPersonalBest).toBe(false);
+      expect(result.body.improvement.totalPlays).toBe(0);
+      expect(result.body.improvement.currentScore).toBe(validBody.score);
+    }
+  });
+
+  it('flags a personal best when the run beats the prior high score', async () => {
+    const supabase = makeMockSupabase({
+      existingProgress: { id: 'prog-1', level: 2, high_score: 400, total_plays: 3, total_score: 900, avg_score: 300 },
+    });
+    const result = await processBrainDrillCompletion(
+      validBody,
+      'user-1',
+      'sub-uuid-4',
+      { supabase: supabase as unknown as never, source: 'offline-sync' },
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.body.improvement.isPersonalBest).toBe(true);
+      expect(result.body.improvement.previousBest).toBe(400);
+      expect(result.body.improvement.averageScore).toBe(300);
+    }
+  });
+
+  it('flags improvedVsLast via the drill_sessions vs-last query (.neq.order.limit)', async () => {
+    const supabase = makeMockSupabase({
+      existingProgress: { id: 'prog-1', level: 2, high_score: 900, total_plays: 4, total_score: 2000, avg_score: 500 },
+      lastSessionScore: 500,
+    });
+    const result = await processBrainDrillCompletion(
+      validBody,
+      'user-1',
+      'sub-uuid-5',
+      { supabase: supabase as unknown as never, source: 'offline-sync' },
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.body.improvement.improvedVsLast).toBe(true);
+      expect(result.body.improvement.isPersonalBest).toBe(false);
+    }
+  });
+
+  it('does not flag improvedVsLast when the previous session scored higher', async () => {
+    const supabase = makeMockSupabase({
+      existingProgress: { id: 'prog-1', level: 2, high_score: 900, total_plays: 4, total_score: 2000, avg_score: 500 },
+      lastSessionScore: 650,
+    });
+    const result = await processBrainDrillCompletion(
+      validBody,
+      'user-1',
+      'sub-uuid-6',
+      { supabase: supabase as unknown as never, source: 'offline-sync' },
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.body.improvement.improvedVsLast).toBe(false);
     }
   });
 });
