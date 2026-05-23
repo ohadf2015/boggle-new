@@ -31,6 +31,23 @@ if [ -z "${TELEGRAM_BOT_TOKEN:-}" ]; then
   exit 0
 fi
 
+# The feedback-daemon (KeepAlive launchd job) long-polls getUpdates continuously
+# and writes the SAME pending-instructions buffer this script does. Telegram
+# allows only ONE getUpdates per bot token, so polling here while the daemon runs
+# makes BOTH fail with "Conflict: terminated by other getUpdates request" — which
+# silently cost ~5 nights of founder feedback. When the daemon is alive, skip:
+# its buffer already has everything, and run.sh's consume_user_directives reads
+# the same PENDING_FILE. Poll only as a FALLBACK when the daemon is down.
+# (Detection overridable via NIGHTLY_DAEMON_CHECK so the guard is unit-testable.)
+feedback_daemon_running() {
+  if [ -n "${NIGHTLY_DAEMON_CHECK:-}" ]; then eval "$NIGHTLY_DAEMON_CHECK"; return $?; fi
+  pgrep -f "scripts/nightly/lib/feedback-daemon.sh" >/dev/null 2>&1
+}
+if feedback_daemon_running; then
+  echo "feedback-poll: feedback-daemon is the sole poller — skipping redundant getUpdates (its buffer feeds consume_user_directives)"
+  exit 0
+fi
+
 LAST_ID=$(cat "$STATE_FILE" 2>/dev/null || echo 0)
 OFFSET=$((LAST_ID + 1))
 
