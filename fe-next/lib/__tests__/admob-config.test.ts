@@ -56,6 +56,15 @@ describe('getAdmobConfig', () => {
     expect(config.rewardedUnits.freeze).toBe(DEFAULTS.android.rewardedSurfaceIds.freeze);
     expect(config.rewardedUnits.retry).toBe(DEFAULTS.android.rewardedSurfaceIds.retry);
     expect(config.rewardedUnits.timeLow).toBe(DEFAULTS.android.rewardedSurfaceIds.timeLow);
+    expect(config.rewardedUnits.catchup).toBe(DEFAULTS.android.rewardedSurfaceIds.catchup);
+  });
+
+  it('per-surface env override for catchup takes precedence over generic and default', () => {
+    process.env.NEXT_PUBLIC_ADMOB_REWARDED_ANDROID = 'ca-app-pub-x/generic';
+    process.env.NEXT_PUBLIC_ADMOB_REWARDED_CATCHUP_ANDROID = 'ca-app-pub-x/catchup';
+    const config = getAdmobConfig('android');
+    expect(config.rewardedUnits.catchup).toBe('ca-app-pub-x/catchup');
+    expect(config.rewardedUnits.generic).toBe('ca-app-pub-x/generic');
   });
 
   it('per-surface env override for hint takes precedence over generic env and surface default', () => {

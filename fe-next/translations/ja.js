@@ -9164,6 +9164,7 @@ const ja = {
     "noWordsLeft": "残りの単語はありません！",
     "moreLevelsComingSoon": "新しいレベルを準備中です。",
     "allCleared": "すべてのレベルをクリア！",
+    "loadingProgress": "進行状況を読み込み中…",
     "playAgain": "レベル1から再挑戦",
     "shuffle": "シャッフル",
     "morePoints": "ポイント追加",

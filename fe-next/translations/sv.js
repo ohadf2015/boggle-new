@@ -9138,6 +9138,7 @@ const sv = {
     "noWordsLeft": "Inga ord kvar!",
     "moreLevelsComingSoon": "Fler nivåer är på gång.",
     "allCleared": "Du klarade alla nivåer!",
+    "loadingProgress": "Laddar dina framsteg…",
     "playAgain": "Spela från nivå 1",
     "shuffle": "Blanda",
     "morePoints": "fler poäng",

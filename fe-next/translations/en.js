@@ -9070,6 +9070,7 @@ const en = {
     "noWordsLeft": "No words remaining!",
     "moreLevelsComingSoon": "Fresh levels are on the way.",
     "allCleared": "You cleared every level!",
+    "loadingProgress": "Loading your progress…",
     "playAgain": "PLAY AGAIN",
     "shuffle": "Shuffle",
     "morePoints": "more pts",

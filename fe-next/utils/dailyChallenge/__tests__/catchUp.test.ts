@@ -5,6 +5,7 @@ import {
   isSubmittableDate,
   isCatchUpDate,
   getMissedCatchUpDates,
+  shouldGateCatchUpBehindAd,
 } from '../catchUp'
 
 describe('getCatchUpDates', () => {
@@ -55,5 +56,40 @@ describe('getMissedCatchUpDates', () => {
   })
   it('ignores completed dates outside the window (e.g. today itself)', () => {
     expect(getMissedCatchUpDates(today, ['2026-05-12', '2026-04-01'])).toEqual(['2026-05-11', '2026-05-10', '2026-05-09'])
+  })
+})
+
+describe('shouldGateCatchUpBehindAd', () => {
+  // Baseline: a native catch-up play with an ad ready → must watch the ad.
+  const ready = {
+    isCatchup: true,
+    alreadyUnlocked: false,
+    isNative: true,
+    isAdAvailable: true,
+    isPlaceholderCooldown: false,
+  }
+
+  it('gates a fresh native catch-up play with an available ad', () => {
+    expect(shouldGateCatchUpBehindAd(ready)).toBe(true)
+  })
+
+  it('does not gate today\'s daily (not catch-up)', () => {
+    expect(shouldGateCatchUpBehindAd({ ...ready, isCatchup: false })).toBe(false)
+  })
+
+  it('does not re-gate once already unlocked for this date', () => {
+    expect(shouldGateCatchUpBehindAd({ ...ready, alreadyUnlocked: true })).toBe(false)
+  })
+
+  it('does not gate on web (degrades to free)', () => {
+    expect(shouldGateCatchUpBehindAd({ ...ready, isNative: false })).toBe(false)
+  })
+
+  it('does not gate when no ad is available', () => {
+    expect(shouldGateCatchUpBehindAd({ ...ready, isAdAvailable: false })).toBe(false)
+  })
+
+  it('does not gate during placeholder cooldown', () => {
+    expect(shouldGateCatchUpBehindAd({ ...ready, isPlaceholderCooldown: true })).toBe(false)
   })
 })

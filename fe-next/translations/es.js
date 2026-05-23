@@ -9209,6 +9209,7 @@ const es = {
     "noWordsLeft": "¡No quedan palabras!",
     "moreLevelsComingSoon": "Nuevos niveles están en camino.",
     "allCleared": "¡Completaste todos los niveles!",
+    "loadingProgress": "Cargando tu progreso…",
     "playAgain": "Jugar desde el nivel 1",
     "shuffle": "Mezclar",
     "stuck": "¿Atascado?",

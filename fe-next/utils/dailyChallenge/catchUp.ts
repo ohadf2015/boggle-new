@@ -50,6 +50,33 @@ export function isCatchUpDate(today: string, date: string, windowDays: number = 
   return date !== today && getCatchUpDates(today, windowDays).includes(date);
 }
 
+export interface CatchUpAdGateState {
+  /** Is this a catch-up play (a past day), not today's daily? */
+  isCatchup: boolean;
+  /** Already watched the ad for this catch-up date this session? */
+  alreadyUnlocked: boolean;
+  /** Running inside the native (Capacitor) app? */
+  isNative: boolean;
+  /** Is a rewarded ad ready to show? */
+  isAdAvailable: boolean;
+  /** Is the placeholder ad provider in its post-show cooldown? */
+  isPlaceholderCooldown: boolean;
+}
+
+/**
+ * Whether starting a catch-up play must first show a rewarded ad.
+ *
+ * Native-only: the ad is the price of replaying a missed day. On web (or when
+ * no ad is ready / a placeholder is cooling down) we degrade to free play —
+ * identical contract to the WordHunt forfeit/retry gate. Returns false once the
+ * date is already unlocked so a single watch covers the whole session for it.
+ */
+export function shouldGateCatchUpBehindAd(state: CatchUpAdGateState): boolean {
+  const { isCatchup, alreadyUnlocked, isNative, isAdAvailable, isPlaceholderCooldown } = state;
+  if (!isCatchup || alreadyUnlocked) return false;
+  return isNative && isAdAvailable && !isPlaceholderCooldown;
+}
+
 /**
  * Catch-up dates the player has NOT yet completed, newest first.
  */

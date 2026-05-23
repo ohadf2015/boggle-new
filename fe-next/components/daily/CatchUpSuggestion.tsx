@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMissedDailies } from '@/hooks/useMissedDailies';
+import { isNative } from '@/utils/platform';
 
 function daysAgo(date: string, today: string): number {
   const a = new Date(date + 'T00:00:00Z').getTime();
@@ -27,6 +28,14 @@ export default function CatchUpSuggestion({ excludeDate }: CatchUpSuggestionProp
   const { missed } = useMissedDailies();
   const today = new Date().toISOString().split('T')[0];
 
+  // Native gates catch-up play behind a rewarded ad — flag it here so tapping a
+  // missed day isn't a bait-and-switch. Resolved post-mount to avoid an SSR
+  // hydration mismatch (isNative() is false on the server).
+  const [showAdHint, setShowAdHint] = useState(false);
+  useEffect(() => {
+    setShowAdHint(isNative());
+  }, []);
+
   const items = missed.filter(m => m.date !== excludeDate);
   if (items.length === 0) return null;
 
@@ -44,6 +53,12 @@ export default function CatchUpSuggestion({ excludeDate }: CatchUpSuggestionProp
       <p className="mb-3 font-neo-body text-sm text-neo-black/80">
         {t('daily.catchUp.subtitle', { count: items.length })}
       </p>
+      {showAdHint && (
+        <p className="mb-3 flex items-center gap-1.5 font-neo-body text-xs font-semibold text-neo-black/70">
+          <span aria-hidden>📺</span>
+          {t('daily.catchUp.watchAd')}
+        </p>
+      )}
       <div className="flex flex-col gap-2">
         {items.map(item => {
           const n = daysAgo(item.date, today);

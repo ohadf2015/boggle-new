@@ -46,7 +46,7 @@ import {
 import { shouldAutoShowTutorial } from './tutorial/shouldAutoShowTutorial';
 import { markWordHuntTutorialSeen } from './tutorial/markWordHuntTutorialSeen';
 import { useDailyChallengeUrlParams } from './useDailyChallengeUrlParams';
-import { isCatchUpDate } from '@/utils/dailyChallenge/catchUp';
+import { isCatchUpDate, shouldGateCatchUpBehindAd } from '@/utils/dailyChallenge/catchUp';
 import { useRetryChallenge } from './useRetryChallenge';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeBadge from '@/components/practice/PracticeBadge';
@@ -152,6 +152,12 @@ const DailyChallenge: React.FC = () => {
   const prevGameLanguageRef = useRef<Language | null>(null);
   const prevWasResetRef = useRef<boolean>(false);
   const gameStartedAtRef = useRef<number>(0);
+  // One rewarded ad unlocks one catch-up date; reset when the date changes so
+  // each missed day is its own watch (and today's daily is never gated).
+  const catchupAdUnlockedRef = useRef<boolean>(false);
+  useEffect(() => {
+    catchupAdUnlockedRef.current = false;
+  }, [catchupDate]);
 
   // Initialize Word Hunt daily challenge
   useEffect(() => {
@@ -276,17 +282,24 @@ const DailyChallenge: React.FC = () => {
     setCountdown(formatTimeHHMMSS(seconds));
   }, 1000);
 
-  // Minimal "go to playing" used after a forfeit replay is granted (skips the
-  // already-played check — a forfeit never saves a result, so it always passes).
-  const beginPlaying = useCallback(() => {
-    clearWordHuntForfeitToday(gameLanguage);
-    setForfeitedToday(false);
+  // Common "enter the game" tail: unlock audio + analytics + flip to playing.
+  // Shared by the normal start path, the forfeit replay, and the catch-up unlock
+  // (unlockAudio is idempotent, so calling it again from here is harmless).
+  const startPlaying = useCallback(() => {
     unlockAudio();
     trackDailyPuzzle('opened', 'word_hunt');
     trackFeatureFirstUse('daily_word_hunt');
     gameStartedAtRef.current = Date.now();
     setPhase('playing');
-  }, [gameLanguage, unlockAudio]);
+  }, [unlockAudio]);
+
+  // Minimal "go to playing" used after a forfeit replay is granted (skips the
+  // already-played check — a forfeit never saves a result, so it always passes).
+  const beginPlaying = useCallback(() => {
+    clearWordHuntForfeitToday(gameLanguage);
+    setForfeitedToday(false);
+    startPlaying();
+  }, [gameLanguage, startPlaying]);
 
   // Rewarded ad that unlocks a replay after a mid-game forfeit (native only;
   // reward arrives via onRewardEarned, not a return value).
@@ -294,6 +307,21 @@ const DailyChallenge: React.FC = () => {
     rewardKind: 'feature',
     surface: 'retry',
     onRewardEarned: () => beginPlaying(),
+  });
+
+  // Rewarded ad that unlocks playing a past day's daily (catch-up). Native only;
+  // web degrades to a free play. Reward → mark this date unlocked + start.
+  const {
+    showAd: showCatchUpAd,
+    isAdAvailable: isCatchUpAdAvailable,
+    isPlaceholderCooldown: isCatchUpPlaceholderCooldown,
+  } = useRewardedAd({
+    rewardKind: 'feature',
+    surface: 'catchup',
+    onRewardEarned: () => {
+      catchupAdUnlockedRef.current = true;
+      startPlaying();
+    },
   });
 
   // Handle game start with safety checks
@@ -362,11 +390,25 @@ const DailyChallenge: React.FC = () => {
       }
     }
 
-    trackDailyPuzzle('opened', 'word_hunt');
-    trackFeatureFirstUse('daily_word_hunt');
-    gameStartedAtRef.current = Date.now();
-    setPhase('playing');
-  }, [gameLanguage, isAuthenticated, profile, t, unlockAudio, justResetRef, isPractice, isCatchup, catchupDate, forfeitedToday, isAdAvailable, isPlaceholderCooldown, showAd]);
+    // Catch-up ad gate (last gate): playing a past day's daily costs a rewarded
+    // ad on native. Placed AFTER the already-played check so we never burn an ad
+    // only to hit an "already played" wall on a deep-linked completed day.
+    // Web / no ad / placeholder cooldown → gate is false → free play.
+    if (
+      shouldGateCatchUpBehindAd({
+        isCatchup,
+        alreadyUnlocked: catchupAdUnlockedRef.current,
+        isNative: isNative(),
+        isAdAvailable: isCatchUpAdAvailable,
+        isPlaceholderCooldown: isCatchUpPlaceholderCooldown,
+      })
+    ) {
+      showCatchUpAd();
+      return;
+    }
+
+    startPlaying();
+  }, [gameLanguage, isAuthenticated, profile, t, unlockAudio, justResetRef, isPractice, isCatchup, catchupDate, forfeitedToday, isAdAvailable, isPlaceholderCooldown, showAd, isCatchUpAdAvailable, isCatchUpPlaceholderCooldown, showCatchUpAd, startPlaying]);
 
   // Handle game completion
   const handleGameComplete = useCallback((result: SurvivalGameResult, rescueMethod?: WordHuntRescueMethod) => {

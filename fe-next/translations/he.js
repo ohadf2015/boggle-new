@@ -9404,6 +9404,7 @@ const he = {
     "noWordsLeft": "לא נשארו מילים!",
     "moreLevelsComingSoon": "רמות חדשות בדרך.",
     "allCleared": "סיימת את כל הרמות!",
+    "loadingProgress": "טוען את ההתקדמות שלך…",
     "playAgain": "שחק שוב",
     "shuffle": "ערבב",
     "morePoints": "נק' נוספות",

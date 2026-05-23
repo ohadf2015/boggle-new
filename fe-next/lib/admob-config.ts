@@ -1,5 +1,5 @@
 export type AdPlatform = 'android' | 'ios';
-export type RewardedSurface = 'generic' | 'hint' | 'doubleGold' | 'freeze' | 'retry' | 'timeLow';
+export type RewardedSurface = 'generic' | 'hint' | 'doubleGold' | 'freeze' | 'retry' | 'timeLow' | 'catchup';
 export type BannerVariant = 'game' | 'content';
 
 export interface AdmobConfig {
@@ -36,6 +36,9 @@ const ANDROID_DEFAULTS: DefaultsEntry = {
     freeze: 'ca-app-pub-1896836706464880/5950581279',
     retry: 'ca-app-pub-1896836706464880/5028381841',
     timeLow: 'ca-app-pub-1896836706464880/3715300178',
+    // Catch-up reuses the retry unit (same "unlock a play" semantics) until a
+    // dedicated unit is wanted — override via NEXT_PUBLIC_ADMOB_REWARDED_CATCHUP.
+    catchup: 'ca-app-pub-1896836706464880/5028381841',
   },
 };
 
@@ -50,6 +53,7 @@ const REWARDED_SURFACE_ENV_KEY: Record<Exclude<RewardedSurface, 'generic'>, stri
   freeze: 'FREEZE',
   retry: 'RETRY',
   timeLow: 'TIME_LOW',
+  catchup: 'CATCHUP',
 };
 
 function pickEnv(...keys: string[]): string | undefined {
@@ -112,6 +116,7 @@ export function getAdmobConfig(platform: AdPlatform): AdmobConfig {
     freeze: resolveRewardedSurface('freeze', platform, suffix, genericRewarded),
     retry: resolveRewardedSurface('retry', platform, suffix, genericRewarded),
     timeLow: resolveRewardedSurface('timeLow', platform, suffix, genericRewarded),
+    catchup: resolveRewardedSurface('catchup', platform, suffix, genericRewarded),
   };
 
   return {
