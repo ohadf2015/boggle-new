@@ -114,24 +114,32 @@ preflight_check() {
   fi
 
   # --- MCP servers alive ----------------------------------------------
-  # posthog + sentry are HARD requirements (every lane uses them).
-  # supabase is SOFT: lanes 1+2 prefer the MCP but can fall back to direct SQL
-  # via SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY env vars; lanes 3-7 don't use it.
-  # Source: web-research best-practice "graceful degradation over hard fail" for
-  # autonomous nightly jobs.
-  local mcp_status
-  mcp_status=$(claude mcp list 2>&1 || true)
-  for srv in posthog sentry; do
-    if ! echo "$mcp_status" | grep -q "^${srv}:.*✓ Connected"; then
-      echo "preflight: ABORT — MCP server '$srv' not connected (hard requirement)"
-      echo "$mcp_status" | grep "^${srv}:" || echo "  (not in list)"
-      return 1
+  # ALL MCP servers are SOFT — a single analytics MCP being unreachable must NOT
+  # abort the whole night. posthog/sentry are HTTP services that blip; on
+  # 2026-05-24 posthog ✗-failed at 02:00:13 and the old hard-abort killed all 8
+  # lanes — even though lanes 4/5/6/7/8 don't touch posthog at all. So: RETRY the
+  # connection check (transient blips recover in seconds), then WARN-and-proceed
+  # on whatever is still down. Lanes that need a down MCP degrade or skip on their
+  # own (they're agents — they see the failure and adapt); lanes that don't still
+  # ship. "Graceful degradation over hard fail" for autonomous jobs.
+  # NIGHTLY_MCP_RETRIES / NIGHTLY_MCP_RETRY_SLEEP overridable for tests.
+  local mcp_status="" tries="${NIGHTLY_MCP_RETRIES:-3}" sleep_s="${NIGHTLY_MCP_RETRY_SLEEP:-15}" i
+  for (( i=1; i<=tries; i++ )); do
+    mcp_status=$(claude mcp list 2>&1 || true)
+    # Stop early once BOTH analytics MCPs report connected.
+    if echo "$mcp_status" | grep -q "^posthog:.*✓ Connected" \
+       && echo "$mcp_status" | grep -q "^sentry:.*✓ Connected"; then
+      break
     fi
+    [ "$i" -lt "$tries" ] && { echo "preflight: MCP check attempt $i — not all connected, retrying in ${sleep_s}s"; sleep "$sleep_s"; }
   done
-  if ! echo "$mcp_status" | grep -q "^supabase:.*✓ Connected"; then
-    echo "preflight: WARN — supabase MCP not connected; lanes 1+2 will degrade to direct SQL via env."
-    echo "$mcp_status" | grep "^supabase:" || echo "  (not in list)"
-  fi
+  for srv in posthog sentry supabase; do
+    if echo "$mcp_status" | grep -q "^${srv}:.*✓ Connected"; then
+      continue
+    fi
+    echo "preflight: WARN — MCP '$srv' not connected after ${tries} attempt(s); lanes needing it will degrade/skip (run continues)."
+    echo "$mcp_status" | grep "^${srv}:" || echo "  ($srv not in list)"
+  done
 
   # --- required env ----------------------------------------------------
   local missing=()

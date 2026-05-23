@@ -71,6 +71,40 @@ assert "returns 0"                    "[ $rc2 -eq 0 ]"
 assert "took the ff-pull path"        'printf "%s" "$OUT2" | grep -q "ff-pulling master"'
 assert "did NOT log dirty-skip"       '! printf "%s" "$OUT2" | grep -q "skipping ff-pull"'
 
+# ── MCP graceful degradation (2026-05-24 regression) ──────────────────────
+# posthog ✗-failed at 02:00:13 and the OLD hard-abort killed all 8 lanes — even
+# though lanes 4/5/6/7/8 don't touch posthog. A down analytics MCP must now
+# WARN-and-proceed (lanes needing it degrade/skip), never abort the whole night.
+cat > "$BIN/claude" <<'STUB'
+#!/bin/bash
+if [ "$1" = "mcp" ] && [ "$2" = "list" ]; then
+  echo "posthog: http://x ✗ Failed to connect"
+  echo "sentry: http://x ✓ Connected"
+  echo "supabase: http://x ✓ Connected"
+fi
+STUB
+chmod +x "$BIN/claude"
+( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null )
+rm -f "$LOCK_FILE" "$LAST_RUN_FILE"; unset NIGHTLY_NOW_EPOCH
+export NIGHTLY_MCP_RETRIES=1 NIGHTLY_MCP_RETRY_SLEEP=0   # no real sleep in test
+echo
+echo "MCP graceful degradation (posthog down)"
+OUTM=$(preflight_check 2>&1); rcM=$?
+assert "posthog down → preflight still RUNS (no hard abort)" "[ $rcM -eq 0 ]"
+assert "  …logs a WARN for posthog"                          'printf "%s" "$OUTM" | grep -q "WARN — MCP .posthog. not connected"'
+assert "  …does NOT abort on MCP"                            '! printf "%s" "$OUTM" | grep -q "ABORT — MCP"'
+unset NIGHTLY_MCP_RETRIES NIGHTLY_MCP_RETRY_SLEEP
+# restore all-connected stub for the dedup cases below
+cat > "$BIN/claude" <<'STUB'
+#!/bin/bash
+if [ "$1" = "mcp" ] && [ "$2" = "list" ]; then
+  echo "posthog: http://x ✓ Connected"
+  echo "sentry: http://x ✓ Connected"
+  echo "supabase: http://x ✓ Connected"
+fi
+STUB
+chmod +x "$BIN/claude"
+
 # ── once-per-day dedup ────────────────────────────────────────────────────
 # Regression guard for 2026-05-22: the OLD 18h rolling window suppressed a
 # legitimate next-day run whenever the prior run drifted into late morning
