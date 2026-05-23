@@ -9,6 +9,7 @@
  */
 import { Container, Graphics, Text, TextStyle } from 'pixi.js';
 import { textColorOn } from '@/lib/wordTower/towerColumn';
+import { tileVariation, type TileVariation } from './tileVariation';
 
 const FONT = 'Fredoka, Rubik, sans-serif';
 
@@ -22,6 +23,9 @@ export type TileSprite = Container & {
   color: number;
   pending: boolean;
   anim: number;
+  /** Deterministic per-position visual jitter (set at build) so the stack reads
+   *  as a hand-built tower, not stamped blocks. Persists across recolours. */
+  variation?: TileVariation;
 };
 
 const easeOutCubic = (k: number) => 1 - Math.pow(1 - k, 3);
@@ -85,17 +89,23 @@ export function paintTile(tile: TileSprite, color: number, pending: boolean, sha
   tile.color = color;
   tile.pending = pending;
 
+  // Per-tile variation: a faint tonal shift on the face + a varied highlight
+  // strip, so a tall stack of same-coloured tiles reads as individually placed
+  // bricks rather than one stamped column.
+  const v = tile.variation;
+  const faceColor = v ? shade(color, 1 + v.tone) : color;
+
   tile.shadow.clear().roundRect(-half + 4, -half + 5, s, s, r).fill({ color: 0x000000, alpha: pending ? 0.2 : 0.5 });
 
   const g = tile.face;
   g.clear();
-  g.roundRect(-half, -half, s, s, r).fill({ color, alpha: a });
+  g.roundRect(-half, -half, s, s, r).fill({ color: faceColor, alpha: a });
   // Flat two-tone block shading: lit top strip + darker base band (inset so the
   // bands never collide with the rounded corners).
-  const topH = Math.round(s * 0.15);
+  const topH = Math.round(s * 0.15 * (v?.highlight ?? 1));
   const baseH = Math.round(s * 0.22);
-  g.rect(-half + inset, -half + Math.ceil(r * 0.5), s - inset * 2, topH).fill({ color: shade(color, 1.3), alpha: a * 0.9 });
-  g.rect(-half + inset, half - Math.ceil(r * 0.5) - baseH, s - inset * 2, baseH).fill({ color: shade(color, 0.6), alpha: a });
+  g.rect(-half + inset, -half + Math.ceil(r * 0.5), s - inset * 2, topH).fill({ color: shade(faceColor, 1.3), alpha: a * 0.9 });
+  g.rect(-half + inset, half - Math.ceil(r * 0.5) - baseH, s - inset * 2, baseH).fill({ color: shade(faceColor, 0.6), alpha: a });
   g.roundRect(-half, -half, s, s, r).stroke({ color: 0x000000, width: Math.max(4, s * 0.06), alignment: 1, alpha: pending ? 0.85 : 1 });
 
   if (shared && !pending) {
@@ -111,13 +121,15 @@ export function paintTile(tile: TileSprite, color: number, pending: boolean, sha
   }
 }
 
-/** Build a tile. `char === null` → a label-less brick (versus spoiler-free row). */
-export function makeTile(char: string | null, size: number, color: number, pending: boolean, shared = false): TileSprite {
+/** Build a tile. `char === null` → a label-less brick (versus spoiler-free row).
+ *  `pos` (position from the base) seeds the deterministic per-tile variation. */
+export function makeTile(char: string | null, size: number, color: number, pending: boolean, shared = false, pos?: number): TileSprite {
   const tile = new Container() as TileSprite;
   tile.size = size;
   tile.color = color;
   tile.pending = pending;
   tile.anim = 0;
+  if (pos != null) tile.variation = tileVariation(pos);
   tile.shadow = new Graphics();
   tile.face = new Graphics();
   tile.glyph = char != null

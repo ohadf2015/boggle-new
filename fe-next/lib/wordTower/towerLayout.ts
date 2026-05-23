@@ -141,10 +141,10 @@ export interface BiomeBackdrop {
  * altitude progression — you literally build away from the earthbound rig.
  */
 const BACKDROP: Record<WordTowerBiomeId, BiomeBackdrop> = {
-  city: { scaffold: 1, crane: 1, skyline: 1, clouds: 0.15 },
-  sky: { scaffold: 0.7, crane: 0.6, skyline: 0.3, clouds: 0.6 },
-  stratosphere: { scaffold: 0.35, crane: 0.25, skyline: 0, clouds: 0.35 },
-  orbit: { scaffold: 0.12, crane: 0, skyline: 0, clouds: 0.1 },
+  city: { scaffold: 1, crane: 1, skyline: 1, clouds: 0.45 },
+  sky: { scaffold: 0.7, crane: 0.6, skyline: 0.3, clouds: 0.75 },
+  stratosphere: { scaffold: 0.35, crane: 0.25, skyline: 0, clouds: 0.25 },
+  orbit: { scaffold: 0.12, crane: 0, skyline: 0, clouds: 0.06 },
   nebula: { scaffold: 0, crane: 0, skyline: 0, clouds: 0 },
   galaxy: { scaffold: 0, crane: 0, skyline: 0, clouds: 0 },
 };

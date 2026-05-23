@@ -4,9 +4,11 @@ import { useEffect, useMemo, useRef, useState, type MutableRefObject } from 'rea
 import { Container } from 'pixi.js';
 import { GameCanvas, useGameEngine } from '@/lib/gameEngine';
 import { CONFETTI_BURST, COMBO_FLASH, GOLD_STARS } from '@/lib/gameEngine/presets/particles';
-import type { WordTowerFloor, ApplyResult } from '@/lib/wordTower/wordTowerManager';
+import { biomeForHeight, type WordTowerFloor, type ApplyResult } from '@/lib/wordTower/wordTowerManager';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
 import { buildTowerColumn, wordColor } from '@/lib/wordTower/towerColumn';
+import { viewAltitudeFor } from '@/lib/wordTower/viewAltitude';
+import { biomeBlendAt } from '@/lib/wordTower/biomeBlend';
 import { letterPlacementFx } from '@/lib/wordTower/placementFx';
 import { towerRowLayout, towerPanMin, clampPan } from '@/lib/wordTower/towerLayout';
 import {
@@ -177,7 +179,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
       const y = localY(l.pos);
       const existing = registry.current.get(l.key);
       if (!existing) {
-        const tile = makeTile(l.char, size, l.color, l.pending, l.shared);
+        const tile = makeTile(l.char, size, l.color, l.pending, l.shared, l.pos);
         tile.x = centerX;
         tile.zIndex = l.pos;
         c.addChild(tile);
@@ -275,8 +277,21 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
 export function WordTowerScene(props: SceneProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{ w: number; h: number } | null>(null);
-  const theme = BIOME_THEME[props.biomeId];
   const pan = useRef<PanState>({ y: 0, panMin: 0, shift: 0, dragging: false, container: null, bgEl: null });
+
+  // The altitude the camera is *looking at* = committed climb, lowered by the
+  // user's pan toward the base. While panned, the backdrop (sky/clouds/props)
+  // tracks the viewed floors instead of staying frozen at the top biome — so
+  // scrolling down actually reveals the lower-altitude scene, not just a colour
+  // tint. `null` = not panned → use the live committed height. Reset on every
+  // committed word (height/biome change), since the pan snaps back to the top.
+  const [panAltitude, setPanAltitude] = useState<number | null>(null);
+  const rafRef = useRef<number | null>(null);
+  useEffect(() => { setPanAltitude(null); }, [props.heightM, props.biomeId]);
+
+  const viewAlt = panAltitude ?? props.heightM;
+  const viewBiome = biomeForHeight(viewAlt);
+  const blend = biomeBlendAt(viewAlt);
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -299,7 +314,16 @@ export function WordTowerScene(props: SceneProps) {
     if (c && !c.destroyed) c.y = pan.current.shift + pan.current.y;
     const bg = pan.current.bgEl;
     if (bg) { bg.style.transition = 'none'; bg.style.transform = `translateY(${pan.current.y * BG_PAN_DEPTH}px)`; }
+    // Recompute the viewed altitude (throttled to one update per frame) so the
+    // backdrop biome/clouds/props follow the scroll without thrashing renders.
+    if (rafRef.current == null) {
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        setPanAltitude(viewAltitudeFor(props.heightM, pan.current.y, pan.current.panMin));
+      });
+    }
   };
+  useEffect(() => () => { if (rafRef.current != null) cancelAnimationFrame(rafRef.current); }, []);
 
   const config = useMemo(
     () => (size ? { width: size.w, height: size.h, background: 0x000000, backgroundAlpha: 0 } : null),
@@ -311,16 +335,24 @@ export function WordTowerScene(props: SceneProps) {
       {/* Background layers grouped in one wrapper that the pan translates (at
           BG_PAN_DEPTH) so the sky/props parallax with the user's scroll too. */}
       <div ref={(el) => { pan.current.bgEl = el; }} className="absolute inset-0 will-change-transform">
-        {/* Biome sky (cross-fades city → galaxy as you climb) */}
+        {/* Biome sky — TWO cross-fading gradient layers (current biome under the
+            next one at `blend.t`) so the colour shifts *continuously* with
+            altitude instead of snapping at the six biome thresholds. */}
         <div
-          className="absolute inset-0 transition-[background] duration-1000 ease-out"
-          style={{ background: theme.bg }}
+          className="absolute inset-0 transition-[background] duration-700 ease-out"
+          style={{ background: BIOME_THEME[blend.fromId].bg }}
           aria-hidden
         />
-        {/* Parallax ascent backdrop (stars/clouds/skyline scroll by altitude) */}
-        <WordTowerBackdrop biomeId={props.biomeId} heightM={props.heightM} reducedMotion={props.reducedMotion} />
-        {/* Lazy altitude-reference props behind the tower */}
-        <WordTowerParallaxProps heightM={props.heightM} reducedMotion={props.reducedMotion} />
+        <div
+          className="absolute inset-0 transition-opacity duration-700 ease-out"
+          style={{ background: BIOME_THEME[blend.toId].bg, opacity: blend.t }}
+          aria-hidden
+        />
+        {/* Parallax ascent backdrop (stars/clouds/skyline) — driven by the
+            *viewed* altitude so panning down reveals that altitude's sky. */}
+        <WordTowerBackdrop biomeId={viewBiome} heightM={viewAlt} reducedMotion={props.reducedMotion} />
+        {/* Lazy altitude-reference props behind the tower (viewed altitude). */}
+        <WordTowerParallaxProps heightM={viewAlt} reducedMotion={props.reducedMotion} />
       </div>
       {/* Brand climb companion — pops in to cheer only when a word is built. */}
       <WordTowerMascot

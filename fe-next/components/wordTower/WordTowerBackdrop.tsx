@@ -49,6 +49,9 @@ export function WordTowerBackdrop({
   const b = biomeBackdrop(biomeId);
   const stars = BIOME_THEME[biomeId].stars;
   const sun = Math.max(0, 1 - stars * 2.2); // daytime sun, gone by deep space
+  // High-altitude cirrus wisps: build through the stratosphere/orbit, fade out
+  // by the galaxy (where the aurora + dense stars carry the sky instead).
+  const wisp = Math.max(0, Math.min(0.42, stars * 1.1)) * Math.max(0, 1 - Math.max(0, stars - 0.8) / 0.2);
 
   const climb = reducedMotion ? 0 : heightM * PX_PER_M;
   const starPos = (depth: number) => `0px ${climb * depth}px`; // seamless infinite scroll
@@ -89,15 +92,32 @@ export function WordTowerBackdrop({
         <path fill="#7fa8d6" d={SKYLINE} />
       </svg>
 
-      {/* Drifting clouds — fall away as you climb. */}
+      {/* High-altitude cirrus wisps — thin, biome-tinted streaks that keep the
+          upper sky alive between the clouds (below) and deep space. They build
+          through the stratosphere/orbit and fade out by the galaxy (the aurora
+          takes over). Slower parallax than the low clouds → depth. */}
       <div
         className="absolute inset-0"
-        style={{ opacity: Math.min(1, b.clouds + sun * 0.5), transition: FLOW, transform: `translateY(${slide(1.05, 1500)}px)` }}
+        style={{ opacity: wisp, transition: FLOW, transform: `translateY(${slide(0.5, 600)}px)` }}
       >
-        <div className="wt-cloud" style={{ top: '12%', width: 180, height: 50, animationDuration: '64s' }} />
-        <div className="wt-cloud" style={{ top: '30%', width: 120, height: 36, animationDuration: '92s', animationDelay: '-30s' }} />
-        <div className="wt-cloud" style={{ top: '46%', width: 210, height: 56, animationDuration: '120s', animationDelay: '-70s' }} />
-        <div className="wt-cloud" style={{ top: '62%', width: 150, height: 42, animationDuration: '104s', animationDelay: '-50s' }} />
+        <div className="wt-wisp" style={{ top: '16%', width: 280, height: 14, animationDuration: '150s' }} />
+        <div className="wt-wisp" style={{ top: '34%', width: 220, height: 11, animationDuration: '190s', animationDelay: '-80s' }} />
+        <div className="wt-wisp" style={{ top: '52%', width: 320, height: 16, animationDuration: '230s', animationDelay: '-140s' }} />
+      </div>
+
+      {/* Drifting clouds — fuller, higher-contrast bank that lingers as you
+          climb (a gentler slide than before, so they don't shoot off-screen the
+          moment you leave the ground). */}
+      <div
+        className="absolute inset-0"
+        style={{ opacity: Math.min(1, b.clouds + sun * 0.55), transition: FLOW, transform: `translateY(${slide(0.85, 700)}px)` }}
+      >
+        <div className="wt-cloud" style={{ top: '10%', width: 200, height: 56, animationDuration: '64s' }} />
+        <div className="wt-cloud" style={{ top: '22%', width: 130, height: 38, animationDuration: '88s', animationDelay: '-20s' }} />
+        <div className="wt-cloud" style={{ top: '36%', width: 230, height: 60, animationDuration: '120s', animationDelay: '-70s' }} />
+        <div className="wt-cloud" style={{ top: '50%', width: 150, height: 44, animationDuration: '104s', animationDelay: '-50s' }} />
+        <div className="wt-cloud" style={{ top: '64%', width: 190, height: 50, animationDuration: '112s', animationDelay: '-90s' }} />
+        <div className="wt-cloud" style={{ top: '78%', width: 120, height: 34, animationDuration: '96s', animationDelay: '-40s' }} />
       </div>
 
       {/* Near city skyline — darker silhouette in front. Faster parallax. */}
@@ -116,10 +136,23 @@ export function WordTowerBackdrop({
         .wt-cloud {
           position: absolute;
           left: 0;
-          background: #ffffff;
+          background: #fdfeff;
           border-radius: 100px 100px 38px 38px;
-          opacity: 0.9;
-          filter: drop-shadow(0 6px 0 rgba(120,150,190,0.18));
+          opacity: 0.95;
+          /* Cool underside shadow + soft contact gives the white cloud contrast
+             against the pale daytime sky (otherwise white-on-near-white). */
+          filter: drop-shadow(0 8px 0 rgba(96,130,178,0.28)) drop-shadow(0 2px 6px rgba(70,100,150,0.25));
+          animation-name: wt-drift;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+        }
+        /* Thin high cirrus streak — soft blurred edges, gentle drift. */
+        .wt-wisp {
+          position: absolute;
+          left: 0;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.85) 30%, rgba(255,255,255,0.85) 70%, transparent);
+          border-radius: 50%;
+          filter: blur(3px);
           animation-name: wt-drift;
           animation-timing-function: linear;
           animation-iteration-count: infinite;
@@ -149,6 +182,7 @@ export function WordTowerBackdrop({
         }
         @media (prefers-reduced-motion: reduce) {
           .wt-cloud { animation: none !important; }
+          .wt-wisp { animation: none !important; }
           .wt-aurora { animation: none !important; }
         }
       `}</style>
