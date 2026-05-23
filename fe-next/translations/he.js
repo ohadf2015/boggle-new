@@ -498,6 +498,7 @@ const he = {
     "reconnecting": "מחזיר אותך...",
     "reconnected": "חזרנו!",
     "connectionLost": "איבדנו חיבור",
+    "reconnectFailed": "החיבור אבד — הקש לרענון",
     "notConnected": "לא מחובר/ת",
     "connected": "מחובר/ת",
     "playerDisconnected": "מנותק/ת",

@@ -248,6 +248,25 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     }
   }
 
+  // ---- Lightning Round-Event Bonus ----
+  // The 'lightning' round event charges a few board tiles (game.lightningTiles)
+  // and advertises a 1.5x payout to the client (tiles glow). Char-based, exactly
+  // like the golden-letter bonus above: if the word uses any charged-tile letter
+  // while lightning is active, award +50% (ceil). Without this the broadcast
+  // bonus was never scored — the event was cosmetic only.
+  let lightningBonus = 0;
+  const lightningTiles = (game as GameState & { lightningTiles?: Array<{ row: number; col: number }> }).lightningTiles;
+  if (game.activeRoundEvent === 'lightning' && lightningTiles?.length && game.letterGrid) {
+    const chargedChars = lightningTiles.map(tile => {
+      const row = game.letterGrid![tile.row];
+      return row ? String(row[tile.col]).toLowerCase() : '';
+    }).filter(Boolean);
+    const usesCharged = normalizedWord.toLowerCase().split('').some(ch => chargedChars.includes(ch));
+    if (usesCharged) {
+      lightningBonus = Math.ceil(wordScore * 0.5);
+    }
+  }
+
   // ---- Special Word Detection ----
   let isSpecialWord = false;
   const specialWordBonus = 10;
@@ -270,7 +289,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
 
   // Single atomic score update: word score + blast tile bonus + word-hunt board bonus + bonuses
   const preScore = game.playerScores?.[username] ?? 0;
-  const totalDelta = wordScore + blastTileBonus + wordHuntBoardBonus + goldenBonus + specialBonus;
+  const totalDelta = wordScore + blastTileBonus + wordHuntBoardBonus + goldenBonus + lightningBonus + specialBonus;
   updatePlayerScore(gameCode, username, totalDelta, true);
   game.serverSeq = (game.serverSeq ?? 0) + 1;
 
@@ -294,6 +313,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     fromLesson: fromLesson,
     inputMethod,
     ...(goldenBonus > 0 ? { goldenBonus } : {}),
+    ...(lightningBonus > 0 ? { lightningBonus } : {}),
     ...(isSpecialWord ? { isSpecialWord: true } : {}),
     // Merged blast data (Fix 2): includes tile bonus, moves, combo info in single emit
     ...(blastMoveResult ? {

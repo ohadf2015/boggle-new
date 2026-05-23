@@ -256,7 +256,7 @@ function DesktopResultsLayout({
   );
 }
 
-const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, seriesTotalGames, seriesLeader, onResetSeries, wordHuntSummary }) => {
+const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, onExitToLobby, username, socket, achievements, duplicateRuleDisabled, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, seriesTotalGames, seriesLeader, onResetSeries, wordHuntSummary }) => {
   const { t, language } = useLanguage();
   const { isAuthenticated, user } = useAuth();
   const setIsInGame = useHideNavigation();
@@ -536,15 +536,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
   const confirmExitRoom = () => {
     // Switch to the exit wash NOW so the half-torn ResultsPage never paints
-    // during the socket-disconnect delay or the browser's nav-paint gap.
+    // during the transition.
     setIsExiting(true);
     setShowExitConfirm(false);
-    // Release the body scroll lock immediately — the cleanup in
-    // useEffect(setIsInGame(true)) only fires on unmount, which a hard nav
-    // doesn't trigger before the new document paints.
+    // Release the body scroll lock immediately.
     setIsInGame(false);
 
-    // Emit leaveRoom so backend properly removes/disconnects the player
+    // Emit leaveRoom so backend properly removes the player from the room. We
+    // keep the socket CONNECTED (no disconnect) — the SPA stays alive and the
+    // lobby reuses it; the prior disconnect only existed because a hard reload
+    // was about to tear everything down anyway.
     try {
       if (socket && gameCode && username) {
         socket.emit('leaveRoom', { gameCode, username });
@@ -557,25 +558,33 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
     // Classroom flow: lessonGameData (sessionStorage) signals this was a teacher-launched
     // classroom game — route back to /education so we don't bounce back into the
-    // classroom lobby (which would happen on a same-URL reload that keeps ?classroom=true).
+    // classroom lobby (which would happen on a same-URL reset that keeps ?classroom=true).
     const isClassroomFlow = !!lessonGameData;
     try {
       sessionStorage.removeItem('lessonGameData');
     } catch {}
-    const exitHref = isClassroomFlow ? `/${language}/education` : `/${language}/multiplayer`;
 
-    setTimeout(() => {
-      try {
-        if (socket) {
-          socket.disconnect();
-        }
-      } catch (error) {
-        logger.error('[RESULTS] Error disconnecting socket:', error);
-      }
-      // Hard navigation (not reload) → drops ?classroom=true&host=true query params
-      // and gives us the same fresh-state reset that reload provided.
-      window.location.href = exitHref;
-    }, 200);
+    if (isClassroomFlow) {
+      // Different route → client-side nav. router.replace resolves the route
+      // in-memory via the SPA router, so it works in the Capacitor static-export
+      // WebView where a `window.location.href` hard nav to a route blanks out
+      // (no server to resolve the path).
+      router.replace(`/${language}/education`);
+      return;
+    }
+
+    if (onExitToLobby) {
+      // Same /multiplayer route → reset MP state IN PLACE (no navigation, no
+      // reload). PageClient flips showResults/isActive off and renders the
+      // lobby. This is the proven host-left-grace-modal exit pattern and is the
+      // native-safe replacement for the old hard reload.
+      onExitToLobby();
+      return;
+    }
+
+    // Fallback (e.g. single-player surfaces with no MP reset wiring): a plain
+    // client-side nav, still never a hard reload.
+    router.replace(`/${language}/multiplayer`);
   };
 
   // Defer expensive word mapping calculation

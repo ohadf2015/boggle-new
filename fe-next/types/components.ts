@@ -86,6 +86,13 @@ export interface ResultsPageProps {
   gameCode?: string;
   /** Handler to return to the room/lobby (optional for single player) */
   onReturnToRoom?: () => void;
+  /**
+   * Handler to fully exit the game back to the multiplayer lobby, resetting MP
+   * state IN PLACE (no page reload). Native-safe: a hard nav blanks the
+   * Capacitor static-export WebView. When absent (e.g. single player) the
+   * exit falls back to a client-side router navigation.
+   */
+  onExitToLobby?: () => void;
   /** Current user's username */
   username: string;
   /** Socket.IO connection */

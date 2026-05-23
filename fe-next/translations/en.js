@@ -504,6 +504,7 @@ const en = {
     "reconnecting": "Getting you back...",
     "reconnected": "We're back!",
     "connectionLost": "Lost connection",
+    "reconnectFailed": "Connection lost — tap to refresh",
     "notConnected": "Offline",
     "connected": "Connected",
     "playerDisconnected": "Disconnected",

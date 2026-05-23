@@ -163,6 +163,24 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   // effect — an inline arrow would re-fire game-start side effects every render.
   const handleGameStartConsumed = useCallback(() => setPendingGameStart(null), [setPendingGameStart]);
 
+  // Native-safe exit to the multiplayer lobby: reset MP state IN PLACE (no page
+  // reload). Shared by the results "Exit" button and the host-left grace modal.
+  // A hard `window.location.href` nav blanks the Capacitor static-export WebView
+  // (no server resolves the route); flipping showResults/isActive off renders the
+  // lobby instantly within the live SPA instead.
+  const handleExitToLobby = useCallback(() => {
+    clearSessionPreservingUsername(username);
+    setIsActive(false); setIsHost(false); setIsPrivate(false); setGameCode('');
+    setShowResults(false); setResultsData(null);
+    try { sessionStorage.setItem('boggle_intentional_exit', '1'); } catch { /* storage blocked */ }
+    if (typeof window !== 'undefined') {
+      const stripped = stripMultiplayerExitParams(window.location.href);
+      if (stripped !== window.location.href) {
+        window.history.replaceState({}, '', stripped);
+      }
+    }
+  }, [username, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData]);
+
   // Hide global footer only when in a game room or viewing results (not the lobby)
   useEffect(() => {
     setIsInGame(isActive || showResults);
@@ -388,7 +406,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         <FeatureErrorBoundary featureName="Results">
           <ResultsPage
             finalScores={resultsData?.scores ?? null} gameCode={gameCode}
-            onReturnToRoom={handleReturnToRoom} username={username} socket={socket}
+            onReturnToRoom={handleReturnToRoom} onExitToLobby={handleExitToLobby} username={username} socket={socket}
             duplicateRuleDisabled={resultsData?.duplicateRuleDisabled}
             playerCount={resultsData?.playerCount} isHost={isHost}
             roomLanguage={roomLanguage ?? undefined}
@@ -507,19 +525,9 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             seconds={10}
             reason={hostLeftState?.reason}
             onExit={() => {
-              // Mirrors the cleanup the prior 2s `window.location` reload was
-              // doing implicitly: reset multiplayer state, drop URL traps, mark
-              // intentional exit so auto-rejoin doesn't yank the player back.
-              clearSessionPreservingUsername(username);
-              setIsActive(false); setIsHost(false); setIsPrivate(false); setGameCode('');
-              setShowResults(false); setResultsData(null);
-              try { sessionStorage.setItem('boggle_intentional_exit', '1'); } catch { /* blocked */ }
-              if (typeof window !== 'undefined') {
-                const stripped = stripMultiplayerExitParams(window.location.href);
-                if (stripped !== window.location.href) {
-                  window.history.replaceState({}, '', stripped);
-                }
-              }
+              // Same native-safe in-place reset as the results "Exit" button,
+              // then clear the grace modal.
+              handleExitToLobby();
               setHostLeftState(null);
             }}
           />

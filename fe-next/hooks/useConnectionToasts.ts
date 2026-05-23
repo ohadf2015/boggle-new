@@ -64,6 +64,27 @@ export function useConnectionToasts() {
       );
     }
 
+    // Reconnect failed / gave up — the "Reconnecting..." toast above has
+    // duration: Infinity and is otherwise dismissed ONLY on a successful
+    // reconnect. When reconnection stops while still disconnected (isReconnecting
+    // flips false, isConnected still false) that toast would stick on screen
+    // forever and block the UI. Dismiss it and surface a terminal error instead.
+    // wasConnected is false here (we were already disconnected/reconnecting), so
+    // this never collides with the "Connection lost" branch above.
+    if (!wasConnected && !isConnected && !isReconnecting && disconnectToastIdRef.current) {
+      toast.dismiss(disconnectToastIdRef.current);
+      disconnectToastIdRef.current = null;
+
+      toast.error(
+        t('common.reconnectFailed') || 'Connection lost. Please refresh.',
+        {
+          id: 'connection-failed',
+          duration: 6000,
+          icon: '⚠️',
+        }
+      );
+    }
+
     // Reconnected
     if (!wasConnected && isConnected) {
       // Dismiss any existing toast

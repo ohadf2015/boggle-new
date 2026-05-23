@@ -498,6 +498,7 @@ const sv = {
     "reconnecting": "Tar dig tillbaka...",
     "reconnected": "Vi är tillbaka!",
     "connectionLost": "Förlorade anslutningen",
+    "reconnectFailed": "Anslutningen bröts — tryck för att uppdatera",
     "notConnected": "Offline",
     "connected": "Ansluten",
     "playerDisconnected": "Frånkopplad",

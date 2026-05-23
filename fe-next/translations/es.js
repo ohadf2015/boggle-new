@@ -503,6 +503,7 @@ const es = {
     "reconnecting": "Te regresamos...",
     "reconnected": "¡Volvimos!",
     "connectionLost": "Conexión perdida",
+    "reconnectFailed": "Se perdió la conexión — toca para actualizar",
     "notConnected": "Sin conexión",
     "connected": "Conectado",
     "playerDisconnected": "Desconectado",

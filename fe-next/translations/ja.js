@@ -498,6 +498,7 @@ const ja = {
     "reconnecting": "すぐ戻るよ...",
     "reconnected": "復活！",
     "connectionLost": "接続切れ",
+    "reconnectFailed": "接続が切れました — タップして更新",
     "notConnected": "オフライン",
     "connected": "接続済み",
     "playerDisconnected": "切断中",
