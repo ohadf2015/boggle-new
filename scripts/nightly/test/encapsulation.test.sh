@@ -145,6 +145,33 @@ assert "lane authored set contains the lane's file"   "[[ \"$AUTHORED\" == *'src
 assert "lane authored set excludes founder pre-edit"  "[[ \"$AUTHORED\" != *'src/founder.ts'* ]]"
 rm -f "$BEFORE" "$AFTER"; teardown
 
+echo "── encapsulation: filter concurrent-committed paths from authored set ──"
+
+# A concurrent session commits a file DURING the run; it gets misattributed into
+# the authored set. filter_concurrent_committed must drop it (it's not ours), so
+# its mid-edit lint can't fail the nightly's gate and drop all genuine lane work.
+setup
+BASE=$(cd "$PROJECT_DIR" && git rev-parse HEAD)             # run baseline
+# genuine lane edit (uncommitted) + a concurrent session commit, both in authored
+printf 'lane work\n' > "$PROJECT_DIR/src/lane.ts"
+printf 'concurrent\n' > "$PROJECT_DIR/src/concurrent.ts"
+( cd "$PROJECT_DIR" && git add src/concurrent.ts && git commit -qm "concurrent commit during run" )
+LIST=$(mktemp); printf 'src/concurrent.ts\nsrc/lane.ts\n' | sort > "$LIST"
+filter_concurrent_committed "$LIST" "$BASE"
+assert "concurrent-committed path dropped from authored set" \
+  "! grep -qx 'src/concurrent.ts' \"\$LIST\""
+assert "genuine lane path kept in authored set" \
+  "grep -qx 'src/lane.ts' \"\$LIST\""
+rm -f "$LIST"; teardown
+
+# No concurrent commits → list unchanged.
+setup
+BASE=$(cd "$PROJECT_DIR" && git rev-parse HEAD)
+LIST=$(mktemp); printf 'src/lane.ts\n' > "$LIST"
+filter_concurrent_committed "$LIST" "$BASE"
+assert "list unchanged when no concurrent commits" "grep -qx 'src/lane.ts' \"\$LIST\""
+rm -f "$LIST"; teardown
+
 echo
 echo "encapsulation: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]

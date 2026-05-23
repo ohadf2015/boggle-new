@@ -291,6 +291,18 @@ if [ -s "$NIGHTLY_AUTHORED_FILE" ]; then
   sort -u "$NIGHTLY_AUTHORED_FILE" -o "$NIGHTLY_AUTHORED_FILE"
 fi
 
+# Drop any path a CONCURRENT session COMMITTED during the run — time-window
+# attribution can't tell a lane's edit from a concurrent edit in the same window,
+# but a path someone else committed is provably not ours. Without this, a
+# concurrent file's mid-edit lint error fails the isolated gate and drops ALL
+# genuine lane work (the 2026-05-23 cascade).
+if [ -s "$NIGHTLY_AUTHORED_FILE" ]; then
+  _auth_before=$(grep -c . "$NIGHTLY_AUTHORED_FILE" 2>/dev/null) || _auth_before=0
+  filter_concurrent_committed "$NIGHTLY_AUTHORED_FILE" "$START_SHA"
+  _auth_after=$(grep -c . "$NIGHTLY_AUTHORED_FILE" 2>/dev/null) || _auth_after=0
+  [ "$_auth_before" != "$_auth_after" ] && log "excluded $(( _auth_before - _auth_after )) concurrently-committed path(s) from the authored set (not the nightly's work)"
+fi
+
 # --- integration: gate + commit + push ------------------------------------
 log "──────── integration ────────"
 

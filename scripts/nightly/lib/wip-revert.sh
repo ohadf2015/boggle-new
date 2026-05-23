@@ -57,6 +57,31 @@ nightly_dirty_paths() {
          git ls-files --others --exclude-standard; } | sort -u )
 }
 
+# filter_concurrent_committed <authored_list_file> <baseline_sha>
+# Remove from the authored allowlist any path a CONCURRENT session COMMITTED
+# during the run (touched by a commit in baseline..HEAD). Time-window attribution
+# — (dirty after lane) − (dirty before lane) — cannot distinguish a lane's edit
+# from a concurrent session's edit in the same window. A path someone else
+# COMMITTED is provably not the nightly's work, so excluding it stops the nightly
+# from gating/committing/reverting other people's files. This is the fix for the
+# 2026-05-23 cascade: 3 concurrent word-tower files were misattributed, their
+# mid-edit lint errors failed the isolated gate, and ALL genuine lane work was
+# dropped. Requires the list to be sorted (run.sh sort -u's it). Mutates the list.
+filter_concurrent_committed() {
+  local list="$1" base="$2"
+  [ -n "$list" ] && [ -s "$list" ] || return 0
+  [ -n "$base" ] || return 0
+  local committed; committed=$(mktemp)
+  git -C "$PROJECT_DIR" log "${base}..HEAD" --name-only --pretty=format: 2>/dev/null \
+    | sed '/^$/d' | sort -u > "$committed"
+  if [ -s "$committed" ]; then
+    local filtered; filtered=$(mktemp)
+    comm -23 "$list" "$committed" > "$filtered"
+    mv "$filtered" "$list"
+  fi
+  rm -f "$committed"
+}
+
 # revert_authored <snapshot_dir> <authored_list_file>
 # The ALLOWLIST counterpart to revert_to_pre_lane. Revert ONLY the paths listed
 # in <authored_list_file> — the nightly's own lane-authored changes — restoring

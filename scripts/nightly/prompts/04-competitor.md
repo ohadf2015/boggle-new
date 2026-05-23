@@ -19,12 +19,18 @@ Surface (a) viral word-game concepts worth borrowing, (b) Reddit threads where L
 
 ═══ TOOLS — use these (NO external API key needed) ═══
 
-**Reddit access strategy** (proven, no auth):
-1. **Native JSON suffix** — append `.json` to any reddit URL to get JSON: `https://www.reddit.com/r/wordgames/top.json?t=week&limit=25`. Returns post titles, scores, comments_count, permalinks, selftexts directly. **Use this FIRST.** Higher rate limit than old.reddit.com.
-2. **pullpush.io archive** — if reddit.com blocks our IP (rare but happens): `https://api.pullpush.io/reddit/search/submission/?subreddit=wordgames&sort=desc&sort_type=score&size=20&after=7d`. Free, no auth, historical data with author + body. Works when reddit.com is hard-blocked.
-3. **old.reddit.com** — last-resort plain HTML at `old.reddit.com/r/<sub>/top/?t=week`. Sometimes blocked entirely in 2026 (lane 4 history: 100% block rate in mid-May 2026); try (1) and (2) first.
-
-For each Reddit target, try sources in order 1 → 2 → 3. Skip the source if it returns 4xx/5xx; do NOT block the lane on any single source.
+**Reddit access strategy** — DIRECT ENDPOINTS ARE DEAD. Confirmed blocked 5
+consecutive nights (2026-05-19 → 05-23): `reddit.com`/`.json` = IP-blocked,
+`old.reddit.com` = blocked, `pullpush.io` = HTTP 400/empty.
+- **DO NOT** `WebFetch` `reddit.com`, `www.reddit.com`, `*.json` reddit URLs,
+  `old.reddit.com`, or `api.pullpush.io`. Every attempt has failed for 5 nights;
+  cycling them just burns tool calls + time. Skip them entirely.
+- **Reddit discovery = `WebSearch` SERP ONLY**: `WebSearch("site:reddit.com r/wordgames <topic> 2026")`.
+  Use the SERP snippets (titles, scores, blurbs) directly — they're enough to
+  judge a thread's relevance. Do NOT then try to fetch the thread body.
+- If a `WebSearch` returns nothing usable for Reddit, that subreddit is a dead
+  end tonight — move on. r/wordgames is genuinely low-traffic; absence of signal
+  is data, not a fetch gap.
 
 **Tools available:**
 - **`WebSearch`** — broad discovery: "site:reddit.com r/wordgames best of week", "indie word game launches reddit 2026". Use to find candidate threads.
@@ -42,14 +48,13 @@ Run 3-5 broad WebSearch queries to find what's trending. Examples:
 Keep the SERP snippets — they often contain the post titles + upvote counts you need without further fetching.
 
 ═══ STEP 2 — Deep-fetch the highest-signal candidates ═══
-Reddit targets (try `.json` first, pullpush.io second):
-- `WebFetch("https://www.reddit.com/r/wordgames/top.json?t=week&limit=25", "extract top posts: title, score, num_comments, permalink, selftext(500), url, author")`
-- `WebFetch("https://www.reddit.com/r/dailygames/top.json?t=week&limit=25", "...")`
-- `WebFetch("https://www.reddit.com/r/Anagrams/top.json?t=month&limit=25", "...")`
-- `WebFetch("https://www.reddit.com/r/Scrabble/top.json?t=week&limit=25", "...")`
-
-If `.json` route returns 429/403/empty for a subreddit, fall back to pullpush.io for that one:
-- `WebFetch("https://api.pullpush.io/reddit/search/submission/?subreddit=wordgames&sort=desc&sort_type=score&size=20&after=7d", "extract data[]: title, score, num_comments, full_link, selftext")`
+**Reddit: do NOT WebFetch reddit/pullpush endpoints — they are dead (see above).**
+Get Reddit signal from `WebSearch` SERP snippets only:
+- `WebSearch("site:reddit.com/r/wordgames top this week 2026")`
+- `WebSearch("site:reddit.com/r/dailygames new word game 2026")`
+- `WebSearch("site:reddit.com/r/Anagrams OR r/Scrabble recommendation 2026")`
+Read the returned titles/blurbs; that IS the data. Spend your deep-fetch budget
+on COMPETITOR sites + portals below, which DO respond, not on dead Reddit URLs.
 
 Portal sites (different fetcher concerns — JS-heavy, prefer agent-browser if WebFetch returns near-empty):
 - `WebFetch("https://poki.com/en/word", "list top word games + featured concepts")`
