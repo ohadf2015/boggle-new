@@ -81,6 +81,37 @@ assert "non-authored new file is preserved" \
   "[ -f \"\$PROJECT_DIR/src/human-new.ts\" ]"
 rm -f "$LIST"; teardown
 
+# 3b) THE 2026-05-23 REGRESSION: a file that a concurrent session CREATED +
+#     COMMITTED during the run gets misattributed into the authored list. revert
+#     must NOT delete it (it's committed work) and must leave NOTHING staged (a
+#     staged deletion leaked into the nightly commit and deleted live files).
+setup
+SNAP=$(snapshot_pre_lane)                                   # taken before the file exists
+printf 'concurrent feature\n' > "$PROJECT_DIR/src/concurrent.ts"
+( cd "$PROJECT_DIR" && git add src/concurrent.ts && git commit -qm "concurrent session commit" )
+LIST=$(mktemp); echo "src/concurrent.ts" > "$LIST"          # misattributed to the nightly
+revert_authored "$SNAP" "$LIST"
+assert "committed-mid-run file is NOT deleted" \
+  "[ -f \"\$PROJECT_DIR/src/concurrent.ts\" ]"
+assert "committed-mid-run file keeps its content" \
+  "grep -q 'concurrent feature' \"\$PROJECT_DIR/src/concurrent.ts\""
+assert "revert leaves NOTHING staged (no leaked deletion)" \
+  "[ -z \"\$(cd \"\$PROJECT_DIR\" && git diff --cached --name-only)\" ]"
+rm -f "$LIST"; teardown
+
+# 3c) An authored file the nightly EDITED on top of a committed version is
+#     restored to HEAD (drops the nightly edit) without deleting anything.
+setup
+SNAP=$(snapshot_pre_lane)
+printf 'nightly broke this {(\n' > "$PROJECT_DIR/src/lane.ts"   # nightly edit on a committed file
+LIST=$(mktemp); echo "src/lane.ts" > "$LIST"
+revert_authored "$SNAP" "$LIST"
+assert "nightly edit on committed file restored to HEAD" \
+  "[ \"\$(cat \"\$PROJECT_DIR/src/lane.ts\")\" = 'committed v1' ]"
+assert "restore-to-HEAD leaves nothing staged" \
+  "[ -z \"\$(cd \"\$PROJECT_DIR\" && git diff --cached --name-only)\" ]"
+rm -f "$LIST"; teardown
+
 # 4) Empty / missing authored list → revert touches NOTHING.
 setup
 SNAP=$(snapshot_pre_lane)

@@ -26,6 +26,13 @@ mkdir -p "$LOG_DIR" "$(dirname "$REPORT")"
 # file even when sourced from a subshell context.
 export NIGHTLY_PID="$$"
 
+# Keep the machine awake for the whole run. Idle sleep SUSPENDS a running lane
+# and PAUSES gtimeout's wall-clock timer, so an 18-min lane sprawls across hours
+# and its timeout never enforces — which is what the loop kept misdiagnosing as
+# an "MCP hang"/exit-124 (the 2026-05-23 14:13 run stalled 75 min on a sleeping
+# laptop until woken). `caffeinate -w $$` exits automatically when this run does.
+command -v caffeinate >/dev/null 2>&1 && caffeinate -i -w "$$" >/dev/null 2>&1 &
+
 # --- flags -----------------------------------------------------------------
 DRY_RUN=0; NO_PUSH=0; NO_MONITOR=0; NO_GATE=0; ONLY=""; SKIP=""
 # Keep a timed-out lane's partial work (within the file cap) instead of reverting

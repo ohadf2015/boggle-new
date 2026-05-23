@@ -73,14 +73,25 @@ revert_authored() {
   [ -n "$list" ] && [ -s "$list" ] || return 0
   while IFS= read -r rel; do
     [ -z "$rel" ] && continue
-    if [ -e "$snap/$rel" ]; then
-      # lane modified or deleted a path that existed pre-lane → restore it
+    if git -C "$PROJECT_DIR" cat-file -e "HEAD:$rel" 2>/dev/null; then
+      # Path is committed in HEAD. Restore the working copy to HEAD — this drops
+      # the nightly's uncommitted edit but is NEVER older than HEAD, so it can't
+      # stomp a concurrent session's COMMITTED work, and (crucially) it does NOT
+      # `git rm` — so no staged deletion can leak into the nightly's commit. This
+      # is the fix for the 2026-05-23 run that committed deletions of concurrent
+      # word-tower files it had misattributed as lane-authored.
+      git -C "$PROJECT_DIR" checkout -q HEAD -- "$rel" 2>/dev/null || true
+    elif [ -e "$snap/$rel" ]; then
+      # Untracked at run start (in the snapshot, not in HEAD) → restore snapshot copy.
       mkdir -p "$PROJECT_DIR/$(dirname "$rel")" 2>/dev/null || true
       cp -p "$snap/$rel" "$PROJECT_DIR/$rel" 2>/dev/null || true
     else
-      # lane newly added this path (tracked or untracked) → drop it
-      ( cd "$PROJECT_DIR" && git rm -f --quiet -- "$rel" 2>/dev/null ) \
-        || rm -f "$PROJECT_DIR/$rel" 2>/dev/null || true
+      # Appeared during the run and is NOT committed → a genuinely new untracked
+      # file. Remove it from the WORKING TREE only (never `git rm`, never staged).
+      # If a concurrent session created+committed it mid-run it would be tracked
+      # in HEAD and handled above — so this only ever drops the nightly's own
+      # uncommitted new file.
+      rm -f "$PROJECT_DIR/$rel" 2>/dev/null || true
     fi
   done < "$list"
 }

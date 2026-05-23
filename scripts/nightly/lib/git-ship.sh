@@ -42,6 +42,13 @@ ship_nightly_commit() {
   # mid-run, which no run-start protect list can catch — into the autonomous
   # commit. Allowlist staging makes that structurally impossible.
   if [ -n "${NIGHTLY_AUTHORED:-}" ] && [ -s "$NIGHTLY_AUTHORED" ]; then
+    # Clear the index FIRST so the commit contains EXACTLY the authored paths and
+    # nothing a prior step left staged. revert_authored / a lane / a concurrent
+    # git op can leave staged changes (e.g. a staged deletion) that would
+    # otherwise ride into this commit — that is how the 2026-05-23 run committed
+    # deletions of concurrent word-tower files. `git reset` only unstages; it
+    # never touches the working tree.
+    git reset -q 2>/dev/null || true
     local p
     while IFS= read -r p; do
       [ -z "$p" ] && continue
