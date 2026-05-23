@@ -306,3 +306,66 @@ describe('nextChainAnchor (vowel-ending chain skip)', () => {
     expect(nextChainAnchor('PIZZA', 'en')).toBe('ZA'); // ends A -> ZA
   });
 });
+
+import { damageTower } from '../wordTowerManager';
+describe('damageTower (hazard ruin)', () => {
+  const built = () => ({
+    ...initWordTowerState({ gameCode: 'G', playerId: 'p1', language: 'en' as const }),
+    floors: [
+      { word: 'CAT', len: 3, meters: 10 },
+      { word: 'TAR', len: 3, meters: 12 },
+      { word: 'RUN', len: 3, meters: 8 },
+    ],
+    heightM: 30,
+    heightHighWaterM: 30,
+    anchorLetter: 'N',
+    combo: 5,
+  });
+
+  it('topples the top k floors and drops height by their metres', () => {
+    const { state, removed, metersLost } = damageTower(built(), 2);
+    expect(removed).toBe(2);
+    expect(metersLost).toBe(20); // TAR(12) + RUN(8)
+    expect(state.heightM).toBe(10);
+    expect(state.floors.map((f) => f.word)).toEqual(['CAT']);
+  });
+
+  it('breaks the combo and re-anchors to the new top floor', () => {
+    const { state } = damageTower(built(), 2);
+    expect(state.combo).toBe(0);
+    expect(state.anchorLetter).toBe(nextChainAnchor('CAT', 'en')); // 'T'
+  });
+
+  it('clamps to the floors available, never negative, and re-anchors when emptied', () => {
+    const { state, removed } = damageTower(built(), 99);
+    expect(removed).toBe(3);
+    expect(state.floors).toHaveLength(0);
+    expect(state.heightM).toBe(0);
+    expect(state.anchorLetter.length).toBeGreaterThan(0); // fresh anchor, no crash
+  });
+
+  it('is a no-op for zero/negative', () => {
+    expect(damageTower(built(), 0).removed).toBe(0);
+    expect(damageTower(built(), -3).removed).toBe(0);
+  });
+
+  it('preserves the high-water mark (anti scramble-farm)', () => {
+    expect(damageTower(built(), 2).state.heightHighWaterM).toBe(30);
+  });
+});
+
+describe('applyTowerWord — high-water guards scramble farming', () => {
+  it('does NOT re-earn a scramble when re-climbing below the high-water mark', () => {
+    const s = {
+      ...initWordTowerState({ gameCode: 'G', playerId: 'p1', language: 'en' as const }),
+      heightM: 10,
+      heightHighWaterM: 30, // already climbed to 30 before a hazard knocked us to 10
+      scramblesLeft: 0,
+      scramblesEarned: 0,
+      anchorLetter: 'C',
+    };
+    const { state } = applyTowerWord(s, 'cat'); // small climb, stays under 25 and under 30
+    expect(state.scramblesLeft).toBe(0);
+    expect(state.scramblesEarned).toBe(0);
+  });
+});

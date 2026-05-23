@@ -12,6 +12,7 @@ const sv = {
     "ach": { "unlocked": "Bedrift!", "firstFloor": "Första våningen", "tenFloors": "Höghus", "skyHigh": "Skyhögt", "wordsmith": "Ordkonstnär", "comboKing": "Combo-kung", "rivalCrusher": "Rivalkrossare", "unstoppable": "Ostoppbar", "toTheMoon": "Till månen", "skylineKing": "Skyline-kung", "centurion": "Centurion", "comboGod": "Combo-gud", "wordWizard": "Ordtrollkarl", "galaxyClass": "Galaxklass", "deepSpace": "Yttre rymden" },
     "zone": { "entered": "Ny zon" },
     "landmark": { "skyscraper": "Skyskrapans topp", "cloudBase": "Molnbas", "mountainTop": "Bergstopp", "jetStream": "Jetström", "stormTops": "Stormtoppar", "weatherBalloon": "Väderballong", "earthCurve": "Jordens krökning", "karman": "Rymdens kant", "meteorBelt": "Meteorbälte", "aurora": "Norrsken", "deepSpace": "Yttre rymden" },
+    "hazard": { "bomb": "Bomb", "hurricane": "Orkan", "lost": "{kind}! −{n} våningar" },
     "error": { "too_short": "För kort — minst 3 bokstäver", "bad_chain": "Börja på den lysande bokstaven", "not_buildable": "Använd brickornas bokstäver", "duplicate": "Ordet är redan använt", "not_in_dictionary": "Inte i ordlistan" },
     "celebration": { "highRise": "Höghus!", "tall": "Skyhögt!", "skyscraper": "SKYSKRAPA!" },
     "leaderboard": { "title": "Topptorn", "error": "Kunde inte ladda topplistan", "empty": "Inga torn än — bli först!" },

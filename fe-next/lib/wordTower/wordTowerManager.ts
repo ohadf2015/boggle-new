@@ -202,6 +202,12 @@ export interface WordTowerPlayerState {
   usedWords: Set<string>;
   longestWord: string;
   longestCombo: number;
+  /** Highest altitude ever reached this run. Scramble-earning is gated on this
+   *  (not the live height) so re-climbing after a hazard knockback can't farm
+   *  free scrambles. Never decreases. */
+  heightHighWaterM: number;
+  /** Ids of environmental hazards already triggered this run (fire once each). */
+  firedHazards: Set<string>;
 }
 
 export interface InitOpts {
@@ -228,6 +234,8 @@ export function initWordTowerState(opts: InitOpts): WordTowerPlayerState {
     usedWords: new Set<string>(),
     longestWord: '',
     longestCombo: 0,
+    heightHighWaterM: 0,
+    firedHazards: new Set<string>(),
   };
 }
 
@@ -286,9 +294,14 @@ export function applyTowerWord(
   const heightBefore = state.heightM;
   const heightM = heightBefore + meters;
 
-  const earned =
+  // Earn scrambles only for NEW altitude above the run's high-water mark, so a
+  // hazard knockback + re-climb can't repeatedly farm the same 25m boundary.
+  const earnBase = Math.max(heightBefore, state.heightHighWaterM);
+  const earned = Math.max(
+    0,
     Math.floor(heightM / WORD_TOWER_SCRAMBLE_EARN_EVERY_M) -
-    Math.floor(heightBefore / WORD_TOWER_SCRAMBLE_EARN_EVERY_M);
+      Math.floor(earnBase / WORD_TOWER_SCRAMBLE_EARN_EVERY_M),
+  );
   const scramblesLeft = Math.min(WORD_TOWER_SCRAMBLES_MAX_BANKED, state.scramblesLeft + earned);
 
   const remaining = consumeFromTray(state.tray, w, state.anchorLetter);
@@ -320,6 +333,7 @@ export function applyTowerWord(
     usedWords,
     longestWord: len > state.longestWord.length ? w : state.longestWord,
     longestCombo: Math.max(state.longestCombo, combo),
+    heightHighWaterM: Math.max(state.heightHighWaterM, heightM),
   };
 
   return {
@@ -380,6 +394,41 @@ export function rerollStart(
   return { ...state, anchorLetter, tray, trayDraws: draw, combo: 0 };
 }
 
+export interface DamageResult {
+  state: WordTowerPlayerState;
+  /** Floors actually toppled (clamped to what existed). */
+  removed: number;
+  /** Altitude (m) lost — the sum of the toppled floors' metres. */
+  metersLost: number;
+}
+
+/**
+ * Environmental hazard hit: topple the top `floorsToRemove` floors off the tower
+ * (bomb / hurricane). Height drops by the lost floors' metres, the combo breaks,
+ * and the chain re-anchors to whatever floor is now on top (a fresh anchor if the
+ * tower is emptied). The high-water mark is deliberately preserved so re-climbing
+ * can't farm scrambles. Pure — the scene reconciles the shorter `floors` array by
+ * popping the missing tiles, which IS the "your building was ruined" visual.
+ */
+export function damageTower(state: WordTowerPlayerState, floorsToRemove: number): DamageResult {
+  const remove = Math.min(Math.max(0, Math.floor(floorsToRemove)), state.floors.length);
+  if (remove === 0) return { state, removed: 0, metersLost: 0 };
+
+  const cut = state.floors.length - remove;
+  const kept = state.floors.slice(0, cut);
+  const metersLost = state.floors.slice(cut).reduce((s, f) => s + f.meters, 0);
+  const heightM = Math.max(0, state.heightM - metersLost);
+  const anchorLetter = kept.length > 0
+    ? nextChainAnchor(kept[kept.length - 1]!.word, state.language)
+    : pickAnchor(state.gameCode, state.playerId, state.language);
+
+  return {
+    state: { ...state, floors: kept, heightM, combo: 0, anchorLetter },
+    removed: remove,
+    metersLost,
+  };
+}
+
 // --- persistence (Phase 2): serialize a compact, versioned save blob and
 //     restore from it. Tray is NOT persisted — it is regenerated fresh on
 //     resume (ephemeral). floors/usedWords are capped to keep the blob small;
@@ -401,6 +450,9 @@ export interface WordTowerSaveState {
   longestCombo: number;
   floors: WordTowerFloor[];
   usedWords: string[];
+  /** Optional (added without a version bump — old blobs default safely). */
+  heightHighWaterM?: number;
+  firedHazards?: string[];
 }
 
 export function serializeWordTowerState(state: WordTowerPlayerState): WordTowerSaveState {
@@ -416,6 +468,8 @@ export function serializeWordTowerState(state: WordTowerPlayerState): WordTowerS
     longestCombo: state.longestCombo,
     floors: state.floors.slice(-SAVE_FLOORS_CAP),
     usedWords: [...state.usedWords].slice(-SAVE_USED_WORDS_CAP),
+    heightHighWaterM: state.heightHighWaterM,
+    firedHazards: [...state.firedHazards],
   };
 }
 
@@ -436,6 +490,10 @@ export function restoreWordTowerState(
     usedWords: new Set(saved.usedWords ?? []),
     longestWord: saved.longestWord ?? '',
     longestCombo: Math.max(0, saved.longestCombo ?? 0),
+    // Old (v1) blobs lack these: default the high-water to the saved height (so a
+    // resumed run still can't farm below it) and an empty fired-hazard set.
+    heightHighWaterM: Math.max(0, saved.heightHighWaterM ?? saved.heightM ?? 0),
+    firedHazards: new Set(saved.firedHazards ?? []),
   };
 }
 

@@ -47,7 +47,18 @@ Two-tap neo-brutalist guard: first tap → button becomes "Sure?" (neo-red, shak
 second tap within 3s commits `tower.reset()`, else reverts. No browser `confirm()`
 (Capacitor-ugly, breaks RTL). New key `wordTower.hud.restartConfirm`.
 
-## D — Environmental hazards that ruin a tower (DESIGN — next dedicated build)
+## D — Environmental hazards that ruin a tower (✅ BUILT v1)
+Implemented: `hazards.ts` (fixed-altitude `WORD_TOWER_HAZARDS` — bomb low, hurricane
+high; `hazardsCrossed`), `damageTower` in the manager (topple top-k, drop height,
+break combo, re-anchor) + **`heightHighWaterM` anti scramble-farm guard**, reducer
+`hazard` action + `firedHazards` in state, `WordTowerPlay` crossing detection +
+unmissable red banner (`wordTower.hazard.lost`) + `haptics.bossHit()` + error sound.
+The scene auto-pops the toppled floors. Defaults shipped: rebuild is free · fixed
+altitude triggers · no opt-out · first hazard at 160m (early climb safe). **Watch
+PostHog quit-rate/retention; add a telegraph (incoming warning) or first-hazard grace
+if numbers dip.** Rival-tower damage (live versus, `WORD_TOWER_BOMB_*`) still separate.
+
+### (original design notes)
 Clarified across follow-ups: hazards damage a **building** (the player's own, and/or a
 rival's) and the partial ruin must be SHOWN. "maybe with a bomb, and higher up a
 hurricane or something — show the player his building was partially ruined."

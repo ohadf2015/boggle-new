@@ -12,6 +12,7 @@ const ja = {
     "ach": { "unlocked": "実績解除！", "firstFloor": "最初の階", "tenFloors": "高層ビル", "skyHigh": "空高く", "wordsmith": "言葉の達人", "comboKing": "コンボ王", "rivalCrusher": "ライバル撃破", "unstoppable": "止まらない", "toTheMoon": "月まで", "skylineKing": "スカイラインの王", "centurion": "百階の戦士", "comboGod": "コンボの神", "wordWizard": "言葉の魔法使い", "galaxyClass": "ギャラクシー級", "deepSpace": "深宇宙" },
     "zone": { "entered": "新エリア" },
     "landmark": { "skyscraper": "超高層ビルの上", "cloudBase": "雲の底", "mountainTop": "山頂", "jetStream": "ジェット気流", "stormTops": "雷雲の頂", "weatherBalloon": "気象観測気球", "earthCurve": "地球の弧", "karman": "宇宙の境界", "meteorBelt": "流星帯", "aurora": "オーロラ", "deepSpace": "深宇宙" },
+    "hazard": { "bomb": "爆弾", "hurricane": "ハリケーン", "lost": "{kind}！{n}階崩落" },
     "error": { "too_short": "短すぎます — 3文字以上", "bad_chain": "光る文字で始めてください", "not_buildable": "トレイの文字を使ってください", "duplicate": "その単語は使用済みです", "not_in_dictionary": "辞書にありません" },
     "celebration": { "highRise": "ハイライズ！", "tall": "そびえ立つ！", "skyscraper": "摩天楼！" },
     "leaderboard": { "title": "トップタワー", "error": "ランキングを読み込めません", "empty": "まだ塔がありません — 最初の一人に！" },

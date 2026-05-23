@@ -12,6 +12,7 @@ const he = {
     "ach": { "unlocked": "הישג!", "firstFloor": "קומה ראשונה", "tenFloors": "בניין", "skyHigh": "גבוה בשמיים", "wordsmith": "אמן מילים", "comboKing": "מלך הקומבו", "rivalCrusher": "מנצח יריבים", "unstoppable": "בלתי עציר", "toTheMoon": "אל הירח", "skylineKing": "מלך קו הרקיע", "centurion": "מאה קומות", "comboGod": "אל הקומבו", "wordWizard": "קוסם המילים", "galaxyClass": "דרגת גלקסיה", "deepSpace": "חלל עמוק" },
     "zone": { "entered": "אזור חדש" },
     "landmark": { "skyscraper": "פסגת גורד שחקים", "cloudBase": "בסיס העננים", "mountainTop": "פסגת ההר", "jetStream": "זרם הסילון", "stormTops": "ראש הסערה", "weatherBalloon": "בלון מזג אוויר", "earthCurve": "עקמומיות כדור הארץ", "karman": "קצה החלל", "meteorBelt": "חגורת המטאורים", "aurora": "זוהר קוטבי", "deepSpace": "חלל עמוק" },
+    "hazard": { "bomb": "פצצה", "hurricane": "סופה", "lost": "{kind}! נפלו {n} קומות" },
     "error": { "too_short": "קצר מדי — 3 אותיות לפחות", "bad_chain": "התחילו באות הזוהרת", "not_buildable": "השתמשו באותיות המגש", "duplicate": "כבר השתמשת במילה הזו", "not_in_dictionary": "לא במילון" },
     "celebration": { "highRise": "מתנשא!", "tall": "גבוה!", "skyscraper": "גורד שחקים!" },
     "leaderboard": { "title": "המגדלים המובילים", "error": "טעינת הלוח נכשלה", "empty": "אין עדיין מגדלים — היו הראשונים!" },

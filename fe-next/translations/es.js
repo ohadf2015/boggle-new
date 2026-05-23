@@ -12,6 +12,7 @@ const es = {
     "ach": { "unlocked": "¡Logro!", "firstFloor": "Primer piso", "tenFloors": "Edificio", "skyHigh": "Por las nubes", "wordsmith": "Maestro de palabras", "comboKing": "Rey del combo", "rivalCrusher": "Aplasta-rivales", "unstoppable": "Imparable", "toTheMoon": "A la luna", "skylineKing": "Rey del horizonte", "centurion": "Centurión", "comboGod": "Dios del combo", "wordWizard": "Mago de palabras", "galaxyClass": "Clase galaxia", "deepSpace": "Espacio profundo" },
     "zone": { "entered": "Nueva zona" },
     "landmark": { "skyscraper": "Cima del rascacielos", "cloudBase": "Base de nubes", "mountainTop": "Pico de montaña", "jetStream": "Corriente en chorro", "stormTops": "Cima de tormenta", "weatherBalloon": "Globo meteorológico", "earthCurve": "Curvatura terrestre", "karman": "Borde del espacio", "meteorBelt": "Cinturón de meteoros", "aurora": "Aurora", "deepSpace": "Espacio profundo" },
+    "hazard": { "bomb": "Bomba", "hurricane": "Huracán", "lost": "¡{kind}! −{n} pisos" },
     "error": { "too_short": "Muy corta — 3+ letras", "bad_chain": "Empieza con la letra brillante", "not_buildable": "Usa las letras de la bandeja", "duplicate": "Ya usaste esa palabra", "not_in_dictionary": "No está en el diccionario" },
     "celebration": { "highRise": "¡Edificio alto!", "tall": "¡Imponente!", "skyscraper": "¡RASCACIELOS!" },
     "leaderboard": { "title": "Torres principales", "error": "No se pudo cargar la clasificación", "empty": "Aún no hay torres — ¡sé el primero!" },

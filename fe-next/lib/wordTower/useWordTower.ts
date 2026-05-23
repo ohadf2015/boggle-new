@@ -16,10 +16,12 @@ import {
   applyTowerWord,
   scrambleTray,
   rerollStart,
+  damageTower,
   type WordTowerPlayerState,
   type ApplyResult,
   type ValidationError,
 } from './wordTowerManager';
+import type { HazardEvent, HazardKind } from './hazards';
 
 export interface WordTowerUIState {
   game: WordTowerPlayerState;
@@ -33,6 +35,10 @@ export interface WordTowerUIState {
   lastError: ValidationError | null;
   /** Bumps on every rejection so the shake animation re-fires. */
   errorKey: number;
+  /** Last environmental-hazard strike — drives the "tower ruined" banner + FX. */
+  lastHazard: HazardEvent | null;
+  /** Bumps on every hazard strike so the banner/FX re-fire. */
+  hazardKey: number;
 }
 
 type Action =
@@ -42,6 +48,7 @@ type Action =
   | { type: 'submit'; isInDictionary: (canonWord: string) => boolean }
   | { type: 'scramble' }
   | { type: 'rerollStart'; isViableAnchor?: (anchor: string, tray: string[]) => boolean }
+  | { type: 'hazard'; floors: number; kind: HazardKind; ids: string[] }
   | { type: 'reset'; game: WordTowerPlayerState };
 
 /** Word currently being built: anchor letter + the selected tray tiles. */
@@ -78,6 +85,22 @@ function reducer(state: WordTowerUIState, action: Action): WordTowerUIState {
         lastError: null,
       };
     }
+    case 'hazard': {
+      // Always record the ids as fired (so the strike never re-triggers), even if
+      // there were no floors left to topple.
+      const firedHazards = new Set(state.game.firedHazards);
+      action.ids.forEach((id) => firedHazards.add(id));
+      const { state: damaged, removed, metersLost } = damageTower(state.game, action.floors);
+      const game = { ...damaged, firedHazards };
+      if (removed === 0) return { ...state, game };
+      return {
+        ...state,
+        game,
+        selected: [],
+        lastHazard: { kind: action.kind, removed, metersLost },
+        hazardKey: state.hazardKey + 1,
+      };
+    }
     case 'scramble':
       return { ...state, game: scrambleTray(state.game), selected: [] };
     case 'rerollStart':
@@ -90,7 +113,7 @@ function reducer(state: WordTowerUIState, action: Action): WordTowerUIState {
 }
 
 function makeInitial(game: WordTowerPlayerState): WordTowerUIState {
-  return { game, selected: [], lastResult: null, resultKey: 0, lastError: null, errorKey: 0 };
+  return { game, selected: [], lastResult: null, resultKey: 0, lastError: null, errorKey: 0, lastHazard: null, hazardKey: 0 };
 }
 
 export interface UseWordTowerOpts {
@@ -122,6 +145,7 @@ export function useWordTower(opts: UseWordTowerOpts) {
       submit: () => dispatch({ type: 'submit', isInDictionary: dictRef.current }),
       scramble: () => dispatch({ type: 'scramble' }),
       reroll: (isViableAnchor?: (anchor: string, tray: string[]) => boolean) => dispatch({ type: 'rerollStart', isViableAnchor }),
+      hazard: (floors: number, kind: HazardKind, ids: string[]) => dispatch({ type: 'hazard', floors, kind, ids }),
       reset: () =>
         dispatch({ type: 'reset', game: initWordTowerState({ gameCode: sessionId, playerId: 'solo', language }) }),
     }),

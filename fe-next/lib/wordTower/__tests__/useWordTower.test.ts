@@ -85,4 +85,26 @@ describe('useWordTower', () => {
     expect(result.current.state.game.heightM).toBe(0);
     expect(result.current.state.resultKey).toBe(0);
   });
+
+  it('hazard topples floors, drops height, breaks combo, and fires once', () => {
+    const { result } = setup(acceptAll);
+    const build = () => {
+      act(() => result.current.selectTile(0));
+      act(() => result.current.selectTile(1));
+      act(() => result.current.submit());
+    };
+    build(); build(); build();
+    const before = result.current.state.game.floors.length;
+    expect(before).toBeGreaterThanOrEqual(1);
+    const h0 = result.current.state.game.heightM;
+
+    act(() => result.current.hazard(2, 'hurricane', ['storm-x']));
+
+    expect(result.current.state.game.floors.length).toBe(Math.max(0, before - 2));
+    expect(result.current.state.game.heightM).toBeLessThan(h0);
+    expect(result.current.state.game.combo).toBe(0);
+    expect(result.current.state.game.firedHazards.has('storm-x')).toBe(true);
+    expect(result.current.state.hazardKey).toBe(1);
+    expect(result.current.state.lastHazard?.kind).toBe('hurricane');
+  });
 });

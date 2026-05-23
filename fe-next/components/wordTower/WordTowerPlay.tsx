@@ -20,6 +20,7 @@ import type { RivalMarker } from '@/lib/wordTower/rivals';
 import { WordTowerRivalRail } from './WordTowerRivalRail';
 import { WordTowerLandmarkRail } from './WordTowerLandmarkRail';
 import { milestoneCrossed } from '@/lib/wordTower/milestones';
+import { hazardsCrossed } from '@/lib/wordTower/hazards';
 import { newlyUnlocked, type Achievement } from '@/lib/wordTower/achievements';
 import { WordTowerScene } from './WordTowerScene';
 import { WordTowerHud } from './WordTowerHud';
@@ -144,6 +145,33 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
 
   const haptics = useHaptics();
   const { playCoinCollectSound, playChestOpenSound, playErrorSound } = useSoundEffects();
+
+  // Environmental hazards: a bomb low down, a hurricane up high, strike at fixed
+  // altitudes and topple the top floors. Detect the crossing → apply the damage
+  // (the scene pops the lost floors automatically; the banner below names it).
+  // height drops after a strike, so the next run sees curM<prevM → no re-fire,
+  // and `firedHazards` guards re-climbing past the same altitude.
+  const prevHazardH = useRef(game.heightM);
+  useEffect(() => {
+    const prev = prevHazardH.current;
+    prevHazardH.current = game.heightM;
+    const crossed = hazardsCrossed(prev, game.heightM, game.firedHazards);
+    if (crossed.length === 0) return;
+    const floors = crossed.reduce((s, h) => s + h.floors, 0);
+    tower.hazard(floors, crossed[crossed.length - 1]!.kind, crossed.map((h) => h.id));
+  }, [game.heightM]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // "Your tower was ruined" banner + FX — never silent (founder ask).
+  const [hazardText, setHazardText] = useState<string | null>(null);
+  useEffect(() => {
+    const hz = tower.state.lastHazard;
+    if (!hz || tower.state.hazardKey === 0) return;
+    setHazardText(t('wordTower.hazard.lost', { kind: t(`wordTower.hazard.${hz.kind}`), n: hz.removed }));
+    haptics.bossHit();
+    playErrorSound();
+    const id = setTimeout(() => setHazardText(null), 2900);
+    return () => clearTimeout(id);
+  }, [tower.state.hazardKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Hide the global bottom nav for the duration of gameplay (full-screen mode).
   const setIsInGame = useHideNavigation();
@@ -297,6 +325,16 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           aria-live="polite"
         >
           {milestoneText}
+        </div>
+      )}
+
+      {/* Hazard "tower ruined" banner — bold + red so the loss is unmissable */}
+      {hazardText && (
+        <div
+          className={`pointer-events-none absolute left-1/2 top-[15%] z-40 -translate-x-1/2 rounded-neo border-neo-thick border-black bg-neo-red px-4 py-2 text-center font-neo-display text-base font-black text-neo-white shadow-hard ${reducedMotion ? '' : 'animate-neo-shake'}`}
+          aria-live="assertive"
+        >
+          {hazardText}
         </div>
       )}
 
