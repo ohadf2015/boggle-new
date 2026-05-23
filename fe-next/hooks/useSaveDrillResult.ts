@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { DrillType, CognitiveDomain, BrainTier } from '@/shared/types/cognitive';
+import type { DrillImprovement } from '@/shared/utils/drillImprovement';
 import { useNetworkState } from '@/hooks/useNetworkState';
 import { useOfflineModeFlag } from '@/hooks/useOfflineModeFlag';
 import { getOfflineStore } from '@/lib/offline';
@@ -36,6 +37,8 @@ interface SaveDrillResultResponse {
   idempotent?: boolean;
   /** True when the result was enqueued for offline sync rather than submitted live. Rewards arrive on reconnect via /api/scores/sync. */
   queued?: boolean;
+  /** "You got better" signals for the results screen (personal best, vs average, vs last). */
+  improvement?: DrillImprovement;
 }
 
 interface UseSaveDrillResultReturn {
@@ -106,6 +109,7 @@ export function useSaveDrillResult(): UseSaveDrillResultReturn {
         newLevel: data.newLevel,
         previousLevel: data.previousLevel,
         idempotent: data.idempotent ?? false,
+        improvement: data.improvement,
       };
     } catch (error) {
       const err = error as Error;

@@ -12,6 +12,7 @@ import DrillProgressionOverlay from '@/components/brain/DrillProgressionOverlay'
 import DrillResearchIntro from '@/components/brain/DrillResearchIntro';
 import { useDrillGrid } from '@/hooks/useDrillGrid';
 import { useSaveDrillResult, DrillBrainScoreUpdate } from '@/hooks/useSaveDrillResult';
+import type { DrillImprovement } from '@/shared/utils/drillImprovement';
 import { useDrillRewards } from '@/hooks/useDrillRewards';
 import { useDrillLevel } from '@/hooks/useDrillLevel';
 import { trackDrillStart } from '@/lib/drills/telemetry';
@@ -37,6 +38,7 @@ export default function MemoryHuntPageClient() {
   // State for progression overlay
   const [showProgressionOverlay, setShowProgressionOverlay] = useState(false);
   const [brainScoreUpdate, setBrainScoreUpdate] = useState<DrillBrainScoreUpdate | null>(null);
+  const [improvement, setImprovement] = useState<DrillImprovement | null>(null);
   const [drillRewards, setDrillRewards] = useState<{ xpAwarded: number; goldAwarded: number } | null>(null);
   const [levelUp, setLevelUp] = useState<{ newLevel: number; previousLevel: number } | null>(null);
   const [sessionId] = useState(() => `drill_memory-hunt_${crypto.randomUUID()}`);
@@ -79,6 +81,7 @@ export default function MemoryHuntPageClient() {
     if (saveResult.success && saveResult.brainScore) {
       try { sessionStorage.setItem('lex_brain_dirty', '1'); } catch { /* ignore */ }
       setBrainScoreUpdate(saveResult.brainScore);
+      setImprovement(saveResult.improvement ?? null);
       if (saveResult.levelPromoted && saveResult.newLevel != null && saveResult.previousLevel != null) {
         setLevelUp({ newLevel: saveResult.newLevel, previousLevel: saveResult.previousLevel });
       } else {
@@ -179,6 +182,7 @@ export default function MemoryHuntPageClient() {
           xpAwarded={drillRewards?.xpAwarded}
           goldAwarded={drillRewards?.goldAwarded}
           levelUp={levelUp ?? undefined}
+          improvement={improvement ?? undefined}
         />
       )}
     </div>

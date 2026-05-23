@@ -19,6 +19,7 @@ import {
 } from '@/utils/cognitiveScoring';
 import { computeDrillProgressUpdate } from '@/shared/utils/drillLeveling';
 import { validateDrillSubmission } from '@/shared/utils/drillSubmissionValidation';
+import { computeDrillImprovement, type DrillImprovement } from '@/shared/utils/drillImprovement';
 
 export type SupabaseLike = any;
 
@@ -52,6 +53,8 @@ export interface DrillCompletionResponseBody {
   levelPromoted: boolean;
   newLevel?: number;
   previousLevel?: number;
+  /** "You got better" signals for the results screen (best-effort). */
+  improvement?: DrillImprovement;
 }
 
 export type DrillProcessResult =
@@ -397,6 +400,37 @@ export async function processBrainDrillCompletion(
   const previousLevel = priorSnapshot?.level ?? 1;
   const levelPromoted = nextProgress.level > previousLevel;
 
+  // "You got better" signals for the results screen. priorSnapshot is the
+  // progress BEFORE this run; the current run's session row is already inserted
+  // above, so exclude it by id when reading the immediately-previous score.
+  let lastSessionScore: number | null = null;
+  try {
+    const { data: priorSessions } = await supabase
+      .from('drill_sessions')
+      .select('score')
+      .eq('user_id', userId)
+      .eq('drill_type', drillType)
+      .neq('id', sessionData.id)
+      .order('created_at', { ascending: false })
+      .limit(1);
+    if (Array.isArray(priorSessions) && priorSessions.length > 0) {
+      lastSessionScore = priorSessions[0]?.score ?? null;
+    }
+  } catch {
+    /* non-fatal — improvement just omits the vs-last signal */
+  }
+  const improvement = computeDrillImprovement(
+    priorSnapshot
+      ? {
+          highScore: priorSnapshot.highScore,
+          totalPlays: priorSnapshot.totalPlays,
+          totalScore: priorSnapshot.totalScore,
+        }
+      : null,
+    score,
+    lastSessionScore,
+  );
+
   // Fire-and-forget: mark brainDrills quest slot complete for today
   import('@/backend/modules/dailyMissionsManager').then(({ completeMissionForMode }) => {
     completeMissionForMode(userId, 'brainDrills').catch(() => {});
@@ -412,6 +446,7 @@ export async function processBrainDrillCompletion(
       levelPromoted,
       newLevel: nextProgress.level,
       previousLevel,
+      improvement,
     },
   };
 }

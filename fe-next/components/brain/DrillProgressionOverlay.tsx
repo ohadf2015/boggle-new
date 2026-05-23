@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { Zap, Brain, Target, Shuffle, BookOpen, TrendingUp, X, Star, Coins } from 'lucide-react';
+import { Zap, Brain, Target, Shuffle, BookOpen, TrendingUp, X, Star, Coins, Trophy, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { CognitiveDomain, BrainTier } from '@/shared/types/cognitive';
+import type { DrillImprovement } from '@/shared/utils/drillImprovement';
 
 interface DrillProgressionOverlayProps {
   /** Whether the overlay is visible */
@@ -31,6 +32,30 @@ interface DrillProgressionOverlayProps {
   goldAwarded?: number;
   /** Level promotion info if drill bumped player to a new level */
   levelUp?: { newLevel: number; previousLevel: number };
+  /** "You got better" signals — surfaces the single most flattering true one. */
+  improvement?: DrillImprovement;
+}
+
+/**
+ * Picks the single most flattering TRUE improvement signal to celebrate.
+ * Priority: personal best > above your average > better than last time >
+ * first attempt. Returns null when there's nothing genuine to show.
+ */
+function pickImprovementBadge(improvement: DrillImprovement | undefined) {
+  if (!improvement) return null;
+  if (improvement.isPersonalBest) {
+    return { key: 'brain.drills.newPersonalBest', Icon: Trophy, bg: 'bg-neo-yellow' } as const;
+  }
+  if (improvement.totalPlays > 0 && improvement.averageScore > 0 && improvement.currentScore > improvement.averageScore) {
+    return { key: 'brain.drills.aboveAverage', Icon: TrendingUp, bg: 'bg-neo-green' } as const;
+  }
+  if (improvement.improvedVsLast) {
+    return { key: 'brain.drills.betterThanLast', Icon: TrendingUp, bg: 'bg-neo-green' } as const;
+  }
+  if (improvement.totalPlays === 0) {
+    return { key: 'brain.drills.firstAttempt', Icon: Sparkles, bg: 'bg-neo-cyan' } as const;
+  }
+  return null;
 }
 
 const DOMAIN_CONFIG: Record<CognitiveDomain, {
@@ -133,10 +158,13 @@ export default function DrillProgressionOverlay({
   xpAwarded,
   goldAwarded,
   levelUp,
+  improvement,
 }: DrillProgressionOverlayProps) {
   const { theme } = useTheme();
   const { t } = useLanguage();
   const isDarkMode = theme === 'dark';
+  const improvementBadge = pickImprovementBadge(improvement);
+  const ImprovementIcon = improvementBadge?.Icon;
   const [showScore, setShowScore] = useState(false);
   const [showDelta, setShowDelta] = useState(false);
   const [showOverall, setShowOverall] = useState(false);
@@ -323,6 +351,29 @@ export default function DrillProgressionOverlay({
                       animate={{ width: `${newDomainScore}%` }}
                       transition={{ type: 'spring', stiffness: 80, damping: 15 }}
                     />
+                  </div>
+                </m.div>
+              )}
+            </AnimatePresence>
+
+            {/* Improvement badge — the single most flattering true "you got better" signal */}
+            <AnimatePresence>
+              {showDelta && improvementBadge && ImprovementIcon && (
+                <m.div
+                  initial={{ opacity: 0, scale: 0.5, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ type: 'spring', damping: 15 }}
+                  className="flex justify-center mb-4"
+                  data-testid="drill-improvement-badge"
+                >
+                  <div className={cn(
+                    'inline-flex items-center gap-2 px-4 py-2 rounded-neo border-3 border-neo-black',
+                    improvementBadge.bg
+                  )}>
+                    <ImprovementIcon className="w-5 h-5 text-neo-black" />
+                    <span className="text-sm font-black uppercase tracking-wide text-neo-black">
+                      {t(improvementBadge.key)}
+                    </span>
                   </div>
                 </m.div>
               )}
