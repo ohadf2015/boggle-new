@@ -19,23 +19,30 @@ Surface (a) viral word-game concepts worth borrowing, (b) Reddit threads where L
 
 ═══ TOOLS — use these (NO external API key needed) ═══
 
-**Reddit access strategy** — DIRECT ENDPOINTS ARE DEAD. Confirmed blocked 5
-consecutive nights (2026-05-19 → 05-23): `reddit.com`/`.json` = IP-blocked,
-`old.reddit.com` = blocked, `pullpush.io` = HTTP 400/empty.
-- **DO NOT** `WebFetch` `reddit.com`, `www.reddit.com`, `*.json` reddit URLs,
-  `old.reddit.com`, or `api.pullpush.io`. Every attempt has failed for 5 nights;
-  cycling them just burns tool calls + time. Skip them entirely.
-- **Reddit discovery = `WebSearch` SERP ONLY**: `WebSearch("site:reddit.com r/wordgames <topic> 2026")`.
-  Use the SERP snippets (titles, scores, blurbs) directly — they're enough to
-  judge a thread's relevance. Do NOT then try to fetch the thread body.
-- If a `WebSearch` returns nothing usable for Reddit, that subreddit is a dead
-  end tonight — move on. r/wordgames is genuinely low-traffic; absence of signal
-  is data, not a fetch gap.
+**Reddit access — use the LOCAL Bash helper, NOT WebFetch.** Reddit's block is
+User-Agent based, not IP based: WebFetch (Anthropic IP, no UA control) gets
+403/429 — that's the 5-night "Reddit is dead" history (05-19→23). A local `curl`
+with a descriptive UA returns HTTP 200 + real JSON. So fetch Reddit through the
+maintained helper via the **Bash** tool:
+
+```bash
+# Subreddit feed → compact JSON array [{title,score,num_comments,permalink,author,selftext(500)}]
+scripts/nightly/lib/reddit-fetch.sh feed wordgames top week 25
+# Global/subreddit search
+scripts/nightly/lib/reddit-fetch.sh search "indie word game launch 2026" relevance week 25
+```
+
+- It ALWAYS exits 0; on failure it prints `{"error":...}` — just move on, never block.
+- **DO NOT** `WebFetch` reddit.com / `.json` / old.reddit / pullpush.io — that's
+  the dead path. Use the helper.
+- `WebSearch` SERP is still fine as a SUPPLEMENT for discovery, but the helper is
+  the primary source now (real titles/scores/bodies, not just snippets).
 
 **Tools available:**
-- **`WebSearch`** — broad discovery: "site:reddit.com r/wordgames best of week", "indie word game launches reddit 2026". Use to find candidate threads.
-- **`WebFetch`** — pull JSON or HTML. For Reddit `.json` URLs, your fetch prompt should say "extract: title, score, num_comments, permalink, selftext (truncated 500 chars), url, author". For pullpush.io: "extract: data[].title, data[].score, data[].num_comments, data[].full_link, data[].selftext".
-- **`agent-browser` skill** — fallback ONLY if WebFetch returns empty on a JS-only site (e.g., a portal that hydrates client-side). Max twice per run.
+- **`reddit-fetch.sh` (Bash)** — PRIMARY Reddit source. Local curl + descriptive UA → real JSON, works unattended. See above for usage. (WebFetch on reddit is blocked — don't.)
+- **`WebSearch`** — broad discovery for NON-reddit signal + supplemental reddit thread-finding: "indie word game launch 2026", "viral wordle clone 2026".
+- **`WebFetch`** — pull competitor sites / portals / articles (NOT reddit). For JSON/HTML, state the fields to extract in the prompt.
+- **Fallbacks if a source still resists** (use only if the above fail, max twice/run): the `agent-browser` skill, or the `browsing-skills` skill's `reddit.com` actions via Playwriter — both drive a real browser. NOTE: Playwriter/agent-browser need an interactive browser session and generally WON'T be available in the unattended 02:00 run, so they're best-effort only; `reddit-fetch.sh` is the one that always works at 02:00.
 
 ═══ STEP 1 — Discover via WebSearch ═══
 Run 3-5 broad WebSearch queries to find what's trending. Examples:
@@ -48,10 +55,12 @@ Run 3-5 broad WebSearch queries to find what's trending. Examples:
 Keep the SERP snippets — they often contain the post titles + upvote counts you need without further fetching.
 
 ═══ STEP 2 — Deep-fetch the highest-signal candidates ═══
-**Reddit: do NOT WebFetch reddit/pullpush endpoints — they are dead (see above).**
-Get Reddit signal from `WebSearch` SERP snippets only:
-- `WebSearch("site:reddit.com/r/wordgames top this week 2026")`
-- `WebSearch("site:reddit.com/r/dailygames new word game 2026")`
+**Reddit: use the `reddit-fetch.sh` Bash helper (see above), NOT WebFetch.**
+- `scripts/nightly/lib/reddit-fetch.sh feed wordgames top week 25`
+- `scripts/nightly/lib/reddit-fetch.sh feed dailygames top week 25`
+- `scripts/nightly/lib/reddit-fetch.sh feed Anagrams top month 25`
+- `scripts/nightly/lib/reddit-fetch.sh search "<topic>" relevance week 25`
+Parse the JSON it returns directly. `WebSearch("site:reddit.com ...")` only as a supplement.
 - `WebSearch("site:reddit.com/r/Anagrams OR r/Scrabble recommendation 2026")`
 Read the returned titles/blurbs; that IS the data. Spend your deep-fetch budget
 on COMPETITOR sites + portals below, which DO respond, not on dead Reddit URLs.
