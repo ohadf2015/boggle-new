@@ -45,6 +45,46 @@ snapshot_pre_lane() {
   echo "$snap"
 }
 
+# nightly_dirty_paths → one line per currently-dirty path (tracked unstaged +
+# staged + untracked, sorted/unique). Diffing this set before vs after a lane
+# attributes EXACTLY which paths the lane authored, so every later stage/revert
+# can be scoped to the nightly's own work — never the founder's WIP or a
+# concurrent session's edits.
+nightly_dirty_paths() {
+  ( cd "$PROJECT_DIR" 2>/dev/null \
+    && { git diff --name-only; \
+         git diff --cached --name-only; \
+         git ls-files --others --exclude-standard; } | sort -u )
+}
+
+# revert_authored <snapshot_dir> <authored_list_file>
+# The ALLOWLIST counterpart to revert_to_pre_lane. Revert ONLY the paths listed
+# in <authored_list_file> — the nightly's own lane-authored changes — restoring
+# each from the snapshot, or dropping it if the lane newly added it. Any path NOT
+# on the list (founder WIP, a human's concurrent edit, anything the nightly did
+# not author) is NEVER touched, even if it is dirty and even if it was clean when
+# the snapshot was taken. This closes the concurrent-edit window entirely:
+# attribution is EXPLICIT, not inferred from "dirty minus a stale protect list".
+# Does NOT consume the snapshot dir (caller may revert several lists against it,
+# then clean up) — unlike revert_to_pre_lane.
+revert_authored() {
+  local snap="$1" list="$2" rel
+  [ -n "$snap" ] && [ -d "$snap" ] || return 0
+  [ -n "$list" ] && [ -s "$list" ] || return 0
+  while IFS= read -r rel; do
+    [ -z "$rel" ] && continue
+    if [ -e "$snap/$rel" ]; then
+      # lane modified or deleted a path that existed pre-lane → restore it
+      mkdir -p "$PROJECT_DIR/$(dirname "$rel")" 2>/dev/null || true
+      cp -p "$snap/$rel" "$PROJECT_DIR/$rel" 2>/dev/null || true
+    else
+      # lane newly added this path (tracked or untracked) → drop it
+      ( cd "$PROJECT_DIR" && git rm -f --quiet -- "$rel" 2>/dev/null ) \
+        || rm -f "$PROJECT_DIR/$rel" 2>/dev/null || true
+    fi
+  done < "$list"
+}
+
 # revert_to_pre_lane <snapshot_dir>
 # Restore ONLY the tracked files the lane changed (those that differ from the
 # snapshot), skipping any path protected as founder WIP. Untracked files are

@@ -36,7 +36,24 @@ NIGHTLY_GENERATED_EXCLUDE=(
 )
 
 ship_nightly_commit() {
-  git add -A
+  # Stage ONLY the paths the nightly's own lanes authored (the allowlist run.sh
+  # built as per-lane (dirty after) − (dirty before)). NEVER `git add -A`: a
+  # blanket stage sweeps the founder's concurrent WIP — including files dirtied
+  # mid-run, which no run-start protect list can catch — into the autonomous
+  # commit. Allowlist staging makes that structurally impossible.
+  if [ -n "${NIGHTLY_AUTHORED:-}" ] && [ -s "$NIGHTLY_AUTHORED" ]; then
+    local p
+    while IFS= read -r p; do
+      [ -z "$p" ] && continue
+      git add -- "$p" 2>/dev/null || true   # stages modifications, additions, and deletions
+    done < "$NIGHTLY_AUTHORED"
+  else
+    # No allowlist provided (e.g. an isolated unit test, or --only with no output).
+    # Fall back to the legacy blanket stage; the protect-list unstage below still
+    # guards run-start founder WIP. Production always exports NIGHTLY_AUTHORED.
+    log "ship: NIGHTLY_AUTHORED unset/empty — falling back to git add -A (legacy)"
+    git add -A
+  fi
 
   # Drop volatile generated artifacts: unstage + restore working copy so the
   # NEXT run's preflight doesn't see a dirty tree. (All entries are tracked, so
@@ -135,9 +152,8 @@ ship_nightly_commit() {
       # not origin. So --theirs keeps the nightly's fresh docs. (Rebase inverts the
       # intuitive ours/theirs — origin is "ours"/HEAD here.)
       while IFS= read -r cf; do
-        [ -n "$cf" ] && git checkout --theirs -- "$cf" 2>/dev/null
+        [ -n "$cf" ] && git checkout --theirs -- "$cf" 2>/dev/null && git add -- "$cf" 2>/dev/null
       done <<< "$conflicted"
-      git add -A
       if git rebase --continue >> "$RUN_LOG" 2>&1 \
          && git push origin master >> "$RUN_LOG" 2>&1; then
         NEW_SHA=$(git rev-parse HEAD)

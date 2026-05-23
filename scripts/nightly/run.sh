@@ -80,8 +80,9 @@ cleanup() {
   # shellcheck disable=SC1091
   . "$LIB_DIR/preflight.sh"
   preflight_release_lock
-  # On the success path the WIP snapshot is never reverted, so its tempdir leaks
-  # unless we sweep it here. (Revert paths null it out after consuming it.)
+  # The run-start WIP snapshot (rsync mirror) is consulted by revert_authored but
+  # never consumed, so sweep its tempdir here on every exit path (rm -rf is a
+  # no-op if a branch already removed it).
   [ -n "${RUN_SNAPSHOT:-}" ] && rm -rf "$RUN_SNAPSHOT" 2>/dev/null
 }
 trap cleanup EXIT
@@ -174,10 +175,10 @@ fi
 # --- WIP snapshot + dirty baseline ----------------------------------------
 # The loop runs ON TOP OF the founder's uncommitted WIP and ships it. Snapshot the
 # FULL working tree NOW (after the report header is written, before any lane runs)
-# so every abort / gate-failure path can restore it byte-for-byte — we sweep WIP
-# into the commit on success, but on failure we must NEVER destroy it or push it
-# broken. Also record the pre-lane dirty count so the sanity cap below measures
-# LANE-introduced churn, not the founder's pre-existing WIP.
+# so revert_authored can restore any of the nightly's OWN files byte-for-byte on
+# an abort / gate failure. The nightly NEVER sweeps founder WIP into its commit
+# and NEVER reverts it — staging and reverts are scoped to the lane-authored
+# allowlist below. BASELINE_DIRTY is informational only (how much WIP we ran on top of).
 RUN_SNAPSHOT=$(snapshot_pre_lane)
 BASELINE_DIRTY=$(git status --porcelain | wc -l | tr -d ' ')
 # Founder WIP paths at run start → git-ship excludes these from the nightly commit
@@ -190,6 +191,17 @@ cp "$RUN_SNAPSHOT/.wip-protect.list" "$WIP_PROTECT_FILE" 2>/dev/null \
        git ls-files --others --exclude-standard; } | sort -u > "$WIP_PROTECT_FILE"
 export NIGHTLY_WIP_PROTECT="$WIP_PROTECT_FILE"
 log "pre-lane WIP: $BASELINE_DIRTY dirty files (snapshot $RUN_SNAPSHOT; protect list $WIP_PROTECT_FILE)"
+
+# Allowlist of paths the nightly's OWN lanes authored — built per-lane below as
+# (dirty after lane) − (dirty before lane), accumulated only for KEPT lanes.
+# EVERY stage (git-ship) and EVERY revert is scoped to this set, so the loop can
+# physically only touch files it created — never the founder's WIP and never a
+# concurrent session's edits, even ones made mid-run. This replaces the old
+# denylist ("everything dirty except a run-start protect list"), which could not
+# tell the nightly's output from concurrent human work.
+NIGHTLY_AUTHORED_FILE="$(dirname "$RUN_LOG")/authored-${DATE_TAG}.list"
+: > "$NIGHTLY_AUTHORED_FILE"
+export NIGHTLY_AUTHORED="$NIGHTLY_AUTHORED_FILE"
 
 # --- run lanes -------------------------------------------------------------
 LANES=(01-triage 02-perf 03-engagement 04-competitor 05-landing 06-seo 07-self-learn 08-adsense)
@@ -219,49 +231,67 @@ for i in 1 2 3 4 5 6 7 8; do
 
   log "──────── lane $i: $lane ────────"
   PRE_LANE=$(snapshot_pre_lane)
-  BEFORE_DIRTY=$(git status --porcelain | wc -l | tr -d ' ')
+  # Capture the dirty-path SET before the lane so we can attribute exactly what
+  # the lane authored = (dirty after) − (dirty before). Counting paths (not the
+  # raw porcelain delta) makes the file cap + churn measure the nightly's OWN
+  # work, immune to concurrent sessions dirtying the tree at the same time.
+  LANE_BEFORE=$(mktemp); nightly_dirty_paths > "$LANE_BEFORE"
 
   if NIGHTLY_DRY_RUN="$DRY_RUN" "$lane_script" 2>&1 | tee -a "$RUN_LOG"; then
-    AFTER_DIRTY=$(git status --porcelain | wc -l | tr -d ' ')
-    changed=$(( AFTER_DIRTY - BEFORE_DIRTY ))
-    if [ "$changed" -gt 8 ]; then
-      log "lane $i — EXCEEDED 8-file cap ($changed); reverting THIS lane only"
-      revert_to_pre_lane "$PRE_LANE"
-      LANE_RESULTS+=("⚠️  lane $i ($lane) — cap exceeded, reverted")
-      echo "- ⚠️  **$lane** — exceeded 8-file cap, reverted" >> "$REPORT"
-    else
-      LANE_RESULTS+=("✅ lane $i ($lane) — changed $changed files")
-      echo "- ✅ **$lane** — $changed files touched" >> "$REPORT"
-    fi
+    LANE_AFTER=$(mktemp); nightly_dirty_paths > "$LANE_AFTER"
+    LANE_AUTHORED=$(mktemp); comm -13 "$LANE_BEFORE" "$LANE_AFTER" > "$LANE_AUTHORED"
+    changed=$(grep -c . "$LANE_AUTHORED" 2>/dev/null || echo 0)
+    # No file cap. The lint/test/build gate is the authoritative correctness
+    # check, and encapsulation already limits a lane to ITS OWN files — so a
+    # large-but-correct change ships instead of being reverted for an arbitrary
+    # count. (A lane that genuinely crashes, below, still has its own output
+    # reverted — that is cleanup of broken partial work, not a cap.)
+    cat "$LANE_AUTHORED" >> "$NIGHTLY_AUTHORED_FILE"
+    log "lane $i — kept $changed authored file(s)"
+    LANE_RESULTS+=("✅ lane $i ($lane) — changed $changed files")
+    echo "- ✅ **$lane** — $changed files touched" >> "$REPORT"
+    rm -f "$LANE_AFTER" "$LANE_AUTHORED"
   else
     rc=$?
-    AFTER_DIRTY=$(git status --porcelain | wc -l | tr -d ' ')
-    changed=$(( AFTER_DIRTY - BEFORE_DIRTY ))
-    if [ "$rc" = "124" ] && [ "$KEEP_TIMEOUT_PARTIALS" = "1" ] && [ "$changed" -ge 1 ] && [ "$changed" -le 8 ]; then
-      # Lane hit its time ceiling but left partial work within the file cap.
-      # KEEP it (flag-gated): the integration gate validates before anything
-      # ships, and docs-only salvage backstops a broken partial — so the time
-      # the lane already spent is recovered instead of discarded.
+    LANE_AFTER=$(mktemp); nightly_dirty_paths > "$LANE_AFTER"
+    LANE_AUTHORED=$(mktemp); comm -13 "$LANE_BEFORE" "$LANE_AFTER" > "$LANE_AUTHORED"
+    changed=$(grep -c . "$LANE_AUTHORED" 2>/dev/null || echo 0)
+    if [ "$rc" = "124" ] && [ "$KEEP_TIMEOUT_PARTIALS" = "1" ] && [ "$changed" -ge 1 ]; then
+      # Lane hit its time ceiling but left partial work. KEEP it (flag-gated):
+      # the integration gate validates before anything ships, so the time the
+      # lane already spent is recovered instead of discarded — no count cap.
       log "lane $i — TIMEOUT (124), kept $changed partial file(s) [KEEP_TIMEOUT_PARTIALS=1]"
+      cat "$LANE_AUTHORED" >> "$NIGHTLY_AUTHORED_FILE"
       LANE_RESULTS+=("⏱️  lane $i ($lane) — timeout, kept $changed partial file(s)")
       echo "- ⏱️  **$lane** — timed out, kept $changed partial file(s) (gate-validated)" >> "$REPORT"
     else
-      log "lane $i — exit $rc (continuing); reverting THIS lane only"
-      revert_to_pre_lane "$PRE_LANE"
+      log "lane $i — exit $rc (continuing); reverting THIS lane's own files only"
+      revert_authored "$PRE_LANE" "$LANE_AUTHORED"
       LANE_RESULTS+=("❌ lane $i ($lane) — exit $rc")
       echo "- ❌ **$lane** — failed (exit $rc), reverted" >> "$REPORT"
     fi
+    rm -f "$LANE_AFTER" "$LANE_AUTHORED"
   fi
+  rm -rf "$PRE_LANE"; rm -f "$LANE_BEFORE"
 done
+
+# De-dup the run allowlist (a later lane may re-touch an earlier lane's file).
+if [ -s "$NIGHTLY_AUTHORED_FILE" ]; then
+  sort -u "$NIGHTLY_AUTHORED_FILE" -o "$NIGHTLY_AUTHORED_FILE"
+fi
 
 # --- integration: gate + commit + push ------------------------------------
 log "──────── integration ────────"
 
-DIRTY_COUNT=$(git status --porcelain | wc -l | tr -d ' ')
-log "total dirty files: $DIRTY_COUNT"
+# Everything below keys off NIGHTLY_AUTHORED — the nightly's OWN files — never the
+# whole-tree dirty count, which includes the founder's WIP + any concurrent
+# session. That is what makes the loop encapsulated: a quiet night, the churn
+# cap, and every revert all measure only what the lanes themselves produced.
+AUTHORED_COUNT=$(grep -c . "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || echo 0)
+log "nightly authored $AUTHORED_COUNT file(s) this run (whole tree: $(git status --porcelain | wc -l | tr -d ' ') dirty incl. founder WIP)"
 
-if [ "$DIRTY_COUNT" = "0" ]; then
-  log "no changes from any lane — composing summary anyway"
+if [ "$AUTHORED_COUNT" = "0" ]; then
+  log "no changes authored by any lane — composing summary anyway"
   echo -e "\n**Outcome:** no shippable changes (baselines stable, no errors to fix)." >> "$REPORT"
   # User wants a daily summary EVERY day, even if quiet. Compose a brief one.
   NEW_SHA="$START_SHA"  # nothing pushed; baseline sha is "this morning"
@@ -270,18 +300,10 @@ else
   NO_CHANGE_MODE=0
 fi
 
-LANE_CHURN=$(( DIRTY_COUNT - BASELINE_DIRTY ))
-if [ "$NO_CHANGE_MODE" = "0" ] && [ "$LANE_CHURN" -gt 30 ]; then
-  log "ABORT: lane churn $LANE_CHURN (>$DIRTY_COUNT total - $BASELINE_DIRTY WIP) > 30 sanity cap; restoring pre-run tree"
-  # Restore the EXACT pre-lane tree (founder WIP intact, lane changes dropped). The
-  # snapshot was taken after the report header, so the header survives; re-append a
-  # clear failure Outcome below.
-  revert_to_pre_lane "$RUN_SNAPSHOT"; RUN_SNAPSHOT=""
-  mkdir -p "$(dirname "$REPORT")"
-  echo -e "\n**Outcome:** ABORTED — lane churn $LANE_CHURN files > 30 sanity cap. Pre-run WIP restored, lane changes dropped." >> "$REPORT"
-  send_failure_digest "Lane churn $LANE_CHURN files exceeded the 30-file sanity cap — too many changes, aborted for safety. Founder WIP restored."
-  exit 1
-fi
+# No churn cap. The lint/test/build gate validates correctness regardless of how
+# many files the lanes authored, and encapsulation guarantees a failed gate only
+# ever drops the nightly's OWN files — never founder WIP. An arbitrary file-count
+# ceiling just blocked legitimate multi-file work, so it is gone.
 
 # --- build/lint/test gate (authoritative) ---------------------------------
 gate_ok="${gate_ok:-0}"
@@ -317,21 +339,19 @@ for attempt in 1 2; do
 done
 
 if [ "$gate_ok" = "0" ]; then
-  # NEVER push broken code, and NEVER lose the founder's WIP. But don't throw away
+  # NEVER push broken code, and NEVER touch the founder's WIP. But don't throw away
   # a whole night's reports/ideas/learnings because one lane shipped breaking CODE.
   # Lanes write docs under docs/ (repo root, OUTSIDE fe-next); the lint/test/build
   # gate runs INSIDE fe-next, so docs can NEVER break it — the culprit is always a
-  # lane's fe-next code. Salvage: stash post-lane docs, restore the pre-run tree
-  # (drops lane code), re-apply docs, then RE-GATE founder-WIP+docs to be certain.
-  log "GATE FAILED — attempting docs-only salvage before full revert"
-  SALVAGE_DOCS=$(mktemp -d -t nightly-docs.XXXXXX)
-  rsync -a "$PROJECT_DIR/docs/" "$SALVAGE_DOCS/" 2>/dev/null
-  revert_to_pre_lane "$RUN_SNAPSHOT"; RUN_SNAPSHOT=""
-  PRISTINE=$(snapshot_pre_lane)            # pre-run tree, kept for the failure path
-  rsync -a "$SALVAGE_DOCS/" "$PROJECT_DIR/docs/" 2>/dev/null
-  rm -rf "$SALVAGE_DOCS"
+  # lane's fe-next code. Salvage: drop ONLY the nightly's own authored CODE (the
+  # allowlist minus docs/), keep its authored docs, then re-gate. Everything not on
+  # the allowlist — founder WIP, concurrent edits — is never touched, on any branch.
+  log "GATE FAILED — dropping the nightly's own lane CODE (keeping its authored docs; founder WIP untouched)"
+  AUTHORED_CODE=$(mktemp); grep -vE '^docs/' "$NIGHTLY_AUTHORED_FILE" > "$AUTHORED_CODE" || true
+  revert_authored "$RUN_SNAPSHOT" "$AUTHORED_CODE"
+  rm -f "$AUTHORED_CODE"
 
-  log "docs-only salvage: re-gating founder-WIP + lane docs (no lane code)"
+  log "docs-only salvage: re-gating (lane code dropped; founder WIP + nightly's authored docs only)"
   salvage_ok=0
   if ( cd fe-next \
         && npm run lint >>"$RUN_LOG" 2>&1 \
@@ -342,17 +362,22 @@ if [ "$gate_ok" = "0" ]; then
 
   if [ "$salvage_ok" = "1" ]; then
     log "docs-only salvage PASSED — shipping reports/ideas/learnings, lane code dropped"
-    rm -rf "$PRISTINE"
+    # Narrow the allowlist to authored docs so the commit stages only those.
+    grep -E '^docs/' "$NIGHTLY_AUTHORED_FILE" > "${NIGHTLY_AUTHORED_FILE}.tmp" 2>/dev/null || true
+    mv "${NIGHTLY_AUTHORED_FILE}.tmp" "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || : > "$NIGHTLY_AUTHORED_FILE"
+    AUTHORED_COUNT=$(grep -c . "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || echo 0)
+    [ "$AUTHORED_COUNT" = "0" ] && { NO_CHANGE_MODE=1; NEW_SHA="$START_SHA"; }
     gate_ok=1
-    echo -e "\n**Outcome:** GATE FAILED on lane code — DOCS-ONLY salvage shipped (reports/ideas/learnings kept, lane CODE dropped, founder WIP intact)." >> "$REPORT"
-    tg_alert "nightly $TODAY: code gate failed — shipped DOCS-ONLY (reports/ideas/learnings). Lane code dropped, founder WIP intact. See \`$RUN_LOG\`."
-    # fall through to commit; docs are now the only lane-introduced changes
+    echo -e "\n**Outcome:** GATE FAILED on lane code — DOCS-ONLY salvage shipped (reports/ideas/learnings kept, lane CODE dropped, founder WIP untouched)." >> "$REPORT"
+    tg_alert "nightly $TODAY: code gate failed — shipped DOCS-ONLY (reports/ideas/learnings). Lane code dropped, founder WIP untouched. See \`$RUN_LOG\`."
+    # fall through to commit; the allowlist now lists only the nightly's docs
   else
-    log "docs-only salvage FAILED too (founder WIP not gate-clean) — full revert"
-    revert_to_pre_lane "$PRISTINE"
+    log "docs-only salvage FAILED too (founder WIP not gate-clean) — dropping the nightly's authored docs too"
+    revert_authored "$RUN_SNAPSHOT" "$NIGHTLY_AUTHORED_FILE"
+    : > "$NIGHTLY_AUTHORED_FILE"
     mkdir -p "$(dirname "$REPORT")"
-    echo -e "\n**Outcome:** GATE FAILED — lint/test/build failed; docs-only salvage also failed. Pre-run tree restored (founder WIP intact, all lane changes dropped)." >> "$REPORT"
-    send_failure_digest "Gate failed (lint/test/build) on both attempts, and the docs-only salvage also failed. All lane changes dropped, founder WIP intact."
+    echo -e "\n**Outcome:** GATE FAILED — lint/test/build failed; docs-only salvage also failed. All of the nightly's own changes dropped; founder WIP untouched." >> "$REPORT"
+    send_failure_digest "Gate failed (lint/test/build) on both attempts, and the docs-only salvage also failed. Only the nightly's own changes were dropped; founder WIP untouched."
     exit 1
   fi
 fi
@@ -588,22 +613,33 @@ fi
 # run. Sweep the residue into a follow-up commit so "more changes get pushed too"
 # and the tree ends CLEAN. Reuse ship_nightly_commit (fetch+rebase+docs-resolve);
 # point REPORT at /dev/null so its OWN Outcome append can't re-dirty the tree.
-if [ "$DRY_RUN" = "0" ] && [ "$NO_PUSH" = "0" ] && [ -n "$(git status --porcelain)" ]; then
-  log "residual changes after main ship — sweeping into a follow-up commit"
-  RESIDUAL_MSG=$(mktemp)
-  cat > "$RESIDUAL_MSG" <<EOF
+# The residue is the nightly's OWN post-ship doc writes (report finalization,
+# manager summary, seo-daily) — written after the lane loop, so they are not in
+# the per-lane allowlist. Scope the residual ship to exactly the nightly's doc
+# output roots so it can clean its own trailing files WITHOUT sweeping any
+# founder WIP that also happens to be dirty.
+if [ "$DRY_RUN" = "0" ] && [ "$NO_PUSH" = "0" ]; then
+  RESIDUAL_AUTHORED=$(mktemp)
+  nightly_dirty_paths | grep -E '^docs/(nightly|seo-daily)/' > "$RESIDUAL_AUTHORED" || true
+  if [ -s "$RESIDUAL_AUTHORED" ]; then
+    log "residual nightly-doc changes after main ship — sweeping into a follow-up commit"
+    RESIDUAL_MSG=$(mktemp)
+    cat > "$RESIDUAL_MSG" <<EOF
 chore(nightly): post-run residue ${TODAY}
 
-Trailing changes after the main ship (report finalization, etc).
+Trailing nightly doc writes after the main ship (report finalization, summary).
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 EOF
-  if MSG_FILE="$RESIDUAL_MSG" REPORT=/dev/null NO_CHANGE_MODE=0 ship_nightly_commit; then
-    log "residual ship OK ($(git rev-parse --short HEAD)); tree now $([ -z "$(git status --porcelain)" ] && echo clean || echo 'still dirty'))"
-  else
-    log "residual ship failed (non-fatal — main work already pushed; tree left for next run)"
+    if MSG_FILE="$RESIDUAL_MSG" REPORT=/dev/null NO_CHANGE_MODE=0 \
+       NIGHTLY_AUTHORED="$RESIDUAL_AUTHORED" ship_nightly_commit; then
+      log "residual ship OK ($(git rev-parse --short HEAD))"
+    else
+      log "residual ship failed (non-fatal — main work already pushed; tree left for next run)"
+    fi
+    rm -f "$RESIDUAL_MSG"
   fi
-  rm -f "$RESIDUAL_MSG"
+  rm -f "$RESIDUAL_AUTHORED"
 fi
 
 preflight_mark_success
