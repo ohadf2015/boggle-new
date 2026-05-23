@@ -6653,6 +6653,10 @@ const he = {
       "foundWordsHint": "מילים שתמצא יופיעו כאן",
       "nextDrillCta": "הבא: {drill}",
       "dailyChallengeCta": "אתגר יומי",
+      "newPersonalBest": "שיא אישי חדש!",
+      "aboveAverage": "מעל הממוצע שלך!",
+      "betterThanLast": "טוב מהפעם הקודמת!",
+      "firstAttempt": "ניסיון ראשון נרשם!",
       "finishGame": "סיים משחק",
       "useHint": "השתמש ברמז",
       "lightning-round": {

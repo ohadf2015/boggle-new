@@ -6633,6 +6633,10 @@ const sv = {
       "foundWordsHint": "Ord du hittar visas här",
       "nextDrillCta": "Nästa: {drill}",
       "dailyChallengeCta": "Daglig utmaning",
+      "newPersonalBest": "Nytt personbästa!",
+      "aboveAverage": "Över ditt snitt!",
+      "betterThanLast": "Bättre än förra gången!",
+      "firstAttempt": "Första försöket loggat!",
       "finishGame": "Avsluta Spel",
       "useHint": "Använd Tips",
       "lightning-round": {

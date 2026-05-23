@@ -6675,6 +6675,10 @@ const es = {
       "foundWordsHint": "Las palabras que encuentres aparecen aquí",
       "nextDrillCta": "Siguiente: {drill}",
       "dailyChallengeCta": "Reto diario",
+      "newPersonalBest": "¡Nuevo récord personal!",
+      "aboveAverage": "¡Por encima de tu media!",
+      "betterThanLast": "¡Mejor que la última vez!",
+      "firstAttempt": "¡Primer intento registrado!",
       "finishGame": "Terminar Juego",
       "useHint": "Usar Pista",
       "lightning-round": {

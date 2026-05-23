@@ -6659,6 +6659,10 @@ const ja = {
       "foundWordsHint": "見つけた単語がここに表示されます",
       "nextDrillCta": "次へ: {drill}",
       "dailyChallengeCta": "デイリーチャレンジ",
+      "newPersonalBest": "自己ベスト更新！",
+      "aboveAverage": "平均以上！",
+      "betterThanLast": "前回より良い！",
+      "firstAttempt": "初挑戦を記録！",
       "finishGame": "ゲーム終了",
       "useHint": "ヒントを使う",
       "lightning-round": {
