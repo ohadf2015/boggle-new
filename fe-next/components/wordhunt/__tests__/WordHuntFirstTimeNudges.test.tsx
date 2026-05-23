@@ -120,4 +120,28 @@ describe('WordHuntFirstTimeNudges', () => {
     );
     expect(screen.queryByTestId('nudge-lifeDrop')).not.toBeInTheDocument();
   });
+
+  // The nudge floats (fixed) over the bright white Word Hunt grid tiles. A
+  // translucent color fill (bg-neo-X/10) lets the white grid bleed through, so
+  // cream text lands on near-white → ~1.2:1 contrast (invisible). The fill MUST
+  // be a solid opaque dark base so contrast is independent of what's behind it.
+  describe('contrast: backdrop-independent solid background', () => {
+    const cases: Array<[string, Partial<React.ComponentProps<typeof WordHuntFirstTimeNudges>>]> = [
+      ['nudge-lifeDrop', { lifePoints: 65 }],
+      ['nudge-firstClue', { discoveryClueCount: 1 }],
+      ['nudge-wrongGuess', { wrongGuessCount: 1 }],
+    ];
+
+    it.each(cases)('%s uses a solid dark fill, never a translucent color tint', (testId, trigger) => {
+      const base = { lifePoints: 100, discoveryClueCount: 0, wrongGuessCount: 0, t: mockT };
+      const { rerender } = render(<WordHuntFirstTimeNudges {...base} />);
+      rerender(<WordHuntFirstTimeNudges {...base} {...trigger} />);
+
+      const className = screen.getByTestId(testId).className;
+      // Opaque dark base guarantees contrast regardless of the white grid behind it.
+      expect(className).toContain('bg-neo-navy');
+      // No translucent color fill (the bug: white grid bled through bg-neo-*/10).
+      expect(className).not.toMatch(/bg-neo-\w+\/\d/);
+    });
+  });
 });

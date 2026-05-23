@@ -16,22 +16,26 @@ interface NudgeConfig {
 }
 
 const NUDGE_CONFIGS: NudgeConfig[] = [
+  // Solid bg-neo-navy fill keeps contrast backdrop-independent — the nudge floats
+  // over the bright white grid tiles, so a translucent color tint (bg-neo-*/10)
+  // let the white bleed through and cream text vanished. Color-coding lives in
+  // the full-opacity border + icon instead.
   {
     type: 'lifeDrop',
     key: 'wordHuntNudge.lifeDrop',
-    accent: 'border-neo-red/50 bg-neo-red/10',
+    accent: 'border-neo-red bg-neo-navy',
     icon: '❤️‍🩹',
   },
   {
     type: 'firstClue',
     key: 'wordHuntNudge.firstClue',
-    accent: 'border-neo-lime/50 bg-neo-lime/10',
+    accent: 'border-neo-lime bg-neo-navy',
     icon: '💡',
   },
   {
     type: 'wrongGuess',
     key: 'wordHuntNudge.wrongGuess',
-    accent: 'border-neo-pink/50 bg-neo-pink/10',
+    accent: 'border-neo-pink bg-neo-navy',
     icon: '⚠️',
   },
 ];
