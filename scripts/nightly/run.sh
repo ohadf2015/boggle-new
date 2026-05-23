@@ -240,7 +240,7 @@ for i in 1 2 3 4 5 6 7 8; do
   if NIGHTLY_DRY_RUN="$DRY_RUN" "$lane_script" 2>&1 | tee -a "$RUN_LOG"; then
     LANE_AFTER=$(mktemp); nightly_dirty_paths > "$LANE_AFTER"
     LANE_AUTHORED=$(mktemp); comm -13 "$LANE_BEFORE" "$LANE_AFTER" > "$LANE_AUTHORED"
-    changed=$(grep -c . "$LANE_AUTHORED" 2>/dev/null || echo 0)
+    changed=$(grep -c . "$LANE_AUTHORED" 2>/dev/null) || changed=0
     # No file cap. The lint/test/build gate is the authoritative correctness
     # check, and encapsulation already limits a lane to ITS OWN files — so a
     # large-but-correct change ships instead of being reverted for an arbitrary
@@ -255,7 +255,7 @@ for i in 1 2 3 4 5 6 7 8; do
     rc=$?
     LANE_AFTER=$(mktemp); nightly_dirty_paths > "$LANE_AFTER"
     LANE_AUTHORED=$(mktemp); comm -13 "$LANE_BEFORE" "$LANE_AFTER" > "$LANE_AUTHORED"
-    changed=$(grep -c . "$LANE_AUTHORED" 2>/dev/null || echo 0)
+    changed=$(grep -c . "$LANE_AUTHORED" 2>/dev/null) || changed=0
     if [ "$rc" = "124" ] && [ "$KEEP_TIMEOUT_PARTIALS" = "1" ] && [ "$changed" -ge 1 ]; then
       # Lane hit its time ceiling but left partial work. KEEP it (flag-gated):
       # the integration gate validates before anything ships, so the time the
@@ -285,9 +285,11 @@ log "──────── integration ────────"
 
 # Everything below keys off NIGHTLY_AUTHORED — the nightly's OWN files — never the
 # whole-tree dirty count, which includes the founder's WIP + any concurrent
-# session. That is what makes the loop encapsulated: a quiet night, the churn
-# cap, and every revert all measure only what the lanes themselves produced.
-AUTHORED_COUNT=$(grep -c . "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || echo 0)
+# session. That is what makes the loop encapsulated: a quiet night and every
+# revert measure only what the lanes themselves produced. (The `||` is on the
+# assignment, NOT inside $(...): `$(grep -c . f || echo 0)` would print "0\n0"
+# on an empty file — grep prints 0 AND exits 1 — corrupting the count.)
+AUTHORED_COUNT=$(grep -c . "$NIGHTLY_AUTHORED_FILE" 2>/dev/null) || AUTHORED_COUNT=0
 log "nightly authored $AUTHORED_COUNT file(s) this run (whole tree: $(git status --porcelain | wc -l | tr -d ' ') dirty incl. founder WIP)"
 
 if [ "$AUTHORED_COUNT" = "0" ]; then
@@ -365,7 +367,7 @@ if [ "$gate_ok" = "0" ]; then
     # Narrow the allowlist to authored docs so the commit stages only those.
     grep -E '^docs/' "$NIGHTLY_AUTHORED_FILE" > "${NIGHTLY_AUTHORED_FILE}.tmp" 2>/dev/null || true
     mv "${NIGHTLY_AUTHORED_FILE}.tmp" "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || : > "$NIGHTLY_AUTHORED_FILE"
-    AUTHORED_COUNT=$(grep -c . "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || echo 0)
+    AUTHORED_COUNT=$(grep -c . "$NIGHTLY_AUTHORED_FILE" 2>/dev/null) || AUTHORED_COUNT=0
     [ "$AUTHORED_COUNT" = "0" ] && { NO_CHANGE_MODE=1; NEW_SHA="$START_SHA"; }
     gate_ok=1
     echo -e "\n**Outcome:** GATE FAILED on lane code — DOCS-ONLY salvage shipped (reports/ideas/learnings kept, lane CODE dropped, founder WIP untouched)." >> "$REPORT"
