@@ -26,9 +26,13 @@ export interface PositionedLandmark extends Landmark {
 export const WORD_TOWER_LANDMARKS: Landmark[] = [
   { id: 'skyscraper', m: 30, icon: '🏢', key: 'wordTower.landmark.skyscraper' },
   { id: 'cloudBase', m: 100, icon: '☁️', key: 'wordTower.landmark.cloudBase' },
+  { id: 'mountainTop', m: 220, icon: '⛰️', key: 'wordTower.landmark.mountainTop' },
   { id: 'jetStream', m: 350, icon: '✈️', key: 'wordTower.landmark.jetStream' },
+  { id: 'stormTops', m: 500, icon: '🌩️', key: 'wordTower.landmark.stormTops' },
   { id: 'weatherBalloon', m: 700, icon: '🎈', key: 'wordTower.landmark.weatherBalloon' },
+  { id: 'earthCurve', m: 950, icon: '🌍', key: 'wordTower.landmark.earthCurve' },
   { id: 'karman', m: 1200, icon: '🛰️', key: 'wordTower.landmark.karman' },
+  { id: 'meteorBelt', m: 1550, icon: '☄️', key: 'wordTower.landmark.meteorBelt' },
   { id: 'aurora', m: 1900, icon: '🌌', key: 'wordTower.landmark.aurora' },
   { id: 'deepSpace', m: 2800, icon: '👽', key: 'wordTower.landmark.deepSpace' },
 ];

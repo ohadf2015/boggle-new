@@ -11,6 +11,21 @@ describe('WORD_TOWER_LANDMARKS', () => {
       expect(l.key).toMatch(/^wordTower\.landmark\./);
     }
   });
+
+  it('has unique ids', () => {
+    const ids = WORD_TOWER_LANDMARKS.map((l) => l.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('stays dense on the heavily-played lower climb — no big blank gap up to 1200m', () => {
+    // Founder: "more interesting milestones and elements on the way" — keep a
+    // reference point coming so the sky never reads empty as you climb.
+    for (let i = 1; i < WORD_TOWER_LANDMARKS.length; i++) {
+      const lo = WORD_TOWER_LANDMARKS[i - 1]!;
+      const hi = WORD_TOWER_LANDMARKS[i]!;
+      if (lo.m < 1200) expect(hi.m - lo.m).toBeLessThanOrEqual(300);
+    }
+  });
 });
 
 describe('visibleLandmarks', () => {

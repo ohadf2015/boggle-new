@@ -44,6 +44,11 @@ interface SceneProps {
   personalBestM?: number;
   /** Translator — for the minimap + back-to-top affordance labels. */
   t?: (key: string, params?: Record<string, string | number>) => string;
+  /** Fires with the altitude the camera is *looking at* (live height, or lower
+   *  while panned) so sibling layers — landmark + rival rails — track the scroll
+   *  too instead of freezing at the live height and leaving blank sky on the way
+   *  down. Throttled to one call per animation frame. */
+  onViewAltChange?: (alt: number) => void;
 }
 
 /** Shared camera-pan state between the DOM gesture layer and the Pixi layer. */
@@ -316,9 +321,16 @@ export function WordTowerScene(props: SceneProps) {
   // the back-to-top button. Reset whenever a committed word snaps us back up.
   const [pannedDown, setPannedDown] = useState(false);
   const rafRef = useRef<number | null>(null);
-  useEffect(() => { setPanAltitude(null); setPannedDown(false); }, [props.heightM, props.biomeId]);
+  // Pulled out so the pan callbacks close over specific values (the React
+  // Compiler can't preserve a `useCallback` that reads `props.*` directly).
+  const { heightM, onViewAltChange } = props;
+  useEffect(() => {
+    setPanAltitude(null);
+    setPannedDown(false);
+    onViewAltChange?.(heightM); // snap sibling rails back to the live height
+  }, [heightM, props.biomeId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const viewAlt = panAltitude ?? props.heightM;
+  const viewAlt = panAltitude ?? heightM;
   const viewBiome = biomeForHeight(viewAlt);
   const blend = biomeBlendAt(viewAlt);
 
@@ -348,8 +360,10 @@ export function WordTowerScene(props: SceneProps) {
     if (rafRef.current == null) {
       rafRef.current = requestAnimationFrame(() => {
         rafRef.current = null;
-        setPanAltitude(viewAltitudeFor(props.heightM, pan.current.y, pan.current.panMin));
+        const alt = viewAltitudeFor(heightM, pan.current.y, pan.current.panMin);
+        setPanAltitude(alt);
         setPannedDown(pan.current.y < -BACK_TO_TOP_REVEAL_PX);
+        onViewAltChange?.(alt); // landmark + rival rails follow the scroll down
       });
     }
   };
@@ -365,7 +379,8 @@ export function WordTowerScene(props: SceneProps) {
     if (bg) { bg.style.transition = 'transform 340ms cubic-bezier(0.22,1,0.36,1)'; bg.style.transform = ''; }
     setPanAltitude(null);
     setPannedDown(false);
-  }, []);
+    onViewAltChange?.(heightM); // rails snap back to the live top with the camera
+  }, [heightM, onViewAltChange]);
 
   const config = useMemo(
     () => (size ? { width: size.w, height: size.h, background: 0x000000, backgroundAlpha: 0 } : null),

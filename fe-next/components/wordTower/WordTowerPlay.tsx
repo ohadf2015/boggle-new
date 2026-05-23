@@ -51,6 +51,12 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   const { game } = tower.state;
   const biomeId = useMemo(() => biomeForHeight(game.heightM), [game.heightM]);
   const personalBest = Math.max(personalBestM, game.heightM);
+  // Altitude the camera is *looking at* — equals the live height, but drops as the
+  // user pans down to review lower floors. The scene owns the pan gesture and
+  // reports it here so the landmark + rival rails track the scroll too (otherwise
+  // they freeze at the top and the lower sky reads blank). Starts at the height
+  // the session resumes from.
+  const [viewAlt, setViewAlt] = useState(game.heightM);
 
   // "N words possible" hint — how many dictionary words the player could build
   // from the current anchor + tray (recomputed only when those change).
@@ -247,14 +253,16 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         bottomInsetPx={deckHeight}
         personalBestM={personalBest}
         t={t}
+        onViewAltChange={setViewAlt}
       />
 
       {/* World altitude landmarks you climb past (cloud base, jet stream, edge
-          of space…) — gives the height a real sense of place. */}
-      <WordTowerLandmarkRail viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} />
+          of space…) — gives the height a real sense of place. Driven by the
+          *viewed* altitude so panning down reveals the marks at that height. */}
+      <WordTowerLandmarkRail viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
 
       {/* Rival record lines you climb past — fed by the leaderboard. */}
-      <WordTowerRivalRail rivals={rivals} viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} />
+      <WordTowerRivalRail rivals={rivals} viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
 
       {/* NEW ZONE banner — the headline of entering a new biome */}
       {zoneText && (

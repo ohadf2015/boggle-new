@@ -1,7 +1,7 @@
 'use client';
 
 import { miniTowerScaleMax, altToFraction, miniTowerZones } from '@/lib/wordTower/miniTower';
-import { BIOME_THEME } from './biomeTheme';
+import { blockMaterial } from '@/lib/wordTower/blockGrade';
 
 interface WordTowerMinimapProps {
   /** Committed climber height (m). */
@@ -48,8 +48,8 @@ export function WordTowerMinimap({ heightM, viewM, personalBestM, onScrollTop, t
             style={{
               bottom: `${z.fromFrac * 100}%`,
               height: `${(z.toFrac - z.fromFrac) * 100}%`,
-              backgroundColor: hex(BIOME_THEME[z.id].block),
-              opacity: 0.85,
+              backgroundColor: hex(blockMaterial(z.id)),
+              opacity: 0.9,
             }}
           />
         ))}

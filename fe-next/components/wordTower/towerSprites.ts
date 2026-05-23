@@ -135,16 +135,21 @@ export function paintTile(tile: TileSprite, color: number, pending: boolean, sha
 }
 
 /**
- * Static per-zone surface decoration, drawn ONCE onto a tile's detail layer:
- * city/sky tiles wear a recessed window grid (skyscraper), mid-altitude tiles
- * wear riveted hull panels, deep-space tiles glint with crystalline facets. Tile
- * coords are centred (−half..half), matching the face. Drawn in near-black /
- * near-white with low alpha so it reads on any graded fill (and any ghost). */
+ * Static per-zone surface decoration, drawn ONCE onto a tile's detail layer, so
+ * each altitude milestone has its own STRUCTURE: a lit window grid in the city, a
+ * glass curtain wall in the sky, riveted hull panels in the stratosphere, sci-fi
+ * greebles in orbit, crystalline facets in the nebula, and a star-field energy
+ * skin in the deep-space galaxy ("spacy" up high). Tile coords are centred
+ * (−half..half), matching the face. Neo-brutalist: hard pixels, NO blur, drawn in
+ * near-black / near-white / one neon accent with low alpha so it reads on any
+ * graded fill (and any ghost). */
 export function drawBlockSurface(g: Graphics | null, size: number, surface: BlockSurface): void {
   if (!g) return;
   const half = size / 2;
   const dark = 0x05060a;
   const lite = 0xfffef0;
+  const neon = 0xffe135; // celebration gold — the deep-space "neon edge" accent
+  const line = Math.max(1, size * 0.03);
   if (surface === 'windows') {
     // 2 columns × 3 rows of small recessed windows, a couple "lit".
     const cols = 2, rows = 3;
@@ -159,6 +164,16 @@ export function drawBlockSurface(g: Graphics | null, size: number, surface: Bloc
         g.rect(x, y, gw, gh).fill({ color: lit ? 0xffe27a : dark, alpha: lit ? 0.5 : 0.3 });
       }
     }
+  } else if (surface === 'glass') {
+    // Curtain wall: three tall mullions split by a horizontal floor band, plus a
+    // single hard diagonal glint — a sleek glazed sky-tower face.
+    const pad = size * 0.18;
+    const usable = size - pad * 2;
+    for (let c = 0; c < 3; c++) {
+      g.rect(-half + pad + (c + 0.5) * (usable / 3) - line / 2, -half + pad, line, usable).fill({ color: dark, alpha: 0.28 });
+    }
+    g.rect(-half + pad, -line / 2, usable, line).fill({ color: dark, alpha: 0.24 });
+    g.rect(-half + size * 0.2, -half + size * 0.22, size * 0.26, line * 1.5).fill({ color: lite, alpha: 0.4 });
   } else if (surface === 'panels') {
     // Two horizontal hull seams + four corner rivets.
     const inset = size * 0.2;
@@ -169,11 +184,33 @@ export function drawBlockSurface(g: Graphics | null, size: number, surface: Bloc
     for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
       g.circle(sx * (half - inset * 1.1), sy * (half - inset * 1.1), rv).fill({ color: lite, alpha: 0.4 });
     }
-  } else {
+  } else if (surface === 'greebles') {
+    // Orbital hull greebles: an L-shaped circuit trace + two indicator ports (one
+    // lit neon) + a vent slot — reads as machined sci-fi panelling.
+    const x0 = -half + size * 0.2;
+    const y0 = half - size * 0.22;
+    g.rect(x0, y0, size * 0.42, line).fill({ color: dark, alpha: 0.34 }); // trace, horizontal
+    g.rect(x0 + size * 0.42 - line, y0 - size * 0.3, line, size * 0.3).fill({ color: dark, alpha: 0.34 }); // trace, up
+    g.circle(-half + size * 0.26, -half + size * 0.26, size * 0.055).fill({ color: neon, alpha: 0.6 }); // lit port
+    g.circle(half - size * 0.26, -half + size * 0.26, size * 0.045).fill({ color: lite, alpha: 0.4 }); // cold port
+    g.rect(half - size * 0.36, half - size * 0.34, size * 0.2, line).fill({ color: lite, alpha: 0.3 }); // vent slot
+  } else if (surface === 'facets') {
     // facets: a bright glint + two thin crystalline lines.
     g.circle(-size * 0.12, -size * 0.12, size * 0.08).fill({ color: lite, alpha: 0.5 });
-    g.rect(-half + size * 0.22, half - size * 0.34, size * 0.5, Math.max(1, size * 0.03)).fill({ color: lite, alpha: 0.22 });
-    g.rect(half - size * 0.34, -half + size * 0.24, Math.max(1, size * 0.03), size * 0.42).fill({ color: lite, alpha: 0.22 });
+    g.rect(-half + size * 0.22, half - size * 0.34, size * 0.5, line).fill({ color: lite, alpha: 0.22 });
+    g.rect(half - size * 0.34, -half + size * 0.24, line, size * 0.42).fill({ color: lite, alpha: 0.22 });
+  } else {
+    // energy (deep-space galaxy): scattered hard-pixel stars + a diagonal neon
+    // seam — the tile looks lit from within the void, the "spacy" extreme.
+    const stars: Array<[number, number, number]> = [
+      [-0.28, -0.22, 0.06], [0.18, -0.3, 0.045], [0.3, 0.12, 0.055],
+      [-0.16, 0.26, 0.04], [0.02, -0.04, 0.05], [-0.32, 0.06, 0.038],
+    ];
+    for (const [sx, sy, sr] of stars) {
+      const r = size * sr;
+      g.rect(sx * size - r / 2, sy * size - r / 2, r, r).fill({ color: lite, alpha: 0.7 });
+    }
+    g.rect(-half + size * 0.16, half - size * 0.3, size * 0.6, line).fill({ color: neon, alpha: 0.45 });
   }
 }
 
