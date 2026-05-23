@@ -5,6 +5,8 @@ import {
   isEmailServiceConfigured,
   generateUnsubscribeToken,
   getSubscriberRecipients,
+  isUnsubscribedFromCampaigns,
+  CAMPAIGN_SUBSCRIPTION_COLUMN,
 } from '@/lib/email';
 import {
   resolveUserLanguage,
@@ -90,12 +92,15 @@ export async function POST(request: NextRequest) {
 
     // Get all subscribed players (not unsubscribed).
     // One-click unsubscribe flips daily_email_subscribed=false (see
-    // lib/email.ts unsubscribeByToken). IS DISTINCT FROM false keeps NULL +
-    // true. (Was filtering a nonexistent `email_subscribed` column → 500.)
+    // lib/email.ts unsubscribeByToken). `.neq(..., false)` keeps NULL + true
+    // (legacy rows default NULL). We also SELECT the flag so the in-memory guard
+    // below can act as a second line of defense if this query ever drifts.
     const { data: players, error: fetchError } = await adminSupabase
       .from('profiles')
-      .select('id, display_name, username, timezone, country_code, email_unsubscribe_token')
-      .neq('daily_email_subscribed', false);
+      .select(
+        `id, display_name, username, timezone, country_code, email_unsubscribe_token, ${CAMPAIGN_SUBSCRIPTION_COLUMN}`
+      )
+      .neq(CAMPAIGN_SUBSCRIPTION_COLUMN, false);
 
     if (fetchError) {
       logger.error('BULK_EMAIL', 'Failed to fetch players:', fetchError);
@@ -117,8 +122,12 @@ export async function POST(request: NextRequest) {
       if (u.email) emailMap.set(u.id, u.email);
     }
 
-    // Filter to players with emails
-    const eligible = players.filter((p) => emailMap.has(p.id));
+    // Filter to players with emails, then HARD-suppress anyone who unsubscribed.
+    // The unsubscribe guard is enforced here in-memory (not just in the query)
+    // so it holds for every bulk email type even if the recipient query changes.
+    const eligible = players
+      .filter((p) => emailMap.has(p.id))
+      .filter((p) => !isUnsubscribedFromCampaigns(p));
 
     if (dryRun) {
       const dryRunResponse: Record<string, unknown> = {

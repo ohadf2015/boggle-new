@@ -45,6 +45,9 @@ vi.mock('@/lib/email', () => ({
   isEmailServiceConfigured: vi.fn(() => true),
   generateUnsubscribeToken: vi.fn(() => 'mock-unsub-token'),
   getSubscriberRecipients: vi.fn(),
+  CAMPAIGN_SUBSCRIPTION_COLUMN: 'daily_email_subscribed',
+  isUnsubscribedFromCampaigns: (p: { daily_email_subscribed?: boolean | null }) =>
+    p?.daily_email_subscribed === false,
 }));
 
 vi.mock('@/lib/reengagementEmail', () => ({
@@ -84,7 +87,9 @@ function setupAdminAuth() {
   mockProfileSelect.mockResolvedValue({ data: { is_admin: true } });
 }
 
-function setupPlayers(players: { id: string; email: string }[]) {
+function setupPlayers(
+  players: { id: string; email: string; daily_email_subscribed?: boolean | null }[]
+) {
   mockAdminFrom.mockImplementation((table: string) => {
     if (table === 'profiles') {
       return {
@@ -97,7 +102,8 @@ function setupPlayers(players: { id: string; email: string }[]) {
               timezone: null,
               country_code: null,
               email_unsubscribe_token: 'tok',
-              email_subscribed: true,
+              // NULL/true = subscribed; explicit false = unsubscribed.
+              daily_email_subscribed: p.daily_email_subscribed ?? true,
             })),
             error: null,
           }),
@@ -178,6 +184,28 @@ describe('POST /api/admin/send-bulk-email', () => {
     expect(json.success).toBe(true);
     expect(getSubscriberRecipients).not.toHaveBeenCalled();
     expect(json.subscribersSent).toBeUndefined();
+  });
+
+  it('NEVER emails a profile that has unsubscribed, even if it slips past the DB query', async () => {
+    // Defense-in-depth: the mock query returns BOTH an unsubscribed row and a
+    // subscribed one (simulating query drift). The route must still suppress the
+    // unsubscribed recipient in-memory — the unsubscribe guarantee for ALL bulk
+    // email types must not rely on the DB filter alone.
+    setupAdminAuth();
+    setupPlayers([
+      { id: 'p-sub', email: 'subscribed@test.com', daily_email_subscribed: true },
+      { id: 'p-unsub', email: 'unsubscribed@test.com', daily_email_subscribed: false },
+    ]);
+
+    const res = await POST(makeRequest({ emailType: 'game-mode-announcement', mode: 'blast' }));
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+    expect(json.total).toBe(1); // only the subscribed player is a recipient
+    expect(json.sent).toBe(1);
+    expect(mockSendToPlayer).toHaveBeenCalledTimes(1);
+    expect(mockSendToPlayer).toHaveBeenCalledWith('subscribed@test.com', 'blast');
+    expect(mockSendToPlayer).not.toHaveBeenCalledWith('unsubscribed@test.com', 'blast');
   });
 
   it('dryRun includes subscriber count when includeSubscribers=true', async () => {

@@ -56,6 +56,25 @@ export function generateUnsubscribeToken(): string {
   return crypto.randomBytes(32).toString('hex');
 }
 
+/** Profile column that records campaign/marketing email opt-out. */
+export const CAMPAIGN_SUBSCRIPTION_COLUMN = 'daily_email_subscribed' as const;
+
+/**
+ * Single source of truth for "has this user opted OUT of marketing/campaign
+ * email?". One-click unsubscribe sets `daily_email_subscribed = false` (see
+ * unsubscribeByToken). NULL/true = still subscribed (legacy rows default NULL).
+ *
+ * This is a campaign/marketing guard ONLY — transactional email (magic link,
+ * password reset, account/security) must NOT consult it. Every BULK or campaign
+ * recipient list must pass through this so the unsubscribe guarantee can never
+ * regress from a drifting hand-written query.
+ */
+export function isUnsubscribedFromCampaigns(
+  profile: { daily_email_subscribed?: boolean | null } | null | undefined
+): boolean {
+  return profile?.daily_email_subscribed === false;
+}
+
 /**
  * Get the current puzzle number (days since launch)
  */
