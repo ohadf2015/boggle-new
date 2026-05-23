@@ -1,36 +1,25 @@
 /**
- * Word Tower — feature flags (pure config + resolver).
+ * Word Tower — whole-game feature gate (pure config + resolver).
  *
- * Every new mechanic ships behind a PostHog flag so it can be rolled out (or
- * killed) without a deploy. Behaviour-changing mechanics default OFF until vetted;
- * harmless polish defaults ON. A `?wt-*` query override always wins, so the
- * founder can live-verify any combination on a real device before rollout.
+ * The ENTIRE Word Tower mode sits behind one flag (not per-mechanic): flip
+ * `word-tower` in PostHog to roll the game out (or kill it) without a deploy. A
+ * `?word-tower=1|0` URL override always wins so the founder can live-verify on a
+ * real device. Admin access is handled separately at the route (admins always in).
  */
 
-export interface WordTowerFlags {
-  /** Environmental hazards (bomb/hurricane) that topple floors. Risky → default OFF. */
-  hazards: boolean;
-  /** Next-zone "tease" anticipation chip. Harmless polish → default ON. */
-  zoneTease: boolean;
-  /** Daily Seed Tower mode. Not GA yet → default OFF. */
-  dailyTower: boolean;
-}
-
-export type WordTowerFlagName = keyof WordTowerFlags;
-
-interface FlagConfig {
+interface GameFlagConfig {
   /** PostHog flag key. */
   key: string;
   /** `?<query>=1|0` URL override for live-verify. */
   query: string;
-  /** Value when PostHog is unavailable / no override. */
+  /** Value when PostHog is unavailable / no override (off → admins only). */
   default: boolean;
 }
 
-export const WORD_TOWER_FLAGS: Record<WordTowerFlagName, FlagConfig> = {
-  hazards: { key: 'word-tower-hazards', query: 'wt-hazards', default: false },
-  zoneTease: { key: 'word-tower-zone-tease', query: 'wt-tease', default: true },
-  dailyTower: { key: 'word-tower-daily', query: 'wt-daily', default: false },
+export const WORD_TOWER_GAME_FLAG: GameFlagConfig = {
+  key: 'word-tower',
+  query: 'word-tower',
+  default: false,
 };
 
 /** A boolean override from the URL query string, or undefined when not present. */
@@ -40,7 +29,8 @@ export function flagFromQuery(search: string, param: string): boolean | undefine
   return v === '1' || v === 'true' || v === 'on';
 }
 
-/** Resolve a flag: a URL override wins, else the (PostHog-sourced) value. */
-export function resolveWordTowerFlag(name: WordTowerFlagName, posthogValue: boolean, search: string): boolean {
-  return flagFromQuery(search, WORD_TOWER_FLAGS[name].query) ?? posthogValue;
+/** Resolve whether the Word Tower game is enabled: a URL override wins, else the
+ *  (PostHog-sourced) flag value. */
+export function resolveWordTowerEnabled(posthogValue: boolean, search: string): boolean {
+  return flagFromQuery(search, WORD_TOWER_GAME_FLAG.query) ?? posthogValue;
 }

@@ -5,21 +5,23 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useExperiment } from '@/hooks/useExperiment';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useWordTowerEnabled } from '@/hooks/useWordTowerEnabled';
 import { WordTowerGame } from '@/components/wordTower/WordTowerGame';
 
 /**
- * Word Tower solo is an admin-only dev preview — gated on `isAdmin` alone
- * (matching the landing card + sibling admin previews). Non-admins are
- * redirected home and never see the route exists (no flash of content).
- * `trackExposure` still fires for admin-usage analytics on the `word-tower`
- * experiment, but is no longer part of the access gate.
+ * The WHOLE Word Tower game is feature-gated: admins always have access (dev
+ * preview), and everyone else is gated behind the single `word-tower` PostHog
+ * flag (`useWordTowerEnabled`, with a `?word-tower=1` live-verify override). When
+ * neither is true, non-admins are redirected home and never see the route exists
+ * (no flash of content). `trackExposure` fires for usage analytics.
  */
 export function WordTowerPageClient() {
   const { language } = useLanguage();
   const router = useRouter();
   const { isAdmin, loading } = useAuth();
   const { trackExposure } = useExperiment('word-tower');
-  const allowed = isAdmin;
+  const gameEnabled = useWordTowerEnabled();
+  const allowed = isAdmin || gameEnabled;
 
   useEffect(() => {
     if (allowed) trackExposure();

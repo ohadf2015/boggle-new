@@ -22,7 +22,6 @@ import { WordTowerLandmarkRail } from './WordTowerLandmarkRail';
 import { milestoneCrossed } from '@/lib/wordTower/milestones';
 import { hazardsCrossed } from '@/lib/wordTower/hazards';
 import { zoneTeaseAt } from '@/lib/wordTower/zoneTease';
-import { useWordTowerFlags } from '@/hooks/useWordTowerFlags';
 import { newlyUnlocked, type Achievement } from '@/lib/wordTower/achievements';
 import { WordTowerScene } from './WordTowerScene';
 import { WordTowerHud } from './WordTowerHud';
@@ -50,9 +49,6 @@ function usePrefersReducedMotion(): boolean {
 export function WordTowerPlay({ language, isInDictionary, dictionary, initialGame, personalBestM, onOpenLeaderboard, rivals = [] }: PlayProps) {
   const { t, dir } = useLanguage();
   const reducedMotion = usePrefersReducedMotion();
-  // Every new mechanic is PostHog-gated (rollout/kill without a deploy; `?wt-*=1`
-  // overrides for live-verify). Hazards default OFF until vetted.
-  const flags = useWordTowerFlags();
   const tower = useWordTower({ language, sessionId: 'solo', isInDictionary, initialGame });
   const { game } = tower.state;
   const biomeId = useMemo(() => biomeForHeight(game.heightM), [game.heightM]);
@@ -162,8 +158,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   const prevHazardH = useRef(game.heightM);
   useEffect(() => {
     const prev = prevHazardH.current;
-    prevHazardH.current = game.heightM; // keep tracking even while gated, so toggling
-    if (!flags.hazards) return;          // the flag on can't retroactively fire a big span
+    prevHazardH.current = game.heightM;
     const crossed = hazardsCrossed(prev, game.heightM, game.firedHazards);
     if (crossed.length === 0) return;
     const floors = crossed.reduce((s, h) => s + h.floors, 0);
@@ -318,7 +313,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
 
       {/* Next-zone tease — quiet anticipation chip in the approach window. Hidden
           while the NEW ZONE banner is paying off the arrival. */}
-      {flags.zoneTease && tease && !zoneText && (
+      {tease && !zoneText && (
         <div
           className="pointer-events-none absolute left-1/2 top-[6%] z-20 -translate-x-1/2 flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy/75 px-2 py-1 font-neo-body text-[11px] font-bold text-neo-cyan backdrop-blur-sm"
           aria-live="polite"
