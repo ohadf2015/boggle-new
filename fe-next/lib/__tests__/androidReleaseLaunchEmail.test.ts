@@ -91,6 +91,45 @@ describe('generateAndroidReleaseLaunchHtml (cached render)', () => {
     expect(html).toContain('dir="rtl"');
   });
 
+  it('renders feature chips as SOLID neo tags (filled bg + black border), not thin outlines', async () => {
+    const { html } = await generateAndroidReleaseLaunchHtml({
+      recipientName: 'Alex',
+      language: 'en',
+      unsubscribeUrl: 'https://example.com/unsub',
+      playUrl: PLAY_STORE_URL,
+    });
+    const lower = html.toLowerCase();
+    // The OLD hollow-outline chip signature (thin colored border, no fill) must be gone.
+    expect(lower).not.toContain('border:2px solid #00ffff');
+    expect(lower).not.toContain('border:2px solid #ff1493');
+    // A filled neo chip = colored fill + hard BLACK border in the SAME style attr.
+    // The rainbow strip uses these fills too, but has no black border — so this
+    // co-occurrence regex can only match the redesigned chips.
+    expect(lower).toMatch(/background-color:#ff1493;[^"]*3px solid #000000/);
+    expect(lower).toMatch(/background-color:#00ffff;[^"]*3px solid #000000/);
+  });
+
+  it('does NOT render the bare colored play emoji in the CTA', async () => {
+    const { html } = await generateAndroidReleaseLaunchHtml({
+      recipientName: 'Alex',
+      language: 'en',
+      unsubscribeUrl: 'https://example.com/unsub',
+      playUrl: PLAY_STORE_URL,
+    });
+    expect(html).not.toContain('▶'); // ▶ renders as an off-brand color emoji
+    expect(html).toContain('/email-assets/android-release-play-icon.png');
+  });
+
+  it('flips hard shadows for Hebrew RTL (negative x-offset)', async () => {
+    const { html } = await generateAndroidReleaseLaunchHtml({
+      recipientName: 'דנה',
+      language: 'he',
+      unsubscribeUrl: 'https://example.com/unsub',
+      playUrl: PLAY_STORE_URL,
+    });
+    expect(html.toLowerCase()).toContain('-8px 8px 0px #000000');
+  });
+
   it('reuses the same cached template across recipients without leaking names', async () => {
     const a = await generateAndroidReleaseLaunchHtml({
       recipientName: 'Alice',

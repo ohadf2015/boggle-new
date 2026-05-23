@@ -35,6 +35,11 @@ export interface AndroidReleaseLaunchEmailProps {
 export const HERO_IMAGE =
   'https://www.lexiclash.live/email-assets/android-release-hero.jpg';
 
+// Crisp neo "play" glyph for the CTA (SVG→PNG, not diffusion). Language-neutral,
+// replaces the off-brand color ▶ emoji. Same deploy-hosted pattern as HERO_IMAGE.
+export const PLAY_ICON_IMAGE =
+  'https://www.lexiclash.live/email-assets/android-release-play-icon.png';
+
 // Neo-brutalist palette (mirrors .claude/docs/design-system.md).
 const C = {
   bg: '#1a1a2e',
@@ -71,7 +76,9 @@ export default function AndroidReleaseLaunchEmail({
   // Hard shadows flip horizontally in RTL so the "light source" stays consistent.
   const sh = rtl ? '-' : '';
 
-  const chipColors = [C.lime, C.cyan, C.pink];
+  // Semantic color map (mirrors in-app mode coding): daily→lime (primary),
+  // multiplayer→pink, offline→cyan. Chip order matches the strings array.
+  const chipColors = [C.lime, C.pink, C.cyan];
 
   return (
     <Html lang={language} dir={dir}>
@@ -99,7 +106,9 @@ export default function AndroidReleaseLaunchEmail({
             u + .body { background-color: ${C.bg} !important; }
             @media (max-width: 480px) {
               .h1 { font-size: 28px !important; }
-              .chip { display: block !important; width: 100% !important; padding: 8px 0 !important; }
+              /* Stacked filled chips need real vertical breathing room so the hard
+                 shadows don't collide. Bottom-padding on the cell does this safely. */
+              .chip { display: block !important; width: 100% !important; padding: 0 0 14px 0 !important; }
               .card-pad { padding: 24px 20px !important; }
             }
           `}</style>
@@ -204,16 +213,18 @@ export default function AndroidReleaseLaunchEmail({
                               <tr>
                                 <td
                                   style={{
-                                    backgroundColor: C.lime,
+                                    // Cream (not lime) so the badge doesn't compete with the
+                                    // lime CTA below — keeps a single dominant lime focal point.
+                                    backgroundColor: C.cream,
                                     color: C.black,
                                     border: `3px solid ${C.black}`,
                                     borderRadius: '9999px',
                                     boxShadow: `${sh}3px 3px 0px ${C.black}`,
-                                    padding: '6px 16px',
+                                    padding: '7px 18px',
                                     fontFamily: FONT_STACK,
                                     fontSize: '12px',
                                     fontWeight: 700,
-                                    letterSpacing: '1px',
+                                    letterSpacing: '1.5px',
                                     whiteSpace: 'nowrap',
                                   }}
                                 >
@@ -268,13 +279,18 @@ export default function AndroidReleaseLaunchEmail({
                                         <td
                                           align="center"
                                           style={{
-                                            border: `2px solid ${chipColors[i]}`,
-                                            borderRadius: '12px',
-                                            padding: '10px 6px',
+                                            // Solid neo tag: colored fill + hard black border +
+                                            // hard shadow + black bold text. Matches the badge/CTA
+                                            // language instead of the old weak hollow outline.
+                                            backgroundColor: chipColors[i],
+                                            border: `3px solid ${C.black}`,
+                                            borderRadius: '10px',
+                                            boxShadow: `${sh}3px 3px 0px ${C.black}`,
+                                            padding: '11px 6px',
                                             fontFamily: FONT_STACK,
                                             fontSize: '13px',
-                                            fontWeight: 600,
-                                            color: chipColors[i],
+                                            fontWeight: 700,
+                                            color: C.black,
                                           }}
                                         >
                                           {chip}
@@ -302,15 +318,30 @@ export default function AndroidReleaseLaunchEmail({
                                     className="cta-btn"
                                     style={{
                                       display: 'block',
-                                      padding: '16px 36px',
+                                      padding: '15px 32px',
                                       fontFamily: FONT_STACK,
                                       fontSize: '18px',
                                       fontWeight: 700,
                                       color: C.black,
                                       textDecoration: 'none',
+                                      whiteSpace: 'nowrap',
                                     }}
                                   >
-                                    {t.cta} ▶
+                                    <Img
+                                      src={PLAY_ICON_IMAGE}
+                                      alt=""
+                                      width="26"
+                                      height="26"
+                                      style={{
+                                        display: 'inline-block',
+                                        verticalAlign: 'middle',
+                                        border: 0,
+                                        outline: 'none',
+                                        // Gap sits between glyph and label on the correct side.
+                                        ...(rtl ? { marginLeft: '10px' } : { marginRight: '10px' }),
+                                      }}
+                                    />
+                                    <span style={{ verticalAlign: 'middle' }}>{t.cta}</span>
                                   </a>
                                 </td>
                               </tr>
