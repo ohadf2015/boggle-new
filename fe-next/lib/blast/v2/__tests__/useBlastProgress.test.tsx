@@ -12,11 +12,15 @@ type Resp = { ok: boolean; status: number; json: () => Promise<unknown>; text?: 
  */
 function routeFetch(routes: {
   progress?: () => Resp;
+  claim?: () => Resp;
   clearLevel?: () => Resp;
   openChest?: () => Resp;
 }) {
-  return vi.fn((url: string) => {
+  return vi.fn((url: string, init?: { method?: string }) => {
     if (url.includes('/api/blast/progress')) {
+      if (init?.method === 'POST') {
+        return Promise.resolve((routes.claim ?? (() => ({ ok: true, status: 200, json: async () => ({ currentLevel: 1 }) })))());
+      }
       return Promise.resolve((routes.progress ?? (() => ({ ok: false, status: 401, json: async () => ({}) })))());
     }
     if (url.includes('/api/blast/clear-level')) {
@@ -79,19 +83,38 @@ describe('useBlastProgress', () => {
     expect(result.current.state.unlocksSeenFlag).toEqual({ coinOverlay: true });
   });
 
-  it('clears stale guest localStorage on an authed (200) load — server wins', async () => {
-    localStorage.setItem(GUEST_PROGRESS_KEY, JSON.stringify({ currentLevel: 99, locale: 'en' }));
-    global.fetch = routeFetch({
-      progress: () => ({
-        ok: true,
-        status: 200,
-        json: async () => ({ currentLevel: 3, maxLevelCleared: 2, coins: 10, chestNumber: 1, chestProgress: 0, unlocksSeen: {}, locale: 'en' }),
-      }),
-    }) as unknown as typeof fetch;
+  it('claims a higher guest level onto the server on authed load, then clears guest LS', async () => {
+    localStorage.setItem(GUEST_PROGRESS_KEY, JSON.stringify({ currentLevel: 9, locale: 'en' }));
+    const fetchMock = routeFetch({
+      progress: () => ({ ok: true, status: 200, json: async () => ({ currentLevel: 3, maxLevelCleared: 2, coins: 0, chestNumber: 1, chestProgress: 0, unlocksSeen: {}, locale: 'en' }) }),
+      claim: () => ({ ok: true, status: 200, json: async () => ({ currentLevel: 9 }) }),
+    });
+    global.fetch = fetchMock as unknown as typeof fetch;
 
     const { result } = renderHook(() => useBlastProgress());
     await waitFor(() => expect(result.current.progressLoaded).toBe(true));
-    expect(result.current.currentLevel).toBe(3);
+
+    // Resumes at the claimed (higher) guest level, not the lower server level.
+    expect(result.current.currentLevel).toBe(9);
+    const claimCall = fetchMock.mock.calls.find((c) => String(c[0]).includes('/api/blast/progress') && (c[1] as { method?: string })?.method === 'POST');
+    expect(claimCall).toBeTruthy();
+    expect(JSON.parse((claimCall![1] as { body: string }).body).currentLevel).toBe(9);
+    expect(localStorage.getItem(GUEST_PROGRESS_KEY)).toBeNull();
+  });
+
+  it('does NOT claim when the guest level is not higher than the server level', async () => {
+    localStorage.setItem(GUEST_PROGRESS_KEY, JSON.stringify({ currentLevel: 2, locale: 'en' }));
+    const fetchMock = routeFetch({
+      progress: () => ({ ok: true, status: 200, json: async () => ({ currentLevel: 5, maxLevelCleared: 4, coins: 0, chestNumber: 1, chestProgress: 0, unlocksSeen: {}, locale: 'en' }) }),
+    });
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    const { result } = renderHook(() => useBlastProgress());
+    await waitFor(() => expect(result.current.progressLoaded).toBe(true));
+
+    expect(result.current.currentLevel).toBe(5);
+    const claimCall = fetchMock.mock.calls.find((c) => String(c[0]).includes('/api/blast/progress') && (c[1] as { method?: string })?.method === 'POST');
+    expect(claimCall).toBeUndefined();
     expect(localStorage.getItem(GUEST_PROGRESS_KEY)).toBeNull();
   });
 
@@ -178,6 +201,27 @@ describe('useBlastProgress', () => {
     const clearCall = fetchMock.mock.calls.find((c) => String(c[0]).includes('clear-level'))!;
     const body = JSON.parse((clearCall[1] as { body: string }).body);
     expect(body.submissionId).toBe('fixed-uuid-123');
+  });
+
+  it('clearLevel forwards unlocksSeen in the request body (tutorial persistence)', async () => {
+    const fetchMock = routeFetch({
+      clearLevel: () => ({ ok: true, status: 200, json: async () => ({ coins: 0, chestProgress: 0, chestNumber: 1 }) }),
+    });
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    const { result } = renderHook(() => useBlastProgress());
+    const submission = {
+      levelNumber: 1, locale: 'en' as const, wordsFound: ['test'],
+      timeSeconds: 30, hintsUsed: 0, wrongAttempts: 0, cascadesTriggered: 0,
+    };
+
+    result.current.clearLevel(submission, 100, 5, { ftue_completed: true, coinOverlay: true });
+
+    await waitFor(() => expect(result.current.clearMutation.status).toBe('success'));
+
+    const clearCall = fetchMock.mock.calls.find((c) => String(c[0]).includes('clear-level'))!;
+    const body = JSON.parse((clearCall[1] as { body: string }).body);
+    expect(body.unlocksSeen).toEqual({ ftue_completed: true, coinOverlay: true });
   });
 
   it('openChest mutation resets chest progress and increments chest number', async () => {

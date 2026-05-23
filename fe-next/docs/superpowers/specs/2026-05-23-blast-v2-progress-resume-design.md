@@ -34,9 +34,6 @@ instead of always level 1.
 ## Non-Goals (deferred)
 
 - **Level-select map UI** — not planned in Plan 3, out of scope here. Progression stays linear.
-- **Claim-on-login** (merge a guest's localStorage level into the server row). Deferred: it's a
-  mild skip-ahead cheat vector and low value. On login the **server row wins**; stale guest
-  localStorage is cleared.
 - **Local-JWT verify** for the new GET route. We match the sibling blast routes
   (`createClient()` + `auth.getUser()`) for consistency; the read-path JWT optimization
   (`auth-getuser-refactor-playbook`) is tracked separately.
@@ -182,14 +179,23 @@ advance (guest): writeGuestProgress({currentLevel: next, locale})
 | `app/[locale]/blast/v2/__tests__/BlastV2PageClient.test.tsx` | **new/extend** |
 | `translations/{en,he,sv,ja,es}.*` | `blast.loadingProgress` (+ optional `blast.signInToSaveRewards`) |
 
+## Follow-ups (implemented 2026-05-24)
+
+- **`unlocks_seen` write — DONE.** `clear-level` now persists the client's accumulated
+  tutorial-seen flags via the pure `mergeUnlocksSeen()` helper (additive union; `clearLevel` and
+  BlastGame thread `unlocksSeen` into the POST). `grantVeteranBonus` (telemetry.server.ts) was
+  also fixed to merge rather than replace. `veteran_bonus_granted` is a server-owned key the
+  client can never clear — a replace there could re-fire the 500-coin bonus.
+- **Claim-on-login — DONE (made safe).** New `POST /api/blast/progress`
+  (`handleClaimBlastProgress`) bumps **only `current_level`** (`GREATEST`, clamped to
+  `[1, 1000]`) — never `max_level_cleared`. Since the veteran bonus is gated on legacy play
+  history (not `max_level_cleared`) and there is no blast leaderboard, skipping ahead grants
+  nothing (you forfeit the skipped levels' coins), so trusting the client's claimed level is safe.
+  `useBlastProgress` fires the claim on authed load when the guest's localStorage level exceeds the
+  server's, then clears the guest store.
+
 ## Known limitations / accepted costs
 
-- **`unlocks_seen` is read-then-threaded but not yet *written*.** The GET returns it and the
-  PageClient threads `validateUnlocksSeen(progressState.unlocksSeenFlag)` into BlastGame's
-  `unlocksSeen` prop (resumers won't re-watch FTUE prompts). But `clear-level` still does not
-  persist `unlocks_seen` (deferred in Plan 3), so today the stored value is `{}` for everyone and
-  the thread is forward-correct rather than immediately visible. Wiring the write is a small
-  follow-up.
 - **HUD coins flash 0 → real value for one frame on resume.** BlastGame's own `useBlastProgress`
   instance fires its GET *after* the boot gate releases, so coins paint as 0 until it resolves.
   This is the visible cost of the two-instance design (vs. lifting the hook). Acceptable.

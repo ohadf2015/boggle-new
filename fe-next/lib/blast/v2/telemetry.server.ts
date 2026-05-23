@@ -1,5 +1,6 @@
 import { getPostHogServer } from '@/lib/posthog';
 import { createClient } from '@supabase/supabase-js';
+import { mergeUnlocksSeen } from './mergeUnlocksSeen';
 
 let supabaseInstance: ReturnType<typeof createClient> | null = null;
 
@@ -52,9 +53,14 @@ export async function grantVeteranBonus(userId: string): Promise<{ grantedCoins:
     return { grantedCoins: 0 };
   }
 
-  // Mark granted, return 500 coins
+  // Mark granted, return 500 coins. Merge (not replace) so we don't wipe the
+  // player's seen-tutorial flags that clear-level persists.
+  const mergedUnlocks = mergeUnlocksSeen(
+    (progress?.unlocks_seen as Record<string, boolean> | null) ?? null,
+    { veteran_bonus_granted: true },
+  );
   await (supabase.from('blast_progress') as any)
-    .update({ unlocks_seen: { veteran_bonus_granted: true } })
+    .update({ unlocks_seen: mergedUnlocks })
     .eq('user_id', userId);
 
   return { grantedCoins: 500 };

@@ -355,8 +355,8 @@ export function BlastGame({
       gems_collected: gemsCollected,
     });
 
-    clearLevel(submission, state.coins, gemsCollected);
-  }, [state.status, introDismissed, level, levelStartTime, state.foundWords, state.hintsUsed, state.cascadeCount, state.coins, state.chestProgress, clearLevel]);
+    clearLevel(submission, state.coins, gemsCollected, unlocksSeen);
+  }, [state.status, introDismissed, level, levelStartTime, state.foundWords, state.hintsUsed, state.cascadeCount, state.coins, state.chestProgress, clearLevel, unlocksSeen]);
 
   const handleFtueComplete = () => {
     const updated = completeFtue(unlocksSeen);

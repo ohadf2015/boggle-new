@@ -20,12 +20,13 @@ vi.mock('@/utils/supabase/server', () => ({
   createClient: vi.fn(),
 }));
 
-import { handleGetBlastProgress } from '../route';
+import { handleGetBlastProgress, handleClaimBlastProgress } from '../route';
 
 interface MockSupabase {
   from: Mock;
   __insert: Mock;
   __upsert: Mock;
+  __update: Mock;
 }
 
 function createMockSupabase({
@@ -37,9 +38,11 @@ function createMockSupabase({
 } = {}): MockSupabase {
   const __insert = vi.fn().mockResolvedValue({ error: null });
   const __upsert = vi.fn().mockResolvedValue({ error: null });
+  const __update = vi.fn();
   return {
     __insert,
     __upsert,
+    __update,
     from: vi.fn().mockReturnValue({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
@@ -48,6 +51,10 @@ function createMockSupabase({
       }),
       insert: __insert,
       upsert: __upsert,
+      update: vi.fn((payload: Record<string, unknown>) => {
+        __update(payload);
+        return { eq: vi.fn().mockResolvedValue({ error: null }) };
+      }),
     }),
   };
 }
@@ -142,5 +149,62 @@ describe('handleGetBlastProgress', () => {
 
     const result = await handleGetBlastProgress('user-123', { from } as unknown as MockSupabase);
     expect(result.status).toBe(500);
+  });
+});
+
+describe('handleClaimBlastProgress (guest → server resume position)', () => {
+  it('bumps current_level to the claimed level when higher — and NEVER touches max_level_cleared', async () => {
+    const mockSupabase = createMockSupabase({ selectData: { current_level: 3, max_level_cleared: 2 } });
+
+    const result = await handleClaimBlastProgress('user-123', mockSupabase, 8);
+
+    expect(result.status).toBe(200);
+    expect(result.data.currentLevel).toBe(8);
+    expect(mockSupabase.__update).toHaveBeenCalledTimes(1);
+    const payload = mockSupabase.__update.mock.calls[0][0];
+    expect(payload).toMatchObject({ current_level: 8 });
+    // Critical: max_level_cleared stays earned-only (veteran bonus / future ranking safe).
+    expect(payload).not.toHaveProperty('max_level_cleared');
+  });
+
+  it('is a no-op when the claimed level is not higher than the server level', async () => {
+    const mockSupabase = createMockSupabase({ selectData: { current_level: 10, max_level_cleared: 9 } });
+
+    const result = await handleClaimBlastProgress('user-123', mockSupabase, 4);
+
+    expect(result.status).toBe(200);
+    expect(result.data.currentLevel).toBe(10);
+    expect(mockSupabase.__update).not.toHaveBeenCalled();
+  });
+
+  it('creates the row at the claimed level when none exists (max_level_cleared stays 0)', async () => {
+    const mockSupabase = createMockSupabase({ selectData: null, selectError: { message: 'No rows found' } });
+
+    const result = await handleClaimBlastProgress('user-123', mockSupabase, 6, 'sv');
+
+    expect(result.status).toBe(200);
+    expect(result.data.currentLevel).toBe(6);
+    expect(mockSupabase.__insert).toHaveBeenCalledTimes(1);
+    const payload = mockSupabase.__insert.mock.calls[0][0];
+    expect(payload).toMatchObject({ user_id: 'user-123', current_level: 6, locale: 'sv' });
+    expect(payload).not.toHaveProperty('max_level_cleared');
+  });
+
+  it('rejects an absurd claim level (anti-tamper) as a no-op', async () => {
+    const mockSupabase = createMockSupabase({ selectData: { current_level: 5, max_level_cleared: 4 } });
+
+    const result = await handleClaimBlastProgress('user-123', mockSupabase, 999999);
+
+    expect(result.status).toBe(200);
+    expect(result.data.currentLevel).toBe(5);
+    expect(mockSupabase.__update).not.toHaveBeenCalled();
+  });
+
+  it('rejects a non-positive / non-integer claim level as a no-op', async () => {
+    const mockSupabase = createMockSupabase({ selectData: { current_level: 5, max_level_cleared: 4 } });
+
+    expect((await handleClaimBlastProgress('user-123', mockSupabase, 0)).data.currentLevel).toBe(5);
+    expect((await handleClaimBlastProgress('user-123', mockSupabase, 2.5)).data.currentLevel).toBe(5);
+    expect(mockSupabase.__update).not.toHaveBeenCalled();
   });
 });

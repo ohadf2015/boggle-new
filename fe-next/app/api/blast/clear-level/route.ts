@@ -3,6 +3,8 @@ import { applyAntiCheatCaps, applyAntiCheatCapsWithLevel, type ClearSubmission }
 import { buildRegistry, getLevelSourceForLevel } from '@/lib/blast/v2/level-source-registry';
 import { CURATED_LEVEL_CUTOFF } from '@/lib/blast/v2/level-source';
 import { awardCoinsServer } from '@/backend/services/economy/awardCoins';
+import { mergeUnlocksSeen } from '@/lib/blast/v2/mergeUnlocksSeen';
+import { validateUnlocksSeen } from '@/lib/blast/v2/tutorial/unlocks-seen';
 import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
 
@@ -13,7 +15,12 @@ export async function POST(req: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  let submission: ClearSubmission & { earnedCoins: number; earnedGems: number; submissionId?: string };
+  let submission: ClearSubmission & {
+    earnedCoins: number;
+    earnedGems: number;
+    submissionId?: string;
+    unlocksSeen?: Record<string, boolean>;
+  };
   try {
     submission = await req.json();
   } catch {
@@ -120,6 +127,20 @@ export async function POST(req: NextRequest) {
     p_next_level: submission.levelNumber + 1,
     p_coins_delta: totalCoins,
   });
+
+  // Persist the player's seen-tutorial flags so a resume skips FTUE prompts they
+  // already cleared. Merge (never replace) to keep the server-owned
+  // veteran_bonus_granted flag intact — a replace could let the 500-coin bonus
+  // re-fire on the next load.
+  if (submission.unlocksSeen && typeof submission.unlocksSeen === 'object') {
+    const mergedUnlocks = validateUnlocksSeen(
+      mergeUnlocksSeen(
+        (existingProgress?.unlocks_seen as Record<string, boolean> | null) ?? null,
+        submission.unlocksSeen,
+      ),
+    );
+    await supabase.from('blast_progress').update({ unlocks_seen: mergedUnlocks }).eq('user_id', user.id);
+  }
 
   return NextResponse.json({
     coins: updated?.[0]?.total_coins_earned_blast ?? 0,

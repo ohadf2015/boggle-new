@@ -64,7 +64,28 @@ export function useBlastProgress() {
           chestProgress: data.chestProgress ?? 0,
           unlocksSeenFlag: data.unlocksSeen ?? {},
         }));
-        setCurrentLevel(data.currentLevel ?? 1);
+        let resumeLevel = data.currentLevel ?? 1;
+        // Claim-on-login: if the player got further as a guest than the server
+        // knows, carry that resume position up. Only current_level moves — no
+        // coins/clears are granted (see handleClaimBlastProgress).
+        const guest = readGuestProgress();
+        if (guest && guest.currentLevel > resumeLevel) {
+          try {
+            const claimRes = await fetch('/api/blast/progress', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ currentLevel: guest.currentLevel, locale: guest.locale }),
+            });
+            if (claimRes.ok) {
+              const claimed = await claimRes.json();
+              resumeLevel = claimed.currentLevel ?? resumeLevel;
+            }
+          } catch {
+            // Claim is best-effort — fall back to the server level.
+          }
+        }
+        if (cancelled) return;
+        setCurrentLevel(resumeLevel);
         setMaxLevelCleared(data.maxLevelCleared ?? 0);
         setIsGuest(false);
         clearGuestProgress(); // server is the source of truth for authed players
@@ -81,7 +102,12 @@ export function useBlastProgress() {
     };
   }, []);
 
-  const clearLevel = async (submission: ClearSubmission, earnedCoins: number, earnedGems: number) => {
+  const clearLevel = async (
+    submission: ClearSubmission,
+    earnedCoins: number,
+    earnedGems: number,
+    unlocksSeen?: Record<string, boolean>,
+  ) => {
     setClearMutation({ status: 'loading' });
     try {
       const res = await fetch('/api/blast/clear-level', {
@@ -91,6 +117,7 @@ export function useBlastProgress() {
           ...submission,
           earnedCoins,
           earnedGems,
+          unlocksSeen,
         }),
       });
       if (!res.ok) throw new Error(await res.text());
