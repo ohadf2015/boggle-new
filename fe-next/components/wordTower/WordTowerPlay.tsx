@@ -67,12 +67,28 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     [tower, dictionary],
   );
 
+  // "NEW ZONE" banner on entering a new biome — the headline celebration of the
+  // climb. Owns its height so a colliding milestone (m50/m150 sit on the
+  // sky/stratosphere thresholds) defers to it.
+  const [zoneText, setZoneText] = useState<string | null>(null);
+  const prevZone = useRef(biomeId);
+  useEffect(() => {
+    if (prevZone.current === biomeId) return;
+    prevZone.current = biomeId;
+    setZoneText(t(`wordTower.biome.${biomeId}`));
+    const id = setTimeout(() => setZoneText(null), 2600);
+    return () => clearTimeout(id);
+  }, [biomeId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Witty milestone toast on crossing a height landmark.
   const [milestoneText, setMilestoneText] = useState<string | null>(null);
   const prevMilestoneH = useRef(game.heightM);
   useEffect(() => {
-    const hit = milestoneCrossed(prevMilestoneH.current, game.heightM);
+    const prev = prevMilestoneH.current;
     prevMilestoneH.current = game.heightM;
+    // A zone change owns the celebration at that height → skip the colliding milestone.
+    if (biomeForHeight(prev) !== biomeForHeight(game.heightM)) return;
+    const hit = milestoneCrossed(prev, game.heightM);
     if (!hit) return;
     setMilestoneText(t(hit.key));
     const id = setTimeout(() => setMilestoneText(null), 2400);
@@ -234,6 +250,17 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
 
       {/* Rival record lines you climb past — fed by the leaderboard. */}
       <WordTowerRivalRail rivals={rivals} viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} />
+
+      {/* NEW ZONE banner — the headline of entering a new biome */}
+      {zoneText && (
+        <div
+          className="pointer-events-none absolute left-1/2 top-[9%] z-30 -translate-x-1/2 animate-neo-pop rounded-neo border-neo-thick border-black bg-neo-cyan px-4 py-2 text-center shadow-hard"
+          aria-live="polite"
+        >
+          <div className="font-neo-body text-[10px] font-bold uppercase tracking-[0.2em] text-black/60">{t('wordTower.zone.entered')}</div>
+          <div className="font-neo-display text-base font-black uppercase tracking-wide text-black">{zoneText}</div>
+        </div>
+      )}
 
       {/* Witty milestone toast */}
       {milestoneText && (

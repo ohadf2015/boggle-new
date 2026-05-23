@@ -33,6 +33,13 @@ export const WORD_TOWER_ACHIEVEMENTS: ReadonlyArray<Achievement> = [
   { id: 'rivalCrusher', nameKey: 'wordTower.ach.rivalCrusher', icon: '👑', test: (s) => s.passedRival },
   { id: 'unstoppable', nameKey: 'wordTower.ach.unstoppable', icon: '🚀', test: (s) => s.heightM >= 500 },
   { id: 'toTheMoon', nameKey: 'wordTower.ach.toTheMoon', icon: '🌙', test: (s) => s.heightM >= 1000 },
+  // Higher-bar feats so the dopamine ladder keeps going past the early unlocks.
+  { id: 'skylineKing', nameKey: 'wordTower.ach.skylineKing', icon: '🏙️', test: (s) => s.floors >= 25 },
+  { id: 'centurion', nameKey: 'wordTower.ach.centurion', icon: '🗼', test: (s) => s.floors >= 100 },
+  { id: 'comboGod', nameKey: 'wordTower.ach.comboGod', icon: '⚡', test: (s) => s.longestCombo >= 8 },
+  { id: 'wordWizard', nameKey: 'wordTower.ach.wordWizard', icon: '🧙', test: (s) => s.longestWord >= 9 },
+  { id: 'galaxyClass', nameKey: 'wordTower.ach.galaxyClass', icon: '🌌', test: (s) => s.heightM >= 800 },
+  { id: 'deepSpace', nameKey: 'wordTower.ach.deepSpace', icon: '🛸', test: (s) => s.heightM >= 2000 },
 ];
 
 /** Achievements newly satisfied by `stats` that aren't already `unlocked`. */

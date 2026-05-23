@@ -270,7 +270,11 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
   const prevBiome = useRef(biomeId);
   useEffect(() => {
     if (prevBiome.current !== biomeId) {
-      if (!reducedMotion) engine.flash.flash({ color: BIOME_THEME[biomeId].block, duration: 0.5, intensity: 0.45 });
+      if (!reducedMotion) {
+        engine.flash.flash({ color: BIOME_THEME[biomeId].block, duration: 0.5, intensity: 0.45 });
+        // Star shower to celebrate reaching a new zone (dopamine on arrival).
+        engine.particles.burst(GOLD_STARS, engine.width / 2, engine.height * 0.24, 34);
+      }
       prevBiome.current = biomeId;
     }
   }, [biomeId, engine, reducedMotion]);
