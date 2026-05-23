@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Check, Home } from 'lucide-react';
+import { ArrowRight, Check, Home, Pencil, Search, Disc3, type LucideIcon } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -32,12 +32,12 @@ const MODE_HERO: Record<PracticeMode, string> = {
   wheelRush: '/practice/help/practice-help-wheelrush.png',
 };
 
-// Friendly emoji per mode — adds personality to the headers without
-// hardcoding strings into translations.
-const MODE_EMOJI: Record<PracticeMode, string> = {
-  classic: '✏️',
-  wordHunt: '🔍',
-  wheelRush: '🎡',
+// Per-mode glyph (lucide) — adds personality to the hero tiles without
+// emoji. Matches the icons used in the tutorial + desktop welcome.
+const MODE_ICON: Record<PracticeMode, LucideIcon> = {
+  classic: Pencil,
+  wordHunt: Search,
+  wheelRush: Disc3,
 };
 
 interface Props {
@@ -104,6 +104,7 @@ export default function PracticeHubClient({ locale }: Props) {
           {PRACTICE_MODES.map((mode, idx) => {
             const isDone = completed.has(mode);
             const isNext = mode === nextMode;
+            const ModeIcon = MODE_ICON[mode];
             const baseClass =
               'group relative flex items-stretch gap-3 rounded-neo border-2 border-neo-black p-3 shadow-hard overflow-hidden transition-all';
 
@@ -134,9 +135,9 @@ export default function PracticeHubClient({ locale }: Props) {
                   />
                   <span
                     aria-hidden
-                    className="absolute bottom-1 start-1 text-base leading-none drop-shadow-[1px_1px_0_rgba(0,0,0,0.9)]"
+                    className="absolute bottom-1 start-1 inline-flex items-center justify-center w-6 h-6 rounded-md border-2 border-neo-black bg-neo-cream text-neo-navy shadow-hard-sm"
                   >
-                    {MODE_EMOJI[mode]}
+                    <ModeIcon className="w-3.5 h-3.5" strokeWidth={2.5} />
                   </span>
                 </div>
 

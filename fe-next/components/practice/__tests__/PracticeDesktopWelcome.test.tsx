@@ -49,4 +49,13 @@ describe('PracticeDesktopWelcome', () => {
     render(<PracticeDesktopWelcome mode="classic" onDismiss={onDismiss} />);
     expect(screen.getByTestId('practice-desktop-welcome')).toBeInTheDocument();
   });
+
+  it('uses lucide icons (svg), not emoji glyphs', () => {
+    render(<PracticeDesktopWelcome mode="classic" onDismiss={onDismiss} />);
+    const root = screen.getByTestId('practice-desktop-welcome');
+    // One icon per tip (3) + a mode header icon → at least 4 svg icons.
+    expect(root.querySelectorAll('svg').length).toBeGreaterThanOrEqual(4);
+    // No leftover emoji glyphs anywhere in the rendered text.
+    expect(root.textContent ?? '').not.toMatch(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2700}-\u{27BF}\u{FE0F}\u{2705}\u{270F}]/u);
+  });
 });

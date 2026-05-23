@@ -63,6 +63,8 @@ interface GridComponentProps {
   ghostCells?: boolean;
   /** Optional adjacency override — return true if cell2 should be reachable from cell1 (e.g. portal teleportation) */
   isAdjacent?: (cell1: { row: number; col: number }, cell2: { row: number; col: number }) => boolean;
+  /** Desktop idle auto-submit (ms). Submits a ≥3-letter selection that sits unchanged this long on non-touch devices. Used by practice. */
+  autoSubmitIdleMs?: number;
 }
 
 const GridComponent = memo<GridComponentProps>(({
@@ -94,6 +96,7 @@ const GridComponent = memo<GridComponentProps>(({
   meteorTiles,
   ghostCells = false,
   isAdjacent,
+  autoSubmitIdleMs,
 }) => {
   const { t } = useLanguage();
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -151,6 +154,7 @@ const GridComponent = memo<GridComponentProps>(({
     disableLetterKeyInput,
     cellFilter,
     isAdjacent,
+    autoSubmitIdleMs,
   });
 
   // Stable handlers that read row/col from data attributes to avoid inline arrows per cell

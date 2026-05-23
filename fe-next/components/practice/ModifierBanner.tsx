@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { PracticeModifier } from '@/lib/practice/modifiers';
 
@@ -33,7 +34,7 @@ export function ModifierBanner({ modifier, className }: ModifierBannerProps): Re
         className ?? '',
       ].join(' ')}
     >
-      <span aria-hidden className="text-xl">🎯</span>
+      <Target aria-hidden className="w-5 h-5 shrink-0" strokeWidth={2.5} />
       <div className="min-w-0 flex-1">
         <div className="text-xs font-bold uppercase tracking-wide opacity-70">
           {t('practice.modifier.todayLabel')}

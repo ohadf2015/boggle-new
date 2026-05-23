@@ -40,6 +40,15 @@ interface UseGridInteractionProps {
   cellFilter?: (row: number, col: number, currentPathLength?: number) => boolean;
   /** Optional adjacency override — return true if cell2 is reachable from cell1 (e.g. portal teleportation). */
   isAdjacent?: (cell1: GridPosition, cell2: GridPosition) => boolean;
+  /**
+   * Desktop-only idle auto-submit. When set (ms), a selection of ≥3 cells that
+   * sits unchanged for this long on a non-touch device submits automatically —
+   * so click-built words and drag-then-stall don't leave the word stuck
+   * (founder report: players thought they had to "click elsewhere" to submit).
+   * Undefined = off (multiplayer/daily keep release/tap-to-submit only).
+   * Mobile is excluded so a paused finger never fires early.
+   */
+  autoSubmitIdleMs?: number;
 }
 
 interface UseGridInteractionReturn {
@@ -80,6 +89,7 @@ export function useGridInteraction({
   disableLetterKeyInput = false,
   cellFilter,
   isAdjacent: isAdjacentOverride,
+  autoSubmitIdleMs,
 }: UseGridInteractionProps): UseGridInteractionReturn {
   const [internalSelectedCells, setInternalSelectedCells] = useState<SelectedCell[]>([]);
   const [fadingCells, setFadingCells] = useState<GridPosition[]>([]);
@@ -99,6 +109,10 @@ export function useGridInteraction({
   const isTouchDeviceRef = useRef(false);
   const lastDirectionRef = useRef<{ dx: number; dy: number } | null>(null);
   const autoSubmitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Desktop idle auto-submit (autoSubmitIdleMs). Guard prevents a re-arm during
+  // the post-submit clear window (submitWord clears selection ~150ms later).
+  const idleSubmitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const idleSubmitGuardRef = useRef(false);
   const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const gridMeasurementsRef = useRef<GridMeasurements | null>(null);
   // Map of "row-col" → HTMLElement, built lazily on first lookup and
@@ -278,6 +292,33 @@ export function useGridInteraction({
       if (autoSubmitTimeoutRef.current) clearTimeout(autoSubmitTimeoutRef.current);
     };
   }, [selectedCells, comboLevel, interactive, onWordSubmit, onPathSubmit, startSequentialFadeOut]);
+  // Desktop idle auto-submit. Unlike the combo timer above this fires
+  // regardless of combo and covers BOTH click-built words (which otherwise
+  // only submit via re-click/double-click/click-outside) and drag-then-stall.
+  // Re-arms on every selection change, so the player gets the full idle window
+  // after their LAST letter. Touch devices are excluded — they submit on
+  // finger lift, and an idle timer would fire on a mid-drag pause.
+  useEffect(() => {
+    if (!interactive || autoSubmitIdleMs == null || isTouchDeviceRef.current) return;
+    if (selectedCells.length < 3) { idleSubmitGuardRef.current = false; return; }
+    if (idleSubmitGuardRef.current) return; // already auto-submitted this selection
+    idleSubmitTimeoutRef.current = setTimeout(() => {
+      if (isTouchDeviceRef.current) return;
+      if (selectedCellsRef.current.length < 3) return;
+      idleSubmitGuardRef.current = true;
+      submitWord();
+      // Reset drag state so a later mouseup (drag-then-stall case) doesn't
+      // re-submit the same word via handleTouchEnd reading dragSelectionRef.
+      isTouchingRef.current = false;
+      isDraggingRef.current = false;
+      hasMovedRef.current = false;
+      dragSelectionRef.current = [];
+      clearAllDragClasses();
+    }, autoSubmitIdleMs);
+    return () => {
+      if (idleSubmitTimeoutRef.current) { clearTimeout(idleSubmitTimeoutRef.current); idleSubmitTimeoutRef.current = null; }
+    };
+  }, [selectedCells, interactive, autoSubmitIdleMs, submitWord, clearAllDragClasses]);
   const handleTouchStart = useCallback((
     rowIndex: number, colIndex: number, letter: string,
     event: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>

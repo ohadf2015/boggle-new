@@ -193,6 +193,7 @@ export default function PracticeClassicSandbox() {
             onSelectionChange={onSelectionChange}
             hideComboIndicator
             language={language}
+            autoSubmitIdleMs={1000}
           />
         </div>
       </div>

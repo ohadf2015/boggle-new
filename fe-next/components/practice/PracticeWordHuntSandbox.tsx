@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Heart } from 'lucide-react';
+import { ArrowLeft, Heart, Lightbulb, Search } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeCompletePopup from './PracticeCompletePopup';
 import PracticePostCompleteChip from './PracticePostCompleteChip';
@@ -331,7 +331,7 @@ export default function PracticeWordHuntSandbox() {
       {/* Discovery mechanic onboarding tip */}
       {showDiscoveryTip && (
         <div className="flex items-start gap-2 bg-neo-navy/60 border-2 border-neo-lime text-neo-cream text-sm p-3 mb-2 rounded-neo">
-          <span className="shrink-0">💡</span>
+          <Lightbulb aria-hidden className="w-4 h-4 mt-0.5 shrink-0 text-neo-lime" strokeWidth={2.5} />
           <div className="flex-1">
             <span className="font-bold">{t('practice.wordHunt.discoveryTip')}</span>
             <button
@@ -380,7 +380,7 @@ export default function PracticeWordHuntSandbox() {
             presence without depending on internal SurvivalClueBoxes markup. */}
         <div data-testid="practice-target" className="flex flex-col items-center gap-1.5 w-full">
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-neo-lime/20 border border-neo-lime text-neo-lime font-neo-display font-black text-sm">
-            <span aria-hidden>🔍</span>
+            <Search aria-hidden className="w-3.5 h-3.5 shrink-0" strokeWidth={2.5} />
             <span>{t('practice.wordHunt.goalChip', { word: target.toUpperCase() })}</span>
           </div>
           <div data-testid="practice-clue-boxes" className="w-full">
@@ -428,6 +428,7 @@ export default function PracticeWordHuntSandbox() {
             onSelectionChange={onSelectionChange}
             hideComboIndicator
             language={language}
+            autoSubmitIdleMs={1000}
           />
         </div>
         {isVerifying && (
