@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { rivalScreenY, rivalsPassed, visibleRivalMarkers, type RivalMarker } from '../rivals';
+import { rivalScreenY, rivalsPassed, visibleRivalMarkers, rivalsFromLeaderboard, type RivalMarker } from '../rivals';
 
 const PX = 5;
 const BUILD = 200; // build-line y
@@ -42,5 +42,39 @@ describe('visibleRivalMarkers', () => {
   it('brings a high record into view as the viewer climbs toward it', () => {
     const vis = visibleRivalMarkers(280, rivals, BUILD, 600, PX); // near Cy(300)
     expect(vis.map((m) => m.id)).toContain('c');
+  });
+});
+
+describe('rivalsFromLeaderboard', () => {
+  const rows = [
+    { playerId: 'me', isYou: true, username: 'Fish', bestHeightM: 583, highestBiome: 'nebula' },
+    { playerId: 'p1', isYou: false, username: 'Ann', bestHeightM: 400, highestBiome: 'orbit', avatarEmoji: '🐙', avatarColor: '#f0f' },
+    { playerId: 'p2', username: 'Bo', bestHeightM: 120, highestBiome: 'sky' },
+    { playerId: 'p3', username: 'Zed', bestHeightM: 0 }, // never climbed → dropped
+  ];
+
+  it('excludes the viewer themselves (no "passed yourself")', () => {
+    const out = rivalsFromLeaderboard(rows);
+    expect(out.find((r) => r.name === 'Fish')).toBeUndefined();
+    expect(out.map((r) => r.name)).toEqual(['Ann', 'Bo']);
+  });
+
+  it('drops records with no climb and respects max', () => {
+    expect(rivalsFromLeaderboard(rows).every((r) => r.heightM > 0)).toBe(true);
+    expect(rivalsFromLeaderboard(rows, 1)).toHaveLength(1);
+  });
+
+  it('carries highestBiome + avatar so the ghost tower can be themed', () => {
+    const ann = rivalsFromLeaderboard(rows).find((r) => r.name === 'Ann')!;
+    expect(ann.highestBiome).toBe('orbit');
+    expect(ann.avatarEmoji).toBe('🐙');
+    expect(ann.playerId).toBe('p1');
+  });
+
+  it('defaults a missing biome to city', () => {
+    const bo = rivalsFromLeaderboard(rows).find((r) => r.name === 'Bo')!;
+    expect(bo.highestBiome).toBe('sky');
+    const noBiome = rivalsFromLeaderboard([{ playerId: 'x', username: 'X', bestHeightM: 10 }]);
+    expect(noBiome[0]!.highestBiome).toBe('city');
   });
 });

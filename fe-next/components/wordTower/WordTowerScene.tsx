@@ -389,22 +389,24 @@ export function WordTowerScene(props: SceneProps) {
 
   return (
     <div ref={wrapRef} className="absolute inset-0 touch-none overflow-hidden">
-      {/* Background layers grouped in one wrapper that the pan translates (at
-          BG_PAN_DEPTH) so the sky/props parallax with the user's scroll too. */}
-      <div ref={(el) => { pan.current.bgEl = el; }} className="absolute inset-0 will-change-transform">
-        {/* Biome sky — TWO cross-fading gradient layers (current biome under the
-            next one at `blend.t`) so the colour shifts *continuously* with
-            altitude instead of snapping at the six biome thresholds. */}
+      {/* Static biome sky — TWO cross-fading gradient layers (current biome under
+          the next at `blend.t`) so the colour shifts *continuously* with altitude.
+          NOT inside the panned wrapper: a full-bleed fixed fill so scrolling down
+          can never slide it away and expose the navy behind (the old blank band). */}
+      <div className="absolute inset-0" aria-hidden>
         <div
           className="absolute inset-0 transition-[background] duration-700 ease-out"
           style={{ background: BIOME_THEME[blend.fromId].bg }}
-          aria-hidden
         />
         <div
           className="absolute inset-0 transition-opacity duration-700 ease-out"
           style={{ background: BIOME_THEME[blend.toId].bg, opacity: blend.t }}
-          aria-hidden
         />
+      </div>
+      {/* Parallax elements grouped in one wrapper the pan translates (at
+          BG_PAN_DEPTH) so stars/clouds/props parallax with the user's scroll. They
+          are transparent over the static sky above — no edge can reveal navy. */}
+      <div ref={(el) => { pan.current.bgEl = el; }} className="absolute inset-0 will-change-transform">
         {/* Parallax ascent backdrop (stars/clouds/skyline) — driven by the
             *viewed* altitude so panning down reveals that altitude's sky. */}
         <WordTowerBackdrop biomeId={viewBiome} heightM={viewAlt} reducedMotion={props.reducedMotion} />

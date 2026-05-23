@@ -6,7 +6,7 @@ const he = {
     "cardDesc": "בנו מגדל מילים עד השמיים — תצוגת אדמין",
     "loading": "טוען מילון…",
     "biome": { "city": "קרקע", "sky": "שמיים", "stratosphere": "סטרטוספירה", "orbit": "מסלול", "nebula": "ערפילית", "galaxy": "גלקסיה" },
-    "hud": { "floors": "{n} קומות", "combo": "שרשרת {n}", "scramble": "ערבוב", "backspace": "מחיקה", "build": "בנייה", "restart": "מחדש", "best": "שיא {m} מ'", "possible": "{n} מילים", "clue": "רמז", "collapse": "כיווץ", "expand": "הרחבה", "rivalPassed": "עברת את {name}!", "stuck": "תקוע? אות חדשה", "backToTop": "למעלה" },
+    "hud": { "floors": "{n} קומות", "combo": "שרשרת {n}", "scramble": "ערבוב", "backspace": "מחיקה", "build": "בנייה", "restart": "מחדש", "restartConfirm": "בטוח?", "best": "שיא {m} מ'", "possible": "{n} מילים", "clue": "רמז", "collapse": "כיווץ", "expand": "הרחבה", "rivalPassed": "עברת את {name}!", "stuck": "תקוע? אות חדשה", "backToTop": "למעלה" },
     "minimap": { "label": "מפת המגדל — {m} מ', הקש לחזרה למעלה" },
     "milestone": { "m50": "מעל צמרות העצים! 🌳", "m150": "אזור העננים ☁️", "m400": "הציפורים מקנאות 🐦", "m250": "מעל הרחפנים 🛸", "m650": "אווירת ערפילית 🌌", "m900": "דופק בדלת של החלל 🚀", "m1300": "תושב החלל העמוק 👽", "m1800": "כמעט אסטרונאוט ✨" },
     "ach": { "unlocked": "הישג!", "firstFloor": "קומה ראשונה", "tenFloors": "בניין", "skyHigh": "גבוה בשמיים", "wordsmith": "אמן מילים", "comboKing": "מלך הקומבו", "rivalCrusher": "מנצח יריבים", "unstoppable": "בלתי עציר", "toTheMoon": "אל הירח", "skylineKing": "מלך קו הרקיע", "centurion": "מאה קומות", "comboGod": "אל הקומבו", "wordWizard": "קוסם המילים", "galaxyClass": "דרגת גלקסיה", "deepSpace": "חלל עמוק" },

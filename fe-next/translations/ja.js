@@ -6,7 +6,7 @@ const ja = {
     "cardDesc": "言葉を積んで空へ — 管理者プレビュー",
     "loading": "辞書を読み込み中…",
     "biome": { "city": "地上", "sky": "空", "stratosphere": "成層圏", "orbit": "軌道", "nebula": "星雲", "galaxy": "銀河" },
-    "hud": { "floors": "{n} 階", "combo": "{n} 連鎖", "scramble": "シャッフル", "backspace": "削除", "build": "建てる", "restart": "やり直す", "best": "ベスト {m} m", "possible": "{n} 単語", "clue": "ヒント", "collapse": "閉じる", "expand": "開く", "rivalPassed": "{name} を抜いた！", "stuck": "詰まった？新しい文字", "backToTop": "上へ" },
+    "hud": { "floors": "{n} 階", "combo": "{n} 連鎖", "scramble": "シャッフル", "backspace": "削除", "build": "建てる", "restart": "やり直す", "restartConfirm": "本当に？", "best": "ベスト {m} m", "possible": "{n} 単語", "clue": "ヒント", "collapse": "閉じる", "expand": "開く", "rivalPassed": "{name} を抜いた！", "stuck": "詰まった？新しい文字", "backToTop": "上へ" },
     "minimap": { "label": "タワーマップ — {m} m、タップで頂上へ" },
     "milestone": { "m50": "木のてっぺん超え！🌳", "m150": "雲の中へ ☁️", "m400": "鳥もうらやむ 🐦", "m250": "ドローンより上だ 🛸", "m650": "星雲の気分 🌌", "m900": "宇宙までもうすぐ 🚀", "m1300": "深宇宙の住人 👽", "m1800": "ほぼ宇宙飛行士 ✨" },
     "ach": { "unlocked": "実績解除！", "firstFloor": "最初の階", "tenFloors": "高層ビル", "skyHigh": "空高く", "wordsmith": "言葉の達人", "comboKing": "コンボ王", "rivalCrusher": "ライバル撃破", "unstoppable": "止まらない", "toTheMoon": "月まで", "skylineKing": "スカイラインの王", "centurion": "百階の戦士", "comboGod": "コンボの神", "wordWizard": "言葉の魔法使い", "galaxyClass": "ギャラクシー級", "deepSpace": "深宇宙" },

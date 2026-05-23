@@ -57,6 +57,21 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // they freeze at the top and the lower sky reads blank). Starts at the height
   // the session resumes from.
   const [viewAlt, setViewAlt] = useState(game.heightM);
+  // Restart guard: a climb is hard-won, so the reset button asks once. First tap
+  // arms a 3s "Sure?" state; a second tap commits, otherwise it reverts.
+  const [confirmReset, setConfirmReset] = useState(false);
+  const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (confirmTimer.current) clearTimeout(confirmTimer.current); }, []);
+  const handleResetClick = () => {
+    if (confirmReset) {
+      if (confirmTimer.current) clearTimeout(confirmTimer.current);
+      setConfirmReset(false);
+      tower.reset();
+      return;
+    }
+    setConfirmReset(true);
+    confirmTimer.current = setTimeout(() => setConfirmReset(false), 3000);
+  };
 
   // "N words possible" hint — how many dictionary words the player could build
   // from the current anchor + tray (recomputed only when those change).
@@ -323,11 +338,13 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           </button>
           <button
             type="button"
-            onClick={tower.reset}
-            aria-label={t('wordTower.hud.restart')}
-            className="rounded-neo border-neo-thick border-black bg-neo-navy/80 p-2 text-neo-white shadow-hard backdrop-blur-sm"
+            onClick={handleResetClick}
+            aria-label={confirmReset ? t('wordTower.hud.restartConfirm') : t('wordTower.hud.restart')}
+            className={`rounded-neo border-neo-thick border-black p-2 shadow-hard backdrop-blur-sm transition-colors ${confirmReset ? `bg-neo-red text-neo-white ${reducedMotion ? '' : 'animate-neo-shake'}` : 'bg-neo-navy/80 text-neo-white'}`}
           >
-            <RotateCcw className="h-4 w-4" />
+            {confirmReset
+              ? <span className="px-1 font-neo-display text-xs font-black leading-none">{t('wordTower.hud.restartConfirm')}</span>
+              : <RotateCcw className="h-4 w-4" />}
           </button>
         </div>
       </div>
