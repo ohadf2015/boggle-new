@@ -6672,6 +6672,9 @@ const es = {
       "timeSpent": "Tiempo",
       "playAgain": "Jugar de Nuevo",
       "exit": "Salir",
+      "foundWordsHint": "Las palabras que encuentres aparecen aquí",
+      "nextDrillCta": "Siguiente: {drill}",
+      "dailyChallengeCta": "Reto diario",
       "finishGame": "Terminar Juego",
       "useHint": "Usar Pista",
       "lightning-round": {

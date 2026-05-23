@@ -6650,6 +6650,9 @@ const he = {
       "timeSpent": "זמן",
       "playAgain": "שחק שוב",
       "exit": "יציאה",
+      "foundWordsHint": "מילים שתמצא יופיעו כאן",
+      "nextDrillCta": "הבא: {drill}",
+      "dailyChallengeCta": "אתגר יומי",
       "finishGame": "סיים משחק",
       "useHint": "השתמש ברמז",
       "lightning-round": {

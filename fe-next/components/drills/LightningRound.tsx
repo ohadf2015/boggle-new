@@ -319,47 +319,57 @@ export default function LightningRound({
               </AdaptiveMotion.div>
             )}
 
-            {/* Feedback message */}
-            <AdaptiveAnimatePresence>
-              {feedback && (
-                <AdaptiveMotion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  role="status"
-                  aria-live={feedback.type === 'error' ? 'assertive' : 'polite'}
-                  aria-atomic="true"
-                  className={cn(
-                    'text-center px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm',
-                    feedback.type === 'error'
-                      ? 'bg-neo-red text-neo-white'
-                      : 'bg-neo-green text-neo-black'
-                  )}
-                >
-                  {feedback.message}
-                </AdaptiveMotion.div>
-              )}
-            </AdaptiveAnimatePresence>
+            {/* Feedback message — fixed-height slot so toggling doesn't shift the grid */}
+            <div className="min-h-[2.75rem] flex items-center justify-center">
+              <AdaptiveAnimatePresence>
+                {feedback && (
+                  <AdaptiveMotion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    role="status"
+                    aria-live={feedback.type === 'error' ? 'assertive' : 'polite'}
+                    aria-atomic="true"
+                    className={cn(
+                      'text-center px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm',
+                      feedback.type === 'error'
+                        ? 'bg-neo-red text-neo-white'
+                        : 'bg-neo-green text-neo-black'
+                    )}
+                  >
+                    {feedback.message}
+                  </AdaptiveMotion.div>
+                )}
+              </AdaptiveAnimatePresence>
+            </div>
 
-            {/* Recent words */}
-            {wordsFound.length > 0 && (
-              <div className={cn(
-                'flex flex-wrap gap-2 justify-center p-3 rounded-neo border-2 border-neo-black max-h-28 overflow-y-auto',
+            {/* Recent words — always-rendered, fixed height: it scrolls instead of
+                growing, so the centered grid never re-positions on submit (CLS fix). */}
+            <div
+              data-testid="drill-found-words"
+              className={cn(
+                'flex flex-wrap gap-2 justify-center content-start p-3 rounded-neo border-2 border-neo-black h-28 overflow-y-auto',
                 'bg-slate-800'
-              )}>
-                {wordsFound.slice(-10).map((word, i) => (
+              )}
+            >
+              {wordsFound.length === 0 ? (
+                <span className="self-center text-xs text-neo-white/40">
+                  {t('brain.drills.foundWordsHint')}
+                </span>
+              ) : (
+                wordsFound.slice(-10).map((word, i) => (
                   <span
                     key={`${word}-${i}`}
                     className={cn(
-                      'px-3 py-1 rounded-neo text-sm font-bold',
+                      'px-3 py-1 rounded-neo text-sm font-bold h-fit',
                       'bg-neo-green/20 text-neo-green border border-neo-green/30'
                     )}
                   >
                     {word}
                   </span>
-                ))}
-              </div>
-            )}
+                ))
+              )}
+            </div>
 
             {/* Keyboard UI - Desktop only */}
             {keyboard.isDesktop && (

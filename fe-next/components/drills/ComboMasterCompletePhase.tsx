@@ -1,9 +1,10 @@
 'use client';
 
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Trophy, RotateCcw, Flame, Target } from 'lucide-react';
+import { Trophy, Flame, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import DrillCompleteActions from './DrillCompleteActions';
 
 interface ComboMasterCompletePhaseProps {
   score: number;
@@ -97,30 +98,11 @@ export default function ComboMasterCompletePhase({
           </AdaptiveMotion.div>
         </div>
       </AdaptiveMotion.div>
-      <AdaptiveMotion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.2 }}
-        className="flex gap-3 justify-center"
-      >
-        <AdaptiveMotion.button
-          whileTap={{ scale: 0.95 }}
-          onClick={onPlayAgain}
-          className="flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-slate-700 text-neo-white"
-        >
-          <RotateCcw className="w-5 h-5" />
-          {t('brain.drills.playAgain')}
-        </AdaptiveMotion.button>
-        {onExit && (
-          <AdaptiveMotion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={onExit}
-            className="px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-neo-orange text-neo-black"
-          >
-            {t('brain.drills.exit')}
-          </AdaptiveMotion.button>
-        )}
-      </AdaptiveMotion.div>
+      <DrillCompleteActions
+        currentDrillId="combo-master"
+        onPlayAgain={onPlayAgain}
+        onExit={onExit}
+      />
     </AdaptiveMotion.div>
   );
 }

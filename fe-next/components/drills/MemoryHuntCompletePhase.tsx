@@ -1,7 +1,8 @@
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Trophy, RotateCcw, Clock, Target } from 'lucide-react';
+import { Trophy, Clock, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
+import DrillCompleteActions from './DrillCompleteActions';
 
 interface MemoryHuntCompletePhaseProps {
   isDarkMode: boolean;
@@ -105,38 +106,11 @@ export function MemoryHuntCompletePhase({
           />
         </AdaptiveMotion.div>
       )}
-      <AdaptiveMotion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.2 }}
-        className="flex gap-3 justify-center"
-      >
-        <AdaptiveMotion.button
-          whileTap={{ scale: 0.95 }}
-          onClick={onPlayAgain}
-          className={cn(
-            'flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard',
-            'font-bold uppercase transition-all hover:translate-y-[-2px]',
-            isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-white text-neo-black'
-          )}
-        >
-          <RotateCcw className="w-5 h-5" />
-          {t('brain.drills.playAgain')}
-        </AdaptiveMotion.button>
-        {onExit && (
-          <AdaptiveMotion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={onExit}
-            className={cn(
-              'px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard',
-              'font-bold uppercase transition-all hover:translate-y-[-2px]',
-              'bg-neo-purple text-neo-white'
-            )}
-          >
-            {t('brain.drills.exit')}
-          </AdaptiveMotion.button>
-        )}
-      </AdaptiveMotion.div>
+      <DrillCompleteActions
+        currentDrillId="memory-hunt"
+        onPlayAgain={onPlayAgain}
+        onExit={onExit}
+      />
     </AdaptiveMotion.div>
   );
 }

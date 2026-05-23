@@ -6630,6 +6630,9 @@ const sv = {
       "timeSpent": "Tid",
       "playAgain": "Spela igen",
       "exit": "Avsluta",
+      "foundWordsHint": "Ord du hittar visas här",
+      "nextDrillCta": "Nästa: {drill}",
+      "dailyChallengeCta": "Daglig utmaning",
       "finishGame": "Avsluta Spel",
       "useHint": "Använd Tips",
       "lightning-round": {

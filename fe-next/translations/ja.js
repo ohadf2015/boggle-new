@@ -6656,6 +6656,9 @@ const ja = {
       "timeSpent": "時間",
       "playAgain": "もう一度",
       "exit": "終了",
+      "foundWordsHint": "見つけた単語がここに表示されます",
+      "nextDrillCta": "次へ: {drill}",
+      "dailyChallengeCta": "デイリーチャレンジ",
       "finishGame": "ゲーム終了",
       "useHint": "ヒントを使う",
       "lightning-round": {
