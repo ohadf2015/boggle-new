@@ -31,13 +31,15 @@ import { POST } from './route'
 // `.eq(player)` and awaits — so the first .eq must itself be thenable.
 function createChainableMock(data: unknown) {
   const leaf = { data, error: null }
+  // Self-returning thenable: .eq()/.gt() chain to ANY depth (the hunt query now
+  // chains .eq('player_id').eq('solved').eq('is_catchup')) and `await` resolves.
   const thenable: any = {
     ...leaf,
-    eq: vi.fn().mockResolvedValue(leaf),
-    gt: vi.fn().mockResolvedValue(leaf),
+    eq: vi.fn(() => thenable),
+    gt: vi.fn(() => thenable),
     then: (onFulfilled: any) => Promise.resolve(leaf).then(onFulfilled),
   }
-  return { eq: vi.fn().mockReturnValue(thenable) }
+  return thenable
 }
 
 describe('POST /api/daily/weekly-chest/claim', () => {

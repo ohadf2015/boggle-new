@@ -29,9 +29,16 @@ import {
 } from './utils';
 import { completeMissionForMode } from '../../modules/dailyMissionsManager';
 import { updateDailyProfileStats } from './profileStats';
-import { computeCycleProgress, computeWeekScore, getChestTier, type DayScore } from '../../../lib/daily/weeklyChest';
+import {
+  computeCycleProgress,
+  computeChestTierForCycle,
+  type HuntScoreRow,
+  type WheelScoreRow,
+  type PuzzleScoreRow,
+} from '../../../lib/daily/weeklyChest';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
 import { shouldCreditDailyChallengeQuest } from '../../../lib/daily/questCredit';
+import { isSubmittableDate, isCatchUpDate } from '../../../utils/dailyChallenge/catchUp';
 
 const router: Router = express.Router();
 
@@ -56,6 +63,7 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       avatarEmoji,
       avatarColor,
       countryCode,
+      isCatchup,
       solved,
       attemptsUsed,
       targetWord,
@@ -87,14 +95,18 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
 
     logger.info('API', `[WordHunt Submit] Received: playerId=${playerId || 'null'}, guestFingerprint=${guestFingerprint ? guestFingerprint.substring(0, 8) + '...' : 'null'}, displayName=${displayName}, solved=${solved}, attempts=${attemptsUsed}`);
 
-    // Validate puzzleDate is today or yesterday (UTC) to prevent clock-drift abuse
+    // Accept today plus the catch-up window (last 3 days). Anything older — or a
+    // future date — is rejected to block clock-drift abuse.
     const serverDate = new Date().toISOString().split('T')[0];
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-    if (puzzleDate !== serverDate && puzzleDate !== yesterday) {
-      logger.info('API', `[WordHunt] Date drift: client=${puzzleDate}, server=${serverDate}`);
+    if (!isSubmittableDate(serverDate, puzzleDate)) {
+      logger.info('API', `[WordHunt] Date out of window: client=${puzzleDate}, server=${serverDate}`);
       res.status(400).json({ error: 'Invalid puzzle date' });
       return;
     }
+    // A catch-up play replays a past daily within the window. Trust the client's
+    // intent flag but only ever honor it for a genuine past date (today is never
+    // catch-up; a near-midnight "yesterday" submit without the flag stays normal).
+    const isCatchupRow = Boolean(isCatchup) && isCatchUpDate(serverDate, puzzleDate);
 
     // Server-side validation
     try {
@@ -176,7 +188,8 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       display_name: displayName || 'Anonymous',
       avatar_emoji: avatarEmoji || '🎯',
       avatar_color: avatarColor || '#6366f1',
-      country_code: countryCode || undefined
+      country_code: countryCode || undefined,
+      is_catchup: isCatchupRow
     };
 
     // Add survival mode fields (round floats to integers)
@@ -349,9 +362,11 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
         const today = new Date().toISOString().split('T')[0]
         // Only *completed* attempts count toward the streak — keep in sync with
         // /api/daily/weekly-chest/status + claim.
+        // Catch-up plays are excluded (.eq is_catchup false) — they fill personal
+        // stats but must not bridge weekly-chest cycles (anti-farm).
         const [puzzleRes, huntRes, wheelRes] = await Promise.all([
-          supabase.from('daily_puzzle_attempts').select('puzzle_date').eq('player_id', playerId).gt('word_count', 0),
-          supabase.from('daily_word_hunt_attempts').select('puzzle_date,efficiency_score').eq('player_id', playerId).eq('solved', true),
+          supabase.from('daily_puzzle_attempts').select('puzzle_date,score,time_seconds').eq('player_id', playerId).gt('word_count', 0),
+          supabase.from('daily_word_hunt_attempts').select('puzzle_date,efficiency_score').eq('player_id', playerId).eq('solved', true).eq('is_catchup', false),
           supabase.from('daily_word_wheel_attempts').select('puzzle_date,score,time_seconds').eq('player_id', playerId).gt('word_count', 0),
         ])
         const allDates = [
@@ -369,12 +384,14 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
               silver: { coins: 300, badge_id: 'badge_weekly_silver' },
               gold:   { coins: 600, badge_id: 'badge_weekly_gold' },
             } as const
-            const cycleDateSet = new Set(progress.completedDates)
-            const scores: DayScore[] = (huntRes.data ?? [])
-              .filter((r: { puzzle_date: string }) => cycleDateSet.has(r.puzzle_date))
-              .map((r: { efficiency_score: number }) => ({ mode: 'word_hunt' as const, rawScore: r.efficiency_score ?? 0, timeSeconds: null }))
-            const weekScore = computeWeekScore(scores)
-            const tier = getChestTier(weekScore)
+            // All three modes + the consistency floor decide the tier — keep in
+            // sync with /api/daily/weekly-chest/status + claim.
+            const { weekScore, tier } = computeChestTierForCycle(
+              progress.completedDates,
+              (huntRes.data ?? []) as HuntScoreRow[],
+              (wheelRes.data ?? []) as WheelScoreRow[],
+              (puzzleRes.data ?? []) as PuzzleScoreRow[],
+            )
             await supabase.from('daily_weekly_chests').insert({
               player_id: playerId, cycle_start: progress.cycleStart,
               cycle_number: progress.cycleNumber, tier,

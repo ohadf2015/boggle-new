@@ -49,16 +49,14 @@ function makeMockSupabase(opts: {
         }
       }
       if (table === 'daily_word_hunt_attempts') {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              eq: vi.fn().mockResolvedValue({
-                data: opts.huntAttempts ?? [],
-                error: null,
-              }),
-            }),
-          }),
+        // Route chains .eq('player_id').eq('solved').eq('is_catchup') — make the
+        // builder a self-returning thenable so any chain depth resolves.
+        const huntResolved = { data: opts.huntAttempts ?? [], error: null }
+        const huntChain: any = {
+          eq: vi.fn(() => huntChain),
+          then: (onFulfilled: any) => Promise.resolve(huntResolved).then(onFulfilled),
         }
+        return { select: vi.fn().mockReturnValue(huntChain) }
       }
       if (table === 'daily_word_wheel_attempts') {
         return {

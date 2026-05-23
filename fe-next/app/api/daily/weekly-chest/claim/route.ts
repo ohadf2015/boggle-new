@@ -33,7 +33,8 @@ export async function POST() {
       .from('daily_word_hunt_attempts')
       .select('puzzle_date,efficiency_score')
       .eq('player_id', user.id)
-      .eq('solved', true),
+      .eq('solved', true)
+      .eq('is_catchup', false), // catch-up plays don't count toward the chest cycle
     supabase
       .from('daily_word_wheel_attempts')
       .select('puzzle_date,score,time_seconds')

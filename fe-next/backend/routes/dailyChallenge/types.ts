@@ -146,6 +146,8 @@ export interface WordHuntSubmitRequest extends Request {
     avatarEmoji?: string;
     avatarColor?: string;
     countryCode?: string;
+    /** True when replaying a past daily within the catch-up window (last 3 days). */
+    isCatchup?: boolean;
     solved?: boolean;
     attemptsUsed?: number;
     targetWord?: string;
