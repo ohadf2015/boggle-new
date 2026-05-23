@@ -55,6 +55,10 @@ export interface WordHuntResult {
   puzzleDate: string;
   language: Language;
 
+  /** True when this was a catch-up play of a past daily (last-3-days window).
+   *  Persisted so a queued/offline submission keeps the flag. */
+  isCatchup?: boolean;
+
   // Game outcome
   solved: boolean;                // Did player find the target word?
   attemptsUsed: number;          // 1-10 attempts

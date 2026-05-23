@@ -5423,6 +5423,12 @@ const ja = {
     "nextPuzzleIn": "次のパズルまで:",
     "samePuzzle": "世界中で同じパズル。結果をシェアして友達に挑戦！",
     "alreadyPlayed": "今日はプレイ済み",
+    "catchUp": {
+      "title": "見逃したデイリーに挑戦",
+      "subtitle": "直近の未完了が{count}件あります",
+      "yesterday": "昨日のパズル",
+      "daysAgo": "{count}日前"
+    },
     "completed": "完了！",
     "questPlayedSubtitle": "今日はプレイ済み",
     "questPlayedCta": "デイリーハブへ",

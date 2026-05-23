@@ -5350,6 +5350,12 @@ const sv = {
     "nextPuzzleIn": "Nästa pussel om:",
     "samePuzzle": "Samma pussel för alla världen över. Dela dina resultat för att utmana vänner!",
     "alreadyPlayed": "Redan spelat idag",
+    "catchUp": {
+      "title": "Ta igen missade dagliga",
+      "subtitle": "Du har {count} från de senaste dagarna kvar",
+      "yesterday": "Gårdagens pussel",
+      "daysAgo": "{count} dagar sedan"
+    },
     "completed": "Klart!",
     "questPlayedSubtitle": "Redan spelat idag",
     "questPlayedCta": "Daglig översikt",

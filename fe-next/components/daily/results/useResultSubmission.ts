@@ -154,6 +154,7 @@ export function useResultSubmission({
             avatarEmoji,
             avatarColor,
             countryCode: countryCode || null,
+            isCatchup: result.isCatchup ?? false,
             solved: result.solved,
             attemptsUsed: result.attemptsUsed,
             targetWord: result.targetWord,

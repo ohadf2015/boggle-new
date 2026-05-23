@@ -16,6 +16,7 @@ import Link from 'next/link';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import DailyInsightStack from './DailyInsightStack';
+import CatchUpSuggestion from './CatchUpSuggestion';
 import WatchAdButton from './WatchAdButton';
 import WatchAdForRevealButton from '@/components/ads/WatchAdForRevealButton';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
@@ -325,6 +326,9 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         sees a clear, useful next step instead of a stale cross-promo. */}
     {backToDailyCtaNode}
     {!wordWheelPlayed && crossPromoOrder === 'wheel-first' && wheelCtaNode}
+
+    {/* Catch up dailies missed in the last 3 days — nudge after finishing one. */}
+    <CatchUpSuggestion excludeDate={puzzleDate} />
 
     {/* FAIL state: Reveal target word + watch ad */}
     {!result.solved && (

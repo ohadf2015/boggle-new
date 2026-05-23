@@ -5374,6 +5374,12 @@ const en = {
     "nextPuzzleIn": "Next in",
     "samePuzzle": "Same puzzle for everyone. How do you rank?",
     "alreadyPlayed": "Done Today!",
+    "catchUp": {
+      "title": "Catch up missed dailies",
+      "subtitle": "You have {count} from the last few days still open",
+      "yesterday": "Yesterday's puzzle",
+      "daysAgo": "{count} days ago"
+    },
     "completed": "Complete!",
     "questPlayedSubtitle": "Already played today",
     "questPlayedCta": "View Daily Hub",

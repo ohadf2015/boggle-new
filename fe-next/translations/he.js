@@ -5367,6 +5367,12 @@ const he = {
     "nextPuzzleIn": "החידה הבאה בעוד",
     "samePuzzle": "אותה חידה לכולם בעולם. שתפו את התוצאות שלכם לאתגר חברים!",
     "alreadyPlayed": "כבר שיחקתם היום",
+    "catchUp": {
+      "title": "השלימו אתגרים שפספסתם",
+      "subtitle": "יש לכם {count} מהימים האחרונים שעדיין פתוחים",
+      "yesterday": "החידה של אתמול",
+      "daysAgo": "לפני {count} ימים"
+    },
     "completed": "הושלם!",
     "questPlayedSubtitle": "כבר שיחקתם היום",
     "questPlayedCta": "לעמוד האתגר",

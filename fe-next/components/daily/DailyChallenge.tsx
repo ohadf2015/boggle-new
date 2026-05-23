@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useInterval } from '@/hooks/useSafeTimeout';
 import { m, AnimatePresence } from 'framer-motion';
 import { isNative } from '@/utils/platform';
@@ -46,6 +46,7 @@ import {
 import { shouldAutoShowTutorial } from './tutorial/shouldAutoShowTutorial';
 import { markWordHuntTutorialSeen } from './tutorial/markWordHuntTutorialSeen';
 import { useDailyChallengeUrlParams } from './useDailyChallengeUrlParams';
+import { isCatchUpDate } from '@/utils/dailyChallenge/catchUp';
 import { useRetryChallenge } from './useRetryChallenge';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeBadge from '@/components/practice/PracticeBadge';
@@ -67,6 +68,14 @@ const DailyChallenge: React.FC = () => {
   const offlineFlag = useOfflineModeFlag();
   const { online } = useNetworkState();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Catch-up: `?date=YYYY-MM-DD` launches a past daily within the last-3-days
+  // window. Validated against today so only a genuine catch-up date is honored
+  // (anything else falls through to today's puzzle).
+  const dateParam = searchParams.get('date');
+  const catchupDate = dateParam && isCatchUpDate(getDailyChallengeDate(), dateParam) ? dateParam : null;
+  const isCatchup = !!catchupDate;
 
   // Game language state
   const urlLocale = language as Language;
@@ -158,7 +167,7 @@ const DailyChallenge: React.FC = () => {
     if (needsFullReload) setPhase('loading');
 
     const initializePuzzle = async () => {
-      const date = getDailyChallengeDate();
+      const date = catchupDate || getDailyChallengeDate();
       const number = getPuzzleNumber(date);
       if (!isMounted) return;
       setPuzzleDate(date);
@@ -172,9 +181,11 @@ const DailyChallenge: React.FC = () => {
       // rewarded ad on native. Skipped for practice + post-retry replays.
       setForfeitedToday(!isPractice && !wasJustReset && hasWordHuntForfeitToday(gameLanguage));
 
-      // Practice mode: bypass already-played gates so the player can replay safely
+      // Practice mode: bypass already-played gates so the player can replay safely.
+      // Catch-up skips the today-only local cache (it's keyed to today) but still
+      // runs the server check below, which gates by the catch-up `date`.
       if (!wasJustReset && !isPractice) {
-        const localResult = getTodaysWordHuntResult(gameLanguage);
+        const localResult = isCatchup ? null : getTodaysWordHuntResult(gameLanguage);
         if (localResult) {
           if (!isMounted) return;
           setStoredResult(localResult);
@@ -257,7 +268,7 @@ const DailyChallenge: React.FC = () => {
     initializePuzzle();
     return () => { isMounted = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameLanguage, wasReset, isAuthenticated, profile?.id]);
+  }, [gameLanguage, wasReset, isAuthenticated, profile?.id, catchupDate]);
 
   // Countdown timer
   useInterval(() => {
@@ -307,8 +318,9 @@ const DailyChallenge: React.FC = () => {
       return;
     }
 
-    // Practice mode: bypass already-played gates so the player can replay safely
-    if (!isPractice && hasPlayedWordHuntToday(gameLanguage)) {
+    // Practice mode: bypass already-played gates so the player can replay safely.
+    // Catch-up uses its own date (below), so the today-only cache gate is skipped.
+    if (!isPractice && !isCatchup && hasPlayedWordHuntToday(gameLanguage)) {
       const result = getTodaysWordHuntResult(gameLanguage);
       if (result) {
         setStoredResult(result);
@@ -319,7 +331,7 @@ const DailyChallenge: React.FC = () => {
 
     if (!isPractice) {
       try {
-        const date = getDailyChallengeDate();
+        const date = catchupDate || getDailyChallengeDate();
         const fp = await getGuestFingerprint();
         const checkParams = new URLSearchParams();
         if (isAuthenticated && profile) checkParams.set('playerId', profile.id);
@@ -354,7 +366,7 @@ const DailyChallenge: React.FC = () => {
     trackFeatureFirstUse('daily_word_hunt');
     gameStartedAtRef.current = Date.now();
     setPhase('playing');
-  }, [gameLanguage, isAuthenticated, profile, t, unlockAudio, justResetRef, isPractice, forfeitedToday, isAdAvailable, isPlaceholderCooldown, showAd]);
+  }, [gameLanguage, isAuthenticated, profile, t, unlockAudio, justResetRef, isPractice, isCatchup, catchupDate, forfeitedToday, isAdAvailable, isPlaceholderCooldown, showAd]);
 
   // Handle game completion
   const handleGameComplete = useCallback((result: SurvivalGameResult, rescueMethod?: WordHuntRescueMethod) => {
@@ -369,6 +381,7 @@ const DailyChallenge: React.FC = () => {
       puzzleNumber,
       puzzleDate,
       language: gameLanguage,
+      isCatchup,
       solved: result.solved,
       attemptsUsed: result.attemptsUsed,
       targetWord: result.targetWord,
@@ -443,7 +456,7 @@ const DailyChallenge: React.FC = () => {
         .catch(() => { /* non-critical */ });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- t is stable from LanguageContext
-}, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated, recordStreak, isPractice]);
+}, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated, recordStreak, isPractice, isCatchup]);
 
   const handleTutorialComplete = useCallback(() => {
     markWordHuntTutorialSeen(gameLanguage);

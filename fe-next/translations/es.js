@@ -5401,6 +5401,12 @@ const es = {
     "nextPuzzleIn": "Próximo puzzle en:",
     "samePuzzle": "Mismo puzzle para todos en el mundo. ¡Comparte tus resultados para desafiar a amigos!",
     "alreadyPlayed": "Ya Jugaste Hoy",
+    "catchUp": {
+      "title": "Recupera los retos perdidos",
+      "subtitle": "Tienes {count} de los últimos días sin completar",
+      "yesterday": "El reto de ayer",
+      "daysAgo": "Hace {count} días"
+    },
     "completed": "¡Completado!",
     "questPlayedSubtitle": "Ya jugaste hoy",
     "questPlayedCta": "Ir al Reto Diario",
