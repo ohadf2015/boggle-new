@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { ArrowDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 
@@ -49,9 +50,10 @@ export default function PracticeHubWelcome() {
         data-testid="practice-hub-welcome-hint"
         animate={{ y: [0, 4, 0] }}
         transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
-        className="text-[10px] uppercase font-neo-display font-black text-neo-cyan tracking-wider whitespace-nowrap"
+        className="inline-flex items-center gap-1 text-[10px] uppercase font-neo-display font-black text-neo-cyan tracking-wider whitespace-nowrap"
       >
-        {t('practiceHub.welcome.startHere')} ↓
+        <span>{t('practiceHub.welcome.startHere')}</span>
+        <ArrowDown className="w-3 h-3" strokeWidth={3} aria-hidden />
       </AdaptiveMotion.div>
     </AdaptiveMotion.div>
   );

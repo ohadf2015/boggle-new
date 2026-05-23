@@ -1,10 +1,15 @@
 'use client';
 
+import { useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { ArrowRight, Check, Home, Pencil, Search, Disc3, type LucideIcon } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import PracticeHubWelcome from '@/components/practice/PracticeHubWelcome';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { haptics } from '@/utils/haptics';
 import { PRACTICE_MODES } from '@/lib/practice/practiceRoute';
@@ -60,6 +65,30 @@ export default function PracticeHubClient({ locale }: Props) {
     haptics.tap();
   };
 
+  // Choreographed page-load: the mode tiles cascade up with a hard-shadow
+  // "settle" so the hub reads as a deliberate stack of cards, not a static
+  // list that just appears. clearProps hands transforms back to CSS so the
+  // hover lift still works after the entrance. Gated on reduced-motion +
+  // scoped via useGSAP so all tweens auto-kill on unmount.
+  const reduceMotion = useShouldReduceMotion();
+  const gridRef = useRef<HTMLDivElement>(null);
+  useGSAP(() => {
+    if (reduceMotion || !gridRef.current) return;
+    const tiles = gridRef.current.children;
+    if (tiles.length === 0) return;
+    gsap.from(tiles, {
+      opacity: 0,
+      y: 28,
+      scale: 0.92,
+      rotateZ: (i: number) => (i % 2 === 0 ? -2.5 : 2.5),
+      duration: 0.55,
+      ease: 'back.out(1.5)',
+      stagger: 0.09,
+      delay: 0.12,
+      clearProps: 'transform,opacity',
+    });
+  }, { scope: gridRef, dependencies: [reduceMotion] });
+
   return (
     <div className="relative min-h-[100dvh] w-full overflow-hidden bg-linear-to-b from-neo-navy to-neo-navy-light px-4 sm:px-6 py-6 sm:py-10">
       <PracticeHubAtmosphere />
@@ -81,6 +110,11 @@ export default function PracticeHubClient({ locale }: Props) {
         <PendingRoomBanner locale={locale} />
         <PracticeHubHeader completedCount={completed.size} totalCount={PRACTICE_MODES.length} />
 
+        {/* Brand-new players get a warm mascot hello pointing at the first
+            tile. Retires the moment any mode is finished — a returning player
+            doesn't need re-greeting. */}
+        {completed.size === 0 && <PracticeHubWelcome />}
+
         {completed.size === PRACTICE_MODES.length && (
           <AdaptiveMotion.div
             data-testid="practice-all-complete"
@@ -100,7 +134,7 @@ export default function PracticeHubClient({ locale }: Props) {
           </AdaptiveMotion.div>
         )}
 
-        <div className="flex flex-col gap-2.5 md:grid md:grid-cols-3 md:gap-4">
+        <div ref={gridRef} className="flex flex-col gap-2.5 md:grid md:grid-cols-3 md:gap-4">
           {PRACTICE_MODES.map((mode, idx) => {
             const isDone = completed.has(mode);
             const isNext = mode === nextMode;

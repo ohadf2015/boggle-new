@@ -83,3 +83,16 @@ describe('PracticeHubClient tutorial simplification', () => {
     expect(screen.getByTestId('practice-tile-classic')).toHaveAttribute('data-next', 'false');
   });
 });
+
+describe('PracticeHubClient first-time welcome', () => {
+  it('greets a brand-new player with the welcome banner (no modes complete)', () => {
+    wrap(<PracticeHubClient locale="en" />);
+    expect(screen.getByTestId('practice-hub-welcome')).toBeInTheDocument();
+  });
+
+  it('retires the welcome banner once any mode is complete', () => {
+    mockCompleted.current = new Set(['classic']);
+    wrap(<PracticeHubClient locale="en" />);
+    expect(screen.queryByTestId('practice-hub-welcome')).toBeNull();
+  });
+});
