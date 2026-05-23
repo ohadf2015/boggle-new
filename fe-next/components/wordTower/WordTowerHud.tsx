@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Delete, Shuffle, ArrowUp, Lightbulb, ChevronDown, ChevronUp, RotateCw } from 'lucide-react';
 import { comboMult, type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
+import { useTimedReveal } from '@/lib/wordTower/useTimedReveal';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
 
 export interface WordTowerHudProps {
@@ -37,6 +38,10 @@ export interface WordTowerHudProps {
   dir: 'ltr' | 'rtl';
 }
 
+/** How long the reward popup stays before it fades away (matches the
+ *  wt-reward-pop keyframe's full run so the unmount lands after the fade). */
+const REWARD_REVEAL_MS = 2400;
+
 const TIER_KEY: Record<NonNullable<ApplyResult['tier']>, string> = {
   none: '',
   highRise: 'wordTower.celebration.highRise',
@@ -53,6 +58,12 @@ export function WordTowerHud(props: WordTowerHudProps) {
 
   const mult = comboMult(combo);
   const canSubmit = word.length >= 3;
+
+  // Reward popup is a momentary celebration — it pops in, holds, then fades out
+  // (founder: the "+m ×combo" text used to stay on-screen forever between
+  // words). Re-reveals on every accepted word; the timer also covers reduced-
+  // motion users (who get no CSS fade, just a clean hide).
+  const showReward = useTimedReveal(resultKey, REWARD_REVEAL_MS);
 
   // Clue: reveal a masked sample word on demand; reset when the anchor changes.
   const [clueShown, setClueShown] = useState(false);
@@ -86,11 +97,11 @@ export function WordTowerHud(props: WordTowerHudProps) {
 
   return (
     <div className="pointer-events-none relative flex h-full flex-col justify-between">
-      {/* Floating reward popup on each accepted word */}
-      {resultKey > 0 && lastResult && (
+      {/* Floating reward popup on each accepted word — pops in, holds, fades. */}
+      {showReward && lastResult && (
         <div
           key={`pop-${resultKey}`}
-          className="pointer-events-none absolute left-1/2 top-[30%] z-20 -translate-x-1/2 animate-[fadeInUp_0.6s_ease-out] text-center"
+          className="pointer-events-none absolute left-1/2 top-[30%] z-20 -translate-x-1/2 animate-[wt-reward-pop_2.2s_ease-out_forwards] text-center"
         >
           {lastResult.tier !== 'none' && (
             <div className="font-neo-display text-3xl font-extrabold uppercase tracking-wide text-neo-yellow drop-shadow-[3px_3px_0_#000]">

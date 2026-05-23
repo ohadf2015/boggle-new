@@ -388,6 +388,15 @@ module.exports = {
           "0%": { opacity: "0", transform: "translateY(20px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        // Word Tower reward popup: rise + fade IN, hold, then fade OUT + drift
+        // up — so the "+m ×combo" celebration never lingers between words.
+        "wt-reward-pop": {
+          "0%": { opacity: "0", transform: "translate(-50%, 18px) scale(0.9)" },
+          "16%": { opacity: "1", transform: "translate(-50%, 0) scale(1.04)" },
+          "26%": { transform: "translate(-50%, 0) scale(1)" },
+          "68%": { opacity: "1", transform: "translate(-50%, 0) scale(1)" },
+          "100%": { opacity: "0", transform: "translate(-50%, -14px) scale(0.96)" },
+        },
         "fadeInLeft": {
           "0%": { opacity: "0", transform: "translateX(-10px)" },
           "100%": { opacity: "1", transform: "translateX(0)" },
