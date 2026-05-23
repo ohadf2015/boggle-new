@@ -10,7 +10,7 @@ const es = {
     "minimap": { "label": "Mapa de la torre — {m} m, toca para subir" },
     "milestone": { "m50": "¡Sobre las copas! 🌳", "m150": "Zona de nubes ☁️", "m400": "Los pájaros tienen envidia 🐦", "m250": "Más alto que los drones 🛸", "m650": "Ambiente de nebulosa 🌌", "m900": "Tocando el espacio 🚀", "m1300": "Habitante del espacio profundo 👽", "m1800": "Casi astronauta ✨" },
     "ach": { "unlocked": "¡Logro!", "firstFloor": "Primer piso", "tenFloors": "Edificio", "skyHigh": "Por las nubes", "wordsmith": "Maestro de palabras", "comboKing": "Rey del combo", "rivalCrusher": "Aplasta-rivales", "unstoppable": "Imparable", "toTheMoon": "A la luna", "skylineKing": "Rey del horizonte", "centurion": "Centurión", "comboGod": "Dios del combo", "wordWizard": "Mago de palabras", "galaxyClass": "Clase galaxia", "deepSpace": "Espacio profundo" },
-    "zone": { "entered": "Nueva zona" },
+    "zone": { "entered": "Nueva zona", "next": "Siguiente: {zone} · {m}m" },
     "landmark": { "skyscraper": "Cima del rascacielos", "cloudBase": "Base de nubes", "mountainTop": "Pico de montaña", "jetStream": "Corriente en chorro", "stormTops": "Cima de tormenta", "weatherBalloon": "Globo meteorológico", "earthCurve": "Curvatura terrestre", "karman": "Borde del espacio", "meteorBelt": "Cinturón de meteoros", "aurora": "Aurora", "deepSpace": "Espacio profundo" },
     "hazard": { "bomb": "Bomba", "hurricane": "Huracán", "lost": "¡{kind}! −{n} pisos" },
     "error": { "too_short": "Muy corta — 3+ letras", "bad_chain": "Empieza con la letra brillante", "not_buildable": "Usa las letras de la bandeja", "duplicate": "Ya usaste esa palabra", "not_in_dictionary": "No está en el diccionario" },
@@ -5409,7 +5409,8 @@ const es = {
       "title": "Recupera los retos perdidos",
       "subtitle": "Tienes {count} de los últimos días sin completar",
       "yesterday": "El reto de ayer",
-      "daysAgo": "Hace {count} días"
+      "daysAgo": "Hace {count} días",
+      "watchAd": "Mira un anuncio corto para jugar"
     },
     "completed": "¡Completado!",
     "questPlayedSubtitle": "Ya jugaste hoy",

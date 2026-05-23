@@ -10,7 +10,7 @@ const he = {
     "minimap": { "label": "מפת המגדל — {m} מ', הקש לחזרה למעלה" },
     "milestone": { "m50": "מעל צמרות העצים! 🌳", "m150": "אזור העננים ☁️", "m400": "הציפורים מקנאות 🐦", "m250": "מעל הרחפנים 🛸", "m650": "אווירת ערפילית 🌌", "m900": "דופק בדלת של החלל 🚀", "m1300": "תושב החלל העמוק 👽", "m1800": "כמעט אסטרונאוט ✨" },
     "ach": { "unlocked": "הישג!", "firstFloor": "קומה ראשונה", "tenFloors": "בניין", "skyHigh": "גבוה בשמיים", "wordsmith": "אמן מילים", "comboKing": "מלך הקומבו", "rivalCrusher": "מנצח יריבים", "unstoppable": "בלתי עציר", "toTheMoon": "אל הירח", "skylineKing": "מלך קו הרקיע", "centurion": "מאה קומות", "comboGod": "אל הקומבו", "wordWizard": "קוסם המילים", "galaxyClass": "דרגת גלקסיה", "deepSpace": "חלל עמוק" },
-    "zone": { "entered": "אזור חדש" },
+    "zone": { "entered": "אזור חדש", "next": "הבא: {zone} · {m}מ'" },
     "landmark": { "skyscraper": "פסגת גורד שחקים", "cloudBase": "בסיס העננים", "mountainTop": "פסגת ההר", "jetStream": "זרם הסילון", "stormTops": "ראש הסערה", "weatherBalloon": "בלון מזג אוויר", "earthCurve": "עקמומיות כדור הארץ", "karman": "קצה החלל", "meteorBelt": "חגורת המטאורים", "aurora": "זוהר קוטבי", "deepSpace": "חלל עמוק" },
     "hazard": { "bomb": "פצצה", "hurricane": "סופה", "lost": "{kind}! נפלו {n} קומות" },
     "error": { "too_short": "קצר מדי — 3 אותיות לפחות", "bad_chain": "התחילו באות הזוהרת", "not_buildable": "השתמשו באותיות המגש", "duplicate": "כבר השתמשת במילה הזו", "not_in_dictionary": "לא במילון" },
@@ -5375,7 +5375,8 @@ const he = {
       "title": "השלימו אתגרים שפספסתם",
       "subtitle": "יש לכם {count} מהימים האחרונים שעדיין פתוחים",
       "yesterday": "החידה של אתמול",
-      "daysAgo": "לפני {count} ימים"
+      "daysAgo": "לפני {count} ימים",
+      "watchAd": "צפו בפרסומת קצרה כדי לשחק"
     },
     "completed": "הושלם!",
     "questPlayedSubtitle": "כבר שיחקתם היום",

@@ -10,7 +10,7 @@ const en = {
     "minimap": { "label": "Tower map — {m} m, tap to jump to top" },
     "milestone": { "m50": "Above the treetops! 🌳", "m150": "Cloud territory ☁️", "m400": "The birds are jealous 🐦", "m250": "Higher than the drones 🛸", "m650": "Nebula vibes 🌌", "m900": "Knock knock, space? 🚀", "m1300": "Deep-space dweller 👽", "m1800": "Basically an astronaut now ✨" },
     "ach": { "unlocked": "Achievement!", "firstFloor": "First Floor", "tenFloors": "Tower Block", "skyHigh": "Sky High", "wordsmith": "Wordsmith", "comboKing": "Combo King", "rivalCrusher": "Rival Crusher", "unstoppable": "Unstoppable", "toTheMoon": "To the Moon", "skylineKing": "Skyline King", "centurion": "Centurion", "comboGod": "Combo God", "wordWizard": "Word Wizard", "galaxyClass": "Galaxy Class", "deepSpace": "Deep Space" },
-    "zone": { "entered": "New Zone" },
+    "zone": { "entered": "New Zone", "next": "Next: {zone} · {m}m" },
     "landmark": { "skyscraper": "Skyscraper top", "cloudBase": "Cloud base", "mountainTop": "Mountain peak", "jetStream": "Jet stream", "stormTops": "Storm tops", "weatherBalloon": "Weather balloon", "earthCurve": "Earth's curve", "karman": "Edge of space", "meteorBelt": "Meteor belt", "aurora": "Aurora", "deepSpace": "Deep space" },
     "hazard": { "bomb": "Bomb", "hurricane": "Hurricane", "lost": "{kind}! −{n} floors" },
     "error": { "too_short": "Too short — 3+ letters", "bad_chain": "Start with the glowing letter", "not_buildable": "Use the tray letters", "duplicate": "Already used that word", "not_in_dictionary": "Not in the dictionary" },
@@ -5382,7 +5382,8 @@ const en = {
       "title": "Catch up missed dailies",
       "subtitle": "You have {count} from the last few days still open",
       "yesterday": "Yesterday's puzzle",
-      "daysAgo": "{count} days ago"
+      "daysAgo": "{count} days ago",
+      "watchAd": "Watch a quick ad to play"
     },
     "completed": "Complete!",
     "questPlayedSubtitle": "Already played today",

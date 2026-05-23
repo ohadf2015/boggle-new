@@ -10,7 +10,7 @@ const sv = {
     "minimap": { "label": "Tornkarta — {m} m, tryck för toppen" },
     "milestone": { "m50": "Över trädtopparna! 🌳", "m150": "Molnland ☁️", "m400": "Fåglarna är avundsjuka 🐦", "m250": "Högre än drönarna 🛸", "m650": "Nebulosakänsla 🌌", "m900": "Knack knack, rymden? 🚀", "m1300": "Bor i yttre rymden 👽", "m1800": "Nästan astronaut nu ✨" },
     "ach": { "unlocked": "Bedrift!", "firstFloor": "Första våningen", "tenFloors": "Höghus", "skyHigh": "Skyhögt", "wordsmith": "Ordkonstnär", "comboKing": "Combo-kung", "rivalCrusher": "Rivalkrossare", "unstoppable": "Ostoppbar", "toTheMoon": "Till månen", "skylineKing": "Skyline-kung", "centurion": "Centurion", "comboGod": "Combo-gud", "wordWizard": "Ordtrollkarl", "galaxyClass": "Galaxklass", "deepSpace": "Yttre rymden" },
-    "zone": { "entered": "Ny zon" },
+    "zone": { "entered": "Ny zon", "next": "Nästa: {zone} · {m}m" },
     "landmark": { "skyscraper": "Skyskrapans topp", "cloudBase": "Molnbas", "mountainTop": "Bergstopp", "jetStream": "Jetström", "stormTops": "Stormtoppar", "weatherBalloon": "Väderballong", "earthCurve": "Jordens krökning", "karman": "Rymdens kant", "meteorBelt": "Meteorbälte", "aurora": "Norrsken", "deepSpace": "Yttre rymden" },
     "hazard": { "bomb": "Bomb", "hurricane": "Orkan", "lost": "{kind}! −{n} våningar" },
     "error": { "too_short": "För kort — minst 3 bokstäver", "bad_chain": "Börja på den lysande bokstaven", "not_buildable": "Använd brickornas bokstäver", "duplicate": "Ordet är redan använt", "not_in_dictionary": "Inte i ordlistan" },
@@ -5358,7 +5358,8 @@ const sv = {
       "title": "Ta igen missade dagliga",
       "subtitle": "Du har {count} från de senaste dagarna kvar",
       "yesterday": "Gårdagens pussel",
-      "daysAgo": "{count} dagar sedan"
+      "daysAgo": "{count} dagar sedan",
+      "watchAd": "Se en kort annons för att spela"
     },
     "completed": "Klart!",
     "questPlayedSubtitle": "Redan spelat idag",

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, RotateCcw, Trophy, Share2 } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Trophy, Share2, ChevronsUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useHaptics } from '@/hooks/useHaptics';
@@ -21,6 +21,7 @@ import { WordTowerRivalRail } from './WordTowerRivalRail';
 import { WordTowerLandmarkRail } from './WordTowerLandmarkRail';
 import { milestoneCrossed } from '@/lib/wordTower/milestones';
 import { hazardsCrossed } from '@/lib/wordTower/hazards';
+import { zoneTeaseAt } from '@/lib/wordTower/zoneTease';
 import { newlyUnlocked, type Achievement } from '@/lib/wordTower/achievements';
 import { WordTowerScene } from './WordTowerScene';
 import { WordTowerHud } from './WordTowerHud';
@@ -52,6 +53,9 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   const { game } = tower.state;
   const biomeId = useMemo(() => biomeForHeight(game.heightM), [game.heightM]);
   const personalBest = Math.max(personalBestM, game.heightM);
+  // Near-miss anticipation: a quiet "Next: Aurora · 18m" chip in the last stretch
+  // before a new zone (the zone-entry banner pays it off).
+  const tease = useMemo(() => zoneTeaseAt(game.heightM), [game.heightM]);
   // Altitude the camera is *looking at* — equals the live height, but drops as the
   // user pans down to review lower floors. The scene owns the pan gesture and
   // reports it here so the landmark + rival rails track the scroll too (otherwise
@@ -306,6 +310,18 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
 
       {/* Rival record lines you climb past — fed by the leaderboard. */}
       <WordTowerRivalRail rivals={rivals} viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
+
+      {/* Next-zone tease — quiet anticipation chip in the approach window. Hidden
+          while the NEW ZONE banner is paying off the arrival. */}
+      {tease && !zoneText && (
+        <div
+          className="pointer-events-none absolute left-1/2 top-[6%] z-20 -translate-x-1/2 flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy/75 px-2 py-1 font-neo-body text-[11px] font-bold text-neo-cyan backdrop-blur-sm"
+          aria-live="polite"
+        >
+          <ChevronsUp className="h-3 w-3" />
+          {t('wordTower.zone.next', { zone: t(`wordTower.biome.${tease.nextBiomeId}`), m: Math.ceil(tease.metersToNext) })}
+        </div>
+      )}
 
       {/* NEW ZONE banner — the headline of entering a new biome */}
       {zoneText && (
