@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react';
+import { ChevronsUp } from 'lucide-react';
 import { Container } from 'pixi.js';
 import { GameCanvas, useGameEngine } from '@/lib/gameEngine';
 import { CONFETTI_BURST, COMBO_FLASH, GOLD_STARS } from '@/lib/gameEngine/presets/particles';
@@ -20,6 +21,7 @@ import { BIOME_THEME } from './biomeTheme';
 import { WordTowerBackdrop } from './WordTowerBackdrop';
 import { WordTowerParallaxProps } from './WordTowerParallaxProps';
 import { WordTowerMascot } from './WordTowerMascot';
+import { WordTowerMinimap } from './WordTowerMinimap';
 
 interface SceneProps {
   floors: WordTowerFloor[];
@@ -38,6 +40,10 @@ interface SceneProps {
   bottomInsetPx?: number;
   /** Anchor length (1 or 2) — how many leading pending chars are the connector. */
   anchorLen?: number;
+  /** Personal best (m) — drawn as a tick on the minimap. */
+  personalBestM?: number;
+  /** Translator — for the minimap + back-to-top affordance labels. */
+  t?: (key: string, params?: Record<string, string | number>) => string;
 }
 
 /** Shared camera-pan state between the DOM gesture layer and the Pixi layer. */
@@ -59,6 +65,9 @@ interface PanState {
 
 /** Fraction of the user's pan applied to the background (parallax — bg slower). */
 const BG_PAN_DEPTH = 0.4;
+
+/** How far the user must scroll down (px) before the back-to-top button shows. */
+const BACK_TO_TOP_REVEAL_PX = 90;
 
 /** One live row in the unified (committed ++ pending) stack. */
 interface LiveCell {
@@ -299,8 +308,11 @@ export function WordTowerScene(props: SceneProps) {
   // tint. `null` = not panned → use the live committed height. Reset on every
   // committed word (height/biome change), since the pan snaps back to the top.
   const [panAltitude, setPanAltitude] = useState<number | null>(null);
+  // True once the user has scrolled meaningfully below the build line → reveals
+  // the back-to-top button. Reset whenever a committed word snaps us back up.
+  const [pannedDown, setPannedDown] = useState(false);
   const rafRef = useRef<number | null>(null);
-  useEffect(() => { setPanAltitude(null); }, [props.heightM, props.biomeId]);
+  useEffect(() => { setPanAltitude(null); setPannedDown(false); }, [props.heightM, props.biomeId]);
 
   const viewAlt = panAltitude ?? props.heightM;
   const viewBiome = biomeForHeight(viewAlt);
@@ -333,10 +345,23 @@ export function WordTowerScene(props: SceneProps) {
       rafRef.current = requestAnimationFrame(() => {
         rafRef.current = null;
         setPanAltitude(viewAltitudeFor(props.heightM, pan.current.y, pan.current.panMin));
+        setPannedDown(pan.current.y < -BACK_TO_TOP_REVEAL_PX);
       });
     }
   };
   useEffect(() => () => { if (rafRef.current != null) cancelAnimationFrame(rafRef.current); }, []);
+
+  // Glide the camera back to the build line (back-to-top button + minimap tap).
+  const scrollToTop = useCallback(() => {
+    const ps = pan.current;
+    ps.y = 0;
+    const c = ps.container;
+    if (c && !c.destroyed) snapContainerY(c, ps.shift, 340, () => ps.dragging);
+    const bg = ps.bgEl;
+    if (bg) { bg.style.transition = 'transform 340ms cubic-bezier(0.22,1,0.36,1)'; bg.style.transform = ''; }
+    setPanAltitude(null);
+    setPannedDown(false);
+  }, []);
 
   const config = useMemo(
     () => (size ? { width: size.w, height: size.h, background: 0x000000, backgroundAlpha: 0 } : null),
@@ -373,6 +398,27 @@ export function WordTowerScene(props: SceneProps) {
         lastResult={props.lastResult}
         reducedMotion={props.reducedMotion}
       />
+      {/* Pocket mini-tower: zone bands + a marker at the current height. Tap to
+          jump back to the build line. */}
+      <WordTowerMinimap
+        heightM={props.heightM}
+        viewM={viewAlt}
+        personalBestM={props.personalBestM ?? 0}
+        onScrollTop={scrollToTop}
+        t={props.t ?? ((k) => k)}
+      />
+      {/* Back-to-top button — only while scrolled down past the build line. */}
+      {pannedDown && (
+        <button
+          type="button"
+          onClick={scrollToTop}
+          aria-label={(props.t ?? ((k) => k))('wordTower.hud.backToTop')}
+          className={`pointer-events-auto absolute end-3 top-[12%] z-[9] flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-cyan px-2.5 py-1.5 font-neo-display text-xs font-bold text-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed ${props.reducedMotion ? '' : 'animate-neo-pop'}`}
+        >
+          <ChevronsUp className="h-4 w-4" />
+          {(props.t ?? ((k) => k))('wordTower.hud.backToTop')}
+        </button>
+      )}
       {config && (
         <GameCanvas config={config} usePhysics={false} className="absolute inset-0">
           <TowerCanvasLayer {...props} panState={pan} />

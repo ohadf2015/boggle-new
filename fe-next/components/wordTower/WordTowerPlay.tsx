@@ -228,6 +228,8 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         lastResult={tower.state.lastResult}
         reducedMotion={reducedMotion}
         bottomInsetPx={deckHeight}
+        personalBestM={personalBest}
+        t={t}
       />
 
       {/* Rival record lines you climb past — fed by the leaderboard. */}
