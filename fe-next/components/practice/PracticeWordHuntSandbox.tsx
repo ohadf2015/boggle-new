@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Heart, Lightbulb, Search } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import PracticeCompletePopup from './PracticeCompletePopup';
 import PracticePostCompleteChip from './PracticePostCompleteChip';
 import PracticeInstructions from './PracticeInstructions';
@@ -125,6 +126,13 @@ export default function PracticeWordHuntSandbox() {
   );
 
   const dir: 'ltr' | 'rtl' = language === 'he' ? 'rtl' : 'ltr';
+
+  // Full-screen game surface — hide site footer + bottom nav (no page scroll).
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
 
   useEffect(() => {
     startedAtRef.current = Date.now();

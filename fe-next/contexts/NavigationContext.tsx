@@ -66,13 +66,19 @@ export function useNavigation() {
   return context;
 }
 
+const NOOP_SET_IN_GAME = (_value: boolean) => {};
+
 /**
  * Hook to hide/show the bottom navigation during gameplay.
  * Call setIsInGame(true) when entering a game, and setIsInGame(false) when exiting.
+ *
+ * Degrades to a no-op when used outside a NavigationProvider (e.g. isolated
+ * component tests) instead of throwing — the worst case is the nav simply
+ * doesn't auto-hide. In the app the provider is always mounted by the layout.
  */
 export function useHideNavigation() {
-  const { setIsInGame } = useNavigation();
-  return setIsInGame;
+  const context = useContext(NavigationContext);
+  return context?.setIsInGame ?? NOOP_SET_IN_GAME;
 }
 
 export default NavigationContext;

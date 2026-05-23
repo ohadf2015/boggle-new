@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, Check, RotateCcw, Shuffle } from 'lucide-react';
 import { AnimatePresence, m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import PracticeCompletePopup from './PracticeCompletePopup';
 import PracticePostCompleteChip from './PracticePostCompleteChip';
 import PracticeInstructions from './PracticeInstructions';
@@ -68,6 +69,12 @@ const RADIUS_PX = 84; // matches real WheelRush mid-breakpoint orbit
  */
 export default function PracticeWheelSandbox() {
   const { language, t } = useLanguage();
+  // Full-screen game surface — hide site footer + bottom nav (no page scroll).
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
   const puzzle = PUZZLES[language] ?? PUZZLES.en;
   // Outer letters live in state so Shuffle can rearrange them. Reset on
   // language change so locale switches still pull from PUZZLES correctly.

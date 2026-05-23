@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import PracticeCompletePopup from './PracticeCompletePopup';
 import PracticePostCompleteChip from './PracticePostCompleteChip';
 import PracticeInstructions from './PracticeInstructions';
@@ -75,6 +76,14 @@ export default function PracticeClassicSandbox() {
   // Friendly mid-game coaching — fires once per session per mistake kind.
   const coach = usePracticeMistakeCoach();
   const badCountRef = useRef(0);
+
+  // Full-screen game surface — hide the site footer + bottom nav (matches
+  // every other game screen), so the board fits one viewport without scroll.
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
 
   useEffect(() => {
     startedAtRef.current = Date.now();

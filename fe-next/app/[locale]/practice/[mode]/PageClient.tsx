@@ -81,12 +81,20 @@ export default function PracticePageClient({ mode, locale }: Props) {
 
   if (step === 'tutorial') {
     if (isDesktop) {
-      // Desktop: show compact tip card inline above the sandbox so new players
-      // get context without a full-screen gate blocking immediate play.
+      // Desktop: compact tip card inline ABOVE the sandbox so new players get
+      // context without a full-screen gate. The sandbox root is hardcoded to
+      // ~100dvh, so cap the whole thing to one viewport and let the sandbox
+      // fill the remaining height ([&>div]:!h-full overrides its own height) —
+      // otherwise card + 100dvh sandbox overflows and the board lands far
+      // below the fold (founder: "too much scroll in the game screen").
       return (
-        <div className="flex flex-col">
-          <PracticeDesktopWelcome mode={mode} onDismiss={goToPlay} />
-          {sandbox}
+        <div className="h-[100dvh] overflow-hidden flex flex-col">
+          <div className="shrink-0">
+            <PracticeDesktopWelcome mode={mode} onDismiss={goToPlay} />
+          </div>
+          <div className="flex-1 min-h-0 [&>div]:!h-full">
+            {sandbox}
+          </div>
         </div>
       );
     }
