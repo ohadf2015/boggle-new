@@ -176,6 +176,12 @@ export default function SettingsPageClient(): React.JSX.Element {
       <AutoHideHeader />
 
       <div className={cn(
+        // w-full + min-w-0: this wrapper is a flex item of the flex-col page root.
+        // Without them it keeps min-width:auto and inflates to its content's
+        // min-content (~486px), overflowing narrow phones; in RTL the overflow
+        // spills left and pushes every row's control off-screen (clipped, see
+        // settings-row-control-clipping). The classes let it shrink to the device.
+        "w-full min-w-0",
         "max-w-2xl mx-auto px-4 page-content-safe lg:max-w-4xl xl:max-w-5xl",
         // Reduced padding: mobile 12px, desktop 16px (was 24px)
         "py-3 sm:py-4 lg:py-6"
