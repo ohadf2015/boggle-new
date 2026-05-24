@@ -6,10 +6,6 @@
         "/Users/ohadfisher/git/animate_ai/skill/animate-ai-skill/dist/server.js"
       ]
     },
-    "sentry": {
-      "type": "http",
-      "url": "https://mcp.sentry.dev/mcp"
-    },
     "memory": {
       "type": "stdio",
       "command": "npx",
