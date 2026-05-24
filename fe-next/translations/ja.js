@@ -13,6 +13,7 @@ const ja = {
     "zone": { "entered": "新エリア", "next": "次: {zone} · あと{m}m" },
     "landmark": { "skyscraper": "超高層ビルの上", "cloudBase": "雲の底", "mountainTop": "山頂", "jetStream": "ジェット気流", "stormTops": "雷雲の頂", "weatherBalloon": "気象観測気球", "earthCurve": "地球の弧", "karman": "宇宙の境界", "meteorBelt": "流星帯", "aurora": "オーロラ", "deepSpace": "深宇宙" },
     "hazard": { "bomb": "爆弾", "hurricane": "ハリケーン", "lost": "{kind}！{n}階崩落" },
+    "crane": { "place": "単語を置く", "tapToDrop": "タップして落とす", "perfect": "パーフェクト！", "good": "ナイス！", "sloppy": "ぐらぐら", "miss": "おっと！" },
     "error": { "too_short": "短すぎます — 3文字以上", "bad_chain": "光る文字で始めてください", "not_buildable": "トレイの文字を使ってください", "duplicate": "その単語は使用済みです", "not_in_dictionary": "辞書にありません" },
     "celebration": { "highRise": "ハイライズ！", "tall": "そびえ立つ！", "skyscraper": "摩天楼！" },
     "leaderboard": { "title": "トップタワー", "error": "ランキングを読み込めません", "empty": "まだ塔がありません — 最初の一人に！" },
@@ -891,6 +892,8 @@ const ja = {
     "music": "音楽",
     "soundEffects": "効果音",
     "accessibility": "アクセシビリティ",
+    "cosyMode": "おだやかモード",
+    "cosyModeDescription": "やさしい表示、時間プレッシャーの点滅なし、控えめなお祝い",
     "reduceMotion": "視差効果を減らす",
     "reduceMotionDescription": "アニメーションを制限",
     "fireRoundLights": "ファイアラウンドライト",
@@ -1852,6 +1855,15 @@ const ja = {
     "code": "コード:"
   },
   "onboarding": {
+    "calmMode": {
+      "title": "好みのスタイルを選ぼう",
+      "subtitle": "にぎやかで競争的に、または静かでリラックスして遊べます。どちらもここに——今日の気分に合うほうを選んでください。",
+      "energetic": "エネルギッシュ",
+      "energeticDesc": "フル演出、コンボ、カウントダウン。",
+      "calm": "おだやか",
+      "calmDesc": "やさしい表示、時間プレッシャーなし、控えめなお祝い。",
+      "changeLater": "設定でいつでも変更できます。"
+    },
     "header": "クイックスタートガイド",
     "loading": "読み込み中...",
     "skip": "スキップ",
@@ -9119,6 +9131,10 @@ const ja = {
     "complete": {
       "title": "レベルクリア！",
       "boardCleared": "ボードクリア！",
+      "bonusLabel": "ボーナス",
+      "best": "ベスト",
+      "newBest": "新記録！",
+      "stars": "星",
       "coins": "コイン",
       "cascadesLabel": "カスケード",
       "next": "次のレベル"

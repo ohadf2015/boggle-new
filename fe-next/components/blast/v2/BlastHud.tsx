@@ -22,6 +22,10 @@ type Props = {
   // so old call sites keep working.
   targetWords?: string[];
   foundWords?: string[];
+  // Count of off-theme dictionary words the player has discovered this level.
+  // Surfaced as a chip so free-form "bonus word" hunting feels rewarded
+  // (Wordscapes-style) even though it's never required to finish a level.
+  bonusWordCount?: number;
   // Reverse-move support: when canUndo is true the HUD renders an Undo button
   // beside the hint button. Lets players rewind a misplaced clear so they
   // never get stuck mid-level.
@@ -90,6 +94,7 @@ export function BlastHud({
   theme,
   targetWords,
   foundWords,
+  bonusWordCount = 0,
   canUndo = false,
   onUndo,
 }: Props) {
@@ -193,6 +198,24 @@ export function BlastHud({
               </m.span>
             );
           })}
+          {bonusWordCount > 0 && (
+            <m.span
+              data-testid="hud-bonus-count"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: [1, 1.18, 1], opacity: 1 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+              className="text-[10px] font-black uppercase tracking-wider rounded-md px-2 py-0.5"
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                color: modeColor,
+                border: `1px solid color-mix(in srgb, ${modeColor} 45%, transparent)`,
+              }}
+            >
+              {t('blast.feedback.bonusCount', `⭐ ${bonusWordCount} bonus`, {
+                count: String(bonusWordCount),
+              })}
+            </m.span>
+          )}
         </div>
       )}
       {((mech.revealLetterHint || mech.revealWordHint) || (canUndo && onUndo)) && (

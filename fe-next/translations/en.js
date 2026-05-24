@@ -13,6 +13,7 @@ const en = {
     "zone": { "entered": "New Zone", "next": "Next: {zone} · {m}m" },
     "landmark": { "skyscraper": "Skyscraper top", "cloudBase": "Cloud base", "mountainTop": "Mountain peak", "jetStream": "Jet stream", "stormTops": "Storm tops", "weatherBalloon": "Weather balloon", "earthCurve": "Earth's curve", "karman": "Edge of space", "meteorBelt": "Meteor belt", "aurora": "Aurora", "deepSpace": "Deep space" },
     "hazard": { "bomb": "Bomb", "hurricane": "Hurricane", "lost": "{kind}! −{n} floors" },
+    "crane": { "place": "Place your word", "tapToDrop": "Tap to drop", "perfect": "Perfect!", "good": "Nice!", "sloppy": "Wobbly", "miss": "Whoops!" },
     "error": { "too_short": "Too short — 3+ letters", "bad_chain": "Start with the glowing letter", "not_buildable": "Use the tray letters", "duplicate": "Already used that word", "not_in_dictionary": "Not in the dictionary" },
     "celebration": { "highRise": "High Rise!", "tall": "Towering!", "skyscraper": "SKYSCRAPER!" },
     "leaderboard": { "title": "Top Towers", "error": "Couldn't load leaderboard", "empty": "No towers yet — be the first!" },
@@ -881,6 +882,8 @@ const en = {
     "music": "Music",
     "soundEffects": "Sound Effects",
     "accessibility": "Accessibility",
+    "cosyMode": "Calm Mode",
+    "cosyModeDescription": "Gentler visuals, no time-pressure flashing, softer celebrations",
     "reduceMotion": "Reduce Motion",
     "reduceMotionDescription": "Limit animations",
     "fireRoundLights": "Fire Round Lights",
@@ -1967,6 +1970,15 @@ const en = {
     "copy": "Copy code"
   },
   "onboarding": {
+    "calmMode": {
+      "title": "Pick your vibe",
+      "subtitle": "Play loud and competitive, or calm and relaxed. Both live here — choose what fits you today.",
+      "energetic": "Energetic",
+      "energeticDesc": "Full effects, combos, and the ticking clock.",
+      "calm": "Calm",
+      "calmDesc": "Gentler visuals, no time pressure, softer celebrations.",
+      "changeLater": "You can switch anytime in Settings."
+    },
     "header": "Quick Start",
     "loading": "Loading...",
     "skip": "Skip",
@@ -9021,6 +9033,10 @@ const en = {
     "complete": {
       "title": "Level Complete!",
       "boardCleared": "Board Cleared!",
+      "bonusLabel": "Bonus",
+      "best": "Best",
+      "newBest": "NEW BEST!",
+      "stars": "stars",
       "coins": "Coins",
       "cascadesLabel": "Cascades",
       "next": "Next Level",

@@ -13,6 +13,7 @@ const sv = {
     "zone": { "entered": "Ny zon", "next": "Nästa: {zone} · {m}m" },
     "landmark": { "skyscraper": "Skyskrapans topp", "cloudBase": "Molnbas", "mountainTop": "Bergstopp", "jetStream": "Jetström", "stormTops": "Stormtoppar", "weatherBalloon": "Väderballong", "earthCurve": "Jordens krökning", "karman": "Rymdens kant", "meteorBelt": "Meteorbälte", "aurora": "Norrsken", "deepSpace": "Yttre rymden" },
     "hazard": { "bomb": "Bomb", "hurricane": "Orkan", "lost": "{kind}! −{n} våningar" },
+    "crane": { "place": "Placera ditt ord", "tapToDrop": "Tryck för att släppa", "perfect": "Perfekt!", "good": "Snyggt!", "sloppy": "Vingligt", "miss": "Hoppsan!" },
     "error": { "too_short": "För kort — minst 3 bokstäver", "bad_chain": "Börja på den lysande bokstaven", "not_buildable": "Använd brickornas bokstäver", "duplicate": "Ordet är redan använt", "not_in_dictionary": "Inte i ordlistan" },
     "celebration": { "highRise": "Höghus!", "tall": "Skyhögt!", "skyscraper": "SKYSKRAPA!" },
     "leaderboard": { "title": "Topptorn", "error": "Kunde inte ladda topplistan", "empty": "Inga torn än — bli först!" },
@@ -897,6 +898,8 @@ const sv = {
     "music": "Musik",
     "soundEffects": "Ljudeffekter",
     "accessibility": "Tillgänglighet",
+    "cosyMode": "Lugnt läge",
+    "cosyModeDescription": "Mjukare visuella effekter, ingen tidspressblinkning, lugnare firande",
     "reduceMotion": "Reducera rörelse",
     "reduceMotionDescription": "Begränsa animeringar",
     "fireRoundLights": "Eldrundeljus",
@@ -1865,6 +1868,15 @@ const sv = {
     "code": "Kod:"
   },
   "onboarding": {
+    "calmMode": {
+      "title": "Välj din stil",
+      "subtitle": "Spela högljutt och tävlingsinriktat, eller lugnt och avslappnat. Båda finns här — välj det som passar dig idag.",
+      "energetic": "Energisk",
+      "energeticDesc": "Fulla effekter, combos och tickande klocka.",
+      "calm": "Lugn",
+      "calmDesc": "Mjukare bilder, ingen tidspress, lugnare firande.",
+      "changeLater": "Du kan byta när som helst i inställningarna."
+    },
     "header": "Snabbguide",
     "loading": "Laddar...",
     "skip": "Hoppa över",
@@ -9093,6 +9105,10 @@ const sv = {
     "complete": {
       "title": "Nivå klar!",
       "boardCleared": "Brädet rensat!",
+      "bonusLabel": "Bonus",
+      "best": "Bästa",
+      "newBest": "NYTT REKORD!",
+      "stars": "stjärnor",
       "coins": "Mynt",
       "cascadesLabel": "Kaskader",
       "next": "Nästa nivå"

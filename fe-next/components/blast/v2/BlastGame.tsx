@@ -15,6 +15,7 @@ import { useCompleteCardDelay } from '@/lib/blast/v2/fx/useCompleteCardDelay';
 import type { BlastProgressApi } from '@/lib/blast/v2/useBlastProgress';
 import { useBlastTutorial } from '@/hooks/useBlastTutorial';
 import { starRating } from '@/lib/blast/v2/anti-cheat';
+import { recordBestStars } from '@/lib/blast/v2/bestStars';
 import { mechanicsForLevel } from '@/lib/blast/v2/mechanic-flags';
 import { trackBlastLevelStarted, trackBlastLevelCompleted, trackBlastLevelAbandoned } from '@/lib/blast/v2/telemetry';
 import { BlastBoard } from './BlastBoard';
@@ -28,7 +29,9 @@ import { BlastFtueOverlay, type FtueStep } from './BlastFtueOverlay';
 import { BlastUnlockCard } from './BlastUnlockCard';
 import { BlastConceptIntroCard } from './BlastConceptIntroCard';
 import { BlastWordCelebration } from './BlastWordCelebration';
+import { BlastWordFeedback } from './BlastWordFeedback';
 import { BlastUndoAdModal } from './BlastUndoAdModal';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useBlastDictionary } from '@/lib/blast/v2/useBlastDictionary';
 import { parseCell } from '@/lib/blast/v2/engine/cell-id';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
@@ -112,7 +115,7 @@ export function BlastGame({
   // Finalized run stats — snapshot when the level transitions to complete so
   // re-renders of the results card don't re-read Date.now() (impure during
   // render).
-  const [finalStats, setFinalStats] = useState<{ timeSeconds: number; gemsCollected: number; stars: number } | null>(null);
+  const [finalStats, setFinalStats] = useState<{ timeSeconds: number; gemsCollected: number; stars: number; bestStars: number; isNewBest: boolean } | null>(null);
   useChainHaptics({ chainEventKey: state.chainEventKey, chainDepth: state.lastChainDepth });
   // Selection-count derived from active drag — only counts cells that are
   // currently part of the live trace, so backtracking doesn't double-tick.
@@ -197,6 +200,11 @@ export function BlastGame({
       const accepted = fOk ? forward : rOk ? reversed : null;
       if (accepted) {
         handlers.onForceBonus(cells, accepted);
+      } else {
+        // Dictionary confirms it's not a real word — release the deferred
+        // shake now (the submit didn't fire it, so the player gets a single
+        // clear "nope" instead of a flash-then-nothing).
+        handlers.onRejectConfirmed();
       }
     })();
 
@@ -337,13 +345,16 @@ export function BlastGame({
       wordsFound: Array.from(state.foundWords),
       timeSeconds,
       hintsUsed: state.hintsUsed,
-      wrongAttempts: 0,
+      wrongAttempts: state.wrongAttempts,
       cascadesTriggered: state.cascadeCount,
       submissionId: submissionIdRef.current,
     };
 
-    const stars = starRating(submission, level);
-    setFinalStats({ timeSeconds, gemsCollected, stars });
+    const stars = starRating(submission, level, state.bonusWordCount);
+    // Personal-best tracking (local) — drives the "NEW BEST!" flash + best line
+    // on the complete card, giving a reason to replay for a higher rating.
+    const { best, isNewBest } = recordBestStars(level.locale, level.levelNumber, stars);
+    setFinalStats({ timeSeconds, gemsCollected, stars, bestStars: best, isNewBest });
 
     trackBlastLevelCompleted({
       level: level.levelNumber,
@@ -358,7 +369,7 @@ export function BlastGame({
     });
 
     clearLevel(submission, state.coins, gemsCollected, unlocksSeen);
-  }, [state.status, introDismissed, level, levelStartTime, state.foundWords, state.hintsUsed, state.cascadeCount, state.coins, state.chestProgress, clearLevel, unlocksSeen]);
+  }, [state.status, introDismissed, level, levelStartTime, state.foundWords, state.hintsUsed, state.wrongAttempts, state.bonusWordCount, state.cascadeCount, state.coins, state.chestProgress, clearLevel, unlocksSeen]);
 
   const handleFtueComplete = () => {
     const updated = completeFtue(unlocksSeen);
@@ -385,6 +396,7 @@ export function BlastGame({
   };
 
   const modeColor = MODE_COLORS[level.theme] || '#BFFF00';
+  const { t } = useLanguage();
   // FX integration point: BlastFxOverlay mounts useBlastFx internally
   // Board ref is obtained internally by BlastBoard via useRef
 
@@ -445,12 +457,14 @@ export function BlastGame({
         cascadeCount={state.cascadeCount}
         modeColor={modeColor}
         levelNumber={level.levelNumber}
-        wordsFound={state.foundWords.size}
-        wordsFoundList={Array.from(state.foundWords)}
+        themeWordCount={level.words.length}
+        wordsFound={level.words.length}
+        bonusWordsFound={state.bonusWordCount}
         timeSeconds={finalStats?.timeSeconds}
-        gemsCollected={finalStats?.gemsCollected}
         bestChainDepth={bestChainDepth}
         stars={finalStats?.stars}
+        bestStars={finalStats?.bestStars}
+        isNewBest={finalStats?.isNewBest}
         onNext={onAdvance}
       />
     );
@@ -480,6 +494,7 @@ export function BlastGame({
         theme={level.theme}
         targetWords={level.words}
         foundWords={Array.from(state.foundWords)}
+        bonusWordCount={state.bonusWordCount}
         canUndo={state.canUndo && state.status === 'playing'}
         onUndo={handleUndoPressed}
         onHint={() => {
@@ -500,6 +515,13 @@ export function BlastGame({
           centers={clearCentersRef.current}
           modeColor={modeColor}
           chainDepth={state.lastChainDepth}
+        />
+        <BlastWordFeedback
+          dictCheckPending={state.dictCheckPending}
+          lastValidation={state.lastValidation}
+          eventKey={state.chainEventKey}
+          modeColor={modeColor}
+          t={t}
         />
         <BlastChainSoundListener />
         {/* Size-typed stage: drives container-query tile sizing on BOTH axes.

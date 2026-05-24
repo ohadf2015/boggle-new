@@ -114,7 +114,11 @@ describe('useBlastV2 hook', () => {
     expect(result.current.state.status).toBe('levelComplete');
   });
 
-  it('invalid selection triggers invalidShakeKey increment', () => {
+  it('defers the shake for an "unknown" rejection until the async dict check resolves', () => {
+    // Dragging row 0 spells "CS" — a real-letter run that is NOT a theme word
+    // and (with no dictionaryCheck) rejects as 'unknown'. This is the retryable
+    // path: the player may have found a valid off-theme word, so we must NOT
+    // fire the red shake before /api/dictionary/check has had its say.
     const { result } = renderHook(() => useBlastV2(mockLevel));
     const initialShakeKey = result.current.state.invalidShakeKey;
 
@@ -124,7 +128,134 @@ describe('useBlastV2 hook', () => {
       result.current.handlers.onPointerUp();
     });
 
+    // No premature shake — the verdict is pending.
+    expect(result.current.state.invalidShakeKey).toBe(initialShakeKey);
+    expect(result.current.state.dictCheckPending).toBe(true);
+    expect(result.current.state.lastRejectedCells.length).toBe(2);
+  });
+
+  it('shakes immediately for a deterministic rejection (frozen tile) — no dict check', () => {
+    // Frozen tiles are an unambiguous, terminal rejection. There is no point
+    // deferring to the dictionary, so the shake fires at once and nothing is
+    // queued for an async retry.
+    const frozenLevel: BlastLevel = {
+      ...mockLevel,
+      id: 'frozen-reject-test',
+      tileFlags: { [cellId(0, 0)]: ['frozen'] },
+    };
+    const { result } = renderHook(() => useBlastV2(frozenLevel));
+    const initialShakeKey = result.current.state.invalidShakeKey;
+
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(0, 1));
+      result.current.handlers.onPointerMove(cellId(0, 2));
+      result.current.handlers.onPointerUp();
+    });
+
     expect(result.current.state.invalidShakeKey).toBe(initialShakeKey + 1);
+    expect(result.current.state.dictCheckPending).toBe(false);
+    expect(result.current.state.lastRejectedCells).toEqual([]);
+  });
+
+  it('onRejectConfirmed fires the shake after the dict check rejects the word', () => {
+    // BlastGame calls this when /api/dictionary/check confirms the pending word
+    // is NOT real. Only now does the red shake fire, and the pending flag clears.
+    const { result } = renderHook(() => useBlastV2(mockLevel));
+
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(1, 0));
+      result.current.handlers.onPointerUp();
+    });
+    expect(result.current.state.dictCheckPending).toBe(true);
+    const pendingShakeKey = result.current.state.invalidShakeKey;
+
+    act(() => {
+      result.current.handlers.onRejectConfirmed();
+    });
+
+    expect(result.current.state.invalidShakeKey).toBe(pendingShakeKey + 1);
+    expect(result.current.state.dictCheckPending).toBe(false);
+    expect(result.current.state.lastRejectedCells).toEqual([]);
+  });
+
+  it('bonusWordCount counts off-theme found words', () => {
+    // dictionaryCheck accepts "CSE" (row 0). It is not a theme word → bonus.
+    const { result } = renderHook(() =>
+      useBlastV2(mockLevel, { dictionaryCheck: (w) => w.toLowerCase() === 'cse' }),
+    );
+    expect(result.current.state.bonusWordCount).toBe(0);
+
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(1, 0));
+      result.current.handlers.onPointerMove(cellId(2, 0));
+      result.current.handlers.onPointerUp();
+    });
+    expect(result.current.state.foundWords.size).toBe(1);
+    expect(result.current.state.bonusWordCount).toBe(1);
+  });
+
+  it('counts a real miss in wrongAttempts only once the verdict is in', () => {
+    const { result } = renderHook(() => useBlastV2(mockLevel));
+    expect(result.current.state.wrongAttempts).toBe(0);
+
+    // An 'unknown' reject is NOT yet a confirmed miss — verdict pending.
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(1, 0));
+      result.current.handlers.onPointerUp();
+    });
+    expect(result.current.state.wrongAttempts).toBe(0);
+
+    // Dictionary confirms it's not a word → now it's a real miss.
+    act(() => {
+      result.current.handlers.onRejectConfirmed();
+    });
+    expect(result.current.state.wrongAttempts).toBe(1);
+  });
+
+  it('counts a deterministic rejection (frozen) as a wrong attempt immediately', () => {
+    const frozenLevel: BlastLevel = {
+      ...mockLevel,
+      id: 'frozen-wrong-attempt',
+      tileFlags: { [cellId(0, 0)]: ['frozen'] },
+    };
+    const { result } = renderHook(() => useBlastV2(frozenLevel));
+
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(0, 1));
+      result.current.handlers.onPointerMove(cellId(0, 2));
+      result.current.handlers.onPointerUp();
+    });
+    expect(result.current.state.wrongAttempts).toBe(1);
+  });
+
+  it('does not count a successful word as a wrong attempt', () => {
+    const { result } = renderHook(() => useBlastV2(mockLevel));
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(0, 1));
+      result.current.handlers.onPointerMove(cellId(0, 2));
+      result.current.handlers.onPointerUp();
+    });
+    expect(result.current.state.foundWords.has('CAT')).toBe(true);
+    expect(result.current.state.wrongAttempts).toBe(0);
+  });
+
+  it('bonusWordCount stays 0 when only theme words are found', () => {
+    const { result } = renderHook(() => useBlastV2(mockLevel));
+
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(0, 1));
+      result.current.handlers.onPointerMove(cellId(0, 2));
+      result.current.handlers.onPointerUp();
+    });
+    expect(result.current.state.foundWords.has('CAT')).toBe(true);
+    expect(result.current.state.bonusWordCount).toBe(0);
   });
 
   it('completing all words sets status to levelComplete', () => {

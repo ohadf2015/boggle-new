@@ -13,6 +13,7 @@ const es = {
     "zone": { "entered": "Nueva zona", "next": "Siguiente: {zone} · {m}m" },
     "landmark": { "skyscraper": "Cima del rascacielos", "cloudBase": "Base de nubes", "mountainTop": "Pico de montaña", "jetStream": "Corriente en chorro", "stormTops": "Cima de tormenta", "weatherBalloon": "Globo meteorológico", "earthCurve": "Curvatura terrestre", "karman": "Borde del espacio", "meteorBelt": "Cinturón de meteoros", "aurora": "Aurora", "deepSpace": "Espacio profundo" },
     "hazard": { "bomb": "Bomba", "hurricane": "Huracán", "lost": "¡{kind}! −{n} pisos" },
+    "crane": { "place": "Coloca tu palabra", "tapToDrop": "Toca para soltar", "perfect": "¡Perfecto!", "good": "¡Bien!", "sloppy": "Tambaleante", "miss": "¡Ups!" },
     "error": { "too_short": "Muy corta — 3+ letras", "bad_chain": "Empieza con la letra brillante", "not_buildable": "Usa las letras de la bandeja", "duplicate": "Ya usaste esa palabra", "not_in_dictionary": "No está en el diccionario" },
     "celebration": { "highRise": "¡Edificio alto!", "tall": "¡Imponente!", "skyscraper": "¡RASCACIELOS!" },
     "leaderboard": { "title": "Torres principales", "error": "No se pudo cargar la clasificación", "empty": "Aún no hay torres — ¡sé el primero!" },
@@ -878,6 +879,8 @@ const es = {
     "music": "Música",
     "soundEffects": "Efectos de Sonido",
     "accessibility": "Accesibilidad",
+    "cosyMode": "Modo tranquilo",
+    "cosyModeDescription": "Efectos más suaves, sin parpadeos de presión de tiempo, celebraciones tranquilas",
     "reduceMotion": "Reducir Movimiento",
     "reduceMotionDescription": "Limitar animaciones",
     "fireRoundLights": "Luces de Ronda de Fuego",
@@ -3959,6 +3962,15 @@ const es = {
     }
   },
   "onboarding": {
+    "calmMode": {
+      "title": "Elige tu estilo",
+      "subtitle": "Juega ruidoso y competitivo, o tranquilo y relajado. Ambos están aquí: elige lo que prefieras hoy.",
+      "energetic": "Enérgico",
+      "energeticDesc": "Efectos completos, combos y el reloj en marcha.",
+      "calm": "Tranquilo",
+      "calmDesc": "Efectos más suaves, sin presión de tiempo, celebraciones tranquilas.",
+      "changeLater": "Puedes cambiarlo cuando quieras en Ajustes."
+    },
     "header": "Guía Rápida",
     "loading": "Cargando...",
     "skip": "Omitir",
@@ -9176,6 +9188,10 @@ const es = {
     "complete": {
       "title": "¡Nivel completado!",
       "boardCleared": "¡Tablero limpio!",
+      "bonusLabel": "Extra",
+      "best": "Mejor",
+      "newBest": "¡NUEVO RÉCORD!",
+      "stars": "estrellas",
       "coins": "Monedas",
       "cascadesLabel": "Cascadas",
       "next": "Siguiente nivel"

@@ -80,15 +80,39 @@ export function applyAntiCheatCapsWithLevel(
   return applyAntiCheatCaps(submission, clientCoins);
 }
 
-export function starRating(submission: ClearSubmission, level: BlastLevel): 1 | 2 | 3 {
+/**
+ * Grade a level clear 1–3 stars.
+ *
+ * Reworked 2026-05-24: the prior version compared `wordsFound.length` to
+ * `level.words.length`, which broke the 3-star path the moment a player found
+ * any off-theme bonus word (wordsFound then exceeds the theme count). It also
+ * left `wrongAttempts <= 5` always true (the reducer never tracked misses), so
+ * every clear scored 2★ unless it was fast. Both are fixed here:
+ *
+ *   - "all theme words" is a set check, so bonus words never count against it.
+ *   - Two routes to 3★ reward two play styles (Wordscapes-style): a spotless
+ *     SPEED run, or a spotless run that DISCOVERS an off-theme bonus word.
+ *     This makes free-form exploration a path to mastery, not just a sink.
+ *
+ * `bonusWordsFound` = count of dictionary words the player found that aren't on
+ * the level's target list.
+ */
+export function starRating(
+  submission: ClearSubmission,
+  level: BlastLevel,
+  bonusWordsFound = 0,
+): 1 | 2 | 3 {
+  const config = LOCALE_CONFIGS[submission.locale];
+  const normFound = new Set(submission.wordsFound.map(config.normalize));
+  const allTheme = level.words.every((w) => normFound.has(config.normalize(w)));
   const targetTime = 30 * level.words.length;
-  const allWords = submission.wordsFound.length === level.words.length;
 
-  if (allWords && submission.hintsUsed === 0 && submission.wrongAttempts <= 3 && submission.timeSeconds <= targetTime) {
-    return 3;
-  }
-  if (submission.hintsUsed <= 1 || submission.wrongAttempts <= 5) {
-    return 2;
-  }
+  const spotless = submission.hintsUsed === 0 && submission.wrongAttempts <= 2;
+  const masterful = allTheme && spotless && (submission.timeSeconds <= targetTime || bonusWordsFound >= 1);
+  if (masterful) return 3;
+
+  const solid = submission.hintsUsed <= 1 && submission.wrongAttempts <= 5;
+  if (solid) return 2;
+
   return 1;
 }

@@ -13,6 +13,7 @@ const he = {
     "zone": { "entered": "אזור חדש", "next": "הבא: {zone} · {m}מ'" },
     "landmark": { "skyscraper": "פסגת גורד שחקים", "cloudBase": "בסיס העננים", "mountainTop": "פסגת ההר", "jetStream": "זרם הסילון", "stormTops": "ראש הסערה", "weatherBalloon": "בלון מזג אוויר", "earthCurve": "עקמומיות כדור הארץ", "karman": "קצה החלל", "meteorBelt": "חגורת המטאורים", "aurora": "זוהר קוטבי", "deepSpace": "חלל עמוק" },
     "hazard": { "bomb": "פצצה", "hurricane": "סופה", "lost": "{kind}! נפלו {n} קומות" },
+    "crane": { "place": "הנח את המילה", "tapToDrop": "הקש כדי לשחרר", "perfect": "מושלם!", "good": "יפה!", "sloppy": "מתנדנד", "miss": "אופס!" },
     "error": { "too_short": "קצר מדי — 3 אותיות לפחות", "bad_chain": "התחילו באות הזוהרת", "not_buildable": "השתמשו באותיות המגש", "duplicate": "כבר השתמשת במילה הזו", "not_in_dictionary": "לא במילון" },
     "celebration": { "highRise": "מתנשא!", "tall": "גבוה!", "skyscraper": "גורד שחקים!" },
     "leaderboard": { "title": "המגדלים המובילים", "error": "טעינת הלוח נכשלה", "empty": "אין עדיין מגדלים — היו הראשונים!" },
@@ -890,6 +891,8 @@ const he = {
     "music": "מוזיקה",
     "soundEffects": "אפקטים קוליים",
     "accessibility": "נגישות",
+    "cosyMode": "מצב רגוע",
+    "cosyModeDescription": "חזות עדינה יותר, ללא הבהובי לחץ זמן, חגיגות רכות יותר",
     "reduceMotion": "הפחתת תנועה",
     "reduceMotionDescription": "הגבלת אנימציות",
     "fireRoundLights": "תאורת סיבוב אש",
@@ -1994,6 +1997,15 @@ const he = {
     "copy": "העתק קוד"
   },
   "onboarding": {
+    "calmMode": {
+      "title": "בחרו את הסגנון שלכם",
+      "subtitle": "אפשר לשחק קולני ותחרותי, או רגוע ונינוח. שניהם כאן — בחרו מה שמתאים לכם היום.",
+      "energetic": "אנרגטי",
+      "energeticDesc": "אפקטים מלאים, קומבואים ושעון מתקתק.",
+      "calm": "רגוע",
+      "calmDesc": "חזות עדינה, בלי לחץ זמן, חגיגות רכות יותר.",
+      "changeLater": "אפשר להחליף בכל עת בהגדרות."
+    },
     "header": "מדריך מהיר",
     "loading": "טוען...",
     "skip": "דלג",
@@ -9355,6 +9367,10 @@ const he = {
     "complete": {
       "title": "השלב הושלם!",
       "boardCleared": "הלוח נוקה!",
+      "bonusLabel": "בונוס",
+      "best": "שיא",
+      "newBest": "שיא חדש!",
+      "stars": "כוכבים",
       "coins": "מטבעות",
       "cascadesLabel": "שרשראות",
       "next": "השלב הבא",

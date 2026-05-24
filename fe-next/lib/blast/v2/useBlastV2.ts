@@ -39,11 +39,22 @@ type State = {
   hintsUsed: number;
   cascadeCount: number;
   invalidShakeKey: number;
+  // Count of confirmed wrong attempts this level — deterministic rejections
+  // plus dictionary-confirmed non-words. Feeds the star rating. A pending
+  // `unknown` reject does NOT count until the dictionary verdict lands, so a
+  // valid off-theme bonus word is never punished as a miss.
+  wrongAttempts: number;
   lastValidation: ValidationResult | null;
   // Cells of the most recently rejected submit. BlastGame uses this to retry
   // an async dictionary lookup for free-form (non-theme) word validation when
   // the local validator rejects with `reason: 'unknown'`.
   lastRejectedCells: CellId[];
+  // True while an `unknown` rejection is awaiting the async /api/dictionary/check
+  // verdict. During this window we DON'T shake — the word may be a valid
+  // off-theme bonus word. BlastGame shows a subtle "checking" state instead,
+  // then either credits it (onForceBonus) or confirms the reject
+  // (onRejectConfirmed → shake fires). Deterministic rejections skip this.
+  dictCheckPending: boolean;
   // Number of free undos the player has consumed this level. Drives the
   // rewarded-ad gate: the first two undos cost nothing; further undos require
   // confirming a rewarded ad via `markRewardedUndo`.
@@ -59,6 +70,7 @@ type Action =
   | { type: 'shuffle' }
   | { type: 'undo' }
   | { type: 'forceBonus'; cells: CellId[]; word: string }
+  | { type: 'rejectConfirmed' }
   | { type: 'markRewardedUndo' };
 
 type UseBlastV2Options = {
@@ -104,14 +116,30 @@ function applyValidatedSubmit(
       length: cells.length,
       reason: res.reason,
     });
+    // `unknown` is the retryable path: the letters form a real run that simply
+    // isn't a theme word. It may be a valid off-theme bonus word, so we DEFER
+    // the shake — BlastGame asks /api/dictionary/check, then either credits the
+    // word (onForceBonus) or confirms the reject (onRejectConfirmed → shake).
+    // Firing the shake now would flash a false "wrong!" before the word lands.
+    if (res.reason === 'unknown') {
+      return {
+        ...state,
+        lastValidation: res,
+        lastRejectedCells: cells,
+        dictCheckPending: true,
+      };
+    }
+    // Deterministic rejections (length/axis/gap/frozen/duplicate) are terminal
+    // — no dictionary can rescue them, so shake immediately. A duplicate isn't
+    // a skill miss (the word was real), so it doesn't count against stars.
+    const countsAsMiss = res.reason !== 'duplicate';
     return {
       ...state,
       lastValidation: res,
       invalidShakeKey: state.invalidShakeKey + 1,
-      // Remember the rejected cells ONLY when the rejection is a candidate
-      // for async dictionary fallback. Shape/duplicate rejections are
-      // terminal — no point keeping them around to retry.
-      lastRejectedCells: res.reason === 'unknown' ? cells : [],
+      wrongAttempts: state.wrongAttempts + (countsAsMiss ? 1 : 0),
+      lastRejectedCells: [],
+      dictCheckPending: false,
     };
   }
   const kind = res.kind === 'theme_match' ? 'theme' : 'bonus';
@@ -179,6 +207,7 @@ function applyValidatedSubmit(
     chainEventKey: state.chainEventKey + 1,
     tileIds: newTileIds,
     history: newHistory,
+    dictCheckPending: false,
   };
 }
 
@@ -251,6 +280,7 @@ function applyForceBonus(state: State, cells: CellId[], word: string): State {
     tileIds: newTileIds,
     history: newHistory,
     lastRejectedCells: [],
+    dictCheckPending: false,
   };
 }
 
@@ -270,6 +300,19 @@ function reducer(state: State, action: Action): State {
   }
   if (action.type === 'forceBonus') {
     return applyForceBonus(state, action.cells, action.word);
+  }
+  if (action.type === 'rejectConfirmed') {
+    // The async dictionary check came back negative for a pending `unknown`
+    // word. NOW fire the shake (it was deferred at submit time) and clear the
+    // pending markers so a fresh attempt isn't mistaken for a stale verdict.
+    if (!state.dictCheckPending) return state;
+    return {
+      ...state,
+      invalidShakeKey: state.invalidShakeKey + 1,
+      wrongAttempts: state.wrongAttempts + 1,
+      dictCheckPending: false,
+      lastRejectedCells: [],
+    };
   }
   if (action.type === 'markRewardedUndo') {
     // Reset the free-undo counter so the next two undos are free again.
@@ -319,8 +362,10 @@ export function useBlastV2(initialLevel: BlastLevel, options: UseBlastV2Options 
     hintsUsed: 0,
     cascadeCount: 0,
     invalidShakeKey: 0,
+    wrongAttempts: 0,
     lastValidation: null,
     lastRejectedCells: [],
+    dictCheckPending: false,
     freeUndosUsed: 0,
     lastChainDepth: 0,
     chainEventKey: 0,
@@ -352,18 +397,31 @@ export function useBlastV2(initialLevel: BlastLevel, options: UseBlastV2Options 
       // Player watched the rewarded ad to refresh their free-undo budget.
       // Resets the counter so the next FREE_UNDO_LIMIT undos cost nothing.
       onRewardedUndoGranted: () => dispatch({ type: 'markRewardedUndo' }),
+      // The async dictionary check rejected a pending `unknown` word — it's
+      // genuinely not a real word. Fires the (deferred) shake.
+      onRejectConfirmed: () => dispatch({ type: 'rejectConfirmed' }),
     }),
     []
   );
-  const stateWithCanUndo = useMemo(
-    () => ({
+  const stateWithCanUndo = useMemo(() => {
+    // Bonus words = found words that aren't theme words. Derived (not stored)
+    // so undo, which restores `foundWords` from a snapshot, keeps the count
+    // correct automatically. Both sides normalized: theme words store as their
+    // original casing, bonus words as the normalized form.
+    const config = LOCALE_CONFIGS[state.level.locale];
+    const themeNorm = new Set(state.level.words.map(config.normalize));
+    let bonusWordCount = 0;
+    for (const w of state.foundWords) {
+      if (!themeNorm.has(config.normalize(w))) bonusWordCount += 1;
+    }
+    return {
       ...state,
       canUndo: state.history.length > 0,
       // True once the next undo would exceed the free quota — BlastGame uses
       // this to gate the button behind a rewarded-ad modal.
       needsRewardedAdForUndo: state.freeUndosUsed >= FREE_UNDO_LIMIT,
-    }),
-    [state],
-  );
+      bonusWordCount,
+    };
+  }, [state]);
   return { state: stateWithCanUndo, handlers };
 }

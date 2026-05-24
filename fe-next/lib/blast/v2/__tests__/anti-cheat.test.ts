@@ -88,46 +88,52 @@ describe('anti-cheat', () => {
   });
 
   describe('starRating', () => {
-    it('returns 3 stars for perfect clear (all words, no hints, <=3 wrong, time <= 30s/word)', () => {
-      const submission: ClearSubmission = {
-        levelNumber: 1,
-        locale: 'en',
-        wordsFound: ['apple', 'banana', 'cherry'],
-        timeSeconds: 80, // 3 words * 30 = 90s
-        hintsUsed: 0,
-        wrongAttempts: 1,
-        cascadesTriggered: 0,
-      };
-      const stars = starRating(submission, mockLevel);
-      expect(stars).toBe(3);
+    const base = (over: Partial<ClearSubmission>): ClearSubmission => ({
+      levelNumber: 1,
+      locale: 'en',
+      wordsFound: ['apple', 'banana', 'cherry'],
+      timeSeconds: 80, // 3 words * 30 = 90s target
+      hintsUsed: 0,
+      wrongAttempts: 0,
+      cascadesTriggered: 0,
+      ...over,
     });
 
-    it('returns 2 stars for good clear (hints<=1 OR wrong<=5)', () => {
-      const submission: ClearSubmission = {
-        levelNumber: 1,
-        locale: 'en',
-        wordsFound: ['apple', 'banana'],
-        timeSeconds: 100,
-        hintsUsed: 1,
-        wrongAttempts: 2,
-        cascadesTriggered: 0,
-      };
-      const stars = starRating(submission, mockLevel);
-      expect(stars).toBe(2);
+    it('returns 3 stars for a clean, fast clear', () => {
+      expect(starRating(base({ wrongAttempts: 1, timeSeconds: 80 }), mockLevel)).toBe(3);
     });
 
-    it('returns 1 star otherwise', () => {
-      const submission: ClearSubmission = {
-        levelNumber: 1,
-        locale: 'en',
-        wordsFound: ['apple'],
-        timeSeconds: 150,
-        hintsUsed: 3,
-        wrongAttempts: 10,
-        cascadesTriggered: 0,
-      };
-      const stars = starRating(submission, mockLevel);
-      expect(stars).toBe(1);
+    it('returns 3 stars for a clean clear that found a bonus word, even if slow (explorer path)', () => {
+      // Slow (200s > 90s target) but spotless AND discovered an off-theme word.
+      expect(starRating(base({ wrongAttempts: 0, timeSeconds: 200 }), mockLevel, 1)).toBe(3);
+    });
+
+    it('does NOT award 3 stars when slow AND no bonus word found', () => {
+      expect(starRating(base({ wrongAttempts: 0, timeSeconds: 200 }), mockLevel, 0)).toBe(2);
+    });
+
+    it('does NOT award 3 stars when there were too many wrong attempts', () => {
+      expect(starRating(base({ wrongAttempts: 4, timeSeconds: 80 }), mockLevel)).toBe(2);
+    });
+
+    it('counts bonus words in wordsFound without breaking the all-theme-words check', () => {
+      // Regression: the old length-equality test mis-fired once a bonus word
+      // padded wordsFound beyond level.words.length. All three theme words ARE
+      // present, so a clean+fast run is still 3 stars.
+      const sub = base({
+        wordsFound: ['apple', 'banana', 'cherry', 'plea'],
+        timeSeconds: 80,
+        wrongAttempts: 0,
+      });
+      expect(starRating(sub, mockLevel, 1)).toBe(3);
+    });
+
+    it('returns 2 stars for a solid clear (a hint or a few misses)', () => {
+      expect(starRating(base({ hintsUsed: 1, wrongAttempts: 2 }), mockLevel)).toBe(2);
+    });
+
+    it('returns 1 star for a messy clear (many misses and hints)', () => {
+      expect(starRating(base({ hintsUsed: 3, wrongAttempts: 10, timeSeconds: 150 }), mockLevel)).toBe(1);
     });
   });
 
