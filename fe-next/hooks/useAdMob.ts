@@ -19,6 +19,14 @@ export interface ShowRewardedOptions {
 // instant (preloaded).
 export const REWARD_PREPARE_TIMEOUT_MS = 12000;
 
+// Overall watchdog for the show-and-reward lifecycle. AdMob's rewarded video
+// can stall at *show* time — a backgrounded WebView or buggy mediation adapter
+// fires NO Rewarded/Dismissed/Failed event AND never resolves
+// `showRewardVideoAd()`. AdMob's own rewarded video tops out at 30s, so 90s is
+// well past any legitimate ad lifecycle: real events settle and clear this
+// well before it fires.
+export const REWARD_SAFETY_TIMEOUT_MS = 90000;
+
 export interface ShowBannerOptions {
   variant?: BannerVariant;
 }
@@ -46,12 +54,6 @@ export function useAdMob() {
     let safetyTimer: ReturnType<typeof setTimeout> | null = null;
     let prepareTimer: ReturnType<typeof setTimeout> | null = null;
     const REWARD_GRACE_MS = 750;
-    // Backstop for the v8 plugin's silent-stall case: poor network, backgrounded
-    // WebView, or a buggy mediation adapter can fire NO Rewarded/Dismissed/Failed
-    // event at all — leaving the UI's `status='showing'` flag forever-on and
-    // blocking the user from any further opt-in. AdMob's own rewarded video tops
-    // out at 30s, so 90s is well past any legitimate ad lifecycle.
-    const REWARD_SAFETY_TIMEOUT_MS = 90000;
     const handles: Array<{ remove: () => void | Promise<void> }> = [];
 
     const cleanup = () => {
@@ -112,16 +114,20 @@ export function useAdMob() {
             // would grant no reward. Leave the prepared ad cached for retry.
             if (settled) return;
             if (prepareTimer) { clearTimeout(prepareTimer); prepareTimer = null; }
+            // Arm the safety watchdog BEFORE showing — not after show resolves.
+            // The plugin can stall *during* show: `showRewardVideoAd()` never
+            // resolves and no Rewarded/Dismissed/Failed event fires, which left
+            // the old code awaiting show forever (the watchdog was never armed)
+            // and the UI frozen in status='showing' — the "stuck in reward ads"
+            // bug. Arming it here covers the whole show-and-reward window; a
+            // real ad fires its events well within REWARD_SAFETY_TIMEOUT_MS,
+            // and finishRef is idempotent so the watchdog is harmless if it
+            // outlives a normal ad.
+            safetyTimer = setTimeout(
+              () => finishRef(false, 'Ad timed out — please try again'),
+              REWARD_SAFETY_TIMEOUT_MS,
+            );
             await AdMob.showRewardVideoAd();
-            // Arm the safety timer only AFTER show resolves. If the plugin then
-            // stalls and never fires Rewarded/Dismissed/Failed, this rescues
-            // the UI.
-            if (!settled) {
-              safetyTimer = setTimeout(
-                () => finishRef(false, 'Ad timed out — please try again'),
-                REWARD_SAFETY_TIMEOUT_MS,
-              );
-            }
           } catch (err) {
             const msg = err instanceof Error ? err.message : 'Ad failed';
             finishRef(false, msg);
