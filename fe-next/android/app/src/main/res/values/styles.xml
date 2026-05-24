@@ -12,17 +12,31 @@
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:background">@null</item>
         <!--
+          Solid brand-navy window background (#1a1a2e). This is the POST-SPLASH window
+          background (see postSplashScreenTheme on AppTheme.NoActionBarLaunch). It MUST NOT
+          be @null/transparent: with edge-to-edge transparent bars the WebView leaves the
+          top inset unpainted, and a transparent/leftover window background let the splash
+          image bleed through there (regression ed536b23a). Navy matches the app so the
+          inset is seamless; the opaque WebView draws on top everywhere else.
+
           Edge-to-edge (transparent bars, WebView underneath) is configured at runtime in
           MainActivity via androidx.activity EdgeToEdge.enable(). The status/navigation bar
           color + contrast theme attributes were removed: they are deprecated in Android 15
           (API 35) and flagged by Play Console's edge-to-edge pre-launch check.
         -->
+        <item name="android:windowBackground">#FF1A1A2E</item>
     </style>
 
 
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
         <item name="android:background">@drawable/splash</item>
+        <!--
+          Hand off to a normal theme once the splash is dismissed. Without this, the
+          activity stays on Theme.SplashScreen and @drawable/splash remains the window
+          background for the whole session — which, under edge-to-edge transparent bars,
+          showed as a stuck logo strip in the top inset over the loaded app (ed536b23a).
+        -->
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
     </style>
 </resources>

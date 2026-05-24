@@ -26,7 +26,8 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
     protected void onCreate(Bundle savedInstanceState) {
         // Crash logger installed in LexiClashApplication.attachBaseContext —
         // earlier than this hook so ContentProvider init failures get captured too.
-        //
+        super.onCreate(savedInstanceState);
+
         // Edge-to-edge: WebView extends behind status + navigation bars; useSafeArea
         // hook (JS) reads insets and exposes them as CSS vars so layout adapts.
         // EdgeToEdge.enable() (AndroidX) is the forward-compatible replacement for the
@@ -35,15 +36,22 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         // enforced by the platform, and a back-fill of the same transparent bars + light
         // (white) icons on older APIs. SystemBarStyle.dark(TRANSPARENT) = transparent
         // scrim with light icons — our app is dark navy, so the bg shows through and the
-        // gesture-nav pill blends seamlessly. Called before super.onCreate() (AndroidX
-        // canonical placement) so window flags are set before BridgeActivity wires up
-        // the WebView. Per-route bar icon tint is then handled in JS (useStatusBarTint).
+        // gesture-nav pill blends seamlessly.
+        //
+        // MUST run AFTER super.onCreate(): BridgeActivity installs the Theme.SplashScreen
+        // splash during super.onCreate(). Calling EdgeToEdge.enable() *before* it (the
+        // AndroidX "canonical" placement, introduced in ed536b23a) disturbed the splash
+        // window-background teardown, leaving the @drawable/splash window background
+        // exposed in the now-transparent top inset over the fully-loaded WebView — it
+        // looked like a stuck logo bar where the header should be. Running it after
+        // super.onCreate() restores the pre-regression ordering while keeping the
+        // Android-15-compliant AndroidX API (paired with postSplashScreenTheme in
+        // styles.xml). Per-route bar icon tint is handled in JS (useStatusBarTint).
         EdgeToEdge.enable(
             this,
             SystemBarStyle.dark(Color.TRANSPARENT),
             SystemBarStyle.dark(Color.TRANSPARENT)
         );
-        super.onCreate(savedInstanceState);
         ensureDefaultNotificationChannel();
         handleDeepLinkIntent(getIntent());
     }
