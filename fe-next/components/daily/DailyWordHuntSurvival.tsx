@@ -13,6 +13,7 @@ const WordHuntEffectsCanvas = dynamic(
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDesktopLayout } from '@/hooks/useDesktopLayout';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { useReducedEffects } from '@/hooks/useReducedEffects';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
 import { useCoinsFromContext } from '@/contexts/CoinContext';
@@ -86,11 +87,14 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const { isDesktop, isTv } = useDesktopLayout();
   const setIsInGame = useHideNavigation();
 
-  // Performance optimization for low-end devices
+  // Performance optimization for low-end devices + player opt-out.
+  // The in-game effects toggle (and OS reduced-motion) collapse onto the same
+  // skipAnimations lever that already gates particles, flashes, and confetti.
   const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
+  const [effectsReduced] = useReducedEffects();
   const skipAnimations = useMemo(
-    () => isLowEnd || !enableComplexAnimations,
-    [isLowEnd, enableComplexAnimations]
+    () => isLowEnd || !enableComplexAnimations || effectsReduced,
+    [isLowEnd, enableComplexAnimations, effectsReduced]
   );
 
   // Extra-life offer state (rewarded ad OR coin-spend on life=0, single-use per run)
@@ -226,8 +230,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       const cx = canvasSize.width / 2;
       const cy = canvasSize.height / 2;
       if (state.feedbackType === 'valid-word') {
-        triggerReward('wordFound');
         if (!skipAnimations) {
+          triggerReward('wordFound');
           setFlashColor('bg-green-400/15');
           setFlashTrigger((n) => n + 1);
           pushEffect({
@@ -238,9 +242,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           });
         }
       } else if (state.feedbackType === 'target-found') {
-        triggerReward('levelUp');
-        setShowTargetConfetti(true);
         if (!skipAnimations) {
+          triggerReward('levelUp');
+          setShowTargetConfetti(true);
           setFlashColor('bg-neo-lime/20');
           setFlashTrigger((n) => n + 1);
           pushEffect({ type: 'targetFound', x: cx, y: cy });
