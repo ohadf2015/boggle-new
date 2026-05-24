@@ -58,7 +58,7 @@ function resetState() {
 }
 
 const audioButton = () => screen.getByRole('button', { name: /mute|unmute/i });
-const effectsButton = () => screen.getByRole('button', { name: /reduceEffects|enableEffects/i });
+const effectsButton = () => screen.getByRole('button', { name: /disableAnimations|effects\.enable/i });
 
 describe('SurvivalAudioEffectsControls', () => {
   beforeEach(resetState);

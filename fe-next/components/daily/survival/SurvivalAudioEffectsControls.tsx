@@ -47,9 +47,11 @@ export const SurvivalAudioEffectsControls = memo<SurvivalAudioEffectsControlsPro
   }, [audioUnlocked, unlockAudio, isMuted, sfxMuted, toggleMute, toggleSfxMute]);
 
   const audioLabel = allMuted ? t('music.unmute', 'Unmute') : t('music.mute', 'Mute');
+  // Reuse the established effects.* keys (already localized in every locale) so
+  // the toggle needs no new translation strings.
   const effectsLabel = effectsReduced
-    ? t('music.enableEffects', 'Turn effects on')
-    : t('music.reduceEffects', 'Reduce effects');
+    ? t('effects.enable', 'Enable effects')
+    : t('effects.disableAnimations', 'Disable effects');
 
   return (
     <div className="flex items-center gap-1.5" role="group" aria-label={t('music.controls', 'Sound controls')}>
