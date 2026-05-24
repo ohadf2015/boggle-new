@@ -3,6 +3,7 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { PowerCard } from '@/lib/word-craft/run/powerCards';
 import { ROUND_COUNT } from '@/lib/word-craft/run/runTargets';
+import RunProgressMeter from './RunProgressMeter';
 
 interface RunHUDProps {
   round: number;
@@ -19,12 +20,12 @@ export function RunHUD({ round, target, score, runTotal, activeCards, tilesRemai
     <div className="flex flex-col gap-2 rounded-neo border-neo bg-neo-navy-light p-3 shadow-hard">
       <div className="flex items-center justify-between font-neo-display text-neo-cream">
         <span>{t('wordcraft.run.round', { n: round, total: ROUND_COUNT })}</span>
-        <span data-wc-run-score>
-          {t('wordcraft.run.score')}: <span className="text-neo-lime">{score}</span> / {target}
-        </span>
+        <span className="text-sm">{t('wordcraft.run.runTotal')}: {runTotal}</span>
       </div>
-      <div className="flex items-center justify-between text-sm font-neo-body text-neo-white/80">
-        <span>{t('wordcraft.run.runTotal')}: {runTotal}</span>
+      <div data-wc-run-score>
+        <RunProgressMeter score={score} target={target} t={t} />
+      </div>
+      <div className="flex items-center justify-end text-sm font-neo-body text-neo-white/80">
         <span>{t('wordcraft.tilesLeft')}: {tilesRemaining}</span>
       </div>
       {activeCards.length > 0 && (

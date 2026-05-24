@@ -8,13 +8,16 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 describe('RunHUD', () => {
-  it('shows the current round, score and target', () => {
+  it('shows the current round and the score-toward-target meter', () => {
     render(
       <RunHUD round={2} target={120} score={45} runTotal={60} activeCards={[]} tilesRemaining={14} />,
     );
     expect(screen.getByText(/wordcraft\.run\.round/)).toBeInTheDocument();
-    expect(screen.getByText('45')).toBeInTheDocument();
-    expect(screen.getByText(/120/)).toBeInTheDocument();
+    // Progress meter renders the score/target together + an accessible progressbar.
+    expect(screen.getByText('45/120')).toBeInTheDocument();
+    const bar = screen.getByRole('progressbar');
+    expect(bar).toHaveAttribute('aria-valuenow', '45');
+    expect(bar).toHaveAttribute('aria-valuemax', '120');
   });
 
   it('renders a chip per active card', () => {
