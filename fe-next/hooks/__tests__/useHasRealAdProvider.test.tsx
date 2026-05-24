@@ -39,10 +39,9 @@ describe('useHasRealAdProvider', () => {
     expect(result.current).toBe(true);
   });
 
-  it('returns false in production without any provider — GameMonetize fallback removed (IMA SDK must not load)', () => {
-    // GameMonetize SDK transitively pulls Google IMA. AdSense rejected the
-    // site, so we removed the hardcoded fallback game-id. Without explicit
-    // env opt-in, web users get placeholder mode (no real provider).
+  it('returns false in production without any provider (placeholder mode)', () => {
+    // Prod web with no CrazyGames platform + not native = no real ad
+    // provider → placeholder mode → entry points must hide.
     vi.stubEnv('NODE_ENV', 'production');
     const { result } = renderHook(() => useHasRealAdProvider());
     expect(result.current).toBe(false);
@@ -63,21 +62,13 @@ describe('useHasRealAdProvider', () => {
     expect(result.current).toBe(true);
   });
 
-  it('returns false in production when CrazyGames SDK loaded but not on platform — no GameMonetize fallback', () => {
+  it('returns false in production when CrazyGames SDK loaded but not on platform', () => {
     // CG SDK loads on every page (sniffer), but isOnCrazyGamesPlatform
-    // false means user is on plain web. GameMonetize fallback removed
-    // (IMA SDK gated), so prod web without explicit env = placeholder.
+    // false means user is on plain web. No real provider = placeholder.
     vi.stubEnv('NODE_ENV', 'production');
     crazyGamesState.isAvailable = true;
     crazyGamesState.isOnCrazyGamesPlatform = false;
     const { result } = renderHook(() => useHasRealAdProvider());
     expect(result.current).toBe(false);
-  });
-
-  it('returns true in production when GameMonetize game-id env is set (explicit override)', () => {
-    vi.stubEnv('NODE_ENV', 'production');
-    vi.stubEnv('NEXT_PUBLIC_GAMEMONETIZE_GAME_ID', 'real-gid');
-    const { result } = renderHook(() => useHasRealAdProvider());
-    expect(result.current).toBe(true);
   });
 });
