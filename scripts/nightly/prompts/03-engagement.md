@@ -28,7 +28,7 @@ From the **Specialized Skills** table above, invoke the skills listed for **lane
 - **All new events** must be added to typed event registry if one exists (grep `analytics/events.ts` or similar).
 
 ═══ STEP 1 — Pull data ═══
-Use the Bash helper (posthog MCP flaps — handshake times out + hangs the lane): `scripts/nightly/lib/posthog-query.sh hogql "<HogQL>"` for funnels, `scripts/nightly/lib/posthog-query.sh flags` for the flag list. Reliable + headless.
+Use the Bash helper for ALL PostHog data: `scripts/nightly/lib/posthog-query.sh hogql "<HogQL>"` for funnels, `scripts/nightly/lib/posthog-query.sh flags` for the flag list. DO NOT call the posthog MCP tools — it flaps and HANGS the lane to a timeout (this lane exit-124'd that way twice). The helper is the ONLY PostHog path.
   • Funnel: homepage → game-start → game-complete → return-day-2, last 24h vs prior-7d-baseline
   • Largest drop per step
   • Flag list: query `GET /api/projects/{PROJECT_ID}/feature_flags/` to enumerate active flags + their experiment-result link

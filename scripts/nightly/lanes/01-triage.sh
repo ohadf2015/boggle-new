@@ -9,4 +9,4 @@ LIB_DIR="$(dirname "$0")/../lib"
 LOG="${RUN_LOG:-/tmp/lane-01.log}"
 PROMPT="$(dirname "$0")/../prompts/01-triage.md"
 
-headless_run "01-triage" "$PROMPT" "sonnet" 900 "$LOG"
+headless_run "01-triage" "$PROMPT" "sonnet" 1200 "$LOG"

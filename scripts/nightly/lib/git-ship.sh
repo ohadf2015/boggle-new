@@ -133,8 +133,13 @@ ship_nightly_commit() {
   # is already gate-vetted, so rebase onto origin and retry once. With generated
   # files excluded above, the common case rebases clean.
   log "push rejected — fetch+rebase onto origin/master, retry once"
+  # --autostash: the nightly ALWAYS runs on top of the founder's dirty WIP, and
+  # plain `git rebase` refuses with "cannot rebase: you have unstaged changes" —
+  # which stranded the 2026-05-24 docs commit locally (committed, never pushed).
+  # autostash stashes the tracked WIP before the rebase and restores it after
+  # (untracked files don't block rebase, so they're left as-is).
   if git fetch origin master --quiet \
-     && git rebase origin/master >> "$RUN_LOG" 2>&1 \
+     && git rebase --autostash origin/master >> "$RUN_LOG" 2>&1 \
      && git push origin master >> "$RUN_LOG" 2>&1; then
     NEW_SHA=$(git rev-parse HEAD)
     log "pushed after rebase $NEW_SHA"
