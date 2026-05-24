@@ -9,6 +9,35 @@ import { isNative } from '@/utils/platform';
 import { setupPushListeners } from '@/utils/pushNotifications/tokenRegistration';
 import { handlePushData } from '@/utils/pushNotifications/handlePushData';
 
+const isValidLocale = (locale: string | null | undefined): locale is string =>
+  !!locale && locales.includes(locale);
+
+/** Locale of the page the app is currently on (the remote app redirects /→/{locale} on boot). */
+function detectLocaleFromPath(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  const firstSegment = window.location.pathname.split('/').filter(Boolean)[0];
+  return isValidLocale(firstSegment) ? firstSegment : undefined;
+}
+
+/** Stored language preference — the same cookie app/route.ts uses to pick the boot redirect. */
+function detectLocaleFromCookie(): string | undefined {
+  if (typeof document === 'undefined') return undefined;
+  const match = document.cookie.match(/(?:^|;\s*)boggle_language=([^;]+)/);
+  const value = match ? decodeURIComponent(match[1]) : undefined;
+  return isValidLocale(value) ? value : undefined;
+}
+
+/**
+ * Resolve the locale for a deep link. Shortcut/App-Link URLs carry no ?locale=,
+ * so falling straight back to defaultLocale ('he') sends every non-Hebrew player
+ * to a Hebrew page. Prefer an explicit param, then the on-screen path, then the
+ * language cookie, and only then the default.
+ */
+function resolvePreferredLocale(explicit: string | null): string {
+  if (isValidLocale(explicit)) return explicit;
+  return detectLocaleFromPath() ?? detectLocaleFromCookie() ?? defaultLocale;
+}
+
 /**
  * DeepLinkHandler Component
  *
@@ -27,7 +56,11 @@ export default function DeepLinkHandler() {
     let mounted = true;
 
     type CapListener = { remove: () => void };
-    type CapAppPlugin = { addListener: (event: string, handler: (e: { url: string }) => void) => CapListener | Promise<CapListener> };
+    type CapAppPlugin = {
+      addListener: (event: string, handler: (e: { url: string }) => void) => CapListener | Promise<CapListener>;
+      // Cold-start path: the launch URL is only here, not via appUrlOpen. See below.
+      getLaunchUrl?: () => Promise<{ url?: string } | undefined>;
+    };
     type CapBrowserPlugin = { close: () => Promise<void> };
     type CapGlobal = { Capacitor?: { Plugins?: { App?: CapAppPlugin; Browser?: CapBrowserPlugin }; isPluginAvailable?: (name: string) => boolean } };
 
@@ -79,11 +112,10 @@ export default function DeepLinkHandler() {
         }
 
         const searchParams = new URLSearchParams(url.search);
-        const locale = searchParams.get('locale') || defaultLocale;
+        const validLocale = resolvePreferredLocale(searchParams.get('locale'));
         searchParams.delete('locale');
         searchParams.delete('from_app');
 
-        const validLocale = locales.includes(locale) ? locale : defaultLocale;
         const queryString = searchParams.toString();
         const finalRoute = `/${validLocale}/${path}${queryString ? `?${queryString}` : ''}`;
 
@@ -91,6 +123,53 @@ export default function DeepLinkHandler() {
         router.replace(finalRoute);
       } catch (error) {
         logger.error('Error handling deep link:', error);
+      }
+    };
+
+    // Cold-start deep links (Android app shortcuts, App Links opened while the app
+    // is NOT running). On cold start Capacitor delivers the VIEW intent during
+    // BridgeActivity.onCreate — BEFORE the remote WebView has loaded and this
+    // listener is registered — so the retained `appUrlOpen` replay is unreliable
+    // across the /→/{locale} redirect. The launch URL is reliably available from
+    // App.getLaunchUrl() (native bridge.getIntentUri()), so read it directly.
+    // sessionStorage scopes this to once per WebView session (= once per cold
+    // start); a true relaunch gets a fresh session and re-reads the new launch URL.
+    const LAUNCH_HANDLED_KEY = '__lexi_launch_url_handled';
+
+    const launchUrlHasTarget = (rawUrl: string): boolean => {
+      try {
+        const u = new URL(rawUrl);
+        // Custom scheme (lexiclash://connections): the host carries the target.
+        if (u.protocol !== 'https:' && u.protocol !== 'http:') {
+          return (u.hostname + u.pathname).replace(/^\/+/, '').length > 0;
+        }
+        // App Link / web URL: only route when there's a real path or query —
+        // a bare origin ("https://host/") IS the homepage, so don't redirect.
+        return u.pathname.replace(/^\/+/, '').length > 0 || u.search.length > 0;
+      } catch {
+        return false;
+      }
+    };
+
+    const handleColdStartLaunchUrl = async () => {
+      try {
+        try {
+          if (window.sessionStorage.getItem(LAUNCH_HANDLED_KEY) === '1') return;
+        } catch { /* sessionStorage unavailable — fall through, best-effort */ }
+
+        const AppPlugin = getSyncAppPlugin() ?? (await getAppPlugin());
+        if (!AppPlugin || typeof AppPlugin.getLaunchUrl !== 'function') return;
+
+        const launch = await AppPlugin.getLaunchUrl();
+        const launchUrl = launch?.url;
+        if (!launchUrl || !launchUrlHasTarget(launchUrl) || !mounted) return;
+
+        // Mark consumed BEFORE awaiting the route so a fast remount mid-await
+        // cannot double-fire (appUrlOpen may also replay the same URL).
+        try { window.sessionStorage.setItem(LAUNCH_HANDLED_KEY, '1'); } catch { /* ignore */ }
+        await handleAppUrlOpen({ url: launchUrl });
+      } catch (error) {
+        logger.debug('Cold-start launch URL handling failed:', error);
       }
     };
 
@@ -132,6 +211,9 @@ export default function DeepLinkHandler() {
           }
         });
       }
+
+      // After wiring the warm-start listener, resolve any cold-start launch URL.
+      void handleColdStartLaunchUrl();
     }
 
     async function initPush() {
