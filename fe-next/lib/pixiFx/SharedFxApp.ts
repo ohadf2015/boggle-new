@@ -81,6 +81,13 @@ let deviceConfig: DeviceConfig = DEFAULT_DEVICE;
 let mountPromise: Promise<void> | null = null;
 let coinStreams: CoinStream[] = [];
 let fireworkParticles: FireworkParticle[] = [];
+// `live` gates the ticker so a late frame can't touch graphics mid/post-teardown
+// (JAVASCRIPT-NEXTJS-13Y null-'x' class). `generation` lets a pending init detect
+// that an unmount happened before it settled, so it discards instead of assigning
+// a half-torn-down app (JAVASCRIPT-NEXTJS-15B _cancelResize class).
+let live = false;
+let generation = 0;
+let resizeHandler: (() => void) | null = null;
 
 function isSSR(): boolean {
   return typeof window === 'undefined';
@@ -94,17 +101,33 @@ async function mount(
   if (app) return;
   if (mountPromise) return mountPromise;
 
+  const myGeneration = ++generation;
+
   mountPromise = (async () => {
     deviceConfig = { ...DEFAULT_DEVICE, ...device };
 
     const instance = new Application();
+    // NOTE: no `resizeTo` — it installs Pixi's ResizePlugin, whose destroy()
+    // throws `_cancelResize is not a function` when teardown races init. We size
+    // explicitly and drive resizes ourselves via the listener below.
     await instance.init({
       backgroundAlpha: 0,
       antialias: true,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
-      resizeTo: window,
+      width: window.innerWidth,
+      height: window.innerHeight,
     });
+
+    // unmount() ran while init was pending → discard this instance, don't wire it.
+    if (myGeneration !== generation) {
+      try {
+        instance.destroy(true, { children: true });
+      } catch {
+        // safe: instance may not be fully initialized under a fast unmount
+      }
+      return;
+    }
 
     const canvas = instance.canvas;
     canvas.style.position = 'fixed';
@@ -119,13 +142,20 @@ async function mount(
     pool = new ParticlePool(instance.stage);
 
     tickerFn = (t: { deltaMS: number }) => {
+      if (!live) return; // ignore frames once teardown has begun
       pool?.update(t.deltaMS / 1000);
       updateCoinStreams(t.deltaMS);
       updateFireworks(t.deltaMS);
     };
     instance.ticker.add(tickerFn);
 
+    resizeHandler = () => {
+      instance.renderer?.resize?.(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', resizeHandler);
+
     app = instance;
+    live = true;
   })();
 
   await mountPromise;
@@ -133,6 +163,16 @@ async function mount(
 }
 
 function unmount(): void {
+  // Invalidate any in-flight mount so its init() discards instead of assigning,
+  // and clear mountPromise so the next mount() starts fresh rather than awaiting
+  // the discarded attempt (StrictMode mount→unmount→mount before init settles).
+  generation++;
+  mountPromise = null;
+  live = false;
+  if (resizeHandler) {
+    window.removeEventListener('resize', resizeHandler);
+    resizeHandler = null;
+  }
   if (!app) return;
   if (tickerFn) app.ticker.remove(tickerFn);
   clearCoinStreams();

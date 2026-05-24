@@ -311,5 +311,70 @@ describe('SharedFxApp', () => {
       const initArgs = app.init.mock.calls[0][0];
       expect(initArgs.backgroundAlpha).toBe(0);
     });
+
+    it('does not use resizeTo (avoids Pixi ResizePlugin _cancelResize teardown crash)', async () => {
+      await SharedFxApp.mount(parent);
+      const app = SharedFxApp.getApplication() as unknown as {
+        init: ReturnType<typeof vi.fn>;
+      };
+      const initArgs = app.init.mock.calls[0][0];
+      // resizeTo:window installs a ResizePlugin whose destroy() crashes if init
+      // hasn't fully settled. Size explicitly + manage resize ourselves instead.
+      expect(initArgs.resizeTo).toBeUndefined();
+    });
+  });
+
+  // Teardown-race hardening. SharedFxApp is async-mounted but its consumers can
+  // unmount (route change / StrictMode) before init() settles. Regression cover
+  // for the BlastFxOverlay crashes JAVASCRIPT-NEXTJS-15B (_cancelResize on
+  // destroy) and 13Y (null reading 'x' in a ticker frame after teardown), which
+  // live latently in this singleton once a mount is wired in production.
+  describe('teardown race hardening', () => {
+    it('does not initialize when unmount is requested during pending init (regression: JAVASCRIPT-NEXTJS-15B _cancelResize class)', async () => {
+      const pending = SharedFxApp.mount(parent); // init() resolves on a microtask
+      SharedFxApp.unmount(); // tear down before init settles
+      await expect(pending).resolves.toBeUndefined();
+      expect(SharedFxApp.isInitialized()).toBe(false);
+      expect(SharedFxApp.getApplication()).toBeNull();
+    });
+
+    it('can mount cleanly after an interrupted mount', async () => {
+      const interrupted = SharedFxApp.mount(parent);
+      SharedFxApp.unmount();
+      await interrupted;
+      expect(SharedFxApp.isInitialized()).toBe(false);
+
+      await SharedFxApp.mount(parent);
+      expect(SharedFxApp.isInitialized()).toBe(true);
+    });
+
+    it('re-mounts when mount→unmount→mount interleave before init settles (React StrictMode double-invoke)', async () => {
+      const first = SharedFxApp.mount(parent); // gen N, init pending
+      SharedFxApp.unmount(); // cleanup before init settles
+      const second = SharedFxApp.mount(parent); // must NOT reuse the discarded mount
+      await Promise.all([first, second]);
+      expect(SharedFxApp.isInitialized()).toBe(true);
+    });
+
+    it('removes the window resize listener on unmount', async () => {
+      const removeSpy = vi.spyOn(window, 'removeEventListener');
+      await SharedFxApp.mount(parent);
+      SharedFxApp.unmount();
+      expect(removeSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+      expect(() => window.dispatchEvent(new Event('resize'))).not.toThrow();
+      removeSpy.mockRestore();
+    });
+
+    it('ticker frame is inert after unmount (regression: JAVASCRIPT-NEXTJS-13Y null-x class)', async () => {
+      await SharedFxApp.mount(parent, { maxParticles: 20, prefersReducedMotion: false });
+      const app = SharedFxApp.getApplication() as unknown as {
+        ticker: { listeners: Array<(t: { deltaMS: number }) => void> };
+      };
+      const tickerFn = app.ticker.listeners[0];
+      SharedFxApp.spawnCoinStream({ source: { x: 0, y: 0 }, target: { x: 10, y: 10 }, count: 3 });
+      SharedFxApp.unmount();
+      // A late frame must not touch destroyed graphics.
+      expect(() => tickerFn?.({ deltaMS: 16 })).not.toThrow();
+    });
   });
 });
