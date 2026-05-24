@@ -122,13 +122,24 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
     return () => mediaQuery.removeListener(handleChange);
   }, []);
 
+  // QA affordance: `?cosy=1`/`?cosy=0` forces cosy for the session (in-memory,
+  // not persisted; bypasses the admin gate — cosy is a calmer view, harmless).
+  const [cosyUrlOverride, setCosyUrlOverride] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const raw = new URLSearchParams(window.location.search).get('cosy');
+    if (raw === '1' || raw === 'true') setCosyUrlOverride(true);
+    else if (raw === '0' || raw === 'false') setCosyUrlOverride(false);
+  }, []);
+
   // Resolve the EFFECTIVE preferences: cosy mode ORs every calming flag on.
   // Existing consumers read these through the per-flag hooks below, so cosy
   // propagates everywhere without touching any call site.
   const effective = useMemo(
     () =>
       resolveCosyPreferences({
-        cosyMode: settings.cosyMode,
+        cosyMode: cosyUrlOverride ?? settings.cosyMode,
         reduceMotion: settings.reduceMotion,
         systemPrefersReducedMotion,
         disableFireRoundLights: settings.disableFireRoundLights,
@@ -136,6 +147,7 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
         useLargeLetters: settings.useLargeLetters,
       }),
     [
+      cosyUrlOverride,
       settings.cosyMode,
       settings.reduceMotion,
       systemPrefersReducedMotion,

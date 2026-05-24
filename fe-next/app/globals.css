@@ -3792,33 +3792,119 @@ body.crazygames-embed .game-view-container,
    is. Higher specificity than `:root` so it always wins.
    ============================================================ */
 html[data-cosy='true'] {
-  /* LIME (primary) */
-  --neo-lime: hsl(76 33% 60%);
-  --neo-lime-light: hsl(76 28% 72%);
-  --neo-lime-muted: hsl(76 24% 52%);
-  --neo-lime-dark: hsl(76 28% 42%);
+  /* ---- Calm "parchment-on-dusk" theme. Overrides cascade app-wide via the
+     var-backed neo-* utilities; removing data-cosy reverts instantly. This is
+     the documented calm EXCEPTION to the dark/hard/halftone default in
+     .claude/docs/design-system.md. Palette legibility is locked by
+     lib/cosy/__tests__/calmPalette.contract.test.ts (WCAG floors). ---- */
 
-  /* PINK (multiplayer) */
-  --neo-pink: hsl(328 38% 62%);
-  --neo-pink-light: hsl(328 34% 72%);
-  --neo-pink-muted: hsl(328 28% 56%);
-  --neo-pink-dark: hsl(328 32% 44%);
+  /* Background — warm dusk (white text stays >= AA; contract floor = 6:1) */
+  --neo-navy: hsl(222 13% 23%);
+  --neo-navy-light: hsl(222 12% 28%);
+  --neo-navy-elevated: hsl(222 12% 31%);
+  --neo-navy-radial: hsl(222 13% 25%);
+  --neo-abyss: hsl(222 16% 15%);
+  --neo-abyss-deep: hsl(222 18% 11%);
+  --neo-abyss-mid: hsl(222 16% 17%);
+  --neo-abyss-light: hsl(222 15% 20%);
+  --neo-gray: hsl(222 10% 34%);
 
-  /* CYAN (single player) */
-  --neo-cyan: hsl(180 33% 56%);
-  --neo-cyan-light: hsl(180 30% 68%);
-  --neo-cyan-muted: hsl(180 26% 50%);
-  --neo-cyan-dark: hsl(180 30% 40%);
+  /* Dominant cream card surface + softened structural ink (charcoal, not
+     black). --neo-black recolours every border/shadow/text-stroke/focus-ring
+     globally (it is never used as a background). */
+  --neo-cream: hsl(40 33% 97%);
+  --neo-black: 56 58 72;
 
-  /* PURPLE (brain training) */
-  --neo-purple: hsl(258 32% 66%);
-  --neo-purple-light: hsl(258 30% 76%);
-  --neo-purple-muted: hsl(258 26% 56%);
-  --neo-purple-dark: hsl(258 30% 46%);
+  /* Soft diffuse shadows — kill the hard pixel stamp */
+  --shadow-sm: 0 1px 2px rgba(20, 20, 35, 0.1);
+  --shadow-md: 0 2px 6px rgba(20, 20, 35, 0.1);
+  --shadow-lg: 0 6px 16px rgba(20, 20, 35, 0.12);
+  --shadow-xl: 0 12px 28px rgba(20, 20, 35, 0.14);
+  --shadow-pressed: inset 0 1px 2px rgba(20, 20, 35, 0.12);
 
-  /* Celebratory accents — softened too (cosy = calmer rewards) */
-  --neo-yellow: hsl(49 55% 62%);
-  --neo-yellow-hover: hsl(49 50% 56%);
-  --neo-orange: hsl(20 50% 60%);
-  --neo-orange-hover: hsl(20 48% 54%);
+  /* Thinner borders (colour softens via the charcoal --neo-black above) */
+  --border-neo: 1px;
+  --border-neo-thick: 1.5px;
+
+  /* De-noise — drop the halftone dots + retro grid (consumed on body) */
+  --halftone-pattern: none;
+  --retro-grid-pattern: none;
+
+  /* New calm palette — DISTINCT hues so mode colour-coding survives
+     (lime=primary, pink=MP, cyan=SP, purple=brain). Bright families carry
+     BLACK text (kept light); dark families carry WHITE text (kept dark). */
+  /* LIME -> sage (black text) */
+  --neo-lime: hsl(110 24% 64%);
+  --neo-lime-light: hsl(110 22% 74%);
+  --neo-lime-muted: hsl(110 18% 56%);
+  --neo-lime-dark: hsl(110 22% 46%);
+
+  /* CYAN -> calm teal (black text) */
+  --neo-cyan: hsl(185 30% 64%);
+  --neo-cyan-light: hsl(185 28% 74%);
+  --neo-cyan-muted: hsl(185 24% 56%);
+  --neo-cyan-dark: hsl(185 28% 46%);
+
+  /* PINK -> dusty rose (white text) */
+  --neo-pink: hsl(345 40% 50%);
+  --neo-pink-light: hsl(345 38% 62%);
+  --neo-pink-muted: hsl(345 30% 44%);
+  --neo-pink-dark: hsl(345 36% 38%);
+
+  /* PURPLE -> muted lavender (white text) */
+  --neo-purple: hsl(262 30% 52%);
+  --neo-purple-light: hsl(262 30% 64%);
+  --neo-purple-muted: hsl(262 24% 46%);
+  --neo-purple-dark: hsl(262 30% 40%);
+
+  /* Celebration accents — softened, black text. --neo-red is intentionally
+     NOT overridden: error/destructive stays hot (safety semantics). */
+  --neo-yellow: hsl(45 60% 66%);
+  --neo-yellow-hover: hsl(45 56% 60%);
+  --neo-orange: hsl(28 55% 64%);
+  --neo-orange-hover: hsl(28 52% 58%);
+}
+
+/* ---- Cosy / Calm Mode: structural softening beyond the token overrides.
+   Catches what tokens alone can't reach: the Tailwind shadow-hard* utilities
+   (literal hard stamps that don't read --shadow-*), the decorative texture
+   overlays, and airy spacing/type. ---- */
+
+/* Tailwind shadow-hard* utilities are literal "Npx Npx 0px" stamps; soften
+   them to diffuse under cosy. */
+html[data-cosy='true'] .shadow-hard,
+html[data-cosy='true'] .shadow-hard-sm,
+html[data-cosy='true'] .shadow-hard-lg,
+html[data-cosy='true'] .shadow-hard-xl {
+  box-shadow: 0 4px 12px rgba(20, 20, 35, 0.12) !important;
+}
+html[data-cosy='true'] .shadow-hard-pressed {
+  box-shadow: inset 0 1px 2px rgba(20, 20, 35, 0.12) !important;
+}
+
+/* Suppress decorative halftone/comic texture overlays (pseudo-elements). */
+html[data-cosy='true'] .texture-halftone::before,
+html[data-cosy='true'] .texture-halftone-lg::before,
+html[data-cosy='true'] .texture-halftone-comic::before,
+html[data-cosy='true'] .texture-halftone-comic-light::before {
+  display: none !important;
+}
+
+/* Airy cream cards — more breathing room + soft chrome (the "parchment" feel). */
+html[data-cosy='true'] .card-neo,
+html[data-cosy='true'] .neo-card,
+html[data-cosy='true'] .neo-panel {
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+/* Softer type — lift line-height + letter-spacing, ease heavy weights. */
+html[data-cosy='true'] body {
+  letter-spacing: 0.01em;
+  line-height: 1.65;
+}
+html[data-cosy='true'] h1,
+html[data-cosy='true'] h2,
+html[data-cosy='true'] h3 {
+  font-weight: 600;
 }
