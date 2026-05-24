@@ -5,6 +5,7 @@ import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Clock, Shuffle, RotateCcw, Sparkles, Flame, TrendingUp, ChevronUp, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { computeWheelRadius } from '@/lib/wordWheel/wheelGeometry';
 import { isValidWordWheelWord, type WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
 import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -612,19 +613,18 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // Keep submit ref fresh so double-tap handler (created earlier) can reach the latest closure.
   useEffect(() => { handleSubmitRef.current = handleSubmit; }, [handleSubmit]);
 
-  // Responsive wheel radius based on the wheel div width (not the game container)
+  // Responsive wheel radius based on the wheel div width (not the game container).
+  // The container is height-capped on short viewports (max-w/max-h below), so the
+  // measured width shrinks there and the orbit pulls inward to stay inside the rim.
   const [wheelRadius, setWheelRadius] = useState(96);
   useEffect(() => {
-    const update = () => {
-      if (wheelContainerRef.current) {
-        const w = wheelContainerRef.current.getBoundingClientRect().width;
-        // Radius should keep outer letters inside the wheel div (account for letter size ~60px)
-        setWheelRadius(Math.max(72, Math.min(136, (w - 64) / 2)));
-      }
-    };
+    const el = wheelContainerRef.current;
+    if (!el) return;
+    const update = () => setWheelRadius(computeWheelRadius(el.getBoundingClientRect().width, 136));
     update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
   }, []);
 
   // ── Keyboard input ──
@@ -898,7 +898,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           left a 100–250px gap between the wheel and Submit. The inline-submit
           chip near the word-builder still serves as the primary CTA when the
           found-words list grows past viewport. */}
-      <div className="flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1" data-testid="wheel-cluster">
+      <div className="@container/wheel [container-type:size] flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1" data-testid="wheel-cluster">
       {/* Tap-to-remove + double-tap-to-submit hint — fixed-height reserved
           slot (h-*, not min-h-*) so even font/locale ascender variance can't
           grow the slot when builtLetters mounts/unmounts the hint text. */}
@@ -916,7 +916,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       {/* ── The Wheel ── */}
       <div
         ref={wheelContainerRef}
-        className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 shrink-0 flex items-center justify-center touch-none"
+        // Height-cap (max-*) only binds when smaller than the fixed size, so tall
+        // screens are unchanged while short/landscape ones shrink the wheel to fit
+        // the cluster instead of overlapping the pills above / buttons below.
+        // Reserve ~116px (tap-hint + rule-hint + action bar + gaps); floor 176px.
+        className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 max-w-[max(176px,calc(100cqb-116px))] max-h-[max(176px,calc(100cqb-116px))] shrink-0 flex items-center justify-center touch-none"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -1045,7 +1049,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           inside the cap; only the chip animations move, never the slot. ── */}
       <div
         data-testid="found-words-slot"
-        className="w-full mt-2 h-[112px] sm:h-[136px] flex flex-col"
+        className="w-full mt-2 medium-short:mt-1 h-[112px] sm:h-[136px] medium-short:h-[88px] short:h-16 flex flex-col"
       >
         <h3
           className={cn(

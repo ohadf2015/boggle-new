@@ -19,6 +19,7 @@ import { MyWordsChips, type WordEntry } from './WheelRushPieces';
 import { WheelRushHeader } from './WheelRushHeader';
 import { WheelRushCelebration, type WheelCelebration } from './WheelRushCelebration';
 import { classifyLetterCoverage } from '@/lib/wheelRush/letterCoverage';
+import { computeWheelRadius } from '@/lib/wordWheel/wheelGeometry';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
@@ -490,9 +491,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     const el = wheelContainerRef.current;
     if (!el) return;
     const update = () => {
-      const w = el.getBoundingClientRect().width;
-      const maxR = isDesktopCanvas ? 140 : 96;
-      setWheelRadius(Math.max(56, Math.min(maxR, (w - 56) / 2)));
+      setWheelRadius(computeWheelRadius(el.getBoundingClientRect().width, isDesktopCanvas ? 140 : 96));
     };
     update();
     const ro = new ResizeObserver(update);
@@ -629,15 +628,20 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         </AnimatePresence>
       </div>
 
-      {/* Wheel + actions cluster — kept tight together, vertically centered. */}
-      <div className="flex-1 flex flex-col items-center justify-center min-h-0 gap-3">
+      {/* Wheel + actions cluster — kept tight together, vertically centered.
+          container-type:size lets the wheel's max-* height cap (below) read the
+          cluster's block size via cqb. */}
+      <div className="@container/wheel [container-type:size] flex-1 flex flex-col items-center justify-center min-h-0 gap-3">
         <div
           ref={wheelContainerRef}
           className={cn(
-            "relative flex items-center justify-center touch-none",
+            "relative flex items-center justify-center touch-none shrink-0",
+            // Height-cap binds only when smaller than the fixed size → tall screens
+            // unchanged, short/landscape ones shrink to fit. Reserve ~148px (action
+            // bar + MyWordsChips + gaps, both inside the cluster); floor 176px.
             isDesktopCanvas
               ? "w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96"
-              : "w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72",
+              : "w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 max-w-[max(176px,calc(100cqb-148px))] max-h-[max(176px,calc(100cqb-148px))]",
           )}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}

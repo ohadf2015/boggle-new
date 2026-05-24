@@ -83,9 +83,12 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
         // Invisible hit-area expander (≥48px WCAG AAA). Fixes rageclicks on Hebrew RTL wheel.
         'before:absolute before:-inset-2 before:content-[""]',
         'border-3 border-neo-black rounded-full transition-colors duration-150',
+        // short: (≤600px height) shrinks letters so a height-capped wheel doesn't
+        // collide center↔orbit. Landscape phones are short AND ≥sm/md wide, so the
+        // short:sm/short:md compounds force the shrink to win over width breakpoints.
         isCenter
-          ? 'w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 text-3xl sm:text-4xl md:text-5xl z-10'
-          : 'w-[52px] h-[52px] sm:w-[60px] sm:h-[60px] md:w-[68px] md:h-[68px] text-lg sm:text-xl md:text-2xl',
+          ? 'w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 short:w-16 short:h-16 short:sm:w-16 short:sm:h-16 short:md:w-16 short:md:h-16 text-3xl sm:text-4xl md:text-5xl short:text-2xl short:sm:text-2xl short:md:text-2xl z-10'
+          : 'w-[52px] h-[52px] sm:w-[60px] sm:h-[60px] md:w-[68px] md:h-[68px] short:w-12 short:h-12 short:sm:w-12 short:sm:h-12 short:md:w-12 short:md:h-12 text-lg sm:text-xl md:text-2xl short:text-base short:sm:text-base short:md:text-base',
         isCenter
           ? isUsed
             ? 'bg-neo-lime/40 text-neo-black/40 shadow-hard-lg'
