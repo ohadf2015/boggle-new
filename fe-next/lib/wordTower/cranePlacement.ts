@@ -67,6 +67,25 @@ export function nextConsecutiveSloppy(prev: number, quality: PlacementQuality): 
   return quality === 'perfect' || quality === 'good' ? 0 : prev + 1;
 }
 
+/** Per-perfect bonus added to the height multiplier, and the cap on the run. */
+export const PERFECT_STREAK_STEP = 0.12;
+export const PERFECT_STREAK_BONUS_CAP = 0.5;
+
+/** Next perfect-streak count: a perfect drop extends it, anything else resets. */
+export function nextPerfectStreak(prev: number, quality: PlacementQuality): number {
+  return quality === 'perfect' ? prev + 1 : 0;
+}
+
+/**
+ * Extra height multiplier for a run of perfect drops — the "just one more" hook.
+ * `streak` includes the current drop; a lone perfect (≤1) earns nothing, each
+ * additional perfect adds {@link PERFECT_STREAK_STEP}, capped so it never runs away.
+ */
+export function perfectStreakBonus(streak: number): number {
+  if (streak <= 1) return 0;
+  return Math.min((streak - 1) * PERFECT_STREAK_STEP, PERFECT_STREAK_BONUS_CAP);
+}
+
 /**
  * Crane sweep position at `elapsedMs`, as a signed value in [-1, 1] (0 = centre).
  * A full sweep takes `periodMs`. The UI maps this to pixels; the drop error fed

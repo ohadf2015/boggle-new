@@ -21,8 +21,8 @@ import { WordTowerRivalRail } from './WordTowerRivalRail';
 import { WordTowerLandmarkRail } from './WordTowerLandmarkRail';
 import { milestoneCrossed } from '@/lib/wordTower/milestones';
 import { landmarkCrossed } from '@/lib/wordTower/landmarkMoment';
-import { nextConsecutiveSloppy, type PlacementOutcome } from '@/lib/wordTower/cranePlacement';
 import WordTowerCrane from './WordTowerCrane';
+import { useCraneDrop } from './useCraneDrop';
 import { hazardsCrossed } from '@/lib/wordTower/hazards';
 import { zoneTeaseAt } from '@/lib/wordTower/zoneTease';
 import { newlyUnlocked, type Achievement } from '@/lib/wordTower/achievements';
@@ -168,25 +168,12 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   }, [game.heightM, game.floors.length, game.longestWord, game.longestCombo, rivals]);  
 
   const haptics = useHaptics();
-  const {
-    playCoinCollectSound, playChestOpenSound, playErrorSound,
-    playPerfectWordSound, playWordAcceptedSound,
-  } = useSoundEffects();
+  const { playCoinCollectSound, playChestOpenSound, playErrorSound } = useSoundEffects();
 
   // Crane Stack: tap-to-drop quality scales height (cosy reward-amplifier); a
-  // third bad drop in a row wobbles the just-placed floor off (recoverable).
-  const sloppyRef = useRef(0);
-  const handleCraneDrop = useCallback((o: PlacementOutcome) => {
-    tower.commitPlacement(o.heightMultiplier);
-    sloppyRef.current = nextConsecutiveSloppy(sloppyRef.current, o.quality);
-    if (o.quality === 'perfect') { playPerfectWordSound(); haptics.levelComplete(); }
-    else if (o.topples) {
-      sloppyRef.current = 0; // a topple resets the streak (hazard FX fires its own sound)
-      tower.hazard(1, 'wobble', [`crane-wobble-${Date.now()}`]);
-    }
-    else if (o.quality === 'miss') { playErrorSound(); haptics.bossHit(); }
-    else { playWordAcceptedSound(); haptics.selection(); }
-  }, [tower, playPerfectWordSound, playWordAcceptedSound, playErrorSound, haptics]);
+  // perfect run earns escalating bonus height; a third bad drop in a row wobbles
+  // the just-placed floor off (recoverable). Drop logic lives in useCraneDrop.
+  const crane = useCraneDrop(tower.commitPlacement, tower.hazard);
 
   // Environmental hazards: a bomb low down, a hurricane up high, strike at fixed
   // altitudes and topple the top floors. Detect the crossing → apply the damage
@@ -398,8 +385,8 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {tower.state.pendingWord && (
         <WordTowerCrane
           word={tower.state.pendingWord}
-          consecutiveSloppy={sloppyRef.current}
-          onDrop={handleCraneDrop}
+          consecutiveSloppy={crane.consecutiveSloppy}
+          onDrop={crane.onDrop}
           t={t}
           reducedMotion={reducedMotion}
         />

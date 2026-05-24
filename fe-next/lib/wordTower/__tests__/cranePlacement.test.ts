@@ -3,6 +3,8 @@ import {
   evaluatePlacement,
   nextConsecutiveSloppy,
   craneOffsetAt,
+  nextPerfectStreak,
+  perfectStreakBonus,
 } from '../cranePlacement';
 
 describe('evaluatePlacement — cosy reward amplifier (never a fail-gate)', () => {
@@ -68,6 +70,33 @@ describe('nextConsecutiveSloppy — instability counter', () => {
   it('increments on a bad drop', () => {
     expect(nextConsecutiveSloppy(1, 'sloppy')).toBe(2);
     expect(nextConsecutiveSloppy(2, 'miss')).toBe(3);
+  });
+});
+
+describe('nextPerfectStreak — chaining accurate drops', () => {
+  it('increments on a perfect drop', () => {
+    expect(nextPerfectStreak(0, 'perfect')).toBe(1);
+    expect(nextPerfectStreak(2, 'perfect')).toBe(3);
+  });
+  it('resets on any non-perfect drop', () => {
+    expect(nextPerfectStreak(3, 'good')).toBe(0);
+    expect(nextPerfectStreak(3, 'sloppy')).toBe(0);
+    expect(nextPerfectStreak(3, 'miss')).toBe(0);
+  });
+});
+
+describe('perfectStreakBonus — escalating reward for a run of perfects', () => {
+  it('gives no bonus for a lone perfect', () => {
+    expect(perfectStreakBonus(0)).toBe(0);
+    expect(perfectStreakBonus(1)).toBe(0);
+  });
+  it('grows with the streak', () => {
+    expect(perfectStreakBonus(2)).toBeGreaterThan(0);
+    expect(perfectStreakBonus(4)).toBeGreaterThan(perfectStreakBonus(2));
+  });
+  it('caps so it never runs away', () => {
+    expect(perfectStreakBonus(50)).toBeLessThanOrEqual(0.5);
+    expect(perfectStreakBonus(50)).toBe(perfectStreakBonus(999));
   });
 });
 
