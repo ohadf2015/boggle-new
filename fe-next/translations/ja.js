@@ -5740,6 +5740,7 @@ const ja = {
     "timeLimit": "2分の制限時間",
     "clear": "クリア",
     "shuffle": "シャッフル",
+    "removeLetter": "1文字削除",
     "stealLabel": "スチール",
     "foundWords": "見つかった単語",
     "possibleWords": "可能",

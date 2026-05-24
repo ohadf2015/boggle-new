@@ -5707,6 +5707,7 @@ const sv = {
     "timeLimit": "2 minuters tidsgräns",
     "clear": "Rensa",
     "shuffle": "Blanda",
+    "removeLetter": "Ta bort bokstav",
     "stealLabel": "STJÄL",
     "foundWords": "Hittade ord",
     "possibleWords": "Möjliga",

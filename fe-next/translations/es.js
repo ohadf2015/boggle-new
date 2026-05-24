@@ -5749,6 +5749,7 @@ const es = {
     "timeLimit": "Límite de tiempo: 2 minutos",
     "clear": "Borrar",
     "shuffle": "Mezclar",
+    "removeLetter": "Quitar letra",
     "stealLabel": "ROBAR",
     "foundWords": "Palabras encontradas",
     "possibleWords": "Posibles",

@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Socket } from 'socket.io-client';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import dynamic from 'next/dynamic';
-import { ChevronUp, RotateCcw, Shuffle, Sparkles } from 'lucide-react';
+import { ChevronUp, Delete, RotateCcw, Sparkles } from 'lucide-react';
 import { WheelLetter, WordTile } from '@/components/daily/WordWheelParts';
 import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -105,7 +105,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const wordDir = languageDir(gameLanguage);
   const {
     playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
-    playButtonClickSound, playBoardShuffleSound, playLegendaryWordSound,
+    playButtonClickSound, playLegendaryWordSound,
   } = useSoundEffects();
 
   const prefersReduced = useReducedMotion();
@@ -447,17 +447,12 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     playButtonClickSound();
   }, [playButtonClickSound]);
 
-  const handleShuffle = useCallback(() => {
-    setOuterLetters(prev => {
-      const arr = [...prev];
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    });
-    playBoardShuffleSound();
-  }, [playBoardShuffleSound]);
+  // Remove just the last built letter (backspace). Pairs with Clear (wipe all);
+  // replaces the old shuffle button. Parity with daily WordWheelGame.
+  const handleBackspace = useCallback(() => {
+    setBuiltLetters(prev => prev.slice(0, -1));
+    playButtonClickSound();
+  }, [playButtonClickSound]);
 
   const handleSubmit = useCallback(() => {
     if (!socket || !puzzle || builtLetters.length === 0) return;
@@ -697,7 +692,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
           {t('wordWheel.centerLetterRule') || 'Must include center letter'} &middot; {(t('wordWheel.minLetters') || 'Min {min} letters').replace('{min}', String(MIN_LEN))}
         </p>
 
-        {/* Actions (Clear / Submit / Shuffle) — sit directly under the wheel
+        {/* Actions (Clear / Submit / Remove-last) — sit directly under the wheel
             so the player's thumb stays in the wheel's gravity well. */}
         <div className="flex items-center justify-center gap-3 shrink-0 mt-1">
         <m.button
@@ -737,16 +732,17 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
 
         <m.button
           type="button"
-          onClick={handleShuffle}
+          onClick={handleBackspace}
+          disabled={builtLetters.length === 0}
           className={cn(
             'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-cream shadow-hard',
             'hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
+            'disabled:opacity-30 disabled:cursor-not-allowed',
           )}
-          whileTap={prefersReduced ? {} : { scale: 0.9, rotate: 180 }}
-          transition={{ type: 'spring', stiffness: 300 }}
-          aria-label={t('wordWheel.shuffle') || 'Shuffle'}
+          whileTap={prefersReduced ? {} : { scale: 0.9 }}
+          aria-label={t('wordWheel.removeLetter') || 'Remove letter'}
         >
-          <Shuffle className="w-5 h-5" />
+          <Delete className="w-5 h-5" />
         </m.button>
         </div>
 

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Clock, Shuffle, RotateCcw, Sparkles, Flame, TrendingUp, ChevronUp, Check } from 'lucide-react';
+import { Clock, Delete, RotateCcw, Sparkles, Flame, TrendingUp, ChevronUp, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { computeWheelRadius } from '@/lib/wordWheel/wheelGeometry';
@@ -60,7 +60,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const {
     playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
     playComboSound, playLegendaryWordSound, playEpicVictorySound,
-    playCountdownBeep, playBoardShuffleSound, playButtonClickSound,
+    playCountdownBeep, playButtonClickSound,
     playWordLengthSound,
   } = useSoundEffects();
 
@@ -482,37 +482,13 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     playButtonClickSound();
   }, [playButtonClickSound]);
 
-  // ── Shuffle outer letters ──
-  // builtLetters store positional wheelIndex; after shuffle the same index
-  // maps to a different letter, which would desync the wheel highlight from
-  // the word builder. Remap each built letter to its new position (preferring
-  // unused positions in the case of duplicate letters); drop any that can't
-  // be relocated.
-  const handleShuffle = useCallback(() => {
-    setOuterLetters(prev => {
-      const arr = [...prev];
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      // Remap built letters to new wheel positions
-      setBuiltLetters(prevBuilt => {
-        const claimed = new Set<number>();
-        const remapped: Array<{ letter: string; wheelIndex: number }> = [];
-        for (const bl of prevBuilt) {
-          if (bl.wheelIndex === -1) { remapped.push(bl); continue; } // center letter unaffected
-          const newIdx = arr.findIndex((l, idx) => l === bl.letter && !claimed.has(idx));
-          if (newIdx !== -1) {
-            claimed.add(newIdx);
-            remapped.push({ letter: bl.letter, wheelIndex: newIdx });
-          }
-        }
-        return remapped;
-      });
-      return arr;
-    });
-    playBoardShuffleSound();
-  }, [playBoardShuffleSound]);
+  // ── Remove last letter (backspace) ──
+  // Replaces the old shuffle button. Pairs with Clear (wipe all): a single-step
+  // undo of the most recent letter. Parity with MP Wheel Rush controls.
+  const handleBackspace = useCallback(() => {
+    setBuiltLetters(prev => prev.slice(0, -1));
+    playButtonClickSound();
+  }, [playButtonClickSound]);
 
   // ── Submit word ──
   const handleSubmit = useCallback(async () => {
@@ -1026,19 +1002,20 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           </div>
         </m.button>
 
-        {/* Shuffle */}
+        {/* Remove last letter */}
         <m.button
           type="button"
-          onClick={handleShuffle}
+          onClick={handleBackspace}
+          disabled={builtLetters.length === 0}
           className={cn(
             'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-cream shadow-hard',
             'hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
+            'disabled:opacity-30 disabled:cursor-not-allowed',
           )}
-          whileTap={{ scale: 0.9, rotate: 180 }}
-          transition={{ type: 'spring', stiffness: 300 }}
-          aria-label={t('wordWheel.shuffle')}
+          whileTap={{ scale: 0.9 }}
+          aria-label={t('wordWheel.removeLetter')}
         >
-          <Shuffle className="w-5 h-5" />
+          <Delete className="w-5 h-5" />
         </m.button>
       </div>
       </div>

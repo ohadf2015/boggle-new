@@ -5759,6 +5759,7 @@ const he = {
     "timeLimit": "מגבלת זמן: 2 דקות",
     "clear": "נקה",
     "shuffle": "ערבב",
+    "removeLetter": "מחק אות",
     "stealLabel": "גנוב!",
     "foundWords": "מילים שנמצאו",
     "possibleWords": "אפשרי",

@@ -5750,6 +5750,7 @@ const en = {
     "timeLimit": "2 minute time limit",
     "clear": "Clear",
     "shuffle": "Shuffle",
+    "removeLetter": "Remove letter",
     "stealLabel": "STEAL",
     "foundWords": "Found Words",
     "possibleWords": "Possible",
