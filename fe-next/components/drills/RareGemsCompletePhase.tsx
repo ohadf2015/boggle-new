@@ -55,7 +55,7 @@ export default function RareGemsCompletePhase({
         transition={{ delay: 0.3 }}
         className="text-2xl font-black text-neo-white"
       >
-        {reachedTarget ? t('brain.drills.complete') : t('brain.drills.gameOver')}
+        {reachedTarget ? t('brain.drills.pouchFull') : t('brain.drills.timeUpHaul')}
       </AdaptiveMotion.h2>
       <AdaptiveMotion.div
         initial={{ opacity: 0, y: 20 }}

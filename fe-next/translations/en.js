@@ -6722,6 +6722,10 @@ const en = {
       "patternLength": "Pattern length",
       "targetRareWords": "Target rare words",
       "rareWords": "rare words",
+      "gemPouch": "Gem Pouch",
+      "gemsCollected": "Gems collected",
+      "pouchFull": "Pouch Full!",
+      "timeUpHaul": "Time's Up — Nice Haul!",
       "rarity": {
         "common": "common",
         "uncommon": "uncommon",
@@ -6757,7 +6761,7 @@ const en = {
       },
       "rare-gems": {
         "name": "Rare Gems",
-        "description": "Discover uncommon and rare words"
+        "description": "Fill your gem pouch — the longer the word, the rarer the gem"
       },
       "locked": "Locked",
       "unlock": "Complete level {{level}} to unlock",
@@ -9024,6 +9028,12 @@ const en = {
       "gemsLabel": "Gems",
       "timeLabel": "Time",
       "wordsLabel": "Words"
+    },
+    "feedback": {
+      "checking": "Checking…",
+      "bonusWord": "BONUS WORD!",
+      "bonusHint": "Not on the list — still counts!",
+      "bonusCount": "⭐ {count} bonus"
     },
     "noMoreWords": "No more words possible",
     "giveUp": "End Game",

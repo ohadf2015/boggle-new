@@ -6699,7 +6699,7 @@ const ja = {
       },
       "rare-gems": {
         "name": "レアジェム",
-        "description": "珍しくてレアな単語を発見せよ"
+        "description": "ジェムポーチを満たそう — 長い単語ほどレアなジェムに"
       },
       "locked": "ロック中",
       "unlock": "レベル{{level}}をクリアしてアンロック",
@@ -6724,6 +6724,10 @@ const ja = {
       "patternLength": "パターン長",
       "targetRareWords": "目標レア数",
       "rareWords": "レア語",
+      "gemPouch": "ジェムポーチ",
+      "gemsCollected": "集めたジェム",
+      "pouchFull": "ポーチが満タン！",
+      "timeUpHaul": "時間切れ — いい収穫！",
       "rarity": {
         "common": "普通",
         "uncommon": "レア",
@@ -9118,6 +9122,12 @@ const ja = {
       "coins": "コイン",
       "cascadesLabel": "カスケード",
       "next": "次のレベル"
+    },
+    "feedback": {
+      "checking": "確認中…",
+      "bonusWord": "ボーナスワード！",
+      "bonusHint": "リストにないけどカウントされる！",
+      "bonusCount": "⭐ ボーナス {count}"
     },
     "noMoreWords": "もう単語がありません",
     "giveUp": "ゲーム終了",

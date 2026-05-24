@@ -6715,7 +6715,7 @@ const es = {
       },
       "rare-gems": {
         "name": "Gemas Raras",
-        "description": "Descubre palabras poco comunes y raras"
+        "description": "Llena tu bolsa de gemas — cuanto más larga la palabra, más rara la gema"
       },
       "locked": "Bloqueado",
       "unlock": "Completa nivel {{level}} para desbloquear",
@@ -6740,6 +6740,10 @@ const es = {
       "patternLength": "Largo del patrón",
       "targetRareWords": "Meta: palabras raras",
       "rareWords": "palabras raras",
+      "gemPouch": "Bolsa de gemas",
+      "gemsCollected": "Gemas recogidas",
+      "pouchFull": "¡Bolsa llena!",
+      "timeUpHaul": "¡Se acabó el tiempo — buen botín!",
       "rarity": {
         "common": "común",
         "uncommon": "rara",
@@ -9175,6 +9179,12 @@ const es = {
       "coins": "Monedas",
       "cascadesLabel": "Cascadas",
       "next": "Siguiente nivel"
+    },
+    "feedback": {
+      "checking": "Comprobando…",
+      "bonusWord": "¡PALABRA EXTRA!",
+      "bonusHint": "No está en la lista, ¡pero cuenta!",
+      "bonusCount": "⭐ {count} extra"
     },
     "noMoreWords": "No hay más palabras posibles",
     "giveUp": "Terminar juego",

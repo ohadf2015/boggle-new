@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { Gem, Star, Clock } from 'lucide-react';
+import { Gem, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
@@ -12,6 +12,17 @@ import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import RareGemsCompletePhase from './RareGemsCompletePhase';
+import GemPouchMeter from './GemPouchMeter';
+import GemFindPopup from './GemFindPopup';
+import PouchFullBeat from './PouchFullBeat';
+import {
+  classifyGem,
+  gemValue,
+  GEM_POINTS,
+  celebrationFor,
+  computeGemProgress,
+  type CelebrationLevel,
+} from '@/lib/drills/rareGems';
 import type { LetterGrid, Language } from '@/types';
 
 // Level configurations
@@ -23,27 +34,12 @@ const LEVEL_CONFIGS = [
   { level: 5, timeLimit: 45, targetRare: 15, targetScore: 500 },
 ];
 
-// Word rarity based on length (adjusted for fair gameplay - max 5 letters for rare)
-const getWordRarity = (word: string): 'common' | 'uncommon' | 'rare' | 'legendary' => {
-  const len = word.length;
-  if (len >= 6) return 'legendary';  // 6+ letters = legendary
-  if (len >= 5) return 'rare';       // 5 letters = rare
-  if (len >= 4) return 'uncommon';   // 4 letters = uncommon
-  return 'common';                   // 3 letters = common
-};
-
+// Gem-tier → swatch colour (UI only; tier + points live in lib/drills/rareGems).
 const RARITY_COLORS = {
   common: 'bg-gray-400',
   uncommon: 'bg-neo-green',
   rare: 'bg-neo-purple',
   legendary: 'bg-neo-lime',
-};
-
-const RARITY_POINTS = {
-  common: 10,
-  uncommon: 25,
-  rare: 50,
-  legendary: 100,
 };
 
 interface RareGemsProps {
@@ -80,7 +76,15 @@ export default function RareGems({
   onPlayAgain,
 }: RareGemsProps) {
   const { t, dir } = useLanguage();
-  const { playErrorSound, playDrillStartSound, playDrillCompleteSound } = useSoundEffects();
+  const {
+    playErrorSound,
+    playDrillStartSound,
+    playDrillCompleteSound,
+    playWordAcceptedSound,
+    playRareWordSound,
+    playLegendaryWordSound,
+    playChestOpenSound,
+  } = useSoundEffects();
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
@@ -88,10 +92,13 @@ export default function RareGems({
   const [timeRemaining, setTimeRemaining] = useState(levelConfig.timeLimit);
   const [wordsFound, setWordsFound] = useState<{ word: string; rarity: string }[]>([]);
   const [score, setScore] = useState(0);
-  const [lastWord, setLastWord] = useState<{ word: string; rarity: string; points: number } | null>(null);
+  const [lastWord, setLastWord] = useState<{ word: string; rarity: string; points: number; celebration: CelebrationLevel } | null>(null);
   const [feedback, setFeedback] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
+  // Brief "Pouch Full!" celebration beat before flipping to the results phase.
+  const [pouchFull, setPouchFull] = useState(false);
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const winBeatRef = useRef<NodeJS.Timeout | null>(null);
 
   const foundWordStrings = useMemo(
     () => wordsFound.map(w => w.word),
@@ -118,14 +125,14 @@ export default function RareGems({
     minWordLength: 2,
   });
 
-  const rareWordsFound = wordsFound.filter(w =>
-    w.rarity === 'rare' || w.rarity === 'legendary'
-  ).length;
+  const progress = computeGemProgress(wordsFound, levelConfig.targetRare);
+  const rareWordsFound = progress.rareCount;
 
   // Start game
   const startGame = useCallback(() => {
     playDrillStartSound();
     setPhase('playing');
+    setPouchFull(false);
     setTimeRemaining(levelConfig.timeLimit);
     setWordsFound([]);
     setScore(0);
@@ -154,25 +161,50 @@ export default function RareGems({
       return;
     }
 
-    // Valid word!
-    const rarity = getWordRarity(word);
-    const points = RARITY_POINTS[rarity];
+    // Valid word — mine a gem! Tier + points come from the pure lib.
+    const rarity = classifyGem(word);
+    const points = gemValue(rarity);
+    const celebration = celebrationFor(rarity);
+
+    // Escalating find ceremony: bigger gem → louder, richer feedback.
+    switch (celebration) {
+      case 'epic': playLegendaryWordSound(); break;
+      case 'big': playRareWordSound(); break;
+      default: playWordAcceptedSound(); break;
+    }
+
     setWordsFound(prev => [...prev, { word: upperWord, rarity }]);
     setScore(prev => prev + points);
-    setLastWord({ word: upperWord, rarity, points });
+    setLastWord({ word: upperWord, rarity, points, celebration });
     setFeedback({ message: `+${points} ${t('brain.drills.points')} (${t(`brain.drills.rarity.${rarity}`)})`, type: 'success' });
     setTimeout(() => {
       setLastWord(null);
       setFeedback(null);
     }, 1500);
 
-    if (rareWordsFound + (rarity === 'rare' || rarity === 'legendary' ? 1 : 0) >= levelConfig.targetRare) {
+    const willComplete =
+      rareWordsFound + (rarity === 'rare' || rarity === 'legendary' ? 1 : 0) >=
+      levelConfig.targetRare;
+    if (willComplete) {
       if (timerRef.current) clearInterval(timerRef.current);
       const bonusTime = timeRemaining * 2;
       setScore(prev => prev + bonusTime);
-      setPhase('complete');
+      // Cosy payoff: a short "Pouch Full!" beat before the results phase.
+      setPouchFull(true);
+      playChestOpenSound();
+      winBeatRef.current = setTimeout(() => setPhase('complete'), 900);
     }
-  }, [validateWord, rareWordsFound, levelConfig.targetRare, timeRemaining, t]);
+  }, [
+    validateWord,
+    rareWordsFound,
+    levelConfig.targetRare,
+    timeRemaining,
+    t,
+    playWordAcceptedSound,
+    playRareWordSound,
+    playLegendaryWordSound,
+    playChestOpenSound,
+  ]);
 
   // Finish game early (saves progress)
   const finishGame = useCallback(() => {
@@ -201,12 +233,13 @@ export default function RareGems({
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      if (winBeatRef.current) clearTimeout(winBeatRef.current);
     };
   }, []);
 
   return (
     <div dir={dir} className={cn(
-      'flex flex-col h-full',
+      'relative flex flex-col h-full',
       'bg-neo-navy'
     )}>
       {/* Header */}
@@ -232,26 +265,25 @@ export default function RareGems({
               {timeRemaining}s
             </span>
           </div>
-
-          {/* Rare count */}
-          <div className={cn(
-            'flex items-center gap-1 px-2 py-1 rounded border-2 border-neo-black',
-            'bg-slate-700'
-          )}>
-            <Gem className="w-4 h-4 text-neo-purple" />
-            <span className={cn(
-              'font-bold text-sm',
-              'text-neo-white'
-            )}>
-              {rareWordsFound}/{levelConfig.targetRare}
-            </span>
-          </div>
         </div>
 
         <div aria-live="polite" className="px-3 py-1 rounded-neo border-2 border-neo-black font-bold bg-neo-lime text-neo-black">
           {score} {t('brain.drills.points')}
         </div>
       </div>
+
+      {/* Gem Pouch — the felt-progress meter (replaces the old tiny count chip) */}
+      {phase === 'playing' && (
+        <div className="px-4 py-2 border-b-2 border-neo-black bg-slate-800">
+          <GemPouchMeter
+            rareCount={rareWordsFound}
+            target={levelConfig.targetRare}
+            fraction={progress.fraction}
+            totalGems={progress.totalGems}
+            t={t}
+          />
+        </div>
+      )}
 
       {/* Rarity Legend */}
       {phase === 'playing' && (
@@ -264,7 +296,7 @@ export default function RareGems({
             <div key={rarity} className="flex items-center gap-1">
               <div className={cn('w-3 h-3 rounded border border-neo-black', color)} />
               <span className={'text-neo-white/70'}>
-                {t(`brain.drills.rarity.${rarity}`)} (+{RARITY_POINTS[rarity as keyof typeof RARITY_POINTS]})
+                {t(`brain.drills.rarity.${rarity}`)} (+{GEM_POINTS[rarity as keyof typeof GEM_POINTS]})
               </span>
             </div>
           ))}
@@ -357,28 +389,8 @@ export default function RareGems({
               </AdaptiveAnimatePresence>
             </div>
 
-            {/* Word popup */}
-            <AdaptiveAnimatePresence>
-              {lastWord && (
-                <AdaptiveMotion.div
-                  initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className={cn(
-                    'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-                    'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard',
-                    RARITY_COLORS[lastWord.rarity as keyof typeof RARITY_COLORS]
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    {lastWord.rarity === 'legendary' && <Star className="w-5 h-5 text-neo-black" />}
-                    {lastWord.rarity === 'rare' && <Gem className="w-5 h-5 text-neo-black" />}
-                    <span className="font-black text-neo-black">{lastWord.word}</span>
-                    <span className="font-bold text-neo-black">+{lastWord.points}</span>
-                  </div>
-                </AdaptiveMotion.div>
-              )}
-            </AdaptiveAnimatePresence>
+            {/* Escalating gem find ceremony — bigger gem pops bigger. */}
+            <GemFindPopup find={lastWord} />
 
             {/* Found words — always-rendered, fixed height: scrolls instead of
                 growing, so the centered grid never re-positions on submit (CLS fix). */}
@@ -453,6 +465,9 @@ export default function RareGems({
           />
         )}
       </div>
+
+      {/* "Pouch Full!" win beat — a short cosy payoff before the results phase. */}
+      <PouchFullBeat visible={pouchFull && phase === 'playing'} t={t} />
     </div>
   );
 }

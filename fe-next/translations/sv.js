@@ -6673,7 +6673,7 @@ const sv = {
       },
       "rare-gems": {
         "name": "Sällsynta ädelstenar",
-        "description": "Upptäck ovanliga och sällsynta ord"
+        "description": "Fyll din ädelstenspåse — ju längre ord, desto sällsyntare ädelsten"
       },
       "locked": "Låst",
       "unlock": "Slutför nivå {{level}} för att låsa upp",
@@ -6698,6 +6698,10 @@ const sv = {
       "patternLength": "Mönsterlängd",
       "targetRareWords": "Mål: sällsynta ord",
       "rareWords": "sällsynta ord",
+      "gemPouch": "Ädelstenspåse",
+      "gemsCollected": "Insamlade ädelstenar",
+      "pouchFull": "Påsen är full!",
+      "timeUpHaul": "Tiden är ute — fin fångst!",
       "rarity": {
         "common": "vanlig",
         "uncommon": "ovanlig",
@@ -9092,6 +9096,12 @@ const sv = {
       "coins": "Mynt",
       "cascadesLabel": "Kaskader",
       "next": "Nästa nivå"
+    },
+    "feedback": {
+      "checking": "Kollar…",
+      "bonusWord": "BONUSORD!",
+      "bonusHint": "Inte på listan – räknas ändå!",
+      "bonusCount": "⭐ {count} bonus"
     },
     "noMoreWords": "Inga fler ord möjliga",
     "giveUp": "Avsluta spel",

@@ -6693,7 +6693,7 @@ const he = {
       },
       "rare-gems": {
         "name": "אבנים נדירות",
-        "description": "גלה מילים לא נפוצות ונדירות"
+        "description": "מלא את שק האבנים — ככל שהמילה ארוכה יותר, האבן נדירה יותר"
       },
       "locked": "נעול",
       "unlock": "השלם רמה {{level}} לפתיחה",
@@ -6718,6 +6718,10 @@ const he = {
       "patternLength": "אורך דפוס",
       "targetRareWords": "יעד: מילים נדירות",
       "rareWords": "מילים נדירות",
+      "gemPouch": "שק האבנים",
+      "gemsCollected": "אבנים שנאספו",
+      "pouchFull": "השק מלא!",
+      "timeUpHaul": "הזמן נגמר — שלל יפה!",
       "rarity": {
         "common": "רגיל",
         "uncommon": "נדיר",
@@ -9358,6 +9362,12 @@ const he = {
       "gemsLabel": "יהלומים",
       "timeLabel": "זמן",
       "wordsLabel": "מילים"
+    },
+    "feedback": {
+      "checking": "בודק…",
+      "bonusWord": "מילת בונוס!",
+      "bonusHint": "לא ברשימה — ועדיין נספרת!",
+      "bonusCount": "⭐ {count} בונוס"
     },
     "noMoreWords": "אין עוד מילים אפשריות",
     "giveUp": "סיום משחק",
