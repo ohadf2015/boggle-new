@@ -21,6 +21,8 @@ import { WordTowerRivalRail } from './WordTowerRivalRail';
 import { WordTowerLandmarkRail } from './WordTowerLandmarkRail';
 import { milestoneCrossed } from '@/lib/wordTower/milestones';
 import { landmarkCrossed } from '@/lib/wordTower/landmarkMoment';
+import { nextConsecutiveSloppy, type PlacementOutcome } from '@/lib/wordTower/cranePlacement';
+import WordTowerCrane from './WordTowerCrane';
 import { hazardsCrossed } from '@/lib/wordTower/hazards';
 import { zoneTeaseAt } from '@/lib/wordTower/zoneTease';
 import { newlyUnlocked, type Achievement } from '@/lib/wordTower/achievements';
@@ -166,7 +168,22 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   }, [game.heightM, game.floors.length, game.longestWord, game.longestCombo, rivals]);  
 
   const haptics = useHaptics();
-  const { playCoinCollectSound, playChestOpenSound, playErrorSound } = useSoundEffects();
+  const {
+    playCoinCollectSound, playChestOpenSound, playErrorSound,
+    playPerfectWordSound, playWordAcceptedSound,
+  } = useSoundEffects();
+
+  // Crane Stack: build a word → it swings on the crane → tap to drop. The drop
+  // quality scales the height granted (cosy reward-amplifier). Track the bad-drop
+  // streak so a third miss in a row can wobble (recoverable) — see cranePlacement.
+  const sloppyRef = useRef(0);
+  const handleCraneDrop = useCallback((o: PlacementOutcome) => {
+    tower.commitPlacement(o.heightMultiplier);
+    sloppyRef.current = nextConsecutiveSloppy(sloppyRef.current, o.quality);
+    if (o.quality === 'perfect') { playPerfectWordSound(); haptics.levelComplete(); }
+    else if (o.quality === 'miss') { playErrorSound(); haptics.bossHit(); }
+    else { playWordAcceptedSound(); haptics.selection(); }
+  }, [tower, playPerfectWordSound, playWordAcceptedSound, playErrorSound, haptics]);
 
   // Environmental hazards: a bomb low down, a hurricane up high, strike at fixed
   // altitudes and topple the top floors. Detect the crossing → apply the damage
@@ -291,7 +308,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
-      if (e.key === 'Enter') { e.preventDefault(); tower.submit(); return; }
+      if (e.key === 'Enter') { e.preventDefault(); tower.hold(); return; }
       if (e.key === 'Backspace') { e.preventDefault(); tower.backspace(); return; }
       if (e.key === 'Escape') { tower.clear(); return; }
       if (e.key.length !== 1) return;
@@ -372,6 +389,17 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         >
           {landmarkText}
         </div>
+      )}
+
+      {/* Crane Stack — the held word swings; tap to drop it onto the tower. */}
+      {tower.state.pendingWord && (
+        <WordTowerCrane
+          word={tower.state.pendingWord}
+          consecutiveSloppy={sloppyRef.current}
+          onDrop={handleCraneDrop}
+          t={t}
+          reducedMotion={reducedMotion}
+        />
       )}
 
       {/* Hazard "tower ruined" banner — bold + red so the loss is unmissable */}
@@ -457,7 +485,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           onSelectTile={selectTileHaptic}
           onBackspace={tower.backspace}
           onClear={tower.clear}
-          onSubmit={tower.submit}
+          onSubmit={tower.hold}
           onScramble={tower.scramble}
           onDeckHeight={onDeckHeight}
           t={t}

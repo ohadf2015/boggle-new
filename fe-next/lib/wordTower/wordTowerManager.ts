@@ -183,6 +183,8 @@ export interface WordTowerFloor {
   word: string;
   len: number;
   meters: number;
+  /** Crane Stack drop quality applied to this floor's height (default 1). */
+  placementMultiplier?: number;
 }
 export interface WordTowerPlayerState {
   gameCode: string;
@@ -281,16 +283,19 @@ export interface ApplyResult {
   biome: WordTowerBiomeId;
 }
 
-/** Apply an already-validated word. Returns a new state plus a result for FX/telemetry. */
+/** Apply an already-validated word. Returns a new state plus a result for FX/telemetry.
+ *  `placementMultiplier` (default 1) scales the height granted — the Crane Stack
+ *  layer feeds 0.3–1.4 here so a well-placed drop climbs farther. */
 export function applyTowerWord(
   state: WordTowerPlayerState,
   word: string,
+  placementMultiplier = 1,
 ): { state: WordTowerPlayerState; result: ApplyResult } {
   const { language } = state;
   const w = canon(word, language);
   const len = w.length;
   const combo = state.combo + 1;
-  const meters = floorMeters(len, combo);
+  const meters = floorMeters(len, combo) * placementMultiplier;
   const heightBefore = state.heightM;
   const heightM = heightBefore + meters;
 
@@ -321,7 +326,7 @@ export function applyTowerWord(
 
   const next: WordTowerPlayerState = {
     ...state,
-    floors: [...state.floors, { word: w, len, meters }],
+    floors: [...state.floors, { word: w, len, meters, placementMultiplier }],
     heightM,
     combo,
     anchorLetter: nextChainAnchor(word, language),

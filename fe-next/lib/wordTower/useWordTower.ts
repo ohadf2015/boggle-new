@@ -39,6 +39,8 @@ export interface WordTowerUIState {
   lastHazard: HazardEvent | null;
   /** Bumps on every hazard strike so the banner/FX re-fire. */
   hazardKey: number;
+  /** Crane Stack: a validated word held for placement, awaiting the drop. */
+  pendingWord: string | null;
 }
 
 type Action =
@@ -46,6 +48,9 @@ type Action =
   | { type: 'backspace' }
   | { type: 'clear' }
   | { type: 'submit'; isInDictionary: (canonWord: string) => boolean }
+  | { type: 'hold'; isInDictionary: (canonWord: string) => boolean }
+  | { type: 'commitPlacement'; multiplier: number }
+  | { type: 'cancelPlacement' }
   | { type: 'scramble' }
   | { type: 'rerollStart'; isViableAnchor?: (anchor: string, tray: string[]) => boolean }
   | { type: 'hazard'; floors: number; kind: HazardKind; ids: string[] }
@@ -85,6 +90,32 @@ function reducer(state: WordTowerUIState, action: Action): WordTowerUIState {
         lastError: null,
       };
     }
+    case 'hold': {
+      // Crane step 1: validate the built word and hand it to the crane. The word
+      // is NOT committed yet — the drop (commitPlacement) finalises it.
+      const word = currentWord(state);
+      const v = validateTowerWord(state.game, word, action.isInDictionary);
+      if (!v.accepted) {
+        return { ...state, lastError: v.error ?? null, errorKey: state.errorKey + 1, selected: [] };
+      }
+      return { ...state, pendingWord: word, selected: [], lastError: null };
+    }
+    case 'commitPlacement': {
+      // Crane step 2: drop. Apply the held word scaled by the placement quality.
+      if (!state.pendingWord) return state;
+      const { state: nextGame, result } = applyTowerWord(state.game, state.pendingWord, action.multiplier);
+      return {
+        ...state,
+        game: nextGame,
+        pendingWord: null,
+        lastResult: result,
+        resultKey: state.resultKey + 1,
+        lastError: null,
+      };
+    }
+    case 'cancelPlacement':
+      if (!state.pendingWord) return state;
+      return { ...state, pendingWord: null };
     case 'hazard': {
       // Always record the ids as fired (so the strike never re-triggers), even if
       // there were no floors left to topple.
@@ -113,7 +144,7 @@ function reducer(state: WordTowerUIState, action: Action): WordTowerUIState {
 }
 
 function makeInitial(game: WordTowerPlayerState): WordTowerUIState {
-  return { game, selected: [], lastResult: null, resultKey: 0, lastError: null, errorKey: 0, lastHazard: null, hazardKey: 0 };
+  return { game, selected: [], lastResult: null, resultKey: 0, lastError: null, errorKey: 0, lastHazard: null, hazardKey: 0, pendingWord: null };
 }
 
 export interface UseWordTowerOpts {
@@ -143,6 +174,9 @@ export function useWordTower(opts: UseWordTowerOpts) {
       backspace: () => dispatch({ type: 'backspace' }),
       clear: () => dispatch({ type: 'clear' }),
       submit: () => dispatch({ type: 'submit', isInDictionary: dictRef.current }),
+      hold: () => dispatch({ type: 'hold', isInDictionary: dictRef.current }),
+      commitPlacement: (multiplier: number) => dispatch({ type: 'commitPlacement', multiplier }),
+      cancelPlacement: () => dispatch({ type: 'cancelPlacement' }),
       scramble: () => dispatch({ type: 'scramble' }),
       reroll: (isViableAnchor?: (anchor: string, tray: string[]) => boolean) => dispatch({ type: 'rerollStart', isViableAnchor }),
       hazard: (floors: number, kind: HazardKind, ids: string[]) => dispatch({ type: 'hazard', floors, kind, ids }),

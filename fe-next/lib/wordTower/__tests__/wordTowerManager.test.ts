@@ -189,6 +189,20 @@ describe('wordTowerManager — apply', () => {
     expect(state.tray).toHaveLength(WORD_TOWER_TRAY_SIZE); // refilled
   });
 
+  it('scales meters by the crane placement multiplier', () => {
+    const base = applyTowerWord(freshState(), 'cat').result.meters;
+    const { state, result } = applyTowerWord(freshState(), 'cat', 0.5);
+    expect(result.meters).toBeCloseTo(base * 0.5);
+    expect(state.heightM).toBeCloseTo(base * 0.5);
+    expect(state.floors[0].placementMultiplier).toBeCloseTo(0.5);
+  });
+
+  it('defaults the placement multiplier to 1 (no crane = unchanged behaviour)', () => {
+    const noArg = applyTowerWord(freshState(), 'cat').result.meters;
+    const explicitOne = applyTowerWord(freshState(), 'cat', 1).result.meters;
+    expect(noArg).toBeCloseTo(explicitOne);
+  });
+
   it('earns a scramble when crossing the meter threshold', () => {
     const s = freshState();
     s.heightM = WORD_TOWER_SCRAMBLE_EARN_EVERY_M - 1; // 24m, one floor crosses 25m

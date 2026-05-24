@@ -36,6 +36,72 @@ describe('useWordTower', () => {
     expect(result.current.state.lastResult).not.toBeNull();
   });
 
+  describe('crane two-step: hold → commitPlacement', () => {
+    it('hold validates and stashes the word WITHOUT committing it', () => {
+      const { result } = setup(acceptAll);
+      act(() => result.current.selectTile(0));
+      act(() => result.current.selectTile(1));
+      const expected = result.current.word;
+
+      act(() => result.current.hold());
+
+      expect(result.current.state.pendingWord).toBe(expected);
+      expect(result.current.state.game.floors).toHaveLength(0); // not committed yet
+      expect(result.current.state.selected).toEqual([]);        // tiles taken by the crane
+    });
+
+    it('a rejected hold errors and stashes nothing (no crane for a bad word)', () => {
+      const { result } = setup(rejectAll);
+      act(() => result.current.selectTile(0));
+      act(() => result.current.selectTile(1));
+      act(() => result.current.hold());
+
+      expect(result.current.state.pendingWord).toBeNull();
+      expect(result.current.state.lastError).toBe('not_in_dictionary');
+    });
+
+    it('commitPlacement applies the held word scaled by the drop multiplier', () => {
+      const { result } = setup(acceptAll);
+      act(() => result.current.selectTile(0));
+      act(() => result.current.selectTile(1));
+      act(() => result.current.hold());
+      act(() => result.current.commitPlacement(1.4));
+
+      expect(result.current.state.game.floors).toHaveLength(1);
+      expect(result.current.state.pendingWord).toBeNull();
+      expect(result.current.state.resultKey).toBe(1);
+      const floor = result.current.state.game.floors[0];
+      expect(floor.placementMultiplier).toBeCloseTo(1.4);
+    });
+
+    it('a perfect drop (×1.4) climbs higher than a sloppy one (×0.6)', () => {
+      const perfect = setup(acceptAll);
+      act(() => perfect.result.current.selectTile(0));
+      act(() => perfect.result.current.selectTile(1));
+      act(() => perfect.result.current.hold());
+      act(() => perfect.result.current.commitPlacement(1.4));
+
+      const sloppy = setup(acceptAll);
+      act(() => sloppy.result.current.selectTile(0));
+      act(() => sloppy.result.current.selectTile(1));
+      act(() => sloppy.result.current.hold());
+      act(() => sloppy.result.current.commitPlacement(0.6));
+
+      expect(perfect.result.current.state.game.heightM)
+        .toBeGreaterThan(sloppy.result.current.state.game.heightM);
+    });
+
+    it('cancelPlacement drops the held word without committing', () => {
+      const { result } = setup(acceptAll);
+      act(() => result.current.selectTile(0));
+      act(() => result.current.hold());
+      act(() => result.current.cancelPlacement());
+
+      expect(result.current.state.pendingWord).toBeNull();
+      expect(result.current.state.game.floors).toHaveLength(0);
+    });
+  });
+
   it('rejects a non-dictionary word: sets error, bumps errorKey, no floor', () => {
     const { result } = setup(rejectAll);
     act(() => result.current.selectTile(0));
