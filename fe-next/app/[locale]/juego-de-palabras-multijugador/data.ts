@@ -14,7 +14,7 @@ export const HERO_TILES: Tile[] = [
 export const STATS = [
   { num: '10K+', label: 'palabras ES', color: 'text-neo-lime' },
   { num: '0€', label: 'precio total', color: 'text-neo-pink' },
-  { num: '2-8', label: 'jugadores', color: 'text-neo-cyan' },
+  { num: '2-50', label: 'jugadores', color: 'text-neo-cyan' },
   { num: '5', label: 'idiomas', color: 'text-neo-purple-light' },
 ];
 
@@ -85,6 +85,24 @@ export const MODES = [
     rot: 'rotate-1',
   },
 ];
+
+export type CompareCell = boolean | string;
+
+export const COMPARISON: {
+  columns: [string, string, string];
+  rows: { label: string; cells: [CompareCell, CompareCell, CompareCell] }[];
+} = {
+  columns: ['LexiClash', 'Scrabble (app)', 'Apalabrados'],
+  rows: [
+    { label: '100 % gratis, sin pagar por ganar', cells: [true, 'Compras', 'Compras'] },
+    { label: 'Sin registro ni descarga', cells: [true, false, false] },
+    { label: 'Multijugador en tiempo real', cells: ['2-50', 'Por turnos', 'Por turnos'] },
+    { label: 'Diccionario español 10.000+', cells: [true, true, true] },
+    { label: 'Modos de juego', cells: ['8 modos', '1', '1'] },
+    { label: 'Juega en el navegador', cells: [true, 'Solo app', 'Solo app'] },
+    { label: 'Sin anuncios entre rondas', cells: [true, false, false] },
+  ],
+};
 
 export const FAQ_ACCENTS = [
   'border-neo-pink shadow-hard-pink',

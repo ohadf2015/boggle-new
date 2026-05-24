@@ -9,6 +9,8 @@ import { StepsSection } from './components/StepsSection';
 import { ModesShowcase } from './components/ModesShowcase';
 import { FaqAccordion } from './components/FaqAccordion';
 import { BottomCTA } from './components/BottomCTA';
+import { ComparisonTable } from './components/ComparisonTable';
+import { PageScrollFx } from './components/PageScrollFx';
 import { FAQS } from './data';
 
 
@@ -25,7 +27,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Scrabble Online en Español Gratis — Sin Registro | LexiClash',
-    description: 'Juega scrabble online en español gratis — sin registro, sin descarga. Partidas en tiempo real para 2-20 jugadores. Crea sala, invita con enlace. 10.000+ palabras.',
+    description: 'Juega scrabble online en español gratis — sin registro, sin descarga. Partidas en tiempo real para 2-50 jugadores. Crea sala, invita con enlace. 10.000+ palabras.',
     keywords: 'cruzaletras online, apalabrados online gratis, scrabble en linea, scrabble en línea español, jugar scrabble online en español, alternativa a scrabble online español multijugador, juego como scrabble online en español gratis, alternativa scrabble multijugador online, scrabble online en español multijugador, jugar scrabble gratis multijugador, juegos de palabras online multijugador, juego de palabras multijugador, boggle online en español, juego de palabras online gratis, batalla de palabras tiempo real, juegos de letras online',
     openGraph: {
       title: 'Scrabble Online en Español Gratis — Sin Registro | LexiClash',
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: pageUrl,
       images: [
         {
-          url: `${BASE_URL}/og-image-es.webp`,
+          url: `${BASE_URL}/og-image-es-multiplayer.webp`,
           width: 1200,
           height: 630,
           alt: 'LexiClash - Alternativa a Scrabble Online en Español Multijugador',
@@ -46,7 +48,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: 'Scrabble Online en Español Gratis — Sin Registro | LexiClash',
       description: 'Juega scrabble online en español con amigos. Sala con enlace, tiempo real, sin registro. ¡100% gratis!',
-      images: [`${BASE_URL}/og-image-es.webp`],
+      images: [`${BASE_URL}/og-image-es-multiplayer.webp`],
     },
     alternates: {
       canonical: pageUrl,
@@ -99,7 +101,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
         name="LexiClash - Alternativa a Scrabble Online en Español Multijugador"
         description="Alternativa al estilo Scrabble online en español multijugador gratis. Crea sala, comparte enlace, compite en tiempo real con amigos. 10,000+ palabras, sin registro, sin descargas."
         playMode="MultiPlayer"
-        numberOfPlayers={{ minValue: 2, maxValue: 8 }}
+        numberOfPlayers={{ minValue: 2, maxValue: 50 }}
       />
       <script
         type="application/ld+json"
@@ -122,7 +124,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
                 totalTime: 'PT1M',
                 step: [
                   { '@type': 'HowToStep', name: 'Abrir LexiClash', text: 'Entra a lexiclash.live desde cualquier navegador en móvil, tablet o computadora. No requiere descarga.' },
-                  { '@type': 'HowToStep', name: 'Crear una sala', text: 'Pulsa "Crear sala" y comparte el enlace por WhatsApp, Discord o mensaje directo. Hasta 20 jugadores pueden unirse.' },
+                  { '@type': 'HowToStep', name: 'Crear una sala', text: 'Pulsa "Crear sala" y comparte el enlace por WhatsApp, Discord o mensaje directo. Hasta 50 jugadores pueden unirse.' },
                   { '@type': 'HowToStep', name: 'Encontrar palabras en tiempo real', text: 'Todos ven la misma cuadrícula al mismo tiempo. Haz clic o arrastra para formar palabras — las más largas dan más puntos. Partida de 2-3 minutos.' },
                 ],
               },
@@ -133,18 +135,23 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
 
       <div
         aria-hidden
+        data-parallax-speed="80"
         className="pointer-events-none absolute -left-32 top-32 -z-10 h-72 w-72 rotate-12 bg-neo-cyan/10 blur-3xl sm:h-[28rem] sm:w-[28rem]"
       />
       <div
         aria-hidden
+        data-parallax-speed="-64"
         className="pointer-events-none absolute -right-40 top-[60%] -z-10 h-72 w-72 -rotate-12 bg-neo-lime/10 blur-3xl sm:h-[28rem] sm:w-[28rem]"
       />
+
+      <PageScrollFx />
 
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <HeroAnimated locale={locale} />
         <FeatureGrid />
         <StepsSection />
         <ModesShowcase />
+        <ComparisonTable />
         <FaqAccordion />
 
         <section className="mb-12 max-w-3xl">
@@ -159,7 +166,15 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
               Juega con amigos, familia o rivales de todo el mundo hispanohablante. Una partida rápida de 15 minutos o una sesión competitiva más larga, LexiClash se adapta a tu ritmo. La interfaz funciona en escritorio y móvil, así que puedes jugar en cualquier lugar.
             </p>
             <p>
-              Compite en clasificaciones globales, obtén logros y desbloquea modos especiales. Las batallas de jefes añaden un giro PvE donde colaboras contra oponentes de IA. Los desafíos diarios traen rompecabezas nuevos cada día con recompensas exclusivas.
+              Compite en{' '}
+              <Link href={`/${locale}/leaderboard`} className="text-neo-yellow underline">
+                clasificaciones globales
+              </Link>
+              , obtén logros y desbloquea modos especiales. Las batallas de jefes añaden un giro PvE donde colaboras contra oponentes de IA. Los{' '}
+              <Link href={`/${locale}/daily`} className="text-neo-pink underline">
+                desafíos diarios
+              </Link>{' '}
+              traen rompecabezas nuevos cada día con recompensas exclusivas.
             </p>
             <p>
               Para jugar scrabble en línea gratis sin registrarte, abre LexiClash en tu navegador, crea una sala y comparte el enlace. Funciona como juego de palabras gratis online en español sin instalación. Compite en{' '}
@@ -170,7 +185,15 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
               <Link href={`/${locale}/singleplayer`} className="text-neo-lime underline">
                 modo individual
               </Link>
-              . El diccionario incluye más de 10.000 palabras en español, ideal para expandir vocabulario y practicar ortografía mientras te diviertes.
+. El{' '}
+              <Link href={`/${locale}/words`} className="text-neo-cyan underline">
+                diccionario de palabras
+              </Link>{' '}
+              incluye más de 10.000 palabras en español, ideal para expandir vocabulario y practicar ortografía. ¿Atascado en una ronda? El{' '}
+              <Link href={`/${locale}/anagram`} className="text-neo-pink underline">
+                resolvedor de anagramas
+              </Link>{' '}
+              encuentra al instante todas las palabras que puedes formar.
             </p>
           </div>
         </section>

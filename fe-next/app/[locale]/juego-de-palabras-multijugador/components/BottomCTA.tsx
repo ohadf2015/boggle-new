@@ -49,6 +49,7 @@ export function BottomCTA({ locale }: BottomCTAProps) {
       <div className="relative mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
         <Link
           href={`/${locale}/multiplayer`}
+          data-magnetic
           className={cn(
             'group inline-flex items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-pink px-9 py-4 font-neo-display text-base font-black uppercase tracking-wide text-neo-navy shadow-hard-lg',
             'transition-all duration-150 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-y-0.5 active:shadow-hard-pressed sm:text-lg'
