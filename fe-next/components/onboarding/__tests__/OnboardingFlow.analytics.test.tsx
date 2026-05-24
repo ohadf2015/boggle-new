@@ -62,7 +62,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({ isAuthenticated: false, user: null }),
+  // Admin so the (admin-gated) Calm Mode vibe step appears in the flow.
+  useAuth: () => ({ isAuthenticated: false, user: null, isAdmin: true }),
 }));
 
 vi.mock('@/components/auth/AuthModal', () => ({
@@ -115,6 +116,17 @@ vi.mock('../ScoreRevealV2', () => ({
   ),
 }));
 
+vi.mock('../CalmModeChoice', () => ({
+  __esModule: true,
+  default: ({ onChoose }: any) => (
+    <button data-testid="vibe-energetic" onClick={() => onChoose(false)}>vibe</button>
+  ),
+}));
+
+vi.mock('@/contexts/AccessibilityContext', () => ({
+  useAccessibility: () => ({ updateSetting: vi.fn() }),
+}));
+
 vi.mock('../OnboardingProgress', () => ({
   __esModule: true,
   default: () => null,
@@ -134,6 +146,8 @@ describe('OnboardingFlow analytics', () => {
   });
 
   const goNew = () => fireEvent.click(screen.getByTestId('new-btn'));
+  // New player now picks a vibe (calm/energetic) before the tutorial.
+  const chooseVibe = () => fireEvent.click(screen.getByTestId('vibe-energetic'));
 
   it('fires onboarding_started once on mount', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
@@ -151,6 +165,7 @@ describe('OnboardingFlow analytics', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
     fireEvent.click(screen.getByTestId('lang-btn'));
     goNew();
+    chooseVibe();
     fireEvent.click(screen.getByTestId('tut-btn'));
     expect(trackOnboardingStep).toHaveBeenCalledWith('tutorial', {
       score: 47,
@@ -162,6 +177,7 @@ describe('OnboardingFlow analytics', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
     fireEvent.click(screen.getByTestId('lang-btn'));
     goNew();
+    chooseVibe();
     fireEvent.click(screen.getByTestId('tut-btn'));
     fireEvent.click(screen.getByTestId('profile-btn'));
     expect(trackOnboardingStep).toHaveBeenCalledWith('profile', {
@@ -175,6 +191,7 @@ describe('OnboardingFlow analytics', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
     fireEvent.click(screen.getByTestId('lang-btn'));
     goNew();
+    chooseVibe();
     fireEvent.click(screen.getByTestId('tut-btn'));
     fireEvent.click(screen.getByTestId('profile-btn'));
     expect(trackOnboardingStep).toHaveBeenCalledWith('profile', {
@@ -189,6 +206,7 @@ describe('OnboardingFlow analytics', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
     fireEvent.click(screen.getByTestId('lang-btn'));
     goNew();
+    chooseVibe();
     fireEvent.click(screen.getByTestId('tut-btn'));
 
     const tutorialCalls = (trackOnboardingStep as unknown as ReturnType<typeof vi.fn>).mock.calls
@@ -201,6 +219,7 @@ describe('OnboardingFlow analytics', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
     fireEvent.click(screen.getByTestId('lang-btn'));
     goNew();
+    chooseVibe();
     fireEvent.click(screen.getByTestId('tut-btn'));
 
     expect(trackOnboardingStep).not.toHaveBeenCalledWith('tutorial');

@@ -10,6 +10,7 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '/en',
 }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated: false }) }));
+vi.mock('@/contexts/AccessibilityContext', () => ({ useAccessibility: () => ({ updateSetting: vi.fn() }) }));
 vi.mock('@/components/CrazyGamesSDK', () => ({ useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }) }));
 
 // Mock heavy children we don't need to test the routing logic.
@@ -58,6 +59,8 @@ describe('OnboardingFlow — invite mode', () => {
   });
 
   it('uses 4-step path when no invite at mount (regression guard)', () => {
+    // Non-admin (default): language → returningUser → tutorial → profile.
+    // The admin-only Calm Mode vibe step is not injected.
     wrap(<OnboardingFlow onComplete={() => {}} />);
     const progress = screen.getByTestId('onboarding-progress');
     expect(progress.getAttribute('data-total')).toBe('4');

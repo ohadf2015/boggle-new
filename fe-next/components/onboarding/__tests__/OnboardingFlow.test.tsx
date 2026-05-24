@@ -73,8 +73,11 @@ vi.mock('@/utils/profileStorage', () => ({
   getStoredCustomAvatar: vi.fn(() => null),
 }));
 
+// Controllable auth mock — Calm Mode onboarding step is admin-gated, so most
+// tests run as admin; one test flips to non-admin to assert the step is skipped.
+const { mockUseAuth } = vi.hoisted(() => ({ mockUseAuth: vi.fn() }));
 vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({ isAuthenticated: false, user: null }),
+  useAuth: () => mockUseAuth(),
 }));
 
 vi.mock('@/components/auth/AuthModal', () => ({
@@ -118,6 +121,21 @@ vi.mock('../InviteTutorialTeaser', () => ({
   default: () => <div data-testid="invite-tutorial-teaser" />,
 }));
 
+vi.mock('../CalmModeChoice', () => ({
+  __esModule: true,
+  default: ({ onChoose }: any) => (
+    <div data-testid="calm-mode-choice">
+      <button onClick={() => onChoose(false)}>Energetic</button>
+      <button onClick={() => onChoose(true)}>Calm</button>
+    </div>
+  ),
+}));
+
+const mockUpdateSetting = vi.fn();
+vi.mock('@/contexts/AccessibilityContext', () => ({
+  useAccessibility: () => ({ updateSetting: mockUpdateSetting }),
+}));
+
 vi.mock('@/hooks/useInviteOnboardingMode');
 
 import OnboardingFlow from '../OnboardingFlow';
@@ -132,21 +150,25 @@ describe('OnboardingFlow', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseAuth.mockReturnValue({ isAuthenticated: false, user: null, isAdmin: true });
     mockHasPendingRoom.mockReturnValue(false);
     mockConsumePendingRoom.mockReturnValue(null);
     mockUseInviteOnboardingMode.mockReturnValue({
       isInviteMode: false,
       inviteAtMount: null,
-      activeSteps: ['language', 'returningUser', 'tutorial', 'profile', 'inviteTutorial'],
+      activeSteps: ['language', 'returningUser', 'calmMode', 'tutorial', 'profile', 'inviteTutorial'],
       handleInviteTeaserComplete: vi.fn(),
     });
   });
 
   const pickLanguage = () => fireEvent.click(screen.getByText('Select Language'));
   const goNewUser = () => fireEvent.click(screen.getByText("I'm New Here"));
+  const chooseEnergetic = () => fireEvent.click(screen.getByText('Energetic'));
+  // Full path to the tutorial: language → new-here → calm/energetic vibe choice.
   const selectLanguage = () => {
     pickLanguage();
     goNewUser();
+    chooseEnergetic();
   };
 
   it('starts with the language select step', () => {
@@ -160,10 +182,42 @@ describe('OnboardingFlow', () => {
     expect(screen.getByTestId('returning-user-step')).toBeInTheDocument();
   });
 
-  it('transitions to tutorial when returning user chooses new here', () => {
+  it('shows the calm/energetic vibe choice when an admin chooses new here', () => {
+    render(<OnboardingFlow {...defaultProps} />);
+    pickLanguage();
+    goNewUser();
+    expect(screen.getByTestId('calm-mode-choice')).toBeInTheDocument();
+  });
+
+  it('skips the vibe choice for non-admins (soft launch gate) — goes straight to tutorial', () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: false, user: null, isAdmin: false });
+    render(<OnboardingFlow {...defaultProps} />);
+    pickLanguage();
+    goNewUser();
+    expect(screen.queryByTestId('calm-mode-choice')).not.toBeInTheDocument();
+    expect(screen.getByTestId('tutorial-game')).toBeInTheDocument();
+  });
+
+  it('advances to the tutorial after the vibe choice', () => {
     render(<OnboardingFlow {...defaultProps} />);
     selectLanguage();
     expect(screen.getByTestId('tutorial-game')).toBeInTheDocument();
+  });
+
+  it('enables cosy mode when the player picks Calm', () => {
+    render(<OnboardingFlow {...defaultProps} />);
+    pickLanguage();
+    goNewUser();
+    fireEvent.click(screen.getByText('Calm'));
+    expect(mockUpdateSetting).toHaveBeenCalledWith('cosyMode', true);
+  });
+
+  it('leaves cosy mode off when the player picks Energetic', () => {
+    render(<OnboardingFlow {...defaultProps} />);
+    pickLanguage();
+    goNewUser();
+    chooseEnergetic();
+    expect(mockUpdateSetting).toHaveBeenCalledWith('cosyMode', false);
   });
 
   it('transitions to profile setup after tutorial completes', () => {

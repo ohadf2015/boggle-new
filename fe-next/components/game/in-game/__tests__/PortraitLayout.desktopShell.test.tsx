@@ -113,6 +113,7 @@ vi.mock('../../WordHuntPlayerLives', () => ({
 vi.mock('@/contexts/AccessibilityContext', () => ({
   useHapticsEnabled: () => true,
   useShouldReduceMotion: () => false,
+  useSuppressTimerUrgency: () => false,
 }));
 
 // Mock socket and sound contexts

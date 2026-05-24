@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { m } from 'framer-motion';
-import { ArrowLeft, Volume2, VolumeX, Music, Bell, Eye, Sparkles, Zap, Languages, Monitor, MessageSquare, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Volume2, VolumeX, Music, Bell, Eye, Sparkles, Zap, Languages, Monitor, MessageSquare, ChevronRight, Coffee } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AutoHideHeader from '@/components/AutoHideHeader';
@@ -13,6 +13,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import Image from 'next/image';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import DeleteAccountSection from '@/components/settings/DeleteAccountSection';
 import { NotificationCategoryPreferences } from '@/components/notifications/NotificationCategoryPreferences';
@@ -153,7 +154,8 @@ export default function SettingsPageClient(): React.JSX.Element {
   const { t, language, setLanguage } = useLanguage();
   const { volume: musicVolume, setVolume: setMusicVolume, isMuted: musicMuted, toggleMute: toggleMusicMute } = useMusic();
   const { sfxVolume, setSfxVolume, sfxMuted, toggleSfxMute } = useSoundEffects();
-  const { settings, toggleFireRoundLights, toggleEarthquakeEffects, cycleReduceMotion } = useAccessibility();
+  const { settings, toggleFireRoundLights, toggleEarthquakeEffects, cycleReduceMotion, toggleCosyMode } = useAccessibility();
+  const { isAdmin } = useAuth();
   const router = useRouter();
   const isDarkMode = theme === 'dark';
 
@@ -324,6 +326,31 @@ export default function SettingsPageClient(): React.JSX.Element {
               {t('settings.accessibility')}
             </h2>
             <div className="space-y-3">
+              {/* Cosy / Calm Mode — master preset that ORs every calming
+                  setting below on. Set apart with a lime border so it reads as
+                  the one-tap "calmer experience" switch.
+                  ADMIN-ONLY during soft launch — remove the `isAdmin &&` gate to
+                  roll out to everyone. */}
+              {isAdmin && (
+                <div className="rounded-neo border-3 border-neo-lime">
+                  <SettingRow
+                    icon={<Coffee className="w-5 h-5 text-neo-lime" />}
+                    label={t('settings.cosyMode')}
+                    description={t('settings.cosyModeDescription')}
+                    isDarkMode={isDarkMode}
+                  >
+                    <ToggleButton
+                      isOn={settings.cosyMode}
+                      onToggle={toggleCosyMode}
+                      isDarkMode={isDarkMode}
+                      label={t('settings.cosyMode')}
+                      onLabel={t('settings.enabled')}
+                      offLabel={t('settings.disabled')}
+                    />
+                  </SettingRow>
+                </div>
+              )}
+
               <SettingRow
                 icon={<Monitor className="w-5 h-5 text-neo-cyan" />}
                 label={t('settings.reduceMotion')}

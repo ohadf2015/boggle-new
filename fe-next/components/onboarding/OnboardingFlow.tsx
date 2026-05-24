@@ -20,7 +20,9 @@ import {
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { useInviteOnboardingMode, type FlowStep } from '@/hooks/useInviteOnboardingMode';
 import LanguageSelect from './LanguageSelect';
+import CalmModeChoice from './CalmModeChoice';
 import TutorialGame from './TutorialGame';
+import { useAccessibility } from '@/contexts/AccessibilityContext';
 import QuickProfileSetup from './QuickProfileSetup';
 import OnboardingProgress from './OnboardingProgress';
 import ReturningUserStep from './ReturningUserStep';
@@ -42,7 +44,8 @@ interface OnboardingFlowProps {
  */
 const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const { language, dir, t } = useLanguage();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
+  const { updateSetting } = useAccessibility();
   const router = useRouter();
 
   const [step, setStep] = useState<FlowStep>('language');
@@ -125,9 +128,22 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     setShowAuthModal(true);
   }, [isOnCrazyGamesPlatform]);
 
+  // Calm Mode is admin-only during soft launch. handleNewUser only fires in the
+  // non-invite flow, so the admin flag alone decides whether the vibe step shows.
   const handleNewUser = useCallback(() => {
-    setStep('tutorial');
-  }, []);
+    setStep(isAdmin ? 'calmMode' : 'tutorial');
+  }, [isAdmin]);
+
+  // Calm vs energetic vibe choice — applies cosy mode immediately so the very
+  // first tutorial game already reflects the player's pick, then advances.
+  const handleCalmModeChoice = useCallback(
+    (cosy: boolean) => {
+      updateSetting('cosyMode', cosy);
+      recordStep('calmMode', { cosy });
+      setStep('tutorial');
+    },
+    [updateSetting, recordStep]
+  );
 
   const handleSkipOnboarding = useCallback(() => {
     if (isNavigating) return;
@@ -179,7 +195,18 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     inviteContextRef.current = { isInviteMode, inviteAtMount };
   }, [isInviteMode, inviteAtMount]);
 
-  const stepIndex = useMemo(() => activeSteps.indexOf(step), [step, activeSteps]);
+  // Admins (soft launch) get the Calm-vs-Energetic vibe step spliced in after
+  // returningUser; everyone else sees the base flow. Drives progress dots + index.
+  const displaySteps = useMemo(() => {
+    if (!isAdmin || isInviteMode) return activeSteps;
+    const idx = activeSteps.indexOf('returningUser');
+    if (idx < 0 || activeSteps.includes('calmMode')) return activeSteps;
+    const next = [...activeSteps];
+    next.splice(idx + 1, 0, 'calmMode');
+    return next;
+  }, [activeSteps, isAdmin, isInviteMode]);
+
+  const stepIndex = useMemo(() => displaySteps.indexOf(step), [step, displaySteps]);
   // Step 1: Tutorial complete
   const handleTutorialComplete = useCallback(
     (score: number, wordsFound: string[]) => {
@@ -285,6 +312,8 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         );
       case 'language':
         return <LanguageSelect onSelect={handleLanguageSelect} />;
+      case 'calmMode':
+        return <CalmModeChoice onChoose={handleCalmModeChoice} />;
       case 'tutorial':
         return <TutorialGame onComplete={handleTutorialComplete} attemptNumber={tutorialAttempt} />;
       case 'profile':
@@ -408,7 +437,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
             transition={{ duration: 0.25 }}
             className="absolute top-6 z-10"
           >
-            <OnboardingProgress currentStep={stepIndex} totalSteps={activeSteps.length} />
+            <OnboardingProgress currentStep={stepIndex} totalSteps={displaySteps.length} />
           </m.div>
         )}
       </AnimatePresence>

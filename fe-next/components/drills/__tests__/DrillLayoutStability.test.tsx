@@ -68,6 +68,7 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
 }));
 
 vi.mock('@/contexts/AccessibilityContext', () => ({
+  useSuppressTimerUrgency: () => false,
   useShouldReduceMotion: () => false,
 }));
 

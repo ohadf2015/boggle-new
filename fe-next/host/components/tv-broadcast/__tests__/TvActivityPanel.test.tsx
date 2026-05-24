@@ -58,6 +58,7 @@ vi.mock('framer-motion', () => {
 
 // Mock AccessibilityContext
 vi.mock('@/contexts/AccessibilityContext', () => ({
+  useSuppressTimerUrgency: () => false,
   useShouldReduceMotion: vi.fn(() => false),
 }));
 

@@ -12,10 +12,14 @@ import { trackInviteConsumed } from '@/utils/growthTracking';
 export type FlowStep =
   | 'returningUser'
   | 'language'
+  | 'calmMode'
   | 'tutorial'
   | 'profile'
   | 'inviteTutorial';
 
+// Base flow. The 'calmMode' vibe-choice step is ADMIN-ONLY during soft launch —
+// OnboardingFlow injects it after 'returningUser' for admins (see displaySteps).
+// Invite flow stays minimal (no calmMode) to get friends into the room fast.
 export const STEPS: FlowStep[] = ['language', 'returningUser', 'tutorial', 'profile'];
 export const INVITE_STEPS: FlowStep[] = ['language', 'profile', 'inviteTutorial'];
 

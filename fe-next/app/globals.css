@@ -3742,3 +3742,49 @@ body.crazygames-embed .game-view-container,
   letter-spacing: -0.04em;
   line-height: 1;
 }
+
+/* ============================================================
+   Cosy / Calm Mode palette
+   ------------------------------------------------------------
+   Set by AccessibilityProvider via `document.documentElement
+   .dataset.cosy = 'true'`. Because every `neo-*` Tailwind utility
+   resolves to a `var(--neo-*)`, overriding the vars here recolours
+   the whole app with zero component changes.
+
+   We KEEP each family's hue (lime/pink/cyan/purple still identify
+   their modes) but cut the saturation hard — calm and monochrome-
+   leaning, not neon, and not flat grey (which would read as broken).
+   `--neo-red` (error semantics) and the navy background are left as
+   is. Higher specificity than `:root` so it always wins.
+   ============================================================ */
+html[data-cosy='true'] {
+  /* LIME (primary) */
+  --neo-lime: hsl(76 33% 60%);
+  --neo-lime-light: hsl(76 28% 72%);
+  --neo-lime-muted: hsl(76 24% 52%);
+  --neo-lime-dark: hsl(76 28% 42%);
+
+  /* PINK (multiplayer) */
+  --neo-pink: hsl(328 38% 62%);
+  --neo-pink-light: hsl(328 34% 72%);
+  --neo-pink-muted: hsl(328 28% 56%);
+  --neo-pink-dark: hsl(328 32% 44%);
+
+  /* CYAN (single player) */
+  --neo-cyan: hsl(180 33% 56%);
+  --neo-cyan-light: hsl(180 30% 68%);
+  --neo-cyan-muted: hsl(180 26% 50%);
+  --neo-cyan-dark: hsl(180 30% 40%);
+
+  /* PURPLE (brain training) */
+  --neo-purple: hsl(258 32% 66%);
+  --neo-purple-light: hsl(258 30% 76%);
+  --neo-purple-muted: hsl(258 26% 56%);
+  --neo-purple-dark: hsl(258 30% 46%);
+
+  /* Celebratory accents — softened too (cosy = calmer rewards) */
+  --neo-yellow: hsl(49 55% 62%);
+  --neo-yellow-hover: hsl(49 50% 56%);
+  --neo-orange: hsl(20 50% 60%);
+  --neo-orange-hover: hsl(20 48% 54%);
+}

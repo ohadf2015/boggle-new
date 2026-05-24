@@ -145,6 +145,7 @@ export type GrowthEvent =
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =
   | 'language'
+  | 'calmMode'
   | 'tutorial'
   | 'profile'
   | 'mode_select';

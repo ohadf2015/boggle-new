@@ -49,6 +49,7 @@ vi.mock('@/hooks/useMediaQuery', () => ({
 }));
 
 vi.mock('@/contexts/AccessibilityContext', () => ({
+  useSuppressTimerUrgency: () => false,
   useDisableFireRoundLights: () => false,
   useDisableEarthquakeEffects: () => false,
   useLargeLetters: () => false,

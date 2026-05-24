@@ -8,9 +8,24 @@
  */
 
 import confettiLib, { type CreateTypes, type Options, type Shape } from 'canvas-confetti';
+import { applyCelebrationIntensity, type CelebrationIntensity } from '@/lib/cosy/celebrationScale';
 
 // Singleton canvas for confetti
 let confettiCanvas: HTMLCanvasElement | null = null;
+
+/**
+ * Global celebration intensity, synced from Cosy / Calm Mode by the
+ * AccessibilityProvider via `setCelebrationIntensity`. Applied at the single
+ * `fireConfetti` chokepoint so EVERY caller (presets + non-React modules)
+ * scales down under cosy without each having to thread the preference. Defaults
+ * to 'full' → behaviour-neutral until cosy flips it.
+ */
+let celebrationIntensity: CelebrationIntensity = 'full';
+
+/** Set the global celebration intensity (called by AccessibilityProvider). */
+export function setCelebrationIntensity(intensity: CelebrationIntensity): void {
+  celebrationIntensity = intensity;
+}
 let myConfetti: CreateTypes | null = null;
 let resizeHandler: (() => void) | null = null;
 let autoCleanupTimer: ReturnType<typeof setTimeout> | null = null;
@@ -165,11 +180,18 @@ export function fireConfetti(options: Options = {}): Promise<null> | null {
   }, AUTO_CLEANUP_DELAY_MS);
 
   try {
-    return myConfetti({
-      zIndex: 10000,
-      ...NEO_BRUTALIST_DEFAULTS,
-      ...options,
-    });
+    // Cosy / Calm Mode scales every burst down (fewer particles, tighter
+    // spread) — never off; the OS reduced-motion gate above already handles
+    // "no animation at all".
+    const merged = applyCelebrationIntensity(
+      {
+        zIndex: 10000,
+        ...NEO_BRUTALIST_DEFAULTS,
+        ...options,
+      },
+      celebrationIntensity,
+    );
+    return myConfetti(merged);
   } catch (error) {
     console.error('[Confetti] Error firing confetti:', error);
     return null;

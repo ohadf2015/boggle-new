@@ -38,6 +38,10 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ isAuthenticated: false, user: null }),
 }));
 
+vi.mock('@/contexts/AccessibilityContext', () => ({
+  useAccessibility: () => ({ updateSetting: vi.fn() }),
+}));
+
 vi.mock('@/utils/profileStorage', () => ({
   setStoredCustomAvatar: vi.fn(),
   getStoredCustomAvatar: vi.fn(() => null),

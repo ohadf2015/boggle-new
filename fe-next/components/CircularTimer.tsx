@@ -4,6 +4,8 @@ import { useReducedMotion } from '../utils/accessibility';
 import { formatTimeMMSS } from '@/shared/utils';
 import { preloadResultsChunks } from '@/utils/preloadResults';
 import { useIsSelecting } from '@/hooks/useSelectionStore';
+import { useSuppressTimerUrgency } from '@/contexts/AccessibilityContext';
+import { computeTimerUrgency } from '@/lib/cosy/timerUrgency';
 
 /**
  * CircularTimer Props
@@ -33,6 +35,8 @@ const SIZES = {
 const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180, size = 'md', onTimerState }) => {
   const reduceMotion = useReducedMotion();
   const isSelecting = useIsSelecting();
+  // Cosy / Calm mode: keep the timer counting but stop it shouting.
+  const suppressUrgency = useSuppressTimerUrgency();
   const prevStateRef = useRef<'normal' | 'low' | 'veryLow' | 'critical'>('normal');
   const config = SIZES[size];
 
@@ -44,30 +48,20 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
-  // Determine color based on remaining time (20 seconds to match music transition)
-  const isLowTime = remainingTime <= 20;
-  // Even more urgent at 10 seconds
-  const isVeryLowTime = remainingTime <= 10 && remainingTime > 0;
-  // Critical: timer dominates UI at 5 seconds
-  const isCriticalTime = remainingTime <= 5 && remainingTime > 0;
+  // Urgency escalation — clamped to 'normal' under cosy / calm mode.
+  const { state: currentState, isLowTime, isVeryLowTime, isCriticalTime } =
+    computeTimerUrgency(remainingTime, suppressUrgency);
 
-  // Preload results page chunks when timer is low (idempotent — safe to call repeatedly)
+  // Preload results page chunks near the end (idempotent — safe to call
+  // repeatedly). Kept independent of urgency *display* so cosy mode doesn't
+  // disable this perf nicety.
+  const shouldPreloadResults = remainingTime <= 10 && remainingTime > 0;
   useEffect(() => {
-    if (isVeryLowTime) {
+    if (shouldPreloadResults) {
       preloadResultsChunks();
     }
-  }, [isVeryLowTime]);
+  }, [shouldPreloadResults]);
 
-  // Notify parent of timer urgency state changes
-  const currentState: 'normal' | 'low' | 'veryLow' | 'critical' = isCriticalTime
-    ? 'critical'
-    : isVeryLowTime
-    ? 'veryLow'
-    : isLowTime
-    ? 'low'
-    : 'normal';
-
-   
   useEffect(() => {
     if (onTimerState && currentState !== prevStateRef.current) {
       prevStateRef.current = currentState;

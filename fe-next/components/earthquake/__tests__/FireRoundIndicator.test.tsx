@@ -27,6 +27,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 vi.mock('@/contexts/AccessibilityContext', () => ({
+  useSuppressTimerUrgency: () => false,
   useDisableFireRoundLights: () => false,
   useShouldReduceMotion: () => false,
 }));
