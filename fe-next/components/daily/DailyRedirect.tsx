@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Header from '@/components/Header';
 import { DailyChallengeLanding } from './DailyChallengeLanding';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Language } from '@/types';
@@ -22,10 +23,13 @@ export default function DailyRedirect() {
   };
 
   return (
-    <DailyChallengeLanding
-      onSelectWordHunt={handleSelectWordHunt}
-      onSelectWordWheel={handleSelectWordWheel}
-      currentLanguage={language as Language}
-    />
+    <div className="flex-1 flex flex-col bg-neo-navy min-h-screen page-content-safe">
+      <Header />
+      <DailyChallengeLanding
+        onSelectWordHunt={handleSelectWordHunt}
+        onSelectWordWheel={handleSelectWordWheel}
+        currentLanguage={language as Language}
+      />
+    </div>
   );
 }

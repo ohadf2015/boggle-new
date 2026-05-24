@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Header from '@/components/Header';
 import { InlineBannerAd } from '@/components/ads';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
@@ -68,6 +69,7 @@ export default async function WordsHubPage({ params }: PageParams) {
 
   return (
     <div className="min-h-screen bg-neo-navy text-neo-white">
+      <Header />
       <div className="max-w-3xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="mb-6 text-sm text-slate-400">

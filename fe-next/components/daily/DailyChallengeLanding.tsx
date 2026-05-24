@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { m } from 'framer-motion';
-import { ArrowLeft, Timer, CircleDot, Check, X, Eye } from 'lucide-react';
+import { Timer, CircleDot, Check, X, Eye } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -38,12 +38,10 @@ export function DailyChallengeLanding({
   onSelectWordWheel,
   currentLanguage,
 }: DailyChallengeLandingProps) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const { user } = useAuth();
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const isRTL = language === 'he';
 
   const challengerName = searchParams?.get('whChallenger') || null;
   const challengerScore = searchParams?.get('whChallengeScore')
@@ -138,25 +136,6 @@ export function DailyChallengeLanding({
       {/* Ambient effects */}
       <ConfettiBackground />
       <FloatingDecorations />
-
-      {/* Back to home */}
-      <div className="w-full flex items-center relative z-10">
-        <button
-          type="button"
-          onClick={() => router.push(`/${currentLanguage}`)}
-          aria-label={t('common.backHome')}
-          className="flex items-center justify-center w-10 h-10 min-w-[40px] min-h-[40px]
-            bg-neo-cream text-neo-black dark:bg-neo-navy dark:text-white
-            border-3 border-neo-black dark:border-slate-500
-            rounded-neo shadow-hard-sm
-            hover:-translate-x-px hover:-translate-y-px hover:shadow-hard
-            active:translate-x-px active:translate-y-px active:shadow-none
-            transition-all duration-100
-            focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2"
-        >
-          <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} aria-hidden="true" />
-        </button>
-      </div>
 
       {/* Missions Header: XP bar + countdown */}
       <DailyMissionsHeader completedCount={completedCount} />

@@ -9,17 +9,16 @@ import {
   Copy,
   Check,
   Share2,
-  ArrowLeft,
   Trophy,
   QrCode,
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 const QRCodeSVG = dynamic(() => import('qrcode.react').then(m => ({ default: m.QRCodeSVG })), { ssr: false });
-import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
+import Header from '@/components/Header';
 import { Loader } from '@/components/ui/Loader';
 import { trackShare } from '@/utils/growthTracking';
 import AuthModal from '@/components/auth/AuthModal';
@@ -246,7 +245,6 @@ export default function ReferralDashboardClient() {
   const { t } = useLanguage();
   const { isAuthenticated, loading: authLoading } = useAuth();
   const { theme } = useTheme();
-  const router = useRouter();
   const { data, isLoading, error, copied, handleCopy } = useReferralDashboard();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signup');
@@ -282,26 +280,29 @@ export default function ReferralDashboardClient() {
   /* Auth gate */
   if (!authLoading && !isAuthenticated) {
     return (
-      <div className="min-h-screen bg-neo-navy flex flex-col items-center justify-center p-6">
-        <Users className="w-12 h-12 text-neo-pink mb-4" />
-        <p className="text-neo-white font-bold text-center mb-4">
-          {t('referralDashboard.loginRequired')}
-        </p>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-          <button
-            onClick={() => { setAuthModalMode('signup'); setShowAuthModal(true); }}
-            className="px-6 py-3 bg-neo-lime text-neo-black font-bold rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-none transition-shadow"
-          >
-            {t('auth.signUp')}
-          </button>
-          <button
-            onClick={() => { setAuthModalMode('signin'); setShowAuthModal(true); }}
-            className="px-6 py-3 bg-neo-pink text-white font-bold rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-none transition-shadow"
-          >
-            {t('auth.signIn')}
-          </button>
+      <div className="min-h-screen bg-neo-navy flex flex-col">
+        <Header />
+        <div className="flex-1 flex flex-col items-center justify-center p-6">
+          <Users className="w-12 h-12 text-neo-pink mb-4" />
+          <p className="text-neo-white font-bold text-center mb-4">
+            {t('referralDashboard.loginRequired')}
+          </p>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <button
+              onClick={() => { setAuthModalMode('signup'); setShowAuthModal(true); }}
+              className="px-6 py-3 bg-neo-lime text-neo-black font-bold rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-none transition-shadow"
+            >
+              {t('auth.signUp')}
+            </button>
+            <button
+              onClick={() => { setAuthModalMode('signin'); setShowAuthModal(true); }}
+              className="px-6 py-3 bg-neo-pink text-white font-bold rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-none transition-shadow"
+            >
+              {t('auth.signIn')}
+            </button>
+          </div>
+          {showAuthModal && <AuthModal isOpen onClose={() => setShowAuthModal(false)} initialMode={authModalMode} showGuestStats />}
         </div>
-        {showAuthModal && <AuthModal isOpen onClose={() => setShowAuthModal(false)} initialMode={authModalMode} showGuestStats />}
       </div>
     );
   }
@@ -334,24 +335,12 @@ export default function ReferralDashboardClient() {
 
   return (
     <div className="min-h-screen bg-neo-navy pb-24">
-      {/* Header */}
-      <div
-        className="sticky top-0 z-10 bg-neo-navy/95 backdrop-blur-sm border-b-3 border-neo-black/30 px-4 py-3 flex items-center gap-3"
-        style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}
-      >
-        <button
-          onClick={() => router.back()}
-          className="p-2 rounded-neo hover:bg-neo-white/10 transition-colors"
-          aria-label={t('common.back')}
-        >
-          <ArrowLeft className="w-5 h-5 text-neo-white rtl:rotate-180" />
-        </button>
-        <h1 className="font-black text-lg uppercase text-neo-white font-neo-display">
-          {t('referralDashboard.title')}
-        </h1>
-      </div>
+      <Header />
 
       <div className="max-w-2xl mx-auto px-4 py-6 flex flex-col gap-5">
+        <h1 className="font-black text-2xl uppercase text-neo-white font-neo-display">
+          {t('referralDashboard.title')}
+        </h1>
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-3">
           <StatCard
