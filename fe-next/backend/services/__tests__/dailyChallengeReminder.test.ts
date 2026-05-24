@@ -12,7 +12,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const mockGetRecipients = vi.hoisted(() => vi.fn());
 const mockMarkBatch = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
-const mockNotify = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
+// Default: a device received the push (delivered). The service marks users as
+// reminded ONLY when notify reports a real delivery.
+const mockNotify = vi.hoisted(() => vi.fn().mockResolvedValue(true));
 const mockIsSupabaseConfigured = vi.hoisted(() => vi.fn(() => true));
 const mockFindRivals = vi.hoisted(() => vi.fn());
 const mockPickRivalCopy = vi.hoisted(() => vi.fn());
@@ -161,6 +163,30 @@ describe('sendDailyChallengeReminders', () => {
     // batched mark contains only the successful user
     const sentIds = mockMarkBatch.mock.calls[0][0] as string[];
     expect(sentIds).toEqual(['user-2']);
+  });
+
+  it('marks ONLY users whose push actually delivered (undelivered retry next tick)', async () => {
+    mockGetRecipients.mockResolvedValue([recipient('user-1'), recipient('user-2')]);
+    // user-1 reached a live device; user-2 had none this tick (notify resolves
+    // false rather than rejecting — non-delivery is not an error).
+    mockNotify.mockResolvedValueOnce(true).mockResolvedValueOnce(false);
+
+    await sendDailyChallengeReminders();
+
+    const sentIds = mockMarkBatch.mock.calls[0][0] as string[];
+    expect(sentIds).toEqual(['user-1']);
+  });
+
+  it('still sends the general reminder when rival lookup throws', async () => {
+    mockGetRecipients.mockResolvedValue([recipient('user-1'), recipient('user-2')]);
+    mockFindRivals.mockRejectedValue(new Error('season RPC exploded'));
+
+    await expect(sendDailyChallengeReminders()).resolves.not.toThrow();
+
+    // Baseline notification still fires for everyone; no rival copy attempted.
+    expect(mockNotify).toHaveBeenCalledTimes(2);
+    expect(mockPickRivalCopy).not.toHaveBeenCalled();
+    mockNotify.mock.calls.forEach((c) => expect(c[1].kind).toBeUndefined());
   });
 
   describe('rival-aware push', () => {

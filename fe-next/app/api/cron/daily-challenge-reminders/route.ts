@@ -53,13 +53,29 @@ export async function POST(request: NextRequest) {
       // Batch-find leaderboard rivals who already cleared today's daily.
       // Map<userId, RivalCandidate|null>. One set of 3 queries for all
       // recipients — keeps cron O(1) DB cost regardless of cohort size.
-      const rivalsByUser = await findDailyChallengeRivals(
-        recipients.map((r) => r.userId)
-      );
+      // Rival theming is OPTIONAL enrichment: if the lookup throws (transient
+      // DB/RPC failure, oversized .in() on a busy day), degrade to all-general
+      // rather than letting it take down the whole send. The baseline reminder
+      // must always fire — including when the rival simply didn't play.
+      let rivalsByUser: Awaited<ReturnType<typeof findDailyChallengeRivals>>;
+      try {
+        rivalsByUser = await findDailyChallengeRivals(recipients.map((r) => r.userId));
+      } catch (rivalErr) {
+        logger.error(
+          `[Push Cron] rival lookup failed, sending general reminders: ${
+            rivalErr instanceof Error ? rivalErr.message : String(rivalErr)
+          }`
+        );
+        rivalsByUser = new Map();
+      }
 
       let rivalSent = 0;
+      // Each task resolves to true ONLY when a device actually received the
+      // push (see notifyDailyChallengeReminder). Non-delivery resolves false —
+      // we leave that user unmarked so the next hourly tick retries instead of
+      // silencing them all day.
       const results = await Promise.allSettled(
-        recipients.map(async ({ userId, locale, gender }) => {
+        recipients.map(async ({ userId, locale, gender }): Promise<boolean> => {
           const rival = rivalsByUser.get(userId) ?? null;
           if (rival) {
             const copy = pickRivalReminderCopy({
@@ -76,7 +92,7 @@ export async function POST(request: NextRequest) {
               additionalCount: rival.additionalCount,
             });
             rivalSent++;
-            await notifyDailyChallengeReminder(userId, {
+            return notifyDailyChallengeReminder(userId, {
               title: copy.title,
               body: copy.body,
               deepLink: copy.deepLink,
@@ -88,10 +104,9 @@ export async function POST(request: NextRequest) {
               ...(rival.avatarImage ? { imageUrl: rival.avatarImage } : {}),
               kind: 'rival',
             });
-            return;
           }
           const copy = pickDailyReminderCopy({ userId, date, hoursLeft, locale, gender });
-          await notifyDailyChallengeReminder(userId, {
+          return notifyDailyChallengeReminder(userId, {
             title: copy.title,
             body: copy.body,
             deepLink: copy.deepLink,
@@ -101,27 +116,32 @@ export async function POST(request: NextRequest) {
         })
       );
 
-      let sent = 0;
+      let attempted = 0;
+      let delivered = 0;
       let failed = 0;
-      const sentIds: string[] = [];
+      const deliveredIds: string[] = [];
       results.forEach((r, i) => {
         if (r.status === 'fulfilled') {
-          sent++;
-          sentIds.push(recipients[i].userId);
+          attempted++;
+          if (r.value === true) {
+            delivered++;
+            deliveredIds.push(recipients[i].userId);
+          }
         } else {
           failed++;
         }
       });
 
-      // Single batched UPDATE instead of N parallel UPDATEs.
-      await markDailyPushSentBatch(sentIds);
+      // Single batched UPDATE instead of N parallel UPDATEs. Only the users we
+      // confirmed delivery to are marked — undelivered ones retry next tick.
+      await markDailyPushSentBatch(deliveredIds);
 
-      const noRivalSent = sent - rivalSent;
+      const noRivalSent = attempted - rivalSent;
       logger.log(
-        `[Push Cron] Completed: ${sent} sent (${rivalSent} rival-themed, ${noRivalSent} no-rival), ${failed} failed`
+        `[Push Cron] Completed: ${attempted} attempted, ${delivered} delivered (${rivalSent} rival-themed, ${noRivalSent} no-rival), ${failed} failed`
       );
 
-      return { sent, failed, rivalSent, noRivalSent };
+      return { sent: attempted, attempted, delivered, failed, rivalSent, noRivalSent };
     });
 
     if (locked.status === 'skipped') {

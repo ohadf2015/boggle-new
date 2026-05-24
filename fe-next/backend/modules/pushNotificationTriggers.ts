@@ -662,7 +662,7 @@ export async function notifyDailyChallengeReminder(
     imageUrl?: string;
     kind?: string;
   }
-): Promise<void> {
+): Promise<boolean> {
   // Hourly reminder cron pre-fetches every recipient's locale in one batch
   // via getDailyChallengePushRecipients(). When the caller passes it through
   // we skip the per-user profiles round-trip — that fan-out was a primary
@@ -672,17 +672,32 @@ export async function notifyDailyChallengeReminder(
   const body = override?.body ?? translatePush(locale, 'dailyChallenge.body');
   const deepLink = override?.deepLink ?? '/daily';
   const imageUrl = override?.imageUrl ?? mascotImageUrl('encouraging');
-  return triggerPush(toUserId, 'daily_challenge', {
-    title,
-    body,
-    imageUrl,
-    data: {
-      type: 'daily_challenge',
-      deepLink,
-      ...(override?.variant !== undefined ? { variant: String(override.variant) } : {}),
-      ...(override?.kind ? { kind: override.kind } : {}),
-    },
-  }, 'push_only');
+
+  // This is a 'push_only' nudge — no in-app history row — so we inline the
+  // pref-check + send instead of going through triggerPush(). That lets us
+  // RETURN whether a device actually received it. The cron must only mark a
+  // user as "reminded today" on a true return; otherwise one non-delivering
+  // tick (dead token, FCM hiccup) silences them for the rest of the day with
+  // no retry. Mirrors triggerPush's never-throw contract.
+  try {
+    const allowed = await isPushAllowed(toUserId, 'daily_challenge');
+    if (!allowed) return false;
+    const delivered = await sendToUser(toUserId, {
+      title,
+      body,
+      imageUrl,
+      data: {
+        type: 'daily_challenge',
+        deepLink,
+        ...(override?.variant !== undefined ? { variant: String(override.variant) } : {}),
+        ...(override?.kind ? { kind: override.kind } : {}),
+      },
+    });
+    return delivered > 0;
+  } catch (error) {
+    logger.error('PUSH_TRIGGER', `daily reminder send failed for ${toUserId}: ${(error as Error).message}`);
+    return false;
+  }
 }
 
 /**

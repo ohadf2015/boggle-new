@@ -146,9 +146,19 @@ describe('pushNotificationTriggers', () => {
       expect(mockInsert).not.toHaveBeenCalled();
     });
 
-    it('should not throw on FCM failure', async () => {
+    it('returns true when a device actually received the push', async () => {
+      mockSendToUser.mockResolvedValue(1);
+      await expect(notifyDailyChallengeReminder('user')).resolves.toBe(true);
+    });
+
+    it('returns false when nothing was delivered (no live device) — lets the cron retry', async () => {
+      mockSendToUser.mockResolvedValue(0);
+      await expect(notifyDailyChallengeReminder('user')).resolves.toBe(false);
+    });
+
+    it('returns false (not throw) on FCM failure so the user is not marked as reminded', async () => {
       mockSendToUser.mockRejectedValue(new Error('FCM down'));
-      await expect(notifyDailyChallengeReminder('user')).resolves.toBeUndefined();
+      await expect(notifyDailyChallengeReminder('user')).resolves.toBe(false);
     });
   });
 

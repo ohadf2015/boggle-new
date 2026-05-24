@@ -197,6 +197,13 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
     };
 }
 
+export const viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover',
+    themeColor: '#1a1a2e',
+};
+
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps): Promise<ReactNode> {
     const { locale } = await params;
     const validLocale = (SUPPORTED_LOCALES.has(locale) ? locale : 'en') as Locale;
@@ -534,8 +541,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
                 <link rel="apple-touch-icon" sizes="152x152" href="/icon-144.png" />
                 <link rel="apple-touch-icon" sizes="144x144" href="/icon-144.png" />
-                <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-                <meta name="theme-color" content="#1a1a2e" />
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

@@ -9,6 +9,8 @@ interface LandingCardsSkeletonProps {
   compact?: boolean;
   /** Additional className */
   className?: string;
+  /** Whether the user is an admin */
+  isAdmin?: boolean;
 }
 
 /**

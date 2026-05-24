@@ -12,11 +12,13 @@ import { InlineBannerAd } from '@/components/ads';
 const guidesContent: Record<string, {
   title: string;
   subtitle: string;
+  quickStart: string;
   guides: Array<{ slug: string; title: string; description: string; icon: 'classic' | 'blast' | 'wordHunt' }>;
 }> = {
   en: {
     title: 'LexiClash Strategy Guides',
     subtitle: 'Master every game mode with expert strategies, tips, and techniques.',
+    quickStart: 'New to LexiClash? Start with Classic mode. It\'s the quickest way to pick up grid scanning, and the time pressure builds good habits fast. Blast makes more sense after a few Classic games — the combo system clicks once you already know how to find words. Word Hunt runs on different logic; it rewards patience over speed. Each guide covers specific scoring patterns for that mode.',
     guides: [
       { slug: 'classic-strategy', title: 'Classic Mode Strategy', description: 'Learn scanning patterns, time management, and scoring strategies to find more words and score higher.', icon: 'classic' },
       { slug: 'blast-strategy', title: 'Blast Mode Mastery', description: 'Unlock the combo system, master tile effects, and chain your way to massive scores.', icon: 'blast' },
@@ -26,6 +28,7 @@ const guidesContent: Record<string, {
   he: {
     title: 'מדריכי אסטרטגיה של לקסיקלאש',
     subtitle: 'שלטו בכל מצב משחק עם אסטרטגיות מומחים, טיפים וטכניקות.',
+    quickStart: 'חדשים ב-LexiClash? התחילו במצב קלאסי. הוא הדרך המהירה ביותר ללמוד סריקת לוח תחת לחץ זמן. בלאסט כדאי לקרוא שנייה — מערכת הקומבו מובנת הרבה יותר לאחר כמה משחקי קלאסי. ציד מילים פועל לפי היגיון שונה לגמרי ומתגמל סבלנות על פני מהירות. כל מדריך מכסה תבניות ניקוד ספציפיות למצב המשחק שלו.',
     guides: [
       { slug: 'classic-strategy', title: 'אסטרטגיית מצב קלאסי', description: 'למדו תבניות סריקה, ניהול זמן ואסטרטגיות ניקוד למציאת יותר מילים וניקוד גבוה יותר.', icon: 'classic' },
       { slug: 'blast-strategy', title: 'שליטה במצב בלאסט', description: 'פענחו את מערכת הקומבו, שלטו באפקטי אריחים ושרשרו לניקוד מסיבי.', icon: 'blast' },
@@ -35,6 +38,7 @@ const guidesContent: Record<string, {
   sv: {
     title: 'LexiClash Strategiguider',
     subtitle: 'Bemestra varje spelmod med expertstrategier, tips och tekniker.',
+    quickStart: 'Ny på LexiClash? Börja med Klassiskt. Det är det snabbaste sättet att lära sig rutnätsskanning under tidspress. Blast är mer meningsfullt efter några Klassiska spel — kombosystemet faller på plats när du redan vet hur man hittar ord. Word Hunt följer en annan logik; det belönar tålamod framför hastighet. Varje guide täcker specifika poängmönster för det läget.',
     guides: [
       { slug: 'classic-strategy', title: 'Klassisk Strategi', description: 'Lar dig skanningsmonster, tidshantering och poangstrategier for att hitta fler ord.', icon: 'classic' },
       { slug: 'blast-strategy', title: 'Blast-lage Mesterskap', description: 'Las upp kombosystemet, bemestra platteffekter och kedja till massiva poang.', icon: 'blast' },
@@ -44,6 +48,7 @@ const guidesContent: Record<string, {
   ja: {
     title: 'LexiClash 攻略ガイド',
     subtitle: 'エキスパートの戦略、ヒント、テクニックですべてのゲームモードをマスター。',
+    quickStart: 'LexiClashが初めて？クラシックモードから始めましょう。タイムプレッシャーの中でグリッドスキャンをすばやく身につけられます。ブラストはクラシックを数回プレイした後に読むと理解しやすい — 単語の見つけ方がわかると、コンボシステムがすっと入ってきます。ワードハントはまた別のロジックで動いていて、速さより粘り強さが大事です。各ガイドはそのモード固有のスコアパターンをカバーしています。',
     guides: [
       { slug: 'classic-strategy', title: 'クラシックモード攻略', description: 'スキャンパターン、時間管理、スコアリング戦略を学んでもっと単語を見つけよう。', icon: 'classic' },
       { slug: 'blast-strategy', title: 'ブラストモード攻略', description: 'コンボシステムを解き明かし、タイルエフェクトをマスターしてハイスコアを狙おう。', icon: 'blast' },
@@ -53,6 +58,7 @@ const guidesContent: Record<string, {
   es: {
     title: 'Guias de Estrategia LexiClash',
     subtitle: 'Domina cada modo de juego con estrategias expertas, consejos y tecnicas.',
+    quickStart: '¿Nuevo en LexiClash? Empieza con el modo Clásico. Es la forma más rápida de aprender el escaneo de cuadrícula bajo presión de tiempo. Blast tiene más sentido después de algunas partidas Clásicas — el sistema de combos encaja en cuanto ya sabes encontrar palabras. Word Hunt funciona con una lógica distinta; recompensa la paciencia sobre la velocidad. Cada guía cubre patrones de puntuación específicos para ese modo.',
     guides: [
       { slug: 'classic-strategy', title: 'Estrategia Modo Clasico', description: 'Aprende patrones de escaneo, gestion del tiempo y estrategias de puntuacion.', icon: 'classic' },
       { slug: 'blast-strategy', title: 'Dominio Modo Blast', description: 'Desbloquea el sistema de combos, domina efectos de fichas y encadena puntajes masivos.', icon: 'blast' },
@@ -98,6 +104,9 @@ export default function GuidesIndexPageClient(): React.ReactElement {
           </h1>
           <p className={cn('text-lg', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
             {content.subtitle}
+          </p>
+          <p className={cn('text-sm mt-4 max-w-2xl mx-auto leading-relaxed', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+            {content.quickStart}
           </p>
         </header>
 

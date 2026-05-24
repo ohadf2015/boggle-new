@@ -20,6 +20,7 @@ import { hasCompletedOnboarding, hasSupabaseSession, markOnboardingComplete } fr
 import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
 import { LandingBlogSection } from './LandingBlogSection';
 import { LandingHero } from './LandingHero';
+import { LandingHeroVariant } from './LandingHeroVariant';
 import { LandingCardsSkeleton } from './LandingCardsSkeleton';
 // SSR enabled: receives initialData (gamesToday) at server time → no skeleton flash above the fold.
 const LandingSocialProofBar = dynamic(() => import('./LandingSocialProofBar').then(m => m.LandingSocialProofBar), {
@@ -45,6 +46,7 @@ const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.La
 import Header from '@/components/Header';
 import { getPerfVariant } from '@/utils/perfVariant';
 import { useEvents } from '@/hooks/useEvents';
+import { useExperiment } from '@/hooks/useExperiment';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
 
 const EventBanner = dynamic(() => import('@/components/events/EventBanner'), { ssr: false });
@@ -97,6 +99,13 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
   const handleDismissEvent = useCallback(() => {
     if (visibleEvent) setDismissedEventIds((prev) => new Set([...prev, visibleEvent.id]));
   }, [visibleEvent]);
+
+  // Landing hero A/B test — variant adds subtitle + CTA + live count
+  const { variant: heroVariant, trackExposure: trackHeroExposure } =
+    useExperiment('landing-variant-homepage-v1');
+  useEffect(() => {
+    trackHeroExposure();
+  }, [trackHeroExposure]);
 
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { isOnCrazyGamesPlatform, isLoading: cgLoading } = useCrazyGames();
@@ -177,11 +186,20 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
       {/* Main content — padding uses CSS breakpoints to avoid JS-driven CLS */}
       <section className="w-full max-w-7xl mx-auto overflow-x-clip relative z-20 flex flex-col gap-6 sm:gap-8 px-2 py-1.5 sm:px-3 sm:py-5 md:px-4 md:py-6 lg:px-6 lg:py-8 xl:px-8">
         {/* Hero: Mascot + Title + CTA + Leaderboard (desktop) */}
-        <LandingHero
-          players={topPlayers}
-          playersLoading={topPlayersLoading}
-          isMobilePortrait={isMobilePortrait}
-        />
+        {heroVariant === 'variant' ? (
+          <LandingHeroVariant
+            players={topPlayers}
+            playersLoading={topPlayersLoading}
+            isMobilePortrait={isMobilePortrait}
+            activePlayers={activePlayers}
+          />
+        ) : (
+          <LandingHero
+            players={topPlayers}
+            playersLoading={topPlayersLoading}
+            isMobilePortrait={isMobilePortrait}
+          />
+        )}
 
         {/* Social Proof Bar — compact stats, immediately below hero */}
         <LandingSocialProofBar
@@ -210,7 +228,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
             cardOrder={initialData?.cardOrder}
           />
         ) : (
-          <LandingCardsSkeleton />
+          <LandingCardsSkeleton isAdmin={isAdmin} />
         )}
 
         {/* Leaderboard — mobile only via CSS (no JS-driven mount/unmount → no CLS) */}

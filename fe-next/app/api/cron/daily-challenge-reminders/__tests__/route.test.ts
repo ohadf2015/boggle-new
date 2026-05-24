@@ -156,4 +156,71 @@ describe('/api/cron/daily-challenge-reminders no-rival telemetry', () => {
 
     expect(mockCaptureMessage).not.toHaveBeenCalled();
   });
+
+  it('marks ONLY recipients whose push actually delivered (others retry next tick)', async () => {
+    mockGetRecipients.mockResolvedValueOnce([
+      { userId: 'u1', locale: 'en' },
+      { userId: 'u2', locale: 'en' },
+      { userId: 'u3', locale: 'en' },
+    ]);
+    mockFindRivals.mockResolvedValueOnce(new Map());
+    // u1 + u3 reached a live device; u2 had no live device this tick.
+    mockNotify
+      .mockResolvedValueOnce(true) // u1
+      .mockResolvedValueOnce(false) // u2 — not delivered
+      .mockResolvedValueOnce(true); // u3
+    mockMarkBatch.mockResolvedValueOnce(undefined);
+
+    const res = await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.delivered).toBe(2);
+    // Only the delivered users get last_daily_push_sent_at stamped — so u2 is
+    // still eligible on the next hourly tick instead of silenced all day.
+    const marked = mockMarkBatch.mock.calls[0][0] as string[];
+    expect(marked).toEqual(['u1', 'u3']);
+  });
+
+  it('completes cleanly when NOTHING delivered (mass FCM outage hour)', async () => {
+    mockGetRecipients.mockResolvedValueOnce([
+      { userId: 'u1', locale: 'en' },
+      { userId: 'u2', locale: 'en' },
+    ]);
+    mockFindRivals.mockResolvedValueOnce(new Map());
+    mockNotify.mockResolvedValue(false); // no live device this hour
+    mockMarkBatch.mockResolvedValueOnce(undefined);
+
+    const res = await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.delivered).toBe(0);
+    // Nobody marked → the whole cohort retries next tick. Marker call (if made)
+    // gets an empty list, which markDailyPushSentBatch no-ops on.
+    const marked = mockMarkBatch.mock.calls[0]?.[0] ?? [];
+    expect(marked).toEqual([]);
+  });
+
+  it('still sends the general reminder to everyone when rival lookup throws', async () => {
+    mockGetRecipients.mockResolvedValueOnce([
+      { userId: 'u1', locale: 'en' },
+      { userId: 'u2', locale: 'en' },
+    ]);
+    // Rival enrichment is optional — a failure must NOT suppress the baseline.
+    mockFindRivals.mockRejectedValueOnce(new Error('season RPC exploded'));
+    mockNotify.mockResolvedValue(true);
+    mockMarkBatch.mockResolvedValueOnce(undefined);
+
+    const res = await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(mockNotify).toHaveBeenCalledTimes(2);
+    // Everyone gets the general copy, nobody the rival copy.
+    expect(mockPickDaily).toHaveBeenCalledTimes(2);
+    expect(mockPickRival).not.toHaveBeenCalled();
+  });
 });

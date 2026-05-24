@@ -250,6 +250,37 @@ export const EXPERIMENTS = {
       'ohadf2015@gmail.com': 'on',
     },
   }),
+  'landing-variant-homepage-v1': defineExperiment({
+    variants: ['control', 'variant'] as const,
+    default: 'control',
+    description:
+      'Homepage hero CTA variant. Adds subtitle + primary CTA button + live player count to hero. Hypothesis: above-fold CTA lifts game-start CVR by reducing scroll-to-action distance.',
+    forceVariantByEmail: {
+      'ohadf2015@gmail.com': 'variant',
+    },
+  }),
+
+  /**
+   * Post-game quick-replay CTA. After SP game completion (auto-play
+   * countdown cancelled), control shows the existing NextStepPrompt
+   * only. The `quick-replay` variant adds a prominent "Run it back?"
+   * primary button above NextStepPrompt so players can restart the same
+   * mode in one tap without returning to the home screen.
+   *
+   * Hypothesis: reducing friction from results → next game start will
+   * lift same-session replay rate (game_started within 10min of
+   * game_completed per person) by ≥15%.
+   *
+   * Conversion: results_cta_clicked { cta: 'quick_replay' } → game_started
+   * within 10 min per person_id.
+   * Ship to PostHog: flag key = 'exp-results-replay-cta-v1', 50/50 rollout.
+   */
+  'exp-results-replay-cta-v1': defineExperiment({
+    variants: ['control', 'quick-replay'] as const,
+    default: 'control',
+    description:
+      'Post-game quick-replay CTA on SP results page. quick-replay = adds "Run it back?" primary button above NextStepPrompt. control = no change. Conversion = game_started within 10min of game_completed.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

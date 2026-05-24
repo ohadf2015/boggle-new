@@ -53,15 +53,19 @@ function getFirebaseApp() {
 }
 
 /**
- * Send push notification to a single user (all their active devices)
- * Never throws — logs errors and returns silently
+ * Send push notification to a single user (all their active devices).
+ *
+ * Never throws — logs errors and returns the number of devices that actually
+ * received the message (0 on any early-out or failure). Callers that schedule
+ * a "don't send again today" marker MUST gate it on a non-zero return, or a
+ * single dead-token / FCM-outage tick will silence the user for the whole day.
  */
-export async function sendToUser(userId: string, payload: FCMPayload): Promise<void> {
+export async function sendToUser(userId: string, payload: FCMPayload): Promise<number> {
   try {
-    if (!isSupabaseConfigured()) return;
+    if (!isSupabaseConfigured()) return 0;
 
     const supabase = getSupabase();
-    if (!supabase) return;
+    if (!supabase) return 0;
 
     const { data: tokens, error } = await supabase
       .from('user_push_tokens')
@@ -71,13 +75,13 @@ export async function sendToUser(userId: string, payload: FCMPayload): Promise<v
 
     if (error) {
       logger.error('FCM', `Failed to fetch tokens for ${userId}: ${error.message}`);
-      return;
+      return 0;
     }
 
-    if (!tokens || tokens.length === 0) return;
+    if (!tokens || tokens.length === 0) return 0;
 
     const app = getFirebaseApp();
-    if (!app) return;
+    if (!app) return 0;
 
     const messaging = app.messaging();
     const fcmTokens = tokens.map((t: { token: string }) => t.token);
@@ -119,8 +123,10 @@ export async function sendToUser(userId: string, payload: FCMPayload): Promise<v
     }
 
     logger.debug('FCM', `Sent to ${userId}: ${result.successCount}/${fcmTokens.length} delivered`);
+    return result.successCount;
   } catch (error) {
     logger.error('FCM', `Failed to send to ${userId}: ${(error as Error).message}`);
+    return 0;
   }
 }
 

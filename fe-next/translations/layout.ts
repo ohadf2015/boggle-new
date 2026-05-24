@@ -2,8 +2,8 @@ export const layoutTranslations: Record<string, any> = {
   "en": {
     "direction": "ltr",
     "seo": {
-      "title": "Free Boggle Online — No Download | LexiClash Multiplayer Word Game",
-      "description": "Play boggle online free — no download, no signup. Real-time multiplayer word battles with friends. Like Words With Friends but everyone plays at once. Daily challenges, 5 languages.",
+      "title": "Free Boggle Online — No Download | LexiClash Word Game",
+      "description": "Play free boggle online — no download. Real-time multiplayer word battles with friends. Like Words With Friends but live. Daily challenges, 5 languages.",
       "keywords": "play boggle online free no download, word games online free, online multiplayer word game, word game with friends, daily word wheel, word multiplayer, play boggle online free with other players, online multiplayer word games like hanging with friends, boggle online free, free word game no download, word battle game, word hunt game online, daily word challenge, brain training word game, word puzzle game free, word game for groups, word games for parties, wordle alternative multiplayer, scrabble alternative free, words with friends alternative, competitive word game, word race online, boggle alternatives 2026, word game you type in words, games like boggle online free, word making games, word RPG adventure game, vocabulary builder game, ESL word game classroom, family word game night, real-time word battle, online web based multiplayer words games, word combo game, word game for kids, spelling game multiplayer, daily word puzzle free, lexiclash, lexi clash, word game israel, israeli word game, word game made in israel, boggle hebrew english, multilingual word game, multiplayer word game, word games multiplayer, multiplayer word game online, words with friends multiplayer free online, word games multiplayer online free, word game online multiplayer free, word games online free multiplayer, word game like boggle free, word search game multiplayer, word finding game online, word game no download no signup, free online word game with friends, word game browser, word game instant play",
       "ogTitle": "Free Boggle Online — No Download | LexiClash Word Game",
       "ogDescription": "🎮 Play boggle online free with friends — no download! Real-time word battles, daily challenges, adventure mode ⚡ Like Boggle meets Wordle but multiplayer 🔥",
@@ -114,7 +114,7 @@ export const layoutTranslations: Record<string, any> = {
     "direction": "rtl",
     "seo": {
       "title": "לקסיקלאש - משחק מילים חינם בעברית | בוגל אונליין ללא הורדה",
-      "description": "שחקו משחק מילים בעברית בחינם! ללא הורדה, ישירות בדפדפן. לקסיקלאש הוא כמו בוגל וסקראבל אבל מרובה משתתפים בזמן אמת. 10,000+ מילים בעברית, מושלם למסיבות, ערבי משפחה וגיבוש צוות. אתגר מילים יומי, משחק מילים מתוחכם ומשחקי קהילה בעברית. פותח בישראל 🇮🇱",
+      "description": "שחקו משחק מילים בעברית בחינם! לקסיקלאש הוא כמו בוגל וסקראבל מרובה משתתפים בזמן אמת. מושלם למסיבות ולמשפחה. אתגר יומי, משחקי קהילה. ללא הורדה. 🇮🇱",
       "keywords": "משחק מילים חינם בעברית, משחק מילים מרובה משתתפים, משחק כמו וורדל בעברית, בוגל אונליין בעברית, סקראבל אונליין חינם, משחק מילים לחברים, אלטרנטיבה לבוגל, משחק מילים בזמן אמת, קרב מילים אונליין, משחק מילים למסיבות, תפזורת אונליין, משחק מילים ישראלי, ערב משחקים משפחתי, משחק גיבוש צוות, משחק מילים ללא הורדה, משחק דפדפן חינם, אליאס אונליין בעברית, משחק אוצר מילים, משחק לילדים בעברית, משחק חינוכי בעברית, אתגר מילים, משחק מילים מתוחכם, משחק מילים חינם ללא הורדה, משחק מילים אונליין, גלישת מילים, משחקי קהילה בעברית, המילה היומית, מדויקת המילה היומית, מישחק מילים, משחק זיכרון מילים חינם, משחקי מילים בעברית בחינם, משחקי מילים עם חברים, משחק מילים בעברית חינם, משחק מילים אונליין חינם, משחק מילים בדפדפן, לקסיקלאש",
       "ogTitle": "לקסיקלאש - משחק מילים כמו בוגל וסקראבל | מרובה משתתפים בעברית",
       "ogDescription": "🎮 אוהבים וורדל או סקראבל? נסו לקסיקלאש - משחק מילים מרובה משתתפים בעברית! ⚡ צרו חדר, שלחו לינק והתחרו בזמן אמת 🔥 חינם, ללא הרשמה 🇮🇱",
@@ -225,7 +225,7 @@ export const layoutTranslations: Record<string, any> = {
     "direction": "ltr",
     "seo": {
       "title": "Gratis Multiplayer Ordspel - Spela Online",
-      "description": "Tävla mot vänner i spännande ordstrider i realtid! LexiClash är ett snabbt multiplayer-ordspel där varje sekund räknas. Hitta ord, överträffa motståndarna och klättra på topplistan. Perfekt för fester, spelkvällar och vänskaplig tävling. Också bra för att bygga ordförråd medan du har kul! Spela gratis på 5 språk - ingen nedladdning krävs.",
+      "description": "Tävla mot vänner i spännande ordstrider i realtid! LexiClash är ett snabbt multiplayer-ordspel. Hitta ord, klättra på topplistan. Spela gratis online.",
       "keywords": "multiplayer ordspel, realtids ordspel, online ordstrid, festspel, tävlings ordspel, snabbt ordspel, ordpussel multiplayer, alias spel, kahoot alternativ, familjespelkväll, festspel, teambuilding, ordtävling, live ordspel, ordrace, ordförrådsspel, gratis onlinespel, alfapet online gratis, ordspel utan nedladdning, ordspel för fester, dagligt ordpussel, ordlek med vänner, ordäventyr spel, engelska spel mot bottar, ordspel med vänner online, ordspel gratis i webbläsaren",
       "ogTitle": "LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid",
       "ogDescription": "🎮 Tävla mot vänner i spännande ordstrider i realtid! ⚡ Hitta ord snabbt, överträffa motståndarna, klättra på topplistan 🔥 Perfekt för fester och spelkvällar. Spela gratis!",
@@ -336,7 +336,7 @@ export const layoutTranslations: Record<string, any> = {
     "direction": "ltr",
     "seo": {
       "title": "LexiClash - ワードバトル＆ワードハント | 無料マルチプレイヤーワードゲーム",
-      "description": "友達とスリリングなリアルタイムワードバトルで競い合おう！LexiClashは一秒一秒が勝負の速いマルチプレイヤーワードゲーム。ワードハントで単語を見つけ、相手を出し抜き、リーダーボードを駆け上がれ。パーティー、ゲームナイト、友達との対戦に最適。楽しみながら語彙力も鍛えられる！5言語対応で無料プレイ - ダウンロード不要！デイリーワードホイールで世界記録に挑戦！",
+      "description": "友達とリアルタイムワードバトルで競い合おう！LexiClashは一秒が勝負の速いマルチプレイヤーワードゲーム。単語を見つけ相手を出し抜きリーダーボードを駆け上がれ。パーティーに最適。無料プレイ - ダウンロード不要！",
       "keywords": "マルチプレイヤーワードゲーム, リアルタイムワードゲーム, オンラインワードバトル, パーティーゲーム, 対戦ワードゲーム, 速いワードゲーム, ワードパズルマルチプレイヤー, Alias, Kahoot, ファミリーゲームナイト, チームビルディング, 単語対戦, ライブワードゲーム, ワードレース, 語彙ゲーム, 無料オンラインゲーム, ボグル 無料 ダウンロード不要, ワードホイール, 世界記録 ワードゲーム, 文字ゲーム 無料, ワードゲーム ダウンロード不要, 言葉遊び オンライン, 語彙力 ゲーム, ワードアドベンチャー ゲーム, ワードバトル, ワードハント, 共通ワード・チャレンジ, ブラウザゲーム マルチワードゲーム, マルチプレイヤー 言葉ゲーム 無料",
       "ogTitle": "LexiClash - スリル満点のマルチプレイヤーワードゲーム | リアルタイム対戦",
       "ogDescription": "🎮 友達とスリリングなリアルタイムワードバトルで競い合おう！⚡ 素早く単語を見つけ、相手を出し抜き、ランキング上位を目指せ 🔥 パーティーやゲームナイトに最適。無料プレイ！",
@@ -447,7 +447,7 @@ export const layoutTranslations: Record<string, any> = {
     "direction": "ltr",
     "seo": {
       "title": "Juego de Palabras Multijugador Gratis - Online",
-      "description": "¡Compite contra amigos en emocionantes batallas de palabras en tiempo real! LexiClash es un juego de palabras multijugador rápido donde cada segundo cuenta. Encuentra palabras, supera a tus oponentes y sube en la clasificación. Perfecto para fiestas, noches de juegos y competiciones amistosas. ¡Juega gratis en 5 idiomas - sin descargas!",
+      "description": "¡Compite contra amigos en emocionantes batallas de palabras en tiempo real! Encuentra palabras, supera oponentes y sube en la clasificación. ¡Juega gratis!",
       "keywords": "juego de palabras multijugador, juego de palabras en tiempo real, batalla de palabras online, juego de palabras para fiestas, juego de palabras competitivo, boggle online, juego de vocabulario, juego de aprendizaje de idiomas, juego online gratis, juego de letras gratis, wordle en español, boggle en español gratis, juego de palabras sin descargar, juego de palabras para grupos, juego de vocabulario online, juego de palabras con amigos, juego de palabras educativo, scrabble alternativa online, juego de palabras en navegador, reto de palabras diario, juego de palabras rápido, juego cerebral de palabras, juegos de multijugador de palabras online, juego de palabras con tiempo online con amigos",
       "ogTitle": "LexiClash - Juego de Palabras Multijugador Rápido | Compite en Tiempo Real",
       "ogDescription": "🎮 ¡Compite contra amigos en emocionantes batallas de palabras en tiempo real! ⚡ Encuentra palabras rápido, supera a tus oponentes, sube en la clasificación 🔥 ¡Juega gratis ahora!",

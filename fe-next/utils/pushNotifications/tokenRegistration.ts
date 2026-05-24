@@ -55,6 +55,22 @@ const capGlobal = globalThis as unknown as CapacitorGlobal;
 const DEVICE_ID_KEY = 'lexiclash_push_device_id';
 
 /**
+ * UUID v4 generator with fallback for Chrome WebView < 92 (no crypto.randomUUID).
+ * Exported for unit testing only.
+ */
+export function _generateUUID(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  // Fallback: Math.random-based UUID v4 for old WebViews
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+/**
  * Get or create a persistent device ID
  */
 function getDeviceId(): string {
@@ -62,7 +78,7 @@ function getDeviceId(): string {
 
   let deviceId = localStorage.getItem(DEVICE_ID_KEY);
   if (!deviceId) {
-    deviceId = crypto.randomUUID();
+    deviceId = _generateUUID();
     localStorage.setItem(DEVICE_ID_KEY, deviceId);
   }
   return deviceId;

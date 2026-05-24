@@ -118,6 +118,31 @@ describe('fcmService', () => {
       expect(mockSendEachForMulticast).not.toHaveBeenCalled();
     });
 
+    it('returns the delivered device count (lets callers confirm real delivery)', async () => {
+      mockSendEachForMulticast.mockResolvedValue({
+        successCount: 2,
+        failureCount: 0,
+        responses: [{ success: true }, { success: true }],
+      });
+
+      const delivered = await sendToUser('user-123', mockPayload);
+
+      expect(delivered).toBe(2);
+    });
+
+    it('returns 0 when the user has no active tokens (nothing delivered)', async () => {
+      mockEq.mockImplementation((field: string) => {
+        if (field === 'is_active') {
+          return Promise.resolve({ data: [], error: null });
+        }
+        return { eq: mockEq };
+      });
+
+      const delivered = await sendToUser('user-no-tokens', mockPayload);
+
+      expect(delivered).toBe(0);
+    });
+
     it('should deactivate stale tokens on FCM error', async () => {
       mockSendEachForMulticast.mockResolvedValue({
         successCount: 1,
@@ -157,14 +182,14 @@ describe('fcmService', () => {
         return { eq: mockEq };
       });
 
-      // Should not throw
-      await expect(sendToUser('user-123', mockPayload)).resolves.toBeUndefined();
+      // Should not throw — and reports 0 delivered so callers can retry
+      await expect(sendToUser('user-123', mockPayload)).resolves.toBe(0);
     });
 
     it('should not throw on FCM send error', async () => {
       mockSendEachForMulticast.mockRejectedValue(new Error('FCM unavailable'));
 
-      await expect(sendToUser('user-123', mockPayload)).resolves.toBeUndefined();
+      await expect(sendToUser('user-123', mockPayload)).resolves.toBe(0);
     });
   });
 

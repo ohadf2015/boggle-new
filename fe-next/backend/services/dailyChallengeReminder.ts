@@ -34,13 +34,27 @@ export async function sendDailyChallengeReminders(): Promise<void> {
   const localHour = getLocalHour('UTC');
   const hoursLeft = Math.max(1, 24 - localHour);
 
-  const rivalsByUser = await findDailyChallengeRivals(
-    recipients.map((r) => r.userId)
-  );
+  // Rival theming is optional enrichment — degrade to all-general if the
+  // lookup throws so a transient failure never suppresses the baseline
+  // reminder (mirror of the HTTP cron route).
+  let rivalsByUser: Awaited<ReturnType<typeof findDailyChallengeRivals>>;
+  try {
+    rivalsByUser = await findDailyChallengeRivals(recipients.map((r) => r.userId));
+  } catch (rivalErr) {
+    logger.error(
+      'DAILY_REMINDER',
+      `rival lookup failed, sending general reminders: ${
+        rivalErr instanceof Error ? rivalErr.message : String(rivalErr)
+      }`
+    );
+    rivalsByUser = new Map();
+  }
 
   let rivalSent = 0;
+  // Resolves true only when a device actually received the push; non-delivery
+  // resolves false and is left unmarked so the next tick retries.
   const results = await Promise.allSettled(
-    recipients.map(async ({ userId, locale, gender }) => {
+    recipients.map(async ({ userId, locale, gender }): Promise<boolean> => {
       const rival = rivalsByUser.get(userId) ?? null;
       if (rival) {
         const copy = pickRivalReminderCopy({
@@ -57,7 +71,7 @@ export async function sendDailyChallengeReminders(): Promise<void> {
           additionalCount: rival.additionalCount,
         });
         rivalSent++;
-        await notifyDailyChallengeReminder(userId, {
+        return notifyDailyChallengeReminder(userId, {
           title: copy.title,
           body: copy.body,
           deepLink: copy.deepLink,
@@ -68,10 +82,9 @@ export async function sendDailyChallengeReminders(): Promise<void> {
           ...(rival.avatarImage ? { imageUrl: rival.avatarImage } : {}),
           kind: 'rival',
         });
-        return;
       }
       const copy = pickDailyReminderCopy({ userId, date, hoursLeft, locale, gender });
-      await notifyDailyChallengeReminder(userId, {
+      return notifyDailyChallengeReminder(userId, {
         title: copy.title,
         body: copy.body,
         deepLink: copy.deepLink,
@@ -81,13 +94,15 @@ export async function sendDailyChallengeReminders(): Promise<void> {
     })
   );
 
-  let sent = 0;
+  let delivered = 0;
   let failed = 0;
-  const sentIds: string[] = [];
+  const deliveredIds: string[] = [];
   results.forEach((r, i) => {
     if (r.status === 'fulfilled') {
-      sent++;
-      sentIds.push(recipients[i].userId);
+      if (r.value === true) {
+        delivered++;
+        deliveredIds.push(recipients[i].userId);
+      }
     } else {
       failed++;
       logger.error(
@@ -97,7 +112,7 @@ export async function sendDailyChallengeReminders(): Promise<void> {
     }
   });
 
-  await markDailyPushSentBatch(sentIds);
+  await markDailyPushSentBatch(deliveredIds);
 
-  logger.info('DAILY_REMINDER', `Sent ${sent} (${rivalSent} rival-themed), failed ${failed}`);
+  logger.info('DAILY_REMINDER', `Delivered ${delivered} (${rivalSent} rival-themed), failed ${failed}`);
 }

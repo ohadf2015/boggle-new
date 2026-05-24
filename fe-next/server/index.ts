@@ -125,6 +125,74 @@ async function start(): Promise<void> {
     createContext: ({ req, res }) => ({ req, res }),
   }));
 
+  // SEO file bypass - handle directly via Express to avoid Next.js catch-all interference
+  app.get('/sitemap.xml', async (req, res, next) => {
+    try {
+      const sitemapModule = await import('../app/sitemap');
+      const routes = sitemapModule.default();
+      
+      let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+      xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n';
+      
+      for (const route of routes) {
+        xml += '  <url>\n';
+        xml += `    <loc>${route.url}</loc>\n`;
+        if (route.lastModified) xml += `    <lastmod>${route.lastModified}</lastmod>\n`;
+        if (route.changeFrequency) xml += `    <changefreq>${route.changeFrequency}</changefreq>\n`;
+        if (route.priority) xml += `    <priority>${route.priority}</priority>\n`;
+        if (route.alternates?.languages) {
+          for (const [lang, url] of Object.entries(route.alternates.languages)) {
+            xml += `    <xhtml:link rel="alternate" hreflang="${lang}" href="${url}" />\n`;
+          }
+        }
+        xml += '  </url>\n';
+      }
+      xml += '</urlset>';
+      
+      res.setHeader('Content-Type', 'application/xml');
+      res.send(xml);
+    } catch (err) {
+      httpLogger.error({ err }, 'Failed to generate sitemap.xml');
+      next(err);
+    }
+  });
+
+  app.get('/robots.txt', async (req, res, next) => {
+    try {
+      const robotsModule = await import('../app/robots');
+      const config = robotsModule.default();
+      
+      let txt = '';
+      if (config.rules) {
+        const rules = Array.isArray(config.rules) ? config.rules : [config.rules];
+        for (const rule of rules) {
+          const uas = Array.isArray(rule.userAgent) ? rule.userAgent : [rule.userAgent];
+          for (const ua of uas) txt += `User-agent: ${ua}\n`;
+          
+          if (rule.allow) {
+            const allows = Array.isArray(rule.allow) ? rule.allow : [rule.allow];
+            for (const allow of allows) txt += `Allow: ${allow}\n`;
+          }
+          if (rule.disallow) {
+            const disallows = Array.isArray(rule.disallow) ? rule.disallow : [rule.disallow];
+            for (const disallow of disallows) txt += `Disallow: ${disallow}\n`;
+          }
+          txt += '\n';
+        }
+      }
+      if (config.sitemap) {
+        const sitemaps = Array.isArray(config.sitemap) ? config.sitemap : [config.sitemap];
+        for (const s of sitemaps) txt += `Sitemap: ${s}\n`;
+      }
+      
+      res.setHeader('Content-Type', 'text/plain');
+      res.send(txt);
+    } catch (err) {
+      httpLogger.error({ err }, 'Failed to generate robots.txt');
+      next(err);
+    }
+  });
+
   // Next.js request handler (catch-all)
   app.use(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

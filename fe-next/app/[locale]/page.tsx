@@ -22,9 +22,9 @@ interface PageProps {
 const titleMap: Record<string, string> = {
   en: 'Play Free Multiplayer Word Games Online — LexiClash 2026',
   he: 'משחקי מילים אונליין · מרובה משתתפים בעברית חינם | LexiClash',
-  sv: 'Spela Gratis Ordspel Online — Multiplayer Med Vänner | LexiClash',
+  sv: 'Spela Gratis Ordspel Online — Multiplayer | LexiClash',
   ja: '無料オンラインワードゲーム｜友達と対戦・日本語対応 LexiClash',
-  es: 'Juegos de Palabras Online Gratis · Multijugador en Español | LexiClash',
+  es: 'Juegos de Palabras Multijugador en Español | LexiClash',
 };
 
 const keywordsMap: Record<string, string> = {
@@ -36,11 +36,11 @@ const keywordsMap: Record<string, string> = {
 };
 
 const descriptionMap: Record<string, string> = {
-  en: 'Free multiplayer word game — no signup, no download. Real-time Boggle Shake-style battles, daily word wheel puzzles, 6 modes, 5 languages. Play in any browser. Start now →',
+  en: 'Free multiplayer word game — no signup, no download. Real-time Boggle-style battles, daily word wheel, 6 modes, 5 languages. Play in browser. Start now →',
   he: 'משחק מילים מרובה משתתפים חינם בעברית — ללא הורדה. בוגל בזמן אמת עם חברים, גלגל מילים יומי, 6 מצבי משחק, 10,000+ מילים. שחק עכשיו בדפדפן ←',
   sv: 'Spela gratis ordspel online med vänner — ingen nedladdning. Realtids ordstrider, dagligt ordhjul, 6 spellägen, 5 språk. Som Alfapet möter Boggle. Spela nu →',
   ja: '友達と無料マルチプレイヤーワードゲーム — 登録不要・ダウンロード不要。リアルタイム単語バトル、毎日のワードホイール、6モード、5言語対応。今すぐブラウザで開始 →',
-  es: 'Juego de palabras multijugador gratis online — sin descarga, sin registro. Batallas en tiempo real, rueda diaria, 6 modos, 5 idiomas. ¡Juega ya en tu navegador! →',
+  es: 'Juego de palabras multijugador gratis — sin descarga, sin registro. Batallas en tiempo real, rueda diaria, 6 modos, 5 idiomas. ¡Juega en tu navegador! →',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
