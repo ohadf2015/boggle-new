@@ -23,6 +23,7 @@ describe('NativeColdStartGuard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     sessionStorage.clear();
+    localStorage.clear();
     mockIsNative.mockReturnValue(true);
   });
 
@@ -92,5 +93,70 @@ describe('NativeColdStartGuard', () => {
     render(<NativeColdStartGuard />);
 
     expect(mockReplace).toHaveBeenCalledWith('/en');
+  });
+
+  describe('route restoration on cold start', () => {
+    const LAST_ROUTE_KEY = 'lexiclash_last_route';
+    const saveRoute = (path: string, ts: number = Date.now()) =>
+      localStorage.setItem(LAST_ROUTE_KEY, JSON.stringify({ path, ts }));
+
+    it('restores the last stable hub route when booting to home', () => {
+      saveRoute('/en/profile');
+      mockUsePathname.mockReturnValue('/en');
+
+      render(<NativeColdStartGuard />);
+
+      expect(mockReplace).toHaveBeenCalledWith('/en/profile');
+    });
+
+    it('does NOT restore a gameplay route — stays on home', () => {
+      saveRoute('/en/singleplayer');
+      mockUsePathname.mockReturnValue('/en');
+
+      render(<NativeColdStartGuard />);
+
+      expect(mockReplace).not.toHaveBeenCalled();
+    });
+
+    it('does NOT restore a stale route (older than the window)', () => {
+      saveRoute('/en/profile', Date.now() - 60 * 60 * 1000); // 1h ago
+      mockUsePathname.mockReturnValue('/en');
+
+      render(<NativeColdStartGuard />);
+
+      expect(mockReplace).not.toHaveBeenCalled();
+    });
+
+    it('does NOT restore when the launch did not land on home', () => {
+      saveRoute('/en/profile');
+      mockUsePathname.mockReturnValue('/en/leaderboard');
+
+      render(<NativeColdStartGuard />);
+
+      expect(mockReplace).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('route persistence', () => {
+    const LAST_ROUTE_KEY = 'lexiclash_last_route';
+
+    it('persists the current route on native so the next cold start can restore it', () => {
+      mockUsePathname.mockReturnValue('/en/friends');
+
+      render(<NativeColdStartGuard />);
+
+      const saved = JSON.parse(localStorage.getItem(LAST_ROUTE_KEY) ?? 'null');
+      expect(saved?.path).toBe('/en/friends');
+      expect(typeof saved?.ts).toBe('number');
+    });
+
+    it('does not persist anything on web', () => {
+      mockIsNative.mockReturnValue(false);
+      mockUsePathname.mockReturnValue('/en/friends');
+
+      render(<NativeColdStartGuard />);
+
+      expect(localStorage.getItem(LAST_ROUTE_KEY)).toBeNull();
+    });
   });
 });
