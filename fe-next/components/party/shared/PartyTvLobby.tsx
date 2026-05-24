@@ -80,7 +80,7 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyT
               {t('party.roomCode')}
             </p>
             <div className={`border-4 ${accentClasses.split(' ')[1]} rounded-neo-lg px-8 py-4 bg-neo-navy`}>
-              <span className={`font-neo-display text-6xl tracking-[0.4em] ${accentClasses.split(' ')[0]}`}>
+              <span data-selectable className={`font-neo-display text-6xl tracking-[0.4em] ${accentClasses.split(' ')[0]}`}>
                 {room?.roomCode || '-----'}
               </span>
             </div>

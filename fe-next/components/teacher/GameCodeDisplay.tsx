@@ -89,7 +89,7 @@ export default function GameCodeDisplay({
           {t('education.classroomGame.shareCode')}
         </p>
         <div className="flex items-center justify-center gap-4">
-          <span className="text-5xl font-black text-neo-cyan tracking-widest font-mono tabular-nums">
+          <span data-selectable className="text-5xl font-black text-neo-cyan tracking-widest font-mono tabular-nums">
             {gameCode}
           </span>
           <button

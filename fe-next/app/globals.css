@@ -23,6 +23,32 @@
   }
 }
 
+/*
+  Native-app text-selection guard. `html.lexi-native` is set by
+  NativeSelectionGuard ONLY inside the Capacitor app. In the native webview a
+  long-press on any label/logo pops the Android Translate/Copy/Share callout
+  over the chrome — it looks broken. We disable selection + the long-press
+  callout app-wide there (web keeps normal selection for content/SEO pages),
+  then re-enable it for real text inputs and anything opting in via
+  `data-selectable` (e.g. room/game codes users want to copy).
+*/
+html.lexi-native,
+html.lexi-native * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html.lexi-native input,
+html.lexi-native textarea,
+html.lexi-native [contenteditable]:not([contenteditable='false']),
+html.lexi-native [data-selectable] {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
 /* Height-based breakpoints (migrated from tailwind.config.js raw screens for v4 compat) */
 @custom-variant tall (@media (min-height: 800px));
 @custom-variant short (@media (max-height: 600px));

@@ -39,6 +39,7 @@ import { LogRocketIdentify } from '@/components/providers/LogRocketIdentify';
 import { PostHogProvider } from '@/components/providers/PostHogProvider';
 import GlobalCoinEarnFx from '@/components/animations/GlobalCoinEarnFx';
 import SharedFxMount from '@/components/animations/SharedFxMount';
+import NativeSelectionGuard from '@/components/native/NativeSelectionGuard';
 import EasterEggListener from '@/components/EasterEggListener';
 
 
@@ -200,6 +201,8 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                             <AdMobProvider>
                                             <NavigationProvider>
                                                 {memoizedChildren}
+                                                {/* Native-app only: kills the long-press text/image selection callout (looks broken in the webview) */}
+                                                <NativeSelectionGuard />
                                                 {/* Mounts the SharedFxApp Pixi singleton once so coin/level-up/firework FX actually render */}
                                                 <SharedFxMount />
                                                 {/* Global coin-earn VFX: sound + flying coins on every addCoins */}
