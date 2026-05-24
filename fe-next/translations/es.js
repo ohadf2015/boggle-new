@@ -9189,7 +9189,7 @@ const es = {
       "title": "¡Nivel completado!",
       "boardCleared": "¡Tablero limpio!",
       "bonusLabel": "Extra",
-      "best": "Mejor",
+      "best": "Récord",
       "newBest": "¡NUEVO RÉCORD!",
       "stars": "estrellas",
       "coins": "Monedas",

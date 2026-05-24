@@ -9132,7 +9132,7 @@ const ja = {
       "title": "レベルクリア！",
       "boardCleared": "ボードクリア！",
       "bonusLabel": "ボーナス",
-      "best": "ベスト",
+      "best": "自己ベスト",
       "newBest": "新記録！",
       "stars": "星",
       "coins": "コイン",

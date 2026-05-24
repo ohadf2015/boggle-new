@@ -9106,7 +9106,7 @@ const sv = {
       "title": "Nivå klar!",
       "boardCleared": "Brädet rensat!",
       "bonusLabel": "Bonus",
-      "best": "Bästa",
+      "best": "Rekord",
       "newBest": "NYTT REKORD!",
       "stars": "stjärnor",
       "coins": "Mynt",
