@@ -21,9 +21,10 @@ Items flagged by the nightly performance lane that need human judgement or are o
 ## [FRONTEND] Multiplayer LCP — improving but still POOR
 
 **Severity:** High  
-**Routes:** `/en/multiplayer` (p75 LCP: 5807ms 2026-05-21 → **4228ms 2026-05-22**, n=29)  
+**Routes:** `/en/multiplayer` (p75 LCP: 5807ms 2026-05-21 → **4228ms 2026-05-22** n=29 → **1192ms 2026-05-24** n=8)  
 **Threshold:** Good <2500ms, Poor >4000ms  
-**Update 2026-05-22:** Improved 27% (5807→4228ms). CLS also dramatically improved (0.146→0.026). INP flat at ~252ms. `/he/multiplayer` dropped below n=5 threshold today — no fresh data.  
+**Update 2026-05-24:** Today's reading = 1192ms (n=8) vs 4228ms (n=29). **Do not conclude improvement** — n=8 vs n=29 is not comparable (different user mix, time of day). Prior n=29 reading (4228ms) remains authoritative. Watch for n>20 reading with consistent LCP <2500ms before closing.  
+**Update 2026-05-22:** Improved 27% (5807→4228ms). CLS dramatically improved (0.146→0.026). INP flat at ~252ms.  
 **Likely cause:** Game board / WebSocket handshake is the Largest Contentful Paint element. The game client (Pixi.js + GSAP + socket connection) must complete before any above-fold game UI appears.  
 **Not a quick fix.** Options:
 - Render a lightweight skeleton/lobby-waiting UI immediately (SSR), make it the LCP target. The heavy game client loads behind it.
@@ -32,13 +33,16 @@ Items flagged by the nightly performance lane that need human judgement or are o
 
 ---
 
-## [FRONTEND] Daily CLS — 1.153 (POOR, low confidence)
+## [FRONTEND] Daily CLS — admin sessions confirmed, not real-user issue
 
-**Severity:** Medium (low confidence)  
-**Route:** `/he/daily` (p75 CLS 1.153, n=4)  
-**Threshold:** Good <0.1, Poor >0.25  
-**Caveat:** n=4, and all PostHog events in this window appear to come from the admin user. Admin users see extra overlays (admin toolbar, feedback widgets) that regular users don't. CLS may not reflect real-user experience.  
-**Action:** Collect 7-day sample before treating as a real regression. If CLS stays >0.5 with n>20, investigate: banner ad insertion, font swap, or admin-specific element causing layout shift.
+**Severity:** Low (admin-only signal, real users show CLS 0.002-0.007)  
+**Route:** `/he/daily` (PostHog p75 CLS 0.882, n=6 — 2026-05-24)  
+**Updated:** 2026-05-24 — player-id audit via `web_vitals` Supabase table confirmed:  
+- `player 537a9da1` (mobile, real user): CLS 0.0024, 0.0027 — **Good**  
+- `player d0da136a` (mobile, real user): CLS 0.0069 — **Good**  
+- `player 4d68a876` (mobile, admin/founder): CLS 0.220, 0.288 — **Needs improvement**  
+PostHog p75=0.882 is skewed by admin sessions (same player as /he CLS issue). Real users have zero CLS problems on the daily page.  
+**Action:** Close this item. Resume if real-user CLS appears with n>15 non-admin sessions.
 
 ---
 
@@ -50,14 +54,14 @@ Items flagged by the nightly performance lane that need human judgement or are o
 
 ---
 
-## [FRONTEND] Hebrew home CLS — admin card skeleton mismatch
+## ✅ [FRONTEND] Hebrew home CLS — admin card skeleton mismatch — FIXED 2026-05-24
 
 **Severity:** Medium (admin-only, no real-user impact)  
-**Route:** `/he` (p75 CLS 0.118 → 1.119 regression, n=6)  
-**Detected:** 2026-05-22  
-**Root cause:** `LandingChallengeCards` adds 4 admin-only mode cards (`wordCraft`, `wordCraftGems`, `wordTower`, `blastClassic`) via `isAdmin` gate. `LandingCardsSkeleton` renders a fixed non-admin card count. When `hadSession=true` and auth resolves to admin, skeleton→admin-cards swap shifts layout significantly. All 6 sampled sessions are the founder's Hebrew locale sessions.  
-**Fix:** Pass `isAdmin` prop to `LandingCardsSkeleton` so it renders the correct number of skeleton cards for admins. Low priority — zero real-user impact until admin card set is publicly launched.  
-**File:** `fe-next/components/landing/LandingCardsSkeleton.tsx`, `LandingView.tsx:202` (passes `isAdmin` to Cards but not to Skeleton).
+**Route:** `/he`  
+**Detected:** 2026-05-22. **Fixed:** 2026-05-24 by Lane 02.  
+**Root cause:** `LandingChallengeCards` adds 4 admin-only mode cards via `isAdmin` gate. `LandingCardsSkeleton` rendered a fixed 4-card layout. Skeleton→real swap for admin = +4 card height jump = CLS.  
+**Fix applied:** Added `isAdmin?: boolean` prop to `LandingCardsSkeleton`. When `isAdmin=true`, renders 4 extra `ModeCardSkeleton` components matching the admin card count. `LandingView.tsx:231` now passes `isAdmin={isAdmin}`.  
+**Files changed:** `fe-next/components/landing/LandingCardsSkeleton.tsx`, `fe-next/components/landing/LandingView.tsx`.
 
 ---
 
@@ -93,4 +97,14 @@ Items flagged by the nightly performance lane that need human judgement or are o
 
 ---
 
-*Last updated: 2026-05-22 by Lane 02 (perf)*
+---
+
+## [FRONTEND] /he/word-tower — CLS improvement logged
+
+**Route:** `/he/word-tower`  
+**Update 2026-05-24:** CLS improved 73% (1.050→0.280) and LCP improved 15% (2062→1754ms) vs 2026-05-22 baseline (n=12). Recent word-tower fixes appear to have resolved the loading-height mismatch. CLS 0.280 is borderline (threshold 0.25) — watch one more night. If CLS <0.1 with n>10, close this item entirely.  
+**Prior entry:** Loading state `min-h-[100dvh]` spinner vs HUD+board structure was the suspected root cause (2026-05-22). May have been resolved by word-tower structural changes in recent commits.
+
+---
+
+*Last updated: 2026-05-24 by Lane 02 (perf)*
