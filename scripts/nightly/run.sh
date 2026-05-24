@@ -555,9 +555,19 @@ if [ ${#_to[@]} -gt 0 ] && "${_to[@]}" claude -p "$(cat "$SUMMARY_PROMPT")" \
             | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')
   log "manager summary composed ($(echo -n "$SUMMARY" | wc -c) chars after cleanup)"
 else
-  log "summary composer failed/timed out — minimal fallback"
-  SUMMARY=$(printf '🌙 *%s* — \`%s\`\n\nManager summary composer failed. See attached report.\n\n%s' \
-    "$TODAY" "${NEW_SHA:0:7}" "$(printf '%s\n' "${LANE_RESULTS[@]}" | head -3)")
+  # Composer failed/timed out — DO NOT just point at the attached file. Build a
+  # substantive deterministic brief INLINE from data we already have: the report's
+  # Outcome line + every lane's status + the Reddit pick if present. The founder
+  # should get the gist in the message itself, never "see attached report".
+  log "summary composer failed/timed out — deterministic inline brief"
+  _outcome=$(grep -m1 '\*\*Outcome:\*\*' "$REPORT" 2>/dev/null | sed -E 's/.*\*\*Outcome:\*\* *//; s/`//g' | head -c 220)
+  _lanes=$(printf '%s\n' "${LANE_RESULTS[@]:-}")
+  _redditpick=$(awk '/^#### Top Reddit pick of the day/{f=1} f&&/Thread:|Permalink:/{print; c++} c>=1&&f&&/^$/{exit}' "$REPORT" 2>/dev/null | grep -oE 'https?://[^[:space:]]+reddit\.com/[^[:space:])]*' | head -1)
+  _ideapick=$(grep -m1 '^- Top idea:' "$REPORT" 2>/dev/null | sed 's/^- Top idea: //' | head -c 140)
+  SUMMARY=$(printf '🌙 *Nightly %s* — `%s`\n\n*Outcome:* %s\n\n*Lanes:*\n%s%s%s' \
+    "$TODAY" "${NEW_SHA:0:7}" "${_outcome:-see lanes below}" "$_lanes" \
+    "$([ -n "$_redditpick" ] && printf '\n\n💬 *Reddit pick:* %s' "$_redditpick")" \
+    "$([ -n "$_ideapick" ] && printf '\n\n🎮 *Idea:* %s' "$_ideapick")")
 fi
 rm -f "$SUMMARY_PROMPT" "$SUMMARY_FILE"
 
