@@ -377,6 +377,36 @@ if [ "$gate_ok" = "0" ]; then
   esac
 fi
 
+# Drop-and-re-gate salvage: an isolated-gate failure is usually ONE bad file — a
+# misattributed concurrent edit, or a single broken lane file — not the whole
+# authored set. Rather than collapse straight to docs-only, parse the offending
+# file(s) from the gate output, DROP just those from the commit allowlist (leave
+# them untouched as WIP — non-destructive, drops fewer files than the docs-only
+# path), and re-gate the rest. Ships the surviving lane CODE. Up to 2 rounds; on
+# no-parse / still-failing / setup-fail it falls through to the docs-only salvage
+# below (today's behaviour — never a regression).
+if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
+  for _round in 1 2; do
+    _bad=$(nightly_parse_gate_failures "${NIGHTLY_LAST_GATE_OUTPUT:-}")
+    rm -f "${NIGHTLY_LAST_GATE_OUTPUT:-}" 2>/dev/null || true
+    [ -n "$_bad" ] || { log "drop-and-re-gate: no parseable offending files — using docs-only salvage"; break; }
+    log "drop-and-re-gate round $_round: dropping $(printf '%s' "$_bad" | grep -c .) gate-failing file(s) from the commit set, re-gating the rest:"
+    printf '%s\n' "$_bad" | while IFS= read -r f; do [ -n "$f" ] && log "  drop: $f"; done
+    _kept=$(mktemp)
+    grep -vxF -f <(printf '%s\n' "$_bad") "$NIGHTLY_AUTHORED_FILE" > "$_kept" 2>/dev/null || cp "$NIGHTLY_AUTHORED_FILE" "$_kept"
+    mv "$_kept" "$NIGHTLY_AUTHORED_FILE"
+    if [ ! -s "$NIGHTLY_AUTHORED_FILE" ]; then log "drop-and-re-gate: nothing left after drops"; break; fi
+    run_isolated_gate "$NIGHTLY_AUTHORED_FILE"; iso_rc=$?
+    if [ "$iso_rc" = "0" ]; then
+      gate_ok=1
+      log "drop-and-re-gate: PASS after dropping the offending file(s) — shipping the remaining authored work"
+      echo -e "\n**Outcome (partial):** isolated gate passed after dropping gate-failing file(s); shipping the rest of the authored work (the dropped files stay as untouched WIP)." >> "$REPORT"
+      break
+    fi
+    [ "$iso_rc" != "1" ] && break   # setup failed → bail to docs-only salvage
+  done
+fi
+
 if [ "$gate_ok" = "0" ]; then
   # NEVER push broken code, and NEVER touch the founder's WIP. But don't throw away
   # a whole night's reports/ideas/learnings because one lane shipped breaking CODE.

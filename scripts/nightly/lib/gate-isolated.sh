@@ -66,20 +66,47 @@ run_isolated_gate() {
   done
 
   log "isolated-gate: gating $(grep -c . "$authored") authored file(s) on a clean HEAD checkout (worktree $wt)"
+  # Capture the gate's combined output to a file the caller can parse (the
+  # drop-and-re-gate salvage needs to know WHICH file failed). Path is exposed
+  # via the global NIGHTLY_LAST_GATE_OUTPUT; caller parses then removes it.
+  NIGHTLY_LAST_GATE_OUTPUT=$(mktemp -t nightly-gate-out.XXXXXX)
   local rc=0
   if [ -n "${NIGHTLY_GATE_CMD:-}" ]; then
     # Test seam: a deterministic command run inside the worktree's fe-next.
-    ( cd "$wt/fe-next" && eval "$NIGHTLY_GATE_CMD" ) >>"$RUN_LOG" 2>&1 || rc=1
+    ( cd "$wt/fe-next" && eval "$NIGHTLY_GATE_CMD" ) > "$NIGHTLY_LAST_GATE_OUTPUT" 2>&1 || rc=1
   else
     ( cd "$wt/fe-next" \
-        && npm run lint >>"$RUN_LOG" 2>&1 \
-        && npm run test >>"$RUN_LOG" 2>&1 \
-        && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast >>"$RUN_LOG" 2>&1; } ) || rc=1
+        && npm run lint \
+        && npm run test \
+        && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast; } ) > "$NIGHTLY_LAST_GATE_OUTPUT" 2>&1 || rc=1
   fi
+  cat "$NIGHTLY_LAST_GATE_OUTPUT" >> "$RUN_LOG" 2>/dev/null || true
 
   _isolated_gate_cleanup "$wt"
   [ "$rc" = "0" ] && log "isolated-gate: PASS" || log "isolated-gate: FAIL (lane code broke lint/test/build)"
   return $rc
+}
+
+# nightly_parse_gate_failures <gate_output_file> → repo-relative source paths
+# (fe-next/...) that eslint or tsc flagged with an ERROR. Best-effort: handles
+# eslint's absolute file-header lines and tsc's `path(line,col): error` form,
+# normalises both to repo-relative, de-dups. Prints nothing if it can't parse —
+# the caller then falls back to the existing docs-only salvage (never regresses).
+nightly_parse_gate_failures() {
+  local out="$1"
+  [ -n "$out" ] && [ -s "$out" ] || return 0
+  {
+    # eslint prints the file path as a header line; in the worktree it's absolute
+    # and contains /fe-next/… — keep from fe-next/ onward. Only count files that
+    # actually have an "error" (not warning-only) somewhere in the run: eslint
+    # groups errors under the path header, so emitting every flagged path is
+    # acceptable (a warning-only file won't fail the gate, so re-gating without
+    # it is still correct).
+    grep -oE '/fe-next/[A-Za-z0-9_./-]+\.(tsx?|jsx?|mjs|cjs)' "$out" | sed -E 's#^.*/(fe-next/)#\1#'
+    # tsc: `components/foo.tsx(12,3): error TS....` (relative to fe-next cwd).
+    grep -oE '^[A-Za-z0-9_][A-Za-z0-9_./-]*\.(tsx?|jsx?|mjs|cjs)\([0-9]+,[0-9]+\): error' "$out" \
+      | sed -E 's/\([0-9]+,[0-9]+\): error.*$//' | sed -E 's#^#fe-next/#'
+  } 2>/dev/null | sort -u
 }
 
 _isolated_gate_cleanup() {

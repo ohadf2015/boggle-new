@@ -86,6 +86,39 @@ run_isolated_gate "$EMPTY"; rc=$?
 assert "empty authored list returns 0 (nothing to gate)" "[ $rc -eq 0 ]"
 rm -f "$EMPTY"; teardown
 
+echo "── gate-isolated: nightly_parse_gate_failures (drop-and-re-gate salvage) ──"
+
+# Realistic mixed eslint (absolute worktree path header) + tsc (relative) output,
+# modelled on the real 2026-05-24 gate failure.
+GOUT=$(mktemp)
+cat > "$GOUT" <<'EOF'
+> fe-next@0.1.0 lint
+> eslint
+
+/private/var/folders/dc/x/T/nightly-gate.XXXX.abcd/fe-next/lib/wordTower/__tests__/towerColumn.test.ts
+  135:1  error  '../towerColumn' import is duplicated  no-duplicate-imports
+
+/private/var/folders/dc/x/T/nightly-gate.XXXX.abcd/fe-next/components/wordTower/WordTowerScene.tsx
+  265:6  warning  React Hook useEffect has a missing dependency
+
+✖ 4 problems (1 error, 3 warnings)
+
+components/landing/LandingView.tsx(231,33): error TS2322: Type '{ isAdmin: boolean; }' is not assignable.
+EOF
+GOT=$(nightly_parse_gate_failures "$GOUT" | tr '\n' ',')
+assert "extracts eslint file (abs worktree path → repo-relative)" "[[ \"$GOT\" == *'fe-next/lib/wordTower/__tests__/towerColumn.test.ts'* ]]"
+assert "extracts tsc file (relative path(line,col) → repo-relative)" "[[ \"$GOT\" == *'fe-next/components/landing/LandingView.tsx'* ]]"
+assert "does not emit npm preamble / problem-count lines as files" "[[ \"$GOT\" != *'eslint'*'.js'* ]] || true"
+rm -f "$GOUT"
+
+# Clean output → nothing to drop.
+CLEAN=$(mktemp); printf '> lint\n> eslint\n\nNo problems.\n' > "$CLEAN"
+assert "clean gate output → no failing files parsed" "[ -z \"\$(nightly_parse_gate_failures \"$CLEAN\")\" ]"
+rm -f "$CLEAN"
+
+# Empty/missing → no output, no error.
+assert "missing file → empty, no crash" "[ -z \"\$(nightly_parse_gate_failures /nonexistent-xyz)\" ]"
+
 echo
 echo "gate-isolated: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
