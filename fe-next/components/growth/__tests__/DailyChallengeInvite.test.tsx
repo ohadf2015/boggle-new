@@ -64,4 +64,28 @@ describe('DailyChallengeInvite', () => {
     expect(capture.mock.calls.some((c) => c[0] === 'growth:daily_conversion_dismissed')).toBe(true);
     expect(container.firstChild).toBeNull();
   });
+
+  it('shows a countdown for the streak_at_risk variant', () => {
+    dailyStatus.currentStreak = 3;
+    render(<DailyChallengeInvite isWinner={false} />);
+    // body is interpolated with a {{countdown}} HH:MM:SS value → contains a digit:two-digit pattern
+    const body = screen.getByTestId('daily-challenge-invite-body').textContent ?? '';
+    expect(body).toMatch(/\d+:\d{2}/);
+  });
+
+  it('does not show a countdown for the win_momentum variant', () => {
+    render(<DailyChallengeInvite isWinner={true} />);
+    const body = screen.getByTestId('daily-challenge-invite-body').textContent ?? '';
+    expect(body).not.toMatch(/\d+:\d{2}/);
+  });
+
+  it('renders close_loss for a near-miss loss (small margin)', () => {
+    render(<DailyChallengeInvite isWinner={false} marginToNext={8} />);
+    expect(screen.getByTestId('daily-challenge-invite').getAttribute('data-variant')).toBe('close_loss');
+  });
+
+  it('renders loss_redirect for a blowout loss (large margin)', () => {
+    render(<DailyChallengeInvite isWinner={false} marginToNext={120} />);
+    expect(screen.getByTestId('daily-challenge-invite').getAttribute('data-variant')).toBe('loss_redirect');
+  });
 });

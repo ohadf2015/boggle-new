@@ -23,6 +23,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { trackCtaClicked } from '@/utils/posthogEngagement';
+import { getSecondsUntilNextDaily, formatCountdown } from '@/utils/dailyChallenge/dateUtils';
 import {
   selectDailyConversionPitch,
   type DailyPitchVariant,
@@ -39,6 +40,9 @@ const ACCENT = {
 interface Props {
   isWinner: boolean;
   className?: string;
+  placement?: number | null;
+  totalPlayers?: number;
+  marginToNext?: number | null;
 }
 
 function readDismissed(): boolean {
@@ -50,13 +54,14 @@ function readDismissed(): boolean {
   }
 }
 
-export function DailyChallengeInvite({ isWinner, className }: Props) {
+export function DailyChallengeInvite({ isWinner, className, placement = null, totalPlayers, marginToNext = null }: Props) {
   const { t, language } = useLanguage();
   const { isAuthenticated } = useAuth();
   const { hasPlayed, currentStreak, loading } = useDailyChallengeStatus(language);
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [dismissed, setDismissed] = useState<boolean>(readDismissed);
   const shownRef = useRef(false);
+  const [secondsLeft, setSecondsLeft] = useState<number>(() => getSecondsUntilNextDaily());
 
   const pitch = !isAuthenticated || loading
     ? null
@@ -65,9 +70,15 @@ export function DailyChallengeInvite({ isWinner, className }: Props) {
         currentStreak: currentStreak ?? 0,
         missedDays: 0, // Phase 3 supplies real missed-day count.
         isWinner,
-        marginToNext: null, // Phase 2 supplies real placement margin.
+        marginToNext,
         isOnCrazyGames: isOnCrazyGamesPlatform,
       });
+
+  useEffect(() => {
+    if (!pitch?.showCountdown) return;
+    const id = setInterval(() => setSecondsLeft(getSecondsUntilNextDaily()), 1000);
+    return () => clearInterval(id);
+  }, [pitch?.showCountdown]);
 
   const variant: DailyPitchVariant | undefined = pitch?.variant;
 
@@ -79,8 +90,10 @@ export function DailyChallengeInvite({ isWinner, className }: Props) {
       variant: pitch.variant,
       surface: 'mp_results',
       streak: currentStreak ?? 0,
+      placement: placement ?? null,
+      total_players: totalPlayers ?? null,
     });
-  }, [pitch, dismissed, currentStreak]);
+  }, [pitch, dismissed, currentStreak, placement, totalPlayers]);
 
   const handleDismiss = useCallback(() => {
     try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch { /* noop */ }
@@ -100,7 +113,8 @@ export function DailyChallengeInvite({ isWinner, className }: Props) {
 
   const accent = ACCENT[pitch.accent];
   const title = t(pitch.titleKey, { count: currentStreak ?? 0 });
-  const body = t(pitch.bodyKey, { count: currentStreak ?? 0 });
+  const countdown = pitch.showCountdown ? formatCountdown(secondsLeft) : '';
+  const body = t(pitch.bodyKey, { count: currentStreak ?? 0, countdown });
 
   return (
     <div
@@ -132,7 +146,7 @@ export function DailyChallengeInvite({ isWinner, className }: Props) {
         <p className={cn('text-xs font-neo-display font-bold uppercase tracking-wider mb-0.5', accent.text)}>
           {title}
         </p>
-        <p className="text-sm font-neo-body text-neo-white/90 leading-snug">
+        <p data-testid="daily-challenge-invite-body" className="text-sm font-neo-body text-neo-white/90 leading-snug">
           {body}
         </p>
       </div>

@@ -85,6 +85,9 @@ interface DesktopResultsLayoutProps {
   isCurrentUserWinner: boolean;
   userId: string | null;
   matchScore: number;
+  currentPlayerRank: number;
+  sortedScores: any[];
+  marginToNext: number | null;
 }
 
 function DesktopResultsLayout({
@@ -104,6 +107,9 @@ function DesktopResultsLayout({
   isCurrentUserWinner,
   userId,
   matchScore,
+  currentPlayerRank,
+  sortedScores,
+  marginToNext,
 }: DesktopResultsLayoutProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
@@ -202,7 +208,12 @@ function DesktopResultsLayout({
             {/* D1 retention CTA — outcome-aware Daily Challenge invite. Renders on CG too
                 (PostGameEngagement self-hides on CG; this one stays). */}
             <ResultsSectionReveal index={4}>
-              <DailyChallengeInvite isWinner={isCurrentUserWinner} />
+              <DailyChallengeInvite
+                isWinner={isCurrentUserWinner}
+                placement={currentPlayerRank}
+                totalPlayers={sortedScores.length}
+                marginToNext={marginToNext}
+              />
             </ResultsSectionReveal>
             <ResultsSectionReveal index={6}>
               <PostGameEngagement />
@@ -398,6 +409,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     gameMode: resolvedGameMode,
     wordHuntTargetFoundBy: wordHuntSummary?.targetFoundBy,
   });
+
+  const marginToNext =
+    currentPlayerRank > 1 && currentPlayerData
+      ? sortedScores[currentPlayerRank - 2].score - currentPlayerData.score
+      : null;
 
   // Build blast result scores map from sortedScores
   const blastResultScores = useMemo(() => {
@@ -1080,7 +1096,12 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             ) : null}
             {/* D1 retention CTA — Daily Challenge invite */}
             <ResultsSectionReveal index={2}>
-              <DailyChallengeInvite isWinner={isCurrentUserWinner} />
+              <DailyChallengeInvite
+                isWinner={isCurrentUserWinner}
+                placement={currentPlayerRank}
+                totalPlayers={sortedScores.length}
+                marginToNext={marginToNext}
+              />
             </ResultsSectionReveal>
             {/* Post-game banner ad — CrazyGamesBanner covers the web iframe surface;
                 ResultsBannerSlot serves AdMob inside the native app (where
@@ -1168,6 +1189,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         isCurrentUserWinner={isCurrentUserWinner}
         userId={user?.id ?? null}
         matchScore={currentPlayerData?.score ?? 0}
+        currentPlayerRank={currentPlayerRank}
+        sortedScores={sortedScores}
+        marginToNext={marginToNext}
       />
 
       {/* DESKTOP Sticky Ready Bar — pinned to bottom on md+ screens.
