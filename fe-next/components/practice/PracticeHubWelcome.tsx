@@ -42,9 +42,6 @@ export default function PracticeHubWelcome() {
         <p className="text-sm font-neo-display font-black text-neo-cream leading-tight">
           {t('practiceHub.welcome.title')}
         </p>
-        <p className="text-xs font-neo-body text-neo-cream/85 mt-0.5 leading-snug">
-          {t('practiceHub.welcome.body')}
-        </p>
       </div>
       <AdaptiveMotion.div
         data-testid="practice-hub-welcome-hint"

@@ -23,10 +23,10 @@ describe('PracticeInstructions overlay', () => {
     expect(screen.getByText('practice.instructions.title')).toBeInTheDocument();
   });
 
-  it('renders three rule lines per mode', () => {
+  it('renders two rule lines per mode — the two essentials, no filler third tip', () => {
     render(<PracticeInstructions mode="wordHunt" />);
     const list = screen.getByTestId('practice-instructions-list');
-    expect(list.querySelectorAll('li')).toHaveLength(3);
+    expect(list.querySelectorAll('li')).toHaveLength(2);
   });
 
   it('uses mode-specific tip keys from the populated practice.tips.* namespace', () => {
@@ -37,7 +37,8 @@ describe('PracticeInstructions overlay', () => {
     render(<PracticeInstructions mode="wheelRush" />);
     expect(screen.getByText('practice.tips.wheelRush.line1')).toBeInTheDocument();
     expect(screen.getByText('practice.tips.wheelRush.line2')).toBeInTheDocument();
-    expect(screen.getByText('practice.tips.wheelRush.line3')).toBeInTheDocument();
+    // line3 dropped to cut on-screen word count — only the two essentials show.
+    expect(screen.queryByText('practice.tips.wheelRush.line3')).toBeNull();
   });
 
   it('dismiss × button hides the overlay and shows the floating "?" pill', () => {

@@ -34,21 +34,20 @@ const HERO_SRC: Record<PracticeMode, string> = {
 // Tip copy lives under practice.tips.<mode>.line* (populated in all 5 locales).
 // practice.instructions.* only holds title + cta — pointing tips there made every
 // line fall through to a "Translation missing" Sentry log (JAVASCRIPT-NEXTJS-151/152/154).
-const TIPS_KEYS: Record<PracticeMode, [string, string, string]> = {
+// Only the two essential lines per mode show — line3 was the obvious/filler tip
+// ("find as many as you can" / "beat the clock") and was dropped to cut word count.
+const TIPS_KEYS: Record<PracticeMode, [string, string]> = {
   classic: [
     'practice.tips.classic.line1',
     'practice.tips.classic.line2',
-    'practice.tips.classic.line3',
   ],
   wordHunt: [
     'practice.tips.wordHunt.line1',
     'practice.tips.wordHunt.line2',
-    'practice.tips.wordHunt.line3',
   ],
   wheelRush: [
     'practice.tips.wheelRush.line1',
     'practice.tips.wheelRush.line2',
-    'practice.tips.wheelRush.line3',
   ],
 };
 
@@ -68,9 +67,9 @@ interface Props {
 /**
  * Practice help modal — full-screen backdrop + opaque panel so the modal
  * never visually competes with the underlying live-mode UI (was a coach-mark
- * card that bled into the grid). Shows mode mechanic illustration + 3 "How
- * to play" lines + 2 "Scoring" lines + a "Got it" CTA. Dismissal persists
- * per-mode in localStorage, with a re-open "?" pill in the corner.
+ * card that bled into the grid). Shows mode mechanic illustration + 2 "How
+ * to play" lines + a "Got it" CTA. Dismissal persists per-mode in
+ * localStorage, with a re-open "?" pill in the corner.
  */
 export default function PracticeInstructions({ mode, autoOpen = true }: Props) {
   const { t } = useLanguage();
@@ -155,7 +154,7 @@ export default function PracticeInstructions({ mode, autoOpen = true }: Props) {
         </button>
 
         <div className="p-4 sm:p-5 flex flex-col gap-3 min-h-0 overflow-y-auto">
-          {/* Hero illustration. Capped height so 3 tips + CTA always fit on
+          {/* Hero illustration. Capped height so the 2 tips + CTA always fit on
               short phones (iPhone SE, fold-front) without forcing scroll. */}
           <div className="relative w-full aspect-[4/3] max-h-[28vh] sm:max-h-[32vh] rounded-neo overflow-hidden border-2 border-neo-black flex-shrink-0">
             <Image

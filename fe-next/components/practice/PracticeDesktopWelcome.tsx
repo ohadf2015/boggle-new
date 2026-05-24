@@ -56,13 +56,13 @@ interface Props {
 /**
  * Compact desktop onboarding card — shown once per mode on screens ≥768px
  * instead of the full PracticeTutorialSheet (which is optimised for mobile
- * vertical scroll). Same 3 tip lines, now in hard-shadow icon tiles with a
- * mode-accent header and a staggered pop-in so the card has personality
+ * vertical scroll). The two essential tip lines, in hard-shadow icon tiles
+ * with a mode-accent header and a staggered pop-in so the card has personality
  * without gating play. All icons are lucide (no emoji).
  */
 export default function PracticeDesktopWelcome({ mode, onDismiss }: Props) {
   const { t } = useLanguage();
-  const tipKeys = [1, 2, 3].map((n) => `practice.tips.${mode}.line${n}`);
+  const tipKeys = [1, 2].map((n) => `practice.tips.${mode}.line${n}`);
   const icons = TIP_ICONS[mode];
   const HeaderIcon = MODE_HEADER_ICON[mode];
 
@@ -88,7 +88,7 @@ export default function PracticeDesktopWelcome({ mode, onDismiss }: Props) {
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-3">
+      <div className="grid grid-cols-2 gap-3 mb-3">
         {tipKeys.map((key, i) => {
           const Icon = icons[i];
           return (

@@ -25,13 +25,15 @@ vi.mock('next/image', () => ({
 import PracticeHubWelcome from '../PracticeHubWelcome';
 
 describe('PracticeHubWelcome', () => {
-  it('renders the welcome heading + body for first-timers', () => {
+  it('renders a single concise heading for first-timers (no body paragraph)', () => {
     render(<PracticeHubWelcome />);
     expect(screen.getByTestId('practice-hub-welcome')).toBeInTheDocument();
     expect(screen.getByTestId('practice-hub-welcome').textContent).toContain(
       'practiceHub.welcome.title'
     );
-    expect(screen.getByTestId('practice-hub-welcome').textContent).toContain(
+    // Body paragraph removed — the "start here" hint + lime-ringed next tile do
+    // the wayfinding the body used to spell out, so we drop the extra copy.
+    expect(screen.getByTestId('practice-hub-welcome').textContent).not.toContain(
       'practiceHub.welcome.body'
     );
   });

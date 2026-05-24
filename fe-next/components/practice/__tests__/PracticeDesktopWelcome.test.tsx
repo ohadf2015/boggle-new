@@ -1,5 +1,5 @@
 /**
- * PracticeDesktopWelcome — renders 3 mode tips and calls onDismiss on "Got it".
+ * PracticeDesktopWelcome — renders 2 mode tips and calls onDismiss on "Got it".
  */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -22,19 +22,20 @@ import PracticeDesktopWelcome from '../PracticeDesktopWelcome';
 describe('PracticeDesktopWelcome', () => {
   const onDismiss = vi.fn();
 
-  it('renders 3 tip lines for classic mode', () => {
+  it('renders the two essential tip lines for classic mode (third dropped)', () => {
     render(<PracticeDesktopWelcome mode="classic" onDismiss={onDismiss} />);
     expect(screen.getByText('practice.tips.classic.line1')).toBeInTheDocument();
     expect(screen.getByText('practice.tips.classic.line2')).toBeInTheDocument();
-    expect(screen.getByText('practice.tips.classic.line3')).toBeInTheDocument();
+    // line3 trimmed to cut on-screen word count.
+    expect(screen.queryByText('practice.tips.classic.line3')).toBeNull();
   });
 
-  it('renders 3 tip lines for wordHunt mode', () => {
+  it('renders the first tip line for wordHunt mode', () => {
     render(<PracticeDesktopWelcome mode="wordHunt" onDismiss={onDismiss} />);
     expect(screen.getByText('practice.tips.wordHunt.line1')).toBeInTheDocument();
   });
 
-  it('renders 3 tip lines for wheelRush mode', () => {
+  it('renders the first tip line for wheelRush mode', () => {
     render(<PracticeDesktopWelcome mode="wheelRush" onDismiss={onDismiss} />);
     expect(screen.getByText('practice.tips.wheelRush.line1')).toBeInTheDocument();
   });
@@ -53,7 +54,7 @@ describe('PracticeDesktopWelcome', () => {
   it('uses lucide icons (svg), not emoji glyphs', () => {
     render(<PracticeDesktopWelcome mode="classic" onDismiss={onDismiss} />);
     const root = screen.getByTestId('practice-desktop-welcome');
-    // One icon per tip (3) + a mode header icon → at least 4 svg icons.
+    // One icon per tip (2) + a mode header icon + the CTA arrow → at least 4 svg icons.
     expect(root.querySelectorAll('svg').length).toBeGreaterThanOrEqual(4);
     // No leftover emoji glyphs anywhere in the rendered text.
     expect(root.textContent ?? '').not.toMatch(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2700}-\u{27BF}\u{FE0F}\u{2705}\u{270F}]/u);

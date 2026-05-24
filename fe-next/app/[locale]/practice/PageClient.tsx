@@ -17,7 +17,6 @@ import { usePracticeProgress } from '@/components/practice/usePracticeProgress';
 import PendingRoomBanner from '@/components/practice/PendingRoomBanner';
 import PracticeHubAtmosphere from '@/components/practice/PracticeHubAtmosphere';
 import PracticeHubHeader from '@/components/practice/PracticeHubHeader';
-import PracticeCoachingTip from '@/components/practice/PracticeCoachingTip';
 import { useFTUEGate } from '@/lib/onboarding/useFTUEGate';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
@@ -182,16 +181,6 @@ export default function PracticeHubClient({ locale }: Props) {
                   <p className="text-[0.72rem] sm:text-xs font-neo-body text-neo-cream/80 leading-snug line-clamp-2 pe-8">
                     {t(`gameModes.${mode}.description`)}
                   </p>
-                  <div className="flex flex-wrap gap-1 mt-0.5">
-                    {(['feature1', 'feature2'] as const).map((fk) => (
-                      <span
-                        key={fk}
-                        className="inline-flex items-center px-1.5 py-px rounded-full border border-neo-cream/25 bg-neo-navy/60 text-[0.6rem] font-neo-display font-bold text-neo-cream/85 uppercase tracking-wide"
-                      >
-                        {t(`gameModes.${mode}.${fk}`)}
-                      </span>
-                    ))}
-                  </div>
                 </div>
 
                 {/* Right-edge status. Completed → a settled "Completed" badge
@@ -256,8 +245,6 @@ export default function PracticeHubClient({ locale }: Props) {
             );
           })}
         </div>
-
-        <PracticeCoachingTip completedCount={completed.size} />
       </div>
     </div>
   );

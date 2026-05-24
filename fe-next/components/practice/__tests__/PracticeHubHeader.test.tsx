@@ -29,9 +29,11 @@ describe('PracticeHubHeader', () => {
     expect(screen.getByText('Practice Arena')).toBeInTheDocument();
   });
 
-  it('renders subtitle using translation key', () => {
+  it('omits the subtitle — the title + progress bar carry the header without extra copy', () => {
     render(<PracticeHubHeader completedCount={0} totalCount={3} />);
-    expect(screen.getByText('Master all 3 modes to unlock the real game')).toBeInTheDocument();
+    expect(
+      screen.queryByText('Master all 3 modes to unlock the real game')
+    ).not.toBeInTheDocument();
   });
 
   it('renders progress bar with correct width at 1/3', () => {
