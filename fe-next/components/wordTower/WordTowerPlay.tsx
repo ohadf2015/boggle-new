@@ -173,14 +173,17 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     playPerfectWordSound, playWordAcceptedSound,
   } = useSoundEffects();
 
-  // Crane Stack: build a word → it swings on the crane → tap to drop. The drop
-  // quality scales the height granted (cosy reward-amplifier). Track the bad-drop
-  // streak so a third miss in a row can wobble (recoverable) — see cranePlacement.
+  // Crane Stack: tap-to-drop quality scales height (cosy reward-amplifier); a
+  // third bad drop in a row wobbles the just-placed floor off (recoverable).
   const sloppyRef = useRef(0);
   const handleCraneDrop = useCallback((o: PlacementOutcome) => {
     tower.commitPlacement(o.heightMultiplier);
     sloppyRef.current = nextConsecutiveSloppy(sloppyRef.current, o.quality);
     if (o.quality === 'perfect') { playPerfectWordSound(); haptics.levelComplete(); }
+    else if (o.topples) {
+      sloppyRef.current = 0; // a topple resets the streak (hazard FX fires its own sound)
+      tower.hazard(1, 'wobble', [`crane-wobble-${Date.now()}`]);
+    }
     else if (o.quality === 'miss') { playErrorSound(); haptics.bossHit(); }
     else { playWordAcceptedSound(); haptics.selection(); }
   }, [tower, playPerfectWordSound, playWordAcceptedSound, playErrorSound, haptics]);

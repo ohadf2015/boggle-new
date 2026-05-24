@@ -12,7 +12,7 @@ const en = {
     "ach": { "unlocked": "Achievement!", "firstFloor": "First Floor", "tenFloors": "Tower Block", "skyHigh": "Sky High", "wordsmith": "Wordsmith", "comboKing": "Combo King", "rivalCrusher": "Rival Crusher", "unstoppable": "Unstoppable", "toTheMoon": "To the Moon", "skylineKing": "Skyline King", "centurion": "Centurion", "comboGod": "Combo God", "wordWizard": "Word Wizard", "galaxyClass": "Galaxy Class", "deepSpace": "Deep Space" },
     "zone": { "entered": "New Zone", "next": "Next: {zone} · {m}m" },
     "landmark": { "skyscraper": "Skyscraper top", "cloudBase": "Cloud base", "mountainTop": "Mountain peak", "jetStream": "Jet stream", "stormTops": "Storm tops", "weatherBalloon": "Weather balloon", "earthCurve": "Earth's curve", "karman": "Edge of space", "meteorBelt": "Meteor belt", "aurora": "Aurora", "deepSpace": "Deep space" },
-    "hazard": { "bomb": "Bomb", "hurricane": "Hurricane", "lost": "{kind}! −{n} floors" },
+    "hazard": { "bomb": "Bomb", "hurricane": "Hurricane", "wobble": "Wobble", "lost": "{kind}! −{n} floors" },
     "crane": { "place": "Place your word", "tapToDrop": "Tap to drop", "perfect": "Perfect!", "good": "Nice!", "sloppy": "Wobbly", "miss": "Whoops!" },
     "error": { "too_short": "Too short — 3+ letters", "bad_chain": "Start with the glowing letter", "not_buildable": "Use the tray letters", "duplicate": "Already used that word", "not_in_dictionary": "Not in the dictionary" },
     "celebration": { "highRise": "High Rise!", "tall": "Towering!", "skyscraper": "SKYSCRAPER!" },

@@ -9,7 +9,9 @@
  * is always shown — never silent.
  */
 
-export type HazardKind = 'bomb' | 'hurricane';
+// 'wobble' is not an altitude hazard — it's the recoverable Crane Stack topple
+// (a bad-drop streak), reusing the same banner/FX path with its own label.
+export type HazardKind = 'bomb' | 'hurricane' | 'wobble';
 
 /** A hazard strike outcome — drives the "your tower was ruined" banner + FX. */
 export interface HazardEvent {

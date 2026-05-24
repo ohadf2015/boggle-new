@@ -91,6 +91,21 @@ describe('useWordTower', () => {
         .toBeGreaterThan(sloppy.result.current.state.game.heightM);
     });
 
+    it('a wobble topple sheds the just-placed floor (recoverable)', () => {
+      const { result } = setup(acceptAll);
+      act(() => result.current.selectTile(0));
+      act(() => result.current.selectTile(1));
+      act(() => result.current.hold());
+      act(() => result.current.commitPlacement(0.3)); // a bad (miss) drop lands
+      expect(result.current.state.game.floors).toHaveLength(1);
+
+      // The crane's topple path: drop one floor with the 'wobble' kind.
+      act(() => result.current.hazard(1, 'wobble', ['crane-wobble-1']));
+
+      expect(result.current.state.game.floors).toHaveLength(0);
+      expect(result.current.state.lastHazard?.kind).toBe('wobble');
+    });
+
     it('cancelPlacement drops the held word without committing', () => {
       const { result } = setup(acceptAll);
       act(() => result.current.selectTile(0));
