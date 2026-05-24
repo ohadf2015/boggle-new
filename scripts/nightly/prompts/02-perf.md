@@ -30,7 +30,7 @@ For each top-3 candidate:
   • If query rewrite needed → fix at source
 
 ═══ STEP 2 — Frontend (PostHog Web Vitals) ═══
-Use **posthog** MCP or direct HogQL via `POSTHOG_PERSONAL_API_KEY`:
+Pull PostHog data via the Bash helper `scripts/nightly/lib/posthog-query.sh hogql "<HogQL>"` — the posthog MCP flaps (handshake intermittently times out + hangs the lane), the REST helper is reliable + headless. Example HogQL:
 
 ```sql
 SELECT
