@@ -1,3 +1,5 @@
+'use client';
+
 import { memo, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '../contexts/AuthContext';
