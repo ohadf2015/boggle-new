@@ -2335,6 +2335,13 @@
 
   html {
     overflow: visible !important; /* Prevent html from becoming a scroll container */
+    /* Paint the full viewport opaque navy at the ROOT. On native (Capacitor) the
+       WebView is transparent, so any region the page doesn't cover with an opaque
+       element — e.g. a short page below the fold — revealed the native splash's
+       window background (@drawable/splash): a stray centered "LEXICLASH" logo.
+       body's navy only spans its content height; html fills the viewport, so navy
+       here closes the gap everywhere. */
+    background-color: var(--neo-navy);
   }
 
   body {
@@ -2376,6 +2383,7 @@
   /* Light mode color scheme */
   html.light {
     color-scheme: light;
+    background-color: #f8fafc; /* keep root opaque in light mode (matches .light body) */
   }
 }
 
