@@ -20,6 +20,7 @@ import type { RivalMarker } from '@/lib/wordTower/rivals';
 import { WordTowerRivalRail } from './WordTowerRivalRail';
 import { WordTowerLandmarkRail } from './WordTowerLandmarkRail';
 import { milestoneCrossed } from '@/lib/wordTower/milestones';
+import { landmarkCrossed } from '@/lib/wordTower/landmarkMoment';
 import { hazardsCrossed } from '@/lib/wordTower/hazards';
 import { zoneTeaseAt } from '@/lib/wordTower/zoneTease';
 import { newlyUnlocked, type Achievement } from '@/lib/wordTower/achievements';
@@ -119,6 +120,23 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     if (!hit) return;
     setMilestoneText(t(hit.key));
     const id = setTimeout(() => setMilestoneText(null), 2400);
+    return () => clearTimeout(id);
+  }, [game.heightM]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Calm landmark flyby — "you just passed the jet stream". A cosy beat that
+  // names the world point you've earned. Defers to a zone change *or* a
+  // milestone at the same height so it never piles onto the toast stack.
+  const [landmarkText, setLandmarkText] = useState<string | null>(null);
+  const prevLandmarkH = useRef(game.heightM);
+  useEffect(() => {
+    const prev = prevLandmarkH.current;
+    prevLandmarkH.current = game.heightM;
+    if (biomeForHeight(prev) !== biomeForHeight(game.heightM)) return; // zone owns it
+    if (milestoneCrossed(prev, game.heightM)) return;                  // milestone owns it
+    const hit = landmarkCrossed(prev, game.heightM);
+    if (!hit) return;
+    setLandmarkText(`${hit.icon} ${t(hit.key)}`);
+    const id = setTimeout(() => setLandmarkText(null), 2200);
     return () => clearTimeout(id);
   }, [game.heightM]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -341,6 +359,18 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           aria-live="polite"
         >
           {milestoneText}
+        </div>
+      )}
+
+      {/* Calm landmark flyby — a cosy, warm "you passed X" beat. Low-key cream
+          (not electric) so it reads as a scenic moment, not a celebration.
+          Shares the guarded milestone slot, so the two never co-occur. */}
+      {landmarkText && (
+        <div
+          className={`pointer-events-none absolute left-1/2 top-[16%] z-20 -translate-x-1/2 rounded-neo border-neo-thick border-black bg-neo-cream px-3 py-1.5 font-neo-display text-sm font-black text-black shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          aria-live="polite"
+        >
+          {landmarkText}
         </div>
       )}
 
