@@ -11,6 +11,7 @@ import {
 } from 'react';
 import { cn } from '@/lib/utils';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { ZOOM_FEEL, boardFilter, computeAutoZoomScale } from '@/lib/word-craft/zoomFeel';
 
 /**
  * Pinch-zoom + 1-finger pan wrapper for the WordCraft board.
@@ -32,12 +33,11 @@ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
  *   chip so the player knows zoom is engaged.
  */
 
-const MIN_SCALE = 1;
-const MAX_SCALE = 2.0;
+// Zoom magnitude + "camera feel" live in lib/word-craft/zoomFeel.ts so the
+// heaviness (blur / vignette / how far it zooms) is tuned + tested in one place.
+const MIN_SCALE = ZOOM_FEEL.minScale;
+const MAX_SCALE = ZOOM_FEEL.maxScale;
 const DOUBLE_TAP_MS = 280;
-// Fraction of the viewport the focused word should fill when auto-zooming.
-// Leaves context around the word so the player still sees where they are.
-const AUTO_FIT = 0.55;
 
 export interface WordCraftZoomShellProps {
   children: ReactNode;
@@ -104,10 +104,11 @@ export function WordCraftZoomShell({
 
   const reducedMotion = usePrefersReducedMotion();
 
-  // Cinematic depth: while a zoom transition is in flight the board carries a
-  // slight blur (motion-blur feel) that snaps sharp once it settles. Tracked
-  // separately from `isZoomed` so the expensive filter only runs during the
-  // ~320ms camera move, not the whole time the player is panning around.
+  // Tracks whether a zoom transition is in flight. Kept separate from
+  // `isZoomed` so any transition-only effect (see boardFilter) runs just during
+  // the camera move, not the whole time the player is panning around. The
+  // motion blur this once drove is now off (zoomFeel.motionBlurPx = 0) after
+  // players said the zoom felt heavy.
   const [isTransitioning, setIsTransitioning] = useState(false);
   const prevTransformRef = useRef({ scale: 1, tx: 0, ty: 0 });
 
@@ -176,7 +177,7 @@ export function WordCraftZoomShell({
         if (now - lastTapRef.current < DOUBLE_TAP_MS) {
           userControlledRef.current = true;
           if (isZoomed) reset();
-          else setScale(2);
+          else setScale(MAX_SCALE);
         }
         lastTapRef.current = now;
       }
@@ -290,7 +291,7 @@ export function WordCraftZoomShell({
       if (c.col > maxC) maxC = c.col;
     }
     const boxFrac = Math.max((maxC - minC + 1) / boardSize, (maxR - minR + 1) / boardSize);
-    const nextScale = clamp(AUTO_FIT / boxFrac, MIN_SCALE, MAX_SCALE);
+    const nextScale = computeAutoZoomScale(boxFrac);
 
     // Cell-grid centre of the focused box, as a 0..1 fraction of the board.
     const centerFracX = (minC + maxC + 1) / (2 * boardSize);
@@ -318,18 +319,20 @@ export function WordCraftZoomShell({
   const handleTransitionEnd = useCallback(() => setIsTransitioning(false), []);
 
   const transformStyle = useMemo(() => {
-    const easing = 'cubic-bezier(0.65, 0, 0.35, 1)';
     const transition = gestureRef.current
       ? 'none'
       : reducedMotion
         ? 'transform 1ms linear'
-        : `transform 320ms ${easing}, filter 200ms ease-out`;
-    const blurred = !reducedMotion && isTransitioning && !gestureRef.current;
+        : `transform ${ZOOM_FEEL.transitionMs}ms ${ZOOM_FEEL.easing}`;
     return {
       transform: `translate(${tx}px, ${ty}px) scale(${scale})`,
       transformOrigin: 'center center',
       transition,
-      filter: blurred ? 'blur(3px)' : 'none',
+      filter: boardFilter({
+        reducedMotion,
+        isTransitioning,
+        gestureActive: !!gestureRef.current,
+      }),
       willChange: 'transform',
     };
   }, [scale, tx, ty, reducedMotion, isTransitioning]);
@@ -366,8 +369,7 @@ export function WordCraftZoomShell({
           isZoomed && !reducedMotion ? 'opacity-100' : 'opacity-0',
         )}
         style={{
-          background:
-            'radial-gradient(ellipse at center, transparent 55%, rgba(26,26,46,0.78) 100%)',
+          background: `radial-gradient(ellipse at center, transparent 60%, rgba(26,26,46,${ZOOM_FEEL.vignetteOpacity}) 100%)`,
         }}
       />
       {isZoomed && (

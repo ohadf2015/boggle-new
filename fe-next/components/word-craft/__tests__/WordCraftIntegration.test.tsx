@@ -141,10 +141,19 @@ describe('WordCraft mobile-redesign integration', () => {
     fireEvent.click(document.querySelector('[data-board-cell="7,8"]') as HTMLElement);
     expect(readState()).toEqual({ pending: 2, axis: 'h' });
 
-    // Fast-tap the next available rack tile — should drop on (7,9), no cell tap.
+    // New contract: a single rack tap SELECTS; tapping the already-selected
+    // tile again is the explicit fast-tap (auto-place along the locked axis).
+    // This is what lets the player re-select + aim at any cell by tapping
+    // instead of every tap fast-firing — the "tap doesn't work" fix.
     const remaining = rackButtons().filter((b) => !b.hasAttribute('disabled'));
     expect(remaining.length).toBeGreaterThan(0);
-    fireEvent.click(remaining[0]);
+    const targetId = remaining[0].getAttribute('data-rack-tile-id')!;
+    const byId = () => document.querySelector(`[data-rack-tile-id="${targetId}"]`) as HTMLElement;
+
+    fireEvent.click(byId()); // first tap selects — nothing placed yet
+    expect(readState()).toEqual({ pending: 2, axis: 'h' });
+
+    fireEvent.click(byId()); // tap the selected tile again → fast-place on (7,9)
     expect(readState()).toEqual({ pending: 3, axis: 'h' });
 
     // Cell (7,9) should now hold a pending tile

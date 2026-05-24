@@ -88,7 +88,7 @@ function WordCraftRackImpl({
             key={tile.id}
             type="button"
             data-rack-tile-id={tile.id}
-            data-fast-tap={axisLocked && !isPending ? 'true' : undefined}
+            data-fast-tap={axisLocked && isSelected ? 'true' : undefined}
             disabled={disabled || isPending}
             aria-pressed={isSelected}
             onPointerDown={(e) => {
@@ -99,7 +99,13 @@ function WordCraftRackImpl({
             onClick={() => {
               // If the gesture ended as a drop, the tile is now pending — skip toggle.
               if (consumeDropFlag?.()) return;
-              if (axisLocked && onFastTap) {
+              // Tapping the ALREADY-selected tile while an axis is locked is an
+              // explicit "auto-place along the line" shortcut (the 1-tap
+              // convenience). Tapping any OTHER tile just selects it — so
+              // "tap a letter, then tap the cell I want" works at every stage,
+              // not only the first move. (Previously every tap fast-fired once
+              // a tile was pending, which players read as "tap doesn't work".)
+              if (isSelected && axisLocked && onFastTap) {
                 onFastTap(tile);
                 return;
               }

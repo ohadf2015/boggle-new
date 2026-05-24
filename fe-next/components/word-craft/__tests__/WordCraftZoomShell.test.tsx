@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { WordCraftZoomShell } from '../WordCraftZoomShell';
+import { ZOOM_FEEL } from '@/lib/word-craft/zoomFeel';
 
 function pointerDown(target: Element, pointerId: number, x: number, y: number, pointerType = 'touch') {
   fireEvent.pointerDown(target, {
@@ -267,7 +268,7 @@ describe('WordCraftZoomShell', () => {
     pointerDown(region, 20, 100, 200, 'touch');
     pointerDown(region, 21, 200, 200, 'touch');
     act(() => {
-      // Wildly large spread — should clamp at MAX_SCALE = 2.0
+      // Wildly large spread — should clamp at the configured ceiling.
       pointerMove(region, 20, -2000, 200, 'touch');
       pointerMove(region, 21, 2000, 200, 'touch');
     });
@@ -276,7 +277,7 @@ describe('WordCraftZoomShell', () => {
     const text = reset?.textContent ?? '';
     const match = text.match(/(\d+(?:\.\d+)?)/);
     const num = match ? parseFloat(match[1]) : 0;
-    expect(num).toBeLessThanOrEqual(2.0);
-    expect(num).toBeGreaterThanOrEqual(2);
+    // Pinch can never exceed ZOOM_FEEL.maxScale (lowered to gentle the zoom).
+    expect(num).toBeCloseTo(ZOOM_FEEL.maxScale, 1);
   });
 });
