@@ -1,0 +1,78 @@
+/**
+ * Word Tower — Crane Stack placement model (pure).
+ *
+ * Founder idea: build a word, then place the block with a crane like Tower
+ * Bloks. Cosy reconciliation (see spec 2026-05-24-word-tower-crane-stack):
+ * the crane is a REWARD AMPLIFIER, not a fail-gate. A valid word always lands;
+ * placement quality scales the height reward. A single miss never ends the run —
+ * only three bad drops in a row wobble-topple one (recoverable) floor.
+ */
+
+export type PlacementQuality = 'perfect' | 'good' | 'sloppy' | 'miss';
+
+export interface PlacementOutcome {
+  quality: PlacementQuality;
+  /** Fraction of the block that landed on its support (0..1). */
+  overlap: number;
+  /** Multiplier applied to the word's height gain. */
+  heightMultiplier: number;
+  perfect: boolean;
+  /** Cosy: only a miss that follows enough instability topples a floor. */
+  topples: boolean;
+}
+
+/** Normalised drop-error band edges (0 = dead centre). */
+export const PERFECT_MAX = 0.08;
+export const GOOD_MAX = 0.25;
+export const SLOPPY_MAX = 0.6;
+/** Cosy "catch": a missed drop still lands at least this much of the block. */
+export const MIN_CAUGHT_OVERLAP = 0.2;
+/** Bad drops in a row before a miss is allowed to topple a floor. */
+export const TOPPLE_AFTER_SLOPPY = 2;
+
+const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
+
+/**
+ * Evaluate a drop. `offset` is the normalised horizontal error (0 = centre,
+ * 1 = fully off, clamped). `consecutiveSloppy` is how many bad drops preceded
+ * this one (for the recoverable topple rule).
+ */
+export function evaluatePlacement(
+  offset: number,
+  consecutiveSloppy: number,
+): PlacementOutcome {
+  const e = clamp01(offset);
+
+  if (e <= PERFECT_MAX) {
+    return { quality: 'perfect', overlap: 1, heightMultiplier: 1.4, perfect: true, topples: false };
+  }
+  if (e <= GOOD_MAX) {
+    return { quality: 'good', overlap: 1 - e, heightMultiplier: 1, perfect: false, topples: false };
+  }
+  if (e <= SLOPPY_MAX) {
+    return { quality: 'sloppy', overlap: 1 - e, heightMultiplier: 0.6, perfect: false, topples: false };
+  }
+  // Miss — cosy catch at a minimum width; topple only after enough instability.
+  return {
+    quality: 'miss',
+    overlap: Math.max(MIN_CAUGHT_OVERLAP, 1 - e),
+    heightMultiplier: 0.3,
+    perfect: false,
+    topples: consecutiveSloppy >= TOPPLE_AFTER_SLOPPY,
+  };
+}
+
+/** Next instability count: clean drop resets it, a bad drop bumps it. */
+export function nextConsecutiveSloppy(prev: number, quality: PlacementQuality): number {
+  return quality === 'perfect' || quality === 'good' ? 0 : prev + 1;
+}
+
+/**
+ * Crane sweep position at `elapsedMs`, as a signed value in [-1, 1] (0 = centre).
+ * A full sweep takes `periodMs`. The UI maps this to pixels; the drop error fed
+ * to {@link evaluatePlacement} is its absolute value.
+ */
+export function craneOffsetAt(elapsedMs: number, periodMs: number): number {
+  if (periodMs <= 0) return 0;
+  return Math.sin((2 * Math.PI * elapsedMs) / periodMs);
+}
