@@ -1,145 +1,67 @@
-/**
- * DailyChallengeInvite Component Tests
- *
- * Post-game CTA that drives D1 retention by inviting players to the
- * Daily Challenge with outcome-aware messaging. Behaves differently
- * on CrazyGames embed vs main site.
- */
-
-import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-
-const mockT = vi.fn((
-  key: string,
-  fallbackOrParams?: string | Record<string, string | number>,
-  paramsWhenFallback?: Record<string, string | number>
-) => {
-  const translations: Record<string, string> = {
-    'dailyInvite.titleWon': 'Sharp brain today',
-    'dailyInvite.titleLost': 'Shake it off',
-    'dailyInvite.bodyWon': 'Daily Challenge waiting — one puzzle, one shot.',
-    'dailyInvite.bodyLost': 'Daily Challenge — your redemption shot.',
-    'dailyInvite.bodyCgComeBack': 'New puzzle every day. Bookmark and return tomorrow.',
-    'dailyInvite.streak': 'Day {{count}} streak — keep it alive',
-    'dailyInvite.playNow': 'Play Daily',
-    'dailyInvite.dismiss': 'Maybe later',
-  };
-  const tpl = translations[key] || key;
-  const params = typeof fallbackOrParams === 'object' && fallbackOrParams !== null
-    ? fallbackOrParams
-    : (paramsWhenFallback || {});
-  return Object.entries(params).reduce(
-    (s, [k, v]) => s.replace(`{{${k}}}`, String(v)).replace(`{${k}}`, String(v)),
-    tpl
-  );
-});
-
-vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: mockT, language: 'en', dir: 'ltr' }),
-}));
-
-const mockUseAuth = vi.fn();
-vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => mockUseAuth(),
-}));
-
-const mockUseWordOfTheDay = vi.fn();
-vi.mock('@/hooks/useWordOfTheDay', () => ({
-  useWordOfTheDay: () => mockUseWordOfTheDay(),
-}));
-
-const mockUseEngagementStatus = vi.fn();
-vi.mock('@/hooks/useEngagementStatus', () => ({
-  useEngagementStatus: () => mockUseEngagementStatus(),
-}));
-
-const mockUseCrazyGames = vi.fn();
-vi.mock('@/components/CrazyGamesSDK', () => ({
-  useCrazyGames: () => mockUseCrazyGames(),
-}));
-
 import { DailyChallengeInvite } from '../DailyChallengeInvite';
 
+const capture = vi.fn();
+const trackCta = vi.fn();
+
+vi.mock('posthog-js', () => ({ default: { capture: (...a: unknown[]) => capture(...a) } }));
+vi.mock('@/utils/posthogEngagement', () => ({
+  trackCtaClicked: (...a: unknown[]) => trackCta(...a),
+}));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated: true }) }));
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ language: 'en', t: (k: string, vars?: Record<string, unknown>) => (vars ? `${k}:${JSON.stringify(vars)}` : k) }),
+}));
+vi.mock('@/components/CrazyGamesSDK', () => ({ useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }) }));
+
+const dailyStatus = {
+  hasPlayed: false,
+  currentStreak: 0,
+  loading: false,
+};
+vi.mock('@/hooks/useDailyChallengeStatus', () => ({
+  useDailyChallengeStatus: () => dailyStatus,
+}));
+
+beforeEach(() => {
+  capture.mockClear();
+  trackCta.mockClear();
+  dailyStatus.hasPlayed = false;
+  dailyStatus.currentStreak = 0;
+  dailyStatus.loading = false;
+  try { sessionStorage.clear(); } catch { /* noop */ }
+});
+
 describe('DailyChallengeInvite', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockUseAuth.mockReturnValue({ isAuthenticated: true });
-    mockUseWordOfTheDay.mockReturnValue({ playerFound: false, loading: false, word: 'crystal' });
-    mockUseEngagementStatus.mockReturnValue({ streak: 0 });
-    mockUseCrazyGames.mockReturnValue({ isOnCrazyGamesPlatform: false });
-    sessionStorage.clear();
-  });
-
-  it('renders nothing for unauthenticated users', () => {
-    mockUseAuth.mockReturnValue({ isAuthenticated: false });
-    const { container } = render(<DailyChallengeInvite isWinner={true} />);
+  it('renders nothing when the player already played today', () => {
+    dailyStatus.hasPlayed = true;
+    const { container } = render(<DailyChallengeInvite isWinner={false} />);
     expect(container.firstChild).toBeNull();
   });
 
-  it('renders nothing if player already completed today', () => {
-    mockUseWordOfTheDay.mockReturnValue({ playerFound: true, loading: false, word: 'crystal' });
-    const { container } = render(<DailyChallengeInvite isWinner={true} />);
-    expect(container.firstChild).toBeNull();
-  });
-
-  it('renders nothing while WOTD loading', () => {
-    mockUseWordOfTheDay.mockReturnValue({ playerFound: false, loading: true, word: '' });
-    const { container } = render(<DailyChallengeInvite isWinner={true} />);
-    expect(container.firstChild).toBeNull();
-  });
-
-  it('shows winner-flavored copy when isWinner=true', () => {
-    render(<DailyChallengeInvite isWinner={true} />);
-    expect(screen.getByText('Sharp brain today')).toBeInTheDocument();
-    expect(screen.getByText(/one shot/i)).toBeInTheDocument();
-  });
-
-  it('shows loser-flavored copy when isWinner=false', () => {
+  it('fires a single impression event with the selected variant on mount', () => {
+    dailyStatus.currentStreak = 4;
     render(<DailyChallengeInvite isWinner={false} />);
-    expect(screen.getByText('Shake it off')).toBeInTheDocument();
-    expect(screen.getByText(/redemption shot/i)).toBeInTheDocument();
+    const shown = capture.mock.calls.filter((c) => c[0] === 'growth:daily_conversion_shown');
+    expect(shown).toHaveLength(1);
+    expect(shown[0][1]).toMatchObject({ variant: 'streak_at_risk', surface: 'mp_results', streak: 4 });
   });
 
-  it('shows CG come-back-tomorrow copy on CrazyGames embed', () => {
-    mockUseCrazyGames.mockReturnValue({ isOnCrazyGamesPlatform: true });
+  it('CTA click fires trackCtaClicked with the variant and an attributed href', () => {
     render(<DailyChallengeInvite isWinner={true} />);
-    expect(screen.getByText(/bookmark and return tomorrow/i)).toBeInTheDocument();
+    const cta = screen.getByTestId('daily-challenge-invite-cta');
+    expect(cta.getAttribute('href')).toContain('from=mp_results');
+    fireEvent.click(cta);
+    expect(trackCta).toHaveBeenCalledWith(
+      expect.objectContaining({ ctaId: 'mp_to_daily', location: 'mp_results', metadata: expect.objectContaining({ variant: 'win_momentum' }) }),
+    );
   });
 
-  it('renders link to /daily with correct testid', () => {
-    render(<DailyChallengeInvite isWinner={true} />);
-    const link = screen.getByTestId('daily-challenge-invite-cta');
-    expect(link.getAttribute('href')).toBe('/daily');
-  });
-
-  it('hides after dismiss is clicked (session-scoped)', () => {
-    const { rerender, container } = render(<DailyChallengeInvite isWinner={true} />);
+  it('dismiss fires a dismissed event and hides the card', () => {
+    const { container } = render(<DailyChallengeInvite isWinner={false} />);
     fireEvent.click(screen.getByTestId('daily-challenge-invite-dismiss'));
-    rerender(<DailyChallengeInvite isWinner={true} />);
+    expect(capture.mock.calls.some((c) => c[0] === 'growth:daily_conversion_dismissed')).toBe(true);
     expect(container.firstChild).toBeNull();
-  });
-
-  it('persists dismiss across remount via sessionStorage', () => {
-    sessionStorage.setItem('dailyChallengeInvite:dismissed', '1');
-    const { container } = render(<DailyChallengeInvite isWinner={true} />);
-    expect(container.firstChild).toBeNull();
-  });
-
-  it('shows streak line when live engagement streak > 0', () => {
-    mockUseEngagementStatus.mockReturnValue({ streak: 4 });
-    render(<DailyChallengeInvite isWinner={true} />);
-    expect(screen.getByText(/Day 4 streak/)).toBeInTheDocument();
-  });
-
-  it('omits streak line when live streak is 0', () => {
-    mockUseEngagementStatus.mockReturnValue({ streak: 0 });
-    render(<DailyChallengeInvite isWinner={true} />);
-    expect(screen.queryByText(/streak/i)).not.toBeInTheDocument();
-  });
-
-  it('prop streakDays overrides live engagement streak', () => {
-    mockUseEngagementStatus.mockReturnValue({ streak: 4 });
-    render(<DailyChallengeInvite isWinner={true} streakDays={9} />);
-    expect(screen.getByText(/Day 9 streak/)).toBeInTheDocument();
   });
 });

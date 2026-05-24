@@ -11967,7 +11967,17 @@ const sv = {
     "bodyCgComeBack": "Nytt pussel varje dag. Bokmärk och kom tillbaka imorgon.",
     "streak": "Dag {{count}} svit — håll den vid liv",
     "playNow": "Spela",
-    "dismiss": "Kanske senare"
+    "dismiss": "Kanske senare",
+    "streakAtRiskTitle": "🔥 {{count}}-dags svit",
+    "streakAtRiskBody": "Slutar om {{countdown}} — ett pussel håller den vid liv.",
+    "catchupTitle": "Bryt inte kedjan",
+    "catchupBody": "Du missade ett pussel — hämta upp dig innan dagens återställs om {{countdown}}.",
+    "winMomentumTitle": "Du är het",
+    "winMomentumBody": "Rida på vinnaren — starta en daglig svit medan du är varm.",
+    "closeLossTitle": "Så nära",
+    "closeLossBody": "Det var tätt. Dagens är en ren tavla — klättra på den globala listan.",
+    "lossRedirectTitle": "Nytt försök",
+    "lossRedirectBody": "Svårt match. På Dagens börjar alla lika — ta din chans."
   },
   "globalRank": {
     "top": "Topp {{percentile}}% globalt",

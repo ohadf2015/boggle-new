@@ -11941,7 +11941,17 @@ const ja = {
     "bodyCgComeBack": "毎日新しいパズル。ブックマークして明日また来てね。",
     "streak": "{{count}}日連続 — 続けよう",
     "playNow": "プレイ",
-    "dismiss": "あとで"
+    "dismiss": "あとで",
+    "streakAtRiskTitle": "🔥 {{count}}日連続",
+    "streakAtRiskBody": "{{countdown}}後に終了 — 一問で継続。",
+    "catchupTitle": "連続を守ろう",
+    "catchupBody": "パズルを見落とした — {{countdown}}以内に回収してね。",
+    "winMomentumTitle": "好調だね",
+    "winMomentumBody": "勝ちを活かそう — 今のうちにデイリー連続を始めよう。",
+    "closeLossTitle": "惜しい",
+    "closeLossBody": "あと少しだった。デイリーはリセット — グローバルボードで上り詰めよう。",
+    "lossRedirectTitle": "新しい挑戦",
+    "lossRedirectBody": "手ごわかった。デイリーは全員スタート地点 — トライしてみて。"
   },
   "globalRank": {
     "top": "世界トップ{{percentile}}%",

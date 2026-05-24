@@ -12348,7 +12348,17 @@ const he = {
     "bodyCgComeBack": "חידה חדשה כל יום. שמרו וחזרו מחר.",
     "streak": "רצף יום {{count}} — אל תפסיקו",
     "playNow": "שחק",
-    "dismiss": "לא עכשיו"
+    "dismiss": "לא עכשיו",
+    "streakAtRiskTitle": "🔥 רצף {{count}} ימים",
+    "streakAtRiskBody": "מסתיים בעוד {{countdown}} — חידה אחת תשמור עליו.",
+    "catchupTitle": "אל תשברו את הרצף",
+    "catchupBody": "פספסתם חידה — תופסו אותה לפני שהיומי מתאפס בעוד {{countdown}}.",
+    "winMomentumTitle": "אתם בעלילה",
+    "winMomentumBody": "רכיבו על הנצחון — התחילו רצף יומי כשאתם חמים.",
+    "closeLossTitle": "כמעט הצלחתם",
+    "closeLossBody": "זה היה קרוב מאד. היומי הוא לוח נקי — טפסו על הלוח הגלובלי.",
+    "lossRedirectTitle": "התחלה חדשה",
+    "lossRedirectBody": "משחק קשה. ביומי כולם מתחילים שווה — קחו את הסיכוי שלכם."
   },
   "globalRank": {
     "top": "{{percentile}}% המובילים",

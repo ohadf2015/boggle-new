@@ -12064,7 +12064,17 @@ const es = {
     "bodyCgComeBack": "Nuevo puzle cada día. Marca y vuelve mañana.",
     "streak": "Día {{count}} de racha — no la rompas",
     "playNow": "Jugar",
-    "dismiss": "Quizá luego"
+    "dismiss": "Quizá luego",
+    "streakAtRiskTitle": "🔥 Racha de {{count}} días",
+    "streakAtRiskBody": "Se acaba en {{countdown}} — un puzle la mantiene.",
+    "catchupTitle": "No rompas la racha",
+    "catchupBody": "Te perdiste un puzle — cúbrelo antes de que el Diario se reinicie en {{countdown}}.",
+    "winMomentumTitle": "Estás en fuego",
+    "winMomentumBody": "Aprovecha la victoria — empieza una racha diaria mientras estés caliente.",
+    "closeLossTitle": "Tan cerca",
+    "closeLossBody": "Estuvo muy ajustado. El Reto Diario es una pizarra en blanco — sube la tabla global.",
+    "lossRedirectTitle": "Nuevo comienzo",
+    "lossRedirectBody": "Fue un partido difícil. En el Reto Diario todos empiezan igual — dale una oportunidad."
   },
   "globalRank": {
     "top": "Top {{percentile}}% global",

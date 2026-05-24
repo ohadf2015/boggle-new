@@ -11969,7 +11969,17 @@ const en = {
     "bodyCgComeBack": "New puzzle every day. Bookmark and come back tomorrow.",
     "streak": "Day {{count}} streak — keep it alive",
     "playNow": "Play Daily",
-    "dismiss": "Maybe later"
+    "dismiss": "Maybe later",
+    "streakAtRiskTitle": "🔥 {{count}}-day streak",
+    "streakAtRiskBody": "Ends in {{countdown}} — one puzzle keeps it alive.",
+    "catchupTitle": "Don't break the chain",
+    "catchupBody": "You missed a puzzle — catch up before today's resets in {{countdown}}.",
+    "winMomentumTitle": "You're on fire",
+    "winMomentumBody": "Ride the win — start a daily streak while you're hot.",
+    "closeLossTitle": "So close",
+    "closeLossBody": "That was tight. The Daily's a clean slate — climb the global board.",
+    "lossRedirectTitle": "Fresh start",
+    "lossRedirectBody": "Tough match. On the Daily everyone starts equal — take your shot."
   },
   "globalRank": {
     "top": "Top {{percentile}}% globally",

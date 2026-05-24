@@ -1,33 +1,44 @@
 'use client';
 
 /**
- * DailyChallengeInvite — Post-game CTA driving D1 retention.
+ * DailyChallengeInvite — post-MP-game conversion surface.
  *
- * Why: CrazyGames D1 retention sits at 0% — Daily Challenge is the one
- * mechanic that requires players to return on a different calendar day.
- * Hook them at the result-screen pause point with outcome-aware copy.
+ * Behaviorally targeted: a pure selector (lib/growth/dailyConversionPitch) ranks
+ * the strongest pitch from the player's live state (alive streak, win/loss, near-miss).
+ * Fully instrumented: impression / click / dismiss events feed PostHog so conversion
+ * is measurable per variant.
  *
- * Gating: hides if not authenticated, already played today, or dismissed
- * this session. Streak-aware copy when streak is alive.
+ * Gating: hidden if unauthenticated, daily status still loading, already played today
+ * (canonical useDailyChallengeStatus.hasPlayed — NOT WOTD `playerFound`), dismissed,
+ * or the selector returns null.
  */
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import posthog from 'posthog-js';
 import { Sparkles, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useWordOfTheDay } from '@/hooks/useWordOfTheDay';
-import { useEngagementStatus } from '@/hooks/useEngagementStatus';
+import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { trackCtaClicked } from '@/utils/posthogEngagement';
+import {
+  selectDailyConversionPitch,
+  type DailyPitchVariant,
+} from '@/lib/growth/dailyConversionPitch';
 
 const DISMISS_KEY = 'dailyChallengeInvite:dismissed';
+
+const ACCENT = {
+  orange: { border: 'border-neo-orange/40', bg: 'bg-neo-orange/15', ring: 'border-neo-orange/30', text: 'text-neo-orange', btn: 'bg-neo-orange text-neo-navy' },
+  yellow: { border: 'border-neo-yellow/40', bg: 'bg-neo-yellow/15', ring: 'border-neo-yellow/30', text: 'text-neo-yellow', btn: 'bg-neo-yellow text-neo-navy' },
+  cyan: { border: 'border-neo-cyan/40', bg: 'bg-neo-cyan/15', ring: 'border-neo-cyan/30', text: 'text-neo-cyan', btn: 'bg-neo-cyan text-neo-navy' },
+} as const;
 
 interface Props {
   isWinner: boolean;
   className?: string;
-  /** Override streak value (defaults to live engagement-status hook). */
-  streakDays?: number;
 }
 
 function readDismissed(): boolean {
@@ -39,46 +50,68 @@ function readDismissed(): boolean {
   }
 }
 
-export function DailyChallengeInvite({ isWinner, className, streakDays }: Props) {
+export function DailyChallengeInvite({ isWinner, className }: Props) {
   const { t, language } = useLanguage();
   const { isAuthenticated } = useAuth();
-  const { playerFound, loading } = useWordOfTheDay(language);
-  const { streak: liveStreak } = useEngagementStatus();
+  const { hasPlayed, currentStreak, loading } = useDailyChallengeStatus(language);
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [dismissed, setDismissed] = useState<boolean>(readDismissed);
-  const effectiveStreak = streakDays ?? liveStreak ?? 0;
+  const shownRef = useRef(false);
+
+  const pitch = !isAuthenticated || loading
+    ? null
+    : selectDailyConversionPitch({
+        hasPlayedToday: hasPlayed,
+        currentStreak: currentStreak ?? 0,
+        missedDays: 0, // Phase 3 supplies real missed-day count.
+        isWinner,
+        marginToNext: null, // Phase 2 supplies real placement margin.
+        isOnCrazyGames: isOnCrazyGamesPlatform,
+      });
+
+  const variant: DailyPitchVariant | undefined = pitch?.variant;
+
+  // Impression — once per mount, after status settles.
+  useEffect(() => {
+    if (!pitch || dismissed || shownRef.current) return;
+    shownRef.current = true;
+    posthog.capture('growth:daily_conversion_shown', {
+      variant: pitch.variant,
+      surface: 'mp_results',
+      streak: currentStreak ?? 0,
+    });
+  }, [pitch, dismissed, currentStreak]);
 
   const handleDismiss = useCallback(() => {
     try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch { /* noop */ }
     setDismissed(true);
-  }, []);
+    posthog.capture('growth:daily_conversion_dismissed', { variant, surface: 'mp_results' });
+  }, [variant]);
 
-  if (!isAuthenticated) return null;
-  if (loading) return null;
-  if (playerFound) return null;
-  if (dismissed) return null;
+  const handleCtaClick = useCallback(() => {
+    trackCtaClicked({
+      ctaId: 'mp_to_daily',
+      location: 'mp_results',
+      metadata: { variant, streak: currentStreak ?? 0 },
+    });
+  }, [variant, currentStreak]);
 
-  const title = isWinner ? t('dailyInvite.titleWon') : t('dailyInvite.titleLost');
-  const body = isOnCrazyGamesPlatform
-    ? t('dailyInvite.bodyCgComeBack')
-    : isWinner
-      ? t('dailyInvite.bodyWon')
-      : t('dailyInvite.bodyLost');
+  if (!pitch || dismissed) return null;
 
-  const accentBorder = isWinner ? 'border-neo-yellow/40' : 'border-neo-cyan/40';
-  const accentBg = isWinner ? 'bg-neo-yellow/15' : 'bg-neo-cyan/15';
-  const accentRing = isWinner ? 'border-neo-yellow/30' : 'border-neo-cyan/30';
-  const accentText = isWinner ? 'text-neo-yellow' : 'text-neo-cyan';
+  const accent = ACCENT[pitch.accent];
+  const title = t(pitch.titleKey, { count: currentStreak ?? 0 });
+  const body = t(pitch.bodyKey, { count: currentStreak ?? 0 });
 
   return (
     <div
       data-testid="daily-challenge-invite"
+      data-variant={pitch.variant}
       className={cn(
         'relative flex items-stretch gap-3 w-full',
         'rounded-neo border-neo bg-neo-navy/80 p-4',
         'shadow-hard-sm hover:shadow-hard transition-shadow',
-        accentBorder,
-        className
+        accent.border,
+        className,
       )}
     >
       <button
@@ -91,41 +124,31 @@ export function DailyChallengeInvite({ isWinner, className, streakDays }: Props)
         <X className="w-3.5 h-3.5" />
       </button>
 
-      <div className={cn(
-        'shrink-0 w-10 h-10 rounded-neo border-neo flex items-center justify-center',
-        accentBg, accentRing
-      )}>
-        <Sparkles className={cn('w-5 h-5', accentText)} />
+      <div className={cn('shrink-0 w-10 h-10 rounded-neo border-neo flex items-center justify-center', accent.bg, accent.ring)}>
+        <Sparkles className={cn('w-5 h-5', accent.text)} />
       </div>
 
       <div className="flex-1 min-w-0 pe-4">
-        <p className={cn(
-          'text-xs font-neo-display font-bold uppercase tracking-wider mb-0.5',
-          accentText
-        )}>
+        <p className={cn('text-xs font-neo-display font-bold uppercase tracking-wider mb-0.5', accent.text)}>
           {title}
         </p>
         <p className="text-sm font-neo-body text-neo-white/90 leading-snug">
           {body}
         </p>
-        {effectiveStreak > 0 ? (
-          <p className="text-xs font-neo-body text-neo-orange mt-1">
-            {t('dailyInvite.streak', { count: effectiveStreak })}
-          </p>
-        ) : null}
       </div>
 
       <Link
-        href="/daily"
+        href="/daily?from=mp_results"
+        onClick={handleCtaClick}
         data-testid="daily-challenge-invite-cta"
         className={cn(
           'self-center shrink-0 px-3 py-2 rounded-neo border-neo border-black',
           'text-xs font-neo-display font-bold uppercase tracking-wider',
           'shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-shadow',
-          isWinner ? 'bg-neo-yellow text-neo-navy' : 'bg-neo-cyan text-neo-navy'
+          accent.btn,
         )}
       >
-        {t('dailyInvite.playNow')}
+        {t(pitch.ctaKey)}
       </Link>
     </div>
   );
