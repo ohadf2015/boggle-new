@@ -12519,6 +12519,7 @@ const he = {
       "score": "ניקוד",
       "target": "יעד",
       "runTotal": "ניקוד כולל",
+      "feedback": { "nice": "יפה!", "great": "מעולה!", "huge": "ענק!" },
       "submit": "שלחו מילה",
       "recall": "החזרה",
       "endRound": "סיום סבב",

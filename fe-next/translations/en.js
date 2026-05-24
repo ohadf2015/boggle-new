@@ -12140,6 +12140,7 @@ const en = {
       "score": "Score",
       "target": "Target",
       "runTotal": "Run total",
+      "feedback": { "nice": "Nice!", "great": "Great!", "huge": "Huge!" },
       "submit": "Submit word",
       "recall": "Recall",
       "endRound": "End round",

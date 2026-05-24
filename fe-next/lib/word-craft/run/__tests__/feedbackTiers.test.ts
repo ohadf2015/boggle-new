@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getProgressPercent, meterZone } from '../feedbackTiers';
+import { getProgressPercent, meterZone, wordFeedbackTier } from '../feedbackTiers';
 
 describe('getProgressPercent — round score toward target', () => {
   it('is score/target, clamped to [0,1]', () => {
@@ -24,5 +24,17 @@ describe('meterZone — encouraging, not alarming (cosy)', () => {
   it('celebrates once the target is reached or beaten', () => {
     expect(meterZone(100, 100)).toBe('reached');
     expect(meterZone(140, 100)).toBe('reached');
+  });
+});
+
+describe('wordFeedbackTier — escalating per-word praise', () => {
+  it('rises with the word score', () => {
+    expect(wordFeedbackTier(5)).toBe('nice');
+    expect(wordFeedbackTier(20)).toBe('great');
+    expect(wordFeedbackTier(40)).toBe('huge');
+  });
+  it('treats the band edges sensibly', () => {
+    expect(wordFeedbackTier(15)).toBe('great'); // 15+ is great
+    expect(wordFeedbackTier(30)).toBe('huge');  // 30+ is huge
   });
 });

@@ -21,3 +21,12 @@ export function meterZone(score: number, target: number): RunMeterZone {
   if (pct >= 0.85) return 'close';
   return 'building';
 }
+
+export type WordFeedbackTier = 'nice' | 'great' | 'huge';
+
+/** Per-word praise tier by the word's total score — drives the commit pop + sound. */
+export function wordFeedbackTier(wordTotal: number): WordFeedbackTier {
+  if (wordTotal >= 30) return 'huge';
+  if (wordTotal >= 15) return 'great';
+  return 'nice';
+}

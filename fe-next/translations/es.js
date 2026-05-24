@@ -12236,6 +12236,7 @@ const es = {
       "score": "Puntos",
       "target": "Objetivo",
       "runTotal": "Total de la partida",
+      "feedback": { "nice": "¡Bien!", "great": "¡Genial!", "huge": "¡Enorme!" },
       "submit": "Enviar palabra",
       "recall": "Retirar",
       "endRound": "Terminar ronda",

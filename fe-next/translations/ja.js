@@ -12113,6 +12113,7 @@ const ja = {
       "score": "スコア",
       "target": "目標",
       "runTotal": "ラン合計",
+      "feedback": { "nice": "ナイス！", "great": "すごい！", "huge": "特大！" },
       "submit": "単語を送信",
       "recall": "戻す",
       "endRound": "ラウンド終了",

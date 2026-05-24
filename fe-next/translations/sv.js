@@ -12139,6 +12139,7 @@ const sv = {
       "score": "Poäng",
       "target": "Mål",
       "runTotal": "Total poäng",
+      "feedback": { "nice": "Snyggt!", "great": "Toppen!", "huge": "Enormt!" },
       "submit": "Skicka ord",
       "recall": "Ångra",
       "endRound": "Avsluta runda",

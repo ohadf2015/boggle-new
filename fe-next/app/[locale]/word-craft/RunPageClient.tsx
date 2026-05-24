@@ -1,14 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import { useWordCraftRun } from '@/lib/word-craft/run/useWordCraftRun';
+import { wordFeedbackTier } from '@/lib/word-craft/run/feedbackTiers';
 import type { SupportedLocale } from '@/lib/word-craft/tileBag';
 import { WordCraftBoardSection } from '@/components/word-craft/WordCraftBoardSection';
 import { WordCraftRack } from '@/components/word-craft/WordCraftRack';
 import { RunHUD } from '@/components/word-craft/run/RunHUD';
+import RunWordPop, { type RunWordPopData } from '@/components/word-craft/run/RunWordPop';
 import { CardPickScreen } from '@/components/word-craft/run/CardPickScreen';
 import { RoundResultScene } from '@/components/word-craft/run/RoundResultScene';
 import { RunResultScene } from '@/components/word-craft/run/RunResultScene';
@@ -32,6 +35,21 @@ export function RunPageClient() {
   const boardSize: 7 | 9 = typeof window !== 'undefined' && window.innerWidth >= 768 ? 9 : 7;
   const run = useWordCraftRun({ seed: 1, dict, locale, boardSize });
   const { state } = run;
+
+  // Per-word commit ceremony — fills the "submit → nothing happens" dead zone.
+  const { playWordAcceptedSound, playPerfectWordSound } = useSoundEffects();
+  const [wordPop, setWordPop] = useState<RunWordPopData | null>(null);
+  const popKeyRef = useRef(0);
+  useEffect(() => {
+    const ws = state.lastWordScore;
+    if (!ws || ws.total <= 0) return;
+    const tier = wordFeedbackTier(ws.total);
+    popKeyRef.current += 1;
+    setWordPop({ total: ws.total, tier, key: popKeyRef.current });
+    (tier === 'huge' ? playPerfectWordSound : playWordAcceptedSound)();
+    const id = setTimeout(() => setWordPop(null), 1300);
+    return () => clearTimeout(id);
+  }, [state.lastWordScore]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!dict) {
     return <div className="p-6 text-center font-neo-body text-neo-white/70">{t('common.loading')}</div>;
@@ -82,7 +100,8 @@ export function RunPageClient() {
 
   // state.phase === 'playing'
   return (
-    <div className="flex flex-col gap-3 p-3">
+    <div className="relative flex flex-col gap-3 p-3">
+      <RunWordPop pop={wordPop} t={t} />
       <RunHUD
         round={state.round.round}
         target={state.round.target}
