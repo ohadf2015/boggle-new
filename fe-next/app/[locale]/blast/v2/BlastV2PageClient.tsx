@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { BlastGame } from '@/components/blast/v2/BlastGame';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBlastProgress } from '@/lib/blast/v2/useBlastProgress';
-import { writeGuestProgress } from '@/lib/blast/v2/guestProgress';
+import { writeGuestProgress, writeResumeHint, readResumeHint } from '@/lib/blast/v2/guestProgress';
 import type { BlastLevel } from '@/lib/blast/v2/types';
 import { type UnlocksSeen, validateUnlocksSeen } from '@/lib/blast/v2/tutorial/unlocks-seen';
 
@@ -18,8 +18,14 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
   const [isVeteran] = useState(false);
   const [reachedEnd, setReachedEnd] = useState(false);
   // Boot gate — hold the game render until saved progress resolves so a
-  // resuming player never sees level 1 flash before snapping to level N.
-  const [booting, setBooting] = useState(true);
+  // resuming player never sees level 1 flash before snapping to level N. We seed
+  // it from a synchronous resume hint: only gate when we have reason to believe a
+  // resume is coming. Genuinely-new players (no hint, or hint === 1) skip the
+  // loader and paint level 1 instantly. A cross-device returner with no local
+  // hint sees a one-time level-1 → level-N swap, then the hint is written.
+  const [booting, setBooting] = useState(
+    () => (readResumeHint() ?? 1) > initialLevel.levelNumber,
+  );
   const advancingRef = useRef(false);
   const bootedRef = useRef(false);
   const { t } = useLanguage();
@@ -77,6 +83,8 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
       }
       const next = (await res.json()) as BlastLevel;
       setLevel(next);
+      // Paint fast-path hint for next visit (all users).
+      writeResumeHint(nextNumber);
       // Authed players are persisted server-side by clear-level; guests keep
       // their level position in localStorage so a refresh resumes here.
       if (isGuest) {
@@ -96,9 +104,9 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
     advancingRef.current = false;
   }, [initialLevel]);
 
-  if (booting || !progressLoaded) {
+  if (booting) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#0b1530] text-white px-6">
+      <div data-testid="blast-boot-loader" className="flex min-h-dvh items-center justify-center bg-[#0b1530] text-white px-6">
         <div className="flex flex-col items-center gap-4">
           <div className="relative w-24 h-24 animate-neo-wobble">
             <Image

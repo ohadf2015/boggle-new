@@ -3,7 +3,10 @@ import {
   readGuestProgress,
   writeGuestProgress,
   clearGuestProgress,
+  readResumeHint,
+  writeResumeHint,
   GUEST_PROGRESS_KEY,
+  RESUME_HINT_KEY,
 } from '../guestProgress';
 
 /**
@@ -62,6 +65,38 @@ describe('guestProgress', () => {
       throw new Error('QuotaExceeded');
     });
     expect(() => writeGuestProgress({ currentLevel: 2, locale: 'en' })).not.toThrow();
+    spy.mockRestore();
+  });
+});
+
+describe('resume hint (paint-only fast path for all users)', () => {
+  beforeEach(() => localStorage.clear());
+  afterEach(() => localStorage.clear());
+
+  it('returns null when no hint is stored', () => {
+    expect(readResumeHint()).toBeNull();
+  });
+
+  it('round-trips a written hint', () => {
+    writeResumeHint(7);
+    expect(readResumeHint()).toBe(7);
+    expect(localStorage.getItem(RESUME_HINT_KEY)).not.toBeNull();
+  });
+
+  it('returns null for a non-positive / non-integer / corrupt hint', () => {
+    localStorage.setItem(RESUME_HINT_KEY, '0');
+    expect(readResumeHint()).toBeNull();
+    localStorage.setItem(RESUME_HINT_KEY, '2.5');
+    expect(readResumeHint()).toBeNull();
+    localStorage.setItem(RESUME_HINT_KEY, 'abc');
+    expect(readResumeHint()).toBeNull();
+  });
+
+  it('write swallows storage errors', () => {
+    const spy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('QuotaExceeded');
+    });
+    expect(() => writeResumeHint(3)).not.toThrow();
     spy.mockRestore();
   });
 });

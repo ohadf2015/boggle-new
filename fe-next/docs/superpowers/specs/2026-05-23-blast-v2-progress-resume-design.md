@@ -202,20 +202,26 @@ props would have reset coins on every level advance (BlastGame is keyed, so it r
 **lifting the single instance to `BlastV2PageClient`** and passing it down as the `progress` prop
 (`BlastProgressApi`). One GET per load, no flicker, and coins/chest survive the keyed remount.
 
-## Known limitations / accepted costs
+## Boot loader: hint-gated (refined 2026-05-24)
 
-- **The boot loader shows briefly for ALL players, including brand-new ones** (~100–300ms — the
-  duration of the progress GET, plus a claim hop if coming from guest LS). This is a deliberate
-  regression vs. the pre-Plan-3b behavior, where `BlastGame` painted level 1 instantly while the
-  hook loaded in the background.
+The boot gate is now seeded from a synchronous **resume hint** (`RESUME_HINT_KEY` in
+`guestProgress.ts`) — a client-side cache of the level we expect to resume at, written for every
+user on each load and advance:
 
-  **Decision: keep the gate.** The only alternative is to render level 1 immediately and swap on
-  resume — but that shows a level-1 flash to returning players, which reads as "my progress was
-  lost" for the exact users whose progress we just started saving. Protecting that perception is
-  worth a brief branded-mascot loader on entry (standard game UX). A future refinement could
-  instant-paint genuinely-new players by persisting a synchronous client-side level hint for all
-  users (not just guests) and gating only when the hint is `> 1`; deferred as not worth the extra
-  state today.
+- **No hint, or hint `=== 1`** (genuinely-new players) → `booting` starts `false` → level 1 paints
+  instantly, no loader. The progress GET still runs in the background.
+- **Hint `> 1`** (returning player on this device — the common resume case) → `booting` starts
+  `true` → branded-mascot loader holds until the resume resolves → no level-1 flash.
+
+The hint is **paint-only, never a source of truth** — the real resume level always comes from the
+server GET / guest claim. A stale or forged hint can therefore only cost an unnecessary loader or a
+one-time level swap, never progress or coins.
+
+### Known limitation
+
+- **Cross-device returner with no local hint** sees a one-time level-1 → level-N swap on first
+  entry on the new device; the resolved level is then written to the hint, so subsequent visits on
+  that device are flicker-free. Accepted — rare and self-correcting.
 
 ## Rollout / risk
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import type { ClearSubmission } from './anti-cheat';
 import type { ChestContents } from './chest-roll';
-import { readGuestProgress, clearGuestProgress } from './guestProgress';
+import { readGuestProgress, clearGuestProgress, writeResumeHint } from './guestProgress';
 
 export type BlastProgressState = {
   coins: number;
@@ -51,6 +51,7 @@ export function useBlastProgress() {
           setIsGuest(true);
           setCurrentLevel(lvl);
           setMaxLevelCleared(Math.max(lvl - 1, 0));
+          writeResumeHint(lvl); // paint fast-path for next visit
           setProgressLoaded(true);
           return;
         }
@@ -89,6 +90,7 @@ export function useBlastProgress() {
         setMaxLevelCleared(data.maxLevelCleared ?? 0);
         setIsGuest(false);
         clearGuestProgress(); // server is the source of truth for authed players
+        writeResumeHint(resumeLevel); // paint fast-path for next visit
         setProgressLoaded(true);
       } catch {
         // Never strand the boot — degrade to level 1.

@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { BlastV2PageClient } from '../BlastV2PageClient';
 import type { BlastLevel } from '@/lib/blast/v2/types';
-import { GUEST_PROGRESS_KEY, readGuestProgress } from '@/lib/blast/v2/guestProgress';
+import { GUEST_PROGRESS_KEY, RESUME_HINT_KEY, readGuestProgress } from '@/lib/blast/v2/guestProgress';
 
 const mkLevel = (n: number): BlastLevel => ({
   id: `l${n}`, levelNumber: n, theme: 'fruits', locale: 'en',
@@ -58,6 +58,35 @@ describe('BlastV2PageClient — resume + boot gate (Plan 3b)', () => {
     vi.restoreAllMocks();
   });
 
+  it('no resume hint: paints level 1 immediately without a boot loader (instant new-player paint)', async () => {
+    global.fetch = routeFetch({
+      progress: () => ({ ok: true, status: 200, json: async () => ({ currentLevel: 1, maxLevelCleared: 0, coins: 0, chestNumber: 1, chestProgress: 0, unlocksSeen: {}, locale: 'en' }) }),
+    }) as unknown as typeof fetch;
+
+    renderClient();
+
+    // Synchronously, before any progress GET resolves: board is up, no loader.
+    expect(screen.getByTestId('level-number').textContent).toBe('1');
+    expect(screen.queryByTestId('blast-boot-loader')).toBeNull();
+  });
+
+  it('resume hint > 1: holds the boot loader until the resume resolves (no level-1 flash)', async () => {
+    localStorage.setItem(RESUME_HINT_KEY, '5');
+    global.fetch = routeFetch({
+      progress: () => ({ ok: true, status: 200, json: async () => ({ currentLevel: 5, maxLevelCleared: 4, coins: 0, chestNumber: 1, chestProgress: 0, unlocksSeen: {}, locale: 'en' }) }),
+      level: (n) => ({ ok: true, status: 200, json: async () => mkLevel(n) }),
+    }) as unknown as typeof fetch;
+
+    renderClient();
+
+    // First paint is the loader, never level 1.
+    expect(screen.getByTestId('blast-boot-loader')).toBeTruthy();
+    expect(screen.queryByTestId('level-number')).toBeNull();
+
+    await waitFor(() => expect(screen.getByTestId('level-number').textContent).toBe('5'));
+    expect(screen.queryByTestId('blast-boot-loader')).toBeNull();
+  });
+
   it('new player (currentLevel=1): renders level 1, never fetches a resume level', async () => {
     global.fetch = routeFetch({
       progress: () => ({ ok: true, status: 200, json: async () => ({ currentLevel: 1, maxLevelCleared: 0, coins: 0, chestNumber: 1, chestProgress: 0, unlocksSeen: {}, locale: 'en' }) }),
@@ -77,8 +106,11 @@ describe('BlastV2PageClient — resume + boot gate (Plan 3b)', () => {
 
     renderClient();
 
-    await waitFor(() => expect(screen.getByTestId('level-number').textContent).toBe('1'));
-    expect(JSON.parse(screen.getByTestId('unlocks').textContent || '{}')).toMatchObject({ ftue_completed: true });
+    // With instant paint the board shows before the GET resolves; the unlocks
+    // thread in once progress loads — wait for it rather than assert synchronously.
+    await waitFor(() =>
+      expect(JSON.parse(screen.getByTestId('unlocks').textContent || '{}')).toMatchObject({ ftue_completed: true }),
+    );
   });
 
   it('resumes at the saved currentLevel (>1) by fetching that level', async () => {
