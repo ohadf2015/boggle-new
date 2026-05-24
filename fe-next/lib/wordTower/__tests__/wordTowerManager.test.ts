@@ -22,6 +22,9 @@ import {
   serializeWordTowerState,
   restoreWordTowerState,
   WORD_TOWER_SAVE_VERSION,
+  rerollStart,
+  nextChainAnchor,
+  damageTower,
 } from '../wordTowerManager';
 import {
   WORD_TOWER_TRAY_SIZE,
@@ -261,8 +264,6 @@ describe('wordTowerManager — serialize/restore', () => {
   });
 });
 
-import { rerollStart } from '../wordTowerManager';
-
 describe('rerollStart (dead-end escape)', () => {
   const base = () => initWordTowerState({ gameCode: 'g1', playerId: 'p1', language: 'en' });
 
@@ -296,7 +297,6 @@ describe('rerollStart (dead-end escape)', () => {
   });
 });
 
-import { nextChainAnchor } from '../wordTowerManager';
 describe('nextChainAnchor (vowel-ending chain skip)', () => {
   it('chains on the last letter for consonant endings', () => {
     expect(nextChainAnchor('CAT', 'en')).toBe('T');
@@ -307,7 +307,6 @@ describe('nextChainAnchor (vowel-ending chain skip)', () => {
   });
 });
 
-import { damageTower } from '../wordTowerManager';
 describe('damageTower (hazard ruin)', () => {
   const built = () => ({
     ...initWordTowerState({ gameCode: 'G', playerId: 'p1', language: 'en' as const }),

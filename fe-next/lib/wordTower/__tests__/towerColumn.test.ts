@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { buildTowerColumn, cellAltitudes, wordColor, blendColors, hexToHsl } from '../towerColumn';
+const buildCol2 = buildTowerColumn;
 
 describe('buildTowerColumn', () => {
   it('empty tower → no cells', () => {
@@ -132,7 +133,6 @@ describe('cellAltitudes', () => {
   });
 });
 
-import { buildTowerColumn as buildCol2 } from '../towerColumn';
 describe('buildTowerColumn — 2-char vowel connector', () => {
   it('merges a 2-char shared prefix into the previous two tiles', () => {
     // CAT->TEA (share T, 1) ; TEA->EAR (share EA, 2)
