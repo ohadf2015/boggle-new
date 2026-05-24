@@ -93,17 +93,16 @@ Write `docs/nightly/ideas/__TODAY__.md`:
 
 ═══ STEP 4 — Reddit reply candidates (file 2) ═══
 
-**LIVE THREADS ONLY.** If reddit `.json` + pullpush.io + WebSearch all return zero live threads tonight, write a stub file noting "Reddit unreachable tonight — no live candidates" and skip the block entirely. Do NOT invent pattern-based "common thread types" — those are not actionable; the user can't post to a pattern.
+**LIVE THREADS ONLY.** Get them from the helper — it returns real permalinks + scores + bodies directly (no verification needed; they came from Reddit's own API):
+```bash
+scripts/nightly/lib/reddit-fetch.sh feed wordgames new week 25
+scripts/nightly/lib/reddit-fetch.sh feed dailygames new week 25
+scripts/nightly/lib/reddit-fetch.sh search "looking for word game 2026" new week 25
+```
+Each JSON item already has `permalink`, `score`, `num_comments`, `selftext`, `author` — build the full URL as `https://www.reddit.com<permalink>`. `WebSearch("site:reddit.com ...")` is a supplement only. If the helper + WebSearch both return zero usable live threads, write a stub "Reddit unreachable tonight — no live candidates" and skip the block. Do NOT invent pattern-based threads.
 
-**To get live threads when reddit.com is blocked**: fall back to `WebSearch` with queries like:
-- `site:reddit.com r/wordgames "anyone know" 2026`
-- `site:reddit.com r/dailygames "looking for" word`
-- `site:reddit.com r/Anagrams "best" "online"`
-- `site:reddit.com r/Hebrew "vocabulary" game`
-- `site:reddit.com r/Scrabble "alternative" "free"`
-
-SERP snippets contain real permalinks + post titles. Use them. Each thread MUST have:
-- A real, working permalink (verify with `WebFetch` to a `.json` endpoint — if 404, skip it)
+Each thread you pick MUST have:
+- A real permalink straight from the helper JSON (DO NOT re-verify via WebFetch `.json` — that transport is blocked; the helper's permalinks are already valid)
 - Posted within last 14 days
 - ≥5 upvotes (lower-effort threads = better reply odds)
 - An open question OP is asking (not a "look what I made" showcase)

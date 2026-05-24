@@ -330,6 +330,13 @@ fi
 # ever drops the nightly's OWN files — never founder WIP. An arbitrary file-count
 # ceiling just blocked legitimate multi-file work, so it is gone.
 
+# A failed ship/gate must STILL send the full Telegram digest (manager summary +
+# feedback buttons + Reddit pick + game-mode/idea cards) — the founder needs those
+# regardless of whether code shipped. So failure paths set RUN_FAILED + write an
+# Outcome line and FALL THROUGH to the digest block; the run exits non-zero only
+# at the very end (and skips marking success so dedup stays clear for a retry).
+RUN_FAILED=0
+
 # --- build/lint/test gate (authoritative) ---------------------------------
 # PRIMARY: gate ONLY the nightly's authored changes, on a clean HEAD checkout, in
 # a throwaway worktree (lib/gate-isolated.sh). The founder's concurrent WIP can't
@@ -396,8 +403,8 @@ if [ "$gate_ok" = "0" ]; then
     : > "$NIGHTLY_AUTHORED_FILE"
     mkdir -p "$(dirname "$REPORT")"
     echo -e "\n**Outcome:** GATE FAILED on lane code; no docs to salvage. All of the nightly's own changes dropped; founder WIP untouched." >> "$REPORT"
-    send_failure_digest "Isolated gate failed (the nightly's own lane code broke lint/test/build) and there were no docs to salvage. Only the nightly's own changes were dropped; founder WIP untouched."
-    exit 1
+    RUN_FAILED=1; NO_CHANGE_MODE=1; NEW_SHA="$START_SHA"
+    log "gate failed, nothing to ship — falling through to send the full digest, will exit 1"
   fi
 
   log "docs-only salvage — shipping reports/ideas/learnings, lane code dropped ($AUTHORED_COUNT docs)"
@@ -436,12 +443,16 @@ EOF
     # scenarios (clean push, non-overlap rebase, generated-file exclusion, no-change
     # guard, genuine-conflict fail-safe). On unrecoverable failure it has already
     # alerted + preserved a clean tree, so we just exit.
-    ship_nightly_commit || { send_failure_digest "Commit/push failed — likely a real merge conflict with origin/master. The local commit was preserved for a human to resolve."; exit 1; }
+    if ! ship_nightly_commit; then
+      RUN_FAILED=1
+      echo -e "\n**Outcome:** ⚠️ committed locally but PUSH FAILED — local commit preserved; will retry next run or resolve manually." >> "$REPORT"
+      log "ship failed — falling through to send the full digest (summary + buttons + cards), will exit 1"
+    fi
   fi
 fi
 
 # --- post-push monitor (skip in no-change / dry-run / no-push) ------------
-if [ "$NO_MONITOR" = "0" ] && [ "$NO_CHANGE_MODE" = "0" ] && [ "$DRY_RUN" = "0" ] && [ "$NO_PUSH" = "0" ]; then
+if [ "$NO_MONITOR" = "0" ] && [ "$NO_CHANGE_MODE" = "0" ] && [ "$DRY_RUN" = "0" ] && [ "$NO_PUSH" = "0" ] && [ "$RUN_FAILED" = "0" ]; then
   log "spawning health monitor (30 min)"
   nohup "$LIB_DIR/health-monitor.sh" "$NEW_SHA" \
     >> "$LOG_DIR/health-monitor.log" 2>&1 &
@@ -460,7 +471,7 @@ SUMMARY_PROMPT=$(mktemp -t summary-prompt.XXXXXX)
 cat > "$SUMMARY_PROMPT" <<PROMPT_EOF
 You are writing a daily Telegram message for the LexiClash founder. Read \`docs/nightly/reports/${TODAY}.md\` end-to-end.
 
-Mode: $([ "$NO_CHANGE_MODE" = "1" ] && echo "NO-CHANGE NIGHT (no lanes shipped). Output 4-6 lines max: a one-line 'all clear' headline + a brief 'what was checked'. NO bullet sections. Skip 'wins' entirely." || echo "Changes shipped. Lead with concrete impact.")
+Mode: $([ "$RUN_FAILED" = "1" ] && echo "RUN FAILED — the gate failed and/or the push failed (read the **Outcome** line in the report for which). LEAD with that honestly (e.g. 'code gate failed, nothing shipped' or 'committed locally but push failed'), then a brief what-ran/what-was-attempted. Still include the Reddit pick + game-mode idea sections below if present — they're useful regardless." || { [ "$NO_CHANGE_MODE" = "1" ] && echo "NO-CHANGE NIGHT (no lanes shipped). Output 4-6 lines max: a one-line 'all clear' headline + a brief 'what was checked'. NO bullet sections. Skip 'wins' entirely." || echo "Changes shipped. Lead with concrete impact."; })
 
 Compose the message in this MINIMAL format (≤1200 chars total). One blank line between sections. Skip any section that is empty — do NOT print empty section markers.
 
@@ -643,7 +654,7 @@ fi
 # the per-lane allowlist. Scope the residual ship to exactly the nightly's doc
 # output roots so it can clean its own trailing files WITHOUT sweeping any
 # founder WIP that also happens to be dirty.
-if [ "$DRY_RUN" = "0" ] && [ "$NO_PUSH" = "0" ]; then
+if [ "$DRY_RUN" = "0" ] && [ "$NO_PUSH" = "0" ] && [ "$RUN_FAILED" = "0" ]; then
   RESIDUAL_AUTHORED=$(mktemp)
   nightly_dirty_paths | grep -E '^docs/(nightly|seo-daily)/' > "$RESIDUAL_AUTHORED" || true
   if [ -s "$RESIDUAL_AUTHORED" ]; then
@@ -667,6 +678,10 @@ EOF
   rm -f "$RESIDUAL_AUTHORED"
 fi
 
+if [ "$RUN_FAILED" = "1" ]; then
+  log "nightly-loop finished WITH FAILURES — full digest (summary + buttons + Reddit + ideas) was sent; NOT marking success so dedup stays clear for a retry"
+  exit 1
+fi
 preflight_mark_success
 log "nightly-loop complete"
 exit 0
