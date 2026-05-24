@@ -35,7 +35,7 @@ vi.mock('@/contexts/AdMobContext', () => ({
   }),
 }));
 
-import { useAdMob, REWARD_PREPARE_TIMEOUT_MS } from './useAdMob';
+import { useAdMob, REWARD_PREPARE_TIMEOUT_MS, REWARD_SAFETY_TIMEOUT_MS } from './useAdMob';
 
 const flush = () => Promise.resolve();
 
@@ -75,6 +75,39 @@ describe('useAdMob.showRewarded — prepare-phase stall guard', () => {
     expect(onReward).not.toHaveBeenCalled();
     // crucially: we never showed an un-listened ad after bailing
     expect(showRewardVideoAd).not.toHaveBeenCalled();
+  });
+
+  it('recovers when show stalls — settles via the safety timeout after showRewardVideoAd hangs with no event', async () => {
+    // The real "stuck in reward ads" bug: prepare resolves (an ad loaded) and
+    // we call show, but showRewardVideoAd() never resolves AND no Rewarded/
+    // Dismissed/Failed event ever fires (backgrounded WebView, buggy mediation
+    // adapter). The UI must not hang in status='showing' forever — the safety
+    // watchdog has to cover the show phase, not just the post-show event wait.
+    prepareRewardVideoAd.mockResolvedValue(undefined);
+    showRewardVideoAd.mockReturnValue(new Promise<void>(() => {}));
+
+    const { result } = renderHook(() => useAdMob());
+    const onReward = vi.fn();
+    const onError = vi.fn();
+
+    result.current.showRewarded(onReward, onError);
+
+    // drain listener registration + whenReady() + prepare microtasks
+    await flush();
+    await flush();
+    await flush();
+    await flush();
+
+    expect(showRewardVideoAd).toHaveBeenCalledTimes(1);
+    // before the safety timeout: still showing, neither resolved nor errored
+    expect(onError).not.toHaveBeenCalled();
+    expect(onReward).not.toHaveBeenCalled();
+
+    // advance past the safety watchdog — UI is freed with a retry error
+    await vi.advanceTimersByTimeAsync(REWARD_SAFETY_TIMEOUT_MS + 10);
+
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(onReward).not.toHaveBeenCalled();
   });
 
   it('shows the ad normally when prepare resolves before the timeout', async () => {
