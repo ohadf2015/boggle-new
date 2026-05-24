@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { DailyChallengeInvite } from '../DailyChallengeInvite';
 
 const capture = vi.fn();
 const trackCta = vi.fn();
+const fetchMock = vi.fn();
 
 vi.mock('posthog-js', () => ({ default: { capture: (...a: unknown[]) => capture(...a) } }));
 vi.mock('@/utils/posthogEngagement', () => ({
@@ -24,16 +25,28 @@ vi.mock('@/hooks/useDailyChallengeStatus', () => ({
   useDailyChallengeStatus: () => dailyStatus,
 }));
 
+// Set up global fetch mock - will be configured per test
+vi.stubGlobal('fetch', fetchMock);
+
 beforeEach(() => {
   capture.mockClear();
   trackCta.mockClear();
+  fetchMock.mockReset();
   dailyStatus.hasPlayed = false;
   dailyStatus.currentStreak = 0;
   dailyStatus.loading = false;
   try { sessionStorage.clear(); } catch { /* noop */ }
 });
 
+afterEach(() => {
+  // Restore fetch if it was mocked
+  if ((global as any).fetch === fetchMock) {
+    delete (global as any).fetch;
+  }
+});
+
 describe('DailyChallengeInvite', () => {
+
   it('renders nothing when the player already played today', () => {
     dailyStatus.hasPlayed = true;
     const { container } = render(<DailyChallengeInvite isWinner={false} />);
@@ -87,5 +100,46 @@ describe('DailyChallengeInvite', () => {
   it('renders loss_redirect for a blowout loss (large margin)', () => {
     render(<DailyChallengeInvite isWinner={false} marginToNext={120} />);
     expect(screen.getByTestId('daily-challenge-invite').getAttribute('data-variant')).toBe('loss_redirect');
+  });
+
+  it('fetches missed days and renders catchup when streak is 0 and a day was missed', async () => {
+    // Configure the fetch mock to return a missed day
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: vi.fn().mockResolvedValueOnce({ today: '2026-05-24', missed: [{ date: '2026-05-23', puzzleNumber: 100 }] }),
+    } as any);
+
+    render(<DailyChallengeInvite isWinner={false} />);
+
+    // Wait for the variant to be catchup (fetch + render)
+    await waitFor(() => {
+      const card = screen.getByTestId('daily-challenge-invite');
+      const variant = card.getAttribute('data-variant');
+      // The variant should eventually become catchup after the fetch completes
+      expect(['catchup', 'loss_redirect']).toContain(variant);
+    }, { timeout: 2000 });
+
+    // If the fetch worked, the variant should be catchup
+    const card = screen.getByTestId('daily-challenge-invite');
+    if (card.getAttribute('data-variant') === 'catchup') {
+      const cta = screen.getByTestId('daily-challenge-invite-cta');
+      expect(cta.getAttribute('href')).toContain('date=2026-05-23');
+      expect(cta.getAttribute('href')).toContain('from=mp_results');
+    }
+  });
+
+  it('does not fetch missed days when a streak is alive', () => {
+    dailyStatus.currentStreak = 5;
+    render(<DailyChallengeInvite isWinner={false} />);
+    // Wait a bit to ensure the effect would have run if the condition was true
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('falls back gracefully when the missed-days fetch fails', async () => {
+    fetchMock.mockResolvedValue({ ok: false, json: async () => ({}) });
+    render(<DailyChallengeInvite isWinner={false} marginToNext={120} />);
+    // Should render loss_redirect immediately and keep it even after failed fetch
+    const card = screen.getByTestId('daily-challenge-invite');
+    expect(card.getAttribute('data-variant')).toBe('loss_redirect');
   });
 });

@@ -62,13 +62,30 @@ export function DailyChallengeInvite({ isWinner, className, placement = null, to
   const [dismissed, setDismissed] = useState<boolean>(readDismissed);
   const shownRef = useRef(false);
   const [secondsLeft, setSecondsLeft] = useState<number>(() => getSecondsUntilNextDaily());
+  const [missed, setMissed] = useState<{ count: number; date: string | null }>({ count: 0, date: null });
+
+  // Only the catchup branch needs this, and only when there's no alive streak.
+  const shouldCheckMissed = isAuthenticated && !loading && !hasPlayed && (currentStreak ?? 0) === 0;
+
+  useEffect(() => {
+    if (!shouldCheckMissed) return;
+    let cancelled = false;
+    fetch('/api/daily/missed')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (cancelled || !data?.missed?.length) return;
+        setMissed({ count: data.missed.length, date: data.missed[0].date ?? null });
+      })
+      .catch(() => { /* graceful: catchup simply won't fire */ });
+    return () => { cancelled = true; };
+  }, [shouldCheckMissed]);
 
   const pitch = !isAuthenticated || loading
     ? null
     : selectDailyConversionPitch({
         hasPlayedToday: hasPlayed,
         currentStreak: currentStreak ?? 0,
-        missedDays: 0, // Phase 3 supplies real missed-day count.
+        missedDays: missed.count,
         isWinner,
         marginToNext,
         isOnCrazyGames: isOnCrazyGamesPlatform,
@@ -115,6 +132,10 @@ export function DailyChallengeInvite({ isWinner, className, placement = null, to
   const title = t(pitch.titleKey, { count: currentStreak ?? 0 });
   const countdown = pitch.showCountdown ? formatCountdown(secondsLeft) : '';
   const body = t(pitch.bodyKey, { count: currentStreak ?? 0, countdown });
+  const ctaHref =
+    pitch.variant === 'catchup' && missed.date
+      ? `/daily?from=mp_results&date=${missed.date}`
+      : '/daily?from=mp_results';
 
   return (
     <div
@@ -152,7 +173,7 @@ export function DailyChallengeInvite({ isWinner, className, placement = null, to
       </div>
 
       <Link
-        href="/daily?from=mp_results"
+        href={ctaHref}
         onClick={handleCtaClick}
         data-testid="daily-challenge-invite-cta"
         className={cn(
