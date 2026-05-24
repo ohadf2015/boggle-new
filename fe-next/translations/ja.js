@@ -1,5 +1,16 @@
 // Ja translations
 const ja = {
+  "shiritori": {
+    "players": "プレイヤー",
+    "nextStartsWith": "次の単語の頭文字",
+    "chain": "単語のチェーン",
+    "youWin": "あなたの勝ち！",
+    "wins": "の勝ち",
+    "yourTurn": "あなたの番！単語を入力",
+    "waitTurn": "順番を待っています…",
+    "inputLabel": "単語を入力",
+    "submit": "送信"
+  },
   "wordTower": {
     "cardTitle": "ワードタワー",
     "cardDesc": "言葉を積んで空へ — 管理者プレビュー",
@@ -10961,6 +10972,10 @@ const ja = {
         tip2: "周りの文字は順不同でタップ",
         tip3: "複数形を試して単語を伸ばす"
       }
+    },
+    shiritori: {
+      name: "しりとり",
+      description: "前の単語の最後の文字から始まる単語をつなげよう。"
     },
     intro: {
       cta: "はじめよう",

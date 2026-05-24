@@ -11343,6 +11343,10 @@ const he = {
         "tip3": "נסו צורות רבות כדי להאריך מילה"
       }
     },
+    "shiritori": {
+      "name": "שיריטורי",
+      "description": "שרשרו מילים — כל מילה מתחילה באות האחרונה של הקודמת."
+    },
     "intro": {
       "cta": "בוא נתחיל",
       "skip": "דלג על המדריך"
@@ -11358,6 +11362,17 @@ const he = {
     "randomFeature3": "חוקים משולבים",
     "nextMode": "מצב הבא",
     "randomizing": "מגריל..."
+  },
+  "shiritori": {
+    "players": "שחקנים",
+    "nextStartsWith": "המילה הבאה מתחילה ב־",
+    "chain": "שרשרת המילים",
+    "youWin": "ניצחתם!",
+    "wins": "ניצח",
+    "yourTurn": "תורכם — כתבו מילה",
+    "waitTurn": "המתינו לתורכם…",
+    "inputLabel": "הזינו מילה",
+    "submit": "שלח"
   },
   "presets": {
     "fast": "מהיר",

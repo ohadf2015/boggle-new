@@ -11074,6 +11074,10 @@ const en = {
         "tip3": "Try plural forms to extend a word"
       }
     },
+    "shiritori": {
+      "name": "Shiritori",
+      "description": "Chain words — each begins with the last letter of the one before."
+    },
     "intro": {
       "cta": "Let's go",
       "skip": "Skip tutorial"
@@ -11089,6 +11093,17 @@ const en = {
     "randomFeature3": "Mixed rules",
     "nextMode": "Next Mode",
     "randomizing": "Randomizing..."
+  },
+  "shiritori": {
+    "players": "Players",
+    "nextStartsWith": "Next word starts with",
+    "chain": "Word chain",
+    "youWin": "You win!",
+    "wins": "wins",
+    "yourTurn": "Your turn — type a word",
+    "waitTurn": "Waiting for your turn…",
+    "inputLabel": "Enter your word",
+    "submit": "Submit"
   },
   "presets": {
     "fast": "Quick",

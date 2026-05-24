@@ -1,5 +1,16 @@
 // Sv translations
 const sv = {
+  "shiritori": {
+    "players": "Spelare",
+    "nextStartsWith": "Nästa ord börjar på",
+    "chain": "Ordkedja",
+    "youWin": "Du vann!",
+    "wins": "vann",
+    "yourTurn": "Din tur — skriv ett ord",
+    "waitTurn": "Väntar på din tur…",
+    "inputLabel": "Skriv ditt ord",
+    "submit": "Skicka"
+  },
   "wordTower": {
     "cardTitle": "Ordtorn",
     "cardDesc": "Stapla ord mot skyn — adminförhandsvisning",
@@ -10987,6 +10998,10 @@ const sv = {
         tip2: "Tryck på yttre bokstäver i valfri ordning",
         tip3: "Prova pluralformer för att förlänga"
       }
+    },
+    shiritori: {
+      name: "Shiritori",
+      description: "Kedja ord — varje ord börjar på föregående ords sista bokstav."
     },
     intro: {
       cta: "Sätt igång",

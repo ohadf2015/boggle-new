@@ -10889,6 +10889,10 @@ const es = {
         "tip3": "Prueba plurales para alargar la palabra"
       }
     },
+    "shiritori": {
+      "name": "Shiritori",
+      "description": "Encadena palabras: cada una empieza con la última letra de la anterior."
+    },
     "intro": {
       "cta": "Vamos",
       "skip": "Saltar tutorial"
@@ -10904,6 +10908,17 @@ const es = {
     "randomFeature3": "Reglas mixtas",
     "nextMode": "Siguiente modo",
     "randomizing": "Aleatorizando..."
+  },
+  "shiritori": {
+    "players": "Jugadores",
+    "nextStartsWith": "La siguiente palabra empieza con",
+    "chain": "Cadena de palabras",
+    "youWin": "¡Ganaste!",
+    "wins": "gana",
+    "yourTurn": "Tu turno — escribe una palabra",
+    "waitTurn": "Esperando tu turno…",
+    "inputLabel": "Escribe tu palabra",
+    "submit": "Enviar"
   },
   "presets": {
     "fast": "Rápido",
