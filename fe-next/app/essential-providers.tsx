@@ -10,6 +10,7 @@
 import { useEffect, useMemo, ReactNode } from 'react';
 import { ThemeProvider } from '@/utils/ThemeContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { RadixDirectionProvider } from '@/components/providers/RadixDirectionProvider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { MotionConfigProvider } from '@/components/motion/MotionConfigProvider';
 import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
@@ -183,6 +184,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
             {/* Stable tier: rarely changes */}
             <ThemeProvider>
                 <LanguageProvider initialLanguage={lang} initialTranslations={initialTranslations}>
+                    <RadixDirectionProvider>
                     <AuthProvider>
                         <LogRocketIdentify />
                         <PostHogProvider>
@@ -245,7 +247,9 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                     </CoinProvider>
                     </CrazyGamesProvider>
                     </PostHogProvider>
-                    </AuthProvider>                </LanguageProvider>
+                    </AuthProvider>
+                    </RadixDirectionProvider>
+                </LanguageProvider>
             </ThemeProvider>
             </>
             )}
