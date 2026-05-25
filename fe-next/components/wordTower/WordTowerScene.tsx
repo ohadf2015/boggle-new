@@ -266,7 +266,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
 
     firstRender.current = false;
     prevMaxPos.current = maxPos;
-  }, [floors, pendingWord, engine, reducedMotion, bottomInsetPx, anchorLen, panState]);
+  }, [floors, pendingWord, engine, reducedMotion, bottomInsetPx, anchorLen, panState, biomeId]);
 
   // Shake the stack when a word is rejected.
   useEffect(() => {
