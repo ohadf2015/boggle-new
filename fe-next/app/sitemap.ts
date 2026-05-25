@@ -214,6 +214,23 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     images: [`${BASE_URL}/og-image-he.webp`],
   });
 
+  // ─── Hebrew dedicated daily-word landing (targets "המילה היומית" / מילת היום) ───
+  // Hebrew-only by intent; self-referencing he cluster, x-default → /en/daily.
+  routes.push({
+    url: `${BASE_URL}/he/hamila-hayomit`,
+    lastModified: LAST_DEPLOYED,
+    changeFrequency: 'daily',
+    priority: 0.9,
+    alternates: {
+      languages: {
+        'x-default': `${BASE_URL}/en/daily`,
+        he: `${BASE_URL}/he/hamila-hayomit`,
+        'he-IL': `${BASE_URL}/he/hamila-hayomit`,
+      },
+    },
+    images: [`${BASE_URL}/og-image-he.webp`],
+  });
+
   // ─── Spanish dedicated education landing ───
   routes.push({
     url: `${BASE_URL}/es/juegos-vocabulario-aula`,
