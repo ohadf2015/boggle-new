@@ -114,14 +114,31 @@ PY
     return 127
   fi
 
+  # Run in stream-json + verbose so EVERY tool call is observable. In plain text
+  # output `-p` prints only the final message, so a lane that hangs mid-tool
+  # produced 20 min of silence then exit 124 — we could never see WHICH MCP call
+  # hung (every diagnosis was inference; logs run-20260525 lane 1 = zero output).
+  # Now: the full stream-json goes to a per-lane sidecar (greppable forensics),
+  # and lib/stream-timeline.py collapses it into a compact wall-clock timeline
+  # teed into the run log. The LAST "▶ <tool>" with no matching "✓ <tool>" is the
+  # hung call, NAMED (e.g. mcp__supabase__execute_sql + its SQL preview).
+  local stream_sidecar timeline
+  stream_sidecar="$(dirname "$log_file")/stream-${lane_id}-$(date +%H%M%S).ndjson"
+  timeline="$(dirname "${BASH_SOURCE[0]}")/stream-timeline.py"
+
   "${timeout_cmd[@]}" \
     claude -p "$(cat "$rendered")" \
       --allowedTools '*' \
       --dangerously-skip-permissions \
+      --output-format stream-json \
+      --verbose \
       --model "$model" \
-      < /dev/null \
-      2>&1 | tee -a "$log_file"
+      < /dev/null 2>&1 \
+    | tee "$stream_sidecar" \
+    | python3 "$timeline" \
+    | tee -a "$log_file"
   local rc=${PIPESTATUS[0]}
+  echo "headless: lane=$lane_id rc=$rc — full stream-json sidecar: $stream_sidecar" | tee -a "$log_file"
 
   rm -f "$rendered"
   return "$rc"
