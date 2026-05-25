@@ -1,5 +1,10 @@
 /**
  * @jest-environment jsdom
+ *
+ * The auto-showing multiplayer welcome/tutorial card ("Game on. Find your
+ * people.") was removed — it cluttered the Arena Hub. The tutorial content is
+ * now reachable ONLY on demand via the header help (?) button → HowToPlay
+ * dialog. These tests lock that behavior so the card can't silently return.
  */
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -23,17 +28,6 @@ vi.mock('next/dynamic', () => ({
     return DynamicComp;
   },
 }));
-
-vi.mock('@/components/multiplayer/MultiplayerWelcomeCard', () => {
-  const MockCard = ({ onDismiss }: { onDismiss: () => void }) => (
-    <div data-testid="welcome-card">
-      <h2>Welcome to Multiplayer!</h2>
-      <button onClick={onDismiss} aria-label="Close tutorial">Close</button>
-    </div>
-  );
-  MockCard.displayName = 'MultiplayerWelcomeCard';
-  return { default: MockCard };
-});
 
 // Mock dependencies
 vi.mock('@/utils/contextualGuidanceStorage');
@@ -60,7 +54,7 @@ vi.mock('next/link', () => {
 const mockShouldShowGuidance = contextualGuidanceStorage.shouldShowGuidance as vi.MockedFunction<typeof contextualGuidanceStorage.shouldShowGuidance>;
 const mockMarkGuidanceShown = contextualGuidanceStorage.markGuidanceShown as vi.MockedFunction<typeof contextualGuidanceStorage.markGuidanceShown>;
 
-describe('RoomListView - Tutorial Persistence', () => {
+describe('RoomListView - Tutorial (auto-card removed)', () => {
   const mockProps = {
     activeRooms: [],
     roomsLoading: false,
@@ -75,137 +69,50 @@ describe('RoomListView - Tutorial Persistence', () => {
     vi.clearAllMocks();
   });
 
-  it('shows welcome card on first visit when tutorial has not been shown', async () => {
-    // GIVEN: User has never seen the multiplayer tutorial
+  it('does NOT auto-show a welcome/tutorial card, even on a first visit', async () => {
+    // GIVEN: storage says this would have been a first visit
     mockShouldShowGuidance.mockReturnValue(true);
 
-    // WHEN: Component mounts
+    // WHEN: component mounts
     render(
       <LanguageProvider>
         <RoomListView {...mockProps} />
       </LanguageProvider>
     );
 
-    // THEN: Inline welcome card should be visible (not a blocking dialog)
-    await waitFor(() => {
-      expect(screen.getByText(/welcome/i)).toBeInTheDocument();
-    });
-
-    // AND: Tutorial should be marked as shown
-    expect(mockMarkGuidanceShown).toHaveBeenCalledWith('multiplayerTutorialShown');
+    // THEN: no welcome card, and no blocking dialog auto-opens
+    expect(screen.queryByText(/welcome/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('does NOT show tutorial modal on return visits', () => {
-    // GIVEN: User has already seen the multiplayer tutorial
-    mockShouldShowGuidance.mockReturnValue(false);
-
-    // WHEN: Component mounts
+  it('no longer writes the multiplayerTutorialShown guidance flag on mount', () => {
+    mockShouldShowGuidance.mockReturnValue(true);
     render(
       <LanguageProvider>
         <RoomListView {...mockProps} />
       </LanguageProvider>
     );
-
-    // THEN: Tutorial modal should NOT be visible
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-
-    // AND: markGuidanceShown should NOT be called
     expect(mockMarkGuidanceShown).not.toHaveBeenCalled();
   });
 
-  it('does NOT show welcome card again after dismissal on same session', async () => {
+  it('opens the HowToPlay tutorial dialog on demand via the help button', async () => {
     const user = userEvent.setup();
-
-    // GIVEN: First-time user
-    mockShouldShowGuidance.mockReturnValueOnce(true);
-
-    // WHEN: Component mounts and user dismisses welcome card
-    const { rerender } = render(
-      <LanguageProvider>
-        <RoomListView {...mockProps} />
-      </LanguageProvider>
-    );
-
-    // Wait for welcome card to appear
-    await waitFor(() => {
-      expect(screen.getByText(/welcome/i)).toBeInTheDocument();
-    });
-
-    // Verify tutorial was marked as shown on mount
-    expect(mockMarkGuidanceShown).toHaveBeenCalledWith('multiplayerTutorialShown');
-
-    // User closes the welcome card
-    const closeButton = screen.getByRole('button', { name: /close/i });
-    await user.click(closeButton);
-
-    // Mark as shown (simulating the actual storage update)
-    mockShouldShowGuidance.mockReturnValue(false);
-
-    // WHEN: Component re-mounts (e.g., navigation back)
-    rerender(
-      <LanguageProvider>
-        <RoomListView {...mockProps} />
-      </LanguageProvider>
-    );
-
-    // THEN: Welcome card should NOT show again
-    await waitFor(() => {
-      expect(screen.queryByText(/welcome/i)).not.toBeInTheDocument();
-    });
-  });
-
-  it('allows user to manually open tutorial via help button after dismissal', async () => {
-    const user = userEvent.setup();
-
-    // GIVEN: User has already seen tutorial (auto-show dismissed)
-    mockShouldShowGuidance.mockReturnValue(false);
-
-    // WHEN: Component mounts
     render(
       <LanguageProvider>
         <RoomListView {...mockProps} />
       </LanguageProvider>
     );
 
-    // Tutorial not shown initially
+    // No dialog initially
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
-    // WHEN: User clicks help button
+    // WHEN: user clicks the help (?) button
     const helpButton = screen.getByRole('button', { name: /tutorial/i });
     await user.click(helpButton);
 
-    // THEN: Tutorial modal should open
+    // THEN: tutorial dialog opens
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
-  });
-
-  it('does NOT show tutorial modal every time component mounts after first dismissal', async () => {
-    // GIVEN: User has seen tutorial before
-    mockShouldShowGuidance.mockReturnValue(false);
-
-    // WHEN: Component mounts first time
-    const { unmount } = render(
-      <LanguageProvider>
-        <RoomListView {...mockProps} />
-      </LanguageProvider>
-    );
-
-    // First mount - no tutorial
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-
-    unmount();
-
-    // Second mount - no tutorial
-    render(
-      <LanguageProvider>
-        <RoomListView {...mockProps} />
-      </LanguageProvider>
-    );
-
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-
-    // Verify markGuidanceShown was never called (tutorial already shown)
-    expect(mockMarkGuidanceShown).not.toHaveBeenCalled();
   });
 });

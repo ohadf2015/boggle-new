@@ -16,23 +16,14 @@ import type { ActiveRoom } from '@/shared/types/game';
 import { cn } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 
-const TITLE_TEXT_SHADOW_STYLE = { textShadow: '3px 3px 0px rgba(0,0,0,0.8)' } as const;
-
 const HowToPlay = dynamic(() => import('@/components/HowToPlay'), { ssr: false });
-const MultiplayerWelcomeCard = dynamic(() => import('@/components/multiplayer/MultiplayerWelcomeCard'), { ssr: false });
 import { Loader } from '@/components/ui/Loader';
 import AvatarStack from '@/components/multiplayer/AvatarStack';
 import CrazyGamesFriendsStrip from '@/components/multiplayer/CrazyGamesFriendsStrip';
 import ArenaEmptyState from '@/components/multiplayer/ArenaEmptyState';
 import ArenaCTAStrip from '@/components/multiplayer/ArenaCTAStrip';
-import { shouldShowGuidance, markGuidanceShown } from '@/utils/contextualGuidanceStorage';
 
 // ==================== Animation Variants ====================
-
-const headerVariants = {
-  hidden: { opacity: 0, y: -20 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 25 } },
-};
 
 const roomListVariants = {
   hidden: { opacity: 0 },
@@ -143,18 +134,10 @@ const RoomListView: React.FC<RoomListViewProps> = ({
   const { t, dir, language } = useLanguage();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [showHowToPlay, setShowHowToPlay] = useState(false);
-  const [showWelcomeCard, setShowWelcomeCard] = useState(false);
   const hasMountedRef = useRef(false);
 
   useEffect(() => {
     hasMountedRef.current = true;
-  }, []);
-
-  useEffect(() => {
-    if (shouldShowGuidance('multiplayerTutorialShown')) {
-      setShowWelcomeCard(true);
-      markGuidanceShown('multiplayerTutorialShown');
-    }
   }, []);
 
   const { pullToRefreshHandlers, pullState } = usePullToRefresh({
@@ -188,52 +171,19 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           threshold={60}
         />
 
-        {/* Header — Arena Hub style */}
-        <m.header
-          variants={headerVariants}
-          initial={hasMountedRef.current ? false : "hidden"}
-          animate="visible"
-          className="flex items-center justify-between py-3 short:py-1 medium-short:py-1.5 px-4 lg:px-6 shrink-0 border-b-2 border-white/10"
-        >
-          {isOnCrazyGamesPlatform ? (
-            <Link
-              href={`/${language}`}
-              aria-label={t('common.back')}
-              className="flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-2 border-neo-black bg-neo-navy shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
-            >
-              <ArrowLeft className="w-5 h-5 text-neo-white rtl:rotate-180" />
-            </Link>
-          ) : (
-            <span aria-hidden="true" className="w-10 h-10 min-w-[44px] min-h-[44px]" />
-          )}
-
-          <div className="text-center">
-            <h1
-              className="font-neo-display text-xl font-black uppercase text-neo-white tracking-tighter italic"
-              style={TITLE_TEXT_SHADOW_STYLE}
-            >
-              {t('multiplayerFlow.roomList.arenaHub')}
-            </h1>
-          </div>
-
-          <button
-            onClick={() => setShowHowToPlay(true)}
-            className="flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-2 border-neo-black bg-neo-navy shadow-hard-sm hover:bg-white/10 active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
-            aria-label={t('landing.tutorial')}
-          >
-            <HelpCircle className="w-5 h-5 text-neo-white" />
-          </button>
-        </m.header>
-
-        {/* Hero banner — kawaii rivals + neon arena. Decorative; h1 in header
-            owns the localized title. Aspect-locked for layout stability (no CLS),
-            object-cover keeps focal point centered across viewports. */}
+        {/* Hero banner — kawaii mascots facing off across the neon arena ring.
+            The visible "ARENA HUB" wordmark is baked into the art; an sr-only
+            h1 carries the localized title for a11y/SEO. The help (and CG back)
+            buttons overlay the hero corners — this removes a full header row of
+            vertical space, the main lever for eliminating scroll (esp. on the
+            short/medium-short laptop breakpoints). */}
         <m.div
           initial={hasMountedRef.current ? false : { opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut', delay: 0.05 }}
-          className="px-5 lg:px-6 pt-3 lg:pt-5 short:pt-1.5 medium-short:pt-2 shrink-0"
+          className="px-5 lg:px-6 pt-3 lg:pt-4 short:pt-1.5 medium-short:pt-2 shrink-0"
         >
+          <h1 className="sr-only">{t('multiplayerFlow.roomList.arenaHub')}</h1>
           <div className="relative w-full mx-auto">
             <div className="relative w-full max-w-[560px] lg:max-w-[720px] desktop-medium-short:lg:max-w-[520px] desktop-short:lg:max-w-[380px] mx-auto bg-neo-navy h-[140px] short:h-[70px] medium-short:h-[100px] sm:h-auto sm:aspect-[16/9] overflow-hidden rounded-2xl border-3 border-neo-black shadow-hard">
               <Image
@@ -248,12 +198,34 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 aria-hidden="true"
                 className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-neo-navy via-neo-navy/40 to-transparent pointer-events-none"
               />
+
+              {/* CG-only back button — overlays top-start. Off-platform the
+                  global Header owns "back", so we don't render it here. */}
+              {isOnCrazyGamesPlatform && (
+                <Link
+                  href={`/${language}`}
+                  aria-label={t('common.back')}
+                  className="absolute top-2 inset-s-2 z-10 flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-2 border-neo-black bg-neo-navy/80 backdrop-blur-xs shadow-hard-sm hover:bg-neo-navy active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
+                >
+                  <ArrowLeft className="w-5 h-5 text-neo-white rtl:rotate-180" />
+                </Link>
+              )}
+
+              {/* Help / How-to-play — overlays top-end (replaces the old header
+                  help icon; this is the only on-demand path to the tutorial). */}
+              <button
+                onClick={() => setShowHowToPlay(true)}
+                className="absolute top-2 inset-e-2 z-10 flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-2 border-neo-black bg-neo-navy/80 backdrop-blur-xs shadow-hard-sm hover:bg-neo-navy active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
+                aria-label={t('landing.tutorial')}
+              >
+                <HelpCircle className="w-5 h-5 text-neo-white" />
+              </button>
             </div>
           </div>
         </m.div>
 
         {/* Scrollable Content. At lg+ split into a 2-column desktop layout
-            (audit C1 Tier 3): left rail = welcome + actions + CG-friends,
+            (audit C1 Tier 3): left rail = actions + CG-friends,
             right pane = live-match status + open-arenas list. Mobile keeps
             single-column flow. The two wrapper divs share the parent gap-5
             so vertical rhythm matches the prior single-column layout. */}
@@ -261,13 +233,6 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
           {/* Left rail (mobile: in-flow) */}
           <div className="flex flex-col gap-5">
-
-          {/* Welcome Card — inline, non-blocking */}
-          <AnimatePresence>
-            {showWelcomeCard && (
-              <MultiplayerWelcomeCard onDismiss={() => setShowWelcomeCard(false)} />
-            )}
-          </AnimatePresence>
 
           {/* Action Buttons — Quick Start + Create Room side by side */}
           {onQuickPlay && (
@@ -474,7 +439,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 </AnimatePresence>
               </m.div>
             ) : (
-              <ArenaEmptyState onQuickPlay={onQuickPlay} isQuickPlayLoading={isQuickPlayLoading} />
+              <ArenaEmptyState />
             )}
           </m.section>
           </div>

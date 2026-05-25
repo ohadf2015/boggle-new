@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, cleanup, fireEvent } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
 
 const tMock = vi.fn((key: string) => key);
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -17,13 +17,9 @@ vi.mock('next/image', () => ({
   },
 }));
 
-vi.mock('@/components/ui/Loader', () => ({
-  Loader: () => <span data-testid="loader" />,
-}));
-
 import ArenaEmptyState from '../ArenaEmptyState';
 
-describe('ArenaEmptyState', () => {
+describe('ArenaEmptyState (focused / decluttered)', () => {
   beforeEach(() => {
     tMock.mockClear();
   });
@@ -31,50 +27,34 @@ describe('ArenaEmptyState', () => {
     cleanup();
   });
 
-  it('renders mascot, headline, subhead', () => {
+  it('renders the spectating mascot, headline, subhead', () => {
     const { container } = render(<ArenaEmptyState />);
     expect(screen.getByTestId('arena-empty-state')).toBeInTheDocument();
     expect(screen.getByText('multiplayerFlow.roomList.noRoomsYet')).toBeInTheDocument();
     expect(screen.getByText('multiplayerFlow.roomList.beTheLegend')).toBeInTheDocument();
     const mascot = container.querySelector('img');
-    expect(mascot).toHaveAttribute('src', '/mascot/flexing.webp');
+    expect(mascot).toHaveAttribute('src', '/mascot/spectating.webp');
   });
 
-  it('renders 4 mode teaser chips with localized labels', () => {
+  it('does NOT render mode-teaser chips (decluttered — CTAStrip owns actions)', () => {
     render(<ArenaEmptyState />);
-    expect(screen.getByText('multiplayerFlow.roomList.gameModes.classic')).toBeInTheDocument();
-    expect(screen.getByText('multiplayerFlow.roomList.gameModes.blast')).toBeInTheDocument();
-    expect(screen.getByText('multiplayerFlow.roomList.gameModes.wordHunt')).toBeInTheDocument();
-    expect(screen.getByText('multiplayerFlow.roomList.gameModes.wheelRush')).toBeInTheDocument();
+    expect(screen.queryByText('multiplayerFlow.roomList.gameModes.classic')).toBeNull();
+    expect(screen.queryByText('multiplayerFlow.roomList.gameModes.blast')).toBeNull();
+    expect(screen.queryByText('multiplayerFlow.roomList.gameModes.wordHunt')).toBeNull();
+    expect(screen.queryByText('multiplayerFlow.roomList.gameModes.wheelRush')).toBeNull();
   });
 
-  it('omits Quick Start CTA when onQuickPlay is undefined', () => {
+  it('does NOT render its own Quick Start CTA (the CTA strip is the single source of action)', () => {
     render(<ArenaEmptyState />);
-    expect(screen.queryByRole('button', { name: 'multiplayerFlow.roomList.quickStart' })).toBeNull();
+    expect(screen.queryByRole('button')).toBeNull();
   });
 
-  it('renders Quick Start CTA when onQuickPlay is provided and triggers it on click', () => {
-    const onQuickPlay = vi.fn();
-    render(<ArenaEmptyState onQuickPlay={onQuickPlay} />);
-    const cta = screen.getByRole('button', { name: 'multiplayerFlow.roomList.quickStart' });
-    fireEvent.click(cta);
-    expect(onQuickPlay).toHaveBeenCalledTimes(1);
-  });
-
-  it('disables CTA and shows loader while quick-play is loading', () => {
-    const onQuickPlay = vi.fn();
-    render(<ArenaEmptyState onQuickPlay={onQuickPlay} isQuickPlayLoading />);
-    const cta = screen.getByRole('button', { name: 'multiplayerFlow.roomList.quickStart' });
-    expect(cta).toBeDisabled();
-    expect(screen.getByTestId('loader')).toBeInTheDocument();
-  });
-
-  it('mascot image is decorative (empty alt -> presentation role, screen readers skip)', () => {
+  it('mascot image is decorative (empty alt -> presentation, screen readers skip)', () => {
     const { container } = render(<ArenaEmptyState />);
     const mascot = container.querySelector('img');
     expect(mascot).toHaveAttribute('alt', '');
     // Empty alt strips the implicit `img` role → not queryable as role=img.
-    // This is a11y-correct: meaning is carried by the adjacent h3.
+    // Meaning is carried by the adjacent h3.
     expect(screen.queryByRole('img')).toBeNull();
   });
 });
