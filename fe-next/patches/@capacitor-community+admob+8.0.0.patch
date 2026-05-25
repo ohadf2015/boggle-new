@@ -1,5 +1,5 @@
 diff --git a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
-index c629139..80098f2 100644
+index c629139..885ea84 100644
 --- a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
 +++ b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
 @@ -44,7 +44,20 @@ public class BannerExecutor extends Executor {
@@ -72,7 +72,35 @@ index c629139..80098f2 100644
                  final AdRequest adRequest = RequestHelper.createRequest(adOptions);
                  mAdView.loadAd(adRequest);
              });
-@@ -261,7 +288,7 @@ public class BannerExecutor extends Executor {
+@@ -245,6 +272,27 @@ public class BannerExecutor extends Executor {
+                 AdViewIdHelper.assignIdToAdView(mAdView, adOptions, adRequest, logTag, contextSupplier.get());
+                 // Add the AdView to the view hierarchy.
+                 mAdViewLayout.addView(mAdView);
++                // Hard-constrain the banner to its declared ad-size height. An oversized
++                // ad creative (e.g. a 320x480 test creative on a registered test device,
++                // or a misbehaving adaptive size under Android 15/16 edge-to-edge) would
++                // otherwise grow the AdView into a tall, mostly-transparent native surface
++                // that composites OVER and occludes the WebView content beneath it — the
++                // long-reported "blank section / stray logo below the ad". Real banner ads
++                // are already this size, so this is a no-op for them; only a pathological
++                // creative is clamped (and clipped) so it can never cover the page.
++                try {
++                    float dens = contextSupplier.get().getResources().getDisplayMetrics().density;
++                    int maxHpx = (int) (120 * dens); // generous banner ceiling (real banners ~50-90dp)
++                    com.google.android.gms.ads.AdSize sz = mAdView.getAdSize();
++                    int hPx = (sz != null && sz.getHeight() > 0) ? Math.min((int) (sz.getHeight() * dens), maxHpx) : maxHpx;
++                    int wPx = (sz != null && sz.getWidth() > 0)
++                        ? (int) (sz.getWidth() * dens)
++                        : android.widget.RelativeLayout.LayoutParams.WRAP_CONTENT;
++                    mAdView.setLayoutParams(new android.widget.RelativeLayout.LayoutParams(wPx, hPx));
++                    mAdView.setClipChildren(true);
++                    mAdViewLayout.setClipChildren(true);
++                    mAdViewLayout.setClipToPadding(true);
++                } catch (Exception ignored) {}
+                 // Start loading the ad.
+                 mAdView.loadAd(adRequest);
+                 mAdView.setAdListener(
+@@ -261,7 +309,7 @@ public class BannerExecutor extends Executor {
                          @Override
                          public void onAdFailedToLoad(@NonNull LoadAdError adError) {
                              if (mAdView != null) {
@@ -81,7 +109,7 @@ index c629139..80098f2 100644
                                  mAdViewLayout.removeView(mAdView);
                                  mAdView.destroy();
                                  mAdView = null;
-@@ -297,7 +324,12 @@ public class BannerExecutor extends Executor {
+@@ -297,7 +345,12 @@ public class BannerExecutor extends Executor {
                  );
  
                  // Add AdViewLayout top of the WebView
