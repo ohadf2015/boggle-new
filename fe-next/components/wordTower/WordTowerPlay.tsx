@@ -23,6 +23,8 @@ import { milestoneCrossed } from '@/lib/wordTower/milestones';
 import { landmarkCrossed } from '@/lib/wordTower/landmarkMoment';
 import WordTowerCrane from './WordTowerCrane';
 import { useCraneDrop } from './useCraneDrop';
+import { useSabotageIntegration } from './useSabotage';
+import { WordTowerSabotageBay } from './WordTowerSabotageBay';
 import { hazardsCrossed } from '@/lib/wordTower/hazards';
 import { zoneTeaseAt } from '@/lib/wordTower/zoneTease';
 import { newlyUnlocked, type Achievement } from '@/lib/wordTower/achievements';
@@ -59,11 +61,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // Near-miss anticipation: a quiet "Next: Aurora · 18m" chip in the last stretch
   // before a new zone (the zone-entry banner pays it off).
   const tease = useMemo(() => zoneTeaseAt(game.heightM), [game.heightM]);
-  // Altitude the camera is *looking at* — equals the live height, but drops as the
-  // user pans down to review lower floors. The scene owns the pan gesture and
-  // reports it here so the landmark + rival rails track the scroll too (otherwise
-  // they freeze at the top and the lower sky reads blank). Starts at the height
-  // the session resumes from.
+  // Viewed altitude (live height, or lower while panned) — drives the landmark + rival rails.
   const [viewAlt, setViewAlt] = useState(game.heightM);
   // Restart guard: a climb is hard-won, so the reset button asks once. First tap
   // arms a 3s "Sure?" state; a second tap commits, otherwise it reverts.
@@ -97,9 +95,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     [tower, dictionary],
   );
 
-  // "NEW ZONE" banner on entering a new biome — the headline celebration of the
-  // climb. Owns its height so a colliding milestone (m50/m150 sit on the
-  // sky/stratosphere thresholds) defers to it.
+  // "NEW ZONE" banner — owns this slot; milestones at the same height defer.
   const [zoneText, setZoneText] = useState<string | null>(null);
   const prevZone = useRef(biomeId);
   useEffect(() => {
@@ -125,9 +121,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     return () => clearTimeout(id);
   }, [game.heightM]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Calm landmark flyby — "you just passed the jet stream". A cosy beat that
-  // names the world point you've earned. Defers to a zone change *or* a
-  // milestone at the same height so it never piles onto the toast stack.
+  // Landmark flyby — cosy "you passed X" beat. Defers to a zone or milestone at the same height.
   const [landmarkText, setLandmarkText] = useState<string | null>(null);
   const prevLandmarkH = useRef(game.heightM);
   useEffect(() => {
@@ -170,16 +164,15 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   const haptics = useHaptics();
   const { playCoinCollectSound, playChestOpenSound, playErrorSound } = useSoundEffects();
 
-  // Crane Stack: tap-to-drop quality scales height (cosy reward-amplifier); a
-  // perfect run earns escalating bonus height; a third bad drop in a row wobbles
-  // the just-placed floor off (recoverable). Drop logic lives in useCraneDrop.
+  // Crane Stack — cosy reward-amplifier; logic in useCraneDrop.
   const crane = useCraneDrop(tower.commitPlacement, tower.hazard);
 
-  // Environmental hazards: a bomb low down, a hurricane up high, strike at fixed
-  // altitudes and topple the top floors. Detect the crossing → apply the damage
-  // (the scene pops the lost floors automatically; the banner below names it).
-  // height drops after a strike, so the next run sees curM<prevM → no re-fire,
-  // and `firedHazards` guards re-climbing past the same altitude.
+  // Wrecking ball — perfect drops earn tokens; spend on a rival to topple a
+  // floor off their ghost tower. Includes the receiver-side simulator
+  // (?sim_sabotage=1) and the rail-display math.
+  const { sab: sabotage, displayRivals } = useSabotageIntegration(crane.perfectStreak, rivals, tower.hazard);
+
+  // Environmental hazards strike at fixed altitudes → topple floors; firedHazards guards re-fire.
   const prevHazardH = useRef(game.heightM);
   useEffect(() => {
     const prev = prevHazardH.current;
@@ -324,6 +317,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         reducedMotion={reducedMotion}
         bottomInsetPx={deckHeight}
         personalBestM={personalBest}
+        leanDeg={crane.leanDeg}
         t={t}
         onViewAltChange={setViewAlt}
       />
@@ -333,8 +327,8 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           *viewed* altitude so panning down reveals the marks at that height. */}
       <WordTowerLandmarkRail viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
 
-      {/* Rival record lines you climb past — fed by the leaderboard. */}
-      <WordTowerRivalRail rivals={rivals} viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
+      {/* Rival rail — heights include local sabotage hits so the targeted ghost shrinks. */}
+      <WordTowerRivalRail rivals={displayRivals} viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
 
       {/* Next-zone tease — quiet anticipation chip in the approach window. Hidden
           while the NEW ZONE banner is paying off the arrival. */}
@@ -387,10 +381,27 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           word={tower.state.pendingWord}
           consecutiveSloppy={crane.consecutiveSloppy}
           onDrop={crane.onDrop}
+          onSignedDrop={crane.pushSignedOffset}
           t={t}
           reducedMotion={reducedMotion}
         />
       )}
+
+      {/* Wrecking-ball UI: chip + earn toast + rival picker + hit animation. */}
+      <WordTowerSabotageBay
+        tokens={sabotage.tokens}
+        rivals={displayRivals}
+        pickerOpen={sabotage.pickerOpen}
+        onOpen={sabotage.openPicker}
+        onClose={sabotage.closePicker}
+        onSend={sabotage.sabotage}
+        lastHit={sabotage.lastHit}
+        onDismissHit={sabotage.dismissHit}
+        earnedToast={sabotage.earnedToast}
+        onDismissEarned={sabotage.dismissEarned}
+        t={t}
+        reducedMotion={reducedMotion}
+      />
 
       {/* Hazard "tower ruined" banner — bold + red so the loss is unmissable */}
       {hazardText && (

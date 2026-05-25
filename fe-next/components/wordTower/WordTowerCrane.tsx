@@ -5,15 +5,19 @@ import { cn } from '@/lib/utils';
 import {
   evaluatePlacement,
   craneOffsetAt,
+  TOPPLE_AFTER_SLOPPY,
   type PlacementOutcome,
 } from '@/lib/wordTower/cranePlacement';
+import { beamWidthFor } from '@/lib/wordTower/craneBeam';
 
 interface WordTowerCraneProps {
   /** The validated word being placed (rendered on the swinging block). */
   word: string;
-  /** Prior bad-drop streak — feeds the recoverable-topple rule. */
+  /** Prior bad-drop streak — feeds the recoverable-topple rule + meter. */
   consecutiveSloppy: number;
   onDrop: (outcome: PlacementOutcome) => void;
+  /** Sweep direction at drop time — fed to lean tracking by the parent. */
+  onSignedDrop?: (signed: number) => void;
   t: (key: string) => string;
   reducedMotion?: boolean;
   /** Sweep period (ms). */
@@ -29,34 +33,45 @@ const QUALITY_STYLE: Record<string, string> = {
   miss: 'bg-neo-red text-neo-white',
 };
 
+/** How far the trolley carriage slides along the jib (px from centre). */
+const TROLLEY_RANGE_PX = 110;
+/** Length of the cable from the trolley down to the hook (px). */
+const CABLE_LEN_PX = 64;
+
 /**
- * WordTowerCrane — Tower-Bloks placement overlay.
+ * WordTowerCrane — Tower-Bloks placement overlay with a real crane chrome.
  *
- * A block carrying the just-built word sweeps left↔right on a crane; tap to drop.
- * The horizontal error at drop time drives {@link evaluatePlacement} (the cosy
- * reward-amplifier model — see spec). Pure decision logic + a thin rAF sweep, so
- * the outcome is unit-tested and the component stays presentational.
+ * A horizontal jib spans the top of the bay; a trolley carriage slides L↔R
+ * along it; a cable drops from the trolley to a hook that carries the WORD
+ * BEAM (length scales with word length so longer words read as bigger girders).
+ * Tap to drop — beam detaches, falls, squashes on landing, then disappears.
  *
- * Accessibility: with reduced motion the block holds at centre (a generous,
- * skill-free "good" placement) rather than animating — no twitch reflex needed.
+ * Pure decision logic + a thin rAF sweep — the outcome is unit-tested and
+ * the component stays presentational.
+ *
+ * A11y: reduced-motion holds the carriage at centre (a generous, skill-free
+ * "good" placement) rather than animating.
  */
 export default function WordTowerCrane({
   word,
   consecutiveSloppy,
   onDrop,
+  onSignedDrop,
   t,
   reducedMotion = false,
   periodMs = 1800,
   getOffset,
 }: WordTowerCraneProps) {
-  // Live sweep position (-1..1) for rendering; the ref is read at drop time.
   const [pos, setPos] = useState(0);
   const posRef = useRef(0);
   const droppedRef = useRef(false);
   const [result, setResult] = useState<PlacementOutcome | null>(null);
+  // Detach animation: once dropped, the beam drops straight down before the
+  // verdict pill replaces the tap button — gives the impact a real beat.
+  const [falling, setFalling] = useState(false);
 
   useEffect(() => {
-    if (reducedMotion) return; // hold centre — accessible, skill-free
+    if (reducedMotion) return;
     let raf = 0;
     const start = performance.now();
     const tick = (now: number) => {
@@ -70,50 +85,110 @@ export default function WordTowerCrane({
   }, [reducedMotion, periodMs]);
 
   const drop = () => {
-    if (droppedRef.current) return; // one drop per word
+    if (droppedRef.current) return;
     droppedRef.current = true;
-    const offset = getOffset ? getOffset() : posRef.current;
-    const outcome = evaluatePlacement(Math.abs(offset), consecutiveSloppy);
-    setResult(outcome);
-    onDrop(outcome);
+    const signedOffset = getOffset ? getOffset() : posRef.current;
+    onSignedDrop?.(signedOffset);
+    const outcome = evaluatePlacement(Math.abs(signedOffset), consecutiveSloppy);
+    setFalling(true);
+    // Short fall, then settle the verdict — keeps the impact felt.
+    setTimeout(() => {
+      setResult(outcome);
+      onDrop(outcome);
+    }, reducedMotion ? 0 : 260);
   };
 
-  // Map sweep [-1,1] to pendulum swing angle (max 45 degrees)
-  const angle = pos * 45;
+  const trolleyX = pos * TROLLEY_RANGE_PX;
+  const beamW = beamWidthFor(word.length);
+
+  // Instability dots — 0, 1, 2, 3 (3 = next miss topples a floor).
+  const dots = Array.from({ length: TOPPLE_AFTER_SLOPPY + 1 }, (_, i) => i < consecutiveSloppy);
 
   return (
     <div
-      className="pointer-events-auto absolute inset-x-0 top-[10%] z-30 flex flex-col items-center gap-6 px-4"
+      className="pointer-events-auto absolute inset-x-0 top-[10%] z-30 flex flex-col items-center gap-3 px-4"
       role="group"
       aria-label={t('wordTower.crane.place')}
     >
-      {/* Crane / Pendulum Area */}
-      <div className="relative flex w-full max-w-sm flex-col items-center h-[140px]">
-        {/* Crane top mounting */}
-        <div className="absolute top-0 z-20 h-4 w-24 rounded-b-neo border-x-neo-thick border-b-neo-thick border-black bg-neo-navy-light/90 shadow-hard" />
-        
-        {/* Centre drop target */}
-        <div className="absolute bottom-2 z-0 h-10 w-16 rounded-neo border-2 border-dashed border-neo-lime/70" />
+      {/* Stability meter — instability you can SEE before the topple lands */}
+      <div
+        className="flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-navy/85 px-2 py-1 font-neo-body text-[10px] font-bold uppercase tracking-wider text-neo-white shadow-hard backdrop-blur-sm"
+        aria-label={t('wordTower.crane.stability')}
+      >
+        <span className="text-[10px]">{t('wordTower.crane.stability')}</span>
+        <div className="flex gap-1" aria-hidden>
+          {dots.map((on, i) => (
+            <span
+              key={i}
+              className={cn(
+                'h-2 w-2 rounded-full border border-black',
+                on
+                  ? i >= TOPPLE_AFTER_SLOPPY
+                    ? 'bg-neo-red'
+                    : i === TOPPLE_AFTER_SLOPPY - 1
+                    ? 'bg-neo-orange'
+                    : 'bg-neo-yellow'
+                  : 'bg-neo-navy-light',
+              )}
+            />
+          ))}
+        </div>
+      </div>
 
-        {/* Swinging pendulum container */}
-        <div 
-          className="absolute top-0 z-10 flex flex-col items-center"
-          style={{ 
+      {/* Crane chrome — mast + jib + cable + hook + beam */}
+      <div className="relative flex w-full max-w-md flex-col items-center" style={{ height: '168px' }}>
+        {/* Left mast */}
+        <div className="absolute start-2 top-0 h-[90px] w-3 rounded-b-neo border-neo border-black bg-neo-yellow shadow-hard" aria-hidden />
+        {/* Diagonal mast brace */}
+        <div
+          className="absolute start-3 top-12 h-1 w-12 origin-top-left rounded-sm bg-neo-yellow border border-black"
+          style={{ transform: 'rotate(28deg)' }}
+          aria-hidden
+        />
+        {/* Horizontal jib (the arm) — spans the bay */}
+        <div className="absolute top-[18px] z-10 h-3 w-[90%] rounded-neo border-neo-thick border-black bg-neo-yellow shadow-hard" aria-hidden>
+          {/* Jib bracing pattern */}
+          <div className="flex h-full items-center justify-between px-2 text-[8px] text-black/40">
+            <span>▲▼▲▼▲▼</span>
+          </div>
+        </div>
+        {/* Trolley + cable + hook + held beam — slides along the jib */}
+        <div
+          className="absolute top-[20px] z-20 will-change-transform"
+          style={{
+            transform: `translateX(${trolleyX}px) translateY(${falling ? 80 : 0}px)`,
+            transition: falling ? 'transform 240ms cubic-bezier(0.5,0,0.75,0)' : 'none',
             transformOrigin: 'top center',
-            transform: `rotate(${angle}deg)`
           }}
         >
-          {/* The crane rope */}
-          <div className="h-[80px] w-1 border-x-[1px] border-black bg-neutral-400" />
-          
-          {/* swinging word block */}
+          {/* Trolley carriage */}
+          <div className="mx-auto h-3 w-9 rounded-sm border border-black bg-neo-navy-light shadow-hard" aria-hidden />
+          {/* Cable */}
+          <div
+            className="mx-auto w-[2px] bg-black"
+            style={{ height: `${CABLE_LEN_PX}px` }}
+            aria-hidden
+          />
+          {/* Hook */}
+          <div className="mx-auto -mt-1 h-3 w-4 rounded-b-full border-[1.5px] border-t-0 border-black bg-neo-yellow-light shadow-hard" aria-hidden />
+          {/* Held WORD BEAM — width scales with word length */}
           <div
             data-testid="crane-block"
-            className="rounded-neo border-neo-thick border-black bg-neo-cyan px-3 py-1 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard"
+            className={cn(
+              'mx-auto mt-0.5 flex items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cyan font-neo-display text-base font-black uppercase tracking-wide text-neo-black shadow-hard',
+              !reducedMotion && !falling && 'animate-neo-pop',
+            )}
+            style={{ width: `${beamW}px`, height: '38px' }}
           >
             {word}
           </div>
         </div>
+
+        {/* Centre drop guide — the place the beam should land */}
+        <div
+          className="absolute bottom-2 z-0 h-1.5 w-20 rounded-full border border-dashed border-neo-lime/60 bg-neo-lime/15"
+          aria-hidden
+        />
       </div>
 
       {result ? (
@@ -123,6 +198,7 @@ export default function WordTowerCrane({
           className={cn(
             'rounded-neo border-neo-thick border-black px-4 py-1 font-neo-display text-base font-black uppercase shadow-hard',
             QUALITY_STYLE[result.quality],
+            !reducedMotion && 'animate-neo-pop',
           )}
         >
           {t(`wordTower.crane.${result.quality}`)}
@@ -132,7 +208,12 @@ export default function WordTowerCrane({
           type="button"
           data-testid="crane-drop"
           onClick={drop}
-          className="animate-neo-pop rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-2 font-neo-display text-base font-black uppercase text-neo-black shadow-hard transition-transform active:translate-y-px"
+          disabled={falling}
+          className={cn(
+            'rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-2 font-neo-display text-base font-black uppercase text-neo-black shadow-hard transition-transform active:translate-y-px',
+            !reducedMotion && !falling && 'animate-neo-pop',
+            falling && 'opacity-40',
+          )}
         >
           {t('wordTower.crane.tapToDrop')}
         </button>

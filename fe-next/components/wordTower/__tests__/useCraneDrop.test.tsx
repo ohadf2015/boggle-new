@@ -49,4 +49,20 @@ describe('useCraneDrop', () => {
     expect(hazard).toHaveBeenCalledWith(1, 'wobble', expect.any(Array));
     expect(result.current.consecutiveSloppy).toBe(0);
   });
+
+  it('pushSignedOffset accumulates a visible lean (recent-weighted)', () => {
+    const { result } = renderHook(() => useCraneDrop(vi.fn(), vi.fn()));
+    act(() => result.current.pushSignedOffset(0.6));
+    act(() => result.current.pushSignedOffset(0.7));
+    expect(result.current.leanDeg).toBeGreaterThan(0);
+  });
+
+  it('a recoverable topple clears the visible lean (recovery beat)', () => {
+    const { result } = renderHook(() => useCraneDrop(vi.fn(), vi.fn()));
+    act(() => result.current.pushSignedOffset(0.8));
+    act(() => result.current.pushSignedOffset(0.9));
+    expect(result.current.leanDeg).toBeGreaterThan(0);
+    act(() => result.current.onDrop(evaluatePlacement(0.9, 2))); // topple
+    expect(result.current.leanDeg).toBe(0);
+  });
 });

@@ -10,6 +10,7 @@ import {
   perfectStreakBonus,
   type PlacementOutcome,
 } from '@/lib/wordTower/cranePlacement';
+import { leanFromOffsets, pushLeanOffset } from '@/lib/wordTower/towerLean';
 
 /**
  * useCraneDrop — owns the Crane Stack drop reaction (extracted from
@@ -21,6 +22,10 @@ import {
  * hook); a third bad drop in a row wobbles the just-placed floor off (reusing
  * the hazard pipeline, recoverable). Returns the live streak counts so the
  * crane overlay can compute the next drop's topple consistently.
+ *
+ * Tracks the rolling window of signed drop offsets so the scene can render a
+ * VISIBLE tower lean (recent-weighted) — instability you can SEE before the
+ * topple lands. Lean resets when a topple recovers the tower.
  */
 export function useCraneDrop(
   commit: (multiplier: number) => void,
@@ -28,10 +33,17 @@ export function useCraneDrop(
 ) {
   const sloppyRef = useRef(0);
   const perfectRef = useRef(0);
-  const [streaks, setStreaks] = useState({ sloppy: 0, perfect: 0 });
+  const leanHistoryRef = useRef<number[]>([]);
+  const [streaks, setStreaks] = useState({ sloppy: 0, perfect: 0, leanDeg: 0 });
 
   const { playPerfectWordSound, playWordAcceptedSound, playErrorSound } = useSoundEffects();
   const haptics = useHaptics();
+
+  /** Record the signed (−1..+1) drop offset for the rolling lean window. */
+  const pushSignedOffset = useCallback((signed: number) => {
+    leanHistoryRef.current = pushLeanOffset(leanHistoryRef.current, signed);
+    setStreaks((s) => ({ ...s, leanDeg: leanFromOffsets(leanHistoryRef.current) }));
+  }, []);
 
   const onDrop = useCallback(
     (o: PlacementOutcome) => {
@@ -45,14 +57,28 @@ export function useCraneDrop(
       sloppyRef.current = o.topples ? 0 : nextConsecutiveSloppy(sloppyRef.current, o.quality);
 
       if (o.quality === 'perfect') { playPerfectWordSound(); haptics.levelComplete(); }
-      else if (o.topples) { hazard(1, 'wobble', [`crane-wobble-${Date.now()}`]); }
+      else if (o.topples) {
+        hazard(1, 'wobble', [`crane-wobble-${Date.now()}`]);
+        // Topple = the tower is RECOVERED — clear the visible lean.
+        leanHistoryRef.current = [];
+      }
       else if (o.quality === 'miss') { playErrorSound(); haptics.bossHit(); }
       else { playWordAcceptedSound(); haptics.selection(); }
 
-      setStreaks({ sloppy: sloppyRef.current, perfect: perfectRef.current });
+      setStreaks({
+        sloppy: sloppyRef.current,
+        perfect: perfectRef.current,
+        leanDeg: leanFromOffsets(leanHistoryRef.current),
+      });
     },
     [commit, hazard, playPerfectWordSound, playWordAcceptedSound, playErrorSound, haptics],
   );
 
-  return { onDrop, consecutiveSloppy: streaks.sloppy, perfectStreak: streaks.perfect };
+  return {
+    onDrop,
+    pushSignedOffset,
+    consecutiveSloppy: streaks.sloppy,
+    perfectStreak: streaks.perfect,
+    leanDeg: streaks.leanDeg,
+  };
 }

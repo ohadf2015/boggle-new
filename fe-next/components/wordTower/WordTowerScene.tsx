@@ -49,6 +49,10 @@ interface SceneProps {
    *  too instead of freezing at the live height and leaving blank sky on the way
    *  down. Throttled to one call per animation frame. */
   onViewAltChange?: (alt: number) => void;
+  /** Visible tower lean (deg, clamped ±LEAN_MAX_DEG) — recent-weighted from the
+   *  crane drops. 0 = upright. Applied to the Pixi tower container's angle so the
+   *  player SEES instability accumulate before the topple lands. */
+  leanDeg?: number;
 }
 
 /** Shared camera-pan state between the DOM gesture layer and the Pixi layer. */
@@ -109,7 +113,7 @@ function snapContainerY(c: Container, toY: number, dur: number, cancelled: () =>
  * recolours in place, removed pending tiles pop out, survivors slide. Fires the
  * per-word celebration FX, and offsets the whole stack by the user's pan.
  */
-function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, lastResult, reducedMotion, bottomInsetPx = 220, anchorLen = 1, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
+function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, lastResult, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
   const engine = useGameEngine();
   const containerRef = useRef<Container | null>(null);
   const registry = useRef<Map<string, TileSprite>>(new Map());
@@ -270,6 +274,16 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
     const c = containerRef.current;
     if (c) shakeX(c);
   }, [errorKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Visible instability lean — recent-weighted from crane drops, clamped small.
+  // Pixi container.angle is in degrees; pivot at the base so the tower leans
+  // FROM the ground rather than rotating around its centre.
+  useEffect(() => {
+    const c = containerRef.current;
+    if (!c) return;
+    if (reducedMotion) { c.angle = 0; return; }
+    c.angle = leanDeg;
+  }, [leanDeg, reducedMotion]);
 
   // Full-screen flash when crossing into a new biome.
   const prevBiome = useRef(biomeId);

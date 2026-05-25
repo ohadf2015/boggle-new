@@ -11,7 +11,10 @@
 
 // 'wobble' is not an altitude hazard — it's the recoverable Crane Stack topple
 // (a bad-drop streak), reusing the same banner/FX path with its own label.
-export type HazardKind = 'bomb' | 'hurricane' | 'wobble';
+// 'sabotage' is the cross-player wrecking-ball — sent by a rival's perfect
+// streak, lands as a single-floor topple with a warning siren beat. Same
+// pipeline so the recovery UX is consistent.
+export type HazardKind = 'bomb' | 'hurricane' | 'wobble' | 'sabotage';
 
 /** A hazard strike outcome — drives the "your tower was ruined" banner + FX. */
 export interface HazardEvent {
