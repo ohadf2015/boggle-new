@@ -3,11 +3,27 @@ You are running the nightly competitor + Reddit research lane for LexiClash. Tod
 ═══ LEARNINGS FROM PRIOR RUNS ═══
 __LEARNINGS__
 
+═══ IDEAS ALREADY PITCHED — DO NOT REPEAT (run this FIRST) ═══
+Before proposing ANY game-mode idea, run this via the **Bash** tool and read it end-to-end:
+```bash
+scripts/nightly/lib/idea-history.sh
+```
+It is the ledger of every idea you pitched in the last 7 nights + the founder's
+verdicts. **Hard rules, no exceptions:**
+  - Anything under **❌ PASSED** is a HARD BAN — never resurface it, not even reworded or retargeted to a different mode.
+  - Anything under **🔨 BUILD** is in flight — do NOT pitch it as new; at most note its status.
+  - Anything under **⏳ no verdict** must NOT be repeated. If a mechanic there was already **pitched 2×+**, the founder is implicitly ignoring it — DROP that mechanic family entirely and pick a different one.
+  - **Concept-level dedup, not wording.** Two ideas are the SAME idea if their CORE MECHANIC matches, regardless of which mode/surface (MP vs Daily vs Word Tower vs Blast) they target. "Share card in MP" and "share card in Daily" are the SAME idea. If your only novelty is the target mode, it is NOT new — choose a different mechanic family.
+Tonight's pitches MUST be genuinely new relative to this ledger. A fresh idea every night is the whole point of this lane.
+
 ═══ RECENT TELEGRAM-BUTTON FEEDBACK ═══
-Read every `.ndjson` file in `docs/nightly/feedback/` (last 7 days). Each line is a callback_query event. Pay special attention to lines where `callback_data` starts with `reddit:` — that's the user's vote on YOUR PREVIOUS Reddit-pick drafts. Treat patterns:
+Read every `.ndjson` file in `docs/nightly/feedback/` (last 7 days). Each line is a callback_query event. Treat patterns:
   - `reddit:will_post:*` → that subreddit / draft style worked, repeat it
   - `reddit:skip:*` → that subreddit / draft style failed, deprioritize
   - `reddit:redraft:*` → user wanted same thread, different reply tone; rewrite
+  - `idea:pass:*` → founder rejected that game-mode idea — NEVER pitch it (or its mechanic family) again (the ledger above already bans these)
+  - `idea:build:*` → founder wants that idea built — don't re-pitch as "new"; surface progress instead
+  - `mode:drop:*` → a shipped mode the founder killed — don't suggest reviving it; `mode:keep/promote:*` → it landed, build adjacent not duplicate
 
 ═══ SKILLS TO USE ═══
 From the **Specialized Skills** table above, invoke the skills listed for **lane 04 competitor/reddit** unless they conflict with this lane's hard rules. `humanizer` is especially important for Reddit drafts — they must not read AI-written.
@@ -171,7 +187,7 @@ Append to `docs/nightly/reports/__TODAY__.md` — this exact format is parsed by
 - Sources fetched: <count> (.json + pullpush.io + portals)
 - Concepts surfaced: <count> (see docs/nightly/ideas/__TODAY__.md)
 - Reddit reply candidates: <count> (see docs/nightly/ideas/__TODAY__-reddit.md)
-- Top idea: <one-line — should ideally be a game-mode-improvement insight from data>
+- Top idea: <ONE-LINE — a NEW game-mode suggestion OR a fresh improvement to an existing mode. MUST NOT match any concept family in the idea-history ledger (no PASSED, no BUILD, no already-repeated mechanic). This line is what the founder sees in the Telegram idea card — make it count.>
 - Sources that failed: <list or "none">
 
 #### Top Reddit pick of the day
@@ -185,10 +201,10 @@ Append to `docs/nightly/reports/__TODAY__.md` — this exact format is parsed by
 ```
 
 #### Top game-mode improvement idea
-- Title: <name>
+- Title: <name — a fresh improvement to an EXISTING mode (Word Tower / Blast / Word Wheel / WordCraft / MP / Daily). Must be a DIFFERENT mechanic family from the `- Top idea:` line above AND absent from the idea-history ledger.>
 - Source signal: <metric or thread that suggests this>
 - Effort: S/M/L
 - Why it'd help: <one-line>
 ```
 
-These two sub-sections feed directly into tomorrow's Telegram summary so the founder sees them inline (not just buried in attached file).
+So every night the founder gets BOTH a new game-mode concept (`- Top idea:`) and a distinct improvement to an existing mode (`#### Top game-mode improvement idea`) — both genuinely new vs the ledger, both fed into the Telegram summary.
