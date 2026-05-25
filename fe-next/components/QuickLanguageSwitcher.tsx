@@ -49,12 +49,22 @@ export const QuickLanguageSwitcher = memo<QuickLanguageSwitcherProps>(({
   showLabel = false,
   compact = false,
 }) => {
-  const { language, setLanguage, t, currentFlag } = useLanguage();
+  const { language, setLanguage, t, currentFlag, dir } = useLanguage();
 
   const selectedOption = LANGUAGE_OPTIONS.find(opt => opt.code === language);
 
   return (
     <Select
+      // Forward text direction straight to Radix (resolved as dirProp ??
+      // contextDir ?? 'ltr'). Radix Select is unconditionally modal in this
+      // version — it locks <body> and aria-hides every sibling while open — so
+      // if the popper ever computes its placement with LTR collision math on an
+      // RTL page it renders off-screen and the whole page looks blank & frozen
+      // (the reported "tap flag on /he → screen disappears" bug). The global
+      // RadixDirectionProvider already supplies this, but binding dir at the
+      // component guarantees correct RTL placement even if that context is ever
+      // out of reach for this Select.
+      dir={dir}
       value={language}
       onValueChange={(val) => {
         trackLanguageChanged(language, val);
