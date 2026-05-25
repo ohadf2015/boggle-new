@@ -18,6 +18,24 @@ set -uo pipefail
 
 PROJECT_DIR="${PROJECT_DIR:-/Users/ohadfisher/git/boggle-new}"
 
+# --- per-MCP-call watchdogs (the root-cause fix for the exit-124 epidemic) ----
+# Lanes are bounded ONLY by the wall-clock gtimeout below. Before this, a single
+# hung Sentry/Supabase MCP tool call (zero output, indefinite block) stalled the
+# whole lane until the multi-minute ceiling fired (exit 124) — discarding all
+# work and burning ~25 min of sonnet/opus. 12/37 lane-runs (32%) died this way on
+# 2026-05-25; the loop self-proposed "wrap each MCP call in gtimeout 30" for 4
+# nights but that is unimplementable — MCP tools run INSIDE the claude process,
+# not as shell commands. The real lever is Claude's CLIENT-SIDE watchdog:
+#   MCP_TOOL_TIMEOUT — hard wall-clock per tool call (ms). On exceed, Claude gets
+#                      a tool error and CONTINUES; it does not kill the process.
+#   MCP_TIMEOUT      — MCP server startup budget (ms); a dead server fails fast.
+# 60s/20s are deliberately generous for night one (Sentry MCP is HTTP/SSE, whose
+# first-byte budget has a 60s floor regardless — only the tool-call watchdog
+# honours sub-60s) so no legitimate slow query is clipped; tune DOWN after a
+# clean run. Both are overridable so the operator can retune without editing.
+export MCP_TOOL_TIMEOUT="${MCP_TOOL_TIMEOUT:-60000}"
+export MCP_TIMEOUT="${MCP_TIMEOUT:-20000}"
+
 headless_run() {
   local lane_id="$1"
   local prompt_file="$2"

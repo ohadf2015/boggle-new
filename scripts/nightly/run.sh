@@ -66,6 +66,14 @@ export POSTHOG_PERSONAL_API_KEY POSTHOG_PROJECT_ID POSTHOG_HOST
 export SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY
 export NIGHTLY_DISABLED
 
+# Per-MCP-call watchdogs — see lib/headless.sh for the full rationale. Set here
+# too so the run-wide env (and the summary composer at the bottom, which calls
+# `claude` DIRECTLY, not via headless.sh) inherits the same hang protection.
+# A hung Sentry/Supabase MCP call now aborts in ~60s with a tool error instead of
+# stalling a lane until its multi-minute wall-clock ceiling (exit 124).
+export MCP_TOOL_TIMEOUT="${MCP_TOOL_TIMEOUT:-60000}"
+export MCP_TIMEOUT="${MCP_TIMEOUT:-20000}"
+
 # --- helpers ---------------------------------------------------------------
 log() { echo "[$(date +%H:%M:%S)] $*" | tee -a "$RUN_LOG"; }
 TG="$LIB_DIR/telegram.sh"

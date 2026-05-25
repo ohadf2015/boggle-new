@@ -20,9 +20,10 @@ Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All l
 - **Lane 05 skip gate** — skips when no page has >=200 sessions. Correct skip: 05-23. (validated)
 - **Per-lane revert isolation** — 05-25 reverted 4 lanes while 2 shipped. Core safety property proven 5 nights. (kept)
 - **Lightweight lanes dominate** — lanes 04/06/08 (no heavy MCP, <=7m avg) = 100% ship rate. MCP dependency = failure predictor, not lane complexity. (new)
+- **Per-MCP-call watchdog SHIPPED** (`MCP_TOOL_TIMEOUT`/`MCP_TIMEOUT` exports in `lib/headless.sh` + `run.sh`) — the long-proposed per-call timeout, finally landed correctly. NOT a shell `gtimeout` wrap (impossible — MCP tools run INSIDE the claude process); it's Claude's client-side watchdog: a hung Sentry/Supabase call returns a tool error in ~60s and Claude CONTINUES, instead of the whole lane stalling to its wall-clock (exit 124). Covers lanes 01/02/03/05. Values 60s/20s are tunable DOWN after a clean night. (new — verify ship rate on next run)
 
 ## What to avoid (failed this week)
-- **MCP silent hangs = #1 failure mode, WORSENING (32%, up from 24%).** 05-25 worst night: 4/6 lanes timed out. PostHog REST helper fixed ONE vector; Sentry + Supabase MCP still hang. **Per-call `gtimeout 30` wrapper proposed 4 consecutive nights (05-21 to 05-25), still unshipped.** Single highest-leverage improvement.
+- **MCP silent hangs = #1 failure mode (32%).** PostHog REST helper fixed ONE vector; Sentry + Supabase MCP still hung. **FIX SHIPPED 05-25** as `MCP_TOOL_TIMEOUT`/`MCP_TIMEOUT` (NOT a shell `gtimeout` wrap — that was the unimplementable framing that stalled it 4 nights; MCP tools run inside the claude process). Awaiting next-run ship-rate confirmation.
 - **Lane 03 (engagement) = flakiest lane (1/5 = 20%).** PostHog funnel queries = hang vector. When it ships (05-23), output is high-value. Fix: pre-fetch funnel data via REST before lane starts.
 - **Lane 05 (landing) tied flakiest (1/4 = 25%).** Opus/1500s burns fully on timeout. Consider: downgrade to sonnet (lane 04 ships 100% on sonnet/600s doing comparable scope).
 - **Lane 01 (triage) at 40%, down from 50%.** Feedback-digest injection (`18734c040`) added MCP scope. Trim to top-3 items or move digest parsing to lane 07.
@@ -33,7 +34,7 @@ Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All l
 - Demoting `logger.warn -> debug` to clean Sentry — root-cause or queue, never silence. (kept)
 
 ## Open watches (carry forward)
-- **Per-call MCP timeout wrapper** — proposed 4 nights (05-21 to 05-25), unshipped. HIGHEST LEVERAGE. `gtimeout 30` per MCP call would cap hangs. Estimated: timeout rate 32% to <10%. First noticed 05-21.
+- **Per-MCP-call timeout — RESOLVED 05-25** (`MCP_TOOL_TIMEOUT=60000`/`MCP_TIMEOUT=20000`). Watch the next run's timeout rate (target 32% → <10%); if a legit query gets clipped, raise; if clean, lower toward 30000 to fail faster. Does NOT cover lane 08 (no MCP — its 05-25 exit-124 was a slow curl loop / build clip, separate cause).
 - **Shareable result card (Wordle emoji format)** — lane 4 TOP idea 4 nights (05-22 to 05-25). r/wordgames thread confirms active demand. Effort: S. First noticed 05-22.
 - **Parseword (Josh Wardle, Q1-Q2 2026)** — biggest competitor. Reviews call it "niche" — LexiClash's opening. (kept)
 - **`/en/multiplayer` LCP p75 ~4228-5806ms (POOR)** — n=11-29. Game-client hydration suspected. Needs profile + lazy socket bundle. (kept)
