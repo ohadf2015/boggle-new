@@ -12454,7 +12454,13 @@ const en = {
       "title": "Invalid Words title"
     },
     "kpi": {
-      "thisWeek": "Kpi this Week"
+      "dau": "Daily Active Users",
+      "gamesToday": "Games Today",
+      "signupsToday": "Signups Today",
+      "stickiness": "Stickiness",
+      "totalPlayers": "Total Players",
+      "totalWords": "Total Words",
+      "thisWeek": "This Week"
     },
     "landingCardOrder": "Landing Card Order",
     "live": {
@@ -12505,7 +12511,8 @@ const en = {
       "milogWords": "Nav milog Words",
       "webVitals": "Nav web Vitals",
       "wikipediaWords": "Nav wikipedia Words",
-      "wordBank": "Nav word Bank"
+      "wordBank": "Nav word Bank",
+      "teacherAccess": "Teacher Access"
     },
     "noData": "No Data",
     "player": {
