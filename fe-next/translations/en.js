@@ -1,5 +1,30 @@
 // EN translations
 const en = {
+  "shiritori": {
+    "chain": "Word chain",
+    "inputLabel": "Type your word",
+    "nextStartsWith": "Next word starts with",
+    "players": "Players",
+    "submit": "Submit",
+    "waitTurn": "Waiting for your turn…",
+    "wins": "wins!",
+    "yourTurn": "Your turn — type a word",
+    "youWin": "You win!"
+  },
+  "wordAlchemy": {
+    "badge": "Word Alchemy",
+    "title": "Word Alchemy",
+    "instructions": "Transform one word into the next by following each clue.",
+    "puzzleProgress": "Puzzle {n} of {total}",
+    "stepProgress": "Step {n} of {total}",
+    "inputPlaceholder": "Type your word",
+    "hintLabel": "Hint:",
+    "submit": "Submit",
+    "next": "Next puzzle",
+    "restart": "Restart",
+    "wonTitle": "Puzzle solved!",
+    "wonSubtitle": "Nice chain! Ready for the next one?"
+  },
   "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss"},
   "wordTower": {
     "cardTitle": "Word Tower",

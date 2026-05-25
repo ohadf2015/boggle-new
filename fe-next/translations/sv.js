@@ -1,5 +1,30 @@
 // Sv translations
 const sv = {
+  "shiritori": {
+    "chain": "Ordkedja",
+    "inputLabel": "Skriv ditt ord",
+    "nextStartsWith": "Nästa ord börjar med",
+    "players": "Spelare",
+    "submit": "Skicka",
+    "waitTurn": "Väntar på din tur…",
+    "wins": "vinner!",
+    "yourTurn": "Din tur – skriv ett ord",
+    "youWin": "Du vinner!"
+  },
+  "wordAlchemy": {
+    "badge": "Ordalkemi",
+    "title": "Ordalkemi",
+    "instructions": "Förvandla ett ord till nästa genom att följa varje ledtråd.",
+    "puzzleProgress": "Pussel {n} av {total}",
+    "stepProgress": "Steg {n} av {total}",
+    "inputPlaceholder": "Skriv ditt ord",
+    "hintLabel": "Ledtråd:",
+    "submit": "Skicka",
+    "next": "Nästa pussel",
+    "restart": "Börja om",
+    "wonTitle": "Pusslet löst!",
+    "wonSubtitle": "Snygg kedja! Redo för nästa?"
+  },
   "gameFeedback": {"prompt":"Hur var rundan?","bad":"Sådär","ok":"Bra","great":"Älskade den!","thanks":"Tack för din feedback!","dismiss":"Stäng"},
   "wordTower": {
     "cardTitle": "Ordtorn",

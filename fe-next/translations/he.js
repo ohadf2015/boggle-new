@@ -1,5 +1,30 @@
 // HE translations
 const he = {
+  "shiritori": {
+    "chain": "שרשרת מילים",
+    "inputLabel": "הקלידו מילה",
+    "nextStartsWith": "המילה הבאה מתחילה ב־",
+    "players": "שחקנים",
+    "submit": "שליחה",
+    "waitTurn": "ממתינים לתורכם…",
+    "wins": "ניצח!",
+    "yourTurn": "תורכם — הקלידו מילה",
+    "youWin": "ניצחתם!"
+  },
+  "wordAlchemy": {
+    "badge": "אלכימיית מילים",
+    "title": "אלכימיית מילים",
+    "instructions": "הפכו מילה אחת לבאה אחריה לפי כל רמז.",
+    "puzzleProgress": "חידה {n} מתוך {total}",
+    "stepProgress": "שלב {n} מתוך {total}",
+    "inputPlaceholder": "הקלידו מילה",
+    "hintLabel": "רמז:",
+    "submit": "שליחה",
+    "next": "חידה הבאה",
+    "restart": "מהתחלה",
+    "wonTitle": "החידה נפתרה!",
+    "wonSubtitle": "שרשרת יפה! מוכנים לבאה?"
+  },
   "gameFeedback": {"prompt":"איך היה הסיבוב?","bad":"ככה ככה","ok":"טוב","great":"אהבתי!","thanks":"תודה על המשוב!","dismiss":"סגירה"},
   "wordTower": {
     "cardTitle": "מגדל מילים",

@@ -1,5 +1,30 @@
 // Ja translations
 const ja = {
+  "shiritori": {
+    "chain": "言葉のチェーン",
+    "inputLabel": "言葉を入力",
+    "nextStartsWith": "次の言葉の最初の文字",
+    "players": "プレイヤー",
+    "submit": "送信",
+    "waitTurn": "順番をお待ちください…",
+    "wins": "の勝ち！",
+    "yourTurn": "あなたの番です — 言葉を入力",
+    "youWin": "あなたの勝ち！"
+  },
+  "wordAlchemy": {
+    "badge": "ワードアルケミー",
+    "title": "ワードアルケミー",
+    "instructions": "ヒントに従って、言葉を次の言葉へと変えていきましょう。",
+    "puzzleProgress": "パズル {n} / {total}",
+    "stepProgress": "ステップ {n} / {total}",
+    "inputPlaceholder": "言葉を入力",
+    "hintLabel": "ヒント：",
+    "submit": "送信",
+    "next": "次のパズル",
+    "restart": "やり直す",
+    "wonTitle": "パズルクリア！",
+    "wonSubtitle": "お見事！次のパズルへ進みますか？"
+  },
   "gameFeedback": {"prompt":"今のラウンドはどうだった？","bad":"うーん","ok":"良かった","great":"最高！","thanks":"フィードバックありがとう！","dismiss":"閉じる"},
   "wordTower": {
     "cardTitle": "ワードタワー",

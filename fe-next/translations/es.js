@@ -1,5 +1,30 @@
 // Es translations
 const es = {
+  "shiritori": {
+    "chain": "Cadena de palabras",
+    "inputLabel": "Escribe tu palabra",
+    "nextStartsWith": "La siguiente palabra empieza con",
+    "players": "Jugadores",
+    "submit": "Enviar",
+    "waitTurn": "Esperando tu turno…",
+    "wins": "¡gana!",
+    "yourTurn": "Tu turno: escribe una palabra",
+    "youWin": "¡Ganaste!"
+  },
+  "wordAlchemy": {
+    "badge": "Alquimia de palabras",
+    "title": "Alquimia de palabras",
+    "instructions": "Transforma una palabra en la siguiente siguiendo cada pista.",
+    "puzzleProgress": "Puzle {n} de {total}",
+    "stepProgress": "Paso {n} de {total}",
+    "inputPlaceholder": "Escribe tu palabra",
+    "hintLabel": "Pista:",
+    "submit": "Enviar",
+    "next": "Siguiente puzle",
+    "restart": "Reiniciar",
+    "wonTitle": "¡Puzle resuelto!",
+    "wonSubtitle": "¡Buena cadena! ¿Listo para la siguiente?"
+  },
   "gameFeedback": {"prompt":"¿Qué te pareció la ronda?","bad":"Regular","ok":"Bien","great":"¡Me encantó!","thanks":"¡Gracias por tu opinión!","dismiss":"Cerrar"},
   "wordTower": {
     "cardTitle": "Torre de Palabras",
