@@ -52,6 +52,23 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
             SystemBarStyle.dark(Color.TRANSPARENT),
             SystemBarStyle.dark(Color.TRANSPARENT)
         );
+
+        // Force an OPAQUE navy WebView background. Capacitor's
+        // `android.backgroundColor` config does NOT survive the edge-to-edge
+        // transparent-window setup above — the WebView is left composiing
+        // transparently, so any viewport area the page doesn't cover with an
+        // opaque element (a short page below the fold, the band beside a banner
+        // ad) reveals the WINDOW background (@drawable/splash) straight through
+        // it — a stray splash logo / blank panel painted over the loaded app.
+        // This was misdiagnosed for many rounds as a DOM/CSS/ad/FX-canvas issue;
+        // the real cause is the see-through WebView. An opaque navy WebView makes
+        // those uncovered areas read as seamless navy instead. Navy still draws
+        // behind the transparent system bars, so edge-to-edge is unaffected.
+        WebView bridgeWebView = getBridge() != null ? getBridge().getWebView() : null;
+        if (bridgeWebView != null) {
+            bridgeWebView.setBackgroundColor(Color.parseColor("#FF1A1A2E"));
+        }
+
         ensureDefaultNotificationChannel();
         handleDeepLinkIntent(getIntent());
     }
