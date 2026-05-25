@@ -1172,6 +1172,16 @@ export const trackInviteConsumed = (props: InviteConsumedProps): void => {
   } catch { /* silent */ }
 };
 
+// Counterpart to `invite_landed`: the invited room was gone by the time the
+// auto-join fired (expired / host left / never existed). Pairs with the
+// "room is no longer available" toast so the dead-invite rate is visible on
+// the growth dashboards, not just the successful-landing rate.
+export const trackInviteRoomDead = (props: { roomCode: string }): void => {
+  try {
+    posthog.capture('invite_room_dead', props);
+  } catch { /* silent — posthog not initialised */ }
+};
+
 interface PracticePendingBannerProps {
   roomCode: string;
   secondsOnPracticeHub: number;

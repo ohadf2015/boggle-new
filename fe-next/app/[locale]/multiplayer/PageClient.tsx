@@ -35,6 +35,8 @@ import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import { neoInfoToast } from '@/components/NeoToast';
 import { HostLeftGraceModal } from '@/components/multiplayer/HostLeftGraceModal';
 import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
+import { roomGoneFeedback } from '@/lib/multiplayer/roomGoneFeedback';
+import { trackInviteRoomDead } from '@/utils/growthTracking';
 import type { Language, ActiveRoom, Avatar, GameMode } from '@/shared/types/game';
 import type { Socket } from 'socket.io-client';
 import { classifyRoomError } from '@/utils/multiplayer/roomErrorClassifier';
@@ -258,15 +260,31 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       // GAME_CLOSED paths whose custom message lacked "closed"/"not found".
       const kind = classifyRoomError(data);
       if (kind === 'gone') {
+        // Snapshot identity BEFORE the resets below clear it: the dead-invite
+        // toast needs the room code, and `cameFromInvite` is derived from the
+        // `room=` param that this branch strips from the URL at the end.
+        const cameFromInvite = typeof window !== 'undefined' && window.location.search.includes('room=');
+        const urlRoom = typeof window !== 'undefined'
+          ? new URLSearchParams(window.location.search).get('room') ?? ''
+          : '';
+        const goneCode = gameCode || prefilledRoomCode || urlRoom;
         // Stale lobby tap or room torn down mid-join. Drop the dead room from
         // the local list synchronously so a re-tap can't re-fire the same dead
         // join before the server round-trip refreshes the list.
         if (gameCode) setActiveRooms((rooms) => rooms.filter((r) => r.gameCode !== gameCode));
-        // Only show "your room timed out" nudge when the user was ACTIVELY in
-        // this room — not on cold invite-link follows where the silent redirect
-        // to lobby is the right UX. `isActive` discriminates: true = was playing.
-        if (isActive) {
-          toast(t('multiplayerFlow.roomTimedOut'), { duration: 4000, icon: '⏱️', id: MP_TOAST_IDS.roomGone });
+        // Feedback policy lives in `roomGoneFeedback`. Active players get the
+        // "room timed out" nudge. Cold invite-link followers now get a clear
+        // "that room is no longer available" message instead of being silently
+        // dropped onto an empty lobby — that silent drop WAS the 2026-05-25
+        // "empty page" report (invite → dead room → room= stripped → bare
+        // "NO BATTLES IN PROGRESS" lobby with zero explanation). Stale lobby
+        // taps (not active, no invite) stay silent as before.
+        const feedback = roomGoneFeedback({ wasActive: isActive, cameFromInvite, roomCode: goneCode });
+        if (feedback) {
+          toast(t(feedback.key, feedback.params), { duration: 5000, icon: feedback.icon, id: MP_TOAST_IDS.roomGone });
+        }
+        if (!isActive && cameFromInvite) {
+          trackInviteRoomDead({ roomCode: goneCode || 'unknown' });
         }
         setError('');
         setGameCode(''); setPrefilledRoomCode(''); setIsActive(false); setIsHost(false); setIsPrivate(false);
