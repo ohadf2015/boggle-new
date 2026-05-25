@@ -105,6 +105,32 @@ describe('AdvancedSettingsModal save/cancel', () => {
     expect(baseProps.setMinWordLength).toHaveBeenCalledWith(4);
   });
 
+  it('offers a 1:30 (90-second) timer option rendered as MM:SS, not "1.5 min"', () => {
+    render(<AdvancedSettingsModal {...baseProps} />);
+    openModal();
+
+    expect(screen.getByRole('button', { name: '1:30' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /1\.5/ })).toBeNull();
+  });
+
+  it('Save commits the 1:30 timer selection as 1.5 minutes', () => {
+    render(<AdvancedSettingsModal {...baseProps} />);
+    openModal();
+
+    fireEvent.click(screen.getByRole('button', { name: '1:30' }));
+    fireEvent.click(screen.getByRole('button', { name: /common\.save/i }));
+
+    expect(baseProps.setTimerValue).toHaveBeenCalledWith(1.5);
+  });
+
+  it('marks 1:30 as the active chip when timerValue is the 1.5-min default', () => {
+    render(<AdvancedSettingsModal {...baseProps} timerValue={1.5} />);
+    openModal();
+
+    const chip = screen.getByRole('button', { name: '1:30' });
+    expect(chip.getAttribute('class') || '').toMatch(/neo-lime/);
+  });
+
   it('Cancel discards drafts — no setters called', () => {
     render(<AdvancedSettingsModal {...baseProps} />);
     openModal();

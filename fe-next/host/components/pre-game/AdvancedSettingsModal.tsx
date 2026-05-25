@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from '../../../components/ui/dialog';
 import { cn } from '../../../lib/utils';
+import { formatTimeMMSS } from '@/shared/utils';
 import type { Language, DifficultyLevel } from '@/shared/types/game';
 
 interface AdvancedSettingsModalProps {
@@ -24,7 +25,12 @@ interface AdvancedSettingsModalProps {
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
-const TIMER_OPTIONS = [1, 2, 3];
+// Minutes. 1.5 (= 1:30) is the default round length for classic MP.
+const TIMER_OPTIONS = [1, 1.5, 2, 3];
+
+/** Whole minutes render as "N min"; fractional minutes as MM:SS (e.g. 1.5 → "1:30"). */
+const formatTimerOption = (minutes: number, t: (k: string) => string): string =>
+  Number.isInteger(minutes) ? `${minutes} ${t('hostView.min')}` : formatTimeMMSS(minutes * 60);
 const DIFFICULTY_OPTIONS: { key: DifficultyLevel; labelKey: string; board: string }[] = [
   { key: 'EASY', labelKey: 'hostView.presetEasy', board: '5×5' },
   { key: 'MEDIUM', labelKey: 'hostView.presetParty', board: '6×6' },
@@ -122,7 +128,7 @@ export const AdvancedSettingsModal = memo<AdvancedSettingsModalProps>(function A
                   key={val}
                   active={draftTimer === val}
                   onClick={() => setDraftTimer(val)}
-                  label={`${val} ${t('hostView.min')}`}
+                  label={formatTimerOption(val, t)}
                 />
               ))}
             </div>

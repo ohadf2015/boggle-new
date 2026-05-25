@@ -44,7 +44,7 @@ export const DIFFICULTY_TIMERS: Record<DifficultyLevel, number> = {
   HARD: 120,    // 2 minutes - 7x7 board (49 cells)
 };
 
-export const DEFAULT_TIMER = 120; // 2 minutes
+export const DEFAULT_TIMER = 90; // 1.5 minutes (1:30) — classic MP default
 export const MIN_TIMER = 30;     // 30 seconds minimum
 export const MAX_TIMER = 600;    // 10 minutes maximum (aligned with backend clamp)
 /** Default timer for Blast MP when host doesn't set an explicit timer */

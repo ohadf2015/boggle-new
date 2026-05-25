@@ -227,7 +227,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
   // ==========================================
   const [difficulty, setDifficulty] = useState<DifficultyLevel>(DEFAULT_DIFFICULTY);
   const [minWordLength, setMinWordLength] = useState<number>(DEFAULT_MIN_WORD_LENGTH);
-  const [timerValue, setTimerValue] = useState<number>(2);
+  const [timerValue, setTimerValue] = useState<number>(1.5); // 1:30 default (minutes)
   const [timerDirection, setTimerDirection] = useState<number>(0);
   const [hostPlayingEnabled, setHostPlayingEnabled] = useLocalStorageState<boolean>('host_broadcast_mode_enabled', true);
 

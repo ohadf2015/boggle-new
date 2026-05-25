@@ -175,7 +175,7 @@ export const LeaveRoomSchema = z.object({
 export const StartGameSchema = z.object({
   gameCode: GameCodeSchema.optional(),
   letterGrid: z.array(z.array(z.string().max(5)).max(15)).max(15).optional().default([]),
-  timerSeconds: z.number().int().optional().default(120),
+  timerSeconds: z.number().int().optional().default(90),
   language: LanguageSchema.optional(),
   difficulty: DifficultySchema.optional().default('MEDIUM'),
   minWordLength: z.number().int().min(2).max(5).optional().default(2),

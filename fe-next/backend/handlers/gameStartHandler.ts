@@ -45,7 +45,7 @@ import { notifyGameStarted } from '../modules/notificationService.js';
 import { selectNextGameMode, ALL_GAME_MODES } from '../modules/gameModeSelector.js';
 import { initializePlayerData } from './playerDataInit.js';
 import { HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH } from '@/shared/constants/wordHuntMultiplayerConstants';
-import { BLAST_MP_DEFAULT_TIMER, DIFFICULTIES, DEFAULT_DIFFICULTY } from '@/shared/constants/gameConstants';
+import { BLAST_MP_DEFAULT_TIMER, DEFAULT_TIMER, DIFFICULTIES, DEFAULT_DIFFICULTY } from '@/shared/constants/gameConstants';
 import { WHEEL_RUSH_DURATION_SEC } from '@/shared/constants/wheelRushConstants';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { initBlastModeState, hashStringToSeed } from '../modules/blastModeManager.js';
@@ -321,7 +321,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     const timerFallback =
       resolvedMode === 'blast' ? BLAST_MP_DEFAULT_TIMER :
       resolvedMode === 'wheel-rush' ? WHEEL_RUSH_DURATION_SEC :
-      120;
+      DEFAULT_TIMER;
     let validTimer = Math.max(30, Math.min(600, rawTimer || priorTimerSeconds || timerFallback));
 
     // Defense-in-depth: explicit blast pick (or any path that bypassed the pool
