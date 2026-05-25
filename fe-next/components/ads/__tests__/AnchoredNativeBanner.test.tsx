@@ -248,16 +248,17 @@ describe('AnchoredNativeBanner', () => {
     // hideBanner resolves on the next microtask AFTER inline override is published —
     // simulating GlobalBottomNav writing the var mid-await.
     hideBanner.mockImplementationOnce(() => {
-      document.documentElement.style.setProperty('--bottom-nav-height', '128px');
+      document.documentElement.style.setProperty('--bottom-nav-height', '112px');
       return Promise.resolve();
     });
     try {
       render(<AnchoredNativeBanner />);
       await Promise.resolve();
       await Promise.resolve();
-      // showBanner should be called with the LATEST nav-height (128), not the
-      // initial CSS-fallback reading (96).
-      expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 128, { variant: 'content' });
+      // showBanner should be called with the LATEST nav-height (112), not the
+      // initial CSS-fallback reading (96). 112 stays under the 120px clamp so this
+      // asserts the re-read race, not the clamp (covered in bannerMargin.test.ts).
+      expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 112, { variant: 'content' });
     } finally {
       document.documentElement.style.removeProperty('--bottom-nav-height');
       document.head.removeChild(style);
