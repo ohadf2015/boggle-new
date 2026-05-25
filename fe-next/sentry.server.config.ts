@@ -54,6 +54,16 @@ Sentry.init({
     /\[AI_SERVICE\].*failed after.*attempts/i,
     // Bot requests hitting [locale] route with invalid params (e.g. /.rss/blog/...)
     /Incorrect locale information provided/i,
+    // Avatar PNG render (JAVASCRIPT-NEXTJS-1HW + 1DV) — server-side React-tree
+    // render of avatar_config is architecturally unsupported: the avatar parts
+    // depend on 'use client' contexts (useAvatarUid/useEyeColor), and Turbopack
+    // forbids `createContext` from entering the route-handler server graph, so
+    // <Context.Provider> resolves to undefined ("Element type is invalid") and
+    // the hooks throw ("call the default export from the server"). The route
+    // degrades gracefully (404 → mascot push fallback, 0 users impacted). Real
+    // fix = a context-free server-only SVG renderer (tracked in
+    // docs/superpowers/specs/2026-05-25-avatar-png-server-renderer.md).
+    /\[AVATAR_PNG\] render failed/i,
     // Race condition on duplicate word submit — non-critical
     /Error inserting player word/i,
     // Transient API failure for non-critical stat
