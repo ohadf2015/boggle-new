@@ -71,6 +71,88 @@ export function throttle<T extends (...args: unknown[]) => void>(
 }
 
 /**
+ * Like {@link throttle}, but the trailing-edge call uses the LATEST args seen
+ * during the window — not the args captured when the trailing call was first
+ * scheduled. Use this when each call carries a full snapshot and only the most
+ * recent one matters (e.g. a leaderboard payload). Leading-edge fires
+ * immediately so the first event is never delayed; sustained floods are capped
+ * to ~one call per `wait` with bounded latency.
+ *
+ * Uses `Date.now()` (not `performance.now()`) so behaviour is deterministic
+ * under fake timers.
+ *
+ * @param fn - The function to throttle
+ * @param wait - Minimum ms between invocations (default: 150ms)
+ */
+export function throttleLatest<T extends (...args: never[]) => void>(
+  fn: T,
+  wait: number = 150
+): T & { cancel: () => void; flush: () => void } {
+  let lastCall = 0;
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  let lastArgs: Parameters<T> | null = null;
+  let lastThis: unknown = null;
+
+  const invoke = (args: Parameters<T>, thisArg: unknown) => {
+    lastCall = Date.now();
+    fn.apply(thisArg, args);
+  };
+
+  const throttled = function (this: unknown, ...args: Parameters<T>) {
+    const now = Date.now();
+    const remaining = wait - (now - lastCall);
+    lastArgs = args;
+    lastThis = this;
+
+    if (remaining <= 0) {
+      // Window elapsed — fire on the leading edge.
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      lastArgs = null;
+      invoke(args, this);
+    } else if (timeoutId === null) {
+      // Inside the window — schedule a single trailing flush. Subsequent calls
+      // before it fires just update `lastArgs`, so the flush uses the newest.
+      timeoutId = setTimeout(() => {
+        timeoutId = null;
+        if (lastArgs) {
+          const pendingArgs = lastArgs;
+          const pendingThis = lastThis;
+          lastArgs = null;
+          invoke(pendingArgs, pendingThis);
+        }
+      }, remaining);
+    }
+  } as T & { cancel: () => void; flush: () => void };
+
+  throttled.cancel = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+    lastArgs = null;
+    lastThis = null;
+  };
+
+  throttled.flush = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+    if (lastArgs) {
+      const pendingArgs = lastArgs;
+      const pendingThis = lastThis;
+      lastArgs = null;
+      invoke(pendingArgs, pendingThis);
+    }
+  };
+
+  return throttled;
+}
+
+/**
  * Creates a debounced function that delays invoking `fn` until after `wait` milliseconds
  * have elapsed since the last time the debounced function was invoked.
  *

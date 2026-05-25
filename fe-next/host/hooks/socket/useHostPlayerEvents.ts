@@ -9,6 +9,7 @@ import { processAchievements } from '@/shared/utils/achievementUtils';
 import { createXpGainedHandler, createLevelUpHandler } from '@/shared/utils/xpUtils';
 import { createConnectionHandlers } from '@/shared/utils/connectionUtils';
 import { createPlayerPresenceHandler } from '@/shared/utils/presenceUtils';
+import { throttleLatest } from '../../../utils/throttle';
 import logger from '@/utils/logger';
 import type { XpGainedPayload, LevelUpPayload, AchievementPayload } from '@/shared/types/socket';
 import type { GameUser } from '@/shared/types/game';
@@ -19,6 +20,9 @@ interface LeaderboardWirePlayer {
   score: number;
   wordCount?: number;
 }
+
+/** Coalesce the opponent-score leaderboard flood to ~6.7 updates/sec. */
+const LEADERBOARD_THROTTLE_MS = 150;
 
 interface UseHostPlayerEventsProps {
   socket: Socket | null;
@@ -85,6 +89,22 @@ export function useHostPlayerEvents({
   useEffect(() => {
     if (!socket) return;
 
+    // Coalesce the opponent-score leaderboard flood (one event per word in a
+    // busy room) to ~6.7/s with the freshest payload, so a host who is also
+    // playing doesn't lose word-drag frame budget to per-event re-renders.
+    const throttledApplyLeaderboard = throttleLatest((leaderboard: LeaderboardWirePlayer[]) => {
+      const newScores: Record<string, number> = {};
+      const newWordCounts: Record<string, number> = {};
+      leaderboard.forEach((entry) => {
+        newScores[entry.username] = entry.score;
+        if (entry.wordCount !== undefined) {
+          newWordCounts[entry.username] = entry.wordCount;
+        }
+      });
+      setPlayerScores(newScores);
+      setPlayerWordCounts(prev => ({ ...prev, ...newWordCounts }));
+    }, LEADERBOARD_THROTTLE_MS);
+
     const handleUpdateUsers = (data: { users: Array<GameUser | string> }) => {
       const newUsers = (data.users || []) as Player[];
       setPlayersReady(newUsers);
@@ -147,19 +167,7 @@ export function useHostPlayerEvents({
 
     const handleUpdateLeaderboard = (data: { leaderboard: LeaderboardWirePlayer[] }) => {
       if (!data.leaderboard || !Array.isArray(data.leaderboard)) return;
-
-      const newScores: Record<string, number> = {};
-      const newWordCounts: Record<string, number> = {};
-
-      data.leaderboard.forEach((entry) => {
-        newScores[entry.username] = entry.score;
-        if (entry.wordCount !== undefined) {
-          newWordCounts[entry.username] = entry.wordCount;
-        }
-      });
-
-      setPlayerScores(newScores);
-      setPlayerWordCounts(prev => ({ ...prev, ...newWordCounts }));
+      throttledApplyLeaderboard(data.leaderboard);
     };
 
     const handleAchievementUnlocked = (data: { username?: string; achievement?: AchievementPayload }) => {
@@ -197,6 +205,7 @@ export function useHostPlayerEvents({
     socket.on('levelUp', handleLevelUp);
 
     return () => {
+      throttledApplyLeaderboard.cancel();
       socket.off('updateUsers', handleUpdateUsers);
       socket.off('playerPresenceUpdate', handlePlayerPresenceUpdate);
       socket.off('playerJoinedLate', handlePlayerJoinedLate);

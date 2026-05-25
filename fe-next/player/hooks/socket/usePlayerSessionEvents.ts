@@ -8,6 +8,7 @@ import { useEffect, useMemo, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
 import { neoInfoToast, wordErrorToast, TOAST_ICONS } from '../../../components/NeoToast';
 import { clearSessionPreservingUsername } from '../../../utils/session';
+import { throttleLatest } from '../../../utils/throttle';
 import { socketErrorMessage } from '../../../utils/socketErrorMessage';
 import { resolveHostLeftMessage } from '../../../lib/multiplayer/resolveHostLeftMessage';
 import { processAchievements } from '@/shared/utils/achievementUtils';
@@ -34,6 +35,9 @@ interface ShufflingGridPayload {
   highlightedCells?: Array<{ row: number; col: number }>;
 }
 interface LeaderboardUpdatePayload { leaderboard: LeaderboardEntry[] }
+
+/** Coalesce the opponent-score leaderboard flood to ~6.7 updates/sec. */
+const LEADERBOARD_THROTTLE_MS = 150;
 interface LiveAchievementPayload { achievements?: unknown[] }
 interface HostMessagePayload {
   message?: string;
@@ -99,6 +103,18 @@ export function usePlayerSessionEvents({
   useEffect(() => {
     if (!socket) return;
 
+    // Leaderboard updates stream in on every opponent's word in a busy room
+    // (up to ~150/s in a 50-player game). Each raw setLeaderboard re-executes
+    // PlayerView → InGameScreen, stealing frame budget from the player's own
+    // word-drag RAF. Coalesce to ~6.7/s with the freshest payload: the leading
+    // edge keeps the player's own score instant, the display is already frozen
+    // mid-drag by useFrozenWhileSelecting, and 6.7/s is faster than anyone can
+    // read a scoreboard. cancel() on cleanup avoids a post-unmount setState.
+    const throttledSetLeaderboard = throttleLatest(
+      (lb: LeaderboardEntry[]) => setLeaderboard(lb),
+      LEADERBOARD_THROTTLE_MS,
+    );
+
     const handleUpdateUsers = (data: UpdateUsersPayload) => {
       setPlayersReady(data.users || []);
     };
@@ -113,7 +129,7 @@ export function usePlayerSessionEvents({
     };
 
     const handleUpdateLeaderboard = (data: LeaderboardUpdatePayload) => {
-      setLeaderboard(data.leaderboard);
+      throttledSetLeaderboard(data.leaderboard);
     };
 
     const handleLiveAchievementUnlocked = (data: LiveAchievementPayload) => {
@@ -184,6 +200,7 @@ export function usePlayerSessionEvents({
     socket.on('rateLimited', handleRateLimited);
 
     return () => {
+      throttledSetLeaderboard.cancel();
       socket.off('updateUsers', handleUpdateUsers);
       socket.off('playerPresenceUpdate', handlePlayerPresenceUpdate);
       socket.off('shufflingGridUpdate', handleShufflingGridUpdate);
