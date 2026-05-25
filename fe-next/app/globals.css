@@ -3792,89 +3792,117 @@ body.crazygames-embed .game-view-container,
    is. Higher specificity than `:root` so it always wins.
    ============================================================ */
 html[data-cosy='true'] {
-  /* ---- Calm "espresso & oak" woody theme. One coherent warm earth palette
-     (oak/sage/clay/plum on a warm-brown backdrop), NOT a desaturated version
-     of the loud default. Overrides cascade app-wide via the var-backed neo-*
-     utilities; removing data-cosy reverts instantly. This is the documented
-     calm EXCEPTION to the dark/hard/halftone default in
-     .claude/docs/design-system.md. Palette legibility + warm character are
-     locked by lib/cosy/__tests__/calmPalette.contract.test.ts (WCAG floors). ---- */
+  /* ---- Calm "paper & oak" theme — a LIGHT, warm, low-noise inversion of the
+     loud dark default: sandy-paper backdrop, floating cream pills, charcoal
+     ink, gold/clay accents. Monochromatic-warm and spacious, modelled on cosy
+     word-game UIs. Overrides cascade app-wide via the var-backed neo-*
+     utilities; removing data-cosy reverts instantly. The dark theme funnels
+     text through --neo-white and ~1279 literal `text-white` utilities, so the
+     light flip needs both the token override here AND the .text-white
+     circuit-breaker rule below. Documented calm EXCEPTION to the dark/hard
+     default in .claude/docs/design-system.md; legibility (charcoal-on-light)
+     + warm character locked by lib/cosy/__tests__/calmPalette.contract.test.ts. */
 
-  /* Background — warm "espresso & oak" wood, not cool navy. White text stays
-     >= AA (contract floor = 6:1); lightness kept near the prior dusk values so
-     contrast headroom is preserved — only the hue/warmth shifts blue -> brown. */
-  --neo-navy: hsl(28 18% 22%);
-  --neo-navy-light: hsl(28 17% 27%);
-  --neo-navy-elevated: hsl(30 16% 30%);
-  --neo-navy-radial: hsl(28 18% 24%);
-  --neo-abyss: hsl(26 22% 14%);
-  --neo-abyss-deep: hsl(26 24% 10%);
-  --neo-abyss-mid: hsl(26 22% 16%);
-  --neo-abyss-light: hsl(28 20% 19%);
-  --neo-gray: hsl(28 12% 33%);
+  /* Backdrop — warm sandy "paper" (light). The whole app background flips from
+     dark navy to oat-sand; charcoal ink (below) is the page text colour and
+     clears AA on it. "elevated" reads lighter (raised), "abyss" a touch deeper
+     so gradients keep depth without going dark. */
+  --neo-navy: hsl(40 26% 81%);
+  --neo-navy-light: hsl(41 30% 85%);
+  --neo-navy-elevated: hsl(42 34% 89%);
+  --neo-navy-radial: hsl(40 28% 83%);
+  --neo-abyss: hsl(38 22% 74%);
+  --neo-abyss-deep: hsl(38 20% 71%);
+  --neo-abyss-mid: hsl(38 23% 77%);
+  --neo-abyss-light: hsl(40 26% 79%);
+  /* --neo-gray is overloaded (both `bg-neo-gray` surfaces AND `text-neo-gray`
+     muted text), so keep it a mid warm taupe — legible as text on the light
+     theme. Cards/popovers are pointed at cream explicitly below instead. */
+  --neo-gray: hsl(33 14% 50%);
 
-  /* Dominant oat-parchment card surface + warm charcoal-brown ink (walnut,
-     not bluish charcoal). --neo-black recolours every border/shadow/text-
-     stroke/focus-ring globally (it is never used as a background), so warming
-     it tints all the chrome woody too. */
-  --neo-cream: hsl(36 44% 95%);
+  /* Floating cream pill surface + warm charcoal-walnut ink. --neo-black
+     recolours every border/shadow/text-stroke/focus-ring globally and is the
+     page text colour; charcoal-on-sand and charcoal-on-cream both clear AA. */
+  --neo-cream: hsl(42 48% 97%);
   --neo-black: 58 50 42;
+  /* IMPORTANT: --neo-white stays WHITE. It is overloaded — 283 `bg-neo-white`
+     SURFACES rely on it (white inputs/overlays, clean on a light theme). Only
+     the TEXT side flips: the semantic *-foreground tokens below + the literal
+     `.text-white` circuit-breaker rule. (Do not set --neo-white to charcoal —
+     it would turn every bg-neo-white surface dark.) */
+  --neo-white: 255 255 255;
 
-  /* Soft diffuse shadows — kill the hard pixel stamp; warm-brown tint to match
-     the woody palette (was cool 20 20 35). */
-  --shadow-sm: 0 1px 2px rgba(38, 28, 20, 0.1);
-  --shadow-md: 0 2px 6px rgba(38, 28, 20, 0.1);
-  --shadow-lg: 0 6px 16px rgba(38, 28, 20, 0.12);
-  --shadow-xl: 0 12px 28px rgba(38, 28, 20, 0.14);
-  --shadow-pressed: inset 0 1px 2px rgba(38, 28, 20, 0.12);
+  /* Semantic foreground/surface tokens (shadcn-style). Defaults point text at
+     white (rgb(var(--neo-white))) which vanishes on the light theme, so flip
+     every foreground to charcoal ink and float cards/popovers as cream. */
+  --foreground: rgb(var(--neo-black));
+  --card: var(--neo-cream);
+  --card-foreground: rgb(var(--neo-black));
+  --popover: var(--neo-cream);
+  --popover-foreground: rgb(var(--neo-black));
+  --secondary-foreground: rgb(var(--neo-black));
+  --accent-foreground: rgb(var(--neo-black));
+  --muted: hsl(40 24% 89%);
+  --destructive-foreground: 255 255 255; /* white stays on hot red */
 
-  /* Thinner borders (colour softens via the charcoal --neo-black above) */
+  /* Soft, low diffuse shadows — borderless pills lean on these (warm-brown). */
+  --shadow-sm: 0 1px 2px rgba(78, 62, 44, 0.06);
+  --shadow-md: 0 2px 8px rgba(78, 62, 44, 0.08);
+  --shadow-lg: 0 6px 18px rgba(78, 62, 44, 0.09);
+  --shadow-xl: 0 14px 34px rgba(78, 62, 44, 0.1);
+  --shadow-pressed: inset 0 1px 2px rgba(78, 62, 44, 0.1);
+
+  /* Near-borderless — the soft shadow does the separation; keep a hairline. */
   --border-neo: 1px;
-  --border-neo-thick: 1.5px;
+  --border-neo-thick: 1px;
+  /* Borders soften to a barely-there warm tint (not the charcoal --neo-black),
+     so pills read clean/borderless like the reference. */
+  --border: hsl(40 20% 80%);
+  --input: hsl(42 40% 92%);
 
-  /* De-noise — drop the halftone dots + retro grid (consumed on body) */
-  --halftone-pattern: none;
+  /* Whisper of warm paper grain (texture, not noise) + no neon retro grid. */
+  --halftone-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='cg'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.27 0 0 0 0 0.23 0 0 0 0 0.18 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23cg)' opacity='0.05'/%3E%3C/svg%3E");
   --retro-grid-pattern: none;
 
-  /* Woody-cozy palette — one coherent WARM earth family (amber -> olive ->
-     clay -> plum), not the old cool sage/teal/rose/lavender mix. Hues stay
-     distinct enough that mode colour-coding survives, but every one is an
-     autumnal wood tone so the whole UI reads cosy, not desaturated-random.
-     Light families carry BLACK text; dark families carry WHITE text. */
-  /* LIME (primary) -> honey oak (black text) */
-  --neo-lime: hsl(38 48% 64%);
-  --neo-lime-light: hsl(40 50% 74%);
-  --neo-lime-muted: hsl(36 38% 56%);
-  --neo-lime-dark: hsl(34 42% 44%);
+  /* Monochromatic-warm accents — every family is a LIGHT earth tint that reads
+     legibly with CHARCOAL text (the light flip makes white-on-accent unsafe, so
+     all four sit on the same dark-text side). Still distinguishable by hue:
+     honey / sage / clay / dusty-plum. */
+  /* LIME (primary) -> honey oak */
+  --neo-lime: hsl(40 52% 66%);
+  --neo-lime-light: hsl(42 56% 76%);
+  --neo-lime-muted: hsl(38 42% 70%);
+  --neo-lime-dark: hsl(36 46% 58%);
 
-  /* CYAN (single-player) -> warm sage / dried-moss (black text) */
-  --neo-cyan: hsl(78 24% 62%);
-  --neo-cyan-light: hsl(78 26% 72%);
-  --neo-cyan-muted: hsl(76 20% 54%);
-  --neo-cyan-dark: hsl(74 24% 42%);
+  /* CYAN (single-player) -> soft sage / dried-moss */
+  --neo-cyan: hsl(80 28% 64%);
+  --neo-cyan-light: hsl(82 32% 74%);
+  --neo-cyan-muted: hsl(78 24% 68%);
+  --neo-cyan-dark: hsl(76 26% 56%);
 
-  /* PINK (multiplayer) -> terracotta / clay (white text) */
-  --neo-pink: hsl(14 48% 47%);
-  --neo-pink-light: hsl(16 46% 60%);
-  --neo-pink-muted: hsl(12 40% 42%);
-  --neo-pink-dark: hsl(10 44% 36%);
+  /* PINK (multiplayer) -> warm clay / terracotta (lightened for dark text) */
+  --neo-pink: hsl(16 54% 68%);
+  --neo-pink-light: hsl(18 60% 78%);
+  --neo-pink-muted: hsl(14 44% 72%);
+  --neo-pink-dark: hsl(12 48% 60%);
 
-  /* PURPLE (brain) -> mulled-wine plum / aubergine (white text) */
-  --neo-purple: hsl(326 24% 44%);
-  --neo-purple-light: hsl(326 24% 58%);
-  --neo-purple-muted: hsl(324 20% 40%);
-  --neo-purple-dark: hsl(322 26% 34%);
+  /* PURPLE (brain) -> dusty mauve / heather (lightened for dark text) */
+  --neo-purple: hsl(324 28% 70%);
+  --neo-purple-light: hsl(324 34% 80%);
+  --neo-purple-muted: hsl(322 22% 74%);
+  --neo-purple-dark: hsl(320 26% 60%);
 
-  /* Celebration accents — warm gold + clay, black text. --neo-red is
+  /* Celebration accents — warm gold + clay, charcoal text. --neo-red is
      intentionally NOT overridden: error/destructive stays hot (safety). */
-  --neo-yellow: hsl(42 62% 64%);
-  --neo-yellow-hover: hsl(40 58% 58%);
-  --neo-orange: hsl(26 56% 60%);
-  --neo-orange-hover: hsl(24 54% 54%);
+  --neo-yellow: hsl(43 70% 66%);
+  --neo-yellow-hover: hsl(41 64% 60%);
+  --neo-orange: hsl(28 64% 66%);
+  --neo-orange-hover: hsl(26 58% 60%);
 
-  /* Muted secondary text is hardcoded bluish (#d4d4e8) in :root, so it can't
-     follow the --neo-* vars — warm it explicitly to a soft oat-gray. */
-  --muted-foreground: hsl(36 16% 84%);
+  /* Muted secondary text -> warm clay-brown (the reference's low-key accent
+     text). Hardcoded bluish #d4d4e8 in :root can't follow the --neo-* cascade,
+     so it is set explicitly; clear on both sand and cream. */
+  --muted-foreground: hsl(26 28% 44%);
 }
 
 /* ---- Cosy / Calm Mode: structural softening beyond the token overrides.
@@ -3894,7 +3922,8 @@ html[data-cosy='true'] .shadow-hard-pressed {
   box-shadow: inset 0 1px 2px rgba(38, 28, 20, 0.12) !important;
 }
 
-/* Suppress decorative halftone/comic texture overlays (pseudo-elements). */
+/* Suppress decorative halftone/comic texture overlays (pseudo-elements) — the
+   loud comic dots; the subtle paper grain on <body> stays. */
 html[data-cosy='true'] .texture-halftone::before,
 html[data-cosy='true'] .texture-halftone-lg::before,
 html[data-cosy='true'] .texture-halftone-comic::before,
@@ -3902,12 +3931,57 @@ html[data-cosy='true'] .texture-halftone-comic-light::before {
   display: none !important;
 }
 
-/* Airy cream cards — more breathing room + soft chrome (the "parchment" feel). */
+/* ---- Light-theme circuit-breaker for the ~1279 literal `text-white` /
+   `text-neo-white` utilities. They are hardcoded #fff (not var-backed), so on
+   the light sand/cream surfaces they would vanish — flip them to charcoal ink.
+   Every cosy accent is a light tint with charcoal text, so this is safe
+   everywhere EXCEPT destructive/red surfaces, re-whitened just below. ---- */
+html[data-cosy='true'] .text-white,
+html[data-cosy='true'] .text-neo-white {
+  color: rgb(var(--neo-black)) !important;
+}
+
+/* SAFETY: error red stays hot, so its text must stay WHITE (charcoal-on-red
+   fails AA). Two-class selector outweighs the single-class flip above. */
+html[data-cosy='true'] .bg-neo-red .text-white,
+html[data-cosy='true'] .bg-neo-red.text-white,
+html[data-cosy='true'] [class*='destructive'] .text-white,
+html[data-cosy='true'] [role='alert'] .text-white {
+  color: #ffffff !important;
+}
+
+/* Near-borderless: soften the neo border utilities to the barely-there warm
+   tint so pills read clean (the soft shadow provides separation). */
+html[data-cosy='true'] .border-neo,
+html[data-cosy='true'] .border-neo-thick,
+html[data-cosy='true'] .border-2,
+html[data-cosy='true'] .border-4 {
+  border-color: hsl(40 20% 80%) !important;
+}
+
+/* Rounder, softer corners everywhere (the reference's full-pill feel). */
+html[data-cosy='true'] .rounded-neo {
+  border-radius: 18px;
+}
+html[data-cosy='true'] .rounded-neo-lg,
+html[data-cosy='true'] .rounded-neo-xl {
+  border-radius: 26px;
+}
+
+/* Airy cream cards — generous breathing room + soft chrome (cleaner/spacier). */
 html[data-cosy='true'] .card-neo,
 html[data-cosy='true'] .neo-card,
 html[data-cosy='true'] .neo-panel {
-  border-radius: 16px;
-  padding: 1.5rem;
+  border-radius: 26px;
+  padding: 1.75rem;
+}
+
+/* Pill-shaped status chips / small control clusters, like the reference's
+   coin / level / settings row. */
+html[data-cosy='true'] [class*='chip'],
+html[data-cosy='true'] .pill,
+html[data-cosy='true'] .badge-neo {
+  border-radius: 9999px;
 }
 
 /* Softer type — lift line-height + letter-spacing, ease heavy weights. */

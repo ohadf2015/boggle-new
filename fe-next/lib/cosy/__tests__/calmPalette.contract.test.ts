@@ -31,33 +31,89 @@ function isWarmHue(h: number): boolean {
   return h <= 95 || h >= 300;
 }
 
+/** Split the full stylesheet into cosy-scoped rules (selector starts with html[data-cosy]). */
+function cosyRules(css: string): string[] {
+  return css.match(/html\[data-cosy=['"]true['"]\][^{}]*\{[^}]*\}/g) ?? [];
+}
+
 const AA = 4.5;
 
-describe('cosy calm-palette contract (globals.css)', () => {
+/* The cosy "paper & oak" theme is a LIGHT, warm, low-noise inversion of the loud
+   dark default — sand backdrop, cream pills, charcoal text, gold/clay accents.
+   jsdom can't evaluate the CSS cascade, so this contract reads globals.css as
+   text, extracts the cosy token values, and runs pure WCAG + hue math on them. */
+describe('cosy paper-palette contract (globals.css)', () => {
   let block: string;
   beforeAll(() => {
     block = cosyBlock(readFileSync(CSS_PATH, 'utf8'));
   });
 
-  it('overrides the background to a warm dusk (not the loud default)', () => {
-    const navy = tokenValue(block, '--neo-navy');
-    expect(navy, 'cosy must override --neo-navy').toBeTruthy();
-    // white text on the dusk bg must clear AA, incl. headroom for /70 opacity variants
-    expect(contrastRatio('255 255 255', navy!)).toBeGreaterThanOrEqual(6);
-  });
-
-  it('keeps cream surface light and charcoal ink legible on it', () => {
-    const cream = tokenValue(block, '--neo-cream');
+  it('paints a LIGHT warm "paper" backdrop (sand, not the dark default)', () => {
+    const navyRaw = tokenValue(block, '--neo-navy');
+    const navy = parseHsl(navyRaw ?? '');
+    expect(navy, '--neo-navy must be an hsl() value').toBeTruthy();
+    expect(navy!.l, 'cosy bg must be LIGHT (paper), not dark').toBeGreaterThanOrEqual(70);
+    expect(isWarmHue(navy!.h), `bg hue ${navy!.h} must be warm sand`).toBe(true);
+    // charcoal ink is the page text colour now — it must clear AA on the sand bg
     const ink = tokenValue(block, '--neo-black');
-    expect(cream, 'cosy must define --neo-cream').toBeTruthy();
-    expect(ink, 'cosy must soften --neo-black to charcoal').toBeTruthy();
-    expect(ink).not.toBe('0 0 0'); // softened, not pure black
-    expect(contrastRatio(ink!, cream!)).toBeGreaterThanOrEqual(AA);
+    expect(contrastRatio(ink!, navyRaw!), 'charcoal text on sand bg').toBeGreaterThanOrEqual(AA);
   });
 
-  it('removes decorative noise', () => {
-    expect(tokenValue(block, '--halftone-pattern')).toBe('none');
-    expect(tokenValue(block, '--retro-grid-pattern')).toBe('none');
+  it('floats cream pills lighter than the sand backdrop (so they pop)', () => {
+    const cream = parseHsl(tokenValue(block, '--neo-cream') ?? '');
+    const navy = parseHsl(tokenValue(block, '--neo-navy') ?? '');
+    expect(cream, '--neo-cream must be hsl()').toBeTruthy();
+    expect(isWarmHue(cream!.h), 'cream must stay warm').toBe(true);
+    expect(cream!.l, 'cream pills must be lighter than the bg').toBeGreaterThan(navy!.l);
+  });
+
+  it('keeps --neo-white a WHITE surface but flips --foreground text to charcoal', () => {
+    // --neo-white is overloaded — 283 `bg-neo-white` surfaces depend on it, so it
+    // must NOT be darkened (that would turn every white surface charcoal).
+    const white = tokenValue(block, '--neo-white');
+    if (white !== null) expect(white, '--neo-white must stay a white surface').toBe('255 255 255');
+    // The TEXT side flips instead: token foreground must point at the charcoal ink.
+    const fg = tokenValue(block, '--foreground');
+    expect(fg, 'cosy must override --foreground to ink (default points at white)').toBeTruthy();
+    expect(fg!, '--foreground must resolve to the charcoal ink').toMatch(/neo-black/);
+  });
+
+  it('warms the structural ink to charcoal-brown (R≥B, not bluish)', () => {
+    const ink = tokenValue(block, '--neo-black');
+    const [r, , b] = ink!.split(/\s+/).map(Number);
+    expect(r, `ink "${ink}" must be warm: red >= blue`).toBeGreaterThanOrEqual(b);
+    // legible on the cream pill surface
+    expect(contrastRatio(ink!, tokenValue(block, '--neo-cream')!)).toBeGreaterThanOrEqual(AA);
+  });
+
+  it('makes all four accents LIGHT warm tints, legible with CHARCOAL text', () => {
+    const ink = tokenValue(block, '--neo-black')!;
+    for (const name of [
+      '--neo-lime',
+      '--neo-cyan',
+      '--neo-pink',
+      '--neo-purple',
+      '--neo-yellow',
+      '--neo-orange',
+    ]) {
+      const v = tokenValue(block, name);
+      expect(v, `cosy must define ${name}`).toBeTruthy();
+      expect(contrastRatio(ink, v!), `${name} vs charcoal`).toBeGreaterThanOrEqual(AA);
+      const hsl = parseHsl(v!);
+      if (hsl) expect(isWarmHue(hsl.h), `${name} hue ${hsl.h} must be warm/earthy`).toBe(true);
+    }
+  });
+
+  it('warms muted secondary text (not the default bluish gray)', () => {
+    const muted = tokenValue(block, '--muted-foreground');
+    expect(muted, 'cosy must override --muted-foreground (hardcoded bluish in :root)').toBeTruthy();
+    const hsl = parseHsl(muted!);
+    if (hsl) expect(isWarmHue(hsl.h), `muted-foreground hue ${hsl.h} must be warm`).toBe(true);
+  });
+
+  it('re-enables a subtle paper grain, but no neon retro grid (calm, not noisy)', () => {
+    expect(tokenValue(block, '--halftone-pattern'), 'paper grain must be present').not.toBe('none');
+    expect(tokenValue(block, '--retro-grid-pattern'), 'no neon grid in calm mode').toBe('none');
   });
 
   it('softens shadows to diffuse (blur present, no hard 0px stamp)', () => {
@@ -66,71 +122,13 @@ describe('cosy calm-palette contract (globals.css)', () => {
     expect(md).not.toMatch(/0px\s+rgb/); // not the "Npx Npx 0px" hard stamp
   });
 
-  it('light accents (oak/sage/honey/clay) stay legible with BLACK text', () => {
-    const ink = '0 0 0';
-    for (const name of ['--neo-lime', '--neo-cyan', '--neo-yellow', '--neo-orange']) {
-      const v = tokenValue(block, name);
-      expect(v, `cosy must define ${name}`).toBeTruthy();
-      expect(contrastRatio(ink, v!), `${name} vs black`).toBeGreaterThanOrEqual(AA);
-    }
-  });
-
-  it('dark accents (terracotta/plum) stay legible with WHITE text', () => {
-    const white = '255 255 255';
-    for (const name of ['--neo-pink', '--neo-purple']) {
-      const v = tokenValue(block, name);
-      expect(v, `cosy must define ${name}`).toBeTruthy();
-      expect(contrastRatio(white, v!), `${name} vs white`).toBeGreaterThanOrEqual(AA);
-    }
-  });
-
   it('keeps error red hot (does NOT calm safety semantics)', () => {
     // --neo-red must NOT be overridden inside the cosy block
     expect(tokenValue(block, '--neo-red')).toBeNull();
   });
-
-  // ---- Woody-cozy character: warm + coherent, NOT cool-desaturated ----
-
-  it('paints a WARM woody backdrop (espresso, not cool navy blue)', () => {
-    for (const name of ['--neo-navy', '--neo-abyss', '--neo-abyss-deep', '--neo-gray']) {
-      const hsl = parseHsl(tokenValue(block, name) ?? '');
-      expect(hsl, `${name} must be an hsl() value`).toBeTruthy();
-      expect(isWarmHue(hsl!.h), `${name} hue ${hsl!.h} must be warm (not blue ~222)`).toBe(true);
-    }
-    // background must read as WOOD, not a neutral gray — keep some warmth saturation
-    expect(parseHsl(tokenValue(block, '--neo-navy')!)!.s).toBeGreaterThanOrEqual(12);
-  });
-
-  it('keeps the cream surface warm (oat parchment, not bluish white)', () => {
-    const hsl = parseHsl(tokenValue(block, '--neo-cream') ?? '');
-    expect(hsl, '--neo-cream must be hsl()').toBeTruthy();
-    expect(isWarmHue(hsl!.h), `cream hue ${hsl!.h} must be warm`).toBe(true);
-  });
-
-  it('warms the structural ink to charcoal-brown (R≥B, not bluish 56 58 72)', () => {
-    const ink = tokenValue(block, '--neo-black');
-    const [r, , b] = ink!.split(/\s+/).map(Number);
-    // bluish ink has B>R; warm woody ink must lean red/brown
-    expect(r, `ink "${ink}" must be warm: red >= blue`).toBeGreaterThanOrEqual(b);
-  });
-
-  it('uses warm earthy accents — NO cold teal / blue / lavender', () => {
-    for (const name of ['--neo-lime', '--neo-cyan', '--neo-pink', '--neo-purple']) {
-      const hsl = parseHsl(tokenValue(block, name) ?? '');
-      expect(hsl, `${name} must be hsl()`).toBeTruthy();
-      expect(isWarmHue(hsl!.h), `${name} hue ${hsl!.h} must be earthy, not cold`).toBe(true);
-    }
-  });
-
-  it('warms muted secondary text (not the default bluish gray)', () => {
-    const muted = tokenValue(block, '--muted-foreground');
-    expect(muted, 'cosy must override --muted-foreground (it is hardcoded bluish in :root)').toBeTruthy();
-    const hsl = parseHsl(muted!);
-    if (hsl) expect(isWarmHue(hsl.h), `muted-foreground hue ${hsl.h} must be warm`).toBe(true);
-  });
 });
 
-describe('cosy structural softening (globals.css)', () => {
+describe('cosy structural softening + light-theme circuit-breakers (globals.css)', () => {
   const css = readFileSync(CSS_PATH, 'utf8');
 
   it('softens the Tailwind shadow-hard utilities under cosy', () => {
@@ -141,9 +139,26 @@ describe('cosy structural softening (globals.css)', () => {
     expect(rule![0]).not.toMatch(/0px\s+rgb/); // diffuse, not hard stamp
   });
 
-  it('suppresses the halftone texture overlays under cosy', () => {
+  it('suppresses the loud halftone/comic texture overlays under cosy', () => {
     expect(
       /html\[data-cosy=['"]true['"]\][^{]*\.texture-halftone[^{]*\{[^}]*display:\s*none/.test(css),
     ).toBe(true);
+  });
+
+  it('flips hardcoded .text-white to charcoal ink (the 1279-literal circuit-breaker)', () => {
+    const flip = cosyRules(css).find(
+      (r) =>
+        /\.text-white/.test(r) &&
+        !/bg-neo-red|destructive|alert/.test(r) &&
+        /color\s*:/.test(r),
+    );
+    expect(flip, 'cosy must override .text-white color so it survives the light bg').toBeTruthy();
+    expect(flip!).not.toMatch(/color\s*:\s*(255\s+255\s+255|#fff|#ffffff|white)/i);
+  });
+
+  it('keeps white text WHITE on destructive/red surfaces (safety contrast)', () => {
+    const guard = cosyRules(css).find((r) => /bg-neo-red/.test(r) && /text-white/.test(r));
+    expect(guard, 'cosy must re-whiten .text-white on .bg-neo-red (charcoal on red fails AA)').toBeTruthy();
+    expect(guard!).toMatch(/(255\s+255\s+255|#fff|#ffffff|white)/i);
   });
 });
