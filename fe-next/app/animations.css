@@ -955,6 +955,17 @@
   padding-bottom: var(--mobile-bottom-safe);
 }
 
+/* When the global bottom nav is present, `body.screen-fit` already reserves the
+   bottom clearance via --bottom-stack-height (nav + admob banner). Adding
+   --mobile-bottom-safe here too DOUBLE-reserves it — and because BOTH vars
+   include --admob-banner-height, the empty band exploded by ~2x the instant a
+   banner loaded (the "blank panel that only appears when there's an ad", ~700px
+   on Android). Zero it on these pages so the reservation lives in exactly one
+   place (body.screen-fit). Non-nav pages keep --mobile-bottom-safe above. */
+html.has-global-bottom-nav .page-content-safe {
+  padding-bottom: 0;
+}
+
 /* Flex column to row transition at md breakpoint */
 .flex-col-to-row {
   display: flex;

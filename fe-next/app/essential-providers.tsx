@@ -40,7 +40,6 @@ import { LogRocketIdentify } from '@/components/providers/LogRocketIdentify';
 import { PostHogProvider } from '@/components/providers/PostHogProvider';
 import GlobalCoinEarnFx from '@/components/animations/GlobalCoinEarnFx';
 import SharedFxMount from '@/components/animations/SharedFxMount';
-import { NativeDomProbe } from '@/components/dev/NativeDomProbe';
 import NativeSelectionGuard from '@/components/native/NativeSelectionGuard';
 import EasterEggListener from '@/components/EasterEggListener';
 
@@ -222,8 +221,6 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                 <SignupPromptHost />
                                                 {/* Native AdMob banner — single global mount, route-aware. */}
                                                 <AnchoredNativeBanner />
-                                                {/* TEMP admin+native-only diagnostic for the mid-home blank panel. Remove after fix. */}
-                                                <NativeDomProbe />
                                             </NavigationProvider>
                                             </AdMobProvider>
                                         </HapticsProvider>
