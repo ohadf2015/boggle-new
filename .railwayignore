@@ -47,6 +47,28 @@ fe-next/jest.setup.*
 .worktrees/
 .planning/
 .claude/
+# AI agent tooling (contain dangling skill symlinks that abort `railway up` indexing)
+.gemini/
+.trae/
+.opencode/
+.agent/
+.agents/
+.cursor/
+
+# Native mobile projects — NOT part of the web/server build. android/ also holds
+# huge gradle build outputs (app/build, .gradle, *.aab) that blow the upload past
+# Railway/Cloudflare's payload limit (413). Built separately via release-android.sh.
+android/
+ios/
+fe-next/android/
+fe-next/ios/
+fe-next/raw/
+fe-next/tmp/
+fe-next/resources/
+*.aab
+*.apk
+lighthouse-report*.json
+fe-next/lighthouse-report*.json
 
 # Documentation
 *.md

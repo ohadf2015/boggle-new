@@ -32,7 +32,6 @@ export function FaqPageJsonLd({ faqs }: FaqPageJsonLdProps): ReactNode {
     })),
   };
 
-  // eslint-disable-next-line react/no-danger -- static JSON-LD, same pattern as all SEO components
   return (
     <script
       type="application/ld+json"

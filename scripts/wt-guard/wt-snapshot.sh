@@ -25,6 +25,15 @@ KEEP="${WT_GUARD_KEEP:-120}"   # ~6h of history at a 3-min cadence; hardlinked, 
 
 cd "$REPO" 2>/dev/null || exit 0
 
+# Backstop: if the cache ever balloons (e.g. hardlinking silently breaks again),
+# abort rather than fill the disk. 20 GB ≈ days of history even uncompressed.
+CAP_MB="${WT_GUARD_CAP_MB:-20000}"
+size_mb="$(du -sm "$DEST" 2>/dev/null | cut -f1)"
+if [ "${size_mb:-0}" -gt "$CAP_MB" ]; then
+  logger -t wt-guard "ABORT: backups dir ${size_mb}MB exceeds ${CAP_MB}MB cap — not snapshotting"
+  exit 0
+fi
+
 # Only snapshot when there's uncommitted work worth saving (cheap fast-path).
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
 [ -z "$(git status --porcelain 2>/dev/null | head -1)" ] && exit 0
@@ -39,8 +48,11 @@ git rev-parse HEAD > "$DEST/$ts/.HEAD" 2>/dev/null || true
 git status --porcelain > "$DEST/$ts/.dirty" 2>/dev/null || true
 
 # Hardlink unchanged files against the previous snapshot → each snapshot only
-# costs the bytes that actually changed.
-rsync -a ${prev:+--link-dest="$prev"} \
+# costs the bytes that actually changed. NOTE: snapshots are stored under
+# "$ts/tree/", so --link-dest must point at the PREVIOUS "tree/" subdir, not the
+# snapshot root — otherwise rsync finds no matches and every snapshot becomes a
+# full copy (this silently grew the cache to 357G on 2026-05-24).
+rsync -a ${prev:+--link-dest="${prev%/}/tree"} \
   --exclude='.git' \
   --exclude='node_modules' \
   --exclude='.next' --exclude='.next-nightly' \

@@ -96,6 +96,24 @@ Items deferred from automated nightly triage. Human review required.
   - why deferred: no formal PostHog experiment linked (0 running/stopped experiments). Flag tests "signup after 1st win vs after 3rd game" — this is the hypothesis with the most funnel data support (game_completed → signup only 10%, avg 19h to convert). Either: (a) wire a formal PostHog experiment with `exp-results-share-prompt` as the primary test and retire this flag, or (b) wire an experiment to this flag and measure `signup_completed` by variant. Do not leave running without stats.
   - recommended action: decide wire-or-retire this sprint.
 
+## 2026-05-24
+
+- [Sentry] JAVASCRIPT-NEXTJS-1J7 — [REDLOCK] Lock acquisition failed for cron:auto-promotion
+  - first seen: 2026-05-24T~13h ago, last seen: 2026-05-24T~11h ago, count: 2, users: 0
+  - why deferred: same pattern as 145 (reengagement-email Redlock). Expected contention in multi-instance Railway deploy. Not a code bug; both instances race to acquire lock, one wins, one logs error. Non-actionable at code level.
+  - recommended owner: infra (confirm single-instance or accept as noise; consider suppressing Sentry capture for REDLOCK contention logs)
+
+- [Sentry] JAVASCRIPT-NEXTJS-1J8 — SyntaxError in Turbopack worker (multiplayer page)
+  - first seen: 2026-05-24T13:25 UTC, last seen: 2026-05-24T13:39 UTC, count: 5, users: 0
+  - culprit: `/:locale/multiplayer`, error: `Unexpected non-whitespace character after JSON at position 106`
+  - why deferred: stack trace is entirely inside `turbopack-worker-*.js` parsing a URL-encoded JSON parameter — no first-party code in the frame. Likely a Turbopack/Next.js infrastructure bug affecting specific Android 10 WebViews running Chrome Mobile 148. Cannot be fixed in user code without sourcemaps.
+  - recommended owner: infra/build (enable Sentry sourcemap upload; if reproducible, file Next.js/Turbopack upstream issue)
+
+- [Sentry] JAVASCRIPT-NEXTJS-1J5 — Error in registerPushToken: {} — **FIXED tonight**
+  - root cause: `crypto.randomUUID` absent in Chrome WebView 91 (Android emulator default image)
+  - fix: `_generateUUID()` polyfill in `utils/pushNotifications/tokenRegistration.ts`
+  - shipped in this lane run (not committed yet)
+
 - [Flag] `mp-signup-nudge-copy-v1` (PostHog id 183230) — **needs human decision**
   - status: ACTIVE; description states control has 0/77 converts in 28d (confirmed in registry `lib/experiments.ts:128`)
   - why deferred: no formal PostHog experiment linked, so no p-value. The 0/77 control result strongly implies either the prompt never fires correctly or the sheet is ineffective — both warrant action. With 0 converts across all variants in 28d, the experiment may be measuring the wrong conversion window or the sheet isn't rendering on the expected trigger.
