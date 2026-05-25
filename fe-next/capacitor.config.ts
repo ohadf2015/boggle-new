@@ -98,7 +98,7 @@ const config: CapacitorConfig = {
   android: {
     allowMixedContent: false, // Don't allow HTTP in production WebView
     captureInput: true,
-    webContentsDebuggingEnabled: isDev,
+    webContentsDebuggingEnabled: true, // TEMP: allow chrome://inspect on internal-track builds to diagnose the home empty-section; revert to `isDev` after.
     backgroundColor: '#1a1a2e',
     loggingBehavior: isDev ? 'debug' : 'none',
     // CRITICAL: Do NOT add useLegacyBridge or use CapacitorHttp
