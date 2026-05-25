@@ -1,5 +1,5 @@
 diff --git a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
-index c629139..885ea84 100644
+index c629139..492425c 100644
 --- a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
 +++ b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
 @@ -44,7 +44,20 @@ public class BannerExecutor extends Executor {
@@ -24,7 +24,39 @@ index c629139..885ea84 100644
      }
  
      public void showBanner(final PluginCall call) {
-@@ -107,13 +120,23 @@ public class BannerExecutor extends Executor {
+@@ -84,10 +97,29 @@ public class BannerExecutor extends Executor {
+             mAdViewLayout = new RelativeLayout(contextSupplier.get());
+             mAdViewLayout.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
+             mAdViewLayout.setVerticalGravity(Gravity.BOTTOM);
++            mAdViewLayout.setClipChildren(true);
++            mAdViewLayout.setClipToPadding(true);
++
++            // Banner-height container (NOT WRAP_CONTENT). The ad's hardware surface
++            // composites as its own GPU layer; if the container is left tall (a
++            // momentarily-oversized creative makes WRAP_CONTENT measure ~480dp) that
++            // tall layer punctures the WebView across the middle of the screen and the
++            // splash/app-icon shows through — the "logo/navy container hiding the page"
++            // bug. Pin the container to the ad's declared height (capped 120dp) so it's
++            // a thin strip anchored above the tabs; the page fills everything above it.
++            float __dens = contextSupplier.get().getResources().getDisplayMetrics().density;
++            int __bannerH;
++            {
++                com.google.android.gms.ads.AdSize __sz = mAdView.getAdSize();
++                int __cap = (int) (120 * __dens);
++                __bannerH = (__sz != null && __sz.getHeight() > 0)
++                    ? Math.min((int) (__sz.getHeight() * __dens), __cap)
++                    : __cap;
++            }
+ 
+             final CoordinatorLayout.LayoutParams mAdViewLayoutParams = new CoordinatorLayout.LayoutParams(
+-                CoordinatorLayout.LayoutParams.WRAP_CONTENT,
+-                CoordinatorLayout.LayoutParams.WRAP_CONTENT
++                CoordinatorLayout.LayoutParams.MATCH_PARENT,
++                __bannerH
+             );
+ 
+             // TODO: Make an enum like the AdSizeEnum?
+@@ -107,13 +139,23 @@ public class BannerExecutor extends Executor {
              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
                  View rootView = activitySupplier.get().getWindow().getDecorView();
                  rootView.setOnApplyWindowInsetsListener((v, insets) -> {
@@ -52,7 +84,7 @@ index c629139..885ea84 100644
                      }
  
                      mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
-@@ -205,7 +228,7 @@ public class BannerExecutor extends Executor {
+@@ -205,7 +247,7 @@ public class BannerExecutor extends Executor {
                      .get()
                      .runOnUiThread(() -> {
                          if (mAdView != null) {
@@ -61,7 +93,7 @@ index c629139..885ea84 100644
                              mAdViewLayout.removeView(mAdView);
                              mAdView.destroy();
                              mAdView = null;
-@@ -226,6 +249,10 @@ public class BannerExecutor extends Executor {
+@@ -226,6 +268,10 @@ public class BannerExecutor extends Executor {
          activitySupplier
              .get()
              .runOnUiThread(() -> {
@@ -72,7 +104,7 @@ index c629139..885ea84 100644
                  final AdRequest adRequest = RequestHelper.createRequest(adOptions);
                  mAdView.loadAd(adRequest);
              });
-@@ -245,6 +272,27 @@ public class BannerExecutor extends Executor {
+@@ -245,6 +291,27 @@ public class BannerExecutor extends Executor {
                  AdViewIdHelper.assignIdToAdView(mAdView, adOptions, adRequest, logTag, contextSupplier.get());
                  // Add the AdView to the view hierarchy.
                  mAdViewLayout.addView(mAdView);
@@ -100,7 +132,7 @@ index c629139..885ea84 100644
                  // Start loading the ad.
                  mAdView.loadAd(adRequest);
                  mAdView.setAdListener(
-@@ -261,7 +309,7 @@ public class BannerExecutor extends Executor {
+@@ -261,7 +328,7 @@ public class BannerExecutor extends Executor {
                          @Override
                          public void onAdFailedToLoad(@NonNull LoadAdError adError) {
                              if (mAdView != null) {
@@ -109,7 +141,7 @@ index c629139..885ea84 100644
                                  mAdViewLayout.removeView(mAdView);
                                  mAdView.destroy();
                                  mAdView = null;
-@@ -297,7 +345,12 @@ public class BannerExecutor extends Executor {
+@@ -297,7 +364,12 @@ public class BannerExecutor extends Executor {
                  );
  
                  // Add AdViewLayout top of the WebView
