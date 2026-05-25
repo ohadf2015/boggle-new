@@ -81,6 +81,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/guides/blast-strategy",
   "/guides/classic-strategy",
   "/guides/word-hunt-strategy",
+  "/hamila-hayomit",
   "/hebrew-classroom-vocabulary-games",
   "/hebrew-multiplayer-word-game",
   "/how-to-play",
