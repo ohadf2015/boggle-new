@@ -7,7 +7,6 @@ import { AdMob, BannerAdPluginEvents, BannerAdPosition } from '@capacitor-commun
 import { useAdMob } from '@/hooks/useAdMob';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
-import { computeBannerMargin } from '@/lib/ads/bannerMargin';
 
 export default function AnchoredNativeBanner() {
   const pathname = usePathname();
@@ -84,10 +83,7 @@ export default function AnchoredNativeBanner() {
       const inline = root.style.getPropertyValue('--bottom-nav-height').trim();
       const raw = inline || getComputedStyle(root).getPropertyValue('--bottom-nav-height').trim();
       const navHeight = Math.round(parseFloat(raw) || 0);
-      // Clamp via the shared helper: a pathological Android-15 edge-to-edge inset
-      // can inflate --bottom-nav-height and float the banner mid-screen (the "ad
-      // floating with a navy band below" bug). Mirrors the CSS reservation clamp.
-      return computeBannerMargin({ isAndroid, navHeight, safeBottom });
+      return isAndroid ? Math.max(navHeight, safeBottom) : Math.max(0, navHeight - safeBottom);
     };
 
     const applyBanner = async (margin: number) => {

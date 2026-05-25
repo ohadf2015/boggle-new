@@ -31,11 +31,22 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => deviceConfig,
 }));
 
+let nativeFlag = false;
+vi.mock('@/utils/platform', () => ({ isNative: () => nativeFlag }));
+
 describe('SharedFxMount', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     deviceConfig.maxParticles = 20;
     deviceConfig.prefersReducedMotion = false;
+    nativeFlag = false;
+  });
+
+  it('does NOT mount the fullscreen FX canvas on native (it can occlude the page)', () => {
+    nativeFlag = true;
+    render(<SharedFxMount />);
+    expect(mount).not.toHaveBeenCalled();
+    cleanup();
   });
 
   it('renders nothing', () => {

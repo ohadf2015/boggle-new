@@ -363,16 +363,13 @@ describe('useAdMob', () => {
     );
   });
 
-  it('showBanner requests a FIXED banner size, never ADAPTIVE_BANNER (adaptive ballooned to a 1440px occluding AdView on Android 15)', async () => {
+  it('showBanner requests a full-width ADAPTIVE_BANNER (native patch caps its height so it cannot occlude)', async () => {
     const wrapper = makeWrapper(true);
     const { result } = renderHook(() => useAdMob(), { wrapper });
     await act(async () => {
       await result.current.showBanner();
     });
     expect(AdMob.showBanner).toHaveBeenCalledWith(
-      expect.objectContaining({ adSize: 'BANNER' })
-    );
-    expect(AdMob.showBanner).not.toHaveBeenCalledWith(
       expect.objectContaining({ adSize: 'ADAPTIVE_BANNER' })
     );
   });

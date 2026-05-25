@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.webkit.WebView;
@@ -28,46 +29,20 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         // earlier than this hook so ContentProvider init failures get captured too.
         super.onCreate(savedInstanceState);
 
-        // Edge-to-edge: WebView extends behind status + navigation bars; useSafeArea
-        // hook (JS) reads insets and exposes them as CSS vars so layout adapts.
-        // EdgeToEdge.enable() (AndroidX) is the forward-compatible replacement for the
-        // setStatusBarColor / setNavigationBarColor / setDecorFitsSystemWindows path
-        // deprecated in Android 15 (API 35): a no-op on API 35+ where edge-to-edge is
-        // enforced by the platform, and a back-fill of the same transparent bars + light
-        // (white) icons on older APIs. SystemBarStyle.dark(TRANSPARENT) = transparent
-        // scrim with light icons — our app is dark navy, so the bg shows through and the
-        // gesture-nav pill blends seamlessly.
-        //
-        // MUST run AFTER super.onCreate(): BridgeActivity installs the Theme.SplashScreen
-        // splash during super.onCreate(). Calling EdgeToEdge.enable() *before* it (the
-        // AndroidX "canonical" placement, introduced in ed536b23a) disturbed the splash
-        // window-background teardown, leaving the @drawable/splash window background
-        // exposed in the now-transparent top inset over the fully-loaded WebView — it
-        // looked like a stuck logo bar where the header should be. Running it after
-        // super.onCreate() restores the pre-regression ordering while keeping the
-        // Android-15-compliant AndroidX API (paired with postSplashScreenTheme in
-        // styles.xml). Per-route bar icon tint is handled in JS (useStatusBarTint).
-        EdgeToEdge.enable(
-            this,
-            SystemBarStyle.dark(Color.TRANSPARENT),
-            SystemBarStyle.dark(Color.TRANSPARENT)
-        );
+        // Edge-to-edge (Android 15+): WebView draws behind transparent system bars;
+        // useSafeArea (JS) reads the insets into CSS vars. MUST run after
+        // super.onCreate() so it doesn't disturb the splash window-bg teardown.
+        EdgeToEdge.enable(this, SystemBarStyle.dark(Color.TRANSPARENT), SystemBarStyle.dark(Color.TRANSPARENT));
 
-        // Force an OPAQUE navy WebView background. Capacitor's
-        // `android.backgroundColor` config does NOT survive the edge-to-edge
-        // transparent-window setup above — the WebView is left composiing
-        // transparently, so any viewport area the page doesn't cover with an
-        // opaque element (a short page below the fold, the band beside a banner
-        // ad) reveals the WINDOW background (@drawable/splash) straight through
-        // it — a stray splash logo / blank panel painted over the loaded app.
-        // This was misdiagnosed for many rounds as a DOM/CSS/ad/FX-canvas issue;
-        // the real cause is the see-through WebView. An opaque navy WebView makes
-        // those uncovered areas read as seamless navy instead. Navy still draws
-        // behind the transparent system bars, so edge-to-edge is unaffected.
-        WebView bridgeWebView = getBridge() != null ? getBridge().getWebView() : null;
-        if (bridgeWebView != null) {
-            bridgeWebView.setBackgroundColor(Color.parseColor("#FF1A1A2E"));
-        }
+        // Paint everything behind the page opaque navy. Under edge-to-edge both the
+        // window background and the WebView composite transparently by default, so
+        // any area the page doesn't cover — or any hole a native overlay's SurfaceView
+        // (e.g. an ad) punches through the WebView — reveals the @drawable/splash
+        // window background as a stray LEXI logo. Forcing both navy makes those areas
+        // seamless navy instead. (Navy still draws behind the transparent bars.)
+        getWindow().setBackgroundDrawable(new ColorDrawable(0xFF1A1A2E));
+        WebView webView = getBridge() != null ? getBridge().getWebView() : null;
+        if (webView != null) webView.setBackgroundColor(0xFF1A1A2E);
 
         ensureDefaultNotificationChannel();
         handleDeepLinkIntent(getIntent());
