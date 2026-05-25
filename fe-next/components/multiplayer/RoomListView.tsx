@@ -162,7 +162,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
       <div
         dir={dir}
-        className="flex-1 min-h-0 bg-neo-navy relative flex flex-col w-full max-w-2xl min-[720px]:max-w-5xl mx-auto"
+        className="flex-1 min-h-0 bg-neo-navy relative flex flex-col w-full max-w-2xl mx-auto"
         {...pullToRefreshHandlers}
       >
         <PullToRefreshIndicator
@@ -185,7 +185,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         >
           <h1 className="sr-only">{t('multiplayerFlow.roomList.arenaHub')}</h1>
           <div className="relative w-full mx-auto">
-            <div className="relative w-full max-w-[560px] lg:max-w-[720px] desktop-medium-short:lg:max-w-[520px] desktop-short:lg:max-w-[380px] mx-auto bg-neo-navy h-[140px] short:h-[70px] medium-short:h-[100px] sm:h-auto sm:aspect-[16/9] overflow-hidden rounded-2xl border-3 border-neo-black shadow-hard">
+            <div className="relative w-full max-w-[560px] lg:max-w-[720px] desktop-medium-short:lg:max-w-[520px] desktop-short:lg:max-w-[380px] mx-auto bg-neo-navy max-sm:h-[140px] phone-short:h-[70px] sm:aspect-[16/9] overflow-hidden rounded-2xl border-3 border-neo-black shadow-hard">
               <Image
                 src="/images/arena-hub-hero.jpg"
                 alt={t('multiplayerFlow.roomList.heroAlt')}
@@ -224,14 +224,15 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           </div>
         </m.div>
 
-        {/* Scrollable Content. At lg+ split into a 2-column desktop layout
-            (audit C1 Tier 3): left rail = actions + CG-friends,
-            right pane = live-match status + open-arenas list. Mobile keeps
-            single-column flow. The two wrapper divs share the parent gap-5
-            so vertical rhythm matches the prior single-column layout. */}
-        <div className="flex-1 flex flex-col min-[720px]:grid min-[720px]:grid-cols-[minmax(260px,300px)_1fr] lg:grid-cols-[minmax(300px,360px)_1fr] min-[720px]:items-start px-5 lg:px-6 gap-5 min-[720px]:gap-5 lg:gap-6 short:gap-2 medium-short:gap-3 overflow-y-auto pb-10 short:pb-4 medium-short:pb-6 safe-area-bottom pt-5 short:pt-2 medium-short:pt-3">
+        {/* Scrollable content — one centered max-w-2xl column at every width.
+            A prior min-[720px] 2-col split (left CTA rail / right arenas pane)
+            looked broken on wide + medium-short laptops: a 1024px shell with
+            ~205px dead gutters, the CTAs orphaned in a narrow 360px rail above
+            a tall void, and the empty-state floating alone in the right pane.
+            The two wrapper divs below simply stack via the parent gap-5. */}
+        <div className="flex-1 flex flex-col px-5 lg:px-6 gap-5 short:gap-2 medium-short:gap-3 overflow-y-auto pb-10 short:pb-4 medium-short:pb-6 safe-area-bottom pt-5 short:pt-2 medium-short:pt-3">
 
-          {/* Left rail (mobile: in-flow) */}
+          {/* Actions group — CTA strip + CG-friends */}
           <div className="flex flex-col gap-5">
 
           {/* Action Buttons — Quick Start + Create Room side by side */}
@@ -248,7 +249,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           <CrazyGamesFriendsStrip />
 
           </div>
-          {/* Right pane (mobile: in-flow) */}
+          {/* Arenas group — live-match status + open-arenas list */}
           <div className="flex flex-col gap-5">
 
           {/* Live Match Status Bar */}

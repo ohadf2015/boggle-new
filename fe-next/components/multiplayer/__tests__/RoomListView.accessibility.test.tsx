@@ -197,34 +197,34 @@ describe('RoomListView accessibility', () => {
     });
   });
 
-  describe('responsive desktop width (audit C1 + 2026-05-14 MP responsive sweep)', () => {
-    // Mobile: max-w-2xl (672px). Tablet-portrait+ (≥720px): max-w-5xl (1024px)
-    // so the 744px dead-zone (iPad portrait / split-view) gets side-by-side
-    // composition instead of stacking with wasted horizontal width.
-    it('keeps mobile cap and adds min-[720px]:max-w-5xl on tablet+', () => {
+  describe('responsive desktop width (2026-05-25 single-column refocus)', () => {
+    // The prior min-[720px] 2-col split (left CTA rail / right arenas pane)
+    // looked broken on wide + medium-short laptops: it forced the content into
+    // a 1024px shell with ~205px dead gutters, orphaned the CTAs in a narrow
+    // 360px rail above a tall void, and floated the empty-state alone in the
+    // right pane. We collapse to one centered max-w-2xl column at all widths.
+    it('keeps a single centered column (max-w-2xl) — no 2-col desktop shell', () => {
       const { container } = render(<RoomListView {...defaultProps} />);
       const root = container.querySelector('[dir]');
       expect(root).toHaveClass('max-w-2xl');
-      expect(root).toHaveClass('min-[720px]:max-w-5xl');
+      expect(root).not.toHaveClass('min-[720px]:max-w-5xl');
     });
 
-    it('body uses min-[720px]:grid 2-col split for tablet+', () => {
-      // At 720+ split into a left rail (actions + welcome) and right
-      // pane (open-arenas list). Phone keeps single-column flow.
+    it('stays single-column flow at all widths (no min-[720px]:grid split)', () => {
       const { container } = render(<RoomListView {...defaultProps} />);
       const list = container.querySelector('[role="list"]');
       expect(list).toBeTruthy();
-      // Walk up to find an ancestor with min-[720px]:grid + min-[720px]:grid-cols
+      // No ancestor may switch to a 2-col grid at the 720px breakpoint.
       let el: HTMLElement | null = list as HTMLElement | null;
       let foundGrid = false;
       while (el) {
-        if (/min-\[720px\]:grid\b/.test(el.className) && /min-\[720px\]:grid-cols/.test(el.className)) {
+        if (/min-\[720px\]:grid\b/.test(el.className) || /min-\[720px\]:grid-cols/.test(el.className)) {
           foundGrid = true;
           break;
         }
         el = el.parentElement;
       }
-      expect(foundGrid).toBe(true);
+      expect(foundGrid).toBe(false);
     });
   });
 });

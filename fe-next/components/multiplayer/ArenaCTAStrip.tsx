@@ -38,7 +38,7 @@ const ArenaCTAStrip: React.FC<ArenaCTAStripProps> = ({
       variants={stripVariants}
       initial={skipEnterAnimation ? false : 'hidden'}
       animate="visible"
-      className="flex flex-col sm:flex-row min-[720px]:flex-col gap-2.5"
+      className="flex flex-col sm:flex-row gap-2.5"
     >
       {/* Primary action — instant matchmaking. Bumped to the clear hero:
           larger min-height, an icon chip for weight, and a lift-on-hover so it

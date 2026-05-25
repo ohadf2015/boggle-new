@@ -59,4 +59,16 @@ describe('ArenaCTAStrip', () => {
     fireEvent.click(screen.getByRole('button', { name: 'multiplayerFlow.roomList.quickStart' }));
     expect(onQuickPlay).not.toHaveBeenCalled();
   });
+
+  // Layout: stacked on phones, side-by-side (primary + subordinate) from sm up.
+  // It must NOT revert to a stacked column at ≥720px — that only existed to fit
+  // the old narrow desktop left-rail, and read as a weight-mismatched stack
+  // (big lime over a thin pink outline). The lobby is single-column now, so the
+  // pair gets the full column width and stays a row.
+  it('lays the CTAs side-by-side from sm up and never reverts to a column on desktop', () => {
+    render(<ArenaCTAStrip onQuickPlay={vi.fn()} onCreateRoom={vi.fn()} />);
+    const strip = screen.getByTestId('arena-cta-strip');
+    expect(strip.className).toMatch(/sm:flex-row/);
+    expect(strip.className).not.toMatch(/min-\[720px\]:flex-col/);
+  });
 });

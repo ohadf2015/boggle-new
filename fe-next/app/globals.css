@@ -56,6 +56,10 @@ html.lexi-native [data-selectable] {
 @custom-variant desktop-tall (@media (min-width: 1024px) and (min-height: 700px));
 @custom-variant desktop-short (@media (min-width: 1024px) and (max-height: 699px));
 @custom-variant desktop-medium-short (@media (min-width: 1024px) and (max-height: 1023px));
+/* Phone (<sm) AND short height — combined so a fixed compact hero height can be
+   scoped to small phones only, without it leaking onto short desktops. Tailwind
+   v4 does not emit a stacked `max-sm:short:` utility, so we name the combo. */
+@custom-variant phone-short (@media (max-width: 639px) and (max-height: 600px));
 
 @utility text-balance {
   text-wrap: balance;

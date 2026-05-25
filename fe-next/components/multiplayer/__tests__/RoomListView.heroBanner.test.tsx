@@ -92,6 +92,32 @@ describe('RoomListView hero banner — no clip, no shrink', () => {
     expect(frame.className).not.toMatch(/desktop-medium-short:lg:h-\[140px\]/);
   });
 
+  // Regression: on medium-short laptops (max-height ≤ 850) the frame had
+  // `medium-short:h-[100px]`, which on desktop both matched alongside
+  // `sm:aspect-[16/9]` and *won* the cascade — squashing the 16:9 art into a
+  // 5.2:1 strip (520×100), cropping the "ARENA HUB" title + mascot heads.
+  // The fixed pixel heights must be scoped to phones (max-sm) only so that
+  // sm+ is always governed by the aspect ratio.
+  it('never pins a fixed pixel height at sm+ (would override the 16/9 aspect)', () => {
+    render(<RoomListView {...props} />);
+    const img = screen.getByAltText('multiplayerFlow.roomList.heroAlt');
+    const frame = img.parentElement as HTMLElement;
+    // the squash culprits must be gone
+    expect(frame.className).not.toMatch(/medium-short:h-\[/);
+    expect(frame.className).not.toMatch(/(^|\s)sm:h-\[/);
+    expect(frame.className).not.toMatch(/(^|\s)h-\[100px\]/);
+  });
+
+  it('scopes the compact phone fallback heights to phones only (no desktop leak)', () => {
+    render(<RoomListView {...props} />);
+    const img = screen.getByAltText('multiplayerFlow.roomList.heroAlt');
+    const frame = img.parentElement as HTMLElement;
+    expect(frame.className).toMatch(/max-sm:h-\[140px\]/);
+    // short-height refinement is gated to phones via the `phone-short` combined
+    // variant (<640px AND <600px) so it can't squash short desktops.
+    expect(frame.className).toMatch(/phone-short:h-\[70px\]/);
+  });
+
   it('does not anchor object-position at y=60% (which hid the ARENA HUB title)', () => {
     render(<RoomListView {...props} />);
     const img = screen.getByAltText('multiplayerFlow.roomList.heroAlt');
