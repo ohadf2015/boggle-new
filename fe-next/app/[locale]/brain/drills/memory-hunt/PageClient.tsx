@@ -4,6 +4,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { safeRandomUUID } from '@/lib/safeRandomUUID';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
@@ -41,7 +42,7 @@ export default function MemoryHuntPageClient() {
   const [improvement, setImprovement] = useState<DrillImprovement | null>(null);
   const [drillRewards, setDrillRewards] = useState<{ xpAwarded: number; goldAwarded: number } | null>(null);
   const [levelUp, setLevelUp] = useState<{ newLevel: number; previousLevel: number } | null>(null);
-  const [sessionId] = useState(() => `drill_memory-hunt_${crypto.randomUUID()}`);
+  const [sessionId] = useState(() => `drill_memory-hunt_${safeRandomUUID()}`);
 
   // Generate drill grid
   const { grid, availableWords, isLoading, regenerate } = useDrillGrid(5, language);
