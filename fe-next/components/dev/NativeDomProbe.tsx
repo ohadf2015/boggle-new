@@ -1,20 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import { isNative } from '@/utils/platform';
 
 /**
- * TEMPORARY admin-only diagnostic. Renders ONLY on native (Capacitor) for admins.
+ * TEMPORARY diagnostic. Renders ONLY on native (Capacitor) — never on web, so
+ * real web users never see it; only internal-track native testers do, briefly.
  * Reports what occupies the mid-screen "blank panel" region so we can identify
  * the element painting over the home content. Remove once the blank is fixed.
  */
 export function NativeDomProbe(): React.ReactElement | null {
-  const { isAdmin } = useAuth();
   const [report, setReport] = useState('probing…');
 
   useEffect(() => {
-    if (!isNative() || !isAdmin) return;
+    if (!isNative()) return;
     const sample = () => {
       const W = window.innerWidth;
       const H = window.innerHeight;
@@ -54,9 +53,9 @@ export function NativeDomProbe(): React.ReactElement | null {
     sample();
     const id = window.setInterval(sample, 1500);
     return () => window.clearInterval(id);
-  }, [isAdmin]);
+  }, []);
 
-  if (!isNative() || !isAdmin) return null;
+  if (!isNative()) return null;
 
   return (
     <div
