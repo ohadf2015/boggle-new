@@ -223,7 +223,15 @@ export function useAdMob() {
       await whenReady();
       await AdMob.showBanner({
         adId,
-        adSize: BannerAdSize.ADAPTIVE_BANNER,
+        // Fixed BANNER (320x50), NOT ADAPTIVE_BANNER. On Android 15 the adaptive
+        // path produced a 1080x1440 AdView that occluded the WebView content
+        // below it (the ad creative filled only a top strip; the rest was a
+        // transparent native surface revealing the window-bg + splash logo). A
+        // fixed size keeps the AdView a real banner. Proven on-device (OnePlus
+        // CPH2581) via dumpsys (AdView 0,0-1080,1440) + a live fixed-size swap
+        // that restored the full page. Revisit adaptive once the plugin sizes
+        // it correctly under edge-to-edge.
+        adSize: BannerAdSize.BANNER,
         position,
         isTesting: isDev,
         ...(typeof margin === 'number' ? { margin } : {}),

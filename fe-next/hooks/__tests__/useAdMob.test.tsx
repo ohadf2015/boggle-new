@@ -50,7 +50,7 @@ vi.mock('@capacitor-community/admob', () => ({
     REQUIRED: 'REQUIRED',
     UNKNOWN: 'UNKNOWN',
   },
-  BannerAdSize: { ADAPTIVE_BANNER: 'ADAPTIVE_BANNER' },
+  BannerAdSize: { ADAPTIVE_BANNER: 'ADAPTIVE_BANNER', BANNER: 'BANNER' },
   BannerAdPosition: { BOTTOM_CENTER: 'BOTTOM_CENTER' },
   RewardAdPluginEvents: {
     Loaded: 'onRewardedVideoAdLoaded',
@@ -360,6 +360,20 @@ describe('useAdMob', () => {
     });
     expect(AdMob.showBanner).toHaveBeenCalledWith(
       expect.objectContaining({ position: BannerAdPosition.BOTTOM_CENTER })
+    );
+  });
+
+  it('showBanner requests a FIXED banner size, never ADAPTIVE_BANNER (adaptive ballooned to a 1440px occluding AdView on Android 15)', async () => {
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    await act(async () => {
+      await result.current.showBanner();
+    });
+    expect(AdMob.showBanner).toHaveBeenCalledWith(
+      expect.objectContaining({ adSize: 'BANNER' })
+    );
+    expect(AdMob.showBanner).not.toHaveBeenCalledWith(
+      expect.objectContaining({ adSize: 'ADAPTIVE_BANNER' })
     );
   });
 
