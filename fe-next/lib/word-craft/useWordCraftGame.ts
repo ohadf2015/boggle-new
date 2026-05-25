@@ -216,7 +216,7 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
           burnout: false,
         };
       }
-      const heatGain = Math.min(Math.floor(action.score / 5), 25);
+      const heatGain = Math.min(Math.floor(action.score / 3), 35);
       const newHeat = Math.min(state.heat + heatGain, 100);
       const newOverdrive = newHeat >= 100;
       return {
@@ -307,7 +307,7 @@ export interface UseWordCraftGameOptions {
 
 export { reducer as wordCraftReducer, buildInitial as buildInitialState }
 
-export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, botSkillVariance = 0.5, hotseat = false }: UseWordCraftGameOptions) {
+export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, botSkillVariance = 2.5, hotseat = false }: UseWordCraftGameOptions) {
   // Capture viewport dims at initialization and lock them for the game lifetime
   const initialDimsRef = useRef(
     getBoardDims(typeof window === 'undefined' ? 1024 : window.innerWidth)

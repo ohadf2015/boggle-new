@@ -174,6 +174,13 @@ export function findBestBotMove(
   const ranked = [...bestByWord.values()].sort((a, b) => b.ranked - a.ranked);
   const poolSize = Math.max(1, Math.round(1 + skillVariance * 4));
   const pool = ranked.slice(0, poolSize);
-  const idx = Math.min(pool.length - 1, Math.floor(rng() * pool.length));
+  
+  // Bias selection towards the bottom of the allowed pool (sub-optimal words)
+  // so the bot doesn't accidentally pick the absolute best words as often.
+  // Math.sqrt(r) skews the uniform [0,1) distribution toward 1.
+  const r = rng();
+  const skewedRng = skillVariance > 0 ? Math.sqrt(r) : r;
+  const idx = Math.min(pool.length - 1, Math.floor(skewedRng * pool.length));
+  
   return pool[idx].move;
 }

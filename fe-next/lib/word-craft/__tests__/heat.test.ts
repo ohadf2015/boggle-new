@@ -10,23 +10,23 @@ describe('heat meter', () => {
     expect(state.overdriveWarns).toBe(0)
   })
 
-  it('heat increases after player commits a word (score=50 → +10)', () => {
+  it('heat increases after player commits a word (score=50 → +16)', () => {
     const state = buildInitialState(1)
     const next = wordCraftReducer(state, {
       type: 'COMMIT_PLAYER', placements: [], score: 50, words: ['TEST'],
     })
-    // heatGain = min(floor(50/5), 25) = 10
-    expect(next.heat).toBe(10)
+    // heatGain = min(floor(50/3), 35) = 16
+    expect(next.heat).toBe(16)
     expect(next.overdrive).toBe(false)
   })
 
-  it('heat gain is capped at 25', () => {
+  it('heat gain is capped at 35', () => {
     const state = buildInitialState(1)
     const next = wordCraftReducer(state, {
       type: 'COMMIT_PLAYER', placements: [], score: 200, words: ['TEST'],
     })
-    // heatGain = min(floor(200/5), 25) = 25
-    expect(next.heat).toBe(25)
+    // heatGain = min(floor(200/3), 35) = 35
+    expect(next.heat).toBe(35)
   })
 
   it('heat caps at 100 and activates overdrive', () => {

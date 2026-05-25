@@ -78,26 +78,41 @@ export default function WordTowerCrane({
     onDrop(outcome);
   };
 
-  // Map sweep [-1,1] → track position [0%,100%].
-  const leftPct = `${((pos + 1) / 2) * 100}%`;
+  // Map sweep [-1,1] to pendulum swing angle (max 45 degrees)
+  const angle = pos * 45;
 
   return (
     <div
-      className="pointer-events-auto absolute inset-x-0 top-[18%] z-30 flex flex-col items-center gap-2 px-4"
+      className="pointer-events-auto absolute inset-x-0 top-[10%] z-30 flex flex-col items-center gap-6 px-4"
       role="group"
       aria-label={t('wordTower.crane.place')}
     >
-      {/* Sweep track with a centre target zone */}
-      <div className="relative h-12 w-full max-w-sm rounded-neo border-neo-thick border-black bg-neo-navy-light/90 shadow-hard">
-        {/* centre target */}
-        <div className="absolute left-1/2 top-0 h-full w-12 -translate-x-1/2 rounded-neo border-2 border-dashed border-neo-lime/70" />
-        {/* swinging word block */}
-        <div
-          data-testid="crane-block"
-          style={{ left: leftPct }}
-          className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-neo border-neo-thick border-black bg-neo-cyan px-3 py-1 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard"
+      {/* Crane / Pendulum Area */}
+      <div className="relative flex w-full max-w-sm flex-col items-center h-[140px]">
+        {/* Crane top mounting */}
+        <div className="absolute top-0 z-20 h-4 w-24 rounded-b-neo border-x-neo-thick border-b-neo-thick border-black bg-neo-navy-light/90 shadow-hard" />
+        
+        {/* Centre drop target */}
+        <div className="absolute bottom-2 z-0 h-10 w-16 rounded-neo border-2 border-dashed border-neo-lime/70" />
+
+        {/* Swinging pendulum container */}
+        <div 
+          className="absolute top-0 z-10 flex flex-col items-center"
+          style={{ 
+            transformOrigin: 'top center',
+            transform: `rotate(${angle}deg)`
+          }}
         >
-          {word}
+          {/* The crane rope */}
+          <div className="h-[80px] w-1 border-x-[1px] border-black bg-neutral-400" />
+          
+          {/* swinging word block */}
+          <div
+            data-testid="crane-block"
+            className="rounded-neo border-neo-thick border-black bg-neo-cyan px-3 py-1 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard"
+          >
+            {word}
+          </div>
         </div>
       </div>
 
