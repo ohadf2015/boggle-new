@@ -1,7 +1,15 @@
 import type { BlastLevel, Locale } from './types';
 
 export interface LevelSource {
-  resolve(levelNumber: number, locale: Locale, userIdBucket?: string): Promise<BlastLevel>;
+  resolve(
+    levelNumber: number,
+    locale: Locale,
+    userIdBucket?: string,
+    // Optional daily/seasonal salt — only `GeneratedLevelSource` consumes it.
+    // Curated/chain sources ignore the param so hand-authored content stays
+    // visually identical across days.
+    variantSalt?: string,
+  ): Promise<BlastLevel>;
 }
 
 export type LevelSourceRegistry = { curated: LevelSource; generated: LevelSource; chain: LevelSource };

@@ -34,4 +34,27 @@ describe('GeneratedLevelSource', () => {
     const lvl = await source.resolve(35, 'en', 'test');
     expect(['standard', 'lateral-slide']).toContain(lvl.gravityMode);
   });
+
+  it('different variantSalt produces different boards (daily reshuffle)', async () => {
+    const a = await source.resolve(40, 'en', 'bucket', '2026-05-26');
+    const b = await source.resolve(40, 'en', 'bucket', '2026-05-27');
+    const sameShape =
+      a.theme === b.theme &&
+      a.words.join('|') === b.words.join('|') &&
+      a.columns.map((c) => c.tiles.join('')).join('/') ===
+        b.columns.map((c) => c.tiles.join('')).join('/');
+    expect(sameShape).toBe(false);
+  });
+
+  it('same variantSalt is deterministic', async () => {
+    const a = await source.resolve(41, 'en', 'bucket', '2026-05-26');
+    const b = await source.resolve(41, 'en', 'bucket', '2026-05-26');
+    expect(a.id).toBe(b.id);
+  });
+
+  it('omitted variantSalt matches empty string (back-compat)', async () => {
+    const a = await source.resolve(42, 'en', 'bucket');
+    const b = await source.resolve(42, 'en', 'bucket', '');
+    expect(a.id).toBe(b.id);
+  });
 });

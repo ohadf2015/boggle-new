@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Locale } from '@/lib/blast/v2/types';
 import { buildRegistry, getLevelSourceForLevel } from '@/lib/blast/v2/level-source-registry';
+import { todayUtcVariant } from '@/lib/blast/v2/dailyVariant';
 import { BlastV2PageClient } from './v2/BlastV2PageClient';
 import BlastLegacyPageClient from './legacy/PageClient';
 
@@ -29,8 +30,9 @@ export default async function BlastPage({
   if (useV2) {
     const registry = buildRegistry();
     const levelNumber = 1;
-    const level = await getLevelSourceForLevel(levelNumber, locale, registry).resolve(levelNumber, locale)
-      .catch(() => locale !== 'en' ? getLevelSourceForLevel(levelNumber, 'en', registry).resolve(levelNumber, 'en') : Promise.reject(new Error('no en pack')))
+    const variant = todayUtcVariant();
+    const level = await getLevelSourceForLevel(levelNumber, locale, registry).resolve(levelNumber, locale, undefined, variant)
+      .catch(() => locale !== 'en' ? getLevelSourceForLevel(levelNumber, 'en', registry).resolve(levelNumber, 'en', undefined, variant) : Promise.reject(new Error('no en pack')))
       .catch((error: unknown) => {
         console.error('Failed to load blast v2 level:', error);
         return null;

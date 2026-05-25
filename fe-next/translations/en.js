@@ -8850,6 +8850,25 @@ const en = {
       "level": "Level {n}",
       "wordCount": "{count} words"
     },
+    "modifier": {
+      "gemRush": { "title": "GEM RUSH", "sub": "extra gems on the board" },
+      "coinBonanza": { "title": "COIN BONANZA", "sub": "extra coins this round" },
+      "bonusStorm": { "title": "BONUS STORM", "sub": "double-bonus tiles unleashed" }
+    },
+    "quip": {
+      "big": ["NICE CHAIN!", "ON FIRE!", "KEEP IT GOING!"],
+      "mega": ["UNSTOPPABLE!", "LEGENDARY!", "MEGA COMBO!"]
+    },
+    "chestMilestone": {
+      "title": "MILESTONE CHEST",
+      "sub": "Chest #{n} — a rare one!"
+    },
+    "completeExtras": {
+      "bestFast": "Fastest {time}",
+      "bestBonus": "Best ⭐ {count}",
+      "newFast": "NEW FASTEST!",
+      "newBonus": "NEW BONUS RECORD!"
+    },
     "themes": {
       "onboarding": "Onboarding",
       "fruits": "Fruits",

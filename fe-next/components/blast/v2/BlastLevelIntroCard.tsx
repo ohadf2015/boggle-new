@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { BlastLevel } from '@/lib/blast/v2/types';
+import { LEVEL_MODIFIER_INTRO_KEYS } from '@/lib/blast/v2/level-modifiers';
 
 const MODE_COLORS: Record<string, string> = {
   fruits: '#BFFF00', animals: '#00FFFF', food: '#FF1493', ocean: '#00FFFF',
@@ -16,11 +17,15 @@ const MODE_COLORS: Record<string, string> = {
 
 export function BlastLevelIntroCard({ level, onDismiss }: { level: BlastLevel; onDismiss: () => void }) {
   const { t } = useLanguage();
+  // Hold the intro a touch longer when a modifier fires — the banner needs to
+  // land in peripheral vision before the board appears or it reads as a flash.
+  const holdMs = level.modifier ? 2100 : 1500;
   useEffect(() => {
-    const id = setTimeout(onDismiss, 1500);
+    const id = setTimeout(onDismiss, holdMs);
     return () => clearTimeout(id);
-  }, [onDismiss]);
+  }, [onDismiss, holdMs]);
   const modeColor = MODE_COLORS[level.theme] ?? '#BFFF00';
+  const modifierKey = level.modifier ? LEVEL_MODIFIER_INTRO_KEYS[level.modifier] : null;
   return (
     <div
       data-testid="intro-card"
@@ -55,6 +60,26 @@ export function BlastLevelIntroCard({ level, onDismiss }: { level: BlastLevel; o
         >
           {t('blast.intro.wordCount', `${level.words.length} words`, { count: String(level.words.length) })}
         </m.div>
+        {modifierKey && level.modifier && (
+          <m.div
+            data-testid="modifier-banner"
+            data-modifier={level.modifier}
+            initial={{ scale: 0.6, opacity: 0, y: 12 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ delay: 0.55, type: 'spring', stiffness: 380, damping: 18 }}
+            className="mx-auto mt-3 inline-block px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-[0.22em]"
+            style={{
+              background: modeColor,
+              color: '#0b1530',
+              boxShadow: `3px 3px 0 #0b1530`,
+              border: '2px solid #0b1530',
+            }}
+          >
+            <span>{t(`${modifierKey}.title`, level.modifier)}</span>
+            <span className="mx-1.5 opacity-60">·</span>
+            <span className="font-bold">{t(`${modifierKey}.sub`, '')}</span>
+          </m.div>
+        )}
       </div>
     </div>
   );

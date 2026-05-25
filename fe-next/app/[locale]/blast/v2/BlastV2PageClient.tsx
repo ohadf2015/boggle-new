@@ -5,6 +5,7 @@ import { BlastGame } from '@/components/blast/v2/BlastGame';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBlastProgress } from '@/lib/blast/v2/useBlastProgress';
 import { writeGuestProgress, writeResumeHint, readResumeHint } from '@/lib/blast/v2/guestProgress';
+import { todayUtcVariant } from '@/lib/blast/v2/dailyVariant';
 import type { BlastLevel } from '@/lib/blast/v2/types';
 import { type UnlocksSeen, validateUnlocksSeen } from '@/lib/blast/v2/tutorial/unlocks-seen';
 
@@ -53,7 +54,7 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
         return;
       }
       try {
-        const res = await fetch(`/api/blast/level?level=${currentLevel}&locale=${initialLevel.locale}`);
+        const res = await fetch(`/api/blast/level?level=${currentLevel}&locale=${initialLevel.locale}&variant=${todayUtcVariant()}`);
         if (!res.ok) throw new Error('resume level fetch failed');
         const resumed = (await res.json()) as BlastLevel;
         if (!cancelled) setLevel(resumed);
@@ -75,7 +76,7 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
     const nextNumber = level.levelNumber + 1;
     try {
       const res = await fetch(
-        `/api/blast/level?level=${nextNumber}&locale=${level.locale}`,
+        `/api/blast/level?level=${nextNumber}&locale=${level.locale}&variant=${todayUtcVariant()}`,
       );
       if (!res.ok) {
         setReachedEnd(true);

@@ -1,6 +1,7 @@
 import type { Locale } from './types';
 import { hashStringToSeed, seededPRNG } from './prng';
 import { tierForChestNumber, type ChestTier, CHEST_TIERS } from './chest-config';
+import { milestoneForChest } from './chest-milestone';
 
 // Stub pools — Plan 6 expands these per locale
 const BOOST_POOL = ['shield', 'speed', 'xray', 'reload'];
@@ -18,6 +19,8 @@ export type ChestContents = {
   boosts: { type: string; count: number }[];
   avatarPart: string | null;
   frameSkin: string;
+  /** Set when chestNumber lands on a milestone (10/25/50/100/200) — drives a celebratory open variant. */
+  milestone?: number;
 };
 
 export function rollChest(userId: string, chestNumber: number, locale: Locale): ChestContents {
@@ -37,11 +40,13 @@ export function rollChest(userId: string, chestNumber: number, locale: Locale): 
     ? prng.pick(AVATAR_PARTS_PER_LOCALE[locale] ?? AVATAR_PARTS_PER_LOCALE.en)
     : null;
 
+  const milestone = milestoneForChest(chestNumber);
   return {
     tier: tierDef.tier,
     coins,
     boosts,
     avatarPart,
     frameSkin: tierDef.frame,
+    ...(milestone !== null ? { milestone } : {}),
   };
 }

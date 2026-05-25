@@ -10,6 +10,7 @@ import type { LocaleConfig } from '../locale-config';
 import type { LevelSource } from '../level-source';
 import { findExtraWords } from '../engine';
 import { getBlastCommonWords } from '../engine/common-words';
+import { rollLevelModifier } from '../level-modifiers';
 
 let MAX_REGEN_ATTEMPTS = 60;
 const LATERAL_SLIDE_CHANCE = 1 / 8;
@@ -17,10 +18,15 @@ const LATERAL_SLIDE_CHANCE = 1 / 8;
 export class GeneratedLevelSource implements LevelSource {
   constructor(private readonly configs: Record<Locale, LocaleConfig>) {}
 
-  async resolve(levelNumber: number, locale: Locale, userIdBucket = 'default'): Promise<BlastLevel> {
+  async resolve(
+    levelNumber: number,
+    locale: Locale,
+    userIdBucket = 'default',
+    variantSalt = '',
+  ): Promise<BlastLevel> {
     const config = this.configs[locale];
     const mechanics = mechanicsForLevel(levelNumber);
-    const baseSeed = hashStringToSeed(`${levelNumber}:${locale}:${userIdBucket}`);
+    const baseSeed = hashStringToSeed(`${levelNumber}:${locale}:${userIdBucket}:${variantSalt}`);
     const isCommon = await getBlastCommonWords(locale);
     const minLen = config.wordLengthRange.min;
     for (let attempt = 0; attempt < MAX_REGEN_ATTEMPTS; attempt++) {
@@ -51,7 +57,8 @@ export class GeneratedLevelSource implements LevelSource {
       if (!sil.ok) continue;
       const fillerCells = fillEmpties(place.grid, cols, place.heights, config, prng);
       const allCells = [...Object.keys(place.grid.cells), ...Object.keys(fillerCells)] as CellId[];
-      const tileFlags = rollTileFlags(allCells, mechanics, levelNumber, prng);
+      const modifier = rollLevelModifier(prng, levelNumber);
+      const tileFlags = rollTileFlags(allCells, mechanics, levelNumber, prng, modifier);
       const columns = compactColumns(cols, { ...place.grid.cells, ...fillerCells });
       const candidate: BlastLevel = {
         id: `gen-${levelNumber}-${locale}-${userIdBucket}-${attempt}`,
@@ -59,6 +66,7 @@ export class GeneratedLevelSource implements LevelSource {
         resolvableOrder: words, tileFlags, difficulty: levelNumber,
         gravityMode: mechanics.lateralSlideGravity && prng.chance(LATERAL_SLIDE_CHANCE) ? 'lateral-slide' : 'standard',
         hasPivot: mechanics.multiWordReveal && prng.chance(0.15),
+        ...(modifier ? { modifier } : {}),
       };
       const score = interestingnessScore(candidate);
       candidate.interestingnessScore = score;

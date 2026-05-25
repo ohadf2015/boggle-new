@@ -16,8 +16,16 @@ type Props = {
   bonusWordsFound?: number;
   /** Best star rating previously earned on this level, if replaying. */
   bestStars?: number;
-  /** True when THIS run beat the stored best. */
+  /** True when THIS run beat the stored star best. */
   isNewBest?: boolean;
+  /** Personal-best bonus-word count for this level. */
+  bestBonus?: number;
+  /** Pretty-printed fastest time (e.g. "32s" or "1:08") for this level. */
+  fastestLabel?: string;
+  /** True when THIS run set a new fastest time. */
+  isNewFast?: boolean;
+  /** True when THIS run set a new bonus-word record. */
+  isNewBonus?: boolean;
   stars?: number;
   onNext: () => void;
   // Kept for the highlight-line heuristic; no longer rendered as tiles.
@@ -103,6 +111,10 @@ export function BlastLevelCompleteCard({
   bonusWordsFound = 0,
   bestStars,
   isNewBest = false,
+  bestBonus,
+  fastestLabel,
+  isNewFast = false,
+  isNewBonus = false,
   stars,
   onNext,
   cascadeCount,
@@ -276,6 +288,45 @@ export function BlastLevelCompleteCard({
             {t('blast.complete.best', 'Best')} {'★'.repeat(bestStars!)}
           </div>
         ) : null}
+
+        {/* Multi-axis personal-best subline — fastest time + bonus-word best.
+            Flashes yellow on a new record; quiet otherwise. Drives replay
+            on TWO extra axes beyond stars. */}
+        {(isNewFast || isNewBonus || (fastestLabel && fastestLabel !== '—') || (typeof bestBonus === 'number' && bestBonus > 0)) && (
+          <div
+            data-testid="complete-records"
+            className="mt-2 flex flex-wrap justify-center gap-x-3 gap-y-1 text-[10px] uppercase tracking-[0.16em] font-bold"
+          >
+            {fastestLabel && fastestLabel !== '—' && (
+              <span
+                data-testid="complete-fastest"
+                data-new={isNewFast ? 'true' : 'false'}
+                style={{
+                  color: isNewFast ? '#FFE135' : 'rgba(255,255,255,0.55)',
+                  textShadow: isNewFast ? '1px 1px 0 #0b1530' : 'none',
+                }}
+              >
+                {isNewFast
+                  ? t('blast.completeExtras.newFast', 'NEW FASTEST!')
+                  : t('blast.completeExtras.bestFast', 'Fastest {time}', { time: fastestLabel })}
+              </span>
+            )}
+            {typeof bestBonus === 'number' && bestBonus > 0 && (
+              <span
+                data-testid="complete-bestbonus"
+                data-new={isNewBonus ? 'true' : 'false'}
+                style={{
+                  color: isNewBonus ? '#FFE135' : 'rgba(255,255,255,0.55)',
+                  textShadow: isNewBonus ? '1px 1px 0 #0b1530' : 'none',
+                }}
+              >
+                {isNewBonus
+                  ? t('blast.completeExtras.newBonus', 'NEW BONUS RECORD!')
+                  : t('blast.completeExtras.bestBonus', 'Best ⭐ {count}', { count: String(bestBonus) })}
+              </span>
+            )}
+          </div>
+        )}
 
         <div
           ref={titleRef}

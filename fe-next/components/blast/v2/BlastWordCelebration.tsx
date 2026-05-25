@@ -1,6 +1,9 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { classifyOvation } from '@/lib/blast/v2/engine/ovation';
+import { pickQuipKey } from '@/lib/blast/v2/fx/mascotQuips';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 type Props = {
   /** Increments on every word commit — drives the celebration spawn. */
@@ -11,6 +14,8 @@ type Props = {
   modeColor: string;
   /** Cascade depth for the just-committed word — drives ovation intensity. */
   chainDepth?: number;
+  /** Level number — seeds the quip picker so repeated mega-chains rotate lines. */
+  levelNumber?: number;
 };
 
 const PIXEL_COUNT_PER_CELL = 14;
@@ -31,9 +36,10 @@ const RING_LAYERS: Array<{ color: string; delay: number; scale: number; width: n
 // reports it as invisible on some devices (likely a canvas-init race with the
 // page transition). DOM + GSAP is rock-solid and renders the same on every
 // browser — a guaranteed visual payoff for finding a word.
-export function BlastWordCelebration({ eventKey, centers, modeColor, chainDepth = 0 }: Props) {
+export function BlastWordCelebration({ eventKey, centers, modeColor, chainDepth = 0, levelNumber = 0 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const lastKeyRef = useRef<number | undefined>(undefined);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (eventKey === undefined || eventKey === lastKeyRef.current) return;
@@ -207,6 +213,65 @@ export function BlastWordCelebration({ eventKey, centers, modeColor, chainDepth 
       }
     }
 
+    // Mascot quip — a short pop-text label on big / mega chains. Rides above
+    // the rings so the player can read it without the burst-burst-burst FX
+    // drowning it out. Picker lives in lib/blast/v2/fx/mascotQuips (pure).
+    const tier = classifyOvation(chainDepth);
+    const quipKey = pickQuipKey(tier, chainDepth, levelNumber);
+    if (quipKey) {
+      const rootRect = root.getBoundingClientRect();
+      // Anchor at the centroid of the cleared cells so the quip rides the
+      // action, not a fixed banner position.
+      const cx = centers.reduce((s, c) => s + c.x - rootRect.left, 0) / centers.length;
+      const cy = centers.reduce((s, c) => s + c.y - rootRect.top, 0) / centers.length;
+      const quip = document.createElement('div');
+      quip.setAttribute('data-blast-quip', tier);
+      quip.textContent = t(quipKey, tier === 'mega' ? 'MEGA COMBO!' : 'NICE CHAIN!');
+      Object.assign(quip.style, {
+        position: 'absolute',
+        left: `${cx}px`,
+        top: `${cy - 40}px`,
+        transform: 'translate(-50%, -50%)',
+        padding: '6px 14px',
+        background: modeColor,
+        color: '#0b1530',
+        fontFamily: 'var(--font-neo-display, system-ui)',
+        fontWeight: '900',
+        fontSize: tier === 'mega' ? '20px' : '16px',
+        letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+        borderRadius: '10px',
+        boxShadow: `3px 3px 0 #0b1530`,
+        border: '2px solid #0b1530',
+        opacity: '0',
+        whiteSpace: 'nowrap',
+        willChange: 'transform, opacity',
+      });
+      root.appendChild(quip);
+      spawned.push(quip);
+      gsap.fromTo(
+        quip,
+        { scale: 0.5, opacity: 0, y: 0 },
+        {
+          scale: 1,
+          opacity: 1,
+          y: -10,
+          duration: 0.35,
+          ease: 'back.out(2.4)',
+          onComplete: () => {
+            gsap.to(quip, {
+              opacity: 0,
+              y: -28,
+              duration: 0.5,
+              delay: 0.55,
+              ease: 'power2.in',
+              onComplete: () => quip.remove(),
+            });
+          },
+        },
+      );
+    }
+
     // Cascade screen-burst — a quick radial flash overlay that scales with
     // chain depth. Reads as "big moment" punctuation when chains stack.
     if (chainDepth >= 1) {
@@ -239,7 +304,7 @@ export function BlastWordCelebration({ eventKey, centers, modeColor, chainDepth 
         el.remove();
       });
     };
-  }, [eventKey, centers, modeColor, chainDepth]);
+  }, [eventKey, centers, modeColor, chainDepth, levelNumber, t]);
 
   return (
     <div

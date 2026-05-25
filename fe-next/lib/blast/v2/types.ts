@@ -36,6 +36,8 @@ export type BlastLevel = {
   gravityMode?: 'standard' | 'lateral-slide';
   hasPivot?: boolean;
   interestingnessScore?: number;
+  /** Optional per-run random twist — boosts one tile-flag rate; surfaces in intro card. */
+  modifier?: 'gem_rush' | 'coin_bonanza' | 'bonus_storm';
 };
 
 export type ChainLevelSpec = {

@@ -9184,6 +9184,25 @@ const he = {
       "level": "שלב {n}",
       "wordCount": "{count} מילים"
     },
+    "modifier": {
+      "gemRush": { "title": "פריצת יהלומים", "sub": "עוד יהלומים על הלוח" },
+      "coinBonanza": { "title": "מטחנת מטבעות", "sub": "עוד מטבעות הסיבוב הזה" },
+      "bonusStorm": { "title": "סופת בונוס", "sub": "אריחי בונוס כפול שוחררו" }
+    },
+    "quip": {
+      "big": ["שרשרת יפה!", "בוערים!", "תמשיכו!"],
+      "mega": ["בלתי עצירים!", "אגדה!", "קומבו ענק!"]
+    },
+    "chestMilestone": {
+      "title": "תיבת אבן דרך",
+      "sub": "תיבה מס׳ {n} — נדירה!"
+    },
+    "completeExtras": {
+      "bestFast": "המהיר ביותר {time}",
+      "bestBonus": "שיא ⭐ {count}",
+      "newFast": "שיא מהירות חדש!",
+      "newBonus": "שיא בונוס חדש!"
+    },
     "themes": {
       "onboarding": "התחלה",
       "fruits": "פירות",

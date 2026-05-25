@@ -8995,6 +8995,25 @@ const sv = {
       "level": "Nivå {n}",
       "wordCount": "{count} ord"
     },
+    "modifier": {
+      "gemRush": { "title": "JUVELRUSH", "sub": "extra juveler på brädet" },
+      "coinBonanza": { "title": "MYNTREGN", "sub": "extra mynt denna runda" },
+      "bonusStorm": { "title": "BONUSSTORM", "sub": "dubbel-bonus-rutor släppta loss" }
+    },
+    "quip": {
+      "big": ["FIN KEDJA!", "I ELDEN!", "FORTSÄTT!"],
+      "mega": ["OSTOPPBAR!", "LEGENDARISKT!", "MEGA-COMBO!"]
+    },
+    "chestMilestone": {
+      "title": "MILSTOLPS-KISTA",
+      "sub": "Kista #{n} — sällsynt!"
+    },
+    "completeExtras": {
+      "bestFast": "Snabbast {time}",
+      "bestBonus": "Bästa ⭐ {count}",
+      "newFast": "NYTT REKORD I SNABBHET!",
+      "newBonus": "NYTT BONUSREKORD!"
+    },
     "themes": {
       "onboarding": "Introduktion",
       "fruits": "Frukter",

@@ -9021,6 +9021,25 @@ const ja = {
       "level": "レベル{n}",
       "wordCount": "{count}単語"
     },
+    "modifier": {
+      "gemRush": { "title": "ジェムラッシュ", "sub": "ボード上のジェム増加" },
+      "coinBonanza": { "title": "コイン大量発生", "sub": "今ラウンドはコイン増" },
+      "bonusStorm": { "title": "ボーナスストーム", "sub": "ダブルボーナスタイル解放" }
+    },
+    "quip": {
+      "big": ["いいチェーン!", "燃えてる!", "続けて!"],
+      "mega": ["止まらない!", "伝説!", "メガコンボ!"]
+    },
+    "chestMilestone": {
+      "title": "節目のチェスト",
+      "sub": "チェスト #{n} — レア!"
+    },
+    "completeExtras": {
+      "bestFast": "最速 {time}",
+      "bestBonus": "ベスト ⭐ {count}",
+      "newFast": "最速更新!",
+      "newBonus": "ボーナス記録更新!"
+    },
     "themes": {
       "onboarding": "はじめに",
       "fruits": "フルーツ",

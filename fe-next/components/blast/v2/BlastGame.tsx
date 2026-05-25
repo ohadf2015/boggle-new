@@ -16,6 +16,7 @@ import type { BlastProgressApi } from '@/lib/blast/v2/useBlastProgress';
 import { useBlastTutorial } from '@/hooks/useBlastTutorial';
 import { starRating } from '@/lib/blast/v2/anti-cheat';
 import { recordBestStars } from '@/lib/blast/v2/bestStars';
+import { recordBestRun, formatFastest } from '@/lib/blast/v2/bestRecords';
 import { mechanicsForLevel } from '@/lib/blast/v2/mechanic-flags';
 import { trackBlastLevelStarted, trackBlastLevelCompleted, trackBlastLevelAbandoned } from '@/lib/blast/v2/telemetry';
 import { BlastBoard } from './BlastBoard';
@@ -115,7 +116,17 @@ export function BlastGame({
   // Finalized run stats — snapshot when the level transitions to complete so
   // re-renders of the results card don't re-read Date.now() (impure during
   // render).
-  const [finalStats, setFinalStats] = useState<{ timeSeconds: number; gemsCollected: number; stars: number; bestStars: number; isNewBest: boolean } | null>(null);
+  const [finalStats, setFinalStats] = useState<{
+    timeSeconds: number;
+    gemsCollected: number;
+    stars: number;
+    bestStars: number;
+    isNewBest: boolean;
+    bestBonus: number;
+    fastestLabel: string;
+    isNewFast: boolean;
+    isNewBonus: boolean;
+  } | null>(null);
   useChainHaptics({ chainEventKey: state.chainEventKey, chainDepth: state.lastChainDepth });
   // Selection-count derived from active drag — only counts cells that are
   // currently part of the live trace, so backtracking doesn't double-tick.
@@ -351,10 +362,27 @@ export function BlastGame({
     };
 
     const stars = starRating(submission, level, state.bonusWordCount);
-    // Personal-best tracking (local) — drives the "NEW BEST!" flash + best line
-    // on the complete card, giving a reason to replay for a higher rating.
-    const { best, isNewBest } = recordBestStars(level.locale, level.levelNumber, stars);
-    setFinalStats({ timeSeconds, gemsCollected, stars, bestStars: best, isNewBest });
+    // Personal-best tracking (local) — three-axis record so replay has more
+    // than just stars to chase: bonus-word count and fastest time both flash
+    // their own "NEW <X>!" beat on the complete card.
+    const { record, newBests } = recordBestRun(level.locale, level.levelNumber, {
+      stars,
+      bonusWords: state.bonusWordCount,
+      timeSeconds,
+    });
+    // Keep the legacy mirror in sync (other call sites still read it).
+    recordBestStars(level.locale, level.levelNumber, stars);
+    setFinalStats({
+      timeSeconds,
+      gemsCollected,
+      stars,
+      bestStars: record.stars,
+      isNewBest: newBests.stars,
+      bestBonus: record.bonusBest,
+      fastestLabel: formatFastest(record.fastestSeconds),
+      isNewFast: newBests.time,
+      isNewBonus: newBests.bonus,
+    });
 
     trackBlastLevelCompleted({
       level: level.levelNumber,
@@ -465,6 +493,10 @@ export function BlastGame({
         stars={finalStats?.stars}
         bestStars={finalStats?.bestStars}
         isNewBest={finalStats?.isNewBest}
+        bestBonus={finalStats?.bestBonus}
+        fastestLabel={finalStats?.fastestLabel}
+        isNewFast={finalStats?.isNewFast}
+        isNewBonus={finalStats?.isNewBonus}
         onNext={onAdvance}
       />
     );
@@ -515,6 +547,7 @@ export function BlastGame({
           centers={clearCentersRef.current}
           modeColor={modeColor}
           chainDepth={state.lastChainDepth}
+          levelNumber={level.levelNumber}
         />
         <BlastWordFeedback
           dictCheckPending={state.dictCheckPending}

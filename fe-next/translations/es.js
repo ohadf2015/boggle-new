@@ -9078,6 +9078,25 @@ const es = {
       "level": "Nivel {n}",
       "wordCount": "{count} palabras"
     },
+    "modifier": {
+      "gemRush": { "title": "AVALANCHA DE GEMAS", "sub": "más gemas en el tablero" },
+      "coinBonanza": { "title": "LLUVIA DE MONEDAS", "sub": "más monedas esta ronda" },
+      "bonusStorm": { "title": "TORMENTA BONUS", "sub": "fichas de doble bonus desatadas" }
+    },
+    "quip": {
+      "big": ["¡QUÉ CADENA!", "¡EN LLAMAS!", "¡SIGUE ASÍ!"],
+      "mega": ["¡IMPARABLE!", "¡LEGENDARIO!", "¡MEGA COMBO!"]
+    },
+    "chestMilestone": {
+      "title": "COFRE HITO",
+      "sub": "Cofre #{n} — ¡raro!"
+    },
+    "completeExtras": {
+      "bestFast": "Más rápido {time}",
+      "bestBonus": "Mejor ⭐ {count}",
+      "newFast": "¡NUEVO RÉCORD DE TIEMPO!",
+      "newBonus": "¡NUEVO RÉCORD DE BONUS!"
+    },
     "themes": {
       "onboarding": "Iniciación",
       "fruits": "Frutas",
