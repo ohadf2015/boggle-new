@@ -3792,35 +3792,41 @@ body.crazygames-embed .game-view-container,
    is. Higher specificity than `:root` so it always wins.
    ============================================================ */
 html[data-cosy='true'] {
-  /* ---- Calm "parchment-on-dusk" theme. Overrides cascade app-wide via the
-     var-backed neo-* utilities; removing data-cosy reverts instantly. This is
-     the documented calm EXCEPTION to the dark/hard/halftone default in
-     .claude/docs/design-system.md. Palette legibility is locked by
-     lib/cosy/__tests__/calmPalette.contract.test.ts (WCAG floors). ---- */
+  /* ---- Calm "espresso & oak" woody theme. One coherent warm earth palette
+     (oak/sage/clay/plum on a warm-brown backdrop), NOT a desaturated version
+     of the loud default. Overrides cascade app-wide via the var-backed neo-*
+     utilities; removing data-cosy reverts instantly. This is the documented
+     calm EXCEPTION to the dark/hard/halftone default in
+     .claude/docs/design-system.md. Palette legibility + warm character are
+     locked by lib/cosy/__tests__/calmPalette.contract.test.ts (WCAG floors). ---- */
 
-  /* Background — warm dusk (white text stays >= AA; contract floor = 6:1) */
-  --neo-navy: hsl(222 13% 23%);
-  --neo-navy-light: hsl(222 12% 28%);
-  --neo-navy-elevated: hsl(222 12% 31%);
-  --neo-navy-radial: hsl(222 13% 25%);
-  --neo-abyss: hsl(222 16% 15%);
-  --neo-abyss-deep: hsl(222 18% 11%);
-  --neo-abyss-mid: hsl(222 16% 17%);
-  --neo-abyss-light: hsl(222 15% 20%);
-  --neo-gray: hsl(222 10% 34%);
+  /* Background — warm "espresso & oak" wood, not cool navy. White text stays
+     >= AA (contract floor = 6:1); lightness kept near the prior dusk values so
+     contrast headroom is preserved — only the hue/warmth shifts blue -> brown. */
+  --neo-navy: hsl(28 18% 22%);
+  --neo-navy-light: hsl(28 17% 27%);
+  --neo-navy-elevated: hsl(30 16% 30%);
+  --neo-navy-radial: hsl(28 18% 24%);
+  --neo-abyss: hsl(26 22% 14%);
+  --neo-abyss-deep: hsl(26 24% 10%);
+  --neo-abyss-mid: hsl(26 22% 16%);
+  --neo-abyss-light: hsl(28 20% 19%);
+  --neo-gray: hsl(28 12% 33%);
 
-  /* Dominant cream card surface + softened structural ink (charcoal, not
-     black). --neo-black recolours every border/shadow/text-stroke/focus-ring
-     globally (it is never used as a background). */
-  --neo-cream: hsl(40 33% 97%);
-  --neo-black: 56 58 72;
+  /* Dominant oat-parchment card surface + warm charcoal-brown ink (walnut,
+     not bluish charcoal). --neo-black recolours every border/shadow/text-
+     stroke/focus-ring globally (it is never used as a background), so warming
+     it tints all the chrome woody too. */
+  --neo-cream: hsl(36 44% 95%);
+  --neo-black: 58 50 42;
 
-  /* Soft diffuse shadows — kill the hard pixel stamp */
-  --shadow-sm: 0 1px 2px rgba(20, 20, 35, 0.1);
-  --shadow-md: 0 2px 6px rgba(20, 20, 35, 0.1);
-  --shadow-lg: 0 6px 16px rgba(20, 20, 35, 0.12);
-  --shadow-xl: 0 12px 28px rgba(20, 20, 35, 0.14);
-  --shadow-pressed: inset 0 1px 2px rgba(20, 20, 35, 0.12);
+  /* Soft diffuse shadows — kill the hard pixel stamp; warm-brown tint to match
+     the woody palette (was cool 20 20 35). */
+  --shadow-sm: 0 1px 2px rgba(38, 28, 20, 0.1);
+  --shadow-md: 0 2px 6px rgba(38, 28, 20, 0.1);
+  --shadow-lg: 0 6px 16px rgba(38, 28, 20, 0.12);
+  --shadow-xl: 0 12px 28px rgba(38, 28, 20, 0.14);
+  --shadow-pressed: inset 0 1px 2px rgba(38, 28, 20, 0.12);
 
   /* Thinner borders (colour softens via the charcoal --neo-black above) */
   --border-neo: 1px;
@@ -3830,39 +3836,45 @@ html[data-cosy='true'] {
   --halftone-pattern: none;
   --retro-grid-pattern: none;
 
-  /* New calm palette — DISTINCT hues so mode colour-coding survives
-     (lime=primary, pink=MP, cyan=SP, purple=brain). Bright families carry
-     BLACK text (kept light); dark families carry WHITE text (kept dark). */
-  /* LIME -> sage (black text) */
-  --neo-lime: hsl(110 24% 64%);
-  --neo-lime-light: hsl(110 22% 74%);
-  --neo-lime-muted: hsl(110 18% 56%);
-  --neo-lime-dark: hsl(110 22% 46%);
+  /* Woody-cozy palette — one coherent WARM earth family (amber -> olive ->
+     clay -> plum), not the old cool sage/teal/rose/lavender mix. Hues stay
+     distinct enough that mode colour-coding survives, but every one is an
+     autumnal wood tone so the whole UI reads cosy, not desaturated-random.
+     Light families carry BLACK text; dark families carry WHITE text. */
+  /* LIME (primary) -> honey oak (black text) */
+  --neo-lime: hsl(38 48% 64%);
+  --neo-lime-light: hsl(40 50% 74%);
+  --neo-lime-muted: hsl(36 38% 56%);
+  --neo-lime-dark: hsl(34 42% 44%);
 
-  /* CYAN -> calm teal (black text) */
-  --neo-cyan: hsl(185 30% 64%);
-  --neo-cyan-light: hsl(185 28% 74%);
-  --neo-cyan-muted: hsl(185 24% 56%);
-  --neo-cyan-dark: hsl(185 28% 46%);
+  /* CYAN (single-player) -> warm sage / dried-moss (black text) */
+  --neo-cyan: hsl(78 24% 62%);
+  --neo-cyan-light: hsl(78 26% 72%);
+  --neo-cyan-muted: hsl(76 20% 54%);
+  --neo-cyan-dark: hsl(74 24% 42%);
 
-  /* PINK -> dusty rose (white text) */
-  --neo-pink: hsl(345 40% 50%);
-  --neo-pink-light: hsl(345 38% 62%);
-  --neo-pink-muted: hsl(345 30% 44%);
-  --neo-pink-dark: hsl(345 36% 38%);
+  /* PINK (multiplayer) -> terracotta / clay (white text) */
+  --neo-pink: hsl(14 48% 47%);
+  --neo-pink-light: hsl(16 46% 60%);
+  --neo-pink-muted: hsl(12 40% 42%);
+  --neo-pink-dark: hsl(10 44% 36%);
 
-  /* PURPLE -> muted lavender (white text) */
-  --neo-purple: hsl(262 30% 52%);
-  --neo-purple-light: hsl(262 30% 64%);
-  --neo-purple-muted: hsl(262 24% 46%);
-  --neo-purple-dark: hsl(262 30% 40%);
+  /* PURPLE (brain) -> mulled-wine plum / aubergine (white text) */
+  --neo-purple: hsl(326 24% 44%);
+  --neo-purple-light: hsl(326 24% 58%);
+  --neo-purple-muted: hsl(324 20% 40%);
+  --neo-purple-dark: hsl(322 26% 34%);
 
-  /* Celebration accents — softened, black text. --neo-red is intentionally
-     NOT overridden: error/destructive stays hot (safety semantics). */
-  --neo-yellow: hsl(45 60% 66%);
-  --neo-yellow-hover: hsl(45 56% 60%);
-  --neo-orange: hsl(28 55% 64%);
-  --neo-orange-hover: hsl(28 52% 58%);
+  /* Celebration accents — warm gold + clay, black text. --neo-red is
+     intentionally NOT overridden: error/destructive stays hot (safety). */
+  --neo-yellow: hsl(42 62% 64%);
+  --neo-yellow-hover: hsl(40 58% 58%);
+  --neo-orange: hsl(26 56% 60%);
+  --neo-orange-hover: hsl(24 54% 54%);
+
+  /* Muted secondary text is hardcoded bluish (#d4d4e8) in :root, so it can't
+     follow the --neo-* vars — warm it explicitly to a soft oat-gray. */
+  --muted-foreground: hsl(36 16% 84%);
 }
 
 /* ---- Cosy / Calm Mode: structural softening beyond the token overrides.
@@ -3876,10 +3888,10 @@ html[data-cosy='true'] .shadow-hard,
 html[data-cosy='true'] .shadow-hard-sm,
 html[data-cosy='true'] .shadow-hard-lg,
 html[data-cosy='true'] .shadow-hard-xl {
-  box-shadow: 0 4px 12px rgba(20, 20, 35, 0.12) !important;
+  box-shadow: 0 4px 12px rgba(38, 28, 20, 0.12) !important;
 }
 html[data-cosy='true'] .shadow-hard-pressed {
-  box-shadow: inset 0 1px 2px rgba(20, 20, 35, 0.12) !important;
+  box-shadow: inset 0 1px 2px rgba(38, 28, 20, 0.12) !important;
 }
 
 /* Suppress decorative halftone/comic texture overlays (pseudo-elements). */

@@ -18,6 +18,19 @@ function tokenValue(block: string, name: string): string | null {
   return m ? m[1].trim() : null;
 }
 
+/** Parse `hsl(H S% L%)` → { h, s, l }, or null if not an hsl() value. */
+function parseHsl(value: string): { h: number; s: number; l: number } | null {
+  const m = value.match(/hsl\(\s*([\d.]+)\s+([\d.]+)%\s+([\d.]+)%/);
+  return m ? { h: +m[1], s: +m[2], l: +m[3] } : null;
+}
+
+/** A hue counts as "warm/earthy" (amber→clay→plum, no cold blue/teal). */
+function isWarmHue(h: number): boolean {
+  // warm arc: reds/oranges/golds (0–55), warm yellow-greens up to sage (55–95),
+  // and the autumnal plum/wine wrap (300–360). Cold blue/teal/lavender (160–300) excluded.
+  return h <= 95 || h >= 300;
+}
+
 const AA = 4.5;
 
 describe('cosy calm-palette contract (globals.css)', () => {
@@ -53,7 +66,7 @@ describe('cosy calm-palette contract (globals.css)', () => {
     expect(md).not.toMatch(/0px\s+rgb/); // not the "Npx Npx 0px" hard stamp
   });
 
-  it('bright accents (sage/teal/yellow/orange) stay legible with BLACK text', () => {
+  it('light accents (oak/sage/honey/clay) stay legible with BLACK text', () => {
     const ink = '0 0 0';
     for (const name of ['--neo-lime', '--neo-cyan', '--neo-yellow', '--neo-orange']) {
       const v = tokenValue(block, name);
@@ -62,7 +75,7 @@ describe('cosy calm-palette contract (globals.css)', () => {
     }
   });
 
-  it('dark accents (rose/lavender) stay legible with WHITE text', () => {
+  it('dark accents (terracotta/plum) stay legible with WHITE text', () => {
     const white = '255 255 255';
     for (const name of ['--neo-pink', '--neo-purple']) {
       const v = tokenValue(block, name);
@@ -74,6 +87,46 @@ describe('cosy calm-palette contract (globals.css)', () => {
   it('keeps error red hot (does NOT calm safety semantics)', () => {
     // --neo-red must NOT be overridden inside the cosy block
     expect(tokenValue(block, '--neo-red')).toBeNull();
+  });
+
+  // ---- Woody-cozy character: warm + coherent, NOT cool-desaturated ----
+
+  it('paints a WARM woody backdrop (espresso, not cool navy blue)', () => {
+    for (const name of ['--neo-navy', '--neo-abyss', '--neo-abyss-deep', '--neo-gray']) {
+      const hsl = parseHsl(tokenValue(block, name) ?? '');
+      expect(hsl, `${name} must be an hsl() value`).toBeTruthy();
+      expect(isWarmHue(hsl!.h), `${name} hue ${hsl!.h} must be warm (not blue ~222)`).toBe(true);
+    }
+    // background must read as WOOD, not a neutral gray — keep some warmth saturation
+    expect(parseHsl(tokenValue(block, '--neo-navy')!)!.s).toBeGreaterThanOrEqual(12);
+  });
+
+  it('keeps the cream surface warm (oat parchment, not bluish white)', () => {
+    const hsl = parseHsl(tokenValue(block, '--neo-cream') ?? '');
+    expect(hsl, '--neo-cream must be hsl()').toBeTruthy();
+    expect(isWarmHue(hsl!.h), `cream hue ${hsl!.h} must be warm`).toBe(true);
+  });
+
+  it('warms the structural ink to charcoal-brown (R≥B, not bluish 56 58 72)', () => {
+    const ink = tokenValue(block, '--neo-black');
+    const [r, , b] = ink!.split(/\s+/).map(Number);
+    // bluish ink has B>R; warm woody ink must lean red/brown
+    expect(r, `ink "${ink}" must be warm: red >= blue`).toBeGreaterThanOrEqual(b);
+  });
+
+  it('uses warm earthy accents — NO cold teal / blue / lavender', () => {
+    for (const name of ['--neo-lime', '--neo-cyan', '--neo-pink', '--neo-purple']) {
+      const hsl = parseHsl(tokenValue(block, name) ?? '');
+      expect(hsl, `${name} must be hsl()`).toBeTruthy();
+      expect(isWarmHue(hsl!.h), `${name} hue ${hsl!.h} must be earthy, not cold`).toBe(true);
+    }
+  });
+
+  it('warms muted secondary text (not the default bluish gray)', () => {
+    const muted = tokenValue(block, '--muted-foreground');
+    expect(muted, 'cosy must override --muted-foreground (it is hardcoded bluish in :root)').toBeTruthy();
+    const hsl = parseHsl(muted!);
+    if (hsl) expect(isWarmHue(hsl.h), `muted-foreground hue ${hsl.h} must be warm`).toBe(true);
   });
 });
 
