@@ -122,9 +122,9 @@ export default function PracticeHubClient({ locale }: Props) {
             transition={{ duration: 0.5, ease: 'easeOut' }}
             role="status"
             aria-live="polite"
-            className="mb-6 px-4 py-3 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black shadow-hard text-center"
+            className="mb-6 px-4 py-4 rounded-neo border-3 border-neo-black bg-neo-cozy text-neo-black shadow-hard text-center"
           >
-            <p className="font-neo-display font-black text-base mb-0.5">
+            <p className="font-neo-display font-black text-base mb-1">
               {t('practiceHub.allCompleteTitle')}
             </p>
             <p className="font-neo-body text-xs">
@@ -139,7 +139,7 @@ export default function PracticeHubClient({ locale }: Props) {
             const isNext = mode === nextMode;
             const ModeIcon = MODE_ICON[mode];
             const baseClass =
-              'group relative flex items-stretch gap-3 rounded-neo border-2 border-neo-black p-3 shadow-hard overflow-hidden transition-all';
+              'group relative flex items-stretch gap-4 rounded-neo border-2 border-neo-black p-4 shadow-hard overflow-hidden transition focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cozy';
 
             const inner = (
               <>
@@ -148,7 +148,7 @@ export default function PracticeHubClient({ locale }: Props) {
                 <span
                   aria-hidden
                   className={`absolute top-1.5 start-1.5 z-10 inline-flex items-center justify-center w-6 h-6 rounded-full border-2 border-neo-black font-neo-display font-black text-xs shadow-hard-sm ${
-                    isDone ? 'bg-neo-lime text-neo-black' : 'bg-neo-cream text-neo-navy'
+                    isDone ? 'bg-neo-cozy text-neo-black' : 'bg-neo-cream text-neo-navy'
                   }`}
                 >
                   {isDone ? <Check className="w-3.5 h-3.5" strokeWidth={3} /> : idx + 1}
@@ -178,7 +178,7 @@ export default function PracticeHubClient({ locale }: Props) {
                   <h2 className="text-base sm:text-lg font-neo-display font-black text-neo-cream truncate">
                     {t(`gameModes.${mode}.name`)}
                   </h2>
-                  <p className="text-[0.72rem] sm:text-xs font-neo-body text-neo-cream/80 leading-snug line-clamp-2 pe-8">
+                  <p className="text-[0.72rem] sm:text-xs font-neo-body text-neo-cream/90 leading-snug line-clamp-2 pe-8">
                     {t(`gameModes.${mode}.description`)}
                   </p>
                 </div>
@@ -187,7 +187,7 @@ export default function PracticeHubClient({ locale }: Props) {
                     (no arrow, nothing to tap). Next-up → a gently bobbing
                     "Start here" cue. Otherwise → the usual hover arrow. */}
                 {isDone ? (
-                  <span className="absolute top-1/2 end-2 -translate-y-1/2 inline-flex items-center gap-1 px-2 py-1 rounded-full border-2 border-neo-black bg-neo-lime text-neo-black font-neo-display font-black text-[0.6rem] uppercase tracking-wide shadow-hard-sm">
+                  <span className="absolute top-1/2 end-2 -translate-y-1/2 inline-flex items-center gap-1 px-2 py-1 rounded-full border-2 border-neo-black bg-neo-cozy text-neo-black font-neo-display font-black text-[0.6rem] uppercase tracking-wide shadow-hard-sm">
                     <Check className="w-3 h-3" strokeWidth={3} aria-hidden />
                     {t('practiceHub.completedBadge')}
                   </span>
@@ -236,8 +236,8 @@ export default function PracticeHubClient({ locale }: Props) {
                 data-testid={`practice-tile-${mode}`}
                 data-complete="false"
                 data-next={isNext ? 'true' : 'false'}
-                className={`${baseClass} ${MODE_TINT[mode]} active:translate-y-px md:hover:shadow-hard-lg md:hover:-translate-y-0.5 ${
-                  isNext ? 'ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy' : ''
+                className={`${baseClass} ${MODE_TINT[mode]} active:translate-y-px md:hover:shadow-hard-lg md:hover:-translate-y-1 ${
+                  isNext ? 'ring-2 ring-neo-cozy ring-offset-2 ring-offset-neo-navy' : ''
                 }`}
               >
                 {inner}

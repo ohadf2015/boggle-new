@@ -267,7 +267,7 @@ export default function RareGems({
           </div>
         </div>
 
-        <div aria-live="polite" className="px-3 py-1 rounded-neo border-2 border-neo-black font-bold bg-neo-lime text-neo-black">
+        <div aria-live="polite" className="px-3 py-1 rounded-neo border-2 border-neo-black font-bold bg-neo-cozy text-neo-black">
           {score} {t('brain.drills.points')}
         </div>
       </div>
@@ -335,7 +335,7 @@ export default function RareGems({
             <AdaptiveMotion.button
               whileTap={{ scale: 0.95 }}
               onClick={startGame}
-              className="px-8 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold text-lg uppercase bg-neo-purple text-white"
+              className="px-8 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold text-lg uppercase bg-neo-cozy text-neo-black hover:-translate-y-1 hover:shadow-hard-xl transition focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cozy"
             >
               {t('brain.drills.start')}
             </AdaptiveMotion.button>

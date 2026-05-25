@@ -45,7 +45,7 @@ export default function RareGemsCompletePhase({
         <Trophy
           className={cn(
             'w-14 h-14 sm:w-20 sm:h-20 mx-auto',
-            reachedTarget ? 'text-neo-lime' : 'text-gray-400',
+            reachedTarget ? 'text-neo-cozy' : 'text-gray-400',
           )}
         />
       </AdaptiveMotion.div>
@@ -67,7 +67,7 @@ export default function RareGemsCompletePhase({
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.7, type: 'spring' }}
-          className="text-3xl font-black text-neo-green"
+          className="text-3xl font-black text-neo-cozy"
         >
           <AdaptiveMotion.span
             initial={{ opacity: 0 }}
@@ -88,7 +88,7 @@ export default function RareGemsCompletePhase({
           >
             <Gem className="w-6 h-6 mx-auto text-neo-purple mb-1" />
             <p className="text-2xl font-black text-neo-white">{rareWordsFound}</p>
-            <p className="text-xs text-neo-white/70">{t('brain.drills.rareWords')}</p>
+            <p className="text-xs text-neo-white/90">{t('brain.drills.rareWords')}</p>
           </AdaptiveMotion.div>
           <AdaptiveMotion.div
             initial={{ opacity: 0, x: 20 }}
@@ -96,9 +96,9 @@ export default function RareGemsCompletePhase({
             transition={{ delay: 1 }}
             className="p-3 rounded-neo border-2 border-neo-black bg-slate-700"
           >
-            <Target className="w-6 h-6 mx-auto text-neo-green mb-1" />
+            <Target className="w-6 h-6 mx-auto text-neo-cozy mb-1" />
             <p className="text-2xl font-black text-neo-white">{wordsFoundCount}</p>
-            <p className="text-xs text-neo-white/70">{t('brain.drills.wordsFound')}</p>
+            <p className="text-xs text-neo-white/90">{t('brain.drills.wordsFound')}</p>
           </AdaptiveMotion.div>
         </div>
       </AdaptiveMotion.div>

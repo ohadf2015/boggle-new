@@ -71,6 +71,12 @@ module.exports = {
           "purple-muted": "var(--neo-purple-muted)",
           "purple-dark": "var(--neo-purple-dark)",
 
+          // COZY Family (Practice Hub)
+          cozy: "var(--neo-cozy)",
+          "cozy-light": "var(--neo-cozy-light)",
+          "cozy-muted": "var(--neo-cozy-muted)",
+          "cozy-dark": "var(--neo-cozy-dark)",
+
           // Error color
           red: "var(--neo-red)",
 
@@ -239,6 +245,7 @@ module.exports = {
         'hard-pink': '2px 2px 0px var(--neo-pink)',
         'hard-cyan': '2px 2px 0px var(--neo-cyan)',
         'hard-lime': '2px 2px 0px var(--neo-lime)',
+        'hard-cozy': '2px 2px 0px var(--neo-cozy)',
         'hard-purple': '2px 2px 0px #581c87',
         'hard-purple-lg': '3px 3px 0px #581c87',
         // Remove default shadows
@@ -755,6 +762,9 @@ module.exports = {
         },
         '[dir="rtl"] .shadow-hard-cyan': {
           boxShadow: '-4px 4px 0px var(--neo-cyan)',
+        },
+        '[dir="rtl"] .shadow-hard-cozy': {
+          boxShadow: '-4px 4px 0px var(--neo-cozy)',
         },
         '.badge-token-info': {
           backgroundColor: 'var(--badge-info)',

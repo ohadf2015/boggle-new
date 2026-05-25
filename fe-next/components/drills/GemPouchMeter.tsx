@@ -36,7 +36,7 @@ export default function GemPouchMeter({
       {/* Pouch fill bar */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
-          <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-neo-white/80">
+          <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-neo-white/90">
             <Gem className="w-3.5 h-3.5 text-neo-purple" />
             {t('brain.drills.gemPouch')}
           </span>
@@ -62,7 +62,7 @@ export default function GemPouchMeter({
             className={cn(
               'h-full transition-[width] duration-300 ease-out',
               full
-                ? 'bg-neo-lime motion-safe:animate-pulse'
+                ? 'bg-neo-cozy motion-safe:animate-pulse'
                 : 'bg-neo-purple',
             )}
           />

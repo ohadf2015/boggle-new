@@ -87,7 +87,7 @@ const ModeIntroCard: React.FC<ModeIntroCardProps> = ({ mode, t, onContinue, onSk
           />
         </AdaptiveMotion.div>
 
-        <p className="text-sm font-neo-body text-neo-cream/85 italic">
+        <p className="text-sm font-neo-body text-neo-cream/90 italic">
           {greet}
         </p>
 
@@ -102,7 +102,7 @@ const ModeIntroCard: React.FC<ModeIntroCardProps> = ({ mode, t, onContinue, onSk
         <button
           type="button"
           onClick={handleContinue}
-          className="mt-2 px-8 py-3 rounded-neo border-2 border-neo-black bg-neo-lime text-neo-black font-neo-display font-bold shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
+          className="mt-2 px-8 py-3 rounded-neo border-2 border-neo-black bg-neo-cozy text-neo-black font-neo-display font-bold shadow-hard transition active:translate-y-px active:shadow-hard-pressed hover:-translate-y-1 hover:shadow-hard-xl focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cozy"
         >
           {cta}
         </button>
@@ -110,7 +110,7 @@ const ModeIntroCard: React.FC<ModeIntroCardProps> = ({ mode, t, onContinue, onSk
         <button
           type="button"
           onClick={handleSkip}
-          className="text-xs text-neo-cream/50 underline-offset-4 hover:underline focus-visible:underline"
+          className="text-xs text-neo-cream/70 underline-offset-4 hover:underline focus-visible:underline hover:text-neo-cream focus-visible:text-neo-cream transition-colors"
         >
           {skip}
         </button>

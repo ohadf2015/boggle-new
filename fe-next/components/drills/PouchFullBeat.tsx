@@ -31,7 +31,7 @@ export default function PouchFullBeat({
             initial={{ scale: 0.6, rotate: -4 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 320, damping: 14 }}
-            className="flex flex-col items-center gap-2 px-8 py-6 rounded-neo border-3 border-neo-black shadow-hard-lg bg-neo-lime text-neo-black"
+            className="flex flex-col items-center gap-2 px-8 py-6 rounded-neo border-3 border-neo-black shadow-hard-lg bg-neo-cozy text-neo-black"
           >
             <Sparkles className="w-10 h-10 motion-safe:animate-neo-wobble" />
             <span className="text-2xl font-black uppercase tracking-wide">

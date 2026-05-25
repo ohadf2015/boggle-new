@@ -2035,6 +2035,12 @@ html.lexi-native [data-selectable] {
     --neo-purple-muted: #7c4fcc; /* HSL(258, 50%, 56%) - understated depth */
     --neo-purple-dark: #5b21b6; /* HSL(258, 70%, 42%) - authoritative */
 
+    /* COZY Family (Practice Hub & Solo Modes) */
+    --neo-cozy: #f4a261; /* HSL(26, 86%, 66%) - warm peach */
+    --neo-cozy-light: #f8c291; /* HSL(28, 86%, 77%) - soft highlight */
+    --neo-cozy-muted: #e08945; /* HSL(26, 73%, 57%) - subtle shade */
+    --neo-cozy-dark: #c96a27; /* HSL(25, 68%, 47%) - strong anchor */
+
     /* Error color */
     --neo-red: #ff3366;
 
@@ -3901,6 +3907,12 @@ html[data-cosy='true'] {
   --neo-purple-light: hsl(324 34% 80%);
   --neo-purple-muted: hsl(322 22% 74%);
   --neo-purple-dark: hsl(320 26% 60%);
+
+  /* COZY (practice/solo) -> muted peach / terracotta */
+  --neo-cozy: hsl(26 60% 66%);
+  --neo-cozy-light: hsl(28 64% 77%);
+  --neo-cozy-muted: hsl(26 50% 57%);
+  --neo-cozy-dark: hsl(25 45% 47%);
 
   /* Celebration accents — warm gold + clay, charcoal text. --neo-red is
      intentionally NOT overridden: error/destructive stays hot (safety). */
