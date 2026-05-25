@@ -2101,8 +2101,18 @@ html.lexi-native [data-selectable] {
     /* AdMob banner height (incl. its own safe-area) — published by AnchoredNativeBanner. */
     --admob-banner-height: 0px;
     /* Single composed offset every fixed-bottom-aware page consumes. Avoids
-       triple-counting safe-area: each layer's var already includes its own. */
-    --bottom-stack-height: calc(var(--bottom-nav-height, 0px) + var(--admob-banner-height, 0px));
+       triple-counting safe-area: each layer's var already includes its own.
+       Each component is CLAMPED to a sane max: the Android 15+ safe-area plugin
+       can report pathological insets (300+px) that inflate --bottom-nav-height
+       and --admob-banner-height, turning this bottom reservation into a huge
+       empty band on the native app (the home "blank section below the ad").
+       A real bottom nav is ~64–112px and an adaptive banner ~50–90px, so 120px
+       each is generous headroom while making a runaway reservation impossible.
+       On web both vars are 0px, so the clamps are no-ops there. */
+    --bottom-stack-height: calc(
+      min(var(--bottom-nav-height, 0px), 120px) +
+        min(var(--admob-banner-height, 0px), 120px)
+    );
 
     /* Snappy Timing Functions */
     --ease-snap: cubic-bezier(0.68, -0.55, 0.265, 1.55);
