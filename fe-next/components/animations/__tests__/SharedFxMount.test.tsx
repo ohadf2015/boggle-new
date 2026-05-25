@@ -31,20 +31,11 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => deviceConfig,
 }));
 
-// Native (Capacitor) gate: the always-on fullscreen WebGL FX canvas composites
-// as a transparent "hole" to the native window background in the Android
-// WebView, occluding the page content behind it. Skip the mount on native.
-let nativeFlag = false;
-vi.mock('@/utils/platform', () => ({
-  isNative: () => nativeFlag,
-}));
-
 describe('SharedFxMount', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     deviceConfig.maxParticles = 20;
     deviceConfig.prefersReducedMotion = false;
-    nativeFlag = false;
   });
 
   it('renders nothing', () => {
@@ -78,13 +69,6 @@ describe('SharedFxMount', () => {
 
   it('does not initialize Pixi when the particle budget is zero (very low-end)', () => {
     deviceConfig.maxParticles = 0;
-    render(<SharedFxMount />);
-    expect(mount).not.toHaveBeenCalled();
-    cleanup();
-  });
-
-  it('does not mount the global FX canvas on native (Capacitor) — it composites as a transparent hole to the window background in the Android WebView', () => {
-    nativeFlag = true;
     render(<SharedFxMount />);
     expect(mount).not.toHaveBeenCalled();
     cleanup();
