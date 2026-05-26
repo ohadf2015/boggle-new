@@ -285,6 +285,10 @@ export function useGridInteraction({
     if (selectedCells.length >= 3) {
       if (autoSubmitTimeoutRef.current) clearTimeout(autoSubmitTimeoutRef.current);
       autoSubmitTimeoutRef.current = setTimeout(() => {
+        // Combo auto-submit is mobile-only ergonomics (finger-still-on-last-tile
+        // chain-words). Desktop pauses mid-drag must NOT silently submit — players
+        // expect explicit release/double-click. Reported in MP classic.
+        if (!activePointerIsTouchRef.current) return;
         if (selectedCells.length >= 3 && isTouchingRef.current) {
           const formedWord = selectedCells.map(c => c.letter).join('');
           if (onPathSubmit) onPathSubmit([...selectedCells]);
