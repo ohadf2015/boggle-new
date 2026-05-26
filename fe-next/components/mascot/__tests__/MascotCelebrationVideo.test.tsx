@@ -84,6 +84,18 @@ describe('MascotCelebrationVideo', () => {
     expect(onDone).toHaveBeenCalledTimes(1);
   });
 
+  it('overlay is non-blocking: click-through and no dimming backdrop', () => {
+    // The celebration must not hide ("kiss") the results text or block
+    // scroll/taps. Overlay should be pointer-events:none with no dark/blur
+    // backdrop, so the live results stay readable and scrollable while the
+    // mascot video + halo glow play on top, then fade.
+    render(<MascotCelebrationVideo kind="champion" />);
+    const overlay = screen.getByTestId('mascot-celebration-video');
+    expect(overlay.style.pointerEvents).toBe('none');
+    expect(overlay.style.background).toBe('');
+    expect(overlay.style.backdropFilter).toBe('');
+  });
+
   it('never calls onDone when autoDismissMs is 0', () => {
     const onDone = vi.fn();
     render(<MascotCelebrationVideo kind="knight" autoDismissMs={0} onDone={onDone} />);
