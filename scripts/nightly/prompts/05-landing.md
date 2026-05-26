@@ -23,10 +23,16 @@ Default: pick the WORST-converting landing page with ≥200 sessions in the last
 
 **ONLY ONE landing variant per week** — if any `landing_variant_*_v1` flag is <7 days old, skip the landing variant and consider STEP 0 instead.
 
-═══ STEP 0 — Experimental game mode (admin-only visibility on landing/hub) ═══
+═══ STEP 0 — Experimental game mode OR polish (DEFAULT path — try this FIRST) ═══
 *Permission granted by user (see `Permissions` block in preamble). Updated 2026-05-19: mode lives at its natural route; the hub tile that links to it is wrapped in an `isAdmin` check so only the admin sees the entry point. User playtests manually then decides on public rollout.*
 
-Look at `docs/nightly/loop-improvements/*.md` from the last 3 nights AND `docs/nightly/ideas/*.md` from lane 4. If a NEW game-mode concept appears with **≥2 mentions of evidence (data citation + competitor signal)**, you MAY ship an EXPERIMENTAL implementation in place of the landing variant this week.
+**Execution order: STEP 0 is the DEFAULT.** Only fall through to STEP 1 (landing CVR) if NONE of these signals fire:
+
+1. **`polish:try:<slug>:<hash>` callback in `docs/nightly/feedback/*.ndjson` from the last 7 days** — founder explicitly voted YES on a polish idea. Find the matching `#### Top game-mode improvement idea` block in `docs/nightly/reports/*.md` (grep the title) and SHIP its `Concrete change:` line tonight. This is the strongest signal — never override it with STEP 1.
+2. **`idea:build:<hash>` callback in feedback ndjson** — founder voted YES on a game-mode idea. Build it tonight as an experimental mode (see constraints below).
+3. **NEW game-mode concept in `docs/nightly/loop-improvements/*.md` (last 3 nights) OR `docs/nightly/ideas/*.md` (lane 4)** with ≥2 mentions of evidence (data citation + competitor signal) — ship as experimental mode.
+
+If ANY of (1)/(2)/(3) fires → ship via STEP 0, skip STEP 1 entirely, do NOT call PostHog. If NONE fires → fall through to STEP 1 (bounded).
 
 Constraints (ALL must hold):
 - **Mode route at its natural slug**: `fe-next/app/[locale]/<mode-slug>/page.tsx`. The page itself is plain code — no auth gate, no admin lock. If a non-admin types the URL they get the game, but they should never have a path to discover it.
@@ -48,7 +54,7 @@ Constraints (ALL must hold):
   - Next step for user: open URL or refresh home as admin, play 1 round, send 👍/👎 to bot
   ```
 
-If no concept passes the gate, fall back to the landing variant path below.
+If none of the STEP 0 signals (polish:try, idea:build, evidenced new concept) fire, only THEN fall through to STEP 1.
 
 ═══ HARD RULES ═══
 - **Ground-truth audit** before writing copy: read `fe-next/public/llms.txt`, `fe-next/app/sitemap.ts`, and the actual mode pages your copy references. No fabricated features, modes, languages.
@@ -57,14 +63,23 @@ If no concept passes the gate, fall back to the landing variant path below.
 - **5 locales required** for any new strings (en, he, sv, ja, es). Hebrew RTL-safe.
 - **Reuse design tokens** — no new colors/spacing outside `tailwind.config.ts` palette. Read `.impeccable.md` for brand context.
 
-═══ STEP 1 — Pull CVR data ═══
-Use **posthog** MCP. For each landing route (homepage + every `/[locale]/<mode>` and `/[locale]/<gsc-landing>`):
-  • Sessions last 14d
-  • Conversion to `game_started` (mode plays) and `signup_complete`
-  • Pick the route with ≥200 sessions AND lowest CVR
+═══ STEP 1 — Pull CVR data (BOUNDED — was the lane's 0/6 root cause) ═══
 
-Skip if all landings are within 10% of each other (no clear loser).
-Skip if no landing has ≥200 sessions (too noisy).
+**EXECUTION RULE — max 2 PostHog calls, hard-bail after 180s wall-clock**
+
+The old "for each landing route" loop is what made this lane 0/6 for six nights running (05-21..05-26): PostHog `query-trends` with breakdowns hangs intermittently, and looping over ~91 route directories × 5 locales burned the entire 1500s budget before any code was written. Constrain hard:
+
+1. **Call 1 (homepage CVR, ~60s budget)**: ONE PostHog trends query, no breakdown:
+   - `event: $pageview`, filter `$pathname starts_with "/en/"` (no per-locale split), `dateRange: -14d`
+   - Compute CVR as `game_started` count / `$pageview` count over the same window
+2. **Call 2 (ONLY if call 1 succeeded AND CVR < 40%)**: ONE trends query with `breakdownBy: $pathname`, limit 10
+   - Pick the route with ≥200 sessions AND lowest CVR; that's your target
+
+**If either call hangs (returns `MCP_TOOL_TIMEOUT` / takes >90s / errors):** SKIP STEP 1 entirely and execute STEP 0 instead — it doesn't need PostHog (reads `docs/nightly/loop-improvements/*.md` + `docs/nightly/feedback/*.ndjson`). Do NOT retry. Do NOT try a third call. The polish / experimental-mode path is fully viable without CVR data.
+
+**If homepage CVR ≥40% AND no clear loser in call 2:** also skip to STEP 0 (no signal to act on).
+
+**Never** invoke `mcp__posthog__exec` more than 2 times in this lane. If a fix genuinely needs more data, log a follow-up in `docs/nightly/triage-queue.md` and exit cleanly — don't burn the budget chasing it.
 
 ═══ STEP 2 — Design the variant ═══
 Invoke the `frontend-design` skill (or `impeccable:craft`) with the existing page as context. Generate ONE variant. Areas to consider:

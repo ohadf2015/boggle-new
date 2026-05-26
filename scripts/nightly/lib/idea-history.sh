@@ -166,5 +166,56 @@ if [ -d "$FEEDBACK" ]; then
   fi
 fi
 
+# ─── RECENT REDDIT PITCHES — added 2026-05-26 after founder noted reply text was
+# template-y (3 nights in a row used the same "lexiclash.live · multiplayer
+# Boggle · no signup" shape, just different lead-ins). Surface enough of past
+# replies that the lane can SEE the rut and write something different. Hard
+# rules: never reuse a thread URL within the 7-day window, never reuse a
+# lead-in phrase, never use the same reply SHAPE (URL→feature triple→close).
+REDDIT_TMP=$(mktemp); : > "$REDDIT_TMP"
+while IFS= read -r f; do
+  [ -n "$f" ] || continue
+  date=$(basename "$f" .md)
+  awk -v date="$date" '
+    /^#### Top Reddit pick of the day/ { in_p=1; thread=""; sub_=""; lead=""; mention=0; next }
+    in_p && /^- \*\*Thread:\*\*/ { sub(/^- \*\*Thread:\*\* */, ""); thread=$0; next }
+    in_p && /^- \*\*Subreddit:\*\*/ { sub(/^- \*\*Subreddit:\*\* */, ""); sub_=$0; next }
+    in_p && /Suggested reply/ { in_r=1; next }
+    in_r && /^[A-Za-z]/ && lead=="" { lead=substr($0, 1, 120) }
+    in_r && /lexiclash\.live/ { mention=1 }
+    in_p && (/^####/ || /^### /) && thread {
+      printf "%s\t%s\t%s\t%s\t%d\n", date, thread, sub_, lead, mention
+      in_p=0; in_r=0; thread=""
+    }
+    END {
+      if (in_p && thread) printf "%s\t%s\t%s\t%s\t%d\n", date, thread, sub_, lead, mention
+    }
+  ' "$f" >> "$REDDIT_TMP" 2>/dev/null
+done <<< "$FILES"
+if [ -s "$REDDIT_TMP" ]; then
+  echo
+  echo "### 📣 RECENT REDDIT PITCHES — vary the angle, NEVER reuse a thread URL, lead-in, or shape"
+  echo
+  echo "_HARD RULES for tonight's reply:_"
+  echo "1. **Thread URL** in this list → SKIP that thread entirely (pick a different one)."
+  echo "2. **Lead-in phrase** in this list → use a DIFFERENT opening. Don't paraphrase — rewrite the angle."
+  echo "3. **Shape** = \`URL → 3-feature-bullets → close\` is the rut. If 2+ recent replies used it, write a DIFFERENT shape tonight: ask the OP a follow-up question, share a player anecdote, contribute non-self-promo first, or skip the URL until paragraph 2."
+  echo "4. **Don't lead with \`lexiclash.live\`** if 2+ recent replies did. Drop the URL deep in a 4+ sentence reply that genuinely answers the OP."
+  echo
+  awk -F'\t' '{ printf "- %s  r/%s  — \`%s\`\n  > %s%s\n", $1, ($3 ? $3 : "?"), $2, ($4 ? $4 : "(no lead-in captured)"), ($5 ? "  [mentioned lexiclash.live]" : "")  }' "$REDDIT_TMP" | sed 's#  r/r/#  r/#'
+fi
+rm -f "$REDDIT_TMP"
+
+# Reddit-card feedback (reddit:will_post/skip/redraft:<hash>) — what the founder
+# thinks of the actual drafts that went out, joined by the URL-hash in run.sh.
+if [ -d "$FEEDBACK" ]; then
+  rverdicts=$(grep -rhoE 'reddit:(will_post|skip|redraft):[a-f0-9]+' "$FEEDBACK"/*.ndjson 2>/dev/null | sort -u)
+  if [ -n "$rverdicts" ]; then
+    echo; echo "### 📨 Founder verdicts on past Reddit drafts (hash = first 8 of \`shasum permalink\`):"
+    printf '%s\n' "$rverdicts" | sed -E 's#reddit:([a-z_]+):(.*)#- \2 → \1#'
+    echo "  ↳ \`will_post\` = subreddit + draft style worked, repeat the SHAPE not the WORDING. \`skip\` = avoid that subreddit AND that thread style. \`redraft\` = same thread, different reply tone."
+  fi
+fi
+
 rm -f "$ROWS" "$IMPROVE" "$PASSED" "$BUILT" "$SILENT"
 exit 0
