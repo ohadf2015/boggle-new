@@ -40,11 +40,14 @@ report_files() {
 }
 
 # Does any feedback callback record a given verdict for hash $1?
+# Recognizes both legacy `idea:*` (lane-4 top-idea card) and `polish:*` (lane-4
+# game-mode improvement card). polish callbacks carry `<slug>:<hash>` — match the
+# trailing hash so the slug doesn't have to be passed in.
 verdict_for() { # hash → prints PASS|BUILD|""
   local h="$1"
   [ -d "$FEEDBACK" ] || { echo ""; return; }
-  if grep -rqlE "idea:pass:$h([^0-9a-f]|\")" "$FEEDBACK"/*.ndjson 2>/dev/null; then echo "PASS"; return; fi
-  if grep -rqlE "idea:build:$h([^0-9a-f]|\")" "$FEEDBACK"/*.ndjson 2>/dev/null; then echo "BUILD"; return; fi
+  if grep -rqlE "(idea:pass|polish:pass:[a-z0-9-]+):$h([^0-9a-f]|\")" "$FEEDBACK"/*.ndjson 2>/dev/null; then echo "PASS"; return; fi
+  if grep -rqlE "(idea:build|polish:try:[a-z0-9-]+):$h([^0-9a-f]|\")" "$FEEDBACK"/*.ndjson 2>/dev/null; then echo "BUILD"; return; fi
   echo ""
 }
 
@@ -69,11 +72,29 @@ while IFS= read -r f; do
     h=$(printf '%s\n' "$text" | shasum | cut -c1-8)
     printf '%s|%s|%s\n' "$h" "$date" "$text" >> "$ROWS"
   done < <(grep -E '^- Top idea:' "$f" 2>/dev/null)
-  # Existing-mode improvement titles.
-  while IFS= read -r t; do
-    title=${t#- Title: }
-    [ -n "$title" ] && printf '%s (%s)\n' "$title" "$date" >> "$IMPROVE"
-  done < <(awk '/^#### Top game-mode improvement idea/{f=1;next} f&&/^- Title:/{print; f=0}' "$f" 2>/dev/null)
+  # Game-mode improvement (polish) blocks. The new format may emit up to 2 blocks
+  # per report, each with `- Title:` + `- Mode:`; keep scanning across blocks
+  # (don't reset f after the first hit) so we capture both. Stop at the next ####
+  # heading or blank line. Hash = shasum(title|mode) — MUST match run.sh's card hash
+  # so verdict_for joins on the same key the founder's polish:* button uses.
+  while IFS=$'\t' read -r title mode; do
+    [ -n "$title" ] || continue
+    [ -n "$mode" ] || mode="unknown"
+    h=$(printf '%s|%s' "$title" "$mode" | shasum | cut -c1-8)
+    printf '%s\t%s\t%s\t%s\n' "$h" "$date" "$mode" "$title" >> "$IMPROVE"
+  done < <(awk '
+    /^#### Top game-mode improvement idea/ {
+      if (in_block && title) printf "%s\t%s\n", title, mode
+      in_block=1; title=""; mode=""; next
+    }
+    /^(####|### )/ && in_block {
+      if (title) printf "%s\t%s\n", title, mode
+      in_block=0; title=""; mode=""; next
+    }
+    in_block && /^- Title:[[:space:]]*/ { sub(/^- Title:[[:space:]]*/, ""); title=$0; next }
+    in_block && /^- Mode:[[:space:]]*/  { sub(/^- Mode:[[:space:]]*/, "");  mode=$0;  next }
+    END { if (in_block && title) printf "%s\t%s\n", title, mode }
+  ' "$f" 2>/dev/null)
 done <<< "$FILES"
 
 if [ ! -s "$ROWS" ]; then
@@ -110,8 +131,30 @@ if [ -s "$SILENT" ]; then
   echo; echo "### ⏳ Pitched, no verdict — do NOT repeat; if a mechanic here was pitched 2×+, the founder is implicitly ignoring it, drop it:"; cat "$SILENT"
 fi
 if [ -s "$IMPROVE" ]; then
-  echo; echo "### 🎮 Existing-mode improvements already surfaced (don't repeat the same one):"
-  sort -u "$IMPROVE" | sed 's/^/- /'
+  POL_PASS=$(mktemp); POL_TRY=$(mktemp); POL_SILENT=$(mktemp)
+  : > "$POL_PASS"; : > "$POL_TRY"; : > "$POL_SILENT"
+  for h in $(cut -f1 "$IMPROVE" | sort -u); do
+    row=$(grep -m1 "^$h	" "$IMPROVE")
+    date=$(printf '%s' "$row" | cut -f2)
+    mode=$(printf '%s' "$row" | cut -f3)
+    title=$(printf '%s' "$row" | cut -f4-)
+    v=$(verdict_for "$h")
+    case "$v" in
+      PASS)  printf -- '- "%s" [mode=%s] (%s)\n' "$title" "$mode" "$date" >> "$POL_PASS" ;;
+      BUILD) printf -- '- "%s" [mode=%s] (%s)\n' "$title" "$mode" "$date" >> "$POL_TRY"  ;;
+      *)     printf -- '- "%s" [mode=%s] (%s)\n' "$title" "$mode" "$date" >> "$POL_SILENT" ;;
+    esac
+  done
+  if [ -s "$POL_PASS" ]; then
+    echo; echo "### ❌🎮 Polish ideas the founder PASSED — HARD BAN, never resurface (mechanic-level dedup):"; cat "$POL_PASS"
+  fi
+  if [ -s "$POL_TRY" ]; then
+    echo; echo "### 🔨🎮 Polish ideas the founder said TRY — lane 5 ships these (do NOT re-pitch as new):"; cat "$POL_TRY"
+  fi
+  if [ -s "$POL_SILENT" ]; then
+    echo; echo "### ⏳🎮 Polish ideas pitched, no verdict — pick a DIFFERENT mode or DIFFERENT return-hook this time:"; cat "$POL_SILENT"
+  fi
+  rm -f "$POL_PASS" "$POL_TRY" "$POL_SILENT"
 fi
 # Mode-card feedback (mode:keep/drop/tweak/promote:<slug>) — what the founder
 # thinks of modes already shipped, so lane 4 doesn't re-suggest a dropped one.

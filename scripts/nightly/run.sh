@@ -550,6 +550,9 @@ Why this format: Telegram renders a bare URL as a tappable link, and triple-back
 🎮 *Game-mode idea* (only if no mode was shipped this run — surface the top concept from lane 4 / lane 7 instead)
 <one line: name + why>
 
+🎨 *Polish ideas* (ONLY if the report has at least one `#### Top game-mode improvement idea` block — these are separate try/pass cards sent below this summary, so here just NAME them so the founder knows what's coming. One line per block, max 2 lines total.)
+> <Mode-slug>: <Title> — <Return-hook>
+
 → <one-line tomorrow focus>
 \`\`\`
 
@@ -687,6 +690,55 @@ $IDEA_LINE
       "$TG" kbd "$IDEA_MSG" "$IDEA_KBD" >/dev/null 2>&1
       log "sent game-mode-idea card (hash=$IDEA_HASH)"
     fi
+  fi
+
+  # Game-mode polish ideas — lane 4 emits up to 2 `#### Top game-mode improvement
+  # idea` blocks with locked structure (Title / Mode / Return-hook / Pitch /
+  # Concrete change / Evidence). One card per block, 2 max. The slug+hash is the
+  # callback key; verdict feeds idea-history.sh and lane-5's STEP 0 next night,
+  # so a 👍 Try it turns into shipped polish without a separate human step.
+  POLISH_BLOCKS=$(awk '
+    /^#### Top game-mode improvement idea/ { if (block) print block "\n---POLISH-BLOCK-SEP---"; block="" ; in_b=1; next }
+    /^(####|### )/ && in_b { print block "\n---POLISH-BLOCK-SEP---"; block=""; in_b=0; next }
+    in_b { block = block "\n" $0 }
+    END { if (block) print block "\n---POLISH-BLOCK-SEP---" }
+  ' "$REPORT" 2>/dev/null)
+
+  if [ -n "$POLISH_BLOCKS" ]; then
+    POLISH_COUNT=0
+    POLISH_TMP=$(mktemp); echo "$POLISH_BLOCKS" > "$POLISH_TMP"
+    while IFS= read -r line; do
+      if [ "$line" = "---POLISH-BLOCK-SEP---" ]; then
+        if [ -n "${P_TITLE:-}" ] && [ -n "${P_MODE:-}" ] && [ "$POLISH_COUNT" -lt 2 ]; then
+          P_HASH=$(printf '%s|%s' "$P_TITLE" "$P_MODE" | shasum | cut -c1-8)
+          POLISH_MSG="🎮 *Polish idea* — \`${P_MODE}\` (unpublished mode)
+*${P_TITLE}*
+↩️ Return-hook: ${P_HOOK:-unspecified}
+
+${P_PITCH:-}
+
+📐 Concrete change:
+${P_CHANGE:-(see report)}
+
+(👍 Try it → lane 5 ships this polish tomorrow night. 👎 Pass → hard-banned. 🔁 Combine → log for rework.)"
+          POLISH_KBD="[[{\"text\":\"👍 Try it\",\"callback_data\":\"polish:try:${P_MODE}:${P_HASH}\"},{\"text\":\"👎 Pass\",\"callback_data\":\"polish:pass:${P_MODE}:${P_HASH}\"}],[{\"text\":\"🔁 Combine / rework\",\"callback_data\":\"polish:combine:${P_MODE}:${P_HASH}\"}]]"
+          "$TG" kbd "$POLISH_MSG" "$POLISH_KBD" >/dev/null 2>&1
+          log "sent polish-idea card (mode=$P_MODE hash=$P_HASH)"
+          POLISH_COUNT=$((POLISH_COUNT + 1))
+        fi
+        unset P_TITLE P_MODE P_HOOK P_PITCH P_CHANGE
+        continue
+      fi
+      case "$line" in
+        "- Title: "*)            P_TITLE="${line#- Title: }" ;;
+        "- Mode: "*)             P_MODE="${line#- Mode: }" ;;
+        "- Return-hook: "*)      P_HOOK="${line#- Return-hook: }" ;;
+        "- Pitch: "*)            P_PITCH="${line#- Pitch: }" ;;
+        "- Concrete change: "*)  P_CHANGE="${line#- Concrete change: }" ;;
+      esac
+    done < "$POLISH_TMP"
+    rm -f "$POLISH_TMP"
+    [ "$POLISH_COUNT" = "0" ] && log "polish: no parseable blocks (missing Title/Mode fields)"
   fi
 fi
 

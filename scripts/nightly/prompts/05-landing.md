@@ -4,13 +4,16 @@ You are running the nightly landing/CVR lane for LexiClash. Today: __TODAY__. Wo
 __LEARNINGS__
 
 ═══ RECENT TELEGRAM-BUTTON FEEDBACK ═══
-Read every `.ndjson` file in `docs/nightly/feedback/` (last 7 days). Look for lines where `callback_data` starts with `mode:` or `idea:` — user feedback on prior game-mode ships / ideas. Treat:
+Read every `.ndjson` file in `docs/nightly/feedback/` (last 7 days). Look for lines where `callback_data` starts with `mode:`, `idea:`, or `polish:` — user feedback on prior game-mode ships / ideas / polish proposals. Treat:
   - `mode:keep:<slug>` → that mode direction worked; build adjacent concepts
   - `mode:drop:<slug>` → that mode failed; do NOT propose anything similar this week
   - `mode:promote:<slug>` → user wants to make it public; lane 5 should propose the promotion path in the report (rollout flag + landing copy + sitemap entry) for next-night work
   - `mode:tweak:<slug>` → user wants iteration; check the chat history (msg_text_first120 field) for the change request
   - `idea:build:<hash>` → user voted YES on yesterday's idea; ship it tonight
   - `idea:pass:<hash>` → user voted NO; don't pitch the same idea again
+  - `polish:try:<slug>:<hash>` → user voted YES on a game-mode polish idea (lane-4 `#### Top game-mode improvement idea` block; slug = the `Mode:` field, hash = shasum of `Title|Mode`). **Ship THIS polish to that mode tonight in place of the landing variant.** Find the matching block in the prior report (grep `docs/nightly/reports/*.md` for the title, confirm hash) — its `Concrete change:` line is your spec. Treat as a THIRD STEP 0 evidence path on par with lane-4 ideas / loop-improvements citations; no new-mode constraint applies (you're polishing an existing route).
+  - `polish:pass:<slug>:<hash>` → user vetoed that polish; don't ship it (idea-history hard-bans it from re-pitch already)
+  - `polish:combine:<slug>:<hash>` → user wants rework combined with sibling concept; do NOT ship verbatim, log a note in tonight's lane-5 report for next-night lane 4 to iterate on
 
 ═══ SKILLS TO USE ═══
 From the **Specialized Skills** table above, invoke the skills listed for **lane 05 landing**. Design-quality skills (`frontend-design` or `impeccable:craft`) are MANDATORY here. Use `web-interface-guidelines` or `code-review` for the post-edit review pass.

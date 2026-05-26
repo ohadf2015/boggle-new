@@ -201,10 +201,26 @@ Append to `docs/nightly/reports/__TODAY__.md` — this exact format is parsed by
 ```
 
 #### Top game-mode improvement idea
-- Title: <name — a fresh improvement to an EXISTING mode (Word Tower / Blast / Word Wheel / WordCraft / MP / Daily). Must be a DIFFERENT mechanic family from the `- Top idea:` line above AND absent from the idea-history ledger.>
-- Source signal: <metric or thread that suggests this>
-- Effort: S/M/L
-- Why it'd help: <one-line>
+**FOCUS — UNPUBLISHED modes first.** The founder wants to make admin-gated / experimental modes (the ones not yet shown to all players) GOOD ENOUGH to promote. Polishing a public mode helps the player base less than turning an experimental mode into something players want to come back to.
+
+Discovery (do this BEFORE picking a Mode):
+  1. `grep -rEn "isAdmin\s*&&" fe-next/app/[locale]/page.tsx fe-next/components/home/ fe-next/components/hub/ 2>/dev/null` — admin-only hub tiles → those routes are unpublished.
+  2. Last 14d reports: `grep -hA5 "Experimental game mode shipped" docs/nightly/reports/*.md | grep -E "Mode:|URL:" | sort -u` → other admin-gated experimentals.
+  3. PostHog session counts will be near-zero for these (admin self-play only) — that's expected. Reason from design + competitor signal + feedback ndjson, not funnels.
+  4. Public modes (Word Tower / Blast / Word Wheel / WordCraft / MP / Daily) only as FALLBACK when no unpublished mode is a viable polish target.
+
+Emit **up to 2 blocks** (founder gets two polish cards in the Telegram digest; each card has 👍 Try it / 👎 Pass / 🔁 Combine buttons). Skip the second block if you don't have a second high-quality idea — quality over quantity.
+
+Each block MUST use this EXACT structure (run.sh parses it for the Telegram card; missing required fields = no card):
+
+- Title: <name — a fresh polish, DIFFERENT mechanic family from `- Top idea:` above AND absent from the idea-history ledger>
+- Mode: <slug — lowercase-kebab, matches the route, e.g. `word-tower`, `crane`, `cosy`, `wordcraft-run`>
+- Return-hook: <one of: streak | variable-reward | social-share | mastery | surprise> — the engagement primitive driving comeback
+- Pitch: <one line — what the player feels different about>
+- Concrete change: <what ships — specific component / file / mechanic, implementable in ≤1 night>
+- Evidence: <feedback ndjson ref / competitor thread / report line — why this hook fits this mode>
+
+(If a second block is included, repeat the `#### Top game-mode improvement idea` heading + the same 6 fields. Each block hashes independently so the founder can vote per-idea.)
 ```
 
-So every night the founder gets BOTH a new game-mode concept (`- Top idea:`) and a distinct improvement to an existing mode (`#### Top game-mode improvement idea`) — both genuinely new vs the ledger, both fed into the Telegram summary.
+So every night the founder gets BOTH a new game-mode concept (`- Top idea:`) and up to two distinct polish ideas for unpublished modes — each surfaced as its own Telegram card with try/pass/combine buttons. A `polish:try:<slug>:<hash>` verdict feeds into lane 5's STEP 0 evidence path the next night, so a thumbs-up turns into shipped polish without a separate human step.
