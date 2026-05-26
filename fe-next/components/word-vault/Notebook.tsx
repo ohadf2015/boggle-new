@@ -55,7 +55,7 @@ export function Notebook({ fragments }: { fragments: ClueFragment[] }) {
             {f.kind === 'sense' && (
               <span
                 className="inline-flex items-baseline gap-1 text-orange-200/80"
-                aria-label={ICON_LABEL_HE[f.icon] ?? f.icon}
+                aria-label={`clue-icon-${f.icon}`}
                 title={ICON_LABEL_HE[f.icon] ?? f.icon}
               >
                 <span className="text-base">{ICON_GLYPH[f.icon] ?? '·'}</span>
