@@ -43,6 +43,15 @@ const accepted = (word: string): WordFeedback => ({
   timestamp: Date.now(),
 });
 
+const rejected = (word: string): WordFeedback => ({
+  id: `rejected-${Date.now()}`,
+  type: 'rejected',
+  word,
+  message: 'Not a word',
+  timestamp: Date.now(),
+});
+
+
 describe('WordFormingArea — feedback bridge on submit', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => {
@@ -88,6 +97,28 @@ describe('WordFormingArea — feedback bridge on submit', () => {
     expect(screen.queryByText('✓')).not.toBeInTheDocument();
     expect(screen.queryByText('CAT')).not.toBeInTheDocument();
     expect(screen.getByText('···')).toBeInTheDocument();
+  });
+
+  it('rejection feedback clears faster than accepted (does not linger 5s)', () => {
+    // MP classic regression: a "stuck" ✗ pill that hung around for 5s while
+    // the player wanted to move on. Rejected/duplicate clear in 1.5s, not 5s.
+    const { rerender } = render(<WordFormingArea word="" letterCount={0} feedback={rejected('XQZ')} compact />);
+    expect(screen.getByText('✗')).toBeInTheDocument();
+
+    // Still visible mid-window.
+    act(() => { vi.advanceTimersByTime(1000); });
+    expect(screen.getByText('✗')).toBeInTheDocument();
+
+    // Gone shortly after — well before the accepted 5s window.
+    act(() => { vi.advanceTimersByTime(700); });
+    expect(screen.queryByText('✗')).not.toBeInTheDocument();
+    expect(screen.getByText('···')).toBeInTheDocument();
+
+    // Accepted on the same component still uses the longer 5s window.
+    rerender(<WordFormingArea word="" letterCount={0} feedback={accepted('CAT')} compact />);
+    expect(screen.getByText('✓')).toBeInTheDocument();
+    act(() => { vi.advanceTimersByTime(3000); });
+    expect(screen.getByText('✓')).toBeInTheDocument(); // still visible — accepted gets full 5s
   });
 
   it('bounds the bridge — an abandoned word (no feedback ever) clears, not lingers', () => {

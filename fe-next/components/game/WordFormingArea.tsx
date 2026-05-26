@@ -9,7 +9,15 @@ import { useLanguageSafe } from '@/contexts/LanguageContext';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 // How long the ✓/✗ note stays on screen after it arrives (ms).
-const FEEDBACK_VISIBLE_MS = 5000;
+// Rejected/duplicate get a SHORTER window so a bad word doesn't linger as a
+// "stuck" pill while the player wants to keep moving. Reported in MP classic.
+const FEEDBACK_VISIBLE_MS_ACCEPTED = 5000;
+const FEEDBACK_VISIBLE_MS_REJECTED = 1500;
+function feedbackVisibleMs(type: WordFeedback['type']): number {
+  return type === 'rejected' || type === 'duplicate'
+    ? FEEDBACK_VISIBLE_MS_REJECTED
+    : FEEDBACK_VISIBLE_MS_ACCEPTED;
+}
 // How long the just-submitted word bridges the gap until async feedback lands.
 // Covers the socket round-trip (50–200ms typ.). If nothing arrives by then the
 // word was abandoned (deselected, never submitted) so the pill clears rather
@@ -131,7 +139,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
         setVisibleFeedback(null);
         setLastWord('');
         feedbackTimeoutRef.current = null;
-      }, FEEDBACK_VISIBLE_MS);
+      }, feedbackVisibleMs(feedback.type));
     }
 
     return () => {
