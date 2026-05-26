@@ -32,8 +32,11 @@ import { useWordCraftKeyboardShortcuts } from '@/components/word-craft/hooks/use
 import type { SceneCtx } from '@/lib/word-craft/pixi/sceneCtx';
 import { mountAmbientSparkles, type PremiumCellRef } from '@/lib/word-craft/pixi/ambientSparkles';
 import { playTilePlaceRipple } from '@/lib/word-craft/pixi/scenes/tilePlaceRipple';
-import { playWordCommitWave } from '@/lib/word-craft/pixi/scenes/wordCommitWave';
-import { playScoreConfetti } from '@/lib/word-craft/pixi/scenes/scoreConfetti';
+import { playSpectacleCommit } from '@/lib/word-craft/celebration/playSpectacleCommit';
+import { useAccessibility } from '@/contexts/AccessibilityContext';
+import { classifyHeat, detectHeatTransition, type HeatBeat } from '@/lib/word-craft/celebration/heatTransition';
+import { WordCraftHeatStamp } from '@/components/word-craft/WordCraftHeatStamp';
+import { WordCraftScorePreviewBadge } from '@/components/word-craft/WordCraftScorePreviewBadge';
 import { playBotMoveReveal } from '@/lib/word-craft/pixi/scenes/botMoveReveal';
 import { playGameOverBurst } from '@/lib/word-craft/pixi/scenes/gameOverBurst';
 import { inferAxis, resolveTap } from '@/lib/word-craft/placement';
@@ -143,6 +146,7 @@ export default function WordCraftPageClient() {
   }, []);
 
   const game = useWordCraftGame({ seed, dict, locale, territoryEnabled, hotseat });
+  const { cosyMode } = useAccessibility();
 
   // Pass-and-play hand-off curtain: when the turn flips between the two human
   // seats, cover the screen so the incoming player can't see the outgoing
@@ -418,26 +422,41 @@ export default function WordCraftPageClient() {
 
       setScoreFloat({ score: newest.score, overdrive: false, isBingo, encouragement, key: len });
 
-      // Fire Pixi word commit wave (scan board by rackTileId rather than history).
+      // Fire tiered spectacle: tier resolver picks the FX bundle (ripple →
+      // wave → path trace → word stamp → edge flash → aurora) per commit
+      // size/streak. Cosy mode clamps huge/bingo down to "great" to keep
+      // calm-mode players from being blasted by fullscreen flashes.
       if (sceneCtx) {
         const placements: { row: number; col: number; letter: string; value: number }[] = [];
         const ids = new Set(newest.placedTileIds);
+        let premiumTriggered = false;
+        let hasRareTile = false;
         for (let r = 0; r < game.state.board.size; r++) {
           for (let c = 0; c < game.state.board.size; c++) {
             const tile = game.state.board.cells[r][c].tile;
             if (tile && ids.has(tile.rackTileId)) {
               placements.push({ row: r, col: c, letter: tile.letter, value: tile.value });
+              if (game.state.board.cells[r][c].premium) premiumTriggered = true;
+              if (tile.value >= 8) hasRareTile = true;
             }
           }
         }
-        playWordCommitWave(sceneCtx, { placements, totalScore: newest.score }).catch(() => {
+        playSpectacleCommit(sceneCtx, {
+          ctx: {
+            scoreThisTurn: newest.score,
+            tilesPlaced: newest.placedTileIds.length,
+            bingo: isBingo,
+            streak: game.state.streaks.player,
+            hasRareTile,
+            premiumTriggered,
+            heatLevel: game.state.heat,
+          },
+          placements,
+          word: newest.words[0] ?? '',
+          cosyMode,
+        }).catch(() => {
           // Pixi animations can fail on low-end devices; silently continue
         });
-        if (newest.score >= 30) {
-          playScoreConfetti(sceneCtx).catch(() => {
-            // Pixi animations can fail on low-end devices; silently continue
-          });
-        }
       }
 
       // Achievement: first word
@@ -464,7 +483,7 @@ export default function WordCraftPageClient() {
         setScoreFloat((prev) => prev ? { ...prev, overdrive: true } : prev);
       }
     }
-  }, [game.state.history, game.state.overdrive, juice, t, queueAchievement, sceneCtx, game]);
+  }, [game.state.history, game.state.overdrive, juice, t, queueAchievement, sceneCtx, game, cosyMode]);
 
   // --- Overdrive enter ---
   const prevOverdriveRef = useRef(false);
@@ -485,6 +504,35 @@ export default function WordCraftPageClient() {
     }
     prevOverdriveRef.current = cur;
   }, [game.state.overdrive, queueAchievement]);
+
+  // --- Heat-state transition beat ---
+  // Detects cold/warm/overdrive/burnout state crossings and fires the
+  // corresponding Pixi scene + DOM stamp. Stacks ABOVE existing celebrations
+  // so we keep the achievement toast/celebration overlay too.
+  const [heatBeat, setHeatBeat] = useState<HeatBeat | null>(null);
+  const prevHeatStateRef = useRef(classifyHeat({
+    heat: game.state.heat,
+    overdrive: game.state.overdrive,
+    burnout: game.state.burnout,
+  }));
+  useEffect(() => {
+    const current = classifyHeat({
+      heat: game.state.heat,
+      overdrive: game.state.overdrive,
+      burnout: game.state.burnout,
+    });
+    const beat = detectHeatTransition(prevHeatStateRef.current, current);
+    prevHeatStateRef.current = current;
+    if (!beat) return;
+    setHeatBeat(beat);
+    if (sceneCtx) {
+      import('@/lib/word-craft/pixi/scenes/heatBeat')
+        .then(({ playHeatBeat }) => playHeatBeat(sceneCtx, beat))
+        .catch(() => {
+          // Pixi animations can fail on low-end devices; silently continue
+        });
+    }
+  }, [game.state.heat, game.state.overdrive, game.state.burnout, sceneCtx]);
 
   // --- Burnout auto-skip after 1.5s ---
   const prevBurnoutRef = useRef(false);
@@ -761,6 +809,8 @@ export default function WordCraftPageClient() {
                 encouragement={scoreFloat.encouragement}
               />
             ) : null}
+            <WordCraftHeatStamp beat={heatBeat} onDone={() => setHeatBeat(null)} />
+            <WordCraftScorePreviewBadge board={game.state.board} placements={game.state.pendingPlacements} />
           </div>
         </div>
 

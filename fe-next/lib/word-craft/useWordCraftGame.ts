@@ -49,6 +49,12 @@ export interface WordCraftState {
    * side doesn't get a lopsided advantage.
    */
   hotseat: boolean;
+  /**
+   * Consecutive valid-commit count per side. Resets on PASS for the
+   * passing side. Used by the celebration tier resolver to escalate
+   * "on-fire" feedback. Capped at 99 to prevent state runaway.
+   */
+  streaks: { player: number; bot: number };
 }
 
 type Action =
@@ -97,6 +103,7 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
     territoryEnabled,
     lastCapture: null,
     hotseat,
+    streaks: { player: 0, bot: 0 },
   };
 }
 
@@ -145,6 +152,10 @@ function commitMove(
 
   const totalScore = baseScore + captureBonus;
   const updatedOwner: PlayerState = { ...owner, score: owner.score + totalScore, rack: newRack };
+  const nextStreaks = {
+    ...state.streaks,
+    [who]: Math.min(state.streaks[who] + 1, 99),
+  };
   const next: WordCraftState = {
     ...state,
     board: nextBoard,
@@ -157,6 +168,7 @@ function commitMove(
     consecutivePasses: 0,
     turn: who === 'player' ? 'bot' : 'player',
     lastCapture,
+    streaks: nextStreaks,
   };
   if (newRack.length === 0) {
     next.turn = 'over';
@@ -245,6 +257,7 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
       const turn: Turn = passes >= 2 ? 'over' : state.turn === 'player' ? 'bot' : 'player';
       const newWarns = state.overdrive ? state.overdriveWarns + 1 : state.overdriveWarns;
       const burnout = state.overdrive && newWarns >= 2;
+      const passingSide = state.turn === 'player' ? 'player' : 'bot';
       return {
         ...state,
         pendingPlacements: [],
@@ -253,7 +266,8 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
         turn,
         overdriveWarns: newWarns,
         burnout,
-        history: [...state.history, { who: state.turn === 'player' ? 'player' : 'bot', words: [], score: 0, placedTileIds: [] }],
+        history: [...state.history, { who: passingSide, words: [], score: 0, placedTileIds: [] }],
+        streaks: { ...state.streaks, [passingSide]: 0 },
       };
     }
     case 'SWAP': {
