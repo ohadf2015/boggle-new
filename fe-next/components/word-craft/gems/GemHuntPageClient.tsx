@@ -122,7 +122,7 @@ export default function GemHuntPageClient() {
         },
       });
     }
-  }, [state.lastCollection, state.turnIndex]);
+  }, [state.lastCollection, state.turnIndex, cosyMode]);
 
   const tilesRemaining = state.bag.tiles.length;
 
