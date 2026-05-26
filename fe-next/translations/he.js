@@ -9,21 +9,68 @@ const he = {
     "waitTurn": "ממתינים לתורכם…",
     "wins": "ניצח!",
     "yourTurn": "תורכם — הקלידו מילה",
-    "youWin": "ניצחתם!"
+    "youWin": "ניצחתם!",
+    "solo": {
+      "title": "שיריטורי לבד",
+      "tagline": "שרשרו מילות היראגנה מול הבוט.",
+      "back": "חזרה לשיריטורי",
+      "adminBadge": "תצוגה לאדמין",
+      "adminOnly": "שיריטורי לבד זמין רק לאדמינים.",
+      "headPrompt": "המילה הבאה מתחילה ב־",
+      "inputPlaceholder": "הקלידו מילה ביראגנה",
+      "submit": "שליחה",
+      "checking": "בודק…",
+      "giveUp": "אני נכנע",
+      "again": "עוד פעם",
+      "won": "ניצחתם!",
+      "lost": "הסיבוב נגמר",
+      "botThinking": "הבוט חושב…",
+      "difficultyLabel": "רמת קושי",
+      "difficulty": {"easy": "קל", "medium": "בינוני", "hard": "קשה"},
+      "err": {
+        "not-hiragana": "רק יראגנה (לדוגמה ねこ).",
+        "wrong-head": "אות פתיחה שגויה — התחילו מהאות המודגשת.",
+        "duplicate": "המילה כבר שוחקה.",
+        "not-in-dict": "לא נמצא במילון היפני."
+      },
+      "endReason": {
+        "player-no-move": "ויתרתם — הבוט מנצח.",
+        "player-ends-n": "המילה שלכם הסתיימה ב־ん — הבוט מנצח.",
+        "player-invalid": "מילה לא תקינה — הבוט מנצח.",
+        "bot-no-move": "הבוט אזל המילים — ניצחתם!",
+        "bot-ends-n": "הבוט סיים ב־ん — ניצחתם!"
+      }
+    }
   },
   "wordAlchemy": {
     "badge": "אלכימיית מילים",
     "title": "אלכימיית מילים",
-    "instructions": "הפכו מילה אחת לבאה אחריה לפי כל רמז.",
+    "instructions": "הפכו מילה אחת לבאה אחריה לפי כל רמז (התוכן באנגלית).",
     "puzzleProgress": "חידה {n} מתוך {total}",
     "stepProgress": "שלב {n} מתוך {total}",
     "inputPlaceholder": "הקלידו מילה",
     "hintLabel": "רמז:",
-    "submit": "שליחה",
+    "submit": "להפוך",
     "next": "חידה הבאה",
     "restart": "מהתחלה",
     "wonTitle": "החידה נפתרה!",
-    "wonSubtitle": "שרשרת יפה! מוכנים לבאה?"
+    "wonSubtitle": "שרשרת יפה! מוכנים לבאה?",
+    "adminOnly": "אלכימיית מילים זמינה לאדמינים בלבד.",
+    "streak": "{n} ברצף",
+    "ops": {
+      "synonym": "מילה נרדפת",
+      "anagram": "אנגרמה",
+      "reverse": "הפוך",
+      "addLetter": "הוסיפו אות",
+      "removeLetter": "הסירו אות",
+      "changeLetter": "החליפו אות אחת",
+      "homophone": "נשמע כמו"
+    },
+    "clues": {
+      "p2s1": "פרח, לא חומר אפייה.",
+      "p5s1": "מהיר, במילה אחת.",
+      "p6s1": "קרבה משפחתית, לא בשמיים."
+    }
   },
   "gameFeedback": {"prompt":"איך היה הסיבוב?","bad":"ככה ככה","ok":"טוב","great":"אהבתי!","thanks":"תודה על המשוב!","dismiss":"סגירה"},
   "wordTower": {

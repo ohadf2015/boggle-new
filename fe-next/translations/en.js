@@ -9,7 +9,38 @@ const en = {
     "waitTurn": "Waiting for your turn…",
     "wins": "wins!",
     "yourTurn": "Your turn — type a word",
-    "youWin": "You win!"
+    "youWin": "You win!",
+    "solo": {
+      "title": "Shiritori Solo",
+      "tagline": "Chain hiragana words against the bot.",
+      "back": "Back to Shiritori",
+      "adminBadge": "Admin preview",
+      "adminOnly": "Shiritori Solo is an admin-only preview.",
+      "headPrompt": "Next word starts with:",
+      "inputPlaceholder": "Type a hiragana word",
+      "submit": "Send",
+      "checking": "Checking…",
+      "giveUp": "Give up",
+      "again": "Play again",
+      "won": "You win!",
+      "lost": "Round over",
+      "botThinking": "Bot is thinking…",
+      "difficultyLabel": "Bot difficulty",
+      "difficulty": {"easy": "Easy", "medium": "Medium", "hard": "Hard"},
+      "err": {
+        "not-hiragana": "Hiragana only (e.g. ねこ).",
+        "wrong-head": "Wrong head kana — chain from the highlighted kana.",
+        "duplicate": "That word was already played.",
+        "not-in-dict": "Not in the Japanese dictionary."
+      },
+      "endReason": {
+        "player-no-move": "You gave up — the bot wins.",
+        "player-ends-n": "Your word ended in ん — the bot wins.",
+        "player-invalid": "Invalid word — the bot wins.",
+        "bot-no-move": "The bot ran out of words — you win!",
+        "bot-ends-n": "The bot ended in ん — you win!"
+      }
+    }
   },
   "wordAlchemy": {
     "badge": "Word Alchemy",
@@ -19,11 +50,27 @@ const en = {
     "stepProgress": "Step {n} of {total}",
     "inputPlaceholder": "Type your word",
     "hintLabel": "Hint:",
-    "submit": "Submit",
+    "submit": "Transmute",
     "next": "Next puzzle",
     "restart": "Restart",
     "wonTitle": "Puzzle solved!",
-    "wonSubtitle": "Nice chain! Ready for the next one?"
+    "wonSubtitle": "Nice chain! Ready for the next one?",
+    "adminOnly": "Word Alchemy is an admin-only preview.",
+    "streak": "{n} in a row",
+    "ops": {
+      "synonym": "Synonym",
+      "anagram": "Anagram",
+      "reverse": "Reverse",
+      "addLetter": "Add a letter",
+      "removeLetter": "Remove a letter",
+      "changeLetter": "Change one letter",
+      "homophone": "Sounds like"
+    },
+    "clues": {
+      "p2s1": "A bloom, not a baking ingredient.",
+      "p5s1": "Speedy, in one word.",
+      "p6s1": "Family relation, not the sky."
+    }
   },
   "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss"},
   "wordTower": {

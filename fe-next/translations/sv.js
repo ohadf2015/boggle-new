@@ -9,21 +9,68 @@ const sv = {
     "waitTurn": "Väntar på din tur…",
     "wins": "vinner!",
     "yourTurn": "Din tur – skriv ett ord",
-    "youWin": "Du vinner!"
+    "youWin": "Du vinner!",
+    "solo": {
+      "title": "Shiritori Solo",
+      "tagline": "Kedja hiragana-ord mot boten.",
+      "back": "Tillbaka till Shiritori",
+      "adminBadge": "Adminförhandsvisning",
+      "adminOnly": "Shiritori Solo är endast en admin-förhandsvisning.",
+      "headPrompt": "Nästa ord börjar med:",
+      "inputPlaceholder": "Skriv ett hiragana-ord",
+      "submit": "Skicka",
+      "checking": "Kontrollerar…",
+      "giveUp": "Ge upp",
+      "again": "Spela igen",
+      "won": "Du vinner!",
+      "lost": "Rundan är slut",
+      "botThinking": "Boten tänker…",
+      "difficultyLabel": "Botens svårighetsgrad",
+      "difficulty": {"easy": "Lätt", "medium": "Medel", "hard": "Svår"},
+      "err": {
+        "not-hiragana": "Endast hiragana (t.ex. ねこ).",
+        "wrong-head": "Fel inledande kana — börja med den markerade kana.",
+        "duplicate": "Det ordet har redan spelats.",
+        "not-in-dict": "Inte i den japanska ordboken."
+      },
+      "endReason": {
+        "player-no-move": "Du gav upp — boten vinner.",
+        "player-ends-n": "Ditt ord slutade på ん — boten vinner.",
+        "player-invalid": "Ogiltigt ord — boten vinner.",
+        "bot-no-move": "Boten fick slut på ord — du vinner!",
+        "bot-ends-n": "Boten slutade på ん — du vinner!"
+      }
+    }
   },
   "wordAlchemy": {
     "badge": "Ordalkemi",
     "title": "Ordalkemi",
-    "instructions": "Förvandla ett ord till nästa genom att följa varje ledtråd.",
+    "instructions": "Förvandla ett ord till nästa genom att följa varje ledtråd (innehåll på engelska).",
     "puzzleProgress": "Pussel {n} av {total}",
     "stepProgress": "Steg {n} av {total}",
     "inputPlaceholder": "Skriv ditt ord",
     "hintLabel": "Ledtråd:",
-    "submit": "Skicka",
+    "submit": "Förvandla",
     "next": "Nästa pussel",
     "restart": "Börja om",
     "wonTitle": "Pusslet löst!",
-    "wonSubtitle": "Snygg kedja! Redo för nästa?"
+    "wonSubtitle": "Snygg kedja! Redo för nästa?",
+    "adminOnly": "Ordalkemi är endast en admin-förhandsvisning.",
+    "streak": "{n} i rad",
+    "ops": {
+      "synonym": "Synonym",
+      "anagram": "Anagram",
+      "reverse": "Baklänges",
+      "addLetter": "Lägg till bokstav",
+      "removeLetter": "Ta bort bokstav",
+      "changeLetter": "Byt en bokstav",
+      "homophone": "Låter som"
+    },
+    "clues": {
+      "p2s1": "En blomma, inte en bakingrediens.",
+      "p5s1": "Snabbt, i ett ord.",
+      "p6s1": "En släkting, inte himlen."
+    }
   },
   "gameFeedback": {"prompt":"Hur var rundan?","bad":"Sådär","ok":"Bra","great":"Älskade den!","thanks":"Tack för din feedback!","dismiss":"Stäng"},
   "wordTower": {

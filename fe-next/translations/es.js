@@ -9,21 +9,68 @@ const es = {
     "waitTurn": "Esperando tu turno…",
     "wins": "¡gana!",
     "yourTurn": "Tu turno: escribe una palabra",
-    "youWin": "¡Ganaste!"
+    "youWin": "¡Ganaste!",
+    "solo": {
+      "title": "Shiritori en solitario",
+      "tagline": "Encadena palabras en hiragana contra el bot.",
+      "back": "Volver a Shiritori",
+      "adminBadge": "Vista de admin",
+      "adminOnly": "Shiritori en solitario es solo una vista previa para admins.",
+      "headPrompt": "La siguiente palabra empieza con:",
+      "inputPlaceholder": "Escribe una palabra en hiragana",
+      "submit": "Enviar",
+      "checking": "Comprobando…",
+      "giveUp": "Rendirse",
+      "again": "Jugar otra vez",
+      "won": "¡Ganaste!",
+      "lost": "Ronda terminada",
+      "botThinking": "El bot está pensando…",
+      "difficultyLabel": "Dificultad del bot",
+      "difficulty": {"easy": "Fácil", "medium": "Media", "hard": "Difícil"},
+      "err": {
+        "not-hiragana": "Solo hiragana (p. ej. ねこ).",
+        "wrong-head": "Letra inicial incorrecta — empieza por la kana resaltada.",
+        "duplicate": "Esa palabra ya se jugó.",
+        "not-in-dict": "No está en el diccionario japonés."
+      },
+      "endReason": {
+        "player-no-move": "Te rendiste — gana el bot.",
+        "player-ends-n": "Tu palabra terminó en ん — gana el bot.",
+        "player-invalid": "Palabra no válida — gana el bot.",
+        "bot-no-move": "El bot se quedó sin palabras — ¡ganas tú!",
+        "bot-ends-n": "El bot terminó en ん — ¡ganas tú!"
+      }
+    }
   },
   "wordAlchemy": {
     "badge": "Alquimia de palabras",
     "title": "Alquimia de palabras",
-    "instructions": "Transforma una palabra en la siguiente siguiendo cada pista.",
+    "instructions": "Transforma una palabra en la siguiente siguiendo cada pista (contenido en inglés).",
     "puzzleProgress": "Puzle {n} de {total}",
     "stepProgress": "Paso {n} de {total}",
     "inputPlaceholder": "Escribe tu palabra",
     "hintLabel": "Pista:",
-    "submit": "Enviar",
+    "submit": "Transmutar",
     "next": "Siguiente puzle",
     "restart": "Reiniciar",
     "wonTitle": "¡Puzle resuelto!",
-    "wonSubtitle": "¡Buena cadena! ¿Listo para la siguiente?"
+    "wonSubtitle": "¡Buena cadena! ¿Listo para la siguiente?",
+    "adminOnly": "Alquimia de palabras es una vista previa solo para admins.",
+    "streak": "{n} seguidos",
+    "ops": {
+      "synonym": "Sinónimo",
+      "anagram": "Anagrama",
+      "reverse": "Inversa",
+      "addLetter": "Añade una letra",
+      "removeLetter": "Quita una letra",
+      "changeLetter": "Cambia una letra",
+      "homophone": "Suena como"
+    },
+    "clues": {
+      "p2s1": "Una flor, no un ingrediente de repostería.",
+      "p5s1": "Rápido, en una palabra.",
+      "p6s1": "Un familiar, no el cielo."
+    }
   },
   "gameFeedback": {"prompt":"¿Qué te pareció la ronda?","bad":"Regular","ok":"Bien","great":"¡Me encantó!","thanks":"¡Gracias por tu opinión!","dismiss":"Cerrar"},
   "wordTower": {

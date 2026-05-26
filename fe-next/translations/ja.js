@@ -9,21 +9,68 @@ const ja = {
     "waitTurn": "順番をお待ちください…",
     "wins": "の勝ち！",
     "yourTurn": "あなたの番です — 言葉を入力",
-    "youWin": "あなたの勝ち！"
+    "youWin": "あなたの勝ち！",
+    "solo": {
+      "title": "しりとり ソロ",
+      "tagline": "ボット相手にひらがなでしりとり。",
+      "back": "しりとりに戻る",
+      "adminBadge": "管理者プレビュー",
+      "adminOnly": "しりとりソロは管理者専用のプレビューです。",
+      "headPrompt": "次の言葉の最初の文字：",
+      "inputPlaceholder": "ひらがなで入力",
+      "submit": "送信",
+      "checking": "確認中…",
+      "giveUp": "降参",
+      "again": "もう一度",
+      "won": "勝利！",
+      "lost": "ラウンド終了",
+      "botThinking": "ボットが考え中…",
+      "difficultyLabel": "ボットの難易度",
+      "difficulty": {"easy": "やさしい", "medium": "ふつう", "hard": "むずかしい"},
+      "err": {
+        "not-hiragana": "ひらがなのみ（例：ねこ）。",
+        "wrong-head": "最初の文字が違います — 表示された文字から始めてください。",
+        "duplicate": "その単語はもう使われました。",
+        "not-in-dict": "日本語辞書にありません。"
+      },
+      "endReason": {
+        "player-no-move": "降参しました — ボットの勝ち。",
+        "player-ends-n": "ん で終わりました — ボットの勝ち。",
+        "player-invalid": "無効な単語 — ボットの勝ち。",
+        "bot-no-move": "ボットの単語切れ — あなたの勝ち！",
+        "bot-ends-n": "ボットが ん で終了 — あなたの勝ち！"
+      }
+    }
   },
   "wordAlchemy": {
     "badge": "ワードアルケミー",
     "title": "ワードアルケミー",
-    "instructions": "ヒントに従って、言葉を次の言葉へと変えていきましょう。",
+    "instructions": "ヒントに従って、言葉を次の言葉へと変えていきましょう（内容は英語）。",
     "puzzleProgress": "パズル {n} / {total}",
     "stepProgress": "ステップ {n} / {total}",
     "inputPlaceholder": "言葉を入力",
     "hintLabel": "ヒント：",
-    "submit": "送信",
+    "submit": "変える",
     "next": "次のパズル",
     "restart": "やり直す",
     "wonTitle": "パズルクリア！",
-    "wonSubtitle": "お見事！次のパズルへ進みますか？"
+    "wonSubtitle": "お見事！次のパズルへ進みますか？",
+    "adminOnly": "ワードアルケミーは管理者専用のプレビューです。",
+    "streak": "{n} 連続",
+    "ops": {
+      "synonym": "同義語",
+      "anagram": "アナグラム",
+      "reverse": "逆順",
+      "addLetter": "文字を追加",
+      "removeLetter": "文字を削除",
+      "changeLetter": "一文字を変更",
+      "homophone": "同音"
+    },
+    "clues": {
+      "p2s1": "花であって、製菓材料ではない。",
+      "p5s1": "速い、ひと言で。",
+      "p6s1": "家族の繋がりで、空ではない。"
+    }
   },
   "gameFeedback": {"prompt":"今のラウンドはどうだった？","bad":"うーん","ok":"良かった","great":"最高！","thanks":"フィードバックありがとう！","dismiss":"閉じる"},
   "wordTower": {

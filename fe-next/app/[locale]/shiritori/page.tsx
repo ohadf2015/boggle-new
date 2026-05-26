@@ -35,6 +35,8 @@ interface Copy {
   steps: { title: string; text: string }[];
   cta: string;
   comingSoon: string;
+  /** Admin-only solo preview link label. Falls back to en. */
+  soloPreview: string;
   faqs: { q: string; a: string }[];
 }
 
@@ -59,6 +61,7 @@ const COPY: Record<string, Copy> = {
     ],
     cta: '無料で言葉ゲームをプレイ',
     comingSoon: 'しりとりモードはマルチプレイに登場予定です。',
+    soloPreview: 'ソロでお試し（管理者プレビュー）',
     faqs: [
       { q: 'しりとりは無料で遊べますか？', a: 'はい。LexiClash はブラウザで無料で遊べます。登録は不要です。' },
       { q: 'オンラインで対戦できますか？', a: 'はい。ともだちや世界中のプレイヤーとリアルタイムで対戦できます。' },
@@ -83,6 +86,7 @@ const COPY: Record<string, Copy> = {
     ],
     cta: 'Play word games free',
     comingSoon: 'Shiritori mode is coming soon to multiplayer.',
+    soloPreview: 'Try solo (admin preview)',
     faqs: [
       { q: 'Is Shiritori free to play?', a: 'Yes. LexiClash plays free in your browser, no signup required.' },
       { q: 'Can I play online with others?', a: 'Yes — real-time multiplayer with friends or players worldwide.' },
@@ -169,6 +173,12 @@ export default async function ShiritoriLandingPage({ params }: PageProps) {
             {copy.cta}
           </Link>
           <p className="font-neo-body text-sm text-neo-cream/60">{copy.comingSoon}</p>
+          <Link
+            href={`/${locale}/shiritori/solo`}
+            className="font-neo-body text-xs underline text-neo-cream/50 hover:text-neo-cream"
+          >
+            {copy.soloPreview}
+          </Link>
         </div>
 
         <section className="mt-14 rounded-neo border-neo-thick border-black bg-neo-navy-light p-6 shadow-hard">
