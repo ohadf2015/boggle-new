@@ -51,4 +51,17 @@ describe('MascotHaloGlow', () => {
     expect(style).toContain('@keyframes mascotHaloPulse_purple-pink_subtle');
     expect(style).toContain('prefers-reduced-motion');
   });
+
+  it('merges wrapperStyle but keeps position:relative non-negotiable', () => {
+    const { container } = render(
+      <MascotHaloGlow wrapperStyle={{ width: '100%', height: '100%', position: 'absolute' }}>
+        <div />
+      </MascotHaloGlow>,
+    );
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper.style.width).toBe('100%');
+    expect(wrapper.style.height).toBe('100%');
+    // even though caller tried position:absolute, the component pins it back to relative
+    expect(wrapper.style.position).toBe('relative');
+  });
 });

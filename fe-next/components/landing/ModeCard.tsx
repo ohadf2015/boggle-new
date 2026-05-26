@@ -11,6 +11,19 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTiltEffect } from '@/hooks/useTiltEffect';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { haptics } from '@/utils/haptics';
+import { MascotHaloGlow, type HaloTone } from '@/components/mascot/MascotHaloGlow';
+
+// Card variant → halo tone. Each tone amplifies the variant's existing
+// accent (cyan/pink card gets pink-cyan halo; purple gets purple-pink; etc.)
+// so the glow looks like the card's own color, not a sticker on top.
+const VARIANT_HALO_TONE: Record<'cyan' | 'pink' | 'purple' | 'orange' | 'lime' | 'blue', HaloTone> = {
+  cyan: 'pink-cyan',
+  pink: 'pink-cyan',
+  purple: 'purple-pink',
+  orange: 'yellow-orange',
+  lime: 'lime-cyan',
+  blue: 'pink-cyan',
+};
 
 export interface LiveBadgeProps {
   openRooms: number;
@@ -265,7 +278,10 @@ const ModeCard: React.FC<ModeCardProps> = ({
         </div>
       )}
 
-      {/* Mode character — large blended illustration anchored to bottom-end */}
+      {/* Mode character — large blended illustration anchored to bottom-end,
+          wrapped in MascotHaloGlow so the brand pulse sits behind it.
+          Paused when the user prefers reduced motion or on low-end devices
+          to keep the landing page cheap to paint. */}
       {modeImage && !secondary && (
         <m.div
           className={cn(
@@ -285,21 +301,29 @@ const ModeCard: React.FC<ModeCardProps> = ({
           }
           transition={{ type: 'spring', stiffness: 300, damping: 18 }}
         >
-          <Image
-            src={modeImage}
-            alt=""
-            fill
-            className={cn(
-              'object-contain',
-              'drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]',
-              isHovered ? 'brightness-110' : 'brightness-100'
-            )}
-            style={{
-              filter: isHovered ? 'drop-shadow(0 6px 16px rgba(0,0,0,0.5))' : undefined,
-              transition: 'filter 0.3s ease',
-            }}
-            sizes="(max-width: 640px) 96px, 192px"
-          />
+          <MascotHaloGlow
+            tone={VARIANT_HALO_TONE[variant]}
+            intensity={isHovered ? 'bold' : 'subtle'}
+            paused={prefersReducedMotion || !enableComplexAnimations}
+            scale={1.15}
+            wrapperStyle={{ width: '100%', height: '100%' }}
+          >
+            <Image
+              src={modeImage}
+              alt=""
+              fill
+              className={cn(
+                'object-contain',
+                'drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]',
+                isHovered ? 'brightness-110' : 'brightness-100'
+              )}
+              style={{
+                filter: isHovered ? 'drop-shadow(0 6px 16px rgba(0,0,0,0.5))' : undefined,
+                transition: 'filter 0.3s ease',
+              }}
+              sizes="(max-width: 640px) 96px, 192px"
+            />
+          </MascotHaloGlow>
         </m.div>
       )}
 

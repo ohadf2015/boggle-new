@@ -28,6 +28,13 @@ export interface MascotHaloGlowProps {
   className?: string;
   /** Halo size multiplier (1 = matches content). Default 1.1 */
   scale?: number;
+  /**
+   * Extra CSS on the wrapper (e.g. `{ width: '100%', height: '100%' }` when
+   * the parent is sized and the child uses Image `fill`).
+   * `position: relative` is always enforced — it must remain to keep the
+   * absolute halo and children stacked correctly.
+   */
+  wrapperStyle?: CSSProperties;
 }
 
 function rgbaWithAlpha(rgba: string, alpha: number): string {
@@ -47,13 +54,15 @@ export const MascotHaloGlow = memo(function MascotHaloGlow({
   paused = false,
   className = '',
   scale = 1.1,
+  wrapperStyle: extraWrapperStyle,
 }: MascotHaloGlowProps) {
   const stops = TONE_STOPS[tone];
   const cfg = INTENSITY[intensity];
   const sizePct = `${scale * 100}%`;
   const animKey = `mascotHaloPulse_${tone}_${intensity}`;
 
-  const wrapperStyle: CSSProperties = { position: 'relative' };
+  // Always enforce position:relative so the absolute halo + children stack.
+  const wrapperStyle: CSSProperties = { ...extraWrapperStyle, position: 'relative' };
   const haloStyle: CSSProperties = {
     position: 'absolute',
     inset: 0,
