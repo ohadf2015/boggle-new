@@ -67,32 +67,37 @@ export function HubFoyer({ store, onEnterRoom }: HubFoyerProps) {
       {/* Ember particles */}
       <EmberParticles />
 
-      <h1 className="relative z-10 mt-2 font-fredoka text-5xl font-black tracking-tight text-lime-300 drop-shadow-[3px_3px_0_#000] sm:text-6xl">
+      <h1
+        className="relative z-10 mt-2 font-fredoka text-4xl font-black uppercase tracking-[0.18em] text-orange-100 sm:text-5xl"
+        style={{ textShadow: '0 0 24px rgba(255,107,53,0.35), 2px 2px 0 rgba(0,0,0,0.7)' }}
+      >
         מרתף המילים
       </h1>
-      <p className="relative z-10 mt-1 font-rubik text-sm text-white/60">
-        ספר 1 — אולמות האח · {solvedRooms.length} / {BOOK_1_HEARTH_ROOMS.length}
+      <p className="relative z-10 mt-2 font-rubik text-xs uppercase tracking-[0.3em] text-orange-200/50">
+        ספר 1 · אולמות האח · {solvedRooms.length} / {BOOK_1_HEARTH_ROOMS.length}
       </p>
 
-      <div className="relative z-10 mt-8 flex flex-col items-center gap-3">
+      <div className="relative z-10 mt-10 flex flex-col items-center gap-4">
         {!allDone && nextRoom && (
           <button
             type="button"
             onClick={() => onEnterRoom(nextRoom.id)}
-            className="rounded-md border-4 border-amber-300 bg-amber-200 px-10 py-3 font-fredoka text-2xl font-black text-[#1a0e08] shadow-[4px_4px_0_0_#000] transition active:translate-y-[2px] active:shadow-[2px_2px_0_0_#000]"
+            className="group relative rounded-sm border border-orange-300/60 bg-gradient-to-b from-[#3a1f10] to-[#1a0e08] px-12 py-3.5 font-rubik text-base font-bold uppercase tracking-[0.2em] text-orange-100 shadow-[0_0_24px_rgba(255,107,53,0.25)] transition hover:border-orange-200 hover:text-orange-50 hover:shadow-[0_0_36px_rgba(255,107,53,0.45)] active:translate-y-[1px]"
+            style={{ letterSpacing: '0.25em' }}
           >
-            המשך &nbsp;→
+            <span className="absolute inset-0 -z-10 rounded-sm bg-[radial-gradient(ellipse_at_center,_rgba(255,107,53,0.18)_0%,_transparent_70%)]" aria-hidden="true" />
+            המשך
           </button>
         )}
         {allDone && (
-          <p className="font-fredoka text-lg font-black text-amber-200" dir="rtl">
-            ספר 1 הושלם.
+          <p className="font-rubik text-sm uppercase tracking-[0.3em] text-orange-200" dir="rtl">
+            ספר 1 הושלם
           </p>
         )}
         <button
           type="button"
           onClick={() => setShowWorldmap(true)}
-          className="rounded border-2 border-white/30 bg-transparent px-5 py-1.5 font-rubik text-sm text-white/70 transition hover:bg-white/10"
+          className="border-b border-white/15 px-2 pb-1 font-rubik text-[11px] uppercase tracking-[0.25em] text-white/50 transition hover:border-white/40 hover:text-white/80"
         >
           מפת חדרים
         </button>
@@ -121,9 +126,9 @@ interface WorldmapPanelProps {
 function WorldmapPanel({ solvedRooms, onClose, onEnterRoom }: WorldmapPanelProps) {
   return (
     <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#0b1220]/95 p-6">
-      <div className="w-full max-w-md rounded-lg border-4 border-amber-300 bg-[#111a2c] p-5 shadow-[6px_6px_0_0_#000]" dir="rtl">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-fredoka text-xl font-bold text-amber-200">ספר 1 — אולמות האח</h2>
+      <div className="w-full max-w-md rounded-sm border border-orange-300/40 bg-[#0b1220]/95 p-6 shadow-[0_0_40px_rgba(255,107,53,0.2)]" dir="rtl">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="font-rubik text-xs uppercase tracking-[0.3em] text-orange-200">ספר 1 · אולמות האח</h2>
           <button
             type="button"
             onClick={onClose}

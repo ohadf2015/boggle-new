@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useStore } from 'zustand';
 import type { Locale } from '@/lib/word-vault/types';
@@ -9,6 +10,13 @@ import { HubFoyer } from '@/components/word-vault/HubFoyer';
 import { RoomShell } from '@/components/word-vault/RoomShell';
 import { BOOK_1_HEARTH_ROOMS } from '@/lib/word-vault/content/book1-hearth-stub';
 import { getGameStore, type WordVaultStore } from '@/lib/word-vault/state/gameStore';
+
+// Pixi overlay only mounts during scene transitions — keeps the rest of the
+// page free of the Pixi runtime cost on first paint.
+const EmberOverlayLazy = dynamic(
+  () => import('@/components/word-vault/pixi/EmberOverlay').then((m) => m.EmberOverlay),
+  { ssr: false },
+);
 
 interface PageClientProps {
   locale: Locale;
@@ -177,28 +185,41 @@ function SceneTransition({
   nextRoomId: string | null;
   setScreen: (s: Screen) => void;
 }) {
+  // Lazy import to keep the room-scene bundle smaller — only loaded when a
+  // transition actually fires (typically once per room).
+  const [burst, setBurst] = useState<{ id: number; x: number; y: number } | null>(null);
   useEffect(() => {
+    const cx = typeof window !== 'undefined' ? window.innerWidth / 2 : 200;
+    const cy = typeof window !== 'undefined' ? window.innerHeight / 2 : 200;
+    setBurst({ id: Date.now(), x: cx, y: cy });
     const t = setTimeout(() => {
       if (nextRoomId) setScreen({ kind: 'story', roomId: nextRoomId });
       else setScreen({ kind: 'hub' });
-    }, 900);
+    }, 1100);
     return () => clearTimeout(t);
   }, [nextRoomId, setScreen]);
 
   return (
     <div
-      className="flex min-h-[100dvh] flex-col items-center justify-center bg-[#050309]"
+      className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[#050309]"
       style={{ animation: 'wv-sceneIn 600ms ease-out' }}
     >
-      {/* Soft ember pulse during transition */}
-      <div
-        className="h-2 w-2 rounded-full"
-        style={{
-          background: 'rgba(255,140,60,0.9)',
-          boxShadow: '0 0 32px 8px rgba(255,140,60,0.6)',
-          animation: 'wv-pulse 1.4s ease-in-out infinite',
-        }}
-      />
+      {/* Pixi ember overlay — bursts on enter for a dramatic scene-shift beat. */}
+      <EmberOverlayLazy density={36} tint={0xff6b35} intensity={0.6} burst={burst ?? undefined} />
+
+      {/* Sigil mark — pulses softly in/out. */}
+      <div className="relative z-10 text-center">
+        <p
+          className="font-serif italic text-3xl text-orange-200/80"
+          style={{ textShadow: '0 0 28px rgba(255,107,53,0.45)' }}
+        >
+          ⟡
+        </p>
+        <p className="mt-3 font-rubik text-[10px] uppercase tracking-[0.4em] text-orange-100/40">
+          ...
+        </p>
+      </div>
+
       <style jsx global>{`
         @keyframes wv-pulse {
           0%, 100% { transform: scale(1); opacity: 0.9; }
