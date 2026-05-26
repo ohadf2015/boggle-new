@@ -39,7 +39,7 @@ import { FLEXING_SCORE_THRESHOLD, ENCOURAGING_SCORE_THRESHOLD } from '@/utils/ma
 import { WinCinematic } from './WinCinematic';
 import { WordHuntResultsContent } from './WordHuntResultsContent';
 import { MascotCelebrationVideo } from '@/components/mascot/MascotCelebrationVideo';
-import { pickCelebrationKind } from '@/components/mascot/celebrationKind';
+import { pickCelebrationKind, celebrationTitleFor } from '@/components/mascot/celebrationKind';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeChainCta from '@/components/practice/PracticeChainCta';
 
@@ -369,6 +369,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       {showFanfare && fanfareKind && (
         <MascotCelebrationVideo
           kind={fanfareKind}
+          title={celebrationTitleFor(fanfareKind, t)}
           autoDismissMs={2600}
           onDone={() => setShowFanfare(false)}
         />

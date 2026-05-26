@@ -44,7 +44,7 @@ import type { WordHuntResultsSummaryProps } from '@/components/results/WordHuntR
 const StickyReadyBar = dynamic(() => import('@/components/results/StickyReadyBar'), { ssr: false });
 import { ResultsFriendStatusProvider } from '@/components/results/ResultsFriendStatus';
 import { MascotCelebrationVideo } from '@/components/mascot/MascotCelebrationVideo';
-import { pickCelebrationKind } from '@/components/mascot/celebrationKind';
+import { pickCelebrationKind, celebrationTitleFor } from '@/components/mascot/celebrationKind';
 import { generateRandomTable } from '@/utils/utils';
 import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
@@ -1050,6 +1050,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       {showCelebration && celebrationKind && (
         <MascotCelebrationVideo
           kind={celebrationKind}
+          title={celebrationTitleFor(celebrationKind, t)}
           autoDismissMs={2800}
           onDone={() => setShowCelebration(false)}
         />

@@ -117,4 +117,44 @@ describe('MascotCelebrationVideo', () => {
     rerender(<MascotCelebrationVideo kind="knight" overlay={false} />);
     expect(screen.getByTestId('mascot-celebration-video').getAttribute('role')).toBeNull();
   });
+
+  it('renders a hero title above the video, sourced from the kind by default', () => {
+    render(<MascotCelebrationVideo kind="champion" />);
+    const title = screen.getByTestId('mascot-celebration-title');
+    expect(title).not.toBeNull();
+    // Title must precede the video in DOM order (so it renders above it).
+    const video = screen.getByTestId('mascot-celebration-video').querySelector('video')!;
+    const pos = title.compareDocumentPosition(video);
+    expect(pos & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('honors a caller-provided title (translated by parent)', () => {
+    render(<MascotCelebrationVideo kind="bingo" title="מרשים!" />);
+    expect(screen.getByTestId('mascot-celebration-title').textContent).toContain('מרשים!');
+  });
+
+  it('omits the title when title=null and no built-in default exists', () => {
+    render(<MascotCelebrationVideo kind="champion" title={null} />);
+    expect(screen.queryByTestId('mascot-celebration-title')).toBeNull();
+  });
+
+  it('renders an animated edge glow layer around the video frame', () => {
+    render(<MascotCelebrationVideo kind="bingo" />);
+    expect(screen.getByTestId('mascot-celebration-edge-glow')).not.toBeNull();
+  });
+
+  it('renders sparkle particle elements for extra ambient animation', () => {
+    render(<MascotCelebrationVideo kind="streak" />);
+    const sparkles = screen.getAllByTestId('mascot-celebration-sparkle');
+    expect(sparkles.length).toBeGreaterThanOrEqual(6);
+  });
+
+  it('uses the upgraded video file for the "explorer" first-visit-today kind', () => {
+    // The original celebration-explorer.mp4 felt low-energy for the daily first-visit
+    // beat. Swapped to celebration-knight.mp4 — a more impressive generic victory
+    // render that lands better as the player's first celebration of the day.
+    render(<MascotCelebrationVideo kind="explorer" />);
+    const video = screen.getByTestId('mascot-celebration-video').querySelector('video');
+    expect(video?.getAttribute('src')).toBe('/mascots/celebration-knight.mp4');
+  });
 });

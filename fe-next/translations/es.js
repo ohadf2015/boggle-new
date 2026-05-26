@@ -12573,6 +12573,16 @@ const es = {
     "faqA5": "No. LexiClash funciona en cualquier navegador moderno en teléfono, tableta o TV — sin instalación y sin cuenta necesaria.",
     "faqQ6": "¿Hay tablas de clasificación competitivas?",
     "faqA6": "Sí — desafíos diarios y tablas de clasificación globales. Sube en la clasificación diaria, construye combos y llega a la cima en uno de los mejores juegos de palabras gratuitos en línea."
+  },
+  "mascotCelebration": {
+    "titleChampion": "¡CAMPEÓN!",
+    "titleRunnerUp": "¡PODIO!",
+    "titleDefeat": "GG",
+    "titleBingo": "¡BINGO!",
+    "titleKnight": "¡VICTORIA!",
+    "titleStreak": "¡EN LLAMAS!",
+    "titleExplorer": "¡QUÉ HALLAZGO!",
+    "titleMissionComplete": "¡TODO LISTO!"
   }
 };
 

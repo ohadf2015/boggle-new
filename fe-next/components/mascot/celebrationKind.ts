@@ -53,3 +53,36 @@ export function pickCelebrationKind(input: PickCelebrationInput): MascotCelebrat
   }
   return null;
 }
+
+const TITLE_KEY_BY_KIND: Record<MascotCelebrationKind, string> = {
+  champion: 'mascotCelebration.titleChampion',
+  'runner-up': 'mascotCelebration.titleRunnerUp',
+  defeat: 'mascotCelebration.titleDefeat',
+  bingo: 'mascotCelebration.titleBingo',
+  knight: 'mascotCelebration.titleKnight',
+  streak: 'mascotCelebration.titleStreak',
+  explorer: 'mascotCelebration.titleExplorer',
+  'mission-complete': 'mascotCelebration.titleMissionComplete',
+};
+
+const TITLE_FALLBACK_BY_KIND: Record<MascotCelebrationKind, string> = {
+  champion: 'CHAMPION!',
+  'runner-up': 'PODIUM!',
+  defeat: 'GG',
+  bingo: 'BINGO!',
+  knight: 'VICTORY!',
+  streak: 'ON FIRE!',
+  explorer: 'NICE FIND!',
+  'mission-complete': 'ALL CLEAR!',
+};
+
+/**
+ * Resolve the localized hero title for a given celebration kind via the
+ * caller's `t()` function (each surface owns its own LanguageContext binding).
+ */
+export function celebrationTitleFor(
+  kind: MascotCelebrationKind,
+  t: (path: string, fallback?: string) => string,
+): string {
+  return t(TITLE_KEY_BY_KIND[kind], TITLE_FALLBACK_BY_KIND[kind]);
+}
