@@ -66,7 +66,17 @@ export const MascotCelebrationVideo = memo(function MascotCelebrationVideo({
   const variant = VARIANTS[kind];
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const handleDone = useCallback(() => onDone?.(), [onDone]);
+  // Keep the latest onDone in a ref so the auto-dismiss timer below depends only
+  // on autoDismissMs. Parents commonly pass a fresh inline `onDone` arrow on
+  // every render (e.g. DailyWordHuntResults re-renders each second from its
+  // countdown); keying the timer on the callback identity would clear+reset it
+  // before it ever fires, leaving this fixed full-screen overlay stuck on top of
+  // the page and blocking scroll/taps.
+  const onDoneRef = useRef(onDone);
+  useEffect(() => {
+    onDoneRef.current = onDone;
+  });
+  const handleDone = useCallback(() => onDoneRef.current?.(), []);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');

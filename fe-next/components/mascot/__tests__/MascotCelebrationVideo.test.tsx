@@ -64,6 +64,26 @@ describe('MascotCelebrationVideo', () => {
     expect(onDone).toHaveBeenCalledTimes(1);
   });
 
+  it('still auto-dismisses when the parent re-renders with a fresh onDone every tick', () => {
+    // Regression: a parent with a 1s countdown (e.g. DailyWordHuntResults) passes
+    // a NEW inline `onDone` arrow on every render. If the auto-dismiss timer is
+    // keyed on that callback identity it gets cleared+reset every second and the
+    // fixed full-screen overlay never dismisses — leaving the results page
+    // unresponsive and unscrollable. The timer must survive parent re-renders.
+    const onDone = vi.fn();
+    const { rerender } = render(
+      <MascotCelebrationVideo kind="streak" autoDismissMs={2600} onDone={() => onDone()} />,
+    );
+    // Three 1s ticks → 3s of wall-clock, re-rendering with a new onDone each time.
+    for (let i = 0; i < 3; i++) {
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      rerender(<MascotCelebrationVideo kind="streak" autoDismissMs={2600} onDone={() => onDone()} />);
+    }
+    expect(onDone).toHaveBeenCalledTimes(1);
+  });
+
   it('never calls onDone when autoDismissMs is 0', () => {
     const onDone = vi.fn();
     render(<MascotCelebrationVideo kind="knight" autoDismissMs={0} onDone={onDone} />);
