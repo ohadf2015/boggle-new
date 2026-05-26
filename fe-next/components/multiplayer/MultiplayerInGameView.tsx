@@ -341,6 +341,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         onQuit={handleQuit}
         t={t}
         remainingTime={remainingTime}
+        totalTime={totalTime ?? undefined}
         gameLanguage={gameLanguage}
       />
     );

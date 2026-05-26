@@ -57,6 +57,8 @@ interface Props {
   t: (path: string, params?: Record<string, string | number>) => string;
   /** Match countdown in seconds, sourced from MP startGame.timerSeconds. Null while server timer not yet known. */
   remainingTime?: number | null;
+  /** Total match duration in seconds — drives CircularTimer ring fill in the header. */
+  totalTime?: number | null;
   /** Called every ~250ms with 0..1 fog progress while fog is active, then 0 when fog clears. */
   onFogProgressChange?: (progress: number) => void;
   /** When true, hides the internal top-bar (leaderboard chips + timer + quit) and word chips —
@@ -99,7 +101,7 @@ export const FogCountdown: React.FC<{ endsAt: number }> = ({ endsAt }) => {
   return <span ref={ref} data-testid="fog-countdown" className="opacity-60 tabular-nums" />;
 };
 
-export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t, remainingTime, onFogProgressChange, isDesktopCanvas = false, gameLanguage }) => {
+export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t, remainingTime, totalTime, onFogProgressChange, isDesktopCanvas = false, gameLanguage }) => {
   // Word surfaces follow the GAME language, not the UI locale. A Hebrew-UI
   // player in an English game must still read words left-to-right.
   const wordDir = languageDir(gameLanguage);
@@ -517,7 +519,11 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   }
 
   return (
-    <div className="relative flex-1 flex flex-col min-h-0 bg-neo-navy p-3 md:p-4 gap-2 overflow-hidden">
+    <div className="relative flex-1 flex flex-col items-center min-h-0 bg-neo-navy p-3 md:p-4 gap-2 overflow-hidden">
+      {/* Inner column caps width on desktop so the lime self-badge + game body
+          don't stretch edge-to-edge on a 1440px viewport (mobile-tree fallback
+          when desktop shell isn't mounted). bg stays full-bleed on outer. */}
+      <div className="w-full max-w-2xl flex-1 flex flex-col min-h-0 gap-2">
       {/* Top bar: opponent progress rail + prominent self score + timer + quit
           — hidden in desktop shell (handled by side rails). */}
       {!isDesktopCanvas && (
@@ -526,6 +532,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
           username={username}
           fogActive={fogActive}
           remainingTime={remainingTime}
+          totalTime={totalTime}
           onQuit={onQuit}
           t={t}
         />
@@ -636,7 +643,10 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             // bar + MyWordsChips + gaps, both inside the cluster); floor 176px.
             isDesktopCanvas
               ? "w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96"
-              : "w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 max-w-[max(176px,calc(100cqb-148px))] max-h-[max(176px,calc(100cqb-148px))]",
+              // Mobile-tree path is also rendered on desktop when the desktop
+              // shell isn't mounted — bump md/lg to the solo WordWheel sizes
+              // so the wheel doesn't look small inside a 1440px viewport.
+              : "w-52 h-52 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 max-w-[max(176px,calc(100cqb-148px))] max-h-[max(176px,calc(100cqb-148px))]",
           )}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -753,6 +763,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       </div>
 
       <WheelRushCelebration celebration={celebration} t={t} prefersReduced={!!prefersReduced} />
+      </div>
 
       <div className="pointer-events-none absolute inset-0 z-40">
         {floatingReactions.map(r => (

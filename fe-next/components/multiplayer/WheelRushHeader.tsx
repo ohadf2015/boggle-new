@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Crown } from 'lucide-react';
+import { Crown, X } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { Button } from '@/components/ui/button';
+import CircularTimer from '@/components/ui/CircularTimer';
 import { cn } from '@/lib/utils';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
@@ -20,6 +21,8 @@ interface Props {
   username: string;
   fogActive: boolean;
   remainingTime?: number | null;
+  /** Total match duration in seconds — drives the CircularTimer ring fill. */
+  totalTime?: number | null;
   onQuit: () => void;
   t: (path: string, params?: Record<string, string | number>) => string;
 }
@@ -34,7 +37,7 @@ const ProgressBar: React.FC<{ ratio: number; tone: 'self' | 'opp' }> = ({ ratio,
   </div>
 );
 
-export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogActive, remainingTime, onQuit, t }) => {
+export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogActive, remainingTime, totalTime, onQuit, t }) => {
   const self = useMemo(() => leaderboard.find(p => p.username === username), [leaderboard, username]);
   const opponents = useMemo(
     () => leaderboard.filter(p => p.username !== username).sort((a, b) => b.score - a.score).slice(0, 3),
@@ -45,8 +48,12 @@ export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogAct
   const selfScore = self?.score ?? 0;
   const isLeader = selfScore >= maxScore && maxScore > 0;
 
+  // CircularTimer needs a positive duration. Fall back to a safe envelope:
+  // prefer caller's totalTime, else cover current remaining, else 90s (current MP default).
+  const timerDuration = Math.max(1, totalTime ?? Math.max(remainingTime ?? 0, 90));
+
   return (
-    <div className="flex flex-col gap-2 shrink-0 pt-[env(safe-area-inset-top)]">
+    <div className="flex flex-col gap-2 shrink-0 pt-[env(safe-area-inset-top)] w-full max-w-2xl mx-auto">
       {/* Row 1 — opponent progress rail + timer + quit */}
       <div className="flex items-stretch gap-2">
         <div
@@ -89,20 +96,35 @@ export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogAct
           })}
         </div>
 
-        <div className="flex flex-col items-end gap-1 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {typeof remainingTime === 'number' && (
             <div
               data-testid="wheel-rush-timer"
               aria-label={t('wordWheel.timeLeft') || 'Time Left'}
-              className={cn(
-                'px-2.5 py-1 rounded-neo border-2 border-neo-black font-neo-display font-bold text-xs sm:text-sm shadow-hard tabular-nums',
-                remainingTime <= 10 ? 'bg-neo-red text-neo-white animate-pulse' : 'bg-neo-cyan text-neo-black',
-              )}
+              className="shrink-0"
             >
-              {Math.floor(Math.max(0, remainingTime) / 60)}:{String(Math.max(0, remainingTime) % 60).padStart(2, '0')}
+              <CircularTimer
+                duration={timerDuration}
+                initialRemainingTime={Math.max(0, remainingTime)}
+                isPlaying
+                size={52}
+                strokeWidth={4}
+                colorFamily="cyan"
+                warningAt={15}
+                criticalAt={5}
+                timerKey={timerDuration}
+              />
             </div>
           )}
-          <Button size="sm" variant="destructive" onClick={onQuit}>{t('common.quit') || 'Quit'}</Button>
+          <Button
+            size="icon"
+            variant="destructive"
+            onClick={onQuit}
+            aria-label={t('common.quit') || 'Quit'}
+            className="shrink-0"
+          >
+            <X />
+          </Button>
         </div>
       </div>
 
