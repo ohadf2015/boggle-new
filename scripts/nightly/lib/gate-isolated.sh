@@ -75,8 +75,14 @@ run_isolated_gate() {
     # Test seam: a deterministic command run inside the worktree's fe-next.
     ( cd "$wt/fe-next" && eval "$NIGHTLY_GATE_CMD" ) > "$NIGHTLY_LAST_GATE_OUTPUT" 2>&1 || rc=1
   else
+    # build:schemas FIRST — `npm run test` imports `../dist/backend/utils/schemas`
+    # via the compiled-bridge in backend/utils/socketValidation.ts:69. The fresh
+    # worktree has no dist/ yet, so 12 handler-test suites fail with "Cannot find
+    # module" — that's what reverted every CODE lane on 2026-05-26. Cheap (~3s
+    # tsc), then build:fast for the final next build (skip dicts/routes regen).
     ( cd "$wt/fe-next" \
         && npm run lint \
+        && npm run build:schemas \
         && npm run test \
         && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast; } ) > "$NIGHTLY_LAST_GATE_OUTPUT" 2>&1 || rc=1
   fi

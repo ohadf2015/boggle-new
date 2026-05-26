@@ -579,11 +579,19 @@ else
   log "FATAL — neither timeout nor gtimeout. Install: brew install coreutils"
   _to=()
 fi
-if [ ${#_to[@]} -gt 0 ] && "${_to[@]}" claude -p "$(cat "$SUMMARY_PROMPT")" \
+# Pipe the prompt via stdin instead of `-p "$(cat …)"` positional. Why:
+# `-p` is a boolean flag (`--print`); the next positional is the prompt. If
+# `$(cat $SUMMARY_PROMPT)` evaluates to empty (temp-file race, disk pressure,
+# or any unexpected shell-substitution edge case), claude sees an empty prompt
+# AND closed stdin and dies with "Input must be provided either through stdin
+# or as a prompt argument" — exactly what aborted the 2026-05-26 summary.
+# Stdin piping cannot silently empty itself: an empty file fails earlier and
+# loudly, and the kernel never re-quotes content.
+if [ ${#_to[@]} -gt 0 ] && [ -s "$SUMMARY_PROMPT" ] && "${_to[@]}" claude --print \
   --allowedTools '*' \
   --dangerously-skip-permissions \
   --model sonnet \
-  < /dev/null \
+  < "$SUMMARY_PROMPT" \
   > "$SUMMARY_FILE" 2>>"$RUN_LOG"; then
   # Strip leakage from Claude CLI startup + Explanatory output-style decorations:
   #  - "Warning: no stdin data received..." (suppressed by </dev/null but belt-and-suspenders)
@@ -603,12 +611,41 @@ else
   log "summary composer failed/timed out — deterministic inline brief"
   _outcome=$(grep -m1 '\*\*Outcome:\*\*' "$REPORT" 2>/dev/null | sed -E 's/.*\*\*Outcome:\*\* *//; s/`//g' | head -c 220)
   _lanes=$(printf '%s\n' "${LANE_RESULTS[@]:-}")
+  # Mine ✅ wins from LANE_RESULTS (1 line per success). Each ✅ line is
+  # "✅ lane NN (name) — changed N files" — keep up to 4, trim count noise.
+  _wins=$(printf '%s\n' "${LANE_RESULTS[@]:-}" \
+    | grep -E '^✅ lane' \
+    | sed -E 's/^✅ lane [0-9]+ \(([^)]+)\) — changed ([0-9]+) files?/✅ \1 (\2 files)/' \
+    | head -4)
+  # Concerns: timeouts + hard failures (LANE_RESULTS already differentiates ⏱ vs ❌)
+  _concerns=$(printf '%s\n' "${LANE_RESULTS[@]:-}" \
+    | grep -E '^(⏱|❌|⏭)' \
+    | sed -E 's/^(⏱[^ ]*|❌|⏭[^ ]*)[[:space:]]+lane [0-9]+ ?\(?([^)]*)\)?[[:space:]]*[—-][[:space:]]*/⚠️ \2 — /' \
+    | head -3)
   _redditpick=$(awk '/^#### Top Reddit pick of the day/{f=1} f&&/Thread:|Permalink:/{print; c++} c>=1&&f&&/^$/{exit}' "$REPORT" 2>/dev/null | grep -oE 'https?://[^[:space:]]+reddit\.com/[^[:space:])]*' | head -1)
   _ideapick=$(grep -m1 '^- Top idea:' "$REPORT" 2>/dev/null | sed 's/^- Top idea: //' | head -c 140)
-  SUMMARY=$(printf '🌙 *Nightly %s* — `%s`\n\n*Outcome:* %s\n\n*Lanes:*\n%s%s%s' \
-    "$TODAY" "${NEW_SHA:0:7}" "${_outcome:-see lanes below}" "$_lanes" \
+  # Top game-mode polish idea title (lane 4 emits up to 2 — name them so the
+  # founder knows the polish cards below are coming, matching the LLM template).
+  _polishline=$(awk '
+    /^#### Top game-mode improvement idea/ { in_b=1; next }
+    in_b && /^- Title:/ { sub(/^- Title: */, "", $0); t=$0 }
+    in_b && /^- Mode:/  { sub(/^- Mode: */,  "", $0); m=$0 }
+    in_b && /^- Return-hook:/ { sub(/^- Return-hook: */, "", $0); h=$0 }
+    in_b && /^$/ && t { printf "> %s: %s — %s\n", m, t, h; t=""; m=""; h=""; in_b=0; count++; if(count>=2)exit }
+  ' "$REPORT" 2>/dev/null)
+  # Tomorrow's focus: first "loop improvement" or unresolved triage item.
+  _tomorrow=$(grep -m1 -E '^[0-9]+\. \*\*' "docs/nightly/loop-improvements/${TODAY}.md" 2>/dev/null \
+    | sed -E 's/^[0-9]+\. \*\*([^*]+)\*\*.*$/\1/' | head -c 140)
+  [ -z "$_tomorrow" ] && _tomorrow="check triage-queue.md"
+
+  SUMMARY=$(printf '🌙 *Nightly %s* — `%s` · %s files\n\n*Outcome:* %s\n%s%s%s%s%s\n\n→ tomorrow: %s' \
+    "$TODAY" "${NEW_SHA:0:7}" "${DIRTY_COUNT:-?}" "${_outcome:-see lanes below}" \
+    "$([ -n "$_wins" ] && printf '\n%s' "$_wins")" \
+    "$([ -n "$_concerns" ] && printf '\n%s' "$_concerns")" \
     "$([ -n "$_redditpick" ] && printf '\n\n💬 *Reddit pick:* %s' "$_redditpick")" \
-    "$([ -n "$_ideapick" ] && printf '\n\n🎮 *Idea:* %s' "$_ideapick")")
+    "$([ -n "$_ideapick" ] && printf '\n\n🎮 *Idea:* %s' "$_ideapick")" \
+    "$([ -n "$_polishline" ] && printf '\n\n🎨 *Polish ideas:*\n%s' "$_polishline")" \
+    "$_tomorrow")
 fi
 rm -f "$SUMMARY_PROMPT" "$SUMMARY_FILE"
 
