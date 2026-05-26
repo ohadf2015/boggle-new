@@ -1,0 +1,88 @@
+import { act, render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { MascotCelebrationVideo } from '../MascotCelebrationVideo';
+
+function mockReducedMotion(matches: boolean) {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string) => ({
+      matches,
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }),
+  });
+}
+
+describe('MascotCelebrationVideo', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    mockReducedMotion(false);
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('renders the champion variant src for kind="champion"', () => {
+    render(<MascotCelebrationVideo kind="champion" />);
+    const video = screen.getByTestId('mascot-celebration-video').querySelector('video');
+    expect(video?.getAttribute('src')).toBe('/mascots/celebration-champion.mp4');
+  });
+
+  it('renders the bingo variant src for kind="bingo"', () => {
+    render(<MascotCelebrationVideo kind="bingo" />);
+    const video = screen.getByTestId('mascot-celebration-video').querySelector('video');
+    expect(video?.getAttribute('src')).toBe('/mascots/celebration-bingo.mp4');
+  });
+
+  it('renders the streak variant src for kind="streak"', () => {
+    render(<MascotCelebrationVideo kind="streak" />);
+    const video = screen.getByTestId('mascot-celebration-video').querySelector('video');
+    expect(video?.getAttribute('src')).toBe('/mascots/celebration-streak.mp4');
+  });
+
+  it('exposes data-kind for analytics/E2E selection', () => {
+    render(<MascotCelebrationVideo kind="defeat" />);
+    expect(screen.getByTestId('mascot-celebration-video').dataset.kind).toBe('defeat');
+  });
+
+  it('calls onDone after autoDismissMs', () => {
+    const onDone = vi.fn();
+    render(<MascotCelebrationVideo kind="knight" autoDismissMs={2500} onDone={onDone} />);
+    expect(onDone).not.toHaveBeenCalled();
+    act(() => {
+      vi.advanceTimersByTime(2499);
+    });
+    expect(onDone).not.toHaveBeenCalled();
+    act(() => {
+      vi.advanceTimersByTime(2);
+    });
+    expect(onDone).toHaveBeenCalledTimes(1);
+  });
+
+  it('never calls onDone when autoDismissMs is 0', () => {
+    const onDone = vi.fn();
+    render(<MascotCelebrationVideo kind="knight" autoDismissMs={0} onDone={onDone} />);
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
+    expect(onDone).not.toHaveBeenCalled();
+  });
+
+  it('renders nothing under prefers-reduced-motion', () => {
+    mockReducedMotion(true);
+    const { container } = render(<MascotCelebrationVideo kind="champion" />);
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('renders overlay role status by default; not as overlay when overlay=false', () => {
+    const { rerender } = render(<MascotCelebrationVideo kind="knight" />);
+    expect(screen.getByTestId('mascot-celebration-video').getAttribute('role')).toBe('status');
+    rerender(<MascotCelebrationVideo kind="knight" overlay={false} />);
+    expect(screen.getByTestId('mascot-celebration-video').getAttribute('role')).toBeNull();
+  });
+});
