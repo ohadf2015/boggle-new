@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers, Gem, Building2, Hammer, Vault, Compass } from 'lucide-react';
+import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers, Gem, Building2, Hammer, Vault, Compass, PartyPopper, FlaskConical, ScrollText } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
@@ -56,7 +56,10 @@ type LandingCardKey =
   | 'blastClassic'
   | 'wordForge'
   | 'wordVault'
-  | 'adventurePrototype';
+  | 'adventurePrototype'
+  | 'party'
+  | 'wordAlchemy'
+  | 'shiritori';
 
 /** Default card order when no server data available */
 const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'practice', 'blast', 'connections', 'brainGym'];
@@ -70,6 +73,7 @@ const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
   'connections', 'brainGym', 'wordCraft', 'wordCraftGems', 'wordTower', 'blastClassic',
   'wordForge', 'wordVault', 'adventurePrototype',
+  'party', 'wordAlchemy', 'shiritori',
 ]);
 
 /** CSS stagger delay for each card index */
@@ -157,6 +161,14 @@ export function LandingChallengeCards({
     if (isAdmin && !next.includes('wordForge')) next.push('wordForge');
     if (isAdmin && !next.includes('wordVault')) next.push('wordVault');
     if (isAdmin && !next.includes('adventurePrototype')) next.push('adventurePrototype');
+    // Hidden modes that ship code but aren't surfaced to the public hub —
+    // gated behind a PostHog flag (party), a typed-URL-only puzzle
+    // (wordAlchemy), or pure standalone routes (shiritori). Admins get one
+    // hub entry per mode so dev previews stay reachable without flipping
+    // flags in the dashboard.
+    if (isAdmin && !next.includes('party')) next.push('party');
+    if (isAdmin && !next.includes('wordAlchemy')) next.push('wordAlchemy');
+    if (isAdmin && !next.includes('shiritori')) next.push('shiritori');
     if (language === 'ja') return next.filter((m) => !JA_HIDDEN_MODES.has(m));
     return next;
   })();
@@ -411,13 +423,58 @@ export function LandingChallengeCards({
           </div>
         );
 
+      case 'party':
+        return (
+          <div key="party" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+            <ModeCard
+              title={t('landing.partyMode')}
+              description={t('landing.partyModeDesc')}
+              href={`/${language}/party`}
+              icon={<PartyPopper className="w-6 h-6" />}
+              variant="pink"
+              badge="ADMIN"
+              onClick={() => { trackLandingCtaClick('mode_card', { mode: 'party', variant: 'pink' }); }}
+            />
+          </div>
+        );
+
+      case 'wordAlchemy':
+        return (
+          <div key="wordAlchemy" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+            <ModeCard
+              title={t('landing.wordAlchemyMode')}
+              description={t('landing.wordAlchemyModeDesc')}
+              href={`/${language}/word-alchemy`}
+              icon={<FlaskConical className="w-6 h-6" />}
+              variant="purple"
+              badge="ADMIN"
+              onClick={() => { trackLandingCtaClick('mode_card', { mode: 'wordAlchemy', variant: 'purple' }); }}
+            />
+          </div>
+        );
+
+      case 'shiritori':
+        return (
+          <div key="shiritori" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+            <ModeCard
+              title={t('landing.shiritoriMode')}
+              description={t('landing.shiritoriModeDesc')}
+              href={`/${language}/shiritori`}
+              icon={<ScrollText className="w-6 h-6" />}
+              variant="cyan"
+              badge="ADMIN"
+              onClick={() => { trackLandingCtaClick('mode_card', { mode: 'shiritori', variant: 'cyan' }); }}
+            />
+          </div>
+        );
+
       default:
         return null;
     }
   };
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordCraftGems', 'wordTower', 'blastClassic', 'wordForge', 'wordVault', 'adventurePrototype']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordCraftGems', 'wordTower', 'blastClassic', 'wordForge', 'wordVault', 'adventurePrototype', 'party', 'wordAlchemy', 'shiritori']);
   // Newcomer-essential modes — always visible above the fold. Everything else
   // collapses into a "More Game Modes" expander to reduce choice paralysis
   // without removing the cards from the DOM (preserves SEO + AI-crawler links).

@@ -195,6 +195,60 @@ describe('LandingChallengeCards — Adventure Prototype admin dev-preview gate',
   });
 });
 
+describe('LandingChallengeCards — Party Games admin dev-preview gate', () => {
+  it('does NOT render the Party Games card for a non-admin', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.queryByTestId('mode-landing.partyMode')).toBeNull();
+  });
+
+  it('renders the Party Games card for an admin with /party href', () => {
+    mockIsAdmin.mockReturnValue(true);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    const card = screen.getByTestId('mode-landing.partyMode');
+    expect(card).toBeInTheDocument();
+    expect(card.getAttribute('data-href')).toBe('/en/party');
+  });
+});
+
+describe('LandingChallengeCards — Word Alchemy admin dev-preview gate', () => {
+  it('does NOT render the Word Alchemy card for a non-admin', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.queryByTestId('mode-landing.wordAlchemyMode')).toBeNull();
+  });
+
+  it('renders the Word Alchemy card for an admin with /word-alchemy href', () => {
+    mockIsAdmin.mockReturnValue(true);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    const card = screen.getByTestId('mode-landing.wordAlchemyMode');
+    expect(card).toBeInTheDocument();
+    expect(card.getAttribute('data-href')).toBe('/en/word-alchemy');
+  });
+});
+
+describe('LandingChallengeCards — Shiritori admin dev-preview gate', () => {
+  it('does NOT render the Shiritori card for a non-admin', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.queryByTestId('mode-landing.shiritoriMode')).toBeNull();
+  });
+
+  it('renders the Shiritori card for an admin with /shiritori href', () => {
+    mockIsAdmin.mockReturnValue(true);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    const card = screen.getByTestId('mode-landing.shiritoriMode');
+    expect(card).toBeInTheDocument();
+    expect(card.getAttribute('data-href')).toBe('/en/shiritori');
+  });
+});
+
 describe('LandingChallengeCards — Blast Classic admin gate', () => {
   it('does NOT render the Blast Classic card for a non-admin', () => {
     mockIsAdmin.mockReturnValue(false);
