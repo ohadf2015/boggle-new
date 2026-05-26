@@ -12487,6 +12487,13 @@ const he = {
     "heatLabel": "חום",
     "overdrive": "!אוברדרייב",
     "burnout": "נשרפת — מדלגים תור…",
+    "heatStamp": {
+      "exitOverdrive": "!נפרע",
+      "recover": "התאוששת"
+    },
+    "scorePreview": {
+      "bingoReady": "!בינגו"
+    },
     "encouragement": {
       "0": "!מילה יפה",
       "1": "!מהמם",

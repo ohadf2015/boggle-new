@@ -12203,6 +12203,13 @@ const es = {
     "heatLabel": "Calor",
     "overdrive": "¡SOBREMARCHA!",
     "burnout": "¡AGOTADO — saltando turno…",
+    "heatStamp": {
+      "exitOverdrive": "¡COBRADO!",
+      "recover": "RECUPERADO"
+    },
+    "scorePreview": {
+      "bingoReady": "¡BINGO!"
+    },
     "encouragement": {
       "0": "¡Buena palabra!",
       "1": "¡Hermoso!",

@@ -12080,6 +12080,13 @@ const ja = {
     "heatLabel": "ヒート",
     "overdrive": "オーバードライブ！",
     "burnout": "バーンアウト — ターンをスキップ…",
+    "heatStamp": {
+      "exitOverdrive": "回収！",
+      "recover": "復活"
+    },
+    "scorePreview": {
+      "bingoReady": "ビンゴ！"
+    },
     "encouragement": {
       "0": "いい言葉！",
       "1": "すばらしい！",

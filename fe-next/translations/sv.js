@@ -12106,6 +12106,13 @@ const sv = {
     "heatLabel": "Värme",
     "overdrive": "ÖVERDRIFT!",
     "burnout": "UTBRÄND — hoppar tur…",
+    "heatStamp": {
+      "exitOverdrive": "INKASSERAT!",
+      "recover": "ÅTERHÄMTAD"
+    },
+    "scorePreview": {
+      "bingoReady": "BINGO!"
+    },
     "encouragement": {
       "0": "Snyggt ord!",
       "1": "Vackert!",

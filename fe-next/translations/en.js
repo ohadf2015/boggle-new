@@ -12108,6 +12108,13 @@ const en = {
     "heatLabel": "Heat",
     "overdrive": "OVERDRIVE!",
     "burnout": "BURNED OUT — skipping turn…",
+    "heatStamp": {
+      "exitOverdrive": "CASHED!",
+      "recover": "REVIVED"
+    },
+    "scorePreview": {
+      "bingoReady": "BINGO!"
+    },
     "encouragement": {
       "0": "Nice word!",
       "1": "Beautiful!",

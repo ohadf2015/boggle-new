@@ -18,9 +18,13 @@ import { GemHuntHUD } from './GemHuntHUD';
 import { GemInventory } from './GemInventory';
 import { GemShop } from './GemShop';
 import { GemCellOverlay } from './GemCellOverlay';
+import { WordCraftScorePreviewBadge } from '@/components/word-craft/WordCraftScorePreviewBadge';
 import { GemHuntWinScene } from './GemHuntWinScene';
 import { cn } from '@/lib/utils';
-import type { AbilityKind } from '@/lib/word-craft/gems/types';
+import type { AbilityCard, AbilityKind } from '@/lib/word-craft/gems/types';
+import { planGemDrama, clampGemDramaForCosy } from '@/lib/word-craft/celebration/gemDrama';
+import { useAccessibility } from '@/contexts/AccessibilityContext';
+import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 
 export default function GemHuntPageClient() {
   const router = useRouter();
@@ -53,6 +57,7 @@ export default function GemHuntPageClient() {
 
   const hunt = useGemHunt({ seed, dict, locale, boardSize: 11 });
   const { state } = hunt;
+  const { cosyMode } = useAccessibility();
 
   // GSAP collect burst: when state.lastCollection updates, fly each collected
   // gem's icon from its board cell to its matching inventory chip. Clone the
@@ -66,6 +71,28 @@ export default function GemHuntPageClient() {
       const sourceEl = document.querySelector<HTMLElement>(`[data-gem-id="${gem.cellId}"]`);
       const targetEl = document.querySelector<HTMLElement>(`[data-inv-cell="${gem.color}-${gem.rarity}"]`);
       if (!sourceEl || !targetEl) continue;
+      // Rarity drama: shards pulse, crowns trigger the fullscreen celebration
+      // burst at the inventory chip + brief board freeze-frame. Cosy clamps
+      // the crown down to a shard-equivalent (no freeze, sparkle only).
+      const dramaRaw = planGemDrama({ rarity: gem.rarity });
+      const drama = cosyMode ? clampGemDramaForCosy(dramaRaw) : dramaRaw;
+      if (drama.sharedFxPreset && SharedFxApp.isInitialized()) {
+        const dstCenter = targetEl.getBoundingClientRect();
+        SharedFxApp.spawnBurst(
+          drama.sharedFxPreset,
+          dstCenter.left + dstCenter.width / 2,
+          dstCenter.top + dstCenter.height / 2,
+        );
+      }
+      if (drama.freezeFrameMs > 0) {
+        const board = document.querySelector<HTMLElement>('[data-wc-board]');
+        if (board) {
+          board.style.filter = 'brightness(1.25) saturate(1.4)';
+          setTimeout(() => {
+            if (board) board.style.filter = '';
+          }, drama.freezeFrameMs);
+        }
+      }
       const srcRect = sourceEl.getBoundingClientRect();
       const dstRect = targetEl.getBoundingClientRect();
       const clone = sourceEl.cloneNode(true) as HTMLElement;
@@ -124,6 +151,31 @@ export default function GemHuntPageClient() {
   const handleRecallPending = useCallback(
     (rackTileId: string) => hunt.recallTile(rackTileId),
     [hunt],
+  );
+
+  // Card-pull fanfare: when a shop card is bought, fire a sparkle stream
+  // from the card to the gem chip it spent. Sells the "this is a moment"
+  // beat that the silent state-update used to miss. Skipped under cosy.
+  const handleBuyAbility = useCallback(
+    (card: AbilityCard) => {
+      const result = hunt.buyAbility(card);
+      if (!cosyMode && SharedFxApp.isInitialized()) {
+        const cardEl = document.querySelector<HTMLElement>(`[data-shop-card="${card.id}"]`);
+        const chipEl = document.querySelector<HTMLElement>(
+          `[data-inv-cell="${card.cost.color}-${card.cost.rarity}"]`,
+        );
+        if (cardEl) {
+          const r = cardEl.getBoundingClientRect();
+          SharedFxApp.spawnBurst('sparkle-gold', r.left + r.width / 2, r.top + r.height / 2);
+        }
+        if (chipEl) {
+          const r = chipEl.getBoundingClientRect();
+          SharedFxApp.spawnBurst('sparkle', r.left + r.width / 2, r.top + r.height / 2);
+        }
+      }
+      return result;
+    },
+    [hunt, cosyMode],
   );
 
   const handleSubmit = useCallback(() => hunt.submitMove(), [hunt]);
@@ -202,7 +254,7 @@ export default function GemHuntPageClient() {
           shop={state.shop}
           inventory={state.inventory}
           pendingAbilities={state.pendingAbilities}
-          onBuy={hunt.buyAbility}
+          onBuy={handleBuyAbility}
           onReroll={hunt.rerollShop}
           labels={{
             title: t('wordcraft.gems.shop.title'),
@@ -231,6 +283,7 @@ export default function GemHuntPageClient() {
               locale={locale}
             />
             <GemCellOverlay gemCells={state.gemCells} />
+            <WordCraftScorePreviewBadge board={state.board} placements={state.pendingPlacements} />
           </div>
         </div>
 

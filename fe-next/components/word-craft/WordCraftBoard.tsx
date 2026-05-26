@@ -103,6 +103,7 @@ function WordCraftBoardImpl({
       aria-label="WordCraft board"
       data-tile-selected={hasSelectedTile ? 'true' : undefined}
       data-board-size={size}
+      data-wc-board=""
       className="grid bg-black border-neo-thick border-black rounded-neo p-1.5 shadow-hard-lg w-full h-full @container"
       style={{
         gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`,
