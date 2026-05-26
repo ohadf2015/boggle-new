@@ -21,7 +21,7 @@ import { WordTowerRivalRail } from './WordTowerRivalRail';
 import { WordTowerLandmarkRail } from './WordTowerLandmarkRail';
 import { milestoneCrossed } from '@/lib/wordTower/milestones';
 import { landmarkCrossed } from '@/lib/wordTower/landmarkMoment';
-import WordTowerCrane from './WordTowerCrane';
+import WordTowerCrane, { type WordTowerCraneHandle } from './WordTowerCrane';
 import { useCraneDrop } from './useCraneDrop';
 import { useSabotageIntegration } from './useSabotage';
 import { WordTowerSabotageBay } from './WordTowerSabotageBay';
@@ -166,6 +166,12 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
 
   // Crane Stack — cosy reward-amplifier; logic in useCraneDrop.
   const crane = useCraneDrop(tower.commitPlacement, tower.hazard);
+
+  // Imperative handle on the crane so the bottom HUD's swapped-in DROP CTA
+  // can fire drop() — the player's thumb stays on the same button instead of
+  // chasing the swinging beam to the top of the screen.
+  const craneRef = useRef<WordTowerCraneHandle | null>(null);
+  const triggerCraneDrop = useCallback(() => craneRef.current?.drop(), []);
 
   // Wrecking ball — perfect drops earn tokens; spend on a rival to topple a
   // floor off their ghost tower. Includes the receiver-side simulator
@@ -375,15 +381,19 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         </div>
       )}
 
-      {/* Crane Stack — the held word swings; tap to drop it onto the tower. */}
+      {/* Crane Stack — the held word swings; tap the BOTTOM CTA to drop it.
+          The crane's own button is hidden; the HUD's swapped-in DROP button
+          calls craneRef.current.drop() so the player never chases the beam. */}
       {tower.state.pendingWord && (
         <WordTowerCrane
+          ref={craneRef}
           word={tower.state.pendingWord}
           consecutiveSloppy={crane.consecutiveSloppy}
           onDrop={crane.onDrop}
           onSignedDrop={crane.pushSignedOffset}
           t={t}
           reducedMotion={reducedMotion}
+          hideOwnButton
         />
       )}
 
@@ -489,6 +499,8 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           onSubmit={tower.hold}
           onScramble={tower.scramble}
           onDeckHeight={onDeckHeight}
+          pendingWord={tower.state.pendingWord}
+          onCraneDrop={triggerCraneDrop}
           t={t}
           dir={dir}
         />

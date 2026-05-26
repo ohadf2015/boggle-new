@@ -88,4 +88,32 @@ describe('WordTowerHud', () => {
     render(<WordTowerHud {...makeProps({ onDeckHeight })} />);
     expect(onDeckHeight).toHaveBeenCalled();
   });
+
+  it('swaps Build → Drop CTA at the SAME position when a word is pending placement', () => {
+    const onSubmit = vi.fn();
+    const onCraneDrop = vi.fn();
+    const { rerender } = render(
+      <WordTowerHud {...makeProps({ word: 'CAT', onSubmit, onCraneDrop })} />,
+    );
+    expect(screen.queryByRole('button', { name: /wordTower\.crane\.tapToDrop/ })).toBeNull();
+    expect(screen.getByRole('button', { name: /wordTower\.hud\.build/ })).toBeEnabled();
+
+    rerender(
+      <WordTowerHud {...makeProps({ word: 'CAT', pendingWord: 'CCAT', onSubmit, onCraneDrop })} />,
+    );
+    expect(screen.queryByRole('button', { name: /wordTower\.hud\.build/ })).toBeNull();
+    const dropBtn = screen.getByRole('button', { name: /wordTower\.crane\.tapToDrop/ });
+    fireEvent.click(dropBtn);
+    expect(onCraneDrop).toHaveBeenCalledTimes(1);
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('locks the tray + edit buttons while a word is pending placement', () => {
+    render(
+      <WordTowerHud {...makeProps({ word: 'CAT', selected: [0, 1, 2], pendingWord: 'CCAT' })} />,
+    );
+    expect(screen.getByRole('button', { name: 'wordTower.a11y.tile:R' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /wordTower\.hud\.backspace/ })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /wordTower\.hud\.scramble/ })).toBeDisabled();
+  });
 });

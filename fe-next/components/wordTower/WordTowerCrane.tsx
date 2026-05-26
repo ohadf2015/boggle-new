@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import {
   evaluatePlacement,
@@ -9,6 +9,13 @@ import {
   type PlacementOutcome,
 } from '@/lib/wordTower/cranePlacement';
 import { beamWidthFor } from '@/lib/wordTower/craneBeam';
+
+/** Imperative handle so a parent CTA (e.g. the bottom HUD) can trigger the
+ *  drop — keeps the player's finger pinned to one button rather than chasing
+ *  the crane to the top of the screen. */
+export interface WordTowerCraneHandle {
+  drop: () => void;
+}
 
 interface WordTowerCraneProps {
   /** The validated word being placed (rendered on the swinging block). */
@@ -24,6 +31,9 @@ interface WordTowerCraneProps {
   periodMs?: number;
   /** Test/override seam: returns the signed offset [-1,1] at drop time. */
   getOffset?: () => number;
+  /** When true, the crane chrome renders without its own drop button — the
+   *  parent CTA drives `drop()` via the imperative ref instead. */
+  hideOwnButton?: boolean;
 }
 
 const QUALITY_STYLE: Record<string, string> = {
@@ -49,19 +59,27 @@ const CABLE_LEN_PX = 64;
  * Pure decision logic + a thin rAF sweep — the outcome is unit-tested and
  * the component stays presentational.
  *
+ * The drop trigger is exposed via `useImperativeHandle` so the parent can
+ * mount the CTA at the BOTTOM of the screen (where the player's thumb already
+ * is) instead of forcing a finger trip to the top.
+ *
  * A11y: reduced-motion holds the carriage at centre (a generous, skill-free
  * "good" placement) rather than animating.
  */
-export default function WordTowerCrane({
-  word,
-  consecutiveSloppy,
-  onDrop,
-  onSignedDrop,
-  t,
-  reducedMotion = false,
-  periodMs = 1800,
-  getOffset,
-}: WordTowerCraneProps) {
+const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(function WordTowerCrane(
+  {
+    word,
+    consecutiveSloppy,
+    onDrop,
+    onSignedDrop,
+    t,
+    reducedMotion = false,
+    periodMs = 1800,
+    getOffset,
+    hideOwnButton = false,
+  },
+  ref,
+) {
   const [pos, setPos] = useState(0);
   const posRef = useRef(0);
   const droppedRef = useRef(false);
@@ -84,7 +102,7 @@ export default function WordTowerCrane({
     return () => cancelAnimationFrame(raf);
   }, [reducedMotion, periodMs]);
 
-  const drop = () => {
+  const drop = useCallback(() => {
     if (droppedRef.current) return;
     droppedRef.current = true;
     const signedOffset = getOffset ? getOffset() : posRef.current;
@@ -96,7 +114,9 @@ export default function WordTowerCrane({
       setResult(outcome);
       onDrop(outcome);
     }, reducedMotion ? 0 : 260);
-  };
+  }, [getOffset, onSignedDrop, onDrop, consecutiveSloppy, reducedMotion]);
+
+  useImperativeHandle(ref, () => ({ drop }), [drop]);
 
   const trolleyX = pos * TROLLEY_RANGE_PX;
   const beamW = beamWidthFor(word.length);
@@ -203,7 +223,7 @@ export default function WordTowerCrane({
         >
           {t(`wordTower.crane.${result.quality}`)}
         </div>
-      ) : (
+      ) : hideOwnButton ? null : (
         <button
           type="button"
           data-testid="crane-drop"
@@ -220,4 +240,6 @@ export default function WordTowerCrane({
       )}
     </div>
   );
-}
+});
+
+export default WordTowerCrane;
