@@ -1,8 +1,11 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FlaskConical, ArrowRight, RotateCcw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 
 /**
  * Word Alchemy — an experimental, admin-gated transformation-chain mode
@@ -136,29 +139,53 @@ export const PUZZLES: AlchemyPuzzle[] = [
 
 export default function WordAlchemyPage() {
   const { t } = useLanguage();
+  const { isAdmin } = useAuth();
+  const { playSound } = useSoundEffects();
 
   const [puzzleIdx, setPuzzleIdx] = useState(0);
   const [stepIdx, setStepIdx] = useState(0);
   const [input, setInput] = useState('');
   const [wrongCount, setWrongCount] = useState(0);
+  const [streak, setStreak] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const flaskRef = useRef<HTMLSpanElement>(null);
+  const wonFxFiredRef = useRef(false);
 
   const puzzle = PUZZLES[puzzleIdx];
   const won = stepIdx >= puzzle.steps.length;
   const step = won ? null : puzzle.steps[stepIdx];
 
-  // Words proven so far: the start word plus every solved step's answer.
   const chain = useMemo(
     () => [puzzle.start, ...puzzle.steps.slice(0, stepIdx).map((s) => s.answer)],
     [puzzle, stepIdx]
   );
   const prevWord = chain[chain.length - 1];
 
+  // Win ceremony — fires once per puzzle. Stacks fanfare + big burst at flask.
+  useEffect(() => {
+    if (!won || wonFxFiredRef.current) return;
+    wonFxFiredRef.current = true;
+    playSound('victoryFanfare');
+    const rect = flaskRef.current?.getBoundingClientRect();
+    const x = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+    const y = rect ? rect.top + rect.height / 2 : window.innerHeight / 3;
+    SharedFxApp.spawnBurst('victory-burst', x, y);
+    SharedFxApp.spawnBurst('sparkle-gold', x, y, { count: 24 });
+  }, [won, playSound]);
+
   const resetPuzzle = (idx: number) => {
     setPuzzleIdx(idx);
     setStepIdx(0);
     setInput('');
     setWrongCount(0);
+    setStreak(0);
+    wonFxFiredRef.current = false;
+  };
+
+  const burstAt = (preset: string, fallbackEl: HTMLElement | null, extraCount?: number) => {
+    const rect = fallbackEl?.getBoundingClientRect();
+    if (!rect) return;
+    SharedFxApp.spawnBurst(preset, rect.left + rect.width / 2, rect.top + rect.height / 2, extraCount ? { count: extraCount } : undefined);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -168,21 +195,39 @@ export default function WordAlchemyPage() {
       setStepIdx((s) => s + 1);
       setInput('');
       setWrongCount(0);
+      const nextStreak = streak + 1;
+      setStreak(nextStreak);
+      playSound('wordAccepted');
+      // Tiered burst: bigger preset at 3+ streak.
+      burstAt(nextStreak >= 3 ? 'celebration' : 'sparkle-valid', inputRef.current, nextStreak >= 3 ? 18 : undefined);
     } else {
       setWrongCount((w) => w + 1);
-      // Re-trigger the shake without remounting the input (keeps focus).
-      // Honour prefers-reduced-motion at the source.
+      setStreak(0);
+      playSound('wordRejected');
+      burstAt('sparkle-invalid', inputRef.current, 8);
       const el = inputRef.current;
       const reduce =
         typeof window !== 'undefined' &&
         window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
       if (el && !reduce) {
         el.classList.remove('animate-neo-shake');
-        void el.offsetWidth; // force reflow so the animation restarts
+        void el.offsetWidth;
         el.classList.add('animate-neo-shake');
       }
     }
   };
+
+  // Admin gate — Word Alchemy stays an admin-only preview per project scope.
+  // Render after hooks so order is stable across admin/non-admin renders.
+  if (!isAdmin) {
+    return (
+      <main className="min-h-[100dvh] bg-neo-navy texture-halftone px-4 py-12 flex items-center justify-center">
+        <p className="font-neo-body text-neo-white/60 text-center max-w-sm">
+          {t('wordAlchemy.adminOnly')}
+        </p>
+      </main>
+    );
+  }
 
   const opLabel = step ? t(`wordAlchemy.ops.${step.op}`) : '';
   const clue = step?.clueKey ? t(step.clueKey) : '';
@@ -193,10 +238,18 @@ export default function WordAlchemyPage() {
       <div className="mx-auto w-full max-w-2xl space-y-6 animate-[fadeInUp_0.4s_ease-out_both] motion-reduce:animate-none">
         {/* Header */}
         <header className="text-center space-y-3">
-          <span className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-purple px-3 py-1 font-neo-display font-black text-xs uppercase tracking-wide text-neo-navy shadow-hard-sm">
+          <span
+            ref={flaskRef}
+            className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-purple px-3 py-1 font-neo-display font-black text-xs uppercase tracking-wide text-neo-navy shadow-hard-sm"
+          >
             <FlaskConical className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
             {t('wordAlchemy.badge')}
           </span>
+          {streak >= 2 && (
+            <span className="inline-flex items-center gap-1 rounded-neo border-2 border-black bg-neo-yellow px-2.5 py-0.5 font-neo-display font-black text-[10px] uppercase tracking-wide text-neo-navy shadow-hard-sm animate-neo-pop">
+              {t('wordAlchemy.streak', { n: streak })}
+            </span>
+          )}
           <h1 className="font-neo-display font-black text-3xl sm:text-4xl uppercase tracking-tight text-neo-white">
             {t('wordAlchemy.title')}
           </h1>
