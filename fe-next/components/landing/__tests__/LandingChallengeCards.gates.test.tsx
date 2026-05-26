@@ -141,6 +141,60 @@ describe('LandingChallengeCards — Word Tower admin solo gate', () => {
   });
 });
 
+describe('LandingChallengeCards — Word Forge admin dev-preview gate', () => {
+  it('does NOT render the Word Forge card for a non-admin', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.queryByTestId('mode-landing.wordForgeMode')).toBeNull();
+  });
+
+  it('renders the Word Forge card for an admin with /word-forge href', () => {
+    mockIsAdmin.mockReturnValue(true);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    const card = screen.getByTestId('mode-landing.wordForgeMode');
+    expect(card).toBeInTheDocument();
+    expect(card.getAttribute('data-href')).toBe('/en/word-forge');
+  });
+});
+
+describe('LandingChallengeCards — Word Vault admin dev-preview gate', () => {
+  it('does NOT render the Word Vault card for a non-admin', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.queryByTestId('mode-landing.wordVaultMode')).toBeNull();
+  });
+
+  it('renders the Word Vault card for an admin with /word-vault href', () => {
+    mockIsAdmin.mockReturnValue(true);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    const card = screen.getByTestId('mode-landing.wordVaultMode');
+    expect(card).toBeInTheDocument();
+    expect(card.getAttribute('data-href')).toBe('/en/word-vault');
+  });
+});
+
+describe('LandingChallengeCards — Adventure Prototype admin dev-preview gate', () => {
+  it('does NOT render the Adventure Prototype card for a non-admin', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.queryByTestId('mode-landing.adventurePrototypeMode')).toBeNull();
+  });
+
+  it('renders the Adventure Prototype card for an admin with /adventure-prototype href', () => {
+    mockIsAdmin.mockReturnValue(true);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    const card = screen.getByTestId('mode-landing.adventurePrototypeMode');
+    expect(card).toBeInTheDocument();
+    expect(card.getAttribute('data-href')).toBe('/en/adventure-prototype');
+  });
+});
+
 describe('LandingChallengeCards — Blast Classic admin gate', () => {
   it('does NOT render the Blast Classic card for a non-admin', () => {
     mockIsAdmin.mockReturnValue(false);
