@@ -12438,6 +12438,16 @@ const sv = {
     faqA5: "Nej. LexiClash körs i vilken modern webbläsare som helst på telefon, surfplatta eller TV — ingen installation och inget konto behövs.",
     faqQ6: "Finns det konkurrensmässiga rankinglistor?",
     faqA6: "Ja — dagliga utmaningar och globala rankinglistor. Klättra i den dagliga rankningen, bygg combos och toppa listan i ett av de bästa kostnadsfria ordspelen online."
+  },
+  mascotCelebration: {
+    titleChampion: "MÄSTARE!",
+    titleRunnerUp: "PODIUM!",
+    titleDefeat: "GG",
+    titleBingo: "BINGO!",
+    titleKnight: "SEGER!",
+    titleStreak: "PÅ ELD!",
+    titleExplorer: "BRA FYND!",
+    titleMissionComplete: "ALLT KLART!"
   }
 };
 

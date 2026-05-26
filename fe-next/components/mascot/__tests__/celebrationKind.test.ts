@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { pickCelebrationKind } from '../celebrationKind';
+import { describe, expect, it, vi } from 'vitest';
+import { pickCelebrationKind, celebrationTitleFor } from '../celebrationKind';
 
 describe('pickCelebrationKind', () => {
   it('returns "bingo" when hadBingo even at last place', () => {
@@ -46,5 +46,28 @@ describe('pickCelebrationKind', () => {
 
   it('does not treat solo (totalPlayers=1) rank=1 as "defeat" overlap', () => {
     expect(pickCelebrationKind({ rank: 1, totalPlayers: 1 })).toBe('champion');
+  });
+});
+
+describe('celebrationTitleFor', () => {
+  it('resolves each kind to a distinct, non-empty title via the supplied t() function', () => {
+    const t = vi.fn((_path: string, fallback?: string) => fallback ?? _path);
+    const kinds = ['champion', 'runner-up', 'defeat', 'bingo', 'knight', 'streak', 'explorer', 'mission-complete'] as const;
+    const titles = kinds.map((k) => celebrationTitleFor(k, t));
+    // Each title is non-empty
+    for (const title of titles) expect(title.length).toBeGreaterThan(0);
+    // All distinct (no two kinds share the same title)
+    expect(new Set(titles).size).toBe(titles.length);
+  });
+
+  it('passes the translation path and an English fallback string to t()', () => {
+    const t = vi.fn((_path: string, fallback?: string) => fallback ?? '');
+    celebrationTitleFor('bingo', t);
+    expect(t).toHaveBeenCalledWith('mascotCelebration.titleBingo', 'BINGO!');
+  });
+
+  it('returns the translated string when t() supplies one (e.g. Hebrew)', () => {
+    const t = vi.fn((path: string) => (path === 'mascotCelebration.titleBingo' ? 'בינגו!' : ''));
+    expect(celebrationTitleFor('bingo', t)).toBe('בינגו!');
   });
 });

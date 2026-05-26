@@ -12450,6 +12450,16 @@ const ja = {
     "faqA5": "いいえ。LexiClashはスマートフォン、タブレット、またはテレビの任意の最新ブラウザで実行されます — インストールもアカウントも不要。",
     "faqQ6": "競争的なリーダーボードはありますか?",
     "faqA6": "はい — 日替わりチャレンジと世界リーダーボード。日替わりランキングを登り、コンボを構築し、最高の無料オンライン単語ゲームの1つでボードのトップに立ってください。"
+  },
+  "mascotCelebration": {
+    "titleChampion": "チャンピオン！",
+    "titleRunnerUp": "表彰台！",
+    "titleDefeat": "GG",
+    "titleBingo": "ビンゴ！",
+    "titleKnight": "勝利！",
+    "titleStreak": "絶好調！",
+    "titleExplorer": "ナイス！",
+    "titleMissionComplete": "全クリ！"
   }
 };
 

@@ -16,7 +16,7 @@ import PracticeChainCta from '@/components/practice/PracticeChainCta';
 import DailyInsightStack from './DailyInsightStack';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import { MascotCelebrationVideo } from '@/components/mascot/MascotCelebrationVideo';
-import { pickCelebrationKind } from '@/components/mascot/celebrationKind';
+import { pickCelebrationKind, celebrationTitleFor } from '@/components/mascot/celebrationKind';
 import type { Language } from '@/types';
 import type { WordWheelGameResult } from './WordWheelGame';
 
@@ -187,6 +187,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
       {showFanfare && fanfareKind && (
         <MascotCelebrationVideo
           kind={fanfareKind}
+          title={celebrationTitleFor(fanfareKind, t)}
           autoDismissMs={2600}
           onDone={() => setShowFanfare(false)}
         />

@@ -12855,6 +12855,16 @@ const en = {
     "faqA5": "No. LexiClash runs in any modern browser on phone, tablet, or TV — no install and no account needed to start.",
     "faqQ6": "Are there competitive leaderboards?",
     "faqA6": "Yes — daily challenges and global leaderboards. Climb the daily rank, build combos, and top the board in one of the best free competitive word games online."
+  },
+  "mascotCelebration": {
+    "titleChampion": "CHAMPION!",
+    "titleRunnerUp": "PODIUM!",
+    "titleDefeat": "GG",
+    "titleBingo": "BINGO!",
+    "titleKnight": "VICTORY!",
+    "titleStreak": "ON FIRE!",
+    "titleExplorer": "NICE FIND!",
+    "titleMissionComplete": "ALL CLEAR!"
   }
 };
 
