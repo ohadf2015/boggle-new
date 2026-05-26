@@ -66,7 +66,17 @@ export const MascotCelebrationVideo = memo(function MascotCelebrationVideo({
   const variant = VARIANTS[kind];
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const handleDone = useCallback(() => onDone?.(), [onDone]);
+  // Keep the latest onDone in a ref so the auto-dismiss timer below depends only
+  // on autoDismissMs. Parents commonly pass a fresh inline `onDone` arrow on
+  // every render (e.g. DailyWordHuntResults re-renders each second from its
+  // countdown); keying the timer on the callback identity would clear+reset it
+  // before it ever fires, leaving this fixed full-screen overlay stuck on top of
+  // the page and blocking scroll/taps.
+  const onDoneRef = useRef(onDone);
+  useEffect(() => {
+    onDoneRef.current = onDone;
+  });
+  const handleDone = useCallback(() => onDoneRef.current?.(), []);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -94,9 +104,10 @@ export const MascotCelebrationVideo = memo(function MascotCelebrationVideo({
         paddingBottom: 'max(env(safe-area-inset-bottom, 0px), var(--cap-safe-area-bottom, 0px))',
         paddingLeft: 'env(safe-area-inset-left, 0px)',
         paddingRight: 'env(safe-area-inset-right, 0px)',
-        background: 'rgba(10, 24, 40, 0.55)',
-        backdropFilter: 'blur(4px)',
-        WebkitBackdropFilter: 'blur(4px)',
+        // No dim/blur backdrop and click-through: the celebration plays over the
+        // live results so the text stays readable and the page stays scrollable
+        // and tappable the whole time it's on screen.
+        pointerEvents: 'none',
         zIndex: 9998,
         animation: 'lcMcvEnter 280ms ease-out both, lcMcvExit 320ms ease-in forwards',
         animationDelay: `0ms, ${Math.max(autoDismissMs - 280, 0)}ms`,

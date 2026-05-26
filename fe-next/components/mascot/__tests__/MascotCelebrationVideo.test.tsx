@@ -64,6 +64,38 @@ describe('MascotCelebrationVideo', () => {
     expect(onDone).toHaveBeenCalledTimes(1);
   });
 
+  it('still auto-dismisses when the parent re-renders with a fresh onDone every tick', () => {
+    // Regression: a parent with a 1s countdown (e.g. DailyWordHuntResults) passes
+    // a NEW inline `onDone` arrow on every render. If the auto-dismiss timer is
+    // keyed on that callback identity it gets cleared+reset every second and the
+    // fixed full-screen overlay never dismisses — leaving the results page
+    // unresponsive and unscrollable. The timer must survive parent re-renders.
+    const onDone = vi.fn();
+    const { rerender } = render(
+      <MascotCelebrationVideo kind="streak" autoDismissMs={2600} onDone={() => onDone()} />,
+    );
+    // Three 1s ticks → 3s of wall-clock, re-rendering with a new onDone each time.
+    for (let i = 0; i < 3; i++) {
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      rerender(<MascotCelebrationVideo kind="streak" autoDismissMs={2600} onDone={() => onDone()} />);
+    }
+    expect(onDone).toHaveBeenCalledTimes(1);
+  });
+
+  it('overlay is non-blocking: click-through and no dimming backdrop', () => {
+    // The celebration must not hide ("kiss") the results text or block
+    // scroll/taps. Overlay should be pointer-events:none with no dark/blur
+    // backdrop, so the live results stay readable and scrollable while the
+    // mascot video + halo glow play on top, then fade.
+    render(<MascotCelebrationVideo kind="champion" />);
+    const overlay = screen.getByTestId('mascot-celebration-video');
+    expect(overlay.style.pointerEvents).toBe('none');
+    expect(overlay.style.background).toBe('');
+    expect(overlay.style.backdropFilter).toBe('');
+  });
+
   it('never calls onDone when autoDismissMs is 0', () => {
     const onDone = vi.fn();
     render(<MascotCelebrationVideo kind="knight" autoDismissMs={0} onDone={onDone} />);
