@@ -43,6 +43,8 @@ import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import type { WordHuntResultsSummaryProps } from '@/components/results/WordHuntResultsSummary';
 const StickyReadyBar = dynamic(() => import('@/components/results/StickyReadyBar'), { ssr: false });
 import { ResultsFriendStatusProvider } from '@/components/results/ResultsFriendStatus';
+import { MascotCelebrationVideo } from '@/components/mascot/MascotCelebrationVideo';
+import { pickCelebrationKind } from '@/components/mascot/celebrationKind';
 import { generateRandomTable } from '@/utils/utils';
 import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
@@ -414,6 +416,25 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     currentPlayerRank > 1 && currentPlayerData
       ? sortedScores[currentPlayerRank - 2].score - currentPlayerData.score
       : null;
+
+  // AI mascot celebration overlay — picks the variant based on placement +
+  // whether the viewer landed a 7+-letter "bingo" word. Shows briefly before
+  // the scoreboard reads.
+  const hadBingo = useMemo(
+    () => (currentPlayerValidWords ?? []).some((w: { word?: string }) => (w.word?.length ?? 0) >= 7),
+    [currentPlayerValidWords],
+  );
+  const celebrationKind = useMemo(
+    () => sortedScores.length === 0
+      ? null
+      : pickCelebrationKind({
+          rank: currentPlayerRank,
+          totalPlayers: sortedScores.length,
+          hadBingo,
+        }),
+    [sortedScores.length, currentPlayerRank, hadBingo],
+  );
+  const [showCelebration, setShowCelebration] = useState(true);
 
   // Build blast result scores map from sortedScores
   const blastResultScores = useMemo(() => {
@@ -1023,6 +1044,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
       {/* What you missed during your round — drains MidRoundEventQueue */}
       <PostRoundSummary />
+
+      {/* AI-generated mascot celebration overlay — appears for ~2.8s before the
+          scoreboard lands. Variant picked by placement + bingo signal. */}
+      {showCelebration && celebrationKind && (
+        <MascotCelebrationVideo
+          kind={celebrationKind}
+          autoDismissMs={2800}
+          onDone={() => setShowCelebration(false)}
+        />
+      )}
 
       <div
         className="flex-1 flex flex-col min-h-0 bg-neo-navy transition-colors duration-300 relative"

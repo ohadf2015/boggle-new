@@ -38,6 +38,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { FLEXING_SCORE_THRESHOLD, ENCOURAGING_SCORE_THRESHOLD } from '@/utils/mascotConfig';
 import { WinCinematic } from './WinCinematic';
 import { WordHuntResultsContent } from './WordHuntResultsContent';
+import { MascotCelebrationVideo } from '@/components/mascot/MascotCelebrationVideo';
+import { pickCelebrationKind } from '@/components/mascot/celebrationKind';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeChainCta from '@/components/practice/PracticeChainCta';
 
@@ -135,6 +137,21 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const efficiency = result.efficiencyScore ?? 0;
   const showFlexing = efficiency >= FLEXING_SCORE_THRESHOLD;
   const showEncouraging = efficiency < ENCOURAGING_SCORE_THRESHOLD;
+
+  // AI mascot celebration overlay — appears after WinCinematic (or directly,
+  // when no cinematic) for a brief brand beat before the player reads stats.
+  const fanfareKind = useMemo(
+    () =>
+      pickCelebrationKind({
+        daily: {
+          perfectScore: showFlexing,
+          streakMilestone: Boolean(streakMilestone),
+          firstVisitToday: Boolean(isNewCompletion && result.solved && !showFlexing && !streakMilestone),
+        },
+      }),
+    [showFlexing, streakMilestone, isNewCompletion, result.solved],
+  );
+  const [showFanfare, setShowFanfare] = useState(true);
 
   const displayName = isAuthenticated && profile
     ? profile.display_name || profile.username || 'Player'
@@ -349,6 +366,13 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       exit={{ opacity: 0, y: -20 }}
       className="flex-1 flex flex-col min-h-0 overflow-hidden"
     >
+      {showFanfare && fanfareKind && (
+        <MascotCelebrationVideo
+          kind={fanfareKind}
+          autoDismissMs={2600}
+          onDone={() => setShowFanfare(false)}
+        />
+      )}
       {/* Compact Header */}
       <div className="shrink-0 px-3 py-2 border-b border-slate-700/50 bg-neo-navy">
         <div className="max-w-md mx-auto lg:max-w-5xl xl:max-w-6xl">
