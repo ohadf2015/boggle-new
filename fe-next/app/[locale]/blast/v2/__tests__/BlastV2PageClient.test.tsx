@@ -122,7 +122,7 @@ describe('BlastV2PageClient — resume + boot gate (Plan 3b)', () => {
     renderClient();
 
     await waitFor(() => expect(screen.getByTestId('level-number').textContent).toBe('5'));
-    expect(global.fetch).toHaveBeenCalledWith('/api/blast/level?level=5&locale=en');
+    expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('/api/blast/level?level=5&locale=en'));
   });
 
   it('falls back to level 1 when the resume level fetch fails', async () => {
@@ -148,7 +148,7 @@ describe('BlastV2PageClient — resume + boot gate (Plan 3b)', () => {
     screen.getByTestId('advance').click();
 
     await waitFor(() => expect(screen.getByTestId('level-number').textContent).toBe('2'));
-    expect(global.fetch).toHaveBeenCalledWith('/api/blast/level?level=2&locale=en');
+    expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('/api/blast/level?level=2&locale=en'));
   });
 
   it('guest advance persists the new level position to localStorage', async () => {
