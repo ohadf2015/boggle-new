@@ -1,8 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import type { WordForgeRunState } from '@/types/wordForge';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { calculateRunXp, XP_THRESHOLDS } from '@/lib/wordForge/scoring';
@@ -20,9 +22,26 @@ interface RunSummaryProps {
  */
 export function RunSummary({ state, onPlayAgain, onExit }: RunSummaryProps): React.JSX.Element {
   const { t } = useLanguage();
+  const { playSound } = useSoundEffects();
   const won = state.round >= state.maxRounds && state.roundHistory.every(r => r.passed);
   const xpEarned = calculateRunXp(state.round, state.allWords.length, state.totalScore, won);
   const nextThreshold = XP_THRESHOLDS.find(th => th.xp > (state.totalScore /* approximate */)) ?? XP_THRESHOLDS[XP_THRESHOLDS.length - 1];
+  const fxFiredRef = useRef(false);
+
+  // Final-screen ceremony — only on win. Run-over plays a softer rejected cue.
+  useEffect(() => {
+    if (fxFiredRef.current) return;
+    fxFiredRef.current = true;
+    const x = typeof window !== 'undefined' ? window.innerWidth / 2 : 200;
+    const y = typeof window !== 'undefined' ? window.innerHeight * 0.32 : 160;
+    if (won) {
+      playSound('crownVictory');
+      SharedFxApp.spawnBurst('victory-burst', x, y, { count: 36 });
+      SharedFxApp.spawnBurst('sparkle-gold', x, y, { count: 24 });
+    } else {
+      playSound('wordRejected');
+    }
+  }, [won, playSound]);
 
   return (
     <div className="min-h-screen bg-[#0A0A1A] flex flex-col items-center justify-center gap-6 p-4">

@@ -134,6 +134,7 @@ export default function WordForgeGame(): React.JSX.Element {
         score={lastRound?.score ?? run.state.roundScore}
         target={lastRound?.target ?? run.state.roundTarget}
         wordsFound={lastRound?.wordsFound ?? run.state.wordsThisRound.length}
+        wasBoss={lastRound?.wasBossRound ?? (run.state.round > 0 && run.state.round % 3 === 0)}
         onContinue={run.continueToRunePick}
       />
     );

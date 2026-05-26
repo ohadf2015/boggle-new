@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 import { cn } from '@/lib/utils';
 
 interface RoundCompleteProps {
@@ -10,6 +12,8 @@ interface RoundCompleteProps {
   score: number;
   target: number;
   wordsFound: number;
+  /** True if the round just cleared was a boss round — fires a heavier ceremony. */
+  wasBoss?: boolean;
   onContinue: () => void;
 }
 
@@ -22,11 +26,31 @@ export function RoundComplete({
   score,
   target,
   wordsFound,
+  wasBoss = false,
   onContinue,
 }: RoundCompleteProps): React.JSX.Element {
   const { t } = useLanguage();
+  const { playSound } = useSoundEffects();
   const prefersReducedMotion = useReducedMotion();
   const [animatedScore, setAnimatedScore] = useState(0);
+  const ceremonyFiredRef = useRef(false);
+
+  // Ceremony — fire once on mount. Boss rounds get a heavier preset stack
+  // and the epic-victory sound; normal rounds get a lighter celebration.
+  useEffect(() => {
+    if (ceremonyFiredRef.current) return;
+    ceremonyFiredRef.current = true;
+    const x = typeof window !== 'undefined' ? window.innerWidth / 2 : 200;
+    const y = typeof window !== 'undefined' ? window.innerHeight * 0.42 : 200;
+    if (wasBoss) {
+      playSound('epicVictory');
+      SharedFxApp.spawnBurst('victory-burst', x, y);
+      SharedFxApp.spawnBurst('sparkle-gold', x, y, { count: 28 });
+    } else {
+      playSound('levelUp');
+      SharedFxApp.spawnBurst('celebration', x, y);
+    }
+  }, [wasBoss, playSound]);
 
   // Count up score over 800ms
   useEffect(() => {
