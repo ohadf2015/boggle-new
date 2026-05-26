@@ -267,6 +267,58 @@ describe('LandingChallengeCards — Blast Classic admin gate', () => {
   });
 });
 
+describe('LandingChallengeCards — full admin dev-preview roster', () => {
+  it('renders ALL 9 admin-gated dev preview cards for a post-newbie admin', () => {
+    mockIsAdmin.mockReturnValue(true);
+    mockUserEmail.mockReturnValue('admin@example.com');
+    // Past newbie + first-timer + newcomer-by-games gates → no collapse expander,
+    // every admin card lives directly in the rendered grid (not inside <details>).
+    mockIsNewPlayer.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    mockUserStats.mockReturnValue({ totalGamesPlayed: 50 });
+    render(<LandingChallengeCards {...baseProps} />);
+    const expected = [
+      'mode-wordcraft.modeTitle',          // Word Craft
+      'mode-wordcraft.gemsModeTitle',      // Word Craft Gem Hunt
+      'mode-wordTower.cardTitle',          // Word Tower
+      'mode-landing.blastClassic',         // Blast Classic V1
+      'mode-landing.wordForgeMode',        // Word Forge
+      'mode-landing.wordVaultMode',        // Word Vault
+      'mode-landing.adventurePrototypeMode',// Adventure Prototype
+      'mode-landing.partyMode',            // Party Games
+      'mode-landing.wordAlchemyMode',      // Word Alchemy
+      'mode-landing.shiritoriMode',        // Shiritori
+    ];
+    for (const id of expected) {
+      expect(screen.getByTestId(id), `missing admin card: ${id}`).toBeInTheDocument();
+    }
+  });
+
+  it('renders ZERO admin dev preview cards for a non-admin (same fixture)', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockUserEmail.mockReturnValue(undefined);
+    mockIsNewPlayer.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    mockUserStats.mockReturnValue({ totalGamesPlayed: 50 });
+    render(<LandingChallengeCards {...baseProps} />);
+    const adminOnly = [
+      'mode-wordcraft.modeTitle',
+      'mode-wordcraft.gemsModeTitle',
+      'mode-wordTower.cardTitle',
+      'mode-landing.blastClassic',
+      'mode-landing.wordForgeMode',
+      'mode-landing.wordVaultMode',
+      'mode-landing.adventurePrototypeMode',
+      'mode-landing.partyMode',
+      'mode-landing.wordAlchemyMode',
+      'mode-landing.shiritoriMode',
+    ];
+    for (const id of adminOnly) {
+      expect(screen.queryByTestId(id), `leaked admin card to non-admin: ${id}`).toBeNull();
+    }
+  });
+});
+
 describe('LandingChallengeCards — collapse-after-MP gate', () => {
   it('renders the "More Game Modes" expander for a brand-new player (zero MP games)', () => {
     mockIsNewPlayer.mockReturnValue(true);
