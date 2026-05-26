@@ -44,10 +44,12 @@ export function pickCelebrationKind(input: PickCelebrationInput): MascotCelebrat
 
   if (typeof rank === 'number') {
     if (rank === 1) return 'champion';
-    if (rank === 2 || rank === 3) return 'runner-up';
+    // Defeat (last-place) overrides runner-up — in a 2- or 3-player match,
+    // finishing at the bottom is "GG" not "podium finish".
     if (typeof totalPlayers === 'number' && totalPlayers >= 2 && rank === totalPlayers) {
       return 'defeat';
     }
+    if (rank === 2 || rank === 3) return 'runner-up';
   }
   return null;
 }
