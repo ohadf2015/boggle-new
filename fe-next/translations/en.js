@@ -4864,8 +4864,6 @@ const en = {
     "wordForgeModeBadge": "NEW",
     "wordVaultMode": "Word Vault",
     "wordVaultModeDesc": "Story-driven solo campaign",
-    "adventurePrototypeMode": "Adventure Prototype",
-    "adventurePrototypeModeDesc": "Roguelike dungeon-crawl preview",
     "partyMode": "Party Games",
     "partyModeDesc": "Big-screen Caption / Pixel / Shadow Clash",
     "wordAlchemyMode": "Word Alchemy",

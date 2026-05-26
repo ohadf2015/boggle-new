@@ -4889,8 +4889,6 @@ const he = {
     "wordForgeModeBadge": "חדש",
     "wordVaultMode": "כספת המילים",
     "wordVaultModeDesc": "קמפיין סולו מבוסס סיפור",
-    "adventurePrototypeMode": "פרוטוטייפ הרפתקה",
-    "adventurePrototypeModeDesc": "תצוגה מקדימה של רוגלייק מבוכים",
     "partyMode": "משחקי מסיבה",
     "partyModeDesc": "Caption / Pixel / Shadow Clash על מסך גדול",
     "wordAlchemyMode": "אלכימיית מילים",

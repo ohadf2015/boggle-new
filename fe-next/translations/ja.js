@@ -4788,8 +4788,6 @@ const ja = {
     "wordForgeModeBadge": "NEW",
     "wordVaultMode": "ワードヴォルト",
     "wordVaultModeDesc": "ストーリー仕立てのソロキャンペーン",
-    "adventurePrototypeMode": "アドベンチャー試作",
-    "adventurePrototypeModeDesc": "ローグライクダンジョン・プレビュー",
     "partyMode": "パーティーゲーム",
     "partyModeDesc": "大画面で Caption / Pixel / Shadow Clash",
     "wordAlchemyMode": "ワードアルケミー",

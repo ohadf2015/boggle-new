@@ -4803,8 +4803,6 @@ const sv = {
     "wordForgeModeBadge": "NYTT",
     "wordVaultMode": "Ordvalvet",
     "wordVaultModeDesc": "Berättelsedriven solokampanj",
-    "adventurePrototypeMode": "Äventyrsprototyp",
-    "adventurePrototypeModeDesc": "Förhandsvisning av roguelike-dungeon",
     "partyMode": "Festspel",
     "partyModeDesc": "Caption / Pixel / Shadow Clash på stor skärm",
     "wordAlchemyMode": "Ordalkemi",

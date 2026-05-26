@@ -177,24 +177,6 @@ describe('LandingChallengeCards — Word Vault admin dev-preview gate', () => {
   });
 });
 
-describe('LandingChallengeCards — Adventure Prototype admin dev-preview gate', () => {
-  it('does NOT render the Adventure Prototype card for a non-admin', () => {
-    mockIsAdmin.mockReturnValue(false);
-    mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-landing.adventurePrototypeMode')).toBeNull();
-  });
-
-  it('renders the Adventure Prototype card for an admin with /adventure-prototype href', () => {
-    mockIsAdmin.mockReturnValue(true);
-    mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    const card = screen.getByTestId('mode-landing.adventurePrototypeMode');
-    expect(card).toBeInTheDocument();
-    expect(card.getAttribute('data-href')).toBe('/en/adventure-prototype');
-  });
-});
-
 describe('LandingChallengeCards — Party Games admin dev-preview gate', () => {
   it('does NOT render the Party Games card for a non-admin', () => {
     mockIsAdmin.mockReturnValue(false);
@@ -284,7 +266,6 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
       'mode-landing.blastClassic',         // Blast Classic V1
       'mode-landing.wordForgeMode',        // Word Forge
       'mode-landing.wordVaultMode',        // Word Vault
-      'mode-landing.adventurePrototypeMode',// Adventure Prototype
       'mode-landing.partyMode',            // Party Games
       'mode-landing.wordAlchemyMode',      // Word Alchemy
       'mode-landing.shiritoriMode',        // Shiritori
@@ -308,7 +289,6 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
       'mode-landing.blastClassic',
       'mode-landing.wordForgeMode',
       'mode-landing.wordVaultMode',
-      'mode-landing.adventurePrototypeMode',
       'mode-landing.partyMode',
       'mode-landing.wordAlchemyMode',
       'mode-landing.shiritoriMode',

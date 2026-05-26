@@ -4849,8 +4849,6 @@ const es = {
     "wordForgeModeBadge": "NUEVO",
     "wordVaultMode": "Bóveda de Palabras",
     "wordVaultModeDesc": "Campaña en solitario con narrativa",
-    "adventurePrototypeMode": "Prototipo de Aventura",
-    "adventurePrototypeModeDesc": "Vista previa de calabozos roguelike",
     "partyMode": "Juegos de Fiesta",
     "partyModeDesc": "Caption / Pixel / Shadow Clash en pantalla grande",
     "wordAlchemyMode": "Alquimia de Palabras",

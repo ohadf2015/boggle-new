@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers, Gem, Building2, Hammer, Vault, Compass, PartyPopper, FlaskConical, ScrollText } from 'lucide-react';
+import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers, Gem, Building2, Hammer, Vault, PartyPopper, FlaskConical, ScrollText } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
@@ -56,7 +56,6 @@ type LandingCardKey =
   | 'blastClassic'
   | 'wordForge'
   | 'wordVault'
-  | 'adventurePrototype'
   | 'party'
   | 'wordAlchemy'
   | 'shiritori';
@@ -72,7 +71,7 @@ const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'practice', 'blast', 
 const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
   'connections', 'brainGym', 'wordCraft', 'wordCraftGems', 'wordTower', 'blastClassic',
-  'wordForge', 'wordVault', 'adventurePrototype',
+  'wordForge', 'wordVault',
   'party', 'wordAlchemy', 'shiritori',
 ]);
 
@@ -160,7 +159,6 @@ export function LandingChallengeCards({
     // Admin-only dev previews of modes not yet surfaced on the public hub.
     if (isAdmin && !next.includes('wordForge')) next.push('wordForge');
     if (isAdmin && !next.includes('wordVault')) next.push('wordVault');
-    if (isAdmin && !next.includes('adventurePrototype')) next.push('adventurePrototype');
     // Hidden modes that ship code but aren't surfaced to the public hub —
     // gated behind a PostHog flag (party), a typed-URL-only puzzle
     // (wordAlchemy), or pure standalone routes (shiritori). Admins get one
@@ -408,21 +406,6 @@ export function LandingChallengeCards({
           </div>
         );
 
-      case 'adventurePrototype':
-        return (
-          <div key="adventurePrototype" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
-            <ModeCard
-              title={t('landing.adventurePrototypeMode')}
-              description={t('landing.adventurePrototypeModeDesc')}
-              href={`/${language}/adventure-prototype`}
-              icon={<Compass className="w-6 h-6" />}
-              variant="purple"
-              badge="ADMIN"
-              onClick={() => { trackLandingCtaClick('mode_card', { mode: 'adventurePrototype', variant: 'purple' }); }}
-            />
-          </div>
-        );
-
       case 'party':
         return (
           <div key="party" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
@@ -474,7 +457,7 @@ export function LandingChallengeCards({
   };
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordCraftGems', 'wordTower', 'blastClassic', 'wordForge', 'wordVault', 'adventurePrototype', 'party', 'wordAlchemy', 'shiritori']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordCraftGems', 'wordTower', 'blastClassic', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori']);
   // Newcomer-essential modes — always visible above the fold. Everything else
   // collapses into a "More Game Modes" expander to reduce choice paralysis
   // without removing the cards from the DOM (preserves SEO + AI-crawler links).
