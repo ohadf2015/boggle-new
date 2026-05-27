@@ -136,3 +136,38 @@ Items deferred from automated nightly triage. Human review required.
   - timestamp: 2026-05-25T08:42:27Z; chunk `/_next/static/chunks/0bwv0jwk01wlj.js`
   - why deferred: single occurrence, same pattern as prior JAVASCRIPT-NEXTJS-14N (wasm streaming compile failed). Likely transient CDN hiccup or Edge-specific WASM loading quirk. Not reproducible without source maps or repro steps.
   - recommended owner: infra (confirm WASM assets served with correct MIME type and no CORS/CSP block on word-wheel page; add error boundary with retry for WASM init)
+
+## 2026-05-27
+
+- [Supabase] `sync_coins` + `function_search_path_mutable` (2026-05-26 entry)
+  - status: shipped (migration `fix_function_search_path_mutable`, same run as below)
+  - note: REVOKE also shipped (see `anon_security_definer_function_executable` below)
+
+- [Supabase] `anon_security_definer_function_executable` — all 6 RPCs (2026-05-26 entry update)
+  - status: shipped (migration `revoke_anon_execute_on_secdef_rpcs`)
+  - verified: 0 anon callsites in codebase; all API routes gate on `auth.getUser()`; cron fns invoked by pg_cron (postgres role, not anon)
+
+- [Supabase] `auth_rls_initplan` — 9 policies on 4 tables
+  - affected: `teacher_access_requests` (3), `teacher_access_allowlist` (3), `word_tower_progress` (2), `daily_streak_freezes` (1)
+  - fix: replace `auth.uid()` with `(select auth.uid())` in each policy expression
+  - status: deferred
+  - why: requires DROP + CREATE POLICY (replacement) — failure mode = users locked out of their own records; performance-only (not a bug)
+  - recommended owner: review-by-eod
+
+- [Supabase] `multiple_permissive_policies` — `teacher_access_requests` (5 overlapping SELECT policies)
+  - affected roles: anon, authenticated, authenticator, dashboard_user, supabase_privileged_role
+  - status: deferred
+  - why: consolidation requires design decision on which policy wins; no production impact now
+  - recommended owner: backend
+
+- [Sentry] JAVASCRIPT-NEXTJS-145 — `[REDLOCK] Lock acquisition failed for cron:reengagement-email`
+  - first/last seen: ~20h ago, count: 1, users: 0
+  - status: deferred
+  - why: single occurrence, 0 users; Redis lock contention on cron is transient / expected under concurrent server instances; no user-visible impact
+  - recommended owner: backend (check if reengagement cron overlaps with another lock holder; consider jittered scheduling)
+
+- [Sentry] JAVASCRIPT-NEXTJS-14N + PostHog `RuntimeError: Aborted(wasm failed)` on `/practice/:mode`
+  - count: 1, users: 0 (Sentry); 1 occurrence, 1 user (PostHog)
+  - status: deferred (same recurring pattern as 2026-05-26 entry)
+  - why: transient CDN/Edge WASM load failure; no repro, no source maps for stack attribution
+  - recommended owner: infra (verify WASM MIME type + CSP on practice pages; add retry error boundary)

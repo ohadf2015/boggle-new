@@ -99,12 +99,45 @@ PostHog p75=0.882 is skewed by admin sessions (same player as /he CLS issue). Re
 
 ---
 
-## [FRONTEND] /he/word-tower — CLS improvement logged
+## [FRONTEND] /he/word-tower — CLS improvement logged, now re-elevated
 
 **Route:** `/he/word-tower`  
-**Update 2026-05-24:** CLS improved 73% (1.050→0.280) and LCP improved 15% (2062→1754ms) vs 2026-05-22 baseline (n=12). Recent word-tower fixes appear to have resolved the loading-height mismatch. CLS 0.280 is borderline (threshold 0.25) — watch one more night. If CLS <0.1 with n>10, close this item entirely.  
+**Update 2026-05-27:** 72h PostHog shows CLS 0.797 (n=11) — up from 0.280 on 2026-05-24. Regression flag raised, but data is **inconclusive**:
+- All `WordTowerPlay` children are `position: absolute` (verified `WordTowerPlay.tsx:313`, `477`). The crane (`abs inset-x-0 top-[10%]`), HUD (`abs inset-0`), overlays, rival rail — none are in document flow. Document-flow layout shifts are **ruled out**.
+- The 72h window (2026-05-24 to 2026-05-27) includes 2 days **before** the crane chrome commit (`58a80eebf` 2026-05-26). Attribution to crane commit is not supported by available data.
+- Possible pre-existing source: Pixi canvas (`WordTowerScene`) mounting at top of DOM with undefined height. This was the original suspected root cause (2026-05-22 entry).
+**Action:** Wait for 24h PostHog data with n>5 post-crane-commit (earliest: 2026-05-28). If CLS stays >0.5 with confirmed post-commit sessions, audit `WordTowerScene` canvas dimensions and mounting sequence.  
 **Prior entry:** Loading state `min-h-[100dvh]` spinner vs HUD+board structure was the suspected root cause (2026-05-22). May have been resolved by word-tower structural changes in recent commits.
 
 ---
 
-*Last updated: 2026-05-24 by Lane 02 (perf)*
+## [FRONTEND] /es/multiplayer + /en/multiplayer — LCP POOR, INP POOR (escalated)
+
+**Severity:** High  
+**Routes:**
+- `/es/multiplayer`: p75 LCP 4648ms, INP 712ms (72h n=10) — **new in baseline 2026-05-27**
+- `/en/multiplayer`: p75 LCP 3165ms, INP 292ms (72h n=40) — high-confidence, improving from 4228ms
+
+**Root cause hypothesis:** Game-client hydration (Pixi.js + Socket.IO + game state) blocks above-fold render. The multiplayer page likely requires game-client mount before showing any interactive UI. `/es/` is not measurably worse than `/en/` (overlapping confidence intervals at n=8 vs n=40). Both share the same root cause.  
+**INP 712ms** is the most alarming — heavy main-thread work (game board initialization, socket event processing) is blocking input response.  
+**Fix direction (human):**
+1. Render a lightweight SSR lobby skeleton as the LCP target. Heavy Pixi/socket client loads behind it. Lobby content (room code, player count) is the real user-facing payload, not the game canvas.
+2. Profile with Chrome DevTools Performance tab: identify what occupies the main thread during those 3-6 seconds. Long tasks >50ms are the INP source.
+3. Check if Socket.IO connection attempt is synchronous on mount — move to `useEffect` if not already.
+
+*Added: 2026-05-27 by Lane 02 (perf)*
+
+---
+
+## ✅ [FRONTEND] /en/about LCP — opacity:0 animation FIXED 2026-05-27
+
+**Severity:** High → FIXED  
+**Route:** `/en/about` — p75 LCP 10218ms (72h n=6)  
+**Root cause:** `LegalPageLayout.tsx:50-54` wrapped the `<h1>` title in `<m.div initial={{ opacity: 0, y: -20 }}>`. Browser LCP measurement requires the element to be visible (opacity > 0). The Framer Motion animation delayed the element becoming visible, inflating LCP by the animation duration on every legal/about page.  
+**Affects:** `/about`, `/legal/terms`, `/legal/privacy`, `/legal/cookies`, `/legal/disclaimer`, `/contact` — all pages using `LegalPageLayout`.  
+**Fix applied:** Changed `initial={{ opacity: 0, y: -20 }}` → `initial={{ y: -20 }}` (title starts visible, slides in from y:-20 only). Also simplified `animate` to `{{ y: 0 }}` (removed no-op `opacity: 1`). File: `fe-next/components/legal/LegalPageLayout.tsx:50`.  
+**Expected:** LCP reduction on all legal pages next night. The 10218ms reading likely includes slow-network sessions; even those should improve by 300-600ms (animation delay removed).
+
+---
+
+*Last updated: 2026-05-27 by Lane 02 (perf)*

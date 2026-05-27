@@ -1,16 +1,16 @@
 {
-  "date": "2026-05-24",
-  "note": "Fourth snapshot. PostHog web vitals still low volume — n>50 threshold unreachable; using n>3 (all results are Hebrew-locale, mix of admin+real sessions). pg_stat_statements is cumulative — delta vs prior baseline: WAL parser +53k calls (+13%), sync_coins 0 delta (no new calls since 2026-05-22, fix landed 2026-05-21). /he/word-tower CLS improved 73% (1.050→0.280). Admin skeleton CLS fix shipped (LandingCardsSkeleton isAdmin prop).",
+  "date": "2026-05-27",
+  "note": "Fifth snapshot. PostHog 24h window has very low volume — using n>5 threshold, yielding 2 routes. 72h window more meaningful (n>5: 11 routes). Baseline uses 72h for trend; 24h for regression detection. pg_stat_statements cumulative — deltas vs 2026-05-24 baseline. Frontend fix shipped: LegalPageLayout h1 opacity:0 removed (LCP improvement on all legal/about pages). WAL parser publication confirmed EMPTY (pg_publication_tables returns []); historical calls still dominate cumulative total. sync_coins: zero new calls in 3 days (endpoint idle). Backend is clean.",
   "backend": {
     "top_queries": [
       {
         "label": "supabase_realtime_wal_parser",
         "query_preview": "SELECT wal->>$5 as type, wal->>$6 as schema, wal->>$7 as table ...",
-        "calls": 453343,
-        "mean_ms": 4.24,
-        "total_ms": 1923711,
-        "delta_vs_prior_calls": "+53471",
-        "verdict": "INFRASTRUCTURE: publication empty, auto-remediation working. Trending down: 89.57% (2026-05-11) → 78.12% (2026-05-18). Next weekly audit 2026-05-25. Deferred to Supabase support. See perf-watch.md."
+        "calls": 547235,
+        "mean_ms": 4.26,
+        "total_ms": 2329450,
+        "delta_vs_prior_calls": "+93892 (3-day delta since 2026-05-24)",
+        "verdict": "INFRASTRUCTURE: publication confirmed EMPTY (pg_publication_tables=[]) — WAL parser runs anyway for broadcast/presence. Deferred to Supabase support. db_perf_top_query_audit 2026-05-25 = 81.98% of DB CPU (historical). See perf-watch.md."
       },
       {
         "label": "sync_coins_rpc",
@@ -18,153 +18,210 @@
         "calls": 18761,
         "mean_ms": 7.30,
         "total_ms": 136907,
-        "delta_vs_prior_calls": "0 (no new calls since 2026-05-22 baseline)",
-        "verdict": "WATCH: Fix applied 2026-05-21. Zero new calls logged since baseline — may be low-frequency endpoint. Verify improvement in weekly db_perf_top_query_audit 2026-05-25."
-      },
-      {
-        "label": "mcp_studio_schema_browser",
-        "query_preview": "with tables as (SELECT c.oid :: int8 AS id, nc.nspname AS schema ...",
-        "calls": 12,
-        "mean_ms": 2407,
-        "total_ms": 28885,
-        "delta_vs_prior_calls": "0 (unchanged)",
-        "verdict": "STUDIO/MCP: schema browser from Supabase Studio or MCP sessions only. Not app traffic. No action."
-      },
-      {
-        "label": "pg_timezone_names",
-        "query_preview": "SELECT name FROM pg_timezone_names",
-        "calls": 85,
-        "mean_ms": 375.57,
-        "total_ms": 31923,
-        "delta_vs_prior_calls": "+10",
-        "verdict": "STUDIO/MCP: system catalog query. Not app traffic. No action."
+        "delta_vs_prior_calls": "0 (zero new calls since 2026-05-24 — endpoint idle)",
+        "verdict": "WATCH: Fix applied 2026-05-21. No new calls in 3 days. Endpoint appears low-frequency or feature-gated. No action."
       },
       {
         "label": "profiles_update_last_seen_at",
         "query_preview": "UPDATE profiles SET last_seen_at = ...",
-        "calls": 12346,
-        "mean_ms": 1.88,
-        "total_ms": 23216,
-        "delta_vs_prior_calls": "+1758",
+        "calls": 14978,
+        "mean_ms": 1.77,
+        "total_ms": 26461,
+        "delta_vs_prior_calls": "+2632",
         "verdict": "ok"
       },
       {
         "label": "pgrst_search_path_set",
         "query_preview": "set_config('search_path', ...), set_config('role', ...)",
-        "calls": 386006,
-        "mean_ms": 0.06,
-        "total_ms": 21638,
-        "delta_vs_prior_calls": "+38325",
+        "calls": 483832,
+        "mean_ms": 0.05,
+        "total_ms": 25293,
+        "delta_vs_prior_calls": "+97826",
         "verdict": "ok"
       },
       {
         "label": "web_vitals_insert",
-        "query_preview": "INSERT INTO web_vitals ...",
-        "calls": 18554,
-        "mean_ms": 0.50,
-        "total_ms": 9287,
-        "delta_vs_prior_calls": "+551",
+        "query_preview": "INSERT INTO public.web_vitals ...",
+        "calls": 25839,
+        "mean_ms": 0.54,
+        "total_ms": 17516,
+        "delta_vs_prior_calls": "+7285 (two query plans combined)",
         "verdict": "ok"
+      },
+      {
+        "label": "profiles_read",
+        "query_preview": "SELECT public.profiles.username, display_name, avatar_emoji, avatar_color ...",
+        "calls": 58760,
+        "mean_ms": 0.07,
+        "total_ms": 3827,
+        "delta_vs_prior_calls": "new split (was in friend_messages_select)",
+        "verdict": "ok"
+      },
+      {
+        "label": "word_hunt_alltime_leaderboard_select",
+        "query_preview": "SELECT public.word_hunt_alltime_leaderboard.* FROM public.word_hunt_alltime_leaderboard WHERE language = $1 LIMIT $2",
+        "calls": 2516,
+        "mean_ms": 2.18,
+        "total_ms": 5453,
+        "delta_vs_prior_calls": "new in top-15",
+        "verdict": "EXPLAIN VERIFIED: 0.671ms actual execution. Uses IndexScan on word_hunt_user_once_daily (language, player_id IS NOT NULL) + Memoize on profiles_pkey. No index needed. SELECT * via PostgREST is standard — view collapses to 10 rows max. ok."
       },
       {
         "label": "friend_messages_select",
         "query_preview": "SELECT public.friend_messages.message, created_at ...",
-        "calls": 45714,
-        "mean_ms": 0.17,
-        "total_ms": 7907,
-        "delta_vs_prior_calls": "+6358",
+        "calls": 59097,
+        "mean_ms": 0.16,
+        "total_ms": 9694,
+        "delta_vs_prior_calls": "+13383",
         "verdict": "ok"
       },
       {
         "label": "auth_users_lookup",
         "query_preview": "SELECT users.aud, users.id ... FROM users WHERE instance_id = $1 and id = $2",
-        "calls": 117223,
+        "calls": 150018,
         "mean_ms": 0.05,
-        "total_ms": 5631,
-        "delta_vs_prior_calls": "+7426",
+        "total_ms": 7099,
+        "delta_vs_prior_calls": "+32795",
         "verdict": "ok"
       }
     ],
-    "advisor_warnings_count": "unindexed_foreign_keys on admin tables only — intentionally kept (see 2026-04-29 cleanup). No new performance advisor warnings.",
-    "new_regressions_detected": false
+    "advisor_warnings_count": "unindexed_foreign_keys on admin tables only (admin_alerts, admin_audit_log, admin_gift_mess, etc.) — intentionally kept, admin traffic only. No new performance advisor warnings.",
+    "new_regressions_detected": false,
+    "realtime_publication_tables": 0
   },
   "frontend": {
-    "note": "PostHog n>3 threshold (n>50 still unreachable at current traffic volume). All data is Hebrew-locale sessions — mix of admin (player 4d68a876) and real users (537a9da1, d0da136a). Real-user CLS on /he/daily is 0.002-0.007 (excellent); admin sessions skew p75 high. /he/word-tower CLS improved 73% from prior baseline.",
+    "note": "24h window: n>5 threshold yields only 2 routes (/es/multiplayer, /he). 72h window more useful for trend — 11 routes. Baselines use 72h. Fix shipped: LegalPageLayout opacity:0 removed from h1 wrapper — expected LCP improvement on /en/about + all legal pages next night.",
     "thresholds": { "lcp_poor_ms": 4000, "lcp_needs_improvement_ms": 2500, "inp_needs_improvement_ms": 200, "cls_poor": 0.25 },
-    "by_route": [
+    "by_route_24h": [
       {
-        "route": "/he/admin",
-        "p75_lcp": 3196,
-        "p75_inp": 160,
-        "p75_cls": 1.448,
-        "n": 10,
-        "flags": ["LCP_NEEDS_IMPROVEMENT", "CLS_POOR_ADMIN_ONLY"],
-        "notes": "Admin sessions only. CLS from extra admin mode cards in skeleton (fix shipped today: LandingCardsSkeleton isAdmin prop). LCP ~3200ms on admin page is expected (heavier state)."
-      },
-      {
-        "route": "/he/daily",
-        "p75_lcp": 2876,
-        "p75_inp": 168,
-        "p75_cls": 0.882,
-        "n": 6,
-        "flags": ["LCP_NEEDS_IMPROVEMENT", "CLS_POOR_ADMIN_SKEWED"],
-        "delta_vs_prior": { "lcp": "NEW_ROUTE", "cls": "NEW_ROUTE" },
-        "notes": "web_vitals DB audit: real users (537a9da1, d0da136a) show CLS 0.002-0.007. Admin player 4d68a876 shows 0.22-0.29. PostHog p75 0.882 = admin session dominates p75 on n=6. Not a real-user issue. LCP 2876ms borderline — watch."
+        "route": "/es/multiplayer",
+        "p75_lcp": 6052,
+        "p75_inp": 750,
+        "p75_cls": 0.191,
+        "n": 8,
+        "flags": ["LCP_POOR", "INP_POOR"],
+        "notes": "New in baseline. Same root cause as /en/multiplayer (game-client hydration). /es/ locale adds no known extra weight. Deferred to human. See perf-watch.md."
       },
       {
         "route": "/he",
-        "p75_lcp": 2682,
-        "p75_inp": null,
-        "p75_cls": 0.218,
-        "n": 10,
-        "flags": ["LCP_NEEDS_IMPROVEMENT_LOW_CONFIDENCE"],
-        "delta_vs_prior": { "lcp": "+568ms (+27%)", "cls": "-1.225 (IMPROVED — admin skeleton fix effect)" },
-        "notes": "LCP +27% vs prior (2114→2682ms) — n=10, within sampling variance. CLS improved significantly (1.443→0.218) — admin skeleton fix wired today may already be in effect (or different session mix). Watch."
-      },
-      {
-        "route": "/he/word-tower",
-        "p75_lcp": 1754,
-        "p75_inp": 164,
-        "p75_cls": 0.280,
-        "n": 12,
-        "flags": [],
-        "delta_vs_prior": { "lcp": "-308ms (-15% IMPROVED)", "cls": "-0.770 (-73% IMPROVED)" },
-        "notes": "Both LCP and CLS improved significantly from prior baseline (LCP 2062→1754ms, CLS 1.050→0.280). Likely from recent word-tower fixes. LCP now Good, CLS borderline but trending down."
-      },
-      {
-        "route": "/he/daily/word-wheel",
-        "p75_lcp": 1680,
+        "p75_lcp": 1616,
         "p75_inp": null,
         "p75_cls": null,
-        "n": 4,
+        "n": 7,
         "flags": [],
-        "notes": "New route today. LCP 1680ms (Good). No CLS/INP data (n=4, insufficient)."
-      },
+        "notes": "24h only. Good LCP."
+      }
+    ],
+    "by_route_72h": [
       {
-        "route": "/en/multiplayer",
-        "p75_lcp": 1192.5,
-        "p75_inp": null,
-        "p75_cls": null,
-        "n": 8,
-        "flags": [],
-        "delta_vs_prior": { "lcp": "-3035ms vs 2026-05-22 (n=8 vs prior n=29 — different sample size, not comparable)" },
-        "notes": "LCP 1192ms vs prior 4228ms (n=29). Different user mix and n — cannot draw regression/improvement conclusion. Prior high-confidence reading (n=29) still the authoritative LCP baseline for this route. See perf-watch.md."
-      },
-      {
-        "route": "/en/legal/cookies",
-        "p75_lcp": 909.25,
+        "route": "/en/about",
+        "p75_lcp": 10218,
         "p75_inp": null,
         "p75_cls": null,
         "n": 6,
+        "flags": ["LCP_POOR"],
+        "notes": "LCP driven by Framer Motion opacity:0 initial state on h1 (LegalPageLayout.tsx:51). FIXED: changed initial={y:-20} so h1 visible on first paint. Expect significant LCP improvement next night."
+      },
+      {
+        "route": "/es/multiplayer",
+        "p75_lcp": 4648,
+        "p75_inp": 712,
+        "p75_cls": 0.152,
+        "n": 10,
+        "flags": ["LCP_POOR", "INP_POOR"],
+        "notes": "Deferred. See perf-watch.md."
+      },
+      {
+        "route": "/he/admin",
+        "p75_lcp": 3792,
+        "p75_inp": 208,
+        "p75_cls": 1.227,
+        "n": 10,
+        "flags": ["LCP_NEEDS_IMPROVEMENT", "CLS_POOR_ADMIN_ONLY"],
+        "notes": "Admin sessions only. Expected."
+      },
+      {
+        "route": "/en",
+        "p75_lcp": 3626,
+        "p75_inp": 368,
+        "p75_cls": 0.255,
+        "n": 24,
+        "flags": ["LCP_POOR", "INP_NEEDS_IMPROVEMENT", "CLS_BORDERLINE"],
+        "notes": "LCP 3626ms (24h was 2682ms at n=10 on 2026-05-24 — different window). INP 368ms poor. CLS 0.255 borderline. n=24 gives moderate confidence. Watch for 3 nights."
+      },
+      {
+        "route": "/en/multiplayer",
+        "p75_lcp": 3165,
+        "p75_inp": 292,
+        "p75_cls": 0.056,
+        "n": 40,
+        "flags": ["LCP_POOR", "INP_NEEDS_IMPROVEMENT"],
+        "delta_vs_prior": { "lcp": "vs 4228ms n=29 on 2026-05-22 (authoritative). 3165ms = improvement but still POOR." },
+        "notes": "n=40 high confidence. Game-client hydration root cause. Skeleton SSR approach needed. See perf-watch.md."
+      },
+      {
+        "route": "/he/daily/word-hunt",
+        "p75_lcp": 2964,
+        "p75_inp": 216,
+        "p75_cls": 0.042,
+        "n": 11,
+        "flags": ["LCP_NEEDS_IMPROVEMENT", "INP_NEEDS_IMPROVEMENT"],
+        "notes": "LCP borderline. INP 216ms slightly over threshold. Watch."
+      },
+      {
+        "route": "/he/daily",
+        "p75_lcp": 2739,
+        "p75_inp": 96,
+        "p75_cls": 0.167,
+        "n": 14,
+        "flags": ["LCP_NEEDS_IMPROVEMENT"],
+        "notes": "LCP borderline needs-improvement. INP good. CLS borderline. Watch."
+      },
+      {
+        "route": "/",
+        "p75_lcp": 2414,
+        "p75_inp": null,
+        "p75_cls": 0.946,
+        "n": 7,
+        "flags": ["CLS_POOR"],
+        "notes": "CLS 0.946 poor (n=7 low confidence). Could be redirect CLS (/ → /he/ locale redirect). Watch."
+      },
+      {
+        "route": "/he",
+        "p75_lcp": 2120,
+        "p75_inp": 152,
+        "p75_cls": 0.798,
+        "n": 41,
+        "flags": ["CLS_POOR"],
+        "delta_vs_prior": { "lcp": "2682ms (2026-05-24 n=10) → 2120ms (-21% improved)", "cls": "0.218 (2026-05-24 n=10) → 0.798 (worse, but n=41 vs n=10 — admin sessions diluted into larger pool)" },
+        "notes": "n=41 higher confidence. CLS 0.798 — likely admin session skew (known: founder tests /he). Real-user CLS confirmed good from DB audit on 2026-05-24. Do not act."
+      },
+      {
+        "route": "/he/word-tower",
+        "p75_lcp": 1680,
+        "p75_inp": 136,
+        "p75_cls": 0.797,
+        "n": 11,
+        "flags": ["CLS_POOR"],
+        "delta_vs_prior": { "cls": "0.280 (2026-05-24) → 0.797 (+185% REGRESSION FLAG)" },
+        "notes": "CLS regression flagged. Investigation: all WordTowerPlay children are absolute-positioned (verified in code), so document-flow shifts are ruled out. 72h window predates crane commit 58a80eebf by 2 days — data is insufficient to attribute to crane commit. Possible source: Pixi canvas height on mount (pre-existing). Need 24h post-commit data with n>5 to confirm. See perf-watch.md."
+      },
+      {
+        "route": "/he/daily/word-wheel",
+        "p75_lcp": 1399,
+        "p75_inp": null,
+        "p75_cls": 0.000,
+        "n": 11,
         "flags": [],
-        "notes": "New route today. Excellent LCP. Static legal page."
+        "notes": "Good LCP, excellent CLS."
       }
     ],
-    "new_regressions_detected": false,
-    "improvements_detected": ["/he/word-tower CLS -73% (1.050→0.280)", "/he/word-tower LCP -15% (2062→1754ms)"]
+    "new_regressions_detected": true,
+    "regressions": ["/he/word-tower CLS 0.280→0.797 (data inconclusive — deferred)", "/en/about LCP 10218ms (FIXED: opacity:0 removed)"],
+    "improvements_detected": ["/en/multiplayer LCP trending 4228ms→3165ms", "/he LCP 2682ms→2120ms (-21%)"]
   },
   "bundle": {
-    "note": "Railway deploys — no local .next build available. Skipped for third consecutive night.",
+    "note": "Railway deploys — no local .next build available. Skipped for fourth consecutive night.",
     "total_kb": 0,
     "top_chunks": []
   }
