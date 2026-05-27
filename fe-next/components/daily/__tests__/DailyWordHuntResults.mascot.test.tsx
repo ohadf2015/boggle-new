@@ -215,6 +215,13 @@ vi.mock('@/hooks/useInterstitialAd', () => ({
   }),
 }));
 
+// ── Celebration video fanfare mock (TDD for removal from daily results) ──────
+vi.mock('@/components/mascot/MascotCelebrationVideo', () => ({
+  MascotCelebrationVideo: (props: { kind?: string }) => (
+    <div data-testid="mascot-celebration-video" data-kind={props.kind} />
+  ),
+}));
+
 // ── import component AFTER all mocks ────────────────────────────────────────
 import DailyWordHuntResults from '../DailyWordHuntResults';
 import type { DailyWordHuntResultsProps } from '../results';
@@ -286,5 +293,17 @@ describe('DailyWordHuntResults - mascots', () => {
     );
     expect(screen.queryAllByTestId('mascot-flexing')).toHaveLength(0);
     expect(screen.queryAllByTestId('mascot-encouraging')).toHaveLength(0);
+  });
+
+  it('does NOT render MascotCelebrationVideo fanfare overlay even for high-score returning visits that would trigger bingo kind (replaced: AI video was weird + too distracting for daily results focus)', () => {
+    render(
+      <DailyWordHuntResults
+        {...baseProps}
+        isNewCompletion={false}
+        result={{ ...baseResult, solved: true, efficiencyScore: 0.75 }}
+      />
+    );
+    // perfectScore branch triggers 'bingo' fanfare for returning high-eff views (no cinematic early-return)
+    expect(screen.queryByTestId('mascot-celebration-video')).toBeNull();
   });
 });

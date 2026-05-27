@@ -15,8 +15,6 @@ import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeChainCta from '@/components/practice/PracticeChainCta';
 import DailyInsightStack from './DailyInsightStack';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
-import { MascotCelebrationVideo } from '@/components/mascot/MascotCelebrationVideo';
-import { pickCelebrationKind, celebrationTitleFor } from '@/components/mascot/celebrationKind';
 import type { Language } from '@/types';
 import type { WordWheelGameResult } from './WordWheelGame';
 
@@ -168,15 +166,6 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
 
   const confettiCount = isExceptional ? 80 : result.score >= 50 ? 25 : 15;
 
-  // AI mascot celebration overlay — perfect run → bingo; new daily clear → mission-complete; weaker score → none.
-  const fanfareKind = pickCelebrationKind({
-    daily: {
-      perfectScore: isExceptional,
-      allDailiesDone: !isExceptional && result.score >= 25,
-    },
-  });
-  const [showFanfare, setShowFanfare] = useState(true);
-
   return (
     <m.div
       className="relative flex flex-col items-center gap-5 w-full max-w-md mx-auto px-4 py-8 overflow-hidden"
@@ -184,14 +173,6 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {showFanfare && fanfareKind && (
-        <MascotCelebrationVideo
-          kind={fanfareKind}
-          title={celebrationTitleFor(fanfareKind, t)}
-          autoDismissMs={2600}
-          onDone={() => setShowFanfare(false)}
-        />
-      )}
       {/* DOM Confetti */}
       {showConfetti && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
