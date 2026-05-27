@@ -149,6 +149,42 @@ assert "diff day, ~22h apart → RUNS"                       "[ $rcD -eq 0 ]"
 unset NIGHTLY_NOW_EPOCH
 rm -f "$LAST_RUN_FILE" "$LOCK_FILE"
 
+# ── unpushed non-docs guard (2026-05-27 regression) ───────────────────────
+# Founder's hand-committed local code on HEAD (unpushed) is a latent push-time
+# conflict if origin advances during the 2-3h run — the actual 2026-05-27 root
+# cause. Preflight must abort BEFORE running 8 lanes, regardless of whether
+# origin has moved yet.
+( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null )
+rm -f "$LOCK_FILE"
+echo
+echo "unpushed non-docs commit on HEAD"
+( cd "$REPO"
+  echo "hand-edit" >> base.txt
+  git add base.txt
+  git -c user.email=t@t -c user.name=t commit -qm "hand: local non-docs commit" )
+OUTE=$(preflight_check 2>&1); rcE=$?
+assert "unpushed non-docs commit → ABORT (return 1)"  "[ $rcE -eq 1 ]"
+assert "  …logs the offending path"                   'printf "%s" "$OUTE" | grep -q "base.txt"'
+assert "  …names the unpushed-non-docs reason"        'printf "%s" "$OUTE" | grep -q "unpushed non-docs commits"'
+# Reset for next case
+( cd "$REPO"; git reset --hard origin/master -q )
+
+# Mirror: unpushed DOCS-only commit must NOT abort (loop's own salvage commits
+# and stranded seo-daily reports are common; ff-pull/rebase paths handle them).
+rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
+echo
+echo "unpushed docs-only commit on HEAD (must NOT abort)"
+( cd "$REPO"
+  mkdir -p docs/nightly/reports
+  echo "report" > docs/nightly/reports/2099-01-01.md
+  git add docs/
+  git -c user.email=t@t -c user.name=t commit -qm "docs(nightly): stranded report" )
+OUTF=$(preflight_check 2>&1); rcF=$?
+assert "unpushed docs-only commit → PROCEEDS (return 0)" "[ $rcF -eq 0 ]"
+assert "  …does NOT log unpushed-non-docs abort"         '! printf "%s" "$OUTF" | grep -q "unpushed non-docs commits"'
+( cd "$REPO"; git reset --hard origin/master -q )
+rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
+
 rm -rf "$ROOT"
 echo
 echo "──────────────────────────────────────────"

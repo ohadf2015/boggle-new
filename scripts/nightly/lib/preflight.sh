@@ -109,8 +109,36 @@ preflight_check() {
         return 1
       fi
     fi
+    # Even when ff-only SUCCEEDED (origin hadn't moved at run-start), abort if
+    # local HEAD carries any unpushed NON-docs commits — building the nightly on
+    # top of unpushed hand-work is a recipe for push-time source conflicts when
+    # origin advances during the 2-3h run. This was the 2026-05-27 root cause:
+    # founder's local `702dc0fa0` (mascot rework) was unpushed at 02:00; origin
+    # ff-only-clean; nightly built docs commit on top; during run, PRs #486/#487
+    # merged the same `MascotCelebrationVideo.tsx`; git-ship's rebase hit a real
+    # source conflict at push time → correct abort, but the night was wasted.
+    # Catch it here BEFORE running 8 lanes.
+    local unpushed_non_docs
+    unpushed_non_docs=$(git diff --name-only origin/master..HEAD 2>/dev/null | grep -vE '^docs/' || true)
+    if [ -n "$unpushed_non_docs" ]; then
+      echo "preflight: ABORT — HEAD carries unpushed non-docs commits (push or revert first):"
+      echo "$unpushed_non_docs" | sed 's/^/  /'
+      git log origin/master..HEAD --oneline | sed 's/^/  /'
+      return 1
+    fi
   else
     echo "preflight: dirty tree — skipping ff-pull (git-ship rebases onto origin at push time)"
+    # Same guard for the dirty-tree path: unpushed non-docs commits on HEAD are a
+    # latent conflict no matter how clean the working tree is. The dirty-tree
+    # branch above bypassed the ff-pull block entirely, so check here too.
+    local unpushed_non_docs_dirty
+    unpushed_non_docs_dirty=$(git diff --name-only origin/master..HEAD 2>/dev/null | grep -vE '^docs/' || true)
+    if [ -n "$unpushed_non_docs_dirty" ]; then
+      echo "preflight: ABORT — HEAD carries unpushed non-docs commits (push or revert first):"
+      echo "$unpushed_non_docs_dirty" | sed 's/^/  /'
+      git log origin/master..HEAD --oneline | sed 's/^/  /'
+      return 1
+    fi
   fi
 
   # --- MCP servers alive ----------------------------------------------
