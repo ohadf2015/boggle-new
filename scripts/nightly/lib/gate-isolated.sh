@@ -98,6 +98,16 @@ run_isolated_gate() {
 # eslint's absolute file-header lines and tsc's `path(line,col): error` form,
 # normalises both to repo-relative, de-dups. Prints nothing if it can't parse —
 # the caller then falls back to the existing docs-only salvage (never regresses).
+#
+# 2026-05-27 fixes:
+#   • Exclude `node_modules/` — happy-dom/vitest/etc paths appear in test-runner
+#     error output and were being dropped as if lane-authored (27/27 drops on
+#     2026-05-27 round 1 were noise of this kind).
+#   • Anchor extension at non-alpha boundary so `\.js` doesn't swallow `\.json`
+#     (the run dropped `fe-next/package.js` — a non-existent file produced by
+#     `package.json` truncation under the old `\.(tsx?|jsx?|mjs|cjs)` group).
+# Caller is also expected to intersect with the authored allowlist (run.sh)
+# so even a stray parse never drops a non-authored file.
 nightly_parse_gate_failures() {
   local out="$1"
   [ -n "$out" ] && [ -s "$out" ] || return 0
@@ -108,10 +118,15 @@ nightly_parse_gate_failures() {
     # groups errors under the path header, so emitting every flagged path is
     # acceptable (a warning-only file won't fail the gate, so re-gating without
     # it is still correct).
-    grep -oE '/fe-next/[A-Za-z0-9_./-]+\.(tsx?|jsx?|mjs|cjs)' "$out" | sed -E 's#^.*/(fe-next/)#\1#'
+    grep -oE '/fe-next/[A-Za-z0-9_./-]+\.(tsx|ts|jsx|js|mjs|cjs)([^A-Za-z0-9]|$)' "$out" \
+      | sed -E 's/[^A-Za-z0-9]$//' \
+      | sed -E 's#^.*/(fe-next/)#\1#' \
+      | grep -v '/node_modules/'
     # tsc: `components/foo.tsx(12,3): error TS....` (relative to fe-next cwd).
-    grep -oE '^[A-Za-z0-9_][A-Za-z0-9_./-]*\.(tsx?|jsx?|mjs|cjs)\([0-9]+,[0-9]+\): error' "$out" \
-      | sed -E 's/\([0-9]+,[0-9]+\): error.*$//' | sed -E 's#^#fe-next/#'
+    grep -oE '^[A-Za-z0-9_][A-Za-z0-9_./-]*\.(tsx|ts|jsx|js|mjs|cjs)\([0-9]+,[0-9]+\): error' "$out" \
+      | sed -E 's/\([0-9]+,[0-9]+\): error.*$//' \
+      | sed -E 's#^#fe-next/#' \
+      | grep -v '/node_modules/'
   } 2>/dev/null | sort -u
 }
 

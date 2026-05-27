@@ -111,6 +111,29 @@ assert "extracts tsc file (relative path(line,col) → repo-relative)" "[[ \"$GO
 assert "does not emit npm preamble / problem-count lines as files" "[[ \"$GOT\" != *'eslint'*'.js'* ]] || true"
 rm -f "$GOUT"
 
+# 2026-05-27 regression: parser dropped 27 files including node_modules/* and
+# `package.js` (extension swallow of `package.json`). Lock both fixes.
+NOISY=$(mktemp)
+cat > "$NOISY" <<'EOF'
+> fe-next@0.1.0 test
+> vitest run
+
+ FAIL  components/__tests__/PlayerView.navigation.test.tsx
+  ● PlayerView › navigation › advances
+    TypeError: foo is undefined
+      at /private/var/folders/dc/x/T/nightly-gate.XXXX/fe-next/node_modules/happy-dom/lib/window/DetachedWindowAPI.js:42
+      at /private/var/folders/dc/x/T/nightly-gate.XXXX/fe-next/node_modules/vitest/dist/chunks/base.C9_VThnT.js:101
+      at /private/var/folders/dc/x/T/nightly-gate.XXXX/fe-next/components/__tests__/PlayerView.navigation.test.tsx:33
+
+Some message referencing /private/var/folders/dc/x/T/nightly-gate.XXXX/fe-next/package.json directly.
+EOF
+GOTN=$(nightly_parse_gate_failures "$NOISY" | tr '\n' ',')
+assert "excludes node_modules/happy-dom paths"   "[[ \"$GOTN\" != *'/node_modules/happy-dom/'* ]]"
+assert "excludes node_modules/vitest paths"      "[[ \"$GOTN\" != *'/node_modules/vitest/'* ]]"
+assert "does NOT match package.js (from package.json truncation)" "[[ \"$GOTN\" != *'fe-next/package.js'* ]]"
+assert "still extracts real authored test file"  "[[ \"$GOTN\" == *'fe-next/components/__tests__/PlayerView.navigation.test.tsx'* ]]"
+rm -f "$NOISY"
+
 # Clean output → nothing to drop.
 CLEAN=$(mktemp); printf '> lint\n> eslint\n\nNo problems.\n' > "$CLEAN"
 assert "clean gate output → no failing files parsed" "[ -z \"\$(nightly_parse_gate_failures \"$CLEAN\")\" ]"

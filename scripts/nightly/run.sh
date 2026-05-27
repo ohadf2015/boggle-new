@@ -394,21 +394,58 @@ fi
 # no-parse / still-failing / setup-fail it falls through to the docs-only salvage
 # below (today's behaviour — never a regression).
 if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
+  # Snapshot the ORIGINAL authored set before any drop-and-re-gate trims it.
+  # The salvage path below needs to revert all originally-authored CODE files,
+  # not just the trimmed remainder. On 2026-05-27 the loop dropped 3 i18n
+  # files in round 1 (`fe-next/translations/{en,es,sv}.js`); when the gate
+  # ultimately failed and the docs-only salvage fired, it only reverted the
+  # *trimmed* list — leaving those 3 files modified in the working tree as
+  # orphan keys with no consumer (the hook + component that referenced them
+  # had been correctly reverted as part of the trimmed set). The orphan i18n
+  # then leaked into the next git status. Preserving the original here closes
+  # that leak: any path the nightly authored is either committed or reverted,
+  # never left as half-state WIP.
+  NIGHTLY_AUTHORED_ORIGINAL="$(dirname "$NIGHTLY_AUTHORED_FILE")/authored-original-${DATE_TAG}.list"
+  cp "$NIGHTLY_AUTHORED_FILE" "$NIGHTLY_AUTHORED_ORIGINAL" 2>/dev/null || : > "$NIGHTLY_AUTHORED_ORIGINAL"
   for _round in 1 2; do
-    _bad=$(nightly_parse_gate_failures "${NIGHTLY_LAST_GATE_OUTPUT:-}")
+    _bad_raw=$(nightly_parse_gate_failures "${NIGHTLY_LAST_GATE_OUTPUT:-}")
     rm -f "${NIGHTLY_LAST_GATE_OUTPUT:-}" 2>/dev/null || true
-    [ -n "$_bad" ] || { log "drop-and-re-gate: no parseable offending files — using docs-only salvage"; break; }
+    # Intersect with authored allowlist — never drop a file the nightly didn't
+    # author. The parser is best-effort and on 2026-05-27 returned 27 paths of
+    # which 14 were node_modules/* + framework files (none authored). Dropping
+    # them just shrinks the commit without addressing the real failure. If the
+    # gate fails on a non-authored file, the cause is pre-existing repo state
+    # the lane code happened to expose, and no amount of dropping our own files
+    # will fix it — fall through to docs-only salvage cleanly.
+    _bad=""
+    if [ -n "$_bad_raw" ] && [ -s "$NIGHTLY_AUTHORED_FILE" ]; then
+      _bad=$(printf '%s\n' "$_bad_raw" | grep -xF -f "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || true)
+    fi
+    _ignored=$(printf '%s\n' "$_bad_raw" | grep -vxF -f <(printf '%s\n' "$_bad") 2>/dev/null || true)
+    if [ -n "$_ignored" ]; then
+      log "drop-and-re-gate: parser returned $(printf '%s' "$_ignored" | grep -c .) non-authored path(s) — ignoring (not in authored allowlist):"
+      printf '%s\n' "$_ignored" | while IFS= read -r f; do [ -n "$f" ] && log "  ignore: $f"; done
+    fi
+    [ -n "$_bad" ] || { log "drop-and-re-gate: no authored offending files to drop — using docs-only salvage"; break; }
     log "drop-and-re-gate round $_round: dropping $(printf '%s' "$_bad" | grep -c .) gate-failing file(s) from the commit set, re-gating the rest:"
     printf '%s\n' "$_bad" | while IFS= read -r f; do [ -n "$f" ] && log "  drop: $f"; done
     _kept=$(mktemp)
     grep -vxF -f <(printf '%s\n' "$_bad") "$NIGHTLY_AUTHORED_FILE" > "$_kept" 2>/dev/null || cp "$NIGHTLY_AUTHORED_FILE" "$_kept"
     mv "$_kept" "$NIGHTLY_AUTHORED_FILE"
+    # EAGER REVERT the dropped files — leaving them as dirty WIP pollutes the
+    # working tree and (if any was an i18n / config file) ships orphan keys to
+    # the next preflight scan. revert_authored will restore each from the run-
+    # start snapshot or remove it if newly added by the lane. Safe because the
+    # paths are guaranteed to be in our authored set (intersected above).
+    _dropped_list=$(mktemp); printf '%s\n' "$_bad" > "$_dropped_list"
+    revert_authored "$RUN_SNAPSHOT" "$_dropped_list"
+    rm -f "$_dropped_list"
     if [ ! -s "$NIGHTLY_AUTHORED_FILE" ]; then log "drop-and-re-gate: nothing left after drops"; break; fi
     run_isolated_gate "$NIGHTLY_AUTHORED_FILE"; iso_rc=$?
     if [ "$iso_rc" = "0" ]; then
       gate_ok=1
-      log "drop-and-re-gate: PASS after dropping the offending file(s) — shipping the remaining authored work"
-      echo -e "\n**Outcome (partial):** isolated gate passed after dropping gate-failing file(s); shipping the rest of the authored work (the dropped files stay as untouched WIP)." >> "$REPORT"
+      log "drop-and-re-gate: PASS after dropping + reverting the offending file(s) — shipping the remaining authored work"
+      echo -e "\n**Outcome (partial):** isolated gate passed after dropping + reverting gate-failing file(s); shipping the rest of the authored work." >> "$REPORT"
       break
     fi
     [ "$iso_rc" != "1" ] && break   # setup failed → bail to docs-only salvage
@@ -424,7 +461,16 @@ if [ "$gate_ok" = "0" ]; then
   # allowlist minus docs/), keep its authored docs, then re-gate. Everything not on
   # the allowlist — founder WIP, concurrent edits — is never touched, on any branch.
   log "GATE FAILED on lane code — dropping the nightly's own authored CODE (keeping its authored docs; founder WIP untouched)"
-  AUTHORED_CODE=$(mktemp); grep -vE '^docs/' "$NIGHTLY_AUTHORED_FILE" > "$AUTHORED_CODE" || true
+  # Use the ORIGINAL authored set (pre-drop-and-re-gate), not the trimmed list.
+  # If drop-and-re-gate ran first, NIGHTLY_AUTHORED_FILE no longer contains the
+  # files we already dropped — so reverting only the trimmed list would leave
+  # those dropped files modified in the working tree. NIGHTLY_AUTHORED_ORIGINAL
+  # is the full set we authored across all lanes; it's the only safe source for
+  # "revert every code change we made". Falls back gracefully if the original
+  # snapshot wasn't taken (drop-and-re-gate didn't run at all).
+  _AUTH_SRC="${NIGHTLY_AUTHORED_ORIGINAL:-$NIGHTLY_AUTHORED_FILE}"
+  [ -s "$_AUTH_SRC" ] || _AUTH_SRC="$NIGHTLY_AUTHORED_FILE"
+  AUTHORED_CODE=$(mktemp); grep -vE '^docs/' "$_AUTH_SRC" > "$AUTHORED_CODE" || true
   revert_authored "$RUN_SNAPSHOT" "$AUTHORED_CODE"
   rm -f "$AUTHORED_CODE"
 

@@ -2,7 +2,11 @@
 # Lane 8 — AdSense approval. Strengthens NON-game informational pages, fixes
 # real thinness/SSR bugs, improves crawl/structure. Never bloats word counts,
 # never adds text to game pages, never creates programmatic pages.
-# Sonnet · 12 min cap · ≤8 files
+# Sonnet · 15 min cap
+#
+# Budget history: 720s (12 min) was 4/5 (80%) until 2026-05-27 first timeout
+# at npm-test step. 900s adds 3-min safety margin; per-tool MCP_TOOL_TIMEOUT
+# still caps hung MCP calls.
 set -uo pipefail
 LIB_DIR="$(dirname "$0")/../lib"
 # shellcheck disable=SC1091
@@ -18,4 +22,4 @@ if [ ! -f "$HOME/.config/gcloud/application_default_credentials.json" ]; then
   echo "lane-08: gcloud ADC missing — running without GSC traffic data (noindex step skipped)" | tee -a "$LOG"
 fi
 
-headless_run "08-adsense" "$PROMPT" "sonnet" 720 "$LOG"
+headless_run "08-adsense" "$PROMPT" "sonnet" 900 "$LOG"
