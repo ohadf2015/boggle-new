@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, ReactNode } from 'react';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import { syncAuthAnalyticsTransition } from '@/utils/authAnalytics';
-import { consumePendingSignupCompletion, trackSignupCompleted } from '@/utils/growthTracking';
+import { consumePendingSignupCompletion, maybeTrackSignupCompleted } from '@/utils/growthTracking';
 
 // Import hooks from auth module (types are re-exported separately below)
 import {
@@ -132,7 +132,11 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
             : pending === 'multi_game'
             ? 'multi_game_prompt'
             : 'header_or_menu';
-        trackSignupCompleted(source);
+        // Re-fire-proof: only fires for a *just-created* account, deduped per
+        // user per device. A restored session on cold load (returning user)
+        // resets `wasGuest` to true via the in-memory ref, but its account is
+        // not recent and/or already counted, so no spurious signup is emitted.
+        maybeTrackSignupCompleted({ userId: user.id, createdAt: user.created_at, source });
         consumePendingSignupCompletion();
         // Allowlist bridge: if this email was pre-approved for teacher access, consume the entry.
         if (user?.email) {

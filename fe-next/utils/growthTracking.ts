@@ -493,6 +493,75 @@ export const trackSignupCompleted = (source: string = 'unknown'): void => {
   trackGrowthEvent('signup_completed', { source });
 };
 
+/** localStorage key holding the JSON array of userIds already counted as a
+ *  completed signup on this device (dedup set). */
+export const SIGNUP_COUNTED_KEY = 'lexiclash_signup_counted';
+/** An account older than this when first seen authed is a returning user, not
+ *  a fresh signup. Generous (1h) so OAuth + email-confirm + magic-link flows
+ *  all comfortably fit, while days-old accounts are excluded. */
+export const SIGNUP_RECENT_WINDOW_MS = 60 * 60 * 1000;
+const SIGNUP_FUTURE_SKEW_MS = 5 * 60 * 1000;
+
+/**
+ * Is this a *just-created* account (vs a returning session being restored)?
+ *
+ * A genuine signup resolves authed within seconds-to-minutes of `created_at`;
+ * a returning user's restored session carries a `created_at` days/months old.
+ * Missing/unparseable timestamps return `false` — we never fire a "signup" we
+ * cannot confirm is fresh (biases the conversion metric toward purity).
+ */
+export const isRecentAccount = (
+  createdAt: string | null | undefined,
+  nowMs: number,
+  windowMs: number = SIGNUP_RECENT_WINDOW_MS,
+): boolean => {
+  if (!createdAt) return false;
+  const created = Date.parse(createdAt);
+  if (Number.isNaN(created)) return false;
+  const age = nowMs - created;
+  // Allow small negative age (client/server clock skew) for genuinely new rows.
+  return age >= -SIGNUP_FUTURE_SKEW_MS && age < windowMs;
+};
+
+/**
+ * Fire `signup_completed` at most once per genuine signup.
+ *
+ * Replaces the raw `trackSignupCompleted` call in AuthContext, which re-fired
+ * on every cold load because its `wasGuest` gate trusts an in-memory ref that
+ * resets on mount (PostHog 30d: 380 events / 9 users). Two guards:
+ *   1. recency — old accounts (returning users) are excluded outright;
+ *   2. dedup — a per-device userId set, so reloads and multi-account devices
+ *      each count a given account only once.
+ * Returns whether the event was emitted (for callers/tests).
+ */
+export const maybeTrackSignupCompleted = (args: {
+  userId: string;
+  createdAt?: string | null;
+  source?: string;
+  nowMs?: number;
+  recentWindowMs?: number;
+}): boolean => {
+  const { userId, createdAt, source = 'unknown', nowMs = Date.now(), recentWindowMs } = args;
+  if (typeof window === 'undefined' || !userId) return false;
+  if (!isRecentAccount(createdAt, nowMs, recentWindowMs)) return false;
+
+  try {
+    const raw = localStorage.getItem(SIGNUP_COUNTED_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    const counted: string[] = Array.isArray(parsed) ? parsed : [];
+    if (counted.includes(userId)) return false;
+    // Cap to bound storage (multi-account dev devices) — keep most recent 50.
+    localStorage.setItem(SIGNUP_COUNTED_KEY, JSON.stringify([...counted, userId].slice(-50)));
+  } catch {
+    // localStorage unavailable (private mode / quota). The recency guard still
+    // blocks old accounts; without dedup we may re-emit on reloads within the
+    // window — best-effort, far better than the unbounded pre-fix re-fire.
+  }
+
+  trackSignupCompleted(source);
+  return true;
+};
+
 /**
  * Get growth metrics summary (for admin dashboard)
  */
