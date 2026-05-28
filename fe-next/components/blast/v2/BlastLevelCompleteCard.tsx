@@ -27,6 +27,14 @@ type Props = {
   /** True when THIS run set a new bonus-word record. */
   isNewBonus?: boolean;
   stars?: number;
+  /**
+   * Why the level ended. 'mastered' = every theme word found (the clean win).
+   * 'partial' = the board was cleared / soft-locked without every target — the
+   * "finish but fewer stars" path. Framed as a positive ("Board cleared!"),
+   * never as a miss; the star count carries the nuance. Defaults to 'mastered'
+   * so existing call sites read unchanged.
+   */
+  completionReason?: 'mastered' | 'partial';
   onNext: () => void;
   // Kept for the highlight-line heuristic; no longer rendered as tiles.
   cascadeCount?: number;
@@ -46,7 +54,11 @@ function pickHighlight(opts: {
   cascadeCount?: number;
   bestChainDepth?: number;
   timeSeconds?: number;
+  completionReason?: 'mastered' | 'partial';
 }): { label: string; key: string } {
+  // A partial finish gets its own upbeat badge — never a "perfect run" claim,
+  // and never a scolding "you missed words". It's still a cleared board.
+  if (opts.completionReason === 'partial') return { label: 'BOARD CLEARED', key: 'partial' };
   if (opts.stars === 3) return { label: 'PERFECT RUN', key: 'perfect' };
   if ((opts.bonusWordsFound ?? 0) >= 2) return { label: 'TREASURE HUNTER', key: 'treasure' };
   if ((opts.bestChainDepth ?? 0) >= 3) return { label: 'CHAIN MASTER', key: 'chain' };
@@ -116,6 +128,7 @@ export function BlastLevelCompleteCard({
   isNewFast = false,
   isNewBonus = false,
   stars,
+  completionReason = 'mastered',
   onNext,
   cascadeCount,
   timeSeconds,
@@ -128,7 +141,11 @@ export function BlastLevelCompleteCard({
   const showWords = wordCount > 0;
   const showBest = typeof bestStars === 'number' && bestStars > 0;
 
-  const highlight = pickHighlight({ stars, bonusWordsFound, cascadeCount, bestChainDepth, timeSeconds });
+  const highlight = pickHighlight({ stars, bonusWordsFound, cascadeCount, bestChainDepth, timeSeconds, completionReason });
+  const isPartial = completionReason === 'partial';
+  const titleText = isPartial
+    ? t('blast.complete.titlePartial', 'Board Cleared!')
+    : t('blast.complete.title', 'Level Complete!');
 
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -330,10 +347,11 @@ export function BlastLevelCompleteCard({
 
         <div
           ref={titleRef}
+          data-testid="complete-title"
           className="text-2xl font-black mt-2"
           style={{ color: modeColor, textShadow: `2px 2px 0 #0b1530` }}
         >
-          {t('blast.complete.title', 'Level Complete!')}
+          {titleText}
         </div>
 
         <div

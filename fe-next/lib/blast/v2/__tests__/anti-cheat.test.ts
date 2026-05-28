@@ -135,6 +135,18 @@ describe('anti-cheat', () => {
     it('returns 1 star for a messy clear (many misses and hints)', () => {
       expect(starRating(base({ hintsUsed: 3, wrongAttempts: 10, timeSeconds: 150 }), mockLevel)).toBe(1);
     });
+
+    it('caps a PARTIAL finish (a theme word missing) at 1 star, even if otherwise spotless/fast', () => {
+      // Player cleared the board / soft-locked without finding "cherry". A clean,
+      // fast run that still missed a target is the "finish but fewer stars" case.
+      const sub = base({ wordsFound: ['apple', 'banana'], hintsUsed: 0, wrongAttempts: 0, timeSeconds: 60 });
+      expect(starRating(sub, mockLevel)).toBe(1);
+    });
+
+    it('caps a partial finish at 1 star even with a bonus word found', () => {
+      const sub = base({ wordsFound: ['apple', 'banana', 'plea'], hintsUsed: 0, wrongAttempts: 0, timeSeconds: 60 });
+      expect(starRating(sub, mockLevel, 1)).toBe(1);
+    });
   });
 
   describe('maxPossibleCoins (level-less upper bound)', () => {

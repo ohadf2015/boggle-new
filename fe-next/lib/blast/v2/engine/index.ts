@@ -6,6 +6,8 @@ export { collapseCells, rebuildTileIds } from './collapse';
 export type { CollapseResult } from './collapse';
 export { detectCascade, detectAllCascades } from './cascade';
 export type { Cascade } from './cascade';
+export { computeCompletion } from './completion';
+export type { CompletionReason, CompletionResult } from './completion';
 export { detectAlmostWords } from './almost-word';
 export type { AlmostWord } from './almost-word';
 export { classifyOvation } from './ovation';

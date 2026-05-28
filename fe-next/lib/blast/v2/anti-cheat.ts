@@ -105,10 +105,16 @@ export function starRating(
   const config = LOCALE_CONFIGS[submission.locale];
   const normFound = new Set(submission.wordsFound.map(config.normalize));
   const allTheme = level.words.every((w) => normFound.has(config.normalize(w)));
-  const targetTime = 30 * level.words.length;
 
+  // Partial finish (board cleared or soft-locked WITHOUT every theme word) caps
+  // at 1 star — the "finish but fewer stars" rule. Every higher tier below is
+  // therefore guaranteed all-theme, so the 2★ `solid` path can no longer leak a
+  // 2-star grade to a run that missed a target.
+  if (!allTheme) return 1;
+
+  const targetTime = 30 * level.words.length;
   const spotless = submission.hintsUsed === 0 && submission.wrongAttempts <= 2;
-  const masterful = allTheme && spotless && (submission.timeSeconds <= targetTime || bonusWordsFound >= 1);
+  const masterful = spotless && (submission.timeSeconds <= targetTime || bonusWordsFound >= 1);
   if (masterful) return 3;
 
   const solid = submission.hintsUsed <= 1 && submission.wrongAttempts <= 5;

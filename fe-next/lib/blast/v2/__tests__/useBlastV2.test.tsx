@@ -112,6 +112,58 @@ describe('useBlastV2 hook', () => {
 
     expect(result.current.state.foundWords.has('DOG')).toBe(true);
     expect(result.current.state.status).toBe('levelComplete');
+    expect(result.current.state.completionReason).toBe('mastered');
+  });
+
+  it('completes as a PARTIAL finish when a collapse strands the last theme word (soft-lock rescue)', () => {
+    // col0 = [C,A,T] stacked, col1 = [X], col2 = [Z].
+    //   r2: T . .
+    //   r1: A . .
+    //   r0: C X Z
+    // Words: CAT (col-0 vertical) + XYZ (never on the board — Y is missing).
+    // Finding CAT collapses column 0; XYZ can never be formed, so the player
+    // would be stuck forever. Completion must fire as 'partial'.
+    const softLock: BlastLevel = {
+      id: 'soft-lock-test',
+      levelNumber: 1,
+      locale: 'en',
+      theme: 'onboarding',
+      columns: [
+        { index: 0, tiles: ['C', 'A', 'T'] },
+        { index: 1, tiles: ['X'] },
+        { index: 2, tiles: ['Z'] },
+      ],
+      words: ['CAT', 'XYZ'],
+      resolvableOrder: ['CAT', 'XYZ'],
+      tileFlags: {},
+      gravityMode: 'standard',
+      difficulty: 1,
+    };
+    const { result } = renderHook(() => useBlastV2(softLock));
+
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(0, 1));
+      result.current.handlers.onPointerMove(cellId(0, 2));
+      result.current.handlers.onPointerUp();
+    });
+
+    expect(result.current.state.foundWords.has('CAT')).toBe(true);
+    expect(result.current.state.foundWords.has('XYZ')).toBe(false);
+    expect(result.current.state.status).toBe('levelComplete');
+    expect(result.current.state.completionReason).toBe('partial');
+  });
+
+  it('keeps completionReason null while the level is still in progress', () => {
+    const { result } = renderHook(() => useBlastV2(mockLevel));
+    act(() => {
+      result.current.handlers.onPointerDown(cellId(0, 0));
+      result.current.handlers.onPointerMove(cellId(0, 1));
+      result.current.handlers.onPointerMove(cellId(0, 2));
+      result.current.handlers.onPointerUp();
+    });
+    expect(result.current.state.status).toBe('playing');
+    expect(result.current.state.completionReason).toBeNull();
   });
 
   it('defers the shake for an "unknown" rejection until the async dict check resolves', () => {

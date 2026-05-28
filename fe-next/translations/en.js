@@ -9154,6 +9154,8 @@ const en = {
     "progress": "Cleared",
     "complete": {
       "title": "Level Complete!",
+      "titlePartial": "Board Cleared!",
+      "skip": "Show results",
       "boardCleared": "Board Cleared!",
       "bonusLabel": "Bonus",
       "best": "Best",

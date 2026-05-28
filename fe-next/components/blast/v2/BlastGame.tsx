@@ -138,9 +138,13 @@ export function BlastGame({
     status: state.status,
   });
   useChainEventBus({ chainEventKey: state.chainEventKey, chainDepth: state.lastChainDepth });
-  // Cascade pacing — Royal Match style. Complete card delayed by `(chainDepth-1)*350 + 700`ms
-  // so each cascade beat + final ovation flash plays out visibly before the modal pops.
-  const showCompleteCard = useCompleteCardDelay({ status: state.status, chainDepth: state.lastChainDepth });
+  // Cascade pacing — Royal Match style. The card is gated behind a short settle
+  // (max ~800ms even on a deep cascade) so the final chain flash plays out, but
+  // an impatient player can tap anywhere to `skip` straight to the result.
+  const { show: showCompleteCard, skip: skipCompleteSettle } = useCompleteCardDelay({
+    status: state.status,
+    chainDepth: state.lastChainDepth,
+  });
   // Almost-word ghost letters — translucent glowing letters in empty cells
   // that hint at completing a target word. Restricted to tutorial levels
   // (L1–L2) because the ghosts floating above tall columns or near scattered
@@ -479,6 +483,8 @@ export function BlastGame({
   }
 
   if (state.status === 'levelComplete' && showCompleteCard) {
+    // Count how many theme words were actually found
+    const foundThemeWordsCount = level.words.filter((w) => state.foundWords.has(w)).length;
     return (
       <BlastLevelCompleteCard
         coins={state.coins}
@@ -486,8 +492,11 @@ export function BlastGame({
         modeColor={modeColor}
         levelNumber={level.levelNumber}
         themeWordCount={level.words.length}
-        wordsFound={level.words.length}
+        // On a partial finish the player did NOT find every theme word, so show
+        // how many of the targets they actually got, not the full count.
+        wordsFound={state.completionReason === 'partial' ? foundThemeWordsCount : level.words.length}
         bonusWordsFound={state.bonusWordCount}
+        completionReason={state.completionReason ?? 'mastered'}
         timeSeconds={finalStats?.timeSeconds}
         bestChainDepth={bestChainDepth}
         stars={finalStats?.stars}

@@ -4,7 +4,8 @@ import type { BlastLevel, CellId } from './types';
 import { LOCALE_CONFIGS } from './locale-config';
 import {
   reduceSelection, validateSelection, collapseCells, rebuildTileIds, detectAllCascades, scoreForWord,
-  type SelectionState, type SelectionEvent, type ValidationResult,
+  computeCompletion,
+  type SelectionState, type SelectionEvent, type ValidationResult, type CompletionReason,
 } from './engine';
 import { mechanicsForLevel } from './mechanic-flags';
 import { trackBlastWordFound, trackBlastWordRejected, trackBlastHintUsed } from './telemetry';
@@ -22,6 +23,7 @@ type HistoryEntry = {
   chainEventKey: number;
   tileIds: string[][];
   status: 'playing' | 'levelComplete';
+  completionReason: CompletionReason | null;
 };
 
 // Cap so the stack can't grow unbounded over a long session. Five undos is
@@ -36,6 +38,10 @@ type State = {
   coins: number;
   chestProgress: number;
   status: 'playing' | 'levelComplete';
+  // Why the level ended. Snapshotted at the moment status flips to
+  // 'levelComplete' so a later cascade/collapse can't retroactively change the
+  // headline the result card already showed. Null while playing.
+  completionReason: CompletionReason | null;
   hintsUsed: number;
   cascadeCount: number;
   invalidShakeKey: number;
@@ -179,7 +185,10 @@ function applyValidatedSubmit(
     .map((c) => c.word)
     .filter((w) => !formableBefore.has(w));
   newCascadeCount += revealed.length;
-  const allFound = state.level.words.every((w) => newFound.has(w));
+  // Completion check runs on the POST-collapse board (newLevel) so it can tell
+  // a clean win from a soft-lock — a collapse that strands the last theme word
+  // now finishes the level as a `partial` instead of trapping the player.
+  const completion = computeCompletion(newLevel, newFound, config);
   const thisChainDepth = newCascadeCount - state.cascadeCount;
   // Snapshot the pre-submit slice so undo can rewind exactly this move.
   const snapshot: HistoryEntry = {
@@ -192,6 +201,7 @@ function applyValidatedSubmit(
     chainEventKey: state.chainEventKey,
     tileIds: state.tileIds,
     status: state.status,
+    completionReason: state.completionReason,
   };
   const newHistory = [...state.history, snapshot].slice(-UNDO_STACK_LIMIT);
   return {
@@ -202,7 +212,8 @@ function applyValidatedSubmit(
     chestProgress: Math.min(1, newChestProgress),
     cascadeCount: newCascadeCount,
     lastValidation: res,
-    status: allFound ? 'levelComplete' : 'playing',
+    status: completion.complete ? 'levelComplete' : 'playing',
+    completionReason: completion.complete ? completion.reason : null,
     lastChainDepth: thisChainDepth,
     chainEventKey: state.chainEventKey + 1,
     tileIds: newTileIds,
@@ -250,7 +261,9 @@ function applyForceBonus(state: State, cells: CellId[], word: string): State {
     .map((c) => c.word)
     .filter((w) => !formableBefore.has(w));
   const newCascadeCount = state.cascadeCount + revealed.length;
-  const allFound = state.level.words.every((w) => newFound.has(w));
+  // A bonus word can strand the last theme word too — run the same completion
+  // check on the post-collapse board so the player isn't soft-locked.
+  const completion = computeCompletion(newLevel, newFound, config);
   const thisChainDepth = newCascadeCount - state.cascadeCount;
 
   const snapshot: HistoryEntry = {
@@ -263,6 +276,7 @@ function applyForceBonus(state: State, cells: CellId[], word: string): State {
     chainEventKey: state.chainEventKey,
     tileIds: state.tileIds,
     status: state.status,
+    completionReason: state.completionReason,
   };
   const newHistory = [...state.history, snapshot].slice(-UNDO_STACK_LIMIT);
 
@@ -274,7 +288,8 @@ function applyForceBonus(state: State, cells: CellId[], word: string): State {
     chestProgress: Math.min(1, newChestProgress),
     cascadeCount: newCascadeCount,
     lastValidation: { kind: 'bonus', word },
-    status: allFound ? 'levelComplete' : 'playing',
+    status: completion.complete ? 'levelComplete' : 'playing',
+    completionReason: completion.complete ? completion.reason : null,
     lastChainDepth: thisChainDepth,
     chainEventKey: state.chainEventKey + 1,
     tileIds: newTileIds,
@@ -338,6 +353,7 @@ function reducer(state: State, action: Action): State {
       chainEventKey: state.chainEventKey + 1,
       tileIds: prev.tileIds,
       status: prev.status,
+      completionReason: prev.completionReason,
       selection: { kind: 'idle' },
       lastValidation: null,
       lastRejectedCells: [],
@@ -359,6 +375,7 @@ export function useBlastV2(initialLevel: BlastLevel, options: UseBlastV2Options 
     coins: 0,
     chestProgress: 0,
     status: 'playing',
+    completionReason: null,
     hintsUsed: 0,
     cascadeCount: 0,
     invalidShakeKey: 0,
