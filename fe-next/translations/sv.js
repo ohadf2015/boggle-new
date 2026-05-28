@@ -9253,6 +9253,7 @@ const sv = {
     },
     "feedback": {
       "checking": "Kollar…",
+      "target": "MÅLORD!",
       "bonusWord": "BONUSORD!",
       "bonusHint": "Inte på listan – räknas ändå!",
       "bonusCount": "⭐ {count} bonus"

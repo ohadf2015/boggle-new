@@ -9173,6 +9173,7 @@ const en = {
     },
     "feedback": {
       "checking": "Checking…",
+      "target": "TARGET!",
       "bonusWord": "BONUS WORD!",
       "bonusHint": "Not on the list — still counts!",
       "bonusCount": "⭐ {count} bonus"

@@ -9519,6 +9519,7 @@ const he = {
     },
     "feedback": {
       "checking": "בודק…",
+      "target": "מצאת מטרה!",
       "bonusWord": "מילת בונוס!",
       "bonusHint": "לא ברשימה — ועדיין נספרת!",
       "bonusCount": "⭐ {count} בונוס"

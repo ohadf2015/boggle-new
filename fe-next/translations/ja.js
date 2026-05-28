@@ -9279,6 +9279,7 @@ const ja = {
     },
     "feedback": {
       "checking": "確認中…",
+      "target": "ターゲット！",
       "bonusWord": "ボーナスワード！",
       "bonusHint": "リストにないけどカウントされる！",
       "bonusCount": "⭐ ボーナス {count}"

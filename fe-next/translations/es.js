@@ -9324,6 +9324,7 @@ const es = {
     },
     "feedback": {
       "checking": "Comprobando…",
+      "target": "¡OBJETIVO!",
       "bonusWord": "¡PALABRA EXTRA!",
       "bonusHint": "No está en la lista, ¡pero cuenta!",
       "bonusCount": "⭐ {count} extra"
