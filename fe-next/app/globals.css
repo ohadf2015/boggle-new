@@ -3927,8 +3927,19 @@ html[data-cosy='true'] {
 
   /* Muted secondary text -> warm clay-brown (the reference's low-key accent
      text). Hardcoded bluish #d4d4e8 in :root can't follow the --neo-* cascade,
-     so it is set explicitly; clear on both sand and cream. */
-  --muted-foreground: hsl(26 28% 44%);
+     so it is set explicitly. Darkened to L34 so it clears WCAG AA 4.5:1 on the
+     sand backdrop (was L44 = 3.17:1, a fail) — secondary text legibility is
+     critical for this mode's elder audience. Now 4.69:1 on sand / 6.6:1 cream. */
+  --muted-foreground: hsl(26 30% 34%);
+
+  /* Functional edge: a warm oak line strong enough (>=3:1 on sand AND cream)
+     for input borders and focus rings, where the boundary IS the affordance.
+     Decorative card edges keep the barely-there --border below — only
+     interactive controls use this. */
+  --cosy-edge-strong: hsl(34 24% 42%);
+  /* Focus ring -> the strong functional edge (default sage ring is too light
+     on sand for a visible keyboard-focus indicator). */
+  --ring: var(--cosy-edge-strong);
 }
 
 /* ---- Cosy / Calm Mode: structural softening beyond the token overrides.
@@ -4010,13 +4021,62 @@ html[data-cosy='true'] .badge-neo {
   border-radius: 9999px;
 }
 
-/* Softer type — lift line-height + letter-spacing, ease heavy weights. */
+/* Softer type — lift line-height + letter-spacing, ease heavy weights. More
+   generous leading aids older eyes and reinforces the unhurried, premium feel
+   (the "library/journal" reading rhythm vs. the loud default's tight set). */
 html[data-cosy='true'] body {
   letter-spacing: 0.01em;
-  line-height: 1.65;
+  line-height: 1.72;
+}
+html[data-cosy='true'] p,
+html[data-cosy='true'] li {
+  line-height: 1.72;
+  /* Keep prose readable — never let a calm reading column run too wide. */
+  max-width: 70ch;
 }
 html[data-cosy='true'] h1,
 html[data-cosy='true'] h2,
 html[data-cosy='true'] h3 {
   font-weight: 600;
+  letter-spacing: 0.005em;
+}
+
+/* Functional contrast (WCAG 1.4.11): interactive control boundaries and the
+   keyboard-focus indicator must be perceptible. Cards stay soft (separated by
+   fill + shadow); only controls get the strong oak edge. */
+html[data-cosy='true'] input,
+html[data-cosy='true'] textarea,
+html[data-cosy='true'] select {
+  border-color: var(--cosy-edge-strong) !important;
+}
+html[data-cosy='true'] :focus-visible {
+  outline: 2px solid var(--cosy-edge-strong) !important;
+  outline-offset: 2px;
+}
+
+/* Calm motion: strip the playful keyframes (wobble / shake / pop / press /
+   bounce). Cosy already forces reduced-motion for framer-driven motion, but
+   these Tailwind CSS keyframes aren't covered by that — kill them here so
+   nothing jiggles or springs. What remains are gentle opacity/scale eases. */
+html[data-cosy='true'] .animate-neo-wobble,
+html[data-cosy='true'] .animate-neo-shake,
+html[data-cosy='true'] .animate-neo-pop,
+html[data-cosy='true'] .animate-neo-press,
+html[data-cosy='true'] .animate-bounce,
+html[data-cosy='true'] .animate-neo-reject-flash {
+  animation: none !important;
+}
+
+/* Cosy / Calm Mode — quiet celebration acknowledgement (replaces confetti).
+   A gentle scale-in + fade; deliberately slow and soft, no bounce. The OS
+   reduced-motion gate is handled by `motion-reduce:animate-none` on the node. */
+@keyframes cosy-quiet-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.animate-cosy-quiet-in {
+  animation: cosy-quiet-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-cosy-quiet-in { animation: none; }
 }

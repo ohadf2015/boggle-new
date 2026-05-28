@@ -1,5 +1,8 @@
 // EN translations
 const en = {
+  "cosy": {
+    "wellDone": "Well done"
+  },
   "shiritori": {
     "chain": "Word chain",
     "inputLabel": "Type your word",
@@ -85,6 +88,9 @@ const en = {
     "zone": { "entered": "New Zone", "next": "Next: {zone} · {m}m" },
     "landmark": { "skyscraper": "Skyscraper top", "cloudBase": "Cloud base", "mountainTop": "Mountain peak", "jetStream": "Jet stream", "stormTops": "Storm tops", "weatherBalloon": "Weather balloon", "earthCurve": "Earth's curve", "karman": "Edge of space", "meteorBelt": "Meteor belt", "aurora": "Aurora", "deepSpace": "Deep space" },
     "hazard": { "bomb": "Bomb", "hurricane": "Hurricane", "wobble": "Wobble", "sabotage": "Sabotage", "lost": "{kind}! −{n} floors" },
+    "clutch": { "save": "Clutch save!", "critical": "Wobbling — land it clean!" },
+    "daily": { "badge": "Daily · {date}", "streak": "{n}-day streak", "toDaily": "Daily", "toEndless": "Endless" },
+    "perk": { "title": "Choose a boon", "subtitle": "Pick one — it lasts this climb", "skip": "Skip for now", "masterCrane": { "name": "Master Crane", "desc": "Bigger reward on perfect drops" }, "tallTimber": { "name": "Tall Timber", "desc": "+12% height on every floor" }, "featherfall": { "name": "Featherfall", "desc": "Topples cost one fewer floor" }, "reinforced": { "name": "Reinforced", "desc": "More wobble before the brink" }, "cushion": { "name": "Safety Cushion", "desc": "Crane wobbles never drop a floor" } },
     "crane": { "place": "Place your word", "tapToDrop": "Tap to drop", "perfect": "Perfect!", "good": "Nice!", "sloppy": "Wobbly", "miss": "Whoops!", "stability": "Stability" },
     "sabotage": { "chip": "Wrecking ball", "tokens": "{n}", "pickTarget": "Pick a rival", "noTargets": "No rivals to target yet", "confirm": "Send wrecking ball to {name}?", "send": "Send", "cancel": "Cancel", "sentTo": "💥 Hit {name} — −1m", "incoming": "🚨 Sabotage incoming from {name}!", "recovered": "Tower stands. Climb on.", "earned": "🎯 Wrecking Ball earned!", "earnedHint": "{n} perfect drops in a row" },
     "error": { "too_short": "Too short — 3+ letters", "bad_chain": "Start with the glowing letter", "not_buildable": "Use the tray letters", "duplicate": "Already used that word", "not_in_dictionary": "Not in the dictionary" },
@@ -956,7 +962,7 @@ const en = {
     "soundEffects": "Sound Effects",
     "accessibility": "Accessibility",
     "cosyMode": "Calm Mode",
-    "cosyModeDescription": "Gentler visuals, no time-pressure flashing, softer celebrations",
+    "cosyModeDescription": "Gentler visuals, no time-pressure flashing, no confetti — calm acknowledgements instead",
     "reduceMotion": "Reduce Motion",
     "reduceMotionDescription": "Limit animations",
     "fireRoundLights": "Fire Round Lights",

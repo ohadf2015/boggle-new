@@ -34,12 +34,18 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
 let nativeFlag = false;
 vi.mock('@/utils/platform', () => ({ isNative: () => nativeFlag }));
 
+let celebrationIntensity: 'full' | 'gentle' | 'calm' = 'full';
+vi.mock('@/contexts/AccessibilityContext', () => ({
+  useCelebrationIntensity: () => celebrationIntensity,
+}));
+
 describe('SharedFxMount', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     deviceConfig.maxParticles = 20;
     deviceConfig.prefersReducedMotion = false;
     nativeFlag = false;
+    celebrationIntensity = 'full';
   });
 
   it('does NOT mount the fullscreen FX canvas on native (it can occlude the page)', () => {
@@ -82,6 +88,22 @@ describe('SharedFxMount', () => {
     deviceConfig.maxParticles = 0;
     render(<SharedFxMount />);
     expect(mount).not.toHaveBeenCalled();
+    cleanup();
+  });
+
+  it('does not initialize the Pixi FX layer in calm mode (no GPU bursts/fireworks)', () => {
+    // Cosy / Calm Mode replaces particle celebrations with quiet feedback, so
+    // the always-on GPU particle layer must stay dark.
+    celebrationIntensity = 'calm';
+    render(<SharedFxMount />);
+    expect(mount).not.toHaveBeenCalled();
+    cleanup();
+  });
+
+  it('still mounts the FX layer at gentle intensity (non-cosy reduce-effects path)', () => {
+    celebrationIntensity = 'gentle';
+    render(<SharedFxMount />);
+    expect(mount).toHaveBeenCalledTimes(1);
     cleanup();
   });
 });

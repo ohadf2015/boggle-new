@@ -40,6 +40,7 @@ import { LogRocketIdentify } from '@/components/providers/LogRocketIdentify';
 import { PostHogProvider } from '@/components/providers/PostHogProvider';
 import GlobalCoinEarnFx from '@/components/animations/GlobalCoinEarnFx';
 import SharedFxMount from '@/components/animations/SharedFxMount';
+import QuietCelebrationLayer from '@/components/cosy/QuietCelebrationLayer';
 import NativeSelectionGuard from '@/components/native/NativeSelectionGuard';
 import EasterEggListener from '@/components/EasterEggListener';
 
@@ -207,6 +208,8 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                 <NativeSelectionGuard />
                                                 {/* Mounts the SharedFxApp Pixi singleton once so coin/level-up/firework FX actually render */}
                                                 <SharedFxMount />
+                                                {/* Cosy / Calm Mode: dignified quiet acknowledgement that replaces confetti when celebrations are suppressed */}
+                                                <QuietCelebrationLayer />
                                                 {/* Global coin-earn VFX: sound + flying coins on every addCoins */}
                                                 <GlobalCoinEarnFx />
                                                 {/* Hidden Konami-code easter egg → fireworks + toast (cosmetic only) */}

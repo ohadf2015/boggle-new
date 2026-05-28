@@ -73,9 +73,11 @@ describe('resolveCosyPreferences', () => {
       expect(eff.shouldReduceMotion).toBe(true);
     });
 
-    it('switches to gentle celebrations and suppresses timer urgency', () => {
+    it('switches celebrations to calm (effects off) and suppresses timer urgency', () => {
+      // Calm persona (elder / effect-averse) gets dignified quiet feedback, not
+      // scaled-down confetti. 'calm' is the off-particles tier.
       const eff = resolveCosyPreferences(cosy);
-      expect(eff.celebrationIntensity).toBe('gentle');
+      expect(eff.celebrationIntensity).toBe('calm');
       expect(eff.suppressTimerUrgency).toBe(true);
     });
   });

@@ -61,7 +61,7 @@ describe('Cosy mode wiring in AccessibilityContext', () => {
     expect(result.current.quake).toBe(true);
     expect(result.current.reduceMotion).toBe(true);
     expect(result.current.urgency).toBe(true);
-    expect(result.current.celebration).toBe('gentle');
+    expect(result.current.celebration).toBe('calm');
   });
 
   it('reflects cosy on the <html> data-cosy attribute (drives the calm palette)', () => {

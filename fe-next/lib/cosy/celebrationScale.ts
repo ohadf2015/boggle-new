@@ -1,9 +1,15 @@
 /**
  * Celebration scaling for Cosy / Calm Mode.
  *
- * Cosy does NOT remove celebrations — a dead feedback loop feels broken, not
- * cosy. It scales them down: fewer particles, narrower spread, no screen-shake,
- * shorter burst. The payoff still lands, just without the assault.
+ * Three tiers:
+ * - `full`   — default party strength.
+ * - `gentle` — fewer particles, narrower spread, no screen-shake (a quieter
+ *              party; kept for non-cosy "reduce effects" use).
+ * - `calm`   — particles OFF entirely. Cosy mode uses this. The elder /
+ *              effect-averse persona doesn't want a smaller explosion; they
+ *              want a different acknowledgement. Particle effects are replaced
+ *              by dignified quiet feedback (see `quietFeedback.ts`), so the
+ *              feedback loop is never dead — just calm.
  *
  * Pure on purpose — call sites (confetti, win beats) read these multipliers and
  * apply them to their own particle configs.
@@ -38,8 +44,24 @@ const FULL: CelebrationScale = {
   enableScreenShake: true,
 };
 
+const CALM: CelebrationScale = {
+  particleMultiplier: 0,
+  spreadMultiplier: 0,
+  durationMultiplier: 0,
+  enableScreenShake: false,
+};
+
 export function celebrationScale(intensity: CelebrationIntensity): CelebrationScale {
+  if (intensity === 'calm') return CALM;
   return intensity === 'gentle' ? GENTLE : FULL;
+}
+
+/**
+ * True when particle effects should not fire at all (calm / cosy). Call sites
+ * use this to skip the burst and instead emit dignified quiet feedback.
+ */
+export function isCelebrationSuppressed(intensity: CelebrationIntensity): boolean {
+  return intensity === 'calm';
 }
 
 /**
@@ -49,6 +71,7 @@ export function celebrationScale(intensity: CelebrationIntensity): CelebrationSc
  */
 export function scaleParticleCount(base: number, intensity: CelebrationIntensity): number {
   if (intensity === 'full') return base;
+  if (intensity === 'calm') return 0; // particles off — quiet feedback takes over
   return Math.max(1, Math.round(base * GENTLE.particleMultiplier));
 }
 

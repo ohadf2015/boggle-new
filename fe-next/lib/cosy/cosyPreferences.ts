@@ -37,8 +37,15 @@ export interface EffectiveCosyPreferences {
   largeLettersEnabled: boolean;
   /** New under cosy: stop the timer from shouting (color/scale escalation). */
   suppressTimerUrgency: boolean;
-  /** New under cosy: scale celebrations down — never off. */
-  celebrationIntensity: 'full' | 'gentle';
+  /**
+   * Celebration tier:
+   * - `full`   — default loud party (confetti + Pixi bursts at full strength).
+   * - `gentle` — scaled-down particles (kept for non-cosy reduce-effects paths).
+   * - `calm`   — particles OFF; replaced by dignified quiet feedback. Cosy mode
+   *              uses this: the elder / effect-averse persona wants a different
+   *              kind of acknowledgement, not a smaller explosion.
+   */
+  celebrationIntensity: 'full' | 'gentle' | 'calm';
 }
 
 /** Resolve the stored reduce-motion preference against the system setting. */
@@ -63,6 +70,6 @@ export function resolveCosyPreferences(inputs: RawCosyInputs): EffectiveCosyPref
     disableEarthquakeEffects: inputs.disableEarthquakeEffects || cosyMode,
     largeLettersEnabled: inputs.useLargeLetters || cosyMode,
     suppressTimerUrgency: cosyMode,
-    celebrationIntensity: cosyMode ? 'gentle' : 'full',
+    celebrationIntensity: cosyMode ? 'calm' : 'full',
   };
 }

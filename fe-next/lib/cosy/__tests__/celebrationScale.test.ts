@@ -3,6 +3,7 @@ import {
   celebrationScale,
   scaleParticleCount,
   applyCelebrationIntensity,
+  isCelebrationSuppressed,
 } from '../celebrationScale';
 
 describe('celebrationScale', () => {
@@ -21,6 +22,21 @@ describe('celebrationScale', () => {
     expect(s.spreadMultiplier).toBeLessThan(1);
     expect(s.enableScreenShake).toBe(false);
   });
+
+  it('turns calm fully off (zero particles, no shake) — quiet feedback replaces it', () => {
+    const s = celebrationScale('calm');
+    expect(s.particleMultiplier).toBe(0);
+    expect(s.spreadMultiplier).toBe(0);
+    expect(s.enableScreenShake).toBe(false);
+  });
+});
+
+describe('isCelebrationSuppressed', () => {
+  it('is true only for calm (particle effects off)', () => {
+    expect(isCelebrationSuppressed('calm')).toBe(true);
+    expect(isCelebrationSuppressed('gentle')).toBe(false);
+    expect(isCelebrationSuppressed('full')).toBe(false);
+  });
 });
 
 describe('scaleParticleCount', () => {
@@ -30,6 +46,11 @@ describe('scaleParticleCount', () => {
 
   it('reduces the count at gentle intensity', () => {
     expect(scaleParticleCount(120, 'gentle')).toBeLessThan(120);
+  });
+
+  it('drops to zero particles at calm intensity (effects off)', () => {
+    expect(scaleParticleCount(120, 'calm')).toBe(0);
+    expect(scaleParticleCount(1, 'calm')).toBe(0);
   });
 
   it('never drops a celebration to zero particles (payoff survives)', () => {
@@ -54,6 +75,12 @@ describe('applyCelebrationIntensity', () => {
     expect(out.particleCount).toBeLessThan(40);
     expect(out.particleCount).toBeGreaterThan(0);
     expect(out.spread).toBeLessThan(80);
+  });
+
+  it('zeroes particleCount and spread at calm intensity (effects off)', () => {
+    const out = applyCelebrationIntensity({ particleCount: 40, spread: 80 }, 'calm');
+    expect(out.particleCount).toBe(0);
+    expect(out.spread).toBe(0);
   });
 
   it('leaves options without particleCount/spread alone (no NaN)', () => {

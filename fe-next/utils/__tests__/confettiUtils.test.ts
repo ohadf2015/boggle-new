@@ -134,6 +134,30 @@ describe('confettiUtils', () => {
       expect(result).toBeNull();
     });
 
+    it('fireConfetti fires no particles but emits a quiet-celebrate event in calm mode', async () => {
+      Object.defineProperty(window, 'matchMedia', {
+        writable: true,
+        configurable: true,
+        value: vi.fn().mockReturnValue({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() }),
+      });
+
+      const mod = await import('../confettiUtils');
+      const { QUIET_FEEDBACK_EVENT } = await import('../../lib/cosy/quietFeedback');
+      mod.setCelebrationIntensity('calm');
+
+      const handler = vi.fn();
+      window.addEventListener(QUIET_FEEDBACK_EVENT, handler);
+      const result = mod.fireConfetti({ particleCount: 50 });
+      window.removeEventListener(QUIET_FEEDBACK_EVENT, handler);
+
+      // No particles fired in calm...
+      expect(result).toBeNull();
+      // ...but the dignified quiet beat was dispatched instead of nothing.
+      expect(handler).toHaveBeenCalledTimes(1);
+
+      mod.setCelebrationIntensity('full'); // reset module state for other tests
+    });
+
     it('fireLevelUpConfetti is a no-op under prefers-reduced-motion', async () => {
       Object.defineProperty(window, 'matchMedia', {
         writable: true,

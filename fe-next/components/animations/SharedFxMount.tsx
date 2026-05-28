@@ -3,6 +3,8 @@
 import { useEffect } from 'react';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { useCelebrationIntensity } from '@/contexts/AccessibilityContext';
+import { isCelebrationSuppressed } from '@/lib/cosy/celebrationScale';
 import { isNative } from '@/utils/platform';
 
 /**
@@ -20,11 +22,16 @@ import { isNative } from '@/utils/platform';
  */
 export const SharedFxMount: React.FC = () => {
   const { maxParticles, prefersReducedMotion } = useDevicePerformance();
+  // Cosy / Calm Mode (calm tier) replaces particle celebrations with quiet
+  // feedback, so the always-on GPU particle layer must not even mount — no
+  // coin streams, level-up bursts, or fireworks. 'gentle' (non-cosy reduce
+  // effects) keeps the layer; only 'calm' suppresses it entirely.
+  const fxSuppressed = isCelebrationSuppressed(useCelebrationIntensity());
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
     if (isNative()) return;
-    if (prefersReducedMotion || maxParticles <= 0) return;
+    if (prefersReducedMotion || maxParticles <= 0 || fxSuppressed) return;
 
     SharedFxApp.mount(document.body, { maxParticles, prefersReducedMotion }).catch(() => {
       // mount is best-effort; a failed GPU init must never break the app shell.
@@ -33,7 +40,7 @@ export const SharedFxMount: React.FC = () => {
     return () => {
       SharedFxApp.unmount();
     };
-  }, [maxParticles, prefersReducedMotion]);
+  }, [maxParticles, prefersReducedMotion, fxSuppressed]);
 
   return null;
 };

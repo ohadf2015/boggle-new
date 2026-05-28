@@ -8,7 +8,12 @@
  */
 
 import confettiLib, { type CreateTypes, type Options, type Shape } from 'canvas-confetti';
-import { applyCelebrationIntensity, type CelebrationIntensity } from '@/lib/cosy/celebrationScale';
+import {
+  applyCelebrationIntensity,
+  isCelebrationSuppressed,
+  type CelebrationIntensity,
+} from '@/lib/cosy/celebrationScale';
+import { emitQuietFeedback } from '@/lib/cosy/quietFeedback';
 
 // Singleton canvas for confetti
 let confettiCanvas: HTMLCanvasElement | null = null;
@@ -161,6 +166,15 @@ export function fireConfetti(options: Options = {}): Promise<null> | null {
     } catch {
       // matchMedia stubs in test environments may throw — treat as "not set"
     }
+  }
+
+  // Cosy / Calm Mode (calm tier): particle effects are OFF for the elder /
+  // effect-averse persona. Instead of a smaller explosion we emit ONE quiet
+  // dignified beat (a soft checkmark) via the QuietCelebrationLayer — the
+  // feedback loop stays alive, just calm. Return before touching the canvas.
+  if (isCelebrationSuppressed(celebrationIntensity)) {
+    emitQuietFeedback();
+    return null;
   }
 
   // Ensure canvas exists

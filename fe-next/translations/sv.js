@@ -1,5 +1,8 @@
 // Sv translations
 const sv = {
+  "cosy": {
+    "wellDone": "Bra jobbat"
+  },
   "shiritori": {
     "chain": "Ordkedja",
     "inputLabel": "Skriv ditt ord",
@@ -85,6 +88,9 @@ const sv = {
     "zone": { "entered": "Ny zon", "next": "Nästa: {zone} · {m}m" },
     "landmark": { "skyscraper": "Skyskrapans topp", "cloudBase": "Molnbas", "mountainTop": "Bergstopp", "jetStream": "Jetström", "stormTops": "Stormtoppar", "weatherBalloon": "Väderballong", "earthCurve": "Jordens krökning", "karman": "Rymdens kant", "meteorBelt": "Meteorbälte", "aurora": "Norrsken", "deepSpace": "Yttre rymden" },
     "hazard": { "bomb": "Bomb", "hurricane": "Orkan", "wobble": "Vingel", "sabotage": "Sabotage", "lost": "{kind}! −{n} våningar" },
+    "clutch": { "save": "Räddning i sista stund!", "critical": "Vacklar — landa rent!" },
+    "daily": { "badge": "Daglig · {date}", "streak": "{n} dagar i rad", "toDaily": "Daglig", "toEndless": "Oändlig" },
+    "perk": { "title": "Välj en förmån", "subtitle": "Välj en — den varar hela klättringen", "skip": "Hoppa över", "masterCrane": { "name": "Mästarkran", "desc": "Större belöning vid perfekta släpp" }, "tallTimber": { "name": "Högt virke", "desc": "+12% höjd på varje våning" }, "featherfall": { "name": "Fjäderfall", "desc": "Ras kostar en våning mindre" }, "reinforced": { "name": "Förstärkt", "desc": "Mer vinglande innan kanten" }, "cushion": { "name": "Säkerhetsdyna", "desc": "Kranvinglande tappar aldrig en våning" } },
     "crane": { "place": "Placera ditt ord", "tapToDrop": "Tryck för att släppa", "perfect": "Perfekt!", "good": "Snyggt!", "sloppy": "Vingligt", "miss": "Hoppsan!", "stability": "Stabilitet" },
     "sabotage": { "chip": "Rivningskula", "tokens": "{n}", "pickTarget": "Välj en rival", "noTargets": "Inga rivaler att rikta sig mot än", "confirm": "Skicka rivningskula till {name}?", "send": "Skicka", "cancel": "Avbryt", "sentTo": "💥 Träffade {name} — −1m", "incoming": "🚨 Sabotage på väg från {name}!", "recovered": "Tornet står. Klättra på.", "earned": "🎯 Rivningskula intjänad!", "earnedHint": "{n} perfekta släpp i rad" },
     "error": { "too_short": "För kort — minst 3 bokstäver", "bad_chain": "Börja på den lysande bokstaven", "not_buildable": "Använd brickornas bokstäver", "duplicate": "Ordet är redan använt", "not_in_dictionary": "Inte i ordlistan" },
@@ -972,7 +978,7 @@ const sv = {
     "soundEffects": "Ljudeffekter",
     "accessibility": "Tillgänglighet",
     "cosyMode": "Lugnt läge",
-    "cosyModeDescription": "Mjukare visuella effekter, ingen tidspressblinkning, lugnare firande",
+    "cosyModeDescription": "Mjukare grafik, inga tidspressblinkningar, ingen konfetti — lugna bekräftelser istället",
     "reduceMotion": "Reducera rörelse",
     "reduceMotionDescription": "Begränsa animeringar",
     "fireRoundLights": "Eldrundeljus",

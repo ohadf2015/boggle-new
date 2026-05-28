@@ -1,5 +1,8 @@
 // HE translations
 const he = {
+  "cosy": {
+    "wellDone": "כל הכבוד"
+  },
   "shiritori": {
     "chain": "שרשרת מילים",
     "inputLabel": "הקלידו מילה",
@@ -85,6 +88,9 @@ const he = {
     "zone": { "entered": "אזור חדש", "next": "הבא: {zone} · {m}מ'" },
     "landmark": { "skyscraper": "פסגת גורד שחקים", "cloudBase": "בסיס העננים", "mountainTop": "פסגת ההר", "jetStream": "זרם הסילון", "stormTops": "ראש הסערה", "weatherBalloon": "בלון מזג אוויר", "earthCurve": "עקמומיות כדור הארץ", "karman": "קצה החלל", "meteorBelt": "חגורת המטאורים", "aurora": "זוהר קוטבי", "deepSpace": "חלל עמוק" },
     "hazard": { "bomb": "פצצה", "hurricane": "סופה", "wobble": "רעד", "sabotage": "חבלה", "lost": "{kind}! נפלו {n} קומות" },
+    "clutch": { "save": "הצלה ברגע האחרון!", "critical": "מתנדנד — נחיתה נקייה!" },
+    "daily": { "badge": "יומי · {date}", "streak": "רצף {n} ימים", "toDaily": "יומי", "toEndless": "אינסופי" },
+    "perk": { "title": "בחרו מתנה", "subtitle": "בחרו אחת — היא נשארת לכל הטיפוס", "skip": "דלגו בינתיים", "masterCrane": { "name": "מנופאי מומחה", "desc": "תגמול גדול יותר על הנחה מושלמת" }, "tallTimber": { "name": "קורות גבוהות", "desc": "+12% גובה בכל קומה" }, "featherfall": { "name": "נפילת נוצה", "desc": "התמוטטות מפילה קומה אחת פחות" }, "reinforced": { "name": "מחוזק", "desc": "יותר התנדנדות לפני הסכנה" }, "cushion": { "name": "כרית ביטחון", "desc": "התנדנדות מנוף לא מפילה קומות" } },
     "crane": { "place": "הנח את המילה", "tapToDrop": "הקש כדי לשחרר", "perfect": "מושלם!", "good": "יפה!", "sloppy": "מתנדנד", "miss": "אופס!", "stability": "יציבות" },
     "sabotage": { "chip": "כדור הריסה", "tokens": "{n}", "pickTarget": "בחר יריב", "noTargets": "אין יריבים לכיוון כרגע", "confirm": "לשלוח כדור הריסה אל {name}?", "send": "שלח", "cancel": "ביטול", "sentTo": "💥 פגעת ב-{name} — מטר אחד פחות", "incoming": "🚨 חבלה מתקרבת מ-{name}!", "recovered": "המגדל עומד. תמשיכו לטפס.", "earned": "🎯 השגת כדור הריסה!", "earnedHint": "{n} הנחות מושלמות ברצף" },
     "error": { "too_short": "קצר מדי — 3 אותיות לפחות", "bad_chain": "התחילו באות הזוהרת", "not_buildable": "השתמשו באותיות המגש", "duplicate": "כבר השתמשת במילה הזו", "not_in_dictionary": "לא במילון" },
@@ -965,7 +971,7 @@ const he = {
     "soundEffects": "אפקטים קוליים",
     "accessibility": "נגישות",
     "cosyMode": "מצב רגוע",
-    "cosyModeDescription": "חזות עדינה יותר, ללא הבהובי לחץ זמן, חגיגות רכות יותר",
+    "cosyModeDescription": "חזות רכה יותר, ללא הבהובי לחץ זמן, ללא קונפטי — אישור שקט במקום",
     "reduceMotion": "הפחתת תנועה",
     "reduceMotionDescription": "הגבלת אנימציות",
     "fireRoundLights": "תאורת סיבוב אש",

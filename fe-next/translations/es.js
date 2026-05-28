@@ -1,5 +1,8 @@
 // Es translations
 const es = {
+  "cosy": {
+    "wellDone": "Bien hecho"
+  },
   "shiritori": {
     "chain": "Cadena de palabras",
     "inputLabel": "Escribe tu palabra",
@@ -85,6 +88,9 @@ const es = {
     "zone": { "entered": "Nueva zona", "next": "Siguiente: {zone} · {m}m" },
     "landmark": { "skyscraper": "Cima del rascacielos", "cloudBase": "Base de nubes", "mountainTop": "Pico de montaña", "jetStream": "Corriente en chorro", "stormTops": "Cima de tormenta", "weatherBalloon": "Globo meteorológico", "earthCurve": "Curvatura terrestre", "karman": "Borde del espacio", "meteorBelt": "Cinturón de meteoros", "aurora": "Aurora", "deepSpace": "Espacio profundo" },
     "hazard": { "bomb": "Bomba", "hurricane": "Huracán", "wobble": "Tambaleo", "sabotage": "Sabotaje", "lost": "¡{kind}! −{n} pisos" },
+    "clutch": { "save": "¡Salvada increíble!", "critical": "¡Tambalea — aterriza limpio!" },
+    "daily": { "badge": "Diario · {date}", "streak": "racha de {n} días", "toDaily": "Diario", "toEndless": "Infinito" },
+    "perk": { "title": "Elige un don", "subtitle": "Elige uno — dura toda la escalada", "skip": "Saltar por ahora", "masterCrane": { "name": "Grúa maestra", "desc": "Mayor recompensa en caídas perfectas" }, "tallTimber": { "name": "Madera alta", "desc": "+12% de altura en cada piso" }, "featherfall": { "name": "Caída de pluma", "desc": "Los derrumbes cuestan un piso menos" }, "reinforced": { "name": "Reforzado", "desc": "Más tambaleo antes del abismo" }, "cushion": { "name": "Cojín de seguridad", "desc": "El vaivén de la grúa nunca tira un piso" } },
     "crane": { "place": "Coloca tu palabra", "tapToDrop": "Toca para soltar", "perfect": "¡Perfecto!", "good": "¡Bien!", "sloppy": "Tambaleante", "miss": "¡Ups!", "stability": "Estabilidad" },
     "sabotage": { "chip": "Bola de demolición", "tokens": "{n}", "pickTarget": "Elige un rival", "noTargets": "Aún no hay rivales", "confirm": "¿Enviar bola de demolición a {name}?", "send": "Enviar", "cancel": "Cancelar", "sentTo": "💥 Golpeaste a {name} — −1m", "incoming": "🚨 ¡Sabotaje entrante de {name}!", "recovered": "La torre resiste. Sigue subiendo.", "earned": "🎯 ¡Bola de demolición ganada!", "earnedHint": "{n} caídas perfectas seguidas" },
     "error": { "too_short": "Muy corta — 3+ letras", "bad_chain": "Empieza con la letra brillante", "not_buildable": "Usa las letras de la bandeja", "duplicate": "Ya usaste esa palabra", "not_in_dictionary": "No está en el diccionario" },
@@ -953,7 +959,7 @@ const es = {
     "soundEffects": "Efectos de Sonido",
     "accessibility": "Accesibilidad",
     "cosyMode": "Modo tranquilo",
-    "cosyModeDescription": "Efectos más suaves, sin parpadeos de presión de tiempo, celebraciones tranquilas",
+    "cosyModeDescription": "Visuales más suaves, sin parpadeos de presión, sin confeti — confirmaciones tranquilas",
     "reduceMotion": "Reducir Movimiento",
     "reduceMotionDescription": "Limitar animaciones",
     "fireRoundLights": "Luces de Ronda de Fuego",

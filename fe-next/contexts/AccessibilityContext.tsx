@@ -25,8 +25,9 @@ interface AccessibilitySettings {
   /**
    * Cosy / Calm Mode — global calm overlay. When on, it ORs every calming flag
    * on (reduce motion, fire-round lights, earthquakes, large letters),
-   * suppresses timer urgency, and switches celebrations to gentle. It can only
-   * make the game calmer, never louder. Haptics are deliberately untouched.
+   * suppresses timer urgency, and switches celebrations to calm (particle
+   * effects off, replaced by dignified quiet feedback). It can only make the
+   * game calmer, never louder. Haptics are deliberately untouched.
    */
   cosyMode: boolean;
 }
@@ -60,7 +61,7 @@ interface AccessibilityContextType {
   largeLettersEnabled: boolean;
   /** Whether the timer should stop escalating its urgency (cosy) */
   suppressTimerUrgency: boolean;
-  /** Celebration intensity — 'gentle' under cosy, else 'full' */
+  /** Celebration intensity — 'calm' under cosy (effects off), else 'full' */
   celebrationIntensity: CelebrationIntensity;
   /** Update a specific setting */
   updateSetting: <K extends keyof AccessibilitySettings>(
@@ -356,7 +357,7 @@ export function useSuppressTimerUrgency(): boolean {
 }
 
 /**
- * Hook that returns the celebration intensity ('gentle' under cosy, else 'full').
+ * Hook that returns the celebration intensity ('calm' under cosy, else 'full').
  * Safe to use outside of provider - returns 'full'.
  */
 export function useCelebrationIntensity(): CelebrationIntensity {

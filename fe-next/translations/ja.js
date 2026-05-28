@@ -1,5 +1,8 @@
 // Ja translations
 const ja = {
+  "cosy": {
+    "wellDone": "おみごと"
+  },
   "shiritori": {
     "chain": "言葉のチェーン",
     "inputLabel": "言葉を入力",
@@ -85,6 +88,9 @@ const ja = {
     "zone": { "entered": "新エリア", "next": "次: {zone} · あと{m}m" },
     "landmark": { "skyscraper": "超高層ビルの上", "cloudBase": "雲の底", "mountainTop": "山頂", "jetStream": "ジェット気流", "stormTops": "雷雲の頂", "weatherBalloon": "気象観測気球", "earthCurve": "地球の弧", "karman": "宇宙の境界", "meteorBelt": "流星帯", "aurora": "オーロラ", "deepSpace": "深宇宙" },
     "hazard": { "bomb": "爆弾", "hurricane": "ハリケーン", "wobble": "ぐらつき", "sabotage": "妨害", "lost": "{kind}！{n}階崩落" },
+    "clutch": { "save": "ギリギリセーフ！", "critical": "ぐらぐら — きれいに着地！" },
+    "daily": { "badge": "デイリー · {date}", "streak": "{n}日連続", "toDaily": "デイリー", "toEndless": "エンドレス" },
+    "perk": { "title": "ボーナスを選ぶ", "subtitle": "1つ選択 — この登攀の間ずっと有効", "skip": "今回はスキップ", "masterCrane": { "name": "マスタークレーン", "desc": "パーフェクト時の報酬アップ" }, "tallTimber": { "name": "ノッポ材木", "desc": "全階の高さ+12%" }, "featherfall": { "name": "フェザーフォール", "desc": "崩落で失う階が1つ減る" }, "reinforced": { "name": "補強済み", "desc": "崖っぷちまでの猶予が増える" }, "cushion": { "name": "安全クッション", "desc": "クレーンのぐらつきで階が落ちない" } },
     "crane": { "place": "単語を置く", "tapToDrop": "タップして落とす", "perfect": "パーフェクト！", "good": "ナイス！", "sloppy": "ぐらぐら", "miss": "おっと！", "stability": "安定" },
     "sabotage": { "chip": "鉄球", "tokens": "{n}", "pickTarget": "ライバルを選ぶ", "noTargets": "まだ標的がいません", "confirm": "{name}に鉄球を送る？", "send": "送る", "cancel": "キャンセル", "sentTo": "💥 {name}に命中 — −1m", "incoming": "🚨 {name}から妨害が来ます！", "recovered": "塔は健在。登り続けよう。", "earned": "🎯 鉄球を獲得！", "earnedHint": "{n}回連続パーフェクト" },
     "error": { "too_short": "短すぎます — 3文字以上", "bad_chain": "光る文字で始めてください", "not_buildable": "トレイの文字を使ってください", "duplicate": "その単語は使用済みです", "not_in_dictionary": "辞書にありません" },
@@ -966,7 +972,7 @@ const ja = {
     "soundEffects": "効果音",
     "accessibility": "アクセシビリティ",
     "cosyMode": "おだやかモード",
-    "cosyModeDescription": "やさしい表示、時間プレッシャーの点滅なし、控えめなお祝い",
+    "cosyModeDescription": "穏やかな見た目、時間プレッシャーの点滅なし、紙吹雪なし — 静かな承認に",
     "reduceMotion": "視差効果を減らす",
     "reduceMotionDescription": "アニメーションを制限",
     "fireRoundLights": "ファイアラウンドライト",

@@ -104,11 +104,29 @@ describe('cosy paper-palette contract (globals.css)', () => {
     }
   });
 
-  it('warms muted secondary text (not the default bluish gray)', () => {
+  it('warms muted secondary text (not the default bluish gray) AND clears WCAG AA on sand', () => {
     const muted = tokenValue(block, '--muted-foreground');
     expect(muted, 'cosy must override --muted-foreground (hardcoded bluish in :root)').toBeTruthy();
     const hsl = parseHsl(muted!);
     if (hsl) expect(isWarmHue(hsl.h), `muted-foreground hue ${hsl.h} must be warm`).toBe(true);
+    // Secondary text legibility is critical for this mode's elder audience: it
+    // must pass AA on the sand backdrop, not just look warm. (Regression guard
+    // for the L44 = 3.17:1 fail.)
+    const sand = tokenValue(block, '--neo-navy')!;
+    expect(contrastRatio(muted!, sand), 'muted text on sand backdrop').toBeGreaterThanOrEqual(AA);
+  });
+
+  it('defines a functional edge strong enough for control borders + focus (>=3:1)', () => {
+    const AA_UI = 3; // WCAG 1.4.11 non-text contrast
+    const edge = tokenValue(block, '--cosy-edge-strong');
+    expect(edge, 'cosy must define --cosy-edge-strong for input borders / focus rings').toBeTruthy();
+    const sand = tokenValue(block, '--neo-navy')!;
+    const cream = tokenValue(block, '--neo-cream')!;
+    expect(contrastRatio(edge!, sand), 'functional edge on sand').toBeGreaterThanOrEqual(AA_UI);
+    expect(contrastRatio(edge!, cream), 'functional edge on cream').toBeGreaterThanOrEqual(AA_UI);
+    // The keyboard-focus indicator must use it (default sage ring is too light).
+    const ring = tokenValue(block, '--ring');
+    expect(ring, 'cosy must point --ring at the strong edge').toMatch(/cosy-edge-strong/);
   });
 
   it('re-enables a subtle paper grain, but no neon retro grid (calm, not noisy)', () => {
