@@ -26,6 +26,7 @@ import { useCraneDrop } from './useCraneDrop';
 import { useWordTowerPerks } from './useWordTowerPerks';
 import { WordTowerPerkDraft } from './WordTowerPerkDraft';
 import { perkMilestoneAt, reducedTopple, PERKS } from '@/lib/wordTower/perks';
+import { beatsDailyBest } from '@/lib/wordTower/dailyBest';
 import { useSabotageIntegration } from './useSabotage';
 import { WordTowerSabotageBay } from './WordTowerSabotageBay';
 import { hazardsCrossed } from '@/lib/wordTower/hazards';
@@ -53,6 +54,9 @@ interface PlayProps {
   /** Seed for the daily perk draft (the shared daily game code) — perks only
    *  appear in daily mode, so this is unused when `daily` is false. */
   perkSeed?: string;
+  /** Fires (daily mode) the first time the climb beats today's stored best —
+   *  the wrapper persists the new best. */
+  onNewDailyBest?: (heightM: number) => void;
 }
 
 function usePrefersReducedMotion(): boolean {
@@ -63,7 +67,7 @@ function usePrefersReducedMotion(): boolean {
   return ref.current;
 }
 
-export function WordTowerPlay({ language, isInDictionary, dictionary, initialGame, personalBestM, onOpenLeaderboard, rivals = [], daily = false, onDailyEngaged, perkSeed = '' }: PlayProps) {
+export function WordTowerPlay({ language, isInDictionary, dictionary, initialGame, personalBestM, onOpenLeaderboard, rivals = [], daily = false, onDailyEngaged, perkSeed = '', onNewDailyBest }: PlayProps) {
   const { t, dir } = useLanguage();
   const reducedMotion = usePrefersReducedMotion();
   const tower = useWordTower({ language, sessionId: 'solo', isInDictionary, initialGame });
@@ -300,6 +304,19 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   useEffect(() => {
     if (daily && floorsCount >= 1) onDailyEngaged?.();
   }, [daily, floorsCount, onDailyEngaged]);
+
+  // Daily best → the self-comparison routine beat. Fires once the moment the
+  // climb first passes the best this run started with; the wrapper persists it.
+  const [newBestShown, setNewBestShown] = useState(false);
+  const [newBestText, setNewBestText] = useState<string | null>(null);
+  useEffect(() => {
+    if (!daily || newBestShown || !beatsDailyBest(personalBestM, game.heightM)) return;
+    setNewBestShown(true);
+    setNewBestText(t('wordTower.daily.newBest'));
+    onNewDailyBest?.(game.heightM);
+    const id = setTimeout(() => setNewBestText(null), 2200);
+    return () => clearTimeout(id);
+  }, [daily, newBestShown, personalBestM, game.heightM, onNewDailyBest]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (game.heightM > 0) save(); }, [biomeId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Always flush when the tab is hidden / page unloads.
@@ -493,6 +510,16 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           aria-live="assertive"
         >
           {clutchText}
+        </div>
+      )}
+
+      {/* New daily best — the self-comparison routine beat. Gold = personal record. */}
+      {newBestText && (
+        <div
+          className={`pointer-events-none absolute left-1/2 top-[19%] z-40 -translate-x-1/2 flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-2 text-center font-neo-display text-base font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          aria-live="polite"
+        >
+          🏆 {newBestText}
         </div>
       )}
 

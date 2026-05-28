@@ -11,6 +11,7 @@ import {
 } from '@/lib/wordTower/wordTowerManager';
 import { useWordTowerRivals } from '@/lib/wordTower/useWordTowerRivals';
 import { dailyTowerGameCode, DAILY_PLAYER_ID, utcDateKey } from '@/lib/wordTower/dailySeed';
+import { dailyBestKey, mergeDailyBest } from '@/lib/wordTower/dailyBest';
 import { useDailyStreak } from '@/lib/wordTower/useDailyStreak';
 import { WordTowerPlay } from './WordTowerPlay';
 import { WordTowerLeaderboard } from './WordTowerLeaderboard';
@@ -94,6 +95,16 @@ export function WordTowerGame() {
     [],
   );
 
+  // Persist today's daily best so the minimap tick + next-attempt baseline reflect
+  // prior climbs (the self-comparison loop).
+  const persistDailyBest = useCallback((heightM: number) => {
+    try {
+      const key = dailyBestKey(utcDateKey());
+      const stored = Number(localStorage.getItem(key)) || 0;
+      localStorage.setItem(key, String(mergeDailyBest(stored, heightM)));
+    } catch { /* best-effort */ }
+  }, []);
+
   const openLeaderboard = useCallback(() => setShowLeaderboard(true), []);
   const closeLeaderboard = useCallback(() => setShowLeaderboard(false), []);
   const rivals = useWordTowerRivals();
@@ -127,6 +138,7 @@ export function WordTowerGame() {
         daily={daily}
         onDailyEngaged={recordPlay}
         perkSeed={daily ? dailyTowerGameCode() : ''}
+        onNewDailyBest={persistDailyBest}
       />
 
       {/* Daily badge + streak + mode toggle — the routine hook. Top-centre, above
